@@ -66,17 +66,18 @@ OBJS  = ..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\zabbix_agent\zabbix_agentd.o \
 	..\..\..\src\zabbix_agent\zbxconf.o \
 	..\..\..\src\libs\zbxregexp\gnuregex.o \
-	..\..\..\src\libs\zbxregexp\zbxregexp.o
+	..\..\..\src\libs\zbxregexp\zbxregexp.o \
+	..\..\..\src\libs\zbxwin32\fatal.o
 
 LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib delayimp.lib wevtapi.lib
 
 all: $(PROGNAME)
 
 clean:
-	del $(OBJS) $(RESOURCE_RES) $(MESSAGES_H) $(PROGNAME) messages.rc MSG00001.bin zabbix_agentd.exe.manifest
+	del $(OBJS) $(RESOURCE_RES) $(MESSAGES_H) $(PROGNAME) messages.rc MSG00001.bin zabbix_agentd.exe.manifest *.idb *.pdb
 
 $(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_RES)
-	$(LINKER) $(OBJS) $(RESOURCE_RES) /OUT:$(PROGNAME) $(LFLAGS) $(LIBS)
+	$(LINKER) $(OBJS) $(RESOURCE_RES) /OUT:$(PROGNAME) /PDB:$(PDBNAME) $(LFLAGS) $(LIBS)
 	$(MT) /outputresource:"$(PROGNAME);#1" /manifest zabbix_agentd.exe.manifest /nologo
 
 $(MESSAGES_H): messages.mc
@@ -262,4 +263,5 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 ..\..\..\src\zabbix_agent\zbxconf.o: ..\..\..\src\zabbix_agent\zbxconf.c
 	$(CC) ..\..\..\src\zabbix_agent\zbxconf.c /Fo"..\..\..\src\zabbix_agent\zbxconf.o" $(CFLAGS)
 
-
+..\..\..\src\libs\zbxwin32\fatal.o: ..\..\..\src\libs\zbxwin32\fatal.c
+	$(CC) ..\..\..\src\libs\zbxwin32\fatal.c /Fo"..\..\..\src\libs\zbxwin32\fatal.o" $(CFLAGS)
