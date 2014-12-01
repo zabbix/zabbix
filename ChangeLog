@@ -14,6 +14,7 @@ New features:
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+..F....... [ZBX-8943] fixed script ordering when using backslashes in popup script menus (arvids)
 ..F....... [ZBX-8922] fixed form element positioning issues in host add/edit form (arvids)
 ..F....... [ZBX-8934] removed translation for the bytes unit prefixes (KB, MB, etc) (arvids)
 ..F....... [ZBX-8888] fixed history.php showing data for 11 more seconds than the defined interval (arvids)
