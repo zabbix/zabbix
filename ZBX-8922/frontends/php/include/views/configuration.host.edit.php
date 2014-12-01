@@ -260,7 +260,7 @@ if (!$isDiscovered) {
 	$buttonCol->addItem($helpTextWhenDragInterfaceAgent);
 
 	$buttonRow = new CRow(array($buttonCol));
-	$buttonRow->setAttribute('id', 'agentIterfacesFooter');
+	$buttonRow->setAttribute('id', 'agentInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 
@@ -277,7 +277,7 @@ if (!$isDiscovered) {
 	$buttonCol->addItem($helpTextWhenDragInterfaceSNMP);
 
 	$buttonRow = new CRow(array($buttonCol));
-	$buttonRow->setAttribute('id', 'SNMPIterfacesFooter');
+	$buttonRow->setAttribute('id', 'SNMPInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 
@@ -293,7 +293,7 @@ if (!$isDiscovered) {
 	$buttonCol->addItem($helpTextWhenDragInterfaceJMX);
 
 	$buttonRow = new CRow(array($buttonCol));
-	$buttonRow->setAttribute('id', 'JMXIterfacesFooter');
+	$buttonRow->setAttribute('id', 'JMXInterfacesFooter');
 	$ifTab->addRow($buttonRow);
 
 	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
@@ -308,7 +308,7 @@ if (!$isDiscovered) {
 	$buttonCol->addItem($helpTextWhenDragInterfaceIPMI);
 
 	$buttonRow = new CRow(array($buttonCol));
-	$buttonRow->setAttribute('id', 'IPMIIterfacesFooter');
+	$buttonRow->setAttribute('id', 'IPMIInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
@@ -322,7 +322,7 @@ else {
 		$existingInterfaceTypes[$interface['type']] = true;
 		$interfaces[$interface['interfaceid']] = $interface;
 	}
-	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson($interfaces).');');
+	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson(array_values($interfaces)).');');
 	zbx_add_post_js('hostInterfacesManager.disable();');
 
 	// table for agent interfaces with footer
@@ -341,7 +341,7 @@ else {
 		new CCol(SPACE, 'interface-control')
 	));
 
-	$row = new CRow(null, null, 'agentIterfacesFooter');
+	$row = new CRow(null, null, 'agentInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_AGENT])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No agent interfaces found.'), null, 5));
@@ -355,7 +355,7 @@ else {
 	$ifTab->setAttribute('id', 'SNMPInterfaces');
 	$ifTab->setAttribute('data-type', 'snmp');
 
-	$row = new CRow(null, null, 'SNMPIterfacesFooter');
+	$row = new CRow(null, null, 'SNMPInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No SNMP interfaces found.'), null, 5));
@@ -368,7 +368,7 @@ else {
 	$ifTab->setAttribute('id', 'JMXInterfaces');
 	$ifTab->setAttribute('data-type', 'jmx');
 
-	$row = new CRow(null, null, 'JMXIterfacesFooter');
+	$row = new CRow(null, null, 'JMXInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No JMX interfaces found.'), null, 5));
@@ -381,7 +381,7 @@ else {
 	$ifTab->setAttribute('id', 'IPMIInterfaces');
 	$ifTab->setAttribute('data-type', 'ipmi');
 
-	$row = new CRow(null, null, 'IPMIIterfacesFooter');
+	$row = new CRow(null, null, 'IPMIInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
 		$row->addItem(new CCol(null, 'interface-drag-control'));
 		$row->addItem(new CCol(_('No IPMI interfaces found.'), null, 5));
@@ -818,7 +818,7 @@ $inventoryTypeRadioButton = array(
 	$inventoryAutomaticBtn,
 	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
 );
-$inventoryFormList->addRow(SPACE, new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
+$inventoryFormList->addRow(SPACE, new CDiv($inventoryTypeRadioButton, 'jqueryinputset radioset'));
 
 $hostInventoryTable = DB::getSchema('host_inventory');
 $hostInventoryFields = getHostInventories();
@@ -894,7 +894,7 @@ if (getRequest('hostid') && !in_array(getRequest('form'), array('clone', 'full_c
 else {
 	$frmHost->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('groupid'))
+		array(new CButtonCancel(url_param('groupid')))
 	));
 }
 

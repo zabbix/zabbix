@@ -187,4 +187,6 @@ char		*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len);
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
 char		*zbx_db_dyn_escape_like_pattern(const char *src);
 
+int		zbx_db_strlen_n(const char *text, size_t maxlen);
+
 #endif
