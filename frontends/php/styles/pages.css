@@ -20,7 +20,7 @@
 
 /* host edit */
 .host-edit .interface-group,
-.hostprototype-edit .interface-group { width: 750px; }
+.hostprototype-edit .interface-group { width: 800px; }
 .host-edit .interface-row .dt,
 .hostprototype-edit .interface-row .dt { padding-top: 5px; }
 .host-edit .interface-row .dd,
@@ -32,19 +32,27 @@
 .host-edit .interface-row .interface-drag-control,
 .host-edit .interface-row .interface-add-control,
 .hostprototype-edit .interface-row .interface-drag-control,
-.hostprototype-edit .interface-row .interface-add-control { width: 28px; }
+.hostprototype-edit .interface-row .interface-add-control { width: 30px; }
 .host-edit .interface-row .interface-ip,
-.hostprototype-edit .interface-row .interface-ip { width: 16.5em; }
+.hostprototype-edit .interface-row .interface-ip { width: 170px; }
+.host-edit .interface-row .interface-ip input[type="text"],
+.hostprototype-edit .interface-row .interface-ip input[type="text"] { width: 160px; }
 .host-edit .interface-row .interface-dns,
-.hostprototype-edit .interface-row .interface-dns { width: 20em; }
+.hostprototype-edit .interface-row .interface-dns { width: 200px; }
+.host-edit .interface-row .interface-dns input[type="text"],
+.hostprototype-edit .interface-row .interface-dns input[type="text"] { width: 200px; }
 .host-edit .interface-row .interface-connect-to,
-.hostprototype-edit .interface-row .interface-connect-to { width: 8em; white-space: nowrap; }
+.hostprototype-edit .interface-row .interface-connect-to { width: 110px; }
 .host-edit .interface-row .interface-port,
-.hostprototype-edit .interface-row .interface-port { width: 11em; }
+.hostprototype-edit .interface-row .interface-port { width: 100px; }
+.host-edit .interface-row .interface-port input[type="text"],
+.hostprototype-edit .interface-row .interface-port input[type="text"] { width: 100px; }
 .host-edit .interface-row .interface-default,
-.hostprototype-edit .interface-row .interface-default { width: 4em; }
+.hostprototype-edit .interface-row .interface-default { width: 40px; }
 .host-edit .interface-row .interface-bulk,
 .hostprototype-edit .interface-row .interface-bulk { height: 25px; margin-top: 5px; }
+.host-edit .interface-row .interface-bulk label,
+.hostprototype-edit .interface-row .interface-bulk label { position: absolute; }
 .host-edit .interface-row-first .dd,
 .hostprototype-edit .interface-row-first .dd { padding-top: 2px; }
 .host-edit .interface-row-first .objectgroup,
