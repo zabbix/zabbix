@@ -2252,7 +2252,6 @@ function uncheckTableRows($cookieId = null) {
  */
 function splitPath($path, $stripSlashes = true, $cleanupBackslashes = false) {
 	$position = 0;
-
 	$escapeCharacters = '';
 	$pathItemsArray = array();
 	$pathItemString = '';
@@ -2260,6 +2259,7 @@ function splitPath($path, $stripSlashes = true, $cleanupBackslashes = false) {
 	for ($stringLength = strlen($path); $position < $stringLength; ++$position) {
 		// Determine how many escape characters we already have in the backlog.
 		$escapeCharacterCount = strlen($escapeCharacters);
+
 		if ($path[$position] === '/') {
 			// If we have no escape chars previously - save item into the array and move on.
 			if ($escapeCharacterCount == 0) {
@@ -2268,19 +2268,23 @@ function splitPath($path, $stripSlashes = true, $cleanupBackslashes = false) {
 				$pathItemString = '';
 				continue;
 			}
+
 			// We have a backslash before the / - keep it as part of the item and clean escape char buffer.
 			$pathItemString .= $escapeCharacters.$path[$position];
 			$escapeCharacters = '';
 		}
 		elseif ($cleanupBackslashes && $path[$position] === '\\') {
-			// If we had a backslash before - this is an escaped backslash, keep it and empty char backlog.
-			// This way we save only paired backslashes.
+
+			/*
+			 * If we had a backslash before - this is an escaped backslash, keep it and empty char backlog. This way
+			 * we save only paired backslashes.
+			 */
 			if ($escapeCharacterCount == 1) {
 				$pathItemString .= $escapeCharacters.$path[$position];
 				$escapeCharacters = '';
 			}
 			else {
-				// It is a first backslash - add it to the backlog
+				// It is a first backslash - add it to the backlog.
 				$escapeCharacters .= $path[$position];
 			}
 		}
@@ -2290,6 +2294,7 @@ function splitPath($path, $stripSlashes = true, $cleanupBackslashes = false) {
 			$escapeCharacters = '';
 		}
 	}
+
 	// Save the path tail.
 	if (strlen($pathItemString) != 0) {
 		$pathItemsArray[] = $pathItemString;
