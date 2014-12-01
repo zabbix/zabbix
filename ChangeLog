@@ -54,6 +54,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian and Slovak translati
 .......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
 
 Bug fixes:
+A.F....... [ZBX-9065] fixed default value for screens_items.max_columns in PHP schema (Krists)
 ..F....... [ZBX-5077] fixed percentile calculation formula and corrected accessed index, by which value is selected (arvids)
 A......... [ZBX-8486] fixed re-linking templates with web scenarios (Krists)
 ..F....... [ZBX-8863] fixed ad-hoc graphs with multiple items for the same host not showing the hosts name (arvids)
@@ -547,7 +548,6 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-A.F....... [ZBX-9065] fixed default value for screens_items.max_columns in PHP schema (Krists)
 ..F....... [ZBX-5077] fixed percentile calculation formula and corrected accessed index, by which value is selected (arvids)
 A......... [ZBX-8486] fixed re-linking templates with web scenarios (Krists)
 ..F....... [ZBX-8919] fixed range selection in graphs in IE10 and IE11 (arvids)
