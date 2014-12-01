@@ -113,6 +113,59 @@ out:
 	return ret;
 }
 
+static int	get_function_parameter_float(zbx_uint64_t hostid, const char *parameters, int Nparam, double *value)
+{
+	const char	*__function_name = "get_function_parameter_float";
+	char		*parameter;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __function_name, parameters, Nparam);
+
+	if (NULL == (parameter = get_param_dyn(parameters, Nparam)))
+		goto out;
+
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
+			&parameter, MACRO_TYPE_COMMON, NULL, 0))
+	{
+		int		digits;
+		const char	*p = parameter, *dot;
+
+		while (0 != isdigit(*p))
+			p++;
+
+		digits = p - parameter;
+
+		if ('.' == *p)
+		{
+			dot = p++;
+
+			while (0 != isdigit(*p))
+				p++;
+
+			if (4 < p - dot - 1)	/* limit to 4 digits after the decimal point */
+				goto clean;
+
+			digits += p - dot - 1;
+		}
+
+		if ('\0' != *p || 0 == digits)
+			goto clean;
+
+		*value = atof(parameter);
+
+		ret = SUCCEED;
+	}
+
+	if (SUCCEED == ret)
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:" ZBX_FS_DBL, __function_name, *value);
+clean:
+	zbx_free(parameter);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
 static int	get_function_parameter_str(zbx_uint64_t hostid, const char *parameters, int Nparam, char **value)
 {
 	const char	*__function_name = "get_function_parameter_str";
@@ -1027,8 +1080,8 @@ static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *function,
 {
 	const char			*__function_name = "evaluate_PERCENTILE";
 
-	int				nparams, ret = FAIL, seconds = 0, nvalues = 0;
-	int				arg1, time_shift, percentile, flag;
+	int				nparams, arg1, time_shift, flag, ret = FAIL, seconds = 0, nvalues = 0;
+	double				percentile;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1072,7 +1125,7 @@ static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *function,
 
 	now -= time_shift;
 
-	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 3, &percentile, &flag) ||
+	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 3, &percentile) ||
 			0 == percentile || percentile > 100)
 	{
 		*error = zbx_strdup(*error, "invalid third parameter");
@@ -1091,7 +1144,7 @@ static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *function,
 		else
 			zbx_vector_history_record_sort(&values, (zbx_compare_func_t)__history_record_uint64_compare);
 
-		index = (int)((values.values_num * (zbx_uint64_t)percentile + 99) / 100);
+		index = (int)ceil(values.values_num * (percentile / 100));
 
 		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &values.values[index - 1].value, item->value_type);
 
