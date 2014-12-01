@@ -120,7 +120,7 @@ int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 			goto fail;
 		}
 
-		*(void **)(&func_version) = dlsym(lib, ZBX_MODULE_FUNC_API_VERSION);
+		func_version = (int (*)(void))dlsym(lib, ZBX_MODULE_FUNC_API_VERSION);
 		if (NULL == func_version)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot find \"" ZBX_MODULE_FUNC_API_VERSION "()\""
@@ -136,7 +136,7 @@ int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 			goto fail;
 		}
 
-		*(void **)(&func_init) = dlsym(lib, ZBX_MODULE_FUNC_INIT);
+		func_init = (int (*)(void))dlsym(lib, ZBX_MODULE_FUNC_INIT);
 		if (NULL == func_init)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot find \"" ZBX_MODULE_FUNC_INIT "()\""
@@ -153,7 +153,7 @@ int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 		}
 
 		/* the function is optional, zabbix will load the module even if it is missing */
-		*(void **)(&func_timeout) = dlsym(lib, ZBX_MODULE_FUNC_ITEM_TIMEOUT);
+		func_timeout = (void (*)(void))dlsym(lib, ZBX_MODULE_FUNC_ITEM_TIMEOUT);
 		if (NULL == func_timeout)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_ITEM_TIMEOUT "()\""
@@ -162,7 +162,7 @@ int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 		else
 			func_timeout(timeout);
 
-		*(void **)(&func_list) = dlsym(lib, ZBX_MODULE_FUNC_ITEM_LIST);
+		func_list = (ZBX_METRIC *(*)(void))dlsym(lib, ZBX_MODULE_FUNC_ITEM_LIST);
 		if (NULL == func_list)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"" ZBX_MODULE_FUNC_ITEM_LIST "()\""
@@ -234,7 +234,7 @@ void	unload_modules()
 
 	for (module = modules; NULL != *module; module++)
 	{
-		*(void **)(&func_uninit) = dlsym(*module, ZBX_MODULE_FUNC_UNINIT);
+		func_uninit = (int (*)(void))dlsym(*module, ZBX_MODULE_FUNC_UNINIT);
 		if (NULL == func_uninit)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_UNINIT "()\" function: %s",
