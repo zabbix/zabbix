@@ -28,10 +28,11 @@
 #include "mediatype.h"
 #include "user.h"
 
-#define ZBX_API_MEDIATYPE_GET_TAG_MEDIATYPEIDS	"mediatypeids"
-#define ZBX_API_MEDIATYPE_GET_TAG_MEDIAIDS	"mediaids"
-#define ZBX_API_MEDIATYPE_GET_TAG_USERIDS	"userids"
-#define ZBX_API_MEDIATYPE_GET_TAG_SELECTUSERS	"selectUsers"
+/* mediatype.get */
+#define ZBX_API_PARAM_GET_MEDIATYPEIDS		"mediatypeids"
+#define ZBX_API_PARAM_GET_MEDIAIDS		"mediaids"
+#define ZBX_API_PARAM_GET_USERIDS		"userids"
+#define ZBX_API_PARAM_GET_SELECTUSERS		"selectUsers"
 
 typedef struct
 {
@@ -43,34 +44,37 @@ typedef struct
 
 	zbx_api_query_t		select_users;
 
-	zbx_api_getoptions_t		options;
+	zbx_api_getoptions_t	options;
 }
 zbx_api_mediatype_get_t;
 
-
 /* TODO: wrap into class defining other object properties if necessary */
-const zbx_api_field_t zbx_api_object_mediatype[] = {
-		{"mediatypeid", ZBX_TYPE_ID, ZBX_API_FIELD_FLAG_SORTABLE},
-		{"type", ZBX_TYPE_INT, ZBX_API_FIELD_FLAG_REQUIRED},
-		{"description", ZBX_TYPE_CHAR,  ZBX_API_FIELD_FLAG_REQUIRED},
-		{"smtp_server", ZBX_TYPE_CHAR, 0},
-		{"smtp_email", ZBX_TYPE_CHAR, 0},
-		{"exec_path", ZBX_TYPE_CHAR, 0},
-		{"gsm_modem", ZBX_TYPE_CHAR, 0},
-		{"username", ZBX_TYPE_CHAR, 0},
-		{"passwd", ZBX_TYPE_CHAR, 0},
-		{"status", ZBX_TYPE_INT, 0},
+static zbx_api_property_t zbx_api_object_properties[] = {
+		{"mediatypeid", "mediatypeid", NULL, ZBX_API_FIELD_FLAG_SORTABLE},
+		{"type", "type", NULL, ZBX_API_FIELD_FLAG_REQUIRED},
+		{"description", "description", NULL,  ZBX_API_FIELD_FLAG_REQUIRED},
+		{"smtp_server", "smtp_server", NULL,  0},
+		{"smtp_email", "smtp_email", NULL, 0},
+		{"exec_path", "exec_path", NULL, 0},
+		{"gsm_modem", "gsm_modem", NULL, 0},
+		{"username", "username", NULL, 0},
+		{"passwd", "passwd", NULL, 0},
+		{"status", "status", NULL, 0},
 		{NULL}
 };
 
+zbx_api_object_t	zbx_api_object_mediatype = {"mediatype", "media_type", zbx_api_object_properties};
+
 static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_json_parse *json, char **error);
-static void	zbx_api_mediatype_get_free(zbx_api_mediatype_get_t *self);
+static void	zbx_api_mediatype_get_clean(zbx_api_mediatype_get_t *self);
 
 static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_json_parse *jp, char **error)
 {
 	char		name[ZBX_API_PARAM_NAME_SIZE], *value = NULL;
 	const char	*p = NULL;
 	int		ret = FAIL;
+
+	memset(self, 0, sizeof(zbx_api_mediatype_get_t));
 
 	zbx_vector_uint64_create(&self->mediatypeids);
 	zbx_vector_uint64_create(&self->mediaids);
@@ -83,7 +87,7 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 	{
 		const char	*next = p;
 
-		if (SUCCEED != zbx_api_getoptions_parse(&self->options, zbx_api_object_mediatype, name, jp, &next,
+		if (SUCCEED != zbx_api_getoptions_parse(&self->options, &zbx_api_object_mediatype, name, jp, &next,
 				error))
 		{
 			goto out;
@@ -96,34 +100,34 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 			continue;
 		}
 
-		if (0 == strcmp(name, ZBX_API_MEDIATYPE_GET_TAG_MEDIATYPEIDS))
+		if (0 == strcmp(name, ZBX_API_PARAM_GET_MEDIATYPEIDS))
 		{
-			if (SUCCEED != zbx_api_get_param_idarray(ZBX_API_MEDIATYPE_GET_TAG_MEDIATYPEIDS, &next,
+			if (SUCCEED != zbx_api_get_param_idarray(ZBX_API_PARAM_GET_MEDIATYPEIDS, &next,
 					&self->mediatypeids, error))
 			{
 				goto out;
 			}
 		}
-		else if (0 == strcmp(name, ZBX_API_MEDIATYPE_GET_TAG_MEDIAIDS))
+		else if (0 == strcmp(name, ZBX_API_PARAM_GET_MEDIAIDS))
 		{
-			if (SUCCEED != zbx_api_get_param_idarray(ZBX_API_MEDIATYPE_GET_TAG_MEDIAIDS, &next,
+			if (SUCCEED != zbx_api_get_param_idarray(ZBX_API_PARAM_GET_MEDIAIDS, &next,
 					&self->mediaids, error))
 			{
 				goto out;
 			}
 		}
-		else if (0 == strcmp(name, ZBX_API_MEDIATYPE_GET_TAG_USERIDS))
+		else if (0 == strcmp(name, ZBX_API_PARAM_GET_USERIDS))
 		{
-			if (SUCCEED != zbx_api_get_param_idarray(ZBX_API_MEDIATYPE_GET_TAG_USERIDS, &next,
+			if (SUCCEED != zbx_api_get_param_idarray(ZBX_API_PARAM_GET_USERIDS, &next,
 					&self->userids, error))
 			{
 				goto out;
 			}
 		}
-		else if (0 == strcmp(name, ZBX_API_MEDIATYPE_GET_TAG_SELECTUSERS))
+		else if (0 == strcmp(name, ZBX_API_PARAM_GET_SELECTUSERS))
 		{
-			if (SUCCEED != zbx_api_get_param_query(ZBX_API_MEDIATYPE_GET_TAG_SELECTUSERS, &next,
-					zbx_api_object_user, &self->select_users, error))
+			if (SUCCEED != zbx_api_get_param_query(ZBX_API_PARAM_GET_SELECTUSERS, &next,
+					&zbx_api_object_user, &self->select_users, error))
 			{
 				goto out;
 			}
@@ -136,20 +140,20 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 		}
 	}
 
-	if (SUCCEED != zbx_api_getoptions_finalize(&self->options, zbx_api_object_mediatype, error))
+	if (SUCCEED != zbx_api_getoptions_finalize(&self->options, &zbx_api_object_mediatype, error))
 		goto out;
 
-	if (-1 != self->select_users.key)
+	if (0 != self->select_users.is_set)
 	{
-		if (0 == self->options.output.fields.values_num)
+		if (0 == self->options.output.properties.values_num)
 		{
 			*error = zbx_dsprintf(*error, "Parameter \"selectUsers\" cannot be used with"
-					"parameter \"countOutput\"");
+					" parameter \"countOutput\"");
 			goto out;
 		}
 
 		/* ensure that selected output contains mediatypeid field required to select users */
-		if (SUCCEED != zbx_api_getoptions_add_output_field(&self->options, zbx_api_object_mediatype,
+		if (SUCCEED != zbx_api_getoptions_add_output_field(&self->options, &zbx_api_object_mediatype,
 				"mediatypeid", &self->select_users.key, error))
 			goto out;
 	}
@@ -160,12 +164,12 @@ out:
 	zbx_free(value);
 
 	if (SUCCEED != ret)
-		zbx_api_mediatype_get_free(self);
+		zbx_api_mediatype_get_clean(self);
 
 	return ret;
 }
 
-static void	zbx_api_mediatype_get_free(zbx_api_mediatype_get_t *self)
+static void	zbx_api_mediatype_get_clean(zbx_api_mediatype_get_t *self)
 {
 	zbx_api_getoptions_free(&self->options);
 
@@ -186,22 +190,21 @@ int	zbx_api_mediatype_get(zbx_api_user_t *user, struct zbx_json_parse *jp_reques
 	const char		*sql_condition = " where";
 	zbx_api_get_result_t	result;
 
+	zbx_api_get_result_init(&result);
+
 	if (SUCCEED != zbx_json_brackets_by_name(jp_request, "params", &jp_params))
 	{
-		error = zbx_dsprintf(error, "Cannot open parameters");
+		error = zbx_strdup(error, "Cannot open parameters");
 		goto out;
 	}
 
 	if (SUCCEED != zbx_api_mediatype_get_init(&mediatype, &jp_params, &error))
 		goto out;
 
-	zbx_api_get_result_init(&result);
-
-	if ((USER_TYPE_ZABBIX_ADMIN != user->type || ZBX_API_ACCESS_WRITE == mediatype.options.access) &&
-			USER_TYPE_SUPER_ADMIN != user->type)
-	{
+	/* security checks */
+	if (USER_TYPE_SUPER_ADMIN != user->type &&
+			(USER_TYPE_ZABBIX_ADMIN != user->type || 0 != mediatype.options.editable))
 		goto skip_query;
-	}
 
 	zbx_api_sql_add_query(&sql, &sql_alloc, &sql_offset, &mediatype.options.output, "media_type", "mt");
 
@@ -246,14 +249,14 @@ int	zbx_api_mediatype_get(zbx_api_user_t *user, struct zbx_json_parse *jp_reques
 
 	DBbegin();
 
-	if (SUCCEED != zbx_api_db_fetch_rows(sql, mediatype.options.output.fields.values_num, mediatype.options.limit,
-			&result.rows, &error))
+	if (SUCCEED != zbx_api_db_fetch_rows(sql, mediatype.options.output.properties.values_num,
+			mediatype.options.limit, &result.rows, &error))
 	{
 		DBrollback();
 		goto out;
 	}
 
-	if (-1 != mediatype.select_users.key)
+	if (0 != mediatype.select_users.is_set)
 	{
 		sql_offset = 0;
 		zbx_api_sql_add_query(&sql, &sql_alloc, &sql_offset, &mediatype.select_users, "users", "u");
@@ -272,9 +275,7 @@ int	zbx_api_mediatype_get(zbx_api_user_t *user, struct zbx_json_parse *jp_reques
 skip_query:
 	zbx_api_json_add_result(output, &mediatype.options, &result);
 
-	zbx_api_get_result_clean(&result);
-
-	zbx_api_mediatype_get_free(&mediatype);
+	zbx_api_mediatype_get_clean(&mediatype);
 
 	ret = SUCCEED;
 out:
@@ -282,6 +283,9 @@ out:
 		zbx_api_json_add_error(output, error);
 
 	zbx_free(error);
+	zbx_free(sql);
+
+	zbx_api_get_result_clean(&result);
 
 	return ret;
 }

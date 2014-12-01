@@ -22,7 +22,6 @@
 
 #include "../api.h"
 
-extern const zbx_api_field_t zbx_api_object_user[];
-
+extern zbx_api_object_t	zbx_api_object_user;
 
 #endif

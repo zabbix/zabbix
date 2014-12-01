@@ -22,7 +22,7 @@
 
 #include "../api.h"
 
-extern const zbx_api_field_t zbx_api_object_mediatype[];
+extern zbx_api_object_t zbx_api_object_mediatype;
 
 int	zbx_api_mediatype_get(zbx_api_user_t *user, struct zbx_json_parse *jp_request, struct zbx_json *result);
 

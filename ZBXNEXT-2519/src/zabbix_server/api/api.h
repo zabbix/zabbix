@@ -52,9 +52,6 @@
 #define ZBX_API_RESULT_TAG_ERRDATA	"data"
 
 
-#define ZBX_API_ACCESS_READ		0
-#define ZBX_API_ACCESS_WRITE		1
-
 /* api request data */
 typedef struct
 {
@@ -63,17 +60,34 @@ typedef struct
 }
 zbx_api_user_t;
 
-/* object field definition */
+/* object property definition */
 typedef struct
 {
 	/* field name */
 	char		*name;
-	/* ZBX_TYPE_ */
-	unsigned char	type;
+
+	/* database schema field name, can be NULL */
+	char		*field_name;
+
+	/* the database schema field */
+	const ZBX_FIELD	*field;
+
 	/* see ZBX_API_FIELD_FLAG_* defines */
 	unsigned int	flags;
 }
-zbx_api_field_t;
+zbx_api_property_t;
+
+/* API objet definition */
+typedef struct
+{
+	char			*name;
+
+
+	char			*table_name;
+	zbx_api_property_t	*properties;
+}
+zbx_api_object_t;
+
 
 /* filter definition */
 typedef struct
@@ -93,22 +107,23 @@ zbx_api_filter_t;
 /* query parameter definition */
 typedef struct
 {
-	/* a vector of output fields, when empty query is interpreted as select count(*) */
-	zbx_vector_ptr_t	fields;
+	/* a vector of output properties, when empty query is interpreted as select count(*) */
+	zbx_vector_ptr_t	properties;
 
-	/* The number of fields specified by the request.                                */
-	/* During processing fields required to fetch referred data might be added to    */
-	/* fields vector, so fields_num should be used to determine the number of        */
-	/* columns when creating response json.                                          */
-	int			fields_num;
+	/* The number of properties specified by the request.                            */
+	/* More fields might be added to query for internal processing. Use the          */
+	/* properties_num value to determine the number of requested fields.             */
+	int			properties_num;
 
 	/* Index of the key field in fields list vector.                                  */
 	/* For main query the key field is the object id field if preservekeys is set or  */
 	/* 0 otherwise.                                                                   */
 	/* For sub queries the key field is the main query result field, used to execute  */
 	/* sub queries.                                                                   */
-	/* If they key_index is -1 then the query is not active.                          */
-	int		key;
+	int			key;
+
+	/* 1 if the query is set, 0 otherwise */
+	int			is_set;
 }
 zbx_api_query_t;
 
@@ -116,10 +131,10 @@ zbx_api_query_t;
 typedef struct
 {
 	/* sort field */
-	const zbx_api_field_t	*field;
+	const zbx_api_property_t	*field;
 
 	/* sorting order, see ZBX_API_SORT_* defines */
-	unsigned char		order;
+	unsigned char			order;
 }
 zbx_api_sort_t;
 
@@ -130,10 +145,10 @@ typedef struct
 	unsigned int		parameters;
 
 	/* preservekeys */
-	unsigned char		output_byid;
+	unsigned char		preservekeys;
 
 	/* editable */
-	unsigned char		access;
+	unsigned char		editable;
 
 	/* limit */
 	int			limit;
@@ -144,10 +159,6 @@ typedef struct
 
 	/* output, countOutput */
 	zbx_api_query_t		output;
-
-	/* the starting index of hidden fields that are retrieved from database, */
-	/* but not returned with the rest of fields                              */
-	int			output_num;
 
 	/* sort, sortOrder (a vector of zbx_api_sort_t structures) */
 	zbx_vector_ptr_t	sort;
@@ -282,20 +293,21 @@ zbx_api_get_result_t;
 #define ZBX_API_FIELD_FLAG_CALCULATED	4
 
 
+int	zbx_api_init(char **error);
 
 void	zbx_api_getoptions_init(zbx_api_getoptions_t *self);
-int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_field_t *fields, const char *parameter,
+int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t *fields, const char *parameter,
 		struct zbx_json_parse *json, const char **next, char **error);
 
-int	zbx_api_getoptions_finalize( zbx_api_getoptions_t *self, const zbx_api_field_t *fields, char **error);
-int	zbx_api_getoptions_add_output_field(zbx_api_getoptions_t *self, const zbx_api_field_t *fields,
+int	zbx_api_getoptions_finalize( zbx_api_getoptions_t *self, const zbx_api_object_t *fields, char **error);
+int	zbx_api_getoptions_add_output_field(zbx_api_getoptions_t *self, const zbx_api_object_t *fields,
 		const char *name, int *index, char **error);
 void	zbx_api_getoptions_free(zbx_api_getoptions_t *self);
 
 void	zbx_api_query_init(zbx_api_query_t *self);
 void	zbx_api_query_free(zbx_api_query_t *self);
 
-int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_field_t *fields,
+int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_object_t *fields,
 		zbx_api_query_t *value, char **error);
 int	zbx_api_get_param_flag(const char *param, const char **next, unsigned char *value, char **error);
 int	zbx_api_get_param_bool(const char *param, const char **next, unsigned char *value, char **error);
@@ -322,7 +334,7 @@ void	zbx_api_get_result_init(zbx_api_get_result_t *self);
 void	zbx_api_get_result_clean(zbx_api_get_result_t *self);
 
 
-const zbx_api_field_t	*zbx_api_object_get_field(const zbx_api_field_t *fields, const char *name);
+const zbx_api_property_t	*zbx_api_object_get_property(const zbx_api_object_t *fields, const char *name);
 
 void	zbx_api_json_init(struct zbx_json *json, const char *id);
 void	zbx_api_json_add_count(struct zbx_json *json, const char *name, const zbx_vector_ptr_t *rows);
@@ -333,5 +345,6 @@ void	zbx_api_json_add_row(struct zbx_json *json, const zbx_api_query_t *query, c
 void	zbx_api_json_add_query(struct zbx_json *json, const char *name, const zbx_api_query_t *query,
 		const zbx_vector_ptr_t *rows);
 void	zbx_api_json_add_error(struct zbx_json *json, const char *error);
+
 
 #endif

@@ -28,22 +28,24 @@
 #include "user.h"
 
 /* move into user class file */
-const zbx_api_field_t zbx_api_object_user[] = {
-		{"userid", ZBX_TYPE_ID, ZBX_API_FIELD_FLAG_SORTABLE},
-		{"alias", ZBX_TYPE_CHAR, ZBX_API_FIELD_FLAG_REQUIRED | ZBX_API_FIELD_FLAG_SORTABLE},
-		{"name", ZBX_TYPE_CHAR, 0},
-		{"surname", ZBX_TYPE_CHAR, 0},
-		{"url", ZBX_TYPE_CHAR, 0},
-		{"autologin", ZBX_TYPE_INT, 0},
-		{"autologout", ZBX_TYPE_INT, 0},
-		{"lang", ZBX_TYPE_CHAR, 0},
-		{"refresh", ZBX_TYPE_INT,  0},
-		{"type", ZBX_TYPE_INT, 0},
-		{"theme", ZBX_TYPE_CHAR,  0},
-		{"attempt_failed", ZBX_TYPE_INT, 0},
-		{"attempt_ip", ZBX_TYPE_CHAR, 0},
-		{"attempt_clock", ZBX_TYPE_INT, 0},
-		{"rows_per_page", ZBX_TYPE_INT, 0},
+static zbx_api_property_t zbx_api_object_properties[] = {
+		{"userid", "userid", NULL, ZBX_API_FIELD_FLAG_SORTABLE},
+		{"alias", "alias", NULL, ZBX_API_FIELD_FLAG_REQUIRED | ZBX_API_FIELD_FLAG_SORTABLE},
+		{"name", "name", NULL, 0},
+		{"surname", "surname", NULL, 0},
+		{"url", "url", NULL, 0},
+		{"autologin", "autologin", NULL, 0},
+		{"autologout", "autologout", NULL, 0},
+		{"lang", "lang", NULL, 0},
+		{"refresh", "refresh", NULL,  0},
+		{"type", "type", NULL, 0},
+		{"theme", "theme", NULL,  0},
+		{"attempt_failed", "attempt_failed", NULL, 0},
+		{"attempt_ip", "attempt_ip", NULL, 0},
+		{"attempt_clock", "attempt_clock", NULL, 0},
+		{"rows_per_page", "rows_per_page", NULL, 0},
 		{NULL}
 };
 
+
+zbx_api_object_t	zbx_api_object_user = {"user", "users", zbx_api_object_properties};
