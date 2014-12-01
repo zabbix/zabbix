@@ -42,7 +42,7 @@
 .host-edit .interface-row .interface-dns input[type="text"],
 .hostprototype-edit .interface-row .interface-dns input[type="text"] { width: 200px; }
 .host-edit .interface-row .interface-connect-to,
-.hostprototype-edit .interface-row .interface-connect-to { width: 110px;}
+.hostprototype-edit .interface-row .interface-connect-to { width: 110px; }
 .host-edit .interface-row .interface-port,
 .hostprototype-edit .interface-row .interface-port { width: 100px; }
 .host-edit .interface-row .interface-port input[type="text"],
