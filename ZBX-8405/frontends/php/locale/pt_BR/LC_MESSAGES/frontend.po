@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-28 12:22+0300\n"
-"PO-Revision-Date: 2014-11-04 18:27+0300\n"
+"POT-Creation-Date: 2014-11-26 13:50+0200\n"
+"PO-Revision-Date: 2014-11-06 10:54+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1415118478.0\n"
+"X-POOTLE-MTIME: 1415264089.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -2212,6 +2212,11 @@ msgstr "Não foi possível salvar as regras de descoberta sem checar."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Não foi possível enviar o comando, verifique a comunicação com o servidor Zabbix \"%1$s\"."
 
+#: api/classes/CHostGroup.php:493
+#, c-format
+msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: api/classes/CItemGeneral.php:242
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
@@ -2310,6 +2315,11 @@ msgstr "Não é possível atualizar \"%1$s\" para uma trigger descoberta."
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Não foi possível atualizar \"%1$s\" na ação \"%2$s\"."
 
+#: api/classes/CHostGroup.php:535
+#, c-format
+msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: api/classes/CItemGeneral.php:206
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
@@ -2354,7 +2364,7 @@ msgstr "Não foi possível atualizar o \"templateid\" para o protótipo de trigg
 msgid "Cannot update a discovered graph."
 msgstr "Não é possível atualizar um gráfico descoberto."
 
-#: api/classes/CHostGroup.php:537
+#: api/classes/CHostGroup.php:550
 msgid "Cannot update a discovered host group."
 msgstr "Não é possível atualizar um grupo de hosts descoberto."
 
@@ -2404,8 +2414,8 @@ msgstr "Grupo não foi atualizado"
 msgid "Cannot update group."
 msgstr "Grupo não foi atualizado."
 
-#: api/classes/CHostGroup.php:792 api/classes/CHostGroup.php:850
-#: api/classes/CHostGroup.php:909
+#: api/classes/CHostGroup.php:805 api/classes/CHostGroup.php:863
+#: api/classes/CHostGroup.php:922
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Não é possível atualizar os grupos para o host descoberto \"%1$s\"."
@@ -3470,8 +3480,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "DETALHES DO CENÁRIO"
 
-#: include/maps.inc.php:686 include/maps.inc.php:768 include/maps.inc.php:856
-#: include/maps.inc.php:946
+#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
+#: include/maps.inc.php:935
 msgid "DISABLED"
 msgstr "DESATIVADO"
 
@@ -4751,7 +4761,7 @@ msgstr "Host nulo."
 #: api/classes/CAction.php:1275 api/classes/CApplication.php:288
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
-#: api/classes/CHostGroup.php:509 api/classes/CHostGroup.php:580
+#: api/classes/CHostGroup.php:516 api/classes/CHostGroup.php:593
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1419
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
@@ -5781,7 +5791,7 @@ msgstr "Grade"
 msgid "Group"
 msgstr "Grupo"
 
-#: api/classes/CHostGroup.php:613
+#: api/classes/CHostGroup.php:626
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "O grupo \"%1$s\" não pode ser excluído por ser utilizado em um protótipo de host."
@@ -6149,22 +6159,22 @@ msgstr[1] "Hosts ativados"
 msgid "Host group"
 msgstr "Grupo de hosts"
 
-#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:552
+#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:565
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "O grupo de hosts \"%1$s\" já existe."
 
-#: api/classes/CHostGroup.php:645
+#: api/classes/CHostGroup.php:658
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "O grupo de hosts \"%1$s\" não pode ser excluído pois é utilizado por um script global."
 
-#: api/classes/CHostGroup.php:626
+#: api/classes/CHostGroup.php:639
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr "O grupo de hosts \"%1$s\" não pode ser excluído pois alguns hosts dependem dele."
 
-#: api/classes/CHostGroup.php:600
+#: api/classes/CHostGroup.php:613
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "O grupo de hosts \"%1$s\" é interno e não pode ser excluído."
@@ -6181,7 +6191,7 @@ msgstr "Incidentes do grupo de hosts"
 msgid "Host group label type"
 msgstr "Tipo de rótulo do grupo de hosts"
 
-#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:544
+#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:557
 msgid "Host group name cannot be empty."
 msgstr "O nome do grupo de hosts não pode ser nulo."
 
@@ -6713,7 +6723,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "Se você entende que esta mensagem está errada, por favor consulte os administradores sobre como conseguir as permissões necessárias."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:968
+#: include/maps.inc.php:957
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -8554,7 +8564,7 @@ msgstr "Endereço MAC A"
 msgid "MAC address B"
 msgstr "Endereço MAC B"
 
-#: include/maps.inc.php:760
+#: include/maps.inc.php:749
 msgid "MAINTENANCE"
 msgstr "MANUTENÇÃO"
 
@@ -8628,7 +8638,7 @@ msgstr "Macros"
 msgid "Macros updated"
 msgstr "Macros atualizadas"
 
-#: include/audit.inc.php:48 include/maps.inc.php:845 include/maps.inc.php:935
+#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -9954,10 +9964,10 @@ msgstr "Sem permissão de acesso ao sistema."
 #: api/classes/CGraphGeneral.php:88 api/classes/CGraph.php:719
 #: api/classes/CGraphPrototype.php:693 api/classes/CGraphPrototype.php:756
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:139
-#: api/classes/CHostGroup.php:522 api/classes/CHostGroup.php:595
-#: api/classes/CHostGroup.php:779 api/classes/CHostGroup.php:841
-#: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:903
-#: api/classes/CHostGroup.php:925 api/classes/CHostInterface.php:319
+#: api/classes/CHostGroup.php:529 api/classes/CHostGroup.php:608
+#: api/classes/CHostGroup.php:792 api/classes/CHostGroup.php:854
+#: api/classes/CHostGroup.php:907 api/classes/CHostGroup.php:916
+#: api/classes/CHostGroup.php:938 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
 #: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
 #: api/classes/CHost.php:716 api/classes/CHost.php:1806
@@ -10128,7 +10138,7 @@ msgid "No value maps found."
 msgstr "Nenhum mapeamento de valores encontrado."
 
 #: include/classes/screens/CScreenHistory.php:161
-#: include/classes/screens/CScreenHistory.php:267
+#: include/classes/screens/CScreenHistory.php:259
 #: include/classes/screens/CScreenPlainText.php:41
 #: include/classes/screens/CScreenPlainText.php:63 latest.php:317
 msgid "No values found."
@@ -10473,8 +10483,8 @@ msgstr "OEM"
 
 #: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
-#: include/maps.inc.php:956 include/setup.inc.php:198
+#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
+#: include/maps.inc.php:945 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10562,7 +10572,7 @@ msgstr "Ao mudar o status da trigger piscar por"
 msgid "Once"
 msgstr "Uma vez"
 
-#: api/classes/CHostGroup.php:857 api/classes/CHostGroup.php:989
+#: api/classes/CHostGroup.php:870 api/classes/CHostGroup.php:1002
 msgid "One of the objects is left without a host group."
 msgstr "Um dos objetos está sem um grupo de hosts."
 
@@ -10989,7 +10999,7 @@ msgstr "A extensão PHP \"xmlwriter\" está ausente."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:678 include/triggers.inc.php:155
+#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "INCIDENTE"
@@ -11029,7 +11039,7 @@ msgstr "Gráficos herdados"
 
 #: include/views/configuration.item.edit.php:56
 msgid "Parent items"
-msgstr "Itens herdados"
+msgstr "Item pai"
 
 #: include/views/configuration.services.edit.php:50
 msgid "Parent service"
@@ -11330,7 +11340,7 @@ msgstr "Nível de acesso"
 msgid "Probably php-ldap module is missing."
 msgstr "Provavelmente o módulo php-ldap está ausente."
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "Incidente"
@@ -11356,8 +11366,8 @@ msgstr "Incidente, se todos os filhos possuem incidentes"
 msgid "Problem, if at least one child has a problem"
 msgstr "Incidente, se pelo menos um filho tem incidente"
 
-#: chart4.php:163 include/maps.inc.php:726 include/maps.inc.php:809
-#: include/maps.inc.php:900 report2.php:402 report3.php:83
+#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: include/maps.inc.php:889 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Incidentes"
 
@@ -13628,7 +13638,7 @@ msgid "Timeout"
 msgstr "Tempo limite"
 
 #: include/classes/screens/CScreenHistory.php:164
-#: include/classes/screens/CScreenHistory.php:268
+#: include/classes/screens/CScreenHistory.php:260
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:64
 msgid "Timestamp"
@@ -14160,7 +14170,7 @@ msgstr "Não foi possível selecionar a configuração."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "Não é possível enviar arquivos pois a opção \"file_uploads\" está desabilitada."
 
-#: include/maps.inc.php:743 include/maps.inc.php:826 include/maps.inc.php:917
+#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
 msgid "Unacknowledged"
 msgstr "Não reconhecido"
 
@@ -14859,7 +14869,7 @@ msgstr "Tempo de carga da máquina virtual VMware, <url> endereço de serviço d
 #: include/blocks.inc.php:741 include/classes/graphdraw/CPieGraphDraw.php:327
 #: include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:170
-#: include/classes/screens/CScreenHistory.php:268 include/reports.inc.php:175
+#: include/classes/screens/CScreenHistory.php:260 include/reports.inc.php:175
 #: include/views/administration.general.valuemapping.edit.php:41
 #: include/views/common.macros.php:37 tr_testexpr.php:50
 #, c-format

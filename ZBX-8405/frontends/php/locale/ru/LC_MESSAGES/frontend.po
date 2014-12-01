@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-28 12:22+0300\n"
+"POT-Creation-Date: 2014-11-26 13:50+0200\n"
 "PO-Revision-Date: 2014-11-03 10:13+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2244,6 +2244,11 @@ msgstr "Невозможно сохранить правило обнаруже�
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Не удалось отправить команду, проверьте соединение с Zabbix сервером \"%1$s\"."
 
+#: api/classes/CHostGroup.php:493
+#, c-format
+msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: api/classes/CItemGeneral.php:242
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
@@ -2342,6 +2347,11 @@ msgstr "Не удалось обновить \"%1$s\" для обнаружен�
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Не удалось обновить \"%1$s\" для действия \"%2$s\"."
 
+#: api/classes/CHostGroup.php:535
+#, c-format
+msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: api/classes/CItemGeneral.php:206
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
@@ -2386,7 +2396,7 @@ msgstr "Не удалось обновить \"templateid\" для протот�
 msgid "Cannot update a discovered graph."
 msgstr "Не удалось обновить обнаруженный график."
 
-#: api/classes/CHostGroup.php:537
+#: api/classes/CHostGroup.php:550
 msgid "Cannot update a discovered host group."
 msgstr "Не удалось обновить обнаруженную группу узлов сети."
 
@@ -2436,8 +2446,8 @@ msgstr "Не удалось обновить группу"
 msgid "Cannot update group."
 msgstr "Не удалось обновить группу."
 
-#: api/classes/CHostGroup.php:792 api/classes/CHostGroup.php:850
-#: api/classes/CHostGroup.php:909
+#: api/classes/CHostGroup.php:805 api/classes/CHostGroup.php:863
+#: api/classes/CHostGroup.php:922
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Не удалось обновить группы для обнаруженного узла сети \"%1$s\"."
@@ -3502,8 +3512,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "ДЕТАЛИ СЦЕНАРИЯ"
 
-#: include/maps.inc.php:686 include/maps.inc.php:768 include/maps.inc.php:856
-#: include/maps.inc.php:946
+#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
+#: include/maps.inc.php:935
 msgid "DISABLED"
 msgstr "ОТКЛЮЧЕНО"
 
@@ -4785,7 +4795,7 @@ msgstr "Пустое имя узла сети."
 #: api/classes/CAction.php:1275 api/classes/CApplication.php:288
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
-#: api/classes/CHostGroup.php:509 api/classes/CHostGroup.php:580
+#: api/classes/CHostGroup.php:516 api/classes/CHostGroup.php:593
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1419
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
@@ -5815,7 +5825,7 @@ msgstr "Сетка"
 msgid "Group"
 msgstr "Группа"
 
-#: api/classes/CHostGroup.php:613
+#: api/classes/CHostGroup.php:626
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "Группа \"%1$s\" не может быть удалена, так как используется прототипом узла сети."
@@ -6185,22 +6195,22 @@ msgstr[2] "Узлы сети активированы"
 msgid "Host group"
 msgstr "Группа узлов сети"
 
-#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:552
+#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:565
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "Группа узлов сети \"%1$s\" уже существует."
 
-#: api/classes/CHostGroup.php:645
+#: api/classes/CHostGroup.php:658
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "Группа узлов сети \"%1$s\" не может быть удалена, так как используется в глобальном скрипте."
 
-#: api/classes/CHostGroup.php:626
+#: api/classes/CHostGroup.php:639
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr "Группа узлов сети \"%1$s\" не может быть удалена, так как некоторые узлы сети принадлежат этой группе."
 
-#: api/classes/CHostGroup.php:600
+#: api/classes/CHostGroup.php:613
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "Группа узлов сети \"%1$s\" является внутренней и не может быть удалена."
@@ -6217,7 +6227,7 @@ msgstr "События в группах узлов сети"
 msgid "Host group label type"
 msgstr "Тип подписи к группе узлов сети"
 
-#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:544
+#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:557
 msgid "Host group name cannot be empty."
 msgstr "Имя группы узлов сети не может быть пустым."
 
@@ -6750,7 +6760,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "Если вы считаете это сообщение ошибкой, пожалуйста, свяжитесь с вашими администраторами для получения прав доступа."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:968
+#: include/maps.inc.php:957
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -8588,7 +8598,7 @@ msgstr "MAC адрес A"
 msgid "MAC address B"
 msgstr "MAC адрес B"
 
-#: include/maps.inc.php:760
+#: include/maps.inc.php:749
 msgid "MAINTENANCE"
 msgstr "ОБСЛУЖИВАНИЕ"
 
@@ -8661,7 +8671,7 @@ msgstr "Макросы"
 msgid "Macros updated"
 msgstr "Макросы обновлены"
 
-#: include/audit.inc.php:48 include/maps.inc.php:845 include/maps.inc.php:935
+#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -9988,10 +9998,10 @@ msgstr "Нет прав доступа в систему."
 #: api/classes/CGraphGeneral.php:88 api/classes/CGraph.php:719
 #: api/classes/CGraphPrototype.php:693 api/classes/CGraphPrototype.php:756
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:139
-#: api/classes/CHostGroup.php:522 api/classes/CHostGroup.php:595
-#: api/classes/CHostGroup.php:779 api/classes/CHostGroup.php:841
-#: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:903
-#: api/classes/CHostGroup.php:925 api/classes/CHostInterface.php:319
+#: api/classes/CHostGroup.php:529 api/classes/CHostGroup.php:608
+#: api/classes/CHostGroup.php:792 api/classes/CHostGroup.php:854
+#: api/classes/CHostGroup.php:907 api/classes/CHostGroup.php:916
+#: api/classes/CHostGroup.php:938 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
 #: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
 #: api/classes/CHost.php:716 api/classes/CHost.php:1806
@@ -10162,7 +10172,7 @@ msgid "No value maps found."
 msgstr "Преобразования значений не найдены."
 
 #: include/classes/screens/CScreenHistory.php:161
-#: include/classes/screens/CScreenHistory.php:267
+#: include/classes/screens/CScreenHistory.php:259
 #: include/classes/screens/CScreenPlainText.php:41
 #: include/classes/screens/CScreenPlainText.php:63 latest.php:317
 msgid "No values found."
@@ -10505,8 +10515,8 @@ msgstr "OEM"
 
 #: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
-#: include/maps.inc.php:956 include/setup.inc.php:198
+#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
+#: include/maps.inc.php:945 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10594,7 +10604,7 @@ msgstr "Мигание триггеров при изменении состоя
 msgid "Once"
 msgstr "Один раз"
 
-#: api/classes/CHostGroup.php:857 api/classes/CHostGroup.php:989
+#: api/classes/CHostGroup.php:870 api/classes/CHostGroup.php:1002
 msgid "One of the objects is left without a host group."
 msgstr "Один из объектов остался без группы узлов сети."
 
@@ -11021,7 +11031,7 @@ msgstr "Отсутствует расширение PHP xmlwriter."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:678 include/triggers.inc.php:155
+#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "ПРОБЛЕМА"
@@ -11362,7 +11372,7 @@ msgstr "Уровень привилегий"
 msgid "Probably php-ldap module is missing."
 msgstr "Возможно отсутствует модуль php-ldap."
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "Проблема"
@@ -11388,8 +11398,8 @@ msgstr "Проблема, если все подчиненные имеют пр
 msgid "Problem, if at least one child has a problem"
 msgstr "Проблема, если хотя бы у одного из подчиненных имеется проблема"
 
-#: chart4.php:163 include/maps.inc.php:726 include/maps.inc.php:809
-#: include/maps.inc.php:900 report2.php:402 report3.php:83
+#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: include/maps.inc.php:889 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Проблемы"
 
@@ -13660,7 +13670,7 @@ msgid "Timeout"
 msgstr "Время ожидания"
 
 #: include/classes/screens/CScreenHistory.php:164
-#: include/classes/screens/CScreenHistory.php:268
+#: include/classes/screens/CScreenHistory.php:260
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:64
 msgid "Timestamp"
@@ -14195,7 +14205,7 @@ msgstr "Не удалось выбрать конфигурацию."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "Не удалось загрузить файл, так как \"file_uploads\" отключено."
 
-#: include/maps.inc.php:743 include/maps.inc.php:826 include/maps.inc.php:917
+#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
 msgid "Unacknowledged"
 msgstr "Неподтверждено"
 
@@ -14896,7 +14906,7 @@ msgstr "Время работы виртуальной машины VMware, <url
 #: include/blocks.inc.php:741 include/classes/graphdraw/CPieGraphDraw.php:327
 #: include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:170
-#: include/classes/screens/CScreenHistory.php:268 include/reports.inc.php:175
+#: include/classes/screens/CScreenHistory.php:260 include/reports.inc.php:175
 #: include/views/administration.general.valuemapping.edit.php:41
 #: include/views/common.macros.php:37 tr_testexpr.php:50
 #, c-format
