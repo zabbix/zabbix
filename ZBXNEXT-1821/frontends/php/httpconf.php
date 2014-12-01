@@ -32,77 +32,55 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'groupid'			=>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				null),
-	'new_httpstep'		=>	array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'sel_step'			=>	array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65534),	null),
-	'group_httptestid'	=>	array(T_ZBX_INT, O_OPT, null,		DB_ID,				null),
-	'showdisabled'		=>	array(T_ZBX_INT, O_OPT, P_SYS,		IN('0,1'),			null),
+	'groupid'			=> array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,				null),
+	'new_httpstep'		=> array(T_ZBX_STR, O_OPT, null,	null,				null),
+	'sel_step'			=> array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65534),	null),
+	'group_httptestid'	=> array(T_ZBX_INT, O_OPT, null,	DB_ID,				null),
+	'showdisabled'		=> array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),			null),
 	// form
-	'hostid'			=>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID.NOT_ZERO,
-		'isset({form}) || isset({add}) || isset({update})'
-	),
-	'applicationid'		=>	array(T_ZBX_INT, O_OPT, null,		DB_ID,				null, _('Application')),
-	'httptestid'		=>	array(T_ZBX_INT, O_NO,  P_SYS,		DB_ID,
-		'isset({form}) && {form} == "update"'
-	),
-	'name'				=>	array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,
-		'isset({add}) || isset({update})', _('Name')
-	),
-	'delay'				=>	array(T_ZBX_INT, O_OPT, null,		BETWEEN(1, SEC_PER_DAY),
-		'isset({add}) || isset({update})', _('Update interval (in sec)')
-	),
-	'retries'			=>	array(T_ZBX_INT, O_OPT, null,		BETWEEN(1, 10),
-		'isset({add}) || isset({update})', _('Retries')
-	),
-	'status'			=>	array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'agent'				=>	array(T_ZBX_STR, O_OPT, P_NO_TRIM,	null,				'isset({add}) || isset({update})'),
-	'variables'			=>	array(T_ZBX_STR, O_OPT, null,		null,				'isset({add}) || isset({update})'),
-	'steps'				=>	array(T_ZBX_STR, O_OPT, null,		null,				'isset({add}) || isset({update})',
-		_('Steps')
-	),
-	'authentication'	=>	array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		'isset({add}) || isset({update})'),
-	'http_user'			=>	array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication} == '.HTTPTEST_AUTH_BASIC.
-		' || {authentication} == '.HTTPTEST_AUTH_NTLM.')', _('User')
-	),
-	'http_password'		=>	array(T_ZBX_STR, O_OPT, P_NO_TRIM,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication} == '.HTTPTEST_AUTH_BASIC.
-		' || {authentication} == '.HTTPTEST_AUTH_NTLM.')', _('Password')
-	),
-	'http_proxy'		=>	array(T_ZBX_STR, O_OPT, null,		null,				'isset({add}) || isset({update})'),
-	'new_application'	=>	array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'hostname'			=>	array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'templated'			=>	array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'verify_host'		=>	array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'verify_peer'		=>	array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'headers'			=>	array(T_ZBX_STR, O_OPT, null,		null,				'isset({add}) || isset({update})'),
-	'ssl_cert_file'		=>	array(T_ZBX_STR, O_OPT, null,		null,				'isset({add}) || isset({update})'),
-	'ssl_key_file'		=>	array(T_ZBX_STR, O_OPT, null,		null,				'isset({add}) || isset({update})'),
-	'ssl_key_password'	=>	array(T_ZBX_STR, O_OPT, P_NO_TRIM,	null,				'isset({add}) || isset({update})'),
+	'hostid'          => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID.NOT_ZERO,          'isset({form}) || isset({add}) || isset({update})'),
+	'applicationid'   => array(T_ZBX_INT, O_OPT, null,  DB_ID,                   null, _('Application')),
+	'httptestid'      => array(T_ZBX_INT, O_NO,  P_SYS, DB_ID,                   'isset({form}) && {form} == "update"'),
+	'name'            => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({add}) || isset({update})', _('Name')),
+	'delay'           => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})', _('Update interval (in sec)')),
+	'retries'         => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({add}) || isset({update})', _('Retries')),
+	'status'          => array(T_ZBX_STR, O_OPT, null,  null,                    null),
+	'agent'           => array(T_ZBX_STR, O_OPT, P_NO_TRIM, null,                'isset({add}) || isset({update})'),
+	'variables'       => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})'),
+	'steps'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})', _('Steps')),
+	'authentication'  => array(T_ZBX_INT, O_OPT, null,  IN('0,1,2'),             'isset({add}) || isset({update})'),
+	'http_user'       => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               '(isset({add}) || isset({update})) && isset({authentication}) && ({authentication} == '.HTTPTEST_AUTH_BASIC.
+		' || {authentication} == '.HTTPTEST_AUTH_NTLM.')', _('User')),
+	'http_password'		=> array(T_ZBX_STR, O_OPT, P_NO_TRIM,	NOT_EMPTY,		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication} == '.HTTPTEST_AUTH_BASIC.
+		' || {authentication} == '.HTTPTEST_AUTH_NTLM.')', _('Password')),
+	'http_proxy'		=> array(T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'),
+	'new_application'	=> array(T_ZBX_STR, O_OPT, null,	null,				null),
+	'hostname'			=> array(T_ZBX_STR, O_OPT, null,	null,				null),
+	'templated'			=> array(T_ZBX_STR, O_OPT, null,	null,				null),
+	'verify_host'		=> array(T_ZBX_STR, O_OPT, null,	null,				null),
+	'verify_peer'		=> array(T_ZBX_STR, O_OPT, null,	null,				null),
+	'headers'			=> array(T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'),
+	'ssl_cert_file'		=> array(T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'),
+	'ssl_key_file'		=> array(T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'),
+	'ssl_key_password'	=> array(T_ZBX_STR, O_OPT, P_NO_TRIM, null,				'isset({add}) || isset({update})'),
 	// actions
-	'action'			=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+	'action'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"httptest.massclearhistory","httptest.massdelete","httptest.massdisable",'.
 									'"httptest.massenable"'
 								),
 								null
 							),
-	'clone'				=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
-	'del_history'		=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
-	'add'				=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
-	'update'			=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
-	'delete'			=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
-	'cancel'			=>	array(T_ZBX_STR, O_OPT, P_SYS,		null,				null),
-	'form'				=>	array(T_ZBX_STR, O_OPT, P_SYS,		null,				null),
-	'form_refresh'		=>	array(T_ZBX_INT, O_OPT, null,		null,				null),
+	'clone'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'del_history'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'add'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'update'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'delete'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'cancel'			=> array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
+	'form'				=> array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
+	'form_refresh'		=> array(T_ZBX_INT, O_OPT, null,	null,				null),
 	// sort and sortorder
-	'sort'				=>	array(T_ZBX_STR, O_OPT, P_SYS,
-								IN('"hostname","name","status"'),
-								null
-							),
-	'sortorder'			=>	array(T_ZBX_STR, O_OPT, P_SYS,
-								IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),
-								null
-							)
+	'sort'				=> array(T_ZBX_STR, O_OPT, P_SYS, IN('"hostname","name","status"'),				null),
+	'sortorder'			=> array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
 );
 $_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.httpconf.showdisabled', 1));
 
@@ -551,7 +529,7 @@ if (isset($_REQUEST['form'])) {
 		$data['new_application'] = getRequest('new_application', '');
 		$data['delay'] = getRequest('delay', 60);
 		$data['retries'] = getRequest('retries', 1);
-		$data['agent'] = getRequest('agent', 'Zabbix');
+		$data['agent'] = getRequest('agent', ZBX_DEFAULT_AGENT);
 		$data['variables'] = getRequest('variables', array());
 		$data['authentication'] = getRequest('authentication', HTTPTEST_AUTH_NONE);
 		$data['http_user'] = getRequest('http_user', '');
