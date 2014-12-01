@@ -524,12 +524,16 @@ if (isset($_REQUEST['form'])) {
 			$data['status'] = HTTPTEST_STATUS_ACTIVE;
 		}
 
+		$agent = (hasRequest('agent') && zbx_empty(getRequest('agent')))
+			? ZBX_DEFAULT_AGENT
+			: getRequest('agent');
+
 		$data['name'] = getRequest('name', '');
 		$data['applicationid'] = getRequest('applicationid');
 		$data['new_application'] = getRequest('new_application', '');
 		$data['delay'] = getRequest('delay', 60);
 		$data['retries'] = getRequest('retries', 1);
-		$data['agent'] = getRequest('agent', ZBX_DEFAULT_AGENT);
+		$data['agent'] = $agent;
 		$data['variables'] = getRequest('variables', array());
 		$data['authentication'] = getRequest('authentication', HTTPTEST_AUTH_NONE);
 		$data['http_user'] = getRequest('http_user', '');
