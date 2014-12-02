@@ -547,8 +547,10 @@ class CLineGraphDraw extends CGraphDraw {
 		foreach ($this->percentile as $side => $percentile) {
 			if ($percentile['percent'] > 0 && !empty($values[$side])) {
 				sort($values[$side]);
-				$percent = (int) ((count($values[$side]) * $percentile['percent'] / 100) + 0.5);
-				$this->percentile[$side]['value'] = $values[$side][$percent];
+				// Using "Nearest Rank" method: http://en.wikipedia.org/wiki/Percentile#Definition_of_the_Nearest_Rank_method
+				$percent = (int) ceil($percentile['percent'] / 100 * count($values[$side]));
+				// - 1 is necessary because array starts with the 0 index
+				$this->percentile[$side]['value'] = $values[$side][$percent - 1];
 				unset($values[$side]);
 			}
 		}
