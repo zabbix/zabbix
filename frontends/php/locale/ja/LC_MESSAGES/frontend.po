@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-02 03:57+0200\n"
-"PO-Revision-Date: 2014-08-19 04:41+0300\n"
+"POT-Creation-Date: 2014-12-02 04:08+0200\n"
+"PO-Revision-Date: 2014-12-01 01:45+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1408416084.0\n"
+"X-POOTLE-MTIME: 1417391127.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -2173,7 +2173,7 @@ msgstr "コマンドを送信できません。Zabbixサーバー\"%1$s\"との�
 #: api/classes/CHostGroup.php:493
 #, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "ホストグループ\"%2$s\"に\"%1$s\"を設定できません。"
 
 #: api/classes/CItemGeneral.php:242
 #, c-format
@@ -2276,7 +2276,7 @@ msgstr "アクション\"%2$s\"の\"%1$s\"を更新できません。"
 #: api/classes/CHostGroup.php:535
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "ホストグループ\"%2$s\"の\"%1$s\"を更新できません。"
 
 #: api/classes/CItemGeneral.php:206
 #, c-format
