@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-02 04:16+0200\n"
-"PO-Revision-Date: 2014-11-20 08:19+0300\n"
+"POT-Creation-Date: 2014-12-02 04:30+0200\n"
+"PO-Revision-Date: 2014-11-26 21:41+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1416464357.0\n"
+"X-POOTLE-MTIME: 1417030872.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2317,7 +2317,7 @@ msgstr "Nie je možné poslať príkaz, skontrolujte spojenie so Zabbix serverom
 #: include/classes/api/services/CHostGroup.php:429
 #, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Nie je možné nastaviť \"%1$s\" pre skupinu \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:242
 #, c-format
@@ -2433,7 +2433,7 @@ msgstr "Nie je možné aktualizovať \"%1$s\" pre akciu \"%2$s\"."
 #: include/classes/api/services/CHostGroup.php:490
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Nie je možné aktualizovať \"%1$s\" pre skupinu \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:206
 #, c-format
