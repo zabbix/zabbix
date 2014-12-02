@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-26 14:09+0200\n"
+"POT-Creation-Date: 2014-12-02 04:16+0200\n"
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -177,7 +177,7 @@ msgstr "5 menit"
 msgid "5 seconds"
 msgstr "5 detik"
 
-#: include/views/monitoring.history.php:75
+#: include/views/monitoring.history.php:91
 msgid "500 latest values"
 msgstr "500 isi terbaru"
 
@@ -491,7 +491,7 @@ msgstr "Aktif sampai"
 #: include/views/js/configuration.sysmap.edit.js.php:32
 #: include/views/js/configuration.sysmaps.js.php:191
 #: include/views/js/configuration.sysmaps.js.php:404
-#: include/views/monitoring.history.php:115 jsLoader.php:182
+#: include/views/monitoring.history.php:131 jsLoader.php:182
 #: popup_bitem.php:179 popup_media.php:137 popup_period.php:148
 #: tr_logform.php:263 tr_logform.php:350 tr_status.php:732
 msgid "Add"
@@ -771,7 +771,7 @@ msgstr "Jenis area"
 msgid "As is"
 msgstr "Seperti"
 
-#: include/views/monitoring.history.php:79
+#: include/views/monitoring.history.php:95
 msgid "As plain text"
 msgstr "Sebagai teks biasa"
 
@@ -3496,7 +3496,7 @@ msgstr "Custom slides"
 msgid "Czech (cs_CZ)"
 msgstr "Czech (cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1375
+#: include/classes/graphdraw/CLineGraphDraw.php:1377
 msgid "D"
 msgstr "D"
 
@@ -3588,7 +3588,7 @@ msgstr "Data"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2517
+#: include/classes/graphdraw/CLineGraphDraw.php:2519
 #: include/classes/graphdraw/CPieGraphDraw.php:750
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -5448,7 +5448,7 @@ msgstr "Region diisi"
 #: include/views/common.filter.trigger.php:147
 #: include/views/inventory.host.list.php:52
 #: include/views/monitoring.dashconf.php:116
-#: include/views/monitoring.history.php:146
+#: include/views/monitoring.history.php:162
 #: include/views/monitoring.overview.items.php:82 latest.php:420
 #: report2.php:383
 msgid "Filter"
@@ -5729,7 +5729,7 @@ msgstr "Garis gradasi"
 #: include/audit.inc.php:29 include/screens.inc.php:30
 #: include/views/configuration.graph.edit.php:293
 #: include/views/monitoring.charts.php:27
-#: include/views/monitoring.history.php:72 latest.php:578 latest.php:765
+#: include/views/monitoring.history.php:88 latest.php:578 latest.php:765
 #: report2.php:397
 msgid "Graph"
 msgstr "Grafik"
@@ -5871,7 +5871,7 @@ msgstr "Grafik jumlah"
 
 #: include/views/configuration.graph.edit.php:60
 #: include/views/configuration.graph.list.php:80
-#: include/views/monitoring.history.php:233 popup.php:1296 popup.php:1302
+#: include/views/monitoring.history.php:249 popup.php:1296 popup.php:1302
 msgid "Graph type"
 msgstr "Tipe grafik"
 
@@ -6027,8 +6027,8 @@ msgstr "Grup"
 msgid "Groups in maintenance"
 msgstr "Grup dalam pemeliharaan"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1381
-#: include/classes/graphdraw/CLineGraphDraw.php:1440
+#: include/classes/graphdraw/CLineGraphDraw.php:1383
+#: include/classes/graphdraw/CLineGraphDraw.php:1442
 #: include/translateDefines.inc.php:34
 msgid "H:i"
 msgstr "H:i"
@@ -6141,7 +6141,7 @@ msgstr "Sembunyikan trigger non-aktif"
 msgid "Hide filter"
 msgstr ""
 
-#: include/views/monitoring.history.php:130
+#: include/views/monitoring.history.php:146
 msgid "Hide selected"
 msgstr "Sembunyikan yang dipilih"
 
@@ -8219,7 +8219,7 @@ msgstr "Item menggunakan interface host dari yang bukan host induk."
 msgid "Item uses incorrect interface type."
 msgstr "Item menggunakan tipe inferface yang salah."
 
-#: chart.php:89
+#: chart.php:94 chart.php:97
 msgid "Item values"
 msgstr ""
 
@@ -8257,8 +8257,8 @@ msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai elemen item yan
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\"."
 
-#: include/classes/api/managers/CHttpTestManager.php:712
-#: include/classes/api/managers/CHttpTestManager.php:843
+#: include/classes/api/managers/CHttpTestManager.php:715
+#: include/classes/api/managers/CHttpTestManager.php:846
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
 msgstr ""
@@ -8292,7 +8292,7 @@ msgstr "Item disalin"
 msgid "Items deleted"
 msgstr "Item dihapus"
 
-#: include/views/monitoring.history.php:123
+#: include/views/monitoring.history.php:139
 msgid "Items list"
 msgstr "Daftar item"
 
@@ -9056,11 +9056,11 @@ msgstr "Maret"
 msgid "Mark elements on trigger status change"
 msgstr "Tandai elemen pada perubahan status trigger"
 
-#: include/views/monitoring.history.php:132
+#: include/views/monitoring.history.php:148
 msgid "Mark others"
 msgstr "Tandai lainnya"
 
-#: include/views/monitoring.history.php:131
+#: include/views/monitoring.history.php:147
 msgid "Mark selected"
 msgstr "Tandai yang dipilih"
 
@@ -10442,7 +10442,7 @@ msgid "None"
 msgstr "Tidak ada"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1484 include/views/monitoring.history.php:226
+#: include/triggers.inc.php:1484 include/views/monitoring.history.php:242
 #: popup.php:1372
 msgid "Normal"
 msgstr "Normal"
@@ -11932,7 +11932,7 @@ msgstr "Hapus host"
 msgid "Remove link"
 msgstr "Hapus tautan"
 
-#: include/views/monitoring.history.php:120
+#: include/views/monitoring.history.php:136
 msgid "Remove selected"
 msgstr "Hapus yang dipilih"
 
@@ -12720,13 +12720,13 @@ msgstr "Pilih"
 msgid "Select prototype"
 msgstr "Pilih prototipe"
 
-#: include/views/monitoring.history.php:124
+#: include/views/monitoring.history.php:140
 msgid "Select rows with value like"
 msgstr "Pilih baris dengan nilai seperti"
 
 #: include/views/administration.script.edit.php:82
 #: include/views/monitoring.dashconf.php:49
-#: include/views/monitoring.history.php:145
+#: include/views/monitoring.history.php:161
 msgid "Selected"
 msgstr "Dipilih"
 
@@ -12979,7 +12979,7 @@ msgstr "Tampilkan legenda"
 msgid "Show lines"
 msgstr "Tampilkan garis"
 
-#: include/views/monitoring.history.php:129
+#: include/views/monitoring.history.php:145
 msgid "Show selected"
 msgstr "Tampilkan yang dipilih"
 
@@ -13229,7 +13229,7 @@ msgstr ""
 msgid "Speed"
 msgstr "Kecepatan"
 
-#: include/graphs.inc.php:25 include/views/monitoring.history.php:230
+#: include/graphs.inc.php:25 include/views/monitoring.history.php:246
 #: popup.php:1363
 msgid "Stacked"
 msgstr "Ditumpuk"
@@ -15318,7 +15318,7 @@ msgstr ""
 msgid "Value: no data"
 msgstr "Nilai: tidak ada data"
 
-#: include/views/monitoring.history.php:74
+#: include/views/monitoring.history.php:90
 msgid "Values"
 msgstr "Nilai"
 
@@ -15688,7 +15688,7 @@ msgid "Y axis MAX value"
 msgstr "Nilai Y axis MAX"
 
 #: include/classes/api/services/CGraphGeneral.php:356
-#: include/classes/graphdraw/CLineGraphDraw.php:712
+#: include/classes/graphdraw/CLineGraphDraw.php:714
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Nilai Y axis MAX harus lebih besar dari nilai Y axis MIN."
 
@@ -15958,7 +15958,7 @@ msgstr "[Nilai yang salah untuk bulan: \"%s\" ]"
 msgid "agent"
 msgstr "agen"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1856
+#: include/classes/graphdraw/CLineGraphDraw.php:1858
 #: include/classes/pagefilter/CPageFilter.php:738
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
@@ -15978,15 +15978,15 @@ msgstr "semua"
 msgid "all media"
 msgstr ""
 
-#: include/views/monitoring.history.php:139
+#: include/views/monitoring.history.php:155
 msgid "as Blue"
 msgstr "sebagai Biru"
 
-#: include/views/monitoring.history.php:138
+#: include/views/monitoring.history.php:154
 msgid "as Green"
 msgstr "Sebagai Hijau"
 
-#: include/views/monitoring.history.php:137
+#: include/views/monitoring.history.php:153
 msgid "as Red"
 msgstr "sebagai Merah"
 
@@ -15998,8 +15998,8 @@ msgstr ""
 msgid "auto-registered host"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1838
-#: include/classes/graphdraw/CLineGraphDraw.php:1860
+#: include/classes/graphdraw/CLineGraphDraw.php:1840
+#: include/classes/graphdraw/CLineGraphDraw.php:1862
 #: include/classes/graphdraw/CPieGraphDraw.php:326 include/graphs.inc.php:85
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:155
@@ -16020,14 +16020,14 @@ msgstr "d"
 msgid "d.M"
 msgstr "d.M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1378
-#: include/classes/graphdraw/CLineGraphDraw.php:1431
+#: include/classes/graphdraw/CLineGraphDraw.php:1380
+#: include/classes/graphdraw/CLineGraphDraw.php:1433
 msgid "d.m"
 msgstr "d.m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1400
-#: include/classes/graphdraw/CLineGraphDraw.php:1415
-#: include/classes/graphdraw/CLineGraphDraw.php:1434
+#: include/classes/graphdraw/CLineGraphDraw.php:1402
+#: include/classes/graphdraw/CLineGraphDraw.php:1417
+#: include/classes/graphdraw/CLineGraphDraw.php:1436
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
@@ -16154,7 +16154,7 @@ msgstr ""
 msgid "key is empty"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1836
+#: include/classes/graphdraw/CLineGraphDraw.php:1838
 #: include/classes/graphdraw/CPieGraphDraw.php:321 include/graphs.inc.php:82
 #: include/views/js/configuration.graph.edit.js.php:43
 msgid "last"
@@ -16199,16 +16199,16 @@ msgstr "peta"
 msgid "matches"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1839
-#: include/classes/graphdraw/CLineGraphDraw.php:1853
+#: include/classes/graphdraw/CLineGraphDraw.php:1841
+#: include/classes/graphdraw/CLineGraphDraw.php:1855
 #: include/classes/graphdraw/CPieGraphDraw.php:317 include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:42
 #: include/views/js/configuration.graph.edit.js.php:50 popup_bitem.php:156
 msgid "max"
 msgstr "max"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1837
-#: include/classes/graphdraw/CLineGraphDraw.php:1850
+#: include/classes/graphdraw/CLineGraphDraw.php:1839
+#: include/classes/graphdraw/CLineGraphDraw.php:1852
 #: include/classes/graphdraw/CPieGraphDraw.php:313 include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:154
@@ -16244,7 +16244,7 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1931
+#: include/classes/graphdraw/CLineGraphDraw.php:1933
 #: include/classes/graphdraw/CPieGraphDraw.php:347
 msgid "no data"
 msgstr "tidak ada data"

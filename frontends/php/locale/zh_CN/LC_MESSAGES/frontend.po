@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-26 14:09+0200\n"
+"POT-Creation-Date: 2014-12-02 04:16+0200\n"
 "PO-Revision-Date: 2013-08-25 15:11+0300\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -181,7 +181,7 @@ msgstr "5分"
 msgid "5 seconds"
 msgstr "5秒"
 
-#: include/views/monitoring.history.php:75
+#: include/views/monitoring.history.php:91
 msgid "500 latest values"
 msgstr "最近500个值"
 
@@ -495,7 +495,7 @@ msgstr "作用中直到"
 #: include/views/js/configuration.sysmap.edit.js.php:32
 #: include/views/js/configuration.sysmaps.js.php:191
 #: include/views/js/configuration.sysmaps.js.php:404
-#: include/views/monitoring.history.php:115 jsLoader.php:182
+#: include/views/monitoring.history.php:131 jsLoader.php:182
 #: popup_bitem.php:179 popup_media.php:137 popup_period.php:148
 #: tr_logform.php:263 tr_logform.php:350 tr_status.php:732
 msgid "Add"
@@ -775,7 +775,7 @@ msgstr "区域类型"
 msgid "As is"
 msgstr "不变"
 
-#: include/views/monitoring.history.php:79
+#: include/views/monitoring.history.php:95
 msgid "As plain text"
 msgstr "纯文字"
 
@@ -3502,7 +3502,7 @@ msgstr "自定义幻灯片"
 msgid "Czech (cs_CZ)"
 msgstr "捷克(cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1375
+#: include/classes/graphdraw/CLineGraphDraw.php:1377
 msgid "D"
 msgstr "D"
 
@@ -3594,7 +3594,7 @@ msgstr "数据"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2517
+#: include/classes/graphdraw/CLineGraphDraw.php:2519
 #: include/classes/graphdraw/CPieGraphDraw.php:750
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -5454,7 +5454,7 @@ msgstr "填满的区域"
 #: include/views/common.filter.trigger.php:147
 #: include/views/inventory.host.list.php:52
 #: include/views/monitoring.dashconf.php:116
-#: include/views/monitoring.history.php:146
+#: include/views/monitoring.history.php:162
 #: include/views/monitoring.overview.items.php:82 latest.php:420
 #: report2.php:383
 msgid "Filter"
@@ -5735,7 +5735,7 @@ msgstr "梯度线"
 #: include/audit.inc.php:29 include/screens.inc.php:30
 #: include/views/configuration.graph.edit.php:293
 #: include/views/monitoring.charts.php:27
-#: include/views/monitoring.history.php:72 latest.php:578 latest.php:765
+#: include/views/monitoring.history.php:88 latest.php:578 latest.php:765
 #: report2.php:397
 msgid "Graph"
 msgstr "图形"
@@ -5877,7 +5877,7 @@ msgstr "图形总合"
 
 #: include/views/configuration.graph.edit.php:60
 #: include/views/configuration.graph.list.php:80
-#: include/views/monitoring.history.php:233 popup.php:1296 popup.php:1302
+#: include/views/monitoring.history.php:249 popup.php:1296 popup.php:1302
 msgid "Graph type"
 msgstr "图形类别"
 
@@ -6034,8 +6034,8 @@ msgstr "群组"
 msgid "Groups in maintenance"
 msgstr "群组在维护中"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1381
-#: include/classes/graphdraw/CLineGraphDraw.php:1440
+#: include/classes/graphdraw/CLineGraphDraw.php:1383
+#: include/classes/graphdraw/CLineGraphDraw.php:1442
 #: include/translateDefines.inc.php:34
 msgid "H:i"
 msgstr "H:i"
@@ -6148,7 +6148,7 @@ msgstr "隐藏失效的触发器"
 msgid "Hide filter"
 msgstr ""
 
-#: include/views/monitoring.history.php:130
+#: include/views/monitoring.history.php:146
 msgid "Hide selected"
 msgstr "隐藏所选的"
 
@@ -8226,7 +8226,7 @@ msgstr "项目使用来自非上层主机的主机介面."
 msgid "Item uses incorrect interface type."
 msgstr "项目使用不正确的介面类型."
 
-#: chart.php:89
+#: chart.php:94 chart.php:97
 msgid "Item values"
 msgstr ""
 
@@ -8264,8 +8264,8 @@ msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" 为未知的项目组件
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" ."
 
-#: include/classes/api/managers/CHttpTestManager.php:712
-#: include/classes/api/managers/CHttpTestManager.php:843
+#: include/classes/api/managers/CHttpTestManager.php:715
+#: include/classes/api/managers/CHttpTestManager.php:846
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
 msgstr "键值为\"%1$s\"的项目已经存在."
@@ -8299,7 +8299,7 @@ msgstr "项目已複製"
 msgid "Items deleted"
 msgstr "项目已删除"
 
-#: include/views/monitoring.history.php:123
+#: include/views/monitoring.history.php:139
 msgid "Items list"
 msgstr "项目清单"
 
@@ -9063,11 +9063,11 @@ msgstr "三月"
 msgid "Mark elements on trigger status change"
 msgstr "触发器状态上的标记组件改变"
 
-#: include/views/monitoring.history.php:132
+#: include/views/monitoring.history.php:148
 msgid "Mark others"
 msgstr "标记其他"
 
-#: include/views/monitoring.history.php:131
+#: include/views/monitoring.history.php:147
 msgid "Mark selected"
 msgstr "标记所选"
 
@@ -10449,7 +10449,7 @@ msgid "None"
 msgstr "无"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1484 include/views/monitoring.history.php:226
+#: include/triggers.inc.php:1484 include/views/monitoring.history.php:242
 #: popup.php:1372
 msgid "Normal"
 msgstr "正常"
@@ -11939,7 +11939,7 @@ msgstr "移除主机"
 msgid "Remove link"
 msgstr "移除连结"
 
-#: include/views/monitoring.history.php:120
+#: include/views/monitoring.history.php:136
 msgid "Remove selected"
 msgstr "移除所选的"
 
@@ -12727,13 +12727,13 @@ msgstr "选择"
 msgid "Select prototype"
 msgstr "选择原型"
 
-#: include/views/monitoring.history.php:124
+#: include/views/monitoring.history.php:140
 msgid "Select rows with value like"
 msgstr "选择行含有值类似于"
 
 #: include/views/administration.script.edit.php:82
 #: include/views/monitoring.dashconf.php:49
-#: include/views/monitoring.history.php:145
+#: include/views/monitoring.history.php:161
 msgid "Selected"
 msgstr "选择的"
 
@@ -12986,7 +12986,7 @@ msgstr "展示图标"
 msgid "Show lines"
 msgstr "展示线条"
 
-#: include/views/monitoring.history.php:129
+#: include/views/monitoring.history.php:145
 msgid "Show selected"
 msgstr "展示所选的"
 
@@ -13236,7 +13236,7 @@ msgstr ""
 msgid "Speed"
 msgstr "速度"
 
-#: include/graphs.inc.php:25 include/views/monitoring.history.php:230
+#: include/graphs.inc.php:25 include/views/monitoring.history.php:246
 #: popup.php:1363
 msgid "Stacked"
 msgstr "层积的"
@@ -15325,7 +15325,7 @@ msgstr ""
 msgid "Value: no data"
 msgstr "值: 无资料"
 
-#: include/views/monitoring.history.php:74
+#: include/views/monitoring.history.php:90
 msgid "Values"
 msgstr "值"
 
@@ -15696,7 +15696,7 @@ msgid "Y axis MAX value"
 msgstr "纵轴最大值"
 
 #: include/classes/api/services/CGraphGeneral.php:356
-#: include/classes/graphdraw/CLineGraphDraw.php:712
+#: include/classes/graphdraw/CLineGraphDraw.php:714
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Y axis MAX value must be greater than Y axis MIN value."
 
@@ -15966,7 +15966,7 @@ msgstr "[错误的月计数: \"%s\" ]"
 msgid "agent"
 msgstr "端点代理程式"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1856
+#: include/classes/graphdraw/CLineGraphDraw.php:1858
 #: include/classes/pagefilter/CPageFilter.php:738
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
@@ -15986,15 +15986,15 @@ msgstr "所有"
 msgid "all media"
 msgstr "所有介质"
 
-#: include/views/monitoring.history.php:139
+#: include/views/monitoring.history.php:155
 msgid "as Blue"
 msgstr "成蓝"
 
-#: include/views/monitoring.history.php:138
+#: include/views/monitoring.history.php:154
 msgid "as Green"
 msgstr "成绿"
 
-#: include/views/monitoring.history.php:137
+#: include/views/monitoring.history.php:153
 msgid "as Red"
 msgstr "成红"
 
@@ -16006,8 +16006,8 @@ msgstr "自动注册"
 msgid "auto-registered host"
 msgstr "自动被注册的主机"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1838
-#: include/classes/graphdraw/CLineGraphDraw.php:1860
+#: include/classes/graphdraw/CLineGraphDraw.php:1840
+#: include/classes/graphdraw/CLineGraphDraw.php:1862
 #: include/classes/graphdraw/CPieGraphDraw.php:326 include/graphs.inc.php:85
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:155
@@ -16028,14 +16028,14 @@ msgstr "d"
 msgid "d.M"
 msgstr "d.M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1378
-#: include/classes/graphdraw/CLineGraphDraw.php:1431
+#: include/classes/graphdraw/CLineGraphDraw.php:1380
+#: include/classes/graphdraw/CLineGraphDraw.php:1433
 msgid "d.m"
 msgstr "d.m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1400
-#: include/classes/graphdraw/CLineGraphDraw.php:1415
-#: include/classes/graphdraw/CLineGraphDraw.php:1434
+#: include/classes/graphdraw/CLineGraphDraw.php:1402
+#: include/classes/graphdraw/CLineGraphDraw.php:1417
+#: include/classes/graphdraw/CLineGraphDraw.php:1436
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
@@ -16162,7 +16162,7 @@ msgstr "监控项"
 msgid "key is empty"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1836
+#: include/classes/graphdraw/CLineGraphDraw.php:1838
 #: include/classes/graphdraw/CPieGraphDraw.php:321 include/graphs.inc.php:82
 #: include/views/js/configuration.graph.edit.js.php:43
 msgid "last"
@@ -16207,16 +16207,16 @@ msgstr "拓墣图"
 msgid "matches"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1839
-#: include/classes/graphdraw/CLineGraphDraw.php:1853
+#: include/classes/graphdraw/CLineGraphDraw.php:1841
+#: include/classes/graphdraw/CLineGraphDraw.php:1855
 #: include/classes/graphdraw/CPieGraphDraw.php:317 include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:42
 #: include/views/js/configuration.graph.edit.js.php:50 popup_bitem.php:156
 msgid "max"
 msgstr "最大"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1837
-#: include/classes/graphdraw/CLineGraphDraw.php:1850
+#: include/classes/graphdraw/CLineGraphDraw.php:1839
+#: include/classes/graphdraw/CLineGraphDraw.php:1852
 #: include/classes/graphdraw/CPieGraphDraw.php:313 include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:154
@@ -16252,7 +16252,7 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1931
+#: include/classes/graphdraw/CLineGraphDraw.php:1933
 #: include/classes/graphdraw/CPieGraphDraw.php:347
 msgid "no data"
 msgstr "没有数据"
