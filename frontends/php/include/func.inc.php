@@ -418,14 +418,14 @@ function str2mem($val) {
 }
 
 function mem2str($size) {
-	$prefix = _x('B', 'Byte short');
+	$prefix = 'B';
 	if ($size > 1048576) {
 		$size = $size / 1048576;
-		$prefix = _x('M', 'Mega short');
+		$prefix = 'M';
 	}
 	elseif ($size > 1024) {
 		$size = $size / 1024;
-		$prefix = _x('K', 'Kilo short');
+		$prefix = 'K';
 	}
 
 	return round($size, 6).$prefix;
@@ -660,15 +660,15 @@ function convert_units($options = array()) {
 
 	if (!isset($digitUnits[$step])) {
 		$digitUnits[$step] = array(
-			array('pow' => 0, 'short' => '', 'long' => ''),
-			array('pow' => 1, 'short' => _x('K', 'Kilo short'), 'long' => _('Kilo')),
-			array('pow' => 2, 'short' => _x('M', 'Mega short'), 'long' => _('Mega')),
-			array('pow' => 3, 'short' => _x('G', 'Giga short'), 'long' => _('Giga')),
-			array('pow' => 4, 'short' => _x('T', 'Tera short'), 'long' => _('Tera')),
-			array('pow' => 5, 'short' => _x('P', 'Peta short'), 'long' => _('Peta')),
-			array('pow' => 6, 'short' => _x('E', 'Exa short'), 'long' => _('Exa')),
-			array('pow' => 7, 'short' => _x('Z', 'Zetta short'), 'long' => _('Zetta')),
-			array('pow' => 8, 'short' => _x('Y', 'Yotta short'), 'long' => _('Yotta'))
+			array('pow' => 0, 'short' => ''),
+			array('pow' => 1, 'short' => 'K'),
+			array('pow' => 2, 'short' => 'M'),
+			array('pow' => 3, 'short' => 'G'),
+			array('pow' => 4, 'short' => 'T'),
+			array('pow' => 5, 'short' => 'P'),
+			array('pow' => 6, 'short' => 'E'),
+			array('pow' => 7, 'short' => 'Z'),
+			array('pow' => 8, 'short' => 'Y')
 		);
 
 		foreach ($digitUnits[$step] as $dunit => $data) {
@@ -678,7 +678,7 @@ function convert_units($options = array()) {
 	}
 
 
-	$valUnit = array('pow' => 0, 'short' => '', 'long' => '', 'value' => $options['value']);
+	$valUnit = array('pow' => 0, 'short' => '', 'value' => $options['value']);
 
 	if ($options['pow'] === false || $options['value'] == 0) {
 		foreach ($digitUnits[$step] as $dnum => $data) {
@@ -710,7 +710,6 @@ function convert_units($options = array()) {
 	switch ($options['convert']) {
 		case 0: $options['units'] = trim($options['units']);
 		case 1: $desc = $valUnit['short']; break;
-		case 2: $desc = $valUnit['long']; break;
 	}
 
 	$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'],
@@ -1686,11 +1685,11 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			// display the login button only for guest users
 			if (CWebUser::isGuest()) {
 				$buttons[] = new CButton('login', _('Login'),
-					'javascript: document.location = "index.php?request='.$url.'";', 'formlist'
+					'javascript: document.location = "index.php?request='.$url.'";', 'button'
 				);
 			}
 			$buttons[] = new CButton('back', _('Go to dashboard'),
-				'javascript: document.location = "dashboard.php"', 'formlist'
+				'javascript: document.location = "dashboard.php"', 'button'
 			);
 		}
 		// if the user is not logged in - offer to login
@@ -1702,7 +1701,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 			);
 			$buttons = array(
-				new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist')
+				new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'button')
 			);
 		}
 
@@ -2242,49 +2241,67 @@ function uncheckTableRows($cookieId = null) {
 }
 
 /**
- * Splitting string using slashes with escape backslash support.
+ * Splitting string using slashes with escape backslash support and non-pair backslash cleanup.
  *
- * @param string $path				string path to parse
- * @param bool   $stripSlashes		remove escaped slashes from the path pieces
+ * @param string $path					String path to parse.
+ * @param bool   $stripSlashes			Remove escaped slashes from the path pieces.
+ * @param bool   $cleanupBackslashes	Cleanup invalid backslash combinations.
  *
  * @return array
  */
-function splitPath($path, $stripSlashes = true) {
-	$items = array();
-	$s = $escapes = '';
+function splitPath($path, $stripSlashes = true, $cleanupBackslashes = false) {
+	$position = 0;
+	$escapeCharacters = '';
+	$pathItemsArray = array();
+	$pathItemString = '';
 
-	for ($i = 0, $size = strlen($path); $i < $size; $i++) {
-		if ($path[$i] === '/') {
-			if ($escapes === '') {
-				$items[] = $s;
-				$s = '';
+	for ($stringLength = strlen($path); $position < $stringLength; ++$position) {
+		// Determine how many escape characters we already have in the backlog.
+		$escapeCharacterCount = strlen($escapeCharacters);
+
+		if ($path[$position] === '/') {
+			// If we have no escape chars previously - save item into the array and move on.
+			if ($escapeCharacterCount == 0) {
+				$pathItemsArray[] = $pathItemString;
+				$escapeCharacters = '';
+				$pathItemString = '';
+				continue;
+			}
+
+			// We have a backslash before the / - keep it as part of the item and clean escape char buffer.
+			$pathItemString .= $escapeCharacters.$path[$position];
+			$escapeCharacters = '';
+		}
+		elseif ($cleanupBackslashes && $path[$position] === '\\') {
+
+			/*
+			 * If we had a backslash before - this is an escaped backslash, keep it and empty char backlog. This way
+			 * we save only paired backslashes.
+			 */
+			if ($escapeCharacterCount == 1) {
+				$pathItemString .= $escapeCharacters.$path[$position];
+				$escapeCharacters = '';
 			}
 			else {
-				if (strlen($escapes) % 2 == 0) {
-					$s .= $stripSlashes ? stripslashes($escapes) : $escapes;
-					$items[] = $s;
-					$s = $escapes = '';
-				}
-				else {
-					$s .= $stripSlashes ? stripslashes($escapes).$path[$i] : $escapes.$path[$i];
-					$escapes = '';
-				}
+				// It is a first backslash - add it to the backlog.
+				$escapeCharacters .= $path[$position];
 			}
 		}
-		elseif ($path[$i] === '\\') {
-			$escapes .= $path[$i];
-		}
 		else {
-			$s .= $stripSlashes ? stripslashes($escapes).$path[$i] : $escapes.$path[$i];
-			$escapes = '';
+			// A regular character - save it and move on. If previous char was a backslash - it is dropped.
+			$pathItemString .= $path[$position];
+			$escapeCharacters = '';
 		}
 	}
 
-	if ($escapes !== '') {
-		$s .= $stripSlashes ? stripslashes($escapes) : $escapes;
+	// Save the path tail.
+	if (strlen($pathItemString) != 0) {
+		$pathItemsArray[] = $pathItemString;
 	}
 
-	$items[] = $s;
+	if ($stripSlashes) {
+		$pathItemsArray = array_map('stripslashes', $pathItemsArray);
+	}
 
-	return $items;
+	return $pathItemsArray;
 }
