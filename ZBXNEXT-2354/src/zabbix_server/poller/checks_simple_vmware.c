@@ -18,7 +18,9 @@
 **/
 
 #include "common.h"
+
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"

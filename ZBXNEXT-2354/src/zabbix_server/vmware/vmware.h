@@ -178,8 +178,11 @@ void	zbx_vmware_destroy(void);
 void	zbx_vmware_lock(void);
 void	zbx_vmware_unlock(void);
 
-zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
 int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
 
 int	zbx_vmware_service_get_perfcounterid(zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid);
 int	zbx_vmware_service_start_monitoring(zbx_vmware_service_t *service, const char *type, const char *id,
@@ -240,8 +243,6 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 /*
  * XML support
  */
-
-#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #	define ZBX_XPATH_LN(LN)			"/*[local-name()='" LN "']"
 #	define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)

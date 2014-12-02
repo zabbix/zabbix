@@ -2571,34 +2571,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vmware_service_get_perf_entity                               *
- *                                                                            *
- * Purpose: gets performance entity by type and id                            *
- *                                                                            *
- * Parameters: service - [IN] the vmware service                              *
- *             type    - [IN] the performance entity type                     *
- *             id      - [IN] the performance entity id                       *
- *                                                                            *
- * Return value: the performance entity or NULL if not found                  *
- *                                                                            *
- ******************************************************************************/
-zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
-		const char *id)
-{
-	const char			*__function_name = "zbx_vmware_service_get_perf_entity";
-	zbx_vmware_perf_entity_t	*pentity, entity = {(char *)type, (char *)id};
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s", __function_name, type, id);
-
-	pentity = zbx_hashset_search(&service->entities, &entity);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() entity:%p", __function_name, entity);
-
-	return pentity;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: vmware_service_add_perf_entity                                   *
  *                                                                            *
  * Purpose: adds entity to vmware service performance entity list             *
@@ -3247,6 +3219,128 @@ out:
 	return service;
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vmware_service_get_perfcounterid                             *
+ *                                                                            *
+ * Purpose: gets vmware performance counter id by the path                    *
+ *                                                                            *
+ * Parameters: counters  - [IN] the counters hashset                          *
+ *             path      - [IN] the path of counter to retrieve in format     *
+ *                             <group>/<key>[<rollup type>]                   *
+ *             counterid - [OUT] the counter id                               *
+ *                                                                            *
+ * Return value: SUCCEED if the counter was found, FAIL otherwise             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_vmware_service_get_perfcounterid(zbx_vmware_service_t *service, const char *path,
+		zbx_uint64_t *counterid)
+{
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+	const char		*__function_name = "zbx_vmware_service_get_perfcounterid";
+	zbx_vmware_counter_t	*counter;
+	int			ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() path:%s", __function_name, path);
+
+	if (NULL != (counter = zbx_hashset_search(&service->counters, &path)))
+	{
+		*counterid = counter->id;
+		ret = SUCCEED;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s counterid:" ZBX_FS_UI64, __function_name, zbx_result_string(ret),
+			*counterid);
+	return ret;
+#else
+	return FAIL;
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vmware_service_start_monitoring                              *
+ *                                                                            *
+ * Purpose: start monitoring performance counter of the specified entity      *
+ *                                                                            *
+ * Parameters: service   - [IN] the vmware service                            *
+ *             type      - [IN] the entity type                               *
+ *             id        - [IN] the entity id                                 *
+ *             counterid - [IN] the performance counter id                    *
+ *                                                                            *
+ * Return value: SUCCEED - the entity counter was added to monitoring list.   *
+ *               FAIL    - the performance counter of the specified entity    *
+ *                         is already being monitored.                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_vmware_service_start_monitoring(zbx_vmware_service_t *service, const char *type, const char *id,
+		zbx_uint64_t counterid)
+{
+	const char			*__function_name = "zbx_vmware_service_start_monitoring";
+	int				ret = FAIL;
+	zbx_vmware_perf_entity_t	*pentity, entity;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s counterid:" ZBX_FS_UI64, __function_name, type, id,
+			counterid);
+
+	if (NULL == (pentity = zbx_vmware_service_get_perf_entity(service, type, id)))
+	{
+		entity.refresh = 0;
+		entity.last_seen = 0;
+		entity.type = vmware_shared_strdup(type);
+		entity.id = vmware_shared_strdup(id);
+		zbx_vector_ptr_create_ext(&entity.counters, __vm_mem_malloc_func, __vm_mem_realloc_func,
+				__vm_mem_free_func);
+
+		pentity = zbx_hashset_insert(&service->entities, &entity, sizeof(zbx_vmware_perf_entity_t));
+	}
+
+	if (FAIL == zbx_vector_ptr_search(&pentity->counters, &counterid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+	{
+		zbx_vmware_perf_counter_t	*counter;
+
+		counter = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_perf_counter_t));
+		counter->counterid = counterid;
+		zbx_vector_ptr_pair_create_ext(&counter->values, __vm_mem_malloc_func, __vm_mem_realloc_func,
+				__vm_mem_free_func);
+		zbx_vector_ptr_append(&pentity->counters, counter);
+
+		ret = SUCCEED;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vmware_service_get_perf_entity                               *
+ *                                                                            *
+ * Purpose: gets performance entity by type and id                            *
+ *                                                                            *
+ * Parameters: service - [IN] the vmware service                              *
+ *             type    - [IN] the performance entity type                     *
+ *             id      - [IN] the performance entity id                       *
+ *                                                                            *
+ * Return value: the performance entity or NULL if not found                  *
+ *                                                                            *
+ ******************************************************************************/
+zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
+		const char *id)
+{
+	const char			*__function_name = "zbx_vmware_service_get_perf_entity";
+	zbx_vmware_perf_entity_t	*pentity, entity = {(char *)type, (char *)id};
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s", __function_name, type, id);
+
+	pentity = zbx_hashset_search(&service->entities, &entity);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() entity:%p", __function_name, entity);
+
+	return pentity;
+}
 #endif
 
 /******************************************************************************
@@ -3438,97 +3532,6 @@ void	main_vmware_loop(void)
 	}
 #undef STAT_INTERVAL
 #endif
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_vmware_service_get_perfcounterid                             *
- *                                                                            *
- * Purpose: gets vmware performance counter id by the path                    *
- *                                                                            *
- * Parameters: counters  - [IN] the counters hashset                          *
- *             path      - [IN] the path of counter to retrieve in format     *
- *                             <group>/<key>[<rollup type>]                   *
- *             counterid - [OUT] the counter id                               *
- *                                                                            *
- * Return value: SUCCEED if the counter was found, FAIL otherwise             *
- *                                                                            *
- ******************************************************************************/
-int	zbx_vmware_service_get_perfcounterid(zbx_vmware_service_t *service, const char *path,
-		zbx_uint64_t *counterid)
-{
-	const char			*__function_name = "zbx_vmware_service_get_perfcounterid";
-	zbx_vmware_counter_t	*counter;
-	int				ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() path:%s", __function_name, path);
-
-	if (NULL != (counter = zbx_hashset_search(&service->counters, &path)))
-	{
-		*counterid = counter->id;
-		ret = SUCCEED;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s counterid:" ZBX_FS_UI64, __function_name, zbx_result_string(ret),
-			*counterid);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_vmware_service_start_monitoring                              *
- *                                                                            *
- * Purpose: start monitoring performance counter of the specified entity      *
- *                                                                            *
- * Parameters: service   - [IN] the vmware service                            *
- *             type      - [IN] the entity type                               *
- *             id        - [IN] the entity id                                 *
- *             counterid - [IN] the performance counter id                    *
- *                                                                            *
- * Return value: SUCCEED - the entity counter was added to monitoring list.   *
- *               FAIL    - the performance counter of the specified entity    *
- *                         is already being monitored.                        *
- *                                                                            *
- ******************************************************************************/
-int	zbx_vmware_service_start_monitoring(zbx_vmware_service_t *service, const char *type, const char *id,
-		zbx_uint64_t counterid)
-{
-	const char			*__function_name = "zbx_vmware_service_start_monitoring";
-	int				ret = FAIL;
-	zbx_vmware_perf_entity_t	*pentity, entity;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s counterid:" ZBX_FS_UI64, __function_name, type, id,
-			counterid);
-
-	if (NULL == (pentity = zbx_vmware_service_get_perf_entity(service, type, id)))
-	{
-		entity.refresh = 0;
-		entity.last_seen = 0;
-		entity.type = vmware_shared_strdup(type);
-		entity.id = vmware_shared_strdup(id);
-		zbx_vector_ptr_create_ext(&entity.counters, __vm_mem_malloc_func, __vm_mem_realloc_func,
-				__vm_mem_free_func);
-
-		pentity = zbx_hashset_insert(&service->entities, &entity, sizeof(zbx_vmware_perf_entity_t));
-	}
-
-	if (FAIL == zbx_vector_ptr_search(&pentity->counters, &counterid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
-	{
-		zbx_vmware_perf_counter_t	*counter;
-
-		counter = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_perf_counter_t));
-		counter->counterid = counterid;
-		zbx_vector_ptr_pair_create_ext(&counter->values, __vm_mem_malloc_func, __vm_mem_realloc_func,
-				__vm_mem_free_func);
-		zbx_vector_ptr_append(&pentity->counters, counter);
-
-		ret = SUCCEED;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
 }
 
 /******************************************************************************
