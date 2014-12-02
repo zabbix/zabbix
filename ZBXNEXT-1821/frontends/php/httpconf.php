@@ -526,7 +526,7 @@ if (isset($_REQUEST['form'])) {
 
 		$agent = (hasRequest('agent') && zbx_empty(getRequest('agent')))
 			? ZBX_DEFAULT_AGENT
-			: getRequest('agent');
+			: getRequest('agent', ZBX_DEFAULT_AGENT);
 
 		$data['name'] = getRequest('name', '');
 		$data['applicationid'] = getRequest('applicationid');
