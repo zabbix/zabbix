@@ -78,7 +78,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		$existingInterfaceTypes[$interface['type']] = true;
 	}
 
-	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson($parentHost['interfaces']).');');
+	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson(array_values($parentHost['interfaces'])).');');
 	zbx_add_post_js('hostInterfacesManager.disable();');
 
 	// table for agent interfaces with footer
@@ -312,7 +312,7 @@ $inventoryTypeRadioButton = array(
 	$inventoryAutomaticBtn,
 	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
 );
-$inventoryFormList->addRow(new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
+$inventoryFormList->addRow(new CDiv($inventoryTypeRadioButton, 'jqueryinputset radioset'));
 
 // clearing the float
 $clearFixDiv = new CDiv();
@@ -345,7 +345,7 @@ if (isset($hostPrototype['hostid'])) {
 else {
 	$frmHost->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('parent_discoveryid'))
+		array(new CButtonCancel(url_param('parent_discoveryid')))
 	));
 }
 

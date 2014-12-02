@@ -1218,7 +1218,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	DCconfig_get_items_by_itemids(items, ids.values, errcodes, history_num);
 	DCget_delta_items(&delta_history, &ids);
 
-	ids.values_num = 0;	/* item ids that are not disabled and not deleted in DB */
+	zbx_vector_uint64_clear(&ids);	/* item ids that are not disabled and not deleted in DB */
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1266,7 +1266,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	DCadd_update_inventory_sql(&sql_offset, &inventory_values);
 
-	zbx_vector_ptr_clean(&inventory_values, (zbx_mem_free_func_t)DCinventory_value_free);
+	zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
 	zbx_vector_ptr_destroy(&inventory_values);
 
 	/* disable processing of deleted and disabled items by setting value_null */
@@ -2198,7 +2198,7 @@ static void	DCvacuum_text()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() text_free:%d/%d",
 			__function_name, cache->text_free, CONFIG_TEXT_CACHE_SIZE);
 
-	if (CONFIG_TEXT_CACHE_SIZE / 1024 >= cache->text_free)
+	if (CONFIG_TEXT_CACHE_SIZE / 1024 >= (unsigned int)cache->text_free)
 		goto exit;
 
 	cache->last_text = cache->text;
@@ -2580,7 +2580,7 @@ static void	dc_local_add_history_str(zbx_uint64_t itemid, zbx_timespec_t *ts, co
 	item_value->value_type = ITEM_VALUE_TYPE_STR;
 	item_value->state = ITEM_STATE_NORMAL;
 	item_value->flags = 0;
-	item_value->value.value_str.len = zbx_strlen_utf8_n(value_orig, HISTORY_STR_VALUE_LEN) + 1;
+	item_value->value.value_str.len = zbx_db_strlen_n(value_orig, HISTORY_STR_VALUE_LEN) + 1;
 
 	dc_string_buffer_realloc(item_value->value.value_str.len);
 	item_value->value.value_str.pvalue = string_values_offset;
@@ -2599,7 +2599,7 @@ static void	dc_local_add_history_text(zbx_uint64_t itemid, zbx_timespec_t *ts, c
 	item_value->value_type = ITEM_VALUE_TYPE_TEXT;
 	item_value->state = ITEM_STATE_NORMAL;
 	item_value->flags = 0;
-	item_value->value.value_str.len = zbx_strlen_utf8_n(value_orig, HISTORY_TEXT_VALUE_LEN) + 1;
+	item_value->value.value_str.len = zbx_db_strlen_n(value_orig, HISTORY_TEXT_VALUE_LEN) + 1;
 
 	dc_string_buffer_realloc(item_value->value.value_str.len);
 	item_value->value.value_str.pvalue = string_values_offset;
@@ -2619,10 +2619,10 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, zbx_timespec_t *ts, co
 	item_value->value_type = ITEM_VALUE_TYPE_LOG;
 	item_value->state = ITEM_STATE_NORMAL;
 	item_value->flags = 0;
-	item_value->value.value_str.len = zbx_strlen_utf8_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
+	item_value->value.value_str.len = zbx_db_strlen_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
 	item_value->timestamp = timestamp;
 	if (NULL != source && '\0' != *source)
-		item_value->source.len = zbx_strlen_utf8_n(source, HISTORY_LOG_SOURCE_LEN) + 1;
+		item_value->source.len = zbx_db_strlen_n(source, HISTORY_LOG_SOURCE_LEN) + 1;
 	else
 		item_value->source.len = 0;
 	item_value->severity = severity;
@@ -2651,7 +2651,7 @@ static void	dc_local_add_history_notsupported(zbx_uint64_t itemid, zbx_timespec_
 	item_value->itemid = itemid;
 	item_value->ts = *ts;
 	item_value->state = ITEM_STATE_NOTSUPPORTED;
-	item_value->value.value_str.len = zbx_strlen_utf8_n(error, ITEM_ERROR_LEN) + 1;
+	item_value->value.value_str.len = zbx_db_strlen_n(error, ITEM_ERROR_LEN) + 1;
 
 	dc_string_buffer_realloc(item_value->value.value_str.len);
 	item_value->value.value_str.pvalue = string_values_offset;
@@ -3078,3 +3078,4 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 
 	return nextid;
 }
+

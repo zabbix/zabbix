@@ -1304,19 +1304,6 @@ class CHost extends CHostGeneral {
 		}
 
 		if (!$nopermissions) {
-			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid', 'name', 'flags'),
-				'hostids' => $hostIds,
-				'preservekeys' => true,
-				'editable' => true
-			));
-
-			foreach ($dbHosts as $dbHost) {
-				if ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete discovered host "%1$s".', $dbHost['name']));
-				}
-			}
-
 			$this->checkPermissions($hostIds);
 		}
 	}
@@ -1354,7 +1341,7 @@ class CHost extends CHostGeneral {
 			API::Item()->delete(array_keys($delItems), true);
 		}
 
-// delete web tests
+		// delete web tests
 		$delHttptests = array();
 		$dbHttptests = get_httptests_by_hostid($hostIds);
 		while ($dbHttptest = DBfetch($dbHttptests)) {
@@ -1365,13 +1352,13 @@ class CHost extends CHostGeneral {
 		}
 
 
-// delete screen items
+		// delete screen items
 		DB::delete('screens_items', array(
 			'resourceid' => $hostIds,
 			'resourcetype' => SCREEN_RESOURCE_HOST_TRIGGERS
 		));
 
-// delete host from maps
+		// delete host from maps
 		if (!empty($hostIds)) {
 			DB::delete('sysmaps_elements', array(
 				'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
@@ -1379,8 +1366,8 @@ class CHost extends CHostGeneral {
 			));
 		}
 
-// disable actions
-// actions from conditions
+		// disable actions
+		// actions from conditions
 		$actionids = array();
 		$sql = 'SELECT DISTINCT actionid'.
 				' FROM conditions'.
@@ -1391,7 +1378,7 @@ class CHost extends CHostGeneral {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
 		}
 
-// actions from operations
+		// actions from operations
 		$sql = 'SELECT DISTINCT o.actionid'.
 				' FROM operations o, opcommand_hst oh'.
 				' WHERE o.operationid=oh.operationid'.
@@ -1410,13 +1397,13 @@ class CHost extends CHostGeneral {
 			DB::update('actions', $update);
 		}
 
-// delete action conditions
+		// delete action conditions
 		DB::delete('conditions', array(
 			'conditiontype' => CONDITION_TYPE_HOST,
 			'value' => $hostIds
 		));
 
-// delete action operation commands
+		// delete action operation commands
 		$operationids = array();
 		$sql = 'SELECT DISTINCT oh.operationid'.
 				' FROM opcommand_hst oh'.
@@ -1430,7 +1417,7 @@ class CHost extends CHostGeneral {
 			'hostid' => $hostIds,
 		));
 
-// delete empty operations
+		// delete empty operations
 		$delOperationids = array();
 		$sql = 'SELECT DISTINCT o.operationid'.
 				' FROM operations o'.
@@ -1454,16 +1441,16 @@ class CHost extends CHostGeneral {
 			'nopermissions' => true
 		));
 
-// delete host inventory
+		// delete host inventory
 		DB::delete('host_inventory', array('hostid' => $hostIds));
 
-// delete host applications
+		// delete host applications
 		DB::delete('applications', array('hostid' => $hostIds));
 
-// delete host
+		// delete host
 		DB::delete('hosts', array('hostid' => $hostIds));
 
-// TODO: remove info from API
+		// TODO: remove info from API
 		foreach ($hosts as $host) {
 			info(_s('Deleted: Host "%1$s".', $host['name']));
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['name'], 'hosts', NULL, NULL);
