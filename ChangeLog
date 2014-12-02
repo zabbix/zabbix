@@ -545,7 +545,7 @@ Changes for 2.2.8rc1
 
 New features:
 .......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ..F....... [ZBX-5077] fixed percentile calculation formula and corrected accessed index, by which value is selected (arvids)
