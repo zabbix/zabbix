@@ -287,7 +287,7 @@ $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 // append tabs and form
 $hostInventoriesForm = new CForm();
 $hostInventoriesForm->addItem($hostInventoriesTab);
-$hostInventoriesForm->addItem(makeFormFooter(null, new CButtonCancel(url_param('groupid'))));
+$hostInventoriesForm->addItem(makeFormFooter(null, array(new CButtonCancel(url_param('groupid')))));
 $hostInventoryWidget->addItem($hostInventoriesForm);
 
 return $hostInventoryWidget;
