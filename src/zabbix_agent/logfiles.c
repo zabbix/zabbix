@@ -488,33 +488,33 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 	{
 		if (old->ino_lo != new->ino_lo || old->dev != new->dev)
 		{
-			/* File's inode and device id cannot differ. */
+			/* file inode and device id cannot differ */
 			goto out;
 		}
 	}
 
 	if (2 == use_ino && old->ino_hi != new->ino_hi)
 	{
-		/* File's inode (older 64-bits) cannot differ. */
+		/* file inode (older 64-bits) cannot differ */
 		goto out;
 	}
 
 	if (old->mtime > new->mtime)
 	{
-		/* File's mtime cannot decrease unless manipulated. */
+		/* file mtime cannot decrease unless manipulated */
 		goto out;
 	}
 
 	if (old->size > new->size)
 	{
-		/* File's size cannot decrease. Truncating or replacing a file with a smaller one */
+		/* File size cannot decrease. Truncating or replacing a file with a smaller one */
 		/* counts as 2 different files. */
 		goto out;
 	}
 
 	if (old->size == new->size && old->mtime < new->mtime)
 	{
-		/* File's mtime cannot increase without changing size unless manipulated. */
+		/* file mtime cannot increase without changing size unless manipulated */
 		goto out;
 	}
 
@@ -526,7 +526,7 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 
 	if (old->md5size > new->md5size)
 	{
-		/* File's initial block size from which MD5 sum is calculated cannot decrease. */
+		/* file initial block size from which MD5 sum is calculated cannot decrease */
 		goto out;
 	}
 
@@ -1484,10 +1484,14 @@ int	process_logrt(int is_logrt, const char *filename, zbx_uint64_t *lastlogsize,
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
-				max_old_seq = 0, old_last, from_first_file = 1;
-	char			*old2new = NULL;
+				max_old_seq = 0, old_last, from_first_file = 1, mtime_orig;
+	char			*old2new = NULL, value_added;
 	struct st_logfile	*logfiles = NULL;
 	time_t			now;
+	zbx_uint64_t		lastlogsize_orig;
+
+	lastlogsize_orig = *lastlogsize;
+	mtime_orig = *mtime;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() is_logrt:%d filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
 			__function_name, is_logrt, filename, *lastlogsize, *mtime);
@@ -1642,7 +1646,15 @@ int	process_logrt(int is_logrt, const char *filename, zbx_uint64_t *lastlogsize,
 			ret = process_log(logfiles[i].filename, lastlogsize, (1 == is_logrt) ? mtime : NULL,
 					skip_old_data, big_rec, &logfiles[i].incomplete, err_msg, encoding, regexps,
 					pattern, output_template, p_count, s_count, process_value, server, port,
-					hostname, key);
+					hostname, key, &value_added);
+
+			if (SUCCEED == ret && 0 == value_added &&
+					(lastlogsize_orig != *lastlogsize || mtime_orig != *mtime))
+			{
+				/* make sure we send meta information update */
+				ret = process_value(server, port, hostname, key, NULL, ITEM_STATE_NORMAL, lastlogsize,
+						mtime, NULL, NULL, NULL, NULL, 1);
+			}
 
 			/* process_log() advances 'lastlogsize' only on success therefore */
 			/* we do not check for errors here */
@@ -1749,7 +1761,7 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, int *incomplete, char **err_msg,
 		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
 		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
-		unsigned short port, const char *hostname, const char *key)
+		unsigned short port, const char *hostname, const char *key, char *value_added)
 {
 	ZBX_THREAD_LOCAL static char	*buf = NULL;
 
@@ -1762,8 +1774,9 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 	zbx_uint64_t			lastlogsize1;
 
 #define BUF_SIZE	(256 * ZBX_KIBIBYTE)	/* The longest encodings use 4-bytes for every character. To send */
-						/* up to 64 k characters to the Zabbix server a 256 kB buffer might */
-						/* be required. */
+						/* up to 64 k characters to Zabbix server a 256 kB buffer might be */
+						/* required. */
+
 	if (NULL == buf)
 	{
 		buf = zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
@@ -1850,7 +1863,6 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 							" is running.", value);
 
 					lastlogsize1 = (size_t)offset + (size_t)nbytes;
-					send_err = SUCCEED;
 
 					regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE, output_template,
 							&item_value);
@@ -1865,6 +1877,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 					{
 						(*s_count)--;
 
+						*value_added = 1;
 						*lastlogsize = lastlogsize1;
 						*big_rec = 1;	/* ignore the rest of this record */
 					}
@@ -1909,7 +1922,6 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 						value = p_start;
 
 					lastlogsize1 = (size_t)offset + (size_t)(p_next - buf);
-					send_err = SUCCEED;
 
 					regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE, output_template,
 							&item_value);
@@ -1924,6 +1936,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 					{
 						(*s_count)--;
 
+						*value_added = 1;
 						*lastlogsize = lastlogsize1;
 					}
 
@@ -2015,6 +2028,7 @@ out:
  *     port            - [IN] port to send data to                            *
  *     hostname        - [IN] hostname the data comes from                    *
  *     key             - [IN] item key the data belongs to                    *
+ *     value_added     - [OUT] non-zero if a value was added                  *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -2029,7 +2043,7 @@ int	process_log(const char *filename, zbx_uint64_t *lastlogsize, int *mtime, uns
 		int *big_rec, int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps,
 		const char *pattern, const char *output_template, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
-		const char *key)
+		const char *key, char *value_added)
 {
 	const char	*__function_name = "process_log";
 
@@ -2039,6 +2053,8 @@ int	process_log(const char *filename, zbx_uint64_t *lastlogsize, int *mtime, uns
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d",
 			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0);
+
+	*value_added = 0;
 
 	if (0 != zbx_stat(filename, &buf))
 	{
@@ -2073,7 +2089,7 @@ int	process_log(const char *filename, zbx_uint64_t *lastlogsize, int *mtime, uns
 				filename, l_size);
 	}
 
-	if ((zbx_uint64_t)buf.st_size < l_size)		/* handle file truncation */
+	if ((zbx_uint64_t)buf.st_size < l_size)	/* handle file truncation */
 		l_size = 0;
 
 	if ((zbx_offset_t)-1 != zbx_lseek(f, l_size, SEEK_SET))
@@ -2082,7 +2098,8 @@ int	process_log(const char *filename, zbx_uint64_t *lastlogsize, int *mtime, uns
 		*skip_old_data = 0;
 
 		ret = zbx_read2(f, lastlogsize, mtime, big_rec, incomplete, err_msg, encoding, regexps, pattern,
-				output_template, p_count, s_count, process_value, server, port, hostname, key);
+				output_template, p_count, s_count, process_value, server, port, hostname, key,
+				value_added);
 	}
 	else
 	{

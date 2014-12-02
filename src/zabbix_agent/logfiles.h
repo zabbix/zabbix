@@ -43,7 +43,7 @@ int	process_log(const char *filename, zbx_uint64_t *lastlogsize, int *mtime, uns
 		int *big_rec, int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps,
 		const char *pattern, const char *output_template, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
-		const char *key);
+		const char *key, char *value_added);
 
 int	process_logrt(int is_logrt, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
 		unsigned char *skip_old_data, int *big_rec, int *use_ino, char **err_msg,
