@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-28 11:18+0300\n"
+"POT-Creation-Date: 2014-12-02 03:54+0200\n"
 "PO-Revision-Date: 2014-06-08 10:44+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2877,7 +2877,7 @@ msgstr "Слайдшоу користувачів"
 msgid "Czech (cs_CZ)"
 msgstr "Чеська (cs_CZ)"
 
-#: include/classes/class.cchart.php:1227
+#: include/classes/class.cchart.php:1229
 msgid "D"
 msgstr "D"
 
@@ -2957,7 +2957,7 @@ msgstr "Пунктирна лінія"
 msgid "Data"
 msgstr "Дані"
 
-#: include/classes/class.cchart.php:2376 include/classes/class.cpie.php:702
+#: include/classes/class.cchart.php:2378 include/classes/class.cpie.php:702
 #, php-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Дані із %1$s. Згенеровано за %2$s сек."
@@ -5021,7 +5021,7 @@ msgstr "Групи, в яких проводиться сервіс"
 msgid "H.i"
 msgstr "H.i"
 
-#: include/classes/class.cchart.php:1233 include/classes/class.cchart.php:1292
+#: include/classes/class.cchart.php:1235 include/classes/class.cchart.php:1294
 #: include/page_header.php:486
 msgid "H:i"
 msgstr "H:i"
@@ -13491,7 +13491,7 @@ msgstr "[Неправильне значення місяця: \"%s\" ]"
 msgid "agent"
 msgstr "агент"
 
-#: include/classes/class.cchart.php:1764
+#: include/classes/class.cchart.php:1766
 #: include/classes/class.cpagefilter.php:631
 #: include/classes/screens/CScreenHostgroupTriggers.php:104
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
@@ -13533,7 +13533,7 @@ msgstr "зеленим"
 msgid "as Red"
 msgstr "червоним"
 
-#: include/classes/class.cchart.php:1746 include/classes/class.cchart.php:1768
+#: include/classes/class.cchart.php:1748 include/classes/class.cchart.php:1770
 #: include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:129
@@ -13577,12 +13577,12 @@ msgstr "d.m.Y H:i:s"
 msgid "d.M"
 msgstr "d M"
 
-#: include/classes/class.cchart.php:1230 include/classes/class.cchart.php:1283
+#: include/classes/class.cchart.php:1232 include/classes/class.cchart.php:1285
 msgid "d.m"
 msgstr "d.m"
 
-#: include/classes/class.cchart.php:1252 include/classes/class.cchart.php:1267
-#: include/classes/class.cchart.php:1286
+#: include/classes/class.cchart.php:1254 include/classes/class.cchart.php:1269
+#: include/classes/class.cchart.php:1288
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
@@ -13695,7 +13695,7 @@ msgstr "є"
 msgid "key is empty"
 msgstr "ключ пустий"
 
-#: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
+#: include/classes/class.cchart.php:1746 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
 msgid "last"
 msgstr "ост."
@@ -13735,14 +13735,14 @@ msgstr "сервіс"
 msgid "map"
 msgstr "карта мережі"
 
-#: include/classes/class.cchart.php:1747 include/classes/class.cchart.php:1761
+#: include/classes/class.cchart.php:1749 include/classes/class.cchart.php:1763
 #: include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:130
 msgid "max"
 msgstr "макс."
 
-#: include/classes/class.cchart.php:1745 include/classes/class.cchart.php:1758
+#: include/classes/class.cchart.php:1747 include/classes/class.cchart.php:1760
 #: include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:39
 #: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:128
@@ -13791,7 +13791,7 @@ msgstr "має бути дійсним користувачем LDAP"
 msgid "no"
 msgstr "ні"
 
-#: include/blocks.inc.php:1440 include/classes/class.cchart.php:1825
+#: include/blocks.inc.php:1440 include/classes/class.cchart.php:1827
 #: include/classes/class.cpie.php:320 include/maps.inc.php:435
 #: include/maps.inc.php:479
 #, php-format
