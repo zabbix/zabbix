@@ -1081,7 +1081,7 @@ static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *function,
 	const char			*__function_name = "evaluate_PERCENTILE";
 
 	int				nparams, arg1, time_shift, flag, ret = FAIL, seconds = 0, nvalues = 0;
-	double				percentile;
+	double				percentage;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1125,8 +1125,7 @@ static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *function,
 
 	now -= time_shift;
 
-	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 3, &percentile) ||
-			0 == percentile || percentile > 100)
+	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 3, &percentage) || percentage > 100)
 	{
 		*error = zbx_strdup(*error, "invalid third parameter");
 		goto out;
@@ -1144,7 +1143,10 @@ static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *function,
 		else
 			zbx_vector_history_record_sort(&values, (zbx_compare_func_t)__history_record_uint64_compare);
 
-		index = (int)ceil(values.values_num * (percentile / 100));
+		if (0 == percentage)
+			index = 1;
+		else
+			index = (int)ceil(values.values_num * (percentage / 100));
 
 		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &values.values[index - 1].value, item->value_type);
 
