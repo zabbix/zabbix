@@ -99,6 +99,8 @@ static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
 {
 	zbx_vector_ptr_clear_ext(&trigger->functions, (zbx_clean_func_t)lld_function_free);
 	zbx_vector_ptr_destroy(&trigger->functions);
+	zbx_free(trigger->url_orig);
+	zbx_free(trigger->url);
 	zbx_free(trigger->comments_orig);
 	zbx_free(trigger->comments);
 	zbx_free(trigger->expression_orig);
@@ -964,6 +966,8 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 			db_trigger->expression_orig = NULL;
 			db_trigger->comments = NULL;
 			db_trigger->comments_orig = NULL;
+			db_trigger->url = NULL;
+			db_trigger->url_orig = NULL;
 			db_trigger->flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 
 			zbx_vector_ptr_create(&db_trigger->functions);
