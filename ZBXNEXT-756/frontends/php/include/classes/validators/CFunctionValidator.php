@@ -34,7 +34,7 @@ class CFunctionValidator extends CValidator {
 	 *   )
 	 * )
 	 *
-	 * <parameter_type> can be 'sec_zero', 'sec_num', 'sec_num_zero', 'num', 'float', 'operation', 'str'
+	 * <parameter_type> can be 'sec_zero', 'sec_num', 'sec_num_zero', 'num', 'percent', 'operation', 'str'
 	 * <value_type> can be one of ITEM_VALUE_TYPE_*
 	 *
 	 * @var array
@@ -189,7 +189,7 @@ class CFunctionValidator extends CValidator {
 				'args' => array(
 					array('type' => 'sec_num', 'mandat' => true),
 					array('type' => 'sec_zero', 'mandat' => true, 'can_be_empty' => true),
-					array('type' => 'float', 'mandat' => true)
+					array('type' => 'percent', 'mandat' => true)
 				),
 				'value_types' => $valueTypesNum
 			),
@@ -312,7 +312,7 @@ class CFunctionValidator extends CValidator {
 	 * Validate trigger function parameter.
 	 *
 	 * @param string $param
-	 * @param string $type  type of $param ('sec_zero', 'sec_num', 'sec_num_zero', 'num', 'float', 'operation', 'str')
+	 * @param string $type  type of $param ('sec_zero', 'sec_num', 'sec_num_zero', 'num', 'percent', 'operation', 'str')
 	 *
 	 * @return bool
 	 */
@@ -330,8 +330,8 @@ class CFunctionValidator extends CValidator {
 			case 'num':
 				return is_numeric($param);
 
-			case 'float':
-				return $this->validateFloat($param);
+			case 'percent':
+				return $this->validatePercent($param);
 
 			case 'operation':
 				return $this->validateOperation($param);
@@ -396,15 +396,15 @@ class CFunctionValidator extends CValidator {
 	}
 
 	/**
-	 * Validate trigger function parameter which can contain a float.
-	 * Examples: 1, 1.2, 1.2345, 1., .1
+	 * Validate trigger function parameter which can contain a percentage.
+	 * Examples: 0, 1, 1.2, 1.2345, 1., .1, 100
 	 *
 	 * @param string $param
 	 *
 	 * @return bool
 	 */
-	private function validateFloat($param) {
-		return (preg_match('/^\d*(\.\d{0,4})?/', $param) && $param !== '.');
+	private function validatePercent($param) {
+		return (preg_match('/^\d*(\.\d{0,4})?$/', $param) && $param !== '.' && $param <= 100);
 	}
 
 	/**
