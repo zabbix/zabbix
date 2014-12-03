@@ -83,49 +83,44 @@ $httpFormList->addRow(_('Retries'), new CNumericBox('retries', $this->data['retr
 // append http agents to form list - http://www.useragentstring.com
 $agentComboBox = new CEditableComboBox('agent', $this->data['agent'], ZBX_TEXTBOX_STANDARD_SIZE);
 $agentComboBox->addItemsInGroup(_('Internet Explorer'), array(
+	'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0)' => 'Internet Explorer 11.0',
 	'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)' => 'Internet Explorer 10.0',
-	'Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)' => 'Internet Explorer 9.0',
-	'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)' => 'Internet Explorer 8.0',
-	'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)' => 'Internet Explorer 7.0',
+	'Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; Trident/5.0)' => 'Internet Explorer 9.0',
+	'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)' => 'Internet Explorer 8.0',
+	'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0)' => 'Internet Explorer 7.0',
 	'Mozilla/5.0 (compatible; MSIE 6.0; Windows NT 5.1)' => 'Internet Explorer 6.0'
 ));
 $agentComboBox->addItemsInGroup(_('Mozilla Firefox'), array(
-	'Mozilla/5.0 (X11; Linux i686; rv:8.0) Gecko/20100101 Firefox/8.0' => 'Mozilla Firefox 8.0',
-	'Mozilla/5.0 (X11; Linux i686; rv:7.0) Gecko/20100101 Firefox/7.0' => 'Mozilla Firefox 7.0',
-	'Mozilla/5.0 (X11; Linux i686; rv:6.0) Gecko/20100101 Firefox/6.0' => 'Mozilla Firefox 6.0',
-	'Mozilla/5.0 (X11; U; Linux i586; de; rv:5.0) Gecko/20100101 Firefox/5.0' => 'Mozilla Firefox 5.0',
-	'Mozilla/5.0 (X11; U; Linux x86_64; pl-PL; rv:2.0) Gecko/20110307 Firefox/4.0' => 'Mozilla Firefox 4.0',
-	'Mozilla/6.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:2.0.0.0) Gecko/20061028 Firefox/3.0' => 'Mozilla Firefox 3.0',
-	'Mozilla/5.0 (X11;U;Linux i686;en-US;rv:1.8.1) Gecko/2006101022 Firefox/2.0' => 'Mozilla Firefox 2.0'
-));
-$agentComboBox->addItemsInGroup(_('Opera'), array(
-	'Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00' => 'Opera 12.00',
-	'Opera/9.80 (X11; Linux x86_64; U; pl) Presto/2.7.62 Version/11.00' => 'Opera 11.00',
-	'Opera/9.80 (X11; Linux x86_64; U; en) Presto/2.2.15 Version/10.00' => 'Opera 10.00',
-	'Opera/9.00 (X11; Linux i686; U; pl)' => 'Opera 9.00'
-));
-$agentComboBox->addItemsInGroup(_('Safari'), array(
-	'Mozilla/5.0 (X11; U; Linux x86_64; en-us) AppleWebKit/531.2+ (KHTML, like Gecko) Version/5.0 Safari/531.2+' => 'Safari 5.0',
-	'Mozilla/5.0 (Windows; U; Windows NT 6.0; ru-RU) AppleWebKit/528.16 (KHTML, like Gecko) Version/4.0 Safari/528.16' => 'Safari 4.0',
-	'Mozilla/5.0 (Windows; U; Windows NT 6.0; sv-SE) AppleWebKit/523.13 (KHTML, like Gecko) Version/3.0 Safari/523.13' => 'Safari 3.0',
-	'Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_1 like Mac OS X; fr-fr) AppleWebKit/525.18.1 (KHTML, like Gecko) Mobile/5F136' => 'Safari on iPhone'
+	'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20100101 Firefox/33.0' => 'Firefox 33.0 (Windows)',
+	'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0' => 'Firefox 33.0 (Linux)',
+	'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:33.0) Gecko/20100101 Firefox/33.0' => 'Firefox 33.0 (Mac)'
 ));
 $agentComboBox->addItemsInGroup(_('Google Chrome'), array(
-	'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.8 (KHTML, like Gecko) Chrome/17.0.940.0 Safari/535.8' => 'Google Chrome 17',
-	'Mozilla/5.0 (Windows NT 6.0; WOW64) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.36 Safari/535.7' => 'Google Chrome 16',
-	'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.872.0 Safari/535.2' => 'Google Chrome 15',
-	'Mozilla/5.0 (X11; Linux i686) AppleWebKit/535.1 (KHTML, like Gecko) Ubuntu/11.04 Chromium/14.0.825.0 Chrome/14.0.825.0 Safari/535.1' => 'Google Chrome 14',
-	'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_3) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.32 Safari/535.1' => 'Google Chrome 13',
-	'Mozilla/5.0 (Windows NT 6.1; en-US) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.750.0 Safari/534.30' => 'Google Chrome 12'
+	'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.104 Safari/537.36' => 'Chrome 38.0 (Windows)',
+	'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.104 Safari/537.36' => 'Chrome 38.0 (Linux)',
+	'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.104 Safari/537.36' => 'Chrome 38.0 (Mac)',
+	'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/37.0.2062.120 Chrome/37.0.2062.120 Safari/537.36' => 'Chromium 37.0 (Linux)'
+));
+$agentComboBox->addItemsInGroup(_('Opera'), array(
+	'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.101 Safari/537.36 OPR/25.0.1614.50' => 'Opera 25.0 (Windows)',
+	'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.101 Safari/537.36 OPR/25.0.1614.50' => 'Opera 25.0 (Mac)',
+	'Opera/9.80 (X11; Linux x86_64) Presto/2.12.388 Version/12.16' => 'Opera 12.16 (Linux)',
+	'Opera/12.02 (Android 4.1; Linux; Opera Mobi/ADR-1111101157; U; en-US) Presto/2.9.201 Version/12.02' => 'Opera Mobile 12.02',
+	'Opera/9.80 (J2ME/MIDP; Opera Mini/9.80 (S60; SymbOS; Opera Mobi/23.348; U; en) Presto/2.5.25 Version/10.54' => 'Opera Mini 9.80'
+));
+$agentComboBox->addItemsInGroup(_('Safari'), array(
+	'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.78.2 (KHTML, like Gecko) Version/7.0.6 Safari/537.78.2' => 'Safari 7.0.6 (Mac)',
+	'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534.57.2 (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2' => 'Safari 5.1.7 (Windows)',
+	'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25' => 'Safari 6.0 (iPad)',
+	'Mozilla/5.0 (iPod; U; CPU iPhone OS 4_3_3 like Mac OS X) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5' => 'Safari 5.0.2 (iPhone)'
 ));
 $agentComboBox->addItemsInGroup(_('Others'), array(
-	'Mozilla/5.0 (X11; Linux 3.1.0-rc9+; en_US) KHTML/4.7.2 (like Gecko) Konqueror/4.7' => 'Konqueror 4.7',
-	'Mozilla/5.0 (compatible; Konqueror/4.6; Linux) KHTML/4.6.0 (like Gecko)' => 'Konqueror 4.6',
-	'Lynx/2.8.7rel.1 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/0.9.8r' => 'Lynx 2.8.7rel.1',
-	'Lynx/2.8.4rel.1 libwww-FM/2.14' => 'Lynx 2.8.4rel.1',
-	'Links (2.3pre1; Linux 2.6.35.10 i686; 225x51)' => 'Links 2.3pre1',
-	'Links (2.2; Linux 2.6.37.6-0.7-desktop i686; 225x51)' => 'Links 2.2',
-	'Googlebot/2.1 (+http://www.google.com/bot.html)' => 'Googlebot',
+	ZBX_DEFAULT_AGENT => 'Zabbix',
+	'Mozilla/5.0 (X11; Linux x86_64) konqueror/4.14.2' => 'Konqueror 4.14.2',
+	'Lynx/2.8.8rel.2 libwww-FM/2.14 SSL-MM/1.4.1' => 'Lynx 2.8.8rel.2',
+	'Links (2.8; Linux 3.13.0-36-generic x86_64; GNU C 4.8.2; text)' => 'Links 2.8',
+	'Mozilla/5.0 (Linux; Android 4.4.4; Nexus 5 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.114 Mobile Safari/537.36' => 'Android Webkit Browser 4.4.4',
+	'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' => 'Googlebot 2.1',
 	-1 => _('other').' ...'
 ));
 
