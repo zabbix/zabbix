@@ -126,7 +126,7 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 		return $tests;
 	}
 
-	private static function parameterFloat_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
+	private static function parameterPercent_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
 		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_TEXT);
 
@@ -135,7 +135,6 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 		foreach ($valueTypesAny as $valueType) {
 			$params[$no] = '0';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
 			$params[$no] = '1';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '12345';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
 			$params[$no] = '01';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
 			$params[$no] = '1s';		$tests[] = array($func, $params, $valueType, false);
 			$params[$no] = '1m';		$tests[] = array($func, $params, $valueType, false);
@@ -156,6 +155,8 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 			$params[$no] = '1.';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
 			$params[$no] = '.1';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
 			$params[$no] = '.';			$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '100.0000';	$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
+			$params[$no] = '100.0001';	$tests[] = array($func, $params, $valueType, false);
 			$params[$no] = '#0';		$tests[] = array($func, $params, $valueType, false);
 			$params[$no] = '#1';		$tests[] = array($func, $params, $valueType, false);
 			$params[$no] = '#1.0';		$tests[] = array($func, $params, $valueType, false);
@@ -311,7 +312,7 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 			// percentile() - (sec or #num, time_shift, float) [float, int]
 			self::parameterSecNumPeriod_TestCases('percentile', $valueTypesNum, array('#1', '', '50')),
 			self::parameterTimeShift_TestCases('percentile', $valueTypesNum, array('#1', '', '50'), 1),
-			self::parameterFloat_TestCases('percentile', $valueTypesNum, array('#1', '', '50'), 2),
+			self::parameterPercent_TestCases('percentile', $valueTypesNum, array('#1', '', '50'), 2),
 
 			// strlen() - (sec or #num, time_shift) [str, text, log]
 			self::parameterSecNumOffset_TestCases('strlen', $valueTypesStr),
