@@ -188,7 +188,7 @@ class CFunctionValidator extends CValidator {
 			'percentile' => array(
 				'args' => array(
 					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'sec', 'mandat' => true, 'can_be_empty' => true),
+					array('type' => 'sec_zero', 'mandat' => true, 'can_be_empty' => true),
 					array('type' => 'float', 'mandat' => true)
 				),
 				'value_types' => $valueTypesNum
