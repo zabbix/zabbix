@@ -1164,7 +1164,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 				if (p_count >= (4 * rate * metric->refresh))
 					break;
 
-			} /* while processing an eventlog */
+			}	/* while processing an eventlog */
 
 			finalize_eventlog6(&eventlog6_render_context, &eventlog6_query);
 		}

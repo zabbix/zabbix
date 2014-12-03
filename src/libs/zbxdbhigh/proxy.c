@@ -1986,7 +1986,7 @@ try_again:
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, hd->clock);
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, hd->ns);
 
-		/* meta information update (log size and mtime) record does not need those */
+		/* meta information update record does not need those */
 		if (0 == hd->meta)
 		{
 			if (0 != hd->timestamp)

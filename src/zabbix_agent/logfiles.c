@@ -1484,14 +1484,10 @@ int	process_logrt(int is_logrt, const char *filename, zbx_uint64_t *lastlogsize,
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
-				max_old_seq = 0, old_last, from_first_file = 1, mtime_orig;
-	char			*old2new = NULL, value_added;
+				max_old_seq = 0, old_last, from_first_file = 1;
+	char			*old2new = NULL;
 	struct st_logfile	*logfiles = NULL;
 	time_t			now;
-	zbx_uint64_t		lastlogsize_orig;
-
-	lastlogsize_orig = *lastlogsize;
-	mtime_orig = *mtime;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() is_logrt:%d filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
 			__function_name, is_logrt, filename, *lastlogsize, *mtime);
@@ -1646,15 +1642,7 @@ int	process_logrt(int is_logrt, const char *filename, zbx_uint64_t *lastlogsize,
 			ret = process_log(logfiles[i].filename, lastlogsize, (1 == is_logrt) ? mtime : NULL,
 					skip_old_data, big_rec, &logfiles[i].incomplete, err_msg, encoding, regexps,
 					pattern, output_template, p_count, s_count, process_value, server, port,
-					hostname, key, &value_added);
-
-			if (SUCCEED == ret && 0 == value_added &&
-					(lastlogsize_orig != *lastlogsize || mtime_orig != *mtime))
-			{
-				/* make sure we send meta information update */
-				ret = process_value(server, port, hostname, key, NULL, ITEM_STATE_NORMAL, lastlogsize,
-						mtime, NULL, NULL, NULL, NULL, 1);
-			}
+					hostname, key);
 
 			/* process_log() advances 'lastlogsize' only on success therefore */
 			/* we do not check for errors here */
@@ -1761,7 +1749,8 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, int *incomplete, char **err_msg,
 		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
 		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
-		unsigned short port, const char *hostname, const char *key, char *value_added)
+		unsigned short port, const char *hostname, const char *key, zbx_uint64_t *lastlogsize_sent,
+		int *mtime_sent)
 {
 	ZBX_THREAD_LOCAL static char	*buf = NULL;
 
@@ -1776,6 +1765,9 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 #define BUF_SIZE	(256 * ZBX_KIBIBYTE)	/* The longest encodings use 4-bytes for every character. To send */
 						/* up to 64 k characters to Zabbix server a 256 kB buffer might be */
 						/* required. */
+
+	*lastlogsize_sent = *lastlogsize;
+	*mtime_sent = *mtime;
 
 	if (NULL == buf)
 	{
@@ -1864,25 +1856,33 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 
 					lastlogsize1 = (size_t)offset + (size_t)nbytes;
 
-					regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE, output_template,
-							&item_value);
+					send_err = SUCCEED;
 
-					send_err = process_value(server, port, hostname, key, item_value,
-							ITEM_STATE_NORMAL, &lastlogsize1, mtime, NULL, NULL, NULL,
-							NULL, 1);
-
-					zbx_free(item_value);
-
-					if (SUCCEED == send_err)
+					if (SUCCEED == regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE,
+							output_template, &item_value))
 					{
-						(*s_count)--;
+						send_err = process_value(server, port, hostname, key, item_value,
+								ITEM_STATE_NORMAL, &lastlogsize1, mtime, NULL, NULL,
+								NULL, NULL, 1);
 
-						*value_added = 1;
-						*lastlogsize = lastlogsize1;
-						*big_rec = 1;	/* ignore the rest of this record */
+						zbx_free(item_value);
+
+						if (SUCCEED == send_err)
+						{
+							*lastlogsize_sent = lastlogsize1;
+							*mtime_sent = *mtime;
+
+							(*s_count)--;
+						}
 					}
 
 					(*p_count)--;
+
+					if (SUCCEED == send_err)
+					{
+						*lastlogsize = lastlogsize1;
+						*big_rec = 1;	/* ignore the rest of this record */
+					}
 
 					if ('\0' != *encoding)
 						zbx_free(value);
@@ -1923,24 +1923,30 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 
 					lastlogsize1 = (size_t)offset + (size_t)(p_next - buf);
 
-					regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE, output_template,
-							&item_value);
+					send_err = SUCCEED;
 
-					send_err = process_value(server, port, hostname, key, item_value,
-							ITEM_STATE_NORMAL, &lastlogsize1, mtime, NULL, NULL, NULL,
-							NULL, 1);
-
-					zbx_free(item_value);
-
-					if (SUCCEED == send_err)
+					if (SUCCEED == regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE,
+							output_template, &item_value))
 					{
-						(*s_count)--;
+						send_err = process_value(server, port, hostname, key, item_value,
+								ITEM_STATE_NORMAL, &lastlogsize1, mtime, NULL, NULL,
+								NULL, NULL, 1);
 
-						*value_added = 1;
-						*lastlogsize = lastlogsize1;
+						zbx_free(item_value);
+
+						if (SUCCEED == send_err)
+						{
+							*lastlogsize_sent = lastlogsize1;
+							*mtime_sent = *mtime;
+
+							(*s_count)--;
+						}
 					}
 
 					(*p_count)--;
+
+					if (SUCCEED == send_err)
+						*lastlogsize = lastlogsize1;
 
 					if ('\0' != *encoding)
 						zbx_free(value);
@@ -2028,7 +2034,6 @@ out:
  *     port            - [IN] port to send data to                            *
  *     hostname        - [IN] hostname the data comes from                    *
  *     key             - [IN] item key the data belongs to                    *
- *     value_added     - [OUT] non-zero if a value was added                  *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -2043,18 +2048,16 @@ int	process_log(const char *filename, zbx_uint64_t *lastlogsize, int *mtime, uns
 		int *big_rec, int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps,
 		const char *pattern, const char *output_template, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
-		const char *key, char *value_added)
+		const char *key)
 {
 	const char	*__function_name = "process_log";
 
-	int		f, ret = FAIL;
+	int		f, mtime_sent, ret = FAIL;
 	zbx_stat_t	buf;
-	zbx_uint64_t	l_size;
+	zbx_uint64_t	l_size, lastlogsize_sent;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d",
 			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0);
-
-	*value_added = 0;
 
 	if (0 != zbx_stat(filename, &buf))
 	{
@@ -2099,7 +2102,7 @@ int	process_log(const char *filename, zbx_uint64_t *lastlogsize, int *mtime, uns
 
 		ret = zbx_read2(f, lastlogsize, mtime, big_rec, incomplete, err_msg, encoding, regexps, pattern,
 				output_template, p_count, s_count, process_value, server, port, hostname, key,
-				value_added);
+				&lastlogsize_sent, &mtime_sent);
 	}
 	else
 	{
@@ -2113,6 +2116,13 @@ int	process_log(const char *filename, zbx_uint64_t *lastlogsize, int *mtime, uns
 		ret = FAIL;
 	}
 out:
+	if (SUCCEED == ret && (*lastlogsize != lastlogsize_sent || *mtime != mtime_sent))
+	{
+		/* meta information update */
+		ret = process_value(server, port, hostname, key, NULL, ITEM_STATE_NORMAL, lastlogsize, mtime, NULL, NULL,
+				NULL, NULL, 1);
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d ret:%s",
 			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0, zbx_result_string(ret));
 
