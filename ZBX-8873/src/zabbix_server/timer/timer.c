@@ -332,14 +332,11 @@ out:
  *                                                                            *
  * Function: generate_events                                                  *
  *                                                                            *
- * Purpose: generate events for triggers after maintenance period             *
- *          The events will be generated if trigger changed its state during  *
- *          the maintenance                                                   *
+ * Purpose: Generate events for triggers after maintenance period. Events     *
+ *          will be generated if trigger value changed during maintenance.    *
  *                                                                            *
  * Parameters: hostid - host identifier from database                         *
  *             maintenance_from, maintenance_to - maintenance period bounds   *
- *                                                                            *
- * Return value: ret - number of hosts that went in and out of maintenance    *
  *                                                                            *
  ******************************************************************************/
 static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maintenance_to)
@@ -351,7 +348,6 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 	zbx_uint64_t	triggerid;
 	zbx_timespec_t	ts;
 	unsigned char	value_before, value_inside, value_after;
-	int		lastchange;
 
 	ts.sec = maintenance_to;
 	ts.ns = 0;
@@ -374,17 +370,13 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		if (atoi(row[5]) < maintenance_from)	/* if no events inside maintenance */
+			continue;
+
 		ZBX_STR2UINT64(triggerid, row[0]);
-		lastchange = atoi(row[5]);
 		ZBX_STR2UCHAR(value_after, row[6]);
 
-		if (lastchange < maintenance_from)	/* if no events inside maintenance */
-		{
-			value_before = value_after;
-			value_inside = value_after;
-		}
-		else
-			get_trigger_values(triggerid, maintenance_from, &value_before, &value_inside, value_after);
+		get_trigger_values(triggerid, maintenance_from, &value_before, &value_inside, value_after);
 
 		if (value_before == value_inside && value_inside == value_after)
 			continue;
