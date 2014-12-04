@@ -251,71 +251,27 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
  *                                                                            *
  * Parameters: triggerid        - [IN] trigger identifier from database       *
  *             maintenance_from - [IN] maintenance period start               *
- *             maintenance_to   - [IN] maintenance period stop                *
  *             value_before     - [OUT] trigger value before maintenance      *
  *             value_inside     - [OUT] trigger value inside maintenance      *
  *                                      (only if value_before=value_after)    *
- *             value_after      - [OUT] trigger value after maintenance       *
+ *             value_after      - [IN] trigger value after maintenance        *
  *                                                                            *
  * Return value: SUCCEED if found event with OK or PROBLEM statuses           *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int maintenance_to,
-		unsigned char *value_before, unsigned char *value_inside, unsigned char *value_after)
+static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, unsigned char *value_before,
+		unsigned char *value_inside, unsigned char value_after)
 {
 	const char	*__function_name = "get_trigger_values";
 
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		sql[256];
-	int		clock;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() from:'%s %s'", __function_name,
 			zbx_date2str(maintenance_from), zbx_time2str(maintenance_from));
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() to:'%s %s'", __function_name,
-			zbx_date2str(maintenance_to), zbx_time2str(maintenance_to));
-
-	/* check for value after maintenance period */
-	zbx_snprintf(sql, sizeof(sql),
-			"select clock,value"
-			" from events"
-			" where source=%d"
-				" and object=%d"
-				" and objectid=" ZBX_FS_UI64
-				" and clock<%d"
-			" order by eventid desc",
-			EVENT_SOURCE_TRIGGERS,
-			EVENT_OBJECT_TRIGGER,
-			triggerid,
-			maintenance_to);
-
-	result = DBselectN(sql, 1);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		clock = atoi(row[0]);
-		*value_after = atoi(row[1]);
-	}
-	else
-	{
-		clock = 0;
-		*value_after = TRIGGER_VALUE_UNKNOWN;
-	}
-	DBfree_result(result);
-
-	/* if no events inside maintenance */
-	if (clock < maintenance_from)
-	{
-		*value_before = *value_after;
-		*value_inside = *value_after;
-		goto out;
-	}
 
 	/* check for value before maintenance period */
 	zbx_snprintf(sql, sizeof(sql),
@@ -339,7 +295,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 		*value_before = TRIGGER_VALUE_UNKNOWN;
 	DBfree_result(result);
 
-	if (*value_after != *value_before)
+	if (value_after != *value_before)
 	{
 		*value_inside = TRIGGER_VALUE_UNKNOWN;	/* not important what value is here */
 		goto out;
@@ -352,13 +308,13 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 			" where source=%d"
 				" and object=%d"
 				" and objectid=" ZBX_FS_UI64
-				" and clock between %d and %d"
+				" and clock>=%d"
 				" and value=%d",
 			EVENT_SOURCE_TRIGGERS,
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
-			maintenance_from, maintenance_to - 1,
-			*value_after == TRIGGER_VALUE_OK ? TRIGGER_VALUE_PROBLEM : TRIGGER_VALUE_OK);
+			maintenance_from,
+			value_after == TRIGGER_VALUE_OK ? TRIGGER_VALUE_PROBLEM : TRIGGER_VALUE_OK);
 
 	result = DBselectN(sql, 1);
 
@@ -369,7 +325,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 	DBfree_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() before:%d inside:%d after:%d",
-			__function_name, (int)*value_before, (int)*value_inside, (int)*value_after);
+			__function_name, (int)*value_before, (int)*value_inside, (int)value_after);
 }
 
 /******************************************************************************
@@ -385,10 +341,6 @@ out:
  *                                                                            *
  * Return value: ret - number of hosts that went in and out of maintenance    *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maintenance_to)
 {
@@ -399,6 +351,7 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 	zbx_uint64_t	triggerid;
 	zbx_timespec_t	ts;
 	unsigned char	value_before, value_inside, value_after;
+	int		lastchange;
 
 	ts.sec = maintenance_to;
 	ts.ns = 0;
@@ -406,7 +359,7 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select distinct t.triggerid,t.description,t.expression,t.priority,t.type"
+			"select distinct t.triggerid,t.description,t.expression,t.priority,t.type,t.lastchange,t.value"
 			" from triggers t,functions f,items i"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -422,9 +375,16 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(triggerid, row[0]);
+		lastchange = atoi(row[5]);
+		ZBX_STR2UCHAR(value_after, row[6]);
 
-		get_trigger_values(triggerid, maintenance_from, maintenance_to,
-				&value_before, &value_inside, &value_after);
+		if (lastchange < maintenance_from)	/* if no events inside maintenance */
+		{
+			value_before = value_after;
+			value_inside = value_after;
+		}
+		else
+			get_trigger_values(triggerid, maintenance_from, &value_before, &value_inside, value_after);
 
 		if (value_before == value_inside && value_inside == value_after)
 			continue;
