@@ -53,6 +53,9 @@ sub create_probe_health_tmpl;
 sub manage_tld_objects($$$$$);
 sub manage_tld_hosts($$);
 
+sub get_nsservers_list($);
+sub update_nsservers($$);
+
 my $trigger_rollweek_thresholds = rsm_trigger_rollweek_thresholds;
 
 my $cfg_global_macros = cfg_global_macros;
@@ -91,6 +94,8 @@ my $rv = GetOptions(\%OPTS,
 		    "ns-servers-v4=s",
 		    "ns-servers-v6=s",
 		    "rdds-ns-string=s",
+		    "get-nsservers-list!",
+		    "update-nsservers!",
 		    "only-cron!",
 		    "verbose!",
 		    "quiet!",
@@ -135,6 +140,25 @@ if (defined($OPTS{'set-type'})) {
     {
 	print("${OPTS{'tld'}} is already set to \"${OPTS{'type'}}\"\n");
     }
+    exit;
+}
+
+#### Manage NS + IP server pairs ####
+if (defined($OPTS{'get-nsservers-list'})) {
+    my $nsservers = get_nsservers_list($OPTS{'tld'});
+
+    foreach my $type (keys %{$nsservers}) {
+	foreach my $ip (keys %{$nsservers->{$type}}) {
+		print $type."\t".$nsservers->{$type}->{$ip}."\t".$ip."\n";
+	}
+    }
+    exit;
+}
+
+if (defined($OPTS{'update-nsservers'})) {
+    # Possible use dig instead of --ns-servers-v4 and ns-servers-v6
+    $ns_servers = get_ns_servers($OPTS{'tld'});
+    update_nsservers($OPTS{'tld'}, $ns_servers);
     exit;
 }
 
@@ -279,7 +303,7 @@ sub get_ns_servers {
     my $tld = shift;
 
     if ($OPTS{'ns-servers-v4'} or $OPTS{'ns-servers-v6'}) {
-	if ($OPTS{'ns-servers-v4'} and $OPTS{'ipv4'} == 1) {
+	if ($OPTS{'ns-servers-v4'} and ($OPTS{'ipv4'} == 1 or $OPTS{'update-nsservers'})) {
 	    my @nsservers = split(/\s/, $OPTS{'ns-servers-v4'});
 	    foreach my $ns (@nsservers) {
 		my @entries = split(/,/, $ns);
@@ -296,7 +320,7 @@ sub get_ns_servers {
 	    }
 	}
 
-	if ($OPTS{'ns-servers-v6'} and $OPTS{'ipv6'} == 1) {
+	if ($OPTS{'ns-servers-v6'} and ($OPTS{'ipv6'} == 1 or $OPTS{'update-nsservers'})) {
 	    my @nsservers = split(/\s/, $OPTS{'ns-servers-v6'});
 	    foreach my $ns (@nsservers) {
 		my @entries = split(/,/, $ns);
@@ -357,6 +381,7 @@ sub create_item_dns_rtt {
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('DNS RTT ('.$proto_uc.')', $templateid)],
                                               'type' => 2, 'value_type' => 0,
+					      'status' => ITEM_STATUS_ACTIVE,
                                               'valuemapid' => rsm_value_mappings->{'rsm_dns'}};
 
     create_item($options);
@@ -365,6 +390,7 @@ sub create_item_dns_rtt {
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_INTERNAL.
                                             '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
                         'priority' => '2',
+			'status' => TRIGGER_STATUS_ENABLED
                 };
 
     create_trigger($options);
@@ -373,6 +399,7 @@ sub create_item_dns_rtt {
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_NOREPLY.
 					    '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
                         'priority' => '2',
+			'status' => TRIGGER_STATUS_ENABLED
                 };
 
     create_trigger($options);
@@ -381,6 +408,7 @@ sub create_item_dns_rtt {
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRREPLY.
                                             '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
                         'priority' => '2',
+			'status' => TRIGGER_STATUS_ENABLED
                 };
 
     create_trigger($options);
@@ -389,6 +417,7 @@ sub create_item_dns_rtt {
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_NOTS.
                                             '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
                         'priority' => '2',
+			'status' => TRIGGER_STATUS_ENABLED
                 };
 
     create_trigger($options);
@@ -397,6 +426,7 @@ sub create_item_dns_rtt {
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRTS.
                                             '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
                         'priority' => '2',
+			'status' => TRIGGER_STATUS_ENABLED
                 };
 
     create_trigger($options);
@@ -406,6 +436,7 @@ sub create_item_dns_rtt {
 		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRSIG.
                                             '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
 		     'priority' => '2',
+		    'status' => TRIGGER_STATUS_ENABLED
 	};
 
 	create_trigger($options);
@@ -415,6 +446,7 @@ sub create_item_dns_rtt {
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_RES_NOREPLY.
                                             '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
 			'priority' => '2',
+			'status' => TRIGGER_STATUS_ENABLED
                 };
 
     create_trigger($options);
@@ -423,6 +455,7 @@ sub create_item_dns_rtt {
                          'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_RES_NOADBIT.
                                             '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
 			'priority' => '2',
+			'status' => TRIGGER_STATUS_ENABLED
                 };
 
     create_trigger($options);
@@ -445,6 +478,7 @@ sub create_slv_item {
                                               'hostid' => $hostid,
                                               'type' => 2, 'value_type' => 3,
 					      'applications' => $applicationids,
+					    'status' => ITEM_STATUS_ACTIVE,
 					      'valuemapid' => rsm_value_mappings->{'rsm_avail'}};
     }
     elsif ($value_type == VALUE_TYPE_NUM)
@@ -453,6 +487,7 @@ sub create_slv_item {
                                               'key_'=> $key,
                                               'hostid' => $hostid,
                                               'type' => 2, 'value_type' => 3,
+					    'status' => ITEM_STATUS_ACTIVE,
 					      'applications' => $applicationids};
     }
     elsif ($value_type == VALUE_TYPE_PERC) {
@@ -461,11 +496,13 @@ sub create_slv_item {
                                               'hostid' => $hostid,
                                               'type' => 2, 'value_type' => 0,
                                               'applications' => $applicationids,
+					    'status' => ITEM_STATUS_ACTIVE,
 					      'units' => '%'};
     }
     else {
 	pfail("Unknown value type $value_type.");
     }
+
 
     return create_item($options);
 }
@@ -1387,6 +1424,10 @@ Other options
                 delete specified TLD
         --disable
                 disable specified TLD
+	--get-nsservers-list
+		CSV formatted list of NS + IP server pairs for specified TLD
+	--update-nsservers
+		update all NS + IP pairs for specified TLD. --ns-servers-v4 or/and --ns-servers-v6 is mandatory in this case
         --type=STRING
                 Type of TLD. Possible values: @{[TLD_TYPE_G]}, @{[TLD_TYPE_CC]}, @{[TLD_TYPE_OTHER]}, @{[TLD_TYPE_TEST]}.
         --set-type
@@ -1455,7 +1496,7 @@ sub validate_input {
     return if (defined($OPTS{'only-cron'}));
 
     $msg  = "TLD must be specified (--tld)\n" unless (defined($OPTS{'tld'}));
-    if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}))
+    if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'}))
     {
 	    if (!defined($OPTS{'type'}))
 	    {
@@ -1476,8 +1517,11 @@ sub validate_input {
 	    return;
     }
 
-    $msg .= "at least one IPv4 or IPv6 must be enabled (--ipv4 or --ipv6)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'ipv4'}) and !defined($OPTS{'ipv6'}));
-    $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'dns-test-prefix'}));
+    $msg .= "at least one IPv4 or IPv6 must be enabled (--ipv4 or --ipv6)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'})
+										and !defined($OPTS{'ipv4'}) and !defined($OPTS{'ipv6'})
+										and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'}));
+    $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'dns-test-prefix'})
+									    and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'}));
     $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds-test-prefix'})) or
 									    (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds-test-prefix'})));
     $msg .= "none or both --rdds43-servers and --rdds80-servers must be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
@@ -1491,6 +1535,13 @@ sub validate_input {
 	$msg .= "EPP domain test prefix must be specified (--epp-test-prefix)\n" unless ($OPTS{'epp-serverid'});
 	$msg .= "EPP Server certificate file must be specified (--epp-servercert)\n" unless ($OPTS{'epp-servercert'});
     }
+
+    $OPTS{'ipv4'} = 0 if (defined($OPTS{'update-nsservers'}));
+    $OPTS{'ipv6'} = 0 if (defined($OPTS{'update-nsservers'}));
+
+#    if (defined($OPTS{'update-nsservers'}) and !defined($OPTS{'ns-servers-v4'}) and !defined($OPTS{'ns-servers-v6'})) {
+#	$msg .= "Update NS + IP server pairs required at least one of --ns-servers-v4 and --ns-servers-v6 argument\n";
+#    }
 
     $OPTS{'dns'} = 0 unless defined $OPTS{'dns'};
     $OPTS{'rdds'} = 0 unless defined $OPTS{'rdds'};
@@ -1751,7 +1802,7 @@ sub compare_arrays($$) {
 
     foreach my $a (@{$array_A}) {
 	my $found = false;
-	foreach $b (@${array_B}) {
+	foreach $b (@{$array_B}) {
 	    $found = true if $a eq $b;
 	}
 
@@ -1759,4 +1810,173 @@ sub compare_arrays($$) {
     }
 
     return @result;
+}
+
+sub get_nsservers_list($) {
+    my $TLD = shift;
+    my $result;
+
+    my $templateid = get_template('Template '.$TLD, false, false);
+
+    return unless defined $templateid->{'templateid'};
+
+    $templateid = $templateid->{'templateid'};
+
+    my $items = get_items_like($templateid, 'rsm.dns.tcp.rtt', true); 
+
+    foreach my $itemid (keys %{$items}) {
+	next if $items->{$itemid}->{'status'} == ITEM_STATUS_DISABLED;
+
+	my $name = $items->{$itemid}->{'key_'};
+	my $ip = $items->{$itemid}->{'key_'};
+
+	$ip =~s/.+\,.+\,(.+)\]$/$1/;
+	$name =~s/.+\,(.+)\,.+\]$/$1/;
+	
+	if ($ip=~/\d*\.\d*\.\d*\.\d+/) {
+	    $result->{'v4'}->{$ip} = $name;
+	}
+	else {
+	    $result->{'v6'}->{$ip} = $name;
+	}
+    }
+
+    return $result;
+}
+
+sub update_nsservers($$) {
+    my $TLD = shift;
+    my $new_ns_servers = shift;
+
+    my $old_ns_servers = get_nsservers_list($TLD);
+
+    my $need_to_add = {};
+    my $need_to_remove = {};
+
+    foreach my $new_nsname (keys %{$new_ns_servers}) {
+	my $new_ns = $new_ns_servers->{$new_nsname};
+
+	foreach my $proto (keys %{$new_ns}) {
+	    my $new_ips = $new_ns->{$proto};
+	    foreach my $new_ip (@{$new_ips}) {
+		
+		if (!defined($old_ns_servers->{$proto}->{$new_ip}) or $old_ns_servers->{$proto}->{$new_ip} ne $new_nsname) {
+		    $need_to_add->{$new_ip}->{'ns'} = $new_nsname;
+		    $need_to_add->{$new_ip}->{'proto'} = $proto;
+		}
+	    }
+
+	}
+    }
+
+    foreach my $proto (keys %{$old_ns_servers}) {
+	my $old_ips = $old_ns_servers->{$proto};
+	foreach my $old_ip (keys %{$old_ips}) {
+	    my $old_nsname = $old_ips->{$old_ip};
+
+	    my $is_need_to_remove = false;
+    
+	    if (defined($new_ns_servers->{$old_nsname}->{$proto})) {
+		    $is_need_to_remove = true;
+		    foreach my $new_ip (@{$new_ns_servers->{$old_nsname}->{$proto}}) {
+			$is_need_to_remove = false if $new_ip eq $old_ip;
+		    }
+	    }
+	    else {
+		$is_need_to_remove = true;
+	    }
+
+	    $need_to_remove->{$old_ip} = $old_nsname if $is_need_to_remove == true;
+	}
+    }
+
+    add_new_ns($TLD, $need_to_add) if scalar(%{$need_to_add});
+    disable_old_ns($TLD, $need_to_remove) if scalar(%{$need_to_remove});
+}
+
+sub add_new_ns($) {
+    my $TLD = shift;
+    my $ns_servers = shift;
+
+    my $main_templateid = get_template('Template '.$TLD, false, false);
+
+    return unless defined $main_templateid->{'templateid'};
+
+    $main_templateid = $main_templateid->{'templateid'};
+
+    my $main_hostid = get_host($TLD, false);
+
+    return unless defined $main_hostid->{'hostid'};
+
+    $main_hostid = $main_hostid->{'hostid'};
+
+    my $macro_value = get_host_macro($main_templateid, '{$RSM.TLD.DNSSEC.ENABLED}');
+
+    $OPTS{'dnssec'} = true if (defined($macro_value) and $macro_value->{'value'} eq true);
+
+    $macro_value = get_host_macro($main_templateid, '{$RSM.TLD.EPP.ENABLED}');
+    
+    $OPTS{'epp-servers'} = true if (defined($macro_value) and $macro_value->{'value'} eq true);
+
+    foreach my $ip (keys %{$ns_servers}) {
+	my $proto = $ns_servers->{$ip}->{'proto'};
+	my $ns = $ns_servers->{$ip}->{'ns'};
+
+	$proto=~s/v(\d)/$1/;
+
+	create_item_dns_rtt($ns, $ip, $main_templateid, 'Template '.$TLD, 'tcp', $proto);
+	create_item_dns_rtt($ns, $ip, $main_templateid, 'Template '.$TLD, 'udp', $proto);
+
+	create_all_slv_ns_items($ns, $ip, $main_hostid);
+    }
+}
+
+sub disable_old_ns($) {
+    my $TLD = shift;
+    my $ns_servers = shift;
+
+    my @itemids;
+
+    my $main_templateid = get_template('Template '.$TLD, false, false);
+
+    return unless defined $main_templateid->{'templateid'};
+
+    $main_templateid = $main_templateid->{'templateid'};
+
+    my $main_hostid = get_host($TLD, false);
+
+    return unless defined $main_hostid->{'hostid'};
+
+    $main_hostid = $main_hostid->{'hostid'};
+
+
+
+    foreach my $ip (keys %{$ns_servers}) {
+	my $ns_server = $ns_servers->{$ip};
+	my $item_key = ','.$ns_server.','.$ip.']';
+
+	my $items = get_items_like($main_templateid, $item_key, true);
+
+	my @tmp_items = keys %{$items};
+
+	push @itemids, @tmp_items;
+
+	$item_key = '['.$ns_server.','.$ip.']';
+
+	$items = get_items_like($main_hostid, $item_key, false);
+
+        @tmp_items = keys %{$items};
+
+        push @itemids, @tmp_items;
+    }
+
+    if (scalar(@itemids) > 0) {
+	my $triggers = get_triggers_by_items(\@itemids);
+
+        my @triggerids = keys %{$triggers};
+
+#	disable_triggers(\@triggerids) if scalar @triggerids;
+
+    	disable_items(\@itemids);
+    }
 }

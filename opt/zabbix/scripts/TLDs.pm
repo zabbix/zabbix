@@ -13,10 +13,10 @@ our @EXPORT = qw(zbx_connect check_api_error get_tld_list get_proxies_list
 		create_passive_proxy is_probe_exist get_host_group get_template get_probe get_host
 		remove_templates remove_hosts remove_hostgroups remove_probes remove_items
 		disable_host disable_hosts
-		disable_items
-		macro_value get_global_macro_value
+		disable_items disable_triggers
+		macro_value get_global_macro_value get_host_macro
 		set_proxy_status
-		get_application_id get_items_like set_tld_type
+		get_application_id get_items_like set_tld_type get_triggers_by_items
 		add_dependency
 		create_cron_items
 		pfail);
@@ -160,6 +160,20 @@ sub disable_items($) {
 
     foreach my $itemid (@{$items}) {
 	$result->{$itemid} = $zabbix->update('item', {'itemid' => $itemid, 'status' => ITEM_STATUS_DISABLED});
+    }
+
+    return $result;
+}
+
+sub disable_triggers($) {
+    my $triggers = shift;
+
+    return unless scalar(@{$triggers});
+
+    my $result;
+
+    foreach my $triggerid (@{$triggers}) {
+	$result->{$triggerid} = $zabbix->update('trigger', {'triggerid' => $triggerid, 'status' => TRIGGER_STATUS_DISABLED});
     }
 
     return $result;
@@ -427,6 +441,17 @@ sub create_macro {
 
 }
 
+sub get_host_macro {
+    my $templateid = shift;
+    my $name = shift;
+    
+    my $result;
+
+    $result = $zabbix->get('usermacro',{'hostids' => $templateid, 'output' => 'extend', 'filter' => {'macro' => $name}});
+
+    return $result;
+}
+
 sub create_passive_proxy($$) {
     my $probe_name = shift;
     my $probe_ip = shift;
@@ -690,11 +715,21 @@ sub get_items_like($$$) {
     my $result;
 
     if (!defined($is_template) or $is_template == false) {
-	$result = $zabbix->get('item', {'hostids' => [$hostid], 'output' => ['itemid', 'name', 'hostid'], 'search' => {'key_' => $like}, 'preservekeys' => true});
+	$result = $zabbix->get('item', {'hostids' => [$hostid], 'output' => ['itemid', 'name', 'hostid', 'key_', 'status'], 'search' => {'key_' => $like}, 'preservekeys' => true});
 	return $result;
     }
 
-    $result = $zabbix->get('item', {'templateids' => [$hostid], 'output' => ['itemid', 'name', 'hostid'], 'search' => {'key_' => $like}, 'preservekeys' => true});
+    $result = $zabbix->get('item', {'templateids' => [$hostid], 'output' => ['itemid', 'name', 'hostid', 'key_', 'status'], 'search' => {'key_' => $like}, 'preservekeys' => true});
+
+    return $result;
+}
+
+sub get_triggers_by_items($) {
+    my @itemids = shift;
+
+    my $result;
+
+    $result = $zabbix->get('trigger', {'itemids' => @itemids, 'output' => ['triggerid'], 'preservekeys' => true});
 
     return $result;
 }
