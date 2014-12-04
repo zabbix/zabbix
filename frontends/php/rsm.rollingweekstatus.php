@@ -256,6 +256,22 @@ if ($notEmptyResult) {
 	// get TLDs
 	$whereCondition[] = dbConditionInt('hg.groupid', $selectedGroups);
 	$whereCondition[] = 'hg.hostid=h.hostid';
+
+	if (CUser::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		$userid = CWebUser::$data['userid'];
+		$userGroups = getUserGroupsByUserId($userid);
+		$whereCondition[] = 'EXISTS ('.
+			'SELECT NULL'.
+			' FROM hosts_groups hgg'.
+				' JOIN rights r'.
+					' ON r.id=hgg.groupid'.
+						' AND '.dbConditionInt('r.groupid', $userGroups).
+			' WHERE h.hostid=hgg.hostid'.
+			' GROUP BY hgg.hostid'.
+			' HAVING MIN(r.permission)>='.PERM_READ_ONLY.
+		')';
+	}
+
 	$where = ' WHERE '.implode(' AND ', $whereCondition);
 	$hostCount = (count($selectedGroups) >= 2) ? 2 : 1;
 
