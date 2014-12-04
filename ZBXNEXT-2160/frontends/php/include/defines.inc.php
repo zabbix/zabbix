@@ -848,6 +848,7 @@ define('IPMI_PRIVILEGE_ADMIN',		4);
 define('IPMI_PRIVILEGE_OEM',		5);
 
 define('ZBX_HAVE_IPV6', 1);
+define('ZBX_IP_MAX_COUNT', 65536);
 
 define('ZBX_SOCKET_TIMEOUT',        3);         // socket timeout limit
 define('ZBX_SOCKET_BYTES_LIMIT',    1048576);   // socket response size limit, 1048576 is 1MB in bytes

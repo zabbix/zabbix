@@ -60,52 +60,6 @@ function KEY_PARAM($var = null) {
 	return 'preg_match("/'.ZBX_PREG_PARAMS.'/",{'.$var.'})&&';
 }
 
-function validate_ipv4($str, &$arr) {
-	if (!preg_match('/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/', $str, $arr)) {
-		return false;
-	}
-
-	for ($i = 1; $i <= 4; $i++) {
-		if (!is_numeric($arr[$i]) || $arr[$i] > 255 || $arr[$i] < 0 ) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-function validate_ipv6($str) {
-	$pattern1 = '([a-f0-9]{1,4}:){7}[a-f0-9]{1,4}';
-	$pattern2 = ':(:[a-f0-9]{1,4}){1,7}';
-	$pattern3 = '[a-f0-9]{1,4}::([a-f0-9]{1,4}:){0,5}[a-f0-9]{1,4}';
-	$pattern4 = '([a-f0-9]{1,4}:){2}:([a-f0-9]{1,4}:){0,4}[a-f0-9]{1,4}';
-	$pattern5 = '([a-f0-9]{1,4}:){3}:([a-f0-9]{1,4}:){0,3}[a-f0-9]{1,4}';
-	$pattern6 = '([a-f0-9]{1,4}:){4}:([a-f0-9]{1,4}:){0,2}[a-f0-9]{1,4}';
-	$pattern7 = '([a-f0-9]{1,4}:){5}:([a-f0-9]{1,4}:){0,1}[a-f0-9]{1,4}';
-	$pattern8 = '([a-f0-9]{1,4}:){6}:[a-f0-9]{1,4}';
-	$pattern9 = '([a-f0-9]{1,4}:){1,7}:';
-	$pattern10 = '::';
-
-	$full = "/^($pattern1)$|^($pattern2)$|^($pattern3)$|^($pattern4)$|^($pattern5)$|^($pattern6)$|^($pattern7)$|^($pattern8)$|^($pattern9)$|^($pattern10)$/i";
-
-	if (!preg_match($full, $str)) {
-		return false;
-	}
-	return true;
-}
-
-function validate_ip($str, &$arr) {
-	if (validate_ipv4($str, $arr)) {
-		return true;
-	}
-
-	if (ZBX_HAVE_IPV6) {
-		return validate_ipv6($str);
-	}
-
-	return false;
-}
-
 function validate_port_list($str) {
 	foreach (explode(',', $str) as $port_range) {
 		$port_range = explode('-', $port_range);
@@ -204,16 +158,17 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	$message = '';
 
 	if ($type == T_ZBX_IP) {
-		if (!validate_ip($var, $arr)) {
+		$ipValidator = new CIPValidator();
+		if (!$ipValidator->validate($var)) {
 			$error = true;
-			$message = _s('Field "%1$s" is not IP.', $caption);
+			$message = _s('Field "%1$s" is not IP: %2$s', $caption, $ipValidator->getError());
 		}
 	}
 	elseif ($type == T_ZBX_IP_RANGE) {
-		$ipRangeValidator = new CIpRangeValidator();
+		$ipRangeValidator = new CIPRangeValidator();
 		if (!$ipRangeValidator->validate($var)) {
 			$error = true;
-			$message = _s('Field "%1$s" is not IP range: %1$s', $caption, $ipRangeValidator->getError());
+			$message = _s('Field "%1$s" is not IP range: %2$s', $caption, $ipRangeValidator->getError());
 		}
 	}
 	elseif ($type == T_ZBX_INT_RANGE) {
