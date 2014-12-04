@@ -58,38 +58,20 @@ function getLastEvent($problemTrigger) {
 function getPreEvents($objectid, $clock, $eventid) {
 	$result = $eventid;
 
-	$beforeEvents = DBselect(
+	$beforeEvent = DBfetch(DBselect(
 		'SELECT e.eventid,e.clock,e.value'.
 		' FROM events e'.
 		' WHERE e.objectid='.$objectid.
 			' AND e.source='.EVENT_SOURCE_TRIGGERS.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.clock<='.$clock.
-			' AND e.eventid!='.$eventid,
-		2
-	);
+			' AND e.eventid!='.$eventid.
+		' ORDER BY e.clock DESC',
+		1
+	));
 
-	if ($beforeEvents) {
-		$firstElement = true;
-		while ($beforeEvent = DBfetch($beforeEvents)) {
-			if ($firstElement) {
-				if ($beforeEvent['value'] == TRIGGER_VALUE_TRUE) {
-					getPreEvents($objectid, $beforeEvent['clock'], $beforeEvent['eventid']);
-					break;
-				}
-				else {
-					$firstElement = false;
-				}
-			}
-			else {
-				if ($beforeEvent['value'] == TRIGGER_VALUE_TRUE) {
-					$result = $beforeEvent['eventid'];
-				}
-				else {
-					$result = $eventid;
-				}
-			}
-		}
+	if ($beforeEvent && $beforeEvent['value'] == TRIGGER_VALUE_TRUE) {
+		$result = getPreEvents($objectid, $beforeEvent['clock'], $beforeEvent['eventid']);
 	}
 
 	return $result;
