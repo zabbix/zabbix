@@ -160,7 +160,7 @@ if (hasRequest('form_refresh')) {
 	$data['config']['hk_trends'] = getRequest('hk_trends', $data['config']['hk_trends']);
 }
 else {
-	$data['config'] = select_config(false);
+	$data['config'] = select_config();
 }
 
 $houseKeeperForm = new CView('administration.general.housekeeper.edit', $data);

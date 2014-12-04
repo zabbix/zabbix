@@ -19,26 +19,34 @@
 **/
 
 
-/************ CONFIG **************/
-function select_config($cache = true) {
+/**
+ * Select configuration parameters.
+ *
+ * @global array $page		Array containing information about current page.
+ * @static array $config	Array containing configuration parameters.
+ *
+ * @return array
+ */
+function select_config() {
 	global $page;
 	static $config;
 
-	if ($cache && isset($config)) {
+	if (isset($config)) {
 		return $config;
 	}
 
-	$db_config = DBfetch(DBselect('SELECT c.* FROM config c'));
+	$dbConfig = DBfetch(DBselect('SELECT c.* FROM config c'));
 
-	if (!empty($db_config)) {
-		$config = $db_config;
-		return $db_config;
+	if ($dbConfig) {
+		$config = $dbConfig;
+
+		return $dbConfig;
 	}
-	elseif (isset($page['title']) && $page['title'] != _('Installation')) {
+	elseif (isset($page['title']) && $page['title'] !== _('Installation')) {
 		error(_('Unable to select configuration.'));
 	}
 
-	return $db_config;
+	return $dbConfig;
 }
 
 function update_config($configs) {
