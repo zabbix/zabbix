@@ -2,9 +2,13 @@ Changes for 2.2.8rc1
 
 New features:
 .......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-8506] fixed memory leak in wmi.get[]; thanks to Pedro Nunes for patch (asaveljevs)
+.......PS. [ZBX-9016] fixed items not being processed again in case these items or their hosts are disabled and then reenabled (asaveljevs, Sasha)
+..F....... [ZBX-5077] fixed percentile calculation formula and corrected accessed index, by which value is selected (arvids)
+A......... [ZBX-8486] fixed re-linking templates with web scenarios (Krists)
 ..F....... [ZBX-8919] fixed range selection in graphs in IE10 and IE11 (arvids)
 A......... [ZBX-9017] fixed hostgroup.create and hostgroup.update API calls allowing setting readonly "internal" param (arvids)
 ..F....... [ZBX-9004] fixed visible corners in table cells in eventlog history (arvids)
@@ -1158,6 +1162,7 @@ New features:
 A.F....... [ZBX-1357] updated Italian, Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-5077] fixed percentile calculation formula and corrected accessed index, by which value is selected (arvids)
 ........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
 .D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
 .......PS. [ZBX-8833] fixed dynamic SNMP item cache working incorrectly for hosts with multiple SNMP interfaces (asaveljevs)
