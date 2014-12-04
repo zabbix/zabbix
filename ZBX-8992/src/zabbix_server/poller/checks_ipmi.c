@@ -228,14 +228,10 @@ static zbx_ipmi_sensor_t	*get_ipmi_sensor_by_id(zbx_ipmi_host_t *h, const char *
 			/* Some devices present a sensor as both a threshold sensor and a discrete sensor. We work */
 			/* around this by preferring the threshold sensor in such case, as it is most widely used. */
 
-			if (IPMI_EVENT_READING_TYPE_THRESHOLD == h->sensors[i].reading_type)
-			{
-				s = &h->sensors[i];
-				break;
-			}
+			s = &h->sensors[i];
 
-			if (NULL == s)
-				s = &h->sensors[i];
+			if (IPMI_EVENT_READING_TYPE_THRESHOLD == s->reading_type)
+				break;
 		}
 	}
 
