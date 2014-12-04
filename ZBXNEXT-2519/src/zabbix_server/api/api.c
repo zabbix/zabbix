@@ -306,7 +306,7 @@ void	zbx_api_query_init(zbx_api_query_t *self)
 	zbx_vector_ptr_create(&self->properties);
 	self->properties_num = 0;
 	self->key = 0;
-	self->is_set = 0;
+	self->is_set = ZBX_API_FALSE;
 }
 
 /******************************************************************************
@@ -427,7 +427,7 @@ int	zbx_api_get_param_flag(const char *param, const char **next, unsigned char *
 		goto out;
 	}
 
-	*value = (0 == is_null ? 1 : 0);
+	*value = (0 == is_null ? ZBX_API_TRUE : ZBX_API_FALSE);
 
 	ret = SUCCEED;
 out:
@@ -468,11 +468,11 @@ int	zbx_api_get_param_bool(const char *param, const char **next, unsigned char *
 	{
 		if (0 == strcmp(data, "true"))
 		{
-			*value = 1;
+			*value = ZBX_API_TRUE;
 		}
 		else if (0 == strcmp(data, "false"))
 		{
-			*value = 0;
+			*value = ZBX_API_FALSE;
 		}
 		else
 		{
@@ -653,7 +653,7 @@ static int	zbx_api_get_param_filter(const char *param, const char **next, const 
 			case ZBX_TYPE_UINT:
 			case ZBX_TYPE_FLOAT:
 			case ZBX_TYPE_INT:
-				if (0 != like)
+				if (ZBX_API_TRUE != like)
 				{
 					*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" field \"%s\" type",
 							param, (char *)objects.values[i].second);
@@ -674,7 +674,7 @@ static int	zbx_api_get_param_filter(const char *param, const char **next, const 
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_SHORTTEXT:
-				if (0 == like)
+				if (ZBX_API_FALSE == like)
 				{
 					*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" field \"%s\" type",
 							param, (char *)objects.values[i].second);
@@ -881,7 +881,7 @@ int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_
 		ret = SUCCEED;
 	}
 
-	value->is_set = 1;
+	value->is_set = ZBX_API_TRUE;
 	value->properties_num = value->properties.values_num;
 out:
 	zbx_free(data);
@@ -1056,8 +1056,8 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t 
 			goto out;
 		}
 
-		if (0 != value_flag)
-			self->output.is_set = 1;
+		if (ZBX_API_TRUE == value_flag)
+			self->output.is_set = ZBX_API_TRUE;
 	}
 	else if (0 == strcmp(parameter, zbx_api_params[ZBX_API_PARAM_EDITABLE]))
 	{
@@ -1073,7 +1073,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t 
 			goto out;
 		}
 
-		if (0 != value_bool)
+		if (ZBX_API_TRUE == value_bool)
 			self->editable = 1;
 	}
 	else if (0 == strcmp(parameter, zbx_api_params[ZBX_API_PARAM_LIMIT]))
@@ -1118,7 +1118,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t 
 			goto out;
 		}
 
-		if (0 != value_flag)
+		if (ZBX_API_TRUE == value_flag)
 			self->filter.options |= ZBX_API_FILTER_OPTION_EXCLUDE;
 	}
 	else if (0 == strcmp(parameter, zbx_api_params[ZBX_API_PARAM_STARTSEARCH]))
@@ -1135,7 +1135,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t 
 			goto out;
 		}
 
-		if (0 != value_flag)
+		if (ZBX_API_TRUE == value_flag)
 			self->filter.options |= ZBX_API_FILTER_OPTION_START;
 	}
 	else if (0 == strcmp(parameter, zbx_api_params[ZBX_API_PARAM_SEARCHBYANY]))
@@ -1152,7 +1152,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t 
 			goto out;
 		}
 
-		if (0 != value_flag)
+		if (ZBX_API_TRUE == value_flag)
 			self->filter.options |= ZBX_API_FILTER_OPTION_ANY;
 	}
 	else if (0 == strcmp(parameter, zbx_api_params[ZBX_API_PARAM_SEARCHWILDCARDSENABLED]))
@@ -1167,7 +1167,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t 
 				next, &value_flag, error))
 			goto out;
 
-		if (0 != value_flag)
+		if (ZBX_API_TRUE == value_flag)
 			self->filter.options |= ZBX_API_FILTER_OPTION_WILDCARD;
 	}
 	else if (0 == strcmp(parameter, zbx_api_params[ZBX_API_PARAM_FILTER]))
@@ -1179,7 +1179,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t 
 		}
 
 		if (SUCCEED != zbx_api_get_param_filter(zbx_api_params[ZBX_API_PARAM_FILTER], next, object,
-				0, &self->filter.exact, error))
+				ZBX_API_FALSE, &self->filter.exact, error))
 		{
 			goto out;
 		}
@@ -1193,7 +1193,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t 
 		}
 
 		if (SUCCEED != zbx_api_get_param_filter(zbx_api_params[ZBX_API_PARAM_SEARCH], next, object,
-				1, &self->filter.like, error))
+				ZBX_API_TRUE, &self->filter.like, error))
 		{
 			goto out;
 		}
@@ -1455,7 +1455,7 @@ int	zbx_api_getoptions_finalize(zbx_api_getoptions_t *self, const zbx_api_object
 	}
 
 	/* if output was not set add all fields, as 'extend' is the default output option */
-	if (0 == self->output.is_set)
+	if (ZBX_API_TRUE != self->output.is_set)
 	{
 		for (prop = object->properties; NULL != prop->name; prop++)
 			zbx_vector_ptr_append(&self->output.properties, (void *)prop);
@@ -1464,7 +1464,7 @@ int	zbx_api_getoptions_finalize(zbx_api_getoptions_t *self, const zbx_api_object
 		self->output.key = 0;
 	}
 
-	if (0 != self->preservekeys)
+	if (ZBX_API_TRUE == self->preservekeys)
 	{
 		/* if indexed output is set ensure that object id (first field in object definition) */
 		/* is also retrieved.                                                                */
@@ -1534,6 +1534,7 @@ const zbx_api_property_t	*zbx_api_object_get_property(const zbx_api_object_t *ob
  *             query      - [IN] the query to add                             *
  *             table      - [IN] the source table name                        *
  *             alias      - [IN] the source table alias                       *
+ *             distinct   - [IN] if not 0 then distinct option to select      *
  *                                                                            *
  * Comments: This function formats sql select statement beginning. For        *
  *           ZBX_API_QUERY_COUNT queries it will have format:                 *
@@ -1544,11 +1545,14 @@ const zbx_api_property_t	*zbx_api_object_get_property(const zbx_api_object_t *ob
  *                                                                            *
  ******************************************************************************/
 void	zbx_api_sql_add_query(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_api_query_t *query,
-		const char *table, const char *alias)
+		const char *table, const char *alias, int distinct)
 {
 	int	i;
 
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "select ");
+
+	if (ZBX_API_TRUE == distinct)
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "distinct ");
 
 	if (0 == query->properties.values_num)
 	{
@@ -2123,5 +2127,3 @@ int	zbx_api_init(char **error)
 
 	return SUCCEED;
 }
-
-/* DEBUG end */

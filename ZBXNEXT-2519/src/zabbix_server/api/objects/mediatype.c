@@ -143,7 +143,7 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 	if (SUCCEED != zbx_api_getoptions_finalize(&self->options, &zbx_api_object_mediatype, error))
 		goto out;
 
-	if (0 != self->select_users.is_set)
+	if (ZBX_API_TRUE == self->select_users.is_set)
 	{
 		if (0 == self->options.output.properties.values_num)
 		{
@@ -185,7 +185,7 @@ int	zbx_api_mediatype_get(zbx_api_user_t *user, struct zbx_json_parse *jp_reques
 	zbx_api_mediatype_get_t	mediatype;
 	struct zbx_json_parse	jp_params;
 	char			*error = NULL, *sql = NULL;
-	int			ret = FAIL;
+	int			ret = FAIL, join_media = ZBX_API_FALSE;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	const char		*sql_condition = " where";
 	zbx_api_get_result_t	result;
@@ -206,15 +206,14 @@ int	zbx_api_mediatype_get(zbx_api_user_t *user, struct zbx_json_parse *jp_reques
 			(USER_TYPE_ZABBIX_ADMIN != user->type || 0 != mediatype.options.editable))
 		goto skip_query;
 
-	zbx_api_sql_add_query(&sql, &sql_alloc, &sql_offset, &mediatype.options.output, "media_type", "mt");
-
 	if (0 != mediatype.userids.values_num || 0 != mediatype.mediaids.values_num)
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",media m%s mt.mediatypeid=m.mediatypeid",
-				sql_condition);
+		join_media = ZBX_API_TRUE;
 
-		sql_condition = " and";
-	}
+	zbx_api_sql_add_query(&sql, &sql_alloc, &sql_offset, &mediatype.options.output, "media_type", "mt", join_media);
+
+	if (ZBX_API_TRUE == join_media)
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " join media m on m.mediatypeid=mt.mediatypeid");
+
 
 	if (0 != mediatype.userids.values_num)
 	{
@@ -256,11 +255,13 @@ int	zbx_api_mediatype_get(zbx_api_user_t *user, struct zbx_json_parse *jp_reques
 		goto out;
 	}
 
-	if (0 != mediatype.select_users.is_set)
+	if (ZBX_API_TRUE == mediatype.select_users.is_set)
 	{
 		sql_offset = 0;
-		zbx_api_sql_add_query(&sql, &sql_alloc, &sql_offset, &mediatype.select_users, "users", "u");
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",media m where u.userid=m.userid and m.mediatypeid=");
+		zbx_api_sql_add_query(&sql, &sql_alloc, &sql_offset, &mediatype.select_users, "users", "u",
+				ZBX_API_TRUE);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " join media m on m.userid=u.userid and"
+				" m.mediatypeid=");
 
 		if (SUCCEED != zbx_api_db_fetch_query(&sql, &sql_alloc, &sql_offset, "users", &mediatype.select_users,
 				&result, &error))

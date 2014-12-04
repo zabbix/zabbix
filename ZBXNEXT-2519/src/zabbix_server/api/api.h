@@ -22,6 +22,9 @@
 
 #include "db.h"
 
+#define ZBX_API_TRUE	1
+#define ZBX_API_FALSE	0
+
 /* if set then filter matches if any item matches */
 #define ZBX_API_FILTER_OPTION_ANY	1
 /* if set then * wildcard is allowed for LIKE type filters */
@@ -317,7 +320,7 @@ int	zbx_api_get_param_string_or_array(const char *param, const char **next, zbx_
 int	zbx_api_get_param_idarray(const char *param, const char **next, zbx_vector_uint64_t *value, char **error);
 
 void	zbx_api_sql_add_query(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_api_query_t *query,
-		const char *table, const char *alias);
+		const char *table, const char *alias, int distinct);
 void	zbx_api_sql_add_filter(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_api_filter_t *filter,
 		const char *alias, const char **sql_condition);
 void	zbx_api_sql_add_sort(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *sort,
@@ -345,6 +348,5 @@ void	zbx_api_json_add_row(struct zbx_json *json, const zbx_api_query_t *query, c
 void	zbx_api_json_add_query(struct zbx_json *json, const char *name, const zbx_api_query_t *query,
 		const zbx_vector_ptr_t *rows);
 void	zbx_api_json_add_error(struct zbx_json *json, const char *error);
-
 
 #endif
