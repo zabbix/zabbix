@@ -46,7 +46,7 @@ check_fields($fields);
 if (hasRequest('update')) {
 	DBstart();
 
-	$orig_config = select_config(false);
+	$configOriginal = select_config();
 
 	$configs = array(
 		'refresh_unsupported' => getRequest('refresh_unsupported'),
@@ -72,8 +72,8 @@ if (hasRequest('update')) {
 
 				$audit[] = _s('Group for discovered hosts "%1$s".', $hostGroup['name']);
 
-				if (bccomp($hostGroup['groupid'], $orig_config['discovery_groupid']) != 0) {
-					setHostGroupInternal($orig_config['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
+				if (bccomp($hostGroup['groupid'], $configOriginal['discovery_groupid']) != 0) {
+					setHostGroupInternal($configOriginal['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
 					setHostGroupInternal($hostGroup['groupid'], ZBX_INTERNAL_GROUP);
 				}
 			}
