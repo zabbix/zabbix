@@ -1136,7 +1136,6 @@ static void	lld_triggers_save(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *t
 	zbx_vector_ptr_t	upd_functions;	/* the ordered list of functions which will be updated */
 	zbx_vector_uint64_t	del_functionids;
 	zbx_uint64_t		triggerid = 0, functionid = 0;
-	unsigned char		flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 	char			*sql = NULL, *function_esc, *parameter_esc;
 	size_t			sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
 	zbx_db_insert_t		db_insert, db_insert_tdiscovery, db_insert_tfunctions;
@@ -1160,7 +1159,6 @@ static void	lld_triggers_save(zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *t
 		else if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE))
 		{
 			upd_triggers++;
-			flags |= trigger->flags;
 		}
 
 		for (j = 0; j < trigger->functions.values_num; j++)
