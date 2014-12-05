@@ -60,7 +60,7 @@ extern int		server_num, process_num;
 #define ZBX_VMWARE_CACHE_TTL	CONFIG_VMWARE_FREQUENCY
 #define ZBX_VMWARE_SERVICE_TTL	SEC_PER_DAY
 
-static ZBX_MUTEX	vmware_lock;
+static ZBX_MUTEX	vmware_lock = ZBX_MUTEX_NULL;
 
 static zbx_mem_info_t	*vmware_mem = NULL;
 

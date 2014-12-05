@@ -73,8 +73,6 @@ LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
 			}
 			break;
 		default:
-			zabbix_log(LOG_LEVEL_DEBUG, "unexpected exception [%08X] in process_eventlog()",
-					excpointers->ExceptionRecord->ExceptionCode);
 			disposition = EXCEPTION_CONTINUE_SEARCH;
 			break;
 	}
@@ -458,7 +456,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 							" using first %d characters", CONFIG_HOST_METADATA_ITEM,
 							HOST_METADATA_LEN);
 
-					bytes = zbx_strlen_utf8_n(*value, HOST_METADATA_LEN);
+					bytes = zbx_strlen_utf8_nchars(*value, HOST_METADATA_LEN);
 					(*value)[bytes] = '\0';
 				}
 				zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, *value, ZBX_JSON_TYPE_STRING);
