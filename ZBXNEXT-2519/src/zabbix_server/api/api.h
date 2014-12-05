@@ -54,7 +54,6 @@
 #define ZBX_API_RESULT_TAG_ERRMESSAGE	"message"
 #define ZBX_API_RESULT_TAG_ERRDATA	"data"
 
-
 /* api request data */
 typedef struct
 {
@@ -63,7 +62,7 @@ typedef struct
 }
 zbx_api_user_t;
 
-/* object property definition */
+/* class property definition */
 typedef struct
 {
 	/* field name */
@@ -80,17 +79,26 @@ typedef struct
 }
 zbx_api_property_t;
 
-/* API objet definition */
+/* (property, value) pair definition */
+typedef struct
+{
+	const zbx_api_property_t	*property;
+	zbx_db_value_t			value;
+}
+zbx_api_property_value_t;
+
+/* API object class definition */
 typedef struct
 {
 	char			*name;
 
-
+	/* corresponding table name */
 	char			*table_name;
+
+	/* object property list */
 	zbx_api_property_t	*properties;
 }
-zbx_api_object_t;
-
+zbx_api_class_t;
 
 /* filter definition */
 typedef struct
@@ -299,25 +307,28 @@ zbx_api_get_result_t;
 int	zbx_api_init(char **error);
 
 void	zbx_api_getoptions_init(zbx_api_getoptions_t *self);
-int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t *fields, const char *parameter,
-		struct zbx_json_parse *json, const char **next, char **error);
+int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_class_t *objclass, const char *parameter,
+		const char **next, char **error);
 
-int	zbx_api_getoptions_finalize( zbx_api_getoptions_t *self, const zbx_api_object_t *fields, char **error);
-int	zbx_api_getoptions_add_output_field(zbx_api_getoptions_t *self, const zbx_api_object_t *fields,
+int	zbx_api_getoptions_finalize(zbx_api_getoptions_t *self, const zbx_api_class_t *objclass, char **error);
+int	zbx_api_getoptions_add_output_field(zbx_api_getoptions_t *self, const zbx_api_class_t *objclass,
 		const char *name, int *index, char **error);
-void	zbx_api_getoptions_free(zbx_api_getoptions_t *self);
+void	zbx_api_getoptions_clean(zbx_api_getoptions_t *self);
 
 void	zbx_api_query_init(zbx_api_query_t *self);
-void	zbx_api_query_free(zbx_api_query_t *self);
+void	zbx_api_query_clean(zbx_api_query_t *self);
 
-int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_object_t *fields,
+int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_class_t *objclass,
 		zbx_api_query_t *value, char **error);
 int	zbx_api_get_param_flag(const char *param, const char **next, unsigned char *value, char **error);
 int	zbx_api_get_param_bool(const char *param, const char **next, unsigned char *value, char **error);
 int	zbx_api_get_param_int(const char *param, const char **next, int *value, char **error);
-int	zbx_api_get_param_object(const char *param, const char **next, zbx_vector_ptr_pair_t *value, char **error);
-int	zbx_api_get_param_string_or_array(const char *param, const char **next, zbx_vector_str_t *value, char **error);
+int	zbx_api_get_param_map(const char *param, const char **next, zbx_vector_ptr_pair_t *value, char **error);
+int	zbx_api_get_param_stringarray(const char *param, const char **next, zbx_vector_str_t *value, char **error);
 int	zbx_api_get_param_idarray(const char *param, const char **next, zbx_vector_uint64_t *value, char **error);
+int	zbx_api_get_param_objectarray(const char *param, const char **next, const zbx_api_class_t *objclass,
+		zbx_vector_ptr_t *value, char **error);
+
 
 void	zbx_api_sql_add_query(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_api_query_t *query,
 		const char *table, const char *alias, int distinct);
@@ -325,6 +336,9 @@ void	zbx_api_sql_add_filter(char **sql, size_t *sql_alloc, size_t *sql_offset, c
 		const char *alias, const char **sql_condition);
 void	zbx_api_sql_add_sort(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *sort,
 		const char *alias);
+void	zbx_api_sql_add_field_value(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field,
+		const zbx_db_value_t *value);
+
 
 void	zbx_api_db_clean_rows(zbx_vector_ptr_t *rows);
 void	zbx_api_db_free_rows(zbx_vector_ptr_t *rows);
@@ -336,8 +350,23 @@ int	zbx_api_db_fetch_query(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 void	zbx_api_get_result_init(zbx_api_get_result_t *self);
 void	zbx_api_get_result_clean(zbx_api_get_result_t *self);
 
+int	zbx_api_property_convert(const zbx_api_property_t *self, const char *value_str, zbx_db_value_t *value,
+		char **error);
 
-const zbx_api_property_t	*zbx_api_object_get_property(const zbx_api_object_t *fields, const char *name);
+/* Object primary key property. It must be the first property in object class definition. */
+#define zbx_api_object_pk(object)	(object->properties)
+
+const zbx_api_property_t	*zbx_api_class_get_property(const zbx_api_class_t *objclass, const char *name);
+void	zbx_api_object_free(zbx_vector_ptr_t *object);
+
+int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, char **error);
+int	zbx_api_prepare_objects_for_update(zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass, char **error);
+
+int	zbx_api_create_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass,
+		zbx_vector_uint64_t *outids, char **error);
+int	zbx_api_delete_objects(const zbx_vector_uint64_t *ids, const zbx_api_class_t *objclass, char **error);
+int	zbx_api_update_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass,
+		zbx_vector_uint64_t *outids, char **error);
 
 void	zbx_api_json_init(struct zbx_json *json, const char *id);
 void	zbx_api_json_add_count(struct zbx_json *json, const char *name, const zbx_vector_ptr_t *rows);
@@ -347,6 +376,7 @@ void	zbx_api_json_add_row(struct zbx_json *json, const zbx_api_query_t *query, c
 		const zbx_vector_ptr_t *queries, int row);
 void	zbx_api_json_add_query(struct zbx_json *json, const char *name, const zbx_api_query_t *query,
 		const zbx_vector_ptr_t *rows);
+void	zbx_api_json_add_idarray(struct zbx_json *json, const char *name, const zbx_vector_uint64_t *ids);
 void	zbx_api_json_add_error(struct zbx_json *json, const char *error);
 
 #endif

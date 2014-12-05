@@ -22,9 +22,18 @@
 
 #include "../api.h"
 
-extern zbx_api_object_t zbx_api_object_mediatype;
+extern zbx_api_class_t zbx_api_class_mediatype;
 
-int	zbx_api_mediatype_get(zbx_api_user_t *user, struct zbx_json_parse *jp_request, struct zbx_json *result);
+int	zbx_api_mediatype_get(const zbx_api_user_t *user, const struct zbx_json_parse *jp_request,
+		struct zbx_json *result);
 
+int	zbx_api_mediatype_create(const zbx_api_user_t *user, const struct zbx_json_parse *jp_request,
+		struct zbx_json *output);
+
+int	zbx_api_mediatype_delete(const zbx_api_user_t *user, const struct zbx_json_parse *jp_request,
+		struct zbx_json *output);
+
+int	zbx_api_mediatype_update(const zbx_api_user_t *user, const struct zbx_json_parse *jp_request,
+		struct zbx_json *output);
 
 #endif

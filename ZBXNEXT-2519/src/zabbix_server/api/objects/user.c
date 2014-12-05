@@ -28,7 +28,7 @@
 #include "user.h"
 
 /* move into user class file */
-static zbx_api_property_t zbx_api_object_properties[] = {
+static zbx_api_property_t zbx_api_class_properties[] = {
 		{"userid", "userid", NULL, ZBX_API_FIELD_FLAG_SORTABLE},
 		{"alias", "alias", NULL, ZBX_API_FIELD_FLAG_REQUIRED | ZBX_API_FIELD_FLAG_SORTABLE},
 		{"name", "name", NULL, 0},
@@ -48,4 +48,4 @@ static zbx_api_property_t zbx_api_object_properties[] = {
 };
 
 
-zbx_api_object_t	zbx_api_object_user = {"user", "users", zbx_api_object_properties};
+zbx_api_class_t	zbx_api_class_user = {"user", "users", zbx_api_class_properties};

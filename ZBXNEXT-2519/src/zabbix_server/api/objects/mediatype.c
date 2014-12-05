@@ -48,13 +48,32 @@ typedef struct
 }
 zbx_api_mediatype_get_t;
 
+typedef struct
+{
+	zbx_vector_ptr_t	objects;
+}
+zbx_api_mediatype_create_t;
+
+typedef struct
+{
+	zbx_vector_ptr_t	objects;
+}
+zbx_api_mediatype_update_t;
+
+typedef struct
+{
+	zbx_vector_uint64_t	objectids;
+}
+zbx_api_mediatype_delete_t;
+
 /* TODO: wrap into class defining other object properties if necessary */
-static zbx_api_property_t zbx_api_object_properties[] = {
+static zbx_api_property_t zbx_api_class_properties[] = {
 		{"mediatypeid", "mediatypeid", NULL, ZBX_API_FIELD_FLAG_SORTABLE},
 		{"type", "type", NULL, ZBX_API_FIELD_FLAG_REQUIRED},
 		{"description", "description", NULL,  ZBX_API_FIELD_FLAG_REQUIRED},
 		{"smtp_server", "smtp_server", NULL,  0},
 		{"smtp_email", "smtp_email", NULL, 0},
+		{"smtp_helo", "smtp_helo", NULL, 0},
 		{"exec_path", "exec_path", NULL, 0},
 		{"gsm_modem", "gsm_modem", NULL, 0},
 		{"username", "username", NULL, 0},
@@ -63,12 +82,47 @@ static zbx_api_property_t zbx_api_object_properties[] = {
 		{NULL}
 };
 
-zbx_api_object_t	zbx_api_object_mediatype = {"mediatype", "media_type", zbx_api_object_properties};
+zbx_api_class_t	zbx_api_class_mediatype = {"mediatype", "media_type", zbx_api_class_properties};
 
-static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_json_parse *json, char **error);
-static void	zbx_api_mediatype_get_clean(zbx_api_mediatype_get_t *self);
+/*
+ * mediatype.get
+ */
 
-static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_json_parse *jp, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_mediatype_get_clean                                      *
+ *                                                                            *
+ * Purpose: frees resources allocated by mediatype.get request             *
+ *                                                                            *
+ * Parameters: self  - [IN/OUT] the request                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_api_mediatype_get_clean(zbx_api_mediatype_get_t *self)
+{
+	zbx_api_getoptions_clean(&self->options);
+
+	zbx_api_query_clean(&self->select_users);
+
+	zbx_vector_uint64_destroy(&self->userids);
+	zbx_vector_uint64_destroy(&self->mediaids);
+	zbx_vector_uint64_destroy(&self->mediatypeids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_mediatype_get_init                                       *
+ *                                                                            *
+ * Purpose: initializes mediatype.get request                                 *
+ *                                                                            *
+ * Parameters: self  - [OUT] the request                                      *
+ *             jp    - [IN]  json data containing request parameters          *
+ *             error - [OUT] the error message                                *
+ *                                                                            *
+ * Return value: SUCCESS - the request was initialized successfully           *
+ *               FAIL    - failed to parse request parameters                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, const struct zbx_json_parse *jp, char **error)
 {
 	char		name[ZBX_API_PARAM_NAME_SIZE], *value = NULL;
 	const char	*p = NULL;
@@ -87,7 +141,7 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 	{
 		const char	*next = p;
 
-		if (SUCCEED != zbx_api_getoptions_parse(&self->options, &zbx_api_object_mediatype, name, jp, &next,
+		if (SUCCEED != zbx_api_getoptions_parse(&self->options, &zbx_api_class_mediatype, name, &next,
 				error))
 		{
 			goto out;
@@ -127,7 +181,7 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 		else if (0 == strcmp(name, ZBX_API_PARAM_GET_SELECTUSERS))
 		{
 			if (SUCCEED != zbx_api_get_param_query(ZBX_API_PARAM_GET_SELECTUSERS, &next,
-					&zbx_api_object_user, &self->select_users, error))
+					&zbx_api_class_user, &self->select_users, error))
 			{
 				goto out;
 			}
@@ -140,7 +194,7 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 		}
 	}
 
-	if (SUCCEED != zbx_api_getoptions_finalize(&self->options, &zbx_api_object_mediatype, error))
+	if (SUCCEED != zbx_api_getoptions_finalize(&self->options, &zbx_api_class_mediatype, error))
 		goto out;
 
 	if (ZBX_API_TRUE == self->select_users.is_set)
@@ -153,7 +207,7 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, struct zbx_
 		}
 
 		/* ensure that selected output contains mediatypeid field required to select users */
-		if (SUCCEED != zbx_api_getoptions_add_output_field(&self->options, &zbx_api_object_mediatype,
+		if (SUCCEED != zbx_api_getoptions_add_output_field(&self->options, &zbx_api_class_mediatype,
 				"mediatypeid", &self->select_users.key, error))
 			goto out;
 	}
@@ -169,20 +223,27 @@ out:
 	return ret;
 }
 
-static void	zbx_api_mediatype_get_clean(zbx_api_mediatype_get_t *self)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_mediatype_get                                            *
+ *                                                                            *
+ * Purpose: processes mediatype.get request                                   *
+ *                                                                            *
+ * Parameters: user        - [IN] the user that issued this request           *
+ *             jp_request  - [IN] json data containing request                *
+ *             output      - [IN/OUT] json response data                      *
+ *                                                                            *
+ * Return value: SUCCESS - the request was completed successfully             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: Depending on success or failure either result or error tags      *
+ *           with corresponding data will be added to the json output.        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_mediatype_get(const zbx_api_user_t *user, const struct zbx_json_parse *jp_request,
+		struct zbx_json *output)
 {
-	zbx_api_getoptions_free(&self->options);
-
-	zbx_api_query_free(&self->select_users);
-
-	zbx_vector_uint64_destroy(&self->userids);
-	zbx_vector_uint64_destroy(&self->mediaids);
-	zbx_vector_uint64_destroy(&self->mediatypeids);
-}
-
-int	zbx_api_mediatype_get(zbx_api_user_t *user, struct zbx_json_parse *jp_request, struct zbx_json *output)
-{
-	zbx_api_mediatype_get_t	mediatype;
+	zbx_api_mediatype_get_t	request;
 	struct zbx_json_parse	jp_params;
 	char			*error = NULL, *sql = NULL;
 	int			ret = FAIL, join_media = ZBX_API_FALSE;
@@ -198,87 +259,86 @@ int	zbx_api_mediatype_get(zbx_api_user_t *user, struct zbx_json_parse *jp_reques
 		goto out;
 	}
 
-	if (SUCCEED != zbx_api_mediatype_get_init(&mediatype, &jp_params, &error))
+	if (SUCCEED != zbx_api_mediatype_get_init(&request, &jp_params, &error))
 		goto out;
 
 	/* security checks */
 	if (USER_TYPE_SUPER_ADMIN != user->type &&
-			(USER_TYPE_ZABBIX_ADMIN != user->type || 0 != mediatype.options.editable))
+			(USER_TYPE_ZABBIX_ADMIN != user->type || 0 != request.options.editable))
 		goto skip_query;
 
-	if (0 != mediatype.userids.values_num || 0 != mediatype.mediaids.values_num)
+	if (0 != request.userids.values_num || 0 != request.mediaids.values_num)
 		join_media = ZBX_API_TRUE;
 
-	zbx_api_sql_add_query(&sql, &sql_alloc, &sql_offset, &mediatype.options.output, "media_type", "mt", join_media);
+	zbx_api_sql_add_query(&sql, &sql_alloc, &sql_offset, &request.options.output, "media_type", "mt", join_media);
 
 	if (ZBX_API_TRUE == join_media)
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " join media m on m.mediatypeid=mt.mediatypeid");
 
 
-	if (0 != mediatype.userids.values_num)
+	if (0 != request.userids.values_num)
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, sql_condition);
 		sql_condition = " and";
 
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "m.userid", mediatype.userids.values,
-				mediatype.userids.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "m.userid", request.userids.values,
+				request.userids.values_num);
 	}
 
-	if (0 != mediatype.mediaids.values_num)
+	if (0 != request.mediaids.values_num)
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, sql_condition);
 		sql_condition = " and";
 
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "m.mediaid", mediatype.mediaids.values,
-				mediatype.mediaids.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "m.mediaid", request.mediaids.values,
+				request.mediaids.values_num);
 	}
 
-	if (0 != mediatype.mediatypeids.values_num)
+	if (0 != request.mediatypeids.values_num)
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, sql_condition);
 		sql_condition = " and";
 
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "mt.mediatypeid", mediatype.mediatypeids.values,
-				mediatype.mediatypeids.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "mt.mediatypeid", request.mediatypeids.values,
+				request.mediatypeids.values_num);
 	}
 
-	zbx_api_sql_add_filter(&sql, &sql_alloc, &sql_offset, &mediatype.options.filter, "mt", &sql_condition);
+	zbx_api_sql_add_filter(&sql, &sql_alloc, &sql_offset, &request.options.filter, "mt", &sql_condition);
 
-	zbx_api_sql_add_sort(&sql, &sql_alloc, &sql_offset, &mediatype.options.sort, "mt");
+	zbx_api_sql_add_sort(&sql, &sql_alloc, &sql_offset, &request.options.sort, "mt");
 
 	DBbegin();
 
-	if (SUCCEED != zbx_api_db_fetch_rows(sql, mediatype.options.output.properties.values_num,
-			mediatype.options.limit, &result.rows, &error))
+	if (SUCCEED != zbx_api_db_fetch_rows(sql, request.options.output.properties.values_num,
+			request.options.limit, &result.rows, &error))
 	{
 		DBrollback();
-		goto out;
+		goto clean;
 	}
 
-	if (ZBX_API_TRUE == mediatype.select_users.is_set)
+	if (ZBX_API_TRUE == request.select_users.is_set)
 	{
 		sql_offset = 0;
-		zbx_api_sql_add_query(&sql, &sql_alloc, &sql_offset, &mediatype.select_users, "users", "u",
+		zbx_api_sql_add_query(&sql, &sql_alloc, &sql_offset, &request.select_users, "users", "u",
 				ZBX_API_TRUE);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " join media m on m.userid=u.userid and"
 				" m.mediatypeid=");
 
-		if (SUCCEED != zbx_api_db_fetch_query(&sql, &sql_alloc, &sql_offset, "users", &mediatype.select_users,
+		if (SUCCEED != zbx_api_db_fetch_query(&sql, &sql_alloc, &sql_offset, "users", &request.select_users,
 				&result, &error))
 		{
 			DBrollback();
-			goto out;
+			goto clean;
 		}
 	}
 
 	DBcommit();
 
 skip_query:
-	zbx_api_json_add_result(output, &mediatype.options, &result);
-
-	zbx_api_mediatype_get_clean(&mediatype);
-
+	zbx_api_json_add_result(output, &request.options, &result);
 	ret = SUCCEED;
+clean:
+	zbx_api_mediatype_get_clean(&request);
 out:
 	if (SUCCEED != ret)
 		zbx_api_json_add_error(output, error);
@@ -287,6 +347,370 @@ out:
 	zbx_free(sql);
 
 	zbx_api_get_result_clean(&result);
+
+	return ret;
+}
+
+/*
+ * mediatype.create
+ */
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_mediatype_create_clean                                   *
+ *                                                                            *
+ * Purpose: frees resources allocated by mediatype.create request             *
+ *                                                                            *
+ * Parameters: self  - [IN/OUT] the request                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_api_mediatype_create_clean(zbx_api_mediatype_create_t *self)
+{
+	zbx_vector_ptr_clear_ext(&self->objects, (zbx_mem_free_func_t)zbx_api_object_free);
+	zbx_vector_ptr_destroy(&self->objects);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_mediatype_create_init                                    *
+ *                                                                            *
+ * Purpose: initializes mediatype.create request                              *
+ *                                                                            *
+ * Parameters: self  - [OUT] the request                                      *
+ *             jp    - [IN]  json data containing request parameters          *
+ *             error - [OUT] the error message                                *
+ *                                                                            *
+ * Return value: SUCCESS - the request was initialized successfully           *
+ *               FAIL    - failed to parse request parameters                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_api_mediatype_create_init(zbx_api_mediatype_create_t *self, const struct zbx_json_parse *jp,
+		char **error)
+{
+	int		ret = FAIL;
+	const char	*next = jp->start;
+
+	zbx_vector_ptr_create(&self->objects);
+
+	if (SUCCEED != zbx_api_get_param_objectarray("params", &next, &zbx_api_class_mediatype, &self->objects, error))
+		goto out;
+
+	if (SUCCEED != zbx_api_prepare_objects_for_create(&self->objects, error))
+		goto out;
+
+	ret = SUCCEED;
+out:
+	if (SUCCEED != ret)
+		zbx_api_mediatype_create_clean(self);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_mediatype_create                                         *
+ *                                                                            *
+ * Purpose: processes mediatype.create request                                *
+ *                                                                            *
+ * Parameters: user        - [IN] the user that issued this request           *
+ *             jp_request  - [IN] json data containing request                *
+ *             output      - [IN/OUT] json response data                      *
+ *                                                                            *
+ * Return value: SUCCESS - the request was completed successfully             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: Depending on success or failure either result or error tags      *
+ *           with corresponding data will be added to the json output.        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_mediatype_create(const zbx_api_user_t *user, const struct zbx_json_parse *jp_request,
+		struct zbx_json *output)
+{
+	zbx_api_mediatype_create_t	request;
+	struct zbx_json_parse		jp_params;
+	char				*error = NULL;
+	int				ret = FAIL;
+	zbx_vector_uint64_t		ids;
+
+	zbx_vector_uint64_create(&ids);
+
+	if (SUCCEED != zbx_json_brackets_by_name(jp_request, "params", &jp_params))
+	{
+		error = zbx_strdup(error, "Cannot open parameters");
+		goto out;
+	}
+
+	if (USER_TYPE_SUPER_ADMIN != user->type)
+	{
+		error = zbx_strdup(error, "Insufficient access rights");
+		goto out;
+	}
+
+	if (SUCCEED != zbx_api_mediatype_create_init(&request, &jp_params, &error))
+		goto out;
+
+	DBbegin();
+
+	if (SUCCEED != zbx_api_create_objects(&request.objects, &zbx_api_class_mediatype, &ids, &error))
+	{
+		DBrollback();
+		goto clean;
+	}
+
+	DBcommit();
+
+	zbx_api_json_add_idarray(output, "mediatypeids", &ids);
+
+	ret = SUCCEED;
+clean:
+	zbx_api_mediatype_create_clean(&request);
+out:
+	if (SUCCEED != ret)
+		zbx_api_json_add_error(output, error);
+
+	zbx_free(error);
+
+	zbx_vector_uint64_destroy(&ids);
+
+	return ret;
+}
+
+/*
+ * mediatype.delete
+ */
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_mediatype_delete_clean                                   *
+ *                                                                            *
+ * Purpose: frees resources allocated by mediatype.delete request             *
+ *                                                                            *
+ * Parameters: self  - [IN/OUT] the request                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_api_mediatype_delete_clean(zbx_api_mediatype_delete_t *self)
+{
+	zbx_vector_uint64_destroy(&self->objectids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_mediatype_delete_init                                    *
+ *                                                                            *
+ * Purpose: initializes mediatype.delete request                              *
+ *                                                                            *
+ * Parameters: self  - [OUT] the request                                      *
+ *             jp    - [IN]  json data containing request parameters          *
+ *             error - [OUT] the error message                                *
+ *                                                                            *
+ * Return value: SUCCESS - the request was initialized successfully           *
+ *               FAIL    - failed to parse request parameters                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_api_mediatype_delete_init(zbx_api_mediatype_delete_t *self, const struct zbx_json_parse *jp,
+		char **error)
+{
+	int		ret = FAIL;
+	const char	*next = jp->start;
+
+	zbx_vector_uint64_create(&self->objectids);
+
+	if (SUCCEED != zbx_api_get_param_idarray("params", &next, &self->objectids, error))
+		goto out;
+
+
+	ret = SUCCEED;
+out:
+	if (SUCCEED != ret)
+		zbx_api_mediatype_delete_clean(self);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_mediatype_delete                                         *
+ *                                                                            *
+ * Purpose: processes mediatype.create request                                *
+ *                                                                            *
+ * Parameters: user        - [IN] the user that issued this request           *
+ *             jp_request  - [IN] json data containing request                *
+ *             output      - [IN/OUT] json response data                      *
+ *                                                                            *
+ * Return value: SUCCESS - the request was completed successfully             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: Depending on success or failure either result or error tags      *
+ *           with corresponding data will be added to the json output.        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_mediatype_delete(const zbx_api_user_t *user, const struct zbx_json_parse *jp_request,
+		struct zbx_json *output)
+{
+	zbx_api_mediatype_delete_t	request;
+	struct zbx_json_parse		jp_params;
+	char				*error = NULL;
+	int				ret = FAIL;
+
+	if (SUCCEED != zbx_json_brackets_by_name(jp_request, "params", &jp_params))
+	{
+		error = zbx_strdup(error, "Cannot open parameters");
+		goto out;
+	}
+
+	if (USER_TYPE_SUPER_ADMIN != user->type)
+	{
+		error = zbx_strdup(error, "Insufficient access rights");
+		goto out;
+	}
+
+	if (SUCCEED != zbx_api_mediatype_delete_init(&request, &jp_params, &error))
+		goto out;
+
+	DBbegin();
+
+	if (SUCCEED != zbx_api_delete_objects(&request.objectids, &zbx_api_class_mediatype, &error))
+	{
+		DBrollback();
+		goto clean;
+	}
+
+	DBcommit();
+
+	zbx_api_json_add_idarray(output, "mediatypeids", &request.objectids);
+
+	ret = SUCCEED;
+clean:
+	zbx_api_mediatype_delete_clean(&request);
+out:
+	if (SUCCEED != ret)
+		zbx_api_json_add_error(output, error);
+
+	zbx_free(error);
+
+	return ret;
+}
+
+/*
+ * mediatype.update
+ */
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_mediatype_update_clean                                   *
+ *                                                                            *
+ * Purpose: frees resources allocated by mediatype.update request             *
+ *                                                                            *
+ * Parameters: self  - [IN/OUT] the request                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_api_mediatype_update_clean(zbx_api_mediatype_update_t *self)
+{
+	zbx_vector_ptr_clear_ext(&self->objects, (zbx_mem_free_func_t)zbx_api_object_free);
+	zbx_vector_ptr_destroy(&self->objects);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_mediatype_update_init                                    *
+ *                                                                            *
+ * Purpose: initializes mediatype.update request                              *
+ *                                                                            *
+ * Parameters: self  - [OUT] the request                                      *
+ *             jp    - [IN]  json data containing request parameters          *
+ *             error - [OUT] the error message                                *
+ *                                                                            *
+ * Return value: SUCCESS - the request was initialized successfully           *
+ *               FAIL    - failed to parse request parameters                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_api_mediatype_update_init(zbx_api_mediatype_update_t *self, const struct zbx_json_parse *jp,
+		char **error)
+{
+	int		ret = FAIL;
+	const char	*next = jp->start;
+
+	zbx_vector_ptr_create(&self->objects);
+
+	if (SUCCEED != zbx_api_get_param_objectarray("params", &next, &zbx_api_class_mediatype, &self->objects, error))
+		goto out;
+
+	if (SUCCEED != zbx_api_prepare_objects_for_update(&self->objects, &zbx_api_class_mediatype, error))
+		goto out;
+
+	ret = SUCCEED;
+out:
+	if (SUCCEED != ret)
+		zbx_api_mediatype_update_clean(self);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_mediatype_update                                         *
+ *                                                                            *
+ * Purpose: processes mediatype.update request                                *
+ *                                                                            *
+ * Parameters: user        - [IN] the user that issued this request           *
+ *             jp_request  - [IN] json data containing request                *
+ *             output      - [IN/OUT] json response data                      *
+ *                                                                            *
+ * Return value: SUCCESS - the request was completed successfully             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: Depending on success or failure either result or error tags      *
+ *           with corresponding data will be added to the json output.        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_mediatype_update(const zbx_api_user_t *user, const struct zbx_json_parse *jp_request,
+		struct zbx_json *output)
+{
+	zbx_api_mediatype_update_t	request;
+	struct zbx_json_parse		jp_params;
+	char				*error = NULL;
+	int				ret = FAIL;
+	zbx_vector_uint64_t		ids;
+
+	zbx_vector_uint64_create(&ids);
+
+	if (SUCCEED != zbx_json_brackets_by_name(jp_request, "params", &jp_params))
+	{
+		error = zbx_strdup(error, "Cannot open parameters");
+		goto out;
+	}
+
+	if (USER_TYPE_SUPER_ADMIN != user->type)
+	{
+		error = zbx_strdup(error, "Insufficient access rights");
+		goto out;
+	}
+
+	if (SUCCEED != zbx_api_mediatype_update_init(&request, &jp_params, &error))
+		goto out;
+
+	DBbegin();
+
+	if (SUCCEED != zbx_api_update_objects(&request.objects, &zbx_api_class_mediatype, &ids, &error))
+	{
+		DBrollback();
+		goto clean;
+	}
+
+	DBcommit();
+
+	zbx_api_json_add_idarray(output, "mediatypeids", &ids);
+
+	zbx_api_mediatype_update_clean(&request);
+
+	ret = SUCCEED;
+clean:
+	zbx_api_mediatype_update_clean(&request);
+out:
+	if (SUCCEED != ret)
+		zbx_api_json_add_error(output, error);
+
+	zbx_free(error);
+
+	zbx_vector_uint64_destroy(&ids);
 
 	return ret;
 }

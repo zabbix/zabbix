@@ -22,6 +22,6 @@
 
 #include "../api.h"
 
-extern zbx_api_object_t	zbx_api_object_user;
+extern zbx_api_class_t	zbx_api_class_user;
 
 #endif

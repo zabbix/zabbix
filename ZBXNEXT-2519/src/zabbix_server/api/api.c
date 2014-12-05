@@ -91,7 +91,7 @@ static const char *zbx_api_params[] = {
  *                                                                            *
  * Purpose: initializes API object                                            *
  *                                                                            *
- * Parameters: object - [IN] the value to initialize                          *
+ * Parameters: object - [OUT] the value to initialize                         *
  *             error  - [OUT] the error message                               *
  *                                                                            *
  * Return value: SUCCEED - the initialization was successful                  *
@@ -101,7 +101,7 @@ static const char *zbx_api_params[] = {
  *           fields in database schema.                                       *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_api_object_init(zbx_api_object_t *object, char **error)
+static int	zbx_api_object_init(zbx_api_class_t *object, char **error)
 {
 	zbx_api_property_t	*prop;
 	const ZBX_TABLE		*table;
@@ -147,8 +147,6 @@ static int	zbx_api_object_init(zbx_api_object_t *object, char **error)
  * Return value: SUCCEED - the validation was successful                      *
  *               FAIL    - the value contains invalid data                    *
  *                                                                            *
- * Comments: Object is an associative array and is stored as ptr pair vector. *
- *                                                                            *
  ******************************************************************************/
 static int	zbx_api_value_validate(const char *value, int type)
 {
@@ -180,9 +178,9 @@ static int	zbx_api_value_validate(const char *value, int type)
  *                                                                            *
  * Function: zbx_api_getoptions_register_param                                *
  *                                                                            *
- * Purpose: checks conflicting parameters and marks parameter as parsed       *
+ * Purpose: checks conflicting parameters and registers parameter as parsed   *
  *                                                                            *
- * Parameters: self    - [IN] common get request options                      *
+ * Parameters: self    - [IN/OUT] common get request options                  *
  *             paramid - [IN] the parameter to check                          *
  *             mask    - [IN] the mask of conflicting parameters              *
  *             error   - [OUT] the error message                              *
@@ -298,7 +296,7 @@ static void	zbx_api_query_result_free(zbx_api_query_result_t *self)
  *                                                                            *
  * Purpose: initializes query parameter                                       *
  *                                                                            *
- * Parameters: self - [IN] the query parameter                                *
+ * Parameters: self - [OUT] the query parameter                               *
  *                                                                            *
  ******************************************************************************/
 void	zbx_api_query_init(zbx_api_query_t *self)
@@ -311,14 +309,14 @@ void	zbx_api_query_init(zbx_api_query_t *self)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_query_free                                               *
+ * Function: zbx_api_query_clean                                              *
  *                                                                            *
- * Purpose: frees query parameter                                             *
+ * Purpose: frees resources used to store query data                          *
  *                                                                            *
- * Parameters: self - [IN] the query parameter                                *
+ * Parameters: self - [IN/OUT] the query parameter                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_api_query_free(zbx_api_query_t *self)
+void	zbx_api_query_clean(zbx_api_query_t *self)
 {
 	zbx_vector_ptr_destroy(&self->properties);
 }
@@ -327,9 +325,9 @@ void	zbx_api_query_free(zbx_api_query_t *self)
  *                                                                            *
  * Function: zbx_api_vector_ptr_pair_clear                                    *
  *                                                                            *
- * Purpose: clears ptr pair vector. used to store key=>value string mapping   *
+ * Purpose: clears ptr pair vector. used to store key => value string mapping *
  *                                                                            *
- * Parameters: vector - [IN] the vector to clear                              *
+ * Parameters: vector - [IN/OUT] the vector to clear                          *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_api_vector_ptr_pair_clear(zbx_vector_ptr_pair_t *vector)
@@ -349,10 +347,10 @@ static void	zbx_api_vector_ptr_pair_clear(zbx_vector_ptr_pair_t *vector)
  *                                                                            *
  * Function: zbx_api_filter_vector_clear                                      *
  *                                                                            *
- * Purpose: clears ptr pair vector used to store <field>=>value mapping,      *
- *          where <field> is constant reference to filter field.              *
+ * Purpose: clears ptr pair vector used to store <property> => value mapping, *
+ *          where <property> is a constant reference to class property        *
  *                                                                            *
- * Parameters: vector - [IN] the vector to clear                              *
+ * Parameters: vector - [IN/OUT] the vector to clear                          *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_api_filter_vector_clear(zbx_vector_ptr_pair_t *vector)
@@ -371,7 +369,7 @@ static void	zbx_api_filter_vector_clear(zbx_vector_ptr_pair_t *vector)
  *                                                                            *
  * Purpose: initializes filter data                                           *
  *                                                                            *
- * Parameters: self - [IN] the filter data                                    *
+ * Parameters: self - [OUT] the filter data                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_api_filter_init(zbx_api_filter_t *self)
@@ -383,14 +381,14 @@ static void	zbx_api_filter_init(zbx_api_filter_t *self)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_filter_free                                              *
+ * Function: zbx_api_filter_clean                                             *
  *                                                                            *
- * Purpose: frees filter data                                                 *
+ * Purpose: frees resources used to store filter data                         *
  *                                                                            *
- * Parameters: self - [IN] the filter data                                    *
+ * Parameters: self - [IN/OUT] the filter data                                *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_api_filter_free(zbx_api_filter_t *self)
+static void	zbx_api_filter_clean(zbx_api_filter_t *self)
 {
 	zbx_api_filter_vector_clear(&self->like);
 	zbx_api_filter_vector_clear(&self->exact);
@@ -543,9 +541,9 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_get_param_object                                         *
+ * Function: zbx_api_get_param_map                                            *
  *                                                                            *
- * Purpose: gets object type parameter from json data                         *
+ * Purpose: gets a key=>value map type parameter from json data               *
  *                                                                            *
  * Parameters: param - [IN] the parameter name                                *
  *             next  - [IN/OUT] the next character in json data buffer        *
@@ -556,10 +554,10 @@ out:
  *               FAIL    - the parsing failed, the error message is stored    *
  *                         in error parameter.                                *
  *                                                                            *
- * Comments: Object is an associative array and is stored as ptr pair vector. *
+ * Comments: The map is stored as a ptr pair vector.                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_api_get_param_object(const char *param, const char **next, zbx_vector_ptr_pair_t *value, char **error)
+int	zbx_api_get_param_map(const char *param, const char **next, zbx_vector_ptr_pair_t *value, char **error)
 {
 	const char		*p = NULL;
 	char			name[ZBX_API_PARAM_NAME_SIZE], *data = NULL;
@@ -612,19 +610,19 @@ out:
  *                                                                            *
  * Purpose: gets filter exact or like fields from json data                   *
  *                                                                            *
- * Parameters: param  - [IN] the parameter name                               *
- *             next   - [IN/OUT] the next character in json data buffer       *
- *             object - [IN] the API object definition                        *
- *             value  - [OUT] the parsed value                                *
- *             error  - [OUT] the error message                               *
+ * Parameters: param    - [IN] the parameter name                             *
+ *             next     - [IN/OUT] the next character in json data buffer     *
+ *             objclass - [IN] the object class definition                    *
+ *             value    - [OUT] the parsed value                              *
+ *             error    - [OUT] the error message                             *
  *                                                                            *
  * Return value: SUCCEED - the parameter was parsed successfully.             *
  *               FAIL    - the parsing failed, the error message is stored    *
  *                         in error parameter.                                *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_api_get_param_filter(const char *param, const char **next, const zbx_api_object_t *object, int like,
-		zbx_vector_ptr_pair_t *value, char **error)
+static int	zbx_api_get_param_filter(const char *param, const char **next, const zbx_api_class_t *objclass,
+		int like, zbx_vector_ptr_pair_t *value, char **error)
 {
 	zbx_vector_ptr_pair_t		objects;
 	int				ret = FAIL, i;
@@ -633,12 +631,12 @@ static int	zbx_api_get_param_filter(const char *param, const char **next, const 
 
 	zbx_vector_ptr_pair_create(&objects);
 
-	if (SUCCEED != zbx_api_get_param_object(param, next, &objects, error))
+	if (SUCCEED != zbx_api_get_param_map(param, next, &objects, error))
 		goto out;
 
 	for (i = 0; i < objects.values_num; i++)
 	{
-		if (NULL == (prop = zbx_api_object_get_property(object, (char *)objects.values[i].first)))
+		if (NULL == (prop = zbx_api_class_get_property(objclass, (char *)objects.values[i].first)))
 		{
 			*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" field name \"%s\"",
 					param, (char *)objects.values[i].first);
@@ -807,11 +805,11 @@ out:
  *                                                                            *
  * Purpose: gets query type parameter from json data                          *
  *                                                                            *
- * Parameters: param  - [IN] the parameter name                               *
- *             next   - [IN/OUT] the next character in json data buffer       *
- *             object - [IN] the API object definition                        *
- *             value  - [OUT] the parsed value                                *
- *             error  - [OUT] the error message                               *
+ * Parameters: param    - [IN] the parameter name                             *
+ *             next     - [IN/OUT] the next character in json data buffer     *
+ *             objclass - [IN] the object class definition                    *
+ *             value    - [OUT] the parsed value                              *
+ *             error    - [OUT] the error message                             *
  *                                                                            *
  * Return value: SUCCEED - the parameter was parsed successfully.             *
  *               FAIL    - the parsing failed, the error message is stored    *
@@ -823,7 +821,7 @@ out:
  *           defines) and fields contain the defined field names.             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_object_t *object,
+int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_class_t *objclass,
 		zbx_api_query_t *value, char **error)
 {
 	char				*data = NULL;
@@ -840,7 +838,7 @@ int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_
 		{
 			for (i = 0; i < outfields.values_num; i++)
 			{
-				if (NULL == (prop = zbx_api_object_get_property(object, outfields.values[i])))
+				if (NULL == (prop = zbx_api_class_get_property(objclass, outfields.values[i])))
 				{
 					*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" query field \"%s\"",
 							param, outfields.values[i]);
@@ -865,7 +863,7 @@ int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_
 
 		if (NULL == data || 0 == strcmp(data, ZBX_API_PARAM_QUERY_EXTEND))
 		{
-			for (prop = object->properties; NULL != prop->name; prop++)
+			for (prop = objclass->properties; NULL != prop->name; prop++)
 				zbx_vector_ptr_append(&value->properties, (void *)prop);
 		}
 		else if (0 == strcmp(data, ZBX_API_PARAM_QUERY_COUNT))
@@ -891,7 +889,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_get_param_string_or_array                                *
+ * Function: zbx_api_get_param_stringarray                                    *
  *                                                                            *
  * Purpose: gets a parameter that can be defined either a string or an array  *
  *                                                                            *
@@ -906,10 +904,10 @@ out:
  *                                                                            *
  * Comments: The result is always returned as a vector of strings.            *
  *           If parameter was defined as a single string, then a vector with  *
- *           its value as the single item is returned.                        *
+ *           single item containing this string is returned.                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_api_get_param_string_or_array(const char *param, const char **next, zbx_vector_str_t *value, char **error)
+int	zbx_api_get_param_stringarray(const char *param, const char **next, zbx_vector_str_t *value, char **error)
 {
 	char			*data = NULL;
 	int			ret = FAIL;
@@ -966,7 +964,7 @@ int	zbx_api_get_param_idarray(const char *param, const char **next, zbx_vector_u
 
 	zbx_vector_str_create(&ids);
 
-	if (FAIL == zbx_api_get_param_string_or_array(param, next, &ids, error))
+	if (FAIL == zbx_api_get_param_stringarray(param, next, &ids, error))
 		goto out;
 
 	for (i = 0; i < ids.values_num; i++)
@@ -987,11 +985,175 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_api_object_get_property_value                                *
+ *                                                                            *
+ * Purpose: converts object property value to native format and allocates     *
+ *          property value structure to store it                              *
+ *                                                                            *
+ * Parameters: objclass  - [IN] the object class definition                   *
+ *             name      - [IN] the property name                             *
+ *             value     - [IN] the property value in text format             *
+ *             propvalue - [OUT] property value data                          *
+ *             error     - [OUT] the error message                            *
+ *                                                                            *
+ * Return value: SUCCEED - the property value was retrieved successfully      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_api_object_get_property_value(const zbx_api_class_t *objclass, const char *name, const char *value,
+		zbx_api_property_value_t **propvalue, char **error)
+{
+	const zbx_api_property_t	*prop;
+	zbx_db_value_t			dbvalue;
+
+	if (NULL == (prop = zbx_api_class_get_property(objclass, name)))
+	{
+		*error = zbx_dsprintf(*error, "invalid object \"%s\" property name \"%s\"", objclass->name, name);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_api_property_convert(prop, value, &dbvalue, error))
+		return FAIL;
+
+	*propvalue = zbx_malloc(NULL, sizeof(zbx_api_property_value_t));
+	(*propvalue)->property = prop;
+	(*propvalue)->value = dbvalue;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_get_param_object                                         *
+ *                                                                            *
+ * Purpose: gets object parameter                                             *
+ *                                                                            *
+ * Parameters: param    - [IN] the parameter name                             *
+ *             next     - [IN/OUT] the next character in json data buffer     *
+ *             objclass - [IN] the object class definition                    *
+ *             value    - [OUT] the parsed value                              *
+ *             error    - [OUT] the error message                             *
+ *                                                                            *
+ * Return value: SUCCEED - the parameter was parsed successfully.             *
+ *               FAIL    - the parsing failed, the error message is stored    *
+ *                         in error parameter.                                *
+ *                                                                            *
+ * Comments: The object parameter is stored as a vector of property values    *
+ *           (see zbx_api_property_value_t structure).                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_get_param_object(const char *param, const char **next, const zbx_api_class_t *objclass,
+		zbx_vector_ptr_t *value, char **error)
+{
+	int			ret = FAIL, i;
+	zbx_vector_ptr_pair_t	propmap;
+
+	zbx_vector_ptr_pair_create(&propmap);
+
+	if (SUCCEED != zbx_api_get_param_map(param, next, &propmap, error))
+		goto out;
+
+	/* replace property names in (<name>, <value>) ptr pair vector with */
+	/* corresponding references to object properties                    */
+	for (i = 0; i < propmap.values_num; i++)
+	{
+		zbx_ptr_pair_t			*pair = &propmap.values[i];
+		zbx_api_property_value_t	*propvalue;
+
+		if (SUCCEED != zbx_api_object_get_property_value(objclass, (char *)pair->first, (char *)pair->second,
+				&propvalue, error))
+		{
+			goto out;
+		}
+
+		zbx_vector_ptr_append(value, propvalue);
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_api_vector_ptr_pair_clear(&propmap);
+	zbx_vector_ptr_pair_destroy(&propmap);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_get_param_objectarray                                    *
+ *                                                                            *
+ * Purpose: gets a parameter that can be defined either a object or an array  *
+ *          of objects                                                        *
+ *                                                                            *
+ * Parameters: param    - [IN] the parameter name                             *
+ *             next     - [IN/OUT] the next character in json data buffer     *
+ *             objclass - [IN] the object class definition                    *
+ *             value    - [OUT] the parsed value                              *
+ *             error    - [OUT] the error message                             *
+ *                                                                            *
+ * Return value: SUCCEED - the parameter was parsed successfully.             *
+ *               FAIL    - the parsing failed, the error message is stored    *
+ *                         in error parameter.                                *
+ *                                                                            *
+ * Comments: The result is always returned as a vector of objects.            *
+ *           If parameter was defined as an object, then a vector with one    *
+ *           item containing this object is returned.                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_get_param_objectarray(const char *param, const char **next, const zbx_api_class_t *objclass,
+		zbx_vector_ptr_t *value, char **error)
+{
+	const char		*p = NULL;
+	int			ret = FAIL;
+	zbx_vector_ptr_t	*properties = NULL;
+	struct zbx_json_parse	jp;
+
+	if ('[' == **next)
+	{
+		if (SUCCEED != zbx_json_brackets_open(*next, &jp))
+		{
+			*error = zbx_dsprintf(*error, "Cannot open parameter \"%s\" value array", param);
+			goto out;
+		}
+
+		while (NULL != (p = zbx_json_next(&jp, p)))
+		{
+			properties = zbx_malloc(NULL, sizeof(zbx_vector_ptr_t));
+			zbx_vector_ptr_create(properties);
+
+			if (SUCCEED != zbx_api_get_param_object(param, &p, objclass, properties, error))
+				goto out;
+
+			zbx_vector_ptr_append(value, properties);
+		}
+
+		*next = jp.end + 1;
+	}
+	else
+	{
+		properties = zbx_malloc(NULL, sizeof(zbx_vector_ptr_t));
+		zbx_vector_ptr_create(properties);
+
+		if (SUCCEED != zbx_api_get_param_object(param, next, objclass, properties, error))
+			goto out;
+
+		zbx_vector_ptr_append(value, properties);
+	}
+
+	ret = SUCCEED;
+out:
+	if (SUCCEED != ret && NULL != properties)
+		zbx_api_object_free(properties);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_api_getoptions_init                                          *
  *                                                                            *
  * Purpose: initializes common get request parameters                         *
  *                                                                            *
- * Parameters: self - [IN] the common get request parameter data              *
+ * Parameters: self - [OUT] the common get request parameter data             *
  *                                                                            *
  ******************************************************************************/
 void	zbx_api_getoptions_init(zbx_api_getoptions_t *self)
@@ -1010,10 +1172,9 @@ void	zbx_api_getoptions_init(zbx_api_getoptions_t *self)
  *                                                                            *
  * Purpose: parses get request common parameter                               *
  *                                                                            *
- * Parameters: self      - [IN] the common get request parameter data         *
- *             object    - [IN] the API object definition                     *
+ * Parameters: self      - [IN/OUT] the common get request parameter data     *
+ *             objclass  - [IN] the object class definition                   *
  *             parameter - [IN] the parameter name                            *
- *             json      - [IN] the json data                                 *
  *             next      - [IN/OUT] the next character in json data buffer    *
  *             error     - [OUT] the error message                            *
  *                                                                            *
@@ -1022,8 +1183,8 @@ void	zbx_api_getoptions_init(zbx_api_getoptions_t *self)
  *                         in error parameter.                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t *object, const char *parameter,
-		struct zbx_json_parse *json, const char **next, char **error)
+int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_class_t *objclass, const char *parameter,
+		const char **next, char **error)
 {
 	int		ret = FAIL;
 	unsigned char	value_flag, value_bool;
@@ -1036,7 +1197,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t 
 			goto out;
 		}
 
-		if (SUCCEED != zbx_api_get_param_query(zbx_api_params[ZBX_API_PARAM_OUTPUT], next, object,
+		if (SUCCEED != zbx_api_get_param_query(zbx_api_params[ZBX_API_PARAM_OUTPUT], next, objclass,
 				&self->output, error))
 		{
 			goto out;
@@ -1178,7 +1339,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t 
 			goto out;
 		}
 
-		if (SUCCEED != zbx_api_get_param_filter(zbx_api_params[ZBX_API_PARAM_FILTER], next, object,
+		if (SUCCEED != zbx_api_get_param_filter(zbx_api_params[ZBX_API_PARAM_FILTER], next, objclass,
 				ZBX_API_FALSE, &self->filter.exact, error))
 		{
 			goto out;
@@ -1192,7 +1353,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t 
 			goto out;
 		}
 
-		if (SUCCEED != zbx_api_get_param_filter(zbx_api_params[ZBX_API_PARAM_SEARCH], next, object,
+		if (SUCCEED != zbx_api_get_param_filter(zbx_api_params[ZBX_API_PARAM_SEARCH], next, objclass,
 				ZBX_API_TRUE, &self->filter.like, error))
 		{
 			goto out;
@@ -1211,7 +1372,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t 
 
 		zbx_vector_str_create(&sortfields);
 
-		if (SUCCEED == (rc = zbx_api_get_param_string_or_array(zbx_api_params[ZBX_API_PARAM_SORTFIELD],
+		if (SUCCEED == (rc = zbx_api_get_param_stringarray(zbx_api_params[ZBX_API_PARAM_SORTFIELD],
 				next, &sortfields, error)))
 		{
 			/* add the sort fields to field vector if it was not done by sortorder parameter */
@@ -1242,7 +1403,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t 
 			{
 				zbx_api_sort_t	*sort = (zbx_api_sort_t *)self->sort.values[i];
 
-				if (NULL == (sort->field = zbx_api_object_get_property(object, sortfields.values[i])))
+				if (NULL == (sort->field = zbx_api_class_get_property(objclass, sortfields.values[i])))
 				{
 					*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" value \"%s\"",
 							zbx_api_params[ZBX_API_PARAM_SORTFIELD],
@@ -1277,7 +1438,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_object_t 
 
 		zbx_vector_str_create(&sortfields);
 
-		if (SUCCEED == (rc = zbx_api_get_param_string_or_array(zbx_api_params[ZBX_API_PARAM_SORTORDER],
+		if (SUCCEED == (rc = zbx_api_get_param_stringarray(zbx_api_params[ZBX_API_PARAM_SORTORDER],
 				next, &sortfields, error)))
 		{
 			/* add the sort fields to field vector if it was not done by sortfield parameter */
@@ -1346,24 +1507,25 @@ out:
  * Purpose: checks if the specified field is in output fields vector and adds *
  *          it if necessary                                                   *
  *                                                                            *
- * Parameters: self   - [IN] the common get request parameter data            *
- *             object - [IN] the API object definition                        *
- *             name   - [IN] the field name                                   *
- *             index  - [OUT] the index of the field in output fields vector  *
- *             error  - [OUT] the error message                               *
+ * Parameters: self     - [IN/OUT] the common get request parameter data      *
+ *             objclass - [IN] the object class definition                    *
+ *             name     - [IN] the field name                                 *
+ *             index    - [OUT] the index of the field in output fields       *
+ *                              vector                                        *
+ *             error    - [OUT] the error message                             *
  *                                                                            *
  * Return value: SUCCEED - the field was found or added                       *
  *               FAIL    - no field with the specified name was found in      *
  *                         fields vector                                      *
  *                                                                            *
  ******************************************************************************/
-int	zbx_api_getoptions_add_output_field(zbx_api_getoptions_t *self, const zbx_api_object_t *object,
+int	zbx_api_getoptions_add_output_field(zbx_api_getoptions_t *self, const zbx_api_class_t *objclass,
 		const char *name, int *index, char **error)
 {
 	const zbx_api_property_t	*field;
 	int			ret = FAIL, i;
 
-	if (NULL == (field = zbx_api_object_get_property(object, name)))
+	if (NULL == (field = zbx_api_class_get_property(objclass, name)))
 	{
 		*error = zbx_dsprintf(*error, "Invalid additional output field name \"%s\"", name);
 		goto out;
@@ -1391,15 +1553,15 @@ out:
  *                                                                            *
  * Purpose: finalizes common get request and validates it                     *
  *                                                                            *
- * Parameters: self   - [IN] the common get request parameter data            *
- *             object - [IN] the API object definition                        *
- *             error  - [OUT] the error message                               *
+ * Parameters: self     - [IN/OUT] the common get request parameter data      *
+ *             objclass - [IN] the object class definition                    *
+ *             error    - [OUT] the error message                             *
  *                                                                            *
  * Return value: SUCCEED - the request was finalized successfully.            *
  *               FAIL    - the validation failed failed.                      *
  *                                                                            *
  ******************************************************************************/
-int	zbx_api_getoptions_finalize(zbx_api_getoptions_t *self, const zbx_api_object_t *object, char **error)
+int	zbx_api_getoptions_finalize(zbx_api_getoptions_t *self, const zbx_api_class_t *objclass, char **error)
 {
 	int				i;
 	const zbx_api_property_t	*prop;
@@ -1457,7 +1619,7 @@ int	zbx_api_getoptions_finalize(zbx_api_getoptions_t *self, const zbx_api_object
 	/* if output was not set add all fields, as 'extend' is the default output option */
 	if (ZBX_API_TRUE != self->output.is_set)
 	{
-		for (prop = object->properties; NULL != prop->name; prop++)
+		for (prop = objclass->properties; NULL != prop->name; prop++)
 			zbx_vector_ptr_append(&self->output.properties, (void *)prop);
 
 		self->output.properties_num = self->output.properties.values_num;
@@ -1466,9 +1628,9 @@ int	zbx_api_getoptions_finalize(zbx_api_getoptions_t *self, const zbx_api_object
 
 	if (ZBX_API_TRUE == self->preservekeys)
 	{
-		/* if indexed output is set ensure that object id (first field in object definition) */
-		/* is also retrieved.                                                                */
-		if (SUCCEED != zbx_api_getoptions_add_output_field(self, object, object->properties->name,
+		/* If indexed output is set ensure that object id              */
+		/* (first field in object class definition) is also retrieved. */
+		if (SUCCEED != zbx_api_getoptions_add_output_field(self, objclass, zbx_api_object_pk(objclass)->name,
 				&self->output.key, error))
 		{
 			return FAIL;
@@ -1481,39 +1643,141 @@ int	zbx_api_getoptions_finalize(zbx_api_getoptions_t *self, const zbx_api_object
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_getoptions_free                                          *
+ * Function: zbx_api_getoptions_clean                                         *
  *                                                                            *
- * Purpose: frees get request common parameters                               *
+ * Purpose: frees resources allocated to store common get request parameters  *
  *                                                                            *
- * Parameters: self - [IN] the common get request parameter data              *
+ * Parameters: self - [IN/OUT] the common get request parameter data          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_api_getoptions_free(zbx_api_getoptions_t *self)
+void	zbx_api_getoptions_clean(zbx_api_getoptions_t *self)
 {
 	zbx_vector_ptr_clear_ext(&self->sort, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&self->sort);
 
-	zbx_api_filter_free(&self->filter);
-	zbx_api_query_free(&self->output);
+	zbx_api_filter_clean(&self->filter);
+	zbx_api_query_clean(&self->output);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_property_convert                                         *
+ *                                                                            *
+ * Purpose: converts property from text format to native format               *
+ *                                                                            *
+ * Parameters: self      - [IN] the property to convert                       *
+ *             value_str - [IN] the property value in text format             *
+ *             value     - [OUT] the converted value                          *
+ *             error     - [OUT] the error message                            *
+ *                                                                            *
+ * Return value: SUCCEED - the property value was converted successfully.     *
+ *               FAIL    - the value conversion failed                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_property_convert(const zbx_api_property_t *self, const char *value_str, zbx_db_value_t *value,
+		char **error)
+{
+	if (NULL == self->field)
+	{
+		/* property is not backed by database, just copy its value */
+		value->str = zbx_strdup(NULL, value_str);
+		return SUCCEED;
+	}
+
+	switch (self->field->type)
+	{
+		case ZBX_TYPE_CHAR:
+		case ZBX_TYPE_TEXT:
+		case ZBX_TYPE_SHORTTEXT:
+		case ZBX_TYPE_LONGTEXT:
+		case ZBX_TYPE_BLOB:
+			value->str = zbx_strdup(NULL, value_str);
+			break;
+		case ZBX_TYPE_INT:
+			/* TODO: validation ? */
+			value->i32 = atoi(value_str);
+			break;
+		case ZBX_TYPE_FLOAT:
+			/* TODO: validation ? */
+			value->dbl = atof(value_str);
+			break;
+		case ZBX_TYPE_UINT:
+		case ZBX_TYPE_ID:
+			if (SUCCEED != is_uint64(value_str, &value->ui64))
+			{
+				if (NULL != *error)
+				{
+					*error = zbx_dsprintf(*error, "invalid property \"%s\" value \"%s\"",
+							self->name, value_str);
+				}
+				return FAIL;
+			}
+			break;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_property_value_free                                      *
+ *                                                                            *
+ * Purpose: frees property value                                              *
+ *                                                                            *
+ * Parameters: propvalue - [IN] the property value                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_property_value_free(zbx_api_property_value_t *propvalue)
+{
+	switch (propvalue->property->field->type)
+	{
+		case ZBX_TYPE_CHAR:
+		case ZBX_TYPE_TEXT:
+		case ZBX_TYPE_SHORTTEXT:
+		case ZBX_TYPE_LONGTEXT:
+		case ZBX_TYPE_BLOB:
+			zbx_free(propvalue->value.str);
+			break;
+	}
+
+	zbx_free(propvalue);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_object_free                                              *
+ *                                                                            *
+ * Purpose: frees API object                                                  *
+ *                                                                            *
+ * Parameters: properties - [IN] the object                                   *
+ *                                                                            *
+ * Comments: An API object is stored as a ptr vector of property values (see  *
+ *           zbx_api_property_value_t type).                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_object_free(zbx_vector_ptr_t *object)
+{
+	zbx_vector_ptr_clear_ext(object, (zbx_mem_free_func_t)zbx_api_property_value_free);
+	zbx_free(object);
 }
 
 /******************************************************************************
  *                                                                            *
  * Function: zbx_api_object_get_property                                      *
  *                                                                            *
- * Purpose: searches for the specified field in a fields array                *
+ * Purpose: searches for the specified property in object class definition    *
  *                                                                            *
- * Parameters: object - [IN] the API object definition                        *
- *             name   - [IN] the field name                                   *
+ * Parameters: objclass - [IN] the API object class definition                *
+ *             name     - [IN] the field name                                 *
  *                                                                            *
  * Return value: The found field or NULL if no field had the specified name.  *
  *                                                                            *
  ******************************************************************************/
-const zbx_api_property_t	*zbx_api_object_get_property(const zbx_api_object_t *object, const char *name)
+const zbx_api_property_t	*zbx_api_class_get_property(const zbx_api_class_t *objclass, const char *name)
 {
 	const zbx_api_property_t	*prop;
 
-	for (prop = object->properties; NULL != prop->name; prop++)
+	for (prop = objclass->properties; NULL != prop->name; prop++)
 	{
 		if (0 == strcmp(prop->name, name))
 			return prop;
@@ -1521,6 +1785,372 @@ const zbx_api_property_t	*zbx_api_object_get_property(const zbx_api_object_t *ob
 
 	return NULL;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_3ptr_compare_func                                        *
+ *                                                                            *
+ * Purpose: helper function for zbx_api_object_prepare_for_insert() function  *
+ *          to sort property index hashset matching the property order in     *
+ *          object class definition.                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_3ptr_compare_func(const void *d1, const void *d2)
+{
+	const void	*p1 = **(const void ***)d1;
+	const void	*p2 = **(const void ***)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(p1, p2);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_prepare_objects_for_create                               *
+ *                                                                            *
+ * Purpose: prepares an object vector for create operation                    *
+ *                                                                            *
+ * Parameters: objects   - [IN/OUT] the objects to prepare                    *
+ *             error     - [OUT] the error message                            *
+ *                                                                            *
+ * Return value: SUCCEED - the objects were successfully prepared for create  *
+ *                         operation                                          *
+ *               FAIL    - object preparation failed. Currently the only      *
+ *                         reason is default value conversion failure.        *
+ *                                                                            *
+ * Comments: This function ensures that all objects have the same properties  *
+ *           ordered by property order in object class definition. If         *
+ *           necessary new properties with default values are added.          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, char **error)
+{
+	typedef struct
+	{
+		const char			*name;
+		const zbx_api_property_t	*property;
+		int				value;
+	}
+	zbx_api_property_index_t;
+
+	int				ret = FAIL, i, j;
+	zbx_hashset_t			propindex;
+	zbx_hashset_iter_t		iter;
+	zbx_api_property_index_t	*pi;
+	zbx_api_property_value_t	*pv;
+
+	zbx_hashset_create(&propindex, 100, ZBX_DEFAULT_STRING_HASH_FUNC, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+	for (i = 0; i < objects->values_num; i++)
+	{
+		zbx_vector_ptr_t	*props = (zbx_vector_ptr_t *)objects->values[i];
+
+		for (j = 0; j < props->values_num; j++)
+		{
+			zbx_api_property_value_t	*propvalue = (zbx_api_property_value_t *)props->values[j];
+
+			if (NULL == zbx_hashset_search(&propindex, &propvalue->property->name))
+			{
+				zbx_api_property_index_t	rec = {propvalue->property->name, propvalue->property};
+
+				zbx_hashset_insert(&propindex, (void *)&rec, sizeof(zbx_api_property_index_t));
+			}
+		}
+	}
+
+	for (i = 0; i < objects->values_num; i++)
+	{
+		zbx_vector_ptr_t	*props = (zbx_vector_ptr_t *)objects->values[i];
+
+		/* reset field values */
+		zbx_hashset_iter_reset(&propindex, &iter);
+		while (NULL != (pi = zbx_hashset_iter_next(&iter)))
+			pi->value = ZBX_API_FALSE;
+
+		/* mark object properties */
+		for (j = 0; j < props->values_num; j++)
+		{
+			zbx_api_property_value_t	*propvalue = (zbx_api_property_value_t *)props->values[j];
+
+			if (NULL != (pi = zbx_hashset_search(&propindex, &propvalue->property->name)))
+				pi->value = ZBX_API_TRUE;
+		}
+
+		/* add missing properties */
+		zbx_hashset_iter_reset(&propindex, &iter);
+		while (NULL != (pi = zbx_hashset_iter_next(&iter)))
+		{
+			if (ZBX_API_TRUE == pi->value)
+				continue;
+
+			pv = zbx_malloc(NULL, sizeof(zbx_api_property_value_t));
+			pv->property = pi->property;
+
+			if (SUCCEED != zbx_api_property_convert(pv->property, pv->property->field->default_value,
+					&pv->value, error))
+			{
+				goto out;
+			}
+
+			zbx_vector_ptr_append(props, pv);
+		}
+
+		/* sort by property order in object class definition */
+		zbx_vector_ptr_sort(props, zbx_api_3ptr_compare_func);
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_hashset_destroy(&propindex);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_create_objects                                           *
+ *                                                                            *
+ * Purpose: creates objects specified by the objects vector                   *
+ *                                                                            *
+ * Parameters: objects  - [IN] the objects to prepare                         *
+ *             objclass - [IN] the object class definition                    *
+ *             outids   - [OUT] a vector of the created object ids            *
+ *             error    - [OUT] error message                                 *
+ *                                                                            *
+ * Return value: SUCCEED - the objects were created successfully              *
+ *               FAIL    - object creation failed.                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_create_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass,
+		zbx_vector_uint64_t *outids, char **error)
+{
+	zbx_db_insert_t		db_insert;
+	int			i, j, cols_num, ret;
+	const ZBX_TABLE		*table;
+	const ZBX_FIELD		**fields;
+	zbx_vector_ptr_t	*props;
+	const zbx_db_value_t	**values;
+	zbx_db_value_t		idvalue;
+
+	if (0 == objects->values_num)
+		return SUCCEED;
+
+	idvalue.ui64 = DBget_maxid_num(objclass->table_name, objects->values_num);
+
+	table = DBget_table(objclass->table_name);
+
+	/* reserve memory for column definitions/values */
+	props = (zbx_vector_ptr_t *)objects->values[0];
+	cols_num = props->values_num + 1;
+
+	fields = zbx_malloc(NULL, sizeof(ZBX_FIELD *) * cols_num);
+	values = zbx_malloc(NULL, sizeof(zbx_db_value_t *) * cols_num);
+
+	fields[0] = zbx_api_object_pk(objclass)->field;
+
+	for (i = 1; i < cols_num; i++)
+	{
+		zbx_api_property_value_t	*pv = (zbx_api_property_value_t *)props->values[i - 1];
+
+		fields[i] = pv->property->field;
+	}
+
+	zbx_db_insert_prepare_dyn(&db_insert, table, fields, props->values_num + 1);
+
+	values[0] = &idvalue;
+	for (i = 0; i < objects->values_num; i++)
+	{
+		props = (zbx_vector_ptr_t *)objects->values[i];
+
+		for (j = 1; j < cols_num; j++)
+		{
+			zbx_api_property_value_t	*pv = (zbx_api_property_value_t *)props->values[j - 1];
+
+			values[j] = &pv->value;
+		}
+
+		zbx_db_insert_add_values_dyn(&db_insert, values, cols_num);
+		zbx_vector_uint64_append(outids, idvalue.ui64++);
+	}
+
+	/* TODO: error message */
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
+		*error = zbx_dsprintf(*error, "An SQL error occurred");
+
+	zbx_db_insert_clean(&db_insert);
+
+	zbx_free(values);
+	zbx_free(fields);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_delete_objects                                           *
+ *                                                                            *
+ * Purpose: deletes objects specified by the ids vector                       *
+ *                                                                            *
+ * Parameters: ids      - [IN] the ids of objects to delete                   *
+ *             objclass - [IN] the object class definition                    *
+ *             error    - [OUT] error message                                 *
+ *                                                                            *
+ * Return value: SUCCEED - the objects were created successfully              *
+ *               FAIL    - object creation failed.                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_delete_objects(const zbx_vector_uint64_t *ids, const zbx_api_class_t *objclass, char **error)
+{
+	char	*sql = NULL;
+	size_t	sql_offset = 0, sql_alloc = 0;
+	int	ret = FAIL;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where ", objclass->table_name);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, zbx_api_object_pk(objclass)->field_name, ids->values,
+			ids->values_num);
+
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+	{
+		/* TODO: prepare proper error message */
+		*error = zbx_dsprintf(*error, "And SQL error occurred");
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_free(sql);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_prepare_objects_for_update                               *
+ *                                                                            *
+ * Purpose: prepares an object vector for update operation                    *
+ *                                                                            *
+ * Parameters: objects  - [IN/OUT] the objects to prepare                     *
+ *             objclass - [IN] the object class definition                    *
+ *             error    - [OUT] the error message                             *
+ *                                                                            *
+ * Return value: SUCCEED - the objects were successfully prepared for update  *
+ *                         operation                                          *
+ *               FAIL    - object preparation failed.                         *
+ *                                                                            *
+ * Comments: This function checks if primary key is specified for all objects *
+ *           and sorts properties to ensure that primary key is the first     *
+ *           property.                                                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_prepare_objects_for_update(zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass, char **error)
+{
+	int				ret = FAIL, i;
+	zbx_vector_ptr_t		*props;
+	zbx_api_property_value_t	*pv;
+
+	for (i = 0; i < objects->values_num; i++)
+	{
+		props = (zbx_vector_ptr_t *)objects->values[i];
+
+		if (2 > props->values_num)
+		{
+			*error = zbx_dsprintf(*error, "Cannot update object #%d:  not enough properties specified",
+					i + 1);
+			goto out;
+		}
+
+		zbx_vector_ptr_sort(props, zbx_api_3ptr_compare_func);
+
+		pv = (zbx_api_property_value_t *)props->values[0];
+
+		if (zbx_api_object_pk(objclass) != pv->property)
+		{
+			*error = zbx_dsprintf(*error, "Cannot update object #%d:  no primary key specified", i + 1);
+			goto out;
+		}
+	}
+
+	ret = SUCCEED;
+out:
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_update_objects                                           *
+ *                                                                            *
+ * Purpose: updates objects with properties specified by the objects vector   *
+ *                                                                            *
+ * Parameters: objects  - [IN] the objects to prepare                         *
+ *             objclass - [IN] the object class definition                    *
+ *             outids   - [OUT] a vector of the created object ids            *
+ *             error    - [OUT] error message                                 *
+ *                                                                            *
+ * Return value: SUCCEED - the objects were created successfully              *
+ *               FAIL    - object creation failed.                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_update_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass,
+		zbx_vector_uint64_t *outids, char **error)
+{
+	char				*sql = NULL;
+	size_t				sql_offset = 0, sql_alloc = 0;
+	int 				ret = FAIL, i, j;
+	const zbx_vector_ptr_t		*props;
+	const zbx_api_property_value_t	*pv
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < objects->values_num; i++)
+	{
+		props = (const zbx_vector_ptr_t *)objects->values[i];
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", objclass->table_name);
+
+		for (j = 1; j < props->values_num; j++)
+		{
+			pv = (zbx_api_property_value_t *)props->values[j];
+
+			if (1 < j)
+				zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s=", pv->property->field_name);
+			zbx_api_sql_add_field_value(&sql, &sql_alloc, &sql_offset, pv->property->field, &pv->value);
+		}
+
+		pv = (zbx_api_property_value_t *)props->values[0];
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where %s=" ZBX_FS_UI64 ";\n",
+				zbx_api_object_pk(objclass)->field_name, pv->value.ui64);
+		zbx_vector_uint64_append(outids, pv->value.ui64);
+
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+		{
+			/* TODO: proper sql error message */
+			*error = zbx_dsprintf(*error, "An SQL error occurred");
+			goto out;
+		}
+	}
+
+	if (16 < sql_offset)
+	{
+		DBend_multiple_update(sql, sql_alloc, sql_offset);
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+		{
+			/* TODO: proper sql error message */
+			*error = zbx_dsprintf(*error, "An SQL error occurred");
+			goto out;
+		}
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_free(sql);
+
+	return ret;
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -1716,6 +2346,55 @@ void	zbx_api_sql_add_sort(char **sql, size_t *sql_alloc, size_t *sql_offset, con
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_api_sql_add_field_value                                      *
+ *                                                                            *
+ * Purpose: adds field value to sql statement                                 *
+ *                                                                            *
+ * Parameters: sql        - [IN/OUT] the sql statement                        *
+ *             sql_alloc  - [IN/OUT] the allocated size of sql statement      *
+ *             sql_offset - [IN/OUT] the sql statement end offset             *
+ *             field      - [IN] the field data                               *
+ *             value      - [IN] the value to add                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_sql_add_field_value(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field,
+		const zbx_db_value_t *value)
+{
+	char	*str;
+
+	switch (field->type)
+	{
+		case ZBX_TYPE_CHAR:
+		case ZBX_TYPE_TEXT:
+		case ZBX_TYPE_SHORTTEXT:
+		case ZBX_TYPE_LONGTEXT:
+		case ZBX_TYPE_BLOB:
+			str = DBdyn_escape_string_len(value->str, field->length);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "'%s'", str);
+			zbx_free(str);
+			break;
+		case ZBX_TYPE_INT:
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%d", value->i32);
+			break;
+		case ZBX_TYPE_FLOAT:
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_DBL, value->dbl);
+			break;
+		case ZBX_TYPE_ID:
+			if (0 == value->ui64)
+			{
+				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "null");
+				break;
+			}
+			/* fall through to uint64 value processing */
+		case ZBX_TYPE_UINT:
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64, value->ui64);
+			break;
+	}
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_api_db_fetch_rows                                            *
  *                                                                            *
  * Purpose: perform sql select, fetch and store the resulting rows            *
@@ -1863,7 +2542,7 @@ out:
  *                                                                            *
  * Purpose: initializes api get request result storage                        *
  *                                                                            *
- * Parameters: self - [IN] the get request result storage                     *
+ * Parameters: self - [OUT] the get request result storage                    *
  *                                                                            *
  ******************************************************************************/
 void	zbx_api_get_result_init(zbx_api_get_result_t *self)
@@ -1876,9 +2555,9 @@ void	zbx_api_get_result_init(zbx_api_get_result_t *self)
  *                                                                            *
  * Function: zbx_api_get_result_clean                                         *
  *                                                                            *
- * Purpose: releases resources allocated by get request result storage        *
+ * Purpose: frees resources allocated by get request result storage           *
  *                                                                            *
- * Parameters: self - [IN] the get request result storage                     *
+ * Parameters: self - [IN/OUT] the get request result storage                 *
  *                                                                            *
  ******************************************************************************/
 void	zbx_api_get_result_clean(zbx_api_get_result_t *self)
@@ -1893,9 +2572,9 @@ void	zbx_api_get_result_clean(zbx_api_get_result_t *self)
  *                                                                            *
  * Function: zbx_api_db_clean_rows                                            *
  *                                                                            *
- * Purpose: releases resources allocated to store result set (rows)           *
+ * Purpose: frees resources allocated to store result set (rows)              *
  *                                                                            *
- * Parameters: self - [IN] the result set data (rows)                         *
+ * Parameters: self - [IN/OUT] the result set data (rows)                     *
  *                                                                            *
  ******************************************************************************/
 void	zbx_api_db_clean_rows(zbx_vector_ptr_t *rows)
@@ -1907,7 +2586,7 @@ void	zbx_api_db_clean_rows(zbx_vector_ptr_t *rows)
  *                                                                            *
  * Function: zbx_api_db_free_rows                                             *
  *                                                                            *
- * Purpose: frees resources allocated to store result set (rows)              *
+ * Purpose: frees result set (rows)                                           *
  *                                                                            *
  * Parameters: self - [IN] the result set data (rows)                         *
  *                                                                            *
@@ -1925,7 +2604,7 @@ void	zbx_api_db_free_rows(zbx_vector_ptr_t *rows)
  *                                                                            *
  * Purpose: initializes json data for api responses                           *
  *                                                                            *
- * Parameters: json - [IN] the json data structure                            *
+ * Parameters: json - [OUT] the json data structure                           *
  *             id   - [IN] the response id                                    *
  *                                                                            *
  ******************************************************************************/
@@ -1943,7 +2622,7 @@ void	zbx_api_json_init(struct zbx_json *json, const char *id)
  *                                                                            *
  * Purpose: adds a sub query result to json data                              *
  *                                                                            *
- * Parameters: json  - [IN] the json data structure                           *
+ * Parameters: json  - [IN/OUT] the json data structure                       *
  *             name  - [IN] the query name                                    *
  *             query - [IN] the query data                                    *
  *             rows  - [IN] the query result                                  *
@@ -1979,7 +2658,7 @@ void	zbx_api_json_add_query(struct zbx_json *json, const char *name, const zbx_a
  *                                                                            *
  * Purpose: adds a single query row to json data                              *
  *                                                                            *
- * Parameters: json    - [IN] the json data structure                         *
+ * Parameters: json    - [IN/OUT] the json data structure                     *
  *             query   - [IN] the query data                                  *
  *             columns - [IN] the row to add                                  *
  *             queries - [IN] the sub query vector. Should be NULL when       *
@@ -2016,7 +2695,7 @@ void	zbx_api_json_add_row(struct zbx_json *json, const zbx_api_query_t *query, c
  *                                                                            *
  * Purpose: adds count(*) request results to json data                        *
  *                                                                            *
- * Parameters: json - [IN] the json data structure                            *
+ * Parameters: json - [IN/OUT] the json data structure                        *
  *             name - [IN] the column name                                    *
  *             rows - [IN] the query result set                               *
  *                                                                            *
@@ -2034,7 +2713,7 @@ void	zbx_api_json_add_count(struct zbx_json *json, const char *name, const zbx_v
  *                                                                            *
  * Purpose: adds get request result to json data                              *
  *                                                                            *
- * Parameters: json    - [IN] the json data structure                         *
+ * Parameters: json    - [IN/OUT] the json data structure                     *
  *             options - [IN] the common get request options                  *
  *             result  - [IN] the request result data                         *
  *                                                                            *
@@ -2080,11 +2759,37 @@ void	zbx_api_json_add_result(struct zbx_json *json, const zbx_api_getoptions_t *
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_api_json_add_idarray                                         *
+ *                                                                            *
+ * Purpose: id vector to json data                                            *
+ *                                                                            *
+ * Parameters: json - [IN/OUT] the json data structure                        *
+ *             name - [IN] the vector name                                    *
+ *             ids  - [IN] the vector to add                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_json_add_idarray(struct zbx_json *json, const char *name, const zbx_vector_uint64_t *ids)
+{
+	int	i;
+
+	zbx_json_addobject(json, ZBX_API_RESULT_TAG_RESULT);
+	zbx_json_addarray(json, name);
+
+	for (i = 0; i < ids->values_num; i++)
+		zbx_json_adduint64(json, NULL, ids->values[i]);
+
+	zbx_json_close(json);
+	zbx_json_close(json);
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_api_json_add_error                                           *
  *                                                                            *
  * Purpose: adds error response to json data                                  *
  *                                                                            *
- * Parameters: json  - [IN] the json data structure                           *
+ * Parameters: json  - [IN/OUT] the json data structure                       *
  *             error - [IN] the error message                                 *
  *                                                                            *
  ******************************************************************************/
@@ -2106,18 +2811,18 @@ void	zbx_api_json_add_error(struct zbx_json *json, const char *error)
  *                                                                            *
  * Purpose: initializes API subsystem                                         *
  *                                                                            *
- * Parameters: error - [IN] the error message                                 *
+ * Parameters: error - [OUT] the error message                                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_api_init(char **error)
 {
-	zbx_api_object_t*	zbx_api_objects[] = {
-						&zbx_api_object_user,
-						&zbx_api_object_mediatype,
+	zbx_api_class_t*	zbx_api_objects[] = {
+						&zbx_api_class_user,
+						&zbx_api_class_mediatype,
 						NULL
 	};
 
-	zbx_api_object_t	**object;
+	zbx_api_class_t	**object;
 
 	for (object = zbx_api_objects; NULL != *object; object++)
 	{
