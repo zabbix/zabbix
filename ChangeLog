@@ -56,6 +56,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese and Slovak
 .......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
 
 Bug fixes:
+........S. [ZBX-8873] fixed incorrect event being generated after maintenance in case there are out of order events due to proxy (asaveljevs, Sasha)
 .......PS. [ZBX-8882] fixed message logging on DB2 errors (igors)
 .......PS. [ZBX-8992] made Zabbix prefer the threshold sensor over a discrete sensor, in case both are available under the same name (asaveljevs)
 ...G...... [ZBX-8506] fixed memory leak in wmi.get[]; thanks to Pedro Nunes for patch (asaveljevs)
@@ -554,6 +555,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8873] fixed incorrect event being generated after maintenance in case there are out of order events due to proxy (asaveljevs, Sasha)
 .......PS. [ZBX-8882] fixed message logging on DB2 errors (igors)
 .......PS. [ZBX-8992] made Zabbix prefer the threshold sensor over a discrete sensor, in case both are available under the same name (asaveljevs)
 ...G...... [ZBX-8506] fixed memory leak in wmi.get[]; thanks to Pedro Nunes for patch (asaveljevs)
