@@ -21,7 +21,6 @@
 #define ZABBIX_ZBXDB_H
 
 #include "common.h"
-#include "log.h"
 
 #define ZBX_DB_OK	0
 #define ZBX_DB_FAIL	-1
@@ -59,7 +58,6 @@
 	int	IBM_DB2server_status();
 	int	zbx_ibm_db2_success(SQLRETURN ret);
 	int	zbx_ibm_db2_success_ext(SQLRETURN ret);
-	void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_codes_t err, const char *context);
 
 #elif defined(HAVE_MYSQL)
 
