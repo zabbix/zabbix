@@ -238,16 +238,16 @@ if ($notEmptyResult) {
 			$groupNames[] = RSM_TEST_GROUP;
 		}
 
-		$tldGroups = API::HostGroup()->get(array(
-			'output' => array('groupid'),
-			'filter' => array(
-				'name' => $groupNames
-			),
-			'preservekeys' => true
-		));
+		$getGroups = DBselect(
+			'SELECT g.groupid'.
+			' FROM groups g'.
+			' WHERE '.dbConditionString('g.name', $groupNames)
+		);
 
-		foreach ($tldGroups as $key => $value) {
-			$selectedGroups[$key] = $key;
+		if ($getGroups) {
+			while ($getGroup = DBfetch($getGroups)) {
+				$selectedGroups[$getGroup['groupid']] = $getGroup['groupid'];
+			}
 		}
 	}
 
