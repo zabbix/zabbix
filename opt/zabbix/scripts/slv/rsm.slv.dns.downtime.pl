@@ -36,7 +36,7 @@ foreach (@$tlds_ref)
     $tld = $_; # set global variable here
 
     # for future calculation of downtime
-    $tld_items{$tld} = get_itemid($tld, $cfg_key_in);
+    $tld_items{$tld} = get_itemid_by_host($tld, $cfg_key_in);
 }
 
 init_values();

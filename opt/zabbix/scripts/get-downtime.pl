@@ -82,7 +82,7 @@ foreach (@$tlds_ref)
     }
     else
     {
-	my $itemid = get_itemid($tld, $key);
+	my $itemid = get_itemid_by_host($tld, $key);
 	my $downtime = get_downtime($itemid, $from, $till);
 
 	info("$downtime minutes of downtime from ", ts_str($from), " ($from) till ", ts_str($till), " ($till)");
