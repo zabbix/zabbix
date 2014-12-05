@@ -36,6 +36,8 @@ static int		log_level = LOG_LEVEL_DEBUG;
 static int		log_level = LOG_LEVEL_WARNING;
 #endif
 
+static char		*zbx_sqlerror_message = NULL;
+
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
 #define ZBX_CHECK_LOG_LEVEL(level)	\
@@ -193,7 +195,6 @@ void	zabbix_set_log_level(int level)
 void	zabbix_errlog(zbx_err_codes_t err, ...)
 {
 	const char	*msg;
-	char		*s = NULL;
 	va_list		ap;
 
 	switch (err)
@@ -224,12 +225,10 @@ void	zabbix_errlog(zbx_err_codes_t err, ...)
 	}
 
 	va_start(ap, err);
-	s = zbx_dvsprintf(s, msg, ap);
+	zbx_sqlerror_message = zbx_dvsprintf(zbx_sqlerror_message, msg, ap);
 	va_end(ap);
 
-	zabbix_log(LOG_LEVEL_ERR, "[Z%04d] %s", err, s);
-
-	zbx_free(s);
+	zabbix_log(LOG_LEVEL_ERR, "[Z%04d] %s", err, zbx_sqlerror_message);
 }
 
 /******************************************************************************
@@ -505,6 +504,11 @@ char	*zbx_strerror(int errnum)
 	zbx_snprintf(utf8_string, sizeof(utf8_string), "[%d] %s", errnum, strerror(errnum));
 
 	return utf8_string;
+}
+
+const char	*zbx_sqlerror()
+{
+	return zbx_sqlerror_message;
 }
 
 char	*strerror_from_system(unsigned long error)

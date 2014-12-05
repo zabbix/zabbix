@@ -67,6 +67,8 @@ int		zabbix_check_log_level(int level);
 char		*zbx_strerror(int errnum);
 char		*strerror_from_system(unsigned long error);
 
+const char	*zbx_sqlerror();
+
 #ifdef _WINDOWS
 char		*strerror_from_module(unsigned long error, const wchar_t *module);
 #endif
