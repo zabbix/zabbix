@@ -1880,8 +1880,8 @@ int	IBM_DB2server_status()
 {
 	int	server_status = SQL_CD_TRUE;
 
-	if (SUCCEED != zbx_ibm_db2_success(SQLGetConnectAttr(ibm_db2.hdbc, SQL_ATTR_CONNECTION_DEAD,
-			&server_status, SQL_IS_POINTER, NULL)))
+	if (SUCCEED != zbx_ibm_db2_success(SQLGetConnectAttr(ibm_db2.hdbc, SQL_ATTR_CONNECTION_DEAD, &server_status,
+			SQL_IS_POINTER, NULL)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot determine IBM DB2 server status, assuming not connected");
 	}
@@ -1906,8 +1906,8 @@ void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_codes_t e
 	SQLINTEGER	sqlcode;
 	SQLSMALLINT	length, i = 1;
 
-	while (SQL_SUCCESS == SQLGetDiagRec(htype, hndl, i++, sqlstate, &sqlcode, tmp_message,
-			SQL_MAX_MESSAGE_LENGTH + 1, &length))
+	while (SQL_SUCCESS == SQLGetDiagRec(htype, hndl, i++, sqlstate, &sqlcode, tmp_message, sizeof(tmp_message),
+			&length))
 	{
 		zbx_snprintf(message, sizeof(message), "%s %s", sqlstate, tmp_message);
 		zbx_rtrim(message, ZBX_WHITESPACE);
