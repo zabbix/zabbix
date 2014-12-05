@@ -317,7 +317,7 @@ $itemFormList->addRow(_('New flexible interval'), array($newFlexInt, $maxFlexMsg
 $keepHistory = array();
 $keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
 if ($data['config']['hk_history_global'] && $data['parent_discoveryid'] == 0
-		&& $host['status'] != HOST_STATUS_TEMPLATE) {
+		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 
 	$keepHistory[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
@@ -335,7 +335,7 @@ $itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
 $keepTrend = array();
 $keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
 if ($data['config']['hk_trends_global'] && $data['parent_discoveryid'] == 0
-		&& $host['status'] != HOST_STATUS_TEMPLATE) {
+		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 
 	$keepTrend[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
@@ -447,7 +447,9 @@ $itemForm->addItem($itemTab);
 
 // append buttons to form
 if ($this->data['itemid'] != 0) {
-	if ($this->data['parent_discoveryid'] == 0 && $host['status'] != HOST_STATUS_TEMPLATE) {
+	if ($this->data['parent_discoveryid'] == 0
+			&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
+
 		$buttonDelHistory = new CButtonQMessage(
 			'del_history',
 			_('Clear history and trends'),
