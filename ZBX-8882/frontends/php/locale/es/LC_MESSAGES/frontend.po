@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-28 12:22+0300\n"
-"PO-Revision-Date: 2014-07-23 20:30+0300\n"
+"POT-Creation-Date: 2014-12-02 03:57+0200\n"
+"PO-Revision-Date: 2014-10-17 22:56+0300\n"
 "Last-Translator: Saúl <saulortega.co@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1406140231.0\n"
+"X-POOTLE-MTIME: 1413579365.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -1565,20 +1565,20 @@ msgstr "No se puede borrar el usuario \"%1$s\", prueba deshabilitandolo primero.
 
 #: actionconf.php:177
 msgid "Cannot delete action"
-msgstr "No es posible eliminar la acción"
+msgstr "No se pudo eliminar la acción"
 
 #: applications.php:142 applications.php:181
 msgid "Cannot delete application"
-msgstr "No es posible eliminar la aplicación"
+msgstr "No se pudo eliminar la aplicación"
 
 #: api/classes/CTrigger.php:1073
 msgid "Cannot delete dependency"
-msgstr "No es posible eliminar la dependecia"
+msgstr "No se pudo eliminar la dependencia"
 
 #: api/classes/CDiscoveryRule.php:401 discoveryconf.php:163
 #: host_discovery.php:185
 msgid "Cannot delete discovery rule"
-msgstr "No es posible eliminar la regla"
+msgstr "No se pudo eliminar la regla de descubrimiento"
 
 #: discoveryconf.php:204 host_discovery.php:294
 msgid "Cannot delete discovery rules"
@@ -1586,7 +1586,7 @@ msgstr "No se pudo eliminar las reglas de descubrimiento"
 
 #: graphs.php:279
 msgid "Cannot delete graph"
-msgstr "No es posible eliminar el gráfico"
+msgstr "No se pudo eliminar la gráfica"
 
 #: api/classes/CItemPrototype.php:551 graphs.php:273
 msgid "Cannot delete graph prototype"
@@ -1602,7 +1602,7 @@ msgstr "No se pudo eliminar la gráfica."
 
 #: graphs.php:299
 msgid "Cannot delete graphs"
-msgstr "No es posible eliminar los gráficos"
+msgstr "No se pudo eliminar las gráficas"
 
 #: api/classes/CGraphPrototype.php:602
 msgid "Cannot delete graphs created by low level discovery."
@@ -1610,7 +1610,7 @@ msgstr "No se puede eliminar las gráficas creadas por bajo nivel de descubrimie
 
 #: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:238
 msgid "Cannot delete group"
-msgstr "No es posible eliminar el grupo"
+msgstr "No se pudo eliminar el grupo"
 
 #: hosts.php:583 hosts.php:600
 msgid "Cannot delete host"
@@ -1630,11 +1630,11 @@ msgstr "No se pudo eliminar los prototipos de equipo"
 
 #: adm.iconmapping.php:97
 msgid "Cannot delete icon map"
-msgstr "No es posible eliminar el mapa de iconos"
+msgstr "No se pudo eliminar el mapa de íconos"
 
 #: adm.images.php:121
 msgid "Cannot delete image"
-msgstr "No es posible eliminar la imágen"
+msgstr "No se pudo eliminar la imagen"
 
 #: api/classes/CHost.php:1287
 msgid "Cannot delete inventory."
@@ -1642,7 +1642,7 @@ msgstr "No se pudo eliminar el inventario."
 
 #: items.php:365 screenedit.php:202
 msgid "Cannot delete item"
-msgstr "No es posible eliminar el monitor"
+msgstr "No se pudo eliminar el ítem"
 
 #: disc_prototypes.php:206
 msgid "Cannot delete item prototype"
@@ -1654,7 +1654,7 @@ msgstr "No se pudo eliminar los prototipos de ítems"
 
 #: items.php:767
 msgid "Cannot delete items"
-msgstr "No es posible eliminar los monitores"
+msgstr "No se pudo eliminar los ítems"
 
 #: api/classes/CItemPrototype.php:568
 msgid "Cannot delete items created by low level discovery."
@@ -1662,38 +1662,37 @@ msgstr "No se puede eliminar los ítems creados por bajo nivel de descubrimiento
 
 #: maintenance.php:232
 msgid "Cannot delete maintenance"
-msgstr "No es posible eliminar el periodo de mantenimiento"
+msgstr "No se pudo eliminar el periodo de mantenimiento"
 
 #: media_types.php:143 media_types.php:174
 msgid "Cannot delete media type"
-msgstr "No es posible eliminar el tipo de medio"
+msgstr "No se pudo eliminar el tipo de medios"
 
 #: sysmaps.php:207
 msgid "Cannot delete network map"
-msgstr "No es posible eliminar el mapa de red"
+msgstr "No se pudo eliminar el mapa de red"
 
 #: nodes.php:98
 msgid "Cannot delete node"
-msgstr "No es posible eliminar el nodo"
+msgstr "No se pudo eliminar el nodo"
 
 #: proxies.php:136 proxies.php:194
 msgid "Cannot delete proxy"
-msgstr "No es posible eliminar el proxy"
+msgstr "No se pudo eliminar el proxy"
 
 #: adm.regexps.php:182
-#, fuzzy
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
-msgstr[0] "No es posible eliminar la expresión regular"
-msgstr[1] "No es posible eliminar la expresión regular"
+msgstr[0] "No se pudo eliminar la expresión regular"
+msgstr[1] "No se pudo eliminar las expresiones regulares"
 
 #: screenconf.php:225
 msgid "Cannot delete screen"
-msgstr "No es posible eliminar la pantalla"
+msgstr "No se pudo eliminar la pantalla"
 
 #: scripts.php:149 scripts.php:171
 msgid "Cannot delete script"
-msgstr "No es posible eliminar el script"
+msgstr "No se pudo eliminar el script"
 
 #: api/classes/CScript.php:504
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
@@ -1702,7 +1701,7 @@ msgstr "No se pudo eliminar los scripts. El parámetro de entrada \"scriptids\" 
 #: api/classes/CScript.php:536
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
-msgstr "No es posible eliminar los scripts. script \"%1$s\" es usado en accioón \"%2$s\"."
+msgstr "No se pudo eliminar los scripts. El script \"%1$s\" está siendo usado por la operación de acción \"%2$s\"."
 
 #: api/classes/CScript.php:519
 #, c-format
@@ -1711,19 +1710,19 @@ msgstr "No se pudo eliminar los scripts. El script con ID \"%1$s\" no existe."
 
 #: actionconf.php:356
 msgid "Cannot delete selected actions"
-msgstr "No es posible eliminar las acciones seleccionadas"
+msgstr "No se pudo eliminar las acciones seleccionadas"
 
 #: services.php:107
 msgid "Cannot delete service"
-msgstr "No es posible eliminar el servicio"
+msgstr "No se pudo eliminar el servicio"
 
 #: slideconf.php:122 slideconf.php:149
 msgid "Cannot delete slide show"
-msgstr "No es posible eliminar la diapositiva"
+msgstr "No se pudo eliminar la diapositiva"
 
 #: templates.php:361 templates.php:377 templates.php:405
 msgid "Cannot delete template"
-msgstr "No es posible eliminar las plantilla"
+msgstr "No se pudo eliminar la plantilla"
 
 #: api/classes/CApplication.php:444
 msgid "Cannot delete templated application."
@@ -2169,9 +2168,9 @@ msgid "Cannot mass update visible template name"
 msgstr "No se puede actualizar en masa los nombres visibles de las plantillas"
 
 #: api/classes/CHostBase.php:57
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
-msgstr "El enlace %s no pasó la verificación de de duplicado de ID de plantilla."
+msgstr "El enlace %s no pasó la verificación de duplicidad de ID de plantilla."
 
 #: include/classes/db/DB.php:708
 #, c-format
@@ -2217,6 +2216,11 @@ msgstr "No se puede guardar una regla de descubrimiento sin revisiones."
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "No se pudo enviar la instrucción. Verifique la conexión con el servidor Zabbix \"%1$s\"."
+
+#: api/classes/CHostGroup.php:493
+#, c-format
+msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
+msgstr ""
 
 #: api/classes/CItemGeneral.php:242
 #, c-format
@@ -2316,6 +2320,11 @@ msgstr "No se puede actualizar el \"%1$s\" de un disparador descubierto."
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "No se puede actualizar el \"%1$s\" de una acción \"%2$s\"."
 
+#: api/classes/CHostGroup.php:535
+#, c-format
+msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: api/classes/CItemGeneral.php:206
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
@@ -2360,7 +2369,7 @@ msgstr "No se pudo actualizar el \"templateid\" del prototipo de disparador \"%1
 msgid "Cannot update a discovered graph."
 msgstr "No se puede actualizar una gráfica descubierta."
 
-#: api/classes/CHostGroup.php:537
+#: api/classes/CHostGroup.php:550
 msgid "Cannot update a discovered host group."
 msgstr "No se puede actualizar un grupo de equipos descubierto."
 
@@ -2410,8 +2419,8 @@ msgstr "No es posible actualizar el grupo"
 msgid "Cannot update group."
 msgstr "No se pudo actualizar el grupo."
 
-#: api/classes/CHostGroup.php:792 api/classes/CHostGroup.php:850
-#: api/classes/CHostGroup.php:909
+#: api/classes/CHostGroup.php:805 api/classes/CHostGroup.php:863
+#: api/classes/CHostGroup.php:922
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "No se pudo actualizar los grupos del equipo descubierto \"%1$s\"."
@@ -3458,7 +3467,7 @@ msgstr "Diapositivas personalizadas"
 msgid "Czech (cs_CZ)"
 msgstr "Checo (cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1369
+#: include/classes/graphdraw/CLineGraphDraw.php:1371
 msgid "D"
 msgstr "D"
 
@@ -3481,8 +3490,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "DETALLES DEL ESCENARIO"
 
-#: include/maps.inc.php:686 include/maps.inc.php:768 include/maps.inc.php:856
-#: include/maps.inc.php:946
+#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
+#: include/maps.inc.php:935
 msgid "DISABLED"
 msgstr "DESHABILITADO"
 
@@ -3559,7 +3568,7 @@ msgstr "Monitores"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Estadísticas de caché de datos. Caché (all, float, uint, str, log, text); historial (pfree, total, used, free); tendencia (pfree, total, used, free); texto (pfree, total, used, free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2509
+#: include/classes/graphdraw/CLineGraphDraw.php:2511
 #: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4767,7 +4776,7 @@ msgstr ""
 #: api/classes/CAction.php:1275 api/classes/CApplication.php:288
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
-#: api/classes/CHostGroup.php:509 api/classes/CHostGroup.php:580
+#: api/classes/CHostGroup.php:516 api/classes/CHostGroup.php:593
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1419
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
@@ -5797,7 +5806,7 @@ msgstr ""
 msgid "Group"
 msgstr "Grupo"
 
-#: api/classes/CHostGroup.php:613
+#: api/classes/CHostGroup.php:626
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr ""
@@ -5874,8 +5883,8 @@ msgstr ""
 msgid "H.i"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1375
-#: include/classes/graphdraw/CLineGraphDraw.php:1434
+#: include/classes/graphdraw/CLineGraphDraw.php:1377
+#: include/classes/graphdraw/CLineGraphDraw.php:1436
 #: include/page_header.php:450
 msgid "H:i"
 msgstr ""
@@ -6165,22 +6174,22 @@ msgstr[1] ""
 msgid "Host group"
 msgstr "Grupo del equipo"
 
-#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:552
+#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:565
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr ""
 
-#: api/classes/CHostGroup.php:645
+#: api/classes/CHostGroup.php:658
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr ""
 
-#: api/classes/CHostGroup.php:626
+#: api/classes/CHostGroup.php:639
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr ""
 
-#: api/classes/CHostGroup.php:600
+#: api/classes/CHostGroup.php:613
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr ""
@@ -6197,7 +6206,7 @@ msgstr ""
 msgid "Host group label type"
 msgstr ""
 
-#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:544
+#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:557
 msgid "Host group name cannot be empty."
 msgstr ""
 
@@ -6728,7 +6737,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr ""
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:968
+#: include/maps.inc.php:957
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7972,8 +7981,8 @@ msgstr ""
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: api/classes/managers/CHttpTestManager.php:710
-#: api/classes/managers/CHttpTestManager.php:841
+#: api/classes/managers/CHttpTestManager.php:713
+#: api/classes/managers/CHttpTestManager.php:844
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
 msgstr ""
@@ -8560,7 +8569,7 @@ msgstr ""
 msgid "MAC address B"
 msgstr ""
 
-#: include/maps.inc.php:760
+#: include/maps.inc.php:749
 msgid "MAINTENANCE"
 msgstr ""
 
@@ -8633,7 +8642,7 @@ msgstr ""
 msgid "Macros updated"
 msgstr ""
 
-#: include/audit.inc.php:48 include/maps.inc.php:845 include/maps.inc.php:935
+#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -9952,10 +9961,10 @@ msgstr ""
 #: api/classes/CGraphGeneral.php:88 api/classes/CGraph.php:719
 #: api/classes/CGraphPrototype.php:693 api/classes/CGraphPrototype.php:756
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:139
-#: api/classes/CHostGroup.php:522 api/classes/CHostGroup.php:595
-#: api/classes/CHostGroup.php:779 api/classes/CHostGroup.php:841
-#: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:903
-#: api/classes/CHostGroup.php:925 api/classes/CHostInterface.php:319
+#: api/classes/CHostGroup.php:529 api/classes/CHostGroup.php:608
+#: api/classes/CHostGroup.php:792 api/classes/CHostGroup.php:854
+#: api/classes/CHostGroup.php:907 api/classes/CHostGroup.php:916
+#: api/classes/CHostGroup.php:938 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
 #: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
 #: api/classes/CHost.php:716 api/classes/CHost.php:1806
@@ -10126,7 +10135,7 @@ msgid "No value maps found."
 msgstr ""
 
 #: include/classes/screens/CScreenHistory.php:161
-#: include/classes/screens/CScreenHistory.php:267
+#: include/classes/screens/CScreenHistory.php:259
 #: include/classes/screens/CScreenPlainText.php:41
 #: include/classes/screens/CScreenPlainText.php:63 latest.php:317
 msgid "No values found."
@@ -10469,8 +10478,8 @@ msgstr ""
 
 #: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
-#: include/maps.inc.php:956 include/setup.inc.php:198
+#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
+#: include/maps.inc.php:945 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10558,7 +10567,7 @@ msgstr ""
 msgid "Once"
 msgstr ""
 
-#: api/classes/CHostGroup.php:857 api/classes/CHostGroup.php:989
+#: api/classes/CHostGroup.php:870 api/classes/CHostGroup.php:1002
 msgid "One of the objects is left without a host group."
 msgstr ""
 
@@ -10985,7 +10994,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:678 include/triggers.inc.php:155
+#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr ""
@@ -11326,7 +11335,7 @@ msgstr ""
 msgid "Probably php-ldap module is missing."
 msgstr ""
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr ""
@@ -11352,8 +11361,8 @@ msgstr ""
 msgid "Problem, if at least one child has a problem"
 msgstr ""
 
-#: chart4.php:163 include/maps.inc.php:726 include/maps.inc.php:809
-#: include/maps.inc.php:900 report2.php:402 report3.php:83
+#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: include/maps.inc.php:889 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Problemas"
 
@@ -13323,7 +13332,7 @@ msgstr ""
 
 #: include/views/conf.import.php:30
 msgid "Template linkage"
-msgstr "Plantilla vinculada"
+msgstr "Plantilla enlazada"
 
 #: include/html.inc.php:336
 msgid "Template list"
@@ -13619,7 +13628,7 @@ msgid "Timeout"
 msgstr "Timeout"
 
 #: include/classes/screens/CScreenHistory.php:164
-#: include/classes/screens/CScreenHistory.php:268
+#: include/classes/screens/CScreenHistory.php:260
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:64
 msgid "Timestamp"
@@ -14150,7 +14159,7 @@ msgstr ""
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr ""
 
-#: include/maps.inc.php:743 include/maps.inc.php:826 include/maps.inc.php:917
+#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
 msgid "Unacknowledged"
 msgstr ""
 
@@ -14849,7 +14858,7 @@ msgstr ""
 #: include/blocks.inc.php:741 include/classes/graphdraw/CPieGraphDraw.php:327
 #: include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:170
-#: include/classes/screens/CScreenHistory.php:268 include/reports.inc.php:175
+#: include/classes/screens/CScreenHistory.php:260 include/reports.inc.php:175
 #: include/views/administration.general.valuemapping.edit.php:41
 #: include/views/common.macros.php:37 tr_testexpr.php:50
 #, c-format
@@ -15342,7 +15351,7 @@ msgid "Y axis MAX value"
 msgstr "Valor MAX del eje Y"
 
 #: api/classes/CGraphGeneral.php:361
-#: include/classes/graphdraw/CLineGraphDraw.php:706
+#: include/classes/graphdraw/CLineGraphDraw.php:708
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr ""
 
@@ -15620,7 +15629,7 @@ msgid "agent"
 msgstr "agente"
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1850
+#: include/classes/graphdraw/CLineGraphDraw.php:1852
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15671,8 +15680,8 @@ msgstr ""
 msgid "auto-registered host"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1832
-#: include/classes/graphdraw/CLineGraphDraw.php:1854
+#: include/classes/graphdraw/CLineGraphDraw.php:1834
+#: include/classes/graphdraw/CLineGraphDraw.php:1856
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:145
@@ -15717,14 +15726,14 @@ msgstr "d M H:i:s"
 msgid "d.M"
 msgstr "d.M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1372
-#: include/classes/graphdraw/CLineGraphDraw.php:1425
+#: include/classes/graphdraw/CLineGraphDraw.php:1374
+#: include/classes/graphdraw/CLineGraphDraw.php:1427
 msgid "d.m"
 msgstr "d.m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1394
-#: include/classes/graphdraw/CLineGraphDraw.php:1409
-#: include/classes/graphdraw/CLineGraphDraw.php:1428
+#: include/classes/graphdraw/CLineGraphDraw.php:1396
+#: include/classes/graphdraw/CLineGraphDraw.php:1411
+#: include/classes/graphdraw/CLineGraphDraw.php:1430
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
@@ -15854,7 +15863,7 @@ msgstr ""
 msgid "key is empty"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1830
+#: include/classes/graphdraw/CLineGraphDraw.php:1832
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:43
 msgid "last"
@@ -15894,16 +15903,16 @@ msgstr "mantenimiento"
 msgid "map"
 msgstr "mapa"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1833
-#: include/classes/graphdraw/CLineGraphDraw.php:1847
+#: include/classes/graphdraw/CLineGraphDraw.php:1835
+#: include/classes/graphdraw/CLineGraphDraw.php:1849
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:42
 #: include/views/js/configuration.graph.edit.js.php:50 popup_bitem.php:146
 msgid "max"
 msgstr "máximo"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1831
-#: include/classes/graphdraw/CLineGraphDraw.php:1844
+#: include/classes/graphdraw/CLineGraphDraw.php:1833
+#: include/classes/graphdraw/CLineGraphDraw.php:1846
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:144
@@ -15939,7 +15948,7 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1925
+#: include/classes/graphdraw/CLineGraphDraw.php:1927
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"
