@@ -27,7 +27,6 @@
 #include "../api.h"
 #include "user.h"
 
-/* move into user class file */
 static zbx_api_property_t zbx_api_class_properties[] = {
 		{"userid", "userid", NULL, ZBX_API_FIELD_FLAG_SORTABLE},
 		{"alias", "alias", NULL, ZBX_API_FIELD_FLAG_REQUIRED | ZBX_API_FIELD_FLAG_SORTABLE},
@@ -46,6 +45,5 @@ static zbx_api_property_t zbx_api_class_properties[] = {
 		{"rows_per_page", "rows_per_page", NULL, 0},
 		{NULL}
 };
-
 
 zbx_api_class_t	zbx_api_class_user = {"user", "users", zbx_api_class_properties};

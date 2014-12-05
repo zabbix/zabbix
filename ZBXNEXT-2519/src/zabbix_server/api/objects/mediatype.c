@@ -66,7 +66,6 @@ typedef struct
 }
 zbx_api_mediatype_delete_t;
 
-/* TODO: wrap into class defining other object properties if necessary */
 static zbx_api_property_t zbx_api_class_properties[] = {
 		{"mediatypeid", "mediatypeid", NULL, ZBX_API_FIELD_FLAG_SORTABLE},
 		{"type", "type", NULL, ZBX_API_FIELD_FLAG_REQUIRED},
@@ -341,7 +340,7 @@ clean:
 	zbx_api_mediatype_get_clean(&request);
 out:
 	if (SUCCEED != ret)
-		zbx_api_json_add_error(output, error);
+		zbx_api_json_add_error(output, "Cannot get media type", error);
 
 	zbx_free(error);
 	zbx_free(sql);
@@ -465,7 +464,7 @@ clean:
 	zbx_api_mediatype_create_clean(&request);
 out:
 	if (SUCCEED != ret)
-		zbx_api_json_add_error(output, error);
+		zbx_api_json_add_error(output, "Cannot create media type", error);
 
 	zbx_free(error);
 
@@ -583,7 +582,7 @@ clean:
 	zbx_api_mediatype_delete_clean(&request);
 out:
 	if (SUCCEED != ret)
-		zbx_api_json_add_error(output, error);
+		zbx_api_json_add_error(output, "Cannot delete media type", error);
 
 	zbx_free(error);
 
@@ -706,7 +705,7 @@ clean:
 	zbx_api_mediatype_update_clean(&request);
 out:
 	if (SUCCEED != ret)
-		zbx_api_json_add_error(output, error);
+		zbx_api_json_add_error(output, "Cannot update media type", error);
 
 	zbx_free(error);
 

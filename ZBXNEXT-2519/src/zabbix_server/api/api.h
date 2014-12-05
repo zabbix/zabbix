@@ -377,6 +377,6 @@ void	zbx_api_json_add_row(struct zbx_json *json, const zbx_api_query_t *query, c
 void	zbx_api_json_add_query(struct zbx_json *json, const char *name, const zbx_api_query_t *query,
 		const zbx_vector_ptr_t *rows);
 void	zbx_api_json_add_idarray(struct zbx_json *json, const char *name, const zbx_vector_uint64_t *ids);
-void	zbx_api_json_add_error(struct zbx_json *json, const char *error);
+void	zbx_api_json_add_error(struct zbx_json *json, const char *prefix, const char *error);
 
 #endif

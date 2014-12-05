@@ -20,6 +20,7 @@
 #include "common.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
+#include "log.h"
 
 #include "api.h"
 
@@ -1974,9 +1975,8 @@ int	zbx_api_create_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_
 		zbx_vector_uint64_append(outids, idvalue.ui64++);
 	}
 
-	/* TODO: error message */
 	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
-		*error = zbx_dsprintf(*error, "An SQL error occurred");
+		*error = zbx_strdup(*error, zbx_sqlerror());
 
 	zbx_db_insert_clean(&db_insert);
 
@@ -2012,8 +2012,7 @@ int	zbx_api_delete_objects(const zbx_vector_uint64_t *ids, const zbx_api_class_t
 
 	if (ZBX_DB_OK > DBexecute("%s", sql))
 	{
-		/* TODO: prepare proper error message */
-		*error = zbx_dsprintf(*error, "And SQL error occurred");
+		*error = zbx_strdup(*error, zbx_sqlerror());
 		goto out;
 	}
 
@@ -2126,8 +2125,7 @@ int	zbx_api_update_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 		{
-			/* TODO: proper sql error message */
-			*error = zbx_dsprintf(*error, "An SQL error occurred");
+			*error = zbx_strdup(*error, zbx_sqlerror());
 			goto out;
 		}
 	}
@@ -2138,8 +2136,7 @@ int	zbx_api_update_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_
 
 		if (ZBX_DB_OK > DBexecute("%s", sql))
 		{
-			/* TODO: proper sql error message */
-			*error = zbx_dsprintf(*error, "An SQL error occurred");
+			*error = zbx_strdup(*error, zbx_sqlerror());
 			goto out;
 		}
 	}
@@ -2427,8 +2424,7 @@ int	zbx_api_db_fetch_rows(const char *sql, int fields_num, int rows_num, zbx_vec
 
 	if (NULL == result)
 	{
-		/* TODO: fetch the correct SQL error message ? */
-		*error = zbx_dsprintf(*error, "An SQL error occurred while executing: %s", sql);
+		*error = zbx_strdup(*error, zbx_sqlerror());
 		goto out;
 	}
 
@@ -2530,8 +2526,6 @@ int	zbx_api_db_fetch_query(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 		*sql_offset = sql_offset_original;
 	}
 	ret = SUCCEED;
-
-	/* TODO: handle SQL error  */
 out:
 	return ret;
 }
@@ -2789,20 +2783,35 @@ void	zbx_api_json_add_idarray(struct zbx_json *json, const char *name, const zbx
  *                                                                            *
  * Purpose: adds error response to json data                                  *
  *                                                                            *
- * Parameters: json  - [IN/OUT] the json data structure                       *
- *             error - [IN] the error message                                 *
+ * Parameters: json   - [IN/OUT] the json data structure                      *
+ *             prefox - [IN] the error message prefix, optional               *
+ *             error  - [IN] the error message                                *
+ *                                                                            *
+ * Comments: The error message has the following format:                      *
+ *                [<prefix>: ]<error>                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_api_json_add_error(struct zbx_json *json, const char *error)
+void	zbx_api_json_add_error(struct zbx_json *json, const char *prefix, const char *error)
 {
+	const char	*perror = NULL == error ? "Unknown error" : error;
+	char		*msg = NULL;
+	size_t		msg_alloc = 0, msg_offset = 0;
+
 	zbx_json_addobject(json, ZBX_API_RESULT_TAG_ERROR);
 	zbx_json_addint(json, ZBX_API_RESULT_TAG_ERRCODE, -32602);
 	zbx_json_addstring(json, ZBX_API_RESULT_TAG_ERRMESSAGE, "Invalid params.", ZBX_JSON_TYPE_STRING);
 
-	zbx_json_addstring(json, ZBX_API_RESULT_TAG_ERRDATA, NULL == error ? "unknown error" : error,
-			ZBX_JSON_TYPE_STRING);
+	if (NULL != prefix)
+	{
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s: %s", prefix, perror);
+		perror = msg;
+	}
+
+	zbx_json_addstring(json, ZBX_API_RESULT_TAG_ERRDATA, perror, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_close(json);
+
+	zbx_free(msg);
 }
 
 /******************************************************************************
