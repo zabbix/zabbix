@@ -35,18 +35,18 @@
 #define ZBX_REQUEST_HOST_PORT		4
 
 /* DBget_item_value() */
-#define ZBX_REQUEST_HOST_HOST		101
-#define ZBX_REQUEST_HOST_NAME		102
-#define ZBX_REQUEST_HOST_DESCRIPTION	103
-#define ZBX_REQUEST_ITEM_ID		104
-#define ZBX_REQUEST_ITEM_NAME		105
-#define ZBX_REQUEST_ITEM_NAME_ORIG	106
-#define ZBX_REQUEST_ITEM_KEY		107
-#define ZBX_REQUEST_ITEM_KEY_ORIG	108
-#define ZBX_REQUEST_ITEM_DESCRIPTION	109
-#define ZBX_REQUEST_PROXY_NAME		110
-#define ZBX_REQUEST_PROXY_DESCRIPTION	111
-#define ZBX_REQUEST_HOST_ID		112
+#define ZBX_REQUEST_HOST_ID		101
+#define ZBX_REQUEST_HOST_HOST		102
+#define ZBX_REQUEST_HOST_NAME		103
+#define ZBX_REQUEST_HOST_DESCRIPTION	104
+#define ZBX_REQUEST_ITEM_ID		105
+#define ZBX_REQUEST_ITEM_NAME		106
+#define ZBX_REQUEST_ITEM_NAME_ORIG	107
+#define ZBX_REQUEST_ITEM_KEY		108
+#define ZBX_REQUEST_ITEM_KEY_ORIG	109
+#define ZBX_REQUEST_ITEM_DESCRIPTION	110
+#define ZBX_REQUEST_PROXY_NAME		111
+#define ZBX_REQUEST_PROXY_DESCRIPTION	112
 
 /* DBget_history_log_value() */
 #define ZBX_REQUEST_ITEM_LOG_DATE	201
@@ -3230,9 +3230,15 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			{
 				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					DCget_user_macro(NULL, 0, m, &replace_to);
+					cache_trigger_hostids(&hostids, event->trigger.expression);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 				}
-				if (0 == strcmp(m, MVAR_HOST_HOST))
+				else if (0 == strcmp(m, MVAR_HOST_ID))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_ID);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_HOST))
 				{
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_HOST);
@@ -3246,11 +3252,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_IP);
-				}
-				else if (0 == strcmp(m, MVAR_HOST_ID))
-				{
-					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
-							ZBX_REQUEST_HOST_ID);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_DNS))
 				{
