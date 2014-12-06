@@ -10290,8 +10290,8 @@ msgstr "Now"
 
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:427
-msgid "Number of available proccessors."
-msgstr "Number of available proccessors."
+msgid "Number of available processors."
+msgstr "Number of available processors."
 
 #: include/blocks.inc.php:753 include/blocks.inc.php:755
 msgid "Number of hosts (monitored/not monitored/templates)"
