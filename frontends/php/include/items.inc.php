@@ -487,24 +487,6 @@ function disable_item($itemids) {
 	return update_item_status($itemids, ITEM_STATUS_DISABLED);
 }
 
-function get_item_by_key($key, $host = '') {
-	$item = false;
-	$sql_from = '';
-	$sql_where = '';
-	if (!empty($host)) {
-		$sql_from = ',hosts h ';
-		$sql_where = ' AND h.host='.zbx_dbstr($host).' AND i.hostid=h.hostid ';
-	}
-	$sql = 'SELECT DISTINCT i.*'.
-			' FROM items i '.$sql_from.
-			' WHERE i.key_='.zbx_dbstr($key).
-				$sql_where;
-	if ($item = DBfetch(DBselect($sql))) {
-		$item = $item;
-	}
-	return $item;
-}
-
 function get_item_by_itemid($itemid) {
 	$db_items = DBfetch(DBselect('SELECT i.* FROM items i WHERE i.itemid='.zbx_dbstr($itemid)));
 	if ($db_items) {
