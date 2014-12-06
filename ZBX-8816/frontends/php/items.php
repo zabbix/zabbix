@@ -853,9 +853,8 @@ elseif (hasRequest('action') && getRequest('action') == 'item.massdelete' && has
  * Display
  */
 if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create item'), 'update', 'clone'))) {
-	$item = array();
 	if (hasRequest('itemid')) {
-		$item = API::Item()->get(array(
+		$items = API::Item()->get(array(
 			'itemids' => getRequest('itemid'),
 			'output' => array(
 				'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
@@ -865,9 +864,21 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
 				'snmpv3_privprotocol', 'snmpv3_contextname'
-			)
+			),
+			'selectHosts' => array('status')
 		));
-		$item = reset($item);
+		$item = $items[0];
+		$host = $item['hosts'][0];
+		unset($item['hosts']);
+	}
+	else {
+		$hosts = API::Host()->get(array(
+			'output' => array('status'),
+			'hostids' => getRequest('hostid'),
+			'templated_hosts' => true
+		));
+		$item = array();
+		$host = $hosts[0];
 	}
 
 	$data = getItemFormData($item);
