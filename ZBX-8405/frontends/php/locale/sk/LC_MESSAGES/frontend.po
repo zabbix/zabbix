@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-26 13:50+0200\n"
+"POT-Creation-Date: 2014-12-06 04:46+0200\n"
 "PO-Revision-Date: 2014-08-17 18:30+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -3491,7 +3491,7 @@ msgstr "Vlastné prezentácie"
 msgid "Czech (cs_CZ)"
 msgstr "Česky (cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1369
+#: include/classes/graphdraw/CLineGraphDraw.php:1371
 msgid "D"
 msgstr "D"
 
@@ -3591,7 +3591,7 @@ msgstr "Údaje"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Cache štatistiky. Cache - jedna z hodnôt (módy: all, float, uint, str, log, text), história (módy: pfree, total, used, free), trend (módy: pfree, total, used, free), text (módy: pfree, total, used, free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2509
+#: include/classes/graphdraw/CLineGraphDraw.php:2511
 #: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -5904,8 +5904,8 @@ msgstr "Skupiny hostov v údržbe"
 msgid "H.i"
 msgstr "H.i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1375
-#: include/classes/graphdraw/CLineGraphDraw.php:1434
+#: include/classes/graphdraw/CLineGraphDraw.php:1377
+#: include/classes/graphdraw/CLineGraphDraw.php:1436
 #: include/page_header.php:450
 msgid "H:i"
 msgstr "H:i"
@@ -8010,8 +8010,8 @@ msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako neznámy elem
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\"."
 
-#: api/classes/managers/CHttpTestManager.php:710
-#: api/classes/managers/CHttpTestManager.php:841
+#: api/classes/managers/CHttpTestManager.php:713
+#: api/classes/managers/CHttpTestManager.php:844
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
 msgstr "Položka s kľúčom \"%1$s\" už existuje."
@@ -10350,7 +10350,7 @@ msgstr "Teraz"
 
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:427
-msgid "Number of available proccessors."
+msgid "Number of available processors."
 msgstr "Počet dostupných procesorov."
 
 #: include/blocks.inc.php:753 include/blocks.inc.php:755
@@ -15401,7 +15401,7 @@ msgid "Y axis MAX value"
 msgstr "Maximálna hodnota osy Y"
 
 #: api/classes/CGraphGeneral.php:361
-#: include/classes/graphdraw/CLineGraphDraw.php:706
+#: include/classes/graphdraw/CLineGraphDraw.php:708
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Maximálna hodnota pre os Y musí byť väčšia ako minimálna hodnota pre túto os."
 
@@ -15682,7 +15682,7 @@ msgid "agent"
 msgstr "agent"
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1850
+#: include/classes/graphdraw/CLineGraphDraw.php:1852
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15733,8 +15733,8 @@ msgstr "automatická registrácia"
 msgid "auto-registered host"
 msgstr "automaticky registrovaný host"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1832
-#: include/classes/graphdraw/CLineGraphDraw.php:1854
+#: include/classes/graphdraw/CLineGraphDraw.php:1834
+#: include/classes/graphdraw/CLineGraphDraw.php:1856
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:145
@@ -15779,14 +15779,14 @@ msgstr "d M Y H:i:s"
 msgid "d.M"
 msgstr "d.M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1372
-#: include/classes/graphdraw/CLineGraphDraw.php:1425
+#: include/classes/graphdraw/CLineGraphDraw.php:1374
+#: include/classes/graphdraw/CLineGraphDraw.php:1427
 msgid "d.m"
 msgstr "d.m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1394
-#: include/classes/graphdraw/CLineGraphDraw.php:1409
-#: include/classes/graphdraw/CLineGraphDraw.php:1428
+#: include/classes/graphdraw/CLineGraphDraw.php:1396
+#: include/classes/graphdraw/CLineGraphDraw.php:1411
+#: include/classes/graphdraw/CLineGraphDraw.php:1430
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
@@ -15916,7 +15916,7 @@ msgstr "položka"
 msgid "key is empty"
 msgstr "kľúč je prázdny"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1830
+#: include/classes/graphdraw/CLineGraphDraw.php:1832
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:43
 msgid "last"
@@ -15956,16 +15956,16 @@ msgstr "údržba"
 msgid "map"
 msgstr "mapa"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1833
-#: include/classes/graphdraw/CLineGraphDraw.php:1847
+#: include/classes/graphdraw/CLineGraphDraw.php:1835
+#: include/classes/graphdraw/CLineGraphDraw.php:1849
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:42
 #: include/views/js/configuration.graph.edit.js.php:50 popup_bitem.php:146
 msgid "max"
 msgstr "max"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1831
-#: include/classes/graphdraw/CLineGraphDraw.php:1844
+#: include/classes/graphdraw/CLineGraphDraw.php:1833
+#: include/classes/graphdraw/CLineGraphDraw.php:1846
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:144
@@ -16001,7 +16001,7 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr "nový"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1925
+#: include/classes/graphdraw/CLineGraphDraw.php:1927
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"

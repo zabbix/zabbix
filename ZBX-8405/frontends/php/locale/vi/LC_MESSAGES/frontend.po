@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-26 13:50+0200\n"
+"POT-Creation-Date: 2014-12-06 04:46+0200\n"
 "PO-Revision-Date: 2013-11-04 19:10+0300\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -3403,7 +3403,7 @@ msgstr ""
 msgid "Czech (cs_CZ)"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1369
+#: include/classes/graphdraw/CLineGraphDraw.php:1371
 msgid "D"
 msgstr ""
 
@@ -3502,7 +3502,7 @@ msgstr ""
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2509
+#: include/classes/graphdraw/CLineGraphDraw.php:2511
 #: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -5809,8 +5809,8 @@ msgstr ""
 msgid "H.i"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1375
-#: include/classes/graphdraw/CLineGraphDraw.php:1434
+#: include/classes/graphdraw/CLineGraphDraw.php:1377
+#: include/classes/graphdraw/CLineGraphDraw.php:1436
 #: include/page_header.php:450
 msgid "H:i"
 msgstr ""
@@ -7899,8 +7899,8 @@ msgstr ""
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: api/classes/managers/CHttpTestManager.php:710
-#: api/classes/managers/CHttpTestManager.php:841
+#: api/classes/managers/CHttpTestManager.php:713
+#: api/classes/managers/CHttpTestManager.php:844
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
 msgstr ""
@@ -10221,7 +10221,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:427
-msgid "Number of available proccessors."
+msgid "Number of available processors."
 msgstr ""
 
 #: include/blocks.inc.php:753 include/blocks.inc.php:755
@@ -15248,7 +15248,7 @@ msgid "Y axis MAX value"
 msgstr ""
 
 #: api/classes/CGraphGeneral.php:361
-#: include/classes/graphdraw/CLineGraphDraw.php:706
+#: include/classes/graphdraw/CLineGraphDraw.php:708
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr ""
 
@@ -15526,7 +15526,7 @@ msgid "agent"
 msgstr ""
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1850
+#: include/classes/graphdraw/CLineGraphDraw.php:1852
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15577,8 +15577,8 @@ msgstr ""
 msgid "auto-registered host"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1832
-#: include/classes/graphdraw/CLineGraphDraw.php:1854
+#: include/classes/graphdraw/CLineGraphDraw.php:1834
+#: include/classes/graphdraw/CLineGraphDraw.php:1856
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:145
@@ -15623,14 +15623,14 @@ msgstr ""
 msgid "d.M"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1372
-#: include/classes/graphdraw/CLineGraphDraw.php:1425
+#: include/classes/graphdraw/CLineGraphDraw.php:1374
+#: include/classes/graphdraw/CLineGraphDraw.php:1427
 msgid "d.m"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1394
-#: include/classes/graphdraw/CLineGraphDraw.php:1409
-#: include/classes/graphdraw/CLineGraphDraw.php:1428
+#: include/classes/graphdraw/CLineGraphDraw.php:1396
+#: include/classes/graphdraw/CLineGraphDraw.php:1411
+#: include/classes/graphdraw/CLineGraphDraw.php:1430
 msgid "d.m H:i"
 msgstr ""
 
@@ -15760,7 +15760,7 @@ msgstr ""
 msgid "key is empty"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1830
+#: include/classes/graphdraw/CLineGraphDraw.php:1832
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:43
 msgid "last"
@@ -15800,16 +15800,16 @@ msgstr ""
 msgid "map"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1833
-#: include/classes/graphdraw/CLineGraphDraw.php:1847
+#: include/classes/graphdraw/CLineGraphDraw.php:1835
+#: include/classes/graphdraw/CLineGraphDraw.php:1849
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:42
 #: include/views/js/configuration.graph.edit.js.php:50 popup_bitem.php:146
 msgid "max"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1831
-#: include/classes/graphdraw/CLineGraphDraw.php:1844
+#: include/classes/graphdraw/CLineGraphDraw.php:1833
+#: include/classes/graphdraw/CLineGraphDraw.php:1846
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:144
@@ -15845,7 +15845,7 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1925
+#: include/classes/graphdraw/CLineGraphDraw.php:1927
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"
