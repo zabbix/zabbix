@@ -53,6 +53,7 @@
 #include "proxypoller/proxypoller.h"
 #include "selfmon/selfmon.h"
 #include "vmware/vmware.h"
+#include "api/apiserver.h"
 
 #include "valuecache.h"
 #include "setproctitle.h"
@@ -136,11 +137,16 @@ int	CONFIG_HEARTBEAT_FORKS		= 0;
 int	CONFIG_COLLECTOR_FORKS		= 0;
 int	CONFIG_PASSIVE_FORKS		= 0;
 int	CONFIG_ACTIVE_FORKS		= 0;
+int	CONFIG_APISERVER_FORKS		= 5;
+int	CONFIG_VMWARE_FORKS		= 0;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
+
+int	CONFIG_API_PORT			= ZBX_DEFAULT_API_PORT;
+char	*CONFIG_API_IP			= NULL;
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 500;		/* applies for every separate field value */
@@ -150,7 +156,6 @@ int	CONFIG_HISTSYNCER_FREQUENCY	= 5;
 int	CONFIG_CONFSYNCER_FORKS		= 1;
 int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
 
-int	CONFIG_VMWARE_FORKS		= 0;
 int	CONFIG_VMWARE_FREQUENCY		= 60;
 
 zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
@@ -316,6 +321,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_VMWARE;
 		*local_process_num = local_server_num - server_count + CONFIG_VMWARE_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_APISERVER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_APISERVER;
+		*local_process_num = local_server_num - server_count + CONFIG_APISERVER_FORKS;
 	}
 	else
 		return FAIL;
@@ -513,6 +523,12 @@ static void	zbx_load_config(void)
 			PARM_OPT,	1024,			32767},
 		{"SourceIP",			&CONFIG_SOURCE_IP,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"ApiServerIP",			&CONFIG_API_IP,				TYPE_STRING_LIST,
+			PARM_OPT,	1024,			32767},
+		{"ApiServerPort",		&CONFIG_API_PORT,			TYPE_INT,
+			PARM_OPT,	1024,			32767},
+		{"StartApiServers",		&CONFIG_APISERVER_FORKS,		TYPE_INT,
+			PARM_OPT,	1,			100},
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
 			PARM_OPT,	0,			4},
 		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
@@ -685,13 +701,12 @@ int	main(int argc, char **argv)
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();
 #endif
-
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER);
 }
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	zbx_sock_t	listen_sock;
+	zbx_sock_t	listen_sock, api_sock;
 	int		i, db_type;
 
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
@@ -813,12 +828,20 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS
 			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_JAVAPOLLER_FORKS
 			+ CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS
-			+ CONFIG_VMWARE_FORKS;
+			+ CONFIG_VMWARE_FORKS + CONFIG_APISERVER_FORKS;
 	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_tcp_strerror());
+			exit(EXIT_FAILURE);
+		}
+	}
+	if (0 != CONFIG_APISERVER_FORKS)
+	{
+		if (FAIL == zbx_tcp_listen(&api_sock, CONFIG_API_IP, (unsigned short)CONFIG_API_PORT))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_tcp_strerror());
 			exit(EXIT_FAILURE);
@@ -908,6 +931,9 @@ int	MAIN_ZABBIX_ENTRY()
 				break;
 			case ZBX_PROCESS_TYPE_VMWARE:
 				threads[i] = zbx_thread_start(vmware_thread, &thread_args);
+			case ZBX_PROCESS_TYPE_APISERVER:
+				thread_args.args = &api_sock;
+				threads[i] = zbx_thread_start(apiserver_thread, &thread_args);
 				break;
 		}
 	}

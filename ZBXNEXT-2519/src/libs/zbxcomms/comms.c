@@ -954,6 +954,9 @@ int	zbx_tcp_accept(zbx_sock_t *s)
 	s->socket	= accepted_socket;	/* replace socket to accepted */
 	s->accepted	= 1;
 
+	s->read_bytes	= 0;
+	s->next_line	= NULL;
+
 	return SUCCEED;
 }
 

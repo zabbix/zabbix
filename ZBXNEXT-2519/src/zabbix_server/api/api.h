@@ -53,6 +53,8 @@
 #define ZBX_API_RESULT_TAG_ERRCODE	"code"
 #define ZBX_API_RESULT_TAG_ERRMESSAGE	"message"
 #define ZBX_API_RESULT_TAG_ERRDATA	"data"
+#define ZBX_API_RESULT_TAG_AUTH		"auth"
+#define ZBX_API_RESULT_TAG_METHOD	"method"
 
 /* api request data */
 typedef struct
