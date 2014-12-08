@@ -254,7 +254,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	if (NULL == fgets(tmp, sizeof(tmp), f))
 	{
-		zbx_strlcpy(tmp, "no output", sizeof(tmp));
+		strscpy(tmp, "no output");
 	}
 	else
 	{

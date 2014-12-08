@@ -64,8 +64,6 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	int		errcode;
 	AGENT_RESULT	value;
 
-	assert(value_ui64 || value_dbl);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
@@ -158,7 +156,7 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 			{
 				case ICMPPING:
 					value_uint64 = (0 != hosts[h].rcv ? 1 : 0);
-					process_value(items[i].itemid, &value_uint64, NULL, ts, ping_result, error);
+					process_value(items[i].itemid, &value_uint64, NULL, ts, SUCCEED, NULL);
 					break;
 				case ICMPPINGSEC:
 					switch (items[i].type)
@@ -173,11 +171,11 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 							value_dbl = hosts[h].avg;
 							break;
 					}
-					process_value(items[i].itemid, NULL, &value_dbl, ts, ping_result, error);
+					process_value(items[i].itemid, NULL, &value_dbl, ts, SUCCEED, NULL);
 					break;
 				case ICMPPINGLOSS:
 					value_dbl = 100 * (1 - (double)hosts[h].rcv / (double)hosts[h].cnt);
-					process_value(items[i].itemid, NULL, &value_dbl, ts, ping_result, error);
+					process_value(items[i].itemid, NULL, &value_dbl, ts, SUCCEED, NULL);
 					break;
 			}
 		}
