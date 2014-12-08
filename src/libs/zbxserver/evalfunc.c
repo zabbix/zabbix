@@ -1068,11 +1068,13 @@ static int	__history_record_uint64_compare(const zbx_history_record_t *d1, const
  *                                                                            *
  * Purpose: evaluate function 'percentile' for the item                       *
  *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameters - seconds/values, time shift (optional), percentile *
+ * Parameters: item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] seconds/values, time shift (optional),       *
+ *                               percentile                                   *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
- *               FAIL - failed to evaluate function                           *
+ * Return value: SUCCEED - evaluated successfully, result is stored in        *
+ *                         'value'                                            *
+ *               FAIL    - failed to evaluate function                        *
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *function, const char *parameters,
@@ -1094,14 +1096,9 @@ static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *function,
 		goto out;
 	}
 
-	if (3 < (nparams = num_param(parameters)))
+	if (3 != (nparams = num_param(parameters)))
 	{
-		*error = zbx_strdup(*error, "too many parameters");
-		goto out;
-	}
-	else if (3 != nparams)
-	{
-		*error = zbx_strdup(*error, "invalid number of parameters");
+		*error = zbx_strdup(*error, 3 < nparams ? "too many parameters" : "invalid number of parameters");
 		goto out;
 	}
 
@@ -1318,8 +1315,8 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, con
 
 		if (seconds + arg1 > now)
 		{
-			*error = zbx_strdup(*error, "item does not have enough data after server start or item"
-					" creation");
+			*error = zbx_strdup(*error,
+					"item does not have enough data after server start or item creation");
 			goto out;
 		}
 
