@@ -142,17 +142,41 @@ if (!isset($data['rollWeekSeconds'])) {
 
 // get "TLDs" groupId
 $tldGroups = API::HostGroup()->get(array(
-	'output' => array('groupid'),
+	'output' => array('groupid', 'name'),
 	'filter' => array(
-		'name' => RSM_TLDS_GROUP
+		'name' => array(RSM_TLDS_GROUP, RSM_CC_TLD_GROUP, RSM_G_TLD_GROUP, RSM_OTHER_TLD_GROUP, RSM_TEST_GROUP)
 	)
 ));
 
-if ($tldGroups) {
-	$tldGroup = reset($tldGroups);
-	$selectedGroups[$tldGroup['groupid']] = $tldGroup['groupid'];
+$selectedGroups = array();
+$data['allowedGroups'] = array(
+	RSM_CC_TLD_GROUP => false,
+	RSM_G_TLD_GROUP => false,
+	RSM_OTHER_TLD_GROUP => false,
+	RSM_TEST_GROUP => false
+);
+
+foreach ($tldGroups as $tldGroup) {
+	switch ($tldGroup['name']) {
+		case RSM_TLDS_GROUP:
+			$selectedGroups[$tldGroup['groupid']] = $tldGroup['groupid'];
+			break;
+		case RSM_CC_TLD_GROUP:
+			$data['allowedGroups'][RSM_CC_TLD_GROUP] = true;
+			break;
+		case RSM_G_TLD_GROUP:
+			$data['allowedGroups'][RSM_G_TLD_GROUP] = true;
+			break;
+		case RSM_OTHER_TLD_GROUP:
+			$data['allowedGroups'][RSM_OTHER_TLD_GROUP] = true;
+			break;
+		case RSM_TEST_GROUP:
+			$data['allowedGroups'][RSM_TEST_GROUP] = true;
+			break;
+	}
 }
-else {
+
+if (!$selectedGroups) {
 	show_error_message(_s('No permissions to referred "%1$s" group or it doesn\'t not exist.', RSM_TLDS_GROUP));
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit;

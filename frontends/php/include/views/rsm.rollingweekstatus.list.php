@@ -79,31 +79,59 @@ $filterTable->addRow(array(
 	array(array(bold(_('Current status')), ':'.SPACE), $filterStatus)
 ));
 
+// set disabled for no permission elements
+// ccTLD's group
+$filterCctldGroup = new CCheckBox('filter_cctld_group',
+	isset($this->data['filter_cctld_group']) ? $this->data['filter_cctld_group'] : null, null, 1
+);
+if (!$this->data['allowedGroups'][RSM_CC_TLD_GROUP]) {
+	$filterCctldGroup->setAttribute('disabled', true);
+}
+
+// gTLD's group
+$filterGtldGroup = new CCheckBox('filter_gtld_group',
+	isset($this->data['filter_gtld_group']) ? $this->data['filter_gtld_group'] : null, null, 1
+);
+if (!$this->data['allowedGroups'][RSM_G_TLD_GROUP]) {
+	$filterGtldGroup->setAttribute('disabled', true);
+}
+
+// other TLD's group
+$filterOtherGroup = new CCheckBox('filter_othertld_group',
+	isset($this->data['filter_othertld_group']) ? $this->data['filter_othertld_group'] : null, null, 1
+);
+if (!$this->data['allowedGroups'][RSM_OTHER_TLD_GROUP]) {
+	$filterOtherGroup->setAttribute('disabled', true);
+}
+
+// test TLD's group
+$filterTestGroup = new CCheckBox('filter_test_group',
+	isset($this->data['filter_test_group']) ? $this->data['filter_test_group'] : null, null, 1
+);
+if (!$this->data['allowedGroups'][RSM_TEST_GROUP]) {
+	$filterTestGroup->setAttribute('disabled', true);
+}
+
 $filterTable->addRow(array(
 	'',
 	array(array(
 		array(
-			new CCheckBox('filter_cctld_group',
-				isset($this->data['filter_cctld_group']) ? $this->data['filter_cctld_group'] : null, null, 1
-			),
+			$filterCctldGroup,
 			SPACE,
 			bold(_(RSM_CC_TLD_GROUP)),
 		),
-		new CSpan(array(new CCheckBox('filter_gtld_group',
-				isset($this->data['filter_gtld_group']) ? $this->data['filter_gtld_group'] : null, null, 1
-			),
+		new CSpan(array(
+			$filterGtldGroup,
 			SPACE,
 			bold(_(RSM_G_TLD_GROUP))
 		), 'checkbox-block'),
-		new CSpan(array(new CCheckBox('filter_othertld_group',
-				isset($this->data['filter_othertld_group']) ? $this->data['filter_othertld_group'] : null, null, 1
-			),
+		new CSpan(array(
+			$filterOtherGroup,
 			SPACE,
 			bold(_(RSM_OTHER_TLD_GROUP))
 		), 'checkbox-block'),
-		new CSpan(array(new CCheckBox('filter_test_group',
-				isset($this->data['filter_test_group']) ? $this->data['filter_test_group'] : null, null, 1
-			),
+		new CSpan(array(
+			$filterTestGroup,
 			SPACE,
 			bold(_(RSM_TEST_GROUP))
 		), 'checkbox-block'),

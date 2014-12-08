@@ -23,10 +23,18 @@
 
 		jQuery('#checkAllGroups').on('click', function() {
 			if (jQuery('#checkAllGroupsValue').val() == 0) {
-				jQuery('#filter_cctld_group').prop('checked', true);
-				jQuery('#filter_gtld_group').prop('checked', true);
-				jQuery('#filter_othertld_group').prop('checked', true);
-				jQuery('#filter_test_group').prop('checked', true);
+				if (!jQuery('#filter_cctld_group').prop('disabled')) {
+					jQuery('#filter_cctld_group').prop('checked', true);
+				}
+				if (!jQuery('#filter_gtld_group').prop('disabled')) {
+					jQuery('#filter_gtld_group').prop('checked', true);
+				}
+				if (!jQuery('#filter_othertld_group').prop('disabled')) {
+					jQuery('#filter_othertld_group').prop('checked', true);
+				}
+				if (!jQuery('#filter_test_group').prop('disabled')) {
+					jQuery('#filter_test_group').prop('checked', true);
+				}
 				jQuery('#checkAllGroupsValue').val(1);
 			}
 			else {
