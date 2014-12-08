@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+A.F....PS. [ZBXNEXT-756] added function percentile() to calculated items and trigger expressions (asaveljevs)
 .....J.... [ZBX-9006] added support for IPv6 addresses to Java gateway (asaveljevs)
 A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent and updated outdated user agent strings in web scenario form (Ivo)
 ..F....... [ZBXNEXT-1036] improved "Most busy triggers top 100" page filter (Oleg)
