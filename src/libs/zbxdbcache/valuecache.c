@@ -2658,8 +2658,7 @@ out:
 						(zbx_compare_func_t)vc_history_record_compare_desc_func);
 
 				/* vc_db_read_values_by_count() returns requested values + the rest of values having */
-				/* within the same second as the last value - so drop the values outside request     */
-				/* range                                                                             */
+				/* within the same second as the last value, so drop the values outside request range */
 				while (count < values->values_num)
 					zbx_history_record_clear(&values->values[--values->values_num], value_type);
 			}
