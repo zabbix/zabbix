@@ -34,6 +34,8 @@ extern int	CONFIG_LOG_SLOW_QUERIES;
 
 #if defined(HAVE_IBM_DB2)
 static zbx_ibm_db2_handle_t	ibm_db2;
+
+void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_codes_t err, const char *context);
 #elif defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
 #elif defined(HAVE_ORACLE)
@@ -251,27 +253,37 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	/* recommended for pure IBM DB2 CLI, but not required */
 	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetEnvAttr(ibm_db2.henv, SQL_ATTR_ODBC_VERSION,
 			(void *)SQL_OV_ODBC3, 0)))
+	{
 		ret = ZBX_DB_FAIL;
+	}
 
 	/* allocate a database connection handle */
 	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLAllocHandle(SQL_HANDLE_DBC, ibm_db2.henv,
 			&ibm_db2.hdbc)))
+	{
 		ret = ZBX_DB_FAIL;
+	}
 
 	/* connect to the database */
 	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLDriverConnect(ibm_db2.hdbc, NULL, (SQLCHAR *)connect,
 			SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT)))
+	{
 		ret = ZBX_DB_FAIL;
+	}
 
 	/* set autocommit on */
   	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
 			(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	{
 		ret = ZBX_DB_DOWN;
+	}
 
 	/* we do not generate vendor escape clause sequences */
   	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_NOSCAN,
 			(SQLPOINTER)SQL_NOSCAN_ON, SQL_NTS)))
+	{
 		ret = ZBX_DB_DOWN;
+	}
 
 	/* set current schema */
 	if (NULL != dbschema && '\0' != *dbschema && ZBX_DB_OK == ret)
@@ -289,9 +301,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	/* output error information */
 	if (ZBX_DB_OK != ret)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_ENV, ibm_db2.henv);
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
-
+		zbx_ibm_db2_log_errors(SQL_HANDLE_ENV, ibm_db2.henv, ERR_Z3001, dbname);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3001, dbname);
 	}
 #elif defined(HAVE_MYSQL)
 	conn = mysql_init(NULL);
@@ -654,12 +665,15 @@ int	zbx_db_begin(void)
 	txn_level++;
 
 #if defined(HAVE_IBM_DB2)
-	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_OFF, SQL_NTS)))
+	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
+			(SQLPOINTER)SQL_AUTOCOMMIT_OFF, SQL_NTS)))
+	{
 		rc = ZBX_DB_DOWN;
+	}
 
 	if (ZBX_DB_OK != rc)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, "<begin>");
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -704,12 +718,15 @@ int	zbx_db_commit(void)
 #if defined(HAVE_IBM_DB2)
 	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_COMMIT)))
 		rc = ZBX_DB_DOWN;
-	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
+			(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	{
 		rc = ZBX_DB_DOWN;
+	}
 
 	if (ZBX_DB_OK != rc)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, "<commit>");
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -755,12 +772,15 @@ int	zbx_db_rollback(void)
 #if defined(HAVE_IBM_DB2)
 	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_ROLLBACK)))
 		rc = ZBX_DB_DOWN;
-	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
+			(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+	{
 		rc = ZBX_DB_DOWN;
+	}
 
 	if (ZBX_DB_OK != rc)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, "<rollback>");
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -814,7 +834,8 @@ static sword	zbx_oracle_statement_execute(ub4 *nrows)
 			(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL,
 			0 == txn_level ? OCI_COMMIT_ON_SUCCESS : OCI_DEFAULT)))
 	{
-		err = OCIAttrGet((void *)oracle.stmthp, OCI_HTYPE_STMT, nrows, (ub4 *)0, OCI_ATTR_ROW_COUNT, oracle.errhp);
+		err = OCIAttrGet((void *)oracle.stmthp, OCI_HTYPE_STMT, nrows, (ub4 *)0, OCI_ATTR_ROW_COUNT,
+				oracle.errhp);
 	}
 
 	oci_ids_num = 0;
@@ -1028,8 +1049,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	if (ZBX_DB_OK != ret)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
-		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, hstmt);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, sql);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, hstmt, ERR_Z3005, sql);
 
 		ret = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
@@ -1251,8 +1272,8 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 error:
 	if (SUCCEED != zbx_ibm_db2_success(ret) || 0 == result->ncolumn)
 	{
-		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
-		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, result->hstmt);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, sql);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, result->hstmt, ERR_Z3005, sql);
 
 		IBM_DB2free_result(result);
 
@@ -1884,8 +1905,8 @@ int	IBM_DB2server_status()
 {
 	int	server_status = SQL_CD_TRUE;
 
-	if (SUCCEED != zbx_ibm_db2_success(SQLGetConnectAttr(ibm_db2.hdbc, SQL_ATTR_CONNECTION_DEAD,
-								&server_status, SQL_IS_POINTER, NULL)))
+	if (SUCCEED != zbx_ibm_db2_success(SQLGetConnectAttr(ibm_db2.hdbc, SQL_ATTR_CONNECTION_DEAD, &server_status,
+			SQL_IS_POINTER, NULL)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot determine IBM DB2 server status, assuming not connected");
 	}
@@ -1903,16 +1924,30 @@ int	zbx_ibm_db2_success_ext(SQLRETURN ret)
 	return (SQL_SUCCESS == ret || SQL_SUCCESS_WITH_INFO == ret || SQL_NO_DATA_FOUND == ret ? SUCCEED : FAIL);
 }
 
-void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl)
+void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_codes_t err, const char *context)
 {
-	SQLCHAR		message[SQL_MAX_MESSAGE_LENGTH + 1];
-	SQLCHAR		sqlstate[SQL_SQLSTATE_SIZE + 1];
+	SQLCHAR		tmp_message[SQL_MAX_MESSAGE_LENGTH + 1], sqlstate[SQL_SQLSTATE_SIZE + 1];
+	char		message[SQL_MAX_MESSAGE_LENGTH + SQL_SQLSTATE_SIZE + 2];
 	SQLINTEGER	sqlcode;
 	SQLSMALLINT	length, i = 1;
 
-	while (SQL_SUCCESS == SQLGetDiagRec(htype, hndl, i++, sqlstate, &sqlcode, message, SQL_MAX_MESSAGE_LENGTH + 1, &length))
+	while (SQL_SUCCESS == SQLGetDiagRec(htype, hndl, i++, sqlstate, &sqlcode, tmp_message, sizeof(tmp_message),
+			&length))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "IBM DB2 ERROR: [%d] %s [%s]", (int)sqlcode, sqlstate, message);
+		zbx_snprintf(message, sizeof(message), "%s %s", sqlstate, tmp_message);
+		zbx_rtrim(message, ZBX_WHITESPACE);
+
+		switch(err)
+		{
+			case ERR_Z3001:
+				zabbix_errlog(err, context, (int)sqlcode, message);
+				break;
+			case ERR_Z3005:
+				zabbix_errlog(err, (int)sqlcode, message, context);
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
 	}
 }
 #elif defined(HAVE_ORACLE)
