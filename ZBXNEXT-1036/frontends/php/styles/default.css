@@ -450,10 +450,9 @@ table.requirements input#port { width: 50px; }
 table.requirements select { width: 152px; }
 
 /* filter */
-table.filter { width: 100%; border-collapse: collapse; }
-table.filter tr td {
-	line-height: 20px; height: 26px; vertical-align: middle; border-left: 0 !important; padding: 0 2px 0 6px;
-}
+.filter { width: 100%; border-collapse: collapse; }
+.filter tr td { line-height: 20px; height: 26px; border-left: 0 !important; padding: 0 2px 0 6px; }
+.filter tr td tr td { border-style: none none; }
 .filter .label { border-right: 0 !important; text-align: right; }
 .filter .controls { text-align: center; }
 .filter .controls .ui-button { margin: 1px; }
