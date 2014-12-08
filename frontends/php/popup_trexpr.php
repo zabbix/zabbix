@@ -98,7 +98,7 @@ $param3SecPercent = array(
 	),
 	array(
 		'C' => _('Percentage').' (P)',
-		'T' => T_ZBX_STR
+		'T' => T_ZBX_DBL
 	)
 );
 $paramSecIntCount = array(

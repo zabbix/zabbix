@@ -1070,7 +1070,7 @@ static int	__history_record_uint64_compare(const zbx_history_record_t *d1, const
  *                                                                            *
  * Parameters: item       - [IN] item (performance metric)                    *
  *             parameters - [IN] seconds/values, time shift (optional),       *
- *                               percentile                                   *
+ *                               percentage                                   *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in        *
  *                         'value'                                            *
