@@ -40,7 +40,7 @@ $param1SecCount = array(
 		'M' => $metrics				// metrics
 	),
 	array(
-		'C' => _('Time shift').' ',
+		'C' => _('Time shift'),
 		'T' => T_ZBX_INT
 	)
 );
@@ -82,7 +82,7 @@ $param3SecVal = array(
 		'T' => T_ZBX_STR
 	),
 	array(
-		'C' => _('Time shift').' ',
+		'C' => _('Time shift'),
 		'T' => T_ZBX_INT
 	)
 );
@@ -93,7 +93,7 @@ $param3SecPercent = array(
 		'M' => $metrics
 	),
 	array(
-		'C' => _('Time shift').' ',
+		'C' => _('Time shift'),
 		'T' => T_ZBX_INT
 	),
 	array(
@@ -112,7 +112,7 @@ $paramSecIntCount = array(
 		'T' => T_ZBX_STR
 	),
 	array(
-		'C' => _('Time shift').' ',
+		'C' => _('Time shift'),
 		'T' => T_ZBX_INT
 	)
 );

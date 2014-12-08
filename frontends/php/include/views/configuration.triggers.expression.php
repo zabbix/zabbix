@@ -100,7 +100,7 @@ if (isset($this->data['functions'][$this->data['selectedFunction']]['params'])) 
 					: new CTextBox('params['.$paramId.']', $paramValue, 10);
 			}
 
-			$expressionFormList->addRow($paramFunction['C'].' ', array($paramField, $paramTypeElement));
+			$expressionFormList->addRow($paramFunction['C'], array($paramField, $paramTypeElement));
 		}
 		else {
 			$expressionFormList->addRow($paramFunction['C'], new CTextBox('params['.$paramId.']', $paramValue, 30));
