@@ -103,7 +103,9 @@ if (isset($this->data['functions'][$this->data['selectedFunction']]['params'])) 
 			$expressionFormList->addRow($paramFunction['C'], array($paramField, $paramTypeElement));
 		}
 		else {
-			$expressionFormList->addRow($paramFunction['C'], new CTextBox('params['.$paramId.']', $paramValue, 30));
+			$expressionFormList->addRow($paramFunction['C'],
+				new CTextBox('params['.$paramId.']', $paramValue, $paramFunction['T'] == T_ZBX_DBL ? 10 : 30
+			));
 			$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
 		}
 	}
