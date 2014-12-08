@@ -71,6 +71,30 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+static const char	*get_drive_type_string(UINT type)
+{
+	switch (type)
+	{
+		case DRIVE_UNKNOWN:
+			return "unknown";
+		case DRIVE_NO_ROOT_DIR:
+			return "norootdir";
+		case DRIVE_REMOVABLE:
+			return "removable";
+		case DRIVE_FIXED:
+			return "fixed";
+		case DRIVE_REMOTE:
+			return "remote";
+		case DRIVE_CDROM:
+			return "cdrom";
+		case DRIVE_RAMDISK:
+			return "ramdisk";
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return "unknown";
+	}
+}
+
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	wchar_t		fsName[MAX_PATH + 1];
@@ -124,6 +148,8 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 		else
 			zbx_json_addstring(&j, "{#FSTYPE}", "UNKNOWN", ZBX_JSON_TYPE_STRING);
+
+		zbx_json_addstring(&j, "{#FSDRIVETYPE}", get_drive_type_string(GetDriveType(p)), ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&j);
 	}

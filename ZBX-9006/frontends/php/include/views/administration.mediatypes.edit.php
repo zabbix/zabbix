@@ -117,7 +117,7 @@ if (!empty($this->data['mediatypeid'])) {
 else {
 	$mediaTypeForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('config'))
+		array(new CButtonCancel(url_param('config')))
 	));
 }
 

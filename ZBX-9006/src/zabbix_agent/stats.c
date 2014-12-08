@@ -46,7 +46,7 @@ extern int		server_num, process_num;
 static int		shm_id;
 int 			my_diskstat_shmid = NONEXISTENT_SHMID;
 ZBX_DISKDEVICES_DATA	*diskdevices = NULL;
-ZBX_MUTEX		diskstats_lock;
+ZBX_MUTEX		diskstats_lock = ZBX_MUTEX_NULL;
 #endif
 
 /******************************************************************************
@@ -192,7 +192,7 @@ void	init_collector_data()
 	collector->cpus.count = cpu_count;
 	collector->diskstat_shmid = NONEXISTENT_SHMID;
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&diskstats_lock, ZBX_MUTEX_DISKSTATS))
+	if (FAIL == zbx_mutex_create_force(&diskstats_lock, ZBX_MUTEX_DISKSTATS))
 	{
 		zbx_error("cannot create mutex for disk statistics collector");
 		exit(EXIT_FAILURE);
