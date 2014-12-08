@@ -21,30 +21,50 @@
 
 class CRowTest extends CTagTest {
 
-	public function itemProvider() {
+	public function constructProvider() {
 		return array(
 			// the row should render an empty <td> tag instead
-			array(null, '<tr></tr>'),
-			array('', '<tr><td></td></tr>'),
-			array('test', '<tr><td>test</td></tr>'),
-			array(array('one', 'two'), '<tr><td>one</td><td>two</td></tr>'),
+			array(
+				array(null),
+				'<tr></tr>'
+			),
+			array(
+				array(''),
+				'<tr><td></td></tr>'
+			),
+			array(
+				array('test'),
+				'<tr><td>test</td></tr>'
+			),
+			array(
+				array(array('one', 'two')),
+				'<tr><td>one</td><td>two</td></tr>'
+			),
 
 			// null columns are not rendered
-			array(array('one', null), '<tr><td>one</td></tr>'),
+			array(
+				array(array('one', null)),
+				'<tr><td>one</td></tr>'
+			),
 
-			array(new CCol('test'), '<tr><td>test</td></tr>'),
-			array(array(new CCol('one'), new CCol('two')), '<tr><td>one</td><td>two</td></tr>'),
+			array(
+				array(new CCol('test')),
+				'<tr><td>test</td></tr>'
+			),
+			array(
+				array(array(new CCol('one'), new CCol('two'))),
+				'<tr><td>one</td><td>two</td></tr>'
+			),
+
+			array(
+				array('', 'myclass'),
+				'<tr class="myclass"><td></td></tr>'
+			),
+			array(
+				array('', null, 'myid'),
+				'<tr id="myid"><td></td></tr>'
+			),
 		);
-	}
-
-	public function testClass() {
-		$tag = $this->createTag('', 'myclass');
-		$this->assertEquals('<tr class="myclass"><td></td></tr>', (string) $tag);
-	}
-
-	public function testId() {
-		$tag = $this->createTag('', null, 'myid');
-		$this->assertEquals('<tr id="myid"><td></td></tr>', (string) $tag);
 	}
 
 	public function createTag($items = null, $class = null, $id = null) {

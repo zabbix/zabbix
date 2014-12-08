@@ -4,12 +4,14 @@
 			<span class="bold">#{name}</span>
 		</td>
 		<td>
-			<input type="button" class="input link_menu" name="edit" value="<?php echo CHtml::encode(_('Edit')); ?>"
-				onclick="javascript: showNewCheckForm(null, null, '#{dcheckid}');" />
+			<button type="button" class="button link_menu" onclick="javascript: showNewCheckForm(null, null, '#{dcheckid}');">
+				<?php echo _('Edit'); ?>
+			</button>
 		</td>
 		<td>
-			<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>"
-				onclick="javascript: removeDCheckRow('#{dcheckid}');" />
+			<button type="button" class="button link_menu" onclick="javascript: removeDCheckRow('#{dcheckid}');">
+				<?php echo _('Remove'); ?>
+			</button>
 		</td>
 	</tr>
 </script>
@@ -70,7 +72,7 @@
 				<tr id="newCheckAuthProtocolRow" class="hidden">
 					<td><label for="snmpv3_authprotocol"><?php echo _('Authentication protocol'); ?></label></td>
 					<td>
-						<div class="jqueryinputset">
+						<div class="jqueryinputset radioset">
 							<input name="snmpv3_authprotocol" id="snmpv3_authprotocol_0" type="radio" checked="checked"
 								value="<?php echo ITEM_AUTHPROTOCOL_MD5; ?>" />
 							<input name="snmpv3_authprotocol" id="snmpv3_authprotocol_1" type="radio"
@@ -87,7 +89,7 @@
 				<tr id="newCheckPrivProtocolRow" class="hidden">
 					<td><label for="snmpv3_authprotocol"><?php echo _('Authentication protocol'); ?></label></td>
 					<td>
-						<div class="jqueryinputset">
+						<div class="jqueryinputset radioset">
 							<input name="snmpv3_privprotocol" id="snmpv3_privprotocol_0" type="radio" checked="checked"
 								value="<?php echo ITEM_PRIVPROTOCOL_DES; ?>" />
 							<input name="snmpv3_privprotocol" id="snmpv3_privprotocol_1" type="radio"
@@ -106,12 +108,14 @@
 			<table class="formElementTable">
 				<tr>
 					<td>
-						<input type="button" id="add_new_dcheck" name="add_new_dcheck" class="input button link_menu"
-							value="<?php echo CHtml::encode(_('Add')); ?>" />
+						<button type="button" id="add_new_dcheck" name="add_new_dcheck" class="button link_menu">
+							<?php echo _('Add') ?>
+						</button>
 					</td>
 					<td>
-						<input type="button" id="cancel_new_dcheck" name="cancel_new_dcheck" class="input button link_menu"
-							value="<?php echo CHtml::encode(_('Cancel')); ?>" />
+						<button type="button" id="cancel_new_dcheck" name="cancel_new_dcheck" class="button link_menu">
+							<?php echo _('Cancel') ?>
+						</button>
 					</td>
 				</tr>
 			</table>
@@ -352,7 +356,7 @@
 
 			// rename button to "update"
 			if (isUpdate) {
-				jQuery('#add_new_dcheck').val(<?php echo CJs::encodeJson(_('Update')); ?>);
+				jQuery('#add_new_dcheck').text(<?php echo CJs::encodeJson(_('Update')); ?>);
 			}
 
 			// button "remove" form
@@ -659,7 +663,8 @@
 
 		jQuery('#newCheck').click(showNewCheckForm);
 		jQuery('#clone').click(function() {
-			jQuery('#update').val(<?php echo CJs::encodeJson(_('Add')); ?>).attr({id: 'add', name: 'add'});
+			jQuery('#update').button('option', 'label', <?php echo CJs::encodeJson(_('Add')); ?>)
+				.attr({id: 'add', name: 'add'});
 			jQuery('#druleid, #delete, #clone').remove();
 			jQuery('#cancel').addClass('ui-corner-left');
 			jQuery('#form').val('clone');
