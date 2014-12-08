@@ -1,6 +1,9 @@
 Changes for 2.5.0
 
 New features:
+A.F....PS. [ZBXNEXT-756] added function percentile() to calculated items and trigger expressions (asaveljevs)
+.....J.... [ZBX-9006] added support for IPv6 addresses to Java gateway (asaveljevs)
+A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent and updated outdated user agent strings in web scenario form (Ivo)
 ..F....... [ZBXNEXT-1036] improved "Most busy triggers top 100" page filter (Oleg)
 ..F....... [ZBXNEXT-2602] minor design and layout improvements (Pavels)
 ........S. [ZBXNEXT-2471] improved value cache management by resetting item's cached range to the daily request range once per day (wiper)
@@ -55,6 +58,11 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Italian, Japanese and Slovak
 .......PS. [ZBX-4054] added support for SNMP values of type OID (asaveljevs)
 
 Bug fixes:
+........S. [ZBX-8873] fixed incorrect event being generated after maintenance in case there are out of order events due to proxy (asaveljevs, Sasha)
+.......PS. [ZBX-8882] fixed message logging on DB2 errors (igors)
+.......PS. [ZBX-8992] made Zabbix prefer the threshold sensor over a discrete sensor, in case both are available under the same name (asaveljevs)
+...G...... [ZBX-8506] fixed memory leak in wmi.get[]; thanks to Pedro Nunes for patch (asaveljevs)
+.......PS. [ZBX-9016] fixed items not being processed again in case these items or their hosts are disabled and then reenabled (asaveljevs, Sasha)
 A.F....... [ZBX-9065] fixed default value for screens_items.max_columns in PHP schema (Krists)
 ..F....... [ZBX-5077] fixed percentile calculation formula and corrected accessed index, by which value is selected (arvids)
 A......... [ZBX-8486] fixed re-linking templates with web scenarios (Krists)
@@ -549,6 +557,11 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8873] fixed incorrect event being generated after maintenance in case there are out of order events due to proxy (asaveljevs, Sasha)
+.......PS. [ZBX-8882] fixed message logging on DB2 errors (igors)
+.......PS. [ZBX-8992] made Zabbix prefer the threshold sensor over a discrete sensor, in case both are available under the same name (asaveljevs)
+...G...... [ZBX-8506] fixed memory leak in wmi.get[]; thanks to Pedro Nunes for patch (asaveljevs)
+.......PS. [ZBX-9016] fixed items not being processed again in case these items or their hosts are disabled and then reenabled (asaveljevs, Sasha)
 ..F....... [ZBX-5077] fixed percentile calculation formula and corrected accessed index, by which value is selected (arvids)
 A......... [ZBX-8486] fixed re-linking templates with web scenarios (Krists)
 ..F....... [ZBX-8919] fixed range selection in graphs in IE10 and IE11 (arvids)
