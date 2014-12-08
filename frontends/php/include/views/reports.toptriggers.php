@@ -118,7 +118,7 @@ $severitiesTable = new CTable(null, 'severities-table');
 
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$serverityCheckBox = new CCheckBox('severities['.$severity.']',
-		in_array($severity, $this->data['filter']['severities']), '', 1
+		in_array($severity, $this->data['filter']['severities']), null, 1
 	);
 
 	if ($severity % 2) {
