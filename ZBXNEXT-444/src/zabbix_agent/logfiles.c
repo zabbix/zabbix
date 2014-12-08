@@ -1435,6 +1435,8 @@ clean:
  *     filename         - [IN] logfile name (regular expression with a path)  *
  *     lastlogsize      - [IN/OUT] offset from the beginning of the file      *
  *     mtime            - [IN/OUT] last modification time of the file         *
+ *     lastlogsize_sent - [OUT] lastlogsize value that was last sent          *
+ *     mtime_sent       - [OUT] mtime value that was last sent                *
  *     skip_old_data    - [IN/OUT] start from the beginning of the file or    *
  *                        jump to the end                                     *
  *     big_rec          - [IN/OUT] state variable to remember whether a long  *
@@ -1476,11 +1478,11 @@ clean:
  *                                                                            *
  ******************************************************************************/
 int	process_logrt(int is_logrt, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
-		unsigned char *skip_old_data, int *big_rec, int *use_ino, char **err_msg,
-		struct st_logfile **logfiles_old, int *logfiles_num_old, const char *encoding,
-		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
-		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
-		const char *key)
+		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
+		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int *logfiles_num_old,
+		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
+		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
+		unsigned short port, const char *hostname, const char *key)
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
@@ -1640,9 +1642,9 @@ int	process_logrt(int is_logrt, const char *filename, zbx_uint64_t *lastlogsize,
 				*lastlogsize = logfiles[i].processed_size;
 
 			ret = process_log(logfiles[i].filename, lastlogsize, (1 == is_logrt) ? mtime : NULL,
-					skip_old_data, big_rec, &logfiles[i].incomplete, err_msg, encoding, regexps,
-					pattern, output_template, p_count, s_count, process_value, server, port,
-					hostname, key);
+					lastlogsize_sent, (1 == is_logrt) ? mtime_sent : NULL, skip_old_data, big_rec,
+					&logfiles[i].incomplete, err_msg, encoding, regexps, pattern, output_template,
+					p_count, s_count, process_value, server, port, hostname, key);
 
 			/* process_log() advances 'lastlogsize' only on success therefore */
 			/* we do not check for errors here */
@@ -1766,9 +1768,6 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 						/* up to 64 k characters to Zabbix server a 256 kB buffer might be */
 						/* required. */
 
-	*lastlogsize_sent = *lastlogsize;
-	*mtime_sent = *mtime;
-
 	if (NULL == buf)
 	{
 		buf = zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
@@ -1870,7 +1869,8 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 						if (SUCCEED == send_err)
 						{
 							*lastlogsize_sent = lastlogsize1;
-							*mtime_sent = *mtime;
+							if (NULL != mtime_sent)
+								*mtime_sent = *mtime;
 
 							(*s_count)--;
 						}
@@ -1937,7 +1937,8 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 						if (SUCCEED == send_err)
 						{
 							*lastlogsize_sent = lastlogsize1;
-							*mtime_sent = *mtime;
+							if (NULL != mtime_sent)
+								*mtime_sent = *mtime;
 
 							(*s_count)--;
 						}
@@ -2044,17 +2045,17 @@ out:
  *           This function does not deal with log file rotation.              *
  *                                                                            *
  ******************************************************************************/
-int	process_log(const char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
-		int *big_rec, int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps,
-		const char *pattern, const char *output_template, int *p_count, int *s_count,
-		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
-		const char *key)
+int	process_log(const char *filename, zbx_uint64_t *lastlogsize, int *mtime, zbx_uint64_t *lastlogsize_sent,
+		int *mtime_sent, unsigned char *skip_old_data, int *big_rec, int *incomplete, char **err_msg,
+		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
+		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
+		unsigned short port, const char *hostname, const char *key)
 {
 	const char	*__function_name = "process_log";
 
-	int		f, mtime_sent, ret = FAIL;
+	int		f, ret = FAIL;
 	zbx_stat_t	buf;
-	zbx_uint64_t	l_size, lastlogsize_sent;
+	zbx_uint64_t	l_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d",
 			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0);
@@ -2102,7 +2103,7 @@ int	process_log(const char *filename, zbx_uint64_t *lastlogsize, int *mtime, uns
 
 		ret = zbx_read2(f, lastlogsize, mtime, big_rec, incomplete, err_msg, encoding, regexps, pattern,
 				output_template, p_count, s_count, process_value, server, port, hostname, key,
-				&lastlogsize_sent, &mtime_sent);
+				lastlogsize_sent, mtime_sent);
 	}
 	else
 	{
@@ -2116,13 +2117,6 @@ int	process_log(const char *filename, zbx_uint64_t *lastlogsize, int *mtime, uns
 		ret = FAIL;
 	}
 out:
-	if (SUCCEED == ret && (*lastlogsize != lastlogsize_sent || *mtime != mtime_sent))
-	{
-		/* meta information update */
-		ret = process_value(server, port, hostname, key, NULL, ITEM_STATE_NORMAL, lastlogsize, mtime, NULL, NULL,
-				NULL, NULL, 1);
-	}
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d ret:%s",
 			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0, zbx_result_string(ret));
 
