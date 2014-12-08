@@ -34,7 +34,7 @@ class CFunctionValidator extends CValidator {
 	 *   )
 	 * )
 	 *
-	 * <parameter_type> can be 'sec_zero', 'sec_num', 'sec_num_zero', 'num', 'percent', 'operation', 'str'
+	 * <parameter_type> can be 'num', 'operation', 'percent', 'sec_num', 'sec_num_zero', 'sec_zero', 'str'
 	 * <value_type> can be one of ITEM_VALUE_TYPE_*
 	 *
 	 * @var array
@@ -188,7 +188,7 @@ class CFunctionValidator extends CValidator {
 			'percentile' => array(
 				'args' => array(
 					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'sec_zero', 'mandat' => true, 'can_be_empty' => true),
+					array('type' => 'sec_zero', 'can_be_empty' => true),
 					array('type' => 'percent', 'mandat' => true)
 				),
 				'value_types' => $valueTypesNum
@@ -312,7 +312,7 @@ class CFunctionValidator extends CValidator {
 	 * Validate trigger function parameter.
 	 *
 	 * @param string $param
-	 * @param string $type  type of $param ('sec_zero', 'sec_num', 'sec_num_zero', 'num', 'percent', 'operation', 'str')
+	 * @param string $type  type of $param ('num', 'operation', 'percent', 'sec_num', 'sec_num_zero', 'sec_zero', 'str')
 	 *
 	 * @return bool
 	 */
