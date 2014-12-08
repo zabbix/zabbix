@@ -350,8 +350,10 @@ int	zbx_api_db_fetch_query(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 void	zbx_api_get_result_init(zbx_api_get_result_t *self);
 void	zbx_api_get_result_clean(zbx_api_get_result_t *self);
 
-int	zbx_api_property_convert(const zbx_api_property_t *self, const char *value_str, zbx_db_value_t *value,
+int	zbx_api_property_from_string(const zbx_api_property_t *self, const char *value_str, zbx_db_value_t *value,
 		char **error);
+void	zbx_api_property_to_string(char **str, size_t *str_alloc, size_t *str_offset, const zbx_api_property_t *self,
+		const zbx_db_value_t *value);
 
 /* Object primary key property. It must be the first property in object class definition. */
 #define zbx_api_object_pk(object)	(object->properties)
@@ -367,6 +369,9 @@ int	zbx_api_create_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_
 int	zbx_api_delete_objects(const zbx_vector_uint64_t *ids, const zbx_api_class_t *objclass, char **error);
 int	zbx_api_update_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass,
 		zbx_vector_uint64_t *outids, char **error);
+
+int	zbx_api_check_objects_for_unique_property(const zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass,
+		const char *propname, int update, char **error);
 
 void	zbx_api_json_init(struct zbx_json *json, const char *id);
 void	zbx_api_json_add_count(struct zbx_json *json, const char *name, const zbx_vector_ptr_t *rows);

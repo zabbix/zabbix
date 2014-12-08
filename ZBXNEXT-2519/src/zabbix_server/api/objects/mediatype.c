@@ -187,7 +187,7 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, const struc
 		}
 		else
 		{
-			*error = zbx_dsprintf(*error, "Invalid parameter \"%s\"", name);
+			*error = zbx_dsprintf(*error, "invalid parameter \"%s\"", name);
 			goto out;
 
 		}
@@ -200,7 +200,7 @@ static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, const struc
 	{
 		if (0 == self->options.output.properties.values_num)
 		{
-			*error = zbx_dsprintf(*error, "Parameter \"selectUsers\" cannot be used with"
+			*error = zbx_dsprintf(*error, "parameter \"selectUsers\" cannot be used with"
 					" parameter \"countOutput\"");
 			goto out;
 		}
@@ -254,7 +254,7 @@ int	zbx_api_mediatype_get(const zbx_api_user_t *user, const struct zbx_json_pars
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp_request, "params", &jp_params))
 	{
-		error = zbx_strdup(error, "Cannot open parameters");
+		error = zbx_strdup(error, "cannot open parameters");
 		goto out;
 	}
 
@@ -434,13 +434,13 @@ int	zbx_api_mediatype_create(const zbx_api_user_t *user, const struct zbx_json_p
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp_request, "params", &jp_params))
 	{
-		error = zbx_strdup(error, "Cannot open parameters");
+		error = zbx_strdup(error, "cannot open parameters");
 		goto out;
 	}
 
 	if (USER_TYPE_SUPER_ADMIN != user->type)
 	{
-		error = zbx_strdup(error, "Insufficient access rights");
+		error = zbx_strdup(error, "insufficient access rights");
 		goto out;
 	}
 
@@ -448,6 +448,13 @@ int	zbx_api_mediatype_create(const zbx_api_user_t *user, const struct zbx_json_p
 		goto out;
 
 	DBbegin();
+
+	if (SUCCEED != zbx_api_check_objects_for_unique_property(&request.objects, &zbx_api_class_mediatype,
+			"description", ZBX_API_FALSE, &error))
+	{
+		DBrollback();
+		goto clean;
+	}
 
 	if (SUCCEED != zbx_api_create_objects(&request.objects, &zbx_api_class_mediatype, &ids, &error))
 	{
@@ -552,13 +559,13 @@ int	zbx_api_mediatype_delete(const zbx_api_user_t *user, const struct zbx_json_p
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp_request, "params", &jp_params))
 	{
-		error = zbx_strdup(error, "Cannot open parameters");
+		error = zbx_strdup(error, "cannot open parameters");
 		goto out;
 	}
 
 	if (USER_TYPE_SUPER_ADMIN != user->type)
 	{
-		error = zbx_strdup(error, "Insufficient access rights");
+		error = zbx_strdup(error, "insufficient access rights");
 		goto out;
 	}
 
@@ -673,13 +680,13 @@ int	zbx_api_mediatype_update(const zbx_api_user_t *user, const struct zbx_json_p
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp_request, "params", &jp_params))
 	{
-		error = zbx_strdup(error, "Cannot open parameters");
+		error = zbx_strdup(error, "cannot open parameters");
 		goto out;
 	}
 
 	if (USER_TYPE_SUPER_ADMIN != user->type)
 	{
-		error = zbx_strdup(error, "Insufficient access rights");
+		error = zbx_strdup(error, "insufficient access rights");
 		goto out;
 	}
 
@@ -687,6 +694,13 @@ int	zbx_api_mediatype_update(const zbx_api_user_t *user, const struct zbx_json_p
 		goto out;
 
 	DBbegin();
+
+	if (SUCCEED != zbx_api_check_objects_for_unique_property(&request.objects, &zbx_api_class_mediatype,
+			"description", ZBX_API_TRUE, &error))
+	{
+		DBrollback();
+		goto clean;
+	}
 
 	if (SUCCEED != zbx_api_update_objects(&request.objects, &zbx_api_class_mediatype, &ids, &error))
 	{

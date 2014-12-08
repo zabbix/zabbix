@@ -113,7 +113,7 @@ static int	zbx_api_object_init(zbx_api_class_t *object, char **error)
 
 	if (NULL == (table = DBget_table(object->table_name)))
 	{
-		*error = zbx_dsprintf(NULL, "Invalid object \"%s\" table name \"%s\"", object->name,
+		*error = zbx_dsprintf(NULL, "invalid object \"%s\" table name \"%s\"", object->name,
 				object->table_name);
 		return FAIL;
 	}
@@ -125,7 +125,7 @@ static int	zbx_api_object_init(zbx_api_class_t *object, char **error)
 
 		if (NULL == (field = DBget_field(table, prop->field_name)))
 		{
-			*error = zbx_dsprintf(NULL, "Invalid object \"%s\" property \"%s\" field \"%s\"", object->name,
+			*error = zbx_dsprintf(NULL, "invalid object \"%s\" property \"%s\" field \"%s\"", object->name,
 					prop->name, prop->field_name);
 			return FAIL;
 		}
@@ -205,13 +205,13 @@ static int	zbx_api_getoptions_register_param(zbx_api_getoptions_t *self, int par
 			{
 				if (paramid != i)
 				{
-					*error = zbx_dsprintf(*error, "Parameter \"%s\" conflicts with parameter"
+					*error = zbx_dsprintf(*error, "parameter \"%s\" conflicts with parameter"
 							" \"%s\"", zbx_api_params[paramid],
 							zbx_api_params[i]);
 				}
 				else
 				{
-					*error = zbx_dsprintf(*error, "Duplicate parameter \"%s\" found",
+					*error = zbx_dsprintf(*error, "duplicate parameter \"%s\" found",
 							zbx_api_params[paramid]);
 				}
 
@@ -250,7 +250,7 @@ static int	zbx_api_getoptions_validate_dependency(const zbx_api_getoptions_t *se
 {
 	if (0 != (self->parameters & (1 << paramid)) && 0 == (self->parameters & (1 << requiredid)))
 	{
-		*error = zbx_dsprintf(*error, "Parameter \"%s\" requires parameter \"%s\" to be defined",
+		*error = zbx_dsprintf(*error, "parameter \"%s\" requires parameter \"%s\" to be defined",
 				zbx_api_params[paramid], zbx_api_params[requiredid]);
 		return FAIL;
 	}
@@ -422,7 +422,7 @@ int	zbx_api_get_param_flag(const char *param, const char **next, unsigned char *
 
 	if (NULL == (*next = zbx_json_decodevalue_dyn(*next, &data, &data_alloc, &is_null)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot parse parameter \"%s\" value", param);
+		*error = zbx_dsprintf(*error, "cannot parse parameter \"%s\" value", param);
 		goto out;
 	}
 
@@ -459,7 +459,7 @@ int	zbx_api_get_param_bool(const char *param, const char **next, unsigned char *
 
 	if (NULL == (*next = zbx_json_decodevalue_dyn(*next, &data, &data_alloc, &is_null)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot parse parameter \"%s\" value", param);
+		*error = zbx_dsprintf(*error, "cannot parse parameter \"%s\" value", param);
 		goto out;
 	}
 
@@ -475,7 +475,7 @@ int	zbx_api_get_param_bool(const char *param, const char **next, unsigned char *
 		}
 		else
 		{
-			*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" value \"%s\"", param, data);
+			*error = zbx_dsprintf(*error, "invalid parameter \"%s\" value \"%s\"", param, data);
 			goto out;
 
 		}
@@ -512,7 +512,7 @@ int	zbx_api_get_param_int(const char *param, const char **next, int *value, char
 
 	if (NULL == (*next = zbx_json_decodevalue_dyn(*next, &data, &data_alloc, &is_null)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot parse parameter \"%s\" value", param);
+		*error = zbx_dsprintf(*error, "cannot parse parameter \"%s\" value", param);
 		goto out;
 	}
 
@@ -525,7 +525,7 @@ int	zbx_api_get_param_int(const char *param, const char **next, int *value, char
 
 		if (SUCCEED != is_uint31(ptr, value))
 		{
-			*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" value \"%s\"", param, data);
+			*error = zbx_dsprintf(*error, "invalid parameter \"%s\" value \"%s\"", param, data);
 			goto out;
 		}
 
@@ -569,7 +569,7 @@ int	zbx_api_get_param_map(const char *param, const char **next, zbx_vector_ptr_p
 
 	if (SUCCEED != zbx_json_brackets_open(*next, &jp))
 	{
-		*error = zbx_dsprintf(*error, "Cannot open object parameter \"%s\"", param);
+		*error = zbx_dsprintf(*error, "cannot open object parameter \"%s\"", param);
 		goto out;
 	}
 
@@ -579,7 +579,7 @@ int	zbx_api_get_param_map(const char *param, const char **next, zbx_vector_ptr_p
 	{
 		if (NULL == (p = zbx_json_decodevalue_dyn(p, &data, &data_alloc, &is_null)))
 		{
-			*error = zbx_dsprintf(*error, "Cannot parse parameter \"%s\" value", param);
+			*error = zbx_dsprintf(*error, "cannot parse parameter \"%s\" value", param);
 			goto out;
 		}
 
@@ -639,7 +639,7 @@ static int	zbx_api_get_param_filter(const char *param, const char **next, const 
 	{
 		if (NULL == (prop = zbx_api_class_get_property(objclass, (char *)objects.values[i].first)))
 		{
-			*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" field name \"%s\"",
+			*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field name \"%s\"",
 					param, (char *)objects.values[i].first);
 			goto out;
 		}
@@ -654,14 +654,14 @@ static int	zbx_api_get_param_filter(const char *param, const char **next, const 
 			case ZBX_TYPE_INT:
 				if (ZBX_API_TRUE != like)
 				{
-					*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" field \"%s\" type",
+					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field \"%s\" type",
 							param, (char *)objects.values[i].second);
 					goto out;
 				}
 				if (SUCCEED != zbx_api_value_validate((char *)objects.values[i].second,
 						prop->field->type))
 				{
-					*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" field \"%s\" value",
+					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field \"%s\" value",
 							param, (char *)objects.values[i].second);
 					goto out;
 				}
@@ -675,7 +675,7 @@ static int	zbx_api_get_param_filter(const char *param, const char **next, const 
 			case ZBX_TYPE_SHORTTEXT:
 				if (ZBX_API_FALSE == like)
 				{
-					*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" field \"%s\" type",
+					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field \"%s\" type",
 							param, (char *)objects.values[i].second);
 					goto out;
 				}
@@ -732,7 +732,7 @@ int	zbx_api_get_param_array(const char *param, const char **next, zbx_vector_str
 
 	if (SUCCEED != zbx_json_brackets_open(*next, &jp))
 	{
-		*error = zbx_dsprintf(*error, "Cannot open parameter \"%s\" value array", param);
+		*error = zbx_dsprintf(*error, "cannot open parameter \"%s\" value array", param);
 		goto out;
 	}
 
@@ -783,7 +783,7 @@ int	zbx_api_get_param_string(const char *param, const char **next, char **value,
 
 	if (NULL == (*next = zbx_json_decodevalue_dyn(*next, &data, &data_alloc, &is_null)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot parse parameter \"%s\" value", param);
+		*error = zbx_dsprintf(*error, "cannot parse parameter \"%s\" value", param);
 		goto out;
 	}
 
@@ -841,7 +841,7 @@ int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_
 			{
 				if (NULL == (prop = zbx_api_class_get_property(objclass, outfields.values[i])))
 				{
-					*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" query field \"%s\"",
+					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" query field \"%s\"",
 							param, outfields.values[i]);
 					ret = FAIL;
 
@@ -873,7 +873,7 @@ int	zbx_api_get_param_query(const char *param, const char **next, const zbx_api_
 		}
 		else
 		{
-			*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" value \"%s\"", param, data);
+			*error = zbx_dsprintf(*error, "invalid parameter \"%s\" value \"%s\"", param, data);
 			goto out;
 		}
 
@@ -941,7 +941,7 @@ out:
  *                                                                            *
  * Function: zbx_api_get_param_idarray                                        *
  *                                                                            *
- * Purpose: gets id list parameter                                            *
+ * Purpose: gets id list parameter (sorted)                                   *
  *                                                                            *
  * Parameters: param - [IN] the parameter name                                *
  *             next  - [IN/OUT] the next character in json data buffer        *
@@ -979,6 +979,8 @@ int	zbx_api_get_param_idarray(const char *param, const char **next, zbx_vector_u
 		zbx_vector_uint64_append(value, id);
 	}
 
+	zbx_vector_uint64_sort(value, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	ret = SUCCEED;
 out:
 	return ret;
@@ -1013,7 +1015,7 @@ static int	zbx_api_object_get_property_value(const zbx_api_class_t *objclass, co
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_api_property_convert(prop, value, &dbvalue, error))
+	if (SUCCEED != zbx_api_property_from_string(prop, value, &dbvalue, error))
 		return FAIL;
 
 	*propvalue = zbx_malloc(NULL, sizeof(zbx_api_property_value_t));
@@ -1112,7 +1114,7 @@ int	zbx_api_get_param_objectarray(const char *param, const char **next, const zb
 	{
 		if (SUCCEED != zbx_json_brackets_open(*next, &jp))
 		{
-			*error = zbx_dsprintf(*error, "Cannot open parameter \"%s\" value array", param);
+			*error = zbx_dsprintf(*error, "cannot open parameter \"%s\" value array", param);
 			goto out;
 		}
 
@@ -1392,7 +1394,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_class_t *
 			/* check that sortfield items match sortoder items */
 			if (sortfields.values_num != self->sort.values_num)
 			{
-				*error = zbx_dsprintf(*error, "The number of parameter \"%s\" values differs from the"
+				*error = zbx_dsprintf(*error, "the number of parameter \"%s\" values differs from the"
 						" number of parameter \"%s\" values",
 						zbx_api_params[ZBX_API_PARAM_SORTFIELD],
 						zbx_api_params[ZBX_API_PARAM_SORTORDER]);
@@ -1406,7 +1408,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_class_t *
 
 				if (NULL == (sort->field = zbx_api_class_get_property(objclass, sortfields.values[i])))
 				{
-					*error = zbx_dsprintf(*error, "Invalid parameter \"%s\" value \"%s\"",
+					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" value \"%s\"",
 							zbx_api_params[ZBX_API_PARAM_SORTFIELD],
 							sortfields.values[i]);
 
@@ -1458,7 +1460,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_class_t *
 			/* check that sortfield items match sortoder items */
 			if (sortfields.values_num != self->sort.values_num)
 			{
-				*error = zbx_dsprintf(*error, "The number of parameter \"%s\" values differs from the"
+				*error = zbx_dsprintf(*error, "the number of parameter \"%s\" values differs from the"
 						" number of parameter \"%s\" values",
 						zbx_api_params[ZBX_API_PARAM_SORTFIELD],
 						zbx_api_params[ZBX_API_PARAM_SORTORDER]);
@@ -1480,7 +1482,7 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_class_t *
 				}
 				else
 				{
-					*error = zbx_dsprintf(*error, "Invalid sort order \"%s\"",
+					*error = zbx_dsprintf(*error, "invalid sort order \"%s\"",
 							sortfields.values[i]);
 					rc = FAIL;
 					break;
@@ -1528,7 +1530,7 @@ int	zbx_api_getoptions_add_output_field(zbx_api_getoptions_t *self, const zbx_ap
 
 	if (NULL == (field = zbx_api_class_get_property(objclass, name)))
 	{
-		*error = zbx_dsprintf(*error, "Invalid additional output field name \"%s\"", name);
+		*error = zbx_dsprintf(*error, "invalid additional output field name \"%s\"", name);
 		goto out;
 	}
 
@@ -1583,7 +1585,7 @@ int	zbx_api_getoptions_finalize(zbx_api_getoptions_t *self, const zbx_api_class_
 			0 == (self->parameters & (1 << ZBX_API_PARAM_FILTER)) &&
 			0 != (self->parameters & (1 << ZBX_API_PARAM_SEARCHBYANY)))
 	{
-		*error = zbx_dsprintf(*error, "Parameter \"%s\" requires either parameter \"%s\" or parameter \"%s\""
+		*error = zbx_dsprintf(*error, "parameter \"%s\" requires either parameter \"%s\" or parameter \"%s\""
 				" to be defined", zbx_api_params[ZBX_API_PARAM_SEARCHBYANY],
 				zbx_api_params[ZBX_API_PARAM_FILTER],
 				zbx_api_params[ZBX_API_PARAM_SEARCH]);
@@ -1662,7 +1664,7 @@ void	zbx_api_getoptions_clean(zbx_api_getoptions_t *self)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_property_convert                                         *
+ * Function: zbx_api_property_from_string                                     *
  *                                                                            *
  * Purpose: converts property from text format to native format               *
  *                                                                            *
@@ -1675,7 +1677,7 @@ void	zbx_api_getoptions_clean(zbx_api_getoptions_t *self)
  *               FAIL    - the value conversion failed                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_api_property_convert(const zbx_api_property_t *self, const char *value_str, zbx_db_value_t *value,
+int	zbx_api_property_from_string(const zbx_api_property_t *self, const char *value_str, zbx_db_value_t *value,
 		char **error)
 {
 	if (NULL == self->field)
@@ -1721,14 +1723,55 @@ int	zbx_api_property_convert(const zbx_api_property_t *self, const char *value_s
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_property_value_free                                      *
+ * Function: zbx_api_property_to_string                                       *
  *                                                                            *
- * Purpose: frees property value                                              *
+ * Purpose: converts property from native format to text format               *
+ *                                                                            *
+ * Parameters: str        - [IN/OUT] the output string                        *
+ *             str_alloc  - [IN/OUT] the allocated size of output string      *
+ *             str_offset - [IN/OUT] the output string end offset             *
+ *             self       - [IN] the property to convert                      *
+ *             value      - [IN] the property value                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_property_to_string(char **str, size_t *str_alloc, size_t *str_offset, const zbx_api_property_t *self,
+		const zbx_db_value_t *value)
+{
+
+	switch (self->field->type)
+	{
+		case ZBX_TYPE_CHAR:
+		case ZBX_TYPE_TEXT:
+		case ZBX_TYPE_SHORTTEXT:
+		case ZBX_TYPE_LONGTEXT:
+		case ZBX_TYPE_BLOB:
+			zbx_strcpy_alloc(str, str_alloc, str_offset, value->str);
+			break;
+		case ZBX_TYPE_INT:
+			zbx_snprintf_alloc(str, str_alloc, str_offset, "%d", value->i32);
+			break;
+		case ZBX_TYPE_FLOAT:
+			zbx_snprintf_alloc(str, str_alloc, str_offset, ZBX_FS_DBL, value->dbl);
+			break;
+		case ZBX_TYPE_UINT:
+		case ZBX_TYPE_ID:
+			zbx_snprintf_alloc(str, str_alloc, str_offset, ZBX_FS_UI64, value->ui64);
+			break;
+		default:
+			zbx_strcpy_alloc(str, str_alloc, str_offset, "(unknown value type)");
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_property_value_clean                                     *
+ *                                                                            *
+ * Purpose: frees resources allocated to store property value                 *
  *                                                                            *
  * Parameters: propvalue - [IN] the property value                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_api_property_value_free(zbx_api_property_value_t *propvalue)
+static void	zbx_api_property_value_clean(zbx_api_property_value_t *propvalue)
 {
 	switch (propvalue->property->field->type)
 	{
@@ -1740,8 +1783,66 @@ void	zbx_api_property_value_free(zbx_api_property_value_t *propvalue)
 			zbx_free(propvalue->value.str);
 			break;
 	}
+}
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_property_value_free                                      *
+ *                                                                            *
+ * Purpose: frees property value                                              *
+ *                                                                            *
+ * Parameters: propvalue - [IN] the property value                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_property_value_free(zbx_api_property_value_t *propvalue)
+{
+	zbx_api_property_value_clean(propvalue);
 	zbx_free(propvalue);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_property_value_compare                                   *
+ *                                                                            *
+ * Purpose: compares two property values                                      *
+ *                                                                            *
+ * Parameters: v1 - [IN] the first property value to compare                  *
+ *             v2 - [IN] the second property value to compare                 *
+ *                                                                            *
+ * Return value: <0 : v1 < v2                                                 *
+ *                0 : v1 == v2                                                *
+ *               >0 : v1 > v2                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_api_property_value_compare(const zbx_api_property_value_t *v1, const zbx_api_property_value_t *v2)
+{
+	switch (v1->property->field->type)
+	{
+		case ZBX_TYPE_CHAR:
+		case ZBX_TYPE_TEXT:
+		case ZBX_TYPE_SHORTTEXT:
+		case ZBX_TYPE_LONGTEXT:
+		case ZBX_TYPE_BLOB:
+			return strcmp(v1->value.str, v2->value.str);
+		case ZBX_TYPE_INT:
+			return v1->value.i32 - v2->value.i32;
+		case ZBX_TYPE_FLOAT:
+		{
+			double	diff = v1->value.dbl - v2->value.dbl;
+
+			if (-ZBX_DOUBLE_EPSILON < diff && diff < ZBX_DOUBLE_EPSILON)
+				return 0;
+
+			return 0 < diff ? 1 : -1;
+		}
+		case ZBX_TYPE_UINT:
+		case ZBX_TYPE_ID:
+			ZBX_RETURN_IF_NOT_EQUAL(v1->value.ui64, v2->value.ui64);
+			return 0;
+	}
+	THIS_SHOULD_NEVER_HAPPEN;
+	return 0;
 }
 
 /******************************************************************************
@@ -1764,7 +1865,7 @@ void	zbx_api_object_free(zbx_vector_ptr_t *object)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_object_get_property                                      *
+ * Function: zbx_api_class_get_property                                       *
  *                                                                            *
  * Purpose: searches for the specified property in object class definition    *
  *                                                                            *
@@ -1888,7 +1989,7 @@ int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, char **error)
 			pv = zbx_malloc(NULL, sizeof(zbx_api_property_value_t));
 			pv->property = pi->property;
 
-			if (SUCCEED != zbx_api_property_convert(pv->property, pv->property->field->default_value,
+			if (SUCCEED != zbx_api_property_from_string(pv->property, pv->property->field->default_value,
 					&pv->value, error))
 			{
 				goto out;
@@ -2044,9 +2145,9 @@ out:
  ******************************************************************************/
 int	zbx_api_prepare_objects_for_update(zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass, char **error)
 {
-	int				ret = FAIL, i;
+	int				ret = FAIL, i, j;
 	zbx_vector_ptr_t		*props;
-	zbx_api_property_value_t	*pv;
+	zbx_api_property_value_t	*pv1, *pv2;
 
 	for (i = 0; i < objects->values_num; i++)
 	{
@@ -2054,19 +2155,30 @@ int	zbx_api_prepare_objects_for_update(zbx_vector_ptr_t *objects, const zbx_api_
 
 		if (2 > props->values_num)
 		{
-			*error = zbx_dsprintf(*error, "Cannot update object #%d:  not enough properties specified",
-					i + 1);
+			*error = zbx_strdup(*error, "not enough properties specified");
 			goto out;
 		}
 
 		zbx_vector_ptr_sort(props, zbx_api_3ptr_compare_func);
 
-		pv = (zbx_api_property_value_t *)props->values[0];
+		pv1 = (zbx_api_property_value_t *)props->values[0];
 
-		if (zbx_api_object_pk(objclass) != pv->property)
+		if (zbx_api_object_pk(objclass) != pv1->property)
 		{
-			*error = zbx_dsprintf(*error, "Cannot update object #%d:  no primary key specified", i + 1);
+			*error = zbx_strdup(*error, "no primary key specified");
 			goto out;
+		}
+
+		for (j = 0; j < props->values_num - 1; j++)
+		{
+			pv1 = (zbx_api_property_value_t *)props->values[j];
+			pv2 = (zbx_api_property_value_t *)props->values[j + 1];
+
+			if (pv1->property == pv2->property)
+			{
+				*error = zbx_dsprintf(*error, "duplicate property \"%s\"" " found");
+				goto out;
+			}
 		}
 	}
 
@@ -2148,6 +2260,181 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_check_objects_for_unique_property                        *
+ *                                                                            *
+ * Purpose: checks if the objects have unique values for the specified        *
+ *          property                                                          *
+ *                                                                            *
+ * Parameters: objects  - [IN] the objects to prepare                         *
+ *             objclass - [IN] the object class definition                    *
+ *             propname - [IN] the property name                              *
+ *             update   - [IN] ZBX_API_TRUE:  check for update uniqueness     *
+ *                             ZBX_API_FALSE: check for create uniqueness     *
+ *             error    - [OUT] error message                                 *
+ *                                                                            *
+ * Return value: SUCCEED - the property has unique values                     *
+ *               FAIL    - the property has duplicated values                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_check_objects_for_unique_property(const zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass,
+		const char *propname, int update, char **error)
+{
+	typedef struct
+	{
+		zbx_uint64_t			id;
+		const zbx_api_property_value_t	*propval;
+	}
+	zbx_api_idprop_t;
+
+	DB_RESULT			result;
+	DB_ROW				row;
+	zbx_vector_ptr_t		values;
+	const zbx_api_property_t	*property;
+	const zbx_api_property_value_t	*propval, *key = NULL;
+	const zbx_vector_ptr_t		*props;
+	zbx_api_idprop_t		*idprop1, *idprop2;
+	int				ret = FAIL, i, j;
+	char				*sql = NULL;
+	size_t				sql_offset = 0, sql_alloc = 0;
+
+	if (NULL == (property = zbx_api_class_get_property(objclass, propname)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+	zbx_vector_ptr_create(&values);
+
+	/* create a list of new values and object ids */
+	for (i = 0; i < objects->values_num; i++)
+	{
+		props = (const zbx_vector_ptr_t *)objects->values[i];
+
+		for (j = 0; j < props->values_num; j++)
+		{
+			propval = (const zbx_api_property_value_t *)props->values[j];
+
+			if (propval->property == property)
+			{
+				idprop1 = (zbx_api_idprop_t *)zbx_malloc(NULL, sizeof(zbx_api_idprop_t));
+
+				idprop1->propval = propval;
+
+				if (ZBX_API_TRUE == update)
+				{
+					/* the object id (primary key) is first property */
+					key = (const zbx_api_property_value_t *)props->values[0];
+					idprop1->id = key->value.ui64;
+				}
+				else
+					idprop1->id = 0;
+
+				zbx_vector_ptr_append(&values, idprop1);
+				break;
+			}
+		}
+	}
+
+	if (0 == values.values_num)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	/* check if the new values are unique between themselves */
+	for (i = 0; i < values.values_num - 1; i++)
+	{
+		idprop1 = (zbx_api_idprop_t *)values.values[i];
+
+		for (j = i + 1; j < values.values_num; j++)
+		{
+			idprop2 = (zbx_api_idprop_t *)values.values[j];
+
+			/* check if it is the same object being updated multiple times */
+			if (ZBX_API_TRUE == update && idprop1->id == idprop2->id)
+				continue;
+
+			if (0 == zbx_api_property_value_compare(idprop1->propval, idprop2->propval))
+			{
+				size_t	error_alloc = 0, error_offset = 0;
+
+				zbx_free(*error);
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "duplicate property \"%s\""
+						" value \"", property->name);
+				zbx_api_property_to_string(error, &error_alloc, &error_offset, property,
+						&idprop1->propval->value);
+				zbx_chrcpy_alloc(error, &error_alloc, &error_offset, '"');
+
+				goto out;
+			}
+		}
+	}
+
+	/* Check if there are no duplicate values in database.     */
+
+	/* First select all objects with matching property values. */
+	if (ZBX_API_TRUE == update)
+		zbx_vector_ptr_sort(&values, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s,%s from %s where %s in (",
+			objclass->properties->field_name, property->field_name, objclass->table_name,
+			property->field_name);
+
+	for (i = 0; i < values.values_num; i++)
+	{
+		if (0 != i)
+			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
+
+		idprop1 = (zbx_api_idprop_t *)values.values[i];
+
+		zbx_api_sql_add_field_value(&sql, &sql_alloc, &sql_offset, idprop1->propval->property->field,
+				&idprop1->propval->value);
+	}
+	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
+
+	result = DBselect("%s", sql);
+
+	ret = SUCCEED;
+
+	/* the check if the matching property value is not assigned to the same object */
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t			objectid;
+		zbx_api_property_value_t	value;
+
+		ZBX_STR2UINT64(objectid, row[0]);
+
+		/* find the object in property update list */
+		if (FAIL == (i = zbx_vector_ptr_bsearch(&values, &objectid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			/* the object is not being updated, fail immediately */
+			ret = FAIL;
+			continue;
+		}
+
+		idprop1 = values.values[i];
+		value.property = idprop1->propval->property;
+		zbx_api_property_from_string(value.property, row[1], &value.value, NULL);
+
+		/* fail if the property is not being assigned to the same object */
+		if (0 != zbx_api_property_value_compare(idprop1->propval, &value))
+			ret = FAIL;
+
+		zbx_api_property_value_clean(&value);
+	}
+
+	if (SUCCEED != ret)
+		*error = zbx_dsprintf(*error, "duplicate property \"%s\" value \"%s\"", property->name, row[1]);
+
+	DBfree_result(result);
+out:
+	zbx_vector_ptr_clear_ext(&values, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&values);
+
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
