@@ -83,6 +83,74 @@ static zbx_api_property_t zbx_api_class_properties[] = {
 
 zbx_api_class_t	zbx_api_class_mediatype = {"mediatype", "media_type", zbx_api_class_properties};
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_mediatype_user_access_objectids                          *
+ *                                                                            *
+ * Purpose: checks user access for specified media type object identifiers    *
+ *                                                                            *
+ * Parameters: user      - [IN] the user                                      *
+ *             objectids - [IN] a vector of object identifiers to check       *
+ *             int       - [IN] the desired access type (ZBX_API_ACCESS_WRITE *
+ *                              or ZBX_API_ACCESS_READ)                       *
+ *             error     - [OUT] the error message, optional                  *
+ *                                                                            *
+ * Return value: SUCCEED - the user has the desired access rights to the      *
+ *                         specified objects                                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_api_mediatype_user_access_objectids(const zbx_api_user_t *user,
+		const zbx_vector_uint64_t *objectids, int access, char **error)
+{
+	if (USER_TYPE_SUPER_ADMIN != user->type &&
+			(USER_TYPE_ZABBIX_ADMIN == user->type && ZBX_API_ACCESS_WRITE == access))
+	{
+		*error = zbx_strdup(*error, "insufficient access rights");
+		return FAIL;
+	}
+
+	if (ZBX_API_ACCESS_READ == access || NULL == objectids)
+		return SUCCEED;
+
+	return  zbx_api_check_objectids(objectids, &zbx_api_class_mediatype, error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_mediatype_user_access_objects                            *
+ *                                                                            *
+ * Purpose: checks user access for specified media type objects               *
+ *                                                                            *
+ * Parameters: user    - [IN] the user                                        *
+ *             objects - [IN] a vector of objects to check                    *
+ *             int     - [IN] the desired access type (ZBX_API_ACCESS_WRITE   *
+ *                              or ZBX_API_ACCESS_READ)                       *
+ *             error   - [OUT] the error message, optional                    *
+ *                                                                            *
+ * Return value: SUCCEED - the user has the desired access rights to the      *
+ *                         specified objects                                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_api_mediatype_user_access_objects(const zbx_api_user_t *user, const zbx_vector_ptr_t *objects,
+		int access, char **error)
+{
+	int			ret;
+	zbx_vector_uint64_t	objectids;
+
+	zbx_vector_uint64_create(&objectids);
+
+	zbx_api_objects_to_ids(objects, &objectids);
+	ret = zbx_api_mediatype_user_access_objectids(user, &objectids, access, error);
+
+	zbx_vector_uint64_destroy(&objectids);
+
+	return ret;
+}
+
+
 /*
  * mediatype.get
  */
@@ -91,7 +159,7 @@ zbx_api_class_t	zbx_api_class_mediatype = {"mediatype", "media_type", zbx_api_cl
  *                                                                            *
  * Function: zbx_api_mediatype_get_clean                                      *
  *                                                                            *
- * Purpose: frees resources allocated by mediatype.get request             *
+ * Purpose: frees resources allocated by mediatype.get request                *
  *                                                                            *
  * Parameters: self  - [IN/OUT] the request                                   *
  *                                                                            *
@@ -262,8 +330,7 @@ int	zbx_api_mediatype_get(const zbx_api_user_t *user, const struct zbx_json_pars
 		goto out;
 
 	/* security checks */
-	if (USER_TYPE_SUPER_ADMIN != user->type &&
-			(USER_TYPE_ZABBIX_ADMIN != user->type || 0 != request.options.editable))
+	if (SUCCEED != zbx_api_mediatype_user_access_objectids(user, NULL, ZBX_API_ACCESS_READ, &error))
 		goto skip_query;
 
 	if (0 != request.userids.values_num || 0 != request.mediaids.values_num)
@@ -438,11 +505,8 @@ int	zbx_api_mediatype_create(const zbx_api_user_t *user, const struct zbx_json_p
 		goto out;
 	}
 
-	if (USER_TYPE_SUPER_ADMIN != user->type)
-	{
-		error = zbx_strdup(error, "insufficient access rights");
+	if (SUCCEED != zbx_api_mediatype_user_access_objectids(user, NULL, ZBX_API_ACCESS_WRITE, &error))
 		goto out;
-	}
 
 	if (SUCCEED != zbx_api_mediatype_create_init(&request, &jp_params, &error))
 		goto out;
@@ -523,9 +587,6 @@ static int	zbx_api_mediatype_delete_init(zbx_api_mediatype_delete_t *self, const
 	if (SUCCEED != zbx_api_get_param_idarray("object identifier", &next, &self->objectids, error))
 		goto out;
 
-	if (SUCCEED != zbx_api_prepare_objects_for_delete(&self->objectids, &zbx_api_class_mediatype, error))
-		goto out;
-
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
@@ -565,13 +626,10 @@ int	zbx_api_mediatype_delete(const zbx_api_user_t *user, const struct zbx_json_p
 		goto out;
 	}
 
-	if (USER_TYPE_SUPER_ADMIN != user->type)
-	{
-		error = zbx_strdup(error, "insufficient access rights");
-		goto out;
-	}
-
 	if (SUCCEED != zbx_api_mediatype_delete_init(&request, &jp_params, &error))
+		goto out;
+
+	if (SUCCEED != zbx_api_mediatype_user_access_objectids(user, &request.objectids, ZBX_API_ACCESS_WRITE, &error))
 		goto out;
 
 	DBbegin();
@@ -686,13 +744,10 @@ int	zbx_api_mediatype_update(const zbx_api_user_t *user, const struct zbx_json_p
 		goto out;
 	}
 
-	if (USER_TYPE_SUPER_ADMIN != user->type)
-	{
-		error = zbx_strdup(error, "insufficient access rights");
-		goto out;
-	}
-
 	if (SUCCEED != zbx_api_mediatype_update_init(&request, &jp_params, &error))
+		goto out;
+
+	if (SUCCEED != zbx_api_mediatype_user_access_objects(user, &request.objects, ZBX_API_ACCESS_WRITE, &error))
 		goto out;
 
 	DBbegin();

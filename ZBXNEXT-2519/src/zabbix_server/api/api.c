@@ -1757,7 +1757,13 @@ int	zbx_api_property_from_string(const zbx_api_property_t *self, const char *val
 			break;
 		case ZBX_TYPE_UINT:
 		case ZBX_TYPE_ID:
-			ret = is_uint64(value_str, &value->ui64);
+			if (SUCCEED != is_uint64(value_str, &value->ui64))
+			{
+				*error = zbx_dsprintf(*error, "invalid property \"%s\" unsigned 64 bit value \"%s\"",
+						self->name, value_str);
+				break;
+			}
+			ret = SUCCEED;
 			break;
 	}
 
@@ -1905,6 +1911,30 @@ void	zbx_api_object_free(zbx_vector_ptr_t *object)
 	zbx_vector_ptr_clear_ext(object, (zbx_mem_free_func_t)zbx_api_property_value_free);
 	zbx_vector_ptr_destroy(object);
 	zbx_free(object);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_objects_to_ids                                           *
+ *                                                                            *
+ * Purpose: get object identifiers from an object vector                      *
+ *                                                                            *
+ * Parameters: objects - [IN] the object vector                               *
+ *             ids     - [OUT] the object identifiers                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_api_objects_to_ids(const zbx_vector_ptr_t *objects, zbx_vector_uint64_t *ids)
+{
+	int	i;
+
+	for (i = 0; i < objects->values_num; i++)
+	{
+		const zbx_vector_ptr_t		*props = (const zbx_vector_ptr_t *)objects->values[i];
+		const zbx_api_property_value_t	*propval = (const zbx_api_property_value_t *)props->values[0];
+
+		/* the first property will always be objectid or the request would fail initialization */
+		zbx_vector_uint64_append(ids, propval->value.ui64);
+	}
 }
 
 /******************************************************************************
@@ -2183,70 +2213,6 @@ int	zbx_api_create_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_api_prepare_objects_for_delete                               *
- *                                                                            *
- * Purpose: prepares an object vector for delete operation                    *
- *                                                                            *
- * Parameters: objectids - [IN/OUT] the object identifiers                    *
- *             objclass  - [IN] the object class definition                   *
- *             error     - [OUT] the error message                            *
- *                                                                            *
- * Return value: SUCCEED - the objects were successfully prepared for delete  *
- *                         operation                                          *
- *               FAIL    - object preparation failed.                         *
- *                                                                            *
- * Comments: This function simply checks if the specified objects exist.      *
- *                                                                            *
- ******************************************************************************/
-int	zbx_api_prepare_objects_for_delete(zbx_vector_uint64_t *objectids, const zbx_api_class_t *objclass,
-		char **error)
-{
-	int		ret = FAIL, i;
-	char		*sql = NULL;
-	size_t		sql_offset = 0, sql_alloc = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	objectid;
-
-	if (0 == objectids->values_num)
-	{
-		*error = zbx_strdup(*error, "no object identifiers specified");
-		goto out;
-	}
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s from %s where", objclass->properties->field_name,
-			objclass->table_name);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, objclass->properties->field_name, objectids->values,
-			objectids->values_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by %s", objclass->properties->field_name);
-
-	i = 0;
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(objectid, row[0]);
-
-		if (objectids->values[i] != objectid)
-			break;
-
-		i++;
-	}
-
-	if (i != objectids->values_num)
-		*error = zbx_dsprintf(*error, "invalid object identifier \"" ZBX_FS_UI64 "\"", objectids->values[i]);
-	else
-		ret = SUCCEED;
-
-	DBfree_result(result);
-out:
-	zbx_free(sql);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_api_delete_objects                                           *
  *                                                                            *
  * Purpose: deletes objects specified by the ids vector                       *
@@ -2311,21 +2277,28 @@ int	zbx_api_prepare_objects_for_update(zbx_vector_ptr_t *objects, const zbx_api_
 	{
 		props = (zbx_vector_ptr_t *)objects->values[i];
 
-		if (2 > props->values_num)
+		if (0 == props->values_num)
 		{
-			*error = zbx_strdup(*error, "not enough properties specified");
+			*error = zbx_dsprintf(*error, "property \"%s\" is required for object update",
+					zbx_api_object_pk(objclass)->name);
 			goto out;
 		}
+
+		pv1 = (0 == props->values_num ? NULL :  (zbx_api_property_value_t *)props->values[0]);
 
 		zbx_vector_ptr_sort(props, zbx_api_3ptr_compare_func);
 
 		/* check if the object id property is specified */
-		pv1 = (zbx_api_property_value_t *)props->values[0];
-
-		if (zbx_api_object_pk(objclass) != pv1->property)
+		if (NULL == pv1 || zbx_api_object_pk(objclass) != pv1->property)
 		{
 			*error = zbx_dsprintf(*error, "property \"%s\" is required for object update",
 					zbx_api_object_pk(objclass)->name);
+			goto out;
+		}
+
+		if (2 > props->values_num)
+		{
+			*error = zbx_strdup(*error, "not enough properties specified");
 			goto out;
 		}
 
@@ -2596,6 +2569,67 @@ out:
 
 	zbx_vector_ptr_clear_ext(&values, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&values);
+
+	return ret;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_check_objectids                                          *
+ *                                                                            *
+ * Purpose: checks if the objectids vector contains valid object identifiers  *
+ *                                                                            *
+ * Parameters: objectids - [IN/OUT] the object identifiers                    *
+ *             objclass  - [IN] the object class definition                   *
+ *             error     - [OUT] the error message                            *
+ *                                                                            *
+ * Return value: SUCCEED - all object identifiers are valid                   *
+ *               FAIL    - otherwise                .                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_check_objectids(const zbx_vector_uint64_t *objectids, const zbx_api_class_t *objclass, char **error)
+{
+	int		ret = FAIL, i;
+	char		*sql = NULL;
+	size_t		sql_offset = 0, sql_alloc = 0;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	objectid;
+
+	if (0 == objectids->values_num)
+	{
+		*error = zbx_strdup(*error, "no object identifiers specified");
+		goto out;
+	}
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s from %s where", objclass->properties->field_name,
+			objclass->table_name);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, objclass->properties->field_name, objectids->values,
+			objectids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by %s", objclass->properties->field_name);
+
+	i = 0;
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(objectid, row[0]);
+
+		if (objectids->values[i] != objectid)
+			break;
+
+		i++;
+	}
+
+	if (i != objectids->values_num)
+		*error = zbx_dsprintf(*error, "invalid object identifier \"" ZBX_FS_UI64 "\"", objectids->values[i]);
+	else
+		ret = SUCCEED;
+
+	DBfree_result(result);
+out:
+	zbx_free(sql);
 
 	return ret;
 }

@@ -45,6 +45,9 @@
 
 #define ZBX_API_PARAM_NAME_SIZE		256
 
+#define ZBX_API_ACCESS_READ		0
+#define ZBX_API_ACCESS_WRITE		1
+
 /* json result tags */
 #define ZBX_API_RESULT_TAG_JSONRPC	"jsonrpc"
 #define ZBX_API_RESULT_TAG_ID		"id"
@@ -362,11 +365,10 @@ void	zbx_api_property_to_string(char **str, size_t *str_alloc, size_t *str_offse
 
 const zbx_api_property_t	*zbx_api_class_get_property(const zbx_api_class_t *objclass, const char *name);
 void	zbx_api_object_free(zbx_vector_ptr_t *object);
+void	zbx_api_objects_to_ids(const zbx_vector_ptr_t *objects, zbx_vector_uint64_t *ids);
 
 int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass, char **error);
 int	zbx_api_prepare_objects_for_update(zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass, char **error);
-int	zbx_api_prepare_objects_for_delete(zbx_vector_uint64_t *objectids, const zbx_api_class_t *objclass,
-		char **error);
 
 int	zbx_api_create_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass,
 		zbx_vector_uint64_t *outids, char **error);
@@ -376,6 +378,7 @@ int	zbx_api_update_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_
 
 int	zbx_api_check_objects_for_unique_property(const zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass,
 		const char *propname, int update, char **error);
+int	zbx_api_check_objectids(const zbx_vector_uint64_t *objectids, const zbx_api_class_t *objclass, char **error);
 
 void	zbx_api_json_init(struct zbx_json *json, const char *id);
 void	zbx_api_json_add_count(struct zbx_json *json, const char *name, const zbx_vector_ptr_t *rows);
