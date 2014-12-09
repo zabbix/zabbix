@@ -1680,6 +1680,8 @@ void	zbx_api_getoptions_clean(zbx_api_getoptions_t *self)
 int	zbx_api_property_from_string(const zbx_api_property_t *self, const char *value_str, zbx_db_value_t *value,
 		char **error)
 {
+	int	ret = FAIL;
+
 	if (NULL == self->field)
 	{
 		/* property is not backed by database, just copy its value */
@@ -1695,30 +1697,40 @@ int	zbx_api_property_from_string(const zbx_api_property_t *self, const char *val
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_BLOB:
 			value->str = zbx_strdup(NULL, value_str);
+			ret = SUCCEED;
 			break;
 		case ZBX_TYPE_INT:
-			/* TODO: validation ? */
-			value->i32 = atoi(value_str);
+		{
+			const char	*ptr = value_str;
+
+			if ('-' == *ptr)
+				ptr++;
+
+			if (SUCCEED == is_uint31(ptr, &value->i32))
+			{
+				if (ptr != value_str)
+					value->i32 = -value->i32;
+				ret = SUCCEED;
+			}
 			break;
+		}
 		case ZBX_TYPE_FLOAT:
-			/* TODO: validation ? */
+			if (SUCCEED != is_double(value_str))
+				break;
+
 			value->dbl = atof(value_str);
+			ret = SUCCEED;
 			break;
 		case ZBX_TYPE_UINT:
 		case ZBX_TYPE_ID:
-			if (SUCCEED != is_uint64(value_str, &value->ui64))
-			{
-				if (NULL != *error)
-				{
-					*error = zbx_dsprintf(*error, "invalid property \"%s\" value \"%s\"",
-							self->name, value_str);
-				}
-				return FAIL;
-			}
+			ret = is_uint64(value_str, &value->ui64);
 			break;
 	}
 
-	return SUCCEED;
+	if (SUCCEED != ret && NULL != error)
+		*error = zbx_dsprintf(*error, "invalid property \"%s\" value \"%s\"", self->name, value_str);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1992,9 +2004,9 @@ int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, const zbx_api_
 		/* mark object properties */
 		for (j = 0; j < props->values_num; j++)
 		{
-			zbx_api_property_value_t	*propvalue = (zbx_api_property_value_t *)props->values[j];
+			pv = (zbx_api_property_value_t *)props->values[j];
 
-			if (NULL != (pi = zbx_hashset_search(&propindex, &propvalue->property->name)))
+			if (NULL != (pi = zbx_hashset_search(&propindex, &pv->property->name)))
 				pi->value = ZBX_API_TRUE;
 		}
 
@@ -2027,6 +2039,15 @@ int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, const zbx_api_
 
 		/* sort by property order in object class definition */
 		zbx_vector_ptr_sort(props, zbx_api_3ptr_compare_func);
+
+		/* check if object id is not specified in property values */
+		pv = (zbx_api_property_value_t *)props->values[0];
+
+		if (pv->property == objclass->properties)
+		{
+			*error = zbx_dsprintf(*error, "cannot set object id property \"%s\"", pv->property->name);
+			goto out;
+		}
 	}
 
 	ret = SUCCEED;
