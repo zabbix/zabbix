@@ -1695,6 +1695,14 @@ int	zbx_api_property_from_string(const zbx_api_property_t *self, const char *val
 		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_SHORTTEXT:
 		case ZBX_TYPE_LONGTEXT:
+			if (strlen(value_str) > self->field->length)
+			{
+				if (NULL != error)
+					*error = zbx_dsprintf(*error, "property \"%s\" value too long \"%s\"",
+							self->name, value_str);
+				break;
+			}
+			/* continue to value copying */
 		case ZBX_TYPE_BLOB:
 			value->str = zbx_strdup(NULL, value_str);
 			ret = SUCCEED;
@@ -1706,17 +1714,26 @@ int	zbx_api_property_from_string(const zbx_api_property_t *self, const char *val
 			if ('-' == *ptr)
 				ptr++;
 
-			if (SUCCEED == is_uint31(ptr, &value->i32))
+			if (SUCCEED != is_uint31(ptr, &value->i32))
 			{
-				if (ptr != value_str)
-					value->i32 = -value->i32;
-				ret = SUCCEED;
+				*error = zbx_dsprintf(*error, "invalid property \"%s\" integer value \"%s\"",
+						self->name, value_str);
+				break;
 			}
+
+			if (ptr != value_str)
+				value->i32 = -value->i32;
+			ret = SUCCEED;
+
 			break;
 		}
 		case ZBX_TYPE_FLOAT:
 			if (SUCCEED != is_double(value_str))
+			{
+				*error = zbx_dsprintf(*error, "invalid property \"%s\" floating value \"%s\"",
+						self->name, value_str);
 				break;
+			}
 
 			value->dbl = atof(value_str);
 			ret = SUCCEED;
@@ -1726,9 +1743,6 @@ int	zbx_api_property_from_string(const zbx_api_property_t *self, const char *val
 			ret = is_uint64(value_str, &value->ui64);
 			break;
 	}
-
-	if (SUCCEED != ret && NULL != error)
-		*error = zbx_dsprintf(*error, "invalid property \"%s\" value \"%s\"", self->name, value_str);
 
 	return ret;
 }
@@ -1955,7 +1969,7 @@ int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, const zbx_api_
 	zbx_hashset_t			propindex;
 	zbx_hashset_iter_t		iter;
 	zbx_api_property_index_t	*pi;
-	zbx_api_property_value_t	*pv;
+	zbx_api_property_value_t	*pv1, *pv2;
 	const zbx_api_property_t	*prop;
 
 	zbx_hashset_create(&propindex, 100, ZBX_DEFAULT_STRING_HASH_FUNC, ZBX_DEFAULT_STR_COMPARE_FUNC);
@@ -2004,9 +2018,9 @@ int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, const zbx_api_
 		/* mark object properties */
 		for (j = 0; j < props->values_num; j++)
 		{
-			pv = (zbx_api_property_value_t *)props->values[j];
+			pv1 = (zbx_api_property_value_t *)props->values[j];
 
-			if (NULL != (pi = zbx_hashset_search(&propindex, &pv->property->name)))
+			if (NULL != (pi = zbx_hashset_search(&propindex, &pv1->property->name)))
 				pi->value = ZBX_API_TRUE;
 		}
 
@@ -2025,29 +2039,44 @@ int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, const zbx_api_
 				goto out;
 			}
 
-			pv = zbx_malloc(NULL, sizeof(zbx_api_property_value_t));
-			pv->property = pi->property;
+			pv1 = zbx_malloc(NULL, sizeof(zbx_api_property_value_t));
+			pv1->property = pi->property;
 
-			if (SUCCEED != zbx_api_property_from_string(pv->property, pv->property->field->default_value,
-					&pv->value, error))
+			if (SUCCEED != zbx_api_property_from_string(pv1->property, pv1->property->field->default_value,
+					&pv1->value, error))
 			{
 				goto out;
 			}
 
-			zbx_vector_ptr_append(props, pv);
+			zbx_vector_ptr_append(props, pv1);
 		}
 
 		/* sort by property order in object class definition */
 		zbx_vector_ptr_sort(props, zbx_api_3ptr_compare_func);
 
 		/* check if object id is not specified in property values */
-		pv = (zbx_api_property_value_t *)props->values[0];
+		pv1 = (zbx_api_property_value_t *)props->values[0];
 
-		if (pv->property == objclass->properties)
+		if (pv1->property == objclass->properties)
 		{
-			*error = zbx_dsprintf(*error, "cannot set object id property \"%s\"", pv->property->name);
+			*error = zbx_dsprintf(*error, "cannot set object id property \"%s\"", pv1->property->name);
 			goto out;
 		}
+
+		/* check for duplicate properties */
+		for (j = 0; j < props->values_num - 1; j++)
+		{
+			pv1 = (zbx_api_property_value_t *)props->values[j];
+			pv2 = (zbx_api_property_value_t *)props->values[j + 1];
+
+			if (pv1->property == pv2->property)
+			{
+				*error = zbx_dsprintf(*error, "duplicate property \"%s\"" " found",
+						pv1->property->name);
+				goto out;
+			}
+		}
+
 	}
 
 	ret = SUCCEED;
@@ -2209,14 +2238,17 @@ int	zbx_api_prepare_objects_for_update(zbx_vector_ptr_t *objects, const zbx_api_
 
 		zbx_vector_ptr_sort(props, zbx_api_3ptr_compare_func);
 
+		/* check if the object id property is specified */
 		pv1 = (zbx_api_property_value_t *)props->values[0];
 
 		if (zbx_api_object_pk(objclass) != pv1->property)
 		{
-			*error = zbx_strdup(*error, "no primary key specified");
+			*error = zbx_dsprintf(*error, "property \"%s\" is required for object update",
+					zbx_api_object_pk(objclass)->name);
 			goto out;
 		}
 
+		/* check for duplicate properties */
 		for (j = 0; j < props->values_num - 1; j++)
 		{
 			pv1 = (zbx_api_property_value_t *)props->values[j];
@@ -2224,7 +2256,8 @@ int	zbx_api_prepare_objects_for_update(zbx_vector_ptr_t *objects, const zbx_api_
 
 			if (pv1->property == pv2->property)
 			{
-				*error = zbx_dsprintf(*error, "duplicate property \"%s\"" " found");
+				*error = zbx_dsprintf(*error, "duplicate property \"%s\"" " found",
+						pv1->property->name);
 				goto out;
 			}
 		}
@@ -2698,11 +2731,13 @@ void	zbx_api_sql_add_field_value(char **sql, size_t *sql_alloc, size_t *sql_offs
 
 	switch (field->type)
 	{
+		case ZBX_TYPE_BLOB:
+			/* TODO: handle blob stored as base64 */
+			break;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_SHORTTEXT:
 		case ZBX_TYPE_LONGTEXT:
-		case ZBX_TYPE_BLOB:
 			str = DBdyn_escape_string_len(value->str, field->length);
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "'%s'", str);
 			zbx_free(str);
