@@ -5135,9 +5135,6 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
 
-	if (ZBX_LOC_POLLER == dc_item->location)
-		dc_item->location = ZBX_LOC_NOWHERE;
-
 	old_poller_type = dc_item->poller_type;
 
 	if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type)
@@ -5156,9 +5153,6 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *
 
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
-
-	if (ZBX_LOC_POLLER == dc_item->location)
-		dc_item->location = ZBX_LOC_NOWHERE;
 
 	old_poller_type = dc_item->poller_type;
 
@@ -5188,6 +5182,9 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 
 		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])))
 			continue;
+
+		if (ZBX_LOC_POLLER == dc_item->location)
+			dc_item->location = ZBX_LOC_NOWHERE;
 
 		if (ITEM_STATUS_ACTIVE != dc_item->status)
 			continue;
