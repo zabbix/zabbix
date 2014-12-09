@@ -972,7 +972,7 @@ int	zbx_api_get_param_idarray(const char *param, const char **next, zbx_vector_u
 	{
 		if (SUCCEED != is_uint64(ids.values[i], &id))
 		{
-			zbx_vector_uint64_clear(value);
+			*error = zbx_dsprintf(*error, "invalid parameter \"%s\" value \"%s\"", param, ids.values[i]);
 			goto out;
 		}
 
@@ -981,8 +981,25 @@ int	zbx_api_get_param_idarray(const char *param, const char **next, zbx_vector_u
 
 	zbx_vector_uint64_sort(value, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+	/* check for duplicated identifiers */
+	for (i = 0; i < value->values_num - 1; i++)
+	{
+		if (value->values[i] == value->values[i + 1])
+		{
+			*error = zbx_dsprintf(*error, "duplicated parameter \"%s\" value \"" ZBX_FS_UI64 "\"", param,
+					value->values[i]);
+			goto out;
+		}
+	}
+
 	ret = SUCCEED;
 out:
+	if (SUCCEED != ret)
+		zbx_vector_uint64_clear(value);
+
+	zbx_vector_str_clear_ext(&ids, zbx_ptr_free);
+	zbx_vector_str_destroy(&ids);
+
 	return ret;
 }
 
@@ -2160,6 +2177,70 @@ int	zbx_api_create_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_
 
 	zbx_free(values);
 	zbx_free(fields);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_api_prepare_objects_for_delete                               *
+ *                                                                            *
+ * Purpose: prepares an object vector for delete operation                    *
+ *                                                                            *
+ * Parameters: objectids - [IN/OUT] the object identifiers                    *
+ *             objclass  - [IN] the object class definition                   *
+ *             error     - [OUT] the error message                            *
+ *                                                                            *
+ * Return value: SUCCEED - the objects were successfully prepared for delete  *
+ *                         operation                                          *
+ *               FAIL    - object preparation failed.                         *
+ *                                                                            *
+ * Comments: This function simply checks if the specified objects exist.      *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_api_prepare_objects_for_delete(zbx_vector_uint64_t *objectids, const zbx_api_class_t *objclass,
+		char **error)
+{
+	int		ret = FAIL, i;
+	char		*sql = NULL;
+	size_t		sql_offset = 0, sql_alloc = 0;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	objectid;
+
+	if (0 == objectids->values_num)
+	{
+		*error = zbx_strdup(*error, "no object identifiers specified");
+		goto out;
+	}
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s from %s where", objclass->properties->field_name,
+			objclass->table_name);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, objclass->properties->field_name, objectids->values,
+			objectids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by %s", objclass->properties->field_name);
+
+	i = 0;
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(objectid, row[0]);
+
+		if (objectids->values[i] != objectid)
+			break;
+
+		i++;
+	}
+
+	if (i != objectids->values_num)
+		*error = zbx_dsprintf(*error, "invalid object identifier \"" ZBX_FS_UI64 "\"", objectids->values[i]);
+	else
+		ret = SUCCEED;
+
+	DBfree_result(result);
+out:
+	zbx_free(sql);
 
 	return ret;
 }

@@ -520,9 +520,11 @@ static int	zbx_api_mediatype_delete_init(zbx_api_mediatype_delete_t *self, const
 
 	zbx_vector_uint64_create(&self->objectids);
 
-	if (SUCCEED != zbx_api_get_param_idarray("params", &next, &self->objectids, error))
+	if (SUCCEED != zbx_api_get_param_idarray("object identifier", &next, &self->objectids, error))
 		goto out;
 
+	if (SUCCEED != zbx_api_prepare_objects_for_delete(&self->objectids, &zbx_api_class_mediatype, error))
+		goto out;
 
 	ret = SUCCEED;
 out:

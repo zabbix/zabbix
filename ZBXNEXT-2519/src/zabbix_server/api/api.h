@@ -365,6 +365,8 @@ void	zbx_api_object_free(zbx_vector_ptr_t *object);
 
 int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass, char **error);
 int	zbx_api_prepare_objects_for_update(zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass, char **error);
+int	zbx_api_prepare_objects_for_delete(zbx_vector_uint64_t *objectids, const zbx_api_class_t *objclass,
+		char **error);
 
 int	zbx_api_create_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass,
 		zbx_vector_uint64_t *outids, char **error);
