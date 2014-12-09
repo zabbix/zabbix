@@ -7,7 +7,7 @@ use TLD_constants qw(:general :templates :api :config);
 use Data::Dumper;
 use base 'Exporter';
 
-our @EXPORT = qw(zbx_connect check_api_error get_tld_list get_proxies_list
+our @EXPORT = qw(zbx_connect check_api_error get_proxies_list
 		create_probe_status_host
 		create_probe_template create_probe_status_template create_host create_group create_template create_item create_trigger create_macro update_root_servers
 		create_passive_proxy is_probe_exist get_host_group get_template get_probe get_host

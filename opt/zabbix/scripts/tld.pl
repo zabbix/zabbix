@@ -55,6 +55,7 @@ sub manage_tld_hosts($$);
 
 sub get_nsservers_list($);
 sub update_nsservers($$);
+sub get_tld_list();
 
 my $trigger_rollweek_thresholds = rsm_trigger_rollweek_thresholds;
 
@@ -145,11 +146,27 @@ if (defined($OPTS{'set-type'})) {
 
 #### Manage NS + IP server pairs ####
 if (defined($OPTS{'get-nsservers-list'})) {
-    my $nsservers = get_nsservers_list($OPTS{'tld'});
+    my $nsservers;
 
-    foreach my $type (keys %{$nsservers}) {
-	foreach my $ip (keys %{$nsservers->{$type}}) {
-		print $type."\t".$nsservers->{$type}->{$ip}."\t".$ip."\n";
+    if (defined($OPTS{'tld'})) {
+	$nsservers->{$OPTS{'tld'}} = get_nsservers_list($OPTS{'tld'});
+    }
+    else {
+	my @tlds = get_tld_list();
+
+	foreach my $tld (@tlds) {
+	    my $ns = get_nsservers_list($tld);
+
+	    $nsservers->{$tld} = $ns; 
+	}
+    }
+
+    foreach my $tld (sort keys %{$nsservers}) {
+	my $ns = $nsservers->{$tld};
+	foreach my $type (sort keys %{$ns}) {
+	    foreach my $ip (sort keys %{$ns->{$type}}) {
+	    	print $tld.",".$type.",".$ns->{$type}->{$ip}.",".$ip."\n";
+	    }
 	}
     }
     exit;
@@ -1495,7 +1512,8 @@ sub validate_input {
 
     return if (defined($OPTS{'only-cron'}));
 
-    $msg  = "TLD must be specified (--tld)\n" unless (defined($OPTS{'tld'}));
+    $msg  = "TLD must be specified (--tld)\n" if (!defined($OPTS{'tld'}) and !defined($OPTS{'get-nsservers-list'}));
+
     if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'}))
     {
 	    if (!defined($OPTS{'type'}))
@@ -1807,6 +1825,18 @@ sub compare_arrays($$) {
 	}
 
 	push @result, $a if $found eq false;
+    }
+
+    return @result;
+}
+
+sub get_tld_list() {
+    my $tlds = get_host_group('TLDs', true);
+
+    my @result;
+
+    foreach my $tld (@{$tlds->{'hosts'}}) {
+	push @result, $tld->{'name'};
     }
 
     return @result;
