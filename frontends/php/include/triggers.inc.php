@@ -2204,7 +2204,7 @@ function get_item_function_info($expr) {
 }
 
 /**
- * Substitute macros in the expression with the given values and evaluate it's result.
+ * Substitute macros in the expression with the given values and evaluate its result.
  *
  * @param string $expression                a trigger expression
  * @param array  $replaceFunctionMacros     an array of macro - value pairs
