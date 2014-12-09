@@ -2309,7 +2309,7 @@ function convert($value) {
 }
 
 /**
- * Quoting $param if it contain special characters.
+ * Quoting $param if it contains special characters.
  *
  * @param string $param
  *
@@ -2324,7 +2324,7 @@ function quoteFunctionParam($param) {
 }
 
 /**
- * Returns the text indicating the triggers status and state. If the $state parameter is not given, only the status of
+ * Returns the text indicating the trigger's status and state. If the $state parameter is not given, only the status of
  * the trigger will be taken into account.
  *
  * @param int $status
@@ -2344,7 +2344,7 @@ function triggerIndicator($status, $state = null) {
 }
 
 /**
- * Returns the CSS class for the triggers status and state indicator. If the $state parameter is not given, only the
+ * Returns the CSS class for the trigger's status and state indicator. If the $state parameter is not given, only the
  * status of the trigger will be taken into account.
  *
  * @param int $status
@@ -2364,7 +2364,7 @@ function triggerIndicatorStyle($status, $state = null) {
 }
 
 /**
- * Orders trigger by both status and state. Triggers are sorted in the following order: enabled, disabled, unknown.
+ * Orders triggers by both status and state. Triggers are sorted in the following order: enabled, disabled, unknown.
  *
  * Keep in sync with orderItemsByStatus().
  *
