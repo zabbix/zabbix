@@ -25,13 +25,6 @@
 class CIPValidator extends CValidator {
 
 	/**
-	 * If set to false, the string cannot be empty.
-	 *
-	 * @var bool
-	 */
-	public $empty = false;
-
-	/**
 	 * If set to false, only IPv4 and IPv6 is allowed. If set to true, macros are allowed instead of IP address.
 	 *
 	 * @var bool
@@ -39,21 +32,22 @@ class CIPValidator extends CValidator {
 	public $allowMacros = false;
 
 	/**
-	 * Checks if the given IP address not empty and is a valid IPv4 or IPv6 address. If IP address is
-	 * invalid, sets an error and returns false. Otherwise returns true.
+	 * Checks if the given IP address is a valid IPv4 or IPv6 address. If IP address is invalid, sets an error
+	 * and returns false. Otherwise returns true.
 	 *
 	 * @param string $ip
 	 *
 	 * @return bool
 	 */
 	public function validate($ip) {
-		if (!$this->empty && zbx_empty($ip)) {
-			$this->setError(_('IP address cannot be empty.'));
+		if (!is_string($ip)) {
+			$this->setError(_s('Invalid IP address "%1$s": must be a string.', $this->stringify($ip)));
 
 			return false;
 		}
-		elseif (!is_string($ip)) {
-			$this->setError(_s('Invalid IP address "%1$s": must be a string.', $this->stringify($ip)));
+
+		if (zbx_empty($ip)) {
+			$this->setError(_('IP address cannot be empty.'));
 
 			return false;
 		}
@@ -64,10 +58,12 @@ class CIPValidator extends CValidator {
 		 * If macros are not allowed, return true or false depeding on whether IP address is valid. If macros are
 		 * allowed and IP address is invalid, check if string contains a valid macro.
 		 */
-		if (!$this->allowMacros) {
-			return $isValidIp;
+		if (!$this->allowMacros && !$isValidIp) {
+			$this->setError(_s('Invalid IP address "%1$s".', $ip));
+
+			return false;
 		}
-		elseif (!$isValidIp && !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $ip)
+		elseif ($this->allowMacros && !$isValidIp && !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $ip)
 				&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $ip)) {
 			$this->setError(_s('Invalid IP address "%1$s".', $ip));
 
@@ -86,14 +82,12 @@ class CIPValidator extends CValidator {
 	 */
 	protected function isValidIPv4($ip) {
 		if (!preg_match('/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/', $ip, $matches)) {
-			$this->setError(_s('Invalid IP address "%1$s".', $ip));
 
 			return false;
 		}
 
 		for ($i = 1; $i <= 4; $i++) {
 			if (!is_numeric($matches[$i]) || $matches[$i] > 255 || $matches[$i] < 0 ) {
-				$this->setError(_s('Invalid IP address "%1$s".', $ip));
 
 				return false;
 			}
@@ -111,7 +105,6 @@ class CIPValidator extends CValidator {
 	 */
 	protected function isValidIPv6($ip) {
 		if (!ZBX_HAVE_IPV6) {
-			$this->setError(_s('Invalid IP address "%1$s".', $ip));
 
 			return false;
 		}
@@ -132,7 +125,6 @@ class CIPValidator extends CValidator {
 		$pattern = '/^('.implode(')$|^(', $patterns).')$/i';
 
 		if (!preg_match($pattern, $ip)) {
-			$this->setError(_s('Invalid IP address "%1$s".', $ip));
 
 			return false;
 		}

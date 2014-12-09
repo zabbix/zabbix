@@ -25,13 +25,6 @@
 class CIPRangeValidator extends CIPValidator {
 
 	/**
-	 * If set to false, the string cannot be empty.
-	 *
-	 * @var bool
-	 */
-	public $empty = false;
-
-	/**
 	 * If set to true, all IP range (for example, 0-255.0-255.0-255.0-255) is possible to set.
 	 *
 	 * @var bool
@@ -46,13 +39,14 @@ class CIPRangeValidator extends CIPValidator {
 	 * @return bool
 	 */
 	public function validate($ipRangeList) {
-		if (!$this->empty && zbx_empty($ipRangeList)) {
-			$this->setError(_('IP range cannot be empty.'));
+		if (!is_string($ipRangeList)) {
+			$this->setError(_s('Invalid IP range "%1$s": must be a string.', $this->stringify($ipRangeList)));
 
 			return false;
 		}
-		elseif (!is_string($ipRangeList)) {
-			$this->setError(_s('Invalid IP range "%1$s": must be a string.', $this->stringify($ipRangeList)));
+
+		if (zbx_empty($ipRangeList)) {
+			$this->setError(_('IP range cannot be empty.'));
 
 			return false;
 		}
@@ -68,7 +62,7 @@ class CIPRangeValidator extends CIPValidator {
 			}
 		}
 
-		return $isRangeValid;
+		return (bool) $isRangeValid;
 	}
 
 	/**

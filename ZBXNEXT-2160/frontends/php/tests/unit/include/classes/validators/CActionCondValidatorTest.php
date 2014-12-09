@@ -72,7 +72,39 @@ class CActionCondValidatorTest extends CValidatorTest {
 			)),
 			array(array(), array(
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
-				'value' => '192.168.0.0/24'
+				'value' => '192.168.0.0/16'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => '192.168.0.0/30'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => '192.168.0-255.0-255'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => 'fe80:0:0:0:0:0:c0a8:0/112'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => 'fe80:0:0:0:0:0:c0a8:0/128'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => 'fe80::c0a8:0/112'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => 'fe80::c0a8:0/128'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => '192.168.0.1-127,192.168.2.1'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => '0-255.0-255.0-255.0-255'
 			)),
 			array(array(), array(
 				'conditiontype' => CONDITION_TYPE_DSERVICE_TYPE,
@@ -219,9 +251,65 @@ class CActionCondValidatorTest extends CValidatorTest {
 			array(array(),
 				array(
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
+					'value' => '192.168.0.0/15'
+				),
+				'Incorrect action condition IP: Invalid network mask "192.168.0.0/15": must be between 16 and 30.'
+			),
+			array(array(),
+				array(
+					'conditiontype' => CONDITION_TYPE_DHOST_IP,
+					'value' => '192.168.0.0/31'
+				),
+				'Incorrect action condition IP: Invalid network mask "192.168.0.0/31": must be between 16 and 30.'
+			),
+			array(array(),
+				array(
+					'conditiontype' => CONDITION_TYPE_DHOST_IP,
+					'value' => '192.168.0.0/16-30'
+				),
+				'Incorrect action condition IP: Invalid network mask "192.168.0.0/16-30": must be between 16 and 30.'
+			),
+			array(array(),
+				array(
+					'conditiontype' => CONDITION_TYPE_DHOST_IP,
+					'value' => 'fe80:0:0:0:0:0:c0a8:0/111'
+				),
+				'Incorrect action condition IP: Invalid network mask "fe80:0:0:0:0:0:c0a8:0/111": must be between 112 and 128.'
+			),
+			array(array(),
+				array(
+					'conditiontype' => CONDITION_TYPE_DHOST_IP,
+					'value' => 'fe80:0:0:0:0:0:c0a8:0/129'
+				),
+				'Incorrect action condition IP: Invalid network mask "fe80:0:0:0:0:0:c0a8:0/129": must be between 112 and 128.'
+			),
+			array(array(),
+				array(
+					'conditiontype' => CONDITION_TYPE_DHOST_IP,
+					'value' => 'fe80::c0a8:0/111'
+				),
+				'Incorrect action condition IP: Invalid network mask "fe80::c0a8:0/111": must be between 112 and 128.'
+			),
+			array(array(),
+				array(
+					'conditiontype' => CONDITION_TYPE_DHOST_IP,
+					'value' => 'fe80::c0a8:0/129'
+				),
+				'Incorrect action condition IP: Invalid network mask "fe80::c0a8:0/129": must be between 112 and 128.'
+			),
+			array(array(),
+				array(
+					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '192.168.443.0/432'
 				),
-				'Incorrect action condition ip "192.168.443.0/432".'
+				'Incorrect action condition IP: Invalid IP address "192.168.443.0/432".'
+			),
+			array(array(),
+				array(
+					'conditiontype' => CONDITION_TYPE_DHOST_IP,
+					'value' => '{$A}'
+				),
+				'Incorrect action condition IP: Invalid IP address "{$A}".'
 			),
 			array(array(),
 				array(
