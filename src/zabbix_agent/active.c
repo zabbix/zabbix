@@ -123,7 +123,6 @@ static void	free_active_metric(ZBX_ACTIVE_METRIC *metric)
 static void	free_active_metrics(void)
 {
 	const char	*__function_name = "free_active_metrics";
-	int		i, j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -929,16 +928,12 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 #define ZBX_ACTIVE_CHECK_LOGRT	1
 
 static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric, int logtype,
-		char **error)
+		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error)
 {
 	AGENT_REQUEST	request;
 	const char	*filename, *pattern, *encoding, *maxlines_persec, *skip, *template;
 	char		*encoding_uc = NULL;
-	zbx_uint64_t	lastlogsize_sent;
-	int		rate, ret = FAIL, s_count, p_count, mtime_sent;
-
-	lastlogsize_sent = metric->lastlogsize;
-	mtime_sent = metric->mtime;
+	int		rate, ret = FAIL, s_count, p_count;
 
 	init_request(&request);
 
@@ -1009,7 +1004,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	/* do not flood local system if file grows too fast */
 	p_count = 4 * s_count;
 
-	ret = process_logrt(logtype, filename, &metric->lastlogsize, &metric->mtime, &lastlogsize_sent, &mtime_sent,
+	ret = process_logrt(logtype, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			&metric->logfiles_num, encoding, &regexps, pattern, template, &p_count, &s_count, process_value,
 			server, port, CONFIG_HOSTNAME, metric->key_orig);
@@ -1017,14 +1012,6 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	if (SUCCEED == ret)
 	{
 		metric->error_count = 0;
-
-		if (SUCCEED == need_meta_update(metric, lastlogsize_sent, mtime_sent))
-		{
-			/* meta information update */
-			ret = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL, ITEM_STATE_NORMAL,
-					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, 1);
-		}
-
 	}
 	else
 	{
@@ -1048,7 +1035,8 @@ out:
 	return ret;
 }
 
-static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric, char **error)
+static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric,
+		zbx_uint64_t *lastlogsize_sent, char **error)
 {
 	int 		ret = FAIL;
 
@@ -1197,36 +1185,37 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 
 				zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-				if (SUCCEED != regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) ||
-						SUCCEED != regexp_match_ex(&regexps, str_severity, key_severity,
-								ZBX_IGNORE_CASE) ||
-						SUCCEED != regexp_match_ex(&regexps, provider, key_source,
-								ZBX_IGNORE_CASE) ||
-						SUCCEED != regexp_match_ex(&regexps, str_logeventid, key_logeventid,
+				if (SUCCEED == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
+						SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
+								ZBX_IGNORE_CASE) &&
+						SUCCEED == regexp_match_ex(&regexps, provider, key_source,
+								ZBX_IGNORE_CASE) &&
+						SUCCEED == regexp_match_ex(&regexps, str_logeventid, key_logeventid,
 								ZBX_CASE_SENSITIVE))
 				{
-					zbx_free(value);
-				}
+					send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
+							ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, provider,
+							&severity, &logeventid, 1);
 
-				send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
-						ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, provider, &severity,
-						&logeventid, 1);
+					if (SUCCEED == send_err)
+					{
+						*lastlogsize_sent = lastlogsize;
+						s_count++;
+					}
+				}
+				p_count++;
 
 				zbx_free(source);
 				zbx_free(provider);
 				zbx_free(value);
 
-				p_count++;
-
 				if (SUCCEED == send_err)
 				{
-					s_count++;
-
 					metric->lastlogsize = lastlogsize;
 				}
 				else
 				{
-					/* buffer is full, stop processing active checks*/
+					/* buffer is full, stop processing active checks */
 					/* till the buffer is cleared */
 					lastlogsize = metric->lastlogsize;
 					break;
@@ -1291,29 +1280,30 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 
 			zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-			if (SUCCEED != regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) ||
-					SUCCEED != regexp_match_ex(&regexps, str_severity, key_severity,
-							ZBX_IGNORE_CASE) ||
-					SUCCEED != regexp_match_ex(&regexps, source, key_source, ZBX_IGNORE_CASE) ||
-					SUCCEED != regexp_match_ex(&regexps, str_logeventid, key_logeventid,
+			if (SUCCEED == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
+					SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
+							ZBX_IGNORE_CASE) &&
+					SUCCEED == regexp_match_ex(&regexps, source, key_source, ZBX_IGNORE_CASE) &&
+					SUCCEED == regexp_match_ex(&regexps, str_logeventid, key_logeventid,
 							ZBX_CASE_SENSITIVE))
 			{
-				zbx_free(value);
-			}
+				send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
+						ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, source, &severity,
+						&logeventid, 1);
 
-			send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
-					ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, source, &severity,
-					&logeventid, 1);
+				if (SUCCEED == send_err)
+				{
+					*lastlogsize_sent = lastlogsize;
+					s_count++;
+				}
+			}
+			p_count++;
 
 			zbx_free(source);
 			zbx_free(value);
 
-			p_count++;
-
 			if (SUCCEED == send_err)
 			{
-				s_count++;
-
 				metric->lastlogsize = lastlogsize;
 			}
 			else
@@ -1373,7 +1363,8 @@ static void	process_active_checks(char *server, unsigned short port)
 {
 	const char	*__function_name = "process_active_checks";
 	char		*error = NULL;
-	int		i, now, ret;
+	zbx_uint64_t	lastlogsize_sent;
+	int		i, now, mtime_sent, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu)", __function_name, server, port);
 
@@ -1389,12 +1380,23 @@ static void	process_active_checks(char *server, unsigned short port)
 		if (SUCCEED != metric_ready_to_process(metric))
 			continue;
 
+		lastlogsize_sent = metric->lastlogsize;
+		mtime_sent = metric->mtime;
+
 		if (0 == strncmp(metric->key, "log[", 4))		/* log files without rotation */
-			ret = process_log_check(server, port, metric, ZBX_ACTIVE_CHECK_LOG, &error);
+		{
+			ret = process_log_check(server, port, metric, ZBX_ACTIVE_CHECK_LOG, &lastlogsize_sent,
+					&mtime_sent, &error);
+		}
 		else if (0 == strncmp(metric->key, "logrt[", 6))	/* log files with rotation */
-			ret = process_log_check(server, port, metric, ZBX_ACTIVE_CHECK_LOGRT, &error);
-		else if (0 == strncmp(metric->key, "eventlog[", 9))   /* Windows eventlog */
-			ret = process_eventlog_check(server, port, metric, &error);
+		{
+			ret = process_log_check(server, port, metric, ZBX_ACTIVE_CHECK_LOGRT, &lastlogsize_sent,
+					&mtime_sent, &error);
+		}
+		else if (0 == strncmp(metric->key, "eventlog[", 9))	/* Windows eventlog */
+		{
+			ret = process_eventlog_check(server, port, metric, &lastlogsize_sent, &error);
+		}
 		else
 			ret = process_common_check(server, port, metric, &error);
 
@@ -1416,10 +1418,21 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			zbx_free(error);
 		}
-		else if (ITEM_STATE_NOTSUPPORTED == metric->state && metric->error_count == 0)
+		else
 		{
-			metric->state = ITEM_STATE_NORMAL;
-			metric->refresh_unsupported = 0;
+			if (ITEM_STATE_NOTSUPPORTED == metric->state && metric->error_count == 0)
+			{
+				/* item became supported */
+				metric->state = ITEM_STATE_NORMAL;
+				metric->refresh_unsupported = 0;
+			}
+
+			if (SUCCEED == need_meta_update(metric, lastlogsize_sent, mtime_sent))
+			{
+				/* meta information update */
+				process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL, ITEM_STATE_NORMAL,
+						&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, 1);
+			}
 		}
 
 		metric->nextcheck = (int)time(NULL) + metric->refresh;
