@@ -122,23 +122,15 @@ table.tableinfo-overview-hint { width: 200px; }
 .latest-mon .tableinfo td a { float: left; max-width: 100%; }
 .latest-mon .tableinfo div.item { padding-left: 8px; }
 .latest-mon .filter tr td.label { width: 15%; }
-.latest-mon .filter tr td.inputcol { min-width: 277px; width: 35%; }
 .latest-mon .filter tr td.inputcol .checkbox { margin-top: 4px; }
 .latest-mon .filter tr td .text { width: 216px; }
-.latest-mon .filter .multiselect-wrapper { width: 280px; }
-.latest-mon .filter .multiselect { width: 216px; line-height: 12px; }
 
 /* triggers top 100 */
 .top-triggers .filter .label { width: 15%; }
-.top-triggers .filter .inputcol { min-width: 277px; width: 35%; }
-.top-triggers .filter .inputcol .checkbox { margin-top: 4px; }
-.top-triggers .filter .multiselect-wrapper { width: 280px; }
-.top-triggers .filter .multiselect { width: 216px; line-height: 12px; }
-.top-triggers .filter .period-link { margin-left: 10px; }
-.top-triggers .filter .top { vertical-align: top; }
-.top-triggers .filter .period-table { margin-left: auto; margin-right: auto; }
-.top-triggers .filter .period-table td { border-style: none none; }
+.top-triggers .filter .period-table { margin: 0 auto; }
 .top-triggers .filter .period-table .quick-input { white-space: nowrap; }
+.top-triggers .filter .period-table .period-link { margin-left: 10px; }
+.top-triggers .filter .severities-table td { padding: 0 20px 0 0; white-space: nowrap; }
 
 /*history */
 .history .filter tr td { width: 50%; }
