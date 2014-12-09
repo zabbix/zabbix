@@ -1914,8 +1914,9 @@ int	zbx_api_3ptr_compare_func(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: prepares an object vector for create operation                    *
  *                                                                            *
- * Parameters: objects   - [IN/OUT] the objects to prepare                    *
- *             error     - [OUT] the error message                            *
+ * Parameters: objects  - [IN/OUT] the objects to prepare                     *
+ *             objclass - [IN] the object class definition                    *
+ *             error    - [OUT] the error message                             *
  *                                                                            *
  * Return value: SUCCEED - the objects were successfully prepared for create  *
  *                         operation                                          *
@@ -1927,13 +1928,14 @@ int	zbx_api_3ptr_compare_func(const void *d1, const void *d2)
  *           necessary new properties with default values are added.          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, char **error)
+int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass, char **error)
 {
 	typedef struct
 	{
 		const char			*name;
 		const zbx_api_property_t	*property;
 		int				value;
+		int				required;
 	}
 	zbx_api_property_index_t;
 
@@ -1942,6 +1944,7 @@ int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, char **error)
 	zbx_hashset_iter_t		iter;
 	zbx_api_property_index_t	*pi;
 	zbx_api_property_value_t	*pv;
+	const zbx_api_property_t	*prop;
 
 	zbx_hashset_create(&propindex, 100, ZBX_DEFAULT_STRING_HASH_FUNC, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
@@ -1961,6 +1964,21 @@ int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, char **error)
 			}
 		}
 	}
+
+	for (prop = objclass->properties; NULL != prop->name; prop++)
+	{
+		if (0 == (prop->flags & ZBX_API_PROPERTY_REQUIRED))
+			continue;
+
+		if (NULL == (pi = zbx_hashset_search(&propindex, &prop->name)))
+		{
+			*error = zbx_dsprintf(*error, "missing required property \"%s\"", prop->name);
+			goto out;
+		}
+
+		pi->required = ZBX_API_TRUE;
+	}
+
 
 	for (i = 0; i < objects->values_num; i++)
 	{
@@ -1984,8 +2002,16 @@ int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, char **error)
 		zbx_hashset_iter_reset(&propindex, &iter);
 		while (NULL != (pi = zbx_hashset_iter_next(&iter)))
 		{
+			/* check if property is missing */
 			if (ZBX_API_TRUE == pi->value)
 				continue;
+
+			/* fail if a required property is missing */
+			if (ZBX_API_TRUE == pi->required)
+			{
+				*error = zbx_dsprintf(*error, "missing required property \"%s\"", pi->name);
+				goto out;
+			}
 
 			pv = zbx_malloc(NULL, sizeof(zbx_api_property_value_t));
 			pv->property = pi->property;

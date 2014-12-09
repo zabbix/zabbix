@@ -301,8 +301,8 @@ typedef struct
 zbx_api_get_result_t;
 
 /* object field flags */
-#define ZBX_API_FIELD_FLAG_SORTABLE	1
-#define ZBX_API_FIELD_FLAG_REQUIRED	2
+#define ZBX_API_PROPERTY_SORTABLE	1
+#define ZBX_API_PROPERTY_REQUIRED	2
 #define ZBX_API_FIELD_FLAG_CALCULATED	4
 
 
@@ -363,7 +363,7 @@ void	zbx_api_property_to_string(char **str, size_t *str_alloc, size_t *str_offse
 const zbx_api_property_t	*zbx_api_class_get_property(const zbx_api_class_t *objclass, const char *name);
 void	zbx_api_object_free(zbx_vector_ptr_t *object);
 
-int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, char **error);
+int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass, char **error);
 int	zbx_api_prepare_objects_for_update(zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass, char **error);
 
 int	zbx_api_create_objects(const zbx_vector_ptr_t *objects, const zbx_api_class_t *objclass,

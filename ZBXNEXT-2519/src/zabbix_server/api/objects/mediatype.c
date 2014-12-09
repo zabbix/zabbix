@@ -67,9 +67,9 @@ typedef struct
 zbx_api_mediatype_delete_t;
 
 static zbx_api_property_t zbx_api_class_properties[] = {
-		{"mediatypeid", "mediatypeid", NULL, ZBX_API_FIELD_FLAG_SORTABLE},
-		{"type", "type", NULL, ZBX_API_FIELD_FLAG_REQUIRED},
-		{"description", "description", NULL,  ZBX_API_FIELD_FLAG_REQUIRED},
+		{"mediatypeid", "mediatypeid", NULL, ZBX_API_PROPERTY_SORTABLE},
+		{"type", "type", NULL, ZBX_API_PROPERTY_REQUIRED},
+		{"description", "description", NULL,  ZBX_API_PROPERTY_REQUIRED},
 		{"smtp_server", "smtp_server", NULL,  0},
 		{"smtp_email", "smtp_email", NULL, 0},
 		{"smtp_helo", "smtp_helo", NULL, 0},
@@ -393,7 +393,7 @@ static int	zbx_api_mediatype_create_init(zbx_api_mediatype_create_t *self, const
 	if (SUCCEED != zbx_api_get_param_objectarray("params", &next, &zbx_api_class_mediatype, &self->objects, error))
 		goto out;
 
-	if (SUCCEED != zbx_api_prepare_objects_for_create(&self->objects, error))
+	if (SUCCEED != zbx_api_prepare_objects_for_create(&self->objects, &zbx_api_class_mediatype, error))
 		goto out;
 
 	ret = SUCCEED;

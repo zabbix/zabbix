@@ -28,8 +28,8 @@
 #include "user.h"
 
 static zbx_api_property_t zbx_api_class_properties[] = {
-		{"userid", "userid", NULL, ZBX_API_FIELD_FLAG_SORTABLE},
-		{"alias", "alias", NULL, ZBX_API_FIELD_FLAG_REQUIRED | ZBX_API_FIELD_FLAG_SORTABLE},
+		{"userid", "userid", NULL, ZBX_API_PROPERTY_SORTABLE},
+		{"alias", "alias", NULL, ZBX_API_PROPERTY_REQUIRED | ZBX_API_PROPERTY_SORTABLE},
 		{"name", "name", NULL, 0},
 		{"surname", "surname", NULL, 0},
 		{"url", "url", NULL, 0},
