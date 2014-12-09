@@ -74,7 +74,7 @@ static int	zbx_api_get_user(const struct zbx_json_parse *jp, zbx_api_user_t *use
 	auth_esc = DBdyn_escape_string(auth);
 	zbx_free(auth);
 
-	result = DBselect("select u.userid,u.type from users u,session s where s.sessionid='%s' and u.userid=s.userid"
+	result = DBselect("select u.userid,u.type from users u,sessions s where s.sessionid='%s' and u.userid=s.userid"
 			" and s.status=%d", auth_esc, ZBX_SESSION_ACTIVE);
 
 	/* TODO: should API timeout inactive sessions ? */
@@ -208,6 +208,7 @@ static int	zbx_api_process_jsonrpc(zbx_sock_t *sock, const char *data)
 	zbx_free(header);
 	zbx_json_free(&result);
 out:
+	zbx_free(id);
 	zbx_free(error);
 
 	return ret;

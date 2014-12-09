@@ -1860,6 +1860,7 @@ static int	zbx_api_property_value_compare(const zbx_api_property_value_t *v1, co
 void	zbx_api_object_free(zbx_vector_ptr_t *object)
 {
 	zbx_vector_ptr_clear_ext(object, (zbx_mem_free_func_t)zbx_api_property_value_free);
+	zbx_vector_ptr_destroy(object);
 	zbx_free(object);
 }
 
@@ -2430,6 +2431,8 @@ int	zbx_api_check_objects_for_unique_property(const zbx_vector_ptr_t *objects, c
 
 	DBfree_result(result);
 out:
+	zbx_free(sql);
+
 	zbx_vector_ptr_clear_ext(&values, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&values);
 
