@@ -1363,8 +1363,7 @@ static void	process_active_checks(char *server, unsigned short port)
 {
 	const char	*__function_name = "process_active_checks";
 	char		*error = NULL;
-	zbx_uint64_t	lastlogsize_sent;
-	int		i, now, mtime_sent, ret;
+	int		i, now, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu)", __function_name, server, port);
 
@@ -1372,6 +1371,8 @@ static void	process_active_checks(char *server, unsigned short port)
 
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
+		zbx_uint64_t		lastlogsize_sent;
+		int			mtime_sent;
 		ZBX_ACTIVE_METRIC	*metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
 
 		if (metric->nextcheck > now)
@@ -1430,7 +1431,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			if (SUCCEED == need_meta_update(metric, lastlogsize_sent, mtime_sent))
 			{
 				/* meta information update */
-				process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL, ITEM_STATE_NORMAL,
+				process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL, metric->state,
 						&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, 1);
 			}
 		}
