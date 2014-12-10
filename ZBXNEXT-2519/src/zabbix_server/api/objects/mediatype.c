@@ -633,7 +633,7 @@ int	zbx_api_mediatype_delete(const zbx_api_user_t *user, const struct zbx_json_p
 		goto out;
 
 	if (SUCCEED != zbx_api_mediatype_user_access_objectids(user, &request.objectids, ZBX_API_ACCESS_WRITE, &error))
-		goto out;
+		goto clean;
 
 	DBbegin();
 
