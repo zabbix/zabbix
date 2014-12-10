@@ -3067,6 +3067,7 @@ void	zbx_api_get_result_clean(zbx_api_get_result_t *self)
 	zbx_vector_ptr_destroy(&self->queries);
 
 	zbx_api_db_clean_rows(&self->rows);
+	zbx_vector_ptr_destroy(&self->rows);
 }
 
 /******************************************************************************
