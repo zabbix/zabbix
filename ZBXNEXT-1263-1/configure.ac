@@ -1068,6 +1068,7 @@ have_snmp="no"
 have_ipmi="no"
 have_ipv6="no"
 have_ssh2="no"
+have_tls="no"
 
 if test "x$ipv6" = "xyes"; then
 	AC_DEFINE(HAVE_IPV6,1,[Define to 1 if IPv6 should be enabled.])
@@ -1296,6 +1297,25 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $SSH2_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $SSH2_LIBS"
 
+	dnl Check for PolarSSL libpolarssl [by default - skip]
+	LIBPOLARSSL_CHECK_CONFIG([no])
+	if test "x$want_polarssl" = "xyes"; then
+		if test "x$found_polarssl" != "xyes"; then
+			AC_MSG_ERROR([PolarSSL library libpolarssl not found])
+		else
+			have_tls="PolarSSL"
+		fi
+	fi
+	CFLAGS="$CFLAGS $POLARSSL_CFLAGS"
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $POLARSSL_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $POLARSSL_LIBS"
+
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $POLARSSL_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $POLARSSL_LIBS"
+
+	AGENT_LDFLAGS="$AGENT_LDFLAGS $POLARSSL_LDFLAGS"
+	AGENT_LIBS="$AGENT_LIBS $POLARSSL_LIBS"
+
 	found_openipmi="no"
 	dnl Check for libOpenIPMI [by default - skip]
 	LIBOPENIPMI_CHECK_CONFIG([no])
@@ -1508,6 +1528,7 @@ echo "  Server details:
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
+    TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${LDFLAGS} ${SERVER_LDFLAGS}
     Libraries:             ${LIBS} ${SERVER_LIBS}"
@@ -1525,6 +1546,7 @@ echo "  Proxy details:
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
+    TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${LDFLAGS} ${PROXY_LDFLAGS}
     Libraries:             ${LIBS} ${PROXY_LIBS}"
@@ -1537,6 +1559,7 @@ echo "
 if test "x$agent" != "xno"; then
 
 echo "  Agent details:
+    TLS:                   ${have_tls}
     Linker flags:          ${LDFLAGS} ${AGENT_LDFLAGS}
     Libraries:             ${LIBS} ${AGENT_LIBS}"
 
