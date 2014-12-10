@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-11 00:28+0200\n"
-"PO-Revision-Date: 2014-10-24 09:03+0300\n"
+"POT-Creation-Date: 2014-12-11 00:41+0200\n"
+"PO-Revision-Date: 2014-11-20 05:52+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1414134201.0\n"
+"X-POOTLE-MTIME: 1416455573.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -9224,7 +9224,7 @@ msgstr "メモリ制限: %s"
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:399
 msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). <memtype> type of process memory (supported on some platforms, see documentation). Example: proc.mem[,root]."
-msgstr ""
+msgstr "プロセスの利用メモリ。<name>はプロセス名 (デフォルト：すべてのプロセス)。<user>はユーザー名 (デフォルト：すべてのユーザー)。<mode>は次の値：avg、max、min、sum (デフォルト)。<cmdline>はコマンドラインによりフィルタリング (正規表現をサポート)。<memtype>はプロセスのメモリのタイプ(いくつかのプラットフォームでサポート、詳細はドキュメント参照)。 例： proc.mem[,root]。"
 
 #: dashboard.php:310 dashboard.php:324 dashboard.php:338 dashboard.php:364
 #: dashboard.php:388 dashboard.php:411 dashboard.php:434 dashboard.php:457
