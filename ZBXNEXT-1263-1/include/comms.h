@@ -20,6 +20,14 @@
 #ifndef ZABBIX_COMMS_H
 #define ZABBIX_COMMS_H
 
+#if defined(HAVE_POLARSSL)
+#	include <polarssl/ssl.h>
+#elif defined(HAVE_GNUTLS)
+#	include <gnutls/gnutls.h>
+#elif defined(HAVE_OPENSSL)
+#	include <openssl/ssl.h>
+#endif
+
 #if defined(_WINDOWS)
 #	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
 typedef int	ssize_t;
@@ -62,18 +70,25 @@ zbx_buf_type_t;
 
 typedef struct
 {
-	int		num_socks;
-	ZBX_SOCKET	sockets[ZBX_SOCKET_COUNT];
-	ZBX_SOCKET	socket;
-	ZBX_SOCKET	socket_orig;
-	size_t		read_bytes;
-	zbx_buf_type_t	buf_type;
-	char		buf_stat[ZBX_STAT_BUF_LEN];
-	char		*buffer;
-	unsigned char	accepted;
-	char		*error;
-	char		*next_line;
-	int		timeout;
+	ZBX_SOCKET		socket;
+	ZBX_SOCKET		socket_orig;
+	size_t			read_bytes;
+	char			*buffer;
+	char			*error;
+	char			*next_line;
+#if defined(HAVE_POLARSSL)
+	ssl_context		*tls_ctx;
+#elif defined(HAVE_GNUTLS)
+	gnutls_session_t	tls_ctx;
+#elif defined(HAVE_OPENSSL)
+	SSL			*tls_ctx;
+#endif
+	int			timeout;
+	zbx_buf_type_t		buf_type;
+	unsigned char		accepted;
+	int			num_socks;
+	ZBX_SOCKET		sockets[ZBX_SOCKET_COUNT];
+	char			buf_stat[ZBX_STAT_BUF_LEN];
 }
 zbx_sock_t;
 
