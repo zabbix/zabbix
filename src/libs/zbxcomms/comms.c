@@ -361,7 +361,8 @@ static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, sockle
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_IPV6)
-int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
+int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
+		int secure)
 {
 	int		ret = FAIL;
 	struct addrinfo	*ai = NULL, hints;
@@ -433,7 +434,8 @@ out:
 	return ret;
 }
 #else
-int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
+int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
+		int secure)
 {
 	ZBX_SOCKADDR	servaddr_in;
 	struct hostent	*hp;
