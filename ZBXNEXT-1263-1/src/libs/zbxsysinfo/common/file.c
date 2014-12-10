@@ -516,7 +516,7 @@ int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	md5_init(&state);
+	zbx_md5_init(&state);
 
 	while (0 < (nbytes = (int)read(f, buf, sizeof(buf))))
 	{
@@ -526,10 +526,10 @@ int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err;
 		}
 
-		md5_append(&state, (const md5_byte_t *)buf, nbytes);
+		zbx_md5_append(&state, (const md5_byte_t *)buf, nbytes);
 	}
 
-	md5_finish(&state, hash);
+	zbx_md5_finish(&state, hash);
 
 	if (0 > nbytes)
 	{

@@ -275,9 +275,9 @@ static int	file_start_md5(int f, int length, md5_byte_t *md5buf, const char *fil
 		return FAIL;
 	}
 
-	md5_init(&state);
-	md5_append(&state, (const md5_byte_t *)buf, length);
-	md5_finish(&state, md5buf);
+	zbx_md5_init(&state);
+	zbx_md5_append(&state, (const md5_byte_t *)buf, length);
+	zbx_md5_finish(&state, md5buf);
 
 	return SUCCEED;
 }
