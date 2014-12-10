@@ -1966,7 +1966,7 @@ const zbx_api_property_t	*zbx_api_class_get_property(const zbx_api_class_t *objc
  *                                                                            *
  * Function: zbx_api_3ptr_compare_func                                        *
  *                                                                            *
- * Purpose: helper function for zbx_api_object_prepare_for_insert() function  *
+ * Purpose: helper function for object prepare functions                      *
  *          to sort property index hashset matching the property order in     *
  *          object class definition.                                          *
  *                                                                            *
@@ -2021,6 +2021,7 @@ int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, const zbx_api_
 
 	zbx_hashset_create(&propindex, 100, ZBX_DEFAULT_STRING_HASH_FUNC, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
+	/* scan objects for used properties */
 	for (i = 0; i < objects->values_num; i++)
 	{
 		zbx_vector_ptr_t	*props = (zbx_vector_ptr_t *)objects->values[i];
@@ -2038,6 +2039,7 @@ int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, const zbx_api_
 		}
 	}
 
+	/* check if the required properties are defined */
 	for (prop = objclass->properties; NULL != prop->name; prop++)
 	{
 		if (0 == (prop->flags & ZBX_API_PROPERTY_REQUIRED))
@@ -2052,7 +2054,7 @@ int	zbx_api_prepare_objects_for_create(zbx_vector_ptr_t *objects, const zbx_api_
 		pi->required = ZBX_API_TRUE;
 	}
 
-
+	/* normalize objects so they have the same properties defined */
 	for (i = 0; i < objects->values_num; i++)
 	{
 		zbx_vector_ptr_t	*props = (zbx_vector_ptr_t *)objects->values[i];

@@ -143,13 +143,16 @@ static int	zbx_api_mediatype_user_access_objects(const zbx_api_user_t *user, con
 	zbx_vector_uint64_create(&objectids);
 
 	zbx_api_objects_to_ids(objects, &objectids);
+
+	zbx_vector_uint64_sort(&objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	ret = zbx_api_mediatype_user_access_objectids(user, &objectids, access, error);
 
 	zbx_vector_uint64_destroy(&objectids);
 
 	return ret;
 }
-
 
 /*
  * mediatype.get
@@ -748,7 +751,7 @@ int	zbx_api_mediatype_update(const zbx_api_user_t *user, const struct zbx_json_p
 		goto out;
 
 	if (SUCCEED != zbx_api_mediatype_user_access_objects(user, &request.objects, ZBX_API_ACCESS_WRITE, &error))
-		goto out;
+		goto clean;
 
 	DBbegin();
 
