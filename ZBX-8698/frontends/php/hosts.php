@@ -682,8 +682,6 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), array('host.m
 /*
  * Display
  */
-$hostsWidget = new CWidget();
-
 $pageFilter = new CPageFilter(array(
 	'groups' => array(
 		'real_hosts' => true,
@@ -695,9 +693,7 @@ $pageFilter = new CPageFilter(array(
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = getRequest('hostid', 0);
 
-if (hasRequest('action') && getRequest('action') == 'host.massupdateform' && hasRequest('hosts')) {
-	$hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'));
-
+if (hasRequest('action') && getRequest('action') === 'host.massupdateform' && hasRequest('hosts')) {
 	$data = array(
 		'hosts' => getRequest('hosts'),
 		'visible' => getRequest('visible', array()),
@@ -752,18 +748,18 @@ if (hasRequest('action') && getRequest('action') == 'host.massupdateform' && has
 		}
 	}
 
-	$hostForm = new CView('configuration.host.massupdate', $data);
-	$hostsWidget->addItem($hostForm->render());
+	$hostView = new CView('configuration.host.massupdate', $data);
 }
-elseif (isset($_REQUEST['form'])) {
-	$hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'));
+elseif (hasRequest('form')) {
+	$data = array(
+		'form' => getRequest('form'),
+		'hostId' => getRequest('hostid', 0),
+		'groupId' => getRequest('groupid', 0)
+	);
 
-	$data = array();
-	if ($hostId = getRequest('hostid', 0)) {
-		$hostsWidget->addItem(get_header_host_table('', $_REQUEST['hostid']));
-
+	if ($data['hostId']) {
 		$dbHosts = API::Host()->get(array(
-			'hostids' => $hostId,
+			'hostids' => $data['hostId'],
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => array('templateid', 'name'),
 			'selectMacros' => API_OUTPUT_EXTEND,
@@ -774,7 +770,7 @@ elseif (isset($_REQUEST['form'])) {
 		$dbHost = reset($dbHosts);
 
 		$dbHost['interfaces'] = API::HostInterface()->get(array(
-			'hostids' => $hostId,
+			'hostids' => $data['hostId'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectItems' => array('type'),
 			'sortfield' => 'interfaceid',
@@ -784,16 +780,7 @@ elseif (isset($_REQUEST['form'])) {
 		$data['dbHost'] = $dbHost;
 	}
 
-	$data['form'] = getRequest('form');
-
-	$hostForm = new CView('configuration.host.edit', $data);
-	$hostsWidget->addItem($hostForm->render());
-
-	$rootClass = 'host-edit';
-	if (getRequest('hostid') && $dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-		$rootClass .= ' host-edit-discovered';
-	}
-	$hostsWidget->setRootClass($rootClass);
+	$hostView = new CView('configuration.host.edit', $data);
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -873,7 +860,6 @@ else {
 	}
 
 	$data = array(
-		'hostsWidget' => $hostsWidget,
 		'pageFilter' => $pageFilter,
 		'hosts' => $hosts,
 		'paging' => $pagingLine,
@@ -886,10 +872,10 @@ else {
 		'proxies' => $proxies
 	);
 
-	$form = new CView('configuration.host.list', $data);
-	$hostsWidget->addItem($form->render());
+	$hostView = new CView('configuration.host.list', $data);
 }
 
-$hostsWidget->show();
+$hostView->render();
+$hostView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
