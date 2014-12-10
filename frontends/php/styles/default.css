@@ -151,7 +151,6 @@ a.weight_normal { font-weight: normal; }
 	border: 0; border-bottom-width: 1px; border-bottom-style: dotted; background: none;
 	text-decoration: none; padding: 1px 1px 0 1px; margin: 0; cursor: pointer;
 }
-.link_menu_with_right_margin { margin-right: 10px; }
 
 span.link_menu { height: 16px; }
 .link_menu[disabled], .link_menu[disabled]:hover { cursor: default; border: 0; }
@@ -457,8 +456,8 @@ table.filter tr td {
 	line-height: 20px; height: 26px; vertical-align: middle; border-left: 0 !important; padding: 0 2px 0 6px;
 }
 table.filter tr td.label { border-right: 0 !important; text-align: right; }
-table.filter tr td.controls { text-align: center; }
-table.filter tr td.controls .ui-button { margin: 1px; }
+table.filter .controls { text-align: center; }
+table.filter .controls .ui-button { margin: 1px 3px; }
 table.filter .text { height: 16px; }
 table.filter .button-form { height: 20px; vertical-align: bottom; /* required to align buttons with input in IE8 */ }
 table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; margin-bottom: 1px; }
@@ -466,7 +465,6 @@ table.filter .host-inventories .select,
 table.filter .host-inventories .text { vertical-align: middle; }
 table.filter tr.item-list-row { height: 26px; }
 table.filter-center tr td { text-align: center; }
-table.filter .ui-button { margin-right: 3px; }
 
 table.filter.sub-filter tr td { text-align: left; }
 table.filter.sub-filter tr td:first-child { width: 8%; }

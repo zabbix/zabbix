@@ -19,23 +19,7 @@
 **/
 
 
-/* @var $hostsWidget CWidget */
-$hostsWidget = $this->data['hostsWidget'];
-
-/* @var $pageFilter CPageFilter */
-$pageFilter = $this->data['pageFilter'];
-
-$paging = $this->data['paging'];
-$filter = $this->data['filter'];
-$hosts = $this->data['hosts'];
-$sortField = $this->data['sortField'];
-$sortOrder = $this->data['sortOrder'];
-$groupId = $this->data['groupId'];
-
-$config = $this->data['config'];
-$templates = $this->data['templates'];
-$proxies = $this->data['proxies'];
-
+$hostWidget = new CWidget(null, 'host-list');
 
 $frmForm = new CForm();
 $frmForm->cleanItems();
@@ -43,24 +27,23 @@ $frmForm->addItem(new CDiv(array(
 	new CSubmit('form', _('Create host')),
 	new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
 )));
-$frmForm->addItem(new CVar('groupid', $groupId, 'filter_groupid_id'));
+$frmForm->addItem(new CVar('groupid', $data['groupId'], 'filter_groupid_id'));
 
-$hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'), $frmForm);
+$hostWidget->addPageHeader(_('CONFIGURATION OF HOSTS'), $frmForm);
 
 $frmGroup = new CForm('get');
-$frmGroup->addItem(array(_('Group').' ', $pageFilter->getGroupsCB()));
+$frmGroup->addItem(array(_('Group').' ', $data['pageFilter']->getGroupsCB()));
 
-$hostsWidget->addHeader(_('Hosts'), $frmGroup);
-$hostsWidget->addHeaderRowNumber();
-$hostsWidget->setRootClass('host-list');
+$hostWidget->addHeader(_('Hosts'), $frmGroup);
+$hostWidget->addHeaderRowNumber();
 
 // filter
 $filterTable = new CTable('', 'filter filter-center');
 $filterTable->addRow(array(
-	array(array(bold(_('Name')), ' '._('like').NAME_DELIMITER), new CTextBox('filter_host', $filter['host'], 20)),
-	array(array(bold(_('DNS')), ' '._('like').NAME_DELIMITER), new CTextBox('filter_dns', $filter['dns'], 20)),
-	array(array(bold(_('IP')), ' '._('like').NAME_DELIMITER), new CTextBox('filter_ip', $filter['ip'], 20)),
-	array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $filter['port'], 20))
+	array(array(bold(_('Name')),' '._('like').' '), new CTextBox('filter_host', $data['filter']['host'], 20)),
+	array(array(bold(_('DNS')),' '._('like').' '), new CTextBox('filter_dns', $data['filter']['dns'], 20)),
+	array(array(bold(_('IP')),' '._('like').' '), new CTextBox('filter_ip', $data['filter']['ip'], 20)),
+	array(bold(_('Port').' '), new CTextBox('filter_port', $data['filter']['port'], 20))
 ));
 
 $filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();',
@@ -73,7 +56,7 @@ $resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOn
 );
 
 $divButtons = new CDiv(array($filterButton, $resetButton));
-$divButtons->setAttribute('style', 'padding: 4px 0;');
+$divButtons->addStyle('padding: 4px 0;');
 
 $filterTable->addRow(new CCol($divButtons, 'controls', 4));
 
@@ -82,7 +65,7 @@ $filterForm->setAttribute('name', 'zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
 $filterForm->addItem($filterTable);
 
-$hostsWidget->addFlicker($filterForm, CProfile::get('web.hosts.filter.state', 0));
+$hostWidget->addFlicker($filterForm, CProfile::get('web.hosts.filter.state', 0));
 
 // table hosts
 $form = new CForm();
@@ -91,7 +74,7 @@ $form->setName('hosts');
 $table = new CTableInfo(_('No hosts found.'));
 $table->setHeader(array(
 	new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');"),
-	make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
+	make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
 	_('Applications'),
 	_('Items'),
 	_('Triggers'),
@@ -100,37 +83,43 @@ $table->setHeader(array(
 	_('Web'),
 	_('Interface'),
 	_('Templates'),
-	make_sorting_header(_('Status'), 'status', $sortField, $sortOrder),
+	make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder']),
 	_('Availability')
 ));
 
-foreach ($hosts as $host) {
+foreach ($data['hosts'] as $host) {
 	$interface = reset($host['interfaces']);
 
-	$applications = array(new CLink(_('Applications'), 'applications.php?groupid='.$groupId.'&hostid='.$host['hostid']),
-						' ('.$host['applications'].')');
-	$items = array(new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$host['hostid']),
-						' ('.$host['items'].')');
-	$triggers = array(new CLink(_('Triggers'), 'triggers.php?groupid='.$groupId.'&hostid='.$host['hostid']),
-						' ('.$host['triggers'].')');
-	$graphs = array(new CLink(_('Graphs'), 'graphs.php?groupid='.$groupId.'&hostid='.$host['hostid']),
-						' ('.$host['graphs'].')');
+	$applications = array(new CLink(_('Applications'),
+		'applications.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']), ' ('.$host['applications'].')'
+	);
+	$items = array(new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$host['hostid']), ' ('.$host['items'].')');
+	$triggers = array(new CLink(_('Triggers'),
+		'triggers.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']), ' ('.$host['triggers'].')'
+	);
+	$graphs = array(new CLink(_('Graphs'), 'graphs.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+		' ('.$host['graphs'].')'
+	);
 	$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$host['hostid']),
-						' ('.$host['discoveries'].')');
-	$httpTests = array(new CLink(_('Web'), 'httpconf.php?&hostid='.$host['hostid']),
-						' ('.$host['httpTests'].')');
+		' ('.$host['discoveries'].')'
+	);
+	$httpTests = array(new CLink(_('Web'), 'httpconf.php?&hostid='.$host['hostid']), ' ('.$host['httpTests'].')');
 
 	$description = array();
 
-	if (isset($proxies[$host['proxy_hostid']])) {
-		$description[] = $proxies[$host['proxy_hostid']]['host'].NAME_DELIMITER;
+	if (isset($data['proxies'][$host['proxy_hostid']])) {
+		$description[] = $data['proxies'][$host['proxy_hostid']]['host'].NAME_DELIMITER;
 	}
 	if ($host['discoveryRule']) {
-		$description[] = new CLink($host['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid'], 'parent-discovery');
+		$description[] = new CLink($host['discoveryRule']['name'],
+			'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid'], 'parent-discovery'
+		);
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = new CLink(CHtml::encode($host['name']), 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
+	$description[] = new CLink(CHtml::encode($host['name']),
+		'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid')
+	);
 
 	$hostInterface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 	$hostInterface .= empty($interface['port']) ? '' : NAME_DELIMITER.$interface['port'];
@@ -171,7 +160,7 @@ foreach ($hosts as $host) {
 		foreach ($host['parentTemplates'] as $template) {
 			$i++;
 
-			if ($i > $config['max_in_table']) {
+			if ($i > $data['config']['max_in_table']) {
 				$hostTemplates[] = ' &hellip;';
 
 				break;
@@ -183,12 +172,15 @@ foreach ($hosts as $host) {
 				'unknown'
 			));
 
-			if (!empty($templates[$template['templateid']]['parentTemplates'])) {
-				order_result($templates[$template['templateid']]['parentTemplates'], 'name');
+			$parentTemplates = $data['templates'][$template['templateid']]['parentTemplates'];
+			if ($parentTemplates) {
+				order_result($parentTemplates, 'name');
 
 				$caption[] = ' (';
-				foreach ($templates[$template['templateid']]['parentTemplates'] as $tpl) {
-					$caption[] = new CLink(CHtml::encode($tpl['name']),'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
+				foreach ($parentTemplates as $parentTemplate) {
+					$caption[] = new CLink(CHtml::encode($parentTemplate['name']),
+						'templates.php?form=update&templateid='.$parentTemplate['templateid'], 'unknown'
+					);
 					$caption[] = ', ';
 				}
 				array_pop($caption);
@@ -242,6 +234,8 @@ $goButton->setAttribute('id', 'goButton');
 
 zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
-$form->addItem(array($paging, $table, $paging, get_table_header(array($goBox, $goButton))));
+$form->addItem(array($data['paging'], $table, $data['paging'], get_table_header(array($goBox, $goButton))));
 
-return $form;
+$hostWidget->addItem($form);
+
+return $hostWidget;
