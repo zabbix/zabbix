@@ -28,7 +28,7 @@ if (!isset($_REQUEST['form_refresh'])) {
 
 $groupIds = getRequest('groups', array());
 if (getRequest('groupid') != 0 && !$groupIds) {
-	$groupIds[]= getRequest('groupid');
+	$groupIds[] = getRequest('groupid');
 }
 
 $newgroup = get_request('newgroup', '');
