@@ -604,7 +604,11 @@ class CHostInterface extends CApiService {
 	 * @param array $interface
 	 */
 	protected function checkIp(array $interface) {
-		$ipValidator = new CIPValidator(array('allowMacros' => true));
+		$ipValidator = new CIPValidator(array(
+			'empty' => true,
+			'allowMacros' => true
+		));
+
 		if (!$ipValidator->validate($interface['ip'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $ipValidator->getError());
 		}

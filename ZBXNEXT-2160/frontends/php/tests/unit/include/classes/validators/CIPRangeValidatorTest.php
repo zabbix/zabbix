@@ -32,6 +32,7 @@ class CIPRangeValidatorTest extends CValidatorTest {
 	public function validParamProvider() {
 		return array(
 			array(array(
+				'empty' => true,
 				'skipIpCountLimit' => true
 			))
 		);
@@ -63,7 +64,8 @@ class CIPRangeValidatorTest extends CValidatorTest {
 			array(array(), 'fe80::c0a8:0/128'),
 			array(array(), 'fe80:0:0:0:0:0:c0a8:0-ff'),
 			array(array(), 'fe80::c0a8:0-ff'),
-			array(array('skipIpCountLimit' => true), '0-255.0-255.0-255.0-255')
+			array(array('skipIpCountLimit' => true), '0-255.0-255.0-255.0-255'),
+			array(array('empty' => true), '')
 		);
 	}
 

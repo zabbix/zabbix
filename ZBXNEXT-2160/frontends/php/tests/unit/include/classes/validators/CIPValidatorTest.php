@@ -32,6 +32,7 @@ class CIPValidatorTest extends CValidatorTest {
 	public function validParamProvider() {
 		return array(
 			array(array(
+				'empty' => true,
 				'allowMacros' => true
 			))
 		);
@@ -51,7 +52,8 @@ class CIPValidatorTest extends CValidatorTest {
 			array(array(), '2002:0:0:0:0:0:ffff:ffff'),
 			array(array(), 'fe80:0:0:0:0:0:c0a8:100'),
 			array(array(), 'fe80::c0a8:100'),
-			array(array('allowMacros' => true), '{$A}')
+			array(array('allowMacros' => true), '{$A}'),
+			array(array('empty' => true), '')
 		);
 	}
 

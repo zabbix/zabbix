@@ -25,6 +25,13 @@
 class CIPValidator extends CValidator {
 
 	/**
+	 * If set to false, the string cannot be empty.
+	 *
+	 * @var bool
+	 */
+	public $empty = false;
+
+	/**
 	 * If set to false, only IPv4 and IPv6 is allowed. If set to true, macros are allowed instead of IP address.
 	 *
 	 * @var bool
@@ -46,10 +53,14 @@ class CIPValidator extends CValidator {
 			return false;
 		}
 
-		if (zbx_empty($ip)) {
+		if (!$this->empty && zbx_empty($ip)) {
 			$this->setError(_('IP address cannot be empty.'));
 
 			return false;
+		}
+		elseif ($this->empty && zbx_empty($ip)) {
+
+			return true;
 		}
 
 		$isValidIp = ($this->isValidIPv4($ip) || $this->isValidIPv6($ip));
