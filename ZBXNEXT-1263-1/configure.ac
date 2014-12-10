@@ -1320,6 +1320,12 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	AGENT_LDFLAGS="$AGENT_LDFLAGS $POLARSSL_LDFLAGS"
 	AGENT_LIBS="$AGENT_LIBS $POLARSSL_LIBS"
 
+	ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $POLARSSL_LDFLAGS"
+	ZBXGET_LIBS="$ZBXGET_LIBS $POLARSSL_LIBS"
+
+	SENDER_LDFLAGS="$SENDER_LDFLAGS $POLARSSL_LDFLAGS"
+	SENDER_LIBS="$SENDER_LIBS $POLARSSL_LIBS"
+
 	dnl Check for GnuTLS libgnutls [by default - skip]
 	LIBGNUTLS_CHECK_CONFIG([no])
 	if test "x$want_gnutls" = "xyes"; then
@@ -1343,6 +1349,12 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	AGENT_LDFLAGS="$AGENT_LDFLAGS $GNUTLS_LDFLAGS"
 	AGENT_LIBS="$AGENT_LIBS $GNUTLS_LIBS"
 
+	ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $GNUTLS_LDFLAGS"
+	ZBXGET_LIBS="$ZBXGET_LIBS $GNUTLS_LIBS"
+
+	SENDER_LDFLAGS="$SENDER_LDFLAGS $GNUTLS_LDFLAGS"
+	SENDER_LIBS="$SENDER_LIBS $GNUTLS_LIBS"
+
 	dnl Check for OpenSSL libssl [by default - skip]
 	LIBOPENSSL_CHECK_CONFIG([no])
 	if test "x$want_openssl" = "xyes"; then
@@ -1365,6 +1377,12 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	AGENT_LDFLAGS="$AGENT_LDFLAGS $OPENSSL_LDFLAGS"
 	AGENT_LIBS="$AGENT_LIBS $OPENSSL_LIBS"
+
+	ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $OPENSSL_LDFLAGS"
+	ZBXGET_LIBS="$ZBXGET_LIBS $OPENSSL_LIBS"
+
+	SENDER_LDFLAGS="$SENDER_LDFLAGS $OPENSSL_LDFLAGS"
+	SENDER_LIBS="$SENDER_LIBS $OPENSSL_LIBS"
 
 	found_openipmi="no"
 	dnl Check for libOpenIPMI [by default - skip]
@@ -1461,6 +1479,12 @@ AC_SUBST(PROXY_LIBS)
 
 AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
+
+AC_SUBST(ZBXGET_LDFLAGS)
+AC_SUBST(ZBXGET_LIBS)
+
+AC_SUBST(SENDER_LDFLAGS)
+AC_SUBST(SENDER_LIBS)
 
 dnl *****************************************************************
 dnl *                                                               *
