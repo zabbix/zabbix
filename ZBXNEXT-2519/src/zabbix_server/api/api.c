@@ -652,7 +652,7 @@ static int	zbx_api_get_param_filter(const char *param, const char **next, const 
 			case ZBX_TYPE_UINT:
 			case ZBX_TYPE_FLOAT:
 			case ZBX_TYPE_INT:
-				if (ZBX_API_TRUE != like)
+				if (ZBX_API_TRUE == like)
 				{
 					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field \"%s\" type",
 							param, (char *)objects.values[i].second);
@@ -673,7 +673,7 @@ static int	zbx_api_get_param_filter(const char *param, const char **next, const 
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_SHORTTEXT:
-				if (ZBX_API_FALSE == like)
+				if (ZBX_API_FALSE != like)
 				{
 					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" field \"%s\" type",
 							param, (char *)objects.values[i].second);
@@ -687,18 +687,14 @@ static int	zbx_api_get_param_filter(const char *param, const char **next, const 
 		}
 
 		zbx_vector_ptr_pair_append(value, pair);
-
-		/* free the field name and move ownership of field value to filter */
-		zbx_free(objects.values[i].first);
 	}
 
 	ret = SUCCEED;
 out:
-	zbx_api_filter_vector_clear(&objects);
-
 	if (SUCCEED != ret)
 		zbx_api_vector_ptr_pair_clear(value);
 
+	zbx_api_vector_ptr_pair_clear(&objects);
 	zbx_vector_ptr_pair_destroy(&objects);
 
 	return ret;
@@ -1270,6 +1266,13 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_class_t *
 		{
 			goto out;
 		}
+
+		if (0 >= self->limit)
+		{
+			*error = zbx_dsprintf(*error, "invalid parameter \"%s\" value \"%d\"",
+					zbx_api_params[ZBX_API_PARAM_LIMIT], self->limit);
+			goto out;
+		}
 	}
 	else if (0 == strcmp(parameter, zbx_api_params[ZBX_API_PARAM_PRESERVEKEYS]))
 	{
@@ -1429,7 +1432,16 @@ int	zbx_api_getoptions_parse(zbx_api_getoptions_t *self, const zbx_api_class_t *
 							zbx_api_params[ZBX_API_PARAM_SORTFIELD],
 							sortfields.values[i]);
 
-					zbx_vector_ptr_clear_ext(&self->sort, zbx_ptr_free);
+					rc = FAIL;
+					break;
+				}
+
+				if (0 == (sort->field->flags & ZBX_API_PROPERTY_SORTABLE))
+				{
+					*error = zbx_dsprintf(*error, "invalid parameter \"%s\" value \"%s\"",
+							zbx_api_params[ZBX_API_PARAM_SORTFIELD],
+							sortfields.values[i]);
+
 					rc = FAIL;
 					break;
 				}
@@ -1587,6 +1599,12 @@ int	zbx_api_getoptions_finalize(zbx_api_getoptions_t *self, const zbx_api_class_
 	const zbx_api_property_t	*prop;
 
 	if (SUCCEED != zbx_api_getoptions_validate_dependency(self, ZBX_API_PARAM_EXCLUDESEARCH, ZBX_API_PARAM_SEARCH,
+			error))
+	{
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_api_getoptions_validate_dependency(self, ZBX_API_PARAM_STARTSEARCH, ZBX_API_PARAM_SEARCH,
 			error))
 	{
 		return FAIL;
