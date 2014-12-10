@@ -634,6 +634,25 @@ class CHost extends CHostGeneral {
 				'preservekeys' => true
 			));
 		}
+		else {
+			$groupIds = array();
+
+			foreach ($hosts as $host) {
+				if (!isset($host['groups'])) {
+					continue;
+				}
+				$groupIds = array_merge($groupIds, zbx_objectValues($host['groups'], 'groupid'));
+			}
+
+			if ($groupIds) {
+				$dbGroups = API::HostGroup()->get(array(
+					'output' => array('groupid'),
+					'groupids' => $groupIds,
+					'editable' => true,
+					'preservekeys' => true
+				));
+			}
+		}
 
 		foreach ($hosts as $host) {
 			// validate mandatory fields
@@ -662,6 +681,14 @@ class CHost extends CHostGeneral {
 			else {
 				if (!isset($host['groups'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
+				}
+
+				foreach ($host['groups'] as $group) {
+					if (!isset($dbGroups[$group['groupid']])) {
+						self::exception(ZBX_API_ERROR_PERMISSIONS,
+							_('No permissions to referred object or it does not exist!')
+						);
+					}
 				}
 			}
 		}
