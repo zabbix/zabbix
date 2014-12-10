@@ -34,7 +34,8 @@ int	connect_to_server(zbx_sock_t *sock, int timeout, int retry_interval)
 	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_server() [%s]:%d [timeout:%d]",
 			CONFIG_SERVER, CONFIG_SERVER_PORT, timeout);
 
-	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout)))
+	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout,
+			ZBX_TCP_SEC_NULL)))
 	{
 		if (0 == retry_interval)
 		{
@@ -46,7 +47,8 @@ int	connect_to_server(zbx_sock_t *sock, int timeout, int retry_interval)
 			zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s]:%d [%s]. Will retry every %d second(s)",
 					CONFIG_SERVER, CONFIG_SERVER_PORT, zbx_tcp_strerror(), retry_interval);
 			lastlogtime = (int)time(NULL);
-			while (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout)))
+			while (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT,
+					timeout, ZBX_TCP_SEC_NULL)))
 			{
 				now = (int)time(NULL);
 				if (60 <= now - lastlogtime)
