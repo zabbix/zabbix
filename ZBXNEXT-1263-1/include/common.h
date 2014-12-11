@@ -662,6 +662,7 @@ void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, si
 void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
 void    *zbx_realloc2(const char *filename, int line, void *old, size_t size);
 char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);
+void	*zbx_guaranteed_memset(void *v, int c, size_t n);
 
 #define zbx_free(ptr)		\
 				\
