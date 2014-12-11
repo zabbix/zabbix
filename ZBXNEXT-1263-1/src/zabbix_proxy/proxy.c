@@ -52,6 +52,7 @@
 #include "../zabbix_server/selfmon/selfmon.h"
 #include "../zabbix_server/vmware/vmware.h"
 #include "setproctitle.h"
+#include "../libs/zbxcrypto/tls.h"
 
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_proxy";
@@ -769,6 +770,11 @@ int	MAIN_ZABBIX_ENTRY()
 #else
 #	define IPV6_FEATURE_STATUS 	" NO"
 #endif
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#	define TLS_FEATURE_STATUS	"YES"
+#else
+#	define TLS_FEATURE_STATUS	" NO"
+#endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).",
 			ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE ? "passive" : "active",
@@ -782,6 +788,7 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "ODBC:                  " ODBC_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "SSH2 support:          " SSH2_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:          " IPV6_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
 
@@ -840,6 +847,9 @@ int	MAIN_ZABBIX_ENTRY()
 		}
 	}
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_parent();
+#endif
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
 	for (i = 0; i < threads_num; i++)

@@ -52,6 +52,7 @@
 #endif
 
 #include "setproctitle.h"
+#include "../libs/zbxcrypto/tls.h"
 
 const char	*progname = NULL;
 
@@ -169,6 +170,12 @@ static char	shortopts[] =
 #endif
 	;
 /* end of COMMAND LINE OPTIONS */
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#	define TLS_FEATURE_STATUS	"YES"
+#else
+#	define TLS_FEATURE_STATUS	" NO"
+#endif
 
 static char		*TEST_METRIC = NULL;
 int			threads_num = 0;
@@ -798,6 +805,9 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Agent [%s]. Zabbix %s (revision %s).",
 			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
+	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
 
 #ifndef _WINDOWS
@@ -824,6 +834,9 @@ int	MAIN_ZABBIX_ENTRY()
 #endif
 	zbx_free_config();
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_parent();
+#endif
 	/* --- START THREADS ---*/
 
 	/* allocate memory for a collector, all listeners and active checks */

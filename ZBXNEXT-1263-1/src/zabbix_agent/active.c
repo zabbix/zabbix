@@ -44,6 +44,8 @@ extern int		server_num, process_num;
 #	include "daemon.h"
 #endif
 
+#include "../libs/zbxcrypto/tls.h"
+
 ZBX_THREAD_LOCAL static ZBX_ACTIVE_METRIC	*active_metrics = NULL;
 ZBX_THREAD_LOCAL static ZBX_ACTIVE_BUFFER	buffer;
 ZBX_THREAD_LOCAL static zbx_vector_ptr_t	regexps;
@@ -1352,6 +1354,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	zbx_free(args);
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child();
+#endif
 	init_active_metrics();
 
 	while (ZBX_IS_RUNNING())

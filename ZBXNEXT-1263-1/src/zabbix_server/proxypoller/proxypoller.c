@@ -29,6 +29,7 @@
 #include "zbxjson.h"
 #include "log.h"
 #include "proxy.h"
+#include "../../libs/zbxcrypto/tls.h"
 
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
@@ -355,6 +356,9 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child();
+#endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 

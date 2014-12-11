@@ -36,6 +36,7 @@
 #include "proxyhosts.h"
 
 #include "daemon.h"
+#include "../../libs/zbxcrypto/tls.h"
 
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
@@ -656,6 +657,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child();
+#endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
