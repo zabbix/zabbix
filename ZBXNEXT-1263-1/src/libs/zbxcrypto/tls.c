@@ -21,6 +21,45 @@
 #include "log.h"
 #include "tls.h"
 
+#if defined(HAVE_POLARSSL)
+#	include <polarssl/entropy.h>
+#	include <polarssl/ctr_drbg.h>
+#elif defined(HAVE_GNUTLS)
+#	include <gnutls/gnutls.h>
+#elif defined(HAVE_OPENSSL)
+#	include <openssl/ssl.h>
+#endif
+
+#if defined(HAVE_POLARSSL)
+static entropy_context	entropy;
+static ctr_drbg_context	ctr_drbg;
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_make_personalization_string                              *
+ *                                                                            *
+ * Purpose: provide additional entropy for initialization of crypto library   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     For more information about why and how to use personalization strings  *
+ *     see                                                                    *
+ *     https://polarssl.org/module-level-design-rng                           *
+ *     http://csrc.nist.gov/publications/nistpubs/800-90A/SP800-90A.pdf       *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_tls_make_personalization_string(char **pers, size_t *len)
+{
+	/* TODO: follow recommendations in http://csrc.nist.gov/publications/nistpubs/800-90A/SP800-90A.pdf */
+	/* and add more entropy into the personalization string (e.g. process PID, microseconds of current time etc.) */
+	/* Pay attention to the personalization string length as described in SP800-90A.pdf */
+
+	/* For demo purposes only. TODO: replace with production code. */
+#define DEMO_PERS_STRING	"Zabbix TLSZabbix TLSZabbix TLSZabbix TLSZabbix TLS"
+	*pers = zbx_strdup(*pers, DEMO_PERS_STRING);
+	*len = strlen(DEMO_PERS_STRING);
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_init_parent                                              *
@@ -52,8 +91,35 @@ int	zbx_tls_init_child(void)
 	const char	*__function_name = "zbx_tls_init_child";
 	int		ret = SUCCEED;
 
+#if defined(HAVE_POLARSSL)
+	char	*pers = NULL;
+	size_t	pers_len = 0;
+#endif
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-	/* TODO fill in implementation */
+
+#if defined(HAVE_POLARSSL)
+	entropy_init(&entropy);
+	zbx_tls_make_personalization_string(&pers, &pers_len);
+
+	if (0 != (ret = ctr_drbg_init(&ctr_drbg, entropy_func, &entropy, (unsigned char *)pers, pers_len)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize random number generator: %d", ret);
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_guaranteed_memset(pers, 0, pers_len);
+	zbx_free(pers);
+#elif defined(HAVE_GNUTLS)
+	if (GNUTLS_E_SUCCESS != gnutls_global_init())
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize GnuTLS library");
+		exit(EXIT_FAILURE);
+	}
+#elif defined(HAVE_OPENSSL)
+	SSL_load_error_strings();
+	SSL_library_init();
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
