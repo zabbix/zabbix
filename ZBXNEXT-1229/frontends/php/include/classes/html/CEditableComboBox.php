@@ -50,7 +50,7 @@ class CEditableComboBox extends CComboBox {
 	}
 
 	public function toString($destroy = true) {
-		if (!isset($this->value_exist) && !empty($this->value)) {
+		if (!isset($this->value_exist) && !zbx_empty($this->value)) {
 			$this->addItem($this->value, $this->value, 'yes');
 		}
 		return parent::toString($destroy);

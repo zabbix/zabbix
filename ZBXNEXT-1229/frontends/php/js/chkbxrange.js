@@ -254,7 +254,7 @@ var chkbxRange = {
 
 		// update go button
 		var goButton = jQuery('#goButton');
-		goButton.val(goButton.val().split(' ')[0] + ' (' + count + ')')
+		goButton.text(goButton.text().split(' ')[0] + ' (' + count + ')')
 			.prop('disabled', count == 0);
 		jQuery('#action').prop('disabled', count == 0);
 	},

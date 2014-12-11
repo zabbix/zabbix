@@ -79,7 +79,7 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	VARIANT			vtProp;
 	IWbemLocator		*pLoc = 0;
 	IWbemServices		*pService = 0;
-	IEnumWbemClassObject*	pEnumerator = 0;
+	IEnumWbemClassObject	*pEnumerator = 0;
 	HRESULT			hres;
 	int			ret = SYSINFO_RET_FAIL;
 
@@ -117,7 +117,7 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-	/* set the IWbemServices proxy so that impersonation f the user (client) occurs */
+	/* set the IWbemServices proxy so that impersonation of the user (client) occurs */
 	hres = CoSetProxyBlanket(pService, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, NULL, RPC_C_AUTHN_LEVEL_CALL,
 			RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE);
 
@@ -154,9 +154,7 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	pclsObj->EndEnumeration();
 
 	if (FAILED(hres) || hres == WBEM_S_NO_MORE_DATA)
-	{
 		goto out;
-	}
 
 	if (0 != (vtProp.vt & VT_ARRAY))
 	{
@@ -164,7 +162,7 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-	switch(vtProp.vt)
+	switch (vtProp.vt)
 	{
 		case VT_EMPTY:
 		case VT_NULL:
@@ -214,7 +212,7 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				goto out;
 			}
 
-			SET_TEXT_RESULT(result, zbx_strdup(NULL, (char*)_bstr_t(vtProp.bstrVal)));
+			SET_TEXT_RESULT(result, zbx_strdup(NULL, (char *)_bstr_t(vtProp.bstrVal)));
 			ret = SYSINFO_RET_OK;
 
 			break;
@@ -222,10 +220,13 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 out:
 	VariantClear(&vtProp);
 
+	if (0 != pclsObj)
+		pclsObj->Release();
+
 	if (0 != pEnumerator)
 		pEnumerator->Release();
 
-	if( 0 != pService)
+	if (0 != pService)
 		pService->Release();
 
 	if (0 != pLoc)
