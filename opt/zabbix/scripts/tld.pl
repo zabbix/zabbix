@@ -164,8 +164,11 @@ if (defined($OPTS{'get-nsservers-list'})) {
     foreach my $tld (sort keys %{$nsservers}) {
 	my $ns = $nsservers->{$tld};
 	foreach my $type (sort keys %{$ns}) {
-	    foreach my $ip (sort keys %{$ns->{$type}}) {
-	    	print $tld.",".$type.",".$ns->{$type}->{$ip}.",".$ip."\n";
+	    foreach my $ns_name (sort keys %{$ns->{$type}}) {
+		my @ip_list = @{$ns->{$type}->{$ns_name}};
+		foreach my $ip (@ip_list) {
+	    	    print $tld.",".$type.",".$ns_name.",".$ip."\n";
+		}
 	    }
 	}
     }
@@ -1864,10 +1867,10 @@ sub get_nsservers_list($) {
 	$name =~s/.+\,(.+)\,.+\]$/$1/;
 	
 	if ($ip=~/\d*\.\d*\.\d*\.\d+/) {
-	    $result->{'v4'}->{$ip} = $name;
+	    push @{$result->{'v4'}->{$name}}, $ip;
 	}
 	else {
-	    $result->{'v6'}->{$ip} = $name;
+	    push @{$result->{'v6'}->{$name}}, $ip;
 	}
     }
 
