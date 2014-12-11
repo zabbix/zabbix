@@ -45,7 +45,7 @@ $fields = array(
 	'delay'           => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})', _('Update interval (in sec)')),
 	'retries'         => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({add}) || isset({update})', _('Retries')),
 	'status'          => array(T_ZBX_STR, O_OPT, null,  null,                    null),
-	'agent'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})'),
+	'agent'           => array(T_ZBX_STR, O_OPT, P_NO_TRIM, null,                'isset({add}) || isset({update})'),
 	'variables'       => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})'),
 	'steps'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})', _('Steps')),
 	'authentication'  => array(T_ZBX_INT, O_OPT, null,  IN('0,1,2'),             'isset({add}) || isset({update})'),
@@ -524,12 +524,16 @@ if (isset($_REQUEST['form'])) {
 			$data['status'] = HTTPTEST_STATUS_ACTIVE;
 		}
 
+		$agent = (hasRequest('agent') && zbx_empty(getRequest('agent')))
+			? ZBX_DEFAULT_AGENT
+			: getRequest('agent', ZBX_DEFAULT_AGENT);
+
 		$data['name'] = getRequest('name', '');
 		$data['applicationid'] = getRequest('applicationid');
 		$data['new_application'] = getRequest('new_application', '');
 		$data['delay'] = getRequest('delay', 60);
 		$data['retries'] = getRequest('retries', 1);
-		$data['agent'] = getRequest('agent', '');
+		$data['agent'] = $agent;
 		$data['variables'] = getRequest('variables', array());
 		$data['authentication'] = getRequest('authentication', HTTPTEST_AUTH_NONE);
 		$data['http_user'] = getRequest('http_user', '');

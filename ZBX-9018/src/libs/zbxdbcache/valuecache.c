@@ -63,7 +63,7 @@ static time_t (*vc_time)(time_t *) = time;
 
 static zbx_mem_info_t	*vc_mem = NULL;
 
-static ZBX_MUTEX	vc_lock;
+static ZBX_MUTEX	vc_lock = ZBX_MUTEX_NULL;
 
 /* flag indicating that the cache was explicitly locked by this process */
 static int	vc_locked = 0;
@@ -2434,7 +2434,7 @@ void	zbx_vc_init(void)
 		exit(EXIT_FAILURE);
 	}
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&vc_lock, ZBX_MUTEX_VALUECACHE))
+	if (FAIL == zbx_mutex_create_force(&vc_lock, ZBX_MUTEX_VALUECACHE))
 	{
 		zbx_error("cannot create mutex for value cache");
 		exit(EXIT_FAILURE);
@@ -2658,8 +2658,7 @@ out:
 						(zbx_compare_func_t)vc_history_record_compare_desc_func);
 
 				/* vc_db_read_values_by_count() returns requested values + the rest of values having */
-				/* within the same second as the last value - so drop the values outside request     */
-				/* range                                                                             */
+				/* within the same second as the last value, so drop the values outside request range */
 				while (count < values->values_num)
 					zbx_history_record_clear(&values->values[--values->values_num], value_type);
 			}

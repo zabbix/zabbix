@@ -38,41 +38,43 @@ div.preloader {
 	background: url("images/preloader.gif") no-repeat;
 }
 
-.input[readonly], .input[readonly]:hover {
-	border-color: #d0d0d0;
-	background: #eeeeee;
-	color: #000000;
-}
+/* button */
+.button-plain { border: 1px solid #808080; }
+.button-plain:hover { border-color: #000; }
+.button-plain[disabled], .button-plain[disabled]:hover { border-color: #d0d0d0; background: #eee; color: #aca899; }
 
+.link_menu { border-color: #3c3089; color: #3c3089; }
+.link_menu:hover { color: #6c80b9; border-color: #6c80b9; }
+.link_menu[disabled], .link_menu[disabled]:hover { background-color: #fff; color: #aca899; }
+
+.ui-button.main, .ui-button.main[disabled]:hover { border-color: #ffaa33 !important; }
+.ui-button.main:hover { border-color: #dd7711 !important; }
+
+/* form input and form buttons */
+.input, .button-form { border: 1px solid #aca899; background-color: #fff; }
+.checkbox { border: none; }
+
+.button-form { background: #fff; }
+.button-form:hover { border-color: #6e8ab4; }
+
+.input:focus, .input:hover { border-color: #6e8ab4; }
+.input[readonly], .input[readonly]:hover, .input[readonly]:focus {
+	border-color: #d0d0d0; background: #eee; color: #000;
+}
 .input[disabled], .input[disabled]:hover,
-input.input.formlist[type="button"][disabled], input.input.formlist[type="submit"][disabled] {
-	border-color: #d0d0d0;
-	background: #eeeeee;
+.button-form[disabled], .button-form[disabled]:hover {
+	border-color: #d0d0d0; background: #eee;
 	/* ignored by IE for <select> */
 	color: #aca899;
 }
 
+/* Make checked checkboxes/radiobuttons have black label text */
+.radioset .ui-button.ui-state-active .ui-button-text { color: #000; }
+.radioset .ui-button.ui-state-active.ui-state-disabled .ui-button-text { color: #777; }
+
 /* disabled <select> font color for IE 10+ */
 select[disabled]::-ms-value {
 	color: #aca899;
-}
-
-.link_menu[disabled], .link_menu[disabled]:hover {
-	background-color: #ffffff;
-	color: #aca899;
-}
-
-/* disabled form buttons */
-.formtable .input.button[disabled]:hover {
-	background-color: #fafbfc;
-	border-color: #ced8e6;
-	color: #a8bfd4;
-}
-
-/* disabled save button */
-.formtable .jqueryinput.input.button[disabled]:hover {
-	border-color: #ffaa33;
-	color: #a8bfd4;
 }
 
 /* show non-gray background for disabled multiselect inputs on hover */

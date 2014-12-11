@@ -34,7 +34,7 @@ class CFunctionValidator extends CValidator {
 	 *   )
 	 * )
 	 *
-	 * <parameter_type> can be 'sec', 'sec_num' or 'str'
+	 * <parameter_type> can be 'num', 'operation', 'percent', 'sec_num', 'sec_num_zero', 'sec_zero', 'str'
 	 * <value_type> can be one of ITEM_VALUE_TYPE_*
 	 *
 	 * @var array
@@ -185,6 +185,14 @@ class CFunctionValidator extends CValidator {
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
 			),
+			'percentile' => array(
+				'args' => array(
+					array('type' => 'sec_num', 'mandat' => true),
+					array('type' => 'sec_zero', 'can_be_empty' => true),
+					array('type' => 'percent', 'mandat' => true)
+				),
+				'value_types' => $valueTypesNum
+			),
 			'prev' => array(
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
@@ -304,7 +312,7 @@ class CFunctionValidator extends CValidator {
 	 * Validate trigger function parameter.
 	 *
 	 * @param string $param
-	 * @param string $type  a type of the parameter ('sec_zero', 'sec_num', 'sec_num_zero', 'num', 'operation')
+	 * @param string $type  type of $param ('num', 'operation', 'percent', 'sec_num', 'sec_num_zero', 'sec_zero', 'str')
 	 *
 	 * @return bool
 	 */
@@ -321,6 +329,9 @@ class CFunctionValidator extends CValidator {
 
 			case 'num':
 				return is_numeric($param);
+
+			case 'percent':
+				return $this->validatePercent($param);
 
 			case 'operation':
 				return $this->validateOperation($param);
@@ -382,6 +393,18 @@ class CFunctionValidator extends CValidator {
 		}
 
 		return $this->validateSecValue($param);
+	}
+
+	/**
+	 * Validate trigger function parameter which can contain a percentage.
+	 * Examples: 0, 1, 1.2, 1.2345, 1., .1, 100
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validatePercent($param) {
+		return (preg_match('/^\d*(\.\d{0,4})?$/', $param) && $param !== '.' && $param <= 100);
 	}
 
 	/**
