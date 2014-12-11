@@ -387,7 +387,7 @@ else {
 						'&with_monitored_triggers=1'.
 						($pageFilter->hostid ? '&only_hostid='.$pageFilter->hostid : '').
 						'");',
-					'T'
+					'button-form'
 				)
 			), 'form_row_r')
 		)));

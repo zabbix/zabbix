@@ -43,14 +43,14 @@ $item = array(
 	new CButton('select', _('Select'), 'return PopUp(\'popup.php?writeonly=1&dstfrm='.$expressionForm->getName().
 		'&dstfld1=itemid&dstfld2=description&submitParent=1'.(!empty($this->data['parent_discoveryid']) ? '&normal_only=1' : '').
 		'&srctbl=items&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');',
-		'formlist'
+		'button-form'
 	)
 );
 if (!empty($this->data['parent_discoveryid'])) {
 	$item[] = new CButton('select', _('Select prototype'), 'return PopUp(\'popup.php?dstfrm='.$expressionForm->getName().
 		'&dstfld1=itemid&dstfld2=description&submitParent=1'.url_param('parent_discoveryid', true).
 		'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');',
-		'formlist'
+		'button-form'
 	);
 }
 
@@ -100,10 +100,12 @@ if (isset($this->data['functions'][$this->data['selectedFunction']]['params'])) 
 					: new CTextBox('params['.$paramId.']', $paramValue, 10);
 			}
 
-			$expressionFormList->addRow($paramFunction['C'].' ', array($paramField, $paramTypeElement));
+			$expressionFormList->addRow($paramFunction['C'], array($paramField, $paramTypeElement));
 		}
 		else {
-			$expressionFormList->addRow($paramFunction['C'], new CTextBox('params['.$paramId.']', $paramValue, 30));
+			$expressionFormList->addRow($paramFunction['C'],
+				new CTextBox('params['.$paramId.']', $paramValue, $paramFunction['T'] == T_ZBX_DBL ? 10 : 30
+			));
 			$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
 		}
 	}
@@ -122,7 +124,7 @@ $expressionForm->addItem($expressionTab);
 // append buttons to form
 $expressionForm->addItem(makeFormFooter(
 	new CSubmit('insert', _('Insert')),
-	new CButtonCancel(url_params(array('parent_discoveryid', 'dstfrm', 'dstfld1'))
+	array(new CButtonCancel(url_params(array('parent_discoveryid', 'dstfrm', 'dstfld1')))
 )));
 
 $expressionWidget->addItem($expressionForm);
