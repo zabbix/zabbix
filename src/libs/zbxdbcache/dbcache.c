@@ -43,9 +43,9 @@ static zbx_mem_info_t	*trend_mem = NULL;
 #define	LOCK_CACHE_IDS		zbx_mutex_lock(&cache_ids_lock)
 #define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(&cache_ids_lock)
 
-static ZBX_MUTEX	cache_lock;
-static ZBX_MUTEX	trends_lock;
-static ZBX_MUTEX	cache_ids_lock;
+static ZBX_MUTEX	cache_lock = ZBX_MUTEX_NULL;
+static ZBX_MUTEX	trends_lock = ZBX_MUTEX_NULL;
+static ZBX_MUTEX	cache_ids_lock = ZBX_MUTEX_NULL;
 
 static char		*sql = NULL;
 static size_t		sql_alloc = 64 * ZBX_KIBIBYTE;
@@ -2198,7 +2198,7 @@ static void	DCvacuum_text()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() text_free:%d/%d",
 			__function_name, cache->text_free, CONFIG_TEXT_CACHE_SIZE);
 
-	if (CONFIG_TEXT_CACHE_SIZE / 1024 >= cache->text_free)
+	if (CONFIG_TEXT_CACHE_SIZE / 1024 >= (unsigned int)cache->text_free)
 		goto exit;
 
 	cache->last_text = cache->text;
@@ -2827,7 +2827,7 @@ static void	init_trend_cache()
 		exit(EXIT_FAILURE);
 	}
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&trends_lock, ZBX_MUTEX_TRENDS))
+	if (FAIL == zbx_mutex_create_force(&trends_lock, ZBX_MUTEX_TRENDS))
 	{
 		zbx_error("cannot create mutex for trend cache");
 		exit(EXIT_FAILURE);
@@ -2880,13 +2880,13 @@ void	init_database_cache()
 		exit(EXIT_FAILURE);
 	}
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_lock, ZBX_MUTEX_CACHE))
+	if (FAIL == zbx_mutex_create_force(&cache_lock, ZBX_MUTEX_CACHE))
 	{
 		zbx_error("cannot create mutex for history cache");
 		exit(EXIT_FAILURE);
 	}
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
+	if (FAIL == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
 	{
 		zbx_error("cannot create mutex for IDs cache");
 		exit(EXIT_FAILURE);
@@ -3078,3 +3078,4 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 
 	return nextid;
 }
+

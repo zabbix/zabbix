@@ -492,7 +492,10 @@ if (($templateid > 0) && ($_REQUEST['form'] != 'full_clone')) {
 	));
 }
 else {
-	$frmHost->addItem(makeFormFooter(new CSubmit('add', _('Add')), new CButtonCancel(url_param('groupid'))));
+	$frmHost->addItem(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		array(new CButtonCancel(url_param('groupid')))
+	));
 }
 
 
