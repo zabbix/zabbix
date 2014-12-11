@@ -347,6 +347,29 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
 	exit(EXIT_FAILURE);
 }
 
+/****************************************************************************************
+ *                                                                                      *
+ * Function: zbx_guaranteed_memset                                                      *
+ *                                                                                      *
+ * Purpose: for overwriting sensitive data in memory.                                   *
+ *          Similar to memset() but should not be optimized out by a compiler.          *
+ *                                                                                      *
+ * Derived from:                                                                        *
+ *   http://www.dwheeler.com/secure-programs/Secure-Programs-HOWTO/protect-secrets.html *
+ * See also:                                                                            *
+ *   http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1381.pdf on secure_memset()       *
+ *                                                                                      *
+ ****************************************************************************************/
+void	*zbx_guaranteed_memset(void *v, int c, size_t n)
+{
+	volatile signed char	*p = (volatile signed char *)v;
+
+	while (n--)
+		*p++ = (signed char)c;
+
+	return v;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_setproctitle                                                 *
