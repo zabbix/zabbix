@@ -32,15 +32,10 @@ $triggerDOFormList->addRow(
 	_('Unacknowledged PROBLEM events'),
 	array(
 		new CDiv(
-			new CColor('problem_unack_color', $this->data['problem_unack_color']),
+			new CColor('problem_unack_color', $data['problem_unack_color']),
 			'inlineblock trigger_displaying_form_col'
 		),
-		new CCheckBox(
-			'problem_unack_style',
-			$this->data['problem_unack_style'] == 1,
-			null,
-			1
-		)
+		new CCheckBox('problem_unack_style', $data['problem_unack_style'] == 1, null, 1)
 	)
 );
 
@@ -49,15 +44,10 @@ $triggerDOFormList->addRow(
 	_('Acknowledged PROBLEM events'),
 	array(
 		new CDiv(
-			new CColor('problem_ack_color', $this->data['problem_ack_color']),
+			new CColor('problem_ack_color', $data['problem_ack_color']),
 			'inlineblock trigger_displaying_form_col'
 		),
-		new CCheckBox(
-			'problem_ack_style',
-			$this->data['problem_ack_style'] == 1,
-			null,
-			1
-		)
+		new CCheckBox('problem_ack_style', $data['problem_ack_style'] == 1, null, 1)
 	)
 );
 
@@ -66,15 +56,10 @@ $triggerDOFormList->addRow(
 	_('Unacknowledged OK events'),
 	array(
 		new CDiv(
-			new CColor('ok_unack_color', $this->data['ok_unack_color']),
+			new CColor('ok_unack_color', $data['ok_unack_color']),
 			'inlineblock trigger_displaying_form_col'
 		),
-		new CCheckBox(
-			'ok_unack_style',
-			$this->data['ok_unack_style'] == 1,
-			null,
-			1
-		)
+		new CCheckBox('ok_unack_style', $data['ok_unack_style'] == 1, null, 1)
 	)
 );
 
@@ -83,15 +68,10 @@ $triggerDOFormList->addRow(
 	_('Acknowledged OK events'),
 	array(
 		new CDiv(
-			new CColor('ok_ack_color', $this->data['ok_ack_color']),
+			new CColor('ok_ack_color', $data['ok_ack_color']),
 			'inlineblock trigger_displaying_form_col'
 		),
-		new CCheckBox(
-			'ok_ack_style',
-			$this->data['ok_ack_style'] == 1,
-			null,
-			1
-		)
+		new CCheckBox('ok_ack_style', $data['ok_ack_style'] == 1, null, 1)
 	)
 );
 
@@ -99,13 +79,13 @@ $triggerDOFormList->addRow(
 $triggerDOFormList->addRow(BR());
 
 // Display OK triggers
-$okPeriodTextBox = new CTextBox('ok_period', $this->data['ok_period']);
+$okPeriodTextBox = new CTextBox('ok_period', $data['ok_period']);
 $okPeriodTextBox->addStyle('width: 4em;');
 $okPeriodTextBox->setAttribute('maxlength', '6');
 $triggerDOFormList->addRow(_('Display OK triggers for'), array($okPeriodTextBox, SPACE, _('seconds')));
 
 // Triggers blink on status change
-$okPeriodTextBox = new CTextBox('blink_period', $this->data['blink_period']);
+$okPeriodTextBox = new CTextBox('blink_period', $data['blink_period']);
 $okPeriodTextBox->addStyle('width: 4em;');
 $okPeriodTextBox->setAttribute('maxlength', '6');
 $triggerDOFormList->addRow(_('On status change triggers blink for'), array($okPeriodTextBox, SPACE, _('seconds')));
