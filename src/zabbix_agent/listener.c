@@ -37,6 +37,8 @@ extern int		server_num, process_num;
 #	include "daemon.h"
 #endif
 
+#include "../libs/zbxcrypto/tls.h"
+
 static void	process_listener(zbx_sock_t *s)
 {
 	AGENT_RESULT	result;
@@ -109,6 +111,9 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 	zbx_free(args);
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child();
+#endif
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_setproctitle("listener #%d [waiting for connection]", process_num);

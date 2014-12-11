@@ -42,6 +42,7 @@
 #include "checks_telnet.h"
 #include "checks_java.h"
 #include "checks_calculated.h"
+#include "../../libs/zbxcrypto/tls.h"
 
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
@@ -771,6 +772,10 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 #ifdef HAVE_NETSNMP
 	if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
 		init_snmp(progname);
+#endif
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child();
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
