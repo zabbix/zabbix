@@ -53,14 +53,15 @@ class CIPValidator extends CValidator {
 			return false;
 		}
 
-		if (!$this->empty && zbx_empty($ip)) {
-			$this->setError(_('IP address cannot be empty.'));
+		if ($ip === '') {
+			if ($this->empty) {
+				return true;
+			}
+			else {
+				$this->setError(_('IP address cannot be empty.'));
 
-			return false;
-		}
-		elseif ($this->empty && zbx_empty($ip)) {
-
-			return true;
+				return false;
+			}
 		}
 
 		$isValidIp = ($this->isValidIPv4($ip) || $this->isValidIPv6($ip));
@@ -93,13 +94,11 @@ class CIPValidator extends CValidator {
 	 */
 	protected function isValidIPv4($ip) {
 		if (!preg_match('/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/', $ip, $matches)) {
-
 			return false;
 		}
 
 		for ($i = 1; $i <= 4; $i++) {
 			if (!is_numeric($matches[$i]) || $matches[$i] > 255 || $matches[$i] < 0 ) {
-
 				return false;
 			}
 		}
@@ -116,7 +115,6 @@ class CIPValidator extends CValidator {
 	 */
 	protected function isValidIPv6($ip) {
 		if (!ZBX_HAVE_IPV6) {
-
 			return false;
 		}
 
