@@ -630,7 +630,7 @@ static void	cuvc_dump_cache(zbx_vc_item_t *item)
 	printf("ITEM DUMP: " ZBX_FS_UI64 " (type=%d, records=%d, recount=%d, hits=" ZBX_FS_UI64,
 			item->itemid, item->value_type, item->values_total, item->refcount, item->hits);
 
-	printf(", status=%d, range=%d)\n", item->status, item->range);
+	printf(", status=%d, active range=%d, daily range=%d)\n", item->status, item->active_range, item->daily_range);
 
 	while (NULL != chunk)
 	{

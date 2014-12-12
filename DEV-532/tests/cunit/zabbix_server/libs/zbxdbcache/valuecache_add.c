@@ -1013,7 +1013,7 @@ static void	cuvc_suite_add5_test1()
 	cuvc_check_cache_str(item, "1003:200", "1003:500", "1003:700", "1004:200", "1004:500", "1004:700",
 			"1005:200", "1005:500", "1005:700", NULL);
 
-	ZBX_CU_ASSERT_INT_EQ(item->range, VC_MIN_RANGE);
+	ZBX_CU_ASSERT_INT_EQ(item->active_range, VC_MIN_RANGE);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 9);
 
 	zbx_history_record_clear(&record, ITEM_VALUE_TYPE_STR);

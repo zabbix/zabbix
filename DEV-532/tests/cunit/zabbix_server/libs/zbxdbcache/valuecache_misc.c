@@ -420,7 +420,7 @@ static void	cuvc_suite_misc2_test3()
 	cuvc_check_cache_str(item, "1005:200", "1005:500", "1005:700", NULL);
 
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
-	ZBX_CU_ASSERT_INT_EQ(item->range, SEC_PER_DAY * 2 + 4);
+	ZBX_CU_ASSERT_INT_EQ(item->active_range, SEC_PER_DAY * 2 + 4);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 3);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
@@ -480,7 +480,7 @@ static void	cuvc_suite_misc3_test1()
 	ZBX_CU_ASSERT_INT_EQ(records.values_num, 0);
 
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
-	ZBX_CU_ASSERT_INT_EQ(item->range, 1000);
+	ZBX_CU_ASSERT_INT_EQ(item->active_range, 1000);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 0);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
@@ -529,7 +529,7 @@ static void	cuvc_suite_misc3_test2()
 	ZBX_CU_ASSERT_INT_EQ(records.values_num, 0);
 
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
-	ZBX_CU_ASSERT_INT_EQ(item->range, 1000);
+	ZBX_CU_ASSERT_INT_EQ(item->active_range, 1000);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 0);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
@@ -578,7 +578,7 @@ static void	cuvc_suite_misc3_test3()
 	ZBX_CU_ASSERT_INT_EQ(records.values_num, 0);
 
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
-	ZBX_CU_ASSERT_INT_EQ(item->range, 800);
+	ZBX_CU_ASSERT_INT_EQ(item->active_range, 800);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 0);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
