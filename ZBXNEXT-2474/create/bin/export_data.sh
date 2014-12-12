@@ -47,6 +47,16 @@ for table in `grep TABLE "$schema" | grep ZBX_DATA | awk -F'|' '{print $2}'`; do
 			sortorder="order by $pri_field<$ref_field,$ref_field"
 		fi
 	done
+	
+	# sort by first field if no sortorder is defined
+	if [ -z "$sortorder" ]; then
+		line=`grep -v ZBX_NODATA "$schema" | grep -A 1 "TABLE|$table|" | tail -1 | grep FIELD`
+		if [ -n "$line" ]; then
+			pri_field=`echo $line | cut -f2 -d'|' | sed -e 's/ //'`
+			sortorder="order by $table.$pri_field"
+		fi	
+	fi
+	
 	# remove first comma
 	fields=`echo $fields | cut -c2-`
 	echo "select $fields from $table $sortorder" | mysql -t -uroot $dbname | grep -v '^+' | sed -e 's/ | /|/g' -e '1,1s/^| /FIELDS|/g' -e '2,$s/^| /ROW   |/g' -e 's/ |$/|/g'
