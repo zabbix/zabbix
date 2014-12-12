@@ -2377,7 +2377,7 @@ static void	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_history_
 static void	vch_item_get_values_by_time_and_count(zbx_vc_item_t *item, zbx_vector_history_record_t *values,
 		int seconds, int count, int timestamp)
 {
-	int		index, now, range;
+	int		index, now, range_timestamp;
 	zbx_vc_chunk_t	*chunk;
 
 	if (FAIL == vch_item_get_last_value(item, timestamp, &chunk, &index))
@@ -2415,16 +2415,16 @@ out:
 			return;
 		}
 		/* not enough data in the requested period, set the range equal to the period */
-		range = now - timestamp + seconds;
+		range_timestamp = timestamp - seconds;
 	}
 	else
 	{
 		/* the requested number of values was retrieved, set the range to the oldest value timestamp */
-		range = now - values->values[values->values_num - 1].timestamp.sec + 1;
+		range_timestamp = values->values[values->values_num - 1].timestamp.sec - 1;
 	}
 
 	now = ZBX_VC_TIME();
-	vch_item_update_range(item, range, now);
+	vch_item_update_range(item, now - range_timestamp, now);
 }
 
 /******************************************************************************
