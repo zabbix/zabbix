@@ -126,7 +126,6 @@ else {
 
 // form
 $testForm = new CFormTable(_('Test'), 'tr_testexpr.php');
-$testForm->addHelpIcon();
 $testForm->setTableClass('formlongtable formtable');
 $testForm->addVar('expression', $expression);
 $testForm->addRow(_('Test data'), $dataTable);

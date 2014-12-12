@@ -171,7 +171,6 @@ if (hasRequest('add') || hasRequest('update')) {
 if (hasRequest('sform')) {
 	$frmTRLog = new CFormTable(_('Trigger'), null, null, null, 'sform');
 	$frmTRLog->setName('sform');
-	$frmTRLog->addHelpIcon();
 	$frmTRLog->setTableClass('formlongtable formtable');
 
 	if (hasRequest('triggerid')) {
