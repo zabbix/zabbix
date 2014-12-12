@@ -96,8 +96,8 @@ foreach ($userAgentsAll as $userAgentGroup => $userAgents) {
 
 $httpFormList->addRow(_('Agent'), $agentComboBox);
 
-$httpFormList->addRow(null, new CTextBox('agent_other', $this->data['agent_other'], ZBX_TEXTBOX_STANDARD_SIZE), false,
-	'row_agent_other'
+$httpFormList->addRow(_('User agent string'),
+	new CTextBox('agent_other', $this->data['agent_other'], ZBX_TEXTBOX_STANDARD_SIZE), false, 'row_agent_other'
 );
 
 // append HTTP proxy to form list
