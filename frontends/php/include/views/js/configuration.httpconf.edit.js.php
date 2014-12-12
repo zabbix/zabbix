@@ -211,5 +211,11 @@
 				$('#http_password').closest('li').removeClass('hidden');
 			}
 		});
+
+		<?php if (isset($this->data['agentVisibility']) && $this->data['agentVisibility']) { ?>
+			new CViewSwitcher('agent', 'change', <?php echo zbx_jsvalue($this->data['agentVisibility'], true); ?>);
+		<?php } ?>
+
+		$('#agent').trigger('change');
 	});
 </script>
