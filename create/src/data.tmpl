@@ -144,6 +144,7 @@ ROW   |72          |19      |0           |495       |500  |100   |0|0|1      |1 
 ROW   |73          |19      |0           |546       |500  |100   |1|0|1      |1      |0       |0     |0     |0    |   |0      |0            |           |3          |
 ROW   |74          |19      |1           |23140     |500  |100   |0|1|1      |1      |0       |0     |0     |0    |   |0      |0            |           |3          |
 ROW   |75          |19      |1           |23138     |500  |100   |1|1|1      |1      |0       |0     |0     |0    |   |0      |0            |           |3          |
+
 TABLE |drules
 FIELDS|druleid|proxy_hostid|name         |iprange        |delay|status|
 ROW   |2      |NULL        |Local network|192.168.0.1-254|3600 |1     |
@@ -154,40 +155,40 @@ ROW   |2       |2      |9   |system.uname|              |10050|                 
 
 TABLE |applications
 FIELDS|applicationid|hostid|name              |
-ROW   |13           |10001 |CPU               |
-ROW   |5            |10001 |Filesystems       |
-ROW   |21           |10001 |General           |
-ROW   |15           |10001 |Memory            |
-ROW   |7            |10001 |Network interfaces|
 ROW   |1            |10001 |OS                |
-ROW   |17           |10001 |Performance       |
+ROW   |5            |10001 |Filesystems       |
+ROW   |7            |10001 |Network interfaces|
 ROW   |9            |10001 |Processes         |
+ROW   |13           |10001 |CPU               |
+ROW   |15           |10001 |Memory            |
+ROW   |17           |10001 |Performance       |
+ROW   |21           |10001 |General           |
 ROW   |23           |10001 |Security          |
-ROW   |207          |10001 |Zabbix agent      |
 ROW   |179          |10047 |Zabbix server     |
-ROW   |356          |10048 |Zabbix proxy      |
 ROW   |206          |10050 |Zabbix agent      |
+ROW   |207          |10001 |Zabbix agent      |
 ROW   |227          |10060 |Interfaces        |
 ROW   |228          |10065 |General           |
 ROW   |229          |10066 |General           |
 ROW   |230          |10066 |Interfaces        |
-ROW   |235          |10067 |Disk partitions   |
 ROW   |231          |10067 |General           |
 ROW   |232          |10067 |Interfaces        |
-ROW   |242          |10067 |Processors        |
 ROW   |234          |10068 |Disk partitions   |
+ROW   |235          |10067 |Disk partitions   |
 ROW   |236          |10069 |Disk partitions   |
 ROW   |237          |10069 |General           |
 ROW   |238          |10069 |Interfaces        |
-ROW   |241          |10069 |Processors        |
 ROW   |240          |10070 |Processors        |
-ROW   |247          |10071 |Fans              |
-ROW   |246          |10071 |Temperature       |
+ROW   |241          |10069 |Processors        |
+ROW   |242          |10067 |Processors        |
 ROW   |245          |10071 |Voltage           |
-ROW   |250          |10072 |Fans              |
-ROW   |249          |10072 |Temperature       |
+ROW   |246          |10071 |Temperature       |
+ROW   |247          |10071 |Fans              |
 ROW   |248          |10072 |Voltage           |
+ROW   |249          |10072 |Temperature       |
+ROW   |250          |10072 |Fans              |
 ROW   |251          |10073 |MySQL             |
+ROW   |252          |10074 |Zabbix agent      |
 ROW   |253          |10074 |CPU               |
 ROW   |254          |10074 |Filesystems       |
 ROW   |255          |10074 |General           |
@@ -197,7 +198,7 @@ ROW   |258          |10074 |OS                |
 ROW   |259          |10074 |Performance       |
 ROW   |260          |10074 |Processes         |
 ROW   |261          |10074 |Security          |
-ROW   |252          |10074 |Zabbix agent      |
+ROW   |262          |10075 |Zabbix agent      |
 ROW   |263          |10075 |CPU               |
 ROW   |264          |10075 |Filesystems       |
 ROW   |265          |10075 |General           |
@@ -207,18 +208,17 @@ ROW   |268          |10075 |OS                |
 ROW   |269          |10075 |Performance       |
 ROW   |270          |10075 |Processes         |
 ROW   |271          |10075 |Security          |
-ROW   |262          |10075 |Zabbix agent      |
+ROW   |272          |10076 |Zabbix agent      |
 ROW   |273          |10076 |CPU               |
 ROW   |274          |10076 |Filesystems       |
 ROW   |275          |10076 |General           |
-ROW   |331          |10076 |Logical partitions|
 ROW   |276          |10076 |Memory            |
 ROW   |277          |10076 |Network interfaces|
 ROW   |278          |10076 |OS                |
 ROW   |279          |10076 |Performance       |
 ROW   |280          |10076 |Processes         |
 ROW   |281          |10076 |Security          |
-ROW   |272          |10076 |Zabbix agent      |
+ROW   |282          |10077 |Zabbix agent      |
 ROW   |283          |10077 |CPU               |
 ROW   |284          |10077 |Filesystems       |
 ROW   |285          |10077 |General           |
@@ -228,7 +228,7 @@ ROW   |288          |10077 |OS                |
 ROW   |289          |10077 |Performance       |
 ROW   |290          |10077 |Processes         |
 ROW   |291          |10077 |Security          |
-ROW   |282          |10077 |Zabbix agent      |
+ROW   |292          |10078 |Zabbix agent      |
 ROW   |293          |10078 |CPU               |
 ROW   |294          |10078 |Filesystems       |
 ROW   |295          |10078 |General           |
@@ -238,7 +238,7 @@ ROW   |298          |10078 |OS                |
 ROW   |299          |10078 |Performance       |
 ROW   |300          |10078 |Processes         |
 ROW   |301          |10078 |Security          |
-ROW   |292          |10078 |Zabbix agent      |
+ROW   |302          |10079 |Zabbix agent      |
 ROW   |303          |10079 |CPU               |
 ROW   |304          |10079 |Filesystems       |
 ROW   |305          |10079 |General           |
@@ -248,16 +248,16 @@ ROW   |308          |10079 |OS                |
 ROW   |309          |10079 |Performance       |
 ROW   |310          |10079 |Processes         |
 ROW   |311          |10079 |Security          |
-ROW   |302          |10079 |Zabbix agent      |
-ROW   |325          |10081 |CPU               |
-ROW   |322          |10081 |Filesystems       |
 ROW   |319          |10081 |General           |
-ROW   |328          |10081 |Memory            |
-ROW   |330          |10081 |Network interfaces|
-ROW   |323          |10081 |OS                |
 ROW   |320          |10081 |Performance       |
+ROW   |322          |10081 |Filesystems       |
+ROW   |323          |10081 |OS                |
 ROW   |324          |10081 |Processes         |
+ROW   |325          |10081 |CPU               |
+ROW   |328          |10081 |Memory            |
 ROW   |329          |10081 |Zabbix agent      |
+ROW   |330          |10081 |Network interfaces|
+ROW   |331          |10076 |Logical partitions|
 ROW   |332          |10082 |Classes           |
 ROW   |333          |10082 |Compilation       |
 ROW   |334          |10082 |Garbage Collector |
@@ -271,6 +271,7 @@ ROW   |341          |10083 |http-8443         |
 ROW   |342          |10083 |jk-8009           |
 ROW   |343          |10083 |Sessions          |
 ROW   |344          |10083 |Tomcat            |
+ROW   |345          |10084 |Zabbix server     |
 ROW   |346          |10084 |CPU               |
 ROW   |347          |10084 |Filesystems       |
 ROW   |348          |10084 |General           |
@@ -281,24 +282,23 @@ ROW   |352          |10084 |Performance       |
 ROW   |353          |10084 |Processes         |
 ROW   |354          |10084 |Security          |
 ROW   |355          |10084 |Zabbix agent      |
-ROW   |345          |10084 |Zabbix server     |
-ROW   |434          |10088 |Clusters          |
-ROW   |458          |10088 |General           |
-ROW   |433          |10088 |Log               |
+ROW   |356          |10048 |Zabbix proxy      |
 ROW   |408          |10089 |CPU               |
-ROW   |435          |10089 |Disks             |
-ROW   |424          |10089 |Filesystems       |
-ROW   |412          |10089 |General           |
-ROW   |437          |10089 |Interfaces        |
 ROW   |410          |10089 |Memory            |
-ROW   |428          |10089 |Network           |
+ROW   |412          |10089 |General           |
 ROW   |414          |10089 |Storage           |
 ROW   |416          |10091 |CPU               |
-ROW   |445          |10091 |Datastore         |
 ROW   |418          |10091 |General           |
 ROW   |420          |10091 |Hardware          |
 ROW   |422          |10091 |Memory            |
+ROW   |424          |10089 |Filesystems       |
+ROW   |428          |10089 |Network           |
+ROW   |433          |10088 |Log               |
+ROW   |434          |10088 |Clusters          |
+ROW   |435          |10089 |Disks             |
+ROW   |437          |10089 |Interfaces        |
 ROW   |443          |10091 |Network           |
+ROW   |445          |10091 |Datastore         |
 ROW   |446          |10093 |FTP service       |
 ROW   |447          |10094 |HTTP service      |
 ROW   |448          |10095 |HTTPS service     |
@@ -311,27 +311,29 @@ ROW   |454          |10101 |SMTP service      |
 ROW   |455          |10102 |SSH service       |
 ROW   |456          |10103 |Telnet service    |
 ROW   |457          |10104 |ICMP              |
+ROW   |458          |10088 |General           |
 
 TABLE |interface
-FIELDS|interfaceid|hostid|main|type|useip|ip       |dns|port |
-ROW   |1          |10084 |1   |1   |1    |127.0.0.1|   |10050|
+FIELDS|interfaceid|hostid|main|type|useip|ip       |dns|port |bulk|
+ROW   |1          |10084 |1   |1   |1    |127.0.0.1|   |10050|1   |
 
 TABLE |valuemaps
 FIELDS|valuemapid|name                                 |
+ROW   |1         |Service state                        |
+ROW   |2         |Host status                          |
+ROW   |3         |Windows service state                |
 ROW   |4         |APC Battery Replacement Status       |
 ROW   |5         |APC Battery Status                   |
-ROW   |7         |Dell Open Manage System Status       |
-ROW   |2         |Host status                          |
 ROW   |6         |HP Insight System Status             |
-ROW   |1         |Service state                        |
-ROW   |9         |SNMP device status (hrDeviceStatus)  |
-ROW   |11        |SNMP interface status (ifAdminStatus)|
+ROW   |7         |Dell Open Manage System Status       |
 ROW   |8         |SNMP interface status (ifOperStatus) |
-ROW   |13        |VMware status                        |
-ROW   |12        |VMware VirtualMachinePowerState      |
-ROW   |3         |Windows service state                |
+ROW   |9         |SNMP device status (hrDeviceStatus)  |
 ROW   |10        |Zabbix agent ping status             |
+ROW   |11        |SNMP interface status (ifAdminStatus)|
+ROW   |12        |VMware VirtualMachinePowerState      |
+ROW   |13        |VMware status                        |
 ROW   |14        |Maintenance status                   |
+ROW   |15        |Value cache operating mode           |
 
 TABLE |items
 FIELDS|itemid|type|snmp_community   |snmp_oid                                                 |hostid|name                                                             |key_                                                                           |delay|history|trends|status|value_type|trapper_hosts|units   |multiplier|delta|snmpv3_securityname|snmpv3_securitylevel|snmpv3_authpassphrase|snmpv3_privpassphrase|formula|logtimefmt|templateid|valuemapid|delay_flex|params                                                                              |ipmi_sensor     |data_type|authtype|username   |password   |publickey|privatekey|flags|interfaceid|port|description                                                                                                                                                                                                                                                                                                                                                                                                                               |inventory_link|lifetime|snmpv3_authprotocol|snmpv3_privprotocol|snmpv3_contextname|evaltype|
@@ -865,6 +867,8 @@ ROW   |23656 |3   |                 |                                           
 ROW   |23657 |3   |                 |                                                         |10104 |ICMP loss                                                        |icmppingloss                                                                   |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |NULL      |NULL      |          |                                                                                    |                |0        |0       |           |           |         |          |0    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |0       |
 ROW   |23658 |3   |                 |                                                         |10088 |Full name                                                        |vmware.fullname[{$URL}]                                                        |3600 |90     |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |NULL      |NULL      |          |                                                                                    |                |0        |0       |{$USERNAME}|{$PASSWORD}|         |          |0    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |0       |
 ROW   |23659 |3   |                 |                                                         |10088 |Version                                                          |vmware.version[{$URL}]                                                         |3600 |90     |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |NULL      |NULL      |          |                                                                                    |                |0        |0       |{$USERNAME}|{$PASSWORD}|         |          |0    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |0       |
+ROW   |23660 |5   |                 |                                                         |10047 |Zabbix $4 $2 processes, in %                                     |zabbix[process,node watcher,avg,busy]                                          |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |NULL      |NULL      |          |                                                                                    |                |0        |0       |           |           |         |          |0    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |0       |
+ROW   |23661 |5   |                 |                                                         |10047 |Zabbix value cache operating mode                                |zabbix[vcache,cache,mode]                                                      |60   |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |NULL      |15        |          |                                                                                    |                |0        |0       |           |           |         |          |0    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |0       |
 ROW   |10020 |0   |                 |                                                         |10001 |Agent ping                                                       |agent.ping                                                                     |60   |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22232     |10        |          |                                                                                    |                |0        |0       |           |           |         |          |0    |NULL       |    |The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.                                                                                                                                                                                                                                                                                                                           |0             |0       |0                  |0                  |                  |0       |
 ROW   |10059 |0   |                 |                                                         |10001 |Version of zabbix_agent(d) running                               |agent.version                                                                  |3600 |7      |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22231     |NULL      |          |                                                                                    |                |0        |0       |           |           |         |          |0    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |0       |0                  |0                  |                  |0       |
 ROW   |22715 |4   |{$SNMP_COMMUNITY}|SNMPv2-MIB::sysContact.0                                 |10066 |Device contact details                                           |sysContact                                                                     |3600 |7      |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22713     |NULL      |          |                                                                                    |                |0        |0       |           |           |         |          |0    |NULL       |    |The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.                                                                                                                                                                                                                                |23            |0       |0                  |0                  |                  |0       |
@@ -1023,6 +1027,8 @@ ROW   |23620 |5   |                 |                                           
 ROW   |23625 |5   |                 |                                                         |10084 |Zabbix value cache hits                                          |zabbix[vcache,cache,hits]                                                      |60   |7      |365   |0     |0         |             |vps     |0         |1    |                   |0                   |                     |                     |1      |          |22196     |NULL      |          |                                                                                    |                |0        |0       |           |           |         |          |0    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |0       |0                  |0                  |                  |0       |
 ROW   |23628 |5   |                 |                                                         |10084 |Zabbix value cache misses                                        |zabbix[vcache,cache,misses]                                                    |60   |7      |365   |0     |0         |             |vps     |0         |1    |                   |0                   |                     |                     |1      |          |22199     |NULL      |          |                                                                                    |                |0        |0       |           |           |         |          |0    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |0       |0                  |0                  |                  |0       |
 ROW   |23635 |5   |                 |                                                         |10084 |Zabbix vmware cache, % free                                      |zabbix[vmware,buffer,pfree]                                                    |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |23634     |NULL      |          |                                                                                    |                |0        |0       |           |           |         |          |0    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |0       |
+ROW   |23662 |5   |                 |                                                         |10084 |Zabbix $4 $2 processes, in %                                     |zabbix[process,node watcher,avg,busy]                                          |60   |7      |365   |0     |0         |             |%       |0         |0    |                   |0                   |                     |                     |1      |          |23660     |NULL      |          |                                                                                    |                |0        |0       |           |           |         |          |0    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |0       |
+ROW   |23663 |5   |                 |                                                         |10084 |Zabbix value cache operating mode                                |zabbix[vcache,cache,mode]                                                      |60   |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |23661     |15        |          |                                                                                    |                |0        |0       |           |           |         |          |0    |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |0       |
 
 TABLE |media_type
 FIELDS|mediatypeid|type|description|smtp_server     |smtp_helo  |smtp_email        |exec_path|gsm_modem |username          |passwd|status|
@@ -1045,8 +1051,8 @@ ROW   |12      |No access to the frontend|2         |0           |0         |
 
 TABLE |users_groups
 FIELDS|id|usrgrpid|userid|
-ROW   |4 |7       |1     |
 ROW   |2 |8       |2     |
+ROW   |4 |7       |1     |
 
 TABLE |scripts
 FIELDS|scriptid|name                   |command                               |host_access|usrgrpid|groupid|description|confirmation|type|execute_on|
@@ -1055,12 +1061,12 @@ ROW   |2       |Traceroute             |/usr/bin/traceroute {HOST.CONN} 2>&1  |2
 ROW   |3       |Detect operating system|sudo /usr/bin/nmap -O {HOST.CONN} 2>&1|2          |7       |NULL   |           |            |0   |1         |
 
 TABLE |actions
-FIELDS|actionid|name                                          |eventsource|evaltype|status|esc_period|def_shortdata                              |def_longdata                                                                                                                                                                                                                                                                                                                                                                                    |recovery_msg|r_shortdata                                |r_longdata                                                                                                                                                                                                                                                                                                                                                                                      |
-ROW   |2       |Auto discovery. Linux servers.                |1          |0       |1     |0         |                                           |                                                                                                                                                                                                                                                                                                                                                                                                |0           |                                           |                                                                                                                                                                                                                                                                                                                                                                                                |
-ROW   |3       |Report problems to Zabbix administrators      |0          |0       |1     |3600      |{TRIGGER.STATUS}: {TRIGGER.NAME}           |Trigger: {TRIGGER.NAME}&eol;Trigger status: {TRIGGER.STATUS}&eol;Trigger severity: {TRIGGER.SEVERITY}&eol;Trigger URL: {TRIGGER.URL}&eol;&eol;Item values:&eol;&eol;1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}&eol;2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}&eol;3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}&eol;&eol;Original event ID: {EVENT.ID}|1           |{TRIGGER.STATUS}: {TRIGGER.NAME}           |Trigger: {TRIGGER.NAME}&eol;Trigger status: {TRIGGER.STATUS}&eol;Trigger severity: {TRIGGER.SEVERITY}&eol;Trigger URL: {TRIGGER.URL}&eol;&eol;Item values:&eol;&eol;1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}&eol;2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}&eol;3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}&eol;&eol;Original event ID: {EVENT.ID}|
-ROW   |4       |Report not supported items                    |3          |0       |1     |3600      |{ITEM.STATE}: {HOST.NAME}:{ITEM.NAME}      |Host: {HOST.NAME}&eol;Item: {ITEM.NAME}&eol;Key: {ITEM.KEY}&eol;State: {ITEM.STATE}                                                                                                                                                                                                                                                                                                             |1           |{ITEM.STATE}: {HOST.NAME}:{ITEM.NAME}      |Host: {HOST.NAME}&eol;Item: {ITEM.NAME}&eol;Key: {ITEM.KEY}&eol;State: {ITEM.STATE}                                                                                                                                                                                                                                                                                                             |
-ROW   |5       |Report not supported low level discovery rules|3          |0       |1     |3600      |{LLDRULE.STATE}: {HOST.NAME}:{LLDRULE.NAME}|Host: {HOST.NAME}&eol;Low level discovery rule: {LLDRULE.NAME}&eol;Key: {LLDRULE.KEY}&eol;State: {LLDRULE.STATE}                                                                                                                                                                                                                                                                                |1           |{LLDRULE.STATE}: {HOST.NAME}:{LLDRULE.NAME}|Host: {HOST.NAME}&eol;Low level discovery rule: {LLDRULE.NAME}&eol;Key: {LLDRULE.KEY}&eol;State: {LLDRULE.STATE}                                                                                                                                                                                                                                                                                |
-ROW   |6       |Report unknown triggers                       |3          |0       |1     |3600      |{TRIGGER.STATE}: {TRIGGER.NAME}            |Trigger name: {TRIGGER.NAME}&eol;Expression: {TRIGGER.EXPRESSION}&eol;State: {TRIGGER.STATE}                                                                                                                                                                                                                                                                                                    |1           |{TRIGGER.STATE}: {TRIGGER.NAME}            |Trigger name: {TRIGGER.NAME}&eol;Expression: {TRIGGER.EXPRESSION}&eol;State: {TRIGGER.STATE}                                                                                                                                                                                                                                                                                                    |
+FIELDS|actionid|name                                          |eventsource|evaltype|status|esc_period|def_shortdata                              |def_longdata                                                                                                                                                                                                                                                                                                                                                                                    |recovery_msg|r_shortdata                                |r_longdata                                                                                                                                                                                                                                                                                                                                                                                      |formula|
+ROW   |2       |Auto discovery. Linux servers.                |1          |0       |1     |0         |                                           |                                                                                                                                                                                                                                                                                                                                                                                                |0           |                                           |                                                                                                                                                                                                                                                                                                                                                                                                |       |
+ROW   |3       |Report problems to Zabbix administrators      |0          |0       |1     |3600      |{TRIGGER.STATUS}: {TRIGGER.NAME}           |Trigger: {TRIGGER.NAME}&eol;Trigger status: {TRIGGER.STATUS}&eol;Trigger severity: {TRIGGER.SEVERITY}&eol;Trigger URL: {TRIGGER.URL}&eol;&eol;Item values:&eol;&eol;1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}&eol;2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}&eol;3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}&eol;&eol;Original event ID: {EVENT.ID}|1           |{TRIGGER.STATUS}: {TRIGGER.NAME}           |Trigger: {TRIGGER.NAME}&eol;Trigger status: {TRIGGER.STATUS}&eol;Trigger severity: {TRIGGER.SEVERITY}&eol;Trigger URL: {TRIGGER.URL}&eol;&eol;Item values:&eol;&eol;1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}&eol;2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}&eol;3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}&eol;&eol;Original event ID: {EVENT.ID}|       |
+ROW   |4       |Report not supported items                    |3          |0       |1     |3600      |{ITEM.STATE}: {HOST.NAME}:{ITEM.NAME}      |Host: {HOST.NAME}&eol;Item: {ITEM.NAME}&eol;Key: {ITEM.KEY}&eol;State: {ITEM.STATE}                                                                                                                                                                                                                                                                                                             |1           |{ITEM.STATE}: {HOST.NAME}:{ITEM.NAME}      |Host: {HOST.NAME}&eol;Item: {ITEM.NAME}&eol;Key: {ITEM.KEY}&eol;State: {ITEM.STATE}                                                                                                                                                                                                                                                                                                             |       |
+ROW   |5       |Report not supported low level discovery rules|3          |0       |1     |3600      |{LLDRULE.STATE}: {HOST.NAME}:{LLDRULE.NAME}|Host: {HOST.NAME}&eol;Low level discovery rule: {LLDRULE.NAME}&eol;Key: {LLDRULE.KEY}&eol;State: {LLDRULE.STATE}                                                                                                                                                                                                                                                                                |1           |{LLDRULE.STATE}: {HOST.NAME}:{LLDRULE.NAME}|Host: {HOST.NAME}&eol;Low level discovery rule: {LLDRULE.NAME}&eol;Key: {LLDRULE.KEY}&eol;State: {LLDRULE.STATE}                                                                                                                                                                                                                                                                                |       |
+ROW   |6       |Report unknown triggers                       |3          |0       |1     |3600      |{TRIGGER.STATE}: {TRIGGER.NAME}            |Trigger name: {TRIGGER.NAME}&eol;Expression: {TRIGGER.EXPRESSION}&eol;State: {TRIGGER.STATE}                                                                                                                                                                                                                                                                                                    |1           |{TRIGGER.STATE}: {TRIGGER.NAME}            |Trigger name: {TRIGGER.NAME}&eol;Expression: {TRIGGER.EXPRESSION}&eol;State: {TRIGGER.STATE}                                                                                                                                                                                                                                                                                                    |       |
 
 TABLE |operations
 FIELDS|operationid|actionid|operationtype|esc_period|esc_step_from|esc_step_to|evaltype|
@@ -1326,6 +1332,8 @@ ROW   |13553    |{13158}=0                                                      
 ROW   |13554    |{13096}=0                                                               |{HOST.NAME} is unavailable by ICMP                                  |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13555    |{13097}>0.15                                                            |Response time is too high on {HOST.NAME}                            |   |0     |2       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13556    |{13098}>20                                                              |Ping loss is too high on {HOST.NAME}                                |   |0     |2       |                                                                                                                                      |NULL      |0   |0    |
+ROW   |13557    |({TRIGGER.VALUE}=0 and {13160}>75) or ({TRIGGER.VALUE}=1 and {13160}>65)|Zabbix node watcher processes more than 75% busy                    |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
+ROW   |13558    |{13161}=1                                                               |Zabbix value cache working in low memory mode                       |   |0     |4       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |10045    |{12927}>0                                                               |Version of zabbix_agent(d) was changed on {HOST.NAME}               |   |0     |1       |                                                                                                                                      |13026     |0   |0    |
 ROW   |10047    |{12550}=1                                                               |Zabbix agent on {HOST.NAME} is unreachable for 5 minutes            |   |0     |3       |                                                                                                                                      |13025     |0   |0    |
 ROW   |13075    |{12648}<5                                                               |Less than 5% free in the value cache                                |   |0     |3       |                                                                                                                                      |13074     |0   |0    |
@@ -1398,21 +1406,23 @@ ROW   |13514    |{12943}>0                                                      
 ROW   |13515    |{12944}>0                                                               |Host name of zabbix_agentd was changed on {HOST.NAME}               |   |0     |1       |                                                                                                                                      |13507     |0   |0    |
 ROW   |13516    |{12945}>0                                                               |Host name of zabbix_agentd was changed on {HOST.NAME}               |   |0     |1       |                                                                                                                                      |13507     |0   |0    |
 ROW   |13537    |{12966}<25                                                              |Less than 25% free in the vmware cache                              |   |0     |3       |                                                                                                                                      |13536     |0   |0    |
+ROW   |13559    |({TRIGGER.VALUE}=0 and {13162}>75) or ({TRIGGER.VALUE}=1 and {13162}>65)|Zabbix node watcher processes more than 75% busy                    |   |0     |3       |                                                                                                                                      |13557     |0   |0    |
+ROW   |13560    |{13163}=1                                                               |Zabbix value cache working in low memory mode                       |   |0     |4       |                                                                                                                                      |13558     |0   |0    |
 
 TABLE |trigger_depends
 FIELDS|triggerdepid|triggerid_down|triggerid_up|
 ROW   |1           |13295         |13321       |
-ROW   |3           |13296         |13295       |
 ROW   |2           |13296         |13321       |
+ROW   |3           |13296         |13295       |
 ROW   |4           |13297         |13321       |
 ROW   |5           |13298         |13297       |
 ROW   |6           |13298         |13321       |
 ROW   |7           |13299         |13321       |
-ROW   |9           |13300         |13299       |
 ROW   |8           |13300         |13321       |
+ROW   |9           |13300         |13299       |
 ROW   |10          |13301         |13321       |
-ROW   |12          |13302         |13301       |
 ROW   |11          |13302         |13321       |
+ROW   |12          |13302         |13301       |
 ROW   |13          |13303         |13322       |
 ROW   |14          |13304         |13303       |
 ROW   |15          |13304         |13322       |
@@ -1440,8 +1450,8 @@ ROW   |36          |13324         |13323       |
 ROW   |37          |13325         |13321       |
 ROW   |38          |13326         |13321       |
 ROW   |39          |13326         |13325       |
-ROW   |41          |13555         |13554       |
 ROW   |40          |13556         |13554       |
+ROW   |41          |13555         |13554       |
 
 TABLE |functions
 FIELDS|functionid|itemid|triggerid|function|parameter|
@@ -1761,6 +1771,10 @@ ROW   |13156     |23650 |13550    |max     |#3       |
 ROW   |13157     |23652 |13552    |max     |#3       |
 ROW   |13158     |23653 |13553    |max     |#3       |
 ROW   |13159     |23654 |13285    |max     |#3       |
+ROW   |13160     |23660 |13557    |avg     |10m      |
+ROW   |13161     |23661 |13558    |last    |         |
+ROW   |13162     |23662 |13559    |avg     |10m      |
+ROW   |13163     |23663 |13560    |last    |         |
 
 TABLE |graphs
 FIELDS|graphid|name                                    |width|height|yaxismin|yaxismax|templateid|show_work_period|show_triggers|graphtype|show_legend|show_3d|percent_left|percent_right|ymin_type|ymax_type|ymin_itemid|ymax_itemid|flags|
@@ -2178,7 +2192,6 @@ TABLE |hosts_groups
 FIELDS|hostgroupid|hostid|groupid|
 ROW   |1          |10001 |1      |
 ROW   |47         |10047 |1      |
-ROW   |98         |10048 |1      |
 ROW   |50         |10050 |1      |
 ROW   |70         |10060 |1      |
 ROW   |73         |10065 |1      |
@@ -2203,6 +2216,7 @@ ROW   |92         |10084 |4      |
 ROW   |95         |10088 |1      |
 ROW   |96         |10089 |1      |
 ROW   |97         |10091 |1      |
+ROW   |98         |10048 |1      |
 ROW   |99         |10093 |1      |
 ROW   |100        |10094 |1      |
 ROW   |101        |10095 |1      |
@@ -2219,16 +2233,16 @@ ROW   |110        |10104 |1      |
 TABLE |hosts_templates
 FIELDS|hosttemplateid|hostid|templateid|
 ROW   |4             |10001 |10050     |
-ROW   |22            |10066 |10060     |
 ROW   |21            |10066 |10065     |
-ROW   |24            |10067 |10060     |
+ROW   |22            |10066 |10060     |
 ROW   |23            |10067 |10065     |
+ROW   |24            |10067 |10060     |
 ROW   |25            |10067 |10068     |
-ROW   |30            |10067 |10070     |
-ROW   |28            |10069 |10060     |
-ROW   |27            |10069 |10065     |
 ROW   |26            |10069 |10068     |
+ROW   |27            |10069 |10065     |
+ROW   |28            |10069 |10060     |
 ROW   |29            |10069 |10070     |
+ROW   |30            |10067 |10070     |
 ROW   |31            |10074 |10050     |
 ROW   |32            |10075 |10050     |
 ROW   |33            |10076 |10050     |
@@ -2236,77 +2250,41 @@ ROW   |34            |10077 |10050     |
 ROW   |35            |10078 |10050     |
 ROW   |36            |10079 |10050     |
 ROW   |37            |10081 |10050     |
-ROW   |39            |10084 |10001     |
 ROW   |38            |10084 |10047     |
+ROW   |39            |10084 |10001     |
 ROW   |41            |10090 |10089     |
 ROW   |42            |10092 |10091     |
 
 TABLE |items_applications
 FIELDS|itemappid|applicationid|itemid|
-ROW   |4653     |1            |10016 |
-ROW   |694      |1            |10025 |
-ROW   |636      |1            |10055 |
-ROW   |634      |1            |10056 |
-ROW   |448      |1            |10057 |
-ROW   |444      |1            |10058 |
-ROW   |646      |1            |17318 |
-ROW   |642      |1            |17352 |
-ROW   |4462     |5            |22452 |
-ROW   |4464     |5            |22454 |
-ROW   |4466     |5            |22456 |
-ROW   |4468     |5            |22458 |
-ROW   |4704     |5            |22686 |
-ROW   |4458     |7            |22446 |
-ROW   |4460     |7            |22448 |
-ROW   |600      |9            |10009 |
-ROW   |804      |9            |10013 |
-ROW   |587      |13           |10010 |
-ROW   |689      |13           |17354 |
-ROW   |671      |13           |17356 |
-ROW   |675      |13           |17358 |
-ROW   |679      |13           |17360 |
-ROW   |683      |13           |17362 |
-ROW   |4659     |13           |22665 |
-ROW   |4665     |13           |22668 |
-ROW   |4671     |13           |22671 |
-ROW   |4677     |13           |22674 |
-ROW   |4683     |13           |22677 |
-ROW   |4692     |13           |22680 |
-ROW   |4698     |13           |22683 |
-ROW   |4587     |15           |10014 |
-ROW   |4593     |15           |10026 |
-ROW   |4595     |15           |10030 |
-ROW   |4589     |15           |17350 |
-ROW   |4583     |15           |22181 |
-ROW   |588      |17           |10010 |
-ROW   |690      |17           |17354 |
-ROW   |672      |17           |17356 |
-ROW   |676      |17           |17358 |
-ROW   |680      |17           |17360 |
-ROW   |684      |17           |17362 |
-ROW   |4660     |17           |22665 |
-ROW   |4666     |17           |22668 |
-ROW   |4672     |17           |22671 |
-ROW   |4678     |17           |22674 |
-ROW   |4684     |17           |22677 |
-ROW   |4693     |17           |22680 |
-ROW   |4699     |17           |22683 |
-ROW   |693      |21           |10025 |
-ROW   |447      |21           |10057 |
 ROW   |443      |21           |10058 |
-ROW   |645      |21           |17318 |
+ROW   |444      |1            |10058 |
+ROW   |447      |21           |10057 |
+ROW   |448      |1            |10057 |
+ROW   |587      |13           |10010 |
+ROW   |588      |17           |10010 |
+ROW   |600      |9            |10009 |
+ROW   |634      |1            |10056 |
+ROW   |636      |1            |10055 |
 ROW   |641      |21           |17352 |
-ROW   |4654     |23           |10016 |
+ROW   |642      |1            |17352 |
+ROW   |645      |21           |17318 |
+ROW   |646      |1            |17318 |
 ROW   |654      |23           |10019 |
-ROW   |4447     |179          |22183 |
-ROW   |4443     |179          |22185 |
-ROW   |4441     |179          |22187 |
+ROW   |671      |13           |17356 |
+ROW   |672      |17           |17356 |
+ROW   |675      |13           |17358 |
+ROW   |676      |17           |17358 |
+ROW   |679      |13           |17360 |
+ROW   |680      |17           |17360 |
+ROW   |683      |13           |17362 |
+ROW   |684      |17           |17362 |
+ROW   |689      |13           |17354 |
+ROW   |690      |17           |17354 |
+ROW   |693      |21           |10025 |
+ROW   |694      |1            |10025 |
+ROW   |804      |9            |10013 |
 ROW   |4097     |179          |22189 |
-ROW   |5813     |179          |22191 |
-ROW   |5814     |179          |22196 |
-ROW   |5815     |179          |22199 |
-ROW   |4451     |179          |22219 |
-ROW   |4445     |179          |22396 |
 ROW   |4398     |179          |22399 |
 ROW   |4400     |179          |22400 |
 ROW   |4401     |179          |22401 |
@@ -2324,16 +2302,44 @@ ROW   |4422     |179          |22422 |
 ROW   |4424     |179          |22424 |
 ROW   |4426     |179          |22426 |
 ROW   |4430     |179          |22430 |
-ROW   |4707     |179          |22689 |
-ROW   |5341     |179          |23171 |
-ROW   |5421     |179          |23251 |
-ROW   |5849     |179          |23634 |
-ROW   |4548     |206          |22231 |
+ROW   |4441     |179          |22187 |
+ROW   |4443     |179          |22185 |
+ROW   |4445     |179          |22396 |
+ROW   |4447     |179          |22183 |
+ROW   |4451     |179          |22219 |
+ROW   |4458     |7            |22446 |
+ROW   |4460     |7            |22448 |
+ROW   |4462     |5            |22452 |
+ROW   |4464     |5            |22454 |
+ROW   |4466     |5            |22456 |
+ROW   |4468     |5            |22458 |
 ROW   |4544     |206          |22232 |
-ROW   |5514     |206          |23318 |
 ROW   |4545     |207          |10020 |
+ROW   |4548     |206          |22231 |
 ROW   |4549     |207          |10059 |
-ROW   |5515     |207          |23319 |
+ROW   |4583     |15           |22181 |
+ROW   |4587     |15           |10014 |
+ROW   |4589     |15           |17350 |
+ROW   |4593     |15           |10026 |
+ROW   |4595     |15           |10030 |
+ROW   |4653     |1            |10016 |
+ROW   |4654     |23           |10016 |
+ROW   |4659     |13           |22665 |
+ROW   |4660     |17           |22665 |
+ROW   |4665     |13           |22668 |
+ROW   |4666     |17           |22668 |
+ROW   |4671     |13           |22671 |
+ROW   |4672     |17           |22671 |
+ROW   |4677     |13           |22674 |
+ROW   |4678     |17           |22674 |
+ROW   |4683     |13           |22677 |
+ROW   |4684     |17           |22677 |
+ROW   |4692     |13           |22680 |
+ROW   |4693     |17           |22680 |
+ROW   |4698     |13           |22683 |
+ROW   |4699     |17           |22683 |
+ROW   |4704     |5            |22686 |
+ROW   |4707     |179          |22689 |
 ROW   |4719     |227          |22701 |
 ROW   |4720     |227          |22702 |
 ROW   |4721     |227          |22703 |
@@ -2342,7 +2348,6 @@ ROW   |4723     |227          |22705 |
 ROW   |4724     |227          |22706 |
 ROW   |4725     |227          |22707 |
 ROW   |4726     |227          |22708 |
-ROW   |4762     |227          |22709 |
 ROW   |4727     |228          |22710 |
 ROW   |4728     |228          |22711 |
 ROW   |4729     |228          |22712 |
@@ -2361,7 +2366,6 @@ ROW   |4741     |230          |22725 |
 ROW   |4742     |230          |22726 |
 ROW   |4743     |230          |22727 |
 ROW   |4744     |230          |22728 |
-ROW   |4763     |230          |22729 |
 ROW   |4745     |231          |22730 |
 ROW   |4746     |231          |22731 |
 ROW   |4747     |231          |22732 |
@@ -2375,11 +2379,13 @@ ROW   |4754     |232          |22740 |
 ROW   |4755     |232          |22741 |
 ROW   |4756     |232          |22742 |
 ROW   |4757     |232          |22743 |
-ROW   |4764     |232          |22744 |
 ROW   |4758     |234          |22749 |
 ROW   |4759     |234          |22755 |
 ROW   |4760     |234          |22756 |
 ROW   |4761     |234          |22757 |
+ROW   |4762     |227          |22709 |
+ROW   |4763     |230          |22729 |
+ROW   |4764     |232          |22744 |
 ROW   |4765     |234          |22758 |
 ROW   |4766     |234          |22759 |
 ROW   |4767     |235          |22761 |
@@ -2416,8 +2422,8 @@ ROW   |4818     |245          |22801 |
 ROW   |4819     |245          |22802 |
 ROW   |4820     |245          |22803 |
 ROW   |4821     |245          |22805 |
-ROW   |4823     |245          |22806 |
 ROW   |4822     |246          |22804 |
+ROW   |4823     |245          |22806 |
 ROW   |4824     |247          |22807 |
 ROW   |4825     |248          |22809 |
 ROW   |4826     |248          |22810 |
@@ -2446,339 +2452,324 @@ ROW   |4848     |251          |22831 |
 ROW   |4849     |251          |22832 |
 ROW   |4850     |252          |22833 |
 ROW   |4851     |252          |22834 |
-ROW   |5516     |252          |23320 |
-ROW   |4858     |253          |22840 |
-ROW   |4860     |253          |22841 |
-ROW   |4862     |253          |22842 |
-ROW   |4864     |253          |22843 |
-ROW   |4866     |253          |22844 |
-ROW   |4868     |253          |22845 |
-ROW   |4870     |253          |22846 |
-ROW   |4874     |253          |22848 |
-ROW   |4880     |253          |22851 |
-ROW   |4882     |253          |22852 |
-ROW   |5276     |254          |22868 |
-ROW   |5278     |254          |22869 |
-ROW   |5279     |254          |22870 |
-ROW   |5280     |254          |22871 |
-ROW   |5277     |254          |22872 |
+ROW   |4852     |258          |22835 |
+ROW   |4853     |258          |22836 |
+ROW   |4854     |260          |22837 |
+ROW   |4855     |260          |22838 |
+ROW   |4856     |258          |22839 |
 ROW   |4857     |255          |22839 |
+ROW   |4858     |253          |22840 |
+ROW   |4859     |259          |22840 |
+ROW   |4860     |253          |22841 |
+ROW   |4861     |259          |22841 |
+ROW   |4862     |253          |22842 |
+ROW   |4863     |259          |22842 |
+ROW   |4864     |253          |22843 |
+ROW   |4865     |259          |22843 |
+ROW   |4866     |253          |22844 |
+ROW   |4867     |259          |22844 |
+ROW   |4868     |253          |22845 |
+ROW   |4869     |259          |22845 |
+ROW   |4870     |253          |22846 |
+ROW   |4871     |259          |22846 |
+ROW   |4874     |253          |22848 |
+ROW   |4875     |259          |22848 |
+ROW   |4880     |253          |22851 |
+ROW   |4881     |259          |22851 |
+ROW   |4882     |253          |22852 |
+ROW   |4883     |259          |22852 |
+ROW   |4884     |258          |22853 |
 ROW   |4885     |255          |22853 |
+ROW   |4886     |258          |22854 |
 ROW   |4887     |255          |22854 |
-ROW   |4892     |255          |22858 |
-ROW   |4894     |255          |22859 |
 ROW   |4888     |256          |22855 |
 ROW   |4889     |256          |22856 |
 ROW   |4890     |256          |22857 |
-ROW   |4898     |256          |22862 |
-ROW   |4899     |256          |22863 |
-ROW   |5152     |257          |23075 |
-ROW   |5153     |257          |23076 |
-ROW   |4852     |258          |22835 |
-ROW   |4853     |258          |22836 |
-ROW   |4856     |258          |22839 |
-ROW   |4884     |258          |22853 |
-ROW   |4886     |258          |22854 |
 ROW   |4891     |258          |22858 |
+ROW   |4892     |255          |22858 |
 ROW   |4893     |258          |22859 |
+ROW   |4894     |255          |22859 |
 ROW   |4895     |258          |22860 |
-ROW   |4859     |259          |22840 |
-ROW   |4861     |259          |22841 |
-ROW   |4863     |259          |22842 |
-ROW   |4865     |259          |22843 |
-ROW   |4867     |259          |22844 |
-ROW   |4869     |259          |22845 |
-ROW   |4871     |259          |22846 |
-ROW   |4875     |259          |22848 |
-ROW   |4881     |259          |22851 |
-ROW   |4883     |259          |22852 |
-ROW   |4854     |260          |22837 |
-ROW   |4855     |260          |22838 |
 ROW   |4896     |261          |22860 |
 ROW   |4897     |261          |22861 |
+ROW   |4898     |256          |22862 |
+ROW   |4899     |256          |22863 |
 ROW   |4900     |262          |22873 |
 ROW   |4901     |262          |22874 |
-ROW   |5517     |262          |23321 |
-ROW   |4908     |263          |22880 |
-ROW   |4910     |263          |22881 |
-ROW   |4912     |263          |22882 |
-ROW   |4914     |263          |22883 |
-ROW   |4916     |263          |22884 |
-ROW   |4918     |263          |22885 |
-ROW   |4920     |263          |22886 |
-ROW   |4924     |263          |22888 |
-ROW   |4930     |263          |22891 |
-ROW   |4932     |263          |22892 |
-ROW   |5256     |264          |22908 |
-ROW   |5258     |264          |22909 |
-ROW   |5259     |264          |22910 |
-ROW   |5260     |264          |22911 |
-ROW   |5257     |264          |22912 |
+ROW   |4902     |268          |22875 |
+ROW   |4903     |268          |22876 |
+ROW   |4904     |270          |22877 |
+ROW   |4905     |270          |22878 |
+ROW   |4906     |268          |22879 |
 ROW   |4907     |265          |22879 |
+ROW   |4908     |263          |22880 |
+ROW   |4909     |269          |22880 |
+ROW   |4910     |263          |22881 |
+ROW   |4911     |269          |22881 |
+ROW   |4912     |263          |22882 |
+ROW   |4913     |269          |22882 |
+ROW   |4914     |263          |22883 |
+ROW   |4915     |269          |22883 |
+ROW   |4916     |263          |22884 |
+ROW   |4917     |269          |22884 |
+ROW   |4918     |263          |22885 |
+ROW   |4919     |269          |22885 |
+ROW   |4920     |263          |22886 |
+ROW   |4921     |269          |22886 |
+ROW   |4924     |263          |22888 |
+ROW   |4925     |269          |22888 |
+ROW   |4930     |263          |22891 |
+ROW   |4931     |269          |22891 |
+ROW   |4932     |263          |22892 |
+ROW   |4933     |269          |22892 |
+ROW   |4934     |268          |22893 |
 ROW   |4935     |265          |22893 |
+ROW   |4936     |268          |22894 |
 ROW   |4937     |265          |22894 |
-ROW   |4942     |265          |22898 |
-ROW   |4944     |265          |22899 |
 ROW   |4938     |266          |22895 |
 ROW   |4939     |266          |22896 |
 ROW   |4940     |266          |22897 |
-ROW   |4948     |266          |22902 |
-ROW   |4949     |266          |22903 |
-ROW   |5150     |267          |23073 |
-ROW   |5151     |267          |23074 |
-ROW   |4902     |268          |22875 |
-ROW   |4903     |268          |22876 |
-ROW   |4906     |268          |22879 |
-ROW   |4934     |268          |22893 |
-ROW   |4936     |268          |22894 |
 ROW   |4941     |268          |22898 |
+ROW   |4942     |265          |22898 |
 ROW   |4943     |268          |22899 |
+ROW   |4944     |265          |22899 |
 ROW   |4945     |268          |22900 |
-ROW   |4909     |269          |22880 |
-ROW   |4911     |269          |22881 |
-ROW   |4913     |269          |22882 |
-ROW   |4915     |269          |22883 |
-ROW   |4917     |269          |22884 |
-ROW   |4919     |269          |22885 |
-ROW   |4921     |269          |22886 |
-ROW   |4925     |269          |22888 |
-ROW   |4931     |269          |22891 |
-ROW   |4933     |269          |22892 |
-ROW   |4904     |270          |22877 |
-ROW   |4905     |270          |22878 |
 ROW   |4946     |271          |22900 |
 ROW   |4947     |271          |22901 |
+ROW   |4948     |266          |22902 |
+ROW   |4949     |266          |22903 |
 ROW   |4950     |272          |22913 |
 ROW   |4951     |272          |22914 |
-ROW   |5518     |272          |23322 |
-ROW   |4958     |273          |22920 |
-ROW   |4960     |273          |22921 |
-ROW   |4962     |273          |22922 |
-ROW   |4964     |273          |22923 |
-ROW   |4966     |273          |22924 |
-ROW   |5310     |273          |23108 |
-ROW   |5307     |273          |23109 |
-ROW   |5290     |273          |23110 |
-ROW   |5313     |273          |23111 |
-ROW   |5304     |273          |23112 |
-ROW   |5296     |273          |23113 |
-ROW   |5292     |273          |23114 |
-ROW   |5294     |273          |23115 |
-ROW   |5330     |273          |23118 |
-ROW   |5332     |273          |23119 |
-ROW   |5334     |273          |23120 |
-ROW   |5336     |273          |23121 |
-ROW   |5328     |273          |23123 |
-ROW   |5248     |274          |22948 |
-ROW   |5250     |274          |22949 |
-ROW   |5251     |274          |22950 |
-ROW   |5252     |274          |22951 |
-ROW   |5249     |274          |22952 |
-ROW   |5323     |274          |23116 |
-ROW   |5326     |274          |23117 |
-ROW   |5512     |275          |22933 |
-ROW   |4987     |275          |22934 |
-ROW   |4992     |275          |22938 |
-ROW   |4994     |275          |22939 |
-ROW   |4998     |276          |22942 |
-ROW   |4999     |276          |22943 |
-ROW   |5340     |276          |23122 |
-ROW   |5193     |276          |23124 |
-ROW   |5194     |276          |23125 |
-ROW   |5319     |276          |23126 |
-ROW   |5321     |276          |23127 |
-ROW   |5322     |276          |23128 |
-ROW   |5316     |276          |23129 |
-ROW   |5317     |276          |23130 |
-ROW   |5325     |276          |23131 |
-ROW   |5254     |277          |22945 |
-ROW   |5255     |277          |22946 |
-ROW   |5513     |278          |22933 |
-ROW   |4986     |278          |22934 |
-ROW   |4991     |278          |22938 |
-ROW   |4993     |278          |22939 |
-ROW   |4995     |278          |22940 |
-ROW   |4959     |279          |22920 |
-ROW   |4961     |279          |22921 |
-ROW   |4963     |279          |22922 |
-ROW   |4965     |279          |22923 |
-ROW   |4967     |279          |22924 |
-ROW   |5312     |279          |23108 |
-ROW   |5309     |279          |23109 |
-ROW   |5291     |279          |23110 |
-ROW   |5315     |279          |23111 |
-ROW   |5305     |279          |23112 |
-ROW   |5297     |279          |23113 |
-ROW   |5293     |279          |23114 |
-ROW   |5295     |279          |23115 |
-ROW   |5324     |279          |23116 |
-ROW   |5327     |279          |23117 |
-ROW   |5333     |279          |23119 |
-ROW   |5335     |279          |23120 |
-ROW   |5337     |279          |23121 |
 ROW   |4954     |280          |22917 |
 ROW   |4955     |280          |22918 |
+ROW   |4958     |273          |22920 |
+ROW   |4959     |279          |22920 |
+ROW   |4960     |273          |22921 |
+ROW   |4961     |279          |22921 |
+ROW   |4962     |273          |22922 |
+ROW   |4963     |279          |22922 |
+ROW   |4964     |273          |22923 |
+ROW   |4965     |279          |22923 |
+ROW   |4966     |273          |22924 |
+ROW   |4967     |279          |22924 |
+ROW   |4986     |278          |22934 |
+ROW   |4987     |275          |22934 |
+ROW   |4991     |278          |22938 |
+ROW   |4992     |275          |22938 |
+ROW   |4993     |278          |22939 |
+ROW   |4994     |275          |22939 |
+ROW   |4995     |278          |22940 |
 ROW   |4996     |281          |22940 |
 ROW   |4997     |281          |22941 |
+ROW   |4998     |276          |22942 |
+ROW   |4999     |276          |22943 |
 ROW   |5000     |282          |22953 |
 ROW   |5001     |282          |22954 |
-ROW   |5519     |282          |23323 |
 ROW   |5010     |283          |22961 |
-ROW   |5012     |283          |22962 |
-ROW   |5014     |283          |22963 |
-ROW   |5018     |283          |22965 |
-ROW   |5024     |283          |22968 |
-ROW   |5030     |283          |22971 |
-ROW   |5032     |283          |22972 |
-ROW   |5262     |284          |22988 |
-ROW   |5264     |284          |22989 |
-ROW   |5265     |284          |22990 |
-ROW   |5267     |284          |22991 |
-ROW   |5263     |284          |22992 |
-ROW   |5035     |285          |22973 |
-ROW   |5037     |285          |22974 |
-ROW   |5042     |285          |22978 |
-ROW   |5048     |286          |22982 |
-ROW   |5049     |286          |22983 |
-ROW   |5268     |287          |22985 |
-ROW   |5269     |287          |22986 |
-ROW   |5034     |288          |22973 |
-ROW   |5036     |288          |22974 |
-ROW   |5041     |288          |22978 |
-ROW   |5045     |288          |22980 |
 ROW   |5011     |289          |22961 |
+ROW   |5012     |283          |22962 |
 ROW   |5013     |289          |22962 |
+ROW   |5014     |283          |22963 |
 ROW   |5015     |289          |22963 |
+ROW   |5018     |283          |22965 |
 ROW   |5019     |289          |22965 |
+ROW   |5024     |283          |22968 |
 ROW   |5025     |289          |22968 |
+ROW   |5030     |283          |22971 |
 ROW   |5031     |289          |22971 |
+ROW   |5032     |283          |22972 |
 ROW   |5033     |289          |22972 |
+ROW   |5034     |288          |22973 |
+ROW   |5035     |285          |22973 |
+ROW   |5036     |288          |22974 |
+ROW   |5037     |285          |22974 |
+ROW   |5041     |288          |22978 |
+ROW   |5042     |285          |22978 |
+ROW   |5045     |288          |22980 |
 ROW   |5046     |291          |22980 |
 ROW   |5047     |291          |22981 |
+ROW   |5048     |286          |22982 |
+ROW   |5049     |286          |22983 |
 ROW   |5050     |292          |22993 |
 ROW   |5051     |292          |22994 |
-ROW   |5520     |292          |23324 |
-ROW   |5058     |293          |23000 |
-ROW   |5060     |293          |23001 |
-ROW   |5062     |293          |23002 |
-ROW   |5064     |293          |23003 |
-ROW   |5066     |293          |23004 |
-ROW   |5068     |293          |23005 |
-ROW   |5072     |293          |23007 |
-ROW   |5080     |293          |23011 |
-ROW   |5082     |293          |23012 |
-ROW   |5281     |294          |23028 |
-ROW   |5284     |294          |23029 |
-ROW   |5285     |294          |23030 |
-ROW   |5286     |294          |23031 |
-ROW   |5283     |294          |23032 |
+ROW   |5053     |298          |22996 |
+ROW   |5054     |300          |22997 |
+ROW   |5055     |300          |22998 |
+ROW   |5056     |298          |22999 |
 ROW   |5057     |295          |22999 |
+ROW   |5058     |293          |23000 |
+ROW   |5059     |299          |23000 |
+ROW   |5060     |293          |23001 |
+ROW   |5061     |299          |23001 |
+ROW   |5062     |293          |23002 |
+ROW   |5063     |299          |23002 |
+ROW   |5064     |293          |23003 |
+ROW   |5065     |299          |23003 |
+ROW   |5066     |293          |23004 |
+ROW   |5067     |299          |23004 |
+ROW   |5068     |293          |23005 |
+ROW   |5069     |299          |23005 |
+ROW   |5072     |293          |23007 |
+ROW   |5073     |299          |23007 |
+ROW   |5080     |293          |23011 |
+ROW   |5081     |299          |23011 |
+ROW   |5082     |293          |23012 |
+ROW   |5083     |299          |23012 |
+ROW   |5084     |298          |23013 |
 ROW   |5085     |295          |23013 |
+ROW   |5086     |298          |23014 |
 ROW   |5087     |295          |23014 |
-ROW   |5092     |295          |23018 |
-ROW   |5094     |295          |23019 |
 ROW   |5088     |296          |23015 |
 ROW   |5089     |296          |23016 |
 ROW   |5090     |296          |23017 |
-ROW   |5098     |296          |23022 |
-ROW   |5099     |296          |23023 |
-ROW   |5287     |297          |23025 |
-ROW   |5288     |297          |23026 |
-ROW   |5053     |298          |22996 |
-ROW   |5056     |298          |22999 |
-ROW   |5084     |298          |23013 |
-ROW   |5086     |298          |23014 |
 ROW   |5091     |298          |23018 |
+ROW   |5092     |295          |23018 |
 ROW   |5093     |298          |23019 |
+ROW   |5094     |295          |23019 |
 ROW   |5095     |298          |23020 |
-ROW   |5059     |299          |23000 |
-ROW   |5061     |299          |23001 |
-ROW   |5063     |299          |23002 |
-ROW   |5065     |299          |23003 |
-ROW   |5067     |299          |23004 |
-ROW   |5069     |299          |23005 |
-ROW   |5073     |299          |23007 |
-ROW   |5081     |299          |23011 |
-ROW   |5083     |299          |23012 |
-ROW   |5054     |300          |22997 |
-ROW   |5055     |300          |22998 |
 ROW   |5096     |301          |23020 |
 ROW   |5097     |301          |23021 |
+ROW   |5098     |296          |23022 |
+ROW   |5099     |296          |23023 |
 ROW   |5100     |302          |23033 |
 ROW   |5101     |302          |23034 |
-ROW   |5521     |302          |23325 |
-ROW   |5110     |303          |23041 |
-ROW   |5112     |303          |23042 |
-ROW   |5114     |303          |23043 |
-ROW   |5271     |304          |23068 |
-ROW   |5273     |304          |23069 |
-ROW   |5274     |304          |23070 |
-ROW   |5275     |304          |23071 |
-ROW   |5272     |304          |23072 |
-ROW   |5107     |305          |23039 |
-ROW   |5135     |305          |23053 |
-ROW   |5137     |305          |23054 |
-ROW   |5142     |305          |23058 |
-ROW   |5144     |305          |23059 |
-ROW   |5148     |306          |23062 |
-ROW   |5149     |306          |23063 |
-ROW   |5154     |307          |23077 |
-ROW   |5155     |307          |23078 |
 ROW   |5102     |308          |23035 |
 ROW   |5103     |308          |23036 |
 ROW   |5106     |308          |23039 |
-ROW   |5134     |308          |23053 |
-ROW   |5136     |308          |23054 |
-ROW   |5141     |308          |23058 |
-ROW   |5143     |308          |23059 |
-ROW   |5145     |308          |23060 |
+ROW   |5107     |305          |23039 |
+ROW   |5110     |303          |23041 |
 ROW   |5111     |309          |23041 |
+ROW   |5112     |303          |23042 |
 ROW   |5113     |309          |23042 |
+ROW   |5114     |303          |23043 |
 ROW   |5115     |309          |23043 |
+ROW   |5134     |308          |23053 |
+ROW   |5135     |305          |23053 |
+ROW   |5136     |308          |23054 |
+ROW   |5137     |305          |23054 |
+ROW   |5141     |308          |23058 |
+ROW   |5142     |305          |23058 |
+ROW   |5143     |308          |23059 |
+ROW   |5144     |305          |23059 |
+ROW   |5145     |308          |23060 |
 ROW   |5146     |311          |23060 |
 ROW   |5147     |311          |23061 |
-ROW   |5510     |319          |23149 |
-ROW   |5217     |319          |23150 |
-ROW   |5229     |320          |23134 |
-ROW   |5231     |320          |23135 |
-ROW   |5424     |320          |23136 |
-ROW   |5426     |320          |23137 |
-ROW   |5233     |320          |23143 |
-ROW   |5246     |320          |23144 |
-ROW   |5244     |320          |23145 |
-ROW   |5228     |322          |23134 |
-ROW   |5230     |322          |23135 |
-ROW   |5423     |322          |23136 |
-ROW   |5425     |322          |23137 |
-ROW   |5240     |322          |23159 |
-ROW   |5247     |322          |23164 |
-ROW   |5253     |322          |23165 |
-ROW   |5266     |322          |23167 |
-ROW   |5270     |322          |23168 |
+ROW   |5148     |306          |23062 |
+ROW   |5149     |306          |23063 |
+ROW   |5150     |267          |23073 |
+ROW   |5151     |267          |23074 |
+ROW   |5152     |257          |23075 |
+ROW   |5153     |257          |23076 |
+ROW   |5154     |307          |23077 |
+ROW   |5155     |307          |23078 |
+ROW   |5193     |276          |23124 |
+ROW   |5194     |276          |23125 |
 ROW   |5204     |323          |23138 |
-ROW   |5511     |323          |23149 |
 ROW   |5206     |324          |23140 |
+ROW   |5217     |319          |23150 |
+ROW   |5226     |328          |23158 |
+ROW   |5228     |322          |23134 |
+ROW   |5229     |320          |23134 |
+ROW   |5230     |322          |23135 |
+ROW   |5231     |320          |23135 |
 ROW   |5232     |325          |23143 |
-ROW   |5245     |325          |23144 |
-ROW   |5243     |325          |23145 |
+ROW   |5233     |320          |23143 |
 ROW   |5234     |328          |23147 |
 ROW   |5235     |328          |23148 |
-ROW   |5226     |328          |23158 |
+ROW   |5240     |322          |23159 |
 ROW   |5241     |329          |23160 |
 ROW   |5242     |329          |23161 |
-ROW   |5522     |329          |23326 |
+ROW   |5243     |325          |23145 |
+ROW   |5244     |320          |23145 |
+ROW   |5245     |325          |23144 |
+ROW   |5246     |320          |23144 |
+ROW   |5247     |322          |23164 |
+ROW   |5248     |274          |22948 |
+ROW   |5249     |274          |22952 |
+ROW   |5250     |274          |22949 |
+ROW   |5251     |274          |22950 |
+ROW   |5252     |274          |22951 |
+ROW   |5253     |322          |23165 |
+ROW   |5254     |277          |22945 |
+ROW   |5255     |277          |22946 |
+ROW   |5256     |264          |22908 |
+ROW   |5257     |264          |22912 |
+ROW   |5258     |264          |22909 |
+ROW   |5259     |264          |22910 |
+ROW   |5260     |264          |22911 |
+ROW   |5262     |284          |22988 |
+ROW   |5263     |284          |22992 |
+ROW   |5264     |284          |22989 |
+ROW   |5265     |284          |22990 |
+ROW   |5266     |322          |23167 |
+ROW   |5267     |284          |22991 |
+ROW   |5268     |287          |22985 |
+ROW   |5269     |287          |22986 |
+ROW   |5270     |322          |23168 |
+ROW   |5271     |304          |23068 |
+ROW   |5272     |304          |23072 |
+ROW   |5273     |304          |23069 |
+ROW   |5274     |304          |23070 |
+ROW   |5275     |304          |23071 |
+ROW   |5276     |254          |22868 |
+ROW   |5277     |254          |22872 |
+ROW   |5278     |254          |22869 |
+ROW   |5279     |254          |22870 |
+ROW   |5280     |254          |22871 |
+ROW   |5281     |294          |23028 |
 ROW   |5282     |330          |23169 |
+ROW   |5283     |294          |23032 |
+ROW   |5284     |294          |23029 |
+ROW   |5285     |294          |23030 |
+ROW   |5286     |294          |23031 |
+ROW   |5287     |297          |23025 |
+ROW   |5288     |297          |23026 |
 ROW   |5289     |330          |23170 |
-ROW   |5311     |331          |23108 |
-ROW   |5308     |331          |23109 |
-ROW   |5314     |331          |23111 |
+ROW   |5290     |273          |23110 |
+ROW   |5291     |279          |23110 |
+ROW   |5292     |273          |23114 |
+ROW   |5293     |279          |23114 |
+ROW   |5294     |273          |23115 |
+ROW   |5295     |279          |23115 |
+ROW   |5296     |273          |23113 |
+ROW   |5297     |279          |23113 |
+ROW   |5304     |273          |23112 |
+ROW   |5305     |279          |23112 |
 ROW   |5306     |331          |23112 |
+ROW   |5307     |273          |23109 |
+ROW   |5308     |331          |23109 |
+ROW   |5309     |279          |23109 |
+ROW   |5310     |273          |23108 |
+ROW   |5311     |331          |23108 |
+ROW   |5312     |279          |23108 |
+ROW   |5313     |273          |23111 |
+ROW   |5314     |331          |23111 |
+ROW   |5315     |279          |23111 |
+ROW   |5316     |276          |23129 |
+ROW   |5317     |276          |23130 |
+ROW   |5319     |276          |23126 |
+ROW   |5321     |276          |23127 |
+ROW   |5322     |276          |23128 |
+ROW   |5323     |274          |23116 |
+ROW   |5324     |279          |23116 |
+ROW   |5325     |276          |23131 |
+ROW   |5326     |274          |23117 |
+ROW   |5327     |279          |23117 |
+ROW   |5328     |273          |23123 |
+ROW   |5330     |273          |23118 |
 ROW   |5331     |331          |23118 |
+ROW   |5332     |273          |23119 |
+ROW   |5333     |279          |23119 |
+ROW   |5334     |273          |23120 |
+ROW   |5335     |279          |23120 |
+ROW   |5336     |273          |23121 |
+ROW   |5337     |279          |23121 |
+ROW   |5340     |276          |23122 |
+ROW   |5341     |179          |23171 |
+ROW   |5342     |333          |23172 |
 ROW   |5343     |332          |23173 |
 ROW   |5344     |332          |23174 |
 ROW   |5345     |332          |23175 |
-ROW   |5342     |333          |23172 |
-ROW   |5382     |333          |23212 |
 ROW   |5346     |334          |23176 |
 ROW   |5347     |334          |23177 |
 ROW   |5348     |334          |23178 |
@@ -2791,13 +2782,9 @@ ROW   |5354     |334          |23184 |
 ROW   |5355     |334          |23185 |
 ROW   |5356     |334          |23186 |
 ROW   |5357     |334          |23187 |
+ROW   |5358     |338          |23188 |
+ROW   |5359     |338          |23189 |
 ROW   |5360     |335          |23190 |
-ROW   |5853     |335          |23638 |
-ROW   |5854     |335          |23639 |
-ROW   |5855     |335          |23640 |
-ROW   |5856     |335          |23641 |
-ROW   |5857     |335          |23642 |
-ROW   |5858     |335          |23643 |
 ROW   |5361     |336          |23191 |
 ROW   |5362     |336          |23192 |
 ROW   |5363     |336          |23193 |
@@ -2819,12 +2806,9 @@ ROW   |5378     |336          |23208 |
 ROW   |5379     |336          |23209 |
 ROW   |5380     |336          |23210 |
 ROW   |5381     |336          |23211 |
+ROW   |5382     |333          |23212 |
 ROW   |5383     |337          |23213 |
 ROW   |5384     |337          |23214 |
-ROW   |5852     |337          |23637 |
-ROW   |5358     |338          |23188 |
-ROW   |5359     |338          |23189 |
-ROW   |5851     |338          |23636 |
 ROW   |5385     |339          |23215 |
 ROW   |5386     |339          |23216 |
 ROW   |5387     |339          |23217 |
@@ -2861,6 +2845,11 @@ ROW   |5417     |343          |23247 |
 ROW   |5418     |343          |23248 |
 ROW   |5419     |343          |23249 |
 ROW   |5420     |344          |23250 |
+ROW   |5421     |179          |23251 |
+ROW   |5423     |322          |23136 |
+ROW   |5424     |320          |23136 |
+ROW   |5425     |322          |23137 |
+ROW   |5426     |320          |23137 |
 ROW   |5427     |345          |23252 |
 ROW   |5428     |345          |23253 |
 ROW   |5429     |345          |23254 |
@@ -2886,69 +2875,133 @@ ROW   |5449     |345          |23274 |
 ROW   |5450     |345          |23275 |
 ROW   |5451     |345          |23276 |
 ROW   |5452     |345          |23277 |
-ROW   |5524     |345          |23328 |
-ROW   |5527     |345          |23620 |
-ROW   |5528     |345          |23625 |
-ROW   |5529     |345          |23628 |
-ROW   |5850     |345          |23635 |
-ROW   |5468     |346          |23294 |
-ROW   |5470     |346          |23295 |
-ROW   |5472     |346          |23296 |
-ROW   |5474     |346          |23297 |
-ROW   |5476     |346          |23298 |
-ROW   |5478     |346          |23299 |
-ROW   |5480     |346          |23300 |
-ROW   |5482     |346          |23301 |
-ROW   |5484     |346          |23302 |
-ROW   |5486     |346          |23303 |
-ROW   |5488     |346          |23304 |
-ROW   |5490     |346          |23305 |
-ROW   |5492     |346          |23306 |
+ROW   |5453     |350          |23280 |
+ROW   |5454     |350          |23281 |
 ROW   |5455     |347          |23282 |
 ROW   |5456     |347          |23283 |
 ROW   |5457     |347          |23284 |
 ROW   |5458     |347          |23285 |
 ROW   |5459     |347          |23286 |
+ROW   |5460     |355          |23287 |
+ROW   |5461     |355          |23288 |
+ROW   |5462     |351          |23289 |
+ROW   |5463     |351          |23290 |
+ROW   |5464     |353          |23291 |
+ROW   |5465     |353          |23292 |
+ROW   |5466     |351          |23293 |
 ROW   |5467     |348          |23293 |
+ROW   |5468     |346          |23294 |
+ROW   |5469     |352          |23294 |
+ROW   |5470     |346          |23295 |
+ROW   |5471     |352          |23295 |
+ROW   |5472     |346          |23296 |
+ROW   |5473     |352          |23296 |
+ROW   |5474     |346          |23297 |
+ROW   |5475     |352          |23297 |
+ROW   |5476     |346          |23298 |
+ROW   |5477     |352          |23298 |
+ROW   |5478     |346          |23299 |
+ROW   |5479     |352          |23299 |
+ROW   |5480     |346          |23300 |
+ROW   |5481     |352          |23300 |
+ROW   |5482     |346          |23301 |
+ROW   |5483     |352          |23301 |
+ROW   |5484     |346          |23302 |
+ROW   |5485     |352          |23302 |
+ROW   |5486     |346          |23303 |
+ROW   |5487     |352          |23303 |
+ROW   |5488     |346          |23304 |
+ROW   |5489     |352          |23304 |
+ROW   |5490     |346          |23305 |
+ROW   |5491     |352          |23305 |
+ROW   |5492     |346          |23306 |
+ROW   |5493     |352          |23306 |
+ROW   |5494     |351          |23307 |
 ROW   |5495     |348          |23307 |
+ROW   |5496     |351          |23308 |
 ROW   |5497     |348          |23308 |
-ROW   |5502     |348          |23312 |
-ROW   |5504     |348          |23313 |
 ROW   |5498     |349          |23309 |
 ROW   |5499     |349          |23310 |
 ROW   |5500     |349          |23311 |
-ROW   |5508     |349          |23316 |
-ROW   |5509     |349          |23317 |
-ROW   |5453     |350          |23280 |
-ROW   |5454     |350          |23281 |
-ROW   |5462     |351          |23289 |
-ROW   |5463     |351          |23290 |
-ROW   |5466     |351          |23293 |
-ROW   |5494     |351          |23307 |
-ROW   |5496     |351          |23308 |
 ROW   |5501     |351          |23312 |
+ROW   |5502     |348          |23312 |
 ROW   |5503     |351          |23313 |
+ROW   |5504     |348          |23313 |
 ROW   |5505     |351          |23314 |
-ROW   |5469     |352          |23294 |
-ROW   |5471     |352          |23295 |
-ROW   |5473     |352          |23296 |
-ROW   |5475     |352          |23297 |
-ROW   |5477     |352          |23298 |
-ROW   |5479     |352          |23299 |
-ROW   |5481     |352          |23300 |
-ROW   |5483     |352          |23301 |
-ROW   |5485     |352          |23302 |
-ROW   |5487     |352          |23303 |
-ROW   |5489     |352          |23304 |
-ROW   |5491     |352          |23305 |
-ROW   |5493     |352          |23306 |
-ROW   |5464     |353          |23291 |
-ROW   |5465     |353          |23292 |
 ROW   |5506     |354          |23314 |
 ROW   |5507     |354          |23315 |
-ROW   |5460     |355          |23287 |
-ROW   |5461     |355          |23288 |
+ROW   |5508     |349          |23316 |
+ROW   |5509     |349          |23317 |
+ROW   |5510     |319          |23149 |
+ROW   |5511     |323          |23149 |
+ROW   |5512     |275          |22933 |
+ROW   |5513     |278          |22933 |
+ROW   |5514     |206          |23318 |
+ROW   |5515     |207          |23319 |
+ROW   |5516     |252          |23320 |
+ROW   |5517     |262          |23321 |
+ROW   |5518     |272          |23322 |
+ROW   |5519     |282          |23323 |
+ROW   |5520     |292          |23324 |
+ROW   |5521     |302          |23325 |
+ROW   |5522     |329          |23326 |
 ROW   |5523     |355          |23327 |
+ROW   |5524     |345          |23328 |
+ROW   |5527     |345          |23620 |
+ROW   |5528     |345          |23625 |
+ROW   |5529     |345          |23628 |
+ROW   |5740     |410          |23543 |
+ROW   |5741     |410          |23544 |
+ROW   |5742     |410          |23545 |
+ROW   |5743     |410          |23546 |
+ROW   |5744     |414          |23547 |
+ROW   |5745     |414          |23548 |
+ROW   |5746     |414          |23549 |
+ROW   |5747     |408          |23550 |
+ROW   |5748     |408          |23551 |
+ROW   |5749     |412          |23552 |
+ROW   |5750     |412          |23553 |
+ROW   |5751     |420          |23555 |
+ROW   |5752     |416          |23556 |
+ROW   |5753     |420          |23556 |
+ROW   |5754     |416          |23557 |
+ROW   |5755     |420          |23557 |
+ROW   |5756     |416          |23558 |
+ROW   |5757     |420          |23558 |
+ROW   |5758     |416          |23559 |
+ROW   |5759     |420          |23559 |
+ROW   |5760     |416          |23560 |
+ROW   |5761     |418          |23561 |
+ROW   |5762     |420          |23562 |
+ROW   |5763     |418          |23563 |
+ROW   |5764     |420          |23564 |
+ROW   |5765     |422          |23564 |
+ROW   |5766     |418          |23565 |
+ROW   |5767     |422          |23566 |
+ROW   |5768     |420          |23567 |
+ROW   |5769     |418          |23568 |
+ROW   |5770     |418          |23569 |
+ROW   |5773     |422          |23572 |
+ROW   |5774     |412          |23573 |
+ROW   |5776     |424          |23576 |
+ROW   |5777     |424          |23577 |
+ROW   |5778     |424          |23578 |
+ROW   |5779     |424          |23579 |
+ROW   |5793     |433          |23593 |
+ROW   |5794     |434          |23596 |
+ROW   |5795     |412          |23597 |
+ROW   |5796     |418          |23598 |
+ROW   |5797     |435          |23601 |
+ROW   |5798     |435          |23602 |
+ROW   |5799     |435          |23603 |
+ROW   |5800     |435          |23604 |
+ROW   |5801     |437          |23605 |
+ROW   |5802     |437          |23606 |
+ROW   |5803     |437          |23607 |
+ROW   |5804     |437          |23608 |
+ROW   |5813     |179          |22191 |
+ROW   |5814     |179          |22196 |
+ROW   |5815     |179          |22199 |
 ROW   |5816     |356          |23340 |
 ROW   |5817     |356          |23341 |
 ROW   |5818     |356          |23342 |
@@ -2970,63 +3023,24 @@ ROW   |5833     |356          |23357 |
 ROW   |5834     |356          |23358 |
 ROW   |5835     |356          |23359 |
 ROW   |5836     |356          |23360 |
-ROW   |5747     |408          |23550 |
-ROW   |5748     |408          |23551 |
-ROW   |5740     |410          |23543 |
-ROW   |5741     |410          |23544 |
-ROW   |5742     |410          |23545 |
-ROW   |5743     |410          |23546 |
 ROW   |5841     |410          |23585 |
 ROW   |5842     |410          |23586 |
 ROW   |5843     |410          |23587 |
 ROW   |5844     |410          |23588 |
-ROW   |5749     |412          |23552 |
-ROW   |5750     |412          |23553 |
-ROW   |5774     |412          |23573 |
-ROW   |5795     |412          |23597 |
-ROW   |5744     |414          |23547 |
-ROW   |5745     |414          |23548 |
-ROW   |5746     |414          |23549 |
-ROW   |5752     |416          |23556 |
-ROW   |5754     |416          |23557 |
-ROW   |5756     |416          |23558 |
-ROW   |5758     |416          |23559 |
-ROW   |5760     |416          |23560 |
-ROW   |5761     |418          |23561 |
-ROW   |5763     |418          |23563 |
-ROW   |5766     |418          |23565 |
-ROW   |5769     |418          |23568 |
-ROW   |5770     |418          |23569 |
-ROW   |5796     |418          |23598 |
-ROW   |5751     |420          |23555 |
-ROW   |5753     |420          |23556 |
-ROW   |5755     |420          |23557 |
-ROW   |5757     |420          |23558 |
-ROW   |5759     |420          |23559 |
-ROW   |5762     |420          |23562 |
-ROW   |5764     |420          |23564 |
-ROW   |5768     |420          |23567 |
-ROW   |5765     |422          |23564 |
-ROW   |5767     |422          |23566 |
-ROW   |5773     |422          |23572 |
-ROW   |5776     |424          |23576 |
-ROW   |5777     |424          |23577 |
-ROW   |5778     |424          |23578 |
-ROW   |5779     |424          |23579 |
-ROW   |5793     |433          |23593 |
-ROW   |5794     |434          |23596 |
-ROW   |5797     |435          |23601 |
-ROW   |5798     |435          |23602 |
-ROW   |5799     |435          |23603 |
-ROW   |5800     |435          |23604 |
-ROW   |5801     |437          |23605 |
-ROW   |5802     |437          |23606 |
-ROW   |5803     |437          |23607 |
-ROW   |5804     |437          |23608 |
 ROW   |5845     |443          |23629 |
 ROW   |5846     |443          |23630 |
 ROW   |5847     |445          |23632 |
 ROW   |5848     |445          |23633 |
+ROW   |5849     |179          |23634 |
+ROW   |5850     |345          |23635 |
+ROW   |5851     |338          |23636 |
+ROW   |5852     |337          |23637 |
+ROW   |5853     |335          |23638 |
+ROW   |5854     |335          |23639 |
+ROW   |5855     |335          |23640 |
+ROW   |5856     |335          |23641 |
+ROW   |5857     |335          |23642 |
+ROW   |5858     |335          |23643 |
 ROW   |5859     |446          |23644 |
 ROW   |5860     |447          |23645 |
 ROW   |5861     |448          |23646 |
@@ -3043,6 +3057,10 @@ ROW   |5871     |457          |23656 |
 ROW   |5872     |457          |23657 |
 ROW   |5873     |458          |23658 |
 ROW   |5874     |458          |23659 |
+ROW   |5875     |179          |23660 |
+ROW   |5876     |179          |23661 |
+ROW   |5877     |345          |23662 |
+ROW   |5878     |345          |23663 |
 
 TABLE |mappings
 FIELDS|mappingid|valuemapid|value|newvalue          |
@@ -3104,6 +3122,8 @@ ROW   |78       |13        |3    |red               |
 ROW   |79       |14        |0    |normal            |
 ROW   |80       |14        |1    |in maintenance    |
 ROW   |81       |14        |2    |no data collection|
+ROW   |82       |15        |0    |Normal            |
+ROW   |83       |15        |1    |Low memory        |
 
 TABLE |sysmaps
 FIELDS|sysmapid|name         |width|height|backgroundid|label_type|label_location|highlight|expandproblem|markelements|show_unack|grid_size|grid_show|grid_align|label_format|label_type_host|label_type_hostgroup|label_type_trigger|label_type_map|label_type_image|label_string_host|label_string_hostgroup|label_string_trigger|label_string_map|label_string_image|iconmapid|expand_macros|severity_min|
@@ -3224,10 +3244,6 @@ ROW   |171            |23069 |23067        |
 ROW   |172            |23070 |23067        |
 ROW   |173            |23071 |23067        |
 ROW   |174            |23072 |23067        |
-ROW   |189            |23073 |23540        |
-ROW   |190            |23074 |23540        |
-ROW   |191            |23075 |23329        |
-ROW   |192            |23076 |23329        |
 ROW   |175            |23164 |23162        |
 ROW   |176            |23165 |23162        |
 ROW   |178            |23167 |23162        |
@@ -3241,6 +3257,10 @@ ROW   |185            |23283 |23279        |
 ROW   |186            |23284 |23279        |
 ROW   |187            |23285 |23279        |
 ROW   |188            |23286 |23279        |
+ROW   |189            |23073 |23540        |
+ROW   |190            |23074 |23540        |
+ROW   |191            |23075 |23329        |
+ROW   |192            |23076 |23329        |
 ROW   |193            |23576 |23575        |
 ROW   |194            |23577 |23575        |
 ROW   |195            |23578 |23575        |
@@ -3316,3 +3336,4 @@ ROW   |17              |22760 |8       |{#SNMPVALUE}|@Storage devices for SNMP d
 ROW   |18              |22767 |8       |{#SNMPVALUE}|@Storage devices for SNMP discovery|
 ROW   |19              |23278 |8       |{#IFNAME}   |@Network interfaces for discovery  |
 ROW   |20              |23279 |8       |{#FSTYPE}   |@File systems for discovery        |
+

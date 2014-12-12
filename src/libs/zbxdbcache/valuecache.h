@@ -66,6 +66,9 @@ zbx_history_record_t;
 
 ZBX_VECTOR_DECL(history_record, zbx_history_record_t);
 
+#define ZBX_VC_MODE_NORMAL	0
+#define ZBX_VC_MODE_LOWMEM	1
+
 /* the cache statistics */
 typedef struct
 {
@@ -75,8 +78,8 @@ typedef struct
 	zbx_uint64_t	total_size;
 	zbx_uint64_t	free_size;
 
-	/* 0 - cache is working normally, 1 - cache is working in low memory mode */
-	int		low_memory;
+	/* value cache operating mode: 0 - normal, 1 - low memory */
+	int		mode;
 }
 zbx_vc_stats_t;
 
