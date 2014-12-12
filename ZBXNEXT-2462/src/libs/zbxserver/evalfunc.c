@@ -1298,8 +1298,8 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *function, con
 
 	now = (int)time(NULL);
 
-	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
-			1 == values.values_num && values.values[0].timestamp.sec + arg1 > now)
+	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, arg1, 1, now) &&
+			1 == values.values_num)
 	{
 		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 	}
