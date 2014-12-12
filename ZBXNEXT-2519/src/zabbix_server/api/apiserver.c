@@ -113,9 +113,13 @@ out:
 static int	zbx_api_call_method(const struct zbx_json_parse *jp, const zbx_api_user_t *user,
 		struct zbx_json *result, char **error)
 {
-	int	ret = SUCCEED;
-	char	*method = NULL;
-	size_t	method_alloc = 0;
+	const char	*__function_name = "zbx_api_call_method";
+	int		ret = SUCCEED;
+	char		*method = NULL;
+	size_t		method_alloc = 0;
+
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_API_RESULT_TAG_METHOD, &method, &method_alloc))
 	{
@@ -150,6 +154,8 @@ static int	zbx_api_call_method(const struct zbx_json_parse *jp, const zbx_api_us
 out:
 	zbx_free(method);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -170,12 +176,15 @@ out:
  ******************************************************************************/
 static int	zbx_api_process_jsonrpc(zbx_sock_t *sock, const char *data)
 {
+	const char		*__function_name = "zbx_api_process_jsonrpc";
 	char			*header, *error = NULL, *id = NULL;
 	struct zbx_json_parse	jp;
 	struct zbx_json		result;
 	size_t			id_alloc = 0;
 	zbx_api_user_t		user;
 	int			ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __function_name, data);
 
 	if (SUCCEED != zbx_json_open(data, &jp))
 	{
@@ -211,6 +220,8 @@ out:
 	zbx_free(id);
 	zbx_free(error);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -225,21 +236,24 @@ out:
  ******************************************************************************/
 static void	zbx_api_process_request(zbx_sock_t *sock)
 {
+	const char	*__function_name = "zbx_api_process_request";
 	const char	*line;
 	size_t		content_length = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == (line = zbx_tcp_recv_line(sock)))
 	{
 		zbx_tcp_send_raw(sock, "HTTP/1.1 400 Bad Request\r\n");
 		zabbix_log(LOG_LEVEL_WARNING, "cannot read post request");
-		return;
+		goto out;
 	}
 
 	if (0 != strcmp(line, ZBX_APISERVER_REQUEST_LINE))
 	{
 		zbx_tcp_send_raw(sock, "HTTP/1.1 400 Bad Request\r\n");
 		zabbix_log(LOG_LEVEL_WARNING, "invalid request line \"%s\"", line);
-		return;
+		goto out;
 	}
 
 	for (line = zbx_tcp_recv_line(sock); '\0' != *line; line = zbx_tcp_recv_line(sock))
@@ -277,7 +291,7 @@ static void	zbx_api_process_request(zbx_sock_t *sock)
 	{
 		zbx_tcp_send_raw(sock, "HTTP/1.1 411 Length Required\r\n");
 		zabbix_log(LOG_LEVEL_WARNING, "no Content-Length value specified");
-		return;
+		goto out;
 	}
 
 	if (content_length == sock->read_bytes - (unsigned)(sock->next_line - sock->buffer))
@@ -290,7 +304,7 @@ static void	zbx_api_process_request(zbx_sock_t *sock)
 		/* we already have received more data than expected, throw error  */
 		zbx_tcp_send_raw(sock, "HTTP/1.1 400 Bad Request\r\n");
 		zabbix_log(LOG_LEVEL_WARNING, "received more data than expected");
-		return;
+		goto out;
 	}
 	else
 	{
@@ -323,6 +337,8 @@ static void	zbx_api_process_request(zbx_sock_t *sock)
 clean:
 		zbx_free(data);
 	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 ZBX_THREAD_ENTRY(apiserver_thread, args)

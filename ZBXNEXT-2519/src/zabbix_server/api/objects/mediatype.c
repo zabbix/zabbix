@@ -104,17 +104,31 @@ zbx_api_class_t	zbx_api_class_mediatype = {"mediatype", "media_type", zbx_api_cl
 static int	zbx_api_mediatype_user_access_objectids(const zbx_api_user_t *user,
 		const zbx_vector_uint64_t *objectids, int access, char **error)
 {
+	const char	*__function_name = "zbx_api_mediatype_user_access_objectids";
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 " type:%d access:%s",
+			__function_name, user->id, user->type,
+			(ZBX_API_ACCESS_WRITE == access ? "write" : "read"));
+
 	if (USER_TYPE_SUPER_ADMIN != user->type &&
 			(USER_TYPE_ZABBIX_ADMIN == user->type && ZBX_API_ACCESS_WRITE == access))
 	{
 		*error = zbx_strdup(*error, "insufficient access rights");
-		return FAIL;
+		goto out;
 	}
 
 	if (ZBX_API_ACCESS_READ == access || NULL == objectids)
-		return SUCCEED;
+	{
+		ret = SUCCEED;
+		goto out;
+	}
 
-	return  zbx_api_check_objectids(objectids, &zbx_api_class_mediatype, error);
+	ret =  zbx_api_check_objectids(objectids, &zbx_api_class_mediatype, error);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -137,8 +151,11 @@ static int	zbx_api_mediatype_user_access_objectids(const zbx_api_user_t *user,
 static int	zbx_api_mediatype_user_access_objects(const zbx_api_user_t *user, const zbx_vector_ptr_t *objects,
 		int access, char **error)
 {
+	const char		*__function_name = "zbx_api_mediatype_user_access_objects";
 	int			ret;
 	zbx_vector_uint64_t	objectids;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ", __function_name);
 
 	zbx_vector_uint64_create(&objectids);
 
@@ -150,6 +167,8 @@ static int	zbx_api_mediatype_user_access_objects(const zbx_api_user_t *user, con
 	ret = zbx_api_mediatype_user_access_objectids(user, &objectids, access, error);
 
 	zbx_vector_uint64_destroy(&objectids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -194,9 +213,12 @@ static void	zbx_api_mediatype_get_clean(zbx_api_mediatype_get_t *self)
  ******************************************************************************/
 static int	zbx_api_mediatype_get_init(zbx_api_mediatype_get_t *self, const struct zbx_json_parse *jp, char **error)
 {
+	const char	*__function_name = "zbx_api_mediatype_get_init";
 	char		name[ZBX_API_PARAM_NAME_SIZE], *value = NULL;
 	const char	*p = NULL;
 	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ", __function_name);
 
 	memset(self, 0, sizeof(zbx_api_mediatype_get_t));
 
@@ -290,6 +312,8 @@ out:
 	if (SUCCEED != ret)
 		zbx_api_mediatype_get_clean(self);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -313,6 +337,7 @@ out:
 int	zbx_api_mediatype_get(const zbx_api_user_t *user, const struct zbx_json_parse *jp_request,
 		struct zbx_json *output)
 {
+	const char		*__function_name = "zbx_api_mediatype_get";
 	zbx_api_mediatype_get_t	request;
 	struct zbx_json_parse	jp_params;
 	char			*error = NULL, *sql = NULL;
@@ -320,6 +345,8 @@ int	zbx_api_mediatype_get(const zbx_api_user_t *user, const struct zbx_json_pars
 	size_t			sql_alloc = 0, sql_offset = 0;
 	const char		*sql_condition = " where";
 	zbx_api_get_result_t	result;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_api_get_result_init(&result);
 
@@ -417,6 +444,8 @@ out:
 
 	zbx_api_get_result_clean(&result);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -455,8 +484,11 @@ static void	zbx_api_mediatype_create_clean(zbx_api_mediatype_create_t *self)
 static int	zbx_api_mediatype_create_init(zbx_api_mediatype_create_t *self, const struct zbx_json_parse *jp,
 		char **error)
 {
+	const char	*__function_name = "zbx_api_mediatype_create_init";
 	int		ret = FAIL;
 	const char	*next = jp->start;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ", __function_name);
 
 	zbx_vector_ptr_create(&self->objects);
 
@@ -470,6 +502,8 @@ static int	zbx_api_mediatype_create_init(zbx_api_mediatype_create_t *self, const
 out:
 	if (SUCCEED != ret)
 		zbx_api_mediatype_create_clean(self);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -494,11 +528,14 @@ out:
 int	zbx_api_mediatype_create(const zbx_api_user_t *user, const struct zbx_json_parse *jp_request,
 		struct zbx_json *output)
 {
+	const char			*__function_name = "zbx_api_mediatype_create";
 	zbx_api_mediatype_create_t	request;
 	struct zbx_json_parse		jp_params;
 	char				*error = NULL;
 	int				ret = FAIL;
 	zbx_vector_uint64_t		ids;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&ids);
 
@@ -544,6 +581,8 @@ out:
 
 	zbx_vector_uint64_destroy(&ids);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -582,8 +621,11 @@ static void	zbx_api_mediatype_delete_clean(zbx_api_mediatype_delete_t *self)
 static int	zbx_api_mediatype_delete_init(zbx_api_mediatype_delete_t *self, const struct zbx_json_parse *jp,
 		char **error)
 {
+	const char	*__function_name = "zbx_api_mediatype_delete_init";
 	int		ret = FAIL;
 	const char	*next = jp->start;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ", __function_name);
 
 	zbx_vector_uint64_create(&self->objectids);
 
@@ -594,6 +636,8 @@ static int	zbx_api_mediatype_delete_init(zbx_api_mediatype_delete_t *self, const
 out:
 	if (SUCCEED != ret)
 		zbx_api_mediatype_delete_clean(self);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -618,10 +662,13 @@ out:
 int	zbx_api_mediatype_delete(const zbx_api_user_t *user, const struct zbx_json_parse *jp_request,
 		struct zbx_json *output)
 {
+	const char			*__function_name = "zbx_api_mediatype_delete";
 	zbx_api_mediatype_delete_t	request;
 	struct zbx_json_parse		jp_params;
 	char				*error = NULL;
 	int				ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp_request, "params", &jp_params))
 	{
@@ -655,6 +702,8 @@ out:
 		zbx_api_json_add_error(output, "Cannot delete media type", error);
 
 	zbx_free(error);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -694,8 +743,11 @@ static void	zbx_api_mediatype_update_clean(zbx_api_mediatype_update_t *self)
 static int	zbx_api_mediatype_update_init(zbx_api_mediatype_update_t *self, const struct zbx_json_parse *jp,
 		char **error)
 {
+	const char	*__function_name = "zbx_api_mediatype_update_init";
 	int		ret = FAIL;
 	const char	*next = jp->start;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ", __function_name);
 
 	zbx_vector_ptr_create(&self->objects);
 
@@ -709,6 +761,8 @@ static int	zbx_api_mediatype_update_init(zbx_api_mediatype_update_t *self, const
 out:
 	if (SUCCEED != ret)
 		zbx_api_mediatype_update_clean(self);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -733,11 +787,14 @@ out:
 int	zbx_api_mediatype_update(const zbx_api_user_t *user, const struct zbx_json_parse *jp_request,
 		struct zbx_json *output)
 {
+	const char			*__function_name = "zbx_api_mediatype_update";
 	zbx_api_mediatype_update_t	request;
 	struct zbx_json_parse		jp_params;
 	char				*error = NULL;
 	int				ret = FAIL;
 	zbx_vector_uint64_t		ids;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&ids);
 
@@ -784,6 +841,8 @@ out:
 	zbx_free(error);
 
 	zbx_vector_uint64_destroy(&ids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

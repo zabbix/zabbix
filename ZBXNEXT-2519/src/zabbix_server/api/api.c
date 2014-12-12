@@ -104,18 +104,25 @@ static const char *zbx_api_params[] = {
  ******************************************************************************/
 static int	zbx_api_object_init(zbx_api_class_t *object, char **error)
 {
+	const char		*__function_name = "zbx_api_object_init";
 	zbx_api_property_t	*prop;
 	const ZBX_TABLE		*table;
 	const ZBX_FIELD		*field;
+	int			ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ", __function_name);
 
 	if (NULL == object->table_name)
-		return SUCCEED;
+	{
+		ret = SUCCEED;
+		goto out;
+	}
 
 	if (NULL == (table = DBget_table(object->table_name)))
 	{
 		*error = zbx_dsprintf(NULL, "invalid object \"%s\" table name \"%s\"", object->name,
 				object->table_name);
-		return FAIL;
+		goto out;
 	}
 
 	for (prop = object->properties; NULL != prop->name; prop++)
@@ -127,13 +134,18 @@ static int	zbx_api_object_init(zbx_api_class_t *object, char **error)
 		{
 			*error = zbx_dsprintf(NULL, "invalid object \"%s\" property \"%s\" field \"%s\"", object->name,
 					prop->name, prop->field_name);
-			return FAIL;
+			goto out;
 		}
 
 		prop->field = field;
 	}
 
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -3333,6 +3345,8 @@ void	zbx_api_json_add_error(struct zbx_json *json, const char *prefix, const cha
  ******************************************************************************/
 int	zbx_api_init(char **error)
 {
+	const char		*__function_name = "zbx_api_init";
+
 	zbx_api_class_t*	zbx_api_objects[] = {
 						&zbx_api_class_user,
 						&zbx_api_class_mediatype,
@@ -3340,12 +3354,19 @@ int	zbx_api_init(char **error)
 	};
 
 	zbx_api_class_t	**object;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ", __function_name);
 
 	for (object = zbx_api_objects; NULL != *object; object++)
 	{
 		if (SUCCEED != zbx_api_object_init(*object, error))
-			return FAIL;
+			goto out;
 	}
 
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
