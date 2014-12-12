@@ -14,7 +14,8 @@ Actual information about correct repository can be founded at https://downloads.
 2. Install MariaDB server/client and other prerequisites:
     yum install MariaDB-server MariaDB-client MariaDB-devel MariaDB-common \
     ldns ldns-devel openssl openssl-devel perl-IO-CaptureOutput perl-Crypt-OpenSSL-RSA \
-    perl-WWW-Salesforce perl-DateTime.x86_64 perl-DBD-MySQL.x86_64 perl-File-Pid perl-Expect
+    perl-WWW-Salesforce perl-DateTime.x86_64 perl-DBD-MySQL.x86_64 perl-File-Pid perl-Expect \
+    perl-DateTime-Format-RFC3339
 
 3. Add 'zabbix' user to the system:
     useradd zabbix

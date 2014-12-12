@@ -67,8 +67,8 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds minutes_last_month
 		get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_avail process_slv_ns_avail
-		process_slv_monthly get_results get_item_values check_lastclock get_downtime get_downtime_prepare
-		get_downtime_execute avail_result_msg
+		process_slv_monthly get_results get_item_values check_lastclock sql_time_condition get_incidents
+		get_downtime get_downtime_prepare get_downtime_execute avail_result_msg
 		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str usage);
 
 # configuration, set in set_slv_config()
@@ -1126,7 +1126,7 @@ sub push_value
 #
 sub send_values
 {
-    if (defined($OPTS{'debug'}))
+    if (defined($OPTS{'debug'}) or defined($OPTS{'test'}))
     {
 	# $tld is a global variable which is used in info()
 	my $saved_tld = $tld;
@@ -1648,7 +1648,7 @@ sub check_lastclock
     my $value_ts = shift;
     my $interval = shift;
 
-    return SUCCESS if (defined($OPTS{'debug'}));
+    return SUCCESS if (defined($OPTS{'debug'}) or defined($OPTS{'test'}));
 
     if ($lastclock + $interval > $value_ts)
     {
@@ -1659,6 +1659,197 @@ sub check_lastclock
     return SUCCESS;
 }
 
+sub __make_incident
+{
+    my %h;
+
+    $h{'eventid'} = shift;
+    $h{'start'} = shift;
+    $h{'false_positive'} = shift;
+
+    return \%h;
+}
+
+sub sql_time_condition
+{
+    my $from = shift;
+    my $till = shift;
+
+    if (defined($from) and not defined($till))
+    {
+	return "clock>=$from";
+    }
+
+    if (not defined($from) and defined($till))
+    {
+	return "clock<=$till";
+    }
+
+    if (defined($from) and defined($till))
+    {
+	return "clock=$from" if ($from == $till);
+	fail("invalid time conditions: from=$from till=$till") if ($from > $till);
+	return "clock between $from and $till";
+    }
+
+    return "1=1";
+}
+
+# return incidents as an array reference (sorted by time):
+#
+# [
+#     {
+#         'eventid' => '5881',
+#         'start' => '1418272230',
+#         'end' => '1418273230'
+#         'false_positive' => '0',
+#     },
+#     {
+#         'eventid' => '6585',
+#         'start' => '1418280000',
+#         'false_positive' => '1',
+#     }
+# ]
+#
+# An incident is a period when the problem was active. This period is
+# limited by 2 events, the PROBLEM event and the first OK event after
+# that.
+#
+# Incidents are returned within time limits specified by $from and $till.
+# If an incident is on-going at the $from time the event "start" time is
+# used. In case event is on-going at time specified as $till it's "end"
+# time is not defined.
+sub get_incidents
+{
+    my $itemid = shift;
+    my $from = shift;
+    my $till = shift;
+
+    my (@incidents, $rows_ref, $row_ref);
+
+    $rows_ref = db_select(
+	"select distinct t.triggerid".
+	" from triggers t,functions f".
+	" where t.triggerid=f.triggerid".
+		" and f.itemid=$itemid".
+		" and t.priority=".TRIGGER_SEVERITY_NOT_CLASSIFIED);
+
+    my $rows = scalar(@$rows_ref);
+
+    unless ($rows == 1)
+    {
+	wrn("item $itemid must have one not classified trigger (found: $rows)");
+	return \@incidents;
+    }
+
+    my $triggerid = $rows_ref->[0]->[0];
+
+    my $last_trigger_value = TRIGGER_VALUE_FALSE;
+
+    if (defined($from))
+    {
+	# first check for ongoing incident
+	$rows_ref = db_select(
+	    "select max(clock)".
+	    " from events".
+	    " where object=".EVENT_OBJECT_TRIGGER.
+	    	" and source=".EVENT_SOURCE_TRIGGERS.
+		" and objectid=$triggerid".
+		" and clock<$from");
+
+	$row_ref = $rows_ref->[0];
+
+	if (defined($row_ref) and defined($row_ref->[0]))
+	{
+	    my $preincident_clock = $row_ref->[0];
+
+	    $rows_ref = db_select(
+		"select eventid,clock,value,false_positive".
+		" from events".
+		" where object=".EVENT_OBJECT_TRIGGER.
+	    		" and source=".EVENT_SOURCE_TRIGGERS.
+	    		" and objectid=$triggerid".
+	    		" and clock=$preincident_clock".
+		" order by ns desc".
+		" limit 1");
+
+	    $row_ref = $rows_ref->[0];
+
+	    my $eventid = $row_ref->[0];
+	    my $clock = $row_ref->[1];
+	    my $value = $row_ref->[2];
+	    my $false_positive = $row_ref->[3];
+
+	    dbg("pre-incident $eventid: clock:" . ts_str($clock) . " ($clock), value:$value, false_positive:$false_positive") if ($OPTS{'debug'});
+
+	    # do not add 'value=TRIGGER_VALUE_TRUE' to SQL above just for corner case of 2 events at the same second
+	    if ($value == TRIGGER_VALUE_TRUE)
+	    {
+		push(@incidents, __make_incident($eventid, $clock, $false_positive));
+
+		$last_trigger_value = TRIGGER_VALUE_TRUE;
+	    }
+	}
+    }
+
+    # now check for incidents within given period
+    $rows_ref = db_select(
+	"select eventid,clock,value,false_positive".
+	" from events".
+	" where object=".EVENT_OBJECT_TRIGGER.
+		" and source=".EVENT_SOURCE_TRIGGERS.
+		" and objectid=$triggerid".
+		" and ".sql_time_condition($from, $till).
+	" order by clock,ns");
+
+    foreach my $row_ref (@$rows_ref)
+    {
+	my $eventid = $row_ref->[0];
+	my $clock = $row_ref->[1];
+	my $value = $row_ref->[2];
+	my $false_positive = $row_ref->[3];
+	
+	dbg("$eventid: clock:" . ts_str($clock) . " ($clock), value:$value, false_positive:$false_positive") if ($OPTS{'debug'});
+
+	next if ($value == $last_trigger_value);
+
+	if ($value == TRIGGER_VALUE_FALSE)
+	{
+	    # event that closes an incident
+	    my $idx = scalar(@incidents) - 1;
+
+	    $incidents[$idx]->{'end'} = $clock;
+	}
+	else
+	{
+	    # event that starts an incident
+	    push(@incidents, __make_incident($eventid, $clock, $false_positive));
+	}
+
+	$last_trigger_value = $value;
+    }
+
+    if ($OPTS{'debug'})
+    {
+	foreach (@incidents)
+	{
+	    my $eventid = $_->{'eventid'};
+	    my $inc_from = $_->{'start'};
+	    my $inc_till = $_->{'end'};
+	    my $false_positive = $_->{'false_positive'};
+
+	    my $str = "$eventid";
+	    $str .= " (false positive)" if ($false_positive != 0);
+	    $str .= ": " . ts_str($inc_from) . " ($inc_from) -> ";
+	    $str .= $inc_till ? ts_str($inc_till) . " ($inc_till)" : "null";
+
+	    dbg($str);
+	}
+    }
+
+    return \@incidents;
+}
+
 sub get_downtime
 {
     my $itemid = shift;
@@ -1666,26 +1857,45 @@ sub get_downtime
     my $till = shift;
     my $ignore_incidents = shift; # if set check the whole period
 
-    my $incidents = ($ignore_incidents) ? [$from, $till] : __get_incidents($itemid, $from, $till);
+    my $incidents;
+    if ($ignore_incidents)
+    {
+	my %h;
+
+	$h{'start'} = $from;
+	$h{'end'} = $till;
+	$h{'false_positive'} = 0;
+
+	push(@$incidents, \%h);
+    }
+    else
+    {
+	$incidents = get_incidents($itemid, $from, $till);
+    }
 
     my $count = 0;
 
     my $total = scalar(@$incidents);
-    my $i = 0;
     my $downtime = 0;
 
-    while ($i < $total)
+    foreach (@$incidents)
     {
-	my $event_from = $incidents->[$i++];
-	my $event_till = $incidents->[$i++];
+	my $false_positive = $_->{'false_positive'};
+	my $period_from = $_->{'start'};
+	my $period_till = $_->{'end'};
 
-	fail("internal error handling incidents, check function __get_incidents()") if (($event_from < $from) and ($event_till < $from));
+	fail("internal error: incident outside time bounds, check function get_incidents()") if (($period_from < $from) and defined($period_till) and ($period_till < $from));
+
+	$period_from = $from if ($period_from < $from);
+	$period_till = $till unless (defined($period_till)); # last incident may be ongoing
+
+	next if ($false_positive != 0);
 
 	my $rows_ref = db_select(
 	    "select value,clock".
 	    " from history_uint".
 	    " where itemid=$itemid".
-	    	" and clock between $event_from and $event_till".
+	    	" and clock between $period_from and $period_till".
 	    " order by clock");
 
 	my $prevvalue = UP;
@@ -1711,7 +1921,7 @@ sub get_downtime
 	}
 
 	# leftover of downtime
-	$downtime += $event_till - $prevclock if ($prevvalue == DOWN);
+	$downtime += $period_till - $prevclock if ($prevvalue == DOWN);
     }
 
     return $downtime / 60; # minutes
@@ -1742,24 +1952,43 @@ sub get_downtime_execute
     my $till = shift;
     my $ignore_incidents = shift; # if set check the whole period
 
-    my $incidents = ($ignore_incidents) ? [$from, $till] : __get_incidents($itemid, $from, $till);
+    my $incidents;
+    if ($ignore_incidents)
+    {
+	my %h;
+
+	$h{'start'} = $from;
+	$h{'end'} = $till;
+	$h{'false_positive'} = 0;
+
+	push(@$incidents, \%h);
+    }
+    else
+    {
+	$incidents = get_incidents($itemid, $from, $till);
+    }
 
     my $count = 0;
 
     my $total = scalar(@$incidents);
-    my $i = 0;
     my $downtime = 0;
 
-    while ($i < $total)
+    foreach (@$incidents)
     {
-	my $event_from = $incidents->[$i++];
-	my $event_till = $incidents->[$i++];
+	my $false_positive = $_->{'false_positive'};
+	my $period_from = $_->{'start'};
+	my $period_till = $_->{'end'};
 
-	fail("internal error handling incidents, check function __get_incidents()") if (($event_from < $from) and ($event_till < $from));
+	fail("internal error: incident outside time bounds, check function get_incidents()") if (($period_from < $from) and defined($period_till) and ($period_till < $from));
+
+	$period_from = $from if ($period_from < $from);
+	$period_till = $till unless (defined($period_till)); # last incident may be ongoing
+
+	next if ($false_positive != 0);
 
 	$sth->bind_param(1, $itemid);
-	$sth->bind_param(2, $event_from);
-	$sth->bind_param(3, $event_till);
+	$sth->bind_param(2, $period_from);
+	$sth->bind_param(3, $period_till);
 
 	$sth->execute()
 	    or fail("cannot execute query: ", $sth->errstr);
@@ -1787,7 +2016,7 @@ sub get_downtime_execute
 	}
 
 	# leftover of downtime
-	$downtime += $event_till - $prevclock if ($prevclock != 0 and $prevvalue == DOWN);
+	$downtime += $period_till - $prevclock if ($prevclock != 0 and $prevvalue == DOWN);
 
 	$sth->finish();
     }
@@ -1822,7 +2051,7 @@ sub slv_exit
 
 sub exit_if_running
 {
-    return if (defined($OPTS{'debug'}));
+    return if (defined($OPTS{'debug'}) or defined($OPTS{'test'}));
 
     my $filename = __get_pidfile();
 
@@ -1885,7 +2114,7 @@ sub trim
 
 sub parse_opts
 {
-    GetOptions(\%OPTS, "help!", "debug!", @_) or pod2usage(2);
+    GetOptions(\%OPTS, "help!", "test!", "debug!", @_) or pod2usage(2);
     pod2usage(1) if ($OPTS{'help'});
 }
 
@@ -1917,6 +2146,29 @@ my $facility = 'user';
 my $prev_tld = "";
 my $log_open = 0;
 
+sub __func
+{
+    my $func;
+    my $i = 3;
+
+    while ($i > 0)
+    {
+	$func = (caller($i))[3];
+
+	if (defined($func))
+	{
+	    $func =~ s/^[^:]*::(.*)$/$1/;
+	    last;
+	}
+
+	$i--;
+    }
+
+    return "$func()" if (defined($func));
+
+    return "";
+}
+
 sub __log
 {
 	my $syslog_priority = shift;
@@ -1947,9 +2199,9 @@ sub __log
 
 	my $cur_tld = $tld || "";
 
-	if (defined($OPTS{'debug'}))
+	if (defined($OPTS{'debug'}) or defined($OPTS{'test'}))
 	{
-		print(ts_str(), " [$priority]", ($cur_tld eq "" ? "" : " $cur_tld:"), " $msg\n");
+		print(ts_str(), " [$priority] ", ($cur_tld eq "" ? "" : "$cur_tld:"), __func(), " $msg\n");
 		return;
 	}
 
@@ -1966,7 +2218,7 @@ sub __log
 		openlog($ident, $logopt, $facility);
 	}
 
-	syslog($syslog_priority, ts_str() . " [$priority] $msg"); # first paramtere is not used in our rsyslog template
+	syslog($syslog_priority, ts_str() . " [$priority] $msg"); # first parameter is not used in our rsyslog template
 
 	$prev_tld = $cur_tld;
 }
@@ -2127,151 +2379,9 @@ sub __script
     return $script;
 }
 
-sub __func
-{
-    my $func = (caller(4))[3];
-
-    if (defined($func))
-    {
-	$func =~ s/^[^:]*::(.*)$/$1/;
-	$func .= "()";
-    }
-
-    return $func;
-}
-
 sub __get_pidfile
 {
     return PID_DIR . '/' . __script() . '.pid';
-}
-
-# return incidents (start and end times) in array:
-#
-# [
-#   1386066210, 1386340110,
-#   1386340290, 1386340470
-# ]
-#
-# An incident is a period when the problem was active. This period is
-# limited by 2 events, the PROBLEM event and the first OK event after
-# that.
-#
-# first ongoing incident will have start time specified as $from
-# last ongoing incident will have end time specified as $till
-sub __get_incidents
-{
-    my $itemid = shift;
-    my $from = shift;
-    my $till = shift;
-
-    my (@incidents, $rows_ref, $row_ref);
-
-    $rows_ref = db_select(
-	"select distinct t.triggerid".
-	" from triggers t,functions f".
-	" where t.triggerid=f.triggerid".
-		" and f.itemid=$itemid".
-		" and t.priority=".TRIGGER_SEVERITY_NOT_CLASSIFIED);
-
-    my $rows = scalar(@$rows_ref);
-
-    unless ($rows == 1)
-    {
-	wrn("item $itemid must have one not classified trigger (found: $rows)");
-	return \@incidents;
-    }
-
-    my $triggerid = $rows_ref->[0]->[0];
-
-    # select previous event to see if $from time gets into PROBLEM state of a trigger
-    $rows_ref = db_select(
-	"select max(clock)".
-	" from events".
-	" where object=".EVENT_OBJECT_TRIGGER.
-		" and source=".EVENT_SOURCE_TRIGGERS.
-		" and objectid=$triggerid".
-		" and clock<$from");
-
-    my $last_trigger_value = TRIGGER_VALUE_FALSE;
-
-    $row_ref = $rows_ref->[0];
-
-    if (defined($row_ref) and defined($row_ref->[0]))
-    {
-	my $preincident_clock = $row_ref->[0];
-
-	$rows_ref = db_select(
-	    "select value,false_positive".
-	    " from events".
-	    " where object=".EVENT_OBJECT_TRIGGER.
-	    	" and source=".EVENT_SOURCE_TRIGGERS.
-	    	" and objectid=$triggerid".
-	    	" and clock=$preincident_clock".
-	    " order by ns desc".
-	    " limit 1");
-
-	$row_ref = $rows_ref->[0];
-
-	my $value = $row_ref->[0];
-	my $false_positive = $row_ref->[1];
-
-	dbg("event before rolling week detected: value:$value false_positive:$false_positive");
-
-	# we cannot add 'value=TRIGGER_VALUE_TRUE' and 'false_positive!=INCIDENT_FALSE_POSITIVE'
-	# to the SQL query above as we need the latest event before $from
-	if ($value == TRIGGER_VALUE_TRUE and $false_positive != INCIDENT_FALSE_POSITIVE)
-	{
-	    push(@incidents, $from);
-
-	    $last_trigger_value = $value;
-	}
-    }
-
-    $rows_ref = db_select(
-	"select clock,value,false_positive".
-	" from events".
-	" where object=".EVENT_OBJECT_TRIGGER.
-		" and source=".EVENT_SOURCE_TRIGGERS.
-		" and objectid=$triggerid".
-		" and clock between $from and $till".
-	" order by clock,ns");
-
-    my @unsorted_incidents;
-
-    foreach my $row_ref (@$rows_ref)
-    {
-	my $clock = $row_ref->[0];
-	my $value = $row_ref->[1];
-	my $false_positive = $row_ref->[2];
-
-	dbg("event: clock:$clock value:$value false_positive:$false_positive");
-
-	# incident is stopped unless PROBLEM and NOT FALSE POSITIVE event
-	if ($value != TRIGGER_VALUE_FALSE)
-	{
-	    $value = TRIGGER_VALUE_FALSE unless ($value == TRIGGER_VALUE_TRUE and $false_positive != INCIDENT_FALSE_POSITIVE);
-	}
-
-	next if ($value == $last_trigger_value);
-
-	push(@incidents, $clock);
-
-	$last_trigger_value = $value;
-    }
-
-    push(@incidents, $_) foreach (sort(@unsorted_incidents));
-    push(@incidents, $till) if ($last_trigger_value == TRIGGER_VALUE_TRUE);
-
-    # debug
-    my $i = 0;
-    while ($i < scalar(@incidents))
-    {
-	my $inc_from = $incidents[$i++];
-	my $inc_till = $incidents[$i++];
-	dbg(ts_str($inc_from), " ($inc_from) -> ", ts_str($inc_till), " ($inc_till)");
-    }
-
-    return \@incidents;
 }
 
 # Times when probe "lastaccess" within $probe_avail_limit.
