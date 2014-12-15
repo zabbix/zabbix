@@ -31,6 +31,7 @@ static int	trap_lastsize;
 static ino_t	trap_ino = 0;
 static int	retry_read = 0;
 zbx_stat_t	file_buf;
+char		buffer[MAX_BUFFER_LEN];
 
 static void	DBget_lastsize()
 {
@@ -267,7 +268,7 @@ static void	process_trap(const char *addr, char *begin, char *end)
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	parse_traps(char *buffer)
+static void	parse_traps()
 {
 	char	*c, *line, *begin = NULL, *end = NULL, *addr = NULL;
 
@@ -353,7 +354,7 @@ static void	parse_traps(char *buffer)
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	read_traps(char *buffer)
+static void	read_traps()
 {
 	const char	*__function_name = "read_traps";
 	int		nbytes, old_size;
@@ -389,7 +390,7 @@ static void	read_traps(char *buffer)
 		trap_lastsize += nbytes;
 		DBupdate_lastsize();
 
-		parse_traps(buffer);
+		parse_traps();
 	}
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -460,7 +461,7 @@ static int	open_trap_file()
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-static int	get_latest_data(char *buffer)
+static int	get_latest_data()
 {
 	memset(&file_buf, 0, sizeof(file_buf));
 
@@ -475,7 +476,7 @@ static int	get_latest_data(char *buffer)
 				zabbix_log(LOG_LEVEL_CRIT, "cannot stat [%s]: %s",
 						CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 			}
-			read_traps(buffer);
+			read_traps();
 			memset(buffer, 0, MAX_BUFFER_LEN);
 			*buffer = '\0';
 			close_trap_file();
@@ -484,7 +485,7 @@ static int	get_latest_data(char *buffer)
 		{
 			/* file has been rotated, process the current file */
 
-			read_traps(buffer);
+			read_traps();
 			memset(buffer, 0, MAX_BUFFER_LEN);
 			*buffer = '\0';
 			close_trap_file();
@@ -517,7 +518,6 @@ static int	get_latest_data(char *buffer)
 void	main_snmptrapper_loop()
 {
 	const char	*__function_name = "main_snmptrapper_loop";
-	char		buffer[MAX_BUFFER_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trapfile:'%s'", __function_name, CONFIG_SNMPTRAP_FILE);
 
@@ -533,9 +533,9 @@ void	main_snmptrapper_loop()
 	{
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
-		while (SUCCEED == get_latest_data(buffer))
+		while (SUCCEED == get_latest_data())
 		{
-			read_traps(buffer);
+			read_traps();
 
 			if (1 == retry_read)
 				break;
