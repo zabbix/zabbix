@@ -33,6 +33,13 @@ static int	retry_read = 0;
 zbx_stat_t	file_buf;
 char		buffer[MAX_BUFFER_LEN];
 
+static void	clear_buffer(void)
+{
+	memset(buffer, 0, MAX_BUFFER_LEN);
+	*buffer = '\0';
+	retry_read = 0;
+}
+
 static void	DBget_lastsize()
 {
 	DB_RESULT	result;
@@ -324,7 +331,7 @@ static void	parse_traps()
 
 		unprocessed_trap = zbx_dsprintf(unprocessed_trap, "%sZBXTRAP %s\n%s\n", begin, addr, end);
 
-		memset(buffer, 0, MAX_BUFFER_LEN);
+		clear_buffer();
 		zbx_snprintf(buffer, MAX_BUFFER_LEN, "%s", unprocessed_trap);
 		retry_read = 1;
 		zbx_free(unprocessed_trap);
@@ -332,16 +339,12 @@ static void	parse_traps()
 	else if (NULL != end && 1 == retry_read) /* process the last trap */
 	{
 		process_trap(addr, begin, end);
-		memset(buffer, 0, MAX_BUFFER_LEN);
-		*buffer = '\0';
-		retry_read = 0;
+		clear_buffer();
 	}
 	else if (NULL == addr)	/* no trap was found */
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid trap found [%s]", buffer);
-		memset(buffer, 0, MAX_BUFFER_LEN);
-		*buffer = '\0';
-		retry_read = 0;
+		clear_buffer();
 	}
 }
 
@@ -363,7 +366,7 @@ static void	read_traps()
 
 	if (file_buf.st_size == trap_lastsize && 1 == retry_read)
 	{
-		parse_traps(buffer);
+		parse_traps();
 		goto exit;
 	}
 
@@ -473,12 +476,11 @@ static int	get_latest_data()
 
 			if (ENOENT != errno)
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "cannot stat [%s]: %s",
-						CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+				zabbix_log(LOG_LEVEL_CRIT, "cannot stat [%s]: %s", CONFIG_SNMPTRAP_FILE,
+						zbx_strerror(errno));
 			}
 			read_traps();
-			memset(buffer, 0, MAX_BUFFER_LEN);
-			*buffer = '\0';
+			clear_buffer();
 			close_trap_file();
 		}
 		else if (file_buf.st_ino != trap_ino || file_buf.st_size < trap_lastsize)
@@ -486,8 +488,7 @@ static int	get_latest_data()
 			/* file has been rotated, process the current file */
 
 			read_traps();
-			memset(buffer, 0, MAX_BUFFER_LEN);
-			*buffer = '\0';
+			clear_buffer();
 			close_trap_file();
 		}
 		else if (file_buf.st_size == trap_lastsize && 0 == retry_read)
@@ -497,11 +498,7 @@ static int	get_latest_data()
 	}
 
 	if (-1 == trap_fd && -1 == open_trap_file())
-	{
-		memset(buffer, 0, MAX_BUFFER_LEN);
-		*buffer = '\0';
 		return FAIL;
-	}
 
 	return SUCCEED;
 }
