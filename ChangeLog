@@ -1,3 +1,8 @@
+Changes for 2.0.14
+
+2.0.14rc1 was released as 2.0.14 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.14rc1
 
 New features:
@@ -5,6 +10,7 @@ New features:
 A.F....... [ZBX-1357] updated Italian, Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8582] fixed SQL injection vulnerability in bar graphs (Ivo, Pavels)
 ..F....... [ZBX-5077] fixed percentile calculation formula and corrected accessed index, by which value is selected (arvids)
 ........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
 .D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
