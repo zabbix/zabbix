@@ -3311,8 +3311,13 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.22
+
+1.8.22rc1 was released as 1.8.22 without any changes
+
 Changes for 1.8.22rc1
 
+..F....... [ZBX-8582] fixed SQL injection vulnerability in bar graphs (Ivo, Pavels)
 ........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
 ...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
