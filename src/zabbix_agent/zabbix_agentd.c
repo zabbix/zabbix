@@ -214,6 +214,16 @@ int	CONFIG_COLLECTOR_FORKS		= 1;
 int	CONFIG_PASSIVE_FORKS		= 3;	/* number of listeners for processing passive checks */
 int	CONFIG_ACTIVE_FORKS		= 0;
 
+/* TLS parameters */
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+char	*CONFIG_TLS_CA_FILE		= NULL;
+char	*CONFIG_TLS_CA_PATH		= NULL;
+char	*CONFIG_TLS_CERT_FILE		= NULL;
+char	*CONFIG_TLS_KEY_FILE		= NULL;
+char	*CONFIG_TLS_PSK_FILE		= NULL;
+char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
+#endif
+
 char	*opt = NULL;
 
 #ifdef _WINDOWS
@@ -707,6 +717,20 @@ static void	zbx_load_config(int requirement)
 #endif
 #ifdef _WINDOWS
 		{"PerfCounter",			&CONFIG_PERF_COUNTERS,			TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
+#endif
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		{"TLSCaFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCaPath",			&CONFIG_TLS_CA_PATH,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCertFile",			&CONFIG_TLS_CERT_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPskFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPskIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 #endif
 		{NULL}
