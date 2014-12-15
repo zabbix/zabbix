@@ -40,7 +40,7 @@
 #
 # Mandatory: yes
 # Default:
-$SNMPTrapperFile = '/var/log/snmptt/snmptt.log';
+$SNMPTrapperFile = '/tmp/zabbix_traps.tmp';
 
 ### Option: DateTimeFormat
 #	The date time format in strftime() format. Please make sure to have a corresponding
