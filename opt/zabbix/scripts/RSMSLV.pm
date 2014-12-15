@@ -55,7 +55,8 @@ our ($result, $dbh, $tld);
 our %OPTS; # specified command-line options
 
 our @EXPORT = qw($result $dbh $tld %OPTS
-		SUCCESS FAIL UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT MIN_INFO_ERROR MAX_INFO_ERROR
+		SUCCESS FAIL UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR MIN_INFO_ERROR
+		MAX_INFO_ERROR
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
 		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt_high get_macro_dns_udp_rtt_low
 		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_macro_dns_udp_delay get_macro_dns_tcp_delay
