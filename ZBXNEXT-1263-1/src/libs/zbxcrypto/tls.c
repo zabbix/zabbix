@@ -139,7 +139,16 @@ int	zbx_tls_free(void)
 	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-	/* TODO fill in implementation */
+
+#if defined(HAVE_POLARSSL)
+	ctr_drbg_free(&ctr_drbg);
+	entropy_free(&entropy);
+#elif defined(HAVE_GNUTLS)
+	gnutls_global_deinit();
+#elif defined(HAVE_OPENSSL)
+	/* TODO there is no ERR_free_strings() in my libssl. Commented out temporarily. */
+	/* ERR_free_strings(); */
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
