@@ -3328,6 +3328,9 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.23rc1
+
+
 Changes for 1.8.22
 
 1.8.22rc1 was released as 1.8.22 without any changes
