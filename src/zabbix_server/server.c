@@ -143,7 +143,7 @@ char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
-int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 500;		/* applies for every separate field value */
+int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field value */
 int	CONFIG_SENDER_FREQUENCY		= 30;
 int	CONFIG_HISTSYNCER_FORKS		= 4;
 int	CONFIG_HISTSYNCER_FREQUENCY	= 5;
