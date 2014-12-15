@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 
-#use lib '/opt/zabbix/scripts';
-use lib '/home/vladimir.levijev/svn/zabbix/branches/2.0.rsm/opt/zabbix/scripts';
+use lib '/opt/zabbix/scripts';
 
 use strict;
 use RSM;
