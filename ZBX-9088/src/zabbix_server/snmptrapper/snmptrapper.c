@@ -29,6 +29,8 @@
 static int	trap_fd = -1;
 static int	trap_lastsize;
 static ino_t	trap_ino = 0;
+static int	retry_read = 0;
+zbx_stat_t	file_buf;
 
 static void	DBget_lastsize()
 {
@@ -292,6 +294,7 @@ static void	parse_traps(char *buffer)
 		{
 			*(line - 1) = '\0';
 			process_trap(addr, begin, end);
+			retry_read = 0;
 			end = NULL;
 		}
 
@@ -314,11 +317,31 @@ static void	parse_traps(char *buffer)
 		end = c;	/* the rest of the trap */
 	}
 
-	/* process the last trap */
-	if (NULL != end)
+	if (NULL != end && 0 == retry_read)	/* store the last trap to be processed on the next cycle*/
+	{
+		char	*unprocessed_trap = NULL;
+
+		unprocessed_trap = zbx_dsprintf(unprocessed_trap, "%sZBXTRAP %s\n%s\n", begin, addr, end);
+
+		memset(buffer, 0, MAX_BUFFER_LEN);
+		zbx_snprintf(buffer, MAX_BUFFER_LEN, "%s", unprocessed_trap);
+		retry_read = 1;
+		zbx_free(unprocessed_trap);
+	}
+	else if (NULL != end && 1 == retry_read) /* process the last trap */
+	{
 		process_trap(addr, begin, end);
+		memset(buffer, 0, MAX_BUFFER_LEN);
+		*buffer = '\0';
+		retry_read = 0;
+	}
 	else if (NULL == addr)	/* no trap was found */
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid trap found [%s]", buffer);
+		memset(buffer, 0, MAX_BUFFER_LEN);
+		*buffer = '\0';
+		retry_read = 0;
+	}
 }
 
 /******************************************************************************
@@ -330,34 +353,38 @@ static void	parse_traps(char *buffer)
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	read_traps()
+static void	read_traps(char *buffer)
 {
 	const char	*__function_name = "read_traps";
-	int		nbytes;
-	char		buffer[MAX_BUFFER_LEN];
+	int		nbytes, old_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastsize:%d", __function_name, trap_lastsize);
 
-	*buffer = '\0';
-
-	if ((off_t)-1 == lseek(trap_fd, (off_t)trap_lastsize, SEEK_SET))
+	if (file_buf.st_size == trap_lastsize && 1 == retry_read)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to [%d] for [%s]: %s",
-				trap_lastsize, CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+		parse_traps(buffer);
 		goto exit;
 	}
 
-	if (-1 == (nbytes = read(trap_fd, buffer, sizeof(buffer) - 1)))
+	if ((off_t)-1 == lseek(trap_fd, (off_t)trap_lastsize, SEEK_SET))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot read from [%s]: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to [%d] for [%s]: %s", trap_lastsize,
 				CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+		goto exit;
+	}
+
+	old_size = strlen(buffer);
+
+	if (-1 == (nbytes = read(trap_fd, *(&buffer) + old_size, MAX_BUFFER_LEN - old_size - 1)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot read from [%s]: %s", CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 		goto exit;
 	}
 
 	if (0 < nbytes)
 	{
-		buffer[nbytes] = '\0';
-		zbx_rtrim(buffer + MAX(nbytes - 3, 0), " \r\n");
+		buffer[nbytes + old_size] = '\0';
+		zbx_rtrim(buffer + old_size + MAX(nbytes - 3, 0), " \r\n");
 
 		trap_lastsize += nbytes;
 		DBupdate_lastsize();
@@ -433,9 +460,9 @@ static int	open_trap_file()
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-static int	get_latest_data()
+static int	get_latest_data(char *buffer)
 {
-	zbx_stat_t	file_buf;
+	memset(&file_buf, 0, sizeof(file_buf));
 
 	if (-1 != trap_fd)	/* a trap file is already open */
 	{
@@ -448,24 +475,32 @@ static int	get_latest_data()
 				zabbix_log(LOG_LEVEL_CRIT, "cannot stat [%s]: %s",
 						CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 			}
-			read_traps();
+			read_traps(buffer);
+			memset(buffer, 0, MAX_BUFFER_LEN);
+			*buffer = '\0';
 			close_trap_file();
 		}
 		else if (file_buf.st_ino != trap_ino || file_buf.st_size < trap_lastsize)
 		{
 			/* file has been rotated, process the current file */
 
-			read_traps();
+			read_traps(buffer);
+			memset(buffer, 0, MAX_BUFFER_LEN);
+			*buffer = '\0';
 			close_trap_file();
 		}
-		else if (file_buf.st_size == trap_lastsize)
+		else if (file_buf.st_size == trap_lastsize && 0 == retry_read)
 		{
-			return FAIL;	/* no new traps */
+			return FAIL;	/* no new traps and no data left in the buffer*/
 		}
 	}
 
 	if (-1 == trap_fd && -1 == open_trap_file())
+	{
+		memset(buffer, 0, MAX_BUFFER_LEN);
+		*buffer = '\0';
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -482,6 +517,7 @@ static int	get_latest_data()
 void	main_snmptrapper_loop()
 {
 	const char	*__function_name = "main_snmptrapper_loop";
+	char		buffer[MAX_BUFFER_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trapfile:'%s'", __function_name, CONFIG_SNMPTRAP_FILE);
 
@@ -491,12 +527,19 @@ void	main_snmptrapper_loop()
 
 	DBget_lastsize();
 
+	*buffer = '\0';
+
 	for (;;)
 	{
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
-		while (SUCCEED == get_latest_data())
-			read_traps();
+		while (SUCCEED == get_latest_data(buffer))
+		{
+			read_traps(buffer);
+
+			if (1 == retry_read)
+				break;
+		}
 
 		zbx_sleep_loop(1);
 	}
