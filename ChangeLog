@@ -51,6 +51,11 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
 
 --------------------------------------------------------------------------------
+Changes for 2.4.3
+
+2.4.3rc1 was released as 2.4.3 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.4.3rc1
 
 New features:
