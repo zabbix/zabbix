@@ -19,8 +19,10 @@ use constant AH_ALARMED_FILE => 'alarmed';
 use constant AH_ALARMED_YES => 'YES';
 use constant AH_ALARMED_NO => 'NO';
 use constant AH_ALARMED_DISABLED => 'DISABLED';
+use constant AH_SERVICE_AVAILABILITY_FILE => 'serviceAvailability';
 
-our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED ah_get_error ah_save_alarmed ah_save_incident);
+our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED ah_get_error ah_save_alarmed
+	ah_save_service_availability ah_save_incident);
 
 my $error_string = "";
 
@@ -161,6 +163,27 @@ sub ah_save_alarmed
     $alarmed_path .= "/" . AH_ALARMED_FILE;
 
     return __write_file($alarmed_path, $status);
+}
+
+sub ah_save_service_availability
+{
+    my $tld = shift;
+    my $service = shift;
+    my $downtime = shift;
+
+    my $service_availability_path = __make_base_path($tld, $service);
+
+    make_path($service_availability_path, {error => \my $err});
+
+    if (@$err)
+    {
+        __set_file_error($err);
+        return AH_FAIL;
+    }
+
+    $service_availability_path .= "/" . AH_SERVICE_AVAILABILITY_FILE;
+
+    return __write_file($service_availability_path, $downtime);
 }
 
 sub ah_save_incident

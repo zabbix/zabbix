@@ -531,6 +531,7 @@ static void	zbx_destroy_owners(zbx_vector_ptr_t *owners)
 
 	for (i = 0; i < owners->values_num; i++)
 		ldns_rdf_deep_free((ldns_rdf *)owners->values[i]);
+
 	zbx_vector_ptr_destroy(owners);
 }
 
@@ -1558,8 +1559,8 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 			else
 				rtt = res_ec;
 
-			zbx_set_dns_values(nss[i].name, nss[i].ips[j], rtt, upd, item->nextcheck,
-					strlen(keyname) + 1, items, items_num);
+			zbx_set_dns_values(nss[i].name, nss[i].ips[j], rtt, upd, item->nextcheck, strlen(keyname) + 1,
+					items, items_num);
 
 			/* if a single IP of the Name Server fails, consider the whole Name Server down */
 			if (SUCCEED != rtt_result(rtt, rtt_limit))
@@ -2080,6 +2081,7 @@ static void	zbx_vector_str_clean_and_destroy(zbx_vector_str_t *v)
 
 	for (i = 0; i < v->values_num; i++)
 		zbx_free(v->values[i]);
+
 	zbx_vector_str_destroy(v);
 }
 
