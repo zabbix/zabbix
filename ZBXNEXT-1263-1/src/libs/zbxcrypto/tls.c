@@ -24,6 +24,8 @@
 #if defined(HAVE_POLARSSL)
 #	include <polarssl/entropy.h>
 #	include <polarssl/ctr_drbg.h>
+#	include <polarssl/ssl.h>
+#	include <polarssl/error.h>
 #elif defined(HAVE_GNUTLS)
 #	include <gnutls/gnutls.h>
 #elif defined(HAVE_OPENSSL)
@@ -33,7 +35,9 @@
 #if defined(HAVE_POLARSSL)
 static entropy_context	entropy;
 static ctr_drbg_context	ctr_drbg;
+#endif
 
+#if defined(HAVE_POLARSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_make_personalization_string                              *
@@ -57,6 +61,46 @@ static void	zbx_tls_make_personalization_string(char **pers, size_t *len)
 #define DEMO_PERS_STRING	"Zabbix TLSZabbix TLSZabbix TLSZabbix TLSZabbix TLS"
 	*pers = zbx_strdup(*pers, DEMO_PERS_STRING);
 	*len = strlen(DEMO_PERS_STRING);
+}
+#endif
+
+#if defined(HAVE_POLARSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: polarssl_debug                                                   *
+ *                                                                            *
+ * Purpose: write a PolarSSL debug message into Zabbix log                    *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     Parameter 'tls_ctx' is not used but cannot be removed because this is  *
+ *     a callback function, its arguments are defined in PolarSSL.            *
+ ******************************************************************************/
+static void	polarssl_debug(ssl_context *tls_ctx, int level, const char *str)
+{
+	char	msg[1024];	/* Apparently 1024 bytes is the longest message which can come from PolarSSL 1.3.9 */
+
+	/* TODO code can be improved by allocating a dynamic buffer if message is longer than 1024 bytes */
+	/* remove '\n' from the end of debug message */
+	zbx_strlcpy(msg, str, sizeof(msg));
+	zbx_rtrim(msg, "\n");
+	zabbix_log(LOG_LEVEL_DEBUG, "PolarSSL debug: level=%d \"%s\"", level, msg);
+}
+#endif
+
+#if defined(HAVE_POLARSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_error_msg                                                *
+ *                                                                            *
+ * Purpose: compose a TLS error message                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_tls_error_msg(int error_code, char *msg, char **error)
+{
+	char	err[128];	/* 128 bytes are enough for PolarSSL error messages */
+
+	polarssl_strerror(error_code, err, sizeof(err));
+	*error = zbx_dsprintf(*error, "%s%s", msg, err);
 }
 #endif
 
