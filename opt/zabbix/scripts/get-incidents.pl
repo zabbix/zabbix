@@ -5,7 +5,6 @@ use lib '/opt/zabbix/scripts';
 use strict;
 use RSM;
 use RSMSLV;
-use Data::Dumper;
 
 parse_opts("tld=s", "from=n", "till=n");
 
@@ -25,7 +24,7 @@ db_connect();
 my $from = $OPTS{'from'};
 my $till = $OPTS{'till'};
 
-my $tlds_ref = defined($OPTS{'tld'}) ? [ $OPTS{'tld'} ] : get_tlds($OPTS{'service'});
+my $tlds_ref = defined($OPTS{'tld'}) ? [ $OPTS{'tld'} ] : get_tlds();
 
 foreach (@$tlds_ref)
 {
@@ -39,10 +38,6 @@ foreach (@$tlds_ref)
 
 	my $itemid = get_itemid_by_host($tld, $key);
 	my $incidents = get_incidents($itemid, $from, $till);
-
-	# TODO: REMOVE ME
-	#$incidents->[0]->{'end'} = $incidents->[0]->{'start'} + 600 if ($tld eq "yoga" and defined($incidents->[0]));
-	#print(Dumper($incidents));
 
 	foreach (@$incidents)
 	{
