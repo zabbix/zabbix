@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-12-11 00:41+0200\n"
-"PO-Revision-Date: 2014-11-20 05:52+0300\n"
+"PO-Revision-Date: 2014-12-15 04:42+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1416455573.0\n"
+"X-POOTLE-MTIME: 1418611352.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2239,7 +2239,7 @@ msgstr "コマンドを送信できません。Zabbixサーバー\"%1$s\"との�
 #: include/classes/api/services/CHostGroup.php:429
 #, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "ホストグループ\"%2$s\"に\"%1$s\"を設定できません。"
 
 #: include/classes/api/services/CItemGeneral.php:247
 #, c-format
@@ -2340,7 +2340,7 @@ msgstr "アクション\"%2$s\"の\"%1$s\"を更新できません。"
 #: include/classes/api/services/CHostGroup.php:490
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "ホストグループ\"%2$s\"の\"%1$s\"を更新できません。"
 
 #: include/classes/api/services/CItemGeneral.php:211
 #, c-format
@@ -3435,7 +3435,7 @@ msgstr "現在のホスト"
 
 #: include/views/reports.toptriggers.php:57
 msgid "Current month"
-msgstr ""
+msgstr "今月"
 
 #: popup_trexpr.php:520
 msgid "Current time is < N"
@@ -3459,11 +3459,11 @@ msgstr "現在の値"
 
 #: include/views/reports.toptriggers.php:54
 msgid "Current week"
-msgstr ""
+msgstr "今週"
 
 #: include/views/reports.toptriggers.php:60
 msgid "Current year"
-msgstr ""
+msgstr "今年"
 
 #: include/views/configuration.action.edit.php:129
 #: include/views/configuration.host.discovery.edit.php:280
@@ -8541,7 +8541,7 @@ msgstr "最新1時間のグラフ"
 
 #: include/views/reports.toptriggers.php:67
 msgid "Last month"
-msgstr ""
+msgstr "先月"
 
 #: jsLoader.php:210
 msgid "Last month graph"
@@ -8562,7 +8562,7 @@ msgstr "最新の値"
 
 #: include/views/reports.toptriggers.php:64
 msgid "Last week"
-msgstr ""
+msgstr "先週"
 
 #: jsLoader.php:211
 msgid "Last week graph"
@@ -8570,7 +8570,7 @@ msgstr "最新1週間のグラフ"
 
 #: include/views/reports.toptriggers.php:70
 msgid "Last year"
-msgstr ""
+msgstr "昨年"
 
 #: include/menu.inc.php:46 include/views/inventory.host.view.php:209
 #: jsLoader.php:206 latest.php:26 search.php:134 search.php:220 search.php:274
@@ -11360,23 +11360,23 @@ msgstr "ピークのメモリ使用量: %s"
 
 #: popup_trexpr.php:100
 msgid "Percentage"
-msgstr ""
+msgstr "パーセンテージ"
 
 #: popup_trexpr.php:304
 msgid "Percentile P of a period T is < N"
-msgstr ""
+msgstr "期間TのパーセンテージP < N"
 
 #: popup_trexpr.php:314
 msgid "Percentile P of a period T is = N"
-msgstr ""
+msgstr "期間TのパーセンテージP = N"
 
 #: popup_trexpr.php:309
 msgid "Percentile P of a period T is > N"
-msgstr ""
+msgstr "期間TのパーセンテージP > N"
 
 #: popup_trexpr.php:319
 msgid "Percentile P of a period T is NOT N"
-msgstr ""
+msgstr "期間TのパーセンテージP NOT N"
 
 #: graphs.php:53 include/views/configuration.graph.edit.php:84
 msgid "Percentile line (left)"
@@ -14345,7 +14345,7 @@ msgstr "logキーを利用する場合はデータ型を\"ログ\"に設定し�
 
 #: include/classes/api/services/CItemGeneral.php:321
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
-msgstr ""
+msgstr "Zabbixアグリゲートを利用する場合はデータ型を\"数値(整数)\"か\"数値(浮動小数)\"に設定してください。"
 
 #: include/forms.inc.php:898
 msgid "Types"
@@ -15742,7 +15742,7 @@ msgstr "はい"
 
 #: include/views/reports.toptriggers.php:51
 msgid "Yesterday"
-msgstr ""
+msgstr "昨日"
 
 #: include/views/administration.users.edit.php:140
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
