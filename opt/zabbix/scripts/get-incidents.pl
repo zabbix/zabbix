@@ -5,7 +5,6 @@ use lib '/opt/zabbix/scripts';
 use strict;
 use RSM;
 use RSMSLV;
-use ApiHelper;
 use Data::Dumper;
 
 parse_opts("tld=s", "from=n", "till=n");
