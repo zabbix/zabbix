@@ -550,6 +550,11 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.8
+
+2.2.8rc1 was released as 2.2.8 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.8rc1
 
 New features:
@@ -557,6 +562,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8582] fixed SQL injection vulnerability in bar graphs (Ivo, Pavels)
 ........S. [ZBX-8873] fixed incorrect event being generated after maintenance in case there are out of order events due to proxy (asaveljevs, Sasha)
 .......PS. [ZBX-8882] fixed message logging on DB2 errors (igors)
 .......PS. [ZBX-8992] made Zabbix prefer the threshold sensor over a discrete sensor, in case both are available under the same name (asaveljevs)
