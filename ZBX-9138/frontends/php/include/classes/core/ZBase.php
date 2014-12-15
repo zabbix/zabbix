@@ -292,7 +292,7 @@ class ZBase {
 	protected function setMaintenanceMode() {
 		require_once $this->getRootDir().'/conf/maintenance.inc.php';
 
-		if (defined('ZBX_DENY_GUI_ACCESS')) {
+		if (defined('ZBX_DENY_GUI_ACCESS') && ZBX_DENY_GUI_ACCESS == 1) {
 			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))
 					? $_SERVER['HTTP_X_FORWARDED_FOR']
 					: $_SERVER['REMOTE_ADDR'];
