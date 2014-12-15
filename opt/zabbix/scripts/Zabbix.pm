@@ -27,8 +27,7 @@ sub to_utf8($);
 sub get_authid($);
 sub set_authid($$);
 
-use constant ATTEMPTS => 20;
-use constant SLEEP => 2;
+use constant ATTEMPTS => 10;
 
 sub new($$) {
     my ($class, $options) = @_;
@@ -76,13 +75,17 @@ sub new($$) {
 
     my $res;
     my $attempts = ATTEMPTS;
+    my $sleep = 1;
 
     while ($attempts-- > 0) {
 	$res = $ua->request($req);
 
 	last if ($res->is_success);
 
-	sleep(SLEEP);
+	sleep($sleep);
+
+	$sleep *= 1.3;
+	$sleep = 3 if ($sleep > 3);
     }
 
     croak "cannot connect to Zabbix: " . $res->status_line unless ($res->is_success);
@@ -449,13 +452,17 @@ sub __send_request {
 
     my $res;
     my $attempts = ATTEMPTS;
+    my $sleep = 1;
 
     while ($attempts-- > 0) {
 	$res = $self->ua->request($req);
 
 	last if ($res->is_success);
 
-	sleep(SLEEP);
+	sleep($sleep);
+
+	$sleep *= 1.3;
+	$sleep = 3 if ($sleep > 3);
     }
 
     die("Can't connect to Zabbix: " . $res->status_line) unless ($res->is_success);
