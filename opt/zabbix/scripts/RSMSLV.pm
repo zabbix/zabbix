@@ -68,7 +68,7 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_avail process_slv_ns_avail
 		process_slv_monthly get_results get_item_values check_lastclock sql_time_condition get_incidents
-		get_downtime get_downtime_prepare get_downtime_execute avail_result_msg
+		get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
 		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str usage);
 
 # configuration, set in set_slv_config()
@@ -944,16 +944,12 @@ sub get_online_probes
 	{
 	    # We did not get any values between $from and $till, consider the last value.
 
-	    $rows_ref = db_select("select lastvalue from items where itemid=$itemid");
+	    my $lastvalue = get_current_value($itemid);
 
-	    if (scalar(@$rows_ref) != 0)
+	    if (defined($lastvalue) and $lastvalue == DOWN)
 	    {
-		my $lastvalue = $rows_ref->[0]->[0];
-		if (defined($lastvalue) and $lastvalue == DOWN)
-		{
-		    dbg("$host ($hostid) down (manual: latest)");
-		    next;
-		}
+		dbg("$host ($hostid) down (manual: lastvalue)");
+		next;
 	    }
 	}
 
@@ -966,35 +962,31 @@ sub get_online_probes
 	$rows_ref = db_select("select value from history_uint where itemid=$itemid and clock between $from and $till order by clock");
 
 	$probe_down = 0;
-        $no_values = 1;
+	$no_values = 1;
 	foreach my $row_ref (@$rows_ref)
-        {
-            $no_values = 0;
+	{
+	    $no_values = 0;
 
-            if ($row_ref->[0] == DOWN)
-            {
+	    if ($row_ref->[0] == DOWN)
+	    {
 		dbg("$host ($hostid) down (automatic: between $from and $till)");
-                $probe_down = 1;
-                last;
-            }
-        }
+		$probe_down = 1;
+		last;
+	    }
+	}
 
 	next if ($probe_down == 1);
 
 	if ($no_values == 1)
-        {
-	    # We did not get any values between $from and $till, consider the latest value.
+	{
+	    # We did not get any values between $from and $till, consider lastvalue
 
-	    $rows_ref = db_select("select lastvalue from items where itemid=$itemid");
+	    my $lastvalue = get_current_value($itemid);
 
-	    if (scalar(@$rows_ref) != 0)
+	    if (defined($lastvalue) and $lastvalue == DOWN)
 	    {
-		my $lastvalue = $rows_ref->[0]->[0];
-		if (defined($lastvalue) and $lastvalue == DOWN)
-		{
-		    dbg("$host ($hostid) down (automatic: latest)");
-		    next;
-		}
+		dbg("$host ($hostid) down (automatic: lastvalue)");
+		next;
 	    }
 	}
 
@@ -2035,6 +2027,18 @@ sub avail_result_msg
     my $result_str = ($test_result == UP ? "Up" : "Down");
 
     return sprintf("$result_str (%d/%d positive, %.3f%%, %s)", $success_values, $total_results, $perc, ts_str($value_ts));
+}
+
+sub get_current_value
+{
+    my $itemid = shift;
+
+    my $rows_ref = db_select("select lastvalue from items where itemid=$itemid");
+
+    fail("cannot find item (itemid:$itemid) in configuration") if (scalar(@$rows_ref) == 0);
+
+    # undef in case lastvalue=NULL
+    return $rows_ref->[0]->[0];
 }
 
 sub slv_exit

@@ -36,7 +36,7 @@ db_connect();
 my $from = $OPTS{'from'};
 my $till = $OPTS{'till'};
 
-my $tlds_ref = defined($OPTS{'tld'}) ? [ $OPTS{'tld'} ] : get_tlds($OPTS{'service'});
+my $tlds_ref = defined($OPTS{'tld'}) ? [ $OPTS{'tld'} ] : get_tlds();
 
 foreach (@$tlds_ref)
 {
@@ -44,12 +44,9 @@ foreach (@$tlds_ref)
 
     foreach my $service (@services)
     {
-	# TODO: remove me
-	#next if (($tld eq "abogado") and ($service eq 'rdds'));
-
-	if (SUCCESS != tld_service_enabled($tld, $service))
+	if (tld_service_enabled($tld, $service) != SUCCESS)
 	{
-	    if (AH_SUCCESS != ah_save_alarmed($tld, $service, AH_ALARMED_DISABLED))
+	    if (ah_save_alarmed($tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
 	    {
 		fail("cannot save alarmed: ", ah_get_error());
 	    }
@@ -88,10 +85,6 @@ foreach (@$tlds_ref)
 	}
 
 	$incidents = get_incidents($itemid, $from, $till);
-
-	# TODO: REMOVE ME
-	#$incidents->[0]->{'end'} = $incidents->[0]->{'start'} + 600 if ($tld eq "yoga" and defined($incidents->[0]));
-	#print(Dumper($incidents));
 
 	foreach (@$incidents)
 	{
