@@ -11652,7 +11652,7 @@ msgid "Replace applications"
 msgstr ""
 
 #: include/views/configuration.triggers.massupdate.php:131
-msgid "Replace depenencies"
+msgid "Replace dependencies"
 msgstr ""
 
 #: include/views/configuration.host.massupdate.php:66
