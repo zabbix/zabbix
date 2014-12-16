@@ -96,9 +96,9 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 
 		free_result(&value);
 	}
-
-	DCrequeue_items(&item.itemid, &item.state, &ts->sec, NULL, NULL, &errcode, 1);
 clean:
+	DCrequeue_items(&item.itemid, &item.state, &ts->sec, NULL, NULL, &errcode, 1);
+
 	DCconfig_clean_items(&item, &errcode, 1);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

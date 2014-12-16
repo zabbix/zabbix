@@ -29,12 +29,15 @@ static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 
 static char		log_filename[MAX_STRING_LEN];
 static int		log_type = LOG_TYPE_UNDEFINED;
-static ZBX_MUTEX	log_file_access;
+static ZBX_MUTEX	log_file_access = ZBX_MUTEX_NULL;
 #ifdef DEBUG
 static int		log_level = LOG_LEVEL_DEBUG;
 #else
 static int		log_level = LOG_LEVEL_WARNING;
 #endif
+
+#define LOCK_LOG	zbx_mutex_lock(&log_file_access)
+#define UNLOCK_LOG	zbx_mutex_unlock(&log_file_access)
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
@@ -148,7 +151,7 @@ int	zabbix_open_log(int type, int level, const char *filename)
 			exit(EXIT_FAILURE);
 		}
 
-		if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&log_file_access, ZBX_MUTEX_LOG))
+		if (FAIL == zbx_mutex_create_force(&log_file_access, ZBX_MUTEX_LOG))
 		{
 			zbx_error("unable to create mutex for log file");
 			exit(EXIT_FAILURE);
@@ -280,7 +283,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
 			zbx_error("cannot set sigprocmask to block the user signal");
 #endif
-		zbx_mutex_lock(&log_file_access);
+		LOCK_LOG;
 
 		if (0 != CONFIG_LOG_FILE_SIZE && 0 == zbx_stat(log_filename, &buf))
 		{
@@ -379,7 +382,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 			zbx_fclose(log_file);
 		}
 
-		zbx_mutex_unlock(&log_file_access);
+		UNLOCK_LOG;
 
 #ifndef _WINDOWS
 		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
@@ -460,7 +463,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
 			zbx_error("cannot set sigprocmask to block the user signal");
 #endif
-		zbx_mutex_lock(&log_file_access);
+		LOCK_LOG;
 
 		switch (level)
 		{
@@ -484,7 +487,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 				break;
 		}
 
-		zbx_mutex_unlock(&log_file_access);
+		UNLOCK_LOG;
 #ifndef _WINDOWS
 		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
 			zbx_error("cannot restore sigprocmask");
