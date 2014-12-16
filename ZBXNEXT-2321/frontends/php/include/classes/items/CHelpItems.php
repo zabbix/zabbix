@@ -162,7 +162,7 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'system.cpu.num',
-					'description' => _('Number of available proccessors.')
+					'description' => _('Number of available processors.')
 				),
 				array(
 					'key' => 'system.cpu.switches',
@@ -424,7 +424,7 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'system.cpu.num',
-					'description' => _('Number of available proccessors.')
+					'description' => _('Number of available processors.')
 				),
 				array(
 					'key' => 'system.cpu.switches',
