@@ -280,12 +280,12 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	struct zbx_json_parse	jp;
 	struct zbx_json_parse	jp_data, jp_row;
 	ZBX_ACTIVE_METRIC	*metric;
-	zbx_vector_str_t	added_metrics;
+	zbx_vector_str_t	received_metrics;
 	int			delay, mtime, expression_type, case_sensitive, i, j, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_str_create(&added_metrics);
+	zbx_vector_str_create(&received_metrics);
 
 	if (SUCCEED != zbx_json_open(str, &jp))
 	{
@@ -363,7 +363,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		add_check(name, key_orig, delay, lastlogsize, mtime);
 
 		/* remember what was received */
-		zbx_vector_str_append(&added_metrics, zbx_strdup(NULL, key_orig));
+		zbx_vector_str_append(&received_metrics, zbx_strdup(NULL, key_orig));
 	}
 
 	/* remove what wasn't received */
@@ -373,9 +373,9 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 
 		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
 
-		for (j = 0; j < added_metrics.values_num; j++)
+		for (j = 0; j < received_metrics.values_num; j++)
 		{
-			if (0 == strcmp(metric->key_orig, added_metrics.values[j]))
+			if (0 == strcmp(metric->key_orig, received_metrics.values[j]))
 			{
 				found = 1;
 				break;
@@ -384,8 +384,9 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 
 		if (0 == found)
 		{
-			zbx_vector_ptr_remove(&active_metrics, i);
+			zbx_vector_ptr_remove_noorder(&active_metrics, i);
 			free_active_metric(metric);
+			i--;	/* consider the same index on the next run */
 		}
 	}
 
@@ -449,7 +450,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 
 	ret = SUCCEED;
 out:
-	zbx_vector_str_destroy(&added_metrics);
+	zbx_vector_str_destroy(&received_metrics);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
