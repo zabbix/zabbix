@@ -31,10 +31,7 @@ class CIPValidatorTest extends CValidatorTest {
 	 */
 	public function validParamProvider() {
 		return array(
-			array(array(
-				'empty' => true,
-				'allowMacros' => true
-			))
+			array(array())
 		);
 	}
 
@@ -51,9 +48,7 @@ class CIPValidatorTest extends CValidatorTest {
 			array(array(), '2002:0:0:0:0:0:0:0'),
 			array(array(), '2002:0:0:0:0:0:ffff:ffff'),
 			array(array(), 'fe80:0:0:0:0:0:c0a8:100'),
-			array(array(), 'fe80::c0a8:100'),
-			array(array('allowMacros' => true), '{$A}'),
-			array(array('empty' => true), '')
+			array(array(), 'fe80::c0a8:100')
 		);
 	}
 
@@ -99,10 +94,6 @@ class CIPValidatorTest extends CValidatorTest {
 			array(array(),
 				'192.168.0.0-255',
 				'Invalid IP address "192.168.0.0-255".'
-			),
-			array(array('allowMacros' => true),
-				'{#@$!(^&=_%*)}',
-				'Invalid IP address "{#@$!(^&=_%*)}".'
 			)
 		);
 	}

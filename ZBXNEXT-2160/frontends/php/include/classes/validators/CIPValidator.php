@@ -25,20 +25,6 @@
 class CIPValidator extends CValidator {
 
 	/**
-	 * If set to false, the string cannot be empty.
-	 *
-	 * @var bool
-	 */
-	public $empty = false;
-
-	/**
-	 * If set to false, only IPv4 and IPv6 is allowed. If set to true, macros are allowed instead of IP address.
-	 *
-	 * @var bool
-	 */
-	public $allowMacros = false;
-
-	/**
 	 * Checks if the given IP address is a valid IPv4 or IPv6 address. If IP address is invalid, sets an error
 	 * and returns false. Otherwise returns true.
 	 *
@@ -54,29 +40,12 @@ class CIPValidator extends CValidator {
 		}
 
 		if ($ip === '') {
-			if ($this->empty) {
-				return true;
-			}
-			else {
-				$this->setError(_('IP address cannot be empty.'));
-
-				return false;
-			}
-		}
-
-		$isValidIp = ($this->isValidIPv4($ip) || $this->isValidIPv6($ip));
-
-		/*
-		 * If macros are not allowed, return true or false depeding on whether IP address is valid. If macros are
-		 * allowed and IP address is invalid, check if string contains a valid macro.
-		 */
-		if (!$this->allowMacros && !$isValidIp) {
-			$this->setError(_s('Invalid IP address "%1$s".', $ip));
+			$this->setError(_('IP address cannot be empty.'));
 
 			return false;
 		}
-		elseif ($this->allowMacros && !$isValidIp && !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $ip)
-				&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $ip)) {
+
+		if (!$this->isValidIPv4($ip) && !$this->isValidIPv6($ip)) {
 			$this->setError(_s('Invalid IP address "%1$s".', $ip));
 
 			return false;
@@ -98,7 +67,7 @@ class CIPValidator extends CValidator {
 		}
 
 		for ($i = 1; $i <= 4; $i++) {
-			if (!is_numeric($matches[$i]) || $matches[$i] > 255 || $matches[$i] < 0 ) {
+			if ($matches[$i] > 255 || $matches[$i] < 0 ) {
 				return false;
 			}
 		}
@@ -139,27 +108,5 @@ class CIPValidator extends CValidator {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Check if given string has a dot, it is considered as a type of IPv4 address.
-	 *
-	 * @param string $ip
-	 *
-	 * @return bool
-	 */
-	protected function isIPv4($ip) {
-		return (strpos($ip, '.') !== false);
-	}
-
-	/**
-	 * Check if IPv6 is enabled and given string has a colon. If so it is considered as a type of IPv6 address.
-	 *
-	 * @param string $ip
-	 *
-	 * @return bool
-	 */
-	protected function isIPv6($ip) {
-		return (ZBX_HAVE_IPV6 && strpos($ip, ':') !== false);
 	}
 }

@@ -604,11 +604,16 @@ class CHostInterface extends CApiService {
 	 * @param array $interface
 	 */
 	protected function checkIp(array $interface) {
-		$ipValidator = new CIPValidator(array(
-			'empty' => true,
-			'allowMacros' => true
-		));
+		if ($interface['ip'] === '') {
+			return;
+		}
 
+		if (preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $interface['ip'])
+				|| preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $interface['ip'])) {
+			return;
+		}
+
+		$ipValidator = new CIPValidator();
 		if (!$ipValidator->validate($interface['ip'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $ipValidator->getError());
 		}

@@ -209,7 +209,7 @@ class CDRule extends CApiService {
 		}
 
 		$proxies = array();
-		$ipRangeValidator = new CIPRangeValidator();
+		$ipRangeValidator = new CIPRangeValidator(array('ipMaxCount' => ZBX_IP_MAX_COUNT));
 		foreach ($dRules as $dRule) {
 			if (!isset($dRule['iprange'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
