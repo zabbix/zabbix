@@ -679,7 +679,8 @@ class CHost extends CHostGeneral {
 				}
 			}
 			else {
-				if (!isset($host['groups'])) {
+				if (!isset($host['groups'])
+						|| (isset($host['groups']) && (!is_array($host['groups']) || !$host['groups']))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
 				}
 
