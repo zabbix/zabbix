@@ -1127,6 +1127,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 		goto out;
 	}
 
+	s_count = 0;
 	p_count = 0;
 	lastlogsize = metric->lastlogsize;
 
