@@ -357,10 +357,10 @@ static void	parse_traps()
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	read_traps()
+static int	read_traps()
 {
 	const char	*__function_name = "read_traps";
-	int		nbytes, old_size;
+	int		nbytes = 0, old_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastsize:%d", __function_name, trap_lastsize);
 
@@ -397,6 +397,7 @@ static void	read_traps()
 	}
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	return nbytes;
 }
 
 /******************************************************************************
@@ -479,17 +480,22 @@ static int	get_latest_data()
 				zabbix_log(LOG_LEVEL_CRIT, "cannot stat [%s]: %s", CONFIG_SNMPTRAP_FILE,
 						zbx_strerror(errno));
 			}
-			read_traps();
-			clear_buffer();
-			close_trap_file();
+
+			if (0 >= read_traps())
+			{
+				clear_buffer();
+				close_trap_file();
+			}
 		}
 		else if (file_buf.st_ino != trap_ino || file_buf.st_size < trap_lastsize)
 		{
 			/* file has been rotated, process the current file */
 
-			read_traps();
-			clear_buffer();
-			close_trap_file();
+			if (0 >= read_traps())
+			{
+				clear_buffer();
+				close_trap_file();
+			}
 		}
 		else if (file_buf.st_size == trap_lastsize && 0 == retry_read)
 		{
