@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of web monitoring');
 $page['file'] = 'httpconf.php';
+$page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array('groupid', 'hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -45,7 +46,10 @@ $fields = array(
 	'delay'           => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})', _('Update interval (in sec)')),
 	'retries'         => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({add}) || isset({update})', _('Retries')),
 	'status'          => array(T_ZBX_STR, O_OPT, null,  null,                    null),
-	'agent'           => array(T_ZBX_STR, O_OPT, P_NO_TRIM, null,                'isset({add}) || isset({update})'),
+	'agent'           => array(T_ZBX_STR, O_OPT, null, null,                     'isset({add}) || isset({update})'),
+	'agent_other'     => array(T_ZBX_STR, O_OPT, P_NO_TRIM, null,
+		'(isset({add}) || isset({update})) && {agent} == '.ZBX_AGENT_OTHER
+	),
 	'variables'       => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})'),
 	'steps'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})', _('Steps')),
 	'authentication'  => array(T_ZBX_INT, O_OPT, null,  IN('0,1,2'),             'isset({add}) || isset({update})'),
@@ -227,7 +231,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'delay' => $_REQUEST['delay'],
 			'retries' => $_REQUEST['retries'],
 			'status' => isset($_REQUEST['status']) ? 0 : 1,
-			'agent' => $_REQUEST['agent'],
+			'agent' => hasRequest('agent_other') ? getRequest('agent_other') : getRequest('agent'),
 			'variables' => $_REQUEST['variables'],
 			'http_proxy' => $_REQUEST['http_proxy'],
 			'steps' => $steps,
@@ -501,7 +505,18 @@ if (isset($_REQUEST['form'])) {
 		$data['delay'] = $dbHttpTest['delay'];
 		$data['retries'] = $dbHttpTest['retries'];
 		$data['status'] = $dbHttpTest['status'];
-		$data['agent'] = $dbHttpTest['agent'];
+
+		$data['agent'] = ZBX_AGENT_OTHER;
+		$data['agent_other'] = $dbHttpTest['agent'];
+
+		foreach (userAgents() as $userAgents) {
+			if (array_key_exists($dbHttpTest['agent'], $userAgents)) {
+				$data['agent'] = $dbHttpTest['agent'];
+				$data['agent_other'] = '';
+				break;
+			}
+		}
+
 		$data['variables'] = $dbHttpTest['variables'];
 		$data['authentication'] = $dbHttpTest['authentication'];
 		$data['http_user'] = $dbHttpTest['http_user'];
@@ -524,16 +539,25 @@ if (isset($_REQUEST['form'])) {
 			$data['status'] = HTTPTEST_STATUS_ACTIVE;
 		}
 
-		$agent = (hasRequest('agent') && zbx_empty(getRequest('agent')))
-			? ZBX_DEFAULT_AGENT
-			: getRequest('agent', ZBX_DEFAULT_AGENT);
-
 		$data['name'] = getRequest('name', '');
 		$data['applicationid'] = getRequest('applicationid');
 		$data['new_application'] = getRequest('new_application', '');
 		$data['delay'] = getRequest('delay', 60);
 		$data['retries'] = getRequest('retries', 1);
-		$data['agent'] = $agent;
+
+		$data['agent'] = getRequest('agent', ZBX_DEFAULT_AGENT);
+		$data['agent_other'] = getRequest('agent_other');
+
+		if ($data['agent'] == ZBX_AGENT_OTHER) {
+			foreach (userAgents() as $userAgents) {
+				if (array_key_exists($data['agent_other'], $userAgents)) {
+					$data['agent'] = $data['agent_other'];
+					$data['agent_other'] = '';
+					break;
+				}
+			}
+		}
+
 		$data['variables'] = getRequest('variables', array());
 		$data['authentication'] = getRequest('authentication', HTTPTEST_AUTH_NONE);
 		$data['http_user'] = getRequest('http_user', '');
