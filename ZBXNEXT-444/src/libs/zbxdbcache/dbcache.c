@@ -86,7 +86,7 @@ typedef struct
 	int		mtime;
 	int		num;		/* number of continuous values with the same itemid */
 	unsigned char	value_type;
-	unsigned char	value_undef;	/* unsupported or undefined (delta) */
+	unsigned char	value_undef;	/* unsupported or undefined (delta calculation failed) */
 	unsigned char	meta;		/* meta information update (log size and mtime) */
 	unsigned char	keep_history;
 	unsigned char	keep_trends;
@@ -1540,6 +1540,7 @@ static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num, int hlo
 static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
 	const char	*__function_name = "DCmass_add_history";
+
 	ZBX_DC_HISTORY	*h;
 	int		i, h_num = 0, huint_num = 0, hstr_num = 0, htext_num = 0, hlog_num = 0, rc = ZBX_DB_OK;
 
@@ -2504,6 +2505,7 @@ static void	DCadd_history_log(dc_item_value_t *value)
 	history->ts = value->ts;
 	history->state = ITEM_STATE_NORMAL;
 	history->value_type = ITEM_VALUE_TYPE_LOG;
+
 	if (0 != value->value.value_str.len)
 		DCadd_text(&history->value_orig.str, &string_values[value->value.value_str.pvalue], value->value.value_str.len);
 	else
@@ -2661,7 +2663,7 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, zbx_timespec_t *ts, co
 	item_value->mtime = mtime;
 	item_value->meta = meta;
 
-	if (item_value->value.value_str.len + item_value->source.len > 0)
+	if (0 != item_value->value.value_str.len + item_value->source.len)
 	{
 		dc_string_buffer_realloc(item_value->value.value_str.len + item_value->source.len);
 
