@@ -288,10 +288,16 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	zbx_vector_str_create(&added_metrics);
 
 	if (SUCCEED != zbx_json_open(str, &jp))
-		goto json_error;
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
+		goto out;
+	}
 
 	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, tmp, sizeof(tmp)))
-		goto json_error;
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
+		goto out;
+	}
 
 	if (0 != strcmp(tmp, ZBX_PROTO_VALUE_SUCCESS))
 	{
@@ -299,11 +305,15 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 			zabbix_log(LOG_LEVEL_WARNING, "no active checks on server [%s:%hu]: %s", host, port, tmp);
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "no active checks on server");
-		return FAIL;
+
+		goto out;
 	}
 
 	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
-		goto json_error;
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
+		goto out;
+	}
 
  	p = NULL;
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
@@ -311,7 +321,10 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 /* {"data":[{"key":"system.cpu.num",...,...},{...},...]}
  *          ^------------------------------^
  */ 		if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
-			goto json_error;
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
+			goto out;
+		}
 
 		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, name, sizeof(name)) || '\0' == *name)
 		{
@@ -386,7 +399,10 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 /* {"regexp":[{"name":"regexp1",...,...},{...},...]}
  *            ^------------------------^
  */			if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
-				goto json_error;
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
+				goto out;
+			}
 
 			if (SUCCEED != zbx_json_value_by_name(&jp_row, "name", name, sizeof(name)))
 			{
@@ -432,11 +448,8 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	}
 
 	ret = SUCCEED;
-json_error:
+out:
 	zbx_vector_str_destroy(&added_metrics);
-
-	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
