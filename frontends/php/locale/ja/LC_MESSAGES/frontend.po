@@ -10548,7 +10548,7 @@ msgstr "現在"
 
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:427
-msgid "Number of available proccessors."
+msgid "Number of available processors."
 msgstr "有効なプロセッサー数。"
 
 #: include/blocks.inc.php:838 include/blocks.inc.php:840
