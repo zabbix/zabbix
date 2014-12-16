@@ -10610,7 +10610,7 @@ msgstr "Agora"
 
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:427
-msgid "Number of available proccessors."
+msgid "Number of available processors."
 msgstr "Número de processadores disponíveis."
 
 #: include/blocks.inc.php:816 include/blocks.inc.php:818
