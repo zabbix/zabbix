@@ -22,8 +22,8 @@
 // Maintenance mode.
 //define('ZBX_DENY_GUI_ACCESS', 1);
 
-// Array of IP addresses, which are allowed to connect to frontend. Optional.
+// Array of IP addresses, which are allowed to connect to frontend (optional).
 //$ZBX_GUI_ACCESS_IP_RANGE = array('127.0.0.1');
 
-// Message shown on warning screen. Optional.
+// Message shown on warning screen (optional).
 //$_REQUEST['warning_msg'] = 'Zabbix is under maintenance.';
