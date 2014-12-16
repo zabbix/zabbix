@@ -20,33 +20,31 @@
 #include "checks_db.h"
 
 #include "zbxodbc.h"
-#include "log.h"
 #include "zbxjson.h"
+#include "log.h"
 
-static int	get_result_table_column_names(ZBX_ODBC_DBH *dbh, char **buffer, size_t num)
+static int	get_result_columns(ZBX_ODBC_DBH *dbh, char **buffer)
 {
-	int		ret = FAIL, i, j;
+	int		ret = SUCCEED, i, j;
 	char		str[MAX_STRING_LEN];
 	SQLRETURN	rc;
 	SQLSMALLINT	len;
 
-	for (i = 0; i < num; i++)
+	for (i = 0; i < dbh->col_num; i++)
 	{
 		rc = SQLColAttribute(dbh->hstmt, i + 1, SQL_DESC_LABEL, str, sizeof(str), &len, NULL);
 
-		if (SQL_SUCCESS != rc || MAX_STRING_LEN <= len || '\0' == *str)
+		if (SQL_SUCCESS != rc || sizeof(str) <= len || '\0' == *str)
 		{
 			for (j = 0; j < i; j++)
 				zbx_free(buffer[j]);
 
+			ret = FAIL;
 			break;
 		}
 
 		buffer[i] = zbx_strdup(NULL, str);
 	}
-
-	if (i == num)
-		ret = SUCCEED;
 
 	return ret;
 }
@@ -55,10 +53,10 @@ static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT
 {
 	const char	*__function_name = "db_odbc_discovery";
 
-	int		ret = NOTSUPPORTED, failure = 0, i, j;
+	int		ret = NOTSUPPORTED, i, j;
 	ZBX_ODBC_DBH	dbh;
 	ZBX_ODBC_ROW	row;
-	char		**column_names, colname[MAX_STRING_LEN];
+	char		**columns, *p, macro[MAX_STRING_LEN];
 	struct zbx_json	json;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() query:'%s'", __function_name, item->params);
@@ -77,63 +75,70 @@ static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT
 
 	if (NULL != odbc_DBselect(&dbh, item->params))
 	{
-		column_names = zbx_malloc(NULL, sizeof(char *) * dbh.col_num);
+		columns = zbx_malloc(NULL, sizeof(char *) * dbh.col_num);
 
-		if (SUCCEED == get_result_table_column_names(&dbh, column_names, dbh.col_num))
+		if (SUCCEED == get_result_columns(&dbh, columns))
 		{
-			for (i = 0; i < dbh.col_num && 0 == failure; i++)
+			for (i = 0; i < dbh.col_num; i++)
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() column[%d]:'%s'", __function_name, i + 1, columns[i]);
+
+			for (i = 0; i < dbh.col_num; i++)
 			{
-				char	*str = column_names[i];
-
-				for (j = 0; '\0' != str[j]; j++)
+				for (p = columns[i]; '\0' != *p; p++)
 				{
-					if (0 != isalpha(str[j]))
-						str[j] = toupper(str[j]);
+					if (0 != isalpha(*p))
+						*p = toupper(*p);
 
-					if (SUCCEED != is_macro_char(str[j]))
+					if (SUCCEED != is_macro_char(*p))
 					{
-						failure = 1;
-						break;
+						SET_MSG_RESULT(result, zbx_dsprintf(NULL,
+								"Cannot convert column #%d name to macro.", i + 1));
+						goto clean;
+					}
+				}
+
+				for (j = 0; j < i; j++)
+				{
+					if (0 == strcmp(columns[i], columns[j]))
+					{
+						SET_MSG_RESULT(result, zbx_dsprintf(NULL,
+								"Duplicate macro name: {#%s}.", columns[i]));
+						goto clean;
 					}
 				}
 			}
 
-			if (0 == failure)
+			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+
+			while (NULL != (row = odbc_DBfetch(&dbh)))
 			{
-				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-				zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+				zbx_json_addobject(&json, NULL);
 
-				while (NULL != (row = odbc_DBfetch(&dbh)))
+				for (i = 0; i < dbh.col_num; i++)
 				{
-					zbx_json_addobject(&json, NULL);
-
-					for (i = 0; i < dbh.col_num; i++)
-					{
-						zbx_snprintf(colname, MAX_STRING_LEN, "{#%s}", column_names[i]);
-						zbx_json_addstring(&json, colname, row[i], ZBX_JSON_TYPE_STRING);
-					}
-
-					zbx_json_close(&json);
+					zbx_snprintf(macro, MAX_STRING_LEN, "{#%s}", columns[i]);
+					zbx_json_addstring(&json, macro, row[i], ZBX_JSON_TYPE_STRING);
 				}
 
 				zbx_json_close(&json);
-
-				SET_STR_RESULT(result, zbx_strdup(NULL, json.buffer));
-
-				zbx_json_free(&json);
-
-				ret = SUCCEED;
 			}
-			else
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot convert column name to macro."));
 
+			zbx_json_close(&json);
+
+			SET_STR_RESULT(result, zbx_strdup(NULL, json.buffer));
+
+			zbx_json_free(&json);
+
+			ret = SUCCEED;
+clean:
 			for (i = 0; i < dbh.col_num; i++)
-				zbx_free(column_names[i]);
+				zbx_free(columns[i]);
 		}
 		else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain column names."));
 
-		zbx_free(column_names);
+		zbx_free(columns);
 	}
 	else
 		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
