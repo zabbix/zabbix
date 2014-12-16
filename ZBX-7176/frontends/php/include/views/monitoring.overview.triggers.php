@@ -58,7 +58,7 @@ if ($this->data['config']['blink_period'] > 0) {
 
 $hintTable->addRow(array(new CCol(SPACE), _('No trigger')));
 
-$help = new CHelp();
+$help = new CIcon(null, 'iconhelp');
 $help->setHint($hintTable);
 
 // header right

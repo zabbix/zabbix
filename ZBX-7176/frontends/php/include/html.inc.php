@@ -180,16 +180,16 @@ function get_icon($type, $params = array()) {
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = new CIcon(
 					_('Remove from favourites'),
-					'iconminus',
-					'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");'
+					'iconminus'
 				);
+				$icon->addAction('onclick', 'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
 				$icon = new CIcon(
 					_('Add to favourites'),
-					'iconplus',
-					'add2favorites("'.$params['elname'].'", "'.$params['elid'].'");'
+					'iconplus'
 				);
+				$icon->addAction('onclick', 'add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			$icon->setAttribute('id', 'addrm_fav');
 
@@ -199,14 +199,19 @@ function get_icon($type, $params = array()) {
 			$url = new CUrl();
 			$url->setArgument('fullscreen', $params['fullscreen'] ? '0' : '1');
 
-			return new CIcon(
+			$icon = new CIcon(
 				$params['fullscreen'] ? _('Normal view') : _('Fullscreen'),
-				'fullscreen',
-				"document.location = '".$url->getUrl()."';"
+				'fullscreen'
 			);
+			$icon->addAction('onclick', "document.location = '".$url->getUrl()."';");
+
+			return $icon;
 
 		case 'reset':
-			return new CIcon(_('Reset'), 'iconreset', 'timeControl.objectReset();');
+			$icon = new CIcon(_('Reset'), 'iconreset');
+			$icon->addAction('onclick', 'timeControl.objectReset();');
+
+			return $icon;
 	}
 
 	return null;
