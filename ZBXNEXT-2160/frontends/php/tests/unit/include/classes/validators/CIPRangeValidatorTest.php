@@ -78,11 +78,11 @@ class CIPRangeValidatorTest extends CValidatorTest {
 		return array(
 			array(array(),
 				null,
-				'Invalid IP range "null": must be a string.'
+				'Invalid IP address range "null": must be a string.'
 			),
 			array(array(),
 				array(),
-				'Invalid IP range "array": must be a string.'
+				'Invalid IP address range "array": must be a string.'
 			),
 			array(array(),
 				'',
@@ -156,7 +156,7 @@ class CIPRangeValidatorTest extends CValidatorTest {
 		return array(array(
 			array(),
 			null,
-			'Invalid IP range "null": must be a string.'
+			'Invalid IP address range "null": must be a string.'
 		));
 	}
 

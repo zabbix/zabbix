@@ -41,7 +41,7 @@ class CIPRangeValidator extends CIPValidator {
 	 */
 	public function validate($ipRangeList) {
 		if (!is_string($ipRangeList)) {
-			$this->setError(_s('Invalid IP range "%1$s": must be a string.', $this->stringify($ipRangeList)));
+			$this->setError(_s('Invalid IP address range "%1$s": must be a string.', $this->stringify($ipRangeList)));
 
 			return false;
 		}
