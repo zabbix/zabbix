@@ -13,7 +13,7 @@ A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent and updated outda
 .......PS. [ZBXNEXT-207] added a runtime control option to force execution of housekeeper (igors, wiper)
 ........S. [ZBXNEXT-1799] added support of low-level discovery macros in the "IPMI sensor" field (Sasha)
 ........S. [ZBXNEXT-2079] added support of low-level discovery macros in the "Units" field (Sasha)
-...G...... [ZBXNEXT-689] added protocol option to net.dns and net.dns.query keys to enable tcp based queries (wiper)
+...G...... [ZBXNEXT-689] added protocol option to net.dns and net.dns.query keys to enable TCP based queries (wiper)
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
@@ -23,7 +23,7 @@ Bug fixes:
 ..F....... [ZBX-8934] removed translation for the bytes unit prefixes (KB, MB, etc) (arvids)
 ..F....... [ZBX-8888] fixed history.php showing data for 11 more seconds than the defined interval (arvids)
 ..F.....S. [ZBX-9005] fixed aggregate item check to make forth parameter not mandatory when third parameter is set to 'last' (igors)
-...G...... [ZBX-3437] fixed Windows agent to use the configured timeout option when estabilishing tcp connection (wiper)
+...G...... [ZBX-3437] fixed Windows agent to use the configured timeout option when establishing TCP connection (wiper)
 ........S. [ZBX-8542] improved performance and reduced configuration cache locking when evaluating trigger expressions (wiper)
 ...G...PS. [ZBX-8470] fixed possible crash condition in agent, proxy and server daemons where a memory corruption might occur during module unloading (Juris)
 ..F....... [ZBX-8780] removed hover effect from readonly and disabled fields (arvids)
@@ -49,6 +49,19 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 .D........ [ZBX-5166] replaced '-' with '\-' in man-pages (Andris)
 ...G...PS. [ZBX-8391] added stronger command-line parameter validation, revised help and version messages, revised man-pages for Zabbix server, proxy, agent, sender and get utilities (Andris)
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.4rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-9126] fixed processing of trigger/graph prototypes in the case when all item prototypes in the trigger/graph prototypes was changed (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.3
+
+2.4.3rc1 was released as 2.4.3 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.4.3rc1
@@ -550,6 +563,19 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.9rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-9126] fixed processing of trigger/graph prototypes in the case when all item prototypes in the trigger/graph prototypes was changed (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.8
+
+2.2.8rc1 was released as 2.2.8 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.8rc1
 
 New features:
@@ -557,6 +583,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8582] fixed SQL injection vulnerability in bar graphs (Ivo, Pavels)
 ........S. [ZBX-8873] fixed incorrect event being generated after maintenance in case there are out of order events due to proxy (asaveljevs, Sasha)
 .......PS. [ZBX-8882] fixed message logging on DB2 errors (igors)
 .......PS. [ZBX-8992] made Zabbix prefer the threshold sensor over a discrete sensor, in case both are available under the same name (asaveljevs)
@@ -1710,6 +1737,19 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.15rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-9126] fixed processing of trigger/graph prototypes in the case when all item prototypes in the trigger/graph prototypes was changed (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.14
+
+2.0.14rc1 was released as 2.0.14 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.14rc1
 
 New features:
@@ -1717,6 +1757,7 @@ New features:
 A.F....... [ZBX-1357] updated Italian, Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8582] fixed SQL injection vulnerability in bar graphs (Ivo, Pavels)
 ..F....... [ZBX-5077] fixed percentile calculation formula and corrected accessed index, by which value is selected (arvids)
 ........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
 .D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
@@ -3311,8 +3352,16 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.23rc1
+
+
+Changes for 1.8.22
+
+1.8.22rc1 was released as 1.8.22 without any changes
+
 Changes for 1.8.22rc1
 
+..F....... [ZBX-8582] fixed SQL injection vulnerability in bar graphs (Ivo, Pavels)
 ........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
 ...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
