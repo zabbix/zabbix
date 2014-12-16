@@ -81,8 +81,6 @@ $httpFormList->addRow(_('Retries'), new CNumericBox('retries', $this->data['retr
 $agentComboBox = new CComboBox('agent', $this->data['agent']);
 
 $userAgentsAll = userAgents();
-
-// Append "other ..." to array of user agents.
 $userAgentsAll[_('Others')][ZBX_AGENT_OTHER] = _('other').' ...';
 
 foreach ($userAgentsAll as $userAgentGroup => $userAgents) {
