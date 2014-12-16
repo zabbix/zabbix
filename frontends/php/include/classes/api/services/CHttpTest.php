@@ -272,7 +272,7 @@ class CHttpTest extends CApiService {
 
 			unset($httpTest['templateid']);
 
-			if (!isset($httpTest['agent']) || (isset($httpTest['agent']) && zbx_empty($httpTest['agent']))) {
+			if (!isset($httpTest['agent'])) {
 				$httpTest['agent'] = ZBX_DEFAULT_AGENT;
 			}
 
@@ -314,14 +314,6 @@ class CHttpTest extends CApiService {
 			_('Empty web scenario ID.'),
 			_('Incorrect web scenario ID.')
 		);
-
-		// Roll back to default user agent if empty string is set.
-		foreach ($httpTests as &$httpTest) {
-			if (isset($httpTest['agent']) && zbx_empty($httpTest['agent'])) {
-				$httpTest['agent'] = ZBX_DEFAULT_AGENT;
-			}
-		}
-		unset($httpTest);
 
 		$httpTests = zbx_toHash($httpTests, 'httptestid');
 
