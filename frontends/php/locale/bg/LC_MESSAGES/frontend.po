@@ -10313,7 +10313,7 @@ msgstr "Сега"
 
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:427
-msgid "Number of available proccessors."
+msgid "Number of available processors."
 msgstr ""
 
 #: include/blocks.inc.php:753 include/blocks.inc.php:755

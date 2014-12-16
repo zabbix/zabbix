@@ -10348,7 +10348,7 @@ msgstr "Acum"
 
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:427
-msgid "Number of available proccessors."
+msgid "Number of available processors."
 msgstr "Număr de procesoare disponibile."
 
 #: include/blocks.inc.php:753 include/blocks.inc.php:755
