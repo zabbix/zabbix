@@ -905,7 +905,7 @@ static int	process_value(
 		el->severity = *severity;
 	if (NULL != lastlogsize)
 		el->lastlogsize = *lastlogsize;
-	if (NULL != mtime)	/* will be null for "eventlog" and "log" and the value will be 0, only "logrt" matters */
+	if (NULL != mtime)	/* used by "logrt" checks only, null in other cases */
 		el->mtime = *mtime;
 	if (NULL != timestamp)
 		el->timestamp = *timestamp;
