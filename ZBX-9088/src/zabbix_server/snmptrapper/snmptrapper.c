@@ -31,11 +31,14 @@ static int	trap_lastsize;
 static ino_t	trap_ino = 0;
 static int	retry_read = 0;
 zbx_stat_t	file_buf;
-char		buffer[MAX_BUFFER_LEN];
+
+#define MAX_BUFFER_LENN MAX_BUFFER_LEN*2
+
+char		buffer[MAX_BUFFER_LENN];
 
 static void	clear_buffer(void)
 {
-	memset(buffer, 0, MAX_BUFFER_LEN);
+	memset(buffer, 0, MAX_BUFFER_LENN);
 	*buffer = '\0';
 	retry_read = 0;
 }
@@ -127,6 +130,8 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		if (0 != strcmp(cmd, "snmptrap"))
 			continue;
 
+		zabbix_log(LOG_LEVEL_WARNING, "ONE");
+
 		if (1 < num_param(params))
 			continue;
 
@@ -182,6 +187,9 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	for (i = 0; i < num; i++)
 	{
+
+		zabbix_log(LOG_LEVEL_WARNING, "errcodes[%d]: %d", i, errcodes[i]);
+
 		switch (errcodes[i])
 		{
 			case SUCCEED:
@@ -259,6 +267,8 @@ static void	process_trap(const char *addr, char *begin, char *end)
 			ret = SUCCEED;
 	}
 
+	zabbix_log(LOG_LEVEL_WARNING, "addr [%s]: count: %d", addr, count);
+
 	if (FAIL == ret && 1 == *(unsigned char *)DCconfig_get_config_data(&i, CONFIG_SNMPTRAP_LOGGING))
 		zabbix_log(LOG_LEVEL_WARNING, "unmatched trap received from [%s]: %s", addr, trap);
 
@@ -332,7 +342,7 @@ static void	parse_traps()
 		unprocessed_trap = zbx_dsprintf(unprocessed_trap, "%sZBXTRAP %s\n%s\n", begin, addr, end);
 
 		clear_buffer();
-		zbx_snprintf(buffer, MAX_BUFFER_LEN, "%s", unprocessed_trap);
+		zbx_snprintf(buffer, MAX_BUFFER_LENN, "%s", unprocessed_trap);
 		retry_read = 1;
 		zbx_free(unprocessed_trap);
 	}
@@ -379,11 +389,14 @@ static int	read_traps()
 
 	old_size = strlen(buffer);
 
-	if (-1 == (nbytes = read(trap_fd, *(&buffer) + old_size, MAX_BUFFER_LEN - old_size - 1)))
+	if (-1 == (nbytes = read(trap_fd, *(&buffer) + old_size, MAX_BUFFER_LENN - old_size - 1)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot read from [%s]: %s", CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 		goto exit;
 	}
+
+	zabbix_log(LOG_LEVEL_WARNING, "buffer: '%s'", buffer);
+	zabbix_log(LOG_LEVEL_WARNING, "nbytes: '%d'", nbytes);
 
 	if (0 < nbytes)
 	{
@@ -475,6 +488,8 @@ static int	get_latest_data()
 		{
 			/* file might have been renamed or deleted, process the current file */
 
+			zabbix_log(LOG_LEVEL_CRIT, "file might have been renamed or deleted, process the current file");
+
 			if (ENOENT != errno)
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot stat [%s]: %s", CONFIG_SNMPTRAP_FILE,
@@ -489,6 +504,7 @@ static int	get_latest_data()
 		}
 		else if (file_buf.st_ino != trap_ino || file_buf.st_size < trap_lastsize)
 		{
+			zabbix_log(LOG_LEVEL_CRIT, "file has been rotated, process the current file");
 			/* file has been rotated, process the current file */
 
 			if (0 >= read_traps())
@@ -502,6 +518,8 @@ static int	get_latest_data()
 			return FAIL;	/* no new traps and no data left in the buffer*/
 		}
 	}
+
+	zabbix_log(LOG_LEVEL_CRIT, "file_buf.st_size: %d, trap_lastsize: %d, retry_read: %d", file_buf.st_size, trap_lastsize, retry_read);
 
 	if (-1 == trap_fd && -1 == open_trap_file())
 		return FAIL;
