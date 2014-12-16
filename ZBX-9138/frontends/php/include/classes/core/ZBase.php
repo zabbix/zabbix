@@ -297,7 +297,7 @@ class ZBase {
 					? $_SERVER['HTTP_X_FORWARDED_FOR']
 					: $_SERVER['REMOTE_ADDR'];
 			if (!isset($ZBX_GUI_ACCESS_IP_RANGE) || !in_array($user_ip, $ZBX_GUI_ACCESS_IP_RANGE)) {
-				throw new Exception($_REQUEST['warning_msg']);
+				throw new Exception(getRequest('warning_msg', _('Zabbix is under maintenance.')));
 			}
 		}
 	}
