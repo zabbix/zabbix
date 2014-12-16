@@ -77,7 +77,7 @@ LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
 			break;
 	}
 
-	return(disposition);
+	return disposition;
 }
 #endif
 
@@ -161,11 +161,11 @@ static int	get_min_nextcheck(void)
 		if (SUCCEED != metric_ready_to_process(metric))
 			continue;
 
-		if (metric->nextcheck < min || (-1) == min)
+		if (metric->nextcheck < min || -1 == min)
 			min = metric->nextcheck;
 	}
 
-	if ((-1) == min)
+	if (-1 == min)
 		min = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, min);
@@ -173,7 +173,7 @@ static int	get_min_nextcheck(void)
 	return min;
 }
 
-void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime)
+static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime)
 {
 	const char		*__function_name = "add_check";
 	ZBX_ACTIVE_METRIC	*metric;
@@ -215,7 +215,7 @@ void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t 
 			metric->refresh = refresh;
 		}
 
-		if (metric->state == ITEM_STATE_NOTSUPPORTED)
+		if (ITEM_STATE_NOTSUPPORTED == metric->state)
 		{
 			/* re-check unsupported item, hopefully in the future this will be controlled by server */
 			metric->refresh_unsupported = 1;
@@ -236,7 +236,7 @@ void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t 
 	metric->lastlogsize = lastlogsize;
 	metric->mtime = mtime;
 	/* can skip existing log[] and eventlog[] data */
-	metric->skip_old_data = metric->lastlogsize ? 0 : 1;
+	metric->skip_old_data = (0 != metric->lastlogsize ? 0 : 1);
 	metric->big_rec = 0;
 	metric->use_ino = 0;
 	metric->error_count = 0;
@@ -838,8 +838,7 @@ static int	process_value(
 	int				i, ret = FAIL;
 	size_t				sz;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __function_name, host, key,
-			value ? value : "NULL");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __function_name, host, key, ZBX_NULL2STR(value));
 
 	send_buffer(server, port);
 
@@ -927,8 +926,8 @@ out:
 
 static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent)
 {
-	if (metric->lastlogsize != lastlogsize_sent || metric->mtime != mtime_sent ||
-			metric->state == ITEM_STATE_NOTSUPPORTED)
+	if (lastlogsize_sent != metric->lastlogsize || mtime_sent != metric->mtime ||
+			ITEM_STATE_NOTSUPPORTED == metric->state)
 	{
 		/* needs meta information update */
 		return SUCCEED;
@@ -1386,7 +1385,9 @@ static void	process_active_checks(char *server, unsigned short port)
 	{
 		zbx_uint64_t		lastlogsize_sent;
 		int			mtime_sent;
-		ZBX_ACTIVE_METRIC	*metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+		ZBX_ACTIVE_METRIC	*metric;
+
+		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
 
 		if (metric->nextcheck > now)
 			continue;
@@ -1419,22 +1420,21 @@ static void	process_active_checks(char *server, unsigned short port)
 			const char	*perror;
 
 			perror = (NULL != error ? error : ZBX_NOTSUPPORTED);
+
 			metric->state = ITEM_STATE_NOTSUPPORTED;
 			metric->refresh_unsupported = 0;
 			metric->error_count = 0;
 
-			zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", metric->key,
-					perror);
+			zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", metric->key, perror);
 
-			process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, perror,
-					ITEM_STATE_NOTSUPPORTED, &metric->lastlogsize,
-					&metric->mtime, NULL, NULL, NULL, NULL, 0);
+			process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
+					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, 0);
 
 			zbx_free(error);
 		}
 		else
 		{
-			if (ITEM_STATE_NOTSUPPORTED == metric->state && metric->error_count == 0)
+			if (ITEM_STATE_NOTSUPPORTED == metric->state && 0 == metric->error_count)
 			{
 				/* item became supported */
 				metric->state = ITEM_STATE_NORMAL;

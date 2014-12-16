@@ -671,6 +671,7 @@ zbx_log_t	*add_log_result(AGENT_RESULT *result, const char *value)
 	log = zbx_malloc(NULL, sizeof(zbx_log_t));
 
 	zbx_log_init(log);
+
 	if (NULL != value)
 		log->value = zbx_strdup(log->value, value);
 

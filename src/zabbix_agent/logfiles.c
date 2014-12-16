@@ -1641,8 +1641,8 @@ int	process_logrt(int is_logrt, const char *filename, zbx_uint64_t *lastlogsize,
 			if (start_idx != i)
 				*lastlogsize = logfiles[i].processed_size;
 
-			ret = process_log(logfiles[i].filename, lastlogsize, (1 == is_logrt) ? mtime : NULL,
-					lastlogsize_sent, (1 == is_logrt) ? mtime_sent : NULL, skip_old_data, big_rec,
+			ret = process_log(logfiles[i].filename, lastlogsize, (1 == is_logrt ? mtime : NULL),
+					lastlogsize_sent, (1 == is_logrt ? mtime_sent : NULL), skip_old_data, big_rec,
 					&logfiles[i].incomplete, err_msg, encoding, regexps, pattern, output_template,
 					p_count, s_count, process_value, server, port, hostname, key);
 
@@ -1764,7 +1764,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 	int				send_err;
 	zbx_uint64_t			lastlogsize1;
 
-#define BUF_SIZE	(256 * ZBX_KIBIBYTE)	/* The longest encodings use 4-bytes for every character. To send */
+#define BUF_SIZE	(256 * ZBX_KIBIBYTE)	/* The longest encodings use 4 bytes for every character. To send */
 						/* up to 64 k characters to Zabbix server a 256 kB buffer might be */
 						/* required. */
 
