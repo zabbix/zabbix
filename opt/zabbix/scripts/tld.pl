@@ -1887,8 +1887,8 @@ sub update_nsservers($$) {
 
     my $old_ns_servers = get_nsservers_list($TLD);
 
-    my @need_to_add = ();
-    my @need_to_remove = ();
+    my @to_be_added = ();
+    my @to_be_removed = ();
 
     foreach my $new_nsname (keys %{$new_ns_servers}) {
 	my $new_ns = $new_ns_servers->{$new_nsname};
@@ -1908,7 +1908,7 @@ sub update_nsservers($$) {
 			my $ns_ip;
 			$ns_ip->{$new_ip}->{'ns'} = $new_nsname;
 			$ns_ip->{$new_ip}->{'proto'} = $proto;
-			push @need_to_add, $ns_ip;
+			push @to_be_added, $ns_ip;
 		    }
 	    }
 
@@ -1919,32 +1919,32 @@ sub update_nsservers($$) {
 	my $old_ns = $old_ns_servers->{$proto};
 	foreach my $old_nsname (keys %{$old_ns}) {
 	    foreach my $old_ip (@{$old_ns->{$old_nsname}}) {
-		my $is_need_to_remove = false;
+		my $need_to_remove = false;
 
 		if (defined($new_ns_servers->{$old_nsname}->{$proto})) {
-		    $is_need_to_remove = true;
+		    $need_to_remove = true;
 
 		    foreach my $new_ip (@{$new_ns_servers->{$old_nsname}->{$proto}}) {
-		    	    $is_need_to_remove = false if $new_ip eq $old_ip;
+		    	    $need_to_remove = false if $new_ip eq $old_ip;
 		        }
 		}
 		else {
-		    $is_need_to_remove = true;
+		    $need_to_remove = true;
 		}
 
-		if ( $is_need_to_remove == true ) {
+		if ($need_to_remove == true) {
 		    my $ns_ip;
 
 		    $ns_ip->{$old_ip} = $old_nsname;
 
-		    push @need_to_remove, $ns_ip;
+		    push @to_be_removed, $ns_ip;
 		}
 	    }
 	}
     }
 
-    add_new_ns($TLD, \@need_to_add) if scalar(@need_to_add);
-    disable_old_ns($TLD, \@need_to_remove) if scalar(@need_to_remove);
+    add_new_ns($TLD, \@to_be_added) if scalar(@to_be_added);
+    disable_old_ns($TLD, \@to_be_removed) if scalar(@to_be_removed);
 }
 
 sub add_new_ns($) {
