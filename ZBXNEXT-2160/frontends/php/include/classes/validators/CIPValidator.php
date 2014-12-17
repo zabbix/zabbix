@@ -67,7 +67,7 @@ class CIPValidator extends CValidator {
 		}
 
 		for ($i = 1; $i <= 4; $i++) {
-			if ($matches[$i] > 255 || $matches[$i] < 0 ) {
+			if ($matches[$i] > 255) {
 				return false;
 			}
 		}
@@ -103,7 +103,6 @@ class CIPValidator extends CValidator {
 		$pattern = '/^('.implode(')$|^(', $patterns).')$/i';
 
 		if (!preg_match($pattern, $ip)) {
-
 			return false;
 		}
 
