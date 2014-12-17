@@ -319,6 +319,7 @@ static void	vmware_vector_ptr_pair_shared_clean(zbx_vector_ptr_pair_t *pairs)
 static void	vmware_perf_counter_shared_free(zbx_vmware_perf_counter_t *counter)
 {
 	vmware_vector_ptr_pair_shared_clean(&counter->values);
+	zbx_vector_ptr_pair_destroy(&counter->values);
 	__vm_mem_free_func(counter);
 }
 
@@ -541,9 +542,13 @@ static void	vmware_counter_shared_clean(zbx_vmware_counter_t *counter)
  ******************************************************************************/
 static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 {
+	const char			*__function_name = "vmware_service_shared_free";
+
 	zbx_hashset_iter_t		iter;
 	zbx_vmware_counter_t		*counter;
 	zbx_vmware_perf_entity_t	*entity;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, service->username, service->url);
 
 	__vm_mem_free_func(service->url);
 	__vm_mem_free_func(service->username);
@@ -567,6 +572,8 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 	zbx_hashset_destroy(&service->counters);
 
 	__vm_mem_free_func(service);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -3183,9 +3190,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 
 			/* return NULL if the service is not ready yet */
 			if (0 == (service->state & (ZBX_VMWARE_STATE_READY | ZBX_VMWARE_STATE_FAILED)))
-			{
 				service = NULL;
-			}
 
 			goto out;
 		}
@@ -3483,12 +3488,15 @@ void	main_vmware_loop(void)
 					break;
 				}
 
-				if (service->lastcheck + ZBX_VMWARE_CACHE_TTL < next_update)
-					next_update = service->lastcheck + ZBX_VMWARE_CACHE_TTL;
+				/* don't change next update timestamp for failed services */
+				if (0 != (service->state & ZBX_VMWARE_STATE_READY))
+				{
+					if (service->lastcheck + ZBX_VMWARE_CACHE_TTL < next_update)
+						next_update = service->lastcheck + ZBX_VMWARE_CACHE_TTL;
 
-				if (service->lastperfcheck + ZBX_VMWARE_PERF_TTL < next_update)
-					next_update = service->lastperfcheck + ZBX_VMWARE_PERF_TTL;
-
+					if (service->lastperfcheck + ZBX_VMWARE_PERF_TTL < next_update)
+						next_update = service->lastperfcheck + ZBX_VMWARE_PERF_TTL;
+				}
 			}
 
 			zbx_vmware_unlock();
