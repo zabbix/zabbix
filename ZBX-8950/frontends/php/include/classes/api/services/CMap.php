@@ -971,22 +971,17 @@ class CMap extends CMapElement {
 
 		// adding icon maps
 		if ($options['selectIconMap'] !== null && $options['selectIconMap'] != API_OUTPUT_COUNT) {
-			$iconMapIds = array();
+			$iconMaps = API::getApiService()->select('sysmaps', array(
+				'output' => array('sysmapid', 'iconmapid'),
+				'filter' => array('sysmapid' => $sysmapIds)
+			));
 
-			// collect icon mapping ids
-			foreach ($result as $map) {
-				if ($map['iconmapid'] != 0) {
-					$iconMapIds[$map['iconmapid']] = true;
-				}
-			}
-
-			$relationMap = $this->createRelationMap($result, 'sysmapid', 'iconmapid');
+			$relationMap = $this->createRelationMap($iconMaps, 'sysmapid', 'iconmapid');
 
 			$iconMaps = API::IconMap()->get(array(
 				'output' => $this->outputExtend($options['selectIconMap'], array('iconmapid')),
-				'iconmapids' => array_keys($iconMapIds),
-				'preservekeys' => true,
-				'nopermissions' => true
+				'iconmapids' => zbx_objectValues($iconMaps, 'iconmapid'),
+				'preservekeys' => true
 			));
 
 			$result = $relationMap->mapOne($result, $iconMaps, 'iconmap');
