@@ -31,7 +31,7 @@ static int	trap_lastsize;
 static ino_t	trap_ino = 0;
 static int	retry_read = 0;
 zbx_stat_t	file_buf;
-char		buffer[MAX_BUFFER_LEN];
+char		*buffer = NULL;
 
 static void	clear_buffer(void)
 {
@@ -379,7 +379,7 @@ static int	read_traps()
 
 	old_size = strlen(buffer);
 
-	if (-1 == (nbytes = read(trap_fd, *(&buffer) + old_size, MAX_BUFFER_LEN - old_size - 1)))
+	if (-1 == (nbytes = read(trap_fd, buffer + old_size, MAX_BUFFER_LEN - old_size - 1)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot read from [%s]: %s", CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 		goto exit;
@@ -501,7 +501,7 @@ static int	get_latest_data()
 		{
 			return FAIL;	/* no new traps and no data left in the buffer*/
 		}
-		else if ((MAX_BUFFER_LEN -1) <= strlen(buffer) && 1 == retry_read)
+		else if (MAX_BUFFER_LEN -1 <= strlen(buffer) && 1 == retry_read)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot process the trap. the trap is too long");
 			clear_buffer();
@@ -536,7 +536,8 @@ void	main_snmptrapper_loop()
 
 	DBget_lastsize();
 
-	*buffer = '\0';
+	buffer = zbx_malloc(buffer, MAX_BUFFER_LEN);
+	clear_buffer();
 
 	for (;;)
 	{
@@ -552,6 +553,8 @@ void	main_snmptrapper_loop()
 
 		zbx_sleep_loop(1);
 	}
+
+	zbx_free(buffer);
 
 	if (-1 != trap_fd)
 		close(trap_fd);
