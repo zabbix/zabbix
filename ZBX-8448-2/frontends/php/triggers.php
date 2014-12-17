@@ -88,6 +88,9 @@ $_REQUEST['go'] = get_request('go', 'none');
 
 // validate permissions
 $triggerIds = getRequest('g_triggerid', array());
+if (!is_array($triggerIds)) {
+	$triggerIds = zbx_toArray($triggerIds);
+}
 if (!zbx_empty(getRequest('triggerid'))) {
 	$triggerIds[] = getRequest('triggerid');
 }

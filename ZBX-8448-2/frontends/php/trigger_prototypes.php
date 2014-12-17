@@ -102,6 +102,9 @@ if (get_request('parent_discoveryid')) {
 	}
 
 	$triggerPrototypeIds = getRequest('g_triggerid', array());
+	if (!is_array($triggerPrototypeIds)) {
+		$triggerPrototypeIds = zbx_toArray($triggerPrototypeIds);
+	}
 	if (!zbx_empty(getRequest('triggerid'))) {
 		$triggerPrototypeIds[] = getRequest('triggerid');
 	}
