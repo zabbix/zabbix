@@ -58,7 +58,6 @@
 	int	IBM_DB2server_status();
 	int	zbx_ibm_db2_success(SQLRETURN ret);
 	int	zbx_ibm_db2_success_ext(SQLRETURN ret);
-	void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl);
 
 #elif defined(HAVE_MYSQL)
 
@@ -186,5 +185,7 @@ char		*zbx_db_dyn_escape_string(const char *src);
 char		*zbx_db_dyn_escape_string_len(const char *src, size_t max_src_len);
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
 char		*zbx_db_dyn_escape_like_pattern(const char *src);
+
+int		zbx_db_strlen_n(const char *text, size_t maxlen);
 
 #endif
