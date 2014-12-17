@@ -31,7 +31,7 @@ static int	trap_lastsize;
 static ino_t	trap_ino = 0;
 static int	retry_read = 0;
 zbx_stat_t	file_buf;
-char		buffer[MAX_BUFFER_LEN];
+char		*buffer = NULL;
 
 static void	clear_buffer(void)
 {
@@ -535,6 +535,14 @@ void	main_snmptrapper_loop()
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	DBget_lastsize();
+
+	buffer = zbx_malloc(buffer, MAX_BUFFER_LEN*sizeof(char));
+
+	zabbix_log(LOG_LEVEL_WARNING, "sizeof(buffer): %d", sizeof(buffer));
+
+	memset(buffer, 1, MAX_BUFFER_LEN*4);
+
+	zabbix_log(LOG_LEVEL_WARNING, "buffer: %s", buffer);
 
 	*buffer = '\0';
 
