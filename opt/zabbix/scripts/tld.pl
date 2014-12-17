@@ -1564,10 +1564,6 @@ sub validate_input {
     $OPTS{'ipv4'} = 0 if (defined($OPTS{'update-nsservers'}));
     $OPTS{'ipv6'} = 0 if (defined($OPTS{'update-nsservers'}));
 
-#    if (defined($OPTS{'update-nsservers'}) and !defined($OPTS{'ns-servers-v4'}) and !defined($OPTS{'ns-servers-v6'})) {
-#	$msg .= "Update NS + IP server pairs required at least one of --ns-servers-v4 and --ns-servers-v6 argument\n";
-#    }
-
     $OPTS{'dns'} = 0 unless defined $OPTS{'dns'};
     $OPTS{'rdds'} = 0 unless defined $OPTS{'rdds'};
     $OPTS{'epp'} = 0 unless defined $OPTS{'epp'};
