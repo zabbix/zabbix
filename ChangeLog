@@ -41,7 +41,7 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 ...G...PS. [ZBX-8796] added get_process_info_by_thread() function prototype and renamed server_num, process_type and process_num local variables to eliminate conflict with the local ones (igors)
 ...G...PS. [ZBX-8763] fixed log message printing to syslog and undefined type log if debug level 5 is set (igors)
 ..F....... [ZBX-8671] fixed missing existence and permission checks for hosts and host groups (Krists)
-..F....... [ZBX-7176] removed empty space in icon buttons (Ivo)
+..F....... [ZBX-7176] removed empty space in icon buttons and removed help icons from pop-ups (Ivo)
 ...G...PS. [ZBX-8736] added validation of timestamp values received by the server and sent via zabbix_sender (Juris)
 ..F....... [ZBX-8560] fixed web scenario HTTP proxy field placeholder content not fitting into input field (Ivo)
 ..F....... [ZBX-8570] fixed colons in frontend filters (Oleg)
