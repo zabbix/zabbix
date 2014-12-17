@@ -456,23 +456,14 @@ static zbx_lld_graph_t	*lld_graph_by_item(zbx_vector_ptr_t *graphs, zbx_uint64_t
  * Return value: upon successful completion return pointer to the graph       *
  *                                                                            *
  ******************************************************************************/
-static zbx_lld_graph_t	*lld_graph_get(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *graphs,
-		zbx_vector_ptr_t *item_links)
+static zbx_lld_graph_t	*lld_graph_get(zbx_vector_ptr_t *graphs, zbx_vector_ptr_t *item_links)
 {
-	int			i, index;
-	zbx_lld_graph_t		*graph;
-	zbx_lld_item_link_t	*item_link;
+	int		i;
+	zbx_lld_graph_t	*graph;
 
-	for (i = 0; i < gitems_proto->values_num; i++)
+	for (i = 0; i < item_links->values_num; i++)
 	{
-		zbx_lld_gitem_t	*gitem = (zbx_lld_gitem_t *)gitems_proto->values[i];
-
-		index = zbx_vector_ptr_bsearch(item_links, &gitem->itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-		if (FAIL == index)
-			continue;
-
-		item_link = (zbx_lld_item_link_t *)item_links->values[index];
+		zbx_lld_item_link_t	*item_link = (zbx_lld_item_link_t *)item_links->values[i];
 
 		if (NULL != (graph = lld_graph_by_item(graphs, item_link->itemid)))
 			return graph;
@@ -649,7 +640,7 @@ static void 	lld_graph_make(zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *gr
 	else if (SUCCEED != lld_item_get(ymax_itemid_proto, items, &lld_row->item_links, &ymax_itemid))
 		goto out;
 
-	if (NULL != (graph = lld_graph_get(gitems_proto, graphs, &lld_row->item_links)))
+	if (NULL != (graph = lld_graph_get(graphs, &lld_row->item_links)))
 	{
 		buffer = zbx_strdup(buffer, name_proto);
 		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_SIMPLE, NULL, 0);
