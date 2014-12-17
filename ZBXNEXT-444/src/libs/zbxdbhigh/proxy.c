@@ -2012,8 +2012,11 @@ try_again:
 		if (0 != hd->state)
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_STATE, hd->state);
 
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_LASTLOGSIZE, hd->lastlogsize);
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_MTIME, hd->mtime);
+		if (ITEM_VALUE_TYPE_LOG == dc_items[i].value_type)
+		{
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_LASTLOGSIZE, hd->lastlogsize);
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_MTIME, hd->mtime);
+		}
 
 		zbx_json_close(j);
 
