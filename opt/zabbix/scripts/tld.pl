@@ -157,7 +157,7 @@ if (defined($OPTS{'get-nsservers-list'})) {
 	foreach my $tld (@tlds) {
 	    my $ns = get_nsservers_list($tld);
 
-	    $nsservers->{$tld} = $ns; 
+	    $nsservers->{$tld} = $ns;
 	}
     }
 
@@ -326,6 +326,8 @@ sub get_ns_servers {
 	if ($OPTS{'ns-servers-v4'} and ($OPTS{'ipv4'} == 1 or $OPTS{'update-nsservers'})) {
 	    my @nsservers = split(/\s/, $OPTS{'ns-servers-v4'});
 	    foreach my $ns (@nsservers) {
+		next if ($ns eq '');
+
 		my @entries = split(/,/, $ns);
 
 		my $exists = 0;
@@ -343,6 +345,8 @@ sub get_ns_servers {
 	if ($OPTS{'ns-servers-v6'} and ($OPTS{'ipv6'} == 1 or $OPTS{'update-nsservers'})) {
 	    my @nsservers = split(/\s/, $OPTS{'ns-servers-v6'});
 	    foreach my $ns (@nsservers) {
+		next if ($ns eq '');
+
 		my @entries = split(/,/, $ns);
 
 		my $exists = 0;
@@ -1855,7 +1859,7 @@ sub get_nsservers_list($) {
 
     $templateid = $templateid->{'templateid'};
 
-    my $items = get_items_like($templateid, 'rsm.dns.tcp.rtt', true); 
+    my $items = get_items_like($templateid, 'rsm.dns.tcp.rtt', true);
 
     foreach my $itemid (keys %{$items}) {
 	next if $items->{$itemid}->{'status'} == ITEM_STATUS_DISABLED;
@@ -1865,7 +1869,7 @@ sub get_nsservers_list($) {
 
 	$ip =~s/.+\,.+\,(.+)\]$/$1/;
 	$name =~s/.+\,(.+)\,.+\]$/$1/;
-	
+
 	if ($ip=~/\d*\.\d*\.\d*\.\d+/) {
 	    push @{$result->{'v4'}->{$name}}, $ip;
 	}
@@ -1883,8 +1887,8 @@ sub update_nsservers($$) {
 
     my $old_ns_servers = get_nsservers_list($TLD);
 
-    my $need_to_add = {};
-    my $need_to_remove = {};
+    my @need_to_add = ();
+    my @need_to_remove = ();
 
     foreach my $new_nsname (keys %{$new_ns_servers}) {
 	my $new_ns = $new_ns_servers->{$new_nsname};
@@ -1892,39 +1896,55 @@ sub update_nsservers($$) {
 	foreach my $proto (keys %{$new_ns}) {
 	    my $new_ips = $new_ns->{$proto};
 	    foreach my $new_ip (@{$new_ips}) {
-		
-		if (!defined($old_ns_servers->{$proto}->{$new_ip}) or $old_ns_servers->{$proto}->{$new_ip} ne $new_nsname) {
-		    $need_to_add->{$new_ip}->{'ns'} = $new_nsname;
-		    $need_to_add->{$new_ip}->{'proto'} = $proto;
-		}
+		    my $need_to_add = true;
+
+		    if (defined($old_ns_servers->{$proto}) and defined($old_ns_servers->{$proto}->{$new_nsname})) {
+			foreach my $old_ip (@{$old_ns_servers->{$proto}->{$new_nsname}}) {
+			    $need_to_add = false if $old_ip eq $new_ip;
+			}
+		    }
+
+		    if ($need_to_add == true) {
+			my $ns_ip;
+			$ns_ip->{$new_ip}->{'ns'} = $new_nsname;
+			$ns_ip->{$new_ip}->{'proto'} = $proto;
+			push @need_to_add, $ns_ip;
+		    }
 	    }
 
 	}
     }
 
     foreach my $proto (keys %{$old_ns_servers}) {
-	my $old_ips = $old_ns_servers->{$proto};
-	foreach my $old_ip (keys %{$old_ips}) {
-	    my $old_nsname = $old_ips->{$old_ip};
+	my $old_ns = $old_ns_servers->{$proto};
+	foreach my $old_nsname (keys %{$old_ns}) {
+	    foreach my $old_ip (@{$old_ns->{$old_nsname}}) {
+		my $is_need_to_remove = false;
 
-	    my $is_need_to_remove = false;
-    
-	    if (defined($new_ns_servers->{$old_nsname}->{$proto})) {
+		if (defined($new_ns_servers->{$old_nsname}->{$proto})) {
 		    $is_need_to_remove = true;
-		    foreach my $new_ip (@{$new_ns_servers->{$old_nsname}->{$proto}}) {
-			$is_need_to_remove = false if $new_ip eq $old_ip;
-		    }
-	    }
-	    else {
-		$is_need_to_remove = true;
-	    }
 
-	    $need_to_remove->{$old_ip} = $old_nsname if $is_need_to_remove == true;
+		    foreach my $new_ip (@{$new_ns_servers->{$old_nsname}->{$proto}}) {
+		    	    $is_need_to_remove = false if $new_ip eq $old_ip;
+		        }
+		}
+		else {
+		    $is_need_to_remove = true;
+		}
+
+		if ( $is_need_to_remove == true ) {
+		    my $ns_ip;
+
+		    $ns_ip->{$old_ip} = $old_nsname;
+
+		    push @need_to_remove, $ns_ip;
+		}
+	    }
 	}
     }
 
-    add_new_ns($TLD, $need_to_add) if scalar(%{$need_to_add});
-    disable_old_ns($TLD, $need_to_remove) if scalar(%{$need_to_remove});
+    add_new_ns($TLD, \@need_to_add) if scalar(@need_to_add);
+    disable_old_ns($TLD, \@need_to_remove) if scalar(@need_to_remove);
 }
 
 sub add_new_ns($) {
@@ -1948,19 +1968,21 @@ sub add_new_ns($) {
     $OPTS{'dnssec'} = true if (defined($macro_value) and $macro_value->{'value'} eq true);
 
     $macro_value = get_host_macro($main_templateid, '{$RSM.TLD.EPP.ENABLED}');
-    
+
     $OPTS{'epp-servers'} = true if (defined($macro_value) and $macro_value->{'value'} eq true);
 
-    foreach my $ip (keys %{$ns_servers}) {
-	my $proto = $ns_servers->{$ip}->{'proto'};
-	my $ns = $ns_servers->{$ip}->{'ns'};
+    foreach my $ns_ip (@$ns_servers) {
+	foreach my $ip (keys %{$ns_ip}) {
+	    my $proto = $ns_ip->{$ip}->{'proto'};
+	    my $ns = $ns_ip->{$ip}->{'ns'};
 
-	$proto=~s/v(\d)/$1/;
+	    $proto=~s/v(\d)/$1/;
 
-	create_item_dns_rtt($ns, $ip, $main_templateid, 'Template '.$TLD, 'tcp', $proto);
-	create_item_dns_rtt($ns, $ip, $main_templateid, 'Template '.$TLD, 'udp', $proto);
+	    create_item_dns_rtt($ns, $ip, $main_templateid, 'Template '.$TLD, 'tcp', $proto);
+	    create_item_dns_rtt($ns, $ip, $main_templateid, 'Template '.$TLD, 'udp', $proto);
 
-	create_all_slv_ns_items($ns, $ip, $main_hostid);
+    	    create_all_slv_ns_items($ns, $ip, $main_hostid);
+	}
     }
 }
 
@@ -1982,25 +2004,25 @@ sub disable_old_ns($) {
 
     $main_hostid = $main_hostid->{'hostid'};
 
+    foreach my $ns (@$ns_servers) {
+	foreach my $ip (keys %{$ns}) {
+	    my $ns_name = $ns->{$ip};
+	    my $item_key = ','.$ns_name.','.$ip.']';
 
+	    my $items = get_items_like($main_templateid, $item_key, true);
 
-    foreach my $ip (keys %{$ns_servers}) {
-	my $ns_server = $ns_servers->{$ip};
-	my $item_key = ','.$ns_server.','.$ip.']';
+	    my @tmp_items = keys %{$items};
 
-	my $items = get_items_like($main_templateid, $item_key, true);
+	    push @itemids, @tmp_items;
 
-	my @tmp_items = keys %{$items};
+	    $item_key = '['.$ns_name.','.$ip.']';
 
-	push @itemids, @tmp_items;
+	    $items = get_items_like($main_hostid, $item_key, false);
 
-	$item_key = '['.$ns_server.','.$ip.']';
+    	    @tmp_items = keys %{$items};
 
-	$items = get_items_like($main_hostid, $item_key, false);
-
-        @tmp_items = keys %{$items};
-
-        push @itemids, @tmp_items;
+    	    push @itemids, @tmp_items;
+	}
     }
 
     if (scalar(@itemids) > 0) {
