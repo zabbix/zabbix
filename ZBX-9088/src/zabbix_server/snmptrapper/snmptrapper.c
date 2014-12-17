@@ -501,6 +501,12 @@ static int	get_latest_data()
 		{
 			return FAIL;	/* no new traps and no data left in the buffer*/
 		}
+		else if ((MAX_BUFFER_LEN -1) <= strlen(buffer) && 1 == retry_read)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process the trap. the trap is too long");
+			clear_buffer();
+			return FAIL;
+		}
 	}
 
 	if (-1 == trap_fd && -1 == open_trap_file())
