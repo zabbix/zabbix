@@ -32,7 +32,8 @@
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
 
-#define ZBX_APISERVER_REQUEST_LINE	"POST /api_jsonrpc.php HTTP/1.1"
+#define ZBX_APISERVER_REQUEST_LINE		"POST /api_jsonrpc.php HTTP/1."
+#define ZBX_APISERVER_REQUEST_LINE_SIZE		(sizeof(ZBX_APISERVER_REQUEST_LINE) - 1)
 
 static const char	*skip_field_spaces(const char *in)
 {
@@ -208,7 +209,7 @@ static int	zbx_api_process_jsonrpc(zbx_sock_t *sock, const char *data)
 
 	zbx_json_close(&result);
 
-	header = zbx_dsprintf(NULL, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\nConnection: close\r\n"
+	header = zbx_dsprintf(NULL, "HTTP/1.0 200 OK\r\nContent-Length: %d\r\nConnection: close\r\n"
 			"Content-Type: application/json\r\n\r\n", strlen(result.buffer));
 
 	zbx_tcp_send_raw(sock, header);
@@ -216,6 +217,8 @@ static int	zbx_api_process_jsonrpc(zbx_sock_t *sock, const char *data)
 
 	zbx_free(header);
 	zbx_json_free(&result);
+
+	ret = SUCCEED;
 out:
 	zbx_free(id);
 	zbx_free(error);
@@ -244,14 +247,15 @@ static void	zbx_api_process_request(zbx_sock_t *sock)
 
 	if (NULL == (line = zbx_tcp_recv_line(sock)))
 	{
-		zbx_tcp_send_raw(sock, "HTTP/1.1 400 Bad Request\r\n");
+		zbx_tcp_send_raw(sock, "HTTP/1.0 400 Bad Request\r\n");
 		zabbix_log(LOG_LEVEL_WARNING, "cannot read post request");
 		goto out;
 	}
 
-	if (0 != strcmp(line, ZBX_APISERVER_REQUEST_LINE))
+	if (0 != strncmp(line, ZBX_APISERVER_REQUEST_LINE, sizeof(ZBX_APISERVER_REQUEST_LINE_SIZE)) ||
+			(line[ZBX_APISERVER_REQUEST_LINE_SIZE] != '0' && line[ZBX_APISERVER_REQUEST_LINE_SIZE] != '1'))
 	{
-		zbx_tcp_send_raw(sock, "HTTP/1.1 400 Bad Request\r\n");
+		zbx_tcp_send_raw(sock, "HTTP/1.0 400 Bad Request\r\n");
 		zabbix_log(LOG_LEVEL_WARNING, "invalid request line \"%s\"", line);
 		goto out;
 	}
@@ -264,7 +268,7 @@ static void	zbx_api_process_request(zbx_sock_t *sock)
 
 			if (SUCCEED != is_uint31(line, &content_length))
 			{
-				zbx_tcp_send_raw(sock, "HTTP/1.1 400 Bad Request\r\n");
+				zbx_tcp_send_raw(sock, "HTTP/1.0 400 Bad Request\r\n");
 				zabbix_log(LOG_LEVEL_WARNING, "invalid Content-Length value \"%s\"", line);
 				return;
 			}
@@ -278,7 +282,7 @@ static void	zbx_api_process_request(zbx_sock_t *sock)
 
 			if (0 != strncmp(line, "application/json", 17))
 			{
-				zbx_tcp_send_raw(sock, "HTTP/1.1 415 Unsupported Media Type\r\n");
+				zbx_tcp_send_raw(sock, "HTTP/1.0 415 Unsupported Media Type\r\n");
 				zabbix_log(LOG_LEVEL_WARNING, "invalid Content-Type value \"%s\"", line);
 				return;
 			}
@@ -289,7 +293,7 @@ static void	zbx_api_process_request(zbx_sock_t *sock)
 
 	if (0 == content_length)
 	{
-		zbx_tcp_send_raw(sock, "HTTP/1.1 411 Length Required\r\n");
+		zbx_tcp_send_raw(sock, "HTTP/1.0 411 Length Required\r\n");
 		zabbix_log(LOG_LEVEL_WARNING, "no Content-Length value specified");
 		goto out;
 	}
@@ -297,12 +301,13 @@ static void	zbx_api_process_request(zbx_sock_t *sock)
 	if (content_length == sock->read_bytes - (unsigned)(sock->next_line - sock->buffer))
 	{
 		/* trivial case - the expected data was sent in one line */
-		zbx_api_process_jsonrpc(sock, sock->next_line);
+		if (SUCCEED != zbx_api_process_jsonrpc(sock, sock->next_line))
+			zbx_tcp_send_raw(sock, "HTTP/1.0 400 Bad Request\r\n");
 	}
 	else if (content_length < sock->read_bytes - (unsigned)(sock->next_line - sock->buffer))
 	{
 		/* we already have received more data than expected, throw error  */
-		zbx_tcp_send_raw(sock, "HTTP/1.1 400 Bad Request\r\n");
+		zbx_tcp_send_raw(sock, "HTTP/1.0 400 Bad Request\r\n");
 		zabbix_log(LOG_LEVEL_WARNING, "received more data than expected");
 		goto out;
 	}
@@ -317,14 +322,14 @@ static void	zbx_api_process_request(zbx_sock_t *sock)
 
 		if (SUCCEED != zbx_tcp_recv(sock))
 		{
-			zbx_tcp_send_raw(sock, "HTTP/1.1 400 Bad Request\r\n");
+			zbx_tcp_send_raw(sock, "HTTP/1.0 400 Bad Request\r\n");
 			zabbix_log(LOG_LEVEL_WARNING, "cannot receive full request body");
 			goto clean;
 		}
 
 		if (data_offset + sock->read_bytes != content_length)
 		{
-			zbx_tcp_send_raw(sock, "HTTP/1.1 400 Bad Request\r\n");
+			zbx_tcp_send_raw(sock, "HTTP/1.0 400 Bad Request\r\n");
 			zabbix_log(LOG_LEVEL_WARNING, "received data size does not match the content length");
 			goto clean;
 		}
@@ -332,7 +337,7 @@ static void	zbx_api_process_request(zbx_sock_t *sock)
 		zbx_strcpy_alloc(&data, &data_alloc, &data_offset, sock->buffer);
 
 		if (SUCCEED != zbx_api_process_jsonrpc(sock, data))
-			zbx_tcp_send_raw(sock, "HTTP/1.1 400 Bad Request\r\n");
+			zbx_tcp_send_raw(sock, "HTTP/1.0 400 Bad Request\r\n");
 
 clean:
 		zbx_free(data);

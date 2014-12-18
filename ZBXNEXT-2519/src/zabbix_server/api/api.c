@@ -2316,9 +2316,15 @@ int	zbx_api_prepare_objects_for_update(zbx_vector_ptr_t *objects, const zbx_api_
 			goto out;
 		}
 
-		pv1 = (0 == props->values_num ? NULL :  (zbx_api_property_value_t *)props->values[0]);
+		if (0 != props->values_num)
+		{
+			/* sort by property order in object class definition */
+			zbx_vector_ptr_sort(props, zbx_api_3ptr_compare_func);
 
-		zbx_vector_ptr_sort(props, zbx_api_3ptr_compare_func);
+			pv1 = (zbx_api_property_value_t *)props->values[0];
+		}
+		else
+			pv1 = NULL;
 
 		/* check if the object id property is specified */
 		if (NULL == pv1 || zbx_api_object_pk(objclass) != pv1->property)
