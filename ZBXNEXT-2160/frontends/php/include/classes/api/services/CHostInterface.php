@@ -608,8 +608,8 @@ class CHostInterface extends CApiService {
 			return;
 		}
 
-		if (preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $interface['ip'])
-				|| preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $interface['ip'])) {
+		if (preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/', $interface['ip'])
+				|| preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $interface['ip'])) {
 			return;
 		}
 

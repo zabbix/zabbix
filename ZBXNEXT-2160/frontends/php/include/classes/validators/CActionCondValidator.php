@@ -123,7 +123,7 @@ class CActionCondValidator extends CValidator {
 					$this->setError(_('Empty action condition.'));
 				}
 				elseif (!$ipRangeValidator->validate($conditionValue)) {
-					$this->setError(_s('Incorrect action condition IP: %1$s', $ipRangeValidator->getError()));
+					$this->setError($ipRangeValidator->getError());
 				}
 				break;
 

@@ -30,9 +30,7 @@ class CIPRangeValidatorTest extends CValidatorTest {
 	 * @return array
 	 */
 	public function validParamProvider() {
-		return array(
-			array(array('ipMaxCount' => 65536))
-		);
+		return array(array(array('ipRangeLimit' => 65536)));
 	}
 
 	/**
@@ -50,7 +48,7 @@ class CIPRangeValidatorTest extends CValidatorTest {
 			array(array(), 'fe80:0:0:0:0:0:c0a8:100'),
 			array(array(), 'fe80::c0a8:100'),
 			array(array(), '0.0.0.0/0'),
-			array(array(), '0.0.0.0/32'),
+			array(array(), '0.0.0.0/30'),
 			array(array(), '192.168.255.0/30'),
 			array(array(), '192.168.0-255.0-255'),
 			array(array(), '0-255.0-255.0-255.0-255'),
@@ -63,9 +61,9 @@ class CIPRangeValidatorTest extends CValidatorTest {
 			array(array(), 'fe80:0:0:0:0:0:c0a8:0-ff'),
 			array(array(), 'fe80::c0a8:0-ff'),
 			array(array(), '0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff'),
-			array(array('ipMaxCount' => 1), '255.255.255.254/32'),
-			array(array('ipMaxCount' => 65536), '255.255.0.0/16'),
-			array(array('ipMaxCount' => 65536), 'fe80:0:0:0:0:0:c0a8:0/112')
+			array(array('ipRangeLimit' => 4), '255.255.255.254/30'),
+			array(array('ipRangeLimit' => 65536), '255.255.0.0/16'),
+			array(array('ipRangeLimit' => 65536), 'fe80:0:0:0:0:0:c0a8:0/112')
 		);
 	}
 
@@ -86,31 +84,32 @@ class CIPRangeValidatorTest extends CValidatorTest {
 			),
 			array(array(),
 				'',
-				'IP range cannot be empty.'
+				'IP address range cannot be empty.'
 			),
 			array(array(),
 				'192.168.0-255.0/30',
-				'Invalid IP address "192.168.0-255.0/30".'
+				'Invalid IP address range "192.168.0-255.0/30".'
 			),
 			array(array(),
 				'192.168.0-255.0-255/16-30',
-				'Invalid IP address "192.168.0-255.0-255/16-30".'
+				'Invalid IP address range "192.168.0-255.0-255/16-30".'
 			),
-			array(array('ipMaxCount' => 65536),
+			array(array('ipRangeLimit' => 65536),
 				'0-255.0-255.0-255.0-255',
-				'Invalid IP address range "0-255.0-255.0-255.0-255".'
+				'IP range "0-255.0-255.0-255.0-255" exceeds "65536" address limit.'
 			),
-			array(array('ipMaxCount' => 65536),
+			array(array('ipRangeLimit' => 65536),
 				'0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff',
-				'Invalid IP address range "0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff".'
+				'IP range "0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff"'.
+				' exceeds "65536" address limit.'
 			),
 			array(array(),
 				'{$A}',
-				'Invalid IP address "{$A}".'
+				'Invalid IP address range "{$A}".'
 			),
 			array(array(),
 				'321.654.987.456',
-				'Invalid IP address "321.654.987.456".'
+				'Invalid IP address range "321.654.987.456".'
 			),
 			array(array(),
 				'321.654.987.456-456',
@@ -118,31 +117,27 @@ class CIPRangeValidatorTest extends CValidatorTest {
 			),
 			array(array(),
 				'192.168.443.0/432',
-				'Invalid IP address "192.168.443.0/432".'
+				'Invalid IP address range "192.168.443.0/432".'
 			),
-			array(array('ipMaxCount' => 65536),
+			array(array('ipRangeLimit' => 65536),
 				'192.168.0.0/15',
-				'Invalid network mask "192.168.0.0/15".'
+				'IP range "192.168.0.0/15" exceeds "65536" address limit.'
 			),
 			array(array(),
 				'192.168.0.0/16-30',
-				'Invalid network mask "192.168.0.0/16-30".'
+				'Invalid IP address range "192.168.0.0/16-30".'
 			),
-			array(array('ipMaxCount' => 65536),
+			array(array('ipRangeLimit' => 65536),
 				'fe80:0:0:0:0:0:c0a8:0/111',
-				'Invalid network mask "fe80:0:0:0:0:0:c0a8:0/111".'
+				'IP range "fe80:0:0:0:0:0:c0a8:0/111" exceeds "65536" address limit.'
 			),
-			array(array('ipMaxCount' => 65536),
+			array(array(),
 				'fe80:0:0:0:0:0:c0a8:0/129',
-				'Invalid network mask "fe80:0:0:0:0:0:c0a8:0/129".'
+				'Invalid IP address range "fe80:0:0:0:0:0:c0a8:0/129".'
 			),
-			array(array('ipMaxCount' => 65536),
-				'fe80::c0a8:0/111',
-				'Invalid network mask "fe80::c0a8:0/111".'
-			),
-			array(array('ipMaxCount' => 65536),
+			array(array(),
 				'fe80::c0a8:0/129',
-				'Invalid network mask "fe80::c0a8:0/129".'
+				'Invalid IP address range "fe80::c0a8:0/129".'
 			)
 		);
 	}

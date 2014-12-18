@@ -25,189 +25,60 @@
 class CIPRangeValidator extends CIPValidator {
 
 	/**
-	 * Specifies the maximum amount of allowed IP addresses. If set to 0, it is possible to select all IP range
-	 * 0-255.0-255.0-255.0-255 and 0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff.
+	 * Maximum amount of IP addresses for each range (configuration parameter).
+	 *
+	 */
+	public $ipRangeLimit = 0;
+
+	/**
+	 * Maximum amount of IP addresses.
 	 *
 	 * @var int
 	 */
-	public $ipMaxCount = 0;
+	private $maxIPCount;
 
 	/**
-	 * Validate ranges for the provided comma-separated string of IP's.
+	 * IP address range with maximum amount of IP addresses.
 	 *
-	 * @param string $ipRangeList
+	 * @var string
+	 */
+	private $maxIPRange;
+
+	/**
+	 * Validate comma-separated IP address ranges.
+	 *
+	 * @param string $ranges
 	 *
 	 * @return bool
 	 */
-	public function validate($ipRangeList) {
-		if (!is_string($ipRangeList)) {
-			$this->setError(_s('Invalid IP address range "%1$s": must be a string.', $this->stringify($ipRangeList)));
+	public function validate($ranges) {
+		if (!is_string($ranges)) {
+			$this->setError(_s('Invalid IP address range "%1$s": must be a string.', $this->stringify($ranges)));
 
 			return false;
 		}
 
-		if ($ipRangeList === '') {
-			$this->setError(_('IP range cannot be empty.'));
+		if ($ranges === '') {
+			$this->setError(_('IP address range cannot be empty.'));
 
 			return false;
 		}
 
-		$isRangeValid = true;
+		$this->maxIPCount = 0;
+		$this->maxIPRange = '';
 
-		$this->ipMaxCount = (string) $this->ipMaxCount;
-
-		foreach (explode(',', $ipRangeList) as $ipRange) {
-			if (strpos($ipRange, '/') !== false) {
-				$isRangeValid &= $this->isValidMask($ipRange);
-			}
-			else {
-				$isRangeValid &= $this->isValidRange($ipRange);
-			}
-		}
-
-		return (bool) $isRangeValid;
-	}
-
-	/**
-	 * Validate IP mask. IP/bits.
-	 * bits range for IPv4: 16 - 30
-	 * bits range for IPv6: 112 - 128
-	 *
-	 * @param string $ipMask
-	 *
-	 * @return bool
-	 */
-	protected function isValidMask($ipMask) {
-		$parts = explode('/', $ipMask);
-
-		if (count($parts) > 2) {
-			$this->setError(_s('Invalid IP address range "%1$s".', $ipMask));
-
-			return false;
-		}
-
-		$ip = $parts[0];
-		$bits = $parts[1];
-
-		if ($this->isValidIPv4($ip)) {
-			$isMaskNumber = preg_match('/^[0-9]{1,2}$/', $bits);
-			$bitsLeft = 32 - $bits;
-		}
-		elseif ($this->isValidIPv6($ip)) {
-			$isMaskNumber = preg_match('/^[0-9]{1,3}$/', $bits);
-			$bitsLeft = 128 - $bits;
-		}
-		else {
-			$this->setError(_s('Invalid IP address "%1$s".', $ipMask));
-
-			return false;
-		}
-
-		if (!$isMaskNumber || $bitsLeft < 0) {
-			$this->setError(_s('Invalid network mask "%1$s".', $ipMask));
-
-			return false;
-		}
-
-		if ($this->ipMaxCount != 0) {
-			$ipCount = bcpow('2', (string) $bitsLeft);
-
-			if (bccomp($ipCount, $this->ipMaxCount) > 0) {
-				$this->setError(_s('Invalid network mask "%1$s".', $ipMask));
+		foreach (explode(',', $ranges) as $range) {
+			if (!$this->isValidMask($range) && !$this->isValidRange($range)) {
+				$this->setError(_s('Invalid IP address range "%1$s".', $range));
 
 				return false;
 			}
 		}
 
-		return true;
-	}
-
-	/**
-	 * Validate ranges in the IP.
-	 *
-	 * @param string $ipRange
-	 *
-	 * @return bool
-	 */
-	protected function isValidRange($ipRange) {
-		if (strpos($ipRange, '.') !== false) {
-			return $this->isValidRangeIPv4($ipRange);
-		}
-		elseif (ZBX_HAVE_IPV6 && strpos($ipRange, ':') !== false) {
-			return $this->isValidRangeIPv6($ipRange);
-		}
-		else {
-			$this->setError(_s('Invalid IP address "%1$s".', $ipRange));
-
-			return false;
-		}
-	}
-
-	/**
-	 * Validate an IP range in IPv4.
-	 *
-	 * @param string $ipRange
-	 *
-	 * @return bool
-	 */
-	protected function isValidRangeIPv4($ipRange) {
-		$ipCount = 0;
-
-		// To validate an IP, use this array to construct the starting IP of the range and then validate it.
-		$ipPartsForValidation = array();
-
-		$ipParts = explode('.', $ipRange);
-
-		foreach ($ipParts as $part) {
-			// Check if we have the range in the part.
-			if (strpos($part, '-') !== false) {
-				$rangeParts = explode('-', $part);
-
-				// Check that we got only 2 parts and if IP part conforms to IPv4 definition format.
-				if (count($rangeParts) != 2 || !preg_match('/^([0-9]{1,3}-[0-9]{1,3})$/', $part)) {
-					$this->setError(_s('Invalid IP address range "%1$s".', $ipRange));
-
-					return false;
-				}
-
-				sscanf($rangeParts[0], "%d", $fromValue);
-				sscanf($rangeParts[1], "%d", $toValue);
-
-				// Check that end IP is not bigger that 255 and start IP is smaller than end.
-				if ($toValue > 255 || $fromValue > $toValue) {
-					$this->setError(_s('Invalid IP address range "%1$s".', $ipRange));
-
-					return false;
-				}
-
-				$ipsInRange = $toValue - $fromValue + 1;
-
-				// Counting the amount of IP's in the range.
-				if ($ipCount == 0) {
-					$ipCount = $ipsInRange;
-				}
-				else {
-					$ipCount = bcmul((string) $ipCount, (string) $ipsInRange);
-				}
-
-				$ipPartsForValidation[] = $rangeParts[0];
-			}
-			else {
-				$ipPartsForValidation[] = $part;
-			}
-		}
-
-		$ip = implode('.', $ipPartsForValidation);
-
-		if (!$this->isValidIPv4($ip)) {
-			$this->setError(_s('Invalid IP address "%1$s".', $ipRange));
-
-			return false;
-		}
-
-		// Check if IP count in the given range is bigger that the limit.
-		if ($this->ipMaxCount != 0 && bccomp((string) $ipCount, $this->ipMaxCount) > 0) {
-			$this->setError(_s('Invalid IP address range "%1$s".', $ipRange));
+		if ($this->ipRangeLimit != 0 && bccomp($this->maxIPCount, $this->ipRangeLimit) > 0) {
+			$this->setError(
+				_s('IP range "%1$s" exceeds "%2$s" address limit.', $this->maxIPRange, $this->ipRangeLimit)
+			);
 
 			return false;
 		}
@@ -216,72 +87,167 @@ class CIPRangeValidator extends CIPValidator {
 	}
 
 	/**
-	 * Validate an IP range in IPv6.
+	 * Validate an IP mask.
 	 *
-	 * @param string $ipRange
+	 * @param string $range
 	 *
 	 * @return bool
 	 */
-	protected function isValidRangeIPv6($ipRange) {
-		$ipCount = 0;
+	protected function isValidMask($range) {
+		return ($this->isValidMaskIPv4($range) || $this->isValidMaskIPv6($range));
+	}
 
-		// To validate an IP, use this array to construct the starting IP of the range and then validate it.
-		$ipPartsForValidation = array();
+	/**
+	 * Validate an IPv4 mask.
+	 *
+	 * @param string $range
+	 *
+	 * @return bool
+	 */
+	protected function isValidMaskIPv4($range) {
+		$parts = explode('/', $range);
 
-		$ipParts = explode(':', $ipRange);
+		if (count($parts) != 2) {
+			return false;
+		}
 
-		foreach ($ipParts as $part) {
-			// Check if we have the range in the part.
-			if (strpos($part, '-')) {
-				$rangeParts = explode('-', $part);
+		if (!$this->isValidIPv4($parts[0])) {
+			return false;
+		}
 
-				// Check that we got only 2 parts and if IP part conforms to IPv6 definition format.
-				if (count($rangeParts) != 2 || !preg_match('/^([a-f0-9]{1,4}-[a-f0-9]{1,4})$/i', $part)) {
-					$this->setError(_s('Invalid IP address range "%1$s".', $ipRange));
+		if (!preg_match('/^[0-9]{1,2}$/', $parts[1]) || $parts[1] > 30) {
+			return false;
+		}
 
+		$ipCount = bcpow(2, 32 - $parts[1]);
+
+		if ($this->maxIPCount < $ipCount) {
+			$this->maxIPCount = $ipCount;
+			$this->maxIPRange = $range;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate an IPv6 mask.
+	 *
+	 * @param string $range
+	 *
+	 * @return bool
+	 */
+	protected function isValidMaskIPv6($range) {
+		$parts = explode('/', $range);
+
+		if (count($parts) != 2) {
+			return false;
+		}
+
+		if (!$this->isValidIPv6($parts[0])) {
+			return false;
+		}
+
+		if (!preg_match('/^[0-9]{1,3}$/', $parts[1]) || $parts[1] > 128) {
+			return false;
+		}
+
+		$ipCount = bcpow(2, 128 - $parts[1]);
+
+		if ($this->maxIPCount < $ipCount) {
+			$this->maxIPCount = $ipCount;
+			$this->maxIPRange = $range;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate an IP address range.
+	 *
+	 * @param string $range
+	 *
+	 * @return bool
+	 */
+	protected function isValidRange($range) {
+		return ($this->isValidRangeIPv4($range) || $this->isValidRangeIPv6($range));
+	}
+
+	/**
+	 * Validate an IPv4 address range.
+	 *
+	 * @param string $range
+	 *
+	 * @return bool
+	 */
+	protected function isValidRangeIPv4($range) {
+		$parts = explode('.', $range);
+
+		$ipCount = 1;
+		$ipParts = array();
+
+		foreach ($parts as $part) {
+			if (preg_match('/^([0-9]{1,3})-([0-9]{1,3})$/', $part, $matches)) {
+				if ($matches[1] > $matches[2]) {
 					return false;
 				}
 
-				sscanf($rangeParts[0], "%x", $fromValue);
-				sscanf($rangeParts[1], "%x", $toValue);
-
-				// Check that end IP is not bigger that 65535 and start IP is smaller than end.
-				if ($toValue > 65535 || $fromValue > $toValue) {
-					$this->setError(_s('Invalid IP address range "%1$s".', $ipRange));
-
-					return false;
-				}
-
-				$ipsInRange = $toValue - $fromValue + 1;
-
-				// Counting the amount of IP's in the range.
-				if ($ipCount == 0) {
-					$ipCount = $ipsInRange;
-				}
-				else {
-					$ipCount = bcmul((string) $ipCount, (string) $ipsInRange);
-				}
-
-				$ipPartsForValidation[] = $rangeParts[0];
+				$ipCount = bcmul($ipCount, $matches[2] - $matches[1] + 1);
+				$ipParts[] = $matches[2];
 			}
 			else {
-				$ipPartsForValidation[] = $part;
+				$ipParts[] = $part;
 			}
 		}
 
-		$ip = implode(':', $ipPartsForValidation);
-
-		if (!$this->isValidIPv6($ip)) {
-			$this->setError(_s('Invalid IP address "%1$s".', $ipRange));
-
+		if (!$this->isValidIPv4(implode('.', $ipParts))) {
 			return false;
 		}
 
-		// Check if IP count in the given range is bigger that the limit.
-		if ($this->ipMaxCount != 0 && bccomp((string) $ipCount, $this->ipMaxCount) > 0) {
-			$this->setError(_s('Invalid IP address range "%1$s".', $ipRange));
+		if ($this->maxIPCount < $ipCount) {
+			$this->maxIPCount = $ipCount;
+			$this->maxIPRange = $range;
+		}
 
+		return true;
+	}
+
+	/**
+	 * Validate an IPv6 address range.
+	 *
+	 * @param string $range
+	 *
+	 * @return bool
+	 */
+	protected function isValidRangeIPv6($range) {
+		$parts = explode(':', $range);
+
+		$ipCount = 1;
+		$ipParts = array();
+
+		foreach ($parts as $part) {
+			if (preg_match('/^([a-f0-9]{1,4})-([a-f0-9]{1,4})$/i', $part, $matches)) {
+				sscanf($matches[1], '%x', $from);
+				sscanf($matches[2], '%x', $to);
+
+				if ($from > $to) {
+					return false;
+				}
+
+				$ipCount = bcmul($ipCount, $to - $from + 1);
+				$ipParts[] = $matches[1];
+			}
+			else {
+				$ipParts[] = $part;
+			}
+		}
+
+		if (!$this->isValidIPv6(implode(':', $ipParts))) {
 			return false;
+		}
+
+		if ($this->maxIPCount < $ipCount) {
+			$this->maxIPCount = $ipCount;
+			$this->maxIPRange = $range;
 		}
 
 		return true;

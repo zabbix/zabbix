@@ -144,7 +144,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		$caption = $field;
 	}
 
-	if (is_array($var) && $type != T_ZBX_IP) {
+	if (is_array($var)) {
 		$err = ZBX_VALID_OK;
 
 		foreach ($var as $v) {
@@ -157,21 +157,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	$error = false;
 	$message = '';
 
-	if ($type == T_ZBX_IP) {
-		$ipValidator = new CIPValidator();
-		if (!$ipValidator->validate($var)) {
-			$error = true;
-			$message = _s('Field "%1$s" is not IP: %2$s', $caption, $ipValidator->getError());
-		}
-	}
-	elseif ($type == T_ZBX_IP_RANGE) {
-		$ipRangeValidator = new CIPRangeValidator();
-		if (!$ipRangeValidator->validate($var)) {
-			$error = true;
-			$message = _s('Field "%1$s" is not IP range: %2$s', $caption, $ipRangeValidator->getError());
-		}
-	}
-	elseif ($type == T_ZBX_INT_RANGE) {
+	if ($type == T_ZBX_INT_RANGE) {
 		if (!is_int_range($var)) {
 			$error = true;
 			$message = _s('Field "%1$s" is not integer list or range.', $caption);
