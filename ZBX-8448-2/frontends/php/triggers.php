@@ -116,7 +116,8 @@ if ($triggerIds) {
 	}
 }
 
-if (getRequest('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
+$hostId = getRequest('hostid');
+if ($hostId && !API::Host()->isWritable(array($hostId))) {
 	access_deny();
 }
 
