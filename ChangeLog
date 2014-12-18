@@ -56,6 +56,7 @@ Changes for 2.4.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8405] fixed typo in item key helper for system.cpu.num item description (asaveljevs)
 ..F....... [ZBX-8846] fixed non-existent page displaying (Oleg)
 ........S. [ZBX-9126] fixed processing of trigger/graph prototypes in the case when all item prototypes in the trigger/graph prototypes was changed (Sasha)
 
@@ -569,6 +570,7 @@ Changes for 2.2.9rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8405] fixed typo in item key helper for system.cpu.num item description (asaveljevs)
 ..F....... [ZBX-8846] fixed non-existent page displaying (Oleg)
 ........S. [ZBX-9126] fixed processing of trigger/graph prototypes in the case when all item prototypes in the trigger/graph prototypes was changed (Sasha)
 
