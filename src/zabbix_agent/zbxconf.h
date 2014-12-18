@@ -41,6 +41,15 @@ extern char	**CONFIG_PERF_COUNTERS;
 #endif
 extern char	*CONFIG_USER;
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+extern char	*CONFIG_TLS_CA_FILE;
+extern char	*CONFIG_TLS_CA_PATH;
+extern char	*CONFIG_TLS_CERT_FILE;
+extern char	*CONFIG_TLS_KEY_FILE;
+extern char	*CONFIG_TLS_PSK_FILE;
+extern char	*CONFIG_TLS_PSK_IDENTITY;
+#endif
+
 void	load_aliases(char **lines);
 void	load_user_parameters(char **lines);
 #ifdef _WINDOWS
