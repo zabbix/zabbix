@@ -13,6 +13,29 @@ bin/win64/zabbix_sender.exe -text
 build/win32/project/Makefile_sender_dll -text
 build/win32/project/Makefile_sender_dll_x64 -text
 create/src/data.tmpl -text
+frontends/php/app/.htaccess -text
+frontends/php/app/controllers/CControllerProxyCreate.php -text
+frontends/php/app/controllers/CControllerProxyDelete.php -text
+frontends/php/app/controllers/CControllerProxyFormCreate.php -text
+frontends/php/app/controllers/CControllerProxyFormEdit.php -text
+frontends/php/app/controllers/CControllerProxyList.php -text
+frontends/php/app/controllers/CControllerProxyMassDelete.php -text
+frontends/php/app/controllers/CControllerProxyMassDisable.php -text
+frontends/php/app/controllers/CControllerProxyMassEnable.php -text
+frontends/php/app/controllers/CControllerProxyUpdate.php -text
+frontends/php/app/controllers/CControllerScriptCreate.php -text
+frontends/php/app/controllers/CControllerScriptDelete.php -text
+frontends/php/app/controllers/CControllerScriptFormCreate.php -text
+frontends/php/app/controllers/CControllerScriptFormEdit.php -text
+frontends/php/app/controllers/CControllerScriptList.php -text
+frontends/php/app/controllers/CControllerScriptMassDelete.php -text
+frontends/php/app/controllers/CControllerScriptUpdate.php -text
+frontends/php/app/views/administration.proxy.edit.js.php -text
+frontends/php/app/views/general.page.footer.php -text
+frontends/php/app/views/general.page.header.php -text
+frontends/php/app/views/general.page.layout.php -text
+frontends/php/app/views/general.page.menu.php -text
+frontends/php/app/views/general.page.top.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
@@ -144,11 +167,20 @@ frontends/php/images/gradients/sla_red.png -text
 frontends/php/images/gradients/sla_red15.png -text
 frontends/php/images/gradients/table_head2_bb.gif -text
 frontends/php/images/gradients/table_head_bb.gif -text
+frontends/php/include/classes/core/CController.php -text
+frontends/php/include/classes/core/CControllerResponse.php -text
+frontends/php/include/classes/core/CControllerResponseData.php -text
+frontends/php/include/classes/core/CControllerResponseFatal.php -text
+frontends/php/include/classes/core/CControllerResponseRedirect.php -text
+frontends/php/include/classes/core/CNewValidator.php -text
+frontends/php/include/classes/core/CRouter.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/menupopup.js -text svneol=unset#text/plain
 frontends/php/js/multiselect.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
 frontends/php/js/vendors/activity-indicator.js -text svneol=unset#text/plain
+frontends/php/local/.htaccess -text
+frontends/php/local/README -text
 frontends/php/locale/bg/LC_MESSAGES/frontend.po -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text

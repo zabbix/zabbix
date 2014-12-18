@@ -40,7 +40,8 @@
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#scriptid, #delete, #clone').remove();
-			jQuery('#update').val(<?php echo CJs::encodeJson(_('Add')); ?>).attr({id: 'add', name: 'add'});
+			jQuery('#update span').text(<?php echo CJs::encodeJson(_('Add')); ?>);
+			jQuery('#update').val('script.create').attr({id: 'add'});
 			jQuery('#cancel').addClass('ui-corner-left');
 			jQuery('#name').focus();
 		});
@@ -51,7 +52,7 @@
 		}).keyup();
 
 		// enable confirmation checkbox
-		jQuery('#enableConfirmation').change(function() {
+		jQuery('#enable_confirmation').change(function() {
 			if (this.checked) {
 				jQuery('#confirmation').removeAttr('disabled').keyup();
 			}

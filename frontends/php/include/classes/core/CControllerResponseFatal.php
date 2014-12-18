@@ -18,11 +18,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$page['file'] = 'scripts.php';
-$page['title'] = _('Configuration of scripts');
-if (!isset($_GET['action'])) {
-	$_GET['action'] = 'script.list';
-}
-require_once dirname(__FILE__).'/include/config.inc.php';
+class CControllerResponseFatal extends CControllerResponse {
 
-$page['hist_arg'] = array('scriptid');
+	private $location;
+	private $messageError = null;
+
+	public function __construct() {
+		$this->location = 'dashboard.php';
+		$this->messageError = 'Fatal error, please report to Zabbix Team';
+	}
+
+	public function getLocation() {
+		return $this->location;
+	}
+
+	public function getMessageError() {
+		return $this->messageError;
+	}
+}

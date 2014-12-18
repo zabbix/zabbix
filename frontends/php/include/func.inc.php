@@ -1391,15 +1391,6 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 	$link->setArgument('sort', $tabfield);
 	$link->setArgument('sortorder', $sortorder);
 
-	$url = $link->getUrl();
-
-	if ($page['type'] != PAGE_TYPE_HTML && defined('ZBX_PAGE_MAIN_HAT')) {
-		$script = "javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."', '".$url."');";
-	}
-	else {
-		$script = 'javascript: redirect("'.$url.'");';
-	}
-
 	zbx_value2array($obj);
 	$cont = new CSpan();
 
@@ -1423,7 +1414,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 		}
 	}
 	$col = new CCol(array($cont, $img), 'nowrap hover_grey');
-	$col->setAttribute('onclick', $script);
+	$col->setAttribute('onclick', 'javascript: redirect("'.$link->getUrl().'");');
 
 	return $col;
 }
@@ -1743,7 +1734,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES;
 
 	if (!defined('PAGE_HEADER_LOADED')) {
-		return null;
+//		return null;
 	}
 	if (defined('ZBX_API_REQUEST')) {
 		return null;

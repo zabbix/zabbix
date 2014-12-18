@@ -18,11 +18,42 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$page['file'] = 'scripts.php';
-$page['title'] = _('Configuration of scripts');
-if (!isset($_GET['action'])) {
-	$_GET['action'] = 'script.list';
-}
-require_once dirname(__FILE__).'/include/config.inc.php';
+class CControllerResponseRedirect extends CControllerResponse {
 
-$page['hist_arg'] = array('scriptid');
+	private $location;
+	private $messageOk = null;
+	private $messageError = null;
+	private $formData = null;
+
+	public function __construct($location) {
+		$this->location = $location;
+	}
+
+	public function getLocation() {
+		return $this->location;
+	}
+
+	public function getFormData() {
+		return $this->formData;
+	}
+
+	public function setFormData($formData) {
+		$this->formData = $formData;
+	}
+
+	public function setMessageOk($messageOk) {
+		$this->messageOk = $messageOk;
+	}
+
+	public function getMessageOk() {
+		return $this->messageOk;
+	}
+
+	public function setMessageError($messageError) {
+		$this->messageError = $messageError;
+	}
+
+	public function getMessageError() {
+		return $this->messageError;
+	}
+}
