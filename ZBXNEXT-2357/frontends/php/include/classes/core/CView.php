@@ -38,13 +38,26 @@ class CView {
 
 	/**
 	 * @var string - scripts on page
+	 * @deprecated
 	 */
 	private $scripts;
 
 	/**
-	 * @const string - directory where views are stored
+	 * @var array - Java Script files for inclusions on page, pre-processed by PHP
 	 */
-	const viewsDir = 'include/views';
+	private $jsIncludeFiles = array();
+
+	/**
+	 * @var array - Java Script files for inclusions on page, included as <script src="..."></script>
+	 */
+	private $jsFiles = array();
+
+	/**
+	 * @array - directories where views are stored, ordered by priority
+	 * include/views should be removed once we fully move to MVC
+	 */
+//	static $viewsDir = array('app/local/views', 'app/views', 'include/views');
+	static $viewsDir = array('local/app/views', 'app/views', 'include/views');
 
 	/**
 	 * Creates a new view based on provided template file.
@@ -62,9 +75,16 @@ class CView {
 			throw new Exception(_s('Invalid view name given "%s". Allowed chars: "a-z" and ".".', $view));
 		}
 
-		$this->filePath = self::viewsDir.'/'.$view.'.php';
+		$found = false;
+		foreach (self::$viewsDir as $dir) {
+			$this->filePath = $dir.'/'.$view.'.php';
+			if (file_exists($this->filePath)) {
+				$found = true;
+				break;
+			}
+		}
 
-		if (!file_exists($this->filePath)) {
+		if ($found == false) {
 			throw new Exception(_s('File provided to a view does not exist. Tried to find "%s".', $this->filePath));
 		}
 	}
@@ -84,6 +104,7 @@ class CView {
 	 * @param string $var name of the variable.
 	 * @return string variable value. Returns empty string if the variable is not defined.
 	 * @example get('hostName')
+	 * @deprecated use $data instead
 	 */
 	public function get($var) {
 		return isset($this->data[$var]) ? $this->data[$var] : '';
@@ -94,6 +115,7 @@ class CView {
 	 * @param string $var name of the variable.
 	 * @return array variable value. Returns empty array if the variable is not defined or not an array.
 	 * @example getArray('hosts')
+	 * @deprecated use $data instead
 	 */
 	public function getArray($var) {
 		return isset($this->data[$var]) && is_array($this->data[$var]) ? $this->data[$var] : array();
@@ -102,6 +124,7 @@ class CView {
 	/**
 	 * Load and execute view.
 	 * TODO It outputs JavaScript code immediately, should be done in show() or processed separately.
+	 * @deprecated will not be supported when we fully move to MVC
 	 * @return object GUI object.
 	 */
 	public function render() {
@@ -122,6 +145,7 @@ class CView {
 	/**
 	 * The method outputs HTML code based on rendered template.
 	 * It calls render() if not called already.
+	 * @deprecated will not be supported when we fully move to MVC
 	 * @return NULL
 	 */
 	public function show() {
@@ -129,5 +153,55 @@ class CView {
 			throw new Exception(_('View is not rendered.'));
 		}
 		$this->template->show();
+	}
+
+	/**
+	* The method returns HTML/JSON/CVS/etc text based on rendered template.
+	* show() and render() should be made deprecated. View should only output text, no objects, nothing.
+	* @return NULL
+	*/
+	public function getOutput() {
+		$data = $this->data;
+		ob_start();
+		include($this->filePath);
+		return ob_get_clean();
+	}
+
+	/**
+	 * Include Java Script file required for the view into HTML
+	 * @param string $filename name of java Script file, will be pre-processed by PHP
+	 */
+	public function includeJSfile($filename) {
+		$this->jsIncludeFiles[] = $filename;
+	}
+
+	/**
+	 * Add Java Script file required for the view as <script src="..."></script>
+	 * @param string $filename name of java Script file
+	 */
+	public function addJSfile($filename) {
+		$this->jsFiles[] = $filename;
+	}
+
+	/**
+	 * Get content of all included Java Script files
+	 * @return string empty string or content of included JS files
+	 */
+	public function getIncludedJS() {
+		ob_start();
+		foreach ($this->jsIncludeFiles as $filename) {
+			if((include $filename) === false) {
+				throw new Exception(_s('Cannot include JS file "%s".', $filename));
+			}
+		}
+		return ob_get_clean();
+	}
+
+	/**
+	 * Get content of all included Java Script files
+	 * @return string empty string or array of path of included JS files
+	 */
+	public function getAddedJS() {
+		return $this->jsFiles;
 	}
 }

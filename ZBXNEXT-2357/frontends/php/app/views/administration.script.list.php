@@ -18,11 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+if ($data['uncheck']) {
+	uncheckTableRows();
+}
 
 $scriptsWidget = new CWidget();
 
 $createForm = new CForm('get');
-$createForm->addItem(new CSubmit('form', _('Create script')));
+$createForm->addItem(new CRedirectButton(_('Create script'), 'scripts.php?action=script.formcreate'));
 
 $scriptsWidget->addPageHeader(_('CONFIGURATION OF SCRIPTS'), $createForm);
 $scriptsWidget->addHeader(_('Scripts'));
@@ -34,26 +37,23 @@ $scriptsForm->setAttribute('id', 'scripts');
 
 $scriptsTable = new CTableInfo(_('No scripts found.'));
 $scriptsTable->setHeader(array(
-	new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scripts');"),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+	new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');"),
+	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
 	_('Type'),
 	_('Execute on'),
-	make_sorting_header(_('Commands'), 'command', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Commands'), 'command', $data['sort'], $data['sortorder']),
 	_('User group'),
 	_('Host group'),
 	_('Host access')
 ));
 
-foreach ($this->data['scripts'] as $script) {
+foreach ($data['scripts'] as $script) {
 	switch ($script['type']) {
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			$scriptType = _('Script');
 			break;
 		case ZBX_SCRIPT_TYPE_IPMI:
 			$scriptType = _('IPMI');
-			break;
-		default:
-			$scriptType = '';
 			break;
 	}
 
@@ -72,13 +72,13 @@ foreach ($this->data['scripts'] as $script) {
 	}
 
 	$scriptsTable->addRow(array(
-		new CCheckBox('scripts['.$script['scriptid'].']', 'no', null, $script['scriptid']),
-		new CLink($script['name'], 'scripts.php?form=1&scriptid='.$script['scriptid']),
+		new CCheckBox('scriptids['.$script['scriptid'].']', 'no', null, $script['scriptid']),
+		new CLink($script['name'], 'scripts.php?action=script.formedit&scriptid='.$script['scriptid']),
 		$scriptType,
 		$scriptExecuteOn,
 		zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
-		$script['userGroupName'] ? $script['userGroupName'] : _('All'),
-		$script['hostGroupName'] ? $script['hostGroupName'] : _('All'),
+		$script['userGroupName'] == null ?  _('All') : $script['userGroupName'],
+		$script['hostGroupName'] == null ?  _('All') : $script['hostGroupName'],
 		($script['host_access'] == PERM_READ_WRITE) ? _('Write') : _('Read')
 	));
 }
@@ -92,12 +92,12 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "scripts";');
+zbx_add_post_js('chkbxRange.pageGoName = "scriptids";');
 
 // append table to form
-$scriptsForm->addItem(array($this->data['paging'], $scriptsTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$scriptsForm->addItem(array($data['paging'], $scriptsTable, $data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $scriptsWidget->addItem($scriptsForm);
 
-return $scriptsWidget;
+$scriptsWidget->show();

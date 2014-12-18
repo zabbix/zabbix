@@ -18,11 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$page['file'] = 'scripts.php';
-$page['title'] = _('Configuration of scripts');
-if (!isset($_GET['action'])) {
-	$_GET['action'] = 'script.list';
-}
-require_once dirname(__FILE__).'/include/config.inc.php';
+class CControllerResponseData extends CControllerResponse {
 
-$page['hist_arg'] = array('scriptid');
+	private $data;
+
+	public function __construct($data) {
+		$this->data = $data;
+	}
+
+	public function getData() {
+		return $this->data;
+	}
+}

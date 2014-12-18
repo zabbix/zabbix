@@ -18,13 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+if ($data['uncheck']) {
+	uncheckTableRows();
+}
 
 $proxyWidget = new CWidget();
 
 // create new proxy button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addItem(new CSubmit('form', _('Create proxy')));
+$createForm->addItem(new CRedirectButton(_('Create proxy'), 'proxies.php?action=proxy.formcreate'));
 $proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'), $createForm);
 $proxyWidget->addHeader(_('Proxies'));
 $proxyWidget->addHeaderRowNumber();
@@ -36,8 +39,8 @@ $proxyForm->setName('proxyForm');
 // create table
 $proxyTable = new CTableInfo(_('No proxies found.'));
 $proxyTable->setHeader(array(
-	new CCheckBox('all_hosts', null, "checkAll('".$proxyForm->getName()."', 'all_hosts', 'hosts');"),
-	make_sorting_header(_('Name'), 'host', $this->data['sort'], $this->data['sortorder']),
+	new CCheckBox('all_hosts', null, "checkAll('".$proxyForm->getName()."', 'all_hosts', 'proxyids');"),
+	make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder']),
 	_('Mode'),
 	_('Last seen (age)'),
 	_('Host count'),
@@ -46,14 +49,14 @@ $proxyTable->setHeader(array(
 	_('Hosts')
 ));
 
-foreach ($this->data['proxies'] as $proxy) {
+foreach ($data['proxies'] as $proxy) {
 	$hosts = array();
 
 	if (!empty($proxy['hosts'])) {
 		$i = 1;
 
 		foreach ($proxy['hosts'] as $host) {
-			if ($i > $this->data['config']['max_in_table']) {
+			if ($i > $data['config']['max_in_table']) {
 				$hosts[] = ' &hellip;';
 
 				break;
@@ -79,16 +82,11 @@ foreach ($this->data['proxies'] as $proxy) {
 		}
 	}
 
-	$lastAccess = '-';
-	if (isset($proxy['lastaccess'])) {
-		$lastAccess = ($proxy['lastaccess'] == 0) ? '-' : zbx_date2age($proxy['lastaccess']);
-	}
-
 	$proxyTable->addRow(array(
-		new CCheckBox('hosts['.$proxy['proxyid'].']', null, null, $proxy['proxyid']),
-		isset($proxy['host']) ? new CLink($proxy['host'], 'proxies.php?form=update&proxyid='.$proxy['proxyid']) : '',
-		(isset($proxy['status']) && $proxy['status'] == HOST_STATUS_PROXY_ACTIVE) ? _('Active') : _('Passive'),
-		$lastAccess,
+		new CCheckBox('proxyids['.$proxy['proxyid'].']', null, null, $proxy['proxyid']),
+		new CLink($proxy['host'], 'proxies.php?action=proxy.formedit&proxyid='.$proxy['proxyid']),
+		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
+		($proxy['lastaccess'] == 0) ? '-' : zbx_date2age($proxy['lastaccess']),
 		isset($proxy['host']) ? count($proxy['hosts']) : '',
 		isset($proxy['item_count']) ? $proxy['item_count'] : 0,
 		isset($proxy['perf']) ? $proxy['perf'] : '-',
@@ -113,12 +111,12 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
+zbx_add_post_js('chkbxRange.pageGoName = "proxyids";');
 
 // append table to form
-$proxyForm->addItem(array($this->data['paging'], $proxyTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$proxyForm->addItem(array($data['paging'], $proxyTable, $data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $proxyWidget->addItem($proxyForm);
 
-return $proxyWidget;
+$proxyWidget->show();

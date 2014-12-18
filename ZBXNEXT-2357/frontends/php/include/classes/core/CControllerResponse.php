@@ -18,11 +18,5 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$page['file'] = 'scripts.php';
-$page['title'] = _('Configuration of scripts');
-if (!isset($_GET['action'])) {
-	$_GET['action'] = 'script.list';
+class CControllerResponse {
 }
-require_once dirname(__FILE__).'/include/config.inc.php';
-
-$page['hist_arg'] = array('scriptid');

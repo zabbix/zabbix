@@ -29,8 +29,6 @@ $page['hist_arg'] = array('groupids', 'hostids', 'filter_set');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['scripts'] = array('multiselect.js');
 
-define('ZBX_PAGE_MAIN_HAT', 'hat_latest');
-
 if (PAGE_TYPE_HTML == $page['type']) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
 }
