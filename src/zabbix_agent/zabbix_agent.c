@@ -105,6 +105,20 @@ static void	zbx_load_config(int optional)
 			PARM_OPT,	0,			0},
 		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		{"TLSCaFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCaPath",			&CONFIG_TLS_CA_PATH,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCertFile",			&CONFIG_TLS_CERT_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPskFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPskIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+#endif
 		{NULL}
 	};
 
