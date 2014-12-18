@@ -971,7 +971,7 @@ class CMap extends CMapElement {
 
 		// adding icon maps
 		if ($options['selectIconMap'] !== null && $options['selectIconMap'] != API_OUTPUT_COUNT) {
-			$iconMaps = API::getApiService()->select('sysmaps', array(
+			$iconMaps = API::getApiService()->select($this->tableName(), array(
 				'output' => array('sysmapid', 'iconmapid'),
 				'filter' => array('sysmapid' => $sysmapIds)
 			));
@@ -983,6 +983,8 @@ class CMap extends CMapElement {
 				'iconmapids' => zbx_objectValues($iconMaps, 'iconmapid'),
 				'preservekeys' => true
 			));
+
+			$iconMaps = $this->unsetExtraFields($iconMaps, array('iconmapid'), $options['selectIconMap']);
 
 			$result = $relationMap->mapOne($result, $iconMaps, 'iconmap');
 		}
