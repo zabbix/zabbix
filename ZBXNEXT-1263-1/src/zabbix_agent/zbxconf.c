@@ -60,6 +60,16 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
 
 char	*CONFIG_USER			= NULL;
 
+/* TLS parameters */
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+char	*CONFIG_TLS_CA_FILE		= NULL;
+char	*CONFIG_TLS_CA_PATH		= NULL;
+char	*CONFIG_TLS_CERT_FILE		= NULL;
+char	*CONFIG_TLS_KEY_FILE		= NULL;
+char	*CONFIG_TLS_PSK_FILE		= NULL;
+char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: load_aliases                                                     *
