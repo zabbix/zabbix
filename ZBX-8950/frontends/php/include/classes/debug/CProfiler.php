@@ -153,7 +153,7 @@ class CProfiler {
 			list($class, $method, $params, $result, $file, $line) = $apiCall;
 			// api method
 			$debug_str .= '<div style="padding-bottom: 10px;">';
-			$debug_str .= ($i + 1).'. <b>'.$class.'.'.$method.'</b> ['.$file.':'.$line.']';
+			$debug_str .= ($i + 1).'. <b>'.$class.'.'.$method.'</b>'.(($file !== null) ? ' ['.$file.':'.$line.']' : '');
 			$debug_str .= '</div>';
 			// parameters
 			$debug_str .= '<table><tr><td style="width: 300px" valign="top">Parameters:';
@@ -232,8 +232,19 @@ class CProfiler {
 		}
 
 		$backtrace = debug_backtrace();
-		$file = basename($backtrace[2]['file']);
-		$line = basename($backtrace[2]['line']);
+
+		// Use the file name and line number from the first call to the API wrapper object.
+		// Due to a bug earlier versions of PHP 5.3 did not provide the file name and line number
+		// of calls to magic methods.
+		if (isset($backtrace[2]['file'])) {
+			$file = basename($backtrace[2]['file']);
+			$line = basename($backtrace[2]['line']);
+		}
+		else {
+			$file = null;
+			$line = null;
+		}
+
 		$this->apiLog[] = array(
 			$class,
 			$method,

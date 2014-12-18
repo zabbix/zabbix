@@ -1,5 +1,5 @@
 <?php
-// Zabbix GUI configuration file
+// Zabbix GUI configuration file.
 global $DB;
 
 $DB["TYPE"]				= 'MYSQL';
@@ -8,7 +8,7 @@ $DB["PORT"]				= '0';
 $DB["DATABASE"]			= 'zabbix';
 $DB["USER"]				= 'zabbix';
 $DB["PASSWORD"]			= 'zabbix_password';
-// SCHEMA is relevant only for IBM_DB2 database
+// Schema name. Used for IBM DB2 and PostgreSQL.
 $DB["SCHEMA"]			= '';
 
 $ZBX_SERVER				= 'localhost';
