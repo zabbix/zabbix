@@ -35,6 +35,7 @@
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern char	*CONFIG_TLS_CA_FILE;
 extern char	*CONFIG_TLS_CA_PATH;
+extern char	*CONFIG_TLS_CRL_FILE;
 extern char	*CONFIG_TLS_CERT_FILE;
 extern char	*CONFIG_TLS_KEY_FILE;
 extern char	*CONFIG_TLS_PSK_FILE;
@@ -43,6 +44,7 @@ extern char	*CONFIG_TLS_PSK_IDENTITY;
 
 #if defined(HAVE_POLARSSL)
 static x509_crt		*ca_cert		= NULL;
+static x509_crt		*crl			= NULL;
 static x509_crt		*my_cert		= NULL;
 static pk_context	*my_priv_key		= NULL;
 static unsigned char	*my_psk			= NULL;
@@ -213,6 +215,34 @@ int	zbx_tls_init_child(void)
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded CA certificate(s) from file", __function_name);
+	}
+
+	/* load CRL (certificate revocation list) file */
+	if (NULL != CONFIG_TLS_CRL_FILE && '\0' != *CONFIG_TLS_CRL_FILE)
+	{
+		crl = zbx_malloc(crl, sizeof(x509_crt));
+		x509_crt_init(crl);
+
+		if (0 != (res = x509_crt_parse_file(crl, CONFIG_TLS_CRL_FILE)))
+		{
+			if (0 > res)
+			{
+				zbx_tls_error_msg(res, "", &err_msg);
+				zabbix_log(LOG_LEVEL_CRIT, "cannot parse CRL file \"%s\": %s", CONFIG_TLS_CRL_FILE,
+						err_msg);
+				zbx_free(err_msg);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot parse %d certificate(s) in CRL file \"%s\"", res,
+						CONFIG_TLS_CRL_FILE);
+			}
+
+			zbx_tls_free();
+			exit(EXIT_FAILURE);
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded CRL from file", __function_name);
 	}
 
 	/* load certificate */
@@ -395,6 +425,12 @@ int	zbx_tls_free(void)
 	{
 		x509_crt_free(my_cert);
 		zbx_free(my_cert);
+	}
+
+	if (NULL != crl)
+	{
+		x509_crt_free(crl);
+		zbx_free(crl);
 	}
 
 	if (NULL != ca_cert)
