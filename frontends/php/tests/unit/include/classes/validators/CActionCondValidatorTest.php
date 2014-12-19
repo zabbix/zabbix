@@ -72,7 +72,47 @@ class CActionCondValidatorTest extends CValidatorTest {
 			)),
 			array(array(), array(
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
-				'value' => '192.168.0.0/24'
+				'value' => '192.168.0.0/16'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => '192.168.0.0/30'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => '192.168.0-255.0-255'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => 'fe80:0:0:0:0:0:c0a8:0/0'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => 'fe80:0:0:0:0:0:c0a8:0/111'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => 'fe80:0:0:0:0:0:c0a8:0/112'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => 'fe80:0:0:0:0:0:c0a8:0/128'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => 'fe80::c0a8:0/112'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => 'fe80::c0a8:0/128'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => '192.168.0.1-127,192.168.2.1'
+			)),
+			array(array(), array(
+				'conditiontype' => CONDITION_TYPE_DHOST_IP,
+				'value' => '0-255.0-255.0-255.0-255'
 			)),
 			array(array(), array(
 				'conditiontype' => CONDITION_TYPE_DSERVICE_TYPE,
@@ -219,9 +259,44 @@ class CActionCondValidatorTest extends CValidatorTest {
 			array(array(),
 				array(
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
+					'value' => '192.168.0.0/31'
+				),
+				'Invalid IP address range "192.168.0.0/31".'
+			),
+			array(array(),
+				array(
+					'conditiontype' => CONDITION_TYPE_DHOST_IP,
+					'value' => '192.168.0.0/16-30'
+				),
+				'Invalid IP address range "192.168.0.0/16-30".'
+			),
+			array(array(),
+				array(
+					'conditiontype' => CONDITION_TYPE_DHOST_IP,
+					'value' => 'fe80:0:0:0:0:0:c0a8:0/129'
+				),
+				'Invalid IP address range "fe80:0:0:0:0:0:c0a8:0/129".'
+			),
+			array(array(),
+				array(
+					'conditiontype' => CONDITION_TYPE_DHOST_IP,
+					'value' => 'fe80::c0a8:0/129'
+				),
+				'Invalid IP address range "fe80::c0a8:0/129".'
+			),
+			array(array(),
+				array(
+					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '192.168.443.0/432'
 				),
-				'Incorrect action condition ip "192.168.443.0/432".'
+				'Invalid IP address range "192.168.443.0/432".'
+			),
+			array(array(),
+				array(
+					'conditiontype' => CONDITION_TYPE_DHOST_IP,
+					'value' => '{$A}'
+				),
+				'Invalid IP address range "{$A}".'
 			),
 			array(array(),
 				array(
