@@ -95,7 +95,7 @@ elseif (isset($_REQUEST['save'])) {
 			'output' => array('name', 'flags'),
 			'selectHosts' => array('hostid'),
 			'selectTemplates' => array('templateid'),
-			'groupids' => array($groupId),
+			'groupids' => array($groupId)
 		));
 		$oldGroup = reset($oldGroups);
 
