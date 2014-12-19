@@ -157,13 +157,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	$error = false;
 	$message = '';
 
-	if ($type == T_ZBX_INT_RANGE) {
-		if (!is_int_range($var)) {
-			$error = true;
-			$message = _s('Field "%1$s" is not integer list or range.', $caption);
-		}
-	}
-	elseif ($type == T_ZBX_INT) {
+	if ($type == T_ZBX_INT) {
 		if (!zbx_is_int($var)) {
 			$error = true;
 			$message = _s('Field "%1$s" is not integer.', $caption);

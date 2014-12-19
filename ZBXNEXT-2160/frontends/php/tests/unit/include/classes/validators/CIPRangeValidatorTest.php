@@ -63,7 +63,18 @@ class CIPRangeValidatorTest extends CValidatorTest {
 			array(array(), '0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff'),
 			array(array('ipRangeLimit' => 4), '255.255.255.254/30'),
 			array(array('ipRangeLimit' => 65536), '255.255.0.0/16'),
-			array(array('ipRangeLimit' => 65536), 'fe80:0:0:0:0:0:c0a8:0/112')
+			array(array('ipRangeLimit' => 65536), 'fe80:0:0:0:0:0:c0a8:0/112'),
+			array(array('ipRangeLimit' => 131072), '255.254.0.0/15'),
+			array(array('ipRangeLimit' => 262144), '255.252.0.0/14'),
+			array(array('ipRangeLimit' => 524288), '255.248.0.0/13'),
+			array(array('ipRangeLimit' => 1048576), '255.240.0.0/12'),
+			array(array('ipRangeLimit' => 2097152), '255.224.0.0/11'),
+			array(array('ipRangeLimit' => 4194304), '255.192.0.0/10'),
+			array(array('ipRangeLimit' => 8388608), '255.128.0.0/9'),
+			array(array('ipRangeLimit' => 16777216), '255.0.0.0/8'),
+			array(array('ipRangeLimit' => 268435456), '64.0.0.0/4'),
+			array(array('ipRangeLimit' => 2147483648), '0.0.0.0/1'),
+			array(array('ipRangeLimit' => 4294967296), '0.0.0.0/0')
 		);
 	}
 

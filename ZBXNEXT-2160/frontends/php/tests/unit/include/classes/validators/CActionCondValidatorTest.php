@@ -261,42 +261,42 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '192.168.0.0/31'
 				),
-				'Incorrect action condition IP: Invalid IP address range "192.168.0.0/31".'
+				'Invalid IP address range "192.168.0.0/31".'
 			),
 			array(array(),
 				array(
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '192.168.0.0/16-30'
 				),
-				'Incorrect action condition IP: Invalid IP address range "192.168.0.0/16-30".'
+				'Invalid IP address range "192.168.0.0/16-30".'
 			),
 			array(array(),
 				array(
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => 'fe80:0:0:0:0:0:c0a8:0/129'
 				),
-				'Incorrect action condition IP: Invalid IP address range "fe80:0:0:0:0:0:c0a8:0/129".'
+				'Invalid IP address range "fe80:0:0:0:0:0:c0a8:0/129".'
 			),
 			array(array(),
 				array(
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => 'fe80::c0a8:0/129'
 				),
-				'Incorrect action condition IP: Invalid IP address range "fe80::c0a8:0/129".'
+				'Invalid IP address range "fe80::c0a8:0/129".'
 			),
 			array(array(),
 				array(
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '192.168.443.0/432'
 				),
-				'Incorrect action condition IP: Invalid IP address range "192.168.443.0/432".'
+				'Invalid IP address range "192.168.443.0/432".'
 			),
 			array(array(),
 				array(
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '{$A}'
 				),
-				'Incorrect action condition IP: Invalid IP address range "{$A}".'
+				'Invalid IP address range "{$A}".'
 			),
 			array(array(),
 				array(

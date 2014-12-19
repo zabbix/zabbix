@@ -126,7 +126,6 @@ define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
 define('T_ZBX_DBL',			2);
 define('T_ZBX_CLR',			5);
-define('T_ZBX_INT_RANGE',	8);
 define('T_ZBX_DBL_BIG',		9);
 define('T_ZBX_DBL_STR',		10);
 
