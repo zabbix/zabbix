@@ -23,6 +23,7 @@
 #include "log.h"
 #include "cfg.h"
 #include "alias.h"
+#include "zbxalgo.h"
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
@@ -707,6 +708,26 @@ zbx_log_t	*add_log_result(AGENT_RESULT *result, const char *value)
 	result->type |= AR_LOG;
 
 	return log;
+}
+
+static int	zbx_log_compare_by_lastlogsize(const void *d1, const void *d2)
+{
+	const zbx_log_t **log1 = (const zbx_log_t **)d1;
+	const zbx_log_t **log2 = (const zbx_log_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL((*log1)->lastlogsize, (*log2)->lastlogsize);
+
+	return 0;
+}
+
+void	sort_log_result_by_lastlogsize(AGENT_RESULT *result)
+{
+	int	count;
+
+	for (count = 0; NULL != result->logs && NULL != result->logs[count]; count++)
+		;
+
+	qsort(result->logs, count, sizeof(zbx_log_t *), zbx_log_compare_by_lastlogsize);
 }
 
 zbx_uint64_t	get_log_result_lastlogsize(AGENT_RESULT *result)

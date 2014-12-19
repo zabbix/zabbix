@@ -686,6 +686,8 @@ static int	get_values(unsigned char poller_type)
 
 		if (SUCCEED == errcodes[i])
 		{
+			zbx_uint64_t	lastlogsize;
+
 			/* remove formatting symbols from the end of the result */
 			/* so it could be checked by "is_uint64" and "is_double" functions */
 			/* when we try to get "int" or "float" values from "string" result */
@@ -697,7 +699,11 @@ static int	get_values(unsigned char poller_type)
 			items[i].state = ITEM_STATE_NORMAL;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
 					items[i].state, NULL);
-			lastlogsizes[i] = get_log_result_lastlogsize(&results[i]);
+
+			if (0 != (lastlogsize = get_log_result_lastlogsize(&results[i])))
+				lastlogsizes[i] = lastlogsize;
+			else
+				lastlogsizes[i] = items[i].lastlogsize;
 		}
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{

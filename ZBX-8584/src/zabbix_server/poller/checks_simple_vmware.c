@@ -329,6 +329,8 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
 
 	if (!ISSET_LOG(result))
 		set_log_result_empty(result);
+	else
+		sort_log_result_by_lastlogsize(result);
 
 	zbx_vector_str_clean(&keys);
 	zbx_vector_str_destroy(&keys);
