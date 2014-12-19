@@ -44,6 +44,7 @@ extern char	*CONFIG_USER;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern char	*CONFIG_TLS_CA_FILE;
 extern char	*CONFIG_TLS_CA_PATH;
+extern char	*CONFIG_TLS_CRL_FILE;
 extern char	*CONFIG_TLS_CERT_FILE;
 extern char	*CONFIG_TLS_KEY_FILE;
 extern char	*CONFIG_TLS_PSK_FILE;

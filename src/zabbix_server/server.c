@@ -216,6 +216,7 @@ char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 char	*CONFIG_TLS_CA_FILE		= NULL;
 char	*CONFIG_TLS_CA_PATH		= NULL;
+char	*CONFIG_TLS_CRL_FILE		= NULL;
 char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
@@ -586,6 +587,8 @@ static void	zbx_load_config(void)
 		{"TLSCaFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCaPath",			&CONFIG_TLS_CA_PATH,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCrlFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCertFile",			&CONFIG_TLS_CERT_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
