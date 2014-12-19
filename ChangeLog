@@ -59,7 +59,7 @@ Bug fixes:
 A......... [ZBX-8950] fixed "selecIconMap" option in map.get method (Oleg)
 ..F....... [ZBX-8405] fixed typo in item key helper for system.cpu.num item description (asaveljevs)
 ..F....... [ZBX-8846] fixed non-existent page displaying (Oleg)
-........S. [ZBX-9126] fixed processing of trigger/graph prototypes in the case when all item prototypes in the trigger/graph prototypes was changed (Sasha)
+........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.4.3
@@ -573,7 +573,7 @@ New features:
 Bug fixes:
 ..F....... [ZBX-8405] fixed typo in item key helper for system.cpu.num item description (asaveljevs)
 ..F....... [ZBX-8846] fixed non-existent page displaying (Oleg)
-........S. [ZBX-9126] fixed processing of trigger/graph prototypes in the case when all item prototypes in the trigger/graph prototypes was changed (Sasha)
+........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.8
@@ -1747,7 +1747,7 @@ Changes for 2.0.15rc1
 New features:
 
 Bug fixes:
-........S. [ZBX-9126] fixed processing of trigger/graph prototypes in the case when all item prototypes in the trigger/graph prototypes was changed (Sasha)
+........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.14
