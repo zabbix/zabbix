@@ -269,22 +269,6 @@ class CHttpTest extends CApiService {
 			);
 
 			check_db_fields($defaultValues, $httpTest);
-
-			unset($httpTest['templateid']);
-
-			if (!isset($httpTest['agent'])) {
-				$httpTest['agent'] = ZBX_DEFAULT_AGENT;
-			}
-
-			if (!isset($httpTest['hostid']) && isset($httpTest['applicationid'])) {
-				$dbHostId = DBfetch(DBselect(
-					'SELECT a.hostid'.
-					' FROM applications a'.
-					' WHERE a.applicationid='.zbx_dbstr($httpTest['applicationid'])
-				));
-
-				$httpTest['hostid'] = $dbHostId['hostid'];
-			}
 		}
 		unset($httpTest);
 
