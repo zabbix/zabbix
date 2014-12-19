@@ -56,6 +56,7 @@ sub manage_tld_hosts($$);
 sub get_nsservers_list($);
 sub update_nsservers($$);
 sub get_tld_list();
+sub get_services($);
 
 my $trigger_rollweek_thresholds = rsm_trigger_rollweek_thresholds;
 
@@ -97,6 +98,7 @@ my $rv = GetOptions(\%OPTS,
 		    "rdds-ns-string=s",
 		    "get-nsservers-list!",
 		    "update-nsservers!",
+		    "list-services!",
 		    "only-cron!",
 		    "verbose!",
 		    "quiet!",
@@ -172,6 +174,41 @@ if (defined($OPTS{'get-nsservers-list'})) {
 	    }
 	}
     }
+    exit;
+}
+
+if (defined($OPTS{'list-services'})) {
+    my @tlds = get_tld_list();
+
+    my $report;
+
+    my @columns = ('tld_type', '{$RSM.DNS.TESTPREFIX}', '{$RSM.RDDS.NS.STRING}', '{$RSM.RDDS.TESTPREFIX}',
+		    '{$RSM.TLD.DNSSEC.ENABLED}', '{$RSM.TLD.EPP.ENABLED}', '{$RSM.TLD.RDDS.ENABLED}');
+
+    foreach my $tld (@tlds) {
+	my $services = get_services($tld);
+
+        $report->{$tld} = $services;
+    }
+
+    foreach my $tld (sort keys %{$report}) {
+	print $tld.",";
+
+	my $count = 0;
+
+	foreach my $column (@columns) {
+	    if (defined($report->{$tld}->{$column})) {
+		print $report->{$tld}->{$column};
+	    }
+
+	    $count++;
+
+	    print "," if (scalar(@columns) != $count);
+	}
+
+	print "\n";
+    }
+
     exit;
 }
 
@@ -1448,6 +1485,9 @@ Other options
                 delete specified TLD
         --disable
                 disable specified TLD
+	--list-services
+		list services of each TLD, the output is comma-separated list:
+                <TLD>,<TLD-TYPE>,<RDDS.DNS.TESTPREFIX>,<RDDS.NS.STRING>,<RDDS.TESTPREFIX>,<TLD.DNSSEC.ENABLED>,<TLD.EPP.ENABLED>,<TLD.RDDS.ENABLED>
 	--get-nsservers-list
 		CSV formatted list of NS + IP server pairs for specified TLD
 	--update-nsservers
@@ -1519,9 +1559,9 @@ sub validate_input {
 
     return if (defined($OPTS{'only-cron'}));
 
-    $msg  = "TLD must be specified (--tld)\n" if (!defined($OPTS{'tld'}) and !defined($OPTS{'get-nsservers-list'}));
+    $msg  = "TLD must be specified (--tld)\n" if (!defined($OPTS{'tld'}) and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'list-services'}));
 
-    if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'}))
+    if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'}) and !defined($OPTS{'list-services'}))
     {
 	    if (!defined($OPTS{'type'}))
 	    {
@@ -1544,9 +1584,11 @@ sub validate_input {
 
     $msg .= "at least one IPv4 or IPv6 must be enabled (--ipv4 or --ipv6)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'})
 										and !defined($OPTS{'ipv4'}) and !defined($OPTS{'ipv6'})
-										and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'}));
+										and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'})
+										and !defined($OPTS{'list-services'}));
     $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'dns-test-prefix'})
-									    and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'}));
+									    and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'})
+									    and !defined($OPTS{'list-services'}));
     $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds-test-prefix'})) or
 									    (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds-test-prefix'})));
     $msg .= "none or both --rdds43-servers and --rdds80-servers must be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
@@ -1881,7 +1923,11 @@ sub update_nsservers($$) {
     my $TLD = shift;
     my $new_ns_servers = shift;
 
+    return unless defined $new_ns_servers;
+
     my $old_ns_servers = get_nsservers_list($TLD);
+
+    return unless defined $old_ns_servers;
 
     my @to_be_added = ();
     my @to_be_removed = ();
@@ -2031,3 +2077,32 @@ sub disable_old_ns($) {
     	disable_items(\@itemids);
     }
 }
+
+sub get_services($) {
+    my $tld = shift;
+
+    my @tld_types = [TLD_TYPE_G, TLD_TYPE_CC, TLD_TYPE_OTHER, TLD_TYPE_TEST];
+
+    my $result;
+
+    my $main_templateid = get_template('Template '.$tld, false, false);
+
+    my $macros = get_host_macro($main_templateid, undef);
+
+    my $tld_host = get_host($tld, true);
+
+    foreach my $group (@{$tld_host->{'groups'}}) {
+	my $name = $group->{'name'};
+	$result->{'tld_type'} = $name if ($name ~~ @tld_types);
+    }
+
+    foreach my $macro (@{$macros}) {
+	my $name = $macro->{'macro'};
+	my $value = $macro->{'value'};
+
+	$result->{$name} = $value;
+    }
+
+    return $result;
+}
+
