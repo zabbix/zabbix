@@ -1,0 +1,84 @@
+#
+# These groups are read by MariaDB server.
+# Use it for options that only the server (but not clients) should see
+#
+# See the examples of server my.cnf files in /usr/share/mysql/
+#
+
+# this is read by the standalone daemon and embedded servers
+[server]
+
+log-error                                       = /var/log/mysql/mysqld.err
+basedir                                         = /usr
+datadir                                         = /var/lib/mysql/
+language                                        = /usr/share/mysql/english
+skip-external-locking
+
+
+# this is only for the mysqld standalone daemon
+[mysqld]
+
+default-storage-engine = InnoDB
+skip-name-resolve
+key_buffer      = 32M
+key_buffer_size = 32M
+max_allowed_packet = 32M
+table_open_cache = 512
+
+join_buffer_size = 1M
+sort_buffer_size = 2M
+read_buffer_size = 256K
+read_rnd_buffer_size = 256K
+myisam_sort_buffer_size = 1M
+thread_cache_size = 512
+query_cache_limit               = 8M
+query_cache_size                = 64M
+
+thread_concurrency = 12
+
+log-bin=mysql-bin
+binlog_format=mixed
+max_binlog_size = 512M
+expire_logs_days = 1
+server-id       = 1
+
+innodb_data_file_path = ibdata1:64M:autoextend:max:4G
+
+innodb_buffer_pool_size = 2G
+
+innodb_additional_mem_pool_size = 64M
+innodb_log_file_size = 2G
+innodb_log_buffer_size = 32M
+innodb_file_per_table = 1
+
+innodb_flush_method     =       O_DIRECT
+
+innodb_buffer_pool_instances    = 8
+
+innodb_write_io_threads         = 8
+innodb_read_io_threads          = 8
+
+innodb_purge_threads=1
+innodb_adaptive_flushing=1
+
+innodb_lock_wait_timeout = 50
+
+innodb_checksums=1
+innodb_doublewrite=1
+innodb_support_xa=0
+innodb_thread_concurrency = 0
+
+# this is only for embedded server
+[embedded]
+
+# This group is only read by MariaDB-5.5 servers.
+# If you use the same .cnf file for MariaDB of different versions,
+# use this group for options that older servers don't understand
+[mysqld-5.5]
+
+# These two groups are only read by MariaDB servers, not by MySQL.
+# If you use the same .cnf file for MySQL and MariaDB,
+# you can put MariaDB-only options here
+[mariadb]
+
+[mariadb-5.5]

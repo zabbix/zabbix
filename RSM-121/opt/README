@@ -1,0 +1,33 @@
+This directory contains set of scripts that is part of extensive DNS
+service monitoring (RSM).
+
+zabbix/scripts/add_tld.pl
+  script to add TLD
+
+zabbix/alertscripts
+  directory containing Zabbix alertscripts
+
+zabbix/scripts/rsm.conf.example
+  RSM configuration file
+
+zabbix/scripts/RSM.pm
+  basic Perl module for getting configuration
+
+zabbix/scripts/RSMSLV.pm
+  Perl helper module for SLV scripts
+
+zabbix/externalscripts
+  directory containing Zabbix externalscripts
+
+zabbix/scripts/MySQL_part_management.pl
+  manages MySQL partitioning, this script should be run by cron
+
+zabbix/scripts/rdds-enabled.pl
+  lists Probes that are RDDS-enabled
+
+zabbix/scripts/slv
+  directory containing SLV scripts (scripts that calculate Service
+  Level Values and add them to Zabbix using zabbix_sender)
+
+zabbix/scripts/Zabbix.pm
+  Zabbix API implementation for Perl
