@@ -152,6 +152,4 @@ jQuery(function($) {
 	$('.jqueryinputset').buttonset();
 
 	createPlaceholders();
-
-	$('form').enterSubmit('input[type=submit].main');
 });

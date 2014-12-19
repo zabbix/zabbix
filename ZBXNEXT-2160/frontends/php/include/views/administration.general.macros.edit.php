@@ -32,7 +32,7 @@ $macrosTab->addTab('macros', _('Macros'), $macrosView->render());
 
 $saveButton = new CSubmit('update', _('Update'));
 $saveButton->attr('data-removed-count', 0);
-$saveButton->useJQueryStyle('main');
+$saveButton->addClass('main');
 
 $macrosForm->addItem($macrosTab);
 $macrosForm->addItem(makeFormFooter(null, array($saveButton)));

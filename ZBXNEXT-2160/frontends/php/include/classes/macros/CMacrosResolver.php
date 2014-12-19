@@ -670,19 +670,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$allowedItems = API::Item()->get(array(
 			'itemids' => array_keys($items),
 			'webitems' => true,
-			'output' => array('itemid', 'value_type'),
+			'output' => array('itemid', 'value_type', 'lastvalue', 'lastclock'),
 			'preservekeys' => true
 		));
 
 		// map item data only for allowed items
 		foreach ($items as $item) {
 			if (isset($allowedItems[$item['itemid']])) {
+				$item['lastvalue'] = $allowedItems[$item['itemid']]['lastvalue'];
+				$item['lastclock'] = $allowedItems[$item['itemid']]['lastclock'];
 				$hostKeyPairs[$item['host']][$item['key_']] = $item;
 			}
 		}
 
-		// fetch history
-		$history = Manager::History()->getLast($items);
 
 		// replace macros with their corresponding values in graph strings
 		$matches = reset($matchesList);
@@ -703,8 +703,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 					// macro function is "last"
 					if ($function == 'last') {
-						$value = isset($history[$item['itemid']])
-							? formatHistoryValue($history[$item['itemid']][0]['value'], $item)
+						$value = ($item['lastclock'] > 0)
+							? formatHistoryValue($item['lastvalue'], $item)
 							: UNRESOLVED_MACRO_STRING;
 					}
 					// macro function is "max", "min" or "avg"
@@ -1160,7 +1160,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$function = $expressionData->expressions[0]['functionName'];
 
 			$item = API::Item()->get(array(
-				'output' => array('itemid', 'value_type', 'units', 'valuemapid'),
+				'output' => array('itemid', 'value_type', 'units', 'valuemapid', 'lastvalue', 'lastclock'),
 				'webitems' => true,
 				'filter' => array(
 					'host' => $itemHost,
@@ -1175,17 +1175,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$label = str_replace($expr, UNRESOLVED_MACRO_STRING, $label);
 
 				continue;
-			}
-
-			$lastValue = Manager::History()->getLast(array($item));
-			if ($lastValue) {
-				$lastValue = reset($lastValue[$item['itemid']]);
-				$item['lastvalue'] = $lastValue['value'];
-				$item['lastclock'] = $lastValue['clock'];
-			}
-			else {
-				$item['lastvalue'] = '0';
-				$item['lastclock'] = '0';
 			}
 
 			// do function type (last, min, max, avg) related actions
