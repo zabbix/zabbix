@@ -9,6 +9,9 @@ use RSMSLV;
 
 parse_opts("tld=s", "from=n", "till=n", "service=s");
 
+# do not write any logs
+$OPTS{'test'} = 1;
+
 if (defined($OPTS{'debug'}))
 {
     dbg("command-line parameters:");
@@ -129,8 +132,8 @@ foreach (@$tlds_ref)
 
     if ("," eq substr($key, -1))
     {
-	my $targets_ref = get_targets("Template $tld", $key);
-	$items_ref = get_all_ns_items($targets_ref, $key, $tld);
+	my $nsips_ref = get_nsips($tld, $key, 1); # templated
+	$items_ref = get_all_ns_items($nsips_ref, $key, $tld);
     }
     else
     {
@@ -139,25 +142,25 @@ foreach (@$tlds_ref)
 
     my $result = get_results($tld, $value_ts, $probe_times_ref, $items_ref, \&check_item_value);
 
-    foreach my $target (keys(%$result))
+    foreach my $nsip (keys(%$result))
     {
-	my $total = $result->{$target}->{'total'};
-	my $successful = $result->{$target}->{'successful'};
-	my $target_label = '';
-	$target_label = "$target: " unless ($target eq '');
+	my $total = $result->{$nsip}->{'total'};
+	my $successful = $result->{$nsip}->{'successful'};
+	my $nsip_label = '';
+	$nsip_label = "$nsip: " unless ($nsip eq '');
 
 	if ($total == 0)
 	{
-	    info($target_label, "no results found in the database from ", ts_str($from), " ($from) till ", ts_str($till), " ($till)");
+	    info($nsip_label, "no results found in the database from ", ts_str($from), " ($from) till ", ts_str($till), " ($till)");
 	    next;
 	}
 
-	info($target_label, "$successful/$total successful results from ", ts_str($from), " ($from) till ", ts_str($till), " ($till)");
+	info($nsip_label, "$successful/$total successful results from ", ts_str($from), " ($from) till ", ts_str($till), " ($till)");
 
 	if ($calculate_month_total != 0)
 	{
 	    my $month_total = $total + int(($eomonth - $value_ts) / $delay);
-	    info($target_label, "month total $month_total tests");
+	    info($nsip_label, "month total $month_total tests");
 	}
     }
 }

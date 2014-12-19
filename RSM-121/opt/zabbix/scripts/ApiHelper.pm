@@ -22,7 +22,7 @@ use constant AH_ALARMED_DISABLED => 'DISABLED';
 use constant AH_SERVICE_AVAILABILITY_FILE => 'serviceAvailability';
 
 our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED ah_get_error ah_save_alarmed
-	ah_save_service_availability ah_save_incident);
+	ah_save_service_availability ah_save_incident ah_save_incident_json);
 
 my $error_string = "";
 
@@ -211,6 +211,33 @@ sub ah_save_incident
     return AH_FAIL unless (__apply_inc_end($inc_path, $end) == AH_SUCCESS);
 
     return __apply_inc_false_positive($inc_path, $false_positive);
+}
+
+sub ah_save_incident_json
+{
+    my $tld = shift;
+    my $service = shift;
+    my $eventid = shift; # incident is identified by event ID
+    my $start = shift;
+    my $json = shift;
+    my $clock = shift;
+
+    $tld = lc($tld);
+    $service = lc($service);
+
+    my $json_path = __make_inc_path($tld, $service, $start, $eventid);
+
+    make_path($json_path, {error => \my $err});
+
+    if (@$err)
+    {
+	__set_file_error($err);
+	return AH_FAIL;
+    }
+
+    $json_path .= "/$clock.$eventid.json";
+
+    return __write_file($json_path, "$json\n");
 }
 
 1;

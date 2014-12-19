@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# DNS availability
+# DNS unavailability
 
 use lib '/opt/zabbix/scripts';
 
