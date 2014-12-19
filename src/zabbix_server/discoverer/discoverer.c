@@ -36,6 +36,8 @@ extern int		CONFIG_DISCOVERER_FORKS;
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
 
+#define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
+
 /******************************************************************************
  *                                                                            *
  * Function: proxy_update_service                                             *
@@ -449,148 +451,71 @@ static void	process_rule(DB_DRULE *drule)
 
 	DB_DHOST	dhost;
 	int		host_status, now;
-	unsigned short	j[9];
-	unsigned int	i, first, last, ip_dig;
-	char		ip[INTERFACE_IP_LEN_MAX], *start, *comma, *dash, *slash, dns[INTERFACE_DNS_LEN_MAX];
-	int		invalid_range;
-#ifdef HAVE_IPV6
-	int		ipv6;
-#endif
+	char		ip[INTERFACE_IP_LEN_MAX], *start, *comma, dns[INTERFACE_DNS_LEN_MAX];
+	int		ipaddress[8];
+	zbx_iprange_t	iprange;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __function_name,
-			drule->name, drule->iprange);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __function_name, drule->name, drule->iprange);
 
 	for (start = drule->iprange; '\0' != *start;)
 	{
-		invalid_range = 0;
-
 		if (NULL != (comma = strchr(start, ',')))
 			*comma = '\0';
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() range:'%s'", __function_name, start);
 
-		if (NULL != (dash = strchr(start, '-')))
-			*dash = '\0';
-		else if (NULL != (slash = strchr(start, '/')))
-			*slash = '\0';
+		if (SUCCEED != iprange_parse(&iprange, start))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": wrong format of IP range \"%s\"",
+					drule->name, start);
+			goto next;
+		}
 
-		if (SUCCEED == ip6_str2dig(start, j))
+		if (ZBX_DISCOVERER_IPRANGE_LIMIT < iprange_volume(&iprange))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": IP range \"%s\" exceeds %d address limit",
+					drule->name, start, ZBX_DISCOVERER_IPRANGE_LIMIT);
+			goto next;
+		}
+#ifndef HAVE_IPV6
+		if (ZBX_IPRANGE_V6 == iprange.type)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": encountered IP range \"%s\","
+					" but IPv6 support not compiled in", drule->name, start);
+			goto next;
+		}
+#endif
+		iprange_first(&iprange, ipaddress);
+
+		do
 		{
 #ifdef HAVE_IPV6
-			ipv6 = 1;
-
-			if (NULL != dash)
+			if (ZBX_IPRANGE_V6 == iprange.type)
 			{
-				if (1 != sscanf(dash + 1, "%hx", &j[8]))
-				{
-					invalid_range = 1;
-					goto next;
-				}
-
-				first = j[7];
-				last = j[8];
-			}
-			else if (NULL != slash)
-			{
-				unsigned short	mask;
-
-				if (1 != sscanf(slash + 1, "%hu", &j[8]) || 112 > j[8] || j[8] > 128)
-				{
-					invalid_range = 1;
-					goto next;
-				}
-
-				mask = 0xffff << (128 - j[8]);
-				first = j[7] & mask;
-				last = 0xffff & (j[7] | ~mask);
+				zbx_snprintf(ip, sizeof(ip), "%x:%x:%x:%x:%x:%x:%x:%x", ipaddress[0], ipaddress[1],
+						ipaddress[2], ipaddress[3], ipaddress[4], ipaddress[5], ipaddress[6],
+						ipaddress[7], ipaddress[8]);
 			}
 			else
 			{
-				first = j[7];
-				last = j[7];
-			}
-#else
-			invalid_range = 2;
-			goto next;
 #endif
-		}
-		else if (SUCCEED == ip4_str2dig(start, &ip_dig))
-		{
+				zbx_snprintf(ip, sizeof(ip), "%u.%u.%u.%u", ipaddress[0], ipaddress[1], ipaddress[2],
+						ipaddress[3]);
 #ifdef HAVE_IPV6
-			ipv6 = 0;
+			}
 #endif
-			if (NULL != dash)
-			{
-				if (1 != sscanf(dash + 1, "%hu", &j[4]) || 255 < j[4])
-				{
-					invalid_range = 1;
-					goto next;
-				}
-
-				first = ip_dig;
-				last = (ip_dig & 0xffffff00) + j[4];
-			}
-			else if (NULL != slash)
-			{
-				unsigned int	mask;
-
-				if (1 != sscanf(slash + 1, "%hu", &j[4]) || 16 > j[4] || j[4] > 30)
-				{
-					invalid_range = 1;
-					goto next;
-				}
-
-				mask = 0xffffffff << (32 - j[4]);
-				first = (ip_dig & mask) + 1;
-				last = (ip_dig | ~mask) - 1;
-			}
-			else
-			{
-				first = ip_dig;
-				last = ip_dig;
-			}
-		}
-		else
-		{
-			invalid_range = 1;
-			goto next;
-		}
-
-		if (first > last)
-		{
-			invalid_range = 1;
-			goto next;
-		}
-
-		for (i = first; i <= last; i++)
-		{
 			memset(&dhost, 0, sizeof(dhost));
 			host_status = -1;
 
 			now = time(NULL);
-#ifdef HAVE_IPV6
-			switch (ipv6)
-			{
-				case 0:
-#endif
-					zbx_snprintf(ip, sizeof(ip), "%u.%u.%u.%u",
-							(i & 0xff000000) >> 24, (i & 0x00ff0000) >> 16,
-							(i & 0x0000ff00) >> 8, i & 0x000000ff);
-#ifdef HAVE_IPV6
-					break;
-				case 1:
-					j[7] = i;
-					ip6_dig2str(j, ip, sizeof(ip));
-					break;
-			}
-#endif
+
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() ip:'%s'", __function_name, ip);
 
 			alarm(CONFIG_TIMEOUT);
 			zbx_gethost_by_ip(ip, dns, sizeof(dns));
 			alarm(0);
 
-			if (drule->unique_dcheckid)
+			if (0 != drule->unique_dcheckid)
 				process_checks(drule, &dhost, &host_status, ip, dns, 1, now);
 			process_checks(drule, &dhost, &host_status, ip, dns, 0, now);
 
@@ -602,26 +527,9 @@ static void	process_rule(DB_DRULE *drule)
 				proxy_update_host(drule, ip, dns, host_status, now);
 
 			DBcommit();
-
 		}
+		while (SUCCEED == iprange_next(&iprange, ipaddress));
 next:
-		if (NULL != dash)
-			*dash = '-';
-		else if (NULL != slash)
-			*slash = '/';
-
-		switch (invalid_range)
-		{
-			case 1:
-				zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": wrong format of IP range \"%s\"",
-						drule->name, start);
-				break;
-			case 2:
-				zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": encountered IP range \"%s\","
-						" but IPv6 support not compiled in", drule->name, start);
-				break;
-		}
-
 		if (NULL != comma)
 		{
 			*comma = ',';
@@ -823,7 +731,7 @@ static int	get_minnextcheck(int now)
 
 /******************************************************************************
  *                                                                            *
- * Function: main_discoverer_loop                                             *
+ * Function: discoverer_thread                                                *
  *                                                                            *
  * Purpose: periodically try to find new hosts and services                   *
  *                                                                            *
