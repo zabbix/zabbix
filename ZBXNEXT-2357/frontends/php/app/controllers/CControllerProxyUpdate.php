@@ -23,7 +23,7 @@ class CControllerProxyUpdate extends CController {
 		$fields = array(
 			'proxyid' =>			'fatal|db:hosts.hostid      |required',
 			'host' =>				'      db:hosts.host        |required|not_empty',
-			'status' =>				'fatal|db:hosts.status      |required|db:hosts.status|in_int:'.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
+			'status' =>				'fatal|db:hosts.status      |required|in_int:'.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
 			'interface' =>			'      array                |required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
 			'interface/dns' =>		'      db:interface.dns     |required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
 			'interface/ip' =>		'      db:interface.ip      |required_if:status,'.HOST_STATUS_PROXY_ACTIVE.'|ip',

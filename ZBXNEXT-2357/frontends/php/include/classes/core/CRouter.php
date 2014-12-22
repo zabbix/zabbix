@@ -19,30 +19,57 @@
 **/
 
 class CRouter {
+	/**
+	 * Layout used for view rendering.
+	 *
+	 * @var string
+	 */
 	private $layout = null;
+
+	/**
+	 * Controller class for action handling.
+	 *
+	 * @var string
+	 */
 	private $controller = null;
+
+	/**
+	 * View used to generate HTML, CSV, JSON and other content.
+	 *
+	 * @var string
+	 */
 	private $view = null;
 
+	/**
+	 * Unique action (request) identifier.
+	 *
+	 * @var string
+	 */
 	private $action = null;
 
+	/**
+	 * Mapping between action and corresponding controller, layout and view.
+	 *
+	 * @var array
+	 */
 	private $routes = array(
-// action layout controller view
-		'proxy.create'		=> array(null,					'CControllerProxyCreate',		null),
-		'proxy.delete'		=> array(null,					'CControllerProxyDelete',		null),
-		'proxy.formcreate'	=> array('general.page.layout', 'CControllerProxyFormCreate',	'administration.proxy.edit'),
-		'proxy.formedit'	=> array('general.page.layout', 'CControllerProxyFormEdit',		'administration.proxy.edit'),
-		'proxy.list'		=> array('general.page.layout', 'CControllerProxyList',			'administration.proxy.list'),
-		'proxy.massdelete'	=> array(null,					'CControllerProxyMassDelete',	null),
-		'proxy.massdisable'	=> array(null,					'CControllerProxyMassDisable',	null),
-		'proxy.massenable'	=> array(null,					'CControllerProxyMassEnable',	null),
-		'proxy.update'		=> array(null,					'CControllerProxyUpdate',		null),
-		'script.create'		=> array(null,					'CControllerScriptCreate',		null),
-		'script.delete'		=> array(null,					'CControllerScriptDelete',		null),
-		'script.formcreate'	=> array('general.page.layout', 'CControllerScriptFormCreate',	'administration.script.edit'),
-		'script.formedit'	=> array('general.page.layout', 'CControllerScriptFormEdit',	'administration.script.edit'),
-		'script.list'		=> array('general.page.layout', 'CControllerScriptList',		'administration.script.list'),
-		'script.massdelete'	=> array(null,					'CControllerScriptMassDelete',	null),
-		'script.update'		=> array(null,					'CControllerScriptUpdate',		null)
+		// action					controller						layout					view
+		'proxy.create'		=> array('CControllerProxyCreate',		null,					null),
+		'proxy.delete'		=> array('CControllerProxyDelete',		null,					null),
+		'proxy.formcreate'	=> array('CControllerProxyFormCreate',	'general.page.layout',	'administration.proxy.edit'),
+		'proxy.formedit'	=> array('CControllerProxyFormEdit',	'general.page.layout',	'administration.proxy.edit'),
+		'proxy.list'		=> array('CControllerProxyList',		'general.page.layout',	'administration.proxy.list'),
+		'proxy.massdelete'	=> array('CControllerProxyMassDelete',	null,					null),
+		'proxy.massdisable'	=> array('CControllerProxyMassDisable',	null,					null),
+		'proxy.massenable'	=> array('CControllerProxyMassEnable',	null,					null),
+		'proxy.update'		=> array('CControllerProxyUpdate',		null,					null),
+		'script.create'		=> array('CControllerScriptCreate',		null,					null),
+		'script.delete'		=> array('CControllerScriptDelete',		null,					null),
+		'script.formcreate'	=> array('CControllerScriptFormCreate',	'general.page.layout',	'administration.script.edit'),
+		'script.formedit'	=> array('CControllerScriptFormEdit',	'general.page.layout',	'administration.script.edit'),
+		'script.list'		=> array('CControllerScriptList',		'general.page.layout',	'administration.script.list'),
+		'script.massdelete'	=> array('CControllerScriptMassDelete',	null,					null),
+		'script.update'		=> array('CControllerScriptUpdate',		null,					null)
 	);
 
 	public function __construct($action) {
@@ -50,27 +77,52 @@ class CRouter {
 		$this->calculateRoute();
 	}
 
+	/**
+	 * Locate and set controller, layout and view by action name.
+	 *
+	 * @return string
+	 */
 	public function calculateRoute() {
 		if (isset($this->routes[$this->action]))
 		{
-			$this->layout = $this->routes[$this->action][0];
-			$this->controller = $this->routes[$this->action][1];
+			$this->controller = $this->routes[$this->action][0];
+			$this->layout = $this->routes[$this->action][1];
 			$this->view = $this->routes[$this->action][2];
 		}
 	}
 
+	/**
+	 * Returns layout name.
+	 *
+	 * @return string
+	 */
 	public function getLayout() {
 		return $this->layout;
 	}
 
+	/**
+	 * Returns controller name.
+	 *
+	 * @return string
+	 */
 	public function getController() {
 		return $this->controller;
 	}
 
+	/**
+	 * Returns view name.
+	 *
+	 * @return string
+	 */
 	public function getView() {
 		return $this->view;
 	}
 
+	/**
+	 * Returns action name.
+	 *
+	 * @return string
+	 */
 	public function getAction() {
 		return $this->action;
 	}

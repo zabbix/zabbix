@@ -156,7 +156,7 @@ class ZBase {
 				break;
 		}
 
-		// New MVC processing, otherwise we continue execution old style
+		// new MVC processing, otherwise we continue execution old style
 		if (hasRequest('action')) {
 			$router = new CRouter(getRequest('action'));
 			if ($router->getController() <> null) {
@@ -252,8 +252,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/regexp',
 			$this->rootDir.'/include/classes/ldap',
 			$this->rootDir.'/include/classes/pagefilter',
-			$this->rootDir.'/app/controllers',
-			$this->rootDir.'/app/views'
+			$this->rootDir.'/app/controllers'
 		);
 	}
 
