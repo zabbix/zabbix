@@ -74,6 +74,17 @@ const char	*help_message[] = {
 	NULL	/* end of text */
 };
 
+/* TLS parameters */
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+char	*CONFIG_TLS_CA_FILE		= NULL;
+char	*CONFIG_TLS_CA_PATH		= NULL;
+char	*CONFIG_TLS_CRL_FILE		= NULL;
+char	*CONFIG_TLS_CERT_FILE		= NULL;
+char	*CONFIG_TLS_KEY_FILE		= NULL;
+char	*CONFIG_TLS_PSK_FILE		= NULL;
+char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
+#endif
+
 /* COMMAND LINE OPTIONS */
 
 /* long options */
