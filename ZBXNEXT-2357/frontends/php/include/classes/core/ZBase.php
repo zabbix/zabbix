@@ -252,6 +252,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/regexp',
 			$this->rootDir.'/include/classes/ldap',
 			$this->rootDir.'/include/classes/pagefilter',
+			$this->rootDir.'/local/app/controllers',
 			$this->rootDir.'/app/controllers'
 		);
 	}
