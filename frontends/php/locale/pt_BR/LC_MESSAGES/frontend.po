@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-22 16:33+0200\n"
-"PO-Revision-Date: 2014-11-21 15:12+0300\n"
+"POT-Creation-Date: 2014-12-22 16:54+0200\n"
+"PO-Revision-Date: 2014-12-18 19:28+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1416575567.0\n"
+"X-POOTLE-MTIME: 1418923732.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -1101,12 +1101,12 @@ msgstr "CONFIGURAÇÃO DE AUTENTICAÇÃO"
 #: include/views/configuration.discovery.list.php:28
 #: include/views/configuration.host.discovery.list.php:29
 msgid "CONFIGURATION OF DISCOVERY RULES"
-msgstr "CONFIGURAÇÃO DAS REGRAS DE DISCOVERY"
+msgstr "CONFIGURAÇÃO DAS REGRAS DE DESCOBERTA"
 
 #: include/views/configuration.graph.edit.php:25
 #: include/views/configuration.graph.list.php:31
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
-msgstr "CONFIGURAÇÃO DE TIPOS DE GRÁFICOS"
+msgstr "CONFIGURAÇÃO DE PROTÓTIPOS DE GRÁFICOS"
 
 #: include/views/configuration.graph.edit.php:29
 #: include/views/configuration.graph.list.php:50
@@ -2274,7 +2274,7 @@ msgstr "Não foi possível enviar o comando, verifique a comunicação com o ser
 #: include/classes/api/services/CHostGroup.php:429
 #, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Não foi possível configurar \"%1$s\" para o grupo de hosts \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:242
 #, c-format
@@ -2390,7 +2390,7 @@ msgstr "Não foi possível atualizar \"%1$s\" para a ação \"%2$s\"."
 #: include/classes/api/services/CHostGroup.php:490
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar \"%1$s\" no grupo de hosts \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:206
 #, c-format
@@ -10614,7 +10614,7 @@ msgstr "Agora"
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:427
 msgid "Number of available processors."
-msgstr "Número de processadores disponíveis."
+msgstr ""
 
 #: include/blocks.inc.php:816 include/blocks.inc.php:818
 msgid "Number of hosts (enabled/disabled/templates)"
@@ -15773,7 +15773,7 @@ msgstr "O arquivo XML contêm o alerta %1$s:"
 
 #: include/views/js/configuration.sysmaps.js.php:171
 msgid "Y"
-msgstr "A"
+msgstr "Y"
 
 #: include/func.inc.php:671
 msgctxt "Yotta short"
