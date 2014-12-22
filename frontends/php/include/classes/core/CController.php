@@ -109,14 +109,14 @@ class CController {
 	public function validateInput($validationRules) {
 		if (isset($_SESSION['formData']))
 		{
-			$this->input = array_merge($_REQUEST, $_SESSION['formData']);
+			$input = array_merge($_REQUEST, $_SESSION['formData']);
 			unset($_SESSION['formData']);
 		}
 		else {
-			$this->input = $_REQUEST;
+			$input = $_REQUEST;
 		}
 
-		$validator = new CNewValidator($this->input, $validationRules);
+		$validator = new CNewValidator($input, $validationRules);
 		$result = !$validator->isError() && !$validator->isErrorFatal();
 
 		foreach ($validator->getAllErrors() as $error) {
@@ -127,9 +127,11 @@ class CController {
 			$this->validationResult = self::VALIDATION_FATAL_ERROR;
 		}
 		else if ($validator->isError()) {
+			$this->input = $validator->getValidInput();
 			$this->validationResult = self::VALIDATION_ERROR;
 		}
 		else {
+			$this->input = $validator->getValidInput();
 			$this->validationResult = self::VALIDATION_OK;
 		}
 

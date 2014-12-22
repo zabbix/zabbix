@@ -23,6 +23,8 @@ class CNewValidator {
 
 	private $fields;
 	private $rules;
+	private $input = array();
+	private $output = array();
 	private $errors = array();
 	private $errorsFatal = array();
 
@@ -49,7 +51,13 @@ class CNewValidator {
 	 */
 	private function validate() {
 		foreach ($this->rules as $field => $fieldRules) {
-			$this->validateField($field, $fieldRules);
+			$field_trimmed = trim($field, ' ');
+			$result = $this->validateField($field_trimmed, $fieldRules);
+
+			// add to output only existing fields
+			if (array_key_exists($field_trimmed, $this->input)) {
+				$this->output[$field_trimmed] = $this->input[$field_trimmed];
+			}
 		}
 	}
 
@@ -65,9 +73,12 @@ class CNewValidator {
 			$fatal = false;
 		}
 
+		$result = true;
 		foreach ($rules as $rule) {
-			$this->validateRule(trim($field,' '), trim($rule,' '), $fatal);
+			$result = $result && $this->validateRule($field, trim($rule, ' '), $fatal);
 		}
+
+		return $result;
 	}
 
 	public static function is_int($value) {
@@ -115,32 +126,38 @@ class CNewValidator {
 		$params = isset($parts[1]) ? explode(',', $parts[1]) : array();
 
 		// simple field name
+		$result = true;
 		if ($field_minor === null) {
 			switch ($command) {
 			case 'required':
 				if (!array_key_exists($field, $this->input)) {
 					$this->addError($fatal, _s('Field "%1$s" is mandatory.', $field));
+					$result = false;
 				}
 				break;
 			// required_if:field,value
 			case 'required_if':
 				if (array_key_exists($field, $this->input) && !array_key_exists($params[0], $this->input)) {
 					$this->addError($fatal, _s('Field "%1$s" must present only if "%2$s" exists and equal to "%3$s".', $field, $params[0], $params[1]));
+					$result = false;
 				}
 				else if (!array_key_exists($field, $this->input) && (array_key_exists($params[0], $this->input) && $this->input[$params[0]] == $params[1])) {
 					$this->addError($fatal, _s('Field "%1$s" must present only if "%2$s" exists and equal to "%3$s".', $field, $params[0], $params[1]));
+					$result = false;
 				}
 				break;
 			// required_if_not:field,value
 			case 'required_if_not':
 				if (array_key_exists($field, $this->input) && array_key_exists($params[0], $this->input) && $this->input[$params[0]] == $params[1]) {
 					$this->addError($fatal, _s('Field "%1$s" must present if "%2$s" exists and equal to "%3$s".', $field, $params[0], $params[1]));
+					$result = false;
 				}
 				break;
 			case 'array':
 				if (array_key_exists($field, $this->input)) {
 					if(!CNewValidator::is_array($this->input[$field])) {
 						$this->addError($fatal, _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field));
+						$result = false;
 					}
 				}
 				break;
@@ -148,6 +165,7 @@ class CNewValidator {
 				if (array_key_exists($field, $this->input)) {
 					if($this->input[$field] === '') {
 						$this->addError($fatal, _s('Incorrect value for field "%1$s": cannot be empty.', $field));
+						$result = false;
 					}
 				}
 				break;
@@ -156,6 +174,7 @@ class CNewValidator {
 				if (array_key_exists($field, $this->input)) {
 					if (!in_array($this->input[$field], $params, true)) {
 						$this->addError($fatal, _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field));
+						$result = false;
 					}
 				}
 				break;
@@ -163,6 +182,7 @@ class CNewValidator {
 				if (array_key_exists($field, $this->input)) {
 					if (!validate_ip($this->input[$field], $arr)) {
 						$this->addError($fatal, _s('Field "%1$s" is not IP.', $field));
+						$result = false;
 					}
 				}
 				break;
@@ -171,6 +191,7 @@ class CNewValidator {
 				if (array_key_exists($field, $this->input)) {
 					if (!in_array($this->input[$field], $params, true)) {
 						$this->addError($fatal, _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field));
+						$result = false;
 					}
 				}
 				break;
@@ -179,6 +200,7 @@ class CNewValidator {
 				if (array_key_exists($field, $this->input)) {
 					if (!CNewValidator::is_db_type($this->input[$field], $params[0])) {
 						$this->addError($fatal, _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field));
+						$result = false;
 					}
 				}
 				break;
@@ -188,6 +210,7 @@ class CNewValidator {
 					foreach ($this->input[$field] as $value) {
 						if (!CNewValidator::is_db_type($value, $params[0])) {
 							$this->addError($fatal, _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field));
+							$result = false;
 						}
 					}
 				}
@@ -238,6 +261,8 @@ class CNewValidator {
 				break;
 			}
 		}
+
+		return $result;
 	}
 
 	/**
@@ -252,6 +277,15 @@ class CNewValidator {
 		else {
 			$this->errors[] = $error;
 		}
+	}
+
+	/**
+	 * Get valid fields.
+	 *
+	 * @return array of fields passed validation
+	 */
+	public function getValidInput() {
+		return $this->output;
 	}
 
 	/**

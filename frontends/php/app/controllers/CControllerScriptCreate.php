@@ -22,6 +22,7 @@ class CControllerScriptCreate extends CController {
 
 	protected function checkInput() {
 		$fields = array(
+			'form' =>				'fatal|in_int:1',
 			'name' =>				'      db:scripts.name        |required|not_empty',
 			'type' =>				'fatal|db:scripts.type        |required|in_int:0,1',
 			'execute_on' =>			'fatal|db:scripts.execute_on  |required|required_if:type,'.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.'|in_int:0,1',

@@ -22,6 +22,7 @@ class CControllerScriptUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = array(
+			'form' =>				'fatal|in_int:1',
 			'scriptid' =>			'fatal|db:scripts.scriptid    |required',
 			'name' =>				'      db:scripts.name        |required|not_empty',
 			'type' =>				'fatal|db:scripts.type        |required|in_int:0,1',
