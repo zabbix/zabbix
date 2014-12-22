@@ -215,9 +215,12 @@ foreach (@$tlds_ref)
 	foreach (@$incidents)
 	{
 	    my $eventid = $_->{'eventid'};
-	    my $start = ((defined($from) and $_->{'start'} < $from) ? $from : $_->{'start'});
+	    my $start = $_->{'start'};
 	    my $end = $_->{'end'};
 	    my $false_positive = $_->{'false_positive'};
+
+	    my $start = $from if (defined($from) and $_->{'start'} < $from);
+	    my $end = $till if (defined($till) and not defined($end));
 
 	    if (ah_save_incident($tld, $OPTS{'service'}, $eventid, $start, $end, $false_positive) != AH_SUCCESS)
 	    {
@@ -270,6 +273,9 @@ foreach (@$tlds_ref)
 
 		my $values_ref = __get_values($nsip_items_ref, $values_from, $values_till);
 
+		my $test_results_count = scalar(@test_results);
+
+		# run through values from probes (ordered by clock)
 		foreach my $probe (keys(%$values_ref))
 		{
 		    my $nsips_ref = $values_ref->{$probe};
@@ -286,36 +292,40 @@ foreach (@$tlds_ref)
 
 			my $total = scalar(@$nsip_results_ref);
 
-			dbg("  $nsip: found $total:\n");
+			dbg("  $nsip: found $total:");
 
-			my $count = 0;
+			my $test_result_index = 0;
+
 			foreach my $result_ref (@$nsip_results_ref)
 			{
 			    my $value = $result_ref->{'value'};
 			    my $clock = $result_ref->{'clock'};
 
-			    foreach my $r_ref (@test_results)
-			    {
-				my $r_status = $r_ref->{'status'};
-				my $r_clock = $r_ref->{'clock'};
-				my $r_start = $r_ref->{'start'};
-				my $r_end = $r_ref->{'end'};
+			    dbg("test ", $test_result_index + 1, " start:", $test_results[$test_result_index]->{'start'}, " clock:", $test_results[$test_result_index]->{'clock'}, " end:", $test_results[$test_result_index]->{'end'});
 
-				if ($clock >= $r_start and $clock <= $r_end)
-				{
-				    $r_ref->{'probes'} = {} unless (exists($r_ref->{'probes'}));
-				    $r_ref->{'probes'}->{$probe} = {} unless (exists($r_ref->{'probes'}->{$probe}));
-				    $r_ref->{'probes'}->{$probe}->{'status'} = ':TODO:' unless (exists($r_ref->{'probes'}->{$probe}->{'nss'}->{'status'}));
-				    $r_ref->{'probes'}->{$probe}->{'nss'} = {} unless (exists($r_ref->{'probes'}->{$probe}->{'nss'}));
-				    $r_ref->{'probes'}->{$probe}->{'nss'}->{$ns} = [] unless (exists($r_ref->{'probes'}->{$probe}->{'nss'}->{$ns}));
+			    fail("no status in the database related to value (probe:$probe service:$service clock:$clock value:$value)") if ($clock < $test_results[$test_result_index]->{'start'});
 
-				    my $ns_ref = $r_ref->{'probes'}->{$probe}->{'nss'}->{$ns};
+			    # move to corresponding test result
+			    $test_result_index++ while ($test_result_index < $test_results_count and $clock > $test_results[$test_result_index]->{'end'});
 
-				    push(@$ns_ref, {'ip' => $ip, 'rtt' => $value, 'clock' => $clock});
+			    fail("no status in the database related to value (probe:$probe service:$service clock:$clock value:$value)") if ($test_result_index == $test_results_count);
 
-				    last;
-				}
-			    }
+			    my $r_ref = $test_results[$test_result_index];
+
+			    my $r_status = $r_ref->{'status'};
+			    my $r_clock = $r_ref->{'clock'};
+			    my $r_start = $r_ref->{'start'};
+			    my $r_end = $r_ref->{'end'};
+
+			    $r_ref->{'probes'} = {} unless (exists($r_ref->{'probes'}));
+			    $r_ref->{'probes'}->{$probe} = {} unless (exists($r_ref->{'probes'}->{$probe}));
+			    $r_ref->{'probes'}->{$probe}->{'status'} = ':TODO:' unless (exists($r_ref->{'probes'}->{$probe}->{'nss'}->{'status'}));
+			    $r_ref->{'probes'}->{$probe}->{'nss'} = {} unless (exists($r_ref->{'probes'}->{$probe}->{'nss'}));
+			    $r_ref->{'probes'}->{$probe}->{'nss'}->{$ns} = [] unless (exists($r_ref->{'probes'}->{$probe}->{'nss'}->{$ns}));
+
+			    my $ns_ref = $r_ref->{'probes'}->{$probe}->{'nss'}->{$ns};
+
+			    push(@$ns_ref, {'ip' => $ip, 'rtt' => $value, 'clock' => $clock});
 			}
 		    }
 		}
@@ -404,7 +414,7 @@ sub __get_values
 		last if ($last == 1);
 	    }
 
-	    fail("internal error: name server of item $itemid not found") unless (defined($nsip));
+	    fail("internal error: Name Server,IP pair of item $itemid not found") unless (defined($nsip));
 
 	    $result{$host} = {} unless (exists($result{$host}));
 
