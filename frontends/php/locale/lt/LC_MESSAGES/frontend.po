@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-18 13:05+0200\n"
+"POT-Creation-Date: 2014-12-22 16:56+0200\n"
 "PO-Revision-Date: 2013-10-10 08:29+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -2322,7 +2322,7 @@ msgstr ""
 msgid "Cannot rename guest user."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:229
+#: include/classes/api/services/CDRule.php:231
 msgid "Cannot save discovery rule without checks."
 msgstr ""
 
@@ -2827,7 +2827,7 @@ msgstr ""
 msgid "Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:378
+#: include/classes/api/services/CDRule.php:380
 msgid "Checks should be unique."
 msgstr ""
 
@@ -2936,7 +2936,7 @@ msgid "Colour"
 msgstr ""
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:386 jsLoader.php:158
+#: include/validate.inc.php:231 jsLoader.php:158
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr ""
@@ -4630,10 +4630,10 @@ msgstr ""
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:417
-#: include/classes/api/services/CDRule.php:430
-#: include/classes/api/services/CDRule.php:505
-#: include/classes/api/services/CDRule.php:524
+#: include/classes/api/services/CDRule.php:419
+#: include/classes/api/services/CDRule.php:432
+#: include/classes/api/services/CDRule.php:507
+#: include/classes/api/services/CDRule.php:526
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists."
 msgstr ""
@@ -4918,14 +4918,14 @@ msgstr ""
 #: include/classes/validators/CActionCondValidator.php:95
 #: include/classes/validators/CActionCondValidator.php:101
 #: include/classes/validators/CActionCondValidator.php:107
-#: include/classes/validators/CActionCondValidator.php:122
-#: include/classes/validators/CActionCondValidator.php:131
-#: include/classes/validators/CActionCondValidator.php:140
-#: include/classes/validators/CActionCondValidator.php:149
-#: include/classes/validators/CActionCondValidator.php:164
-#: include/classes/validators/CActionCondValidator.php:173
-#: include/classes/validators/CActionCondValidator.php:182
-#: include/classes/validators/CActionCondValidator.php:196
+#: include/classes/validators/CActionCondValidator.php:123
+#: include/classes/validators/CActionCondValidator.php:132
+#: include/classes/validators/CActionCondValidator.php:141
+#: include/classes/validators/CActionCondValidator.php:150
+#: include/classes/validators/CActionCondValidator.php:165
+#: include/classes/validators/CActionCondValidator.php:174
+#: include/classes/validators/CActionCondValidator.php:183
+#: include/classes/validators/CActionCondValidator.php:197
 msgid "Empty action condition."
 msgstr ""
 
@@ -4959,7 +4959,7 @@ msgstr ""
 #: include/classes/api/services/CAction.php:1246
 #: include/classes/api/services/CApplication.php:267
 #: include/classes/api/services/CDiscoveryRule.php:371
-#: include/classes/api/services/CDRule.php:635
+#: include/classes/api/services/CDRule.php:637
 #: include/classes/api/services/CGraph.php:529
 #: include/classes/api/services/CGraphPrototype.php:545
 #: include/classes/api/services/CHostGroup.php:471
@@ -5479,42 +5479,27 @@ msgstr ""
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr ""
 
-#: include/validate.inc.php:443
+#: include/validate.inc.php:288
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr ""
 
-#: include/validate.inc.php:306
-#, c-format
-msgid "Field \"%1$s\" is not IP range."
-msgstr ""
-
-#: include/validate.inc.php:300
-#, c-format
-msgid "Field \"%1$s\" is not IP."
-msgstr ""
-
-#: include/validate.inc.php:312
-#, c-format
-msgid "Field \"%1$s\" is not integer list or range."
-msgstr ""
-
-#: include/validate.inc.php:318
+#: include/validate.inc.php:163
 #, c-format
 msgid "Field \"%1$s\" is not integer."
 msgstr ""
 
-#: include/validate.inc.php:376
+#: include/validate.inc.php:221
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr ""
 
-#: include/validate.inc.php:455
+#: include/validate.inc.php:300
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:347
+#: include/classes/api/services/CDRule.php:349
 msgid "Field \"druleid\" is required."
 msgstr ""
 
@@ -5522,7 +5507,7 @@ msgstr ""
 msgid "Field \"host\" is mandatory."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:354
+#: include/classes/api/services/CDRule.php:356
 msgid "Field \"name\" is required."
 msgstr ""
 
@@ -6380,7 +6365,7 @@ msgstr ""
 msgid "Host added"
 msgstr ""
 
-#: include/classes/api/services/CHostInterface.php:815
+#: include/classes/api/services/CHostInterface.php:823
 msgid "Host cannot have more than one default interface of the same type."
 msgstr ""
 
@@ -6756,6 +6741,14 @@ msgstr ""
 msgid "IP address"
 msgstr ""
 
+#: include/classes/validators/CIPValidator.php:43
+msgid "IP address cannot be empty."
+msgstr ""
+
+#: include/classes/validators/CIPRangeValidator.php:62
+msgid "IP address range cannot be empty."
+msgstr ""
+
 #: include/classes/api/services/CHostInterface.php:292
 msgid "IP and DNS cannot be empty for host interface."
 msgstr ""
@@ -6765,7 +6758,12 @@ msgstr ""
 msgid "IP range"
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:214
+#: include/classes/validators/CIPRangeValidator.php:80
+#, c-format
+msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit."
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:215
 msgid "IP range cannot be empty."
 msgstr ""
 
@@ -7123,17 +7121,12 @@ msgstr ""
 msgid "Incorrect API \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:217
-#, c-format
-msgid "Incorrect IP range \"%s\"."
-msgstr ""
-
-#: include/classes/api/services/CDRule.php:292
+#: include/classes/api/services/CDRule.php:294
 #: include/views/js/configuration.discovery.edit.js.php:583
 msgid "Incorrect SNMP OID."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:288
+#: include/classes/api/services/CDRule.php:290
 #: include/views/js/configuration.discovery.edit.js.php:579
 msgid "Incorrect SNMP community."
 msgstr ""
@@ -7153,7 +7146,7 @@ msgstr ""
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr ""
 
-#: include/classes/validators/CActionCondValidator.php:134
+#: include/classes/validators/CActionCondValidator.php:135
 msgid "Incorrect action condition discovery check."
 msgstr ""
 
@@ -7169,11 +7162,11 @@ msgstr ""
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/validators/CActionCondValidator.php:152
+#: include/classes/validators/CActionCondValidator.php:153
 msgid "Incorrect action condition discovery status."
 msgstr ""
 
-#: include/classes/validators/CActionCondValidator.php:185
+#: include/classes/validators/CActionCondValidator.php:186
 msgid "Incorrect action condition event type."
 msgstr ""
 
@@ -7185,12 +7178,7 @@ msgstr ""
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/validators/CActionCondValidator.php:125
-#, c-format
-msgid "Incorrect action condition ip \"%1$s\"."
-msgstr ""
-
-#: include/classes/validators/CActionCondValidator.php:143
+#: include/classes/validators/CActionCondValidator.php:144
 #, c-format
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr ""
@@ -7203,11 +7191,11 @@ msgstr ""
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/validators/CActionCondValidator.php:167
+#: include/classes/validators/CActionCondValidator.php:168
 msgid "Incorrect action condition trigger severity."
 msgstr ""
 
-#: include/classes/validators/CActionCondValidator.php:176
+#: include/classes/validators/CActionCondValidator.php:177
 msgid "Incorrect action condition trigger value."
 msgstr ""
 
@@ -7215,7 +7203,7 @@ msgstr ""
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr ""
 
-#: include/classes/validators/CActionCondValidator.php:201
+#: include/classes/validators/CActionCondValidator.php:202
 msgid "Incorrect action condition type."
 msgstr ""
 
@@ -7291,7 +7279,7 @@ msgstr ""
 msgid "Incorrect arguments passed to method."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:321
+#: include/classes/api/services/CDRule.php:323
 #, c-format
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr ""
@@ -7301,7 +7289,7 @@ msgstr ""
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHostInterface.php:658
+#: include/classes/api/services/CHostInterface.php:666
 msgid "Incorrect bulk value for interface."
 msgstr ""
 
@@ -7352,7 +7340,7 @@ msgstr ""
 msgid "Incorrect custom expression \"%2$s\" for discovery rule \"%1$s\": %3$s."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:221
+#: include/classes/api/services/CDRule.php:223
 msgid "Incorrect delay."
 msgstr ""
 
@@ -7503,12 +7491,7 @@ msgstr ""
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr ""
 
-#: include/classes/api/services/CHostInterface.php:610
-#, c-format
-msgid "Incorrect interface IP parameter \"%s\" provided."
-msgstr ""
-
-#: include/classes/api/services/CHostInterface.php:626
+#: include/classes/api/services/CHostInterface.php:634
 #, c-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr ""
@@ -7542,7 +7525,7 @@ msgstr ""
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:274
+#: include/classes/api/services/CDRule.php:276
 msgid "Incorrect key."
 msgstr ""
 
@@ -7663,11 +7646,11 @@ msgstr ""
 msgid "Incorrect parent service."
 msgstr ""
 
-#: discoveryconf.php:97 include/classes/api/services/CDRule.php:268
+#: discoveryconf.php:97 include/classes/api/services/CDRule.php:270
 msgid "Incorrect port range."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:330
+#: include/classes/api/services/CDRule.php:332
 #, c-format
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr ""
@@ -7677,7 +7660,7 @@ msgstr ""
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:247
+#: include/classes/api/services/CDRule.php:249
 msgid "Incorrect proxyid."
 msgstr ""
 
@@ -7748,7 +7731,7 @@ msgstr ""
 msgid "Incorrect status for service \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:225
+#: include/classes/api/services/CDRule.php:227
 msgid "Incorrect status."
 msgstr ""
 
@@ -7844,13 +7827,13 @@ msgstr ""
 msgid "Incorrect user group."
 msgstr ""
 
-#: include/validate.inc.php:494
+#: include/validate.inc.php:339
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr ""
 
 #: include/classes/api/services/CScreenItem.php:618
-#: include/validate.inc.php:490
+#: include/validate.inc.php:335
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr ""
@@ -7875,7 +7858,7 @@ msgstr ""
 msgid "Incorrect value for field \"%1$s\"."
 msgstr ""
 
-#: include/validate.inc.php:485
+#: include/validate.inc.php:330
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr ""
@@ -7952,7 +7935,7 @@ msgstr ""
 msgid "Interface"
 msgstr ""
 
-#: include/classes/api/services/CHostInterface.php:835
+#: include/classes/api/services/CHostInterface.php:843
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -8035,6 +8018,26 @@ msgstr ""
 msgid "Interval (in sec)"
 msgstr ""
 
+#: include/classes/validators/CIPValidator.php:49
+#, c-format
+msgid "Invalid IP address \"%1$s\"."
+msgstr ""
+
+#: include/classes/validators/CIPValidator.php:37
+#, c-format
+msgid "Invalid IP address \"%1$s\": must be a string."
+msgstr ""
+
+#: include/classes/validators/CIPRangeValidator.php:72
+#, c-format
+msgid "Invalid IP address range \"%1$s\"."
+msgstr ""
+
+#: include/classes/validators/CIPRangeValidator.php:56
+#, c-format
+msgid "Invalid IP address range \"%1$s\": must be a string."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:170
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr ""
@@ -8076,7 +8079,7 @@ msgstr ""
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr ""
 
-#: discoveryconf.php:104 include/classes/api/services/CDRule.php:279
+#: discoveryconf.php:104 include/classes/api/services/CDRule.php:281
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr ""
@@ -9044,7 +9047,7 @@ msgstr ""
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
 msgstr ""
 
-#: include/classes/validators/CActionCondValidator.php:158
+#: include/classes/validators/CActionCondValidator.php:159
 msgid "Maintenance action condition value must be empty."
 msgstr ""
 
@@ -10003,7 +10006,7 @@ msgstr ""
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
 msgstr ""
 
-#: include/classes/api/services/CHostInterface.php:811
+#: include/classes/api/services/CHostInterface.php:819
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr ""
@@ -10342,8 +10345,8 @@ msgstr ""
 #: include/classes/api/services/CDiscoveryRule.php:482
 #: include/classes/api/services/CDiscoveryRule.php:487
 #: include/classes/api/services/CDRule.php:208
-#: include/classes/api/services/CDRule.php:500
-#: include/classes/api/services/CDRule.php:801
+#: include/classes/api/services/CDRule.php:502
+#: include/classes/api/services/CDRule.php:803
 #: include/classes/api/services/CEvent.php:640
 #: include/classes/api/services/CGraphGeneral.php:66
 #: include/classes/api/services/CGraphGeneral.php:88
@@ -10362,7 +10365,7 @@ msgstr ""
 #: include/classes/api/services/CHostInterface.php:264
 #: include/classes/api/services/CHostInterface.php:280
 #: include/classes/api/services/CHostInterface.php:423
-#: include/classes/api/services/CHostInterface.php:639
+#: include/classes/api/services/CHostInterface.php:647
 #: include/classes/api/services/CHost.php:530
 #: include/classes/api/services/CHost.php:621
 #: include/classes/api/services/CHost.php:1646
@@ -10707,11 +10710,11 @@ msgstr ""
 msgid "Number of processes. <name> and <user> same as in proc.mem item. <state> all (default), run, sleep, zomb. <cmdline> filter by command line (supports regex). Example: proc.num[apache2,www-data]. On Windows, only <name> and <user> are supported."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:647
+#: include/classes/items/CHelpItems.php:643
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:651
+#: include/classes/items/CHelpItems.php:647
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -10808,7 +10811,7 @@ msgstr ""
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:695
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -10995,7 +10998,7 @@ msgstr ""
 msgid "Only Zabbix Admins can remove user media."
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:260
+#: include/classes/api/services/CDRule.php:262
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr ""
 
@@ -11003,7 +11006,7 @@ msgstr ""
 msgid "Only items assigned to enabled hosts are counted"
 msgstr ""
 
-#: include/classes/api/services/CDRule.php:339
+#: include/classes/api/services/CDRule.php:341
 msgid "Only one check can be unique."
 msgstr ""
 
@@ -11033,7 +11036,7 @@ msgstr ""
 msgid "Operation \"%s\" already exists."
 msgstr ""
 
-#: include/validate.inc.php:467
+#: include/validate.inc.php:312
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr ""
 
@@ -11379,7 +11382,7 @@ msgstr ""
 msgid "PROBLEM"
 msgstr ""
 
-#: include/validate.inc.php:555
+#: include/validate.inc.php:400
 msgid "Page received incorrect data"
 msgstr ""
 
@@ -11612,7 +11615,7 @@ msgstr ""
 msgid "Port"
 msgstr ""
 
-#: include/classes/api/services/CHostInterface.php:623
+#: include/classes/api/services/CHostInterface.php:631
 msgid "Port cannot be empty for host interface."
 msgstr ""
 
@@ -15178,75 +15181,75 @@ msgstr ""
 msgid "VMware event log, <url> - VMware service URL"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:663
+#: include/classes/items/CHelpItems.php:659
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:671
+#: include/classes/items/CHelpItems.php:667
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:619
+#: include/classes/items/CHelpItems.php:615
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:627
+#: include/classes/items/CHelpItems.php:623
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:631
+#: include/classes/items/CHelpItems.php:627
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:659
+#: include/classes/items/CHelpItems.php:655
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:635
+#: include/classes/items/CHelpItems.php:631
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:675
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:679
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:639
+#: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:643
+#: include/classes/items/CHelpItems.php:639
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:623
+#: include/classes/items/CHelpItems.php:619
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:655
+#: include/classes/items/CHelpItems.php:651
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:675
+#: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:667
+#: include/classes/items/CHelpItems.php:663
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -15254,7 +15257,7 @@ msgstr ""
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:615
+#: include/classes/items/CHelpItems.php:699
 msgid "VMware service version, <url> - VMware service URL"
 msgstr ""
 
@@ -15377,23 +15380,23 @@ msgstr ""
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr ""
 
-#: include/validate.inc.php:325 include/validate.inc.php:349
-#: include/validate.inc.php:364
+#: include/validate.inc.php:170 include/validate.inc.php:194
+#: include/validate.inc.php:209
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr ""
 
-#: include/validate.inc.php:335 include/validate.inc.php:351
+#: include/validate.inc.php:180 include/validate.inc.php:196
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
 msgstr ""
 
-#: include/validate.inc.php:331
+#: include/validate.inc.php:176
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
 msgstr ""
 
-#: include/validate.inc.php:327
+#: include/validate.inc.php:172
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr ""
@@ -16020,7 +16023,7 @@ msgstr ""
 msgid "Zabbix aggregate"
 msgstr ""
 
-#: include/validate.inc.php:505
+#: include/validate.inc.php:350
 msgid "Zabbix has received an incorrect request."
 msgstr ""
 
