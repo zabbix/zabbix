@@ -22,6 +22,7 @@ class CControllerProxyCreate extends CController {
 
 	protected function checkInput() {
 		$fields = array(
+			'form' =>				'fatal|in_int:1',
 			'host' =>				'      db:hosts.host        |required|not_empty',
 			'status' =>				'fatal|db:hosts.status      |required|in_int:'.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
 			'interface' =>			'      array                |required|required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
