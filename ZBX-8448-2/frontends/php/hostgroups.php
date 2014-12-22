@@ -72,7 +72,6 @@ elseif (isset($_REQUEST['save'])) {
 
 	$hosts = API::Host()->get(array(
 		'output' => array('hostid'),
-		'selectGroups' => array('groupid'),
 		'hostids' => $hostIds,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'preservekeys' => true
@@ -80,7 +79,6 @@ elseif (isset($_REQUEST['save'])) {
 
 	$templates = API::Template()->get(array(
 		'output' => array('templateid'),
-		'selectGroups' => array('groupid'),
 		'templateids' => $hostIds,
 		'preservekeys' => true
 	));
