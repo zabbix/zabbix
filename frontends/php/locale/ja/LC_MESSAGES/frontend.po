@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-18 13:05+0200\n"
+"POT-Creation-Date: 2014-12-22 16:56+0200\n"
 "PO-Revision-Date: 2014-12-15 04:42+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -2227,7 +2227,7 @@ msgstr "マクロを削除できません"
 msgid "Cannot rename guest user."
 msgstr "ゲストユーザーの名前は変更できません"
 
-#: include/classes/api/services/CDRule.php:229
+#: include/classes/api/services/CDRule.php:231
 msgid "Cannot save discovery rule without checks."
 msgstr "ディスカバリルールにはチェックの設定が必須です"
 
@@ -2732,7 +2732,7 @@ msgstr "サーバーがICMP pingでアクセス可能かチェック。0 - ICMP 
 msgid "Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state."
 msgstr "このポート番号がLISTEN状態にあるかチェック。0 - 違う、1 - LISTEN状態にある。"
 
-#: include/classes/api/services/CDRule.php:378
+#: include/classes/api/services/CDRule.php:380
 msgid "Checks should be unique."
 msgstr "チェックは重複できません"
 
@@ -2841,7 +2841,7 @@ msgid "Colour"
 msgstr "色"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:386 jsLoader.php:158
+#: include/validate.inc.php:231 jsLoader.php:158
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "色\"%1$s\"の設定が正しくありません: 16進数のカラーコードを指定してください(6文字)。"
@@ -4542,10 +4542,10 @@ msgstr "ディスカバリルール\"%1$s\"は\"%2$s\"にすでに存在しま�
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
 msgstr "ディスカバリルール\"%1$s\"は\"%2$s\"にすでに存在します。"
 
-#: include/classes/api/services/CDRule.php:417
-#: include/classes/api/services/CDRule.php:430
-#: include/classes/api/services/CDRule.php:505
-#: include/classes/api/services/CDRule.php:524
+#: include/classes/api/services/CDRule.php:419
+#: include/classes/api/services/CDRule.php:432
+#: include/classes/api/services/CDRule.php:507
+#: include/classes/api/services/CDRule.php:526
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists."
 msgstr "ディスカバリルール\"%1$s\"はすでに存在します。"
@@ -4826,14 +4826,14 @@ msgstr "Webシナリオ\"%1$s\"のためのSSL秘密鍵ファイルが空白で�
 #: include/classes/validators/CActionCondValidator.php:95
 #: include/classes/validators/CActionCondValidator.php:101
 #: include/classes/validators/CActionCondValidator.php:107
-#: include/classes/validators/CActionCondValidator.php:122
-#: include/classes/validators/CActionCondValidator.php:131
-#: include/classes/validators/CActionCondValidator.php:140
-#: include/classes/validators/CActionCondValidator.php:149
-#: include/classes/validators/CActionCondValidator.php:164
-#: include/classes/validators/CActionCondValidator.php:173
-#: include/classes/validators/CActionCondValidator.php:182
-#: include/classes/validators/CActionCondValidator.php:196
+#: include/classes/validators/CActionCondValidator.php:123
+#: include/classes/validators/CActionCondValidator.php:132
+#: include/classes/validators/CActionCondValidator.php:141
+#: include/classes/validators/CActionCondValidator.php:150
+#: include/classes/validators/CActionCondValidator.php:165
+#: include/classes/validators/CActionCondValidator.php:174
+#: include/classes/validators/CActionCondValidator.php:183
+#: include/classes/validators/CActionCondValidator.php:197
 msgid "Empty action condition."
 msgstr "アクションの実行条件が空白です。"
 
@@ -4867,7 +4867,7 @@ msgstr "ホストが空白です。"
 #: include/classes/api/services/CAction.php:1246
 #: include/classes/api/services/CApplication.php:267
 #: include/classes/api/services/CDiscoveryRule.php:371
-#: include/classes/api/services/CDRule.php:635
+#: include/classes/api/services/CDRule.php:637
 #: include/classes/api/services/CGraph.php:529
 #: include/classes/api/services/CGraphPrototype.php:545
 #: include/classes/api/services/CHostGroup.php:471
@@ -5387,42 +5387,27 @@ msgstr "フィールド"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "フィールド\"%1$s\"はNULLに設定できません。"
 
-#: include/validate.inc.php:443
+#: include/validate.inc.php:288
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "フィールド\"%1$s\"は必須です。"
 
-#: include/validate.inc.php:306
-#, c-format
-msgid "Field \"%1$s\" is not IP range."
-msgstr "フィールド\"%1$s\"はIPアドレスの範囲ではありません。"
-
-#: include/validate.inc.php:300
-#, c-format
-msgid "Field \"%1$s\" is not IP."
-msgstr "フィールド\"%1$s\"はIPアドレスではありません。"
-
-#: include/validate.inc.php:312
-#, c-format
-msgid "Field \"%1$s\" is not integer list or range."
-msgstr "フィールド\"%1$s\"はリストや指定された範囲内の整数値ではありません。"
-
-#: include/validate.inc.php:318
+#: include/validate.inc.php:163
 #, c-format
 msgid "Field \"%1$s\" is not integer."
 msgstr "フィールド\"%1$s\"は整数値ではありません。"
 
-#: include/validate.inc.php:376
+#: include/validate.inc.php:221
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr "フィールド\"%1$s\"は文字列ではありません。"
 
-#: include/validate.inc.php:455
+#: include/validate.inc.php:300
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "フィールド\"%1$s\"が入力されていません。"
 
-#: include/classes/api/services/CDRule.php:347
+#: include/classes/api/services/CDRule.php:349
 msgid "Field \"druleid\" is required."
 msgstr "フィールド\"druleid\"を指定してください"
 
@@ -5430,7 +5415,7 @@ msgstr "フィールド\"druleid\"を指定してください"
 msgid "Field \"host\" is mandatory."
 msgstr "フィールド\"host\"は必須です。"
 
-#: include/classes/api/services/CDRule.php:354
+#: include/classes/api/services/CDRule.php:356
 msgid "Field \"name\" is required."
 msgstr "フィールド\"name\"を指定してください"
 
@@ -6284,7 +6269,7 @@ msgstr "ホストアクセス"
 msgid "Host added"
 msgstr "ホストを追加しました"
 
-#: include/classes/api/services/CHostInterface.php:815
+#: include/classes/api/services/CHostInterface.php:823
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "ホストに同じタイプのデフォルトインターフェースは2つ以上設定できません。"
 
@@ -6652,6 +6637,14 @@ msgstr "IPアドレス"
 msgid "IP address"
 msgstr "IPアドレス"
 
+#: include/classes/validators/CIPValidator.php:43
+msgid "IP address cannot be empty."
+msgstr ""
+
+#: include/classes/validators/CIPRangeValidator.php:62
+msgid "IP address range cannot be empty."
+msgstr ""
+
 #: include/classes/api/services/CHostInterface.php:292
 msgid "IP and DNS cannot be empty for host interface."
 msgstr "ホストインターフェースのIPとDNSは必須項目です"
@@ -6661,7 +6654,12 @@ msgstr "ホストインターフェースのIPとDNSは必須項目です"
 msgid "IP range"
 msgstr "IPアドレスの範囲"
 
-#: include/classes/api/services/CDRule.php:214
+#: include/classes/validators/CIPRangeValidator.php:80
+#, c-format
+msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit."
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:215
 msgid "IP range cannot be empty."
 msgstr "IPレンジは必須項目です"
 
@@ -7019,17 +7017,12 @@ msgstr "マップ\"%2$s\"のラベルタイプの値%1$sが正しくありませ
 msgid "Incorrect API \"%1$s\"."
 msgstr "API\"%1$s\"が正しくありません。"
 
-#: include/classes/api/services/CDRule.php:217
-#, c-format
-msgid "Incorrect IP range \"%s\"."
-msgstr "IPアドレスの範囲\"%s\"が正しくありません"
-
-#: include/classes/api/services/CDRule.php:292
+#: include/classes/api/services/CDRule.php:294
 #: include/views/js/configuration.discovery.edit.js.php:583
 msgid "Incorrect SNMP OID."
 msgstr "SNMP OIDの値が正しくありません。"
 
-#: include/classes/api/services/CDRule.php:288
+#: include/classes/api/services/CDRule.php:290
 #: include/views/js/configuration.discovery.edit.js.php:579
 msgid "Incorrect SNMP community."
 msgstr "SNMPコミュニティの値が正しくありません。"
@@ -7049,7 +7042,7 @@ msgstr "Webシナリオ\"%1$s\"のためのSSLピア検証の値が正しくあ�
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のSLAの許容値が正しくありません。"
 
-#: include/classes/validators/CActionCondValidator.php:134
+#: include/classes/validators/CActionCondValidator.php:135
 msgid "Incorrect action condition discovery check."
 msgstr "アクションの実行条件のディスカバリチェックの値が正しくありません。"
 
@@ -7065,11 +7058,11 @@ msgstr "アクションの実行条件のディスカバリオブジェクトが
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "アクションの実行条件のディスカバリルールが正しくありません。ディスカバリルールが存在しないか、権限がありません"
 
-#: include/classes/validators/CActionCondValidator.php:152
+#: include/classes/validators/CActionCondValidator.php:153
 msgid "Incorrect action condition discovery status."
 msgstr "アクションの実行条件のディスカバリのステータスの値が正しくありません。"
 
-#: include/classes/validators/CActionCondValidator.php:185
+#: include/classes/validators/CActionCondValidator.php:186
 msgid "Incorrect action condition event type."
 msgstr "アクションの実行条件のイベントタイプが正しくありません。"
 
@@ -7081,12 +7074,7 @@ msgstr "アクションの実行条件のホストグループの値が正しく
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
 msgstr "アクションの実行条件のホストの値が正しくありません。ホストが存在しないか、アクセス権がありません。"
 
-#: include/classes/validators/CActionCondValidator.php:125
-#, c-format
-msgid "Incorrect action condition ip \"%1$s\"."
-msgstr "アクションの実行条件のIPアドレス\"%1$s\"が正しくありません。"
-
-#: include/classes/validators/CActionCondValidator.php:143
+#: include/classes/validators/CActionCondValidator.php:144
 #, c-format
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "アクションの実行条件のポート\"%1$s\"が正しくありません。"
@@ -7099,11 +7087,11 @@ msgstr "アクションの実行条件のプロキシ設定が正しくありま
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
 msgstr "アクションの実行条件のテンプレートの値が正しくありません。テンプレートが存在しないか、アクセス権がありません。"
 
-#: include/classes/validators/CActionCondValidator.php:167
+#: include/classes/validators/CActionCondValidator.php:168
 msgid "Incorrect action condition trigger severity."
 msgstr "アクションの実行条件のトリガーの深刻度が正しくありません。"
 
-#: include/classes/validators/CActionCondValidator.php:176
+#: include/classes/validators/CActionCondValidator.php:177
 msgid "Incorrect action condition trigger value."
 msgstr "アクションの実行条件のトリガーの値が正しくありません。"
 
@@ -7111,7 +7099,7 @@ msgstr "アクションの実行条件のトリガーの値が正しくありま
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "アクションの実行条件のトリガーの値が正しくありません。トリガーが存在しないか、アクセス権がありません。"
 
-#: include/classes/validators/CActionCondValidator.php:201
+#: include/classes/validators/CActionCondValidator.php:202
 msgid "Incorrect action condition type."
 msgstr "アクションの実行条件のタイプの値が正しくありません"
 
@@ -7187,7 +7175,7 @@ msgstr "不正な引数が関数に渡されました。"
 msgid "Incorrect arguments passed to method."
 msgstr "入力項目が正しくありません。"
 
-#: include/classes/api/services/CDRule.php:321
+#: include/classes/api/services/CDRule.php:323
 #, c-format
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "ディスカバリルール\"%1$s\"の認証プロトコルが正しくありません。"
@@ -7197,7 +7185,7 @@ msgstr "ディスカバリルール\"%1$s\"の認証プロトコルが正しく�
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "アイテム\"%1$s\"の認証プロトコルが正しくありません。"
 
-#: include/classes/api/services/CHostInterface.php:658
+#: include/classes/api/services/CHostInterface.php:666
 msgid "Incorrect bulk value for interface."
 msgstr "インターフェースのbulkの値が正しくありません。"
 
@@ -7248,7 +7236,7 @@ msgstr "アクション\"%1$s\"のカスタム条件式\"%2$s\"が正しくあ�
 msgid "Incorrect custom expression \"%2$s\" for discovery rule \"%1$s\": %3$s."
 msgstr "ディスカバリルール\"%1$s\"のカスタム条件式\"%2$s\"が正しくありません: %3$s。"
 
-#: include/classes/api/services/CDRule.php:221
+#: include/classes/api/services/CDRule.php:223
 msgid "Incorrect delay."
 msgstr "間隔の値が正しくありません。"
 
@@ -7399,12 +7387,7 @@ msgstr "入力されたパラメータが正しくありません。"
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "インターフェースのDNSパラメータ\"%s\"が正しくありません。"
 
-#: include/classes/api/services/CHostInterface.php:610
-#, c-format
-msgid "Incorrect interface IP parameter \"%s\" provided."
-msgstr "インターフェースのIPパラメータ\"%s\"が正しくありません。"
-
-#: include/classes/api/services/CHostInterface.php:626
+#: include/classes/api/services/CHostInterface.php:634
 #, c-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "インターフェースのポート\"%s\"が正しくありません。"
@@ -7438,7 +7421,7 @@ msgstr "スクリーンの要素のアイテムのプロトタイプID\"%1$s\"�
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "トリガー関数\"%2$s\"に正しくないアイテムのデータ型\"%1$s\" が利用されています。"
 
-#: include/classes/api/services/CDRule.php:274
+#: include/classes/api/services/CDRule.php:276
 msgid "Incorrect key."
 msgstr "キーが正しくありません。"
 
@@ -7559,11 +7542,11 @@ msgstr "サービス\"%1$s\"の親が正しくありません。"
 msgid "Incorrect parent service."
 msgstr "親サービスが正しくありません。"
 
-#: discoveryconf.php:97 include/classes/api/services/CDRule.php:268
+#: discoveryconf.php:97 include/classes/api/services/CDRule.php:270
 msgid "Incorrect port range."
 msgstr "ポートの範囲が正しくありません。"
 
-#: include/classes/api/services/CDRule.php:330
+#: include/classes/api/services/CDRule.php:332
 #, c-format
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "ディスカバリルール\"%1$s\"のプライバシープロトコルが正しくありません。"
@@ -7573,7 +7556,7 @@ msgstr "ディスカバリルール\"%1$s\"のプライバシープロトコル�
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "アイテム\"%1$s\"のプライバシープロトコルが正しくありません。"
 
-#: include/classes/api/services/CDRule.php:247
+#: include/classes/api/services/CDRule.php:249
 msgid "Incorrect proxyid."
 msgstr "プロキシIDが正しくありません。"
 
@@ -7644,7 +7627,7 @@ msgstr "ホストのプロトタイプ\"%1$s\"のステータスが正しくあ�
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のステータスが正しくありません。"
 
-#: include/classes/api/services/CDRule.php:225
+#: include/classes/api/services/CDRule.php:227
 msgid "Incorrect status."
 msgstr "ステータスが正しくありません。"
 
@@ -7740,13 +7723,13 @@ msgstr "ディスカバリルール\"%1$s\"の計算のタイプが正しくあ�
 msgid "Incorrect user group."
 msgstr "ユーザーグループが正しくありません。"
 
-#: include/validate.inc.php:494
+#: include/validate.inc.php:339
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "\"%2$s\"フィールドの値\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CScreenItem.php:618
-#: include/validate.inc.php:490
+#: include/validate.inc.php:335
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "\"%2$s\"フィールドの値\"%1$s\"が正しくありません: %3$sから%4$sの間で設定してください。"
@@ -7771,7 +7754,7 @@ msgstr "符号なし整数フィールド\"%2$s\"の値\"%1$s\"が正しくあ�
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "フィールド\"%1$s\"の値が正しくありません。"
 
-#: include/validate.inc.php:485
+#: include/validate.inc.php:330
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "フィールド\"%1$s\"の値が正しくありません: 空の値を設定することはできません。"
@@ -7848,7 +7831,7 @@ msgstr "インストーラ名"
 msgid "Interface"
 msgstr "インターフェース"
 
-#: include/classes/api/services/CHostInterface.php:835
+#: include/classes/api/services/CHostInterface.php:843
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "インターフェースは\"%2$s\"のアイテム\"%1$s\"にリンクされています。"
@@ -7931,6 +7914,26 @@ msgstr "更新間隔"
 msgid "Interval (in sec)"
 msgstr "更新間隔 (秒)"
 
+#: include/classes/validators/CIPValidator.php:49
+#, c-format
+msgid "Invalid IP address \"%1$s\"."
+msgstr ""
+
+#: include/classes/validators/CIPValidator.php:37
+#, c-format
+msgid "Invalid IP address \"%1$s\": must be a string."
+msgstr ""
+
+#: include/classes/validators/CIPRangeValidator.php:72
+#, c-format
+msgid "Invalid IP address range \"%1$s\"."
+msgstr ""
+
+#: include/classes/validators/CIPRangeValidator.php:56
+#, c-format
+msgid "Invalid IP address range \"%1$s\": must be a string."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:170
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "JSONデータが正しくありません。JSONテキストのパース中にサーバーでエラーが発生しました。"
@@ -7972,7 +7975,7 @@ msgstr "\"%3$s\": %4$sのアイテム\"%2$s\"のキー\"%1$s\"が正しくあり
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr "\"%3$s\": %4$sのアイテムプロトタイプ\"%2$s\"のキー\"%1$s\"が正しくありません。"
 
-#: discoveryconf.php:104 include/classes/api/services/CDRule.php:279
+#: discoveryconf.php:104 include/classes/api/services/CDRule.php:281
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "キー\"%1$s\": %2$sが正しくありません。"
@@ -8930,7 +8933,7 @@ msgstr "メンテナンス\"%1$s\"はすでに存在します。"
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
 msgstr "メンテナンス期間の開始時刻は終了時刻よりも大きい値を指定できません。"
 
-#: include/classes/validators/CActionCondValidator.php:158
+#: include/classes/validators/CActionCondValidator.php:159
 msgid "Maintenance action condition value must be empty."
 msgstr "アクションの実行条件のメンテナンスの設定は空である必要があります。"
 
@@ -9881,7 +9884,7 @@ msgstr "期間Tの間にデータが存在しない N= 1、それ以外 N = 0"
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
 msgstr "期間Tの間にデータが存在しない N NOT 1、それ以外 N NOT 0"
 
-#: include/classes/api/services/CHostInterface.php:811
+#: include/classes/api/services/CHostInterface.php:819
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "\"%2$s\"上の\"%1$s\"タイプのデフォルトインターフェースが設定されていません。"
@@ -10220,8 +10223,8 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/services/CDiscoveryRule.php:482
 #: include/classes/api/services/CDiscoveryRule.php:487
 #: include/classes/api/services/CDRule.php:208
-#: include/classes/api/services/CDRule.php:500
-#: include/classes/api/services/CDRule.php:801
+#: include/classes/api/services/CDRule.php:502
+#: include/classes/api/services/CDRule.php:803
 #: include/classes/api/services/CEvent.php:640
 #: include/classes/api/services/CGraphGeneral.php:66
 #: include/classes/api/services/CGraphGeneral.php:88
@@ -10240,7 +10243,7 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/services/CHostInterface.php:264
 #: include/classes/api/services/CHostInterface.php:280
 #: include/classes/api/services/CHostInterface.php:423
-#: include/classes/api/services/CHostInterface.php:639
+#: include/classes/api/services/CHostInterface.php:647
 #: include/classes/api/services/CHost.php:530
 #: include/classes/api/services/CHost.php:621
 #: include/classes/api/services/CHost.php:1646
@@ -10585,11 +10588,11 @@ msgstr "監視ホスト数"
 msgid "Number of processes. <name> and <user> same as in proc.mem item. <state> all (default), run, sleep, zomb. <cmdline> filter by command line (supports regex). Example: proc.num[apache2,www-data]. On Windows, only <name> and <user> are supported."
 msgstr "プロセス数。<name>と<user>はproc.memアイテムと同様。<state>はall (default), run, sleep, zomb。<cmdline>はコマンドラインでフィルタリングする(正規表現をサポート)。例：proc.num[apache2,www-data]。Windows上では<name>と<user>のみをサポート。"
 
-#: include/classes/items/CHelpItems.php:647
+#: include/classes/items/CHelpItems.php:643
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザー上のプロセッサコア数、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
-#: include/classes/items/CHelpItems.php:651
+#: include/classes/items/CHelpItems.php:647
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザー上のプロセッサスレッド数、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
@@ -10686,7 +10689,7 @@ msgstr "テーブルTRENDS内の値保存数。"
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "テーブルTRENDS_UINT内の値保存数。"
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:695
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザー上の仮想マシン数、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
@@ -10873,7 +10876,7 @@ msgstr "特権管理者のみがユーザーのメディアを変更できます
 msgid "Only Zabbix Admins can remove user media."
 msgstr "特権管理者のみがユーザーのメディアを削除できます。"
 
-#: include/classes/api/services/CDRule.php:260
+#: include/classes/api/services/CDRule.php:262
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr "Zabbixエージェント、SNMPv1、SNMPv2、SNMPv3がユニークかどうかだけチェックします。"
 
@@ -10881,7 +10884,7 @@ msgstr "Zabbixエージェント、SNMPv1、SNMPv2、SNMPv3がユニークかど
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "有効なホストのアイテムのみカウント"
 
-#: include/classes/api/services/CDRule.php:339
+#: include/classes/api/services/CDRule.php:341
 msgid "Only one check can be unique."
 msgstr "ユニークかどうかだけチェックします。"
 
@@ -10911,7 +10914,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "実行するアクション\"%s\"はすでに存在します。"
 
-#: include/validate.inc.php:467
+#: include/validate.inc.php:312
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "認証されていないリクエストのため操作を実行できません。"
 
@@ -11257,7 +11260,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "障害"
 
-#: include/validate.inc.php:555
+#: include/validate.inc.php:400
 msgid "Page received incorrect data"
 msgstr "誤ったデータを受信しました"
 
@@ -11490,7 +11493,7 @@ msgstr "ホストインベントリフィールドの自動設定"
 msgid "Port"
 msgstr "ポート"
 
-#: include/classes/api/services/CHostInterface.php:623
+#: include/classes/api/services/CHostInterface.php:631
 msgid "Port cannot be empty for host interface."
 msgstr "ホストインターフェースのポートは必須項目です。"
 
@@ -15032,75 +15035,75 @@ msgstr "VMwareクラスターの状態、<url> - VMwareサービスURL、<name> 
 msgid "VMware event log, <url> - VMware service URL"
 msgstr "VMwareのイベントログ、<url> - VMwareサービスURL"
 
-#: include/classes/items/CHelpItems.php:663
+#: include/classes/items/CHelpItems.php:659
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのBIOS uuid、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:671
+#: include/classes/items/CHelpItems.php:667
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのバルーニングされたメモリサイズ、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:619
+#: include/classes/items/CHelpItems.php:615
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのクラスター名、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:627
+#: include/classes/items/CHelpItems.php:623
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMwareハイパーバイザーのデータストア読み込み統計、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名、<datastore> - データストア名、<mode> - latency"
 
-#: include/classes/items/CHelpItems.php:631
+#: include/classes/items/CHelpItems.php:627
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMwareハイパーバイザーのデータストア書き込み統計、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名、<datastore> - データストア名、<mode> - latency"
 
-#: include/classes/items/CHelpItems.php:659
+#: include/classes/items/CHelpItems.php:655
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのモデル、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:635
+#: include/classes/items/CHelpItems.php:631
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザー名、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:675
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMwareハイパーバイザーネットワーク入力統計、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名、<mode> - bps"
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:679
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMwareハイパーバイザーネットワーク出力統計、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名、<mode> - bps"
 
-#: include/classes/items/CHelpItems.php:639
+#: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのプロセッサー周波数、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:643
+#: include/classes/items/CHelpItems.php:639
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのプロセッサーモデル、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:623
+#: include/classes/items/CHelpItems.php:619
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのプロセッサー利用量(Hz)、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのステータス、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:655
+#: include/classes/items/CHelpItems.php:651
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのトータルメモリサイズ、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーの稼働秒数、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:675
+#: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーの利用済メモリサイズ、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:667
+#: include/classes/items/CHelpItems.php:663
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーベンダー名、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーバージョン、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーホスト名"
 
@@ -15108,7 +15111,7 @@ msgstr "VMwareハイパーバイザーバージョン、<url> - VMwareサービ�
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "VMwareサービスフルネーム、<url> - VMwareサービスURL"
 
-#: include/classes/items/CHelpItems.php:615
+#: include/classes/items/CHelpItems.php:699
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMwareサービスバージョン、<url> - VMwareサービスURL"
 
@@ -15231,23 +15234,23 @@ msgstr "フィールド\"%2$s\"の値\"%1$s\"が長過ぎます - %3$d文字。%
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr "フィールド\"%2$s\"の値\"%1$s\"が長過ぎます - %3$d文字。2048文字以内で設定してください。"
 
-#: include/validate.inc.php:325 include/validate.inc.php:349
-#: include/validate.inc.php:364
+#: include/validate.inc.php:170 include/validate.inc.php:194
+#: include/validate.inc.php:209
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr "\"%1$s\"の値\"%2$s\"は10進数のフォーマットではありません。"
 
-#: include/validate.inc.php:335 include/validate.inc.php:351
+#: include/validate.inc.php:180 include/validate.inc.php:196
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
 msgstr "\"%1$s\"の値\"%2$s\"は小数点以下の桁数が多すぎます: %3$s桁を超える値は設定できません。"
 
-#: include/validate.inc.php:331
+#: include/validate.inc.php:176
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
 msgstr "\"%1$s\"の値\"%2$s\"は小数点より前の桁数が多すぎます: %3$s桁を超える値は設定できません。"
 
-#: include/validate.inc.php:327
+#: include/validate.inc.php:172
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr "\"%1$s\"の値\"%2$s\"は長すぎます: 小数点より前は%3$s桁までで小数点以下は%4$sまでです。"
@@ -15870,7 +15873,7 @@ msgstr "Zabbixエージェント(アクティブ)"
 msgid "Zabbix aggregate"
 msgstr "Zabbixアグリゲート"
 
-#: include/validate.inc.php:505
+#: include/validate.inc.php:350
 msgid "Zabbix has received an incorrect request."
 msgstr "不正なURLパラメータ"
 
