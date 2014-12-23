@@ -19,7 +19,7 @@
 **/
 
 $page['file'] = 'maps.php';
-$page['title'] = _('Configuration of proxies');
+$page['title'] = _('Network maps');
 
 $page['hist_arg'] = array('sysmapid');
 $page['menu'] = 'view';
