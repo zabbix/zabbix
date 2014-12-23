@@ -1082,10 +1082,10 @@ sub probes2tldhostids
 
     my @result;
 
-    my $hosts_str = "";
+    my $hosts_str = '';
     foreach (@$probes_ref)
     {
-	$hosts_str .= " or " unless ($hosts_str eq "");
+	$hosts_str .= ' or ' unless ($hosts_str eq '');
 	$hosts_str .= "host='$tld $_'";
     }
 
@@ -1612,8 +1612,8 @@ sub get_results
 #
 # E. g.:
 #
-# '10010' => [205],
-# '10011' => [-102, 304]
+# '10010' => [1],
+# '10011' => [2, 0]
 # ...
 sub get_item_values
 {

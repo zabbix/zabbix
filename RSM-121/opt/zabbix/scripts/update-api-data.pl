@@ -27,137 +27,17 @@ if (defined($OPTS{'service'}))
 }
 else
 {
-    push(@services, 'dns', 'rdds', 'epp');
+    push(@services, 'dns', 'dnssec', 'rdds', 'epp');
 }
 
 set_slv_config(get_rsm_config());
 
 db_connect();
 
-
-
-#my $hashref = {'foo' => 1, 'bar' => 3, 'baz' => 13, 'subhash' => {'subhash1' => 121, 'subhash2' => 124}};
-#my $json = encode_json($hashref);
-#my $href = decode_json($json);
-#print(Dumper($href));
-#exit;
-
-
-
-# [
-#  {
-#      'clock' => '1418908679',
-#      'status' => 'Down',
-#      'probes' =>
-#      {
-# 	 'Amsterdam' =>
-# 	 {
-# 	     'status' => 'Down',
-# 	     'nss' =>
-# 	     {
-# 		 'ns1.barbadosdomain.net' =>
-# 		     [
-# 		      {
-# 			  'ip' => '200.50.92.195',
-# 			  'rtt' => '131',
-# 			  'clock' => '1418908679'
-# 		      },
-# 		      {
-# 			  'ip' => '200.50.92.196',
-# 			  'rtt' => '134',
-# 			  'clock' => '1418908679'
-# 		      }
-# 		     ],
-# 		 'ns2.barbadosdomain.net' =>
-# 		     [
-# 		      {
-# 			  'ip' => '200.50.92.196',
-# 			  'rtt' => '-200, No reply from Name Server',
-# 			  'clock' => '1418908679'
-# 		      }
-# 		     ]
-# 	     }
-# 	 },
-# 	 'London' =>
-# 	 {
-# 	     'status' => 'Down',
-# 	     'nss' =>
-# 	     {
-# 		 'ns1.barbadosdomain.net' =>
-# 		     [
-# 		      {
-# 			  'ip' => '200.50.92.195',
-# 			  'rtt' => '131',
-# 			  'clock' => '1418908679'
-# 		      },
-# 		      {
-# 			  'ip' => '200.50.92.197',
-# 			  'rtt' => '-200, No reply from Name Server',
-# 			  'clock' => '1418908679'
-# 		      }
-# 		     ]
-# 	     }
-# 	 }
-#      }
-#  },
-#  {
-#      'clock' => '1418908739',
-#      'status' => 'Down',
-#      'probes' =>
-#      {
-# 	 'Amsterdam' =>
-# 	 {
-# 	     'status' => 'Down',
-# 	     'nss' =>
-# 	     {
-# 		 'ns1.barbadosdomain.net' =>
-# 		     [
-# 		      {
-# 			  'ip' => '200.50.92.195',
-# 			  'rtt' => '131',
-# 			  'clock' => '1418908739'
-# 		      },
-# 		      {
-# 			  'ip' => '200.50.92.196',
-# 			  'rtt' => '134',
-# 			  'clock' => '1418908739'
-# 		      }
-# 		     ],
-# 		 'ns2.barbadosdomain.net' =>
-# 		     [
-# 		      {
-# 			  'ip' => '200.50.92.196',
-# 			  'rtt' => '-200, No reply from Name Server',
-# 			  'clock' => '1418908739'
-# 		      }
-# 		     ]
-# 	     }
-# 	 },
-# 	 'London' =>
-# 	 {
-# 	     'status' => 'Down',
-# 	     'nss' =>
-# 	     {
-# 		 'ns1.barbadosdomain.net' =>
-# 		     [
-# 		      {
-# 			  'ip' => '200.50.92.195',
-# 			  'rtt' => '131',
-# 			  'clock' => '1418908739'
-# 		      },
-# 		      {
-# 			  'ip' => '200.50.92.197',
-# 			  'rtt' => '-200, No reply from Name Server',
-# 			  'clock' => '1418908739'
-# 		      }
-# 		     ]
-# 	     }
-# 	 }
-#      }
-#  }
-# ];
-
-my $dns_interval = get_macro_dns_udp_delay();
+my $cfg_dns_interval = get_macro_dns_udp_delay();
+my $cfg_minns = get_macro_minns();
+my $cfg_dns_key_nss = 'rsm.dns.udp[{$RSM.TLD}]';
+my $cfg_dns_key_rtt = 'rsm.dns.udp.rtt[{$RSM.TLD},';
 
 my $from = $OPTS{'from'};
 my $till = $OPTS{'till'};
@@ -176,12 +56,13 @@ foreach (@$tlds_ref)
 	    {
 		fail("cannot save alarmed: ", ah_get_error());
 	    }
+
 	    next;
 	}
 
 	# working item
-	my $key = "rsm.slv.$service.avail";
-	my $itemid = get_itemid_by_host($tld, $key);
+	my $avail_key = "rsm.slv.$service.avail";
+	my $itemid = get_itemid_by_host($tld, $avail_key);
 
 	my ($rollweek_from, $rollweek_till) = get_rollweek_bounds();
 
@@ -199,7 +80,7 @@ foreach (@$tlds_ref)
 	my $alarmed_status = AH_ALARMED_NO;
 	if (scalar(@$incidents) != 0)
 	{
-	    if ($incidents->[0]->{'false_positive'} != 0 and not defined($incidents->[0]->{'end'}))
+	    if ($incidents->[0]->{'false_positive'} == 0 and not defined($incidents->[0]->{'end'}))
 	    {
 		$alarmed_status = AH_ALARMED_YES;
 	    }
@@ -208,6 +89,15 @@ foreach (@$tlds_ref)
 	if (ah_save_alarmed($tld, $service, $alarmed_status) != AH_SUCCESS)
 	{
 	    fail("cannot save alarmed: ", ah_get_error());
+	}
+
+	my ($nsips_ref, $nsip_items_ref, $interval);
+
+	if ($service eq 'dns')
+	{
+	    $nsips_ref = get_nsips($tld, $cfg_dns_key_rtt, 1); # templated
+	    $nsip_items_ref = __get_nsip_itemids($nsips_ref, $cfg_dns_key_rtt, $tld);
+	    $interval = $cfg_dns_interval;
 	}
 
 	$incidents = get_incidents($itemid, $from, $till);
@@ -219,18 +109,18 @@ foreach (@$tlds_ref)
 	    my $end = $_->{'end'};
 	    my $false_positive = $_->{'false_positive'};
 
-	    my $start = $from if (defined($from) and $_->{'start'} < $from);
-	    my $end = $till if (defined($till) and not defined($end));
+	    my $event_clock = $_->{'start'};
 
-	    if (ah_save_incident($tld, $OPTS{'service'}, $eventid, $start, $end, $false_positive) != AH_SUCCESS)
+	    $start = $from if (defined($from) and $_->{'start'} < $from);
+	    $end = $till if (defined($till) and not defined($end));
+
+	    if (ah_save_incident($tld, $service, $eventid, $event_clock, $end, $false_positive) != AH_SUCCESS)
 	    {
 		fail("cannot save incident: ", ah_get_error());
 	    }
 
 	    if ($service eq 'dns')
 	    {
-		my $interval = $dns_interval;
-
 		# get results within incidents
 		my $rows_ref = db_select(
 		    "select value,clock".
@@ -248,7 +138,7 @@ foreach (@$tlds_ref)
 
 		    my $result;
 
-		    $result->{'status'} = $value;
+		    $result->{'status'} = ($value == 1 ? "Up" : "Down");
 		    $result->{'clock'} = $clock;
 
 		    # time bounds for results from proxies
@@ -258,20 +148,12 @@ foreach (@$tlds_ref)
 		    push(@test_results, $result);
 		}
 
-		fail("no results found within incident: eventid:$eventid start:$start") if (scalar(@test_results) == 0);
+		fail("no results found within incident: eventid:$eventid clock:$event_clock") if (scalar(@test_results) == 0);
 
 		my $values_from = $test_results[0]->{'start'};
 		my $values_till = $test_results[scalar(@test_results) - 1]->{'end'};
 
-		my $key = 'rsm.dns.udp.rtt[{$RSM.TLD},';
-
-		# TODO: move out of the cycle
-		my $nsips_ref = get_nsips($tld, $key, 1); # templated
-
-		# TODO: move out of the cycle
-		my $nsip_items_ref = __get_nsip_items($nsips_ref, $key, $tld);
-
-		my $values_ref = __get_values($nsip_items_ref, $values_from, $values_till);
+		my $values_ref = __get_dns_test_values($nsip_items_ref, $values_from, $values_till);
 
 		my $test_results_count = scalar(@test_results);
 
@@ -319,7 +201,7 @@ foreach (@$tlds_ref)
 
 			    $r_ref->{'probes'} = {} unless (exists($r_ref->{'probes'}));
 			    $r_ref->{'probes'}->{$probe} = {} unless (exists($r_ref->{'probes'}->{$probe}));
-			    $r_ref->{'probes'}->{$probe}->{'status'} = ':TODO:' unless (exists($r_ref->{'probes'}->{$probe}->{'nss'}->{'status'}));
+			    $r_ref->{'probes'}->{$probe}->{'status'} = 'No result' unless (exists($r_ref->{'probes'}->{$probe}->{'nss'}->{'status'}));
 			    $r_ref->{'probes'}->{$probe}->{'nss'} = {} unless (exists($r_ref->{'probes'}->{$probe}->{'nss'}));
 			    $r_ref->{'probes'}->{$probe}->{'nss'}->{$ns} = [] unless (exists($r_ref->{'probes'}->{$probe}->{'nss'}->{$ns}));
 
@@ -330,19 +212,41 @@ foreach (@$tlds_ref)
 		    }
 		}
 
-		foreach my $r_ref (@test_results)
+		# get results from probes: number of working Name Servers
+		my $itemids_ref = __get_itemids($cfg_dns_key_nss, $tld);
+		my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
+
+		foreach my $tr_ref (@test_results)
 		{
-		    delete($r_ref->{'start'});
-		    delete($r_ref->{'end'});
+		    # set status
+		    my $tr_start = $tr_ref->{'start'};
+		    my $tr_end = $tr_ref->{'end'};
 
-		    my $json = encode_json($r_ref);
+		    delete($tr_ref->{'start'});
+		    delete($tr_ref->{'end'});
 
-		    if (ah_save_incident_json($tld, $OPTS{'service'}, $eventid, $start, $json, $r_ref->{'clock'}) != AH_SUCCESS)
+		    my $probes_ref = $tr_ref->{'probes'};
+		    foreach my $probe (keys(%$probes_ref))
+		    {
+			my $probe_data_ref = $probes_ref->{$probe};
+
+			foreach my $status_ref (@{$statuses_ref->{$probe}})
+			{
+			    next if ($status_ref->{'clock'} < $tr_start);
+			    last if ($status_ref->{'clock'} > $tr_end);
+
+			    $probe_data_ref->{'status'} = ($status_ref->{'value'} >= $cfg_minns ? "Up" : "Down");
+			}
+		    }
+
+		    my $json = encode_json($tr_ref);
+
+		    if (ah_save_incident_json($tld, $service, $eventid, $event_clock, $json, $tr_ref->{'clock'}) != AH_SUCCESS)
 		    {
 			fail("cannot save incident: ", ah_get_error());
 		    }
 
-		    dbg(JSON->new->utf8(1)->pretty(1)->encode($r_ref), "-----------------------------------------------------------\n") if (defined($OPTS{'debug'}));
+		    #dbg(JSON->new->utf8(1)->pretty(1)->encode($tr_ref), "-----------------------------------------------------------\n") if (defined($OPTS{'debug'}));
 		}
 	    }
 	}
@@ -363,7 +267,7 @@ slv_exit(SUCCESS);
 #                 '-204',
 #                 '124',
 #                 ...
-sub __get_values
+sub __get_dns_test_values
 {
     my $nsip_items_ref = shift;
     my $start = shift;
@@ -373,9 +277,9 @@ sub __get_values
 
     # generate list if itemids
     my $itemids_str = '';
-    foreach my $host (keys(%$nsip_items_ref))
+    foreach my $probe (keys(%$nsip_items_ref))
     {
-	my $itemids_ref = $nsip_items_ref->{$host};
+	my $itemids_ref = $nsip_items_ref->{$probe};
 
 	foreach my $itemid (keys(%$itemids_ref))
 	{
@@ -394,19 +298,19 @@ sub __get_values
 	    my $value = $row_ref->[1];
 	    my $clock = $row_ref->[2];
 
-	    my ($nsip, $host);
+	    my ($nsip, $probe);
 	    my $last = 0;
 
-	    foreach my $hid (keys(%$nsip_items_ref))
+	    foreach my $pr (keys(%$nsip_items_ref))
 	    {
-		my $itemids_ref = $nsip_items_ref->{$hid};
+		my $itemids_ref = $nsip_items_ref->{$pr};
 
 		foreach my $i (keys(%$itemids_ref))
 		{
 		    if ($i == $itemid)
 		    {
-			$nsip = $nsip_items_ref->{$hid}{$i};
-			$host = $hid;
+			$nsip = $nsip_items_ref->{$pr}{$i};
+			$probe = $pr;
 			$last = 1;
 			last;
 		    }
@@ -416,15 +320,15 @@ sub __get_values
 
 	    fail("internal error: Name Server,IP pair of item $itemid not found") unless (defined($nsip));
 
-	    $result{$host} = {} unless (exists($result{$host}));
+	    $result{$probe} = {} unless (exists($result{$probe}));
 
-	    if (exists($result{$host}{$nsip}))
+	    if (exists($result{$probe}{$nsip}))
 	    {
-		push(@{$result{$host}{$nsip}->{'results'}}, {'value' => $value, 'clock' => $clock});
+		push(@{$result{$probe}{$nsip}->{'results'}}, {'value' => $value, 'clock' => $clock});
 	    }
 	    else
 	    {
-		$result{$host}{$nsip} = {'results' => [{'value' => $value, 'clock' => $clock}]};
+		$result{$probe}{$nsip} = {'results' => [{'value' => $value, 'clock' => $clock}]};
 	    }
 	}
     }
@@ -444,14 +348,14 @@ sub __get_values
 #         'itemid4' => 'ns1,192.0.34.201'
 #    }
 # }
-sub __get_nsip_items
+sub __get_nsip_itemids
 {
     my $nsips_ref = shift; # array reference of NS,IP pairs
-    my $cfg_key_in = shift;
+    my $key = shift;
     my $tld = shift;
 
     my @keys;
-    push(@keys, "'" . $cfg_key_in . $_ . "]'") foreach (@$nsips_ref);
+    push(@keys, "'" . $key . $_ . "]'") foreach (@$nsips_ref);
 
     my $keys_str = join(',', @keys);
 
@@ -483,6 +387,124 @@ sub __get_nsip_items
     return \%result;
 }
 
+# returns hash reference of Probe=>itemid of specified key
+#
+# {
+#    'Amsterdam' => 'itemid1',
+#    'London' => 'itemid2',
+#    ...
+# }
+sub __get_itemids
+{
+    my $key = shift;
+    my $tld = shift;
+
+    my $sql =
+	"select h.host,i.itemid".
+	" from items i,hosts h".
+	" where i.hostid=h.hostid".
+		" and i.templateid is not null".
+		" and i.key_='$key'".
+		" and h.host like '$tld %'".
+	" group by h.host,i.itemid";
+
+    my $rows_ref = db_select($sql);
+
+    fail("no items matching '$key' found at host '$tld %'") if (scalar(@$rows_ref) == 0);
+
+    my %result;
+
+    my $tld_length = length($tld) + 1; # skip white space
+    foreach my $row_ref (@$rows_ref)
+    {
+	my $host = $row_ref->[0];
+	my $itemid = $row_ref->[1];
+
+	# remove TLD from host name to get just the Probe name
+	my $probe = substr($host, $tld_length);
+
+	$result{$probe} = $itemid;
+    }
+
+    return \%result;
+}
+
+#
+# {
+#     'Probe1' =>
+#     [
+#         {
+#             'clock' => 1234234234,
+#             'status' => 'Up'
+#         },
+#         {
+#             'clock' => 1234234294,
+#             'status' => 'Up'
+#         }
+#     ],
+#     'Probe2' =>
+#     [
+#         {
+#             'clock' => 1234234234,
+#             'status' => 'Down'
+#         },
+#         {
+#             'clock' => 1234234294,
+#             'status' => 'Up'
+#         }
+#     ]
+# }
+#
+sub __get_probe_statuses
+{
+    my $itemids_ref = shift;
+    my $from = shift;
+    my $till = shift;
+
+    my %result;
+
+    # generate list if itemids
+    my $itemids_str = '';
+    foreach my $probe (keys(%$itemids_ref))
+    {
+	$itemids_str .= ',' unless ($itemids_str eq '');
+	$itemids_str .= $itemids_ref->{$probe};
+    }
+
+    if ($itemids_str ne '')
+    {
+	my $rows_ref = db_select("select itemid,value,clock from history_uint where itemid in ($itemids_str) and " . sql_time_condition($from, $till). " order by clock");
+
+	foreach my $row_ref (@$rows_ref)
+	{
+	    my $itemid = $row_ref->[0];
+	    my $value = $row_ref->[1];
+	    my $clock = $row_ref->[2];
+
+	    my $probe;
+	    foreach my $pr (keys(%$itemids_ref))
+	    {
+		my $i = $itemids_ref->{$pr};
+
+		if ($i == $itemid)
+		{
+		    $probe = $pr;
+
+		    last;
+		}
+	    }
+
+	    fail("internal error: Name Server,IP pair of item $itemid not found") unless (defined($probe));
+
+	    #$result{$probe} = [] unless (exists($result{$probe}));
+
+	    push(@{$result{$probe}}, {'value' => $value, 'clock' => $clock});
+	}
+    }
+
+    return \%result;
+}
+
 __END__
 
 =head1 NAME
@@ -507,12 +529,12 @@ Process only specified TLD. By default all TLDs will be processed.
 
 =item B<--from> timestamp
 
-Optionally specify the beginning of period for getting incidents. In case of ongoing                                                                                                                                                          
+Optionally specify the beginning of period for getting incidents. In case of ongoing
 incident at the specified time it will be displayed with full details.
 
 =item B<--till> timestamp
 
-Optionally specify the end of period for getting incidents.                               
+Optionally specify the end of period for getting incidents.
 
 =item B<--debug>
 
