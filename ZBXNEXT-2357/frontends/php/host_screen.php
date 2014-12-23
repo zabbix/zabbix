@@ -47,9 +47,7 @@ $fields = array(
 	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null),
 	// ajax
 	'filterState' => array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
-	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT, null,		null),
-	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT, null,		null),
-	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT, IN('"add","remove"'), null)
+	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT, null,		null)
 );
 check_fields($fields);
 

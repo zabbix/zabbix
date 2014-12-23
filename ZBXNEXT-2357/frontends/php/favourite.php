@@ -15,16 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-$page['file'] = 'maps.php';
-$page['title'] = _('Configuration of proxies');
-
-$page['hist_arg'] = array('sysmapid');
-$page['menu'] = 'view';
-if (!isset($_GET['action'])) {
-	$_GET['action'] = 'map.view';
-}
 
 require_once dirname(__FILE__).'/include/config.inc.php';

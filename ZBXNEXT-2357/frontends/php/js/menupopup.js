@@ -119,7 +119,12 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 				clickCallback: function() {
 					var obj = jQuery(this);
 
-					rm4favorites(favouriteObj, item.id);
+					sendAjaxData('dashboard.php?output=ajax&favaction=remove', {
+						data: {
+							favobj: favouriteObj,
+							favid: item.id
+						}
+					});
 
 					obj.closest('.menuPopup').fadeOut(100);
 					obj.remove();
@@ -148,7 +153,12 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 				label: t('Remove all'),
 				css: (removeItems.length == 0) ? 'ui-state-disabled' : '',
 				clickCallback: function() {
-					rm4favorites(favouriteObj, 0);
+					sendAjaxData('dashboard.php?output=ajax&favaction=remove', {
+						data: {
+							favobj: favouriteObj,
+							favid: 0
+						}
+					});
 
 					jQuery(this).closest('.menuPopup').fadeOut(100);
 				}
@@ -476,7 +486,7 @@ function getMenuPopupRefresh(options) {
 				var obj = jQuery(this),
 					currentRate = obj.data('value');
 
-				sendAjaxData({
+				sendAjaxData(location.href, {
 					data: jQuery.extend({}, params, {
 						widgetName: options.widgetName,
 						widgetRefreshRate: currentRate
