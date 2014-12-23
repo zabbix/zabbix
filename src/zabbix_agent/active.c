@@ -905,7 +905,7 @@ static int	process_value(
 		el->severity = *severity;
 	if (NULL != lastlogsize)
 		el->lastlogsize = *lastlogsize;
-	if (NULL != mtime)	/* used by "logrt" checks only, null in other cases */
+	if (NULL != mtime)
 		el->mtime = *mtime;
 	if (NULL != timestamp)
 		el->timestamp = *timestamp;
