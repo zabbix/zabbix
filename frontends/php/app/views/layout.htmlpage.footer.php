@@ -26,24 +26,26 @@ if (CProfile::isModified()) {
 	DBend($result);
 }
 
-$table = new CTable(null, 'textwhite bold maxwidth ui-widget-header ui-corner-all page_footer');
+if ($data['fullscreen'] == 0) {
+	$table = new CTable(null, 'textwhite bold maxwidth ui-widget-header ui-corner-all page_footer');
 
-$conString = ($data['userid'] == 0)
-		? _('Not connected')
-		: _s('Connected as \'%1$s\'', $data['alias']);
+	$conString = ($data['userid'] == 0)
+			? _('Not connected')
+			: _s('Connected as \'%1$s\'', $data['alias']);
 
-$table->addRow(array(
-	new CCol(new CLink(
-		_s('Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA',
-		ZABBIX_VERSION, ZABBIX_COPYRIGHT_FROM, ZABBIX_COPYRIGHT_TO),
-		ZABBIX_HOMEPAGE, 'highlight', null, true), 'center'),
-		new CCol(array(
-			new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-			new CSpan($conString, 'footer_sign')
-		), 'right')
-	));
+	$table->addRow(array(
+		new CCol(new CLink(
+			_s('Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA',
+			ZABBIX_VERSION, ZABBIX_COPYRIGHT_FROM, ZABBIX_COPYRIGHT_TO),
+			ZABBIX_HOMEPAGE, 'highlight', null, true), 'center'),
+			new CCol(array(
+				new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+				new CSpan($conString, 'footer_sign')
+			), 'right')
+		));
 
-$table->show();
+	$table->show();
+}
 
 if (!isset($ZBX_PAGE_POST_JS)) {
 	global $ZBX_PAGE_POST_JS;

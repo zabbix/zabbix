@@ -173,7 +173,7 @@ function getFavouriteMaps() {
 
 	if ($data) {
 		foreach ($data as $map) {
-			$favourites->addItem(new CLink($map['label'], 'maps.php?sysmapid='.$map['id']), 'nowrap');
+			$favourites->addItem(new CLink($map['label'], 'maps.php?action=map.view&sysmapid='.$map['id']), 'nowrap');
 		}
 	}
 

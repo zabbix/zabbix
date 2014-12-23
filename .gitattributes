@@ -14,6 +14,9 @@ build/win32/project/Makefile_sender_dll -text
 build/win32/project/Makefile_sender_dll_x64 -text
 create/src/data.tmpl -text
 frontends/php/app/.htaccess -text
+frontends/php/app/controllers/CControllerFavouriteCreate.php -text
+frontends/php/app/controllers/CControllerFavouriteDelete.php -text
+frontends/php/app/controllers/CControllerMapView.php -text
 frontends/php/app/controllers/CControllerProxyCreate.php -text
 frontends/php/app/controllers/CControllerProxyDelete.php -text
 frontends/php/app/controllers/CControllerProxyFormCreate.php -text
@@ -31,11 +34,12 @@ frontends/php/app/controllers/CControllerScriptList.php -text
 frontends/php/app/controllers/CControllerScriptMassDelete.php -text
 frontends/php/app/controllers/CControllerScriptUpdate.php -text
 frontends/php/app/views/administration.proxy.edit.js.php -text
-frontends/php/app/views/general.page.footer.php -text
-frontends/php/app/views/general.page.header.php -text
-frontends/php/app/views/general.page.layout.php -text
-frontends/php/app/views/general.page.menu.php -text
-frontends/php/app/views/general.page.top.php -text
+frontends/php/app/views/layout.htmlpage.footer.php -text
+frontends/php/app/views/layout.htmlpage.header.php -text
+frontends/php/app/views/layout.htmlpage.menu.php -text
+frontends/php/app/views/layout.htmlpage.php -text
+frontends/php/app/views/layout.htmlpage.top.php -text
+frontends/php/app/views/layout.javascript.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
@@ -43,6 +47,7 @@ frontends/php/audio/alarm_information.wav -text
 frontends/php/audio/alarm_ok.wav -text
 frontends/php/audio/alarm_warning.wav -text
 frontends/php/audio/no_sound.wav -text
+frontends/php/favourite.php -text
 frontends/php/fonts/DejaVuSans.ttf -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/arrow_down.png -text

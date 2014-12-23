@@ -420,17 +420,24 @@ class ZBase {
 
 		// Controller returned data
 		if ($response instanceof CControllerResponseData) {
-			$view = new CView($router->getView(), $response->getData());
-			$data['main_block'] = $view->getOutput();
-			$data['javascript']['files'] = $view->getAddedJS();
-			$data['javascript']['pre'] = $view->getIncludedJS();
-			$layout = new CView($router->getLayout(), $data);
-			echo $layout->getOutput();
+			// if no view defined we pass data directly to layout
+			if ($router->getView() === null) {
+				$layout = new CView($router->getLayout(), $response->getData());
+				echo $layout->getOutput();
+			}
+			else {
+				$view = new CView($router->getView(), $response->getData());
+				$data['main_block'] = $view->getOutput();
+				$data['fullscreen'] = isset($_REQUEST['fullscreen']) && $_REQUEST['fullscreen'] == 1 ? 1 : 0;
+				$data['javascript']['files'] = $view->getAddedJS();
+				$data['javascript']['pre'] = $view->getIncludedJS();
+				$layout = new CView($router->getLayout(), $data);
+				echo $layout->getOutput();
+			}
 		}
 		// Controller returned redirect to another page
 		else if ($response instanceof CControllerResponseRedirect) {
 			header('Content-Type: text/html; charset=UTF-8');
-//			session_start();
 			if ($response->getMessageOk() !== null) {
 				$_SESSION['messageOk'] = $response->getMessageOk();
 			}

@@ -392,7 +392,7 @@ var CDoll = Class.create({
 								});
 							});
 
-							sendAjaxData({
+							sendAjaxData(location.href, {
 								data: {widgetSort: Object.toJSON(widgetPositions)}
 							});
 						}

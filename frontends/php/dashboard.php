@@ -331,7 +331,7 @@ $icon->setMenuPopup(CMenuPopupHelper::getFavouriteMaps());
 $favouriteMaps = new CCollapsibleUiWidget(WIDGET_FAVOURITE_MAPS, getFavouriteMaps());
 $favouriteMaps->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.state', true);
 $favouriteMaps->setHeader(_('Favourite maps'), $icon);
-$favouriteMaps->setFooter(new CLink(_('Maps').' &raquo;', 'maps.php', 'highlight'), true);
+$favouriteMaps->setFooter(new CLink(_('Maps').' &raquo;', 'maps.php?action=map.view', 'highlight'), true);
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.col', 0);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.row', 2);
@@ -550,7 +550,7 @@ zbx_add_post_js('jqBlink.blink();');
 				favouriteIds.push(list.values[i][list.object]);
 			}
 
-			sendAjaxData({
+			sendAjaxData(location.href, {
 				data: {
 					favobj: list.object,
 					'favid[]': favouriteIds,

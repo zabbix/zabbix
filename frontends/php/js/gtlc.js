@@ -970,7 +970,7 @@ var CScrollBar = Class.create({
 		this.fixedperiod = (this.fixedperiod == 1) ? 0 : 1;
 
 		// sending fixed/dynamic setting to server to save in a profile
-		sendAjaxData({
+		sendAjaxData(location.href, {
 			data: {
 				favobj: 'timelinefixedperiod',
 				favid: this.fixedperiod

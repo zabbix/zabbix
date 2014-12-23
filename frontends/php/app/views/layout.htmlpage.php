@@ -37,50 +37,52 @@ global $page;
 			access_deny(ACCESS_DENY_PAGE);
 		}
 
-		$pageHeader = new CView('general.page.header', $data);
+		$pageHeader = new CView('layout.htmlpage.header', $data);
 		echo $pageHeader->getOutput();
 
-		$pageTop = new CView('general.page.top');
+		$pageTop = new CView('layout.htmlpage.top', $data);
 		echo $pageTop->getOutput();
 
-		$data['main_menu'] = $main_menu;
-		$data['sub_menus'] = $sub_menus;
-		$pageMenu = new CView('general.page.menu', $data);
-		echo $pageMenu->getOutput();
+		if ($data['fullscreen'] == 0) {
+			$data['main_menu'] = $main_menu;
+			$data['sub_menus'] = $sub_menus;
+			$pageMenu = new CView('layout.htmlpage.menu', $data);
+			echo $pageMenu->getOutput();
 
-		// create history
-		$table = new CTable(null, 'history left');
-		$table->addRow(new CRow(array(
-			new CCol(_('History').':', 'caption'),
-			get_user_history()
-		)));
-		$table->show();
+			// create history
+			$table = new CTable(null, 'history left');
+			$table->addRow(new CRow(array(
+				new CCol(_('History').':', 'caption'),
+				get_user_history()
+			)));
+			$table->show();
 
-		zbx_add_post_js('initMessages({});');
+			zbx_add_post_js('initMessages({});');
 
-		// if a user logs in after several unsuccessful attempts, display a warning
-		if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
-			$attempip = CProfile::get('web.login.attempt.ip', '');
-			$attempdate = CProfile::get('web.login.attempt.clock', 0);
+			// if a user logs in after several unsuccessful attempts, display a warning
+			if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
+				$attempip = CProfile::get('web.login.attempt.ip', '');
+				$attempdate = CProfile::get('web.login.attempt.clock', 0);
 
-			$error_msg = _n('%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s.',
-				'%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s.',
-				$attempip,
-				zbx_date2str(DATE_FORMAT, $attempdate),
-				zbx_date2str(TIME_FORMAT, $attempdate),
-				$failedAttempts
-			);
-			error($error_msg);
+				$error_msg = _n('%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s.',
+					'%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s.',
+					$attempip,
+					zbx_date2str(DATE_FORMAT, $attempdate),
+					zbx_date2str(TIME_FORMAT, $attempdate),
+					$failedAttempts
+				);
+				error($error_msg);
 
-			CProfile::update('web.login.attempt.failed', 0, PROFILE_TYPE_INT);
+				CProfile::update('web.login.attempt.failed', 0, PROFILE_TYPE_INT);
+			}
+			show_messages();
 		}
-		show_messages();
 	}
 
-	function local_generateFooter() {
+	function local_generateFooter($data) {
 		$data['alias'] = CWebUser::$data['alias'];
 		$data['userid'] = CWebUser::$data['userid'];
-		$pageFooter = new CView('general.page.footer', $data);
+		$pageFooter = new CView('layout.htmlpage.footer', $data);
 		echo $pageFooter->getOutput();
 		echo '</body>'."\n".'</html>'."\n";
 	}
@@ -121,5 +123,5 @@ global $page;
 	local_showMessage();
 	echo $data['javascript']['pre'];
 	echo $data['main_block'];
-	local_generateFooter();
+	local_generateFooter($data);
 show_messages();
