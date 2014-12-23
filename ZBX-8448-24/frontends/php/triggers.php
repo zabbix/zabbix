@@ -93,21 +93,38 @@ $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIG
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 
 // validate permissions
-if (getRequest('triggerid')) {
+$triggerIds = getRequest('g_triggerid', array());
+if (!is_array($triggerIds)) {
+	$triggerIds = zbx_toArray($triggerIds);
+}
+if (!zbx_empty(getRequest('triggerid'))) {
+	$triggerIds[] = getRequest('triggerid');
+}
+if ($triggerIds) {
 	$triggers = API::Trigger()->get(array(
-		'triggerids' => $_REQUEST['triggerid'],
 		'output' => array('triggerid'),
+		'triggerids' => array_keys(array_flip($triggerIds)),
 		'preservekeys' => true,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'editable' => true
 	));
-	if (!$triggers) {
+	if ($triggers) {
+		foreach ($triggerIds as $triggerId) {
+			if (!isset($triggers[$triggerId])) {
+				access_deny();
+			}
+		}
+	}
+	else {
 		access_deny();
 	}
 }
-if (getRequest('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
+
+$hostId = getRequest('hostid');
+if ($hostId && !API::Host()->isWritable(array($hostId))) {
 	access_deny();
 }
+
 /*
  * Actions
  */
