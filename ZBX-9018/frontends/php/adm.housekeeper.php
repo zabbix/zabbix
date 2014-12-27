@@ -27,7 +27,6 @@ $page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hk_events_mode' =>		array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')),
 	'hk_events_trigger' => 	array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
