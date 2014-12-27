@@ -109,10 +109,10 @@ if (hasRequest('form_refresh')) {
 		'problem_ack_color' => getRequest('problem_ack_color', $config['problem_ack_color']),
 		'ok_unack_color' => getRequest('ok_unack_color', $config['ok_unack_color']),
 		'ok_ack_color' => getRequest('ok_ack_color', $config['ok_ack_color']),
-		'problem_unack_style' => getRequest('problem_unack_style', $config['problem_unack_style']),
-		'problem_ack_style' => getRequest('problem_ack_style', $config['problem_ack_style']),
-		'ok_unack_style' => getRequest('ok_unack_style', $config['ok_unack_style']),
-		'ok_ack_style' => getRequest('ok_ack_style', $config['ok_ack_style']),
+		'problem_unack_style' => getRequest('problem_unack_style', 0),
+		'problem_ack_style' => getRequest('problem_ack_style', 0),
+		'ok_unack_style' => getRequest('ok_unack_style', 0),
+		'ok_ack_style' => getRequest('ok_ack_style', 0),
 		'ok_period' => getRequest('ok_period', $config['ok_period']),
 		'blink_period' => getRequest('blink_period', $config['blink_period'])
 	);
