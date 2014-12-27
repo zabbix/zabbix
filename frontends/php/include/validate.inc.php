@@ -389,7 +389,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 
 		if (!$timePeriodValidator->validate($var)) {
 			$error = true;
-			$message = _s('Field "%1$s" is not correct: ivalid time period.', $caption);
+			$message = _s('Field "%1$s" is not correct: %2$s', $caption, $timePeriodValidator->getError());
 		}
 	}
 
