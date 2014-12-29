@@ -290,12 +290,15 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  */
 $dashboardWidget = new CWidget(null, 'dashboard');
 $dashboardWidget->setClass('header');
+
+$icon = new CIcon(
+	_s('Configure (Filter %s)', $dashboardConfig['filterEnable'] ? _('Enabled') : _('Disabled')),
+	$dashboardConfig['filterEnable'] ? 'iconconfig_hl' : 'iconconfig'
+);
+$icon->addAction('onclick', 'document.location = "dashconf.php";');
+
 $dashboardWidget->addHeader(_('PERSONAL DASHBOARD'), array(
-	new CIcon(
-		_s('Configure (Filter %s)', $dashboardConfig['filterEnable'] ? _('Enabled') : _('Disabled')),
-		$dashboardConfig['filterEnable'] ? 'iconconfig_hl' : 'iconconfig',
-		'document.location = "dashconf.php";'
-	),
+	$icon,
 	SPACE,
 	get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))))
 );
