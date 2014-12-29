@@ -12096,7 +12096,7 @@ msgid "Replace applications"
 msgstr "Заменить группы элементов данных"
 
 #: include/views/configuration.triggers.massupdate.php:144
-msgid "Replace depenencies"
+msgid "Replace dependencies"
 msgstr "Заменить зависимости"
 
 #: include/views/configuration.host.massupdate.php:66
