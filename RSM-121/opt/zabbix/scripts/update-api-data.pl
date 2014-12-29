@@ -36,8 +36,18 @@ db_connect();
 
 my $cfg_dns_interval = get_macro_dns_udp_delay();
 my $cfg_minns = get_macro_minns();
-my $cfg_dns_key_nss = 'rsm.dns.udp[{$RSM.TLD}]';
+my $cfg_dns_key_status = 'rsm.dns.udp[{$RSM.TLD}]'; # 0 - down, 1 - up
 my $cfg_dns_key_rtt = 'rsm.dns.udp.rtt[{$RSM.TLD},';
+
+my $cfg_rdds_interval = get_macro_rdds_delay();
+my $cfg_rdds_key_status = 'rsm.rdds[{$RSM.TLD}'; # 0 - down, 1 - up, 2 - only 43, 3 - only 80
+my $cfg_rdds_key_43_rtt = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
+my $cfg_rdds_key_43_ip = 'rsm.rdds.43.ip[{$RSM.TLD}]';
+my $cfg_rdds_key_43_upd = 'rsm.rdds.43.upd[{$RSM.TLD}]';
+my $cfg_rdds_key_80_rtt = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
+my $cfg_rdds_key_80_ip = 'rsm.rdds.80.ip[{$RSM.TLD}]';
+
+my $cfg_epp_interval = get_macro_epp_delay();
 
 my $from = $OPTS{'from'};
 my $till = $OPTS{'till'};
@@ -62,11 +72,11 @@ foreach (@$tlds_ref)
 
 	# working item
 	my $avail_key = "rsm.slv.$service.avail";
-	my $itemid = get_itemid_by_host($tld, $avail_key);
+	my $avail_itemid = get_itemid_by_host($tld, $avail_key);
 
 	my ($rollweek_from, $rollweek_till) = get_rollweek_bounds();
 
-	my $downtime = get_downtime($itemid, $rollweek_from, $rollweek_till);
+	my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
 
 	if (ah_save_service_availability($tld, $service, $downtime) != AH_SUCCESS)
         {
@@ -75,7 +85,7 @@ foreach (@$tlds_ref)
 
 	# get availability
 	my $now = time();
-	my $incidents = get_incidents($itemid, $now);
+	my $incidents = get_incidents($avail_itemid, $now);
 
 	my $alarmed_status = AH_ALARMED_NO;
 	if (scalar(@$incidents) != 0)
@@ -91,16 +101,30 @@ foreach (@$tlds_ref)
 	    fail("cannot save alarmed: ", ah_get_error());
 	}
 
-	my ($nsips_ref, $nsip_items_ref, $interval);
+	my ($nsips_ref, $dns_items_ref, $rdds_dbl_items_ref, $rdds_str_items_ref, $interval);
 
 	if ($service eq 'dns')
 	{
 	    $nsips_ref = get_nsips($tld, $cfg_dns_key_rtt, 1); # templated
-	    $nsip_items_ref = __get_nsip_itemids($nsips_ref, $cfg_dns_key_rtt, $tld);
+	    $dns_items_ref = __get_dns_itemids($nsips_ref, $cfg_dns_key_rtt, $tld);
 	    $interval = $cfg_dns_interval;
 	}
+	elsif ($service eq 'dnssec')
+	{
+	    $interval = $cfg_dns_interval;
+	}
+	elsif ($service eq 'rdds')
+	{
+	    $rdds_dbl_items_ref = __get_rdds_dbl_itemids($tld);
+	    $rdds_str_items_ref = __get_rdds_str_itemids($tld);
+	    $interval = $cfg_rdds_interval;
+	}
+	elsif ($service eq 'epp')
+	{
+	    $interval = $cfg_epp_interval;
+	}
 
-	$incidents = get_incidents($itemid, $from, $till);
+	$incidents = get_incidents($avail_itemid, $from, $till);
 
 	foreach (@$incidents)
 	{
@@ -119,43 +143,43 @@ foreach (@$tlds_ref)
 		fail("cannot save incident: ", ah_get_error());
 	    }
 
+	    # get results within incidents
+	    my $rows_ref = db_select(
+		"select value,clock".
+		" from history_uint".
+		" where itemid=$avail_itemid".
+			" and ".sql_time_condition($start, $end).
+		" order by clock");
+
+	    my @test_results;
+
+	    foreach my $row_ref (@$rows_ref)
+	    {
+		my $value = $row_ref->[0];
+		my $clock = $row_ref->[1];
+
+		my $result;
+
+		$result->{'status'} = ($value == 1 ? "Up" : "Down");
+		$result->{'clock'} = $clock;
+
+		# time bounds for results from proxies
+		$result->{'start'} = $clock - $interval + RESULT_TIMESTAMP_SHIFT + 1; # we need to start at 0
+		$result->{'end'} = $clock + RESULT_TIMESTAMP_SHIFT;
+
+		push(@test_results, $result);
+	    }
+
+	    my $test_results_count = scalar(@test_results);
+
+	    fail("no results found within incident: eventid:$eventid clock:$event_clock") if ($test_results_count == 0);
+
+	    my $values_from = $test_results[0]->{'start'};
+	    my $values_till = $test_results[$test_results_count - 1]->{'end'};
+
 	    if ($service eq 'dns')
 	    {
-		# get results within incidents
-		my $rows_ref = db_select(
-		    "select value,clock".
-		    " from history_uint".
-		    " where itemid=$itemid".
-		    	" and ".sql_time_condition($start, $end).
-		    " order by clock");
-
-		my @test_results;
-
-		foreach my $row_ref (@$rows_ref)
-		{
-		    my $value = $row_ref->[0];
-		    my $clock = $row_ref->[1];
-
-		    my $result;
-
-		    $result->{'status'} = ($value == 1 ? "Up" : "Down");
-		    $result->{'clock'} = $clock;
-
-		    # time bounds for results from proxies
-		    $result->{'start'} = $clock - $interval + RESULT_TIMESTAMP_SHIFT + 1; # we need to start at 0
-		    $result->{'end'} = $clock + RESULT_TIMESTAMP_SHIFT;
-
-		    push(@test_results, $result);
-		}
-
-		fail("no results found within incident: eventid:$eventid clock:$event_clock") if (scalar(@test_results) == 0);
-
-		my $values_from = $test_results[0]->{'start'};
-		my $values_till = $test_results[scalar(@test_results) - 1]->{'end'};
-
-		my $values_ref = __get_dns_test_values($nsip_items_ref, $values_from, $values_till);
-
-		my $test_results_count = scalar(@test_results);
+		my $values_ref = __get_dns_test_values($dns_items_ref, $values_from, $values_till);
 
 		# run through values from probes (ordered by clock)
 		foreach my $probe (keys(%$values_ref))
@@ -166,54 +190,41 @@ foreach (@$tlds_ref)
 
 		    foreach my $nsip (keys(%$nsips_ref))
 		    {
-			my $nsip_ref = $nsips_ref->{$nsip};
+			my $endvalues_ref = $nsips_ref->{$nsip};
 
 			my ($ns, $ip) = split(',', $nsip);
 
-			my $nsip_results_ref = $nsip_ref->{'results'};
-
-			my $total = scalar(@$nsip_results_ref);
-
-			dbg("  $nsip: found $total:");
+			dbg("  ", scalar(keys(%$endvalues_ref)), " values for $nsip:") if (defined($OPTS{'debug'}));
 
 			my $test_result_index = 0;
 
-			foreach my $result_ref (@$nsip_results_ref)
+			foreach my $clock (sort(keys(%$endvalues_ref))) # must be sorted by clock
 			{
-			    my $value = $result_ref->{'value'};
-			    my $clock = $result_ref->{'clock'};
+			    dbg(Dumper($endvalues_ref->{$clock})) if (defined($OPTS{'debug'}));
 
-			    dbg("test ", $test_result_index + 1, " start:", $test_results[$test_result_index]->{'start'}, " clock:", $test_results[$test_result_index]->{'clock'}, " end:", $test_results[$test_result_index]->{'end'});
-
-			    fail("no status in the database related to value (probe:$probe service:$service clock:$clock value:$value)") if ($clock < $test_results[$test_result_index]->{'start'});
+			    fail("no status of value (probe:$probe service:$service clock:$clock) found in the database") if ($clock < $test_results[$test_result_index]->{'start'});
 
 			    # move to corresponding test result
 			    $test_result_index++ while ($test_result_index < $test_results_count and $clock > $test_results[$test_result_index]->{'end'});
 
-			    fail("no status in the database related to value (probe:$probe service:$service clock:$clock value:$value)") if ($test_result_index == $test_results_count);
+			    fail("no status of value (probe:$probe service:$service clock:$clock) found in the database") if ($test_result_index == $test_results_count);
 
-			    my $r_ref = $test_results[$test_result_index];
+			    my $tr_ref = $test_results[$test_result_index];
 
-			    my $r_status = $r_ref->{'status'};
-			    my $r_clock = $r_ref->{'clock'};
-			    my $r_start = $r_ref->{'start'};
-			    my $r_end = $r_ref->{'end'};
+			    my $r_status = $tr_ref->{'status'};
+			    my $r_clock = $tr_ref->{'clock'};
+			    my $r_start = $tr_ref->{'start'};
+			    my $r_end = $tr_ref->{'end'};
 
-			    $r_ref->{'probes'} = {} unless (exists($r_ref->{'probes'}));
-			    $r_ref->{'probes'}->{$probe} = {} unless (exists($r_ref->{'probes'}->{$probe}));
-			    $r_ref->{'probes'}->{$probe}->{'status'} = 'No result' unless (exists($r_ref->{'probes'}->{$probe}->{'nss'}->{'status'}));
-			    $r_ref->{'probes'}->{$probe}->{'nss'} = {} unless (exists($r_ref->{'probes'}->{$probe}->{'nss'}));
-			    $r_ref->{'probes'}->{$probe}->{'nss'}->{$ns} = [] unless (exists($r_ref->{'probes'}->{$probe}->{'nss'}->{$ns}));
+			    $tr_ref->{'probes'}->{$probe}->{'status'} = 'No result' unless (exists($tr_ref->{'probes'}->{$probe}->{'status'}));
 
-			    my $ns_ref = $r_ref->{'probes'}->{$probe}->{'nss'}->{$ns};
-
-			    push(@$ns_ref, {'ip' => $ip, 'rtt' => $value, 'clock' => $clock});
+                            $tr_ref->{'probes'}->{$probe}->{'details'}->{$ns}->{$clock} = {'rtt' => $endvalues_ref->{$clock}, 'ip' => $ip};
 			}
 		    }
 		}
 
 		# get results from probes: number of working Name Servers
-		my $itemids_ref = __get_itemids($cfg_dns_key_nss, $tld);
+		my $itemids_ref = __get_itemids($tld, $cfg_dns_key_status);
 		my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
 
 		foreach my $tr_ref (@test_results)
@@ -228,14 +239,101 @@ foreach (@$tlds_ref)
 		    my $probes_ref = $tr_ref->{'probes'};
 		    foreach my $probe (keys(%$probes_ref))
 		    {
-			my $probe_data_ref = $probes_ref->{$probe};
-
 			foreach my $status_ref (@{$statuses_ref->{$probe}})
 			{
 			    next if ($status_ref->{'clock'} < $tr_start);
 			    last if ($status_ref->{'clock'} > $tr_end);
 
-			    $probe_data_ref->{'status'} = ($status_ref->{'value'} >= $cfg_minns ? "Up" : "Down");
+			    $tr_ref->{'probes'}->{$probe}->{'status'} = ($status_ref->{'value'} >= $cfg_minns ? "Up" : "Down");
+			}
+		    }
+
+		    my $json = encode_json($tr_ref);
+
+		    if (ah_save_incident_json($tld, $service, $eventid, $event_clock, $json, $tr_ref->{'clock'}) != AH_SUCCESS)
+		    {
+			fail("cannot save incident: ", ah_get_error());
+		    }
+
+		    #dbg(JSON->new->utf8(1)->pretty(1)->encode($tr_ref), "-----------------------------------------------------------\n") if (defined($OPTS{'debug'}));
+		}
+	    }
+	    elsif ($service eq 'rdds')
+	    {
+		my $values_ref = __get_rdds_test_values($rdds_dbl_items_ref, $rdds_str_items_ref, $values_from, $values_till);		
+
+		dbg(Dumper($values_ref)) if (defined($OPTS{'debug'}));
+
+		# run through values from probes (ordered by clock)
+		foreach my $probe (keys(%$values_ref))
+		{
+		    my $ports_ref = $values_ref->{$probe};
+
+		    dbg("probe:$probe");
+
+		    foreach my $port (keys(%$ports_ref))
+		    {
+			my $endvalues_ref = $ports_ref->{$port};
+
+			dbg("  ", scalar(keys(%$endvalues_ref)), " values for $port:") if (defined($OPTS{'debug'}));
+
+			my $test_result_index = 0;
+
+			foreach my $clock (sort(keys(%$endvalues_ref))) # must be sorted by clock
+			{
+			    dbg(Dumper($endvalues_ref->{$clock}))if (defined($OPTS{'debug'}));
+
+			    fail("no status of the value (probe:$probe service:$service clock:$clock) found in the database") if ($clock < $test_results[$test_result_index]->{'start'});
+
+			    # move to corresponding test result
+			    $test_result_index++ while ($test_result_index < $test_results_count and $clock > $test_results[$test_result_index]->{'end'});
+
+			    fail("no status of the value (probe:$probe service:$service clock:$clock) found in the database") if ($test_result_index == $test_results_count);
+
+			    my $tr_ref = $test_results[$test_result_index];
+
+			    my $r_status = $tr_ref->{'status'};
+			    my $r_clock = $tr_ref->{'clock'};
+			    my $r_start = $tr_ref->{'start'};
+			    my $r_end = $tr_ref->{'end'};
+
+			    $tr_ref->{'ports'}->{$port}->{$probe}->{'status'} = 'No result' unless (exists($tr_ref->{'ports'}->{$port}->{$probe}->{'status'}));
+
+			    $tr_ref->{'ports'}->{$port}->{$probe}->{'details'}->{$clock} = $endvalues_ref->{$clock};
+			}
+		    }
+		}
+
+		# get results from probes: number of working Name Servers
+		my $itemids_ref = __get_itemids($tld, $cfg_rdds_key_status);
+		my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
+
+		foreach my $tr_ref (@test_results)
+		{
+		    # set status
+		    my $tr_start = $tr_ref->{'start'};
+		    my $tr_end = $tr_ref->{'end'};
+
+		    delete($tr_ref->{'start'});
+		    delete($tr_ref->{'end'});
+
+		    my $ports_ref = $tr_ref->{'ports'};
+
+		    foreach my $port (keys(%$ports_ref))
+		    {
+			my $probes_ref = $ports_ref->{$port};
+
+			foreach my $probe (keys(%$probes_ref))
+			{
+			    foreach my $status_ref (@{$statuses_ref->{$probe}})
+			    {
+				next if ($status_ref->{'clock'} < $tr_start);
+				last if ($status_ref->{'clock'} > $tr_end);
+
+				my $service_only = ($port eq "43" ? 2 : 3); # 0 - down, 1 - up, 2 - only 43, 3 - only 80
+
+				$tr_ref->{'ports'}->{$port}->{$probe}->{'status'} = ($status_ref->{'value'} == 1 or $status_ref->{'value'} == $service_only ? "Up" : "Down");
+			    }
 			}
 		    }
 
@@ -260,16 +358,20 @@ slv_exit(SUCCESS);
 
 # values are organized like this:
 # {
-#     'Amsterdam' => {
-#         'ns1,192.0.34.201' => {
-#             'values' => [
-#                 '-204',
-#                 '-204',
-#                 '124',
-#                 ...
+#           'WashingtonDC' => {
+#                               'ns1,192.0.34.201' => {
+#                                                       '1418994681' => '-204.0000',
+#                                                       '1418994621' => '-204.0000'
+#                                                     },
+#                               'ns2,2620:0:2d0:270::1:201' => {
+#                                                                '1418994681' => '-204.0000',
+#                                                                '1418994621' => '-204.0000'
+#                                                              }
+#                             },
+# ...
 sub __get_dns_test_values
 {
-    my $nsip_items_ref = shift;
+    my $dns_items_ref = shift;
     my $start = shift;
     my $end = shift;
 
@@ -277,9 +379,9 @@ sub __get_dns_test_values
 
     # generate list if itemids
     my $itemids_str = '';
-    foreach my $probe (keys(%$nsip_items_ref))
+    foreach my $probe (keys(%$dns_items_ref))
     {
-	my $itemids_ref = $nsip_items_ref->{$probe};
+	my $itemids_ref = $dns_items_ref->{$probe};
 
 	foreach my $itemid (keys(%$itemids_ref))
 	{
@@ -301,15 +403,15 @@ sub __get_dns_test_values
 	    my ($nsip, $probe);
 	    my $last = 0;
 
-	    foreach my $pr (keys(%$nsip_items_ref))
+	    foreach my $pr (keys(%$dns_items_ref))
 	    {
-		my $itemids_ref = $nsip_items_ref->{$pr};
+		my $itemids_ref = $dns_items_ref->{$pr};
 
 		foreach my $i (keys(%$itemids_ref))
 		{
 		    if ($i == $itemid)
 		    {
-			$nsip = $nsip_items_ref->{$pr}{$i};
+			$nsip = $dns_items_ref->{$pr}->{$i};
 			$probe = $pr;
 			$last = 1;
 			last;
@@ -320,21 +422,143 @@ sub __get_dns_test_values
 
 	    fail("internal error: Name Server,IP pair of item $itemid not found") unless (defined($nsip));
 
-	    $result{$probe} = {} unless (exists($result{$probe}));
-
-	    if (exists($result{$probe}{$nsip}))
-	    {
-		push(@{$result{$probe}{$nsip}->{'results'}}, {'value' => $value, 'clock' => $clock});
-	    }
-	    else
-	    {
-		$result{$probe}{$nsip} = {'results' => [{'value' => $value, 'clock' => $clock}]};
-	    }
+	    $result{$probe}->{$nsip}->{$clock} = $value;
 	}
     }
 
     return \%result;
 }
+
+sub __find_rdds_probe_key_by_itemid
+{
+    my $itemid = shift;
+    my $items_ref = shift;
+
+    my ($probe, $key);
+    my $last = 0;
+
+    foreach my $pr (keys(%$items_ref))
+    {
+	my $itemids_ref = $items_ref->{$pr};
+
+	foreach my $i (keys(%$itemids_ref))
+	{
+	    if ($i == $itemid)
+	    {
+		$probe = $pr;
+		$key = $items_ref->{$pr}->{$i};
+		$last = 1;
+		last;
+	    }
+	}
+	last if ($last == 1);
+    }
+
+    return ($probe, $key);
+}
+
+# values are organized like this:
+# {
+#           'WashingtonDC' => {
+#                               '80' => {
+#                                         '1418994206' => {
+#                                                           'ip' => '192.0.34.201',
+#                                                           'rtt' => '127.0000'
+#                                                         },
+#                                         '1418994086' => {
+#                                                           'ip' => '192.0.34.201',
+#                                                           'rtt' => '127.0000'
+#                                                         },
+#                               '43' => {
+#                                         '1418994206' => {
+#                                                           'ip' => '192.0.34.201',
+#                                                           'rtt' => '127.0000'
+#                                                         },
+#                                         '1418994086' => {
+#                                                           'ip' => '192.0.34.201',
+#                                                           'rtt' => '127.0000'
+#                                                         },
+# ...
+sub __get_rdds_test_values
+{
+    my $rdds_dbl_items_ref = shift;
+    my $rdds_str_items_ref = shift;
+    my $start = shift;
+    my $end = shift;
+
+    my %result;
+
+    # generate list if itemids
+    my $dbl_itemids_str = '';
+    foreach my $probe (keys(%$rdds_dbl_items_ref))
+    {
+	my $itemids_ref = $rdds_dbl_items_ref->{$probe};
+
+	foreach my $itemid (keys(%$itemids_ref))
+	{
+	    $dbl_itemids_str .= ',' unless ($dbl_itemids_str eq '');
+	    $dbl_itemids_str .= $itemid;
+	}
+    }
+
+    my $str_itemids_str = '';
+    foreach my $probe (keys(%$rdds_str_items_ref))
+    {
+	my $itemids_ref = $rdds_str_items_ref->{$probe};
+
+	foreach my $itemid (keys(%$itemids_ref))
+	{
+	    $str_itemids_str .= ',' unless ($str_itemids_str eq '');
+	    $str_itemids_str .= $itemid;
+	}
+    }
+
+    return \%result if ($dbl_itemids_str eq '' or $str_itemids_str eq '');
+
+    my $dbl_rows_ref = db_select("select itemid,value,clock from history where itemid in ($dbl_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+
+    foreach my $row_ref (@$dbl_rows_ref)
+    {
+	my $itemid = $row_ref->[0];
+	my $value = $row_ref->[1];
+	my $clock = $row_ref->[2];
+
+	my ($probe, $key) = __find_rdds_probe_key_by_itemid($itemid, $rdds_dbl_items_ref);
+
+	fail("internal error: item $key (itemid:$itemid) or Probe is unknown") unless (defined($probe) and defined($key));
+
+	my $port = __get_rdds_port($key);
+	my $type = __get_rdds_dbl_type($key);
+
+	$result{$probe}->{$port}->{$clock}->{$type} = $value;
+    }
+
+    my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+
+    foreach my $row_ref (@$str_rows_ref)
+    {
+	my $itemid = $row_ref->[0];
+	my $value = $row_ref->[1];
+	my $clock = $row_ref->[2];
+
+	my ($probe, $key) = __find_rdds_probe_key_by_itemid($itemid, $rdds_str_items_ref);
+
+	fail("internal error: item $key (itemid:$itemid) or Probe is unknown") unless (defined($probe) and defined($key));
+
+	my $port = __get_rdds_port($key);
+	my $type = __get_rdds_str_type($key);
+
+	$result{$probe}->{$port}->{$clock}->{$type} = $value;
+    }
+
+    return \%result;
+}
+
+
+
+
+
+
 
 # return itemids grouped by Probes:
 #
@@ -348,7 +572,7 @@ sub __get_dns_test_values
 #         'itemid4' => 'ns1,192.0.34.201'
 #    }
 # }
-sub __get_nsip_itemids
+sub __get_dns_itemids
 {
     my $nsips_ref = shift; # array reference of NS,IP pairs
     my $key = shift;
@@ -379,7 +603,106 @@ sub __get_nsip_itemids
 	# remove TLD from host name to get just the Probe name
 	my $probe = substr($host, $tld_length);
 
-	$result{$probe}{$itemid} = get_ns_from_key($key);
+	$result{$probe}->{$itemid} = get_ns_from_key($key);
+    }
+
+    fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
+
+    return \%result;
+}
+
+sub __get_rdds_port
+{
+    my $key = shift;
+
+    # rsm.rdds.43... <-- returns 43 or 80
+    return substr($key, 9, 2);
+}
+
+sub __get_rdds_dbl_type
+{
+    my $key = shift;
+
+    # rsm.rdds.43.rtt... rsm.rdds.43.upd[... <-- returns rtt, or upd
+    return substr($key, 12, 3);
+}
+
+sub __get_rdds_str_type
+{
+    my $key = shift;
+
+    # rsm.rdds.43.ip[... <-- returns 'ip'
+
+    # NB! This is done for consistency, perhaps in the future there will be more string items, not just 'ip'.
+    return 'ip';
+}
+
+# return itemids of dbl items grouped by Probes:
+#
+# {
+#    'Amsterdam' => {
+#         'itemid1' => 'rsm.rdds.43.rtt...',
+#         'itemid2' => 'rsm.rdds.43.upd...',
+#         'itemid3' => 'rsm.rdds.80.rtt...'
+#    },
+#    'London' => {
+#         'itemid4' => 'rsm.rdds.43.rtt...',
+#         'itemid5' => 'rsm.rdds.43.upd...',
+#         'itemid6' => 'rsm.rdds.80.rtt...'
+#    }
+# }
+sub __get_rdds_dbl_itemids
+{
+    my $tld = shift;
+
+    return __get_rdds_itemids($tld, "'$cfg_rdds_key_43_rtt','$cfg_rdds_key_80_rtt','$cfg_rdds_key_43_upd'");
+}
+
+# return itemids of string items grouped by Probes:
+#
+# {
+#    'Amsterdam' => {
+#         'itemid1' => 'rsm.rdds.43.ip...',
+#         'itemid2' => 'rsm.rdds.80.ip...'
+#    },
+#    'London' => {
+#         'itemid3' => 'rsm.rdds.43.ip...',
+#         'itemid4' => 'rsm.rdds.80.ip...'
+#    }
+# }
+sub __get_rdds_str_itemids
+{
+    my $tld = shift;
+
+    return __get_rdds_itemids($tld, "'$cfg_rdds_key_43_ip','$cfg_rdds_key_80_ip'");
+}
+
+sub __get_rdds_itemids
+{
+    my $tld = shift;
+    my $keys_str = shift;
+
+    my $rows_ref = db_select(
+	"select h.host,i.itemid,i.key_".
+	" from items i,hosts h".
+	" where i.hostid=h.hostid".
+		" and h.host like '$tld %'".
+		" and i.key_ in ($keys_str)".
+		" and i.templateid is not null");
+
+    my %result;
+
+    my $tld_length = length($tld) + 1; # skip white space
+    foreach my $row_ref (@$rows_ref)
+    {
+	my $host = $row_ref->[0];
+	my $itemid = $row_ref->[1];
+	my $key = $row_ref->[2];
+
+	# remove TLD from host name to get just the Probe name
+	my $probe = substr($host, $tld_length);
+
+	$result{$probe}->{$itemid} = $key;
     }
 
     fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
@@ -396,15 +719,17 @@ sub __get_nsip_itemids
 # }
 sub __get_itemids
 {
-    my $key = shift;
     my $tld = shift;
+    my $key = shift;
+
+    my $key_condition = (substr($key, -1) eq ']' ? "i.key_='$key'" : "i.key_ like '$key%'");
 
     my $sql =
 	"select h.host,i.itemid".
 	" from items i,hosts h".
 	" where i.hostid=h.hostid".
 		" and i.templateid is not null".
-		" and i.key_='$key'".
+		" and $key_condition".
 		" and h.host like '$tld %'".
 	" group by h.host,i.itemid";
 
@@ -494,9 +819,7 @@ sub __get_probe_statuses
 		}
 	    }
 
-	    fail("internal error: Name Server,IP pair of item $itemid not found") unless (defined($probe));
-
-	    #$result{$probe} = [] unless (exists($result{$probe}));
+	    fail("internal error: Probe of item (itemid:$itemid) not found") unless (defined($probe));
 
 	    push(@{$result{$probe}}, {'value' => $value, 'clock' => $clock});
 	}

@@ -2274,21 +2274,11 @@ my $log_open = 0;
 
 sub __func
 {
-    my $func;
-    my $i = 3;
+    my $depth = 4;
 
-    while ($i > 0)
-    {
-	$func = (caller($i))[3];
+    my $func = (caller($depth))[3];
 
-	if (defined($func))
-	{
-	    $func =~ s/^[^:]*::(.*)$/$1/;
-	    last;
-	}
-
-	$i--;
-    }
+    $func =~ s/^[^:]*::(.*)$/$1/ if (defined($func));
 
     return "$func()" if (defined($func));
 
