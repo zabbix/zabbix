@@ -12095,7 +12095,7 @@ msgid "Replace applications"
 msgstr "Zamień aplikacje"
 
 #: include/views/configuration.triggers.massupdate.php:144
-msgid "Replace depenencies"
+msgid "Replace dependencies"
 msgstr "Zamień zależności"
 
 #: include/views/configuration.host.massupdate.php:66
