@@ -109,7 +109,7 @@ class CGlobalRegexpTest extends PHPUnit_Framework_TestCase
 		}
 
 		foreach ($failValues as $failValue) {
-			$this->assertNotTrue(CGlobalRegexp::matchExpression($expression, $failValue), 'Value: '.$failValue);
+			$this->assertFalse(CGlobalRegexp::matchExpression($expression, $failValue), 'Value: '.$failValue);
 		}
 	}
 
