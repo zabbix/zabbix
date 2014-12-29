@@ -59,6 +59,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+..F....... [ZBX-9042] unified "mass update" spelling in trigger configuration page (Richlv)
 ..F....... [ZBX-9153] fixed vmware.version item key being listed as vmware.eventlog in the item key helper (Richlv)
 A......... [ZBX-8950] fixed "selecIconMap" option in map.get method (Oleg)
 ..F....... [ZBX-8405] fixed typo in item key helper for system.cpu.num item description (asaveljevs)
@@ -575,6 +576,7 @@ Changes for 2.2.9rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-9042] unified "mass update" spelling in trigger configuration page (Richlv)
 ..F....... [ZBX-9153] fixed vmware.version item key being listed as vmware.eventlog in the item key helper (Richlv)
 ..F....... [ZBX-8405] fixed typo in item key helper for system.cpu.num item description (asaveljevs)
 ..F....... [ZBX-8846] fixed non-existent page displaying (Oleg)
