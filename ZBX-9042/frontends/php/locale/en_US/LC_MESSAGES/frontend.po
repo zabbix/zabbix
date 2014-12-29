@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-02 03:57+0200\n"
+"POT-Creation-Date: 2014-12-22 16:00+0200\n"
 "PO-Revision-Date: 2013-12-17 21:07+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: \n"
@@ -10327,11 +10327,11 @@ msgstr "Number of monitored hosts"
 msgid "Number of processes. <name> and <user> same as in proc.mem item. <state> all (default), run, sleep, zomb. <cmdline> filter by command line (supports regex). Example: proc.num[apache2,www-data]. On Windows, only <name> and <user> are supported."
 msgstr "Number of processes. <name> and <user> same as in proc.mem item. <state> all (default), run, sleep, zomb. <cmdline> filter by command line (supports regex). Example: proc.num[apache2,www-data]. On Windows, only <name> and <user> are supported."
 
-#: include/classes/items/CHelpItems.php:647
+#: include/classes/items/CHelpItems.php:643
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
-#: include/classes/items/CHelpItems.php:651
+#: include/classes/items/CHelpItems.php:647
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
@@ -10428,7 +10428,7 @@ msgstr "Number of values stored in table TRENDS."
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Number of values stored in table TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:695
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
@@ -14669,75 +14669,75 @@ msgstr "VMware cluster status, <url> - VMware service URL, <name> - VMware clust
 msgid "VMware event log, <url> - VMware service URL"
 msgstr "VMware event log, <url> - VMware service URL"
 
-#: include/classes/items/CHelpItems.php:663
+#: include/classes/items/CHelpItems.php:659
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
-#: include/classes/items/CHelpItems.php:671
+#: include/classes/items/CHelpItems.php:667
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
-#: include/classes/items/CHelpItems.php:619
+#: include/classes/items/CHelpItems.php:615
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
-#: include/classes/items/CHelpItems.php:627
+#: include/classes/items/CHelpItems.php:623
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 
-#: include/classes/items/CHelpItems.php:631
+#: include/classes/items/CHelpItems.php:627
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 
-#: include/classes/items/CHelpItems.php:659
+#: include/classes/items/CHelpItems.php:655
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
-#: include/classes/items/CHelpItems.php:635
+#: include/classes/items/CHelpItems.php:631
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:675
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:679
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:639
+#: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
-#: include/classes/items/CHelpItems.php:643
+#: include/classes/items/CHelpItems.php:639
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
-#: include/classes/items/CHelpItems.php:623
+#: include/classes/items/CHelpItems.php:619
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
-#: include/classes/items/CHelpItems.php:655
+#: include/classes/items/CHelpItems.php:651
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
-#: include/classes/items/CHelpItems.php:675
+#: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
-#: include/classes/items/CHelpItems.php:667
+#: include/classes/items/CHelpItems.php:663
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 
@@ -14745,7 +14745,7 @@ msgstr "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware h
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "VMware service full name, <url> - VMware service URL"
 
-#: include/classes/items/CHelpItems.php:615
+#: include/classes/items/CHelpItems.php:699
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware service version, <url> - VMware service URL"
 
