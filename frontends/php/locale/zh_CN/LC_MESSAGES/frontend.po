@@ -11612,7 +11612,7 @@ msgid "Replace applications"
 msgstr "替换应用程序"
 
 #: include/views/configuration.triggers.massupdate.php:131
-msgid "Replace depenencies"
+msgid "Replace dependencies"
 msgstr "替换相依关係"
 
 #: include/views/configuration.host.massupdate.php:66

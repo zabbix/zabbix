@@ -11720,7 +11720,7 @@ msgid "Replace applications"
 msgstr "Înlocuiește aplicațiile"
 
 #: include/views/configuration.triggers.massupdate.php:131
-msgid "Replace depenencies"
+msgid "Replace dependencies"
 msgstr "Înlocuiește dependențele"
 
 #: include/views/configuration.host.massupdate.php:66

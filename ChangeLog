@@ -3,6 +3,7 @@ Changes for 2.2.9rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-9042] unified "mass update" spelling in trigger configuration page (Richlv)
 ..F....... [ZBX-9153] fixed vmware.version item key being listed as vmware.eventlog in the item key helper (Richlv)
 ..F....... [ZBX-8405] fixed typo in item key helper for system.cpu.num item description (asaveljevs)
 ..F....... [ZBX-8846] fixed non-existent page displaying (Oleg)

@@ -11670,7 +11670,7 @@ msgid "Replace applications"
 msgstr "Αντικατάσταση κατηγοριών"
 
 #: include/views/configuration.triggers.massupdate.php:131
-msgid "Replace depenencies"
+msgid "Replace dependencies"
 msgstr "Αντικατάσταση εξαρτήσεων"
 
 #: include/views/configuration.host.massupdate.php:66
