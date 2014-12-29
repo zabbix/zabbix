@@ -593,7 +593,7 @@ function set_color_by_name(id, color) {
  * Add object to the list of favourites.
  */
 function add2favorites(object, objectid) {
-	sendAjaxData('favourite.php?action=favourite.create', {
+	sendAjaxData('zabbix.php?action=favourite.create', {
 		data: {
 			object: object,
 			objectid: objectid
@@ -605,7 +605,7 @@ function add2favorites(object, objectid) {
  * Remove object from the list of favourites. Remove all favourites if objectid==0.
  */
 function rm4favorites(object, objectid) {
-	sendAjaxData('favourite.php?action=favourite.delete', {
+	sendAjaxData('zabbix.php?action=favourite.delete', {
 		data: {
 			object: object,
 			objectid: objectid
