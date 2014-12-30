@@ -99,6 +99,7 @@ sub __write_file
 {
     my $full_path = shift;
     my $text = shift;
+    my $clock = shift;
 
     my $OUTFILE;
 
@@ -115,6 +116,8 @@ sub __write_file
     }
 
     close($OUTFILE);
+
+    utime($clock, $clock, $full_path) if (defined($clock));
 
     return AH_SUCCESS;
 }
@@ -149,6 +152,7 @@ sub ah_save_alarmed
     my $tld = shift;
     my $service = shift;
     my $status = shift;
+    my $clock = shift;
 
     my $alarmed_path = __make_base_path($tld, $service);
 
@@ -162,7 +166,7 @@ sub ah_save_alarmed
 
     $alarmed_path .= "/" . AH_ALARMED_FILE;
 
-    return __write_file($alarmed_path, $status);
+    return __write_file($alarmed_path, $status, $clock);
 }
 
 sub ah_save_service_availability
@@ -170,6 +174,7 @@ sub ah_save_service_availability
     my $tld = shift;
     my $service = shift;
     my $downtime = shift;
+    my $clock = shift;
 
     my $service_availability_path = __make_base_path($tld, $service);
 
@@ -183,7 +188,7 @@ sub ah_save_service_availability
 
     $service_availability_path .= "/" . AH_SERVICE_AVAILABILITY_FILE;
 
-    return __write_file($service_availability_path, $downtime);
+    return __write_file($service_availability_path, $downtime, $clock);
 }
 
 sub ah_save_incident
@@ -237,7 +242,7 @@ sub ah_save_incident_json
 
     $json_path .= "/$clock.$eventid.json";
 
-    return __write_file($json_path, "$json\n");
+    return __write_file($json_path, "$json\n", $clock);
 }
 
 1;

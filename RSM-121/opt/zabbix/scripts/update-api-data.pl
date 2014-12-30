@@ -78,7 +78,9 @@ foreach (@$tlds_ref)
 
 	my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
 
-	if (ah_save_service_availability($tld, $service, $downtime) != AH_SUCCESS)
+	my $clock = get_lastclock($tld, "rsm.slv.$service.rollweek");
+
+	if (ah_save_service_availability($tld, $service, $downtime, $clock) != AH_SUCCESS)
         {
             fail("cannot save service availability: ", ah_get_error());
         }
@@ -96,7 +98,7 @@ foreach (@$tlds_ref)
 	    }
 	}
 
-	if (ah_save_alarmed($tld, $service, $alarmed_status) != AH_SUCCESS)
+	if (ah_save_alarmed($tld, $service, $alarmed_status, $clock) != AH_SUCCESS)
 	{
 	    fail("cannot save alarmed: ", ah_get_error());
 	}

@@ -383,8 +383,7 @@ sub get_lastclock
 	    " from items i,hosts h".
 	    " where i.hostid=h.hostid".
 	    	" and h.host='$host'".
-	    	" and i.key_='$key'".
-	    " limit 1";
+	    	" and i.key_='$key'";
     }
 
     my $rows_ref = db_select($sql);
