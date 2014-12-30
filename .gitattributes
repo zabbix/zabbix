@@ -14,6 +14,7 @@ build/win32/project/Makefile_sender_dll -text
 build/win32/project/Makefile_sender_dll_x64 -text
 create/src/data.tmpl -text
 frontends/php/app/.htaccess -text
+frontends/php/app/controllers/CControllerDiscoveryView.php -text
 frontends/php/app/controllers/CControllerFavouriteCreate.php -text
 frontends/php/app/controllers/CControllerFavouriteDelete.php -text
 frontends/php/app/controllers/CControllerMapView.php -text

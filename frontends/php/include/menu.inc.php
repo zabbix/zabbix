@@ -74,7 +74,9 @@ $ZBX_MENU = array(
 				'sub_pages' => array('map.php')
 			),
 			array(
-				'url' => 'discovery.php',
+				'url' => 'zabbix.php',
+				'action' => 'discovery.view',
+				'active_if' => array('discovery.view'),
 				'label' => _('Discovery'),
 				'user_type' => USER_TYPE_ZABBIX_ADMIN
 			),
