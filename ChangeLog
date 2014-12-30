@@ -1,6 +1,7 @@
 Changes for 2.2.9rc1
 
 New features:
+A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ..F....... [ZBX-9042] unified "mass update" spelling in trigger configuration page (Richlv)
