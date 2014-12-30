@@ -30,7 +30,7 @@ global $page;
 		$main_menu = array();
 		$sub_menus = array();
 
-		$denied_page_requested = zbx_construct_menu($main_menu, $sub_menus, $page);
+		$denied_page_requested = zbx_construct_menu($main_menu, $sub_menus, $page, $data['controller']['action']);
 
 		// render the "Deny access" page
 		if ($denied_page_requested) {

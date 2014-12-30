@@ -91,7 +91,7 @@ $proxyTab->addTab('proxyTab', _('Proxy'), $proxyFormList);
 $proxyForm->addItem($proxyTab);
 
 // append buttons to form
-$cancelButton = new CRedirectButton(_('Cancel'), 'proxies.php?action=proxy.list');
+$cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list');
 $cancelButton->setAttribute('id', 'cancel');
 
 if ($data['proxyid'] == 0) {
@@ -108,7 +108,7 @@ else {
 	$updateButton->setAttribute('id', 'update');
 	$cloneButton = new CSimpleButton(_('Clone'));
 	$cloneButton->setAttribute('id', 'clone');
-	$deleteButton = new CRedirectButton(_('Delete'), 'proxies.php?action=proxy.delete'.url_param('proxyid'),_('Delete proxy?'));
+	$deleteButton = new CRedirectButton(_('Delete'), 'zabbix.php?action=proxy.delete'.url_param('proxyid'),_('Delete proxy?'));
 	$deleteButton->setAttribute('id', 'delete');
 
 	$proxyForm->addItem(makeFormFooter(

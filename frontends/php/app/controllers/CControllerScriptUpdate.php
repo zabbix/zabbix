@@ -43,7 +43,7 @@ class CControllerScriptUpdate extends CController {
 		if (!$result) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('scripts.php?action=script.formedit');
+					$response = new CControllerResponseRedirect('zabbix.php?action=script.formedit');
 					$response->setFormData($this->getInputAll());
 					$response->setMessageError(_('Cannot update script'));
 					$this->setResponse($response);
@@ -97,11 +97,11 @@ class CControllerScriptUpdate extends CController {
 		$result = DBend($result);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect('scripts.php?action=script.list&uncheck=1');
+			$response = new CControllerResponseRedirect('zabbix.php?action=script.list&uncheck=1');
 			$response->setMessageOk(_('Script updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('scripts.php?action=script.formedit&scriptid='.$this->getInput('scriptid'));
+			$response = new CControllerResponseRedirect('zabbix.php?action=script.formedit&scriptid='.$this->getInput('scriptid'));
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot update script'));
 		}

@@ -25,7 +25,7 @@ if ($data['uncheck']) {
 $scriptsWidget = new CWidget();
 
 $createForm = new CForm('get');
-$createForm->addItem(new CRedirectButton(_('Create script'), 'scripts.php?action=script.formcreate'));
+$createForm->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.formcreate'));
 
 $scriptsWidget->addPageHeader(_('CONFIGURATION OF SCRIPTS'), $createForm);
 $scriptsWidget->addHeader(_('Scripts'));
@@ -73,7 +73,7 @@ foreach ($data['scripts'] as $script) {
 
 	$scriptsTable->addRow(array(
 		new CCheckBox('scriptids['.$script['scriptid'].']', 'no', null, $script['scriptid']),
-		new CLink($script['name'], 'scripts.php?action=script.formedit&scriptid='.$script['scriptid']),
+		new CLink($script['name'], 'zabbix.php?action=script.formedit&scriptid='.$script['scriptid']),
 		$scriptType,
 		$scriptExecuteOn,
 		zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),

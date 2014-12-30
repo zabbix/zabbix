@@ -103,6 +103,8 @@ class CControllerMapView extends CController {
 		));
 		$data['severity_min'] = $data['pageFilter']->severityMin;
 
-		$this->setResponse(new CControllerResponseData($data));
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Network maps'));
+		$this->setResponse($response);
 	}
 }

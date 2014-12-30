@@ -20,8 +20,6 @@
 
 class CControllerProxyList extends CController {
 
-	private $data;
-
 	protected function checkInput() {
 		$fields = array(
 			'sort' =>			'fatal|in_str:host',
@@ -34,7 +32,7 @@ class CControllerProxyList extends CController {
 		if (!$result) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('proxies.php?action=proxy.list');
+					$response = new CControllerResponseRedirect('zabbix.php?action=proxy.list');
 					$response->setMessageError(_('Validation error'));
 					$this->setResponse($response);
 					break;
@@ -54,7 +52,7 @@ class CControllerProxyList extends CController {
 	}
 
 	protected function doAction() {
-		$this->data['uncheck'] = $this->hasInput('uncheck');
+		$data['uncheck'] = $this->hasInput('uncheck');
 
 		$sortField = $this->getInput('sort', CProfile::get('web.proxy.php.sort', 'host'));
 		$sortOrder = $this->getInput('sortorder', CProfile::get('web.proxy.php.sortorder', ZBX_SORT_UP));
@@ -64,11 +62,11 @@ class CControllerProxyList extends CController {
 
 		$config = select_config();
 
-		$this->data['sort'] = $sortField;
-		$this->data['sortorder'] = $sortOrder;
-		$this->data['config']['max_in_table'] = $config['max_in_table'];
+		$data['sort'] = $sortField;
+		$data['sortorder'] = $sortOrder;
+		$data['config']['max_in_table'] = $config['max_in_table'];
 
-		$this->data['proxies'] = API::Proxy()->get(array(
+		$data['proxies'] = API::Proxy()->get(array(
 			'editable' => true,
 			'selectHosts' => array('hostid', 'host', 'name', 'status'),
 			'output' => array('proxyid', 'host', 'status', 'lastaccess'),
@@ -76,13 +74,13 @@ class CControllerProxyList extends CController {
 			'limit' => $config['search_limit'] + 1
 		));
 
-		$this->data['proxies'] = zbx_toHash($this->data['proxies'], 'proxyid');
+		$data['proxies'] = zbx_toHash($data['proxies'], 'proxyid');
 
-		$proxyIds = array_keys($this->data['proxies']);
+		$proxyIds = array_keys($data['proxies']);
 
 		// sorting & paging
-		order_result($this->data['proxies'], $sortField, $sortOrder);
-		$this->data['paging'] = getPagingLine($this->data['proxies']);
+		order_result($data['proxies'], $sortField, $sortOrder);
+		$data['paging'] = getPagingLine($data['proxies']);
 
 		// calculate performance
 		$dbPerformance = DBselect(
@@ -97,8 +95,8 @@ class CControllerProxyList extends CController {
 			' GROUP BY h.proxy_hostid'
 		);
 		while ($performance = DBfetch($dbPerformance)) {
-			if (isset($this->data['proxies'][$performance['proxy_hostid']])) {
-				$this->data['proxies'][$performance['proxy_hostid']]['perf'] = round($performance['qps'], 2);
+			if (isset($data['proxies'][$performance['proxy_hostid']])) {
+				$data['proxies'][$performance['proxy_hostid']]['perf'] = round($performance['qps'], 2);
 			}
 		}
 
@@ -111,15 +109,17 @@ class CControllerProxyList extends CController {
 			'monitored' => true
 		));
 		foreach ($items as $item) {
-			if (isset($this->data['proxies'][$item['proxy_hostid']])) {
-				if (!isset($this->data['proxies'][$item['proxy_hostid']]['item_count'])) {
-					$this->data['proxies'][$item['proxy_hostid']]['item_count'] = 0;
+			if (isset($data['proxies'][$item['proxy_hostid']])) {
+				if (!isset($data['proxies'][$item['proxy_hostid']]['item_count'])) {
+					$data['proxies'][$item['proxy_hostid']]['item_count'] = 0;
 				}
 
-				$this->data['proxies'][$item['proxy_hostid']]['item_count'] += $item['rowscount'];
+				$data['proxies'][$item['proxy_hostid']]['item_count'] += $item['rowscount'];
 			}
 		}
 
-		$this->setResponse(new CControllerResponseData($this->data));
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Configuration of proxies'));
+		$this->setResponse($response);
 	}
 }

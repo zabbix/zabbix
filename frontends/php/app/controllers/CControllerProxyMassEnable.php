@@ -76,7 +76,7 @@ class CControllerProxyMassEnable extends CController {
 
 		$result = DBend($result);
 
-		$response = new CControllerResponseRedirect('proxies.php?action=proxy.list&uncheck=1');
+		$response = new CControllerResponseRedirect('zabbix.php?action=proxy.list&uncheck=1');
 
 		if ($result) {
 			$response->setMessageOk(_n('Host enabled', 'Hosts enabled', $updated));
