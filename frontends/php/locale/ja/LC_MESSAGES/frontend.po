@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-30 06:38+0200\n"
-"PO-Revision-Date: 2014-12-15 04:42+0300\n"
+"POT-Creation-Date: 2014-12-30 07:29+0200\n"
+"PO-Revision-Date: 2014-12-27 10:13+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1418611352.0\n"
+"X-POOTLE-MTIME: 1419667980.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -6661,7 +6661,7 @@ msgstr ""
 
 #: include/classes/api/services/CDRule.php:215
 msgid "IP range cannot be empty."
-msgstr "IPレンジは必須項目です"
+msgstr "IPアドレスの範囲は必須項目です。"
 
 #: include/hosts.inc.php:477 include/items.inc.php:283
 #: include/views/administration.script.edit.php:45
@@ -11968,7 +11968,7 @@ msgstr "アプリケーションを置換"
 
 #: include/views/configuration.triggers.massupdate.php:144
 msgid "Replace dependencies"
-msgstr "依存関係を置換"
+msgstr ""
 
 #: include/views/configuration.host.massupdate.php:66
 msgid "Replace host groups"
@@ -14847,7 +14847,7 @@ msgstr "ユーザーを追加しました"
 
 #: include/views/configuration.httpconf.edit.php:92
 msgid "User agent string"
-msgstr ""
+msgstr "ユーザーエージェント文字列"
 
 #: include/views/administration.users.edit.php:316
 msgid "User can't change type for himself"
