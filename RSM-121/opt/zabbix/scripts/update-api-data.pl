@@ -23,6 +23,12 @@ if (defined($OPTS{'debug'}))
 my @services;
 if (defined($OPTS{'service'}))
 {
+    if ($OPTS{'service'} ne 'dns' and $OPTS{'service'} ne 'dnssec' and $OPTS{'service'} ne 'rdds' and $OPTS{'service'} ne 'epp')
+    {
+	print($OPTS{'service'}, ": unknown service\n");
+	usage();
+    }
+
     push(@services, lc($OPTS{'service'}));
 }
 else
@@ -34,20 +40,50 @@ set_slv_config(get_rsm_config());
 
 db_connect();
 
-my $cfg_dns_interval = get_macro_dns_udp_delay();
-my $cfg_minns = get_macro_minns();
-my $cfg_dns_key_status = 'rsm.dns.udp[{$RSM.TLD}]'; # 0 - down, 1 - up
-my $cfg_dns_key_rtt = 'rsm.dns.udp.rtt[{$RSM.TLD},';
+my $cfg_dns_interval;
+my $cfg_dns_minns;
+my $cfg_dns_key_status;
+my $cfg_dns_key_rtt;
+my $cfg_dns_statusmaps;
+my $cfg_dns_valuemaps;
 
-my $cfg_rdds_interval = get_macro_rdds_delay();
-my $cfg_rdds_key_status = 'rsm.rdds[{$RSM.TLD}'; # 0 - down, 1 - up, 2 - only 43, 3 - only 80
-my $cfg_rdds_key_43_rtt = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
-my $cfg_rdds_key_43_ip = 'rsm.rdds.43.ip[{$RSM.TLD}]';
-my $cfg_rdds_key_43_upd = 'rsm.rdds.43.upd[{$RSM.TLD}]';
-my $cfg_rdds_key_80_rtt = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
-my $cfg_rdds_key_80_ip = 'rsm.rdds.80.ip[{$RSM.TLD}]';
+my $cfg_rdds_interval;
+my $cfg_rdds_key_status;
+my $cfg_rdds_key_43_rtt;
+my $cfg_rdds_key_43_ip;
+my $cfg_rdds_key_43_upd;
+my $cfg_rdds_key_80_rtt;
+my $cfg_rdds_key_80_ip;
+my $cfg_rdds_valuemaps;
 
-my $cfg_epp_interval = get_macro_epp_delay();
+my $cfg_epp_interval;
+
+my %services_hash = map { $_ => 1 } @services;
+
+if (exists($services_hash{'dns'}) or exists($services_hash{'dnssec'}))
+{
+    $cfg_dns_interval = get_macro_dns_udp_delay();
+    $cfg_dns_minns = get_macro_minns();
+    $cfg_dns_key_status = 'rsm.dns.udp[{$RSM.TLD}]'; # 0 - down, 1 - up
+    $cfg_dns_key_rtt = 'rsm.dns.udp.rtt[{$RSM.TLD},';
+    $cfg_dns_statusmaps = get_statusmaps('dns');
+    $cfg_dns_valuemaps = get_valuemaps('dns');
+}
+if (exists($services_hash{'rdds'}))
+{
+    $cfg_rdds_interval = get_macro_rdds_delay();
+    $cfg_rdds_key_status = 'rsm.rdds[{$RSM.TLD}'; # 0 - down, 1 - up, 2 - only 43, 3 - only 80
+    $cfg_rdds_key_43_rtt = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
+    $cfg_rdds_key_43_ip = 'rsm.rdds.43.ip[{$RSM.TLD}]';
+    $cfg_rdds_key_43_upd = 'rsm.rdds.43.upd[{$RSM.TLD}]';
+    $cfg_rdds_key_80_rtt = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
+    $cfg_rdds_key_80_ip = 'rsm.rdds.80.ip[{$RSM.TLD}]';
+    $cfg_rdds_valuemaps = get_valuemaps('rdds');
+}
+if (exists($services_hash{'epp'}))
+{
+    $cfg_epp_interval = get_macro_epp_delay();
+}
 
 my $from = $OPTS{'from'};
 my $till = $OPTS{'till'};
@@ -105,14 +141,10 @@ foreach (@$tlds_ref)
 
 	my ($nsips_ref, $dns_items_ref, $rdds_dbl_items_ref, $rdds_str_items_ref, $interval);
 
-	if ($service eq 'dns')
+	if ($service eq 'dns' or $service eq 'dnssec')
 	{
 	    $nsips_ref = get_nsips($tld, $cfg_dns_key_rtt, 1); # templated
 	    $dns_items_ref = __get_dns_itemids($nsips_ref, $cfg_dns_key_rtt, $tld);
-	    $interval = $cfg_dns_interval;
-	}
-	elsif ($service eq 'dnssec')
-	{
 	    $interval = $cfg_dns_interval;
 	}
 	elsif ($service eq 'rdds')
@@ -131,16 +163,14 @@ foreach (@$tlds_ref)
 	foreach (@$incidents)
 	{
 	    my $eventid = $_->{'eventid'};
-	    my $start = $_->{'start'};
-	    my $end = $_->{'end'};
+	    my $event_start = $_->{'start'};
+	    my $event_end = $_->{'end'};
 	    my $false_positive = $_->{'false_positive'};
 
-	    my $event_clock = $_->{'start'};
+	    my $start = $from if (defined($from) and $event_start < $from);
+	    my $end = $till if (defined($till) and not defined($event_end));
 
-	    $start = $from if (defined($from) and $_->{'start'} < $from);
-	    $end = $till if (defined($till) and not defined($end));
-
-	    if (ah_save_incident($tld, $service, $eventid, $event_clock, $end, $false_positive) != AH_SUCCESS)
+	    if (ah_save_incident($tld, $service, $eventid, $event_start, $event_end, $false_positive) != AH_SUCCESS)
 	    {
 		fail("cannot save incident: ", ah_get_error());
 	    }
@@ -162,7 +192,7 @@ foreach (@$tlds_ref)
 
 		my $result;
 
-		$result->{'status'} = ($value == 1 ? "Up" : "Down");
+		$result->{'status'} = get_result_string($cfg_dns_statusmaps, $value);
 		$result->{'clock'} = $clock;
 
 		# time bounds for results from proxies
@@ -174,12 +204,12 @@ foreach (@$tlds_ref)
 
 	    my $test_results_count = scalar(@test_results);
 
-	    fail("no results found within incident: eventid:$eventid clock:$event_clock") if ($test_results_count == 0);
+	    fail("no results found within incident: eventid:$eventid clock:$event_start") if ($test_results_count == 0);
 
 	    my $values_from = $test_results[0]->{'start'};
 	    my $values_till = $test_results[$test_results_count - 1]->{'end'};
 
-	    if ($service eq 'dns')
+	    if ($service eq 'dns' or $service eq 'dnssec')
 	    {
 		my $values_ref = __get_dns_test_values($dns_items_ref, $values_from, $values_till);
 
@@ -213,14 +243,9 @@ foreach (@$tlds_ref)
 
 			    my $tr_ref = $test_results[$test_result_index];
 
-			    my $r_status = $tr_ref->{'status'};
-			    my $r_clock = $tr_ref->{'clock'};
-			    my $r_start = $tr_ref->{'start'};
-			    my $r_end = $tr_ref->{'end'};
-
 			    $tr_ref->{'probes'}->{$probe}->{'status'} = 'No result' unless (exists($tr_ref->{'probes'}->{$probe}->{'status'}));
 
-                            $tr_ref->{'probes'}->{$probe}->{'details'}->{$ns}->{$clock} = {'rtt' => $endvalues_ref->{$clock}, 'ip' => $ip};
+                            $tr_ref->{'probes'}->{$probe}->{'details'}->{$ns}->{$clock} = {'rtt' => get_detailed_result($cfg_dns_valuemaps, $endvalues_ref->{$clock}), 'ip' => $ip};
 			}
 		    }
 		}
@@ -246,13 +271,13 @@ foreach (@$tlds_ref)
 			    next if ($status_ref->{'clock'} < $tr_start);
 			    last if ($status_ref->{'clock'} > $tr_end);
 
-			    $tr_ref->{'probes'}->{$probe}->{'status'} = ($status_ref->{'value'} >= $cfg_minns ? "Up" : "Down");
+			    $tr_ref->{'probes'}->{$probe}->{'status'} = ($status_ref->{'value'} >= $cfg_dns_minns ? "Up" : "Down");
 			}
 		    }
 
 		    my $json = encode_json($tr_ref);
 
-		    if (ah_save_incident_json($tld, $service, $eventid, $event_clock, $json, $tr_ref->{'clock'}) != AH_SUCCESS)
+		    if (ah_save_incident_json($tld, $service, $eventid, $event_start, $json, $tr_ref->{'clock'}) != AH_SUCCESS)
 		    {
 			fail("cannot save incident: ", ah_get_error());
 		    }
@@ -293,11 +318,6 @@ foreach (@$tlds_ref)
 			    fail("no status of the value (probe:$probe service:$service clock:$clock) found in the database") if ($test_result_index == $test_results_count);
 
 			    my $tr_ref = $test_results[$test_result_index];
-
-			    my $r_status = $tr_ref->{'status'};
-			    my $r_clock = $tr_ref->{'clock'};
-			    my $r_start = $tr_ref->{'start'};
-			    my $r_end = $tr_ref->{'end'};
 
 			    $tr_ref->{'ports'}->{$port}->{$probe}->{'status'} = 'No result' unless (exists($tr_ref->{'ports'}->{$port}->{$probe}->{'status'}));
 
@@ -341,7 +361,7 @@ foreach (@$tlds_ref)
 
 		    my $json = encode_json($tr_ref);
 
-		    if (ah_save_incident_json($tld, $service, $eventid, $event_clock, $json, $tr_ref->{'clock'}) != AH_SUCCESS)
+		    if (ah_save_incident_json($tld, $service, $eventid, $event_start, $json, $tr_ref->{'clock'}) != AH_SUCCESS)
 		    {
 			fail("cannot save incident: ", ah_get_error());
 		    }
@@ -532,7 +552,7 @@ sub __get_rdds_test_values
 	my $port = __get_rdds_port($key);
 	my $type = __get_rdds_dbl_type($key);
 
-	$result{$probe}->{$port}->{$clock}->{$type} = $value;
+	$result{$probe}->{$port}->{$clock}->{$type} = ($type eq 'rtt' ? get_detailed_result($cfg_rdds_valuemaps, $value) : $value);
     }
 
     my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
@@ -838,7 +858,7 @@ update-api-data.pl - save information about the incidents to a filesystem
 
 =head1 SYNOPSIS
 
-update-api-data.pl --service <dns|rdds|epp> [--tld tld] [--from timestamp] [--till timestamp] [--test] [--debug] [--help]
+update-api-data.pl --service <dns|dnssec|rdds|epp> [--tld tld] [--from timestamp] [--till timestamp] [--test] [--debug] [--help]
 
 =head1 OPTIONS
 
@@ -846,7 +866,7 @@ update-api-data.pl --service <dns|rdds|epp> [--tld tld] [--from timestamp] [--ti
 
 =item B<--service> name
 
-Specify the name of the service: dns, rdds or epp.
+Specify the name of the service: dns, dnssec, rdds or epp.
 
 =item B<--tld> tld
 

@@ -72,7 +72,7 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_avail process_slv_ns_avail
 		process_slv_monthly get_results get_item_values check_lastclock sql_time_condition get_incidents
 		get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
-		get_itemids_by_hostids get_nsip_values
+		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
 		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str usage);
 
 # configuration, set in set_slv_config()
@@ -2160,6 +2160,91 @@ sub get_nsip_values
     }
 
     return \%result;
+}
+
+sub __get_valuemappings
+{
+    my $vmname = shift;
+
+    my $rows_ref = db_select("select m.value,m.newvalue from valuemaps v,mappings m where v.valuemapid=m.valuemapid and v.name='$vmname'");
+
+    my %result;
+    foreach my $row_ref (@$rows_ref)
+    {
+	$result{$row_ref->[0]} = $row_ref->[1];
+    }
+
+    return \%result;
+}
+
+sub get_valuemaps
+{
+    my $service = shift;
+
+    my $vmname;
+    if ($service eq 'dns' or $service eq 'dnssec')
+    {
+	$vmname = 'RSM DNS result';
+    }
+    elsif ($service eq 'rdds')
+    {
+	$vmname = 'RSM RDDS result';
+    }
+    elsif ($service eq 'epp')
+    {
+	$vmname = 'RSM EPP availability';
+    }
+    else
+    {
+	fail("service '$service' is unknown");
+    }
+
+    return __get_valuemappings($vmname);
+}
+
+sub get_statusmaps
+{
+    my $service = shift;
+
+    my $vmname;
+    if ($service eq 'dns' or $service eq 'dnssec' or $service eq 'epp')
+    {
+	$vmname = 'RSM DNS availability';
+    }
+    elsif ($service eq 'rdds')
+    {
+	$vmname = 'RSM RDDS availability';
+    }
+    else
+    {
+	fail("service '$service' is unknown");
+    }
+
+    return __get_valuemappings($vmname);
+}
+
+sub get_detailed_result
+{
+    my $maps = shift;
+    my $value = shift;
+
+    my $value_int = int($value);
+
+    return $value unless (exists($maps->{$value_int}));
+
+    return "$value, " . $maps->{$value_int};
+}
+
+sub get_result_string
+{
+    my $maps = shift;
+    my $value = shift;
+
+    my $value_int = int($value);
+
+    return $value unless (exists($maps->{$value_int}));
+
+    return $maps->{$value_int};
 }
 
 sub slv_exit
