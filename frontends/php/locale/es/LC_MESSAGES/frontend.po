@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-22 16:56+0200\n"
+"POT-Creation-Date: 2014-12-30 06:38+0200\n"
 "PO-Revision-Date: 2014-10-18 05:18+0300\n"
 "Last-Translator: Saúl <saulortega.co@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -9165,6 +9165,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.trigger.prototype.list.php:143
 #: include/views/configuration.triggers.list.php:222
+#: include/views/configuration.triggers.massupdate.php:159
 msgid "Mass update"
 msgstr "Actualizar masivamente"
 
@@ -14322,10 +14323,6 @@ msgstr "Iniciadores eliminados"
 #: include/classes/html/CTriggersInfo.php:98 include/screens.inc.php:42
 msgid "Triggers info"
 msgstr "Información de los iniciadores"
-
-#: include/views/configuration.triggers.massupdate.php:159
-msgid "Triggers massupdate"
-msgstr ""
 
 #: include/screens.inc.php:43
 msgid "Triggers overview"
