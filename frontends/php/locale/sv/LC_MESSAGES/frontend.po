@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-22 16:56+0200\n"
+"POT-Creation-Date: 2014-12-30 06:38+0200\n"
 "PO-Revision-Date: 2014-02-02 00:19+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -9139,6 +9139,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.trigger.prototype.list.php:143
 #: include/views/configuration.triggers.list.php:222
+#: include/views/configuration.triggers.massupdate.php:159
 msgid "Mass update"
 msgstr ""
 
@@ -14296,10 +14297,6 @@ msgstr "Utlösare togs bort"
 #: include/classes/html/CTriggersInfo.php:98 include/screens.inc.php:42
 msgid "Triggers info"
 msgstr "Info om utlösare"
-
-#: include/views/configuration.triggers.massupdate.php:159
-msgid "Triggers massupdate"
-msgstr ""
 
 #: include/screens.inc.php:43
 msgid "Triggers overview"
