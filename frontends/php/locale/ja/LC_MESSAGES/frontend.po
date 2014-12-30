@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-22 16:33+0200\n"
+"POT-Creation-Date: 2014-12-30 06:33+0200\n"
 "PO-Revision-Date: 2014-12-01 01:46+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -9070,6 +9070,7 @@ msgstr "マスク"
 #: hosts.php:1066 include/views/configuration.item.list.php:273
 #: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.triggers.list.php:299
+#: include/views/configuration.triggers.massupdate.php:159
 msgid "Mass update"
 msgstr "一括更新"
 
@@ -14221,10 +14222,6 @@ msgstr "トリガーを削除しました"
 #: include/classes/html/CTriggersInfo.php:107 include/screens.inc.php:42
 msgid "Triggers info"
 msgstr "トリガー情報"
-
-#: include/views/configuration.triggers.massupdate.php:159
-msgid "Triggers massupdate"
-msgstr "トリガーの一括更新"
 
 #: include/screens.inc.php:43
 msgid "Triggers overview"

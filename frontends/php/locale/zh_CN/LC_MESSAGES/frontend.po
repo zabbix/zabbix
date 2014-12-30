@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-22 16:33+0200\n"
+"POT-Creation-Date: 2014-12-30 06:33+0200\n"
 "PO-Revision-Date: 2013-08-25 15:11+0300\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -9081,6 +9081,7 @@ msgstr "掩码"
 #: hosts.php:1066 include/views/configuration.item.list.php:273
 #: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.triggers.list.php:299
+#: include/views/configuration.triggers.massupdate.php:159
 msgid "Mass update"
 msgstr "批量更新"
 
@@ -14234,10 +14235,6 @@ msgstr "触发器已删除"
 #: include/classes/html/CTriggersInfo.php:107 include/screens.inc.php:42
 msgid "Triggers info"
 msgstr "触发器资讯"
-
-#: include/views/configuration.triggers.massupdate.php:159
-msgid "Triggers massupdate"
-msgstr "触发器大量更新"
 
 #: include/screens.inc.php:43
 msgid "Triggers overview"

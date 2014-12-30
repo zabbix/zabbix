@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-22 16:33+0200\n"
+"POT-Creation-Date: 2014-12-30 06:33+0200\n"
 "PO-Revision-Date: 2014-10-06 06:18+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -9134,6 +9134,7 @@ msgstr "Μάσκα"
 #: hosts.php:1066 include/views/configuration.item.list.php:273
 #: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.triggers.list.php:299
+#: include/views/configuration.triggers.massupdate.php:159
 msgid "Mass update"
 msgstr "Μαζική ενημέρωση"
 
@@ -14300,10 +14301,6 @@ msgstr "Εναύσματα διεγράφησαν"
 #: include/classes/html/CTriggersInfo.php:107 include/screens.inc.php:42
 msgid "Triggers info"
 msgstr "Πληροφορίες εναυσμάτων"
-
-#: include/views/configuration.triggers.massupdate.php:159
-msgid "Triggers massupdate"
-msgstr "Μαζική ενημέρωση εναυσμάτων"
 
 #: include/screens.inc.php:43
 msgid "Triggers overview"
