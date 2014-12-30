@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-30 06:33+0200\n"
-"PO-Revision-Date: 2014-11-26 21:41+0300\n"
+"POT-Creation-Date: 2014-12-30 06:34+0200\n"
+"PO-Revision-Date: 2014-12-22 18:25+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1417030872.0\n"
+"X-POOTLE-MTIME: 1419265503.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -6735,11 +6735,11 @@ msgstr "IP adresa"
 
 #: include/classes/validators/CIPValidator.php:43
 msgid "IP address cannot be empty."
-msgstr ""
+msgstr "IP adresa nemôže byť prázdna."
 
 #: include/classes/validators/CIPRangeValidator.php:62
 msgid "IP address range cannot be empty."
-msgstr ""
+msgstr "Rozsah IP nemôže byť prázdny."
 
 #: include/classes/api/services/CHostInterface.php:292
 msgid "IP and DNS cannot be empty for host interface."
@@ -6753,7 +6753,7 @@ msgstr "Rozsah IP"
 #: include/classes/validators/CIPRangeValidator.php:80
 #, c-format
 msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit."
-msgstr ""
+msgstr "Rozsah IP \"%1$s\" prekročil \"%2$s\" limit adries."
 
 #: include/classes/api/services/CDRule.php:215
 msgid "IP range cannot be empty."
@@ -8013,22 +8013,22 @@ msgstr "Interval (v sekundách)"
 #: include/classes/validators/CIPValidator.php:49
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
-msgstr ""
+msgstr "Neplatná IP adresa \"%1$s\"."
 
 #: include/classes/validators/CIPValidator.php:37
 #, c-format
 msgid "Invalid IP address \"%1$s\": must be a string."
-msgstr ""
+msgstr "Neplatná IP adresa \"%1$s\": musí byť reťazec."
 
 #: include/classes/validators/CIPRangeValidator.php:72
 #, c-format
 msgid "Invalid IP address range \"%1$s\"."
-msgstr ""
+msgstr "Neplatný rozsah IP \"%1$s\"."
 
 #: include/classes/validators/CIPRangeValidator.php:56
 #, c-format
 msgid "Invalid IP address range \"%1$s\": must be a string."
-msgstr ""
+msgstr "Neplatný rozsah IP \"%1$s\": musí byť reťazec."
 
 #: include/classes/core/CJsonRpc.php:170
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -12074,7 +12074,7 @@ msgstr "Nahradiť aplikácie"
 
 #: include/views/configuration.triggers.massupdate.php:144
 msgid "Replace dependencies"
-msgstr "Nahradiť závislosti"
+msgstr ""
 
 #: include/views/configuration.host.massupdate.php:66
 msgid "Replace host groups"

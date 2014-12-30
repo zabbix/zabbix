@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-30 06:33+0200\n"
+"POT-Creation-Date: 2014-12-30 06:34+0200\n"
 "PO-Revision-Date: 2014-12-18 19:28+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -12026,7 +12026,7 @@ msgstr "Substituir aplicações"
 
 #: include/views/configuration.triggers.massupdate.php:144
 msgid "Replace dependencies"
-msgstr "Substituir dependências"
+msgstr ""
 
 #: include/views/configuration.host.massupdate.php:66
 msgid "Replace host groups"

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-30 06:33+0200\n"
-"PO-Revision-Date: 2014-12-01 01:46+0300\n"
+"POT-Creation-Date: 2014-12-30 06:34+0200\n"
+"PO-Revision-Date: 2014-12-27 10:07+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1417391207.0\n"
+"X-POOTLE-MTIME: 1419667648.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -6626,11 +6626,11 @@ msgstr "IPアドレス"
 
 #: include/classes/validators/CIPValidator.php:43
 msgid "IP address cannot be empty."
-msgstr ""
+msgstr "IPアドレスは必須項目です。"
 
 #: include/classes/validators/CIPRangeValidator.php:62
 msgid "IP address range cannot be empty."
-msgstr ""
+msgstr "IPアドレスの範囲は必須項目です。"
 
 #: include/classes/api/services/CHostInterface.php:292
 msgid "IP and DNS cannot be empty for host interface."
@@ -6644,11 +6644,11 @@ msgstr "IPアドレスの範囲"
 #: include/classes/validators/CIPRangeValidator.php:80
 #, c-format
 msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit."
-msgstr ""
+msgstr "IPアドレスの範囲\"%1$s\"がアドレスの制限\"%2$s\"を超えています。"
 
 #: include/classes/api/services/CDRule.php:215
 msgid "IP range cannot be empty."
-msgstr "IPレンジは必須項目です"
+msgstr "IPアドレスの範囲\"%1$s\"がアドレスの制限\"%2$s\"を超えています。"
 
 #: include/hosts.inc.php:477 include/items.inc.php:283
 #: include/views/administration.script.edit.php:45
@@ -7904,22 +7904,22 @@ msgstr "更新間隔 (秒)"
 #: include/classes/validators/CIPValidator.php:49
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
-msgstr ""
+msgstr "IPアドレス\"%1$s\"が正しくありません。"
 
 #: include/classes/validators/CIPValidator.php:37
 #, c-format
 msgid "Invalid IP address \"%1$s\": must be a string."
-msgstr ""
+msgstr "IPアドレス\"%1$s\"が正しくありません: 文字列である必要があります。"
 
 #: include/classes/validators/CIPRangeValidator.php:72
 #, c-format
 msgid "Invalid IP address range \"%1$s\"."
-msgstr ""
+msgstr "IPアドレスの範囲\"%1$s\"が正しくありません。"
 
 #: include/classes/validators/CIPRangeValidator.php:56
 #, c-format
 msgid "Invalid IP address range \"%1$s\": must be a string."
-msgstr ""
+msgstr "IPアドレスの範囲\"%1$s\"が正しくありません: 文字列である必要があります。"
 
 #: include/classes/core/CJsonRpc.php:170
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -11945,7 +11945,7 @@ msgstr "アプリケーションを置換"
 
 #: include/views/configuration.triggers.massupdate.php:144
 msgid "Replace dependencies"
-msgstr "依存関係を置換"
+msgstr ""
 
 #: include/views/configuration.host.massupdate.php:66
 msgid "Replace host groups"
