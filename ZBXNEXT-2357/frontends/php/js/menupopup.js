@@ -398,7 +398,7 @@ function getMenuPopupMap(options) {
 
 		// submap
 		if (typeof options.gotos.submap !== 'undefined') {
-			var url = new Curl('maps.php');
+			var url = new Curl('zabbix.php?action=map.view');
 
 			jQuery.each(options.gotos.submap, function(name, value) {
 				url.setArgument(name, value);

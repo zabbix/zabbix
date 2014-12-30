@@ -48,9 +48,15 @@ global $page;
 				$sub_page['menu_text'] = SPACE;
 			}
 
-			$sub_page['menu_url'] .= '?ddreset=1';
+			$url = new CUrl($sub_page['menu_url']);
+			if ($sub_page['menu_action'] !== null) {
+				$url->setArgument('action', $sub_page['menu_action']);
+			}
+			else {
+				$url->setArgument('ddreset', 1);
+			}
 
-			$sub_menu_item = new CLink($sub_page['menu_text'], $sub_page['menu_url'], $sub_page['class'].' nowrap');
+			$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl(), $sub_page['class'].' nowrap', null, false);
 			if ($sub_page['selected']) {
 				$sub_menu_item = new CSpan($sub_menu_item, 'active nowrap');
 			}
@@ -82,10 +88,8 @@ global $page;
 	$menu_divs[] = $sub_menu_div;
 	$search_div = null;
 
-	if ($page['file'] != 'index.php' && CWebUser::$data['userid'] > 0) {
-		$searchForm = new CView('general.search');
-		$search_div = $searchForm->render();
-	}
+	$searchForm = new CView('general.search');
+	$search_div = $searchForm->render();
 
 	$sub_menu_table->addRow(array($menu_divs, $search_div));
 	$page_menu->addItem($sub_menu_table);

@@ -27,7 +27,7 @@ $proxyWidget = new CWidget();
 // create new proxy button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addItem(new CRedirectButton(_('Create proxy'), 'proxies.php?action=proxy.formcreate'));
+$createForm->addItem(new CRedirectButton(_('Create proxy'), 'zabbix.php?action=proxy.formcreate'));
 $proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'), $createForm);
 $proxyWidget->addHeader(_('Proxies'));
 $proxyWidget->addHeaderRowNumber();
@@ -84,7 +84,7 @@ foreach ($data['proxies'] as $proxy) {
 
 	$proxyTable->addRow(array(
 		new CCheckBox('proxyids['.$proxy['proxyid'].']', null, null, $proxy['proxyid']),
-		new CLink($proxy['host'], 'proxies.php?action=proxy.formedit&proxyid='.$proxy['proxyid']),
+		new CLink($proxy['host'], 'zabbix.php?action=proxy.formedit&proxyid='.$proxy['proxyid']),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
 		($proxy['lastaccess'] == 0) ? '-' : zbx_date2age($proxy['lastaccess']),
 		isset($proxy['host']) ? count($proxy['hosts']) : '',

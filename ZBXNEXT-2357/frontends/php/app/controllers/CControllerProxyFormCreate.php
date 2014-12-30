@@ -51,7 +51,7 @@ class CControllerProxyFormCreate extends CController {
 
 	protected function doAction() {
 		if ($this->hasInput('form')) {
-			$this->data = array(
+			$data = array(
 				'proxyid' => 0,
 				'name' => $this->getInput('host'),
 				'status' => $this->getInput('status'),
@@ -61,7 +61,7 @@ class CControllerProxyFormCreate extends CController {
 			);
 		}
 		else {
-			$this->data = array(
+			$data = array(
 				'proxyid' => 0,
 				'name' => '',
 				'status' => HOST_STATUS_PROXY_ACTIVE,
@@ -76,14 +76,16 @@ class CControllerProxyFormCreate extends CController {
 		}
 
 		// fetch available hosts, skip host prototypes
-		$this->data['all_hosts'] = DBfetchArray(DBselect(
+		$data['all_hosts'] = DBfetchArray(DBselect(
 			'SELECT h.hostid,h.proxy_hostid,h.name,h.flags'.
 			' FROM hosts h'.
 			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 				' AND h.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
 		));
-		order_result($this->data['all_hosts'], 'name');
+		order_result($data['all_hosts'], 'name');
 
-		$this->setResponse(new CControllerResponseData($this->data));
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Configuration of proxies'));
+		$this->setResponse($response);
 	}
 }

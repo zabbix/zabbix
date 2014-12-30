@@ -20,7 +20,17 @@
 
 global $page, $DB;
 
-$pageHeader = new CPageHeader(isset($page['title']) ? $page['title'] : _('Zabbix'));
+if (isset($page['title'])) {
+	$title = $page['title'];
+}
+else if (isset($data['page']['title'])) {
+	$title = $data['page']['title'];
+}
+else {
+	$title = _('Zabbix');
+}
+
+$pageHeader = new CPageHeader($title);
 $pageHeader->addCssInit();
 
 $css = ZBX_DEFAULT_THEME;
@@ -48,7 +58,7 @@ CSS;
 $css = CHtml::encode($css);
 $pageHeader->addCssFile('styles/themes/'.$css.'/main.css');
 
-if ($page['file'] == 'sysmap.php') {
+if (isset($page['file']) && $page['file'] == 'sysmap.php') {
 	$pageHeader->addCssFile('imgstore.php?css=1&output=css');
 }
 $pageHeader->addJsFile('js/browsers.js');

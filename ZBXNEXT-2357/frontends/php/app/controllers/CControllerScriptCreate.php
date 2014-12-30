@@ -42,7 +42,7 @@ class CControllerScriptCreate extends CController {
 		if (!$result) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('scripts.php?action=script.formcreate');
+					$response = new CControllerResponseRedirect('zabbix.php?action=script.formcreate');
 					$response->setFormData($this->getInputAll());
 					$response->setMessageError(_('Cannot add script'));
 					$this->setResponse($response);
@@ -88,11 +88,11 @@ class CControllerScriptCreate extends CController {
 		$result = DBend($result);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect('scripts.php?action=script.list&uncheck=1');
+			$response = new CControllerResponseRedirect('zabbix.php?action=script.list&uncheck=1');
 			$response->setMessageOk(_('Script added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('scripts.php?action=script.formcreate');
+			$response = new CControllerResponseRedirect('zabbix.php?action=script.formcreate');
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot add script'));
 		}

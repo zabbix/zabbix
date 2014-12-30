@@ -20,8 +20,6 @@
 
 class CControllerScriptList extends CController {
 
-	private $data;
-
 	protected function checkInput() {
 		$fields = array(
 			'sort' =>			'fatal|in_str:command,name',
@@ -34,7 +32,7 @@ class CControllerScriptList extends CController {
 		if (!$result) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('scripts.php?action=script.list');
+					$response = new CControllerResponseRedirect('zabbix.php?action=script.list');
 					$response->setMessageError(_('Validation error'));
 					$this->setResponse($response);
 					break;
@@ -43,7 +41,6 @@ class CControllerScriptList extends CController {
 					break;
 			}
 		}
-
 
 		return $result;
 	}
@@ -55,7 +52,7 @@ class CControllerScriptList extends CController {
 	}
 
 	protected function doAction() {
-		$this->data['uncheck'] = $this->hasInput('uncheck');
+		$data['uncheck'] = $this->hasInput('uncheck');
 
 		$sortField = $this->getInput('sort', CProfile::get('web.scripts.php.sort', 'name'));
 		$sortOrder = $this->getInput('sortorder', CProfile::get('web.scripts.php.sortorder', ZBX_SORT_UP));
@@ -63,42 +60,44 @@ class CControllerScriptList extends CController {
 		CProfile::update('web.scripts.php.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.scripts.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-		$this->data['sort'] = $sortField;
-		$this->data['sortorder'] = $sortOrder;
+		$data['sort'] = $sortField;
+		$data['sortorder'] = $sortOrder;
 
 		// list of scripts
-		$this->data['scripts'] = API::Script()->get(array(
+		$data['scripts'] = API::Script()->get(array(
 			'output' => array('scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type', 'execute_on'),
 			'editable' => true,
 			'selectGroups' => API_OUTPUT_EXTEND
 		));
 
 		// find script host group name and user group name. set to '' if all host/user groups used.
-		foreach ($this->data['scripts'] as $key => $script) {
+		foreach ($data['scripts'] as $key => $script) {
 			if ($script['usrgrpid'] > 0) {
 				$userGroup = API::UserGroup()->get(array('usrgrpids' => $script['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
 				$userGroup = reset($userGroup);
 
-				$this->data['scripts'][$key]['userGroupName'] = $userGroup['name'];
+				$data['scripts'][$key]['userGroupName'] = $userGroup['name'];
 			}
 			else {
-				$this->data['scripts'][$key]['userGroupName'] = null; // all user groups
+				$data['scripts'][$key]['userGroupName'] = null; // all user groups
 			}
 
 			if ($script['groupid'] > 0) {
 				$group = array_pop($script['groups']);
 
-				$this->data['scripts'][$key]['hostGroupName'] = $group['name'];
+				$data['scripts'][$key]['hostGroupName'] = $group['name'];
 			}
 			else {
-				$this->data['scripts'][$key]['hostGroupName'] = null; // all host groups
+				$data['scripts'][$key]['hostGroupName'] = null; // all host groups
 			}
 		}
 
 		// sorting & paging
-		order_result($this->data['scripts'], $sortField, $sortOrder);
-		$this->data['paging'] = getPagingLine($this->data['scripts']);
+		order_result($data['scripts'], $sortField, $sortOrder);
+		$data['paging'] = getPagingLine($data['scripts']);
 
-		$this->setResponse(new CControllerResponseData($this->data));
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Configuration of scripts'));
+		$this->setResponse($response);
 	}
 }

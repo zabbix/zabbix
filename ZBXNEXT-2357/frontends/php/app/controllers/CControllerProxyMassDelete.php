@@ -52,7 +52,7 @@ class CControllerProxyMassDelete extends CController {
 	protected function doAction() {
 		$result = API::Proxy()->delete($this->getInput('proxyids'));
 
-		$response = new CControllerResponseRedirect('proxies.php?action=proxy.list&uncheck=1');
+		$response = new CControllerResponseRedirect('zabbix.php?action=proxy.list&uncheck=1');
 
 		if ($result) {
 			$response->setMessageOk(_('Proxy deleted'));

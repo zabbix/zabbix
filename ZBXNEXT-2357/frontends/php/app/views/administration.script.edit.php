@@ -110,7 +110,7 @@ $scriptView->addTab('scripts', _('Script'), $scriptFormList);
 $scriptForm->addItem($scriptView);
 
 // footer
-$cancelButton = new CRedirectButton(_('Cancel'), 'scripts.php?action=script.list');
+$cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=script.list');
 $cancelButton->setAttribute('id', 'cancel');
 
 if ($data['scriptid'] == 0) {
@@ -127,7 +127,7 @@ else {
 	$updateButton->setAttribute('id', 'update');
 	$cloneButton = new CSimpleButton(_('Clone'));
 	$cloneButton->setAttribute('id', 'clone');
-	$deleteButton = new CRedirectButton(_('Delete'), 'scripts.php?action=script.delete'.url_param('scriptid'),_('Delete script?'));
+	$deleteButton = new CRedirectButton(_('Delete'), 'zabbix.php?action=script.delete'.url_param('scriptid'),_('Delete script?'));
 	$deleteButton->setAttribute('id', 'delete');
 
 	$scriptForm->addItem(makeFormFooter(

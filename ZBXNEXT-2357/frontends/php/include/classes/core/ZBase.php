@@ -427,6 +427,8 @@ class ZBase {
 			}
 			else {
 				$view = new CView($router->getView(), $response->getData());
+				$data['page']['title'] = $response->getTitle();
+				$data['controller']['action'] = $router->getAction();
 				$data['main_block'] = $view->getOutput();
 				$data['fullscreen'] = isset($_REQUEST['fullscreen']) && $_REQUEST['fullscreen'] == 1 ? 1 : 0;
 				$data['javascript']['files'] = $view->getAddedJS();

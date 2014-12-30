@@ -1433,7 +1433,8 @@ function getPageNumber() {
 	$pageNumber = getRequest('page');
 	if (!$pageNumber) {
 		$lastPage = CProfile::get('web.paging.lastpage');
-		$pageNumber = ($lastPage == $page['file']) ? CProfile::get('web.paging.page', 1) : 1;
+		// For MVC pages $page is not set
+		$pageNumber = (isset($page['file']) && $lastPage == $page['file']) ? CProfile::get('web.paging.page', 1) : 1;
 	}
 
 	return $pageNumber;
@@ -1472,8 +1473,11 @@ function getPagingLine(&$items) {
 
 	$start = ($currentPage - 1) * $rowsPerPage;
 
-	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
-	CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
+	// For MVC pages $page is not set
+	if (isset($page['file'])) {
+		CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
+		CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
+	}
 
 	// trim array with items to contain items for current page
 	$items = array_slice($items, $start, $rowsPerPage, true);

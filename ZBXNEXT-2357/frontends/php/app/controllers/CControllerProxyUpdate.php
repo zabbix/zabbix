@@ -38,7 +38,7 @@ class CControllerProxyUpdate extends CController {
 		if (!$result) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('proxies.php?action=proxy.formedit');
+					$response = new CControllerResponseRedirect('zabbix.php?action=proxy.formedit');
 					$response->setFormData($this->getInputAll());
 					$response->setMessageError(_('Cannot update proxy'));
 					$this->setResponse($response);
@@ -94,11 +94,11 @@ class CControllerProxyUpdate extends CController {
 		$result = DBend($result);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect('proxies.php?action=proxy.list&uncheck=1');
+			$response = new CControllerResponseRedirect('zabbix.php?action=proxy.list&uncheck=1');
 			$response->setMessageOk(_('Proxy updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('proxies.php?action=proxy.formedit&proxyid='.$this->getInput('proxyid'));
+			$response = new CControllerResponseRedirect('zabbix.php?action=proxy.formedit&proxyid='.$this->getInput('proxyid'));
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot update proxy'));
 		}

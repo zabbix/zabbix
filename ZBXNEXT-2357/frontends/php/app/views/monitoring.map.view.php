@@ -37,10 +37,12 @@ else {
 	}
 
 	$headerMapForm = new CForm('get');
+	$headerMapForm->addVar('action', 'map.view');
 	$headerMapForm->addVar('fullscreen', $data['fullscreen']);
 	$headerMapForm->addItem(array(_('Maps'), SPACE, $mapComboBox));
 
 	$headerSeverityMinForm = new CForm('get');
+	$headerSeverityMinForm->addVar('action', 'map.view');
 	$headerSeverityMinForm->addVar('fullscreen', $data['fullscreen']);
 	$headerSeverityMinForm->addItem(array(SPACE, _('Minimum severity'), SPACE, $data['pageFilter']->getSeveritiesMinCB()));
 
@@ -52,7 +54,7 @@ else {
 		// check for permissions
 		if (isset($data['maps'][$parent['sysmapid']])) {
 			$parentMaps[] = SPACE.SPACE;
-			$parentMaps[] = new CLink($parent['name'], 'maps.php?action=map.view&sysmapid='.$parent['sysmapid'].'&fullscreen='.$data['fullscreen'].'&severity_min='.$data['severity_min']);
+			$parentMaps[] = new CLink($parent['name'], 'zabbix.php?action=map.view&sysmapid='.$parent['sysmapid'].'&fullscreen='.$data['fullscreen'].'&severity_min='.$data['severity_min']);
 		}
 	}
 	if (!empty($parentMaps)) {

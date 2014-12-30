@@ -39,7 +39,7 @@ class CControllerProxyCreate extends CController {
 		if (!$result) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('proxies.php?action=proxy.formcreate');
+					$response = new CControllerResponseRedirect('zabbix.php?action=proxy.formcreate');
 					$response->setFormData($this->getInputAll());
 					$response->setMessageError(_('Cannot add proxy'));
 					$this->setResponse($response);
@@ -85,11 +85,11 @@ class CControllerProxyCreate extends CController {
 		$result = DBend($result);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect('proxies.php?action=proxy.list&uncheck=1');
+			$response = new CControllerResponseRedirect('zabbix.php?action=proxy.list&uncheck=1');
 			$response->setMessageOk(_('Proxy added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('proxies.php?action=proxy.formcreate');
+			$response = new CControllerResponseRedirect('zabbix.php?action=proxy.formcreate');
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot add proxy'));
 		}

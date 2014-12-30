@@ -54,7 +54,7 @@ class CControllerScriptFormCreate extends CController {
 
 	protected function doAction() {
 		if ($this->hasInput('form')) {
-			$this->data = array(
+			$data = array(
 				'scriptid' => 0,
 				'name' => $this->getInput('name'),
 				'type' => $this->getInput('type'),
@@ -70,7 +70,7 @@ class CControllerScriptFormCreate extends CController {
 			);
 		}
 		else {
-			$this->data = array(
+			$data = array(
 				'scriptid' => 0,
 				'name' => '',
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
@@ -87,20 +87,20 @@ class CControllerScriptFormCreate extends CController {
 			);
 		}
 
-		$this->data['command'] = ($this->data['type'] == ZBX_SCRIPT_TYPE_IPMI) ? $this->getInput('commandipmi', '') : $this->data['command'];
+		$data['command'] = ($data['type'] == ZBX_SCRIPT_TYPE_IPMI) ? $this->getInput('commandipmi', '') : $data['command'];
 
 		// get host group
-		if ($this->data['groupid'] == 0) {
-			$this->data['hostgroup'] = null;
+		if ($data['groupid'] == 0) {
+			$data['hostgroup'] = null;
 		}
 		else {
 			$hostgroups = API::HostGroup()->get(array(
-				'groupids' => array($this->data['groupid']),
+				'groupids' => array($data['groupid']),
 				'output' => array('groupid', 'name')
 			));
 			$hostgroup = $hostgroups[0];
 
-			$this->data['hostgroup'][] = array(
+			$data['hostgroup'][] = array(
 				'id' => $hostgroup['groupid'],
 				'name' => $hostgroup['name']
 			);
@@ -111,8 +111,10 @@ class CControllerScriptFormCreate extends CController {
 			'output' => array('usrgrpid', 'name')
 		));
 		order_result($usergroups, 'name');
-		$this->data['usergroups'] = $usergroups;
+		$data['usergroups'] = $usergroups;
 
-		$this->setResponse(new CControllerResponseData($this->data));
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Configuration of scripts'));
+		$this->setResponse($response);
 	}
 }

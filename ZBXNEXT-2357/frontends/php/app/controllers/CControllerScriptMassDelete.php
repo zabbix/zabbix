@@ -61,7 +61,7 @@ class CControllerScriptMassDelete extends CController {
 
 		$result = DBend($result);
 
-		$response = new CControllerResponseRedirect('scripts.php?action=script.list&uncheck=1');
+		$response = new CControllerResponseRedirect('zabbix.php?action=script.list&uncheck=1');
 
 		if ($result) {
 			$response->setMessageOk(_('Script deleted'));

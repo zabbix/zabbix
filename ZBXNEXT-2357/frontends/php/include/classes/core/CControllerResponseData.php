@@ -21,6 +21,7 @@
 class CControllerResponseData extends CControllerResponse {
 
 	private $data;
+	private $title = null;
 
 	public function __construct($data) {
 		$this->data = $data;
@@ -28,5 +29,13 @@ class CControllerResponseData extends CControllerResponse {
 
 	public function getData() {
 		return $this->data;
+	}
+
+	public function setTitle($title) {
+		$this->title = $title;
+	}
+
+	public function getTitle() {
+		return $this->title;
 	}
 }
