@@ -1382,8 +1382,6 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
 
 // creates header col for sorting in table header
 function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
-	global $page;
-
 	$sortorder = ($sortField == $tabfield && $sortOrder == ZBX_SORT_UP) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
 	$link = CUrlFactory::getContextUrl();

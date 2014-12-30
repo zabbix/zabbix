@@ -54,6 +54,7 @@ class CRouter {
 	 */
 	private $routes = array(
 		// action					controller						layout					view
+		'discovery.view'	=> array('CControllerDiscoveryView',	'layout.htmlpage',		'monitoring.discovery.view'),
 		'favourite.create'	=> array('CControllerFavouriteCreate',	'layout.javascript',	null),
 		'favourite.delete'	=> array('CControllerFavouriteDelete',	'layout.javascript',	null),
 		'map.view'			=> array('CControllerMapView',			'layout.htmlpage',		'monitoring.map.view'),

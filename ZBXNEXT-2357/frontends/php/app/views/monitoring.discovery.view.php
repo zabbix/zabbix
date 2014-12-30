@@ -18,16 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $discoveryWidget = new CWidget('hat_discovery');
 
 // create header form
 $discoveryHeaderForm = new CForm('get');
 $discoveryHeaderForm->setName('slideHeaderForm');
-$discoveryHeaderForm->addVar('fullscreen', $this->data['fullscreen']);
-$discoveryWidget->addPageHeader(_('STATUS OF DISCOVERY'), get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
+$discoveryHeaderForm->addVar('action', 'discovery.view');
+$discoveryHeaderForm->addVar('fullscreen', $data['fullscreen']);
+$discoveryWidget->addPageHeader(_('STATUS OF DISCOVERY'), get_icon('fullscreen', array('fullscreen' => $data['fullscreen'])));
 
-$discoveryRulesComboBox = $this->data['pageFilter']->getDiscoveryCB();
+$discoveryRulesComboBox = $data['pageFilter']->getDiscoveryCB();
 
 $discoveryHeaderForm->addItem(array(_('Discovery rule').SPACE, $discoveryRulesComboBox));
 $discoveryWidget->addHeader(_('Discovery rules'), $discoveryHeaderForm);
@@ -36,7 +36,7 @@ $discoveryWidget->addHeader(_('Discovery rules'), $discoveryHeaderForm);
 $discoveryTable = new CTableInfo(_('No discovered devices found.'));
 $discoveryTable->makeVerticalRotation();
 
-$discoveredDeviceCol = make_sorting_header(_('Discovered device'), 'ip', $this->data['sort'], $this->data['sortorder']);
+$discoveredDeviceCol = make_sorting_header(_('Discovered device'), 'ip', $data['sort'], $data['sortorder']);
 $discoveredDeviceCol->addClass('left');
 
 $header = array(
@@ -45,12 +45,12 @@ $header = array(
 	new CCol(array(_('Uptime').'/', _('Downtime')), 'left')
 );
 
-foreach ($this->data['services'] as $name => $foo) {
+foreach ($data['services'] as $name => $foo) {
 	$header[] = new CCol($name, 'vertical_rotation');
 }
 $discoveryTable->setHeader($header, 'vertical_header');
 
-foreach ($this->data['drules'] as $drule) {
+foreach ($data['drules'] as $drule) {
 	$discovery_info = array();
 
 	$dhosts = $drule['dhosts'];
@@ -69,13 +69,13 @@ foreach ($this->data['drules'] as $drule) {
 			unset($primary_ip);
 		}
 
-		$dservices = $this->data['dhosts'][$dhost['dhostid']]['dservices'];
+		$dservices = $data['dhosts'][$dhost['dhostid']]['dservices'];
 		foreach ($dservices as $dservice) {
-			$dservice = $this->data['dservices'][$dservice['dserviceid']];
+			$dservice = $data['dservices'][$dservice['dserviceid']];
 
 			$hostName = '';
 
-			$host = reset($this->data['dservices'][$dservice['dserviceid']]['hosts']);
+			$host = reset($data['dservices'][$dservice['dserviceid']]['hosts']);
 			if (!is_null($host)) {
 				$hostName = $host['name'];
 			}
@@ -114,8 +114,8 @@ foreach ($this->data['drules'] as $drule) {
 
 			$key_ = $dservice['key_'];
 			if (!zbx_empty($key_)) {
-				if (isset($this->data['macros'][$key_])) {
-					$key_ = $this->data['macros'][$key_]['value'];
+				if (isset($data['macros'][$key_])) {
+					$key_ = $data['macros'][$key_]['value'];
 				}
 				$key_ = NAME_DELIMITER.$key_;
 			}
@@ -129,13 +129,13 @@ foreach ($this->data['drules'] as $drule) {
 		}
 	}
 
-	if (empty($this->data['druleid']) && !empty($discovery_info)) {
+	if (empty($data['druleid']) && !empty($discovery_info)) {
 		$col = new CCol(array(bold($drule['name']), SPACE.'('._n('%d device', '%d devices', count($discovery_info)).')'));
-		$col->setColSpan(count($this->data['services']) + 3);
+		$col->setColSpan(count($data['services']) + 3);
 
 		$discoveryTable->addRow($col);
 	}
-	order_result($discovery_info, $this->data['sort'], $this->data['sortorder']);
+	order_result($discovery_info, $data['sort'], $data['sortorder']);
 
 	foreach ($discovery_info as $ip => $h_data) {
 		$dns = $h_data['dns'] == '' ? '' : ' ('.$h_data['dns'].')';
@@ -147,7 +147,7 @@ foreach ($this->data['drules'] as $drule) {
 				: convert_units(array('value' => time() - $h_data['time'], 'units' => 'uptime'))), $h_data['class'])
 		);
 
-		foreach ($this->data['services'] as $name => $foo) {
+		foreach ($data['services'] as $name => $foo) {
 			$class = null;
 			$time = SPACE;
 			$hint = new CDiv(SPACE, $class);
@@ -180,4 +180,4 @@ foreach ($this->data['drules'] as $drule) {
 }
 
 $discoveryWidget->addItem($discoveryTable);
-return $discoveryWidget;
+$discoveryWidget->show();

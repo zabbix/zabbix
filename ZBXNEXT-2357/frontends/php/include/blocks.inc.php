@@ -1285,7 +1285,7 @@ function make_discovery_status() {
 
 	foreach ($drules as $drule) {
 		$table->addRow(array(
-			new CLink($drule['name'], 'discovery.php?druleid='.$drule['druleid']),
+			new CLink($drule['name'], 'zabbix.php?action=discovery.view&druleid='.$drule['druleid']),
 			new CSpan($drule['up'], 'green'),
 			new CSpan($drule['down'], ($drule['down'] > 0) ? 'red' : 'green')
 		));
