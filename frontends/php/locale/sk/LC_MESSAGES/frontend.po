@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-22 16:00+0200\n"
+"POT-Creation-Date: 2014-12-30 05:43+0200\n"
 "PO-Revision-Date: 2014-08-17 18:30+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -8841,6 +8841,7 @@ msgstr "Maska"
 #: hosts.php:1016 include/views/configuration.item.list.php:281
 #: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.triggers.list.php:278
+#: include/views/configuration.triggers.massupdate.php:146
 msgid "Mass update"
 msgstr "Hromadná aktualizácia"
 
@@ -14006,10 +14007,6 @@ msgstr "Spúšťače zmazané"
 #: include/classes/class.ctriggersinfo.php:110 include/screens.inc.php:42
 msgid "Triggers info"
 msgstr "Informácie o spúšťačoch"
-
-#: include/views/configuration.triggers.massupdate.php:146
-msgid "Triggers massupdate"
-msgstr "Hromadná aktualizácia spúšťačov"
 
 #: include/screens.inc.php:43
 msgid "Triggers overview"
