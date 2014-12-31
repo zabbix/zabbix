@@ -225,7 +225,7 @@ class CHelpItems {
 					'description' => _('Swap out. If type is count - swapouts is returned. If type is pages - pages swapped in is returned. If swap is missing all is used.')
 				),
 				array(
-					'key' => 'system.swap.size[<device>,<mode>]',
+					'key' => 'system.swap.size[<device>,<type>]',
 					'description' => _('Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used.')
 				),
 				array(
@@ -487,7 +487,7 @@ class CHelpItems {
 					'description' => _('Swap out. If type is count - swapouts is returned. If type is pages - pages swapped in is returned. If swap is missing all is used.')
 				),
 				array(
-					'key' => 'system.swap.size[<device>,<mode>]',
+					'key' => 'system.swap.size[<device>,<type>]',
 					'description' => _('Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used.')
 				),
 				array(
