@@ -3,6 +3,7 @@ Changes for 2.0.15rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
 ........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
 
 --------------------------------------------------------------------------------
