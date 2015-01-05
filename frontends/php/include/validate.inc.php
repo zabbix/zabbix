@@ -225,10 +225,16 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		$colorValidator = new CColorValidator();
 
 		if (!$colorValidator->validate($var)) {
-			$var = 'FFFFFF';
-
 			$error = true;
 			$message = _s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption);
+		}
+	}
+	elseif ($type == T_ZBX_TP) {
+		$timePeriodValidator = new CTimePeriodValidator();
+
+		if (!$timePeriodValidator->validate($var)) {
+			$error = true;
+			$message = _s('Field "%1$s" is not correct: %2$s', $caption, $timePeriodValidator->getError());
 		}
 	}
 

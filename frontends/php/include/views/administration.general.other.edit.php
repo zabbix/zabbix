@@ -21,21 +21,25 @@
 
 $otherTab = new CFormList('scriptsTab');
 
-$discoveryGroup = new CComboBox('discovery_groupid', $this->data['config']['discovery_groupid']);
-foreach ($this->data['discovery_groups'] as $group) {
+$discoveryGroup = new CComboBox('discovery_groupid', $data['discovery_groupid']);
+foreach ($data['discovery_groups'] as $group) {
 	$discoveryGroup->addItem($group['groupid'], $group['name']);
 }
 
-$alertUserGroup = new CComboBox('alert_usrgrpid', $this->data['config']['alert_usrgrpid']);
+$alertUserGroup = new CComboBox('alert_usrgrpid', $data['alert_usrgrpid']);
 $alertUserGroup->addItem(0, _('None'));
-foreach ($this->data['alert_usrgrps'] as $usrgrp) {
+foreach ($data['alert_usrgrps'] as $usrgrp) {
 	$alertUserGroup->addItem($usrgrp['usrgrpid'], $usrgrp['name']);
 }
 
-$otherTab->addRow(_('Refresh unsupported items (in sec)'), new CNumericBox('refresh_unsupported', $this->data['config']['refresh_unsupported'], 5));
+$otherTab->addRow(_('Refresh unsupported items (in sec)'),
+	new CNumericBox('refresh_unsupported', $data['refresh_unsupported'], 5)
+);
 $otherTab->addRow(_('Group for discovered hosts'), $discoveryGroup);
 $otherTab->addRow(_('User group for database down message'), $alertUserGroup);
-$otherTab->addRow(_('Log unmatched SNMP traps'), new CCheckBox('snmptrap_logging', $this->data['config']['snmptrap_logging'], null, 1));
+$otherTab->addRow(_('Log unmatched SNMP traps'),
+	new CCheckBox('snmptrap_logging', $data['snmptrap_logging'] == 1, null, 1)
+);
 
 $otherView = new CTabView();
 $otherView->addTab('other', _('Other parameters'), $otherTab);
