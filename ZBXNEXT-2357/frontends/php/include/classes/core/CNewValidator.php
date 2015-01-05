@@ -135,7 +135,7 @@ class CNewValidator {
 					$result = false;
 				}
 				break;
-			// required_if:field,value
+			// required_if:field,value1,value2,...
 			case 'required_if':
 				if (array_key_exists($field, $this->input) && !array_key_exists($params[0], $this->input)) {
 					$this->addError($fatal, _s('Field "%1$s" must present only if "%2$s" exists and equal to "%3$s".', $field, $params[0], $params[1]));
@@ -146,7 +146,7 @@ class CNewValidator {
 					$result = false;
 				}
 				break;
-			// required_if_not:field,value
+			// required_if_not:field,value1,value2,...
 			case 'required_if_not':
 				if (array_key_exists($field, $this->input) && array_key_exists($params[0], $this->input) && $this->input[$params[0]] == $params[1]) {
 					$this->addError($fatal, _s('Field "%1$s" must present if "%2$s" exists and equal to "%3$s".', $field, $params[0], $params[1]));

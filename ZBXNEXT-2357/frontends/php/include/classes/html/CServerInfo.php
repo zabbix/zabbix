@@ -33,7 +33,7 @@ class CServerInfo extends CTable {
 			? new CSpan(_('running'), 'off')
 			: new CSpan(_('not running'), 'on');
 		$serverLink = (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN)
-			? new CLink(_('Zabbix server'), 'report1.php')
+			? new CLink(_('Zabbix server'), 'zabbix.php?action=report.status')
 			: _('Zabbix server');
 
 		$this->addRow(new CCol(_('Zabbix server info'), 'nowrap ui-corner-all ui-widget-header'));
