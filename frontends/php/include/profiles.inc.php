@@ -29,29 +29,8 @@
 function select_config() {
 	static $config;
 
-	if (isset($config)) {
-		return $config;
-	}
-
-	$dbConfig = DBfetch(DBselect('SELECT c.* FROM config c'));
-
-	if ($dbConfig) {
-		$config = $dbConfig;
-	}
-	else {
-		// set default configuration
-
-		$config = array();
-
-		$configSchema = DB::getSchema('config');
-		foreach ($configSchema['fields'] as $fieldName => $fieldConfig) {
-			if (array_key_exists('default', $fieldConfig)) {
-				$config[$fieldName] = $fieldConfig['default'];
-			}
-			elseif ($fieldConfig['type'] === DB::FIELD_TYPE_ID) {
-				$config[$fieldName] = 0;
-			}
-		}
+	if (!isset($config)) {
+		$config = DBfetch(DBselect('SELECT c.* FROM config c'));
 	}
 
 	return $config;
