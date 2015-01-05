@@ -138,11 +138,8 @@ static void	free_active_metrics(void)
 
 static int	metric_ready_to_process(const ZBX_ACTIVE_METRIC *metric)
 {
-	if (ITEM_STATE_NORMAL != metric->state)
-	{
-		if (ITEM_STATE_NOTSUPPORTED != metric->state || 0 == metric->refresh_unsupported)
-			return FAIL;
-	}
+	if (ITEM_STATE_NOTSUPPORTED == metric->state && 0 == metric->refresh_unsupported)
+		return FAIL;
 
 	return SUCCEED;
 }
