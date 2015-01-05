@@ -59,6 +59,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese an
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+..F....... [ZBX-8209] improved host and item name column widths on Monitoring / Latest data page (Krists)
 .......PS. [ZBX-9154] fixed compilation error with Oracle backend (wiper)
 ..F....... [ZBX-9042] unified "mass update" spelling in trigger configuration page (Richlv)
 ..F....... [ZBX-9153] fixed vmware.version item key being listed as vmware.eventlog in the item key helper (Richlv)
