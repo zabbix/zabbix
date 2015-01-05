@@ -60,6 +60,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese an
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
 ....I..... [ZBX-9185] fixed upgrade procedure in case database version is greater than version of the binary (Sasha)
 ..F....... [ZBX-9177] improved host and item name column widths on Monitoring / Latest data page (Krists)
 .......PS. [ZBX-9154] fixed compilation error with Oracle backend (wiper)
@@ -581,6 +582,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
 .......PS. [ZBX-9154] fixed compilation error with Oracle backend (wiper)
 ..F....... [ZBX-9042] unified "mass update" spelling in trigger configuration page (Richlv)
 ..F....... [ZBX-9153] fixed vmware.version item key being listed as vmware.eventlog in the item key helper (Richlv)
@@ -1760,6 +1762,7 @@ Changes for 2.0.15rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
 ........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
 
 --------------------------------------------------------------------------------
