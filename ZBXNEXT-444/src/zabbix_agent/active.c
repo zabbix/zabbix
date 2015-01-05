@@ -217,7 +217,8 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 
 		if (ITEM_STATE_NOTSUPPORTED == metric->state)
 		{
-			/* re-check unsupported item, hopefully in the future this will be controlled by server */
+			/* Currently receiving list of active checks works as a signal to refresh unsupported */
+			/* items. Hopefully in the future this will be controlled by server (ZBXNEXT-2633). */
 			metric->refresh_unsupported = 1;
 		}
 
@@ -925,10 +926,10 @@ out:
 	return ret;
 }
 
-static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent)
+static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
+		unsigned char old_state)
 {
-	if (lastlogsize_sent != metric->lastlogsize || mtime_sent != metric->mtime ||
-			ITEM_STATE_NOTSUPPORTED == metric->state)
+	if (lastlogsize_sent != metric->lastlogsize || mtime_sent != metric->mtime || old_state != metric->state)
 	{
 		/* needs meta information update */
 		return SUCCEED;
@@ -1436,6 +1437,10 @@ static void	process_active_checks(char *server, unsigned short port)
 		}
 		else
 		{
+			unsigned char	old_state;
+
+			old_state = metric->state;
+
 			if (ITEM_STATE_NOTSUPPORTED == metric->state && 0 == metric->error_count)
 			{
 				/* item became supported */
@@ -1443,7 +1448,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				metric->refresh_unsupported = 0;
 			}
 
-			if (SUCCEED == need_meta_update(metric, lastlogsize_sent, mtime_sent))
+			if (SUCCEED == need_meta_update(metric, lastlogsize_sent, mtime_sent, old_state))
 			{
 				/* meta information update */
 				process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL, metric->state,
