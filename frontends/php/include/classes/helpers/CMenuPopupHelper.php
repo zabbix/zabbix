@@ -240,6 +240,11 @@ class CMenuPopupHelper {
 		);
 
 		if ($scripts) {
+			foreach ($scripts as &$script) {
+				$script['name'] = implode('/', splitPath($script['name'], false, true));
+			}
+			unset($script);
+
 			CArrayHelper::sort($scripts, array('name'));
 
 			foreach (array_values($scripts) as $script) {
@@ -280,6 +285,10 @@ class CMenuPopupHelper {
 		);
 
 		if ($scripts) {
+			foreach ($scripts as &$script) {
+				$script['name'] = implode('/', splitPath($script['name'], false, true));
+			}
+			unset($script);
 			CArrayHelper::sort($scripts, array('name'));
 
 			$data['hostid'] = $hostId;

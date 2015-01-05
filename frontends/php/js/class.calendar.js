@@ -279,7 +279,7 @@ calendar.prototype = {
 			result = true;
 		}
 		else if (d > 28 && result) {
-			if (d <= this.daysInMonth(this.sdt.getMonth(), this.sdt.getFullYear())) {
+			if (d <= daysInMonth(this.sdt.getFullYear(), this.sdt.getMonth())) {
 				this.sdt.setDate(d);
 				result = true;
 			}
@@ -496,24 +496,6 @@ calendar.prototype = {
 			this.clndr_year.textContent = this.year;
 		}
 		this.createDaysTab();
-	},
-
-	daysInFeb: function(year) {
-		// February has 29 days in any year evenly divisible by four,
-		// EXCEPT for centurial years which are not also divisible by 400.
-		return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) ? 29 : 28;
-	},
-
-	daysInMonth: function(m, y) {
-		m++;
-		var days = 31;
-		if (m == 4 || m == 6 || m == 9 || m == 11) {
-			days = 30;
-		}
-		else if (m == 2) {
-			days = this.daysInFeb(y);
-		}
-		return days;
 	},
 
 	createDaysTab: function() {

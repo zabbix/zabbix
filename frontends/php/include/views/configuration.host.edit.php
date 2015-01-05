@@ -251,16 +251,15 @@ if (!$isDiscovered) {
 	$dnsLabel = new CCol(_('DNS name'), 'interface-dns');
 	$connectToLabel = new CCol(_('Connect to'), 'interface-connect-to');
 	$portLabel = new CCol(_('Port'), 'interface-port');
-	$defaultLabel = new CCol(_('Default'), 'interface-default');
-	$removeLabel = new CCol(SPACE, 'interface-control');
-	$ifTab->addRow(array($iconLabel, $ipLabel, $dnsLabel, $connectToLabel, $portLabel, $defaultLabel, $removeLabel));
+	$defaultLabel = new CCol(_('Default'), 'interface-default', 2);
+	$ifTab->addRow(array($iconLabel, $ipLabel, $dnsLabel, $connectToLabel, $portLabel, $defaultLabel));
 
 	$helpTextWhenDragInterfaceAgent = new CSpan(_('Drag here to change the type of the interface to "agent" type.'));
 	$helpTextWhenDragInterfaceAgent->addClass('dragHelpText');
-	$buttonCol = new CCol(new CButton('addAgentInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
-	$col = new CCol($helpTextWhenDragInterfaceAgent);
-	$col->setAttribute('colspan', 6);
-	$buttonRow = new CRow(array($buttonCol, $col));
+	$buttonCol = new CCol(new CButton('addAgentInterface', _('Add'), null, 'link_menu'), 'interface-add-control', 7);
+	$buttonCol->addItem($helpTextWhenDragInterfaceAgent);
+
+	$buttonRow = new CRow(array($buttonCol));
 	$buttonRow->setAttribute('id', 'agentInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
@@ -274,10 +273,10 @@ if (!$isDiscovered) {
 
 	$helpTextWhenDragInterfaceSNMP = new CSpan(_('Drag here to change the type of the interface to "SNMP" type.'));
 	$helpTextWhenDragInterfaceSNMP->addClass('dragHelpText');
-	$buttonCol = new CCol(new CButton('addSNMPInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
-	$col = new CCol($helpTextWhenDragInterfaceSNMP);
-	$col->setAttribute('colspan', 6);
-	$buttonRow = new CRow(array($buttonCol, $col));
+	$buttonCol = new CCol(new CButton('addSNMPInterface', _('Add'), null, 'link_menu'), 'interface-add-control', 7);
+	$buttonCol->addItem($helpTextWhenDragInterfaceSNMP);
+
+	$buttonRow = new CRow(array($buttonCol));
 	$buttonRow->setAttribute('id', 'SNMPInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
@@ -290,10 +289,10 @@ if (!$isDiscovered) {
 	$ifTab->setAttribute('data-type', 'jmx');
 	$helpTextWhenDragInterfaceJMX = new CSpan(_('Drag here to change the type of the interface to "JMX" type.'));
 	$helpTextWhenDragInterfaceJMX->addClass('dragHelpText');
-	$buttonCol = new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
-	$col = new CCol($helpTextWhenDragInterfaceJMX);
-	$col->setAttribute('colspan', 6);
-	$buttonRow = new CRow(array($buttonCol, $col));
+	$buttonCol = new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu'), 'interface-add-control', 7);
+	$buttonCol->addItem($helpTextWhenDragInterfaceJMX);
+
+	$buttonRow = new CRow(array($buttonCol));
 	$buttonRow->setAttribute('id', 'JMXInterfacesFooter');
 	$ifTab->addRow($buttonRow);
 
@@ -305,10 +304,10 @@ if (!$isDiscovered) {
 	$ifTab->setAttribute('data-type', 'ipmi');
 	$helpTextWhenDragInterfaceIPMI = new CSpan(_('Drag here to change the type of the interface to "IPMI" type.'));
 	$helpTextWhenDragInterfaceIPMI->addClass('dragHelpText');
-	$buttonCol = new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
-	$col = new CCol($helpTextWhenDragInterfaceIPMI);
-	$col->setAttribute('colspan', 6);
-	$buttonRow = new CRow(array($buttonCol, $col));
+	$buttonCol = new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu'), 'interface-add-control', 7);
+	$buttonCol->addItem($helpTextWhenDragInterfaceIPMI);
+
+	$buttonRow = new CRow(array($buttonCol));
 	$buttonRow->setAttribute('id', 'IPMIInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);

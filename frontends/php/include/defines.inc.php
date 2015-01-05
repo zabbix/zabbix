@@ -125,10 +125,7 @@ define('ZBX_DROPDOWN_FIRST_ALL',	1);
 define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
 define('T_ZBX_DBL',			2);
-define('T_ZBX_IP',			4);
 define('T_ZBX_CLR',			5);
-define('T_ZBX_IP_RANGE',	7);
-define('T_ZBX_INT_RANGE',	8);
 define('T_ZBX_DBL_BIG',		9);
 define('T_ZBX_DBL_STR',		10);
 
@@ -277,6 +274,16 @@ define('TIMEPERIOD_TYPE_DAILY',		2);
 define('TIMEPERIOD_TYPE_WEEKLY',	3);
 define('TIMEPERIOD_TYPE_MONTHLY',	4);
 define('TIMEPERIOD_TYPE_YEARLY',	5);
+
+// report periods
+define('REPORT_PERIOD_TODAY',			0);
+define('REPORT_PERIOD_YESTERDAY',		1);
+define('REPORT_PERIOD_CURRENT_WEEK',	2);
+define('REPORT_PERIOD_CURRENT_MONTH',	3);
+define('REPORT_PERIOD_CURRENT_YEAR',	4);
+define('REPORT_PERIOD_LAST_WEEK',		5);
+define('REPORT_PERIOD_LAST_MONTH',		6);
+define('REPORT_PERIOD_LAST_YEAR',		7);
 
 define('SYSMAP_LABEL_ADVANCED_OFF',	0);
 define('SYSMAP_LABEL_ADVANCED_ON',	1);
@@ -633,6 +640,9 @@ define('PERM_DENY',			0);
 define('PARAM_TYPE_TIME',		0);
 define('PARAM_TYPE_COUNTS',		1);
 
+define('ZBX_DEFAULT_AGENT', 'Zabbix');
+define('ZBX_AGENT_OTHER', -1);
+
 define('HTTPTEST_AUTH_NONE',	0);
 define('HTTPTEST_AUTH_BASIC',	1);
 define('HTTPTEST_AUTH_NTLM',	2);
@@ -847,6 +857,7 @@ define('IPMI_PRIVILEGE_ADMIN',		4);
 define('IPMI_PRIVILEGE_OEM',		5);
 
 define('ZBX_HAVE_IPV6', 1);
+define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
 define('ZBX_SOCKET_TIMEOUT',        3);         // socket timeout limit
 define('ZBX_SOCKET_BYTES_LIMIT',    1048576);   // socket response size limit, 1048576 is 1MB in bytes
