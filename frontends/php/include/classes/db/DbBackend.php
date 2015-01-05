@@ -59,7 +59,7 @@ abstract class DbBackend {
 	 * @return bool
 	 */
 	public function checkConfig() {
-		if (false === ($row = DBfetch(DBselect('SELECT NULL FROM config c')))) {
+		if (!DBfetch(DBselect('SELECT NULL FROM config c'))) {
 			$this->setError(_('Unable to select configuration.'));
 			return false;
 		}
