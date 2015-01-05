@@ -1447,7 +1447,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			{
 				/* meta information update */
 				process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL, metric->state,
-						&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, 1);
+						&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, 0);
 			}
 		}
 
