@@ -69,9 +69,6 @@ class CUrlFactory {
 		'maintenance.php' => array(
 			'remove' => array('maintenanceid')
 		),
-		'media_types.php' => array(
-			'remove' => array('mediatypeid')
-		),
 		'screenconf.php' => array(
 			'remove' => array('screenid'),
 			'add' => array('templateid')

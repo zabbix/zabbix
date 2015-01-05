@@ -120,7 +120,9 @@ $ZBX_MENU = array(
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
-				'url' => 'report1.php',
+				'url' => 'zabbix.php',
+				'action' => 'report.status',
+				'active_if' => array('report.status'),
 				'label' => _('Status of Zabbix'),
 				'user_type' => USER_TYPE_SUPER_ADMIN
 			),
@@ -249,7 +251,9 @@ $ZBX_MENU = array(
 				'sub_pages' => array('users.php', 'popup_usrgrp.php')
 			),
 			array(
-				'url' => 'media_types.php',
+				'url' => 'zabbix.php',
+				'action' => 'mediatype.list',
+				'active_if' => array('mediatype.formcreate', 'mediatype.formedit', 'mediatype.list'),
 				'label' => _('Media types')
 			),
 			array(

@@ -18,12 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+if ($data['uncheck']) {
+	uncheckTableRows();
+}
 
 $mediaTypeWidget = new CWidget();
 
 // create new media type button
 $createForm = new CForm('get');
-$createForm->addItem(new CSubmit('form', _('Create media type')));
+$createForm->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.formcreate'));
 $mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'), $createForm);
 $mediaTypeWidget->addHeader(_('Media types'));
 $mediaTypeWidget->addHeaderRowNumber();
@@ -88,7 +91,7 @@ foreach ($this->data['mediatypes'] as $mediaType) {
 	$actionColumn = new CCol($actionLinks);
 	$actionColumn->setAttribute('style', 'white-space: normal;');
 
-	$statusLink = 'media_types.php'.
+	$statusLink = 'zabbix.php'.
 		'?action='.($mediaType['status'] == MEDIA_TYPE_STATUS_DISABLED
 			? 'mediatype.massenable'
 			: 'mediatype.massdisable'
@@ -102,7 +105,7 @@ foreach ($this->data['mediatypes'] as $mediaType) {
 	// append row
 	$mediaTypeTable->addRow(array(
 		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', null, null, $mediaType['mediatypeid']),
-		new CLink($mediaType['description'], '?form=edit&mediatypeid='.$mediaType['mediatypeid']),
+		new CLink($mediaType['description'], '?action=mediatype.formedit&mediatypeid='.$mediaType['mediatypeid']),
 		media_type2str($mediaType['typeid']),
 		$status,
 		$actionColumn,
@@ -135,4 +138,4 @@ $mediaTypeForm->addItem(array($this->data['paging'], $mediaTypeTable, $this->dat
 // append form to widget
 $mediaTypeWidget->addItem($mediaTypeForm);
 
-return $mediaTypeWidget;
+$mediaTypeWidget->show();

@@ -18,19 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/blocks.inc.php';
-
-$page['title'] = _('Status of Zabbix');
-$page['file'] = 'report1.php';
-$page['hist_arg'] = array();
-
-require_once dirname(__FILE__).'/include/page_header.php';
-
-$reportWidget = new CWidget();
-$reportWidget->addPageHeader(_('STATUS OF ZABBIX'));
-$reportWidget->addItem(make_status_of_zbx());
-$reportWidget->show();
-
-require_once dirname(__FILE__).'/include/page_footer.php';
+$widget = new CWidget();
+$widget->addPageHeader(_('STATUS OF ZABBIX'));
+$widget->addItem(make_status_of_zbx());
+$widget->show();

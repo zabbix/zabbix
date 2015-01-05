@@ -30,16 +30,7 @@ class CControllerScriptList extends CController {
 		$result = $this->validateInput($fields);
 
 		if (!$result) {
-			switch ($this->GetValidationError()) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=script.list');
-					$response->setMessageError(_('Validation error'));
-					$this->setResponse($response);
-					break;
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $result;

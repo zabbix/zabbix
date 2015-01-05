@@ -18,6 +18,15 @@ frontends/php/app/controllers/CControllerDiscoveryView.php -text
 frontends/php/app/controllers/CControllerFavouriteCreate.php -text
 frontends/php/app/controllers/CControllerFavouriteDelete.php -text
 frontends/php/app/controllers/CControllerMapView.php -text
+frontends/php/app/controllers/CControllerMediatypeCreate.php -text
+frontends/php/app/controllers/CControllerMediatypeDelete.php -text
+frontends/php/app/controllers/CControllerMediatypeFormCreate.php -text
+frontends/php/app/controllers/CControllerMediatypeFormEdit.php -text
+frontends/php/app/controllers/CControllerMediatypeList.php -text
+frontends/php/app/controllers/CControllerMediatypeMassDelete.php -text
+frontends/php/app/controllers/CControllerMediatypeMassDisable.php -text
+frontends/php/app/controllers/CControllerMediatypeMassEnable.php -text
+frontends/php/app/controllers/CControllerMediatypeUpdate.php -text
 frontends/php/app/controllers/CControllerProxyCreate.php -text
 frontends/php/app/controllers/CControllerProxyDelete.php -text
 frontends/php/app/controllers/CControllerProxyFormCreate.php -text
@@ -27,6 +36,7 @@ frontends/php/app/controllers/CControllerProxyMassDelete.php -text
 frontends/php/app/controllers/CControllerProxyMassDisable.php -text
 frontends/php/app/controllers/CControllerProxyMassEnable.php -text
 frontends/php/app/controllers/CControllerProxyUpdate.php -text
+frontends/php/app/controllers/CControllerReportStatus.php -text
 frontends/php/app/controllers/CControllerScriptCreate.php -text
 frontends/php/app/controllers/CControllerScriptDelete.php -text
 frontends/php/app/controllers/CControllerScriptFormCreate.php -text
@@ -41,6 +51,7 @@ frontends/php/app/views/layout.htmlpage.menu.php -text
 frontends/php/app/views/layout.htmlpage.php -text
 frontends/php/app/views/layout.htmlpage.top.php -text
 frontends/php/app/views/layout.javascript.php -text
+frontends/php/app/views/report.status.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text

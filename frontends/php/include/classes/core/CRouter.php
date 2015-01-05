@@ -53,27 +53,37 @@ class CRouter {
 	 * @var array
 	 */
 	private $routes = array(
-		// action					controller						layout					view
-		'discovery.view'	=> array('CControllerDiscoveryView',	'layout.htmlpage',		'monitoring.discovery.view'),
-		'favourite.create'	=> array('CControllerFavouriteCreate',	'layout.javascript',	null),
-		'favourite.delete'	=> array('CControllerFavouriteDelete',	'layout.javascript',	null),
-		'map.view'			=> array('CControllerMapView',			'layout.htmlpage',		'monitoring.map.view'),
-		'proxy.create'		=> array('CControllerProxyCreate',		null,					null),
-		'proxy.delete'		=> array('CControllerProxyDelete',		null,					null),
-		'proxy.formcreate'	=> array('CControllerProxyFormCreate',	'layout.htmlpage',		'administration.proxy.edit'),
-		'proxy.formedit'	=> array('CControllerProxyFormEdit',	'layout.htmlpage',		'administration.proxy.edit'),
-		'proxy.list'		=> array('CControllerProxyList',		'layout.htmlpage',		'administration.proxy.list'),
-		'proxy.massdelete'	=> array('CControllerProxyMassDelete',	null,					null),
-		'proxy.massdisable'	=> array('CControllerProxyMassDisable',	null,					null),
-		'proxy.massenable'	=> array('CControllerProxyMassEnable',	null,					null),
-		'proxy.update'		=> array('CControllerProxyUpdate',		null,					null),
-		'script.create'		=> array('CControllerScriptCreate',		null,					null),
-		'script.delete'		=> array('CControllerScriptDelete',		null,					null),
-		'script.formcreate'	=> array('CControllerScriptFormCreate',	'layout.htmlpage',		'administration.script.edit'),
-		'script.formedit'	=> array('CControllerScriptFormEdit',	'layout.htmlpage',		'administration.script.edit'),
-		'script.list'		=> array('CControllerScriptList',		'layout.htmlpage',		'administration.script.list'),
-		'script.massdelete'	=> array('CControllerScriptMassDelete',	null,					null),
-		'script.update'		=> array('CControllerScriptUpdate',		null,					null)
+		// action					controller								layout					view
+		'discovery.view'		=> array('CControllerDiscoveryView',		'layout.htmlpage',		'monitoring.discovery.view'),
+		'favourite.create'		=> array('CControllerFavouriteCreate',		'layout.javascript',	null),
+		'favourite.delete'		=> array('CControllerFavouriteDelete',		'layout.javascript',	null),
+		'map.view'				=> array('CControllerMapView',				'layout.htmlpage',		'monitoring.map.view'),
+		'mediatype.create'		=> array('CControllerMediatypeCreate',		null,					null),
+		'mediatype.delete'		=> array('CControllerMediatypeDelete',		null,					null),
+		'mediatype.formcreate'	=> array('CControllerMediatypeFormCreate',	'layout.htmlpage',		'administration.mediatype.edit'),
+		'mediatype.formedit'	=> array('CControllerMediatypeFormEdit',	'layout.htmlpage',		'administration.mediatype.edit'),
+		'mediatype.list'		=> array('CControllerMediatypeList',		'layout.htmlpage',		'administration.mediatype.list'),
+		'mediatype.massdelete'	=> array('CControllerMediatypeMassDelete',	null,					null),
+		'mediatype.massdisable'	=> array('CControllerMediatypeMassDisable',	null,					null),
+		'mediatype.massenable'	=> array('CControllerMediatypeMassEnable',	null,					null),
+		'mediatype.update'		=> array('CControllerMediatypeUpdate',		null,					null),
+		'proxy.create'			=> array('CControllerProxyCreate',			null,					null),
+		'proxy.delete'			=> array('CControllerProxyDelete',			null,					null),
+		'proxy.formcreate'		=> array('CControllerProxyFormCreate',		'layout.htmlpage',		'administration.proxy.edit'),
+		'proxy.formedit'		=> array('CControllerProxyFormEdit',		'layout.htmlpage',		'administration.proxy.edit'),
+		'proxy.list'			=> array('CControllerProxyList',			'layout.htmlpage',		'administration.proxy.list'),
+		'proxy.massdelete'		=> array('CControllerProxyMassDelete',		null,					null),
+		'proxy.massdisable'		=> array('CControllerProxyMassDisable',		null,					null),
+		'proxy.massenable'		=> array('CControllerProxyMassEnable',		null,					null),
+		'proxy.update'			=> array('CControllerProxyUpdate',			null,					null),
+		'report.status'			=> array('CControllerReportStatus',			'layout.htmlpage',		'report.status'),
+		'script.create'			=> array('CControllerScriptCreate',			null,					null),
+		'script.delete'			=> array('CControllerScriptDelete',			null,					null),
+		'script.formcreate'		=> array('CControllerScriptFormCreate',		'layout.htmlpage',		'administration.script.edit'),
+		'script.formedit'		=> array('CControllerScriptFormEdit',		'layout.htmlpage',		'administration.script.edit'),
+		'script.list'			=> array('CControllerScriptList',			'layout.htmlpage',		'administration.script.list'),
+		'script.massdelete'		=> array('CControllerScriptMassDelete',		null,					null),
+		'script.update'			=> array('CControllerScriptUpdate',			null,					null)
 	);
 
 	public function __construct($action) {
