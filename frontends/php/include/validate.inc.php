@@ -60,143 +60,6 @@ function KEY_PARAM($var = null) {
 	return 'preg_match("/'.ZBX_PREG_PARAMS.'/",{'.$var.'})&&';
 }
 
-function validate_ipv4($str, &$arr) {
-	if (!preg_match('/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/', $str, $arr)) {
-		return false;
-	}
-
-	for ($i = 1; $i <= 4; $i++) {
-		if (!is_numeric($arr[$i]) || $arr[$i] > 255 || $arr[$i] < 0 ) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-function validate_ipv6($str) {
-	$pattern1 = '([a-f0-9]{1,4}:){7}[a-f0-9]{1,4}';
-	$pattern2 = ':(:[a-f0-9]{1,4}){1,7}';
-	$pattern3 = '[a-f0-9]{1,4}::([a-f0-9]{1,4}:){0,5}[a-f0-9]{1,4}';
-	$pattern4 = '([a-f0-9]{1,4}:){2}:([a-f0-9]{1,4}:){0,4}[a-f0-9]{1,4}';
-	$pattern5 = '([a-f0-9]{1,4}:){3}:([a-f0-9]{1,4}:){0,3}[a-f0-9]{1,4}';
-	$pattern6 = '([a-f0-9]{1,4}:){4}:([a-f0-9]{1,4}:){0,2}[a-f0-9]{1,4}';
-	$pattern7 = '([a-f0-9]{1,4}:){5}:([a-f0-9]{1,4}:){0,1}[a-f0-9]{1,4}';
-	$pattern8 = '([a-f0-9]{1,4}:){6}:[a-f0-9]{1,4}';
-	$pattern9 = '([a-f0-9]{1,4}:){1,7}:';
-	$pattern10 = '::';
-
-	$full = "/^($pattern1)$|^($pattern2)$|^($pattern3)$|^($pattern4)$|^($pattern5)$|^($pattern6)$|^($pattern7)$|^($pattern8)$|^($pattern9)$|^($pattern10)$/i";
-
-	if (!preg_match($full, $str)) {
-		return false;
-	}
-	return true;
-}
-
-function validate_ip($str, &$arr) {
-	if (validate_ipv4($str, $arr)) {
-		return true;
-	}
-
-	if (ZBX_HAVE_IPV6) {
-		return validate_ipv6($str);
-	}
-
-	return false;
-}
-
-/**
- * Validate IP mask. IP/bits.
- * bits range for IPv4: 16 - 30
- * bits range for IPv6: 112 - 128
- *
- * @param string $ip_range
- *
- * @return bool
- */
-function validate_ip_range_mask($ip_range) {
-	$parts = explode('/', $ip_range);
-
-	if (count($parts) != 2) {
-		return false;
-	}
-	$ip = $parts[0];
-	$bits = $parts[1];
-
-	if (validate_ipv4($ip, $arr)) {
-		return preg_match('/^\d{1,2}$/', $bits) && $bits >= 16 && $bits <= 30;
-	}
-	elseif (ZBX_HAVE_IPV6 && validate_ipv6($ip, $arr)) {
-		return preg_match('/^\d{1,3}$/', $bits) && $bits >= 112 && $bits <= 128;
-	}
-	else {
-		return false;
-	}
-}
-
-/*
- * Validate IP range. ***.***.***.***[-***]
- */
-function validate_ip_range_range($ip_range) {
-	$parts = explode('-', $ip_range);
-	if (($parts_count = count($parts)) > 2) {
-		return false;
-	}
-
-	if (validate_ipv4($parts[0], $arr)) {
-		$ip_parts = explode('.', $parts[0]);
-
-		if ($parts_count == 2) {
-			if (!preg_match('/^([0-9]{1,3})$/', $parts[1])) {
-				return false;
-			}
-			sscanf($ip_parts[3], "%d", $from_value);
-			sscanf($parts[1], "%d", $to_value);
-
-			if (($to_value > 255) || ($from_value > $to_value)) {
-				return false;
-			}
-		}
-	}
-	elseif (ZBX_HAVE_IPV6 && validate_ipv6($parts[0])) {
-		$ip_parts = explode(':', $parts[0]);
-		$ip_parts_count = count($ip_parts);
-
-		if ($parts_count == 2) {
-			if (!preg_match('/^([a-f0-9]{1,4})$/i', $parts[1])) {
-				return false;
-			}
-			sscanf($ip_parts[$ip_parts_count - 1], "%x", $from_value);
-			sscanf($parts[1], "%x", $to_value);
-
-			if ($from_value > $to_value) {
-				return false;
-			}
-		}
-	}
-	else {
-		return false;
-	}
-	return true;
-}
-
-function validate_ip_range($str) {
-	foreach (explode(',', $str) as $ip_range) {
-		if (strpos($ip_range, '/') !== false) {
-			if (!validate_ip_range_mask($ip_range)) {
-				return false;
-			}
-		}
-		else {
-			if (!validate_ip_range_range($ip_range)) {
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
 function validate_port_list($str) {
 	foreach (explode(',', $str) as $port_range) {
 		$port_range = explode('-', $port_range);
@@ -281,7 +144,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		$caption = $field;
 	}
 
-	if (is_array($var) && $type != T_ZBX_IP) {
+	if (is_array($var)) {
 		$err = ZBX_VALID_OK;
 
 		foreach ($var as $v) {
@@ -294,25 +157,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	$error = false;
 	$message = '';
 
-	if ($type == T_ZBX_IP) {
-		if (!validate_ip($var, $arr)) {
-			$error = true;
-			$message = _s('Field "%1$s" is not IP.', $caption);
-		}
-	}
-	elseif ($type == T_ZBX_IP_RANGE) {
-		if (!validate_ip_range($var)) {
-			$error = true;
-			$message = _s('Field "%1$s" is not IP range.', $caption);
-		}
-	}
-	elseif ($type == T_ZBX_INT_RANGE) {
-		if (!is_int_range($var)) {
-			$error = true;
-			$message = _s('Field "%1$s" is not integer list or range.', $caption);
-		}
-	}
-	elseif ($type == T_ZBX_INT) {
+	if ($type == T_ZBX_INT) {
 		if (!zbx_is_int($var)) {
 			$error = true;
 			$message = _s('Field "%1$s" is not integer.', $caption);

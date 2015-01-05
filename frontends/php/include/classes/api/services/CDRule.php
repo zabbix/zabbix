@@ -209,12 +209,14 @@ class CDRule extends CApiService {
 		}
 
 		$proxies = array();
+		$ipRangeValidator = new CIPRangeValidator(array('ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT));
 		foreach ($dRules as $dRule) {
 			if (!isset($dRule['iprange'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
 			}
-			elseif (!validate_ip_range($dRule['iprange'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $dRule['iprange']));
+
+			if (!$ipRangeValidator->validate($dRule['iprange'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $ipRangeValidator->getError());
 			}
 
 			if (isset($dRule['delay']) && $dRule['delay'] < 0) {
@@ -257,7 +259,7 @@ class CDRule extends CApiService {
 			if (isset($dCheck['uniq']) && ($dCheck['uniq'] == 1)) {
 				if (!in_array($dCheck['type'], array(SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.')
+						_('Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.')
 					);
 				}
 

@@ -28,13 +28,6 @@ class CFormTable extends CForm {
 	protected $center_items = array();
 	protected $bottom_items = array();
 
-	/**
-	 * Help icon.
-	 *
-	 * @var CHelp
-	 */
-	protected $help;
-
 	public function __construct($title = null, $action = null, $method = null, $enctype = null, $form_variable = null) {
 		$method = is_null($method) ? 'post' : $method;
 		parent::__construct($method, $action, $enctype);
@@ -78,13 +71,6 @@ class CFormTable extends CForm {
 
 	public function setTitle($value = null) {
 		$this->title = $value;
-	}
-
-	/**
-	 * Adds a help icon.
-	 */
-	public function addHelpIcon() {
-		$this->help = new CHelp();
 	}
 
 	public function addRow($item1, $item2 = null, $class = null, $id = null) {
@@ -160,9 +146,6 @@ class CFormTable extends CForm {
 			$col = new CCol(null, 'form_row_first');
 			$col->setColSpan(2);
 
-			if (isset($this->help)) {
-				$col->addItem($this->help);
-			}
 			if (isset($this->title)) {
 				$col->addItem($this->title);
 			}
