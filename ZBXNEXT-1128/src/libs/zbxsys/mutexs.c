@@ -52,8 +52,8 @@
  *              name - name of mutex (index for nix system)                   *
  *              forced - remove mutex if exists (only for nix)                *
  *                                                                            *
- * Return value: If the function succeeds, then return ZBX_MUTEX_OK,          *
- *               ZBX_MUTEX_ERROR on an error                                  *
+ * Return value: If the function succeeds, then return SUCCEED,               *
+ *               FAIL on an error                                             *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -67,7 +67,7 @@ int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char fo
 	if (NULL == (*mutex = CreateMutex(NULL, FALSE, name)))
 	{
 		zbx_error("error on mutex creating: %s", strerror_from_system(GetLastError()));
-		return ZBX_MUTEX_ERROR;
+		return FAIL;
 	}
 
 #else
@@ -86,7 +86,7 @@ int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char fo
 		if (-1 == (sem_key = ftok(".", (int)'z')))
 		{
 			zbx_error("cannot create IPC key for path '.': %s", zbx_strerror(errno));
-			return ZBX_MUTEX_ERROR;
+			return FAIL;
 		}
 	}
 lbl_create:
@@ -100,7 +100,7 @@ lbl_create:
 			if (-1 == semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
 			{
 				zbx_error("semaphore [%i] error in semctl(SETVAL): %s", name, zbx_strerror(errno));
-				return ZBX_MUTEX_ERROR;
+				return FAIL;
 
 			}
 
@@ -155,12 +155,12 @@ lbl_create:
 		}
 
 		zbx_error("semaphore [%i] not initialized", name);
-		return ZBX_MUTEX_ERROR;
+		return FAIL;
 	}
 	else
 	{
 		zbx_error("cannot create Semaphore: %s", zbx_strerror(errno));
-		return ZBX_MUTEX_ERROR;
+		return FAIL;
 	}
 lbl_return:
 	*mutex = name;
@@ -168,7 +168,7 @@ lbl_return:
 
 #endif	/* _WINDOWS */
 
-	return ZBX_MUTEX_OK;
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -274,12 +274,12 @@ int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 {
 #ifdef _WINDOWS
 	if (ZBX_MUTEX_NULL == *mutex)
-		return ZBX_MUTEX_OK;
+		return SUCCEED;
 
 	if (0 == CloseHandle(*mutex))
 	{
 		zbx_error("error on mutex destroying: %s", strerror_from_system(GetLastError()));
-		return ZBX_MUTEX_ERROR;
+		return FAIL;
 	}
 #else
 	if (0 == --mutexes)
@@ -288,5 +288,5 @@ int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 
 	*mutex = ZBX_MUTEX_NULL;
 
-	return ZBX_MUTEX_OK;
+	return SUCCEED;
 }

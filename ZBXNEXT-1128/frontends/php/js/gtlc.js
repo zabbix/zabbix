@@ -1615,11 +1615,11 @@ var sbox = Class.create({
 		jQuery(this.grphobj).off();
 		jQuery(this.dom_obj).off();
 
-		if (IE) {
+		if (IE8 || IE9 || IE10) {
 			jQuery(this.grphobj).mousedown(jQuery.proxy(this.mouseDown, this));
 			jQuery(this.grphobj).mousemove(jQuery.proxy(this.mouseMove, this));
-			jQuery('#flickerfreescreen_' + this.sbox_id + ' a').click(function() {
-				ZBX_SBOX[this.sbox_id].ieMouseClick();
+			jQuery(this.grphobj).click(function() {
+				ZBX_SBOX[obj.sbox_id].ieMouseClick();
 			});
 		}
 		else {

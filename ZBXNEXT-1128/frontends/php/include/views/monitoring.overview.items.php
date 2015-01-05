@@ -38,7 +38,7 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 $hintTable->addRow(array(new CCol(SPACE), _('OK or no trigger')));
 
-$help = new CHelp();
+$help = new CIcon(null, 'iconhelp');
 $help->setHint($hintTable);
 
 // header right

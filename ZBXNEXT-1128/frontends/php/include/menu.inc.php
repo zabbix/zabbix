@@ -125,7 +125,7 @@ $ZBX_MENU = array(
 				'label' => _('Availability report')
 			),
 			array(
-				'url' => 'report5.php',
+				'url' => 'toptriggers.php',
 				'label' => _('Triggers top 100')
 			),
 			array(
