@@ -788,6 +788,7 @@ int	DBcheck_version(void)
 
 			current++;
 			completed = (int)(100.0 * current / total);
+
 			if (last_completed != completed)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "completed %d%% of database upgrade", completed);
