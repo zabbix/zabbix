@@ -442,7 +442,7 @@ if ($singleHostSelected) {
 }
 else {
 	$hostHeader = make_sorting_header(_('Host'), 'host', $sortField, $sortOrder);
-	$hostHeader->addClass('latest-host');
+	$hostHeader->addClass('latest-host '.($filter['showDetails'] ? 'with-details' : 'no-details'));
 	$hostHeader->setAttribute('title', _('Host'));
 
 	$hostColumn = '';
