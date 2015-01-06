@@ -20,15 +20,19 @@
 #include "common.h"
 #include "sysinfo.h"
 
-#include "zone.h"
-#include "utmpx.h"
+#ifdef HAVE_ZONE_H
+#	include "zone.h"
+#	include "utmpx.h"
+#endif
 
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
 
+#ifdef HAVE_ZONE_H
 	if (GLOBAL_ZONEID == getzoneid())
 	{
+#endif
 		kstat_ctl_t	*kc;
 		kstat_t		*kp;
 		kstat_named_t	*kn;
@@ -48,6 +52,7 @@ int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 		}
 		kstat_close(kc);
+#ifdef HAVE_ZONE_H
 	}
 	else
 	{
@@ -65,7 +70,7 @@ int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		endutxent();
 	}
-
+#endif
 	if (SYSINFO_RET_OK != ret)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system boot time."));
 
