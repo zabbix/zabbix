@@ -1475,7 +1475,7 @@ function getPagingLine(&$items) {
 		$currentPage = 1;
 	}
 
-	if ($itemsCount < (($currentPage - 1) * $rowsPerPage)) {
+	if ($currentPage > $pagesCount) {
 		$currentPage = $pagesCount;
 	}
 
