@@ -716,6 +716,14 @@ static int	DBpatch_2030067(void)
 
 static int	DBpatch_2030068(void)
 {
+	if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
+	{
+		/* "name" is empty on proxy side, because it is not synchronized between server and proxy */
+		/* in 2.2, and should therefore be filled with unique values to create a unique index.    */
+		if (ZBX_DB_OK > DBexecute("update drules set name=druleid"))
+			return FAIL;
+	}
+
 	if (SUCCEED != check_data_uniqueness("drules", "name"))
 		return FAIL;
 
