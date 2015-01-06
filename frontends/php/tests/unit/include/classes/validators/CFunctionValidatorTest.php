@@ -126,6 +126,48 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 		return $tests;
 	}
 
+	private static function parameterPercent_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
+		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+				ITEM_VALUE_TYPE_TEXT);
+
+		$tests = array();
+
+		foreach ($valueTypesAny as $valueType) {
+			$params[$no] = '0';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
+			$params[$no] = '1';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
+			$params[$no] = '01';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
+			$params[$no] = '1s';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '1m';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '1h';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '1d';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '1w';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '1K';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '1M';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '1G';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '1T';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '-15';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '-15.0';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '0.0';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
+			$params[$no] = '1.0';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
+			$params[$no] = '1.0123';	$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
+			$params[$no] = '1.01234';	$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '1.00000';	$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '1.';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
+			$params[$no] = '.1';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
+			$params[$no] = '.';			$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '100.0000';	$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
+			$params[$no] = '100.0001';	$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '#0';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '#1';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '#1.0';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '#-15';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '{$M}';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
+			$params[$no] = '1{$M}';		$tests[] = array($func, $params, $valueType, false);
+		}
+
+		return $tests;
+	}
+
 	private static function parameterString_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
 		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_TEXT);
@@ -266,6 +308,11 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 			// min() - (sec or #num, time_shift) [float, int]
 			self::parameterSecNumPeriod_TestCases('min', $valueTypesNum),
 			self::parameterTimeShift_TestCases('min', $valueTypesNum, array('#1', ''), 1),
+
+			// percentile() - (sec or #num, time_shift, float) [float, int]
+			self::parameterSecNumPeriod_TestCases('percentile', $valueTypesNum, array('#1', '', '50')),
+			self::parameterTimeShift_TestCases('percentile', $valueTypesNum, array('#1', '', '50'), 1),
+			self::parameterPercent_TestCases('percentile', $valueTypesNum, array('#1', '', '50'), 2),
 
 			// strlen() - (sec or #num, time_shift) [str, text, log]
 			self::parameterSecNumOffset_TestCases('strlen', $valueTypesStr),
