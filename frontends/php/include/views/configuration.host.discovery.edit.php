@@ -234,7 +234,7 @@ $newFlexInt = new CSpan(array(
 	SPACE,
 	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
 	SPACE,
-	new CSubmit('add_delay_flex', _('Add'), null, 'button-form')
+	new CButton('add_delay_flex', _('Add'), null, 'button-form')
 ));
 $newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
 

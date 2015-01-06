@@ -60,6 +60,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese an
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+..F....... [ZBX-8874] fixed LLD rule form flexible interval field being submitted when other form fields are in focus (Ivo)
 ....I..... [ZBX-9169] fixed upgrade of the proxy database with several discovery rules (Sasha)
 ........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
 ....I..... [ZBX-9185] fixed upgrade procedure in case database version is greater than version of the binary (Sasha)
