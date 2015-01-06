@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+....I..... [ZBXNEXT-2637] changed the DB user in the default configuration files to "zabbix", server and proxy timeouts to 4 seconds, LogSlowQueries to 3 seconds and MaxHousekeeperDelete to 5000; listed characters, prohibited in user parameters (Richlv)
 A.F....PS. [ZBXNEXT-756] added function percentile() to calculated items and trigger expressions (asaveljevs)
 .....J.... [ZBX-9006] added support for IPv6 addresses to Java gateway (asaveljevs)
 A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent, updated outdated user agent strings in web scenario form and improved selection of other user agents (Ivo)
@@ -17,6 +18,7 @@ A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent, updated outdated
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+..F....... [ZBX-9018] fixed updating of "config" table in Administration -> General pages (Oleg, Sasha)
 ...G...PS. [ZBX-9002] fixed log file locking during logging (igors)
 ..F....... [ZBX-8943] fixed script ordering when using backslashes in popup script menus (arvids)
 ..F....... [ZBX-8922] fixed form element positioning issues in host add/edit form (arvids)
@@ -54,8 +56,16 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 Changes for 2.4.4rc1
 
 New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
+....I..... [ZBX-9185] fixed upgrade procedure in case database version is greater than version of the binary (Sasha)
+..F....... [ZBX-9177] improved host and item name column widths on Monitoring / Latest data page (Krists)
+.......PS. [ZBX-9154] fixed compilation error with Oracle backend (wiper)
+..F....... [ZBX-9042] unified "mass update" spelling in trigger configuration page (Richlv)
+..F....... [ZBX-9153] fixed vmware.version item key being listed as vmware.eventlog in the item key helper (Richlv)
 A......... [ZBX-8950] fixed "selecIconMap" option in map.get method (Oleg)
 ..F....... [ZBX-8405] fixed typo in item key helper for system.cpu.num item description (asaveljevs)
 ..F....... [ZBX-8846] fixed non-existent page displaying (Oleg)
@@ -569,8 +579,13 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.9rc1
 
 New features:
+A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
+.......PS. [ZBX-9154] fixed compilation error with Oracle backend (wiper)
+..F....... [ZBX-9042] unified "mass update" spelling in trigger configuration page (Richlv)
+..F....... [ZBX-9153] fixed vmware.version item key being listed as vmware.eventlog in the item key helper (Richlv)
 ..F....... [ZBX-8405] fixed typo in item key helper for system.cpu.num item description (asaveljevs)
 ..F....... [ZBX-8846] fixed non-existent page displaying (Oleg)
 ........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
@@ -1747,6 +1762,7 @@ Changes for 2.0.15rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
 ........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
 
 --------------------------------------------------------------------------------

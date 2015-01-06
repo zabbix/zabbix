@@ -118,11 +118,12 @@ class CActionCondValidator extends CValidator {
 				break;
 
 			case CONDITION_TYPE_DHOST_IP:
+				$ipRangeValidator = new CIPRangeValidator();
 				if (zbx_empty($conditionValue)) {
 					$this->setError(_('Empty action condition.'));
 				}
-				else if (!validate_ip_range($conditionValue)) {
-					$this->setError(_s('Incorrect action condition ip "%1$s".', $conditionValue));
+				elseif (!$ipRangeValidator->validate($conditionValue)) {
+					$this->setError($ipRangeValidator->getError());
 				}
 				break;
 

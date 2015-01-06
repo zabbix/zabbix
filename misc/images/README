@@ -7,3 +7,7 @@ png_modern contains current Zabbix network map images in PNG format.
 
 In addition to using pre-generated SQL files you may also generate an XML file
  to import additional iconsets with png_to_xml.sh script.
+
+strip_inkscape_attributes.xslt may be used to remove inkscape-specific
+ attributes from SVG files:
+ xsltproc strip_inkscape_attributes.xslt file.svg
