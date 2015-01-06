@@ -2440,9 +2440,17 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_STATE, &tmp, &tmp_alloc))
 			av->state = (unsigned char)atoi(tmp);
 
-		/* meta information update (log size and mtime) */
+		/* meta information update (lastlogsize and mtime) packet is missing value tag */
 		if (NULL == av->value)
-			av->meta = 1;
+		{
+			if (ITEM_STATE_NOTSUPPORTED == av->state)
+			{
+				/* unsupported items cannot have NULL-string error message */
+				av->value = zbx_strdup(NULL, "");
+			}
+			else
+				av->meta = 1;
+		}
 
 		values_num++;
 
