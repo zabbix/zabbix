@@ -19,12 +19,6 @@
 **/
 
 
-function setHostGroupInternal($groupids, $internal = ZBX_NOT_INTERNAL_GROUP) {
-	zbx_value2array($groupids);
-
-	return DBexecute('UPDATE groups SET internal='.zbx_dbstr($internal).' WHERE '.dbConditionInt('groupid', $groupids));
-}
-
 /**
  * Get ipmi auth type label by it's number.
  *

@@ -611,10 +611,6 @@ class CHelpItems {
 					'description' => _('VMware service full name, <url> - VMware service URL')
 				),
 				array(
-					'key' => 'vmware.eventlog[<url>]',
-					'description' => _('VMware service version, <url> - VMware service URL')
-				),
-				array(
 					'key' => 'vmware.hv.cluster.name[<url>,<uuid>]',
 					'description' => _('VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				),
@@ -697,6 +693,10 @@ class CHelpItems {
 				array(
 					'key' => 'vmware.hv.vm.num[<url>,<uuid>]',
 					'description' => _('Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+				),
+				array(
+					'key' => 'vmware.version[<url>]',
+					'description' => _('VMware service version, <url> - VMware service URL')
 				),
 				array(
 					'key' => 'vmware.vm.cluster.name[<url>,<uuid>]',
