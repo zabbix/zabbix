@@ -86,7 +86,7 @@ clean:
 			ret = SYSINFO_RET_OK;
 		}
 		else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system boot time."));}
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system boot time."));
 
 		endutxent();
 	}
