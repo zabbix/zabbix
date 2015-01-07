@@ -34,13 +34,13 @@ class CControllerProxyFormCreate extends CController {
 			'description' =>		'fatal|db:hosts.description |required_if:form,1'
 		);
 
-		$result = $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
 
-		if (!$result) {
+		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
-		return $result;
+		return $ret;
 	}
 
 	protected function checkPermissions() {

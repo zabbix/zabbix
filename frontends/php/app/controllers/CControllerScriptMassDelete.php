@@ -25,13 +25,13 @@ class CControllerScriptMassDelete extends CController {
 			'scriptids' =>		'fatal|array_db:scripts.scriptid|required'
 		);
 
-		$result = $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
 
-		if (!$result) {
+		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
-		return $result;
+		return $ret;
 	}
 
 	protected function checkPermissions() {

@@ -25,13 +25,13 @@ class CControllerMediatypeMassDisable extends CController {
 			'mediatypeids' =>	'fatal|array_db:media_type.mediatypeid|required'
 		);
 
-		$result = $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
 
-		if (!$result) {
+		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
-		return $result;
+		return $ret;
 	}
 
 	protected function checkPermissions() {

@@ -27,13 +27,13 @@ class CControllerMediatypeList extends CController {
 			'uncheck' =>		'fatal|in_int:1'
 		);
 
-		$result = $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
 
-		if (!$result) {
+		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
-		return $result;
+		return $ret;
 	}
 
 	protected function checkPermissions() {

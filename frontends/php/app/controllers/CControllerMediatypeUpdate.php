@@ -36,9 +36,9 @@ class CControllerMediatypeUpdate extends CController {
 			'status' =>				'fatal|db:media_type.status     |required|in:'.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 		);
 
-		$result = $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
 
-		if (!$result) {
+		if (!$ret) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.formedit');
@@ -52,7 +52,7 @@ class CControllerMediatypeUpdate extends CController {
 			}
 		}
 
-		return $result;
+		return $ret;
 	}
 
 	protected function checkPermissions() {

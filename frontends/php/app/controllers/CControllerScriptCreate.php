@@ -37,9 +37,9 @@ class CControllerScriptCreate extends CController {
 			'enable_confirmation' =>'fatal|in_int:1'
 		);
 
-		$result = $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
 
-		if (!$result) {
+		if (!$ret) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=script.formcreate');
@@ -53,7 +53,7 @@ class CControllerScriptCreate extends CController {
 			}
 		}
 
-		return $result;
+		return $ret;
 	}
 
 

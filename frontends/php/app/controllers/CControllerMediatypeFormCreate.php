@@ -35,13 +35,13 @@ class CControllerMediatypeFormCreate extends CController {
 			'status' =>				'fatal|db:media_type.status     |required_if:form,1|in:'.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED
 		);
 
-		$result = $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
 
-		if (!$result) {
+		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
-		return $result;
+		return $ret;
 	}
 
 	protected function checkPermissions() {
