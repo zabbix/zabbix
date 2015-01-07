@@ -54,6 +54,20 @@ abstract class DbBackend {
 	}
 
 	/**
+	 * Check the integrity of the table "config".
+	 *
+	 * @return bool
+	 */
+	public function checkConfig() {
+		if (!DBfetch(DBselect('SELECT NULL FROM config c'))) {
+			$this->setError(_('Unable to select configuration.'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Create INSERT SQL query for MySQL, PostgreSQL and IBM DB2.
 	 * Creation example:
 	 *	INSERT INTO applications (name,hostid,templateid,applicationid)
