@@ -39,14 +39,14 @@ $mediaTypeForm->setName('mediaTypesForm');
 $mediaTypeTable = new CTableInfo(_('No media types found.'));
 $mediaTypeTable->setHeader(array(
 	new CCheckBox('all_media_types', null, "checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"),
-	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
+	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder']),
+	make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder']),
 	_('Status'),
 	_('Used in actions'),
 	_('Details')
 ));
 
-foreach ($this->data['mediatypes'] as $mediaType) {
+foreach ($data['mediatypes'] as $mediaType) {
 	switch ($mediaType['typeid']) {
 		case MEDIA_TYPE_EMAIL:
 			$details =
@@ -133,7 +133,7 @@ $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "mediatypeids";');
 
 // append table to form
-$mediaTypeForm->addItem(array($this->data['paging'], $mediaTypeTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$mediaTypeForm->addItem(array($data['paging'], $mediaTypeTable, $data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $mediaTypeWidget->addItem($mediaTypeForm);

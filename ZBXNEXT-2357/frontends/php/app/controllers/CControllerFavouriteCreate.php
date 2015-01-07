@@ -37,6 +37,7 @@ class CControllerFavouriteCreate extends CController {
 	}
 
 	protected function checkPermissions() {
+		return true;
 	}
 
 	protected function doAction() {

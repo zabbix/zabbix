@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+$this->includeJSfile('app/views/administration.mediatype.edit.js.php');
 
 $mediaTypeWidget = new CWidget();
 $mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'));
@@ -35,7 +36,7 @@ $nameTextBox->attr('autofocus', 'autofocus');
 $mediaTypeFormList->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
-$cmbType = new CComboBox('type', $data['type'], 'submit()');
+$cmbType = new CComboBox('type', $data['type']);
 $cmbType->addItems(array(
 	MEDIA_TYPE_EMAIL => _('Email'),
 	MEDIA_TYPE_EXEC => _('Script'),
@@ -44,53 +45,39 @@ $cmbType->addItems(array(
 ));
 $cmbType->addItemsInGroup(_('Commercial'), array(MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')));
 $cmbTypeRow = array($cmbType);
-if ($data['type'] == MEDIA_TYPE_EZ_TEXTING) {
-	$ez_texting_link = new CLink('https://app.eztexting.com', 'https://app.eztexting.com/', null, null, 'nosid');
-	$ez_texting_link->setTarget('_blank');
-	$cmbTypeRow[] = $ez_texting_link;
-}
+$ez_texting_link = new CLink('https://app.eztexting.com', 'https://app.eztexting.com/', null, null, 'nosid');
+$ez_texting_link->setTarget('_blank');
+$cmbTypeRow[] = $ez_texting_link;
+
 $mediaTypeFormList->addRow(_('Type'), $cmbTypeRow);
 
-// append others fields to form list
-if ($data['type'] == MEDIA_TYPE_EMAIL) {
-	$mediaTypeFormList->addRow(_('SMTP server'), new CTextBox('smtp_server', $data['smtp_server'], ZBX_TEXTBOX_STANDARD_SIZE));
-	$mediaTypeFormList->addRow(_('SMTP helo'), new CTextBox('smtp_helo', $data['smtp_helo'], ZBX_TEXTBOX_STANDARD_SIZE));
-	$mediaTypeFormList->addRow(_('SMTP email'), new CTextBox('smtp_email', $data['smtp_email'], ZBX_TEXTBOX_STANDARD_SIZE));
-}
-elseif ($data['type'] == MEDIA_TYPE_SMS) {
-	$mediaTypeFormList->addRow(_('GSM modem'), new CTextBox('gsm_modem', $data['gsm_modem'], ZBX_TEXTBOX_STANDARD_SIZE));
-}
-elseif ($data['type'] == MEDIA_TYPE_EXEC) {
-	$mediaTypeFormList->addRow(_('Script name'), new CTextBox('exec_path', $data['exec_path'], ZBX_TEXTBOX_STANDARD_SIZE));
-}
-elseif ($data['type'] == MEDIA_TYPE_JABBER || $data['type'] == MEDIA_TYPE_EZ_TEXTING) {
-	// create password field
-	if (!empty($data['passwd'])) {
-		$passwdButton = new CButton('chPass_btn', _('Change password'), 'this.style.display="none"; $("passwd").enable().show().focus();');
-		$passwdBox = new CPassBox('passwd', $data['passwd'], ZBX_TEXTBOX_SMALL_SIZE);
-		$passwdBox->addStyle('display: none;');
-		$passwdField = array($passwdButton, $passwdBox);
-	}
-	else {
-		$passwdField = new CPassBox('passwd', '', ZBX_TEXTBOX_SMALL_SIZE);
-	}
+$mediaTypeFormList->addRow(_('SMTP server'), new CTextBox('smtp_server', $data['smtp_server'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_EMAIL);
+$mediaTypeFormList->addRow(_('SMTP helo'), new CTextBox('smtp_helo', $data['smtp_helo'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_EMAIL);
+$mediaTypeFormList->addRow(_('SMTP email'), new CTextBox('smtp_email', $data['smtp_email'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_EMAIL);
+$mediaTypeFormList->addRow(_('Script name'), new CTextBox('exec_path', $data['exec_path'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_EXEC);
+$mediaTypeFormList->addRow(_('GSM modem'), new CTextBox('gsm_modem', $data['gsm_modem'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_SMS);
 
-	// append password field to form list
-	if ($data['type'] == MEDIA_TYPE_JABBER) {
-		$mediaTypeFormList->addRow(_('Jabber identifier'), new CTextBox('username', $data['username'], ZBX_TEXTBOX_STANDARD_SIZE));
-		$mediaTypeFormList->addRow(_('Password'), $passwdField);
-	}
-	else {
-		$mediaTypeFormList->addRow(_('Username'), new CTextBox('username', $data['username'], ZBX_TEXTBOX_STANDARD_SIZE));
-		$mediaTypeFormList->addRow(_('Password'), $passwdField);
-		$limitCb = new CComboBox('exec_path', $data['exec_path']);
-		$limitCb->addItems(array(
-			EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
-			EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)'),
-		));
-		$mediaTypeFormList->addRow(_('Message text limit'), $limitCb);
-	}
+// create password field
+if ($data['passwd'] != '') {
+	$passwdButton = new CButton('chPass_btn', _('Change password'), 'this.style.display="none"; $("passwd").enable().show().focus();');
+	$passwdBox = new CPassBox('passwd', $data['passwd'], ZBX_TEXTBOX_SMALL_SIZE);
+	$passwdBox->addStyle('display: none;');
+	$passwdField = array($passwdButton, $passwdBox);
 }
+else {
+	$passwdField = new CPassBox('passwd', '', ZBX_TEXTBOX_SMALL_SIZE);
+}
+
+// append password field to form list
+$mediaTypeFormList->addRow(_('Jabber identifier'), new CTextBox('jabber_username', $data['jabber_username'], ZBX_TEXTBOX_STANDARD_SIZE));
+$mediaTypeFormList->addRow(_('Username'), new CTextBox('eztext_username', $data['eztext_username'], ZBX_TEXTBOX_STANDARD_SIZE));
+$mediaTypeFormList->addRow(_('Password'), $passwdField);
+$limitCb = new CComboBox('eztext_limit', $data['exec_path']);
+$limitCb->addItems(array(
+	EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
+	EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)'),
+));
+$mediaTypeFormList->addRow(_('Message text limit'), $limitCb);
 
 $mediaTypeFormList->addRow(_('Enabled'), new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE == $data['status'], null, MEDIA_TYPE_STATUS_ACTIVE));
 

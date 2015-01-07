@@ -46,7 +46,7 @@ class CControllerProxyFormEdit extends CController {
 
 	protected function checkPermissions() {
 		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			access_deny();
+			return false;
 		}
 
 		$proxies = API::Proxy()->get(array(
@@ -55,8 +55,10 @@ class CControllerProxyFormEdit extends CController {
 		));
 
 		if (!$proxies) {
-			access_deny();
+			return false;
 		}
+
+		return true;
 	}
 
 	protected function doAction() {

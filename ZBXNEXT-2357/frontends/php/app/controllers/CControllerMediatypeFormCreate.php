@@ -45,9 +45,7 @@ class CControllerMediatypeFormCreate extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			access_deny();
-		}
+		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
 	protected function doAction() {

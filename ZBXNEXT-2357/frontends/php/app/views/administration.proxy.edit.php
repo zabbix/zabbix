@@ -43,7 +43,6 @@ $proxyFormList->addRow(_('Proxy mode'), $statusBox);
 
 if ($data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$proxyForm->addVar('interface[interfaceid]', $data['interface']['interfaceid']);
-//	$proxyForm->addVar('interface[hostid]', $data['interface']['hostid']);
 }
 
 $interfaceTable = new CTable(null, 'formElementTable');

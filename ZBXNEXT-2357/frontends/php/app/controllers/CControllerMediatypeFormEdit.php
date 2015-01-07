@@ -49,7 +49,7 @@ class CControllerMediatypeFormEdit extends CController {
 
 	protected function checkPermissions() {
 		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			access_deny();
+			return false;
 		}
 
 		$mediatypes = API::Mediatype()->get(array(
@@ -58,10 +58,12 @@ class CControllerMediatypeFormEdit extends CController {
 		));
 
 		if (!$mediatypes) {
-			access_deny();
+			return false;
 		}
 
 		$this->mediatype = $mediatypes[0];
+
+		return true;
 	}
 
 	protected function doAction() {

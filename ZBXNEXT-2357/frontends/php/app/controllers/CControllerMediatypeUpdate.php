@@ -57,7 +57,7 @@ class CControllerMediatypeUpdate extends CController {
 
 	protected function checkPermissions() {
 		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			access_deny();
+			return false;
 		}
 
 		$mediatypes = API::Mediatype()->get(array(
@@ -66,8 +66,10 @@ class CControllerMediatypeUpdate extends CController {
 		));
 
 		if (!$mediatypes) {
-			access_deny();
+			return false;
 		}
+
+		return true;
 	}
 
 	protected function doAction() {

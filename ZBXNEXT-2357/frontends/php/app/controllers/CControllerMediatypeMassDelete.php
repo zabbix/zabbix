@@ -36,7 +36,7 @@ class CControllerMediatypeMassDelete extends CController {
 
 	protected function checkPermissions() {
 		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			access_deny();
+			return false;
 		}
 
 		$mediatypes = API::Mediatype()->get(array(
@@ -45,8 +45,10 @@ class CControllerMediatypeMassDelete extends CController {
 		));
 
 		if ($mediatypes != count($this->getInput('mediatypeids'))) {
-			access_deny();
+			return false;
 		}
+
+		return true;
 	}
 
 	protected function doAction() {

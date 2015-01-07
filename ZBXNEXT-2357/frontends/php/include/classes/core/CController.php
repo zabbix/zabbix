@@ -180,7 +180,7 @@ class CController {
 	 * @return var
 	 */
 	protected function checkPermissions() {
-		access_deny();
+		return false;
 	}
 
 	/**
@@ -208,7 +208,9 @@ class CController {
 	 */
 	final public function run() {
 		if ($this->checkInput()) {
-			$this->checkPermissions();
+			if ($this->checkPermissions() !== true) {
+				access_deny();
+			}
 			$this->doAction();
 		}
 		return $this->getResponse();
