@@ -60,6 +60,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese an
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+.......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
 .......PS. [ZBX-9163] fixed SNMPERR_TOO_LONG error being wrongly treated as a network error; thanks to Santal for patch (asaveljevs)
 ...G...... [ZBX-6047] fixed system.boottime and system.uptime returning incorrect results on Solaris zones (asaveljevs)
 ..F....... [ZBX-8874] fixed LLD rule form flexible interval field being submitted when other form fields are in focus (Ivo)
@@ -586,6 +587,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
 .......PS. [ZBX-9163] fixed SNMPERR_TOO_LONG error being wrongly treated as a network error; thanks to Santal for patch (asaveljevs)
 ...G...... [ZBX-6047] fixed system.boottime and system.uptime returning incorrect results on Solaris zones (asaveljevs)
 ........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
@@ -1768,6 +1770,7 @@ Changes for 2.0.15rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
 ........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
 ........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
 
