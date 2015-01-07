@@ -25,14 +25,14 @@ class CControllerScriptDelete extends CController {
 			'scriptid' =>		'fatal|db:scripts.scriptid|required'
 		);
 
-		$result = $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
 
-		if (!$result) {
+		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
 
-		return $result;
+		return $ret;
 	}
 
 	protected function checkPermissions() {

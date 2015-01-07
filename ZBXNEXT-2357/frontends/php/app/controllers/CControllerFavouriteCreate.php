@@ -26,14 +26,14 @@ class CControllerFavouriteCreate extends CController {
 			'objectid' =>			'fatal|db:items.itemid|required'
 		);
 
-		$result = $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
 
-		if (!$result) {
+		if (!$ret) {
 			$data['javascript'] = '';
 			$this->setResponse(new CControllerResponseData($data));
 		}
 
-		return $result;
+		return $ret;
 	}
 
 	protected function checkPermissions() {

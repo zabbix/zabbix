@@ -33,9 +33,9 @@ class CControllerProxyUpdate extends CController {
 			'description' =>		'      db:hosts.description |required'
 		);
 
-		$result = $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
 
-		if (!$result) {
+		if (!$ret) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=proxy.formedit');
@@ -49,7 +49,7 @@ class CControllerProxyUpdate extends CController {
 			}
 		}
 
-		return $result;
+		return $ret;
 	}
 
 	protected function checkPermissions() {

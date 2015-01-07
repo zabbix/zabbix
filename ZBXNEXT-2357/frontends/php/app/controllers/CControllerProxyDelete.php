@@ -25,13 +25,13 @@ class CControllerProxyDelete extends CController {
 			'proxyid' =>		'fatal|db:hosts.hostid|required'
 		);
 
-		$result = $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
 
-		if (!$result) {
+		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
-		return $result;
+		return $ret;
 	}
 
 	protected function checkPermissions() {
