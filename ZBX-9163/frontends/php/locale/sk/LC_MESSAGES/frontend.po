@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-22 16:00+0200\n"
-"PO-Revision-Date: 2014-08-17 18:30+0300\n"
+"POT-Creation-Date: 2014-12-30 05:45+0200\n"
+"PO-Revision-Date: 2014-12-26 17:27+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1408293044.0\n"
+"X-POOTLE-MTIME: 1419607662.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:500 api/classes/CMaintenance.php:505
@@ -2248,7 +2248,7 @@ msgstr "Nie je možné poslať príkaz, skontrolujte spojenie so Zabbix serverom
 #: api/classes/CHostGroup.php:493
 #, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Nie je možné nastaviť \"%1$s\" pre skupinu \"%2$s\"."
 
 #: api/classes/CItemGeneral.php:242
 #, c-format
@@ -2351,7 +2351,7 @@ msgstr "Nie je možné aktualizovať \"%1$s\" pre akciu \"%2$s\"."
 #: api/classes/CHostGroup.php:535
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Nie je možné aktualizovať \"%1$s\" pre skupinu \"%2$s\"."
 
 #: api/classes/CItemGeneral.php:206
 #, c-format
@@ -8841,6 +8841,7 @@ msgstr "Maska"
 #: hosts.php:1016 include/views/configuration.item.list.php:281
 #: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.triggers.list.php:278
+#: include/views/configuration.triggers.massupdate.php:146
 msgid "Mass update"
 msgstr "Hromadná aktualizácia"
 
@@ -11723,7 +11724,7 @@ msgstr "Nahradiť aplikácie"
 
 #: include/views/configuration.triggers.massupdate.php:131
 msgid "Replace dependencies"
-msgstr "Nahradiť závislosti"
+msgstr ""
 
 #: include/views/configuration.host.massupdate.php:66
 msgid "Replace host groups"
@@ -14006,10 +14007,6 @@ msgstr "Spúšťače zmazané"
 #: include/classes/class.ctriggersinfo.php:110 include/screens.inc.php:42
 msgid "Triggers info"
 msgstr "Informácie o spúšťačoch"
-
-#: include/views/configuration.triggers.massupdate.php:146
-msgid "Triggers massupdate"
-msgstr "Hromadná aktualizácia spúšťačov"
 
 #: include/screens.inc.php:43
 msgid "Triggers overview"
