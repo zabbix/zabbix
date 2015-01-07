@@ -86,8 +86,8 @@ static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT
 			{
 				for (p = columns[i]; '\0' != *p; p++)
 				{
-					if (0 != isalpha(*p))
-						*p = toupper(*p);
+					if (0 != isalpha((unsigned char)*p))
+						*p = toupper((unsigned char)*p);
 
 					if (SUCCEED != is_macro_char(*p))
 					{
