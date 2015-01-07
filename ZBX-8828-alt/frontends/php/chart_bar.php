@@ -172,9 +172,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 					' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
 					' max(value_max) as max,max(clock) as clock'.
 				' FROM trends '.
-				' WHERE itemid='.$itemid.
-					' AND clock>='.$timesince.
-					' AND clock<='.$timetill.
+				' WHERE itemid='.zbx_dbstr($itemid).
+					' AND clock>='.zbx_dbstr($timesince).
+					' AND clock<='.zbx_dbstr($timetill).
 				' GROUP BY itemid,'.$calc_field.
 				' ORDER BY clock ASC'
 				,
@@ -183,9 +183,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 					' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
 					' max(value_max) as max,max(clock) as clock'.
 				' FROM trends_uint '.
-				' WHERE itemid='.$itemid.
-					' AND clock>='.$timesince.
-					' AND clock<='.$timetill.
+				' WHERE itemid='.zbx_dbstr($itemid).
+					' AND clock>='.zbx_dbstr($timesince).
+					' AND clock<='.zbx_dbstr($timetill).
 				' GROUP BY itemid,'.$calc_field.
 				' ORDER BY clock ASC'
 				);
@@ -315,9 +315,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$sql = 'SELECT itemid, sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
 						' max(value_max) as max,max(clock) as clock'.
 					' FROM trends '.
-					' WHERE itemid='.$itemid.
-						' AND clock>='.$period['report_timesince'].
-						' AND clock<='.$period['report_timetill'].
+					' WHERE itemid='.zbx_dbstr($itemid).
+						' AND clock>='.zbx_dbstr($period['report_timesince']).
+						' AND clock<='.zbx_dbstr($period['report_timetill']).
 					' GROUP BY itemid';
 				$result=DBselect($sql);
 				if($row=DBfetch($result)){
@@ -331,9 +331,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$sql = 'SELECT itemid, sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
 						' max(value_max) as max,max(clock) as clock'.
 					' FROM trends_uint '.
-					' WHERE itemid='.$itemid.
-						' AND clock>='.$period['report_timesince'].
-						' AND clock<='.$period['report_timetill'].
+					' WHERE itemid='.zbx_dbstr($itemid).
+						' AND clock>='.zbx_dbstr($period['report_timesince']).
+						' AND clock<='.zbx_dbstr($period['report_timetill']).
 					' GROUP BY itemid';
 				$result=DBselect($sql);
 				if($row=DBfetch($result)){
@@ -582,17 +582,17 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				array_push($sql_arr,
 					'SELECT itemid,'.$calc_field.' as i,sum(num) as count,avg(value_avg) as avg '.
 					' FROM trends '.
-					' WHERE itemid='.$itemid.
-						' AND clock>='.$start.
-						' AND clock<='.$end.
+					' WHERE itemid='.zbx_dbstr($itemid).
+						' AND clock>='.zbx_dbstr($start).
+						' AND clock<='.zbx_dbstr($end).
 					' GROUP BY itemid,'.$calc_field
 					,
 
 					'SELECT itemid,'.$calc_field.' as i,sum(num) as count,avg(value_avg) as avg '.
 					' FROM trends_uint '.
-					' WHERE itemid='.$itemid.
-						' AND clock>='.$start.
-						' AND clock<='.$end.
+					' WHERE itemid='.zbx_dbstr($itemid).
+						' AND clock>='.zbx_dbstr($start).
+						' AND clock<='.zbx_dbstr($end).
 					' GROUP BY itemid,'.$calc_field
 					);
 

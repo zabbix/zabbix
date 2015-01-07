@@ -123,16 +123,19 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 								" and t.triggerid=" ZBX_FS_UI64,
 							triggerid);
 
-					if (NULL != (row = DBfetch(result)))
+					triggerid = 0;
+
+					while (NULL != (row = DBfetch(result)))
 					{
 						ZBX_STR2UINT64(hostid, row[0]);
 						ZBX_STR2UINT64(triggerid, row[1]);
 
 						if (hostid == condition_value)
+						{
 							ret = SUCCEED;
+							break;
+						}
 					}
-					else
-						triggerid = 0;
 					DBfree_result(result);
 				}
 				while (SUCCEED != ret && 0 != triggerid);
