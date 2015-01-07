@@ -189,7 +189,7 @@ class CController {
 	 * @return var
 	 */
 	protected function checkInput() {
-		access_deny();
+		access_deny(ACCESS_DENY_PAGE);
 	}
 
 	/**
@@ -209,7 +209,7 @@ class CController {
 	final public function run() {
 		if ($this->checkInput()) {
 			if ($this->checkPermissions() !== true) {
-				access_deny();
+				access_deny(ACCESS_DENY_PAGE);
 			}
 			$this->doAction();
 		}
