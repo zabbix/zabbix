@@ -41,7 +41,7 @@ class CControllerDiscoveryView extends CController {
 
 	protected function checkPermissions() {
 		if (!in_array($this->getUserType(), array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))) {
-			access_deny();
+			return false;
 		}
 
 		if ($this->hasInput('druleid') && $this->getInput('druleid') != 0) {
@@ -50,9 +50,11 @@ class CControllerDiscoveryView extends CController {
 					'output' => array()
 			));
 			if (!$drules) {
-				access_deny();
+				return false;
 			}
 		}
+
+		return true;
 	}
 
 	protected function doAction() {

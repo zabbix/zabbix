@@ -36,7 +36,7 @@ class CControllerProxyMassDelete extends CController {
 
 	protected function checkPermissions() {
 		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			access_deny();
+			return false;
 		}
 
 		$proxies = API::Proxy()->get(array(
@@ -45,8 +45,10 @@ class CControllerProxyMassDelete extends CController {
 		));
 
 		if ($proxies != count($this->getInput('proxyids'))) {
-			access_deny();
+			return false;
 		}
+
+		return true;
 	}
 
 	protected function doAction() {

@@ -59,7 +59,7 @@ class CControllerScriptUpdate extends CController {
 
 	protected function checkPermissions() {
 		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			access_deny();
+			return false;
 		}
 
 		$scripts = API::Script()->get(array(
@@ -67,8 +67,10 @@ class CControllerScriptUpdate extends CController {
 			'output' => array()
 		));
 		if (!$scripts) {
-			access_deny();
+			return false;
 		}
+
+		return true;
 	}
 
 	protected function doAction() {

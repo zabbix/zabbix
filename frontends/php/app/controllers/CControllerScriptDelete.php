@@ -37,7 +37,7 @@ class CControllerScriptDelete extends CController {
 
 	protected function checkPermissions() {
 		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			access_deny();
+			return false;
 		}
 
 		$scripts = API::Script()->get(array(
@@ -45,8 +45,10 @@ class CControllerScriptDelete extends CController {
 			'output' => array()
 		));
 		if (!$scripts) {
-			access_deny();
+			return false;
 		}
+
+		return true;
 	}
 
 	protected function doAction() {

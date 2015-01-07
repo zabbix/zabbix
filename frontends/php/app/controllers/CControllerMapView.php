@@ -69,11 +69,13 @@ class CControllerMapView extends CController {
 		}
 
 		if ($sysmapid === null) {
-			access_deny();
+			return false;
 		}
 
 		$this->sysmapid = $sysmapid;
 		$this->maps = $maps;
+
+		return true;
 	}
 
 	protected function doAction() {

@@ -43,6 +43,7 @@ frontends/php/app/controllers/CControllerScriptFormEdit.php -text
 frontends/php/app/controllers/CControllerScriptList.php -text
 frontends/php/app/controllers/CControllerScriptMassDelete.php -text
 frontends/php/app/controllers/CControllerScriptUpdate.php -text
+frontends/php/app/views/administration.mediatype.edit.js.php -text
 frontends/php/app/views/administration.proxy.edit.js.php -text
 frontends/php/app/views/layout.htmlpage.footer.php -text
 frontends/php/app/views/layout.htmlpage.header.php -text

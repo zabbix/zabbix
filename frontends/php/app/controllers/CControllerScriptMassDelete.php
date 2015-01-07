@@ -36,7 +36,7 @@ class CControllerScriptMassDelete extends CController {
 
 	protected function checkPermissions() {
 		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			access_deny();
+			return false;
 		}
 
 		$scripts = API::Script()->get(array(
@@ -44,8 +44,10 @@ class CControllerScriptMassDelete extends CController {
 			'countOutput' => true
 		));
 		if ($scripts != count($this->getInput('scriptids'))) {
-			access_deny();
+			return false;
 		}
+
+		return true;
 	}
 
 	protected function doAction() {

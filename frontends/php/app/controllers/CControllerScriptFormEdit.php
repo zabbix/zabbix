@@ -50,7 +50,7 @@ class CControllerScriptFormEdit extends CController {
 
 	protected function checkPermissions() {
 		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			access_deny();
+			return false;
 		}
 
 		$scripts = API::Script()->get(array(
@@ -58,8 +58,10 @@ class CControllerScriptFormEdit extends CController {
 			'scriptids' => $this->getInput('scriptid')
 		));
 		if (!$scripts) {
-			access_deny();
+			return false;
 		}
+
+		return true;
 	}
 
 	protected function doAction() {
