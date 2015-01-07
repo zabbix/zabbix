@@ -51,34 +51,30 @@ $proxyTable->setHeader(array(
 
 foreach ($data['proxies'] as $proxy) {
 	$hosts = array();
+	$i = 0;
 
-	if (!empty($proxy['hosts'])) {
-		$i = 1;
-
-		foreach ($proxy['hosts'] as $host) {
-			if ($i > $data['config']['max_in_table']) {
-				$hosts[] = ' &hellip;';
-
-				break;
-			}
-
-			$i++;
-
-			if ($host['status'] == HOST_STATUS_MONITORED) {
+	foreach ($proxy['hosts'] as $host) {
+		switch ($host['status']) {
+			case HOST_STATUS_MONITORED:
 				$style = 'off';
-			}
-			elseif ($host['status'] == HOST_STATUS_TEMPLATE) {
+				break;
+			case HOST_STATUS_TEMPLATE:
 				$style = 'unknown';
-			}
-			else {
+				break;
+			default:
 				$style = 'on';
-			}
+		}
 
-			if ($hosts) {
-				$hosts[] = ', ';
-			}
+		if ($hosts) {
+			$hosts[] = ', ';
+		}
 
-			$hosts[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'], $style);
+		$hosts[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'], $style);
+
+		if (++$i == $data['config']['max_in_table']) {
+			$hosts[] = ' &hellip;';
+
+			break;
 		}
 	}
 
@@ -86,11 +82,11 @@ foreach ($data['proxies'] as $proxy) {
 		new CCheckBox('proxyids['.$proxy['proxyid'].']', null, null, $proxy['proxyid']),
 		new CLink($proxy['host'], 'zabbix.php?action=proxy.formedit&proxyid='.$proxy['proxyid']),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
-		($proxy['lastaccess'] == 0) ? '-' : zbx_date2age($proxy['lastaccess']),
-		isset($proxy['host']) ? count($proxy['hosts']) : '',
-		isset($proxy['item_count']) ? $proxy['item_count'] : 0,
-		isset($proxy['perf']) ? $proxy['perf'] : '-',
-		new CCol((empty($hosts) ? '-' : $hosts), 'wraptext')
+		$proxy['lastaccess'] == 0 ? '-' : zbx_date2age($proxy['lastaccess']),
+		count($proxy['hosts']),
+		array_key_exists('item_count', $proxy) ? $proxy['item_count'] : 0,
+		array_key_exists('perf', $proxy) ? $proxy['perf'] : '-',
+		new CCol($hosts ? $hosts : '-', 'wraptext')
 	));
 }
 
