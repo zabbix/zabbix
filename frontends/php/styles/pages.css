@@ -104,13 +104,14 @@ table.tableinfo-overview-hint { width: 200px; }
 .latest-mon .tableinfo { table-layout: fixed; }
 .latest-mon .tableinfo td:first-child { width: 15px; padding: 0; }
 .latest-mon .tableinfo td.latest-checkbox { width: 15px; }
-.latest-mon .tableinfo td.latest-host { width: 9%; }
+.latest-mon .tableinfo td.latest-host.no-details { width: 17%; }
+.latest-mon .tableinfo td.latest-host.with-details { width: 13%; }
 .latest-mon .tableinfo td.latest-interval { width: 5%; }
 .latest-mon .tableinfo td.latest-history { width: 5%; }
 .latest-mon .tableinfo td.latest-trends { width: 5%; }
 .latest-mon .tableinfo td.latest-type { width: 8%; }
 .latest-mon .tableinfo td.latest-lastcheck { width: 14%; }
-.latest-mon .tableinfo td.latest-lastvalue { width: 22%; }
+.latest-mon .tableinfo td.latest-lastvalue { width: 14%; }
 .latest-mon .tableinfo td.latest-data { width: 10%; }
 .latest-mon .tableinfo td.latest-actions { width: 5%; }
 .latest-mon .tableinfo td.latest-info { width: 27px; }
