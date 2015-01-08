@@ -121,7 +121,7 @@ if ($data['hostId'] && (!hasRequest('form_refresh') || $cloningDiscoveredHost)) 
 }
 else {
 	$hostGroups = getRequest('groups', array());
-	if ($data['groupId'] && !$hostGroups) {
+	if ($data['groupId'] != 0 && !$hostGroups) {
 		$hostGroups[] = $data['groupId'];
 	}
 

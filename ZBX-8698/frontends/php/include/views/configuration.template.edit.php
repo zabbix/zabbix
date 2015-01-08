@@ -76,7 +76,7 @@ if ($templateid > 0 && !hasRequest('form_refresh')) {
 }
 else {
 	$groups = getRequest('groups', array());
-	if ($data['groupId']) {
+	if ($data['groupId'] != 0 && !$groups) {
 		$groups[] = $data['groupId'];
 	}
 	$hosts_linked_to = getRequest('hosts', array());
@@ -505,6 +505,5 @@ else {
 		array(new CButtonCancel(url_param('groupid')))
 	));
 }
-
 
 return $frmHost;
