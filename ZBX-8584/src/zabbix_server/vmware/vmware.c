@@ -2260,7 +2260,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
-		goto out;
+		goto end_session;
 	}
 
 	page.offset = 0;
@@ -2268,18 +2268,20 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
 		*error = zbx_strdup(*error, curl_easy_strerror(err));
-		goto out;
+		goto end_session;
 	}
 
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-		goto out;
+		goto end_session;
 
 	*events = zbx_strdup(NULL, page.data);
 
-	if (SUCCEED != vmware_service_destroy_event_session(service, easyhandle, event_session, error))
-		goto out;
-
 	ret = SUCCEED;
+
+end_session:
+	if (SUCCEED != vmware_service_destroy_event_session(service, easyhandle, event_session, error))
+		ret = FAIL;
+
 out:
 	zbx_free(event_session);
 
