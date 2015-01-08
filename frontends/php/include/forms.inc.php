@@ -22,28 +22,28 @@
 /**
  * Build user edit form data.
  *
- * @param string $userid			user ID
+ * @param string $userId			user ID
  * @param array	 $config			array of configuration parameters returned in $data['config'] parameter
  *									to later use when configuring user medias
  * @param bool	 $isProfile			true if current user viewing his own profile
  *
  * @return array
  */
-function getUserFormData($userid, array $config, $isProfile = false) {
+function getUserFormData($userId, array $config, $isProfile = false) {
 	$data = array(
 		'is_profile' => $isProfile,
 		'config' => $config
 	);
 
-	if (isset($userid)) {
-		$users = API::User()->get(array(
-			'userids' => $userid,
-			'output' => API_OUTPUT_EXTEND
-		));
-		$user = reset($users);
-	}
+	$users = API::User()->get(array(
+		'output' => array('alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'theme', 'refresh',
+			'rows_per_page', 'type'
+		),
+		'userids' => $userId
+	));
+	$user = reset($users);
 
-	if (isset($userid) && (!isset($_REQUEST['form_refresh']) || isset($_REQUEST['register']))) {
+	if (!hasRequest('form_refresh') || hasRequest('register')) {
 		$data['alias']			= $user['alias'];
 		$data['name']			= $user['name'];
 		$data['surname']		= $user['surname'];
@@ -60,8 +60,8 @@ function getUserFormData($userid, array $config, $isProfile = false) {
 		$data['messages'] 		= getMessageSettings();
 
 		$userGroups = API::UserGroup()->get(array(
-			'userids' => $userid,
-			'output' => array('usrgrpid')
+			'output' => array('usrgrpid'),
+			'userids' => $userId
 		));
 		$userGroup = zbx_objectValues($userGroups, 'usrgrpid');
 		$data['user_groups']	= zbx_toHash($userGroup);
@@ -69,7 +69,7 @@ function getUserFormData($userid, array $config, $isProfile = false) {
 		$data['user_medias'] = array();
 		$dbMedia = DBselect('SELECT m.mediaid,m.mediatypeid,m.period,m.sendto,m.severity,m.active'.
 				' FROM media m'.
-				' WHERE m.userid='.zbx_dbstr($userid)
+				' WHERE m.userid='.zbx_dbstr($userId)
 		);
 		while ($dbMedium = DBfetch($dbMedia)) {
 			$data['user_medias'][] = $dbMedium;
@@ -119,9 +119,9 @@ function getUserFormData($userid, array $config, $isProfile = false) {
 		$data['auth_type'] = getGroupAuthenticationType($data['user_groups'], GROUP_GUI_ACCESS_INTERNAL);
 	}
 	else {
-		$data['auth_type'] = ($userid === null)
+		$data['auth_type'] = ($userId === null)
 			? $config['authentication_type']
-			: getUserAuthenticationType($userid, GROUP_GUI_ACCESS_INTERNAL);
+			: getUserAuthenticationType($userId, GROUP_GUI_ACCESS_INTERNAL);
 	}
 
 	// set autologout
@@ -151,8 +151,8 @@ function getUserFormData($userid, array $config, $isProfile = false) {
 	// set user rights
 	if (!$data['is_profile']) {
 		$data['groups'] = API::UserGroup()->get(array(
-			'usrgrpids' => $data['user_groups'],
-			'output' => array('usrgrpid', 'name')
+			'output' => array('usrgrpid', 'name'),
+			'usrgrpids' => $data['user_groups']
 		));
 		order_result($data['groups'], 'name');
 
@@ -623,7 +623,7 @@ function getItemFilterForm(&$items) {
 
 	$reset = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput shadow');
 
-	$div_buttons = new CDiv(array($filter, SPACE, $reset));
+	$div_buttons = new CDiv(array($filter, $reset));
 	$div_buttons->setAttribute('style', 'padding: 4px 0px;');
 
 	$footer = new CCol($div_buttons, 'controls', 8);
