@@ -656,7 +656,7 @@ finish:
 }
 
 /* expand the string message from a specific event handler */
-static char *expand_message6(const wchar_t *pname, EVT_HANDLE event)
+static char	*expand_message6(const wchar_t *pname, EVT_HANDLE event)
 {
 	const char	*__function_name = "expand_message6";
 	wchar_t		*pmessage = NULL;
@@ -676,7 +676,7 @@ static char *expand_message6(const wchar_t *pname, EVT_HANDLE event)
 		goto finish;
 	}
 
-	if (TRUE != EvtFormatMessage(provider, event, 0, 0, NULL, EvtFormatMessageEvent, 0, NULL, &require) )
+	if (TRUE != EvtFormatMessage(provider, event, 0, 0, NULL, EvtFormatMessageEvent, 0, NULL, &require))
 	{
 		if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
 		{
@@ -700,7 +700,7 @@ finish:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, out_message);
 
-	/* should be freed*/
+	/* should be freed */
 	return out_message;
 }
 
@@ -750,7 +750,7 @@ static int	zbx_get_eventlog_message6(const wchar_t *wsource, zbx_uint64_t *which
 			goto finish;
 		}
 
-		renderedContent = (EVT_VARIANT*)zbx_realloc((void *)renderedContent, require);
+		renderedContent = (EVT_VARIANT *)zbx_realloc((void *)renderedContent, require);
 		size = require;
 
 		if (TRUE != EvtRender(*render_context, event_bookmark, EvtRenderEventValues, size, renderedContent,
@@ -785,7 +785,7 @@ static int	zbx_get_eventlog_message6(const wchar_t *wsource, zbx_uint64_t *which
 		*which = VAR_RECORD_NUMBER(renderedContent);
 	}
 
-	/* some events dont have enough information for making event message */
+	/* some events don't have enough information for making event message */
 	if (NULL == *out_message)
 	{
 		*out_message = zbx_strdcatf(*out_message, "The description for Event ID:%lu in Source:'%s'"
@@ -885,11 +885,13 @@ int	finalize_eventlog6(EVT_HANDLE *render_context, EVT_HANDLE *query)
 		EvtClose(*query);
 		*query = NULL;
 	}
+
 	if (NULL != *render_context)
 	{
 		EvtClose(*render_context);
 		*render_context = NULL;
 	}
+
 	ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

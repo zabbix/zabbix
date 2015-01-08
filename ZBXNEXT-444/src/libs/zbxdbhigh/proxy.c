@@ -2420,11 +2420,13 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 			av->state = (unsigned char)atoi(tmp);
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &tmp, &tmp_alloc))
-			av->value = zbx_strdup(av->value, tmp);
-
-		/* meta information update (lastlogsize and mtime) packet is missing value tag */
-		if (NULL == av->value)
 		{
+			av->value = zbx_strdup(av->value, tmp);
+		}
+		else
+		{
+			/* meta information update (lastlogsize and mtime) packet is missing value tag */
+
 			if (ITEM_STATE_NOTSUPPORTED == av->state)
 			{
 				/* unsupported items cannot have NULL-string error message */
