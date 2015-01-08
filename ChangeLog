@@ -18,6 +18,7 @@ A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent, updated outdated
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+..F....... [ZBX-8698] fixed "Unlink and clear" button being displayed when cloning or full cloning host or template and fixed spacing between "Name" and "Action" in "Linked templates" block in template edit form (Krists, Ivo)
 ..F....... [ZBX-9018] fixed updating of "config" table in Administration -> General pages (Oleg, Sasha)
 ...G...PS. [ZBX-9002] fixed log file locking during logging (igors)
 ..F....... [ZBX-8943] fixed script ordering when using backslashes in popup script menus (arvids)
