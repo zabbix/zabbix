@@ -12,6 +12,7 @@
 					jQuery('#jabber_username').closest('li').css('display', 'none');
 					jQuery('#eztext_username').closest('li').css('display', 'none');
 					jQuery('#eztext_limit').closest('li').css('display', 'none');
+					jQuery('#eztext_link').css('display', 'none');
 					jQuery('#passwd').closest('li').css('display', 'none');
 					break;
 				case '<?php echo MEDIA_TYPE_EXEC; ?>':
@@ -23,6 +24,7 @@
 					jQuery('#jabber_username').closest('li').css('display', 'none');
 					jQuery('#eztext_username').closest('li').css('display', 'none');
 					jQuery('#eztext_limit').closest('li').css('display', 'none');
+					jQuery('#eztext_link').css('display', 'none');
 					jQuery('#passwd').closest('li').css('display', 'none');
 					break;
 				case '<?php echo MEDIA_TYPE_SMS; ?>':
@@ -34,6 +36,7 @@
 					jQuery('#jabber_username').closest('li').css('display', 'none');
 					jQuery('#eztext_username').closest('li').css('display', 'none');
 					jQuery('#eztext_limit').closest('li').css('display', 'none');
+					jQuery('#eztext_link').css('display', 'none');
 					jQuery('#passwd').closest('li').css('display', 'none');
 					break;
 				case '<?php echo MEDIA_TYPE_JABBER; ?>':
@@ -45,6 +48,7 @@
 					jQuery('#jabber_username').closest('li').css('display', '').removeClass('hidden');
 					jQuery('#eztext_username').closest('li').css('display', 'none');
 					jQuery('#eztext_limit').closest('li').css('display', 'none');
+					jQuery('#eztext_link').css('display', 'none');
 					jQuery('#passwd').closest('li').css('display', '').removeClass('hidden');
 					break;
 				case '<?php echo MEDIA_TYPE_EZ_TEXTING; ?>':
@@ -56,6 +60,7 @@
 					jQuery('#jabber_username').closest('li').css('display', 'none');
 					jQuery('#eztext_username').closest('li').css('display', '').removeClass('hidden');
 					jQuery('#eztext_limit').closest('li').css('display', '').removeClass('hidden');
+					jQuery('#eztext_link').css('display', '').removeClass('hidden');
 					jQuery('#passwd').closest('li').css('display', '').removeClass('hidden');
 					break;
 			}

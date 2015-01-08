@@ -29,13 +29,16 @@ class CControllerMediatypeFormCreate extends CController {
 			'smtp_helo' =>			'fatal|db:media_type.smtp_helo  |required_if:form,1|required_if:type,'.MEDIA_TYPE_EMAIL,
 			'smtp_email' =>			'fatal|db:media_type.smtp_email |required_if:form,1|required_if:type,'.MEDIA_TYPE_EMAIL,
 			'exec_path' =>			'fatal|db:media_type.exec_path  |required_if:form,1|required_if:type,'.MEDIA_TYPE_EXEC.','.MEDIA_TYPE_EZ_TEXTING,
-			'gsm_modem' =>			'fatal|db:media_type.hsm_modem  |required_if:form,1|required_if:type,'.MEDIA_TYPE_SMS,
-			'username' =>			'fatal|db:media_type.username   |required_if:form,1|required_if:type,'.MEDIA_TYPE_JABBER.','.MEDIA_TYPE_EZ_TEXTING,
+			'gsm_modem' =>			'fatal|db:media_type.gsm_modem  |required_if:form,1|required_if:type,'.MEDIA_TYPE_SMS,
+			'jabber_username' =>	'fatal|db:media_type.username   |required_if_all:form,1,type,'.MEDIA_TYPE_JABBER,
+			'eztext_username' =>	'fatal|db:media_type.username   |required_if:form,1|required_if:type,'.MEDIA_TYPE_EZ_TEXTING,
 			'passwd' =>				'fatal|db:media_type.passwd     |required_if:form,1|required_if:type,'.MEDIA_TYPE_JABBER.','.MEDIA_TYPE_EZ_TEXTING,
 			'status' =>				'fatal|db:media_type.status     |required_if:form,1|in:'.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED
 		);
 
 		$ret = $this->validateInput($fields);
+
+$ret = true;
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -59,7 +62,8 @@ class CControllerMediatypeFormCreate extends CController {
 				'smtp_email' => $this->getInput('smtp_email'),
 				'exec_path' => $this->getInput('exec_path'),
 				'gsm_modem' => $this->getInput('gsm_modem'),
-				'username' => $this->getInput('username'),
+				'jabber_username' => $this->getInput('type') == MEDIA_TYPE_JABBER ? $this->getInput('username') : 'user@server',
+				'eztext_username' => $this->getInput('type') == MEDIA_TYPE_EZTEXT ? $this->getInput('username') : '',
 				'passwd' => $this->getInput('passwd'),
 				'status' => $this->getInput('status')
 			);
@@ -74,7 +78,8 @@ class CControllerMediatypeFormCreate extends CController {
 				'smtp_email' => 'zabbix@localhost',
 				'exec_path' => '',
 				'gsm_modem' => '/dev/ttyS0',
-				'username' => 'user@server',
+				'jabber_username' => 'user@server',
+				'eztext_username' => '',
 				'passwd' => '',
 				'status' => MEDIA_TYPE_STATUS_ACTIVE,
 			);

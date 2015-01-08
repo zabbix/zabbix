@@ -29,7 +29,7 @@ class CControllerMediatypeCreate extends CController {
 			'smtp_helo' =>			'      db:media_type.smtp_helo  |required_if:type,'.MEDIA_TYPE_EMAIL.'|not_empty',
 			'smtp_email' =>			'      db:media_type.smtp_email |required_if:type,'.MEDIA_TYPE_EMAIL.'|not_empty',
 			'exec_path' =>			'      db:media_type.exec_path  |required_if:type,'.MEDIA_TYPE_EXEC.','.MEDIA_TYPE_EZ_TEXTING.'|not_empty',
-			'gsm_modem' =>			'      db:media_type.hsm_modem  |required_if:type,'.MEDIA_TYPE_SMS.'|not_empty',
+			'gsm_modem' =>			'      db:media_type.gsm_modem  |required_if:type,'.MEDIA_TYPE_SMS.'|not_empty',
 			'username' =>			'      db:media_type.username   |required_if:type,'.MEDIA_TYPE_JABBER.','.MEDIA_TYPE_EZ_TEXTING.'|not_empty',
 			'passwd' =>				'      db:media_type.passwd     |required_if:type,'.MEDIA_TYPE_JABBER.','.MEDIA_TYPE_EZ_TEXTING.'|not_empty',
 			'status' =>				'fatal|db:media_type.status     |required|in:'.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
