@@ -64,6 +64,7 @@
 .host-edit #newTemplateTable { width: 100%; }
 .host-edit.host-edit-discovered #linkedTemplateTable { min-width: 250px; }
 .template-link-block { min-width: 400px; float: left; display: block; }
+.template-link-block #linkedTemplateTable { width: 100%; }
 
 /* housekeeper elements */
 .hk .element-row { margin-top: -3px; border-top-width: 0; }

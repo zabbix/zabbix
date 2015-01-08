@@ -418,7 +418,7 @@ $filterButton->main();
 
 $resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput shadow');
 
-$divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
+$divButtons = new CDiv(array($filterButton, $resetButton));
 $divButtons->setAttribute('style', 'padding: 4px 0px;');
 
 $filterTable->addRow(new CCol($divButtons, 'controls', 4));
