@@ -32,7 +32,7 @@ class CControllerMediatypeFormEdit extends CController {
 			'smtp_helo' =>			'fatal|db:media_type.smtp_helo  |required_if:form,1|required_if:type,'.MEDIA_TYPE_EMAIL,
 			'smtp_email' =>			'fatal|db:media_type.smtp_email |required_if:form,1|required_if:type,'.MEDIA_TYPE_EMAIL,
 			'exec_path' =>			'fatal|db:media_type.exec_path  |required_if:form,1|required_if:type,'.MEDIA_TYPE_EXEC.','.MEDIA_TYPE_EZ_TEXTING,
-			'gsm_modem' =>			'fatal|db:media_type.hsm_modem  |required_if:form,1|required_if:type,'.MEDIA_TYPE_SMS,
+			'gsm_modem' =>			'fatal|db:media_type.gsm_modem  |required_if:form,1|required_if:type,'.MEDIA_TYPE_SMS,
 			'username' =>			'fatal|db:media_type.username   |required_if:form,1|required_if:type,'.MEDIA_TYPE_JABBER.','.MEDIA_TYPE_EZ_TEXTING,
 			'passwd' =>				'fatal|db:media_type.passwd     |required_if:form,1|required_if:type,'.MEDIA_TYPE_JABBER.','.MEDIA_TYPE_EZ_TEXTING,
 			'status' =>				'fatal|db:media_type.status     |required_if:form,1|in:'.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED
