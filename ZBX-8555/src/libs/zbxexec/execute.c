@@ -90,8 +90,11 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 			}
 			else
 			{
-				tmp_buf[read_bytes] = '\0';
-				zbx_strcpy_alloc(buf, buf_size, offset, tmp_buf);
+				if (NULL != buf)
+				{
+					tmp_buf[read_bytes] = '\0';
+					zbx_strcpy_alloc(buf, buf_size, offset, tmp_buf);
+				}
 			}
 			in_buf_size = 0;
 			continue;
@@ -353,8 +356,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	_ftime(&start_time);
 	timeout *= 1000;
 
-	if (NULL != buffer)
-		ret = zbx_read_from_pipe(hRead, buffer, &buf_size, &offset, timeout);
+	ret = zbx_read_from_pipe(hRead, buffer, &buf_size, &offset, timeout);
 
 	if (TIMEOUT_ERROR != ret)
 	{
@@ -395,10 +397,10 @@ close:
 		int	rc = 0;
 		char	tmp_buf[PIPE_BUFFER_SIZE];
 
-		if (NULL != buffer)
+		while (0 < (rc = read(fd, tmp_buf, sizeof(tmp_buf) - 1)) &&
+				MAX_EXECUTE_OUTPUT_LEN > offset + rc)
 		{
-			while (0 < (rc = read(fd, tmp_buf, sizeof(tmp_buf) - 1)) &&
-					MAX_EXECUTE_OUTPUT_LEN > offset + rc)
+			if (NULL != buffer)
 			{
 				tmp_buf[rc] = '\0';
 				zbx_strcpy_alloc(buffer, &buf_size, &offset, tmp_buf);
