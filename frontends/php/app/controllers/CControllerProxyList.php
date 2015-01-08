@@ -73,32 +73,34 @@ class CControllerProxyList extends CController {
 		// get proxy IDs for a *selected* page
 		$proxyIds = array_keys($data['proxies']);
 
-		// calculate performance
-		$dbPerformance = DBselect(
-			'SELECT h.proxy_hostid,SUM(1.0/i.delay) AS qps'.
-			' FROM hosts h,items i'.
-			' WHERE h.hostid=i.hostid'.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND i.delay<>0'.
-				' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE.
-				' AND '.dbConditionInt('h.proxy_hostid', $proxyIds).
-			' GROUP BY h.proxy_hostid'
-		);
-		while ($performance = DBfetch($dbPerformance)) {
-			$data['proxies'][$performance['proxy_hostid']]['perf'] = round($performance['qps'], 2);
-		}
+		if ($proxyIds) {
+			// calculate performance
+			$dbPerformance = DBselect(
+				'SELECT h.proxy_hostid,SUM(1.0/i.delay) AS qps'.
+				' FROM hosts h,items i'.
+				' WHERE h.hostid=i.hostid'.
+					' AND h.status='.HOST_STATUS_MONITORED.
+					' AND i.status='.ITEM_STATUS_ACTIVE.
+					' AND i.delay<>0'.
+					' AND i.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE.
+					' AND '.dbConditionInt('h.proxy_hostid', $proxyIds).
+				' GROUP BY h.proxy_hostid'
+			);
+			while ($performance = DBfetch($dbPerformance)) {
+				$data['proxies'][$performance['proxy_hostid']]['perf'] = round($performance['qps'], 2);
+			}
 
-		// get items
-		$items = API::Item()->get(array(
-			'proxyids' => $proxyIds,
-			'groupCount' => true,
-			'countOutput' => true,
-			'webitems' => true,
-			'monitored' => true
-		));
-		foreach ($items as $item) {
-			$data['proxies'][$item['proxy_hostid']]['item_count'] = $item['rowscount'];
+			// get items
+			$items = API::Item()->get(array(
+				'proxyids' => $proxyIds,
+				'groupCount' => true,
+				'countOutput' => true,
+				'webitems' => true,
+				'monitored' => true
+			));
+			foreach ($items as $item) {
+				$data['proxies'][$item['proxy_hostid']]['item_count'] = $item['rowscount'];
+			}
 		}
 
 		$response = new CControllerResponseData($data);
