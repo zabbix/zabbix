@@ -27,7 +27,6 @@ frontends/php/app/controllers/CControllerMediatypeMassDelete.php -text
 frontends/php/app/controllers/CControllerMediatypeMassDisable.php -text
 frontends/php/app/controllers/CControllerMediatypeMassEnable.php -text
 frontends/php/app/controllers/CControllerMediatypeUpdate.php -text
-frontends/php/app/controllers/CControllerProxyCreate.php -text
 frontends/php/app/controllers/CControllerProxyDelete.php -text
 frontends/php/app/controllers/CControllerProxyFormCreate.php -text
 frontends/php/app/controllers/CControllerProxyFormEdit.php -text
