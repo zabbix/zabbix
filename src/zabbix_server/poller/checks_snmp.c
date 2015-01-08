@@ -24,6 +24,8 @@
 
 #ifdef HAVE_NETSNMP
 
+typedef void (zbx_snmp_walk_cb_func)(void *arg, const char *OID, const char *index, const char *value);
+
 typedef struct
 {
 	char		*addr;
@@ -781,8 +783,9 @@ numeric:
 #define ZBX_SNMP_WALK_MODE_CACHE	0
 #define ZBX_SNMP_WALK_MODE_DISCOVERY	1
 
-static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const char *OID, unsigned char mode,
-		AGENT_RESULT *result, int *max_succeed, int *min_fail, int max_vars, int bulk)
+static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const char *OID, AGENT_RESULT *result,
+		int *max_succeed, int *min_fail, int max_vars, int bulk, zbx_snmp_walk_cb_func walk_cb_func,
+		void *walk_cb_arg)
 {
 	const char		*__function_name = "zbx_snmp_walk";
 
@@ -795,8 +798,8 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	struct zbx_json		j;
 	AGENT_RESULT		snmp_result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d oid:'%s' mode:%d bulk:%d", __function_name, (int)item->type, OID,
-			(int)mode, bulk);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d oid:'%s' bulk:%d", __function_name, (int)item->type, OID,
+			bulk);
 
 	if (ITEM_TYPE_SNMPv1 == item->type)	/* GetBulkRequest-PDU available since SNMPv2 */
 		bulk = SNMP_BULK_DISABLED;
@@ -834,16 +837,6 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	anOID_len = rootOID_len;
 
 	/* initialize variables */
-	if (ZBX_SNMP_WALK_MODE_CACHE == mode)
-	{
-		cache_del_snmp_index_subtree(item, OID);
-	}
-	else
-	{
-		zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-		zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
-	}
-
 	level = 0;
 	running = 1;
 
@@ -949,18 +942,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 				if (SUCCEED == zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &snmp_result) &&
 						NULL != GET_STR_RESULT(&snmp_result))
 				{
-					if (ZBX_SNMP_WALK_MODE_CACHE == mode)
-					{
-						cache_put_snmp_index(item, (char *)OID, snmp_result.str, snmp_oid);
-					}
-					else
-					{
-						zbx_json_addobject(&j, NULL);
-						zbx_json_addstring(&j, "{#SNMPINDEX}", snmp_oid, ZBX_JSON_TYPE_STRING);
-						zbx_json_addstring(&j, "{#SNMPVALUE}", snmp_result.str,
-								ZBX_JSON_TYPE_STRING);
-						zbx_json_close(&j);
-					}
+					walk_cb_func(walk_cb_arg, OID, snmp_oid, snmp_result.str);
 				}
 				else
 				{
@@ -994,16 +976,6 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 next:
 		if (NULL != response)
 			snmp_free_pdu(response);
-	}
-
-	if (ZBX_SNMP_WALK_MODE_DISCOVERY == mode)
-	{
-		zbx_json_close(&j);
-
-		if (SUCCEED == ret)
-			SET_TEXT_RESULT(result, zbx_strdup(NULL, j.buffer));
-
-		zbx_json_free(&j);
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -1356,6 +1328,16 @@ static void	zbx_snmp_translate(char *oid_translated, const char *oid, size_t max
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() oid_translated:'%s'", __function_name, oid_translated);
 }
 
+static void	zbx_snmp_walk_discovery_cb(void *arg, const char *OID, const char *index, const char *value)
+{
+	struct zbx_json	*js = (struct json *)arg;
+
+	zbx_json_addobject(js, NULL);
+	zbx_json_addstring(js, "{#SNMPINDEX}", index, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(js, "{#SNMPVALUE}", value, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(js);
+}
+
 static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
 		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail, int max_vars,
 		int bulk)
@@ -1364,6 +1346,7 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 
 	int		ret;
 	char		oid_translated[ITEM_SNMP_OID_LEN_MAX];
+	struct zbx_json	js;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1372,9 +1355,22 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 	switch (num_key_param(items[0].snmp_oid))
 	{
 		case 0:
+
+			zbx_json_init(&js, ZBX_JSON_STAT_BUF_LEN);
+			zbx_json_addarray(&js, ZBX_PROTO_TAG_DATA);
+
 			zbx_snmp_translate(oid_translated, items[0].snmp_oid, sizeof(oid_translated));
-			errcodes[0] = zbx_snmp_walk(ss, &items[0], oid_translated, ZBX_SNMP_WALK_MODE_DISCOVERY,
-					&results[0], max_succeed, min_fail, max_vars, bulk);
+			errcodes[0] = zbx_snmp_walk(ss, &items[0], oid_translated, &results[0], max_succeed, min_fail,
+					max_vars, bulk, zbx_snmp_walk_discovery_cb, (void *)&js);
+
+			if (SUCCEED == errcodes[0])
+			{
+				zbx_json_close(&js);
+				SET_TEXT_RESULT(&results[0], zbx_strdup(NULL, js.buffer));
+			}
+
+			zbx_json_free(&js);
+
 			break;
 		default:
 			SET_MSG_RESULT(&results[0], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
@@ -1388,6 +1384,11 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+}
+
+static void	zbx_snmp_walk_cache_cb(void *arg, const char *OID, const char *index, const char *value)
+{
+	cache_put_snmp_index((DC_ITEM *)arg, (char *)OID, value, index);
 }
 
 static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
@@ -1523,8 +1524,10 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 
 			init_result(&result);
 
-			errcode = zbx_snmp_walk(ss, &items[j], oids_translated[j], ZBX_SNMP_WALK_MODE_CACHE, &result,
-					max_succeed, min_fail, num, bulk);
+			cache_del_snmp_index_subtree(&items[j], oids_translated[j]);
+
+			errcode = zbx_snmp_walk(ss, &items[j], oids_translated[j], &result, max_succeed, min_fail, num,
+					bulk, zbx_snmp_walk_cache_cb, (void *)&items[j]);
 
 			if (NETWORK_ERROR == errcode)
 			{
