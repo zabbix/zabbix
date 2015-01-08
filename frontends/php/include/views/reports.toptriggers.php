@@ -113,20 +113,28 @@ $filterTable->addRow(array(
 	)
 ));
 
-// get all severities
+// severities
+$severitiesTable = new CTable(null, 'severities-table');
+
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$serverityCheckBox = new CCheckBox('severities['.$severity.']',
-		in_array($severity, $this->data['filter']['severities']), '', 1
+		in_array($severity, $this->data['filter']['severities']), null, 1
 	);
 
-	$severities[] = array($serverityCheckBox, getSeverityName($severity, $this->data['config']));
-	$severities[] = BR();
+	if ($severity % 2) {
+		$severitiesCol2[] = new CCol(array($serverityCheckBox, getSeverityName($severity, $this->data['config'])));
+	}
+	else {
+		$severitiesCol1[] = new CCol(array($serverityCheckBox, getSeverityName($severity, $this->data['config'])));
+	}
 }
-array_pop($severities);
+
+$severitiesTable->addRow($severitiesCol1);
+$severitiesTable->addRow($severitiesCol2);
 
 $filterTable->addRow(array(
 	new CCol(bold(_('Severity')), 'label top'),
-	new CCol($severities, 'inputcol')
+	new CCol($severitiesTable)
 ));
 
 $filterButton = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput shadow');
