@@ -29,7 +29,7 @@
 #if !defined(_WINDOWS)
 #	define LOCK_CPUSTATS	zbx_mutex_lock(&cpustats_lock)
 #	define UNLOCK_CPUSTATS	zbx_mutex_unlock(&cpustats_lock)
-static ZBX_MUTEX	cpustats_lock;
+static ZBX_MUTEX	cpustats_lock = ZBX_MUTEX_NULL;
 #else
 #	define LOCK_CPUSTATS
 #	define UNLOCK_CPUSTATS
@@ -167,7 +167,7 @@ clean:
 	}
 
 #else	/* not _WINDOWS */
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cpustats_lock, ZBX_MUTEX_CPUSTATS))
+	if (FAIL == zbx_mutex_create_force(&cpustats_lock, ZBX_MUTEX_CPUSTATS))
 	{
 		zbx_error("unable to create mutex for cpu collector");
 		exit(EXIT_FAILURE);
