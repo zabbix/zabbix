@@ -20,12 +20,6 @@
 
 show_messages();
 
-if (CProfile::isModified()) {
-	DBstart();
-	$result = CProfile::flush();
-	DBend($result);
-}
-
 if ($data['fullscreen'] == 0) {
 	$table = new CTable(null, 'textwhite bold maxwidth ui-widget-header ui-corner-all page_footer');
 

@@ -659,10 +659,10 @@ function changeWidgetState(obj, widgetId) {
 		state = 1;
 	}
 
-	sendAjaxData(location.href, {
+	sendAjaxData('zabbix.php?action=dashboard.widget', {
 		data: {
-			widgetName: widgetId,
-			widgetState: state
+			widget: widgetId,
+			state: state
 		}
 	});
 }

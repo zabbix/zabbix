@@ -15,24 +15,8 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-class CControllerResponseFatal extends CControllerResponse {
-
-	private $location;
-	private $messageError = null;
-
-	public function __construct() {
-		$this->location = 'zabbix.php?action=dashboard.view';
-		$this->messageError = 'Fatal error, please report to Zabbix Team';
-	}
-
-	public function getLocation() {
-		return $this->location;
-	}
-
-	public function getMessageError() {
-		return $this->messageError;
-	}
-}
+$widget = make_status_of_zbx();
+$widget->show();

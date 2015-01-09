@@ -1682,7 +1682,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 				);
 			}
 			$buttons[] = new CButton('back', _('Go to dashboard'),
-				'javascript: document.location = "dashboard.php"', 'button'
+				'javascript: document.location = "zabbix.php?action=dashboard.view"', 'button'
 			);
 		}
 		// if the user is not logged in - offer to login

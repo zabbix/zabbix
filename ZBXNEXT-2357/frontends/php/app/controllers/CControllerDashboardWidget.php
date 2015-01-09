@@ -18,12 +18,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CControllerFavouriteCreate extends CController {
+require_once dirname(__FILE__).'/../../include/blocks.inc.php';
+
+class CControllerDashboardWidget extends CController {
 
 	protected function checkInput() {
+		$widgets = array(
+			WIDGET_SYSTEM_STATUS, WIDGET_ZABBIX_STATUS, WIDGET_LAST_ISSUES,
+			WIDGET_WEB_OVERVIEW, WIDGET_DISCOVERY_STATUS, WIDGET_HOST_STATUS,
+			WIDGET_FAVOURITE_GRAPHS, WIDGET_FAVOURITE_MAPS, WIDGET_FAVOURITE_SCREENS
+		);
+
 		$fields = array(
-			'object' =>				'fatal|in_str:graphid,itemid,screenid,slideshowid,sysmapid|required',
-			'objectid' =>			'fatal|db:items.itemid|required'
+			'widget' =>			'fatal|in_str:'.implode(',', $widgets).'|required',
+			'refreshrate' =>	'fatal|in:10,30,60,120,600,900',
+			'state' =>			'fatal|in:0,1'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -41,33 +50,23 @@ class CControllerFavouriteCreate extends CController {
 	}
 
 	protected function doAction() {
-		$profile = array(
-					'graphid' => 'web.favorite.graphids',
-					'itemid' => 'web.favorite.graphids',
-					'screenid' => 'web.favorite.screenids',
-					'slideshowid' => 'web.favorite.screenids',
-					'sysmapid' => 'web.favorite.sysmapids'
-		);
+		$widget = $this->getInput('widget');
 
-		$object = $this->getInput('object');
-		$objectid = $this->getInput('objectid');
+		$data=array();
 
-		$data = array (
-			'main_block' => ''
-		);
+		// refresh rate
+		if ($this->hasInput('refreshrate')) {
+				$refreshrate = getRequest('refreshrate');
 
-		DBstart();
+				CProfile::update('web.dashboard.widget.'.$widget.'.rf_rate', $refreshrate, PROFILE_TYPE_INT);
 
-		$result = CFavorite::add($profile[$object], $objectid, $object);
-		if ($result) {
-			$data['main_block'] = $data['main_block'].'$("addrm_fav").title = "'._('Remove from favourites').'";'."\n".
-				'$("addrm_fav").onclick = function() { rm4favorites("'.$object.'", "'.$objectid.'"); }'."\n";
-		}
+				$data['main_block'] = 'PMasters["dashboard"].dolls["'.$widget.'"].frequency('.CJs::encodeJson($refreshrate).');'."\n"
+					.'PMasters["dashboard"].dolls["'.$widget.'"].restartDoll();';
+			}
 
-		$result = DBend($result);
-
-		if ($result) {
-			$data['main_block'] = $data['main_block'].'switchElementClass("addrm_fav", "iconminus", "iconplus");';
+		// widget state
+		if ($this->hasInput('state')) {
+			CProfile::update('web.dashboard.widget.'.$widget.'.state', getRequest('state'), PROFILE_TYPE_INT);
 		}
 
 		$this->setResponse(new CControllerResponseData($data));

@@ -28,7 +28,9 @@ $ZBX_MENU = array(
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
-				'url' => 'dashboard.php',
+				'url' => 'zabbix.php',
+				'action' => 'dashboard.view',
+				'active_if' => array('dashboard.view'),
 				'label' => _('Dashboard'),
 				'sub_pages' => array('dashconf.php')
 			),

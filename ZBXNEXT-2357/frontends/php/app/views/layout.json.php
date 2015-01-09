@@ -18,21 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CControllerResponseFatal extends CControllerResponse {
+header('Cache-Control: no-cache, must-revalidate');
+header('Expires: Mon, 17 Aug 1998 12:51:50 GMT');
+header('Content-type: application/json');
 
-	private $location;
-	private $messageError = null;
-
-	public function __construct() {
-		$this->location = 'zabbix.php?action=dashboard.view';
-		$this->messageError = 'Fatal error, please report to Zabbix Team';
-	}
-
-	public function getLocation() {
-		return $this->location;
-	}
-
-	public function getMessageError() {
-		return $this->messageError;
-	}
-}
+echo $data['main_block'];

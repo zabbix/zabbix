@@ -80,7 +80,7 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 		$request = getRequest('request');
 		$url = zbx_empty($request) ? CWebUser::$data['url'] : $request;
 		if (zbx_empty($url) || $url == $page['file']) {
-			$url = 'dashboard.php';
+			$url = 'zabbix.php?action=dashboard.view';
 		}
 		redirect($url);
 		exit;
@@ -116,5 +116,5 @@ if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 	}
 }
 else {
-	redirect(zbx_empty(CWebUser::$data['url']) ? 'dashboard.php' : CWebUser::$data['url']);
+	redirect(zbx_empty(CWebUser::$data['url']) ? 'zabbix.php?action=dashboard.view' : CWebUser::$data['url']);
 }
