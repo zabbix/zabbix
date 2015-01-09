@@ -1057,6 +1057,8 @@ int	is_key_char(char c);
 int	is_function_char(char c);
 int	is_macro_char(char c);
 
+int	is_discovery_macro(const char *name);
+
 int	is_time_function(const char *func);
 int	is_snmp_type(unsigned char type);
 

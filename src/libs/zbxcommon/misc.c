@@ -1952,6 +1952,33 @@ int	is_macro_char(char c)
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_discovery_macro                                               *
+ *                                                                            *
+ * Purpose: checks if the name is a valid discovery macro                     *
+ *                                                                            *
+ * Return value:  SUCCEED - the char is allowed in the macro name             *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	is_discovery_macro(const char *name)
+{
+	if ('{' != *name++ || '#' != *name++)
+		return FAIL;
+
+	while ('\0' != *name && '}' != *name)
+	{
+		if (SUCCEED != is_macro_char(*name++))
+			return FAIL;
+	}
+
+	if ('}' != *name++ || '\0' != *name)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: is_time_function                                                 *
  *                                                                            *
  * Return value:  SUCCEED - given function is time-based                      *
