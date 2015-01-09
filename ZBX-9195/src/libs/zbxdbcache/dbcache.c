@@ -1316,6 +1316,9 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 			if (ITEM_VALUE_TYPE_LOG != history[j].value_type)
 				continue;
 
+			if (ITEM_STATUS_NOTSUPPORTED == history[j].status)
+				continue;
+
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update items"
 					" set lastlogsize=" ZBX_FS_UI64
