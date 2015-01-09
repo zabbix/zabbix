@@ -1220,9 +1220,6 @@ function getItemFormData(array $item = array(), array $options = array()) {
 		$data['alreadyPopulated'] = zbx_toHash($data['alreadyPopulated'], 'inventory_link');
 	}
 
-	// template
-	$data['is_template'] = isTemplate($data['hostid']);
-
 	// unset snmpv3 fields
 	if ($data['type'] != ITEM_TYPE_SNMPV3) {
 		$data['snmpv3_contextname'] = '';
