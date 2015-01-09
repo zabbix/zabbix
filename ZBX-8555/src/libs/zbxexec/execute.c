@@ -62,6 +62,7 @@ static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
  * Parameters: hRead         - [IN] a handle to the device                    *
  *             buf           - [IN/OUT] a pointer to the buffer               *
  *             buf_size      - [IN] buffer size                               *
+ *             offset        - [IN/OUT] current position in the buffer        *
  *             timeout_ms    - [IN] timeout in milliseconds                   *
  *                                                                            *
  * Return value: SUCCEED or TIMEOUT_ERROR if timeout reached                  *
@@ -394,11 +395,10 @@ close:
 
 	if (-1 != (fd = zbx_popen(&pid, command)))
 	{
-		int	rc = 0;
+		int	rc;
 		char	tmp_buf[PIPE_BUFFER_SIZE];
 
-		while (0 < (rc = read(fd, tmp_buf, sizeof(tmp_buf) - 1)) &&
-				MAX_EXECUTE_OUTPUT_LEN > offset + rc)
+		while (0 < (rc = read(fd, tmp_buf, sizeof(tmp_buf) - 1)) && MAX_EXECUTE_OUTPUT_LEN > offset + rc)
 		{
 			if (NULL != buffer)
 			{
