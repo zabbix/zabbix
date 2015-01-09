@@ -45,18 +45,13 @@ class CNewValidator {
 	/**
 	 * Returns true if the given $value is valid, or set's an error and returns false otherwise.
 	 *
-	 * @param $value
-	 *
-	 * @return bool
 	 */
 	private function validate() {
-		foreach ($this->rules as $field => $fieldRules) {
-			$field_trimmed = trim($field, ' ');
-			$result = $this->validateField($field_trimmed, $fieldRules);
+		foreach ($this->rules as $field => $rule) {
+			$result = $this->validateField($field, $rule);
 
-			// add to output only existing fields
-			if (array_key_exists($field_trimmed, $this->input)) {
-				$this->output[$field_trimmed] = $this->input[$field_trimmed];
+			if (array_key_exists($field, $this->input)) {
+				$this->output[$field] = $this->input[$field];
 			}
 		}
 	}
@@ -73,12 +68,12 @@ class CNewValidator {
 			$fatal = false;
 		}
 
-		$result = true;
+		$ret = true;
 		foreach ($rules as $rule) {
-			$result = $result && $this->validateRule($field, trim($rule, ' '), $fatal);
+			$ret = $ret && $this->validateRule($field, trim($rule, ' '), $fatal);
 		}
 
-		return $result;
+		return $ret;
 	}
 
 	public static function is_int($value) {
@@ -289,29 +284,29 @@ class CNewValidator {
 	}
 
 	/**
-	 * Get validation errors.
+	 * Returns array of error messages.
 	 *
-	 * @return array of error messages
+	 * @return array
 	 */
 	public function getAllErrors() {
 		return array_merge($this->errorsFatal, $this->errors);
 	}
 
 	/**
-	 * Get result.
+	 * Returns true if validation failed with errors.
 	 *
-	 * @param $error
+	 * @return bool
 	 */
 	public function isError() {
-		return (count($this->errors) != 0);
+		return (bool) $this->errors;
 	}
 
 	/**
-	 * Get result.
+	 * Returns true if validation failed with fatal errors.
 	 *
-	 * @param $error
+	 * @return bool
 	 */
 	public function isErrorFatal() {
-		return (count($this->errorsFatal) != 0);
+		return (bool) $this->errorsFatal;
 	}
 }

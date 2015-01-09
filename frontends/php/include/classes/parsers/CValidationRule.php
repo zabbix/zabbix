@@ -23,15 +23,19 @@ class CValidationRule {
 	const STATE_END = 1;
 
 	/**
-	 * An error message if validation rule is not valid
+	 * An error message if validation rule is not valid.
 	 *
 	 * @var string
 	 */
 	private $error = '';
 
-//	public function __construct() {
-//	}
-
+	/**
+	 * Parse validation rule. Returns array of rules or fail if $buffer is not valid.
+	 *
+	 * @param string $buffer
+	 *
+	 * @return array|bool
+	 */
 	public function parse($buffer) {
 		$this->error = '';
 
@@ -230,11 +234,11 @@ class CValidationRule {
 	}
 
 	/**
-	 * required_if:<field>,<value1>[...,<valueN>]
+	 * required_if <field1>=<value1>[,...,<valueN>]][ ... [<fieldN>=<value1>[,...,<valueN>]]]
 	 *
 	 * 'required_if' => array(
-	 *     'field' => '<field>',
-	 *     'values' => array('<value1>', ..., '<valueN>')
+	 *     'field1' => array('<value1>', ..., '<valueN>')
+	 *     'field2' => array('<value1>', ..., '<valueN>')
 	 * )
 	 */
 	private function parseRequiredIf($buffer, &$pos, &$rules) {
@@ -254,7 +258,7 @@ class CValidationRule {
 		while (true) {
 			$field = '';
 
-			if (!$this->parseField($buffer, $i, $field) || !isset($buffer[$i]) || $buffer[$i++] != ':') {
+			if (!$this->parseField($buffer, $i, $field) || !isset($buffer[$i]) || $buffer[$i++] != '=') {
 				return false;
 			}
 
@@ -298,7 +302,7 @@ class CValidationRule {
 	}
 
 	/**
-	 * <value1>[,<value2>[...,<valueN>]]
+	 * <value1>[,...,<valueN>]
 	 */
 	private function parseValues($buffer, &$pos, array &$values) {
 		$i = $pos;
