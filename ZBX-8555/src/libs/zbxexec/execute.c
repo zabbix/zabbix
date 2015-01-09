@@ -65,7 +65,7 @@ static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
  *             offset        - [IN/OUT] current position in the buffer        *
  *             timeout_ms    - [IN] timeout in milliseconds                   *
  *                                                                            *
- * Return value: SUCCEED or TIMEOUT_ERROR if timeout reached                  *
+ * Return value: SUCCEED, FAIL or TIMEOUT_ERROR if timeout reached            *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -99,14 +99,13 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 						strerror_from_system(GetLastError()));
 				return FAIL;
 			}
-			else
+
+			if (NULL != buf)
 			{
-				if (NULL != buf)
-				{
-					tmp_buf[read_bytes] = '\0';
-					zbx_strcpy_alloc(buf, buf_size, offset, tmp_buf);
-				}
+				tmp_buf[read_bytes] = '\0';
+				zbx_strcpy_alloc(buf, buf_size, offset, tmp_buf);
 			}
+
 			in_buf_size = 0;
 			continue;
 		}
