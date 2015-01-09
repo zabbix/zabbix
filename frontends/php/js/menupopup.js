@@ -119,10 +119,10 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 				clickCallback: function() {
 					var obj = jQuery(this);
 
-					sendAjaxData('dashboard.php?output=ajax&favaction=remove', {
+					sendAjaxData('zabbix.php?action=dashboard.favourite&operation=delete', {
 						data: {
-							favobj: favouriteObj,
-							favid: item.id
+							object: favouriteObj,
+							objectid: item.id
 						}
 					});
 
@@ -153,10 +153,10 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 				label: t('Remove all'),
 				css: (removeItems.length == 0) ? 'ui-state-disabled' : '',
 				clickCallback: function() {
-					sendAjaxData('dashboard.php?output=ajax&favaction=remove', {
+					sendAjaxData('zabbix.php?action=dashboard.favourite&operation=delete', {
 						data: {
-							favobj: favouriteObj,
-							favid: 0
+							object: favouriteObj,
+							objectid: 0
 						}
 					});
 
@@ -486,10 +486,10 @@ function getMenuPopupRefresh(options) {
 				var obj = jQuery(this),
 					currentRate = obj.data('value');
 
-				sendAjaxData(location.href, {
+				sendAjaxData('zabbix.php?action=dashboard.widget', {
 					data: jQuery.extend({}, params, {
-						widgetName: options.widgetName,
-						widgetRefreshRate: currentRate
+						widget: options.widgetName,
+						refreshrate: currentRate
 					}),
 					dataType: 'script',
 					success: function(js) { js }

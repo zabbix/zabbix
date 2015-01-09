@@ -18,21 +18,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CControllerResponseFatal extends CControllerResponse {
+require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-	private $location;
-	private $messageError = null;
+class CControllerDashboardView extends CController {
 
-	public function __construct() {
-		$this->location = 'zabbix.php?action=dashboard.view';
-		$this->messageError = 'Fatal error, please report to Zabbix Team';
+	protected function checkInput() {
+		$fields = array(
+		);
+
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			$this->setResponse(new CControllerResponseFatal());
+		}
+
+		return $ret;
 	}
 
-	public function getLocation() {
-		return $this->location;
+	protected function checkPermissions() {
+		return true;
 	}
 
-	public function getMessageError() {
-		return $this->messageError;
+	protected function doAction() {
+		$data = array(
+			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
+			'favourite_graphs' => getFavouriteGraphs(),
+			'favourite_maps' => getFavouriteMaps(),
+			'favourite_screens' => getFavouriteScreens()
+		);
+
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Dashboard'));
+		$this->setResponse($response);
 	}
 }

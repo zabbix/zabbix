@@ -29,7 +29,7 @@ class CControllerFavouriteDelete extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$data['javascript'] = '';
+			$data['main_block'] = '';
 			$this->setResponse(new CControllerResponseData($data));
 		}
 
@@ -52,20 +52,22 @@ class CControllerFavouriteDelete extends CController {
 		$object = $this->getInput('object');
 		$objectid = $this->getInput('objectid');
 
-		$data['javascript'] = '';
+		$data = array (
+			'main_block' => ''
+		);
 
 		DBstart();
 
 		$result = CFavorite::remove($profile[$object], $objectid, $object);
 		if ($result) {
-			echo '$("addrm_fav").title = "'._('Add to favourites').'";'."\n".
+			$data['main_block'] = $data['main_block'].'$("addrm_fav").title = "'._('Add to favourites').'";'."\n".
 				'$("addrm_fav").onclick = function() { add2favorites("'.$object.'", "'.$objectid.'"); }'."\n";
 		}
 
 		$result = DBend($result);
 
 		if ($result) {
-			echo 'switchElementClass("addrm_fav", "iconminus", "iconplus");';
+			$data['main_block'] = $data['main_block'].'switchElementClass("addrm_fav", "iconminus", "iconplus");';
 		}
 
 		$this->setResponse(new CControllerResponseData($data));

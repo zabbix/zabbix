@@ -54,6 +54,10 @@ class CRouter {
 	 */
 	private $routes = array(
 		// action					controller								layout					view
+		'dashboard.favourite'	=> array('CControllerDashboardFavourite',	'layout.javascript',	null),
+		'dashboard.sort'		=> array('CControllerDashboardSort',		'layout.json',			null),
+		'dashboard.view'		=> array('CControllerDashboardView',		'layout.htmlpage',		'monitoring.dashboard.view'),
+		'dashboard.widget'		=> array('CControllerDashboardWidget',		'layout.javascript',	null),
 		'discovery.view'		=> array('CControllerDiscoveryView',		'layout.htmlpage',		'monitoring.discovery.view'),
 		'favourite.create'		=> array('CControllerFavouriteCreate',		'layout.javascript',	null),
 		'favourite.delete'		=> array('CControllerFavouriteDelete',		'layout.javascript',	null),
@@ -83,7 +87,13 @@ class CRouter {
 		'script.formedit'		=> array('CControllerScriptFormEdit',		'layout.htmlpage',		'administration.script.edit'),
 		'script.list'			=> array('CControllerScriptList',			'layout.htmlpage',		'administration.script.list'),
 		'script.massdelete'		=> array('CControllerScriptMassDelete',		null,					null),
-		'script.update'			=> array('CControllerScriptUpdate',			null,					null)
+		'script.update'			=> array('CControllerScriptUpdate',			null,					null),
+		'widget.discovery.view'	=> array('CControllerWidgetDiscoveryView',	'layout.widget',		'monitoring.widget.discovery.view'),
+		'widget.hosts.view'		=> array('CControllerWidgetHostsView',		'layout.widget',		'monitoring.widget.hosts.view'),
+		'widget.issues.view'	=> array('CControllerWidgetIssuesView',		'layout.widget',		'monitoring.widget.issues.view'),
+		'widget.status.view'	=> array('CControllerWidgetStatusView',		'layout.widget',		'monitoring.widget.status.view'),
+		'widget.system.view'	=> array('CControllerWidgetSystemView',		'layout.widget',		'monitoring.widget.system.view'),
+		'widget.web.view'		=> array('CControllerWidgetWebView',		'layout.widget',		'monitoring.widget.web.view')
 	);
 
 	public function __construct($action) {

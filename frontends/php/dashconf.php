@@ -97,11 +97,11 @@ if (hasRequest('update')) {
 		CProfile::update('web.dashconf.events.extAck', $_REQUEST['extAck'], PROFILE_TYPE_INT);
 	}
 
-	jSredirect('dashboard.php');
+	jSredirect('zabbix.php?action=dashboard.view');
 }
 elseif (hasRequest('cancel')) {
 	ob_end_clean();
-	redirect('dashboard.php');
+	redirect('zabbix.php?action=dashboard.view');
 }
 
 ob_end_flush();

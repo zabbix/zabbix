@@ -20,4 +20,4 @@
 
 header('Content-Type: application/javascript; charset=UTF-8');
 
-echo $data['javascript'];
+echo $data['main_block'];
