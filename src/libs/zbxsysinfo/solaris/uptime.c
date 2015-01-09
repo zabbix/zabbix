@@ -19,50 +19,19 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "log.h"
 
 int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	kstat_ctl_t	*kc;
-	kstat_t		*kp;
-	kstat_named_t	*kn;
-	time_t		now;
-	int		ret = SYSINFO_RET_FAIL;
-
-	if (NULL == (kc = kstat_open()))
+	if (SYSINFO_RET_OK == SYSTEM_BOOTTIME(request, result))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open kernel statistics facility: %s",
-				zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		time_t	now;
+
+		time(&now);
+
+		result->ui64 = now - result->ui64;
+
+		return SYSINFO_RET_OK;
 	}
 
-	if (NULL == (kp = kstat_lookup(kc, "unix", 0, "system_misc")))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot look up in kernel statistics facility: %s",
-				zbx_strerror(errno)));
-		goto clean;
-	}
-
-	if (-1 == kstat_read(kc, kp, 0))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot read from kernel statistics facility: %s",
-				zbx_strerror(errno)));
-		goto clean;
-	}
-
-	if (NULL == (kn = (kstat_named_t *)kstat_data_lookup(kp, "boot_time")))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot look up data in kernel statistics facility: %s",
-				zbx_strerror(errno)));
-		goto clean;
-	}
-
-	time(&now);
-
-	SET_UI64_RESULT(result, now - get_kstat_numeric_value(kn));
-	ret = SYSINFO_RET_OK;
-clean:
-	kstat_close(kc);
-
-	return ret;
+	return SYSINFO_RET_FAIL;
 }

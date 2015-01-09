@@ -52,7 +52,7 @@ $filterButton->main();
 
 $resetButton = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput shadow');
 
-$buttonsDiv = new CDiv(array($filterButton, SPACE, $resetButton));
+$buttonsDiv = new CDiv(array($filterButton, $resetButton));
 $buttonsDiv->setAttribute('style', 'padding: 4px 0px;');
 
 $filterTable->addRow(new CCol($buttonsDiv, 'controls'));
