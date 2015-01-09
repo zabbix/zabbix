@@ -36,14 +36,14 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					'required' => true
 				)
 			),
-			array('required_if type:1,2', '',
+			array('required_if type=1,2', '',
 				array(
 					'required_if' => array(
 						'type' => array('1', '2')
 					)
 				)
 			),
-			array('required_if form:1 type:1,2', '',
+			array('required_if form=1 type=1,2', '',
 				array(
 					'required_if' => array(
 						'form' => array('1'),
@@ -51,7 +51,7 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					)
 				)
 			),
-			array('fatal | required_if form:1 type:1,2', '',
+			array('fatal | required_if form=1 type=1,2', '',
 				array(
 					'fatal' => true,
 					'required_if' => array(
@@ -60,7 +60,7 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					)
 				)
 			),
-			array(' fatal  |  required_if  form:1    type:1,2  ', '',
+			array(' fatal  |  required_if  form=1    type=1,2  ', '',
 				array(
 					'fatal' => true,
 					'required_if' => array(
@@ -80,7 +80,7 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					'fatal' => true
 				)
 			),
-			array('in 1,2,3|fatal|required_if form:1 type:1,2', '',
+			array('in 1,2,3|fatal|required_if form=1 type=1,2', '',
 				array(
 					'in' => array('1', '2', '3'),
 					'fatal' => true,
@@ -98,7 +98,7 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					)
 				)
 			),
-			array('in  ASC,DESC | fatal | required_if form:1 type:1,2 | db  interface.ip ', '',
+			array('in  ASC,DESC | fatal | required_if form=1 type=1,2 | db  interface.ip ', '',
 				array(
 					'in' => array('ASC', 'DESC'),
 					'fatal' => true,
@@ -126,7 +126,7 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 			),
 			array('required_if', 'Cannot parse validation rules "required_if" at position 0.', false),
 			array('required_if type', 'Cannot parse validation rules "required_if type" at position 0.', false),
-			array('required_if type:', 'Cannot parse validation rules "required_if type:" at position 0.', false),
+			array('required_if type=', 'Cannot parse validation rules "required_if type=" at position 0.', false),
 			array('in', 'Cannot parse validation rules "in" at position 0.', false),
 			array('in 1, 2', 'Cannot parse validation rules "in 1, 2" at position 0.', false),
 			array('in 1,|fatal', 'Cannot parse validation rules "in 1,|fatal" at position 0.', false),

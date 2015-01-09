@@ -117,7 +117,6 @@ class CController {
 		}
 
 		$validator = new CNewValidator($input, $validationRules);
-		$result = !$validator->isError() && !$validator->isErrorFatal();
 
 		foreach ($validator->getAllErrors() as $error) {
 			info($error);
@@ -135,7 +134,7 @@ class CController {
 			$this->validationResult = self::VALIDATION_OK;
 		}
 
-		return $result;
+		return ($this->validationResult == self::VALIDATION_OK);
 	}
 
 	/**
