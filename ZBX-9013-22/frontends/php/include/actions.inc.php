@@ -655,15 +655,24 @@ function operation_type2str($type = null) {
 	}
 }
 
-function sortOperations($eventSource, &$operations) {
-	if ($eventSource == EVENT_SOURCE_TRIGGERS || $eventSource == EVENT_SOURCE_INTERNAL) {
-		$sortFields = array('esc_step_from', 'esc_step_to', 'esc_period', 'operationtype');
+function sortOperations($eventsource, &$operations) {
+	if ($eventsource == EVENT_SOURCE_TRIGGERS || $eventsource == EVENT_SOURCE_INTERNAL) {
+		$esc_step_from = array();
+		$esc_step_to = array();
+		$esc_period = array();
+		$operationTypes = array();
+
+		foreach ($operations as $key => $operation) {
+			$esc_step_from[$key] = $operation['esc_step_from'];
+			$esc_step_to[$key] = $operation['esc_step_to'];
+			$esc_period[$key] = $operation['esc_period'];
+			$operationTypes[$key] = $operation['operationtype'];
+		}
+		array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $operationTypes, SORT_ASC, $operations);
 	}
 	else {
-		$sortFields = array('operationtype');
+		CArrayHelper::sort($operations, array('operationtype'));
 	}
-
-	CArrayHelper::sort($operations, $sortFields);
 }
 
 /**
