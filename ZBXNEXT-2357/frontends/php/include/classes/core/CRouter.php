@@ -88,6 +88,7 @@ class CRouter {
 		'script.list'			=> array('CControllerScriptList',			'layout.htmlpage',		'administration.script.list'),
 		'script.massdelete'		=> array('CControllerScriptMassDelete',		null,					null),
 		'script.update'			=> array('CControllerScriptUpdate',			null,					null),
+		'system.warning'		=> array('CControllerSystemWarning',		'layout.warning',		'system.warning'),
 		'widget.discovery.view'	=> array('CControllerWidgetDiscoveryView',	'layout.widget',		'monitoring.widget.discovery.view'),
 		'widget.hosts.view'		=> array('CControllerWidgetHostsView',		'layout.widget',		'monitoring.widget.hosts.view'),
 		'widget.issues.view'	=> array('CControllerWidgetIssuesView',		'layout.widget',		'monitoring.widget.issues.view'),
