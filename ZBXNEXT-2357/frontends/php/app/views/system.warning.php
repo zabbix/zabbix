@@ -22,7 +22,7 @@ $pageHeader = new CPageHeader(_('Something wrong hapenned'));
 $pageHeader->addCssInit();
 $pageHeader->display();
 
-$warning = new CWarning(_('Fata error, please report to Zabbix Team'), $data['messages']);
+$warning = new CWarning(_('Fatal error, please report to Zabbix Team'), $data['messages']);
 $buttons = new CButton('back', _('Go to dashboard'),
 				'javascript: document.location = "zabbix.php?action=dashboard.view"', 'button');
 $warning->setButtons($buttons);
