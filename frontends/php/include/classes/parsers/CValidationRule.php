@@ -55,17 +55,20 @@ class CValidationRule {
 							$is_empty = false;
 							$rule = array();
 
-							if (!$this->parseFatal($buffer, $pos, $rule)
-									&& !$this->parseRequired($buffer, $pos, $rule)
-									&& !$this->parseIn($buffer, $pos, $rule)
-									&& !$this->parseDB($buffer, $pos, $rule)
-									&& !$this->parseRequiredIf($buffer, $pos, $rule)) {
+							if (!$this->parseRequiredIf($buffer, $pos, $rule)			// required_if
+									&& !$this->parseRequired($buffer, $pos, $rule)		// required
+									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
+									&& !$this->parseIn($buffer, $pos, $rule)			// in
+									&& !$this->parseFatal($buffer, $pos, $rule)			// fatal
+									&& !$this->parseDB($buffer, $pos, $rule)			// db
+									&& !$this->parseArrayDB($buffer, $pos, $rule)) {	// array_db
 
 								// incorrect validation rule
 								break 3;
 							}
 
 							if (array_key_exists(key($rule), $rules)) {
+								// the message can be not translated because it is an internal error
 								$this->error = 'Validation rule "'.key($rule).'" already exists.';
 								return false;
 							}
@@ -92,7 +95,8 @@ class CValidationRule {
 			}
 		}
 
-		if ($state == self::STATE_BEGIN && !$is_empty) {
+		if (isset($buffer[$pos])) {
+			// the message can be not translated because it is an internal error
 			$this->error = 'Cannot parse validation rules "'.$buffer.'" at position '.$pos.'.';
 			return false;
 		}
@@ -115,19 +119,11 @@ class CValidationRule {
 	 * 'fatal' => true
 	 */
 	private function parseFatal($buffer, &$pos, &$rule) {
-		$i = $pos;
-
-		if (0 != strncmp(substr($buffer, $i), 'fatal', 5)) {
+		if (0 != strncmp(substr($buffer, $pos), 'fatal', 5)) {
 			return false;
 		}
 
-		$i += 5;
-
-		if (isset($buffer[$i]) && $buffer[$i] != ' ' && $buffer[$i] != '|') {
-			return false;
-		}
-
-		$pos = $i;
+		$pos += 5;
 		$rule['fatal'] = true;
 
 		return true;
@@ -139,20 +135,28 @@ class CValidationRule {
 	 * 'required' => true
 	 */
 	private function parseRequired($buffer, &$pos, &$rules) {
-		$i = $pos;
-
 		if (0 != strncmp(substr($buffer, $pos), 'required', 8)) {
 			return false;
 		}
 
-		$i += 8;
+		$pos += 8;
+		$rules['required'] = true;
 
-		if (isset($buffer[$i]) && $buffer[$i] != ' ' && $buffer[$i] != '|') {
+		return true;
+	}
+
+	/**
+	 * not_empty
+	 *
+	 * 'not_empty' => true
+	 */
+	private function parseNotEmpty($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'not_empty', 9)) {
 			return false;
 		}
 
-		$pos = $i;
-		$rules['required'] = true;
+		$pos += 9;
+		$rules['not_empty'] = true;
 
 		return true;
 	}
@@ -220,10 +224,6 @@ class CValidationRule {
 			return false;
 		}
 
-		if (isset($buffer[$i]) && $buffer[$i] != ' ' && $buffer[$i] != '|') {
-			return false;
-		}
-
 		$pos = $i;
 		$rules['db'] = array(
 			'table' => $table,
@@ -234,11 +234,53 @@ class CValidationRule {
 	}
 
 	/**
-	 * required_if <field1>=<value1>[,...,<valueN>]][ ... [<fieldN>=<value1>[,...,<valueN>]]]
+	 * array_db <table>.<field>
+	 *
+	 * 'array_db' => array(
+	 *     'table' => '<table>',
+	 *     'field' => '<field>'
+	 * )
+	 */
+	private function parseArrayDB($buffer, &$pos, &$rules) {
+		$i = $pos;
+
+		if (0 != strncmp(substr($buffer, $i), 'array_db ', 9)) {
+			return false;
+		}
+
+		$i += 9;
+
+		while (isset($buffer[$i]) && $buffer[$i] == ' ') {
+			$i++;
+		}
+
+		$table = '';
+
+		if (!$this->parseField($buffer, $i, $table) || !isset($buffer[$i]) || $buffer[$i++] != '.') {
+			return false;
+		}
+
+		$field = '';
+
+		if (!$this->parseField($buffer, $i, $field)) {
+			return false;
+		}
+
+		$pos = $i;
+		$rules['array_db'] = array(
+			'table' => $table,
+			'field' => $field
+		);
+
+		return true;
+	}
+
+	/**
+	 * required_if <field1>[=<value1>[,...,<valueN>]]][ ... [<fieldN>[=<value1>[,...,<valueN>]]]]
 	 *
 	 * 'required_if' => array(
-	 *     'field1' => array('<value1>', ..., '<valueN>')
-	 *     'field2' => array('<value1>', ..., '<valueN>')
+	 *     'field1' => true / array('<value1>'[, ..., '<valueN>'])
+	 *     'field2' => true / array('<value1>'[, ..., '<valueN>'])
 	 * )
 	 */
 	private function parseRequiredIf($buffer, &$pos, &$rules) {
@@ -251,23 +293,7 @@ class CValidationRule {
 
 		$i += 12;
 
-		while (isset($buffer[$i]) && $buffer[$i] == ' ') {
-			$i++;
-		}
-
-		while (true) {
-			$field = '';
-
-			if (!$this->parseField($buffer, $i, $field) || !isset($buffer[$i]) || $buffer[$i++] != '=') {
-				return false;
-			}
-
-			$rule[$field] = array();
-
-			if (!$this->parseValues($buffer, $i, $rule[$field])) {
-				return false;
-			}
-
+		do {
 			while (isset($buffer[$i]) && $buffer[$i] == ' ') {
 				$i++;
 			}
@@ -275,9 +301,27 @@ class CValidationRule {
 			if (!isset($buffer[$i]) || $buffer[$i] == '|') {
 				break;
 			}
-		}
 
-		if (isset($buffer[$i]) && $buffer[$i] != '|') {
+			$field = '';
+
+			if (!$this->parseField($buffer, $i, $field)) {
+				return false;
+			}
+
+			if (isset($buffer[$i]) && $buffer[$i] == '=') {
+				$i++;
+				$rule[$field] = array();
+
+				if (!$this->parseValues($buffer, $i, $rule[$field])) {
+					return false;
+				}
+			}
+			else {
+				$rule[$field] = true;
+			}
+		} while (isset($buffer[$i]) && $buffer[$i] == ' ');
+
+		if (!$rule) {
 			return false;
 		}
 

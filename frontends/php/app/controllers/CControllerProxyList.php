@@ -22,9 +22,9 @@ class CControllerProxyList extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'sort' =>		'fatal|in_str:host',
-			'sortorder' =>	'fatal|in_str:'.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck' =>	'fatal|in_int:1'
+			'sort' =>		'fatal|in host',
+			'sortorder' =>	'fatal|in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>	'fatal|in 1'
 		);
 
 		$ret = $this->validateInput($fields);

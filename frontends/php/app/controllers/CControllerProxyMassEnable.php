@@ -22,7 +22,7 @@ class CControllerProxyMassEnable extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'proxyids' =>		'fatal|array_db:hosts.hostid|required'
+			'proxyids' =>	'fatal|required|array_db hosts.hostid'
 		);
 
 		$ret = $this->validateInput($fields);

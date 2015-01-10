@@ -36,9 +36,29 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					'required' => true
 				)
 			),
+			array('not_empty', '',
+				array(
+					'not_empty' => true
+				)
+			),
 			array('required_if type=1,2', '',
 				array(
 					'required_if' => array(
+						'type' => array('1', '2')
+					)
+				)
+			),
+			array('required_if type', '',
+				array(
+					'required_if' => array(
+						'type' => true
+					)
+				)
+			),
+			array('required_if form type=1,2', '',
+				array(
+					'required_if' => array(
+						'form' => true,
 						'type' => array('1', '2')
 					)
 				)
@@ -98,6 +118,14 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					)
 				)
 			),
+			array('array_db hosts.name', '',
+				array(
+					'array_db' => array(
+						'table' => 'hosts',
+						'field' => 'name'
+					)
+				)
+			),
 			array('in  ASC,DESC | fatal | required_if form=1 type=1,2 | db  interface.ip ', '',
 				array(
 					'in' => array('ASC', 'DESC'),
@@ -118,21 +146,26 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					'required' => true
 				)
 			),
-			array('  fatal |  required   ', '',
+			array('  fatal |  required   | array_db host.name', '',
 				array(
 					'fatal' => true,
-					'required' => true
+					'required' => true,
+					'array_db' => array(
+						'table' => 'host',
+						'field' => 'name'
+					)
 				)
 			),
-			array('required_if', 'Cannot parse validation rules "required_if" at position 0.', false),
-			array('required_if type', 'Cannot parse validation rules "required_if type" at position 0.', false),
-			array('required_if type=', 'Cannot parse validation rules "required_if type=" at position 0.', false),
+			array('required_if', 'Cannot parse validation rules "required_if" at position 8.', false),
+			array('required_if type=', 'Cannot parse validation rules "required_if type=" at position 8.', false),
 			array('in', 'Cannot parse validation rules "in" at position 0.', false),
 			array('in 1, 2', 'Cannot parse validation rules "in 1, 2" at position 0.', false),
 			array('in 1,|fatal', 'Cannot parse validation rules "in 1,|fatal" at position 0.', false),
 			array('fatal|required|fatal', 'Validation rule "fatal" already exists.', false),
-			array('fatal|required2', 'Cannot parse validation rules "fatal|required2" at position 6.', false),
+			array('fatal|required2', 'Cannot parse validation rules "fatal|required2" at position 14.', false),
 			array('fatal|require', 'Cannot parse validation rules "fatal|require" at position 6.', false),
+			array('fatala', 'Cannot parse validation rules "fatala" at position 5.', false),
+			array('fatal not_empty', 'Cannot parse validation rules "fatal not_empty" at position 6.', false),
 			array('FATAL', 'Cannot parse validation rules "FATAL" at position 0.', false)
 		);
 	}
@@ -145,7 +178,7 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 
 		$rc = $parser->parse($rule);
 
-		$this->assertEquals($parser->getError(), $error_exprected);
 		$this->assertEquals($rc, $result_expected);
+		$this->assertEquals($parser->getError(), $error_exprected);
 	}
 }

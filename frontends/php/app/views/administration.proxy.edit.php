@@ -31,7 +31,7 @@ $proxyForm->addVar('proxyid', $data['proxyid']);
 
 // create form list
 $proxyFormList = new CFormList('proxyFormList');
-$nameTextBox = new CTextBox('host', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
+$nameTextBox = new CTextBox('host', $data['host'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
 $nameTextBox->attr('autofocus', 'autofocus');
 $proxyFormList->addRow(_('Proxy name'), $nameTextBox);
 
@@ -41,10 +41,6 @@ $statusBox->addItem(HOST_STATUS_PROXY_ACTIVE, _('Active'));
 $statusBox->addItem(HOST_STATUS_PROXY_PASSIVE, _('Passive'));
 $proxyFormList->addRow(_('Proxy mode'), $statusBox);
 
-if ($data['status'] == HOST_STATUS_PROXY_PASSIVE) {
-	$proxyForm->addVar('interface[interfaceid]', $data['interface']['interfaceid']);
-}
-
 $interfaceTable = new CTable(null, 'formElementTable');
 $interfaceTable->addRow(array(
 	_('IP address'),
@@ -53,31 +49,34 @@ $interfaceTable->addRow(array(
 	_('Port')
 ));
 
-$connectByComboBox = new CRadioButtonList('interface[useip]', $data['status'] == HOST_STATUS_PROXY_PASSIVE ? $data['interface']['useip'] : 1);
+$connectByComboBox = new CRadioButtonList('useip', $data['useip']);
 $connectByComboBox->addValue(_('IP'), 1);
 $connectByComboBox->addValue(_('DNS'), 0);
 $connectByComboBox->useJQueryStyle();
 
 $interfaceTable->addRow(array(
-	new CTextBox('interface[ip]', $data['interface']['ip'], ZBX_TEXTBOX_SMALL_SIZE, false, 64),
-	new CTextBox('interface[dns]', $data['interface']['dns'], ZBX_TEXTBOX_SMALL_SIZE, false, 64),
+	new CTextBox('ip', $data['ip'], ZBX_TEXTBOX_SMALL_SIZE, false, 64),
+	new CTextBox('dns', $data['dns'], ZBX_TEXTBOX_SMALL_SIZE, false, 64),
 	$connectByComboBox,
-	new CTextBox('interface[port]', $data['interface']['port'], 18, false, 64)
+	new CTextBox('port', $data['port'], 18, false, 64)
 ));
 $proxyFormList->addRow(_('Interface'), new CDiv($interfaceTable, 'objectgroup inlineblock border_dotted ui-corner-all'),
-	$data['status'] == HOST_STATUS_PROXY_ACTIVE);
+	$data['status'] != HOST_STATUS_PROXY_PASSIVE);
 
 // append hosts to form list
 $hostsTweenBox = new CTweenBox($proxyForm, 'proxy_hostids', $data['proxy_hostids']);
 foreach ($data['all_hosts'] as $host) {
 	// show only normal hosts, and discovered hosts monitored by the current proxy
 	// for new proxies display only normal hosts
-	if (($data['proxyid'] != 0 && bccomp($data['proxyid'], $host['proxy_hostid']) == 0) || $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+	if ($host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL
+			|| ($data['proxyid'] != 0 && bccomp($data['proxyid'], $host['proxy_hostid']) == 0)) {
+
 		$hostsTweenBox->addItem(
 			$host['hostid'],
 			$host['name'],
 			null,
-			empty($host['proxy_hostid']) || (isset($data['proxyid']) && bccomp($host['proxy_hostid'], $data['proxyid']) == 0 && $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
+			$host['proxy_hostid'] == 0
+				|| (bccomp($host['proxy_hostid'], $data['proxyid']) == 0 && $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
 		);
 	}
 }
