@@ -15,28 +15,16 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-class CControllerResponseFatal extends CControllerResponse {
+$pageHeader = new CPageHeader(_('Something wrong hapenned'));
+$pageHeader->addCssInit();
+$pageHeader->display();
 
-	private $location;
-	private $messages = array();
+$warning = new CWarning(_('Fata error, please report to Zabbix Team'), $data['messages']);
+$buttons = new CButton('back', _('Go to dashboard'),
+				'javascript: document.location = "zabbix.php?action=dashboard.view"', 'button');
+$warning->setButtons($buttons);
 
-	public function __construct() {
-		$this->location = 'zabbix.php?action=dashboard.view';
-		$this->messageError = 'Fatal error, please report to Zabbix Team';
-	}
-
-	public function getLocation() {
-		return $this->location;
-	}
-
-	public function getMessages() {
-		return $this->messages;
-	}
-
-	public function addMessage($msg) {
-		$this->messages[] = $msg;
-	}
-}
+$warning->show();

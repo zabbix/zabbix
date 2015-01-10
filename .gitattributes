@@ -46,6 +46,7 @@ frontends/php/app/controllers/CControllerScriptFormEdit.php -text
 frontends/php/app/controllers/CControllerScriptList.php -text
 frontends/php/app/controllers/CControllerScriptMassDelete.php -text
 frontends/php/app/controllers/CControllerScriptUpdate.php -text
+frontends/php/app/controllers/CControllerSystemWarning.php -text
 frontends/php/app/controllers/CControllerWidgetDiscoveryView.php -text
 frontends/php/app/controllers/CControllerWidgetHostsView.php -text
 frontends/php/app/controllers/CControllerWidgetIssuesView.php -text
@@ -61,6 +62,7 @@ frontends/php/app/views/layout.htmlpage.php -text
 frontends/php/app/views/layout.htmlpage.top.php -text
 frontends/php/app/views/layout.javascript.php -text
 frontends/php/app/views/layout.json.php -text
+frontends/php/app/views/layout.warning.php -text
 frontends/php/app/views/layout.widget.php -text
 frontends/php/app/views/monitoring.dashboard.view.php -text
 frontends/php/app/views/monitoring.widget.discovery.view.php -text
@@ -70,6 +72,7 @@ frontends/php/app/views/monitoring.widget.status.view.php -text
 frontends/php/app/views/monitoring.widget.system.view.php -text
 frontends/php/app/views/monitoring.widget.web.view.php -text
 frontends/php/app/views/report.status.php -text
+frontends/php/app/views/system.warning.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text

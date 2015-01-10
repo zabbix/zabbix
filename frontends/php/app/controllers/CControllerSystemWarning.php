@@ -18,25 +18,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CControllerResponseFatal extends CControllerResponse {
+class CControllerSystemWarning extends CController {
 
-	private $location;
-	private $messages = array();
-
-	public function __construct() {
-		$this->location = 'zabbix.php?action=dashboard.view';
-		$this->messageError = 'Fatal error, please report to Zabbix Team';
+	protected function checkInput() {
+		return true;
 	}
 
-	public function getLocation() {
-		return $this->location;
+	protected function checkPermissions() {
+		return true;
 	}
 
-	public function getMessages() {
-		return $this->messages;
-	}
+	protected function doAction() {
+		if (isset($_SESSION['messages'])) {
+			$data['messages'] = $_SESSION['messages'];
+			unset($_SESSION['messages']);
+		}
 
-	public function addMessage($msg) {
-		$this->messages[] = $msg;
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Fatal error'));
+		$this->setResponse($response);
 	}
 }
