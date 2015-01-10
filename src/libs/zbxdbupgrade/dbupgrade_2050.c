@@ -35,6 +35,18 @@ static int	DBpatch_2050000(void)
 	return DBset_default("httptest", &field);
 }
 
+static int	DBpatch_2050001(void)
+{
+	if (ZBX_DB_OK > DBexecute("update items set snmp_oid=concat(concat('discovery[{#SNMPVALUE},',snmp_oid,']'))"
+			" where flags=%d and type in (%d,%d,%d)", ZBX_FLAG_DISCOVERY_RULE,
+			ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -42,5 +54,6 @@ DBPATCH_START(2050)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(2050000, 0, 1)
+DBPATCH_ADD(2050001, 0, 1)
 
 DBPATCH_END()
