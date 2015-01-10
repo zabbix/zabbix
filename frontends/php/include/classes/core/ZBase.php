@@ -433,6 +433,7 @@ class ZBase {
 				$data['fullscreen'] = isset($_REQUEST['fullscreen']) && $_REQUEST['fullscreen'] == 1 ? 1 : 0;
 				$data['javascript']['files'] = $view->getAddedJS();
 				$data['javascript']['pre'] = $view->getIncludedJS();
+				$data['javascript']['post'] = $view->getPostJS();
 				$layout = new CView($router->getLayout(), $data);
 				echo $layout->getOutput();
 			}

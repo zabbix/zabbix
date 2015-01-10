@@ -57,6 +57,7 @@ global $page;
 			)));
 			$table->show();
 
+			// Should be replaced with addPostJS() at some point
 			zbx_add_post_js('initMessages({});');
 
 			// if a user logs in after several unsuccessful attempts, display a warning
@@ -123,5 +124,14 @@ global $page;
 	local_showMessage();
 	echo $data['javascript']['pre'];
 	echo $data['main_block'];
+
+	// Add post JS code
+	echo "<script type=\"text/javascript\">\n";
+	echo "jQuery(document).ready(function() {\n";
+	echo $data['javascript']['post'];
+	echo "});\n";
+	echo "</script>\n";
+
 	local_generateFooter($data);
+
 show_messages();
