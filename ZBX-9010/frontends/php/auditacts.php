@@ -118,8 +118,8 @@ if ($data['alias']) {
 if ($queryData) {
 	foreach (eventSourceObjects() as $eventSource) {
 		$data['alerts'] = array_merge($data['alerts'], API::Alert()->get(array(
-			'output' => array('alertid', 'actionid', 'userid', 'clock', 'sendto', 'subject', 'message', 'status',
-				'retries', 'error', 'alerttype'
+			'output' => array('alertid', 'clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error',
+				'alerttype'
 			),
 			'selectMediatypes' => array('mediatypeid', 'description'),
 			'userids' => $data['alias'] ? $user['userid'] : null,
