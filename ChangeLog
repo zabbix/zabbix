@@ -61,6 +61,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese an
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+...G...PS. [ZBX-8555] fixed 'broken pipe' errors when executing remote commands. This was happening because pipe was closed without reading from it (wiper)
 .......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
 .......PS. [ZBX-9163] fixed SNMPERR_TOO_LONG error being wrongly treated as a network error; thanks to Santal for patch (asaveljevs)
 ...G...... [ZBX-6047] fixed system.boottime and system.uptime returning incorrect results on Solaris zones (asaveljevs)
@@ -588,6 +589,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...PS. [ZBX-8555] fixed 'broken pipe' errors when executing remote commands. This was happening because pipe was closed without reading from it (wiper)
 .......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
 .......PS. [ZBX-9163] fixed SNMPERR_TOO_LONG error being wrongly treated as a network error; thanks to Santal for patch (asaveljevs)
 ...G...... [ZBX-6047] fixed system.boottime and system.uptime returning incorrect results on Solaris zones (asaveljevs)
