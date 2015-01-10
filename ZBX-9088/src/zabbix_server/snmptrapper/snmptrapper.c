@@ -29,16 +29,10 @@
 static int	trap_fd = -1;
 static int	trap_lastsize;
 static ino_t	trap_ino = 0;
-static int	retry_read = 0;
 zbx_stat_t	file_buf;
 char		*buffer = NULL;
-
-static void	clear_buffer(void)
-{
-	memset(buffer, 0, MAX_BUFFER_LEN);
-	*buffer = '\0';
-	retry_read = 0;
-}
+int		offset = 0;
+int		force = 0;
 
 static void	DBget_lastsize()
 {
@@ -275,9 +269,9 @@ static void	process_trap(const char *addr, char *begin, char *end)
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	parse_traps()
+static void	parse_traps(int flag)
 {
-	char	*c, *line, *begin = NULL, *end = NULL, *addr = NULL;
+	char	*c, *line, *begin = NULL, *end = NULL, *addr = NULL, *pzbegin, *pzaddr, *pzdate;
 
 	c = line = buffer;
 
@@ -289,7 +283,8 @@ static void	parse_traps()
 		if (0 != strncmp(c, "ZBXTRAP", 7))
 			continue;
 
-		*c = '\0';
+		pzbegin = c;
+
 		c += 7;	/* c now points to the delimiter between "ZBXTRAP" and address */
 
 		while ('\0' != *c && NULL != strchr(ZBX_WHITESPACE, *c))
@@ -301,14 +296,17 @@ static void	parse_traps()
 		if (NULL != begin)
 		{
 			*(line - 1) = '\0';
+			*pzdate = '\0';
+			*pzaddr = '\0';
+
 			process_trap(addr, begin, end);
-			retry_read = 0;
 			end = NULL;
 		}
 
 		/* parse the current trap */
 		begin = line;
 		addr = c;
+		pzdate = pzbegin;
 
 		while ('\0' != *c && NULL == strchr(ZBX_WHITESPACE, *c))
 			c++;
@@ -321,30 +319,43 @@ static void	parse_traps()
 			continue;
 		}
 
-		*c++ = '\0';
-		end = c;	/* the rest of the trap */
+		pzaddr = c;
+
+		end = c+1;	/* the rest of the trap */
 	}
 
-	if (NULL != end && 0 == retry_read)	/* store the last trap to be processed on the next cycle*/
+	if (NULL != end)
 	{
-		char	*unprocessed_trap = NULL;
+		if (0 == flag)	/* store the last trap to be processed on the next cycle*/
+		{
+			offset = c - begin;
 
-		unprocessed_trap = zbx_dsprintf(unprocessed_trap, "%sZBXTRAP %s\n%s\n", begin, addr, end);
+			if (MAX_BUFFER_LEN - 1 == offset)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "No space in buffer for new traps. Force processing");
+				parse_traps(1);
+				offset = 0;
+				*buffer = '\0';
+			}
+			else
+				memmove(buffer, begin, offset + 1);
+		}
+		else	/* process the last trap */
+		{
+			*(line - 1) = '\0';
+			*pzdate = '\0';
+			*pzaddr = '\0';
 
-		clear_buffer();
-		zbx_snprintf(buffer, MAX_BUFFER_LEN, "%s", unprocessed_trap);
-		retry_read = 1;
-		zbx_free(unprocessed_trap);
-	}
-	else if (NULL != end && 1 == retry_read) /* process the last trap */
-	{
-		process_trap(addr, begin, end);
-		clear_buffer();
+			process_trap(addr, begin, end);
+			offset = 0;
+			*buffer = '\0';
+		}
 	}
 	else if (NULL == addr)	/* no trap was found */
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid trap found [%s]", buffer);
-		clear_buffer();
+		offset = 0;
+		*buffer = '\0';
 	}
 }
 
@@ -360,15 +371,9 @@ static void	parse_traps()
 static int	read_traps()
 {
 	const char	*__function_name = "read_traps";
-	int		nbytes = 0, old_size;
+	int		nbytes = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastsize:%d", __function_name, trap_lastsize);
-
-	if (file_buf.st_size == trap_lastsize && 1 == retry_read)
-	{
-		parse_traps();
-		goto exit;
-	}
 
 	if ((off_t)-1 == lseek(trap_fd, (off_t)trap_lastsize, SEEK_SET))
 	{
@@ -377,9 +382,7 @@ static int	read_traps()
 		goto exit;
 	}
 
-	old_size = strlen(buffer);
-
-	if (-1 == (nbytes = read(trap_fd, buffer + old_size, MAX_BUFFER_LEN - old_size - 1)))
+	if (-1 == (nbytes = read(trap_fd, buffer + offset, MAX_BUFFER_LEN - offset - 1)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot read from [%s]: %s", CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 		goto exit;
@@ -387,13 +390,10 @@ static int	read_traps()
 
 	if (0 < nbytes)
 	{
-		buffer[nbytes + old_size] = '\0';
-		zbx_rtrim(buffer + old_size + MAX(nbytes - 3, 0), " \r\n");
-
+		buffer[nbytes + offset] = '\0';
 		trap_lastsize += nbytes;
 		DBupdate_lastsize();
-
-		parse_traps();
+		parse_traps(0);
 	}
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -481,33 +481,43 @@ static int	get_latest_data()
 						zbx_strerror(errno));
 			}
 
-			if (0 >= read_traps())
-			{
-				clear_buffer();
-				close_trap_file();
-			}
+			while (0 < read_traps())
+				;
+
+			if (0 != offset)
+				parse_traps(1);
+
+			close_trap_file();
 		}
 		else if (file_buf.st_ino != trap_ino || file_buf.st_size < trap_lastsize)
 		{
 			/* file has been rotated, process the current file */
 
-			if (0 >= read_traps())
+			while (0 < read_traps())
+				;
+
+			if (0 != offset)
+				parse_traps(1);
+
+			close_trap_file();
+		}
+		else if (file_buf.st_size == trap_lastsize)
+		{
+			if (1 == force)
 			{
-				clear_buffer();
-				close_trap_file();
+				parse_traps(1);
+				force = 0;
 			}
-		}
-		else if (file_buf.st_size == trap_lastsize && 0 == retry_read)
-		{
-			return FAIL;	/* no new traps and no data left in the buffer*/
-		}
-		else if (MAX_BUFFER_LEN -1 <= strlen(buffer) && 1 == retry_read)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot process the trap. the trap is too long");
-			clear_buffer();
-			return FAIL;
+			else if (0 != offset && 0 == force)
+			{
+				force = 1;
+			}
+
+			return FAIL;	/* no new traps */
 		}
 	}
+
+	force = 0;
 
 	if (-1 == trap_fd && -1 == open_trap_file())
 		return FAIL;
@@ -537,19 +547,14 @@ void	main_snmptrapper_loop()
 	DBget_lastsize();
 
 	buffer = zbx_malloc(buffer, MAX_BUFFER_LEN);
-	clear_buffer();
+	*buffer = '\0';
 
 	for (;;)
 	{
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
 		while (SUCCEED == get_latest_data())
-		{
 			read_traps();
-
-			if (1 == retry_read)
-				break;
-		}
 
 		zbx_sleep_loop(1);
 	}
