@@ -365,6 +365,8 @@ else {
 	$operationsTable->setHeader(array(_('Details'), _('Action')));
 }
 
+$sortOperations = 0;
+
 foreach ($this->data['action']['operations'] as $operationid => $operation) {
 	if (!str_in_array($operation['operationtype'], $this->data['allowedOperations'])) {
 		continue;
@@ -375,6 +377,8 @@ foreach ($this->data['action']['operations'] as $operationid => $operation) {
 	if (!isset($operation['mediatypeid'])) {
 		$operation['mediatypeid'] = 0;
 	}
+
+	$operation['sort'] = $sortOperations++;
 
 	$details = new CSpan(get_operation_descr(SHORT_DESCRIPTION, $operation));
 	$details->setHint(get_operation_descr(LONG_DESCRIPTION, $operation));
@@ -454,6 +458,11 @@ if (!empty($this->data['new_operation'])) {
 	if (isset($this->data['new_operation']['operationid'])) {
 		$newOperationsTable->addItem(new CVar('new_operation[operationid]', $this->data['new_operation']['operationid']));
 	}
+
+	$newOperationsTable->addItem(new CVar('new_operation[sort]', isset($this->data['new_operation']['sort'])
+		? $this->data['new_operation']['sort']
+		: $sortOperations
+	));
 
 	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 		$stepFrom = new CNumericBox('new_operation[esc_step_from]', $this->data['new_operation']['esc_step_from'], 5);
