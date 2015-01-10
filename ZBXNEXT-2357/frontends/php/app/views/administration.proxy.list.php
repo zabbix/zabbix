@@ -107,7 +107,7 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "proxyids";');
+$this->addPostJS('chkbxRange.pageGoName = "proxyids";');
 
 // append table to form
 $proxyForm->addItem(array($data['paging'], $proxyTable, $data['paging'], get_table_header(array($goComboBox, $goButton))));

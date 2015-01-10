@@ -43,6 +43,11 @@ class CView {
 	private $scripts;
 
 	/**
+	 * @var array - Java code for inclusions on page
+	 */
+	private $jsIncludePost = array();
+
+	/**
 	 * @var array - Java Script files for inclusions on page, pre-processed by PHP
 	 */
 	private $jsIncludeFiles = array();
@@ -168,6 +173,14 @@ class CView {
 	}
 
 	/**
+	 * Include Java Script code to be executed after page load
+	 * @param string $js Java Script code
+	 */
+	public function addPostJS($js) {
+		$this->jsIncludePost[] = $js;
+	}
+
+	/**
 	 * Include Java Script file required for the view into HTML
 	 * @param string $filename name of java Script file, will be pre-processed by PHP
 	 */
@@ -181,6 +194,14 @@ class CView {
 	 */
 	public function addJSfile($filename) {
 		$this->jsFiles[] = $filename;
+	}
+
+	/**
+	 * Get content of all Java Script code
+	 * @return string Java Script code
+	 */
+	public function getPostJS() {
+		return implode("\n", $this->jsIncludePost);
 	}
 
 	/**

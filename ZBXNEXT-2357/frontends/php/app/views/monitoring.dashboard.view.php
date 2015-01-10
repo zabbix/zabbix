@@ -262,10 +262,10 @@ $dashboardWidget->show();
  * Javascript
  */
 // start refresh process
-zbx_add_post_js('initPMaster("dashboard", '.CJs::encodeJson($widgetRefreshParams).');');
+$this->addPostJS('initPMaster("dashboard", '.CJs::encodeJson($widgetRefreshParams).');');
 
 // activating blinking
-zbx_add_post_js('jqBlink.blink();');
+$this->addPostJS('jqBlink.blink();');
 
 ?>
 

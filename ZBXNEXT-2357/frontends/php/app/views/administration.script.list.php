@@ -92,7 +92,7 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "scriptids";');
+$this->addPostJS('chkbxRange.pageGoName = "scriptids";');
 
 // append table to form
 $scriptsForm->addItem(array($data['paging'], $scriptsTable, $data['paging'], get_table_header(array($goComboBox, $goButton))));

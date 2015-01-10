@@ -130,7 +130,7 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "mediatypeids";');
+$this->addPostJS('chkbxRange.pageGoName = "mediatypeids";');
 
 // append table to form
 $mediaTypeForm->addItem(array($data['paging'], $mediaTypeTable, $data['paging'], get_table_header(array($goComboBox, $goButton))));
