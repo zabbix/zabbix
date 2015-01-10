@@ -37,7 +37,7 @@ static int	DBpatch_2050000(void)
 
 static int	DBpatch_2050001(void)
 {
-	if (ZBX_DB_OK > DBexecute("update items set snmp_oid=concat(concat('discovery[{#SNMPVALUE},',snmp_oid,']'))"
+	if (ZBX_DB_OK > DBexecute("update items set snmp_oid=concat(concat('discovery[{#SNMPVALUE},',snmp_oid),']')"
 			" where flags=%d and type in (%d,%d,%d)", ZBX_FLAG_DISCOVERY_RULE,
 			ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3))
 	{
