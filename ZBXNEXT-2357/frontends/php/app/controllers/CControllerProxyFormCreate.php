@@ -22,16 +22,14 @@ class CControllerProxyFormCreate extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'form' =>				'fatal|in_int:1',
-			'host' =>				'fatal|db:hosts.host        |required_if:form,1',
-			'status' =>				'fatal|db:hosts.status      |required_if:form,1                                                |in_int:'.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'interface' =>			'fatal|array                |required_if:form,1|required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
-			'interface/dns' =>		'fatal|db:interface.dns     |required_if:form,1|required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
-			'interface/ip' =>		'fatal|db:interface.ip      |required_if:form,1|required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
-			'interface/useip' =>	'fatal|db:interface:useip   |required_if:form,1|required_if:status,'.HOST_STATUS_PROXY_ACTIVE.'|in_int:1',
-			'interface/port' =>		'fatal|db:interface:port    |required_if:form,1|required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
-			'proxy_hostids' =>		'fatal|array_db:hosts.hostid',
-			'description' =>		'fatal|db:hosts.description |required_if:form,1'
+			'host' =>			'fatal|db       hosts.host       |not_empty',
+			'status' =>			'fatal|db       hosts.status     |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
+			'dns' =>			'fatal|db       interface.dns',
+			'ip' =>				'fatal|db       interface.ip',
+			'useip' =>			'fatal|db       interface.useip  |in 0,1',
+			'port' =>			'fatal|db       interface.port',
+//			'proxy_hostids' =>	'fatal|array_db hosts.hostid',
+			'description' =>	'fatal|db       hosts.description'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -48,30 +46,17 @@ class CControllerProxyFormCreate extends CController {
 	}
 
 	protected function doAction() {
-		if ($this->hasInput('form')) {
-			$data = array(
-				'proxyid' => 0,
-				'name' => $this->getInput('host'),
-				'status' => $this->getInput('status'),
-				'proxy_hostids' => $this->getInput('proxy_hostids'),
-				'interface' => $this->getInput('interface'),
-				'description' => $this->getInput('description')
-			);
-		}
-		else {
-			$data = array(
-				'proxyid' => 0,
-				'name' => '',
-				'status' => HOST_STATUS_PROXY_ACTIVE,
-				'proxy_hostids' => array(),
-				'interface' => array(
-					'dns' => 'localhost',
-					'ip' => '127.0.0.1',
-					'useip' => 1,
-					'port' => '10051'),
-				'description' => ''
-			);
-		}
+		$data = array(
+			'proxyid' => 0,
+			'host' => $this->getInput('host', ''),
+			'status' => $this->getInput('status', HOST_STATUS_PROXY_ACTIVE),
+			'dns' => $this->getInput('dns', 'localhost'),
+			'ip' => $this->getInput('ip', '127.0.0.1'),
+			'useip' => $this->getInput('useip', '1'),
+			'port' => $this->getInput('port', '10051'),
+			'proxy_hostids' => $this->getInput('proxy_hostids', array()),
+			'description' => $this->getInput('description', '')
+		);
 
 		// fetch available hosts, skip host prototypes
 		$data['all_hosts'] = DBfetchArray(DBselect(

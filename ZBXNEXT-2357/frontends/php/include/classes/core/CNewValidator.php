@@ -29,6 +29,13 @@ class CNewValidator {
 	private $errorsFatal = array();
 
 	/**
+	 * Parser for validation rules.
+	 *
+	 * @var CValidationRule
+	 */
+	private $validationRuleParser;
+
+	/**
 	 * Validation errors.
 	 *
 	 * @var array
@@ -38,13 +45,13 @@ class CNewValidator {
 	public function __construct(array $input, array $rules) {
 		$this->input = $input;
 		$this->rules = $rules;
+		$this->validationRuleParser = new CValidationRule();
 
 		$this->validate();
 	}
 
 	/**
 	 * Returns true if the given $value is valid, or set's an error and returns false otherwise.
-	 *
 	 */
 	private function validate() {
 		foreach ($this->rules as $field => $rule) {
@@ -57,55 +64,205 @@ class CNewValidator {
 	}
 
 	private function validateField($field, $rules) {
-		$rules = explode('|', $rules);
-
-		$key = array_search('fatal', $rules);
-		if ($key !== false) {
-			$fatal = true;
-			unset($rules[$key]);
-		}
-		else {
-			$fatal = false;
+		if (false === ($rules = $this->validationRuleParser->parse($rules))) {
+			$this->addError(true, $this->validationRuleParser->getError());
+			return false;
 		}
 
-		$ret = true;
-		foreach ($rules as $rule) {
-			$ret = $ret && $this->validateRule($field, trim($rule, ' '), $fatal);
+		$fatal = array_key_exists('fatal', $rules);
+
+		foreach ($rules as $rule => $params) {
+			switch ($rule) {
+				/*
+				 * 'fatal' => true
+				 */
+				case 'fatal':
+					// nothing to do
+					break;
+
+				/*
+				 * 'not_empty' => true
+				 */
+				case 'not_empty':
+					if (array_key_exists($field, $this->input) && $this->input[$field] === '') {
+						$this->addError($fatal, _s('Incorrect value for field "%1$s": cannot be empty.', $field));
+						return false;
+					}
+					break;
+
+				/*
+				 * 'in' => array(<values)
+				 */
+				case 'in':
+					if (array_key_exists($field, $this->input)) {
+						if (!is_string($this->input[$field]) || !in_array($this->input[$field], $params)) {
+							$this->addError($fatal,
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
+							);
+							return false;
+						}
+					}
+					break;
+
+				/*
+				 * 'array_db' => array(
+				 *     'table' => <table_name>,
+				 *     'field' => <field_name>
+				 * )
+				 */
+				case 'array_db':
+					if (array_key_exists($field, $this->input)) {
+						if (!is_array($this->input[$field])
+								&& !$this->is_array_db($this->input[$field], $params['table'], $params['field'])) {
+
+							$this->addError($fatal,
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
+							);
+							return false;
+						}
+					}
+					break;
+
+				/*
+				 * 'db' => array(
+				 *     'table' => <table_name>,
+				 *     'field' => <field_name>
+				 * )
+				 */
+				case 'db':
+					if (array_key_exists($field, $this->input)) {
+						if (!is_string($this->input[$field])
+								&& !$this->is_db($this->input[$field], $params['table'], $params['field'])) {
+
+							$this->addError($fatal,
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
+							);
+							return false;
+						}
+					}
+					break;
+
+				/*
+				 * 'not_empty' => true
+				 */
+				case 'not_empty':
+					if (!array_key_exists($field, $this->input)) {
+						$this->addError($fatal, _s('Field "%1$s" is mandatory.', $field));
+						return false;
+					}
+					break;
+
+				/*
+				 * 'required' => true
+				 */
+				case 'required':
+					if (!array_key_exists($field, $this->input)) {
+						$this->addError($fatal, _s('Field "%1$s" is mandatory.', $field));
+						$result = false;
+					}
+					break;
+
+				/*
+				 * 'required_if' => array(
+				 *     <param1> => true,
+				 *     <param2> => array(<values>),
+				 *     ...
+				 *  )
+				 */
+				case 'required_if':
+					$required = true;
+
+					foreach ($params as $field2 => $values) {
+						$required = (array_key_exists($field2, $this->input)
+							&& ($values === true || in_array($this->input[$field2], $values)));
+
+						if (!$required) {
+							break;
+						}
+					}
+
+					if ($required && !array_key_exists($field, $this->input)) {
+						$this->addError($fatal, _s('Field "%1$s" is mandatory.', $field));
+						return false;
+					}
+					elseif (!$required && array_key_exists($field, $this->input)) {
+						$this->addError($fatal, _s('Field "%1$s" must be missing.', $field));
+						return false;
+					}
+					break;
+
+				default:
+					// the message can be not translated because it is an internal error
+					$this->addError($fatal, 'Invalid validation rule "'.$rule.'".');
+					return false;
+			}
+//			if (!$this->validateRule($field, $, $fatal)) {
+//				return false;
+//			}
 		}
 
-		return $ret;
+		return true;
 	}
 
-	public static function is_int($value) {
-		return zbx_ctype_digit($value) &&
-			$value >= 0 && bccomp($value, '10000000000000000000')<0;
+	private function is_id($value) {
+		if (1 != preg_match('/^[0-9]+$/', $value)) {
+			return false;
+		}
+
+		// between 0 and _I64_MAX
+		return (bccomp($value, '0') >= 0 && bccomp($value, '9223372036854775807') <= 0);
+	}
+
+	private function is_int($value) {
+		if (1 != preg_match('/^\-?[0-9]+$/', $value)) {
+			return false;
+		}
+
+		// between INT_MIN and INT_MAX
+		return (bccomp($value, '-2147483648') >= 0 && bccomp($value, '2147483647') <= 0);
 	}
 
 	public static function is_array($value) {
 		return is_array($value);
 	}
 
-	public static function is_db_type($value, $dbfield) {
-		list ($table_schema, $field_schema) = explode('.', $dbfield);
-		$table_schema = DB::getSchema($table_schema);
-		$field_type = $table_schema['fields'][$field_schema]['type'];
-
-		switch ($field_type) {
+	private function check_db_value($type, $value) {
+		switch ($type) {
 			case DB::FIELD_TYPE_ID:
+				return $this->is_id($value);
+
 			case DB::FIELD_TYPE_INT:
-				$result = CNewValidator::is_int($value);
-				break;
+				return $this->is_int($value);
+
 			case DB::FIELD_TYPE_CHAR:
-				$result = true;
-				break;
 			case DB::FIELD_TYPE_TEXT:
-				$result = true;
-				break;
+				// TODO: check length
+				return true;
+
 			default:
-				$result = false;
-				break;
+				return false;
 		}
-		return $result;
+	}
+
+	private function is_array_db(array $values, $table, $field) {
+		$table_schema = DB::getSchema($table);
+
+		foreach ($values as $value) {
+			if (!$this->check_db_value($table_schema['fields'][$field_schema]['type'], $value)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private function is_db($value, $table, $field) {
+		$table_schema = DB::getSchema($table);
+
+		return $this->check_db_value($table_schema['fields'][$field_schema]['type'], $value);
 	}
 
 // $fatal: false - non fatal, true - any error is considered fatal
@@ -193,7 +350,7 @@ class CNewValidator {
 			// db:table.field
 			case 'db':
 				if (array_key_exists($field, $this->input)) {
-					if (!CNewValidator::is_db_type($this->input[$field], $params[0])) {
+					if (!CNewValidator::is_db($this->input[$field], $params[0])) {
 						$this->addError($fatal, _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field));
 						$result = false;
 					}

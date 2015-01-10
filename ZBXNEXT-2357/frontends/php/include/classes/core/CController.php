@@ -152,7 +152,7 @@ class CController {
 	 * @return var
 	 */
 	public function hasInput($var) {
-		return isset($this->input[$var]);
+		return array_key_exists($var, $this->input);
 	}
 
 	/**
@@ -161,7 +161,12 @@ class CController {
 	 * @return var
 	 */
 	public function getInput($var, $default = null) {
-		return isset($this->input[$var]) ? $this->input[$var] : $default;
+		if ($default === null) {
+			return $this->input[$var];
+		}
+		else {
+			return array_key_exists($var, $this->input) ? $this->input[$var] : $default;
+		}
 	}
 
 	/**

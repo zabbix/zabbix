@@ -22,17 +22,16 @@ class CControllerProxyFormEdit extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'form' =>				'fatal|in_int:1',
-			'proxyid' =>			'fatal|db:hosts.hostid      |required',
-			'host' =>				'fatal|db:hosts.host        |required_if:form,1',
-			'status' =>				'fatal|db:hosts.status      |required_if:form,1|in_int:'.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'interface' =>			'fatal|                     required_if:form,1|required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
-			'interface/dns' =>		'fatal|db:interface.dns     |required_if:form,1|required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
-			'interface/ip' =>		'fatal|db:interface.ip      |required_if:form,1|required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
-			'interface/useip' =>	'fatal|db:interface:useip   |required_if:form,1|required_if:status,'.HOST_STATUS_PROXY_ACTIVE.'|in_int:1',
-			'interface/port' =>		'fatal|db:interface:port    |required_if:form,1|required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
-			'proxy_hostids' =>		'fatal|array_db:hosts.hostid',
-			'description' =>		'fatal|db:hosts.description |required_if:form,1'
+			'form' =>			'fatal                                    |in 1',
+			'proxyid' =>		'fatal|required|db       hosts.hostid',
+			'host' =>			'fatal         |db       hosts.host       |not_empty',
+			'status' =>			'fatal         |db       hosts.status     |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
+			'dns' =>			'fatal         |db       interface.dns',
+			'ip' =>				'fatal         |db       interface.ip',
+			'useip' =>			'fatal         |db       interface.useip  |in 0,1',
+			'port' =>			'fatal         |db       interface.port',
+//			'proxy_hostids' =>	'fatal         |array_db hosts.hostid',
+			'description' =>	'fatal         |db       hosts.description'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -62,43 +61,45 @@ class CControllerProxyFormEdit extends CController {
 	}
 
 	protected function doAction() {
+		$data = array(
+			'proxyid' => $this->getInput('proxyid')
+		);
+
 		if ($this->hasInput('form')) {
-			$data = array(
-				'proxyid' => $this->getInput('proxyid'),
-				'name' => $this->getInput('host'),
-				'status' => $this->getInput('status'),
-				'proxy_hostids' => $this->getInput('proxy_hostids'),
-				'interface' => $this->getInput('interface'),
-				'description' => $this->getInput('description')
-			);
+			$data['host'] = $this->getInput('host', '');
+			$data['status'] = $this->getInput('status', HOST_STATUS_PROXY_ACTIVE);
+			$data['dns'] = $this->getInput('dns', 'localhost');
+			$data['ip'] = $this->getInput('ip', '127.0.0.1');
+			$data['useip'] = $this->getInput('useip', '1');
+			$data['port'] = $this->getInput('port', '10051');
+			$data['proxy_hostids'] = $this->getInput('proxy_hostids', array());
+			$data['description'] = $this->getInput('description', '');
 		}
 		else {
 			$proxies = API::Proxy()->get(array(
 				'output' => array('proxyid', 'host', 'status', 'description'),
-				'selectHosts' => array('hostid', 'host'),
-				'selectInterface' => array('interfaceid', 'hostid', 'dns', 'ip', 'useip', 'port'),
-				'proxyids' => $this->getInput('proxyid')
+				'selectHosts' => array('hostid'),
+				'selectInterface' => array('interfaceid', 'dns', 'ip', 'useip', 'port'),
+				'proxyids' => $data['proxyid']
 			));
 			$proxy = $proxies[0];
 
-			$data = array(
-				'proxyid' => $proxy['proxyid'],
-				'name' => $proxy['host'],
-				'status' => $proxy['status'],
-				'proxy_hostids' => zbx_objectValues($proxy['hosts'], 'hostid'),
-				'interface' => $proxy['interface'],
-				'description' => $proxy['description']
-			);
-
-			// interface
-			if ($data['status'] == HOST_STATUS_PROXY_ACTIVE) {
-				$data['interface'] = array(
-					'dns' => 'localhost',
-					'ip' => '127.0.0.1',
-					'useip' => 1,
-					'port' => '10051'
-				);
+			$data['host'] = $proxy['host'];
+			$data['status'] = $proxy['status'];
+			if ($data['status'] == HOST_STATUS_PROXY_PASSIVE) {
+				$data['dns'] = $proxy['interface'][0]['dns'];
+				$data['ip'] = $proxy['interface'][0]['ip'];
+				$data['useip'] = $proxy['interface'][0]['useip'];
+				$data['port'] = $proxy['interface'][0]['port'];
 			}
+			else {
+				$data['dns'] = 'localhost';
+				$data['ip'] = '127.0.0.1';
+				$data['useip'] = '1';
+				$data['port'] = '10051';
+			}
+			$data['proxy_hostids'] = zbx_objectValues($proxy['hosts'], 'hostid');
+			$data['description'] = $proxy['description'];
 		}
 
 		// fetch available hosts, skip host prototypes
