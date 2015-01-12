@@ -1513,7 +1513,7 @@ static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num, int hlo
 		if (ITEM_VALUE_TYPE_LOG != h->value_type)
 			continue;
 
-		if (0 != h->value_undef || 0 == h->keep_history)
+		if (0 != h->value_undef || 0 != h->meta || 0 == h->keep_history)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, id++, h->itemid, h->ts.sec, h->ts.ns, h->timestamp,
