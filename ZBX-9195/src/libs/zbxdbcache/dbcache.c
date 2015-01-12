@@ -1285,10 +1285,10 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
-	const char		*__function_name = "DCmass_proxy_update_items";
+	const char	*__function_name = "DCmass_proxy_update_items";
 
-	size_t			sql_offset = 0;
-	int			i;
+	size_t		sql_offset = 0;
+	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2338,7 +2338,7 @@ int	DCsync_history(int sync_type)
 
 		LOCK_CACHE;
 
-		for (i = 0; i < history_num; i ++)
+		for (i = 0; i < history_num; i++)
 			uint64_array_remove(cache->itemids, &cache->itemids_num, &history[i].itemid, 1);
 
 		UNLOCK_CACHE;
