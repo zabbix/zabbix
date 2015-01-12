@@ -28,6 +28,9 @@ $proxyForm = new CForm();
 $proxyForm->setName('proxyForm');
 $proxyForm->addVar('form', 1);
 $proxyForm->addVar('proxyid', $data['proxyid']);
+if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
+	$proxyForm->addVar('interfaceid', $data['interfaceid']);
+}
 
 // create form list
 $proxyFormList = new CFormList('proxyFormList');

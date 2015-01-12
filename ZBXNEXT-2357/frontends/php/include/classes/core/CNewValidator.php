@@ -133,8 +133,7 @@ class CNewValidator {
 				 */
 				case 'db':
 					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field])
-								&& !$this->is_db($this->input[$field], $params['table'], $params['field'])) {
+							if (!$this->is_db($this->input[$field], $params['table'], $params['field'])) {
 
 							$this->addError($fatal,
 								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
@@ -173,6 +172,10 @@ class CNewValidator {
 				 *  )
 				 */
 				case 'required_if':
+					if (array_key_exists($field, $this->input)) {
+						break;
+					}
+
 					$required = true;
 
 					foreach ($params as $field2 => $values) {
@@ -188,10 +191,10 @@ class CNewValidator {
 						$this->addError($fatal, _s('Field "%1$s" is mandatory.', $field));
 						return false;
 					}
-					elseif (!$required && array_key_exists($field, $this->input)) {
-						$this->addError($fatal, _s('Field "%1$s" must be missing.', $field));
-						return false;
-					}
+//					elseif (!$required && array_key_exists($field, $this->input)) {
+//						$this->addError($fatal, _s('Field "%1$s" must be missing.', $field));
+//						return false;
+//					}
 					break;
 
 				default:
@@ -229,8 +232,8 @@ class CNewValidator {
 		return is_array($value);
 	}
 
-	private function check_db_value($type, $value) {
-		switch ($type) {
+	private function check_db_value($field_schema, $value) {
+		switch ($field_schema['type']) {
 			case DB::FIELD_TYPE_ID:
 				return $this->is_id($value);
 
@@ -238,6 +241,8 @@ class CNewValidator {
 				return $this->is_int($value);
 
 			case DB::FIELD_TYPE_CHAR:
+				return (mb_strlen($value) <= $field_schema['length']);
+
 			case DB::FIELD_TYPE_TEXT:
 				// TODO: check length
 				return true;
@@ -251,7 +256,7 @@ class CNewValidator {
 		$table_schema = DB::getSchema($table);
 
 		foreach ($values as $value) {
-			if (!$this->check_db_value($table_schema['fields'][$field_schema]['type'], $value)) {
+			if (!is_string($value) || !$this->check_db_value($table_schema['fields'][$field], $value)) {
 				return false;
 			}
 		}
@@ -262,7 +267,7 @@ class CNewValidator {
 	private function is_db($value, $table, $field) {
 		$table_schema = DB::getSchema($table);
 
-		return $this->check_db_value($table_schema['fields'][$field_schema]['type'], $value);
+		return (is_string($value) && $this->check_db_value($table_schema['fields'][$field], $value));
 	}
 
 // $fatal: false - non fatal, true - any error is considered fatal
@@ -293,10 +298,10 @@ class CNewValidator {
 					$this->addError($fatal, _s('Field "%1$s" must present only if "%2$s" exists and equal to "%3$s".', $field, $params[0], $params[1]));
 					$result = false;
 				}
-				else if (!array_key_exists($field, $this->input) && (array_key_exists($params[0], $this->input) && $this->input[$params[0]] == $params[1])) {
-					$this->addError($fatal, _s('Field "%1$s" must present only if "%2$s" exists and equal to "%3$s".', $field, $params[0], $params[1]));
-					$result = false;
-				}
+//				else if (!array_key_exists($field, $this->input) && (array_key_exists($params[0], $this->input) && $this->input[$params[0]] == $params[1])) {
+//					$this->addError($fatal, _s('Field "%1$s" must present only if "%2$s" exists and equal to "%3$s".', $field, $params[0], $params[1]));
+//					$result = false;
+//				}
 				break;
 			// required_if_not:field,value1,value2,...
 			case 'required_if_not':

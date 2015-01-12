@@ -22,13 +22,13 @@ class CControllerProxyFormCreate extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'host' =>			'fatal|db       hosts.host       |not_empty',
+			'host' =>			'fatal|db       hosts.host',
 			'status' =>			'fatal|db       hosts.status     |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
 			'dns' =>			'fatal|db       interface.dns',
 			'ip' =>				'fatal|db       interface.ip',
 			'useip' =>			'fatal|db       interface.useip  |in 0,1',
 			'port' =>			'fatal|db       interface.port',
-//			'proxy_hostids' =>	'fatal|array_db hosts.hostid',
+			'proxy_hostids' =>	'fatal|array_db hosts.hostid',
 			'description' =>	'fatal|db       hosts.description'
 		);
 
