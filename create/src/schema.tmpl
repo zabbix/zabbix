@@ -66,6 +66,12 @@ FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|templateid	|t_id		|	|NULL		|0			|3|hosts	|hostid
 FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|tls_connect	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|tls_accept 	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|tls_issuer	|t_varchar(1024)|''	|NOT NULL	|ZBX_PROXY
+FIELD		|tls_subject	|t_varchar(1024)|''	|NOT NULL	|ZBX_PROXY
+FIELD		|tls_psk_identity|t_varchar(128)|''	|NOT NULL	|ZBX_PROXY
+FIELD		|tls_psk	|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
