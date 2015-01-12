@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-12-30 06:34+0200\n"
-"PO-Revision-Date: 2014-12-27 10:07+0300\n"
+"PO-Revision-Date: 2015-01-08 13:49+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1419667648.0\n"
+"X-POOTLE-MTIME: 1420717746.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -11945,7 +11945,7 @@ msgstr "アプリケーションを置換"
 
 #: include/views/configuration.triggers.massupdate.php:144
 msgid "Replace dependencies"
-msgstr ""
+msgstr "依存関係を置換"
 
 #: include/views/configuration.host.massupdate.php:66
 msgid "Replace host groups"
