@@ -22,16 +22,17 @@ class CControllerProxyFormEdit extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'form' =>			'fatal                                    |in 1',
-			'proxyid' =>		'fatal|required|db       hosts.hostid',
-			'host' =>			'fatal         |db       hosts.host       |not_empty',
-			'status' =>			'fatal         |db       hosts.status     |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'dns' =>			'fatal         |db       interface.dns',
-			'ip' =>				'fatal         |db       interface.ip',
-			'useip' =>			'fatal         |db       interface.useip  |in 0,1',
-			'port' =>			'fatal         |db       interface.port',
-//			'proxy_hostids' =>	'fatal         |array_db hosts.hostid',
-			'description' =>	'fatal         |db       hosts.description'
+			'form' =>			'fatal                                        |in 1',
+			'proxyid' =>		'fatal|db       hosts.hostid         |required',
+			'host' =>			'fatal|db       hosts.host',
+			'status' =>			'fatal|db       hosts.status                  |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
+			'interfaceid' =>	'fatal|db       interface.interfaceid',
+			'dns' =>			'fatal|db       interface.dns',
+			'ip' =>				'fatal|db       interface.ip',
+			'useip' =>			'fatal|db       interface.useip               |in 0,1',
+			'port' =>			'fatal|db       interface.port',
+			'proxy_hostids' =>	'fatal|array_db hosts.hostid',
+			'description' =>	'fatal|db       hosts.description'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -44,20 +45,11 @@ class CControllerProxyFormEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			return false;
-		}
-
-		$proxies = API::Proxy()->get(array(
+		return (bool) API::Proxy()->get(array(
 			'output' => array(),
-			'proxyids' => $this->getInput('proxyid')
+			'proxyids' => $this->getInput('proxyid'),
+			'editable' => true
 		));
-
-		if (!$proxies) {
-			return false;
-		}
-
-		return true;
 	}
 
 	protected function doAction() {
@@ -74,6 +66,10 @@ class CControllerProxyFormEdit extends CController {
 			$data['port'] = $this->getInput('port', '10051');
 			$data['proxy_hostids'] = $this->getInput('proxy_hostids', array());
 			$data['description'] = $this->getInput('description', '');
+
+			if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && $this->hasInput('interfaceid')) {
+				$data['interfaceid'] = $this->getInput('interfaceid');
+			}
 		}
 		else {
 			$proxies = API::Proxy()->get(array(
@@ -87,10 +83,11 @@ class CControllerProxyFormEdit extends CController {
 			$data['host'] = $proxy['host'];
 			$data['status'] = $proxy['status'];
 			if ($data['status'] == HOST_STATUS_PROXY_PASSIVE) {
-				$data['dns'] = $proxy['interface'][0]['dns'];
-				$data['ip'] = $proxy['interface'][0]['ip'];
-				$data['useip'] = $proxy['interface'][0]['useip'];
-				$data['port'] = $proxy['interface'][0]['port'];
+				$data['interfaceid'] = $proxy['interface']['interfaceid'];
+				$data['dns'] = $proxy['interface']['dns'];
+				$data['ip'] = $proxy['interface']['ip'];
+				$data['useip'] = $proxy['interface']['useip'];
+				$data['port'] = $proxy['interface']['port'];
 			}
 			else {
 				$data['dns'] = 'localhost';

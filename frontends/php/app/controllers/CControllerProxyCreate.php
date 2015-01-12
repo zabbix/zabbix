@@ -22,16 +22,14 @@ class CControllerProxyCreate extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'form' =>				'fatal|in_int:1',
-			'host' =>				'      db:hosts.host        |required|not_empty',
-			'status' =>				'fatal|db:hosts.status      |required|in_int:'.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'interface' =>			'      array                |required|required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
-			'interface/dns' =>		'      db:interface.dns     |required|required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
-			'interface/ip' =>		'      db:interface.ip      |required|required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
-			'interface/useip' =>	'fatal|db:interface:useip   |required|required_if:status,'.HOST_STATUS_PROXY_ACTIVE.'|in_int:1',
-			'interface/port' =>		'      db:interface:port    |required|required_if:status,'.HOST_STATUS_PROXY_ACTIVE,
-			'proxy_hostids' =>		'fatal|array_db:hosts.hostid',
-			'description' =>		'      db:hosts.description |required'
+			'host' =>			'      db       hosts.host       |required                                        |not_empty',
+			'status' =>			'fatal|db       hosts.status     |required                                        |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
+			'dns' =>			'      db       interface.dns    |required_if status='.HOST_STATUS_PROXY_PASSIVE,
+			'ip' =>				'      db       interface.ip     |required_if status='.HOST_STATUS_PROXY_PASSIVE,
+			'useip' =>			'fatal|db       interface.useip  |required_if status='.HOST_STATUS_PROXY_PASSIVE.'|in 0,1',
+			'port' =>			'      db       interface.port   |required_if status='.HOST_STATUS_PROXY_PASSIVE,
+			'proxy_hostids' =>	'fatal|array_db hosts.hostid',
+			'description' =>	'      db       hosts.description|required'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -61,18 +59,28 @@ class CControllerProxyCreate extends CController {
 		$proxy = array(
 			'host' => $this->getInput('host'),
 			'status' => $this->getInput('status'),
-			'interface' => $this->getInput('interface'),
 			'description' => $this->getInput('description')
 		);
 
+		if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
+			$proxy['interface'] = array(
+				'dns' => $this->getInput('dns'),
+				'ip' => $this->getInput('ip'),
+				'useip' => $this->getInput('useip'),
+				'port' => $this->getInput('port')
+			);
+		}
+
 		DBstart();
 
-		// skip discovered hosts
-		$proxy['hosts'] = API::Host()->get(array(
-			'hostids' => $this->getInput('proxy_hostids', array()),
-			'output' => array('hostid'),
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-		));
+		if ($this->getInput('proxy_hostids', array())) {
+			// skip discovered hosts
+			$proxy['hosts'] = API::Host()->get(array(
+				'output' => array('hostid'),
+				'hostids' => $this->getInput('proxy_hostids'),
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+			));
+		}
 
 		$result = API::Proxy()->create($proxy);
 

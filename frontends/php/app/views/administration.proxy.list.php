@@ -54,6 +54,12 @@ foreach ($data['proxies'] as $proxy) {
 	$i = 0;
 
 	foreach ($proxy['hosts'] as $host) {
+		if (++$i > $data['config']['max_in_table']) {
+			$hosts[] = ' &hellip;';
+
+			break;
+		}
+
 		switch ($host['status']) {
 			case HOST_STATUS_MONITORED:
 				$style = 'off';
@@ -70,12 +76,6 @@ foreach ($data['proxies'] as $proxy) {
 		}
 
 		$hosts[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'], $style);
-
-		if (++$i == $data['config']['max_in_table']) {
-			$hosts[] = ' &hellip;';
-
-			break;
-		}
 	}
 
 	$proxyTable->addRow(array(

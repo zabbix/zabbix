@@ -4,12 +4,12 @@
 		jQuery('#status').change(function() {
 			var active = (jQuery(this).val() == 5);
 			if (active) {
-				jQuery('#interface_ip')
+				jQuery('#ip')
 					.closest('li')
 					.css('display', 'none');
 			}
 			else {
-				jQuery('#interface_ip')
+				jQuery('#ip')
 					.closest('li')
 					.css('display', '')
 					.removeClass('hidden');

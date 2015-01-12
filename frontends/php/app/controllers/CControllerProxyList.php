@@ -70,6 +70,11 @@ class CControllerProxyList extends CController {
 		order_result($data['proxies'], $sortField, $sortOrder);
 		$data['paging'] = getPagingLine($data['proxies']);
 
+		foreach ($data['proxies'] as &$proxy) {
+			order_result($proxy['hosts'], 'name');
+		}
+		unset($proxy);
+
 		// get proxy IDs for a *selected* page
 		$proxyIds = array_keys($data['proxies']);
 
