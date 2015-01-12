@@ -128,7 +128,7 @@ if (empty($this->data['parent_discoveryid'])) {
 
 	$triggersFormList->addRow(
 		array(
-			_('Replace depenencies'),
+			_('Replace dependencies'),
 			SPACE,
 			new CVisibilityBox(
 				'visible[dependencies]',
@@ -143,7 +143,7 @@ if (empty($this->data['parent_discoveryid'])) {
 
 // append tabs to form
 $triggersTab = new CTabView();
-$triggersTab->addTab('triggersTab', _('Triggers massupdate'), $triggersFormList);
+$triggersTab->addTab('triggersTab', _('Mass update'), $triggersFormList);
 $triggersForm->addItem($triggersTab);
 
 // append buttons to form

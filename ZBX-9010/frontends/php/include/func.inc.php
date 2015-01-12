@@ -1789,7 +1789,7 @@ function getPagingLine(&$items, array $removeUrlParams = array(), array $urlPara
 		$currentPage = 1;
 	}
 
-	if ($itemsCount < (($currentPage - 1) * $rowsPerPage)) {
+	if ($currentPage > $pagesCount) {
 		$currentPage = $pagesCount;
 	}
 

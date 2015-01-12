@@ -620,6 +620,16 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	return ret;
 }
 
+static void	zbx_snmp_dump_oid(char *buffer, size_t buffer_len, const oid *objid, size_t objid_len)
+{
+	size_t	i, offset = 0;
+
+	*buffer = '\0';
+
+	for (i = 0; i < objid_len; i++)
+		offset += zbx_snprintf(buffer + offset, buffer_len - offset, ".%lu", (unsigned long)objid[i]);
+}
+
 #define ZBX_OID_INDEX_STRING	0
 #define ZBX_OID_INDEX_NUMERIC	1
 
@@ -861,8 +871,9 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		/* communicate with agent */
 		status = snmp_synch_response(ss, pdu, &response);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d errstat:%ld max_vars:%d",
-				__function_name, status, NULL == response ? (long)-1 : response->errstat, max_vars);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d s_snmp_errno:%d errstat:%ld"
+				" max_vars:%d", __function_name, status, ss->s_snmp_errno,
+				NULL == response ? (long)-1 : response->errstat, max_vars);
 
 		if (1 < max_vars &&
 			((STAT_SUCCESS == status && SNMP_ERR_TOOBIG == response->errstat) || STAT_TIMEOUT == status))
@@ -1055,8 +1066,9 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 retry:
 	status = snmp_synch_response(ss, pdu, &response);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d errstat:%ld mapping_num:%d",
-			__function_name, status, NULL == response ? (long)-1 : response->errstat, mapping_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d s_snmp_errno:%d errstat:%ld mapping_num:%d",
+			__function_name, status, ss->s_snmp_errno, NULL == response ? (long)-1 : response->errstat,
+			mapping_num);
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
@@ -1071,6 +1083,9 @@ retry:
 					zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
 							" too many variable bindings", items[0].host.host);
 
+					if (1 != mapping_num)	/* give device a chance to handle a smaller request */
+						goto halve;
+
 					zbx_strlcpy(error, "Invalid SNMP response: too many variable bindings.",
 							max_error_len);
 
@@ -1082,8 +1097,11 @@ retry:
 
 			if (NULL == var)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" does not contain"
-						" all of the requested variable bindings", items[0].host.host);
+				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
+						" too few variable bindings", items[0].host.host);
+
+				if (1 != mapping_num)	/* give device a chance to handle a smaller request */
+					goto halve;
 
 				zbx_strlcpy(error, "Invalid SNMP response: too few variable bindings.", max_error_len);
 
@@ -1096,14 +1114,27 @@ retry:
 			if (parsed_oid_lens[j] != var->name_length ||
 					0 != memcmp(parsed_oids[j], var->name, parsed_oid_lens[j] * sizeof(oid)))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" does not contain"
-						" variable bindings in the requested order", items[0].host.host);
+				char	sent_oid[ITEM_SNMP_OID_LEN_MAX], received_oid[ITEM_SNMP_OID_LEN_MAX];
 
-				zbx_strlcpy(error, "Invalid SNMP response: variable bindings out of order.",
-						max_error_len);
+				zbx_snmp_dump_oid(sent_oid, sizeof(sent_oid), parsed_oids[j], parsed_oid_lens[j]);
+				zbx_snmp_dump_oid(received_oid, sizeof(received_oid), var->name, var->name_length);
 
-				ret = NOTSUPPORTED;
-				break;
+				if (1 != mapping_num)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
+							" variable bindings that do not match the request:"
+							" sent \"%s\", received \"%s\"",
+							items[0].host.host, sent_oid, received_oid);
+
+					goto halve;	/* give device a chance to handle a smaller request */
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "SNMP response from host \"%s\" contains"
+							" variable bindings that do not match the request:"
+							" sent \"%s\", received \"%s\"",
+							items[0].host.host, sent_oid, received_oid);
+				}
 			}
 
 			/* process received data */
@@ -1144,10 +1175,9 @@ retry:
 		if (0 > i || i >= mapping_num)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "SNMP response from host \"%s\" contains"
-					" an out of bounds error index", items[0].host.host);
+					" an out of bounds error index: %ld", items[0].host.host, response->errindex);
 
-			zbx_snprintf(error, max_error_len, "Invalid SNMP response: error index out of bounds (%ld).",
-					response->errindex);
+			zbx_strlcpy(error, "Invalid SNMP response: error index out of bounds.", max_error_len);
 
 			ret = NOTSUPPORTED;
 			goto exit;
@@ -1184,7 +1214,8 @@ retry:
 		}
 	}
 	else if (1 < mapping_num &&
-			((STAT_SUCCESS == status && SNMP_ERR_TOOBIG == response->errstat) || STAT_TIMEOUT == status))
+			((STAT_SUCCESS == status && SNMP_ERR_TOOBIG == response->errstat) || STAT_TIMEOUT == status ||
+			(STAT_ERROR == status && SNMPERR_TOO_LONG == ss->s_snmp_errno)))
 	{
 		/* Since we are trying to obtain multiple values from the SNMP agent, the response that it has to  */
 		/* generate might be too big. It seems to be required by the SNMP standard that in such cases the  */
@@ -1198,6 +1229,9 @@ retry:
 		/* values one by one, and the next time configuration cache gives us items to query, it will give  */
 		/* us less. */
 
+		/* The explanation above is for the first two conditions. The third condition comes from SNMPv3, */
+		/* where the size of the request that we are trying to send exceeds device's "msgMaxSize" limit. */
+halve:
 		if (*min_fail > mapping_num)
 			*min_fail = mapping_num;
 
