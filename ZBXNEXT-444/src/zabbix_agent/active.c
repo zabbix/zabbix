@@ -689,17 +689,15 @@ static int	send_buffer(const char *host, unsigned short port)
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, el->value, ZBX_JSON_TYPE_STRING);
 		if (ITEM_STATE_NOTSUPPORTED == el->state)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_STATE, ITEM_STATE_NOTSUPPORTED);
-		if (0 != el->lastlogsize)
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, el->lastlogsize);
-		if (el->mtime)
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, el->mtime);
-		if (el->timestamp)
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, el->lastlogsize);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, el->mtime);
+		if (0 != el->timestamp)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, el->timestamp);
-		if (el->source)
+		if (NULL != el->source)
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, el->source, ZBX_JSON_TYPE_STRING);
-		if (el->severity)
+		if (0 != el->severity)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, el->severity);
-		if (el->logeventid)
+		if (0 != el->logeventid)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGEVENTID, el->logeventid);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, el->ts.sec);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, el->ts.ns);
