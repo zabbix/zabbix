@@ -61,6 +61,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, K
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+.......P.. [ZBX-9195] fixed lastlogsize and mtime being updated on proxy for unsupported items; thanks to Yoshinori Komuro for patch (asaveljevs, Sasha)
 ..F....... [ZBX-9010] fixed audit actions not displaying most recent logs when record count exceeds maximum (Krists)
 ...G...PS. [ZBX-8555] fixed 'broken pipe' errors when executing remote commands. This was happening because pipe was closed without reading from it (wiper)
 .......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
@@ -590,6 +591,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......P.. [ZBX-9195] fixed lastlogsize and mtime being updated on proxy for unsupported items; thanks to Yoshinori Komuro for patch (asaveljevs, Sasha)
 ..F....... [ZBX-9010] fixed audit actions not displaying most recent logs when record count exceeds maximum (Krists)
 ...G...PS. [ZBX-8555] fixed 'broken pipe' errors when executing remote commands. This was happening because pipe was closed without reading from it (wiper)
 .......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
@@ -1775,6 +1777,7 @@ Changes for 2.0.15rc1
 New features:
 
 Bug fixes:
+.......P.. [ZBX-9195] fixed lastlogsize and mtime being updated on proxy for unsupported items; thanks to Yoshinori Komuro for patch (asaveljevs, Sasha)
 .......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
 ........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
 ........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
