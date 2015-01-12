@@ -1,9 +1,10 @@
 Changes for 2.5.0
 
 New features:
+....I..... [ZBXNEXT-2637] changed the DB user in the default configuration files to "zabbix", server and proxy timeouts to 4 seconds, LogSlowQueries to 3 seconds and MaxHousekeeperDelete to 5000; listed characters, prohibited in user parameters (Richlv)
 A.F....PS. [ZBXNEXT-756] added function percentile() to calculated items and trigger expressions (asaveljevs)
 .....J.... [ZBX-9006] added support for IPv6 addresses to Java gateway (asaveljevs)
-A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent and updated outdated user agent strings in web scenario form (Ivo)
+A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent, updated outdated user agent strings in web scenario form and improved selection of other user agents (Ivo)
 ..F....... [ZBXNEXT-1036] improved "Most busy triggers top 100" page filter (Oleg)
 ..F....... [ZBXNEXT-2602] minor design and layout improvements (Pavels)
 ........S. [ZBXNEXT-2471] improved value cache management by resetting item's cached range to the daily request range once per day (wiper)
@@ -17,6 +18,8 @@ A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent and updated outda
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+..F....... [ZBX-8698] fixed "Unlink and clear" button being displayed when cloning or full cloning host or template and fixed spacing between "Name" and "Action" in "Linked templates" block in template edit form (Krists, Ivo)
+..F....... [ZBX-9018] fixed updating of "config" table in Administration -> General pages (Oleg, Sasha)
 ...G...PS. [ZBX-9002] fixed log file locking during logging (igors)
 ..F....... [ZBX-8943] fixed script ordering when using backslashes in popup script menus (arvids)
 ..F....... [ZBX-8922] fixed form element positioning issues in host add/edit form (arvids)
@@ -41,7 +44,7 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 ...G...PS. [ZBX-8796] added get_process_info_by_thread() function prototype and renamed server_num, process_type and process_num local variables to eliminate conflict with the local ones (igors)
 ...G...PS. [ZBX-8763] fixed log message printing to syslog and undefined type log if debug level 5 is set (igors)
 ..F....... [ZBX-8671] fixed missing existence and permission checks for hosts and host groups (Krists)
-..F....... [ZBX-7176] removed empty space in icon buttons (Ivo)
+..F....... [ZBX-7176] removed empty space in icon buttons and removed help icons from pop-ups (Ivo)
 ...G...PS. [ZBX-8736] added validation of timestamp values received by the server and sent via zabbix_sender (Juris)
 ..F....... [ZBX-8560] fixed web scenario HTTP proxy field placeholder content not fitting into input field (Ivo)
 ..F....... [ZBX-8570] fixed colons in frontend filters (Oleg)
@@ -54,9 +57,27 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 Changes for 2.4.4rc1
 
 New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
-........S. [ZBX-9126] fixed processing of trigger/graph prototypes in the case when all item prototypes in the trigger/graph prototypes was changed (Sasha)
+..F....... [ZBX-9010] fixed audit actions not displaying most recent logs when record count exceeds maximum (Krists)
+...G...PS. [ZBX-8555] fixed 'broken pipe' errors when executing remote commands. This was happening because pipe was closed without reading from it (wiper)
+.......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
+.......PS. [ZBX-9163] fixed SNMPERR_TOO_LONG error being wrongly treated as a network error; thanks to Santal for patch (asaveljevs)
+...G...... [ZBX-6047] fixed system.boottime and system.uptime returning incorrect results on Solaris zones (asaveljevs)
+..F....... [ZBX-8874] fixed LLD rule form flexible interval field being submitted when other form fields are in focus (Ivo)
+....I..... [ZBX-9169] fixed upgrade of the proxy database with several discovery rules (Sasha)
+........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
+....I..... [ZBX-9185] fixed upgrade procedure in case database version is greater than version of the binary (Sasha)
+..F....... [ZBX-9177] improved host and item name column widths on Monitoring / Latest data page (Krists)
+.......PS. [ZBX-9154] fixed compilation error with Oracle backend (wiper)
+..F....... [ZBX-9042] unified "mass update" spelling in trigger configuration page (Richlv)
+..F....... [ZBX-9153] fixed vmware.version item key being listed as vmware.eventlog in the item key helper (Richlv)
+A......... [ZBX-8950] fixed "selecIconMap" option in map.get method (Oleg)
+..F....... [ZBX-8405] fixed typo in item key helper for system.cpu.num item description (asaveljevs)
+..F....... [ZBX-8846] fixed non-existent page displaying (Oleg)
+........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.4.3
@@ -566,9 +587,21 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.9rc1
 
 New features:
+A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-........S. [ZBX-9126] fixed processing of trigger/graph prototypes in the case when all item prototypes in the trigger/graph prototypes was changed (Sasha)
+..F....... [ZBX-9010] fixed audit actions not displaying most recent logs when record count exceeds maximum (Krists)
+...G...PS. [ZBX-8555] fixed 'broken pipe' errors when executing remote commands. This was happening because pipe was closed without reading from it (wiper)
+.......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
+.......PS. [ZBX-9163] fixed SNMPERR_TOO_LONG error being wrongly treated as a network error; thanks to Santal for patch (asaveljevs)
+...G...... [ZBX-6047] fixed system.boottime and system.uptime returning incorrect results on Solaris zones (asaveljevs)
+........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
+.......PS. [ZBX-9154] fixed compilation error with Oracle backend (wiper)
+..F....... [ZBX-9042] unified "mass update" spelling in trigger configuration page (Richlv)
+..F....... [ZBX-9153] fixed vmware.version item key being listed as vmware.eventlog in the item key helper (Richlv)
+..F....... [ZBX-8405] fixed typo in item key helper for system.cpu.num item description (asaveljevs)
+..F....... [ZBX-8846] fixed non-existent page displaying (Oleg)
+........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.8
@@ -1742,7 +1775,9 @@ Changes for 2.0.15rc1
 New features:
 
 Bug fixes:
-........S. [ZBX-9126] fixed processing of trigger/graph prototypes in the case when all item prototypes in the trigger/graph prototypes was changed (Sasha)
+.......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
+........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
+........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.14
