@@ -28,10 +28,19 @@
 
 #ifndef HAVE_SQLITE3
 
+static int	DBpatch_2050000(void)
+{
+	const ZBX_FIELD	field = {"agent", "Zabbix", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("httptest", &field);
+}
+
 #endif
 
 DBPATCH_START(2050)
 
 /* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(2050000, 0, 1)
 
 DBPATCH_END()

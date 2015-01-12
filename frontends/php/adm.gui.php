@@ -29,20 +29,33 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 $themes = array_keys(Z::getThemes());
 
-// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'default_theme'           => array(T_ZBX_STR, O_OPT, null,        IN('"'.implode('","', $themes).'"'),
-		'isset({update})'),
-	'event_ack_enable'        => array(T_ZBX_INT, O_OPT, null,        IN('1'),            null),
-	'event_expire'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),  'isset({update})', _('Show events not older than (in days)')),
-	'event_show_max'          => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),  'isset({update})', _('Max count of events per trigger to show')),
-	'dropdown_first_entry'    => array(T_ZBX_INT, O_OPT, null,        IN('0,1,2'),        'isset({update})'),
-	'dropdown_first_remember' => array(T_ZBX_INT, O_OPT, null,        IN('1'),            null),
-	'max_in_table'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),  'isset({update})', _('Max count of elements to show inside table cell')),
-	'search_limit'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 999999), 'isset({update})', _('Search/Filter elements limit')),
-	'server_check_interval'   => array(T_ZBX_INT, O_OPT, null,        null,               null, _('Zabbix server activity check interval')),
-	'update'                  => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,               null),
-	'form_refresh'            => array(T_ZBX_INT, O_OPT, null,        null,               null)
+	'default_theme'				=> array(T_ZBX_STR, O_OPT, null, IN('"'.implode('","', $themes).'"'), 'isset({update})',
+		_('Default theme')
+	),
+	'dropdown_first_entry'		=> array(T_ZBX_INT, O_OPT, null, IN('0,1,2'), 'isset({update})',
+		_('Dropdown first entry')
+	),
+	'dropdown_first_remember'	=> array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('remember selected')),
+	'search_limit'				=> array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999), 'isset({update})',
+		_('Search/Filter elements limit')
+	),
+	'max_in_table'				=> array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), 'isset({update})',
+		_('Max count of elements to show inside table cell')
+	),
+	'event_ack_enable'			=> array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable event acknowledges')),
+	'event_expire'				=> array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), 'isset({update})',
+		_('Show events not older than (in days)')
+	),
+	'event_show_max'			=> array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), 'isset({update})',
+		_('Max count of events per trigger to show')
+	),
+	'server_check_interval'		=> array(T_ZBX_INT, O_OPT, null, IN(SERVER_CHECK_INTERVAL), null,
+		_('Show warning if Zabbix server is down')
+	),
+	// actions
+	'update'					=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'form_refresh'				=> array(T_ZBX_INT, O_OPT, null, null, null)
 );
 check_fields($fields);
 
@@ -51,38 +64,20 @@ check_fields($fields);
  */
 if (hasRequest('update')) {
 	DBstart();
-
-	$configs = array(
+	$result = update_config(array(
 		'default_theme' => getRequest('default_theme'),
-		'event_ack_enable' => (is_null(getRequest('event_ack_enable')) ? 0 : 1),
+		'dropdown_first_entry' => getRequest('dropdown_first_entry'),
+		'dropdown_first_remember' => getRequest('dropdown_first_remember', 0),
+		'search_limit' => getRequest('search_limit'),
+		'max_in_table' => getRequest('max_in_table'),
+		'event_ack_enable' => getRequest('event_ack_enable', 0),
 		'event_expire' => getRequest('event_expire'),
 		'event_show_max' => getRequest('event_show_max'),
-		'dropdown_first_entry' => getRequest('dropdown_first_entry'),
-		'dropdown_first_remember' => (is_null(getRequest('dropdown_first_remember')) ? 0 : 1),
-		'max_in_table' => getRequest('max_in_table'),
-		'search_limit' => getRequest('search_limit'),
 		'server_check_interval' => getRequest('server_check_interval', 0)
-	);
-
-	$result = update_config($configs);
+	));
+	$result = DBend($result);
 
 	show_messages($result, _('Configuration updated'), _('Cannot update configuration'));
-
-	if ($result) {
-		$msg = array();
-		$msg[] = _s('Default theme "%1$s".', getRequest('default_theme'));
-		$msg[] = _s('Event acknowledges "%1$s".', getRequest('event_ack_enable'));
-		$msg[] = _s('Show events not older than (in days) "%1$s".', getRequest('event_expire'));
-		$msg[] = _s('Show events max "%1$s".', getRequest('event_show_max'));
-		$msg[] = _s('Dropdown first entry "%1$s".', getRequest('dropdown_first_entry'));
-		$msg[] = _s('Dropdown remember selected "%1$s".', getRequest('dropdown_first_remember'));
-		$msg[] = _s('Max count of elements to show inside table cell "%1$s".', getRequest('max_in_table'));
-		$msg[] = _s('Zabbix server is running check interval "%1$s".', getRequest('server_check_interval'));
-
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $msg));
-	}
-
-	DBend($result);
 }
 
 /*
@@ -90,42 +85,53 @@ if (hasRequest('update')) {
  */
 $form = new CForm();
 $form->cleanItems();
-$cmbConf = new CComboBox('configDropDown', 'adm.gui.php', 'redirect(this.options[this.selectedIndex].value);');
-$cmbConf->addItems(array(
-	'adm.gui.php' => _('GUI'),
-	'adm.housekeeper.php' => _('Housekeeping'),
-	'adm.images.php' => _('Images'),
-	'adm.iconmapping.php' => _('Icon mapping'),
-	'adm.regexps.php' => _('Regular expressions'),
-	'adm.macros.php' => _('Macros'),
-	'adm.valuemapping.php' => _('Value mapping'),
-	'adm.workingtime.php' => _('Working time'),
-	'adm.triggerseverities.php' => _('Trigger severities'),
-	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-	'adm.other.php' => _('Other')
-));
+$cmbConf = new CComboBox('configDropDown', 'adm.gui.php', 'redirect(this.options[this.selectedIndex].value);',
+	array(
+		'adm.gui.php' => _('GUI'),
+		'adm.housekeeper.php' => _('Housekeeping'),
+		'adm.images.php' => _('Images'),
+		'adm.iconmapping.php' => _('Icon mapping'),
+		'adm.regexps.php' => _('Regular expressions'),
+		'adm.macros.php' => _('Macros'),
+		'adm.valuemapping.php' => _('Value mapping'),
+		'adm.workingtime.php' => _('Working time'),
+		'adm.triggerseverities.php' => _('Trigger severities'),
+		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
+		'adm.other.php' => _('Other')
+	)
+);
 $form->addItem($cmbConf);
 
 $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF GUI'), $form);
 
-$data = array();
-$data['form_refresh'] = getRequest('form_refresh', 0);
+$config = select_config();
 
-if ($data['form_refresh']) {
-	$data['config']['default_theme'] = getRequest('default_theme');
-	$data['config']['event_ack_enable'] = getRequest('event_ack_enable');
-	$data['config']['dropdown_first_entry'] = getRequest('dropdown_first_entry');
-	$data['config']['dropdown_first_remember'] = getRequest('dropdown_first_remember');
-	$data['config']['search_limit'] = getRequest('search_limit');
-	$data['config']['max_in_table'] = getRequest('max_in_table');
-	$data['config']['event_expire'] = getRequest('event_expire');
-	$data['config']['event_show_max'] = getRequest('event_show_max');
-	$data['config']['server_check_enabled'] = getRequest('server_check_enabled');
-	$data['config']['server_check_interval'] = getRequest('server_check_interval', 0);
+if (hasRequest('form_refresh')) {
+	$data = array(
+		'default_theme' => getRequest('default_theme', $config['default_theme']),
+		'dropdown_first_entry' => getRequest('dropdown_first_entry', $config['dropdown_first_entry']),
+		'dropdown_first_remember' => getRequest('dropdown_first_remember', 0),
+		'search_limit' => getRequest('search_limit', $config['search_limit']),
+		'max_in_table' => getRequest('max_in_table', $config['max_in_table']),
+		'event_ack_enable' => getRequest('event_ack_enable', 0),
+		'event_expire' => getRequest('event_expire', $config['event_expire']),
+		'event_show_max' => getRequest('event_show_max', $config['event_show_max']),
+		'server_check_interval' => getRequest('server_check_interval', 0)
+	);
 }
 else {
-	$data['config'] = select_config(false);
+	$data = array(
+		'default_theme' => $config['default_theme'],
+		'dropdown_first_entry' => $config['dropdown_first_entry'],
+		'dropdown_first_remember' => $config['dropdown_first_remember'],
+		'search_limit' => $config['search_limit'],
+		'max_in_table' => $config['max_in_table'],
+		'event_ack_enable' => $config['event_ack_enable'],
+		'event_expire' => $config['event_expire'],
+		'event_show_max' => $config['event_show_max'],
+		'server_check_interval' => $config['server_check_interval']
+	);
 }
 
 $guiForm = new CView('administration.general.gui.edit', $data);

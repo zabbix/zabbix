@@ -455,7 +455,7 @@ table.requirements select { width: 152px; }
 .filter tr td tr td { border-style: none none; }
 .filter .label { border-right: 0 !important; text-align: right; }
 .filter .controls { text-align: center; }
-.filter .controls .ui-button { margin: 1px; }
+.filter .controls .ui-button { margin: 1px 3px; }
 .filter .text { height: 16px; }
 .filter .button-form {
 	height: 20px; vertical-align: bottom; /* required to align buttons with input in IE8 */
