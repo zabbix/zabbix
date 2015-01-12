@@ -35,6 +35,47 @@ static int	DBpatch_2050000(void)
 	return DBset_default("httptest", &field);
 }
 
+static int	DBpatch_2050001(void)
+{
+	const ZBX_FIELD field = {"tls_connect", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_2050002(void)
+{
+	const ZBX_FIELD field = {"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_2050003(void)
+{
+	const ZBX_FIELD field = {"tls_issuer", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_2050004(void)
+{
+	const ZBX_FIELD field = {"tls_subject", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+static int	DBpatch_2050005(void)
+{
+	const ZBX_FIELD field = {"tls_psk_identity", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_2050006(void)
+{
+	const ZBX_FIELD field = {"tls_psk", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -42,5 +83,11 @@ DBPATCH_START(2050)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(2050000, 0, 1)
+DBPATCH_ADD(2050001, 0, 1)
+DBPATCH_ADD(2050002, 0, 1)
+DBPATCH_ADD(2050003, 0, 1)
+DBPATCH_ADD(2050004, 0, 1)
+DBPATCH_ADD(2050005, 0, 1)
+DBPATCH_ADD(2050006, 0, 1)
 
 DBPATCH_END()
