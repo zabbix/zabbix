@@ -22,14 +22,14 @@ class CControllerProxyCreate extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'host' =>			'      db       hosts.host       |required                                        |not_empty',
-			'status' =>			'fatal|db       hosts.status     |required                                        |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'dns' =>			'      db       interface.dns    |required_if status='.HOST_STATUS_PROXY_PASSIVE,
-			'ip' =>				'      db       interface.ip     |required_if status='.HOST_STATUS_PROXY_PASSIVE,
-			'useip' =>			'fatal|db       interface.useip  |required_if status='.HOST_STATUS_PROXY_PASSIVE.'|in 0,1',
-			'port' =>			'      db       interface.port   |required_if status='.HOST_STATUS_PROXY_PASSIVE,
-			'proxy_hostids' =>	'fatal|array_db hosts.hostid',
-			'description' =>	'      db       hosts.description|required'
+			'host' =>			'db       hosts.host',
+			'status' =>			'db       hosts.status     |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
+			'dns' =>			'db       interface.dns',
+			'ip' =>				'db       interface.ip',
+			'useip' =>			'db       interface.useip  |in 0,1',
+			'port' =>			'db       interface.port',
+			'proxy_hostids' =>	'array_db hosts.hostid',
+			'description' =>	'db       hosts.description'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -56,19 +56,36 @@ class CControllerProxyCreate extends CController {
 	}
 
 	protected function doAction() {
-		$proxy = array(
-			'host' => $this->getInput('host'),
-			'status' => $this->getInput('status'),
-			'description' => $this->getInput('description')
-		);
+		$proxy = array();
 
-		if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
-			$proxy['interface'] = array(
-				'dns' => $this->getInput('dns'),
-				'ip' => $this->getInput('ip'),
-				'useip' => $this->getInput('useip'),
-				'port' => $this->getInput('port')
-			);
+		if ($this->hasInput('host')) {
+			$proxy['host'] = $this->getInput('host');
+		}
+
+		if ($this->hasInput('status')) {
+			$proxy['status'] = $this->getInput('status');
+
+			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
+				if ($this->hasInput('dns')) {
+					$proxy['interface']['dns'] = $this->getInput('dns');
+				}
+
+				if ($this->hasInput('ip')) {
+					$proxy['interface']['ip'] = $this->getInput('ip');
+				}
+
+				if ($this->hasInput('useip')) {
+					$proxy['interface']['useip'] = $this->getInput('useip');
+				}
+
+				if ($this->hasInput('port')) {
+					$proxy['interface']['port'] = $this->getInput('port');
+				}
+			}
+		}
+
+		if ($this->hasInput('description')) {
+			$proxy['description'] = $this->getInput('description');
 		}
 
 		DBstart();
@@ -82,7 +99,7 @@ class CControllerProxyCreate extends CController {
 			));
 		}
 
-		$result = API::Proxy()->create($proxy);
+		$result = API::Proxy()->create(array($proxy));
 
 		if ($result) {
 			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_PROXY, '['.$this->getInput('host').'] ['.reset($result['proxyids']).']');
