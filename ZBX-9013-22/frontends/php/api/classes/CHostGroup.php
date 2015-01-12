@@ -486,6 +486,13 @@ class CHostGroup extends CZBXAPI {
 			if ($this->exists(array('name' => $group['name']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
 			}
+
+			$this->checkNoParameters(
+				$group,
+				array('internal'),
+				_('Cannot set "%1$s" for host group "%2$s".'),
+				$group['name']
+			);
 		}
 		$groupids = DB::insert('groups', $groups);
 
@@ -511,9 +518,9 @@ class CHostGroup extends CZBXAPI {
 
 		// permissions
 		$updGroups = $this->get(array(
+			'output' => array('groupid', 'flags', 'name'),
 			'groupids' => $groupids,
 			'editable' => true,
-			'output' => array('groupid', 'flags'),
 			'preservekeys' => true
 		));
 		foreach ($groups as $group) {
@@ -522,6 +529,12 @@ class CHostGroup extends CZBXAPI {
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
+			$this->checkNoParameters(
+				$group,
+				array('internal'),
+				_('Cannot update "%1$s" for host group "%2$s".'),
+				isset($group['name']) ? $group['name'] : $updGroups[$group['groupid']]['name']
+			);
 		}
 
 		// name duplicate check

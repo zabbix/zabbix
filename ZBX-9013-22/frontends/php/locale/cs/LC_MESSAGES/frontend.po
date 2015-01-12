@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-28 12:22+0300\n"
+"POT-Creation-Date: 2014-12-30 05:43+0200\n"
 "PO-Revision-Date: 2014-02-01 11:09+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2244,6 +2244,11 @@ msgstr ""
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr ""
 
+#: api/classes/CHostGroup.php:493
+#, c-format
+msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: api/classes/CItemGeneral.php:242
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
@@ -2342,6 +2347,11 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr ""
 
+#: api/classes/CHostGroup.php:535
+#, c-format
+msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: api/classes/CItemGeneral.php:206
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
@@ -2386,7 +2396,7 @@ msgstr ""
 msgid "Cannot update a discovered graph."
 msgstr ""
 
-#: api/classes/CHostGroup.php:537
+#: api/classes/CHostGroup.php:550
 msgid "Cannot update a discovered host group."
 msgstr ""
 
@@ -2436,8 +2446,8 @@ msgstr "Nelze upravit skupinu"
 msgid "Cannot update group."
 msgstr ""
 
-#: api/classes/CHostGroup.php:792 api/classes/CHostGroup.php:850
-#: api/classes/CHostGroup.php:909
+#: api/classes/CHostGroup.php:805 api/classes/CHostGroup.php:863
+#: api/classes/CHostGroup.php:922
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr ""
@@ -3469,7 +3479,7 @@ msgstr "Vlastní prezentace"
 msgid "Czech (cs_CZ)"
 msgstr "Česky (cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1369
+#: include/classes/graphdraw/CLineGraphDraw.php:1371
 msgid "D"
 msgstr "D"
 
@@ -3491,8 +3501,8 @@ msgstr ""
 msgid "DETAILS OF SCENARIO"
 msgstr "DETAILY SCÉNÁŘE"
 
-#: include/maps.inc.php:686 include/maps.inc.php:768 include/maps.inc.php:856
-#: include/maps.inc.php:946
+#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
+#: include/maps.inc.php:935
 msgid "DISABLED"
 msgstr "ZAKÁZÁNO"
 
@@ -3568,7 +3578,7 @@ msgstr "Data"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2509
+#: include/classes/graphdraw/CLineGraphDraw.php:2511
 #: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4775,7 +4785,7 @@ msgstr ""
 #: api/classes/CAction.php:1275 api/classes/CApplication.php:288
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
-#: api/classes/CHostGroup.php:509 api/classes/CHostGroup.php:580
+#: api/classes/CHostGroup.php:516 api/classes/CHostGroup.php:593
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1419
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
@@ -5805,7 +5815,7 @@ msgstr "Mřížka"
 msgid "Group"
 msgstr "Skupina"
 
-#: api/classes/CHostGroup.php:613
+#: api/classes/CHostGroup.php:626
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr ""
@@ -5882,8 +5892,8 @@ msgstr "Skupiny v servisním okně"
 msgid "H.i"
 msgstr "H.i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1375
-#: include/classes/graphdraw/CLineGraphDraw.php:1434
+#: include/classes/graphdraw/CLineGraphDraw.php:1377
+#: include/classes/graphdraw/CLineGraphDraw.php:1436
 #: include/page_header.php:450
 msgid "H:i"
 msgstr "G:i"
@@ -6175,22 +6185,22 @@ msgstr[2] ""
 msgid "Host group"
 msgstr "Skupina hostitele"
 
-#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:552
+#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:565
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr ""
 
-#: api/classes/CHostGroup.php:645
+#: api/classes/CHostGroup.php:658
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr ""
 
-#: api/classes/CHostGroup.php:626
+#: api/classes/CHostGroup.php:639
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr ""
 
-#: api/classes/CHostGroup.php:600
+#: api/classes/CHostGroup.php:613
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr ""
@@ -6207,7 +6217,7 @@ msgstr ""
 msgid "Host group label type"
 msgstr ""
 
-#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:544
+#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:557
 msgid "Host group name cannot be empty."
 msgstr ""
 
@@ -6740,7 +6750,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "Pokud si myslíte, že tato zpráva je špatně, prosím kontaktuje vašeho administrátora pro přidělení potřebných oprávnění."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:968
+#: include/maps.inc.php:957
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -7988,8 +7998,8 @@ msgstr ""
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: api/classes/managers/CHttpTestManager.php:710
-#: api/classes/managers/CHttpTestManager.php:841
+#: api/classes/managers/CHttpTestManager.php:713
+#: api/classes/managers/CHttpTestManager.php:844
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
 msgstr ""
@@ -8577,7 +8587,7 @@ msgstr ""
 msgid "MAC address B"
 msgstr ""
 
-#: include/maps.inc.php:760
+#: include/maps.inc.php:749
 msgid "MAINTENANCE"
 msgstr "ÚDRŽBA"
 
@@ -8650,7 +8660,7 @@ msgstr "Makra"
 msgid "Macros updated"
 msgstr "Makra byla aktualizována"
 
-#: include/audit.inc.php:48 include/maps.inc.php:845 include/maps.inc.php:935
+#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -8819,6 +8829,7 @@ msgstr ""
 #: hosts.php:1016 include/views/configuration.item.list.php:281
 #: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.triggers.list.php:278
+#: include/views/configuration.triggers.massupdate.php:146
 msgid "Mass update"
 msgstr "Hromadná aktualizace"
 
@@ -9977,10 +9988,10 @@ msgstr ""
 #: api/classes/CGraphGeneral.php:88 api/classes/CGraph.php:719
 #: api/classes/CGraphPrototype.php:693 api/classes/CGraphPrototype.php:756
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:139
-#: api/classes/CHostGroup.php:522 api/classes/CHostGroup.php:595
-#: api/classes/CHostGroup.php:779 api/classes/CHostGroup.php:841
-#: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:903
-#: api/classes/CHostGroup.php:925 api/classes/CHostInterface.php:319
+#: api/classes/CHostGroup.php:529 api/classes/CHostGroup.php:608
+#: api/classes/CHostGroup.php:792 api/classes/CHostGroup.php:854
+#: api/classes/CHostGroup.php:907 api/classes/CHostGroup.php:916
+#: api/classes/CHostGroup.php:938 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
 #: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
 #: api/classes/CHost.php:716 api/classes/CHost.php:1806
@@ -10151,7 +10162,7 @@ msgid "No value maps found."
 msgstr ""
 
 #: include/classes/screens/CScreenHistory.php:161
-#: include/classes/screens/CScreenHistory.php:267
+#: include/classes/screens/CScreenHistory.php:259
 #: include/classes/screens/CScreenPlainText.php:41
 #: include/classes/screens/CScreenPlainText.php:63 latest.php:317
 msgid "No values found."
@@ -10328,7 +10339,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:427
-msgid "Number of available proccessors."
+msgid "Number of available processors."
 msgstr ""
 
 #: include/blocks.inc.php:753 include/blocks.inc.php:755
@@ -10365,11 +10376,11 @@ msgstr ""
 msgid "Number of processes. <name> and <user> same as in proc.mem item. <state> all (default), run, sleep, zomb. <cmdline> filter by command line (supports regex). Example: proc.num[apache2,www-data]. On Windows, only <name> and <user> are supported."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:647
+#: include/classes/items/CHelpItems.php:643
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:651
+#: include/classes/items/CHelpItems.php:647
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -10466,7 +10477,7 @@ msgstr ""
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:695
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -10494,8 +10505,8 @@ msgstr "OEM"
 
 #: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
-#: include/maps.inc.php:956 include/setup.inc.php:198
+#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
+#: include/maps.inc.php:945 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10583,7 +10594,7 @@ msgstr ""
 msgid "Once"
 msgstr "Jednou"
 
-#: api/classes/CHostGroup.php:857 api/classes/CHostGroup.php:989
+#: api/classes/CHostGroup.php:870 api/classes/CHostGroup.php:1002
 msgid "One of the objects is left without a host group."
 msgstr ""
 
@@ -11010,7 +11021,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:678 include/triggers.inc.php:155
+#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "PROBLÉM"
@@ -11351,7 +11362,7 @@ msgstr ""
 msgid "Probably php-ldap module is missing."
 msgstr ""
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "Problém"
@@ -11377,8 +11388,8 @@ msgstr "Problém, když všechny podřazené mají problém"
 msgid "Problem, if at least one child has a problem"
 msgstr "Problém, když alespoň jeden podřazený má problém"
 
-#: chart4.php:163 include/maps.inc.php:726 include/maps.inc.php:809
-#: include/maps.inc.php:900 report2.php:402 report3.php:83
+#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: include/maps.inc.php:889 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Problémy"
 
@@ -11700,7 +11711,7 @@ msgid "Replace applications"
 msgstr ""
 
 #: include/views/configuration.triggers.massupdate.php:131
-msgid "Replace depenencies"
+msgid "Replace dependencies"
 msgstr ""
 
 #: include/views/configuration.host.massupdate.php:66
@@ -13648,7 +13659,7 @@ msgid "Timeout"
 msgstr "Časový limit"
 
 #: include/classes/screens/CScreenHistory.php:164
-#: include/classes/screens/CScreenHistory.php:268
+#: include/classes/screens/CScreenHistory.php:260
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:64
 msgid "Timestamp"
@@ -13985,10 +13996,6 @@ msgstr "Spouštěče byly smazány"
 msgid "Triggers info"
 msgstr "Informace o spouštěčích"
 
-#: include/views/configuration.triggers.massupdate.php:146
-msgid "Triggers massupdate"
-msgstr "Hromadná aktualizace spouštěčů"
-
 #: include/screens.inc.php:43
 msgid "Triggers overview"
 msgstr "Přehled spouštěčů"
@@ -14183,7 +14190,7 @@ msgstr ""
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr ""
 
-#: include/maps.inc.php:743 include/maps.inc.php:826 include/maps.inc.php:917
+#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
 msgid "Unacknowledged"
 msgstr "Nepotvrzené"
 
@@ -14717,75 +14724,75 @@ msgstr ""
 msgid "VMware event log, <url> - VMware service URL"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:663
+#: include/classes/items/CHelpItems.php:659
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:671
+#: include/classes/items/CHelpItems.php:667
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:619
+#: include/classes/items/CHelpItems.php:615
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:627
+#: include/classes/items/CHelpItems.php:623
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:631
+#: include/classes/items/CHelpItems.php:627
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:659
+#: include/classes/items/CHelpItems.php:655
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:635
+#: include/classes/items/CHelpItems.php:631
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:675
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:679
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:639
+#: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:643
+#: include/classes/items/CHelpItems.php:639
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:623
+#: include/classes/items/CHelpItems.php:619
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:655
+#: include/classes/items/CHelpItems.php:651
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:675
+#: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:667
+#: include/classes/items/CHelpItems.php:663
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -14793,7 +14800,7 @@ msgstr ""
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:615
+#: include/classes/items/CHelpItems.php:699
 msgid "VMware service version, <url> - VMware service URL"
 msgstr ""
 
@@ -14884,7 +14891,7 @@ msgstr ""
 #: include/blocks.inc.php:741 include/classes/graphdraw/CPieGraphDraw.php:327
 #: include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:170
-#: include/classes/screens/CScreenHistory.php:268 include/reports.inc.php:175
+#: include/classes/screens/CScreenHistory.php:260 include/reports.inc.php:175
 #: include/views/administration.general.valuemapping.edit.php:41
 #: include/views/common.macros.php:37 tr_testexpr.php:50
 #, c-format
@@ -15379,7 +15386,7 @@ msgid "Y axis MAX value"
 msgstr "Maximální hodnota na ose Y"
 
 #: api/classes/CGraphGeneral.php:361
-#: include/classes/graphdraw/CLineGraphDraw.php:706
+#: include/classes/graphdraw/CLineGraphDraw.php:708
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr ""
 
@@ -15657,7 +15664,7 @@ msgid "agent"
 msgstr ""
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1850
+#: include/classes/graphdraw/CLineGraphDraw.php:1852
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15708,8 +15715,8 @@ msgstr ""
 msgid "auto-registered host"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1832
-#: include/classes/graphdraw/CLineGraphDraw.php:1854
+#: include/classes/graphdraw/CLineGraphDraw.php:1834
+#: include/classes/graphdraw/CLineGraphDraw.php:1856
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:145
@@ -15754,14 +15761,14 @@ msgstr "j. M Y G:i:s"
 msgid "d.M"
 msgstr "j. M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1372
-#: include/classes/graphdraw/CLineGraphDraw.php:1425
+#: include/classes/graphdraw/CLineGraphDraw.php:1374
+#: include/classes/graphdraw/CLineGraphDraw.php:1427
 msgid "d.m"
 msgstr "d.m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1394
-#: include/classes/graphdraw/CLineGraphDraw.php:1409
-#: include/classes/graphdraw/CLineGraphDraw.php:1428
+#: include/classes/graphdraw/CLineGraphDraw.php:1396
+#: include/classes/graphdraw/CLineGraphDraw.php:1411
+#: include/classes/graphdraw/CLineGraphDraw.php:1430
 msgid "d.m H:i"
 msgstr "j.n. G:i"
 
@@ -15891,7 +15898,7 @@ msgstr ""
 msgid "key is empty"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1830
+#: include/classes/graphdraw/CLineGraphDraw.php:1832
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:43
 msgid "last"
@@ -15931,16 +15938,16 @@ msgstr "údržba"
 msgid "map"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1833
-#: include/classes/graphdraw/CLineGraphDraw.php:1847
+#: include/classes/graphdraw/CLineGraphDraw.php:1835
+#: include/classes/graphdraw/CLineGraphDraw.php:1849
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:42
 #: include/views/js/configuration.graph.edit.js.php:50 popup_bitem.php:146
 msgid "max"
 msgstr "max"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1831
-#: include/classes/graphdraw/CLineGraphDraw.php:1844
+#: include/classes/graphdraw/CLineGraphDraw.php:1833
+#: include/classes/graphdraw/CLineGraphDraw.php:1846
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:144
@@ -15976,7 +15983,7 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1925
+#: include/classes/graphdraw/CLineGraphDraw.php:1927
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"
