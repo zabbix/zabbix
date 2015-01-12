@@ -29,10 +29,9 @@
 static int	trap_fd = -1;
 static int	trap_lastsize;
 static ino_t	trap_ino = 0;
-zbx_stat_t	file_buf;
-char		*buffer = NULL;
-int		offset = 0;
-int		force = 0;
+static char	*buffer = NULL;
+static int	offset = 0;
+static int	force = 0;
 
 static void	DBget_lastsize()
 {
@@ -275,13 +274,19 @@ static void	parse_traps(int flag)
 
 	c = line = buffer;
 
-	for (; '\0' != *c; c++)
+	while ('\0' != *c)
 	{
 		if ('\n' == *c)
-			line = c + 1;
+		{
+			line = ++c;
+			continue;
+		}
 
 		if (0 != strncmp(c, "ZBXTRAP", 7))
+		{
+			c++;
 			continue;
+		}
 
 		pzbegin = c;
 
@@ -311,36 +316,34 @@ static void	parse_traps(int flag)
 		while ('\0' != *c && NULL == strchr(ZBX_WHITESPACE, *c))
 			c++;
 
-		if ('\0' == c)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "invalid trap found [%s...]", begin);
-			begin = NULL;
-			c = addr;
-			continue;
-		}
-
 		pzaddr = c;
 
-		end = c+1;	/* the rest of the trap */
+		end = c + 1;	/* the rest of the trap */
 	}
 
-	if (NULL != end)
+	if (0 == flag)
 	{
-		if (0 == flag)	/* store the last trap to be processed on the next cycle*/
+		if (NULL == begin)
 		{
-			offset = c - begin;
-
-			if (MAX_BUFFER_LEN - 1 == offset)
+			if (c - buffer == MAX_BUFFER_LEN - 1)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "No space in buffer for new traps. Force processing");
+				zabbix_log(LOG_LEVEL_WARNING, "SNMP trapper buffer is full, trap might be truncated");
 				parse_traps(1);
 				offset = 0;
 				*buffer = '\0';
 			}
 			else
-				memmove(buffer, begin, offset + 1);
+				offset = c - buffer;
 		}
-		else	/* process the last trap */
+		else
+		{
+			offset = c - begin;
+			memmove(buffer, begin, c - begin + 1);
+		}
+	}
+	else
+	{
+		if (NULL != end)
 		{
 			*(line - 1) = '\0';
 			*pzdate = '\0';
@@ -350,12 +353,12 @@ static void	parse_traps(int flag)
 			offset = 0;
 			*buffer = '\0';
 		}
-	}
-	else if (NULL == addr)	/* no trap was found */
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid trap found [%s]", buffer);
-		offset = 0;
-		*buffer = '\0';
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "invalid trap data found \"%s\"", buffer);
+			offset = 0;
+			*buffer = '\0';
+		}
 	}
 }
 
@@ -467,7 +470,7 @@ static int	open_trap_file()
  ******************************************************************************/
 static int	get_latest_data()
 {
-	memset(&file_buf, 0, sizeof(file_buf));
+	zbx_stat_t	file_buf;
 
 	if (-1 != trap_fd)	/* a trap file is already open */
 	{
