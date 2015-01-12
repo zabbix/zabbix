@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-12-30 06:34+0200\n"
-"PO-Revision-Date: 2014-12-22 18:25+0300\n"
+"PO-Revision-Date: 2015-01-03 07:40+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1419265503.0\n"
+"X-POOTLE-MTIME: 1420263601.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -12074,7 +12074,7 @@ msgstr "Nahradiť aplikácie"
 
 #: include/views/configuration.triggers.massupdate.php:144
 msgid "Replace dependencies"
-msgstr ""
+msgstr "Nahradiť závislosti"
 
 #: include/views/configuration.host.massupdate.php:66
 msgid "Replace host groups"
