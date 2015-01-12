@@ -1,0 +1,399 @@
+@import '_reset.scss';
+@import '_variables.scss';
+
+/* ----------- Zabbix Styles ----------- */
+
+html {
+	position: relative;
+	min-height: 100%;
+}
+
+body {
+	@include font-body;
+	color: $font-color;
+	background: $body-bgcolor;
+	margin-bottom: 60px;
+	min-width: 950px;
+}
+
+a {
+	text-decoration: none;
+	color: $link-color;
+
+	&:hover {
+		text-decoration: none;
+		color: $link-hover-color;
+	}
+}
+
+h1 {
+	@include font-h1;
+	border-bottom: 1px solid $underline-color;
+	padding: 0 0 5px 0;
+}
+
+h2 {
+	@include font-h2;
+}
+
+/* Main Navigation */
+nav {
+background: $secondary-color;
+margin: 0 0 13px 0;
+}
+
+div.top-nav-container {
+	height: 36px;
+	line-height: 35px;
+	background: $primary-color;
+}
+
+ul.top-nav {
+	font-size: 1.167em;
+	background: $primary-color;
+
+	li {
+		display: block;
+		float: left;
+
+		&.selected {
+			position: relative;
+
+			&:after{
+				content:'';
+				position: absolute;
+				bottom: -1px;
+				left: 0;
+				right: 0;
+				margin: 0 auto;
+				width: 0; 
+				height: 0;
+				font-size: 0;
+				line-height: 0;
+				border-left: 7px solid transparent;
+				border-right: 7px solid transparent;
+				border-bottom: 7px solid $secondary-color;
+			}
+
+			a, a:hover {
+				color: $link-topnav-hover-color;
+			}
+	    }
+	}
+
+	a {
+		padding: 10px 13px 10px 13px;
+		color: $link-topnav-color;
+
+		&:hover {
+			color: $link-topnav-hover-color;
+		}
+	}
+}
+
+ul.top-nav-icons {
+	position: absolute;
+	top: 0;
+	right: 0;
+
+	li {
+		display: block;
+		float: left;
+	}
+
+	a {
+		display: block;
+		width: 52px;
+		height: 36px;
+		opacity: 0.75;
+		-ms-filter:"alpha(opacity=75)";
+
+		&:hover {
+			opacity: 1;
+			-ms-filter:"alpha(opacity=100)";	
+		}
+	}
+
+	a.top-nav-help {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat 9px -18px;
+	}
+
+	a.top-nav-print {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat 9px -42px;
+	}
+
+	a.top-nav-profile {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat 9px -66px;
+	}
+
+	a.top-nav-signout {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat 9px -91px;
+	}
+}
+
+div.top-subnav-container {
+	height: 36px;
+	line-height: 35px;
+	background: $secondary-color;
+}
+
+ul.top-subnav {
+	background: $secondary-color;
+
+	li {
+		display: block;
+		float: left;
+		padding: 0 5px 0 5px;
+	}
+}
+
+ul.top-subnav a {
+	padding: 5px 8px 5px 8px;
+	color: $link-topsubnav-color;
+
+	&:hover {
+		color: $link-topsubnav-hover-color;
+	}
+
+	&.selected {
+		@include form-border-radius;
+		background: darken($secondary-color, 10%);
+		color: $link-topsubnav-hover-color;
+	}
+}
+
+div.arrow-up {
+	width: 0; 
+	height: 0; 
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-bottom: 5px solid $secondary-color;
+	font-size: 0;
+	line-height: 0;
+}
+
+div.header-title {
+	padding: 0 13px 0 13px;
+	position: relative;
+
+	& ul {
+		position: absolute;
+		right: 13px;
+		bottom: 4px;
+
+		& li {
+			display: block;
+			float: left;
+			padding: 0 0 0 10px;
+		}
+	}
+}
+
+/* Article */
+article {
+	padding: 0 13px 0 13px;
+	padding-bottom: 40px;
+}
+
+/* Obgect Group Navigation */
+ul.object-group {
+	margin: 0 0 15px 0;
+	
+	li {
+		display: inline-block;
+		padding: 0 13px 0 0;
+	}
+}
+
+/* Footer */
+footer {
+	position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 60px;
+    background-color: #f5f5f5;
+	text-align: center;
+	color: $font-alt-color;
+
+	a {
+		color: $link-alt-color;
+
+		&:hover {
+			color: $link-alt-hover-color;
+		}
+	}	
+}
+
+a.logo {
+	display: block;
+	width: 94px;
+	height: 25px;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	background: url(../img/icon-sprite.png) no-repeat 0 -312px;
+}
+
+/* Tables */
+table.list-table {
+	width: 100%;
+    background: $body-content-bgcolor;
+    @include list-table-shadow;
+	
+	thead th {
+		@include list-table-header;
+	    padding: 6px 5px 6px 5px;
+	    vertical-align: middle;
+	    border-bottom: 1px solid $table-hordivider-color;
+	    text-align: left;
+	    color: $font-alt-color;
+
+	    a {
+	    	color: $link-alt-color;
+
+	    	&:hover {
+	    		color: $link-alt-hover-color;
+	    	}
+	    }
+	}
+
+	tbody tr {
+
+		&:hover {
+			background: lighten($primary-color, 55%);
+		}
+
+		&.row-selected {
+			background: $table-tr-selected-color;
+		}
+	}
+
+	td {
+		padding: 6px 5px 6px 5px;
+		vertical-align: middle;
+		border-bottom: 1px solid $table-hordivider-color;
+	}
+}
+
+div.table-paging {
+	text-align: center;
+	background: $body-content-bgcolor;
+
+	a {
+		display: inline-block;
+		padding: 10px;
+		border: 1px solid #000;
+	}
+}
+
+span.grey-small {
+	font-size: 0.917em;
+	color: $font-alt-color;
+}
+
+/* Filters */
+div.filter {
+	text-align: center;
+}
+
+/* Forms */
+input {
+	@include form-border-radius;
+	border: 1px solid $form-input-color;
+	padding: 5px;
+}
+
+input [type="checkbox"] {
+	margin: 0;
+}
+
+button::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+button {
+	@include form-border-radius;
+	background-color: $primary-color;
+	color: $font-white-color;
+	font-family: $font-stack;
+	border: 1px solid $primary-color;
+	padding: 3px 10px;
+
+	cursor: pointer;
+	@extend %button-hover-active;
+
+	&.btn-alt {
+		@extend button;
+		background: transparent;
+		color: $primary-color;
+		@extend %button-hover-active;
+	}
+
+	&.btn-conf {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat -1px -145px;
+		@extend %button-icon-size;
+		@extend %button-hover-active;
+	}
+
+	&.btn-max {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat -1px -169px;
+		@extend %button-icon-size;
+		@extend %button-hover-active;
+	}
+
+	&.btn-min {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat -1px -193px;
+		@extend %button-icon-size;
+		@extend %button-hover-active;
+	}
+}
+
+%button-hover-active {
+	&:hover {
+		background-color: darken($primary-color, 5%);
+		border-color: darken($primary-color, 5%);
+	}
+
+	&:active {
+		background-color: $secondary-color;
+		border-color: $secondary-color;
+	}
+}
+
+%button-icon-size {
+	width: 24px;
+	height: 24px;
+}
+
+button[disabled], button[disabled]:hover {
+	background: transparent;
+	color: $form-disabled-color;
+	border-color: $form-disabled-color;
+	cursor: default;
+}
+
+/* Alerts */
+.green {
+	color: $alert-green-color;
+}
+
+.red {
+	color: $alert-red-color;
+}
+
+.msg-good {
+	@extend .green;
+	border: 1px solid $alert-green-border-color;
+	background: $alert-green-bg-color;
+	padding: 6px 12px 6px 12px;
+	text-align: center;
+	@include form-border-radius; 
+}
+
+.msg-bad {
+	@extend .red;
+	border-color: $alert-red-border-color;
+	background: $alert-red-bg-color;
+	@extend .msg-good;
+}

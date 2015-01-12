@@ -1,0 +1,87 @@
+// PRIMARY ELEMENT COLORS
+$primary-color: #1e71ad; // Blue
+$secondary-color: #1e3d61; // Dark Blue 
+$body-bgcolor: #e9edf2; // Grey Blue
+$body-content-bgcolor: #fff; // Body Content White
+$underline-color: #d0d4d9; 
+
+
+// LINK COLORS
+$link-color: #3071ab; // Blue
+$link-hover-color: #3b8bd1; // Light Blue
+$link-active-color: #3b8bd1; // Light Blue
+$link-visited-color: #3071ab; // Blue
+
+$link-alt-color: #4f86a8; // Alt Blue
+$link-alt-hover-color: #3b8bd1; // Alt Light Blue
+$link-alt-active-color: #3b8bd1; // Alt Light Blue
+$link-alt-visited-color: #4f86a8; // Alt Blue
+
+$link-topnav-color: #bfdbea; // Nav Light Blue
+$link-topnav-hover-color: #fff; // Nav White
+$link-topnav-active-color: #fff; // Nav White
+$link-topnav-visited-color: #bfdbea; // Nav White
+
+$link-topsubnav-color: #bfced7; // SubNav Light Blue
+$link-topsubnav-hover-color: #fff; // SubNav White
+$link-topsubnav-active-color: #fff; // SubNav White
+$link-topsubnav-visited-color: #bfced7; // SubNav Light Blue
+
+// TABLE COLORS
+$table-hordivider-color: #e9edf2; // Grey Blue
+$table-tr-selected-color: #faf4d4; // Yellow
+
+
+// FORM COLORS
+$form-transparent-color: transparent;
+$form-disabled-color: #c4c8cc; // Light Grey 
+$form-input-color: #c4c8cc; // Light Grey
+
+// ALERTS
+$alert-green-color: #3a8a43; // Green
+$alert-green-bg-color: #dff0d8; // Light Green
+$alert-green-border-color: #d6e9c6; // Dark Green
+
+$alert-red-color: #a94442; // Red
+$alert-red-bg-color: #f2dede; // Light Red
+$alert-red-border-color: #ebccd1; // Dark Red
+
+// TYPOGRAPHY & COLORS
+$font-stack: Arial, Tahoma, Verdana, sans-serif;
+
+$font-color: #1f2c33; // Navy Black
+$font-alt-color: #696969; // Alt Grey
+$font-white-color: #fff; // Alt White
+
+@mixin font-body {
+	font: 75% $font-stack; // Default 1em/12px
+	line-height: 1.4em;
+}
+
+@mixin font-h1 {
+	font-size: 1.750em; // 21px
+	line-height: 1.2em;
+}
+
+@mixin font-h2 {
+	font-size: 1.500em; // 18px
+	line-height: 1.2em;
+}
+
+
+@mixin list-table-header {
+	font-size: 0.917em; // 11px   
+	text-transform: uppercase;
+}
+
+@mixin list-table-shadow {
+	-webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
+}
+
+@mixin form-border-radius {
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+}
