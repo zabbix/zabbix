@@ -1460,9 +1460,13 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 			ret = SUCCEED;
 			goto out;
 		}
+		if (NULL == (status = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS)))
+		{
+			*error = zbx_dsprintf(*error, "Incident %s query did no return status field", incident_number);
+			goto out;
+		}
 
-		incident_status = zbx_strdup(NULL, remedy_fields_get_value(fields, ARRSIZE(fields),
-				ZBX_REMEDY_FIELD_STATUS));
+		incident_status = zbx_strdup(NULL, status);
 
 		if (0 == strcmp(incident_status, ZBX_REMEDY_STATUS_RESOLVED) ||
 				0 == strcmp(incident_status, ZBX_REMEDY_STATUS_CLOSED) ||
