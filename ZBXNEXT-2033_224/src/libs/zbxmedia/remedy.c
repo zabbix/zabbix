@@ -1329,7 +1329,7 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 		{
 			if (NULL == (status = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS)))
 			{
-				*error = zbx_dsprintf(*error, "Incident %s query did no return status field",
+				*error = zbx_dsprintf(*error, "Incident %s query did not return status field",
 						incident_number);
 				goto out;
 			}
@@ -1462,7 +1462,7 @@ static int	remedy_process_event(zbx_uint64_t eventid, zbx_uint64_t userid, const
 		}
 		if (NULL == (status = remedy_fields_get_value(fields, ARRSIZE(fields), ZBX_REMEDY_FIELD_STATUS)))
 		{
-			*error = zbx_dsprintf(*error, "Incident %s query did no return status field", incident_number);
+			*error = zbx_dsprintf(*error, "Incident %s query did not return status field", incident_number);
 			goto out;
 		}
 
