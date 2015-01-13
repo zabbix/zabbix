@@ -28,29 +28,36 @@ $page['hist_arg'] = array();
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $fields = array(
-	// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'problem_unack_color' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
-	'problem_ack_color' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
-	'ok_unack_color' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
-	'ok_ack_color' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({update})'),
-	'problem_unack_style' =>	array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-	'problem_ack_style' =>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-	'ok_unack_style' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-	'ok_ack_style' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-	'ok_period' =>				array(T_ZBX_INT, O_OPT,	null,	null,		'isset({update})'),
-	'blink_period' =>			array(T_ZBX_INT, O_OPT,	null,	null,		'isset({update})'),
+	'problem_unack_color' =>	array(T_ZBX_CLR, O_OPT, null, null, 'isset({update})',
+		_('Unacknowledged PROBLEM events')
+	),
+	'problem_ack_color' =>		array(T_ZBX_CLR, O_OPT, null, null, 'isset({update})',
+		_('Acknowledged PROBLEM events')
+	),
+	'ok_unack_color' =>			array(T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('Unacknowledged OK events')),
+	'ok_ack_color' =>			array(T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('Acknowledged OK events')),
+	'problem_unack_style' =>	array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('Blinking')),
+	'problem_ack_style' =>		array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('Blinking')),
+	'ok_unack_style' =>			array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('Blinking')),
+	'ok_ack_style' =>			array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('Blinking')),
+	'ok_period' =>				array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 999999), 'isset({update})',
+		_('Display OK triggers for')
+	),
+	'blink_period' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 999999), 'isset({update})',
+		_('On status change triggers blink for')
+	),
 	// actions
-	'update'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
+	'update'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null, null, null)
 );
 check_fields($fields);
 
-
+/*
+ * Actions
+ */
 if (hasRequest('update')) {
-	$configs = array(
-		'ok_period' => getRequest('ok_period'),
-		'blink_period' => getRequest('blink_period'),
+	DBstart();
+	$result = update_config(array(
 		'problem_unack_color' => getRequest('problem_unack_color'),
 		'problem_ack_color' => getRequest('problem_ack_color'),
 		'ok_unack_color' => getRequest('ok_unack_color'),
@@ -58,66 +65,71 @@ if (hasRequest('update')) {
 		'problem_unack_style' => getRequest('problem_unack_style', 0),
 		'problem_ack_style' => getRequest('problem_ack_style', 0),
 		'ok_unack_style' => getRequest('ok_unack_style', 0),
-		'ok_ack_style' => getRequest('ok_ack_style', 0)
-	);
-
-	DBstart();
-	$result = update_config($configs);
+		'ok_ack_style' => getRequest('ok_ack_style', 0),
+		'ok_period' => getRequest('ok_period'),
+		'blink_period' => getRequest('blink_period')
+	));
 	$result = DBend($result);
+
 	show_messages($result, _('Configuration updated'), _('Cannot update configuration'));
 }
 
-
+/*
+ * Display
+ */
 $form = new CForm();
 $form->cleanItems();
-$cmbConf = new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php', 'redirect(this.options[this.selectedIndex].value);');
-$cmbConf->addItems(array(
-	'adm.gui.php' => _('GUI'),
-	'adm.housekeeper.php' => _('Housekeeping'),
-	'adm.images.php' => _('Images'),
-	'adm.iconmapping.php' => _('Icon mapping'),
-	'adm.regexps.php' => _('Regular expressions'),
-	'adm.macros.php' => _('Macros'),
-	'adm.valuemapping.php' => _('Value mapping'),
-	'adm.workingtime.php' => _('Working time'),
-	'adm.triggerseverities.php' => _('Trigger severities'),
-	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-	'adm.other.php' => _('Other')
-));
+$cmbConf = new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php',
+	'redirect(this.options[this.selectedIndex].value);',
+	array(
+		'adm.gui.php' => _('GUI'),
+		'adm.housekeeper.php' => _('Housekeeping'),
+		'adm.images.php' => _('Images'),
+		'adm.iconmapping.php' => _('Icon mapping'),
+		'adm.regexps.php' => _('Regular expressions'),
+		'adm.macros.php' => _('Macros'),
+		'adm.valuemapping.php' => _('Value mapping'),
+		'adm.workingtime.php' => _('Working time'),
+		'adm.triggerseverities.php' => _('Trigger severities'),
+		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
+		'adm.other.php' => _('Other')
+	)
+);
 $form->addItem($cmbConf);
-
 
 $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
 
-$data = array();
-$data['form_refresh'] = getRequest('form_refresh', 0);
+$config = select_config();
 
 // form has been submitted
-if ($data['form_refresh']) {
-	$data['ok_period'] = getRequest('ok_period');
-	$data['blink_period'] = getRequest('blink_period');
-	$data['problem_unack_color'] = getRequest('problem_unack_color');
-	$data['problem_ack_color'] = getRequest('problem_ack_color');
-	$data['ok_unack_color'] = getRequest('ok_unack_color');
-	$data['ok_ack_color'] = getRequest('ok_ack_color');
-	$data['problem_unack_style'] = getRequest('problem_unack_style');
-	$data['problem_ack_style'] = getRequest('problem_ack_style');
-	$data['ok_unack_style'] = getRequest('ok_unack_style');
-	$data['ok_ack_style'] = getRequest('ok_ack_style');
+if (hasRequest('form_refresh')) {
+	$data = array(
+		'problem_unack_color' => getRequest('problem_unack_color', $config['problem_unack_color']),
+		'problem_ack_color' => getRequest('problem_ack_color', $config['problem_ack_color']),
+		'ok_unack_color' => getRequest('ok_unack_color', $config['ok_unack_color']),
+		'ok_ack_color' => getRequest('ok_ack_color', $config['ok_ack_color']),
+		'problem_unack_style' => getRequest('problem_unack_style', 0),
+		'problem_ack_style' => getRequest('problem_ack_style', 0),
+		'ok_unack_style' => getRequest('ok_unack_style', 0),
+		'ok_ack_style' => getRequest('ok_ack_style', 0),
+		'ok_period' => getRequest('ok_period', $config['ok_period']),
+		'blink_period' => getRequest('blink_period', $config['blink_period'])
+	);
 }
 else {
-	$config = select_config(false);
-	$data['ok_period'] = $config['ok_period'];
-	$data['blink_period'] = $config['blink_period'];
-	$data['problem_unack_color'] = $config['problem_unack_color'];
-	$data['problem_ack_color'] = $config['problem_ack_color'];
-	$data['ok_unack_color'] = $config['ok_unack_color'];
-	$data['ok_ack_color'] = $config['ok_ack_color'];
-	$data['problem_unack_style'] = $config['problem_unack_style'];
-	$data['problem_ack_style'] = $config['problem_ack_style'];
-	$data['ok_unack_style'] = $config['ok_unack_style'];
-	$data['ok_ack_style'] = $config['ok_ack_style'];
+	$data = array(
+		'problem_unack_color' => $config['problem_unack_color'],
+		'problem_ack_color' => $config['problem_ack_color'],
+		'ok_unack_color' => $config['ok_unack_color'],
+		'ok_ack_color' => $config['ok_ack_color'],
+		'problem_unack_style' => $config['problem_unack_style'],
+		'problem_ack_style' => $config['problem_ack_style'],
+		'ok_unack_style' => $config['ok_unack_style'],
+		'ok_ack_style' => $config['ok_ack_style'],
+		'ok_period' => $config['ok_period'],
+		'blink_period' => $config['blink_period']
+	);
 }
 
 $triggerDisplayingForm = new CView('administration.general.triggerDisplayOptions.edit', $data);

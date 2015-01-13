@@ -353,7 +353,6 @@ if (isset($_REQUEST['form'])) {
 
 	$data = getItemFormData($itemPrototype);
 	$data['page_header'] = _('CONFIGURATION OF ITEM PROTOTYPES');
-	$data['is_item_prototype'] = true;
 	$data['config'] = select_config();
 
 	// render view
