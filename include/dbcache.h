@@ -296,9 +296,9 @@ void	*DCget_stats(int request);
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
 void	DCsync_configuration(void);
-void	init_configuration_cache();
-void	free_configuration_cache();
-void	DCload_config();
+void	init_configuration_cache(void);
+void	free_configuration_cache(void);
+void	DCload_config(void);
 
 void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode,
 		size_t num);
@@ -356,7 +356,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 void	*DCconfig_get_stats(int request);
 
 int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts);
-int	DCconfig_get_proxypoller_nextcheck();
+int	DCconfig_get_proxypoller_nextcheck(void);
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *timediff);
 
@@ -374,11 +374,11 @@ void	DCset_delta_items(zbx_hashset_t *items);
 void	DCfree_item_queue(zbx_vector_ptr_t *queue);
 int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
-int	DCget_item_count();
-int	DCget_item_unsupported_count();
-int	DCget_trigger_count();
-double	DCget_required_performance();
-int	DCget_host_count();
+int	DCget_item_count(void);
+int	DCget_item_unsupported_count(void);
+int	DCget_trigger_count(void);
+double	DCget_required_performance(void);
+int	DCget_host_count(void);
 
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);

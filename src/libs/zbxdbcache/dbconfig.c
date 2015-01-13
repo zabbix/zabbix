@@ -444,7 +444,7 @@ static zbx_mem_info_t	*config_mem;
 extern unsigned char	daemon_type;
 extern int		CONFIG_TIMER_FORKS;
 
-ZBX_MEM_FUNC_IMPL(__config, config_mem);
+ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
 /******************************************************************************
  *                                                                            *
@@ -868,7 +868,8 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 }
 
 #define DEFAULT_REFRESH_UNSUPPORTED	600
-static char	*default_severity_names[] = {"Not classified", "Information", "Warning", "Average", "High", "Disaster"};
+static const char	*default_severity_names[] = {"Not classified", "Information", "Warning", "Average", "High",
+		"Disaster"};
 
 static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 {
@@ -1926,11 +1927,11 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 		if ('\0' != *row[16])
 		{
-			int	found;
+			int	found1;
 
-			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found);
+			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found1);
 
-			delay_flex_changed = (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]));
+			delay_flex_changed = (SUCCEED == DCstrpool_replace(found1, &flexitem->delay_flex, row[16]));
 		}
 		else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
 		{
@@ -2500,7 +2501,7 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	DCconfig_sort_triggers_topologically();
+static void	DCconfig_sort_triggers_topologically(void);
 
 static void	DCsync_trigdeps(DB_RESULT tdep_result)
 {
@@ -2845,7 +2846,7 @@ static void	DCsync_expressions(DB_RESULT result)
  *          data with DCsync_config()                                         *
  *                                                                            *
  ******************************************************************************/
-static DB_RESULT	DCsync_config_select()
+static DB_RESULT	DCsync_config_select(void)
 {
 	return DBselect(
 			"select refresh_unsupported,discovery_groupid,snmptrap_logging,"
@@ -3498,7 +3499,7 @@ static int	__config_regexp_compare(const void *d1, const void *d2)
 	return r1->name == r2->name ? 0 : strcmp(r1->name, r2->name);
 }
 
-void	init_configuration_cache()
+void	init_configuration_cache(void)
 {
 	const char	*__function_name = "init_configuration_cache";
 
@@ -3642,7 +3643,7 @@ void	init_configuration_cache()
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
-void	free_configuration_cache()
+void	free_configuration_cache(void)
 {
 	const char	*__function_name = "free_configuration_cache";
 
@@ -3673,7 +3674,7 @@ void	free_configuration_cache()
  * Comments: !! SQL statement must be synced with DCsync_configuration() !!   *
  *                                                                            *
  ******************************************************************************/
-void	DCload_config()
+void	DCload_config(void)
 {
 	const char	*__function_name = "DCload_config";
 
@@ -5606,7 +5607,7 @@ exit:
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
-static void	DCconfig_sort_triggers_topologically()
+static void	DCconfig_sort_triggers_topologically(void)
 {
 	zbx_hashset_iter_t		iter;
 	ZBX_DC_TRIGGER			*trigger;
@@ -5857,7 +5858,7 @@ int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_proxypoller_nextcheck()
+int	DCconfig_get_proxypoller_nextcheck(void)
 {
 	const char		*__function_name = "DCconfig_get_proxypoller_nextcheck";
 
@@ -6283,7 +6284,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
  * Return value: the number of active items                                   *
  *                                                                            *
  ******************************************************************************/
-int	DCget_item_count()
+int	DCget_item_count(void)
 {
 	int			count = 0;
 	zbx_hashset_iter_t	iter;
@@ -6326,7 +6327,7 @@ int	DCget_item_count()
  * Return value: the number of active unsupported items                       *
  *                                                                            *
  ******************************************************************************/
-int	DCget_item_unsupported_count()
+int	DCget_item_unsupported_count(void)
 {
 	int			count = 0;
 	zbx_hashset_iter_t	iter;
@@ -6369,7 +6370,7 @@ int	DCget_item_unsupported_count()
  * Return value: the number of active triggers                                *
  *                                                                            *
  ******************************************************************************/
-int	DCget_trigger_count()
+int	DCget_trigger_count(void)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_uint64_t		functionid;
@@ -6435,7 +6436,7 @@ next:;
  * Return value: the number of monitored hosts                                *
  *                                                                            *
  ******************************************************************************/
-int	DCget_host_count()
+int	DCget_host_count(void)
 {
 	int			nhosts = 0;
 	zbx_hashset_iter_t	iter;
@@ -6465,7 +6466,7 @@ int	DCget_host_count()
  * Return value: the required nvps number                                     *
  *                                                                            *
  ******************************************************************************/
-double	DCget_required_performance()
+double	DCget_required_performance(void)
 {
 	double			nvps = 0;
 	zbx_hashset_iter_t	iter;
