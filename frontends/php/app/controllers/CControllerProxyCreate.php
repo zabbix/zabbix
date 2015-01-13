@@ -37,7 +37,7 @@ class CControllerProxyCreate extends CController {
 		if (!$ret) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=proxy.formcreate');
+					$response = new CControllerResponseRedirect('zabbix.php?action=proxy.edit');
 					$response->setFormData($this->getInputAll());
 					$response->setMessageError(_('Cannot add proxy'));
 					$this->setResponse($response);
@@ -58,34 +58,11 @@ class CControllerProxyCreate extends CController {
 	protected function doAction() {
 		$proxy = array();
 
-		if ($this->hasInput('host')) {
-			$proxy['host'] = $this->getInput('host');
-		}
+		$this->getInputs($proxy, array('host', 'description', 'status'));
 
-		if ($this->hasInput('status')) {
-			$proxy['status'] = $this->getInput('status');
-
-			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
-				if ($this->hasInput('dns')) {
-					$proxy['interface']['dns'] = $this->getInput('dns');
-				}
-
-				if ($this->hasInput('ip')) {
-					$proxy['interface']['ip'] = $this->getInput('ip');
-				}
-
-				if ($this->hasInput('useip')) {
-					$proxy['interface']['useip'] = $this->getInput('useip');
-				}
-
-				if ($this->hasInput('port')) {
-					$proxy['interface']['port'] = $this->getInput('port');
-				}
-			}
-		}
-
-		if ($this->hasInput('description')) {
-			$proxy['description'] = $this->getInput('description');
+		if ($this->getInput('status', HOST_STATUS_PROXY_ACTIVE) == HOST_STATUS_PROXY_PASSIVE) {
+			$proxy['interface'] = array();
+			$this->getInputs($proxy['interface'], array('dns', 'ip', 'useip', 'port'));
 		}
 
 		DBstart();
@@ -112,7 +89,7 @@ class CControllerProxyCreate extends CController {
 			$response->setMessageOk(_('Proxy added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=proxy.formcreate');
+			$response = new CControllerResponseRedirect('zabbix.php?action=proxy.edit');
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot add proxy'));
 		}

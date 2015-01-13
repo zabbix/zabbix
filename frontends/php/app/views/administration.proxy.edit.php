@@ -26,7 +26,6 @@ $proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'));
 // create form
 $proxyForm = new CForm();
 $proxyForm->setName('proxyForm');
-$proxyForm->addVar('form', 1);
 $proxyForm->addVar('proxyid', $data['proxyid']);
 if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
@@ -109,7 +108,7 @@ else {
 	$updateButton->setAttribute('id', 'update');
 	$cloneButton = new CSimpleButton(_('Clone'));
 	$cloneButton->setAttribute('id', 'clone');
-	$deleteButton = new CRedirectButton(_('Delete'), 'zabbix.php?action=proxy.delete'.url_param('proxyid'),_('Delete proxy?'));
+	$deleteButton = new CRedirectButton(_('Delete'), 'zabbix.php?action=proxy.delete&proxyids[]='.$data['proxyid'],_('Delete proxy?'));
 	$deleteButton->setAttribute('id', 'delete');
 
 	$proxyForm->addItem(makeFormFooter(

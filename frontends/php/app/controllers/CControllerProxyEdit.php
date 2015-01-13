@@ -18,21 +18,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CControllerProxyFormEdit extends CController {
+class CControllerProxyEdit extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'form' =>			'fatal                                        |in 1',
-			'proxyid' =>		'fatal|db       hosts.hostid         |required',
-			'host' =>			'fatal|db       hosts.host',
-			'status' =>			'fatal|db       hosts.status                  |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'interfaceid' =>	'fatal|db       interface.interfaceid',
-			'dns' =>			'fatal|db       interface.dns',
-			'ip' =>				'fatal|db       interface.ip',
-			'useip' =>			'fatal|db       interface.useip               |in 0,1',
-			'port' =>			'fatal|db       interface.port',
-			'proxy_hostids' =>	'fatal|array_db hosts.hostid',
-			'description' =>	'fatal|db       hosts.description'
+			'proxyid' =>		'db       hosts.hostid',
+			'host' =>			'db       hosts.host',
+			'status' =>			'db       hosts.status         |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
+			'interfaceid' =>	'db       interface.interfaceid',
+			'dns' =>			'db       interface.dns',
+			'ip' =>				'db       interface.ip',
+			'useip' =>			'db       interface.useip      |in 0,1',
+			'port' =>			'db       interface.port',
+			'proxy_hostids' =>	'array_db hosts.hostid',
+			'description' =>	'db       hosts.description'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -45,33 +44,36 @@ class CControllerProxyFormEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		return (bool) API::Proxy()->get(array(
-			'output' => array(),
-			'proxyids' => $this->getInput('proxyid'),
-			'editable' => true
-		));
+		if ($this->hasInput('proxyid')) {
+			return (bool) API::Proxy()->get(array(
+				'output' => array(),
+				'proxyids' => $this->getInput('proxyid'),
+				'editable' => true
+			));
+		}
+		else {
+			return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		}
 	}
 
 	protected function doAction() {
+		// default values
 		$data = array(
-			'proxyid' => $this->getInput('proxyid')
+			'proxyid' => 0,
+			'host' => '',
+			'status' => HOST_STATUS_PROXY_ACTIVE,
+			'dns' => 'localhost',
+			'ip' => '127.0.0.1',
+			'useip' => '1',
+			'port' => '10051',
+			'proxy_hostids' => array(),
+			'description' => ''
 		);
 
-		if ($this->hasInput('form')) {
-			$data['host'] = $this->getInput('host', '');
-			$data['status'] = $this->getInput('status', HOST_STATUS_PROXY_ACTIVE);
-			$data['dns'] = $this->getInput('dns', 'localhost');
-			$data['ip'] = $this->getInput('ip', '127.0.0.1');
-			$data['useip'] = $this->getInput('useip', '1');
-			$data['port'] = $this->getInput('port', '10051');
-			$data['proxy_hostids'] = $this->getInput('proxy_hostids', array());
-			$data['description'] = $this->getInput('description', '');
+		// get values from the dabatase
+		if ($this->hasInput('proxyid')) {
+			$data['proxyid'] = $this->getInput('proxyid');
 
-			if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && $this->hasInput('interfaceid')) {
-				$data['interfaceid'] = $this->getInput('interfaceid');
-			}
-		}
-		else {
 			$proxies = API::Proxy()->get(array(
 				'output' => array('proxyid', 'host', 'status', 'description'),
 				'selectHosts' => array('hostid'),
@@ -89,14 +91,21 @@ class CControllerProxyFormEdit extends CController {
 				$data['useip'] = $proxy['interface']['useip'];
 				$data['port'] = $proxy['interface']['port'];
 			}
-			else {
-				$data['dns'] = 'localhost';
-				$data['ip'] = '127.0.0.1';
-				$data['useip'] = '1';
-				$data['port'] = '10051';
-			}
 			$data['proxy_hostids'] = zbx_objectValues($proxy['hosts'], 'hostid');
 			$data['description'] = $proxy['description'];
+		}
+
+		$data['host'] = $this->getInput('host', $data['host']);
+		$data['status'] = $this->getInput('status', $data['status']);
+		$data['dns'] = $this->getInput('dns', $data['dns']);
+		$data['ip'] = $this->getInput('ip', $data['ip']);
+		$data['useip'] = $this->getInput('useip', $data['useip']);
+		$data['port'] = $this->getInput('port', $data['port']);
+		$data['proxy_hostids'] = $this->getInput('proxy_hostids', $data['proxy_hostids']);
+		$data['description'] = $this->getInput('description', $data['description']);
+
+		if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && $this->hasInput('interfaceid')) {
+			$data['interfaceid'] = $this->getInput('interfaceid');
 		}
 
 		// fetch available hosts, skip host prototypes

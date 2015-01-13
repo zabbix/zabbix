@@ -170,6 +170,19 @@ class CController {
 	}
 
 	/**
+	 * Get several input parameters.
+	 *
+	 * @return var
+	 */
+	public function getInputs(&$var, $names) {
+		foreach($names as $name) {
+			if ($this->hasInput($name)) {
+				$var[$name] = $this->getInput($name);
+			}
+		}
+	}
+
+	/**
 	 * Return all input parameters.
 	 *
 	 * @return var

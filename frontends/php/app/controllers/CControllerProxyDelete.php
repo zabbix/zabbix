@@ -22,7 +22,7 @@ class CControllerProxyDelete extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'proxyid' =>	'fatal|required|db hosts.hostid'
+			'proxyids' =>	'fatal|required|array_db hosts.hostid'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -35,20 +35,21 @@ class CControllerProxyDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		$proxies = API::Proxy()->get(array(
+			'proxyids' => $this->getInput('proxyids'),
+			'countOutput' => true,
+			'editable' => true
+		));
+
+		if ($proxies != count($this->getInput('proxyids'))) {
 			return false;
 		}
 
-		$proxies = API::Proxy()->get(array(
-			'output' => array(),
-			'proxyids' => $this->getInput('proxyid')
-		));
-
-		return (bool) $proxies;
+		return true;
 	}
 
 	protected function doAction() {
-		$result = API::Proxy()->delete(array($this->getInput('proxyid')));
+		$result = API::Proxy()->delete($this->getInput('proxyids'));
 
 		$response = new CControllerResponseRedirect('zabbix.php?action=proxy.list&uncheck=1');
 
