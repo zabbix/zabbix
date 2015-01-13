@@ -254,7 +254,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	if (NULL == fgets(tmp, sizeof(tmp), f))
 	{
-		ret = SUCCEED; /* fping does not output anything for DNS names that fail to resolve */
+		strscpy(tmp, "no output");
 	}
 	else
 	{
@@ -362,7 +362,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	unlink(filename);
 
 	if (NOTSUPPORTED == ret)
-		zbx_snprintf(error, max_error_len, "fping failed: \"%s\"", tmp);
+		zbx_snprintf(error, max_error_len, "fping failed: %s", tmp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
