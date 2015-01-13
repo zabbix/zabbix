@@ -107,7 +107,7 @@ typedef struct
 	zbx_timespec_t	ts;
 	int		logeventid;
 	int		mtime;
-	unsigned char	persistent;
+	unsigned char	flags;
 }
 ZBX_ACTIVE_BUFFER_ELEMENT;
 
