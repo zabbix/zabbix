@@ -265,11 +265,11 @@ class CHelpItems {
 					'description' => _('Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]')
 				),
 				array(
-					'key' => 'vfs.file.regexp[file,regexp,<encoding>]',
+					'key' => 'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
 					'description' => _('Find string in a file. Matched string')
 				),
 				array(
-					'key' => 'vfs.file.regmatch[file,regexp,<encoding>]',
+					'key' => 'vfs.file.regmatch[file,regexp,<encoding>,<start line>,<end line>]',
 					'description' => _('Find string in a file. 0 - expression not found, 1 - found')
 				),
 				array(
