@@ -40,8 +40,8 @@ if ($templateid > 0) {
 $frmHost = new CForm();
 $frmHost->setName('tpl_for');
 
-$frmHost->addVar('form', getRequest('form', 1));
-$frmHost->addVar('groupid', $_REQUEST['groupid']);
+$frmHost->addVar('form', $data['form']);
+$frmHost->addVar('groupid', $data['groupId']);
 
 if ($templateid) {
 	$frmHost->addVar('templateid', $templateid);
@@ -76,8 +76,8 @@ if ($templateid > 0 && !hasRequest('form_refresh')) {
 }
 else {
 	$groups = getRequest('groups', array());
-	if (isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0) && !uint_in_array($_REQUEST['groupid'], $groups)) {
-		array_push($groups, $_REQUEST['groupid']);
+	if ($data['groupId'] != 0 && !$groups) {
+		$groups[] = $data['groupId'];
 	}
 	$hosts_linked_to = getRequest('hosts', array());
 }
@@ -175,7 +175,7 @@ $templateList->addRow(_('Hosts / templates'), $host_tb->Get(_('In'), array(
 $templateList->addRow(_('Description'), new CTextArea('description', $this->data['description']));
 
 // FULL CLONE {
-if ($_REQUEST['form'] == 'full_clone') {
+if ($data['form'] === 'full_clone') {
 	// template applications
 	$templateApps = API::Application()->get(array(
 		'hostids' => $templateid,
@@ -395,6 +395,8 @@ if ($_REQUEST['form'] == 'full_clone') {
 	}
 }
 
+$cloneOrFullClone = ($data['form'] === 'clone' || $data['form'] === 'full_clone');
+
 $divTabs->addTab('templateTab', _('Template'), $templateList);
 // FULL CLONE }
 
@@ -409,24 +411,30 @@ $linkedTemplateTable->attr('id', 'linkedTemplateTable');
 $linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 
 $ignoredTemplates = array();
-foreach ($this->data['linkedTemplates'] as $template) {
+
+foreach ($data['linkedTemplates'] as $template) {
 	$tmplList->addVar('templates[]', $template['templateid']);
 	$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
 	$templateLink->setTarget('_blank');
+
+	$unlinkButton = new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu');
+	$unlinkAndClearButton = new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null,
+		'link_menu'
+	);
+	$unlinkAndClearButton->addStyle('margin-left: 8px');
 
 	$linkedTemplateTable->addRow(
 		array(
 			$templateLink,
 			array(
-				new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu'),
-				SPACE,
-				SPACE,
-				isset($this->data['original_templates'][$template['templateid']])
-					? new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null, 'link_menu')
-					: SPACE
+				$unlinkButton,
+				(isset($data['original_templates'][$template['templateid']]) && !$cloneOrFullClone)
+					? $unlinkAndClearButton
+					: null
 			)
 		),
-		null, 'conditions_'.$template['templateid']
+		null,
+		'conditions_'.$template['templateid']
 	);
 
 	$ignoredTemplates[$template['templateid']] = $template['name'];
@@ -474,7 +482,7 @@ $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 $frmHost->addItem($divTabs);
 
 // Footer
-if (($templateid > 0) && ($_REQUEST['form'] != 'full_clone')) {
+if ($templateid != 0 && $data['form'] !== 'full_clone') {
 	$frmHost->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
@@ -497,6 +505,5 @@ else {
 		array(new CButtonCancel(url_param('groupid')))
 	));
 }
-
 
 return $frmHost;

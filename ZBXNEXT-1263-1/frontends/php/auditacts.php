@@ -117,13 +117,17 @@ if (!$data['alias'] || $data['users']) {
 	// fetch alerts for different objects and sources and combine them in a single stream
 	foreach (eventSourceObjects() as $eventSource) {
 		$data['alerts'] = array_merge($data['alerts'], API::Alert()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'selectMediatypes' => API_OUTPUT_EXTEND,
+			'output' => array('alertid', 'actionid', 'userid', 'clock', 'sendto', 'subject', 'message', 'status',
+				'retries', 'error', 'alerttype'
+			),
+			'selectMediatypes' => array('mediatypeid', 'description'),
 			'userids' => $userId,
 			'time_from' => $from,
 			'time_till' => $till,
 			'eventsource' => $eventSource['source'],
 			'eventobject' => $eventSource['object'],
+			'sortfield' => 'alertid',
+			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => $config['search_limit'] + 1
 		)));
 	}

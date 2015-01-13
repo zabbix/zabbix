@@ -54,7 +54,7 @@ $filter->main();
 
 $reset = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput shadow');
 
-$divButtons = new CDiv(array($filter, SPACE, $reset));
+$divButtons = new CDiv(array($filter, $reset));
 $divButtons->setAttribute('style', 'padding: 4px 0px;');
 
 $footerCol = new CCol($divButtons, 'controls');
