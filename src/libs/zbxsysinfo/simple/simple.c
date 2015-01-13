@@ -330,14 +330,16 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 			port = ZBX_DEFAULT_NTP_PORT;
 		ret = check_ntp(ip, port, CONFIG_TIMEOUT, &value_int);
 	}
-#ifdef HAVE_LDAP
 	else if (0 == strcmp(service, "ldap"))
 	{
+#ifdef HAVE_LDAP
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_LDAP_PORT;
 		ret = check_ldap(ip, port, CONFIG_TIMEOUT, &value_int);
-	}
+#else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for LDAP check was not compiled in."));
 #endif
+	}
 	else if (0 == strcmp(service, "smtp"))
 	{
 		if (NULL == port_str || '\0' == *port_str)
@@ -383,14 +385,16 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 		}
 		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
 	}
-#ifdef HAVE_LIBCURL
 	else if (0 == strcmp(service, "https"))
 	{
+#ifdef HAVE_LIBCURL
 		if (NULL == port_str || '\0' == *port_str)
 			port = ZBX_DEFAULT_HTTPS_PORT;
 		ret = check_https(ip, port, CONFIG_TIMEOUT, &value_int);
-	}
+#else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for HTTPS check was not compiled in."));
 #endif
+	}
 	else if (0 == strcmp(service, "telnet"))
 	{
 		if (NULL == port_str || '\0' == *port_str)
@@ -398,7 +402,10 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 		ret = check_telnet(ip, port, CONFIG_TIMEOUT, &value_int);
 	}
 	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return ret;
+	}
 
 	if (SYSINFO_RET_OK == ret)
 	{
