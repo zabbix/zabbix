@@ -107,7 +107,7 @@ else {
 	$updateButton->setAttribute('id', 'update');
 	$cloneButton = new CSimpleButton(_('Clone'));
 	$cloneButton->setAttribute('id', 'clone');
-	$deleteButton = new CRedirectButton(_('Delete'), 'zabbix.php?action=mediatype.delete'.url_param('mediatypeid'),_('Delete media type?'));
+	$deleteButton = new CRedirectButton(_('Delete'), 'zabbix.php?action=mediatype.delete&mediatypeids[]='.$data['mediatypeid'],_('Delete media type?'));
 	$deleteButton->setAttribute('id', 'delete');
 
 	$mediaTypeForm->addItem(makeFormFooter(

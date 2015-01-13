@@ -24,10 +24,10 @@ class CControllerDiscoveryView extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'druleid' =>		'fatal|db:drules.druleid',
-			'sort' =>			'fatal|in_str:ip',
-			'sortorder' =>		'fatal|in_str:'.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'fullscreen' =>		'fatal|in_int:0,1'
+			'druleid' =>		'fatal|db drules.druleid',
+			'sort' =>			'fatal|in ip',
+			'sortorder' =>		'fatal|in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'fullscreen' =>		'fatal|in 0,1'
 		);
 
 		$ret = $this->validateInput($fields);

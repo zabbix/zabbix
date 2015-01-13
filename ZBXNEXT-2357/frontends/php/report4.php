@@ -253,7 +253,7 @@ else {
 
 		$links = array();
 		foreach ($media_types as $id => $description) {
-			$links[] = new CLink($description, 'zabbix.php?action=mediatype.formedit&mediatypeid='.$id);
+			$links[] = new CLink($description, 'zabbix.php?action=mediatype.edit&mediatypeid='.$id);
 			$links[] = SPACE.'/'.SPACE;
 		}
 		array_pop($links);

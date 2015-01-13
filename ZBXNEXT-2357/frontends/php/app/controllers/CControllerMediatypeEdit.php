@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CControllerMediatypeFormEdit extends CController {
+class CControllerMediatypeEdit extends CController {
 
 	private $mediatype = array();
 
@@ -95,6 +95,8 @@ class CControllerMediatypeFormEdit extends CController {
 				'smtp_email' => $this->mediatype['smtp_email'],
 				'exec_path' => $this->mediatype['exec_path'],
 				'gsm_modem' => $this->mediatype['gsm_modem'],
+				'jabber_username' => 'user@server',
+				'eztext_username' => '',
 				'username' => $this->mediatype['username'],
 				'passwd' => $this->mediatype['passwd'],
 				'status' => $this->mediatype['status']
@@ -110,6 +112,8 @@ class CControllerMediatypeFormEdit extends CController {
 			'smtp_email',
 			'exec_path',
 			'gsm_modem',
+			'jabber_username',
+			'eztext_username',
 			'username',
 			'passwd',
 			'status'

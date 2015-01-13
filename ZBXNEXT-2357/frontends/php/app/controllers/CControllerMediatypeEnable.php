@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CControllerMediatypeMassEnable extends CController {
+class CControllerMediatypeEnable extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'mediatypeids' =>	'fatal|array_db:media_type.mediatypeid|required'
+			'mediatypeids' =>	'fatal|array_db media_type.mediatypeid|required'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -44,11 +44,7 @@ class CControllerMediatypeMassEnable extends CController {
 			'countOutput' => true
 		));
 
-		if ($mediatypes != count($this->getInput('mediatypeids'))) {
-			return false;
-		}
-
-		return true;
+		return ($mediatypes == count($this->getInput('mediatypeids')));
 	}
 
 	protected function doAction() {

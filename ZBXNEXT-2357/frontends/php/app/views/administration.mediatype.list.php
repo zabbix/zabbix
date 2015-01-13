@@ -26,7 +26,7 @@ $mediaTypeWidget = new CWidget();
 
 // create new media type button
 $createForm = new CForm('get');
-$createForm->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.formcreate'));
+$createForm->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'));
 $mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'), $createForm);
 $mediaTypeWidget->addHeader(_('Media types'));
 $mediaTypeWidget->addHeaderRowNumber();
@@ -93,8 +93,8 @@ foreach ($data['mediatypes'] as $mediaType) {
 
 	$statusLink = 'zabbix.php'.
 		'?action='.($mediaType['status'] == MEDIA_TYPE_STATUS_DISABLED
-			? 'mediatype.massenable'
-			: 'mediatype.massdisable'
+			? 'mediatype.enable'
+			: 'mediatype.disable'
 		).
 		'&mediatypeids[]='.$mediaType['mediatypeid'];
 
@@ -105,7 +105,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 	// append row
 	$mediaTypeTable->addRow(array(
 		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', null, null, $mediaType['mediatypeid']),
-		new CLink($mediaType['description'], '?action=mediatype.formedit&mediatypeid='.$mediaType['mediatypeid']),
+		new CLink($mediaType['description'], '?action=mediatype.edit&mediatypeid='.$mediaType['mediatypeid']),
 		media_type2str($mediaType['typeid']),
 		$status,
 		$actionColumn,
@@ -116,15 +116,15 @@ foreach ($data['mediatypes'] as $mediaType) {
 // create go button
 $goComboBox = new CComboBox('action');
 
-$goOption = new CComboItem('mediatype.massenable', _('Enable selected'));
+$goOption = new CComboItem('mediatype.enable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected media types?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('mediatype.massdisable', _('Disable selected'));
+$goOption = new CComboItem('mediatype.disable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable selected media types?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('mediatype.massdelete', _('Delete selected'));
+$goOption = new CComboItem('mediatype.delete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected media types?'));
 $goComboBox->addItem($goOption);
 

@@ -255,13 +255,13 @@ $ZBX_MENU = array(
 			array(
 				'url' => 'zabbix.php',
 				'action' => 'mediatype.list',
-				'active_if' => array('mediatype.formcreate', 'mediatype.formedit', 'mediatype.list'),
+				'active_if' => array('mediatype.edit', 'mediatype.list'),
 				'label' => _('Media types')
 			),
 			array(
 				'url' => 'zabbix.php',
 				'action' => 'script.list',
-				'active_if' => array('script.formcreate', 'script.formedit', 'script.list'),
+				'active_if' => array('script.edit', 'script.list'),
 				'label' => _('Scripts')
 			),
 			array(

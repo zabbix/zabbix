@@ -45,7 +45,7 @@ class CControllerMediatypeDelete extends CController {
 	}
 
 	protected function doAction() {
-		$result = API::Mediatype()->delete(array($this->getInput('mediatypeids')));
+		$result = API::Mediatype()->delete($this->getInput('mediatypeids'));
 
 		$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.list&uncheck=1');
 

@@ -156,6 +156,13 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					)
 				)
 			),
+			array('in graphid,itemid,screenid,slideshowid,sysmapid|fatal|required', '',
+				array(
+					'in' => array('graphid', 'itemid', 'screenid', 'slideshowid', 'sysmapid'),
+					'fatal' => true,
+					'required' => true
+				)
+			),
 			array('required_if', 'Cannot parse validation rules "required_if" at position 8.', false),
 			array('required_if type=', 'Cannot parse validation rules "required_if type=" at position 8.', false),
 			array('in', 'Cannot parse validation rules "in" at position 0.', false),

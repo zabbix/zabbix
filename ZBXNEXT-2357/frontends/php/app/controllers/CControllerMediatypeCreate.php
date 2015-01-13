@@ -22,17 +22,16 @@ class CControllerMediatypeCreate extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'form' =>				'fatal|in_int:1',
-			'type' =>				'fatal|db:media_type.type       |required|in:'.implode(',', array_keys(media_type2str())),
-			'description' =>		'      db:media_type.description|required|not_empty',
-			'smtp_server' =>		'      db:media_type.smtp_server|required_if:type,'.MEDIA_TYPE_EMAIL.'|not_empty',
-			'smtp_helo' =>			'      db:media_type.smtp_helo  |required_if:type,'.MEDIA_TYPE_EMAIL.'|not_empty',
-			'smtp_email' =>			'      db:media_type.smtp_email |required_if:type,'.MEDIA_TYPE_EMAIL.'|not_empty',
-			'exec_path' =>			'      db:media_type.exec_path  |required_if:type,'.MEDIA_TYPE_EXEC.','.MEDIA_TYPE_EZ_TEXTING.'|not_empty',
-			'gsm_modem' =>			'      db:media_type.gsm_modem  |required_if:type,'.MEDIA_TYPE_SMS.'|not_empty',
-			'username' =>			'      db:media_type.username   |required_if:type,'.MEDIA_TYPE_JABBER.','.MEDIA_TYPE_EZ_TEXTING.'|not_empty',
-			'passwd' =>				'      db:media_type.passwd     |required_if:type,'.MEDIA_TYPE_JABBER.','.MEDIA_TYPE_EZ_TEXTING.'|not_empty',
-			'status' =>				'fatal|db:media_type.status     |required|in:'.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
+			'type' =>				'db media_type.type       |required|in '.implode(',', array_keys(media_type2str())),
+			'description' =>		'db media_type.description',
+			'smtp_server' =>		'db media_type.smtp_server',
+			'smtp_helo' =>			'db media_type.smtp_helo',
+			'smtp_email' =>			'db media_type.smtp_email',
+			'exec_path' =>			'db media_type.exec_path',
+			'gsm_modem' =>			'db media_type.gsm_modem',
+			'username' =>			'db media_type.username',
+			'passwd' =>				'db media_type.passwd',
+			'status' =>				'db media_type.status     |in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 		);
 
 		$ret = $this->validateInput($fields);
@@ -40,7 +39,7 @@ class CControllerMediatypeCreate extends CController {
 		if (!$ret) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.formcreate');
+					$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.edit');
 					$response->setFormData($this->getInputAll());
 					$response->setMessageError(_('Cannot add media type'));
 					$this->setResponse($response);
@@ -59,31 +58,25 @@ class CControllerMediatypeCreate extends CController {
 	}
 
 	protected function doAction() {
-		$mediatype = array(
-			'type' => $this->getInput('type'),
-			'description' => $this->getInput('description')
-		);
+		$mediatype = array();
 
-		switch ($this->getInput('type')) {
+		$this->getInputs($mediatype, array('type', 'description', 'status'));
+
+		switch($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
-				$mediatype['smtp_server'] = $this->getInput('smtp_server');
-				$mediatype['smtp_helo'] = $this->getInput('smtp_helo');
-				$mediatype['smtp_email'] = $this->getInput('smtp_email');
+				$this->getInputs($mediatype, array('smtp_server', 'smtp_helo', 'smtp_email'));
 				break;
 			case MEDIA_TYPE_EXEC:
-				$mediatype['exec_path'] = $this->getInput('exec_path');
+				$this->getInputs($mediatype, array('exec_path'));
 				break;
 			case MEDIA_TYPE_SMS:
-				$mediatype['gsm_modem'] = $this->getInput('gsm_modem');
+				$this->getInputs($mediatype, array('gsm_modem'));
 				break;
 			case MEDIA_TYPE_JABBER:
-				$mediatype['username'] = $this->getInput('username');
-				$mediatype['passwd'] = $this->getInput('passwd');
+				$this->getInputs($mediatype, array('username', 'passwd'));
 				break;
 			case MEDIA_TYPE_EZ_TEXTING:
-				$mediatype['exec_path'] = $this->getInput('exec_path');
-				$mediatype['username'] = $this->getInput('username');
-				$mediatype['passwd'] = $this->getInput('passwd');
+				$this->getInputs($mediatype, array('username', 'passwd', 'exec_path'));
 				break;
 		}
 
@@ -102,7 +95,7 @@ class CControllerMediatypeCreate extends CController {
 			$response->setMessageOk(_('Media type added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.formcreate');
+			$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.edit');
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot add media type'));
 		}

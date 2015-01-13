@@ -122,7 +122,7 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 					sendAjaxData('zabbix.php?action=dashboard.favourite&operation=delete', {
 						data: {
 							object: favouriteObj,
-							objectid: item.id
+							'objectids[]': [item.id]
 						}
 					});
 
@@ -156,7 +156,7 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 					sendAjaxData('zabbix.php?action=dashboard.favourite&operation=delete', {
 						data: {
 							object: favouriteObj,
-							objectid: 0
+							'objectids[]': [0]
 						}
 					});
 

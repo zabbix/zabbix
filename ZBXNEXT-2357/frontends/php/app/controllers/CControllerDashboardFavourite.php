@@ -24,10 +24,9 @@ class CControllerDashboardFavourite extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'object' =>				'fatal|in_str:graphid,itemid,screenid,slideshowid,sysmapid|required',
-			'objectid' =>			'fatal|db:items.itemid|required_if:operation,delete',
-			'objectids' =>			'fatal|db_array:items.itemid|required_if:operation,add',
-			'operation' =>			'fatal|in_str:create,delete|required'
+			'object' =>				'in graphid,itemid,screenid,slideshowid,sysmapid|fatal|required',
+			'objectids' =>			'array_db items.itemid                          |fatal|required',
+			'operation' =>			'in create,delete                               |fatal|required'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -47,12 +46,7 @@ class CControllerDashboardFavourite extends CController {
 	protected function doAction() {
 		$object = $this->getInput('object');
 		$operation = $this->getInput('operation');
-		if ($operation == 'create') {
-			$objectids = $this->getInput('objectids');
-		}
-		else {
-			$objectid = $this->getInput('objectid');
-		}
+		$objectids = $this->getInput('objectids');
 
 		$data = array (
 			'main_block' => ''
@@ -66,15 +60,14 @@ class CControllerDashboardFavourite extends CController {
 			// favourite graphs
 			case 'itemid':
 			case 'graphid':
-				if ($operation == 'create') {
-					zbx_value2array($objectids);
-
-					foreach ($objectids as $id) {
+				zbx_value2array($objectids);
+				foreach ($objectids as $id) {
+					if ($operation == 'create') {
 						$result &= CFavorite::add('web.favorite.graphids', $id, $object);
 					}
-				}
-				elseif ($operation == 'delete') {
-					$result &= CFavorite::remove('web.favorite.graphids', $objectid, $object);
+					elseif ($operation == 'delete') {
+						$result &= CFavorite::remove('web.favorite.graphids', $id, $object);
+					}
 				}
 
 				$graphs = getFavouriteGraphs();
@@ -88,15 +81,14 @@ class CControllerDashboardFavourite extends CController {
 
 			// favourite maps
 			case 'sysmapid':
-				if ($operation == 'create') {
-					zbx_value2array($objectids);
-
-					foreach ($objectids as $id) {
+				zbx_value2array($objectids);
+				foreach ($objectids as $id) {
+					if ($operation == 'create') {
 						$result &= CFavorite::add('web.favorite.sysmapids', $id, $object);
 					}
-				}
-				elseif ($operation == 'delete') {
-					$result &= CFavorite::remove('web.favorite.sysmapids', $objectid, $object);
+					elseif ($operation == 'delete') {
+						$result &= CFavorite::remove('web.favorite.sysmapids', $id, $object);
+					}
 				}
 
 				$maps = getFavouriteMaps();
@@ -111,15 +103,14 @@ class CControllerDashboardFavourite extends CController {
 			// favourite screens, slideshows
 			case 'screenid':
 			case 'slideshowid':
-				if ($operation == 'create') {
-					zbx_value2array($objectids);
-
-					foreach ($objectids as $id) {
+				zbx_value2array($objectids);
+				foreach ($objectids as $id) {
+					if ($operation == 'create') {
 						$result &= CFavorite::add('web.favorite.screenids', $id, $object);
 					}
-				}
-				elseif ($operation == 'delete') {
-					$result &= CFavorite::remove('web.favorite.screenids', $objectid, $object);
+					elseif ($operation == 'delete') {
+						$result &= CFavorite::remove('web.favorite.screenids', $id, $object);
+					}
 				}
 
 				$screens = getFavouriteScreens();
