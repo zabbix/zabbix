@@ -324,21 +324,28 @@ static void	parse_traps(int flag)
 	if (0 == flag)
 	{
 		if (NULL == begin)
+			offset = c - buffer;
+		else
+			offset = c - begin;
+
+		if (offset == MAX_BUFFER_LEN - 1)
 		{
-			if (c - buffer == MAX_BUFFER_LEN - 1)
+			if (NULL != end)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "SNMP trapper buffer is full, trap might be truncated");
+				zabbix_log(LOG_LEVEL_WARNING, "SNMP trapper buffer is full,"
+						" trap data might be truncated");
 				parse_traps(1);
-				offset = 0;
-				*buffer = '\0';
 			}
 			else
-				offset = c - buffer;
+				zabbix_log(LOG_LEVEL_WARNING, "failed to find trap in SNMP trapper file");
+
+			offset = 0;
+			*buffer = '\0';
 		}
 		else
 		{
-			offset = c - begin;
-			memmove(buffer, begin, c - begin + 1);
+			if (NULL != begin && begin != buffer)
+				memmove(buffer, begin, c - begin + 1);
 		}
 	}
 	else
