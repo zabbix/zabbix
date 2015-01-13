@@ -30,9 +30,9 @@ class CControllerDashboardWidget extends CController {
 		);
 
 		$fields = array(
-			'widget' =>			'fatal|in_str:'.implode(',', $widgets).'|required',
-			'refreshrate' =>	'fatal|in:10,30,60,120,600,900',
-			'state' =>			'fatal|in:0,1'
+			'widget' =>			'fatal|in '.implode(',', $widgets).'|required',
+			'refreshrate' =>	'fatal|in 10,30,60,120,600,900',
+			'state' =>			'fatal|in 0,1'
 		);
 
 		$ret = $this->validateInput($fields);

@@ -22,8 +22,8 @@ class CControllerFavouriteDelete extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'object' =>				'fatal|in_str:graphid,itemid,screenid,slideshowid,sysmapid|required',
-			'objectid' =>			'fatal|db:items.itemid|required'
+			'object' =>				'fatal|in graphid,itemid,screenid,slideshowid,sysmapid|required',
+			'objectid' =>			'fatal|db items.itemid|required'
 		);
 
 		$ret = $this->validateInput($fields);

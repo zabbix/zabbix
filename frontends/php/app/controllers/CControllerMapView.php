@@ -24,10 +24,10 @@ class CControllerMapView extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'sysmapid' =>		'fatal|db:sysmaps.sysmapid',
+			'sysmapid' =>		'fatal|db sysmaps.sysmapid',
 			'mapname' =>		'fatal|not_empty',
-			'severity_min' =>	'fatal|in_int:0,1,2,3,4,5',
-			'fullscreen' =>		'fatal|in_int:0,1'
+			'severity_min' =>	'fatal|in 0,1,2,3,4,5',
+			'fullscreen' =>		'fatal|in 0,1'
 		);
 
 		$ret = $this->validateInput($fields);

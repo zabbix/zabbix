@@ -24,11 +24,10 @@ frontends/php/app/controllers/CControllerFavouriteDelete.php -text
 frontends/php/app/controllers/CControllerMapView.php -text
 frontends/php/app/controllers/CControllerMediatypeCreate.php -text
 frontends/php/app/controllers/CControllerMediatypeDelete.php -text
-frontends/php/app/controllers/CControllerMediatypeFormCreate.php -text
-frontends/php/app/controllers/CControllerMediatypeFormEdit.php -text
+frontends/php/app/controllers/CControllerMediatypeDisable.php -text
+frontends/php/app/controllers/CControllerMediatypeEdit.php -text
+frontends/php/app/controllers/CControllerMediatypeEnable.php -text
 frontends/php/app/controllers/CControllerMediatypeList.php -text
-frontends/php/app/controllers/CControllerMediatypeMassDisable.php -text
-frontends/php/app/controllers/CControllerMediatypeMassEnable.php -text
 frontends/php/app/controllers/CControllerMediatypeUpdate.php -text
 frontends/php/app/controllers/CControllerProxyDelete.php -text
 frontends/php/app/controllers/CControllerProxyEdit.php -text
