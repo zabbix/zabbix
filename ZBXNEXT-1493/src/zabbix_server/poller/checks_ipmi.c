@@ -138,9 +138,8 @@ static char	*sensor_id_to_str(char *str, size_t str_sz, const char *id, enum ipm
 	return str;
 }
 
-static zbx_ipmi_host_t	*get_ipmi_host(const char *ip, const int port,
-		int authtype, int privilege, const char *username,
-		const char *password)
+static zbx_ipmi_host_t	*get_ipmi_host(const char *ip, const int port, int authtype, int privilege,
+		const char *username, const char *password)
 {
 	const char	*__function_name = "get_ipmi_host";
 	zbx_ipmi_host_t	*h;
@@ -226,8 +225,13 @@ static zbx_ipmi_sensor_t	*get_ipmi_sensor_by_id(zbx_ipmi_host_t *h, const char *
 	{
 		if (0 == strcmp(h->sensors[i].id, id))
 		{
+			/* Some devices present a sensor as both a threshold sensor and a discrete sensor. We work */
+			/* around this by preferring the threshold sensor in such case, as it is most widely used. */
+
 			s = &h->sensors[i];
-			break;
+
+			if (IPMI_EVENT_READING_TYPE_THRESHOLD == s->reading_type)
+				break;
 		}
 	}
 

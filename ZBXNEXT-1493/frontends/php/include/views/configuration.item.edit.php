@@ -18,6 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+if ($this->data['parent_discoveryid'] == 0) {
+	$host = $this->data['host'];
+}
 
 $itemWidget = new CWidget();
 
@@ -313,7 +316,9 @@ $itemFormList->addRow(_('New flexible interval'), array($newFlexInt, $maxFlexMsg
 
 $keepHistory = array();
 $keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
-if ($data['config']['hk_history_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
+if ($data['config']['hk_history_global'] && $data['parent_discoveryid'] == 0
+		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
+
 	$keepHistory[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
@@ -329,7 +334,9 @@ $itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
 
 $keepTrend = array();
 $keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
-if ($data['config']['hk_trends_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
+if ($data['config']['hk_trends_global'] && $data['parent_discoveryid'] == 0
+		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
+
 	$keepTrend[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
@@ -439,10 +446,11 @@ $itemTab->addTab('itemTab', $this->data['caption'], $itemFormList);
 $itemForm->addItem($itemTab);
 
 // append buttons to form
-if (!empty($this->data['itemid'])) {
+if ($this->data['itemid'] != 0) {
 	$buttons = array(new CSubmit('clone', _('Clone')));
 
-	if (!$this->data['is_template'] && !empty($this->data['itemid']) && empty($this->data['parent_discoveryid'])) {
+	if ($this->data['parent_discoveryid'] == 0
+			&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 		$buttons[] = new CButtonQMessage(
 			'del_history',
 			_('Clear history and trends'),

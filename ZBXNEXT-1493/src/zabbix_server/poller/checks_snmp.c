@@ -876,8 +876,9 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		/* communicate with agent */
 		status = snmp_synch_response(ss, pdu, &response);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d errstat:%ld max_vars:%d",
-				__function_name, status, NULL == response ? (long)-1 : response->errstat, max_vars);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d s_snmp_errno:%d errstat:%ld"
+				" max_vars:%d", __function_name, status, ss->s_snmp_errno,
+				NULL == response ? (long)-1 : response->errstat, max_vars);
 
 		if (1 < max_vars &&
 			((STAT_SUCCESS == status && SNMP_ERR_TOOBIG == response->errstat) || STAT_TIMEOUT == status))
@@ -1070,8 +1071,9 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 retry:
 	status = snmp_synch_response(ss, pdu, &response);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d errstat:%ld mapping_num:%d",
-			__function_name, status, NULL == response ? (long)-1 : response->errstat, mapping_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d s_snmp_errno:%d errstat:%ld mapping_num:%d",
+			__function_name, status, ss->s_snmp_errno, NULL == response ? (long)-1 : response->errstat,
+			mapping_num);
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
@@ -1217,7 +1219,8 @@ retry:
 		}
 	}
 	else if (1 < mapping_num &&
-			((STAT_SUCCESS == status && SNMP_ERR_TOOBIG == response->errstat) || STAT_TIMEOUT == status))
+			((STAT_SUCCESS == status && SNMP_ERR_TOOBIG == response->errstat) || STAT_TIMEOUT == status ||
+			(STAT_ERROR == status && SNMPERR_TOO_LONG == ss->s_snmp_errno)))
 	{
 		/* Since we are trying to obtain multiple values from the SNMP agent, the response that it has to  */
 		/* generate might be too big. It seems to be required by the SNMP standard that in such cases the  */
@@ -1230,6 +1233,9 @@ retry:
 		/* if querying with half the number of the last values does not work either, we resort to querying */
 		/* values one by one, and the next time configuration cache gives us items to query, it will give  */
 		/* us less. */
+
+		/* The explanation above is for the first two conditions. The third condition comes from SNMPv3, */
+		/* where the size of the request that we are trying to send exceeds device's "msgMaxSize" limit. */
 halve:
 		if (*min_fail > mapping_num)
 			*min_fail = mapping_num;

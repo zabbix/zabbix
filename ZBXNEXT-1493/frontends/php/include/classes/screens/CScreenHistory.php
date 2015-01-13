@@ -127,7 +127,8 @@ class CScreenHistory extends CScreenBase {
 			elseif ($this->action == HISTORY_VALUES) {
 				$config = select_config();
 
-				$options['time_from'] = $stime - 10; // some seconds to allow script to execute
+				// interval start value is non-inclusive, hence the + 1 second
+				$options['time_from'] = $stime + 1;
 				$options['time_till'] = $stime + $this->timeline['period'];
 				$options['limit'] = $config['search_limit'];
 			}
@@ -221,15 +222,7 @@ class CScreenHistory extends CScreenBase {
 						$row[] = new CCol($data['value'], 'pre');
 
 						$newRow = new CRow($row);
-						if (is_null($color)) {
-							$min_color = 0x98;
-							$max_color = 0xF8;
-							$int_color = ($max_color - $min_color) / count($itemIds);
-							$int_color *= array_search($data['itemid'], $itemIds);
-							$int_color += $min_color;
-							$newRow->setAttribute('style', 'background-color: '.sprintf("#%X%X%X", $int_color, $int_color, $int_color));
-						}
-						elseif (!is_null($color)) {
+						if (!is_null($color)) {
 							$newRow->setAttribute('class', $color);
 						}
 

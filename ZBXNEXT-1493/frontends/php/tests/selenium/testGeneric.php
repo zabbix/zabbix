@@ -54,14 +54,16 @@ class testGeneric extends CWebTest {
 			array('hostinventories.php',			'Host inventory'),
 
 			// reports
-			array('report1.php',					'Status of Zabbix'),
-			array('report2.php',					'Availability report'),
-			array('report5.php',					'Most busy triggers top 100'),
-			array('report5.php?period=day',			'Most busy triggers top 100'),
-			array('report5.php?period=week',		'Most busy triggers top 100'),
-			array('report5.php?period=month',		'Most busy triggers top 100'),
-			array('report5.php?period=year',		'Most busy triggers top 100'),
-			array('report6.php',					'Bar reports'),
+			array('report1.php',										'Status of Zabbix'),
+			array('report2.php',										'Availability report'),
+			array('toptriggers.php',									'Most busy triggers top 100'),
+			array('toptriggers.php?severities[0]=0&filter_set=Filter',	'Most busy triggers top 100'),
+			array('toptriggers.php?severities[1]=1&filter_set=Filter',	'Most busy triggers top 100'),
+			array('toptriggers.php?severities[2]=2&filter_set=Filter',	'Most busy triggers top 100'),
+			array('toptriggers.php?severities[3]=3&filter_set=Filter',	'Most busy triggers top 100'),
+			array('toptriggers.php?severities[4]=4&filter_set=Filter',	'Most busy triggers top 100'),
+			array('toptriggers.php?severities[5]=5&filter_set=Filter',	'Most busy triggers top 100'),
+			array('report6.php',										'Bar reports'),
 
 			// configuration
 			array('hostgroups.php',					'Configuration of host groups'),
