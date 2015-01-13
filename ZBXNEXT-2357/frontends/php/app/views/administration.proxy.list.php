@@ -27,7 +27,7 @@ $proxyWidget = new CWidget();
 // create new proxy button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addItem(new CRedirectButton(_('Create proxy'), 'zabbix.php?action=proxy.formcreate'));
+$createForm->addItem(new CRedirectButton(_('Create proxy'), 'zabbix.php?action=proxy.edit'));
 $proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'), $createForm);
 $proxyWidget->addHeader(_('Proxies'));
 $proxyWidget->addHeaderRowNumber();
@@ -80,7 +80,7 @@ foreach ($data['proxies'] as $proxy) {
 
 	$proxyTable->addRow(array(
 		new CCheckBox('proxyids['.$proxy['proxyid'].']', null, null, $proxy['proxyid']),
-		new CLink($proxy['host'], 'zabbix.php?action=proxy.formedit&proxyid='.$proxy['proxyid']),
+		new CLink($proxy['host'], 'zabbix.php?action=proxy.edit&proxyid='.$proxy['proxyid']),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
 		$proxy['lastaccess'] == 0 ? '-' : zbx_date2age($proxy['lastaccess']),
 		count($proxy['hosts']),
@@ -93,15 +93,15 @@ foreach ($data['proxies'] as $proxy) {
 // create go buttons
 $goComboBox = new CComboBox('action');
 
-$goOption = new CComboItem('proxy.massenable', _('Enable selected'));
+$goOption = new CComboItem('proxy.hostenable', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable hosts monitored by selected proxies?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('proxy.massdisable', _('Disable selected'));
+$goOption = new CComboItem('proxy.hostdisable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable hosts monitored by selected proxies?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('proxy.massdelete', _('Delete selected'));
+$goOption = new CComboItem('proxy.delete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected proxies?'));
 $goComboBox->addItem($goOption);
 

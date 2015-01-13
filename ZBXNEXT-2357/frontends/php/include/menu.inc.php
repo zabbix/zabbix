@@ -240,7 +240,7 @@ $ZBX_MENU = array(
 			array(
 				'url' => 'zabbix.php',
 				'action' => 'proxy.list',
-				'active_if' => array('proxy.formcreate', 'proxy.formedit', 'proxy.list'),
+				'active_if' => array('proxy.edit', 'proxy.list'),
 				'label' => _('Proxies')
 			),
 			array(

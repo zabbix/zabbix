@@ -22,16 +22,16 @@ class CControllerProxyUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'proxyid' =>		'fatal|db       hosts.hostid         |required',
-			'host' =>			'      db       hosts.host           |required                                        |not_empty',
-			'status' =>			'fatal|db       hosts.status         |required                                        |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'interfaceid' =>    'fatal|db       interface.interfaceid',
-			'dns' =>			'      db       interface.dns        |required_if status='.HOST_STATUS_PROXY_PASSIVE,
-			'ip' =>				'      db       interface.ip         |required_if status='.HOST_STATUS_PROXY_PASSIVE,
-			'useip' =>			'fatal|db       interface.useip      |required_if status='.HOST_STATUS_PROXY_PASSIVE.'|in 0,1',
-			'port' =>			'      db       interface.port       |required_if status='.HOST_STATUS_PROXY_PASSIVE,
-			'proxy_hostids' =>	'fatal|array_db hosts.hostid',
-			'description' =>	'      db       hosts.description    |required'
+			'proxyid' =>		'db       hosts.hostid     |required|fatal',
+			'host' =>			'db       hosts.host       |not_empty',
+			'status' =>			'db       hosts.status     |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
+			'interfaceid' =>    'db       interface.interfaceid',
+			'dns' =>			'db       interface.dns',
+			'ip' =>				'db       interface.ip',
+			'useip' =>			'db       interface.useip  |in 0,1',
+			'port' =>			'db       interface.port',
+			'proxy_hostids' =>	'array_db hosts.hostid',
+			'description' =>	'db       hosts.description'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -39,7 +39,7 @@ class CControllerProxyUpdate extends CController {
 		if (!$ret) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=proxy.formedit');
+					$response = new CControllerResponseRedirect('zabbix.php?action=proxy.edit');
 					$response->setFormData($this->getInputAll());
 					$response->setMessageError(_('Cannot update proxy'));
 					$this->setResponse($response);
@@ -62,23 +62,13 @@ class CControllerProxyUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$proxy = array(
-			'proxyid' => $this->getInput('proxyid'),
-			'host' => $this->getInput('host'),
-			'status' => $this->getInput('status'),
-			'description' => $this->getInput('description')
-		);
+		$proxy = array();
 
-		if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
-			$proxy['interface'] = array(
-				'dns' => $this->getInput('dns'),
-				'ip' => $this->getInput('ip'),
-				'useip' => $this->getInput('useip'),
-				'port' => $this->getInput('port')
-			);
-			if ($this->hasInput('interfaceid')) {
-				$proxy['interface']['interfaceid'] = $this->getInput('interfaceid');
-			}
+		$this->getInputs($proxy, array('proxyid', 'host', 'description', 'status'));
+
+		if ($this->getInput('status', HOST_STATUS_PROXY_ACTIVE) == HOST_STATUS_PROXY_PASSIVE) {
+			$proxy['interface'] = array();
+			$this->getInputs($proxy['interface'], array('interfaceid', 'dns', 'ip', 'useip', 'port'));
 		}
 
 		DBstart();
@@ -105,7 +95,7 @@ class CControllerProxyUpdate extends CController {
 			$response->setMessageOk(_('Proxy updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=proxy.formedit&proxyid='.$this->getInput('proxyid'));
+			$response = new CControllerResponseRedirect('zabbix.php?action=proxy.edit&proxyid='.$this->getInput('proxyid'));
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot update proxy'));
 		}

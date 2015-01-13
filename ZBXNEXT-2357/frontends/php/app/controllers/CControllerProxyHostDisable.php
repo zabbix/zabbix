@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CControllerProxyMassDelete extends CController {
+class CControllerProxyHostDisable extends CController {
 
 	protected function checkInput() {
 		$fields = array(
@@ -35,13 +35,11 @@ class CControllerProxyMassDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			return false;
-		}
-
 		$proxies = API::Proxy()->get(array(
 			'proxyids' => $this->getInput('proxyids'),
-			'countOutput' => true
+			'selectHosts' => array(),
+			'countOutput' => true,
+			'editable' => true
 		));
 
 		if ($proxies != count($this->getInput('proxyids'))) {
@@ -52,15 +50,39 @@ class CControllerProxyMassDelete extends CController {
 	}
 
 	protected function doAction() {
-		$result = API::Proxy()->delete($this->getInput('proxyids'));
+		$result = true;
+		$proxyids = $this->getInput('proxyids');
+
+		DBstart();
+
+		$updated = 0;
+		foreach ($proxyids as $proxyid) {
+
+			$hosts = DBselect(
+				"SELECT h.hostid,h.status FROM hosts h WHERE h.proxy_hostid=$proxyid"
+			);
+
+			while ($host = DBfetch($hosts)) {
+				$status = $host['status'];
+				$updated++;
+
+				if ($status == HOST_STATUS_NOT_MONITORED) {
+					continue;
+				}
+
+				$result &= updateHostStatus($host['hostid'], HOST_STATUS_NOT_MONITORED);
+			}
+		}
+
+		$result = DBend($result);
 
 		$response = new CControllerResponseRedirect('zabbix.php?action=proxy.list&uncheck=1');
 
 		if ($result) {
-			$response->setMessageOk(_('Proxy deleted'));
+			$response->setMessageOk(_n('Host disabled', 'Hosts disabled', $updated));
 		}
 		else {
-			$response->setMessageError(_('Cannot delete proxy'));
+			$response->setMessageError(_n('Cannot disable host', 'Cannot disable hosts', $updated));
 		}
 		$this->setResponse($response);
 	}
