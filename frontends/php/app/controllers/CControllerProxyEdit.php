@@ -95,6 +95,7 @@ class CControllerProxyEdit extends CController {
 			$data['description'] = $proxy['description'];
 		}
 
+		// overwrite with input variables
 		$data['host'] = $this->getInput('host', $data['host']);
 		$data['status'] = $this->getInput('status', $data['status']);
 		$data['dns'] = $this->getInput('dns', $data['dns']);

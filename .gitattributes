@@ -27,7 +27,6 @@ frontends/php/app/controllers/CControllerMediatypeDelete.php -text
 frontends/php/app/controllers/CControllerMediatypeFormCreate.php -text
 frontends/php/app/controllers/CControllerMediatypeFormEdit.php -text
 frontends/php/app/controllers/CControllerMediatypeList.php -text
-frontends/php/app/controllers/CControllerMediatypeMassDelete.php -text
 frontends/php/app/controllers/CControllerMediatypeMassDisable.php -text
 frontends/php/app/controllers/CControllerMediatypeMassEnable.php -text
 frontends/php/app/controllers/CControllerMediatypeUpdate.php -text
@@ -39,10 +38,8 @@ frontends/php/app/controllers/CControllerProxyUpdate.php -text
 frontends/php/app/controllers/CControllerReportStatus.php -text
 frontends/php/app/controllers/CControllerScriptCreate.php -text
 frontends/php/app/controllers/CControllerScriptDelete.php -text
-frontends/php/app/controllers/CControllerScriptFormCreate.php -text
-frontends/php/app/controllers/CControllerScriptFormEdit.php -text
+frontends/php/app/controllers/CControllerScriptEdit.php -text
 frontends/php/app/controllers/CControllerScriptList.php -text
-frontends/php/app/controllers/CControllerScriptMassDelete.php -text
 frontends/php/app/controllers/CControllerScriptUpdate.php -text
 frontends/php/app/controllers/CControllerSystemWarning.php -text
 frontends/php/app/controllers/CControllerWidgetDiscoveryView.php -text
