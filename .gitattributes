@@ -179,64 +179,6 @@ frontends/php/locale/vi/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_TW/LC_MESSAGES/frontend.po -text
 frontends/php/robots.txt svneol=native#text/plain
-frontends/php/styles/themes/classic/images/bg_flat_0_999999.png -text
-frontends/php/styles/themes/classic/images/bg_flat_0_c9c9c9.png -text
-frontends/php/styles/themes/classic/images/bg_flat_100_fef1ec.png -text
-frontends/php/styles/themes/classic/images/bg_flat_100_fffce3.png -text
-frontends/php/styles/themes/classic/images/bg_flat_100_ffffff.png -text
-frontends/php/styles/themes/classic/images/bg_h-hard_55.gif -text
-frontends/php/styles/themes/classic/images/bg_h-hard_75.png -text
-frontends/php/styles/themes/classic/images/bg_h-hard_85.png -text
-frontends/php/styles/themes/classic/images/bg_i-hard_100.png -text
-frontends/php/styles/themes/classic/images/icons_456582.png -text
-frontends/php/styles/themes/classic/images/icons_469bdd.png -text
-frontends/php/styles/themes/classic/images/icons_5481ab.png -text
-frontends/php/styles/themes/classic/images/icons_d40000.png -text
-frontends/php/styles/themes/classic/images/icons_ffffff.png -text
-frontends/php/styles/themes/classic/images/menu_not_active2.gif -text
-frontends/php/styles/themes/classic/images/preloader.gif -text
-frontends/php/styles/themes/classic/images/widget_header.gif -text
-frontends/php/styles/themes/classic/jquery-ui.css -text
-frontends/php/styles/themes/classic/main.css -text
-frontends/php/styles/themes/darkblue/images/bg_flat_0.png -text svneol=unset#image/png
-frontends/php/styles/themes/darkblue/images/bg_flat_10.png -text svneol=unset#image/png
-frontends/php/styles/themes/darkblue/images/bg_flat_100.png -text svneol=unset#image/png
-frontends/php/styles/themes/darkblue/images/bg_flat_30.png -text svneol=unset#image/png
-frontends/php/styles/themes/darkblue/images/bg_h-hard_25.png -text svneol=unset#image/png
-frontends/php/styles/themes/darkblue/images/bg_h-hard_40.png -text svneol=unset#image/png
-frontends/php/styles/themes/darkblue/images/bg_i-hard_40.png -text svneol=unset#image/png
-frontends/php/styles/themes/darkblue/images/bg_i-soft_25.png -text svneol=unset#image/png
-frontends/php/styles/themes/darkblue/images/icons_77b7da.png -text svneol=unset#image/png
-frontends/php/styles/themes/darkblue/images/icons_ffffff.png -text
-frontends/php/styles/themes/darkblue/images/preloader.gif -text
-frontends/php/styles/themes/darkorange/images/bg_flat_25.png -text
-frontends/php/styles/themes/darkorange/images/bg_flat_30.png -text
-frontends/php/styles/themes/darkorange/images/bg_flat_50.png -text
-frontends/php/styles/themes/darkorange/images/bg_g_40_2f2f2f.png -text
-frontends/php/styles/themes/darkorange/images/bg_g_40_ff5500.png -text
-frontends/php/styles/themes/darkorange/images/bg_g_40_ffc73d.png -text
-frontends/php/styles/themes/darkorange/images/bg_h-hard_30.png -text
-frontends/php/styles/themes/darkorange/images/bg_h-soft_80.png -text
-frontends/php/styles/themes/darkorange/images/icons_000000.png -text
-frontends/php/styles/themes/darkorange/images/icons_a83300.png -text
-frontends/php/styles/themes/darkorange/images/icons_dfdfdf.png -text
-frontends/php/styles/themes/darkorange/images/icons_ff5500.png -text
-frontends/php/styles/themes/darkorange/images/preloader.gif -text
-frontends/php/styles/themes/originalblue/images/bg_flat_0_999999.png -text
-frontends/php/styles/themes/originalblue/images/bg_flat_0_c9c9c9.png -text
-frontends/php/styles/themes/originalblue/images/bg_flat_100_fef1ec.png -text
-frontends/php/styles/themes/originalblue/images/bg_flat_100_fffce3.png -text
-frontends/php/styles/themes/originalblue/images/bg_flat_100_ffffff.png -text
-frontends/php/styles/themes/originalblue/images/bg_h-hard_55.png -text
-frontends/php/styles/themes/originalblue/images/bg_h-hard_75.png -text
-frontends/php/styles/themes/originalblue/images/bg_h-hard_85.png -text
-frontends/php/styles/themes/originalblue/images/bg_i-hard_100.png -text
-frontends/php/styles/themes/originalblue/images/icons_456582.png -text
-frontends/php/styles/themes/originalblue/images/icons_469bdd.png -text
-frontends/php/styles/themes/originalblue/images/icons_5481ab.png -text
-frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
-frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
-frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
