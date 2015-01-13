@@ -108,7 +108,9 @@ zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TRAPPER, 'row_trapper
 foreach ($this->data['types'] as $type => $label) {
 	switch ($type) {
 		case ITEM_TYPE_DB_MONITOR:
-			$defaultKey = (empty($this->data['is_discovery_rule']) ? ZBX_DEFAULT_KEY_DB_MONITOR : ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY);
+			$defaultKey = $this->data['is_discovery_rule']
+				? ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY
+				: ZBX_DEFAULT_KEY_DB_MONITOR;
 			zbx_subarray_push($this->data['typeVisibility'], $type, array('id' => 'key', 'defaultValue' => $defaultKey));
 			break;
 		case ITEM_TYPE_SSH:
