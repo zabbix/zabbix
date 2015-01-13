@@ -179,7 +179,6 @@ out:
 	return cluster;
 }
 
-
 static int	vmware_counter_get(const char *stats, const char *instance, zbx_uint64_t counterid, int coeff,
 		AGENT_RESULT *result)
 {
@@ -252,6 +251,7 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
 	const char		*__function_name = "vmware_get_events";
 
 	zbx_vector_str_t	keys;
+	zbx_vector_uint64_t	ids;
 	zbx_uint64_t		key;
 	char			*value, xpath[MAX_STRING_LEN];
 	int			i, ret = SYSINFO_RET_FAIL;
@@ -270,7 +270,9 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
 		goto out;
 	}
 
-	for (i = keys.values_num - 1; i >= 0; i--)
+	zbx_vector_uint64_create(&ids);
+
+	for (i = 0; i < keys.values_num; i++)
 	{
 		if (SUCCEED != is_uint64(keys.values[i], &key))
 			continue;
@@ -278,57 +280,67 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
 		if (key <= lastlogsize)
 			continue;
 
-		/* value */
-
-		zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key") "[.='" ZBX_FS_UI64 "']/.."
-				ZBX_XPATH_LN("fullFormattedMessage"), key);
-
-		if (NULL == (value = zbx_xml_read_value(events, xpath)))
-			continue;
-
-		zbx_replace_invalid_utf8(value);
-		log = add_log_result(result, value);
-		log->logeventid = key;
-		log->lastlogsize = key;
-
-		zbx_free(value);
-
-		/* timestamp */
-
-		zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key") "[.='" ZBX_FS_UI64 "']/.."
-				ZBX_XPATH_LN("createdTime"), key);
-
-		if (NULL == (value = zbx_xml_read_value(events, xpath)))
-			continue;
-
-		/* 2013-06-04T14:19:23.406298Z */
-		if (6 == sscanf(value, "%d-%d-%dT%d:%d:%d.%*s", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour,
-				&tm.tm_min, &tm.tm_sec))
-
-		{
-			int		tz_offset;
-#if defined(HAVE_TM_TM_GMTOFF)
-			struct tm	*ptm;
-			time_t		now;
-
-			now = time(NULL);
-			ptm = localtime(&now);
-			tz_offset = ptm->tm_gmtoff;
-#else
-			tz_offset = -timezone;
-#endif
-			tm.tm_year -= 1900;
-			tm.tm_mon--;
-			tm.tm_isdst = -1;
-
-			if (0 < (t = mktime(&tm)))
-				log->timestamp = (int)t + tz_offset;
-		}
-		zbx_free(value);
+		zbx_vector_uint64_append(&ids, key);
 	}
 
-	if (!ISSET_LOG(result))
+	if (0 != ids.values_num)
+	{
+		zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		for (i = 0; i < ids.values_num; i++)
+		{
+			zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key") "[.='" ZBX_FS_UI64 "']/.."
+					ZBX_XPATH_LN("fullFormattedMessage"), ids.values[i]);
+
+			if (NULL == (value = zbx_xml_read_value(events, xpath)))
+				continue;
+
+			zbx_replace_invalid_utf8(value);
+			log = add_log_result(result, value);
+			log->logeventid = ids.values[i];
+			log->lastlogsize = ids.values[i];
+
+			zbx_free(value);
+
+			/* timestamp */
+
+			zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key") "[.='" ZBX_FS_UI64 "']/.."
+					ZBX_XPATH_LN("createdTime"), ids.values[i]);
+
+			if (NULL == (value = zbx_xml_read_value(events, xpath)))
+				continue;
+
+			/* 2013-06-04T14:19:23.406298Z */
+			if (6 == sscanf(value, "%d-%d-%dT%d:%d:%d.%*s", &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+					&tm.tm_hour, &tm.tm_min, &tm.tm_sec))
+
+			{
+				int		tz_offset;
+	#if defined(HAVE_TM_TM_GMTOFF)
+				struct tm	*ptm;
+				time_t		now;
+
+				now = time(NULL);
+				ptm = localtime(&now);
+				tz_offset = ptm->tm_gmtoff;
+	#else
+				tz_offset = -timezone;
+	#endif
+				tm.tm_year -= 1900;
+				tm.tm_mon--;
+				tm.tm_isdst = -1;
+
+				if (0 < (t = mktime(&tm)))
+					log->timestamp = (int)t + tz_offset;
+			}
+
+			zbx_free(value);
+		}
+	}
+	else
 		set_log_result_empty(result);
+
+	zbx_vector_uint64_destroy(&ids);
 
 	zbx_vector_str_clear_ext(&keys, zbx_ptr_free);
 	zbx_vector_str_destroy(&keys);
@@ -724,7 +736,10 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const char *username, const c
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	{
+		set_log_result_empty(result);
 		goto unlock;
+	}
 
 	ret = vmware_get_events(service->data->events, request->lastlogsize, result);
 unlock:
