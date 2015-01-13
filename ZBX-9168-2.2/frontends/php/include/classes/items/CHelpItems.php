@@ -301,7 +301,7 @@ class CHelpItems {
 					'description' => _('Get timing of loading full WEB page. Default path is /')
 				),
 				array(
-					'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>]',
+					'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>,<output>]',
 					'description' => _('Get first occurence of regexp in WEB page. Default path is /')
 				),
 				array(
@@ -323,7 +323,7 @@ class CHelpItems {
 					'description' => _('Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1')
 				),
 				array(
-					'key' => 'eventlog[logtype,<pattern>,<severity>,<source>,<eventid>,<maxlines>,<mode>]',
+					'key' => 'eventlog[name,<regexp>,<severity>,<source>,<eventid>,<maxlines>,<mode>]',
 					'description' => _('Monitoring of Windows event logs. pattern, severity, eventid - regular expressions')
 				),
 				array(
