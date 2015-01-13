@@ -22,20 +22,19 @@ class CControllerScriptUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'form' =>				'fatal|in_int:1',
-			'scriptid' =>			'fatal|db:scripts.scriptid    |required',
-			'name' =>				'      db:scripts.name        |required|not_empty',
-			'type' =>				'fatal|db:scripts.type        |required|in_int:0,1',
-			'execute_on' =>			'fatal|db:scripts.execute_on  |required|required_if:type,'.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.'|in_int:0,1',
-			'command' =>			'      db:scripts.command     |required_if:type,'.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-			'commandipmi' =>		'      db:scripts.command     |required_if:type,'.ZBX_SCRIPT_TYPE_IPMI,
-			'description' =>		'      db:scripts.description |required',
-			'host_access' =>		'fatal|db:scripts.host_access |required|in_int:0,1,2,3',
-			'groupid' =>			'fatal|db:scripts.groupid     |required_if:hgstype,1',
-			'usrgrpid' =>			'fatal|db:scripts.usrgrpid    |required',
-			'hgstype' =>			'fatal|                        required|in_int:0,1',
-			'confirmation' =>		'      db:scripts.confirmation|required_if:enable_confirmation,1|not_empty',
-			'enable_confirmation' =>'fatal|in_int:1'
+			'scriptid' =>			'db scripts.scriptid    |required|fatal',
+			'name' =>				'db scripts.name        |not_empty',
+			'type' =>				'db scripts.type        |in 0,1',
+			'execute_on' =>			'db scripts.execute_on  |in 0,1',
+			'command' =>			'db scripts.command',
+			'commandipmi' =>		'db scripts.command',
+			'description' =>		'db scripts.description',
+			'host_access' =>		'db scripts.host_access |in 0,1,2,3',
+			'groupid' =>			'db scripts.groupid',
+			'usrgrpid' =>			'db scripts.usrgrpid',
+			'hgstype' =>			'                        in 0,1',
+			'confirmation' =>		'db scripts.confirmation|not_empty',
+			'enable_confirmation' =>'in 1'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -58,34 +57,25 @@ class CControllerScriptUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			return false;
-		}
-
-		$scripts = API::Script()->get(array(
+		return (bool) API::Script()->get(array(
+			'output' => array(),
 			'scriptids' => $this->getInput('scriptid'),
-			'output' => array()
+			'editable' => true
 		));
-		if (!$scripts) {
-			return false;
-		}
-
-		return true;
 	}
 
 	protected function doAction() {
-		$script = array(
-			'scriptid' => $this->getInput('scriptid'),
-			'name' => $this->getInput('name'),
-			'type' => $this->getInput('type'),
-			'execute_on' => $this->getInput('execute_on'),
-			'command' =>  ($this->getInput('type') == ZBX_SCRIPT_TYPE_IPMI) ? $this->getInput('commandipmi') : $this->getInput('command'),
-			'description' => $this->getInput('description'),
-			'usrgrpid' => $this->getInput('usrgrpid'),
-			'groupid' => ($this->getInput('hgstype') == 0) ? 0 : $this->getInput('groupid'),
-			'host_access' => $this->getInput('host_access'),
-			'confirmation' => $this->getInput('confirmation', '')
-		);
+		$script = array();
+
+		$this->getInputs($script, array('scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid', 'groupid', 'host_access', 'confirmation'));
+
+		if ($this->getInput('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) == ZBX_SCRIPT_TYPE_IPMI && $this->hasInput('commandipmi')) {
+			$script['command'] = $this->getInput('commandipmi');
+		}
+
+		if ($this->getInput('hgstype', 1) == 0) {
+			$script['groupid'] = 0;
+		}
 
 		DBstart();
 

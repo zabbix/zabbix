@@ -18,24 +18,23 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CControllerScriptFormEdit extends CController {
+class CControllerScriptEdit extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'form' =>				'fatal|in_int:1',
-			'scriptid' =>			'fatal|db:scripts.scriptid    |required',
-			'name' =>				'fatal|db:scripts.name        |required_if:form,1',
-			'type' =>				'fatal|db:scripts.type        |required_if:form,1|in_int:0,1',
-			'execute_on' =>			'fatal|db:scripts.execute_on  |required_if:form,1|required_if:type,'.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.'|in_int:0,1',
-			'command' =>			'fatal|db:scripts.command     |required_if:form,1',
-			'commandipmi' =>		'fatal|db:scripts.command     |required_if:form,1',
-			'description' =>		'fatal|db:scripts.description |required_if:form,1',
-			'host_access' =>		'fatal|db:scripts.host_access |required_if:form,1|in_int:2,3',
-			'groupid' =>			'fatal|db:scripts.groupid     |required_if:hgstype,1',
-			'usrgrpid' =>			'fatal|db:scripts.usrgrpid    |required_if:form,1',
-			'hgstype' =>			'fatal|                        required_if:form,1|in_int:0,1',
-			'confirmation' =>		'fatal|db:scripts.confirmation|required_if:enable_confirmation,1',
-			'enable_confirmation' =>'fatal|in_int:1'
+			'scriptid' =>			'db scripts.scriptid',
+			'name' =>				'db scripts.name',
+			'type' =>				'db scripts.type        |in 0,1',
+			'execute_on' =>			'db scripts.execute_on  |in 0,1',
+			'command' =>			'db scripts.command',
+			'commandipmi' =>		'db scripts.command',
+			'description' =>		'db scripts.description',
+			'host_access' =>		'db scripts.host_access |in 2,3',
+			'groupid' =>			'db scripts.groupid',
+			'usrgrpid' =>			'db scripts.usrgrpid',
+			'hgstype' =>			'                        in 0,1',
+			'confirmation' =>		'db scripts.confirmation',
+			'enable_confirmation' =>'                        in 1'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -47,42 +46,39 @@ class CControllerScriptFormEdit extends CController {
 		return $ret;
 	}
 
-
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			return false;
+		if ($this->hasInput('scriptid')) {
+			return (bool)API::Script()->get(array(
+				'output' => array(),
+				'scriptids' => $this->getInput('scriptid'),
+				'editable' => true
+			));
 		}
-
-		$scripts = API::Script()->get(array(
-			'output' => array(),
-			'scriptids' => $this->getInput('scriptid')
-		));
-		if (!$scripts) {
-			return false;
+		else {
+			return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 		}
-
-		return true;
 	}
 
 	protected function doAction() {
-		if ($this->hasInput('form')) {
-			$data = array(
-				'scriptid' => $this->getInput('scriptid'),
-				'name' => $this->getInput('name'),
-				'type' => $this->getInput('type'),
-				'execute_on' => $this->getInput('execute_on'),
-				'command' => $this->getInput('command'),
-				'commandipmi' => $this->getInput('commandipmi'),
-				'description' => $this->getInput('description'),
-				'usrgrpid' => $this->getInput('usrgrpid'),
-				'groupid' => $this->getInput('groupid'),
-				'host_access' => $this->getInput('host_access'),
-				'confirmation' => $this->getInput('confirmation'),
-				'enable_confirmation' => $this->getInput('enable_confirmation'),
-				'hgstype' => $this->getInput('groupid') != 0 ? 1 : 0
-			);
-		}
-		else {
+		// default values
+		$data = array(
+			'scriptid' => 0,
+			'name' => '',
+			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+			'execute_on' => 0,
+			'command' => '',
+			'commandipmi' => '',
+			'description' => '',
+			'usrgrpid' => 0,
+			'groupid' => 0,
+			'host_access' => 0,
+			'confirmation' => '',
+			'enable_confirmation' => 0,
+			'hgstype' => 0
+		);
+
+		// get values from the dabatase
+		if ($this->hasInput('scriptid')) {
 			$scripts = API::Script()->get(array(
 				'output' => array('scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid', 'groupid', 'host_access', 'confirmation'),
 				'scriptids' => $this->getInput('scriptid')
@@ -105,6 +101,22 @@ class CControllerScriptFormEdit extends CController {
 				'hgstype' => $script['groupid'] != 0 ? 1 : 0
 			);
 		}
+
+		// overwrite with input variables
+		$this->getInputs($data, array(
+			'name',
+			'type',
+			'execute_on',
+			'command',
+			'commandipmi',
+			'description',
+			'usrgrpid',
+			'groupid',
+			'host_access',
+			'confirmation',
+			'enable_confirmation',
+			'hgstype'
+		));
 
 		// get host group
 		if ($data['groupid'] == 0) {

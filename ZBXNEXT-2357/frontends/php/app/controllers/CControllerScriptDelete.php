@@ -22,7 +22,7 @@ class CControllerScriptDelete extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'scriptid' =>		'fatal|db:scripts.scriptid|required'
+			'scriptids' =>		'fatal|array_db scripts.scriptid|required'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -31,32 +31,28 @@ class CControllerScriptDelete extends CController {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
-
 		return $ret;
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			return false;
-		}
-
 		$scripts = API::Script()->get(array(
-			'scriptids' => $this->getInput('scriptid'),
-			'output' => array()
+			'countOutput' => true,
+			'scriptids' => $this->getInput('scriptids'),
+			'editable' => true
 		));
-		if (!$scripts) {
-			return false;
-		}
 
-		return true;
+		return ($scripts == count($this->getInput('scriptids')));
 	}
 
 	protected function doAction() {
 		DBstart();
 
-		$result = API::Script()->delete(array($this->getInput('scriptid')));
+		$result = API::Script()->delete($this->getInput('scriptids'));
+
 		if ($result) {
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, _('Script').' ['.$this->getInput('scriptid').']');
+			foreach ($this->getInput('scriptids') as $scriptid) {
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, _('Script').' ['.$scriptid.']');
+			}
 		}
 
 		$result = DBend($result);
@@ -69,6 +65,7 @@ class CControllerScriptDelete extends CController {
 		else {
 			$response->setMessageError(_('Cannot delete script'));
 		}
+
 		$this->setResponse($response);
 	}
 }

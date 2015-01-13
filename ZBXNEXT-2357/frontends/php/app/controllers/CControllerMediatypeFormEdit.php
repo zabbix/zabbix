@@ -20,22 +20,21 @@
 
 class CControllerMediatypeFormEdit extends CController {
 
-	private $mediatype;
+	private $mediatype = array();
 
 	protected function checkInput() {
 		$fields = array(
-			'form' =>				'fatal|in_int:1',
-			'mediatypeid' =>		'fatal|db:media_type.mediatypeid|required',
-			'type' =>				'fatal|db:media_type.type       |required_if:form,1|in:'.implode(',', array_keys(media_type2str())),
-			'description' =>		'fatal|db:media_type.description|required_if:form,1',
-			'smtp_server' =>		'fatal|db:media_type.smtp_server|required_if:form,1|required_if:type,'.MEDIA_TYPE_EMAIL,
-			'smtp_helo' =>			'fatal|db:media_type.smtp_helo  |required_if:form,1|required_if:type,'.MEDIA_TYPE_EMAIL,
-			'smtp_email' =>			'fatal|db:media_type.smtp_email |required_if:form,1|required_if:type,'.MEDIA_TYPE_EMAIL,
-			'exec_path' =>			'fatal|db:media_type.exec_path  |required_if:form,1|required_if:type,'.MEDIA_TYPE_EXEC.','.MEDIA_TYPE_EZ_TEXTING,
-			'gsm_modem' =>			'fatal|db:media_type.gsm_modem  |required_if:form,1|required_if:type,'.MEDIA_TYPE_SMS,
-			'username' =>			'fatal|db:media_type.username   |required_if:form,1|required_if:type,'.MEDIA_TYPE_JABBER.','.MEDIA_TYPE_EZ_TEXTING,
-			'passwd' =>				'fatal|db:media_type.passwd     |required_if:form,1|required_if:type,'.MEDIA_TYPE_JABBER.','.MEDIA_TYPE_EZ_TEXTING,
-			'status' =>				'fatal|db:media_type.status     |required_if:form,1|in:'.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED
+			'mediatypeid' =>		'db media_type.mediatypeid',
+			'type' =>				'db media_type.type       |in '.implode(',', array_keys(media_type2str())),
+			'description' =>		'db media_type.description',
+			'smtp_server' =>		'db media_type.smtp_server',
+			'smtp_helo' =>			'db media_type.smtp_helo',
+			'smtp_email' =>			'db media_type.smtp_email',
+			'exec_path' =>			'db media_type.exec_path',
+			'gsm_modem' =>			'db media_type.gsm_modem',
+			'username' =>			'db media_type.username',
+			'passwd' =>				'db media_type.passwd',
+			'status' =>				'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED
 		);
 
 		$ret = $this->validateInput($fields);
@@ -48,41 +47,45 @@ class CControllerMediatypeFormEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			return false;
+		if ($this->hasInput('mediatypeid')) {
+			$mediatypes = API::Mediatype()->get(array(
+				'output' => array('mediatypeid','type','description','smtp_server','smtp_helo','smtp_email','exec_path','gsm_modem','username','passwd','status'),
+				'mediatypeids' => $this->getInput('mediatypeid'),
+				'editable' => true
+			));
+
+			if (!$mediatypes) {
+				return false;
+			}
+
+			$this->mediatype = $mediatypes[0];
+
+			return true;
 		}
-
-		$mediatypes = API::Mediatype()->get(array(
-			'mediatypeids' => $this->getInput('mediatypeid'),
-			'output' => array('mediatypeid','type','description','smtp_server','smtp_helo','smtp_email','exec_path','gsm_modem','username','passwd','status')
-		));
-
-		if (!$mediatypes) {
-			return false;
+		else {
+			return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 		}
-
-		$this->mediatype = $mediatypes[0];
-
-		return true;
 	}
 
 	protected function doAction() {
-		if ($this->hasInput('form')) {
-			$data = array(
-				'mediatypeid' => $this->getInput('mediatypeid'),
-				'type' => $this->getInput('type'),
-				'description' => $this->getInput('description'),
-				'smtp_server' => $this->getInput('smtp_server'),
-				'smtp_helo' => $this->getInput('smtp_helo'),
-				'smtp_email' => $this->getInput('smtp_email'),
-				'exec_path' => $this->getInput('exec_path'),
-				'gsm_modem' => $this->getInput('gsm_modem'),
-				'username' => $this->getInput('username'),
-				'passwd' => $this->getInput('passwd'),
-				'status' => $this->getInput('status')
-			);
-		}
-		else {
+		// default values
+		$data = array(
+			'mediatypeid' => 0,
+			'type' => MEDIA_TYPE_EMAIL,
+			'description' => '',
+			'smtp_server' => 'localhost',
+			'smtp_helo' => 'localhost',
+			'smtp_email' => 'zabbix@localhost',
+			'exec_path' => '',
+			'gsm_modem' => '/dev/ttyS0',
+			'jabber_username' => 'user@server',
+			'eztext_username' => '',
+			'passwd' => '',
+			'status' => MEDIA_TYPE_STATUS_ACTIVE
+		);
+
+		// get values from the dabatase
+		if ($this->hasInput('mediatypeid')) {
 			$data = array(
 				'mediatypeid' => $this->mediatype['mediatypeid'],
 				'type' => $this->mediatype['type'],
@@ -97,6 +100,20 @@ class CControllerMediatypeFormEdit extends CController {
 				'status' => $this->mediatype['status']
 			);
 		}
+
+		// overwrite with input variables
+		$this->getInputs($data, array(
+			'type',
+			'description',
+			'smtp_server',
+			'smtp_helo',
+			'smtp_email',
+			'exec_path',
+			'gsm_modem',
+			'username',
+			'passwd',
+			'status'
+		));
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));
