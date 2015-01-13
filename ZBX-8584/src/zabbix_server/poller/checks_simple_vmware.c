@@ -179,7 +179,6 @@ out:
 	return cluster;
 }
 
-
 static int	vmware_counter_get(const char *stats, const char *instance, zbx_uint64_t counterid, int coeff,
 		AGENT_RESULT *result)
 {
@@ -334,6 +333,7 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
 				if (0 < (t = mktime(&tm)))
 					log->timestamp = (int)t + tz_offset;
 			}
+
 			zbx_free(value);
 		}
 	}

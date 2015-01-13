@@ -1135,11 +1135,11 @@ out:
 static int	 vmware_service_hv_get_stats (const zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_vmware_hv_t *hv, char **error)
 {
-	const char		*__function_name = "vmware_service_hv_get_stats";
+	const char	*__function_name = "vmware_service_hv_get_stats";
 
-	int			err, opt, ret = FAIL, refresh_rate;
-	char			*tmp = NULL;
-	size_t			tmp_alloc = 0, tmp_offset = 0;
+	int		err, opt, ret = FAIL, refresh_rate;
+	char		*tmp = NULL;
+	size_t		tmp_alloc = 0, tmp_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2157,8 +2157,8 @@ out:
  *                                                                            *
  * Parameters: service        - [IN] the vmware service                       *
  *             easyhandle     - [IN] the CURL handle                          *
- *             event_session  - [OUT] event session (EventHistoryCollector)   *
- *                                    identifier                              *
+ *             event_session  - [IN] event session (EventHistoryCollector)    *
+ *                                   identifier                               *
  *             error          - [OUT] the error message in the case of failure*
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
@@ -2281,7 +2281,6 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 end_session:
 	if (SUCCEED != vmware_service_destroy_event_session(service, easyhandle, event_session, error))
 		ret = FAIL;
-
 out:
 	zbx_free(event_session);
 
@@ -2654,7 +2653,7 @@ out:
  ******************************************************************************/
 static void	vmware_service_update(zbx_vmware_service_t *service)
 {
-	const char	*__function_name = "vmware_service_update";
+	const char		*__function_name = "vmware_service_update";
 
 	CURL			*easyhandle = NULL;
 	struct curl_slist	*headers = NULL;
