@@ -1834,7 +1834,7 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 		goto exit;
 	}
 
-	if (0 != (ZBX_FLAG_DISCOVERY_RULE & items[j].flags))
+	if (0 != (ZBX_FLAG_DISCOVERY_RULE & items[j].flags) || 0 == strncmp(items[j].snmp_oid, "discovery[", 10))
 	{
 		int	max_vars;
 
