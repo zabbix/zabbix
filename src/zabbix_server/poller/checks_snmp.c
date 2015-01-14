@@ -1345,13 +1345,16 @@ zbx_snmp_dobject_t;
 typedef struct
 {
 	/* the index of OID being currently processed (walked) */
-	int		num;
+	int			num;
 
 	/* the discovered SNMP objects */
-	zbx_hashset_t	objects;
+	zbx_hashset_t		objects;
+
+	/* the index (order) of discovered SNMP objects */
+	zbx_vector_ptr_t	index;
 
 	/* request data structure used to parse discovery OID key */
-	AGENT_REQUEST	request;
+	AGENT_REQUEST		request;
 }
 zbx_snmp_ddata_t;
 
@@ -1433,6 +1436,7 @@ static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *er
 	}
 
 	zbx_hashset_create(&data->objects, 10, zbx_snmp_dobject_hash, zbx_snmp_dobject_compare);
+	zbx_vector_ptr_create(&data->index);
 
 	ret = SUCCEED;
 out:
@@ -1457,6 +1461,8 @@ static void	zbx_snmp_ddata_clean(zbx_snmp_ddata_t *data)
 	int			i;
 	zbx_hashset_iter_t	iter;
 	zbx_snmp_dobject_t	*obj;
+
+	zbx_vector_ptr_destroy(&data->index);
 
 	zbx_hashset_iter_reset(&data->objects, &iter);
 	while (NULL != (obj = zbx_hashset_iter_next(&iter)))
@@ -1487,6 +1493,7 @@ static void	zbx_snmp_walk_discovery_cb(void *arg, const char *OID, const char *i
 		memset(new_obj.values, 0, sizeof(char *) * data->request.nparam / 2);
 
 		obj = zbx_hashset_insert(&data->objects, &new_obj, sizeof(new_obj));
+		zbx_vector_ptr_append(&data->index, obj);
 	}
 
 	obj->values[data->num] = zbx_strdup(NULL, value);
@@ -1497,7 +1504,7 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 {
 	const char	*__function_name = "zbx_snmp_process_discovery";
 
-	int			i, ret;
+	int			i, j, ret;
 	char			oid_translated[ITEM_SNMP_OID_LEN_MAX];
 	struct zbx_json		js;
 	zbx_snmp_ddata_t	data;
@@ -1525,17 +1532,19 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 
 	zbx_hashset_iter_reset(&data.objects, &iter);
 
-	while (NULL != (obj = zbx_hashset_iter_next(&iter)))
+	for (i = 0; i < data.index.values_num; i++)
 	{
+		obj = (zbx_snmp_dobject_t *)data.index.values[i];
+
 		zbx_json_addobject(&js, NULL);
 		zbx_json_addstring(&js, "{#SNMPINDEX}", obj->index, ZBX_JSON_TYPE_STRING);
 
-		for (i = 0; i < data.request.nparam / 2; i++)
+		for (j = 0; j < data.request.nparam / 2; j++)
 		{
-			if (NULL == obj->values[i])
+			if (NULL == obj->values[j])
 				continue;
 
-			zbx_json_addstring(&js, data.request.params[i * 2], obj->values[i], ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&js, data.request.params[j * 2], obj->values[j], ZBX_JSON_TYPE_STRING);
 		}
 		zbx_json_close(&js);
 	}
