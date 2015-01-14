@@ -200,8 +200,10 @@ $fields = array(
 );
 
 // unset disabled item types
-$allowed_item_types = array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_SNMPTRAP);
-if (isset($_REQUEST['itemtype']) && !str_in_array($_REQUEST['itemtype'], $allowed_item_types)) {
+$allowedItemTypes = array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
+	ITEM_TYPE_AGGREGATE, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DB_MONITOR
+);
+if (hasRequest('itemtype') && !str_in_array(getRequest('itemtype'), $allowedItemTypes)) {
 	unset($_REQUEST['itemtype']);
 }
 
@@ -488,7 +490,7 @@ else {
 		$itemType = getRequest('itemtype', 0);
 		$cmbTypes = new CComboBox('itemtype', $itemType, 'javascript: submit();');
 
-		foreach ($allowed_item_types as $type) {
+		foreach ($allowedItemTypes as $type) {
 			$cmbTypes->addItem($type, item_type2str($type));
 		}
 

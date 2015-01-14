@@ -280,8 +280,23 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			// item key
-			if (($fullItem['type'] == ITEM_TYPE_DB_MONITOR && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_DB_MONITOR) == 0)
-					|| ($fullItem['type'] == ITEM_TYPE_SSH && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_SSH) == 0)
+			if ($fullItem['type'] == ITEM_TYPE_DB_MONITOR) {
+				if (!isset($fullItem['flags']) || $fullItem['flags'] != ZBX_FLAG_DISCOVERY_RULE) {
+					if (strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_DB_MONITOR) == 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Check the key, please. Default example was passed.')
+						);
+					}
+				}
+				elseif ($fullItem['flags'] == ZBX_FLAG_DISCOVERY_RULE) {
+					if (strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY) == 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_('Check the key, please. Default example was passed.')
+						);
+					}
+				}
+			}
+			elseif (($fullItem['type'] == ITEM_TYPE_SSH && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_SSH) == 0)
 					|| ($fullItem['type'] == ITEM_TYPE_TELNET && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_TELNET) == 0)
 					|| ($fullItem['type'] == ITEM_TYPE_JMX && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_JMX) == 0)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Check the key, please. Default example was passed.'));
