@@ -51,11 +51,14 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 	int		ret = SUCCEED;
 	ssize_t		received_len;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s'",
-			__function_name, item->host.host, item->interface.addr, item->key);
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:%u", __function_name,
+			item->host.host, item->interface.addr, item->key, (unsigned int)item->host.tls_connect);
+	}
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
-			ZBX_TCP_SEC_UNENCRYPTED)))
+			item->host.tls_connect)))
 	{
 		zbx_snprintf(buffer, sizeof(buffer), "%s\n", item->key);
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buffer);
@@ -108,6 +111,8 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		ret = NETWORK_ERROR;
 	}
 	zbx_tcp_close(&s);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
 }
