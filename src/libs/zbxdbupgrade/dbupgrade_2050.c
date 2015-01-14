@@ -21,6 +21,7 @@
 #include "db.h"
 #include "zbxdbupgrade.h"
 #include "dbupgrade.h"
+#include "sysinfo.h"
 
 /*
  * 3.0 maintenance database patches
@@ -37,14 +38,47 @@ static int	DBpatch_2050000(void)
 
 static int	DBpatch_2050001(void)
 {
-	if (ZBX_DB_OK > DBexecute("update items set snmp_oid=concat(concat('discovery[{#SNMPVALUE},',snmp_oid),']')"
-			" where flags=%d and type in (%d,%d,%d)", ZBX_FLAG_DISCOVERY_RULE,
-			ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3))
-	{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*oid = NULL;
+	size_t		oid_alloc = 0, oid_offset = 0;
+	int		ret = FAIL, rc;
+
+	/* select itemid, snmp_oid                                               */
+	/*   from items where                                                    */
+	/*   where flags=ZBX_FLAG_DISCOVERY_RULE                                 */
+	/*   and type in (ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3) */
+	if (NULL == (result = DBselect("select itemid,snmp_oid from items where flags=1 and type in (1,4,6)")))
 		return FAIL;
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char	*param, *oid_esc;
+
+		param = zbx_strdup(NULL, row[1]);
+		quote_key_param(&param, 0);
+
+		zbx_snprintf_alloc(&oid, &oid_alloc, &oid_offset, "discovery[{#SNMPVALUE},%s]", param);
+
+		oid_esc = DBdyn_escape_string(oid);
+
+		rc = DBexecute("update items set snmp_oid='%s' where itemid=%s", oid_esc, row[0]);
+
+		zbx_free(oid_esc);
+		zbx_free(param);
+
+		if (ZBX_DB_OK > rc)
+			goto out;
+
+		oid_offset = 0;
 	}
 
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+	zbx_free(oid);
+
+	return ret;
 }
 
 #endif
