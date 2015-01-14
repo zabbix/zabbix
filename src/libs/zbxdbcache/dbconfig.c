@@ -252,6 +252,12 @@ typedef struct
 	unsigned char	ipmi_available;
 	unsigned char	jmx_available;
 	unsigned char	status;
+	unsigned char	tls_connect;
+	unsigned char	tls_accept;
+	const char	*tls_issuer;
+	const char	*tls_subject;
+	const char	*tls_psk_identity;
+	const char	*tls_psk;
 }
 ZBX_DC_HOST;
 
@@ -1060,6 +1066,10 @@ static void	DCsync_hosts(DB_RESULT result)
 		host->proxy_hostid = proxy_hostid;
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
+		DCstrpool_replace(found, &host->tls_issuer, row[26]);
+		DCstrpool_replace(found, &host->tls_subject, row[27]);
+		DCstrpool_replace(found, &host->tls_psk_identity, row[28]);
+		DCstrpool_replace(found, &host->tls_psk, row[29]);
 
 		if (0 == found)
 		{
@@ -1080,6 +1090,8 @@ static void	DCsync_hosts(DB_RESULT result)
 			host->jmx_errors_from = atoi(row[19]);
 			host->jmx_available = (unsigned char)atoi(row[20]);
 			host->jmx_disable_until = atoi(row[21]);
+			host->tls_connect = (unsigned char)atoi(row[24]);
+			host->tls_accept = (unsigned char)atoi(row[25]);
 		}
 		else
 		{
@@ -1213,6 +1225,10 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		zbx_strpool_release(host->host);
 		zbx_strpool_release(host->name);
+		zbx_strpool_release(host->tls_issuer);
+		zbx_strpool_release(host->tls_subject);
+		zbx_strpool_release(host->tls_psk_identity);
+		zbx_strpool_release(host->tls_psk);
 
 		zbx_hashset_iter_remove(&iter);
 	}
@@ -2906,7 +2922,7 @@ void	DCsync_configuration(void)
 				"errors_from,available,disable_until,snmp_errors_from,"
 				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
 				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
-				"status,name"
+				"status,name,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk"
 			" from hosts"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
@@ -3754,6 +3770,12 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	dst_host->jmx_available = src_host->jmx_available;
 	dst_host->jmx_disable_until = src_host->jmx_disable_until;
 	dst_host->status = src_host->status;
+	dst_host->tls_connect = src_host->tls_connect;
+	dst_host->tls_accept = src_host->tls_accept;
+	strscpy(dst_host->tls_issuer, src_host->tls_issuer);
+	strscpy(dst_host->tls_subject, src_host->tls_subject);
+	strscpy(dst_host->tls_psk_identity, src_host->tls_psk_identity);
+	strscpy(dst_host->tls_psk, src_host->tls_psk);
 
 	if (NULL != (ipmihost = zbx_hashset_search(&config->ipmihosts, &src_host->hostid)))
 	{
