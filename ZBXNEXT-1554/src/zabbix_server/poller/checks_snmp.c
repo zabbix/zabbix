@@ -1390,6 +1390,8 @@ static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *er
 {
 	int	i, j, ret = CONFIG_ERROR;
 
+	init_request(&data->request);
+
 	if (SUCCEED != parse_item_key(key, &data->request))
 	{
 		zbx_strlcpy(error, "Invalid SNMP OID: cannot parse expression.", max_error_len);
@@ -1541,6 +1543,8 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 	zbx_json_close(&js);
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, js.buffer));
+
+	zbx_json_free(&js);
 clean:
 	zbx_snmp_ddata_clean(&data);
 out:
