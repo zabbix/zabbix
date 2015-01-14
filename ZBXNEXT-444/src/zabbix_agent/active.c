@@ -170,7 +170,8 @@ static int	get_min_nextcheck(void)
 	return min;
 }
 
-static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime)
+static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime,
+		unsigned char state)
 {
 	const char		*__function_name = "add_check";
 	ZBX_ACTIVE_METRIC	*metric;
@@ -194,6 +195,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			metric->key = zbx_strdup(NULL, key);
 			metric->lastlogsize = lastlogsize;
 			metric->mtime = mtime;
+			metric->state = state;
 			metric->big_rec = 0;
 			metric->use_ino = 0;
 			metric->error_count = 0;
@@ -233,7 +235,8 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	metric->refresh_unsupported = 0;
 	metric->lastlogsize = lastlogsize;
 	metric->mtime = mtime;
-	/* can skip existing log[] and eventlog[] data */
+	metric->state = state;
+	/* existing log[] and eventlog[] data can be skipped */
 	metric->skip_old_data = (0 != metric->lastlogsize ? 0 : 1);
 	metric->big_rec = 0;
 	metric->use_ino = 0;
@@ -280,6 +283,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	ZBX_ACTIVE_METRIC	*metric;
 	zbx_vector_str_t	received_metrics;
 	int			delay, mtime, expression_type, case_sensitive, i, j, ret = FAIL;
+	unsigned char		state;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -358,7 +362,12 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		else
 			mtime = atoi(tmp);
 
-		add_check(name, key_orig, delay, lastlogsize, mtime);
+		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATE, tmp, sizeof(tmp)) || '\0' == *tmp)
+			state = 0;
+		else
+			state = atoi(tmp);
+
+		add_check(name, key_orig, delay, lastlogsize, mtime, state);
 
 		/* remember what was received */
 		zbx_vector_str_append(&received_metrics, zbx_strdup(NULL, key_orig));
