@@ -1478,17 +1478,17 @@ class CHost extends CHostGeneral {
 		$this->checkInput($hosts, __FUNCTION__);
 
 		foreach ($hosts as $host) {
-			$hostid = DB::insert('hosts', array($host));
-			$hostids[] = $hostid = reset($hostid);
+			$hostId = DB::insert('hosts', array($host));
+			$hostId = reset($hostId);
 
-			$host['hostid'] = $hostid;
+			$host['hostid'] = $hostId;
 
 			// save groups
 			// groups must be added before calling massAdd() for permission validation to work
 			$groupsToAdd = array();
 			foreach ($host['groups'] as $group) {
 				$groupsToAdd[] = array(
-					'hostid' => $hostid,
+					'hostid' => $hostId,
 					'groupid' => $group['groupid']
 				);
 			}
@@ -1515,19 +1515,17 @@ class CHost extends CHostGeneral {
 			}
 
 			if (isset($host['inventory']) && !empty($host['inventory'])) {
-				$fields = array_keys($host['inventory']);
-				$fields[] = 'inventory_mode';
-				$fields = implode(', ', $fields);
+				$hostInventory = $host['inventory'];
+				$hostInventory['hostid'] = $hostId;
+				$hostInventory['inventory_mode'] = isset($host['inventory_mode'])
+					? $host['inventory_mode']
+					: HOST_INVENTORY_MANUAL;
 
-				$values = array_map('zbx_dbstr', $host['inventory']);
-				$values[] = isset($host['inventory_mode']) ? $host['inventory_mode'] : HOST_INVENTORY_MANUAL;
-				$values = implode(', ', $values);
-
-				DBexecute('INSERT INTO host_inventory (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
+				DB::insert('host_inventory', array($hostInventory));
 			}
 		}
 
-		return array('hostids' => $hostids);
+		return array('hostids' => array($hostId));
 	}
 
 	/**
