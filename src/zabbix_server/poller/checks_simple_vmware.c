@@ -316,16 +316,16 @@ int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT
 
 			{
 				int		tz_offset;
-	#if defined(HAVE_TM_TM_GMTOFF)
+#if defined(HAVE_TM_TM_GMTOFF)
 				struct tm	*ptm;
 				time_t		now;
 
 				now = time(NULL);
 				ptm = localtime(&now);
 				tz_offset = ptm->tm_gmtoff;
-	#else
+#else
 				tz_offset = -timezone;
-	#endif
+#endif
 				tm.tm_year -= 1900;
 				tm.tm_mon--;
 				tm.tm_isdst = -1;
