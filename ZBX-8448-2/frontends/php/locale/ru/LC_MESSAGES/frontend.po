@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-02 03:57+0200\n"
+"POT-Creation-Date: 2014-12-30 05:43+0200\n"
 "PO-Revision-Date: 2014-11-03 10:13+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -8840,6 +8840,7 @@ msgstr "Маска"
 #: hosts.php:1016 include/views/configuration.item.list.php:281
 #: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.triggers.list.php:278
+#: include/views/configuration.triggers.massupdate.php:146
 msgid "Mass update"
 msgstr "Массовое обновление"
 
@@ -10386,11 +10387,11 @@ msgstr "Количество наблюдаемых узлов сети"
 msgid "Number of processes. <name> and <user> same as in proc.mem item. <state> all (default), run, sleep, zomb. <cmdline> filter by command line (supports regex). Example: proc.num[apache2,www-data]. On Windows, only <name> and <user> are supported."
 msgstr "Количество процессов. <имя> и <пользователь> такие же как и в proc.mem элементе данных. <состояние> all (по умолчаниб), run, sleep, zomb. <cmdline> фильтрация по командной строке (поддерживается regex). Пример: proc.num[apache2,www-data]. На Windows, поддерживаются только  <имя> и <пользователь>."
 
-#: include/classes/items/CHelpItems.php:647
+#: include/classes/items/CHelpItems.php:643
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Количество ядер процессора у VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:651
+#: include/classes/items/CHelpItems.php:647
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Количество потоков процессора у VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста гипервизора VMware"
 
@@ -10487,7 +10488,7 @@ msgstr "Количество значений записанных в табли
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Количество значений записанных в таблице TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:695
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Количество виртуальных машин на VMware гипервизоре, <url> - сервисный  URL VMware, <uuid>  - имя хоста гипервизора VMware"
 
@@ -11722,7 +11723,7 @@ msgid "Replace applications"
 msgstr "Заменить группы элементов данных"
 
 #: include/views/configuration.triggers.massupdate.php:131
-msgid "Replace depenencies"
+msgid "Replace dependencies"
 msgstr "Заменить зависимости"
 
 #: include/views/configuration.host.massupdate.php:66
@@ -14007,10 +14008,6 @@ msgstr "Триггеры удалены"
 msgid "Triggers info"
 msgstr "Информация о триггерах"
 
-#: include/views/configuration.triggers.massupdate.php:146
-msgid "Triggers massupdate"
-msgstr "Массовое обновление триггеров"
-
 #: include/screens.inc.php:43
 msgid "Triggers overview"
 msgstr "Обзор триггеров"
@@ -14739,75 +14736,75 @@ msgstr "Состояние кластера VMware, <url> - VMware сервис�
 msgid "VMware event log, <url> - VMware service URL"
 msgstr "Журнал событий VMware, <url> - VMware сервисный URL"
 
-#: include/classes/items/CHelpItems.php:663
+#: include/classes/items/CHelpItems.php:659
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "BIOS uuid VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:671
+#: include/classes/items/CHelpItems.php:667
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Размер ballooned памяти VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:619
+#: include/classes/items/CHelpItems.php:615
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Имя кластера VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:627
+#: include/classes/items/CHelpItems.php:623
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Статистика чтения с хранилища данных VMware гипервизором, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:631
+#: include/classes/items/CHelpItems.php:627
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Статистика записи с хранилища данных VMware гипервизором, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:659
+#: include/classes/items/CHelpItems.php:655
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Модель VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:635
+#: include/classes/items/CHelpItems.php:631
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Имя VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:675
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Входящая статистика сети VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора, <режим> - bps"
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:679
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Исходящая статистика сети VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора, <режим> - bps"
 
-#: include/classes/items/CHelpItems.php:639
+#: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Частота процессора VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:643
+#: include/classes/items/CHelpItems.php:639
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Модель процессора VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:623
+#: include/classes/items/CHelpItems.php:619
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Использование процессора VMware гипервизора в Гц, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Состояние VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:655
+#: include/classes/items/CHelpItems.php:651
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Полный размер памяти VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Время работы VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:675
+#: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Используемый размер памяти VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:667
+#: include/classes/items/CHelpItems.php:663
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Имя производителя VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Версия VMware гипервизора, <url> - VMware сервисный URL, <uuid> - имя хоста VMware гипервизора"
 
@@ -14815,7 +14812,7 @@ msgstr "Версия VMware гипервизора, <url> - VMware сервис�
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Полное имя сервиса VMware, <url> - VMware сервисный URL"
 
-#: include/classes/items/CHelpItems.php:615
+#: include/classes/items/CHelpItems.php:699
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Версия VMware сервиса, <url> - VMware service URL"
 
