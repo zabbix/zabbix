@@ -1473,14 +1473,14 @@ class CHost extends CHostGeneral {
 	 */
 	public function create($hosts) {
 		$hosts = zbx_toArray($hosts);
-		$hostids = array();
+		$hostIds = array();
 
 		$this->checkInput($hosts, __FUNCTION__);
 
 		foreach ($hosts as $host) {
 			$hostId = DB::insert('hosts', array($host));
 			$hostId = reset($hostId);
-
+			$hostIds[] = $hostId;
 			$host['hostid'] = $hostId;
 
 			// save groups
@@ -1525,7 +1525,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		return array('hostids' => array($hostId));
+		return array('hostids' => $hostIds);
 	}
 
 	/**
