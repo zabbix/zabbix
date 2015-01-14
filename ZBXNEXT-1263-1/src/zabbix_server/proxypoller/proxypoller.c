@@ -43,7 +43,7 @@ static int	connect_to_proxy(DC_PROXY *proxy, zbx_sock_t *sock, int timeout)
 			proxy->port, timeout);
 
 	if (FAIL == (ret = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, proxy->addr, proxy->port, timeout,
-			ZBX_TCP_SEC_NULL)))
+			ZBX_TCP_SEC_UNENCRYPTED)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy \"%s\": %s", proxy->host, zbx_tcp_strerror());
 		ret = NETWORK_ERROR;

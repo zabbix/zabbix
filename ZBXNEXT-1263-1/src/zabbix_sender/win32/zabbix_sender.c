@@ -58,7 +58,8 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	}
 	zbx_json_close(&json);
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&sock, source, address, port, GET_SENDER_TIMEOUT, ZBX_TCP_SEC_NULL)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&sock, source, address, port, GET_SENDER_TIMEOUT,
+			ZBX_TCP_SEC_UNENCRYPTED)))
 	{
 		if (SUCCEED == (ret = zbx_tcp_send(&sock, json.buffer)))
 		{
