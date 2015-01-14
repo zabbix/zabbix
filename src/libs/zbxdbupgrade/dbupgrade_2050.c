@@ -41,19 +41,18 @@ static int	DBpatch_2050001(void)
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*oid = NULL;
-	size_t		oid_alloc = 0, oid_offset = 0;
+	size_t		oid_alloc = 0;
 	int		ret = FAIL, rc;
 
-	/* select itemid, snmp_oid                                               */
-	/*   from items where                                                    */
-	/*   where flags=ZBX_FLAG_DISCOVERY_RULE                                 */
-	/*   and type in (ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3) */
+	/* flags - ZBX_FLAG_DISCOVERY_RULE                               */
+	/* type  - ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3 */
 	if (NULL == (result = DBselect("select itemid,snmp_oid from items where flags=1 and type in (1,4,6)")))
 		return FAIL;
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		char	*param, *oid_esc;
+		size_t	oid_offset = 0;
 
 		param = zbx_strdup(NULL, row[1]);
 		quote_key_param(&param, 0);
@@ -69,8 +68,6 @@ static int	DBpatch_2050001(void)
 
 		if (ZBX_DB_OK > rc)
 			goto out;
-
-		oid_offset = 0;
 	}
 
 	ret = SUCCEED;
