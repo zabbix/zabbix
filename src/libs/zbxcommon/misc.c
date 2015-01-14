@@ -1867,7 +1867,7 @@ double	str2double(const char *str)
  *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-int	is_hostname_char(char c)
+int	is_hostname_char(unsigned char c)
 {
 	if (0 != isalnum(c))
 		return SUCCEED;
@@ -1891,7 +1891,7 @@ int	is_hostname_char(char c)
  *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-int	is_key_char(char c)
+int	is_key_char(unsigned char c)
 {
 	if (0 != isalnum(c))
 		return SUCCEED;
@@ -1915,7 +1915,7 @@ int	is_key_char(char c)
  *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-int	is_function_char(char c)
+int	is_function_char(unsigned char c)
 {
 	if (0 != islower(c))
 		return SUCCEED;
@@ -1936,7 +1936,7 @@ int	is_function_char(char c)
  *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-int	is_macro_char(char c)
+int	is_macro_char(unsigned char c)
 {
 	if (0 != isupper(c))
 		return SUCCEED;
@@ -1948,6 +1948,34 @@ int	is_macro_char(char c)
 		return SUCCEED;
 
 	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_discovery_macro                                               *
+ *                                                                            *
+ * Purpose: checks if the name is a valid discovery macro                     *
+ *                                                                            *
+ * Return value:  SUCCEED - the name is a valid discovery macro               *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	is_discovery_macro(const char *name)
+{
+	if ('{' != *name++ || '#' != *name++)
+		return FAIL;
+
+	do
+	{
+		if (SUCCEED != is_macro_char(*name++))
+			return FAIL;
+
+	} while ('}' != *name);
+
+	if ('\0' != name[1])
+		return FAIL;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
