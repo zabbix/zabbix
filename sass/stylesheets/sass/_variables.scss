@@ -53,31 +53,55 @@ $font-color: #1f2c33; // Navy Black
 $font-alt-color: #696969; // Alt Grey
 $font-white-color: #fff; // Alt White
 
+$font-body-size: 75%; // Default 1em/12px
+$body-line-height: 1.4em;
+
+$font-h1-size: 1.750em; // 21px
+$h1-line-height: 1.2em;
+
+$font-h2-size: 1.500em; // 18px
+$h2-line-height: 1.2em;
+
+$font-h3-size: 0.917em; // 11px
+
+$font-form-size: 1em; // Default 1em/12px 
+
+$font-transform: uppercase;
+
+
+
+// MIXINS
+
+// Fonts
 @mixin font-body {
-	font: 75% $font-stack; // Default 1em/12px
-	line-height: 1.4em;
+	font: $font-body-size $font-stack;
+	line-height: $body-line-height;
 }
 
 @mixin font-h1 {
-	font-size: 1.750em; // 21px
-	line-height: 1.2em;
+	font-size: $font-h1-size;
+	line-height: $h1-line-height;
 }
 
 @mixin font-h2 {
-	font-size: 1.500em; // 18px
-	line-height: 1.2em;
+	font-size: $font-h2-size;
+	line-height: $h2-line-height;
 }
 
 @mixin font-h3 {
-	font-size: 0.917em; // 11px
-	text-transform: uppercase;
+	font-size: $font-h3-size;
+	text-transform: $font-transform;
 	color: $font-alt-color;
 }
 
+@mixin font-form {
+	font: $font-form-size $font-stack;
+}
 
+// Tables
 @mixin list-table-header {
-	font-size: 0.917em; // 11px   
-	text-transform: uppercase;
+	font-size: $font-h3-size;   
+	text-transform: $font-transform;
 }
 
 @mixin list-table-shadow {
@@ -86,21 +110,27 @@ $font-white-color: #fff; // Alt White
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
 }
 
-@mixin button-inset-shadow {
-	-webkit-box-shadow: inset 0 2px 2px 0 rgba(0, 0, 0, 0.20);
-	-moz-box-shadow: inset 0 2px 2px 0 rgba(0, 0, 0, 0.20);
-	box-shadow: inset 0 2px 2px 0 rgba(0, 0, 0, 0.20);
+@mixin inset-shadow {
+	-webkit-box-shadow: inset 0 1px 1px 0 rgba(0, 0, 0, 0.10);
+	-moz-box-shadow: inset 0 1px 1px 0 rgba(0, 0, 0, 0.10);
+	box-shadow: inset 0 1px 1px 0 rgba(0, 0, 0, 0.10);
 }
 
 
-@mixin form-border-radius {
+@mixin border-radius {
 	-webkit-border-radius: 2px;
 	-moz-border-radius: 2px;
 	border-radius: 2px;
 }
 
-@mixin form-top-border-radius {
+@mixin top-border-radius {
 	-webkit-border-radius: 2px 2px 0 0;
 	-moz-border-radius: 2px 2px 0 0;
 	border-radius: 2px 2px 0 0;
+}
+
+@mixin transition {
+	-webkit-transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+	-moz-transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+	transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }

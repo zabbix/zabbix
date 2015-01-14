@@ -40,6 +40,11 @@ h3 {
 	@include font-h3;
 }
 
+sup {
+	font-size: 0.917em;
+	color: $font-alt-color;
+}
+
 /* Main Navigation */
 header {
 	margin: 0 0 12px 0;
@@ -119,7 +124,8 @@ ul.top-nav-icons {
 
 		&:hover {
 			opacity: 1;
-			-ms-filter:"alpha(opacity=100)";	
+			-ms-filter:"alpha(opacity=100)";
+			@include transition;	
 		}
 	}
 
@@ -166,7 +172,7 @@ ul.top-subnav a {
 	}
 
 	&.selected {
-		@include form-border-radius;
+		@include border-radius;
 		background: darken($secondary-color, 10%);
 		color: $link-topsubnav-hover-color;
 	}
@@ -244,7 +250,7 @@ a.logo {
 	height: 25px;
 	margin: 0 auto;
 	margin-bottom: 10px;
-	background: url(../img/icon-sprite.png) no-repeat 0 -312px;
+	background: url(../img/icon-sprite.png) no-repeat 0 -336px;
 }
 
 /* Tables */
@@ -271,6 +277,7 @@ table.list-table {
 	}
 
 	tbody tr {
+		@include transition;
 
 		&:hover {
 			background: lighten($primary-color, 55%);
@@ -294,12 +301,15 @@ div.table-paging {
 	padding: 7px 5px 7px 5px;
 
 	a {
-		@include form-border-radius;
+		@include border-radius;
 		margin: 0 -1px 0 0px;
 		display: inline-block;
-		padding: 3px 10px;
+		padding: 0 14px;
+		min-height: 24px;
+		line-height: 24px;
 		border: 1px solid $form-input-color;
 		text-decoration: none;
+		@include transition;
 
 		&:hover {
 			background: lighten($primary-color, 55%);
@@ -307,13 +317,10 @@ div.table-paging {
 
 		&:active {
 			background: darken($primary-color, 10%);
+			color: $font-white-color;
+			border-color: darken($primary-color, 10%);
 		}
 	}
-}
-
-span.grey-small {
-	font-size: 0.917em;
-	color: $font-alt-color;
 }
 
 /* Filters */
@@ -322,14 +329,41 @@ div.filter {
 }
 
 /* Forms */
-input {
-	@include form-border-radius;
+input[type="text"] {
+	@extend %form-input-style;
+	height: 24px;
+	line-height: 24px;
+	@include transition;
+
+	&:focus {
+		border-color: $primary-color;
+	}
+}
+
+textarea {
+	@extend %form-input-style;
+}
+
+select {
+	@extend %form-input-style;
+	height: 24px;
+}
+
+%form-input-style {
+	@include border-radius;
 	border: 1px solid $form-input-color;
-	padding: 5px;
+	padding: 0 5px;
+	@include font-form;
 }
 
 input [type="checkbox"] {
 	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+ul.top-nav form input {
+	background: $primary-color;
 }
 
 button::-moz-focus-inner {
@@ -338,12 +372,15 @@ button::-moz-focus-inner {
 }
 
 button {
-	@include form-border-radius;
+	@include border-radius;
 	background-color: $primary-color;
 	color: $font-white-color;
 	font-family: $font-stack;
 	border: 1px solid $primary-color;
-	padding: 3px 10px;
+	padding: 0 14px;
+	min-height: 24px;
+	vertical-align: middle;
+	@include transition;
 
 	cursor: pointer;
 	@extend %button-hover-active;
@@ -374,7 +411,7 @@ button {
 	}
 
 	&.filter-trigger {
-		@include form-top-border-radius;
+		@include top-border-radius;
 		min-width: 94px;
 
 		&.filter-active {
@@ -409,10 +446,11 @@ button {
 %button-icon-size {
 	width: 24px;
 	height: 24px;
+	padding: 0;
 }
 
 button[disabled], button[disabled]:hover {
-	background: transparent;
+	background: $form-transparent-color;
 	color: $form-disabled-color;
 	border-color: $form-disabled-color;
 	cursor: default;
@@ -441,7 +479,7 @@ div.action-buttons {
 	background: $alert-green-bg-color;
 	padding: 7px 12px 7px 12px;
 	text-align: center;
-	@include form-border-radius; 
+	@include border-radius; 
 }
 
 .msg-bad {

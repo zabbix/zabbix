@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Zabbix | Hosts</title>
+		<link rel="stylesheet" href="stylesheets/screen.css">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        <link rel="icon" href="img/favicon.ico">
+	</head>
+<body>
+	<header role="banner">
+		<nav role="navigation">
+			<div class="top-nav-container">
+			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text" placeholder="Search"></form></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-print" title="Print"></a></li><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			</div>
+			<div class="top-subnav-container">
+			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
+			</div>
+		</nav>
+		<div class="header-title">
+		<h1>Dashboard</h1>
+		<form>
+		<ul><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul>
+		</form>
+		</div>
+	</header>
+	<article>
+		<ul class="object-group"><li><a href="">All hosts</a></li><li>&rsaquo;</li><li>Zabbix server:</li><li class="green">Enabled</li><li><a href="">Applications</a>&nbsp;<sup>11</sup></li><li><a href="" class="selected">Items</a>&nbsp;<sup>67</sup></li><li><a href="">Triggers</a>&nbsp;<sup>41</sup></li><li><a href="">Graphs</a>&nbsp;<sup>11</sup></li><li><a href="">Discovery rules</a>&nbsp;<sup>2</sup></li><li><a href="">Web scenarios</a></li></ul>
+	<form>
+	<div style="background: #fff">
+	<ul class="tabs"><li>Host</li><li>Templates</li><li>IPMI</li><li>Macros</li><li>Host inventory</li></ul>
+		<table>
+		<tbody>
+			<tr>
+				<td><label for="HostName">Host name</label></td>
+				<td><input type="text" id="HostName"></td>
+			</tr>
+			<tr>
+				<td><label for="VisibleName">Visible name</label></td>
+				<td><input type="text" id="VisibleName"></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><label>Groups</label></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><label for="Groups">New group</label><input type="text" id="Groups"></td>
+			</tr>
+			<tr>
+				<td><label>Agent interfaces</label></td>
+				<td><label for="IpAddress">IP address</label><input type="text" id="IpAddress"><label for="DnsName">DNS name</label><input type="text" id="DnsName"><label>Connect to</label><input type="radio"><input type="radio"><label for="Port">Port</label><input type="text" id="Port"><label>Default</label><input type="radio"><a href="">Add</a></td>
+			</tr>
+			<tr>
+				<td><label>SNMP interfaces</label></td>
+				<td><a href="">Add</a></td>
+			</tr>
+			<tr>
+				<td><label>JMX interfaces</label></td>
+				<td><a href="">Add</a></td>
+			</tr>
+			<tr>
+				<td><label>IPMI interfaces</label></td>
+				<td><a href="">Add</a></td>
+			</tr>
+			<tr>
+				<td><label>Description</label></td>
+				<td><textarea name="" id=""></textarea></td>
+			</tr>
+			<tr>
+				<td><label for="MonitorProxy">Monitores by proxy</label></td>
+				<td><select id="MonitorProxy"><option>(no proxy)</option><option>(no proxy)</option><option>(no proxy)</option></select></td>
+			</tr>
+			<tr>
+				<td><label for="Enabled">Enabled</label></td>
+				<td><input type="checkbox" id="Enabled"></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><button type="button">Update</button><button type="button" class="btn-alt">Clone</button><button type="button" class="btn-alt">Full clone</button><button type="button" class="btn-alt">Delete</button><button type="button" class="btn-alt">Cancel</button></td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+	</form>
+	</article>
+	<footer>
+	<a href="http://www.zabbix.com" target="_blank" class="logo"></a>
+	Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" target="_blank">Zabbix SIA</a>
+	</footer>
+</body>
+</html>
