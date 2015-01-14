@@ -62,8 +62,6 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	int		errcode;
 	AGENT_RESULT	value;
 
-	assert(value_ui64 || value_dbl);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
@@ -140,37 +138,47 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 
 		for (i = first_index; i < last_index; i++)
 		{
-			if (0 == strcmp(items[i].addr, hosts[h].addr))
+			if (0 != strcmp(items[i].addr, hosts[h].addr))
+				continue;
+
+			if (NOTSUPPORTED == ping_result)
 			{
-				switch (items[i].icmpping)
-				{
-					case ICMPPING:
-						value_uint64 = hosts[h].rcv ? 1 : 0;
-						process_value(items[i].itemid, &value_uint64, NULL, ts, ping_result, error);
-						break;
-					case ICMPPINGSEC:
-						switch (items[i].type)
-						{
-							case ICMPPINGSEC_MIN:
-								value_dbl = hosts[h].min;
-								break;
-							case ICMPPINGSEC_MAX:
-								value_dbl = hosts[h].max;
-								break;
-							case ICMPPINGSEC_AVG:
-								value_dbl = hosts[h].avg;
-								break;
-						}
-						process_value(items[i].itemid, NULL, &value_dbl, ts, ping_result, error);
-						break;
-					case ICMPPINGLOSS:
-						if (0 == hosts[h].cnt)
-							value_dbl = 0;
-						else
-							value_dbl = 100 * (1 - (double)hosts[h].rcv / (double)hosts[h].cnt);
-						process_value(items[i].itemid, NULL, &value_dbl, ts, ping_result, error);
-						break;
-				}
+				process_value(items[i].itemid, NULL, NULL, ts, NOTSUPPORTED, error);
+				continue;
+			}
+
+			if (0 == hosts[h].cnt)
+			{
+				process_value(items[i].itemid, NULL, NULL, ts, NOTSUPPORTED,
+						"Cannot send ICMP ping packets to this host.");
+				continue;
+			}
+
+			switch (items[i].icmpping)
+			{
+				case ICMPPING:
+					value_uint64 = (0 != hosts[h].rcv ? 1 : 0);
+					process_value(items[i].itemid, &value_uint64, NULL, ts, SUCCEED, NULL);
+					break;
+				case ICMPPINGSEC:
+					switch (items[i].type)
+					{
+						case ICMPPINGSEC_MIN:
+							value_dbl = hosts[h].min;
+							break;
+						case ICMPPINGSEC_MAX:
+							value_dbl = hosts[h].max;
+							break;
+						case ICMPPINGSEC_AVG:
+							value_dbl = hosts[h].avg;
+							break;
+					}
+					process_value(items[i].itemid, NULL, &value_dbl, ts, SUCCEED, NULL);
+					break;
+				case ICMPPINGLOSS:
+					value_dbl = 100 * (1 - (double)hosts[h].rcv / (double)hosts[h].cnt);
+					process_value(items[i].itemid, NULL, &value_dbl, ts, SUCCEED, NULL);
+					break;
 			}
 		}
 	}
