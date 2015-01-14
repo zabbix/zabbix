@@ -337,7 +337,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 #endif
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port,
-			GET_SENDER_TIMEOUT, ZBX_TCP_SEC_NULL)))
+			GET_SENDER_TIMEOUT, ZBX_TCP_SEC_UNENCRYPTED)))
 	{
 		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sentdval_args->json.buffer)))
 		{

@@ -104,9 +104,8 @@ int     zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, un
 
 #define ZBX_TCP_PROTOCOL	0x01
 
-#define ZBX_TCP_SEC_NULL	1	/* do not use encryption with this socket */
-#define ZBX_TCP_SEC_TLS_OPT	2	/* TLS is optional with this socket (for incoming connections only) */
-#define ZBX_TCP_SEC_TLS_PSK	3	/* use TLS with pre-shared key (PSK) with this socket */
+#define ZBX_TCP_SEC_UNENCRYPTED	1	/* do not use encryption with this socket */
+#define ZBX_TCP_SEC_TLS_PSK	2	/* use TLS with pre-shared key (PSK) with this socket */
 #define ZBX_TCP_SEC_TLS_CERT	4	/* use TLS with certificates with this socket */
 
 #define zbx_tcp_send(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), ZBX_TCP_PROTOCOL, 0)

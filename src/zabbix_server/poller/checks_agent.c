@@ -55,7 +55,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			__function_name, item->host.host, item->interface.addr, item->key);
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
-			ZBX_TCP_SEC_NULL)))
+			ZBX_TCP_SEC_UNENCRYPTED)))
 	{
 		zbx_snprintf(buffer, sizeof(buffer), "%s\n", item->key);
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buffer);
