@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-12 13:12+0200\n"
+"POT-Creation-Date: 2015-01-14 16:51+0200\n"
 "PO-Revision-Date: 2014-02-04 10:36+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: \n"
@@ -585,7 +585,7 @@ msgid "Age less than %s"
 msgstr "Age less than %s"
 
 #: include/items.inc.php:280 include/views/administration.script.list.php:63
-#: include/views/configuration.httpconf.edit.php:90 popup.php:1744
+#: include/views/configuration.httpconf.edit.php:90 popup.php:1746
 msgid "Agent"
 msgstr "Agent"
 
@@ -610,7 +610,7 @@ msgid "Aggregate checks do not require any agent running on a host being monitor
 msgstr ""
 
 #: include/hosts.inc.php:114 include/views/administration.users.edit.php:51
-#: include/views/administration.users.list.php:54 popup.php:593 users.php:44
+#: include/views/administration.users.list.php:54 popup.php:595 users.php:44
 msgid "Alias"
 msgstr "Alias"
 
@@ -716,7 +716,7 @@ msgstr "Application error."
 msgid "Application updated"
 msgstr "Application updated"
 
-#: include/classes/api/services/CItemGeneral.php:404
+#: include/classes/api/services/CItemGeneral.php:419
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Application with ID \"%1$s\" is not available on \"%2$s\"."
@@ -2747,6 +2747,8 @@ msgid "Check the agent usability. Always return 1. Can be used as a TCP ping."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:287
+#: include/classes/api/services/CItemGeneral.php:294
+#: include/classes/api/services/CItemGeneral.php:302
 msgid "Check the key, please. Default example was passed."
 msgstr "Check the key, please. Default example was passed."
 
@@ -2937,8 +2939,8 @@ msgstr "Command cannot be empty."
 #: include/views/administration.script.edit.php:60
 #: include/views/administration.script.list.php:41
 #: include/views/configuration.action.edit.php:838
-#: include/views/configuration.action.edit.php:842 popup.php:1697
-#: popup.php:1704
+#: include/views/configuration.action.edit.php:842 popup.php:1699
+#: popup.php:1706
 msgid "Commands"
 msgstr "Commands"
 
@@ -4278,7 +4280,7 @@ msgstr "Dependent"
 
 #: include/triggers.inc.php:1231
 #: include/views/configuration.services.edit.php:121
-#: include/views/configuration.triggers.list.php:125 popup.php:1032
+#: include/views/configuration.triggers.list.php:125 popup.php:1034
 #: tr_status.php:561
 msgid "Depends on"
 msgstr "Depends on"
@@ -4301,7 +4303,7 @@ msgstr "Deployment status"
 #: include/views/configuration.template.edit.php:175
 #: include/views/configuration.triggers.edit.php:251
 #: include/views/inventory.host.view.php:198
-#: include/views/monitoring.triggerComment.php:39 popup.php:1296
+#: include/views/monitoring.triggerComment.php:39 popup.php:1298
 #: tr_logform.php:221 tr_status.php:299
 msgid "Description"
 msgstr "Description"
@@ -4862,7 +4864,7 @@ msgstr "Element name"
 msgid "Email"
 msgstr "Email"
 
-#: popup.php:516
+#: popup.php:518
 msgid "Empty"
 msgstr "Empty"
 
@@ -5271,8 +5273,8 @@ msgstr ""
 #: include/views/administration.script.edit.php:55
 #: include/views/administration.script.list.php:40
 #: include/views/configuration.action.edit.php:779
-#: include/views/js/configuration.action.edit.js.php:112 popup.php:1696
-#: popup.php:1703
+#: include/views/js/configuration.action.edit.js.php:112 popup.php:1698
+#: popup.php:1705
 msgid "Execute on"
 msgstr "Execute on"
 
@@ -5308,7 +5310,7 @@ msgctxt "maintenance status"
 msgid "Expired"
 msgstr "Expired"
 
-#: include/graphs.inc.php:27 popup.php:1371
+#: include/graphs.inc.php:27 popup.php:1373
 msgid "Exploded"
 msgstr "Exploded"
 
@@ -5931,7 +5933,7 @@ msgstr "Graph sum"
 
 #: include/views/configuration.graph.edit.php:60
 #: include/views/configuration.graph.list.php:80
-#: include/views/monitoring.history.php:249 popup.php:1298 popup.php:1304
+#: include/views/monitoring.history.php:249 popup.php:1300 popup.php:1306
 msgid "Graph type"
 msgstr "Graph type"
 
@@ -6007,7 +6009,7 @@ msgstr "Grid"
 #: include/views/monitoring.overview.items.php:29
 #: include/views/monitoring.overview.triggers.php:31
 #: include/views/monitoring.screen.php:96
-#: include/views/monitoring.slides.php:82 popup.php:483 templates.php:502
+#: include/views/monitoring.slides.php:82 popup.php:485 templates.php:502
 #: tr_status.php:218
 msgid "Group"
 msgstr "Group"
@@ -6304,8 +6306,8 @@ msgstr "Horizontal align"
 #: include/views/monitoring.screen.php:97
 #: include/views/monitoring.slides.php:83
 #: include/views/reports.toptriggers.php:158 items.php:546 items.php:806
-#: items.php:839 jsLoader.php:141 latest.php:444 latest.php:446 popup.php:475
-#: popup.php:501 popup.php:1089 queue.php:248 report2.php:359 report2.php:393
+#: items.php:839 jsLoader.php:141 latest.php:444 latest.php:446 popup.php:477
+#: popup.php:503 popup.php:1091 queue.php:248 report2.php:359 report2.php:393
 #: search.php:131 tr_status.php:219 tr_status.php:297
 #, fuzzy
 msgid "Host"
@@ -7262,7 +7264,7 @@ msgstr "Incorrect arguments passed to method."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Incorrect authentication protocol for discovery rule \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:385
+#: include/classes/api/services/CItemGeneral.php:400
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Incorrect authentication protocol for item \"%1$s\"."
@@ -7387,12 +7389,12 @@ msgstr ""
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:845
+#: include/classes/api/services/CItemGeneral.php:860
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Incorrect flexible interval \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:834
+#: include/classes/api/services/CItemGeneral.php:849
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
@@ -7633,7 +7635,7 @@ msgstr "Incorrect port range."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Incorrect privacy protocol for discovery rule \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:394
+#: include/classes/api/services/CItemGeneral.php:409
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Incorrect privacy protocol for item \"%1$s\"."
@@ -8212,7 +8214,7 @@ msgstr "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Item \"%1$s\" skipped - user rule."
 
-#: include/classes/api/services/CItemGeneral.php:376
+#: include/classes/api/services/CItemGeneral.php:391
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
@@ -8323,36 +8325,36 @@ msgstr "Item uses incorrect interface type."
 msgid "Item values"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:334
+#: include/classes/api/services/CItemGeneral.php:349
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Item will not be refreshed. Please enter a correct update interval."
 
-#: include/classes/api/services/CItemGeneral.php:447
+#: include/classes/api/services/CItemGeneral.php:462
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 
-#: include/classes/api/services/CItemGeneral.php:453
+#: include/classes/api/services/CItemGeneral.php:468
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 
-#: include/classes/api/services/CItemGeneral.php:450
+#: include/classes/api/services/CItemGeneral.php:465
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 
-#: include/classes/api/services/CItemGeneral.php:444
+#: include/classes/api/services/CItemGeneral.php:459
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 
-#: include/classes/api/services/CItemGeneral.php:456
+#: include/classes/api/services/CItemGeneral.php:471
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 
-#: include/classes/api/services/CItemGeneral.php:811
+#: include/classes/api/services/CItemGeneral.php:826
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\"."
@@ -8485,17 +8487,17 @@ msgstr "Keep lost resources period (in days)"
 #: include/views/configuration.item.list.php:67
 #: include/views/configuration.item.prototype.list.php:48
 #: include/views/js/configuration.discovery.edit.js.php:437 items.php:46
-#: popup.php:948 popup.php:1094
+#: popup.php:950 popup.php:1096
 msgid "Key"
 msgstr "Key"
 
-#: include/classes/api/services/CItemGeneral.php:312
+#: include/classes/api/services/CItemGeneral.php:327
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 
 #: include/views/configuration.action.edit.php:825
-#: include/views/js/common.item.edit.js.php:179
+#: include/views/js/common.item.edit.js.php:190
 msgid "Key passphrase"
 msgstr "Key passphrase"
 
@@ -9661,19 +9663,19 @@ msgstr ""
 #: include/views/inventory.host.list.php:75
 #: include/views/js/configuration.sysmaps.js.php:183 items.php:44
 #: latest.php:370 latest.php:451 latest.php:452 maintenance.php:44
-#: maintenance.php:210 maintenance.php:241 popup_httpstep.php:36 popup.php:537
-#: popup.php:660 popup.php:734 popup.php:808 popup.php:883 popup.php:948
-#: popup.php:973 popup.php:1093 popup.php:1223 popup.php:1303 popup.php:1407
-#: popup.php:1410 popup.php:1476 popup.php:1479 popup.php:1539 popup.php:1543
-#: popup.php:1592 popup.php:1619 popup.php:1640 popup.php:1666 popup.php:1695
-#: popup.php:1702 popup_right.php:53 popup_usrgrp.php:89 queue.php:249
+#: maintenance.php:210 maintenance.php:241 popup_httpstep.php:36 popup.php:539
+#: popup.php:662 popup.php:736 popup.php:810 popup.php:885 popup.php:950
+#: popup.php:975 popup.php:1095 popup.php:1225 popup.php:1305 popup.php:1409
+#: popup.php:1412 popup.php:1478 popup.php:1481 popup.php:1541 popup.php:1545
+#: popup.php:1594 popup.php:1621 popup.php:1642 popup.php:1668 popup.php:1697
+#: popup.php:1704 popup_right.php:53 popup_usrgrp.php:89 queue.php:249
 #: report2.php:394 screenconf.php:50 services.php:41 slideconf.php:36
 #: sysmaps.php:48 trigger_prototypes.php:38 triggers.php:41 tr_status.php:298
 msgid "Name"
 msgstr "Name"
 
 #: include/views/administration.users.edit.php:52
-#: include/views/administration.users.list.php:55 popup.php:594 users.php:45
+#: include/views/administration.users.list.php:55 popup.php:596 users.php:45
 msgctxt "user first name"
 msgid "Name"
 msgstr ""
@@ -9880,11 +9882,11 @@ msgstr "No IT services found."
 msgid "No JMX interfaces found."
 msgstr "No JMX interfaces found."
 
-#: include/classes/api/services/CItemGeneral.php:364
+#: include/classes/api/services/CItemGeneral.php:379
 msgid "No SNMP OID specified."
 msgstr "No SNMP OID specified."
 
-#: include/classes/api/services/CItemGeneral.php:370
+#: include/classes/api/services/CItemGeneral.php:385
 msgid "No SNMP community specified."
 msgstr "No SNMP community specified."
 
@@ -9930,7 +9932,7 @@ msgid "No application with ID \"%1$s\"."
 msgstr "No application with ID \"%1$s\"."
 
 #: include/views/configuration.application.list.php:55
-#: include/views/configuration.httpconf.edit.php:67 popup.php:1221
+#: include/views/configuration.httpconf.edit.php:67 popup.php:1223
 msgid "No applications found."
 msgstr "No applications found."
 
@@ -9949,7 +9951,7 @@ msgstr "No authentication type specified for action operation command \"%s\"."
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "No authentication user name specified for action operation command \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:341
+#: include/classes/api/services/CItemGeneral.php:356
 msgid "No authentication user name specified."
 msgstr "No authentication user name specified."
 
@@ -10009,8 +10011,8 @@ msgid "No discovery rule IDs given."
 msgstr "No discovery rule IDs given."
 
 #: include/views/configuration.discovery.list.php:37
-#: include/views/configuration.host.discovery.list.php:42 popup.php:1618
-#: popup.php:1639
+#: include/views/configuration.host.discovery.list.php:42 popup.php:1620
+#: popup.php:1641
 msgid "No discovery rules found."
 msgstr "No discovery rules found."
 
@@ -10059,7 +10061,7 @@ msgstr "No graph item with graphid \"%s\"."
 msgid "No graph prototype ID provided for screen element."
 msgstr ""
 
-#: include/views/configuration.graph.list.php:73 popup.php:1292
+#: include/views/configuration.graph.list.php:73 popup.php:1294
 msgid "No graph prototypes found."
 msgstr "No graph prototypes found."
 
@@ -10068,7 +10070,7 @@ msgid "No graphs added."
 msgstr "No graphs added."
 
 #: include/views/configuration.graph.list.php:73
-#: include/views/monitoring.charts.php:77 popup.php:1292
+#: include/views/monitoring.charts.php:77 popup.php:1294
 msgid "No graphs found."
 msgstr "No graphs found."
 
@@ -10109,7 +10111,7 @@ msgid "No host group ID provided for screen element."
 msgstr "No host group ID provided for screen element."
 
 #: include/blocks.inc.php:276 include/blocks.inc.php:473
-#: include/views/configuration.hostgroups.list.php:47 popup.php:881
+#: include/views/configuration.hostgroups.list.php:47 popup.php:883
 #: popup_right.php:50 search.php:283
 msgid "No host groups found."
 msgstr "No host groups found."
@@ -10133,7 +10135,7 @@ msgid "No host with hostid \"%s\"."
 msgstr "No host with hostid \"%s\"."
 
 #: hostinventoriesoverview.php:95 include/views/configuration.host.list.php:74
-#: include/views/inventory.host.list.php:71 popup.php:732 popup.php:806
+#: include/views/inventory.host.list.php:71 popup.php:734 popup.php:808
 #: search.php:129
 msgid "No hosts found."
 msgstr "No hosts found."
@@ -10182,7 +10184,7 @@ msgstr "No interfaces for host \"%s\"."
 msgid "No item ID provided for screen element."
 msgstr "No item ID provided for screen element."
 
-#: popup.php:947
+#: popup.php:949
 msgid "No item keys found."
 msgstr "No item keys found."
 
@@ -10190,7 +10192,7 @@ msgstr "No item keys found."
 msgid "No item prototype ID provided for screen element."
 msgstr ""
 
-#: include/views/configuration.item.prototype.list.php:43 popup.php:1087
+#: include/views/configuration.item.prototype.list.php:43 popup.php:1089
 msgid "No item prototypes found."
 msgstr "No item prototypes found."
 
@@ -10209,7 +10211,7 @@ msgid "No items defined."
 msgstr "No items defined."
 
 #: include/items.inc.php:697 include/views/configuration.item.list.php:59
-#: include/views/monitoring.overview.items.php:94 popup.php:1087
+#: include/views/monitoring.overview.items.php:94 popup.php:1089
 msgid "No items found."
 msgstr "No items found."
 
@@ -10234,7 +10236,7 @@ msgid "No maps added."
 msgstr "No maps added."
 
 #: include/views/configuration.sysmap.list.php:40
-#: include/views/monitoring.maps.php:23 popup.php:1404
+#: include/views/monitoring.maps.php:23 popup.php:1406
 msgid "No maps found."
 msgstr "No maps found."
 
@@ -10404,11 +10406,11 @@ msgstr "No permissions to referred object or it does not exist!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "No private key file specified for action operation command \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:349
+#: include/classes/api/services/CItemGeneral.php:364
 msgid "No private key file specified."
 msgstr "No private key file specified."
 
-#: include/views/administration.proxy.list.php:37 popup.php:1665
+#: include/views/administration.proxy.list.php:37 popup.php:1667
 msgid "No proxies found."
 msgstr "No proxies found."
 
@@ -10421,7 +10423,7 @@ msgstr "No proxy"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "No public key file specified for action operation command \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:346
+#: include/classes/api/services/CItemGeneral.php:361
 msgid "No public key file specified."
 msgstr "No public key file specified."
 
@@ -10444,7 +10446,7 @@ msgstr "No screens added."
 #: include/classes/screens/CScreenBuilder.php:315
 #: include/views/configuration.screen.list.php:48
 #: include/views/monitoring.hostscreen.php:32
-#: include/views/monitoring.screen.php:35 popup.php:1535 popup.php:1591
+#: include/views/monitoring.screen.php:35 popup.php:1537 popup.php:1593
 msgid "No screens found."
 msgstr "No screens found."
 
@@ -10452,7 +10454,7 @@ msgstr "No screens found."
 msgid "No script specified for action operation command."
 msgstr "No script specified for action operation command."
 
-#: include/views/administration.script.list.php:35 popup.php:1691
+#: include/views/administration.script.list.php:35 popup.php:1693
 msgid "No scripts found."
 msgstr "No scripts found."
 
@@ -10461,7 +10463,7 @@ msgstr "No scripts found."
 msgid "No slide shows found."
 msgstr "No slide shows found."
 
-#: include/views/monitoring.slides.php:93 popup.php:1473
+#: include/views/monitoring.slides.php:93 popup.php:1475
 msgid "No slides found."
 msgstr "No slides found."
 
@@ -10477,7 +10479,7 @@ msgstr "No target selected"
 msgid "No target selected."
 msgstr "No target selected."
 
-#: popup.php:658 search.php:403 templates.php:510
+#: popup.php:660 search.php:403 templates.php:510
 msgid "No templates found."
 msgstr "No templates found."
 
@@ -10512,17 +10514,17 @@ msgstr "No triggers defined."
 #: include/triggers.inc.php:1083
 #: include/views/configuration.triggers.list.php:68
 #: include/views/monitoring.overview.triggers.php:115
-#: include/views/reports.toptriggers.php:156 popup.php:969 report2.php:391
+#: include/views/reports.toptriggers.php:156 popup.php:971 report2.php:391
 #: tr_status.php:286
 msgid "No triggers found."
 msgstr "No triggers found."
 
-#: include/views/administration.usergroups.list.php:42 popup.php:534
+#: include/views/administration.usergroups.list.php:42 popup.php:536
 #: popup_usrgrp.php:86
 msgid "No user groups found."
 msgstr "No user groups found."
 
-#: include/views/administration.users.list.php:51 popup.php:590
+#: include/views/administration.users.list.php:51 popup.php:592
 msgid "No users found."
 msgstr "No users found."
 
@@ -10553,7 +10555,7 @@ msgstr "None"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
 #: include/triggers.inc.php:1500 include/views/monitoring.history.php:242
-#: popup.php:1374
+#: popup.php:1376
 msgid "Normal"
 msgstr "Normal"
 
@@ -11432,7 +11434,7 @@ msgstr "Passive"
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
 #: include/views/general.login.php:69
-#: include/views/js/common.item.edit.js.php:182
+#: include/views/js/common.item.edit.js.php:193
 msgid "Password"
 msgstr "Password"
 
@@ -11529,7 +11531,7 @@ msgstr "Permissions can be assigned for user groups only."
 msgid "Persian (fa_IR)"
 msgstr "Persian (fa_IR)"
 
-#: include/graphs.inc.php:26 popup.php:1368
+#: include/graphs.inc.php:26 popup.php:1370
 msgid "Pie"
 msgstr "Pie"
 
@@ -12231,6 +12233,10 @@ msgstr ""
 msgid "Retry"
 msgstr "Retry"
 
+#: include/classes/items/CHelpItems.php:909
+msgid "Return first column of the first row of the SQL query result."
+msgstr ""
+
 #: include/classes/items/CHelpItems.php:591
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr ""
@@ -12448,7 +12454,7 @@ msgstr "SNMP interfaces"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: include/classes/api/services/CItemGeneral.php:358
+#: include/classes/api/services/CItemGeneral.php:373
 msgid "SNMP trap key is invalid."
 msgstr "SNMP trap key is invalid."
 
@@ -12814,10 +12820,10 @@ msgstr "Security name"
 #: include/views/js/configuration.sysmaps.js.php:114
 #: include/views/js/configuration.sysmaps.js.php:120
 #: include/views/monitoring.overview.items.php:74 jsLoader.php:178
-#: latest.php:402 popup_bitem.php:136 popup.php:573 popup.php:640
-#: popup.php:712 popup.php:786 popup.php:861 popup.php:931 popup.php:1067
-#: popup.php:1201 popup.php:1270 popup.php:1385 popup.php:1454 popup.php:1516
-#: popup.php:1576 popup.php:1762 popup_right.php:71 popup_usrgrp.php:106
+#: latest.php:402 popup_bitem.php:136 popup.php:575 popup.php:642
+#: popup.php:714 popup.php:788 popup.php:863 popup.php:933 popup.php:1069
+#: popup.php:1203 popup.php:1272 popup.php:1387 popup.php:1456 popup.php:1518
+#: popup.php:1578 popup.php:1764 popup_right.php:71 popup_usrgrp.php:106
 #: tr_logform.php:248
 msgid "Select"
 msgstr "Select"
@@ -12909,7 +12915,7 @@ msgstr "Serial number A"
 msgid "Serial number B"
 msgstr "Serial number B"
 
-#: include/views/administration.script.list.php:66 popup.php:1747
+#: include/views/administration.script.list.php:66 popup.php:1749
 #: queue.php:161
 msgid "Server"
 msgstr "Server"
@@ -13007,7 +13013,7 @@ msgstr "Session terminated, re-login, please."
 #: include/views/configuration.triggers.list.php:71
 #: include/views/configuration.triggers.massupdate.php:69
 #: include/views/reports.toptriggers.php:136
-#: include/views/reports.toptriggers.php:160 popup.php:974 tr_logform.php:346
+#: include/views/reports.toptriggers.php:160 popup.php:976 tr_logform.php:346
 #: tr_status.php:290
 msgid "Severity"
 msgstr "Severity"
@@ -13339,7 +13345,7 @@ msgid "Speed"
 msgstr "Speed"
 
 #: include/graphs.inc.php:25 include/views/monitoring.history.php:246
-#: popup.php:1365
+#: popup.php:1367
 msgid "Stacked"
 msgstr "Stacked"
 
@@ -13389,7 +13395,7 @@ msgstr ""
 #: include/views/configuration.item.prototype.list.php:54
 #: include/views/configuration.trigger.prototype.list.php:63
 #: include/views/configuration.triggers.list.php:75 popup_media.php:142
-#: popup.php:975 popup.php:1097 srv_status.php:140 tr_status.php:291
+#: popup.php:977 popup.php:1099 srv_status.php:140 tr_status.php:291
 msgid "Status"
 msgstr "Status"
 
@@ -13537,7 +13543,7 @@ msgid "Support"
 msgstr "Support"
 
 #: include/views/administration.users.edit.php:53
-#: include/views/administration.users.list.php:56 popup.php:595 users.php:46
+#: include/views/administration.users.list.php:56 popup.php:597 users.php:46
 msgid "Surname"
 msgstr "Last Name"
 
@@ -14058,6 +14064,10 @@ msgstr "Total time: %s"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Transaction has not been closed. Aborting..."
 
+#: include/classes/items/CHelpItems.php:913
+msgid "Transform SQL query result into a JSON object for low-level discovery."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:204
 msgid "Transport error."
 msgstr "Transport error."
@@ -14410,7 +14420,7 @@ msgstr "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory fie
 #: include/views/js/configuration.sysmaps.js.php:397
 #: include/views/monitoring.overview.items.php:30
 #: include/views/monitoring.overview.triggers.php:32 latest.php:478
-#: latest.php:479 popup_media.php:124 popup.php:495 popup.php:1095
+#: latest.php:479 popup_media.php:124 popup.php:497 popup.php:1097
 #: tr_logform.php:273 tr_logform.php:277
 msgid "Type"
 msgstr "Type"
@@ -14440,15 +14450,15 @@ msgstr "Type of calculation"
 #: include/forms.inc.php:520 include/forms.inc.php:903
 #: include/views/configuration.item.edit.php:208
 #: include/views/configuration.item.edit.php:219
-#: include/views/configuration.item.massupdate.php:215 popup.php:1096
+#: include/views/configuration.item.massupdate.php:215 popup.php:1098
 msgid "Type of information"
 msgstr "Type of information"
 
-#: include/classes/api/services/CItemGeneral.php:326
+#: include/classes/api/services/CItemGeneral.php:341
 msgid "Type of information must be \"Log\" for log key."
 msgstr "Type of information must be \"Log\" for log key."
 
-#: include/classes/api/services/CItemGeneral.php:321
+#: include/classes/api/services/CItemGeneral.php:336
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
 msgstr ""
 
@@ -15875,7 +15885,7 @@ msgstr "You are not allowed to alter privileges for user \"%s\"."
 msgid "You are not logged in."
 msgstr "You are not logged in."
 
-#: popup.php:474
+#: popup.php:476
 msgid "You can not switch hosts for current selection."
 msgstr "You can not switch hosts for current selection."
 
