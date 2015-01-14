@@ -1473,22 +1473,22 @@ class CHost extends CHostGeneral {
 	 */
 	public function create($hosts) {
 		$hosts = zbx_toArray($hosts);
-		$hostIds = array();
+		$hostids = array();
 
 		$this->checkInput($hosts, __FUNCTION__);
 
 		foreach ($hosts as $host) {
-			$hostId = DB::insert('hosts', array($host));
-			$hostId = reset($hostId);
-			$hostIds[] = $hostId;
-			$host['hostid'] = $hostId;
+			$hostid = DB::insert('hosts', array($host));
+			$hostids[] = $hostid = reset($hostid);
+
+			$host['hostid'] = $hostid;
 
 			// save groups
 			// groups must be added before calling massAdd() for permission validation to work
 			$groupsToAdd = array();
 			foreach ($host['groups'] as $group) {
 				$groupsToAdd[] = array(
-					'hostid' => $hostId,
+					'hostid' => $hostid,
 					'groupid' => $group['groupid']
 				);
 			}
@@ -1516,7 +1516,7 @@ class CHost extends CHostGeneral {
 
 			if (isset($host['inventory']) && !empty($host['inventory'])) {
 				$hostInventory = $host['inventory'];
-				$hostInventory['hostid'] = $hostId;
+				$hostInventory['hostid'] = $hostid;
 				$hostInventory['inventory_mode'] = isset($host['inventory_mode'])
 					? $host['inventory_mode']
 					: HOST_INVENTORY_MANUAL;
@@ -1525,7 +1525,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		return array('hostids' => $hostIds);
+		return array('hostids' => $hostids);
 	}
 
 	/**
