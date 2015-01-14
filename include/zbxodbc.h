@@ -17,17 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-#ifndef ZABBIX_ZODBC_H
-#define ZABBIX_ZODBC_H
+#ifndef ZABBIX_ZBXODBC_H
+#define ZABBIX_ZBXODBC_H
 
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
 
-typedef char	**ZBX_ODBC_ROW;
+#define ZBX_ODBC_ROW	char **
+#define ZBX_ODBC_RESULT	ZBX_ODBC_DBH *
 
-typedef struct zbx_odbc_dbh_s
+typedef struct
 {
 	SQLHENV		henv;
 	SQLHDBC		hdbc;
@@ -36,9 +36,8 @@ typedef struct zbx_odbc_dbh_s
 	SQLSMALLINT     col_num;
 	ZBX_ODBC_ROW	row_data;
 	SQLLEN		*data_len;
-} ZBX_ODBC_DBH;
-
-typedef ZBX_ODBC_DBH*		ZBX_ODBC_RESULT;
+}
+ZBX_ODBC_DBH;
 
 int		odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_name, char *user, char *pass, int login_timeout);
 void		odbc_DBclose(ZBX_ODBC_DBH *pdbh);
@@ -48,4 +47,4 @@ ZBX_ODBC_ROW    odbc_DBfetch(ZBX_ODBC_RESULT pdbh);
 
 const char	*get_last_odbc_strerror(void);
 
-#endif /* ZABBIX_ZODBC_H */
+#endif
