@@ -1070,6 +1070,8 @@ static void	DCsync_hosts(DB_RESULT result)
 		DCstrpool_replace(found, &host->tls_subject, row[27]);
 		DCstrpool_replace(found, &host->tls_psk_identity, row[28]);
 		DCstrpool_replace(found, &host->tls_psk, row[29]);
+		host->tls_connect = (unsigned char)atoi(row[24]);
+		host->tls_accept = (unsigned char)atoi(row[25]);
 
 		if (0 == found)
 		{
@@ -1090,8 +1092,6 @@ static void	DCsync_hosts(DB_RESULT result)
 			host->jmx_errors_from = atoi(row[19]);
 			host->jmx_available = (unsigned char)atoi(row[20]);
 			host->jmx_disable_until = atoi(row[21]);
-			host->tls_connect = (unsigned char)atoi(row[24]);
-			host->tls_accept = (unsigned char)atoi(row[25]);
 		}
 		else
 		{
