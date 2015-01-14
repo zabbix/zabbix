@@ -21,7 +21,7 @@ a {
 	color: $link-color;
 
 	&:hover {
-		text-decoration: none;
+		text-decoration: underline;
 		color: $link-hover-color;
 	}
 }
@@ -36,7 +36,15 @@ h2 {
 	@include font-h2;
 }
 
+h3 {
+	@include font-h3;
+}
+
 /* Main Navigation */
+header {
+	margin: 0 0 12px 0;
+}
+
 nav {
 background: $secondary-color;
 margin: 0 0 13px 0;
@@ -84,6 +92,7 @@ ul.top-nav {
 	a {
 		padding: 10px 13px 10px 13px;
 		color: $link-topnav-color;
+		text-decoration: none;
 
 		&:hover {
 			color: $link-topnav-hover-color;
@@ -133,7 +142,7 @@ ul.top-nav-icons {
 
 div.top-subnav-container {
 	height: 36px;
-	line-height: 35px;
+	line-height: 36px;
 	background: $secondary-color;
 }
 
@@ -153,6 +162,7 @@ ul.top-subnav a {
 
 	&:hover {
 		color: $link-topsubnav-hover-color;
+		text-decoration: none;
 	}
 
 	&.selected {
@@ -197,11 +207,15 @@ article {
 
 /* Obgect Group Navigation */
 ul.object-group {
-	margin: 0 0 15px 0;
+	margin: 0 0 11px 0;
 	
 	li {
 		display: inline-block;
-		padding: 0 13px 0 0;
+		margin: 0 13px 0 0;
+	}
+
+	& a.selected {
+		font-weight: bold;
 	}
 }
 
@@ -212,7 +226,6 @@ footer {
     width: 100%;
     /* Set the fixed height of the footer here */
     height: 60px;
-    background-color: #f5f5f5;
 	text-align: center;
 	color: $font-alt-color;
 
@@ -244,7 +257,7 @@ table.list-table {
 		@include list-table-header;
 	    padding: 6px 5px 6px 5px;
 	    vertical-align: middle;
-	    border-bottom: 1px solid $table-hordivider-color;
+	    border-bottom: 2px solid $table-hordivider-color;
 	    text-align: left;
 	    color: $font-alt-color;
 
@@ -278,11 +291,23 @@ table.list-table {
 div.table-paging {
 	text-align: center;
 	background: $body-content-bgcolor;
+	padding: 7px 5px 7px 5px;
 
 	a {
+		@include form-border-radius;
+		margin: 0 -1px 0 0px;
 		display: inline-block;
-		padding: 10px;
-		border: 1px solid #000;
+		padding: 3px 10px;
+		border: 1px solid $form-input-color;
+		text-decoration: none;
+
+		&:hover {
+			background: lighten($primary-color, 55%);
+		}
+
+		&:active {
+			background: darken($primary-color, 10%);
+		}
 	}
 }
 
@@ -347,17 +372,37 @@ button {
 		@extend %button-icon-size;
 		@extend %button-hover-active;
 	}
+
+	&.filter-trigger {
+		@include form-top-border-radius;
+		min-width: 94px;
+
+		&.filter-active {
+			background: $body-content-bgcolor;
+			border-top-color: $underline-color;
+			border-left-color: $underline-color;
+			border-right-color: $underline-color;
+			border-bottom-color: $body-content-bgcolor;
+			color: $link-color;
+		}
+
+		& span {
+			background: $primary-color url(../img/icon-sprite.png) no-repeat right -314px;
+		}
+	}
 }
 
 %button-hover-active {
 	&:hover {
 		background-color: darken($primary-color, 5%);
 		border-color: darken($primary-color, 5%);
+		color: $font-white-color;
 	}
 
 	&:active {
 		background-color: $secondary-color;
 		border-color: $secondary-color;
+		color: $font-white-color;
 	}
 }
 
@@ -373,6 +418,14 @@ button[disabled], button[disabled]:hover {
 	cursor: default;
 }
 
+div.action-buttons {
+	margin: 15px 0 0 0;
+
+	& button {
+		margin: 0 10px 0 0;
+	}
+}
+
 /* Alerts */
 .green {
 	color: $alert-green-color;
@@ -386,7 +439,7 @@ button[disabled], button[disabled]:hover {
 	@extend .green;
 	border: 1px solid $alert-green-border-color;
 	background: $alert-green-bg-color;
-	padding: 6px 12px 6px 12px;
+	padding: 7px 12px 7px 12px;
 	text-align: center;
 	@include form-border-radius; 
 }

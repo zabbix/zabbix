@@ -29,7 +29,7 @@ $link-topsubnav-visited-color: #bfced7; // SubNav Light Blue
 
 // TABLE COLORS
 $table-hordivider-color: #e9edf2; // Grey Blue
-$table-tr-selected-color: #faf4d4; // Yellow
+$table-tr-selected-color: #ffffcc; // Yellow
 
 
 // FORM COLORS
@@ -68,6 +68,12 @@ $font-white-color: #fff; // Alt White
 	line-height: 1.2em;
 }
 
+@mixin font-h3 {
+	font-size: 0.917em; // 11px
+	text-transform: uppercase;
+	color: $font-alt-color;
+}
+
 
 @mixin list-table-header {
 	font-size: 0.917em; // 11px   
@@ -80,8 +86,21 @@ $font-white-color: #fff; // Alt White
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
 }
 
+@mixin button-inset-shadow {
+	-webkit-box-shadow: inset 0 2px 2px 0 rgba(0, 0, 0, 0.20);
+	-moz-box-shadow: inset 0 2px 2px 0 rgba(0, 0, 0, 0.20);
+	box-shadow: inset 0 2px 2px 0 rgba(0, 0, 0, 0.20);
+}
+
+
 @mixin form-border-radius {
 	-webkit-border-radius: 2px;
 	-moz-border-radius: 2px;
 	border-radius: 2px;
+}
+
+@mixin form-top-border-radius {
+	-webkit-border-radius: 2px 2px 0 0;
+	-moz-border-radius: 2px 2px 0 0;
+	border-radius: 2px 2px 0 0;
 }
