@@ -1455,7 +1455,6 @@ out:
  * Parameters: data - [IN] snmp discovery data object                         *
  *                                                                            *
  ******************************************************************************/
-
 static void	zbx_snmp_ddata_clean(zbx_snmp_ddata_t *data)
 {
 	int			i;
@@ -1500,7 +1499,8 @@ static void	zbx_snmp_walk_discovery_cb(void *arg, const char *OID, const char *i
 }
 
 static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *item, AGENT_RESULT *result,
-		int *errcode, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int max_vars, int bulk)
+		int *errcode, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int max_vars,
+		int bulk)
 {
 	const char	*__function_name = "zbx_snmp_process_discovery";
 
@@ -1508,7 +1508,6 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 	char			oid_translated[ITEM_SNMP_OID_LEN_MAX];
 	struct zbx_json		js;
 	zbx_snmp_ddata_t	data;
-	zbx_hashset_iter_t	iter;
 	zbx_snmp_dobject_t	*obj;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1529,8 +1528,6 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 
 	zbx_json_init(&js, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addarray(&js, ZBX_PROTO_TAG_DATA);
-
-	zbx_hashset_iter_reset(&data.objects, &iter);
 
 	for (i = 0; i < data.index.values_num; i++)
 	{
