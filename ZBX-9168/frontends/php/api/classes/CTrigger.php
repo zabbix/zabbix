@@ -2071,7 +2071,11 @@ class CTrigger extends CTriggerGeneral {
 				);
 
 				// Add trigger IDs as keys and empty arrays as values.
-				$downToUpTriggerIds = $downToUpTriggerIds + array_fill_keys($triggerIds, array());
+				foreach ($triggerIds as $triggerId) {
+					if (!array_key_exists($triggerId, $downToUpTriggerIds)) {
+						$downToUpTriggerIds[$triggerId] = array();
+					}
+				}
 
 				$triggerIds = array();
 				while ($dependency = DBfetch($dbResult)) {
