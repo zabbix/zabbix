@@ -103,6 +103,12 @@ typedef struct
 	int		jmx_disable_until;
 	char		inventory_mode;
 	unsigned char	status;
+	unsigned char	tls_connect;
+	unsigned char	tls_accept;
+	char		tls_issuer[HOST_TLS_ISSUER_LEN_MAX];
+	char		tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
+	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
+	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
 }
 DC_HOST;
 
