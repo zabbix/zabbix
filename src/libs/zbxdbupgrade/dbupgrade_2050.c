@@ -21,6 +21,7 @@
 #include "db.h"
 #include "zbxdbupgrade.h"
 #include "dbupgrade.h"
+#include "sysinfo.h"
 
 /*
  * 3.0 maintenance database patches
@@ -35,6 +36,48 @@ static int	DBpatch_2050000(void)
 	return DBset_default("httptest", &field);
 }
 
+static int	DBpatch_2050001(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*oid = NULL;
+	size_t		oid_alloc = 0;
+	int		ret = FAIL, rc;
+
+	/* flags - ZBX_FLAG_DISCOVERY_RULE                               */
+	/* type  - ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3 */
+	if (NULL == (result = DBselect("select itemid,snmp_oid from items where flags=1 and type in (1,4,6)")))
+		return FAIL;
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char	*param, *oid_esc;
+		size_t	oid_offset = 0;
+
+		param = zbx_strdup(NULL, row[1]);
+		quote_key_param(&param, 0);
+
+		zbx_snprintf_alloc(&oid, &oid_alloc, &oid_offset, "discovery[{#SNMPVALUE},%s]", param);
+
+		oid_esc = DBdyn_escape_string(oid);
+
+		rc = DBexecute("update items set snmp_oid='%s' where itemid=%s", oid_esc, row[0]);
+
+		zbx_free(oid_esc);
+		zbx_free(param);
+
+		if (ZBX_DB_OK > rc)
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+	zbx_free(oid);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -42,5 +85,6 @@ DBPATCH_START(2050)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(2050000, 0, 1)
+DBPATCH_ADD(2050001, 0, 1)
 
 DBPATCH_END()

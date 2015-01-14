@@ -24,6 +24,19 @@
 
 #ifdef HAVE_NETSNMP
 
+/******************************************************************************
+ *                                                                            *
+ * This is zbx_snmp_walk() callback function prototype.                       *
+ *                                                                            *
+ * Parameters: arg   - [IN] an user argument passed to zbx_snmp_walk()        *
+ *                          function                                          *
+ *             oid   - [IN] the OID the walk function is looking for          *
+ *             index - [IN] the index of found OID                            *
+ *             value - [IN] the OID value                                     *
+ *                                                                            *
+ ******************************************************************************/
+typedef void (zbx_snmp_walk_cb_func)(void *arg, const char *oid, const char *index, const char *value);
+
 typedef struct
 {
 	char		*addr;
@@ -136,14 +149,14 @@ end:
 	return ret;
 }
 
-static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, const char *idx)
+static void	cache_put_snmp_index(const DC_ITEM *item, const char *oid, const char *index, const char *value)
 {
 	const char		*__function_name = "cache_put_snmp_index";
 
 	zbx_snmpidx_main_key_t	*main_key, main_key_local;
 	zbx_snmpidx_mapping_t	*mapping, mapping_local;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' value:'%s' idx:'%s'", __function_name, oid, value, idx);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:'%s' index:'%s' value:'%s'", __function_name, oid, index, value);
 
 	if (NULL == snmpidx.slots)
 	{
@@ -154,7 +167,7 @@ static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, co
 
 	main_key_local.addr = item->interface.addr;
 	main_key_local.port = item->interface.port;
-	main_key_local.oid = oid;
+	main_key_local.oid = (char *)oid;
 
 	if (NULL == (main_key = zbx_hashset_search(&snmpidx, &main_key_local)))
 	{
@@ -172,14 +185,14 @@ static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, co
 	if (NULL == (mapping = zbx_hashset_search(main_key->mappings, &value)))
 	{
 		mapping_local.value = zbx_strdup(NULL, value);
-		mapping_local.index = zbx_strdup(NULL, idx);
+		mapping_local.index = zbx_strdup(NULL, index);
 
 		zbx_hashset_insert(main_key->mappings, &mapping_local, sizeof(mapping_local));
 	}
-	else if (0 != strcmp(mapping->index, idx))
+	else if (0 != strcmp(mapping->index, index))
 	{
 		zbx_free(mapping->index);
-		mapping->index = zbx_strdup(NULL, idx);
+		mapping->index = zbx_strdup(NULL, index);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -225,7 +238,7 @@ static char	*zbx_get_snmp_type_error(u_char type)
 }
 
 static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const DC_INTERFACE *interface, int status,
-		const struct snmp_pdu *response, char *error, int max_error_len)
+		const struct snmp_pdu *response, char *error, size_t max_error_len)
 {
 	int	ret;
 
@@ -265,7 +278,7 @@ static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const DC_I
 	return ret;
 }
 
-static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *error, int max_error_len)
+static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *error, size_t max_error_len)
 {
 	const char		*__function_name = "zbx_snmp_open_session";
 	struct snmp_session	session, *ss = NULL;
@@ -316,7 +329,9 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 	zbx_snprintf(addr, sizeof(addr), "%s:%hu", item->interface.addr, item->interface.port);
 #endif
 	session.peername = addr;
-	session.remote_port = item->interface.port;	/* remote_port is no longer used in latest versions of Net-SNMP */
+
+	/* remote_port is no longer used in latest versions of Net-SNMP */
+	session.remote_port = item->interface.port;
 
 	if (SNMP_VERSION_1 == session.version || SNMP_VERSION_2c == session.version)
 	{
@@ -749,15 +764,18 @@ numeric:
  *                                                                            *
  * Purpose: retrieve information by walking an OID tree                       *
  *                                                                            *
- * Parameters: ss          - [IN] SNMP session handle                         *
- *             item        - [IN] configuration of Zabbix item                *
- *             OID         - [IN] OID of table with values of interest        *
- *             mode        - [IN] mode to operate in                          *
- *             result      - [OUT] result structure                           *
- *             max_succeed - [OUT] value of "max_repetitions" that succeeded  *
- *             min_fail    - [OUT] value of "max_repetitions" that failed     *
- *             max_vars    - [IN] suggested value of "max_repetitions"        *
- *             bulk        - [IN] whether GetBulkRequest-PDU should be used   *
+ * Parameters: ss            - [IN] SNMP session handle                       *
+ *             item          - [IN] configuration of Zabbix item              *
+ *             OID           - [IN] OID of table with values of interest      *
+ *             error         - [OUT] a buffer to store error message          *
+ *             max_error_len - [IN] maximum error message length              *
+ *             max_succeed   - [OUT] value of "max_repetitions" that succeeded*
+ *             min_fail      - [OUT] value of "max_repetitions" that failed   *
+ *             max_vars      - [IN] suggested value of "max_repetitions"      *
+ *             bulk          - [IN] whether GetBulkRequest-PDU should be used *
+ *             walk_cb_func  - [IN] callback function to process discovered   *
+ *                                  OIDs and their values                     *
+ *             walk_cb_arg   - [IN] argument to pass to the callback function *
  *                                                                            *
  * Return value: NOTSUPPORTED - OID does not exist, any other critical error  *
  *               NETWORK_ERROR - recoverable network error                    *
@@ -766,37 +784,22 @@ numeric:
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
- * Comments: This function can operate in one of two modes.                   *
- *                                                                            *
- *           Mode ZBX_SNMP_WALK_MODE_CACHE is used for dynamic indices. The   *
- *           function walks the OID tree and caches all values in the table.  *
- *           The 'value' parameter is only used to store an error message.    *
- *                                                                            *
- *           Mode ZBX_SNMP_WALK_MODE_DISCOVERY is used for low-level          *
- *           discovery. The 'value' parameter in this case is used to         *
- *           store JSON with discovery data.                                  *
- *                                                                            *
  ******************************************************************************/
-
-#define ZBX_SNMP_WALK_MODE_CACHE	0
-#define ZBX_SNMP_WALK_MODE_DISCOVERY	1
-
-static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const char *OID, unsigned char mode,
-		AGENT_RESULT *result, int *max_succeed, int *min_fail, int max_vars, int bulk)
+static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const char *OID, char *error,
+		size_t max_error_len, int *max_succeed, int *min_fail, int max_vars, int bulk,
+		zbx_snmp_walk_cb_func walk_cb_func, void *walk_cb_arg)
 {
 	const char		*__function_name = "zbx_snmp_walk";
 
 	struct snmp_pdu		*pdu, *response;
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, root_string_len, root_numeric_len;
-	char			snmp_oid[MAX_STRING_LEN], error[MAX_STRING_LEN];
+	char			snmp_oid[MAX_STRING_LEN];
 	struct variable_list	*var;
 	int			status, level, running, num_vars, ret = SUCCEED;
-	struct zbx_json		j;
 	AGENT_RESULT		snmp_result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d oid:'%s' mode:%d bulk:%d", __function_name, (int)item->type, OID,
-			(int)mode, bulk);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d oid:'%s' bulk:%d", __function_name, (int)item->type, OID, bulk);
 
 	if (ITEM_TYPE_SNMPv1 == item->type)	/* GetBulkRequest-PDU available since SNMPv2 */
 		bulk = SNMP_BULK_DISABLED;
@@ -804,15 +807,15 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	/* create OID from string */
 	if (NULL == snmp_parse_oid(OID, rootOID, &rootOID_len))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "snmp_parse_oid(): cannot parse OID \"%s\".", OID));
+		zbx_snprintf(error, max_error_len, "snmp_parse_oid(): cannot parse OID \"%s\".", OID);
 		ret = CONFIG_ERROR;
 		goto out;
 	}
 
 	if (-1 == zbx_snmp_print_oid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len, ZBX_OID_INDEX_STRING))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "zbx_snmp_print_oid():"
-				" cannot print OID \"%s\" with string indices.", OID));
+		zbx_snprintf(error, max_error_len, "zbx_snmp_print_oid(): cannot print OID \"%s\" with string indices.",
+				OID);
 		ret = CONFIG_ERROR;
 		goto out;
 	}
@@ -821,8 +824,8 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 	if (-1 == zbx_snmp_print_oid(snmp_oid, sizeof(snmp_oid), rootOID, rootOID_len, ZBX_OID_INDEX_NUMERIC))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "zbx_snmp_print_oid():"
-				" cannot print OID \"%s\" with numeric indices.", OID));
+		zbx_snprintf(error, max_error_len, "zbx_snmp_print_oid(): cannot print OID \"%s\""
+				" with numeric indices.", OID);
 		ret = CONFIG_ERROR;
 		goto out;
 	}
@@ -834,16 +837,6 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	anOID_len = rootOID_len;
 
 	/* initialize variables */
-	if (ZBX_SNMP_WALK_MODE_CACHE == mode)
-	{
-		cache_del_snmp_index_subtree(item, OID);
-	}
-	else
-	{
-		zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-		zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
-	}
-
 	level = 0;
 	running = 1;
 
@@ -852,14 +845,14 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		/* create PDU */
 		if (NULL == (pdu = snmp_pdu_create(SNMP_BULK_ENABLED == bulk ? SNMP_MSG_GETBULK : SNMP_MSG_GETNEXT)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "snmp_pdu_create(): cannot create PDU object."));
+			zbx_strlcpy(error, "snmp_pdu_create(): cannot create PDU object.", max_error_len);
 			ret = CONFIG_ERROR;
 			break;
 		}
 
 		if (NULL == snmp_add_null_var(pdu, anOID, anOID_len))	/* add OID as variable to PDU */
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
+			zbx_strlcpy(error, "snmp_add_null_var(): cannot add null variable.", max_error_len);
 			ret = CONFIG_ERROR;
 			snmp_free_pdu(pdu);
 			break;
@@ -904,8 +897,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		}
 		else if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 		{
-			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, sizeof(error));
-			SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, max_error_len);
 			running = 0;
 			goto next;
 		}
@@ -927,7 +919,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 				if (0 <= snmp_oid_compare(anOID, anOID_len, var->name, var->name_length))
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "OID not increasing."));
+					zbx_strlcpy(error, "OID not increasing.", max_error_len);
 					ret = NOTSUPPORTED;
 					running = 0;
 					break;
@@ -936,9 +928,9 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 				if (SUCCEED != zbx_snmp_choose_index(snmp_oid, sizeof(snmp_oid), var->name,
 						var->name_length, root_string_len, root_numeric_len))
 				{
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "zbx_snmp_choose_index():"
+					zbx_snprintf(error, max_error_len, "zbx_snmp_choose_index():"
 							" cannot choose appropriate index while walking for"
-							" OID \"%s\".", OID));
+							" OID \"%s\".", OID);
 					ret = NOTSUPPORTED;
 					running = 0;
 					break;
@@ -949,18 +941,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 				if (SUCCEED == zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &snmp_result) &&
 						NULL != GET_STR_RESULT(&snmp_result))
 				{
-					if (ZBX_SNMP_WALK_MODE_CACHE == mode)
-					{
-						cache_put_snmp_index(item, (char *)OID, snmp_result.str, snmp_oid);
-					}
-					else
-					{
-						zbx_json_addobject(&j, NULL);
-						zbx_json_addstring(&j, "{#SNMPINDEX}", snmp_oid, ZBX_JSON_TYPE_STRING);
-						zbx_json_addstring(&j, "{#SNMPVALUE}", snmp_result.str,
-								ZBX_JSON_TYPE_STRING);
-						zbx_json_close(&j);
-					}
+					walk_cb_func(walk_cb_arg, OID, snmp_oid, snmp_result.str);
 				}
 				else
 				{
@@ -981,8 +962,11 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 			else
 			{
 				/* an exception value, so stop */
+				char	*errmsg;
 
-				SET_MSG_RESULT(result, zbx_get_snmp_type_error(var->type));
+				errmsg = zbx_get_snmp_type_error(var->type);
+				zbx_strlcpy(error, errmsg, max_error_len);
+				zbx_free(errmsg);
 				ret = NOTSUPPORTED;
 				running = 0;
 				break;
@@ -995,16 +979,6 @@ next:
 		if (NULL != response)
 			snmp_free_pdu(response);
 	}
-
-	if (ZBX_SNMP_WALK_MODE_DISCOVERY == mode)
-	{
-		zbx_json_close(&j);
-
-		if (SUCCEED == ret)
-			SET_TEXT_RESULT(result, zbx_strdup(NULL, j.buffer));
-
-		zbx_json_free(&j);
-	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1013,7 +987,7 @@ out:
 
 static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, char oids[][ITEM_SNMP_OID_LEN_MAX],
 		AGENT_RESULT *results, int *errcodes, unsigned char *query_and_ignore_type, int num, int level,
-		char *error, int max_error_len, int *max_succeed, int *min_fail)
+		char *error, size_t max_error_len, int *max_succeed, int *min_fail)
 {
 	const char		*__function_name = "zbx_snmp_get_values";
 
@@ -1356,42 +1330,245 @@ static void	zbx_snmp_translate(char *oid_translated, const char *oid, size_t max
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() oid_translated:'%s'", __function_name, oid_translated);
 }
 
-static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail, int max_vars,
+/* discovered SNMP object, identified by its index */
+typedef struct
+{
+	/* object index returned by zbx_snmp_walk */
+	char	*index;
+
+	/* an array of OID values stored in the same order as defined in OID key */
+	char	**values;
+}
+zbx_snmp_dobject_t;
+
+/* helper data structure used by snmp discovery */
+typedef struct
+{
+	/* the index of OID being currently processed (walked) */
+	int			num;
+
+	/* the discovered SNMP objects */
+	zbx_hashset_t		objects;
+
+	/* the index (order) of discovered SNMP objects */
+	zbx_vector_ptr_t	index;
+
+	/* request data structure used to parse discovery OID key */
+	AGENT_REQUEST		request;
+}
+zbx_snmp_ddata_t;
+
+/* discovery objects hashset support */
+static zbx_hash_t	zbx_snmp_dobject_hash(const void *data)
+{
+	const char	*index = *(const char **)data;
+
+	return ZBX_DEFAULT_STRING_HASH_ALGO(index, strlen(index), ZBX_DEFAULT_HASH_SEED);
+}
+
+static int	zbx_snmp_dobject_compare(const void *d1, const void *d2)
+{
+	const char	*i1 = *(const char **)d1;
+	const char	*i2 = *(const char **)d2;
+
+	return strcmp(i1, i2);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_snmp_ddata_init                                              *
+ *                                                                            *
+ * Purpose: initializes snmp discovery data object                            *
+ *                                                                            *
+ * Parameters: data          - [IN] snmp discovery data object                *
+ *             key           - [IN] discovery OID key                         *
+ *             error         - [OUT] a buffer to store error message          *
+ *             max_error_len - [IN] maximum error message length              *
+ *                                                                            *
+ * Return value: CONFIG_ERROR - OID key configuration error                   *
+ *               SUCCEED - if function successfully completed                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *error, size_t max_error_len)
+{
+	int	i, j, ret = CONFIG_ERROR;
+
+	init_request(&data->request);
+
+	if (SUCCEED != parse_item_key(key, &data->request))
+	{
+		zbx_strlcpy(error, "Invalid SNMP OID: cannot parse expression.", max_error_len);
+		goto out;
+	}
+
+	if (0 == data->request.nparam || 0 != (data->request.nparam & 1))
+	{
+		zbx_strlcpy(error, "Invalid SNMP OID: pairs of macro and OID are expected.", max_error_len);
+		goto out;
+	}
+
+	for (i = 0; i < data->request.nparam; i += 2)
+	{
+		if (SUCCEED != is_discovery_macro(data->request.params[i]))
+		{
+			zbx_snprintf(error, max_error_len, "Invalid SNMP OID: macro \"%s\" is invalid",
+					data->request.params[i]);
+			goto out;
+		}
+
+		if (0 == strcmp(data->request.params[i], "{#SNMPINDEX}"))
+		{
+			zbx_strlcpy(error, "Invalid SNMP OID: macro \"{#SNMPINDEX}\" is not allowed.", max_error_len);
+			goto out;
+		}
+	}
+
+	for (i = 2; i < data->request.nparam; i += 2)
+	{
+		for (j = 0; j < i; j += 2)
+		{
+			if (0 == strcmp(data->request.params[i], data->request.params[j]))
+			{
+				zbx_strlcpy(error, "Invalid SNMP OID: unique macros are expected.", max_error_len);
+				goto out;
+			}
+		}
+	}
+
+	zbx_hashset_create(&data->objects, 10, zbx_snmp_dobject_hash, zbx_snmp_dobject_compare);
+	zbx_vector_ptr_create(&data->index);
+
+	ret = SUCCEED;
+out:
+	if (SUCCEED != ret)
+		free_request(&data->request);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_snmp_ddata_clean                                             *
+ *                                                                            *
+ * Purpose: releases data allocated by snmp discovery                         *
+ *                                                                            *
+ * Parameters: data - [IN] snmp discovery data object                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_snmp_ddata_clean(zbx_snmp_ddata_t *data)
+{
+	int			i;
+	zbx_hashset_iter_t	iter;
+	zbx_snmp_dobject_t	*obj;
+
+	zbx_vector_ptr_destroy(&data->index);
+
+	zbx_hashset_iter_reset(&data->objects, &iter);
+	while (NULL != (obj = zbx_hashset_iter_next(&iter)))
+	{
+		for (i = 0; i < data->request.nparam / 2; i++)
+			zbx_free(obj->values[i]);
+
+		zbx_free(obj->index);
+		zbx_free(obj->values);
+	}
+
+	zbx_hashset_destroy(&data->objects);
+
+	free_request(&data->request);
+}
+
+static void	zbx_snmp_walk_discovery_cb(void *arg, const char *OID, const char *index, const char *value)
+{
+	zbx_snmp_ddata_t	*data = (zbx_snmp_ddata_t *)arg;
+	zbx_snmp_dobject_t	*obj;
+
+	if (NULL == (obj = zbx_hashset_search(&data->objects, &index)))
+	{
+		zbx_snmp_dobject_t	new_obj;
+
+		new_obj.index = zbx_strdup(NULL, index);
+		new_obj.values = (char **)zbx_malloc(NULL, sizeof(char *) * data->request.nparam / 2);
+		memset(new_obj.values, 0, sizeof(char *) * data->request.nparam / 2);
+
+		obj = zbx_hashset_insert(&data->objects, &new_obj, sizeof(new_obj));
+		zbx_vector_ptr_append(&data->index, obj);
+	}
+
+	obj->values[data->num] = zbx_strdup(NULL, value);
+}
+
+static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *item, AGENT_RESULT *result,
+		int *errcode, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int max_vars,
 		int bulk)
 {
 	const char	*__function_name = "zbx_snmp_process_discovery";
 
-	int		ret;
-	char		oid_translated[ITEM_SNMP_OID_LEN_MAX];
+	int			i, j, ret;
+	char			oid_translated[ITEM_SNMP_OID_LEN_MAX];
+	struct zbx_json		js;
+	zbx_snmp_ddata_t	data;
+	zbx_snmp_dobject_t	*obj;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	assert(1 == num);
+	if (SUCCEED != (ret = zbx_snmp_ddata_init(&data, item->snmp_oid, error, max_error_len)))
+		goto out;
 
-	switch (num_key_param(items[0].snmp_oid))
+	for (data.num = 0; data.num < data.request.nparam / 2; data.num++)
 	{
-		case 0:
-			zbx_snmp_translate(oid_translated, items[0].snmp_oid, sizeof(oid_translated));
-			errcodes[0] = zbx_snmp_walk(ss, &items[0], oid_translated, ZBX_SNMP_WALK_MODE_DISCOVERY,
-					&results[0], max_succeed, min_fail, max_vars, bulk);
-			break;
-		default:
-			SET_MSG_RESULT(&results[0], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
-					items[0].snmp_oid));
-			errcodes[0] = CONFIG_ERROR;
+		zbx_snmp_translate(oid_translated, data.request.params[data.num * 2 + 1], sizeof(oid_translated));
+
+		if (SUCCEED != (ret = zbx_snmp_walk(ss, item, oid_translated, error, max_error_len,
+				max_succeed, min_fail, max_vars, bulk, zbx_snmp_walk_discovery_cb, (void *)&data)))
+		{
+			goto clean;
+		}
 	}
 
-	if (SUCCEED != (ret = errcodes[0]))
-		zbx_strlcpy(error, results[0].msg, max_error_len);
+	zbx_json_init(&js, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(&js, ZBX_PROTO_TAG_DATA);
+
+	for (i = 0; i < data.index.values_num; i++)
+	{
+		obj = (zbx_snmp_dobject_t *)data.index.values[i];
+
+		zbx_json_addobject(&js, NULL);
+		zbx_json_addstring(&js, "{#SNMPINDEX}", obj->index, ZBX_JSON_TYPE_STRING);
+
+		for (j = 0; j < data.request.nparam / 2; j++)
+		{
+			if (NULL == obj->values[j])
+				continue;
+
+			zbx_json_addstring(&js, data.request.params[j * 2], obj->values[j], ZBX_JSON_TYPE_STRING);
+		}
+		zbx_json_close(&js);
+	}
+
+	zbx_json_close(&js);
+
+	SET_TEXT_RESULT(result, zbx_strdup(NULL, js.buffer));
+
+	zbx_json_free(&js);
+clean:
+	zbx_snmp_ddata_clean(&data);
+out:
+	if (SUCCEED != (*errcode = ret))
+		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
 
+static void	zbx_snmp_walk_cache_cb(void *arg, const char *oid, const char *index, const char *value)
+{
+	cache_put_snmp_index((const DC_ITEM *)arg, oid, index, value);
+}
+
 static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail, int bulk)
+		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int bulk)
 {
 	const char	*__function_name = "zbx_snmp_process_dynamic";
 
@@ -1503,8 +1680,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 	{
 		for (i = 0; i < to_walk_num; i++)
 		{
-			int		errcode;
-			AGENT_RESULT	result;
+			int	errcode;
 
 			j = to_walk[i];
 
@@ -1521,20 +1697,17 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 
 			/* walk */
 
-			init_result(&result);
+			cache_del_snmp_index_subtree(&items[j], oids_translated[j]);
 
-			errcode = zbx_snmp_walk(ss, &items[j], oids_translated[j], ZBX_SNMP_WALK_MODE_CACHE, &result,
-					max_succeed, min_fail, num, bulk);
+			errcode = zbx_snmp_walk(ss, &items[j], oids_translated[j], error, max_error_len, max_succeed,
+					min_fail, num, bulk, zbx_snmp_walk_cache_cb, (void *)&items[j]);
 
 			if (NETWORK_ERROR == errcode)
 			{
 				/* consider a network error as relating to all items passed to */
 				/* this function, including those we did not just try to walk for */
 
-				zbx_strlcpy(error, result.msg, max_error_len);
 				ret = NETWORK_ERROR;
-
-				free_result(&result);
 				goto exit;
 			}
 
@@ -1547,13 +1720,11 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 				{
 					if (0 == strcmp(oids_translated[to_walk[k]], oids_translated[j]))
 					{
-						SET_MSG_RESULT(&results[to_walk[k]], zbx_strdup(NULL, result.msg));
+						SET_MSG_RESULT(&results[to_walk[k]], zbx_strdup(NULL, error));
 						errcodes[to_walk[k]] = errcode;
 					}
 				}
 			}
-
-			free_result(&result);
 		}
 
 		for (i = 0; i < to_walk_num; i++)
@@ -1600,7 +1771,7 @@ exit:
 }
 
 static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail)
+		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail)
 {
 	const char	*__function_name = "zbx_snmp_process_standard";
 
@@ -1669,13 +1840,13 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 		goto exit;
 	}
 
-	if (0 != (ZBX_FLAG_DISCOVERY_RULE & items[j].flags))
+	if (0 != (ZBX_FLAG_DISCOVERY_RULE & items[j].flags) || 0 == strncmp(items[j].snmp_oid, "discovery[", 10))
 	{
 		int	max_vars;
 
 		max_vars = DCconfig_get_suggested_snmp_vars(items[j].interface.interfaceid, &bulk);
 
-		err = zbx_snmp_process_discovery(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
+		err = zbx_snmp_process_discovery(ss, &items[j], &results[j], &errcodes[j], error, sizeof(error),
 				&max_succeed, &min_fail, max_vars, bulk);
 	}
 	else if (NULL != strchr(items[j].snmp_oid, '['))
