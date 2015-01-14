@@ -264,7 +264,9 @@ if (!empty($this->data['httptestid'])) {
 		);
 	}
 
-	if (!$this->data['is_template']) {
+	if ($this->data['host']['status'] == HOST_STATUS_MONITORED
+			|| $this->data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
+
 		$buttons[] = new CButtonQMessage(
 			'del_history',
 			_('Clear history and trends'),

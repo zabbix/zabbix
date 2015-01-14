@@ -902,6 +902,16 @@ class CHelpItems {
 					'key' => 'zabbix[wcache,<cache>,<mode>]',
 					'description' => _('Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free).')
 				)
+			),
+			ITEM_TYPE_DB_MONITOR => array(
+				array(
+					'key' => 'db.odbc.select[<unique short description>,<dsn>]',
+					'description' => _('Return first column of the first row of the SQL query result.')
+				),
+				array(
+					'key' => 'db.odbc.discovery[<unique short description>,<dsn>]',
+					'description' => _('Transform SQL query result into a JSON object for low-level discovery.')
+				)
 			)
 		);
 	}

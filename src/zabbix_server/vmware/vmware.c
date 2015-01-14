@@ -2126,7 +2126,7 @@ out:
 static int	vmware_service_get_event_session(const zbx_vmware_service_t *service, CURL *easyhandle,
 		char **event_session, char **error)
 {
-#	define ZBX_POST_VMWARE_EVENT_FILTER					\
+#	define ZBX_POST_VMWARE_CREATE_EVENT_COLLECTOR				\
 		ZBX_POST_VSPHERE_HEADER						\
 		"<ns0:CreateCollectorForEvents>"				\
 			"<ns0:_this type=\"EventManager\">%s</ns0:_this>"	\
@@ -2141,7 +2141,7 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_EVENT_FILTER,
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_CREATE_EVENT_COLLECTOR,
 			vmware_service_objects[service->type].event_manager);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
@@ -2168,6 +2168,65 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 		*error = zbx_strdup(*error, "Cannot get EventHistoryCollector session");
 		goto out;
 	}
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_destroy_event_session                             *
+ *                                                                            *
+ * Purpose: destroys event session                                            *
+ *                                                                            *
+ * Parameters: service        - [IN] the vmware service                       *
+ *             easyhandle     - [IN] the CURL handle                          *
+ *             event_session  - [IN] event session (EventHistoryCollector)    *
+ *                                   identifier                               *
+ *             error          - [OUT] the error message in the case of failure*
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_service_destroy_event_session(const zbx_vmware_service_t *service, CURL *easyhandle,
+		const char *event_session, char **error)
+{
+#	define ZBX_POST_VMWARE_DESTROY_EVENT_COLLECTOR					\
+		ZBX_POST_VSPHERE_HEADER							\
+		"<ns0:DestroyCollector>"						\
+			"<ns0:_this type=\"EventHistoryCollector\">%s</ns0:_this>"	\
+		"</ns0:DestroyCollector>"						\
+		ZBX_POST_VSPHERE_FOOTER
+
+	const char	*__function_name = "vmware_service_destroy_event_session";
+
+	int		err, opt, ret = FAIL;
+	char		tmp[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_DESTROY_EVENT_COLLECTOR, event_session);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+		goto out;
+	}
+
+	page.offset = 0;
+
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+	{
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+		goto out;
 
 	ret = SUCCEED;
 out:
@@ -2228,7 +2287,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
-		goto out;
+		goto end_session;
 	}
 
 	page.offset = 0;
@@ -2236,17 +2295,21 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
 		*error = zbx_strdup(*error, curl_easy_strerror(err));
-		goto out;
+		goto end_session;
 	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
 
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-		goto out;
+		goto end_session;
 
 	*events = zbx_strdup(NULL, page.data);
 
 	ret = SUCCEED;
+
+end_session:
+	if (SUCCEED != vmware_service_destroy_event_session(service, easyhandle, event_session, error))
+		ret = FAIL;
 out:
 	zbx_free(event_session);
 
