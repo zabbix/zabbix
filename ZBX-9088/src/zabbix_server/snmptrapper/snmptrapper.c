@@ -345,7 +345,7 @@ static void	parse_traps(int flag)
 		else
 		{
 			if (NULL != begin && begin != buffer)
-				memmove(buffer, begin, c - begin + 1);
+				memmove(buffer, begin, offset + 1);
 		}
 	}
 	else
