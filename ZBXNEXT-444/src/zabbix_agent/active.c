@@ -1460,7 +1460,8 @@ static void	process_active_checks(char *server, unsigned short port)
 				metric->refresh_unsupported = 0;
 			}
 
-			if (SUCCEED == need_meta_update(metric, lastlogsize_sent, mtime_sent, old_state))
+			if (0 != (flags & ZBX_FLAG_ELEMENT_LOG) && SUCCEED == need_meta_update(metric, lastlogsize_sent,
+					mtime_sent, old_state))
 			{
 				/* meta information update */
 				process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL, metric->state,
