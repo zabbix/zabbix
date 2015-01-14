@@ -63,6 +63,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, K
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+..F....... [ZBX-9168] fixed incorrect keys and unified key parameters in the item key helper (Richlv)
 .......PS. [ZBX-8584] fixed vmware eventlog items sometimes returning duplicate values (wiper)
 ...G...PS. [ZBX-9206] fixed agent crash in case net.tcp.service[] item is used as an active agent item with an unsupported first parameter (asaveljevs)
 .......P.. [ZBX-9195] fixed lastlogsize and mtime being updated on proxy for unsupported items; thanks to Yoshinori Komuro for patch (asaveljevs, Sasha)
@@ -595,6 +596,7 @@ New features:
 A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9168] fixed incorrect keys and unified key parameters in the item key helper (Richlv)
 .......PS. [ZBX-8584] fixed vmware eventlog items sometimes returning duplicate values (wiper)
 .......P.. [ZBX-9195] fixed lastlogsize and mtime being updated on proxy for unsupported items; thanks to Yoshinori Komuro for patch (asaveljevs, Sasha)
 ..F....... [ZBX-9010] fixed audit actions not displaying most recent logs when record count exceeds maximum (Krists)
