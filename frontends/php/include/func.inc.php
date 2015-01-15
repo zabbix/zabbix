@@ -1517,7 +1517,7 @@ function getPagingLine(&$items) {
 	}
 	for ($p = $startPage; $p <= $pagesCount; $p++) {
 		$url->setArgument('page', $p);
-		$tags[] = new CLink($p, $url->getUrl());
+		$tags[] = new CLink($p, $url->getUrl(), $p == $currentPage ? 'paging-selected' : null);
 	}
 	if ($currentPage < $pagesCount) {
 		$url->setArgument('page', $currentPage + 1);
