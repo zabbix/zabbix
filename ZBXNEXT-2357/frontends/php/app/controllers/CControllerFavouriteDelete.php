@@ -22,15 +22,14 @@ class CControllerFavouriteDelete extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'object' =>				'fatal|in graphid,itemid,screenid,slideshowid,sysmapid|required',
-			'objectid' =>			'fatal|db items.itemid|required'
+			'object' =>		'fatal|required|in graphid,itemid,screenid,slideshowid,sysmapid',
+			'objectid' =>	'fatal|required|id'
 		);
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$data['main_block'] = '';
-			$this->setResponse(new CControllerResponseData($data));
+			$this->setResponse(new CControllerResponseData(array('main_block' => '')));
 		}
 
 		return $ret;
@@ -42,32 +41,29 @@ class CControllerFavouriteDelete extends CController {
 
 	protected function doAction() {
 		$profile = array(
-					'graphid' => 'web.favorite.graphids',
-					'itemid' => 'web.favorite.graphids',
-					'screenid' => 'web.favorite.screenids',
-					'slideshowid' => 'web.favorite.screenids',
-					'sysmapid' => 'web.favorite.sysmapids'
+			'graphid' => 'web.favorite.graphids',
+			'itemid' => 'web.favorite.graphids',
+			'screenid' => 'web.favorite.screenids',
+			'slideshowid' => 'web.favorite.screenids',
+			'sysmapid' => 'web.favorite.sysmapids'
 		);
 
 		$object = $this->getInput('object');
 		$objectid = $this->getInput('objectid');
 
-		$data = array (
-			'main_block' => ''
-		);
+		$data = array();
 
 		DBstart();
-
 		$result = CFavorite::remove($profile[$object], $objectid, $object);
-		if ($result) {
-			$data['main_block'] = $data['main_block'].'$("addrm_fav").title = "'._('Add to favourites').'";'."\n".
-				'$("addrm_fav").onclick = function() { add2favorites("'.$object.'", "'.$objectid.'"); }'."\n";
-		}
-
 		$result = DBend($result);
 
 		if ($result) {
-			$data['main_block'] = $data['main_block'].'switchElementClass("addrm_fav", "iconminus", "iconplus");';
+			$data['main_block'] = '$("addrm_fav").title = "'._('Add to favourites').'";'."\n".
+				'$("addrm_fav").onclick = function() { add2favorites("'.$object.'", "'.$objectid.'"); }'."\n".
+				'switchElementClass("addrm_fav", "iconminus", "iconplus");';
+		}
+		else {
+			$data['main_block'] = '';
 		}
 
 		$this->setResponse(new CControllerResponseData($data));

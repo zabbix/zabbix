@@ -59,8 +59,10 @@ class CValidationRule {
 									&& !$this->parseRequired($buffer, $pos, $rule)		// required
 									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
 									&& !$this->parseIn($buffer, $pos, $rule)			// in
+									&& !$this->parseId($buffer, $pos, $rule)			// id
 									&& !$this->parseFatal($buffer, $pos, $rule)			// fatal
 									&& !$this->parseDB($buffer, $pos, $rule)			// db
+									&& !$this->parseArrayId($buffer, $pos, $rule)		// array_id
 									&& !$this->parseArrayDB($buffer, $pos, $rule)) {	// array_db
 
 								// incorrect validation rule
@@ -192,6 +194,22 @@ class CValidationRule {
 	}
 
 	/**
+	 * id
+	 *
+	 * 'id' => true
+	 */
+	private function parseId($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'id', 2)) {
+			return false;
+		}
+
+		$pos += 2;
+		$rules['id'] = true;
+
+		return true;
+	}
+
+	/**
 	 * db <table>.<field>
 	 *
 	 * 'db' => array(
@@ -229,6 +247,22 @@ class CValidationRule {
 			'table' => $table,
 			'field' => $field
 		);
+
+		return true;
+	}
+
+	/**
+	 * array_id
+	 *
+	 * 'array_id' => true
+	 */
+	private function parseArrayId($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'array_id', 8)) {
+			return false;
+		}
+
+		$pos += 8;
+		$rules['array_id'] = true;
 
 		return true;
 	}
