@@ -24,16 +24,15 @@ class CControllerDashboardFavourite extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'object' =>				'in graphid,itemid,screenid,slideshowid,sysmapid|fatal|required',
-			'objectids' =>			'array_db items.itemid                          |fatal|required',
-			'operation' =>			'in create,delete                               |fatal|required'
+			'object' =>		'fatal|required|in graphid,itemid,screenid,slideshowid,sysmapid',
+			'objectids' =>	'fatal|required|array_id',
+			'operation' =>	'fatal|required|in create,delete'
 		);
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$data['main_block'] = '';
-			$this->setResponse(new CControllerResponseData($data));
+			$this->setResponse(new CControllerResponseData(array('main_block' => '')));
 		}
 
 		return $ret;
@@ -48,10 +47,7 @@ class CControllerDashboardFavourite extends CController {
 		$operation = $this->getInput('operation');
 		$objectids = $this->getInput('objectids');
 
-		$data = array (
-			'main_block' => ''
-		);
-
+		$data = array();
 		$result = true;
 
 		DBstart();
@@ -73,10 +69,12 @@ class CControllerDashboardFavourite extends CController {
 				$graphs = getFavouriteGraphs();
 				$graphs = $graphs->toString();
 
-				$data['main_block'] = $data['main_block'].'
-					jQuery("#'.WIDGET_FAVOURITE_GRAPHS.'").html('.CJs::encodeJson($graphs).');
-					jQuery(".menuPopup").remove();
-					jQuery("#favouriteGraphs").data("menu-popup", '.CJs::encodeJson(CMenuPopupHelper::getFavouriteGraphs()).');';
+				$data['main_block'] =
+					'jQuery("#'.WIDGET_FAVOURITE_GRAPHS.'").html('.CJs::encodeJson($graphs).');'.
+					'jQuery(".menuPopup").remove();'.
+					'jQuery("#favouriteGraphs").data('.
+						'"menu-popup", '.CJs::encodeJson(CMenuPopupHelper::getFavouriteGraphs()).
+					');';
 				break;
 
 			// favourite maps
@@ -94,10 +92,12 @@ class CControllerDashboardFavourite extends CController {
 				$maps = getFavouriteMaps();
 				$maps = $maps->toString();
 
-				$data['main_block'] = $data['main_block'].'
-					jQuery("#'.WIDGET_FAVOURITE_MAPS.'").html('.CJs::encodeJson($maps).');
-					jQuery(".menuPopup").remove();
-					jQuery("#favouriteMaps").data("menu-popup", '.CJs::encodeJson(CMenuPopupHelper::getFavouriteMaps()).');';
+				$data['main_block'] =
+					'jQuery("#'.WIDGET_FAVOURITE_MAPS.'").html('.CJs::encodeJson($maps).');'.
+					'jQuery(".menuPopup").remove();'.
+					'jQuery("#favouriteMaps").data('.
+						'"menu-popup", '.CJs::encodeJson(CMenuPopupHelper::getFavouriteMaps()).
+					');';
 				break;
 
 			// favourite screens, slideshows
@@ -116,11 +116,16 @@ class CControllerDashboardFavourite extends CController {
 				$screens = getFavouriteScreens();
 				$screens = $screens->toString();
 
-				$data['main_block'] = $data['main_block'].'
-					jQuery("#'.WIDGET_FAVOURITE_SCREENS.'").html('.CJs::encodeJson($screens).');
-					jQuery(".menuPopup").remove();
-					jQuery("#favouriteScreens").data("menu-popup", '.CJs::encodeJson(CMenuPopupHelper::getFavouriteScreens()).');';
+				$data['main_block'] =
+					'jQuery("#'.WIDGET_FAVOURITE_SCREENS.'").html('.CJs::encodeJson($screens).');'.
+					'jQuery(".menuPopup").remove();'.
+					'jQuery("#favouriteScreens").data('.
+						'"menu-popup", '.CJs::encodeJson(CMenuPopupHelper::getFavouriteScreens()).
+					');';
 				break;
+
+			default:
+				$data['main_block'] = '';
 		}
 
 		DBend($result);

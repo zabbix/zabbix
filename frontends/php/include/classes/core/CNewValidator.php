@@ -105,6 +105,33 @@ class CNewValidator {
 					}
 					break;
 
+				case 'id':
+					if (array_key_exists($field, $this->input)) {
+						if (!is_string($this->input[$field]) || !$this->is_id($this->input[$field])) {
+							$this->addError($fatal,
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
+							);
+							return false;
+						}
+					}
+					break;
+
+				/*
+				 * 'array_id' => true
+				 */
+				case 'array_id':
+					if (array_key_exists($field, $this->input)) {
+						if (!is_array($this->input[$field]) || !$this->is_array_id($this->input[$field])) {
+							$this->addError($fatal,
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
+							);
+							return false;
+						}
+					}
+					break;
+
 				/*
 				 * 'array_db' => array(
 				 *     'table' => <table_name>,
@@ -114,7 +141,7 @@ class CNewValidator {
 				case 'array_db':
 					if (array_key_exists($field, $this->input)) {
 						if (!is_array($this->input[$field])
-								&& !$this->is_array_db($this->input[$field], $params['table'], $params['field'])) {
+								|| !$this->is_array_db($this->input[$field], $params['table'], $params['field'])) {
 
 							$this->addError($fatal,
 								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
@@ -133,7 +160,7 @@ class CNewValidator {
 				 */
 				case 'db':
 					if (array_key_exists($field, $this->input)) {
-							if (!$this->is_db($this->input[$field], $params['table'], $params['field'])) {
+						if (!$this->is_db($this->input[$field], $params['table'], $params['field'])) {
 
 							$this->addError($fatal,
 								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
@@ -250,6 +277,18 @@ class CNewValidator {
 			default:
 				return false;
 		}
+	}
+
+	private function is_array_id(array $values, $table, $field) {
+		$table_schema = DB::getSchema($table);
+
+		foreach ($values as $value) {
+			if (!is_string($value) || !$this->is_id($value)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private function is_array_db(array $values, $table, $field) {
