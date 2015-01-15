@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-12 13:12+0200\n"
+"POT-Creation-Date: 2015-01-14 16:51+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -586,7 +586,7 @@ msgid "Age less than %s"
 msgstr "Възраст по-малка от %s"
 
 #: include/items.inc.php:280 include/views/administration.script.list.php:63
-#: include/views/configuration.httpconf.edit.php:90 popup.php:1744
+#: include/views/configuration.httpconf.edit.php:90 popup.php:1746
 msgid "Agent"
 msgstr "Агент"
 
@@ -611,7 +611,7 @@ msgid "Aggregate checks do not require any agent running on a host being monitor
 msgstr ""
 
 #: include/hosts.inc.php:114 include/views/administration.users.edit.php:51
-#: include/views/administration.users.list.php:54 popup.php:593 users.php:44
+#: include/views/administration.users.list.php:54 popup.php:595 users.php:44
 msgid "Alias"
 msgstr "Псевдоним"
 
@@ -717,7 +717,7 @@ msgstr "Грешка в приложението."
 msgid "Application updated"
 msgstr "Приложение актуализирано"
 
-#: include/classes/api/services/CItemGeneral.php:404
+#: include/classes/api/services/CItemGeneral.php:419
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Приложение с ID \"%1$s\" не е налично за \"%2$s\"."
@@ -2753,6 +2753,8 @@ msgid "Check the agent usability. Always return 1. Can be used as a TCP ping."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:287
+#: include/classes/api/services/CItemGeneral.php:294
+#: include/classes/api/services/CItemGeneral.php:302
 msgid "Check the key, please. Default example was passed."
 msgstr "Моля, проверете ключа. Пример показва по подразбиране."
 
@@ -2944,8 +2946,8 @@ msgstr "Комапдата не може да бъде празна."
 #: include/views/administration.script.edit.php:60
 #: include/views/administration.script.list.php:41
 #: include/views/configuration.action.edit.php:838
-#: include/views/configuration.action.edit.php:842 popup.php:1697
-#: popup.php:1704
+#: include/views/configuration.action.edit.php:842 popup.php:1699
+#: popup.php:1706
 msgid "Commands"
 msgstr "Команди"
 
@@ -4288,7 +4290,7 @@ msgstr "Зависим"
 
 #: include/triggers.inc.php:1231
 #: include/views/configuration.services.edit.php:121
-#: include/views/configuration.triggers.list.php:125 popup.php:1032
+#: include/views/configuration.triggers.list.php:125 popup.php:1034
 #: tr_status.php:561
 msgid "Depends on"
 msgstr "Зависи от"
@@ -4311,7 +4313,7 @@ msgstr "Състояние на разгръщане"
 #: include/views/configuration.template.edit.php:175
 #: include/views/configuration.triggers.edit.php:251
 #: include/views/inventory.host.view.php:198
-#: include/views/monitoring.triggerComment.php:39 popup.php:1296
+#: include/views/monitoring.triggerComment.php:39 popup.php:1298
 #: tr_logform.php:221 tr_status.php:299
 msgid "Description"
 msgstr "Описание"
@@ -4872,7 +4874,7 @@ msgstr "Име на елемент"
 msgid "Email"
 msgstr "Е-мейл"
 
-#: popup.php:516
+#: popup.php:518
 msgid "Empty"
 msgstr "Празен"
 
@@ -5281,8 +5283,8 @@ msgstr ""
 #: include/views/administration.script.edit.php:55
 #: include/views/administration.script.list.php:40
 #: include/views/configuration.action.edit.php:779
-#: include/views/js/configuration.action.edit.js.php:112 popup.php:1696
-#: popup.php:1703
+#: include/views/js/configuration.action.edit.js.php:112 popup.php:1698
+#: popup.php:1705
 msgid "Execute on"
 msgstr "Изпълнение на"
 
@@ -5318,7 +5320,7 @@ msgctxt "maintenance status"
 msgid "Expired"
 msgstr "Изтекъл"
 
-#: include/graphs.inc.php:27 popup.php:1371
+#: include/graphs.inc.php:27 popup.php:1373
 msgid "Exploded"
 msgstr "Разширено кръгова"
 
@@ -5941,7 +5943,7 @@ msgstr "Обща графика"
 
 #: include/views/configuration.graph.edit.php:60
 #: include/views/configuration.graph.list.php:80
-#: include/views/monitoring.history.php:249 popup.php:1298 popup.php:1304
+#: include/views/monitoring.history.php:249 popup.php:1300 popup.php:1306
 msgid "Graph type"
 msgstr "Тип графика"
 
@@ -6017,7 +6019,7 @@ msgstr "Решетка"
 #: include/views/monitoring.overview.items.php:29
 #: include/views/monitoring.overview.triggers.php:31
 #: include/views/monitoring.screen.php:96
-#: include/views/monitoring.slides.php:82 popup.php:483 templates.php:502
+#: include/views/monitoring.slides.php:82 popup.php:485 templates.php:502
 #: tr_status.php:218
 msgid "Group"
 msgstr "Група"
@@ -6314,8 +6316,8 @@ msgstr "Хоризонтално подравняване"
 #: include/views/monitoring.screen.php:97
 #: include/views/monitoring.slides.php:83
 #: include/views/reports.toptriggers.php:158 items.php:546 items.php:806
-#: items.php:839 jsLoader.php:141 latest.php:444 latest.php:446 popup.php:475
-#: popup.php:501 popup.php:1089 queue.php:248 report2.php:359 report2.php:393
+#: items.php:839 jsLoader.php:141 latest.php:444 latest.php:446 popup.php:477
+#: popup.php:503 popup.php:1091 queue.php:248 report2.php:359 report2.php:393
 #: search.php:131 tr_status.php:219 tr_status.php:297
 msgid "Host"
 msgid_plural "Hosts"
@@ -7278,7 +7280,7 @@ msgstr "Подадени са неправилни аргументи за ме�
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Неправилен протокол за автентификация на правило за откриването \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:385
+#: include/classes/api/services/CItemGeneral.php:400
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Неправилен протокол за автентификация за елемент на данните \"%1$s\"."
@@ -7403,12 +7405,12 @@ msgstr ""
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:845
+#: include/classes/api/services/CItemGeneral.php:860
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Неправилен променлив интервал \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:834
+#: include/classes/api/services/CItemGeneral.php:849
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Неправилен променлив интервал в елемент на данните \"%1$s\". Променливият интервал трябва да бъде низ."
@@ -7649,7 +7651,7 @@ msgstr "Неправилен диапазон от портовете."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Неправилен протокол за поверителност на правило за откриване \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:394
+#: include/classes/api/services/CItemGeneral.php:409
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Неправилен протокол за поверителност за елемент на данните \"%1$s\"."
@@ -8228,7 +8230,7 @@ msgstr "Елемент на данните \"%1$s\" в \"%2$s\": приложе�
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Елемент на данните \"%1$s\" пропуска - потребителското правило."
 
-#: include/classes/api/services/CItemGeneral.php:376
+#: include/classes/api/services/CItemGeneral.php:391
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Елемент на данните \"%1$s:%2$s\" има невалиден порт: \"%3$s\"."
@@ -8339,36 +8341,36 @@ msgstr "Елемент на данните използва невалиден �
 msgid "Item values"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:334
+#: include/classes/api/services/CItemGeneral.php:349
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Елемента на данните не се обновява. Моля, въведете правилния интервал за актуализация."
 
-#: include/classes/api/services/CItemGeneral.php:447
+#: include/classes/api/services/CItemGeneral.php:462
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като правило за откриване."
 
-#: include/classes/api/services/CItemGeneral.php:453
+#: include/classes/api/services/CItemGeneral.php:468
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните създаден в елемент на данните прототип."
 
-#: include/classes/api/services/CItemGeneral.php:450
+#: include/classes/api/services/CItemGeneral.php:465
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните прототип."
 
-#: include/classes/api/services/CItemGeneral.php:444
+#: include/classes/api/services/CItemGeneral.php:459
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните."
 
-#: include/classes/api/services/CItemGeneral.php:456
+#: include/classes/api/services/CItemGeneral.php:471
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като неизвестен елемент на данните."
 
-#: include/classes/api/services/CItemGeneral.php:811
+#: include/classes/api/services/CItemGeneral.php:826
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\"."
@@ -8501,17 +8503,17 @@ msgstr "Период на пазене на загубените ресурси 
 #: include/views/configuration.item.list.php:67
 #: include/views/configuration.item.prototype.list.php:48
 #: include/views/js/configuration.discovery.edit.js.php:437 items.php:46
-#: popup.php:948 popup.php:1094
+#: popup.php:950 popup.php:1096
 msgid "Key"
 msgstr "Ключ"
 
-#: include/classes/api/services/CItemGeneral.php:312
+#: include/classes/api/services/CItemGeneral.php:327
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Ключ \"%1$s\" не съвпада с <grpmax|grpmin|grpsum|grpavg>[\"Хост група(и)\", \"Ключ елемент на данните\", \"<last|min|max|avg|sum|count>\", \"параметри\"]."
 
 #: include/views/configuration.action.edit.php:825
-#: include/views/js/common.item.edit.js.php:179
+#: include/views/js/common.item.edit.js.php:190
 msgid "Key passphrase"
 msgstr "Ключ фраза за достъп"
 
@@ -9679,19 +9681,19 @@ msgstr ""
 #: include/views/inventory.host.list.php:75
 #: include/views/js/configuration.sysmaps.js.php:183 items.php:44
 #: latest.php:370 latest.php:451 latest.php:452 maintenance.php:44
-#: maintenance.php:210 maintenance.php:241 popup_httpstep.php:36 popup.php:537
-#: popup.php:660 popup.php:734 popup.php:808 popup.php:883 popup.php:948
-#: popup.php:973 popup.php:1093 popup.php:1223 popup.php:1303 popup.php:1407
-#: popup.php:1410 popup.php:1476 popup.php:1479 popup.php:1539 popup.php:1543
-#: popup.php:1592 popup.php:1619 popup.php:1640 popup.php:1666 popup.php:1695
-#: popup.php:1702 popup_right.php:53 popup_usrgrp.php:89 queue.php:249
+#: maintenance.php:210 maintenance.php:241 popup_httpstep.php:36 popup.php:539
+#: popup.php:662 popup.php:736 popup.php:810 popup.php:885 popup.php:950
+#: popup.php:975 popup.php:1095 popup.php:1225 popup.php:1305 popup.php:1409
+#: popup.php:1412 popup.php:1478 popup.php:1481 popup.php:1541 popup.php:1545
+#: popup.php:1594 popup.php:1621 popup.php:1642 popup.php:1668 popup.php:1697
+#: popup.php:1704 popup_right.php:53 popup_usrgrp.php:89 queue.php:249
 #: report2.php:394 screenconf.php:50 services.php:41 slideconf.php:36
 #: sysmaps.php:48 trigger_prototypes.php:38 triggers.php:41 tr_status.php:298
 msgid "Name"
 msgstr "Име"
 
 #: include/views/administration.users.edit.php:52
-#: include/views/administration.users.list.php:55 popup.php:594 users.php:45
+#: include/views/administration.users.list.php:55 popup.php:596 users.php:45
 msgctxt "user first name"
 msgid "Name"
 msgstr ""
@@ -9898,11 +9900,11 @@ msgstr ""
 msgid "No JMX interfaces found."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:364
+#: include/classes/api/services/CItemGeneral.php:379
 msgid "No SNMP OID specified."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:370
+#: include/classes/api/services/CItemGeneral.php:385
 msgid "No SNMP community specified."
 msgstr ""
 
@@ -9948,7 +9950,7 @@ msgid "No application with ID \"%1$s\"."
 msgstr "Няма приложение с ID \"%1$s\"."
 
 #: include/views/configuration.application.list.php:55
-#: include/views/configuration.httpconf.edit.php:67 popup.php:1221
+#: include/views/configuration.httpconf.edit.php:67 popup.php:1223
 msgid "No applications found."
 msgstr ""
 
@@ -9967,7 +9969,7 @@ msgstr "В операция на действие за команда \"%s\" н�
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "В операция на действие за команда \"%s\" не е уточнено потребителското име за автентификация."
 
-#: include/classes/api/services/CItemGeneral.php:341
+#: include/classes/api/services/CItemGeneral.php:356
 msgid "No authentication user name specified."
 msgstr "Не е уточнено потребителското име за автентификация."
 
@@ -10027,8 +10029,8 @@ msgid "No discovery rule IDs given."
 msgstr "Не уточнено ID на правило за откриване."
 
 #: include/views/configuration.discovery.list.php:37
-#: include/views/configuration.host.discovery.list.php:42 popup.php:1618
-#: popup.php:1639
+#: include/views/configuration.host.discovery.list.php:42 popup.php:1620
+#: popup.php:1641
 msgid "No discovery rules found."
 msgstr ""
 
@@ -10077,7 +10079,7 @@ msgstr "Няма елемент на графика с graphid \"%s\"."
 msgid "No graph prototype ID provided for screen element."
 msgstr ""
 
-#: include/views/configuration.graph.list.php:73 popup.php:1292
+#: include/views/configuration.graph.list.php:73 popup.php:1294
 msgid "No graph prototypes found."
 msgstr ""
 
@@ -10086,7 +10088,7 @@ msgid "No graphs added."
 msgstr ""
 
 #: include/views/configuration.graph.list.php:73
-#: include/views/monitoring.charts.php:77 popup.php:1292
+#: include/views/monitoring.charts.php:77 popup.php:1294
 msgid "No graphs found."
 msgstr ""
 
@@ -10127,7 +10129,7 @@ msgid "No host group ID provided for screen element."
 msgstr "Не е определено ID на хост група за елемент от екрана."
 
 #: include/blocks.inc.php:276 include/blocks.inc.php:473
-#: include/views/configuration.hostgroups.list.php:47 popup.php:881
+#: include/views/configuration.hostgroups.list.php:47 popup.php:883
 #: popup_right.php:50 search.php:283
 msgid "No host groups found."
 msgstr ""
@@ -10151,7 +10153,7 @@ msgid "No host with hostid \"%s\"."
 msgstr "Няма хост с  hostid \"%s\"."
 
 #: hostinventoriesoverview.php:95 include/views/configuration.host.list.php:74
-#: include/views/inventory.host.list.php:71 popup.php:732 popup.php:806
+#: include/views/inventory.host.list.php:71 popup.php:734 popup.php:808
 #: search.php:129
 msgid "No hosts found."
 msgstr ""
@@ -10200,7 +10202,7 @@ msgstr "Няма интерфейс за хост \"%s\"."
 msgid "No item ID provided for screen element."
 msgstr "Не е определено ID на елемент на данните за елемент от екрана."
 
-#: popup.php:947
+#: popup.php:949
 msgid "No item keys found."
 msgstr ""
 
@@ -10208,7 +10210,7 @@ msgstr ""
 msgid "No item prototype ID provided for screen element."
 msgstr ""
 
-#: include/views/configuration.item.prototype.list.php:43 popup.php:1087
+#: include/views/configuration.item.prototype.list.php:43 popup.php:1089
 msgid "No item prototypes found."
 msgstr ""
 
@@ -10227,7 +10229,7 @@ msgid "No items defined."
 msgstr "Не са дефинирани елементи на данните."
 
 #: include/items.inc.php:697 include/views/configuration.item.list.php:59
-#: include/views/monitoring.overview.items.php:94 popup.php:1087
+#: include/views/monitoring.overview.items.php:94 popup.php:1089
 msgid "No items found."
 msgstr ""
 
@@ -10252,7 +10254,7 @@ msgid "No maps added."
 msgstr ""
 
 #: include/views/configuration.sysmap.list.php:40
-#: include/views/monitoring.maps.php:23 popup.php:1404
+#: include/views/monitoring.maps.php:23 popup.php:1406
 msgid "No maps found."
 msgstr ""
 
@@ -10422,11 +10424,11 @@ msgstr "Нямате право на достъп до посочения обе
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Не е уточнен файла с личен ключ за команда \"%s\" в операция на действие."
 
-#: include/classes/api/services/CItemGeneral.php:349
+#: include/classes/api/services/CItemGeneral.php:364
 msgid "No private key file specified."
 msgstr "Не е уточнен файла с личен ключ."
 
-#: include/views/administration.proxy.list.php:37 popup.php:1665
+#: include/views/administration.proxy.list.php:37 popup.php:1667
 msgid "No proxies found."
 msgstr ""
 
@@ -10439,7 +10441,7 @@ msgstr "Няма прокси"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Не е уточнен файла с обществен ключ за команда \"%s\" в операция на действие."
 
-#: include/classes/api/services/CItemGeneral.php:346
+#: include/classes/api/services/CItemGeneral.php:361
 msgid "No public key file specified."
 msgstr "Не е уточнен файла с обществен ключ."
 
@@ -10462,7 +10464,7 @@ msgstr ""
 #: include/classes/screens/CScreenBuilder.php:315
 #: include/views/configuration.screen.list.php:48
 #: include/views/monitoring.hostscreen.php:32
-#: include/views/monitoring.screen.php:35 popup.php:1535 popup.php:1591
+#: include/views/monitoring.screen.php:35 popup.php:1537 popup.php:1593
 msgid "No screens found."
 msgstr ""
 
@@ -10470,7 +10472,7 @@ msgstr ""
 msgid "No script specified for action operation command."
 msgstr "Не е уточнен скрипт за команда в операция на действие."
 
-#: include/views/administration.script.list.php:35 popup.php:1691
+#: include/views/administration.script.list.php:35 popup.php:1693
 msgid "No scripts found."
 msgstr ""
 
@@ -10479,7 +10481,7 @@ msgstr ""
 msgid "No slide shows found."
 msgstr ""
 
-#: include/views/monitoring.slides.php:93 popup.php:1473
+#: include/views/monitoring.slides.php:93 popup.php:1475
 msgid "No slides found."
 msgstr ""
 
@@ -10495,7 +10497,7 @@ msgstr "Не е избрана цел"
 msgid "No target selected."
 msgstr "Не е избрана цел."
 
-#: popup.php:658 search.php:403 templates.php:510
+#: popup.php:660 search.php:403 templates.php:510
 msgid "No templates found."
 msgstr ""
 
@@ -10530,17 +10532,17 @@ msgstr "Не са дефинирани тригери."
 #: include/triggers.inc.php:1083
 #: include/views/configuration.triggers.list.php:68
 #: include/views/monitoring.overview.triggers.php:115
-#: include/views/reports.toptriggers.php:156 popup.php:969 report2.php:391
+#: include/views/reports.toptriggers.php:156 popup.php:971 report2.php:391
 #: tr_status.php:286
 msgid "No triggers found."
 msgstr "Не са намерени тригери."
 
-#: include/views/administration.usergroups.list.php:42 popup.php:534
+#: include/views/administration.usergroups.list.php:42 popup.php:536
 #: popup_usrgrp.php:86
 msgid "No user groups found."
 msgstr ""
 
-#: include/views/administration.users.list.php:51 popup.php:590
+#: include/views/administration.users.list.php:51 popup.php:592
 msgid "No users found."
 msgstr ""
 
@@ -10571,7 +10573,7 @@ msgstr "Нищо"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
 #: include/triggers.inc.php:1500 include/views/monitoring.history.php:242
-#: popup.php:1374
+#: popup.php:1376
 msgid "Normal"
 msgstr "Нормално"
 
@@ -11452,7 +11454,7 @@ msgstr "Пасивен"
 #: include/views/configuration.item.massupdate.php:246
 #: include/views/configuration.item.massupdate.php:290
 #: include/views/general.login.php:69
-#: include/views/js/common.item.edit.js.php:182
+#: include/views/js/common.item.edit.js.php:193
 msgid "Password"
 msgstr "Парола"
 
@@ -11549,7 +11551,7 @@ msgstr "Права за достъп може да бъдат назначен �
 msgid "Persian (fa_IR)"
 msgstr "Персийски (fa_IR)"
 
-#: include/graphs.inc.php:26 popup.php:1368
+#: include/graphs.inc.php:26 popup.php:1370
 msgid "Pie"
 msgstr "Кръгов"
 
@@ -12255,6 +12257,10 @@ msgstr ""
 msgid "Retry"
 msgstr "Повторен опит"
 
+#: include/classes/items/CHelpItems.php:909
+msgid "Return first column of the first row of the SQL query result."
+msgstr ""
+
 #: include/classes/items/CHelpItems.php:591
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr ""
@@ -12472,7 +12478,7 @@ msgstr "SNMP интерфейс"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: include/classes/api/services/CItemGeneral.php:358
+#: include/classes/api/services/CItemGeneral.php:373
 msgid "SNMP trap key is invalid."
 msgstr "Ключа за SNMP trap е невалиден."
 
@@ -12838,10 +12844,10 @@ msgstr "Име на сигурност"
 #: include/views/js/configuration.sysmaps.js.php:114
 #: include/views/js/configuration.sysmaps.js.php:120
 #: include/views/monitoring.overview.items.php:74 jsLoader.php:178
-#: latest.php:402 popup_bitem.php:136 popup.php:573 popup.php:640
-#: popup.php:712 popup.php:786 popup.php:861 popup.php:931 popup.php:1067
-#: popup.php:1201 popup.php:1270 popup.php:1385 popup.php:1454 popup.php:1516
-#: popup.php:1576 popup.php:1762 popup_right.php:71 popup_usrgrp.php:106
+#: latest.php:402 popup_bitem.php:136 popup.php:575 popup.php:642
+#: popup.php:714 popup.php:788 popup.php:863 popup.php:933 popup.php:1069
+#: popup.php:1203 popup.php:1272 popup.php:1387 popup.php:1456 popup.php:1518
+#: popup.php:1578 popup.php:1764 popup_right.php:71 popup_usrgrp.php:106
 #: tr_logform.php:248
 msgid "Select"
 msgstr "Изберете"
@@ -12933,7 +12939,7 @@ msgstr "Сериен номер А"
 msgid "Serial number B"
 msgstr "Сериен номер Б"
 
-#: include/views/administration.script.list.php:66 popup.php:1747
+#: include/views/administration.script.list.php:66 popup.php:1749
 #: queue.php:161
 msgid "Server"
 msgstr "Сървър"
@@ -13031,7 +13037,7 @@ msgstr "Сесията е прекратена, моля влезте повто
 #: include/views/configuration.triggers.list.php:71
 #: include/views/configuration.triggers.massupdate.php:69
 #: include/views/reports.toptriggers.php:136
-#: include/views/reports.toptriggers.php:160 popup.php:974 tr_logform.php:346
+#: include/views/reports.toptriggers.php:160 popup.php:976 tr_logform.php:346
 #: tr_status.php:290
 msgid "Severity"
 msgstr "Важност"
@@ -13363,7 +13369,7 @@ msgid "Speed"
 msgstr "Скорост"
 
 #: include/graphs.inc.php:25 include/views/monitoring.history.php:246
-#: popup.php:1365
+#: popup.php:1367
 msgid "Stacked"
 msgstr "Подредени"
 
@@ -13413,7 +13419,7 @@ msgstr ""
 #: include/views/configuration.item.prototype.list.php:54
 #: include/views/configuration.trigger.prototype.list.php:63
 #: include/views/configuration.triggers.list.php:75 popup_media.php:142
-#: popup.php:975 popup.php:1097 srv_status.php:140 tr_status.php:291
+#: popup.php:977 popup.php:1099 srv_status.php:140 tr_status.php:291
 msgid "Status"
 msgstr "Състояние"
 
@@ -13561,7 +13567,7 @@ msgid "Support"
 msgstr "Поддръжка"
 
 #: include/views/administration.users.edit.php:53
-#: include/views/administration.users.list.php:56 popup.php:595 users.php:46
+#: include/views/administration.users.list.php:56 popup.php:597 users.php:46
 msgid "Surname"
 msgstr "Фамилия"
 
@@ -14083,6 +14089,10 @@ msgstr "Общо време: %s"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Транзакцията не е затворена. Прекратяване ..."
 
+#: include/classes/items/CHelpItems.php:913
+msgid "Transform SQL query result into a JSON object for low-level discovery."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:204
 msgid "Transport error."
 msgstr "Грешка при транспорт."
@@ -14435,7 +14445,7 @@ msgstr "Двата елемента на данните (\"%1$s\" и \"%2$s\") �
 #: include/views/js/configuration.sysmaps.js.php:397
 #: include/views/monitoring.overview.items.php:30
 #: include/views/monitoring.overview.triggers.php:32 latest.php:478
-#: latest.php:479 popup_media.php:124 popup.php:495 popup.php:1095
+#: latest.php:479 popup_media.php:124 popup.php:497 popup.php:1097
 #: tr_logform.php:273 tr_logform.php:277
 msgid "Type"
 msgstr "Тип"
@@ -14465,15 +14475,15 @@ msgstr "Тип на изчислението"
 #: include/forms.inc.php:520 include/forms.inc.php:903
 #: include/views/configuration.item.edit.php:208
 #: include/views/configuration.item.edit.php:219
-#: include/views/configuration.item.massupdate.php:215 popup.php:1096
+#: include/views/configuration.item.massupdate.php:215 popup.php:1098
 msgid "Type of information"
 msgstr "Тип на информацията"
 
-#: include/classes/api/services/CItemGeneral.php:326
+#: include/classes/api/services/CItemGeneral.php:341
 msgid "Type of information must be \"Log\" for log key."
 msgstr "За ключ на дневника (лога) типа на информацията трябва да бъде \"Дневник (лог)\"."
 
-#: include/classes/api/services/CItemGeneral.php:321
+#: include/classes/api/services/CItemGeneral.php:336
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
 msgstr ""
 
@@ -15904,7 +15914,7 @@ msgstr "Вие нямате право да променяте привилег�
 msgid "You are not logged in."
 msgstr "Вие не сте влезли в системата."
 
-#: popup.php:474
+#: popup.php:476
 msgid "You can not switch hosts for current selection."
 msgstr "Не може да превключвате хостове за текущата селекция."
 

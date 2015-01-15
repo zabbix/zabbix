@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1053,10 +1053,12 @@ zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
 
 int	zbx_check_hostname(const char *hostname, char **error);
 
-int	is_hostname_char(char c);
-int	is_key_char(char c);
-int	is_function_char(char c);
-int	is_macro_char(char c);
+int	is_hostname_char(unsigned char c);
+int	is_key_char(unsigned char c);
+int	is_function_char(unsigned char c);
+int	is_macro_char(unsigned char c);
+
+int	is_discovery_macro(const char *name);
 
 int	is_time_function(const char *func);
 int	is_snmp_type(unsigned char type);
