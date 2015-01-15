@@ -141,9 +141,9 @@ foreach ($this->data['groups'] as $group) {
 		new CCheckBox('groups['.$group['groupid'].']', null, null, $group['groupid']),
 		$name,
 		array(
-			array(new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'], 'unknown'), ' ('.$templateCount.')'),
+			array(new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'], 'unknown'), CViewHelper::showNum($templateCount)),
 			BR(),
-			array(new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), ' ('.$hostCount.')')
+			array(new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), CViewHelper::showNum($hostCount))
 		),
 		new CCol(empty($hostsOutput) ? '-' : $hostsOutput, 'wraptext'),
 		$info
