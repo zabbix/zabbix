@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-30 06:34+0200\n"
+"POT-Creation-Date: 2015-01-15 18:31+0200\n"
 "PO-Revision-Date: 2014-12-24 07:08+0300\n"
 "Last-Translator: Wayne Wang <net_use@bzhy.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1559,7 +1559,7 @@ msgstr "不能创建触发器本身的依赖."
 msgid "Cannot create discovery rule"
 msgstr "无法创建探索规则"
 
-#: include/classes/api/services/CHost.php:1067
+#: include/classes/api/services/CHost.php:1065
 msgid "Cannot create host group."
 msgstr "无法创建主机群组."
 
@@ -1646,7 +1646,7 @@ msgstr[0] "无法删除组"
 msgid "Cannot delete host"
 msgstr "无法删除主机"
 
-#: include/classes/api/services/CHost.php:1078
+#: include/classes/api/services/CHost.php:1076
 msgid "Cannot delete host group."
 msgstr "无法删除主机群组."
 
@@ -1666,7 +1666,7 @@ msgstr "无法删除图示对应"
 msgid "Cannot delete image"
 msgstr "无法删除图片"
 
-#: include/classes/api/services/CHost.php:1164
+#: include/classes/api/services/CHost.php:1162
 msgid "Cannot delete inventory."
 msgstr "无法删除资产纪录."
 
@@ -2141,7 +2141,7 @@ msgstr "无法插入触发器表达式"
 msgid "Cannot insert user media."
 msgstr "不能插入用户示警媒介"
 
-#: include/classes/api/services/CHost.php:1142
+#: include/classes/api/services/CHost.php:1140
 msgid "Cannot link template"
 msgstr "无法连结模板"
 
@@ -2158,7 +2158,7 @@ msgstr "无法登陆"
 msgid "Cannot logout."
 msgstr "不能登出"
 
-#: include/classes/api/services/CHost.php:963
+#: include/classes/api/services/CHost.php:961
 msgid "Cannot mass update host name."
 msgstr "不能大量更新主机名称."
 
@@ -2166,7 +2166,7 @@ msgstr "不能大量更新主机名称."
 msgid "Cannot mass update template name."
 msgstr "无法批量更新模板名称."
 
-#: include/classes/api/services/CHost.php:953
+#: include/classes/api/services/CHost.php:951
 msgid "Cannot mass update visible host name."
 msgstr "不能大量更新可见主机名称"
 
@@ -2260,7 +2260,7 @@ msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "无法设置 \"模板序列号\" 为触发器原型 \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:572
-#: include/classes/api/services/CHost.php:1017
+#: include/classes/api/services/CHost.php:1015
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "无法设置审计字段为已经禁止的审计."
 
@@ -2310,7 +2310,7 @@ msgstr "无法断连和清除项目"
 msgid "Cannot unlink and clear triggers"
 msgstr "无法断连和清除触发器"
 
-#: include/classes/api/services/CHost.php:1117
+#: include/classes/api/services/CHost.php:1115
 msgid "Cannot unlink template"
 msgstr "无法断连模板"
 
@@ -2667,21 +2667,21 @@ msgstr "检查开始于\"%1$s\"的表示式部份."
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr "检查文件是否存在.0—表示文件不存在，1—表示文件存在"
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "检查服务是否可用.0—表示服务宕机,1—表示服务运行正常.如果<ip>参数省略，则系统会使用在主机上定义的IP地址DNS主机名。如果<port>参数省略，则会使用服务对应的默认端口."
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr "检查服务是否可用.0—表示服务宕机,1—表示服务运行正常.如果IP参数省略,则系统会使用127.0.0.1代替.如果port参数省略，则会使用对应服务的默认端口。例子：net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
 msgstr "检查服务的性能\"服务\".0—表示服务宕机,sec—表示连接到指定服务所花的时间.如果IP参数省略,则系统会使用127.0.0.1代替.如果port参数省略，则会使用对应服务的默认端口."
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "检查服务的性能.0—表示服务宕机,sec—表示连接到指定服务所花的时间.如果<ip>参数省略,则系统会使用在主机上定义IP地址或DNS主机名代替。如果<port>参数省略，则会使用对应服务的默认端口."
 
@@ -2708,8 +2708,8 @@ msgstr "检查是否可以连接到指定的TCP端口。0——表示不能连�
 msgid "Checks"
 msgstr "检查 "
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr "检查DNS服务是否正常.0——表示DNS服务不正常（即服务器对于DNS的解析请求没有回复），1——表示DNS服务正常."
 
@@ -4129,7 +4129,7 @@ msgstr "已删除: 发现规则 \"%1$s\" 于 \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "已删除: 图表 \"%1$s\" 于 \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1445
+#: include/classes/api/services/CHost.php:1443
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "已删除: 主机 \"%1$s\"."
@@ -4856,7 +4856,7 @@ msgstr "空主机"
 #: include/classes/api/services/CHostGroup.php:471
 #: include/classes/api/services/CHostGroup.php:548
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1293
+#: include/classes/api/services/CHost.php:1291
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:618
@@ -6230,7 +6230,7 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "主机"
 
-#: include/classes/api/services/CHost.php:976
+#: include/classes/api/services/CHost.php:974
 #: include/classes/api/services/CTemplate.php:471
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6490,7 +6490,7 @@ msgstr "主机子网路遮罩"
 msgid "Host time"
 msgstr "主机时间"
 
-#: include/classes/api/services/CHost.php:850
+#: include/classes/api/services/CHost.php:848
 msgid "Host update failed."
 msgstr "主机更新失败."
 
@@ -7191,7 +7191,7 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "主机 \"%1$s\"使用了不正确的字符."
 
 #: include/classes/api/services/CHost.php:626
-#: include/classes/api/services/CHost.php:959
+#: include/classes/api/services/CHost.php:957
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "不正确的字元用于主机名称\"%s\"."
@@ -8032,7 +8032,7 @@ msgstr "所给的\"%s\"为无效的检视名称.  可用的: \"a-z\" 和 \".\"."
 msgid "Inventory"
 msgstr "资产记录"
 
-#: include/classes/api/services/CHost.php:1183
+#: include/classes/api/services/CHost.php:1181
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "主机\"%1$s\"的资产记录被禁用."
@@ -9975,7 +9975,7 @@ msgstr "未发现数据图."
 msgid "No groups for host \"%s\"."
 msgstr "没有群组的主机 \"%s\"."
 
-#: include/classes/api/services/CHost.php:945
+#: include/classes/api/services/CHost.php:943
 msgid "No groups for hosts."
 msgstr "没有主机群组"
 
@@ -10238,7 +10238,7 @@ msgstr "没有系统存取的许可权"
 #: include/classes/api/services/CHostInterface.php:647
 #: include/classes/api/services/CHost.php:530
 #: include/classes/api/services/CHost.php:613
-#: include/classes/api/services/CHost.php:1638
+#: include/classes/api/services/CHost.php:1636
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -11368,8 +11368,8 @@ msgstr "百分比线(左)"
 msgid "Percentile line (right)"
 msgstr "百分比线(右)"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:351
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr "执行DNS查询.正确的返回会包含请求类型信息的字符串."
 
@@ -13558,7 +13558,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "模板"
 
-#: include/classes/api/services/CHost.php:987
+#: include/classes/api/services/CHost.php:985
 #: include/classes/api/services/CTemplate.php:461
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -15776,8 +15776,8 @@ msgstr "您没有指定目标为动作操作的全域脚本\"%s\"."
 
 #: include/classes/api/services/CGraph.php:543
 #: include/classes/api/services/CGraphPrototype.php:558
-#: include/classes/api/services/CHost.php:881
-#: include/classes/api/services/CHost.php:939
+#: include/classes/api/services/CHost.php:879
+#: include/classes/api/services/CHost.php:937
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668

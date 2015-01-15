@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-30 06:33+0200\n"
+"POT-Creation-Date: 2015-01-15 18:31+0200\n"
 "PO-Revision-Date: 2014-11-03 21:37+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1586,7 +1586,7 @@ msgstr "Невозможно создать зависимость тригге�
 msgid "Cannot create discovery rule"
 msgstr "Не удалось создать правило обнаружения"
 
-#: include/classes/api/services/CHost.php:1067
+#: include/classes/api/services/CHost.php:1065
 msgid "Cannot create host group."
 msgstr "Не удалось создать группу узлов сети."
 
@@ -1677,7 +1677,7 @@ msgstr[2] "Не удалось удалить группы"
 msgid "Cannot delete host"
 msgstr "Не удалось удалить узел сети"
 
-#: include/classes/api/services/CHost.php:1078
+#: include/classes/api/services/CHost.php:1076
 msgid "Cannot delete host group."
 msgstr "Не удалось удалить группу узлов сети."
 
@@ -1697,7 +1697,7 @@ msgstr "Не удалось удалить соответствие иконок
 msgid "Cannot delete image"
 msgstr "Не удалось удалить изображение"
 
-#: include/classes/api/services/CHost.php:1164
+#: include/classes/api/services/CHost.php:1162
 msgid "Cannot delete inventory."
 msgstr "Не удалось удалить инвентарные данные."
 
@@ -2226,7 +2226,7 @@ msgstr "Не удалось вставить выражение триггера
 msgid "Cannot insert user media."
 msgstr "Не удалось добавить оповещение пользователя."
 
-#: include/classes/api/services/CHost.php:1142
+#: include/classes/api/services/CHost.php:1140
 msgid "Cannot link template"
 msgstr "Не удалось присоединить шаблон"
 
@@ -2243,7 +2243,7 @@ msgstr "Не удалось войти в систему."
 msgid "Cannot logout."
 msgstr "Не удалось выполнить выход."
 
-#: include/classes/api/services/CHost.php:963
+#: include/classes/api/services/CHost.php:961
 msgid "Cannot mass update host name."
 msgstr "Невозможно массово обновить имя узла сети."
 
@@ -2251,7 +2251,7 @@ msgstr "Невозможно массово обновить имя узла с�
 msgid "Cannot mass update template name."
 msgstr "Невозможно массово обновить имя шаблона."
 
-#: include/classes/api/services/CHost.php:953
+#: include/classes/api/services/CHost.php:951
 msgid "Cannot mass update visible host name."
 msgstr "Невозможно массово обновить видимое имя узла сети."
 
@@ -2345,7 +2345,7 @@ msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Не удалось установить \"templateid\" для прототипа триггера \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:572
-#: include/classes/api/services/CHost.php:1017
+#: include/classes/api/services/CHost.php:1015
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Не удалось задать поля инвентарных данных при отключенной инвентаризации."
 
@@ -2395,7 +2395,7 @@ msgstr "Не удалось отсоединить и очистить элем�
 msgid "Cannot unlink and clear triggers"
 msgstr "Не удалось отсоединить и очистить триггеры"
 
-#: include/classes/api/services/CHost.php:1117
+#: include/classes/api/services/CHost.php:1115
 msgid "Cannot unlink template"
 msgstr "Не удалось отсоединить шаблон"
 
@@ -2752,21 +2752,21 @@ msgstr "Проверьте часть выражения начиная с \"%1$
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr "Проверяется существует ли файл. 0 - файл не существует, 1 - существует"
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Проверка, доступен ли сервис. 0 - сервис недоступен, 1 - сервис запущен. Если <ip> не указан, IP или DNS имя берется из настроек узла сети. Если <порт> не указан, то используется порт сервиса по умолчанию."
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr "Проверка, доступен ли сервис. 0 - сервис недоступен, 1 - сервис запущен. Если ip не указан используется 127.0.0.1. Если <порт> не указан, то используется порт сервиса по умолчанию. Пример: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
 msgstr "Проверка производительности сервиса \"услуги\". 0 - сервис недоступен, сек - количество секунд потраченное на подключение к этому сервису. Если ip не указан, используется 127.0.0.1. Если номер порта не указан, то используется порт сервиса по умолчанию."
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Проверка производительности сервиса. 0 - сервис недоступен, сек - количество секунд потраченное на подключение к этому сервису. Если ip не указан, IP или DNS имя берется из настроек узла сети. Если <порт> не указан, то используется порт сервиса по умолчанию."
 
@@ -2793,8 +2793,8 @@ msgstr "Проверка возможности создать TCP подклю�
 msgid "Checks"
 msgstr "Проверки"
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr "Проверка работоспособности DNS сервиса. 0 - DNS недоступен (сервер не ответил или ответ DNS ошибочен), 1 - DNS работает."
 
@@ -4218,7 +4218,7 @@ msgstr "Удалено: Правило обнаружения \"%1$s\" из \"%2
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: График \"%1$s\" из \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1445
+#: include/classes/api/services/CHost.php:1443
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Удалено: Узел сети \"%1$s\"."
@@ -4949,7 +4949,7 @@ msgstr "Пустое имя узла сети."
 #: include/classes/api/services/CHostGroup.php:471
 #: include/classes/api/services/CHostGroup.php:548
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1293
+#: include/classes/api/services/CHost.php:1291
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:618
@@ -6326,7 +6326,7 @@ msgstr[0] "Узел сети"
 msgstr[1] "Узел сети"
 msgstr[2] "Узел сети"
 
-#: include/classes/api/services/CHost.php:976
+#: include/classes/api/services/CHost.php:974
 #: include/classes/api/services/CTemplate.php:471
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6594,7 +6594,7 @@ msgstr "Маска подсети узла сети"
 msgid "Host time"
 msgstr "Время на узле сети"
 
-#: include/classes/api/services/CHost.php:850
+#: include/classes/api/services/CHost.php:848
 msgid "Host update failed."
 msgstr "Ошибка при обновлении узла сети."
 
@@ -7295,7 +7295,7 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Использованы некорректные символы в узле сети \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:626
-#: include/classes/api/services/CHost.php:959
+#: include/classes/api/services/CHost.php:957
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Использованы некорректные символы в имени узла сети \"%s\"."
@@ -8136,7 +8136,7 @@ msgstr "Получено ошибочное имя представления \"
 msgid "Inventory"
 msgstr "Инвентаризация"
 
-#: include/classes/api/services/CHost.php:1183
+#: include/classes/api/services/CHost.php:1181
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Инвентарные данные деактивированы для узла сети \"%1$s\"."
@@ -10098,7 +10098,7 @@ msgstr "Графики не найдены."
 msgid "No groups for host \"%s\"."
 msgstr "Нет групп для узла сети \"%s\"."
 
-#: include/classes/api/services/CHost.php:945
+#: include/classes/api/services/CHost.php:943
 msgid "No groups for hosts."
 msgstr "Нет групп для узлов сети."
 
@@ -10361,7 +10361,7 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CHostInterface.php:647
 #: include/classes/api/services/CHost.php:530
 #: include/classes/api/services/CHost.php:613
-#: include/classes/api/services/CHost.php:1638
+#: include/classes/api/services/CHost.php:1636
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -11491,8 +11491,8 @@ msgstr "Процентная линия (слева)"
 msgid "Percentile line (right)"
 msgstr "Процентная линия (справа)"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:351
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr ""
 
@@ -13688,7 +13688,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Шаблон"
 
-#: include/classes/api/services/CHost.php:987
+#: include/classes/api/services/CHost.php:985
 #: include/classes/api/services/CTemplate.php:461
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -15928,8 +15928,8 @@ msgstr "Вы не указали цели глобального скрипта 
 
 #: include/classes/api/services/CGraph.php:543
 #: include/classes/api/services/CGraphPrototype.php:558
-#: include/classes/api/services/CHost.php:881
-#: include/classes/api/services/CHost.php:939
+#: include/classes/api/services/CHost.php:879
+#: include/classes/api/services/CHost.php:937
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668
