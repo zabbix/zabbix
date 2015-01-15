@@ -23,9 +23,6 @@
 #include "zbxregexp.h"
 #include "md5.h"
 
-#define ZBX_FLAG_ELEMENT_PERSISTENT	0x01	/* do not overwrite old values */
-#define ZBX_FLAG_ELEMENT_LOG		0x02	/* item value type is log */
-
 struct	st_logfile
 {
 	char		*filename;

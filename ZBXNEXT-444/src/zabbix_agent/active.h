@@ -65,6 +65,9 @@ extern int	CONFIG_LISTEN_PORT;
 #	endif
 #endif	/* _WINDOWS */
 
+#define ZBX_BUFFER_ELEMENT_PERSISTENT	0x01	/* do not overwrite old values */
+#define ZBX_BUFFER_ELEMENT_LOG		0x02	/* item value type is log */
+
 typedef struct
 {
 	char			*key, *key_orig;

@@ -20,6 +20,7 @@
 #include "common.h"
 #include "logfiles.h"
 #include "log.h"
+#include "active.h"
 
 #if defined(_WINDOWS)
 #	include "gnuregex.h"
@@ -1862,8 +1863,8 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 					{
 						send_err = process_value(server, port, hostname, key, item_value,
 								ITEM_STATE_NORMAL, &lastlogsize1, mtime, NULL, NULL,
-								NULL, NULL, ZBX_FLAG_ELEMENT_PERSISTENT |
-								ZBX_FLAG_ELEMENT_LOG);
+								NULL, NULL, ZBX_BUFFER_ELEMENT_PERSISTENT |
+								ZBX_BUFFER_ELEMENT_LOG);
 
 						zbx_free(item_value);
 
@@ -1931,8 +1932,8 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 					{
 						send_err = process_value(server, port, hostname, key, item_value,
 								ITEM_STATE_NORMAL, &lastlogsize1, mtime, NULL, NULL,
-								NULL, NULL, ZBX_FLAG_ELEMENT_PERSISTENT |
-								ZBX_FLAG_ELEMENT_LOG);
+								NULL, NULL, ZBX_BUFFER_ELEMENT_PERSISTENT |
+								ZBX_BUFFER_ELEMENT_LOG);
 
 						zbx_free(item_value);
 

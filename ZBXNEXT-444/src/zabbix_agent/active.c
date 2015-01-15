@@ -826,21 +826,9 @@ ret:
  *           process_log(), process_logrt(), zbx_read2() and their callers.   *
  *                                                                            *
  ******************************************************************************/
-static int	process_value(
-		const char	*server,
-		unsigned short	port,
-		const char	*host,
-		const char	*key,
-		const char	*value,
-		unsigned char	state,
-		zbx_uint64_t	*lastlogsize,
-		int		*mtime,
-		unsigned long	*timestamp,
-		const char	*source,
-		unsigned short	*severity,
-		unsigned long	*logeventid,
-		unsigned char	flags
-)
+static int	process_value(const char *server, unsigned short port, const char *host, const char *key,
+		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, int *mtime, unsigned long *timestamp,
+		const char *source, unsigned short *severity, unsigned long *logeventid, unsigned char flags)
 {
 	const char			*__function_name = "process_value";
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el = NULL;
@@ -851,7 +839,7 @@ static int	process_value(
 
 	send_buffer(server, port);
 
-	if (0 != (ZBX_FLAG_ELEMENT_PERSISTENT & flags) && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
+	if (0 != (ZBX_BUFFER_ELEMENT_PERSISTENT & flags) && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "buffer is full, cannot store persistent value");
 		goto out;
@@ -865,7 +853,7 @@ static int	process_value(
 	}
 	else
 	{
-		if (0 == (ZBX_FLAG_ELEMENT_PERSISTENT & flags))
+		if (0 == (ZBX_BUFFER_ELEMENT_PERSISTENT & flags))
 		{
 			for (i = 0; i < buffer.count; i++)
 			{
@@ -875,12 +863,12 @@ static int	process_value(
 			}
 		}
 
-		if (0 != (ZBX_FLAG_ELEMENT_PERSISTENT & flags) || i == buffer.count)
+		if (0 != (ZBX_BUFFER_ELEMENT_PERSISTENT & flags) || i == buffer.count)
 		{
 			for (i = 0; i < buffer.count; i++)
 			{
 				el = &buffer.data[i];
-				if (0 == (ZBX_FLAG_ELEMENT_PERSISTENT & el->flags))
+				if (0 == (ZBX_BUFFER_ELEMENT_PERSISTENT & el->flags))
 					break;
 			}
 		}
@@ -923,7 +911,7 @@ static int	process_value(
 	zbx_timespec(&el->ts);
 	el->flags = flags;
 
-	if (0 != (ZBX_FLAG_ELEMENT_PERSISTENT & flags))
+	if (0 != (ZBX_BUFFER_ELEMENT_PERSISTENT & flags))
 		buffer.pcount++;
 
 	ret = SUCCEED;
@@ -1217,8 +1205,8 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 				{
 					send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
 							ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, provider,
-							&severity, &logeventid, ZBX_FLAG_ELEMENT_PERSISTENT |
-							ZBX_FLAG_ELEMENT_LOG);
+							&severity, &logeventid, ZBX_BUFFER_ELEMENT_PERSISTENT |
+							ZBX_BUFFER_ELEMENT_LOG);
 
 					if (SUCCEED == send_err)
 					{
@@ -1312,7 +1300,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 			{
 				send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
 						ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, source, &severity,
-						&logeventid, ZBX_FLAG_ELEMENT_PERSISTENT | ZBX_FLAG_ELEMENT_LOG);
+						&logeventid, ZBX_BUFFER_ELEMENT_PERSISTENT | ZBX_BUFFER_ELEMENT_LOG);
 
 				if (SUCCEED == send_err)
 				{
@@ -1412,19 +1400,19 @@ static void	process_active_checks(char *server, unsigned short port)
 
 		if (0 == strncmp(metric->key, "log[", 4))		/* log files without rotation */
 		{
-			flags |= ZBX_FLAG_ELEMENT_LOG;
+			flags |= ZBX_BUFFER_ELEMENT_LOG;
 			ret = process_log_check(server, port, metric, ZBX_ACTIVE_CHECK_LOG, &lastlogsize_sent,
 					&mtime_sent, &error);
 		}
 		else if (0 == strncmp(metric->key, "logrt[", 6))	/* log files with rotation */
 		{
-			flags |= ZBX_FLAG_ELEMENT_LOG;
+			flags |= ZBX_BUFFER_ELEMENT_LOG;
 			ret = process_log_check(server, port, metric, ZBX_ACTIVE_CHECK_LOGRT, &lastlogsize_sent,
 					&mtime_sent, &error);
 		}
 		else if (0 == strncmp(metric->key, "eventlog[", 9))	/* Windows eventlog */
 		{
-			flags |= ZBX_FLAG_ELEMENT_LOG;
+			flags |= ZBX_BUFFER_ELEMENT_LOG;
 			ret = process_eventlog_check(server, port, metric, &lastlogsize_sent, &error);
 		}
 		else
@@ -1460,8 +1448,8 @@ static void	process_active_checks(char *server, unsigned short port)
 				metric->refresh_unsupported = 0;
 			}
 
-			if (0 != (flags & ZBX_FLAG_ELEMENT_LOG) && SUCCEED == need_meta_update(metric, lastlogsize_sent,
-					mtime_sent, old_state))
+			if (0 != (flags & ZBX_BUFFER_ELEMENT_LOG) &&
+					SUCCEED == need_meta_update(metric, lastlogsize_sent, mtime_sent, old_state))
 			{
 				/* meta information update */
 				process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL, metric->state,
