@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-30 05:43+0200\n"
+"POT-Creation-Date: 2015-01-15 18:26+0200\n"
 "PO-Revision-Date: 2014-10-02 08:42+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1520,7 +1520,7 @@ msgstr "Impossibile creare dipendenza nel trigger stesso."
 msgid "Cannot create discovery rule"
 msgstr "Impossibile creare regola di discovery"
 
-#: api/classes/CHost.php:1186
+#: api/classes/CHost.php:1184
 msgid "Cannot create host group."
 msgstr "Impossibile creare gruppo host."
 
@@ -1608,7 +1608,7 @@ msgstr "Impossibile rimuovere il gruppo"
 msgid "Cannot delete host"
 msgstr "Impossibile rimuovere l'host"
 
-#: api/classes/CHost.php:1197
+#: api/classes/CHost.php:1195
 msgid "Cannot delete host group."
 msgstr "Impossibile rimuovere gruppo host."
 
@@ -1628,7 +1628,7 @@ msgstr "Impossibile rimuovere mappa icone"
 msgid "Cannot delete image"
 msgstr "Impossibile rimuovere l'immagine"
 
-#: api/classes/CHost.php:1287
+#: api/classes/CHost.php:1285
 msgid "Cannot delete inventory."
 msgstr "Impossibile rimuovere inventario."
 
@@ -2129,7 +2129,7 @@ msgstr "Impossibile inserire espressione trigger"
 msgid "Cannot insert user media."
 msgstr "Impossibile inserire supporto utente."
 
-#: api/classes/CHost.php:1265
+#: api/classes/CHost.php:1263
 msgid "Cannot link template"
 msgstr "Impossibile collegare template"
 
@@ -2141,7 +2141,7 @@ msgstr "Login non possibile"
 msgid "Cannot logout."
 msgstr "Impossibile disconnettersi."
 
-#: api/classes/CHost.php:1094
+#: api/classes/CHost.php:1092
 msgid "Cannot mass update host name."
 msgstr "Impossibile aggiornare massivamente nome host."
 
@@ -2149,7 +2149,7 @@ msgstr "Impossibile aggiornare massivamente nome host."
 msgid "Cannot mass update template name"
 msgstr "Impossibile aggiornare massivamente nome template"
 
-#: api/classes/CHost.php:1084
+#: api/classes/CHost.php:1082
 msgid "Cannot mass update visible host name."
 msgstr "Impossibile aggiornare massivamente nome visibile host."
 
@@ -2237,7 +2237,7 @@ msgstr "Impossibile impostare \"templateid\" per la schermata \"%1$s\"."
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Impossibile impostare \"templateid\" per il prototipo di trigger \"%1$s\"."
 
-#: api/classes/CHost.php:671 api/classes/CHost.php:1139
+#: api/classes/CHost.php:671 api/classes/CHost.php:1137
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Impossibile impostare campi inventario per un inventario disabilitato."
 
@@ -2281,7 +2281,7 @@ msgstr "Impossibile scollegare e pulire gli item"
 msgid "Cannot unlink and clear triggers"
 msgstr "Impossibile scollegare e pulire i trigger"
 
-#: api/classes/CHost.php:1256
+#: api/classes/CHost.php:1254
 msgid "Cannot unlink template"
 msgstr "Impossibile scollegare template"
 
@@ -2643,21 +2643,21 @@ msgstr "Controlla la porzione di espressione che parte da \"%1$s\"."
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr "Controlla l'esistenza del file. 0 - il file non esiste, 1 - file presente"
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Controlla se il servizio è disponibile. 0 - il servizio è giù, 1 - il servizio è in esecuzione. Se <ip> non specificato, viene utilizzato l'IP o il nome DNS della definizione host. Se <porta> non specificato, viene utilizzata la porta di defualt del servizio."
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr "Controllare se il servizio è disponibile. 0 - il servizio è giù, 1 - il servizio è in esecuzione. Se <ip> non presente, viene utilizzato 127.0.0.1. Se il numero di porta non è presente, viene utilizzata la porta di default del servizio. Esempio: net.tcp.service [ftp,, 45]."
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used."
 msgstr "Verifica stato del servizio \"service\". 0 - servizio down,  sec - numero di secondi trascorsi per connetersi al servizio. Se l'ip non e' specificato viene utilizzato 127.0.0.1. Se la porta non viene specificata, viene utilizzata la porta standard del servizio."
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Controlla le prestazioni del servizio. 0 - servizio è down, sec - numero di secondi trascorsi per la connessione al servizio. Se <ip> assente, IP o nome DNS è acquisito dalla definizione dell'host. Se <porta> assente, viene utilizzata la porta di default del servizio."
 
@@ -2684,8 +2684,8 @@ msgstr "Verificare se è possibile effettuare una connessione TCP verso la porta
 msgid "Checks"
 msgstr "Controlli"
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr "Controlla se il servizio DNS è attivo. 0 - DNS è inattivo (server non ha risposto o risoluzione DNS fallita), 1 - DNS è attivo."
 
@@ -4090,7 +4090,7 @@ msgstr "Rimossa: Regola di discovery \"%1$s\" su \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Rimosso: Grafico \"%1$s\" su \"%2$s\"."
 
-#: api/classes/CHost.php:1583
+#: api/classes/CHost.php:1581
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Rimosso: Host \"%1$s\"."
@@ -4756,7 +4756,7 @@ msgstr "Host vuoto."
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
 #: api/classes/CHostGroup.php:516 api/classes/CHostGroup.php:593
-#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1419
+#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1417
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
@@ -6082,7 +6082,7 @@ msgstr "Allinea in orizzontale"
 msgid "Host"
 msgstr "Host"
 
-#: api/classes/CHost.php:1107 api/classes/CTemplate.php:512
+#: api/classes/CHost.php:1105 api/classes/CTemplate.php:512
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "L'host \"%1$s\" esiste già."
@@ -6345,7 +6345,7 @@ msgstr "Maschera sottorete dell'host"
 msgid "Host time"
 msgstr "Ora dell'host"
 
-#: api/classes/CHost.php:982
+#: api/classes/CHost.php:980
 msgid "Host update failed."
 msgstr "Aggiornamento host fallito."
 
@@ -7040,7 +7040,7 @@ msgstr "Utilizzati caratteri non corretti per il nome Template \"%1$s\""
 msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Caratteri errati utilizzati per l'host \"%1$s\"."
 
-#: api/classes/CHost.php:743 api/classes/CHost.php:1090
+#: api/classes/CHost.php:743 api/classes/CHost.php:1088
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Caratteri errati usati per il nome host \"%s\"."
@@ -7737,7 +7737,7 @@ msgstr "Nome vista dato \"%s\" non valido. Caratteri permessi: \"a-z\" e \".\"."
 msgid "Inventory"
 msgstr "Inventario"
 
-#: api/classes/CHost.php:1306
+#: api/classes/CHost.php:1304
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Inventory disabilitato per host \"%1$s\"."
@@ -9708,7 +9708,7 @@ msgstr "Nessun grafico trovato."
 msgid "No groups for host \"%s\"."
 msgstr "Nessun gruppo per l'host \"%s\"."
 
-#: api/classes/CHost.php:1076
+#: api/classes/CHost.php:1074
 msgid "No groups for hosts."
 msgstr "Nessun gruppo per gli host."
 
@@ -9721,7 +9721,7 @@ msgstr "Nessun gruppo per il template"
 msgid "No groups for template \"%1$s\"."
 msgstr "Nessun gruppo per il template \"%1$s\"."
 
-#: api/classes/CHost.php:1443
+#: api/classes/CHost.php:1441
 msgid "No host ID given."
 msgstr "Nessun ID host fornito."
 
@@ -9947,7 +9947,7 @@ msgstr "Nessun permesso per l'accesso al sistema."
 #: api/classes/CHostGroup.php:938 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
 #: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
-#: api/classes/CHost.php:716 api/classes/CHost.php:1806
+#: api/classes/CHost.php:716 api/classes/CHost.php:1804
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
 #: api/classes/CHttpTest.php:395 api/classes/CHttpTest.php:610
@@ -11092,8 +11092,8 @@ msgstr "Linea di percentile (sinistra)"
 msgid "Percentile line (right)"
 msgstr "Linea di percentile (destra)"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:351
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr "Esegue una query DNS. In caso di successo restituisce una stringa di caratteri con le informazioni richieste."
 
@@ -13279,7 +13279,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Template"
 
-#: api/classes/CHost.php:1112 api/classes/CTemplate.php:508
+#: api/classes/CHost.php:1110 api/classes/CTemplate.php:508
 #, c-format
 msgid "Template \"%1$s\" already exists."
 msgstr "Il template \"%1$s\" esiste già."
@@ -15425,8 +15425,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Non hai specificato target per lo script globale dell'operazione azione \"%s\"."
 
 #: api/classes/CGraph.php:557 api/classes/CGraphPrototype.php:574
-#: api/classes/CHost.php:1013 api/classes/CHost.php:1070
-#: api/classes/CHost.php:1385 api/classes/CHttpTest.php:502
+#: api/classes/CHost.php:1011 api/classes/CHost.php:1068
+#: api/classes/CHost.php:1383 api/classes/CHttpTest.php:502
 #: api/classes/CMaintenance.php:537 api/classes/CMaintenance.php:644
 #: api/classes/CMaintenance.php:656 api/classes/CScript.php:300
 #: api/classes/CScript.php:397 api/classes/CScript.php:437
