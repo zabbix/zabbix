@@ -223,7 +223,6 @@ $triggerWidget->addPageHeader(
 	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
 );
 $triggerWidget->addHeader(_('Triggers'), $rightForm);
-$triggerWidget->addHeaderRowNumber();
 
 // filter
 $filterFormView = new CView('common.filter.trigger', array(

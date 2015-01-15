@@ -77,12 +77,6 @@ class CWidget {
 		$this->headers[] = array('left' => $left, 'right' => $right);
 	}
 
-	public function addHeaderRowNumber($right = SPACE) {
-		$numRows = new CDiv();
-		$numRows->setAttribute('name', 'numrows');
-		$this->addHeader($numRows, $right);
-	}
-
 	public function addFlicker($items = null, $flickerState = false) {
 		if (!is_null($items)) {
 			$this->flicker[] = $items;
@@ -170,7 +164,7 @@ class CWidget {
 			$pageHeader[] = get_table_header($header['left'], $header['right']);
 		}
 
-		return new CDiv($pageHeader);
+		return new CDiv($pageHeader, 'header-title');
 	}
 
 	private function createHeader() {

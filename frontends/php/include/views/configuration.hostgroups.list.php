@@ -37,7 +37,6 @@ $hostGroupWidget->addPageHeader(_('CONFIGURATION OF HOST GROUPS'), $createForm);
 
 // header
 $hostGroupWidget->addHeader(_('Host groups'));
-$hostGroupWidget->addHeaderRowNumber();
 
 // create form
 $hostGroupForm = new CForm();

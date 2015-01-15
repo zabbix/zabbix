@@ -41,7 +41,6 @@ foreach ($this->data['userGroups'] as $userGroup) {
 $userGroupListForm->addItem(array(_('User group').SPACE, $userGroupComboBox));
 
 $usersWidget->addHeader(_('Users'), $userGroupListForm);
-$usersWidget->addHeaderRowNumber();
 
 // create form
 $usersForm = new CForm();

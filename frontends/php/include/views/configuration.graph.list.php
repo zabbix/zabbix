@@ -59,7 +59,6 @@ else {
 		$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid']));
 	}
 }
-$graphWidget->addHeaderRowNumber();
 
 // create form
 $graphForm = new CForm();

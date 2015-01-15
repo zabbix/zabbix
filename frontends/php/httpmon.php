@@ -82,7 +82,6 @@ $httpmon_wdgt->addPageHeader(
 	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
 );
 $httpmon_wdgt->addHeader(_('Web scenarios'), $r_form);
-$httpmon_wdgt->addHeaderRowNumber();
 
 // TABLE
 $table = new CTableInfo(_('No web scenarios found.'));
