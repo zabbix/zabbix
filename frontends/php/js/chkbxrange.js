@@ -178,6 +178,8 @@ var chkbxRange = {
 				checkbox.checked = checked;
 
 				jQuery(checkbox).closest('tr').toggleClass('row-selected', checked);
+				// Remove class attribute if it's empty
+				jQuery(checkbox).closest('tr').filter('*[class=""]').removeAttr('class');
 
 				if (checked) {
 					this.selectedIds[objectId] = objectId;
