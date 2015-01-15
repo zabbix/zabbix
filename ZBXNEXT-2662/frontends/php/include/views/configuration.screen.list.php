@@ -76,7 +76,7 @@ $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "screens";');
 
 // append table to form
-$screenForm->addItem(array($this->data['paging'], $screenTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$screenForm->addItem(array($screenTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $screenWidget->addItem($screenForm);

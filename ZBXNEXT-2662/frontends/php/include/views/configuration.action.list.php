@@ -120,7 +120,7 @@ $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "g_actionid";');
 
 // append table to form
-$actionForm->addItem(array($this->data['paging'], $actionTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$actionForm->addItem(array($actionTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $actionWidget->addItem($actionForm);

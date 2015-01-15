@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['file'] = 'tr_status.php';
 $page['title'] = _('Status of triggers');
-$page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.cswitcher.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -827,7 +826,7 @@ if ($config['event_ack_enable']) {
 	$footer = get_table_header(array($goComboBox, $goButton));
 }
 
-$triggerForm->addItem(array($paging, $triggerTable, $paging, $footer));
+$triggerForm->addItem(array($triggerTable, $paging, $footer));
 $triggerWidget->addItem($triggerForm);
 $triggerWidget->show();
 

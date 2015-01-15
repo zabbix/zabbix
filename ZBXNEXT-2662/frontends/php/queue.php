@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = _('Queue');
 $page['file'] = 'queue.php';
-$page['hist_arg'] = array('config');
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 

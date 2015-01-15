@@ -70,7 +70,7 @@ $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "maps";');
 
 // append table to form
-$sysmapForm->addItem(array($this->data['paging'], $sysmapTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$sysmapForm->addItem(array($sysmapTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $sysmapWidget->addItem($sysmapForm);

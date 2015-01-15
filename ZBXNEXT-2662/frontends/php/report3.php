@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/include/services.inc.php';
 
 $page['title'] = _('IT services availability report');
 $page['file'] = 'report3.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

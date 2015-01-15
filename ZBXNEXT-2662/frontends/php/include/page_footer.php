@@ -33,18 +33,6 @@ if (!defined('PAGE_HEADER_LOADED')) {
 	define('PAGE_HEADER_LOADED', 1);
 }
 
-// history
-if (isset($page['hist_arg']) && CWebUser::$data['alias'] != ZBX_GUEST_USER && $page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
-	// if URL length is greater than DB field size, skip history update
-	$url = getHistoryUrl($page);
-
-	if ($url) {
-		DBstart();
-		$result = addUserHistory($page['title'], $url);
-		DBend($result);
-	}
-}
-
 // last page
 if (!defined('ZBX_PAGE_NO_MENU') && $page['file'] != 'profile.php') {
 	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
@@ -72,25 +60,10 @@ if (in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))) {
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
-	if (!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')) {
-		$table = new CTable(null, 'textwhite bold maxwidth ui-widget-header ui-corner-all page_footer');
-
-		$conString = (CWebUser::$data['userid'] == 0)
-			? _('Not connected')
-			: _s('Connected as \'%1$s\'', CWebUser::$data['alias']);
-
-		$table->addRow(array(
-			new CCol(new CLink(
-				_s('Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA',
-					ZABBIX_VERSION, ZABBIX_COPYRIGHT_FROM, ZABBIX_COPYRIGHT_TO),
-				ZABBIX_HOMEPAGE, 'highlight', null, true), 'center'),
-			new CCol(array(
-				new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-				new CSpan($conString, 'footer_sign')
-			), 'right')
-		));
-		$table->show();
-	}
+	echo '<footer>'."\n";
+	echo '<a href="http://www.zabbix.com" target="_blank" class="logo"></a>'."\n";
+	echo 'Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" target="_blank">Zabbix SIA</a>'."\n";
+	echo '</footer>'."\n";
 
 	require_once 'include/views/js/common.init.js.php';
 

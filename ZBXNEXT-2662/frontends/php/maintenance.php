@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of maintenance periods');
 $page['file'] = 'maintenance.php';
-$page['hist_arg'] = array('groupid');
 $page['scripts'] = array('class.calendar.js');
 
 require_once dirname(__FILE__).'/include/page_header.php';

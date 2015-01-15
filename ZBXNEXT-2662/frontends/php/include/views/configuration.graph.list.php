@@ -177,7 +177,7 @@ else {
 }
 
 // append table to form
-$graphForm->addItem(array($this->data['paging'], $graphTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$graphForm->addItem(array($graphTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $graphWidget->addItem($graphForm);

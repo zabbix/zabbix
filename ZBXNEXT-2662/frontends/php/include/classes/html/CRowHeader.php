@@ -19,17 +19,31 @@
 **/
 
 
-require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/blocks.inc.php';
+class CRowHeader extends CTag {
 
-$page['title'] = _('Status of Zabbix');
-$page['file'] = 'report1.php';
+	public function __construct($item = null, $class = null, $id = null) {
+		parent::__construct('tr', 'yes');
+		$this->addItem($item);
+		$this->attr('class', $class);
+		$this->attr('id', $id);
+	}
 
-require_once dirname(__FILE__).'/include/page_header.php';
-
-$reportWidget = new CWidget();
-$reportWidget->addPageHeader(_('STATUS OF ZABBIX'));
-$reportWidget->addItem(make_status_of_zbx());
-$reportWidget->show();
-
-require_once dirname(__FILE__).'/include/page_footer.php';
+	public function addItem($item) {
+		if (is_object($item) && strtolower(get_class($item)) === 'ccolheader') {
+			parent::addItem($item);
+		}
+		elseif (is_array($item)) {
+			foreach ($item as $el) {
+				if (is_object($el) && strtolower(get_class($el)) === 'ccolheader') {
+					parent::addItem($el);
+				}
+				elseif (!is_null($el)) {
+					parent::addItem(new CColHeader($el));
+				}
+			}
+		}
+		elseif (!is_null($item)) {
+			parent::addItem(new CColHeader($item));
+		}
+	}
+}

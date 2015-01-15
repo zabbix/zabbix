@@ -237,7 +237,7 @@ zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
-$triggersForm->addItem(array($this->data['paging'], $triggersTable, $this->data['paging'],
+$triggersForm->addItem(array($triggersTable, $this->data['paging'],
 	get_table_header(array($goComboBox, $goButton))
 ));
 

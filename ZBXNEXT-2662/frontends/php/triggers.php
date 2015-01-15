@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of triggers');
 $page['file'] = 'triggers.php';
-$page['hist_arg'] = array('hostid', 'groupid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

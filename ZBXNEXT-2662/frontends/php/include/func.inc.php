@@ -1422,7 +1422,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 			$img = new CSpan(SPACE, 'icon_sortup');
 		}
 	}
-	$col = new CCol(array($cont, $img), 'nowrap hover_grey');
+	$col = new CColHeader(array($cont, $img), 'nowrap hover_grey');
 	$col->setAttribute('onclick', $script);
 
 	return $col;
@@ -1500,87 +1500,34 @@ function getPagingLine(&$items) {
 
 	$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
 
-	$pageLine = array();
-
-	$table = null;
-
-	if ($pagesCount > 1) {
-		$url = CUrlFactory::getContextUrl();
-
-		if ($startPage > 1) {
-			$url->setArgument('page', 1);
-			$pageLine[] = new CLink('<< '._x('First', 'page navigation'), $url->getUrl(), null, null, true);
-			$pageLine[] = '&nbsp;&nbsp;';
-		}
-
-		if ($currentPage > 1) {
-			$url->setArgument('page', $currentPage - 1);
-			$pageLine[] = new CLink('< '._x('Previous', 'page navigation'), $url->getUrl(), null, null, true);
-			$pageLine[] = ' | ';
-		}
-
-		for ($p = $startPage; $p <= $pagesCount; $p++) {
-			if ($p > $endPage) {
-				break;
-			}
-
-			if ($p == $currentPage) {
-				$pagespan = new CSpan($p, 'bold textcolorstyles');
-			}
-			else {
-				$url->setArgument('page', $p);
-				$pagespan = new CLink($p, $url->getUrl(), null, null, true);
-			}
-
-			$pageLine[] = $pagespan;
-			$pageLine[] = ' | ';
-		}
-
-		array_pop($pageLine);
-
-		if ($currentPage < $pagesCount) {
-			$pageLine[] = ' | ';
-
-			$url->setArgument('page', $currentPage + 1);
-			$pageLine[] = new CLink(_x('Next', 'page navigation').' >', $url->getUrl(), null, null, true);
-		}
-
-		if ($p < $pagesCount) {
-			$pageLine[] = '&nbsp;&nbsp;';
-
-			$url->setArgument('page', $pagesCount);
-			$pageLine[] = new CLink(_x('Last', 'page navigation').' >>', $url->getUrl(), null, null, true);
-		}
-
-		$table = new CTable(null, 'paging');
-		$table->addRow(new CCol($pageLine));
+	if ($pagesCount == 1) {
+		return null;
 	}
 
-	$viewFromPage = ($currentPage - 1) * $rowsPerPage + 1;
+	$tags = array();
 
-	$viewTillPage = $currentPage * $rowsPerPage;
-	if ($viewTillPage > $itemsCount) {
-		$viewTillPage = $itemsCount;
+	$url = CUrlFactory::getContextUrl();
+	if ($startPage > 1) {
+		$url->setArgument('page', 1);
+		$tags[] = new CLink(_('First'), $url->getUrl());
 	}
-
-	$pageView = array();
-	$pageView[] = _('Displaying').SPACE;
-	if ($itemsCount > 0) {
-		$pageView[] = new CSpan($viewFromPage, 'info');
-		$pageView[] = SPACE._('to').SPACE;
+	if ($currentPage > 1) {
+		$url->setArgument('page', $currentPage - 1);
+		$tags[] = new CLink(_('Previous'), $url->getUrl());
 	}
-
-	$pageView[] = new CSpan($viewTillPage, 'info');
-	$pageView[] = SPACE._('of').SPACE;
-	$pageView[] = new CSpan($itemsCount, 'info');
-	$pageView[] = $searchLimit;
-	$pageView[] = SPACE._('found');
-
-	$pageView = new CSpan($pageView);
-
-	zbx_add_post_js('insertInElement("numrows", '.zbx_jsvalue($pageView->toString()).', "div");');
-
-	return $table;
+	for ($p = $startPage; $p <= $pagesCount; $p++) {
+		$url->setArgument('page', $p);
+		$tags[] = new CLink($p, $url->getUrl());
+	}
+	if ($currentPage < $pagesCount) {
+		$url->setArgument('page', $currentPage + 1);
+		$tags[] = new CLink(_('Next'), $url->getUrl());
+	}
+	if ($p < $pagesCount) {
+		$url->setArgument('page', $pagesCount);
+		$tags[] = new CLink(_('Last'), $url->getUrl());
+	}
+	return new CDiv($tags, 'table-paging');
 }
 
 /************* MATH *************/

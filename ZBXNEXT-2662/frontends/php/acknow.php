@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Acknowledges');
 $page['file'] = 'acknow.php';
-$page['hist_arg'] = array('eventid');
 
 ob_start();
 

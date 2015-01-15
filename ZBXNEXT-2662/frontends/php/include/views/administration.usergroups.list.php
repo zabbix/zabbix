@@ -154,7 +154,7 @@ $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
 
 // append table to form
-$userGroupsForm->addItem(array($this->data['paging'], $userGroupTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$userGroupsForm->addItem(array($userGroupTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $userGroupsWidget->addItem($userGroupsForm);

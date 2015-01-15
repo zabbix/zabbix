@@ -32,7 +32,6 @@ else {
 	$page['title'] = _('Configuration of hosts');
 	$page['file'] = 'hosts.php';
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['hist_arg'] = array('groupid');
 	$page['scripts'] = array('multiselect.js');
 
 	$exportData = false;
@@ -1081,7 +1080,7 @@ else {
 
 	zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
-	$form->addItem(array($paging, $table, $paging, get_table_header(array($goBox, $goButton))));
+	$form->addItem(array($table, $paging, get_table_header(array($goBox, $goButton))));
 	$hostsWidget->addItem($form);
 }
 

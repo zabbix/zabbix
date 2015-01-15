@@ -116,7 +116,7 @@ $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
 // append table to form
-$proxyForm->addItem(array($this->data['paging'], $proxyTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$proxyForm->addItem(array($proxyTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $proxyWidget->addItem($proxyForm);
