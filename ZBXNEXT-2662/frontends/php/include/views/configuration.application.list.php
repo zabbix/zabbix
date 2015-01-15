@@ -45,7 +45,6 @@ $filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroup
 $filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 $applicationWidget->addHeader(_('Applications'), $filterForm);
-$applicationWidget->addHeaderRowNumber();
 
 // create form
 $applicationForm = new CForm();

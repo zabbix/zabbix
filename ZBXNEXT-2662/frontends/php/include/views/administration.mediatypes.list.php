@@ -26,7 +26,6 @@ $createForm = new CForm('get');
 $createForm->addItem(new CSubmit('form', _('Create media type')));
 $mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'), $createForm);
 $mediaTypeWidget->addHeader(_('Media types'));
-$mediaTypeWidget->addHeaderRowNumber();
 
 // create form
 $mediaTypeForm = new CForm();

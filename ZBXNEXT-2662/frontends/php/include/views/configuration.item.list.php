@@ -40,7 +40,6 @@ $itemsWidget->addPageHeader(_('CONFIGURATION OF ITEMS'), $createForm);
 
 // header
 $itemsWidget->addHeader(_('Items'));
-$itemsWidget->addHeaderRowNumber();
 
 if (!empty($this->data['hostid'])) {
 	$itemsWidget->addItem(get_header_host_table('items', $this->data['hostid']));

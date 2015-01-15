@@ -32,7 +32,6 @@ $userGroupsWidget->addPageHeader(_('CONFIGURATION OF USER GROUPS'), $createForm)
 
 // append header to widget
 $userGroupsWidget->addHeader(_('User groups'));
-$userGroupsWidget->addHeaderRowNumber();
 
 // create form
 $userGroupsForm = new CForm();

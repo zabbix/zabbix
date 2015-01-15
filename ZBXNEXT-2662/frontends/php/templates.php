@@ -498,7 +498,6 @@ else {
 	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 
 	$templateWidget->addHeader(_('Templates'), $frmGroup);
-	$templateWidget->addHeaderRowNumber();
 
 	$form = new CForm();
 	$form->setName('templates');

@@ -30,7 +30,6 @@ $configComboBox->addItem('auditacts.php', _('Action log'));
 $configForm->addItem($configComboBox);
 $auditWidget->addPageHeader(_('ACTION LOG'), $configForm);
 $auditWidget->addHeader(_('Action log'));
-$auditWidget->addHeaderRowNumber();
 
 // create filter
 $filterForm = new CForm('get');
