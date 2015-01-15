@@ -886,24 +886,15 @@ foreach ($hosts as $hostId => $dbHost) {
 
 $form->addItem(array(
 	$table,
-	get_table_header(new CGoButtonGroup(
+	get_table_header(new CActionButtonList(
 		'graphtype',
 		'itemids',
 		array(
-			GRAPH_TYPE_STACKED => _('Display stacked graph'),
-			GRAPH_TYPE_NORMAL => _('Display graph')
+			GRAPH_TYPE_STACKED => array('name' => _('Display stacked graph')),
+			GRAPH_TYPE_NORMAL => array('name' => _('Display graph'))
 		)
 	))
 ));
-
-//$form->addItem(array(
-//	$table,
-//	get_table_header(array(
-//		new CSpan('0 selected', null, 'selectedCount'),
-//		new CGoButton('graphtype', GRAPH_TYPE_STACKED, _('Display stacked graph')),
-//		new CGoButton('graphtype', GRAPH_TYPE_NORMAL, _('Display graph'))
-//	))
-//));
 
 $latestWidget->addItem($form);
 $latestWidget->show();

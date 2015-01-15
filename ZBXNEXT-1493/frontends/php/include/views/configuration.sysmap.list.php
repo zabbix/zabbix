@@ -62,11 +62,12 @@ $sysmapForm->addItem(array(
 	$sysmapTable,
 	$this->data['paging'],
 	get_table_header(
-	new CActionGoButtonGroup(
+	new CActionButtonList(
+		'action',
 		'maps',
 		array(
-			'map.export' => _('Export'),
-			'map.massdelete' => array(_('Delete'), _('Delete selected maps?'))
+			'map.export' => array('name' => _('Export')),
+			'map.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected maps?'))
 		)
 	))
 ));

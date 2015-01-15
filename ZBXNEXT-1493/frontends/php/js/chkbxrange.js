@@ -27,7 +27,7 @@ var chkbxRange = {
 	prefix:			null,	// prefix for cookie name
 	pageGoName:		null,	// which checkboxes should be counted by Go button and saved to cookies
 	selectedIds:	{},		// ids of selected objects
-	goButtons:		null,
+	footerButtons:	null,
 	cookieName:		null,
 
 	init: function() {
@@ -66,10 +66,10 @@ var chkbxRange = {
 			this.update(this.pageGoName);
 		}
 
-		this.goButtons = jQuery('.button.goButton');
+		this.footerButtons = jQuery('.button.footerButton');
 		var thisChkbxRange = this;
-		this.goButtons.each(function() {
-			addListener(this, 'click', thisChkbxRange.submitGo.bindAsEventListener(thisChkbxRange), false);
+		this.footerButtons.each(function() {
+			addListener(this, 'click', thisChkbxRange.submitFooterButton.bindAsEventListener(thisChkbxRange), false);
 		});
 	},
 
@@ -255,12 +255,11 @@ var chkbxRange = {
 		var selectedCountSpan = jQuery('#selectedCount');
 		selectedCountSpan.text(count + ' ' + selectedCountSpan.text().split(' ')[1]);
 
-		jQuery('.button.goButton').prop('disabled', count == 0);
+		jQuery('.button.footerButton').prop('disabled', count == 0);
 
 		// update go button
-		var goButton = jQuery('#goButton');
-		goButton.text(goButton.text().split(' ')[0] + ' (' + count + ')')
-			.prop('disabled', count == 0);
+		var footerButton = jQuery('#footerButton');
+		footerButton.text(footerButton.text().split(' ')[0] + ' (' + count + ')').prop('disabled', count == 0);
 		jQuery('#action').prop('disabled', count == 0);
 	},
 
@@ -318,12 +317,12 @@ var chkbxRange = {
 		}
 	},
 
-	submitGo: function(e) {
+	submitFooterButton: function(e) {
 		e = e || window.event;
 
-		var goButton = jQuery(e.target);
-		var form = goButton.closest('form');
-		var confirmText = goButton.attr('confirm');
+		var footerButton = jQuery(e.srcElement);
+		var form = footerButton.closest('form');
+		var confirmText = footerButton.attr('confirm');
 		if (confirmText && !confirm(confirmText)) {
 			Event.stop(e);
 			return false;

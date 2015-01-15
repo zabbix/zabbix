@@ -131,14 +131,19 @@ $userGroupsForm->addItem(array(
 	$this->data['paging'],
 	$userGroupTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'group_groupid',
 		array(
-			'usergroup.massenable' => array(_('Enable'), _('Enable selected groups?')),
-			'usergroup.massdisable' => array(_('Disable'), _('Disable selected groups?')),
-			'usergroup.massenabledebug' => array(_('Enable debug mode'), _('Enable debug mode in selected groups?')),
-			'usergroup.massdisabledebug' => array(_('Disable debug mode'), _('Disable debug mode in selected groups?')),
-			'usergroup.massdelete' => array(_('Delete'), _('Delete selected groups?'))
+			'usergroup.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected groups?')),
+			'usergroup.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected groups?')),
+			'usergroup.massenabledebug' => array('name' => _('Enable debug mode'),
+				'confirm' => _('Enable debug mode in selected groups?')
+			),
+			'usergroup.massdisabledebug' => array('name' => _('Disable debug mode'),
+				'confirm' => _('Disable debug mode in selected groups?')
+			),
+			'usergroup.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected groups?'))
 		)
 	))
 ));

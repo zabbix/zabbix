@@ -61,10 +61,11 @@ foreach($this->data['regexps'] as $regexpid => $regexp) {
 	));
 }
 
-$regExpTable->setFooter(new CCol(new CActionGoButtonGroup(
+$regExpTable->setFooter(new CCol(new CActionButtonList(
+	'action',
 	'regexpids',
 	array(
-		'regexp.massdelete' => array(_('Delete'), _('Delete selected regular expressions?'))
+		'regexp.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected regular expressions?'))
 	)
 )));
 

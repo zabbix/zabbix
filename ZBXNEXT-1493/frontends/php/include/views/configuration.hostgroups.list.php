@@ -155,12 +155,15 @@ $hostGroupForm->addItem(array(
 	$this->data['paging'],
 	$hostGroupTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'groups',
 		array(
-			'hostgroup.massenable' => array(_('Enable hosts'), _('Enable selected hosts?')),
-			'hostgroup.massdisable' => array(_('Disable hosts'), _('Disable hosts in the selected host groups?')),
-			'hostgroup.massdelete' => array(_('Delete'), _('Delete selected host groups?'))
+			'hostgroup.massenable' => array('name' => _('Enable hosts'), 'confirm' => _('Enable selected hosts?')),
+			'hostgroup.massdisable' => array('name' => _('Disable hosts'),
+				'confirm' => _('Disable hosts in the selected host groups?')
+			),
+			'hostgroup.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected host groups?'))
 		)
 	))
 ));

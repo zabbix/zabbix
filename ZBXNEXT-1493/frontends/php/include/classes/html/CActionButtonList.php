@@ -20,16 +20,16 @@
 
 
 /**
- * Class CGoButtonGroup
+ * Class CActionButtonList
  *
  * Implements wrapper to handle output of mass action buttons as used in list views.
  */
-class CGoButtonGroup extends CObject {
+class CActionButtonList extends CObject {
 
 	/**
-	 * CGoButton instances.
+	 * CSubmit instances.
 	 *
-	 * @var CGoButton[]
+	 * @var CSubmit[]
 	 */
 	protected $buttons;
 
@@ -55,13 +55,12 @@ class CGoButtonGroup extends CObject {
 	protected $selectedCountElement = null;
 
 	/**
-	 * @param string      $actionName        name of submit buttons
-	 * @param string      $checkboxesName    name of paramerer into which checked checkboxes will be put in
-	 * @param array       $buttonsData       buttons data array - can be:
-	 *                                       - a string and is used as caption,
-	 *                                       - an array with 2 elements - first is used as caption, second is
-	 *                                         used as confirmation text
-	 * @param string|null $cookieNamePrefix  prefix for cookie used for storing currently selected checkboxes.
+	 * @param string		$actionName				name of submit buttons
+	 * @param string		$checkboxesName			Name of paramerer into which checked checkboxes will be put in.
+	 * @param array			$buttonsData			buttons data array
+	 * @param string		$buttonsData['name']	button caption
+	 * @param string|null	$buttonsData['confirm']	confirmation text
+	 * @param string|null	$cookieNamePrefix		Prefix for cookie used for storing currently selected checkboxes.
 	 */
 	function __construct($actionName, $checkboxesName, array $buttonsData, $cookieNamePrefix = null) {
 		$this->checkboxesName = $checkboxesName;
@@ -69,22 +68,20 @@ class CGoButtonGroup extends CObject {
 
 		foreach ($buttonsData as $actionValue => $buttonData) {
 			if ($buttonData) {
-				$this->buttons[$actionValue] = new CGoButton(
+				$this->buttons[$actionValue] = new CSubmit(
 					$actionName,
-					$actionValue,
-					is_array($buttonData) ? $buttonData[0] : $buttonData,
-					is_array($buttonData) && isset($buttonData[1]) ? $buttonData[1] : false
+					is_array($buttonData) ? $buttonData['name'] : $buttonData
 				);
+
+				$this->buttons[$actionValue]->removeAttribute('id');
+				$this->buttons[$actionValue]->setAttribute('value', $actionValue);
+				$this->buttons[$actionValue]->addClass('footerButton');
+
+				if (isset($buttonData['confirm'])) {
+					$this->buttons[$actionValue]->setAttribute('confirm', $buttonData['confirm']);
+				}
 			}
 		}
-	}
-
-	/**
-	 * Sets custom element to be used to show how many checkboxes are selected.
-	 * @param CObject $selectedCountSpan
-	 */
-	public function setSelectedCountElement(CObject $selectedCountSpan) {
-		$this->selectedCountElement = $selectedCountSpan;
 	}
 
 	/**
@@ -102,7 +99,7 @@ class CGoButtonGroup extends CObject {
 	}
 
 	/**
-	 * Gets string representation of go button group.
+	 * Gets string representation of action button list.
 	 *
 	 * @param bool $destroy
 	 *
@@ -119,36 +116,5 @@ class CGoButtonGroup extends CObject {
 		}
 
 		return parent::toString($destroy);
-	}
-
-	/**
-	 * Returns all go buttons.
-	 *
-	 * @return CGoButton[]
-	 */
-	public function getButtons() {
-		return $this->buttons;
-	}
-
-	/**
-	 * Returns go button for action value.
-	 *
-	 * @param string|int $actionValue
-	 *
-	 * @return CGoButton|null
-	 */
-	public function getButton($actionValue) {
-		return isset($this->buttons[$actionValue])
-			? $this->buttons[$actionValue]
-			: null;
-	}
-
-	/**
-	 * Sets go buttons.
-	 *
-	 * @param CGoButton[] $buttons
-	 */
-	public function setButtons(array $buttons) {
-		$this->buttons = $buttons;
 	}
 }

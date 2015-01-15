@@ -80,10 +80,13 @@ $maintenanceForm->addItem(array(
 	$this->data['paging'],
 	$maintenanceTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'maintenanceids',
 		array(
-			'maintenance.massdelete' => array(_('Delete'), _('Delete selected maintenance periods?'))
+			'maintenance.massdelete' => array('name' => _('Delete'),
+				'confirm' => _('Delete selected maintenance periods?')
+			)
 		)
 	))
 ));

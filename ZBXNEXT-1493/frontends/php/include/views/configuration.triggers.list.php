@@ -215,14 +215,15 @@ $triggersForm->addItem(array(
 	$this->data['paging'],
 	$triggersTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'g_triggerid',
 		array(
-			'trigger.massenable' => array(_('Enable'), _('Enable selected triggers?')),
-			'trigger.massdisable' => array(_('Disable'), _('Disable selected triggers?')),
-			'trigger.masscopyto' =>  _('Copy'),
-			'trigger.massupdateform' => _('Mass update'),
-			'trigger.massdelete' => array(_('Delete'), _('Delete selected triggers?'))
+			'trigger.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected triggers?')),
+			'trigger.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected triggers?')),
+			'trigger.masscopyto' =>  array('name' => _('Copy')),
+			'trigger.massupdateform' => array('name' => _('Mass update')),
+			'trigger.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected triggers?'))
 		),
 		$this->data['hostid']
 	))

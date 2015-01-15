@@ -142,13 +142,16 @@ $httpForm->addItem(array(
 	$this->data['paging'],
 	$httpTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'group_httptestid',
 		array(
-			'httptest.massenable' => array(_('Enable'), _('Enable selected web scenarios?')),
-			'httptest.massdisable' => array(_('Disable'), _('Disable selected web scenarios?')),
-			'httptest.massclearhistory' => array(_('Clear history'), _('Delete history of selected web scenarios?')),
-			'httptest.massdelete' => array(_('Delete'), _('Delete selected web scenarios?'))
+			'httptest.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')),
+			'httptest.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')),
+			'httptest.massclearhistory' => array('name' => _('Clear history'),
+				'confirm' => _('Delete history of selected web scenarios?')
+			),
+			'httptest.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?'))
 		),
 		$this->data['hostid']
 	))

@@ -814,10 +814,11 @@ foreach ($triggers as $trigger) {
  */
 $footer = null;
 if ($config['event_ack_enable']) {
-	$footer = get_table_header(new CActionGoButtonGroup(
+	$footer = get_table_header(new CActionButtonList(
+		'action',
 		$showEventColumn ? 'events' : 'triggers',
 		array(
-			'trigger.bulkacknowledge' => _('Bulk acknowledge')
+			'trigger.bulkacknowledge' => array('name' => _('Bulk acknowledge'))
 		)
 	));
 }

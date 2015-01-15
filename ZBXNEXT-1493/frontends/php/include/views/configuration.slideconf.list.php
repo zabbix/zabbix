@@ -56,10 +56,11 @@ $slideForm->addItem(array(
 	$this->data['paging'],
 	$slidesTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'shows',
 		array(
-			'slideshow.massdelete' => array(_('Delete'), _('Delete selected slide shows?'))
+			'slideshow.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected slide shows?'))
 		)
 	))
 ));

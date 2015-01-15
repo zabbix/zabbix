@@ -143,12 +143,19 @@ $discoveryForm->addItem(array(
 	$this->data['paging'],
 	$discoveryTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'g_hostdruleid',
 		array(
-			'discoveryrule.massenable' => array(_('Enable'), _('Enable selected discovery rules?')),
-			'discoveryrule.massdisable' => array(_('Disable'), _('Disable selected discovery rules?')),
-			'discoveryrule.massdelete' => array(_('Delete'), _('Delete selected discovery rules?'))
+			'discoveryrule.massenable' => array('name' => _('Enable'),
+				'confirm' =>_('Enable selected discovery rules?')
+			),
+			'discoveryrule.massdisable' => array('name' => _('Disable'),
+				'confirm' =>_('Disable selected discovery rules?')
+			),
+			'discoveryrule.massdelete' => array('name' => _('Delete'),
+				'confirm' =>_('Delete selected discovery rules?')
+			)
 		),
 		$this->data['hostid']
 	))

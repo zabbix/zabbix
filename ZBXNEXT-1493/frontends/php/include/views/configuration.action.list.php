@@ -105,12 +105,13 @@ $actionForm->addItem(array(
 	$this->data['paging'],
 	$actionTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'g_actionid',
 		array(
-			'action.massenable' => array(_('Enable'), _('Enable selected actions?')),
-			'action.massdisable' => array(_('Disable'), _('Disable selected actions?')),
-			'action.massdelete' => array(_('Delete'), _('Delete selected actions?'))
+			'action.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected actions?')),
+			'action.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected actions?')),
+			'action.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected actions?'))
 		)
 	))
 ));

@@ -67,12 +67,13 @@ $discoveryForm->addItem(array(
 	$this->data['paging'],
 	$discoveryTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'g_druleid',
 		array(
-			'drule.massenable' => array(_('Enable'), _('Enable selected discovery rules?')),
-			'drule.massdisable' => array(_('Disable'), _('Disable selected discovery rules?')),
-			'drule.massdelete' => array(_('Delete'), _('Delete selected discovery rules?'))
+			'drule.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected discovery rules?')),
+			'drule.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected discovery rules?')),
+			'drule.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected discovery rules?'))
 		)
 	))
 ));

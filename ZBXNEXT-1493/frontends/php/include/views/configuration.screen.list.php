@@ -67,11 +67,12 @@ $screenForm->addItem(array(
 	$this->data['paging'],
 	$screenTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'screens',
 		array(
-			'screen.export' => !$this->data['templateid'] ? _('Export') : null,
-			'screen.massdelete' => array(_('Delete'),  _('Delete selected screens?'))
+			'screen.export' => !$this->data['templateid'] ? array('name' => _('Export')) : array(),
+			'screen.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected screens?'))
 		)
 	))
 ));

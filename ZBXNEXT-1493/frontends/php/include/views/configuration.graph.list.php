@@ -161,16 +161,15 @@ $graphForm->addItem(array(
 	$this->data['paging'],
 	$graphTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'group_graphid',
 		array(
-			'graph.masscopyto' => !$this->data['parent_discoveryid'] ? _('Copy') : null,
-			'graph.massdelete' => array(
-				_('Delete'),
-				$this->data['parent_discoveryid']
+			'graph.masscopyto' => !$this->data['parent_discoveryid'] ? array('name' => _('Copy')) : array(),
+			'graph.massdelete' => array('name' => _('Delete'),
+				'confirm' => $this->data['parent_discoveryid']
 					? _('Delete selected graph prototypes?')
 					: _('Delete selected graphs?'),
-
 		)),
 		$this->data['parent_discoveryid'] ? $this->data['parent_discoveryid'] : $this->data['hostid']
 	))
