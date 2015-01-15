@@ -41,7 +41,7 @@ class ZabbixJMXConnectorFactory
 {
 	private static final Logger logger = LoggerFactory.getLogger(ZabbixJMXConnectorFactory.class);
 
-	private static final DaemonThreadFactory daemonThreadFactory = new DaemonThreadFactory();
+	private static final ExecutorService executor = Executors.newCachedThreadPool(new DaemonThreadFactory());
 
 	private static class DaemonThreadFactory implements ThreadFactory
 	{
@@ -61,8 +61,6 @@ class ZabbixJMXConnectorFactory
 		logger.debug("connecting to JMX agent at {}", url);
 
 		final BlockingQueue<Object> queue = new ArrayBlockingQueue<Object>(1);
-
-		ExecutorService executor = Executors.newSingleThreadExecutor(daemonThreadFactory);
 
 		Runnable task = new Runnable()
 		{
@@ -104,10 +102,6 @@ class ZabbixJMXConnectorFactory
 			e2.initCause(e);
 
 			throw e2;
-		}
-		finally
-		{
-			executor.shutdown();
 		}
 
 		if (null == result)
