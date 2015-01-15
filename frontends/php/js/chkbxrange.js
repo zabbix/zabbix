@@ -39,7 +39,7 @@ var chkbxRange = {
 		this.resetOtherPageCookies();
 
 		// initialize checkboxes
-		var chkboxes = jQuery('.tableinfo .checkbox:not(:disabled)');
+		var chkboxes = jQuery('.list-table .checkbox:not(:disabled)');
 		if (chkboxes.length > 0) {
 			for (var i = 0; i < chkboxes.length; i++) {
 				this.implement(chkboxes[i]);
@@ -56,7 +56,7 @@ var chkbxRange = {
 			}
 			// no checkboxes selected from cookies, check browser cache if checkboxes are still checked and update state
 			else {
-				var checkedFromCache = jQuery('.tableinfo tr:not(.header) .checkbox:checked:not(:disabled)');
+				var checkedFromCache = jQuery('.list-table tr:not(.header) .checkbox:checked:not(:disabled)');
 				var objectIds = jQuery.map(checkedFromCache, jQuery.proxy(function(checkbox) {
 					return this.getObjectIdFromName(checkbox.name);
 				}, this));
@@ -177,7 +177,7 @@ var chkbxRange = {
 			if (objectIds.indexOf(objectId) > -1) {
 				checkbox.checked = checked;
 
-				jQuery(checkbox).closest('tr').toggleClass('selected', checked);
+				jQuery(checkbox).closest('tr').toggleClass('row-selected', checked);
 
 				if (checked) {
 					this.selectedIds[objectId] = objectId;
@@ -261,24 +261,24 @@ var chkbxRange = {
 
 	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
 	updateMainCheckbox: function() {
-		var mainCheckbox = jQuery('.tableinfo .header .checkbox:not(:disabled)');
+		var mainCheckbox = jQuery('.list-table .header .checkbox:not(:disabled)');
 		if (!mainCheckbox.length) {
 			return;
 		}
 
-		var countAvailable = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled)').length;
+		var countAvailable = jQuery('.list-table tr:not(.header) .checkbox:not(:disabled)').length;
 
 		if (countAvailable > 0) {
-			var countChecked = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled):checked').length;
+			var countChecked = jQuery('.list-table tr:not(.header) .checkbox:not(:disabled):checked').length;
 
 			mainCheckbox = mainCheckbox[0];
 			mainCheckbox.checked = (countChecked == countAvailable);
 
 			if (mainCheckbox.checked) {
-				jQuery('.tableinfo .header').addClass('selectedMain');
+				jQuery('.list-table .header').addClass('selectedMain');
 			}
 			else {
-				jQuery('.tableinfo .header').removeClass('selectedMain');
+				jQuery('.list-table .header').removeClass('selectedMain');
 			}
 		}
 		else {
