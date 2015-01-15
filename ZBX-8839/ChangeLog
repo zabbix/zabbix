@@ -3,6 +3,12 @@ Changes for 2.0.15rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
+....I..... [ZBX-9168] fixed incorrect keys and added missing keys in the item key helper (Richlv)
+A......... [ZBX-9197] fixed PHP fatal error "Call to undefined function array_fill_keys()" in trigger.get method with PHP<5.2.0 (Sasha)
+.......P.. [ZBX-9195] fixed lastlogsize and mtime being updated on proxy for unsupported items; thanks to Yoshinori Komuro for patch (asaveljevs, Sasha)
+.......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
+........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
 ........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
 
 --------------------------------------------------------------------------------

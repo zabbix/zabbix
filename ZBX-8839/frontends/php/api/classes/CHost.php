@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1515,15 +1515,13 @@ class CHost extends CHostGeneral {
 			}
 
 			if (isset($host['inventory']) && !empty($host['inventory'])) {
-				$fields = array_keys($host['inventory']);
-				$fields[] = 'inventory_mode';
-				$fields = implode(', ', $fields);
+				$hostInventory = $host['inventory'];
+				$hostInventory['hostid'] = $hostid;
+				$hostInventory['inventory_mode'] = isset($host['inventory_mode'])
+					? $host['inventory_mode']
+					: HOST_INVENTORY_MANUAL;
 
-				$values = array_map('zbx_dbstr', $host['inventory']);
-				$values[] = isset($host['inventory_mode']) ? $host['inventory_mode'] : HOST_INVENTORY_MANUAL;
-				$values = implode(', ', $values);
-
-				DBexecute('INSERT INTO host_inventory (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
+				DB::insert('host_inventory', array($hostInventory));
 			}
 		}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ define('ZABBIX_VERSION',		'2.0.15rc1');
 define('ZABBIX_API_VERSION',	'2.0.15');
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
-define('ZABBIX_COPYRIGHT_TO', '2014');
+define('ZABBIX_COPYRIGHT_TO', '2015');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
