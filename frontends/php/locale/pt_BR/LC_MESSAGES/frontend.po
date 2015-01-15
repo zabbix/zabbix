@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:42+0200\n"
-"PO-Revision-Date: 2014-11-04 18:28+0300\n"
+"POT-Creation-Date: 2015-01-15 18:48+0200\n"
+"PO-Revision-Date: 2015-01-15 16:48+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1415118492.0\n"
+"X-POOTLE-MTIME: 1421333287.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -1620,17 +1620,17 @@ msgstr "Não é possível excluir dependência"
 #: include/classes/api/services/CGraph.php:554
 #, c-format
 msgid "Cannot delete discovered graph \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível excluir o gráfico \"%1$s\"."
 
 #: include/classes/api/services/CItem.php:633
 #, c-format
 msgid "Cannot delete discovered item \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível excluir o item descoberto \"%1$s\"."
 
 #: include/classes/api/services/CTrigger.php:852
 #, c-format
 msgid "Cannot delete discovered trigger \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível excluir a trigger descoberta \"%1$s\"."
 
 #: discoveryconf.php:179 host_discovery.php:184
 #: include/classes/api/services/CDiscoveryRule.php:431
@@ -2284,7 +2284,7 @@ msgstr "Não foi possível enviar o comando, verifique a comunicação com o ser
 #: include/classes/api/services/CHostGroup.php:429
 #, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Não foi possível definir \"%1$s\" para o grupo de host \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:247
 #, c-format
@@ -2320,7 +2320,7 @@ msgstr "Não é possível configurar campos do inventário com o inventário des
 #: include/classes/api/services/CScreenItem.php:570
 #: include/classes/api/services/CScreenItem.php:596
 msgid "Cannot set resource ID for screen element."
-msgstr ""
+msgstr "Não foi possível definir o ID de recurso para o elemento da tela."
 
 #: include/classes/api/services/CHostInterface.php:269
 msgid "Cannot switch host for interface."
@@ -2385,7 +2385,7 @@ msgstr "Não foi possível atualizar \"%1$s\" para a ação \"%2$s\"."
 #: include/classes/api/services/CHostGroup.php:490
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar \"%1$s\" para o grupo de host \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:211
 #, c-format
@@ -2400,17 +2400,17 @@ msgstr "Não foi possível atualizar \"%1$s\" para a trigger \"%2$s\"."
 #: include/classes/api/services/CHost.php:558
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar \"%2$s\" para o host descoberto \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:175
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar \"%2$s\" para o item descoberto \"%1$s\"."
 
 #: include/classes/api/services/CTrigger.php:588
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar \"%2$s\" para a trigger descoberta \"%1$s\"."
 
 #: include/classes/api/services/CImage.php:557
 #, c-format
@@ -3404,11 +3404,11 @@ msgstr "Criar mapeamento de valor"
 
 #: include/views/configuration.httpconf.list.php:34
 msgid "Create web scenario"
-msgstr ""
+msgstr "Criar cenário web"
 
 #: include/views/configuration.httpconf.list.php:29
 msgid "Create web scenario (select host first)"
-msgstr ""
+msgstr "Criar cenário web (selecione o host primeiro)"
 
 #: include/classes/api/managers/CApplicationManager.php:73
 #, c-format
@@ -3482,7 +3482,7 @@ msgstr "Host atual"
 
 #: include/views/reports.toptriggers.php:57
 msgid "Current month"
-msgstr ""
+msgstr "Mês atual"
 
 #: popup_trexpr.php:520
 msgid "Current time is < N"
@@ -3506,11 +3506,11 @@ msgstr "Valor atual"
 
 #: include/views/reports.toptriggers.php:54
 msgid "Current week"
-msgstr ""
+msgstr "Semana atual"
 
 #: include/views/reports.toptriggers.php:60
 msgid "Current year"
-msgstr ""
+msgstr "Ano atual"
 
 #: include/views/configuration.action.edit.php:129
 #: include/views/configuration.host.discovery.edit.php:280
@@ -3580,7 +3580,7 @@ msgstr "DES"
 
 #: httpdetails.php:116
 msgid "DETAILS OF WEB SCENARIO"
-msgstr ""
+msgstr "DETALHES DO CENÁRIO WEB"
 
 #: include/maps.inc.php:465 include/maps.inc.php:547 include/maps.inc.php:635
 #: include/maps.inc.php:725
@@ -4180,7 +4180,7 @@ msgstr "Remover trigger?"
 
 #: include/views/configuration.httpconf.edit.php:262
 msgid "Delete web scenario?"
-msgstr ""
+msgstr "Excluir cenário web?"
 
 #: auditlogs.php:132
 msgid "Deleted"
@@ -4326,7 +4326,7 @@ msgstr "Detalhes"
 
 #: httpdetails.php:27
 msgid "Details of web scenario"
-msgstr ""
+msgstr "Detalhes do cenário web"
 
 #: include/actions.inc.php:102
 msgid "Device"
@@ -5458,7 +5458,7 @@ msgstr "O campo \"%1$s\" é obrigatório."
 #: include/validate.inc.php:237
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
-msgstr ""
+msgstr "O campo \"%1$s\" não está correto: %2$s"
 
 #: include/validate.inc.php:163
 #, c-format
@@ -6196,7 +6196,7 @@ msgstr "Esconder triggers inativas"
 
 #: include/views/configuration.httpconf.list.php:49
 msgid "Hide disabled web scenarios"
-msgstr ""
+msgstr "Esconder cenários web inativos"
 
 #: include/classes/html/widget/CWidget.php:128
 msgid "Hide filter"
@@ -6717,11 +6717,11 @@ msgstr "Endereço IP"
 
 #: include/classes/validators/CIPValidator.php:43
 msgid "IP address cannot be empty."
-msgstr ""
+msgstr "O endereço IP não pode ser nulo."
 
 #: include/classes/validators/CIPRangeValidator.php:62
 msgid "IP address range cannot be empty."
-msgstr ""
+msgstr "O range de endereços não pode ser nulo."
 
 #: include/classes/api/services/CHostInterface.php:292
 msgid "IP and DNS cannot be empty for host interface."
@@ -6735,7 +6735,7 @@ msgstr "Intervalo de IPs"
 #: include/classes/validators/CIPRangeValidator.php:80
 #, c-format
 msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit."
-msgstr ""
+msgstr "O range \"%1$s\" excede o limite de \"%2$s\" endereços."
 
 #: include/classes/api/services/CDRule.php:215
 msgid "IP range cannot be empty."
@@ -7712,7 +7712,7 @@ msgstr "Status inválido."
 
 #: include/classes/api/services/CScreenItem.php:643
 msgid "Incorrect style provided for screen element."
-msgstr ""
+msgstr "Foi informado um estilo inválido para o elemento da tela."
 
 #: include/classes/api/services/CTemplateScreen.php:598
 msgid "Incorrect template screen ID."
@@ -7997,12 +7997,12 @@ msgstr "Intervalo (em segundos)"
 #: include/classes/validators/CIPValidator.php:49
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
-msgstr ""
+msgstr "O endereço IP \"%1$s\" é inválido."
 
 #: include/classes/validators/CIPValidator.php:37
 #, c-format
 msgid "Invalid IP address \"%1$s\": must be a string."
-msgstr ""
+msgstr "Endereço IP inválido \"%1$s\": deverá ser um texto."
 
 #: include/classes/validators/CIPRangeValidator.php:72
 #, c-format
@@ -8656,7 +8656,7 @@ msgstr "Último valor"
 
 #: include/views/reports.toptriggers.php:64
 msgid "Last week"
-msgstr ""
+msgstr "Última semana"
 
 #: jsLoader.php:211
 msgid "Last week graph"
@@ -8664,7 +8664,7 @@ msgstr "Gráfico última semana"
 
 #: include/views/reports.toptriggers.php:70
 msgid "Last year"
-msgstr ""
+msgstr "Último ano"
 
 #: include/menu.inc.php:46 include/views/inventory.host.view.php:209
 #: jsLoader.php:206 latest.php:26 search.php:134 search.php:220 search.php:274
@@ -9324,7 +9324,7 @@ msgstr "Limite de memória: %s"
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:399
 msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). <memtype> type of process memory (supported on some platforms, see documentation). Example: proc.mem[,root]."
-msgstr ""
+msgstr "Memória utilizada por um processo. <name> nome do processo (padrão: \"todos os processos\"). <user> nome do usuário (padrão: \"todos os usuários\"). <memtype> tipo do processo em memória (suportado em algumas plataformas, consulte a documentação). Exemplo: proc.mem[,root]."
 
 #: dashboard.php:313 dashboard.php:327 dashboard.php:341 dashboard.php:367
 #: dashboard.php:391 dashboard.php:414 dashboard.php:437 dashboard.php:460
@@ -11196,11 +11196,11 @@ msgstr "DASHBOARD PESSOAL"
 
 #: include/classes/setup/CFrontendSetup.php:366
 msgid "PHP always_populate_raw_post_data"
-msgstr ""
+msgstr "PHP always_populate_raw_post_data"
 
 #: include/classes/setup/CFrontendSetup.php:370
 msgid "PHP always_populate_raw_post_data must be set to -1."
-msgstr ""
+msgstr "PHP always_populate_raw_post_data deve ser configurado para -1."
 
 #: include/classes/setup/CFrontendSetup.php:307
 msgid "PHP bcmath"
@@ -11469,19 +11469,19 @@ msgstr "Pico de utilização de memória: %s"
 
 #: popup_trexpr.php:100
 msgid "Percentage"
-msgstr ""
+msgstr "Percentual"
 
 #: popup_trexpr.php:304
 msgid "Percentile P of a period T is < N"
-msgstr ""
+msgstr "O percentual P de um período T é < N."
 
 #: popup_trexpr.php:314
 msgid "Percentile P of a period T is = N"
-msgstr ""
+msgstr "O percentual P de um período T é = N"
 
 #: popup_trexpr.php:309
 msgid "Percentile P of a period T is > N"
-msgstr ""
+msgstr "O percentual P de um período T é > N"
 
 #: popup_trexpr.php:319
 msgid "Percentile P of a period T is NOT N"
@@ -15618,7 +15618,7 @@ msgstr "O número de um cenário web não pode ser menor do que 1."
 
 #: httpconf.php:195
 msgid "Web scenario updated"
-msgstr ""
+msgstr "Cenário web atualizado"
 
 #: httpmon.php:85 include/html.inc.php:489 include/html.inc.php:493
 #: include/views/configuration.host.edit.php:684
@@ -15881,7 +15881,7 @@ msgstr "Sim"
 
 #: include/views/reports.toptriggers.php:51
 msgid "Yesterday"
-msgstr ""
+msgstr "Ontem"
 
 #: include/views/administration.users.edit.php:140
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
