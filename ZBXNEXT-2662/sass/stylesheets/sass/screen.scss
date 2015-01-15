@@ -178,24 +178,36 @@ ul.top-subnav a {
 	}
 }
 
-div.arrow-up {
+span.arrow-up {
+	@extend %arrow;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	border-bottom: 4px solid $link-color;
+}
+
+span.arrow-down {
+	@extend %arrow;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	border-top: 4px solid $link-color;
+}
+
+%arrow {
 	width: 0; 
 	height: 0; 
-	border-left: 5px solid transparent;
-	border-right: 5px solid transparent;
-	border-bottom: 5px solid $secondary-color;
 	font-size: 0;
 	line-height: 0;
+	display: inline-block;
 }
 
 div.header-title {
-	padding: 0 13px 0 13px;
 	position: relative;
+	margin: 0 0 12px 0;
 
 	& ul {
 		position: absolute;
 		right: 13px;
-		bottom: 4px;
+		bottom: 5px;
 
 		& li {
 			display: block;
@@ -302,7 +314,7 @@ div.table-paging {
 
 	a {
 		@include border-radius;
-		margin: 0 -1px 0 0px;
+		margin: 0 5px 0 5px;
 		display: inline-block;
 		padding: 0 14px;
 		min-height: 24px;
@@ -316,24 +328,29 @@ div.table-paging {
 		}
 
 		&:active {
-			background: darken($primary-color, 10%);
-			color: $font-white-color;
-			border-color: darken($primary-color, 10%);
+			background: lighten($primary-color, 50%);
+		}
+
+		&.paging-selected {
+			cursor: default;
+			color: $font-color;
+			background: $form-input-color;
 		}
 	}
 }
 
 /* Filters */
-div.filter {
+div.filter-container {
 	text-align: center;
 }
 
 /* Forms */
+
+
 input[type="text"] {
 	@extend %form-input-style;
 	height: 24px;
 	line-height: 24px;
-	@include transition;
 
 	&:focus {
 		border-color: $primary-color;
@@ -347,13 +364,21 @@ textarea {
 select {
 	@extend %form-input-style;
 	height: 24px;
+	line-height: 24px;
+	@include transition;
+
+	&:focus {
+		border-color: $primary-color;
+	}
 }
 
 %form-input-style {
 	@include border-radius;
 	border: 1px solid $form-input-color;
+	background: $body-content-bgcolor;
 	padding: 0 5px;
 	@include font-form;
+	@include transition;
 }
 
 input [type="checkbox"] {
@@ -423,8 +448,12 @@ button {
 			color: $link-color;
 		}
 
-		& span {
-			background: $primary-color url(../img/icon-sprite.png) no-repeat right -314px;
+		& span.arrow-up {
+			border-bottom-color: $font-white-color;
+		}
+
+		& span.arrow-down {
+			border-top-color: $font-white-color;
 		}
 	}
 }
@@ -477,7 +506,7 @@ div.action-buttons {
 	@extend .green;
 	border: 1px solid $alert-green-border-color;
 	background: $alert-green-bg-color;
-	padding: 7px 12px 7px 12px;
+	padding: 7px 12px;
 	text-align: center;
 	@include border-radius; 
 }
