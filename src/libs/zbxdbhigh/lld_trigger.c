@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ static void	lld_function_free(zbx_lld_function_t *function)
 
 static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
 {
-	zbx_vector_ptr_clean(&trigger->functions, (zbx_mem_free_func_t)lld_function_free);
+	zbx_vector_ptr_clear_ext(&trigger->functions, (zbx_clean_func_t)lld_function_free);
 	zbx_vector_ptr_destroy(&trigger->functions);
 	zbx_free(trigger->comments_orig);
 	zbx_free(trigger->comments);
@@ -363,23 +363,14 @@ static zbx_lld_trigger_t	*lld_trigger_by_item(zbx_vector_ptr_t *triggers, zbx_ui
  * Return value: upon successful completion return pointer to the trigger     *
  *                                                                            *
  ******************************************************************************/
-static zbx_lld_trigger_t	*lld_trigger_get(const zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_t *triggers,
-		zbx_vector_ptr_t *item_links)
+static zbx_lld_trigger_t	*lld_trigger_get(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *item_links)
 {
-	int			i, index;
+	int			i;
 	zbx_lld_trigger_t	*trigger;
-	zbx_lld_item_link_t	*item_link;
 
-	for (i = 0; i < functions_proto->values_num; i++)
+	for (i = 0; i < item_links->values_num; i++)
 	{
-		zbx_lld_function_t	*function = (zbx_lld_function_t *)functions_proto->values[i];
-
-		index = zbx_vector_ptr_bsearch(item_links, &function->itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-		if (FAIL == index)
-			continue;
-
-		item_link = (zbx_lld_item_link_t *)item_links->values[index];
+		zbx_lld_item_link_t	*item_link = (zbx_lld_item_link_t *)item_links->values[i];
 
 		if (NULL != (trigger = lld_trigger_by_item(triggers, item_link->itemid)))
 			return trigger;
@@ -639,7 +630,7 @@ static void 	lld_trigger_make(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	trigger = lld_trigger_get(functions_proto, triggers, &lld_row->item_links);
+	trigger = lld_trigger_get(triggers, &lld_row->item_links);
 
 	expression = zbx_strdup(expression, expression_proto);
 	if (SUCCEED != substitute_discovery_macros(&expression, jp_row, ZBX_MACRO_NUMERIC, err, sizeof(err)))
@@ -1018,7 +1009,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 			}
 		}
 
-		zbx_vector_ptr_clean(&db_triggers, (zbx_mem_free_func_t)lld_trigger_free);
+		zbx_vector_ptr_clear_ext(&db_triggers, (zbx_clean_func_t)lld_trigger_free);
 		zbx_vector_ptr_destroy(&db_triggers);
 
 		zbx_free(sql);
@@ -1449,9 +1440,9 @@ void	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 
 		/* cleaning */
 
-		zbx_vector_ptr_clean(&items, (zbx_mem_free_func_t)lld_item_free);
-		zbx_vector_ptr_clean(&functions_proto, (zbx_mem_free_func_t)lld_function_free);
-		zbx_vector_ptr_clean(&triggers, (zbx_mem_free_func_t)lld_trigger_free);
+		zbx_vector_ptr_clear_ext(&items, (zbx_clean_func_t)lld_item_free);
+		zbx_vector_ptr_clear_ext(&functions_proto, (zbx_clean_func_t)lld_function_free);
+		zbx_vector_ptr_clear_ext(&triggers, (zbx_clean_func_t)lld_trigger_free);
 
 		zbx_free(expression_proto);
 	}

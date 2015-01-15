@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 #define LOCK_ITSERVICES		zbx_mutex_lock(&itservices_lock)
 #define UNLOCK_ITSERVICES	zbx_mutex_unlock(&itservices_lock)
 
-static ZBX_MUTEX	itservices_lock;
+static ZBX_MUTEX	itservices_lock = ZBX_MUTEX_NULL;
 
 /* status update queue items */
 typedef struct
@@ -328,7 +328,7 @@ static void	its_itservices_load_parents(zbx_itservices_t *itservices, zbx_vector
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "sl.servicedownid", serviceids->values,
 			serviceids->values_num);
 
-	serviceids->values_num = 0;
+	zbx_vector_uint64_clear(serviceids);
 
 	result = DBselect("%s", sql);
 
@@ -594,7 +594,7 @@ static int	its_write_status_and_alarms(zbx_itservices_t *itservices, zbx_vector_
 out:
 	zbx_free(sql);
 
-	zbx_vector_ptr_clean(&updates, (zbx_mem_free_func_t)zbx_status_update_free);
+	zbx_vector_ptr_clear_ext(&updates, (zbx_clean_func_t)zbx_status_update_free);
 	zbx_vector_ptr_destroy(&updates);
 
 	return ret;
@@ -693,7 +693,7 @@ static int	its_flush_updates(zbx_vector_ptr_t *updates)
 
 	ret = its_write_status_and_alarms(&itservices, &alarms);
 
-	zbx_vector_ptr_clean(&alarms, (zbx_mem_free_func_t)zbx_status_update_free);
+	zbx_vector_ptr_clear_ext(&alarms, (zbx_clean_func_t)zbx_status_update_free);
 	zbx_vector_ptr_destroy(&alarms);
 out:
 	its_itservices_clean(&itservices);
@@ -745,7 +745,7 @@ int	DBupdate_itservices(const DB_EVENT *events, size_t events_num)
 
 		UNLOCK_ITSERVICES;
 
-		zbx_vector_ptr_clean(&updates, free);
+		zbx_vector_ptr_clear_ext(&updates, zbx_ptr_free);
 	}
 
 	zbx_vector_ptr_destroy(&updates);
@@ -791,8 +791,7 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 	if (FAIL == its_flush_updates(&updates))
 		goto out;
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"update services set triggerid=null,showsla=0 where");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update services set triggerid=null,showsla=0 where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids, triggerids_num);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
@@ -802,7 +801,7 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 out:
 	UNLOCK_ITSERVICES;
 
-	zbx_vector_ptr_clean(&updates, (zbx_mem_free_func_t)zbx_status_update_free);
+	zbx_vector_ptr_clear_ext(&updates, (zbx_clean_func_t)zbx_status_update_free);
 	zbx_vector_ptr_destroy(&updates);
 
 	return ret;
@@ -810,7 +809,7 @@ out:
 
 void	zbx_create_itservices_lock()
 {
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&itservices_lock, ZBX_MUTEX_ITSERVICES))
+	if (FAIL == zbx_mutex_create_force(&itservices_lock, ZBX_MUTEX_ITSERVICES))
 	{
 		zbx_error("cannot create mutex for IT services");
 		exit(EXIT_FAILURE);

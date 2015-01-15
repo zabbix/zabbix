@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,7 +254,7 @@ var chkbxRange = {
 
 		// update go button
 		var goButton = jQuery('#goButton');
-		goButton.val(goButton.val().split(' ')[0] + ' (' + count + ')')
+		goButton.text(goButton.text().split(' ')[0] + ' (' + count + ')')
 			.prop('disabled', count == 0);
 		jQuery('#action').prop('disabled', count == 0);
 	},

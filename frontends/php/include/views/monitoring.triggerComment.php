@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,18 +47,18 @@ $commentForm->addItem($commentTab);
 $updateButton = new CSubmit('update', _('Update'));
 $updateButton->setEnabled(!$this->data['isCommentExist']);
 
+$buttons = array(
+	new CButtonCancel('&triggerid='.$this->data['triggerid'])
+);
+
 if ($this->data['isCommentExist']) {
 	$editButton = new CButton('edit', _('Edit'));
 	$editButton->setEnabled($this->data['isTriggerEditable']);
-}
-else {
-	$editButton = null;
+
+	array_unshift($buttons, $editButton);
 }
 
-$commentForm->addItem(makeFormFooter(
-	$updateButton,
-	array($editButton, new CButtonCancel('&triggerid='.$this->data['triggerid']))
-));
+$commentForm->addItem(makeFormFooter($updateButton, $buttons));
 
 $commentWidget->addItem($commentForm);
 

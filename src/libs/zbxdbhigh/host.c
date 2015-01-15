@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2337,7 +2337,7 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 		zbx_db_insert_clean(&db_insert);
 	}
 
-	zbx_vector_ptr_clean(&applications, (zbx_mem_free_func_t)zbx_application_clean);
+	zbx_vector_ptr_clear_ext(&applications, (zbx_clean_func_t)zbx_application_clean);
 	zbx_vector_ptr_destroy(&applications);
 	zbx_free(sql);
 
@@ -2596,7 +2596,7 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 
 	/* select list of templates which already linked to host prototypes */
 
-	hostids.values_num = 0;
+	zbx_vector_uint64_clear(&hostids);
 
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
@@ -2727,7 +2727,7 @@ static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
 
 	/* select list of group prototypes which already linked to host prototypes */
 
-	hostids.values_num = 0;
+	zbx_vector_uint64_clear(&hostids);
 
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
@@ -4266,7 +4266,8 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 
 		zbx_free(tmp);
 		tmp = strdup(row[4]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL,  NULL,
+				&tmp, MACRO_TYPE_COMMON, NULL, 0);
 		if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
 			continue;
 

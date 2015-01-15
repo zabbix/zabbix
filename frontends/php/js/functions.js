@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -570,11 +570,11 @@ function executeScript(hostId, scriptId, confirmation) {
 			});
 
 		if (empty(hostId)) {
-			jQuery('.ui-dialog-buttonset button:first').prop('disabled', true).addClass('ui-state-disabled');
-			jQuery('.ui-dialog-buttonset button:last').addClass('main').focus();
+			jQuery('.ui-dialog-buttonset .ui-button:first').prop('disabled', true).addClass('ui-state-disabled');
+			jQuery('.ui-dialog-buttonset .ui-button:last').addClass('main').focus();
 		}
 		else {
-			jQuery('.ui-dialog-buttonset button:first').addClass('main');
+			jQuery('.ui-dialog-buttonset .ui-button:first').addClass('main');
 		}
 	}
 	else {

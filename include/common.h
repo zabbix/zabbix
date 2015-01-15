@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,8 +96,10 @@ const char	*zbx_result_string(int result);
 #define MAX_ZBX_HOSTNAME_LEN	128
 #define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
 
-#define ZBX_MAX_UINT64_LEN	21
 #define ZBX_DM_DELIMITER	'\255'
+
+#define ZBX_MAX_UINT64		(~__UINT64_C(0))
+#define ZBX_MAX_UINT64_LEN	21
 
 typedef struct
 {
@@ -380,6 +382,7 @@ zbx_graph_yaxis_types_t;
 
 /* runtime control options */
 #define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
+#define ZBX_HOUSEKEEPER_EXECUTE	"housekeeper_execute"
 #define ZBX_LOG_LEVEL_INCREASE	"log_level_increase"
 #define ZBX_LOG_LEVEL_DECREASE	"log_level_decrease"
 
@@ -728,6 +731,7 @@ zbx_task_t;
 
 #define ZBX_RTC_LOG_LEVEL_INCREASE	1
 #define ZBX_RTC_LOG_LEVEL_DECREASE	2
+#define ZBX_RTC_HOUSEKEEPER_EXECUTE	3
 #define ZBX_RTC_CONFIG_CACHE_RELOAD	8
 
 typedef enum
@@ -769,27 +773,28 @@ int	is_double(const char *c);
 int	is_uint_suffix(const char *c, unsigned int *value);
 int	is_int_prefix(const char *c);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
+int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
 #define is_ushort(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned short), 0x0LL, 0xFFFFLL)
+	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, sizeof(unsigned short), 0x0, 0xFFFF)
 
 #define is_uint32(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0xFFFFFFFFLL)
+	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 4, 0x0, 0xFFFFFFFF)
 
 #define is_uint64(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
+	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
 
 #define is_uint64_n(str, n, value) \
-	is_uint_n_range(str, n, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
+	is_uint_n_range(str, n, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
 
 #define is_uint31(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFFFLL)
+	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 4, 0x0, 0x7FFFFFFF)
 
 #define is_uint31_1(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFFELL)
+	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 4, 0x0, 0x7FFFFFFE)
 
 #define is_uint_range(str, value, min, max) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned int), min, max)
+	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, sizeof(unsigned int), min, max)
 
 int	is_boolean(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);
@@ -940,13 +945,34 @@ void	zbx_on_exit(void); /* calls exit() at the end! */
 
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
-int	ip_in_list(char *list, const char *ip);
+int	ip_in_list(const char *list, const char *ip);
 
-int	ip4_str2dig(const char *ip, unsigned int *ip_dig);
-int	ip6_str2dig(const char *ip, unsigned short *groups);
-#ifdef HAVE_IPV6
-void	ip6_dig2str(unsigned short *groups, char *ip, size_t ip_len);
-#endif
+/* IP range support */
+typedef struct
+{
+	int	from;
+	int	to;
+}
+zbx_range_t;
+
+typedef struct
+{
+	zbx_range_t	range[8];
+	/* range type - ZBX_IPRANGE_V4 or ZBX_IPRANGE_V6 */
+	unsigned char	type;
+	/* 1 if the range was defined with network mask, 0 otherwise */
+	unsigned char   mask;
+}
+zbx_iprange_t;
+
+#define ZBX_IPRANGE_V4	0
+#define ZBX_IPRANGE_V6	1
+
+int	iprange_parse(zbx_iprange_t *range, const char *address);
+void	iprange_first(const zbx_iprange_t *range, int *address);
+int	iprange_next(const zbx_iprange_t *range, int *address);
+int	iprange_validate(const zbx_iprange_t *range, const int *address);
+zbx_uint64_t	iprange_volume(const zbx_iprange_t *range);
 
 /* time related functions */
 double	time_diff(struct timeval *from, struct timeval *to);
@@ -988,7 +1014,8 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
 size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
-size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen);
+size_t	zbx_strlen_utf8_nchars(const char *text, size_t utf8_maxlen);
+size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen);
 
 int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
@@ -1025,10 +1052,12 @@ zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
 
 int	zbx_check_hostname(const char *hostname, char **error);
 
-int	is_hostname_char(char c);
-int	is_key_char(char c);
-int	is_function_char(char c);
-int	is_macro_char(char c);
+int	is_hostname_char(unsigned char c);
+int	is_key_char(unsigned char c);
+int	is_function_char(unsigned char c);
+int	is_macro_char(unsigned char c);
+
+int	is_discovery_macro(const char *name);
 
 int	is_time_function(const char *func);
 int	is_snmp_type(unsigned char type);

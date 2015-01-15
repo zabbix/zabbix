@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ $macrosTab->addTab('macros', _('Macros'), $macrosView->render());
 
 $saveButton = new CSubmit('update', _('Update'));
 $saveButton->attr('data-removed-count', 0);
-$saveButton->addClass('main');
+$saveButton->main();
 
 $macrosForm->addItem($macrosTab);
 $macrosForm->addItem(makeFormFooter(null, array($saveButton)));

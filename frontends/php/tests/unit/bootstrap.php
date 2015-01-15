@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ $autoloader = new CAutoloader(array(
 	__DIR__.'/../../include/classes/api/services',
 	__DIR__.'/../../include/classes/api/managers',
 	__DIR__.'/../../include/classes/html',
+	__DIR__.'/../../include/classes/html/interfaces',
 	__DIR__.'/include/classes/html',
 	__DIR__.'/include/classes/validators',
 	__DIR__.'/include/classes/parsers',

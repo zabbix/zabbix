@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -193,7 +193,8 @@ static int	process_proxy(void)
 		proxy.addr = proxy.addr_orig;
 
 		port = zbx_strdup(port, proxy.port_orig);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				&port, MACRO_TYPE_COMMON, NULL, 0);
 		if (FAIL == is_ushort(port, &proxy.port))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "invalid proxy \"%s\" port: \"%s\"", proxy.host, port);

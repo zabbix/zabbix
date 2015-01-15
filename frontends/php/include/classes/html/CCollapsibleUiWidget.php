@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,9 +46,9 @@ class CCollapsibleUiWidget extends CUiWidget {
 
 		$icon = new CIcon(
 			_('Show').'/'._('Hide'),
-			$this->open ? 'arrowup' : 'arrowdown',
-			'changeWidgetState(this, "'.$this->id.'");'
+			$this->open ? 'arrowup' : 'arrowdown'
 		);
+		$icon->addAction('onclick', 'changeWidgetState(this, "'.$this->id.'");');
 		$icon->setAttribute('id', $this->id.'_icon');
 		array_unshift($icons, $icon);
 

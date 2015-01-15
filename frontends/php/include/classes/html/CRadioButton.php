@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,20 @@ class CRadioButton extends CTag {
 		}
 		if (!empty($action)) {
 			$this->setAttribute('onchange', $action);
+		}
+	}
+
+	/**
+	 * Enable or disable the element.
+	 *
+	 * @param bool $value
+	 */
+	public function setEnabled($value) {
+		if ($value) {
+			$this->removeAttribute('disabled');
+		}
+		else {
+			$this->attr('disabled', 'disabled');
 		}
 	}
 }

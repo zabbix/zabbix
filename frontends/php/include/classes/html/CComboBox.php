@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,9 @@ class CComboBox extends CTag {
 		if (is_array($items)) {
 			$this->addItems($items);
 		}
+
+		// Prevent Firefox remembering selected option on page refresh.
+		$this->setAttribute('autocomplete', 'off');
 	}
 
 	public function setValue($value = null) {
@@ -43,7 +46,7 @@ class CComboBox extends CTag {
 
 	public function addItems($items) {
 		foreach ($items as $value => $caption) {
-			$selected = (int) ($value == $this->value);
+			$selected = (int) (strcmp($value, $this->value) == 0);
 			parent::addItem(new CComboItem($value, $caption, $selected));
 		}
 	}
@@ -51,17 +54,13 @@ class CComboBox extends CTag {
 	public function addItemsInGroup($label, $items) {
 		$group = new COptGroup($label);
 		foreach ($items as $value => $caption) {
-			$selected = (int) ($value == $this->value);
+			$selected = (int) (strcmp($value, $this->value) == 0);
 			$group->addItem(new CComboItem($value, $caption, $selected));
-
-			if (strcmp($value, $this->value) == 0) {
-				$this->value_exist = 1;
-			}
 		}
 		parent::addItem($group);
 	}
 
-	public function addItem($value, $caption = '', $selected = null, $enabled = 'yes', $class = null) {
+	public function addItem($value, $caption = '', $selected = null, $enabled = true, $class = null) {
 		if ($value instanceof CComboItem || $value instanceof COptGroup) {
 			parent::addItem($value);
 		}
@@ -88,6 +87,20 @@ class CComboBox extends CTag {
 			}
 
 			parent::addItem($citem);
+		}
+	}
+
+	/**
+	 * Enable or disable the element.
+	 *
+	 * @param $value
+	 */
+	public function setEnabled($value) {
+		if ($value) {
+			$this->removeAttribute('disabled');
+		}
+		else {
+			$this->attr('disabled', 'disabled');
 		}
 	}
 }

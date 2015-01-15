@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -240,6 +240,11 @@ class CMenuPopupHelper {
 		);
 
 		if ($scripts) {
+			foreach ($scripts as &$script) {
+				$script['name'] = implode('/', splitPath($script['name'], false, true));
+			}
+			unset($script);
+
 			CArrayHelper::sort($scripts, array('name'));
 
 			foreach (array_values($scripts) as $script) {
@@ -280,6 +285,10 @@ class CMenuPopupHelper {
 		);
 
 		if ($scripts) {
+			foreach ($scripts as &$script) {
+				$script['name'] = implode('/', splitPath($script['name'], false, true));
+			}
+			unset($script);
 			CArrayHelper::sort($scripts, array('name'));
 
 			$data['hostid'] = $hostId;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,7 +85,10 @@ $importTab->addTab('importTab', _('Import'), $importFormList);
 // form
 $importForm = new CForm('post', null, 'multipart/form-data');
 $importForm->addItem($importTab);
-$importForm->addItem(makeFormFooter(new CSubmit('import', _('Import')), new CButtonCancel()));
+$importForm->addItem(makeFormFooter(
+	new CSubmit('import', _('Import')),
+	array(new CButtonCancel())
+));
 
 // widget
 $importWidget = new CWidget();

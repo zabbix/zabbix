@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -180,16 +180,16 @@ function get_icon($type, $params = array()) {
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = new CIcon(
 					_('Remove from favourites'),
-					'iconminus',
-					'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");'
+					'iconminus'
 				);
+				$icon->addAction('onclick', 'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
 				$icon = new CIcon(
 					_('Add to favourites'),
-					'iconplus',
-					'add2favorites("'.$params['elname'].'", "'.$params['elid'].'");'
+					'iconplus'
 				);
+				$icon->addAction('onclick', 'add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			$icon->setAttribute('id', 'addrm_fav');
 
@@ -199,14 +199,19 @@ function get_icon($type, $params = array()) {
 			$url = new CUrl();
 			$url->setArgument('fullscreen', $params['fullscreen'] ? '0' : '1');
 
-			return new CIcon(
+			$icon = new CIcon(
 				$params['fullscreen'] ? _('Normal view') : _('Fullscreen'),
-				'fullscreen',
-				"document.location = '".$url->getUrl()."';"
+				'fullscreen'
 			);
+			$icon->addAction('onclick', "document.location = '".$url->getUrl()."';");
+
+			return $icon;
 
 		case 'reset':
-			return new CIcon(_('Reset'), 'iconreset', 'timeControl.objectReset();');
+			$icon = new CIcon(_('Reset'), 'iconreset');
+			$icon->addAction('onclick', 'timeControl.objectReset();');
+
+			return $icon;
 	}
 
 	return null;
@@ -494,20 +499,40 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	return new CDiv($list, 'objectgroup top ui-widget-content ui-corner-all');
 }
 
-function makeFormFooter($main = null, $others = null) {
-	if ($main) {
-		$main->useJQueryStyle('main');
+/**
+ * Renders a form footer with the given buttons.
+ *
+ * @param CButtonInterface 		$mainButton	main button that will be displayed on the left
+ * @param CButtonInterface[] 	$otherButtons
+ *
+ * @return CDiv
+ *
+ * @throws InvalidArgumentException	if an element of $otherButtons contain something other than CButtonInterface
+ */
+function makeFormFooter(CButtonInterface $mainButton = null, array $otherButtons = array()) {
+	if ($mainButton) {
+		$mainButton->main();
+		$mainButton->setButtonClass('jqueryinput shadow');
 	}
 
-	$othersButtons = new CDiv($others);
-	$othersButtons->useJQueryStyle();
+	foreach ($otherButtons as $button) {
+		if (!$button instanceof CButtonInterface) {
+			throw new InvalidArgumentException('Each element of $otherButtons must be an instance of CButtonInterface');
+		}
+
+		// buttons will inherit the styles from the containing div, so only the shadow class is required
+		$button->setButtonClass('shadow');
+	}
+
+	$otherButtonDiv = new CDiv($otherButtons, 'dd left');
+	$otherButtonDiv->useJQueryStyle();
 
 	return new CDiv(
 		new CDiv(
 			new CDiv(
 				array(
-					new CDiv($main, 'dt right'),
-					new CDiv($othersButtons, 'dd left')
+					new CDiv($mainButton, 'dt right'),
+					$otherButtonDiv
 				),
 				'formrow'
 			),

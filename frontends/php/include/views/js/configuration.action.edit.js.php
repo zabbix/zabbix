@@ -6,7 +6,7 @@
 		<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 	</td>
 	<td>
-		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpGroupRow('#{groupid}');" />
+		<button type="button" class="button link_menu" name="remove" onclick="removeOpGroupRow('#{groupid}');"><?php echo _('Remove'); ?></button>
 	</td>
 </tr>
 </script>
@@ -18,7 +18,7 @@
 		<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 	</td>
 	<td>
-		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpTemplateRow('#{templateid}');" />
+		<button type="button" class="button link_menu" name="remove" onclick="removeOpTemplateRow('#{templateid}');"><?php echo _('Remove'); ?></button>
 	</td>
 </tr>
 </script>
@@ -31,7 +31,7 @@
 		<span>#{name}</span>
 	</td>
 	<td>
-		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpmsgUsrgrpRow('#{usrgrpid}');" />
+		<button type="button" class="button link_menu" name="remove" onclick="removeOpmsgUsrgrpRow('#{usrgrpid}');"><?php echo _('Remove'); ?></button>
 	</td>
 </tr>
 </script>
@@ -43,7 +43,7 @@
 		<span>#{fullname}</span>
 	</td>
 	<td>
-		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpmsgUserRow('#{userid}');" />
+		<button type="button" class="button link_menu" name="remove" onclick="removeOpmsgUserRow('#{userid}');"><?php echo _('Remove'); ?></button>
 	</td>
 </tr>
 </script>
@@ -57,7 +57,7 @@
 		<span>#{name}</span>
 	</td>
 	<td>
-		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpCmdRow('#{groupid}', 'groupid');" />
+		<button type="button" class="button link_menu" name="remove" onclick="removeOpCmdRow('#{groupid}', 'groupid');"><?php echo _('Remove'); ?></button>
 	</td>
 </tr>
 </script>
@@ -71,7 +71,7 @@
 		<span>#{name}</span>
 	</td>
 	<td>
-		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpCmdRow('#{hostid}', 'hostid');" />
+		<button type="button" class="button link_menu" name="remove" onclick="removeOpCmdRow('#{hostid}', 'hostid');"><?php echo _('Remove'); ?></button>
 	</td>
 </tr>
 </script>
@@ -97,8 +97,8 @@
 		</tr>
 		<tr>
 			<td colspan="3">
-				<input type="button" class="input link_menu" name="save" value="#{operationName}" />&nbsp;
-				<input type="button" class="input link_menu" name="cancel" value="<?php echo CHtml::encode(_('Cancel')); ?>" />
+				<button type="button" class="button link_menu" name="save">#{operationName}</button>&nbsp;
+				<button type="button" class="button link_menu" name="cancel"><?php echo CHtml::encode(_('Cancel')); ?></button>
 			</td>
 		</tr>
 		</tbody>
@@ -317,8 +317,8 @@
 		jQuery('#opcmdEditForm')
 			.find('#opCmdTargetSelect')
 			.toggle(objectTPL.target != 'current').end()
-			.find('input[name="save"]').click(saveOpCmdForm).end()
-			.find('input[name="cancel"]').click(closeOpCmdForm).end()
+			.find('button[name="save"]').click(saveOpCmdForm).end()
+			.find('button[name="cancel"]').click(closeOpCmdForm).end()
 			.find('select[name="opCmdTarget"]').val(objectTPL.target).change(changeOpCmdTarget);
 	}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -260,11 +260,10 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = array(
 			new CTextBox('drule', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
-			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=drules&srcfld1=druleid&srcfld2=name'.
 					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=drule", 450, 450);',
-				'link_menu'
+				'button-form'
 			)
 		);
 		break;
@@ -273,11 +272,10 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = array(
 			new CTextBox('dcheck', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
-			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=dchecks&srcfld1=dcheckid&srcfld2=name'.
 					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=dcheck&writeonly=1", 450, 450);',
-				'link_menu'
+				'button-form'
 			)
 		);
 		break;
@@ -286,12 +284,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = array(
 			new CTextBox('proxy', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
-			SPACE,
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=proxies&srcfld1=hostid&srcfld2=host'.
 					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=proxy'.
 					'", 450, 450);',
-				'link_menu'
+				'button-form'
 			)
 		);
 		break;
@@ -1130,7 +1127,7 @@ if (!empty($this->data['actionid'])) {
 else {
 	$actionForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('actiontype'))
+		array(new CButtonCancel(url_param('actiontype')))
 	));
 }
 

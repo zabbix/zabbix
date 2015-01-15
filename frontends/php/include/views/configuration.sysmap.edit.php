@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -187,18 +187,18 @@ $sysmapForm->addItem($sysmapTab);
 // append buttons to form
 if (hasRequest('sysmapid') && getRequest('sysmapid') > 0) {
 	$sysmapForm->addItem(makeFormFooter(
-			new CSubmit('update', _('Update')),
-			array (
-				new	CButton('clone', _('Clone')),
-				new CButtonDelete(_('Delete network map?'), url_param('form').url_param('sysmapid')),
-				new CButtonCancel()
-			)
+		new CSubmit('update', _('Update')),
+		array (
+			new	CButton('clone', _('Clone')),
+			new CButtonDelete(_('Delete network map?'), url_param('form').url_param('sysmapid')),
+			new CButtonCancel()
+		)
 	));
 }
 else {
 	$sysmapForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel()
+		array(new CButtonCancel())
 	));
 }
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,10 @@ class CComboItem extends CTag {
 		$this->setAttribute('value', $value);
 		$this->addItem($caption);
 		$this->setSelected($selected);
-		$this->setEnabled($enabled);
+
+		if ($enabled !== null) {
+			$this->setEnabled($enabled);
+		}
 	}
 
 	public function setValue($value) {
@@ -47,5 +50,19 @@ class CComboItem extends CTag {
 			return $this->attributes['selected'] = 'selected';
 		}
 		$this->removeAttribute('selected');
+	}
+
+	/**
+	 * Enable or disable the element.
+	 *
+	 * @param bool $value
+	 */
+	public function setEnabled($value) {
+		if ($value) {
+			$this->removeAttribute('disabled');
+		}
+		else {
+			$this->attr('disabled', 'disabled');
+		}
 	}
 }

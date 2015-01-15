@@ -12,8 +12,9 @@
 				   size="20" maxlength="255">
 		</td>
 		<td>
-			<input class="input link_menu element-table-remove" type="button" id="inventory_#{rowNum}_remove"
-				   name="inventory_#{rowNum}_remove" value="<?php echo _('Remove'); ?>">
+			<button type="button" class="button link_menu element-table-remove" id="inventory_#{rowNum}_remove" name="inventory_#{rowNum}_remove">
+				<?php echo _('Remove'); ?>
+			</button>
 		</td>
 	</tr>
 </script>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,13 +49,12 @@ $filterTable->addRow(array(
 	),
 ), 'host-inventories');
 
-$filter = new CSubmit('filter_set', _('Filter'));
-$filter->useJQueryStyle('main');
+$filter = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput shadow');
+$filter->main();
 
-$reset = new CSubmit('filter_rst', _('Reset'));
-$reset->useJQueryStyle();
+$reset = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput shadow');
 
-$divButtons = new CDiv(array($filter, SPACE, $reset));
+$divButtons = new CDiv(array($filter, $reset));
 $divButtons->setAttribute('style', 'padding: 4px 0px;');
 
 $footerCol = new CCol($divButtons, 'controls');

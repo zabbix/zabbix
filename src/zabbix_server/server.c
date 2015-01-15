@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,6 +77,7 @@ const char	*help_message[] = {
 	"",
 	"    Runtime control options:",
 	"      " ZBX_CONFIG_CACHE_RELOAD "               Reload configuration cache",
+	"      " ZBX_HOUSEKEEPER_EXECUTE "               Execute the housekeeper",
 	"      " ZBX_LOG_LEVEL_INCREASE "=target         Increase log level, affects all processes if target is not specified",
 	"      " ZBX_LOG_LEVEL_DECREASE "=target         Decrease log level, affects all processes if target is not specified",
 	"",
@@ -142,7 +143,7 @@ char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
-int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 500;		/* applies for every separate field value */
+int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field value */
 int	CONFIG_SENDER_FREQUENCY		= 30;
 int	CONFIG_HISTSYNCER_FORKS		= 4;
 int	CONFIG_HISTSYNCER_FREQUENCY	= 5;
@@ -483,7 +484,7 @@ static void	zbx_load_config(void)
 		{"CacheUpdateFrequency",	&CONFIG_CONFSYNCER_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"HousekeepingFrequency",	&CONFIG_HOUSEKEEPING_FREQUENCY,		TYPE_INT,
-			PARM_OPT,	1,			24},
+			PARM_OPT,	0,			24},
 		{"MaxHousekeeperDelete",	&CONFIG_MAX_HOUSEKEEPER_DELETE,		TYPE_INT,
 			PARM_OPT,	0,			1000000},
 		{"SenderFrequency",		&CONFIG_SENDER_FREQUENCY,		TYPE_INT,
@@ -582,21 +583,6 @@ static void	zbx_load_config(void)
 
 	zbx_validate_config();
 }
-
-#ifdef HAVE_SIGQUEUE
-void	zbx_sigusr_handler(int flags)
-{
-	switch (ZBX_RTC_GET_MSG(flags))
-	{
-		case ZBX_RTC_CONFIG_CACHE_RELOAD:
-			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
-			zbx_wakeup();
-			break;
-		default:
-			break;
-	}
-}
-#endif
 
 /******************************************************************************
  *                                                                            *
@@ -713,7 +699,7 @@ int	MAIN_ZABBIX_ENTRY()
 	else
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 #	define SNMP_FEATURE_STATUS	"YES"
 #else
 #	define SNMP_FEATURE_STATUS	" NO"

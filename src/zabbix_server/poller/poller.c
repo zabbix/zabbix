@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -550,7 +550,7 @@ static int	get_values(unsigned char poller_type)
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(port, items[i].interface.port_orig);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						&port, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
 				if (FAIL == is_ushort(port, &items[i].interface.port))
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
@@ -570,13 +570,13 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].snmpv3_contextname, items[i].snmpv3_contextname_orig);
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						&items[i].snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, &items[i].snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						&items[i].snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, &items[i].snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						&items[i].snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, &items[i].snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						&items[i].snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, &items[i].snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
@@ -584,7 +584,7 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].snmp_oid, items[i].snmp_oid_orig);
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						&items[i].snmp_community, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, &items[i].snmp_community, MACRO_TYPE_COMMON, NULL, 0);
 				if (SUCCEED != substitute_key_macros(&items[i].snmp_oid, &items[i].host.hostid, NULL,
 						NULL, MACRO_TYPE_SNMP_OID, error, sizeof(error)))
 				{
@@ -598,14 +598,14 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].privatekey, items[i].privatekey_orig);
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						&items[i].publickey, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, &items[i].publickey, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						&items[i].privatekey, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, &items[i].privatekey, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_TELNET:
 			case ITEM_TYPE_DB_MONITOR:
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
-						&items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+						NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_SIMPLE:
 			case ITEM_TYPE_JMX:
@@ -613,9 +613,9 @@ static int	get_values(unsigned char poller_type)
 				items[i].password = zbx_strdup(items[i].password, items[i].password_orig);
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						&items[i].username, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						&items[i].password, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				break;
 		}
 	}
@@ -625,7 +625,7 @@ static int	get_values(unsigned char poller_type)
 	/* retrieve item values */
 	if (SUCCEED == is_snmp_type(items[0].type))
 	{
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 		/* SNMP checks use their own timeouts */
 		get_values_snmp(items, results, errcodes, num);
 #else
@@ -698,7 +698,22 @@ static int	get_values(unsigned char poller_type)
 			items[i].state = ITEM_STATE_NORMAL;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
 					items[i].state, NULL);
-			lastlogsizes[i] = get_log_result_lastlogsize(&results[i]);
+
+			if (0 != ISSET_LOG(&results[i]))
+			{
+				if (NULL != results[i].logs[0])
+				{
+					size_t	j;
+
+					for (j = 1; NULL != results[i].logs[j]; j++)
+						;
+
+					lastlogsizes[i] = results[i].logs[j - 1]->lastlogsize;
+				}
+				else
+					lastlogsizes[i] = items[i].lastlogsize;
+			}
+
 		}
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
@@ -768,7 +783,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
 			server_num, get_process_type_string(process_type), process_num);
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 	if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
 		init_snmp(progname);
 #endif

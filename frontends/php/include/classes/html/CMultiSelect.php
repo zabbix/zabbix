@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,8 +62,7 @@ class CMultiSelect extends CTag {
 			'popup' => array(
 				'parameters' => isset($options['popup']['parameters']) ? $options['popup']['parameters'] : null,
 				'width' => isset($options['popup']['width']) ? $options['popup']['width'] : null,
-				'height' => isset($options['popup']['height']) ? $options['popup']['height'] : null,
-				'buttonClass' => isset($options['popup']['buttonClass']) ? $options['popup']['buttonClass'] : null
+				'height' => isset($options['popup']['height']) ? $options['popup']['height'] : null
 			)
 		);
 

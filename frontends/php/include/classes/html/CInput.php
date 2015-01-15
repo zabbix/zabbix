@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,16 +56,17 @@ class CInput extends CTag {
 		}
 	}
 
-	public function setEnabled($value = 'yes') {
-		if ((is_string($value) && ($value == 'yes' || $value == 'checked' || $value == 'on') || $value == '1') || (is_int($value) && $value <> 0) || $value === true) {
+	/**
+	 * Enable or disable the element.
+	 *
+	 * @param bool $value
+	 */
+	public function setEnabled($value) {
+		if ($value) {
 			$this->removeAttribute('disabled');
-			return $this;
 		}
-		$this->attr('disabled', 'disabled');
-		return $this;
-	}
-
-	public function useJQueryStyle($class = '') {
-		$this->attr('class', 'jqueryinput '.$this->getAttribute('class').' '.$class);
+		else {
+			$this->attr('disabled', 'disabled');
+		}
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,8 +111,10 @@ $fields = array(
 	'multiplier' =>				array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'delta' =>					array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'), '(isset({add}) || isset({update})) && isset({value_type}) && '.
 		IN('0,3', 'value_type').'isset({data_type}) && {data_type} != '.ITEM_DATA_TYPE_BOOLEAN),
-	'formula' =>				array(T_ZBX_DBL_STR, O_OPT, null,		'({value_type} == 0 && {} != 0)||({value_type} == 3 && {} > 0)',
-		'(isset({add}) || isset({update})) && isset({multiplier}) && {multiplier} == 1', _('Custom multiplier')),
+	'formula' =>				array(T_ZBX_DBL_STR, O_OPT, null,
+		'({value_type} == 0 && {} != 0) || ({value_type} == 3 && {} > 0)',
+		'(isset({add}) || isset({update})) && isset({multiplier}) && {multiplier} == 1', _('Custom multiplier')
+	),
 	'logtimefmt' =>				array(T_ZBX_STR, O_OPT, null,	null,
 		'(isset({add}) || isset({update})) && isset({value_type}) && {value_type} == 2'),
 	'group_itemid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -851,9 +853,8 @@ elseif (hasRequest('action') && getRequest('action') == 'item.massdelete' && has
  * Display
  */
 if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create item'), 'update', 'clone'))) {
-	$item = array();
 	if (hasRequest('itemid')) {
-		$item = API::Item()->get(array(
+		$items = API::Item()->get(array(
 			'itemids' => getRequest('itemid'),
 			'output' => array(
 				'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
@@ -863,15 +864,28 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
 				'snmpv3_privprotocol', 'snmpv3_contextname'
-			)
+			),
+			'selectHosts' => array('status')
 		));
-		$item = reset($item);
+		$item = $items[0];
+		$host = $item['hosts'][0];
+		unset($item['hosts']);
+	}
+	else {
+		$hosts = API::Host()->get(array(
+			'output' => array('status'),
+			'hostids' => getRequest('hostid'),
+			'templated_hosts' => true
+		));
+		$item = array();
+		$host = $hosts[0];
 	}
 
 	$data = getItemFormData($item);
 	$data['page_header'] = _('CONFIGURATION OF ITEMS');
 	$data['inventory_link'] = getRequest('inventory_link');
 	$data['config'] = select_config();
+	$data['host'] = $host;
 
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];

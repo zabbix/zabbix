@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,15 +42,17 @@ $filterTable->addRow(array(array(
 	' ',
 	new CTextBox('alias', $this->data['alias'], 20),
 	new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm='.$filterForm->getName().
-		'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");', 'filter-select-button'
+		'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");',
+		'button-form'
 	)
 )));
 
-$filterButton = new CSubmit('filter_set', _('Filter'));
-$filterButton->useJQueryStyle('main');
-$resetButton = new CSubmit('filter_rst', _('Reset'));
-$resetButton->useJQueryStyle();
-$buttonsDiv = new CDiv(array($filterButton, SPACE, $resetButton));
+$filterButton = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput shadow');
+$filterButton->main();
+
+$resetButton = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput shadow');
+
+$buttonsDiv = new CDiv(array($filterButton, $resetButton));
 $buttonsDiv->setAttribute('style', 'padding: 4px 0px;');
 
 $filterTable->addRow(new CCol($buttonsDiv, 'controls'));
