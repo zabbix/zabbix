@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-14 16:51+0200\n"
+"POT-Creation-Date: 2015-01-15 18:42+0200\n"
 "PO-Revision-Date: 2014-08-17 12:32+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1581,7 +1581,7 @@ msgstr "Nie je možné vytvoriť závislosť spúšťača na sebe samom."
 msgid "Cannot create discovery rule"
 msgstr "Nie je možné vytvoriť pravidlo zisťovania"
 
-#: include/classes/api/services/CHost.php:1075
+#: include/classes/api/services/CHost.php:1073
 msgid "Cannot create host group."
 msgstr "Nie je možné vytvoriť skupinu hostov."
 
@@ -1687,7 +1687,7 @@ msgstr[2] "Nie je možné zmazať skupinu"
 msgid "Cannot delete host"
 msgstr "Nie je možné zmazať hosta"
 
-#: include/classes/api/services/CHost.php:1086
+#: include/classes/api/services/CHost.php:1084
 msgid "Cannot delete host group."
 msgstr "Nie je možné zmazať skupinu hostov."
 
@@ -1707,7 +1707,7 @@ msgstr "Nie je možné zmazať mapu ikon"
 msgid "Cannot delete image"
 msgstr "Nie je možné zmazať obrázok"
 
-#: include/classes/api/services/CHost.php:1172
+#: include/classes/api/services/CHost.php:1170
 msgid "Cannot delete inventory."
 msgstr "Nie je možné zmazať inventár."
 
@@ -2237,7 +2237,7 @@ msgstr "Nie je možné vložiť výraz spúšťača"
 msgid "Cannot insert user media."
 msgstr "Nie je možné vložiť médium používateľa."
 
-#: include/classes/api/services/CHost.php:1150
+#: include/classes/api/services/CHost.php:1148
 msgid "Cannot link template"
 msgstr "Nie je možné nalinkovať šablónu"
 
@@ -2254,7 +2254,7 @@ msgstr "Nie je možné Vás prihlásiť."
 msgid "Cannot logout."
 msgstr "Odhlásenie nie je možné."
 
-#: include/classes/api/services/CHost.php:971
+#: include/classes/api/services/CHost.php:969
 msgid "Cannot mass update host name."
 msgstr "Nie je možné hromadne aktualizovať meno hosta."
 
@@ -2262,7 +2262,7 @@ msgstr "Nie je možné hromadne aktualizovať meno hosta."
 msgid "Cannot mass update template name."
 msgstr "Nie je možné hromadne aktualizovať meno šablóny."
 
-#: include/classes/api/services/CHost.php:961
+#: include/classes/api/services/CHost.php:959
 msgid "Cannot mass update visible host name."
 msgstr "Nie je možné hromadne aktualizovať zobrazované meno hosta."
 
@@ -2356,7 +2356,7 @@ msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Nie je možné nastaviť \"templateid\" pre prototyp spúšťača \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:583
-#: include/classes/api/services/CHost.php:1025
+#: include/classes/api/services/CHost.php:1023
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Nie je možné nastaviť inventárne polia pre zakázaný inventár."
 
@@ -2406,7 +2406,7 @@ msgstr "Nie je možné zrušiť prepojenie a zmazať položky"
 msgid "Cannot unlink and clear triggers"
 msgstr "Nie je možné zrušiť prepojenie a zmazať spúšťače"
 
-#: include/classes/api/services/CHost.php:1125
+#: include/classes/api/services/CHost.php:1123
 msgid "Cannot unlink template"
 msgstr "Nie je možné zrušiť prepojenie šablóny"
 
@@ -2763,21 +2763,21 @@ msgstr "Skontrolujte časť výrazu začínajúcu od \"%1$s\"."
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr "Kontrola či súbor existuje. 0 - súbor neexistuje, 1 - súbor existuje"
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Kontrola či je služba dostupná. 0 - služba je nedostupná, 1 - služba je dostupná. Ak <ip> chýba, potom je použitá IP alebo DNS meno z nastavenia hosta. Ak <port> chýba, potom je použitý predvolený port služby."
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr "Kontrola či je služba dostupná. 0 - služba je nedostupná, 1 - služba je dostupná. Ak IP chýba, potom je použitá 127.0.0.1. Ak port chýba, potom je použitý predvolený port služby. Príklad: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
 msgstr "Kontrola výkonnosti služby. 0 - služba je nedostupná, sec - počet sekúnd potrebných k spojeniu ku službe. Ak IP chýba, potom je použitá 127.0.0.1. Ak port chýba, potom je použitý predvolený port služby."
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Kontrola výkonnosti služby. 0 - služba je nedostupná, sec - počet sekúnd potrebných k spojeniu ku službe. Ak chýba <ip>, potom je použitá IP alebo DNS meno z nastavenia hosta. Ak chýba <port>, potom je použitý predvolený port služby."
 
@@ -2806,8 +2806,8 @@ msgstr "Kontrola či je možné urobiť TCP spojenie na daný port. 0 - spojenie
 msgid "Checks"
 msgstr "Kontroly"
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr "Kontrola, či je DNS služba dostupná. 0 - DNS je nedostupný (server neodpovedal alebo DNS preklad zlyhal), 1 - DNS je dostupný."
 
@@ -4248,7 +4248,7 @@ msgstr "Zmazané: Zisťovacie pravidlo \"%1$s\" na \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Zmazané: Graf \"%1$s\" na \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1453
+#: include/classes/api/services/CHost.php:1451
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Zmazané: Host \"%1$s\"."
@@ -4979,7 +4979,7 @@ msgstr "Prázdny host."
 #: include/classes/api/services/CHostGroup.php:471
 #: include/classes/api/services/CHostGroup.php:548
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1301
+#: include/classes/api/services/CHost.php:1299
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:606
@@ -6361,7 +6361,7 @@ msgstr[0] "Host"
 msgstr[1] "Hosty"
 msgstr[2] "Hostov"
 
-#: include/classes/api/services/CHost.php:984
+#: include/classes/api/services/CHost.php:982
 #: include/classes/api/services/CTemplate.php:471
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6630,7 +6630,7 @@ msgstr "Hostova maska podsiete"
 msgid "Host time"
 msgstr "Hostov čas"
 
-#: include/classes/api/services/CHost.php:858
+#: include/classes/api/services/CHost.php:856
 msgid "Host update failed."
 msgstr "Aktualizácia hosta zlyhala."
 
@@ -7335,7 +7335,7 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Nepovolené znaky použité pre host \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:634
-#: include/classes/api/services/CHost.php:967
+#: include/classes/api/services/CHost.php:965
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Nepovolené znaky použité pre meno hosta \"%s\"."
@@ -8174,7 +8174,7 @@ msgstr "Neplatné view meno pre \"%s\". Povolené znaky: \"a-z\" a \".\"."
 msgid "Inventory"
 msgstr "Inventár"
 
-#: include/classes/api/services/CHost.php:1191
+#: include/classes/api/services/CHost.php:1189
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Inventár vypnutý pre hosta \"%1$s\"."
@@ -10138,7 +10138,7 @@ msgstr "Nenájdené žiadne grafy."
 msgid "No groups for host \"%s\"."
 msgstr "Žiadne skupiny pre host \"%s\"."
 
-#: include/classes/api/services/CHost.php:953
+#: include/classes/api/services/CHost.php:951
 msgid "No groups for hosts."
 msgstr "Žiadne skupiny pre hostov."
 
@@ -10401,7 +10401,7 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: include/classes/api/services/CHostInterface.php:647
 #: include/classes/api/services/CHost.php:530
 #: include/classes/api/services/CHost.php:621
-#: include/classes/api/services/CHost.php:1646
+#: include/classes/api/services/CHost.php:1644
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -11547,8 +11547,8 @@ msgstr "Percentilová čiara (vľavo)"
 msgid "Percentile line (right)"
 msgstr "Percentilová čiara (vpravo)"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:351
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr "Vykoná DNS dotaz. V prípade úspechu vráti a reťazec s požadovaným typom informácie."
 
@@ -13729,7 +13729,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Šablóna"
 
-#: include/classes/api/services/CHost.php:995
+#: include/classes/api/services/CHost.php:993
 #: include/classes/api/services/CTemplate.php:461
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -15981,8 +15981,8 @@ msgstr "Nešpecifikovali ste ciele pre akciu globálneho skriptu \"%s\"."
 
 #: include/classes/api/services/CGraph.php:543
 #: include/classes/api/services/CGraphPrototype.php:558
-#: include/classes/api/services/CHost.php:889
-#: include/classes/api/services/CHost.php:947
+#: include/classes/api/services/CHost.php:887
+#: include/classes/api/services/CHost.php:945
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668
