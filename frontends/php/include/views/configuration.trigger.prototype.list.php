@@ -136,13 +136,20 @@ $triggersForm->addItem(array(
 	$this->data['paging'],
 	$triggersTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'g_triggerid',
 		array(
-			'triggerprototype.massenable' => array(_('Enable'), _('Enable selected trigger prototypes?')),
-			'triggerprototype.massdisable' => array(_('Disable'), _('Disable selected trigger prototypes?')),
-			'triggerprototype.massupdateform' => _('Mass update'),
-			'triggerprototype.massdelete' => array(_('Delete'), _('Delete selected trigger prototypes?')),
+			'triggerprototype.massenable' => array('name' => _('Enable'),
+				'confirm' => _('Enable selected trigger prototypes?')
+			),
+			'triggerprototype.massdisable' => array('name' => _('Disable'),
+				'confirm' => _('Disable selected trigger prototypes?')
+			),
+			'triggerprototype.massupdateform' => array('name' => _('Mass update')),
+			'triggerprototype.massdelete' => array('name' => _('Delete'),
+				'confirm' => _('Delete selected trigger prototypes?')
+			),
 		),
 		$this->data['parent_discoveryid']
 	))

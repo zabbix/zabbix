@@ -88,10 +88,11 @@ $scriptsForm->addItem(array(
 	$this->data['paging'],
 	$scriptsTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'scripts',
 		array(
-			'script.massdelete' => array(_('Delete'), _('Delete selected scripts?'))
+			'script.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected scripts?'))
 		)
 	))
 ));

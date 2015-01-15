@@ -266,17 +266,19 @@ $itemForm->addItem(array(
 	$this->data['paging'],
 	$itemTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'group_itemid',
 		array(
-			'item.massenable' => array(_('Enable'), _('Enable selected items?')),
-			'item.massdisable' => array(_('Disable'), _('Disable selected items?')),
-			'item.massclearhistory' => array(_('Clear history'), _('Delete history of selected items?')),
-			'item.masscopyto' => _('Copy'),
-			'item.massupdateform' => _('Mass update'),
-			'item.massdelete' => array(_('Delete'), _('Delete selected items?'))
+			'item.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected items?')),
+			'item.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected items?')),
+			'item.massclearhistory' => array('name' => _('Clear history'),
+				'confirm' => _('Delete history of selected items?')
+			),
+			'item.masscopyto' => array('name' => _('Copy')),
+			'item.massupdateform' => array('name' => _('Mass update')),
+			'item.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected items?'))
 		),
-		'action',
 		$this->data['hostid']
 	))
 ));

@@ -109,12 +109,13 @@ $applicationForm->addItem(array(
 	$this->data['paging'],
 	$applicationTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'applications',
 		array(
-			'application.massenable' => array(_('Enable'), _('Enable selected applications?')),
-			'application.massdisable' => array(_('Disable'), _('Disable selected applications?')),
-			'application.massdelete' => array(_('Delete'), _('Delete selected applications?'))
+			'application.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected applications?')),
+			'application.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected applications?')),
+			'application.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected applications?'))
 		),
 		$this->data['hostid']
 	))

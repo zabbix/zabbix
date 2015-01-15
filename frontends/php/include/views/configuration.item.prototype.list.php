@@ -113,12 +113,19 @@ $itemForm->addItem(array(
 	$this->data['paging'],
 	$itemTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'group_itemid',
 		array(
-			'itemprototype.massenable' => array(_('Enable'), _('Enable selected item prototypes?')),
-			'itemprototype.massdisable' => array(_('Disable'), _('Disable selected item prototypes?')),
-			'itemprototype.massdelete' => array(_('Delete'), _('Delete selected item prototypes?'))
+			'itemprototype.massenable' => array('name' => _('Enable'),
+				'confirm' => _('Enable selected item prototypes?')
+			),
+			'itemprototype.massdisable' => array('name' => _('Disable'),
+				'confirm' => _('Disable selected item prototypes?')
+			),
+			'itemprototype.massdelete' => array('name' => _('Delete'),
+				'confirm' => _('Delete selected item prototypes?')
+			)
 		),
 		$this->data['parent_discoveryid']
 	))

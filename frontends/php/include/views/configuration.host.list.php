@@ -212,16 +212,17 @@ foreach ($data['hosts'] as $host) {
 	));
 }
 
-$form->addItem(array($data['paging'], $table, $data['paging'], get_table_header(new CActionGoButtonGroup(
+$form->addItem(array($data['paging'], $table, $data['paging'], get_table_header(new CActionButtonList(
+	'action',
 	'hosts',
 	array(
-		'host.massenable' => array(_('Enable'),  _('Enable selected hosts?')),
-		'host.massdisable' => array(_('Disable'),  _('Disable selected hosts?')),
-		'host.export' => _('Export'),
-		'host.massupdateform' => _('Mass update'),
-		'host.massdelete' => array(_('Delete'),  _('Delete selected hosts?'))
-	))
-)));
+		'host.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected hosts?')),
+		'host.massdisable' => array('name' => _('Disable'), 'confirm' =>  _('Disable selected hosts?')),
+		'host.export' => array('name' => _('Export')),
+		'host.massupdateform' => array('name' => _('Mass update')),
+		'host.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected hosts?'))
+	)
+))));
 
 $hostWidget->addItem($form);
 

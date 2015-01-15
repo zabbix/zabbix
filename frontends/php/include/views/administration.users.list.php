@@ -150,11 +150,12 @@ $usersForm->addItem(array(
 	$this->data['paging'],
 	$usersTable,
 	$this->data['paging'],
-	get_table_header(new CActionGoButtonGroup(
+	get_table_header(new CActionButtonList(
+		'action',
 		'group_userid',
 		array(
-			'user.massunblock' => array(_('Unblock'), _('Unblock selected users?')),
-			'user.massdelete' => array(_('Delete'), _('Delete selected users?'))
+			'user.massunblock' => array('name' => _('Unblock'), 'confirm' => _('Unblock selected users?')),
+			'user.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected users?'))
 		)
 	))
 ));

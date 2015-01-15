@@ -123,12 +123,19 @@ $itemForm->addItem(array(
 	$hostTable,
 	$this->data['paging'],
 	get_table_header(
-	new CActionGoButtonGroup(
+	new CActionButtonList(
+		'action',
 		'group_hostid',
 		array(
-			'hostprototype.massenable' => array(_('Enable'), _('Enable selected host prototypes?')),
-			'hostprototype.massdisable' => array(_('Disable'), _('Disable selected host prototypes?')),
-			'hostprototype.massdelete' => array(_('Delete'), _('Delete selected host prototypes?'))
+			'hostprototype.massenable' => array('name' => _('Enable'),
+				'confirm' => _('Enable selected host prototypes?')
+			),
+			'hostprototype.massdisable' => array('name' => _('Disable'),
+				'confirm' => _('Disable selected host prototypes?')
+			),
+			'hostprototype.massdelete' => array('name' => _('Delete'),
+				'confirm' => _('Delete selected host prototypes?')
+			)
 		),
 		$discoveryRule['itemid']
 	))
