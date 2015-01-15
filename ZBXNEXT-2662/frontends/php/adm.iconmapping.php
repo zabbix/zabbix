@@ -127,7 +127,7 @@ if (!isset($_REQUEST['form'])) {
 }
 
 $iconMapWidget = new CWidget();
-$iconMapWidget->addPageHeader(_('CONFIGURATION OF ICON MAPPING'), $iconMapForm);
+$iconMapWidget->setTitle(_('Configuration of icon mapping'), $iconMapForm);
 
 $data = array(
 	'form_refresh' => getRequest('form_refresh', 0),

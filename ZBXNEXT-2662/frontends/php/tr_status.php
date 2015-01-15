@@ -218,8 +218,8 @@ $rightForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 $rightForm->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB()));
 $rightForm->addVar('fullscreen', $_REQUEST['fullscreen']);
 
-$triggerWidget->addPageHeader(
-	_('STATUS OF TRIGGERS').SPACE.'['.zbx_date2str(DATE_TIME_FORMAT_SECONDS).']',
+$triggerWidget->setTitle(
+	_('Status of triggers').SPACE.'['.zbx_date2str(DATE_TIME_FORMAT_SECONDS).']',
 	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
 );
 $triggerWidget->addHeader(_('Triggers'), $rightForm);

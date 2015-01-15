@@ -52,8 +52,8 @@ if ($this->data['slideshows']) {
 		));
 	}
 
-	$slideshowWidget->addPageHeader(
-		_('SLIDE SHOWS'),
+	$slideshowWidget->setTitle(
+		_('Slide shows'),
 		array(
 			$slideHeaderForm,
 			SPACE,
@@ -94,8 +94,8 @@ if ($this->data['slideshows']) {
 	}
 }
 else {
-	$slideshowWidget->addPageHeader(
-		_('SLIDE SHOWS'),
+	$slideshowWidget->setTitle(
+		_('Slide shows'),
 		array(
 			$slideHeaderForm,
 			SPACE,

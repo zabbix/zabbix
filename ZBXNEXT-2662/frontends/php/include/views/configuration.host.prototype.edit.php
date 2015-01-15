@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 require_once dirname(__FILE__).'/js/configuration.host.prototype.edit.js.php';
 
 $widget = new CWidget(null, 'hostprototype-edit');
-$widget->addPageHeader(_('CONFIGURATION OF HOST PROTOTYPES'));
+$widget->setTitle(_('Host prototypes'));
 $widget->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $discoveryRule['itemid']));
 
 $divTabs = new CTabView();

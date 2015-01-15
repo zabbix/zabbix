@@ -24,7 +24,7 @@ $scriptsWidget = new CWidget();
 $createForm = new CForm('get');
 $createForm->addItem(new CSubmit('form', _('Create script')));
 
-$scriptsWidget->addPageHeader(_('CONFIGURATION OF SCRIPTS'), $createForm);
+$scriptsWidget->setTitle(_('Scripts'), $createForm);
 $scriptsWidget->addHeader(_('Scripts'));
 
 $scriptsForm = new CForm();

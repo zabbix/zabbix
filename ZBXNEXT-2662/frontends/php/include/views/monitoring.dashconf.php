@@ -21,7 +21,7 @@
 
 $dashconfWidget = new CWidget();
 $dashconfWidget->setClass('header');
-$dashconfWidget->addPageHeader(_('DASHBOARD CONFIGURATION'));
+$dashconfWidget->setTitle(_('Dashboard'));
 
 // create form
 $dashconfForm = new CForm();

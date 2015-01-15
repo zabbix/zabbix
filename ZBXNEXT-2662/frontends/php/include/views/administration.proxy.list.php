@@ -24,9 +24,9 @@ $proxyWidget = new CWidget();
 // create new proxy button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addItem(new CSubmit('form', _('Create proxy')));
-$proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'), $createForm);
-$proxyWidget->addHeader(_('Proxies'));
+$controls = new CList(new CSubmit('form', _('Create proxy')));
+$createForm->addItem($controls);
+$proxyWidget->setTitle(_('Proxies'), $createForm);
 
 // create form
 $proxyForm = new CForm('get');

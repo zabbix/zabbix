@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/js/configuration.slideconf.edit.js.php';
 
 $slideWidget = new CWidget();
-$slideWidget->addPageHeader(_('CONFIGURATION OF SLIDE SHOWS'));
+$slideWidget->setTitle(_('Slide shows'));
 
 // create form
 $slideForm = new CForm();

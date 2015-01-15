@@ -20,7 +20,7 @@
 
 
 $serviceWidget = new CWidget(null, 'service-list');
-$serviceWidget->addPageHeader(_('CONFIGURATION OF IT SERVICES'), SPACE);
+$serviceWidget->setTitle(_('IT services'), SPACE);
 $serviceWidget->addHeader(_('IT services'));
 
 // create form

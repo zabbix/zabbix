@@ -25,7 +25,7 @@ if (!empty($this->data['hostid'])) {
 	$itemWidget->addItem(get_header_host_table('items', $this->data['hostid']));
 }
 
-$itemWidget->addPageHeader(_('CONFIGURATION OF ITEMS'));
+$itemWidget->setTitle(_('Items'));
 
 // create form
 $itemForm = new CForm();

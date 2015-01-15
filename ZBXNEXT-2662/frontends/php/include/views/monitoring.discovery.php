@@ -25,7 +25,7 @@ $discoveryWidget = new CWidget('hat_discovery');
 $discoveryHeaderForm = new CForm('get');
 $discoveryHeaderForm->setName('slideHeaderForm');
 $discoveryHeaderForm->addVar('fullscreen', $this->data['fullscreen']);
-$discoveryWidget->addPageHeader(_('STATUS OF DISCOVERY'), get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
+$discoveryWidget->setTitle(_('Status of discovery'), get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
 
 $discoveryRulesComboBox = $this->data['pageFilter']->getDiscoveryCB();
 

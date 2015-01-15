@@ -430,7 +430,7 @@ $pageFilter = new CPageFilter(array(
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
 if (isset($_REQUEST['form'])) {
-	$templateWidget->addPageHeader(_('CONFIGURATION OF TEMPLATES'));
+	$templateWidget->setTitle(_('Templates'));
 
 	if ($templateId = getRequest('templateid', 0)) {
 		$templateWidget->addItem(get_header_host_table('', $templateId));
@@ -492,7 +492,7 @@ else {
 	)));
 	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid'], 'filter_groupid_id'));
 
-	$templateWidget->addPageHeader(_('CONFIGURATION OF TEMPLATES'), $frmForm);
+	$templateWidget->setTitle(_('Templates'), $frmForm);
 
 	$frmGroup = new CForm('get');
 	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));

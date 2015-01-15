@@ -82,7 +82,7 @@ $cmbConf = new CComboBox('configDropDown', 'adm.other.php', 'redirect(this.optio
 $form->addItem($cmbConf);
 
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('OTHER CONFIGURATION PARAMETERS'), $form);
+$cnf_wdgt->setTitle(_('Other configuration parameters'), $form);
 
 $config = select_config();
 

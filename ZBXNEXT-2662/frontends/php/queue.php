@@ -72,7 +72,7 @@ $form->addItem($cmbMode);
 
 // display table
 $queueWidget = new CWidget();
-$queueWidget->addPageHeader(_('QUEUE OF ITEMS TO BE UPDATED'), $form);
+$queueWidget->setTitle(_('QUEUE OF ITEMS TO BE UPDATED'), $form);
 
 $table = new CTableInfo(_('The queue is empty.'));
 

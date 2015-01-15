@@ -110,7 +110,7 @@ $itemHistory = Manager::History()->getLast($items);
  * Display
  */
 $httpdetailsWidget = new CWidget();
-$httpdetailsWidget->addPageHeader(
+$httpdetailsWidget->setTitle(
 	array(
 		_('DETAILS OF WEB SCENARIO'),
 		SPACE,

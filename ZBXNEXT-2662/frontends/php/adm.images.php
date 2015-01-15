@@ -153,7 +153,7 @@ if (!isset($_REQUEST['form'])) {
 }
 
 $imageWidget = new CWidget();
-$imageWidget->addPageHeader(_('CONFIGURATION OF IMAGES'), $form);
+$imageWidget->setTitle(_('CONFIGURATION OF IMAGES'), $form);
 
 $data = array(
 	'form' => getRequest('form'),

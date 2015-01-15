@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/js/monitoring.triggerComment.js.php';
 
 $commentWidget = new CWidget('triggerComment');
-$commentWidget->addPageHeader(_('TRIGGER DESCRIPTION'));
+$commentWidget->setTitle(_('Comments'));
 
 // create form
 $commentForm = new CForm();

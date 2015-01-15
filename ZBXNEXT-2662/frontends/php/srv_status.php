@@ -158,7 +158,7 @@ else {
 		$r_form->addItem(array(_('Period').SPACE, $period_combo));
 
 		$srv_wdgt = new CWidget('hat_services', 'service-list service-mon');
-		$srv_wdgt->addPageHeader(_('IT SERVICES'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
+		$srv_wdgt->setTitle(_('IT services'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 		$srv_wdgt->addHeader(_('IT services'), $r_form);
 		$srv_wdgt->addItem(BR());
 		$srv_wdgt->addItem($tree->getHTML());

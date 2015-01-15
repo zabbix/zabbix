@@ -26,7 +26,7 @@ $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('eventsource', $this->data['eventsource']);
 $createForm->addItem(new CSubmit('form', _('Create action')));
-$actionWidget->addPageHeader(_('CONFIGURATION OF ACTIONS'), $createForm);
+$actionWidget->setTitle(_('Actions'), $createForm);
 
 // create widget header
 $sourceComboBox = new CComboBox('eventsource', $this->data['eventsource'], 'submit()');

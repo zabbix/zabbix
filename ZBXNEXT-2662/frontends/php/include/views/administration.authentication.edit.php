@@ -20,7 +20,7 @@
 
 
 $authenticationWidget = new CWidget();
-$authenticationWidget->addPageHeader(_('CONFIGURATION OF AUTHENTICATION'));
+$authenticationWidget->setTitle(_('Authentication'));
 
 // create form
 $authenticationForm = new CForm();

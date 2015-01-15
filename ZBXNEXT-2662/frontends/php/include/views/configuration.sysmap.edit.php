@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/js/configuration.sysmap.edit.js.php';
 
 $sysmapWidget = new CWidget();
-$sysmapWidget->addPageHeader(_('CONFIGURATION OF NETWORK MAPS'));
+$sysmapWidget->setTitle(_('Network maps'));
 
 // create sysmap form
 $sysmapForm = new CForm();
