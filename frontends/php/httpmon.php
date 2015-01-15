@@ -77,8 +77,8 @@ $r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB()));
 $r_form->addItem(array(SPACE._('Host').SPACE,$pageFilter->getHostsCB()));
 
 $httpmon_wdgt = new CWidget();
-$httpmon_wdgt->addPageHeader(
-	_('STATUS OF WEB MONITORING'),
+$httpmon_wdgt->setTitle(
+	_('Status of WEB monitoring'),
 	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
 );
 $httpmon_wdgt->addHeader(_('Web scenarios'), $r_form);

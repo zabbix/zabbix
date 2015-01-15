@@ -30,7 +30,7 @@ $headerForm = new CForm();
 $headerForm->addItem($configComboBox);
 
 if (empty($this->data['screens'])) {
-	$screenWidget->addPageHeader(_('SCREENS'), $headerForm);
+	$screenWidget->setTitle(_('Screens'), $headerForm);
 	$screenWidget->addItem(BR());
 	$screenWidget->addItem(new CTableInfo(_('No screens found.')));
 
@@ -55,7 +55,7 @@ else {
 	}
 
 	// page header
-	$screenWidget->addPageHeader(_('SCREENS'), array(
+	$screenWidget->setTitle(_('Screens'), array(
 		$headerForm,
 		SPACE,
 		get_icon('favourite', array('fav' => 'web.favorite.screenids', 'elname' => 'screenid', 'elid' => $screen['screenid'])),

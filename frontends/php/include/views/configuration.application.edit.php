@@ -20,7 +20,7 @@
 
 
 $applicationWidget = new CWidget();
-$applicationWidget->addPageHeader(_('CONFIGURATION OF APPLICATIONS'));
+$applicationWidget->setTitle(_('Applications'));
 
 // append host summary to widget header
 $applicationWidget->addItem(get_header_host_table('applications', $this->data['hostid']));

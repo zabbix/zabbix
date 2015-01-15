@@ -68,7 +68,7 @@ $cmbConf = new CComboBox('configDropDown', 'adm.workingtime.php', 'redirect(this
 $form->addItem($cmbConf);
 
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF WORKING TIME'), $form);
+$cnf_wdgt->setTitle(_('Working time'), $form);
 
 $config = select_config();
 

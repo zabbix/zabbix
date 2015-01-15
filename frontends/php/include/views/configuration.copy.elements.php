@@ -28,7 +28,7 @@ if (!empty($this->data['hostid'])) {
 }
 
 if (!empty($this->data['title'])) {
-	$triggersWidget->addPageHeader($this->data['title']);
+	$triggersWidget->setTitle($this->data['title']);
 }
 
 // create form

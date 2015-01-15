@@ -425,7 +425,7 @@ $filterTable->addRow(new CCol($divButtons, 'controls', 4));
 $filterForm->addItem($filterTable);
 
 $latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 0));
-$latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
+$latestWidget->setTitle(_('Latest data'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 
 $form = new CForm('GET', 'history.php');
 $form->setName('items');

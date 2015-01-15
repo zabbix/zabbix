@@ -20,7 +20,7 @@
 
 
 $hostGroupWidget = new CWidget();
-$hostGroupWidget->addPageHeader(_('CONFIGURATION OF HOST GROUPS'));
+$hostGroupWidget->setTitle(_('Host groups'));
 
 // create form
 $hostGroupForm = new CForm();

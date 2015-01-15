@@ -97,7 +97,7 @@ $cmbConf = new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php',
 $form->addItem($cmbConf);
 
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
+$cnf_wdgt->setTitle(_('Trigger displaying options'), $form);
 
 $config = select_config();
 

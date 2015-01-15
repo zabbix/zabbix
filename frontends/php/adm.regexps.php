@@ -217,7 +217,7 @@ if (!isset($_REQUEST['form'])) {
 }
 
 $regExpWidget = new CWidget();
-$regExpWidget->addPageHeader(_('CONFIGURATION OF REGULAR EXPRESSIONS'), $regExpForm);
+$regExpWidget->setTitle(_('Regular expressions'), $regExpForm);
 
 if (isset($_REQUEST['form'])) {
 	$data = array(

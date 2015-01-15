@@ -23,7 +23,8 @@ class CWidget {
 
 	public $flicker_state;
 	private $css_class;
-	private $pageHeaders;
+	private $title;
+	private $controls;
 	private $headers;
 	private $flicker = array();
 
@@ -65,10 +66,11 @@ class CWidget {
 		}
 	}
 
-	public function addPageHeader($left = SPACE, $right = SPACE) {
-		zbx_value2array($right);
+	public function setTitle($title, $controls = null) {
+		zbx_value2array($controls);
 
-		$this->pageHeaders[] = array('left' => $left, 'right' => $right);
+		$this->title = $title;
+		$this->controls = $controls;
 	}
 
 	public function addHeader($left = SPACE, $right = SPACE) {
@@ -93,8 +95,8 @@ class CWidget {
 
 	public function get() {
 		$widget = array();
-		if (!empty($this->pageHeaders)) {
-			$widget[] = $this->createPageHeader();
+		if (!empty($this->title)) {
+			$widget[] = $this->createTitle();
 		}
 		if (!empty($this->headers)) {
 			$widget[] = $this->createHeader();
@@ -157,14 +159,10 @@ class CWidget {
 		return unpack_object($tab);
 	}
 
-	private function createPageHeader() {
-		$pageHeader = array();
+	private function createTitle() {
+		$body = array(new CTag('h1', 'yes', $this->title), $this->controls);
 
-		foreach ($this->pageHeaders as $header) {
-			$pageHeader[] = get_table_header($header['left'], $header['right']);
-		}
-
-		return new CDiv($pageHeader, 'header-title');
+		return new CDiv($body, 'header-title');
 	}
 
 	private function createHeader() {

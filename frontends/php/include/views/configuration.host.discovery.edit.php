@@ -27,7 +27,7 @@ if (!empty($this->data['hostid'])) {
 	));
 }
 
-$itemWidget->addPageHeader($this->data['page_header']);
+$itemWidget->setTitle($this->data['page_header']);
 
 // create form
 $itemForm = new CForm();

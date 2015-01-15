@@ -20,7 +20,7 @@
 
 
 $httpWidget = new CWidget();
-$httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'));
+$httpWidget->setTitle(_('Web monitoring'));
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {

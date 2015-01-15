@@ -22,7 +22,7 @@
 include('include/views/js/administration.script.edit.js.php');
 
 $scriptsWidget = new CWidget();
-$scriptsWidget->addPageHeader(_('CONFIGURATION OF SCRIPTS'));
+$scriptsWidget->setTitle(_('Scripts'));
 
 $scriptForm = new CForm();
 $scriptForm->setName('scripts');

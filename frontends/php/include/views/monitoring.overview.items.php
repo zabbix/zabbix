@@ -42,7 +42,7 @@ $help = new CIcon(null, 'iconhelp');
 $help->setHint($hintTable);
 
 // header right
-$overviewWidget->addPageHeader(_('OVERVIEW'), array(
+$overviewWidget->setTitle(_('Overview'), array(
 	get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])),
 	SPACE,
 	$help

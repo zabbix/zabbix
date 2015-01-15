@@ -296,8 +296,8 @@ else {
 	}
 	$frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
 
-	$eventsWidget->addPageHeader(
-		_('HISTORY OF EVENTS').SPACE.'['.zbx_date2str(DATE_TIME_FORMAT_SECONDS).']',
+	$eventsWidget->setTitle(
+		_('History of events').SPACE.'['.zbx_date2str(DATE_TIME_FORMAT_SECONDS).']',
 		array(
 			$frmForm,
 			SPACE,

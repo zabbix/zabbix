@@ -137,7 +137,7 @@ $cmbConf = new CComboBox('configDropDown', 'adm.housekeeper.php', 'redirect(this
 $form->addItem($cmbConf);
 
 $cnf_wdgt = new CWidget(null, 'hk');
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF HOUSEKEEPING'), $form);
+$cnf_wdgt->setTitle(_('Housekeeping'), $form);
 
 $config = select_config();
 

@@ -28,7 +28,7 @@ $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 $createForm->addItem(new CSubmit('form', _('Create host prototype')));
-$itemsWidget->addPageHeader(_('CONFIGURATION OF HOST PROTOTYPES'), $createForm);
+$itemsWidget->setTitle(_('Host prototypes'), $createForm);
 
 // header
 $itemsWidget->addHeader(array(_('Host prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')));

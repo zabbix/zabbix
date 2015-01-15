@@ -238,7 +238,7 @@ $cnfCmb->addItem(BR_COMPARE_VALUE_MULTIPLE_PERIODS, _('Compare values for multip
 
 $r_form->addItem(array(_('Reports').SPACE, $cnfCmb));
 
-$rep6_wdgt->addPageHeader(_('Bar reports'));
+$rep6_wdgt->setTitle(_('Bar reports'));
 $rep6_wdgt->addHeader(_('Report'), $r_form);
 $rep6_wdgt->addItem(BR());
 

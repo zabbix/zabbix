@@ -25,7 +25,7 @@ $maintenanceWidget = new CWidget();
 $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addItem(new CSubmit('form', _('Create maintenance period')));
-$maintenanceWidget->addPageHeader(_('CONFIGURATION OF MAINTENANCE PERIODS'), $createForm);
+$maintenanceWidget->setTitle(_('Maintenance periods'), $createForm);
 
 // header
 $filterForm = new CForm('get');

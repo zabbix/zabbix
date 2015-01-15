@@ -28,7 +28,7 @@ $configComboBox->setAttribute('onchange', 'javascript: redirect(this.options[thi
 $configComboBox->addItem('auditlogs.php', _('Audit log'));
 $configComboBox->addItem('auditacts.php', _('Action log'));
 $configForm->addItem($configComboBox);
-$auditWidget->addPageHeader(_('AUDIT LOG'), $configForm);
+$auditWidget->setTitle(_('AUDIT LOG'), $configForm);
 $auditWidget->addHeader(_('Audit log'));
 
 // create filter

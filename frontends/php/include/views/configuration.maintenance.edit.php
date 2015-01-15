@@ -20,7 +20,7 @@
 
 
 $maintenanceWidget = new CWidget();
-$maintenanceWidget->addPageHeader(_('CONFIGURATION OF MAINTENANCE PERIODS'));
+$maintenanceWidget->setTitle(_('Maintenance periods'));
 
 // create form
 $maintenanceForm = new CForm();
