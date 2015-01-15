@@ -144,6 +144,7 @@ frontends/php/images/gradients/sla_red.png -text
 frontends/php/images/gradients/sla_red15.png -text
 frontends/php/images/gradients/table_head2_bb.gif -text
 frontends/php/images/gradients/table_head_bb.gif -text
+frontends/php/include/classes/helpers/CViewHelper.php -text
 frontends/php/include/classes/html/CColHeader.php -text
 frontends/php/include/classes/html/CRowHeader.php -text
 frontends/php/include/classes/html/CSup.php -text

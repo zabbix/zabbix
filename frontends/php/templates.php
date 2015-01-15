@@ -566,19 +566,19 @@ else {
 		$templatesOutput[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid'));
 
 		$applications = array(new CLink(_('Applications'), 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
-			' ('.$template['applications'].')');
+			CViewHelper::showNum($template['applications']));
 		$items = array(new CLink(_('Items'), 'items.php?filter_set=1&groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
-			' ('.$template['items'].')');
+			CViewHelper::showNum($template['items']));
 		$triggers = array(new CLink(_('Triggers'), 'triggers.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
-			' ('.$template['triggers'].')');
+			CViewHelper::showNum($template['triggers']));
 		$graphs = array(new CLink(_('Graphs'), 'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
-			' ('.$template['graphs'].')');
+			CViewHelper::showNum($template['graphs']));
 		$screens = array(new CLink(_('Screens'), 'screenconf.php?templateid='.$template['templateid']),
-			' ('.$template['screens'].')');
+			CViewHelper::showNum($template['screens']));
 		$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$template['templateid']),
-			' ('.$template['discoveries'].')');
+			CViewHelper::showNum($template['discoveries']));
 		$httpTests = array(new CLink(_('Web'), 'httpconf.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
-			' ('.$template['httpTests'].')');
+			CViewHelper::showNum($template['httpTests']));
 
 		order_result($template['parentTemplates'], 'name');
 

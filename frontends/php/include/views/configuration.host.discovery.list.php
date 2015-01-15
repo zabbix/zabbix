@@ -99,7 +99,7 @@ foreach ($data['discoveries'] as $discovery) {
 	if ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$hostPrototypeLink = array(
 			new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$discovery['itemid']),
-			' ('.$discovery['hostPrototypes'].')'
+			CViewHelper::showNum($discovery['hostPrototypes'])
 		);
 	}
 
@@ -111,21 +111,21 @@ foreach ($data['discoveries'] as $discovery) {
 				_('Item prototypes'),
 				'disc_prototypes.php?parent_discoveryid='.$discovery['itemid']
 			),
-			' ('.$discovery['items'].')'
+			CViewHelper::showNum($discovery['items'])
 		),
 		array(
 			new CLink(
 				_('Trigger prototypes'),
 				'trigger_prototypes.php?parent_discoveryid='.$discovery['itemid']
 			),
-			' ('.$discovery['triggers'].')'
+			CViewHelper::showNum($discovery['triggers'])
 		),
 		array(
 			new CLink(
 				_('Graph prototypes'),
 				'graphs.php?parent_discoveryid='.$discovery['itemid']
 			),
-			' ('.$discovery['graphs'].')'
+			CViewHelper::showNum($discovery['graphs'])
 		),
 		$hostPrototypeLink,
 		$discovery['key_'],

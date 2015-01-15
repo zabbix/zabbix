@@ -97,7 +97,7 @@ foreach ($this->data['applications'] as $application) {
 					'&filter_set=1'.
 					'&filter_application='.urlencode($application['name'])
 			),
-			SPACE.'('.count($application['items']).')'
+			CViewHelper::showNum(count($application['items']))
 		)
 	));
 }
