@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of authentication');
 $page['file'] = 'authentication.php';
-$page['hist_arg'] = array('config');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

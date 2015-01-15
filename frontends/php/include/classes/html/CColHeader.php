@@ -19,17 +19,35 @@
 **/
 
 
-require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/blocks.inc.php';
+class CColHeader extends CTag {
 
-$page['title'] = _('Status of Zabbix');
-$page['file'] = 'report1.php';
+	public function __construct($item = null, $class = null, $colspan = null, $width = null) {
+		parent::__construct('th', 'yes');
+		$this->addItem($item);
+		$this->attr('class', $class);
+		if (!empty($colspan)) {
+			$this->attr('colspan', $colspan);
+		}
+		if (!empty($width)) {
+			$this->attr('width', $width);
+		}
+	}
 
-require_once dirname(__FILE__).'/include/page_header.php';
+	public function setAlign($value) {
+		$this->attr('align', strval($value));
+	}
 
-$reportWidget = new CWidget();
-$reportWidget->addPageHeader(_('STATUS OF ZABBIX'));
-$reportWidget->addItem(make_status_of_zbx());
-$reportWidget->show();
+	public function setRowSpan($value) {
+		$this->attr('rowspan', strval($value));
+	}
 
-require_once dirname(__FILE__).'/include/page_footer.php';
+	public function setColSpan($value) {
+		$this->attr('colspan', strval($value));
+	}
+
+	public function setWidth($value) {
+		if (is_string($value)) {
+			$this->attr('width', $value);
+		}
+	}
+}

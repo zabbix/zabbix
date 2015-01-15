@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Notification report');
 $page['file'] = 'report4.php';
-$page['hist_arg'] = array('media_type','period','year');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

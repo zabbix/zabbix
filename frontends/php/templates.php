@@ -37,7 +37,6 @@ else {
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	$page['title'] = _('Configuration of templates');
 	$page['file'] = 'templates.php';
-	$page['hist_arg'] = array('groupid');
 	$page['scripts'] = array('multiselect.js');
 }
 
@@ -683,7 +682,7 @@ else {
 
 	$footer = get_table_header(array($goBox, $goButton));
 
-	$form->addItem(array($paging, $table, $paging, $footer));
+	$form->addItem(array($table, $paging, $footer));
 	$templateWidget->addItem($form);
 }
 

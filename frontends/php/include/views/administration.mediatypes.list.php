@@ -130,7 +130,7 @@ $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "mediatypeids";');
 
 // append table to form
-$mediaTypeForm->addItem(array($this->data['paging'], $mediaTypeTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$mediaTypeForm->addItem(array($mediaTypeTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $mediaTypeWidget->addItem($mediaTypeForm);

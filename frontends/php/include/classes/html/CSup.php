@@ -19,17 +19,22 @@
 **/
 
 
-require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/blocks.inc.php';
+class CSup extends CTag {
 
-$page['title'] = _('Status of Zabbix');
-$page['file'] = 'report1.php';
+	public function __construct($items = null) {
+		parent::__construct('sup', 'yes');
+		$this->addItem($items);
 
-require_once dirname(__FILE__).'/include/page_header.php';
+		$this->tag_body_start = '';
+		$this->tag_start = '';
+		$this->tag_end = '';
+		$this->tag_body_start = '';
+		$this->tag_body_end = '';
 
-$reportWidget = new CWidget();
-$reportWidget->addPageHeader(_('STATUS OF ZABBIX'));
-$reportWidget->addItem(make_status_of_zbx());
-$reportWidget->show();
+		return $this;
+	}
 
-require_once dirname(__FILE__).'/include/page_footer.php';
+	public function useJQueryStyle() {
+		$this->addClass('jqueryinputset');
+	}
+}

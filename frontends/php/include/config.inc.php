@@ -70,7 +70,6 @@ global $ZBX_PAGE_POST_JS, $ZBX_SERVER, $ZBX_SERVER_PORT, $page;
 $page = array(
 	'title' => null,
 	'file' => null,
-	'hist_arg' => null,
 	'scripts' => null,
 	'type' => null,
 	'menu' => null

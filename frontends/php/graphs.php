@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = isset($_REQUEST['parent_discoveryid']) ? _('Configuration of graph prototypes') : _('Configuration of graphs');
 $page['file'] = 'graphs.php';
-$page['hist_arg'] = array('hostid', 'parent_discoveryid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

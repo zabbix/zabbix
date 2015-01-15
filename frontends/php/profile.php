@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/media.inc.php';
 
 $page['title'] = _('User profile');
 $page['file'] = 'profile.php';
-$page['hist_arg'] = array();
 $page['scripts'] = array('class.cviewswitcher.js');
 
 ob_start();

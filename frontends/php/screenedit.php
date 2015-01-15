@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 $page['title'] = _('Configuration of screens');
 $page['file'] = 'screenedit.php';
-$page['hist_arg'] = array('screenid');
 $page['scripts'] = array('class.cscreen.js', 'class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'multiselect.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

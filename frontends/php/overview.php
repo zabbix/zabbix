@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = _('Overview');
 $page['file'] = 'overview.php';
-$page['hist_arg'] = array('groupid', 'type');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_REFRESH', 1);

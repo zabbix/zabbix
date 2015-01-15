@@ -40,7 +40,6 @@ else {
 
 	$page['title'] = _('Latest events');
 	$page['file'] = 'events.php';
-	$page['hist_arg'] = array('groupid', 'hostid');
 	$page['scripts'] = array('class.calendar.js', 'gtlc.js');
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -864,7 +863,7 @@ else {
 	}
 
 	if (!$csvExport) {
-		$table = array($paging, $table, $paging);
+		$table = array($table, $paging);
 	}
 }
 

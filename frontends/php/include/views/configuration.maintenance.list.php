@@ -87,7 +87,7 @@ $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');
 
 // append table to form
-$maintenanceForm->addItem(array($this->data['paging'], $maintenanceTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$maintenanceForm->addItem(array($maintenanceTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $maintenanceWidget->addItem($maintenanceForm);

@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/services.inc.php';
 
 $page['title'] = _('IT services');
 $page['file'] = 'srv_status.php';
-$page['hist_arg'] = array();
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 

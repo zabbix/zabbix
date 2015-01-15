@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['title'] = _('Custom graphs');
 $page['file'] = 'charts.php';
-$page['hist_arg'] = array('hostid', 'groupid', 'graphid');
 $page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

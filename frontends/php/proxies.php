@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 
 $page['title'] = _('Configuration of proxies');
 $page['file'] = 'proxies.php';
-$page['hist_arg'] = array('');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

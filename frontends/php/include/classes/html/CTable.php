@@ -90,7 +90,7 @@ class CTable extends CTag {
 		return $item;
 	}
 
-	public function setHeader($value = null, $class = 'header') {
+	public function setHeader($value = null, $class = null) {
 		if (is_null($class)) {
 			$class = $this->headerClass;
 		}
@@ -100,8 +100,9 @@ class CTable extends CTag {
 			}
 		}
 		else {
-			$value = new CRow($value, $class);
+			$value = new CRowHeader($value, $class);
 		}
+		$value = new CTag('thead', 'yes', $value);
 		$this->colnum = $value->itemsCount();
 		$this->header = $value->toString();
 	}

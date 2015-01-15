@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/reports.inc.php';
 
 $page['title'] = _('Availability report');
 $page['file'] = 'report2.php';
-$page['hist_arg'] = array('mode', 'groupid', 'hostid', 'tpl_triggerid');
 $page['scripts'] = array('class.calendar.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -422,7 +421,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	}
 
 	$reportWidget->addItem(BR());
-	$reportWidget->addItem(array($paging, $triggerTable, $paging));
+	$reportWidget->addItem(array($triggerTable, $paging));
 	$reportWidget->show();
 }
 

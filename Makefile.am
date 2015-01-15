@@ -62,3 +62,4 @@ gettext:
 
 css:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/screen.scss frontends/php/styles/zabbix.css
+	cp sass/img/icon-sprite.png frontends/php/img/
