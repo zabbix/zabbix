@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-14 16:51+0200\n"
+"POT-Creation-Date: 2015-01-15 18:42+0200\n"
 "PO-Revision-Date: 2014-11-04 18:28+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1567,7 +1567,7 @@ msgstr "Não é possível criar dependência entre uma trigger e ela mesma."
 msgid "Cannot create discovery rule"
 msgstr "Não foi possível criar a regra de discovery"
 
-#: include/classes/api/services/CHost.php:1075
+#: include/classes/api/services/CHost.php:1073
 msgid "Cannot create host group."
 msgstr "Não é possível criar o grupo de host."
 
@@ -1671,7 +1671,7 @@ msgstr[1] "Não foi possível excluir os grupos"
 msgid "Cannot delete host"
 msgstr "Host não foi removido"
 
-#: include/classes/api/services/CHost.php:1086
+#: include/classes/api/services/CHost.php:1084
 msgid "Cannot delete host group."
 msgstr "Grupo de host não foi removido."
 
@@ -1691,7 +1691,7 @@ msgstr "Não foi possível remover icone do mapa"
 msgid "Cannot delete image"
 msgstr "A imagem não foi excluída"
 
-#: include/classes/api/services/CHost.php:1172
+#: include/classes/api/services/CHost.php:1170
 msgid "Cannot delete inventory."
 msgstr "Não foi possível remover inventário."
 
@@ -2194,7 +2194,7 @@ msgstr "Não foi possível incluir a expressão de trigger"
 msgid "Cannot insert user media."
 msgstr "Não foi possível inserir a mídia do usuário."
 
-#: include/classes/api/services/CHost.php:1150
+#: include/classes/api/services/CHost.php:1148
 msgid "Cannot link template"
 msgstr "Falha na associação do template"
 
@@ -2211,7 +2211,7 @@ msgstr "Não foi possível entrar."
 msgid "Cannot logout."
 msgstr "Não foi possível desconectar a sessão."
 
-#: include/classes/api/services/CHost.php:971
+#: include/classes/api/services/CHost.php:969
 msgid "Cannot mass update host name."
 msgstr "Não foi possível atualizar em massa o nome da máquina."
 
@@ -2219,7 +2219,7 @@ msgstr "Não foi possível atualizar em massa o nome da máquina."
 msgid "Cannot mass update template name."
 msgstr "Não é possível atualizar em massa o nome do template."
 
-#: include/classes/api/services/CHost.php:961
+#: include/classes/api/services/CHost.php:959
 msgid "Cannot mass update visible host name."
 msgstr "Não é possível atualizar em massa o nome visível do host."
 
@@ -2313,7 +2313,7 @@ msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Não foi possível definir o \"templateid\" para o protótipo de trigger \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:583
-#: include/classes/api/services/CHost.php:1025
+#: include/classes/api/services/CHost.php:1023
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Não é possível configurar campos do inventário com o inventário desativado."
 
@@ -2363,7 +2363,7 @@ msgstr "Não foi possível desvíncular e limpar os itens"
 msgid "Cannot unlink and clear triggers"
 msgstr "Não foi possível desvincular e limpar as triggers"
 
-#: include/classes/api/services/CHost.php:1125
+#: include/classes/api/services/CHost.php:1123
 msgid "Cannot unlink template"
 msgstr "Falha na desassociação do template"
 
@@ -2720,21 +2720,21 @@ msgstr "Verifique a expressão a partir de \"%1$s\"."
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr "Verifica se o arquivo existe. 0 - arquivo não existe, 1 - arquivo existe"
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Verifica se o serviço está disponível. 0 - serviço não está disponível, 1 - serviço disponível. Se <ip> estiver ausente, IP ou o nome de DNS é recuperado pela definição do host. Se <port> estiver ausente, a porta de serviço padrão é utilizada."
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr "Verifica se determinado serviço está disponível. 0 - serviço indisponível, 1 - serviço em execução. Se <IP> estiver ausente, é utilizado 127.0.0.1. Se <port number> estiver ausente, a porta padrão do serviço. Exemplo: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
 msgstr "Verifica a performance de um serviço. 0 - serviço indisponível, <sec> - número de segundos gasto para se conectar ao serviço. Se <IP> estiver ausente, 127.0.0.1 é usado. Se <port number> estiver ausente, a porta padrão do serviço."
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Verifica a performance do serviço. 0 - serviço está fora do ar, sec - número de segundos gastos para a conexão com o serviço. Se o <ip> estiver faltando será utilizado o IP ou o DNS da definição do host. Se <port> estiver faltando a porta padrão será utilizada."
 
@@ -2763,8 +2763,8 @@ msgstr "Verifica se é possível estabelecer uma conexão TCP com determinado n�
 msgid "Checks"
 msgstr "Checagens"
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr "Verifica se o serviço DNS está em execução. 0 - DNS está fora do ar (servidor não responde ou a resolução de nome falha), 1 DNS está em execução."
 
@@ -4201,7 +4201,7 @@ msgstr "Excluído: Regra de descoberta \"%1$s\" em \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Excluído: Gráfico \"%1$s\" em \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1453
+#: include/classes/api/services/CHost.php:1451
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Excluído: Host \"%1$s\"."
@@ -4930,7 +4930,7 @@ msgstr "Host nulo."
 #: include/classes/api/services/CHostGroup.php:471
 #: include/classes/api/services/CHostGroup.php:548
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1301
+#: include/classes/api/services/CHost.php:1299
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:606
@@ -6310,7 +6310,7 @@ msgid_plural "Hosts"
 msgstr[0] "Host"
 msgstr[1] "Hosts"
 
-#: include/classes/api/services/CHost.php:984
+#: include/classes/api/services/CHost.php:982
 #: include/classes/api/services/CTemplate.php:471
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6575,7 +6575,7 @@ msgstr "Máscara de sub-rede do host"
 msgid "Host time"
 msgstr "Hora do host"
 
-#: include/classes/api/services/CHost.php:858
+#: include/classes/api/services/CHost.php:856
 msgid "Host update failed."
 msgstr "A atualização do host falhou."
 
@@ -7279,7 +7279,7 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Foram informados caracteres inválidos no host \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:634
-#: include/classes/api/services/CHost.php:967
+#: include/classes/api/services/CHost.php:965
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Foram utilizados caracteres inválidos no nome do host \"%s\"."
@@ -8121,7 +8121,7 @@ msgstr "Nome de visualização inválido \"%s\". Caracteres permitidos: \"a-z\" 
 msgid "Inventory"
 msgstr "Inventário"
 
-#: include/classes/api/services/CHost.php:1191
+#: include/classes/api/services/CHost.php:1189
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Inventário desativado para o host: \"%1$s\"."
@@ -10082,7 +10082,7 @@ msgstr "Nenhum gráfico encontrado."
 msgid "No groups for host \"%s\"."
 msgstr "Nenhum grupo para o host \"%s\"."
 
-#: include/classes/api/services/CHost.php:953
+#: include/classes/api/services/CHost.php:951
 msgid "No groups for hosts."
 msgstr "Nenhum grupo para hosts."
 
@@ -10349,7 +10349,7 @@ msgstr "Sem permissão de acesso ao sistema."
 #: include/classes/api/services/CHostInterface.php:647
 #: include/classes/api/services/CHost.php:530
 #: include/classes/api/services/CHost.php:621
-#: include/classes/api/services/CHost.php:1646
+#: include/classes/api/services/CHost.php:1644
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -11495,8 +11495,8 @@ msgstr "Linha percentual (esquerda)"
 msgid "Percentile line (right)"
 msgstr "Linha percentual (direita)"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:351
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr "Executa uma consulta DNS. Caso seja bem sucedida retorna uma sequência de caracteres com o tipo da informação requisitada."
 
@@ -13678,7 +13678,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Template"
 
-#: include/classes/api/services/CHost.php:995
+#: include/classes/api/services/CHost.php:993
 #: include/classes/api/services/CTemplate.php:461
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -15920,8 +15920,8 @@ msgstr "Você não especificou o alvo da operação do script global \"%s\"."
 
 #: include/classes/api/services/CGraph.php:543
 #: include/classes/api/services/CGraphPrototype.php:558
-#: include/classes/api/services/CHost.php:889
-#: include/classes/api/services/CHost.php:947
+#: include/classes/api/services/CHost.php:887
+#: include/classes/api/services/CHost.php:945
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668
