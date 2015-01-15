@@ -897,6 +897,27 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 
 	if (NULL == (pattern = get_rparam(&request, 1)))
 		pattern = "";
+	else if ('@' == *pattern)
+	{
+		int i, found =0;
+
+		for (i = 0; i < regexps.values_num; i++)
+		{
+			zbx_expression_t	*regexp = regexps.values[i];
+
+			if (0 != strcmp(regexp->name, pattern + 1))
+				continue;
+
+			found = 1;
+			break;
+		}
+
+		if (0 == found)
+		{
+			*error = zbx_strdup(*error, "Invalid regular expression.");
+			goto out;
+		}
+	}
 
 	if (NULL == (encoding = get_rparam(&request, 2)))
 	{
@@ -1017,6 +1038,27 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 
 	if (NULL == (pattern = get_rparam(&request, 1)))
 		pattern = "";
+	else if ('@' == *pattern)
+	{
+		int i, found =0;
+
+		for (i = 0; i < regexps.values_num; i++)
+		{
+			zbx_expression_t	*regexp = regexps.values[i];
+
+			if (0 != strcmp(regexp->name, pattern + 1))
+				continue;
+
+			found = 1;
+			break;
+		}
+
+		if (0 == found)
+		{
+			*error = zbx_strdup(*error, "Invalid regular expression.");
+			goto out;
+		}
+	}
 
 	if (NULL == (key_severity = get_rparam(&request, 2)))
 		key_severity = "";
