@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2071,7 +2071,11 @@ class CTrigger extends CTriggerGeneral {
 				);
 
 				// Add trigger IDs as keys and empty arrays as values.
-				$downToUpTriggerIds = $downToUpTriggerIds + array_fill_keys($triggerIds, array());
+				foreach ($triggerIds as $triggerId) {
+					if (!array_key_exists($triggerId, $downToUpTriggerIds)) {
+						$downToUpTriggerIds[$triggerId] = array();
+					}
+				}
 
 				$triggerIds = array();
 				while ($dependency = DBfetch($dbResult)) {
