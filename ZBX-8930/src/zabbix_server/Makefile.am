@@ -48,6 +48,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
@@ -63,7 +64,6 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
-	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \

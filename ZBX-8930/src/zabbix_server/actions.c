@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 
 					triggerid = 0;
 
-					if (NULL != (row = DBfetch(result)))
+					while (NULL != (row = DBfetch(result)))
 					{
 						ZBX_STR2UINT64(hostid, row[0]);
 						ZBX_STR2UINT64(triggerid, row[1]);
@@ -223,7 +223,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 	{
 		tmp_str = zbx_strdup(tmp_str, event->trigger.description);
 
-		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
 				&tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 		switch (condition->operator)

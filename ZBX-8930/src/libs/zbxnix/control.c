@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -141,6 +141,12 @@ int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message)
 	else if (ZBX_DAEMON_TYPE_AGENT != daemon_type && 0 == strcmp(opt, ZBX_CONFIG_CACHE_RELOAD))
 	{
 		command = ZBX_RTC_CONFIG_CACHE_RELOAD;
+		scope = 0;
+		data = 0;
+	}
+	else if (ZBX_DAEMON_TYPE_AGENT != daemon_type && 0 == strcmp(opt, ZBX_HOUSEKEEPER_EXECUTE))
+	{
+		command = ZBX_RTC_HOUSEKEEPER_EXECUTE;
 		scope = 0;
 		data = 0;
 	}

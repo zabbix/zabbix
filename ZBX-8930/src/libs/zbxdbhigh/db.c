@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,7 +62,6 @@ int	DBconnect(int flag)
 	int		err;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __function_name, flag);
-
 
 	while (ZBX_DB_OK != (err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
 			CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT)))
@@ -2015,7 +2014,7 @@ static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t *valu
  ******************************************************************************/
 void	zbx_db_insert_clean(zbx_db_insert_t *self)
 {
-	int		i, j;
+	int	i, j;
 
 	for (i = 0; i < self->rows.values_num; i++)
 	{
@@ -2199,7 +2198,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 #ifdef HAVE_ORACLE
 				row[i].str = NULL;
 				zbx_strncpy_alloc(&row[i].str, &str_alloc, &str_offset, value->str,
-						zbx_strlen_utf8_n(value->str, field->length));
+						zbx_strlen_utf8_nchars(value->str, field->length));
 #else
 				row[i].str = DBdyn_escape_string_len(value->str, field->length);
 #endif
@@ -2279,7 +2278,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 
 	zbx_db_insert_add_values_dyn(self, (const zbx_db_value_t **)values.values, values.values_num);
 
-	zbx_vector_ptr_clean(&values, zbx_ptr_free);
+	zbx_vector_ptr_clear_ext(&values, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&values);
 }
 

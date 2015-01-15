@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -430,14 +430,17 @@ $pageFilter = new CPageFilter(array(
 ));
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
-if (isset($_REQUEST['form'])) {
+if (hasRequest('form')) {
 	$templateWidget->addPageHeader(_('CONFIGURATION OF TEMPLATES'));
 
 	if ($templateId = getRequest('templateid', 0)) {
 		$templateWidget->addItem(get_header_host_table('', $templateId));
 	}
 
-	$data = array();
+	$data = array(
+		'form' => getRequest('form'),
+		'groupId' => getRequest('groupid', 0)
+	);
 
 	if ($templateId) {
 		$dbTemplates = API::Template()->get(array(

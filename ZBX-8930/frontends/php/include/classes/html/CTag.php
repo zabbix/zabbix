@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -250,15 +250,6 @@ class CTag extends CObject {
 		}
 		else {
 			unset($this->attributes['style']);
-		}
-	}
-
-	public function setEnabled($value = 'yes') {
-		if ((is_string($value) && ($value == 'yes' || $value == 'enabled' || $value == 'on') || $value == '1') || (is_int($value) && $value <> 0)) {
-			unset($this->attributes['disabled']);
-		}
-		elseif ((is_string($value) && ($value == 'no' || $value == 'disabled' || $value == 'off') || $value == '0') || (is_int($value) && $value == 0)) {
-			$this->attributes['disabled'] = 'disabled';
 		}
 	}
 

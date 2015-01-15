@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -227,6 +227,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/html',
 			$this->rootDir.'/include/classes/html/pageheader',
 			$this->rootDir.'/include/classes/html/widget',
+			$this->rootDir.'/include/classes/html/interfaces',
 			$this->rootDir.'/include/classes/parsers',
 			$this->rootDir.'/include/classes/parsers/results',
 			$this->rootDir.'/include/classes/routing',

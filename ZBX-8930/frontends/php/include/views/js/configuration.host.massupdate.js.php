@@ -5,7 +5,6 @@
 		}).change();
 
 		jQuery('#inventory_mode').change(function() {
-			console.log(jQuery('.formrow-inventory').length);
 			jQuery('.formrow-inventory').toggle(jQuery(this).val() !== '<?php echo HOST_INVENTORY_DISABLED; ?>');
 		}).change();
 	});

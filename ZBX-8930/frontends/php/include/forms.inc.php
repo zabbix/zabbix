@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,28 +22,28 @@
 /**
  * Build user edit form data.
  *
- * @param string $userid			user ID
+ * @param string $userId			user ID
  * @param array	 $config			array of configuration parameters returned in $data['config'] parameter
  *									to later use when configuring user medias
  * @param bool	 $isProfile			true if current user viewing his own profile
  *
  * @return array
  */
-function getUserFormData($userid, array $config, $isProfile = false) {
+function getUserFormData($userId, array $config, $isProfile = false) {
 	$data = array(
 		'is_profile' => $isProfile,
 		'config' => $config
 	);
 
-	if (isset($userid)) {
-		$users = API::User()->get(array(
-			'userids' => $userid,
-			'output' => API_OUTPUT_EXTEND
-		));
-		$user = reset($users);
-	}
+	$users = API::User()->get(array(
+		'output' => array('alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'theme', 'refresh',
+			'rows_per_page', 'type'
+		),
+		'userids' => $userId
+	));
+	$user = reset($users);
 
-	if (isset($userid) && (!isset($_REQUEST['form_refresh']) || isset($_REQUEST['register']))) {
+	if (!hasRequest('form_refresh') || hasRequest('register')) {
 		$data['alias']			= $user['alias'];
 		$data['name']			= $user['name'];
 		$data['surname']		= $user['surname'];
@@ -60,8 +60,8 @@ function getUserFormData($userid, array $config, $isProfile = false) {
 		$data['messages'] 		= getMessageSettings();
 
 		$userGroups = API::UserGroup()->get(array(
-			'userids' => $userid,
-			'output' => array('usrgrpid')
+			'output' => array('usrgrpid'),
+			'userids' => $userId
 		));
 		$userGroup = zbx_objectValues($userGroups, 'usrgrpid');
 		$data['user_groups']	= zbx_toHash($userGroup);
@@ -69,7 +69,7 @@ function getUserFormData($userid, array $config, $isProfile = false) {
 		$data['user_medias'] = array();
 		$dbMedia = DBselect('SELECT m.mediaid,m.mediatypeid,m.period,m.sendto,m.severity,m.active'.
 				' FROM media m'.
-				' WHERE m.userid='.zbx_dbstr($userid)
+				' WHERE m.userid='.zbx_dbstr($userId)
 		);
 		while ($dbMedium = DBfetch($dbMedia)) {
 			$data['user_medias'][] = $dbMedium;
@@ -119,9 +119,9 @@ function getUserFormData($userid, array $config, $isProfile = false) {
 		$data['auth_type'] = getGroupAuthenticationType($data['user_groups'], GROUP_GUI_ACCESS_INTERNAL);
 	}
 	else {
-		$data['auth_type'] = ($userid === null)
+		$data['auth_type'] = ($userId === null)
 			? $config['authentication_type']
-			: getUserAuthenticationType($userid, GROUP_GUI_ACCESS_INTERNAL);
+			: getUserAuthenticationType($userId, GROUP_GUI_ACCESS_INTERNAL);
 	}
 
 	// set autologout
@@ -151,8 +151,8 @@ function getUserFormData($userid, array $config, $isProfile = false) {
 	// set user rights
 	if (!$data['is_profile']) {
 		$data['groups'] = API::UserGroup()->get(array(
-			'usrgrpids' => $data['user_groups'],
-			'output' => array('usrgrpid', 'name')
+			'output' => array('usrgrpid', 'name'),
+			'usrgrpids' => $data['user_groups']
 		));
 		order_result($data['groups'], 'name');
 
@@ -442,7 +442,6 @@ function getItemFilterForm(&$items) {
 	$updateIntervalLabel->setAttribute('id', 'filter_delay_label');
 
 	$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, false, true);
-	$updateIntervalInput->setEnabled('no');
 
 	// data type
 	$dataTypeLabel = new CSpan(bold(_('Data type').NAME_DELIMITER));
@@ -451,7 +450,6 @@ function getItemFilterForm(&$items) {
 	$dataTypeInput = new CComboBox('filter_data_type', $filter_data_type);
 	$dataTypeInput->addItem(-1, _('all'));
 	$dataTypeInput->addItems(item_data_type2str());
-	$dataTypeInput->setEnabled('no');
 
 	// filter table
 	$table = new CTable('', 'filter');
@@ -463,28 +461,24 @@ function getItemFilterForm(&$items) {
 	$snmpCommunityLabel->setAttribute('id', 'filter_snmp_community_label');
 
 	$snmpCommunityField = new CTextBox('filter_snmp_community', $filter_snmp_community, ZBX_TEXTBOX_FILTER_SIZE);
-	$snmpCommunityField->setEnabled('no');
 
 	// SNMPv3 security name
 	$snmpSecurityLabel = new CSpan(array(bold(_('Security name')), SPACE._('like').NAME_DELIMITER));
 	$snmpSecurityLabel->setAttribute('id', 'filter_snmpv3_securityname_label');
 
 	$snmpSecurityField = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
-	$snmpSecurityField->setEnabled('no');
 
 	// SNMP OID
 	$snmpOidLabel = new CSpan(array(bold(_('SNMP OID')), SPACE._('like').NAME_DELIMITER));
 	$snmpOidLabel->setAttribute('id', 'filter_snmp_oid_label');
 
 	$snmpOidField = new CTextBox('filter_snmp_oid', $filter_snmp_oid, ZBX_TEXTBOX_FILTER_SIZE);
-	$snmpOidField->setEnabled('no');
 
 	// port
 	$portLabel = new CSpan(array(bold(_('Port')), SPACE._('like').NAME_DELIMITER));
 	$portLabel->setAttribute('id', 'filter_port_label');
 
 	$portField = new CNumericBox('filter_port', $filter_port, 5, false, true);
-	$portField->setEnabled('no');
 
 	// row 1
 	$groupFilter = null;
@@ -517,8 +511,7 @@ function getItemFilterForm(&$items) {
 					'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=filter_groupid'.
 						'&srcfld1=groupid&writeonly=1',
 					'width' => 450,
-					'height' => 450,
-					'buttonClass' => 'input filter-multiselect-select-button'
+					'height' => 450
 				)
 			))
 		), 'col1'),
@@ -562,8 +555,7 @@ function getItemFilterForm(&$items) {
 					'parameters' => 'srctbl=host_templates&dstfrm='.$form->getName().'&dstfld1=filter_hostid'.
 						'&srcfld1=hostid&writeonly=1',
 					'width' => 450,
-					'height' => 450,
-					'buttonClass' => 'input filter-multiselect-select-button'
+					'height' => 450
 				)
 			))
 		), 'col1'),
@@ -585,7 +577,7 @@ function getItemFilterForm(&$items) {
 					'&with_applications=1'.
 					'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
 					.', 550, 450, "application");',
-				'filter-select-button'
+				'button-form'
 			)
 		), 'col1'),
 		new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
@@ -626,13 +618,12 @@ function getItemFilterForm(&$items) {
 		new CCol()
 	), 'item-list-row');
 
-	$filter = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();');
-	$filter->useJQueryStyle('main');
+	$filter = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput shadow');
+	$filter->main();
 
-	$reset = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();');
-	$reset->useJQueryStyle();
+	$reset = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput shadow');
 
-	$div_buttons = new CDiv(array($filter, SPACE, $reset));
+	$div_buttons = new CDiv(array($filter, $reset));
 	$div_buttons->setAttribute('style', 'padding: 4px 0px;');
 
 	$footer = new CCol($div_buttons, 'controls', 8);
@@ -1228,9 +1219,6 @@ function getItemFormData(array $item = array(), array $options = array()) {
 		));
 		$data['alreadyPopulated'] = zbx_toHash($data['alreadyPopulated'], 'inventory_link');
 	}
-
-	// template
-	$data['is_template'] = isTemplate($data['hostid']);
 
 	// unset snmpv3 fields
 	if ($data['type'] != ITEM_TYPE_SNMPV3) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ extern int		server_num, process_num;
 #define ZBX_VMWARE_CACHE_TTL	CONFIG_VMWARE_FREQUENCY
 #define ZBX_VMWARE_SERVICE_TTL	SEC_PER_DAY
 
-static ZBX_MUTEX	vmware_lock;
+static ZBX_MUTEX	vmware_lock = ZBX_MUTEX_NULL;
 
 static zbx_mem_info_t	*vmware_mem = NULL;
 
@@ -223,7 +223,7 @@ static void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
  ******************************************************************************/
 static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 {
-	zbx_vector_ptr_clean(&vm->devs, (zbx_mem_free_func_t)vmware_dev_shared_free);
+	zbx_vector_ptr_clear_ext(&vm->devs, (zbx_clean_func_t)vmware_dev_shared_free);
 	zbx_vector_ptr_destroy(&vm->devs);
 
 	if (NULL != vm->id)
@@ -252,10 +252,10 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
  ******************************************************************************/
 static void	vmware_hv_shared_free(zbx_vmware_hv_t *hv)
 {
-	zbx_vector_ptr_clean(&hv->datastores, (zbx_mem_free_func_t)vmware_datastore_shared_free);
+	zbx_vector_ptr_clear_ext(&hv->datastores, (zbx_clean_func_t)vmware_datastore_shared_free);
 	zbx_vector_ptr_destroy(&hv->datastores);
 
-	zbx_vector_ptr_clean(&hv->vms, (zbx_mem_free_func_t)vmware_vm_shared_free);
+	zbx_vector_ptr_clear_ext(&hv->vms, (zbx_clean_func_t)vmware_vm_shared_free);
 	zbx_vector_ptr_destroy(&hv->vms);
 
 	if (NULL != hv->uuid)
@@ -312,10 +312,10 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 {
 	if (NULL != data)
 	{
-		zbx_vector_ptr_clean(&data->hvs, (zbx_mem_free_func_t)vmware_hv_shared_free);
+		zbx_vector_ptr_clear_ext(&data->hvs, (zbx_clean_func_t)vmware_hv_shared_free);
 		zbx_vector_ptr_destroy(&data->hvs);
 
-		zbx_vector_ptr_clean(&data->clusters, (zbx_mem_free_func_t)vmware_cluster_shared_free);
+		zbx_vector_ptr_clear_ext(&data->clusters, (zbx_clean_func_t)vmware_cluster_shared_free);
 		zbx_vector_ptr_destroy(&data->clusters);
 
 		if (NULL != data->events)
@@ -562,7 +562,7 @@ static void	vmware_dev_free(zbx_vmware_dev_t *dev)
  ******************************************************************************/
 static void	vmware_vm_free(zbx_vmware_vm_t *vm)
 {
-	zbx_vector_ptr_clean(&vm->devs, (zbx_mem_free_func_t)vmware_dev_free);
+	zbx_vector_ptr_clear_ext(&vm->devs, (zbx_clean_func_t)vmware_dev_free);
 	zbx_vector_ptr_destroy(&vm->devs);
 
 	zbx_free(vm->id);
@@ -583,10 +583,10 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
  ******************************************************************************/
 static void	vmware_hv_free(zbx_vmware_hv_t *hv)
 {
-	zbx_vector_ptr_clean(&hv->datastores, (zbx_mem_free_func_t)vmware_datastore_free);
+	zbx_vector_ptr_clear_ext(&hv->datastores, (zbx_clean_func_t)vmware_datastore_free);
 	zbx_vector_ptr_destroy(&hv->datastores);
 
-	zbx_vector_ptr_clean(&hv->vms, (zbx_mem_free_func_t)vmware_vm_free);
+	zbx_vector_ptr_clear_ext(&hv->vms, (zbx_clean_func_t)vmware_vm_free);
 	zbx_vector_ptr_destroy(&hv->vms);
 
 	zbx_free(hv->uuid);
@@ -625,10 +625,10 @@ static void	vmware_cluster_free(zbx_vmware_cluster_t *cluster)
  ******************************************************************************/
 static void	vmware_data_free(zbx_vmware_data_t *data)
 {
-	zbx_vector_ptr_clean(&data->hvs, (zbx_mem_free_func_t)vmware_hv_free);
+	zbx_vector_ptr_clear_ext(&data->hvs, (zbx_clean_func_t)vmware_hv_free);
 	zbx_vector_ptr_destroy(&data->hvs);
 
-	zbx_vector_ptr_clean(&data->clusters, (zbx_mem_free_func_t)vmware_cluster_free);
+	zbx_vector_ptr_clear_ext(&data->clusters, (zbx_clean_func_t)vmware_cluster_free);
 	zbx_vector_ptr_destroy(&data->clusters);
 
 	zbx_free(data->events);
@@ -1868,10 +1868,10 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(const zbx_vmware_service_t *ser
 
 	ret = SUCCEED;
 out:
-	zbx_vector_str_clean(&vms);
+	zbx_vector_str_clear_ext(&vms, zbx_ptr_free);
 	zbx_vector_str_destroy(&vms);
 
-	zbx_vector_str_clean(&datastores);
+	zbx_vector_str_clear_ext(&datastores, zbx_ptr_free);
 	zbx_vector_str_destroy(&datastores);
 
 	if (SUCCEED != ret)
@@ -2126,7 +2126,7 @@ out:
 static int	vmware_service_get_event_session(const zbx_vmware_service_t *service, CURL *easyhandle,
 		char **event_session, char **error)
 {
-#	define ZBX_POST_VMWARE_EVENT_FILTER					\
+#	define ZBX_POST_VMWARE_CREATE_EVENT_COLLECTOR				\
 		ZBX_POST_VSPHERE_HEADER						\
 		"<ns0:CreateCollectorForEvents>"				\
 			"<ns0:_this type=\"EventManager\">%s</ns0:_this>"	\
@@ -2141,7 +2141,7 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_EVENT_FILTER,
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_CREATE_EVENT_COLLECTOR,
 			vmware_service_objects[service->type].event_manager);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
@@ -2168,6 +2168,65 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 		*error = zbx_strdup(*error, "Cannot get EventHistoryCollector session");
 		goto out;
 	}
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_destroy_event_session                             *
+ *                                                                            *
+ * Purpose: destroys event session                                            *
+ *                                                                            *
+ * Parameters: service        - [IN] the vmware service                       *
+ *             easyhandle     - [IN] the CURL handle                          *
+ *             event_session  - [IN] event session (EventHistoryCollector)    *
+ *                                   identifier                               *
+ *             error          - [OUT] the error message in the case of failure*
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_service_destroy_event_session(const zbx_vmware_service_t *service, CURL *easyhandle,
+		const char *event_session, char **error)
+{
+#	define ZBX_POST_VMWARE_DESTROY_EVENT_COLLECTOR					\
+		ZBX_POST_VSPHERE_HEADER							\
+		"<ns0:DestroyCollector>"						\
+			"<ns0:_this type=\"EventHistoryCollector\">%s</ns0:_this>"	\
+		"</ns0:DestroyCollector>"						\
+		ZBX_POST_VSPHERE_FOOTER
+
+	const char	*__function_name = "vmware_service_destroy_event_session";
+
+	int		err, opt, ret = FAIL;
+	char		tmp[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_DESTROY_EVENT_COLLECTOR, event_session);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+		goto out;
+	}
+
+	page.offset = 0;
+
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+	{
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+		goto out;
 
 	ret = SUCCEED;
 out:
@@ -2228,7 +2287,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
-		goto out;
+		goto end_session;
 	}
 
 	page.offset = 0;
@@ -2236,17 +2295,21 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
 		*error = zbx_strdup(*error, curl_easy_strerror(err));
-		goto out;
+		goto end_session;
 	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
 
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-		goto out;
+		goto end_session;
 
 	*events = zbx_strdup(NULL, page.data);
 
 	ret = SUCCEED;
+
+end_session:
+	if (SUCCEED != vmware_service_destroy_event_session(service, easyhandle, event_session, error))
+		ret = FAIL;
 out:
 	zbx_free(event_session);
 
@@ -2563,7 +2626,7 @@ static int	vmware_service_get_cluster_list(const zbx_vmware_service_t *service, 
 
 out:
 	zbx_free(cluster_data);
-	zbx_vector_str_clean(&ids);
+	zbx_vector_str_clear_ext(&ids, zbx_ptr_free);
 	zbx_vector_str_destroy(&ids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found:%d", __function_name, zbx_result_string(ret),
@@ -2690,7 +2753,7 @@ clean:
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
 
-	zbx_vector_str_clean(&hvs);
+	zbx_vector_str_clear_ext(&hvs, zbx_ptr_free);
 	zbx_vector_str_destroy(&hvs);
 out:
 	zbx_vmware_lock();

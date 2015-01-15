@@ -8,7 +8,7 @@
 			<input class="input text" type="text" name="mappings[#{mappingNum}][newvalue]" value="#{newvalue}" size="30" maxlength="64">
 		</td>
 		<td>
-			<input class="input link_menu removeMapping" type="button" value="<?php echo Chtml::encode(_('Remove')); ?>">
+			<button type="button" class="button link_menu removeMapping"><?php echo _('Remove'); ?></button>
 		</td>
 	</tr>
 </script>
@@ -67,6 +67,6 @@
 	jQuery(document).ready(function() {
 		jQuery('#save').button();
 		jQuery('#addMapping').click(mappingsManager.addNew);
-		jQuery('#mappingsTable tbody').on('click', 'input.removeMapping', mappingsManager.remove);
+		jQuery('#mappingsTable tbody').on('click', '.removeMapping', mappingsManager.remove);
 	});
 </script>

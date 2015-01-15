@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -472,10 +472,6 @@ jQuery(function($) {
 
 			// draw popup link
 			if (options.popup.parameters != null) {
-				var popupBlock = $('<div>', {
-					'class': 'select-popup'
-				});
-
 				var urlParameters = options.popup.parameters;
 
 				if (options.ignored) {
@@ -484,10 +480,10 @@ jQuery(function($) {
 					});
 				}
 
-				var popupButton = $('<input>', {
+				var popupButton = $('<button>', {
 					type: 'button',
-					'class': options.popup.buttonClass ? options.popup.buttonClass : 'input link_menu select-popup',
-					value: options.labels['Select']
+					'class': options.popup.buttonClass ? options.popup.buttonClass : 'button button-form',
+					text: options.labels['Select']
 				});
 
 				if (options.disabled) {

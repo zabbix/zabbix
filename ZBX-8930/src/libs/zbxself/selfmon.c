@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,10 +47,10 @@ zbx_selfmon_collector_t;
 static zbx_selfmon_collector_t	*collector = NULL;
 static int			shm_id;
 
-#	define	LOCK_SM		zbx_mutex_lock(&sm_lock)
-#	define	UNLOCK_SM	zbx_mutex_unlock(&sm_lock)
+#	define LOCK_SM		zbx_mutex_lock(&sm_lock)
+#	define UNLOCK_SM	zbx_mutex_unlock(&sm_lock)
 
-static ZBX_MUTEX	sm_lock;
+static ZBX_MUTEX	sm_lock = ZBX_MUTEX_NULL;
 #endif
 
 extern char	*CONFIG_FILE;
@@ -292,7 +292,7 @@ void	init_selfmon_collector(void)
 		exit(EXIT_FAILURE);
 	}
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&sm_lock, ZBX_MUTEX_SELFMON))
+	if (FAIL == zbx_mutex_create_force(&sm_lock, ZBX_MUTEX_SELFMON))
 	{
 		zbx_error("unable to create mutex for a self-monitoring collector");
 		exit(EXIT_FAILURE);
@@ -573,8 +573,28 @@ void	zbx_sleep_loop(int sleeptime)
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 }
 
+void	zbx_sleep_forever(void)
+{
+	sleep_remains = 1;
+
+	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+
+	do
+	{
+		sleep(1);
+	}
+	while (0 != sleep_remains);
+
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+}
+
 void	zbx_wakeup(void)
 {
 	sleep_remains = 0;
+}
+
+int	zbx_sleep_get_remainder(void)
+{
+	return sleep_remains;
 }
 #endif

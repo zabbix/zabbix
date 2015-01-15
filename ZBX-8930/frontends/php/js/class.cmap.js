@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1276,7 +1276,8 @@ ZABBIX.apps.map = (function($) {
 					parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
 						'&srcfld1=hostid&writeonly=1',
 					width: 450,
-					height: 450
+					height: 450,
+					buttonClass: 'button link_menu'
 				}
 			});
 
@@ -1293,7 +1294,8 @@ ZABBIX.apps.map = (function($) {
 					parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
 						'&srcfld1=groupid&writeonly=1',
 					width: 450,
-					height: 450
+					height: 450,
+					buttonClass: 'button link_menu'
 				}
 			});
 

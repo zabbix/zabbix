@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -89,7 +89,9 @@ $dashconfFormList->addRow(_('Hosts'), array($maintenanceCheckBox, _('Show hosts 
 // append trigger severities to form list
 $severities = array();
 foreach ($this->data['severities'] as $severity) {
-	$serverityCheckBox = new CCheckBox('trgSeverity['.$severity.']', isset($this->data['severity'][$severity]), '', 1);
+	$serverityCheckBox = new CCheckBox('trgSeverity['.$severity.']',
+		isset($this->data['severity'][$severity]), null, 1
+	);
 	$serverityCheckBox->setEnabled($this->data['isFilterEnable']);
 	$severities[] = array($serverityCheckBox, getSeverityName($severity, $this->data['config']));
 	$severities[] = BR();
@@ -118,7 +120,7 @@ $dashconfTab->addTab('dashconfTab', _('Filter'), $dashconfFormList);
 $dashconfForm->addItem($dashconfTab);
 $dashconfForm->addItem(makeFormFooter(
 	new CSubmit('update', _('Update')),
-	new CButtonCancel()
+	array(new CButtonCancel())
 ));
 
 $dashconfWidget->addItem($dashconfForm);

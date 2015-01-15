@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,16 +103,28 @@ $permissionsTable->addRow(array(
 ));
 $permissionsTable->addRow(array(
 	array(
-		new CButton('add_read_write', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_READ_WRITE."', 450, 450);", 'formlist'),
-		new CSubmit('del_read_write', _('Delete selected'), null, 'formlist')
+		new CButton('add_read_write', _('Add'),
+			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
+				'&permission='.PERM_READ_WRITE."', 450, 450);",
+			'button-form'
+		),
+		new CSubmit('del_read_write', _('Delete selected'), null, 'button-form')
 	),
 	array(
-		new CButton('add_read_only', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_READ."', 450, 450);", 'formlist'),
-		new CSubmit('del_read_only', _('Delete selected'), null, 'formlist')
+		new CButton('add_read_only', _('Add'),
+			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
+				'&permission='.PERM_READ."', 450, 450);",
+			'button-form'
+		),
+		new CSubmit('del_read_only', _('Delete selected'), null, 'button-form')
 	),
 	array(
-		new CButton('add_deny', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_DENY."', 450, 450);", 'formlist'),
-		new CSubmit('del_deny', _('Delete selected'), null, 'formlist')
+		new CButton('add_deny', _('Add'),
+			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
+				'&permission='.PERM_DENY."', 450, 450);",
+			'button-form'
+		),
+		new CSubmit('del_deny', _('Delete selected'), null, 'button-form')
 	)
 ));
 $permissionsFormList->addRow(_('Composing permissions'), $permissionsTable);
@@ -143,7 +155,7 @@ if (isset($this->data['usrgrpid'])) {
 else {
 	$userGroupForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('config'))
+		array(new CButtonCancel(url_param('config')))
 	));
 }
 

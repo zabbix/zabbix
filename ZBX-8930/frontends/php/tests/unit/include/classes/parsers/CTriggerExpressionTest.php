@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2018,6 +2018,9 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('{host:key.now()}', null, true),
 			array('{host:key.now(0)}', null, true),
 			array('{host:key.now(0,)}', null, true),
+			array('{host:key.percentile(123,,12)}', null, true),
+			array('{host:key.percentile(123,123,12)}', null, true),
+			array('{host:key.percentile(#123,123,12)}', null, true),
 			array('{host:key.prev()}', null, true),
 			array('{host:key.prev(0)}', null, true),
 			array('{host:key.prev(0,)}', null, true),

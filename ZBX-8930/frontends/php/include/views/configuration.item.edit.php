@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+if ($this->data['parent_discoveryid'] == 0) {
+	$host = $this->data['host'];
+}
 
 $itemWidget = new CWidget();
 
@@ -71,7 +74,7 @@ $itemFormList->addRow(_('Key'), array(
 		? new CButton('keyButton', _('Select'),
 			'return PopUp("popup.php?srctbl=help_items&srcfld1=key'.
 				'&dstfrm='.$itemForm->getName().'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());',
-			'formlist')
+			'button-form')
 		: null
 ));
 
@@ -136,7 +139,7 @@ $authProtocolRadioButton = array(
 	new CLabel(_('SHA'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
 );
 $itemFormList->addRow(_('Authentication protocol'),
-	new CDiv($authProtocolRadioButton, 'jqueryinputset'),
+	new CDiv($authProtocolRadioButton, 'jqueryinputset radioset'),
 	false, 'row_snmpv3_authprotocol'
 );
 $itemFormList->addRow(_('Authentication passphrase'),
@@ -150,7 +153,7 @@ $privProtocolRadioButton = array(
 	new CLabel(_('AES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
 );
 $itemFormList->addRow(_('Privacy protocol'),
-	new CDiv($privProtocolRadioButton, 'jqueryinputset'),
+	new CDiv($privProtocolRadioButton, 'jqueryinputset radioset'),
 	false, 'row_snmpv3_privprotocol'
 );
 $itemFormList->addRow(_('Privacy passphrase'),
@@ -301,7 +304,7 @@ $newFlexInt = new CSpan(array(
 	SPACE,
 	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
 	SPACE,
-	new CButton('add_delay_flex', _('Add'), null, 'formlist')
+	new CButton('add_delay_flex', _('Add'), null, 'button-form')
 ));
 $newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
 
@@ -313,7 +316,9 @@ $itemFormList->addRow(_('New flexible interval'), array($newFlexInt, $maxFlexMsg
 
 $keepHistory = array();
 $keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
-if ($data['config']['hk_history_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
+if ($data['config']['hk_history_global'] && $data['parent_discoveryid'] == 0
+		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
+
 	$keepHistory[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
@@ -329,7 +334,9 @@ $itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
 
 $keepTrend = array();
 $keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
-if ($data['config']['hk_trends_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
+if ($data['config']['hk_trends_global'] && $data['parent_discoveryid'] == 0
+		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
+
 	$keepTrend[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
@@ -439,42 +446,33 @@ $itemTab->addTab('itemTab', $this->data['caption'], $itemFormList);
 $itemForm->addItem($itemTab);
 
 // append buttons to form
-if (!empty($this->data['itemid'])) {
-	if (!$this->data['is_template'] && !empty($this->data['itemid']) && empty($this->data['parent_discoveryid'])) {
-		$buttonDelHistory = new CButtonQMessage(
+if ($this->data['itemid'] != 0) {
+	$buttons = array(new CSubmit('clone', _('Clone')));
+
+	if ($this->data['parent_discoveryid'] == 0
+			&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
+		$buttons[] = new CButtonQMessage(
 			'del_history',
 			_('Clear history and trends'),
 			_('History clearing can take a long time. Continue?')
 		);
 	}
-	else {
-		$buttonDelHistory = null;
-	}
 
 	if (!$this->data['limited']) {
-		$buttonDelete = new CButtonDelete(
+		$buttons[] = new CButtonDelete(
 			$this->data['parent_discoveryid'] ? _('Delete item prototype?') : _('Delete item?'),
 			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'))
 		);
 	}
-	else {
-		$buttonDelete = null;
-	}
 
-	$itemForm->addItem(makeFormFooter(
-		new CSubmit('update', _('Update')),
-		array(
-			new CSubmit('clone', _('Clone')),
-			$buttonDelHistory,
-			$buttonDelete,
-			new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))
-		)
-	));
+	$buttons[] = new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'));
+
+	$itemForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$itemForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))
+		array(new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')))
 	));
 }
 $itemWidget->addItem($itemForm);

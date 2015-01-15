@@ -1,7 +1,6 @@
-<?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +17,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_MACROCACHE_H
+#define ZABBIX_MACROCACHE_H
 
-class CHelp extends CIcon {
+#include "zbxtypes.h"
+#include "zbxalgo.h"
 
-	public function __construct() {
-		parent::__construct('http://www.zabbix.com/documentation', 'iconhelp');
-		parent::onClick('window.open("http://www.zabbix.com/documentation/");');
-	}
+/* user macro cache object */
+typedef struct
+{
+	/* the object id, for example trigger id */
+	zbx_uint64_t		objectid;
+	/* the macro source hosts */
+	zbx_vector_uint64_t	hostids;
+	/* the macro:value pairs */
+	zbx_vector_ptr_pair_t	macros;
 }
+zbx_umc_object_t;
+
+#endif

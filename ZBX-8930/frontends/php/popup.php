@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -200,8 +200,10 @@ $fields = array(
 );
 
 // unset disabled item types
-$allowed_item_types = array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_SNMPTRAP);
-if (isset($_REQUEST['itemtype']) && !str_in_array($_REQUEST['itemtype'], $allowed_item_types)) {
+$allowedItemTypes = array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
+	ITEM_TYPE_AGGREGATE, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DB_MONITOR
+);
+if (hasRequest('itemtype') && !str_in_array(getRequest('itemtype'), $allowedItemTypes)) {
 	unset($_REQUEST['itemtype']);
 }
 
@@ -470,7 +472,7 @@ if (isset($onlyHostid)) {
 
 	$cmbHosts = new CComboBox('hostid', $hostid);
 	$cmbHosts->addItem($hostid, $host['name']);
-	$cmbHosts->setEnabled('disabled');
+	$cmbHosts->setEnabled(false);
 	$cmbHosts->setAttribute('title', _('You can not switch hosts for current selection.'));
 	$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $cmbHosts));
 }
@@ -488,7 +490,7 @@ else {
 		$itemType = getRequest('itemtype', 0);
 		$cmbTypes = new CComboBox('itemtype', $itemType, 'javascript: submit();');
 
-		foreach ($allowed_item_types as $type) {
+		foreach ($allowedItemTypes as $type) {
 			$cmbTypes->addItem($type, item_type2str($type));
 		}
 
@@ -691,7 +693,7 @@ elseif ($srctbl == 'templates') {
 		if (isset($excludeids[$template['templateid']])) {
 			if ($multiselect) {
 				$checkBox->setChecked(1);
-				$checkBox->setEnabled('disabled');
+				$checkBox->setEnabled(false);
 			}
 			$name->removeAttribute('class');
 		}
@@ -765,7 +767,7 @@ elseif ($srctbl == 'hosts') {
 		if (isset($excludeids[$host['hostid']])) {
 			if ($multiselect) {
 				$checkBox->setChecked(1);
-				$checkBox->setEnabled('disabled');
+				$checkBox->setEnabled(false);
 			}
 			$name->removeAttribute('class');
 		}
@@ -840,7 +842,7 @@ elseif ($srctbl == 'host_templates') {
 		if (isset($excludeids[$host['hostid']])) {
 			if ($multiselect) {
 				$checkBox->setChecked(1);
-				$checkBox->setEnabled('disabled');
+				$checkBox->setEnabled(false);
 			}
 			$name->removeAttribute('class');
 		}
@@ -910,7 +912,7 @@ elseif ($srctbl == 'host_groups') {
 		if (isset($excludeids[$hostgroup['groupid']])) {
 			if ($multiselect) {
 				$checkBox->setChecked(1);
-				$checkBox->setEnabled('disabled');
+				$checkBox->setEnabled(false);
 			}
 			$name->removeAttribute('class');
 		}

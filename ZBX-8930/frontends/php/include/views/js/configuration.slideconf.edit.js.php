@@ -15,8 +15,9 @@
 			onchange="validateNumericBox(this, true, false);" style="text-align: right;">
 	</td>
 	<td>
-		<input type="button" class="input link_menu" id="remove_#{rowId}" remove_slide="#{rowId}"
-			value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeSlide(this);" />
+		<button type="button" class="button link_menu" id="remove_#{rowId}" remove_slide="#{rowId}" onclick="removeSlide(this);">
+			<?php echo _('Remove') ?>
+		</button>
 	</td>
 </tr>
 </script>

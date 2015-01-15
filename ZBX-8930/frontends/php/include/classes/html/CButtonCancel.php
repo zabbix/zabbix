@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 class CButtonCancel extends CButton {
 
-	public function __construct($vars = null, $action = null, $class = null) {
+	public function __construct($vars = null, $action = null, $class = 'button-plain shadow ui-corner-all') {
 		parent::__construct('cancel', _('Cancel'), $action, $class);
 		if (is_null($action)) {
 			$this->setVars($vars);

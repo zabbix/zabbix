@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -287,7 +287,7 @@ $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 // append tabs and form
 $hostInventoriesForm = new CForm();
 $hostInventoriesForm->addItem($hostInventoriesTab);
-$hostInventoriesForm->addItem(makeFormFooter(null, new CButtonCancel(url_param('groupid'))));
+$hostInventoriesForm->addItem(makeFormFooter(null, array(new CButtonCancel(url_param('groupid')))));
 $hostInventoryWidget->addItem($hostInventoriesForm);
 
 return $hostInventoryWidget;

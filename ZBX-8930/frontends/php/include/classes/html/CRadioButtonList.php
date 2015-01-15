@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,5 +65,10 @@ class CRadioButtonList extends CDiv {
 
 	public function makeVertical() {
 		$this->orientation = self::ORIENTATION_VERTICAL;
+	}
+
+	public function useJQueryStyle() {
+		parent::useJQueryStyle();
+		$this->addClass('radioset');
 	}
 }

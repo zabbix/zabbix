@@ -403,9 +403,6 @@ button.ui-button-icons-only { width: 3.7em; }
 .originalblue .ui-button-text-icon-secondary .ui-button-text, .originalblue .ui-button-text-icons .ui-button-text { padding: .4em 2.1em .4em 1em; }
 .originalblue .ui-button-text-icons .ui-button-text { padding-left: 2.1em; padding-right: 2.1em; }
 
-/* no icon support for input elements, provide padding by default */
-input.ui-button { padding: .3em 1em; }
-
 /*button icon element(s) */
 .originalblue .ui-button-icon-only .ui-icon, .originalblue .ui-button-text-icon-primary .ui-icon, .originalblue .ui-button-text-icon-secondary .ui-icon, .originalblue .ui-button-text-icons .ui-icon, .originalblue .ui-button-icons-only .ui-icon { position: absolute; top: 50%; margin-top: -8px; }
 .originalblue .ui-button-icon-only .ui-icon { left: 50%; margin-left: -8px; }
@@ -568,7 +565,3 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; }
  */
 .originalblue .ui-progressbar { height:2em; text-align: left; }
 .originalblue .ui-progressbar .ui-progressbar-value { margin: -1px; height: 100%; }
-
-/* Make checked checkboxes/radiobuttons have black label text */
-.originalblue .ui-button.ui-state-active .ui-button-text { color: #000000; }
-.originalblue .ui-button.ui-state-active.ui-state-disabled .ui-button-text { color: #777; }

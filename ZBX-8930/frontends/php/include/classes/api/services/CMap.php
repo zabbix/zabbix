@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -971,15 +971,21 @@ class CMap extends CMapElement {
 
 		// adding icon maps
 		if ($options['selectIconMap'] !== null && $options['selectIconMap'] != API_OUTPUT_COUNT) {
-			$iconMaps = API::IconMap()->get(array(
-				'output' => $this->outputExtend($options['selectIconMap'], array('sysmapid', 'iconmapid')),
-				'sysmapids' => $sysmapIds,
-				'preservekeys' => true,
-				'nopermissions' => true
+			$iconMaps = API::getApiService()->select($this->tableName(), array(
+				'output' => array('sysmapid', 'iconmapid'),
+				'filter' => array('sysmapid' => $sysmapIds)
 			));
+
 			$relationMap = $this->createRelationMap($iconMaps, 'sysmapid', 'iconmapid');
 
-			$iconMaps = $this->unsetExtraFields($iconMaps, array('sysmapid', 'iconmapid'), $options['selectIconMap']);
+			$iconMaps = API::IconMap()->get(array(
+				'output' => $this->outputExtend($options['selectIconMap'], array('iconmapid')),
+				'iconmapids' => zbx_objectValues($iconMaps, 'iconmapid'),
+				'preservekeys' => true
+			));
+
+			$iconMaps = $this->unsetExtraFields($iconMaps, array('iconmapid'), $options['selectIconMap']);
+
 			$result = $relationMap->mapOne($result, $iconMaps, 'iconmap');
 		}
 
