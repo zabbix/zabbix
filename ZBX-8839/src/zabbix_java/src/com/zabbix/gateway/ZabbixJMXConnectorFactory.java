@@ -87,7 +87,9 @@ class ZabbixJMXConnectorFactory
 
 		try
 		{
-			result = queue.poll(1, TimeUnit.SECONDS);
+			int timeout = ConfigurationManager.getIntegerParameterValue(ConfigurationManager.TIMEOUT);
+
+			result = queue.poll(timeout, TimeUnit.SECONDS);
 
 			if (null == result)
 			{
