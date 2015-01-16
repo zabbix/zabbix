@@ -929,7 +929,7 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 		/* meta information update is needed if:                               */
 		/* - lastlogsize or mtime changed since we last sent within this check */
 		/* - state changed from notsupported to normal                         */
-		/* - it's a new metric and nothing was sent during the ckeck           */
+		/* - it's a new metric and nothing was sent during the check           */
 		if (lastlogsize_sent != metric->lastlogsize || mtime_sent != metric->mtime ||
 				old_state != metric->state ||
 				(0 != (ZBX_METRIC_FLAG_NEW & metric->flags) &&
@@ -1383,7 +1383,7 @@ static void	process_active_checks(char *server, unsigned short port)
 	char		*error = NULL;
 	int		i, now, ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu)", __function_name, server, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu", __function_name, server, port);
 
 	now = (int)time(NULL);
 
@@ -1395,6 +1395,12 @@ static void	process_active_checks(char *server, unsigned short port)
 
 		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
 
+		if (metric->nextcheck > now)
+			continue;
+
+		if (SUCCEED != metric_ready_to_process(metric))
+			continue;
+
 		if (0 != (ZBX_METRIC_FLAG_NEW & metric->flags))
 		{
 			/* for new metric we should at least send meta information update packet */
@@ -1402,16 +1408,10 @@ static void	process_active_checks(char *server, unsigned short port)
 			mtime_last = metric->mtime;
 		}
 
-		if (metric->nextcheck > now)
-			continue;
-
-		if (SUCCEED != metric_ready_to_process(metric))
-			continue;
-
 		lastlogsize_sent = metric->lastlogsize;
 		mtime_sent = metric->mtime;
 
-		if (0 != (ZBX_METRIC_FLAG_LOG_LOG & metric->flags) || 0 != (ZBX_METRIC_FLAG_LOG_LOGRT & metric->flags))
+		if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags))
 			ret = process_log_check(server, port, metric, &lastlogsize_sent, &mtime_sent, &error);
 		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))
 			ret = process_eventlog_check(server, port, metric, &lastlogsize_sent, &error);
@@ -1437,12 +1437,12 @@ static void	process_active_checks(char *server, unsigned short port)
 		}
 		else
 		{
-			unsigned char	old_state;
-
-			old_state = metric->state;
-
 			if (0 == metric->error_count)
 			{
+				unsigned char	old_state;
+
+				old_state = metric->state;
+
 				if (ITEM_STATE_NOTSUPPORTED == metric->state)
 				{
 					/* item became supported */
@@ -1543,4 +1543,3 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_thread_exit(EXIT_SUCCESS);
 #endif
 }
-
