@@ -65,8 +65,13 @@ extern int	CONFIG_LISTEN_PORT;
 #	endif
 #endif	/* _WINDOWS */
 
-#define ZBX_BUFFER_ELEMENT_PERSISTENT	0x01	/* do not overwrite old values */
-#define ZBX_BUFFER_ELEMENT_LOG		0x02	/* item value type is log */
+/* NB! Next list must fit in unsigned char (see ZBX_ACTIVE_METRIC "flags" field below). */
+#define ZBX_METRIC_FLAG_PERSISTENT	0x01	/* do not overwrite old values when adding to the buffer */
+#define ZBX_METRIC_FLAG_NEW		0x02	/* new metric, just added */
+#define ZBX_METRIC_FLAG_LOG		0x04	/* item value type is log, one of the following: */
+#define ZBX_METRIC_FLAG_LOG_LOG		0x08	/* log[ */
+#define ZBX_METRIC_FLAG_LOG_LOGRT	0x10	/* logrt[ */
+#define ZBX_METRIC_FLAG_LOG_EVENTLOG	0x20	/* eventlog[ */
 
 typedef struct
 {
@@ -84,6 +89,7 @@ typedef struct
 						/* 1 - use inodes (up to 64-bit) (various UNIX file systems, NTFS) */
 						/* 2 - use 128-bit FileID (currently only on ReFS) to identify files */
 						/* on a file system */
+	unsigned char		flags;
 	int			error_count;	/* number of file reading errors in consecutive checks */
 	int			logfiles_num;
 	struct st_logfile	*logfiles;	/* for handling of logfile rotation for logrt[] items */
