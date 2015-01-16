@@ -20,6 +20,7 @@
 
 
 $overviewWidget = new CWidget();
+$overviewWidget->setTitle(_('Overview'));
 
 $typeComboBox = new CComboBox('type', $this->data['type'], 'submit()');
 $typeComboBox->addItem(SHOW_TRIGGERS, _('Triggers'));
@@ -42,7 +43,7 @@ $help = new CIcon(null, 'iconhelp');
 $help->setHint($hintTable);
 
 // header right
-$overviewWidget->setTitle(_('Overview'), array(
+$overviewWidget->setControls(array(
 	get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])),
 	SPACE,
 	$help

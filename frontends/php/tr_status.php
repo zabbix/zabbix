@@ -212,17 +212,19 @@ CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR
  * Display
  */
 $triggerWidget = new CWidget();
+$triggerWidget->setTitle(_('Status of triggers'));
 
 $rightForm = new CForm('get');
-$rightForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
-$rightForm->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB()));
 $rightForm->addVar('fullscreen', $_REQUEST['fullscreen']);
 
-$triggerWidget->setTitle(
-	_('Status of triggers').SPACE.'['.zbx_date2str(DATE_TIME_FORMAT_SECONDS).']',
-	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
-);
-$triggerWidget->addHeader(_('Triggers'), $rightForm);
+$controls = new CList();
+$controls->addItem(array(_('Group'), $pageFilter->getGroupsCB()));
+$controls->addItem(array(_('Host'), $pageFilter->getHostsCB()));
+$controls->addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
+
+$rightForm->addItem($controls);
+
+$triggerWidget->setControls($rightForm);
 
 // filter
 $filterFormView = new CView('common.filter.trigger', array(

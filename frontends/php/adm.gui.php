@@ -84,6 +84,7 @@ if (hasRequest('update')) {
  */
 $form = new CForm();
 $form->cleanItems();
+$controls = new CList();
 $cmbConf = new CComboBox('configDropDown', 'adm.gui.php', 'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
@@ -99,10 +100,12 @@ $cmbConf = new CComboBox('configDropDown', 'adm.gui.php', 'redirect(this.options
 		'adm.other.php' => _('Other')
 	)
 );
-$form->addItem($cmbConf);
+$controls->addItem($cmbConf);
+$form->addItem($controls);
 
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->setTitle(_('GUI'), $form);
+$cnf_wdgt->setTitle(_('GUI'));
+$cnf_wdgt->setControls($form);
 
 $config = select_config();
 

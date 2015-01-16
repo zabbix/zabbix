@@ -52,8 +52,8 @@ if ($this->data['slideshows']) {
 		));
 	}
 
-	$slideshowWidget->setTitle(
-		_('Slide shows'),
+	$slideshowWidget->setTitle(_('Slide shows'));
+	$slideshowWidget->setControls(
 		array(
 			$slideHeaderForm,
 			SPACE,
@@ -94,8 +94,8 @@ if ($this->data['slideshows']) {
 	}
 }
 else {
-	$slideshowWidget->setTitle(
-		_('Slide shows'),
+	$slideshowWidget->setTitle(_('Slide shows'));
+	$slideshowWidget->setControls(
 		array(
 			$slideHeaderForm,
 			SPACE,

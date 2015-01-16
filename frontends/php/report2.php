@@ -168,11 +168,10 @@ if ($triggerData) {
 	$triggerData['hostid'] = $host['hostid'];
 	$triggerData['hostname'] = $host['name'];
 
-	$reportWidget->addHeader(array(
-		new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']),
-		NAME_DELIMITER,
-		$triggerData['description']
-	), SPACE);
+	$controls = new CList();
+	$controls->addItem(new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']));
+	$controls->addItem($triggerData['description']);
+	$reportWidget->setControls($controls);
 
 	$table = new CTableInfo(null, 'graph');
 	$table->addRow(new CImg('chart4.php?triggerid='.$_REQUEST['triggerid']));
@@ -187,9 +186,10 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	$modeComboBox->addItem(AVAILABILITY_REPORT_BY_TEMPLATE, _('By trigger template'));
 
 	$headerForm = new CForm('get');
-	$headerForm->addItem($modeComboBox);
-
-	$reportWidget->addHeader(_('Report'), array(_('Mode').SPACE, $headerForm));
+	$controls = new CList();
+	$controls->addItem(array(_('Mode').SPACE, $modeComboBox));
+	$headerForm->addItem($controls);
+	$reportWidget->setControls($headerForm);
 
 	$triggerOptions = array(
 		'output' => array('triggerid', 'description', 'expression', 'value'),

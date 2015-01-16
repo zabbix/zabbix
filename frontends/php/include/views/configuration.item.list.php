@@ -36,7 +36,8 @@ else {
 	$createForm->addVar('hostid', $this->data['hostid']);
 	$createForm->addItem(new CSubmit('form', _('Create item')));
 }
-$itemsWidget->setTitle(_('Items'), $createForm);
+$itemsWidget->setTitle(_('Items'));
+$itemsWidget->setControls($createForm);
 
 // header
 $itemsWidget->addHeader(_('Items'));

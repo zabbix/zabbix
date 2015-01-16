@@ -23,8 +23,8 @@ class CWidget {
 
 	public $flicker_state;
 	private $css_class;
-	private $title;
-	private $controls;
+	private $title = null;
+	private $controls = null;
 	private $headers;
 	private $flicker = array();
 
@@ -66,10 +66,13 @@ class CWidget {
 		}
 	}
 
-	public function setTitle($title, $controls = null) {
+	public function setTitle($title) {
+		$this->title = $title;
+	}
+
+	public function setControls($controls) {
 		zbx_value2array($controls);
 
-		$this->title = $title;
 		$this->controls = $controls;
 	}
 
@@ -95,8 +98,8 @@ class CWidget {
 
 	public function get() {
 		$widget = array();
-		if (!empty($this->title)) {
-			$widget[] = $this->createTitle();
+		if ($this->title !== null || $this->controls !== null) {
+			$widget[] = $this->createTopHeader();
 		}
 		if (!empty($this->headers)) {
 			$widget[] = $this->createHeader();
@@ -159,7 +162,7 @@ class CWidget {
 		return unpack_object($tab);
 	}
 
-	private function createTitle() {
+	private function createTopHeader() {
 		$body = array(new CTag('h1', 'yes', $this->title), $this->controls);
 
 		return new CDiv($body, 'header-title');

@@ -24,6 +24,9 @@ $hostGroupWidget = new CWidget();
 // create new hostgroup button
 $createForm = new CForm('get');
 $createForm->cleanItems();
+
+$controls = new CList();
+
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$tmpItem = new CSubmit('form', _('Create host group'));
 }
@@ -31,9 +34,11 @@ else {
 	$tmpItem = new CSubmit('form', _('Create host group').SPACE._('(Only super admins can create groups)'));
 	$tmpItem->setEnabled(false);
 }
-$createForm->addItem($tmpItem);
+$controls->addItem($tmpItem);
+$createForm->addItem($controls);
 
-$hostGroupWidget->setTitle(_('Host groups'), $createForm);
+$hostGroupWidget->setTitle(_('Host groups'));
+$hostGroupWidget->setControls($createForm);
 
 // header
 $hostGroupWidget->addHeader(_('Host groups'));

@@ -18,13 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $hostInventoryWidget = new CWidget();
+$hostInventoryWidget->setTitle(_('Host inventory'));
 
 $rForm = new CForm('get');
-$rForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()));
-$hostInventoryWidget->setTitle(_('Host inventory'));
-$hostInventoryWidget->addHeader(_('Hosts'), $rForm);
+$controls = new CList();
+$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+$rForm->addItem($controls);
+$hostInventoryWidget->setControls($rForm);
 
 $filterTable = new CTable('', 'filter filter-center');
 // getting inventory fields to make a drop down

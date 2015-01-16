@@ -230,17 +230,20 @@ $_REQUEST['report_timetill'] = zbxDateToTime(getRequest('report_timetill',
 
 $rep6_wdgt = new CWidget();
 
+$rep6_wdgt->setTitle(_('Bar reports'));
+
 $r_form = new CForm();
+$controls = new CList();
+
 $cnfCmb = new CComboBox('config', $config, 'submit();');
 $cnfCmb->addItem(BR_DISTRIBUTION_MULTIPLE_PERIODS, _('Distribution of values for multiple periods'));
 $cnfCmb->addItem(BR_DISTRIBUTION_MULTIPLE_ITEMS, _('Distribution of values for multiple items'));
 $cnfCmb->addItem(BR_COMPARE_VALUE_MULTIPLE_PERIODS, _('Compare values for multiple periods'));
 
-$r_form->addItem(array(_('Reports').SPACE, $cnfCmb));
+$controls->addItem(array(_('Reports').SPACE, $cnfCmb));
+$r_form->addItem($controls);
 
-$rep6_wdgt->setTitle(_('Bar reports'));
-$rep6_wdgt->addHeader(_('Report'), $r_form);
-$rep6_wdgt->addItem(BR());
+$rep6_wdgt->setControls($r_form);
 
 $rep_tab = new CTable();
 $rep_tab->setCellPadding(3);

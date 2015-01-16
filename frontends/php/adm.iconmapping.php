@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of icon mapping');
@@ -104,6 +103,9 @@ elseif (isset($_REQUEST['clone'])) {
 /*
  * Display
  */
+$iconMapWidget = new CWidget();
+$iconMapWidget->setTitle(_('Configuration of icon mapping'));
+
 $generalComboBox = new CComboBox('configDropDown', 'adm.iconmapping.php', 'redirect(this.options[this.selectedIndex].value);');
 $generalComboBox->addItems(array(
 	'adm.gui.php' => _('GUI'),
@@ -120,14 +122,15 @@ $generalComboBox->addItems(array(
 ));
 $iconMapForm = new CForm();
 $iconMapForm->cleanItems();
-$iconMapForm->addItem($generalComboBox);
+$controls = new CList();
+$controls->addItem($generalComboBox);
 
 if (!isset($_REQUEST['form'])) {
-	$iconMapForm->addItem(new CSubmit('form', _('Create icon map')));
+	$controls->addItem(new CSubmit('form', _('Create icon map')));
 }
 
-$iconMapWidget = new CWidget();
-$iconMapWidget->setTitle(_('Configuration of icon mapping'), $iconMapForm);
+$iconMapForm->addItem($controls);
+$iconMapWidget->setControls($iconMapForm);
 
 $data = array(
 	'form_refresh' => getRequest('form_refresh', 0),

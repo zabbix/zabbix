@@ -119,6 +119,7 @@ if (hasRequest('update')) {
 
 $form = new CForm();
 $form->cleanItems();
+$controls = new CList();
 $cmbConf = new CComboBox('configDropDown', 'adm.housekeeper.php', 'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
@@ -134,10 +135,12 @@ $cmbConf = new CComboBox('configDropDown', 'adm.housekeeper.php', 'redirect(this
 		'adm.other.php' => _('Other')
 	)
 );
-$form->addItem($cmbConf);
+$controls->addItem($cmbConf);
+$form->addItem($controls);
 
 $cnf_wdgt = new CWidget(null, 'hk');
-$cnf_wdgt->setTitle(_('Housekeeping'), $form);
+$cnf_wdgt->setTitle(_('Housekeeping'));
+$cnf_wdgt->setControls($form);
 
 $config = select_config();
 

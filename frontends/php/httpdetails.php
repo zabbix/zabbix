@@ -116,7 +116,9 @@ $httpdetailsWidget->setTitle(
 		SPACE,
 		bold(CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])),
 		isset($httpTestData['lastcheck']) ? ' ['.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $httpTestData['lastcheck']).']' : null
-	),
+	)
+);
+$httpdetailsWidget->setControls(
 	array(
 		get_icon('reset', array('id' => getRequest('httptestid'))),
 		get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))

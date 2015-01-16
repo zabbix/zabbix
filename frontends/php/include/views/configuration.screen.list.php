@@ -18,24 +18,23 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $screenWidget = new CWidget();
+$screenWidget->setTitle(_('Screens'));
 
 // create new screen button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addItem(new CSubmit('form', _('Create screen')));
+$controls = new CList();
+$controls->addItem(new CSubmit('form', _('Create screen')));
 if (!empty($this->data['templateid'])) {
 	$createForm->addVar('templateid', $this->data['templateid']);
 	$screenWidget->addItem(get_header_host_table('screens', $this->data['templateid']));
 }
 else {
-	$createForm->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=screen")'));
+	$controls->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=screen")'));
 }
-$screenWidget->setTitle(_('Screens'), $createForm);
-
-// header
-$screenWidget->addHeader(_('Screens'));
+$createForm->addItem($controls);
+$screenWidget->setControls($createForm);
 
 // create form
 $screenForm = new CForm();
