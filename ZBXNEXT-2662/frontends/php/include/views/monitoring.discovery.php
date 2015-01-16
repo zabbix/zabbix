@@ -18,19 +18,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $discoveryWidget = new CWidget('hat_discovery');
+$discoveryWidget->setTitle(_('Status of discovery'));
 
 // create header form
 $discoveryHeaderForm = new CForm('get');
+$controls = new CList();
 $discoveryHeaderForm->setName('slideHeaderForm');
 $discoveryHeaderForm->addVar('fullscreen', $this->data['fullscreen']);
-$discoveryWidget->setTitle(_('Status of discovery'), get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
+$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
 
 $discoveryRulesComboBox = $this->data['pageFilter']->getDiscoveryCB();
 
-$discoveryHeaderForm->addItem(array(_('Discovery rule').SPACE, $discoveryRulesComboBox));
-$discoveryWidget->addHeader(_('Discovery rules'), $discoveryHeaderForm);
+$controls->addItem(array(_('Discovery rule').SPACE, $discoveryRulesComboBox));
+$discoveryHeaderForm->addItem($controls);
+$discoveryWidget->setControls($discoveryHeaderForm);
 
 // create table
 $discoveryTable = new CTableInfo(_('No discovered devices found.'));
@@ -41,8 +43,8 @@ $discoveredDeviceCol->addClass('left');
 
 $header = array(
 	$discoveredDeviceCol,
-	new CCol(_('Monitored host'), 'left'),
-	new CCol(array(_('Uptime').'/', _('Downtime')), 'left')
+	new CColHeader(_('Monitored host'), 'left'),
+	new CColHeader(array(_('Uptime').'/', _('Downtime')), 'left')
 );
 
 foreach ($this->data['services'] as $name => $foo) {

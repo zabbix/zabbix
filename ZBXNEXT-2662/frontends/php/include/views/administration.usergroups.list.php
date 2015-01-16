@@ -18,20 +18,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $userGroupsWidget = new CWidget();
+$userGroupsWidget->setTitle(_('User groups'));
 
 // append page header to widget
 $createForm = new CForm('get');
 $createForm->cleanItems();
+$controls = new CList();
 $configurationComboBox = new CComboBox('config', 'usergrps.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 $configurationComboBox->addItem('usergrps.php', _('User groups'));
 $configurationComboBox->addItem('users.php', _('Users'));
-$createForm->addItem(array($configurationComboBox, new CSubmit('form', _('Create user group'))));
-$userGroupsWidget->setTitle(_('User groups'), $createForm);
-
-// append header to widget
-$userGroupsWidget->addHeader(_('User groups'));
+$controls->addItem($configurationComboBox);
+$controls->addItem(new CSubmit('form', _('Create user group')));
+$createForm->addItem($controls);
+$userGroupsWidget->setControls($createForm);
 
 // create form
 $userGroupsForm = new CForm();

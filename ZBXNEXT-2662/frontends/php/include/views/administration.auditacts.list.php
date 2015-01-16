@@ -18,18 +18,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $auditWidget = new CWidget();
+$auditWidget->setTitle(_('Action log'));
 
 // header
 $configForm = new CForm('get');
+$controls = new CList();
 $configComboBox = new CComboBox('config', 'auditacts.php');
 $configComboBox->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
 $configComboBox->addItem('auditlogs.php', _('Audit log'));
 $configComboBox->addItem('auditacts.php', _('Action log'));
-$configForm->addItem($configComboBox);
-$auditWidget->setTitle(_('Action log'), $configForm);
-$auditWidget->addHeader(_('Action log'));
+$controls->addItem($configComboBox);
+$configForm->addItem($controls);
+$auditWidget->setControls($configForm);
 
 // create filter
 $filterForm = new CForm('get');

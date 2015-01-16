@@ -30,7 +30,8 @@ $createForm->cleanItems();
 
 $createForm->addItem(new CSubmit('form', _('Create trigger prototype')));
 $createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-$triggersWidget->setTitle(_('Trigger prototypes'), $createForm);
+$triggersWidget->setTitle(_('Trigger prototypes'));
+$triggersWidget->setControls($createForm);
 
 // create widget header
 

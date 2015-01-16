@@ -62,8 +62,12 @@ if (hasRequest('update')) {
 /*
  * Display
  */
+$cnf_wdgt = new CWidget();
+$cnf_wdgt->setTitle(_('Other configuration parameters'));
+
 $form = new CForm();
 $form->cleanItems();
+$controls = new CList();
 $cmbConf = new CComboBox('configDropDown', 'adm.other.php', 'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
@@ -79,10 +83,10 @@ $cmbConf = new CComboBox('configDropDown', 'adm.other.php', 'redirect(this.optio
 		'adm.other.php' => _('Other')
 	)
 );
-$form->addItem($cmbConf);
+$controls->addItem($cmbConf);
 
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->setTitle(_('Other configuration parameters'), $form);
+$form->addItem($controls);
+$cnf_wdgt->setControls($form);
 
 $config = select_config();
 

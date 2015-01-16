@@ -18,15 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $actionWidget = new CWidget();
+$actionWidget->setTitle(_('Actions'));
 
 // create new action button
 $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('eventsource', $this->data['eventsource']);
-$createForm->addItem(new CSubmit('form', _('Create action')));
-$actionWidget->setTitle(_('Actions'), $createForm);
+$controls = new CList();
 
 // create widget header
 $sourceComboBox = new CComboBox('eventsource', $this->data['eventsource'], 'submit()');
@@ -34,10 +33,13 @@ $sourceComboBox->addItem(EVENT_SOURCE_TRIGGERS, _('Triggers'));
 $sourceComboBox->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
 $sourceComboBox->addItem(EVENT_SOURCE_AUTO_REGISTRATION, _('Auto registration'));
 $sourceComboBox->addItem(EVENT_SOURCE_INTERNAL, _x('Internal', 'event source'));
-$filterForm = new CForm('get');
-$filterForm->addItem(array(_('Event source'), SPACE, $sourceComboBox));
 
-$actionWidget->addHeader(_('Actions'), $filterForm);
+$controls->addItem(array(_('Event source'), SPACE, $sourceComboBox));
+$controls->addItem(new CSubmit('form', _('Create action')));
+
+$createForm->addItem($controls);
+
+$actionWidget->setControls($createForm);
 
 // create form
 $actionForm = new CForm();

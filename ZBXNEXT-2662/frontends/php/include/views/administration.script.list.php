@@ -20,12 +20,14 @@
 
 
 $scriptsWidget = new CWidget();
+$scriptsWidget->setTitle(_('Scripts'));
 
 $createForm = new CForm('get');
-$createForm->addItem(new CSubmit('form', _('Create script')));
+$controls = new CList();
+$controls->addItem(new CSubmit('form', _('Create script')));
 
-$scriptsWidget->setTitle(_('Scripts'), $createForm);
-$scriptsWidget->addHeader(_('Scripts'));
+$createForm->addItem($controls);
+$scriptsWidget->setControls($createForm);
 
 $scriptsForm = new CForm();
 $scriptsForm->setName('scriptsForm');

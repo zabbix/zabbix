@@ -339,7 +339,7 @@ if ($filter['groupids'] !== null) {
  * Display
  */
 $latestWidget = new CWidget(null, 'latest-mon');
-$latestWidget->addHeader(_('Items'));
+$latestWidget->setTitle(_('Latest data'));
 
 $filterForm = new CForm('get');
 $filterForm->setAttribute('name',' zbx_filter');
@@ -425,7 +425,8 @@ $filterTable->addRow(new CCol($divButtons, 'controls', 4));
 $filterForm->addItem($filterTable);
 
 $latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 0));
-$latestWidget->setTitle(_('Latest data'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
+$latestWidget->setTitle(_('Latest data'));
+$latestWidget->setControls(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 
 $form = new CForm('GET', 'history.php');
 $form->setName('items');
@@ -454,35 +455,35 @@ $lastCheckHeader = make_sorting_header(_('Last check'), 'lastclock', $sortField,
 $lastCheckHeader->addClass('latest-lastcheck');
 $lastCheckHeader->setAttribute('title', _('Last check'));
 
-$lastValueHeader = new CCol(new CSpan(_('Last value')), 'latest-lastvalue');
+$lastValueHeader = new CColHeader(new CSpan(_('Last value')), 'latest-lastvalue');
 $lastValueHeader->setAttribute('title', _('Last value'));
 
-$lastDataHeader = new CCol(new CSpan(_x('Change', 'noun in latest data')), 'latest-data');
+$lastDataHeader = new CColHeader(new CSpan(_x('Change', 'noun in latest data')), 'latest-data');
 $lastDataHeader->setAttribute('title', _x('Change', 'noun in latest data'));
 
 $checkAllCheckbox = new CCheckBox('all_items', null, "checkAll('".$form->getName()."', 'all_items', 'itemids');");
 
-$checkAllCheckboxCol = new CCol($checkAllCheckbox, 'latest-checkbox');
+$checkAllCheckboxCol = new CColHeader($checkAllCheckbox, 'latest-checkbox');
 
 if ($filter['showDetails']) {
-	$intervalHeader = new CCol(new CSpan(_('Interval')), 'latest-interval');
+	$intervalHeader = new CColHeader(new CSpan(_('Interval')), 'latest-interval');
 	$intervalHeader->setAttribute('title', _('Interval'));
 
-	$historyHeader = new CCol(new CSpan(_('History')), 'latest-history');
+	$historyHeader = new CColHeader(new CSpan(_('History')), 'latest-history');
 	$historyHeader->setAttribute('title', _('History'));
 
-	$trendsHeader = new CCol(new CSpan(_('Trends')), 'latest-trends');
+	$trendsHeader = new CColHeader(new CSpan(_('Trends')), 'latest-trends');
 	$trendsHeader->setAttribute('title', _('Trends'));
 
-	$typeHeader = new CCol(new CSpan(_('Type')), 'latest-type');
+	$typeHeader = new CColHeader(new CSpan(_('Type')), 'latest-type');
 	$typeHeader->setAttribute('title', _('Type'));
 
-	$infoHeader = new CCol(new CSpan(_('Info')), 'latest-info');
+	$infoHeader = new CColHeader(new CSpan(_('Info')), 'latest-info');
 	$infoHeader->setAttribute('title', _('Info'));
 
 	$table->addClass('latest-details');
 	$table->setHeader(array(
-		new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
+		new CColHeader(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
 		$checkAllCheckboxCol,
 		$hostHeader,
 		$nameHeader,
@@ -493,20 +494,20 @@ if ($filter['showDetails']) {
 		$lastCheckHeader,
 		$lastValueHeader,
 		$lastDataHeader,
-		new CCol(null, 'latest-actions'),
+		new CColHeader(null, 'latest-actions'),
 		$infoHeader
 	));
 }
 else {
 	$table->setHeader(array(
-		new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
+		new CColHeader(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
 		$checkAllCheckboxCol,
 		$hostHeader,
 		$nameHeader,
 		$lastCheckHeader,
 		$lastValueHeader,
 		$lastDataHeader,
-		new CCol(null, 'latest-actions')
+		new CColHeader(null, 'latest-actions')
 	));
 }
 

@@ -195,6 +195,9 @@ elseif (hasRequest('action') && getRequest('action') == 'regexp.massdelete') {
 /*
  * Display
  */
+$regExpWidget = new CWidget();
+$regExpWidget->setTitle(_('Regular expressions'));
+
 $generalComboBox = new CComboBox('configDropDown', 'adm.regexps.php', 'redirect(this.options[this.selectedIndex].value);');
 $generalComboBox->addItems(array(
 	'adm.gui.php' => _('GUI'),
@@ -211,13 +214,14 @@ $generalComboBox->addItems(array(
 ));
 $regExpForm = new CForm();
 $regExpForm->cleanItems();
-$regExpForm->addItem($generalComboBox);
+$controls = new CList();
+$controls->addItem($generalComboBox);
 if (!isset($_REQUEST['form'])) {
-	$regExpForm->addItem(new CSubmit('form', _('New regular expression')));
+	$controls->addItem(new CSubmit('form', _('New regular expression')));
 }
 
-$regExpWidget = new CWidget();
-$regExpWidget->setTitle(_('Regular expressions'), $regExpForm);
+$regExpForm->addItem($controls);
+$regExpWidget->setControls($regExpForm);
 
 if (isset($_REQUEST['form'])) {
 	$data = array(

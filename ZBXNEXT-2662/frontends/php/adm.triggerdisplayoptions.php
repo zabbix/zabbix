@@ -76,8 +76,12 @@ if (hasRequest('update')) {
 /*
  * Display
  */
+$cnf_wdgt = new CWidget();
+$cnf_wdgt->setTitle(_('Trigger displaying options'));
+
 $form = new CForm();
 $form->cleanItems();
+$controls = new CList();
 $cmbConf = new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php',
 	'redirect(this.options[this.selectedIndex].value);',
 	array(
@@ -94,10 +98,10 @@ $cmbConf = new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php',
 		'adm.other.php' => _('Other')
 	)
 );
-$form->addItem($cmbConf);
+$controls->addItem($cmbConf);
 
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->setTitle(_('Trigger displaying options'), $form);
+$form->addItem($controls);
+$cnf_wdgt->setControls($form);
 
 $config = select_config();
 

@@ -1739,7 +1739,11 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 					array_unshift($row, new CCol($msg_details, 'clr'));
 				}
 				$msg_tab->addRow($row);
-				$msg_tab->show();
+//				$msg_tab->show();
+// TODO remove old code, make new one
+
+				$msg = new CDiv($msg, 'msg-good');
+				$msg->show();
 				break;
 		}
 	}

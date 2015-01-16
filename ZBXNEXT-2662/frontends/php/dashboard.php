@@ -296,11 +296,11 @@ $icon = new CIcon(
 );
 $icon->addAction('onclick', 'document.location = "dashconf.php";');
 
-$dashboardWidget->addHeader(_('PERSONAL DASHBOARD'), array(
-	$icon,
-	SPACE,
-	get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))))
-);
+$dashboardWidget->setTitle(_('Dashboard'));
+$controls = new CList();
+$controls->addItem($icon);
+$controls->addItem(get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))));
+$dashboardWidget->setControls($controls);
 
 /*
  * Dashboard grid

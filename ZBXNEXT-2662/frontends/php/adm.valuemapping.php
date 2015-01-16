@@ -122,6 +122,9 @@ catch (Exception $e) {
 /*
  * Display
  */
+$valueMapWidget = new CWidget();
+$valueMapWidget->setTitle(_('Configuration of value mapping'));
+
 $generalComboBox = new CComboBox('configDropDown', 'adm.valuemapping.php', 'redirect(this.options[this.selectedIndex].value);');
 $generalComboBox->addItems(array(
 	'adm.gui.php' => _('GUI'),
@@ -139,13 +142,14 @@ $generalComboBox->addItems(array(
 
 $valueMapForm = new CForm();
 $valueMapForm->cleanItems();
-$valueMapForm->addItem($generalComboBox);
+$controls = new CList();
+$controls->addItem($generalComboBox);
 if (!isset($_REQUEST['form'])) {
-	$valueMapForm->addItem(new CSubmit('form', _('Create value map')));
+	$controls->addItem(new CSubmit('form', _('Create value map')));
 }
 
-$valueMapWidget = new CWidget();
-$valueMapWidget->setTitle(_('Configuration of value mapping'), $valueMapForm);
+$valueMapForm->addItem($controls);
+$valueMapWidget->setControls($valueMapForm);
 
 if (isset($_REQUEST['form'])) {
 	$data = array(

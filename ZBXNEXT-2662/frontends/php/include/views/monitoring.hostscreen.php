@@ -37,7 +37,8 @@ if (empty($this->data['screen']) || empty($this->data['host'])) {
 	));
 }
 else {
-	$screenWidget->setTitle(_('Screens'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
+	$screenWidget->setTitle(_('Screens'));
+	$screenWidget->setControls(array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
 	$screenWidget->addItem(BR());
 
 	// host screen list

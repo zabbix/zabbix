@@ -86,10 +86,11 @@ foreach($inventoryFields as $inventoryField){
 }
 
 $r_form = new CForm('get');
-$r_form->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB(), SPACE));
-$r_form->addItem(array(_('Grouping by'), SPACE, $inventoryFieldsComboBox));
-$hostinvent_wdgt->addHeader(_('Hosts'), $r_form);
-$hostinvent_wdgt->addItem(BR());
+$controls = new CList();
+$controls->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+$controls->addItem(array(_('Grouping by').SPACE, $inventoryFieldsComboBox));
+$r_form->addItem($controls);
+$hostinvent_wdgt->setControls($r_form);
 
 $table = new CTableInfo(_('No hosts found.'));
 $table->setHeader(

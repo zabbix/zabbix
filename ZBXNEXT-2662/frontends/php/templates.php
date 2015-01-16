@@ -416,6 +416,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), array('templa
  * Display
  */
 $templateWidget = new CWidget();
+$templateWidget->setTitle(_('Templates'));
 
 $pageFilter = new CPageFilter(array(
 	'config' => array(
@@ -430,7 +431,6 @@ $pageFilter = new CPageFilter(array(
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
 if (isset($_REQUEST['form'])) {
-	$templateWidget->setTitle(_('Templates'));
 
 	if ($templateId = getRequest('templateid', 0)) {
 		$templateWidget->addItem(get_header_host_table('', $templateId));
@@ -484,20 +484,15 @@ else {
 
 	$config = select_config();
 
-	$frmForm = new CForm();
+	$frmForm = new CForm('get');
 	$frmForm->cleanItems();
-	$frmForm->addItem(new CDiv(array(
-		new CSubmit('form', _('Create template')),
-		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=template")')
-	)));
-	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid'], 'filter_groupid_id'));
+	$controls = new CList();
+	$controls->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+	$controls->addItem(new CSubmit('form', _('Create template')));
+	$controls->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=template")'));
+	$frmForm->addItem($controls);
 
-	$templateWidget->setTitle(_('Templates'), $frmForm);
-
-	$frmGroup = new CForm('get');
-	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
-
-	$templateWidget->addHeader(_('Templates'), $frmGroup);
+	$templateWidget->setControls($frmForm);
 
 	$form = new CForm();
 	$form->setName('templates');

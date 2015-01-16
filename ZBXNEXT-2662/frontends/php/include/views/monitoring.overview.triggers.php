@@ -62,7 +62,8 @@ $help = new CIcon(null, 'iconhelp');
 $help->setHint($hintTable);
 
 // header right
-$overviewWidget->setTitle(_('Overview'), array(
+$overviewWidget->setTitle(_('Overview'));
+$overviewWidget->setControls(array(
 	get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])),
 	SPACE,
 	$help

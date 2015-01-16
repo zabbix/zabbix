@@ -73,15 +73,17 @@ $_REQUEST['hostid'] = $pageFilter->hostid;
 
 $r_form = new CForm('get');
 $r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
-$r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB()));
-$r_form->addItem(array(SPACE._('Host').SPACE,$pageFilter->getHostsCB()));
+
+$controls = new CList();
+$controls->addItem(array(_('Group'), $pageFilter->getGroupsCB()));
+$controls->addItem(array(_('Host'), $pageFilter->getHostsCB()));
+$controls->addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
+
+$r_form->addItem($controls);
 
 $httpmon_wdgt = new CWidget();
-$httpmon_wdgt->setTitle(
-	_('Status of WEB monitoring'),
-	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
-);
-$httpmon_wdgt->addHeader(_('Web scenarios'), $r_form);
+$httpmon_wdgt->setTitle(_('WEB monitoring'));
+$httpmon_wdgt->setControls($r_form);
 
 // TABLE
 $table = new CTableInfo(_('No web scenarios found.'));

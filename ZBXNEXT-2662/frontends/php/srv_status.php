@@ -145,9 +145,9 @@ else {
 
 	if ($tree) {
 		// creates form for choosing a preset interval
-		$r_form = new CForm();
+		$r_form = new CForm('get');
+		$controls = new CList();
 		$r_form->setAttribute('class', 'nowrap');
-		$r_form->setMethod('get');
 		$r_form->setAttribute('name', 'period_choice');
 		$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
@@ -155,11 +155,13 @@ else {
 		foreach ($periods as $key => $val) {
 			$period_combo->addItem($key, $val);
 		}
-		$r_form->addItem(array(_('Period').SPACE, $period_combo));
+		$controls->addItem(array(_('Period').SPACE, $period_combo));
+		$controls->addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
+		$r_form->addItem($controls);
 
 		$srv_wdgt = new CWidget('hat_services', 'service-list service-mon');
-		$srv_wdgt->setTitle(_('IT services'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
-		$srv_wdgt->addHeader(_('IT services'), $r_form);
+		$srv_wdgt->setTitle(_('IT services'));
+		$srv_wdgt->setControls($r_form);
 		$srv_wdgt->addItem(BR());
 		$srv_wdgt->addItem($tree->getHTML());
 		$srv_wdgt->show();

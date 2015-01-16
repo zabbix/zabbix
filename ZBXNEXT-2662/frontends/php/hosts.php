@@ -682,6 +682,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), array('host.m
  * Display
  */
 $hostsWidget = new CWidget();
+$hostsWidget->setTitle(_('Hosts'));
 
 $pageFilter = new CPageFilter(array(
 	'groups' => array(
@@ -695,8 +696,6 @@ $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = getRequest('hostid', 0);
 
 if (hasRequest('action') && getRequest('action') == 'host.massupdateform' && hasRequest('hosts')) {
-	$hostsWidget->setTitle(_('Hosts'));
-
 	$data = array(
 		'hosts' => getRequest('hosts'),
 		'visible' => getRequest('visible', array()),
@@ -755,8 +754,6 @@ if (hasRequest('action') && getRequest('action') == 'host.massupdateform' && has
 	$hostsWidget->addItem($hostForm->render());
 }
 elseif (isset($_REQUEST['form'])) {
-	$hostsWidget->setTitle(_('Hosts'));
-
 	$data = array();
 	if ($hostId = getRequest('hostid', 0)) {
 		$hostsWidget->addItem(get_header_host_table('', $_REQUEST['hostid']));
@@ -801,22 +798,18 @@ else {
 
 	$config = select_config();
 
-	$frmForm = new CForm();
+	$frmForm = new CForm('get');
 	$frmForm->cleanItems();
-	$controls = new CList(array(
-		new CSubmit('form', _('Create host')),
-		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
-	));
+
+	$controls = new CList();
+	$controls->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+	$controls->addItem(new CSubmit('form', _('Create host')));
+	$controls->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")'));
+
 	$frmForm->addItem($controls);
 
-	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid'], 'filter_groupid_id'));
+	$hostsWidget->setControls($frmForm);
 
-	$hostsWidget->setTitle(_('Hosts'), $frmForm);
-
-	$frmGroup = new CForm('get');
-	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
-
-	$hostsWidget->addHeader(_('Hosts'), $frmGroup);
 	$hostsWidget->setRootClass('host-list');
 
 	// filter
@@ -983,7 +976,7 @@ else {
 			}
 			else {
 				$statusCaption = _('Enabled');
-				$statusClass = 'enabled';
+				$statusClass = 'green';
 			}
 
 			$statusScript = 'return Confirm('.zbx_jsvalue(_('Disable host?')).');';
@@ -993,7 +986,7 @@ else {
 			$statusCaption = _('Disabled');
 			$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massenable'.url_param('groupid');
 			$statusScript = 'return Confirm('.zbx_jsvalue(_('Enable host?')).');';
-			$statusClass = 'disabled';
+			$statusClass = 'red';
 		}
 
 		$status = new CLink($statusCaption, $statusUrl, $statusClass, $statusScript);

@@ -23,9 +23,11 @@ $mediaTypeWidget = new CWidget();
 
 // create new media type button
 $createForm = new CForm('get');
-$createForm->addItem(new CSubmit('form', _('Create media type')));
-$mediaTypeWidget->setTitle(_('Media types'), $createForm);
-$mediaTypeWidget->addHeader(_('Media types'));
+$controls = new CList();
+$controls->addItem(new CSubmit('form', _('Create media type')));
+$createForm->addItem($controls);
+$mediaTypeWidget->setTitle(_('Media types'));
+$mediaTypeWidget->setControls($createForm);
 
 // create form
 $mediaTypeForm = new CForm();
@@ -95,8 +97,8 @@ foreach ($this->data['mediatypes'] as $mediaType) {
 		'&mediatypeids[]='.$mediaType['mediatypeid'];
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
-		? new CLink(_('Enabled'), $statusLink, 'enabled')
-		: new CLink(_('Disabled'), $statusLink, 'disabled');
+		? new CLink(_('Enabled'), $statusLink, 'green')
+		: new CLink(_('Disabled'), $statusLink, 'red');
 
 	// append row
 	$mediaTypeTable->addRow(array(

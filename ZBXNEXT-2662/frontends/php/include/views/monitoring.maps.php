@@ -20,6 +20,8 @@
 
 
 $mapWidget = new CWidget('hat_maps');
+$mapWidget->setTitle(_('Maps'));
+
 $mapTable = new CTable(_('No maps found.'), 'map map-container');
 $mapTable->setAttribute('style', 'margin-top: 4px;');
 
@@ -32,15 +34,12 @@ if (!empty($this->data['maps'])) {
 	}
 
 	$headerMapForm = new CForm('get');
+	$headerMapForm->cleanItems();
+	$controls = new CList();
 	$headerMapForm->addVar('fullscreen', $this->data['fullscreen']);
-	$headerMapForm->addItem(array(_('Maps'), SPACE, $mapComboBox));
+	$controls->addItem(array(_('Maps').SPACE, $mapComboBox));
 
-	$headerSeverityMinForm = new CForm('get');
-	$headerSeverityMinForm->addVar('fullscreen', $this->data['fullscreen']);
-	$headerSeverityMinForm->addItem(array(SPACE, _('Minimum severity'), SPACE, $this->data['pageFilter']->getSeveritiesMinCB()));
-
-	$mapWidget->addHeader($this->data['map']['name'], array($headerMapForm, $headerSeverityMinForm));
-
+	$controls->addItem(array(_('Minimum severity').SPACE, $this->data['pageFilter']->getSeveritiesMinCB()));
 	// get map parent maps
 	$parentMaps = array();
 	foreach (getParentMaps($this->data['sysmapid']) as $parent) {
@@ -52,7 +51,7 @@ if (!empty($this->data['maps'])) {
 	}
 	if (!empty($parentMaps)) {
 		array_unshift($parentMaps, _('Upper level maps').':');
-		$mapWidget->addHeader($parentMaps);
+		$controls->addItem($parentMaps);
 	}
 
 	$actionMap = getActionMapBySysmap($this->data['map'], array('severity_min' => $this->data['severity_min']));
@@ -69,9 +68,14 @@ if (!empty($this->data['maps'])) {
 		'elid' => $this->data['sysmapid']
 	));
 	$fsIcon = get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']));
+
+	$controls->addItem($icon);
+	$controls->addItem($fsIcon);
+
+	$headerMapForm->addItem($controls);
+	$mapWidget->setControls($headerMapForm);
 }
 
 $mapWidget->addItem($mapTable);
-$mapWidget->setTitle(_('Maps'), array($icon, SPACE, $fsIcon));
 
 return $mapWidget;
