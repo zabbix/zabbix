@@ -227,7 +227,16 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function,
 		goto out;
 
 	if ('@' == *arg1)
+	{
 		DCget_expressions_by_name(&regexps, arg1 + 1);
+
+		if (0 == regexps.values_num)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate logeventid. Invalid regular expression \"%s\"",
+					function, arg1);
+			goto out;
+		}
+	}
 
 	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value))
 	{
@@ -1628,7 +1637,16 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 	}
 
 	if ((ZBX_FUNC_REGEXP == func || ZBX_FUNC_IREGEXP == func) && '@' == *arg1)
+	{
 		DCget_expressions_by_name(&regexps, arg1 + 1);
+
+		if (0 == regexps.values_num)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate str function. Invalid regular expression \"%s\"",
+					arg1);
+			goto out;
+		}
+	}
 
 	if (ZBX_FLAG_SEC == flag)
 		seconds = arg2;
