@@ -1267,7 +1267,7 @@ clean:
  *          parameter                                                         *
  *                                                                            *
  * Parameters:                                                                *
- *     is_logrt       - [IN] Item type: 0 - log[], 1 - logrt[]                *
+ *     flags          - [IN] metric flags to check item type: log or logrt    *
  *     filename       - [IN] logfile name (regular expression with a path)    *
  *     mtime          - [IN] last modification time of the file               *
  *     logfiles       - [IN/OUT] pointer to the list of logfiles              *
@@ -1280,13 +1280,13 @@ clean:
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static int	make_logfile_list(int is_logrt, const char *filename, const int *mtime, struct st_logfile **logfiles,
-		int *logfiles_alloc, int *logfiles_num, int *use_ino, char **err_msg)
+static int	make_logfile_list(unsigned char flags, const char *filename, const int *mtime,
+		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, int *use_ino, char **err_msg)
 {
 	int		ret = SUCCEED, i;
 	zbx_stat_t	file_buf;
 
-	if (0 == is_logrt)	/* log[] item */
+	if (0 != (ZBX_METRIC_FLAG_LOG_LOG & flags))	/* log[] item */
 	{
 		if (0 != zbx_stat(filename, &file_buf))
 		{
@@ -1315,7 +1315,7 @@ static int	make_logfile_list(int is_logrt, const char *filename, const int *mtim
 		*use_ino = 1;
 #endif
 	}
-	else	/* logrt[] item */
+	else if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags))	/* logrt[] item */
 	{
 		char	*directory = NULL, *format = NULL;
 		int	reg_error;
@@ -1380,6 +1380,8 @@ clean1:
 		if (FAIL == ret)
 			goto clean;
 	}
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
 
 	/* Fill in MD5 sums and file indexes in the logfile list. */
 	/* These operations require opening of file, therefore we group them together. */
@@ -1432,7 +1434,7 @@ clean:
  * Purpose: Find new records in logfiles                                      *
  *                                                                            *
  * Parameters:                                                                *
- *     is_logrt         - [IN] Item type: 0 - log[], 1 - logrt[]              *
+ *     flags            - [IN] metric flags to check item type: log or logrt  *
  *     filename         - [IN] logfile name (regular expression with a path)  *
  *     lastlogsize      - [IN/OUT] offset from the beginning of the file      *
  *     mtime            - [IN/OUT] last modification time of the file         *
@@ -1478,7 +1480,7 @@ clean:
  * Author: Dmitry Borovikov (logrotation)                                     *
  *                                                                            *
  ******************************************************************************/
-int	process_logrt(int is_logrt, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
+int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int *logfiles_num_old,
 		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
@@ -1493,7 +1495,7 @@ int	process_logrt(int is_logrt, const char *filename, zbx_uint64_t *lastlogsize,
 	time_t			now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() is_logrt:%d filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
-			__function_name, is_logrt, filename, *lastlogsize, *mtime);
+			__function_name, (ZBX_METRIC_FLAG_LOG_LOGRT & flags), filename, *lastlogsize, *mtime);
 
 	/* Minimize data loss if the system clock has been set back in time. */
 	/* Setting the clock ahead of time is harmless in our case. */
@@ -1508,7 +1510,7 @@ int	process_logrt(int is_logrt, const char *filename, zbx_uint64_t *lastlogsize,
 				"seconds back.", (int)(old_mtime - now));
 	}
 
-	if (SUCCEED != make_logfile_list(is_logrt, filename, mtime, &logfiles, &logfiles_alloc, &logfiles_num, use_ino,
+	if (SUCCEED != make_logfile_list(flags, filename, mtime, &logfiles, &logfiles_alloc, &logfiles_num, use_ino,
 			err_msg))
 	{
 		/* an error occurred or a file was not accessible for a log[] item */
@@ -1642,10 +1644,11 @@ int	process_logrt(int is_logrt, const char *filename, zbx_uint64_t *lastlogsize,
 			if (start_idx != i)
 				*lastlogsize = logfiles[i].processed_size;
 
-			ret = process_log(logfiles[i].filename, lastlogsize, (1 == is_logrt ? mtime : NULL),
-					lastlogsize_sent, (1 == is_logrt ? mtime_sent : NULL), skip_old_data, big_rec,
-					&logfiles[i].incomplete, err_msg, encoding, regexps, pattern, output_template,
-					p_count, s_count, process_value, server, port, hostname, key);
+			ret = process_log(flags, logfiles[i].filename, lastlogsize,
+					(0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) ? mtime : NULL), lastlogsize_sent,
+					(0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) ? mtime_sent : NULL), skip_old_data,
+					big_rec, &logfiles[i].incomplete, err_msg, encoding, regexps, pattern,
+					output_template, p_count, s_count, process_value, server, port, hostname, key);
 
 			/* process_log() advances 'lastlogsize' only on success therefore */
 			/* we do not check for errors here */
@@ -1749,11 +1752,11 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	}
 }
 
-static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec, int *incomplete, char **err_msg,
-		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
-		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
-		unsigned short port, const char *hostname, const char *key, zbx_uint64_t *lastlogsize_sent,
-		int *mtime_sent)
+static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec,
+		int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
+		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
+		const char *server, unsigned short port, const char *hostname, const char *key,
+		zbx_uint64_t *lastlogsize_sent, int *mtime_sent)
 {
 	ZBX_THREAD_LOCAL static char	*buf = NULL;
 
@@ -1863,8 +1866,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 					{
 						send_err = process_value(server, port, hostname, key, item_value,
 								ITEM_STATE_NORMAL, &lastlogsize1, mtime, NULL, NULL,
-								NULL, NULL, ZBX_BUFFER_ELEMENT_PERSISTENT |
-								ZBX_BUFFER_ELEMENT_LOG);
+								NULL, NULL, flags | ZBX_METRIC_FLAG_PERSISTENT);
 
 						zbx_free(item_value);
 
@@ -1932,8 +1934,7 @@ static int	zbx_read2(int fd, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec
 					{
 						send_err = process_value(server, port, hostname, key, item_value,
 								ITEM_STATE_NORMAL, &lastlogsize1, mtime, NULL, NULL,
-								NULL, NULL, ZBX_BUFFER_ELEMENT_PERSISTENT |
-								ZBX_BUFFER_ELEMENT_LOG);
+								NULL, NULL, flags | ZBX_METRIC_FLAG_PERSISTENT);
 
 						zbx_free(item_value);
 
@@ -2002,6 +2003,7 @@ out:
  *          records to Zabbix server                                          *
  *                                                                            *
  * Parameters:                                                                *
+ *     flags           - [IN] metric flags to check item type: log or logrt   *
  *     filename        - [IN] logfile name                                    *
  *     lastlogsize     - [IN/OUT] offset from the beginning of the file       *
  *     mtime           - [IN] file modification time for reporting to server  *
@@ -2048,11 +2050,11 @@ out:
  *           This function does not deal with log file rotation.              *
  *                                                                            *
  ******************************************************************************/
-int	process_log(const char *filename, zbx_uint64_t *lastlogsize, int *mtime, zbx_uint64_t *lastlogsize_sent,
-		int *mtime_sent, unsigned char *skip_old_data, int *big_rec, int *incomplete, char **err_msg,
-		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
-		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
-		unsigned short port, const char *hostname, const char *key)
+int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
+		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
+		int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
+		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
+		const char *server, unsigned short port, const char *hostname, const char *key)
 {
 	const char	*__function_name = "process_log";
 
@@ -2104,7 +2106,7 @@ int	process_log(const char *filename, zbx_uint64_t *lastlogsize, int *mtime, zbx
 		*lastlogsize = l_size;
 		*skip_old_data = 0;
 
-		ret = zbx_read2(f, lastlogsize, mtime, big_rec, incomplete, err_msg, encoding, regexps, pattern,
+		ret = zbx_read2(f, flags, lastlogsize, mtime, big_rec, incomplete, err_msg, encoding, regexps, pattern,
 				output_template, p_count, s_count, process_value, server, port, hostname, key,
 				lastlogsize_sent, mtime_sent);
 	}

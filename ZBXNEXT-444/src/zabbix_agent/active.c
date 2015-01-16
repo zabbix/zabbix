@@ -170,8 +170,7 @@ static int	get_min_nextcheck(void)
 	return min;
 }
 
-static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime,
-		unsigned char state)
+static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime)
 {
 	const char		*__function_name = "add_check";
 	ZBX_ACTIVE_METRIC	*metric;
@@ -195,7 +194,6 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			metric->key = zbx_strdup(NULL, key);
 			metric->lastlogsize = lastlogsize;
 			metric->mtime = mtime;
-			metric->state = state;
 			metric->big_rec = 0;
 			metric->use_ino = 0;
 			metric->error_count = 0;
@@ -235,7 +233,6 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	metric->refresh_unsupported = 0;
 	metric->lastlogsize = lastlogsize;
 	metric->mtime = mtime;
-	metric->state = state;
 	/* existing log[] and eventlog[] data can be skipped */
 	metric->skip_old_data = (0 != metric->lastlogsize ? 0 : 1);
 	metric->big_rec = 0;
@@ -243,6 +240,14 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	metric->error_count = 0;
 	metric->logfiles_num = 0;
 	metric->logfiles = NULL;
+	metric->flags = ZBX_METRIC_FLAG_NEW;
+
+	if (0 == strncmp(metric->key, "log[", 4))
+		metric->flags |= ZBX_METRIC_FLAG_LOG | ZBX_METRIC_FLAG_LOG_LOG;
+	else if (0 == strncmp(metric->key, "logrt[", 6))
+		metric->flags |= ZBX_METRIC_FLAG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT;
+	else if (0 == strncmp(metric->key, "eventlog[", 9))
+		metric->flags |= ZBX_METRIC_FLAG_LOG | ZBX_METRIC_FLAG_LOG_EVENTLOG;
 
 	zbx_vector_ptr_append(&active_metrics, metric);
 out:
@@ -283,7 +288,6 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	ZBX_ACTIVE_METRIC	*metric;
 	zbx_vector_str_t	received_metrics;
 	int			delay, mtime, expression_type, case_sensitive, i, j, ret = FAIL;
-	unsigned char		state;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -362,12 +366,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		else
 			mtime = atoi(tmp);
 
-		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATE, tmp, sizeof(tmp)) || '\0' == *tmp)
-			state = 0;
-		else
-			state = atoi(tmp);
-
-		add_check(name, key_orig, delay, lastlogsize, mtime, state);
+		add_check(name, key_orig, delay, lastlogsize, mtime);
 
 		/* remember what was received */
 		zbx_vector_str_append(&received_metrics, zbx_strdup(NULL, key_orig));
@@ -698,7 +697,7 @@ static int	send_buffer(const char *host, unsigned short port)
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, el->value, ZBX_JSON_TYPE_STRING);
 		if (ITEM_STATE_NOTSUPPORTED == el->state)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_STATE, ITEM_STATE_NOTSUPPORTED);
-		if (0 != (ITEM_VALUE_TYPE_LOG & el->flags))
+		if (0 != (ZBX_METRIC_FLAG_LOG & el->flags))
 		{
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, el->lastlogsize);
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, el->mtime);
@@ -810,7 +809,7 @@ ret:
  *             logeventid  - the application-specific identifier for          *
  *                           the event; used for monitoring of Windows        *
  *                           event logs                                       *
- *             flags       - element flags                                    *
+ *             flags       - metric flags                                     *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
@@ -839,7 +838,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 
 	send_buffer(server, port);
 
-	if (0 != (ZBX_BUFFER_ELEMENT_PERSISTENT & flags) && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
+	if (0 != (ZBX_METRIC_FLAG_PERSISTENT & flags) && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "buffer is full, cannot store persistent value");
 		goto out;
@@ -853,7 +852,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 	}
 	else
 	{
-		if (0 == (ZBX_BUFFER_ELEMENT_PERSISTENT & flags))
+		if (0 == (ZBX_METRIC_FLAG_PERSISTENT & flags))
 		{
 			for (i = 0; i < buffer.count; i++)
 			{
@@ -863,12 +862,12 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 			}
 		}
 
-		if (0 != (ZBX_BUFFER_ELEMENT_PERSISTENT & flags) || i == buffer.count)
+		if (0 != (ZBX_METRIC_FLAG_PERSISTENT & flags) || i == buffer.count)
 		{
 			for (i = 0; i < buffer.count; i++)
 			{
 				el = &buffer.data[i];
-				if (0 == (ZBX_BUFFER_ELEMENT_PERSISTENT & el->flags))
+				if (0 == (ZBX_METRIC_FLAG_PERSISTENT & el->flags))
 					break;
 			}
 		}
@@ -911,7 +910,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 	zbx_timespec(&el->ts);
 	el->flags = flags;
 
-	if (0 != (ZBX_BUFFER_ELEMENT_PERSISTENT & flags))
+	if (0 != (ZBX_METRIC_FLAG_PERSISTENT & flags))
 		buffer.pcount++;
 
 	ret = SUCCEED;
@@ -921,22 +920,30 @@ out:
 	return ret;
 }
 
+/* lastlogsize_last and mtime_last are ignored for all but the first check */
 static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
-		unsigned char old_state)
+		unsigned char old_state, zbx_uint64_t lastlogsize_last, int mtime_last)
 {
-	if (lastlogsize_sent != metric->lastlogsize || mtime_sent != metric->mtime || old_state != metric->state)
+	if (0 != (ZBX_METRIC_FLAG_LOG & metric->flags))
 	{
-		/* needs meta information update */
-		return SUCCEED;
+		/* meta information update is needed if:                               */
+		/* - lastlogsize or mtime changed since we last sent within this check */
+		/* - state changed from notsupported to normal                         */
+		/* - it's a new metric and nothing was sent during the ckeck           */
+		if (lastlogsize_sent != metric->lastlogsize || mtime_sent != metric->mtime ||
+				old_state != metric->state ||
+				(0 != (ZBX_METRIC_FLAG_NEW & metric->flags) &&
+						lastlogsize_last == lastlogsize_sent && mtime_last == mtime_sent))
+		{
+			/* needs meta information update */
+			return SUCCEED;
+		}
 	}
 
 	return FAIL;
 }
 
-#define ZBX_ACTIVE_CHECK_LOG	0
-#define ZBX_ACTIVE_CHECK_LOGRT	1
-
-static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric, int logtype,
+static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error)
 {
 	AGENT_REQUEST	request;
@@ -1013,7 +1020,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	/* do not flood local system if file grows too fast */
 	p_count = 4 * s_count;
 
-	ret = process_logrt(logtype, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
+	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			&metric->logfiles_num, encoding, &regexps, pattern, template, &p_count, &s_count, process_value,
 			server, port, CONFIG_HOSTNAME, metric->key_orig);
@@ -1205,8 +1212,8 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 				{
 					send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
 							ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, provider,
-							&severity, &logeventid, ZBX_BUFFER_ELEMENT_PERSISTENT |
-							ZBX_BUFFER_ELEMENT_LOG);
+							&severity, &logeventid,
+							metric->flags | ZBX_METRIC_FLAG_PERSISTENT);
 
 					if (SUCCEED == send_err)
 					{
@@ -1300,7 +1307,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 			{
 				send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
 						ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, source, &severity,
-						&logeventid, ZBX_BUFFER_ELEMENT_PERSISTENT | ZBX_BUFFER_ELEMENT_LOG);
+						&logeventid, metric->flags | ZBX_METRIC_FLAG_PERSISTENT);
 
 				if (SUCCEED == send_err)
 				{
@@ -1362,7 +1369,7 @@ static int	process_common_check(char *server, unsigned short port, ZBX_ACTIVE_ME
 		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", metric->key, *pvalue);
 
 		process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, *pvalue, ITEM_STATE_NORMAL, NULL, NULL,
-				NULL, NULL, NULL, NULL, 0);
+				NULL, NULL, NULL, NULL, metric->flags);
 	}
 out:
 	free_result(&result);
@@ -1382,12 +1389,18 @@ static void	process_active_checks(char *server, unsigned short port)
 
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
-		zbx_uint64_t		lastlogsize_sent;
-		int			mtime_sent;
+		zbx_uint64_t		lastlogsize_last = 0, lastlogsize_sent;
+		int			mtime_last = 0, mtime_sent;
 		ZBX_ACTIVE_METRIC	*metric;
-		unsigned char		flags = 0;
 
 		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+
+		if (0 != (ZBX_METRIC_FLAG_NEW & metric->flags))
+		{
+			/* for new metric we should at least send meta information update packet */
+			lastlogsize_last = metric->lastlogsize;
+			mtime_last = metric->mtime;
+		}
 
 		if (metric->nextcheck > now)
 			continue;
@@ -1398,23 +1411,10 @@ static void	process_active_checks(char *server, unsigned short port)
 		lastlogsize_sent = metric->lastlogsize;
 		mtime_sent = metric->mtime;
 
-		if (0 == strncmp(metric->key, "log[", 4))		/* log files without rotation */
-		{
-			flags |= ZBX_BUFFER_ELEMENT_LOG;
-			ret = process_log_check(server, port, metric, ZBX_ACTIVE_CHECK_LOG, &lastlogsize_sent,
-					&mtime_sent, &error);
-		}
-		else if (0 == strncmp(metric->key, "logrt[", 6))	/* log files with rotation */
-		{
-			flags |= ZBX_BUFFER_ELEMENT_LOG;
-			ret = process_log_check(server, port, metric, ZBX_ACTIVE_CHECK_LOGRT, &lastlogsize_sent,
-					&mtime_sent, &error);
-		}
-		else if (0 == strncmp(metric->key, "eventlog[", 9))	/* Windows eventlog */
-		{
-			flags |= ZBX_BUFFER_ELEMENT_LOG;
+		if (0 != (ZBX_METRIC_FLAG_LOG_LOG & metric->flags) || 0 != (ZBX_METRIC_FLAG_LOG_LOGRT & metric->flags))
+			ret = process_log_check(server, port, metric, &lastlogsize_sent, &mtime_sent, &error);
+		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))
 			ret = process_eventlog_check(server, port, metric, &lastlogsize_sent, &error);
-		}
 		else
 			ret = process_common_check(server, port, metric, &error);
 
@@ -1431,7 +1431,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", metric->key, perror);
 
 			process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
-					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, flags);
+					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, metric->flags);
 
 			zbx_free(error);
 		}
@@ -1441,19 +1441,26 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			old_state = metric->state;
 
-			if (ITEM_STATE_NOTSUPPORTED == metric->state && 0 == metric->error_count)
+			if (0 == metric->error_count)
 			{
-				/* item became supported */
-				metric->state = ITEM_STATE_NORMAL;
-				metric->refresh_unsupported = 0;
-			}
+				if (ITEM_STATE_NOTSUPPORTED == metric->state)
+				{
+					/* item became supported */
+					metric->state = ITEM_STATE_NORMAL;
+					metric->refresh_unsupported = 0;
+				}
 
-			if (0 != (flags & ZBX_BUFFER_ELEMENT_LOG) &&
-					SUCCEED == need_meta_update(metric, lastlogsize_sent, mtime_sent, old_state))
-			{
-				/* meta information update */
-				process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL, metric->state,
-						&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, flags);
+				if (SUCCEED == need_meta_update(metric, lastlogsize_sent, mtime_sent, old_state,
+						lastlogsize_last, mtime_last))
+				{
+					/* meta information update */
+					process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL,
+							metric->state, &metric->lastlogsize, &metric->mtime, NULL, NULL,
+							NULL, NULL, metric->flags);
+				}
+
+				/* remove "new metric" flag */
+				metric->flags &= ~ZBX_METRIC_FLAG_NEW;
 			}
 		}
 
