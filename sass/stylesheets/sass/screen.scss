@@ -195,14 +195,14 @@ span.arrow-up {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-bottom: 4px solid $link-color;
+	border-bottom: 4px solid $link-alt-color;
 }
 
 span.arrow-down {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-top: 4px solid $link-color;
+	border-top: 4px solid $link-alt-color;
 }
 
 %arrow {
@@ -285,6 +285,8 @@ table.list-table {
 	
 	thead th {
 		@include list-table-header;
+		height: 100%;
+		overflow: hidden;
 	    padding: 6px 5px 6px 5px;
 	    vertical-align: middle;
 	    border-bottom: 2px solid $table-hordivider-color;
@@ -292,11 +294,21 @@ table.list-table {
 	    color: $font-alt-color;
 
 	    a {
+	    	display: block;
 	    	color: $link-alt-color;
+	    	margin: -1em;
+	    	padding: 1em;
+	    	@include transition;
 
 	    	&:hover {
 	    		color: $link-alt-hover-color;
+	    		text-decoration: none;
+	    		background: lighten($primary-color, 55%)
 	    	}
+
+	    	& span {
+	    		margin: 0 0 0 5px;
+	    	}	    
 	    }
 	}
 
@@ -517,16 +529,24 @@ div.action-buttons {
 	color: $alert-green-color;
 }
 
-a.green {
-	color: $alert-green-color;
-}
-
 .red {
 	color: $alert-red-color;
 }
 
+.orange {
+	color: $alert-orange-color;
+}
+
+a.green {
+	@extend .green;
+}
+
 a.red {
-	color: $alert-red-color;
+	@extend .red;
+}
+
+a.orange {
+	@extend .orange;
 }
 
 .msg-good {
