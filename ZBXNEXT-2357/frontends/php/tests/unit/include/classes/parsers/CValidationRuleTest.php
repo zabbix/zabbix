@@ -140,10 +140,11 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					)
 				)
 			),
-			array('fatal|required', '',
+			array('fatal|required|json', '',
 				array(
 					'fatal' => true,
-					'required' => true
+					'required' => true,
+					'json' => true
 				)
 			),
 			array('  fatal |  required   | array_db host.name', '',
@@ -154,6 +155,11 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 						'table' => 'host',
 						'field' => 'name'
 					)
+				)
+			),
+			array('json', '',
+				array(
+					'json' => true
 				)
 			),
 			array('array_id', '',
