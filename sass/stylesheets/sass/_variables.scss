@@ -1,4 +1,4 @@
-// PRIMARY ELEMENT COLORS
+// MAIN ELEMENT COLORS
 $primary-color: #1e71ad; // Blue
 $secondary-color: #1e3d61; // Dark Blue 
 $body-bgcolor: #e9edf2; // Grey Blue
@@ -37,7 +37,7 @@ $form-transparent-color: transparent;
 $form-disabled-color: #c4c8cc; // Light Grey 
 $form-input-color: #c4c8cc; // Light Grey
 
-// ALERTS
+// ALERT COLORS
 $alert-green-color: #3a8a43; // Green
 $alert-green-bg-color: #dff0d8; // Light Green
 $alert-green-border-color: #d6e9c6; // Dark Green
@@ -64,10 +64,11 @@ $h2-line-height: 1.2em;
 
 $font-h3-size: 0.917em; // 11px
 
+$font-top-nav-size: 1.167em; // 14px
+
 $font-form-size: 1em; // Default 1em/12px 
 
 $font-transform: uppercase;
-
 
 
 // MIXINS
@@ -104,18 +105,12 @@ $font-transform: uppercase;
 	text-transform: $font-transform;
 }
 
+//CSS3
 @mixin list-table-shadow {
 	-webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
     -moz-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
 }
-
-@mixin inset-shadow {
-	-webkit-box-shadow: inset 0 1px 1px 0 rgba(0, 0, 0, 0.10);
-	-moz-box-shadow: inset 0 1px 1px 0 rgba(0, 0, 0, 0.10);
-	box-shadow: inset 0 1px 1px 0 rgba(0, 0, 0, 0.10);
-}
-
 
 @mixin border-radius {
 	-webkit-border-radius: 2px;
@@ -123,10 +118,22 @@ $font-transform: uppercase;
 	border-radius: 2px;
 }
 
-@mixin top-border-radius {
+@mixin border-top-radius {
 	-webkit-border-radius: 2px 2px 0 0;
 	-moz-border-radius: 2px 2px 0 0;
 	border-radius: 2px 2px 0 0;
+}
+
+@mixin border-left-radius {
+	-webkit-border-radius: 2px 0 0 2px;
+	-moz-border-radius: 2px 0 0 2px;
+	border-radius: 2px 0 0 2px;
+}
+
+@mixin border-right-radius {
+	-webkit-border-radius: 0 2px 2px 0;
+	-moz-border-radius: 0 2px 2px 0;
+	border-radius: 0 2px 2px 0;
 }
 
 @mixin transition {
