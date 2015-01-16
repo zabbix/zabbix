@@ -53,7 +53,7 @@ class CControllerDashboardView extends CController {
 			'favourite_graphs' => getFavouriteGraphs(),
 			'favourite_maps' => getFavouriteMaps(),
 			'favourite_screens' => getFavouriteScreens(),
-			'show_status_widget' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
+			'show_status_widget' => ($this->getUserType() == USER_TYPE_SUPER_ADMIN),
 			'show_discovery_widget' => (bool) $rules
 		);
 

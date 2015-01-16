@@ -101,7 +101,7 @@ class CControllerMapView extends CController {
 				'default' => $data['map']['severity_min'],
 				'mapId' => $data['sysmapid']
 			),
-			'severityMin' => getRequest('severity_min')
+			'severityMin' => $this->getInput('severity_min')
 		));
 		$data['severity_min'] = $data['pageFilter']->severityMin;
 

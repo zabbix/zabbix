@@ -24,10 +24,10 @@ class CControllerDiscoveryView extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'druleid' =>		'fatal|db drules.druleid',
-			'sort' =>			'fatal|in ip',
-			'sortorder' =>		'fatal|in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'fullscreen' =>		'fatal|in 0,1'
+			'druleid' =>	'db drules.druleid',
+			'sort' =>		'in ip',
+			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'fullscreen' =>	'in 0,1'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -46,8 +46,8 @@ class CControllerDiscoveryView extends CController {
 
 		if ($this->hasInput('druleid') && $this->getInput('druleid') != 0) {
 			$drules = API::DRule()->get(array(
-					'druleids' => $this->getInput('druleid'),
-					'output' => array()
+				'druleids' => $this->getInput('druleid'),
+				'output' => array()
 			));
 			if (!$drules) {
 				return false;
@@ -132,7 +132,8 @@ class CControllerDiscoveryView extends CController {
 					}
 					$key_ = ': '.$key_;
 				}
-				$serviceName = discovery_check_type2str($dservice['type']).discovery_port2str($dservice['type'], $dservice['port']).$key_;
+				$serviceName = discovery_check_type2str($dservice['type']).
+					discovery_port2str($dservice['type'], $dservice['port']).$key_;
 				$data['services'][$serviceName] = 1;
 			}
 			ksort($data['services']);
