@@ -184,16 +184,6 @@ class CNewValidator {
 					break;
 
 				/*
-				 * 'not_empty' => true
-				 */
-				case 'not_empty':
-					if (!array_key_exists($field, $this->input)) {
-						$this->addError($fatal, _s('Field "%1$s" is mandatory.', $field));
-						return false;
-					}
-					break;
-
-				/*
 				 * 'required' => true
 				 */
 				case 'required':

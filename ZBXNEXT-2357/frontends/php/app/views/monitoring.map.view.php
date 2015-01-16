@@ -21,13 +21,7 @@
 
 $mapWidget = new CWidget('hat_maps');
 
-if (count($data['maps']) == 0) {
-	$mapTable = new CTable(_('No maps found.'), 'map map-container');
-	$mapTable->setAttribute('style', 'margin-top: 4px;');
-
-	$icon = $fsIcon = null;
-}
-else {
+if ($data['maps']) {
 	$mapTable = new CTable(null, 'map map-container');
 	$mapTable->setAttribute('style', 'margin-top: 4px;');
 
@@ -70,15 +64,25 @@ else {
 	$imgMap->setMap($actionMap->getName());
 	$mapTable->addRow($imgMap);
 
-	$icon = get_icon('favourite', array(
-		'fav' => 'web.favorite.sysmapids',
-		'elname' => 'sysmapid',
-		'elid' => $data['sysmapid']
-	));
-	$fsIcon = get_icon('fullscreen', array('fullscreen' => $data['fullscreen']));
+	$icons = array(
+		get_icon('favourite', array(
+			'fav' => 'web.favorite.sysmapids',
+			'elname' => 'sysmapid',
+			'elid' => $data['sysmapid']
+		)),
+		'&nbsp'
+	);
+}
+else {
+	$mapTable = new CTable(_('No maps found.'), 'map map-container');
+	$mapTable->setAttribute('style', 'margin-top: 4px;');
+
+	$icons = array();
 }
 
+$icons[] = get_icon('fullscreen', array('fullscreen' => $data['fullscreen']));
+
 $mapWidget->addItem($mapTable);
-$mapWidget->addPageHeader(_('NETWORK MAPS'), array($icon, SPACE, $fsIcon));
+$mapWidget->addPageHeader(_('NETWORK MAPS'), $icons);
 
 $mapWidget->show();
