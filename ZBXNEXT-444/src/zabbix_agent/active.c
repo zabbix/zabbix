@@ -698,10 +698,9 @@ static int	send_buffer(const char *host, unsigned short port)
 		if (ITEM_STATE_NOTSUPPORTED == el->state)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_STATE, ITEM_STATE_NOTSUPPORTED);
 		if (0 != (ZBX_METRIC_FLAG_LOG & el->flags))
-		{
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, el->lastlogsize);
+		if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & el->flags))
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, el->mtime);
-		}
 		if (0 != el->timestamp)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, el->timestamp);
 		if (NULL != el->source)
