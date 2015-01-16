@@ -243,11 +243,11 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	metric->flags = ZBX_METRIC_FLAG_NEW;
 
 	if (0 == strncmp(metric->key, "log[", 4))
-		metric->flags |= ZBX_METRIC_FLAG_LOG | ZBX_METRIC_FLAG_LOG_LOG;
+		metric->flags |= ZBX_METRIC_FLAG_LOG_LOG;
 	else if (0 == strncmp(metric->key, "logrt[", 6))
-		metric->flags |= ZBX_METRIC_FLAG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT;
+		metric->flags |= ZBX_METRIC_FLAG_LOG_LOGRT;
 	else if (0 == strncmp(metric->key, "eventlog[", 9))
-		metric->flags |= ZBX_METRIC_FLAG_LOG | ZBX_METRIC_FLAG_LOG_EVENTLOG;
+		metric->flags |= ZBX_METRIC_FLAG_LOG_EVENTLOG;
 
 	zbx_vector_ptr_append(&active_metrics, metric);
 out:

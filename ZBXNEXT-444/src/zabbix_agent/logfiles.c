@@ -1773,9 +1773,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 						/* required. */
 
 	if (NULL == buf)
-	{
 		buf = zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
-	}
 
 	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
 
@@ -1843,7 +1841,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 					/* regexp now (our buffer length corresponds to what we can save in the */
 					/* database). */
 
-					char	*value = NULL;
+					char	*value;
 
 					buf[BUF_SIZE] = '\0';
 
@@ -1916,7 +1914,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 
 				if (0 == *big_rec)
 				{
-					char	*value = NULL;
+					char	*value;
 
 					*p_nl = '\0';
 

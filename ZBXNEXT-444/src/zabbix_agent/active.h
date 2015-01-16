@@ -68,10 +68,11 @@ extern int	CONFIG_LISTEN_PORT;
 /* NB! Next list must fit in unsigned char (see ZBX_ACTIVE_METRIC "flags" field below). */
 #define ZBX_METRIC_FLAG_PERSISTENT	0x01	/* do not overwrite old values when adding to the buffer */
 #define ZBX_METRIC_FLAG_NEW		0x02	/* new metric, just added */
-#define ZBX_METRIC_FLAG_LOG		0x04	/* item value type is log, one of the following: */
-#define ZBX_METRIC_FLAG_LOG_LOG		0x08	/* log[ */
-#define ZBX_METRIC_FLAG_LOG_LOGRT	0x10	/* logrt[ */
-#define ZBX_METRIC_FLAG_LOG_EVENTLOG	0x20	/* eventlog[ */
+#define ZBX_METRIC_FLAG_LOG_LOG		0x04	/* log[ */
+#define ZBX_METRIC_FLAG_LOG_LOGRT	0x08	/* logrt[ */
+#define ZBX_METRIC_FLAG_LOG_EVENTLOG	0x10	/* eventlog[ */
+#define ZBX_METRIC_FLAG_LOG			/* item value type is log, one of the above */	\
+		(ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT | ZBX_METRIC_FLAG_LOG_EVENTLOG)
 
 typedef struct
 {
