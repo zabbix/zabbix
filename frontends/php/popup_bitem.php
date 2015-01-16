@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,8 +101,6 @@ else {
 
 	$frmGItem = new CFormTable(_('New item for the graph'));
 	$frmGItem->setName('graph_item');
-	$frmGItem->addHelpIcon();
-
 	$frmGItem->addVar('dstfrm', $_REQUEST['dstfrm']);
 
 	$config	= getRequest('config', 1);
