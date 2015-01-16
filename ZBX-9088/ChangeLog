@@ -1,3 +1,22 @@
+Changes for 2.0.15rc1
+
+New features:
+
+Bug fixes:
+A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
+....I..... [ZBX-9168] fixed incorrect keys and added missing keys in the item key helper (Richlv)
+A......... [ZBX-9197] fixed PHP fatal error "Call to undefined function array_fill_keys()" in trigger.get method with PHP<5.2.0 (Sasha)
+.......P.. [ZBX-9195] fixed lastlogsize and mtime being updated on proxy for unsupported items; thanks to Yoshinori Komuro for patch (asaveljevs, Sasha)
+.......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
+........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
+........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.14
+
+2.0.14rc1 was released as 2.0.14 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.14rc1
 
 New features:
@@ -5,6 +24,7 @@ New features:
 A.F....... [ZBX-1357] updated Italian, Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8582] fixed SQL injection vulnerability in bar graphs (Ivo, Pavels)
 ..F....... [ZBX-5077] fixed percentile calculation formula and corrected accessed index, by which value is selected (arvids)
 ........S. [ZBX-8952] fixed bug where an action condition of matching parent templates of a trigger worked with only the first template (Juris)
 .D........ [ZBX-6542] updated description of HousekeepingFrequency parameter in the default server and proxy configuration files (Sasha)
@@ -1599,8 +1619,16 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.23rc1
+
+
+Changes for 1.8.22
+
+1.8.22rc1 was released as 1.8.22 without any changes
+
 Changes for 1.8.22rc1
 
+..F....... [ZBX-8582] fixed SQL injection vulnerability in bar graphs (Ivo, Pavels)
 ........S. [ZBX-8815] fixed adding of host groups to the host by discovery action (Sasha)
 ........S. [ZBX-8798] fixed evaluation of trigger expressions where a suffixed number is followed by a subtraction (asaveljevs)
 ...G...... [ZBX-8595] fixed incorrect event message when handling eventlog (dimir)
