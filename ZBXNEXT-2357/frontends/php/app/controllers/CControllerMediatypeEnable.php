@@ -48,7 +48,7 @@ class CControllerMediatypeEnable extends CController {
 	}
 
 	protected function doAction() {
-		$mediatypeids = getRequest('mediatypeids');
+		$mediatypeids = $this->getInput('mediatypeids');
 
 		foreach ($mediatypeids as $mediatypeid) {
 			$update[] = array(

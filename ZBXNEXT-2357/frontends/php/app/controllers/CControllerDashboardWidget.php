@@ -30,16 +30,15 @@ class CControllerDashboardWidget extends CController {
 		);
 
 		$fields = array(
-			'widget' =>			'fatal|in '.implode(',', $widgets).'|required',
-			'refreshrate' =>	'fatal|in 10,30,60,120,600,900',
-			'state' =>			'fatal|in 0,1'
+			'widget' =>			'fatal|required|in '.implode(',', $widgets),
+			'refreshrate' =>	'fatal         |in 10,30,60,120,600,900',
+			'state' =>			'fatal         |in 0,1'
 		);
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$data['main_block'] = '';
-			$this->setResponse(new CControllerResponseData($data));
+			$this->setResponse(new CControllerResponseData(array('main_block' => '')));
 		}
 
 		return $ret;
@@ -52,21 +51,22 @@ class CControllerDashboardWidget extends CController {
 	protected function doAction() {
 		$widget = $this->getInput('widget');
 
-		$data=array();
+		$data = array();
 
 		// refresh rate
 		if ($this->hasInput('refreshrate')) {
-				$refreshrate = getRequest('refreshrate');
+			$refreshrate = $this->getInput('refreshrate');
 
-				CProfile::update('web.dashboard.widget.'.$widget.'.rf_rate', $refreshrate, PROFILE_TYPE_INT);
+			CProfile::update('web.dashboard.widget.'.$widget.'.rf_rate', $refreshrate, PROFILE_TYPE_INT);
 
-				$data['main_block'] = 'PMasters["dashboard"].dolls["'.$widget.'"].frequency('.CJs::encodeJson($refreshrate).');'."\n"
-					.'PMasters["dashboard"].dolls["'.$widget.'"].restartDoll();';
-			}
+			$data['main_block'] =
+				'PMasters["dashboard"].dolls["'.$widget.'"].frequency('.CJs::encodeJson($refreshrate).');'."\n".
+				'PMasters["dashboard"].dolls["'.$widget.'"].restartDoll();';
+		}
 
 		// widget state
 		if ($this->hasInput('state')) {
-			CProfile::update('web.dashboard.widget.'.$widget.'.state', getRequest('state'), PROFILE_TYPE_INT);
+			CProfile::update('web.dashboard.widget.'.$widget.'.state', $this->getInput('state'), PROFILE_TYPE_INT);
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
