@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -622,25 +622,17 @@ static void	lld_items_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t
  * Return value: upon successful completion return pointer to the trigger     *
  *                                                                            *
  ******************************************************************************/
-static zbx_lld_trigger_t	*lld_trigger_get(zbx_lld_trigger_prototype_t *trigger_prototype,
-		zbx_hashset_t *items_triggers, zbx_vector_ptr_t *item_links)
+static zbx_lld_trigger_t	*lld_trigger_get(zbx_uint64_t parent_triggerid, zbx_hashset_t *items_triggers,
+		zbx_vector_ptr_t *item_links)
 {
-	int			i, index;
-	zbx_lld_item_link_t	*item_link;
-	zbx_lld_item_trigger_t	*item_trigger, item_trigger_local;
+	int	i;
 
-	for (i = 0; i < trigger_prototype->functions.values_num; i++)
+	for (i = 0; i < item_links->values_num; i++)
 	{
-		zbx_lld_function_t	*function = (zbx_lld_function_t *)trigger_prototype->functions.values[i];
+		zbx_lld_item_trigger_t	*item_trigger, item_trigger_local;
+		zbx_lld_item_link_t	*item_link = (zbx_lld_item_link_t *)item_links->values[i];
 
-		index = zbx_vector_ptr_bsearch(item_links, &function->itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-		if (FAIL == index)
-			continue;
-
-		item_link = (zbx_lld_item_link_t *)item_links->values[index];
-
-		item_trigger_local.parent_triggerid = trigger_prototype->triggerid;
+		item_trigger_local.parent_triggerid = parent_triggerid;
 		item_trigger_local.itemid = item_link->itemid;
 
 		if (NULL != (item_trigger = zbx_hashset_search(items_triggers, &item_trigger_local)))
@@ -900,7 +892,7 @@ static void 	lld_trigger_make(zbx_lld_trigger_prototype_t *trigger_prototype, zb
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	trigger = lld_trigger_get(trigger_prototype, items_triggers, &lld_row->item_links);
+	trigger = lld_trigger_get(trigger_prototype->triggerid, items_triggers, &lld_row->item_links);
 
 	expression = zbx_strdup(expression, trigger_prototype->expression);
 	if (SUCCEED != substitute_discovery_macros(&expression, jp_row, ZBX_MACRO_NUMERIC, err, sizeof(err)))
@@ -1070,7 +1062,7 @@ static void 	lld_trigger_dependency_make(zbx_lld_trigger_prototype_t *trigger_pr
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == (trigger = lld_trigger_get(trigger_prototype, items_triggers, &lld_row->item_links)))
+	if (NULL == (trigger = lld_trigger_get(trigger_prototype->triggerid, items_triggers, &lld_row->item_links)))
 		goto out;
 
 	for (i = 0; i < trigger_prototype->dependencies.values_num; i++)
@@ -1085,7 +1077,8 @@ static void 	lld_trigger_dependency_make(zbx_lld_trigger_prototype_t *trigger_pr
 
 			dep_trigger_prototype = (zbx_lld_trigger_prototype_t *)trigger_prototypes->values[index];
 
-			dep_trigger = lld_trigger_get(dep_trigger_prototype, items_triggers, &lld_row->item_links);
+			dep_trigger = lld_trigger_get(dep_trigger_prototype->triggerid, items_triggers,
+					&lld_row->item_links);
 
 			if (NULL != dep_trigger)
 			{

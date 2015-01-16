@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1475,7 +1475,7 @@ function getPagingLine(&$items) {
 		$currentPage = 1;
 	}
 
-	if ($itemsCount < (($currentPage - 1) * $rowsPerPage)) {
+	if ($currentPage > $pagesCount) {
 		$currentPage = $pagesCount;
 	}
 
@@ -1941,34 +1941,6 @@ function fatal_error($msg) {
 	require_once dirname(__FILE__).'/page_header.php';
 	show_error_message($msg);
 	require_once dirname(__FILE__).'/page_footer.php';
-}
-
-function get_tree_by_parentid($parentid, &$tree, $parent_field, $level = 0) {
-	if (empty($tree)) {
-		return $tree;
-	}
-
-	$level++;
-	if ($level > 32) {
-		return array();
-	}
-
-	$result = array();
-	if (isset($tree[$parentid])) {
-		$result[$parentid] = $tree[$parentid];
-	}
-
-	$tree_ids = array_keys($tree);
-
-	foreach ($tree_ids as $key => $id) {
-		$child = $tree[$id];
-		if (bccomp($child[$parent_field], $parentid) == 0) {
-			$result[$id] = $child;
-			$childs = get_tree_by_parentid($id, $tree, $parent_field, $level); // attention recursion !!!
-			$result += $childs;
-		}
-	}
-	return $result;
 }
 
 function parse_period($str) {
