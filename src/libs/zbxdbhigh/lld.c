@@ -159,6 +159,13 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 		if ('@' == *condition->regexp)
 		{
 			DCget_expressions_by_name(&condition->regexps, condition->regexp + 1);
+
+			if (0 == condition->regexps.values_num)
+			{
+				*error = zbx_dsprintf(*error, "Invalid regular expression: \"%s\"", condition->regexp);
+				DBfree_result(result);
+				goto out;
+			}
 		}
 		else
 		{
