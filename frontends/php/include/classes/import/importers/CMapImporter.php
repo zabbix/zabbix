@@ -47,7 +47,7 @@ class CMapImporter extends CImporter {
 			$mapId = $this->referencer->resolveMap($mapWithoutElements['name']);
 			if ($mapId !== false) {
 				// Update sysmapid in source map too
-				$maps[$mapName]['sysmapid'] = $mapWithoutElements['sysmapid'] = $mapId;
+				$maps[$mapName]['sysmapid'] = $mapId;
 				$mapsToProcess['updateExisting'][] = $mapWithoutElements;
 			}
 			else {
@@ -61,6 +61,7 @@ class CMapImporter extends CImporter {
 			foreach ($mapsToProcess['createMissing'] as $num => $map) {
 				$mapId = $newMapIds['sysmapids'][$num];
 				$this->referencer->addMapRef($map['name'], $mapId);
+
 				// Update sysmapid in source map too
 				$maps[$map['name']]['sysmapid'] = $mapId;
 			}
@@ -82,6 +83,7 @@ class CMapImporter extends CImporter {
 						'links' => $maps[$mapItem['name']]['links']
 					);
 					$map = $this->resolveMapReferences($map);
+
 					// We remove the map name so API does not make an update query to the database.
 					unset($map['name']);
 					$mapsToUpdate[] = $map;
@@ -145,8 +147,10 @@ class CMapImporter extends CImporter {
 			 * remove everything that was added before repeated map name.
 			 */
 			$checked = array_slice($checked, array_search($elementMapName, $checked));
+
 			// add repeated name to have nice loop like m1->m2->m3->m1
 			$checked[] = $elementMapName;
+
 			return $checked;
 		}
 		else {
@@ -182,6 +186,7 @@ class CMapImporter extends CImporter {
 			}
 		}
 		unset($map);
+
 		return $maps;
 	}
 
@@ -300,8 +305,9 @@ class CMapImporter extends CImporter {
 	 */
 	protected function resolveMapElementReferences(array $maps) {
 		foreach ($maps as &$map) {
-			if (isset($map['iconmap']) && isset($map['iconmap']['name'])) {
+			if ($map['iconmap']) {
 				$map['iconmapid'] = $this->referencer->resolveIconMap($map['iconmap']['name']);
+
 				if (!$map['iconmapid']) {
 					throw new Exception(_s('Cannot find icon map "%1$s" used in map "%2$s".',
 						$map['iconmap']['name'], $map['name']
@@ -309,7 +315,7 @@ class CMapImporter extends CImporter {
 				}
 			}
 
-			if (isset($map['background']) && isset($map['background']['name'])) {
+			if ($map['background']) {
 				$image = getImageByIdent($map['background']);
 
 				if (!$image) {
@@ -321,6 +327,7 @@ class CMapImporter extends CImporter {
 			}
 		}
 		unset($map);
+
 		return $maps;
 	}
 }
