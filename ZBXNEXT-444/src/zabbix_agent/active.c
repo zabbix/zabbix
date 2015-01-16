@@ -926,14 +926,14 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 {
 	if (0 != (ZBX_METRIC_FLAG_LOG & metric->flags))
 	{
-		/* meta information update is needed if:                               */
-		/* - lastlogsize or mtime changed since we last sent within this check */
-		/* - state changed from notsupported to normal                         */
-		/* - it's a new metric and nothing was sent during the check           */
+		/* meta information update is needed if:                                              */
+		/* - lastlogsize or mtime changed since we last sent within this check                */
+		/* - nothing was sent during this check and state changed from notsupported to normal */
+		/* - nothing was sent during this check and it's a new metric                         */
 		if (lastlogsize_sent != metric->lastlogsize || mtime_sent != metric->mtime ||
-				old_state != metric->state ||
-				(0 != (ZBX_METRIC_FLAG_NEW & metric->flags) &&
-						lastlogsize_last == lastlogsize_sent && mtime_last == mtime_sent))
+				(lastlogsize_last == lastlogsize_sent && mtime_last == mtime_sent &&
+						(old_state != metric->state ||
+						0 != (ZBX_METRIC_FLAG_NEW & metric->flags))))
 		{
 			/* needs meta information update */
 			return SUCCEED;
