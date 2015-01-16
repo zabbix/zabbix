@@ -75,13 +75,14 @@ extern int	CONFIG_LISTEN_PORT;
 
 typedef struct
 {
-	char			*key, *key_orig;
+	char			*key;
+	char			*key_orig;
 	zbx_uint64_t		lastlogsize;
 	int			refresh;
 	int			nextcheck;
-/* must be long for fseek() */
 	int			mtime;
 	unsigned char		skip_old_data;	/* for processing [event]log metrics */
+	unsigned char		flags;
 	unsigned char		state;
 	unsigned char		refresh_unsupported;	/* re-check notsupported item */
 	int			big_rec;	/* for logfile reading: 0 - normal record, 1 - long unfinished record */
@@ -89,7 +90,6 @@ typedef struct
 						/* 1 - use inodes (up to 64-bit) (various UNIX file systems, NTFS) */
 						/* 2 - use 128-bit FileID (currently only on ReFS) to identify files */
 						/* on a file system */
-	unsigned char		flags;
 	int			error_count;	/* number of file reading errors in consecutive checks */
 	int			logfiles_num;
 	struct st_logfile	*logfiles;	/* for handling of logfile rotation for logrt[] items */

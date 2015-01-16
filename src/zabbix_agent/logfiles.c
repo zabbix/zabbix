@@ -1495,7 +1495,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	time_t			now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() is_logrt:%d filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
-			__function_name, (ZBX_METRIC_FLAG_LOG_LOGRT & flags), filename, *lastlogsize, *mtime);
+			__function_name, ZBX_METRIC_FLAG_LOG_LOGRT & flags, filename, *lastlogsize, *mtime);
 
 	/* Minimize data loss if the system clock has been set back in time. */
 	/* Setting the clock ahead of time is harmless in our case. */
