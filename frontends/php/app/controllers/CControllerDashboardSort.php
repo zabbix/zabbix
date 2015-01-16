@@ -21,11 +21,58 @@
 class CControllerDashboardSort extends CController {
 	protected function checkInput() {
 		$fields = array(
-// Should be JSON validated
-			'grid' =>				'fatal'
+			'grid' =>	'fatal|required|json'
 		);
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			$widgets = array(
+				WIDGET_SYSTEM_STATUS, WIDGET_ZABBIX_STATUS, WIDGET_LAST_ISSUES, WIDGET_WEB_OVERVIEW,
+				WIDGET_DISCOVERY_STATUS, WIDGET_HOST_STATUS, WIDGET_FAVOURITE_GRAPHS, WIDGET_FAVOURITE_MAPS,
+				WIDGET_FAVOURITE_SCREENS
+			);
+
+			/*
+			 * {
+			 *     "0": {
+			 *         "0": "stszbx_widget",
+			 *         "1": "favgrph_widget",
+			 *         "2": "favscr_widget",
+			 *         "3": "favmap_widget"
+			 *     },
+			 *     "1": {
+			 *         "0": "lastiss_widget",
+			 *         "1": "webovr_widget",
+			 *         "2": "dscvry_widget"
+			 *     },
+			 *     "2": {
+			 *         "0": "syssum_widget",
+			 *         "1": "hoststat_widget"
+			 *     }
+			 * }
+			 */
+			foreach (CJs::decodeJson($this->getInput('grid')) as $col => $column) {
+				if (!CNewValidator::is_int($col) || $col < 0 || $col > 2 || !is_array($column)) {
+					$ret = false;
+					break;
+				}
+
+				foreach ($column as $row => $widgetName) {
+					if (!CNewValidator::is_int($row) || $row < 0 || !is_string($widgetName)) {
+						$ret = false;
+						break 2;
+					}
+
+					$widgetName = str_replace('_widget', '', $widgetName);
+
+					if (!in_array($widgetName, $widgets)) {
+						$ret = false;
+						break 2;
+					}
+				}
+			}
+		}
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -39,7 +86,7 @@ class CControllerDashboardSort extends CController {
 	}
 
 	protected function doAction() {
-		foreach (CJs::decodeJson(getRequest('grid')) as $col => $column) {
+		foreach (CJs::decodeJson($this->getInput('grid')) as $col => $column) {
 			foreach ($column as $row => $widgetName) {
 				$widgetName = str_replace('_widget', '', $widgetName);
 
@@ -48,7 +95,7 @@ class CControllerDashboardSort extends CController {
 			}
 		}
 
-		$data=array();
+		$data = array();
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

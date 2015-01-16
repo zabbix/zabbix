@@ -90,6 +90,18 @@ class CNewValidator {
 					}
 					break;
 
+				case 'json':
+					if (array_key_exists($field, $this->input)) {
+						if (!is_string($this->input[$field]) || !CJs::decodeJson($this->input[$field])) {
+							$this->addError($fatal,
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
+							);
+							return false;
+						}
+					}
+					break;
+
 				/*
 				 * 'in' => array(<values)
 				 */
@@ -246,7 +258,7 @@ class CNewValidator {
 		return (bccomp($value, '0') >= 0 && bccomp($value, '9223372036854775807') <= 0);
 	}
 
-	private function is_int($value) {
+	public static function is_int($value) {
 		if (1 != preg_match('/^\-?[0-9]+$/', $value)) {
 			return false;
 		}

@@ -24,6 +24,7 @@ class CControllerDashboardView extends CController {
 
 	protected function checkInput() {
 		$fields = array(
+			'fullscreen' =>	'in 0,1'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -40,11 +41,20 @@ class CControllerDashboardView extends CController {
 	}
 
 	protected function doAction() {
+		$rules = API::DRule()->get(array(
+			'output' => array(),
+			'filter' => array('status' => DRULE_STATUS_ACTIVE),
+			'limit' => 1
+		));
+
 		$data = array(
+			'fullscreen' => $this->getInput('fullscreen', 0),
 			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
 			'favourite_graphs' => getFavouriteGraphs(),
 			'favourite_maps' => getFavouriteMaps(),
-			'favourite_screens' => getFavouriteScreens()
+			'favourite_screens' => getFavouriteScreens(),
+			'show_status_widget' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
+			'show_discovery_widget' => (bool) $rules
 		);
 
 		$response = new CControllerResponseData($data);

@@ -32,8 +32,8 @@ $icon->addAction('onclick', 'document.location = "dashconf.php";');
 $dashboardWidget->addHeader(_('PERSONAL DASHBOARD'), array(
 	$icon,
 	SPACE,
-	get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))))
-);
+	get_icon('fullscreen', array('fullscreen' => $data['fullscreen']))
+));
 
 /*
  * Dashboard grid
@@ -93,7 +93,7 @@ $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.row', 1)
 $dashboardGrid[$col][$row] = $favouriteScreens;
 
 // status of Zabbix
-if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+if ($data['show_status_widget']) {
 	$rate = CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.rf_rate', 60);
 
 	$icon = new CIcon(_('Menu'), 'iconmenu');
@@ -210,13 +210,7 @@ $widgetRefreshParams[WIDGET_WEB_OVERVIEW] = array(
 );
 
 // discovery rules
-$dbDiscoveryRules = DBfetch(DBselect(
-	'SELECT COUNT(d.druleid) AS cnt'.
-	' FROM drules d'.
-	' WHERE d.status='.DRULE_STATUS_ACTIVE
-));
-
-if ($dbDiscoveryRules['cnt'] > 0 && check_right_on_discovery()) {
+if ($data['show_discovery_widget']) {
 	$rate = CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.rf_rate', 60);
 
 	$icon = new CIcon(_('Menu'), 'iconmenu');
