@@ -83,6 +83,9 @@ typedef struct
 #elif defined(HAVE_OPENSSL)
 	SSL			*tls_ctx;
 #endif
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	int			connection_type;
+#endif
 	int			timeout;
 	zbx_buf_type_t		buf_type;
 	unsigned char		accepted;
@@ -123,7 +126,7 @@ int	get_address_family(const char *addr, int *family, char *error, int max_error
 
 int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_port);
 
-int	zbx_tcp_accept(zbx_sock_t *s);
+int	zbx_tcp_accept(zbx_sock_t *s, int secure);
 void	zbx_tcp_unaccept(zbx_sock_t *s);
 
 void    zbx_tcp_free(zbx_sock_t *s);

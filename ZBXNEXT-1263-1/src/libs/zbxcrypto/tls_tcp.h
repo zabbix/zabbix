@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 #ifndef ZABBIX_TLS_TCP_H
 #define ZABBIX_TLS_TCP_H
 
-int	zbx_tls_connect(zbx_sock_t *s, char **error);
-int	zbx_tls_accept(zbx_sock_t *s, char **error);
+int	zbx_tls_connect(zbx_sock_t *s, char **error, int secure);
+int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure);
 void	zbx_tls_close(zbx_sock_t *s);
 
 #endif	/* ZABBIX_TLS_TCP_H */

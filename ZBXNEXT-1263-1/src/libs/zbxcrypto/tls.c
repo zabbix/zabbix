@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,18 +18,30 @@
 **/
 
 #include "common.h"
+#include "comms.h"
 #include "log.h"
 #include "tls.h"
+#include "tls_tcp.h"
 
 #if defined(HAVE_POLARSSL)
 #	include <polarssl/entropy.h>
 #	include <polarssl/ctr_drbg.h>
 #	include <polarssl/ssl.h>
 #	include <polarssl/error.h>
+#	include <polarssl/debug.h>
 #elif defined(HAVE_GNUTLS)
 #	include <gnutls/gnutls.h>
 #elif defined(HAVE_OPENSSL)
 #	include <openssl/ssl.h>
+#endif
+
+/* Currently use only TLS 1.2, which has number 3.3. In 2015 a new standard for TLS 1.3 is expected. */
+/* Then we might need to support both TLS 1.2 and 1.3 to work with older Zabbix agents. */
+#if defined(HAVE_POLARSSL)
+#	define ZBX_TLS_MIN_MAJOR_VER	SSL_MAJOR_VERSION_3
+#	define ZBX_TLS_MIN_MINOR_VER	SSL_MINOR_VERSION_3
+#	define ZBX_TLS_MAX_MAJOR_VER	SSL_MAJOR_VERSION_3
+#	define ZBX_TLS_MAX_MINOR_VER	SSL_MINOR_VERSION_3
 #endif
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -44,15 +56,19 @@ extern char	*CONFIG_TLS_PSK_IDENTITY;
 
 #if defined(HAVE_POLARSSL)
 static x509_crt		*ca_cert		= NULL;
-static x509_crt		*crl			= NULL;
+static x509_crl		*crl			= NULL;
 static x509_crt		*my_cert		= NULL;
 static pk_context	*my_priv_key		= NULL;
-static unsigned char	*my_psk			= NULL;
+static char		*my_psk			= NULL;
 static size_t		my_psk_len		= 0;
 static char		*my_psk_identity	= NULL;
+static size_t		my_psk_identity_len	= 0;
 static entropy_context	*entropy		= NULL;
 static ctr_drbg_context	*ctr_drbg		= NULL;
 static char		*err_msg		= NULL;
+static int		*ciphersuites_cert	= NULL;
+static int		*ciphersuites_psk	= NULL;
+static char		buf[SSL_MAX_CONTENT_LEN + 1];
 #endif
 
 #if defined(HAVE_POLARSSL)
@@ -93,7 +109,7 @@ static void	zbx_tls_make_personalization_string(char **pers, size_t *len)
  *     Parameter 'tls_ctx' is not used but cannot be removed because this is  *
  *     a callback function, its arguments are defined in PolarSSL.            *
  ******************************************************************************/
-static void	polarssl_debug(ssl_context *tls_ctx, int level, const char *str)
+static void	polarssl_debug(void *tls_ctx, int level, const char *str)
 {
 	char	msg[1024];	/* Apparently 1024 bytes is the longest message which can come from PolarSSL 1.3.9 */
 
@@ -119,6 +135,151 @@ static void	zbx_tls_error_msg(int error_code, const char *msg, char **error)
 
 	polarssl_strerror(error_code, err, sizeof(err));
 	*error = zbx_dsprintf(*error, "%s%s", msg, err);
+}
+#endif
+
+#if defined(HAVE_POLARSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_validate_config                                          *
+ *                                                                            *
+ * Purpose: check for allowed combinations of TLS configuration parameters    *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_tls_validate_config(void)
+{
+	/* either both a certificate and a private key must be defined or none of them */
+
+	if (NULL != my_cert && NULL == my_priv_key)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCertFile\" is defined but \"TLSKeyFile\" is"
+				" not defined");
+		goto out;
+	}
+
+	if (NULL == my_cert && NULL != my_priv_key)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSKeyFile\" is defined but \"TLSCertFile\" is"
+				" not defined");
+		goto out;
+	}
+
+	/* CA file or directory must be defined only together with a certificate */
+
+	if (NULL != my_cert && NULL == ca_cert)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCertFile\" is defined but neither \"TLSCaFile\""
+				" nor \"TLSCaPath\" is defined");
+		goto out;
+	}
+
+	if (NULL == my_cert && NULL != ca_cert)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCaFile\" or \"TLSCaPath\" is defined but "
+				"\"TLSCertFile\" and \"TLSKeyFile\" are not defined");
+		goto out;
+	}
+
+	/* CRL file must be defined only together with a certificate */
+	if (NULL == my_cert && NULL != crl)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCrlFile\" is defined but \"TLSCertFile\" and "
+				"\"TLSKeyFile\" are not defined");
+		goto out;
+	}
+
+	/* either both a PSK and a PSK-identity must be defined or none of them */
+
+	if (NULL != my_psk && NULL == my_psk_identity)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPskFile\" is defined but \"TLSPskIdentity\" is"
+				" not defined");
+		goto out;
+	}
+
+	if (NULL == my_psk && NULL != my_psk_identity)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPskIdentity\" is defined but \"TLSPskFile\" is"
+				" not defined");
+		goto out;
+	}
+
+	return;
+out:
+	zbx_tls_free();
+	exit(EXIT_FAILURE);
+}
+#endif
+
+#if defined(HAVE_POLARSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_is_ciphersuite_psk                                           *
+ *                                                                            *
+ * Purpose: does the specified ciphersuite ID refer to a PSK ciphersuite      *
+ *          supported for the specified TLS version range                     *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_is_ciphersuite_psk(const int *p)
+{
+	const ssl_ciphersuite_t	*info;
+
+	/* PolarSSL function ssl_ciphersuite_uses_psk() is not used here because it can be unavailable in some */
+	/* installations. */
+	if (NULL != (info = ssl_ciphersuite_from_id(*p)) &&
+			(POLARSSL_KEY_EXCHANGE_PSK == info->key_exchange ||
+			POLARSSL_KEY_EXCHANGE_DHE_PSK == info->key_exchange ||
+			POLARSSL_KEY_EXCHANGE_ECDHE_PSK == info->key_exchange ||
+			POLARSSL_KEY_EXCHANGE_RSA_PSK == info->key_exchange) &&
+			0 == (info->flags & POLARSSL_CIPHERSUITE_WEAK) &&
+			(ZBX_TLS_MIN_MAJOR_VER > info->min_major_ver ||
+			(ZBX_TLS_MIN_MAJOR_VER == info->min_major_ver &&
+			ZBX_TLS_MIN_MINOR_VER >= info->min_minor_ver)) &&
+			(ZBX_TLS_MAX_MAJOR_VER < info->max_major_ver ||
+			(ZBX_TLS_MAX_MAJOR_VER == info->max_major_ver &&
+			ZBX_TLS_MAX_MINOR_VER <= info->max_minor_ver)))
+	{
+		return SUCCEED;
+	}
+	else
+		return FAIL;
+}
+#endif
+
+#if defined(HAVE_POLARSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ciphersuites_psk                                             *
+ *                                                                            *
+ * Purpose: copy a list of ciphersuites for using with a PSK from a list of   *
+ *          all supported ciphersuites                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_ciphersuites_psk(int **suites_psk)
+{
+	const int		*supported_suites, *p;
+	int			*q;
+	unsigned int		count = 0;
+
+	supported_suites = ssl_list_ciphersuites();
+
+	/* count available relevant PSK-ciphersuites */
+	for (p = supported_suites; *p != 0; p++)
+	{
+		if (SUCCEED == zbx_is_ciphersuite_psk(p))
+			count++;
+	}
+
+	*suites_psk = zbx_malloc(*suites_psk, (count + 1) * sizeof(int));
+
+	/* copy the PSK-ciphersuites into array */
+	for (p = supported_suites, q = *suites_psk; *p != 0; p++)
+	{
+		if (SUCCEED == zbx_is_ciphersuite_psk(p))
+			*q++ = *p;
+	}
+
+	*q = 0;
 }
 #endif
 
@@ -185,8 +346,23 @@ int	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded CA certificate(s) from directory",
-				__function_name);
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			/* x509_crt_info() uses a fixed buffer and there is no way to know how large this buffer */
+			/* should be to accumulate all info. */
+			if (-1 != x509_crt_info(buf, sizeof(buf), "", ca_cert))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded CA certificate(s) from directory"
+						" (output may be truncated):\n%s", __function_name, buf);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot print CA certificate(s) info",
+						__function_name);
+				zbx_tls_free();
+				exit(EXIT_FAILURE);
+			}
+		}
 	}
 
 	/* load CA file if CA path is not configured */
@@ -214,16 +390,32 @@ int	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded CA certificate(s) from file", __function_name);
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			/* x509_crt_info() uses a fixed buffer and there is no way to know how large this buffer */
+			/* should be to accumulate all info. */
+			if (-1 != x509_crt_info(buf, sizeof(buf), "", ca_cert))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded CA certificate(s) from file "
+						"(output may be truncated):\n%s", __function_name, buf);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot print CA certificate(s) info",
+						__function_name);
+				zbx_tls_free();
+				exit(EXIT_FAILURE);
+			}
+		}
 	}
 
 	/* load CRL (certificate revocation list) file */
 	if (NULL != CONFIG_TLS_CRL_FILE && '\0' != *CONFIG_TLS_CRL_FILE)
 	{
-		crl = zbx_malloc(crl, sizeof(x509_crt));
-		x509_crt_init(crl);
+		crl = zbx_malloc(crl, sizeof(x509_crl));
+		x509_crl_init(crl);
 
-		if (0 != (res = x509_crt_parse_file(crl, CONFIG_TLS_CRL_FILE)))
+		if (0 != (res = x509_crl_parse_file(crl, CONFIG_TLS_CRL_FILE)))
 		{
 			if (0 > res)
 			{
@@ -242,7 +434,22 @@ int	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded CRL from file", __function_name);
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			/* x509_crl_info() uses a fixed buffer and there is no way to know how large this buffer */
+			/* should be to accumulate all info. */
+			if (-1 != x509_crl_info(buf, sizeof(buf), "", crl))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded CRL from file (output may be "
+						"truncated):\n%s", __function_name, buf);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot print CRL info", __function_name);
+				zbx_tls_free();
+				exit(EXIT_FAILURE);
+			}
+		}
 	}
 
 	/* load certificate */
@@ -270,7 +477,22 @@ int	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded certificate", __function_name);
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			/* x509_crt_info() uses a fixed buffer and there is no way to know how large this buffer */
+			/* should be to accumulate all info. */
+			if (-1 != x509_crt_info(buf, sizeof(buf), "", my_cert))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded certificate (output may be "
+						"truncated):\n%s", __function_name, buf);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot print certificate info", __function_name);
+				zbx_tls_free();
+				exit(EXIT_FAILURE);
+			}
+		}
 	}
 
 	/* load private key */
@@ -281,7 +503,7 @@ int	zbx_tls_init_child(void)
 
 		/* The 3rd argument of pk_parse_keyfile() is password for decrypting the private key. */
 		/* Currently the password is not used, it is empty. */
-		if (0 > (res = pk_parse_keyfile(my_priv_key, CONFIG_TLS_KEY_FILE, "")))
+		if (0 != (res = pk_parse_keyfile(my_priv_key, CONFIG_TLS_KEY_FILE, "")))
 		{
 			zbx_tls_error_msg(res, "", &err_msg);
 			zabbix_log(LOG_LEVEL_CRIT, "cannot parse the private key in file \"%s\": %s",
@@ -291,7 +513,8 @@ int	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded private key", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded %zu-bit %s private key", __function_name,
+				pk_get_size(my_priv_key), pk_get_name(my_priv_key));
 	}
 
 	/* load pre-shared key */
@@ -300,7 +523,7 @@ int	zbx_tls_init_child(void)
 		int	fd;
 		ssize_t	nbytes;
 
-		my_psk = zbx_malloc(my_psk, POLARSSL_PSK_MAX_LEN);
+		my_psk = zbx_malloc(my_psk, (size_t)POLARSSL_PSK_MAX_LEN);
 
 		if (-1 == (fd = zbx_open(CONFIG_TLS_PSK_FILE, O_RDONLY)))
 		{
@@ -342,16 +565,27 @@ int	zbx_tls_init_child(void)
 		/* configure identity to be used with the pre-shared key */
 		if (NULL != CONFIG_TLS_PSK_IDENTITY && '\0' != *CONFIG_TLS_PSK_IDENTITY)
 		{
-			/* TODO implement validation for PSK identity */
+			/* TODO implement validation for PSK identity (must be a valid UTF-8 string (RFC4279 says Unicode) */
 			my_psk_identity = CONFIG_TLS_PSK_IDENTITY;
+			my_psk_identity_len = strlen(my_psk_identity);
 		}
 	}
 
+	zbx_tls_validate_config();
+
+	/* TODO if (NULL != my_cert) */
+	/* TODO		zbx_ciphersuites_cert(&ciphersuites_cert); */
+
+	if (NULL != my_psk)
+		zbx_ciphersuites_psk(&ciphersuites_psk);
+
 	entropy = zbx_malloc(entropy, sizeof(entropy_context));
 	entropy_init(entropy);
+
 	zbx_tls_make_personalization_string(&pers, &pers_len);
 
 	ctr_drbg = zbx_malloc(ctr_drbg, sizeof(ctr_drbg_context));
+
 	if (0 != (res = ctr_drbg_init(ctr_drbg, entropy_func, entropy, (unsigned char *)pers, pers_len)))
 	{
 		zbx_tls_error_msg(res, "", &err_msg);
@@ -363,8 +597,6 @@ int	zbx_tls_init_child(void)
 
 	zbx_guaranteed_memset(pers, 0, pers_len);
 	zbx_free(pers);
-
-	/* TODO validate configuration parameters (allowed combinations etc.) */
 
 #elif defined(HAVE_GNUTLS)
 	if (GNUTLS_E_SUCCESS != gnutls_global_init())
@@ -408,6 +640,12 @@ int	zbx_tls_free(void)
 		zbx_free(entropy);
 	}
 
+	if (NULL != ciphersuites_psk)
+		zbx_free(ciphersuites_psk);
+
+	if (NULL != ciphersuites_cert)
+		zbx_free(ciphersuites_cert);
+
 	if (NULL != my_psk)
 	{
 		zbx_guaranteed_memset(my_psk, 0, my_psk_len);
@@ -429,7 +667,7 @@ int	zbx_tls_free(void)
 
 	if (NULL != crl)
 	{
-		x509_crt_free(crl);
+		x509_crl_free(crl);
 		zbx_free(crl);
 	}
 
@@ -447,4 +685,391 @@ int	zbx_tls_free(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_connect                                                  *
+ *                                                                            *
+ * Purpose: establish a TLS connection over an established TCP connection     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tls_connect(zbx_sock_t *s, char **error, int secure)
+{
+	const char	*__function_name = "zbx_tls_connect";
+	int		ret = FAIL, res;
+
+#if defined(HAVE_POLARSSL)
+	const x509_crt	*peer_cert;
+#endif
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+#if defined(HAVE_POLARSSL)
+	/* set up TLS context */
+
+	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(ssl_context));
+	memset(s->tls_ctx, 0, sizeof(ssl_context));
+
+	if (0 != (res = ssl_init(s->tls_ctx)))
+	{
+		zbx_tls_error_msg(res, "ssl_init(): ", error);
+		ssl_free(s->tls_ctx);
+		zbx_free(s->tls_ctx);
+		goto out;
+	}
+
+	ssl_set_endpoint(s->tls_ctx, SSL_IS_CLIENT);
+
+	/* Set RNG callback where to get random numbers from */
+	ssl_set_rng(s->tls_ctx, ctr_drbg_random, ctr_drbg);
+
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	{
+		/* Set our own debug function 'polarssl_debug()' as a callback function. The 3rd parameter of */
+		/* ssl_set_dbg() we set to NULL. During a calback, the 3rd parameter will be passed to our function */
+		/* 'polarssl_debug()' as the 1st parameter, but it will be ignored in 'polarssl_debug()'. */
+		ssl_set_dbg(s->tls_ctx, polarssl_debug, NULL);
+
+		/* For Zabbix LOG_LEVEL_TRACE, PolarSSL debug level 3 seems the best. Recompile with 4 (apparently */
+		/* the highest PolarSSL debug level) to dump also network raw bytes. */
+		debug_set_threshold(3);
+	}
+
+	/* Set callback functions for receiving and sending data via socket. */
+	/* For now use function provided bu PolarSSL. TODO: replace with our own functions if necessary. */
+	ssl_set_bio(s->tls_ctx, net_recv, &s->socket, net_send, &s->socket);
+
+	/* set protocol version to TLS 1.2 */
+	ssl_set_min_version(s->tls_ctx, ZBX_TLS_MIN_MAJOR_VER, ZBX_TLS_MIN_MINOR_VER);
+	ssl_set_max_version(s->tls_ctx, ZBX_TLS_MAX_MAJOR_VER, ZBX_TLS_MAX_MINOR_VER);
+
+	if (ZBX_TCP_SEC_TLS_CERT == secure)	/* use certificates */
+	{
+		ssl_set_authmode(s->tls_ctx, SSL_VERIFY_REQUIRED);
+
+		/* ssl_set_ciphersuites(s->tls_ctx, ciphersuites_cert); */	/* TODO Andris. */
+
+		/* set CA certificate and certificate revocation lists */
+		ssl_set_ca_chain(s->tls_ctx, ca_cert, crl, NULL);	/* TODO set the 4th argument to expected peer Common Name */
+
+		if (0 != (res = ssl_set_own_cert(s->tls_ctx, my_cert, my_priv_key)))
+		{
+			zbx_tls_error_msg(res, "ssl_set_own_cert(): ", error);
+			ssl_free(s->tls_ctx);
+			zbx_free(s->tls_ctx);
+			goto out;
+		}
+	}
+	else	/* use a pre-shared key */
+	{
+		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_psk);
+
+		if (0 != (res = ssl_set_psk(s->tls_ctx, (const unsigned char *)my_psk, my_psk_len,
+				(const unsigned char *)my_psk_identity, my_psk_identity_len)))
+		{
+			zbx_tls_error_msg(res, "ssl_set_psk(): ", error);
+			ssl_free(s->tls_ctx);
+			zbx_free(s->tls_ctx);
+			goto out;
+		}
+	}
+
+	while (0 != (res = ssl_handshake(s->tls_ctx)))
+	{
+		if (POLARSSL_ERR_NET_WANT_READ != res && POLARSSL_ERR_NET_WANT_WRITE != res)
+		{
+			zbx_tls_error_msg(res, "ssl_handshake(): ", error);
+			ssl_free(s->tls_ctx);
+			zbx_free(s->tls_ctx);
+			goto out;
+		}
+	}
+
+	if (ZBX_TCP_SEC_TLS_CERT == secure)
+	{
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			/* get peer certificate information for debug logging */
+			if (NULL == (peer_cert = ssl_get_peer_cert(s->tls_ctx)) || -1 == x509_crt_info(buf,
+					sizeof(buf), "", peer_cert))
+			{
+				*error = zbx_strdup(*error, "cannot get peer certificate info");
+				ssl_free(s->tls_ctx);
+				zbx_free(s->tls_ctx);
+				goto out;
+			}
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): peer certificate:\n%s", __function_name, buf);
+		}
+
+		/* TODO validate peer certificate */
+		if (0 != (res = ssl_get_verify_result(s->tls_ctx)))
+		{
+			int	k = 0;
+
+			*error = zbx_strdup(*error, "invalid peer certificate: ");
+
+			if (0 != (BADCERT_EXPIRED & res))
+			{
+				*error = zbx_strdcat(*error, "expired");
+				k++;
+			}
+
+			if (0 != (BADCERT_REVOKED & res))
+			{
+				if (0 != k)
+					*error = zbx_strdcat(*error, ", ");
+
+				*error = zbx_strdcat(*error, "revoked");
+				k++;
+			}
+
+			if (0 != (BADCERT_CN_MISMATCH & res))
+			{
+				if (0 != k)
+					*error = zbx_strdcat(*error, ", ");
+
+				*error = zbx_strdcat(*error, "Common Name mismatch");
+				k++;
+			}
+
+			if (0 != (BADCERT_NOT_TRUSTED & res))
+			{
+				if (0 != k)
+					*error = zbx_strdcat(*error, ", ");
+
+				*error = zbx_strdcat(*error, "self-signed or not signed by a trusted CA");
+			}
+
+			ssl_free(s->tls_ctx);
+			zbx_free(s->tls_ctx);
+			goto out;
+		}
+
+		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
+	}
+	else	/* pre-shared key */
+		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s)", __function_name,
+			ssl_get_version(s->tls_ctx), ssl_get_ciphersuite(s->tls_ctx));
+
+	return SUCCEED;
+out:
+#endif
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_accept                                                   *
+ *                                                                            *
+ * Purpose: establish a TLS connection over an accepted TCP connection        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure)
+{
+	const char		*__function_name = "zbx_tls_accept";
+	const ssl_ciphersuite_t	*info;
+	int			ret = FAIL, res;
+
+#if defined(HAVE_POLARSSL)
+	const x509_crt	*peer_cert;
+#endif
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+#if defined(HAVE_POLARSSL)
+	/* set up TLS context */
+
+	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(ssl_context));
+	memset(s->tls_ctx, 0, sizeof(ssl_context));
+
+	if (0 != (res = ssl_init(s->tls_ctx)))
+	{
+		zbx_tls_error_msg(res, "ssl_init(): ", error);
+		ssl_free(s->tls_ctx);
+		zbx_free(s->tls_ctx);
+		goto out;
+	}
+
+	ssl_set_endpoint(s->tls_ctx, SSL_IS_SERVER);
+
+	/* Set RNG callback where to get random numbers from */
+	ssl_set_rng(s->tls_ctx, ctr_drbg_random, ctr_drbg);
+
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	{
+		/* Set our own debug function 'polarssl_debug()' as a callback function. The 3rd parameter of */
+		/* ssl_set_dbg() we set to NULL. During a calback, the 3rd parameter will be passed to our function */
+		/* 'polarssl_debug()' as the 1st parameter, but it will be ignored in 'polarssl_debug()'. */
+		ssl_set_dbg(s->tls_ctx, polarssl_debug, NULL);
+
+		/* For Zabbix LOG_LEVEL_TRACE, PolarSSL debug level 3 seems the best. Recompile with 4 (apparently */
+		/* the highest PolarSSL debug level) to dump also network raw bytes. */
+		debug_set_threshold(3);
+	}
+
+	/* Set callback functions for receiving and sending data via socket. */
+	/* For now use function provided bu PolarSSL. TODO: replace with our own functions if necessary. */
+	ssl_set_bio(s->tls_ctx, net_recv, &s->socket, net_send, &s->socket);
+
+	/* set protocol version to TLS 1.2 */
+	ssl_set_min_version(s->tls_ctx, ZBX_TLS_MIN_MAJOR_VER, ZBX_TLS_MIN_MINOR_VER);
+	ssl_set_max_version(s->tls_ctx, ZBX_TLS_MAX_MAJOR_VER, ZBX_TLS_MAX_MINOR_VER);
+
+	if (0 != (ZBX_TCP_SEC_TLS_CERT & secure))	/* use certificates */
+	{
+		ssl_set_authmode(s->tls_ctx, SSL_VERIFY_REQUIRED);
+
+		/* set CA certificate and certificate revocation lists */
+		ssl_set_ca_chain(s->tls_ctx, ca_cert, crl, NULL);	/* TODO set the 4th argument to expected peer Common Name */
+
+		if (0 != (res = ssl_set_own_cert(s->tls_ctx, my_cert, my_priv_key)))
+		{
+			zbx_tls_error_msg(res, "ssl_set_own_cert(): ", error);
+			ssl_free(s->tls_ctx);
+			zbx_free(s->tls_ctx);
+			goto out;
+		}
+	}
+
+	if (0 != (ZBX_TCP_SEC_TLS_PSK & secure))	/* use a pre-shared key */
+	{
+		if (0 != (res = ssl_set_psk(s->tls_ctx, (const unsigned char *)my_psk, my_psk_len,
+				(const unsigned char *)my_psk_identity, my_psk_identity_len)))
+		{
+			zbx_tls_error_msg(res, "ssl_set_psk(): ", error);
+			ssl_free(s->tls_ctx);
+			zbx_free(s->tls_ctx);
+			goto out;
+		}
+	}
+
+	if (0 != (ZBX_TCP_SEC_TLS_CERT & secure) && 0 == (ZBX_TCP_SEC_TLS_PSK & secure))
+	{
+		; /* ssl_set_ciphersuites(s->tls_ctx, ciphersuites_cert);	*/ /* TODO Andris. */
+	}
+	else if (0 != (ZBX_TCP_SEC_TLS_PSK & secure) && 0 == (ZBX_TCP_SEC_TLS_CERT & secure))
+	{
+		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_psk);
+	}
+	else
+	{
+		; /* ssl_set_ciphersuites(s->tls_ctx, ciphersuites_cert ...+ ... ciphersuites_psk);*/ /* TODO Andris. */
+	}
+
+	while (0 != (res = ssl_handshake(s->tls_ctx)))
+	{
+		if (POLARSSL_ERR_NET_WANT_READ != res && POLARSSL_ERR_NET_WANT_WRITE != res)
+		{
+			zbx_tls_error_msg(res, "ssl_handshake(): ", error);
+			ssl_free(s->tls_ctx);
+			zbx_free(s->tls_ctx);
+			goto out;
+		}
+	}
+
+	if (ZBX_TCP_SEC_TLS_CERT == secure)
+	{
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			/* get peer certificate information for debug logging */
+			if (NULL == (peer_cert = ssl_get_peer_cert(s->tls_ctx)) || -1 == x509_crt_info(buf,
+					sizeof(buf), "", peer_cert))
+			{
+				*error = zbx_strdup(*error, "cannot get peer certificate info");
+				ssl_free(s->tls_ctx);
+				zbx_free(s->tls_ctx);
+				goto out;
+			}
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): peer certificate:\n%s", __function_name, buf);
+		}
+
+		/* TODO validate peer certificate */
+		if (0 != (res = ssl_get_verify_result(s->tls_ctx)))
+		{
+			int	k = 0;
+
+			*error = zbx_strdup(*error, "invalid peer certificate: ");
+
+			if (0 != (BADCERT_EXPIRED & res))
+			{
+				*error = zbx_strdcat(*error, "expired");
+				k++;
+			}
+
+			if (0 != (BADCERT_REVOKED & res))
+			{
+				if (0 != k)
+					*error = zbx_strdcat(*error, ", ");
+
+				*error = zbx_strdcat(*error, "revoked");
+				k++;
+			}
+
+			if (0 != (BADCERT_CN_MISMATCH & res))
+			{
+				if (0 != k)
+					*error = zbx_strdcat(*error, ", ");
+
+				*error = zbx_strdcat(*error, "Common Name mismatch");
+				k++;
+			}
+
+			if (0 != (BADCERT_NOT_TRUSTED & res))
+			{
+				if (0 != k)
+					*error = zbx_strdcat(*error, ", ");
+
+				*error = zbx_strdcat(*error, "self-signed or not signed by a trusted CA");
+			}
+
+			ssl_free(s->tls_ctx);
+			zbx_free(s->tls_ctx);
+			goto out;
+		}
+	}
+
+	/* Is this TLS conection using a certificate or a PSK ? */
+
+	info = ssl_ciphersuite_from_id(s->tls_ctx->session->ciphersuite);
+
+	if (POLARSSL_KEY_EXCHANGE_PSK == info->key_exchange || POLARSSL_KEY_EXCHANGE_DHE_PSK == info->key_exchange ||
+			POLARSSL_KEY_EXCHANGE_ECDHE_PSK == info->key_exchange ||
+			POLARSSL_KEY_EXCHANGE_RSA_PSK == info->key_exchange)
+	{
+		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
+	}
+	else
+		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s)", __function_name,
+			ssl_get_version(s->tls_ctx), ssl_get_ciphersuite(s->tls_ctx));
+
+	return SUCCEED;
+out:
+#endif
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_close                                                    *
+ *                                                                            *
+ * Purpose: close a TLS connection before closing a TCP socket                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tls_close(zbx_sock_t *s)
+{
+#if defined(HAVE_POLARSSL)
+	if (NULL != s->tls_ctx)
+	{
+		ssl_close_notify(s->tls_ctx);
+		ssl_free(s->tls_ctx);
+		zbx_free(s->tls_ctx);
+	}
+#endif
 }
