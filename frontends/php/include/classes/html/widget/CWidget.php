@@ -142,7 +142,7 @@ class CWidget {
 			$flicker_tab->addRow($thin_tab, 'textcolorstyles pointer');
 			$flicker_tab->addRow($div);
 
-			$widget[] = $flicker_tab;
+			$widget[] = new CDiv($flicker_tab, 'filter-container');
 		}
 /*
 		$div = new CDiv($this->body, 'w');

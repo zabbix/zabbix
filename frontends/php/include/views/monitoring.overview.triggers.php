@@ -18,20 +18,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 zbx_add_post_js('jqBlink.blink();');
 
 $overviewWidget = new CWidget();
+$overviewWidget->setTitle(_('Overview'));
 
 $typeComboBox = new CComboBox('type', $this->data['type'], 'submit()');
 $typeComboBox->addItem(SHOW_TRIGGERS, _('Triggers'));
 $typeComboBox->addItem(SHOW_DATA, _('Data'));
 
 $headerForm = new CForm('get');
-$headerForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()));
-$headerForm->addItem(array(SPACE, _('Type'), SPACE, $typeComboBox));
+$controls = new CList();
 
-$overviewWidget->addHeader(_('Overview'), $headerForm);
+$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+$controls->addItem(array(_('Type').SPACE, $typeComboBox));
 
 // hint table
 $hintTable = new CTableInfo(null, 'tableinfo tableinfo-overview-hint');
@@ -62,23 +62,18 @@ $help = new CIcon(null, 'iconhelp');
 $help->setHint($hintTable);
 
 // header right
-$overviewWidget->setTitle(_('Overview'));
-$overviewWidget->setControls(array(
-	get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])),
-	SPACE,
-	$help
-));
+$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
+$controls->addItem($help);
 
 // header left
 $styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit()');
 $styleComboBox->addItem(STYLE_TOP, _('Top'));
 $styleComboBox->addItem(STYLE_LEFT, _('Left'));
 
-$hostLocationForm = new CForm('get');
-$hostLocationForm->addVar('groupid', $this->data['groupid']);
-$hostLocationForm->additem(array(_('Hosts location'), SPACE, $styleComboBox));
+$controls->additem(array(_('Hosts location').SPACE, $styleComboBox));
 
-$overviewWidget->addHeader($hostLocationForm);
+$headerForm->addItem($controls);
+$overviewWidget->setControls($headerForm);
 
 // filter
 $filter = $this->data['filter'];

@@ -75,8 +75,8 @@ $r_form = new CForm('get');
 $r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 $controls = new CList();
-$controls->addItem(array(_('Group'), $pageFilter->getGroupsCB()));
-$controls->addItem(array(_('Host'), $pageFilter->getHostsCB()));
+$controls->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+$controls->addItem(array(_('Host').SPACE, $pageFilter->getHostsCB()));
 $controls->addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 
 $r_form->addItem($controls);
