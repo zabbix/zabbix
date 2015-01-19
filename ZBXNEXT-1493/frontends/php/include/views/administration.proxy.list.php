@@ -101,19 +101,15 @@ $proxyForm->addItem(array(
 	$this->data['paging'],
 	$proxyTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList(
-		'action',
-		'hosts',
-		array(
-			'proxy.massenable' => array('name' => _('Enable hosts'),
-				'confirm' => _('Enable hosts monitored by selected proxies?')
-			),
-			'proxy.massdisable' => array('name' => _('Disable hosts'),
-				'confirm' => _('Disable hosts monitored by selected proxies?')
-			),
-			'proxy.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected proxies?'))
-		)
-	))
+	get_table_header(new CActionButtonList('action', 'hosts', array(
+		'proxy.massenable' => array('name' => _('Enable hosts'),
+			'confirm' => _('Enable hosts monitored by selected proxies?')
+		),
+		'proxy.massdisable' => array('name' => _('Disable hosts'),
+			'confirm' => _('Disable hosts monitored by selected proxies?')
+		),
+		'proxy.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected proxies?'))
+	)))
 ));
 
 // append form to widget

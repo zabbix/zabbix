@@ -143,9 +143,7 @@ $discoveryForm->addItem(array(
 	$this->data['paging'],
 	$discoveryTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList(
-		'action',
-		'g_hostdruleid',
+	get_table_header(new CActionButtonList('action', 'g_hostdruleid',
 		array(
 			'discoveryrule.massenable' => array('name' => _('Enable'),
 				'confirm' =>_('Enable selected discovery rules?')

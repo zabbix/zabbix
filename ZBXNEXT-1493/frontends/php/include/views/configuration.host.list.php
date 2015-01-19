@@ -212,9 +212,7 @@ foreach ($data['hosts'] as $host) {
 	));
 }
 
-$form->addItem(array($data['paging'], $table, $data['paging'], get_table_header(new CActionButtonList(
-	'action',
-	'hosts',
+$form->addItem(array($data['paging'], $table, $data['paging'], get_table_header(new CActionButtonList('action', 'hosts',
 	array(
 		'host.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected hosts?')),
 		'host.massdisable' => array('name' => _('Disable'), 'confirm' =>  _('Disable selected hosts?')),

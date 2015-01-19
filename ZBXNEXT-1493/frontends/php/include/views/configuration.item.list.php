@@ -266,9 +266,7 @@ $itemForm->addItem(array(
 	$this->data['paging'],
 	$itemTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList(
-		'action',
-		'group_itemid',
+	get_table_header(new CActionButtonList('action', 'group_itemid',
 		array(
 			'item.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected items?')),
 			'item.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected items?')),

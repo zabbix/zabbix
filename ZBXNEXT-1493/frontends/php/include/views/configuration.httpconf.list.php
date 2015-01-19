@@ -142,9 +142,7 @@ $httpForm->addItem(array(
 	$this->data['paging'],
 	$httpTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList(
-		'action',
-		'group_httptestid',
+	get_table_header(new CActionButtonList('action', 'group_httptestid',
 		array(
 			'httptest.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')),
 			'httptest.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')),

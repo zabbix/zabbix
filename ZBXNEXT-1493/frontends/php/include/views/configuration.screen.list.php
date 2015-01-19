@@ -74,11 +74,7 @@ $screenForm->addItem(array(
 	$this->data['paging'],
 	$screenTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList(
-		'action',
-		'screens',
-		$buttonsArray
-	))
+	get_table_header(new CActionButtonList('action', 'screens', $buttonsArray))
 ));
 
 // append form to widget
