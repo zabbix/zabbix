@@ -46,8 +46,9 @@ class CControllerDiscoveryView extends CController {
 
 		if ($this->hasInput('druleid') && $this->getInput('druleid') != 0) {
 			$drules = API::DRule()->get(array(
-				'druleids' => $this->getInput('druleid'),
-				'output' => array()
+				'output' => array(),
+				'druleids' => array($this->getInput('druleid')),
+				'filter' => array('status' => DRULE_STATUS_ACTIVE)
 			));
 			if (!$drules) {
 				return false;
@@ -85,9 +86,9 @@ class CControllerDiscoveryView extends CController {
 
 			// discovery rules
 			$options = array(
-				'filter' => array('status' => DRULE_STATUS_ACTIVE),
+				'output' => API_OUTPUT_EXTEND,
 				'selectDHosts' => API_OUTPUT_EXTEND,
-				'output' => API_OUTPUT_EXTEND
+				'filter' => array('status' => DRULE_STATUS_ACTIVE)
 			);
 
 			if ($data['pageFilter']->druleid > 0) {
