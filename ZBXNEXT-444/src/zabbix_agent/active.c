@@ -920,6 +920,12 @@ out:
 static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
 		unsigned char old_state, zbx_uint64_t lastlogsize_last, int mtime_last)
 {
+	const char	*__function_name = "need_meta_update";
+
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
 	if (0 != (ZBX_METRIC_FLAG_LOG & metric->flags))
 	{
 		/* meta information update is needed if:                                              */
@@ -932,11 +938,14 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 						0 != (ZBX_METRIC_FLAG_NEW & metric->flags))))
 		{
 			/* needs meta information update */
-			return SUCCEED;
+			ret = SUCCEED;
+			goto out;
 		}
 	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return FAIL;
+	return ret;
 }
 
 static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric,
@@ -1385,8 +1394,8 @@ static void	process_active_checks(char *server, unsigned short port)
 
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
-		zbx_uint64_t		lastlogsize_last = 0, lastlogsize_sent;
-		int			mtime_last = 0, mtime_sent;
+		zbx_uint64_t		lastlogsize_last, lastlogsize_sent;
+		int			mtime_last, mtime_sent;
 		ZBX_ACTIVE_METRIC	*metric;
 
 		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
@@ -1397,12 +1406,9 @@ static void	process_active_checks(char *server, unsigned short port)
 		if (SUCCEED != metric_ready_to_process(metric))
 			continue;
 
-		if (0 != (ZBX_METRIC_FLAG_NEW & metric->flags))
-		{
-			/* for new metric we should at least send meta information update packet */
-			lastlogsize_last = metric->lastlogsize;
-			mtime_last = metric->mtime;
-		}
+		/* for meta information update we need to know if something was sent at all during the check */
+		lastlogsize_last = metric->lastlogsize;
+		mtime_last = metric->mtime;
 
 		lastlogsize_sent = metric->lastlogsize;
 		mtime_sent = metric->mtime;
