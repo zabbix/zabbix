@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-15 18:48+0200\n"
-"PO-Revision-Date: 2015-01-15 16:48+0300\n"
+"PO-Revision-Date: 2015-01-15 16:52+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1421333287.0\n"
+"X-POOTLE-MTIME: 1421333537.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -8007,12 +8007,12 @@ msgstr "Endereço IP inválido \"%1$s\": deverá ser um texto."
 #: include/classes/validators/CIPRangeValidator.php:72
 #, c-format
 msgid "Invalid IP address range \"%1$s\"."
-msgstr ""
+msgstr "Range de endereços IP inválido \"%1$s\"."
 
 #: include/classes/validators/CIPRangeValidator.php:56
 #, c-format
 msgid "Invalid IP address range \"%1$s\": must be a string."
-msgstr ""
+msgstr "Range de endereços IP inválido \"%1$s\": deverá ser um texto."
 
 #: include/classes/core/CJsonRpc.php:170
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -8635,7 +8635,7 @@ msgstr "Gráfico última hora"
 
 #: include/views/reports.toptriggers.php:67
 msgid "Last month"
-msgstr ""
+msgstr "Último mês"
 
 #: jsLoader.php:210
 msgid "Last month graph"
@@ -11485,7 +11485,7 @@ msgstr "O percentual P de um período T é > N"
 
 #: popup_trexpr.php:319
 msgid "Percentile P of a period T is NOT N"
-msgstr ""
+msgstr "Percentual P de um período T não é N"
 
 #: graphs.php:53 include/views/configuration.graph.edit.php:84
 msgid "Percentile line (left)"
@@ -12241,7 +12241,7 @@ msgstr "Tentar"
 
 #: include/classes/items/CHelpItems.php:909
 msgid "Return first column of the first row of the SQL query result."
-msgstr ""
+msgstr "Retorna a primeira coluna da primeira linha de uma consulta SQL."
 
 #: include/classes/items/CHelpItems.php:591
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
@@ -13060,7 +13060,7 @@ msgstr "Mostrar triggers inativas"
 
 #: include/views/configuration.httpconf.list.php:49
 msgid "Show disabled web scenarios"
-msgstr ""
+msgstr "Exibir cenários web inativos"
 
 #: include/profiles.inc.php:168
 #, c-format
@@ -13468,7 +13468,7 @@ msgstr "Duração do passo"
 
 #: include/views/configuration.httpconf.popup.php:103 popup_httpstep.php:24
 msgid "Step of web scenario"
-msgstr ""
+msgstr "Passo do cenário web"
 
 #: include/views/configuration.httpconf.popup.php:33
 #, c-format
@@ -14077,7 +14077,7 @@ msgstr "A transação não foi fechada. Abortando..."
 
 #: include/classes/items/CHelpItems.php:913
 msgid "Transform SQL query result into a JSON object for low-level discovery."
-msgstr ""
+msgstr "Transformar o resultado de uma consulta SQL em um objeto JSON para o processo de autobusca."
 
 #: include/classes/core/CJsonRpc.php:204
 msgid "Transport error."
@@ -14471,7 +14471,7 @@ msgstr "O tipo de informação deve ser \"Log\" para uma chave de log."
 
 #: include/classes/api/services/CItemGeneral.php:336
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
-msgstr ""
+msgstr "O tipo da informação precisa ser \"Inteiro sem sinal\" ou \"Numérico (fracionário)\" para itens agregados."
 
 #: include/forms.inc.php:898
 msgid "Types"
@@ -14975,7 +14975,7 @@ msgstr "Usuário incluído"
 
 #: include/views/configuration.httpconf.edit.php:92
 msgid "User agent string"
-msgstr ""
+msgstr "Mensagem do agente de usuário"
 
 #: include/views/administration.users.edit.php:316
 msgid "User can't change type for himself"
@@ -15545,7 +15545,7 @@ msgstr "Monitoramento web"
 #: httpconf.php:181 httpconf.php:318 httpconf.php:375 httpconf.php:426
 #: include/audit.inc.php:42 include/classes/api/services/CHttpTest.php:416
 msgid "Web scenario"
-msgstr ""
+msgstr "Cenário web"
 
 #: include/classes/api/managers/CHttpTestManager.php:385
 #: include/classes/api/managers/CHttpTestManager.php:393
@@ -15562,7 +15562,7 @@ msgstr "O cenário web \"%1$s\" já existe."
 
 #: httpconf.php:200
 msgid "Web scenario added"
-msgstr ""
+msgstr "Cenário web adicionado"
 
 #: httpconf.php:149 httpconf.php:448
 msgid "Web scenario deleted"
