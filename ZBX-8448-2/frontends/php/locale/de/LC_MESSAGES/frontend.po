@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-30 05:43+0200\n"
+"POT-Creation-Date: 2015-01-15 18:26+0200\n"
 "PO-Revision-Date: 2014-06-10 10:47+0300\n"
 "Last-Translator: flo <florian.koch1981@googlemail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1533,7 +1533,7 @@ msgstr "Trigger kann nicht von sich selbst abhängig sein."
 msgid "Cannot create discovery rule"
 msgstr "Kann Suchlauf nicht erstellen"
 
-#: api/classes/CHost.php:1186
+#: api/classes/CHost.php:1184
 msgid "Cannot create host group."
 msgstr "Kann Host-Gruppe nicht erstellen."
 
@@ -1621,7 +1621,7 @@ msgstr "Kann Gruppe nicht löschen"
 msgid "Cannot delete host"
 msgstr "Kann Host nicht löschen"
 
-#: api/classes/CHost.php:1197
+#: api/classes/CHost.php:1195
 msgid "Cannot delete host group."
 msgstr "Kann Host-Gruppe nicht löschen."
 
@@ -1641,7 +1641,7 @@ msgstr "Kann Symbolzuordnung nicht löschen"
 msgid "Cannot delete image"
 msgstr "Kann Bild nicht löschen"
 
-#: api/classes/CHost.php:1287
+#: api/classes/CHost.php:1285
 msgid "Cannot delete inventory."
 msgstr "Kann Inventar nicht löschen."
 
@@ -2142,7 +2142,7 @@ msgstr "Auslöserausdruck nicht einfügbar"
 msgid "Cannot insert user media."
 msgstr "Kann Benutzermedium nicht einfügen."
 
-#: api/classes/CHost.php:1265
+#: api/classes/CHost.php:1263
 msgid "Cannot link template"
 msgstr "Kann Vorlage nicht verbinden"
 
@@ -2154,7 +2154,7 @@ msgstr "Anmelden nicht möglich."
 msgid "Cannot logout."
 msgstr "Abmelden nicht möglich."
 
-#: api/classes/CHost.php:1094
+#: api/classes/CHost.php:1092
 msgid "Cannot mass update host name."
 msgstr "Massenänderung nicht möglich für Hostnamen."
 
@@ -2162,7 +2162,7 @@ msgstr "Massenänderung nicht möglich für Hostnamen."
 msgid "Cannot mass update template name"
 msgstr "Massenänderung nicht möglich für Vorlagennamen"
 
-#: api/classes/CHost.php:1084
+#: api/classes/CHost.php:1082
 msgid "Cannot mass update visible host name."
 msgstr "Massenänderung nicht möglich für sichtbare Hostnamen."
 
@@ -2250,7 +2250,7 @@ msgstr "Kann \"templateid\" nicht setzen für Tafel \"%1$s\"."
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Kann \"templateid\" nicht setzen für Auslöser-Prototypen \"%1$s\"."
 
-#: api/classes/CHost.php:671 api/classes/CHost.php:1139
+#: api/classes/CHost.php:671 api/classes/CHost.php:1137
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Kann Inventarfeld nicht setzen wegen deaktivierter Inventarfunktion."
 
@@ -2294,7 +2294,7 @@ msgstr "Kann Datenpunkte nicht trennen und leeren"
 msgid "Cannot unlink and clear triggers"
 msgstr "Kann Auslöser nicht trennen und leeren"
 
-#: api/classes/CHost.php:1256
+#: api/classes/CHost.php:1254
 msgid "Cannot unlink template"
 msgstr "Kann Vorlage nicht trennen"
 
@@ -2657,21 +2657,21 @@ msgstr "Prüfen Sie den Teil des Ausdrucks der bei \"%1$s\" beginnt."
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr "Prüft ob datei existiert. 0 - datei existiert nicht, 1 - datei existiert"
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr "Prüft ob der service verfügbar ist. 0 - service ist nicht verfügbar, 1 service ist verfügbar.Standarteinstellung: ip:127.0.0.1, port: standartport des services, Beispiel: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr ""
 
@@ -2698,8 +2698,8 @@ msgstr ""
 msgid "Checks"
 msgstr "Überprüfungen"
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr ""
 
@@ -4112,7 +4112,7 @@ msgstr "Gelöscht: Suchlauf \"%1$s\" auf \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Gelöscht: Diagramm \"%1$s\" auf \"%2$s\"."
 
-#: api/classes/CHost.php:1583
+#: api/classes/CHost.php:1581
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Gelöscht: Host \"%1$s\"."
@@ -4785,7 +4785,7 @@ msgstr "Leeres System."
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
 #: api/classes/CHostGroup.php:516 api/classes/CHostGroup.php:593
-#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1419
+#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1417
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
@@ -6119,7 +6119,7 @@ msgstr "Horizontale Ausrichtung"
 msgid "Host"
 msgstr "Host"
 
-#: api/classes/CHost.php:1107 api/classes/CTemplate.php:512
+#: api/classes/CHost.php:1105 api/classes/CTemplate.php:512
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Host \"%1$s\" existiert bereits."
@@ -6384,7 +6384,7 @@ msgstr "Subnetzmaske des Hosts"
 msgid "Host time"
 msgstr "Systemzeit"
 
-#: api/classes/CHost.php:982
+#: api/classes/CHost.php:980
 msgid "Host update failed."
 msgstr "Änderung des Hosts fehlgeschlagen."
 
@@ -7080,7 +7080,7 @@ msgstr ""
 msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Unzulässige Zeichen in System \"%1$s\"."
 
-#: api/classes/CHost.php:743 api/classes/CHost.php:1090
+#: api/classes/CHost.php:743 api/classes/CHost.php:1088
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Unzulässige Zeichen im Hostnamen \"%s\"."
@@ -7777,7 +7777,7 @@ msgstr "Ungültiger Name für Ansicht \"%s\" angegeben. Erlaubte Zeichen sind: \
 msgid "Inventory"
 msgstr "Inventar"
 
-#: api/classes/CHost.php:1306
+#: api/classes/CHost.php:1304
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr ""
@@ -9751,7 +9751,7 @@ msgstr ""
 msgid "No groups for host \"%s\"."
 msgstr "Keine Gruppen für Host \"%s\"."
 
-#: api/classes/CHost.php:1076
+#: api/classes/CHost.php:1074
 msgid "No groups for hosts."
 msgstr "Keine Gruppen für Hosts."
 
@@ -9764,7 +9764,7 @@ msgstr "Keine Gruppen für Vorlage"
 msgid "No groups for template \"%1$s\"."
 msgstr ""
 
-#: api/classes/CHost.php:1443
+#: api/classes/CHost.php:1441
 msgid "No host ID given."
 msgstr ""
 
@@ -9990,7 +9990,7 @@ msgstr "Keine Berechtigung zum Zugriff auf die Oberfläche."
 #: api/classes/CHostGroup.php:938 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
 #: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
-#: api/classes/CHost.php:716 api/classes/CHost.php:1806
+#: api/classes/CHost.php:716 api/classes/CHost.php:1804
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
 #: api/classes/CHttpTest.php:395 api/classes/CHttpTest.php:610
@@ -11142,8 +11142,8 @@ msgstr "Perzentilenstrich (links)"
 msgid "Percentile line (right)"
 msgstr "Perzentilenstrich (rechts)"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:351
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr ""
 
@@ -13349,7 +13349,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Vorlage"
 
-#: api/classes/CHost.php:1112 api/classes/CTemplate.php:508
+#: api/classes/CHost.php:1110 api/classes/CTemplate.php:508
 #, c-format
 msgid "Template \"%1$s\" already exists."
 msgstr "Vorlage \"%1$s\" existiert bereits."
@@ -15498,8 +15498,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Sie haben kein Ziel angegeben für das Operations-Kommando globales Skript \"%s\"."
 
 #: api/classes/CGraph.php:557 api/classes/CGraphPrototype.php:574
-#: api/classes/CHost.php:1013 api/classes/CHost.php:1070
-#: api/classes/CHost.php:1385 api/classes/CHttpTest.php:502
+#: api/classes/CHost.php:1011 api/classes/CHost.php:1068
+#: api/classes/CHost.php:1383 api/classes/CHttpTest.php:502
 #: api/classes/CMaintenance.php:537 api/classes/CMaintenance.php:644
 #: api/classes/CMaintenance.php:656 api/classes/CScript.php:300
 #: api/classes/CScript.php:397 api/classes/CScript.php:437

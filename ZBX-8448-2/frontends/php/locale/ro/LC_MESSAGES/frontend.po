@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-30 05:43+0200\n"
+"POT-Creation-Date: 2015-01-15 18:26+0200\n"
 "PO-Revision-Date: 2014-05-02 16:44+0300\n"
 "Last-Translator: altmir <rmircea@birotec.ro>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1530,7 +1530,7 @@ msgstr "Nu se poate crea dependință cu trigger-ul însuși."
 msgid "Cannot create discovery rule"
 msgstr "Nu se poate crea regula de detecție"
 
-#: api/classes/CHost.php:1186
+#: api/classes/CHost.php:1184
 msgid "Cannot create host group."
 msgstr "Nu se poate crea grupul de servere."
 
@@ -1618,7 +1618,7 @@ msgstr "Nu se poate șterge grupul"
 msgid "Cannot delete host"
 msgstr "Nu se poate șterge serverul"
 
-#: api/classes/CHost.php:1197
+#: api/classes/CHost.php:1195
 msgid "Cannot delete host group."
 msgstr "Nu se poate șterge grupul de servere."
 
@@ -1638,7 +1638,7 @@ msgstr "Nu se poate șterge maparea icon-ului"
 msgid "Cannot delete image"
 msgstr "Nu se poate șterge imaginea"
 
-#: api/classes/CHost.php:1287
+#: api/classes/CHost.php:1285
 msgid "Cannot delete inventory."
 msgstr "Nu se poate șterge inventarul."
 
@@ -2166,7 +2166,7 @@ msgstr "Nu se poate introduce expresia trigger"
 msgid "Cannot insert user media."
 msgstr "Nu se poate insera media utilizator."
 
-#: api/classes/CHost.php:1265
+#: api/classes/CHost.php:1263
 msgid "Cannot link template"
 msgstr "Nu se poate asocia șablonul"
 
@@ -2178,7 +2178,7 @@ msgstr "Nu se poate face autentificarea."
 msgid "Cannot logout."
 msgstr "Nu se poate face deconectarea."
 
-#: api/classes/CHost.php:1094
+#: api/classes/CHost.php:1092
 msgid "Cannot mass update host name."
 msgstr "Nu se poate face actualizare în masă a numelui serverului."
 
@@ -2186,7 +2186,7 @@ msgstr "Nu se poate face actualizare în masă a numelui serverului."
 msgid "Cannot mass update template name"
 msgstr "Nu se poate face actualizare în masă a numelui șablonului"
 
-#: api/classes/CHost.php:1084
+#: api/classes/CHost.php:1082
 msgid "Cannot mass update visible host name."
 msgstr "Nu se poate face actualizare în masă a numelui vizibil al serverului."
 
@@ -2274,7 +2274,7 @@ msgstr "Nu se poate seta \"templateid\" pentru ecranul \"%1$s\"."
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Nu se poate seta \"templateid\" pentru prototipul trigger-ului \"%1$s\"."
 
-#: api/classes/CHost.php:671 api/classes/CHost.php:1139
+#: api/classes/CHost.php:671 api/classes/CHost.php:1137
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Nu se pot seta câmpurile inventarului pentru un inventar dezactivat."
 
@@ -2318,7 +2318,7 @@ msgstr "Nu se pot deconecta și șterge elementele"
 msgid "Cannot unlink and clear triggers"
 msgstr "Nu se pot deconecta și șterge trigerii"
 
-#: api/classes/CHost.php:1256
+#: api/classes/CHost.php:1254
 msgid "Cannot unlink template"
 msgstr "Nu se poate deconecta șablonul"
 
@@ -2680,21 +2680,21 @@ msgstr "Verifică partea din expresie care începe de la \"%1$s\"."
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr "Verifică daca există fișierul. 0 - fișierul nu există, 1 - fișierul există"
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Verifică dacă serviciul este disponibil. 0 - serviciul este oprit, 1 - serviciul este în funcțiune. Dacă lipsește <ip>, IP sau nume DNS este luat din definiția serverului. Dacă lipsește <port>, se foloseș portul de service implicit. "
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr "Verifică dacă serviciul este disponibil. 0 - serviciul este oprit, 1 - serviciul este în funcțiune. Dacă lipsește ip-ul, se folosește 127.0.0.1. Dacă lipsește portul, se folosește portul de service implicit. Examplu: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used."
 msgstr "Verifică performanța serviciului \"service\". 0 - serviciul este oprit, sec - numărul de secunde petrecute pe conexiunea la serviciu. Dacă lipsește ip-ul, se folosește 127.0.0.1. Dacă lipsește numărul portului, se folosește portul de service implicit."
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Verifică performanța serviciului. 0 - serviciul este oprit, sec - numărul de secunde petrecute pe conexiunea la serviciu. Dacă lipsește <ip>, IP sau nume DNS se vor lua din definiția serverului. Dacă lipsește <port>, se folosește portul de service implicit."
 
@@ -2721,8 +2721,8 @@ msgstr "Verifică dacă este sposibila conectarea TCP la numărul serverului. 0 
 msgid "Checks"
 msgstr "Verificări"
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr "Verifică daca serviciul DNS este funcțional. 0 - DNS este oprit (serverul nu răspunde sau apare o eroare DNS), 1 - DNS funcționează."
 
@@ -4128,7 +4128,7 @@ msgstr "Ștergere: Regulă de detecție \"%1$s\" pe \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Ștergere: Elementul grafic \"%1$s\" pe \"%2$s\"."
 
-#: api/classes/CHost.php:1583
+#: api/classes/CHost.php:1581
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Ștergere: Server \"%1$s\"."
@@ -4796,7 +4796,7 @@ msgstr "Golire server."
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
 #: api/classes/CHostGroup.php:516 api/classes/CHostGroup.php:593
-#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1419
+#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1417
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
@@ -6122,7 +6122,7 @@ msgstr "Aliniere orizontală"
 msgid "Host"
 msgstr "Server"
 
-#: api/classes/CHost.php:1107 api/classes/CTemplate.php:512
+#: api/classes/CHost.php:1105 api/classes/CTemplate.php:512
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Serverul \"%1$s\" există deja."
@@ -6389,7 +6389,7 @@ msgstr "Mască subnet server"
 msgid "Host time"
 msgstr "Timp server"
 
-#: api/classes/CHost.php:982
+#: api/classes/CHost.php:980
 msgid "Host update failed."
 msgstr "Actualizare server nereușită."
 
@@ -7084,7 +7084,7 @@ msgstr "Caractere incorecte folosite pentru șablonul nume \"%1$s\""
 msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Caractere incorecte folosite pentru serverul \"%1$s\"."
 
-#: api/classes/CHost.php:743 api/classes/CHost.php:1090
+#: api/classes/CHost.php:743 api/classes/CHost.php:1088
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Caractere incorecte folosite pentru serverul nume \"%s\"."
@@ -7781,7 +7781,7 @@ msgstr "Numele \"%s\" este invalid. Caracterele permise: \"a-z\" și \".\"."
 msgid "Inventory"
 msgstr "Inventar"
 
-#: api/classes/CHost.php:1306
+#: api/classes/CHost.php:1304
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Inventar dezactivat pentru server \"%1$s\"."
@@ -9765,7 +9765,7 @@ msgstr "Nici grafic găsit."
 msgid "No groups for host \"%s\"."
 msgstr "Niciun grup pentru server \"%s\"."
 
-#: api/classes/CHost.php:1076
+#: api/classes/CHost.php:1074
 msgid "No groups for hosts."
 msgstr "Niciun grup pentru servere."
 
@@ -9778,7 +9778,7 @@ msgstr "Niciun grup pentru șabloane"
 msgid "No groups for template \"%1$s\"."
 msgstr "Niciun grup pentru șablon \"%1$s\"."
 
-#: api/classes/CHost.php:1443
+#: api/classes/CHost.php:1441
 msgid "No host ID given."
 msgstr "Niciun ID server dat."
 
@@ -10004,7 +10004,7 @@ msgstr "Nicio permisiune de acces la sistem."
 #: api/classes/CHostGroup.php:938 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
 #: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
-#: api/classes/CHost.php:716 api/classes/CHost.php:1806
+#: api/classes/CHost.php:716 api/classes/CHost.php:1804
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
 #: api/classes/CHttpTest.php:395 api/classes/CHttpTest.php:610
@@ -11149,8 +11149,8 @@ msgstr "Linie procentuala (stânga)"
 msgid "Percentile line (right)"
 msgstr "Linie crescătoare (dreapta)"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:351
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr "Efectuează o cerere DNS. Dacă reușește redă un rând de caractere cu tipul de informație cerut."
 
@@ -13337,7 +13337,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Șablon"
 
-#: api/classes/CHost.php:1112 api/classes/CTemplate.php:508
+#: api/classes/CHost.php:1110 api/classes/CTemplate.php:508
 #, c-format
 msgid "Template \"%1$s\" already exists."
 msgstr "Șablonul \"%1$s\" există deja."
@@ -15494,8 +15494,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Nu ați specificat ținte pentru scriptul global al operațiunii de acțiune \"%s\"."
 
 #: api/classes/CGraph.php:557 api/classes/CGraphPrototype.php:574
-#: api/classes/CHost.php:1013 api/classes/CHost.php:1070
-#: api/classes/CHost.php:1385 api/classes/CHttpTest.php:502
+#: api/classes/CHost.php:1011 api/classes/CHost.php:1068
+#: api/classes/CHost.php:1383 api/classes/CHttpTest.php:502
 #: api/classes/CMaintenance.php:537 api/classes/CMaintenance.php:644
 #: api/classes/CMaintenance.php:656 api/classes/CScript.php:300
 #: api/classes/CScript.php:397 api/classes/CScript.php:437

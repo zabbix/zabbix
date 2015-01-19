@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-30 05:43+0200\n"
+"POT-Creation-Date: 2015-01-15 18:26+0200\n"
 "PO-Revision-Date: 2014-09-02 10:34+0300\n"
 "Last-Translator: Hammer <lhy719@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1513,7 +1513,7 @@ msgstr "無法創建在觸發器自身上的相依關係."
 msgid "Cannot create discovery rule"
 msgstr "無法創建探索規則"
 
-#: api/classes/CHost.php:1186
+#: api/classes/CHost.php:1184
 msgid "Cannot create host group."
 msgstr "無法創建主機群組."
 
@@ -1601,7 +1601,7 @@ msgstr "無法刪除群組"
 msgid "Cannot delete host"
 msgstr "無法刪除主機"
 
-#: api/classes/CHost.php:1197
+#: api/classes/CHost.php:1195
 msgid "Cannot delete host group."
 msgstr "無法刪除主機群組."
 
@@ -1621,7 +1621,7 @@ msgstr "無法刪除圖示對應"
 msgid "Cannot delete image"
 msgstr "無法刪除圖片"
 
-#: api/classes/CHost.php:1287
+#: api/classes/CHost.php:1285
 msgid "Cannot delete inventory."
 msgstr "無法刪除資產紀錄."
 
@@ -2097,7 +2097,7 @@ msgstr ""
 msgid "Cannot insert user media."
 msgstr "不能插入用戶示警媒介"
 
-#: api/classes/CHost.php:1265
+#: api/classes/CHost.php:1263
 msgid "Cannot link template"
 msgstr "無法連結範本"
 
@@ -2109,7 +2109,7 @@ msgstr ""
 msgid "Cannot logout."
 msgstr "不能登出"
 
-#: api/classes/CHost.php:1094
+#: api/classes/CHost.php:1092
 msgid "Cannot mass update host name."
 msgstr "不能大量更新主機名稱."
 
@@ -2117,7 +2117,7 @@ msgstr "不能大量更新主機名稱."
 msgid "Cannot mass update template name"
 msgstr "不能大量更新範本名稱"
 
-#: api/classes/CHost.php:1084
+#: api/classes/CHost.php:1082
 msgid "Cannot mass update visible host name."
 msgstr "不能大量更新可見主機名稱"
 
@@ -2205,7 +2205,7 @@ msgstr "無法設置 \"templateid\"給篩選\"%1$s\"."
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "無法設置 \"templateid\"給觸發器原型\"%1$s\"."
 
-#: api/classes/CHost.php:671 api/classes/CHost.php:1139
+#: api/classes/CHost.php:671 api/classes/CHost.php:1137
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr ""
 
@@ -2249,7 +2249,7 @@ msgstr "無法斷連和清除項目"
 msgid "Cannot unlink and clear triggers"
 msgstr "無法斷連和清除觸發器"
 
-#: api/classes/CHost.php:1256
+#: api/classes/CHost.php:1254
 msgid "Cannot unlink template"
 msgstr "無法斷連範本"
 
@@ -2611,21 +2611,21 @@ msgstr "檢查開始於\"%1$s\"的表示式部份."
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr ""
 
@@ -2652,8 +2652,8 @@ msgstr ""
 msgid "Checks"
 msgstr "檢查 "
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr ""
 
@@ -4057,7 +4057,7 @@ msgstr "已刪除: 探索規則 \"%1$s\" 於 \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 圖形 \"%1$s\" 於 \"%2$s\"."
 
-#: api/classes/CHost.php:1583
+#: api/classes/CHost.php:1581
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "已刪除: 主機 \"%1$s\"."
@@ -4721,7 +4721,7 @@ msgstr ""
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
 #: api/classes/CHostGroup.php:516 api/classes/CHostGroup.php:593
-#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1419
+#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1417
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
@@ -6047,7 +6047,7 @@ msgstr "橫向對齊"
 msgid "Host"
 msgstr "主機"
 
-#: api/classes/CHost.php:1107 api/classes/CTemplate.php:512
+#: api/classes/CHost.php:1105 api/classes/CTemplate.php:512
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "主機 \"%1$s\" 已存在."
@@ -6306,7 +6306,7 @@ msgstr "主機子網路遮罩"
 msgid "Host time"
 msgstr "主機時間"
 
-#: api/classes/CHost.php:982
+#: api/classes/CHost.php:980
 msgid "Host update failed."
 msgstr "主機更新失敗."
 
@@ -7001,7 +7001,7 @@ msgstr ""
 msgid "Incorrect characters used for host \"%1$s\"."
 msgstr ""
 
-#: api/classes/CHost.php:743 api/classes/CHost.php:1090
+#: api/classes/CHost.php:743 api/classes/CHost.php:1088
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "不正確的字元用於主機名稱\"%s\"."
@@ -7698,7 +7698,7 @@ msgstr "所給的\"%s\"為無效的檢視名稱.  可用的: \"a-z\" 和 \".\"."
 msgid "Inventory"
 msgstr "資產記錄"
 
-#: api/classes/CHost.php:1306
+#: api/classes/CHost.php:1304
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr ""
@@ -9658,7 +9658,7 @@ msgstr ""
 msgid "No groups for host \"%s\"."
 msgstr "沒有主機[%s]的群組"
 
-#: api/classes/CHost.php:1076
+#: api/classes/CHost.php:1074
 msgid "No groups for hosts."
 msgstr "沒有主機群組"
 
@@ -9671,7 +9671,7 @@ msgstr "沒有範本群組"
 msgid "No groups for template \"%1$s\"."
 msgstr ""
 
-#: api/classes/CHost.php:1443
+#: api/classes/CHost.php:1441
 msgid "No host ID given."
 msgstr ""
 
@@ -9897,7 +9897,7 @@ msgstr "沒有系統存取的許可權"
 #: api/classes/CHostGroup.php:938 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
 #: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
-#: api/classes/CHost.php:716 api/classes/CHost.php:1806
+#: api/classes/CHost.php:716 api/classes/CHost.php:1804
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
 #: api/classes/CHttpTest.php:395 api/classes/CHttpTest.php:610
@@ -11042,8 +11042,8 @@ msgstr "百分比線(左)"
 msgid "Percentile line (right)"
 msgstr "百分比線(右)"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:351
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr ""
 
@@ -13228,7 +13228,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "範本"
 
-#: api/classes/CHost.php:1112 api/classes/CTemplate.php:508
+#: api/classes/CHost.php:1110 api/classes/CTemplate.php:508
 #, c-format
 msgid "Template \"%1$s\" already exists."
 msgstr "範本 \"%1$s\" 已存在."
@@ -15363,8 +15363,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "您沒有指定目標為動作操作的全域腳本\"%s\"."
 
 #: api/classes/CGraph.php:557 api/classes/CGraphPrototype.php:574
-#: api/classes/CHost.php:1013 api/classes/CHost.php:1070
-#: api/classes/CHost.php:1385 api/classes/CHttpTest.php:502
+#: api/classes/CHost.php:1011 api/classes/CHost.php:1068
+#: api/classes/CHost.php:1383 api/classes/CHttpTest.php:502
 #: api/classes/CMaintenance.php:537 api/classes/CMaintenance.php:644
 #: api/classes/CMaintenance.php:656 api/classes/CScript.php:300
 #: api/classes/CScript.php:397 api/classes/CScript.php:437

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-30 05:43+0200\n"
+"POT-Creation-Date: 2015-01-15 18:26+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -1521,7 +1521,7 @@ msgstr "Не може да се създаде зависимост на три�
 msgid "Cannot create discovery rule"
 msgstr "Не може да се създаде правило за откриване"
 
-#: api/classes/CHost.php:1186
+#: api/classes/CHost.php:1184
 msgid "Cannot create host group."
 msgstr "Не може да се създаде хост група."
 
@@ -1610,7 +1610,7 @@ msgstr "Не може да се изтрие групата"
 msgid "Cannot delete host"
 msgstr "Не може да се изтрие хоста"
 
-#: api/classes/CHost.php:1197
+#: api/classes/CHost.php:1195
 msgid "Cannot delete host group."
 msgstr "Не може да се изтрие хост групата."
 
@@ -1631,7 +1631,7 @@ msgstr "Не може да се изтрие съответствие на ик�
 msgid "Cannot delete image"
 msgstr "Не може да се изтрие изображението"
 
-#: api/classes/CHost.php:1287
+#: api/classes/CHost.php:1285
 msgid "Cannot delete inventory."
 msgstr "Не може да се изтрият инвентарните данни."
 
@@ -2135,7 +2135,7 @@ msgstr ""
 msgid "Cannot insert user media."
 msgstr "Не може да вмъкне потребителско уведомление."
 
-#: api/classes/CHost.php:1265
+#: api/classes/CHost.php:1263
 msgid "Cannot link template"
 msgstr "Не може да се върже шаблона"
 
@@ -2147,7 +2147,7 @@ msgstr ""
 msgid "Cannot logout."
 msgstr "Неуспешно излизане от системата."
 
-#: api/classes/CHost.php:1094
+#: api/classes/CHost.php:1092
 msgid "Cannot mass update host name."
 msgstr "Неуспешно общо актуализиране името на хоста."
 
@@ -2155,7 +2155,7 @@ msgstr "Неуспешно общо актуализиране името на �
 msgid "Cannot mass update template name"
 msgstr "Неуспешно общо актуализиране името на шаблона."
 
-#: api/classes/CHost.php:1084
+#: api/classes/CHost.php:1082
 msgid "Cannot mass update visible host name."
 msgstr "Неуспешно общо актуализиране видимото име на хоста."
 
@@ -2243,7 +2243,7 @@ msgstr "Не може да се зададе \"templateid\" за екран \"%1
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Не може да се зададе \"templateid\" за тригер прототип \"%1$s\"."
 
-#: api/classes/CHost.php:671 api/classes/CHost.php:1139
+#: api/classes/CHost.php:671 api/classes/CHost.php:1137
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr ""
 
@@ -2287,7 +2287,7 @@ msgstr "Не може да се премахнат и изчистят елем�
 msgid "Cannot unlink and clear triggers"
 msgstr "Не може да се премахнат и изчистят тригерите"
 
-#: api/classes/CHost.php:1256
+#: api/classes/CHost.php:1254
 msgid "Cannot unlink template"
 msgstr "Не може да се премахне шаблона"
 
@@ -2650,21 +2650,21 @@ msgstr "Проверете част от израза започваща от \"
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr ""
 
@@ -2691,8 +2691,8 @@ msgstr ""
 msgid "Checks"
 msgstr "Проверки"
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr ""
 
@@ -4101,7 +4101,7 @@ msgstr "Изтрито: Правило за откриване \"%1$s\" в \"%2$
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Изтрито: Графика \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CHost.php:1583
+#: api/classes/CHost.php:1581
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Изтрито: Хост \"%1$s\"."
@@ -4767,7 +4767,7 @@ msgstr ""
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
 #: api/classes/CHostGroup.php:516 api/classes/CHostGroup.php:593
-#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1419
+#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1417
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
@@ -6093,7 +6093,7 @@ msgstr "Хоризонтално подравняване"
 msgid "Host"
 msgstr "Хост"
 
-#: api/classes/CHost.php:1107 api/classes/CTemplate.php:512
+#: api/classes/CHost.php:1105 api/classes/CTemplate.php:512
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Хост \"%1$s\" вече съществува."
@@ -6356,7 +6356,7 @@ msgstr "Маска на подмрежата на хоста"
 msgid "Host time"
 msgstr "Хост време"
 
-#: api/classes/CHost.php:982
+#: api/classes/CHost.php:980
 msgid "Host update failed."
 msgstr "Актуализацията на хоста се провали."
 
@@ -7058,7 +7058,7 @@ msgstr ""
 msgid "Incorrect characters used for host \"%1$s\"."
 msgstr ""
 
-#: api/classes/CHost.php:743 api/classes/CHost.php:1090
+#: api/classes/CHost.php:743 api/classes/CHost.php:1088
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Използвани са неправилни символи за името на хост \"%s\"."
@@ -7755,7 +7755,7 @@ msgstr "Невалидно име за преглед дава \"%s\". Позв�
 msgid "Inventory"
 msgstr "Инвентаризация"
 
-#: api/classes/CHost.php:1306
+#: api/classes/CHost.php:1304
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr ""
@@ -9730,7 +9730,7 @@ msgstr ""
 msgid "No groups for host \"%s\"."
 msgstr "Няма групи за хост \"%s\"."
 
-#: api/classes/CHost.php:1076
+#: api/classes/CHost.php:1074
 msgid "No groups for hosts."
 msgstr "Няма групи за хостове."
 
@@ -9743,7 +9743,7 @@ msgstr "Няма групи за шаблони."
 msgid "No groups for template \"%1$s\"."
 msgstr ""
 
-#: api/classes/CHost.php:1443
+#: api/classes/CHost.php:1441
 msgid "No host ID given."
 msgstr ""
 
@@ -9969,7 +9969,7 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CHostGroup.php:938 api/classes/CHostInterface.php:319
 #: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
 #: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
-#: api/classes/CHost.php:716 api/classes/CHost.php:1806
+#: api/classes/CHost.php:716 api/classes/CHost.php:1804
 #: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
 #: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
 #: api/classes/CHttpTest.php:395 api/classes/CHttpTest.php:610
@@ -11116,8 +11116,8 @@ msgstr "Процентна линия (вляво)"
 msgid "Percentile line (right)"
 msgstr "Процентна линия (вдясно)"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:351
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr ""
 
@@ -13307,7 +13307,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Шаблон"
 
-#: api/classes/CHost.php:1112 api/classes/CTemplate.php:508
+#: api/classes/CHost.php:1110 api/classes/CTemplate.php:508
 #, c-format
 msgid "Template \"%1$s\" already exists."
 msgstr "Шаблон \"%1$s\" вече съществува."
@@ -15459,8 +15459,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Вие не сте уточнили цели за глобален скрипт \"%s\" в операция на действие."
 
 #: api/classes/CGraph.php:557 api/classes/CGraphPrototype.php:574
-#: api/classes/CHost.php:1013 api/classes/CHost.php:1070
-#: api/classes/CHost.php:1385 api/classes/CHttpTest.php:502
+#: api/classes/CHost.php:1011 api/classes/CHost.php:1068
+#: api/classes/CHost.php:1383 api/classes/CHttpTest.php:502
 #: api/classes/CMaintenance.php:537 api/classes/CMaintenance.php:644
 #: api/classes/CMaintenance.php:656 api/classes/CScript.php:300
 #: api/classes/CScript.php:397 api/classes/CScript.php:437
