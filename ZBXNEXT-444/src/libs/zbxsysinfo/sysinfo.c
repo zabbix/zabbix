@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -685,19 +685,6 @@ zbx_log_t	*add_log_result(AGENT_RESULT *result, const char *value)
 	result->type |= AR_LOG;
 
 	return log;
-}
-
-zbx_uint64_t	get_log_result_lastlogsize(AGENT_RESULT *result)
-{
-	size_t	i;
-
-	if (0 == ISSET_LOG(result) || NULL == result->logs[0])
-		return 0;
-
-	for (i = 1; NULL != result->logs[i]; i++)
-		;
-
-	return result->logs[i - 1]->lastlogsize;
 }
 
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c)

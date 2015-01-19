@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -418,7 +418,7 @@ $filterButton->main();
 
 $resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput shadow');
 
-$divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
+$divButtons = new CDiv(array($filterButton, $resetButton));
 $divButtons->setAttribute('style', 'padding: 4px 0px;');
 
 $filterTable->addRow(new CCol($divButtons, 'controls', 4));
@@ -442,7 +442,7 @@ if ($singleHostSelected) {
 }
 else {
 	$hostHeader = make_sorting_header(_('Host'), 'host', $sortField, $sortOrder);
-	$hostHeader->addClass('latest-host');
+	$hostHeader->addClass('latest-host '.($filter['showDetails'] ? 'with-details' : 'no-details'));
 	$hostHeader->setAttribute('title', _('Host'));
 
 	$hostColumn = '';
