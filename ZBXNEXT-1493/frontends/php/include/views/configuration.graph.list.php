@@ -171,9 +171,8 @@ $graphForm->addItem(array(
 	$this->data['paging'],
 	$graphTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'group_graphid', $buttonsArray, $this->data['parent_discoveryid']
-		? $this->data['parent_discoveryid']
-		: $this->data['hostid']
+	get_table_header(new CActionButtonList('action', 'group_graphid', $buttonsArray,
+		$this->data['parent_discoveryid'] ? $this->data['parent_discoveryid'] : $this->data['hostid']
 	))
 ));
 

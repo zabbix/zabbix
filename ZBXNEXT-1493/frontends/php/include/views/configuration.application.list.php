@@ -112,7 +112,9 @@ $applicationForm->addItem(array(
 	get_table_header(new CActionButtonList('action', 'applications',
 		array(
 			'application.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected applications?')),
-			'application.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected applications?')),
+			'application.massdisable' => array('name' => _('Disable'),
+				'confirm' => _('Disable selected applications?')
+			),
 			'application.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected applications?'))
 		),
 		$this->data['hostid']
