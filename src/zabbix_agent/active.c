@@ -648,12 +648,10 @@ static int	check_response(char *response)
  * Parameters: host - IP or Hostname of Zabbix server                         *
  *             port - port number                                             *
  *                                                                            *
- * Return value: returns SUCCEED on successful parsing,                       *
+ * Return value: returns SUCCEED on successful sending,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	send_buffer(const char *host, unsigned short port)
@@ -677,8 +675,8 @@ static int	send_buffer(const char *host, unsigned short port)
 	if (CONFIG_BUFFER_SIZE / 2 > buffer.pcount && CONFIG_BUFFER_SIZE > buffer.count &&
 			CONFIG_BUFFER_SEND > now - buffer.lastsent)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() Will not send now. Now %d lastsent %d < %d",
-				__function_name, now, buffer.lastsent, CONFIG_BUFFER_SEND);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() now:%d lastsent:%d now-lastsent:%d BufferSend:%d; will not send now",
+				__function_name, now, buffer.lastsent, now - buffer.lastsent, CONFIG_BUFFER_SEND);
 		goto ret;
 	}
 
