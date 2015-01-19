@@ -2354,10 +2354,10 @@ function triggerIndicator($status, $state = null) {
  */
 function triggerIndicatorStyle($status, $state = null) {
 	if ($status == TRIGGER_STATUS_ENABLED) {
-		return ($state == TRIGGER_STATE_UNKNOWN) ? 'unknown' : 'enabled';
+		return ($state == TRIGGER_STATE_UNKNOWN) ? 'unknown' : 'green';
 	}
 	elseif ($status == TRIGGER_STATUS_DISABLED) {
-		return 'disabled';
+		return 'red';
 	}
 
 	return 'unknown';
