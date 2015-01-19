@@ -97,13 +97,16 @@ $triggerIds = getRequest('g_triggerid', array());
 if (!is_array($triggerIds)) {
 	$triggerIds = zbx_toArray($triggerIds);
 }
-if (!zbx_empty(getRequest('triggerid'))) {
-	$triggerIds[] = getRequest('triggerid');
+
+$triggerId = getRequest('triggerid');
+if ($triggerId !== null) {
+	$triggerIds[] = $triggerId;
 }
+
 if ($triggerIds) {
 	$triggers = API::Trigger()->get(array(
-		'output' => array('triggerid'),
 		'triggerids' => array_keys(array_flip($triggerIds)),
+		'output' => array('triggerid'),
 		'preservekeys' => true,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'editable' => true
@@ -119,12 +122,9 @@ if ($triggerIds) {
 		access_deny();
 	}
 }
-
-$hostId = getRequest('hostid');
-if ($hostId && !API::Host()->isWritable(array($hostId))) {
+if (getRequest('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
 	access_deny();
 }
-
 /*
  * Actions
  */

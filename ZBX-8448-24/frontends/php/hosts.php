@@ -768,24 +768,21 @@ elseif (isset($_REQUEST['form'])) {
 		$hostsWidget->addItem(get_header_host_table('', $_REQUEST['hostid']));
 
 		$dbHosts = API::Host()->get(array(
-			'output' => array('hostid', 'proxy_hostid', 'host', 'name', 'status', 'ipmi_authtype', 'ipmi_privilege',
-				'ipmi_username', 'ipmi_password', 'flags', 'description'
-			),
-			'selectGroups' => array('groupid', 'name'),
-			'selectDiscoveryRule' => array('name', 'itemid'),
+			'hostids' => $hostId,
+			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => array('templateid', 'name'),
-			'selectMacros' => array('hostmacroid', 'macro', 'value'),
+			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectInventory' => true,
-			'hostids' => $hostId
+			'selectDiscoveryRule' => array('name', 'itemid'),
+			'output' => API_OUTPUT_EXTEND
 		));
-
 		$dbHost = reset($dbHosts);
 		order_result($dbHost['groups'], 'name');
 
 		$dbHost['interfaces'] = API::HostInterface()->get(array(
-			'output' => array('interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'bulk'),
+			'hostids' => $hostId,
+			'output' => API_OUTPUT_EXTEND,
 			'selectItems' => array('type'),
-			'hostids' => array($hostId),
 			'sortfield' => 'interfaceid',
 			'preservekeys' => true
 		));

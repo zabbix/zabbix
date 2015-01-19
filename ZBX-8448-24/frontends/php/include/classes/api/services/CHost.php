@@ -506,7 +506,7 @@ class CHost extends CHostGeneral {
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 
-		$hostDbfields = $update ? array('hostid' => null) : array('host' => null);
+		$hostDBfields = $update ? array('hostid' => null) : array('host' => null);
 
 		if ($update) {
 			$dbHosts = $this->get(array(
@@ -525,19 +525,19 @@ class CHost extends CHostGeneral {
 			}
 		}
 		else {
-			$groupIds = array();
+			$groupids = array();
 
 			foreach ($hosts as $host) {
 				if (!isset($host['groups'])) {
 					continue;
 				}
-				$groupIds = array_merge($groupIds, zbx_objectValues($host['groups'], 'groupid'));
+				$groupids = array_merge($groupids, zbx_objectValues($host['groups'], 'groupid'));
 			}
 
-			if ($groupIds) {
+			if (!empty($groupids)) {
 				$dbGroups = API::HostGroup()->get(array(
-					'output' => array('groupid'),
-					'groupids' => $groupIds,
+					'output' => API_OUTPUT_EXTEND,
+					'groupids' => $groupids,
 					'editable' => true,
 					'preservekeys' => true
 				));
@@ -546,7 +546,7 @@ class CHost extends CHostGeneral {
 
 		foreach ($hosts as $host) {
 			// validate mandatory fields
-			if (!check_db_fields($hostDbfields, $host)) {
+			if (!check_db_fields($hostDBfields, $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Wrong fields for host "%1$s".', isset($host['host']) ? $host['host'] : '')
 				);
@@ -617,7 +617,6 @@ class CHost extends CHostGeneral {
 				'allowed' => array('hostid', 'status', 'inventory', 'description'),
 				'messageAllowedField' => _('Cannot update "%1$s" for a discovered host.')
 			));
-
 			if ($update) {
 				// cannot update certain fields for discovered hosts
 				$this->checkPartialValidator($host, $updateDiscoveredValidator, $dbHosts[$host['hostid']]);
@@ -1250,11 +1249,11 @@ class CHost extends CHostGeneral {
 				));
 			}
 
-			$groupIdsToDelete = array_diff($hostGroupIds, $newGroupIds);
-			if ($groupIdsToDelete) {
+			$groupIdsToDel = array_diff($hostGroupIds, $newGroupIds);
+			if ($groupIdsToDel) {
 				$this->massRemove(array(
 					'hostids' => $hostIds,
-					'groupids' => $groupIdsToDelete
+					'groupids' => $groupIdsToDel
 				));
 			}
 		}

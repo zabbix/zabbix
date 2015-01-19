@@ -108,14 +108,16 @@ if (getRequest('parent_discoveryid')) {
 	if (!is_array($triggerPrototypeIds)) {
 		$triggerPrototypeIds = zbx_toArray($triggerPrototypeIds);
 	}
-	if (!zbx_empty(getRequest('triggerid'))) {
-		$triggerPrototypeIds[] = getRequest('triggerid');
+
+	$triggerPrototypeId = getRequest('triggerid');
+	if ($triggerPrototypeId !== null) {
+		$triggerPrototypeIds[] = $triggerPrototypeId;
 	}
 
 	if ($triggerPrototypeIds) {
 		$triggerPrototypes = API::TriggerPrototype()->get(array(
-			'output' => array('triggerid'),
 			'triggerids' => $triggerPrototypeIds,
+			'output' => array('triggerid'),
 			'editable' => true,
 			'preservekeys' => true
 		));

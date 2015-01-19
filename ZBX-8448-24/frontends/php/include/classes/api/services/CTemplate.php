@@ -734,11 +734,11 @@ class CTemplate extends CHostGeneral {
 	 */
 	public function massAdd(array $data) {
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : array();
-		$templateIds = zbx_objectValues($templates, 'templateid');
+		$templateids = zbx_objectValues($templates, 'templateid');
 
 		// check permissions
-		if (!$this->isWritable($templateIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		if (!$this->isWritable($templateids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		// link hosts to the given templates
@@ -756,7 +756,7 @@ class CTemplate extends CHostGeneral {
 				'message' => _('Cannot update templates on discovered host "%1$s".')
 			)));
 
-			$this->link($templateIds, $hostIds);
+			$this->link($templateids, $hostIds);
 		}
 
 		$data['hosts'] = array();
