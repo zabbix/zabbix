@@ -919,7 +919,6 @@ out:
 	return ret;
 }
 
-/* lastlogsize_last and mtime_last are ignored for all but the first check */
 static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
 		unsigned char old_state, zbx_uint64_t lastlogsize_last, int mtime_last)
 {
