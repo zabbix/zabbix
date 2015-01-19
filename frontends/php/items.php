@@ -129,7 +129,8 @@ $fields = array(
 	// actions
 	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
-										'"item.massdisable","item.massenable","item.massupdateform"'
+										'"item.massdisable","item.massenable","item.massupdateform",'.
+										'"item.reschedule"'
 									),
 									null
 								),
@@ -847,6 +848,18 @@ elseif (hasRequest('action') && getRequest('action') == 'item.massdelete' && has
 		uncheckTableRows(getRequest('hostid'));
 	}
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
+}
+elseif (hasRequest('action') && getRequest('action') == 'item.reschedule' && hasRequest('group_itemid')) {
+	$group_itemid = getRequest('group_itemid');
+
+	$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);
+	$result = $zabbixServer->rescheduleItems($group_itemid, get_cookie('zbx_sessionid'));
+
+	if ($result) {
+		uncheckTableRows(getRequest('hostid'));
+	}
+
+	show_messages($result, _('Items rescheduled'), _('Could not reschedule items'));
 }
 
 /*

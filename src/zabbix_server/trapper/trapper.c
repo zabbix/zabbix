@@ -190,6 +190,7 @@ out:
 #define ZBX_GET_QUEUE_OVERVIEW		0
 #define ZBX_GET_QUEUE_PROXY		1
 #define ZBX_GET_QUEUE_DETAILS		2
+#define ZBX_RESCHEDULE_ITEMS		3
 
 /* queue stats split by delay times */
 typedef struct
@@ -331,13 +332,15 @@ static int	zbx_session_validate(const char *sessionid, int access_level)
  ******************************************************************************/
 static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
-	const char		*__function_name = "recv_getqueue";
-	int			ret = FAIL, request_type = -1, now, i;
+	const char		*__function_name = "recv_getqueue", *pf;
+	int			ret = FAIL, request_type = -1, now, i, is_null;
 	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN];
 	zbx_vector_ptr_t	queue;
 	struct zbx_json		json;
 	zbx_hashset_t		queue_stats;
 	zbx_queue_stats_t	*stats;
+	struct zbx_json_parse	jpout;
+	zbx_uint64_t		recid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -348,6 +351,7 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
+
 	if (FAIL != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type)))
 	{
 		if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW))
@@ -356,6 +360,8 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			request_type = ZBX_GET_QUEUE_PROXY;
 		else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_DETAILS))
 			request_type = ZBX_GET_QUEUE_DETAILS;
+		else if (0 == strcmp(type, ZBX_PROTO_VALUE_RESCHEDULE_ITEMS))
+			request_type = ZBX_RESCHEDULE_ITEMS;
 	}
 
 	if (-1 == request_type)
@@ -440,6 +446,41 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 			zbx_json_close(&json);
 
+			break;
+		case ZBX_RESCHEDULE_ITEMS:
+			if (SUCCEED != zbx_json_brackets_by_name(jp, "items", &jpout))
+			{
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED,
+						ZBX_JSON_TYPE_STRING);
+				break;
+			}
+
+			pf = NULL;
+			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+
+			while (NULL != (pf = zbx_json_next_value(&jpout, pf, type, sizeof(type), &is_null)))
+			{
+				zbx_json_addobject(&json, NULL);
+				zbx_json_adduint64(&json, "itemid", recid);
+
+				if (SUCCEED == is_uint64(type, &recid))
+				{
+					DCconfig_reschedule_item(recid);
+					zbx_json_adduint64(&json, "rescheduled", 1);
+					zabbix_log(LOG_LEVEL_DEBUG, "Rescheduling item: %u", recid);
+				}
+				else
+				{
+					zbx_json_adduint64(&json, "rescheduled", 0);
+				}
+
+				zbx_json_close(&json);
+			}
+
+			zbx_json_close(&json);
+
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
+						ZBX_JSON_TYPE_STRING);
 			break;
 	}
 

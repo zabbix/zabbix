@@ -284,6 +284,9 @@ $goOption = new CComboItem('item.massdelete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected items?'));
 $goComboBox->addItem($goOption);
 
+$goOption = new CComboItem('item.reschedule', _('Reschedule selected items...'));
+$goComboBox->addItem($goOption);
+
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
 

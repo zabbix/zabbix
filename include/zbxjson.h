@@ -86,6 +86,7 @@
 #define ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW	"overview"
 #define ZBX_PROTO_VALUE_GET_QUEUE_PROXY		"overview by proxy"
 #define ZBX_PROTO_VALUE_GET_QUEUE_DETAILS	"details"
+#define ZBX_PROTO_VALUE_RESCHEDULE_ITEMS	"reschedule"
 
 typedef enum
 {

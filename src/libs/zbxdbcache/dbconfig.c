@@ -4761,6 +4761,41 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
 	return nextcheck;
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_reschedule_item                                         *
+ *                                                                            *
+ * Purpose: Reschedule item to run on next check cycle                        *
+ *                                                                            *
+ * Parameters: itemid - [IN] itemid to reschedule                             *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_reschedule_item(zbx_uint64_t itemid)
+{
+	int			now, old_nextcheck, found;
+	zbx_binary_heap_t	*queue;
+	ZBX_DC_ITEM		*item;
+
+	now = time(NULL);
+
+	LOCK_CACHE;
+
+	item = DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
+
+	if (1 == found)
+	{
+		queue = &config->queues[item->poller_type];
+		old_nextcheck = item->nextcheck;
+		item->nextcheck = now;
+
+		DCupdate_item_queue(item, item->poller_type, old_nextcheck);
+		zabbix_log(LOG_LEVEL_DEBUG, "Item id=%u rescheduled", itemid);
+	}
+
+	UNLOCK_CACHE;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCconfig_get_poller_items                                        *
