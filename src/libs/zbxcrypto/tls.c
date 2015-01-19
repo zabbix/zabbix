@@ -42,6 +42,8 @@
 #	define ZBX_TLS_MIN_MINOR_VER	SSL_MINOR_VERSION_3
 #	define ZBX_TLS_MAX_MAJOR_VER	SSL_MAJOR_VERSION_3
 #	define ZBX_TLS_MAX_MINOR_VER	SSL_MINOR_VERSION_3
+#	define ZBX_TLS_CIPHERSUITE_CERT	0
+#	define ZBX_TLS_CIPHERSUITE_PSK	1
 #endif
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -214,29 +216,30 @@ out:
 #if defined(HAVE_POLARSSL)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_is_ciphersuite_psk                                           *
+ * Function: zbx_is_ciphersuite_cert                                          *
  *                                                                            *
- * Purpose: does the specified ciphersuite ID refer to a PSK ciphersuite      *
- *          supported for the specified TLS version range                     *
+ * Purpose: does the specified ciphersuite ID refer to a non-PSK              *
+ *          (i.e. certificate) ciphersuite supported for the specified TLS    *
+ *          version range                                                     *
+ *                                                                            *
+ * Comments:                                                                  *
+ *          RC4 and weak encryptions are discarded                            *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_is_ciphersuite_psk(const int *p)
+static int	zbx_is_ciphersuite_cert(const int *p)
 {
 	const ssl_ciphersuite_t	*info;
 
 	/* PolarSSL function ssl_ciphersuite_uses_psk() is not used here because it can be unavailable in some */
 	/* installations. */
-	if (NULL != (info = ssl_ciphersuite_from_id(*p)) &&
-			(POLARSSL_KEY_EXCHANGE_PSK == info->key_exchange ||
-			POLARSSL_KEY_EXCHANGE_DHE_PSK == info->key_exchange ||
-			POLARSSL_KEY_EXCHANGE_ECDHE_PSK == info->key_exchange ||
-			POLARSSL_KEY_EXCHANGE_RSA_PSK == info->key_exchange) &&
-			0 == (info->flags & POLARSSL_CIPHERSUITE_WEAK) &&
-			(ZBX_TLS_MIN_MAJOR_VER > info->min_major_ver ||
-			(ZBX_TLS_MIN_MAJOR_VER == info->min_major_ver &&
+	if (NULL != (info = ssl_ciphersuite_from_id(*p)) && POLARSSL_KEY_EXCHANGE_PSK != info->key_exchange &&
+			POLARSSL_KEY_EXCHANGE_DHE_PSK != info->key_exchange &&
+			POLARSSL_KEY_EXCHANGE_ECDHE_PSK != info->key_exchange &&
+			POLARSSL_KEY_EXCHANGE_RSA_PSK != info->key_exchange &&
+			POLARSSL_CIPHER_ARC4_128 != info->cipher && 0 == (info->flags & POLARSSL_CIPHERSUITE_WEAK) &&
+			(ZBX_TLS_MIN_MAJOR_VER > info->min_major_ver || (ZBX_TLS_MIN_MAJOR_VER == info->min_major_ver &&
 			ZBX_TLS_MIN_MINOR_VER >= info->min_minor_ver)) &&
-			(ZBX_TLS_MAX_MAJOR_VER < info->max_major_ver ||
-			(ZBX_TLS_MAX_MAJOR_VER == info->max_major_ver &&
+			(ZBX_TLS_MAX_MAJOR_VER < info->max_major_ver || (ZBX_TLS_MAX_MAJOR_VER == info->max_major_ver &&
 			ZBX_TLS_MAX_MINOR_VER <= info->max_minor_ver)))
 	{
 		return SUCCEED;
@@ -249,13 +252,48 @@ static int	zbx_is_ciphersuite_psk(const int *p)
 #if defined(HAVE_POLARSSL)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ciphersuites_psk                                             *
+ * Function: zbx_is_ciphersuite_psk                                           *
  *                                                                            *
- * Purpose: copy a list of ciphersuites for using with a PSK from a list of   *
- *          all supported ciphersuites                                        *
+ * Purpose: does the specified ciphersuite ID refer to a PSK ciphersuite      *
+ *          supported for the specified TLS version range                     *
+ *                                                                            *
+ * Comments:                                                                  *
+ *          RC4 and weak encryptions are discarded                            *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_ciphersuites_psk(int **suites_psk)
+static int	zbx_is_ciphersuite_psk(const int *p)
+{
+	const ssl_ciphersuite_t	*info;
+
+	/* PolarSSL function ssl_ciphersuite_uses_psk() is not used here because it can be unavailable in some */
+	/* installations. */
+	if (NULL != (info = ssl_ciphersuite_from_id(*p)) && (POLARSSL_KEY_EXCHANGE_PSK == info->key_exchange ||
+			POLARSSL_KEY_EXCHANGE_DHE_PSK == info->key_exchange ||
+			POLARSSL_KEY_EXCHANGE_ECDHE_PSK == info->key_exchange ||
+			POLARSSL_KEY_EXCHANGE_RSA_PSK == info->key_exchange) &&
+			POLARSSL_CIPHER_ARC4_128 != info->cipher && 0 == (info->flags & POLARSSL_CIPHERSUITE_WEAK) &&
+			(ZBX_TLS_MIN_MAJOR_VER > info->min_major_ver || (ZBX_TLS_MIN_MAJOR_VER == info->min_major_ver &&
+			ZBX_TLS_MIN_MINOR_VER >= info->min_minor_ver)) &&
+			(ZBX_TLS_MAX_MAJOR_VER < info->max_major_ver || (ZBX_TLS_MAX_MAJOR_VER == info->max_major_ver &&
+			ZBX_TLS_MAX_MINOR_VER <= info->max_minor_ver)))
+	{
+		return SUCCEED;
+	}
+	else
+		return FAIL;
+}
+#endif
+
+#if defined(HAVE_POLARSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ciphersuites                                                 *
+ *                                                                            *
+ * Purpose: copy a list of ciphersuites (certificate- or PSK-related) from a  *
+ *          list of all supported ciphersuites                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_ciphersuites(int type, int **suites)
 {
 	const int		*supported_suites, *p;
 	int			*q;
@@ -263,20 +301,40 @@ static void	zbx_ciphersuites_psk(int **suites_psk)
 
 	supported_suites = ssl_list_ciphersuites();
 
-	/* count available relevant PSK-ciphersuites */
+	/* count available relevant ciphersuites */
 	for (p = supported_suites; *p != 0; p++)
 	{
-		if (SUCCEED == zbx_is_ciphersuite_psk(p))
-			count++;
+		if (ZBX_TLS_CIPHERSUITE_CERT == type)
+		{
+			if (SUCCEED != zbx_is_ciphersuite_cert(p))
+				continue;
+		}
+		else	/* ZBX_TLS_CIPHERSUITE_PSK */
+		{
+			if (SUCCEED != zbx_is_ciphersuite_psk(p))
+				continue;
+		}
+
+		count++;
 	}
 
-	*suites_psk = zbx_malloc(*suites_psk, (count + 1) * sizeof(int));
+	*suites = zbx_malloc(*suites, (count + 1) * sizeof(int));
 
-	/* copy the PSK-ciphersuites into array */
-	for (p = supported_suites, q = *suites_psk; *p != 0; p++)
+	/* copy the ciphersuites into array */
+	for (p = supported_suites, q = *suites; *p != 0; p++)
 	{
-		if (SUCCEED == zbx_is_ciphersuite_psk(p))
-			*q++ = *p;
+		if (ZBX_TLS_CIPHERSUITE_CERT == type)
+		{
+			if (SUCCEED != zbx_is_ciphersuite_cert(p))
+				continue;
+		}
+		else	/* ZBX_TLS_CIPHERSUITE_PSK */
+		{
+			if (SUCCEED != zbx_is_ciphersuite_psk(p))
+				continue;
+		}
+
+		*q++ = *p;
 	}
 
 	*q = 0;
@@ -573,11 +631,11 @@ int	zbx_tls_init_child(void)
 
 	zbx_tls_validate_config();
 
-	/* TODO if (NULL != my_cert) */
-	/* TODO		zbx_ciphersuites_cert(&ciphersuites_cert); */
+	if (NULL != my_cert)
+		zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_CERT, &ciphersuites_cert);
 
 	if (NULL != my_psk)
-		zbx_ciphersuites_psk(&ciphersuites_psk);
+		zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_PSK, &ciphersuites_psk);
 
 	entropy = zbx_malloc(entropy, sizeof(entropy_context));
 	entropy_init(entropy);
@@ -705,8 +763,22 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, int secure)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #if defined(HAVE_POLARSSL)
-	/* set up TLS context */
+	if (ZBX_TCP_SEC_TLS_CERT == secure)
+	{
+		if (NULL == ciphersuites_cert)
+		{
+			*error = zbx_strdup(*error, "cannot connect with TLS and certificate: no valid certificate "
+					"loaded");
+			goto out;
+		}
+	}
+	else if (NULL == ciphersuites_psk)	/* use a pre-shared key */
+	{
+		*error = zbx_strdup(*error, "cannot connect with TLS and PSK: no valid PSK loaded");
+		goto out;
+	}
 
+	/* set up TLS context */
 	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(ssl_context));
 	memset(s->tls_ctx, 0, sizeof(ssl_context));
 
@@ -746,8 +818,7 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, int secure)
 	if (ZBX_TCP_SEC_TLS_CERT == secure)	/* use certificates */
 	{
 		ssl_set_authmode(s->tls_ctx, SSL_VERIFY_REQUIRED);
-
-		/* ssl_set_ciphersuites(s->tls_ctx, ciphersuites_cert); */	/* TODO Andris. */
+		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_cert);
 
 		/* set CA certificate and certificate revocation lists */
 		ssl_set_ca_chain(s->tls_ctx, ca_cert, crl, NULL);	/* TODO set the 4th argument to expected peer Common Name */
@@ -880,8 +951,20 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #if defined(HAVE_POLARSSL)
-	/* set up TLS context */
+	if (0 != (ZBX_TCP_SEC_TLS_CERT & secure) && NULL == ciphersuites_cert)
+	{
+		*error = zbx_strdup(*error, "cannot accept TLS connection with certificate: no valid certificate "
+				"loaded");
+		goto out;
+	}
 
+	if (0 != (ZBX_TCP_SEC_TLS_PSK & secure) && NULL == ciphersuites_psk)
+	{
+		*error = zbx_strdup(*error, "cannot accept TLS connection with PSK: no valid PSK loaded");
+		goto out;
+	}
+
+	/* set up TLS context */
 	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(ssl_context));
 	memset(s->tls_ctx, 0, sizeof(ssl_context));
 
@@ -948,7 +1031,7 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure)
 
 	if (0 != (ZBX_TCP_SEC_TLS_CERT & secure) && 0 == (ZBX_TCP_SEC_TLS_PSK & secure))
 	{
-		; /* ssl_set_ciphersuites(s->tls_ctx, ciphersuites_cert);	*/ /* TODO Andris. */
+		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_cert);
 	}
 	else if (0 != (ZBX_TCP_SEC_TLS_PSK & secure) && 0 == (ZBX_TCP_SEC_TLS_CERT & secure))
 	{
@@ -956,7 +1039,11 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure)
 	}
 	else
 	{
-		; /* ssl_set_ciphersuites(s->tls_ctx, ciphersuites_cert ...+ ... ciphersuites_psk);*/ /* TODO Andris. */
+		/* Both certificate and PSK are allowed for this connection. This could be necessary, for example, */
+		/* for switching of TLS connections from using a PSK to using a certificate. Allow all supported   */
+		/* ciphersuites in this case. Do not rely on ssl_init() - it already does that, but it could change */
+		/* in future versions. */
+		ssl_set_ciphersuites(s->tls_ctx, ssl_list_ciphersuites());
 	}
 
 	while (0 != (res = ssl_handshake(s->tls_ctx)))

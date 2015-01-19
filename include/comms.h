@@ -84,6 +84,7 @@ typedef struct
 	SSL			*tls_ctx;
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	/* type of connection actually established: unencrypted, TLS with certificate, TLS with PSK */
 	int			connection_type;
 #endif
 	int			timeout;
