@@ -36,6 +36,8 @@ $table-tr-selected-color: #ffffcc; // Yellow
 $form-transparent-color: transparent;
 $form-disabled-color: #c4c8cc; // Light Grey 
 $form-input-color: #c4c8cc; // Light Grey
+$form-input-top-placeholder: #c5d8e5; // Search Light Blue
+$form-input-top-focus-placeholder: #a9a9a9; // Search Grey
 
 // ALERT COLORS
 $alert-green-color: #3a8a43; // Green
@@ -142,4 +144,18 @@ $font-transform: uppercase;
 	-webkit-transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 	-moz-transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 	transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+@mixin placeholder {
+	::-webkit-input-placeholder {
+	color: $font-white-color;
+}
+
+::-moz-placeholder {
+	color: $font-white-color;
+}
+
+:-ms-input-placeholder {
+	color: $font-white-color;
+}
 }
