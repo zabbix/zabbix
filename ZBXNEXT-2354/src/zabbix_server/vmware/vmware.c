@@ -1443,7 +1443,8 @@ static void	wmware_vm_get_disk_devices(zbx_vmware_vm_t *vm)
 
 			disks++;
 
-		} while (0);
+		}
+		while (0);
 
 		if (NULL != xpathObjController)
 			xmlXPathFreeObject(xpathObjController);
@@ -1454,7 +1455,6 @@ static void	wmware_vm_get_disk_devices(zbx_vmware_vm_t *vm)
 		zbx_free(controllerKey);
 
 	}
-
 clean:
 	zbx_free(xpath);
 
@@ -1464,7 +1464,6 @@ clean:
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
-
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __function_name, disks);
 
@@ -2500,7 +2499,7 @@ static int	vmware_service_get_cluster_list(const zbx_vmware_service_t *service, 
 		if (NULL == (name = zbx_xml_read_value(cluster_data, xpath)))
 			continue;
 
-		if (FAIL == vmware_service_get_cluster_status(service, easyhandle, ids.values[i], &status, error))
+		if (SUCCEED != vmware_service_get_cluster_status(service, easyhandle, ids.values[i], &status, error))
 		{
 			zbx_free(name);
 			goto out;
@@ -2515,7 +2514,6 @@ static int	vmware_service_get_cluster_list(const zbx_vmware_service_t *service, 
 	}
 
 	ret = SUCCEED;
-
 out:
 	zbx_free(cluster_data);
 	zbx_vector_str_clean(&ids);
@@ -2614,11 +2612,7 @@ static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const 
 
 		for (i = 0; NULL != counters[i]; i++)
 		{
-			if(FAIL == zbx_vmware_service_get_perfcounterid(service, counters[i], &counterid))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot find performance counter %s", counters[i]);
-			}
-			else
+			if (SUCCEED == zbx_vmware_service_get_perfcounterid(service, counters[i], &counterid))
 			{
 				zbx_vmware_perf_counter_t	*counter;
 
@@ -2629,6 +2623,8 @@ static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const 
 
 				zbx_vector_ptr_append(&entity.counters, counter);
 			}
+			else
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot find performance counter %s", counters[i]);
 		}
 
 		pentity = zbx_hashset_insert(&service->entities, &entity, sizeof(zbx_vmware_perf_entity_t));
@@ -2715,7 +2711,7 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
  ******************************************************************************/
 static void	vmware_service_update(zbx_vmware_service_t *service)
 {
-	const char	*__function_name = "vmware_service_update";
+	const char		*__function_name = "vmware_service_update";
 
 	CURL			*easyhandle = NULL;
 	struct curl_slist	*headers = NULL;
@@ -2824,6 +2820,7 @@ static void	vmware_service_process_perf_entity_data(zbx_vmware_service_t *servic
 		xmlDoc *doc, xmlNode *node)
 {
 	const char			*__function_name = "vmware_service_process_perf_entity_data";
+
 	xmlXPathContext			*xpathCtx;
 	xmlXPathObject			*xpathObj;
 	xmlNodeSetPtr			nodeset;
@@ -2857,13 +2854,14 @@ static void	vmware_service_process_perf_entity_data(zbx_vmware_service_t *servic
 		counter = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='id']"
 				"/*[local-name()='counterId']");
 
-		if (NULL != value &&  NULL != counter)
+		if (NULL != value && NULL != counter)
 		{
 			ZBX_STR2UINT64(counterid, counter);
 
 			for (j = 0; j < entity->counters.values_num; j++)
 			{
 				perfcounter = (zbx_vmware_perf_counter_t *)entity->counters.values[j];
+
 				if (perfcounter->counterid == counterid)
 				{
 					zbx_ptr_pair_t	perfvalue;
@@ -2887,7 +2885,7 @@ static void	vmware_service_process_perf_entity_data(zbx_vmware_service_t *servic
 		zbx_free(value);
 	}
 
-	/* No valid data found - all metrics has -1 value. In this case clear the counter values. */
+	/* No valid data found - all metrics have -1 value. In this case clear the counter values. */
 	if (0 == valid_data)
 	{
 		for (j = 0; j < entity->counters.values_num; j++)
@@ -2896,7 +2894,6 @@ static void	vmware_service_process_perf_entity_data(zbx_vmware_service_t *servic
 			vmware_vector_ptr_pair_shared_clean(&perfcounter->values);
 		}
 	}
-
 out:
 	if (NULL != xpathObj)
 		xmlXPathFreeObject(xpathObj);
@@ -2919,6 +2916,7 @@ out:
 static void	vmware_service_parse_perf_data(zbx_vmware_service_t *service, const char *data)
 {
 	const char		*__function_name = "vmware_service_parse_perf_data";
+
 	xmlDoc			*doc;
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
@@ -2974,7 +2972,7 @@ out:
  ******************************************************************************/
 static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 {
-	const char	*__function_name = "vmware_service_update_perf";
+	const char			*__function_name = "vmware_service_update_perf";
 
 	CURL				*easyhandle = NULL;
 	struct curl_slist		*headers = NULL;
@@ -3109,7 +3107,6 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 		error = zbx_strdup(error, curl_easy_strerror(err));
-
 clean:
 	zbx_free(tmp);
 
@@ -3301,7 +3298,7 @@ int	zbx_vmware_service_start_monitoring(zbx_vmware_service_t *service, const cha
 		pentity = zbx_hashset_insert(&service->entities, &entity, sizeof(zbx_vmware_perf_entity_t));
 	}
 
-	if (FAIL == zbx_vector_ptr_search(&pentity->counters, &counterid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+	if (SUCCEED != zbx_vector_ptr_search(&pentity->counters, &counterid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
 	{
 		zbx_vmware_perf_counter_t	*counter;
 
@@ -3506,7 +3503,8 @@ void	main_vmware_loop(void)
 			else if (ZBX_VMWARE_SERVICE_UPDATE_PERF == state)
 				vmware_service_update_perf(service);
 
-		} while (ZBX_VMWARE_SERVICE_IDLE != state);
+		}
+		while (ZBX_VMWARE_SERVICE_IDLE != state);
 
 		total_sec += zbx_time() - sec;
 		now = time(NULL);
