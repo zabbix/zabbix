@@ -2168,6 +2168,10 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		if (SUCCEED != errcodes[i])
 			continue;
 
+		/* empty values are only allowed for meta information update packets */
+		if (ITEM_VALUE_TYPE_LOG != items[i].value_type && NULL == values[i].value)
+			continue;
+
 		if (proxy_hostid != items[i].host.proxy_hostid)
 			continue;
 
