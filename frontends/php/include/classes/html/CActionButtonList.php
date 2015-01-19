@@ -67,19 +67,17 @@ class CActionButtonList extends CObject {
 		$this->cookieNamePrefix = $cookieNamePrefix;
 
 		foreach ($buttonsData as $actionValue => $buttonData) {
-			if ($buttonData) {
-				$this->buttons[$actionValue] = new CSubmit(
-					$actionName,
-					is_array($buttonData) ? $buttonData['name'] : $buttonData
-				);
+			$this->buttons[$actionValue] = new CSubmit(
+				$actionName,
+				$buttonData['name']
+			);
 
-				$this->buttons[$actionValue]->removeAttribute('id');
-				$this->buttons[$actionValue]->setAttribute('value', $actionValue);
-				$this->buttons[$actionValue]->addClass('footerButton');
+			$this->buttons[$actionValue]->removeAttribute('id');
+			$this->buttons[$actionValue]->setAttribute('value', $actionValue);
+			$this->buttons[$actionValue]->addClass('footerButton');
 
-				if (array_key_exists('confirm', $buttonData)) {
-					$this->buttons[$actionValue]->setAttribute('confirm', $buttonData['confirm']);
-				}
+			if (array_key_exists('confirm', $buttonData)) {
+				$this->buttons[$actionValue]->setAttribute('confirm', $buttonData['confirm']);
 			}
 		}
 	}
