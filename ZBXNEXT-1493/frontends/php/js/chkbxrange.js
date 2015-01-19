@@ -260,7 +260,6 @@ var chkbxRange = {
 		// update go button
 		var footerButton = jQuery('#footerButton');
 		footerButton.text(footerButton.text().split(' ')[0] + ' (' + count + ')').prop('disabled', count == 0);
-		jQuery('#action').prop('disabled', count == 0);
 	},
 
 	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
@@ -320,9 +319,9 @@ var chkbxRange = {
 	submitFooterButton: function(e) {
 		e = e || window.event;
 
-		var footerButton = jQuery(e.srcElement);
-		var form = footerButton.closest('form');
-		var confirmText = footerButton.attr('confirm');
+		var footerButton = IE8 ? jQuery(e.srcElement) : jQuery(e.target),
+			form = footerButton.closest('form'),
+			confirmText = footerButton.attr('confirm');
 		if (confirmText && !confirm(confirmText)) {
 			Event.stop(e);
 			return false;

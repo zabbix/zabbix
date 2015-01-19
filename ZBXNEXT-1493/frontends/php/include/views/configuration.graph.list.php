@@ -156,6 +156,16 @@ else {
 	zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 }
 
+// buttons
+$buttonsArray = array();
+if (!$this->data['parent_discoveryid']) {
+	$buttonsArray['graph.masscopyto'] = array('name' => _('Copy'));
+}
+$buttonsArray['graph.massdelete'] = array('name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
+	? _('Delete selected graph prototypes?')
+	: _('Delete selected graphs?')
+);
+
 // append table to form
 $graphForm->addItem(array(
 	$this->data['paging'],
@@ -164,13 +174,7 @@ $graphForm->addItem(array(
 	get_table_header(new CActionButtonList(
 		'action',
 		'group_graphid',
-		array(
-			'graph.masscopyto' => !$this->data['parent_discoveryid'] ? array('name' => _('Copy')) : array(),
-			'graph.massdelete' => array('name' => _('Delete'),
-				'confirm' => $this->data['parent_discoveryid']
-					? _('Delete selected graph prototypes?')
-					: _('Delete selected graphs?'),
-		)),
+		$buttonsArray,
 		$this->data['parent_discoveryid'] ? $this->data['parent_discoveryid'] : $this->data['hostid']
 	))
 ));

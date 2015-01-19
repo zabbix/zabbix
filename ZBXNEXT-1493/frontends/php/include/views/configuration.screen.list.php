@@ -62,6 +62,13 @@ foreach ($this->data['screens'] as $screen) {
 	));
 }
 
+// buttons
+$buttonsArray = array();
+if (!$this->data['templateid']) {
+	$buttonsArray['screen.export'] = array('name' => _('Export'));
+}
+$buttonsArray['screen.massdelete'] = array('name' => _('Delete'), 'confirm' => _('Delete selected screens?'));
+
 // append table to form
 $screenForm->addItem(array(
 	$this->data['paging'],
@@ -70,10 +77,7 @@ $screenForm->addItem(array(
 	get_table_header(new CActionButtonList(
 		'action',
 		'screens',
-		array(
-			'screen.export' => !$this->data['templateid'] ? array('name' => _('Export')) : array(),
-			'screen.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected screens?'))
-		)
+		$buttonsArray
 	))
 ));
 
