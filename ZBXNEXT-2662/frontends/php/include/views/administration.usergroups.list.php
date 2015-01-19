@@ -54,16 +54,16 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 
 	$debugMode = ($usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 		? new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisabledebug&usrgrpid='.$userGroupId, 'orange')
-		: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenabledebug&usrgrpid='.$userGroupId, 'enabled');
+		: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenabledebug&usrgrpid='.$userGroupId, 'green');
 
 	// gui access
 	$guiAccess = user_auth_type2str($usrgrp['gui_access']);
-	$guiAccessStyle = 'enabled';
+	$guiAccessStyle = 'green';
 	if ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_INTERNAL) {
 		$guiAccessStyle = 'orange';
 	}
 	if ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-		$guiAccessStyle = 'disabled';
+		$guiAccessStyle = 'red';
 	}
 
 	if (granted2update_group($userGroupId)) {
@@ -78,12 +78,12 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 		);
 
 		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
-			? new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisable&usrgrpid='.$userGroupId, 'enabled')
-			: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenable&usrgrpid='.$userGroupId, 'disabled');
+			? new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisable&usrgrpid='.$userGroupId, 'green')
+			: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenable&usrgrpid='.$userGroupId, 'red');
 	}
 	else {
 		$guiAccess = new CSpan($guiAccess, $guiAccessStyle);
-		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED) ? new CSpan(_('Enabled'), 'enabled') : new CSpan(_('Disabled'), 'disabled');
+		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED) ? new CSpan(_('Enabled'), 'green') : new CSpan(_('Disabled'), 'red');
 	}
 
 	if (isset($usrgrp['users'])) {
@@ -109,7 +109,7 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 			$users[] = new CLink(getUserFullname($user),
 				'users.php?form=update&userid='.$user['userid'],
 				($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $user['users_status'] == GROUP_STATUS_DISABLED)
-					? 'disabled' : 'enabled'
+					? 'red' : 'green'
 			);
 		}
 	}

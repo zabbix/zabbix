@@ -1404,25 +1404,20 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 	$cont = new CSpan();
 
 	foreach ($obj as $el) {
-		if (is_object($el) || $el === SPACE) {
-			$cont->addItem($el);
-		}
-		else {
-			$cont->addItem(new CSpan($el, 'underline'));
-		}
+		$cont->addItem($el);
 	}
 	$cont->addItem(SPACE);
 
-	$img = null;
+	$arrow = null;
 	if ($tabfield == $sortField) {
 		if ($sortorder == ZBX_SORT_UP) {
-			$img = new CSpan(SPACE, 'icon_sortdown');
+			$arrow = new CSpan(SPACE, 'arrow-down');
 		}
 		else {
-			$img = new CSpan(SPACE, 'icon_sortup');
+			$arrow = new CSpan(SPACE, 'arrow-up');
 		}
 	}
-	$col = new CColHeader(array($cont, $img), 'nowrap hover_grey');
+	$col = new CColHeader(array($obj, SPACE, $arrow));
 	$col->setAttribute('onclick', $script);
 
 	return $col;
