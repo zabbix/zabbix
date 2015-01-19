@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-30 06:33+0200\n"
+"POT-Creation-Date: 2015-01-15 18:31+0200\n"
 "PO-Revision-Date: 2014-10-06 06:18+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -1575,7 +1575,7 @@ msgstr "Αδύνατη η δημιουργία αυτοεξάρτησης σε �
 msgid "Cannot create discovery rule"
 msgstr "Αδύνατη η δημιουργία κανόνα εντοπισμού"
 
-#: include/classes/api/services/CHost.php:1067
+#: include/classes/api/services/CHost.php:1065
 msgid "Cannot create host group."
 msgstr "Αδύνατη η δημιουργία ομάδος ξενιστή."
 
@@ -1664,7 +1664,7 @@ msgstr[1] "Αδύνατη η διαγραφή ομάδων"
 msgid "Cannot delete host"
 msgstr "Αδύνατη η διαγραφή ξενιστή"
 
-#: include/classes/api/services/CHost.php:1078
+#: include/classes/api/services/CHost.php:1076
 msgid "Cannot delete host group."
 msgstr "Αδύνατη η διαγραφή ομάδος ξενιστών."
 
@@ -1684,7 +1684,7 @@ msgstr "Αδύνατη η διαγραφή αντιστοίχισης εικον
 msgid "Cannot delete image"
 msgstr "Αδύνατη η διαγραφή εικόνας"
 
-#: include/classes/api/services/CHost.php:1164
+#: include/classes/api/services/CHost.php:1162
 msgid "Cannot delete inventory."
 msgstr "Αδύνατη η διαγραφή απογραφής."
 
@@ -2186,7 +2186,7 @@ msgstr "Αδύνατη η εισαγωγή έκφρασης εναύσματος
 msgid "Cannot insert user media."
 msgstr "Αδύνατη η εισαγωγή μέσου χρήστη."
 
-#: include/classes/api/services/CHost.php:1142
+#: include/classes/api/services/CHost.php:1140
 msgid "Cannot link template"
 msgstr "Αδύνατη η συσχέτιση σχεδιότυπου"
 
@@ -2203,7 +2203,7 @@ msgstr "Αδύνατη σύνδεση."
 msgid "Cannot logout."
 msgstr "Αδύνατη η αποσύνδεση."
 
-#: include/classes/api/services/CHost.php:963
+#: include/classes/api/services/CHost.php:961
 msgid "Cannot mass update host name."
 msgstr "Αδύνατη η μαζική ενημέρωση ονόματος ξενιστή."
 
@@ -2211,7 +2211,7 @@ msgstr "Αδύνατη η μαζική ενημέρωση ονόματος ξε�
 msgid "Cannot mass update template name."
 msgstr "Αδύνατη η μαζική ενημέρωση ονόματος σχεδιότυπου."
 
-#: include/classes/api/services/CHost.php:953
+#: include/classes/api/services/CHost.php:951
 msgid "Cannot mass update visible host name."
 msgstr "Αδύνατη η μαζική ενημέρωση ορατού ονόματος ξενιστή."
 
@@ -2305,7 +2305,7 @@ msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Αδύνατη η τοποθέτηση \"templateid\" για πρωτότυπο έναυσμα \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:572
-#: include/classes/api/services/CHost.php:1017
+#: include/classes/api/services/CHost.php:1015
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Αδύνατη η τοποθέτηση πεδίων απογραφής σε απενεργοποιημένη απογραφή."
 
@@ -2355,7 +2355,7 @@ msgstr "Αδύνατη η αποσύνδεση και καθαρισμός συ�
 msgid "Cannot unlink and clear triggers"
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός εναυσμάτων"
 
-#: include/classes/api/services/CHost.php:1117
+#: include/classes/api/services/CHost.php:1115
 msgid "Cannot unlink template"
 msgstr "Αδύνατη η αποσύνδεση σχεδιότυπου"
 
@@ -2712,21 +2712,21 @@ msgstr "Ελέγξτε το τμήμα έκφρασης που ξεκινά απ
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr "Έλεγχος ύπαρξης αρχείου. 0 - ανύπαρκτο, 1 - υπαρκτό"
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Έλεγχος διαθεσιμότητας υπηρεσίας. 0 - υπηρεσία κλειστή, 1 - υπηρεσία ενεργή. Αν λείπει η <ip>, IP ή DNS όνομα λαμβάνεται από ορισμό ξενιστή. Αν λείπει το <port>, χρησιμοποιείται το προεπιλεγμένο της υπηρεσίας."
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr "Έλεγχος διαθεσιμότητας υπηρεσίας. 0 - υπηρεσία κλειστή, 1 - υπηρεσία ενεργή. Αν λείπει η διεύθυνση χρήση της 127.0.0.1. Αν λείπει η θύρα, χρήση εξ ορισμού θύρας υπηρεσίας. Παράδειγμα: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
 msgstr "Έλεγχος απόδοσης \"υπηρεσία\". 0 - υπηρεσία κλειστή, sec - δευτερόλεπτα χρήσης σύνδεσης υπηρεσίας. Αν λείπει η διεύθυνση χρήση της 127.0.0.1. Αν λείπει η θύρα, χρήση εξ ορισμού θύρας υπηρεσίας."
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Έλεγχος απόδοσης υπηρεσίας. 0 - υπηρεσία κλειστή, sec - δευτερόλεπτα χρήσης σύνδεσης υπηρεσίας. Αν λείπει η <ip>, IP ή DNS όνομα λαμβάνεται από ορισμό ξενιστή. Αν λείπει η <port>, χρήση εξ ορισμού θύρας υπηρεσίας."
 
@@ -2753,8 +2753,8 @@ msgstr "Έλεγχος δυνατότητας σύνδεσης TCP σε αριθ
 msgid "Checks"
 msgstr "Έλεγχοι"
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr "Έλεγχοι υπηρεσίας DNS. 0 - DNS κλειστή (μη απόκριση εξυπηρετητή ή αποτυχία ανάλυσης DNS), 1 - DNS ενεργή."
 
@@ -4176,7 +4176,7 @@ msgstr "Διεγράφη: Κανόνας εντοπισμού \"%1$s\" σε \"%2
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Διεγράφη: Γράφημα \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1445
+#: include/classes/api/services/CHost.php:1443
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Διεγράφη: Ξενιστής \"%1$s\"."
@@ -4905,7 +4905,7 @@ msgstr "Κενός ξενιστής."
 #: include/classes/api/services/CHostGroup.php:471
 #: include/classes/api/services/CHostGroup.php:548
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1293
+#: include/classes/api/services/CHost.php:1291
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:618
@@ -6281,7 +6281,7 @@ msgid_plural "Hosts"
 msgstr[0] "Ξενιστής"
 msgstr[1] "Ξενιστές"
 
-#: include/classes/api/services/CHost.php:976
+#: include/classes/api/services/CHost.php:974
 #: include/classes/api/services/CTemplate.php:471
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6545,7 +6545,7 @@ msgstr "Μάσκα υποδικτύου ξενιστή"
 msgid "Host time"
 msgstr "Χρόνος ξενιστή"
 
-#: include/classes/api/services/CHost.php:850
+#: include/classes/api/services/CHost.php:848
 msgid "Host update failed."
 msgstr "Αποτυχία ενημέρωσης ξενιστή."
 
@@ -7246,7 +7246,7 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Λανθασμένοι χαρακτήρες σε χρήση για ξενιστή \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:626
-#: include/classes/api/services/CHost.php:959
+#: include/classes/api/services/CHost.php:957
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Λανθασμένοι χαρακτήρες για όνομα ξενιστή \"%s\"."
@@ -8087,7 +8087,7 @@ msgstr "Δόθηκε άκυρο όνομα προβολής \"%s\". Επιτρε
 msgid "Inventory"
 msgstr "Απογραφή"
 
-#: include/classes/api/services/CHost.php:1183
+#: include/classes/api/services/CHost.php:1181
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Απενεργοποιημένη απογραφή ξενιστή \"%1$s\"."
@@ -10039,7 +10039,7 @@ msgstr "Δεν βρέθηκαν γραφήματα."
 msgid "No groups for host \"%s\"."
 msgstr "Χωρίς ομάδες για ξενιστή \"%s\"."
 
-#: include/classes/api/services/CHost.php:945
+#: include/classes/api/services/CHost.php:943
 msgid "No groups for hosts."
 msgstr "Χωρίς ομάδες για ξενιστές."
 
@@ -10302,7 +10302,7 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: include/classes/api/services/CHostInterface.php:647
 #: include/classes/api/services/CHost.php:530
 #: include/classes/api/services/CHost.php:613
-#: include/classes/api/services/CHost.php:1638
+#: include/classes/api/services/CHost.php:1636
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -11432,8 +11432,8 @@ msgstr "Εκατοστιαία γραμμή (αριστερά)"
 msgid "Percentile line (right)"
 msgstr "Εκατοστιαία γραμμή (δεξιά)"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:351
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr "Εκτελεί ερώτημα DNS. Σε επιτυχία επιστρέφει σειρά χαρακτήρων με απαιτούμενο είδος πληροφορίας."
 
@@ -13626,7 +13626,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Σχεδιότυπο"
 
-#: include/classes/api/services/CHost.php:987
+#: include/classes/api/services/CHost.php:985
 #: include/classes/api/services/CTemplate.php:461
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -15856,8 +15856,8 @@ msgstr "Δεν καθορίσατε στόχους για γενική δέσμ�
 
 #: include/classes/api/services/CGraph.php:543
 #: include/classes/api/services/CGraphPrototype.php:558
-#: include/classes/api/services/CHost.php:881
-#: include/classes/api/services/CHost.php:939
+#: include/classes/api/services/CHost.php:879
+#: include/classes/api/services/CHost.php:937
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668
