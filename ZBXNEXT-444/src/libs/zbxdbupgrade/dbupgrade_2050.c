@@ -24,7 +24,7 @@
 #include "sysinfo.h"
 
 /*
- * 3.0 maintenance database patches
+ * 3.0 development database patches
  */
 
 #ifndef HAVE_SQLITE3
