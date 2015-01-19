@@ -413,8 +413,8 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			new CLink($trigger['description'], 'events.php?filter_set=1&triggerid='.$trigger['triggerid'].
 				'&source='.EVENT_SOURCE_TRIGGERS
 			),
-			new CSpan(sprintf('%.4f%%', $availability['true']), 'on'),
-			new CSpan(sprintf('%.4f%%', $availability['false']), 'off'),
+			new CSpan(sprintf('%.4f%%', $availability['true']), 'red'),
+			new CSpan(sprintf('%.4f%%', $availability['false']), 'green'),
 			new CLink(_('Show'), 'report2.php?filter_groupid='.$_REQUEST['filter_groupid'].
 				'&filter_hostid='.$_REQUEST['filter_hostid'].'&triggerid='.$trigger['triggerid'])
 		));
