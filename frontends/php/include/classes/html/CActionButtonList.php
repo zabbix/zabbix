@@ -59,7 +59,7 @@ class CActionButtonList extends CObject {
 	 * @param string		$checkboxesName			Name of paramerer into which checked checkboxes will be put in.
 	 * @param array			$buttonsData			buttons data array
 	 * @param string		$buttonsData['name']	button caption
-	 * @param string		$buttonsData['confirm']	confirmation text
+	 * @param string		$buttonsData['confirm']	confirmation text (optional)
 	 * @param string|null	$cookieNamePrefix		Prefix for cookie used for storing currently selected checkboxes.
 	 */
 	function __construct($actionName, $checkboxesName, array $buttonsData, $cookieNamePrefix = null) {
@@ -67,10 +67,7 @@ class CActionButtonList extends CObject {
 		$this->cookieNamePrefix = $cookieNamePrefix;
 
 		foreach ($buttonsData as $actionValue => $buttonData) {
-			$this->buttons[$actionValue] = new CSubmit(
-				$actionName,
-				$buttonData['name']
-			);
+			$this->buttons[$actionValue] = new CSubmit($actionName, $buttonData['name']);
 
 			$this->buttons[$actionValue]->removeAttribute('id');
 			$this->buttons[$actionValue]->setAttribute('value', $actionValue);
