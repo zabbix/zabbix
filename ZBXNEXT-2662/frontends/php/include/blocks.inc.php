@@ -1275,9 +1275,9 @@ function make_discovery_status() {
 	}
 
 	$header = array(
-		new CCol(_('Discovery rule'), 'center'),
-		new CCol(_x('Up', 'discovery results in dashboard')),
-		new CCol(_x('Down', 'discovery results in dashboard'))
+		new CColHeader(_('Discovery rule'), 'center'),
+		new CColHeader(_x('Up', 'discovery results in dashboard')),
+		new CColHeader(_x('Down', 'discovery results in dashboard'))
 	);
 
 	$table = new CTableInfo();

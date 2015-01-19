@@ -59,8 +59,8 @@ function httptest_status2str($status = null) {
 
 function httptest_status2style($status) {
 	$statuses = array(
-		HTTPTEST_STATUS_ACTIVE => 'off',
-		HTTPTEST_STATUS_DISABLED => 'on',
+		HTTPTEST_STATUS_ACTIVE => 'green',
+		HTTPTEST_STATUS_DISABLED => 'red',
 	);
 
 	if (isset($statuses[$status])) {
