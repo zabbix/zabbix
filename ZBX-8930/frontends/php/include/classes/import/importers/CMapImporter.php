@@ -45,9 +45,9 @@ class CMapImporter extends CImporter {
 
 		foreach ($mapsWithoutElements as $mapName => $mapWithoutElements) {
 			$mapId = $this->referencer->resolveMap($mapWithoutElements['name']);
-			if ($mapId !== false) {
+			if ($mapId) {
 				// Update sysmapid in source map too
-				$maps[$mapName]['sysmapid'] = $mapId;
+				$maps[$mapName]['sysmapid'] = $mapWithoutElements['sysmapid'] = $mapId;
 				$mapsToProcess['updateExisting'][] = $mapWithoutElements;
 			}
 			else {
