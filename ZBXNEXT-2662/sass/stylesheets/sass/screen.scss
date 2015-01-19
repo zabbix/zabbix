@@ -19,6 +19,7 @@ body {
 a {
 	text-decoration: none;
 	color: $link-color;
+	@include transition;
 
 	&:hover {
 		text-decoration: underline;
@@ -149,15 +150,36 @@ ul.top-nav-icons input {
 	background: darken($primary-color, 5%) url(../img/icon-sprite.png) no-repeat 0 0;
 	border-color: darken($primary-color, 5%);
 	width: 167px;
-	margin: 5px 15px 0 0;
+	margin: 5px 13px 0 0;
 	padding-left: 24px;
+
+	&::-webkit-input-placeholder {
+		color: $form-input-top-placeholder;
+	}
+
+	&::-moz-placeholder {
+		color: $form-input-top-placeholder;
+	}
+	&:-ms-input-placeholder {
+		color: $form-input-top-placeholder;
+	}
 
 	&:focus {
 		background: $body-bgcolor url(../img/icon-sprite.png) no-repeat 0 -122px;
 		border-color: $body-bgcolor;
+
+		&::-webkit-input-placeholder {
+		color: $form-input-top-focus-placeholder;
+	}
+
+	&::-moz-placeholder {
+		color: $form-input-top-focus-placeholder;
+	}
+	&:-ms-input-placeholder {
+		color: $form-input-top-focus-placeholder;
+	}
 	}
 }
-
 
 div.top-subnav-container {
 	height: 36px;
@@ -225,7 +247,7 @@ div.header-title {
 		& li {
 			display: block;
 			float: left;
-			padding: 0 0 0 15px;
+			padding: 0 0 0 13px;
 		}
 	}
 }
@@ -274,7 +296,7 @@ a.logo {
 	height: 25px;
 	margin: 0 auto;
 	margin-bottom: 10px;
-	background: url(../img/icon-sprite.png) no-repeat 0 -336px;
+	background: url(../img/icon-sprite.png) no-repeat 0 -360px;
 }
 
 /* Tables */
@@ -331,6 +353,12 @@ table.list-table {
 	}
 }
 
+table.table-forms {
+	tfoot button {
+		margin: 0 13px 0 0px;
+	}
+}
+
 div.table-paging {
 	text-align: center;
 	background: $body-content-bgcolor;
@@ -376,30 +404,38 @@ div.filter-container {
 }
 
 /* Forms */
-
-
 input[type="text"] {
-	@extend %form-input-style;
 	height: 24px;
 	line-height: 24px;
+	@extend %form-input-style;
+}
 
-	&:focus {
-		border-color: $primary-color;
-	}
+input[type="password"] {
+	height: 24px;
+	line-height: 24px;
+	@extend %form-input-style;
+}
+
+input[type="search"] {
+	height: 24px;
+	line-height: 24px;
+	@extend %form-input-style;
 }
 
 textarea {
+	height: 24px;
+	line-height: 24px;
 	@extend %form-input-style;
 }
 
 select {
-	@extend %form-input-style;
 	height: 24px;
 	line-height: 24px;
-	@include transition;
+	@extend %form-input-style;
 
-	&:focus {
-		border-color: $primary-color;
+	&[type="multiple"] {
+		height: 100%;
+		padding: 5px;
 	}
 }
 
@@ -410,6 +446,10 @@ select {
 	padding: 0 5px;
 	@include font-form;
 	@include transition;
+
+	&:focus {
+		border-color: $primary-color;
+	}
 }
 
 input [type="checkbox"] {
@@ -437,13 +477,12 @@ button {
 	min-height: 24px;
 	vertical-align: middle;
 	@include transition;
-
 	cursor: pointer;
 	@extend %button-hover-active;
 
 	&.btn-alt {
 		@extend button;
-		background: transparent;
+		background: $body-content-bgcolor;
 		color: $primary-color;
 		@extend %button-hover-active;
 	}
@@ -520,7 +559,50 @@ div.action-buttons {
 	margin: 15px 0 0 0;
 
 	& button {
-		margin: 0 15px 0 0;
+		margin: 0 13px 0 0;
+	}
+}
+
+div.tabs-nav-container {
+	height: 36px;
+	line-height: 36px;
+	margin: 0 0 15px 0;
+	background: lighten($primary-color, 55%);
+	border-bottom: 1px solid #eee;
+}
+
+ul.tabs-nav {
+	background: $form-disabled-color;
+
+	li {
+		display: block;
+		float: left;
+
+		&.selected {
+			background: $body-content-bgcolor;
+
+			a, a:hover {
+				color: $font-color;
+				background: $body-content-bgcolor;
+				text-decoration: none;
+				cursor: default;
+			}
+	    }
+	}
+
+	a {
+		padding: 10px 13px 10px 13px;
+	}
+}
+
+.help-icon {
+	background: url(../img/icon-sprite.png) no-repeat 0 -312px;
+	@extend %button-icon-size;
+	display: block;
+	position: absolute;
+
+	&:hover {
+		background: url(../img/icon-sprite.png) no-repeat 0 -336px;
 	}
 }
 
