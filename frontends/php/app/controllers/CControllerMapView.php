@@ -65,12 +65,10 @@ class CControllerMapView extends CController {
 			}
 		}
 		else {
-			$sysmapid = CProfile::get('web.maps.sysmapid');
+			$sysmapid = CProfile::get('web.maps.sysmapid', 0);
 
-			if ($sysmapid != 0) {
-				if (!array_key_exists($sysmapid, $maps)) {
-					$sysmapid = 0;
-				}
+			if ($sysmapid != 0 && !array_key_exists($sysmapid, $maps)) {
+				$sysmapid = 0;
 			}
 
 			if ($sysmapid == 0 && $maps) {
