@@ -59,7 +59,7 @@ class CActionButtonList extends CObject {
 	 * @param string		$checkboxesName			Name of paramerer into which checked checkboxes will be put in.
 	 * @param array			$buttonsData			buttons data array
 	 * @param string		$buttonsData['name']	button caption
-	 * @param string|null	$buttonsData['confirm']	confirmation text
+	 * @param string		$buttonsData['confirm']	confirmation text
 	 * @param string|null	$cookieNamePrefix		Prefix for cookie used for storing currently selected checkboxes.
 	 */
 	function __construct($actionName, $checkboxesName, array $buttonsData, $cookieNamePrefix = null) {
@@ -77,7 +77,7 @@ class CActionButtonList extends CObject {
 				$this->buttons[$actionValue]->setAttribute('value', $actionValue);
 				$this->buttons[$actionValue]->addClass('footerButton');
 
-				if (isset($buttonData['confirm'])) {
+				if (array_key_exists('confirm', $buttonData)) {
 					$this->buttons[$actionValue]->setAttribute('confirm', $buttonData['confirm']);
 				}
 			}
