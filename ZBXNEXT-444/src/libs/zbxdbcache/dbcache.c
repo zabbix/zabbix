@@ -1980,7 +1980,8 @@ int	DCsync_history(int sync_type)
 							history[history_num].value_orig.str =
 									zbx_strdup(NULL,
 									cache->history[f].value_orig.str);
-							cache->text_free += strlen(cache->history[f].value_orig.str) + 1;
+							cache->text_free +=
+									strlen(cache->history[f].value_orig.str) + 1;
 						}
 						break;
 				}
