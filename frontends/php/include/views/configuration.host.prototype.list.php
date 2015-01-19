@@ -123,9 +123,7 @@ $itemForm->addItem(array(
 	$hostTable,
 	$this->data['paging'],
 	get_table_header(
-	new CActionButtonList(
-		'action',
-		'group_hostid',
+	new CActionButtonList('action', 'group_hostid',
 		array(
 			'hostprototype.massenable' => array('name' => _('Enable'),
 				'confirm' => _('Enable selected host prototypes?')

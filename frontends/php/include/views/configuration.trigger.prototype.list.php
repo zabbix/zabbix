@@ -136,9 +136,7 @@ $triggersForm->addItem(array(
 	$this->data['paging'],
 	$triggersTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList(
-		'action',
-		'g_triggerid',
+	get_table_header(new CActionButtonList('action', 'g_triggerid',
 		array(
 			'triggerprototype.massenable' => array('name' => _('Enable'),
 				'confirm' => _('Enable selected trigger prototypes?')

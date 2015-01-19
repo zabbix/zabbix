@@ -56,13 +56,9 @@ $slideForm->addItem(array(
 	$this->data['paging'],
 	$slidesTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList(
-		'action',
-		'shows',
-		array(
-			'slideshow.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected slide shows?'))
-		)
-	))
+	get_table_header(new CActionButtonList('action', 'shows', array(
+		'slideshow.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected slide shows?'))
+	)))
 ));
 
 // append form to widget

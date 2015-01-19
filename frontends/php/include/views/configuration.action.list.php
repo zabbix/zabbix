@@ -105,15 +105,11 @@ $actionForm->addItem(array(
 	$this->data['paging'],
 	$actionTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList(
-		'action',
-		'g_actionid',
-		array(
-			'action.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected actions?')),
-			'action.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected actions?')),
-			'action.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected actions?'))
-		)
-	))
+	get_table_header(new CActionButtonList('action', 'g_actionid', array(
+		'action.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected actions?')),
+		'action.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected actions?')),
+		'action.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected actions?'))
+	)))
 ));
 
 // append form to widget
