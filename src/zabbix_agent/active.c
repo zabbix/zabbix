@@ -939,10 +939,9 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 		{
 			/* needs meta information update */
 			ret = SUCCEED;
-			goto out;
 		}
 	}
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
