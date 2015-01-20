@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
 require_once dirname(__FILE__).'/testPageStatusOfTriggers.php';
 require_once dirname(__FILE__).'/testPageEvents.php';
+require_once dirname(__FILE__).'/testPageScreens.php';
 
 require_once dirname(__FILE__).'/testPageActions.php';
 require_once dirname(__FILE__).'/testPageAdministrationAudit.php';
@@ -51,7 +52,6 @@ require_once dirname(__FILE__).'/testPagePopup.php';
 //require_once dirname(__FILE__).'/testPageQueueDetails.php';
 //require_once dirname(__FILE__).'/testPageQueueOverview.php';
 //require_once dirname(__FILE__).'/testPageQueueOverviewByProxy.php';
-require_once dirname(__FILE__).'/testPageScreens.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageSlideShows.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
