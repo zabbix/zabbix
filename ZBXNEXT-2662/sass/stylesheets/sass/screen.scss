@@ -311,9 +311,10 @@ table.list-table {
 		overflow: hidden;
 	    padding: 6px 5px 6px 5px;
 	    vertical-align: middle;
-	    border-bottom: 2px solid $table-hordivider-color;
+	    border-bottom: 1px solid $table-hordivider-color;
 	    text-align: left;
 	    color: $font-alt-color;
+	    white-space: nowrap;
 
 	    a {
 	    	display: block;
@@ -325,11 +326,11 @@ table.list-table {
 	    	&:hover {
 	    		color: $link-alt-hover-color;
 	    		text-decoration: none;
-	    		background: lighten($primary-color, 55%)
+	    		background: lighten($primary-color, 56%)
 	    	}
 
 	    	& span {
-	    		margin: 0 0 0 5px;
+	    		margin: 0 0 0 4px;
 	    	}	    
 	    }
 	}
@@ -338,11 +339,15 @@ table.list-table {
 		@include transition;
 
 		&:hover {
-			background: lighten($primary-color, 55%);
+			background: lighten($primary-color, 56%);
 		}
 
 		&.row-selected {
 			background: $table-tr-selected-color;
+		}
+
+		&:last-child td {
+			border-bottom: none;
 		}
 	}
 
@@ -363,6 +368,7 @@ div.table-paging {
 	text-align: center;
 	background: $body-content-bgcolor;
 	padding: 7px 5px 7px 5px;
+	@include list-table-shadow;
 
 	a {
 		display: inline-block;
@@ -482,7 +488,7 @@ button {
 
 	&.btn-alt {
 		@extend button;
-		background: $body-content-bgcolor;
+		background: $form-transparent-color;
 		color: $primary-color;
 		@extend %button-hover-active;
 	}
@@ -619,6 +625,10 @@ ul.tabs-nav {
 	color: $alert-orange-color;
 }
 
+.grey {
+	color: $alert-grey-color;
+}
+
 a.green {
 	@extend .green;
 }
@@ -631,19 +641,56 @@ a.orange {
 	@extend .orange;
 }
 
+a.grey {
+	@extend .grey;
+}
+
+span.status-green {
+	@extend .green;
+	border: 1px solid $alert-green-border-color;
+	background: $alert-green-bg-color;
+	@extend %status;
+}
+
+span.status-red {
+	@extend .red;
+	border: 1px solid $alert-red-border-color;
+	background: $alert-red-bg-color;
+	@extend %status;
+}
+
+span.status-grey {
+	@extend .grey;
+	border: 1px solid $alert-grey-border-color;
+	background: $alert-grey-bg-color;
+	@extend %status;
+}
+
+%status {
+	padding: 2px 4px;
+	font-size: $font-h3-size;
+	text-transform: uppercase;
+	text-align: center;
+	@include border-radius; 
+}
+
 .msg-good {
 	@extend .green;
 	border: 1px solid $alert-green-border-color;
 	background: $alert-green-bg-color;
-	padding: 7px 12px;
-	text-align: center;
-	position: relative;
-	@include border-radius; 
+	@extend %msg; 
 }
 
 .msg-bad {
 	@extend .red;
-	border-color: $alert-red-border-color;
+	border: 1px solid $alert-red-border-color;
 	background: $alert-red-bg-color;
-	@extend .msg-good;
+	@extend %msg;
+}
+
+%msg {
+	padding: 7px 12px;
+	text-align: center;
+	position: relative;
+	@include border-radius;
 }
