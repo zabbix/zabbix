@@ -21,12 +21,34 @@
 
 require_once dirname(__FILE__).'/js/adm.regexprs.edit.js.php';
 
-zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($this->get('expressions'))).');');
+$regExpWidget = new CWidget();
+
+$generalComboBox = new CComboBox('configDropDown', 'adm.regexps.php', 'redirect(this.options[this.selectedIndex].value);');
+$generalComboBox->addItems(array(
+	'adm.gui.php' => _('GUI'),
+	'adm.housekeeper.php' => _('Housekeeping'),
+	'adm.images.php' => _('Images'),
+	'adm.iconmapping.php' => _('Icon mapping'),
+	'adm.regexps.php' => _('Regular expressions'),
+	'adm.macros.php' => _('Macros'),
+	'adm.valuemapping.php' => _('Value mapping'),
+	'adm.workingtime.php' => _('Working time'),
+	'adm.triggerseverities.php' => _('Trigger severities'),
+	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
+	'adm.other.php' => _('Other')
+));
+
+$headerForm = new CForm();
+$headerForm->addItem($generalComboBox);
+
+$regExpWidget->addPageHeader(_('CONFIGURATION OF REGULAR EXPRESSIONS'), $headerForm);
 
 $form = new CForm();
 $form->attr('id', 'zabbixRegExpForm');
 $form->addVar('form', 1);
-$form->addVar('regexpid', $this->data['regexpid']);
+$form->addVar('regexpid', $data['regexpid']);
+
+zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($this->get('expressions'))).');');
 
 /*
  * Expressions tab
@@ -74,7 +96,7 @@ $tabExp->setHeader(array(_('Expression'), _('Expression type'), _('Result')));
 $testTab->addRow(_('Result'), $tabExp);
 
 $regExpView = new CTabView();
-if (!$this->data['form_refresh']) {
+if (!$data['form_refresh']) {
 	$regExpView->setSelected(0);
 }
 $regExpView->addTab('expr', _('Expressions'), $exprTab);
@@ -82,7 +104,7 @@ $regExpView->addTab('test', _('Test'), $testTab);
 $form->addItem($regExpView);
 
 // footer
-if (isset($this->data['regexpid'])) {
+if (isset($data['regexpid'])) {
 	$form->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
@@ -102,4 +124,7 @@ else {
 	));
 }
 
-return $form;
+// append form to widget
+$regExpWidget->addItem($form);
+
+return $regExpWidget;
