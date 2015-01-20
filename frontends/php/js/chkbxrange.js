@@ -27,7 +27,7 @@ var chkbxRange = {
 	prefix:			null,	// prefix for cookie name
 	pageGoName:		null,	// which checkboxes should be counted by Go button and saved to cookies
 	selectedIds:	{},		// ids of selected objects
-	goButton:		null,
+	footerButtons:	null,
 	cookieName:		null,
 
 	init: function() {
@@ -66,11 +66,11 @@ var chkbxRange = {
 			this.update(this.pageGoName);
 		}
 
-		// bind event to the "Go" button
-		this.goButton = $('goButton');
-		if (!is_null(this.goButton)) {
-			addListener(this.goButton, 'click', this.submitGo.bindAsEventListener(this), false);
-		}
+		this.footerButtons = jQuery('.button.footerButton');
+		var thisChkbxRange = this;
+		this.footerButtons.each(function() {
+			addListener(this, 'click', thisChkbxRange.submitFooterButton.bindAsEventListener(thisChkbxRange), false);
+		});
 	},
 
 	implement: function(obj) {
@@ -252,11 +252,14 @@ var chkbxRange = {
 			count++;
 		});
 
+		var selectedCountSpan = jQuery('#selectedCount');
+		selectedCountSpan.text(count + ' ' + selectedCountSpan.text().split(' ')[1]);
+
+		jQuery('.button.footerButton').prop('disabled', count == 0);
+
 		// update go button
-		var goButton = jQuery('#goButton');
-		goButton.text(goButton.text().split(' ')[0] + ' (' + count + ')')
-			.prop('disabled', count == 0);
-		jQuery('#action').prop('disabled', count == 0);
+		var footerButton = jQuery('#footerButton');
+		footerButton.text(footerButton.text().split(' ')[0] + ' (' + count + ')').prop('disabled', count == 0);
 	},
 
 	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
@@ -313,20 +316,19 @@ var chkbxRange = {
 		}
 	},
 
-	submitGo: function(e) {
+	submitFooterButton: function(e) {
 		e = e || window.event;
 
-		var goSelect = $('action');
-		var confirmText = goSelect.options[goSelect.selectedIndex].getAttribute('confirm');
-
-		if (!is_null(confirmText) && !confirm(confirmText)) {
+		var footerButton = IE8 ? jQuery(e.srcElement) : jQuery(e.target),
+			form = footerButton.closest('form'),
+			confirmText = footerButton.attr('confirm');
+		if (confirmText && !confirm(confirmText)) {
 			Event.stop(e);
 			return false;
 		}
 
-		var form = jQuery('#goButton').closest('form');
 		for (var key in this.selectedIds) {
-			if (!empty(this.selectedIds[key])) {
+			if (this.selectedIds.hasOwnProperty(key) && this.selectedIds[key] !== null) {
 				create_var(form.attr('name'), this.pageGoName + '[' + key + ']', key, false);
 			}
 		}
