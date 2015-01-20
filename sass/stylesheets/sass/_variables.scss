@@ -42,7 +42,7 @@ $form-input-top-focus-placeholder: #a9a9a9; // Search Grey
 // ALERT COLORS
 $alert-green-color: #3a8a43; // Green
 $alert-green-bg-color: #dff0d8; // Light Green
-$alert-green-border-color: #d6e9c6; // Dark Green
+$alert-green-border-color: #ccdebd; // Dark Green
 
 $alert-red-color: #a94442; // Red
 $alert-red-bg-color: #f2dede; // Light Red
@@ -50,11 +50,15 @@ $alert-red-border-color: #ebccd1; // Dark Red
 
 $alert-orange-color: #f37421; // Orange
 
+$alert-grey-color: #828282; // Alert Grey
+$alert-grey-bg-color: #e0e0e0; // Alert Light Grey 
+$alert-grey-border-color: #cfcfcf; // Alert Dark Grey
+
 // TYPOGRAPHY
 $font-stack: Arial, Tahoma, Verdana, sans-serif;
 
 $font-color: #1f2c33; // Navy Black
-$font-alt-color: #696969; // Alt Grey
+$font-alt-color: #828282; // Alt Grey
 $font-white-color: #fff; // Alt White
 
 $font-body-size: 75%; // Default 1em/12px
@@ -111,9 +115,9 @@ $font-transform: uppercase;
 
 //CSS3
 @mixin list-table-shadow {
-	-webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
-    -moz-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
+	-webkit-box-shadow: 0 1px 1px 0 rgba(60,60,60,0.1);
+    -moz-box-shadow: 0 1px 1px 0 rgba(60,60,60,0.1);
+    box-shadow: 0 1px 1px 0 rgba(60,60,60,0.1);
 }
 
 @mixin border-radius {
