@@ -28,7 +28,7 @@ class testPageStatusOfTriggers extends CWebTest {
 		$this->zbxTestTextPresent('Triggers');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextPresent(array('Group', 'Host'));
-		$this->zbxTestTextPresent(array('Severity', 'Status', 'Info', 'Last change', 'Age', 'Acknowledged', 'Host', 'Name', 'Comments'));
+		$this->zbxTestTextPresent(array('Severity', 'Status', 'Info', 'Last change', 'Age', 'Acknowledged', 'Host', 'Name', 'Description'));
 	}
 
 // Check that no real host or template names displayed
