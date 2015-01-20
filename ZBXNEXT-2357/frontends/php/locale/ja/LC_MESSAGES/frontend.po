@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-14 17:20+0200\n"
+"POT-Creation-Date: 2015-01-15 18:42+0200\n"
 "PO-Revision-Date: 2015-01-13 02:14+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -1551,7 +1551,7 @@ msgstr "自身に対する依存関係は作成できません。"
 msgid "Cannot create discovery rule"
 msgstr "ディスカバリルールを作成できません"
 
-#: include/classes/api/services/CHost.php:1075
+#: include/classes/api/services/CHost.php:1073
 msgid "Cannot create host group."
 msgstr "ホストグループを作成できません。"
 
@@ -1653,7 +1653,7 @@ msgstr[0] "グループを削除できません"
 msgid "Cannot delete host"
 msgstr "ホストを削除できません"
 
-#: include/classes/api/services/CHost.php:1086
+#: include/classes/api/services/CHost.php:1084
 msgid "Cannot delete host group."
 msgstr "ホストグループを削除できません"
 
@@ -1673,7 +1673,7 @@ msgstr "アイコンのマッピングを削除できません"
 msgid "Cannot delete image"
 msgstr "イメージを削除できません"
 
-#: include/classes/api/services/CHost.php:1172
+#: include/classes/api/services/CHost.php:1170
 msgid "Cannot delete inventory."
 msgstr "インベントリを削除できません"
 
@@ -2148,7 +2148,7 @@ msgstr "トリガー条件式を追加できません"
 msgid "Cannot insert user media."
 msgstr "ユーザーメディアを追加できません"
 
-#: include/classes/api/services/CHost.php:1150
+#: include/classes/api/services/CHost.php:1148
 msgid "Cannot link template"
 msgstr "テンプレートをリンクできません"
 
@@ -2165,7 +2165,7 @@ msgstr "ログインできません。"
 msgid "Cannot logout."
 msgstr "ログアウトできません。"
 
-#: include/classes/api/services/CHost.php:971
+#: include/classes/api/services/CHost.php:969
 msgid "Cannot mass update host name."
 msgstr "ホスト名を一括更新できません"
 
@@ -2173,7 +2173,7 @@ msgstr "ホスト名を一括更新できません"
 msgid "Cannot mass update template name."
 msgstr "テンプレート名を一括更新できません。"
 
-#: include/classes/api/services/CHost.php:961
+#: include/classes/api/services/CHost.php:959
 msgid "Cannot mass update visible host name."
 msgstr "ホストの表示名は一括更新できません。"
 
@@ -2267,7 +2267,7 @@ msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "トリガーのプロトタイプ\"%1$s\"に\"templateid\"を設定できません。"
 
 #: include/classes/api/services/CHost.php:583
-#: include/classes/api/services/CHost.php:1025
+#: include/classes/api/services/CHost.php:1023
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "無効の状態のインベントリのフィールドは設定できません。"
 
@@ -2317,7 +2317,7 @@ msgstr "アイテムのリンク削除と削除が行えません"
 msgid "Cannot unlink and clear triggers"
 msgstr "トリガーのリンク削除と削除が行えません"
 
-#: include/classes/api/services/CHost.php:1125
+#: include/classes/api/services/CHost.php:1123
 msgid "Cannot unlink template"
 msgstr "テンプレートのリンクを削除できません"
 
@@ -2674,21 +2674,21 @@ msgstr "条件式の%1$s\"から始まる部分を確認してください。"
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr "ファイルの存在チェック。0 - ファイルが存在しない、1 - ファイルが存在する"
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "サービスが動作中かチェック。0 - サービス停止中、1 - サービス動作中。<ip>が指定されない場合はホストの定義からIPかDNS名を取得する。<port>が指定されない場合はサービスのデフォルトポート番号が利用される。"
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr "サービスが動作中かチェック。0 - サービス停止中、1 - サービス動作中。IPが指定されない場合は127.0.0.1が利用される。ポート番号が指定されない場合はサービスのデフォルトポート番号が利用される。 例: net.tcp.service[ftp,,45]"
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
 msgstr "サービスのパフォーマンスチェック。0 - サービス停止中、秒数 - そのサービスへの接続にかかった秒数。IPが指定されない場合は127.0.0.1が利用される。ポート番号が指定されない場合はサービスのデフォルトポート番号が利用される。"
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "サービスのパフォーマンスチェック。0 - サービス停止中、秒数 - そのサービスへの接続にかかった秒数。<ip>が指定されない場合はホスト設定のIPかDNS名が利用される。<port>が指定されない場合は、サービスのデフォルトポート番号が利用される。"
 
@@ -2717,8 +2717,8 @@ msgstr "そのポート番号に対してTCPコネクションを作成できる
 msgid "Checks"
 msgstr "チェック"
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr "DNSサービスが起動しているかチェック。0 - DNSが停止(サーバーの応答がないか、DNSの名前解決に失敗)、1 - DNSが稼働中。"
 
@@ -4153,7 +4153,7 @@ msgstr "削除: \"%2$s\"のディスカバリルール\"%1$s\"。"
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のグラフ\"%1$s\"。"
 
-#: include/classes/api/services/CHost.php:1453
+#: include/classes/api/services/CHost.php:1451
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "削除: ホスト\"%1$s\"。"
@@ -4880,7 +4880,7 @@ msgstr "ホストが空白です。"
 #: include/classes/api/services/CHostGroup.php:471
 #: include/classes/api/services/CHostGroup.php:548
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1301
+#: include/classes/api/services/CHost.php:1299
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:606
@@ -6258,7 +6258,7 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "ホスト"
 
-#: include/classes/api/services/CHost.php:984
+#: include/classes/api/services/CHost.php:982
 #: include/classes/api/services/CTemplate.php:471
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6519,7 +6519,7 @@ msgstr "ホストのサブネットマスク"
 msgid "Host time"
 msgstr "ホスト時間"
 
-#: include/classes/api/services/CHost.php:858
+#: include/classes/api/services/CHost.php:856
 msgid "Host update failed."
 msgstr "ホストの更新に失敗しました"
 
@@ -7223,7 +7223,7 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "ホスト\"%1$s\"に不正な文字列が使用されています。"
 
 #: include/classes/api/services/CHost.php:634
-#: include/classes/api/services/CHost.php:967
+#: include/classes/api/services/CHost.php:965
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "ホスト名\"%s\"に不正な文字列が使用されています。"
@@ -8062,7 +8062,7 @@ msgstr "表示名\"%s\"が正しくありません。利用できる文字: \"a-
 msgid "Inventory"
 msgstr "インベントリ"
 
-#: include/classes/api/services/CHost.php:1191
+#: include/classes/api/services/CHost.php:1189
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "ホスト\"%1$s\"のインベントリを無効にしました。"
@@ -10008,7 +10008,7 @@ msgstr "グラフはありません。"
 msgid "No groups for host \"%s\"."
 msgstr "ホスト\"%s\"にグループが設定されていません。"
 
-#: include/classes/api/services/CHost.php:953
+#: include/classes/api/services/CHost.php:951
 msgid "No groups for hosts."
 msgstr "ホストにグループが設定されていません。"
 
@@ -10271,7 +10271,7 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/services/CHostInterface.php:647
 #: include/classes/api/services/CHost.php:530
 #: include/classes/api/services/CHost.php:621
-#: include/classes/api/services/CHost.php:1646
+#: include/classes/api/services/CHost.php:1644
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -11417,8 +11417,8 @@ msgstr "パーセンタイルライン (左)"
 msgid "Percentile line (right)"
 msgstr "パーセンタイルライン (右)"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:351
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr "DNS検索の実行。成功すれば要求したタイプの情報文字列が返却される。"
 
@@ -13593,7 +13593,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "テンプレート"
 
-#: include/classes/api/services/CHost.php:995
+#: include/classes/api/services/CHost.php:993
 #: include/classes/api/services/CTemplate.php:461
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -15822,8 +15822,8 @@ msgstr "アクションのグローバルスクリプト\"%s\"のターゲット
 
 #: include/classes/api/services/CGraph.php:543
 #: include/classes/api/services/CGraphPrototype.php:558
-#: include/classes/api/services/CHost.php:889
-#: include/classes/api/services/CHost.php:947
+#: include/classes/api/services/CHost.php:887
+#: include/classes/api/services/CHost.php:945
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668

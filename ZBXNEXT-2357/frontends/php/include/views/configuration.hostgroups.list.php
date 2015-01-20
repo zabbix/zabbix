@@ -150,27 +150,19 @@ foreach ($this->data['groups'] as $group) {
 	));
 }
 
-// create go button
-$goComboBox = new CComboBox('action');
-
-$goOption = new CComboItem('hostgroup.massenable', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected hosts?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('hostgroup.massdisable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable hosts in the selected host groups?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('hostgroup.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected host groups?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "groups";');
-
 // append table to form
-$hostGroupForm->addItem(array($this->data['paging'], $hostGroupTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$hostGroupForm->addItem(array(
+	$this->data['paging'],
+	$hostGroupTable,
+	$this->data['paging'],
+	get_table_header(new CActionButtonList('action', 'groups', array(
+		'hostgroup.massenable' => array('name' => _('Enable hosts'), 'confirm' => _('Enable selected hosts?')),
+		'hostgroup.massdisable' => array('name' => _('Disable hosts'),
+			'confirm' => _('Disable hosts in the selected host groups?')
+		),
+		'hostgroup.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected host groups?'))
+	)))
+));
 
 // append form to widget
 $hostGroupWidget->addItem($hostGroupForm);
