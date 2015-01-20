@@ -83,19 +83,15 @@ foreach ($data['scripts'] as $script) {
 	));
 }
 
-// create go buttons
-$goComboBox = new CComboBox('action');
-
-$goOption = new CComboItem('script.delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected scripts?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-$this->addPostJS('chkbxRange.pageGoName = "scriptids";');
-
 // append table to form
-$scriptsForm->addItem(array($data['paging'], $scriptsTable, $data['paging'], get_table_header(array($goComboBox, $goButton))));
+$scriptsForm->addItem(array(
+	$this->data['paging'],
+	$scriptsTable,
+	$this->data['paging'],
+	get_table_header(new CActionButtonList('action', 'scriptids', array(
+		'script.delete' => array('name' => _('Delete'), 'confirm' => _('Delete selected scripts?'))
+	)))
+));
 
 // append form to widget
 $scriptsWidget->addItem($scriptsForm);

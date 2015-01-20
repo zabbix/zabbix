@@ -9,6 +9,7 @@ DESC_H = zabbix_sender_desc.h
 RESOURCE_RC = resource.rc
 RESOURCE_RES = zabbix_sender.res
 OBJS = ..\..\..\src\libs\zbxcommon\comms.o \
+	..\..\..\src\libs\zbxcommon\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
 	..\..\..\src\libs\zbxcommon\str.o \
 	..\..\..\src\libs\zbxcommon\xml.o \
@@ -42,11 +43,11 @@ $(MESSAGES_H): messages.mc
 $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 	$(RC) /d "NDEBUG" /d "_VC80_UPGRADE=0x0600" /l 0x419 /fo"$(RESOURCE_RES)" $(RESOURCE_RC)
 
-..\..\..\src\libs\zbxcommon\alias.o: ..\..\..\src\libs\zbxcommon\alias.c
-	$(CC) ..\..\..\src\libs\zbxcommon\alias.c /Fo"..\..\..\src\libs\zbxcommon\alias.o" $(CFLAGS)
-
 ..\..\..\src\libs\zbxcommon\comms.o: ..\..\..\src\libs\zbxcommon\comms.c
 	$(CC) ..\..\..\src\libs\zbxcommon\comms.c /Fo"..\..\..\src\libs\zbxcommon\comms.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxcommon\iprange.o: ..\..\..\src\libs\zbxcommon\iprange.c
+	$(CC) ..\..\..\src\libs\zbxcommon\iprange.c /Fo"..\..\..\src\libs\zbxcommon\iprange.o" $(CFLAGS)
 
 ..\..\..\src\libs\zbxcommon\misc.o: ..\..\..\src\libs\zbxcommon\misc.c
 	$(CC) ..\..\..\src\libs\zbxcommon\misc.c /Fo"..\..\..\src\libs\zbxcommon\misc.o" $(CFLAGS)

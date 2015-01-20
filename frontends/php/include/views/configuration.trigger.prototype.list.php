@@ -129,34 +129,28 @@ foreach ($this->data['triggers'] as $trigger) {
 	));
 }
 
-// create go button
-$goComboBox = new CComboBox('action');
-
-$goOption = new CComboItem('triggerprototype.massenable', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected trigger prototypes?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('triggerprototype.massdisable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected trigger prototypes?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('triggerprototype.massupdateform', _('Mass update'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('triggerprototype.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected trigger prototypes?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-
-zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
-zbx_add_post_js('chkbxRange.prefix = "'.$this->data['parent_discoveryid'].'";');
 zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
 
 // append table to form
-$triggersForm->addItem(array($this->data['paging'], $triggersTable, $this->data['paging'],
-	get_table_header(array($goComboBox, $goButton))
+$triggersForm->addItem(array(
+	$this->data['paging'],
+	$triggersTable,
+	$this->data['paging'],
+	get_table_header(new CActionButtonList('action', 'g_triggerid',
+		array(
+			'triggerprototype.massenable' => array('name' => _('Enable'),
+				'confirm' => _('Enable selected trigger prototypes?')
+			),
+			'triggerprototype.massdisable' => array('name' => _('Disable'),
+				'confirm' => _('Disable selected trigger prototypes?')
+			),
+			'triggerprototype.massupdateform' => array('name' => _('Mass update')),
+			'triggerprototype.massdelete' => array('name' => _('Delete'),
+				'confirm' => _('Delete selected trigger prototypes?')
+			),
+		),
+		$this->data['parent_discoveryid']
+	))
 ));
 
 // append form to widget

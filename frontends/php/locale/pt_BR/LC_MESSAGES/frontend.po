@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-14 16:51+0200\n"
-"PO-Revision-Date: 2014-11-04 18:28+0300\n"
+"POT-Creation-Date: 2015-01-15 18:48+0200\n"
+"PO-Revision-Date: 2015-01-15 16:52+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1415118492.0\n"
+"X-POOTLE-MTIME: 1421333537.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -1567,7 +1567,7 @@ msgstr "Não é possível criar dependência entre uma trigger e ela mesma."
 msgid "Cannot create discovery rule"
 msgstr "Não foi possível criar a regra de discovery"
 
-#: include/classes/api/services/CHost.php:1075
+#: include/classes/api/services/CHost.php:1073
 msgid "Cannot create host group."
 msgstr "Não é possível criar o grupo de host."
 
@@ -1620,17 +1620,17 @@ msgstr "Não é possível excluir dependência"
 #: include/classes/api/services/CGraph.php:554
 #, c-format
 msgid "Cannot delete discovered graph \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível excluir o gráfico \"%1$s\"."
 
 #: include/classes/api/services/CItem.php:633
 #, c-format
 msgid "Cannot delete discovered item \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível excluir o item descoberto \"%1$s\"."
 
 #: include/classes/api/services/CTrigger.php:852
 #, c-format
 msgid "Cannot delete discovered trigger \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível excluir a trigger descoberta \"%1$s\"."
 
 #: discoveryconf.php:179 host_discovery.php:184
 #: include/classes/api/services/CDiscoveryRule.php:431
@@ -1671,7 +1671,7 @@ msgstr[1] "Não foi possível excluir os grupos"
 msgid "Cannot delete host"
 msgstr "Host não foi removido"
 
-#: include/classes/api/services/CHost.php:1086
+#: include/classes/api/services/CHost.php:1084
 msgid "Cannot delete host group."
 msgstr "Grupo de host não foi removido."
 
@@ -1691,7 +1691,7 @@ msgstr "Não foi possível remover icone do mapa"
 msgid "Cannot delete image"
 msgstr "A imagem não foi excluída"
 
-#: include/classes/api/services/CHost.php:1172
+#: include/classes/api/services/CHost.php:1170
 msgid "Cannot delete inventory."
 msgstr "Não foi possível remover inventário."
 
@@ -2194,7 +2194,7 @@ msgstr "Não foi possível incluir a expressão de trigger"
 msgid "Cannot insert user media."
 msgstr "Não foi possível inserir a mídia do usuário."
 
-#: include/classes/api/services/CHost.php:1150
+#: include/classes/api/services/CHost.php:1148
 msgid "Cannot link template"
 msgstr "Falha na associação do template"
 
@@ -2211,7 +2211,7 @@ msgstr "Não foi possível entrar."
 msgid "Cannot logout."
 msgstr "Não foi possível desconectar a sessão."
 
-#: include/classes/api/services/CHost.php:971
+#: include/classes/api/services/CHost.php:969
 msgid "Cannot mass update host name."
 msgstr "Não foi possível atualizar em massa o nome da máquina."
 
@@ -2219,7 +2219,7 @@ msgstr "Não foi possível atualizar em massa o nome da máquina."
 msgid "Cannot mass update template name."
 msgstr "Não é possível atualizar em massa o nome do template."
 
-#: include/classes/api/services/CHost.php:961
+#: include/classes/api/services/CHost.php:959
 msgid "Cannot mass update visible host name."
 msgstr "Não é possível atualizar em massa o nome visível do host."
 
@@ -2284,7 +2284,7 @@ msgstr "Não foi possível enviar o comando, verifique a comunicação com o ser
 #: include/classes/api/services/CHostGroup.php:429
 #, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Não foi possível definir \"%1$s\" para o grupo de host \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:247
 #, c-format
@@ -2313,14 +2313,14 @@ msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Não foi possível definir o \"templateid\" para o protótipo de trigger \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:583
-#: include/classes/api/services/CHost.php:1025
+#: include/classes/api/services/CHost.php:1023
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Não é possível configurar campos do inventário com o inventário desativado."
 
 #: include/classes/api/services/CScreenItem.php:570
 #: include/classes/api/services/CScreenItem.php:596
 msgid "Cannot set resource ID for screen element."
-msgstr ""
+msgstr "Não foi possível definir o ID de recurso para o elemento da tela."
 
 #: include/classes/api/services/CHostInterface.php:269
 msgid "Cannot switch host for interface."
@@ -2363,7 +2363,7 @@ msgstr "Não foi possível desvíncular e limpar os itens"
 msgid "Cannot unlink and clear triggers"
 msgstr "Não foi possível desvincular e limpar as triggers"
 
-#: include/classes/api/services/CHost.php:1125
+#: include/classes/api/services/CHost.php:1123
 msgid "Cannot unlink template"
 msgstr "Falha na desassociação do template"
 
@@ -2385,7 +2385,7 @@ msgstr "Não foi possível atualizar \"%1$s\" para a ação \"%2$s\"."
 #: include/classes/api/services/CHostGroup.php:490
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar \"%1$s\" para o grupo de host \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:211
 #, c-format
@@ -2400,17 +2400,17 @@ msgstr "Não foi possível atualizar \"%1$s\" para a trigger \"%2$s\"."
 #: include/classes/api/services/CHost.php:558
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar \"%2$s\" para o host descoberto \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:175
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar \"%2$s\" para o item descoberto \"%1$s\"."
 
 #: include/classes/api/services/CTrigger.php:588
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
-msgstr ""
+msgstr "Não foi possível atualizar \"%2$s\" para a trigger descoberta \"%1$s\"."
 
 #: include/classes/api/services/CImage.php:557
 #, c-format
@@ -2720,21 +2720,21 @@ msgstr "Verifique a expressão a partir de \"%1$s\"."
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr "Verifica se o arquivo existe. 0 - arquivo não existe, 1 - arquivo existe"
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Verifica se o serviço está disponível. 0 - serviço não está disponível, 1 - serviço disponível. Se <ip> estiver ausente, IP ou o nome de DNS é recuperado pela definição do host. Se <port> estiver ausente, a porta de serviço padrão é utilizada."
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr "Verifica se determinado serviço está disponível. 0 - serviço indisponível, 1 - serviço em execução. Se <IP> estiver ausente, é utilizado 127.0.0.1. Se <port number> estiver ausente, a porta padrão do serviço. Exemplo: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
 msgstr "Verifica a performance de um serviço. 0 - serviço indisponível, <sec> - número de segundos gasto para se conectar ao serviço. Se <IP> estiver ausente, 127.0.0.1 é usado. Se <port number> estiver ausente, a porta padrão do serviço."
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Verifica a performance do serviço. 0 - serviço está fora do ar, sec - número de segundos gastos para a conexão com o serviço. Se o <ip> estiver faltando será utilizado o IP ou o DNS da definição do host. Se <port> estiver faltando a porta padrão será utilizada."
 
@@ -2763,8 +2763,8 @@ msgstr "Verifica se é possível estabelecer uma conexão TCP com determinado n�
 msgid "Checks"
 msgstr "Checagens"
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr "Verifica se o serviço DNS está em execução. 0 - DNS está fora do ar (servidor não responde ou a resolução de nome falha), 1 DNS está em execução."
 
@@ -3404,11 +3404,11 @@ msgstr "Criar mapeamento de valor"
 
 #: include/views/configuration.httpconf.list.php:34
 msgid "Create web scenario"
-msgstr ""
+msgstr "Criar cenário web"
 
 #: include/views/configuration.httpconf.list.php:29
 msgid "Create web scenario (select host first)"
-msgstr ""
+msgstr "Criar cenário web (selecione o host primeiro)"
 
 #: include/classes/api/managers/CApplicationManager.php:73
 #, c-format
@@ -3482,7 +3482,7 @@ msgstr "Host atual"
 
 #: include/views/reports.toptriggers.php:57
 msgid "Current month"
-msgstr ""
+msgstr "Mês atual"
 
 #: popup_trexpr.php:520
 msgid "Current time is < N"
@@ -3506,11 +3506,11 @@ msgstr "Valor atual"
 
 #: include/views/reports.toptriggers.php:54
 msgid "Current week"
-msgstr ""
+msgstr "Semana atual"
 
 #: include/views/reports.toptriggers.php:60
 msgid "Current year"
-msgstr ""
+msgstr "Ano atual"
 
 #: include/views/configuration.action.edit.php:129
 #: include/views/configuration.host.discovery.edit.php:280
@@ -3580,7 +3580,7 @@ msgstr "DES"
 
 #: httpdetails.php:116
 msgid "DETAILS OF WEB SCENARIO"
-msgstr ""
+msgstr "DETALHES DO CENÁRIO WEB"
 
 #: include/maps.inc.php:465 include/maps.inc.php:547 include/maps.inc.php:635
 #: include/maps.inc.php:725
@@ -4180,7 +4180,7 @@ msgstr "Remover trigger?"
 
 #: include/views/configuration.httpconf.edit.php:262
 msgid "Delete web scenario?"
-msgstr ""
+msgstr "Excluir cenário web?"
 
 #: auditlogs.php:132
 msgid "Deleted"
@@ -4201,7 +4201,7 @@ msgstr "Excluído: Regra de descoberta \"%1$s\" em \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Excluído: Gráfico \"%1$s\" em \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1453
+#: include/classes/api/services/CHost.php:1451
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Excluído: Host \"%1$s\"."
@@ -4326,7 +4326,7 @@ msgstr "Detalhes"
 
 #: httpdetails.php:27
 msgid "Details of web scenario"
-msgstr ""
+msgstr "Detalhes do cenário web"
 
 #: include/actions.inc.php:102
 msgid "Device"
@@ -4930,7 +4930,7 @@ msgstr "Host nulo."
 #: include/classes/api/services/CHostGroup.php:471
 #: include/classes/api/services/CHostGroup.php:548
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1301
+#: include/classes/api/services/CHost.php:1299
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:606
@@ -5458,7 +5458,7 @@ msgstr "O campo \"%1$s\" é obrigatório."
 #: include/validate.inc.php:237
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
-msgstr ""
+msgstr "O campo \"%1$s\" não está correto: %2$s"
 
 #: include/validate.inc.php:163
 #, c-format
@@ -6196,7 +6196,7 @@ msgstr "Esconder triggers inativas"
 
 #: include/views/configuration.httpconf.list.php:49
 msgid "Hide disabled web scenarios"
-msgstr ""
+msgstr "Esconder cenários web inativos"
 
 #: include/classes/html/widget/CWidget.php:128
 msgid "Hide filter"
@@ -6310,7 +6310,7 @@ msgid_plural "Hosts"
 msgstr[0] "Host"
 msgstr[1] "Hosts"
 
-#: include/classes/api/services/CHost.php:984
+#: include/classes/api/services/CHost.php:982
 #: include/classes/api/services/CTemplate.php:471
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6575,7 +6575,7 @@ msgstr "Máscara de sub-rede do host"
 msgid "Host time"
 msgstr "Hora do host"
 
-#: include/classes/api/services/CHost.php:858
+#: include/classes/api/services/CHost.php:856
 msgid "Host update failed."
 msgstr "A atualização do host falhou."
 
@@ -6717,11 +6717,11 @@ msgstr "Endereço IP"
 
 #: include/classes/validators/CIPValidator.php:43
 msgid "IP address cannot be empty."
-msgstr ""
+msgstr "O endereço IP não pode ser nulo."
 
 #: include/classes/validators/CIPRangeValidator.php:62
 msgid "IP address range cannot be empty."
-msgstr ""
+msgstr "O range de endereços não pode ser nulo."
 
 #: include/classes/api/services/CHostInterface.php:292
 msgid "IP and DNS cannot be empty for host interface."
@@ -6735,7 +6735,7 @@ msgstr "Intervalo de IPs"
 #: include/classes/validators/CIPRangeValidator.php:80
 #, c-format
 msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit."
-msgstr ""
+msgstr "O range \"%1$s\" excede o limite de \"%2$s\" endereços."
 
 #: include/classes/api/services/CDRule.php:215
 msgid "IP range cannot be empty."
@@ -7279,7 +7279,7 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Foram informados caracteres inválidos no host \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:634
-#: include/classes/api/services/CHost.php:967
+#: include/classes/api/services/CHost.php:965
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Foram utilizados caracteres inválidos no nome do host \"%s\"."
@@ -7712,7 +7712,7 @@ msgstr "Status inválido."
 
 #: include/classes/api/services/CScreenItem.php:643
 msgid "Incorrect style provided for screen element."
-msgstr ""
+msgstr "Foi informado um estilo inválido para o elemento da tela."
 
 #: include/classes/api/services/CTemplateScreen.php:598
 msgid "Incorrect template screen ID."
@@ -7997,22 +7997,22 @@ msgstr "Intervalo (em segundos)"
 #: include/classes/validators/CIPValidator.php:49
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
-msgstr ""
+msgstr "O endereço IP \"%1$s\" é inválido."
 
 #: include/classes/validators/CIPValidator.php:37
 #, c-format
 msgid "Invalid IP address \"%1$s\": must be a string."
-msgstr ""
+msgstr "Endereço IP inválido \"%1$s\": deverá ser um texto."
 
 #: include/classes/validators/CIPRangeValidator.php:72
 #, c-format
 msgid "Invalid IP address range \"%1$s\"."
-msgstr ""
+msgstr "Range de endereços IP inválido \"%1$s\"."
 
 #: include/classes/validators/CIPRangeValidator.php:56
 #, c-format
 msgid "Invalid IP address range \"%1$s\": must be a string."
-msgstr ""
+msgstr "Range de endereços IP inválido \"%1$s\": deverá ser um texto."
 
 #: include/classes/core/CJsonRpc.php:170
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -8121,7 +8121,7 @@ msgstr "Nome de visualização inválido \"%s\". Caracteres permitidos: \"a-z\" 
 msgid "Inventory"
 msgstr "Inventário"
 
-#: include/classes/api/services/CHost.php:1191
+#: include/classes/api/services/CHost.php:1189
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Inventário desativado para o host: \"%1$s\"."
@@ -8635,7 +8635,7 @@ msgstr "Gráfico última hora"
 
 #: include/views/reports.toptriggers.php:67
 msgid "Last month"
-msgstr ""
+msgstr "Último mês"
 
 #: jsLoader.php:210
 msgid "Last month graph"
@@ -8656,7 +8656,7 @@ msgstr "Último valor"
 
 #: include/views/reports.toptriggers.php:64
 msgid "Last week"
-msgstr ""
+msgstr "Última semana"
 
 #: jsLoader.php:211
 msgid "Last week graph"
@@ -8664,7 +8664,7 @@ msgstr "Gráfico última semana"
 
 #: include/views/reports.toptriggers.php:70
 msgid "Last year"
-msgstr ""
+msgstr "Último ano"
 
 #: include/menu.inc.php:46 include/views/inventory.host.view.php:209
 #: jsLoader.php:206 latest.php:26 search.php:134 search.php:220 search.php:274
@@ -9324,7 +9324,7 @@ msgstr "Limite de memória: %s"
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:399
 msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). <memtype> type of process memory (supported on some platforms, see documentation). Example: proc.mem[,root]."
-msgstr ""
+msgstr "Memória utilizada por um processo. <name> nome do processo (padrão: \"todos os processos\"). <user> nome do usuário (padrão: \"todos os usuários\"). <memtype> tipo do processo em memória (suportado em algumas plataformas, consulte a documentação). Exemplo: proc.mem[,root]."
 
 #: dashboard.php:313 dashboard.php:327 dashboard.php:341 dashboard.php:367
 #: dashboard.php:391 dashboard.php:414 dashboard.php:437 dashboard.php:460
@@ -10082,7 +10082,7 @@ msgstr "Nenhum gráfico encontrado."
 msgid "No groups for host \"%s\"."
 msgstr "Nenhum grupo para o host \"%s\"."
 
-#: include/classes/api/services/CHost.php:953
+#: include/classes/api/services/CHost.php:951
 msgid "No groups for hosts."
 msgstr "Nenhum grupo para hosts."
 
@@ -10349,7 +10349,7 @@ msgstr "Sem permissão de acesso ao sistema."
 #: include/classes/api/services/CHostInterface.php:647
 #: include/classes/api/services/CHost.php:530
 #: include/classes/api/services/CHost.php:621
-#: include/classes/api/services/CHost.php:1646
+#: include/classes/api/services/CHost.php:1644
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -11196,11 +11196,11 @@ msgstr "DASHBOARD PESSOAL"
 
 #: include/classes/setup/CFrontendSetup.php:366
 msgid "PHP always_populate_raw_post_data"
-msgstr ""
+msgstr "PHP always_populate_raw_post_data"
 
 #: include/classes/setup/CFrontendSetup.php:370
 msgid "PHP always_populate_raw_post_data must be set to -1."
-msgstr ""
+msgstr "PHP always_populate_raw_post_data deve ser configurado para -1."
 
 #: include/classes/setup/CFrontendSetup.php:307
 msgid "PHP bcmath"
@@ -11469,23 +11469,23 @@ msgstr "Pico de utilização de memória: %s"
 
 #: popup_trexpr.php:100
 msgid "Percentage"
-msgstr ""
+msgstr "Percentual"
 
 #: popup_trexpr.php:304
 msgid "Percentile P of a period T is < N"
-msgstr ""
+msgstr "O percentual P de um período T é < N."
 
 #: popup_trexpr.php:314
 msgid "Percentile P of a period T is = N"
-msgstr ""
+msgstr "O percentual P de um período T é = N"
 
 #: popup_trexpr.php:309
 msgid "Percentile P of a period T is > N"
-msgstr ""
+msgstr "O percentual P de um período T é > N"
 
 #: popup_trexpr.php:319
 msgid "Percentile P of a period T is NOT N"
-msgstr ""
+msgstr "Percentual P de um período T não é N"
 
 #: graphs.php:53 include/views/configuration.graph.edit.php:84
 msgid "Percentile line (left)"
@@ -11495,8 +11495,8 @@ msgstr "Linha percentual (esquerda)"
 msgid "Percentile line (right)"
 msgstr "Linha percentual (direita)"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:351
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr "Executa uma consulta DNS. Caso seja bem sucedida retorna uma sequência de caracteres com o tipo da informação requisitada."
 
@@ -12241,7 +12241,7 @@ msgstr "Tentar"
 
 #: include/classes/items/CHelpItems.php:909
 msgid "Return first column of the first row of the SQL query result."
-msgstr ""
+msgstr "Retorna a primeira coluna da primeira linha de uma consulta SQL."
 
 #: include/classes/items/CHelpItems.php:591
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
@@ -13060,7 +13060,7 @@ msgstr "Mostrar triggers inativas"
 
 #: include/views/configuration.httpconf.list.php:49
 msgid "Show disabled web scenarios"
-msgstr ""
+msgstr "Exibir cenários web inativos"
 
 #: include/profiles.inc.php:168
 #, c-format
@@ -13468,7 +13468,7 @@ msgstr "Duração do passo"
 
 #: include/views/configuration.httpconf.popup.php:103 popup_httpstep.php:24
 msgid "Step of web scenario"
-msgstr ""
+msgstr "Passo do cenário web"
 
 #: include/views/configuration.httpconf.popup.php:33
 #, c-format
@@ -13678,7 +13678,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Template"
 
-#: include/classes/api/services/CHost.php:995
+#: include/classes/api/services/CHost.php:993
 #: include/classes/api/services/CTemplate.php:461
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -14077,7 +14077,7 @@ msgstr "A transação não foi fechada. Abortando..."
 
 #: include/classes/items/CHelpItems.php:913
 msgid "Transform SQL query result into a JSON object for low-level discovery."
-msgstr ""
+msgstr "Transformar o resultado de uma consulta SQL em um objeto JSON para o processo de autobusca."
 
 #: include/classes/core/CJsonRpc.php:204
 msgid "Transport error."
@@ -14471,7 +14471,7 @@ msgstr "O tipo de informação deve ser \"Log\" para uma chave de log."
 
 #: include/classes/api/services/CItemGeneral.php:336
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
-msgstr ""
+msgstr "O tipo da informação precisa ser \"Inteiro sem sinal\" ou \"Numérico (fracionário)\" para itens agregados."
 
 #: include/forms.inc.php:898
 msgid "Types"
@@ -14975,7 +14975,7 @@ msgstr "Usuário incluído"
 
 #: include/views/configuration.httpconf.edit.php:92
 msgid "User agent string"
-msgstr ""
+msgstr "Mensagem do agente de usuário"
 
 #: include/views/administration.users.edit.php:316
 msgid "User can't change type for himself"
@@ -15545,7 +15545,7 @@ msgstr "Monitoramento web"
 #: httpconf.php:181 httpconf.php:318 httpconf.php:375 httpconf.php:426
 #: include/audit.inc.php:42 include/classes/api/services/CHttpTest.php:416
 msgid "Web scenario"
-msgstr ""
+msgstr "Cenário web"
 
 #: include/classes/api/managers/CHttpTestManager.php:385
 #: include/classes/api/managers/CHttpTestManager.php:393
@@ -15562,7 +15562,7 @@ msgstr "O cenário web \"%1$s\" já existe."
 
 #: httpconf.php:200
 msgid "Web scenario added"
-msgstr ""
+msgstr "Cenário web adicionado"
 
 #: httpconf.php:149 httpconf.php:448
 msgid "Web scenario deleted"
@@ -15618,7 +15618,7 @@ msgstr "O número de um cenário web não pode ser menor do que 1."
 
 #: httpconf.php:195
 msgid "Web scenario updated"
-msgstr ""
+msgstr "Cenário web atualizado"
 
 #: httpmon.php:85 include/html.inc.php:489 include/html.inc.php:493
 #: include/views/configuration.host.edit.php:684
@@ -15881,7 +15881,7 @@ msgstr "Sim"
 
 #: include/views/reports.toptriggers.php:51
 msgid "Yesterday"
-msgstr ""
+msgstr "Ontem"
 
 #: include/views/administration.users.edit.php:140
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
@@ -15920,8 +15920,8 @@ msgstr "Você não especificou o alvo da operação do script global \"%s\"."
 
 #: include/classes/api/services/CGraph.php:543
 #: include/classes/api/services/CGraphPrototype.php:558
-#: include/classes/api/services/CHost.php:889
-#: include/classes/api/services/CHost.php:947
+#: include/classes/api/services/CHost.php:887
+#: include/classes/api/services/CHost.php:945
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668
