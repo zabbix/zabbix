@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+..F....... [ZBXNEXT-1493] changed activity dropdowns at the bottom of various pages to buttons (Oleg)
 ....I..PS. [ZBXNEXT-1554] added multiple OID support to SNMP low-level discovery rules (wiper)
 A.F....PS. [ZBXNEXT-2321] added support for "db.odbc.discovery[]" item for low-level discovery through ODBC (asaveljevs, Juris)
 ....I..... [ZBXNEXT-2637] changed the DB user in the default configuration files to "zabbix", server and proxy timeouts to 4 seconds, LogSlowQueries to 3 seconds and MaxHousekeeperDelete to 5000; listed characters, prohibited in user parameters (Richlv)
