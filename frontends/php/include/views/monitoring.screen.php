@@ -20,6 +20,7 @@
 
 
 $screenWidget = new CWidget();
+$screenWidget->setTitle(_('Screens'));
 $screenWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.screens.filter.state', 1));
 
 // header form
@@ -27,11 +28,14 @@ $configComboBox = new CComboBox('config', 'screens.php', 'javascript: redirect(t
 $configComboBox->addItem('screens.php', _('Screens'));
 $configComboBox->addItem('slides.php', _('Slide shows'));
 $headerForm = new CForm();
-$headerForm->addItem($configComboBox);
+
+$controls = new CList();
+
+$controls->addItem($configComboBox);
 
 if (empty($this->data['screens'])) {
-	$screenWidget->setTitle(_('Screens'));
-	$screenWidget->setcontrols($headerForm);
+	$headerForm->addItem($controls);
+	$screenWidget->setControls($headerForm);
 	$screenWidget->addItem(BR());
 	$screenWidget->addItem(new CTableInfo(_('No screens found.')));
 
@@ -56,18 +60,10 @@ else {
 	}
 
 	// page header
-	$screenWidget->setTitle(_('Screens'));
-	$screenWidget->setControls(array(
-		$headerForm,
-		SPACE,
-		get_icon('favourite', array('fav' => 'web.favorite.screenids', 'elname' => 'screenid', 'elid' => $screen['screenid'])),
-		SPACE,
-		get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))
-	));
-	$screenWidget->addItem(BR());
+	$controls->addItem(get_icon('favourite', array('fav' => 'web.favorite.screenids', 'elname' => 'screenid', 'elid' => $screen['screenid'])));
+	$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
 
 	// append screens combobox to page header
-	$headerForm = new CForm('get');
 	$headerForm->setName('headerForm');
 	$headerForm->addVar('fullscreen', $this->data['fullscreen']);
 
@@ -76,7 +72,7 @@ else {
 		$elementsComboBox->addItem($dbScreen['screenid'],
 			htmlspecialchars($dbScreen['name']));
 	}
-	$headerForm->addItem(array(_('Screens').SPACE, $elementsComboBox));
+	$controls->addItem(array(_('Screens').SPACE, $elementsComboBox));
 
 	if (check_dynamic_items($screen['screenid'], 0)) {
 		$pageFilter = new CPageFilter(array(
@@ -95,11 +91,13 @@ else {
 		$_REQUEST['groupid'] = $pageFilter->groupid;
 		$_REQUEST['hostid'] = $pageFilter->hostid;
 
-		$headerForm->addItem(array(SPACE, _('Group'), SPACE, $pageFilter->getGroupsCB()));
-		$headerForm->addItem(array(SPACE, _('Host'), SPACE, $pageFilter->getHostsCB()));
+		$controls->addItem(array( _('Group').SPACE, $pageFilter->getGroupsCB()));
+		$controls->addItem(array( _('Host').SPACE, $pageFilter->getHostsCB()));
 	}
 
-	$screenWidget->addHeader($screen['name'], $headerForm);
+	$headerForm->addItem($controls);
+
+	$screenWidget->setControls($headerForm);
 
 	// append screens to widget
 	$screenBuilder = new CScreenBuilder(array(
