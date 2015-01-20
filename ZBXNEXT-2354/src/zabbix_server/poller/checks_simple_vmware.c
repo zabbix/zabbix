@@ -251,6 +251,13 @@ static int	vmware_service_counter_get(zbx_vmware_service_t *service, const char 
 		goto out;
 	}
 
+	/* VMware returns -1 value if the performance data for the specified period is not ready - ignore it */
+	if (0 == strcmp(perfvalue->second, "-1"))
+	{
+		ret = SYSINFO_RET_OK;
+		goto out;
+	}
+
 	if (SUCCEED == set_result_type(result, ITEM_VALUE_TYPE_UINT64, ITEM_DATA_TYPE_DECIMAL, perfvalue->second))
 	{
 		result->ui64 *= coeff;
