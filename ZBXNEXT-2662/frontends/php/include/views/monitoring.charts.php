@@ -20,34 +20,30 @@
 
 
 $chartsWidget = new CWidget('hat_charts');
+$chartsWidget->setTitle(_('Graphs'));
+
 $chartForm = new CForm('get');
 $chartForm->addVar('fullscreen', $this->data['fullscreen']);
-$chartForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$chartForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
-$chartForm->addItem(array(SPACE._('Graph').SPACE, $this->data['pageFilter']->getGraphsCB()));
+
+$controls = new CList();
+
+$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+$controls->addItem(array(_('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
+$controls->addItem(array(_('Graph').SPACE, $this->data['pageFilter']->getGraphsCB()));
 
 $chartsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.charts.filter.state', 1));
 
 if ($this->data['graphid']) {
-	$chartsWidget->setTitle(_('Graphs'));
-	$chartsWidget->setControls(array(
-		get_icon('favourite', array('fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid'])),
-		get_icon('reset', array('id' => $this->data['graphid'])),
-		get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))
-	));
+	$controls->addItem(get_icon('favourite', array('fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid'])));
+	$controls->addItem(get_icon('reset', array('id' => $this->data['graphid'])));
+	$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
 }
 else {
-	$chartsWidget->setTitle(_('Graphs'));
-	$chartsWidget->setControls(array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
+	$controls->addItem(array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
 }
 
-$chartsWidget->addHeader(
-	isset($this->data['pageFilter']->graphs[$this->data['graphid']]['name'])
-		? $this->data['pageFilter']->graphs[$this->data['graphid']]['name']
-		: null,
-	$chartForm
-);
-$chartsWidget->addItem(BR());
+$chartForm->addItem($controls);
+$chartsWidget->setControls($chartForm);
 
 if (!empty($this->data['graphid'])) {
 	// append chart to widget
