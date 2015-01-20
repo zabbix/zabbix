@@ -68,47 +68,49 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['groupid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (isset($_REQUEST['save'])) {
-	$hostIds = getRequest('hosts', array());
+	$hostIds = get_request('hosts', array());
 
 	$hosts = API::Host()->get(array(
-		'output' => array('hostid'),
 		'hostids' => $hostIds,
+		'output' => array('hostid'),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'preservekeys' => true
 	));
 
 	$templates = API::Template()->get(array(
-		'output' => array('templateid'),
 		'templateids' => $hostIds,
+		'output' => array('templateid'),
 		'preservekeys' => true
 	));
 
-	$groupId = getRequest('groupid');
-	$name = getRequest('name');
+	$groupId = getRequest('groupid', 0);
 
-	if ($groupId) {
+	if ($groupId != 0) {
 		DBstart();
 
-		$oldGroups = API::HostGroup()->get(array(
-			'output' => array('name', 'flags'),
+		$oldGroup = API::HostGroup()->get(array(
+			'groupids' => $_REQUEST['groupid'],
+			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('hostid'),
-			'selectTemplates' => array('templateid'),
-			'groupids' => array($groupId)
+			'selectTemplates' => array('templateid')
 		));
-		$oldGroup = reset($oldGroups);
+		$oldGroup = reset($oldGroup);
 
 		$result = true;
-
-		// Don't try to update the name for a discovered host group.
+		// don't try to update the name for a discovered host group
 		if ($oldGroup['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 			$result = API::HostGroup()->update(array(
 				'groupid' => $groupId,
-				'name' => $name
+				'name' => $_REQUEST['name']
 			));
 		}
 
-		// Add and remove hosts or templates for current group only.
 		if ($result) {
+			$groups = API::HostGroup()->get(array(
+				'groupids' => $_REQUEST['groupid'],
+				'output' => API_OUTPUT_EXTEND
+			));
+
 			$hostIdsToAdd = array();
 			$hostIdsToRemove = array();
 			$templateIdsToAdd = array();
@@ -168,9 +170,10 @@ elseif (isset($_REQUEST['save'])) {
 			}
 
 			if ($result) {
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $groupId, $name, 'groups',
-					array('name' => $oldGroup['name']), array('name' => $name)
-				);
+				$group = reset($groups);
+
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'],
+					'groups', array('name' => $oldGroup['name']), array('name' => $group['name']));
 			}
 		}
 
@@ -182,19 +185,24 @@ elseif (isset($_REQUEST['save'])) {
 	else {
 		DBstart();
 
-		$result = API::HostGroup()->create(array('name' => $name));
+		$result = API::HostGroup()->create(array('name' => $_REQUEST['name']));
 
 		if ($result) {
-			$groupId = reset($result['groupids']);
+			$groups = API::HostGroup()->get(array(
+				'groupids' => $result['groupids'],
+				'output' => API_OUTPUT_EXTEND
+			));
 
 			$result = API::HostGroup()->massAdd(array(
 				'hosts' => $hosts,
 				'templates' => $templates,
-				'groups' => array('groupid' => $groupId)
+				'groups' => $groups
 			));
 
 			if ($result) {
-				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groupId, $name, null, null, null);
+				$group = reset($groups);
+
+				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'], null, null, null);
 			}
 		}
 

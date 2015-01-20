@@ -784,39 +784,35 @@ class CHostGroup extends CZBXAPI {
 
 		$this->validateMassAdd($data);
 
-		$groupIds = zbx_objectValues($data['groups'], 'groupid');
-		$hostIds = zbx_objectValues($data['hosts'], 'hostid');
-		$templateIds = zbx_objectValues($data['templates'], 'templateid');
+		$groupids = zbx_objectValues($data['groups'], 'groupid');
+		$hostids = zbx_objectValues($data['hosts'], 'hostid');
+		$templateids = zbx_objectValues($data['templates'], 'templateid');
 
-		$objectIds = array_merge($hostIds, $templateIds);
-		$objectIds = array_keys(array_flip($objectIds));
+		$objectids = array_merge($hostids, $templateids);
+		$objectids = array_keys(array_flip($objectids));
 
 		$linked = array();
 		$linkedDb = DBselect(
 			'SELECT hg.hostid,hg.groupid'.
 			' FROM hosts_groups hg'.
-			' WHERE '.dbConditionInt('hg.hostid', $objectIds).
-				' AND '.dbConditionInt('hg.groupid', $groupIds)
+			' WHERE '.dbConditionInt('hg.hostid', $objectids).
+				' AND '.dbConditionInt('hg.groupid', $groupids)
 		);
 		while ($pair = DBfetch($linkedDb)) {
 			$linked[$pair['groupid']][$pair['hostid']] = 1;
 		}
 
 		$insert = array();
-		foreach ($groupIds as $groupId) {
-			foreach ($objectIds as $objectId) {
-				if (isset($linked[$groupId][$objectId])) {
+		foreach ($groupids as $groupid) {
+			foreach ($objectids as $hostid) {
+				if (isset($linked[$groupid][$hostid])) {
 					continue;
 				}
-				$insert[] = array('hostid' => $objectId, 'groupid' => $groupId);
+				$insert[] = array('hostid' => $hostid, 'groupid' => $groupid);
 			}
 		}
-
-		if ($insert) {
-			DB::insert('hosts_groups', $insert);
-		}
-
-		return array('groupids' => $groupIds);
+		DB::insert('hosts_groups', $insert);
+		return array('groupids' => $groupids);
 	}
 
 	/**
@@ -836,11 +832,11 @@ class CHostGroup extends CZBXAPI {
 
 		$this->validateMassRemove($data);
 
-		$objectIds = array_merge($data['hostids'], $data['templateids']);
-		$objectIds = array_keys(array_flip($objectIds));
+		$objectids = array_merge($data['hostids'], $data['templateids']);
+		$objectids = array_keys(array_flip($objectids));
 
 		DB::delete('hosts_groups', array(
-			'hostid' => $objectIds,
+			'hostid' => $objectids,
 			'groupid' => $data['groupids']
 		));
 

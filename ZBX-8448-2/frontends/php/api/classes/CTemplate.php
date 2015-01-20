@@ -955,6 +955,7 @@ class CTemplate extends CHostGeneral {
 
 		// UPDATE TEMPLATE LINKAGE {{{
 		// firstly need to unlink all things, to correctly check circulars
+
 		if (isset($data['hosts']) && !is_null($data['hosts'])) {
 			/*
 			 * Get all currently linked hosts and templates (skip discovered hosts) to these templates
@@ -963,18 +964,18 @@ class CTemplate extends CHostGeneral {
 			$templateHosts = API::Host()->get(array(
 				'output' => array('hostid'),
 				'templateids' => $templateids,
-				'templated_hosts' => true,
+				'templated_hosts' => 1,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 			));
 			$templateHostids = zbx_objectValues($templateHosts, 'hostid');
 			$newHostids = zbx_objectValues($data['hosts'], 'hostid');
 
 			$hostsToDel = array_diff($templateHostids, $newHostids);
-			$hostIdsToDel = array_diff($hostsToDel, $templateidsClear);
+			$hostidsToDel = array_diff($hostsToDel, $templateidsClear);
 			$hostIdsToAdd = array_diff($newHostids, $templateHostids);
 
 			// gather both host and template IDs and validate write permissions
-			$hostIds = array_merge($hostIdsToAdd, $hostIdsToDel);
+			$hostIds = array_merge($hostIdsToAdd, $hostidsToDel);
 
 			if ($hostIds) {
 				/*
@@ -998,9 +999,9 @@ class CTemplate extends CHostGeneral {
 				}
 			}
 
-			if ($hostIdsToDel) {
+			if ($hostidsToDel) {
 				$result = $this->massRemove(array(
-					'hostids' => $hostIdsToDel,
+					'hostids' => $hostidsToDel,
 					'templateids' => $templateids
 				));
 				if (!$result) {
@@ -1028,6 +1029,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (isset($data['hosts']) && !is_null($data['hosts'])) {
+
 			$hostsToAdd = array_diff($newHostids, $templateHostids);
 			if (!empty($hostsToAdd)) {
 				$result = $this->massAdd(array('templates' => $templates, 'hosts' => $hostsToAdd));
@@ -1070,10 +1072,10 @@ class CTemplate extends CHostGeneral {
 				'output' => array('groupid'),
 				'templateids' => $templateids
 			));
-			$templateGroupIds = zbx_objectValues($templateGroups, 'groupid');
-			$newGroupIds = zbx_objectValues($updateGroups, 'groupid');
+			$templateGroupids = zbx_objectValues($templateGroups, 'groupid');
+			$newGroupids = zbx_objectValues($updateGroups, 'groupid');
 
-			$groupsToAdd = array_diff($newGroupIds, $templateGroupIds);
+			$groupsToAdd = array_diff($newGroupids, $templateGroupids);
 			if ($groupsToAdd) {
 				$this->massAdd(array(
 					'templates' => $templates,
@@ -1081,11 +1083,11 @@ class CTemplate extends CHostGeneral {
 				));
 			}
 
-			$groupIdsToDelete = array_diff($templateGroupIds, $newGroupIds);
-			if ($groupIdsToDelete) {
+			$groupidsToDel = array_diff($templateGroupids, $newGroupids);
+			if ($groupidsToDel) {
 				$this->massRemove(array(
 					'templateids' => $templateids,
-					'groupids' => $groupIdsToDelete
+					'groupids' => $groupidsToDel
 				));
 			}
 		}
