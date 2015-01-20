@@ -20,7 +20,9 @@
 
 $regExpWidget = new CWidget();
 
-$generalComboBox = new CComboBox('configDropDown', 'adm.regexps.php', 'redirect(this.options[this.selectedIndex].value);');
+$generalComboBox = new CComboBox('configDropDown', 'adm.regexps.php',
+	'redirect(this.options[this.selectedIndex].value);'
+);
 $generalComboBox->addItems(array(
 	'adm.gui.php' => _('GUI'),
 	'adm.housekeeper.php' => _('Housekeeping'),
@@ -36,6 +38,7 @@ $generalComboBox->addItems(array(
 ));
 
 $headerForm = new CForm();
+$headerForm->cleanItems();
 $headerForm->addItem($generalComboBox);
 $headerForm->addItem(new CSubmit('form', _('New regular expression')));
 

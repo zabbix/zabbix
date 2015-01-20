@@ -23,7 +23,9 @@ require_once dirname(__FILE__).'/js/adm.regexprs.edit.js.php';
 
 $regExpWidget = new CWidget();
 
-$generalComboBox = new CComboBox('configDropDown', 'adm.regexps.php', 'redirect(this.options[this.selectedIndex].value);');
+$generalComboBox = new CComboBox('configDropDown', 'adm.regexps.php',
+	'redirect(this.options[this.selectedIndex].value);'
+);
 $generalComboBox->addItems(array(
 	'adm.gui.php' => _('GUI'),
 	'adm.housekeeper.php' => _('Housekeeping'),
@@ -39,6 +41,7 @@ $generalComboBox->addItems(array(
 ));
 
 $headerForm = new CForm();
+$headerForm->cleanItems();
 $headerForm->addItem($generalComboBox);
 
 $regExpWidget->addPageHeader(_('CONFIGURATION OF REGULAR EXPRESSIONS'), $headerForm);
@@ -48,13 +51,13 @@ $form->attr('id', 'zabbixRegExpForm');
 $form->addVar('form', 1);
 $form->addVar('regexpid', $data['regexpid']);
 
-zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($this->get('expressions'))).');');
+zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($data['expressions'])).');');
 
 /*
  * Expressions tab
  */
 $exprTab = new CFormList('exprTab');
-$nameTextBox = new CTextBox('name', $this->get('name'), ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
+$nameTextBox = new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
 $nameTextBox->attr('autofocus', 'autofocus');
 $exprTab->addRow(_('Name'), $nameTextBox);
 
@@ -85,7 +88,7 @@ $exprTab->addRow(null, new CDiv(array($exprForm, $exprFormFooter), 'objectgroup 
  * Test tab
  */
 $testTab = new CFormList('testTab');
-$testTab->addRow(_('Test string'), new CTextArea('test_string', $this->get('test_string')));
+$testTab->addRow(_('Test string'), new CTextArea('test_string', $data['test_string']));
 $preloaderDiv = new CDiv(null, 'preloader', 'testPreloader');
 $preloaderDiv->addStyle('display: none');
 $testTab->addRow(SPACE, array(new CButton('testExpression', _('Test expressions')), $preloaderDiv));
