@@ -1,0 +1,81 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2015 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+@import "jquery-ui.css";
+
+.unknown, a.unknown { color: #777; }
+a.unknown:hover { color: #999; }
+
+table.filter { background: white; border: 1px solid #EEE; }
+table.filter tr td { border: 1px solid #EEE; }
+
+ul.formlist li.new { background: #EEFFEE; }
+
+.dropArea { background-color: #FFB; }
+.dropHereText { color: #5481AB; }
+
+table.ack_msgs tr.msg { background-color: #F8F8F8; }
+
+.ui-widget-content a.on { color: #EE0000; }
+.ui-widget-content a.on:hover { color: #CC4444; }
+
+div.preloader {
+	background: url("images/preloader.gif") no-repeat;
+}
+
+/* button */
+.button-plain { border: 1px solid #808080; }
+.button-plain:hover { border-color: #000; }
+.button-plain[disabled], .button-plain[disabled]:hover { border-color: #d0d0d0; background: #eee; color: #aca899; }
+
+.link_menu { border-color: #3c3089; color: #3c3089; }
+.link_menu:hover { color: #6c80b9; border-color: #6c80b9; }
+.link_menu[disabled], .link_menu[disabled]:hover { background-color: #fff; color: #aca899; }
+
+.ui-button.main, .ui-button.main[disabled]:hover { border-color: #ffaa33 !important; }
+.ui-button.main:hover { border-color: #dd7711 !important; }
+
+/* form input and form buttons */
+.input, .button-form { border: 1px solid #aca899; background-color: #fff; }
+.checkbox { border: none; }
+
+.button-form { background: #fff; }
+.button-form:hover { border-color: #6e8ab4; }
+
+.input:focus, .input:hover { border-color: #6e8ab4; }
+.input[readonly], .input[readonly]:hover, .input[readonly]:focus {
+	border-color: #d0d0d0; background: #eee; color: #000;
+}
+.input[disabled], .input[disabled]:hover,
+.button-form[disabled], .button-form[disabled]:hover {
+	border-color: #d0d0d0; background: #eee;
+	/* ignored by IE for <select> */
+	color: #aca899;
+}
+
+/* Make checked checkboxes/radiobuttons have black label text */
+.radioset .ui-button.ui-state-active .ui-button-text { color: #000; }
+.radioset .ui-button.ui-state-active.ui-state-disabled .ui-button-text { color: #777; }
+
+/* disabled <select> font color for IE 10+ */
+select[disabled]::-ms-value {
+	color: #aca899;
+}
+
+/* show non-gray background for disabled multiselect inputs on hover */
+.multiselect input[type="text"][disabled]:hover { background-color: transparent; }
