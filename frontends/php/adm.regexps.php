@@ -196,30 +196,6 @@ elseif (hasRequest('action') && getRequest('action') == 'regexp.massdelete') {
 /*
  * Display
  */
-$generalComboBox = new CComboBox('configDropDown', 'adm.regexps.php', 'redirect(this.options[this.selectedIndex].value);');
-$generalComboBox->addItems(array(
-	'adm.gui.php' => _('GUI'),
-	'adm.housekeeper.php' => _('Housekeeping'),
-	'adm.images.php' => _('Images'),
-	'adm.iconmapping.php' => _('Icon mapping'),
-	'adm.regexps.php' => _('Regular expressions'),
-	'adm.macros.php' => _('Macros'),
-	'adm.valuemapping.php' => _('Value mapping'),
-	'adm.workingtime.php' => _('Working time'),
-	'adm.triggerseverities.php' => _('Trigger severities'),
-	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-	'adm.other.php' => _('Other')
-));
-$regExpForm = new CForm();
-$regExpForm->cleanItems();
-$regExpForm->addItem($generalComboBox);
-if (!isset($_REQUEST['form'])) {
-	$regExpForm->addItem(new CSubmit('form', _('New regular expression')));
-}
-
-$regExpWidget = new CWidget();
-$regExpWidget->addPageHeader(_('CONFIGURATION OF REGULAR EXPRESSIONS'), $regExpForm);
-
 if (isset($_REQUEST['form'])) {
 	$data = array(
 		'form_refresh' => getRequest('form_refresh'),
@@ -250,11 +226,12 @@ if (isset($_REQUEST['form'])) {
 		$data['expressions'] = getRequest('expressions', array());
 	}
 
-	$regExpForm = new CView('administration.general.regularexpressions.edit', $data);
+	$regExpView = new CView('administration.general.regularexpressions.edit', $data);
+	$regExpView->render();
+	$regExpView->show();
 }
 else {
 	$data = array(
-		'cnf_wdgt' => &$regExpWidget,
 		'regexps' => array(),
 		'regexpids' => array()
 	);
@@ -277,10 +254,9 @@ else {
 		' ORDER BY e.expression_type'
 	));
 
-	$regExpForm = new CView('administration.general.regularexpressions.list', $data);
+	$regExpView = new CView('administration.general.regularexpressions.list', $data);
+	$regExpView->render();
+	$regExpView->show();
 }
-
-$regExpWidget->addItem($regExpForm->render());
-$regExpWidget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
