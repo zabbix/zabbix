@@ -58,7 +58,7 @@ class ZabbixJMXConnectorFactory
 
 	static JMXConnector connect(final JMXServiceURL url, final HashMap<String, String[]> env) throws IOException
 	{
-		logger.debug("connecting to JMX agent at {}", url);
+		logger.debug("connecting to JMX agent at '{}'", url);
 
 		final BlockingQueue<Object> queue = new ArrayBlockingQueue<Object>(1);
 
@@ -71,11 +71,15 @@ class ZabbixJMXConnectorFactory
 				{
 					JMXConnector jmxc = JMXConnectorFactory.connect(url, env);
 
+					logger.trace("call to JMXConnectorFactory.connect('{}') successful", url);
+
 					if (!queue.offer(jmxc))
 						jmxc.close();
 				}
 				catch (Throwable t)
 				{
+					logger.trace("call to JMXConnectorFactory.connect('{}') timed out", url);
+
 					queue.offer(t);
 				}
 			}
@@ -96,6 +100,11 @@ class ZabbixJMXConnectorFactory
 				if (!queue.offer(""))
 					result = queue.take();
 			}
+
+			if (null == result)
+				logger.trace("no connector after {} seconds", timeout);
+			else
+				logger.trace("connector acquired");
 		}
 		catch (InterruptedException e)
 		{
