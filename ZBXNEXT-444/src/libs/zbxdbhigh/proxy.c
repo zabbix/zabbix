@@ -690,8 +690,6 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 {
 	const char		*__function_name = "process_proxyconfig_table";
 
-#define SKIP_ITEMS_FIELDS	"lastlogsize,mtime"	/* do not update lastlogsize and mtime of existing items */
-
 	int			f, fields_count = 0, insert, is_null, i, ret = FAIL, id_field_nr = 0, move_out = 0,
 				move_field_nr = 0;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
@@ -769,7 +767,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			goto out;
 		}
 
-		if (0 != is_items_table && SUCCEED == str_in_list(SKIP_ITEMS_FIELDS, buf, ','))
+		/* do not update lastlogsize and mtime of existing items */
+		if (0 != is_items_table && SUCCEED == str_in_list("lastlogsize,mtime", buf, ','))
 			zbx_vector_uint64_append(&skip_items_fields, fields_count);
 
 		fields_count++;
