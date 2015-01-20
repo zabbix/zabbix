@@ -43,7 +43,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 	));
 	$user = reset($users);
 
-	if (!hasRequest('form_refresh') || hasRequest('register')) {
+	if ($userId !== null && (!hasRequest('form_refresh') || hasRequest('register'))) {
 		$data['alias']			= $user['alias'];
 		$data['name']			= $user['name'];
 		$data['surname']		= $user['surname'];
