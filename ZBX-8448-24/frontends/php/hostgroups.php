@@ -136,7 +136,7 @@ if (hasRequest('form')) {
 
 				if ($hostIdsToAdd || $templateIdsToAdd) {
 					$massAdd = array(
-						'groups' => array('groupid' => $groupId)
+						'groups' => array('groupid' => $data['groupid'])
 					);
 
 					if ($hostIdsToAdd) {
@@ -152,7 +152,7 @@ if (hasRequest('form')) {
 
 				if ($hostIdsToRemove || $templateIdsToRemove) {
 					$massRemove = array(
-						'groupids' => array($groupId)
+						'groupids' => array($data['groupid'])
 					);
 
 					if ($hostIdsToRemove) {
