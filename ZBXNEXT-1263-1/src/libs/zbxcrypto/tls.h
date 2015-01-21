@@ -21,7 +21,7 @@
 #define ZABBIX_TLS_H
 
 int	zbx_tls_init_parent(void);
-int	zbx_tls_init_child(void);
+void	zbx_tls_init_child(void);
 int	zbx_tls_free(void);
 
 #endif	/* ZABBIX_TLS_H */

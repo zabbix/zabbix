@@ -407,10 +407,10 @@ int	zbx_tls_init_parent(void)
  * Purpose: initialize TLS library in a child process                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tls_init_child(void)
+void	zbx_tls_init_child(void)
 {
 	const char	*__function_name = "zbx_tls_init_child";
-	int		ret = SUCCEED, res;
+	int		res;
 
 #if defined(HAVE_POLARSSL)
 	char	*pers = NULL;
@@ -659,14 +659,24 @@ int	zbx_tls_init_child(void)
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded pre-shared key", __function_name);
+	}
 
-		/* configure identity to be used with the pre-shared key */
-		if (NULL != CONFIG_TLS_PSK_IDENTITY && '\0' != *CONFIG_TLS_PSK_IDENTITY)
+	/* configure identity to be used with the pre-shared key */
+	if (NULL != CONFIG_TLS_PSK_IDENTITY && '\0' != *CONFIG_TLS_PSK_IDENTITY)
+	{
+		/* PSK identity must be a valid UTF-8 string (RFC4279 says Unicode) */
+		if (SUCCEED != zbx_is_utf8(CONFIG_TLS_PSK_IDENTITY))
 		{
-			/* TODO implement validation for PSK identity (must be a valid UTF-8 string (RFC4279 says Unicode) */
-			my_psk_identity = CONFIG_TLS_PSK_IDENTITY;
-			my_psk_identity_len = strlen(my_psk_identity);
+			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPskIdentity\" value is not a valid "
+					"UTF-8 string");
+			zbx_tls_free();
+			exit(EXIT_FAILURE);
 		}
+
+		my_psk_identity = CONFIG_TLS_PSK_IDENTITY;
+		my_psk_identity_len = strlen(my_psk_identity);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded pre-shared key identity", __function_name);
 	}
 
 	zbx_tls_validate_config();
@@ -706,9 +716,7 @@ int	zbx_tls_init_child(void)
 	SSL_load_error_strings();
 	SSL_library_init();
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
