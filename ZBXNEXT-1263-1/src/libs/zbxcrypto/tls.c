@@ -47,14 +47,20 @@
 #	define ZBX_TLS_CIPHERSUITE_ALL	2			/* select ciphersuites with certificate and PSK */
 #endif
 
+extern int	CONFIG_TLS_CONNECT_MODE;
+extern int	CONFIG_TLS_ACCEPT_MODES;
+
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-extern char	*CONFIG_TLS_CA_FILE;
-extern char	*CONFIG_TLS_CA_PATH;
-extern char	*CONFIG_TLS_CRL_FILE;
-extern char	*CONFIG_TLS_CERT_FILE;
-extern char	*CONFIG_TLS_KEY_FILE;
-extern char	*CONFIG_TLS_PSK_FILE;
-extern char	*CONFIG_TLS_PSK_IDENTITY;
+extern unsigned char	process_type, daemon_type;
+extern char		*CONFIG_TLS_CONNECT;
+extern char		*CONFIG_TLS_ACCEPT;
+extern char		*CONFIG_TLS_CA_FILE;
+extern char		*CONFIG_TLS_CA_PATH;
+extern char		*CONFIG_TLS_CRL_FILE;
+extern char		*CONFIG_TLS_CERT_FILE;
+extern char		*CONFIG_TLS_KEY_FILE;
+extern char		*CONFIG_TLS_PSK_FILE;
+extern char		*CONFIG_TLS_PSK_IDENTITY;
 #endif
 
 #if defined(HAVE_POLARSSL)

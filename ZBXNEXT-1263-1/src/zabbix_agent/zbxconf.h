@@ -41,7 +41,11 @@ extern char	**CONFIG_PERF_COUNTERS;
 #endif
 extern char	*CONFIG_USER;
 
+extern int	CONFIG_TLS_CONNECT_MODE;
+extern int	CONFIG_TLS_ACCEPT_MODES;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+extern char	*CONFIG_TLS_CONNECT;
+extern char	*CONFIG_TLS_ACCEPT;
 extern char	*CONFIG_TLS_CA_FILE;
 extern char	*CONFIG_TLS_CA_PATH;
 extern char	*CONFIG_TLS_CRL_FILE;

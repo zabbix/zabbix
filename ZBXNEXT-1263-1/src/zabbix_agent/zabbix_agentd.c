@@ -710,6 +710,10 @@ static void	zbx_load_config(int requirement)
 			PARM_OPT,	0,			0},
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		{"TLSConnect",			&CONFIG_TLS_CONNECT,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSAccept",			&CONFIG_TLS_ACCEPT,			TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{"TLSCaFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCaPath",			&CONFIG_TLS_CA_PATH,			TYPE_STRING,
