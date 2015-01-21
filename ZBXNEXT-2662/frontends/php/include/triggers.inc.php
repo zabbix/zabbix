@@ -2354,13 +2354,13 @@ function triggerIndicator($status, $state = null) {
  */
 function triggerIndicatorStyle($status, $state = null) {
 	if ($status == TRIGGER_STATUS_ENABLED) {
-		return ($state == TRIGGER_STATE_UNKNOWN) ? 'unknown' : 'green';
+		return ($state == TRIGGER_STATE_UNKNOWN) ? 'grey' : 'green';
 	}
 	elseif ($status == TRIGGER_STATUS_DISABLED) {
 		return 'red';
 	}
 
-	return 'unknown';
+	return 'grey';
 }
 
 /**

@@ -591,34 +591,34 @@ function getAvailabilityTable($host) {
 	$host['zbx_available'] = $host['available'];
 	$host['zbx_error'] = $host['error'];
 
-	$ad = new CDiv(null, 'invisible');
+	$ad = array();
 
 	foreach ($arr as $val) {
 		switch ($host[$val.'_available']) {
 			case HOST_AVAILABLE_TRUE:
-				$ai = new CDiv(SPACE, 'status_icon status_icon_extra icon'.$val.'available');
+				$ai = new CSpan($val, 'status-green');
 				break;
 			case HOST_AVAILABLE_FALSE:
-				$ai = new CDiv(SPACE, 'status_icon status_icon_extra icon'.$val.'unavailable');
+				$ai = new CSpan($val, 'status-red');
 				$ai->setHint($host[$val.'_error'], 'on');
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
-				$ai = new CDiv(SPACE, 'status_icon status_icon_extra icon'.$val.'unknown');
+				$ai = new CSpan($val, 'status-grey');
 				break;
 		}
-		$ad->addItem($ai);
+		$ad[] = $ai;
 	}
 
 	// discovered host lifetime indicator
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete']) {
-		$deleteError = new CDiv(SPACE, 'status_icon status_icon_extra iconwarning');
+		$deleteError = new CSpan(SPACE);
 		$deleteError->setHint(_s(
 			'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
 			zbx_date2age($host['hostDiscovery']['ts_delete']),
 			zbx_date2str(DATE_FORMAT, $host['hostDiscovery']['ts_delete']),
 			zbx_date2str(TIME_FORMAT, $host['hostDiscovery']['ts_delete'])
 		));
-		$ad->addItem($deleteError);
+		$ad[] = $deleteError;
 	}
 
 	return $ad;
