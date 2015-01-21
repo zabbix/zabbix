@@ -118,7 +118,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	{
 		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
 
-		if (SUCCEED == (ret = zbx_tcp_accept(&s)))
+		if (SUCCEED == (ret = zbx_tcp_accept(&s, CONFIG_TLS_ACCEPT_MODES)))
 		{
 			local_request_failed = 0;     /* reset consecutive errors counter */
 
