@@ -21,26 +21,26 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageScreens extends CWebTest {
-	// Returns all screens
+
 	public static function allScreens() {
-		return DBdata("select * from screens where templateid is NULL order by screenid");
+		return DBdata('SELECT screenid,name FROM screens WHERE templateid IS NULL ORDER BY screenid');
 	}
 
-	/**
-	* @dataProvider allScreens
-	*/
-	public function testPageScreens_CheckLayout($screen) {
+	public function testPageScreens_CheckLayout() {
+		$screens = DBfetchArray(DBSelect('SELECT name FROM screens WHERE templateid IS NULL'));
+
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
 
 		$this->zbxTestTextPresent('CONFIGURATION OF SCREENS');
 		$this->zbxTestTextPresent('Screens');
-		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextNotPresent('Displaying 0');
-		// Header
+		$this->zbxTestTextPresent(sprintf('Displaying 1 to %1$s of %1$s found', count($screens)));
+		// header
 		$this->zbxTestTextPresent(array('Name', 'Dimension (cols x rows)', 'Screen'));
-		// Data
-		$this->zbxTestTextPresent(array($screen['name']));
+		// data
+		foreach ($screens as $screen) {
+			$this->zbxTestTextPresent($screen['name']);
+		}
 		$this->zbxTestDropdownHasOptions('action', array('Export selected', 'Delete selected'));
 	}
 
@@ -48,14 +48,11 @@ class testPageScreens extends CWebTest {
 	* @dataProvider allScreens
 	*/
 	public function testPageScreens_SimpleEdit($screen) {
-		$screenid = $screen['screenid'];
-		$name = $screen['name'];
-
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('link='.$screen['name']);
 		$this->zbxTestCheckTitle('Configuration of screens');
-		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent($screen['name']);
 		$this->zbxTestTextPresent('Change');
 		$this->zbxTestTextPresent('CONFIGURATION OF SCREEN');
 	}
@@ -64,23 +61,18 @@ class testPageScreens extends CWebTest {
 	* @dataProvider allScreens
 	*/
 	public function testPageScreens_SimpleUpdate($screen) {
-		$screenid = $screen['screenid'];
-		$name = $screen['name'];
-
-		$sqlScreen = "select * from screens where screenid=$screenid order by screenid";
-		$oldHashScreen = DBhash($sqlScreen);
-		$sqlScreenItems = "select * from screens_items where screenid=$screenid order by screenitemid";
-		$oldHashScreenItems = DBhash($sqlScreenItems);
-
 		DBsave_tables('screens');
+
+		$sqlScreen = 'SELECT * FROM screens WHERE screenid='.$screen['screenid'];
+		$oldHashScreen = DBhash($sqlScreen);
+		$sqlScreenItems = 'SELECT * FROM screens_items WHERE screenid='.$screen['screenid'].' ORDER BY screenitemid';
+		$oldHashScreenItems = DBhash($sqlScreenItems);
 
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
-		$this->href_click("?form=update&screenid=$screenid&sid=");
-		$this->wait();
+		$this->zbxTestHrefClickWait('?form=update&screenid='.$screen['screenid']);
 
 		$this->zbxTestTextPresent('CONFIGURATION OF SCREENS');
-		// $this->zbxTestTextPresent($name);
 		$this->zbxTestTextPresent('Screen');
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestTextPresent('Columns');
@@ -118,16 +110,13 @@ class testPageScreens extends CWebTest {
 	* @dataProvider allScreens
 	*/
 	public function testPageScreens_MassDelete($screen) {
-		$screenid = $screen['screenid'];
-		$name = $screen['name'];
+		DBsave_tables('screens');
 
 		$this->chooseOkOnNextConfirmation();
 
-		DBsave_tables('screens');
-
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
-		$this->zbxTestCheckboxSelect('screens['.$screenid.']');
+		$this->zbxTestCheckboxSelect('screens['.$screen['screenid'].']');
 		$this->zbxTestDropdownSelect('action', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 
@@ -137,11 +126,11 @@ class testPageScreens extends CWebTest {
 		$this->zbxTestTextPresent('Screen deleted');
 		$this->zbxTestTextPresent('CONFIGURATION OF SCREENS');
 
-		$sql = "select * from screens where screenid=$screenid";
+		$sql = 'SELECT NULL FROM screens WHERE screenid='.$screen['screenid'];
 		$this->assertEquals(0, DBcount($sql));
-		$sql = "select * from screens_items where screenid=$screenid";
+		$sql = 'SELECT NULL FROM screens_items WHERE screenid='.$screen['screenid'];
 		$this->assertEquals(0, DBcount($sql));
-		$sql = "select * from slides where screenid=$screenid";
+		$sql = 'SELECT NULL FROM slides WHERE screenid='.$screen['screenid'];
 		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('screens');

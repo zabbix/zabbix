@@ -149,35 +149,32 @@ foreach ($this->data['graphs'] as $graph) {
 	));
 }
 
-// create go buttons
-$goComboBox = new CComboBox('action');
-
-if (!$this->data['parent_discoveryid']) {
-	$goComboBox->addItem('graph.masscopyto', _('Copy selected to ...'));
-}
-
-$goOption = new CComboItem('graph.massdelete', _('Delete selected'));
-$goOption->setAttribute(
-	'confirm',
-	$this->data['parent_discoveryid'] ? _('Delete selected graph prototypes?') : _('Delete selected graphs?')
-);
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->attr('id', 'goButton');
-
-zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');
 if ($this->data['parent_discoveryid']) {
-	zbx_add_post_js('chkbxRange.prefix = "'.$this->data['parent_discoveryid'].'";');
 	zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
 }
 else {
-	zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
 	zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 }
 
+// buttons
+$buttonsArray = array();
+if (!$this->data['parent_discoveryid']) {
+	$buttonsArray['graph.masscopyto'] = array('name' => _('Copy'));
+}
+$buttonsArray['graph.massdelete'] = array('name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
+	? _('Delete selected graph prototypes?')
+	: _('Delete selected graphs?')
+);
+
 // append table to form
-$graphForm->addItem(array($this->data['paging'], $graphTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$graphForm->addItem(array(
+	$this->data['paging'],
+	$graphTable,
+	$this->data['paging'],
+	get_table_header(new CActionButtonList('action', 'group_graphid', $buttonsArray,
+		$this->data['parent_discoveryid'] ? $this->data['parent_discoveryid'] : $this->data['hostid']
+	))
+));
 
 // append form to widget
 $graphWidget->addItem($graphForm);
