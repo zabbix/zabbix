@@ -75,7 +75,12 @@ const char	*help_message[] = {
 };
 
 /* TLS parameters */
+int	CONFIG_TLS_CONNECT_MODE		= ZBX_TCP_SEC_UNENCRYPTED;
+int	CONFIG_TLS_ACCEPT_MODES		= ZBX_TCP_SEC_UNENCRYPTED;	/* not used in zabbix_sender, just for */
+									/* linking with tls.c */
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+char	*CONFIG_TLS_CONNECT		= NULL;
+char	*CONFIG_TLS_ACCEPT		= NULL; /* not used in zabbix_sender, just for linking with tls.c */
 char	*CONFIG_TLS_CA_FILE		= NULL;
 char	*CONFIG_TLS_CA_PATH		= NULL;
 char	*CONFIG_TLS_CRL_FILE		= NULL;
