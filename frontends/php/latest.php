@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -417,7 +417,7 @@ $filterButton->main();
 
 $resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput shadow');
 
-$divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
+$divButtons = new CDiv(array($filterButton, $resetButton));
 $divButtons->setAttribute('style', 'padding: 4px 0px;');
 
 $filterTable->addRow(new CCol($divButtons, 'controls', 4));
@@ -884,14 +884,13 @@ foreach ($hosts as $hostId => $dbHost) {
 	}
 }
 
-$goBox = new CComboBox('graphtype', GRAPH_TYPE_STACKED, null, array(
-	GRAPH_TYPE_STACKED => _('Display stacked graph'),
-	GRAPH_TYPE_NORMAL => _('Display graph')
+$form->addItem(array(
+	$table,
+	get_table_header(new CActionButtonList('graphtype', 'itemids', array(
+		GRAPH_TYPE_STACKED => array('name' => _('Display stacked graph')),
+		GRAPH_TYPE_NORMAL => array('name' => _('Display graph'))
+	)))
 ));
-$goBox->setAttribute('id', 'action');
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-
-$form->addItem(array($table, get_table_header(array($goBox, $goButton))));
 
 $latestWidget->addItem($form);
 $latestWidget->show();

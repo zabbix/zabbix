@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ var chkbxRange = {
 	prefix:			null,	// prefix for cookie name
 	pageGoName:		null,	// which checkboxes should be counted by Go button and saved to cookies
 	selectedIds:	{},		// ids of selected objects
-	goButton:		null,
+	footerButtons:	{},		// action buttons at the bottom of page
 	cookieName:		null,
 
 	init: function() {
@@ -66,11 +66,11 @@ var chkbxRange = {
 			this.update(this.pageGoName);
 		}
 
-		// bind event to the "Go" button
-		this.goButton = $('goButton');
-		if (!is_null(this.goButton)) {
-			addListener(this.goButton, 'click', this.submitGo.bindAsEventListener(this), false);
-		}
+		this.footerButtons = jQuery('.button.footerButton');
+		var thisChkbxRange = this;
+		this.footerButtons.each(function() {
+			addListener(this, 'click', thisChkbxRange.submitFooterButton.bindAsEventListener(thisChkbxRange), false);
+		});
 	},
 
 	implement: function(obj) {
@@ -254,11 +254,10 @@ var chkbxRange = {
 			count++;
 		});
 
-		// update go button
-		var goButton = jQuery('#goButton');
-		goButton.text(goButton.text().split(' ')[0] + ' (' + count + ')')
-			.prop('disabled', count == 0);
-		jQuery('#action').prop('disabled', count == 0);
+		var selectedCountSpan = jQuery('#selectedCount');
+		selectedCountSpan.text(count + ' ' + selectedCountSpan.text().split(' ')[1]);
+
+		jQuery('.button.footerButton').prop('disabled', count == 0);
 	},
 
 	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
@@ -315,20 +314,19 @@ var chkbxRange = {
 		}
 	},
 
-	submitGo: function(e) {
+	submitFooterButton: function(e) {
 		e = e || window.event;
 
-		var goSelect = $('action');
-		var confirmText = goSelect.options[goSelect.selectedIndex].getAttribute('confirm');
-
-		if (!is_null(confirmText) && !confirm(confirmText)) {
+		var footerButton = IE8 ? jQuery(e.srcElement) : jQuery(e.target),
+			form = footerButton.closest('form'),
+			confirmText = footerButton.attr('confirm');
+		if (confirmText && !confirm(confirmText)) {
 			Event.stop(e);
 			return false;
 		}
 
-		var form = jQuery('#goButton').closest('form');
 		for (var key in this.selectedIds) {
-			if (!empty(this.selectedIds[key])) {
+			if (this.selectedIds.hasOwnProperty(key) && this.selectedIds[key] !== null) {
 				create_var(form.attr('name'), this.pageGoName + '[' + key + ']', key, false);
 			}
 		}
