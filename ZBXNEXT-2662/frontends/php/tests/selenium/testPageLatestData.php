@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@ class testPageLatestData extends CWebTest {
 		$this->zbxTestCheckTitle('Latest data \[refreshed every 30 sec.\]');
 		$this->zbxTestTextPresent('LATEST DATA');
 		$this->zbxTestTextPresent('Items');
-		$this->zbxTestTextPresent(array('Host', 'Group'));
-		$this->zbxTestTextPresent('Filter');
-		$this->zbxTestTextPresent(array('Host', 'Name', 'Last check', 'Last value', 'Change', 'History'));
+//		$this->zbxTestTextPresent(array('Host groups', 'Hosts', 'Application', 'Name', 'Show items without data', 'Show details'));
+//		$this->zbxTestTextPresent('Filter');
+		$this->zbxTestTextPresent(array('Host', 'Name', 'Last check', 'Last value', 'Change'));
 	}
 
 // Check that no real host or template names displayed
