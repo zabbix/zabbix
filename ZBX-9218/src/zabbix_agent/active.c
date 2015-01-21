@@ -1323,9 +1323,6 @@ static void	process_active_checks(char *server, unsigned short port)
 			}
 			else
 			{
-				if (!ISSET_MSG(&result))
-					SET_MSG_RESULT(&result, zbx_strdup(NULL, "Not supported by Zabbix Agent"));
-
 				pvalue = GET_MSG_RESULT(&result);
 
 				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
