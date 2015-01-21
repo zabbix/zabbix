@@ -50,7 +50,7 @@
  * As the data retrieved by VMware collector can be quite big (for example 1 Hypervisor
  * with 500 Virtual Machines will result in approximately 20 MB of data), VMware collector
  * updates performance data (which is only 10% of the structure data) separately
- * with CONFIG_VMWARE_PERF_FREQUENCY period. The performance data are stored directly
+ * with CONFIG_VMWARE_PERF_FREQUENCY period. The performance data is stored directly
  * in VMware service object entities vector - so the structure data is not affected by
  * performance data updates.
  */
@@ -80,9 +80,9 @@ ZBX_MEM_FUNC_IMPL(__vm, vmware_mem)
 static zbx_vmware_t	*vmware = NULL;
 
 /* vmware service types */
-#define ZBX_VMWARE_SERVICE_UNKNOWN	0
-#define ZBX_VMWARE_SERVICE_VSPHERE	1
-#define ZBX_VMWARE_SERVICE_VCENTER	2
+#define ZBX_VMWARE_TYPE_UNKNOWN	0
+#define ZBX_VMWARE_TYPE_VSPHERE	1
+#define ZBX_VMWARE_TYPE_VCENTER	2
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
@@ -219,8 +219,7 @@ int	vmware_perf_entity_compare_func(const void *d1, const void *d2)
 	zbx_vmware_perf_entity_t	*e1 = (zbx_vmware_perf_entity_t *)d1;
 	zbx_vmware_perf_entity_t	*e2 = (zbx_vmware_perf_entity_t *)d2;
 
-	ret = strcmp(e1->type, e2->type);
-	if (0 == ret)
+	if (0 == (ret = strcmp(e1->type, e2->type)))
 		ret = strcmp(e1->id, e2->id);
 
 	return ret;
@@ -940,11 +939,11 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		goto out;
 	}
 
-	if (ZBX_VMWARE_SERVICE_UNKNOWN == service->type)
+	if (ZBX_VMWARE_TYPE_UNKNOWN == service->type)
 	{
 		/* try to detect the service type first using vCenter service manager object */
 		zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH,
-				vmware_service_objects[ZBX_VMWARE_SERVICE_VCENTER].session_manager,
+				vmware_service_objects[ZBX_VMWARE_TYPE_VCENTER].session_manager,
 				service->username, service->password);
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, xml)))
@@ -965,7 +964,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		{
 			/* Successfully authenticated with vcenter service manager. */
 			/* Set the service type and return with success.            */
-			service->type = ZBX_VMWARE_SERVICE_VCENTER;
+			service->type = ZBX_VMWARE_TYPE_VCENTER;
 			ret = SUCCEED;
 			goto out;
 		}
@@ -978,10 +977,10 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 			goto out;
 		}
 
-		if (0 != strcmp(error_object, vmware_service_objects[ZBX_VMWARE_SERVICE_VCENTER].session_manager))
+		if (0 != strcmp(error_object, vmware_service_objects[ZBX_VMWARE_TYPE_VCENTER].session_manager))
 			goto out;
 
-		service->type = ZBX_VMWARE_SERVICE_VSPHERE;
+		service->type = ZBX_VMWARE_TYPE_VSPHERE;
 	}
 
 	zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH, vmware_service_objects[service->type].session_manager,
@@ -2007,7 +2006,7 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (ZBX_VMWARE_SERVICE_VCENTER == service->type)
+	if (ZBX_VMWARE_TYPE_VCENTER == service->type)
 	{
 		char	*token, *token_xpath = NULL;
 
@@ -2767,7 +2766,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	if (SUCCEED != vmware_service_get_event_data(service, easyhandle, &data->events, &data->error))
 		goto clean;
 
-	if (ZBX_VMWARE_SERVICE_VCENTER == service->type &&
+	if (ZBX_VMWARE_TYPE_VCENTER == service->type &&
 			SUCCEED != vmware_service_get_cluster_list(service, easyhandle, &data->clusters, &data->error))
 	{
 		goto clean;
@@ -3148,8 +3147,8 @@ out:
  * Parameters: url      - [IN] the vmware service URL                         *
  *             username - [IN] the vmware service username                    *
  *             password - [IN] the vmware service password                    *
- *             type     - [IN] the vmware service type - VMWARE_TYPE_VSPHERE  *
- *                        or VMWARE_TYPE_VCENTER                              *
+ *             type     - [IN] the vmware service type:                       *
+ *                        ZBX_VMWARE_TYPE_VSPHERE or ZBX_VMWARE_TYPE_VCENTER  *
  *                                                                            *
  * Return value: the requested service object or NULL if the object is not    *
  *               yet ready.                                                   *
@@ -3199,7 +3198,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->url = vmware_shared_strdup(url);
 	service->username = vmware_shared_strdup(username);
 	service->password = vmware_shared_strdup(password);
-	service->type = ZBX_VMWARE_SERVICE_UNKNOWN;
+	service->type = ZBX_VMWARE_TYPE_UNKNOWN;
 	service->state = ZBX_VMWARE_STATE_NEW;
 	service->lastaccess = now;
 
@@ -3404,11 +3403,11 @@ void	zbx_vmware_destroy(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-#define	ZBX_VMWARE_SERVICE_NONE		0
-#define	ZBX_VMWARE_SERVICE_IDLE		1
-#define	ZBX_VMWARE_SERVICE_UPDATE	2
-#define	ZBX_VMWARE_SERVICE_UPDATE_PERF	3
-#define	ZBX_VMWARE_SERVICE_REMOVE	4
+#define	ZBX_VMWARE_TASK_NONE		0
+#define	ZBX_VMWARE_TASK_IDLE		1
+#define	ZBX_VMWARE_TASK_UPDATE		2
+#define	ZBX_VMWARE_TASK_UPDATE_PERF	3
+#define	ZBX_VMWARE_TASK_REMOVE		4
 
 /******************************************************************************
  *                                                                            *
@@ -3444,7 +3443,7 @@ void	main_vmware_loop(void)
 
 		do
 		{
-			state = ZBX_VMWARE_SERVICE_IDLE;
+			state = ZBX_VMWARE_TASK_IDLE;
 
 			now = time(NULL);
 			next_update = now + POLLER_DELAY;
@@ -3460,7 +3459,7 @@ void	main_vmware_loop(void)
 						now - service->lastperfcheck >= ZBX_VMWARE_PERF_TTL)
 				{
 					service->state |= ZBX_VMWARE_STATE_UPDATING_PERF;
-					state = ZBX_VMWARE_SERVICE_UPDATE_PERF;
+					state = ZBX_VMWARE_TASK_UPDATE_PERF;
 					updated_services++;
 					break;
 				}
@@ -3471,7 +3470,7 @@ void	main_vmware_loop(void)
 				if (now - service->lastcheck >= ZBX_VMWARE_CACHE_TTL)
 				{
 					service->state |= ZBX_VMWARE_STATE_UPDATING;
-					state = ZBX_VMWARE_SERVICE_UPDATE;
+					state = ZBX_VMWARE_TASK_UPDATE;
 					updated_services++;
 					break;
 				}
@@ -3480,7 +3479,7 @@ void	main_vmware_loop(void)
 				{
 					zbx_vector_ptr_remove(&vmware->services, i);
 					vmware_service_shared_free(service);
-					state = ZBX_VMWARE_SERVICE_REMOVE;
+					state = ZBX_VMWARE_TASK_REMOVE;
 					removed_services++;
 					break;
 				}
@@ -3498,13 +3497,13 @@ void	main_vmware_loop(void)
 
 			zbx_vmware_unlock();
 
-			if (ZBX_VMWARE_SERVICE_UPDATE == state)
+			if (ZBX_VMWARE_TASK_UPDATE == state)
 				vmware_service_update(service);
-			else if (ZBX_VMWARE_SERVICE_UPDATE_PERF == state)
+			else if (ZBX_VMWARE_TASK_UPDATE_PERF == state)
 				vmware_service_update_perf(service);
 
 		}
-		while (ZBX_VMWARE_SERVICE_IDLE != state);
+		while (ZBX_VMWARE_TASK_IDLE != state);
 
 		total_sec += zbx_time() - sec;
 		now = time(NULL);

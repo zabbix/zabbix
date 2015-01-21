@@ -41,7 +41,8 @@ typedef struct
 	/*    pair->first  - instance (can be NULL for aggregate values) */
 	/*    pair->second - value                                       */
 	zbx_vector_ptr_pair_t	values;
-} zbx_vmware_perf_counter_t;
+}
+zbx_vmware_perf_counter_t;
 
 /* an entity monitored with performance counters */
 typedef struct
@@ -70,13 +71,13 @@ typedef struct
 }
 zbx_vmware_datastore_t;
 
-typedef struct
-{
 #define ZBX_VMWARE_DEV_TYPE_NIC		1
 #define ZBX_VMWARE_DEV_TYPE_DISK	2
-	int			type;
-	char			*instance;
-	char			*label;
+typedef struct
+{
+	int	type;
+	char	*instance;
+	char	*label;
 }
 zbx_vmware_dev_t;
 
@@ -105,9 +106,9 @@ zbx_vmware_hv_t;
 /* the vmware cluster data */
 typedef struct
 {
-	char			*id;
-	char			*name;
-	char			*status;
+	char	*id;
+	char	*name;
+	char	*status;
 }
 zbx_vmware_cluster_t;
 

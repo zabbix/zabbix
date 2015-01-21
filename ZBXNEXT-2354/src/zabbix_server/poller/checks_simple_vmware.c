@@ -187,11 +187,10 @@ static int	vmware_service_counter_get(zbx_vmware_service_t *service, const char 
 	const char			*__function_name = "vmware_service_counter_get";
 
 	zbx_uint64_t			counterid;
-	int				i;
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_perf_counter_t	*perfcounter;
 	zbx_ptr_pair_t			*perfvalue;
-	int				ret = SYSINFO_RET_FAIL;
+	int				i, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s path:%s instance:%s", __function_name, type, id, path,
 			instance);
@@ -238,6 +237,7 @@ static int	vmware_service_counter_get(zbx_vmware_service_t *service, const char 
 		{
 			if ('\0' == *instance)
 				break;
+
 			continue;
 		}
 
@@ -1618,7 +1618,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	/* FAIL means counter already exists */
+	/* FAIL is returned if counter already exists */
 	if (SUCCEED == zbx_vmware_service_start_monitoring(service, "HostSystem", hv->id, counterid))
 	{
 		ret = SYSINFO_RET_OK;
@@ -2712,7 +2712,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	/* FAIL means counter already exists */
+	/* FAIL is returned if counter already exists */
 	if (SUCCEED == zbx_vmware_service_start_monitoring(service, "VirtualMachine", vm->id, counterid))
 	{
 		ret = SYSINFO_RET_OK;
