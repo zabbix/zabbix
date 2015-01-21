@@ -1205,7 +1205,7 @@ static int	vmware_service_get_perfcounters(zbx_vmware_service_t *service, CURL *
 		goto out;
 
 
-	if (NULL == (doc = xmlReadMemory(page.data, page.offset, "noname.xml", NULL, 0)))
+	if (NULL == (doc = xmlReadMemory(page.data, page.offset, ZBX_VM_NONAME_XML, NULL, 0)))
 	{
 		*error = zbx_strdup(*error, "Cannot parse performance counter list.");
 		goto out;
@@ -1301,7 +1301,7 @@ static void	wmware_vm_get_nic_devices(zbx_vmware_vm_t *vm)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == (doc = xmlReadMemory(vm->details, strlen(vm->details), "noname.xml", NULL, 0)))
+	if (NULL == (doc = xmlReadMemory(vm->details, strlen(vm->details), ZBX_VM_NONAME_XML, NULL, 0)))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
@@ -1368,7 +1368,7 @@ static void	wmware_vm_get_disk_devices(zbx_vmware_vm_t *vm)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == (doc = xmlReadMemory(vm->details, strlen(vm->details), "noname.xml", NULL, 0)))
+	if (NULL == (doc = xmlReadMemory(vm->details, strlen(vm->details), ZBX_VM_NONAME_XML, NULL, 0)))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
@@ -2925,7 +2925,7 @@ static void	vmware_service_parse_perf_data(zbx_vmware_service_t *service, const 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == (doc = xmlReadMemory(data, strlen(data), "noname.xml", NULL, 0)))
+	if (NULL == (doc = xmlReadMemory(data, strlen(data), ZBX_VM_NONAME_XML, NULL, 0)))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
@@ -3621,7 +3621,7 @@ char	*zbx_xml_read_value(const char *data, const char *xpath)
 	if (NULL == data)
 		goto out;
 
-	if (NULL == (doc = xmlReadMemory(data, strlen(data), "noname.xml", NULL, 0)))
+	if (NULL == (doc = xmlReadMemory(data, strlen(data), ZBX_VM_NONAME_XML, NULL, 0)))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
@@ -3725,7 +3725,7 @@ int	zbx_xml_read_values(const char *data, const char *xpath, zbx_vector_str_t *v
 	if (NULL == data)
 		goto out;
 
-	if (NULL == (doc = xmlReadMemory(data, strlen(data), "noname.xml", NULL, 0)))
+	if (NULL == (doc = xmlReadMemory(data, strlen(data), ZBX_VM_NONAME_XML, NULL, 0)))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);

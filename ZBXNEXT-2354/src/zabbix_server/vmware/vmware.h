@@ -191,6 +191,8 @@ int	zbx_vmware_service_start_monitoring(zbx_vmware_service_t *service, const cha
 zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
 		const char *id);
 
+#define ZBX_VM_NONAME_XML	"noname.xml"
+
 #define ZBX_VM_QUICKSTATS(property)									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
 		"/*[local-name()='val']/*[local-name()='quickStats']/*[local-name()='" property "']"
@@ -254,6 +256,6 @@ char	*zbx_xml_read_value(const char *data, const char *xpath);
 char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath);
 int	zbx_xml_read_values(const char *data, const char *xpath, zbx_vector_str_t *values);
 
-#endif
+#endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
 #endif	/* ZABBIX_VMWARE_H */

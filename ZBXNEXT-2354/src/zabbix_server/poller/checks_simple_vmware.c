@@ -274,7 +274,7 @@ static int	vmware_service_get_vm_counter(zbx_vmware_service_t *service, const ch
 {
 	const char	*__function_name = "vmware_service_get_vm_counter";
 
-	zbx_vmware_vm_t	*vm = NULL;
+	zbx_vmware_vm_t	*vm;
 	int		ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:%s instance:%s path:%s", __function_name, uuid, instance, path);
@@ -287,119 +287,6 @@ static int	vmware_service_get_vm_counter(zbx_vmware_service_t *service, const ch
 
 	ret = vmware_service_counter_get(service, "VirtualMachine", vm->id, path, instance, coeff, result);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
-
-	return ret;
-}
-
-int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT *result)
-{
-	const char	*__function_name = "vmware_get_events";
-
-	zbx_uint64_t	key;
-	char		*value, *error = NULL;
-	zbx_log_t	*log;
-	struct tm	tm;
-	time_t		t;
-	xmlDoc		*doc;
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
-	int		i, ret = SYSINFO_RET_FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastlogsize:" ZBX_FS_UI64, __function_name, lastlogsize);
-
-	if (NULL == (doc = xmlReadMemory(events, strlen(events), "noname.xml", NULL, 0)))
-	{
-		error = zbx_strdup(error, "Cannot parse event data.");
-		goto out;
-	}
-
-	xpathCtx = xmlXPathNewContext(doc);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_VMWARE_EVENTS(), xpathCtx)))
-	{
-		error = zbx_strdup(error, "Cannot make event parsing query.");
-		goto clean;
-	}
-
-	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-	{
-		error = zbx_strdup(error, "Cannot find event keys in event data.");
-		goto clean;
-	}
-
-	nodeset = xpathObj->nodesetval;
-
-	for (i = 0; i < nodeset->nodeNr; i++)
-	{
-		if (NULL == (value = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='key']")))
-			continue;
-
-		if (SUCCEED == is_uint64(value, &key) && key > lastlogsize)
-		{
-			zbx_free(value);
-
-			value = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
-					"*[local-name()='fullFormattedMessage']");
-
-			if (NULL != value)
-			{
-				zbx_replace_invalid_utf8(value);
-				log = add_log_result(result, value);
-				log->logeventid = key;
-				log->lastlogsize = key;
-
-				zbx_free(value);
-				value = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
-						"*[local-name()='createdTime']");
-
-				if (NULL != value)
-				{
-					if (6 == sscanf(value, "%d-%d-%dT%d:%d:%d.%*s", &tm.tm_year, &tm.tm_mon,
-							&tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec))
-					{
-						int		tz_offset;
-#if defined(HAVE_TM_TM_GMTOFF)
-						struct tm	*ptm;
-						time_t		now;
-
-						now = time(NULL);
-						ptm = localtime(&now);
-						tz_offset = ptm->tm_gmtoff;
-#else
-						tz_offset = -timezone;
-#endif
-						tm.tm_year -= 1900;
-						tm.tm_mon--;
-						tm.tm_isdst = -1;
-
-						if (0 < (t = mktime(&tm)))
-							log->timestamp = (int)t + tz_offset;
-					}
-
-				}
-			}
-		}
-
-		zbx_free(value);
-	}
-
-	if (!ISSET_LOG(result))
-		set_log_result_empty(result);
-
-	ret = SYSINFO_RET_OK;
-clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
-	xmlXPathFreeContext(xpathCtx);
-	xmlFreeDoc(doc);
-	xmlCleanupParser();
-out:
-	if (NULL != error)
-		SET_MSG_RESULT(result, error);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
 
 	return ret;
@@ -762,6 +649,119 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 unlock:
 	zbx_vmware_unlock();
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT *result)
+{
+	const char	*__function_name = "vmware_get_events";
+
+	zbx_uint64_t	key;
+	char		*value, *error = NULL;
+	zbx_log_t	*log;
+	struct tm	tm;
+	time_t		t;
+	xmlDoc		*doc;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	int		i, ret = SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastlogsize:" ZBX_FS_UI64, __function_name, lastlogsize);
+
+	if (NULL == (doc = xmlReadMemory(events, strlen(events), ZBX_VM_NONAME_XML, NULL, 0)))
+	{
+		error = zbx_strdup(error, "Cannot parse event data.");
+		goto out;
+	}
+
+	xpathCtx = xmlXPathNewContext(doc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_VMWARE_EVENTS(), xpathCtx)))
+	{
+		error = zbx_strdup(error, "Cannot make event parsing query.");
+		goto clean;
+	}
+
+	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+	{
+		error = zbx_strdup(error, "Cannot find event keys in event data.");
+		goto clean;
+	}
+
+	nodeset = xpathObj->nodesetval;
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		if (NULL == (value = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='key']")))
+			continue;
+
+		if (SUCCEED == is_uint64(value, &key) && key > lastlogsize)
+		{
+			zbx_free(value);
+
+			value = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+					"*[local-name()='fullFormattedMessage']");
+
+			if (NULL != value)
+			{
+				zbx_replace_invalid_utf8(value);
+				log = add_log_result(result, value);
+				log->logeventid = key;
+				log->lastlogsize = key;
+
+				zbx_free(value);
+				value = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
+						"*[local-name()='createdTime']");
+
+				if (NULL != value)
+				{
+					if (6 == sscanf(value, "%d-%d-%dT%d:%d:%d.%*s", &tm.tm_year, &tm.tm_mon,
+							&tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec))
+					{
+						int		tz_offset;
+#if defined(HAVE_TM_TM_GMTOFF)
+						struct tm	*ptm;
+						time_t		now;
+
+						now = time(NULL);
+						ptm = localtime(&now);
+						tz_offset = ptm->tm_gmtoff;
+#else
+						tz_offset = -timezone;
+#endif
+						tm.tm_year -= 1900;
+						tm.tm_mon--;
+						tm.tm_isdst = -1;
+
+						if (0 < (t = mktime(&tm)))
+							log->timestamp = (int)t + tz_offset;
+					}
+
+				}
+			}
+		}
+
+		zbx_free(value);
+	}
+
+	if (!ISSET_LOG(result))
+		set_log_result_empty(result);
+
+	ret = SYSINFO_RET_OK;
+clean:
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
+
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
+	xmlCleanupParser();
+out:
+	if (NULL != error)
+		SET_MSG_RESULT(result, error);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
 
 	return ret;
