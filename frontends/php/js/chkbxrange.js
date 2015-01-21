@@ -27,7 +27,7 @@ var chkbxRange = {
 	prefix:			null,	// prefix for cookie name
 	pageGoName:		null,	// which checkboxes should be counted by Go button and saved to cookies
 	selectedIds:	{},		// ids of selected objects
-	footerButtons:	null,
+	footerButtons:	{},		// action buttons at the bottom of page
 	cookieName:		null,
 
 	init: function() {
@@ -256,10 +256,6 @@ var chkbxRange = {
 		selectedCountSpan.text(count + ' ' + selectedCountSpan.text().split(' ')[1]);
 
 		jQuery('.button.footerButton').prop('disabled', count == 0);
-
-		// update go button
-		var footerButton = jQuery('#footerButton');
-		footerButton.text(footerButton.text().split(' ')[0] + ' (' + count + ')').prop('disabled', count == 0);
 	},
 
 	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
