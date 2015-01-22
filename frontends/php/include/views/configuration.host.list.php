@@ -88,19 +88,19 @@ foreach ($data['hosts'] as $host) {
 	$interface = reset($host['interfaces']);
 
 	$applications = array(new CLink(_('Applications'),
-		'applications.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']), ' ('.$host['applications'].')'
-	);
-	$items = array(new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$host['hostid']), ' ('.$host['items'].')');
+		'applications.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+		CViewHelper::showNum($host['applications']));
+	$items = array(new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$host['hostid']),
+		CViewHelper::showNum($host['items']));
 	$triggers = array(new CLink(_('Triggers'),
-		'triggers.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']), ' ('.$host['triggers'].')'
-	);
+		'triggers.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+		CViewHelper::showNum($host['triggers']));
 	$graphs = array(new CLink(_('Graphs'), 'graphs.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
-		' ('.$host['graphs'].')'
-	);
+		CViewHelper::showNum($host['graphs']));
 	$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$host['hostid']),
-		' ('.$host['discoveries'].')'
-	);
-	$httpTests = array(new CLink(_('Web'), 'httpconf.php?&hostid='.$host['hostid']), ' ('.$host['httpTests'].')');
+		CViewHelper::showNum($host['discoveries']));
+	$httpTests = array(new CLink(_('Web'), 'httpconf.php?&hostid='.$host['hostid']),
+		CViewHelper::showNum($host['httpTests']));
 
 	$description = array();
 
