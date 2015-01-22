@@ -494,18 +494,18 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 		{
 			if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG))
 			{
-				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+				if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
 				{
 					send_proxyconfig(sock, &jp);
 				}
-				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+				else if (0 != (daemon_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server,"
 							" datalen " ZBX_FS_SIZE_T,
 							(zbx_fs_size_t)(jp.end - jp.start + 1));
 					recv_proxyconfig(sock, &jp);
 				}
-				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_ACTIVE))
+				else if (0 != (daemon_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
 				{
 					/* This is a misconfiguration: the proxy is configured in active mode */
 					/* but server sends requests to it as to a proxy in passive mode. To  */
@@ -522,28 +522,28 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_DATA))
 			{
-				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+				if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
 					recv_proxyhistory(sock, &jp);
-				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+				else if (0 != (daemon_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 					send_proxyhistory(sock);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_DISCOVERY_DATA))
 			{
-				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+				if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
 					recv_discovery_data(sock, &jp);
-				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+				else if (0 != (daemon_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 					send_discovery_data(sock);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA))
 			{
-				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+				if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
 					recv_areg_data(sock, &jp);
-				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+				else if (0 != (daemon_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 					send_areg_data(sock);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
 			{
-				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+				if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
 					recv_proxy_heartbeat(sock, &jp);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
@@ -552,9 +552,9 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_HOST_AVAILABILITY))
 			{
-				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+				if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
 					recv_host_availability(sock, &jp);
-				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+				else if (0 != (daemon_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 					send_host_availability(sock);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
@@ -563,7 +563,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
 			{
-				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+				if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
 					ret = recv_getqueue(sock, &jp);
 			}
 			else

@@ -112,7 +112,7 @@ static char	shortopts[] = "c:n:hVR:";
 int	threads_num = 0;
 pid_t	*threads = NULL;
 
-unsigned char	daemon_type		= ZBX_DAEMON_TYPE_SERVER;
+unsigned char	daemon_type		= ZBX_PROGRAM_TYPE_SERVER;
 unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
 int		process_num		= 0;
 int		server_num		= 0;

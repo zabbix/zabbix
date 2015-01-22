@@ -108,7 +108,7 @@ static char	shortopts[] = "c:n:hVR:";
 int	threads_num = 0;
 pid_t	*threads = NULL;
 
-unsigned char	daemon_type		= ZBX_DAEMON_TYPE_PROXY_ACTIVE;
+unsigned char	daemon_type		= ZBX_PROGRAM_TYPE_PROXY_ACTIVE;
 
 unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
 int		process_num		= 0;
@@ -409,7 +409,7 @@ static void	zbx_set_defaults(void)
 	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
 	{
 		CONFIG_CONFSYNCER_FORKS = CONFIG_DATASENDER_FORKS = 0;
-		daemon_type = ZBX_DAEMON_TYPE_PROXY_PASSIVE;
+		daemon_type = ZBX_PROGRAM_TYPE_PROXY_PASSIVE;
 	}
 }
 

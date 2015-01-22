@@ -181,7 +181,7 @@ static char		*TEST_METRIC = NULL;
 int			threads_num = 0;
 ZBX_THREAD_HANDLE	*threads = NULL;
 
-unsigned char	daemon_type = ZBX_DAEMON_TYPE_AGENT;
+unsigned char	daemon_type = ZBX_PROGRAM_TYPE_AGENTD;
 
 ZBX_THREAD_LOCAL unsigned char process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
 ZBX_THREAD_LOCAL int process_num;
