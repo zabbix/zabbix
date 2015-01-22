@@ -40,6 +40,8 @@ const char	*usage_message[] = {
 	NULL	/* end of text */
 };
 
+unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
+
 const char	*help_message[] = {
 	"Utility for sending monitoring data to Zabbix server or proxy.",
 	"",
@@ -75,8 +77,8 @@ const char	*help_message[] = {
 };
 
 /* TLS parameters */
-int	CONFIG_TLS_CONNECT_MODE		= ZBX_TCP_SEC_UNENCRYPTED;
-int	CONFIG_TLS_ACCEPT_MODES		= ZBX_TCP_SEC_UNENCRYPTED;	/* not used in zabbix_sender, just for */
+int	configured_tls_connect_mode	= ZBX_TCP_SEC_UNENCRYPTED;
+int	configured_tls_accept_modes	= ZBX_TCP_SEC_UNENCRYPTED;	/* not used in zabbix_sender, just for */
 									/* linking with tls.c */
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 char	*CONFIG_TLS_CONNECT		= NULL;

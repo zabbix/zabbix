@@ -213,8 +213,8 @@ char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 #endif
 
 /* TLS parameters */
-int	CONFIG_TLS_CONNECT_MODE		= ZBX_TCP_SEC_UNENCRYPTED; /* not used in server, just for linking with tls.c */
-int	CONFIG_TLS_ACCEPT_MODES		= ZBX_TCP_SEC_UNENCRYPTED; /* not used in server, just for linking with tls.c */
+int	configured_tls_connect_mode	= ZBX_TCP_SEC_UNENCRYPTED; /* not used in server, just for linking with tls.c */
+int	configured_tls_accept_modes	= ZBX_TCP_SEC_UNENCRYPTED; /* not used in server, just for linking with tls.c */
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 char	*CONFIG_TLS_CONNECT		= NULL; /* not used in server, just for linking with tls.c */

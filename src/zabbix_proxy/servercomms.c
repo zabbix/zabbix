@@ -27,7 +27,7 @@
 #include "comms.h"
 #include "servercomms.h"
 
-extern int	CONFIG_TLS_CONNECT_MODE;
+extern int	configured_tls_connect_mode;
 
 int	connect_to_server(zbx_sock_t *sock, int timeout, int retry_interval)
 {
@@ -37,7 +37,7 @@ int	connect_to_server(zbx_sock_t *sock, int timeout, int retry_interval)
 			CONFIG_SERVER, CONFIG_SERVER_PORT, timeout);
 
 	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout,
-			CONFIG_TLS_CONNECT_MODE)))
+			configured_tls_connect_mode)))
 	{
 		if (0 == retry_interval)
 		{
@@ -50,7 +50,7 @@ int	connect_to_server(zbx_sock_t *sock, int timeout, int retry_interval)
 					CONFIG_SERVER, CONFIG_SERVER_PORT, zbx_tcp_strerror(), retry_interval);
 			lastlogtime = (int)time(NULL);
 			while (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT,
-					timeout, CONFIG_TLS_CONNECT_MODE)))
+					timeout, configured_tls_connect_mode)))
 			{
 				now = (int)time(NULL);
 				if (60 <= now - lastlogtime)

@@ -61,8 +61,8 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
 char	*CONFIG_USER			= NULL;
 
 /* TLS parameters */
-int	CONFIG_TLS_CONNECT_MODE		= ZBX_TCP_SEC_UNENCRYPTED;
-int	CONFIG_TLS_ACCEPT_MODES		= ZBX_TCP_SEC_UNENCRYPTED;
+int	configured_tls_connect_mode	= ZBX_TCP_SEC_UNENCRYPTED;
+int	configured_tls_accept_modes	= ZBX_TCP_SEC_UNENCRYPTED;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 char	*CONFIG_TLS_CONNECT		= NULL;
 char	*CONFIG_TLS_ACCEPT		= NULL;

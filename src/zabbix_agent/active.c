@@ -488,7 +488,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, CONFIG_LISTEN_PORT);
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT,
-			CONFIG_TLS_CONNECT_MODE)))
+			configured_tls_connect_mode)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
 
@@ -652,7 +652,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, ts.ns);
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MIN(buffer.count * CONFIG_TIMEOUT, 60),
-			CONFIG_TLS_CONNECT_MODE)))
+			configured_tls_connect_mode)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]", json.buffer);
 

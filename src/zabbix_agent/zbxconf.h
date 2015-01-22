@@ -41,8 +41,8 @@ extern char	**CONFIG_PERF_COUNTERS;
 #endif
 extern char	*CONFIG_USER;
 
-extern int	CONFIG_TLS_CONNECT_MODE;
-extern int	CONFIG_TLS_ACCEPT_MODES;
+extern int	configured_tls_connect_mode;
+extern int	configured_tls_accept_modes;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern char	*CONFIG_TLS_CONNECT;
 extern char	*CONFIG_TLS_ACCEPT;
