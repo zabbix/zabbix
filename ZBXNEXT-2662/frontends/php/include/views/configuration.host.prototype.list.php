@@ -121,7 +121,6 @@ zbx_add_post_js('cookie.prefix = "'.$discoveryRule['itemid'].'";');
 $itemForm->addItem(array(
 	$hostTable,
 	$this->data['paging'],
-	get_table_header(
 	new CActionButtonList('action', 'group_hostid',
 		array(
 			'hostprototype.massenable' => array('name' => _('Enable'),
@@ -135,7 +134,7 @@ $itemForm->addItem(array(
 			)
 		),
 		$discoveryRule['itemid']
-	))
+	)
 ));
 
 // append form to widget

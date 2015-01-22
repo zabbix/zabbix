@@ -88,9 +88,12 @@ foreach($data['regexps'] as $regexpid => $regexp) {
 }
 
 // append table to form
-$form->addItem(array($regExpTable, get_table_header(new CActionButtonList('action', 'regexpids', array(
-	'regexp.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected regular expressions?'))
-)))));
+$form->addItem(array(
+	$regExpTable,
+	new CActionButtonList('action', 'regexpids', array(
+		'regexp.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected regular expressions?'))
+	))
+));
 
 // append form to widget
 $regExpWidget->addItem($form);

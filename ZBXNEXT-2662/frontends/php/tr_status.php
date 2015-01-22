@@ -814,9 +814,9 @@ foreach ($triggers as $trigger) {
  */
 $footer = null;
 if ($config['event_ack_enable']) {
-	$footer = get_table_header(new CActionButtonList('action', $showEventColumn ? 'events' : 'triggers', array(
+	$footer = new CActionButtonList('action', $showEventColumn ? 'events' : 'triggers', array(
 		'trigger.bulkacknowledge' => array('name' => _('Bulk acknowledge'))
-	)));
+	));
 }
 
 $triggerForm->addItem(array($triggerTable, $paging, $footer));

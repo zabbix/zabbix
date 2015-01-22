@@ -138,7 +138,7 @@ zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
 $triggersForm->addItem(array(
 	$triggersTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'g_triggerid',
+	new CActionButtonList('action', 'g_triggerid',
 		array(
 			'triggerprototype.massenable' => array('name' => _('Enable'),
 				'confirm' => _('Enable selected trigger prototypes?')
@@ -152,7 +152,7 @@ $triggersForm->addItem(array(
 			),
 		),
 		$this->data['parent_discoveryid']
-	))
+	)
 ));
 
 // append form to widget

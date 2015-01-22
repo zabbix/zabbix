@@ -112,7 +112,7 @@ zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
 $itemForm->addItem(array(
 	$itemTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'group_itemid',
+	new CActionButtonList('action', 'group_itemid',
 		array(
 			'itemprototype.massenable' => array('name' => _('Enable'),
 				'confirm' => _('Enable selected item prototypes?')
@@ -125,7 +125,7 @@ $itemForm->addItem(array(
 			)
 		),
 		$this->data['parent_discoveryid']
-	))
+	)
 ));
 
 // append form to widget
