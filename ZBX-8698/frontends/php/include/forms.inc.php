@@ -35,15 +35,15 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		'config' => $config
 	);
 
-	$users = API::User()->get(array(
-		'output' => array('alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'theme', 'refresh',
-			'rows_per_page', 'type'
-		),
-		'userids' => $userId
-	));
-	$user = reset($users);
+	if ($userId != 0 && (!hasRequest('form_refresh') || hasRequest('register'))) {
+		$users = API::User()->get(array(
+			'output' => array('alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'theme', 'refresh',
+				'rows_per_page', 'type'
+			),
+			'userids' => $userId
+		));
+		$user = reset($users);
 
-	if ($userId !== null && (!hasRequest('form_refresh') || hasRequest('register'))) {
 		$data['alias']			= $user['alias'];
 		$data['name']			= $user['name'];
 		$data['surname']		= $user['surname'];
