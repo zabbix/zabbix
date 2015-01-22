@@ -213,7 +213,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	switch (ZBX_RTC_GET_MSG(flags))
 	{
 		case ZBX_RTC_CONFIG_CACHE_RELOAD:
-			if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+			if (0 != (daemon_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache"
 						" cannot be performed for a passive proxy");

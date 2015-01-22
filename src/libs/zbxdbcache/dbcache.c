@@ -1567,7 +1567,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		dc_add_history_log(history, history_num, hlog_num);
 
 	/* update value cache */
-	if (ZBX_DB_OK <= rc && 0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER) &&
+	if (ZBX_DB_OK <= rc && 0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER) &&
 			0 != h_num + huint_num + hstr_num + htext_num + hlog_num)
 	{
 		/* the history values were written into database, now add to value cache */
@@ -1917,7 +1917,7 @@ int	DCsync_history(int sync_type)
 			n -= num;
 		}
 
-		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
 			DCconfig_lock_triggers_by_itemids(itemids, candidate_num, &triggerids);
 
 		history_num = 0;
@@ -2004,7 +2004,7 @@ int	DCsync_history(int sync_type)
 
 		DBbegin();
 
-		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			DCmass_update_items(history, history_num);
 			DCmass_add_history(history, history_num);
@@ -2026,7 +2026,7 @@ int	DCsync_history(int sync_type)
 
 		DBcommit();
 
-		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
 			DCconfig_unlock_triggers(&triggerids);
 
 		LOCK_CACHE;
@@ -2682,7 +2682,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 			return;
 
 		/* server processes low-level discovery (lld) items while proxy stores their values in db */
-		if (0 != (ZBX_DAEMON_TYPE_SERVER & daemon_type))
+		if (0 != (ZBX_PROGRAM_TYPE_SERVER & daemon_type))
 			lld_process_discovery_rule(itemid, value->text, ts);
 		else
 			dc_local_add_history_lld(itemid, ts, value->text);
@@ -2920,7 +2920,7 @@ void	init_database_cache()
 	cache->text_free = CONFIG_TEXT_CACHE_SIZE;
 
 	/* trend cache */
-	if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+	if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
 		init_trend_cache();
 
 	cache->last_ts.sec = 0;
@@ -2946,7 +2946,7 @@ static void	DCsync_all()
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
 
 	DCsync_history(ZBX_SYNC_FULL);
-	if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+	if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
 		DCsync_trends();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of DCsync_all()");
@@ -2972,12 +2972,12 @@ void	free_database_cache()
 	cache = NULL;
 	zbx_mem_destroy(history_mem);
 	zbx_mem_destroy(history_text_mem);
-	if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+	if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
 		zbx_mem_destroy(trend_mem);
 
 	zbx_mutex_destroy(&cache_lock);
 	zbx_mutex_destroy(&cache_ids_lock);
-	if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+	if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
 		zbx_mutex_destroy(&trends_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

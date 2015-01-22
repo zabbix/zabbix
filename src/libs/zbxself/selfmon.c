@@ -242,12 +242,12 @@ const char	*get_daemon_type_string(unsigned char daemon_type)
 {
 	switch (daemon_type)
 	{
-		case ZBX_DAEMON_TYPE_SERVER:
+		case ZBX_PROGRAM_TYPE_SERVER:
 			return "server";
-		case ZBX_DAEMON_TYPE_PROXY_ACTIVE:
-		case ZBX_DAEMON_TYPE_PROXY_PASSIVE:
+		case ZBX_PROGRAM_TYPE_PROXY_ACTIVE:
+		case ZBX_PROGRAM_TYPE_PROXY_PASSIVE:
 			return "proxy";
-		case ZBX_DAEMON_TYPE_AGENT:
+		case ZBX_PROGRAM_TYPE_AGENTD:
 			return "agent";
 		default:
 			return "unknown";
