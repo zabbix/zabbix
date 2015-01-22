@@ -547,9 +547,9 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 	const char		*__function_name = "check_vcenter_cluster_discovery";
 
 	struct zbx_json		json_data;
-	int			i, ret = SYSINFO_RET_FAIL;
 	char			*url;
 	zbx_vmware_service_t	*service;
+	int			i, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -955,9 +955,9 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 	const char		*__function_name = "check_vcenter_hv_discovery";
 
 	struct zbx_json		json_data;
-	int			i, ret = SYSINFO_RET_FAIL;
 	char			*url, *name;
 	zbx_vmware_service_t	*service;
+	int			i, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
