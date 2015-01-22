@@ -263,7 +263,7 @@ zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 $itemForm->addItem(array(
 	$itemTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'group_itemid',
+	new CActionButtonList('action', 'group_itemid',
 		array(
 			'item.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected items?')),
 			'item.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected items?')),
@@ -275,7 +275,7 @@ $itemForm->addItem(array(
 			'item.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected items?'))
 		),
 		$this->data['hostid']
-	))
+	)
 ));
 
 // append form to widget

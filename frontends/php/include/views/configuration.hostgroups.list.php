@@ -158,13 +158,13 @@ foreach ($this->data['groups'] as $group) {
 $hostGroupForm->addItem(array(
 	$hostGroupTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'groups', array(
+	new CActionButtonList('action', 'groups', array(
 		'hostgroup.massenable' => array('name' => _('Enable hosts'), 'confirm' => _('Enable selected hosts?')),
 		'hostgroup.massdisable' => array('name' => _('Disable hosts'),
 			'confirm' => _('Disable hosts in the selected host groups?')
 		),
 		'hostgroup.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected host groups?'))
-	)))
+	))
 ));
 
 // append form to widget

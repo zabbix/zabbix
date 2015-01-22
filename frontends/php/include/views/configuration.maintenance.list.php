@@ -76,9 +76,9 @@ foreach ($this->data['maintenances'] as $maintenance) {
 $maintenanceForm->addItem(array(
 	$maintenanceTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'maintenanceids', array(
+	new CActionButtonList('action', 'maintenanceids', array(
 		'maintenance.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected maintenance periods?'))
-	)))
+	))
 ));
 
 // append form to widget

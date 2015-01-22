@@ -55,9 +55,9 @@ foreach ($this->data['slides'] as $slide) {
 $slideForm->addItem(array(
 	$slidesTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'shows', array(
+	new CActionButtonList('action', 'shows', array(
 		'slideshow.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected slide shows?'))
-	)))
+	))
 ));
 
 // append form to widget
