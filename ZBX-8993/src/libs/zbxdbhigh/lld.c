@@ -84,7 +84,6 @@ static int	lld_rows_get(char *value, char *filter, zbx_vector_ptr_t *lld_rows, c
 			DB_RESULT	result;
 			DB_ROW		row;
 			char		*f_regexp_esc;
-			int		found = 0;
 
 			f_regexp_esc = DBdyn_escape_string(f_regexp + 1);
 
@@ -100,14 +99,13 @@ static int	lld_rows_get(char *value, char *filter, zbx_vector_ptr_t *lld_rows, c
 			{
 				add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
 						f_regexp + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
-				found = 1;
 			}
-
 			DBfree_result(result);
 
-			if (0 == found)
+			if (0 == regexps_num)
 			{
-				*error = zbx_strdup(*error, "Invalid regular expression.");
+				*error = zbx_dsprintf(*error, "Global regular expression \"%s\" does not exist.",
+						f_regexp + 1);
 				goto out;
 			}
 		}
