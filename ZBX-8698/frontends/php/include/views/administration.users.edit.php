@@ -332,7 +332,7 @@ if (isset($userMessagingFormList)) {
 $userForm->addItem($userTab);
 
 // append buttons to form
-if ($this->data['userid'] != 0) {
+if ($data['userid'] != 0) {
 	$buttons = array(
 		new CButtonCancel()
 	);

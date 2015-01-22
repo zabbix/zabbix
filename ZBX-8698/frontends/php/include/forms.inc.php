@@ -119,7 +119,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$data['auth_type'] = getGroupAuthenticationType($data['user_groups'], GROUP_GUI_ACCESS_INTERNAL);
 	}
 	else {
-		$data['auth_type'] = ($userId === null)
+		$data['auth_type'] = ($userId == 0)
 			? $config['authentication_type']
 			: getUserAuthenticationType($userId, GROUP_GUI_ACCESS_INTERNAL);
 	}
