@@ -452,7 +452,7 @@ static int	hv_get_stat(zbx_vmware_hv_t *hv, int opt, const char *xpath, AGENT_RE
 			SET_UI64_RESULT(result, hv->vms.values_num);
 			break;
 		case ZBX_OPT_MEM_BALLOONED:
-			xpath = ZBX_VM_QUICKSTATS("balloonedMemory");
+			xpath = ZBX_XPATH_VM_QUICKSTATS("balloonedMemory");
 			value_uint64_sum = 0;
 
 			for (i = 0; i < hv->vms.values_num; i++)
@@ -679,13 +679,13 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_VMWARE_EVENTS(), xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_VMWARE_EVENTS(), xpathCtx)))
 	{
 		error = zbx_strdup(error, "Cannot make event parsing query.");
 		goto clean;
 	}
 
-	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 	{
 		error = zbx_strdup(error, "Cannot find event keys in event data.");
 		goto clean;
@@ -824,7 +824,7 @@ int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const ch
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	if (NULL == (version = zbx_xml_read_value(service->contents, ZBX_VMWARE_ABOUT("version"))))
+	if (NULL == (version = zbx_xml_read_value(service->contents, ZBX_XPATH_VMWARE_ABOUT("version"))))
 		goto unlock;
 
 	SET_STR_RESULT(result, version);
@@ -862,7 +862,7 @@ int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const c
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	if (NULL == (fullname = zbx_xml_read_value(service->contents, ZBX_VMWARE_ABOUT("fullName"))))
+	if (NULL == (fullname = zbx_xml_read_value(service->contents, ZBX_XPATH_VMWARE_ABOUT("fullName"))))
 		goto unlock;
 
 	SET_STR_RESULT(result, fullname);
@@ -939,7 +939,7 @@ int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, con
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH,
-			ZBX_HV_QUICKSTATS("overallCpuUsage"), result);
+			ZBX_XPATH_HV_QUICKSTATS("overallCpuUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
@@ -982,7 +982,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_vmware_cluster_t	*cluster = NULL;
 		zbx_vmware_hv_t	*hv = (zbx_vmware_hv_t *)service->data->hvs.values[i];
 
-		if (NULL == (name = zbx_xml_read_value(hv->details, ZBX_HV_CONFIG("name"))))
+		if (NULL == (name = zbx_xml_read_value(hv->details, ZBX_XPATH_HV_CONFIG("name"))))
 			continue;
 
 		if (NULL != hv->clusterid)
@@ -1023,7 +1023,7 @@ int	check_vcenter_hv_fullname(AGENT_REQUEST *request, const char *username, cons
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_HV_CONFIG_PRODUCT("fullName"),
+	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_HV_CONFIG_PRODUCT("fullName"),
 			result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
@@ -1040,7 +1040,7 @@ int	check_vcenter_hv_hw_cpu_num(AGENT_REQUEST *request, const char *username, co
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_HV_HARDWARE("numCpuCores"),
+	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_HV_HARDWARE("numCpuCores"),
 			result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
@@ -1057,7 +1057,7 @@ int	check_vcenter_hv_hw_cpu_freq(AGENT_REQUEST *request, const char *username, c
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_HV_HARDWARE("cpuMhz"),
+	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_HV_HARDWARE("cpuMhz"),
 			result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
@@ -1077,7 +1077,7 @@ int	check_vcenter_hv_hw_cpu_model(AGENT_REQUEST *request, const char *username, 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_HV_HARDWARE("cpuModel"),
+	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_HV_HARDWARE("cpuModel"),
 			result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
@@ -1094,7 +1094,8 @@ int	check_vcenter_hv_hw_cpu_threads(AGENT_REQUEST *request, const char *username
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_HV_HARDWARE("numCpuThreads"), result);
+	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_HV_HARDWARE("numCpuThreads"),
+			result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
 
@@ -1110,7 +1111,7 @@ int	check_vcenter_hv_hw_memory(AGENT_REQUEST *request, const char *username, con
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_HV_HARDWARE("memorySize"), result);
+	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_HV_HARDWARE("memorySize"), result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
 
@@ -1126,7 +1127,7 @@ int	check_vcenter_hv_hw_model(AGENT_REQUEST *request, const char *username, cons
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_HV_HARDWARE("model"),
+	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_HV_HARDWARE("model"),
 			result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
@@ -1143,7 +1144,7 @@ int	check_vcenter_hv_hw_uuid(AGENT_REQUEST *request, const char *username, const
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_HV_HARDWARE("uuid"),
+	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_HV_HARDWARE("uuid"),
 			result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
@@ -1160,7 +1161,7 @@ int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, const char *username, con
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_HV_HARDWARE("vendor"),
+	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_HV_HARDWARE("vendor"),
 			result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
@@ -1197,7 +1198,7 @@ int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, c
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH,
-			ZBX_HV_QUICKSTATS("overallMemoryUsage"), result);
+			ZBX_XPATH_HV_QUICKSTATS("overallMemoryUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -1216,7 +1217,7 @@ int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_HV_STATUS(), result);
+	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_HV_STATUS(), result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_STR_RESULT(result))
 	{
@@ -1248,7 +1249,7 @@ int	check_vcenter_hv_uptime(AGENT_REQUEST *request, const char *username, const 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_HV_QUICKSTATS("uptime"),
+	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_HV_QUICKSTATS("uptime"),
 			result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
@@ -1265,7 +1266,8 @@ int	check_vcenter_hv_version(AGENT_REQUEST *request, const char *username, const
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_HV_CONFIG_PRODUCT("version"), result);
+	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_HV_CONFIG_PRODUCT("version"),
+			result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
 
@@ -1645,7 +1647,7 @@ int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_CONFIG("numCpu"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_CONFIG("numCpu"), result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
 
@@ -1718,7 +1720,7 @@ int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, const char *username, con
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_QUICKSTATS("overallCpuUsage"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_QUICKSTATS("overallCpuUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
@@ -1771,10 +1773,10 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 		{
 			vm = (zbx_vmware_vm_t *)hv->vms.values[k];
 
-			if (NULL == (vm_name = zbx_xml_read_value(vm->details, ZBX_VM_CONFIG("name"))))
+			if (NULL == (vm_name = zbx_xml_read_value(vm->details, ZBX_XPATH_VM_CONFIG("name"))))
 				continue;
 
-			if (NULL == (hv_name = zbx_xml_read_value(hv->details, ZBX_HV_CONFIG("name"))))
+			if (NULL == (hv_name = zbx_xml_read_value(hv->details, ZBX_XPATH_HV_CONFIG("name"))))
 			{
 				zbx_free(vm_name);
 				continue;
@@ -1851,7 +1853,7 @@ int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const
 
 	if (i != service->data->hvs.values_num)
 	{
-		name = zbx_xml_read_value(hv->details, ZBX_HV_CONFIG("name"));
+		name = zbx_xml_read_value(hv->details, ZBX_XPATH_HV_CONFIG("name"));
 
 		SET_STR_RESULT(result, name);
 		ret = SYSINFO_RET_OK;
@@ -1875,7 +1877,7 @@ int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, const char *username, c
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_CONFIG("memorySizeMB"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_CONFIG("memorySizeMB"), result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -1894,7 +1896,7 @@ int	check_vcenter_vm_memory_size_ballooned(AGENT_REQUEST *request, const char *u
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_QUICKSTATS("balloonedMemory"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_QUICKSTATS("balloonedMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -1913,7 +1915,7 @@ int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, const char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_QUICKSTATS("compressedMemory"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_QUICKSTATS("compressedMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -1932,7 +1934,7 @@ int	check_vcenter_vm_memory_size_swapped(AGENT_REQUEST *request, const char *use
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_QUICKSTATS("swappedMemory"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_QUICKSTATS("swappedMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -1951,7 +1953,7 @@ int	check_vcenter_vm_memory_size_usage_guest(AGENT_REQUEST *request, const char 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_QUICKSTATS("guestMemoryUsage"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_QUICKSTATS("guestMemoryUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -1970,7 +1972,7 @@ int	check_vcenter_vm_memory_size_usage_host(AGENT_REQUEST *request, const char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_QUICKSTATS("hostMemoryUsage"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_QUICKSTATS("hostMemoryUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -1989,7 +1991,7 @@ int	check_vcenter_vm_memory_size_private(AGENT_REQUEST *request, const char *use
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_QUICKSTATS("privateMemory"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_QUICKSTATS("privateMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -2008,7 +2010,7 @@ int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, const char *user
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_QUICKSTATS("sharedMemory"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_QUICKSTATS("sharedMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
@@ -2027,7 +2029,7 @@ int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, co
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_RUNTIME("powerState"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_RUNTIME("powerState"), result);
 
 	if (SYSINFO_RET_OK == ret)
 		ret = vmware_set_powerstate_result(result);
@@ -2249,7 +2251,7 @@ int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, const char *usern
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_STORAGE("committed"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_STORAGE("committed"), result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
 
@@ -2265,7 +2267,7 @@ int	check_vcenter_vm_storage_unshared(AGENT_REQUEST *request, const char *userna
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_STORAGE("unshared"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_STORAGE("unshared"), result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
 
@@ -2281,7 +2283,7 @@ int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *use
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_STORAGE("uncommitted"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_STORAGE("uncommitted"), result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
 
@@ -2297,7 +2299,7 @@ int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_vmstat(request, username, password, ZBX_VM_QUICKSTATS("uptimeSeconds"), result);
+	ret = get_vcenter_vmstat(request, username, password, ZBX_XPATH_VM_QUICKSTATS("uptimeSeconds"), result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
 

@@ -193,59 +193,53 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 
 #define ZBX_VM_NONAME_XML	"noname.xml"
 
-#define ZBX_VM_QUICKSTATS(property)									\
+#define ZBX_XPATH_VM_QUICKSTATS(property)								\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
 		"/*[local-name()='val']/*[local-name()='quickStats']/*[local-name()='" property "']"
 
-#define ZBX_VM_RUNTIME(property)									\
+#define ZBX_XPATH_VM_RUNTIME(property)									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
 		"/*[local-name()='val']/*[local-name()='runtime']/*[local-name()='" property "']"
 
-#define ZBX_VM_CONFIG(property)									\
+#define ZBX_XPATH_VM_CONFIG(property)									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
 		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='" property "']"
 
-#define ZBX_VM_STORAGE(property)									\
+#define ZBX_XPATH_VM_STORAGE(property)									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
 		"/*[local-name()='val']/*[local-name()='storage']/*[local-name()='" property "']"
 
-#define ZBX_VM_HARDWARE(property)									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config']]"		\
+#define ZBX_XPATH_VM_HARDWARE(property)									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config']]"			\
 		"/*[local-name()='val']/*[local-name()='hardware']/*[local-name()='" property "']"
 
-#define ZBX_HV_QUICKSTATS(property)									\
+#define ZBX_XPATH_HV_QUICKSTATS(property)								\
 	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
 		"/*[local-name()='val']/*[local-name()='quickStats']/*[local-name()='" property "']"
 
-#define ZBX_HV_CONFIG(property)										\
+#define ZBX_XPATH_HV_CONFIG(property)									\
 	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
 		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='" property "']"
 
-#define ZBX_HV_CONFIG(property)										\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
-		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='" property "']"
-
-#define ZBX_HV_HARDWARE(property)									\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
-		"/*[local-name()='val']/*[local-name()='hardware']/*[local-name()='" property "']"
-
-#define ZBX_HV_CONFIG_PRODUCT(property)									\
+#define ZBX_XPATH_HV_CONFIG_PRODUCT(property)								\
 	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
 		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='product']"		\
 		"/*[local-name()='" property "']"
 
-#define ZBX_HV_STATUS()											\
+#define ZBX_XPATH_HV_HARDWARE(property)									\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+		"/*[local-name()='val']/*[local-name()='hardware']/*[local-name()='" property "']"
+
+#define ZBX_XPATH_HV_STATUS()										\
 	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
 		"/*[local-name()='val']/*[local-name()='overallStatus']"
 
-#define ZBX_VMWARE_EVENTS()	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='latestPage']]" \
-	"/*/*[local-name()='Event']"
+#define ZBX_XPATH_VMWARE_EVENTS()									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='latestPage']]" 		\
+		"/*/*[local-name()='Event']"
 
-#define ZBX_VMWARE_ABOUT(property)	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
-
-/*
- * XML support
- */
+#define ZBX_XPATH_VMWARE_ABOUT(property)								\
+	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
 
 #	define ZBX_XPATH_LN(LN)			"/*[local-name()='" LN "']"
 #	define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)

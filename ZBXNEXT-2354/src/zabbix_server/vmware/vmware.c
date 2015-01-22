@@ -1306,7 +1306,7 @@ static void	wmware_vm_get_nic_devices(zbx_vmware_vm_t *vm)
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_VM_HARDWARE("device")
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_VM_HARDWARE("device")
 			"[*[local-name()='macAddress']]", xpathCtx)))
 	{
 		goto clean;
@@ -1374,7 +1374,7 @@ static void	wmware_vm_get_disk_devices(zbx_vmware_vm_t *vm)
 	xpathCtx = xmlXPathNewContext(doc);
 
 	/* select all hardware devices of VirtualDisk type */
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_VM_HARDWARE("device")
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_VM_HARDWARE("device")
 			"[string(@*[local-name()='type'])='VirtualDisk']", xpathCtx)))
 	{
 		goto clean;
@@ -1407,7 +1407,7 @@ static void	wmware_vm_get_disk_devices(zbx_vmware_vm_t *vm)
 			}
 
 			/* find the controller (parent) device */
-			xpath = zbx_dsprintf(xpath, ZBX_VM_HARDWARE("device")
+			xpath = zbx_dsprintf(xpath, ZBX_XPATH_VM_HARDWARE("device")
 					"[*[local-name()='key']/text()='%s']", controllerKey);
 
 			if (NULL == (xpathObjController = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
@@ -1794,7 +1794,7 @@ static zbx_vmware_hv_t	*vmware_service_create_hv(zbx_vmware_service_t *service, 
 	if (SUCCEED != vmware_service_get_hv_data(service, easyhandle, id, &hv->details, error))
 		goto out;
 
-	if (NULL == (value = zbx_xml_read_value(hv->details, ZBX_HV_HARDWARE("uuid"))))
+	if (NULL == (value = zbx_xml_read_value(hv->details, ZBX_XPATH_HV_HARDWARE("uuid"))))
 		goto out;
 
 	hv->uuid = value;
