@@ -33,7 +33,6 @@ else {
 // create form
 $userForm = new CForm();
 $userForm->setName('userForm');
-$userForm->addVar('config', getRequest('config', 0));
 $userForm->addVar('form', $this->data['form']);
 
 if ($data['userid'] != 0) {
@@ -335,14 +334,11 @@ $userForm->addItem($userTab);
 // append buttons to form
 if ($this->data['userid'] != 0) {
 	$buttons = array(
-		new CButtonCancel(url_param('config'))
+		new CButtonCancel()
 	);
 
 	if (!$this->data['is_profile']) {
-		$deleteButton = new CButtonDelete(
-			_('Delete selected user?'),
-			url_param('form').url_param('userid').url_param('config')
-		);
+		$deleteButton = new CButtonDelete(_('Delete selected user?'), url_param('form').url_param('userid'));
 		if (bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
 			$deleteButton->setAttribute('disabled', 'disabled');
 		}
@@ -355,7 +351,7 @@ if ($this->data['userid'] != 0) {
 else {
 	$userForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('config')))
+		array(new CButtonCancel())
 	));
 }
 
