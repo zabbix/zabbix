@@ -22,6 +22,7 @@
 #include "zbxdbupgrade.h"
 #include "dbupgrade.h"
 #include "sysinfo.h"
+#include "log.h"
 
 /*
  * 3.0 maintenance database patches
@@ -59,11 +60,21 @@ static int	DBpatch_2050001(void)
 
 		zbx_snprintf_alloc(&oid, &oid_alloc, &oid_offset, "discovery[{#SNMPVALUE},%s]", param);
 
-		oid_esc = DBdyn_escape_string(oid);
+		/* 255 - ITEM_SNMP_OID_LEN */
+		if (255 < oid_offset && 255 < zbx_strlen_utf8(oid))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert SNMP discovery OID \"%s\":"
+					" resulting OID is too long", row[1]);
+		}
+		else
+		{
+			oid_esc = DBdyn_escape_string(oid);
 
-		rc = DBexecute("update items set snmp_oid='%s' where itemid=%s", oid_esc, row[0]);
+			rc = DBexecute("update items set snmp_oid='%s' where itemid=%s", oid_esc, row[0]);
 
-		zbx_free(oid_esc);
+			zbx_free(oid_esc);
+		}
+
 		zbx_free(param);
 
 		if (ZBX_DB_OK > rc)
