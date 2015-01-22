@@ -227,6 +227,20 @@ span.arrow-down {
 	border-top: 4px solid $link-alt-color;
 }
 
+span.arrow-left {
+	@extend %arrow;
+	border-bottom: 4px solid transparent;
+	border-top: 4px solid transparent;
+	border-right: 4px solid $link-color;
+}
+
+span.arrow-right {
+	@extend %arrow;
+	border-bottom: 4px solid transparent;
+	border-top: 4px solid transparent;
+	border-left: 4px solid $link-color;
+}
+
 %arrow {
 	width: 0; 
 	height: 0; 
@@ -270,6 +284,10 @@ ul.object-group {
 	& a.selected {
 		font-weight: bold;
 		background: #eee;
+	}
+
+	span.arrow-right {
+		border-left-color: $font-color;
 	}
 }
 
@@ -363,6 +381,7 @@ div.table-paging {
 	text-align: center;
 	background: $body-content-bgcolor;
 	padding: 7px 5px 7px 5px;
+	border-top: 1px solid $table-hordivider-color;
 	@include list-table-shadow;
 
 	a {
