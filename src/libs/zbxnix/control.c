@@ -138,14 +138,14 @@ int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message)
 		if (SUCCEED != parse_log_level_options(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE), &scope, &data))
 			return FAIL;
 	}
-	else if ((ZBX_PROGRAM_TYPE_SERVER == daemon_type || ZBX_PROGRAM_TYPE_PROXY == daemon_type) &&
+	else if ((0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != (daemon_type & ZBX_PROGRAM_TYPE_PROXY)) &&
 			0 == strcmp(opt, ZBX_CONFIG_CACHE_RELOAD))
 	{
 		command = ZBX_RTC_CONFIG_CACHE_RELOAD;
 		scope = 0;
 		data = 0;
 	}
-	else if ((ZBX_PROGRAM_TYPE_SERVER == daemon_type || ZBX_PROGRAM_TYPE_PROXY == daemon_type) &&
+	else if ((0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != (daemon_type & ZBX_PROGRAM_TYPE_PROXY)) &&
 			0 == strcmp(opt, ZBX_HOUSEKEEPER_EXECUTE))
 	{
 		command = ZBX_RTC_HOUSEKEEPER_EXECUTE;
