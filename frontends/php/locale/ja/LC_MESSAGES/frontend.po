@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-22 10:54+0200\n"
-"PO-Revision-Date: 2015-01-13 02:14+0300\n"
+"POT-Creation-Date: 2015-01-22 10:58+0200\n"
+"PO-Revision-Date: 2015-01-22 02:12+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1421108090.0\n"
+"X-POOTLE-MTIME: 1421885567.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -5402,7 +5402,7 @@ msgstr "フィールド\"%1$s\"は必須です。"
 #: include/validate.inc.php:237
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
-msgstr ""
+msgstr "フィールド\"%1$s\"の設定が正しくありません: %2$s"
 
 #: include/validate.inc.php:163
 #, c-format
@@ -12143,7 +12143,7 @@ msgstr "再試行"
 
 #: include/classes/items/CHelpItems.php:909
 msgid "Return first column of the first row of the SQL query result."
-msgstr ""
+msgstr "SQLクエリ実行結果の最初の行の最初の列を返却。"
 
 #: include/classes/items/CHelpItems.php:591
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
@@ -13969,7 +13969,7 @@ msgstr "トランザクションがクローズされていません。終了し
 
 #: include/classes/items/CHelpItems.php:913
 msgid "Transform SQL query result into a JSON object for low-level discovery."
-msgstr ""
+msgstr "変換したSQLクエリの実行結果をローレベルディスカバリのJSONオプジェクトに挿入。"
 
 #: include/classes/core/CJsonRpc.php:204
 msgid "Transport error."

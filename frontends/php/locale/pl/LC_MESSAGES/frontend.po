@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-22 10:54+0200\n"
-"PO-Revision-Date: 2014-11-03 13:27+0300\n"
+"POT-Creation-Date: 2015-01-22 10:58+0200\n"
+"PO-Revision-Date: 2015-01-19 20:32+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1415014026.0\n"
+"X-POOTLE-MTIME: 1421692375.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2327,7 +2327,7 @@ msgstr "Nie można wydać polecenia, sprawdź połączenie z serwerem Zabbix'a \
 #: include/classes/api/services/CHostGroup.php:429
 #, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Nie można ustawić \"%1$s\" dla grupy hostów \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:247
 #, c-format
@@ -2428,7 +2428,7 @@ msgstr "Nie można zaktualizować \"%1$s\" dla akcji \"%2$s\"."
 #: include/classes/api/services/CHostGroup.php:490
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Nie można zaktualizować \"%1$s\" dla grupy hostów \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:211
 #, c-format
@@ -3525,7 +3525,7 @@ msgstr "Bieżący host"
 
 #: include/views/reports.toptriggers.php:57
 msgid "Current month"
-msgstr ""
+msgstr "Aktualny miesiąc"
 
 #: popup_trexpr.php:520
 msgid "Current time is < N"
@@ -3549,11 +3549,11 @@ msgstr "Bieżąca wartość"
 
 #: include/views/reports.toptriggers.php:54
 msgid "Current week"
-msgstr ""
+msgstr "Aktualny tydzień"
 
 #: include/views/reports.toptriggers.php:60
 msgid "Current year"
-msgstr ""
+msgstr "Aktualny rok"
 
 #: include/views/configuration.action.edit.php:129
 #: include/views/configuration.host.discovery.edit.php:280
@@ -5499,7 +5499,7 @@ msgstr "Pole \"%1$s\" jest wymagane."
 #: include/validate.inc.php:237
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
-msgstr ""
+msgstr "Pole \"%1$s\" jest niewłaściwe: %2$s"
 
 #: include/validate.inc.php:163
 #, c-format
@@ -6741,11 +6741,11 @@ msgstr "Adres IP"
 
 #: include/classes/validators/CIPValidator.php:43
 msgid "IP address cannot be empty."
-msgstr ""
+msgstr "Adres IP nie może być pusty."
 
 #: include/classes/validators/CIPRangeValidator.php:62
 msgid "IP address range cannot be empty."
-msgstr ""
+msgstr "Zakres adresów IP nie może być pusty"
 
 #: include/classes/api/services/CHostInterface.php:292
 msgid "IP and DNS cannot be empty for host interface."
@@ -6759,7 +6759,7 @@ msgstr "Zakres IP"
 #: include/classes/validators/CIPRangeValidator.php:80
 #, c-format
 msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit."
-msgstr ""
+msgstr "Zakres IP \"%1$s\" przekracza limit adresów \"%2$s\"."
 
 #: include/classes/api/services/CDRule.php:215
 msgid "IP range cannot be empty."
@@ -8022,22 +8022,22 @@ msgstr "Interwał (w sek)"
 #: include/classes/validators/CIPValidator.php:49
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
-msgstr ""
+msgstr "Błędny adres IP \"%1$s\"."
 
 #: include/classes/validators/CIPValidator.php:37
 #, c-format
 msgid "Invalid IP address \"%1$s\": must be a string."
-msgstr ""
+msgstr "Błędny adres IP \"%1$s\": musi być ciągiem znaków."
 
 #: include/classes/validators/CIPRangeValidator.php:72
 #, c-format
 msgid "Invalid IP address range \"%1$s\"."
-msgstr ""
+msgstr "Błędny zakres adresów IP \"%1$s\"."
 
 #: include/classes/validators/CIPRangeValidator.php:56
 #, c-format
 msgid "Invalid IP address range \"%1$s\": must be a string."
-msgstr ""
+msgstr "Błędny zakres adresów IP \"%1$s\": musi być ciągiem znaków."
 
 #: include/classes/core/CJsonRpc.php:170
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -8660,7 +8660,7 @@ msgstr "Wykres z ostatniej godziny"
 
 #: include/views/reports.toptriggers.php:67
 msgid "Last month"
-msgstr ""
+msgstr "Ostatni miesiąc"
 
 #: jsLoader.php:210
 msgid "Last month graph"
@@ -8681,7 +8681,7 @@ msgstr "Ostatnia wartość"
 
 #: include/views/reports.toptriggers.php:64
 msgid "Last week"
-msgstr ""
+msgstr "Ostatni tydzień"
 
 #: jsLoader.php:211
 msgid "Last week graph"
@@ -8689,7 +8689,7 @@ msgstr "Wykres z ostatniego tygodnia"
 
 #: include/views/reports.toptriggers.php:70
 msgid "Last year"
-msgstr ""
+msgstr "Ostatni rok"
 
 #: include/menu.inc.php:46 include/views/inventory.host.view.php:209
 #: jsLoader.php:206 latest.php:26 search.php:134 search.php:220 search.php:274
@@ -9353,7 +9353,7 @@ msgstr "Limit pamięci: %s"
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:399
 msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). <memtype> type of process memory (supported on some platforms, see documentation). Example: proc.mem[,root]."
-msgstr ""
+msgstr "Pamięć używana przez proces. <name> nazwa procesu (domyślnie: \"all processes\"). <user> nazwa użytkownika (domyślnie: \"all users\"). <mode> możliwe wartości: avg, max, min, sum (domyślnie). <cmdline> filtr linii komend (obsługuje wyrażenia regularne). <memtype> typ pamięci procesu (obsługiwany na niektórych platformach, zobacz w dokumentacji). Przykład: proc.mem[,root]."
 
 #: dashboard.php:313 dashboard.php:327 dashboard.php:341 dashboard.php:367
 #: dashboard.php:391 dashboard.php:414 dashboard.php:437 dashboard.php:460
@@ -10628,7 +10628,7 @@ msgstr "Niesklasyfikowane"
 
 #: include/page_footer.php:79
 msgid "Not connected"
-msgstr "Nie połączony"
+msgstr "Niepołączony"
 
 #: include/classes/screens/CScreenActions.php:155
 #: include/views/administration.auditacts.list.php:96
@@ -11497,23 +11497,23 @@ msgstr "Chwilowe użycie pamięci: %s"
 
 #: popup_trexpr.php:100
 msgid "Percentage"
-msgstr ""
+msgstr "Procent"
 
 #: popup_trexpr.php:304
 msgid "Percentile P of a period T is < N"
-msgstr ""
+msgstr "Percentyla P okresu T jest < N"
 
 #: popup_trexpr.php:314
 msgid "Percentile P of a period T is = N"
-msgstr ""
+msgstr "Percentyla P okresu T jest = N"
 
 #: popup_trexpr.php:309
 msgid "Percentile P of a period T is > N"
-msgstr ""
+msgstr "Percentyla P okresu T jest > N"
 
 #: popup_trexpr.php:319
 msgid "Percentile P of a period T is NOT N"
-msgstr ""
+msgstr "Percentyla P okresu T NIE jest N"
 
 #: graphs.php:53 include/views/configuration.graph.edit.php:84
 msgid "Percentile line (left)"
@@ -12272,7 +12272,7 @@ msgstr "Ponów"
 
 #: include/classes/items/CHelpItems.php:909
 msgid "Return first column of the first row of the SQL query result."
-msgstr ""
+msgstr "Zwraca pierwszą kolumnę pierwszego wiersza wyniku zapytania SQL."
 
 #: include/classes/items/CHelpItems.php:591
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
@@ -14108,7 +14108,7 @@ msgstr "Transakcja nie została zamknięta. Przerywanie..."
 
 #: include/classes/items/CHelpItems.php:913
 msgid "Transform SQL query result into a JSON object for low-level discovery."
-msgstr ""
+msgstr "Przekształca rezultat zapytania SQL na obiekt JSON dla niskopoziomowych reguł wykrywania."
 
 #: include/classes/core/CJsonRpc.php:204
 msgid "Transport error."
@@ -14511,7 +14511,7 @@ msgstr "Typem informacji dla klucza log musi być \"Log\"."
 
 #: include/classes/api/services/CItemGeneral.php:336
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
-msgstr ""
+msgstr "Typem informacji dla pozycji agregowanych musi być \"Numerycznie (liczba całkowita bez znaku)\" lub \"Numerycznie (zmiennoprzecinkowo)\"."
 
 #: include/forms.inc.php:898
 msgid "Types"
@@ -15014,7 +15014,7 @@ msgstr "Dodano użytkownika"
 
 #: include/views/configuration.httpconf.edit.php:92
 msgid "User agent string"
-msgstr ""
+msgstr "Ciąg znaków agenta użytkownika"
 
 #: include/views/administration.users.edit.php:316
 msgid "User can't change type for himself"
@@ -15928,7 +15928,7 @@ msgstr "Tak"
 
 #: include/views/reports.toptriggers.php:51
 msgid "Yesterday"
-msgstr ""
+msgstr "Wczoraj"
 
 #: include/views/administration.users.edit.php:140
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
