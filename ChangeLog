@@ -1787,6 +1787,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.15rc1
 
 New features:
+A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 .......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
