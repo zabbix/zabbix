@@ -9,11 +9,11 @@
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
         <link rel="icon" href="img/favicon.ico">
 	</head>
-<body>
+<body style="width: 100%">
 	<header role="banner">
 		<nav role="navigation">
 			<div class="top-nav-container">
-			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="search" placeholder="Search"></form></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-print" title="Print"></a></li><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text" placeholder="Search"></form></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-print" title="Print"></a></li><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
 			</div>
 			<div class="top-subnav-container">
 			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
@@ -25,26 +25,26 @@
 	<h1>Dashboard</h1>
 	<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
 	</div>
-		<ul class="object-group"><li><a href="">All hosts</a></li><li>&rsaquo;</li><li>Zabbix server:</li><li class="green">Enabled</li><li><a href="">Applications</a>&nbsp;<sup>11</sup></li><li><a href="" class="selected">Items</a>&nbsp;<sup>67</sup></li><li><a href="">Triggers</a>&nbsp;<sup>41</sup></li><li><a href="">Graphs</a>&nbsp;<sup>11</sup></li><li><a href="">Discovery rules</a>&nbsp;<sup>2</sup></li><li><a href="">Web scenarios</a></li></ul>
+		<ul class="object-group"><li><a href="">All hosts</a></li><li>&rsaquo;</li><li>Zabbix server:</li><li class="green">Enabled</li><li><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></li><li><a href="">Applications</a>&nbsp;<sup>11</sup></li><li><a href="" class="selected">Items</a>&nbsp;<sup>67</sup></li><li><a href="">Triggers</a>&nbsp;<sup>41</sup></li><li><a href="">Graphs</a>&nbsp;<sup>11</sup></li><li><a href="">Discovery rules</a>&nbsp;<sup>2</sup></li><li><a href="">Web scenarios</a></li></ul>
 	<form>
-	<div style="background: #fff; -webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25); -moz-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25); box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);">
-	<div class="tabs-nav-container">
-	<ul class="tabs-nav"><li class="selected"><a href="#">Host</a></li><li><a href="#">Templates</a></li><li class="selected"><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
+	<div class="table-forms-container">
+	<div class="tabs-nav">
+	<a href="#" class="selected">Host</a><a href="#">Templates</a><a href="#">IPMI</a><a href="#">Macros</a><a href="#">Host inventory</a>
 	</div>
-		<ul class="table-forms">
-		<li style="padding: 0 0 10px 0"><label for="HostName">Host name</label><a href="#" class="help-icon"></a><input type="text" id="HostName"><div class="red">You can't leave this empty.</div></li>
-		<li style="padding: 0 0 10px 0"><label for="VisibleName">Visible name</label><input type="text" id="VisibleName" placeholder="Visible Name"></li>
-		<li style="padding: 0 0 10px 0"><label>Groups</label><table><tbody><tr><td><label for="InGroups">In groups</label><select id="InGroups" size="10" multiple><option>Zabbix servers</option><option>Zabbix servers</option></select></td><td><button type="button"><<</button><br><br><button type="button">>></button></td><td><label for="OtherGroups">Other groups</label><select id="OtherGroups" size="10" multiple><option>Discovered hosts</option><option>Linux servers</option><option>Templates</option></select></td></tr></tbody></table></li>
-		<li style="padding: 0 0 10px 0"><label for="Groups">New group</label><input type="text" id="Groups"></li>
-		<li style="padding: 0 0 10px 0"><label>Agent interfaces</label><table><tbody><tr><td><label for="IpAddress">IP address</label><input type="text" id="IpAddress"></td><td><label for="DnsName">DNS name</label><input type="text" id="DnsName"></td><td><label>Connect to</label><input type="radio"><input type="radio"></td><td><label for="Port">Port</label><input type="text" id="Port"></td><td><label>Default</label><input type="radio"></td></tr><tr><td><a href="">Add</a></td></tr></tbody></table></li>
-		<li style="padding: 0 0 10px 0"><label for="snmp">SNMP interfaces</label><a href="">Add</a></li>
-		<li style="padding: 0 0 10px 0"><label for="jmx">JMX interfaces</label><a href="">Add</a></li>
-		<li style="padding: 0 0 10px 0"><label for="ipmi">IPMI interfaces</label><a href="">Add</a></li>
-		<li style="padding: 0 0 10px 0"><label for="descr">Description</label><textarea name="" id="descr"></textarea></li>
-		<li style="padding: 0 0 10px 0"><label for="MonitorProxy">Monitores by proxy</label><select id="MonitorProxy"><option>(no proxy)</option><option>(no proxy)</option><option>(no proxy)</option></select></li>
-		<li style="padding: 0 0 10px 0; text-align: right"><label for="Enabled">Enabled</label><input type="checkbox" id="Enabled"></li>
-		<li style="padding: 0 0 10px 0"><button type="button">Update</button><button type="button" class="btn-alt">Clone</button><button type="button" class="btn-alt">Full clone</button><button type="button" class="btn-alt">Delete</button><button type="button" class="btn-alt">Cancel</button></li>
-		</ul>
+		<table class="table-forms">
+		<tfoot><tr><td class="table-forms-td-left"></td><td class="table-forms-td-right"><button type="button">Update</button><button type="button" class="btn-alt">Clone</button><button type="button" class="btn-alt">Full clone</button><button type="button" class="btn-alt">Delete</button><button type="button" class="btn-alt">Cancel</button></td></tr></tfoot>
+		<tbody><tr><td class="table-forms-td-left"><label for="HostName">Host name</label></td><td class="table-forms-td-right"><div class="input-help-wrapper"><input type="text" id="HostName"><span class="help-icon"></span></div><div class="form-error-msg">You can't leave this empty.</div></td></tr>
+		<tr><td class="table-forms-td-left"><label for="VisibleName">Visible name</label></td><td class="table-forms-td-right"><input type="text" id="VisibleName"></td></tr>
+		<tr><td class="table-forms-td-left"><label>Groups</label></td><td class="table-forms-td-right"><table><tbody><tr><td><label for="InGroups">In groups</label><select id="InGroups" size="10" class="select-multiple" multiple><option>Zabbix servers</option><option>Zabbix servers</option></select></td><td><button type="button" class="btn-grey">&larr;</button><button type="button" class="btn-grey">&rarr;</button></td><td><label for="OtherGroups">Other groups</label><select id="OtherGroups" size="10" class="select-multiple" multiple><option>Discovered hosts</option><option>Linux servers</option><option>Templates</option></select></td></tr></tbody></table></td></tr>
+		<tr><td class="table-forms-td-left"><label for="Groups">New group</label></td><td class="table-forms-td-right"><input type="text" id="Groups"></td></tr>
+		<tr><td class="table-forms-td-left"><label>Agent interfaces</label></td><td class="table-forms-td-right"><table><tbody><tr><td><label for="IpAddress">IP address</label><input type="text" id="IpAddress"></td><td><label for="DnsName">DNS name</label><input type="text" id="DnsName"></td><td><label>Connect to</label><input type="radio"><input type="radio"></td><td><label for="Port">Port</label><input type="text" id="Port"></td><td><label>Default</label><input type="radio"></td></tr><tr><td><a href="">Add</a></td></tr></tbody></table></td></tr>
+		<tr><td class="table-forms-td-left"><label for="snmp">SNMP interfaces</label></td><td class="table-forms-td-right"><a href="">Add</a></td></tr>
+		<tr><td class="table-forms-td-left"><label for="jmx">JMX interfaces</label></td><td class="table-forms-td-right"><a href="">Add</a></td></tr>
+		<tr><td class="table-forms-td-left"><label for="ipmi">IPMI interfaces</label></td><td class="table-forms-td-right"><a href="">Add</a></td></tr>
+		<tr><td class="table-forms-td-left"><label for="descr">Description</label></td><td class="table-forms-td-right"><textarea name="" id="descr" cols="50" rows="1" onfocus="this.style.height='60px';" style="height: 17px"></textarea></td></tr>
+		<tr><td class="table-forms-td-left"><label for="MonitorProxy">Monitored by proxy</label></td><td class="table-forms-td-right"><select id="MonitorProxy"><option>(no proxy)</option><option>(no proxy)</option><option>(no proxy)</option></select></td></tr>
+		<tr><td class="table-forms-td-left"><label for="Enabled">Enabled</label></td><td class="table-forms-td-right" style="padding-top: 2px"><input type="checkbox" id="Enabled"></td></tr></tbody>
+		</table>
 	</div>
 	</form>
 	</article>
