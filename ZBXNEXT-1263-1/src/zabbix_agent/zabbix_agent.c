@@ -41,6 +41,8 @@ const char	*usage_message[] = {
 	NULL	/* end of text */
 };
 
+unsigned char	program_type	= ZBX_PROGRAM_TYPE_AGENT;
+
 unsigned char process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
 int process_num;
 int server_num			= 0;
