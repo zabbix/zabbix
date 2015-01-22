@@ -147,8 +147,8 @@ ul.top-nav-icons {
 }
 
 ul.top-nav-icons input {
-	background: darken($primary-color, 5%) url(../img/icon-sprite.png) no-repeat 0 0;
-	border-color: darken($primary-color, 5%);
+	background: darken($primary-color, 10%) url(../img/icon-sprite.png) no-repeat 0 -1px;
+	border-color: darken($primary-color, 10%);
 	width: 167px;
 	margin: 5px 13px 0 0;
 	padding-left: 24px;
@@ -165,7 +165,7 @@ ul.top-nav-icons input {
 	}
 
 	&:focus {
-		background: $body-bgcolor url(../img/icon-sprite.png) no-repeat 0 -122px;
+		background: $body-bgcolor url(../img/icon-sprite.png) no-repeat 0 -123px;
 		border-color: $body-bgcolor;
 
 		&::-webkit-input-placeholder {
@@ -269,6 +269,7 @@ ul.object-group {
 
 	& a.selected {
 		font-weight: bold;
+		background: #eee;
 	}
 }
 
@@ -309,9 +310,9 @@ table.list-table {
 		@include list-table-header;
 		height: 100%;
 		overflow: hidden;
-	    padding: 6px 5px 6px 5px;
+	    padding: 8px 5px 8px 5px;
 	    vertical-align: middle;
-	    border-bottom: 1px solid $table-hordivider-color;
+	    border-bottom: 2px solid $table-hordivider-color;
 	    text-align: left;
 	    color: $font-alt-color;
 	    white-space: nowrap;
@@ -352,15 +353,9 @@ table.list-table {
 	}
 
 	td {
-		padding: 6px 5px 6px 5px;
+		padding: 8px 5px 8px 5px;
 		vertical-align: middle;
 		border-bottom: 1px solid $table-hordivider-color;
-	}
-}
-
-table.table-forms {
-	tfoot button {
-		margin: 0 13px 0 0px;
 	}
 }
 
@@ -410,27 +405,110 @@ div.filter-container {
 }
 
 /* Forms */
-input[type="text"] {
-	height: 24px;
-	line-height: 24px;
-	@extend %form-input-style;
+div.table-forms-container {
+	padding: 0 10px 10px 10px;
+	background: $body-content-bgcolor;
+	@include list-table-shadow;
 }
 
-input[type="password"] {
-	height: 24px;
-	line-height: 24px;
-	@extend %form-input-style;
+table.table-forms {
+	margin-left: auto;
+	margin-right: auto;
+	
+	tfoot {
+
+		td.table-forms-td-right {
+			//background: lighten($primary-color, 56%);
+			padding-top: 5px;
+		}
+
+		button {
+			margin: 0 13px 0 0;
+		}
+	}
+
+	td.table-forms-td-left {
+		padding: 0 0 10px 0;
+		text-align: right;
+		vertical-align: top;
+	}
+
+	td.table-forms-td-right {
+		padding: 0 0 10px 10px;
+		vertical-align: top;
+
+		td {
+			padding: 0 10px 0 0;
+			vertical-align: middle;
+
+			.btn-grey {
+				margin: 5px 0 5px 0;
+				display: block;
+			}
+		}
+	}
+
+	label {
+		display: block;
+	}
 }
 
-input[type="search"] {
-	height: 24px;
-	line-height: 24px;
-	@extend %form-input-style;
+input {
+	
+	&[type="text"] {
+		height: 22px;
+		line-height: 22px;
+		padding: 0 0 0 5px;
+		@extend %form-input-style;
+	}
+
+	&[type="password"] {
+		height: 22px;
+		line-height: 22px;
+		padding: 0 0 0 5px;
+		@extend %form-input-style;
+	}
+
+	&[type="search"] {
+		height: 22px;
+		line-height: 22px;
+		padding: 0 0 0 5px;
+		@extend %form-input-style;
+	}
+
+	&[type="checkbox"] {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		vertical-align: bottom;
+		position: relative;
+		top: -2px;
+		overflow: hidden;
+		width: 13px;
+		height: 13px;
+		background: none;
+	}
+
+	&[type="radio"] {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		vertical-align: bottom;
+		position: relative;
+		top: -2px;
+		overflow: hidden;
+		width: 13px;
+		height: 13px;
+		background: none;
+	}
 }
 
 textarea {
-	height: 24px;
-	line-height: 24px;
+	height: 12px;
+	line-height: 12px;
+	padding: 5px 0 0 5px;
+	overflow: auto;
+	resize: vertical;
 	@extend %form-input-style;
 }
 
@@ -439,8 +517,8 @@ select {
 	line-height: 24px;
 	@extend %form-input-style;
 
-	&[type="multiple"] {
-		height: 100%;
+	&.select-multiple {
+		height: auto;
 		padding: 5px;
 	}
 }
@@ -449,19 +527,12 @@ select {
 	@include border-radius;
 	border: 1px solid $form-input-color;
 	background: $body-content-bgcolor;
-	padding: 0 5px;
 	@include font-form;
 	@include transition;
 
 	&:focus {
 		border-color: $primary-color;
 	}
-}
-
-input [type="checkbox"] {
-	margin: 0;
-	padding: 0;
-	border: 0;
 }
 
 ul.top-nav form input {
@@ -479,7 +550,7 @@ button {
 	color: $font-white-color;
 	font-family: $font-stack;
 	border: 1px solid $primary-color;
-	padding: 0 14px;
+	padding: 0 11px;
 	min-height: 24px;
 	vertical-align: middle;
 	@include transition;
@@ -509,6 +580,23 @@ button {
 		background: $primary-color url(../img/icon-sprite.png) no-repeat -1px -193px;
 		@extend %button-icon-size;
 		@extend %button-hover-active;
+	}
+
+	&.btn-grey {
+		background: $form-transparent-color;
+		color: $link-color;
+		border-color: $form-input-color;
+
+		&:hover {
+			color: $link-hover-color;
+			background: lighten($primary-color, 55%);
+			border-color: $form-input-color;
+		}
+
+		&:active {
+			color: $link-hover-color;
+			background: lighten($primary-color, 50%);
+		}
 	}
 
 	&.filter-trigger {
@@ -573,32 +661,32 @@ div.tabs-nav-container {
 	height: 36px;
 	line-height: 36px;
 	margin: 0 0 15px 0;
-	background: lighten($primary-color, 55%);
-	border-bottom: 1px solid #eee;
 }
 
-ul.tabs-nav {
-	background: $form-disabled-color;
-
-	li {
-		display: block;
-		float: left;
-
-		&.selected {
-			background: $body-content-bgcolor;
-
-			a, a:hover {
-				color: $font-color;
-				background: $body-content-bgcolor;
-				text-decoration: none;
-				cursor: default;
-			}
-	    }
-	}
+div.tabs-nav {
+	height: 36px;
+	line-height: 36px;
+	text-align: center;
+	margin: 0 -10px 15px -10px;
+	border-bottom: 1px solid $table-hordivider-color;
 
 	a {
-		padding: 10px 13px 10px 13px;
-	}
+		padding: 10px 13px 9px 13px;
+
+		&.selected {
+			font-weight: bold;
+			background: $body-content-bgcolor;
+			color: $font-color;
+			text-decoration: none;
+			cursor: default;
+			border-bottom: 3px solid $primary-color;
+		}
+    }
+}
+
+div.input-help-wrapper {
+	position: relative;
+	display: inline-block;
 }
 
 .help-icon {
@@ -606,9 +694,12 @@ ul.tabs-nav {
 	@extend %button-icon-size;
 	display: block;
 	position: absolute;
+	top: 0;
+	right: -26px;
 
 	&:hover {
 		background: url(../img/icon-sprite.png) no-repeat 0 -336px;
+		cursor: pointer;
 	}
 }
 
@@ -674,18 +765,31 @@ span.status-grey {
 	@include border-radius; 
 }
 
-.msg-good {
+div.msg-good {
 	@extend .green;
 	border: 1px solid $alert-green-border-color;
 	background: $alert-green-bg-color;
-	@extend %msg; 
+	@extend %msg;
 }
 
-.msg-bad {
+div.msg-bad {
 	@extend .red;
 	border: 1px solid $alert-red-border-color;
 	background: $alert-red-bg-color;
 	@extend %msg;
+}
+
+span.msg-close-btn {
+	font-size: $font-h2-size;
+	font-weight: bold;
+	position: absolute;
+	padding: 5px;
+	right: 0;
+	background: #999;
+
+	&:hover {
+		cursor: pointer;
+	}
 }
 
 %msg {
@@ -693,4 +797,9 @@ span.status-grey {
 	text-align: center;
 	position: relative;
 	@include border-radius;
+}
+
+div.form-error-msg {
+	@extend .red;
+	margin: 2px 0 0 0;
 }

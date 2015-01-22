@@ -44,7 +44,7 @@ $alert-green-color: #3a8a43; // Green
 $alert-green-bg-color: #dff0d8; // Light Green
 $alert-green-border-color: #ccdebd; // Dark Green
 
-$alert-red-color: #a94442; // Red
+$alert-red-color: #a83331; // Red
 $alert-red-bg-color: #f2dede; // Light Red
 $alert-red-border-color: #ebccd1; // Dark Red
 
@@ -111,6 +111,7 @@ $font-transform: uppercase;
 @mixin list-table-header {
 	font-size: $font-h3-size;   
 	text-transform: $font-transform;
+	font-weight: bold;
 }
 
 //CSS3
@@ -133,15 +134,15 @@ $font-transform: uppercase;
 }
 
 @mixin border-left-radius {
-	-webkit-border-radius: 2px 0 0 2px;
-	-moz-border-radius: 2px 0 0 2px;
-	border-radius: 2px 0 0 2px;
+	-webkit-border-radius: 3px 0 0 3px;
+	-moz-border-radius: 3px 0 0 3px;
+	border-radius: 3px 0 0 3px;
 }
 
 @mixin border-right-radius {
-	-webkit-border-radius: 0 2px 2px 0;
-	-moz-border-radius: 0 2px 2px 0;
-	border-radius: 0 2px 2px 0;
+	-webkit-border-radius: 0 3px 3px 0;
+	-moz-border-radius: 0 3px 3px 0;
+	border-radius: 0 3px 3px 0;
 }
 
 @mixin transition {
