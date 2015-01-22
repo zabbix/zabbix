@@ -181,7 +181,7 @@ static char		*TEST_METRIC = NULL;
 int			threads_num = 0;
 ZBX_THREAD_HANDLE	*threads = NULL;
 
-unsigned char	daemon_type = ZBX_PROGRAM_TYPE_AGENTD;
+unsigned char	program_type = ZBX_PROGRAM_TYPE_AGENTD;
 
 ZBX_THREAD_LOCAL unsigned char process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
 ZBX_THREAD_LOCAL int process_num;
@@ -277,7 +277,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #ifndef _WINDOWS
 			case 'R':
 				opt_r++;
-				if (SUCCEED != parse_rtc_options(zbx_optarg, daemon_type, &t->flags))
+				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t->flags))
 					exit(EXIT_FAILURE);
 
 				t->task = ZBX_TASK_RUNTIME_CONTROL;

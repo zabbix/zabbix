@@ -28,7 +28,7 @@
 
 #include "../vmware/vmware.h"
 
-extern unsigned char	daemon_type;
+extern unsigned char	program_type;
 
 /******************************************************************************
  *                                                                            *
@@ -76,7 +76,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (0 == strcmp(tmp, "triggers"))			/* zabbix["triggers"] */
 	{
-		if (0 == (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
+		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			goto out;
 
 		if (1 != nparams)
@@ -123,7 +123,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			0 == strcmp(tmp, "history_text") ||	/* zabbix["history_text"] */
 			0 == strcmp(tmp, "history_uint"))	/* zabbix["history_uint"] */
 	{
-		if (0 == (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
+		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			goto out;
 
 		if (1 != nparams)
@@ -137,7 +137,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "trends") ||			/* zabbix["trends"] */
 			0 == strcmp(tmp, "trends_uint"))	/* zabbix["trends_uint"] */
 	{
-		if (0 == (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
+		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			goto out;
 
 		if (1 != nparams)
@@ -315,12 +315,12 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			case ZBX_PROCESS_TYPE_ESCALATOR:
 			case ZBX_PROCESS_TYPE_PROXYPOLLER:
 			case ZBX_PROCESS_TYPE_TIMER:
-				if (0 == (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
+				if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
 			case ZBX_PROCESS_TYPE_HEARTBEAT:
-				if (0 == (daemon_type & ZBX_PROGRAM_TYPE_PROXY))
+				if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
 		}
@@ -444,7 +444,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		}
 		else if (0 == strcmp(tmp, "trend"))
 		{
-			if (0 == (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
+			if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
 				error = zbx_strdup(error, "Invalid second parameter.");
 				goto out;
@@ -523,7 +523,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		zbx_vc_stats_t	stats;
 
-		if (0 == (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
+		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			goto out;
 
 		if (FAIL == zbx_vc_get_statistics(&stats))
@@ -583,7 +583,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(tmp, "proxy_history"))
 	{
-		if (0 == (daemon_type & ZBX_PROGRAM_TYPE_PROXY))
+		if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 			goto out;
 
 		if (1 != nparams)

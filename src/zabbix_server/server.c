@@ -112,7 +112,7 @@ static char	shortopts[] = "c:n:hVR:";
 int	threads_num = 0;
 pid_t	*threads = NULL;
 
-unsigned char	daemon_type		= ZBX_PROGRAM_TYPE_SERVER;
+unsigned char	program_type		= ZBX_PROGRAM_TYPE_SERVER;
 unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
 int		process_num		= 0;
 int		server_num		= 0;
@@ -661,7 +661,7 @@ int	main(int argc, char **argv)
 				break;
 			case 'R':
 				opt_r++;
-				if (SUCCEED != parse_rtc_options(zbx_optarg, daemon_type, &t.flags))
+				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t.flags))
 					exit(EXIT_FAILURE);
 
 				t.task = ZBX_TASK_RUNTIME_CONTROL;

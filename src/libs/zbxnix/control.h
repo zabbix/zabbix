@@ -23,6 +23,6 @@
 #include "common.h"
 #include "zbxself.h"
 
-int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message);
+int	parse_rtc_options(const char *opt, unsigned char program_type, int *message);
 
 #endif

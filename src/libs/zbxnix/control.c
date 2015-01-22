@@ -110,16 +110,16 @@ static int	parse_log_level_options(const char *opt, size_t len, int *scope, int 
  * Purpose: parse runtime control options and create a runtime control        *
  *          message                                                           *
  *                                                                            *
- * Parameters: opt         - [IN] the command line argument                   *
- *             daemon_type - [IN] the daemon type                             *
- *             message     - [OUT] the message containing options for log     *
- *                                 level change or cache reload               *
+ * Parameters: opt          - [IN] the command line argument                  *
+ *             program_type - [IN] the daemon type                            *
+ *             message      - [OUT] the message containing options for log    *
+ *                                  level change or cache reload              *
  *                                                                            *
  * Return value: SUCCEED - the message was created successfully               *
  *               FAIL    - an error occurred                                  *
  *                                                                            *
  ******************************************************************************/
-int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message)
+int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 {
 	int	scope, data, command;
 
@@ -138,14 +138,14 @@ int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message)
 		if (SUCCEED != parse_log_level_options(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE), &scope, &data))
 			return FAIL;
 	}
-	else if ((0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != (daemon_type & ZBX_PROGRAM_TYPE_PROXY)) &&
+	else if ((0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != (program_type & ZBX_PROGRAM_TYPE_PROXY)) &&
 			0 == strcmp(opt, ZBX_CONFIG_CACHE_RELOAD))
 	{
 		command = ZBX_RTC_CONFIG_CACHE_RELOAD;
 		scope = 0;
 		data = 0;
 	}
-	else if ((0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != (daemon_type & ZBX_PROGRAM_TYPE_PROXY)) &&
+	else if ((0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != (program_type & ZBX_PROGRAM_TYPE_PROXY)) &&
 			0 == strcmp(opt, ZBX_HOUSEKEEPER_EXECUTE))
 	{
 		command = ZBX_RTC_HOUSEKEEPER_EXECUTE;

@@ -104,7 +104,7 @@ zbx_db_version_t;
 
 #define ZBX_FIRST_DB_VERSION		2010000
 
-extern unsigned char	daemon_type;
+extern unsigned char	program_type;
 
 
 #ifndef HAVE_SQLITE3
@@ -709,7 +709,7 @@ int	DBcheck_version(void)
 		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
 				" Current database version (mandatory/optional): UNKNOWN."
 				" Required mandatory version: %08d.",
-				ZBX_PROGRAM_TYPE_SERVER == daemon_type ? "server" : "proxy", required);
+				ZBX_PROGRAM_TYPE_SERVER == program_type ? "server" : "proxy", required);
 		zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
 
 		goto out;
@@ -741,7 +741,7 @@ int	DBcheck_version(void)
 		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
 				" Current database version (mandatory/optional): %08d/%08d."
 				" Required mandatory version: %08d.",
-				ZBX_PROGRAM_TYPE_SERVER == daemon_type ? "server" : "proxy",
+				ZBX_PROGRAM_TYPE_SERVER == program_type ? "server" : "proxy",
 				db_mandatory, db_optional, required);
 #ifdef HAVE_SQLITE3
 		if (required > db_mandatory)
