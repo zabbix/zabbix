@@ -31,7 +31,7 @@
 #include "proxy.h"
 #include "../../libs/zbxcrypto/tls.h"
 
-extern unsigned char	process_type, daemon_type;
+extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
 static int	connect_to_proxy(DC_PROXY *proxy, zbx_sock_t *sock, int timeout)
@@ -350,7 +350,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */

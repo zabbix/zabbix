@@ -26,7 +26,7 @@
 
 #include "active.h"
 
-extern unsigned char	daemon_type;
+extern unsigned char	program_type;
 
 /******************************************************************************
  *                                                                            *
@@ -98,9 +98,9 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 
 		DBbegin();
 
-		if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			DBregister_host(0, host, ip, dns, port, host_metadata, (int)time(NULL));
-		else if (0 != (daemon_type & ZBX_PROGRAM_TYPE_PROXY))
+		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 			DBproxy_register_host(host, ip, dns, port, host_metadata);
 
 		DBcommit();

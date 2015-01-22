@@ -51,7 +51,7 @@ extern int	CONFIG_TLS_CONNECT_MODE;
 extern int	CONFIG_TLS_ACCEPT_MODES;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-extern unsigned char	process_type, daemon_type;
+extern unsigned char	process_type, program_type;
 extern char		*CONFIG_TLS_CONNECT;
 extern char		*CONFIG_TLS_ACCEPT;
 extern char		*CONFIG_TLS_CA_FILE;

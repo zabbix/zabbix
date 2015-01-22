@@ -447,7 +447,7 @@ static ZBX_DC_CONFIG	*config = NULL;
 static ZBX_MUTEX	config_lock = ZBX_MUTEX_NULL;
 static zbx_mem_info_t	*config_mem;
 
-extern unsigned char	daemon_type;
+extern unsigned char	program_type;
 extern int		CONFIG_TIMER_FORKS;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem)
@@ -895,7 +895,7 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 
 	if (NULL == (row = DBfetch(result)))
 	{
-		if (0 != (daemon_type & ZBX_PROGRAM_TYPE_SERVER))
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
 
 		if (0 == found)

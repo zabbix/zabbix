@@ -238,9 +238,9 @@ int	get_process_type_by_name(const char *proc_type_str)
 	return ZBX_PROCESS_TYPE_UNKNOWN;
 }
 
-const char	*get_daemon_type_string(unsigned char daemon_type)
+const char	*get_program_type_string(unsigned char program_type)
 {
-	switch (daemon_type)
+	switch (program_type)
 	{
 		case ZBX_PROGRAM_TYPE_SERVER:
 			return "server";
