@@ -2980,7 +2980,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot initialize cURL library");
+		error = zbx_strdup(error, "cannot initialize cURL library");
 		goto out;
 	}
 
@@ -2991,7 +2991,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
 	{
-		error = zbx_dsprintf(error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+		error = zbx_dsprintf(error, "cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto clean;
 	}
 
@@ -3089,7 +3089,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 	{
-		error = zbx_dsprintf(error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+		error = zbx_dsprintf(error, "dannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto clean;
 	}
 
@@ -3107,7 +3107,8 @@ out:
 
 	if (NULL != error)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot update vmware service performance statistics: %s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot update performance statistics of vmware service \"%s\": %s",
+				service->url, error);
 		zbx_free(error);
 	}
 	else
