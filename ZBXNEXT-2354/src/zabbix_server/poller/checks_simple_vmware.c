@@ -32,11 +32,11 @@ static const char	*sysinfo_ret_string(int ret)
 	switch (ret)
 	{
 		case SYSINFO_RET_OK:
-			return "OK";
+			return "SYSINFO_SUCCEED";
 		case SYSINFO_RET_FAIL:
-			return "FAIL";
+			return "SYSINFO_FAIL";
 		default:
-			return "UNKNOWN";
+			return "SYSINFO_UNKNOWN";
 	}
 }
 
