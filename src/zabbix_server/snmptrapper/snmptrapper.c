@@ -138,7 +138,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 				if (0 == regexps.values_num)
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL,
-							"Invalid regular expression \"%s\"", regex));
+							"Global regular expression \"%s\" does not exist.", regex + 1));
 					errcodes[i] = NOTSUPPORTED;
 					goto next;
 				}
