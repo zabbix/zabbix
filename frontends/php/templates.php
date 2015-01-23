@@ -667,24 +667,13 @@ else {
 		));
 	}
 
-	$goBox = new CComboBox('action');
-
-	$goBox->addItem('template.export', _('Export selected'));
-
-	$goOption = new CComboItem('template.massdelete', _('Delete selected'));
-	$goOption->setAttribute('confirm', _('Delete selected templates?'));
-	$goBox->addItem($goOption);
-
-	$goOption = new CComboItem('template.massdeleteclear', _('Delete selected with linked elements'));
-	$goOption->setAttribute('confirm', _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'));
-	$goBox->addItem($goOption);
-
-	$goButton = new CSubmit('goButton', _('Go').' (0)');
-	$goButton->setAttribute('id', 'goButton');
-
-	zbx_add_post_js('chkbxRange.pageGoName = "templates";');
-
-	$footer = get_table_header(array($goBox, $goButton));
+	$footer = get_table_header(new CActionButtonList('action', 'templates', array(
+		'template.export' => array('name' => _('Export')),
+		'template.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected templates?')),
+		'template.massdeleteclear' => array('name' => _('Delete and clear'),
+			'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)')
+		)
+	)));
 
 	$form->addItem(array($paging, $table, $paging, $footer));
 	$templateWidget->addItem($form);

@@ -100,27 +100,17 @@ if ($this->data['actions']) {
 	}
 }
 
-// create go buttons
-$goComboBox = new CComboBox('action');
-
-$goOption = new CComboItem('action.massenable', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected actions?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('action.massdisable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected actions?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('action.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected actions?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "g_actionid";');
-
 // append table to form
-$actionForm->addItem(array($this->data['paging'], $actionTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$actionForm->addItem(array(
+	$this->data['paging'],
+	$actionTable,
+	$this->data['paging'],
+	get_table_header(new CActionButtonList('action', 'g_actionid', array(
+		'action.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected actions?')),
+		'action.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected actions?')),
+		'action.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected actions?'))
+	)))
+));
 
 // append form to widget
 $actionWidget->addItem($actionForm);
