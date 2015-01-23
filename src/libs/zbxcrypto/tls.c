@@ -812,14 +812,25 @@ void	zbx_tls_init_child(void)
 
 	zbx_tls_validate_config();
 
+	/* Certificate always comes from configuration file. Set up ciphersuites. */
 	if (NULL != my_cert)
 		zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_CERT, &ciphersuites_cert);
 
-	if (NULL != my_psk)
+	/* PSK can come from configuration file (in proxy, agentd, agent) and later from database (in server, proxy). */
+	/* Configure ciphersuites just in case they will be used. */
+	if (NULL != my_psk || 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) ||
+			0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	{
 		zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_PSK, &ciphersuites_psk);
+	}
 
-	if (NULL != my_cert && NULL != my_psk)
+	/* Sometimes we need to be ready for both certificate and PSK whichever comes in. Set up a combined list of */
+	/* ciphersuites. */
+	if ((NULL != my_cert && NULL != my_psk) || 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) ||
+			0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	{
 		zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_CERT, &ciphersuites_all);
+	}
 
 	entropy = zbx_malloc(entropy, sizeof(entropy_context));
 	entropy_init(entropy);
@@ -943,14 +954,10 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, int secure)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #if defined(HAVE_POLARSSL)
-	if (ZBX_TCP_SEC_TLS_CERT == secure)
+	if (ZBX_TCP_SEC_TLS_CERT == secure && NULL == my_cert)
 	{
-		if (NULL == ciphersuites_cert)
-		{
-			*error = zbx_strdup(*error, "cannot connect with TLS and certificate: no valid certificate "
-					"loaded");
-			goto out;
-		}
+		*error = zbx_strdup(*error, "cannot connect with TLS and certificate: no valid certificate loaded");
+		goto out;
 	}
 	else if (NULL == ciphersuites_psk)	/* use a pre-shared key */
 	{
