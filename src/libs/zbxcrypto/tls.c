@@ -694,6 +694,9 @@ void	zbx_tls_init_child(void)
 	if (NULL != my_psk)
 		zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_PSK, &ciphersuites_psk);
 
+	if (NULL != my_cert && NULL != my_psk)
+		zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_CERT, &ciphersuites_all);
+
 	entropy = zbx_malloc(entropy, sizeof(entropy_context));
 	entropy_init(entropy);
 
@@ -1004,14 +1007,14 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #if defined(HAVE_POLARSSL)
-	if (0 != (ZBX_TCP_SEC_TLS_CERT & secure) && NULL == ciphersuites_cert)
+	if (0 != (secure & ZBX_TCP_SEC_TLS_CERT) && NULL == ciphersuites_cert)
 	{
 		*error = zbx_strdup(*error, "cannot accept TLS connection with certificate: no valid certificate "
 				"loaded");
 		goto out;
 	}
 
-	if (0 != (ZBX_TCP_SEC_TLS_PSK & secure) && NULL == ciphersuites_psk)
+	if (0 != (secure & ZBX_TCP_SEC_TLS_PSK) && NULL == ciphersuites_psk)
 	{
 		*error = zbx_strdup(*error, "cannot accept TLS connection with PSK: no valid PSK loaded");
 		goto out;
@@ -1054,7 +1057,7 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure)
 	ssl_set_min_version(s->tls_ctx, ZBX_TLS_MIN_MAJOR_VER, ZBX_TLS_MIN_MINOR_VER);
 	ssl_set_max_version(s->tls_ctx, ZBX_TLS_MAX_MAJOR_VER, ZBX_TLS_MAX_MINOR_VER);
 
-	if (0 != (ZBX_TCP_SEC_TLS_CERT & secure))	/* use certificates */
+	if (0 != (secure & ZBX_TCP_SEC_TLS_CERT))	/* prepare to accept with a certificate */
 	{
 		ssl_set_authmode(s->tls_ctx, SSL_VERIFY_REQUIRED);
 
@@ -1070,7 +1073,7 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure)
 		}
 	}
 
-	if (0 != (ZBX_TCP_SEC_TLS_PSK & secure))	/* use a pre-shared key */
+	if (0 != (secure & ZBX_TCP_SEC_TLS_PSK))	/* prepare te accept with a pre-shared key */
 	{
 		if (0 != (res = ssl_set_psk(s->tls_ctx, (const unsigned char *)my_psk, my_psk_len,
 				(const unsigned char *)my_psk_identity, my_psk_identity_len)))
@@ -1082,11 +1085,11 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure)
 		}
 	}
 
-	if (0 != (ZBX_TCP_SEC_TLS_CERT & secure) && 0 == (ZBX_TCP_SEC_TLS_PSK & secure))
+	if (0 != (secure & ZBX_TCP_SEC_TLS_CERT) && 0 == (secure & ZBX_TCP_SEC_TLS_PSK))
 	{
 		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_cert);
 	}
-	else if (0 != (ZBX_TCP_SEC_TLS_PSK & secure) && 0 == (ZBX_TCP_SEC_TLS_CERT & secure))
+	else if (0 != (secure & ZBX_TCP_SEC_TLS_PSK) && 0 == (secure & ZBX_TCP_SEC_TLS_CERT))
 	{
 		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_psk);
 	}
