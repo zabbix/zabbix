@@ -1052,7 +1052,7 @@ int	zbx_tcp_accept(zbx_sock_t *s, int secure)
 	if (1 == recv(s->socket, &buf, 1, MSG_PEEK) && '\x16' == buf)
 	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		if (0 != (ZBX_TCP_SEC_TLS_CERT & secure) || 0 != (ZBX_TCP_SEC_TLS_PSK & secure))
+		if (0 != (secure & ZBX_TCP_SEC_TLS_CERT) || 0 != (secure & ZBX_TCP_SEC_TLS_PSK))
 		{
 			char	*error = NULL;
 

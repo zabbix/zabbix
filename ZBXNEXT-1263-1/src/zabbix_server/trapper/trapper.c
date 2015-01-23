@@ -671,8 +671,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
-		/* Trapper has to accept all types of connections. Only after receiving data it is known who has sent */
-		/* them and one can decide to accept or discard the data. */
+		/* Trapper has to accept all types of connections it can accept with the specified configuration. */
+		/* Only after receiving data it is known who has sent them and one can decide to accept or discard */
+		/* the data. */
 		if (SUCCEED == zbx_tcp_accept(&s, ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_UNENCRYPTED))
 		{
 			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
