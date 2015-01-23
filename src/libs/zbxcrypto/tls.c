@@ -191,6 +191,7 @@ static void	zbx_tls_validate_config(void)
 	}
 
 	/* CRL file must be defined only together with a certificate */
+
 	if (NULL == my_cert && NULL != crl)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCrlFile\" is defined but \"TLSCertFile\" and "
@@ -212,6 +213,67 @@ static void	zbx_tls_validate_config(void)
 		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPskIdentity\" is defined but \"TLSPskFile\" is"
 				" not defined");
 		goto out;
+	}
+
+	/* agentd and active proxy specific validation */
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) || 0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
+	{
+		/* 'TLSConnect' is the master parameter to be matched by certificate and PSK parameters. */
+		/* 'TLSConnect' will be silently ignored on agentd, if active checks are not configured */
+		/* (i.e. 'ServerActive' is not specified. */
+
+		if ((NULL != my_cert || NULL != my_psk) && (NULL == CONFIG_TLS_CONNECT ||
+				(NULL != CONFIG_TLS_CONNECT && '\0' == *CONFIG_TLS_CONNECT)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "certificate or pre-shared key (PSK) is configured but parameter "
+					"\"TLSConnect\" is not defined");
+			goto out;
+		}
+
+		if (0 != (configured_tls_connect_mode & ZBX_TCP_SEC_TLS_CERT) && NULL == my_cert)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"TLSConnect\" value requires a certificate but it is not"
+					" configured");
+			goto out;
+		}
+
+		if (0 != (configured_tls_connect_mode & ZBX_TCP_SEC_TLS_PSK) && NULL == my_psk)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"TLSConnect\" value requires a pre-shared key (PSK) but "
+					"it is not configured");
+			goto out;
+		}
+	}
+
+	/* agentd, agent and passive proxy specific validation */
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) || 0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE) ||
+			0 != (program_type & ZBX_PROGRAM_TYPE_AGENT))
+	{
+		/* 'TLSAccept' is the master parameter to be matched by certificate and PSK parameters */
+
+		if ((NULL != my_cert || NULL != my_psk) && (NULL == CONFIG_TLS_ACCEPT ||
+				(NULL != CONFIG_TLS_ACCEPT && '\0' == *CONFIG_TLS_ACCEPT)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "certificate or pre-shared key (PSK) is configured but parameter "
+					"\"TLSAccept\" is not defined");
+			goto out;
+		}
+
+		if (0 != (configured_tls_accept_modes & ZBX_TCP_SEC_TLS_CERT) && NULL == my_cert)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"TLSAccept\" value requires a certificate but it is not"
+					" configured");
+			goto out;
+		}
+
+		if (0 != (configured_tls_accept_modes & ZBX_TCP_SEC_TLS_PSK) && NULL == my_psk)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"TLSAccept\" value requires a pre-shared key (PSK) but "
+					"it is not configured");
+			goto out;
+		}
 	}
 
 	return;
