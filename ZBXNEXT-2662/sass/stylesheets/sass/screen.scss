@@ -385,36 +385,45 @@ div.table-paging {
 	@include list-table-shadow;
 
 	a {
-		display: inline-block;
-		margin-left: -1px;
-		padding: 0 14px;
-		min-height: 22px;
-		line-height: 22px;
-		border: 1px solid $form-input-color;
-		text-decoration: none;
-		@include transition;
+		@extend %paging-btn;
+	}
+}
 
-		&:hover {
-			background: lighten($primary-color, 55%);
-		}
+span.radio-switch {
+	cursor: pointer;
+	@extend %paging-btn;
+}
 
-		&:active {
-			background: lighten($primary-color, 50%);
-		}
+%paging-btn {
+	display: inline-block;
+	margin-left: -1px;
+	padding: 0 14px;
+	min-height: 22px;
+	line-height: 22px;
+	border: 1px solid $form-input-color;
+	text-decoration: none;
+	@include transition;
 
-		&:first-child {
-			@include border-left-radius;
-		}
+	&:hover {
+		background: lighten($primary-color, 55%);
+	}
 
-		&:last-child {
-			@include border-right-radius;
-		}
+	&:active {
+		background: lighten($primary-color, 50%);
+	}
 
-		&.paging-selected {
-			cursor: default;
-			color: $font-color;
-			background: $form-input-color;
-		}
+	&:first-child {
+		@include border-left-radius;
+	}
+
+	&:last-child {
+		@include border-right-radius;
+	}
+
+	&.paging-selected {
+		cursor: default;
+		color: $font-color;
+		background: $form-input-color;
 	}
 }
 
