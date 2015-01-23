@@ -47,7 +47,10 @@
 		<td class="table-forms-td-left"><label for="VisibleName">Visible name</label></td><td class="table-forms-td-right"><input type="text" id="VisibleName"></td>
 		</tr>
 		<tr>
-		<td class="table-forms-td-left"><label>Groups</label></td><td class="table-forms-td-right"><table><tbody><tr><td><label for="InGroups">In groups</label><select id="InGroups" size="10" class="select-multiple" multiple><option>Zabbix servers</option><option>Zabbix servers</option></select></td><td><button type="button" class="btn-grey"><span class="arrow-left"></span></button><button type="button" class="btn-grey"><span class="arrow-right"></span></button></td><td><label for="OtherGroups">Other groups</label><select id="OtherGroups" size="10" class="select-multiple" multiple><option>Discovered hosts</option><option>Linux servers</option><option>Templates</option></select></td></tr></tbody></table></td>
+		<td class="table-forms-td-left"><label>Groups</label></td>
+		<td class="table-forms-td-right">
+		<table><tbody><tr>
+		<td><label for="InGroups">In groups</label></td><td>&nbsp;</td><td><label for="OtherGroups">Other groups</label></td></tr><tr><td><select id="InGroups" size="10" class="select-multiple" multiple><option>Zabbix servers</option><option>Zabbix servers</option></select></td><td><button type="button" class="btn-grey"><span class="arrow-left"></span></button><button type="button" class="btn-grey"><span class="arrow-right"></span></button></td><td><select id="OtherGroups" size="10" class="select-multiple" multiple><option>Discovered hosts</option><option>Linux servers</option><option>Templates</option></select></td></tr></tbody></table></td>
 		</tr>
 		<tr class="table-forms-tr-new">
 		<td class="table-forms-td-left"><label for="Groups">New group</label></td>
@@ -61,23 +64,39 @@
 		<td>&nbsp;</td><td><label for="IpAddress">IP address</label></td><td><label for="DnsName">DNS name</label></td><td><label>Connect to</label</td><td><label for="Port">Port</label></td><td><label>Default</label></td><td>&nbsp;</td>	
 		</tr>
 		<tr>
-		<td><span class="drag-icon"></span></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#">Remove</a></td>
+		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#">Remove</a></td>
 		</tr>
 		<tr>
-		<td><span class="drag-icon"></span></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#">Remove</a></td></tr><tr><td>&nbsp;</td><td><a href="">Add</a></td>
-		</tr></tbody></table>
+		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#">Remove</a></td></tr><tr><td>&nbsp;</td><td><a href="">Add</a></td></tr></tbody></table><div class="table-forms-separator"></div>
 		</td>
 		</tr>
 		<tr>
 		<td class="table-forms-td-left"><label for="snmp">SNMP interfaces</label></td><td class="table-forms-td-right">
-		<table><tbody><tr><td><span class="drag-icon"></span></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#">Remove</a></td></tr><tr><td>&nbsp;</td><td><a href="">Add</a></td></tr></tbody></table>
+		<table><tbody>
+		<tr>
+		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"><div style="margin-top: 5px"><label for="BulkReq"><input type="checkbox" id="BulkReq" checked> Use bulk requests</label></div></td><td><input type="text" id="DnsName"></td><td><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#">Remove</a></td>
+		</tr>
+		<tr>
+		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"><div style="margin-top: 5px"><label for="BulkReq"><input type="checkbox" id="BulkReq" checked> Use bulk requests</label></div></td><td><input type="text" id="DnsName"></td><td><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#">Remove</a></td>
+		</tr><tr><td>&nbsp;</td><td><a href="">Add</a></td></tr>
+		</tbody></table><div class="table-forms-separator"></div>
 		</td>
 		</tr>
 		<tr>
-		<td class="table-forms-td-left"><label for="jmx">JMX interfaces</label></td><td class="table-forms-td-right"><a href="">Add</a></td>
+		<td class="table-forms-td-left"><label for="jmx">JMX interfaces</label></td>
+		<td class="table-forms-td-right">
+		<table><tbody>
+		<tr><td>&nbsp;</td><td><a href="">Add</a></td></tr>
+		</tbody></table>
+		</td>
 		</tr>
 		<tr>
-		<td class="table-forms-td-left"><label for="ipmi">IPMI interfaces</label></td><td class="table-forms-td-right"><a href="">Add</a></td>
+		<td class="table-forms-td-left"><label for="ipmi">IPMI interfaces</label></td>
+		<td class="table-forms-td-right">
+		<table><tbody>
+		<tr><td>&nbsp;</td><td><a href="">Add</a></td></tr>
+		</tbody></table>
+		</td>
 		</tr>
 		<tr>
 		<td class="table-forms-td-left"><label for="descr">Description</label></td><td class="table-forms-td-right"><textarea name="" id="descr" cols="50" rows="1" onfocus="this.style.height='60px';" style="height: 17px"></textarea></td>

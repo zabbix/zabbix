@@ -451,28 +451,34 @@ table.table-forms {
 	}
 
 	td.table-forms-td-left {
-		padding: 5 0 5px 0;
+		padding: 5px 0 5px 0;
 		text-align: right;
 		vertical-align: top;
+
+		label {
+			display: block;
+			height: 24px;
+			line-height: 24px;
+		}
 	}
 
 	td.table-forms-td-right {
 		padding: 5px 0 5px 10px;
-		vertical-align: top;
+		vertical-align: middle;
 
 		td {
 			padding: 5px 10px 5px 0;
-			vertical-align: middle;
+			vertical-align: top;
+
+			 &.td-drag-icon {
+			 	padding: 5px 0px 5px 0;
+			 }
 
 			.btn-grey {
 				margin: 5px 0 5px 0;
 				display: block;
 			}
 		}
-	}
-
-	label {
-		display: block;
 	}
 
 	span.arrow-left {
@@ -482,6 +488,11 @@ table.table-forms {
 	span.arrow-right {
 		border-left-color: $font-color;
 	}
+}
+
+div.table-forms-separator {
+	margin: 5px 0 0 0;
+	border: 1px solid $table-hordivider-color;
 }
 
 input {
@@ -734,9 +745,9 @@ div.input-help-wrapper {
 	}
 }
 
-span.drag-icon {
+div.drag-icon {
 	@extend %button-icon-size;
-	display: block;
+	margin-left: -9px;
 	cursor: move;
 	background: url(../img/icon-sprite.png) no-repeat 0 -288px;
 }
