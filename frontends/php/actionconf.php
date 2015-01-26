@@ -299,16 +299,18 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 		}
 
 		if ($result) {
+			$eventsource = getRequest('eventsource',
+				CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
+			);
+
 			if (isset($new_operation['id'])) {
 				$_REQUEST['operations'][$new_operation['id']] = $new_operation;
 			}
 			else {
 				$_REQUEST['operations'][] = $new_operation;
-				$eventsource = getRequest('eventsource',
-					CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
-				);
-				sortOperations($eventsource, $_REQUEST['operations']);
 			}
+
+			sortOperations($eventsource, $_REQUEST['operations']);
 		}
 
 		unset($_REQUEST['new_operation']);
@@ -427,8 +429,6 @@ if (hasRequest('form')) {
 		$data['action']['filter']['evaltype'] = getRequest('evaltype');
 		$data['action']['filter']['formula'] = getRequest('formula');
 		$data['action']['filter']['conditions'] = getRequest('conditions', array());
-
-		sortOperations($data['eventsource'], $data['action']['operations']);
 
 		if ($data['actionid'] && hasRequest('form_refresh')) {
 			$data['action']['def_shortdata'] = getRequest('def_shortdata', '');
