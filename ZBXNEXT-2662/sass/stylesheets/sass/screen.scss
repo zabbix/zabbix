@@ -423,6 +423,8 @@ span.radio-switch {
 
 	&.paging-selected {
 		cursor: default;
+		color: $font-white-color;
+		border-color: $form-input-color;
 		background: $form-input-color;
 	}
 }
@@ -786,6 +788,47 @@ a.form-remove-btn {
 	font-weight: bold;
 	font-size: $font-h2-size;
 	text-decoration: none;
+}
+
+/* Action Menus, Pop-up Menus */
+ul.action-menu {
+	position: absolute;
+	z-index: 1000;
+	padding: 7px 15px 7px 15px;
+	min-width: 166px;
+	color: $font-alt-color;
+	background: $body-content-bgcolor;
+	border: 1px solid $underline-color;
+	@include border-radius;
+	@include action-menu-shadow;
+
+	a {
+		display: block;
+		height: 24px;
+		line-height: 24px;
+		color: $font-color;
+		text-decoration: none;
+		padding: 0 15px 0 15px;
+		margin: 0 -15px 0 -15px;
+
+		&:hover {
+			background: lighten($primary-color, 55%);
+		}
+
+		&:active {
+			background: lighten($primary-color, 50%);
+		}
+
+		span {
+			position: absolute;
+			right: 10px;
+		}
+	}
+
+	h3 {
+		height: 24px;
+		line-height: 24px;
+	}
 }
 
 /* Alerts */
