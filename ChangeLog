@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8993] added error message for invalid global regular expressions in lld rules (igors)
 .......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
 A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
 ....I..... [ZBX-9168] fixed incorrect keys and added missing keys in the item key helper (Richlv)
