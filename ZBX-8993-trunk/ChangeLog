@@ -1,6 +1,9 @@
 Changes for 2.5.0
 
 New features:
+..F....... [ZBXNEXT-1493] changed activity dropdowns at the bottom of various pages to buttons (Oleg)
+....I..PS. [ZBXNEXT-1554] added multiple OID support to SNMP low-level discovery rules (wiper)
+A.F....PS. [ZBXNEXT-2321] added support for "db.odbc.discovery[]" item for low-level discovery through ODBC (asaveljevs, Juris)
 ....I..... [ZBXNEXT-2637] changed the DB user in the default configuration files to "zabbix", server and proxy timeouts to 4 seconds, LogSlowQueries to 3 seconds and MaxHousekeeperDelete to 5000; listed characters, prohibited in user parameters (Richlv)
 A.F....PS. [ZBXNEXT-756] added function percentile() to calculated items and trigger expressions (asaveljevs)
 .....J.... [ZBX-9006] added support for IPv6 addresses to Java gateway (asaveljevs)
@@ -57,10 +60,17 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 Changes for 2.4.4rc1
 
 New features:
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, Korean, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+...G...... [ZBX-9218] fixed agent crash if error message is not set in loadable module (igors)
+.......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
+A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
+..F....... [ZBX-9168] fixed incorrect keys and unified key parameters in the item key helper (Richlv)
+.......PS. [ZBX-8584] fixed vmware eventlog items sometimes returning duplicate values (wiper)
+...G...PS. [ZBX-9206] fixed agent crash in case net.tcp.service[] item is used as an active agent item with an unsupported first parameter (asaveljevs)
+.......P.. [ZBX-9195] fixed lastlogsize and mtime being updated on proxy for unsupported items; thanks to Yoshinori Komuro for patch (asaveljevs, Sasha)
 ..F....... [ZBX-9010] fixed audit actions not displaying most recent logs when record count exceeds maximum (Krists)
 ...G...PS. [ZBX-8555] fixed 'broken pipe' errors when executing remote commands. This was happening because pipe was closed without reading from it (wiper)
 .......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
@@ -587,9 +597,14 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.9rc1
 
 New features:
-A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
+A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
+..F....... [ZBX-9168] fixed incorrect keys and unified key parameters in the item key helper (Richlv)
+.......PS. [ZBX-8584] fixed vmware eventlog items sometimes returning duplicate values (wiper)
+.......P.. [ZBX-9195] fixed lastlogsize and mtime being updated on proxy for unsupported items; thanks to Yoshinori Komuro for patch (asaveljevs, Sasha)
 ..F....... [ZBX-9010] fixed audit actions not displaying most recent logs when record count exceeds maximum (Krists)
 ...G...PS. [ZBX-8555] fixed 'broken pipe' errors when executing remote commands. This was happening because pipe was closed without reading from it (wiper)
 .......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
@@ -1773,8 +1788,14 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.15rc1
 
 New features:
+A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
+A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
+....I..... [ZBX-9168] fixed incorrect keys and added missing keys in the item key helper (Richlv)
+A......... [ZBX-9197] fixed PHP fatal error "Call to undefined function array_fill_keys()" in trigger.get method with PHP<5.2.0 (Sasha)
+.......P.. [ZBX-9195] fixed lastlogsize and mtime being updated on proxy for unsupported items; thanks to Yoshinori Komuro for patch (asaveljevs, Sasha)
 .......PS. [ZBX-8828] made ICMP items go unsupported if ICMP packets cannot be sent to their host (asaveljevs)
 ........S. [ZBX-9176] fixed {DISCOVERY.SERVICE.NAME} macro to expand properly for HTTPS and Telnet services (asaveljevs)
 ........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)

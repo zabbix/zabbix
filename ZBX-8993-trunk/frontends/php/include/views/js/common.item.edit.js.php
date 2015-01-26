@@ -108,16 +108,27 @@ zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TRAPPER, 'row_trapper
 foreach ($this->data['types'] as $type => $label) {
 	switch ($type) {
 		case ITEM_TYPE_DB_MONITOR:
-			zbx_subarray_push($this->data['typeVisibility'], $type, array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_DB_MONITOR));
+			$defaultKey = $this->data['is_discovery_rule']
+				? ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY
+				: ZBX_DEFAULT_KEY_DB_MONITOR;
+			zbx_subarray_push($this->data['typeVisibility'], $type,
+				array('id' => 'key', 'defaultValue' => $defaultKey)
+			);
 			break;
 		case ITEM_TYPE_SSH:
-			zbx_subarray_push($this->data['typeVisibility'], $type, array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH));
+			zbx_subarray_push($this->data['typeVisibility'], $type,
+				array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH)
+			);
 			break;
 		case ITEM_TYPE_TELNET:
-			zbx_subarray_push($this->data['typeVisibility'], $type, array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET));
+			zbx_subarray_push($this->data['typeVisibility'], $type,
+				array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET)
+			);
 			break;
 		case ITEM_TYPE_JMX:
-			zbx_subarray_push($this->data['typeVisibility'], $type, array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_JMX));
+			zbx_subarray_push($this->data['typeVisibility'], $type,
+				array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_JMX)
+			);
 			break;
 		default:
 			zbx_subarray_push($this->data['typeVisibility'], $type, array('id' => 'key', 'defaultValue' => ''));
