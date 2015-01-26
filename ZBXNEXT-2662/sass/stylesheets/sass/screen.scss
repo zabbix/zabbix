@@ -231,14 +231,14 @@ span.arrow-left {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
-	border-right: 4px solid $link-color;
+	border-right: 4px solid $font-color;
 }
 
 span.arrow-right {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
-	border-left: 4px solid $link-color;
+	border-left: 4px solid $font-color;
 }
 
 %arrow {
@@ -402,6 +402,7 @@ span.radio-switch {
 	line-height: 22px;
 	border: 1px solid $form-input-color;
 	text-decoration: none;
+	color: $font-color;
 	@include transition;
 
 	&:hover {
@@ -422,7 +423,6 @@ span.radio-switch {
 
 	&.paging-selected {
 		cursor: default;
-		color: $font-color;
 		background: $form-input-color;
 	}
 }
@@ -488,14 +488,6 @@ table.table-forms {
 				display: block;
 			}
 		}
-	}
-
-	span.arrow-left {
-		border-right-color: $font-color;
-	}
-
-	span.arrow-right {
-		border-left-color: $font-color;
 	}
 }
 
@@ -635,17 +627,17 @@ button {
 
 	&.btn-grey {
 		background: $form-transparent-color;
-		color: $link-color;
+		color: $font-color;
 		border-color: $form-input-color;
 
 		&:hover {
-			color: $link-hover-color;
+			color: $font-color;
 			background: lighten($primary-color, 55%);
 			border-color: $form-input-color;
 		}
 
 		&:active {
-			color: $link-hover-color;
+			color: $font-color;
 			background: lighten($primary-color, 50%);
 		}
 	}
