@@ -34,8 +34,8 @@ $table-tr-selected-color: #ffffcc; // Yellow
 
 // FORM COLORS
 $form-transparent-color: transparent;
-$form-disabled-color: #c4c8cc; // Light Grey 
-$form-input-color: #c4c8cc; // Light Grey
+$form-disabled-color: #c4c8cc; // Disabled Light Grey 
+$form-input-color: #b8bbbf; // Light Grey
 $form-input-top-placeholder: #c5d8e5; // Search Light Blue
 $form-input-top-focus-placeholder: #a9a9a9; // Search Grey
 
@@ -119,6 +119,12 @@ $font-transform: uppercase;
 	-webkit-box-shadow: 0 1px 1px 0 rgba(60,60,60,0.1);
     -moz-box-shadow: 0 1px 1px 0 rgba(60,60,60,0.1);
     box-shadow: 0 1px 1px 0 rgba(60,60,60,0.1);
+}
+
+@mixin action-menu-shadow {
+	-webkit-box-shadow: 0 4px 20px 0 rgba(60,60,60,0.2);
+	-moz-box-shadow: 0 4px 20px 0 rgba(60,60,60,0.2);
+	box-shadow: 0 4px 20px 0 rgba(60,60,60,0.2);
 }
 
 @mixin border-radius {
