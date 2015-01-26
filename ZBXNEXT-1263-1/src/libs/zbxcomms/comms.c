@@ -1067,7 +1067,7 @@ int	zbx_tcp_accept(zbx_sock_t *s, int secure)
 		else
 		{
 			zbx_tcp_unaccept(s);
-			zbx_set_tcp_strerror("TLS connections are not allowed.");
+			zbx_set_tcp_strerror("TLS connections are not allowed by configuration.");
 			return FAIL;
 		}
 #else
