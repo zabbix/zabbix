@@ -21,7 +21,7 @@ A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent, updated outdated
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
-...G...PS. [ZBX-8993] added check for valid global regular expressions in snmptrap, log, logrt and eventlog items, trigger expressions and lld rules (igors)
+...G...PS. [ZBX-8993] added check for a valid reference of a global regular expression for snmptrap[], log[], logrt[] and eventlog[] items and logeventid(), regexp() and iregexp() trigger functions (igors)
 ..F....... [ZBX-8698] fixed "Unlink and clear" button being displayed when cloning or full cloning host or template and fixed spacing between "Name" and "Action" in "Linked templates" block in template edit form (Krists, Ivo)
 ..F....... [ZBX-9018] fixed updating of "config" table in Administration -> General pages (Oleg, Sasha)
 ...G...PS. [ZBX-9002] fixed log file locking during logging (igors)
@@ -66,7 +66,7 @@ A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discov
 
 Bug fixes:
 ..F....... [ZBX-9013] fixed action operation incorrect sorting in edit form which sometimes caused duplicate and missing operations (Ivo, Sasha)
-........S. [ZBX-8993] added error message for invalid global regular expressions in lld rules (igors)
+........S. [ZBX-8993] added check for a valid reference of a global regular expression in lld rules (igors)
 ...G...... [ZBX-9218] fixed agent crash if error message is not set in loadable module (igors)
 .......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
 A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
@@ -604,7 +604,7 @@ A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix t
 
 Bug fixes:
 ..F....... [ZBX-9013] fixed action operation incorrect sorting in edit form which sometimes caused duplicate and missing operations (Ivo, Sasha)
-........S. [ZBX-8993] added error message for invalid global regular expressions in lld rules (igors)
+........S. [ZBX-8993] added check for a valid reference of a global regular expression in lld rules (igors)
 .......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
 A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
 ..F....... [ZBX-9168] fixed incorrect keys and unified key parameters in the item key helper (Richlv)
@@ -1796,6 +1796,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8993] added check for a valid reference of a global regular expression in lld rules (igors)
 .......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
 A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
 ....I..... [ZBX-9168] fixed incorrect keys and added missing keys in the item key helper (Richlv)
