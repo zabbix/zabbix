@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@
 **/
 
 
-define('ZABBIX_VERSION',		'2.4.3rc1');
-define('ZABBIX_API_VERSION',	'2.4.3');
+define('ZABBIX_VERSION',		'2.4.4rc1');
+define('ZABBIX_API_VERSION',	'2.4.4');
 define('ZABBIX_DB_VERSION',		2040000);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2014');
+define('ZABBIX_COPYRIGHT_TO',	'2015');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -125,10 +125,7 @@ define('ZBX_DROPDOWN_FIRST_ALL',	1);
 define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
 define('T_ZBX_DBL',			2);
-define('T_ZBX_IP',			4);
 define('T_ZBX_CLR',			5);
-define('T_ZBX_IP_RANGE',	7);
-define('T_ZBX_INT_RANGE',	8);
 define('T_ZBX_DBL_BIG',		9);
 define('T_ZBX_DBL_STR',		10);
 
@@ -848,6 +845,7 @@ define('IPMI_PRIVILEGE_ADMIN',		4);
 define('IPMI_PRIVILEGE_OEM',		5);
 
 define('ZBX_HAVE_IPV6', 1);
+define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
 define('ZBX_SOCKET_TIMEOUT',        3);         // socket timeout limit
 define('ZBX_SOCKET_BYTES_LIMIT',    1048576);   // socket response size limit, 1048576 is 1MB in bytes

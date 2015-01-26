@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -294,14 +294,14 @@ $itemFormList->addRow(_('Flexible intervals'),
 // append new flexible interval to form list
 $newFlexInt = new CSpan(array(
 	_('Interval (in sec)'),
-	' ',
+	SPACE,
 	new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5, false, false, false),
-	' ',
+	SPACE,
 	_('Period'),
-	' ',
+	SPACE,
 	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
-	' ',
-	new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
+	SPACE,
+	new CButton('add_delay_flex', _('Add'), null, 'formlist')
 ));
 $newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
 

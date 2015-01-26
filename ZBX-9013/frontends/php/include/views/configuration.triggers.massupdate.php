@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -141,7 +141,7 @@ if (empty($this->data['parent_discoveryid'])) {
 
 	$triggersFormList->addRow(
 		array(
-			_('Replace depenencies'),
+			_('Replace dependencies'),
 			SPACE,
 			new CVisibilityBox(
 				'visible[dependencies]',
@@ -156,7 +156,7 @@ if (empty($this->data['parent_discoveryid'])) {
 
 // append tabs to form
 $triggersTab = new CTabView();
-$triggersTab->addTab('triggersTab', _('Triggers massupdate'), $triggersFormList);
+$triggersTab->addTab('triggersTab', _('Mass update'), $triggersFormList);
 $triggersForm->addItem($triggersTab);
 
 // append buttons to form

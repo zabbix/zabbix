@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2187,7 +2187,7 @@ function get_item_function_info($expr) {
 }
 
 /**
- * Substitute macros in the expression with the given values and evaluate it's result.
+ * Substitute macros in the expression with the given values and evaluate its result.
  *
  * @param string $expression                a trigger expression
  * @param array  $replaceFunctionMacros     an array of macro - value pairs

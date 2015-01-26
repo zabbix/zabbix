@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-13 05:45+0200\n"
+"POT-Creation-Date: 2015-01-15 18:31+0200\n"
 "PO-Revision-Date: 2014-10-06 06:18+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -192,7 +192,7 @@ msgstr "5 λεπτά"
 msgid "5 seconds"
 msgstr "5 δευτερόλεπτα"
 
-#: include/views/monitoring.history.php:75
+#: include/views/monitoring.history.php:91
 msgid "500 latest values"
 msgstr "500 τελευταίες τιμές"
 
@@ -479,7 +479,7 @@ msgstr "Ενεργό έως"
 #: include/views/configuration.httpconf.popup.php:115
 #: include/views/configuration.item.edit.php:304
 #: include/views/configuration.item.edit.php:477
-#: include/views/configuration.item.massupdate.php:365
+#: include/views/configuration.item.massupdate.php:366
 #: include/views/configuration.maintenance.edit.php:141
 #: include/views/configuration.maintenance.edit.php:203
 #: include/views/configuration.screen.constructor.edit.php:749
@@ -508,7 +508,7 @@ msgstr "Ενεργό έως"
 #: include/views/js/configuration.sysmap.edit.js.php:32
 #: include/views/js/configuration.sysmaps.js.php:191
 #: include/views/js/configuration.sysmaps.js.php:404
-#: include/views/monitoring.history.php:115 jsLoader.php:182
+#: include/views/monitoring.history.php:131 jsLoader.php:182
 #: popup_bitem.php:179 popup_media.php:137 popup_period.php:148
 #: tr_logform.php:263 tr_logform.php:350 tr_status.php:732
 msgid "Add"
@@ -534,7 +534,7 @@ msgstr "Προσθήκη ξενιστή"
 msgid "Add link"
 msgstr "Προσθήκη συνδέσμου"
 
-#: include/views/configuration.item.massupdate.php:542
+#: include/views/configuration.item.massupdate.php:546
 msgid "Add new or existing applications"
 msgstr "Προσθήκη νέων ή υφιστάμενων κατηγοριών"
 
@@ -657,7 +657,7 @@ msgstr "Όλοι οι σύνδεσμοι πρέπει να έχουν \"Όνομ
 
 #: include/views/configuration.host.discovery.edit.php:249
 #: include/views/configuration.item.edit.php:387
-#: include/views/configuration.item.massupdate.php:453
+#: include/views/configuration.item.massupdate.php:457
 msgid "Allowed hosts"
 msgstr "Επιτρεπόμενοι ξενιστές"
 
@@ -783,12 +783,12 @@ msgstr "Τύπος περιοχής"
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.edit.php:372
 #: include/views/configuration.item.edit.php:379
-#: include/views/configuration.item.massupdate.php:420
-#: include/views/configuration.item.massupdate.php:434
+#: include/views/configuration.item.massupdate.php:424
+#: include/views/configuration.item.massupdate.php:438
 msgid "As is"
 msgstr "Ως έχει"
 
-#: include/views/monitoring.history.php:79
+#: include/views/monitoring.history.php:95
 msgid "As plain text"
 msgstr "Ως απλό κείμενο"
 
@@ -1575,7 +1575,7 @@ msgstr "Αδύνατη η δημιουργία αυτοεξάρτησης σε �
 msgid "Cannot create discovery rule"
 msgstr "Αδύνατη η δημιουργία κανόνα εντοπισμού"
 
-#: include/classes/api/services/CHost.php:1067
+#: include/classes/api/services/CHost.php:1065
 msgid "Cannot create host group."
 msgstr "Αδύνατη η δημιουργία ομάδος ξενιστή."
 
@@ -1664,7 +1664,7 @@ msgstr[1] "Αδύνατη η διαγραφή ομάδων"
 msgid "Cannot delete host"
 msgstr "Αδύνατη η διαγραφή ξενιστή"
 
-#: include/classes/api/services/CHost.php:1078
+#: include/classes/api/services/CHost.php:1076
 msgid "Cannot delete host group."
 msgstr "Αδύνατη η διαγραφή ομάδος ξενιστών."
 
@@ -1684,7 +1684,7 @@ msgstr "Αδύνατη η διαγραφή αντιστοίχισης εικον
 msgid "Cannot delete image"
 msgstr "Αδύνατη η διαγραφή εικόνας"
 
-#: include/classes/api/services/CHost.php:1164
+#: include/classes/api/services/CHost.php:1162
 msgid "Cannot delete inventory."
 msgstr "Αδύνατη η διαγραφή απογραφής."
 
@@ -2186,7 +2186,7 @@ msgstr "Αδύνατη η εισαγωγή έκφρασης εναύσματος
 msgid "Cannot insert user media."
 msgstr "Αδύνατη η εισαγωγή μέσου χρήστη."
 
-#: include/classes/api/services/CHost.php:1142
+#: include/classes/api/services/CHost.php:1140
 msgid "Cannot link template"
 msgstr "Αδύνατη η συσχέτιση σχεδιότυπου"
 
@@ -2203,7 +2203,7 @@ msgstr "Αδύνατη σύνδεση."
 msgid "Cannot logout."
 msgstr "Αδύνατη η αποσύνδεση."
 
-#: include/classes/api/services/CHost.php:963
+#: include/classes/api/services/CHost.php:961
 msgid "Cannot mass update host name."
 msgstr "Αδύνατη η μαζική ενημέρωση ονόματος ξενιστή."
 
@@ -2211,7 +2211,7 @@ msgstr "Αδύνατη η μαζική ενημέρωση ονόματος ξε�
 msgid "Cannot mass update template name."
 msgstr "Αδύνατη η μαζική ενημέρωση ονόματος σχεδιότυπου."
 
-#: include/classes/api/services/CHost.php:953
+#: include/classes/api/services/CHost.php:951
 msgid "Cannot mass update visible host name."
 msgstr "Αδύνατη η μαζική ενημέρωση ορατού ονόματος ξενιστή."
 
@@ -2264,7 +2264,7 @@ msgstr "Αδύνατη η κατάργηση μακροεντολής."
 msgid "Cannot rename guest user."
 msgstr "Αδύνατη η μετονομασία χρήστη επισκέπτη."
 
-#: include/classes/api/services/CDRule.php:229
+#: include/classes/api/services/CDRule.php:231
 msgid "Cannot save discovery rule without checks."
 msgstr "Αδύνατη η αποθήκευση κανόνα εντοπισμού χωρίς ελέγχους."
 
@@ -2272,6 +2272,11 @@ msgstr "Αδύνατη η αποθήκευση κανόνα εντοπισμού
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Αδύνατη η αποστολή εντολής, ελέγξτε σύνδεση με Zabbix εξυπηρετητή \"%1$s\"."
+
+#: include/classes/api/services/CHostGroup.php:429
+#, c-format
+msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:242
 #, c-format
@@ -2300,7 +2305,7 @@ msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Αδύνατη η τοποθέτηση \"templateid\" για πρωτότυπο έναυσμα \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:572
-#: include/classes/api/services/CHost.php:1017
+#: include/classes/api/services/CHost.php:1015
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Αδύνατη η τοποθέτηση πεδίων απογραφής σε απενεργοποιημένη απογραφή."
 
@@ -2350,7 +2355,7 @@ msgstr "Αδύνατη η αποσύνδεση και καθαρισμός συ�
 msgid "Cannot unlink and clear triggers"
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός εναυσμάτων"
 
-#: include/classes/api/services/CHost.php:1117
+#: include/classes/api/services/CHost.php:1115
 msgid "Cannot unlink template"
 msgstr "Αδύνατη η αποσύνδεση σχεδιότυπου"
 
@@ -2383,6 +2388,11 @@ msgstr "Αδύνατη η ενημέρωση \"%1$s\" εντοπισμένου �
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Αδύνατη η ενημέρωση \"%1$s\" για ενέργεια \"%2$s\"."
+
+#: include/classes/api/services/CHostGroup.php:490
+#, c-format
+msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:206
 #, c-format
@@ -2428,7 +2438,7 @@ msgstr "Αδύνατη η ενημέρωση \"templateid\" σχεδιότυπη
 msgid "Cannot update a discovered graph."
 msgstr "Αδύνατη η ενημέρωση εντοπισμένου γραφήματος."
 
-#: include/classes/api/services/CHostGroup.php:493
+#: include/classes/api/services/CHostGroup.php:505
 msgid "Cannot update a discovered host group."
 msgstr "Αδύνατη η ενημέρωση εντοπισμένης ομάδος ξενιστή."
 
@@ -2478,9 +2488,9 @@ msgstr "Αδύνατη η ενημέρωση ομάδος"
 msgid "Cannot update group."
 msgstr "Αδύνατη η ενημέρωση ομάδος."
 
-#: include/classes/api/services/CHostGroup.php:748
-#: include/classes/api/services/CHostGroup.php:806
-#: include/classes/api/services/CHostGroup.php:866
+#: include/classes/api/services/CHostGroup.php:760
+#: include/classes/api/services/CHostGroup.php:818
+#: include/classes/api/services/CHostGroup.php:878
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Αδύνατη η ενημέρωση ομάδων εντοπισμένων ξενιστών \"%1$s\"."
@@ -2702,21 +2712,21 @@ msgstr "Ελέγξτε το τμήμα έκφρασης που ξεκινά απ
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr "Έλεγχος ύπαρξης αρχείου. 0 - ανύπαρκτο, 1 - υπαρκτό"
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Έλεγχος διαθεσιμότητας υπηρεσίας. 0 - υπηρεσία κλειστή, 1 - υπηρεσία ενεργή. Αν λείπει η <ip>, IP ή DNS όνομα λαμβάνεται από ορισμό ξενιστή. Αν λείπει το <port>, χρησιμοποιείται το προεπιλεγμένο της υπηρεσίας."
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr "Έλεγχος διαθεσιμότητας υπηρεσίας. 0 - υπηρεσία κλειστή, 1 - υπηρεσία ενεργή. Αν λείπει η διεύθυνση χρήση της 127.0.0.1. Αν λείπει η θύρα, χρήση εξ ορισμού θύρας υπηρεσίας. Παράδειγμα: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used."
 msgstr "Έλεγχος απόδοσης \"υπηρεσία\". 0 - υπηρεσία κλειστή, sec - δευτερόλεπτα χρήσης σύνδεσης υπηρεσίας. Αν λείπει η διεύθυνση χρήση της 127.0.0.1. Αν λείπει η θύρα, χρήση εξ ορισμού θύρας υπηρεσίας."
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Έλεγχος απόδοσης υπηρεσίας. 0 - υπηρεσία κλειστή, sec - δευτερόλεπτα χρήσης σύνδεσης υπηρεσίας. Αν λείπει η <ip>, IP ή DNS όνομα λαμβάνεται από ορισμό ξενιστή. Αν λείπει η <port>, χρήση εξ ορισμού θύρας υπηρεσίας."
 
@@ -2743,8 +2753,8 @@ msgstr "Έλεγχος δυνατότητας σύνδεσης TCP σε αριθ
 msgid "Checks"
 msgstr "Έλεγχοι"
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr "Έλεγχοι υπηρεσίας DNS. 0 - DNS κλειστή (μη απόκριση εξυπηρετητή ή αποτυχία ανάλυσης DNS), 1 - DNS ενεργή."
 
@@ -2759,7 +2769,7 @@ msgstr "Έλεγχοι πρόσβασης εξυπηρετητή με ICMP ping.
 msgid "Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state."
 msgstr "Έλεγχοι κατάστασης LISTEN θύρας. 0 - όχι, 1 - LISTEN κατάσταση."
 
-#: include/classes/api/services/CDRule.php:378
+#: include/classes/api/services/CDRule.php:380
 msgid "Checks should be unique."
 msgstr "Οι έλεγχοι πρέπει να είναι μοναδικοί."
 
@@ -2868,7 +2878,7 @@ msgid "Colour"
 msgstr "Χρώμα"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:386 jsLoader.php:158
+#: include/validate.inc.php:231 jsLoader.php:158
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Χρώμα \"%1$s\" λάθος: περιμένω δεκαεξαδικό κωδικό χρώματος (6 σύμβολα)."
@@ -3532,7 +3542,7 @@ msgstr "Προσαρμοσμένες διαφάνειες"
 msgid "Czech (cs_CZ)"
 msgstr "Τσέχικα (cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1375
+#: include/classes/graphdraw/CLineGraphDraw.php:1377
 msgid "D"
 msgstr "D"
 
@@ -3624,7 +3634,7 @@ msgstr "Δεδομένα"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Στατιστικά δεδομένων cache. Cache - μία από τιμές (λειτουργίες: all, float, uint, str, log, text), ιστορικό (λειτουργίες: pfree, total, used, free), τάση (λειτουργίες: pfree, total, used, free), κείμενο (λειτουργίες: pfree, total, used, free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2517
+#: include/classes/graphdraw/CLineGraphDraw.php:2519
 #: include/classes/graphdraw/CPieGraphDraw.php:750
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4166,7 +4176,7 @@ msgstr "Διεγράφη: Κανόνας εντοπισμού \"%1$s\" σε \"%2
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Διεγράφη: Γράφημα \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1445
+#: include/classes/api/services/CHost.php:1443
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Διεγράφη: Ξενιστής \"%1$s\"."
@@ -4216,12 +4226,12 @@ msgid "Delimiter"
 msgstr "Οριοθέτης"
 
 #: include/views/configuration.item.edit.php:356
-#: include/views/configuration.item.massupdate.php:422
+#: include/views/configuration.item.massupdate.php:426
 msgid "Delta (simple change)"
 msgstr "Διαφορά (απλή αλλαγή)"
 
 #: include/views/configuration.item.edit.php:355
-#: include/views/configuration.item.massupdate.php:421
+#: include/views/configuration.item.massupdate.php:425
 msgid "Delta (speed per second)"
 msgstr "Διαφορά (ταχύτητα ανά δευτερόλεπτο)"
 
@@ -4259,7 +4269,7 @@ msgstr "Κατάσταση υλοποίησης"
 #: include/views/configuration.host.edit.php:394
 #: include/views/configuration.host.massupdate.php:153
 #: include/views/configuration.item.edit.php:431
-#: include/views/configuration.item.massupdate.php:554
+#: include/views/configuration.item.massupdate.php:558
 #: include/views/configuration.maintenance.edit.php:92
 #: include/views/configuration.maintenance.list.php:49
 #: include/views/configuration.template.edit.php:175
@@ -4557,10 +4567,10 @@ msgstr "Ο κανόνας εντοπισμού \"%1$s\" υπάρχει ήδη σ
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
 msgstr "Κανόνας εντοπισμού \"%1$s\" υπάρχει ήδη σε \"%2$s\"."
 
-#: include/classes/api/services/CDRule.php:417
-#: include/classes/api/services/CDRule.php:430
-#: include/classes/api/services/CDRule.php:505
-#: include/classes/api/services/CDRule.php:524
+#: include/classes/api/services/CDRule.php:419
+#: include/classes/api/services/CDRule.php:432
+#: include/classes/api/services/CDRule.php:507
+#: include/classes/api/services/CDRule.php:526
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists."
 msgstr "Κανόνας εντοπισμού \"%1$s\" υπάρχει ήδη."
@@ -4848,14 +4858,14 @@ msgstr "Κενό αρχείο κλειδιού SSL γιά σενάριο ιστ�
 #: include/classes/validators/CActionCondValidator.php:95
 #: include/classes/validators/CActionCondValidator.php:101
 #: include/classes/validators/CActionCondValidator.php:107
-#: include/classes/validators/CActionCondValidator.php:122
-#: include/classes/validators/CActionCondValidator.php:131
-#: include/classes/validators/CActionCondValidator.php:140
-#: include/classes/validators/CActionCondValidator.php:149
-#: include/classes/validators/CActionCondValidator.php:164
-#: include/classes/validators/CActionCondValidator.php:173
-#: include/classes/validators/CActionCondValidator.php:182
-#: include/classes/validators/CActionCondValidator.php:196
+#: include/classes/validators/CActionCondValidator.php:123
+#: include/classes/validators/CActionCondValidator.php:132
+#: include/classes/validators/CActionCondValidator.php:141
+#: include/classes/validators/CActionCondValidator.php:150
+#: include/classes/validators/CActionCondValidator.php:165
+#: include/classes/validators/CActionCondValidator.php:174
+#: include/classes/validators/CActionCondValidator.php:183
+#: include/classes/validators/CActionCondValidator.php:197
 msgid "Empty action condition."
 msgstr "Κενή συνθήκη ενέργειας."
 
@@ -4889,13 +4899,13 @@ msgstr "Κενός ξενιστής."
 #: include/classes/api/services/CAction.php:1246
 #: include/classes/api/services/CApplication.php:267
 #: include/classes/api/services/CDiscoveryRule.php:371
-#: include/classes/api/services/CDRule.php:635
+#: include/classes/api/services/CDRule.php:637
 #: include/classes/api/services/CGraph.php:529
 #: include/classes/api/services/CGraphPrototype.php:545
-#: include/classes/api/services/CHostGroup.php:465
-#: include/classes/api/services/CHostGroup.php:536
+#: include/classes/api/services/CHostGroup.php:471
+#: include/classes/api/services/CHostGroup.php:548
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1293
+#: include/classes/api/services/CHost.php:1291
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:618
@@ -5412,42 +5422,27 @@ msgstr "Πεδίο"
 msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "Πεδίο \"%1$s\" δεν ορίζεται NULL."
 
-#: include/validate.inc.php:443
+#: include/validate.inc.php:288
 #, c-format
 msgid "Field \"%1$s\" is mandatory."
 msgstr "Πεδίο \"%1$s\" υποχρεωτικό."
 
-#: include/validate.inc.php:306
-#, c-format
-msgid "Field \"%1$s\" is not IP range."
-msgstr "Πεδίο \"%1$s\" δεν είναι εύρος IP."
-
-#: include/validate.inc.php:300
-#, c-format
-msgid "Field \"%1$s\" is not IP."
-msgstr "Πεδίο \"%1$s\" δεν είναι IP."
-
-#: include/validate.inc.php:312
-#, c-format
-msgid "Field \"%1$s\" is not integer list or range."
-msgstr "Πεδίο \"%1$s\" δεν είναι κατάλογος ή εύρος ακεραίου."
-
-#: include/validate.inc.php:318
+#: include/validate.inc.php:163
 #, c-format
 msgid "Field \"%1$s\" is not integer."
 msgstr "Πεδίο \"%1$s\" δεν είναι ακέραιος."
 
-#: include/validate.inc.php:376
+#: include/validate.inc.php:221
 #, c-format
 msgid "Field \"%1$s\" is not string."
 msgstr "Πεδίο \"%1$s\" δεν είναι συμβολοσειρά."
 
-#: include/validate.inc.php:455
+#: include/validate.inc.php:300
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Πεδίο \"%1$s\" πρέπει να λείπει."
 
-#: include/classes/api/services/CDRule.php:347
+#: include/classes/api/services/CDRule.php:349
 msgid "Field \"druleid\" is required."
 msgstr "Το Πεδίο \"druleid\" είναι απαιτούμενο."
 
@@ -5455,7 +5450,7 @@ msgstr "Το Πεδίο \"druleid\" είναι απαιτούμενο."
 msgid "Field \"host\" is mandatory."
 msgstr "Πεδίο \"ξενιστής\" υποχρεωτικό."
 
-#: include/classes/api/services/CDRule.php:354
+#: include/classes/api/services/CDRule.php:356
 msgid "Field \"name\" is required."
 msgstr "Το Πεδίο \"name\" είναι απαιτούμενο."
 
@@ -5488,7 +5483,7 @@ msgstr "Γεμισμένη περιοχή"
 #: include/views/common.filter.trigger.php:147
 #: include/views/inventory.host.list.php:52
 #: include/views/monitoring.dashconf.php:116
-#: include/views/monitoring.history.php:146
+#: include/views/monitoring.history.php:162
 #: include/views/monitoring.overview.items.php:82 latest.php:420
 #: report2.php:383
 msgid "Filter"
@@ -5769,7 +5764,7 @@ msgstr "Χρωμοβαθμισμένη γραμμή"
 #: include/audit.inc.php:29 include/screens.inc.php:30
 #: include/views/configuration.graph.edit.php:293
 #: include/views/monitoring.charts.php:27
-#: include/views/monitoring.history.php:72 latest.php:578 latest.php:765
+#: include/views/monitoring.history.php:88 latest.php:578 latest.php:765
 #: report2.php:397
 msgid "Graph"
 msgstr "Γράφημα"
@@ -5911,7 +5906,7 @@ msgstr "Άθροισμα γραφήματος"
 
 #: include/views/configuration.graph.edit.php:60
 #: include/views/configuration.graph.list.php:80
-#: include/views/monitoring.history.php:233 popup.php:1296 popup.php:1302
+#: include/views/monitoring.history.php:249 popup.php:1296 popup.php:1302
 msgid "Graph type"
 msgstr "Τύπος γραφήματος"
 
@@ -5990,7 +5985,7 @@ msgstr "Πλέγμα"
 msgid "Group"
 msgstr "Ομάδα"
 
-#: include/classes/api/services/CHostGroup.php:568
+#: include/classes/api/services/CHostGroup.php:580
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "Ομάδα \"%1$s\" δεν διαγράφεται, διότι χρησιμοποιείται σε πρωτότυπο ξενιστή."
@@ -6067,8 +6062,8 @@ msgstr "Ομάδες"
 msgid "Groups in maintenance"
 msgstr "Ομάδες σε συντήρηση"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1381
-#: include/classes/graphdraw/CLineGraphDraw.php:1440
+#: include/classes/graphdraw/CLineGraphDraw.php:1383
+#: include/classes/graphdraw/CLineGraphDraw.php:1442
 #: include/translateDefines.inc.php:34
 msgid "H:i"
 msgstr "H:i"
@@ -6181,7 +6176,7 @@ msgstr "Απόκρυψη απενεργοποιημένων εναυσμάτων
 msgid "Hide filter"
 msgstr "Απόκρυψη φίλτρου"
 
-#: include/views/monitoring.history.php:130
+#: include/views/monitoring.history.php:146
 msgid "Hide selected"
 msgstr "Απόκρυψη επιλεγμένων"
 
@@ -6232,7 +6227,7 @@ msgid "History storage period"
 msgstr "Ιστορικό περιόδου αποθήκευσης"
 
 #: include/views/configuration.item.edit.php:329
-#: include/views/configuration.item.massupdate.php:377
+#: include/views/configuration.item.massupdate.php:381
 msgid "History storage period (in days)"
 msgstr "Ιστορικό περιόδου αποθήκευσης (σε ημέρες)"
 
@@ -6286,7 +6281,7 @@ msgid_plural "Hosts"
 msgstr[0] "Ξενιστής"
 msgstr[1] "Ξενιστές"
 
-#: include/classes/api/services/CHost.php:976
+#: include/classes/api/services/CHost.php:974
 #: include/classes/api/services/CTemplate.php:471
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6318,7 +6313,7 @@ msgstr "Πρόσβαση ξενιστή"
 msgid "Host added"
 msgstr "Ξενιστής προστέθηκε"
 
-#: include/classes/api/services/CHostInterface.php:815
+#: include/classes/api/services/CHostInterface.php:823
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "Ο ξενιστής δεν μπορεί να έχει πλέον της μιάς προκαθορισμένες διεπαφές ίδιου τύπου."
 
@@ -6358,24 +6353,24 @@ msgstr[1] "Ξενιστές ενεργοποιημένοι"
 msgid "Host group"
 msgstr "Ομάδα ξενιστών"
 
-#: include/classes/api/services/CHostGroup.php:431
-#: include/classes/api/services/CHostGroup.php:443
-#: include/classes/api/services/CHostGroup.php:508
+#: include/classes/api/services/CHostGroup.php:437
+#: include/classes/api/services/CHostGroup.php:449
+#: include/classes/api/services/CHostGroup.php:520
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "Ομάδα ξενιστών \"%1$s\" υπάρχει ήδη."
 
-#: include/classes/api/services/CHostGroup.php:600
+#: include/classes/api/services/CHostGroup.php:612
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "Ομάδα ξενιστών \"%1$s\" μη διαγραφόμενη, διότι χρησιμοποιείται σε καθολική δέσμη ενεργειών."
 
-#: include/classes/api/services/CHostGroup.php:581
+#: include/classes/api/services/CHostGroup.php:593
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr "Ομάδα ξενιστών \"%1$s\" μη διαγραφόμενη, διότι εξαρτώνται μερικοί ξενιστές."
 
-#: include/classes/api/services/CHostGroup.php:555
+#: include/classes/api/services/CHostGroup.php:567
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "Ομάδα ξενιστών \"%1$s\" μη διαγραφόμενη ως εσωτερική."
@@ -6393,7 +6388,7 @@ msgid "Host group label type"
 msgstr "Τύπος ετικέτας ομάδος ξενιστών"
 
 #: include/classes/api/services/CHostGroup.php:424
-#: include/classes/api/services/CHostGroup.php:500
+#: include/classes/api/services/CHostGroup.php:512
 msgid "Host group name cannot be empty."
 msgstr "Όνομα ομάδος ξενιστών δεν μπορεί να είναι κενό."
 
@@ -6550,7 +6545,7 @@ msgstr "Μάσκα υποδικτύου ξενιστή"
 msgid "Host time"
 msgstr "Χρόνος ξενιστή"
 
-#: include/classes/api/services/CHost.php:850
+#: include/classes/api/services/CHost.php:848
 msgid "Host update failed."
 msgstr "Αποτυχία ενημέρωσης ξενιστή."
 
@@ -6688,6 +6683,14 @@ msgstr "IP"
 msgid "IP address"
 msgstr "IP διεύθυνση"
 
+#: include/classes/validators/CIPValidator.php:43
+msgid "IP address cannot be empty."
+msgstr ""
+
+#: include/classes/validators/CIPRangeValidator.php:62
+msgid "IP address range cannot be empty."
+msgstr ""
+
 #: include/classes/api/services/CHostInterface.php:292
 msgid "IP and DNS cannot be empty for host interface."
 msgstr "IP και DNS δεν μπορούν να είναι κενά για διεπαφή ξενιστή."
@@ -6697,7 +6700,12 @@ msgstr "IP και DNS δεν μπορούν να είναι κενά για δι
 msgid "IP range"
 msgstr "Περιοχή IP"
 
-#: include/classes/api/services/CDRule.php:214
+#: include/classes/validators/CIPRangeValidator.php:80
+#, c-format
+msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit."
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:215
 msgid "IP range cannot be empty."
 msgstr "Η Περιοχή IP δεν μπορεί να είναι κενή."
 
@@ -7055,17 +7063,12 @@ msgstr "Λανθασμένη %1$s τιμή σήμανσης για χάρτη \"
 msgid "Incorrect API \"%1$s\"."
 msgstr "Λανθασμένο API \"%1$s\"."
 
-#: include/classes/api/services/CDRule.php:217
-#, c-format
-msgid "Incorrect IP range \"%s\"."
-msgstr "Λανθασμένη περιοχή IP \"%s\"."
-
-#: include/classes/api/services/CDRule.php:292
+#: include/classes/api/services/CDRule.php:294
 #: include/views/js/configuration.discovery.edit.js.php:579
 msgid "Incorrect SNMP OID."
 msgstr "Λανθασμένο SNMP OID."
 
-#: include/classes/api/services/CDRule.php:288
+#: include/classes/api/services/CDRule.php:290
 #: include/views/js/configuration.discovery.edit.js.php:575
 msgid "Incorrect SNMP community."
 msgstr "Λανθασμένο SNMP community."
@@ -7085,7 +7088,7 @@ msgstr "Λανθασμένη τιμή SSL επαλήθευσης ομότιμο�
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Λανθασμένη αποδοχή SLA για υπηρεσία \"%1$s\"."
 
-#: include/classes/validators/CActionCondValidator.php:134
+#: include/classes/validators/CActionCondValidator.php:135
 msgid "Incorrect action condition discovery check."
 msgstr "Λανθασμένη συνθήκη ενέργειας ελέγχου εντοπισμού."
 
@@ -7101,11 +7104,11 @@ msgstr "Λανθασμένη συνθήκη ενέργειας αντικειμ�
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "Λανθασμένη συνθήκη ενέργειας κανόνα εντοπισμού. Ό κανόνας δεν υπάρχει ή δεν έχετε πρόσβαση."
 
-#: include/classes/validators/CActionCondValidator.php:152
+#: include/classes/validators/CActionCondValidator.php:153
 msgid "Incorrect action condition discovery status."
 msgstr "Λανθασμένη συνθήκη ενέργειας κατάστασης εντοπισμού."
 
-#: include/classes/validators/CActionCondValidator.php:185
+#: include/classes/validators/CActionCondValidator.php:186
 msgid "Incorrect action condition event type."
 msgstr "Λανθασμένη συνθήκη ενέργειας είδους συμβάντος."
 
@@ -7117,12 +7120,7 @@ msgstr "Λανθασμένη συνθήκη ενέργειας ομάδος ξε
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
 msgstr "Λανθασμένη συνθήκη ενέργειας ξενιστή. Ο ξενιστής δεν υπάρχει ή δεν έχετε πρόσβαση."
 
-#: include/classes/validators/CActionCondValidator.php:125
-#, c-format
-msgid "Incorrect action condition ip \"%1$s\"."
-msgstr "Λανθασμένη συνθήκη ενέργειας ip \"%1$s\"."
-
-#: include/classes/validators/CActionCondValidator.php:143
+#: include/classes/validators/CActionCondValidator.php:144
 #, c-format
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "Λανθασμένη συνθήκη ενέργειας θύρας \"%1$s\"."
@@ -7135,11 +7133,11 @@ msgstr "Λανθασμένος διαμεσολαβητής στη συνθήκ�
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
 msgstr "Λανθασμένο σχεδιότυπο συνθήκης ενέργειας. Σχεδιότυπο δεν υπάρχει ή δεν έχετε πρόσβαση."
 
-#: include/classes/validators/CActionCondValidator.php:167
+#: include/classes/validators/CActionCondValidator.php:168
 msgid "Incorrect action condition trigger severity."
 msgstr "Λανθασμένη συνθήκη ενέργειας βαρύτητας εναύσματος."
 
-#: include/classes/validators/CActionCondValidator.php:176
+#: include/classes/validators/CActionCondValidator.php:177
 msgid "Incorrect action condition trigger value."
 msgstr "Λανθασμένη συνθήκη ενέργειας τιμής εναύσματος."
 
@@ -7147,7 +7145,7 @@ msgstr "Λανθασμένη συνθήκη ενέργειας τιμής ενα
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "Λανθασμένο έναυσμα στη συνθήκη ενέργειας. Έναυσμα δεν υπάρχει ή δεν έχετε πρόσβαση."
 
-#: include/classes/validators/CActionCondValidator.php:201
+#: include/classes/validators/CActionCondValidator.php:202
 msgid "Incorrect action condition type."
 msgstr "Λανθασμένος τύπος στη συνθήκη ενέργειας."
 
@@ -7223,7 +7221,7 @@ msgstr "Λανθασμένες μεταβλητές πέρασαν στη συν
 msgid "Incorrect arguments passed to method."
 msgstr "Λανθασμένα ορίσματα πέρασαν στη μέθοδο."
 
-#: include/classes/api/services/CDRule.php:321
+#: include/classes/api/services/CDRule.php:323
 #, c-format
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Λανθασμένο πρωτόκολλο ταυτοποίησης κανόνα εντοπισμού \"%1$s\"."
@@ -7233,7 +7231,7 @@ msgstr "Λανθασμένο πρωτόκολλο ταυτοποίησης κα�
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Λανθασμένο πρωτόκολλο ταυτοποίησης συλλέκτη \"%1$s\"."
 
-#: include/classes/api/services/CHostInterface.php:658
+#: include/classes/api/services/CHostInterface.php:666
 msgid "Incorrect bulk value for interface."
 msgstr "Λανθασμένη ομαδική τιμή διεπαφής."
 
@@ -7248,7 +7246,7 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Λανθασμένοι χαρακτήρες σε χρήση για ξενιστή \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:626
-#: include/classes/api/services/CHost.php:959
+#: include/classes/api/services/CHost.php:957
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Λανθασμένοι χαρακτήρες για όνομα ξενιστή \"%s\"."
@@ -7284,7 +7282,7 @@ msgstr "Λανθασμένη προσαρμοσμένη έκφραση \"%2$s\" 
 msgid "Incorrect custom expression \"%2$s\" for discovery rule \"%1$s\": %3$s."
 msgstr "Λανθασμένη προσαρμοσμένη έκφραση \"%2$s\" κανόνα εντοπισμού \"%1$s\": %3$s."
 
-#: include/classes/api/services/CDRule.php:221
+#: include/classes/api/services/CDRule.php:223
 msgid "Incorrect delay."
 msgstr "Λανθασμένη καθυστέρηση."
 
@@ -7435,12 +7433,7 @@ msgstr "Λανθασμένες παράμετροι εισόδου."
 msgid "Incorrect interface DNS parameter \"%s\" provided."
 msgstr "Λανθασμένη παράμετρος DNS διεπαφής \"%s\" παρέχεται."
 
-#: include/classes/api/services/CHostInterface.php:610
-#, c-format
-msgid "Incorrect interface IP parameter \"%s\" provided."
-msgstr "Λανθασμένη παράμετρος IP διεπαφής \"%s\" παρέχεται."
-
-#: include/classes/api/services/CHostInterface.php:626
+#: include/classes/api/services/CHostInterface.php:634
 #, c-format
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Λανθασμένη θύρα διεπαφής \"%s\" παρέχεται."
@@ -7474,7 +7467,7 @@ msgstr "Λανθασμένο ID πρωτότυπου συλλέκτη \"%1$s\" �
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "Λανθασμένος τύπος τιμής συλλέκτη \"%1$s\" παρεχόμενος γιά λειτουργία εναύσματος \"%2$s\"."
 
-#: include/classes/api/services/CDRule.php:274
+#: include/classes/api/services/CDRule.php:276
 msgid "Incorrect key."
 msgstr "Λανθασμένο κλειδί."
 
@@ -7595,11 +7588,11 @@ msgstr "Λανθασμένος γονέας για υπηρεσία \"%1$s\"."
 msgid "Incorrect parent service."
 msgstr "Λανθασμένη γονική υπηρεσία."
 
-#: discoveryconf.php:97 include/classes/api/services/CDRule.php:268
+#: discoveryconf.php:97 include/classes/api/services/CDRule.php:270
 msgid "Incorrect port range."
 msgstr "Λανθασμένη περιοχή θυρών."
 
-#: include/classes/api/services/CDRule.php:330
+#: include/classes/api/services/CDRule.php:332
 #, c-format
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Ανακριβές ιδιωτικό πρωτόκολλο κανόνα εντοπισμού \"%1$s\"."
@@ -7609,7 +7602,7 @@ msgstr "Ανακριβές ιδιωτικό πρωτόκολλο κανόνα ε
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Ανακριβές ιδιωτικό πρωτόκολλο συλλέκτη \"%1$s\"."
 
-#: include/classes/api/services/CDRule.php:247
+#: include/classes/api/services/CDRule.php:249
 msgid "Incorrect proxyid."
 msgstr "Λανθασμένο id διαμεσολαβητή."
 
@@ -7680,7 +7673,7 @@ msgstr "Λανθασμένη κατάσταση πρωτότυπου ξενισ�
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Λανθασμένη κατάσταση για την υπηρεσία \"%1$s\"."
 
-#: include/classes/api/services/CDRule.php:225
+#: include/classes/api/services/CDRule.php:227
 msgid "Incorrect status."
 msgstr "Λανθασμένη κατάσταση."
 
@@ -7776,13 +7769,13 @@ msgstr "Λανθασμένος τύπος υπολογισμού κανόνα ε
 msgid "Incorrect user group."
 msgstr "Λανθασμένη ομάδα χρήστη."
 
-#: include/validate.inc.php:494
+#: include/validate.inc.php:339
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Λανθασμένη τιμή \"%1$s\" για \"%2$s\" πεδίο."
 
 #: include/classes/api/services/CScreenItem.php:618
-#: include/validate.inc.php:490
+#: include/validate.inc.php:335
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Λανθασμένη τιμή \"%1$s\" για \"%2$s\" πεδίο: να είναι μεταξύ %3$s και %4$s."
@@ -7807,7 +7800,7 @@ msgstr "Λανθασμένη τιμή \"%1$s\" για πεδίο απρόσημ�
 msgid "Incorrect value for field \"%1$s\"."
 msgstr "Λανθασμένη τιμή πεδίου \"%1$s\"."
 
-#: include/validate.inc.php:485
+#: include/validate.inc.php:330
 #, c-format
 msgid "Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Λανθασμένη τιμή πεδίου \"%1$s\": δεν μπορεί να είναι κενό."
@@ -7884,7 +7877,7 @@ msgstr "Όνομα εγκαταστάτη"
 msgid "Interface"
 msgstr "Διεπαφή"
 
-#: include/classes/api/services/CHostInterface.php:835
+#: include/classes/api/services/CHostInterface.php:843
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "Η διεπαφή είναι συνδεδεμένη στο συλλέκτη \"%1$s\" επί \"%2$s\"."
@@ -7963,9 +7956,29 @@ msgstr "Χρονικό διάστημα"
 
 #: include/views/configuration.host.discovery.edit.php:229
 #: include/views/configuration.item.edit.php:296
-#: include/views/configuration.item.massupdate.php:357
+#: include/views/configuration.item.massupdate.php:358
 msgid "Interval (in sec)"
 msgstr "Διάστημα (σε δευτ)"
+
+#: include/classes/validators/CIPValidator.php:49
+#, c-format
+msgid "Invalid IP address \"%1$s\"."
+msgstr ""
+
+#: include/classes/validators/CIPValidator.php:37
+#, c-format
+msgid "Invalid IP address \"%1$s\": must be a string."
+msgstr ""
+
+#: include/classes/validators/CIPRangeValidator.php:72
+#, c-format
+msgid "Invalid IP address range \"%1$s\"."
+msgstr ""
+
+#: include/classes/validators/CIPRangeValidator.php:56
+#, c-format
+msgid "Invalid IP address range \"%1$s\": must be a string."
+msgstr ""
 
 #: include/classes/core/CJsonRpc.php:170
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -8008,7 +8021,7 @@ msgstr "Άκυρο κλειδί \"%1$s\" συλλέκτη \"%2$s\" σε \"%3$s\"
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 msgstr "Άκυρο κλειδί \"%1$s\" πρωτότυπου συλλέκτη \"%2$s\" σε \"%3$s\": %4$s."
 
-#: discoveryconf.php:104 include/classes/api/services/CDRule.php:279
+#: discoveryconf.php:104 include/classes/api/services/CDRule.php:281
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Άκυρο κλειδί \"%1$s\": %2$s."
@@ -8074,7 +8087,7 @@ msgstr "Δόθηκε άκυρο όνομα προβολής \"%s\". Επιτρε
 msgid "Inventory"
 msgstr "Απογραφή"
 
-#: include/classes/api/services/CHost.php:1183
+#: include/classes/api/services/CHost.php:1181
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Απενεργοποιημένη απογραφή ξενιστή \"%1$s\"."
@@ -8268,7 +8281,7 @@ msgstr "Ο συλλέκτης χρησιμοποιεί διεπαφή ξενισ
 msgid "Item uses incorrect interface type."
 msgstr "Ο συλλέκτης χρησιμοποιεί λάθος τύπο διεπαφής."
 
-#: chart.php:89
+#: chart.php:94 chart.php:97
 msgid "Item values"
 msgstr "Τιμές συλλεκτών"
 
@@ -8306,8 +8319,8 @@ msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη �
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\"."
 
-#: include/classes/api/managers/CHttpTestManager.php:712
-#: include/classes/api/managers/CHttpTestManager.php:843
+#: include/classes/api/managers/CHttpTestManager.php:715
+#: include/classes/api/managers/CHttpTestManager.php:846
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
 msgstr "Συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη."
@@ -8341,7 +8354,7 @@ msgstr "Συλλέκτες αντιγράφηκαν"
 msgid "Items deleted"
 msgstr "Συλλέκτες διεγράφησαν"
 
-#: include/views/monitoring.history.php:123
+#: include/views/monitoring.history.php:139
 msgid "Items list"
 msgstr "Κατάλογος συλλεκτών"
 
@@ -8790,7 +8803,7 @@ msgid "Log source of the last log entry matching parameter T, then N NOT 1, 0 - 
 msgstr "Παράμετρος καταγραφής πηγής τελευταίας καταχώρησης Τ, τότε N ΟΧΙ 1, 0 - άλλως"
 
 #: include/views/configuration.item.edit.php:347
-#: include/views/configuration.item.massupdate.php:411
+#: include/views/configuration.item.massupdate.php:415
 msgid "Log time format"
 msgstr "Μορφότυπος καταγραφής ώρας"
 
@@ -8969,7 +8982,7 @@ msgstr "Συντήρηση \"%1$s\" υπάρχει ήδη."
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
 msgstr "Τιμή συντήρησης \"Ενεργό από\" όχι μεγαλύτερη της \"Ενεργό έως\"."
 
-#: include/classes/validators/CActionCondValidator.php:158
+#: include/classes/validators/CActionCondValidator.php:159
 msgid "Maintenance action condition value must be empty."
 msgstr "Τιμή συνθήκης ενέργειας συντήρησης να είναι κενή."
 
@@ -9106,11 +9119,11 @@ msgstr "Μάρτιος"
 msgid "Mark elements on trigger status change"
 msgstr "Σημειώστε τα στοιχεία σε μεταβολή κατάστασης εναύσματος"
 
-#: include/views/monitoring.history.php:132
+#: include/views/monitoring.history.php:148
 msgid "Mark others"
 msgstr "Σημειώστε άλλα"
 
-#: include/views/monitoring.history.php:131
+#: include/views/monitoring.history.php:147
 msgid "Mark selected"
 msgstr "Σημάδι επιλέχθηκε"
 
@@ -9119,8 +9132,9 @@ msgid "Mask"
 msgstr "Μάσκα"
 
 #: hosts.php:1066 include/views/configuration.item.list.php:273
-#: include/views/configuration.item.massupdate.php:562
+#: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.triggers.list.php:299
+#: include/views/configuration.triggers.massupdate.php:159
 msgid "Mass update"
 msgstr "Μαζική ενημέρωση"
 
@@ -9154,7 +9168,7 @@ msgstr "Μεγιστοποίηση"
 
 #: include/views/configuration.host.discovery.edit.php:241
 #: include/views/configuration.item.edit.php:308
-#: include/views/configuration.item.massupdate.php:368
+#: include/views/configuration.item.massupdate.php:372
 msgid "Maximum number of flexible intervals added"
 msgstr "Μέγιστος αριθμός ευέλικτων μεσοδιαστημάτων προστέθηκε"
 
@@ -9701,7 +9715,7 @@ msgstr "Νέο στοιχείο"
 #: disc_prototypes.php:49 host_discovery.php:58
 #: include/views/configuration.host.discovery.edit.php:245
 #: include/views/configuration.item.edit.php:312
-#: include/views/configuration.item.massupdate.php:372 items.php:51
+#: include/views/configuration.item.massupdate.php:376 items.php:51
 msgid "New flexible interval"
 msgstr "Νέο ευέλικτο χρονικό διάστημα"
 
@@ -9926,7 +9940,7 @@ msgstr "Δεν ελήφθησαν δεδομένα κατά το χρόνο T, �
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
 msgstr "Δεν ελήφθησαν δεδομένα κατά το χρόνο T, τότε N ΟΧΙ 1, 0 - άλλως"
 
-#: include/classes/api/services/CHostInterface.php:811
+#: include/classes/api/services/CHostInterface.php:819
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "Όχι προεπιλεγμένη διεπαφή για \"%1$s\" τύπου σε \"%2$s\"."
@@ -10025,7 +10039,7 @@ msgstr "Δεν βρέθηκαν γραφήματα."
 msgid "No groups for host \"%s\"."
 msgstr "Χωρίς ομάδες για ξενιστή \"%s\"."
 
-#: include/classes/api/services/CHost.php:945
+#: include/classes/api/services/CHost.php:943
 msgid "No groups for hosts."
 msgstr "Χωρίς ομάδες για ξενιστές."
 
@@ -10265,8 +10279,8 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: include/classes/api/services/CDiscoveryRule.php:482
 #: include/classes/api/services/CDiscoveryRule.php:487
 #: include/classes/api/services/CDRule.php:208
-#: include/classes/api/services/CDRule.php:500
-#: include/classes/api/services/CDRule.php:801
+#: include/classes/api/services/CDRule.php:502
+#: include/classes/api/services/CDRule.php:803
 #: include/classes/api/services/CEvent.php:640
 #: include/classes/api/services/CGraphGeneral.php:66
 #: include/classes/api/services/CGraphGeneral.php:88
@@ -10275,20 +10289,20 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: include/classes/api/services/CGraphPrototype.php:741
 #: include/classes/api/services/CHostBase.php:45
 #: include/classes/api/services/CHostGeneral.php:140
-#: include/classes/api/services/CHostGroup.php:478
-#: include/classes/api/services/CHostGroup.php:550
-#: include/classes/api/services/CHostGroup.php:735
-#: include/classes/api/services/CHostGroup.php:797
-#: include/classes/api/services/CHostGroup.php:851
-#: include/classes/api/services/CHostGroup.php:860
-#: include/classes/api/services/CHostGroup.php:883
+#: include/classes/api/services/CHostGroup.php:484
+#: include/classes/api/services/CHostGroup.php:562
+#: include/classes/api/services/CHostGroup.php:747
+#: include/classes/api/services/CHostGroup.php:809
+#: include/classes/api/services/CHostGroup.php:863
+#: include/classes/api/services/CHostGroup.php:872
+#: include/classes/api/services/CHostGroup.php:895
 #: include/classes/api/services/CHostInterface.php:264
 #: include/classes/api/services/CHostInterface.php:280
 #: include/classes/api/services/CHostInterface.php:423
-#: include/classes/api/services/CHostInterface.php:639
+#: include/classes/api/services/CHostInterface.php:647
 #: include/classes/api/services/CHost.php:530
 #: include/classes/api/services/CHost.php:613
-#: include/classes/api/services/CHost.php:1638
+#: include/classes/api/services/CHost.php:1636
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -10473,7 +10487,7 @@ msgid "No value maps found."
 msgstr "Δεν βρέθηκαν αντιστοιχίσεις τιμών."
 
 #: include/classes/screens/CScreenHistory.php:142
-#: include/classes/screens/CScreenHistory.php:252
+#: include/classes/screens/CScreenHistory.php:244
 #: include/classes/screens/CScreenPlainText.php:41
 #: include/classes/screens/CScreenPlainText.php:63 latest.php:442
 msgid "No values found."
@@ -10494,7 +10508,7 @@ msgid "None"
 msgstr "Ουδέν"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1484 include/views/monitoring.history.php:226
+#: include/triggers.inc.php:1484 include/views/monitoring.history.php:242
 #: popup.php:1372
 msgid "Normal"
 msgstr "Κανονικό"
@@ -10588,7 +10602,7 @@ msgstr "Τώρα"
 
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:427
-msgid "Number of available proccessors."
+msgid "Number of available processors."
 msgstr "Αριθμός διαθέσιμων επεξεργαστών."
 
 #: include/blocks.inc.php:816 include/blocks.inc.php:818
@@ -10625,11 +10639,11 @@ msgstr "Αριθμός εποπτευόμενων συλλεκτών"
 msgid "Number of processes. <name> and <user> same as in proc.mem item. <state> all (default), run, sleep, zomb. <cmdline> filter by command line (supports regex). Example: proc.num[apache2,www-data]. On Windows, only <name> and <user> are supported."
 msgstr "Αριθμός διεργασιών. <name> και <user> ίδια ως στο proc.mem item. <state> all (default), run, sleep, zomb. <cmdline> φίλτρο από γραμμή εντολών (υποστήριξη έκφρασης). Παράδειγμα: proc.num[apache2,www-data]. Σε Windows, υποστηρίζονται μόνο <name> και <user>."
 
-#: include/classes/items/CHelpItems.php:647
+#: include/classes/items/CHelpItems.php:643
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Αριθμός πυρήνων επεξεργαστή σε VMware hypervisor, <url> - URL υπηρεσία VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:651
+#: include/classes/items/CHelpItems.php:647
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Αριθμός νημάτων επεξεργαστή σε VMware hypervisor, <url> - URL υπηρεσία VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
@@ -10726,7 +10740,7 @@ msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακ
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Αριθμός αποθηκευμένων τιμών στον πίνακα TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:695
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Αριθμός εικονικών μηχανών VMware hypervisor, <url> - URL υπηρεσία VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
@@ -10843,8 +10857,8 @@ msgstr "Σε αλλαγή κατάστασης τα εναύσματα αναβ�
 msgid "Once"
 msgstr "Άπαξ"
 
-#: include/classes/api/services/CHostGroup.php:813
-#: include/classes/api/services/CHostGroup.php:947
+#: include/classes/api/services/CHostGroup.php:825
+#: include/classes/api/services/CHostGroup.php:959
 msgid "One of the objects is left without a host group."
 msgstr "Ένα των αντικειμένων χωρίς ομάδα ξενιστή."
 
@@ -10913,7 +10927,7 @@ msgstr "Μόνο Διαχειριστές Zabbix αλλάζουν μέσα χρ�
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Μόνο Διαχειριστές Zabbix αφαιρούν μέσα χρήστη."
 
-#: include/classes/api/services/CDRule.php:260
+#: include/classes/api/services/CDRule.php:262
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr "Μοναδικοί έλεγχοι μόνο Zabbix agent, SNMPv1, SNMPv2 and SNMPv3."
 
@@ -10921,7 +10935,7 @@ msgstr "Μοναδικοί έλεγχοι μόνο Zabbix agent, SNMPv1, SNMPv2 
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Απαριθμώνται μόνο συλλέκτες εκχωρημένοι σε ενεργούς ξενιστές"
 
-#: include/classes/api/services/CDRule.php:339
+#: include/classes/api/services/CDRule.php:341
 msgid "Only one check can be unique."
 msgstr "Μόνο ένας έλεγχος μπορεί να είναι μοναδικός."
 
@@ -10951,7 +10965,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "Η λειτουργία \"%s\" υπάρχει ήδη."
 
-#: include/validate.inc.php:467
+#: include/validate.inc.php:312
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Η λειτουργία δεν εκτελείται λόγω μη εξουσιοδοτημένης αίτησης."
 
@@ -11028,16 +11042,16 @@ msgstr "Ή"
 #: include/views/configuration.item.massupdate.php:302
 #: include/views/configuration.item.massupdate.php:312
 #: include/views/configuration.item.massupdate.php:350
-#: include/views/configuration.item.massupdate.php:379
-#: include/views/configuration.item.massupdate.php:389
-#: include/views/configuration.item.massupdate.php:403
-#: include/views/configuration.item.massupdate.php:413
-#: include/views/configuration.item.massupdate.php:427
-#: include/views/configuration.item.massupdate.php:445
-#: include/views/configuration.item.massupdate.php:455
-#: include/views/configuration.item.massupdate.php:492
-#: include/views/configuration.item.massupdate.php:543
-#: include/views/configuration.item.massupdate.php:556
+#: include/views/configuration.item.massupdate.php:383
+#: include/views/configuration.item.massupdate.php:393
+#: include/views/configuration.item.massupdate.php:407
+#: include/views/configuration.item.massupdate.php:417
+#: include/views/configuration.item.massupdate.php:431
+#: include/views/configuration.item.massupdate.php:449
+#: include/views/configuration.item.massupdate.php:459
+#: include/views/configuration.item.massupdate.php:496
+#: include/views/configuration.item.massupdate.php:547
+#: include/views/configuration.item.massupdate.php:560
 #: include/views/configuration.triggers.massupdate.php:75
 #: include/views/configuration.triggers.massupdate.php:150
 msgid "Original"
@@ -11301,7 +11315,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "ΠΡΟΒΛΗΜΑ"
 
-#: include/validate.inc.php:555
+#: include/validate.inc.php:400
 msgid "Page received incorrect data"
 msgstr "Η σελίδα έλαβε λάθος δεδομένα"
 
@@ -11418,8 +11432,8 @@ msgstr "Εκατοστιαία γραμμή (αριστερά)"
 msgid "Percentile line (right)"
 msgstr "Εκατοστιαία γραμμή (δεξιά)"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:351
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr "Εκτελεί ερώτημα DNS. Σε επιτυχία επιστρέφει σειρά χαρακτήρων με απαιτούμενο είδος πληροφορίας."
 
@@ -11430,7 +11444,7 @@ msgstr "Εκτελεί ερώτημα DNS. Σε επιτυχία επιστρέ�
 #: include/views/configuration.item.edit.php:265
 #: include/views/configuration.item.edit.php:300
 #: include/views/configuration.item.massupdate.php:321
-#: include/views/configuration.item.massupdate.php:361
+#: include/views/configuration.item.massupdate.php:362
 #: include/views/configuration.maintenance.edit.php:102 popup_period.php:25
 #: popup_period.php:96 popup_period.php:136 report2.php:380 report3.php:62
 #: report4.php:102 report6.php:56 srv_status.php:159
@@ -11525,7 +11539,7 @@ msgstr "Συμπληρώνει πεδίο απογραφής ξενιστή"
 msgid "Port"
 msgstr "Θύρα"
 
-#: include/classes/api/services/CHostInterface.php:623
+#: include/classes/api/services/CHostInterface.php:631
 msgid "Port cannot be empty for host interface."
 msgstr "Η θύρα δεν μπορεί να είναι κενή για διεπαφή ξενιστή."
 
@@ -11986,7 +12000,7 @@ msgstr "Αφαίρεση ξενιστή"
 msgid "Remove link"
 msgstr "Αφαίρεση συνδέσμου"
 
-#: include/views/monitoring.history.php:120
+#: include/views/monitoring.history.php:136
 msgid "Remove selected"
 msgstr "Αφαίρεση επιλεγμένου"
 
@@ -11995,12 +12009,12 @@ msgstr "Αφαίρεση επιλεγμένου"
 msgid "Replace"
 msgstr "Αντικατάσταση"
 
-#: include/views/configuration.item.massupdate.php:491
+#: include/views/configuration.item.massupdate.php:495
 msgid "Replace applications"
 msgstr "Αντικατάσταση κατηγοριών"
 
 #: include/views/configuration.triggers.massupdate.php:144
-msgid "Replace depenencies"
+msgid "Replace dependencies"
 msgstr "Αντικατάσταση εξαρτήσεων"
 
 #: include/views/configuration.host.massupdate.php:66
@@ -12774,13 +12788,13 @@ msgstr "Επιλέξτε"
 msgid "Select prototype"
 msgstr "Επιλέξτε πρωτότυπο"
 
-#: include/views/monitoring.history.php:124
+#: include/views/monitoring.history.php:140
 msgid "Select rows with value like"
 msgstr "Επιλέξτε γραμμές με τιμή, όπως"
 
 #: include/views/administration.script.edit.php:82
 #: include/views/monitoring.dashconf.php:49
-#: include/views/monitoring.history.php:145
+#: include/views/monitoring.history.php:161
 msgid "Selected"
 msgstr "Επιλεγμένο"
 
@@ -13034,7 +13048,7 @@ msgstr "Εμφάνιση υπομνήματος"
 msgid "Show lines"
 msgstr "Εμφάνιση γραμμών"
 
-#: include/views/monitoring.history.php:129
+#: include/views/monitoring.history.php:145
 msgid "Show selected"
 msgstr "Εμφάνιση επιλεγμένου"
 
@@ -13058,7 +13072,7 @@ msgstr[0] "Εμφάνιση μη αναγνωρισμένων (%1$s ημέρα)"
 msgstr[1] "Εμφάνιση μη αναγνωρισμένων (%1$s ημέρες)"
 
 #: include/views/configuration.item.edit.php:386
-#: include/views/configuration.item.massupdate.php:443
+#: include/views/configuration.item.massupdate.php:447
 msgid "Show value"
 msgstr "Εμφάνιση τιμής"
 
@@ -13285,7 +13299,7 @@ msgstr "Καθορισμός μερικών συνθηκών φίλτρων γι
 msgid "Speed"
 msgstr "Ταχύτητα"
 
-#: include/graphs.inc.php:25 include/views/monitoring.history.php:230
+#: include/graphs.inc.php:25 include/views/monitoring.history.php:246
 #: popup.php:1363
 msgid "Stacked"
 msgstr "Στοιβαγμένο"
@@ -13331,7 +13345,7 @@ msgstr "Κατάσταση υπηρεσίας. 0 - ενεργή, 1 - παύση,
 #: include/views/configuration.httpconf.list.php:71
 #: include/views/configuration.item.list.php:73
 #: include/views/configuration.item.list.php:151
-#: include/views/configuration.item.massupdate.php:401
+#: include/views/configuration.item.massupdate.php:405
 #: include/views/configuration.item.prototype.list.php:54
 #: include/views/configuration.triggers.list.php:104 popup_media.php:134
 #: popup.php:973 popup.php:1095 srv_status.php:140 tr_status.php:290
@@ -13415,7 +13429,7 @@ msgid "Stop"
 msgstr "Σταματώ"
 
 #: include/views/configuration.item.edit.php:366
-#: include/views/configuration.item.massupdate.php:425
+#: include/views/configuration.item.massupdate.php:429
 msgid "Store value"
 msgstr "Αποθηκευμένη τιμή"
 
@@ -13612,7 +13626,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Σχεδιότυπο"
 
-#: include/classes/api/services/CHost.php:987
+#: include/classes/api/services/CHost.php:985
 #: include/classes/api/services/CTemplate.php:461
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -13944,7 +13958,7 @@ msgid "Timeout"
 msgstr "Λήξη χρόνου"
 
 #: include/classes/screens/CScreenHistory.php:145
-#: include/classes/screens/CScreenHistory.php:253
+#: include/classes/screens/CScreenHistory.php:245
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:64
 msgid "Timestamp"
@@ -14028,7 +14042,7 @@ msgid "Trend storage period"
 msgstr "Περίοδος αποθήκευσης τάσεων"
 
 #: include/views/configuration.item.edit.php:346
-#: include/views/configuration.item.massupdate.php:387
+#: include/views/configuration.item.massupdate.php:391
 msgid "Trend storage period (in days)"
 msgstr "Περίοδος αποθήκευσης τάσεων (σε ημέρες)"
 
@@ -14287,10 +14301,6 @@ msgstr "Εναύσματα διεγράφησαν"
 #: include/classes/html/CTriggersInfo.php:107 include/screens.inc.php:42
 msgid "Triggers info"
 msgstr "Πληροφορίες εναυσμάτων"
-
-#: include/views/configuration.triggers.massupdate.php:159
-msgid "Triggers massupdate"
-msgstr "Μαζική ενημέρωση εναυσμάτων"
 
 #: include/screens.inc.php:43
 msgid "Triggers overview"
@@ -14752,7 +14762,7 @@ msgstr "Ανοικτά"
 #: include/views/configuration.httpconf.edit.php:318
 #: include/views/configuration.httpconf.popup.php:109
 #: include/views/configuration.item.edit.php:466
-#: include/views/configuration.item.massupdate.php:567
+#: include/views/configuration.item.massupdate.php:571
 #: include/views/configuration.maintenance.edit.php:138
 #: include/views/configuration.maintenance.edit.php:193
 #: include/views/configuration.screen.constructor.edit.php:740
@@ -15094,75 +15104,75 @@ msgstr "Κατάσταση cluster VMware, <url> - URL υπηρεσίας VMware
 msgid "VMware event log, <url> - VMware service URL"
 msgstr "Καταγραφή συμβάντων VMware, <url> - URL υπηρεσίας VMware"
 
-#: include/classes/items/CHelpItems.php:663
+#: include/classes/items/CHelpItems.php:659
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor BIOS uuid, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:671
+#: include/classes/items/CHelpItems.php:667
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Μέγεθος μνήμης ballooned VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:619
+#: include/classes/items/CHelpItems.php:615
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Όνομα cluster VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:627
+#: include/classes/items/CHelpItems.php:623
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Στατιστικά datastore read VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor, <datastore> - όνομα datastore, <mode> - latency"
 
-#: include/classes/items/CHelpItems.php:631
+#: include/classes/items/CHelpItems.php:627
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Στατιστικά datastore write VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor, <datastore> - όνομα datastore, <mode> - latency"
 
-#: include/classes/items/CHelpItems.php:659
+#: include/classes/items/CHelpItems.php:655
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Τύπος VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:635
+#: include/classes/items/CHelpItems.php:631
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Όνομα VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:675
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Στατιστικά εισόδου δικτύου VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:679
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Στατιστικά εξόδου δικτύου VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:639
+#: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Συχνότητα επεξεργαστή VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:643
+#: include/classes/items/CHelpItems.php:639
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Τύπος επεξεργαστή VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:623
+#: include/classes/items/CHelpItems.php:619
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Χρήση επεξεργαστή VMware hypervisor σε Hz, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Κατάσταση VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:655
+#: include/classes/items/CHelpItems.php:651
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Συνολικό μέγεθος μνήμης VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Χρόνος λειτουργίας VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:675
+#: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Μέγεθος χρησιμοποιούμενης μνήμης VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:667
+#: include/classes/items/CHelpItems.php:663
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Όνομα κατασκευαστή VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Έκδοση VMware hypervisor, <url> - URL υπηρεσίας VMware, <uuid> - όνομα ξενιστή VMware hypervisor"
 
@@ -15170,7 +15180,7 @@ msgstr "Έκδοση VMware hypervisor, <url> - URL υπηρεσίας VMware, <
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Πλήρες όνομα υπηρεσίας VMware, <url> - URL υπηρεσίας VMware"
 
-#: include/classes/items/CHelpItems.php:615
+#: include/classes/items/CHelpItems.php:699
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Έκδοση υπηρεσίας VMware, <url> - URL υπηρεσίας VMware"
 
@@ -15261,7 +15271,7 @@ msgstr "Χρόνος λειτουργίας εικονικής μηχανής VM
 #: include/blocks.inc.php:804 include/classes/graphdraw/CPieGraphDraw.php:334
 #: include/classes/screens/CScreenEvents.php:42
 #: include/classes/screens/CScreenHistory.php:151
-#: include/classes/screens/CScreenHistory.php:253 include/reports.inc.php:170
+#: include/classes/screens/CScreenHistory.php:245 include/reports.inc.php:170
 #: include/views/administration.general.valuemapping.edit.php:40
 #: include/views/common.macros.php:38 tr_testexpr.php:50
 #, c-format
@@ -15293,23 +15303,23 @@ msgstr "Η Τιμή \"%1$s\" είναι μεγάλη για το πεδίο \"%2
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr "Η Τιμή \"%1$s\" είναι μεγάλη για το πεδίο \"%2$s\" - %3$d χαρακτήρες. Επιτρεπόμενο μήκος 2048 χαρακτήρες."
 
-#: include/validate.inc.php:325 include/validate.inc.php:349
-#: include/validate.inc.php:364
+#: include/validate.inc.php:170 include/validate.inc.php:194
+#: include/validate.inc.php:209
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 msgstr "Τιμή \"%2$s\" από \"%1$s\" ανακριβή δεκαδικό τύπο."
 
-#: include/validate.inc.php:335 include/validate.inc.php:351
+#: include/validate.inc.php:180 include/validate.inc.php:196
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
 msgstr "Τιμή \"%2$s\" από \"%1$s\" πολλά δεκαδικά ψηφία: όχι πλέον των %3$s ψηφίων."
 
-#: include/validate.inc.php:331
+#: include/validate.inc.php:176
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
 msgstr "Τιμή \"%2$s\" από \"%1$s\" πολλά ακέραια ψηφία: όχι πλέον των %3$s ψηφίων."
 
-#: include/validate.inc.php:327
+#: include/validate.inc.php:172
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr "Τιμή \"%2$s\" από \"%1$s\" πολύ μεγάλη: όχι πλέον των %3$s ακέραιων ψηφίων και πλέον των %4$s δεκαδικών."
@@ -15384,7 +15394,7 @@ msgstr "Τιμή κάθε μετρητή επίδοσης, όπου παράμε
 msgid "Value: no data"
 msgstr "Τιμή: όχι δεδομένα"
 
-#: include/views/monitoring.history.php:74
+#: include/views/monitoring.history.php:90
 msgid "Values"
 msgstr "Τιμές"
 
@@ -15756,7 +15766,7 @@ msgid "Y axis MAX value"
 msgstr "Μέγιστη τιμή άξονα Ψ"
 
 #: include/classes/api/services/CGraphGeneral.php:356
-#: include/classes/graphdraw/CLineGraphDraw.php:712
+#: include/classes/graphdraw/CLineGraphDraw.php:714
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Μέγιστη τιμή άξονα Y να είναι μεγαλύτερη της ΕΛΑΧ τιμής άξονα Y."
 
@@ -15846,8 +15856,8 @@ msgstr "Δεν καθορίσατε στόχους για γενική δέσμ�
 
 #: include/classes/api/services/CGraph.php:543
 #: include/classes/api/services/CGraphPrototype.php:558
-#: include/classes/api/services/CHost.php:881
-#: include/classes/api/services/CHost.php:939
+#: include/classes/api/services/CHost.php:879
+#: include/classes/api/services/CHost.php:937
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668
@@ -15935,7 +15945,7 @@ msgstr "Αντιπρόσωπος Zabbix (ενεργός)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix συνολικά"
 
-#: include/validate.inc.php:505
+#: include/validate.inc.php:350
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix έλαβε λανθασμένο αίτημα."
 
@@ -16026,7 +16036,7 @@ msgstr "[Λάθος τιμή για μήνα: \"%s\" ]"
 msgid "agent"
 msgstr "αντιπρόσωπος"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1856
+#: include/classes/graphdraw/CLineGraphDraw.php:1858
 #: include/classes/pagefilter/CPageFilter.php:738
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
@@ -16046,15 +16056,15 @@ msgstr "όλα"
 msgid "all media"
 msgstr "όλα τα μέσα"
 
-#: include/views/monitoring.history.php:139
+#: include/views/monitoring.history.php:155
 msgid "as Blue"
 msgstr "ως Κυανό"
 
-#: include/views/monitoring.history.php:138
+#: include/views/monitoring.history.php:154
 msgid "as Green"
 msgstr "ως Πράσινο"
 
-#: include/views/monitoring.history.php:137
+#: include/views/monitoring.history.php:153
 msgid "as Red"
 msgstr "ως Κόκκινο"
 
@@ -16066,8 +16076,8 @@ msgstr "αυτόματη καταχώρηση"
 msgid "auto-registered host"
 msgstr "αυτόματη καταχώρηση ξενιστή"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1838
-#: include/classes/graphdraw/CLineGraphDraw.php:1860
+#: include/classes/graphdraw/CLineGraphDraw.php:1840
+#: include/classes/graphdraw/CLineGraphDraw.php:1862
 #: include/classes/graphdraw/CPieGraphDraw.php:326 include/graphs.inc.php:85
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:155
@@ -16088,14 +16098,14 @@ msgstr "η"
 msgid "d.M"
 msgstr "d.M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1378
-#: include/classes/graphdraw/CLineGraphDraw.php:1431
+#: include/classes/graphdraw/CLineGraphDraw.php:1380
+#: include/classes/graphdraw/CLineGraphDraw.php:1433
 msgid "d.m"
 msgstr "d.m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1400
-#: include/classes/graphdraw/CLineGraphDraw.php:1415
-#: include/classes/graphdraw/CLineGraphDraw.php:1434
+#: include/classes/graphdraw/CLineGraphDraw.php:1402
+#: include/classes/graphdraw/CLineGraphDraw.php:1417
+#: include/classes/graphdraw/CLineGraphDraw.php:1436
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
@@ -16223,7 +16233,7 @@ msgstr "συλλέκτης"
 msgid "key is empty"
 msgstr "κενό κλειδί"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1836
+#: include/classes/graphdraw/CLineGraphDraw.php:1838
 #: include/classes/graphdraw/CPieGraphDraw.php:321 include/graphs.inc.php:82
 #: include/views/js/configuration.graph.edit.js.php:43
 msgid "last"
@@ -16268,16 +16278,16 @@ msgstr "χάρτης"
 msgid "matches"
 msgstr "ταιριάσματα"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1839
-#: include/classes/graphdraw/CLineGraphDraw.php:1853
+#: include/classes/graphdraw/CLineGraphDraw.php:1841
+#: include/classes/graphdraw/CLineGraphDraw.php:1855
 #: include/classes/graphdraw/CPieGraphDraw.php:317 include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:42
 #: include/views/js/configuration.graph.edit.js.php:50 popup_bitem.php:156
 msgid "max"
 msgstr "μεγ."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1837
-#: include/classes/graphdraw/CLineGraphDraw.php:1850
+#: include/classes/graphdraw/CLineGraphDraw.php:1839
+#: include/classes/graphdraw/CLineGraphDraw.php:1852
 #: include/classes/graphdraw/CPieGraphDraw.php:313 include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:154
@@ -16308,12 +16318,12 @@ msgid "new"
 msgstr "νέο"
 
 #: include/views/configuration.host.massupdate.php:80
-#: include/views/configuration.item.massupdate.php:504
+#: include/views/configuration.item.massupdate.php:508
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "νέο"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1931
+#: include/classes/graphdraw/CLineGraphDraw.php:1933
 #: include/classes/graphdraw/CPieGraphDraw.php:347
 msgid "no data"
 msgstr "όχι δεδομένα"
@@ -16447,7 +16457,7 @@ msgid "show icon mappings"
 msgstr "εμφάνιση αντιστοιχίσεων εικονίδιου"
 
 #: include/views/configuration.item.edit.php:384
-#: include/views/configuration.item.massupdate.php:438
+#: include/views/configuration.item.massupdate.php:442
 msgid "show value mappings"
 msgstr "εμφάνιση αντιστοιχίσεων τιμών"
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,10 +29,19 @@ $header = array(
 );
 $headerPlaintext = array();
 
-if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
-	$item = reset($this->data['items']);
-	$host = reset($item['hosts']);
+$hostNames = array();
+foreach ($this->data['items'] as $itemData) {
+	$hostName = $itemData['hosts'][0]['name'];
 
+	if (!array_key_exists($hostName, $hostNames)) {
+		$hostNames[$hostName] = $hostName;
+	}
+}
+
+$item = reset($this->data['items']);
+$host = reset($item['hosts']);
+
+if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 	$header['left'] = array(
 		new CLink($host['name'], 'latest.php?filter_set=1&hostids[]='.$item['hostid']),
 		NAME_DELIMITER,
@@ -47,6 +56,13 @@ if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 			'elname' => 'itemid'
 		));
 	}
+}
+elseif (count($hostNames) == 1) {
+	$header['left'] = array(
+		new CLink($host['name'], 'latest.php?filter_set=1&hostids[]='.$item['hostid']),
+		NAME_DELIMITER,
+		$header['left']
+	);
 }
 
 $header['right'][] = ' ';

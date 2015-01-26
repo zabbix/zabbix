@@ -2,7 +2,7 @@
 #
 # Zabbix daemon start/stop script.
 #
-# Copyright (C) 2001-2014 Zabbix SIA
+# Copyright (C) 2001-2015 Zabbix SIA
 
 NAME=zabbix_server
 DAEMON=/usr/local/sbin/${NAME}
