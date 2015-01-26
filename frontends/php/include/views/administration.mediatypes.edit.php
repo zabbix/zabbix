@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,18 +106,15 @@ if (!empty($this->data['mediatypeid'])) {
 	$mediaTypeForm->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
-			new CButtonDelete(
-				_('Delete selected media type?'),
-				url_param('form').url_param('mediatypeid').url_param('config')
-			),
-			new CButtonCancel(url_param('config'))
+			new CButtonDelete(_('Delete selected media type?'), url_param('form').url_param('mediatypeid')),
+			new CButtonCancel()
 		)
 	));
 }
 else {
 	$mediaTypeForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('config')))
+		array(new CButtonCancel())
 	));
 }
 
