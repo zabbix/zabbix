@@ -30,6 +30,7 @@
 #include "dbcache.h"
 #include "zbxregexp.h"
 #include "macrocache.h"
+#include "comms.h"
 
 static int	sync_in_progress = 0;
 #define	LOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_lock(&config_lock)
@@ -5789,9 +5790,26 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 	dst_proxy->proxy_data_nextcheck = src_proxy->proxy_data_nextcheck;
 
 	if (NULL != (host = zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
+	{
 		strscpy(dst_proxy->host, host->host);
+		dst_proxy->tls_connect = host->tls_connect;
+		strscpy(dst_proxy->tls_issuer, host->tls_issuer);
+		strscpy(dst_proxy->tls_subject, host->tls_subject);
+		strscpy(dst_proxy->tls_psk_identity, host->tls_psk_identity);
+		strscpy(dst_proxy->tls_psk, host->tls_psk);
+	}
 	else
+	{
+		/* DCget_proxy() is called only from DCconfig_get_proxypoller_hosts(), which is called only from */
+		/* process_proxy(). So, this branch should never happen. */
 		*dst_proxy->host = '\0';
+		dst_proxy->tls_connect = ZBX_TCP_SEC_TLS_PSK;	/* set PSK to deliberately fail in this case */
+		*dst_proxy->tls_issuer = '\0';
+		*dst_proxy->tls_subject = '\0';
+		*dst_proxy->tls_psk_identity = '\0';
+		*dst_proxy->tls_psk = '\0';
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
 
 	interface_ht_local.hostid = src_proxy->hostid;
 	interface_ht_local.type = INTERFACE_TYPE_UNKNOWN;
