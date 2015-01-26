@@ -50,6 +50,7 @@ typedef struct
 	char			*comments_orig;
 	zbx_vector_ptr_t	functions;
 	zbx_vector_ptr_t	dependencies;
+	zbx_vector_ptr_t	dependants;
 #define ZBX_FLAG_LLD_TRIGGER_UNSET			__UINT64_C(0x00)
 #define ZBX_FLAG_LLD_TRIGGER_DISCOVERED			__UINT64_C(0x01)
 #define ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION		__UINT64_C(0x02)
@@ -116,6 +117,56 @@ typedef struct
 }
 zbx_lld_item_t;
 
+/* a reference to trigger which could be either existing trigger in database or */
+/* a just discovered trigger stored in memory                                   */
+typedef struct
+{
+	/* trigger id, 0 for newly discovered triggers */
+	zbx_uint64_t		id;
+
+	/* a reference to trigger data, NULL for non-discovered triggers */
+	zbx_lld_trigger_t	*ptr;
+
+	/* flags to mark trigger dependencies during trigger dependency validation */
+#define ZBX_LLD_TRIGGER_CACHE_LINK_NORMAL	0
+#define ZBX_LLD_TRIGGER_CACHE_LINK_NEW		1
+#define ZBX_LLD_TRIGGER_CACHE_LINK_DELETE	2
+
+	/* flags used to mark dependencies when trigger reference is use to store dependency links */
+	int			flags;
+}
+zbx_lld_trigger_ref_t;
+
+/* a trigger node used to build trigger tree for dependency validation */
+typedef struct
+{
+	/* trigger reference */
+	zbx_lld_trigger_ref_t	ref;
+
+	/* the current iteration number, used during dependency validation */
+	int			iter_num;
+
+	/* trigger dependency list */
+	zbx_vector_ptr_t	dependencies;
+
+	/* the number of dependants */
+	int			parents;
+}
+zbx_lld_trigger_node_t;
+
+/* a structure to keep information about current iteration during trigger dependencies validation */
+typedef struct
+{
+	/* iteration number */
+	int			iter_num;
+
+	/* the dependency (from->to) that should be removed in the case of recursive loop */
+	zbx_lld_trigger_ref_t	*ref_from;
+	zbx_lld_trigger_ref_t	*ref_to;
+}
+zbx_lld_trigger_node_iter_t;
+
+
 static void	lld_item_free(zbx_lld_item_t *item)
 {
 	zbx_free(item);
@@ -145,6 +196,7 @@ static void	lld_trigger_prototype_free(zbx_lld_trigger_prototype_t *trigger_prot
 
 static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
 {
+	zbx_vector_ptr_destroy(&trigger->dependants);
 	zbx_vector_ptr_clear_ext(&trigger->dependencies, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&trigger->dependencies);
 	zbx_vector_ptr_clear_ext(&trigger->functions, (zbx_clean_func_t)lld_function_free);
@@ -305,6 +357,7 @@ static void	lld_triggers_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_pt
 
 		zbx_vector_ptr_create(&trigger->functions);
 		zbx_vector_ptr_create(&trigger->dependencies);
+		zbx_vector_ptr_create(&trigger->dependants);
 
 		zbx_vector_ptr_append(triggers, trigger);
 	}
@@ -551,7 +604,7 @@ static void	lld_dependencies_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vecto
  * Purpose: returns the list of items which are related to the trigger        *
  *          prototypes                                                        *
  *                                                                            *
- * Parameters: parent_triggerid - [IN] trigger prototype identificator        *
+ * Parameters: parent_triggerid - [IN] a vector of trigger prototypes         *
  *             items            - [OUT] sorted list of items                  *
  *                                                                            *
  ******************************************************************************/
@@ -956,6 +1009,7 @@ static void 	lld_trigger_make(zbx_lld_trigger_prototype_t *trigger_prototype, zb
 
 		zbx_vector_ptr_create(&trigger->functions);
 		zbx_vector_ptr_create(&trigger->dependencies);
+		zbx_vector_ptr_create(&trigger->dependants);
 
 		trigger->flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 
@@ -1113,10 +1167,14 @@ static void 	lld_trigger_dependency_make(zbx_lld_trigger_prototype_t *trigger_pr
 
 						zbx_vector_ptr_append(&trigger->dependencies, dependency);
 					}
+
 				}
+
+				zbx_vector_ptr_append(&dep_trigger->dependants, trigger);
 
 				dependency->trigger_up = dep_trigger;
 				dependency->flags = ZBX_FLAG_LLD_DEPENDENCY_DISCOVERED;
+
 			}
 			else
 			{
@@ -1952,6 +2010,580 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/* hash/comparison functions to support cache/vector lookups by trigger reference */
+zbx_hash_t	zbx_lld_trigger_ref_hash_func(const void *data)
+{
+	zbx_hash_t			hash;
+	const zbx_lld_trigger_node_t	*node = (const zbx_lld_trigger_node_t *)data;
+	void				*ptr = NULL;
+
+	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&node->ref.id, sizeof(node->ref.id), ZBX_DEFAULT_HASH_SEED);
+
+	if (0 == node->ref.id)
+		ptr = node->ref.ptr;
+
+	return zbx_hash_modfnv(&ptr, sizeof(node->ref.ptr), hash);
+}
+
+int	zbx_lld_trigger_ref_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_trigger_node_t	*n1 = (const zbx_lld_trigger_node_t *)d1;
+	const zbx_lld_trigger_node_t	*n2 = (const zbx_lld_trigger_node_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(n1->ref.id, n2->ref.id);
+
+	/* Don't check pointer if id matches. If the reference was loaded from database it will not have pointer */
+	if (0 != n1->ref.id)
+		return 0;
+
+	ZBX_RETURN_IF_NOT_EQUAL(n1->ref.ptr, n2->ref.ptr);
+
+	return 0;
+}
+
+/* comparison function to determine trigger dependency validation order */
+int	zbx_lld_trigger_node_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_trigger_node_t	*n1 = *(const zbx_lld_trigger_node_t **)d1;
+	const zbx_lld_trigger_node_t	*n2 = *(const zbx_lld_trigger_node_t **)d2;
+
+	/* sort in ascending order, but ensure that existing triggers are firest */
+	if (0 != n1->ref.id && 0 == n2->ref.id)
+		return -1;
+
+	/* give priority to nodes with less parents */
+	ZBX_RETURN_IF_NOT_EQUAL(n1->parents, n2->parents);
+
+	/* compare ids */
+	ZBX_RETURN_IF_NOT_EQUAL(n1->ref.id, n2->ref.id);
+
+	/* Don't check pointer if id matches. If the reference was loaded from database it will not have pointer */
+	if (0 != n1->ref.id)
+		return 0;
+
+	ZBX_RETURN_IF_NOT_EQUAL(n1->ref.ptr, n2->ref.ptr);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_trigger_cache_add_node                                       *
+ *                                                                            *
+ * Purpose: adds a node to trigger cache                                      *
+ *                                                                            *
+ * Parameters: cache     - [IN] the trigger cache                             *
+ *             triggerid - [IN] the trigger id                                *
+ *             trigger   - [IN] the trigger data for new triggers             *
+ *                                                                            *
+ * Return value: the added node                                               *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_lld_trigger_node_t	*lld_trigger_cache_add_node(zbx_hashset_t *cache, zbx_uint64_t triggerid,
+		zbx_lld_trigger_t *trigger)
+{
+	zbx_lld_trigger_node_t	node_local, *node;
+
+	node_local.ref.id = triggerid;
+	node_local.ref.ptr = trigger;
+	node_local.ref.flags = 0;
+
+	node = zbx_hashset_insert(cache, &node_local, sizeof(node_local));
+
+	node->iter_num = 0;
+	node->parents = 0;
+
+	zbx_vector_ptr_create(&node->dependencies);
+
+	return node;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_trigger_cache_add_trigger                                    *
+ *                                                                            *
+ * Purpose: add trigger and all triggers related to it to trigger dependency  *
+ *          validation cache.                                                 *
+ *                                                                            *
+ * Parameters: cache     - [IN] the trigger cache                             *
+ *             trigger   - [IN] the trigger to add                            *
+ *             childids  - [OUT] identifiers of triggers to check external    *
+ *                               dependants                                   *
+ *             parentids - [OUT] identifiers of triggers to check external    *
+ *                               dependencies                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_trigger_cache_add_trigger(zbx_hashset_t *cache, zbx_lld_trigger_t *trigger,
+		zbx_vector_uint64_t *childids, zbx_vector_uint64_t *parentids)
+{
+	zbx_lld_trigger_ref_t	*pref, ref = {trigger->triggerid, trigger};
+	zbx_lld_trigger_node_t	*node;
+	zbx_lld_dependency_t	*dep;
+	int			i;
+
+	if (NULL != (node = zbx_hashset_search(cache, &ref)))
+		return;
+
+	node = lld_trigger_cache_add_node(cache, trigger->triggerid, trigger);
+
+	for (i = 0; i < trigger->dependencies.values_num; i++)
+	{
+		dep = (zbx_lld_dependency_t *)trigger->dependencies.values[i];
+
+		if (0 != (dep->flags & ZBX_FLAG_LLD_DEPENDENCY_DELETE))
+			continue;
+
+		pref = (zbx_lld_trigger_ref_t *)zbx_malloc(NULL, sizeof(zbx_lld_trigger_ref_t));
+
+		pref->id = (NULL != dep->trigger_up ? dep->trigger_up->triggerid : dep->triggerid_up);
+		pref->ptr = dep->trigger_up;
+		if (0 == dep->triggerdepid)
+			pref->flags = ZBX_LLD_TRIGGER_CACHE_LINK_NEW;
+		else
+			pref->flags = ZBX_LLD_TRIGGER_CACHE_LINK_NORMAL;
+
+		zbx_vector_ptr_append(&node->dependencies, pref);
+
+		if (NULL == dep->trigger_up && 0 != dep->triggerid_up && NULL == zbx_hashset_search(cache, pref))
+		{
+			zbx_vector_uint64_append(childids, dep->triggerid_up);
+			zbx_vector_uint64_append(parentids, dep->triggerid_up);
+
+			node = lld_trigger_cache_add_node(cache, dep->triggerid_up, NULL);
+		}
+	}
+
+	if (0 != trigger->triggerid)
+		zbx_vector_uint64_append(childids, trigger->triggerid);
+
+	for (i = 0; i < trigger->dependants.values_num; i++)
+		lld_trigger_cache_add_trigger(cache, trigger->dependants.values[i], childids, parentids);
+
+	for (i = 0; i < trigger->dependencies.values_num; i++)
+	{
+		dep = (zbx_lld_dependency_t *)trigger->dependencies.values[i];
+
+		if (NULL != dep->trigger_up)
+			lld_trigger_cache_add_trigger(cache, dep->trigger_up, childids, parentids);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_trigger_cache_init                                           *
+ *                                                                            *
+ * Purpose: initializes trigger cache used to perform trigger dependency      *
+ *          validation                                                        *
+ *                                                                            *
+ * Parameters: cache    - [IN] the trigger cache                              *
+ *             triggers - [IN] the discovered triggers                        *
+ *                                                                            *
+ * Comments: All discovered triggers and their external dependencies are      *
+ *           added to the cache.                                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *triggers)
+{
+	zbx_vector_uint64_t	parentids, childids;
+	int			i, j;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_lld_trigger_ref_t	*pref, ref = {0, NULL};
+	zbx_lld_trigger_node_t	*node;
+
+	zbx_hashset_create(cache, triggers->values_num, zbx_lld_trigger_ref_hash_func,
+			zbx_lld_trigger_ref_compare_func);
+
+	zbx_vector_uint64_create(&parentids);
+	zbx_vector_uint64_create(&childids);
+
+	/* add all triggers with new dependencies to validation cache */
+	for (i = 0; i < triggers->values_num; i++)
+	{
+		zbx_lld_trigger_t	*trigger = (zbx_lld_trigger_t *)triggers->values[i];
+
+		for (j = 0; j < trigger->dependencies.values_num; j++)
+		{
+			zbx_lld_dependency_t	*dep = (zbx_lld_dependency_t *)trigger->dependencies.values[j];
+
+			if (0 == dep->triggerdepid && 0 != (dep->flags & ZBX_FLAG_LLD_DEPENDENCY_DISCOVERED))
+			{
+				lld_trigger_cache_add_trigger(cache, trigger, &childids, &parentids);
+				break;
+			}
+		}
+	}
+
+	/* keep trying to load external dependencies until there are no dependencies to load */
+	while (0 != childids.values_num || 0 != parentids.values_num)
+	{
+		/* load dependencies ('up') */
+		if (0 != parentids.values_num)
+		{
+			sql_offset = 0;
+			zbx_vector_uint64_sort(&parentids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(&parentids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select td.triggerid_down,td.triggerid_up"
+					" from trigger_depends td"
+					" left join triggers t on t.triggerid=td.triggerid_up"
+					" where t.flags<>%d and", ZBX_FLAG_DISCOVERY_PROTOTYPE);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_down", parentids.values,
+					parentids.values_num);
+
+			zbx_vector_uint64_clear(&parentids);
+
+			result = DBselect("%s", sql);
+
+			while (NULL != (row = DBfetch(result)))
+			{
+				int			new_node = 0;
+				zbx_lld_trigger_node_t	*child;
+
+				ZBX_STR2UINT64(ref.id, row[1]);
+
+				if (NULL == (child = zbx_hashset_search(cache, &ref)))
+				{
+					child = lld_trigger_cache_add_node(cache, ref.id, NULL);
+					new_node = 1;
+				}
+
+				ZBX_STR2UINT64(ref.id, row[0]);
+
+				if (NULL == (node = zbx_hashset_search(cache, &ref)))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
+
+				/* check if the dependency is not already registered in cache */
+				for (i = 0; i < node->dependencies.values_num; i++)
+				{
+					pref = (zbx_lld_trigger_ref_t *)node->dependencies.values[i];
+
+					/* references to non-discovered triggers (external dependencies) */
+					/* will ayways have valid id value                               */
+					if (pref->id == child->ref.id)
+						break;
+				}
+
+				/* if the dependency was not found - add it */
+				if (i == node->dependencies.values_num)
+				{
+					pref = (zbx_lld_trigger_ref_t *)zbx_malloc(NULL, sizeof(zbx_lld_trigger_ref_t));
+
+					pref->id = child->ref.id;
+					pref->ptr = NULL;
+					pref->flags = ZBX_LLD_TRIGGER_CACHE_LINK_NORMAL;
+
+					zbx_vector_ptr_append(&node->dependencies, pref);
+
+					child->parents++;
+				}
+
+				if (1 == new_node)
+				{
+					/* if the trigger was added to cache, we must check its dependencies */
+					zbx_vector_uint64_append(&childids, child->ref.id);
+					zbx_vector_uint64_append(&parentids, child->ref.id);
+				}
+			}
+
+			DBfree_result(result);
+		}
+
+		/* load dependants ('down') */
+		if (0 != childids.values_num)
+		{
+			sql_offset = 0;
+			zbx_vector_uint64_sort(&childids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(&childids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select td.triggerid_down"
+					" from trigger_depends td"
+					" left join triggers t on t.triggerid=td.triggerid_down"
+					" where t.flags<>%d and", ZBX_FLAG_DISCOVERY_PROTOTYPE);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_up", childids.values,
+					childids.values_num);
+
+			zbx_vector_uint64_clear(&childids);
+
+			result = DBselect("%s", sql);
+
+			while (NULL != (row = DBfetch(result)))
+			{
+				ZBX_STR2UINT64(ref.id, row[0]);
+
+				if (NULL != zbx_hashset_search(cache, &ref))
+					continue;
+
+				node = lld_trigger_cache_add_node(cache, ref.id, NULL);
+
+				zbx_vector_uint64_append(&childids, ref.id);
+				zbx_vector_uint64_append(&parentids, ref.id);
+			}
+
+			DBfree_result(result);
+		}
+
+	}
+
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&childids);
+	zbx_vector_uint64_destroy(&parentids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_trigger_cache_clean                                          *
+ *                                                                            *
+ * Purpose: releases resources allocated by trigger cache                     *
+ *          validation                                                        *
+ *                                                                            *
+ * Parameters: cache - [IN] the trigger cache                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_trigger_cache_clean(zbx_hashset_t *cache)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_lld_trigger_node_t	*node;
+
+	zbx_hashset_iter_reset(cache, &iter);
+	while (NULL != (node = zbx_hashset_iter_next(&iter)))
+	{
+		zbx_vector_ptr_clear_ext(&node->dependencies, zbx_ptr_free);
+		zbx_vector_ptr_destroy(&node->dependencies);
+	}
+
+	zbx_hashset_destroy(cache);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_trigger_dependency_delete                                    *
+ *                                                                            *
+ * Purpose: removes trigger dependency                                        *
+ *                                                                            *
+ * Parameters: from - [IN] the reference to dependent triger                  *
+ *             to   - [IN] the reference to trigger the from depends on       *
+ *                                                                            *
+ * Comments: If possible (the dependency loop was introduced by discovered    *
+ *           dependencies) the last dependency in the loop will be removed.   *
+ *           Otherwise (the triggers in database already had dependency loop) *
+ *           the last dependency in the loop will be marked as removed,       *
+ *           however the dependency in database will be left intact.          *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_trigger_dependency_delete(zbx_lld_trigger_ref_t *from, zbx_lld_trigger_ref_t *to)
+{
+	zbx_lld_trigger_t	*trigger;
+	int			i;
+
+	if (ZBX_LLD_TRIGGER_CACHE_LINK_NORMAL == to->flags)
+	{
+		/* When old dependency loop has been detected mark it as deleted to avoid   */
+		/* infinite recursion during dependency validation, but don't really delete */
+		/* it because only new dependencies can be deleted.                         */
+		to->flags = ZBX_LLD_TRIGGER_CACHE_LINK_DELETE;
+
+		/* in olf dependency loop there will be no new triggers, so all involved */
+		/* triggers will have valid identifiers                                  */
+		zabbix_log(LOG_LEVEL_CRIT, "existing recursive dependency loop detected for trigger \""
+				ZBX_FS_UI64 "\"", to->id);
+		return;
+	}
+
+	/* mark trigger dependency as deleted in cache */
+	to->flags = ZBX_LLD_TRIGGER_CACHE_LINK_DELETE;
+
+	trigger = from->ptr;
+
+	/* remove the dependency */
+	for (i = 0; i < trigger->dependencies.values_num; i++)
+	{
+		zbx_lld_dependency_t	*dep = (zbx_lld_dependency_t *)trigger->dependencies.values[i];
+
+		if (dep->trigger_up == to->ptr || dep->triggerid_up == to->id)
+		{
+			zbx_free(dep);
+			zbx_vector_ptr_remove(&trigger->dependencies, i);
+
+			break;
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_trigger_dependencies_iter                                    *
+ *                                                                            *
+ * Purpose: iterates through trigger dependencies to find dependency loops    *
+ *                                                                            *
+ * Parameters: cache    - [IN] the trigger cache                              *
+ *             triggers - [IN] the discovered triggers                        *
+ *             trigger  - [IN] the trigger to check                           *
+ *             iter     - [IN] the dependency iterator                        *
+ *             level    - [IN] the dependecy level                            *
+ *                                                                            *
+ * Return value: SUCCEED - the trigger's dependency chain in valid            *
+ *               FAIL    - a dependency loop was detected                     *
+ *                                                                            *
+ * Comments: If the validation fails the offending dependency is removed.     *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_trigger_dependencies_iter(zbx_hashset_t *cache, zbx_vector_ptr_t *triggers,
+		zbx_lld_trigger_node_t *trigger, zbx_lld_trigger_node_iter_t *iter, int level)
+{
+	int				i;
+	zbx_lld_trigger_ref_t		*ref;
+	zbx_lld_trigger_node_t		*child;
+	zbx_lld_trigger_node_iter_t	child_iter, *piter;
+
+	if (trigger->iter_num == iter->iter_num || ZBX_TRIGGER_DEPENDENCY_LEVELS_MAX < level)
+	{
+		/* dependency loop detected */
+		lld_trigger_dependency_delete(iter->ref_from, iter->ref_to);
+		return FAIL;
+	}
+
+	trigger->iter_num = iter->iter_num;
+
+	for (i = 0; i < trigger->dependencies.values_num; i++)
+	{
+		ref = (zbx_lld_trigger_ref_t *)trigger->dependencies.values[i];
+
+		/* skip dependencies marked as deleted */
+		if (ZBX_LLD_TRIGGER_CACHE_LINK_DELETE == ref->flags)
+			continue;
+
+		if (NULL == (child = zbx_hashset_search(cache, ref)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		/* Remember last dependency that could be cut.                         */
+		/* It should be either a last new dependency or just a last dependency */
+		/* if no new dependencies were encountered.                            */
+		if (ZBX_LLD_TRIGGER_CACHE_LINK_NEW == ref->flags || NULL == iter->ref_to ||
+				ZBX_LLD_TRIGGER_CACHE_LINK_NORMAL == iter->ref_to->flags)
+		{
+			/* remember last new discovered (hence deletable) dependency */
+			child_iter.ref_from = &trigger->ref;
+			child_iter.ref_to = ref;
+			child_iter.iter_num = iter->iter_num;
+
+			piter = &child_iter;
+		}
+		else
+			piter = iter;
+
+		if (FAIL == lld_trigger_dependencies_iter(cache, triggers, child, piter, level + 1))
+			return FAIL;
+	}
+
+	trigger->iter_num = 0;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_trigger_dependencies_validate                                *
+ *                                                                            *
+ * Purpose: validate discovered trigger dependencies                          *
+ *                                                                            *
+ * Parameters: triggers - [IN] the discovered triggers                        *
+ *             error    - [OUT] the error message                             *
+ *             triggers - [IN] the discovered triggers                        *
+ *             trigger  - [IN] the trigger to check                           *
+ *             iter     - [IN] the dependency iterator                        *
+ *             level    - [IN] the dependency level                           *
+ *                                                                            *
+ * Comments: During validation the dependency loops will be resolved by       *
+ *           removing offending dependencies.                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_trigger_dependencies_validate(zbx_vector_ptr_t *triggers, char **error)
+{
+	zbx_hashset_t			cache;
+	zbx_hashset_iter_t		iter;
+	zbx_lld_trigger_node_t		*trigger, *child;
+	zbx_lld_trigger_node_iter_t	node_iter = {0};
+	zbx_vector_ptr_t		nodes;
+	int				i;
+
+	lld_trigger_cache_init(&cache, triggers);
+
+	/* Perform dependency validation in the order of trigger ids and starting with parentless triggers. */
+	/* This will give some consistency in choosing what dependencies should be deleted in the case of   */
+	/* recursion.                                                                                       */
+	zbx_vector_ptr_create(&nodes);
+	zbx_vector_ptr_reserve(&nodes, cache.num_data);
+
+	zbx_hashset_iter_reset(&cache, &iter);
+	while (NULL != (trigger = zbx_hashset_iter_next(&iter)))
+	{
+		for (i = 0; i < trigger->dependencies.values_num; i++)
+		{
+			if (NULL == (child = zbx_hashset_search(&cache, trigger->dependencies.values[i])))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			child->parents++;
+		}
+		zbx_vector_ptr_append(&nodes, trigger);
+	}
+
+	zbx_vector_ptr_sort(&nodes, zbx_lld_trigger_node_compare_func);
+
+	for (i = 0; i < nodes.values_num; i++)
+	{
+		if (NULL == (trigger = zbx_hashset_search(&cache, nodes.values[i])))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		while (1)
+		{
+			node_iter.iter_num++;
+			node_iter.ref_from = NULL;
+			node_iter.ref_to = NULL;
+
+			/* If dependency iterator returns false it means that dependency loop was detected */
+			/* (and resolved). In this case we have to validate dependencies for this trigger  */
+			/* again.                                                                          */
+			if (SUCCEED != lld_trigger_dependencies_iter(&cache, triggers, trigger, &node_iter, 0))
+			{
+				char	*trigger_desc;
+
+				if (0 != trigger->ref.id)
+					trigger_desc = zbx_dsprintf(NULL, ZBX_FS_UI64, trigger->ref.id);
+				else
+					trigger_desc = zbx_strdup(NULL, trigger->ref.ptr->description);
+
+				*error = zbx_strdcatf(*error, "Cannot create all trigger \"%s\" dependencies:"
+						" recursion too deep.\n", trigger_desc);
+
+				zbx_free(trigger_desc);
+
+				continue;
+			}
+			break;
+		}
+	}
+
+	zbx_vector_ptr_destroy(&nodes);
+	zbx_trigger_cache_clean(&cache);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: lld_update_triggers                                              *
@@ -2009,6 +2641,7 @@ void	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 	lld_triggers_make(&trigger_prototypes, &triggers, &items, lld_rows, error);
 	lld_triggers_validate(hostid, &triggers, error);
 	lld_trigger_dependencies_make(&trigger_prototypes, &triggers, &items, lld_rows, error);
+	lld_trigger_dependencies_validate(&triggers, error);
 	lld_triggers_save(&trigger_prototypes, &triggers);
 
 	/* cleaning */
