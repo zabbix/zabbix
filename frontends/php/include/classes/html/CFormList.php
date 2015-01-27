@@ -21,13 +21,13 @@
 
 class CFormList extends CDiv {
 
-	protected $formList = null;
+	protected $formTable = null;
 	protected $editable = true;
 	protected $formInputs = array('ctextbox', 'cnumericbox', 'ctextarea', 'ccombobox', 'ccheckbox', 'cpassbox', 'cipbox');
 
 	public function __construct($id = null, $class = null, $editable = true) {
 		$this->editable = $editable;
-		$this->formList = new CList(null, 'formlist');
+		$this->formTable = new CTable(null, ZBX_STYLE_TABLE_FORMS);
 
 		parent::__construct();
 
@@ -49,7 +49,7 @@ class CFormList extends CDiv {
 			}
 		}
 
-		$defaultClass = $hidden ? 'formrow hidden' : 'formrow';
+		$defaultClass = $hidden ? ZBX_STYLE_HIDDEN : '';
 
 		if ($class === null) {
 			$class = $defaultClass;
@@ -59,15 +59,15 @@ class CFormList extends CDiv {
 		}
 
 		if ($description === null) {
-			$this->formList->addItem(array(new CDiv(SPACE, 'dt right'), new CDiv($label, 'dd')), $class, $id);
+			$this->formTable->addRow(array(new CDiv(SPACE, 'dt right'), new CDiv($label, 'dd')), $class, $id);
 		}
 		else {
-			$this->formList->addItem(array(new CDiv($label, 'dt right'), new CDiv($description, 'dd')), $class, $id);
+			$this->formTable->addRow(array(new CDiv($label, 'dt right'), new CDiv($description, 'dd')), $class, $id);
 		}
 	}
 
 	public function addInfo($text, $label = null) {
-		$this->formList->addItem(
+		$this->formTable->addRow(
 			array(
 				new CDiv($label ? $label : _('Info'), 'dt right listInfoLabel'),
 				new CDiv($text, 'objectgroup inlineblock border_dotted ui-corner-all listInfoText')
@@ -77,7 +77,7 @@ class CFormList extends CDiv {
 	}
 
 	public function toString($destroy = true) {
-		$this->addItem($this->formList);
+		$this->addItem($this->formTable);
 
 		return parent::toString($destroy);
 	}

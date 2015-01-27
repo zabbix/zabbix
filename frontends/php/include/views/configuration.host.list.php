@@ -109,7 +109,7 @@ foreach ($data['hosts'] as $host) {
 	}
 	if ($host['discoveryRule']) {
 		$description[] = new CLink($host['discoveryRule']['name'],
-			'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid'], 'parent-discovery'
+			'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid'], ZBX_STYLE_ORANGE
 		);
 		$description[] = NAME_DELIMITER;
 	}
@@ -126,11 +126,11 @@ foreach ($data['hosts'] as $host) {
 	if ($host['status'] == HOST_STATUS_MONITORED) {
 		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 			$statusCaption = _('In maintenance');
-			$statusClass = 'orange';
+			$statusClass = ZBX_STYLE_ORANGE;
 		}
 		else {
 			$statusCaption = _('Enabled');
-			$statusClass = 'enabled';
+			$statusClass = ZBX_STYLE_GREEN;
 		}
 
 		$statusScript = 'return Confirm('.CJs::encodeJson(_('Disable host?')).');';
@@ -140,7 +140,7 @@ foreach ($data['hosts'] as $host) {
 		$statusCaption = _('Disabled');
 		$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massenable'.url_param('groupid');
 		$statusScript = 'return Confirm('.CJs::encodeJson(_('Enable host?')).');';
-		$statusClass = 'disabled';
+		$statusClass = ZBX_STYLE_RED;
 	}
 
 	$status = new CLink($statusCaption, $statusUrl, $statusClass, $statusScript);
@@ -166,7 +166,7 @@ foreach ($data['hosts'] as $host) {
 			$caption = array(new CLink(
 				CHtml::encode($template['name']),
 				'templates.php?form=update&templateid='.$template['templateid'],
-				'unknown'
+				ZBX_STYLE_GREY
 			));
 
 			$parentTemplates = $data['templates'][$template['templateid']]['parentTemplates'];
@@ -176,7 +176,7 @@ foreach ($data['hosts'] as $host) {
 				$caption[] = ' (';
 				foreach ($parentTemplates as $parentTemplate) {
 					$caption[] = new CLink(CHtml::encode($parentTemplate['name']),
-						'templates.php?form=update&templateid='.$parentTemplate['templateid'], 'unknown'
+						'templates.php?form=update&templateid='.$parentTemplate['templateid'], ZBX_STYLE_GREY
 					);
 					$caption[] = ', ';
 				}

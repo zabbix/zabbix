@@ -32,7 +32,7 @@ $itemsWidget->setTitle(_('Host prototypes'));
 $itemsWidget->setControls($createForm);
 
 // header
-$itemsWidget->addHeader(array(_('Host prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')));
+$itemsWidget->addHeader(array(_('Host prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], ZBX_STYLE_ORANGE)));
 $itemsWidget->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $this->data['parent_discoveryid']));
 
 // create form
@@ -55,7 +55,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	$name = array();
 	if ($hostPrototype['templateid']) {
 		$sourceTemplate = $hostPrototype['sourceTemplate'];
-		$name[] = new CLink($sourceTemplate['name'], '?parent_discoveryid='.$hostPrototype['sourceDiscoveryRuleId'], 'unknown');
+		$name[] = new CLink($sourceTemplate['name'], '?parent_discoveryid='.$hostPrototype['sourceDiscoveryRuleId'], ZBX_STYLE_GREY);
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($hostPrototype['name'], '?form=update&parent_discoveryid='.$discoveryRule['itemid'].'&hostid='.$hostPrototype['hostid']);
@@ -71,7 +71,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		foreach ($hostPrototype['templates'] as $template) {
 
 			$caption = array();
-			$caption[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'], 'unknown');
+			$caption[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'], ZBX_STYLE_GREY);
 
 			$linkedTemplates = $this->data['linkedTemplates'][$template['templateid']]['parentTemplates'];
 			if ($linkedTemplates) {
@@ -79,7 +79,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 				$caption[] = ' (';
 				foreach ($linkedTemplates as $tpl) {
-					$caption[] = new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
+					$caption[] = new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid'], ZBX_STYLE_GREY);
 					$caption[] = ', ';
 				}
 				array_pop($caption);
