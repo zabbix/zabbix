@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ class JMXItemChecker extends ItemChecker
 			String conn = request.getString(JSON_TAG_CONN);
 			int port = request.getInt(JSON_TAG_PORT);
 
-			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + conn + ":" + port + "/jmxrmi");
+			url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://[" + conn + "]:" + port + "/jmxrmi");
 			jmxc = null;
 			mbsc = null;
 

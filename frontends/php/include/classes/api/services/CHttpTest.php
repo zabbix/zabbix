@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -261,20 +261,8 @@ class CHttpTest extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameters.'));
 		}
 
-		// find hostid by applicationid
+		// Check and set default values, and find "hostid" by "applicationid".
 		foreach ($httpTests as &$httpTest) {
-			unset($httpTest['templateid']);
-
-			if (empty($httpTest['hostid']) && !empty($httpTest['applicationid'])) {
-				$dbHostId = DBfetch(DBselect('SELECT a.hostid'.
-						' FROM applications a'.
-						' WHERE a.applicationid='.zbx_dbstr($httpTest['applicationid'])));
-				$httpTest['hostid'] = $dbHostId['hostid'];
-			}
-		}
-		unset($httpTest);
-
-		foreach($httpTests as &$httpTest) {
 			$defaultValues = array(
 				'verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
 				'verify_host' => HTTPTEST_VERIFY_HOST_OFF

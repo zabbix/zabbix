@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,10 +26,10 @@
 #include "sysinfo.h"
 
 static ZBX_PERF_STAT_DATA	ppsd;
-static ZBX_MUTEX	perfstat_access = ZBX_MUTEX_NULL;
+static ZBX_MUTEX		perfstat_access = ZBX_MUTEX_NULL;
 
-#define LOCK_PERFCOUNTERS	if (ZBX_MUTEX_NULL != perfstat_access) zbx_mutex_lock(&perfstat_access)
-#define UNLOCK_PERFCOUNTERS	if (ZBX_MUTEX_NULL != perfstat_access) zbx_mutex_unlock(&perfstat_access)
+#define LOCK_PERFCOUNTERS	zbx_mutex_lock(&perfstat_access)
+#define UNLOCK_PERFCOUNTERS	zbx_mutex_unlock(&perfstat_access)
 
 /******************************************************************************
  *                                                                            *
@@ -262,7 +262,7 @@ int	init_perf_collector(int multithreaded)
 
 	if (0 != multithreaded)
 	{
-		if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&perfstat_access, ZBX_MUTEX_PERFSTAT))
+		if (FAIL == zbx_mutex_create_force(&perfstat_access, ZBX_MUTEX_PERFSTAT))
 		{
 			zbx_error("cannot create mutex for performance counters");
 			exit(EXIT_FAILURE);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,9 +43,9 @@ static zbx_mem_info_t	*trend_mem = NULL;
 #define	LOCK_CACHE_IDS		zbx_mutex_lock(&cache_ids_lock)
 #define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(&cache_ids_lock)
 
-static ZBX_MUTEX	cache_lock;
-static ZBX_MUTEX	trends_lock;
-static ZBX_MUTEX	cache_ids_lock;
+static ZBX_MUTEX	cache_lock = ZBX_MUTEX_NULL;
+static ZBX_MUTEX	trends_lock = ZBX_MUTEX_NULL;
+static ZBX_MUTEX	cache_ids_lock = ZBX_MUTEX_NULL;
 
 static char		*sql = NULL;
 static size_t		sql_alloc = 64 * ZBX_KIBIBYTE;
@@ -1309,56 +1309,37 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
-	const char		*__function_name = "DCmass_proxy_update_items";
+	const char	*__function_name = "DCmass_proxy_update_items";
 
-	size_t			sql_offset = 0;
-	zbx_vector_uint64_t	itemids;
-	int			i, j;
+	size_t		sql_offset = 0;
+	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_uint64_create(&itemids);
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (ITEM_VALUE_TYPE_LOG == history[i].value_type)
-			zbx_vector_uint64_append(&itemids, history[i].itemid);
-	}
+		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
+			continue;
 
-	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
+			continue;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update items"
+				" set lastlogsize=" ZBX_FS_UI64
+					",mtime=%d"
+				" where itemid=" ZBX_FS_UI64 ";\n",
+				history[i].lastlogsize, history[i].mtime, history[i].itemid);
 
-	for (i = 0; i < itemids.values_num; i++)
-	{
-		for (j = history_num - 1; j >= 0; j--)
-		{
-			if (history[j].itemid != itemids.values[i])
-				continue;
-
-			if (ITEM_VALUE_TYPE_LOG != history[j].value_type)
-				continue;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update items"
-					" set lastlogsize=" ZBX_FS_UI64
-						",mtime=%d"
-					" where itemid=" ZBX_FS_UI64 ";\n",
-					history[j].lastlogsize, history[j].mtime, history[j].itemid);
-
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-
-			break;
-		}
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
-
-	zbx_vector_uint64_destroy(&itemids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -2050,7 +2031,7 @@ int	DCsync_history(int sync_type)
 
 		LOCK_CACHE;
 
-		for (i = 0; i < history_num; i ++)
+		for (i = 0; i < history_num; i++)
 			uint64_array_remove(cache->itemids, &cache->itemids_num, &history[i].itemid, 1);
 
 		UNLOCK_CACHE;
@@ -2827,7 +2808,7 @@ static void	init_trend_cache()
 		exit(EXIT_FAILURE);
 	}
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&trends_lock, ZBX_MUTEX_TRENDS))
+	if (FAIL == zbx_mutex_create_force(&trends_lock, ZBX_MUTEX_TRENDS))
 	{
 		zbx_error("cannot create mutex for trend cache");
 		exit(EXIT_FAILURE);
@@ -2880,13 +2861,13 @@ void	init_database_cache()
 		exit(EXIT_FAILURE);
 	}
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_lock, ZBX_MUTEX_CACHE))
+	if (FAIL == zbx_mutex_create_force(&cache_lock, ZBX_MUTEX_CACHE))
 	{
 		zbx_error("cannot create mutex for history cache");
 		exit(EXIT_FAILURE);
 	}
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
+	if (FAIL == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
 	{
 		zbx_error("cannot create mutex for IDs cache");
 		exit(EXIT_FAILURE);

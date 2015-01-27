@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,10 +100,12 @@ if (isset($this->data['functions'][$this->data['selectedFunction']]['params'])) 
 					: new CTextBox('params['.$paramId.']', $paramValue, 10);
 			}
 
-			$expressionFormList->addRow($paramFunction['C'].' ', array($paramField, $paramTypeElement));
+			$expressionFormList->addRow($paramFunction['C'], array($paramField, $paramTypeElement));
 		}
 		else {
-			$expressionFormList->addRow($paramFunction['C'], new CTextBox('params['.$paramId.']', $paramValue, 30));
+			$expressionFormList->addRow($paramFunction['C'],
+				new CTextBox('params['.$paramId.']', $paramValue, $paramFunction['T'] == T_ZBX_DBL ? 10 : 30
+			));
 			$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
 		}
 	}

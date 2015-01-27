@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -362,6 +362,8 @@ table.tableinfo caption {
 	color: #FFFFFF; font-size: 11px; font-weight: bold; height: 22px; text-align: left; padding: 0 5px; line-height: 22px;
 }
 
+#selectedCount { display: inline-block; min-width: 105px; margin-right: 10px; font-weight: normal; }
+
 /* flicker */
 table.flicker { background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; border: 0; }
 table.flicker tr td.flicker_c { height: 16px; padding-left: 4px; padding-right: 4px; line-height: 12px; }
@@ -450,19 +452,27 @@ table.requirements input#port { width: 50px; }
 table.requirements select { width: 152px; }
 
 /* filter */
-table.filter { width: 100%; border-collapse: collapse; }
-table.filter tr td {
-	line-height: 20px; height: 26px; vertical-align: middle; border-left: 0 !important; padding: 0 2px 0 6px;
+.filter { width: 100%; border-collapse: collapse; }
+.filter tr td { line-height: 20px; height: 26px; border-left: 0 !important; padding: 0 2px 0 6px; }
+.filter tr td tr td { border-style: none none; }
+.filter .label { border-right: 0 !important; text-align: right; }
+.filter .controls { text-align: center; }
+.filter .controls .ui-button { margin: 1px 3px; }
+.filter .text { height: 16px; }
+.filter .button-form {
+	height: 20px; vertical-align: bottom; /* required to align buttons with input in IE8 */
 }
-table.filter tr td.label { border-right: 0 !important; text-align: right; }
-table.filter tr td.controls { text-align: center; }
-table.filter tr td.controls .ui-button { margin: 1px; }
-table.filter .text { height: 16px; }
-table.filter .button-form { height: 20px; vertical-align: bottom; /* required to align buttons with input in IE8 */ }
-table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; margin-bottom: 1px; }
-table.filter .host-inventories .select,
-table.filter .host-inventories .text { vertical-align: middle; }
-table.filter tr.item-list-row { height: 26px; }
+.filter .select {
+	-moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px;
+	vertical-align: top; margin-bottom: 1px;
+}
+.filter .host-inventories .select,
+.filter .host-inventories .text { vertical-align: middle; }
+.filter .item-list-row { height: 26px; }
+.filter .inputcol { min-width: 277px; width: 35%; }
+.filter .multiselect-wrapper { width: 280px; }
+.filter .multiselect { width: 216px; line-height: 12px; }
+
 table.filter-center tr td { text-align: center; }
 
 table.filter.sub-filter tr td { text-align: left; }

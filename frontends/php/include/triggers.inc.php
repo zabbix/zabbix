@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2099,6 +2099,7 @@ function get_item_function_info($expr) {
 		'min' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'nodata' =>		array('value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')),
 		'now' =>		array('value_type' => _('Numeric (integer 64bit)'), 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
+		'percentile' =>	array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'prev' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'regexp' =>		array('value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')),
 		'str' =>		array('value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')),
@@ -2189,7 +2190,7 @@ function get_item_function_info($expr) {
 }
 
 /**
- * Substitute macros in the expression with the given values and evaluate it's result.
+ * Substitute macros in the expression with the given values and evaluate its result.
  *
  * @param string $expression                a trigger expression
  * @param array  $replaceFunctionMacros     an array of macro - value pairs
@@ -2294,7 +2295,7 @@ function convert($value) {
 }
 
 /**
- * Quoting $param if it contain special characters.
+ * Quoting $param if it contains special characters.
  *
  * @param string $param
  *
@@ -2309,7 +2310,7 @@ function quoteFunctionParam($param) {
 }
 
 /**
- * Returns the text indicating the triggers status and state. If the $state parameter is not given, only the status of
+ * Returns the text indicating the trigger's status and state. If the $state parameter is not given, only the status of
  * the trigger will be taken into account.
  *
  * @param int $status
@@ -2329,7 +2330,7 @@ function triggerIndicator($status, $state = null) {
 }
 
 /**
- * Returns the CSS class for the triggers status and state indicator. If the $state parameter is not given, only the
+ * Returns the CSS class for the trigger's status and state indicator. If the $state parameter is not given, only the
  * status of the trigger will be taken into account.
  *
  * @param int $status
@@ -2349,7 +2350,7 @@ function triggerIndicatorStyle($status, $state = null) {
 }
 
 /**
- * Orders trigger by both status and state. Triggers are sorted in the following order: enabled, disabled, unknown.
+ * Orders triggers by both status and state. Triggers are sorted in the following order: enabled, disabled, unknown.
  *
  * Keep in sync with orderItemsByStatus().
  *

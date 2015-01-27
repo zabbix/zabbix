@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 #define LOCK_ITSERVICES		zbx_mutex_lock(&itservices_lock)
 #define UNLOCK_ITSERVICES	zbx_mutex_unlock(&itservices_lock)
 
-static ZBX_MUTEX	itservices_lock;
+static ZBX_MUTEX	itservices_lock = ZBX_MUTEX_NULL;
 
 /* status update queue items */
 typedef struct
@@ -809,7 +809,7 @@ out:
 
 void	zbx_create_itservices_lock()
 {
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&itservices_lock, ZBX_MUTEX_ITSERVICES))
+	if (FAIL == zbx_mutex_create_force(&itservices_lock, ZBX_MUTEX_ITSERVICES))
 	{
 		zbx_error("cannot create mutex for IT services");
 		exit(EXIT_FAILURE);

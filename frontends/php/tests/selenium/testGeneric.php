@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,20 +54,22 @@ class testGeneric extends CWebTest {
 			array('hostinventories.php',			'Host inventory'),
 
 			// reports
-			array('report1.php',					'Status of Zabbix'),
-			array('report2.php',					'Availability report'),
-			array('report5.php',					'Most busy triggers top 100'),
-			array('report5.php?period=day',			'Most busy triggers top 100'),
-			array('report5.php?period=week',		'Most busy triggers top 100'),
-			array('report5.php?period=month',		'Most busy triggers top 100'),
-			array('report5.php?period=year',		'Most busy triggers top 100'),
-			array('report6.php',					'Bar reports'),
+			array('report1.php',										'Status of Zabbix'),
+			array('report2.php',										'Availability report'),
+			array('toptriggers.php',									'Most busy triggers top 100'),
+			array('toptriggers.php?severities[0]=0&filter_set=Filter',	'Most busy triggers top 100'),
+			array('toptriggers.php?severities[1]=1&filter_set=Filter',	'Most busy triggers top 100'),
+			array('toptriggers.php?severities[2]=2&filter_set=Filter',	'Most busy triggers top 100'),
+			array('toptriggers.php?severities[3]=3&filter_set=Filter',	'Most busy triggers top 100'),
+			array('toptriggers.php?severities[4]=4&filter_set=Filter',	'Most busy triggers top 100'),
+			array('toptriggers.php?severities[5]=5&filter_set=Filter',	'Most busy triggers top 100'),
+			array('report6.php',										'Bar reports'),
 
 			// configuration
 			array('hostgroups.php',					'Configuration of host groups'),
 			array('templates.php',					'Configuration of templates'),
 			array('hosts.php',						'Configuration of hosts'),
-			array('maintenance.php',				'Configuration of maintenance'),
+			array('maintenance.php',				'Configuration of maintenance periods'),
 			array('httpconf.php',					'Configuration of web monitoring'),
 
 			array('actionconf.php',					'Configuration of actions'),
@@ -79,7 +81,7 @@ class testGeneric extends CWebTest {
 			array('screenconf.php',					'Configuration of screens'),
 			array('slideconf.php',					'Configuration of slide shows'),
 			array('sysmaps.php',					'Configuration of network maps'),
-			array('discoveryconf.php',				'Configuration of discovery'),
+			array('discoveryconf.php',				'Configuration of discovery rules'),
 			array('services.php',					'Configuration of IT services'),
 
 			// Administration
@@ -101,8 +103,8 @@ class testGeneric extends CWebTest {
 			array('users.php',						'Configuration of users'),
 			array('media_types.php',				'Configuration of media types'),
 			array('scripts.php',					'Configuration of scripts'),
-			array('auditlogs.php',					'Audit logs'),
-			array('auditacts.php',					'Audit actions'),
+			array('auditlogs.php',					'Audit log'),
+			array('auditacts.php',					'Action log'),
 
 			array('queue.php',						'Queue \[refreshed every 30 sec.\]'),
 			array('queue.php?config=0',				'Queue \[refreshed every 30 sec.\]'),
