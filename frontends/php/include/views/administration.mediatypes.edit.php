@@ -106,18 +106,15 @@ if (!empty($this->data['mediatypeid'])) {
 	$mediaTypeForm->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
-			new CButtonDelete(
-				_('Delete selected media type?'),
-				url_param('form').url_param('mediatypeid').url_param('config')
-			),
-			new CButtonCancel(url_param('config'))
+			new CButtonDelete(_('Delete selected media type?'), url_param('form').url_param('mediatypeid')),
+			new CButtonCancel()
 		)
 	));
 }
 else {
 	$mediaTypeForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('config')))
+		array(new CButtonCancel())
 	));
 }
 

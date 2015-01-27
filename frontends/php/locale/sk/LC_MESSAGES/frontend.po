@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:42+0200\n"
+"POT-Creation-Date: 2015-01-22 10:54+0200\n"
 "PO-Revision-Date: 2014-08-17 12:32+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -435,9 +435,9 @@ msgstr "Aktívny do"
 #: include/views/administration.general.iconmap.edit.php:119
 #: include/views/administration.general.iconmap.edit.php:154
 #: include/views/administration.general.image.edit.php:63
-#: include/views/administration.general.regularexpressions.edit.php:47
-#: include/views/administration.general.regularexpressions.edit.php:56
-#: include/views/administration.general.regularexpressions.edit.php:100
+#: include/views/administration.general.regularexpressions.edit.php:72
+#: include/views/administration.general.regularexpressions.edit.php:81
+#: include/views/administration.general.regularexpressions.edit.php:125
 #: include/views/administration.general.valuemapping.edit.php:41
 #: include/views/administration.general.valuemapping.edit.php:69
 #: include/views/administration.mediatypes.edit.php:119
@@ -1193,7 +1193,8 @@ msgstr "NASTAVENIE SIEŤOVÝCH MÁP"
 msgid "CONFIGURATION OF PROXIES"
 msgstr "NASTAVENIE PROXY"
 
-#: adm.regexps.php:221
+#: include/views/administration.general.regularexpressions.edit.php:47
+#: include/views/administration.general.regularexpressions.list.php:45
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
 msgstr "NASTAVENIE REGULÁRNYCH VÝRAZOV"
 
@@ -1313,7 +1314,7 @@ msgstr "Kanada (136 znakov)"
 
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:128 include/js.inc.php:171
-#: include/views/administration.general.regularexpressions.edit.php:58
+#: include/views/administration.general.regularexpressions.edit.php:83
 #: include/views/configuration.action.edit.php:1088
 #: include/views/configuration.action.edit.php:1097
 #: include/views/configuration.maintenance.edit.php:147
@@ -2691,8 +2692,8 @@ msgstr "Nie je možné skontrolovať zisťovaciu kontrolu: neplatná požiadavka
 msgid "Caption"
 msgstr "Titulok"
 
-#: include/views/administration.general.regularexpressions.edit.php:44
-#: include/views/administration.general.regularexpressions.edit.php:54
+#: include/views/administration.general.regularexpressions.edit.php:69
+#: include/views/administration.general.regularexpressions.edit.php:79
 msgid "Case sensitive"
 msgstr "Rozlišovať veľkosť písmen"
 
@@ -2867,15 +2868,15 @@ msgstr "Klasická"
 msgid "Clear"
 msgstr "Vyčistiť"
 
+#: include/views/configuration.httpconf.list.php:149
+#: include/views/configuration.item.list.php:273
+msgid "Clear history"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:272
 #: include/views/configuration.item.edit.php:456
 msgid "Clear history and trends"
 msgstr "Vyčistiť históriu a trendy"
-
-#: include/views/configuration.httpconf.list.php:149
-#: include/views/configuration.item.list.php:279
-msgid "Clear history for selected"
-msgstr "Vyčistiť históriu označených"
 
 #: include/views/configuration.host.massupdate.php:222
 msgid "Clear when unlinking"
@@ -2886,7 +2887,7 @@ msgid "Clock"
 msgstr "Hodiny"
 
 #: include/views/administration.general.iconmap.edit.php:146
-#: include/views/administration.general.regularexpressions.edit.php:89
+#: include/views/administration.general.regularexpressions.edit.php:114
 #: include/views/administration.proxy.edit.php:99
 #: include/views/administration.script.edit.php:120
 #: include/views/configuration.action.edit.php:1118
@@ -3287,6 +3288,9 @@ msgid "Coordinates"
 msgstr "Poloha"
 
 #: include/views/configuration.copy.elements.php:118
+#: include/views/configuration.graph.list.php:162
+#: include/views/configuration.item.list.php:276
+#: include/views/configuration.triggers.list.php:222
 msgid "Copy"
 msgstr "Kopírovať"
 
@@ -3297,12 +3301,6 @@ msgid_plural "Copy %1$s elements to..."
 msgstr[0] "Kopírovať %1$s prvok do ..."
 msgstr[1] "Kopírovať %1$s prvky do ..."
 msgstr[2] "Kopírovať %1$s prvkov do ..."
-
-#: include/views/configuration.graph.list.php:156
-#: include/views/configuration.item.list.php:276
-#: include/views/configuration.triggers.list.php:225
-msgid "Copy selected to ..."
-msgstr "Kopírovať vybrané do ..."
 
 #: include/classes/api/services/CUser.php:1076
 #, c-format
@@ -3925,8 +3923,31 @@ msgstr "Oneskorené o"
 
 #: include/classes/html/CButtonDelete.php:25
 #: include/views/administration.auditlogs.list.php:47
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:108
-#: jsLoader.php:186 tr_logform.php:291 tr_logform.php:317
+#: include/views/administration.general.regularexpressions.list.php:90
+#: include/views/administration.mediatypes.list.php:121
+#: include/views/administration.proxy.list.php:111
+#: include/views/administration.script.list.php:92
+#: include/views/administration.usergroups.list.php:143
+#: include/views/administration.users.list.php:155
+#: include/views/configuration.action.list.php:111
+#: include/views/configuration.application.list.php:118
+#: include/views/configuration.discovery.list.php:73
+#: include/views/configuration.graph.list.php:164
+#: include/views/configuration.host.discovery.list.php:154
+#: include/views/configuration.hostgroups.list.php:163
+#: include/views/configuration.host.list.php:221
+#: include/views/configuration.host.prototype.list.php:134
+#: include/views/configuration.httpconf.list.php:152
+#: include/views/configuration.item.list.php:278
+#: include/views/configuration.item.prototype.list.php:124
+#: include/views/configuration.maintenance.list.php:84
+#: include/views/configuration.screen.list.php:70
+#: include/views/configuration.slideconf.list.php:60
+#: include/views/configuration.sysmap.list.php:67
+#: include/views/configuration.trigger.prototype.list.php:148
+#: include/views/configuration.triggers.edit.php:162
+#: include/views/configuration.triggers.list.php:224 jsLoader.php:108
+#: jsLoader.php:186 templates.php:672 tr_logform.php:291 tr_logform.php:317
 msgid "Delete"
 msgstr "Zmazať"
 
@@ -3935,11 +3956,11 @@ msgstr "Zmazať"
 msgid "Delete all elements that are not present in the XML file?"
 msgstr "Zmazať všetky elementy, ktoré nie sú prítomné v XML súbore?"
 
-#: include/views/configuration.template.edit.php:494
+#: include/views/configuration.template.edit.php:494 templates.php:673
 msgid "Delete and clear"
 msgstr "Zmazať a vyčistiť"
 
-#: templates.php:679
+#: templates.php:674
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Zmazať a vyčistiť zvolené šablóny? (Pozor: všetky prepojené hosty budú tiež vyčistené!)"
 
@@ -3973,7 +3994,7 @@ msgstr "Zmazať prototyp grafu?"
 msgid "Delete graph?"
 msgstr "Zmazať graf?"
 
-#: include/views/configuration.item.list.php:280
+#: include/views/configuration.item.list.php:274
 msgid "Delete history of selected items?"
 msgstr "Zmazať históriu označených položiek?"
 
@@ -4017,7 +4038,7 @@ msgstr "Zmazať mapu siete?"
 msgid "Delete proxy?"
 msgstr "Zmazať proxy?"
 
-#: include/views/administration.general.regularexpressions.edit.php:91
+#: include/views/administration.general.regularexpressions.edit.php:116
 msgid "Delete regular expression?"
 msgstr "Zmazať regulárny výraz?"
 
@@ -4031,47 +4052,24 @@ msgstr "Zmazať skript?"
 
 #: include/reports.inc.php:111 include/reports.inc.php:201
 #: include/reports.inc.php:244
-#: include/views/administration.general.regularexpressions.list.php:66
-#: include/views/administration.mediatypes.list.php:124
-#: include/views/administration.proxy.list.php:110
-#: include/views/administration.script.list.php:89
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:119
 #: include/views/administration.usergroups.edit.php:127
-#: include/views/administration.usergroups.list.php:148
 #: include/views/administration.users.edit.php:73
 #: include/views/administration.users.edit.php:223
-#: include/views/administration.users.list.php:155
-#: include/views/configuration.action.list.php:114
-#: include/views/configuration.application.list.php:116
-#: include/views/configuration.discovery.list.php:76
-#: include/views/configuration.graph.list.php:159
-#: include/views/configuration.host.discovery.list.php:150
-#: include/views/configuration.hostgroups.list.php:164
-#: include/views/configuration.host.list.php:228
-#: include/views/configuration.host.prototype.list.php:128
-#: include/views/configuration.httpconf.list.php:153
-#: include/views/configuration.item.list.php:283
-#: include/views/configuration.item.prototype.list.php:120
-#: include/views/configuration.maintenance.list.php:81
-#: include/views/configuration.screen.list.php:70
-#: include/views/configuration.slideconf.list.php:57
-#: include/views/configuration.sysmap.list.php:64
-#: include/views/configuration.trigger.prototype.list.php:146
-#: include/views/configuration.triggers.list.php:228 templates.php:674
 msgid "Delete selected"
 msgstr "Zmazať označené"
 
-#: include/views/configuration.action.list.php:115
+#: include/views/configuration.action.list.php:111
 msgid "Delete selected actions?"
 msgstr "Zmazať označené akcie?"
 
-#: include/views/configuration.application.list.php:117
+#: include/views/configuration.application.list.php:118
 msgid "Delete selected applications?"
 msgstr "Zmazať označené aplikácie?"
 
-#: include/views/configuration.discovery.list.php:77
-#: include/views/configuration.host.discovery.list.php:151
+#: include/views/configuration.discovery.list.php:73
+#: include/views/configuration.host.discovery.list.php:155
 msgid "Delete selected discovery rules?"
 msgstr "Zmazať označené zisťovacie pravidlá?"
 
@@ -4079,11 +4077,11 @@ msgstr "Zmazať označené zisťovacie pravidlá?"
 msgid "Delete selected elements?"
 msgstr "Zmazať označené elementy?"
 
-#: include/views/configuration.graph.list.php:162
+#: include/views/configuration.graph.list.php:165
 msgid "Delete selected graph prototypes?"
 msgstr "Zmazať označené prototypy grafov?"
 
-#: include/views/configuration.graph.list.php:162
+#: include/views/configuration.graph.list.php:166
 msgid "Delete selected graphs?"
 msgstr "Zmazať označené grafy?"
 
@@ -4092,11 +4090,11 @@ msgstr "Zmazať označené grafy?"
 msgid "Delete selected group?"
 msgstr "Zmazať označenú skupinu?"
 
-#: include/views/administration.usergroups.list.php:149
+#: include/views/administration.usergroups.list.php:143
 msgid "Delete selected groups?"
 msgstr "Zmazať označené skupiny?"
 
-#: include/views/configuration.hostgroups.list.php:165
+#: include/views/configuration.hostgroups.list.php:163
 msgid "Delete selected host groups?"
 msgstr "Zmazať označené skupiny?"
 
@@ -4104,7 +4102,7 @@ msgstr "Zmazať označené skupiny?"
 msgid "Delete selected host prototype?"
 msgstr "Zmazať označený prototyp hosta?"
 
-#: include/views/configuration.host.prototype.list.php:129
+#: include/views/configuration.host.prototype.list.php:135
 msgid "Delete selected host prototypes?"
 msgstr "Zmazať označené prototypy hosta?"
 
@@ -4112,7 +4110,7 @@ msgstr "Zmazať označené prototypy hosta?"
 msgid "Delete selected host?"
 msgstr "Zmazať označeného hosta?"
 
-#: include/views/configuration.host.list.php:229
+#: include/views/configuration.host.list.php:221
 msgid "Delete selected hosts?"
 msgstr "Zmazať označené hosty?"
 
@@ -4120,19 +4118,19 @@ msgstr "Zmazať označené hosty?"
 msgid "Delete selected image?"
 msgstr "Zmazať označený obrázok?"
 
-#: include/views/configuration.item.prototype.list.php:121
+#: include/views/configuration.item.prototype.list.php:125
 msgid "Delete selected item prototypes?"
 msgstr "Zmazať označené prototypy položiek?"
 
-#: include/views/configuration.item.list.php:284
+#: include/views/configuration.item.list.php:278
 msgid "Delete selected items?"
 msgstr "Zmazať označené položky?"
 
-#: include/views/configuration.maintenance.list.php:82
+#: include/views/configuration.maintenance.list.php:84
 msgid "Delete selected maintenance periods?"
 msgstr "Zmazať označené plánované odstávky?"
 
-#: include/views/configuration.sysmap.list.php:65
+#: include/views/configuration.sysmap.list.php:67
 msgid "Delete selected maps?"
 msgstr "Zmazať označené mapy?"
 
@@ -4140,7 +4138,7 @@ msgstr "Zmazať označené mapy?"
 msgid "Delete selected media type?"
 msgstr "Zmazať označený typ média?"
 
-#: include/views/administration.mediatypes.list.php:125
+#: include/views/administration.mediatypes.list.php:121
 msgid "Delete selected media types?"
 msgstr "Zmazať označené typy médií?"
 
@@ -4148,31 +4146,31 @@ msgstr "Zmazať označené typy médií?"
 msgid "Delete selected proxies?"
 msgstr "Zmazať označené proxy?"
 
-#: include/views/administration.general.regularexpressions.list.php:67
+#: include/views/administration.general.regularexpressions.list.php:90
 msgid "Delete selected regular expressions?"
 msgstr "Zmazať označené regulárne výrazy?"
 
-#: include/views/configuration.screen.list.php:71
+#: include/views/configuration.screen.list.php:70
 msgid "Delete selected screens?"
 msgstr "Zmazať označené obrazovky?"
 
-#: include/views/administration.script.list.php:90
+#: include/views/administration.script.list.php:92
 msgid "Delete selected scripts?"
 msgstr "Zmazať označené skripty?"
 
-#: include/views/configuration.slideconf.list.php:58
+#: include/views/configuration.slideconf.list.php:60
 msgid "Delete selected slide shows?"
 msgstr "Zmazať označené prezentácie?"
 
-#: templates.php:675
+#: templates.php:672
 msgid "Delete selected templates?"
 msgstr "Zmazať označené šablóny?"
 
-#: include/views/configuration.trigger.prototype.list.php:147
+#: include/views/configuration.trigger.prototype.list.php:149
 msgid "Delete selected trigger prototypes?"
 msgstr "Zmazať označené prototypy spúšťačov?"
 
-#: include/views/configuration.triggers.list.php:229
+#: include/views/configuration.triggers.list.php:224
 msgid "Delete selected triggers?"
 msgstr "Zmazať označené spúšťače?"
 
@@ -4180,7 +4178,7 @@ msgstr "Zmazať označené spúšťače?"
 msgid "Delete selected user?"
 msgstr "Zmazať označeného používateľa?"
 
-#: include/views/administration.users.list.php:156
+#: include/views/administration.users.list.php:155
 msgid "Delete selected users?"
 msgstr "Zmazať označených používateľov?"
 
@@ -4196,13 +4194,9 @@ msgstr[0] "Zmazať označené mapovanie hodnôt? Je použité pre %d položku!"
 msgstr[1] "Zmazať označené mapovanie hodnôt? Je použité pre %d položky!"
 msgstr[2] "Zmazať označené mapovanie hodnôt? Je použité pre %d položiek!"
 
-#: include/views/configuration.httpconf.list.php:154
+#: include/views/configuration.httpconf.list.php:152
 msgid "Delete selected web scenarios?"
 msgstr "Zmazať označené scenáre?"
-
-#: templates.php:678
-msgid "Delete selected with linked elements"
-msgstr "Zmazať označené s pripojenými elementami"
 
 #: jsLoader.php:187
 #, c-format
@@ -4293,7 +4287,7 @@ msgstr "Zmazané: Prototyp spúšťača \"%1$s\" na \"%2$s\"."
 msgid "Deleted: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Zmazané: Web scenár \"%1$s\" na \"%2$s\"."
 
-#: include/views/administration.general.regularexpressions.edit.php:53
+#: include/views/administration.general.regularexpressions.edit.php:78
 msgid "Delimiter"
 msgstr "Oddeľovač"
 
@@ -4453,14 +4447,27 @@ msgid "Dimension (cols x rows)"
 msgstr "Rozmer (stĺpce x riadky)"
 
 #: include/views/administration.auditlogs.list.php:49
+#: include/views/administration.mediatypes.list.php:120
+#: include/views/administration.usergroups.list.php:136
+#: include/views/configuration.action.list.php:110
+#: include/views/configuration.application.list.php:115
+#: include/views/configuration.discovery.list.php:72
+#: include/views/configuration.host.discovery.list.php:151
+#: include/views/configuration.host.list.php:218
+#: include/views/configuration.host.prototype.list.php:131
+#: include/views/configuration.httpconf.list.php:148
+#: include/views/configuration.item.list.php:272
+#: include/views/configuration.item.prototype.list.php:121
+#: include/views/configuration.trigger.prototype.list.php:144
+#: include/views/configuration.triggers.list.php:221
 msgid "Disable"
 msgstr "Zakázať"
 
-#: include/views/administration.usergroups.list.php:144
+#: include/views/administration.usergroups.list.php:140
 msgid "Disable debug mode"
 msgstr "Zakázať ladiaci režim"
 
-#: include/views/administration.usergroups.list.php:145
+#: include/views/administration.usergroups.list.php:141
 msgid "Disable debug mode in selected groups?"
 msgstr "Zakázať ladiaci režim pre označené skupiny?"
 
@@ -4472,78 +4479,65 @@ msgstr "Zakázať host"
 msgid "Disable host?"
 msgstr "Zakázať host?"
 
+#: include/views/administration.proxy.list.php:108
+#: include/views/configuration.hostgroups.list.php:160
+msgid "Disable hosts"
+msgstr ""
+
 #: include/views/configuration.hostgroups.list.php:161
 msgid "Disable hosts in the selected host groups?"
 msgstr "Zakázať hostov v označených skupinách?"
 
-#: include/views/administration.proxy.list.php:107
+#: include/views/administration.proxy.list.php:109
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Zakázať hostov monitorovaných cez označené proxy?"
 
-#: include/views/administration.mediatypes.list.php:120
-#: include/views/administration.proxy.list.php:106
-#: include/views/administration.usergroups.list.php:136
 #: include/views/configuration.action.list.php:110
-#: include/views/configuration.application.list.php:112
-#: include/views/configuration.discovery.list.php:72
-#: include/views/configuration.host.discovery.list.php:146
-#: include/views/configuration.hostgroups.list.php:160
-#: include/views/configuration.host.list.php:224
-#: include/views/configuration.host.prototype.list.php:124
-#: include/views/configuration.httpconf.list.php:145
-#: include/views/configuration.item.list.php:269
-#: include/views/configuration.item.prototype.list.php:116
-#: include/views/configuration.trigger.prototype.list.php:139
-#: include/views/configuration.triggers.list.php:218
-msgid "Disable selected"
-msgstr "Zakázať označené"
-
-#: include/views/configuration.action.list.php:111
 msgid "Disable selected actions?"
 msgstr "Zakázať označené akcie?"
 
-#: include/views/configuration.application.list.php:113
+#: include/views/configuration.application.list.php:116
 msgid "Disable selected applications?"
 msgstr "Zakázať označené aplikácie?"
 
-#: include/views/configuration.discovery.list.php:73
-#: include/views/configuration.host.discovery.list.php:147
+#: include/views/configuration.discovery.list.php:72
+#: include/views/configuration.host.discovery.list.php:152
 msgid "Disable selected discovery rules?"
 msgstr "Zakázať označené zisťovacie pravidlá?"
 
-#: include/views/administration.usergroups.list.php:137
+#: include/views/administration.usergroups.list.php:136
 msgid "Disable selected groups?"
 msgstr "Zakázať označené skupiny?"
 
-#: include/views/configuration.host.prototype.list.php:125
+#: include/views/configuration.host.prototype.list.php:132
 msgid "Disable selected host prototypes?"
 msgstr "Zakázať označené prototypy hosta?"
 
-#: include/views/configuration.host.list.php:225
+#: include/views/configuration.host.list.php:218
 msgid "Disable selected hosts?"
 msgstr "Zakázať označené hosty?"
 
-#: include/views/configuration.item.prototype.list.php:117
+#: include/views/configuration.item.prototype.list.php:122
 msgid "Disable selected item prototypes?"
 msgstr "Zakázať označené prototypy položiek?"
 
-#: include/views/configuration.item.list.php:270
+#: include/views/configuration.item.list.php:272
 msgid "Disable selected items?"
 msgstr "Zakázať označené položky?"
 
-#: include/views/administration.mediatypes.list.php:121
+#: include/views/administration.mediatypes.list.php:120
 msgid "Disable selected media types?"
 msgstr "Zakázať označené média typy?"
 
-#: include/views/configuration.trigger.prototype.list.php:140
+#: include/views/configuration.trigger.prototype.list.php:145
 msgid "Disable selected trigger prototypes?"
 msgstr "Zakázať označené prototypy spúšťačov?"
 
-#: include/views/configuration.triggers.list.php:219
+#: include/views/configuration.triggers.list.php:221
 msgid "Disable selected triggers?"
 msgstr "Zakázať označené spúšťače?"
 
-#: include/views/configuration.httpconf.list.php:146
+#: include/views/configuration.httpconf.list.php:148
 msgid "Disable selected web scenarios?"
 msgstr "Zakázať označené scenáre?"
 
@@ -4705,11 +4699,11 @@ msgstr "Stav zisťovania"
 msgid "Display OK triggers for"
 msgstr "Zobrazovať spúšťače v stave OK po dobu"
 
-#: latest.php:889
+#: latest.php:891
 msgid "Display graph"
 msgstr ""
 
-#: latest.php:888
+#: latest.php:890
 msgid "Display stacked graph"
 msgstr ""
 
@@ -5064,6 +5058,19 @@ msgid "Empty web scenario ID."
 msgstr "Prázdne ID web scenára."
 
 #: include/views/administration.auditlogs.list.php:48
+#: include/views/administration.mediatypes.list.php:119
+#: include/views/administration.usergroups.list.php:135
+#: include/views/configuration.action.list.php:109
+#: include/views/configuration.application.list.php:114
+#: include/views/configuration.discovery.list.php:71
+#: include/views/configuration.host.discovery.list.php:148
+#: include/views/configuration.host.list.php:217
+#: include/views/configuration.host.prototype.list.php:128
+#: include/views/configuration.httpconf.list.php:147
+#: include/views/configuration.item.list.php:271
+#: include/views/configuration.item.prototype.list.php:118
+#: include/views/configuration.trigger.prototype.list.php:141
+#: include/views/configuration.triggers.list.php:220
 msgid "Enable"
 msgstr "Povoliť"
 
@@ -5071,11 +5078,11 @@ msgstr "Povoliť"
 msgid "Enable confirmation"
 msgstr "Povoliť potvrdenia"
 
-#: include/views/administration.usergroups.list.php:140
+#: include/views/administration.usergroups.list.php:137
 msgid "Enable debug mode"
 msgstr "Povoliť ladiaci režim"
 
-#: include/views/administration.usergroups.list.php:141
+#: include/views/administration.usergroups.list.php:138
 msgid "Enable debug mode in selected groups?"
 msgstr "Povoliť ladiaci režim pre označené skupiny?"
 
@@ -5091,7 +5098,12 @@ msgstr "Povoliť hosta"
 msgid "Enable host?"
 msgstr "Povoliť hosta?"
 
-#: include/views/administration.proxy.list.php:103
+#: include/views/administration.proxy.list.php:105
+#: include/views/configuration.hostgroups.list.php:159
+msgid "Enable hosts"
+msgstr ""
+
+#: include/views/administration.proxy.list.php:106
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "Povoliť hostov monitorovaných cez označené proxy?"
 
@@ -5106,71 +5118,53 @@ msgstr "Povoliť hostov monitorovaných cez označené proxy?"
 msgid "Enable internal housekeeping"
 msgstr "Povoliť internú údržbu"
 
-#: include/views/administration.mediatypes.list.php:116
-#: include/views/administration.proxy.list.php:102
-#: include/views/administration.usergroups.list.php:132
-#: include/views/configuration.action.list.php:106
-#: include/views/configuration.application.list.php:108
-#: include/views/configuration.discovery.list.php:68
-#: include/views/configuration.host.discovery.list.php:142
-#: include/views/configuration.hostgroups.list.php:156
-#: include/views/configuration.host.list.php:220
-#: include/views/configuration.host.prototype.list.php:120
-#: include/views/configuration.httpconf.list.php:141
-#: include/views/configuration.item.list.php:265
-#: include/views/configuration.item.prototype.list.php:112
-#: include/views/configuration.trigger.prototype.list.php:135
-#: include/views/configuration.triggers.list.php:214
-msgid "Enable selected"
-msgstr "Povoliť označené"
-
-#: include/views/configuration.action.list.php:107
+#: include/views/configuration.action.list.php:109
 msgid "Enable selected actions?"
 msgstr "Povoliť označené akcie?"
 
-#: include/views/configuration.application.list.php:109
+#: include/views/configuration.application.list.php:114
 msgid "Enable selected applications?"
 msgstr "Povoliť označené aplikácie?"
 
-#: include/views/configuration.discovery.list.php:69
-#: include/views/configuration.host.discovery.list.php:143
+#: include/views/configuration.discovery.list.php:71
+#: include/views/configuration.host.discovery.list.php:149
 msgid "Enable selected discovery rules?"
 msgstr "Povoliť označené zisťovacie pravidlá?"
 
-#: include/views/administration.usergroups.list.php:133
+#: include/views/administration.usergroups.list.php:135
 msgid "Enable selected groups?"
 msgstr "Povoliť označené skupiny?"
 
-#: include/views/configuration.host.prototype.list.php:121
+#: include/views/configuration.host.prototype.list.php:129
 msgid "Enable selected host prototypes?"
 msgstr "Povoliť označené prototypy hostov?"
 
-#: include/views/configuration.hostgroups.list.php:157
-#: include/views/configuration.host.list.php:221
+#: include/views/configuration.hostgroups.list.php:159
+#: include/views/configuration.host.list.php:217
 msgid "Enable selected hosts?"
 msgstr "Povoliť označených hostov?"
 
-#: include/views/configuration.item.prototype.list.php:113
+#: include/views/configuration.item.prototype.list.php:119
 msgid "Enable selected item prototypes?"
 msgstr "Povoliť označené prototypy položiek?"
 
-#: include/views/configuration.item.list.php:266
+#: include/views/configuration.item.list.php:271
 msgid "Enable selected items?"
 msgstr "Povoliť označené položky?"
 
-#: include/views/administration.mediatypes.list.php:117
+#: include/views/administration.mediatypes.list.php:119
 msgid "Enable selected media types?"
 msgstr "Povoliť označené typy médií?"
 
-#: include/views/configuration.trigger.prototype.list.php:136
+#: include/views/configuration.trigger.prototype.list.php:142
 msgid "Enable selected trigger prototypes?"
 msgstr "Povoliť označené prototypy spúšťačov?"
 
-#: include/views/configuration.triggers.list.php:215
+#: include/views/configuration.triggers.list.php:220
 msgid "Enable selected triggers?"
 msgstr "Povoliť označené spúšťače?"
 
-#: include/views/configuration.httpconf.list.php:142
+#: include/views/configuration.httpconf.list.php:147
 msgid "Enable selected web scenarios?"
 msgstr "Povoliť označené scenáre?"
 
@@ -5360,11 +5354,11 @@ msgstr "Uplynutý"
 msgid "Exploded"
 msgstr "Koláčový"
 
-#: include/views/configuration.host.list.php:217
+#: include/views/configuration.host.list.php:219
 #: include/views/configuration.screen.list.php:68
-#: include/views/configuration.sysmap.list.php:62 templates.php:672
-msgid "Export selected"
-msgstr "Export označených"
+#: include/views/configuration.sysmap.list.php:66 templates.php:671
+msgid "Export"
+msgstr ""
 
 #: events.php:298
 msgid "Export to CSV"
@@ -5372,9 +5366,9 @@ msgstr "Export do CSV súboru"
 
 #: include/triggers.inc.php:1497
 #: include/views/administration.general.iconmap.edit.php:41
-#: include/views/administration.general.regularexpressions.edit.php:42
-#: include/views/administration.general.regularexpressions.edit.php:51
-#: include/views/administration.general.regularexpressions.edit.php:73
+#: include/views/administration.general.regularexpressions.edit.php:67
+#: include/views/administration.general.regularexpressions.edit.php:76
+#: include/views/administration.general.regularexpressions.edit.php:98
 #: include/views/configuration.item.list.php:150
 #: include/views/configuration.trigger.prototype.list.php:62
 #: include/views/configuration.triggers.edit.php:142
@@ -5403,15 +5397,15 @@ msgstr "Výraz nemôže byť prázdny"
 msgid "Expression constructor"
 msgstr "Konštruktér výrazu"
 
-#: include/views/administration.general.regularexpressions.edit.php:43
-#: include/views/administration.general.regularexpressions.edit.php:52
-#: include/views/administration.general.regularexpressions.edit.php:73
+#: include/views/administration.general.regularexpressions.edit.php:68
+#: include/views/administration.general.regularexpressions.edit.php:77
+#: include/views/administration.general.regularexpressions.edit.php:98
 msgid "Expression type"
 msgstr "Typ výrazu"
 
-#: include/views/administration.general.regularexpressions.edit.php:48
-#: include/views/administration.general.regularexpressions.edit.php:80
-#: include/views/administration.general.regularexpressions.list.php:32
+#: include/views/administration.general.regularexpressions.edit.php:73
+#: include/views/administration.general.regularexpressions.edit.php:105
+#: include/views/administration.general.regularexpressions.list.php:56
 msgid "Expressions"
 msgstr "Výrazy"
 
@@ -5729,10 +5723,12 @@ msgid "GSM modem"
 msgstr "GSM modem"
 
 #: adm.gui.php:90 adm.housekeeper.php:125 adm.iconmapping.php:110
-#: adm.images.php:135 adm.macros.php:158 adm.other.php:70 adm.regexps.php:201
+#: adm.images.php:135 adm.macros.php:158 adm.other.php:70
 #: adm.triggerdisplayoptions.php:85 adm.triggerseverities.php:81
 #: adm.valuemapping.php:128 adm.workingtime.php:56
 #: include/views/administration.general.gui.edit.php:59
+#: include/views/administration.general.regularexpressions.edit.php:30
+#: include/views/administration.general.regularexpressions.list.php:27
 msgid "GUI"
 msgstr "GUI"
 
@@ -5793,33 +5789,6 @@ msgstr "Globálny skript"
 #: popup.php:115
 msgid "Global scripts"
 msgstr "Globálne skripty"
-
-#: include/views/administration.general.regularexpressions.list.php:70
-#: include/views/administration.mediatypes.list.php:128
-#: include/views/administration.proxy.list.php:114
-#: include/views/administration.script.list.php:93
-#: include/views/administration.usergroups.list.php:152
-#: include/views/administration.users.list.php:159
-#: include/views/configuration.action.list.php:118
-#: include/views/configuration.application.list.php:120
-#: include/views/configuration.discovery.list.php:80
-#: include/views/configuration.graph.list.php:166
-#: include/views/configuration.host.discovery.list.php:154
-#: include/views/configuration.hostgroups.list.php:168
-#: include/views/configuration.host.list.php:232
-#: include/views/configuration.host.prototype.list.php:132
-#: include/views/configuration.httpconf.list.php:157
-#: include/views/configuration.item.list.php:287
-#: include/views/configuration.item.prototype.list.php:124
-#: include/views/configuration.maintenance.list.php:85
-#: include/views/configuration.screen.list.php:74
-#: include/views/configuration.slideconf.list.php:61
-#: include/views/configuration.sysmap.list.php:68
-#: include/views/configuration.trigger.prototype.list.php:150
-#: include/views/configuration.triggers.list.php:232 latest.php:892
-#: templates.php:682 tr_status.php:820
-msgid "Go"
-msgstr "Vykonať"
 
 #: jsLoader.php:201
 msgid "Go to"
@@ -6722,10 +6691,12 @@ msgid "Hours"
 msgstr "hodín"
 
 #: adm.gui.php:91 adm.housekeeper.php:126 adm.iconmapping.php:111
-#: adm.images.php:136 adm.macros.php:159 adm.other.php:71 adm.regexps.php:202
+#: adm.images.php:136 adm.macros.php:159 adm.other.php:71
 #: adm.triggerdisplayoptions.php:86 adm.triggerseverities.php:82
 #: adm.valuemapping.php:129 adm.workingtime.php:57
 #: include/views/administration.general.housekeeper.edit.php:151
+#: include/views/administration.general.regularexpressions.edit.php:31
+#: include/views/administration.general.regularexpressions.list.php:28
 msgid "Housekeeping"
 msgstr "Údržba"
 
@@ -6985,9 +6956,11 @@ msgstr "Mapová ikona s iconmapid \"%s\" neexistuje."
 
 #: adm.gui.php:93 adm.housekeeper.php:128 adm.iconmapping.php:113
 #: adm.iconmapping.php:176 adm.images.php:138 adm.macros.php:161
-#: adm.other.php:73 adm.regexps.php:204 adm.triggerdisplayoptions.php:88
+#: adm.other.php:73 adm.triggerdisplayoptions.php:88
 #: adm.triggerseverities.php:84 adm.valuemapping.php:131
 #: adm.workingtime.php:59
+#: include/views/administration.general.regularexpressions.edit.php:33
+#: include/views/administration.general.regularexpressions.list.php:30
 msgid "Icon mapping"
 msgstr "Mapovanie ikon"
 
@@ -7056,10 +7029,12 @@ msgid "Image updated"
 msgstr "Obrázok aktualizovaný"
 
 #: adm.gui.php:92 adm.housekeeper.php:127 adm.iconmapping.php:112
-#: adm.images.php:137 adm.macros.php:160 adm.other.php:72 adm.regexps.php:203
+#: adm.images.php:137 adm.macros.php:160 adm.other.php:72
 #: adm.triggerdisplayoptions.php:87 adm.triggerseverities.php:83
 #: adm.valuemapping.php:130 adm.workingtime.php:58
 #: include/views/administration.general.image.list.php:29
+#: include/views/administration.general.regularexpressions.edit.php:32
+#: include/views/administration.general.regularexpressions.list.php:29
 #: include/views/conf.import.php:39
 msgid "Images"
 msgstr "Obrázky"
@@ -9043,10 +9018,12 @@ msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "Makro s hostmacroid \"%1$s\" neexistuje."
 
 #: adm.gui.php:95 adm.housekeeper.php:130 adm.iconmapping.php:115
-#: adm.images.php:140 adm.macros.php:163 adm.other.php:75 adm.regexps.php:206
+#: adm.images.php:140 adm.macros.php:163 adm.other.php:75
 #: adm.triggerdisplayoptions.php:90 adm.triggerseverities.php:86
 #: adm.valuemapping.php:133 adm.workingtime.php:61
 #: include/views/administration.general.macros.edit.php:31
+#: include/views/administration.general.regularexpressions.edit.php:35
+#: include/views/administration.general.regularexpressions.list.php:32
 #: include/views/configuration.host.edit.php:823
 #: include/views/configuration.host.prototype.edit.php:285
 #: include/views/configuration.template.edit.php:480
@@ -9227,11 +9204,11 @@ msgstr "Označiť vybrané"
 msgid "Mask"
 msgstr "Maska"
 
-#: include/views/configuration.host.list.php:219
-#: include/views/configuration.item.list.php:273
+#: include/views/configuration.host.list.php:220
+#: include/views/configuration.item.list.php:277
 #: include/views/configuration.item.massupdate.php:566
-#: include/views/configuration.trigger.prototype.list.php:143
-#: include/views/configuration.triggers.list.php:222
+#: include/views/configuration.trigger.prototype.list.php:147
+#: include/views/configuration.triggers.list.php:223
 #: include/views/configuration.triggers.massupdate.php:159
 msgid "Mass update"
 msgstr "Hromadná aktualizácia"
@@ -9665,8 +9642,8 @@ msgstr "NTLM"
 #: include/views/administration.general.iconmap.edit.php:29
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.image.edit.php:34
-#: include/views/administration.general.regularexpressions.edit.php:37
-#: include/views/administration.general.regularexpressions.list.php:31
+#: include/views/administration.general.regularexpressions.edit.php:62
+#: include/views/administration.general.regularexpressions.list.php:55
 #: include/views/administration.general.valuemapping.edit.php:35
 #: include/views/administration.general.valuemapping.list.php:24
 #: include/views/administration.mediatypes.edit.php:35
@@ -9835,7 +9812,7 @@ msgstr "Nová položka grafu"
 msgid "New media"
 msgstr "Nové médium"
 
-#: adm.regexps.php:217
+#: include/views/administration.general.regularexpressions.list.php:43
 msgid "New regular expression"
 msgstr "Nový regulárny výraz"
 
@@ -10489,7 +10466,7 @@ msgstr "Žiadny špecifikovaný súbor s verejným kľúčom."
 msgid "No recipients for action operation message."
 msgstr "Žiadny príjemcovia pre operáciu odoslania správy."
 
-#: include/views/administration.general.regularexpressions.list.php:28
+#: include/views/administration.general.regularexpressions.list.php:52
 msgid "No regular expressions found."
 msgstr "Nenájdené žiadne regulárne výrazy."
 
@@ -11167,11 +11144,13 @@ msgid "Original blue"
 msgstr "Pôvodná modrá"
 
 #: adm.gui.php:100 adm.housekeeper.php:135 adm.iconmapping.php:120
-#: adm.images.php:145 adm.macros.php:168 adm.other.php:80 adm.regexps.php:211
+#: adm.images.php:145 adm.macros.php:168 adm.other.php:80
 #: adm.triggerdisplayoptions.php:95 adm.triggerseverities.php:91
 #: adm.valuemapping.php:138 adm.workingtime.php:66
 #: include/classes/html/CTweenBox.php:76
 #: include/classes/html/CTweenBox.php:103
+#: include/views/administration.general.regularexpressions.edit.php:40
+#: include/views/administration.general.regularexpressions.list.php:37
 msgid "Other"
 msgstr "Ostatné"
 
@@ -12017,10 +11996,12 @@ msgid "Regular expression updated"
 msgstr "Regulárny výraz aktualizovaný"
 
 #: adm.gui.php:94 adm.housekeeper.php:129 adm.iconmapping.php:114
-#: adm.images.php:139 adm.macros.php:162 adm.other.php:74 adm.regexps.php:205
+#: adm.images.php:139 adm.macros.php:162 adm.other.php:74
 #: adm.triggerdisplayoptions.php:89 adm.triggerseverities.php:85
 #: adm.valuemapping.php:132 adm.workingtime.php:60
-#: include/views/administration.general.regularexpressions.list.php:22
+#: include/views/administration.general.regularexpressions.edit.php:34
+#: include/views/administration.general.regularexpressions.list.php:31
+#: include/views/administration.general.regularexpressions.list.php:49
 msgid "Regular expressions"
 msgstr "Regulárne výrazy"
 
@@ -12250,8 +12231,8 @@ msgstr "Návratový kód"
 msgid "Response time"
 msgstr "Čas odozvy"
 
-#: include/views/administration.general.regularexpressions.edit.php:73
-#: include/views/administration.general.regularexpressions.edit.php:74
+#: include/views/administration.general.regularexpressions.edit.php:98
+#: include/views/administration.general.regularexpressions.edit.php:99
 #: tr_testexpr.php:137 tr_testexpr.php:181
 msgid "Result"
 msgstr "Výsledok"
@@ -13835,7 +13816,7 @@ msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Šablóny \"%1$s\" odpojené od hostov \"%2$s\"."
 
 #: include/views/administration.authentication.edit.php:138
-#: include/views/administration.general.regularexpressions.edit.php:81
+#: include/views/administration.general.regularexpressions.edit.php:106
 #: include/views/configuration.triggers.edit.php:221 tr_testexpr.php:25
 #: tr_testexpr.php:128 tr_testexpr.php:184
 msgid "Test"
@@ -13853,12 +13834,12 @@ msgstr "Test potvrdenia"
 msgid "Test data"
 msgstr "Testovacie údaje"
 
-#: include/views/administration.general.regularexpressions.edit.php:69
+#: include/views/administration.general.regularexpressions.edit.php:94
 msgid "Test expressions"
 msgstr "Testovacie výrazy"
 
 #: adm.regexps.php:38
-#: include/views/administration.general.regularexpressions.edit.php:66
+#: include/views/administration.general.regularexpressions.edit.php:91
 msgid "Test string"
 msgstr "Testovací reťazec"
 
@@ -14227,9 +14208,11 @@ msgstr[1] "Spúštače vypnuté"
 msgstr[2] "Spúštače vypnuté"
 
 #: adm.gui.php:99 adm.housekeeper.php:134 adm.iconmapping.php:119
-#: adm.images.php:144 adm.macros.php:167 adm.other.php:79 adm.regexps.php:210
+#: adm.images.php:144 adm.macros.php:167 adm.other.php:79
 #: adm.triggerdisplayoptions.php:94 adm.triggerseverities.php:90
 #: adm.valuemapping.php:137 adm.workingtime.php:65
+#: include/views/administration.general.regularexpressions.edit.php:39
+#: include/views/administration.general.regularexpressions.list.php:36
 #: include/views/administration.general.triggerDisplayOptions.edit.php:94
 msgid "Trigger displaying options"
 msgstr "Zobrazovacie možnosti spúšťačov"
@@ -14353,9 +14336,11 @@ msgid "Trigger prototypes updated"
 msgstr "Prototypy spúšťačov aktualizované"
 
 #: adm.gui.php:98 adm.housekeeper.php:133 adm.iconmapping.php:118
-#: adm.images.php:143 adm.macros.php:166 adm.other.php:78 adm.regexps.php:209
+#: adm.images.php:143 adm.macros.php:166 adm.other.php:78
 #: adm.triggerdisplayoptions.php:93 adm.triggerseverities.php:89
 #: adm.valuemapping.php:136 adm.workingtime.php:64
+#: include/views/administration.general.regularexpressions.edit.php:38
+#: include/views/administration.general.regularexpressions.list.php:35
 #: include/views/administration.general.triggerSeverity.edit.php:70
 msgid "Trigger severities"
 msgstr "Závažnosti spúšťačov"
@@ -14637,11 +14622,11 @@ msgstr "Len nepotvrdené"
 msgid "Unavailable for users with %1$s."
 msgstr "Nedostupné pre používateľov s %1$s."
 
-#: include/views/administration.users.list.php:151
-msgid "Unblock selected"
-msgstr "Odblokovať označené"
+#: include/views/administration.users.list.php:154
+msgid "Unblock"
+msgstr ""
 
-#: include/views/administration.users.list.php:152
+#: include/views/administration.users.list.php:154
 msgid "Unblock selected users?"
 msgstr "Odblokovať označených používateľov?"
 
@@ -14850,7 +14835,7 @@ msgstr "Dostupný"
 #: include/views/administration.general.image.edit.php:54
 #: include/views/administration.general.macros.edit.php:33
 #: include/views/administration.general.other.edit.php:50
-#: include/views/administration.general.regularexpressions.edit.php:87
+#: include/views/administration.general.regularexpressions.edit.php:112
 #: include/views/administration.general.triggerDisplayOptions.edit.php:100
 #: include/views/administration.general.triggerSeverity.edit.php:76
 #: include/views/administration.general.valuemapping.edit.php:60
@@ -15491,9 +15476,11 @@ msgid "Value map with valuemapid \"%1$s\" does not exist."
 msgstr "Mapa hodnôt s valuemapid \"%1$s\" neexistuje."
 
 #: adm.gui.php:96 adm.housekeeper.php:131 adm.iconmapping.php:116
-#: adm.images.php:141 adm.macros.php:164 adm.other.php:76 adm.regexps.php:207
+#: adm.images.php:141 adm.macros.php:164 adm.other.php:76
 #: adm.triggerdisplayoptions.php:91 adm.triggerseverities.php:87
 #: adm.valuemapping.php:134 adm.valuemapping.php:200 adm.workingtime.php:62
+#: include/views/administration.general.regularexpressions.edit.php:36
+#: include/views/administration.general.regularexpressions.list.php:33
 #: include/views/administration.general.valuemapping.edit.php:54
 msgid "Value mapping"
 msgstr "Mapovanie hodnôt"
@@ -15752,9 +15739,11 @@ msgid "Wizard"
 msgstr "Pomocník"
 
 #: adm.gui.php:97 adm.housekeeper.php:132 adm.iconmapping.php:117
-#: adm.images.php:142 adm.macros.php:165 adm.other.php:77 adm.regexps.php:208
+#: adm.images.php:142 adm.macros.php:165 adm.other.php:77
 #: adm.triggerdisplayoptions.php:92 adm.triggerseverities.php:88
 #: adm.valuemapping.php:135 adm.workingtime.php:31 adm.workingtime.php:63
+#: include/views/administration.general.regularexpressions.edit.php:37
+#: include/views/administration.general.regularexpressions.list.php:34
 #: include/views/administration.general.workingtime.edit.php:25
 #: include/views/administration.general.workingtime.edit.php:28
 msgid "Working time"
@@ -16558,6 +16547,10 @@ msgstr "sek"
 #: include/views/administration.general.triggerDisplayOptions.edit.php:91
 msgid "seconds"
 msgstr "sekúnd"
+
+#: include/classes/html/CActionButtonList.php:90
+msgid "selected"
+msgstr ""
 
 #: include/actions.inc.php:1152
 msgid "sent"
