@@ -1,10 +1,13 @@
 Changes for 2.4.4rc1
 
 New features:
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, Korean and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, Korean, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+..F....... [ZBX-9013] fixed action operation incorrect sorting in edit form which sometimes caused duplicate and missing operations (Ivo, Sasha)
+........S. [ZBX-8993] added check for a valid reference of a global regular expression in lld rules (igors)
+...G...... [ZBX-9218] fixed agent crash if error message is not set in loadable module (igors)
 .......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
 A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
 ..F....... [ZBX-9168] fixed incorrect keys and unified key parameters in the item key helper (Richlv)
@@ -537,9 +540,11 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.9rc1
 
 New features:
-A.F....... [ZBX-1357] updated Slovak translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9013] fixed action operation incorrect sorting in edit form which sometimes caused duplicate and missing operations (Ivo, Sasha)
+........S. [ZBX-8993] added check for a valid reference of a global regular expression in lld rules (igors)
 .......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
 A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
 ..F....... [ZBX-9168] fixed incorrect keys and unified key parameters in the item key helper (Richlv)
@@ -1728,8 +1733,10 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.15rc1
 
 New features:
+A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-8993] added check for a valid reference of a global regular expression in lld rules (igors)
 .......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
 A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
 ....I..... [ZBX-9168] fixed incorrect keys and added missing keys in the item key helper (Richlv)
