@@ -65,6 +65,21 @@ static void	lld_condition_free(lld_condition_t *condition)
 
 /******************************************************************************
  *                                                                            *
+ * Function: lld_conditions_free                                              *
+ *                                                                            *
+ * Purpose: release resources allocated by filter conditions                  *
+ *                                                                            *
+ * Parameters: conditions - [IN] the filter conditions                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_conditions_free(zbx_vector_ptr_t *conditions)
+{
+	zbx_vector_ptr_clear_ext(conditions, (zbx_clean_func_t)lld_condition_free);
+	zbx_vector_ptr_destroy(conditions);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_condition_compare_by_macro                                   *
  *                                                                            *
  * Purpose: compare two filter conditions by their macros                     *
@@ -109,8 +124,7 @@ static void	lld_filter_init(lld_filter_t *filter)
 static void	lld_filter_clean(lld_filter_t *filter)
 {
 	zbx_free(filter->expression);
-	zbx_vector_ptr_clear_ext(&filter->conditions, (zbx_clean_func_t)lld_condition_free);
-	zbx_vector_ptr_destroy(&filter->conditions);
+	lld_conditions_free(&filter->conditions);
 }
 
 /******************************************************************************
@@ -130,7 +144,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 	DB_ROW		row;
 	lld_condition_t	*condition;
 	DC_ITEM		item;
-	int		errcode, ret = FAIL;
+	int		errcode, ret = SUCCEED;
 
 	DCconfig_get_items_by_itemids(&item, &lld_ruleid, &errcode, 1);
 
@@ -138,6 +152,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 	{
 		*error = zbx_dsprintf(*error, "Invalid discovery rule ID [" ZBX_FS_UI64 "].",
 				lld_ruleid);
+		ret = FAIL;
 		goto out;
 	}
 
@@ -156,24 +171,32 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 
 		zbx_vector_ptr_create(&condition->regexps);
 
+		zbx_vector_ptr_append(&filter->conditions, condition);
+
 		if ('@' == *condition->regexp)
 		{
 			DCget_expressions_by_name(&condition->regexps, condition->regexp + 1);
+
+			if (0 == condition->regexps.values_num)
+			{
+				*error = zbx_dsprintf(*error, "Global regular expression \"%s\" does not exist.",
+						condition->regexp + 1);
+				ret = FAIL;
+				break;
+			}
 		}
 		else
 		{
 			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &item, NULL,
 					&condition->regexp, MACRO_TYPE_LLD_FILTER, NULL, 0);
 		}
-
-		zbx_vector_ptr_append(&filter->conditions, condition);
 	}
 	DBfree_result(result);
 
-	if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
+	if (SUCCEED != ret)
+		lld_conditions_free(&filter->conditions);
+	else if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
 		zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
-
-	ret = SUCCEED;
 out:
 	DCconfig_clean_items(&item, &errcode, 1);
 
