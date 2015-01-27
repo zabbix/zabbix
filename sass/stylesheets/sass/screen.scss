@@ -788,6 +788,15 @@ a.form-remove-btn {
 	font-weight: bold;
 	font-size: $font-h2-size;
 	text-decoration: none;
+	@include border-radius;
+
+	&:hover {
+		background: lighten($primary-color, 55%);
+	}
+
+	&:active {
+		background: lighten($primary-color, 50%);
+	}
 }
 
 /* Action Menus, Pop-up Menus */
@@ -802,6 +811,11 @@ ul.action-menu {
 	@include border-radius;
 	@include action-menu-shadow;
 
+	li {
+		height: 24px;
+		line-height: 24px;
+	}
+
 	a {
 		display: block;
 		height: 24px;
@@ -810,6 +824,7 @@ ul.action-menu {
 		text-decoration: none;
 		padding: 0 15px 0 15px;
 		margin: 0 -15px 0 -15px;
+		position: relative;
 
 		&:hover {
 			background: lighten($primary-color, 55%);
@@ -822,6 +837,7 @@ ul.action-menu {
 		span {
 			position: absolute;
 			right: 10px;
+			top: 8px;
 		}
 	}
 
