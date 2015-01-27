@@ -1248,56 +1248,6 @@ function make_webmon_overview($filter) {
 	return new CDiv(array($table, $script));
 }
 
-function make_discovery_status() {
-	$options = array(
-		'filter' => array('status' => DHOST_STATUS_ACTIVE),
-		'selectDHosts' => array('druleid', 'dhostid', 'status'),
-		'output' => API_OUTPUT_EXTEND
-	);
-	$drules = API::DRule()->get($options);
-
-	CArrayHelper::sort($drules, array(
-		array('field' => 'name', 'order' => ZBX_SORT_UP)
-	));
-
-	foreach ($drules as $drnum => $drule) {
-		$drules[$drnum]['up'] = 0;
-		$drules[$drnum]['down'] = 0;
-
-		foreach ($drule['dhosts'] as $dhost){
-			if (DRULE_STATUS_DISABLED == $dhost['status']) {
-				$drules[$drnum]['down']++;
-			}
-			else {
-				$drules[$drnum]['up']++;
-			}
-		}
-	}
-
-	$header = array(
-		new CCol(_('Discovery rule'), 'center'),
-		new CCol(_x('Up', 'discovery results in dashboard')),
-		new CCol(_x('Down', 'discovery results in dashboard'))
-	);
-
-	$table = new CTableInfo();
-	$table->setHeader($header,'header');
-
-	foreach ($drules as $drule) {
-		$table->addRow(array(
-			new CLink($drule['name'], 'zabbix.php?action=discovery.view&druleid='.$drule['druleid']),
-			new CSpan($drule['up'], 'green'),
-			new CSpan($drule['down'], ($drule['down'] > 0) ? 'red' : 'green')
-		));
-	}
-
-	$script = new CJsScript(get_js('jQuery("#'.WIDGET_DISCOVERY_STATUS.'_footer").html("'.
-		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
-	));
-
-	return new CDiv(array($table, $script));
-}
-
 /**
  * Generate table for dashboard triggers popup.
  *

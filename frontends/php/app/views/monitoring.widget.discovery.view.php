@@ -18,5 +18,48 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-$widget = make_discovery_status();
+$drules = API::DRule()->get(array(
+	'output' => array('druleid', 'name'),
+	'selectDHosts' => array('status'),
+	'filter' => array('status' => DHOST_STATUS_ACTIVE)
+));
+CArrayHelper::sort($drules, array('name'));
+
+foreach ($drules as &$drule) {
+	$drule['up'] = 0;
+	$drule['down'] = 0;
+
+	foreach ($drule['dhosts'] as $dhost){
+		if (DRULE_STATUS_DISABLED == $dhost['status']) {
+			$drule['down']++;
+		}
+		else {
+			$drule['up']++;
+		}
+	}
+}
+unset($drule);
+
+$header = array(
+	new CCol(_('Discovery rule')),
+	new CCol(_x('Up', 'discovery results in dashboard')),
+	new CCol(_x('Down', 'discovery results in dashboard'))
+);
+
+$table = new CTableInfo();
+$table->setHeader($header, 'header');
+
+foreach ($drules as $drule) {
+	$table->addRow(array(
+		new CLink($drule['name'], 'zabbix.php?action=discovery.view&druleid='.$drule['druleid']),
+		new CSpan($drule['up'], 'green'),
+		new CSpan($drule['down'], ($drule['down'] != 0) ? 'red' : 'green')
+	));
+}
+
+$script = new CJsScript(get_js('jQuery("#'.WIDGET_DISCOVERY_STATUS.'_footer").html("'.
+	_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
+));
+
+$widget = new CDiv(array($table, $script));
 $widget->show();
