@@ -198,14 +198,50 @@ $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 // groups for normal hosts
 if (!$isDiscovered) {
+	$hostGroups = array_combine($hostGroups, $hostGroups);
 	$grp_tb = new CTweenBox($frmHost, 'groups', $hostGroups, 10);
-	$all_groups = API::HostGroup()->get(array(
+
+	// get user allowed host groups and sort them by name
+	$groupsAllowed = API::HostGroup()->get(array(
 		'editable' => true,
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'preservekeys' => true
 	));
-	order_result($all_groups, 'name');
-	foreach ($all_groups as $group) {
-		$grp_tb->addItem($group['groupid'], $group['name']);
+	order_result($groupsAllowed, 'name');
+
+	if (getRequest('form') === 'update') {
+		// get other host groups that user has also read permissions and sort by name
+		$all_groups = API::HostGroup()->get(array(
+			'output' => array('groupid', 'name'),
+			'preservekeys' => true
+		));
+		order_result($all_groups, 'name');
+
+		// Add existing host groups to list and, depending on permissions show name as enabled or disabled
+		$groupsInList = array();
+
+		foreach ($all_groups as $group) {
+			if (isset($hostGroups[$group['groupid']])) {
+				$grp_tb->addItem($group['groupid'], $group['name'], true, isset($groupsAllowed[$group['groupid']]));
+				$groupsInList[$group['groupid']] = true;
+			}
+		}
+
+		// Add other host groups that user has permissions to, if not yet added to the list.
+		foreach ($groupsAllowed as $group) {
+			if (!isset($groupsInList[$group['groupid']])) {
+				$grp_tb->addItem($group['groupid'], $group['name']);
+			}
+		}
+	}
+	else {
+		/*
+		 * When cloning a host or creating a new one, don't show read-only host groups in left box. Show empty or posted
+		 * groups in case of an error.
+		 */
+		foreach ($groupsAllowed as $group) {
+			$grp_tb->addItem($group['groupid'], $group['name']);
+		}
 	}
 
 	$hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));

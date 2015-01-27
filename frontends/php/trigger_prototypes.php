@@ -104,14 +104,32 @@ if (getRequest('parent_discoveryid')) {
 		access_deny();
 	}
 
-	if (isset($_REQUEST['triggerid'])) {
-		$triggerPrototype = API::TriggerPrototype()->get(array(
-			'triggerids' => $_REQUEST['triggerid'],
+	$triggerPrototypeIds = getRequest('g_triggerid', array());
+	if (!is_array($triggerPrototypeIds)) {
+		$triggerPrototypeIds = zbx_toArray($triggerPrototypeIds);
+	}
+
+	$triggerPrototypeId = getRequest('triggerid');
+	if ($triggerPrototypeId !== null) {
+		$triggerPrototypeIds[] = $triggerPrototypeId;
+	}
+
+	if ($triggerPrototypeIds) {
+		$triggerPrototypes = API::TriggerPrototype()->get(array(
+			'triggerids' => $triggerPrototypeIds,
 			'output' => array('triggerid'),
 			'editable' => true,
 			'preservekeys' => true
 		));
-		if (empty($triggerPrototype)) {
+
+		if ($triggerPrototypes) {
+			foreach ($triggerPrototypeIds as $triggerPrototypeId) {
+				if (!isset($triggerPrototypes[$triggerPrototypeId])) {
+					access_deny();
+				}
+			}
+		}
+		else {
 			access_deny();
 		}
 	}
