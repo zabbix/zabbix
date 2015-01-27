@@ -35,15 +35,12 @@ class CControllerWidgetHostsView extends CController {
 			'groupids' => null,
 			'maintenance' => null,
 			'severity' => null,
-			'extAck' => 0,
-			'filterEnable' => CProfile::get('web.dashconf.filter.enable', 0)
+			'extAck' => 0
 		);
 
-		if ($filter['filterEnable'] == 1) {
+		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
 			// groups
-			$filter['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
-
-			if ($filter['grpswitch'] == 0) {
+			if (CProfile::get('web.dashconf.groups.grpswitch', 0) == 0) {
 				// null mean all groups
 				$filter['groupids'] = null;
 			}
@@ -64,14 +61,14 @@ class CControllerWidgetHostsView extends CController {
 
 					// get available hosts
 					$dbAvailableHosts = API::Host()->get(array(
-						'groupids' => $filter['groupids'],
-						'output' => array('hostid')
+						'output' => array('hostid'),
+						'groupids' => $filter['groupids']
 					));
 					$availableHostIds = zbx_objectValues($dbAvailableHosts, 'hostid');
 
 					$dbDisabledHosts = API::Host()->get(array(
-						'groupids' => $hideHostGroupIds,
-						'output' => array('hostid')
+						'output' => array('hostid'),
+						'groupids' => $hideHostGroupIds
 					));
 					$disabledHostIds = zbx_objectValues($dbDisabledHosts, 'hostid');
 
@@ -98,8 +95,18 @@ class CControllerWidgetHostsView extends CController {
 			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
 		}
 
-		$data = array (
-			'filter' => $filter
+		$config = select_config();
+
+		$data = array(
+			'filter' => $filter,
+			'config' => array(
+				'severity_name_0' => $config['severity_name_0'],
+				'severity_name_1' => $config['severity_name_1'],
+				'severity_name_2' => $config['severity_name_2'],
+				'severity_name_3' => $config['severity_name_3'],
+				'severity_name_4' => $config['severity_name_4'],
+				'severity_name_5' => $config['severity_name_5']
+			)
 		);
 
 		$response = new CControllerResponseData($data);
