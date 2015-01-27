@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 $hintTable->addRow(array(new CCol(SPACE), _('OK or no trigger')));
 
-$help = new CHelp();
+$help = new CIcon(null, 'iconhelp');
 $help->setHint($hintTable);
 
 // header right

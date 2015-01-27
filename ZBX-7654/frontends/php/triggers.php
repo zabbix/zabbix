@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,15 +93,32 @@ $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIG
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 
 // validate permissions
+$triggerIds = getRequest('g_triggerid', array());
+if (!is_array($triggerIds)) {
+	$triggerIds = zbx_toArray($triggerIds);
+}
+
 $triggerId = getRequest('triggerid');
-if ($triggerId) {
-	$trigger = (bool) API::Trigger()->get(array(
-		'output' => array(),
-		'triggerids' => $triggerId,
+if ($triggerId !== null) {
+	$triggerIds[] = $triggerId;
+}
+
+if ($triggerIds) {
+	$triggers = API::Trigger()->get(array(
+		'output' => array('triggerid'),
+		'triggerids' => array_keys(array_flip($triggerIds)),
+		'preservekeys' => true,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'editable' => true
 	));
-	if (!$trigger) {
+	if ($triggers) {
+		foreach ($triggerIds as $triggerId) {
+			if (!isset($triggers[$triggerId])) {
+				access_deny();
+			}
+		}
+	}
+	else {
 		access_deny();
 	}
 }

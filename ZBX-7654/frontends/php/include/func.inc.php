@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1475,7 +1475,7 @@ function getPagingLine(&$items) {
 		$currentPage = 1;
 	}
 
-	if ($itemsCount < (($currentPage - 1) * $rowsPerPage)) {
+	if ($currentPage > $pagesCount) {
 		$currentPage = $pagesCount;
 	}
 
@@ -1943,34 +1943,6 @@ function fatal_error($msg) {
 	require_once dirname(__FILE__).'/page_footer.php';
 }
 
-function get_tree_by_parentid($parentid, &$tree, $parent_field, $level = 0) {
-	if (empty($tree)) {
-		return $tree;
-	}
-
-	$level++;
-	if ($level > 32) {
-		return array();
-	}
-
-	$result = array();
-	if (isset($tree[$parentid])) {
-		$result[$parentid] = $tree[$parentid];
-	}
-
-	$tree_ids = array_keys($tree);
-
-	foreach ($tree_ids as $key => $id) {
-		$child = $tree[$id];
-		if (bccomp($child[$parent_field], $parentid) == 0) {
-			$result[$id] = $child;
-			$childs = get_tree_by_parentid($id, $tree, $parent_field, $level); // attention recursion !!!
-			$result += $childs;
-		}
-	}
-	return $result;
-}
-
 function parse_period($str) {
 	$out = null;
 	$str = trim($str, ';');
@@ -2241,49 +2213,67 @@ function uncheckTableRows($cookieId = null) {
 }
 
 /**
- * Splitting string using slashes with escape backslash support.
+ * Splitting string using slashes with escape backslash support and non-pair backslash cleanup.
  *
- * @param string $path				string path to parse
- * @param bool   $stripSlashes		remove escaped slashes from the path pieces
+ * @param string $path					String path to parse.
+ * @param bool   $stripSlashes			Remove escaped slashes from the path pieces.
+ * @param bool   $cleanupBackslashes	Cleanup invalid backslash combinations.
  *
  * @return array
  */
-function splitPath($path, $stripSlashes = true) {
-	$items = array();
-	$s = $escapes = '';
+function splitPath($path, $stripSlashes = true, $cleanupBackslashes = false) {
+	$position = 0;
+	$escapeCharacters = '';
+	$pathItemsArray = array();
+	$pathItemString = '';
 
-	for ($i = 0, $size = strlen($path); $i < $size; $i++) {
-		if ($path[$i] === '/') {
-			if ($escapes === '') {
-				$items[] = $s;
-				$s = '';
+	for ($stringLength = strlen($path); $position < $stringLength; ++$position) {
+		// Determine how many escape characters we already have in the backlog.
+		$escapeCharacterCount = strlen($escapeCharacters);
+
+		if ($path[$position] === '/') {
+			// If we have no escape chars previously - save item into the array and move on.
+			if ($escapeCharacterCount == 0) {
+				$pathItemsArray[] = $pathItemString;
+				$escapeCharacters = '';
+				$pathItemString = '';
+				continue;
+			}
+
+			// We have a backslash before the / - keep it as part of the item and clean escape char buffer.
+			$pathItemString .= $escapeCharacters.$path[$position];
+			$escapeCharacters = '';
+		}
+		elseif ($cleanupBackslashes && $path[$position] === '\\') {
+
+			/*
+			 * If we had a backslash before - this is an escaped backslash, keep it and empty char backlog. This way
+			 * we save only paired backslashes.
+			 */
+			if ($escapeCharacterCount == 1) {
+				$pathItemString .= $escapeCharacters.$path[$position];
+				$escapeCharacters = '';
 			}
 			else {
-				if (strlen($escapes) % 2 == 0) {
-					$s .= $stripSlashes ? stripslashes($escapes) : $escapes;
-					$items[] = $s;
-					$s = $escapes = '';
-				}
-				else {
-					$s .= $stripSlashes ? stripslashes($escapes).$path[$i] : $escapes.$path[$i];
-					$escapes = '';
-				}
+				// It is a first backslash - add it to the backlog.
+				$escapeCharacters .= $path[$position];
 			}
 		}
-		elseif ($path[$i] === '\\') {
-			$escapes .= $path[$i];
-		}
 		else {
-			$s .= $stripSlashes ? stripslashes($escapes).$path[$i] : $escapes.$path[$i];
-			$escapes = '';
+			// A regular character - save it and move on. If previous char was a backslash - it is dropped.
+			$pathItemString .= $path[$position];
+			$escapeCharacters = '';
 		}
 	}
 
-	if ($escapes !== '') {
-		$s .= $stripSlashes ? stripslashes($escapes) : $escapes;
+	// Save the path tail.
+	if (strlen($pathItemString) != 0) {
+		$pathItemsArray[] = $pathItemString;
 	}
 
-	$items[] = $s;
+	if ($stripSlashes) {
+		$pathItemsArray = array_map('stripslashes', $pathItemsArray);
+	}
 
-	return $items;
+	return $pathItemsArray;
 }

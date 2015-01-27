@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ $triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 $triggersForm->addVar('input_method', $this->data['input_method']);
 $triggersForm->addVar('toggle_input_method', '');
 $triggersForm->addVar('remove_expression', '');
-if (!empty($this->data['triggerid'])) {
+if ($data['triggerid'] !== null) {
 	$triggersForm->addVar('triggerid', $this->data['triggerid']);
 }
 

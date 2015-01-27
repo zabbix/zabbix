@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,16 +21,24 @@
 
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 
-if (getRequest('hostid', 0) > 0) {
-	$dbHost = $this->data['dbHost'];
+$widgetClass = 'host-edit';
+if (isset($data['dbHost']) && $data['dbHost']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+	$widgetClass .= ' host-edit-discovered';
+}
+$hostWidget = new CWidget(null, $widgetClass);
+$hostWidget->addPageHeader(_('CONFIGURATION OF HOSTS'));
+$hostWidget->addItem(get_header_host_table('', $data['hostId']));
+
+if ($data['hostId']) {
+	$dbHost = $data['dbHost'];
 
 	$originalTemplates = $dbHost['parentTemplates'];
 	$originalTemplates = zbx_toHash($originalTemplates, 'templateid');
 
 	// get items that populate host inventory fields
 	$hostItemsToInventory = API::Item()->get(array(
-		'filter' => array('hostid' => $dbHost['hostid']),
 		'output' => array('inventory_link', 'itemid', 'hostid', 'name', 'key_'),
+		'filter' => array('hostid' => $dbHost['hostid']),
 		'preserveKeys' => true,
 		'nopermissions' => true
 	));
@@ -43,12 +51,16 @@ else {
 	$originalTemplates = array();
 }
 
-$cloningDiscoveredHost = (in_array(getRequest('form'), array('clone', 'full_clone'))
-	&& (getRequest('form_refresh') == 1) && ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
+$cloneOrFullClone = ($data['form'] === 'clone' || $data['form'] === 'full_clone');
+
+$cloningDiscoveredHost = (
+	$cloneOrFullClone
+	&& getRequest('form_refresh') == 1
+	&& $dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED
 );
 
 // Use data from database when host is opened and form is shown for first time or discovered host is being cloned.
-if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloningDiscoveredHost)) {
+if ($data['hostId'] && (!hasRequest('form_refresh') || $cloningDiscoveredHost)) {
 	$proxyHostId = $dbHost['proxy_hostid'];
 	$host = $dbHost['host'];
 	$visibleName = $dbHost['name'];
@@ -64,7 +76,7 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloningDiscoveredHo
 	$ipmiPassword = $dbHost['ipmi_password'];
 
 	$macros = order_macros($dbHost['macros'], 'macro');
-	$hostGroups = zbx_objectValues($dbHost['groups'], 'groupid');
+	$groupIds = zbx_objectValues($dbHost['groups'], 'groupid');
 
 	if ($cloningDiscoveredHost) {
 		$status = getRequest('status', HOST_STATUS_NOT_MONITORED);
@@ -77,11 +89,13 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloningDiscoveredHo
 		$hostInventory = $dbHost['inventory'];
 	}
 
-	$inventoryMode = isset($dbHost['inventory']['inventory_mode']) ? $dbHost['inventory']['inventory_mode'] : HOST_INVENTORY_DISABLED;
+	$inventoryMode = isset($dbHost['inventory']['inventory_mode'])
+		? $dbHost['inventory']['inventory_mode']
+		: HOST_INVENTORY_DISABLED;
 
 	$templateIds = array();
-	foreach ($originalTemplates as $tpl) {
-		$templateIds[$tpl['templateid']] = $tpl['templateid'];
+	foreach ($originalTemplates as $originalTemplate) {
+		$templateIds[$originalTemplate['templateid']] = $originalTemplate['templateid'];
 	}
 
 	$interfaces = $dbHost['interfaces'];
@@ -106,9 +120,9 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloningDiscoveredHo
 	$newGroupName = '';
 }
 else {
-	$hostGroups = getRequest('groups', array());
-	if (hasRequest('groupid') && (getRequest('groupid', 0) > 0) && empty($hostGroups)) {
-		array_push($hostGroups, getRequest('groupid'));
+	$groupIds = getRequest('groups', array());
+	if ($data['groupId'] != 0 && !$groupIds) {
+		$groupIds[] = $data['groupId'];
 	}
 
 	$newGroupName = getRequest('newgroup', '');
@@ -128,7 +142,7 @@ else {
 	$clearTemplates = getRequest('clear_templates', array());
 	$description = getRequest('description', '');
 
-	if ((getRequest('hostid', 0) == 0) && !hasRequest('form_refresh')) {
+	if ($data['hostId'] == 0 && !hasRequest('form_refresh')) {
 		$status = HOST_STATUS_MONITORED;
 	}
 	else {
@@ -150,9 +164,9 @@ natcasesort($templateIds);
 
 // whether this is a discovered host
 $isDiscovered = (
-	getRequest('hostid')
+	$data['hostId']
 	&& $dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED
-	&& in_array(getRequest('form'), array('update'))
+	&& $data['form'] === 'update'
 );
 
 $divTabs = new CTabView();
@@ -162,20 +176,18 @@ if (!hasRequest('form_refresh')) {
 
 $frmHost = new CForm();
 $frmHost->setName('web.hosts.host.php.');
-$frmHost->addVar('form', getRequest('form', 1));
+$frmHost->addVar('form', $data['form']);
 
 $frmHost->addVar('clear_templates', $clearTemplates);
 
 $hostList = new CFormList('hostlist');
 
-$hostId = getRequest('hostid', 0);
-if ($hostId > 0 && getRequest('form') != 'clone') {
-	$frmHost->addVar('hostid', $hostId);
+if ($data['hostId'] && $data['form'] !== 'clone') {
+	$frmHost->addVar('hostid', $data['hostId']);
 }
 
-$groupId = getRequest('groupid', 0);
-if ($groupId > 0) {
-	$frmHost->addVar('groupid', $groupId);
+if ($data['groupId']) {
+	$frmHost->addVar('groupid', $data['groupId']);
 }
 
 // LLD rule link
@@ -196,31 +208,59 @@ $hostList->addRow(_('Host name'), $hostTB);
 $visiblenameTB = new CTextBox('visiblename', $visibleName, ZBX_TEXTBOX_STANDARD_SIZE, $isDiscovered, 128);
 $hostList->addRow(_('Visible name'), $visiblenameTB);
 
-// groups for normal hosts
 if (!$isDiscovered) {
-	$grp_tb = new CTweenBox($frmHost, 'groups', $hostGroups, 10);
-	$all_groups = API::HostGroup()->get(array(
-		'editable' => true,
-		'output' => API_OUTPUT_EXTEND
-	));
-	order_result($all_groups, 'name');
-	foreach ($all_groups as $group) {
-		$grp_tb->addItem($group['groupid'], $group['name']);
+	// groups for normal hosts
+
+	$groupIds = array_combine($groupIds, $groupIds);
+
+	$groupsTB = new CTweenBox($frmHost, 'groups', $groupIds, 10);
+
+	if ($data['form'] === 'update') {
+		// Add existing host groups to list and, depending on permissions show name as enabled or disabled.
+
+		$groupsInList = array();
+
+		foreach ($data['groupsAll'] as $group) {
+			if (isset($groupIds[$group['groupid']])) {
+				$groupsTB->addItem($group['groupid'], $group['name'], true,
+					isset($data['groupsAllowed'][$group['groupid']])
+				);
+				$groupsInList[$group['groupid']] = true;
+			}
+		}
+
+		// Add other host groups that user has permissions to, if not yet added to the list.
+		foreach ($data['groupsAllowed'] as $group) {
+			if (!isset($groupsInList[$group['groupid']])) {
+				$groupsTB->addItem($group['groupid'], $group['name']);
+			}
+		}
+	}
+	else {
+		/*
+		 * When cloning a host or creating a new one, don't show read-only host groups in left box. Show empty or posted
+		 * groups in case of an error.
+		 */
+
+		foreach ($data['groupsAllowed'] as $group) {
+			$groupsTB->addItem($group['groupid'], $group['name']);
+		}
 	}
 
-	$hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));
+	$hostList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
 
 	$newgroupTB = new CTextBox('newgroup', $newGroupName, ZBX_TEXTBOX_SMALL_SIZE);
 	$newgroupTB->setAttribute('maxlength', 64);
 	$tmp_label = _('New group');
 	if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-		$tmp_label .= SPACE._('(Only super admins can create groups)');
+		$tmp_label .= ' '._('(Only super admins can create groups)');
 		$newgroupTB->setReadonly(true);
 	}
-	$hostList->addRow(SPACE, array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, 'new');
+	$hostList->addRow(null, array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, 'new');
 }
-// groups for discovered hosts
 else {
+	// groups for discovered hosts
+
 	$groupBox = new CComboBox('groups');
 	$groupBox->setAttribute('readonly', true);
 	$groupBox->setAttribute('size', 10);
@@ -246,21 +286,20 @@ if (!$isDiscovered) {
 	$ifTab->setAttribute('data-type', 'agent');
 
 	// headers with sizes
-	$iconLabel = new CCol(SPACE, 'interface-drag-control');
+	$iconLabel = new CCol(' ', 'interface-drag-control');
 	$ipLabel = new CCol(_('IP address'), 'interface-ip');
 	$dnsLabel = new CCol(_('DNS name'), 'interface-dns');
 	$connectToLabel = new CCol(_('Connect to'), 'interface-connect-to');
 	$portLabel = new CCol(_('Port'), 'interface-port');
-	$defaultLabel = new CCol(_('Default'), 'interface-default');
-	$removeLabel = new CCol(SPACE, 'interface-control');
-	$ifTab->addRow(array($iconLabel, $ipLabel, $dnsLabel, $connectToLabel, $portLabel, $defaultLabel, $removeLabel));
+	$defaultLabel = new CCol(_('Default'), 'interface-default', 2);
+	$ifTab->addRow(array($iconLabel, $ipLabel, $dnsLabel, $connectToLabel, $portLabel, $defaultLabel));
 
 	$helpTextWhenDragInterfaceAgent = new CSpan(_('Drag here to change the type of the interface to "agent" type.'));
 	$helpTextWhenDragInterfaceAgent->addClass('dragHelpText');
-	$buttonCol = new CCol(new CButton('addAgentInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
-	$col = new CCol($helpTextWhenDragInterfaceAgent);
-	$col->setAttribute('colspan', 6);
-	$buttonRow = new CRow(array($buttonCol, $col));
+	$buttonCol = new CCol(new CButton('addAgentInterface', _('Add'), null, 'link_menu'), 'interface-add-control', 7);
+	$buttonCol->addItem($helpTextWhenDragInterfaceAgent);
+
+	$buttonRow = new CRow(array($buttonCol));
 	$buttonRow->setAttribute('id', 'agentInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
@@ -274,10 +313,10 @@ if (!$isDiscovered) {
 
 	$helpTextWhenDragInterfaceSNMP = new CSpan(_('Drag here to change the type of the interface to "SNMP" type.'));
 	$helpTextWhenDragInterfaceSNMP->addClass('dragHelpText');
-	$buttonCol = new CCol(new CButton('addSNMPInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
-	$col = new CCol($helpTextWhenDragInterfaceSNMP);
-	$col->setAttribute('colspan', 6);
-	$buttonRow = new CRow(array($buttonCol, $col));
+	$buttonCol = new CCol(new CButton('addSNMPInterface', _('Add'), null, 'link_menu'), 'interface-add-control', 7);
+	$buttonCol->addItem($helpTextWhenDragInterfaceSNMP);
+
+	$buttonRow = new CRow(array($buttonCol));
 	$buttonRow->setAttribute('id', 'SNMPInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
@@ -290,10 +329,10 @@ if (!$isDiscovered) {
 	$ifTab->setAttribute('data-type', 'jmx');
 	$helpTextWhenDragInterfaceJMX = new CSpan(_('Drag here to change the type of the interface to "JMX" type.'));
 	$helpTextWhenDragInterfaceJMX->addClass('dragHelpText');
-	$buttonCol = new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
-	$col = new CCol($helpTextWhenDragInterfaceJMX);
-	$col->setAttribute('colspan', 6);
-	$buttonRow = new CRow(array($buttonCol, $col));
+	$buttonCol = new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu'), 'interface-add-control', 7);
+	$buttonCol->addItem($helpTextWhenDragInterfaceJMX);
+
+	$buttonRow = new CRow(array($buttonCol));
 	$buttonRow->setAttribute('id', 'JMXInterfacesFooter');
 	$ifTab->addRow($buttonRow);
 
@@ -305,10 +344,10 @@ if (!$isDiscovered) {
 	$ifTab->setAttribute('data-type', 'ipmi');
 	$helpTextWhenDragInterfaceIPMI = new CSpan(_('Drag here to change the type of the interface to "IPMI" type.'));
 	$helpTextWhenDragInterfaceIPMI->addClass('dragHelpText');
-	$buttonCol = new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
-	$col = new CCol($helpTextWhenDragInterfaceIPMI);
-	$col->setAttribute('colspan', 6);
-	$buttonRow = new CRow(array($buttonCol, $col));
+	$buttonCol = new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu'), 'interface-add-control', 7);
+	$buttonCol->addItem($helpTextWhenDragInterfaceIPMI);
+
+	$buttonRow = new CRow(array($buttonCol));
 	$buttonRow->setAttribute('id', 'IPMIInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
@@ -333,13 +372,13 @@ else {
 
 	// header
 	$ifTab->addRow(array(
-		new CCol(SPACE, 'interface-drag-control'),
+		new CCol(null, 'interface-drag-control'),
 		new CCol(_('IP address'), 'interface-ip'),
 		new CCol(_('DNS name'), 'interface-dns'),
 		new CCol(_('Connect to'), 'interface-connect-to'),
 		new CCol(_('Port'), 'interface-port'),
 		new CCol(_('Default'), 'interface-default'),
-		new CCol(SPACE, 'interface-control')
+		new CCol(null, 'interface-control')
 	));
 
 	$row = new CRow(null, null, 'agentInterfacesFooter');
@@ -424,16 +463,16 @@ $hostList->addRow(_('Monitored by proxy'), $proxyControl);
 
 $hostList->addRow(_('Enabled'), new CCheckBox('status', ($status == HOST_STATUS_MONITORED), null, HOST_STATUS_MONITORED));
 
-if (getRequest('form') == 'full_clone') {
+if ($data['form'] === 'full_clone') {
 	// host applications
 	$hostApps = API::Application()->get(array(
-		'hostids' => $hostId,
-		'inherited' => false,
 		'output' => array('name'),
+		'hostids' => array($data['hostId']),
+		'inherited' => false,
 		'preservekeys' => true
 	));
 
-	if (!empty($hostApps)) {
+	if ($hostApps) {
 		$applicationsList = array();
 		foreach ($hostApps as $hostAppId => $hostApp) {
 			$applicationsList[$hostAppId] = $hostApp['name'];
@@ -448,10 +487,10 @@ if (getRequest('form') == 'full_clone') {
 
 	// host items
 	$hostItems = API::Item()->get(array(
-		'hostids' => $hostId,
+		'output' => array('itemid', 'hostid', 'key_', 'name'),
+		'hostids' => array($data['hostId']),
 		'inherited' => false,
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'output' => array('itemid', 'hostid', 'key_', 'name')
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 	));
 
 	if ($hostItems) {
@@ -471,13 +510,14 @@ if (getRequest('form') == 'full_clone') {
 
 	// host triggers
 	$hostTriggers = API::Trigger()->get(array(
-		'inherited' => false,
-		'hostids' => $hostId,
 		'output' => array('triggerid', 'description'),
 		'selectItems' => array('type'),
+		'hostids' => array($data['hostId']),
+		'inherited' => false,
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL))
 	));
-	if (!empty($hostTriggers)) {
+
+	if ($hostTriggers) {
 		$triggersList = array();
 
 		foreach ($hostTriggers as $hostTrigger) {
@@ -487,7 +527,7 @@ if (getRequest('form') == 'full_clone') {
 			$triggersList[$hostTrigger['triggerid']] = $hostTrigger['description'];
 		}
 
-		if (!empty($triggersList)) {
+		if ($triggersList) {
 			order_result($triggersList);
 
 			$listBox = new CListBox('triggers', null, 8);
@@ -499,14 +539,15 @@ if (getRequest('form') == 'full_clone') {
 
 	// host graphs
 	$hostGraphs = API::Graph()->get(array(
-		'inherited' => false,
-		'hostids' => $hostId,
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
+		'output' => array('graphid', 'name'),
 		'selectHosts' => array('hostid'),
 		'selectItems' => array('type'),
-		'output' => array('graphid', 'name')
+		'hostids' => array($data['hostId']),
+		'inherited' => false,
+		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL))
 	));
-	if (!empty($hostGraphs)) {
+
+	if ($hostGraphs) {
 		$graphsList = array();
 		foreach ($hostGraphs as $hostGraph) {
 			if (count($hostGraph['hosts']) > 1) {
@@ -518,7 +559,7 @@ if (getRequest('form') == 'full_clone') {
 			$graphsList[$hostGraph['graphid']] = $hostGraph['name'];
 		}
 
-		if (!empty($graphsList)) {
+		if ($graphsList) {
 			order_result($graphsList);
 
 			$listBox = new CListBox('graphs', null, 8);
@@ -532,9 +573,9 @@ if (getRequest('form') == 'full_clone') {
 	$hostDiscoveryRuleIds = array();
 
 	$hostDiscoveryRules = API::DiscoveryRule()->get(array(
-		'inherited' => false,
-		'hostids' => $hostId,
-		'output' => array('itemid', 'hostid', 'key_', 'name')
+		'output' => array('itemid', 'hostid', 'key_', 'name'),
+		'hostids' => array($data['hostId']),
+		'inherited' => false
 	));
 
 	if ($hostDiscoveryRules) {
@@ -555,10 +596,10 @@ if (getRequest('form') == 'full_clone') {
 
 	// item prototypes
 	$hostItemPrototypes = API::ItemPrototype()->get(array(
-		'hostids' => $hostId,
+		'output' => array('itemid', 'hostid', 'key_', 'name'),
+		'hostids' => array($data['hostId']),
 		'discoveryids' => $hostDiscoveryRuleIds,
-		'inherited' => false,
-		'output' => array('itemid', 'hostid', 'key_', 'name')
+		'inherited' => false
 	));
 
 	if ($hostItemPrototypes) {
@@ -578,13 +619,14 @@ if (getRequest('form') == 'full_clone') {
 
 	// Trigger prototypes
 	$hostTriggerPrototypes = API::TriggerPrototype()->get(array(
-		'hostids' => $hostId,
-		'discoveryids' => $hostDiscoveryRuleIds,
-		'inherited' => false,
 		'output' => array('triggerid', 'description'),
-		'selectItems' => array('type')
+		'selectItems' => array('type'),
+		'hostids' => array($data['hostId']),
+		'discoveryids' => $hostDiscoveryRuleIds,
+		'inherited' => false
 	));
-	if (!empty($hostTriggerPrototypes)) {
+
+	if ($hostTriggerPrototypes) {
 		$prototypeList = array();
 		foreach ($hostTriggerPrototypes as $triggerPrototype) {
 			// skip trigger prototypes with web items
@@ -606,13 +648,14 @@ if (getRequest('form') == 'full_clone') {
 
 	// Graph prototypes
 	$hostGraphPrototypes = API::GraphPrototype()->get(array(
-		'hostids' => $hostId,
-		'discoveryids' => $hostDiscoveryRuleIds,
-		'inherited' => false,
+		'output' => array('graphid', 'name'),
 		'selectHosts' => array('hostid'),
-		'output' => array('graphid', 'name')
+		'hostids' => array($data['hostId']),
+		'discoveryids' => $hostDiscoveryRuleIds,
+		'inherited' => false
 	));
-	if (!empty($hostGraphPrototypes)) {
+
+	if ($hostGraphPrototypes) {
 		$prototypeList = array();
 		foreach ($hostGraphPrototypes as $graphPrototype) {
 			if (count($graphPrototype['hosts']) == 1) {
@@ -629,10 +672,11 @@ if (getRequest('form') == 'full_clone') {
 
 	// host prototypes
 	$hostPrototypes = API::HostPrototype()->get(array(
+		'output' => array('hostid', 'name'),
 		'discoveryids' => $hostDiscoveryRuleIds,
-		'inherited' => false,
-		'output' => array('hostid', 'name')
+		'inherited' => false
 	));
+
 	if ($hostPrototypes) {
 		$prototypeList = array();
 		foreach ($hostPrototypes as $hostPrototype) {
@@ -649,7 +693,7 @@ if (getRequest('form') == 'full_clone') {
 	// web scenarios
 	$httpTests = API::HttpTest()->get(array(
 		'output' => array('httptestid', 'name'),
-		'hostids' => $hostId,
+		'hostids' => array($data['hostId']),
 		'inherited' => false
 	));
 
@@ -668,6 +712,7 @@ if (getRequest('form') == 'full_clone') {
 		$hostList->addRow(_('Web scenarios'), $listBox);
 	}
 }
+
 $divTabs->addTab('hostTab', _('Host'), $hostList);
 
 // templates
@@ -687,29 +732,37 @@ CArrayHelper::sort($linkedTemplates, array('name'));
 if (!$isDiscovered) {
 	$linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 	$ignoredTemplates = array();
+
 	foreach ($linkedTemplates as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
 		$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
 		$templateLink->setTarget('_blank');
 
+		$unlinkButton = new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu');
+		$unlinkAndClearButton = new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'),
+			null, 'link_menu'
+		);
+		$unlinkAndClearButton->addStyle('margin-left: 8px');
+
 		$linkedTemplateTable->addRow(
 			array(
 				$templateLink,
 				array(
-					new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu'),
-					SPACE,
-					SPACE,
-					isset($originalTemplates[$template['templateid']])
-						? new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null, 'link_menu')
-						: SPACE
+					$unlinkButton,
+					(isset($originalTemplates[$template['templateid']]) && !$cloneOrFullClone)
+						? $unlinkAndClearButton
+						: null
 				)
 			),
-			null, 'conditions_'.$template['templateid']
+			null,
+			'conditions_'.$template['templateid']
 		);
 		$ignoredTemplates[$template['templateid']] = $template['name'];
 	}
 
-	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
+	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable,
+		'template-link-block objectgroup inlineblock border_dotted ui-corner-all')
+	);
 
 	// create new linked template table
 	$newTemplateTable = new CTable(null, 'formElementTable');
@@ -729,7 +782,9 @@ if (!$isDiscovered) {
 
 	$newTemplateTable->addRow(array(new CSubmit('add_template', _('Add'), null, 'link_menu')));
 
-	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
+	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable,
+		'template-link-block objectgroup inlineblock border_dotted ui-corner-all')
+	);
 }
 // templates for discovered hosts
 else {
@@ -741,7 +796,9 @@ else {
 		$linkedTemplateTable->addRow($templateLink, null, 'conditions_'.$template['templateid']);
 	}
 
-	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
+	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable,
+		'template-link-block objectgroup inlineblock border_dotted ui-corner-all')
+	);
 }
 
 $divTabs->addTab('templateTab', _('Templates'), $tmplList);
@@ -819,7 +876,7 @@ $inventoryTypeRadioButton = array(
 	$inventoryAutomaticBtn,
 	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
 );
-$inventoryFormList->addRow(SPACE, new CDiv($inventoryTypeRadioButton, 'jqueryinputset radioset'));
+$inventoryFormList->addRow(null, new CDiv($inventoryTypeRadioButton, 'jqueryinputset radioset'));
 
 $hostInventoryTable = DB::getSchema('host_inventory');
 $hostInventoryFields = getHostInventories();
@@ -880,8 +937,8 @@ $frmHost->addItem($divTabs);
 /*
  * footer
  */
-// do not display the clone and delete buttons for clone forms and new host forms
-if (getRequest('hostid') && !in_array(getRequest('form'), array('clone', 'full_clone'))) {
+// Do not display the clone and delete buttons for clone forms and new host forms.
+if ($data['hostId'] && !$cloneOrFullClone) {
 	$frmHost->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
@@ -899,5 +956,6 @@ else {
 	));
 }
 
+$hostWidget->addItem($frmHost);
 
-return $frmHost;
+return $hostWidget;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,6 @@
 	int	IBM_DB2server_status();
 	int	zbx_ibm_db2_success(SQLRETURN ret);
 	int	zbx_ibm_db2_success_ext(SQLRETURN ret);
-	void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl);
 
 #elif defined(HAVE_MYSQL)
 

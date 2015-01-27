@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -430,14 +430,18 @@ $pageFilter = new CPageFilter(array(
 ));
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
-if (isset($_REQUEST['form'])) {
+if (hasRequest('form')) {
 	$templateWidget->addPageHeader(_('CONFIGURATION OF TEMPLATES'));
 
 	if ($templateId = getRequest('templateid', 0)) {
 		$templateWidget->addItem(get_header_host_table('', $templateId));
 	}
 
-	$data = array();
+	$data = array(
+		'form' => getRequest('form'),
+		'groupId' => getRequest('groupid', 0),
+		'groupIds' => getRequest('groups', array())
+	);
 
 	if ($templateId) {
 		$dbTemplates = API::Template()->get(array(
@@ -465,13 +469,89 @@ if (isset($_REQUEST['form'])) {
 
 	$templateIds = getRequest('templates', hasRequest('form_refresh') ? array() : $data['original_templates']);
 
-	// linked templates
+	// Get linked templates.
 	$data['linkedTemplates'] = API::Template()->get(array(
 		'templateids' => $templateIds,
 		'output' => array('templateid', 'name')
 	));
-
 	CArrayHelper::sort($data['linkedTemplates'], array('name'));
+
+	// Get user allowed host groups and sort them by name.
+	$data['groupsAllowed'] = API::HostGroup()->get(array(
+		'output' => array('groupid', 'name'),
+		'editable' => true,
+		'preservekeys' => true
+	));
+	CArrayHelper::sort($data['groupsAllowed'], array('name'));
+
+	// Get other host groups that user has also read permissions and sort by name.
+	$data['groupsAll'] = API::HostGroup()->get(array(
+		'output' => array('groupid', 'name'),
+		'preservekeys' => true
+	));
+	CArrayHelper::sort($data['groupsAll'], array('name'));
+
+	// "Other | group" tweenbox selector for hosts and templates
+	$data['twb_groupid'] = getRequest('twb_groupid', 0);
+	if ($data['twb_groupid'] == 0) {
+		$group = reset($data['groupsAllowed']);
+		$data['twb_groupid'] = $group['groupid'];
+	}
+
+	// Get allowed hosts from selected twb_groupid combobox.
+	$data['hostsAllowedToAdd'] = API::Host()->get(array(
+		'output' => array('hostid', 'name'),
+		'groupids' => $data['twb_groupid'],
+		'templated_hosts' => true,
+		'editable' => true,
+		'preservekeys' => true,
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+	));
+	CArrayHelper::sort($data['hostsAllowedToAdd'], array('name'));
+
+	if ($templateId != 0 && !hasRequest('form_refresh')) {
+		$data['groupIds'] = zbx_objectValues($data['dbTemplate']['groups'], 'groupid');
+
+		// Get template hosts from DB.
+		$hostIdsLinkedTo = API::Host()->get(array(
+			'output' => array('hostid'),
+			'templateids' => $templateId,
+			'templated_hosts' => true,
+			'preservekeys' => true
+		));
+		$hostIdsLinkedTo = array_keys($hostIdsLinkedTo);
+	}
+	else {
+		if ($data['groupId'] != 0 && !$data['groupIds']) {
+			$data['groupIds'][] = $data['groupId'];
+		}
+		$hostIdsLinkedTo = getRequest('hosts', array());
+	}
+
+	$data['groupIds'] = array_combine($data['groupIds'], $data['groupIds']);
+	$hostIdsLinkedTo = array_combine($hostIdsLinkedTo, $hostIdsLinkedTo);
+
+	// Select allowed selected hosts.
+	$data['hostsAllowed'] = API::Host()->get(array(
+		'output' => array('hostid', 'name', 'flags'),
+		'hostids' => $hostIdsLinkedTo,
+		'templated_hosts' => true,
+		'editable' => true,
+		'preservekeys' => true,
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+	));
+	CArrayHelper::sort($data['hostsAllowed'], array('name'));
+
+	// Select selected hosts including read only.
+	$data['hostsAll'] = API::Host()->get(array(
+		'output' => array('hostid', 'name', 'flags'),
+		'hostids' => $hostIdsLinkedTo,
+		'templated_hosts' => true
+	));
+	CArrayHelper::sort($data['hostsAll'], array('name'));
+
+	$data['hostIdsLinkedTo'] = $hostIdsLinkedTo;
+	$data['templateId'] = $templateId;
 
 	$templateForm = new CView('configuration.template.edit', $data);
 	$templateWidget->addItem($templateForm->render());
@@ -664,24 +744,13 @@ else {
 		));
 	}
 
-	$goBox = new CComboBox('action');
-
-	$goBox->addItem('template.export', _('Export selected'));
-
-	$goOption = new CComboItem('template.massdelete', _('Delete selected'));
-	$goOption->setAttribute('confirm', _('Delete selected templates?'));
-	$goBox->addItem($goOption);
-
-	$goOption = new CComboItem('template.massdeleteclear', _('Delete selected with linked elements'));
-	$goOption->setAttribute('confirm', _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'));
-	$goBox->addItem($goOption);
-
-	$goButton = new CSubmit('goButton', _('Go').' (0)');
-	$goButton->setAttribute('id', 'goButton');
-
-	zbx_add_post_js('chkbxRange.pageGoName = "templates";');
-
-	$footer = get_table_header(array($goBox, $goButton));
+	$footer = get_table_header(new CActionButtonList('action', 'templates', array(
+		'template.export' => array('name' => _('Export')),
+		'template.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected templates?')),
+		'template.massdeleteclear' => array('name' => _('Delete and clear'),
+			'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)')
+		)
+	)));
 
 	$form->addItem(array($paging, $table, $paging, $footer));
 	$templateWidget->addItem($form);
