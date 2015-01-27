@@ -163,18 +163,18 @@ if ($pageFilter->hostsSelected) {
 					$status['msg'] = _s('Unknown step failed: %1$s', $error);
 				}
 
-				$status['style'] = 'disabled';
+				$status['style'] = ZBX_STYLE_RED;
 			}
 			else {
 				$status['msg'] = _('OK');
-				$status['style'] = 'enabled';
+				$status['style'] = ZBX_STYLE_GREEN;
 			}
 		}
 		// no history data exists
 		else {
 			$lastcheck = _('Never');
 			$status['msg'] = _('Unknown');
-			$status['style'] = 'unknown';
+			$status['style'] = ZBX_STYLE_GREY;
 		}
 
 		$cpsan = new CSpan($httpTest['hostname'],

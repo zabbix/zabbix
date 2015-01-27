@@ -92,7 +92,7 @@ foreach ($this->data['triggers'] as $trigger) {
 			$description[] = new CLink(
 				CHtml::encode($real_host['name']),
 				'trigger_prototypes.php?parent_discoveryid='.$tpl_disc_ruleid,
-				'unknown'
+				ZBX_STYLE_GREY
 			);
 
 			$description[] = NAME_DELIMITER;

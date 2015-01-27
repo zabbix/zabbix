@@ -149,23 +149,23 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 	$httpStepItemsByType = $httpStepItems[$httpstep_data['httpstepid']];
 
 	$status['msg'] = _('OK');
-	$status['style'] = 'enabled';
+	$status['style'] = ZBX_STYLE_GREEN;
 	$status['afterError'] = false;
 
 	if (!isset($httpTestData['lastfailedstep'])) {
 		$status['msg'] = _('Never executed');
-		$status['style'] = 'unknown';
+		$status['style'] = ZBX_STYLE_GREY;
 	}
 	elseif ($httpTestData['lastfailedstep'] != 0) {
 		if ($httpTestData['lastfailedstep'] == $httpstep_data['no']) {
 			$status['msg'] = ($httpTestData['error'] === null)
 				? _('Unknown error')
 				: _s('Error: %1$s', $httpTestData['error']);
-			$status['style'] = 'disabled';
+			$status['style'] = ZBX_STYLE_RED;
 		}
 		elseif ($httpTestData['lastfailedstep'] < $httpstep_data['no']) {
 			$status['msg'] = _('Unknown');
-			$status['style'] = 'unknown';
+			$status['style'] = ZBX_STYLE_GREY;
 			$status['afterError'] = true;
 		}
 	}
@@ -227,17 +227,17 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 
 if (!isset($httpTestData['lastfailedstep'])) {
 	$status['msg'] = _('Never executed');
-	$status['style'] = 'unknown';
+	$status['style'] = ZBX_STYLE_GREY;
 }
 elseif ($httpTestData['lastfailedstep'] != 0) {
 	$status['msg'] = ($httpTestData['error'] === null)
 		? _('Unknown error')
 		: _s('Error: %1$s', $httpTestData['error']);
-	$status['style'] = 'disabled';
+	$status['style'] = ZBX_STYLE_RED;
 }
 else {
 	$status['msg'] = _('OK');
-	$status['style'] = 'enabled';
+	$status['style'] = ZBX_STYLE_GREEN;
 }
 
 $httpdetailsTable->addRow(array(

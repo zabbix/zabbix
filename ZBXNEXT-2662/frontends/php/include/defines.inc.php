@@ -980,6 +980,15 @@ define('HISTORY_LATEST', 'showlatest');
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
+// CSS styles
+define('ZBX_STYLE_GREEN', 'green');
+define('ZBX_STYLE_GREY', 'grey');
+define('ZBX_STYLE_HIDDEN', 'hidden');
+define('ZBX_STYLE_ORANGE', 'orange');
+define('ZBX_STYLE_RED', 'red');
+define('ZBX_STYLE_SELECT_MULTIPLE', 'select-multiple');
+define('ZBX_STYLE_TABLE_FORMS', 'table-forms');
+
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');
 
