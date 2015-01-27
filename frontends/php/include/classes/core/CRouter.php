@@ -55,7 +55,7 @@ class CRouter {
 	private $routes = array(
 		// action					controller								layout					view
 		'dashboard.favourite'	=> array('CControllerDashboardFavourite',	'layout.javascript',	null),
-		'dashboard.sort'		=> array('CControllerDashboardSort',		'layout.json',			null),
+		'dashboard.sort'		=> array('CControllerDashboardSort',		'layout.javascript',	null),
 		'dashboard.view'		=> array('CControllerDashboardView',		'layout.htmlpage',		'monitoring.dashboard.view'),
 		'dashboard.widget'		=> array('CControllerDashboardWidget',		'layout.javascript',	null),
 		'discovery.view'		=> array('CControllerDiscoveryView',		'layout.htmlpage',		'monitoring.discovery.view'),
