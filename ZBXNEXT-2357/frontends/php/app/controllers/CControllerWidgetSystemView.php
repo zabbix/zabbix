@@ -35,15 +35,12 @@ class CControllerWidgetSystemView extends CController {
 			'groupids' => null,
 			'maintenance' => null,
 			'severity' => null,
-			'extAck' => 0,
-			'filterEnable' => CProfile::get('web.dashconf.filter.enable', 0)
+			'extAck' => 0
 		);
 
-		if ($filter['filterEnable'] == 1) {
+		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
 			// groups
-			$filter['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
-
-			if ($filter['grpswitch'] == 0) {
+			if (CProfile::get('web.dashconf.groups.grpswitch', 0) == 0) {
 				// null mean all groups
 				$filter['groupids'] = null;
 			}
