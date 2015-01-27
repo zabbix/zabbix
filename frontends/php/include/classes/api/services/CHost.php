@@ -785,7 +785,7 @@ class CHost extends CHostGeneral {
 					? $host['inventory_mode']
 					: HOST_INVENTORY_MANUAL;
 
-				DB::insert('host_inventory', array($hostInventory));
+				DB::insert('host_inventory', array($hostInventory), false);
 			}
 		}
 
