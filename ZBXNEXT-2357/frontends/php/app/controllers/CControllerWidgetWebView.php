@@ -33,17 +33,12 @@ class CControllerWidgetWebView extends CController {
 	protected function doAction() {
 		$filter = array(
 			'groupids' => null,
-			'maintenance' => null,
-			'severity' => null,
-			'extAck' => 0,
-			'filterEnable' => CProfile::get('web.dashconf.filter.enable', 0)
+			'maintenance' => null
 		);
 
-		if ($filter['filterEnable'] == 1) {
+		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
 			// groups
-			$filter['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
-
-			if ($filter['grpswitch'] == 0) {
+			if (CProfile::get('web.dashconf.groups.grpswitch', 0) == 0) {
 				// null mean all groups
 				$filter['groupids'] = null;
 			}
@@ -88,14 +83,6 @@ class CControllerWidgetWebView extends CController {
 			// hosts
 			$maintenance = CProfile::get('web.dashconf.hosts.maintenance', 1);
 			$filter['maintenance'] = ($maintenance == 0) ? 0 : null;
-
-			// triggers
-			$severity = CProfile::get('web.dashconf.triggers.severity', null);
-			$filter['severity'] = zbx_empty($severity) ? null : explode(';', $severity);
-			$filter['severity'] = zbx_toHash($filter['severity']);
-
-			$config = select_config();
-			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
 		}
 
 		$data = array (

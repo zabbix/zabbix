@@ -31,6 +31,8 @@ class CControllerWidgetHostsView extends CController {
 	}
 
 	protected function doAction() {
+		$config = select_config();
+
 		$filter = array(
 			'groupids' => null,
 			'maintenance' => null,
@@ -91,11 +93,8 @@ class CControllerWidgetHostsView extends CController {
 			$filter['severity'] = zbx_empty($severity) ? null : explode(';', $severity);
 			$filter['severity'] = zbx_toHash($filter['severity']);
 
-			$config = select_config();
 			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
 		}
-
-		$config = select_config();
 
 		$data = array(
 			'filter' => $filter,
