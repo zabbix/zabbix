@@ -730,12 +730,16 @@ div.tabs-nav-container {
 	margin: 0 0 15px 0;
 }
 
-div.tabs-nav {
+ul.tabs-nav {
 	height: 36px;
 	line-height: 36px;
 	text-align: center;
 	margin: 0 -10px 15px -10px;
 	border-bottom: 1px solid $table-hordivider-color;
+
+	li {
+		display: inline;
+	}
 
 	a {
 		padding: 10px 13px 9px 13px;

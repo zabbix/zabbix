@@ -459,6 +459,7 @@ sass/apple-touch-icon-120x120-precomposed.png -text svneol=unset#image/png
 sass/apple-touch-icon-152x152-precomposed.png -text svneol=unset#image/png
 sass/apple-touch-icon-180x180-precomposed.png -text svneol=unset#image/png
 sass/apple-touch-icon-76x76-precomposed.png -text svneol=unset#image/png
+sass/favicon.ico -text svneol=unset#image/x-icon
 sass/img/icon-sprite.png -text svneol=unset#image/png
 sass/img/zabbix.ico -text svneol=unset#image/x-icon
 sass/touch-icon-192x192.png -text svneol=unset#image/png
