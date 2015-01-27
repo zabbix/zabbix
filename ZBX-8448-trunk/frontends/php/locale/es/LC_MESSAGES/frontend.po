@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:42+0200\n"
+"POT-Creation-Date: 2015-01-22 10:54+0200\n"
 "PO-Revision-Date: 2014-10-18 05:18+0300\n"
 "Last-Translator: Saúl <saulortega.co@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -423,9 +423,9 @@ msgstr "Activo hasta"
 #: include/views/administration.general.iconmap.edit.php:119
 #: include/views/administration.general.iconmap.edit.php:154
 #: include/views/administration.general.image.edit.php:63
-#: include/views/administration.general.regularexpressions.edit.php:47
-#: include/views/administration.general.regularexpressions.edit.php:56
-#: include/views/administration.general.regularexpressions.edit.php:100
+#: include/views/administration.general.regularexpressions.edit.php:72
+#: include/views/administration.general.regularexpressions.edit.php:81
+#: include/views/administration.general.regularexpressions.edit.php:125
 #: include/views/administration.general.valuemapping.edit.php:41
 #: include/views/administration.general.valuemapping.edit.php:69
 #: include/views/administration.mediatypes.edit.php:119
@@ -1178,7 +1178,8 @@ msgstr "CONFIGURACIÓN DE MAPAS DE RED"
 msgid "CONFIGURATION OF PROXIES"
 msgstr "CONFIGURACIÓN DE PROXYS"
 
-#: adm.regexps.php:221
+#: include/views/administration.general.regularexpressions.edit.php:47
+#: include/views/administration.general.regularexpressions.list.php:45
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
 msgstr "CONFIGURACIÓN DE EXPRESIONES REGULARES"
 
@@ -1298,7 +1299,7 @@ msgstr "Canadá (136 caracteres)"
 
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:128 include/js.inc.php:171
-#: include/views/administration.general.regularexpressions.edit.php:58
+#: include/views/administration.general.regularexpressions.edit.php:83
 #: include/views/configuration.action.edit.php:1088
 #: include/views/configuration.action.edit.php:1097
 #: include/views/configuration.maintenance.edit.php:147
@@ -2648,8 +2649,8 @@ msgstr "No se pudo validar la verificación de descubrimiento porque la petició
 msgid "Caption"
 msgstr "Descripción"
 
-#: include/views/administration.general.regularexpressions.edit.php:44
-#: include/views/administration.general.regularexpressions.edit.php:54
+#: include/views/administration.general.regularexpressions.edit.php:69
+#: include/views/administration.general.regularexpressions.edit.php:79
 msgid "Case sensitive"
 msgstr "Distingue mayúsculas y minúsculas"
 
@@ -2825,15 +2826,15 @@ msgstr "Clásico"
 msgid "Clear"
 msgstr "Limpiar"
 
+#: include/views/configuration.httpconf.list.php:149
+#: include/views/configuration.item.list.php:273
+msgid "Clear history"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:272
 #: include/views/configuration.item.edit.php:456
 msgid "Clear history and trends"
 msgstr "Limpiar historial y tendencias"
-
-#: include/views/configuration.httpconf.list.php:149
-#: include/views/configuration.item.list.php:279
-msgid "Clear history for selected"
-msgstr "Eliminar histórico del monitor seleccionado"
 
 #: include/views/configuration.host.massupdate.php:222
 msgid "Clear when unlinking"
@@ -2844,7 +2845,7 @@ msgid "Clock"
 msgstr "Reloj"
 
 #: include/views/administration.general.iconmap.edit.php:146
-#: include/views/administration.general.regularexpressions.edit.php:89
+#: include/views/administration.general.regularexpressions.edit.php:114
 #: include/views/administration.proxy.edit.php:99
 #: include/views/administration.script.edit.php:120
 #: include/views/configuration.action.edit.php:1118
@@ -3245,6 +3246,9 @@ msgid "Coordinates"
 msgstr "Coordenadas"
 
 #: include/views/configuration.copy.elements.php:118
+#: include/views/configuration.graph.list.php:162
+#: include/views/configuration.item.list.php:276
+#: include/views/configuration.triggers.list.php:222
 msgid "Copy"
 msgstr "Copiar"
 
@@ -3254,12 +3258,6 @@ msgid "Copy %1$s element to..."
 msgid_plural "Copy %1$s elements to..."
 msgstr[0] "Copiar %1$s elemento a..."
 msgstr[1] "Copiar %1$s elementos a..."
-
-#: include/views/configuration.graph.list.php:156
-#: include/views/configuration.item.list.php:276
-#: include/views/configuration.triggers.list.php:225
-msgid "Copy selected to ..."
-msgstr "Copiar a ..."
 
 #: include/classes/api/services/CUser.php:1076
 #, c-format
@@ -3881,8 +3879,31 @@ msgstr "Demorado por"
 
 #: include/classes/html/CButtonDelete.php:25
 #: include/views/administration.auditlogs.list.php:47
-#: include/views/configuration.triggers.edit.php:162 jsLoader.php:108
-#: jsLoader.php:186 tr_logform.php:291 tr_logform.php:317
+#: include/views/administration.general.regularexpressions.list.php:90
+#: include/views/administration.mediatypes.list.php:121
+#: include/views/administration.proxy.list.php:111
+#: include/views/administration.script.list.php:92
+#: include/views/administration.usergroups.list.php:143
+#: include/views/administration.users.list.php:155
+#: include/views/configuration.action.list.php:111
+#: include/views/configuration.application.list.php:118
+#: include/views/configuration.discovery.list.php:73
+#: include/views/configuration.graph.list.php:164
+#: include/views/configuration.host.discovery.list.php:154
+#: include/views/configuration.hostgroups.list.php:163
+#: include/views/configuration.host.list.php:221
+#: include/views/configuration.host.prototype.list.php:134
+#: include/views/configuration.httpconf.list.php:152
+#: include/views/configuration.item.list.php:278
+#: include/views/configuration.item.prototype.list.php:124
+#: include/views/configuration.maintenance.list.php:84
+#: include/views/configuration.screen.list.php:70
+#: include/views/configuration.slideconf.list.php:60
+#: include/views/configuration.sysmap.list.php:67
+#: include/views/configuration.trigger.prototype.list.php:148
+#: include/views/configuration.triggers.edit.php:162
+#: include/views/configuration.triggers.list.php:224 jsLoader.php:108
+#: jsLoader.php:186 templates.php:672 tr_logform.php:291 tr_logform.php:317
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -3890,11 +3911,11 @@ msgstr "Eliminar"
 msgid "Delete all elements that are not present in the XML file?"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:494
+#: include/views/configuration.template.edit.php:494 templates.php:673
 msgid "Delete and clear"
 msgstr "Eliminar y limpiar"
 
-#: templates.php:679
+#: templates.php:674
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "¿Desea eliminar y limpiar las plantillas seleccionadas? (Advertencia: Todos los equipos enlazados serán purgados)"
 
@@ -3928,7 +3949,7 @@ msgstr "¿Desea eliminar el prototipo de gráfica?"
 msgid "Delete graph?"
 msgstr "¿Desea eliminar el mapa de íconos?"
 
-#: include/views/configuration.item.list.php:280
+#: include/views/configuration.item.list.php:274
 msgid "Delete history of selected items?"
 msgstr "¿Desea eliminar el historial de los ítems seleccionados?"
 
@@ -3972,7 +3993,7 @@ msgstr "¿Desea eliminar el mapa de red?"
 msgid "Delete proxy?"
 msgstr "¿Desea eliminar el proxy?"
 
-#: include/views/administration.general.regularexpressions.edit.php:91
+#: include/views/administration.general.regularexpressions.edit.php:116
 msgid "Delete regular expression?"
 msgstr "¿Desea eliminar la expresión regular?"
 
@@ -3986,47 +4007,24 @@ msgstr "¿Desea eliminar el script?"
 
 #: include/reports.inc.php:111 include/reports.inc.php:201
 #: include/reports.inc.php:244
-#: include/views/administration.general.regularexpressions.list.php:66
-#: include/views/administration.mediatypes.list.php:124
-#: include/views/administration.proxy.list.php:110
-#: include/views/administration.script.list.php:89
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:119
 #: include/views/administration.usergroups.edit.php:127
-#: include/views/administration.usergroups.list.php:148
 #: include/views/administration.users.edit.php:73
 #: include/views/administration.users.edit.php:223
-#: include/views/administration.users.list.php:155
-#: include/views/configuration.action.list.php:114
-#: include/views/configuration.application.list.php:116
-#: include/views/configuration.discovery.list.php:76
-#: include/views/configuration.graph.list.php:159
-#: include/views/configuration.host.discovery.list.php:150
-#: include/views/configuration.hostgroups.list.php:164
-#: include/views/configuration.host.list.php:228
-#: include/views/configuration.host.prototype.list.php:128
-#: include/views/configuration.httpconf.list.php:153
-#: include/views/configuration.item.list.php:283
-#: include/views/configuration.item.prototype.list.php:120
-#: include/views/configuration.maintenance.list.php:81
-#: include/views/configuration.screen.list.php:70
-#: include/views/configuration.slideconf.list.php:57
-#: include/views/configuration.sysmap.list.php:64
-#: include/views/configuration.trigger.prototype.list.php:146
-#: include/views/configuration.triggers.list.php:228 templates.php:674
 msgid "Delete selected"
 msgstr "Eliminar lo seleccionado"
 
-#: include/views/configuration.action.list.php:115
+#: include/views/configuration.action.list.php:111
 msgid "Delete selected actions?"
 msgstr "¿Desea eliminar las acciones seleccionadas?"
 
-#: include/views/configuration.application.list.php:117
+#: include/views/configuration.application.list.php:118
 msgid "Delete selected applications?"
 msgstr "¿Desea eliminar las aplicaciones seleccionadas?"
 
-#: include/views/configuration.discovery.list.php:77
-#: include/views/configuration.host.discovery.list.php:151
+#: include/views/configuration.discovery.list.php:73
+#: include/views/configuration.host.discovery.list.php:155
 msgid "Delete selected discovery rules?"
 msgstr "¿Desea eliminar las reglas de descubrimiento seleccionadas?"
 
@@ -4034,11 +4032,11 @@ msgstr "¿Desea eliminar las reglas de descubrimiento seleccionadas?"
 msgid "Delete selected elements?"
 msgstr "¿Desea eliminar los elementos seleccionados?"
 
-#: include/views/configuration.graph.list.php:162
+#: include/views/configuration.graph.list.php:165
 msgid "Delete selected graph prototypes?"
 msgstr "¿Desea eliminar los prototipos de gráficas seleccionados?"
 
-#: include/views/configuration.graph.list.php:162
+#: include/views/configuration.graph.list.php:166
 msgid "Delete selected graphs?"
 msgstr "¿Desea eliminar las gráficas seleccionadas?"
 
@@ -4047,11 +4045,11 @@ msgstr "¿Desea eliminar las gráficas seleccionadas?"
 msgid "Delete selected group?"
 msgstr "¿Desea eliminar el grupo seleccionado?"
 
-#: include/views/administration.usergroups.list.php:149
+#: include/views/administration.usergroups.list.php:143
 msgid "Delete selected groups?"
 msgstr "¿Desea eliminar los grupos seleccionados?"
 
-#: include/views/configuration.hostgroups.list.php:165
+#: include/views/configuration.hostgroups.list.php:163
 msgid "Delete selected host groups?"
 msgstr "¿Desea eliminar los grupos de equipos seleccionados?"
 
@@ -4059,7 +4057,7 @@ msgstr "¿Desea eliminar los grupos de equipos seleccionados?"
 msgid "Delete selected host prototype?"
 msgstr "¿Desea eliminar el prototipo de equipo seleccionado?"
 
-#: include/views/configuration.host.prototype.list.php:129
+#: include/views/configuration.host.prototype.list.php:135
 msgid "Delete selected host prototypes?"
 msgstr "¿Desea eliminar los prototipos de equipos seleccionados?"
 
@@ -4067,7 +4065,7 @@ msgstr "¿Desea eliminar los prototipos de equipos seleccionados?"
 msgid "Delete selected host?"
 msgstr "¿Desea eliminar el equipo seleccionado?"
 
-#: include/views/configuration.host.list.php:229
+#: include/views/configuration.host.list.php:221
 msgid "Delete selected hosts?"
 msgstr "¿Desea eliminar los equipos seleccionados?"
 
@@ -4075,19 +4073,19 @@ msgstr "¿Desea eliminar los equipos seleccionados?"
 msgid "Delete selected image?"
 msgstr "¿Desea eliminar la imagen seleccionada?"
 
-#: include/views/configuration.item.prototype.list.php:121
+#: include/views/configuration.item.prototype.list.php:125
 msgid "Delete selected item prototypes?"
 msgstr "¿Desea eliminar los prototipos de ítems seleccionados?"
 
-#: include/views/configuration.item.list.php:284
+#: include/views/configuration.item.list.php:278
 msgid "Delete selected items?"
 msgstr "¿Desea eliminar los ítems seleccionados?"
 
-#: include/views/configuration.maintenance.list.php:82
+#: include/views/configuration.maintenance.list.php:84
 msgid "Delete selected maintenance periods?"
 msgstr "¿Desea eliminar los periodos de mantenimiento seleccionados?"
 
-#: include/views/configuration.sysmap.list.php:65
+#: include/views/configuration.sysmap.list.php:67
 msgid "Delete selected maps?"
 msgstr "¿Desea eliminar los mapas seleccionados?"
 
@@ -4095,7 +4093,7 @@ msgstr "¿Desea eliminar los mapas seleccionados?"
 msgid "Delete selected media type?"
 msgstr "¿Desea eliminar el tipo de medios seleccionado?"
 
-#: include/views/administration.mediatypes.list.php:125
+#: include/views/administration.mediatypes.list.php:121
 msgid "Delete selected media types?"
 msgstr "¿Desea eliminar los tipos de medios seleccionados?"
 
@@ -4103,31 +4101,31 @@ msgstr "¿Desea eliminar los tipos de medios seleccionados?"
 msgid "Delete selected proxies?"
 msgstr "¿Desea eliminar los proxys seleccionados?"
 
-#: include/views/administration.general.regularexpressions.list.php:67
+#: include/views/administration.general.regularexpressions.list.php:90
 msgid "Delete selected regular expressions?"
 msgstr "¿Desea eliminar las expresiones regulares seleccionadas?"
 
-#: include/views/configuration.screen.list.php:71
+#: include/views/configuration.screen.list.php:70
 msgid "Delete selected screens?"
 msgstr "¿Desea eliminar las pantallas seleccionadas?"
 
-#: include/views/administration.script.list.php:90
+#: include/views/administration.script.list.php:92
 msgid "Delete selected scripts?"
 msgstr "¿Desea eliminar los scripts seleccionados?"
 
-#: include/views/configuration.slideconf.list.php:58
+#: include/views/configuration.slideconf.list.php:60
 msgid "Delete selected slide shows?"
 msgstr "¿Desea eliminar las diapositivas seleccionadas?"
 
-#: templates.php:675
+#: templates.php:672
 msgid "Delete selected templates?"
 msgstr "¿Desea eliminar las plantillas seleccionadas?"
 
-#: include/views/configuration.trigger.prototype.list.php:147
+#: include/views/configuration.trigger.prototype.list.php:149
 msgid "Delete selected trigger prototypes?"
 msgstr "¿Desea eliminar los prototipos de disparadores seleccionados?"
 
-#: include/views/configuration.triggers.list.php:229
+#: include/views/configuration.triggers.list.php:224
 msgid "Delete selected triggers?"
 msgstr "¿Desea eliminar los disparadores seleccionados?"
 
@@ -4135,7 +4133,7 @@ msgstr "¿Desea eliminar los disparadores seleccionados?"
 msgid "Delete selected user?"
 msgstr "¿Desea eliminar el usuario seleccionado?"
 
-#: include/views/administration.users.list.php:156
+#: include/views/administration.users.list.php:155
 msgid "Delete selected users?"
 msgstr "¿Desea eliminar los usuarios seccionados?"
 
@@ -4150,13 +4148,9 @@ msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] "¿Desea eliminar el mapeo de valores seleccionado? ¡Está siendo usado por %d ítem!"
 msgstr[1] "¿Desea eliminar el mapeo de valores seleccionado? ¡Está siendo usado por %d ítems!"
 
-#: include/views/configuration.httpconf.list.php:154
+#: include/views/configuration.httpconf.list.php:152
 msgid "Delete selected web scenarios?"
 msgstr "¿Desea eliminar los escenarios web seleccionados?"
-
-#: templates.php:678
-msgid "Delete selected with linked elements"
-msgstr "Eliminar lo seleccionado con los elementos enlazados"
 
 #: jsLoader.php:187
 #, c-format
@@ -4247,7 +4241,7 @@ msgstr "Se ha eliminado el prototipo de disparador \"%1$s\" de \"%2$s\"."
 msgid "Deleted: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Se ha eliminado el escenario web \"%1$s\" de \"%2$s\"."
 
-#: include/views/administration.general.regularexpressions.edit.php:53
+#: include/views/administration.general.regularexpressions.edit.php:78
 msgid "Delimiter"
 msgstr "Delimitador"
 
@@ -4409,14 +4403,27 @@ msgid "Dimension (cols x rows)"
 msgstr "Dimensiones (columnas x filas)"
 
 #: include/views/administration.auditlogs.list.php:49
+#: include/views/administration.mediatypes.list.php:120
+#: include/views/administration.usergroups.list.php:136
+#: include/views/configuration.action.list.php:110
+#: include/views/configuration.application.list.php:115
+#: include/views/configuration.discovery.list.php:72
+#: include/views/configuration.host.discovery.list.php:151
+#: include/views/configuration.host.list.php:218
+#: include/views/configuration.host.prototype.list.php:131
+#: include/views/configuration.httpconf.list.php:148
+#: include/views/configuration.item.list.php:272
+#: include/views/configuration.item.prototype.list.php:121
+#: include/views/configuration.trigger.prototype.list.php:144
+#: include/views/configuration.triggers.list.php:221
 msgid "Disable"
 msgstr ""
 
-#: include/views/administration.usergroups.list.php:144
+#: include/views/administration.usergroups.list.php:140
 msgid "Disable debug mode"
 msgstr ""
 
-#: include/views/administration.usergroups.list.php:145
+#: include/views/administration.usergroups.list.php:141
 msgid "Disable debug mode in selected groups?"
 msgstr "¿Desea desactivar el modo de depuración en los grupos seleccionados?"
 
@@ -4428,78 +4435,65 @@ msgstr "Desactivar equipo"
 msgid "Disable host?"
 msgstr "¿Desea desactivar el equipo?"
 
+#: include/views/administration.proxy.list.php:108
+#: include/views/configuration.hostgroups.list.php:160
+msgid "Disable hosts"
+msgstr ""
+
 #: include/views/configuration.hostgroups.list.php:161
 msgid "Disable hosts in the selected host groups?"
 msgstr "¿Desea desactivar los equipos en los grupos de equipos seleccionados?"
 
-#: include/views/administration.proxy.list.php:107
+#: include/views/administration.proxy.list.php:109
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "¿Desea desactivar los equipos monitoreados por los proxis seleccionados?"
 
-#: include/views/administration.mediatypes.list.php:120
-#: include/views/administration.proxy.list.php:106
-#: include/views/administration.usergroups.list.php:136
 #: include/views/configuration.action.list.php:110
-#: include/views/configuration.application.list.php:112
-#: include/views/configuration.discovery.list.php:72
-#: include/views/configuration.host.discovery.list.php:146
-#: include/views/configuration.hostgroups.list.php:160
-#: include/views/configuration.host.list.php:224
-#: include/views/configuration.host.prototype.list.php:124
-#: include/views/configuration.httpconf.list.php:145
-#: include/views/configuration.item.list.php:269
-#: include/views/configuration.item.prototype.list.php:116
-#: include/views/configuration.trigger.prototype.list.php:139
-#: include/views/configuration.triggers.list.php:218
-msgid "Disable selected"
-msgstr "Desactivar"
-
-#: include/views/configuration.action.list.php:111
 msgid "Disable selected actions?"
 msgstr "¿Desea desactivar las acciones seleccionadas?"
 
-#: include/views/configuration.application.list.php:113
+#: include/views/configuration.application.list.php:116
 msgid "Disable selected applications?"
 msgstr "¿Desea desactivar las aplicaciones seleccionadas?"
 
-#: include/views/configuration.discovery.list.php:73
-#: include/views/configuration.host.discovery.list.php:147
+#: include/views/configuration.discovery.list.php:72
+#: include/views/configuration.host.discovery.list.php:152
 msgid "Disable selected discovery rules?"
 msgstr "¿Desea desactivar las reglas de descubrimiento seleccionadas?"
 
-#: include/views/administration.usergroups.list.php:137
+#: include/views/administration.usergroups.list.php:136
 msgid "Disable selected groups?"
 msgstr ""
 
-#: include/views/configuration.host.prototype.list.php:125
+#: include/views/configuration.host.prototype.list.php:132
 msgid "Disable selected host prototypes?"
 msgstr "¿Desea desactivar los prototipos de equipo seleccionados?"
 
-#: include/views/configuration.host.list.php:225
+#: include/views/configuration.host.list.php:218
 msgid "Disable selected hosts?"
 msgstr "¿Desea desactivar los equipos seleccionados?"
 
-#: include/views/configuration.item.prototype.list.php:117
+#: include/views/configuration.item.prototype.list.php:122
 msgid "Disable selected item prototypes?"
 msgstr "¿Desea desactivar los prototipos de ítem seleccionados?"
 
-#: include/views/configuration.item.list.php:270
+#: include/views/configuration.item.list.php:272
 msgid "Disable selected items?"
 msgstr "¿Desea desactivar los ítems seleccionados?"
 
-#: include/views/administration.mediatypes.list.php:121
+#: include/views/administration.mediatypes.list.php:120
 msgid "Disable selected media types?"
 msgstr "¿Desea desactivar los tipos de medios seleccionados?"
 
-#: include/views/configuration.trigger.prototype.list.php:140
+#: include/views/configuration.trigger.prototype.list.php:145
 msgid "Disable selected trigger prototypes?"
 msgstr "¿Desea desactivar los prototipos de disparador seleccionados?"
 
-#: include/views/configuration.triggers.list.php:219
+#: include/views/configuration.triggers.list.php:221
 msgid "Disable selected triggers?"
 msgstr "¿Desea desactivar los disparadores seleccionados?"
 
-#: include/views/configuration.httpconf.list.php:146
+#: include/views/configuration.httpconf.list.php:148
 msgid "Disable selected web scenarios?"
 msgstr "¿Desea desactivar los escenarios web seleccionados?"
 
@@ -4660,11 +4654,11 @@ msgstr "Estado del descubrimiento"
 msgid "Display OK triggers for"
 msgstr "Mostrar disparadores en «BIEN» para"
 
-#: latest.php:889
+#: latest.php:891
 msgid "Display graph"
 msgstr "Mostrar gráfica"
 
-#: latest.php:888
+#: latest.php:890
 #, fuzzy
 msgid "Display stacked graph"
 msgstr "Mostrar gráfica apilada"
@@ -5029,6 +5023,19 @@ msgid "Empty web scenario ID."
 msgstr "ID de escenario web vacío."
 
 #: include/views/administration.auditlogs.list.php:48
+#: include/views/administration.mediatypes.list.php:119
+#: include/views/administration.usergroups.list.php:135
+#: include/views/configuration.action.list.php:109
+#: include/views/configuration.application.list.php:114
+#: include/views/configuration.discovery.list.php:71
+#: include/views/configuration.host.discovery.list.php:148
+#: include/views/configuration.host.list.php:217
+#: include/views/configuration.host.prototype.list.php:128
+#: include/views/configuration.httpconf.list.php:147
+#: include/views/configuration.item.list.php:271
+#: include/views/configuration.item.prototype.list.php:118
+#: include/views/configuration.trigger.prototype.list.php:141
+#: include/views/configuration.triggers.list.php:220
 msgid "Enable"
 msgstr "Activar"
 
@@ -5036,11 +5043,11 @@ msgstr "Activar"
 msgid "Enable confirmation"
 msgstr "Activar confirmación"
 
-#: include/views/administration.usergroups.list.php:140
+#: include/views/administration.usergroups.list.php:137
 msgid "Enable debug mode"
 msgstr ""
 
-#: include/views/administration.usergroups.list.php:141
+#: include/views/administration.usergroups.list.php:138
 msgid "Enable debug mode in selected groups?"
 msgstr ""
 
@@ -5056,7 +5063,12 @@ msgstr "Activar equipo"
 msgid "Enable host?"
 msgstr "¿Desea activar el equipo?"
 
-#: include/views/administration.proxy.list.php:103
+#: include/views/administration.proxy.list.php:105
+#: include/views/configuration.hostgroups.list.php:159
+msgid "Enable hosts"
+msgstr ""
+
+#: include/views/administration.proxy.list.php:106
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "¿Desea activar los equipos monitorizados por los proxis seleccionados?"
 
@@ -5071,71 +5083,53 @@ msgstr "¿Desea activar los equipos monitorizados por los proxis seleccionados?"
 msgid "Enable internal housekeeping"
 msgstr "Activar limpieza interna"
 
-#: include/views/administration.mediatypes.list.php:116
-#: include/views/administration.proxy.list.php:102
-#: include/views/administration.usergroups.list.php:132
-#: include/views/configuration.action.list.php:106
-#: include/views/configuration.application.list.php:108
-#: include/views/configuration.discovery.list.php:68
-#: include/views/configuration.host.discovery.list.php:142
-#: include/views/configuration.hostgroups.list.php:156
-#: include/views/configuration.host.list.php:220
-#: include/views/configuration.host.prototype.list.php:120
-#: include/views/configuration.httpconf.list.php:141
-#: include/views/configuration.item.list.php:265
-#: include/views/configuration.item.prototype.list.php:112
-#: include/views/configuration.trigger.prototype.list.php:135
-#: include/views/configuration.triggers.list.php:214
-msgid "Enable selected"
-msgstr "Activar"
-
-#: include/views/configuration.action.list.php:107
+#: include/views/configuration.action.list.php:109
 msgid "Enable selected actions?"
 msgstr "¿Desea activar las acciones seleccionadas?"
 
-#: include/views/configuration.application.list.php:109
+#: include/views/configuration.application.list.php:114
 msgid "Enable selected applications?"
 msgstr "¿Desea activar las aplicaciones seleccionadas?"
 
-#: include/views/configuration.discovery.list.php:69
-#: include/views/configuration.host.discovery.list.php:143
+#: include/views/configuration.discovery.list.php:71
+#: include/views/configuration.host.discovery.list.php:149
 msgid "Enable selected discovery rules?"
 msgstr "¿Desea activar las reglas de descubrimiento seleccionadas?"
 
-#: include/views/administration.usergroups.list.php:133
+#: include/views/administration.usergroups.list.php:135
 msgid "Enable selected groups?"
 msgstr "¿Desea activar los grupos seleccionados?"
 
-#: include/views/configuration.host.prototype.list.php:121
+#: include/views/configuration.host.prototype.list.php:129
 msgid "Enable selected host prototypes?"
 msgstr "¿Desea activar los prototipos de equipo seleccionados?"
 
-#: include/views/configuration.hostgroups.list.php:157
-#: include/views/configuration.host.list.php:221
+#: include/views/configuration.hostgroups.list.php:159
+#: include/views/configuration.host.list.php:217
 msgid "Enable selected hosts?"
 msgstr ""
 
-#: include/views/configuration.item.prototype.list.php:113
+#: include/views/configuration.item.prototype.list.php:119
 msgid "Enable selected item prototypes?"
 msgstr ""
 
-#: include/views/configuration.item.list.php:266
+#: include/views/configuration.item.list.php:271
 msgid "Enable selected items?"
 msgstr "¿Desea activar los ítems seleccionados?"
 
-#: include/views/administration.mediatypes.list.php:117
+#: include/views/administration.mediatypes.list.php:119
 msgid "Enable selected media types?"
 msgstr "¿Desea activar los tipos de medios seleccionados?"
 
-#: include/views/configuration.trigger.prototype.list.php:136
+#: include/views/configuration.trigger.prototype.list.php:142
 msgid "Enable selected trigger prototypes?"
 msgstr "¿Desea activar los prototipos de disparador seleccionados?"
 
-#: include/views/configuration.triggers.list.php:215
+#: include/views/configuration.triggers.list.php:220
 msgid "Enable selected triggers?"
 msgstr "¿Desea activar los disparadores seleccionados?"
 
-#: include/views/configuration.httpconf.list.php:142
+#: include/views/configuration.httpconf.list.php:147
 msgid "Enable selected web scenarios?"
 msgstr "¿Desea activar los escenarios web seleccionados?"
 
@@ -5326,11 +5320,11 @@ msgstr ""
 msgid "Exploded"
 msgstr "Dividido"
 
-#: include/views/configuration.host.list.php:217
+#: include/views/configuration.host.list.php:219
 #: include/views/configuration.screen.list.php:68
-#: include/views/configuration.sysmap.list.php:62 templates.php:672
-msgid "Export selected"
-msgstr "Exportar lo seleccionado"
+#: include/views/configuration.sysmap.list.php:66 templates.php:671
+msgid "Export"
+msgstr ""
 
 #: events.php:298
 msgid "Export to CSV"
@@ -5338,9 +5332,9 @@ msgstr "Exportar a CSV"
 
 #: include/triggers.inc.php:1497
 #: include/views/administration.general.iconmap.edit.php:41
-#: include/views/administration.general.regularexpressions.edit.php:42
-#: include/views/administration.general.regularexpressions.edit.php:51
-#: include/views/administration.general.regularexpressions.edit.php:73
+#: include/views/administration.general.regularexpressions.edit.php:67
+#: include/views/administration.general.regularexpressions.edit.php:76
+#: include/views/administration.general.regularexpressions.edit.php:98
 #: include/views/configuration.item.list.php:150
 #: include/views/configuration.trigger.prototype.list.php:62
 #: include/views/configuration.triggers.edit.php:142
@@ -5370,15 +5364,15 @@ msgstr "La expresión no puede estar vacía"
 msgid "Expression constructor"
 msgstr "Constructor de expresiones"
 
-#: include/views/administration.general.regularexpressions.edit.php:43
-#: include/views/administration.general.regularexpressions.edit.php:52
-#: include/views/administration.general.regularexpressions.edit.php:73
+#: include/views/administration.general.regularexpressions.edit.php:68
+#: include/views/administration.general.regularexpressions.edit.php:77
+#: include/views/administration.general.regularexpressions.edit.php:98
 msgid "Expression type"
 msgstr "Tipo de expresón"
 
-#: include/views/administration.general.regularexpressions.edit.php:48
-#: include/views/administration.general.regularexpressions.edit.php:80
-#: include/views/administration.general.regularexpressions.list.php:32
+#: include/views/administration.general.regularexpressions.edit.php:73
+#: include/views/administration.general.regularexpressions.edit.php:105
+#: include/views/administration.general.regularexpressions.list.php:56
 msgid "Expressions"
 msgstr "Expresiones"
 
@@ -5696,10 +5690,12 @@ msgid "GSM modem"
 msgstr "Modem GSM"
 
 #: adm.gui.php:90 adm.housekeeper.php:125 adm.iconmapping.php:110
-#: adm.images.php:135 adm.macros.php:158 adm.other.php:70 adm.regexps.php:201
+#: adm.images.php:135 adm.macros.php:158 adm.other.php:70
 #: adm.triggerdisplayoptions.php:85 adm.triggerseverities.php:81
 #: adm.valuemapping.php:128 adm.workingtime.php:56
 #: include/views/administration.general.gui.edit.php:59
+#: include/views/administration.general.regularexpressions.edit.php:30
+#: include/views/administration.general.regularexpressions.list.php:27
 msgid "GUI"
 msgstr ""
 
@@ -5760,33 +5756,6 @@ msgstr "Script global"
 #: popup.php:115
 msgid "Global scripts"
 msgstr "Scripts globales"
-
-#: include/views/administration.general.regularexpressions.list.php:70
-#: include/views/administration.mediatypes.list.php:128
-#: include/views/administration.proxy.list.php:114
-#: include/views/administration.script.list.php:93
-#: include/views/administration.usergroups.list.php:152
-#: include/views/administration.users.list.php:159
-#: include/views/configuration.action.list.php:118
-#: include/views/configuration.application.list.php:120
-#: include/views/configuration.discovery.list.php:80
-#: include/views/configuration.graph.list.php:166
-#: include/views/configuration.host.discovery.list.php:154
-#: include/views/configuration.hostgroups.list.php:168
-#: include/views/configuration.host.list.php:232
-#: include/views/configuration.host.prototype.list.php:132
-#: include/views/configuration.httpconf.list.php:157
-#: include/views/configuration.item.list.php:287
-#: include/views/configuration.item.prototype.list.php:124
-#: include/views/configuration.maintenance.list.php:85
-#: include/views/configuration.screen.list.php:74
-#: include/views/configuration.slideconf.list.php:61
-#: include/views/configuration.sysmap.list.php:68
-#: include/views/configuration.trigger.prototype.list.php:150
-#: include/views/configuration.triggers.list.php:232 latest.php:892
-#: templates.php:682 tr_status.php:820
-msgid "Go"
-msgstr "Ir"
 
 #: jsLoader.php:201
 msgid "Go to"
@@ -6684,10 +6653,12 @@ msgid "Hours"
 msgstr ""
 
 #: adm.gui.php:91 adm.housekeeper.php:126 adm.iconmapping.php:111
-#: adm.images.php:136 adm.macros.php:159 adm.other.php:71 adm.regexps.php:202
+#: adm.images.php:136 adm.macros.php:159 adm.other.php:71
 #: adm.triggerdisplayoptions.php:86 adm.triggerseverities.php:82
 #: adm.valuemapping.php:129 adm.workingtime.php:57
 #: include/views/administration.general.housekeeper.edit.php:151
+#: include/views/administration.general.regularexpressions.edit.php:31
+#: include/views/administration.general.regularexpressions.list.php:28
 msgid "Housekeeping"
 msgstr ""
 
@@ -6947,9 +6918,11 @@ msgstr ""
 
 #: adm.gui.php:93 adm.housekeeper.php:128 adm.iconmapping.php:113
 #: adm.iconmapping.php:176 adm.images.php:138 adm.macros.php:161
-#: adm.other.php:73 adm.regexps.php:204 adm.triggerdisplayoptions.php:88
+#: adm.other.php:73 adm.triggerdisplayoptions.php:88
 #: adm.triggerseverities.php:84 adm.valuemapping.php:131
 #: adm.workingtime.php:59
+#: include/views/administration.general.regularexpressions.edit.php:33
+#: include/views/administration.general.regularexpressions.list.php:30
 msgid "Icon mapping"
 msgstr ""
 
@@ -7018,10 +6991,12 @@ msgid "Image updated"
 msgstr "Imágen actualizada"
 
 #: adm.gui.php:92 adm.housekeeper.php:127 adm.iconmapping.php:112
-#: adm.images.php:137 adm.macros.php:160 adm.other.php:72 adm.regexps.php:203
+#: adm.images.php:137 adm.macros.php:160 adm.other.php:72
 #: adm.triggerdisplayoptions.php:87 adm.triggerseverities.php:83
 #: adm.valuemapping.php:130 adm.workingtime.php:58
 #: include/views/administration.general.image.list.php:29
+#: include/views/administration.general.regularexpressions.edit.php:32
+#: include/views/administration.general.regularexpressions.list.php:29
 #: include/views/conf.import.php:39
 msgid "Images"
 msgstr "Imágenes"
@@ -8999,10 +8974,12 @@ msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr ""
 
 #: adm.gui.php:95 adm.housekeeper.php:130 adm.iconmapping.php:115
-#: adm.images.php:140 adm.macros.php:163 adm.other.php:75 adm.regexps.php:206
+#: adm.images.php:140 adm.macros.php:163 adm.other.php:75
 #: adm.triggerdisplayoptions.php:90 adm.triggerseverities.php:86
 #: adm.valuemapping.php:133 adm.workingtime.php:61
 #: include/views/administration.general.macros.edit.php:31
+#: include/views/administration.general.regularexpressions.edit.php:35
+#: include/views/administration.general.regularexpressions.list.php:32
 #: include/views/configuration.host.edit.php:823
 #: include/views/configuration.host.prototype.edit.php:285
 #: include/views/configuration.template.edit.php:480
@@ -9183,11 +9160,11 @@ msgstr "Marcar seleccionados"
 msgid "Mask"
 msgstr ""
 
-#: include/views/configuration.host.list.php:219
-#: include/views/configuration.item.list.php:273
+#: include/views/configuration.host.list.php:220
+#: include/views/configuration.item.list.php:277
 #: include/views/configuration.item.massupdate.php:566
-#: include/views/configuration.trigger.prototype.list.php:143
-#: include/views/configuration.triggers.list.php:222
+#: include/views/configuration.trigger.prototype.list.php:147
+#: include/views/configuration.triggers.list.php:223
 #: include/views/configuration.triggers.massupdate.php:159
 msgid "Mass update"
 msgstr "Actualizar masivamente"
@@ -9617,8 +9594,8 @@ msgstr ""
 #: include/views/administration.general.iconmap.edit.php:29
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.image.edit.php:34
-#: include/views/administration.general.regularexpressions.edit.php:37
-#: include/views/administration.general.regularexpressions.list.php:31
+#: include/views/administration.general.regularexpressions.edit.php:62
+#: include/views/administration.general.regularexpressions.list.php:55
 #: include/views/administration.general.valuemapping.edit.php:35
 #: include/views/administration.general.valuemapping.list.php:24
 #: include/views/administration.mediatypes.edit.php:35
@@ -9787,7 +9764,7 @@ msgstr "Nuevo elemento para el gráfico"
 msgid "New media"
 msgstr "Nuevo medio"
 
-#: adm.regexps.php:217
+#: include/views/administration.general.regularexpressions.list.php:43
 msgid "New regular expression"
 msgstr "Nueva expresión regular"
 
@@ -10441,7 +10418,7 @@ msgstr ""
 msgid "No recipients for action operation message."
 msgstr ""
 
-#: include/views/administration.general.regularexpressions.list.php:28
+#: include/views/administration.general.regularexpressions.list.php:52
 msgid "No regular expressions found."
 msgstr ""
 
@@ -11119,11 +11096,13 @@ msgid "Original blue"
 msgstr "Azul (Original)"
 
 #: adm.gui.php:100 adm.housekeeper.php:135 adm.iconmapping.php:120
-#: adm.images.php:145 adm.macros.php:168 adm.other.php:80 adm.regexps.php:211
+#: adm.images.php:145 adm.macros.php:168 adm.other.php:80
 #: adm.triggerdisplayoptions.php:95 adm.triggerseverities.php:91
 #: adm.valuemapping.php:138 adm.workingtime.php:66
 #: include/classes/html/CTweenBox.php:76
 #: include/classes/html/CTweenBox.php:103
+#: include/views/administration.general.regularexpressions.edit.php:40
+#: include/views/administration.general.regularexpressions.list.php:37
 msgid "Other"
 msgstr "Otras configuraciones"
 
@@ -11968,10 +11947,12 @@ msgid "Regular expression updated"
 msgstr ""
 
 #: adm.gui.php:94 adm.housekeeper.php:129 adm.iconmapping.php:114
-#: adm.images.php:139 adm.macros.php:162 adm.other.php:74 adm.regexps.php:205
+#: adm.images.php:139 adm.macros.php:162 adm.other.php:74
 #: adm.triggerdisplayoptions.php:89 adm.triggerseverities.php:85
 #: adm.valuemapping.php:132 adm.workingtime.php:60
-#: include/views/administration.general.regularexpressions.list.php:22
+#: include/views/administration.general.regularexpressions.edit.php:34
+#: include/views/administration.general.regularexpressions.list.php:31
+#: include/views/administration.general.regularexpressions.list.php:49
 msgid "Regular expressions"
 msgstr ""
 
@@ -12201,8 +12182,8 @@ msgstr "Código de respuesta"
 msgid "Response time"
 msgstr "Tiempo de respuesta"
 
-#: include/views/administration.general.regularexpressions.edit.php:73
-#: include/views/administration.general.regularexpressions.edit.php:74
+#: include/views/administration.general.regularexpressions.edit.php:98
+#: include/views/administration.general.regularexpressions.edit.php:99
 #: tr_testexpr.php:137 tr_testexpr.php:181
 msgid "Result"
 msgstr "Resultado"
@@ -13784,7 +13765,7 @@ msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr ""
 
 #: include/views/administration.authentication.edit.php:138
-#: include/views/administration.general.regularexpressions.edit.php:81
+#: include/views/administration.general.regularexpressions.edit.php:106
 #: include/views/configuration.triggers.edit.php:221 tr_testexpr.php:25
 #: tr_testexpr.php:128 tr_testexpr.php:184
 msgid "Test"
@@ -13802,12 +13783,12 @@ msgstr ""
 msgid "Test data"
 msgstr ""
 
-#: include/views/administration.general.regularexpressions.edit.php:69
+#: include/views/administration.general.regularexpressions.edit.php:94
 msgid "Test expressions"
 msgstr ""
 
 #: adm.regexps.php:38
-#: include/views/administration.general.regularexpressions.edit.php:66
+#: include/views/administration.general.regularexpressions.edit.php:91
 msgid "Test string"
 msgstr ""
 
@@ -14172,9 +14153,11 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: adm.gui.php:99 adm.housekeeper.php:134 adm.iconmapping.php:119
-#: adm.images.php:144 adm.macros.php:167 adm.other.php:79 adm.regexps.php:210
+#: adm.images.php:144 adm.macros.php:167 adm.other.php:79
 #: adm.triggerdisplayoptions.php:94 adm.triggerseverities.php:90
 #: adm.valuemapping.php:137 adm.workingtime.php:65
+#: include/views/administration.general.regularexpressions.edit.php:39
+#: include/views/administration.general.regularexpressions.list.php:36
 #: include/views/administration.general.triggerDisplayOptions.edit.php:94
 msgid "Trigger displaying options"
 msgstr ""
@@ -14295,9 +14278,11 @@ msgid "Trigger prototypes updated"
 msgstr ""
 
 #: adm.gui.php:98 adm.housekeeper.php:133 adm.iconmapping.php:118
-#: adm.images.php:143 adm.macros.php:166 adm.other.php:78 adm.regexps.php:209
+#: adm.images.php:143 adm.macros.php:166 adm.other.php:78
 #: adm.triggerdisplayoptions.php:93 adm.triggerseverities.php:89
 #: adm.valuemapping.php:136 adm.workingtime.php:64
+#: include/views/administration.general.regularexpressions.edit.php:38
+#: include/views/administration.general.regularexpressions.list.php:35
 #: include/views/administration.general.triggerSeverity.edit.php:70
 msgid "Trigger severities"
 msgstr ""
@@ -14579,11 +14564,11 @@ msgstr ""
 msgid "Unavailable for users with %1$s."
 msgstr ""
 
-#: include/views/administration.users.list.php:151
-msgid "Unblock selected"
+#: include/views/administration.users.list.php:154
+msgid "Unblock"
 msgstr ""
 
-#: include/views/administration.users.list.php:152
+#: include/views/administration.users.list.php:154
 msgid "Unblock selected users?"
 msgstr ""
 
@@ -14792,7 +14777,7 @@ msgstr ""
 #: include/views/administration.general.image.edit.php:54
 #: include/views/administration.general.macros.edit.php:33
 #: include/views/administration.general.other.edit.php:50
-#: include/views/administration.general.regularexpressions.edit.php:87
+#: include/views/administration.general.regularexpressions.edit.php:112
 #: include/views/administration.general.triggerDisplayOptions.edit.php:100
 #: include/views/administration.general.triggerSeverity.edit.php:76
 #: include/views/administration.general.valuemapping.edit.php:60
@@ -15430,9 +15415,11 @@ msgid "Value map with valuemapid \"%1$s\" does not exist."
 msgstr ""
 
 #: adm.gui.php:96 adm.housekeeper.php:131 adm.iconmapping.php:116
-#: adm.images.php:141 adm.macros.php:164 adm.other.php:76 adm.regexps.php:207
+#: adm.images.php:141 adm.macros.php:164 adm.other.php:76
 #: adm.triggerdisplayoptions.php:91 adm.triggerseverities.php:87
 #: adm.valuemapping.php:134 adm.valuemapping.php:200 adm.workingtime.php:62
+#: include/views/administration.general.regularexpressions.edit.php:36
+#: include/views/administration.general.regularexpressions.list.php:33
 #: include/views/administration.general.valuemapping.edit.php:54
 msgid "Value mapping"
 msgstr "Asignación de valores"
@@ -15689,9 +15676,11 @@ msgid "Wizard"
 msgstr ""
 
 #: adm.gui.php:97 adm.housekeeper.php:132 adm.iconmapping.php:117
-#: adm.images.php:142 adm.macros.php:165 adm.other.php:77 adm.regexps.php:208
+#: adm.images.php:142 adm.macros.php:165 adm.other.php:77
 #: adm.triggerdisplayoptions.php:92 adm.triggerseverities.php:88
 #: adm.valuemapping.php:135 adm.workingtime.php:31 adm.workingtime.php:63
+#: include/views/administration.general.regularexpressions.edit.php:37
+#: include/views/administration.general.regularexpressions.list.php:34
 #: include/views/administration.general.workingtime.edit.php:25
 #: include/views/administration.general.workingtime.edit.php:28
 msgid "Working time"
@@ -16492,6 +16481,10 @@ msgstr "seg"
 #: include/views/administration.general.triggerDisplayOptions.edit.php:91
 msgid "seconds"
 msgstr "segundos"
+
+#: include/classes/html/CActionButtonList.php:90
+msgid "selected"
+msgstr ""
 
 #: include/actions.inc.php:1152
 msgid "sent"
