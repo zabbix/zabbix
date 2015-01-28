@@ -374,7 +374,7 @@ static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, sockle
  ******************************************************************************/
 #if defined(HAVE_IPV6)
 int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		int secure)
+		int tls_connect, char *tls_arg1, char *tls_arg2)
 {
 	int		ret = FAIL;
 	struct addrinfo	*ai = NULL, hints;
@@ -435,10 +435,10 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		goto out;
 	}
 
-	if (ZBX_TCP_SEC_TLS_CERT == secure || ZBX_TCP_SEC_TLS_PSK == secure)
+	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		if (SUCCEED != zbx_tls_connect(s, &error, secure))
+		if (SUCCEED != zbx_tls_connect(s, &error, tls_connect, tls_arg1, tls_arg2))
 		{
 			zbx_tcp_close(s);
 			zbx_set_tcp_strerror("%s", error);
@@ -464,7 +464,7 @@ out:
 }
 #else
 int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		int secure)
+		int tls_connect, char *tls_arg1, char *tls_arg2)
 {
 	ZBX_SOCKADDR	servaddr_in;
 	struct hostent	*hp;
@@ -525,10 +525,10 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		return FAIL;
 	}
 
-	if (ZBX_TCP_SEC_TLS_CERT == secure || ZBX_TCP_SEC_TLS_PSK == secure)
+	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		if (SUCCEED != zbx_tls_connect(s, &error, secure))
+		if (SUCCEED != zbx_tls_connect(s, &error, tls_connect, tls_arg1, tls_arg2))
 		{
 			zbx_tcp_close(s);
 			zbx_set_tcp_strerror("%s", error);
@@ -1001,7 +1001,7 @@ out:
  * Author: Eugene Grigorjev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_accept(zbx_sock_t *s, int secure)
+int	zbx_tcp_accept(zbx_sock_t *s, int tls_accept)
 {
 	ZBX_SOCKADDR	serv_addr;
 	fd_set		sock_set;
@@ -1052,11 +1052,11 @@ int	zbx_tcp_accept(zbx_sock_t *s, int secure)
 	if (1 == recv(s->socket, &buf, 1, MSG_PEEK) && '\x16' == buf)
 	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		if (0 != (secure & ZBX_TCP_SEC_TLS_CERT) || 0 != (secure & ZBX_TCP_SEC_TLS_PSK))
+		if (0 != (tls_accept & ZBX_TCP_SEC_TLS_CERT) || 0 != (tls_accept & ZBX_TCP_SEC_TLS_PSK))
 		{
 			char	*error = NULL;
 
-			if (SUCCEED != zbx_tls_accept(s, &error, secure))
+			if (SUCCEED != zbx_tls_accept(s, &error, tls_accept))
 			{
 				zbx_tcp_unaccept(s);
 				zbx_set_tcp_strerror("%s", error);
@@ -1078,7 +1078,7 @@ int	zbx_tcp_accept(zbx_sock_t *s, int secure)
 	}
 	else
 	{
-		if (0 == (ZBX_TCP_SEC_UNENCRYPTED & secure))
+		if (0 == (tls_accept & ZBX_TCP_SEC_UNENCRYPTED))
 		{
 			zbx_tcp_unaccept(s);
 			zbx_set_tcp_strerror("Unencrypted connections are not allowed.");

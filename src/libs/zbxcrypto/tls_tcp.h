@@ -20,8 +20,8 @@
 #ifndef ZABBIX_TLS_TCP_H
 #define ZABBIX_TLS_TCP_H
 
-int	zbx_tls_connect(zbx_sock_t *s, char **error, int secure);
-int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure);
+int	zbx_tls_connect(zbx_sock_t *s, char **error, int tls_connect, char *tls_arg1, char *tls_arg2);
+int	zbx_tls_accept(zbx_sock_t *s, char **error, int tls_accept);
 void	zbx_tls_close(zbx_sock_t *s);
 
 #endif	/* ZABBIX_TLS_TCP_H */

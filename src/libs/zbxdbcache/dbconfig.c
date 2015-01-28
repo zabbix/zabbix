@@ -5793,10 +5793,22 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 	{
 		strscpy(dst_proxy->host, host->host);
 		dst_proxy->tls_connect = host->tls_connect;
-		strscpy(dst_proxy->tls_issuer, host->tls_issuer);
-		strscpy(dst_proxy->tls_subject, host->tls_subject);
-		strscpy(dst_proxy->tls_psk_identity, host->tls_psk_identity);
-		strscpy(dst_proxy->tls_psk, host->tls_psk);
+
+		if (ZBX_TCP_SEC_TLS_CERT == host->tls_connect)
+		{
+			strscpy(dst_proxy->tls_arg1, host->tls_issuer);
+			strscpy(dst_proxy->tls_arg2, host->tls_subject);
+		}
+		else if (ZBX_TCP_SEC_TLS_PSK == host->tls_connect)
+		{
+			strscpy(dst_proxy->tls_arg1, host->tls_psk_identity);
+			strscpy(dst_proxy->tls_arg2, host->tls_psk);
+		}
+		else	/* ZBX_TCP_SEC_UNENCRYPTED */
+		{
+			*dst_proxy->tls_arg1 = '\0';
+			*dst_proxy->tls_arg2 = '\0';
+		}
 	}
 	else
 	{
@@ -5804,10 +5816,8 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 		/* process_proxy(). So, this branch should never happen. */
 		*dst_proxy->host = '\0';
 		dst_proxy->tls_connect = ZBX_TCP_SEC_TLS_PSK;	/* set PSK to deliberately fail in this case */
-		*dst_proxy->tls_issuer = '\0';
-		*dst_proxy->tls_subject = '\0';
-		*dst_proxy->tls_psk_identity = '\0';
-		*dst_proxy->tls_psk = '\0';
+		*dst_proxy->tls_arg1 = '\0';
+		*dst_proxy->tls_arg2 = '\0';
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 

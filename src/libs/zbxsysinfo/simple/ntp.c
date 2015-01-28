@@ -187,7 +187,8 @@ int	check_ntp(char *host, unsigned short port, int timeout, int *value_int)
 
 	*value_int = 0;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout, ZBX_TCP_SEC_UNENCRYPTED)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL,
+			NULL)))
 	{
 		make_packet(&data);
 

@@ -203,11 +203,20 @@ typedef struct
 	char		port_orig[INTERFACE_PORT_LEN_MAX];
 	char		*addr;
 	unsigned short	port;
-	unsigned char	tls_connect;
-	char		tls_issuer[HOST_TLS_ISSUER_LEN_MAX];
-	char		tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
-	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
-	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
+	unsigned char	tls_connect;				/* how to connect: ZBX_TCP_SEC_UNENCRYPTED, */
+								/* ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT */
+#if HOST_TLS_ISSUER_LEN_MAX > HOST_TLS_PSK_IDENTITY_LEN_MAX
+	char		tls_arg1[HOST_TLS_ISSUER_LEN_MAX];	/* for passing 'tls_issuer' or 'tls_psk_identity' */
+								/* depending on value of 'tls_connect' */
+#else
+	char		tls_arg1[HOST_TLS_PSK_IDENTITY_LEN_MAX];
+#endif
+#if HOST_TLS_SUBJECT_LEN_MAX > HOST_TLS_PSK_LEN_MAX
+	char		tls_arg2[HOST_TLS_SUBJECT_LEN_MAX];	/* for passing 'tls_subject' or 'tls_psk' depending */
+								/* on value of 'tls_connect' */
+#else
+	char		tls_arg2[HOST_TLS_PSK_LEN_MAX];
+#endif
 }
 DC_PROXY;
 

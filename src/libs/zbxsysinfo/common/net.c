@@ -40,8 +40,11 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 
 	*value_int = 0;
 
-	if (SUCCEED != (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout, ZBX_TCP_SEC_UNENCRYPTED)))
+	if (SUCCEED != (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL,
+			NULL)))
+	{
 		goto out;
+	}
 
 	if (NULL != request)
 		net = zbx_tcp_send_raw(&s, request);
