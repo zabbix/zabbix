@@ -3024,8 +3024,8 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 		if (SUCCEED != vmware_service_get_perf_counter_refreshrate(service, easyhandle, local_entity->type,
 				local_entity->id, &local_entity->refresh, &error))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot get refresh rate for performance entity (type:%s id:%s): %s",
-					local_entity->type, local_entity->id, error);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get refresh rate for %s \"%s\": %s", local_entity->type,
+					local_entity->id, error);
 			zbx_free(error);
 		}
 	}
