@@ -759,7 +759,6 @@ clean:
 
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
-	xmlCleanupParser();
 out:
 	if (NULL != error)
 		SET_MSG_RESULT(result, error);

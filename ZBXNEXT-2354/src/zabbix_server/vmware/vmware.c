@@ -1264,7 +1264,6 @@ clean:
 
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
-	xmlCleanupParser();
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1335,7 +1334,6 @@ clean:
 
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
-	xmlCleanupParser();
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __function_name, nics);
 }
@@ -1455,7 +1453,6 @@ clean:
 
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
-	xmlCleanupParser();
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __function_name, disks);
 
@@ -2947,7 +2944,6 @@ clean:
 
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
-	xmlCleanupParser();
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -3637,7 +3633,6 @@ clean:
 
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
-	xmlCleanupParser();
 out:
 	return value;
 }
@@ -3686,7 +3681,6 @@ clean:
 		xmlXPathFreeObject(xpathObj);
 
 	xmlXPathFreeContext(xpathCtx);
-	xmlCleanupParser();
 
 	return value;
 }
@@ -3746,7 +3740,6 @@ clean:
 
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
-	xmlCleanupParser();
 out:
 	return ret;
 }
