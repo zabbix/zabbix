@@ -1059,7 +1059,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_get_perfcounter_refreshrate                       *
+ * Function: vmware_service_get_perf_counter_refreshrate                      *
  *                                                                            *
  * Purpose: get the performance counter refreshrate for the specified entity  *
  *                                                                            *
@@ -1076,7 +1076,7 @@ out:
  *               FAIL    - the authentication process has failed              *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_perfcounter_refreshrate(const zbx_vmware_service_t *service, CURL *easyhandle,
+static int	vmware_service_get_perf_counter_refreshrate(const zbx_vmware_service_t *service, CURL *easyhandle,
 		const char *type, const char *id, int *refresh_rate, char **error)
 {
 #	define ZBX_POST_VCENTER_PERF_COUNTERS_REFRESH_RATE			\
@@ -1134,7 +1134,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_get_perfcounters                                  *
+ * Function: vmware_service_get_perf_counters                                 *
  *                                                                            *
  * Purpose: get the performance counter ids                                   *
  *                                                                            *
@@ -1146,7 +1146,7 @@ out:
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_perfcounters(zbx_vmware_service_t *service, CURL *easyhandle,
+static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_vector_ptr_t *counters, char **error)
 {
 #	define ZBX_POST_VMWARE_GET_PERFCOUTNER							\
@@ -2541,7 +2541,7 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 
 	zbx_vector_ptr_create(&counters);
 
-	if (SUCCEED != vmware_service_get_perfcounters(service, easyhandle, &counters, error))
+	if (SUCCEED != vmware_service_get_perf_counters(service, easyhandle, &counters, error))
 		goto out;
 
 	if (SUCCEED != vmware_service_get_contents(service, easyhandle, &contents, error))
@@ -2595,16 +2595,17 @@ static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const 
 
 	if (NULL == (pentity = zbx_vmware_service_get_perf_entity(service, type, id)))
 	{
-		entity.refresh = 0;
 		entity.type = vmware_shared_strdup(type);
 		entity.id = vmware_shared_strdup(id);
 
-		zbx_vector_ptr_create_ext(&entity.counters, __vm_mem_malloc_func, __vm_mem_realloc_func,
+		pentity = zbx_hashset_insert(&service->entities, &entity, sizeof(zbx_vmware_perf_entity_t));
+
+		zbx_vector_ptr_create_ext(&pentity->counters, __vm_mem_malloc_func, __vm_mem_realloc_func,
 				__vm_mem_free_func);
 
 		for (i = 0; NULL != counters[i]; i++)
 		{
-			if (SUCCEED == zbx_vmware_service_get_perfcounterid(service, counters[i], &counterid))
+			if (SUCCEED == zbx_vmware_service_get_counterid(service, counters[i], &counterid))
 			{
 				zbx_vmware_perf_counter_t	*counter;
 
@@ -2613,13 +2614,14 @@ static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const 
 				zbx_vector_ptr_pair_create_ext(&counter->values, __vm_mem_malloc_func,
 						__vm_mem_realloc_func, __vm_mem_free_func);
 
-				zbx_vector_ptr_append(&entity.counters, counter);
+				zbx_vector_ptr_append(&pentity->counters, counter);
 			}
 			else
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot find performance counter %s", counters[i]);
 		}
 
-		pentity = zbx_hashset_insert(&service->entities, &entity, sizeof(zbx_vmware_perf_entity_t));
+		zbx_vector_ptr_sort(&pentity->counters, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		pentity->refresh = 0;
 	}
 
 	pentity->last_seen = now;
@@ -2817,7 +2819,7 @@ static void	vmware_service_process_perf_entity_data(zbx_vmware_service_t *servic
 	xmlXPathObject			*xpathObj;
 	xmlNodeSetPtr			nodeset;
 	char				*instance, *counter, *value;
-	int				i, j, values = 0, valid_data = 0;
+	int				i, index, values = 0, valid_data = 0;
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_uint64_t			counterid;
 	zbx_vmware_perf_counter_t	*perfcounter;
@@ -2846,29 +2848,26 @@ static void	vmware_service_process_perf_entity_data(zbx_vmware_service_t *servic
 		counter = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='id']"
 				"/*[local-name()='counterId']");
 
+		zabbix_log(LOG_LEVEL_INFORMATION, "[WDN] %s(%s) %s[%s]=%s", type, id, counter, instance, value);
+
 		if (NULL != value && NULL != counter)
 		{
 			ZBX_STR2UINT64(counterid, counter);
 
-			for (j = 0; j < entity->counters.values_num; j++)
+			if (FAIL != (index = zbx_vector_ptr_bsearch(&entity->counters, &counterid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
-				perfcounter = (zbx_vmware_perf_counter_t *)entity->counters.values[j];
+				zbx_ptr_pair_t	perfvalue;
+				perfcounter = (zbx_vmware_perf_counter_t *)entity->counters.values[index];
 
-				if (perfcounter->counterid == counterid)
-				{
-					zbx_ptr_pair_t	perfvalue;
+				perfvalue.first = vmware_shared_strdup(instance);
+				perfvalue.second = vmware_shared_strdup(value);
 
-					perfvalue.first = vmware_shared_strdup(instance);
-					perfvalue.second = vmware_shared_strdup(value);
+				zbx_vector_ptr_pair_append_ptr(&perfcounter->values, &perfvalue);
+				values++;
 
-					zbx_vector_ptr_pair_append_ptr(&perfcounter->values, &perfvalue);
-					values++;
-
-					if (0 == valid_data && 0 != strcmp(value, "-1"))
-						valid_data = 1;
-
-					break;
-				}
+				if (0 == valid_data && 0 != strcmp(value, "-1"))
+					valid_data = 1;
 			}
 		}
 
@@ -2880,9 +2879,9 @@ static void	vmware_service_process_perf_entity_data(zbx_vmware_service_t *servic
 	/* No valid data found - all metrics have -1 value. In this case clear the counter values. */
 	if (0 == valid_data)
 	{
-		for (j = 0; j < entity->counters.values_num; j++)
+		for (i = 0; i < entity->counters.values_num; i++)
 		{
-			perfcounter = (zbx_vmware_perf_counter_t *)entity->counters.values[j];
+			perfcounter = (zbx_vmware_perf_counter_t *)entity->counters.values[i];
 			vmware_vector_ptr_pair_shared_clean(&perfcounter->values);
 		}
 	}
@@ -3026,7 +3025,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 	{
 		local_entity = entities.values[i];
 
-		if (SUCCEED != vmware_service_get_perfcounter_refreshrate(service, easyhandle, local_entity->type,
+		if (SUCCEED != vmware_service_get_perf_counter_refreshrate(service, easyhandle, local_entity->type,
 				local_entity->id, &local_entity->refresh, &error))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot get refresh rate for performance entity (type:%s id:%s): %s",
@@ -3213,7 +3212,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vmware_service_get_perfcounterid                             *
+ * Function: zbx_vmware_service_get_counterid                                 *
  *                                                                            *
  * Purpose: gets vmware performance counter id by the path                    *
  *                                                                            *
@@ -3225,7 +3224,7 @@ out:
  * Return value: SUCCEED if the counter was found, FAIL otherwise             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vmware_service_get_perfcounterid(zbx_vmware_service_t *service, const char *path,
+int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *path,
 		zbx_uint64_t *counterid)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
@@ -3251,7 +3250,7 @@ int	zbx_vmware_service_get_perfcounterid(zbx_vmware_service_t *service, const ch
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vmware_service_start_monitoring                              *
+ * Function: zbx_vmware_service_add_perf_counter                              *
  *                                                                            *
  * Purpose: start monitoring performance counter of the specified entity      *
  *                                                                            *
@@ -3265,7 +3264,7 @@ int	zbx_vmware_service_get_perfcounterid(zbx_vmware_service_t *service, const ch
  *                         is already being monitored.                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vmware_service_start_monitoring(zbx_vmware_service_t *service, const char *type, const char *id,
+int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const char *type, const char *id,
 		zbx_uint64_t counterid)
 {
 	const char			*__function_name = "zbx_vmware_service_start_monitoring";
@@ -3296,6 +3295,8 @@ int	zbx_vmware_service_start_monitoring(zbx_vmware_service_t *service, const cha
 		zbx_vector_ptr_pair_create_ext(&counter->values, __vm_mem_malloc_func, __vm_mem_realloc_func,
 				__vm_mem_free_func);
 		zbx_vector_ptr_append(&pentity->counters, counter);
+
+		zbx_vector_ptr_sort(&pentity->counters, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		ret = SUCCEED;
 	}

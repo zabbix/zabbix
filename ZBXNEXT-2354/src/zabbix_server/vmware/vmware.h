@@ -185,8 +185,8 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
 
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
 
-int	zbx_vmware_service_get_perfcounterid(zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid);
-int	zbx_vmware_service_start_monitoring(zbx_vmware_service_t *service, const char *type, const char *id,
+int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid);
+int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const char *type, const char *id,
 		zbx_uint64_t counterid);
 zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
 		const char *id);

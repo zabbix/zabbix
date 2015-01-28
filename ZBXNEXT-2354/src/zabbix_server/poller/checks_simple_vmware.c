@@ -202,19 +202,13 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	for (i = 0; i < entity->counters.values_num; i++)
-	{
-		perfcounter = (zbx_vmware_perf_counter_t *)entity->counters.values[i];
-
-		if (perfcounter->counterid == counterid)
-			break;
-	}
-
-	if (i == entity->counters.values_num)
+	if (FAIL == (i = zbx_vector_ptr_bsearch(&entity->counters, &counterid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter data was not found."));
 		goto out;
 	}
+
+	perfcounter = (zbx_vmware_perf_counter_t *)entity->counters.values[i];
 
 	if (0 == perfcounter->values.values_num)
 	{
@@ -267,7 +261,7 @@ static int	vmware_service_get_counter_value_by_path(zbx_vmware_service_t *servic
 {
 	zbx_uint64_t	counterid;
 
-	if (FAIL == zbx_vmware_service_get_perfcounterid(service, path, &counterid))
+	if (FAIL == zbx_vmware_service_get_counterid(service, path, &counterid))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
 		return SYSINFO_RET_FAIL;
@@ -1622,14 +1616,14 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	if (FAIL == zbx_vmware_service_get_perfcounterid(service, path, &counterid))
+	if (FAIL == zbx_vmware_service_get_counterid(service, path, &counterid))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
 		goto unlock;
 	}
 
 	/* FAIL is returned if counter already exists */
-	if (SUCCEED == zbx_vmware_service_start_monitoring(service, "HostSystem", hv->id, counterid))
+	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "HostSystem", hv->id, counterid))
 	{
 		ret = SYSINFO_RET_OK;
 		goto unlock;
@@ -2716,14 +2710,14 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	if (FAIL == zbx_vmware_service_get_perfcounterid(service, path, &counterid))
+	if (FAIL == zbx_vmware_service_get_counterid(service, path, &counterid))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
 		goto unlock;
 	}
 
 	/* FAIL is returned if counter already exists */
-	if (SUCCEED == zbx_vmware_service_start_monitoring(service, "VirtualMachine", vm->id, counterid))
+	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "VirtualMachine", vm->id, counterid))
 	{
 		ret = SYSINFO_RET_OK;
 		goto unlock;
