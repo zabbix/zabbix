@@ -67,8 +67,8 @@ extern zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE;
 #define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_mem_malloc_func, \
 		__vm_mem_realloc_func, __vm_mem_free_func)
 
-#define ZBX_VMWARE_CACHE_TTL	CONFIG_VMWARE_FREQUENCY
-#define ZBX_VMWARE_PERF_TTL	CONFIG_VMWARE_PERF_FREQUENCY
+#define ZBX_VMWARE_CAHCE_UPDATE_PERIOD	CONFIG_VMWARE_FREQUENCY
+#define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
 #define ZBX_VMWARE_SERVICE_TTL	SEC_PER_DAY
 
 static ZBX_MUTEX	vmware_lock;
@@ -3444,7 +3444,7 @@ void	main_vmware_loop(void)
 
 				if (0 == (service->state & ZBX_VMWARE_STATE_UPDATING_PERF) &&
 						0 != (service->state & ZBX_VMWARE_STATE_READY) &&
-						now - service->lastperfcheck >= ZBX_VMWARE_PERF_TTL)
+						now - service->lastperfcheck >= ZBX_VMWARE_PERF_UPDATE_PERIOD)
 				{
 					service->state |= ZBX_VMWARE_STATE_UPDATING_PERF;
 					state = ZBX_VMWARE_TASK_UPDATE_PERF;
@@ -3455,7 +3455,7 @@ void	main_vmware_loop(void)
 				if (0 != (service->state & ZBX_VMWARE_STATE_UPDATING))
 					continue;
 
-				if (now - service->lastcheck >= ZBX_VMWARE_CACHE_TTL)
+				if (now - service->lastcheck >= ZBX_VMWARE_CAHCE_UPDATE_PERIOD)
 				{
 					service->state |= ZBX_VMWARE_STATE_UPDATING;
 					state = ZBX_VMWARE_TASK_UPDATE;
@@ -3475,11 +3475,11 @@ void	main_vmware_loop(void)
 				/* don't change next update timestamp for failed services */
 				if (0 != (service->state & ZBX_VMWARE_STATE_READY))
 				{
-					if (service->lastcheck + ZBX_VMWARE_CACHE_TTL < next_update)
-						next_update = service->lastcheck + ZBX_VMWARE_CACHE_TTL;
+					if (service->lastcheck + ZBX_VMWARE_CAHCE_UPDATE_PERIOD < next_update)
+						next_update = service->lastcheck + ZBX_VMWARE_CAHCE_UPDATE_PERIOD;
 
-					if (service->lastperfcheck + ZBX_VMWARE_PERF_TTL < next_update)
-						next_update = service->lastperfcheck + ZBX_VMWARE_PERF_TTL;
+					if (service->lastperfcheck + ZBX_VMWARE_PERF_UPDATE_PERIOD < next_update)
+						next_update = service->lastperfcheck + ZBX_VMWARE_PERF_UPDATE_PERIOD;
 				}
 			}
 
