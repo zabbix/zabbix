@@ -504,6 +504,63 @@ static int	zbx_psk_hex2bin(const unsigned char *p_hex, unsigned char *buf, int b
 }
 #endif
 
+#if defined(HAVE_POLARSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_psk_callback                                                 *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *    find and set the requested pre-shared key upon PolarSSL request         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     par              - [IN] not used                                       *
+ *     tls_ctx          - [IN] TLS connection context                         *
+ *     psk_identity     - [IN] PSK identity for which the PSK should be       *
+ *                             searched and set                               *
+ *     psk_identity_len - [IN] size of 'psk_identity'                         *
+ *                                                                            *
+ * Return value:                                                              *
+ *      0  - required PSK ssuccessfully found and set                         *
+ *     -1 - an error occurred.                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     A callback function, its arguments are defined in PolarSSL.            *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_psk_callback(void *par, ssl_context *tls_ctx, const unsigned char *psk_identity,
+		size_t psk_identity_len)
+{
+	const char	*__function_name = "zbx_psk_callback";
+	int		res;
+
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		/* psk_identity is not '\0'-terminated */
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): requested PSK-identity: \"%.*s\"", __function_name, psk_identity_len,
+				psk_identity);
+	}
+
+	/* try PSK from configuration file first */
+	if (0 < my_psk_identity_len)
+	{
+		if (my_psk_identity_len == psk_identity_len &&
+				0 == memcmp(my_psk_identity, psk_identity, psk_identity_len))
+		{
+			if (0 != (res = ssl_set_psk(tls_ctx, (const unsigned char *)my_psk, my_psk_len,
+					(const unsigned char *)my_psk_identity, my_psk_identity_len)))
+			{
+				return -1;
+			}
+			else
+				return 0;
+		}
+	}
+
+	/* TODO implement searching the required PSK in configuration cache */
+	return -1;
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_init_parent                                              *
@@ -1023,17 +1080,21 @@ int	zbx_tls_free(void)
  * Purpose: establish a TLS connection over an established TCP connection     *
  *                                                                            *
  * Parameters:                                                                *
- *     s      - [IN]  socket with opened connection                           *
- *     error  - [OUT] dynamically allocated memory with error message         *
- *     secure - [IN]  how to connect. Must be either ZBX_TCP_SEC_TLS_CERT or  *
- *                    ZBX_TCP_SEC_TLS_PSK.                                    *
+ *     s           - [IN]  socket with opened connection                      *
+ *     error       - [OUT] dynamically allocated memory with error message    *
+ *     tls_connect - [IN]  how to connect. Allowed values:                    *
+ *                         ZBX_TCP_SEC_TLS_CERT, ZBX_TCP_SEC_TLS_PSK.         *
+ *     tls_arg1    - [IN]  'tls_issuer' or 'tls_psk_identity' depending on    *
+ *                         value of 'tls_connect'.                            *
+ *     tls_arg2    - [IN]  'tls_subject' or 'tls_psk' depending on value of   *
+ *                         'tls_connect'.                                     *
  *                                                                            *
  * Return value: SUCCEED on successful TLS handshake with a valid certificate *
  *               or PSK                                                       *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tls_connect(zbx_sock_t *s, char **error, int secure)
+int	zbx_tls_connect(zbx_sock_t *s, char **error, int tls_connect, char *tls_arg1, char *tls_arg2)
 {
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
@@ -1044,7 +1105,7 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, int secure)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #if defined(HAVE_POLARSSL)
-	if (ZBX_TCP_SEC_TLS_CERT == secure)
+	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
 		if (NULL == ciphersuites_cert)
 		{
@@ -1089,14 +1150,14 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, int secure)
 	}
 
 	/* Set callback functions for receiving and sending data via socket. */
-	/* For now use function provided bu PolarSSL. TODO: replace with our own functions if necessary. */
+	/* Functions provided by PolarSSL work well so far, no need to invent our own. */
 	ssl_set_bio(s->tls_ctx, net_recv, &s->socket, net_send, &s->socket);
 
 	/* set protocol version to TLS 1.2 */
 	ssl_set_min_version(s->tls_ctx, ZBX_TLS_MIN_MAJOR_VER, ZBX_TLS_MIN_MINOR_VER);
 	ssl_set_max_version(s->tls_ctx, ZBX_TLS_MAX_MAJOR_VER, ZBX_TLS_MAX_MINOR_VER);
 
-	if (ZBX_TCP_SEC_TLS_CERT == secure)	/* use certificates */
+	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)	/* use certificates */
 	{
 		ssl_set_authmode(s->tls_ctx, SSL_VERIFY_REQUIRED);
 		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_cert);
@@ -1116,20 +1177,45 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, int secure)
 	{
 		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_psk);
 
-		/* for agentd set up the PSK from a configuration file */
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) &&
-				0 != (res = ssl_set_psk(s->tls_ctx, (const unsigned char *)my_psk, my_psk_len,
+		if (NULL == tls_arg1)	/* 'tls_psk_identity' is not set */
+		{
+			/* set up the PSK from a configuration file (in agentd, agent (always) and a case in active */
+			/* proxy when it connects to server) */
+
+			if (0 != (res = ssl_set_psk(s->tls_ctx, (const unsigned char *)my_psk, my_psk_len,
 				(const unsigned char *)my_psk_identity, my_psk_identity_len)))
-		{
-			zbx_tls_error_msg(res, "ssl_set_psk(): ", error);
-			ssl_free(s->tls_ctx);
-			zbx_free(s->tls_ctx);
-			goto out;
+			{
+				zbx_tls_error_msg(res, "ssl_set_psk(): ", error);
+				ssl_free(s->tls_ctx);
+				zbx_free(s->tls_ctx);
+				goto out;
+			}
 		}
-		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY) ||
-				0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		else
 		{
-			; /* TODO for server and proxy set up the PSK from a DB or config file as necessary */
+			/* PSK comes from a database (case for a server/proxy when it connects to an agent for */
+			/* passive checks, for a server when it connects to a passive proxy) */
+
+			int	psk_len;
+			char	psk_buf[HOST_TLS_PSK_LEN/2];
+
+			if (0 >= (psk_len = zbx_psk_hex2bin((unsigned char *)tls_arg2, (unsigned char *)psk_buf,
+					sizeof(psk_buf))))
+			{
+				*error = zbx_strdup(*error, "invalid pre-shared key");
+				ssl_free(s->tls_ctx);
+				zbx_free(s->tls_ctx);
+				goto out;
+			}
+
+			if (0 != (res = ssl_set_psk(s->tls_ctx, (const unsigned char *)psk_buf, (size_t)psk_len,
+				(const unsigned char *)tls_arg1, strlen(tls_arg1))))
+			{
+				zbx_tls_error_msg(res, "ssl_set_psk(): ", error);
+				ssl_free(s->tls_ctx);
+				zbx_free(s->tls_ctx);
+				goto out;
+			}
 		}
 	}
 
@@ -1144,7 +1230,7 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, int secure)
 		}
 	}
 
-	if (ZBX_TCP_SEC_TLS_CERT == secure)
+	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
 		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		{
@@ -1213,7 +1299,12 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, int secure)
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): PSK-identity: \"%s\"", __function_name, s->tls_ctx->psk_identity);
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			/* s->tls_ctx->psk_identity is not '\0'-terminated */
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): PSK-identity: \"%.*s\"", __function_name,
+					s->tls_ctx->psk_identity_len, s->tls_ctx->psk_identity);
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s)", __function_name,
@@ -1233,18 +1324,18 @@ out:
  * Purpose: establish a TLS connection over an accepted TCP connection        *
  *                                                                            *
  * Parameters:                                                                *
- *     s      - [IN]  socket with opened connection                           *
- *     error  - [OUT] dynamically allocated memory with error message         *
- *     secure - [IN]  what connection to accept. Can be be either             *
- *                    ZBX_TCP_SEC_TLS_CERT or ZBX_TCP_SEC_TLS_PSK, or         *
- *                    a bitwise 'OR' of both.                                 *
+ *     s          - [IN]  socket with opened connection                       *
+ *     error      - [OUT] dynamically allocated memory with error message     *
+ *     tls_accept - [IN]  what connection to accept. Can be be either         *
+ *                        ZBX_TCP_SEC_TLS_CERT or ZBX_TCP_SEC_TLS_PSK, or     *
+ *                        a bitwise 'OR' of both.                             *
  *                                                                            *
  * Return value: SUCCEED on successful TLS handshake with a valid certificate *
  *               or PSK                                                       *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure)
+int	zbx_tls_accept(zbx_sock_t *s, char **error, int tls_accept)
 {
 	const char		*__function_name = "zbx_tls_accept";
 	const ssl_ciphersuite_t	*info;
@@ -1256,14 +1347,7 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #if defined(HAVE_POLARSSL)
-	if (0 != (secure & ZBX_TCP_SEC_TLS_CERT) && NULL == ciphersuites_cert)
-	{
-		*error = zbx_strdup(*error, "cannot accept TLS connection with certificate: no valid certificate "
-				"loaded");
-		goto out;
-	}
-
-	if (0 != (secure & ZBX_TCP_SEC_TLS_PSK) && NULL == ciphersuites_psk)
+	if (0 != (tls_accept & ZBX_TCP_SEC_TLS_PSK) && NULL == ciphersuites_psk)
 	{
 		*error = zbx_strdup(*error, "cannot accept TLS connection with PSK: no valid PSK loaded");
 		goto out;
@@ -1299,21 +1383,22 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure)
 	}
 
 	/* Set callback functions for receiving and sending data via socket. */
-	/* For now use function provided bu PolarSSL. TODO: replace with our own functions if necessary. */
+	/* Functions provided by PolarSSL work well so far, no need to invent our own. */
 	ssl_set_bio(s->tls_ctx, net_recv, &s->socket, net_send, &s->socket);
 
 	/* set protocol version to TLS 1.2 */
 	ssl_set_min_version(s->tls_ctx, ZBX_TLS_MIN_MAJOR_VER, ZBX_TLS_MIN_MINOR_VER);
 	ssl_set_max_version(s->tls_ctx, ZBX_TLS_MAX_MAJOR_VER, ZBX_TLS_MAX_MINOR_VER);
 
-	if (0 != (secure & ZBX_TCP_SEC_TLS_CERT))	/* prepare to accept with a certificate */
+	if (0 != (tls_accept & ZBX_TCP_SEC_TLS_CERT))	/* prepare to accept with a certificate */
 	{
 		ssl_set_authmode(s->tls_ctx, SSL_VERIFY_REQUIRED);
 
 		/* set CA certificate and certificate revocation lists */
-		ssl_set_ca_chain(s->tls_ctx, ca_cert, crl, NULL);	/* TODO set the 4th argument to expected peer Common Name */
+		if (NULL != ca_cert)
+			ssl_set_ca_chain(s->tls_ctx, ca_cert, crl, NULL);	/* TODO set the 4th argument to expected peer Common Name ? */
 
-		if (0 != (res = ssl_set_own_cert(s->tls_ctx, my_cert, my_priv_key)))
+		if (NULL != my_cert && 0 != (res = ssl_set_own_cert(s->tls_ctx, my_cert, my_priv_key)))
 		{
 			zbx_tls_error_msg(res, "ssl_set_own_cert(): ", error);
 			ssl_free(s->tls_ctx);
@@ -1322,7 +1407,7 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure)
 		}
 	}
 
-	if (0 != (secure & ZBX_TCP_SEC_TLS_PSK))	/* prepare te accept with a pre-shared key */
+	if (0 != (tls_accept & ZBX_TCP_SEC_TLS_PSK))	/* prepare te accept with a pre-shared key */
 	{
 		/* for agentd and agent the only possibility is a PSK from configuration file */
 		if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) ||
@@ -1340,24 +1425,29 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure)
 		{
 			/* For server or proxy a PSK can come from configuration file or database. */
 			/* Set up a callback function for finding the requested PSK. */
-			;	/* TODO ssl_set_psk_cb(s->tls_ctx, .....); */
+			ssl_set_psk_cb(s->tls_ctx, zbx_psk_callback, NULL);
 		}
 	}
 
-	if (0 != (secure & ZBX_TCP_SEC_TLS_CERT) && 0 == (secure & ZBX_TCP_SEC_TLS_PSK))
+	if ((ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK) == (tls_accept & (ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK)))
 	{
+		/* common case in trapper - be ready for all types of incoming connections */
+		if (NULL != my_cert)
+		{
+			/* it can also be a case in agentd listener - when both certificate and PSK is allowed, e.g. */
+			/* for switching of TLS connections from PSK to using a certificate */
+			ssl_set_ciphersuites(s->tls_ctx, ciphersuites_all);
+		}
+		else
+		{
+			/* assume PSK, although it is not yet known will there be the right PSK available */
+			ssl_set_ciphersuites(s->tls_ctx, ciphersuites_psk);
+		}
+	}
+	else if (0 != (tls_accept & ZBX_TCP_SEC_TLS_CERT) && NULL != my_cert)
 		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_cert);
-	}
-	else if (0 != (secure & ZBX_TCP_SEC_TLS_PSK) && 0 == (secure & ZBX_TCP_SEC_TLS_CERT))
-	{
+	else if (0 != (tls_accept & ZBX_TCP_SEC_TLS_PSK))
 		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_psk);
-	}
-	else
-	{
-		/* Certificate and PSK - both are allowed for this connection, for example, */
-		/* for switching of TLS connections from PSK to using a certificate. */
-		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_all);
-	}
 
 	while (0 != (res = ssl_handshake(s->tls_ctx)))
 	{
@@ -1381,7 +1471,12 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, int secure)
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): PSK-identity: \"%s\"", __function_name, s->tls_ctx->psk_identity);
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			/* s->tls_ctx->psk_identity is not '\0'-terminated */
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): PSK-identity: \"%.*s\"", __function_name,
+					s->tls_ctx->psk_identity_len, s->tls_ctx->psk_identity);
+		}
 	}
 	else
 	{

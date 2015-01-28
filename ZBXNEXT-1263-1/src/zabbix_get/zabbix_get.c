@@ -131,7 +131,8 @@ static void	get_value(const char *source_ip, const char *host, unsigned short po
 	int		ret;
 	char		request[1024];
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT, ZBX_TCP_SEC_UNENCRYPTED)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT, ZBX_TCP_SEC_UNENCRYPTED,
+			NULL, NULL)))
 	{
 		zbx_snprintf(request, sizeof(request), "%s\n", key);
 

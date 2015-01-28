@@ -47,7 +47,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_agent";
 	zbx_sock_t	s;
-	char		buffer[MAX_STRING_LEN];
+	char		buffer[MAX_STRING_LEN], *tls_arg1, *tls_arg2;
 	int		ret = SUCCEED;
 	ssize_t		received_len;
 
@@ -57,8 +57,24 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			item->host.host, item->interface.addr, item->key, (unsigned int)item->host.tls_connect);
 	}
 
+	if (ZBX_TCP_SEC_UNENCRYPTED == item->host.tls_connect)
+	{
+		tls_arg1 = NULL;
+		tls_arg2 = NULL;
+	}
+	else if (ZBX_TCP_SEC_TLS_CERT == item->host.tls_connect)
+	{
+		tls_arg1 = item->host.tls_issuer;
+		tls_arg2 = item->host.tls_subject;
+	}
+	else	/* ZBX_TCP_SEC_TLS_PSK */
+	{
+		tls_arg1 = item->host.tls_psk_identity;
+		tls_arg2 = item->host.tls_psk;
+	}
+
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
-			item->host.tls_connect)))
+			item->host.tls_connect, tls_arg1, tls_arg2)))
 	{
 		zbx_snprintf(buffer, sizeof(buffer), "%s\n", item->key);
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buffer);

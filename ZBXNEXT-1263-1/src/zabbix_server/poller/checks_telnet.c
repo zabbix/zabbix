@@ -37,7 +37,7 @@ static int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
-			ZBX_TCP_SEC_UNENCRYPTED))
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to TELNET server: %s", zbx_tcp_strerror()));
 		goto close;

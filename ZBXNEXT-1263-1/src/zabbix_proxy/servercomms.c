@@ -37,7 +37,15 @@ int	connect_to_server(zbx_sock_t *sock, int timeout, int retry_interval)
 			CONFIG_SERVER, CONFIG_SERVER_PORT, timeout);
 
 	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout,
-			configured_tls_connect_mode)))
+			configured_tls_connect_mode, NULL, NULL)))	/* The connect mode can specify TLS with PSK */
+									/* but here we do not know PSK details. */
+									/* Therefore we put NULL in the last 2 */
+									/* arguments. zbx_tls_connect() will find */
+									/* out PSK in this case. If the connect mode */
+									/* specifies TLS with certificate then also */
+									/* NULLs are ok, as the active proxy does not */
+									/* verify server certificate issuer and */
+									/* subject. */
 	{
 		if (0 == retry_interval)
 		{
@@ -50,7 +58,7 @@ int	connect_to_server(zbx_sock_t *sock, int timeout, int retry_interval)
 					CONFIG_SERVER, CONFIG_SERVER_PORT, zbx_tcp_strerror(), retry_interval);
 			lastlogtime = (int)time(NULL);
 			while (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT,
-					timeout, configured_tls_connect_mode)))
+					timeout, configured_tls_connect_mode, NULL, NULL)))
 			{
 				now = (int)time(NULL);
 				if (60 <= now - lastlogtime)
