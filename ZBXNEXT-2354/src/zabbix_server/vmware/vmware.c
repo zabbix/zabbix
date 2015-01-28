@@ -3287,7 +3287,7 @@ int	zbx_vmware_service_start_monitoring(zbx_vmware_service_t *service, const cha
 		pentity = zbx_hashset_insert(&service->entities, &entity, sizeof(zbx_vmware_perf_entity_t));
 	}
 
-	if (SUCCEED != zbx_vector_ptr_search(&pentity->counters, &counterid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+	if (FAIL == zbx_vector_ptr_search(&pentity->counters, &counterid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
 	{
 		zbx_vmware_perf_counter_t	*counter;
 
@@ -3329,7 +3329,7 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 
 	pentity = zbx_hashset_search(&service->entities, &entity);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() entity:%p", __function_name, entity);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() entity:%p", __function_name, pentity);
 
 	return pentity;
 }

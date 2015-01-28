@@ -181,25 +181,18 @@ out:
 	return cluster;
 }
 
-static int	vmware_service_counter_get(zbx_vmware_service_t *service, const char *type, const char *id,
-		const char *path, const char *instance, int coeff, AGENT_RESULT *result)
+static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service, const char *type, const char *id,
+		zbx_uint64_t counterid, const char *instance, int coeff, AGENT_RESULT *result)
 {
-	const char			*__function_name = "vmware_service_counter_get";
+	const char			*__function_name = "vmware_service_get_counter_value_by_id";
 
-	zbx_uint64_t			counterid;
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_perf_counter_t	*perfcounter;
 	zbx_ptr_pair_t			*perfvalue;
 	int				i, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s path:%s instance:%s", __function_name, type, id, path,
-			instance);
-
-	if (FAIL == zbx_vmware_service_get_perfcounterid(service, path, &counterid))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
-		goto out;
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s counterid:" ZBX_FS_UI64 " instance:%s", __function_name,
+			type, id, counterid, instance);
 
 	if (NULL == (entity = zbx_vmware_service_get_perf_entity(service, type, id)))
 	{
@@ -269,6 +262,20 @@ out:
 	return ret;
 }
 
+static int	vmware_service_get_counter_value_by_path(zbx_vmware_service_t *service, const char *type,
+		const char *id, const char *path, const char *instance, int coeff, AGENT_RESULT *result)
+{
+	zbx_uint64_t	counterid;
+
+	if (FAIL == zbx_vmware_service_get_perfcounterid(service, path, &counterid))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	return vmware_service_get_counter_value_by_id(service, type, id, counterid, instance, coeff, result);
+}
+
 static int	vmware_service_get_vm_counter(zbx_vmware_service_t *service, const char *uuid, const char *instance,
 		const char *path, int coeff, AGENT_RESULT *result)
 {
@@ -285,7 +292,8 @@ static int	vmware_service_get_vm_counter(zbx_vmware_service_t *service, const ch
 		goto out;
 	}
 
-	ret = vmware_service_counter_get(service, "VirtualMachine", vm->id, path, instance, coeff, result);
+	ret = vmware_service_get_counter_value_by_path(service, "VirtualMachine", vm->id, path, instance, coeff,
+			result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
 
@@ -1329,8 +1337,8 @@ int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, co
 		goto unlock;
 	}
 
-	ret = vmware_service_counter_get(service, "HostSystem", hv->id, "net/received[average]", "", ZBX_KIBIBYTE,
-			result);
+	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, "net/received[average]", "",
+			ZBX_KIBIBYTE, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -1378,8 +1386,8 @@ int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	ret = vmware_service_counter_get(service, "HostSystem", hv->id, "net/transmitted[average]", "", ZBX_KIBIBYTE,
-			result);
+	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, "net/transmitted[average]", "",
+			ZBX_KIBIBYTE, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -1497,7 +1505,7 @@ int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username
 			if (NULL == datastore->uuid)
 				break;
 
-			ret = vmware_service_counter_get(service, "HostSystem", hv->id,
+			ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id,
 					"datastore/totalReadLatency[average]", datastore->uuid, 1, result);
 			goto unlock;
 		}
@@ -1561,7 +1569,7 @@ int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *usernam
 			if (NULL == datastore->uuid)
 				break;
 
-			ret = vmware_service_counter_get(service, "HostSystem", hv->id,
+			ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id,
 					"datastore/totalWriteLatency[average]", datastore->uuid, 1, result);
 			goto unlock;
 		}
@@ -1628,7 +1636,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 	}
 
 	/* the performance counter is already being monitored, try to get the results from statistics */
-	ret = vmware_service_counter_get(service, "HostSystem", hv->id, path, instance, 1, result);
+	ret = vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id, counterid, instance, 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -2722,7 +2730,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 	}
 
 	/* the performance counter is already being monitored, try to get the results from statistics */
-	ret = vmware_service_counter_get(service, "VirtualMachine", vm->id, path, instance, 1, result);
+	ret = vmware_service_get_counter_value_by_id(service, "VirtualMachine", vm->id, counterid, instance, 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
