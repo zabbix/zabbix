@@ -85,7 +85,6 @@ $font-transform: uppercase;
 @mixin font-body {
 	font: $font-body-size $font-stack;
 	line-height: $body-line-height;
-	font-weight: 400;
 }
 
 @mixin font-h1 {
