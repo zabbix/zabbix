@@ -59,10 +59,18 @@ class CFormList extends CDiv {
 		}
 
 		if ($description === null) {
-			$this->formTable->addRow(array(new CDiv(SPACE, 'dt right'), new CDiv($label, 'dd')), $class, $id);
+			$this->formTable->addRow(array(
+				new CCol(SPACE, ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+				new CCol($label, ZBX_STYLE_TABLE_FORMS_TD_RIGHT)),
+				$class, $id
+			);
 		}
 		else {
-			$this->formTable->addRow(array(new CDiv($label, 'dt right'), new CDiv($description, 'dd')), $class, $id);
+			$this->formTable->addRow(array(
+				new CCol($label, ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+				new CCol($description, ZBX_STYLE_TABLE_FORMS_TD_RIGHT)),
+				$class, $id
+			);
 		}
 	}
 

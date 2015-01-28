@@ -229,7 +229,7 @@ if (!$isDiscovered) {
 		$tmp_label .= ' '._('(Only super admins can create groups)');
 		$newgroupTB->setReadonly(true);
 	}
-	$hostList->addRow(null, array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, 'new');
+	$hostList->addRow(new CLabel($tmp_label, 'newgroup'), $newgroupTB, null, null, ZBX_STYLE_TABLE_FORMS_TR_NEW);
 }
 // groups for discovered hosts
 else {

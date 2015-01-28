@@ -45,7 +45,7 @@ class CTabView extends CDiv {
 		}
 		parent::__construct();
 		$this->attr('id', zbx_formatDomId($this->id));
-		$this->attr('class', 'tabs');
+		$this->attr('class', ZBX_STYLE_TABLE_FORMS_CONTAINER);
 	}
 
 	public function setSelected($selected) {
@@ -70,21 +70,16 @@ class CTabView extends CDiv {
 	}
 
 	public function toString($destroy = true) {
+		// No header if we have only one Tab
 		if (count($this->tabs) == 1) {
-			$this->setAttribute('class', 'min-width ui-tabs ui-widget ui-widget-content ui-corner-all widget');
-
-			$header = reset($this->headers);
-			$header = new CDiv($header);
-			$header->addClass('ui-corner-all ui-widget-header header');
-			$header->setAttribute('id', 'tab_'.key($this->headers));
-			$this->addItem($header);
+			$this->setAttribute('class', ZBX_STYLE_TABLE_FORMS_CONTAINER);
 
 			$tab = reset($this->tabs);
-			$tab->addClass('ui-tabs ui-tabs-panel ui-widget ui-widget-content ui-corner-all widget');
 			$this->addItem($tab);
 		}
 		else {
-			$headersList = new CList();
+			$headersList = new CList(null, ZBX_STYLE_TABS_NAV);
+
 
 			foreach ($this->headers as $id => $header) {
 				$tabLink = new CLink($header, '#'.$id, null, null, false);
