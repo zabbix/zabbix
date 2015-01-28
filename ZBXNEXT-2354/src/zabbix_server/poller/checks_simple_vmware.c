@@ -220,14 +220,6 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 	{
 		perfvalue = (zbx_ptr_pair_t *)&perfcounter->values.values[i];
 
-		if (NULL == perfvalue->first)
-		{
-			if ('\0' == *instance)
-				break;
-
-			continue;
-		}
-
 		if (0 == strcmp(perfvalue->first, instance))
 			break;
 	}

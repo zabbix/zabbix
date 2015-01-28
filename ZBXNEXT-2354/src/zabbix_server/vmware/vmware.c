@@ -2857,7 +2857,7 @@ static void	vmware_service_process_perf_entity_data(zbx_vmware_service_t *servic
 				zbx_ptr_pair_t	perfvalue;
 				perfcounter = (zbx_vmware_perf_counter_t *)entity->counters.values[index];
 
-				perfvalue.first = vmware_shared_strdup(instance);
+				perfvalue.first = vmware_shared_strdup(NULL != instance ? instance : "");
 				perfvalue.second = vmware_shared_strdup(value);
 
 				zbx_vector_ptr_pair_append_ptr(&perfcounter->values, &perfvalue);
