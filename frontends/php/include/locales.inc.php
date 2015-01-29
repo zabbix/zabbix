@@ -52,7 +52,7 @@ function getLocales() {
 		'en_GB' => array('name' => _('English (en_GB)'),	'display' => true),
 		'en_US' => array('name' => _('English (en_US)'),	'display' => true),
 		'bg_BG' => array('name' => _('Bulgarian (bg_BG)'),	'display' => false),
-		'zh_CN' => array('name' => _('Chinese (zh_CN)'),	'display' => false),
+		'zh_CN' => array('name' => _('Chinese (zh_CN)'),	'display' => true),
 		'zh_TW' => array('name' => _('Chinese (zh_TW)'),	'display' => false),
 		'cs_CZ' => array('name' => _('Czech (cs_CZ)'),		'display' => false),
 		'nl_NL' => array('name' => _('Dutch (nl_NL)'),		'display' => false),
