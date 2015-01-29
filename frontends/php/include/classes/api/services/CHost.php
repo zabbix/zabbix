@@ -548,7 +548,7 @@ class CHost extends CHostGeneral {
 			// validate mandatory fields
 			if (!check_db_fields($hostDBfields, $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Wrong fields for host "%1$s".', isset($host['host']) ? $host['host'] : '')
+					_s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : '')
 				);
 			}
 
@@ -563,14 +563,14 @@ class CHost extends CHostGeneral {
 				}
 
 				if (isset($host['groups']) && (!is_array($host['groups']) || !$host['groups'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%1$s".',
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".',
 						$dbHosts[$hostId]['host'])
 					);
 				}
 			}
 			else {
 				if (!isset($host['groups']) || !is_array($host['groups']) || !$host['groups']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%1$s".', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
 				}
 
 				foreach ($host['groups'] as $group) {
