@@ -478,6 +478,14 @@ div.table-forms-container {
 	@include list-table-shadow;
 }
 
+div.form-btns {
+	text-align: center;
+
+	button {
+		margin: 10px 6px 5px 6px;
+	}
+}
+
 table.table-forms {
 	margin: 0 auto;
 	
