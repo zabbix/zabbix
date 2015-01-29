@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,9 +64,22 @@ else {
 	$isAuthenticationTypeChanged = false;
 }
 
-foreach ($config as $name => $value) {
-	if (array_key_exists($name, $_REQUEST)) {
-		$config[$name] = $_REQUEST[$name];
+$fields = array(
+	'authentication_type' => true,
+	'ldap_host' => true,
+	'ldap_port' => true,
+	'ldap_base_dn' => true,
+	'ldap_search_attribute' => true,
+	'ldap_bind_dn' => true,
+	'ldap_bind_password' => true
+);
+
+foreach ($config as $field => $value) {
+	if (array_key_exists($field, $fields)) {
+		$config[$field] = getRequest($field, $config[$field]);
+	}
+	else {
+		unset($config[$field]);
 	}
 }
 

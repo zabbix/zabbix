@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,15 +34,8 @@ class testPageEvents extends CWebTest {
 		$this->zbxTestTextPresent('Group');
 		$this->zbxTestTextPresent('Host');
 		$this->zbxTestTextPresent('Source');
-		$this->zbxTestTextPresent('Filter');
 		$this->zbxTestTextPresent('Displaying');
-		// table header
-		if (0 == DBcount('select * from events where source='.EVENT_SOURCE_TRIGGERS)) {
-			$this->zbxTestTextPresent('No events defined.');
-		}
-		else {
-			$this->zbxTestTextPresent(array('Time', 'Description', 'Status', 'Severity', 'Duration', 'Ack', 'Actions'));
-		}
+		$this->zbxTestTextPresent(array('Time', 'Host', 'Description', 'Status', 'Severity', 'Duration', 'Ack', 'Actions'));
 	}
 
 	public function testPageEvents_Discovery_CheckLayout() {
@@ -53,15 +46,8 @@ class testPageEvents extends CWebTest {
 		$this->zbxTestCheckTitle('Latest events \[refreshed every 30 sec.\]');
 		$this->zbxTestTextPresent('HISTORY OF EVENTS');
 		$this->zbxTestTextPresent('Source');
-		$this->zbxTestTextPresent('Filter');
 		$this->zbxTestTextPresent('Displaying');
-		// table header
-		if (0 == DBcount('select * from events where source='.EVENT_SOURCE_DISCOVERY)) {
-			$this->zbxTestTextPresent('No events defined.');
-		}
-		else {
-			$this->zbxTestTextPresent(array('Time', 'IP', 'DNS', 'Description', 'Status'));
-		}
+		$this->zbxTestTextPresent(array('Time', 'IP', 'DNS', 'Description', 'Status'));
 	}
 
 	public function testPageEvents_Triggers_NoHostNames() {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -362,6 +362,8 @@ table.tableinfo caption {
 	color: #FFFFFF; font-size: 11px; font-weight: bold; height: 22px; text-align: left; padding: 0 5px; line-height: 22px;
 }
 
+#selectedCount { display: inline-block; min-width: 105px; margin-right: 10px; font-weight: normal; }
+
 /* flicker */
 table.flicker { background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; border: 0; }
 table.flicker tr td.flicker_c { height: 16px; padding-left: 4px; padding-right: 4px; line-height: 12px; }
@@ -455,7 +457,7 @@ table.requirements select { width: 152px; }
 .filter tr td tr td { border-style: none none; }
 .filter .label { border-right: 0 !important; text-align: right; }
 .filter .controls { text-align: center; }
-.filter .controls .ui-button { margin: 1px; }
+.filter .controls .ui-button { margin: 1px 3px; }
 .filter .text { height: 16px; }
 .filter .button-form {
 	height: 20px; vertical-align: bottom; /* required to align buttons with input in IE8 */
