@@ -374,7 +374,7 @@ static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, sockle
  ******************************************************************************/
 #if defined(HAVE_IPV6)
 int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		int tls_connect, char *tls_arg1, char *tls_arg2)
+		unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
 {
 	int		ret = FAIL;
 	struct addrinfo	*ai = NULL, hints;
@@ -464,7 +464,7 @@ out:
 }
 #else
 int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		int tls_connect, char *tls_arg1, char *tls_arg2)
+		unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
 {
 	ZBX_SOCKADDR	servaddr_in;
 	struct hostent	*hp;
@@ -1001,7 +1001,7 @@ out:
  * Author: Eugene Grigorjev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_accept(zbx_sock_t *s, int tls_accept)
+int	zbx_tcp_accept(zbx_sock_t *s, unsigned int tls_accept)
 {
 	ZBX_SOCKADDR	serv_addr;
 	fd_set		sock_set;

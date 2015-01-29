@@ -85,7 +85,7 @@ typedef struct
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	/* type of connection actually established: unencrypted, TLS with certificate, TLS with PSK */
-	int			connection_type;
+	unsigned int		connection_type;
 #endif
 	int			timeout;
 	zbx_buf_type_t		buf_type;
@@ -104,7 +104,7 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 
 void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o);
 int     zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		int tls_connect, char *tls_arg1, char *tls_arg2);
+		unsigned int tls_connect, char *tls_arg1, char *tls_arg2);
 
 #define ZBX_TCP_PROTOCOL	0x01
 
@@ -130,7 +130,7 @@ int	get_address_family(const char *addr, int *family, char *error, int max_error
 
 int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_port);
 
-int	zbx_tcp_accept(zbx_sock_t *s, int tls_accept);
+int	zbx_tcp_accept(zbx_sock_t *s, unsigned int tls_accept);
 void	zbx_tcp_unaccept(zbx_sock_t *s);
 
 void    zbx_tcp_free(zbx_sock_t *s);
