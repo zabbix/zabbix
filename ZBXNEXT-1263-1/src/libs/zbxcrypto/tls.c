@@ -48,8 +48,8 @@
 #	define ZBX_TLS_CIPHERSUITE_ALL	2			/* select ciphersuites with certificate and PSK */
 #endif
 
-extern int	configured_tls_connect_mode;
-extern int	configured_tls_accept_modes;
+extern unsigned int	configured_tls_connect_mode;
+extern unsigned int	configured_tls_accept_modes;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern unsigned char	process_type, program_type;
@@ -1094,7 +1094,7 @@ int	zbx_tls_free(void)
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tls_connect(zbx_sock_t *s, char **error, int tls_connect, char *tls_arg1, char *tls_arg2)
+int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
 {
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
@@ -1335,7 +1335,7 @@ out:
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tls_accept(zbx_sock_t *s, char **error, int tls_accept)
+int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 {
 	const char		*__function_name = "zbx_tls_accept";
 	const ssl_ciphersuite_t	*info;
@@ -1572,3 +1572,29 @@ void	zbx_tls_close(zbx_sock_t *s)
 	}
 #endif
 }
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_connection_type_name                                     *
+ *                                                                            *
+ * Purpose: translate connection type code to name                            *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_tls_connection_type_name(unsigned int type)
+{
+	static const char	*unencrypted = "unencrypted";
+	static const char	*tls_psk = "TLS with PSK";
+	static const char	*tls_cert = "TLS with certificate";
+	static const char	*unknown = "unknown";
+
+	if (ZBX_TCP_SEC_UNENCRYPTED == type)
+		return unencrypted;
+	else if (ZBX_TCP_SEC_TLS_CERT == type)
+		return tls_cert;
+	else if (ZBX_TCP_SEC_TLS_PSK == type)
+		return tls_psk;
+	else
+		return unknown;
+}
+#endif

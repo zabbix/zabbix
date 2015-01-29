@@ -27,7 +27,7 @@
 #include "comms.h"
 #include "servercomms.h"
 
-extern int	configured_tls_connect_mode;
+extern unsigned int	configured_tls_connect_mode;
 
 int	connect_to_server(zbx_sock_t *sock, int timeout, int retry_interval)
 {
