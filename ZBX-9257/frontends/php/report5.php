@@ -123,6 +123,12 @@ $triggers = API::Trigger()->get(array(
 $hostIds = array();
 
 foreach ($triggers as $triggerId => $trigger) {
+	$usedHosts = array();
+	foreach ($trigger['hosts'] as $triggerHost) {
+		$usedHosts[$triggerHost['hostid']] = $triggerHost['name'];
+	}
+	$usedHostCount = count($usedHosts);
+
 	$hostIds[$trigger['hosts'][0]['hostid']] = $trigger['hosts'][0]['hostid'];
 
 	$triggerItems = array();
@@ -131,7 +137,9 @@ foreach ($triggers as $triggerId => $trigger) {
 
 	foreach ($trigger['items'] as $item) {
 		$triggerItems[] = array(
-			'name' => $item['name_expanded'],
+			'name' => ($usedHostCount > 1)
+				? $usedHosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded']
+				: $item['name_expanded'],
 			'params' => array(
 				'itemid' => $item['itemid'],
 				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
