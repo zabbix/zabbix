@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -365,7 +365,7 @@ $_REQUEST['filter_usrgrpid'] = getRequest('filter_usrgrpid', CProfile::get('web.
 CProfile::update('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROFILE_TYPE_ID);
 
 if (!empty($_REQUEST['form'])) {
-	$userId = getRequest('userid');
+	$userId = getRequest('userid', 0);
 
 	$data = getUserFormData($userId, $config);
 
