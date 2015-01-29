@@ -61,10 +61,12 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 Changes for 2.4.4rc1
 
 New features:
+A.F....... [ZBX-1357] enabled Chinese (China) locale to be displayed by default (Richlv)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, Korean, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+..F....... [ZBX-8930] fixed map import displaying incorrect message when map had non-existing sub elements (Oleg)
 A.F....... [ZBX-8448] fixed host and template permissions validation when an object belongs to both read and read-write groups (Ivo)
 ..F....... [ZBX-8448] added read-only groups in host and template edit forms as grayed out when object belongs to both read and read-write groups (Ivo)
 ..F....... [ZBX-8448] fixed template edit form losing host and template linkages by adding grayed out objects when they belong to both read and read-write groups (Ivo)
