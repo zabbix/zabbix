@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-28 12:22+0300\n"
+"POT-Creation-Date: 2015-01-28 12:40+0200\n"
 "PO-Revision-Date: 2014-11-06 10:54+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -90,9 +90,9 @@ msgstr "(%1$s %2$s)"
 msgid "(0 - infinitely)"
 msgstr "(0 - indefinidamente)"
 
-#: include/views/configuration.host.edit.php:200
+#: include/views/configuration.host.edit.php:236
 #: include/views/configuration.hostgroups.list.php:31
-#: include/views/configuration.template.edit.php:122
+#: include/views/configuration.template.edit.php:157
 msgid "(Only super admins can create groups)"
 msgstr "(Apenas super administradores podem criar grupos)"
 
@@ -108,8 +108,8 @@ msgstr "(em segs)"
 msgid "(minimum 60 seconds, 0 - use action default)"
 msgstr "(mínimo de 60 segundos, 0 - usar a ação padrão)"
 
-#: include/views/configuration.host.edit.php:382
-#: include/views/configuration.host.edit.php:403
+#: include/views/configuration.host.edit.php:418
+#: include/views/configuration.host.edit.php:439
 #: include/views/configuration.host.massupdate.php:152
 #: include/views/configuration.host.prototype.edit.php:153
 msgid "(no proxy)"
@@ -296,7 +296,7 @@ msgstr "Reconhecimento desativado"
 #: include/views/configuration.action.edit.php:940
 #: include/views/configuration.action.edit.php:1082
 #: include/views/configuration.graph.edit.php:229
-#: include/views/configuration.host.edit.php:675
+#: include/views/configuration.host.edit.php:711
 #: include/views/configuration.host.prototype.edit.php:220
 #: include/views/configuration.item.edit.php:276
 #: include/views/configuration.item.massupdate.php:321
@@ -304,7 +304,7 @@ msgstr "Reconhecimento desativado"
 #: include/views/configuration.services.edit.php:92
 #: include/views/configuration.services.edit.php:128
 #: include/views/configuration.slideconf.edit.php:52
-#: include/views/configuration.template.edit.php:409
+#: include/views/configuration.template.edit.php:460
 #: include/views/configuration.triggers.edit.php:149
 #: include/views/configuration.triggers.edit.php:276
 #: include/views/configuration.triggers.massupdate.php:89 tr_logform.php:303
@@ -336,13 +336,13 @@ msgstr "Ação incluída"
 msgid "Action deleted"
 msgstr "Ação excluída"
 
-#: actionconf.php:345
+#: actionconf.php:347
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Ação desativada"
 msgstr[1] "Ações desativadas"
 
-#: actionconf.php:344
+#: actionconf.php:346
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Ação ativada"
@@ -410,11 +410,11 @@ msgstr "Ativo até"
 #: include/views/configuration.action.edit.php:1061
 #: include/views/configuration.action.edit.php:1070
 #: include/views/configuration.graph.edit.php:232
-#: include/views/configuration.host.edit.php:245
-#: include/views/configuration.host.edit.php:262
-#: include/views/configuration.host.edit.php:278
-#: include/views/configuration.host.edit.php:293
-#: include/views/configuration.host.edit.php:717
+#: include/views/configuration.host.edit.php:281
+#: include/views/configuration.host.edit.php:298
+#: include/views/configuration.host.edit.php:314
+#: include/views/configuration.host.edit.php:329
+#: include/views/configuration.host.edit.php:753
 #: include/views/configuration.host.prototype.edit.php:199
 #: include/views/configuration.host.prototype.edit.php:260
 #: include/views/configuration.httpconf.edit.php:231
@@ -426,7 +426,7 @@ msgstr "Ativo até"
 #: include/views/configuration.services.edit.php:265
 #: include/views/configuration.slideconf.edit.php:87
 #: include/views/configuration.sysmap.edit.php:173
-#: include/views/configuration.template.edit.php:454
+#: include/views/configuration.template.edit.php:505
 #: include/views/configuration.triggers.edit.php:81
 #: include/views/configuration.triggers.edit.php:98
 #: include/views/configuration.triggers.edit.php:293
@@ -537,8 +537,8 @@ msgstr "Agente"
 msgid "Agent host name defined in the configuration file. String value."
 msgstr "Nome do agente definido no arquivo de configuração. Valor textual."
 
-#: include/views/configuration.host.edit.php:253
-#: include/views/configuration.host.edit.php:337
+#: include/views/configuration.host.edit.php:289
+#: include/views/configuration.host.edit.php:373
 #: include/views/configuration.host.prototype.edit.php:107
 #: include/views/inventory.host.view.php:111
 msgid "Agent interfaces"
@@ -653,14 +653,14 @@ msgstr "Aplicação atualizada"
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplicação com ID \"%1$s\" não está disponível no \"%2$s\"."
 
-#: hosts.php:813 hosts.php:903 include/forms.inc.php:921
+#: hosts.php:814 hosts.php:904 include/forms.inc.php:921
 #: include/html.inc.php:401 include/html.inc.php:405
 #: include/views/configuration.application.list.php:47
-#: include/views/configuration.host.edit.php:433
+#: include/views/configuration.host.edit.php:469
 #: include/views/configuration.item.edit.php:451
 #: include/views/configuration.item.list.php:71
 #: include/views/configuration.item.prototype.list.php:57
-#: include/views/configuration.template.edit.php:195
+#: include/views/configuration.template.edit.php:246
 #: include/views/inventory.host.view.php:227 popup.php:56 search.php:140
 #: search.php:166 search.php:192 search.php:382 search.php:405 search.php:435
 #: templates.php:493 templates.php:553
@@ -801,8 +801,8 @@ msgstr "Agosto"
 msgid "Authentication"
 msgstr "Autenticação"
 
-#: include/views/configuration.host.edit.php:745
-#: include/views/configuration.host.edit.php:757
+#: include/views/configuration.host.edit.php:781
+#: include/views/configuration.host.edit.php:793
 #: include/views/configuration.host.prototype.edit.php:273
 msgid "Authentication algorithm"
 msgstr "Algoritmo de autenticação"
@@ -863,7 +863,7 @@ msgstr "Período de retenção dos dados de eventos e alertas"
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr "Período de retenção dos dados de eventos e alertas relacionados ao auto-registro (em dias) \"%1$s\"."
 
-#: include/views/configuration.host.edit.php:804
+#: include/views/configuration.host.edit.php:840
 #: include/views/configuration.host.massupdate.php:263
 #: include/views/configuration.host.prototype.edit.php:315
 msgid "Automatic"
@@ -878,7 +878,7 @@ msgstr "Mapeamento automático de icone"
 msgid "Automatic icon selection"
 msgstr "Seleção automática de ícone"
 
-#: hosts.php:822
+#: hosts.php:823
 msgid "Availability"
 msgstr "Disponibilidade"
 
@@ -1056,7 +1056,7 @@ msgstr "CONFIGURAÇÃO DE GRUPOS DE HOSTS"
 msgid "CONFIGURATION OF HOST PROTOTYPES"
 msgstr "CONFIGURAÇÃO DOS PROTÓTIPOS DE HOST"
 
-#: hosts.php:653 hosts.php:718 hosts.php:766
+#: hosts.php:653 hosts.php:718 hosts.php:767
 msgid "CONFIGURATION OF HOSTS"
 msgstr "CONFIGURAÇÃO DE HOSTS"
 
@@ -1154,7 +1154,7 @@ msgstr "CONFIGURAÇÃO DAS SEVERIDADES DE TRIGGER"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:54
-#: include/views/configuration.triggers.massupdate.php:42 triggers.php:336
+#: include/views/configuration.triggers.massupdate.php:42 triggers.php:352
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "CONFIGURAÇÃO DE TRIGGERS"
 
@@ -1232,19 +1232,11 @@ msgstr "Permissões calculadas"
 msgid "Callback"
 msgstr "Retorno"
 
-#: api/classes/CTemplate.php:953
-msgid "Can't add group"
-msgstr "Impossível adicionar grupo"
-
-#: api/classes/CTemplate.php:1030 api/classes/CTemplate.php:1040
+#: api/classes/CTemplate.php:1037 api/classes/CTemplate.php:1047
 msgid "Can't link template"
 msgstr "Impossível vincular template"
 
-#: api/classes/CTemplate.php:964
-msgid "Can't remove group"
-msgstr "Impossível remover grupo"
-
-#: api/classes/CTemplate.php:1001 api/classes/CTemplate.php:1019
+#: api/classes/CTemplate.php:1008 api/classes/CTemplate.php:1026
 msgid "Can't unlink template"
 msgstr "Impossível desvincular os templates"
 
@@ -1321,7 +1313,7 @@ msgstr "Gráfico não foi adicionado"
 msgid "Cannot add graph prototype"
 msgstr "Não foi possível adicionar o protótipo de gráfico"
 
-#: hostgroups.php:154 usergrps.php:186
+#: hostgroups.php:212 usergrps.php:186
 msgid "Cannot add group"
 msgstr "Grupo não foi incluído"
 
@@ -1421,11 +1413,11 @@ msgstr "Não foi possível adicionar o slide show"
 msgid "Cannot add template"
 msgstr "Não foi possível adicionar template"
 
-#: triggers.php:183 triggers.php:306 tr_logform.php:148
+#: triggers.php:199 triggers.php:322 tr_logform.php:148
 msgid "Cannot add trigger"
 msgstr "Tigger não foi adicionada"
 
-#: trigger_prototypes.php:168
+#: trigger_prototypes.php:184
 msgid "Cannot add trigger prototype"
 msgstr "Não foi possível adicionar o protótipo de trigger"
 
@@ -1523,10 +1515,6 @@ msgstr "Não é possível criar dependência entre uma trigger e ela mesma."
 msgid "Cannot create discovery rule"
 msgstr "Não foi possível criar a regra de discovery"
 
-#: api/classes/CHost.php:1186
-msgid "Cannot create host group."
-msgstr "Não é possível criar o grupo de host."
-
 #: adm.iconmapping.php:81
 msgid "Cannot create icon map"
 msgstr "Não foi possível criar o ícone no mapa"
@@ -1603,17 +1591,13 @@ msgstr "Não foi possível remover gráficos"
 msgid "Cannot delete graphs created by low level discovery."
 msgstr "Não é possível excluir gráficos criados pela auto-busca (LLD)."
 
-#: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:238
+#: hostgroups.php:226 hostgroups.php:237 usergrps.php:201 usergrps.php:238
 msgid "Cannot delete group"
 msgstr "Grupo não foi removido"
 
 #: hosts.php:583 hosts.php:600
 msgid "Cannot delete host"
 msgstr "Host não foi removido"
-
-#: api/classes/CHost.php:1197
-msgid "Cannot delete host group."
-msgstr "Grupo de host não foi removido."
 
 #: api/classes/CDiscoveryRule.php:413
 msgid "Cannot delete host prototype."
@@ -1631,7 +1615,7 @@ msgstr "Não foi possível remover icone do mapa"
 msgid "Cannot delete image"
 msgstr "A imagem não foi excluída"
 
-#: api/classes/CHost.php:1287
+#: api/classes/CHost.php:1273
 msgid "Cannot delete inventory."
 msgstr "Não foi possível remover inventário."
 
@@ -1703,7 +1687,7 @@ msgstr "Não foi possível excluir os scripts. Script \"%1$s\" é usado na opera
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Falha ao excluir scripts. Não existe script com o scriptid \"%1$s\"."
 
-#: actionconf.php:356
+#: actionconf.php:358
 msgid "Cannot delete selected actions"
 msgstr "Ações selecionadas não foram excluídas"
 
@@ -1753,15 +1737,15 @@ msgstr "A trigger \"%1$s:%2$s\" é oriunda de um template, por isso não é poss
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Não é possível excluir cenários web vindos do template \"%1$s\"."
 
-#: triggers.php:197
+#: triggers.php:213
 msgid "Cannot delete trigger"
 msgstr "A trigger não foi excluída"
 
-#: api/classes/CItemPrototype.php:583 trigger_prototypes.php:181
+#: api/classes/CItemPrototype.php:583 trigger_prototypes.php:197
 msgid "Cannot delete trigger prototype"
 msgstr "Não foi possível excluir o protótipo de trigger"
 
-#: trigger_prototypes.php:256
+#: trigger_prototypes.php:272
 msgid "Cannot delete trigger prototypes"
 msgstr "Não foi possível excluir os protótipos de trigger"
 
@@ -1769,7 +1753,7 @@ msgstr "Não foi possível excluir os protótipos de trigger"
 msgid "Cannot delete trigger."
 msgstr "Trigger não foi excluída."
 
-#: triggers.php:318
+#: triggers.php:334
 msgid "Cannot delete triggers"
 msgstr "As triggers não foram excluídas"
 
@@ -1793,7 +1777,7 @@ msgstr "Mapeamento não foi removido"
 msgid "Cannot delete web scenario"
 msgstr "Não foi possível excluir o cenário web"
 
-#: actionconf.php:348
+#: actionconf.php:350
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Não foi possível desativar a ação"
@@ -1812,7 +1796,7 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Não foi possível desativar a autobusca"
 msgstr[1] "Não foi possível desativar as regras de autobusca"
 
-#: hostgroups.php:231 hosts.php:629 proxies.php:183
+#: hostgroups.php:289 hosts.php:629 proxies.php:183
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "Não foi possível desativar host"
@@ -1842,13 +1826,13 @@ msgid_plural "Cannot disable media types"
 msgstr[0] "Não foi possível desativar o tipo de mídia"
 msgstr[1] "Não foi possível desativar os tipos de mídia"
 
-#: triggers.php:276
+#: triggers.php:292
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] "Não foi possível desativar trigger"
 msgstr[1] "Não foi possível desativar triggers"
 
-#: trigger_prototypes.php:248
+#: trigger_prototypes.php:264
 msgid "Cannot disable trigger prototype"
 msgid_plural "Cannot disable trigger prototypes"
 msgstr[0] "Não foi possível desativar protótipo de trigger"
@@ -1874,7 +1858,7 @@ msgstr "Não foi possível exibir a fila de item."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Não é possível exibir mais de um item com o tipo \"Soma do gráfico\"."
 
-#: actionconf.php:347
+#: actionconf.php:349
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Não foi possível ativar a ação"
@@ -1893,7 +1877,7 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Não foi possível ativar a autobusca"
 msgstr[1] "Não foi possível ativar as regras de autobusca"
 
-#: hostgroups.php:230 hosts.php:628 proxies.php:182
+#: hostgroups.php:288 hosts.php:628 proxies.php:182
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "Não foi possível ativar o host"
@@ -1923,13 +1907,13 @@ msgid_plural "Cannot enable media types"
 msgstr[0] "Não foi possível ativar o tipo de mídia"
 msgstr[1] "Não foi possível ativar o tipos de mídia"
 
-#: triggers.php:275
+#: triggers.php:291
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] "Não foi possível ativar a trigger"
 msgstr[1] "Não foi possível ativar as triggers"
 
-#: trigger_prototypes.php:247
+#: trigger_prototypes.php:263
 msgid "Cannot enable trigger prototype"
 msgid_plural "Cannot enable trigger prototypes"
 msgstr[0] "Não foi possível ativar protótipo de trigger"
@@ -2097,7 +2081,7 @@ msgstr "Não foi possível formatar a Árvore. Cheque a estrutura lógica nos li
 msgid "Cannot format tree."
 msgstr "Não foi possível formatar a árvore."
 
-#: api/classes/CTemplate.php:924
+#: api/classes/CTemplate.php:933
 msgid "Cannot have empty visible template name"
 msgstr "Não pode ter espaço vazio no nome do template"
 
@@ -2134,7 +2118,7 @@ msgstr "Não foi possível inserir a expressão na trigger"
 msgid "Cannot insert user media."
 msgstr "Não foi possível inserir a mídia do usuário."
 
-#: api/classes/CHost.php:1265
+#: api/classes/CHost.php:1251
 msgid "Cannot link template"
 msgstr "Falha na associação do template"
 
@@ -2146,19 +2130,19 @@ msgstr "Não foi possível entrar."
 msgid "Cannot logout."
 msgstr "Não foi possível terminar sessão."
 
-#: api/classes/CHost.php:1094
+#: api/classes/CHost.php:1111
 msgid "Cannot mass update host name."
 msgstr "Não foi possível atualizar em massa o nome da máquina."
 
-#: api/classes/CTemplate.php:874
+#: api/classes/CTemplate.php:883
 msgid "Cannot mass update template name"
 msgstr "Não foi possível a atualização em massa do nome do template"
 
-#: api/classes/CHost.php:1084
+#: api/classes/CHost.php:1101
 msgid "Cannot mass update visible host name."
 msgstr "Não é possível atualizar em massa o nome visível do host."
 
-#: api/classes/CTemplate.php:841
+#: api/classes/CTemplate.php:850
 msgid "Cannot mass update visible template name"
 msgstr "Não é possível atualizar em massa o nome visível do template"
 
@@ -2212,6 +2196,11 @@ msgstr "Não foi possível salvar as regras de descoberta sem checar."
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Não foi possível enviar o comando, verifique a comunicação com o servidor Zabbix \"%1$s\"."
 
+#: api/classes/CHostGroup.php:493
+#, c-format
+msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
+msgstr ""
+
 #: api/classes/CItemGeneral.php:242
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
@@ -2237,7 +2226,7 @@ msgstr "Não foi possível definir o \"templateid\" para a tela \"%1$s\"."
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Não foi possível definir o \"templateid\" para o protótipo de trigger \"%1$s\"."
 
-#: api/classes/CHost.php:671 api/classes/CHost.php:1139
+#: api/classes/CHost.php:703 api/classes/CHost.php:1156
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Não é possível configurar campos do inventário com o inventário desabilitado."
 
@@ -2249,48 +2238,48 @@ msgstr "Não foi possível mudar a interface do host."
 msgid "Cannot unblock users"
 msgstr "Não foi possível desbloquear usuários"
 
-#: api/classes/CHostGeneral.php:511
+#: api/classes/CHostGeneral.php:519
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "Não foi possível desvincular e limpar os cenários web."
 
-#: api/classes/CHostGeneral.php:564
+#: api/classes/CHostGeneral.php:572
 msgid "Cannot unlink and clear applications."
 msgstr "Não foi possível desvincular e limpar as aplicações."
 
-#: api/classes/CHostGeneral.php:338
+#: api/classes/CHostGeneral.php:346
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Não foi possível desvíncular e limpar regras decobertas"
 
-#: api/classes/CHostGeneral.php:455
+#: api/classes/CHostGeneral.php:463
 msgid "Cannot unlink and clear graph prototypes"
 msgstr "Não foi possível desvíncular e limpar protótipos de gráficos"
 
-#: api/classes/CHostGeneral.php:472
+#: api/classes/CHostGeneral.php:480
 msgid "Cannot unlink and clear graphs."
 msgstr "Não foi possível desvíncular e limpar os gráficos."
 
-#: api/classes/CHostGeneral.php:372
+#: api/classes/CHostGeneral.php:380
 msgid "Cannot unlink and clear item prototypes"
 msgstr "Não foi possível desvícular e limpar os protótipos de itens"
 
-#: api/classes/CHostGeneral.php:355
+#: api/classes/CHostGeneral.php:363
 msgid "Cannot unlink and clear items"
 msgstr "Não foi possível desvíncular e limpar os itens"
 
-#: api/classes/CHostGeneral.php:278 api/classes/CHostGeneral.php:295
+#: api/classes/CHostGeneral.php:286 api/classes/CHostGeneral.php:303
 msgid "Cannot unlink and clear triggers"
 msgstr "Não foi possível desvincular e limpar as triggers"
 
-#: api/classes/CHost.php:1256
+#: api/classes/CHost.php:1242
 msgid "Cannot unlink template"
 msgstr "Falha na desassociação do template"
 
-#: api/classes/CHostGeneral.php:233
+#: api/classes/CHostGeneral.php:241
 #, c-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Não é possível desvincular a trigger \"%s\", tem itens do template que estão vinculados ao host."
 
-#: api/classes/CHost.php:684
+#: api/classes/CHost.php:716
 #, c-format
 msgid "Cannot update \"%1$s\" for a discovered host."
 msgstr "Não é possível atualizar \"%1$s\" para a descoberta de host."
@@ -2309,6 +2298,11 @@ msgstr "Não é possível atualizar \"%1$s\" para uma trigger descoberta."
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Não foi possível atualizar \"%1$s\" na ação \"%2$s\"."
+
+#: api/classes/CHostGroup.php:535
+#, c-format
+msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
+msgstr ""
 
 #: api/classes/CItemGeneral.php:206
 #, c-format
@@ -2354,7 +2348,7 @@ msgstr "Não foi possível atualizar o \"templateid\" para o protótipo de trigg
 msgid "Cannot update a discovered graph."
 msgstr "Não é possível atualizar um gráfico descoberto."
 
-#: api/classes/CHostGroup.php:537
+#: api/classes/CHostGroup.php:550
 msgid "Cannot update a discovered host group."
 msgstr "Não é possível atualizar um grupo de hosts descoberto."
 
@@ -2396,7 +2390,7 @@ msgstr "Gráfico não foi atualizado"
 msgid "Cannot update graph prototype"
 msgstr "Não foi possível atualizar o protótipo de gráfico"
 
-#: hostgroups.php:125 usergrps.php:180
+#: hostgroups.php:183 usergrps.php:180
 msgid "Cannot update group"
 msgstr "Grupo não foi atualizado"
 
@@ -2404,8 +2398,8 @@ msgstr "Grupo não foi atualizado"
 msgid "Cannot update group."
 msgstr "Grupo não foi atualizado."
 
-#: api/classes/CHostGroup.php:792 api/classes/CHostGroup.php:850
-#: api/classes/CHostGroup.php:909
+#: api/classes/CHostGroup.php:943 api/classes/CHostGroup.php:1046
+#: api/classes/CHostGroup.php:1187
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Não é possível atualizar os grupos para o host descoberto \"%1$s\"."
@@ -2521,20 +2515,20 @@ msgstr "Não foi possível atualizar template"
 msgid "Cannot update templated applications."
 msgstr "Não é possível atualizar aplicações vindas de templates."
 
-#: api/classes/CTemplate.php:797 api/classes/CTemplate.php:1082
+#: api/classes/CTemplate.php:806 api/classes/CTemplate.php:1127
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Não é possível atualizar templates no host descoberto \"%1$s\"."
 
-#: triggers.php:179 triggers.php:237 tr_logform.php:113
+#: triggers.php:195 triggers.php:253 tr_logform.php:113
 msgid "Cannot update trigger"
 msgstr "Trigger não foi atualizada"
 
-#: trigger_prototypes.php:163
+#: trigger_prototypes.php:179
 msgid "Cannot update trigger prototype"
 msgstr "Não foi possível atualizar o protótipo de trigger"
 
-#: trigger_prototypes.php:209
+#: trigger_prototypes.php:225
 msgid "Cannot update trigger prototypes"
 msgstr "Não foi possível atualizar os protótipos de trigger"
 
@@ -2638,21 +2632,21 @@ msgstr "Verifique a expressão a partir de \"%1$s\"."
 msgid "Check if file exists. 0 - file does not exist, 1 - file exists"
 msgstr "Verifica se o arquivo existe. 0 - arquivo não existe, 1 - arquivo existe"
 
-#: include/classes/items/CHelpItems.php:599
+#: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Verifica se o serviço está disponível. 0 - serviço está fora do ar, 1 - serviço está em execução. Se o parâmetro <ip> estiver ausente, o IP ou nome de DNS serão utilizados a partir da definição do host. Se o parâmetro <port> estiver ausente, a porta padrão do serviço será utilizada."
 
 #: include/classes/items/CHelpItems.php:121
-#: include/classes/items/CHelpItems.php:387
+#: include/classes/items/CHelpItems.php:383
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45]."
 msgstr "Verifica se o serviço está disponível. 0 - serviço está fora do ar, 1 - serviço está em execução. Se o parâmetro <ip> estiver ausente, será utilizado o ip 127.0.0.1. Se o parâmetro <port> estiver ausente, a porta padrão do serviço será utilizada. Exemplo: net.tcp.service[ftp,,45]."
 
 #: include/classes/items/CHelpItems.php:125
-#: include/classes/items/CHelpItems.php:383
+#: include/classes/items/CHelpItems.php:387
 msgid "Check performance of service \"service\". 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used."
 msgstr "Verifica a performance do serviço \"service\". 0 - serviço está fora do ar, \"sec\" - tempo gasto para obter a resposta do serviço (em segundos). Se o parâmetro <ip> estiver ausente, o ip 127.0.0.1 será utilizado. Se o parâmetro <port> estiver ausente, a porta padrão do serviço será utilizada."
 
-#: include/classes/items/CHelpItems.php:595
+#: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
 msgstr "Verifica a performance do serviço. 0 - serviço está fora do ar, \"sec\" - tempo gasto para obter a resposta do serviço (em segundos). Se o parâmetro <ip> estiver ausente, o IP ou o nome de DNS serão utilizados a partir da definição do host. Se o parâmetro <port> estiver ausente, a porta padrão do serviço será utilizada."
 
@@ -2679,8 +2673,8 @@ msgstr "Verifica se é possível iniciar uma conexão TCP com um número de port
 msgid "Checks"
 msgstr "Checagens"
 
-#: include/classes/items/CHelpItems.php:89
-#: include/classes/items/CHelpItems.php:351
+#: include/classes/items/CHelpItems.php:85
+#: include/classes/items/CHelpItems.php:347
 msgid "Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up."
 msgstr "Verifica se o serviço DNS está em execução. 0 - o serviço de DNS está fora do ar (servidor não respondeu ou resolução de nome falhou), 1 - serviço em execução."
 
@@ -2768,7 +2762,7 @@ msgstr "Relógio"
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.graph.edit.php:305
-#: include/views/configuration.host.edit.php:870
+#: include/views/configuration.host.edit.php:906
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:336
 #: include/views/configuration.httpconf.edit.php:250
@@ -2777,7 +2771,7 @@ msgstr "Relógio"
 #: include/views/configuration.screen.edit.php:54
 #: include/views/configuration.slideconf.edit.php:116
 #: include/views/configuration.sysmap.edit.php:190
-#: include/views/configuration.template.edit.php:477
+#: include/views/configuration.template.edit.php:528
 #: include/views/configuration.triggers.edit.php:315
 msgid "Clone"
 msgstr "Clonar"
@@ -3064,8 +3058,8 @@ msgid "Confirmation text"
 msgstr "Mensagem de confirmação"
 
 #: include/views/administration.proxy.edit.php:56
-#: include/views/configuration.host.edit.php:237
-#: include/views/configuration.host.edit.php:324
+#: include/views/configuration.host.edit.php:273
+#: include/views/configuration.host.edit.php:360
 #: include/views/configuration.host.prototype.edit.php:94
 #: include/views/inventory.host.view.php:103
 #: include/views/inventory.host.view.php:125
@@ -3207,7 +3201,7 @@ msgstr "Criar gráfico (selecione o host primeiro)"
 msgid "Create graph prototype"
 msgstr "Criar protótipo de gráfico"
 
-#: hosts.php:761
+#: hosts.php:762
 msgid "Create host"
 msgstr "Criar host"
 
@@ -3448,7 +3442,7 @@ msgstr "Slides personalizados"
 msgid "Czech (cs_CZ)"
 msgstr "Checo(cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1369
+#: include/classes/graphdraw/CLineGraphDraw.php:1371
 msgid "D"
 msgstr "D"
 
@@ -3470,8 +3464,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "DETALHES DO CENÁRIO"
 
-#: include/maps.inc.php:686 include/maps.inc.php:768 include/maps.inc.php:856
-#: include/maps.inc.php:946
+#: include/maps.inc.php:675 include/maps.inc.php:757 include/maps.inc.php:845
+#: include/maps.inc.php:935
 msgid "DISABLED"
 msgstr "DESATIVADO"
 
@@ -3483,7 +3477,7 @@ msgstr "DISCOVERED"
 msgid "DM"
 msgstr "MD"
 
-#: events.php:509 events.php:518 hosts.php:779
+#: events.php:509 events.php:518 hosts.php:780
 #: include/views/administration.proxy.edit.php:62
 #: include/views/inventory.host.view.php:64
 #: include/views/inventory.host.view.php:73
@@ -3494,8 +3488,8 @@ msgid "DNS"
 msgstr "DNS"
 
 #: include/views/administration.proxy.edit.php:55
-#: include/views/configuration.host.edit.php:236
-#: include/views/configuration.host.edit.php:323
+#: include/views/configuration.host.edit.php:272
+#: include/views/configuration.host.edit.php:359
 #: include/views/configuration.host.prototype.edit.php:93
 #: include/views/inventory.host.view.php:103
 #: include/views/inventory.host.view.php:125
@@ -3547,7 +3541,7 @@ msgstr "Dados"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Estatísticas de dados em cache. <cache> - all, float, uint, str, log, text. <history> - pfree, total, used, free. <trend> - pfree, total, used, free. <text> - pfree, total, used, free."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2509
+#: include/classes/graphdraw/CLineGraphDraw.php:2511
 #: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -3710,8 +3704,8 @@ msgstr "Decimal"
 #: include/hosts.inc.php:37
 #: include/views/administration.general.iconmap.edit.php:133
 #: include/views/configuration.action.edit.php:398
-#: include/views/configuration.host.edit.php:239
-#: include/views/configuration.host.edit.php:326
+#: include/views/configuration.host.edit.php:275
+#: include/views/configuration.host.edit.php:362
 #: include/views/configuration.host.prototype.edit.php:96
 #: include/views/js/configuration.sysmaps.js.php:82
 #: include/views/js/configuration.sysmaps.js.php:132
@@ -3772,7 +3766,7 @@ msgstr "Atrasado por"
 msgid "Delete"
 msgstr "Remover"
 
-#: include/views/configuration.template.edit.php:480
+#: include/views/configuration.template.edit.php:531
 msgid "Delete and clear"
 msgstr "Remover e limpar"
 
@@ -3780,7 +3774,7 @@ msgstr "Remover e limpar"
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Remover e limpar templates selecionados? (Aviso: todos os hosts associados terão limpados seus elementos herdados dos templates removidos!)"
 
-#: include/views/configuration.template.edit.php:480
+#: include/views/configuration.template.edit.php:531
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Remover e limpar template? (Aviso: todos os hosts associados terão limpados seus elementos herdados do template removido!)"
 
@@ -3866,7 +3860,7 @@ msgstr "Remover tela?"
 msgid "Delete script?"
 msgstr "Remover script?"
 
-#: hosts.php:1023 include/reports.inc.php:114 include/reports.inc.php:211
+#: hosts.php:1024 include/reports.inc.php:114 include/reports.inc.php:211
 #: include/reports.inc.php:257
 #: include/views/administration.general.regularexpressions.list.php:67
 #: include/views/administration.mediatypes.list.php:121
@@ -3948,11 +3942,11 @@ msgstr "Excluir os protótipos de host selecionados?"
 msgid "Delete selected host prototypes?"
 msgstr "Excluir os protótipos de host selecionados?"
 
-#: include/views/configuration.host.edit.php:872
+#: include/views/configuration.host.edit.php:908
 msgid "Delete selected host?"
 msgstr "Remover host selecionado?"
 
-#: hosts.php:1024
+#: hosts.php:1025
 msgid "Delete selected hosts?"
 msgstr "Remover hosts selecionados?"
 
@@ -4051,7 +4045,7 @@ msgstr "Excluir serviço"
 msgid "Delete slide show?"
 msgstr "Apagar apresentação de slides?"
 
-#: include/views/configuration.template.edit.php:479
+#: include/views/configuration.template.edit.php:530
 msgid "Delete template?"
 msgstr "Remover template?"
 
@@ -4086,7 +4080,7 @@ msgstr "Excluído: Regra de descoberta \"%1$s\" em \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Excluído: Gráfico \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CHost.php:1583
+#: api/classes/CHost.php:1601
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Excluído: Host \"%1$s\"."
@@ -4111,7 +4105,7 @@ msgstr "Excluído: Protótipo de item \"%1$s\" em \"%2$s\"."
 msgid "Deleted: Proxy \"%1$s\"."
 msgstr "Excluído: Proxy \"%1$s\"."
 
-#: api/classes/CTemplate.php:763
+#: api/classes/CTemplate.php:766
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Excluído: Template \"%1$s\"."
@@ -4291,7 +4285,7 @@ msgstr "Desativar modo debug nos grupos selecionados?"
 msgid "Disable host"
 msgstr "Desativar host"
 
-#: hosts.php:944 hosts.php:957
+#: hosts.php:945 hosts.php:958
 msgid "Disable host?"
 msgstr "Desabilitar host?"
 
@@ -4303,7 +4297,7 @@ msgstr "Desabilitar os hosts nos grupos selecionados?"
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Desabilitar hosts monitorados pelos proxies selecionados?"
 
-#: hosts.php:1020 include/views/administration.mediatypes.list.php:117
+#: hosts.php:1021 include/views/administration.mediatypes.list.php:117
 #: include/views/administration.proxy.list.php:108
 #: include/views/administration.usergroups.list.php:141
 #: include/views/configuration.action.list.php:101
@@ -4344,7 +4338,7 @@ msgstr "Desabilitar grupos selecionados?"
 msgid "Disable selected host prototypes?"
 msgstr "Desabilitar os protótipos de host selecionados?"
 
-#: hosts.php:1021
+#: hosts.php:1022
 msgid "Disable selected hosts?"
 msgstr "Desativar hosts selecionados?"
 
@@ -4380,7 +4374,7 @@ msgstr "Desativar triggers selecionadas?"
 #: include/views/administration.users.list.php:128
 #: include/views/administration.users.list.php:129
 #: include/views/configuration.action.list.php:73
-#: include/views/configuration.host.edit.php:800
+#: include/views/configuration.host.edit.php:836
 #: include/views/configuration.host.massupdate.php:261
 #: include/views/configuration.host.prototype.edit.php:311
 #: include/views/configuration.item.massupdate.php:300
@@ -4407,7 +4401,7 @@ msgstr "Descoberto por"
 msgid "Discovered device"
 msgstr "Dispositivo descoberto"
 
-#: events.php:301 hosts.php:817 hosts.php:911 include/html.inc.php:391
+#: events.php:301 hosts.php:818 hosts.php:912 include/html.inc.php:391
 #: include/menu.inc.php:77 include/menu.inc.php:209
 #: include/views/configuration.action.list.php:34
 #: include/views/inventory.host.view.php:232
@@ -4497,8 +4491,8 @@ msgstr "Regra de autobusca atualizada"
 #: include/html.inc.php:512 include/html.inc.php:516
 #: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
-#: include/views/configuration.host.edit.php:540
-#: include/views/configuration.template.edit.php:285
+#: include/views/configuration.host.edit.php:576
+#: include/views/configuration.template.edit.php:336
 #: include/views/conf.import.php:32 include/views/monitoring.discovery.php:33
 #: popup.php:108
 msgid "Discovery rules"
@@ -4567,19 +4561,19 @@ msgstr "Fora"
 msgid "Downtime"
 msgstr "Tempo offline"
 
-#: include/views/configuration.host.edit.php:291
+#: include/views/configuration.host.edit.php:327
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
 msgstr "Arraste para cá para mudar a interface para o tipo \"IPMI\"."
 
-#: include/views/configuration.host.edit.php:276
+#: include/views/configuration.host.edit.php:312
 msgid "Drag here to change the type of the interface to \"JMX\" type."
 msgstr "Arraste para cá para mudar o tipo da interface para \"JMX\"."
 
-#: include/views/configuration.host.edit.php:260
+#: include/views/configuration.host.edit.php:296
 msgid "Drag here to change the type of the interface to \"SNMP\" type."
 msgstr "Arraste para cá para mudar o tipo da interface para \"SNMP\"."
 
-#: include/views/configuration.host.edit.php:243
+#: include/views/configuration.host.edit.php:279
 msgid "Drag here to change the type of the interface to \"agent\" type."
 msgstr "Arraste para cá para mudar o tipo da interface para \"agente\"."
 
@@ -4616,12 +4610,12 @@ msgstr "Nome de protótipo de grupo duplicado \"%2$s\" para o protótipo de host
 msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
 msgstr "ID de grupo duplicado \"%2$s\" para o protótipo de host \"%1$s\"."
 
-#: api/classes/CHost.php:747
+#: api/classes/CHost.php:760
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "Host duplicado. Já existe outro com o mesmo nome de host: \"%s\"."
 
-#: api/classes/CHost.php:779
+#: api/classes/CHost.php:792
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Host duplicado. Já existe outro com o mesmo nome visível: \"%s\"."
@@ -4751,13 +4745,13 @@ msgstr "Host nulo."
 #: api/classes/CAction.php:1275 api/classes/CApplication.php:288
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
-#: api/classes/CHostGroup.php:509 api/classes/CHostGroup.php:580
-#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1419
+#: api/classes/CHostGroup.php:516 api/classes/CHostGroup.php:593
+#: api/classes/CHostInterface.php:465 api/classes/CHost.php:1437
 #: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
 #: api/classes/CService.php:377 api/classes/CService.php:443
-#: api/classes/CService.php:515 api/classes/CTemplate.php:624
+#: api/classes/CService.php:515 api/classes/CTemplate.php:627
 #: api/classes/CTrigger.php:875 api/classes/CTrigger.php:948
 #: api/classes/CTrigger.php:1038 api/classes/CTriggerPrototype.php:627
 #: api/classes/CUserGroup.php:635 api/classes/CUserMacro.php:394
@@ -4844,7 +4838,7 @@ msgstr "Habilitar reconhecimento dos eventos"
 msgid "Enable host"
 msgstr "Ativar host"
 
-#: hosts.php:951
+#: hosts.php:952
 msgid "Enable host?"
 msgstr "Habilitar host?"
 
@@ -4861,7 +4855,7 @@ msgstr "Habilitar hosts monitorados pelos proxies selecionados?"
 msgid "Enable internal housekeeping"
 msgstr "Ativar limpeza interna de dados"
 
-#: hosts.php:1017 include/views/administration.mediatypes.list.php:113
+#: hosts.php:1018 include/views/administration.mediatypes.list.php:113
 #: include/views/administration.proxy.list.php:104
 #: include/views/administration.usergroups.list.php:137
 #: include/views/configuration.action.list.php:97
@@ -4902,7 +4896,7 @@ msgstr "Habilitar grupos selecionados?"
 msgid "Enable selected host prototypes?"
 msgstr "Habilitar os protótipos de host selecionados?"
 
-#: hosts.php:1018 include/views/configuration.hostgroups.list.php:162
+#: hosts.php:1019 include/views/configuration.hostgroups.list.php:162
 msgid "Enable selected hosts?"
 msgstr "Habilitar os hosts selecionados?"
 
@@ -5109,7 +5103,7 @@ msgstr "Expirada"
 msgid "Exploded"
 msgstr "Explodido"
 
-#: hosts.php:1015 include/views/configuration.screen.list.php:70
+#: hosts.php:1016 include/views/configuration.screen.list.php:70
 #: include/views/configuration.sysmap.list.php:63 templates.php:650
 msgid "Export selected"
 msgstr "Exportar selecionados"
@@ -5194,7 +5188,7 @@ msgstr "Falhou"
 msgid "Failed"
 msgstr "Falhou"
 
-#: api/classes/CTemplate.php:605
+#: api/classes/CTemplate.php:611
 msgid "Failed to update template"
 msgstr "Falha ao atualizar o template"
 
@@ -5306,7 +5300,7 @@ msgstr "Informação de horário do arquivo. Numero de segundos. <mode> é opcio
 msgid "Filled region"
 msgstr "Região preenchida"
 
-#: events.php:362 hosts.php:784 include/classes/class.cwidget.php:130
+#: events.php:362 hosts.php:785 include/classes/class.cwidget.php:130
 #: include/forms.inc.php:646
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
@@ -5425,8 +5419,8 @@ msgstr "Acesso à interface web atualizado"
 msgid "Frontend messaging"
 msgstr "Mensagem da interface web"
 
-#: include/views/configuration.host.edit.php:871
-#: include/views/configuration.template.edit.php:478
+#: include/views/configuration.host.edit.php:907
+#: include/views/configuration.template.edit.php:529
 msgid "Full clone"
 msgstr "Clone completo"
 
@@ -5529,7 +5523,7 @@ msgstr "Script global"
 msgid "Global scripts"
 msgstr "Scripts globais"
 
-#: hosts.php:1026
+#: hosts.php:1027
 #: include/views/administration.general.regularexpressions.list.php:70
 #: include/views/administration.mediatypes.list.php:125
 #: include/views/administration.proxy.list.php:116
@@ -5685,8 +5679,8 @@ msgstr "Protótipo de gráfico atualizado"
 
 #: include/html.inc.php:464 include/html.inc.php:468
 #: include/views/configuration.host.discovery.list.php:120
-#: include/views/configuration.host.edit.php:614
-#: include/views/configuration.template.edit.php:350
+#: include/views/configuration.host.edit.php:650
+#: include/views/configuration.template.edit.php:401
 msgid "Graph prototypes"
 msgstr "Protótipo de gráficos"
 
@@ -5722,12 +5716,12 @@ msgstr "Gráfico com o nome \"%1$s\" já existe em gráficos ou protótipos de g
 msgid "Graph with same name but other type exist."
 msgstr "Já existe outro gráfico com o mesmo nome, mas com outro tipo."
 
-#: dashboard.php:312 hosts.php:816 hosts.php:909 include/blocks.inc.php:1335
+#: dashboard.php:312 hosts.php:817 hosts.php:910 include/blocks.inc.php:1335
 #: include/html.inc.php:475 include/html.inc.php:479 include/menu.inc.php:62
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:53
-#: include/views/configuration.host.edit.php:514
-#: include/views/configuration.template.edit.php:261
+#: include/views/configuration.host.edit.php:550
+#: include/views/configuration.template.edit.php:312
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:216
 #: include/views/inventory.host.view.php:231
 #: include/views/inventory.host.view.php:241 popup.php:92 search.php:137
@@ -5754,7 +5748,7 @@ msgstr "Grego (el_GR)"
 msgid "Grid"
 msgstr "Grade"
 
-#: events.php:289 hostinventoriesoverview.php:83 hosts.php:769 httpmon.php:72
+#: events.php:289 hostinventoriesoverview.php:83 hosts.php:770 httpmon.php:72
 #: include/classes/class.chostsinfo.php:112
 #: include/classes/class.ctriggersinfo.php:121
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
@@ -5781,7 +5775,7 @@ msgstr "Grade"
 msgid "Group"
 msgstr "Grupo"
 
-#: api/classes/CHostGroup.php:613
+#: api/classes/CHostGroup.php:626
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "O grupo \"%1$s\" não pode ser excluído por ser utilizado em um protótipo de host."
@@ -5796,11 +5790,11 @@ msgstr "O grupo \"%1$s\" não existe."
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "O grupo \"%1$s\" para o host \"%2$s\" não existe."
 
-#: hostgroups.php:153 usergrps.php:186
+#: hostgroups.php:211 usergrps.php:186
 msgid "Group added"
 msgstr "Grupo incluído"
 
-#: hostgroups.php:168 hostgroups.php:179 usergrps.php:201 usergrps.php:238
+#: hostgroups.php:226 hostgroups.php:237 usergrps.php:201 usergrps.php:238
 msgid "Group deleted"
 msgstr "Grupo removido"
 
@@ -5831,7 +5825,7 @@ msgstr "O protótipo de grupo não pode ser baseado em regra de auto-busca no ho
 msgid "Group prototypes"
 msgstr "Protótipos de grupo"
 
-#: hostgroups.php:124 usergrps.php:180
+#: hostgroups.php:182 usergrps.php:180
 msgid "Group updated"
 msgstr "Grupo atualizado"
 
@@ -5841,11 +5835,11 @@ msgstr "Agrupando por"
 
 #: include/reports.inc.php:342 include/views/administration.users.edit.php:67
 #: include/views/administration.users.list.php:59
-#: include/views/configuration.host.edit.php:194
-#: include/views/configuration.host.edit.php:213
+#: include/views/configuration.host.edit.php:230
+#: include/views/configuration.host.edit.php:249
 #: include/views/configuration.host.prototype.edit.php:177
 #: include/views/configuration.host.prototype.edit.php:211
-#: include/views/configuration.template.edit.php:115
+#: include/views/configuration.template.edit.php:150
 #: include/views/conf.import.php:26
 msgid "Groups"
 msgstr "Grupos"
@@ -5858,8 +5852,8 @@ msgstr "Grupos em manutenção"
 msgid "H.i"
 msgstr "H.i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1375
-#: include/classes/graphdraw/CLineGraphDraw.php:1434
+#: include/classes/graphdraw/CLineGraphDraw.php:1377
+#: include/classes/graphdraw/CLineGraphDraw.php:1436
 #: include/page_header.php:450
 msgid "H:i"
 msgstr "H:i"
@@ -6052,7 +6046,7 @@ msgstr "Alinhamento horizontal"
 #: include/views/configuration.application.list.php:61
 #: include/views/configuration.graph.list.php:54
 #: include/views/configuration.host.edit.php:52
-#: include/views/configuration.host.edit.php:658
+#: include/views/configuration.host.edit.php:694
 #: include/views/configuration.host.massupdate.php:313
 #: include/views/configuration.host.prototype.edit.php:164
 #: include/views/configuration.httpconf.list.php:44
@@ -6078,7 +6072,7 @@ msgstr "Alinhamento horizontal"
 msgid "Host"
 msgstr "Host"
 
-#: api/classes/CHost.php:1107 api/classes/CTemplate.php:512
+#: api/classes/CHost.php:1124 api/classes/CTemplate.php:512
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "O host \"%1$s\" já existe."
@@ -6122,13 +6116,13 @@ msgstr "Contagem de hosts"
 msgid "Host deleted"
 msgstr "Host removido"
 
-#: hostgroups.php:228 hosts.php:626 proxies.php:180
+#: hostgroups.php:286 hosts.php:626 proxies.php:180
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Host desativado"
 msgstr[1] "Hosts desativados"
 
-#: hostgroups.php:227 hosts.php:625 proxies.php:179
+#: hostgroups.php:285 hosts.php:625 proxies.php:179
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Host ativado"
@@ -6149,22 +6143,22 @@ msgstr[1] "Hosts ativados"
 msgid "Host group"
 msgstr "Grupo de hosts"
 
-#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:552
+#: api/classes/CHostGroup.php:487 api/classes/CHostGroup.php:565
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "O grupo de hosts \"%1$s\" já existe."
 
-#: api/classes/CHostGroup.php:645
+#: api/classes/CHostGroup.php:658
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "O grupo de hosts \"%1$s\" não pode ser excluído pois é utilizado por um script global."
 
-#: api/classes/CHostGroup.php:626
+#: api/classes/CHostGroup.php:639
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr "O grupo de hosts \"%1$s\" não pode ser excluído pois alguns hosts dependem dele."
 
-#: api/classes/CHostGroup.php:600
+#: api/classes/CHostGroup.php:613
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "O grupo de hosts \"%1$s\" é interno e não pode ser excluído."
@@ -6181,7 +6175,7 @@ msgstr "Incidentes do grupo de hosts"
 msgid "Host group label type"
 msgstr "Tipo de rótulo do grupo de hosts"
 
-#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:544
+#: api/classes/CHostGroup.php:484 api/classes/CHostGroup.php:557
 msgid "Host group name cannot be empty."
 msgstr "O nome do grupo de hosts não pode ser nulo."
 
@@ -6202,7 +6196,7 @@ msgstr "Interface do host"
 msgid "Host inventories"
 msgstr "Inventários de host"
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:861
+#: hostinventories.php:26 include/views/configuration.host.edit.php:897
 #: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:204
 msgid "Host inventory"
 msgstr "Inventário do host"
@@ -6309,7 +6303,7 @@ msgstr "Já existe protótipo de host com o nome visível \"%1$s\"."
 
 #: include/html.inc.php:488 include/html.inc.php:492
 #: include/views/configuration.host.discovery.list.php:96
-#: include/views/configuration.host.edit.php:633
+#: include/views/configuration.host.edit.php:669
 msgid "Host prototypes"
 msgstr "Protótipos de host"
 
@@ -6341,7 +6335,7 @@ msgstr "Máscara de sub-rede do host"
 msgid "Host time"
 msgstr "Hora do host"
 
-#: api/classes/CHost.php:982
+#: api/classes/CHost.php:1003
 msgid "Host update failed."
 msgstr "A atualização do host falhou."
 
@@ -6349,27 +6343,27 @@ msgstr "A atualização do host falhou."
 msgid "Host updated"
 msgstr "Host atualizado"
 
-#: api/classes/CTemplate.php:899
+#: api/classes/CTemplate.php:908
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Já existe um host com o nome \"%1$s\"."
 
-#: api/classes/CHost.php:809
+#: api/classes/CHost.php:822
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "Já existe um host com o mesmo nome: \"%s\"."
 
-#: api/classes/CTemplate.php:526 api/classes/CTemplate.php:866
+#: api/classes/CTemplate.php:526 api/classes/CTemplate.php:875
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Já existe um host com o nome visível \"%1$s\"."
 
-#: api/classes/CHost.php:815
+#: api/classes/CHost.php:828
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Já existe um host com o mesmo nome visível: \"%s\"."
 
-#: hostinventoriesoverview.php:85 hosts.php:771 include/forms.inc.php:225
+#: hostinventoriesoverview.php:85 hosts.php:772 include/forms.inc.php:225
 #: include/forms.inc.php:916 include/items.inc.php:728
 #: include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:384 include/views/administration.proxy.edit.php:88
@@ -6396,7 +6390,7 @@ msgid "Hosts (m/n/t)"
 msgstr "Hosts (m/n/t/d)"
 
 # I think the correctly for original setense is: Hosts / Templates (captalization of Templates)
-#: include/views/configuration.template.edit.php:171
+#: include/views/configuration.template.edit.php:222
 msgid "Hosts / templates"
 msgstr "Hosts / Templates"
 
@@ -6458,7 +6452,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:508 events.php:517 hosts.php:780
+#: events.php:508 events.php:517 hosts.php:781
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.node.edit.php:75
 #: include/views/administration.node.list.php:44
@@ -6473,8 +6467,8 @@ msgstr "IP"
 
 #: include/maps.inc.php:46 include/views/administration.proxy.edit.php:54
 #: include/views/configuration.discovery.edit.php:68
-#: include/views/configuration.host.edit.php:235
-#: include/views/configuration.host.edit.php:322
+#: include/views/configuration.host.edit.php:271
+#: include/views/configuration.host.edit.php:358
 #: include/views/configuration.host.prototype.edit.php:92
 #: include/views/inventory.host.view.php:103
 #: include/views/inventory.host.view.php:125
@@ -6500,7 +6494,7 @@ msgstr "O range de IP não pode ser nulo."
 #: include/views/administration.script.edit.php:46
 #: include/views/administration.script.list.php:54
 #: include/views/configuration.action.edit.php:722
-#: include/views/configuration.host.edit.php:765
+#: include/views/configuration.host.edit.php:801
 #: include/views/configuration.host.massupdate.php:315
 #: include/views/configuration.host.prototype.edit.php:280
 msgid "IPMI"
@@ -6514,8 +6508,8 @@ msgstr "Agente IPMI"
 msgid "IPMI authentication algorithm"
 msgstr "Algoritmo de Autenticação IPMI"
 
-#: include/views/configuration.host.edit.php:300
-#: include/views/configuration.host.edit.php:376
+#: include/views/configuration.host.edit.php:336
+#: include/views/configuration.host.edit.php:412
 #: include/views/configuration.host.prototype.edit.php:146
 #: include/views/inventory.host.view.php:177
 msgid "IPMI interfaces"
@@ -6713,7 +6707,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "Se você entende que esta mensagem está errada, por favor consulte os administradores sobre como conseguir as permissões necessárias."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:968
+#: include/maps.inc.php:957
 #: include/views/administration.general.image.edit.php:41
 #: include/views/administration.general.image.edit.php:44
 #: include/views/administration.general.image.edit.php:50
@@ -6769,7 +6763,7 @@ msgstr "As imagens de todos os mapas serão atualizadas!"
 msgid "Immediately"
 msgstr "Imediatamente"
 
-#: hosts.php:762 include/views/configuration.screen.list.php:33
+#: hosts.php:763 include/views/configuration.screen.list.php:33
 #: include/views/configuration.sysmap.list.php:28
 #: include/views/conf.import.php:69 include/views/conf.import.php:74
 #: templates.php:473
@@ -6799,7 +6793,7 @@ msgstr "Não é possível remover a última linha e coluna."
 
 #: include/classes/class.ctweenbox.php:73
 #: include/classes/class.ctweenbox.php:100
-#: include/views/configuration.template.edit.php:171
+#: include/views/configuration.template.edit.php:222
 msgid "In"
 msgstr "Em"
 
@@ -6807,12 +6801,12 @@ msgstr "Em"
 msgid "In group"
 msgstr "No grupo"
 
-#: include/views/configuration.host.edit.php:194
-#: include/views/configuration.template.edit.php:115
+#: include/views/configuration.host.edit.php:230
+#: include/views/configuration.template.edit.php:150
 msgid "In groups"
 msgstr "Nos grupos"
 
-#: hosts.php:936 include/html.inc.php:369
+#: hosts.php:937 include/html.inc.php:369
 #: include/views/configuration.maintenance.edit.php:168
 #: include/views/configuration.maintenance.edit.php:176
 msgid "In maintenance"
@@ -7037,7 +7031,7 @@ msgstr "Foram usados caracteres inválidos para o nome do template \"%1$s\""
 msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Foram informados caracteres inválidos no host \"%1$s\"."
 
-#: api/classes/CHost.php:743 api/classes/CHost.php:1090
+#: api/classes/CHost.php:756 api/classes/CHost.php:1107
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Foram utilizados caracteres inválidos no nome do host \"%s\"."
@@ -7047,7 +7041,7 @@ msgstr "Foram utilizados caracteres inválidos no nome do host \"%s\"."
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Foram utilizados caracteres inválidos no nome do proxy \"%1$s\"."
 
-#: api/classes/CTemplate.php:907
+#: api/classes/CTemplate.php:916
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "Caracteres inválidos para o nome do template: \"%1$s\"."
@@ -7170,7 +7164,7 @@ msgstr "Foi informado um parâmetro inválido para a interface IP \"%s\"."
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Foi informada uma porta inválida para a interface: \"%s\"."
 
-#: api/classes/CHost.php:677
+#: api/classes/CHost.php:709
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "O campo de inventário \"%s\" é inválido."
@@ -7550,7 +7544,7 @@ msgstr "Instalação"
 msgid "Installer name"
 msgstr "Nome de instalação"
 
-#: disc_prototypes.php:41 host_discovery.php:40 hosts.php:819
+#: disc_prototypes.php:41 host_discovery.php:40 hosts.php:820
 #: include/views/administration.proxy.edit.php:71 items.php:40
 msgid "Interface"
 msgstr "Interface"
@@ -7737,7 +7731,7 @@ msgstr "Nome de visualização inválido \"%s\". Caracteres permitidos: \"a-z\" 
 msgid "Inventory"
 msgstr "Inventário"
 
-#: api/classes/CHost.php:1306
+#: api/classes/CHost.php:1292
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Inventário desativado para o host \"%1$s\"."
@@ -7903,8 +7897,8 @@ msgstr "Protótipo de item atualizado"
 
 #: include/html.inc.php:414 include/html.inc.php:418
 #: include/views/configuration.host.discovery.list.php:106
-#: include/views/configuration.host.edit.php:563
-#: include/views/configuration.template.edit.php:308
+#: include/views/configuration.host.edit.php:599
+#: include/views/configuration.template.edit.php:359
 msgid "Item prototypes"
 msgstr "Protótipos de itens"
 
@@ -7962,21 +7956,21 @@ msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\", ele é um item desc
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\"."
 
-#: api/classes/managers/CHttpTestManager.php:710
-#: api/classes/managers/CHttpTestManager.php:841
+#: api/classes/managers/CHttpTestManager.php:713
+#: api/classes/managers/CHttpTestManager.php:844
 #, c-format
 msgid "Item with key \"%1$s\" already exists."
 msgstr "Já existe um item com a chave \"%1$s\"."
 
-#: hosts.php:814 hosts.php:905 include/html.inc.php:425
+#: hosts.php:815 hosts.php:906 include/html.inc.php:425
 #: include/html.inc.php:429 include/items.inc.php:711
 #: include/reports.inc.php:120 include/reports.inc.php:263
 #: include/views/configuration.application.list.php:99
 #: include/views/configuration.graph.edit.php:274
 #: include/views/configuration.host.discovery.list.php:51
-#: include/views/configuration.host.edit.php:456
+#: include/views/configuration.host.edit.php:492
 #: include/views/configuration.item.list.php:42
-#: include/views/configuration.template.edit.php:219
+#: include/views/configuration.template.edit.php:270
 #: include/views/conf.import.php:31 include/views/inventory.host.view.php:229
 #: include/views/inventory.host.view.php:239 latest.php:300 popup.php:72
 #: queue.php:101 report6.php:44 search.php:141 search.php:170 search.php:193
@@ -8013,8 +8007,8 @@ msgstr "JMX"
 msgid "JMX agent"
 msgstr "Agente JMX"
 
-#: include/views/configuration.host.edit.php:285
-#: include/views/configuration.host.edit.php:363
+#: include/views/configuration.host.edit.php:321
+#: include/views/configuration.host.edit.php:399
 #: include/views/configuration.host.prototype.edit.php:133
 #: include/views/inventory.host.view.php:155
 msgid "JMX interfaces"
@@ -8333,9 +8327,9 @@ msgstr "Indicadores de link"
 msgid "Link name should be unique for map \"%s\"."
 msgstr "O nome do link deve ser único no mapa \"%s\"."
 
-#: include/views/configuration.host.edit.php:719
+#: include/views/configuration.host.edit.php:755
 #: include/views/configuration.host.prototype.edit.php:262
-#: include/views/configuration.template.edit.php:458
+#: include/views/configuration.template.edit.php:509
 msgid "Link new templates"
 msgstr "Vincular a novos templates"
 
@@ -8370,11 +8364,11 @@ msgstr "Vínculo para templates"
 msgid "Link with templates"
 msgstr "Vínculo com templates"
 
-#: include/views/configuration.host.edit.php:698
-#: include/views/configuration.host.edit.php:728
+#: include/views/configuration.host.edit.php:734
+#: include/views/configuration.host.edit.php:764
 #: include/views/configuration.host.prototype.edit.php:235
-#: include/views/configuration.template.edit.php:433
-#: include/views/configuration.template.edit.php:460 templates.php:500
+#: include/views/configuration.template.edit.php:484
+#: include/views/configuration.template.edit.php:511 templates.php:500
 msgid "Linked templates"
 msgstr "Associado aos templates"
 
@@ -8554,7 +8548,7 @@ msgstr "Endereço MAC A"
 msgid "MAC address B"
 msgstr "Endereço MAC B"
 
-#: include/maps.inc.php:760
+#: include/maps.inc.php:749
 msgid "MAINTENANCE"
 msgstr "MANUTENÇÃO"
 
@@ -8618,9 +8612,9 @@ msgstr "A macro com o ID de host \"%1$s\" (hostmacroid) não existe."
 #: adm.triggerdisplayoptions.php:79 adm.triggerseverities.php:84
 #: adm.valuemapping.php:131 adm.workingtime.php:66
 #: include/views/administration.general.macros.edit.php:31
-#: include/views/configuration.host.edit.php:778
+#: include/views/configuration.host.edit.php:814
 #: include/views/configuration.host.prototype.edit.php:287
-#: include/views/configuration.template.edit.php:470
+#: include/views/configuration.template.edit.php:521
 msgid "Macros"
 msgstr "Macros"
 
@@ -8628,7 +8622,7 @@ msgstr "Macros"
 msgid "Macros updated"
 msgstr "Macros atualizadas"
 
-#: include/audit.inc.php:48 include/maps.inc.php:845 include/maps.inc.php:935
+#: include/audit.inc.php:48 include/maps.inc.php:834 include/maps.inc.php:924
 #: include/menu.inc.php:187
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:144
@@ -8692,7 +8686,7 @@ msgstr "Manutenção sem coleta de dados"
 msgid "Mandatory parameter is missing."
 msgstr "Um parâmetro obrigatório está faltando."
 
-#: include/views/configuration.host.edit.php:802
+#: include/views/configuration.host.edit.php:838
 #: include/views/configuration.host.massupdate.php:262
 #: include/views/configuration.host.prototype.edit.php:313
 msgid "Manual"
@@ -8794,9 +8788,10 @@ msgstr "Marcar selecionados"
 msgid "Mask"
 msgstr "Máscara"
 
-#: hosts.php:1016 include/views/configuration.item.list.php:281
+#: hosts.php:1017 include/views/configuration.item.list.php:281
 #: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.triggers.list.php:278
+#: include/views/configuration.triggers.massupdate.php:146
 msgid "Mass update"
 msgstr "Atualização em massa"
 
@@ -8852,7 +8847,7 @@ msgid_plural "Maximum alias length is %1$d characters, \"%2$s\" is %3$d characte
 msgstr[0] "O tamanho máximo de um apelido é de %1$d caracteres, \"%2$s\" possui %3$d caracter."
 msgstr[1] "O tamanho máximo de um apelido é de %1$d caracteres, \"%2$s\" possui %3$d caracteres."
 
-#: api/classes/CHost.php:733
+#: api/classes/CHost.php:746
 #, c-format
 msgid "Maximum host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum host name length is %1$d characters, \"%2$s\" is %3$d characters."
@@ -8897,7 +8892,7 @@ msgstr "O valor máximo para um período T é > N"
 msgid "Maximum value for period T is NOT N"
 msgstr "O valor máximo para um período T é NÃO É N"
 
-#: api/classes/CHost.php:769
+#: api/classes/CHost.php:782
 #, c-format
 msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
@@ -9173,14 +9168,14 @@ msgstr "Seg"
 msgid "Monday"
 msgstr "Segunda-feira"
 
-#: hosts.php:940 include/html.inc.php:372
-#: include/views/configuration.host.edit.php:409
+#: hosts.php:941 include/html.inc.php:372
+#: include/views/configuration.host.edit.php:445
 #: include/views/configuration.host.massupdate.php:167
 #: include/views/configuration.host.prototype.edit.php:159
 msgid "Monitored"
 msgstr "Monitorado"
 
-#: include/views/configuration.host.edit.php:406
+#: include/views/configuration.host.edit.php:442
 #: include/views/configuration.host.massupdate.php:158
 #: include/views/configuration.host.prototype.edit.php:155
 msgid "Monitored by proxy"
@@ -9272,7 +9267,7 @@ msgstr "Autenticação NTLM"
 
 #: actionconf.php:37 actionconf.php:166 adm.regexps.php:37 adm.regexps.php:140
 #: adm.regexps.php:172 applications.php:38 disc_prototypes.php:42
-#: graphs.php:41 host_discovery.php:41 hosts.php:778 hosts.php:812
+#: graphs.php:41 host_discovery.php:41 hosts.php:779 hosts.php:813
 #: httpconf.php:44 httpmon.php:88 include/forms.inc.php:621
 #: include/hosts.inc.php:115 include/reports.inc.php:174
 #: include/setup.inc.php:384
@@ -9304,8 +9299,8 @@ msgstr "Autenticação NTLM"
 #: include/views/configuration.graph.edit.php:221
 #: include/views/configuration.graph.list.php:78
 #: include/views/configuration.host.discovery.list.php:50
-#: include/views/configuration.host.edit.php:675
-#: include/views/configuration.host.edit.php:723
+#: include/views/configuration.host.edit.php:711
+#: include/views/configuration.host.edit.php:759
 #: include/views/configuration.hostgroups.list.php:60
 #: include/views/configuration.host.prototype.edit.php:220
 #: include/views/configuration.host.prototype.list.php:52
@@ -9327,7 +9322,7 @@ msgstr "Autenticação NTLM"
 #: include/views/configuration.sysmap.edit.php:41
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.sysmap.list.php:44
-#: include/views/configuration.template.edit.php:409
+#: include/views/configuration.template.edit.php:460
 #: include/views/configuration.triggers.edit.php:63
 #: include/views/configuration.triggers.edit.php:276
 #: include/views/configuration.triggers.list.php:110
@@ -9426,8 +9421,8 @@ msgstr "Novo elemento"
 msgid "New flexible interval"
 msgstr "Novo intervalo flexível"
 
-#: include/views/configuration.host.edit.php:198
-#: include/views/configuration.template.edit.php:120
+#: include/views/configuration.host.edit.php:234
+#: include/views/configuration.template.edit.php:155
 msgid "New group"
 msgstr "Novo grupo"
 
@@ -9508,7 +9503,7 @@ msgstr "Falta o campo \"ymax_type\" para o gráfico \"%s\"."
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Falta o campo \"ymin_type\" para o gráfico \"%s\"."
 
-#: include/views/configuration.host.edit.php:373
+#: include/views/configuration.host.edit.php:409
 #: include/views/configuration.host.prototype.edit.php:143
 msgid "No IPMI interfaces found."
 msgstr "Nenhuma interface IPMI encontrada."
@@ -9517,7 +9512,7 @@ msgstr "Nenhuma interface IPMI encontrada."
 msgid "No IT services found."
 msgstr "Nenhum serviço de TI encontrado."
 
-#: include/views/configuration.host.edit.php:360
+#: include/views/configuration.host.edit.php:396
 #: include/views/configuration.host.prototype.edit.php:130
 msgid "No JMX interfaces found."
 msgstr "Nenhuma interface JMX encontrada."
@@ -9530,7 +9525,7 @@ msgstr "Não foi especificado o OID SNMP."
 msgid "No SNMP community specified."
 msgstr "Não foi especificada a comunidade SNMP."
 
-#: include/views/configuration.host.edit.php:347
+#: include/views/configuration.host.edit.php:383
 #: include/views/configuration.host.prototype.edit.php:117
 msgid "No SNMP interfaces found."
 msgstr "Nenhuma interface SNMP encontrada."
@@ -9557,7 +9552,7 @@ msgstr "Nenhum reconhecimento encontrado."
 msgid "No actions found."
 msgstr "Nenhuma ação localizada."
 
-#: include/views/configuration.host.edit.php:333
+#: include/views/configuration.host.edit.php:369
 #: include/views/configuration.host.prototype.edit.php:103
 msgid "No agent interfaces found."
 msgstr "Nenhuma interface de agente encontrada."
@@ -9709,16 +9704,16 @@ msgstr "Nenhum gráfico adicionado."
 msgid "No graphs found."
 msgstr "Nenhum gráfico encontrado."
 
-#: api/classes/CHost.php:701 api/classes/CHost.php:711
+#: api/classes/CHost.php:676 api/classes/CHost.php:683
 #, c-format
 msgid "No groups for host \"%s\"."
 msgstr "Nenhum grupo para o host \"%s\"."
 
-#: api/classes/CHost.php:1076
+#: api/classes/CHost.php:1093
 msgid "No groups for hosts."
 msgstr "Nenhum grupo para hosts."
 
-#: api/classes/CTemplate.php:833
+#: api/classes/CTemplate.php:842
 msgid "No groups for template"
 msgstr "Nenhum grupo de template"
 
@@ -9730,7 +9725,7 @@ msgstr "Sem grupos para o template \"%1$s\"."
 # Maybe this and 
 # api/classes/CDiscoveryRule.php:431
 # is a plural / singular case ?
-#: api/classes/CHost.php:1443
+#: api/classes/CHost.php:1461
 msgid "No host ID given."
 msgstr "Não foi informado nenhum ID de host."
 
@@ -9771,7 +9766,7 @@ msgstr "Nenhum protótipo de host encontrado."
 msgid "No host with hostid \"%s\"."
 msgstr "Não existe host com o hostid \"%s\"."
 
-#: hostinventoriesoverview.php:88 hosts.php:808
+#: hostinventoriesoverview.php:88 hosts.php:809
 #: include/views/inventory.host.list.php:74 popup.php:775 popup.php:852
 #: search.php:128
 msgid "No hosts found."
@@ -9811,7 +9806,7 @@ msgstr "Nenhuma interface encontrada."
 msgid "No interface provided for proxy \"%s\"."
 msgstr "Nenhuma interface informada para o proxy \"%s\"."
 
-#: api/classes/CHost.php:705 api/classes/CHost.php:723
+#: api/classes/CHost.php:730 api/classes/CHost.php:736
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "Nenhuma interface para o host \"%s\"."
@@ -9953,31 +9948,33 @@ msgstr "Sem permissão de acesso ao sistema."
 #: api/classes/CEvent.php:735 api/classes/CGraphGeneral.php:66
 #: api/classes/CGraphGeneral.php:88 api/classes/CGraph.php:719
 #: api/classes/CGraphPrototype.php:693 api/classes/CGraphPrototype.php:756
-#: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:139
-#: api/classes/CHostGroup.php:522 api/classes/CHostGroup.php:595
-#: api/classes/CHostGroup.php:779 api/classes/CHostGroup.php:841
-#: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:903
-#: api/classes/CHostGroup.php:925 api/classes/CHostInterface.php:319
-#: api/classes/CHostInterface.php:335 api/classes/CHostInterface.php:476
-#: api/classes/CHostInterface.php:687 api/classes/CHost.php:688
-#: api/classes/CHost.php:716 api/classes/CHost.php:1806
-#: api/classes/CHostPrototype.php:1020 api/classes/CHostPrototype.php:1035
-#: api/classes/CHostPrototype.php:1048 api/classes/CHostPrototype.php:1061
-#: api/classes/CHttpTest.php:395 api/classes/CHttpTest.php:610
-#: api/classes/CIconMap.php:319 api/classes/CImage.php:242
-#: api/classes/CImage.php:356 api/classes/CImage.php:473
-#: api/classes/CItemGeneral.php:181 api/classes/CItemGeneral.php:234
-#: api/classes/CItem.php:690 api/classes/CItemPrototype.php:509
-#: api/classes/CMaintenance.php:320 api/classes/CMaintenance.php:345
-#: api/classes/CMaintenance.php:358 api/classes/CMaintenance.php:466
-#: api/classes/CMaintenance.php:483 api/classes/CMaintenance.php:550
-#: api/classes/CMapElement.php:60 api/classes/CMapElement.php:119
-#: api/classes/CMapElement.php:190 api/classes/CMap.php:389
-#: api/classes/CProxy.php:172 api/classes/CProxy.php:213
-#: api/classes/CProxy.php:285 api/classes/CProxy.php:551
-#: api/classes/CScreenItem.php:362 api/classes/CScreenItem.php:445
-#: api/classes/CScreen.php:445 api/classes/CScreen.php:619
-#: api/classes/CService.php:1255 api/classes/CService.php:1270
+#: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:65
+#: api/classes/CHostGeneral.php:115 api/classes/CHostGroup.php:529
+#: api/classes/CHostGroup.php:608 api/classes/CHostGroup.php:977
+#: api/classes/CHostGroup.php:1007 api/classes/CHostGroup.php:1134
+#: api/classes/CHostGroup.php:1236 api/classes/CHostGroup.php:1263
+#: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
+#: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:687
+#: api/classes/CHost.php:671 api/classes/CHost.php:689
+#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1020
+#: api/classes/CHostPrototype.php:1035 api/classes/CHostPrototype.php:1048
+#: api/classes/CHostPrototype.php:1061 api/classes/CHttpTest.php:395
+#: api/classes/CHttpTest.php:610 api/classes/CIconMap.php:319
+#: api/classes/CImage.php:242 api/classes/CImage.php:356
+#: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
+#: api/classes/CItemGeneral.php:234 api/classes/CItem.php:690
+#: api/classes/CItemPrototype.php:509 api/classes/CMaintenance.php:320
+#: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
+#: api/classes/CMaintenance.php:466 api/classes/CMaintenance.php:483
+#: api/classes/CMaintenance.php:550 api/classes/CMapElement.php:60
+#: api/classes/CMapElement.php:119 api/classes/CMapElement.php:190
+#: api/classes/CMap.php:389 api/classes/CProxy.php:172
+#: api/classes/CProxy.php:213 api/classes/CProxy.php:285
+#: api/classes/CProxy.php:551 api/classes/CScreenItem.php:362
+#: api/classes/CScreenItem.php:445 api/classes/CScreen.php:445
+#: api/classes/CScreen.php:619 api/classes/CService.php:1255
+#: api/classes/CService.php:1270 api/classes/CTemplate.php:800
+#: api/classes/CTemplate.php:996 api/classes/CTemplate.php:1121
 #: api/classes/CTemplateScreen.php:573 api/classes/CTemplateScreen.php:624
 #: api/classes/CTemplateScreen.php:676 api/classes/CTemplateScreen.php:682
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
@@ -10068,7 +10065,7 @@ msgstr "Nenhum slide encontrado."
 msgid "No status for proxy."
 msgstr "Sem status do proxy."
 
-#: triggers.php:312
+#: triggers.php:328
 msgid "No target selected"
 msgstr "Nenhum alvo selecionado"
 
@@ -10080,10 +10077,10 @@ msgstr "Nenhum alvo selecionado."
 msgid "No templates found."
 msgstr "Nenhum template encontrado."
 
-#: include/views/configuration.host.edit.php:664
+#: include/views/configuration.host.edit.php:700
 #: include/views/configuration.host.prototype.edit.php:217
 #: include/views/configuration.host.prototype.edit.php:239
-#: include/views/configuration.template.edit.php:406
+#: include/views/configuration.template.edit.php:457
 msgid "No templates linked."
 msgstr "Nenhum template vinculado."
 
@@ -10128,7 +10125,7 @@ msgid "No value maps found."
 msgstr "Nenhum mapeamento de valores encontrado."
 
 #: include/classes/screens/CScreenHistory.php:161
-#: include/classes/screens/CScreenHistory.php:267
+#: include/classes/screens/CScreenHistory.php:259
 #: include/classes/screens/CScreenPlainText.php:41
 #: include/classes/screens/CScreenPlainText.php:63 latest.php:317
 msgid "No values found."
@@ -10139,7 +10136,7 @@ msgstr "Nenhum valor encontrado."
 msgid "No web scenarios found."
 msgstr "Nenhum cenário web encontrado."
 
-#: events.php:584 events.php:597 hosts.php:811 httpmon.php:86
+#: events.php:584 events.php:597 hosts.php:812 httpmon.php:86
 #: include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:197 include/blocks.inc.php:398
 #: include/blocks.inc.php:930 include/blocks.inc.php:1105
@@ -10253,8 +10250,8 @@ msgstr "Não classificada"
 msgid "Not connected"
 msgstr "Não conectado"
 
-#: hosts.php:949 include/html.inc.php:376
-#: include/views/configuration.host.edit.php:410
+#: hosts.php:950 include/html.inc.php:376
+#: include/views/configuration.host.edit.php:446
 #: include/views/configuration.host.massupdate.php:168
 #: include/views/configuration.host.prototype.edit.php:160
 msgid "Not monitored"
@@ -10305,7 +10302,7 @@ msgstr "Agora"
 
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:427
-msgid "Number of available proccessors."
+msgid "Number of available processors."
 msgstr "Quantidade de processadores disponíveis."
 
 #: include/blocks.inc.php:753 include/blocks.inc.php:755
@@ -10343,11 +10340,11 @@ msgstr "Quantidade de hosts monitorados"
 msgid "Number of processes. <name> and <user> same as in proc.mem item. <state> all (default), run, sleep, zomb. <cmdline> filter by command line (supports regex). Example: proc.num[apache2,www-data]. On Windows, only <name> and <user> are supported."
 msgstr "Quantidade de processos. <name> e <user> igual ao item proc.mem. <state> - all (padrão), run, sleep, zomb. <cmdline> - filtro por linha de comando (suporta expressão regular). Exemplo: proc.num[apache2,www-data]. Apenas em Windows, apenas <name> e <user> são suportados."
 
-#: include/classes/items/CHelpItems.php:647
+#: include/classes/items/CHelpItems.php:643
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Quantidade de núcleos de processamento no hypervisor VMware, <url> - endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:651
+#: include/classes/items/CHelpItems.php:647
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Número de threads de processamento no hypervisor VMware, <url> endereço de serviço do VMware, <uuid> - nome de host da hypervisor VMware"
 
@@ -10445,7 +10442,7 @@ msgstr "Número de valores armazenados na tabela TRENDS."
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Número de valores armazenados na tabela TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:695
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Número de máquinas virtuals no hypervisor VMware, <url> endereço de serviço do VMware, <uuid> - nome de host da máquina virtual VMware"
 
@@ -10473,8 +10470,8 @@ msgstr "OEM"
 
 #: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
-#: include/maps.inc.php:694 include/maps.inc.php:776 include/maps.inc.php:866
-#: include/maps.inc.php:956 include/setup.inc.php:198
+#: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
+#: include/maps.inc.php:945 include/setup.inc.php:198
 #: include/setup.inc.php:239 include/setup.inc.php:351
 #: include/setup.inc.php:515 include/triggers.inc.php:154
 #: include/views/monitoring.overview.php:41
@@ -10562,7 +10559,8 @@ msgstr "Ao mudar o status da trigger piscar por"
 msgid "Once"
 msgstr "Uma vez"
 
-#: api/classes/CHostGroup.php:857 api/classes/CHostGroup.php:989
+#: api/classes/CHostGroup.php:1143 api/classes/CHostGroup.php:1152
+#: api/classes/CHostGroup.php:1245
 msgid "One of the objects is left without a host group."
 msgstr "Um dos objetos está sem um grupo de hosts."
 
@@ -10769,9 +10767,9 @@ msgstr "Outros parâmetros de configuração"
 
 #: include/reports.inc.php:342
 #: include/views/administration.usergroups.edit.php:55
-#: include/views/configuration.host.edit.php:194
+#: include/views/configuration.host.edit.php:230
 #: include/views/configuration.maintenance.edit.php:176
-#: include/views/configuration.template.edit.php:115
+#: include/views/configuration.template.edit.php:150
 msgid "Other groups"
 msgstr "Outros grupos"
 
@@ -10789,7 +10787,7 @@ msgstr "Outro host | grupo"
 msgid "Other parameters"
 msgstr "Outros parâmetros"
 
-#: include/views/configuration.template.edit.php:172
+#: include/views/configuration.template.edit.php:223
 msgid "Other | group"
 msgstr "Outro | grupo"
 
@@ -10989,7 +10987,7 @@ msgstr "A extensão PHP \"xmlwriter\" está ausente."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:678 include/triggers.inc.php:155
+#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "INCIDENTE"
@@ -11065,7 +11063,7 @@ msgstr "Passivo"
 #: include/views/administration.users.edit.php:106
 #: include/views/configuration.action.edit.php:745
 #: include/views/configuration.action.edit.php:778
-#: include/views/configuration.host.edit.php:764
+#: include/views/configuration.host.edit.php:800
 #: include/views/configuration.host.prototype.edit.php:279
 #: include/views/configuration.httpconf.edit.php:83
 #: include/views/configuration.item.edit.php:180
@@ -11107,8 +11105,8 @@ msgstr "Linha percentual (esquerda)"
 msgid "Percentile line (right)"
 msgstr "Linha percentual (direita)"
 
-#: include/classes/items/CHelpItems.php:85
-#: include/classes/items/CHelpItems.php:347
+#: include/classes/items/CHelpItems.php:89
+#: include/classes/items/CHelpItems.php:351
 msgid "Performs a DNS query. On success returns a character string with the required type of information."
 msgstr "Executa uma consulta DNS. Se for bem sucedida retornará texto com o tipo de informação solicitado."
 
@@ -11196,14 +11194,14 @@ msgid "Populates host inventory field"
 msgstr "Preencha o campo do inventário do host"
 
 #: authentication.php:40 disc_prototypes.php:82 host_discovery.php:79
-#: hosts.php:781 include/forms.inc.php:498 include/setup.inc.php:379
+#: hosts.php:782 include/forms.inc.php:498 include/setup.inc.php:379
 #: include/views/administration.authentication.edit.php:71
 #: include/views/administration.node.edit.php:78
 #: include/views/administration.node.list.php:44
 #: include/views/administration.proxy.edit.php:57
 #: include/views/configuration.action.edit.php:792
-#: include/views/configuration.host.edit.php:238
-#: include/views/configuration.host.edit.php:325
+#: include/views/configuration.host.edit.php:274
+#: include/views/configuration.host.edit.php:361
 #: include/views/configuration.host.prototype.edit.php:95
 #: include/views/configuration.item.edit.php:170
 #: include/views/configuration.item.massupdate.php:199
@@ -11320,8 +11318,8 @@ msgstr "Protocolo de privacidade"
 msgid "Private key file"
 msgstr "Arquivo de chave privada"
 
-#: include/views/configuration.host.edit.php:752
-#: include/views/configuration.host.edit.php:760
+#: include/views/configuration.host.edit.php:788
+#: include/views/configuration.host.edit.php:796
 #: include/views/configuration.host.prototype.edit.php:276
 msgid "Privilege level"
 msgstr "Nível de acesso"
@@ -11330,7 +11328,7 @@ msgstr "Nível de acesso"
 msgid "Probably php-ldap module is missing."
 msgstr "Provavelmente o módulo php-ldap está ausente."
 
-#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
+#: include/maps.inc.php:721 include/maps.inc.php:804 include/maps.inc.php:895
 #: include/views/js/configuration.sysmaps.js.php:137 tr_status.php:282
 msgid "Problem"
 msgstr "Incidente"
@@ -11356,8 +11354,8 @@ msgstr "Incidente, se todos os filhos possuem incidentes"
 msgid "Problem, if at least one child has a problem"
 msgstr "Incidente, se pelo menos um filho tem incidente"
 
-#: chart4.php:163 include/maps.inc.php:726 include/maps.inc.php:809
-#: include/maps.inc.php:900 report2.php:402 report3.php:83
+#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: include/maps.inc.php:889 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Incidentes"
 
@@ -11678,7 +11676,7 @@ msgid "Replace applications"
 msgstr "Substituir aplicações"
 
 #: include/views/configuration.triggers.massupdate.php:131
-msgid "Replace depenencies"
+msgid "Replace dependencies"
 msgstr "Substituir dependências"
 
 #: include/views/configuration.host.massupdate.php:66
@@ -11745,7 +11743,7 @@ msgstr "Código de status requerido"
 msgid "Required string"
 msgstr "Texto requerido"
 
-#: events.php:363 hosts.php:789 include/forms.inc.php:651
+#: events.php:363 hosts.php:790 include/forms.inc.php:651
 #: include/html.inc.php:249 include/reports.inc.php:131
 #: include/reports.inc.php:274 include/reports.inc.php:458
 #: include/views/administration.auditacts.list.php:51
@@ -12036,8 +12034,8 @@ msgstr "SNMP OID"
 msgid "SNMP community"
 msgstr "Comunidade SNMP"
 
-#: include/views/configuration.host.edit.php:270
-#: include/views/configuration.host.edit.php:350
+#: include/views/configuration.host.edit.php:306
+#: include/views/configuration.host.edit.php:386
 #: include/views/configuration.host.prototype.edit.php:120
 #: include/views/inventory.host.view.php:134
 msgid "SNMP interfaces"
@@ -12155,7 +12153,7 @@ msgstr "Sábado"
 #: include/views/configuration.application.edit.php:62
 #: include/views/configuration.discovery.edit.php:90
 #: include/views/configuration.graph.edit.php:298
-#: include/views/configuration.host.edit.php:876
+#: include/views/configuration.host.edit.php:912
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.prototype.edit.php:341
@@ -12172,7 +12170,7 @@ msgstr "Sábado"
 #: include/views/configuration.slideconf.edit.php:114
 #: include/views/configuration.sysmap.constructor.php:62
 #: include/views/configuration.sysmap.edit.php:195
-#: include/views/configuration.template.edit.php:484
+#: include/views/configuration.template.edit.php:535
 #: include/views/configuration.triggers.edit.php:328
 #: include/views/configuration.triggers.massupdate.php:151
 #: include/views/monitoring.dashconf.php:119
@@ -12298,7 +12296,7 @@ msgstr "Tela atualizada"
 #: dashboard.php:326 include/blocks.inc.php:1474 include/html.inc.php:500
 #: include/html.inc.php:504 include/menu.inc.php:67 include/menu.inc.php:195
 #: include/views/configuration.screen.list.php:38
-#: include/views/configuration.template.edit.php:371
+#: include/views/configuration.template.edit.php:422
 #: include/views/conf.import.php:35 include/views/inventory.host.view.php:217
 #: include/views/monitoring.screen.php:27
 #: include/views/monitoring.screen.php:77
@@ -12484,7 +12482,7 @@ msgstr "Selecionar registros com valores como"
 msgid "Selected"
 msgstr "Selecionado"
 
-#: actionconf.php:356
+#: actionconf.php:358
 msgid "Selected actions deleted"
 msgstr "A ação selecionada foi excluída"
 
@@ -12992,7 +12990,7 @@ msgstr "Status"
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr "Estado do serviço. 0 - em execução, 1 - pausado, 2 - iniciando, 3 - pausando, 4 - aguardando retorno, 5 - parando, 6 - parado, 7 - desconhecido, 255 - serviço desconhecido"
 
-#: events.php:511 events.php:520 events.php:587 events.php:600 hosts.php:821
+#: events.php:511 events.php:520 events.php:587 events.php:600 hosts.php:822
 #: httpdetails.php:136 httpmon.php:91 include/actions.inc.php:830
 #: include/actions.inc.php:908 include/actions.inc.php:967
 #: include/classes/screens/CScreenActions.php:58
@@ -13007,7 +13005,7 @@ msgstr "Estado do serviço. 0 - em execução, 1 - pausado, 2 - iniciando, 3 - p
 #: include/views/configuration.action.list.php:55
 #: include/views/configuration.discovery.list.php:45
 #: include/views/configuration.host.discovery.list.php:58
-#: include/views/configuration.host.edit.php:412
+#: include/views/configuration.host.edit.php:448
 #: include/views/configuration.hostgroups.list.php:63
 #: include/views/configuration.host.massupdate.php:171
 #: include/views/configuration.host.prototype.edit.php:162
@@ -13293,12 +13291,12 @@ msgstr "Telnet"
 #: include/actions.inc.php:62 include/audit.inc.php:51
 #: include/forms.inc.php:627 include/forms.inc.php:946
 #: include/html.inc.php:363 include/views/configuration.template.edit.php:35
-#: include/views/configuration.template.edit.php:397
+#: include/views/configuration.template.edit.php:448
 #: include/views/configuration.triggers.list.php:126 report2.php:259
 msgid "Template"
 msgstr "Template"
 
-#: api/classes/CHost.php:1112 api/classes/CTemplate.php:508
+#: api/classes/CHost.php:1129 api/classes/CTemplate.php:508
 #, c-format
 msgid "Template \"%1$s\" already exists."
 msgstr "O template \"%1$s\" já existe."
@@ -13363,22 +13361,22 @@ msgstr "Template atualizado"
 msgid "Template with item key \"%1$s\" already linked to host."
 msgstr "Já existe template com a chave \"%1$s\" vinculado com o host."
 
-#: api/classes/CTemplate.php:891
+#: api/classes/CTemplate.php:900
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "Já existe template com o nome \"%1$s\"."
 
-#: api/classes/CHost.php:825
+#: api/classes/CHost.php:838
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "Já existe template com o nome \"%s\"."
 
-#: api/classes/CTemplate.php:519 api/classes/CTemplate.php:858
+#: api/classes/CTemplate.php:519 api/classes/CTemplate.php:867
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Já existe template com o nome visível \"%1$s\"."
 
-#: api/classes/CHost.php:831
+#: api/classes/CHost.php:844
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Já existe template com o nome visível \"%s\"."
@@ -13387,8 +13385,8 @@ msgstr "Já existe template com o nome visível \"%s\"."
 msgid "Templated items"
 msgstr "Itens no template"
 
-#: hosts.php:820 include/menu.inc.php:164
-#: include/views/configuration.host.edit.php:731
+#: hosts.php:821 include/menu.inc.php:164
+#: include/views/configuration.host.edit.php:767
 #: include/views/configuration.hostgroups.list.php:150
 #: include/views/configuration.host.massupdate.php:314
 #: include/views/configuration.host.prototype.edit.php:265
@@ -13526,7 +13524,7 @@ msgstr[1] "Existem \"%1$d\" grupos com acesso interno à interface web."
 msgid "Third"
 msgstr "Terceiro"
 
-#: include/views/configuration.host.edit.php:835
+#: include/views/configuration.host.edit.php:871
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Este campo é automaticamente preenchido pelo item \"%s\"."
@@ -13628,7 +13626,7 @@ msgid "Timeout"
 msgstr "Tempo limite"
 
 #: include/classes/screens/CScreenHistory.php:164
-#: include/classes/screens/CScreenHistory.php:268
+#: include/classes/screens/CScreenHistory.php:260
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:64
 msgid "Timestamp"
@@ -13760,7 +13758,7 @@ msgstr "A trigger \"%1$s\" foi ignorada - regra de usuário."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "A trigger \"%s\" pertence a templates com vínculos diferentes."
 
-#: triggers.php:183 triggers.php:306 tr_logform.php:148
+#: triggers.php:199 triggers.php:322 tr_logform.php:148
 msgid "Trigger added"
 msgstr "Trigger adicionada"
 
@@ -13776,11 +13774,11 @@ msgstr "Comentários"
 msgid "Trigger data storage period (in days)"
 msgstr "Período de retenção dos dados sobre triggers (em dias)"
 
-#: triggers.php:197
+#: triggers.php:213
 msgid "Trigger deleted"
 msgstr "A trigger foi excluída"
 
-#: triggers.php:273
+#: triggers.php:289
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] "Trigger desativada"
@@ -13794,7 +13792,7 @@ msgstr[1] "Triggers desativadas"
 msgid "Trigger displaying options"
 msgstr "Opções de exibição de trigger"
 
-#: triggers.php:272
+#: triggers.php:288
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] "Trigger ativada"
@@ -13865,38 +13863,38 @@ msgstr "O protótipo de trigger \"%1$s\" contêm protótipos de itens de múltip
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr "O protótipo de trigger \"%1$s\" precisa conter no mínimo um protótipo de item."
 
-#: trigger_prototypes.php:168
+#: trigger_prototypes.php:184
 msgid "Trigger prototype added"
 msgstr "Protótipo de trigger adicionado"
 
-#: trigger_prototypes.php:181
+#: trigger_prototypes.php:197
 msgid "Trigger prototype deleted"
 msgstr "Protótipo de trigger excluído"
 
-#: trigger_prototypes.php:245
+#: trigger_prototypes.php:261
 msgid "Trigger prototype disabled"
 msgid_plural "Trigger prototypes disabled"
 msgstr[0] "Protótipo de trigger desativado"
 msgstr[1] "Protótipos de trigger desativados"
 
-#: trigger_prototypes.php:244
+#: trigger_prototypes.php:260
 msgid "Trigger prototype enabled"
 msgid_plural "Trigger prototypes enabled"
 msgstr[0] "Protótipo de trigger ativado"
 msgstr[1] "Protótipos de trigger ativados"
 
-#: trigger_prototypes.php:163
+#: trigger_prototypes.php:179
 msgid "Trigger prototype updated"
 msgstr "Protótipo de trigger atualizado"
 
 #: include/html.inc.php:439 include/html.inc.php:443
 #: include/views/configuration.host.discovery.list.php:113
-#: include/views/configuration.host.edit.php:590
-#: include/views/configuration.template.edit.php:329
+#: include/views/configuration.host.edit.php:626
+#: include/views/configuration.template.edit.php:380
 msgid "Trigger prototypes"
 msgstr "Protótipos de trigger"
 
-#: trigger_prototypes.php:256
+#: trigger_prototypes.php:272
 msgid "Trigger prototypes deleted"
 msgstr "Protótipos de trigger excluídos"
 
@@ -13904,7 +13902,7 @@ msgstr "Protótipos de trigger excluídos"
 msgid "Trigger prototypes of"
 msgstr "Protótipos de trigger de"
 
-#: trigger_prototypes.php:209
+#: trigger_prototypes.php:225
 msgid "Trigger prototypes updated"
 msgstr "Protótipos de trigger atualizados"
 
@@ -13920,7 +13918,7 @@ msgstr "Severidades de trigger"
 msgid "Trigger severity"
 msgstr "Severidade da trigger"
 
-#: triggers.php:179 triggers.php:237 tr_logform.php:113
+#: triggers.php:195 triggers.php:253 tr_logform.php:113
 msgid "Trigger updated"
 msgstr "Trigger atualizada"
 
@@ -13928,15 +13926,15 @@ msgstr "Trigger atualizada"
 msgid "Trigger value"
 msgstr "Valor da trigger"
 
-#: hosts.php:815 hosts.php:907 include/forms.inc.php:612
+#: hosts.php:816 hosts.php:908 include/forms.inc.php:612
 #: include/html.inc.php:450 include/html.inc.php:454 include/menu.inc.php:52
 #: include/triggers.inc.php:1251
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:52
-#: include/views/configuration.host.edit.php:483
+#: include/views/configuration.host.edit.php:519
 #: include/views/configuration.item.list.php:65
 #: include/views/configuration.item.list.php:197
-#: include/views/configuration.template.edit.php:240
+#: include/views/configuration.template.edit.php:291
 #: include/views/configuration.triggers.list.php:77
 #: include/views/conf.import.php:33 include/views/inventory.host.view.php:209
 #: include/views/inventory.host.view.php:230
@@ -13953,17 +13951,13 @@ msgstr "Triggers"
 msgid "Triggers (e/d)[p/o]"
 msgstr "Triggers (e/d)[p/o]"
 
-#: triggers.php:318
+#: triggers.php:334
 msgid "Triggers deleted"
 msgstr "As triggers foram excluídas"
 
 #: include/classes/class.ctriggersinfo.php:110 include/screens.inc.php:42
 msgid "Triggers info"
 msgstr "Info triggers"
-
-#: include/views/configuration.triggers.massupdate.php:146
-msgid "Triggers massupdate"
-msgstr "Atualização em grupo de triggers"
 
 #: include/screens.inc.php:43
 msgid "Triggers overview"
@@ -14160,7 +14154,7 @@ msgstr "Não foi possível selecionar a configuração."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "Não é possível enviar arquivos pois a opção \"file_uploads\" está desabilitada."
 
-#: include/maps.inc.php:743 include/maps.inc.php:826 include/maps.inc.php:917
+#: include/maps.inc.php:732 include/maps.inc.php:815 include/maps.inc.php:906
 msgid "Unacknowledged"
 msgstr "Não reconhecido"
 
@@ -14196,7 +14190,7 @@ msgid "Units"
 msgstr "Unidades"
 
 #: events.php:531 events.php:532 events.php:542 events.php:543 events.php:544
-#: events.php:545 hosts.php:956 httpdetails.php:168 httpmon.php:170
+#: events.php:545 hosts.php:957 httpdetails.php:168 httpmon.php:170
 #: include/actions.inc.php:41 include/actions.inc.php:98
 #: include/actions.inc.php:115 include/actions.inc.php:139
 #: include/actions.inc.php:163 include/actions.inc.php:176
@@ -14261,14 +14255,14 @@ msgstr "Passo desconhecido falhou: %1$s"
 msgid "Unknown value type"
 msgstr "Tipo de valor desconhecido"
 
-#: include/views/configuration.host.edit.php:684
+#: include/views/configuration.host.edit.php:720
 #: include/views/configuration.host.prototype.edit.php:229
-#: include/views/configuration.template.edit.php:419
+#: include/views/configuration.template.edit.php:470
 msgid "Unlink"
 msgstr "Desassociar"
 
-#: include/views/configuration.host.edit.php:688
-#: include/views/configuration.template.edit.php:423
+#: include/views/configuration.host.edit.php:724
+#: include/views/configuration.template.edit.php:474
 msgid "Unlink and clear"
 msgstr "Desassociar e limpar"
 
@@ -14280,52 +14274,52 @@ msgstr "Desassociar da template"
 msgid "Unlink from templates"
 msgstr "Desvincular dos templates"
 
-#: api/classes/CHostGeneral.php:569
+#: api/classes/CHostGeneral.php:577
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Desvinculado: Aplicação \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:347
+#: api/classes/CHostGeneral.php:355
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Desvinculado: Regra de descoberta \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:481
+#: api/classes/CHostGeneral.php:489
 #, c-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Desvinculado: Gráfico \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:464
+#: api/classes/CHostGeneral.php:472
 #, c-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr "Desvinculado: Protótipo de gráfico \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:412
+#: api/classes/CHostGeneral.php:420
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Desvinculado: Protótipo de host \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:364
+#: api/classes/CHostGeneral.php:372
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Desvinculado: Item \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:381
+#: api/classes/CHostGeneral.php:389
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Desvinculado: Protótipo de item \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:287
+#: api/classes/CHostGeneral.php:295
 #, c-format
 msgid "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Desvinculado: Trigger \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:304
+#: api/classes/CHostGeneral.php:312
 #, c-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Desvinculado: Protótipo de trigger \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CHostGeneral.php:520
+#: api/classes/CHostGeneral.php:528
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Desvinculado: Cenário web \"%1$s\" em \"%2$s\"."
@@ -14657,7 +14651,7 @@ msgstr "Já existe um usuário com o apelido \"%s\"."
 
 #: include/views/administration.mediatypes.edit.php:85
 #: include/views/administration.mediatypes.list.php:69
-#: include/views/configuration.host.edit.php:763
+#: include/views/configuration.host.edit.php:799
 #: include/views/configuration.host.prototype.edit.php:278
 #: include/views/general.login.php:66 index.php:34
 msgid "Username"
@@ -14692,75 +14686,75 @@ msgstr "Status do cluster VMware, <url> - endereço de serviço do VMware, <name
 msgid "VMware event log, <url> - VMware service URL"
 msgstr "Evento no log VMware, <url> endereço de serviço do VMware"
 
-#: include/classes/items/CHelpItems.php:663
+#: include/classes/items/CHelpItems.php:659
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "BIOS uuid do hypervisor VMware, <url> endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:671
+#: include/classes/items/CHelpItems.php:667
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tamanho do inchaço de memória no hypervisor VMware, <url> endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:619
+#: include/classes/items/CHelpItems.php:615
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nome do cluster VMware, <url> endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:627
+#: include/classes/items/CHelpItems.php:623
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Estatísticas de leitura no datastore do VMware, <url> endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware, <datastore> - nome do datastore, <mode> - \"latency\" (latência)"
 
-#: include/classes/items/CHelpItems.php:631
+#: include/classes/items/CHelpItems.php:627
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Estatísticas de escrita no datastore do VMware, <url> endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware, <datastore> - nome do datastore, <mode> - \"latency\" (latência)"
 
-#: include/classes/items/CHelpItems.php:659
+#: include/classes/items/CHelpItems.php:655
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Modelo do hypervisor VMware, <url> endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:635
+#: include/classes/items/CHelpItems.php:631
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nome do hypervisor VMware, <url> endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:679
+#: include/classes/items/CHelpItems.php:675
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Estatísticas de entrada de rede do hypervisor VMware, <url> endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware, <mode> bps"
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:679
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Estatísticas de saída de rede do hypervisor VMware, <url> - endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:639
+#: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Frequência de processamento do hypervisor VMware, <url> - endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:643
+#: include/classes/items/CHelpItems.php:639
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Modelo do processador do hypervisor VMware, <url> - endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:623
+#: include/classes/items/CHelpItems.php:619
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Utilização de processador em Hz no hypervisor VMware, <url> - endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Status do hypervisor VMware, <url> - endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:655
+#: include/classes/items/CHelpItems.php:651
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Total de memória no hypervisor VMware, <url> - endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tempo em carga do hypervisor VMware, <url> - endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:675
+#: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tamanho utilizado de memória no hypervisor VMware, <url> - endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:667
+#: include/classes/items/CHelpItems.php:663
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nome do fabricante do hypervisor VMware, <url> - endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Versão do hypervisor VMware, <url> endereço de serviço do VMware, <uuid> - nome de host do hypervisor VMware"
 
@@ -14768,7 +14762,7 @@ msgstr "Versão do hypervisor VMware, <url> endereço de serviço do VMware, <uu
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Nome de serviço completo do VMware, <url> endereço de serviço do VMware"
 
-#: include/classes/items/CHelpItems.php:615
+#: include/classes/items/CHelpItems.php:699
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Nome do serviço VMware, <url> endereço de serviço do VMware"
 
@@ -14859,7 +14853,7 @@ msgstr "Tempo de carga da máquina virtual VMware, <url> endereço de serviço d
 #: include/blocks.inc.php:741 include/classes/graphdraw/CPieGraphDraw.php:327
 #: include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:170
-#: include/classes/screens/CScreenHistory.php:268 include/reports.inc.php:175
+#: include/classes/screens/CScreenHistory.php:260 include/reports.inc.php:175
 #: include/views/administration.general.valuemapping.edit.php:41
 #: include/views/common.macros.php:37 tr_testexpr.php:50
 #, c-format
@@ -15033,7 +15027,7 @@ msgstr "Estatísticas de memória virtual."
 msgid "Visible name"
 msgstr "Nome visível"
 
-#: api/classes/CHost.php:758
+#: api/classes/CHost.php:771
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "O nome visível não pode ser vazio se o nome do host não for informado."
 
@@ -15057,7 +15051,7 @@ msgstr "Atenção"
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Desculpe, mas o número máximo de elementos a recordar foi atingido."
 
-#: hosts.php:818 hosts.php:913 include/menu.inc.php:42
+#: hosts.php:819 hosts.php:914 include/menu.inc.php:42
 #: include/views/inventory.host.view.php:206
 #: include/views/inventory.host.view.php:234
 #: include/views/inventory.host.view.php:243 search.php:139 search.php:145
@@ -15129,8 +15123,8 @@ msgid "Web scenario step number cannot be less than 1."
 msgstr "O número de um cenário web não pode ser menor do que 1."
 
 #: httpmon.php:80 include/html.inc.php:524 include/html.inc.php:528
-#: include/views/configuration.host.edit.php:655
-#: include/views/configuration.template.edit.php:393
+#: include/views/configuration.host.edit.php:691
+#: include/views/configuration.template.edit.php:444
 msgid "Web scenarios"
 msgstr "Cenários web"
 
@@ -15229,7 +15223,7 @@ msgstr "Campos errados para a dependência do serviço \"%1$s\"."
 msgid "Wrong fields for element."
 msgstr "Campos errados para o elemento."
 
-#: api/classes/CHost.php:665
+#: api/classes/CHost.php:661
 #, c-format
 msgid "Wrong fields for host \"%s\"."
 msgstr "Campos errado para o host \"%s\"."
@@ -15352,7 +15346,7 @@ msgid "Y axis MAX value"
 msgstr "Valor MÁXIMO no eixo Y"
 
 #: api/classes/CGraphGeneral.php:361
-#: include/classes/graphdraw/CLineGraphDraw.php:706
+#: include/classes/graphdraw/CLineGraphDraw.php:708
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "O valor MÁXIMO do eixo Y deve ser superior ao valor configurado para o MÍNIMO."
 
@@ -15450,15 +15444,15 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Você não especificou o alvo da operação do script global \"%s\"."
 
 #: api/classes/CGraph.php:557 api/classes/CGraphPrototype.php:574
-#: api/classes/CHost.php:1013 api/classes/CHost.php:1070
-#: api/classes/CHost.php:1385 api/classes/CHttpTest.php:502
+#: api/classes/CHost.php:1030 api/classes/CHost.php:1087
+#: api/classes/CHost.php:1403 api/classes/CHttpTest.php:502
 #: api/classes/CMaintenance.php:537 api/classes/CMaintenance.php:644
 #: api/classes/CMaintenance.php:656 api/classes/CScript.php:300
 #: api/classes/CScript.php:397 api/classes/CScript.php:437
 #: api/classes/CScript.php:500 api/classes/CTemplate.php:480
-#: api/classes/CTemplate.php:580 api/classes/CTemplate.php:638
-#: api/classes/CTemplate.php:788 api/classes/CTemplate.php:827
-#: api/classes/CTemplate.php:1076
+#: api/classes/CTemplate.php:580 api/classes/CTemplate.php:641
+#: api/classes/CTemplate.php:791 api/classes/CTemplate.php:836
+#: api/classes/CTemplate.php:1115
 msgid "You do not have permission to perform this operation."
 msgstr "Você não tem permissão para executar esta operação."
 
@@ -15634,7 +15628,7 @@ msgid "agent"
 msgstr "agente"
 
 #: include/classes/class.cpagefilter.php:890
-#: include/classes/graphdraw/CLineGraphDraw.php:1850
+#: include/classes/graphdraw/CLineGraphDraw.php:1852
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15685,8 +15679,8 @@ msgstr "auto-registro"
 msgid "auto-registered host"
 msgstr "host auto-registrado"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1832
-#: include/classes/graphdraw/CLineGraphDraw.php:1854
+#: include/classes/graphdraw/CLineGraphDraw.php:1834
+#: include/classes/graphdraw/CLineGraphDraw.php:1856
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:145
@@ -15731,14 +15725,14 @@ msgstr "d M Y H:i:s"
 msgid "d.M"
 msgstr "d/M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1372
-#: include/classes/graphdraw/CLineGraphDraw.php:1425
+#: include/classes/graphdraw/CLineGraphDraw.php:1374
+#: include/classes/graphdraw/CLineGraphDraw.php:1427
 msgid "d.m"
 msgstr "d/m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1394
-#: include/classes/graphdraw/CLineGraphDraw.php:1409
-#: include/classes/graphdraw/CLineGraphDraw.php:1428
+#: include/classes/graphdraw/CLineGraphDraw.php:1396
+#: include/classes/graphdraw/CLineGraphDraw.php:1411
+#: include/classes/graphdraw/CLineGraphDraw.php:1430
 msgid "d.m H:i"
 msgstr "d/m H:i"
 
@@ -15870,13 +15864,13 @@ msgstr "item"
 msgid "key is empty"
 msgstr "a chave está vazia"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1830
+#: include/classes/graphdraw/CLineGraphDraw.php:1832
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:43
 msgid "last"
 msgstr "último"
 
-#: hosts.php:778 hosts.php:779 hosts.php:780 include/actions.inc.php:29
+#: hosts.php:779 hosts.php:780 hosts.php:781 include/actions.inc.php:29
 #: include/forms.inc.php:477 include/forms.inc.php:484
 #: include/forms.inc.php:491 include/forms.inc.php:498
 #: include/forms.inc.php:621 include/forms.inc.php:636
@@ -15910,16 +15904,16 @@ msgstr "manutenção"
 msgid "map"
 msgstr "mapa"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1833
-#: include/classes/graphdraw/CLineGraphDraw.php:1847
+#: include/classes/graphdraw/CLineGraphDraw.php:1835
+#: include/classes/graphdraw/CLineGraphDraw.php:1849
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:42
 #: include/views/js/configuration.graph.edit.js.php:50 popup_bitem.php:146
 msgid "max"
 msgstr "máx"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1831
-#: include/classes/graphdraw/CLineGraphDraw.php:1844
+#: include/classes/graphdraw/CLineGraphDraw.php:1833
+#: include/classes/graphdraw/CLineGraphDraw.php:1846
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:144
@@ -15955,7 +15949,7 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr "novo"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1925
+#: include/classes/graphdraw/CLineGraphDraw.php:1927
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"

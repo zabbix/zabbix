@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -461,7 +461,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 				'host' => $itemHost,
 				'key_' => $key
 			),
-			'output' => array('itemid', 'value_type', 'units', 'valuemapid')
+			'output' => array('itemid', 'value_type', 'units', 'valuemapid', 'lastvalue', 'lastclock')
 		));
 
 		$item = reset($item);
@@ -470,17 +470,6 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 		if (!$item) {
 			$label = str_replace($expr, UNRESOLVED_MACRO_STRING, $label);
 			continue;
-		}
-
-		$lastValue = Manager::History()->getLast(array($item));
-		if ($lastValue) {
-			$lastValue = reset($lastValue[$item['itemid']]);
-			$item['lastvalue'] = $lastValue['value'];
-			$item['lastclock'] = $lastValue['clock'];
-		}
-		else {
-			$item['lastvalue'] = '0';
-			$item['lastclock'] = '0';
 		}
 
 		// do function type (last, min, max, avg) related actions

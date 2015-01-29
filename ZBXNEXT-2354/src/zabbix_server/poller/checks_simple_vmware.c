@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -782,7 +782,10 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const char *username, const c
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	{
+		set_log_result_empty(result);
 		goto unlock;
+	}
 
 	ret = vmware_get_events(service->data->events, request->lastlogsize, result);
 unlock:

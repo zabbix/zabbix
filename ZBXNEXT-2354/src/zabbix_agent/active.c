@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,12 +58,12 @@ LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
 		case VcppException(ERROR_SEVERITY_ERROR, ERROR_PROC_NOT_FOUND):
 			if (delayloadinfo->dlp.fImportByName)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "function %s was not found in %sn",
+				zabbix_log(LOG_LEVEL_DEBUG, "function %s was not found in %s",
 						delayloadinfo->dlp.szProcName, delayloadinfo->szDll);
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "function ordinal %d was not found in %sn",
+				zabbix_log(LOG_LEVEL_DEBUG, "function ordinal %d was not found in %s",
 						delayloadinfo->dlp.dwOrdinal, delayloadinfo->szDll);
 			}
 			break;

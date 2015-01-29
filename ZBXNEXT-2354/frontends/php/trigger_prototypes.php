@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,14 +101,30 @@ if (get_request('parent_discoveryid')) {
 		access_deny();
 	}
 
-	if (isset($_REQUEST['triggerid'])) {
-		$triggerPrototype = API::TriggerPrototype()->get(array(
-			'triggerids' => $_REQUEST['triggerid'],
+	$triggerPrototypeIds = getRequest('g_triggerid', array());
+	if (!is_array($triggerPrototypeIds)) {
+		$triggerPrototypeIds = zbx_toArray($triggerPrototypeIds);
+	}
+	if (!zbx_empty(getRequest('triggerid'))) {
+		$triggerPrototypeIds[] = getRequest('triggerid');
+	}
+
+	if ($triggerPrototypeIds) {
+		$triggerPrototypes = API::TriggerPrototype()->get(array(
 			'output' => array('triggerid'),
+			'triggerids' => $triggerPrototypeIds,
 			'editable' => true,
 			'preservekeys' => true
 		));
-		if (empty($triggerPrototype)) {
+
+		if ($triggerPrototypes) {
+			foreach ($triggerPrototypeIds as $triggerPrototypeId) {
+				if (!isset($triggerPrototypes[$triggerPrototypeId])) {
+					access_deny();
+				}
+			}
+		}
+		else {
 			access_deny();
 		}
 	}

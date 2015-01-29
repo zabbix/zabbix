@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -334,7 +334,8 @@ table.chart { width: 100%; background-color: #DDDDDD; text-align: center; }
 table.tableinfo { empty-cells: show; width: 100%; border-spacing: 2px; }
 table.tableinfo > tbody > tr > td {
 	padding: 1px 3px; white-space: nowrap; font-weight: normal; text-align: left;
-	border: 0; height: 22px; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px;
+	border: 0; height: 22px;
+	-moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px;
 }
 table.tableinfo tr.header td { white-space: nowrap; font-weight: bold; border: 0; }
 table.tableinfo tr.header td.hover_grey {
