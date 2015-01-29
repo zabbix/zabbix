@@ -104,29 +104,25 @@ void	recv_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid proxy configuration data: %s", zbx_json_strerror());
 		zbx_send_response(sock, ret, zbx_json_strerror(), CONFIG_TIMEOUT);
+		goto out;
 	}
-	else
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (0 == (configured_tls_accept_modes & sock->connection_type))
 	{
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		if (0 == (configured_tls_accept_modes & sock->connection_type))
-		{
-			char	*msg;
+		char	*msg;
 
-			msg = zbx_dsprintf(NULL, "configuration update from server over connection of type \"%s\" is "
-					"not allowed", zbx_tls_connection_type_name(sock->connection_type));
-			zabbix_log(LOG_LEVEL_WARNING, "%s by proxy configuration parameter \"TLSAccept\"", msg);
-			zbx_send_response(sock, FAIL, msg, CONFIG_TIMEOUT);
-			zbx_free(msg);
-		}
-		else
-		{
-#endif
-			process_proxyconfig(&jp_data);
-			zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		}
-#endif
+		msg = zbx_dsprintf(NULL, "configuration update from server over connection of type \"%s\" is not "
+				"allowed", zbx_tls_connection_type_name(sock->connection_type));
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s by proxy configuration parameter \"TLSAccept\"", msg);
+		zbx_send_response(sock, FAIL, msg, CONFIG_TIMEOUT);
+		zbx_free(msg);
+		goto out;
 	}
-
+#endif
+	process_proxyconfig(&jp_data);
+	zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
