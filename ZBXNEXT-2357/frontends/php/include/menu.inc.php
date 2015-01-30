@@ -387,7 +387,12 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			continue;
 		}
 
-		$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'];
+		if ($sub_menus[$label][$menu['default_page_id']]['menu_action'] === null) {
+			$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'];
+		}
+		else {
+			$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'].'?action='.$sub_menus[$label][$menu['default_page_id']]['menu_action'];
+		}
 		$mmenu_entry = new CCol($menu['label'], $menu_class);
 		$mmenu_entry->setAttribute('id', $label);
 		$mmenu_entry->addAction('onclick', 'javascript: redirect(\''.$menu_url.'\');');
