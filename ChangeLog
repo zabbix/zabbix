@@ -67,6 +67,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, K
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+...G...... [ZBX-9233] fixed processing of bogus negative value of performance couter (igors)
 .......PS. [ZBXNEXT-2354] fixed VMware virtual machine network and disk transmission rates being reported in kilobytes rather than bytes (wiper)
 ..F....... [ZBX-8930] fixed map import displaying incorrect message when map had non-existing sub elements (Oleg)
 A.F....... [ZBX-8448] fixed host and template permissions validation when an object belongs to both read and read-write groups (Ivo)
@@ -612,6 +613,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9233] fixed processing of bogus negative value of performance couter (igors)
 .......PS. [ZBXNEXT-2354] fixed VMware virtual machine network and disk transmission rates being reported in kilobytes rather than bytes (wiper)
 A.F....... [ZBX-8448] fixed host and template permissions validation when an object belongs to both read and read-write groups (Ivo)
 ..F....... [ZBX-8448] added read-only groups in host and template edit forms as grayed out when object belongs to both read and read-write groups (Ivo)
