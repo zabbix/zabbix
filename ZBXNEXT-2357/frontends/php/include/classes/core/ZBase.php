@@ -162,10 +162,6 @@ class ZBase {
 			if ($router->getController() <> null) {
 				CProfiler::getInstance()->start();
 				$this->processRequest();
-				if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode']) && CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-					CProfiler::getInstance()->stop();
-					CProfiler::getInstance()->show();
-				}
 				exit;
 			}
 		}
