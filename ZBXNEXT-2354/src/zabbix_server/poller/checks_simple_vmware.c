@@ -650,111 +650,105 @@ out:
 
 static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT *result)
 {
-	const char	*__function_name = "vmware_get_events";
+	const char		*__function_name = "vmware_get_events";
 
-	zbx_uint64_t	key;
-	char		*value, *error = NULL;
-	zbx_log_t	*log;
-	struct tm	tm;
-	time_t		t;
-	xmlDoc		*doc;
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
-	int		i, ret = SYSINFO_RET_FAIL;
+	zbx_vector_str_t	keys;
+	zbx_vector_uint64_t	ids;
+	zbx_uint64_t		key;
+	char			*value, xpath[MAX_STRING_LEN];
+	int			i, ret = SYSINFO_RET_FAIL;
+	zbx_log_t		*log;
+	struct tm		tm;
+	time_t			t;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastlogsize:" ZBX_FS_UI64, __function_name, lastlogsize);
 
-	if (NULL == (doc = xmlReadMemory(events, strlen(events), ZBX_VM_NONAME_XML, NULL, 0)))
+	zbx_vector_str_create(&keys);
+
+	if (SUCCEED != zbx_xml_read_values(events, ZBX_XPATH_LN2("Event", "key"), &keys))
 	{
-		error = zbx_strdup(error, "Cannot parse event data.");
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "No event key found."));
+		zbx_vector_str_destroy(&keys);
 		goto out;
 	}
 
-	xpathCtx = xmlXPathNewContext(doc);
+	zbx_vector_uint64_create(&ids);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_VMWARE_EVENTS(), xpathCtx)))
+	for (i = 0; i < keys.values_num; i++)
 	{
-		error = zbx_strdup(error, "Cannot make event parsing query.");
-		goto clean;
-	}
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-	{
-		error = zbx_strdup(error, "Cannot find event keys in event data.");
-		goto clean;
-	}
-
-	nodeset = xpathObj->nodesetval;
-
-	for (i = 0; i < nodeset->nodeNr; i++)
-	{
-		if (NULL == (value = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='key']")))
+		if (SUCCEED != is_uint64(keys.values[i], &key))
 			continue;
 
-		if (SUCCEED == is_uint64(value, &key) && key > lastlogsize)
-		{
-			zbx_free(value);
+		if (key <= lastlogsize)
+			continue;
 
-			value = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
-					"*[local-name()='fullFormattedMessage']");
-
-			if (NULL != value)
-			{
-				zbx_replace_invalid_utf8(value);
-				log = add_log_result(result, value);
-				log->logeventid = key;
-				log->lastlogsize = key;
-
-				zbx_free(value);
-				value = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
-						"*[local-name()='createdTime']");
-
-				if (NULL != value)
-				{
-					if (6 == sscanf(value, "%d-%d-%dT%d:%d:%d.%*s", &tm.tm_year, &tm.tm_mon,
-							&tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec))
-					{
-						int		tz_offset;
-#if defined(HAVE_TM_TM_GMTOFF)
-						struct tm	*ptm;
-						time_t		now;
-
-						now = time(NULL);
-						ptm = localtime(&now);
-						tz_offset = ptm->tm_gmtoff;
-#else
-						tz_offset = -timezone;
-#endif
-						tm.tm_year -= 1900;
-						tm.tm_mon--;
-						tm.tm_isdst = -1;
-
-						if (0 < (t = mktime(&tm)))
-							log->timestamp = (int)t + tz_offset;
-					}
-
-				}
-			}
-		}
-
-		zbx_free(value);
+		zbx_vector_uint64_append(&ids, key);
 	}
 
-	if (!ISSET_LOG(result))
+	if (0 != ids.values_num)
+	{
+		zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		for (i = 0; i < ids.values_num; i++)
+		{
+			zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key") "[.='" ZBX_FS_UI64 "']/.."
+					ZBX_XPATH_LN("fullFormattedMessage"), ids.values[i]);
+
+			if (NULL == (value = zbx_xml_read_value(events, xpath)))
+				continue;
+
+			zbx_replace_invalid_utf8(value);
+			log = add_log_result(result, value);
+			log->logeventid = ids.values[i];
+			log->lastlogsize = ids.values[i];
+
+			zbx_free(value);
+
+			/* timestamp */
+
+			zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key") "[.='" ZBX_FS_UI64 "']/.."
+					ZBX_XPATH_LN("createdTime"), ids.values[i]);
+
+			if (NULL == (value = zbx_xml_read_value(events, xpath)))
+				continue;
+
+			/* 2013-06-04T14:19:23.406298Z */
+			if (6 == sscanf(value, "%d-%d-%dT%d:%d:%d.%*s", &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+					&tm.tm_hour, &tm.tm_min, &tm.tm_sec))
+
+			{
+				int		tz_offset;
+#if defined(HAVE_TM_TM_GMTOFF)
+				struct tm	*ptm;
+				time_t		now;
+
+				now = time(NULL);
+				ptm = localtime(&now);
+				tz_offset = ptm->tm_gmtoff;
+#else
+				tz_offset = -timezone;
+#endif
+				tm.tm_year -= 1900;
+				tm.tm_mon--;
+				tm.tm_isdst = -1;
+
+				if (0 < (t = mktime(&tm)))
+					log->timestamp = (int)t + tz_offset;
+			}
+
+			zbx_free(value);
+		}
+	}
+	else
 		set_log_result_empty(result);
 
+	zbx_vector_uint64_destroy(&ids);
+
+	zbx_vector_str_clean(&keys);
+	zbx_vector_str_destroy(&keys);
+
 	ret = SYSINFO_RET_OK;
-clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
-	xmlXPathFreeContext(xpathCtx);
-	xmlFreeDoc(doc);
 out:
-	if (NULL != error)
-		SET_MSG_RESULT(result, error);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
 
 	return ret;
