@@ -194,9 +194,10 @@ $data['triggers'] = API::Trigger()->get(array(
 	'selectHosts' => array('hostid', 'status', 'name'),
 	'triggerids' => array_keys($triggersEventCount),
 	'expandDescription' => true,
-	'preservekeys' => true,
-	'nopermissions' => true
+	'preservekeys' => true
 ));
+
+$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrl($data['triggers']);
 
 $hostIds = array();
 
