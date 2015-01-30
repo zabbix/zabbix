@@ -1074,7 +1074,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 					'priority' => $trigger['priority'],
 					'flags' => $trigger['flags'],
 					'url' => $trigger['url'],
-					'hosts' => array($host)
+					'hosts' => $trigger['hosts']
 				);
 			}
 		}
@@ -1210,9 +1210,17 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 
 		$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
 
+		$usedHosts = array();
+		foreach ($trigger['hosts'] as $triggerHost) {
+			$usedHosts[$triggerHost['hostid']] = $triggerHost['name'];
+		}
+		$usedHostCount = count($usedHosts);
+
 		foreach ($dbItems as $dbItem) {
 			$triggerItems[] = array(
-				'name' => $dbItem['name_expanded'],
+				'name' => ($usedHostCount > 1)
+					? $usedHosts[$dbItem['hostid']].NAME_DELIMITER.$dbItem['name_expanded']
+					: $dbItem['name_expanded'],
 				'params' => array(
 					'action' => in_array($dbItem['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
 						? HISTORY_GRAPH : HISTORY_VALUES,

@@ -736,7 +736,7 @@ else {
 
 			$triggers = API::Trigger()->get(array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
-				'selectHosts' => array('hostid', 'status'),
+				'selectHosts' => array('hostid', 'name', 'status'),
 				'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
 				'output' => array('description', 'expression', 'priority', 'flags', 'url')
 			));
@@ -772,13 +772,21 @@ else {
 				$host = reset($trigger['hosts']);
 				$host = $hosts[$host['hostid']];
 
+				$usedHosts = array();
+				foreach ($trigger['hosts'] as $triggerHost) {
+					$usedHosts[$triggerHost['hostid']] = $triggerHost['name'];
+				}
+				$usedHostCount = count($usedHosts);
+
 				$triggerItems = array();
 
 				$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
 
 				foreach ($trigger['items'] as $item) {
 					$triggerItems[] = array(
-						'name' => $item['name_expanded'],
+						'name' => ($usedHostCount > 1)
+							? $usedHosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded']
+							: $item['name_expanded'],
 						'params' => array(
 							'itemid' => $item['itemid'],
 							'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
