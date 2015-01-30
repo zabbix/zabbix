@@ -66,7 +66,7 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid_by_key get_itemid_by_host
 		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids get_lastclock get_tlds get_probes get_nsips
-		get_all_items get_nsip_items tld_service_enabled db_connect db_select set_slv_config
+		get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_select set_slv_config
 		get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds minutes_last_month
 		get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_avail process_slv_ns_avail
@@ -648,6 +648,24 @@ sub get_tld_items
     fail("cannot find items ($cfg_key*) at host ($tld)") if (scalar(@items) == 0);
 
     return \@items;
+}
+
+sub tld_exists
+{
+    my $tld = shift;
+
+    my $rows_ref = db_select(
+	"select 1".
+	" from hosts h,hosts_groups hg,groups g".
+	" where h.hostid=hg.hostid".
+	    " and hg.groupid=g.groupid".
+	    " and g.name='TLDs'".
+	    " and h.status=0".
+	    " and h.host='$tld'");
+
+    return 0 if (scalar(@$rows_ref) == 0);
+
+    return 1;
 }
 
 sub tld_service_enabled
@@ -1712,13 +1730,13 @@ sub sql_time_condition
 #     {
 #         'eventid' => '5881',
 #         'start' => '1418272230',
-#         'end' => '1418273230'
-#         'false_positive' => '0',
+#         'end' => '1418273230',
+#         'false_positive' => '0'
 #     },
 #     {
 #         'eventid' => '6585',
 #         'start' => '1418280000',
-#         'false_positive' => '1',
+#         'false_positive' => '1'
 #     }
 # ]
 #
@@ -1819,14 +1837,14 @@ sub get_incidents
 	my $clock = $row_ref->[1];
 	my $value = $row_ref->[2];
 	my $false_positive = $row_ref->[3];
-	
+
 	dbg("$eventid: clock:" . ts_str($clock) . " ($clock), value:$value, false_positive:$false_positive") if ($OPTS{'debug'});
 
 	next if ($value == $last_trigger_value);
 
 	if ($value == TRIGGER_VALUE_FALSE)
 	{
-	    # event that closes an incident
+	    # event that closes the incident
 	    my $idx = scalar(@incidents) - 1;
 
 	    $incidents[$idx]->{'end'} = $clock;
@@ -1840,6 +1858,7 @@ sub get_incidents
 	$last_trigger_value = $value;
     }
 
+    # DEBUG
     if ($OPTS{'debug'})
     {
 	foreach (@incidents)
@@ -2364,7 +2383,7 @@ sub __func
 
     $func =~ s/^[^:]*::(.*)$/$1/ if (defined($func));
 
-    return "$func()" if (defined($func));
+    return "$func() " if (defined($func));
 
     return "";
 }
@@ -2401,7 +2420,7 @@ sub __log
 
 	if (defined($OPTS{'debug'}) or defined($OPTS{'test'}))
 	{
-		print(ts_str(), " [$priority] ", ($cur_tld eq "" ? "" : "$cur_tld:"), __func(), " $msg\n");
+		print(ts_str(), " [$priority] ", ($cur_tld eq "" ? "" : "$cur_tld: "), __func(), "$msg\n");
 		return;
 	}
 

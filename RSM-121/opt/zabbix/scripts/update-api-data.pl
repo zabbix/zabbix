@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use lib '/opt/zabbix/scripts';
+use lib '/home/vladimir.levijev/svn/zabbix/branches/dev/RSM-121/opt/zabbix/scripts';
 
 use strict;
 use RSM;
@@ -9,7 +9,7 @@ use ApiHelper;
 use JSON::XS;
 use Data::Dumper;
 
-parse_opts("tld=s", "service=s", "from=n", "till=n");
+parse_opts("tld=s", "service=s", "from=n", "till=n", "dry-run");
 
 # do not write any logs
 $OPTS{'test'} = 1;
@@ -88,7 +88,17 @@ if (exists($services_hash{'epp'}))
 my $from = $OPTS{'from'};
 my $till = $OPTS{'till'};
 
-my $tlds_ref = defined($OPTS{'tld'}) ? [ $OPTS{'tld'} ] : get_tlds();
+my $tlds_ref;
+if (defined($OPTS{'tld'}))
+{
+    fail("TLD ", $OPTS{'tld'}, " does not exist.") if (tld_exists($OPTS{'tld'}) == 0);
+
+    $tlds_ref = [ $OPTS{'tld'} ];
+}
+else
+{
+    $tlds_ref = get_tlds();
+}
 
 foreach (@$tlds_ref)
 {
@@ -98,9 +108,16 @@ foreach (@$tlds_ref)
     {
 	if (tld_service_enabled($tld, $service) != SUCCESS)
 	{
-	    if (ah_save_alarmed($tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
+	    if (defined($OPTS{'dry-run'}))
 	    {
-		fail("cannot save alarmed: ", ah_get_error());
+		info(uc($service), " DISABLED");
+	    }
+	    else
+	    {
+		if (ah_save_alarmed($tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
+		{
+		    fail("cannot save alarmed: ", ah_get_error());
+		}
 	    }
 
 	    next;
@@ -116,10 +133,17 @@ foreach (@$tlds_ref)
 
 	my $clock = get_lastclock($tld, "rsm.slv.$service.rollweek");
 
-	if (ah_save_service_availability($tld, $service, $downtime, $clock) != AH_SUCCESS)
-        {
-            fail("cannot save service availability: ", ah_get_error());
-        }
+	if (defined($OPTS{'dry-run'}))
+	{
+	    info(uc($service), " service availability $downtime ($clock)");
+	}
+	else
+	{
+	    if (ah_save_service_availability($tld, $service, $downtime, $clock) != AH_SUCCESS)
+	    {
+		fail("cannot save service availability: ", ah_get_error());
+	    }
+	}
 
 	# get availability
 	my $now = time();
@@ -134,9 +158,16 @@ foreach (@$tlds_ref)
 	    }
 	}
 
-	if (ah_save_alarmed($tld, $service, $alarmed_status, $clock) != AH_SUCCESS)
+	if (defined($OPTS{'dry-run'}))
 	{
-	    fail("cannot save alarmed: ", ah_get_error());
+	    info(uc($service), " alarmed:$alarmed_status");
+	}
+	else
+	{
+	    if (ah_save_alarmed($tld, $service, $alarmed_status, $clock) != AH_SUCCESS)
+	    {
+		fail("cannot save alarmed: ", ah_get_error());
+	    }
 	}
 
 	my ($nsips_ref, $dns_items_ref, $rdds_dbl_items_ref, $rdds_str_items_ref, $interval);
@@ -170,9 +201,16 @@ foreach (@$tlds_ref)
 	    my $start = $from if (defined($from) and $event_start < $from);
 	    my $end = $till if (defined($till) and not defined($event_end));
 
-	    if (ah_save_incident($tld, $service, $eventid, $event_start, $event_end, $false_positive) != AH_SUCCESS)
+	    if (defined($OPTS{'dry-run'}))
 	    {
-		fail("cannot save incident: ", ah_get_error());
+		info(uc($service), " incident id:$eventid start:$event_start end:" . ($event_end ? $event_end : "ACTIVE") . " fp:$false_positive");
+	    }
+	    else
+	    {
+		if (ah_save_incident($tld, $service, $eventid, $event_start, $event_end, $false_positive) != AH_SUCCESS)
+		{
+		    fail("cannot save incident: ", ah_get_error());
+		}
 	    }
 
 	    # get results within incidents
@@ -232,7 +270,7 @@ foreach (@$tlds_ref)
 
 			foreach my $clock (sort(keys(%$endvalues_ref))) # must be sorted by clock
 			{
-			    dbg(Dumper($endvalues_ref->{$clock})) if (defined($OPTS{'debug'}));
+			    #dbg(Dumper($endvalues_ref->{$clock})) if (defined($OPTS{'debug'}));
 
 			    fail("no status of value (probe:$probe service:$service clock:$clock) found in the database") if ($clock < $test_results[$test_result_index]->{'start'});
 
@@ -277,17 +315,22 @@ foreach (@$tlds_ref)
 
 		    my $json = encode_json($tr_ref);
 
-		    if (ah_save_incident_json($tld, $service, $eventid, $event_start, $json, $tr_ref->{'clock'}) != AH_SUCCESS)
+		    if (defined($OPTS{'dry-run'}))
 		    {
-			fail("cannot save incident: ", ah_get_error());
+			info(JSON->new->utf8(1)->pretty(1)->encode($tr_ref), "-----------------------------------------------------------");
 		    }
-
-		    #dbg(JSON->new->utf8(1)->pretty(1)->encode($tr_ref), "-----------------------------------------------------------\n") if (defined($OPTS{'debug'}));
+		    else
+		    {
+			if (ah_save_incident_json($tld, $service, $eventid, $event_start, $json, $tr_ref->{'clock'}) != AH_SUCCESS)
+			{
+			    fail("cannot save incident: ", ah_get_error());
+			}
+		    }
 		}
 	    }
 	    elsif ($service eq 'rdds')
 	    {
-		my $values_ref = __get_rdds_test_values($rdds_dbl_items_ref, $rdds_str_items_ref, $values_from, $values_till);		
+		my $values_ref = __get_rdds_test_values($rdds_dbl_items_ref, $rdds_str_items_ref, $values_from, $values_till);
 
 		dbg(Dumper($values_ref)) if (defined($OPTS{'debug'}));
 
@@ -308,7 +351,7 @@ foreach (@$tlds_ref)
 
 			foreach my $clock (sort(keys(%$endvalues_ref))) # must be sorted by clock
 			{
-			    dbg(Dumper($endvalues_ref->{$clock}))if (defined($OPTS{'debug'}));
+			    #dbg(Dumper($endvalues_ref->{$clock}))if (defined($OPTS{'debug'}));
 
 			    fail("no status of the value (probe:$probe service:$service clock:$clock) found in the database") if ($clock < $test_results[$test_result_index]->{'start'});
 
@@ -361,13 +404,26 @@ foreach (@$tlds_ref)
 
 		    my $json = encode_json($tr_ref);
 
-		    if (ah_save_incident_json($tld, $service, $eventid, $event_start, $json, $tr_ref->{'clock'}) != AH_SUCCESS)
+		    if (defined($OPTS{'dry-run'}))
 		    {
-			fail("cannot save incident: ", ah_get_error());
+			info(JSON->new->utf8(1)->pretty(1)->encode($tr_ref), "-----------------------------------------------------------\n") if (defined($OPTS{'debug'}));
 		    }
-
-		    #dbg(JSON->new->utf8(1)->pretty(1)->encode($tr_ref), "-----------------------------------------------------------\n") if (defined($OPTS{'debug'}));
+		    else
+		    {
+			if (ah_save_incident_json($tld, $service, $eventid, $event_start, $json, $tr_ref->{'clock'}) != AH_SUCCESS)
+			{
+			    fail("cannot save incident: ", ah_get_error());
+			}
+		    }
 		}
+	    }
+	    elsif ($service eq 'epp')
+	    {
+		    dbg("EPP results calculation is not implemented yet");
+	    }
+	    else
+	    {
+		    fail("THIS SHOULD NEVER HAPPEN (unknown service \"$service\")");
 	    }
 	}
     }
@@ -782,22 +838,22 @@ sub __get_itemids
 #     [
 #         {
 #             'clock' => 1234234234,
-#             'status' => 'Up'
+#             'value' => 'Up'
 #         },
 #         {
 #             'clock' => 1234234294,
-#             'status' => 'Up'
+#             'value' => 'Up'
 #         }
 #     ],
 #     'Probe2' =>
 #     [
 #         {
 #             'clock' => 1234234234,
-#             'status' => 'Down'
+#             'value' => 'Down'
 #         },
 #         {
 #             'clock' => 1234234294,
-#             'status' => 'Up'
+#             'value' => 'Up'
 #         }
 #     ]
 # }
@@ -858,7 +914,7 @@ update-api-data.pl - save information about the incidents to a filesystem
 
 =head1 SYNOPSIS
 
-update-api-data.pl --service <dns|dnssec|rdds|epp> [--tld tld] [--from timestamp] [--till timestamp] [--test] [--debug] [--help]
+update-api-data.pl --service <dns|dnssec|rdds|epp> [--tld tld] [--from timestamp] [--till timestamp] [--dry-run] [--debug] [--help]
 
 =head1 OPTIONS
 
@@ -875,11 +931,15 @@ Process only specified TLD. By default all TLDs will be processed.
 =item B<--from> timestamp
 
 Optionally specify the beginning of period for getting incidents. In case of ongoing
-incident at the specified time it will be displayed with full details.
+incident at the specified time it will be displayed with full details. E. g.:
 
 =item B<--till> timestamp
 
 Optionally specify the end of period for getting incidents.
+
+=item B<--dry-run>
+
+Print data to the screen, do not write anything to the filesystem.
 
 =item B<--debug>
 
@@ -896,5 +956,11 @@ Print a brief help message and exit.
 B<This program> will run through all the incidents found at optionally specified time bounds
 and store details about each on the filesystem. This information will be used by external
 program to provide it for users in convenient way.
+
+=head1 EXAMPLES
+
+./update-api-data.pl --tld example --from $(date -d '-10 min' +%s)
+
+This will update API data of the last 10 minutes of DNS, DNSSEC, RDDS and EPP services of TLD example.
 
 =cut
