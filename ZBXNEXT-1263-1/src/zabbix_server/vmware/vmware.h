@@ -27,24 +27,43 @@
 #define ZBX_VMWARE_STATE_READY		0x002
 #define ZBX_VMWARE_STATE_FAILED		0x004
 
-#define ZBX_VMWARE_STATE_UPDATING	0x100
+#define ZBX_VMWARE_STATE_MASK		0x0FF
 
+#define ZBX_VMWARE_STATE_UPDATING	0x100
+#define ZBX_VMWARE_STATE_UPDATING_PERF	0x200
+
+/* performance counter data */
 typedef struct
 {
-	zbx_uint64_t	nic_packets_rx;
-	zbx_uint64_t	nic_packets_tx;
-	zbx_uint64_t	nic_received;
-	zbx_uint64_t	nic_transmitted;
+	/* the counter id */
+	zbx_uint64_t		counterid;
 
-	zbx_uint64_t	disk_read;
-	zbx_uint64_t	disk_write;
-	zbx_uint64_t	disk_number_read_averaged;
-	zbx_uint64_t	disk_number_write_averaged;
-
-	zbx_uint64_t	datastore_read_latency;
-	zbx_uint64_t	datastore_write_latency;
+	/* the counter values for various instances */
+	/*    pair->first  - instance               */
+	/*    pair->second - value                  */
+	zbx_vector_ptr_pair_t	values;
 }
-zbx_vmware_counters_t;
+zbx_vmware_perf_counter_t;
+
+/* an entity monitored with performance counters */
+typedef struct
+{
+	/* entity type: HostSystem or VirtualMachine */
+	char			*type;
+
+	/* entity id */
+	char			*id;
+
+	/* the performance counter refresh rate */
+	int			refresh;
+
+	/* timestamp when the entity was queried last time */
+	int			last_seen;
+
+	/* the performance counters to monitor */
+	zbx_vector_ptr_t	counters;
+}
+zbx_vmware_perf_entity_t;
 
 typedef struct
 {
@@ -53,13 +72,13 @@ typedef struct
 }
 zbx_vmware_datastore_t;
 
-typedef struct
-{
 #define ZBX_VMWARE_DEV_TYPE_NIC		1
 #define ZBX_VMWARE_DEV_TYPE_DISK	2
-	int			type;
-	char			*instance;
-	char			*label;
+typedef struct
+{
+	int	type;
+	char	*instance;
+	char	*label;
 }
 zbx_vmware_dev_t;
 
@@ -69,7 +88,6 @@ typedef struct
 	char			*uuid;
 	char			*id;
 	char			*details;
-	char			*stats;
 	zbx_vector_ptr_t	devs;
 }
 zbx_vmware_vm_t;
@@ -81,7 +99,6 @@ typedef struct
 	char			*id;
 	char			*details;
 	char			*clusterid;
-	char			*stats;
 	zbx_vector_ptr_t	datastores;
 	zbx_vector_ptr_t	vms;
 }
@@ -90,9 +107,9 @@ zbx_vmware_hv_t;
 /* the vmware cluster data */
 typedef struct
 {
-	char			*id;
-	char			*name;
-	char			*status;
+	char	*id;
+	char	*name;
+	char	*status;
 }
 zbx_vmware_cluster_t;
 
@@ -120,16 +137,20 @@ typedef struct
 	/* the service state - see ZBX_VMWARE_STATE_* defines */
 	int			state;
 
-	/* the performance counters */
-	zbx_vmware_counters_t	counters;
-
 	int			lastcheck;
+	int			lastperfcheck;
 
 	/* The last vmware service access time. If a service is not accessed for a day it is removed */
 	int			lastaccess;
 
 	/* the vmware service instance contents */
 	char			*contents;
+
+	/* the performance counters */
+	zbx_hashset_t 		counters;
+
+	/* list of entities to monitor with performance counters */
+	zbx_hashset_t		entities;
 
 	/* The service data object that is swapped with a new one during service update */
 	zbx_vmware_data_t	*data;
@@ -159,14 +180,67 @@ void	zbx_vmware_destroy(void);
 void	zbx_vmware_lock(void);
 void	zbx_vmware_unlock(void);
 
-zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
 int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
 
-/*
- * XML support
- */
-
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
+
+int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid);
+int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const char *type, const char *id,
+		zbx_uint64_t counterid);
+zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
+		const char *id);
+
+#define ZBX_VM_NONAME_XML	"noname.xml"
+
+#define ZBX_XPATH_VM_QUICKSTATS(property)								\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
+		"/*[local-name()='val']/*[local-name()='quickStats']/*[local-name()='" property "']"
+
+#define ZBX_XPATH_VM_RUNTIME(property)									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
+		"/*[local-name()='val']/*[local-name()='runtime']/*[local-name()='" property "']"
+
+#define ZBX_XPATH_VM_CONFIG(property)									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
+		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='" property "']"
+
+#define ZBX_XPATH_VM_STORAGE(property)									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
+		"/*[local-name()='val']/*[local-name()='storage']/*[local-name()='" property "']"
+
+#define ZBX_XPATH_VM_HARDWARE(property)									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config']]"			\
+		"/*[local-name()='val']/*[local-name()='hardware']/*[local-name()='" property "']"
+
+#define ZBX_XPATH_HV_QUICKSTATS(property)								\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+		"/*[local-name()='val']/*[local-name()='quickStats']/*[local-name()='" property "']"
+
+#define ZBX_XPATH_HV_CONFIG(property)									\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='" property "']"
+
+#define ZBX_XPATH_HV_CONFIG_PRODUCT(property)								\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='product']"		\
+		"/*[local-name()='" property "']"
+
+#define ZBX_XPATH_HV_HARDWARE(property)									\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+		"/*[local-name()='val']/*[local-name()='hardware']/*[local-name()='" property "']"
+
+#define ZBX_XPATH_HV_STATUS()										\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+		"/*[local-name()='val']/*[local-name()='overallStatus']"
+
+#define ZBX_XPATH_VMWARE_EVENTS()									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='latestPage']]" 		\
+		"/*/*[local-name()='Event']"
+
+#define ZBX_XPATH_VMWARE_ABOUT(property)								\
+	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
 
 #	define ZBX_XPATH_LN(LN)			"/*[local-name()='" LN "']"
 #	define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
@@ -177,6 +251,6 @@ char	*zbx_xml_read_value(const char *data, const char *xpath);
 char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath);
 int	zbx_xml_read_values(const char *data, const char *xpath, zbx_vector_str_t *values);
 
-#endif
+#endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
 #endif	/* ZABBIX_VMWARE_H */
