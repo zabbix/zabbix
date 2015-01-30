@@ -47,11 +47,9 @@ if (!empty($DB['DB'])) {
 .not_classified { background: #{$config['severity_color_0']} !important; }
 CSS;
 	$pageHeader->addStyle($severityCss);
-	$page['scripts'][] = 'servercheck.js';
 
 	// perform Zabbix server check only for standard pages
-	if ((!defined('ZBX_PAGE_NO_MENU') || $data['fullscreen'] == 1) && $config['server_check_interval']
-			&& !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
+	if ($config['server_check_interval']) {
 		$page['scripts'][] = 'servercheck.js';
 	}
 }
