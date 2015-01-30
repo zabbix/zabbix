@@ -95,7 +95,9 @@ class CControllerDashboardSort extends CController {
 			}
 		}
 
-		$data = array();
+		$data = array(
+			'main_block' => ''
+		);
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

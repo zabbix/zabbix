@@ -51,7 +51,9 @@ class CControllerDashboardWidget extends CController {
 	protected function doAction() {
 		$widget = $this->getInput('widget');
 
-		$data = array();
+		$data = array(
+			'main_block' => ''
+		);
 
 		// refresh rate
 		if ($this->hasInput('refreshrate')) {
