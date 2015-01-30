@@ -24,14 +24,17 @@ class CMacrosResolverGeneral {
 	const PATTERN_HOST = '{(HOSTNAME|HOST\.HOST|HOST\.NAME)}';
 	const PATTERN_HOST_ID = '{(HOST\.ID)}';
 	const PATTERN_HOST_FUNCTION = '{(HOSTNAME|HOST\.HOST|HOST\.NAME)([1-9]?)}';
+	const PATTERN_HOST_FUNCTION2 = '{(HOST\.ID|HOST\.HOST|HOST\.NAME)([1-9]?)}';
 	const PATTERN_HOST_INTERNAL = 'HOST\.HOST|HOSTNAME';
 	const PATTERN_MACRO_PARAM = '[1-9]?';
 	const PATTERN_INTERFACE = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)}';
 	const PATTERN_INTERFACE_FUNCTION = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN|HOST\.PORT)([1-9]?)}';
+	const PATTERN_INTERFACE_FUNCTION2 = '{(HOST\.IP|HOST\.DNS|HOST\.CONN|HOST\.PORT)([1-9]?)}';
 	const PATTERN_INTERFACE_FUNCTION_WITHOUT_PORT = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)([1-9]?)}';
 	const PATTERN_ITEM_FUNCTION = '{(ITEM\.LASTVALUE|ITEM\.VALUE)([1-9]?)}';
 	const PATTERN_ITEM_NUMBER = '\$[1-9]';
 	const PATTERN_ITEM_MACROS = '{(HOSTNAME|HOST\.HOST|HOST\.NAME|IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)}';
+	const PATTERN_TRIGGER = '{(TRIGGER\.ID)}';
 
 	/**
 	 * Interface priorities.
@@ -329,7 +332,7 @@ class CMacrosResolverGeneral {
 	protected function getHostMacros(array $macros, array $macroValues) {
 		if ($macros) {
 			$dbFuncs = DBselect(
-				'SELECT f.triggerid,f.functionid,h.host,h.name'.
+				'SELECT f.triggerid,f.functionid,h.hostid,h.host,h.name'.
 				' FROM functions f'.
 					' JOIN items i ON f.itemid=i.itemid'.
 					' JOIN hosts h ON i.hostid=h.hostid'.
@@ -338,6 +341,10 @@ class CMacrosResolverGeneral {
 			while ($func = DBfetch($dbFuncs)) {
 				foreach ($macros[$func['functionid']] as $macro => $fNums) {
 					switch ($macro) {
+						case 'HOST.ID':
+							$replace = $func['hostid'];
+							break;
+
 						case 'HOSTNAME':
 						case 'HOST.HOST':
 							$replace = $func['host'];

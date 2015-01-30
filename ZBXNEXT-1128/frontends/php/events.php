@@ -738,9 +738,11 @@ else {
 				'triggerids' => zbx_objectValues($events, 'objectid'),
 				'selectHosts' => array('hostid', 'status'),
 				'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
-				'output' => array('description', 'expression', 'priority', 'flags', 'url')
+				'output' => array('description', 'expression', 'priority', 'flags', 'url'),
+				'preservekeys' => true
 			));
-			$triggers = zbx_toHash($triggers, 'triggerid');
+
+			$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
 
 			// fetch hosts
 			$hosts = array();

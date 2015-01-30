@@ -246,6 +246,24 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Resolve macros in trigger url.
+	 *
+	 * @static
+	 *
+	 * @param array $triggers
+	 *
+	 * @return array
+	 */
+	public static function resolveTriggerUrl(array $triggers) {
+		self::init();
+
+		return self::$macrosResolver->resolve(array(
+			'config' => 'triggerUrl',
+			'data' => $triggers
+		));
+	}
+
+	/**
 	 * Get trigger by id and resolve macros in trigger name.
 	 *
 	 * @static

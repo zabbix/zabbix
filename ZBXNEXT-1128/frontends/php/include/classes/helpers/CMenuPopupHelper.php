@@ -384,12 +384,20 @@ class CMenuPopupHelper {
 		$data = array(
 			'type' => 'trigger',
 			'triggerid' => $trigger['triggerid'],
-			'items' => $items,
-			'acknowledge' => $acknowledge,
-			'eventTime' => $eventTime,
-			'configuration' => null,
-			'url' => resolveTriggerUrl($trigger)
+			'items' => $items
 		);
+
+		if ($acknowledge !== null) {
+			$data['acknowledge'] = $acknowledge;
+		}
+
+		if ($eventTime !== null) {
+			$data['eventTime'] = $eventTime;
+		}
+
+		if ($trigger['url'] !== '') {
+			$data['url'] = $trigger['url'];
+		}
 
 		$host = reset($trigger['hosts']);
 
