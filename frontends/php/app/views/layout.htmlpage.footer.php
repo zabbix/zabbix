@@ -41,6 +41,11 @@ if ($data['fullscreen'] == 0) {
 	$table->show();
 }
 
+if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode']) && CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	CProfiler::getInstance()->show();
+}
+
 if (!isset($ZBX_PAGE_POST_JS)) {
 	global $ZBX_PAGE_POST_JS;
 }
