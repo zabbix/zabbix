@@ -486,14 +486,28 @@ function getMenuPopupRefresh(options) {
 				var obj = jQuery(this),
 					currentRate = obj.data('value');
 
-				sendAjaxData('zabbix.php?action=dashboard.widget', {
-					data: jQuery.extend({}, params, {
-						widget: options.widgetName,
-						refreshrate: currentRate
-					}),
-					dataType: 'script',
-					success: function(js) { js }
-				});
+
+				// it is a quick solution for slide refresh multiplier, should be replaced with slide.refresh or similar
+				if (options.multiplier) {
+					sendAjaxData('slides.php', {
+						data: jQuery.extend({}, params, {
+							widgetName: options.widgetName,
+							widgetRefreshRate: currentRate
+						}),
+						dataType: 'script',
+						success: function(js) { js }
+					});
+				}
+				else {
+					sendAjaxData('zabbix.php?action=dashboard.widget', {
+						data: jQuery.extend({}, params, {
+							widget: options.widgetName,
+							refreshrate: currentRate
+						}),
+						dataType: 'script',
+						success: function(js) { js }
+					});
+				}
 
 				jQuery('a', obj.closest('ul')).each(function() {
 					var a = jQuery(this),
