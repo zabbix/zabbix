@@ -31,7 +31,9 @@
 	</div>
 	
 	<div class="dashbrd-widget">
-		Favorite screeens
+		<div class="dashbrd-widget-head">
+		<h4>Favorite screeens</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		</div>
 		<table class="list-table">
 		<tbody>
 			<tr>
@@ -42,11 +44,13 @@
 			</tr>
 		</tbody>
 		</table>
-		<ul class="dashbrd-widget-footer"><li><a href="#">Screens</a></li><li><a href="#">Slide shows</a></li></ul>
+		<ul class="dashbrd-widget-foot"><li><a href="#">Screens</a></li><li><a href="#">Slide shows</a></li></ul>
 	</div>
 
 	<div class="dashbrd-widget">
-		Favorite graphs
+		<div class="dashbrd-widget-head">
+		<h4>Favorite graphs</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		</div>
 		<table class="list-table">
 		<tbody>
 			<tr>
@@ -54,11 +58,13 @@
 			</tr>
 		</tbody>
 		</table>
-		<ul style="text-align: right"><li style="display: inline"><a href="#">Graphs</a></li></ul>
+		<ul class="dashbrd-widget-foot"><li><a href="#">Graphs</a></li></ul>
 	</div>
 
 	<div class="dashbrd-widget">
-		Favorite maps
+		<div class="dashbrd-widget-head">
+		<h4>Favorite maps</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		</div>
 		<table class="list-table">
 		<tbody>
 			<tr>
@@ -69,11 +75,71 @@
 			</tr>
 		</tbody>
 		</table>
-		<ul class="dashbrd-widget-footer"><li><a href="#">Maps</a></li></ul>
+		<ul class="dashbrd-widget-foot"><li><a href="#">Maps</a></li></ul>
 	</div>
 
 	<div class="dashbrd-widget">
-		Web monitoring
+		<div class="dashbrd-widget-head">
+		<h4>Status of Zabbix</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<thead>
+		<tr>
+			<th>Parameter</th>
+			<th>Value</th>
+			<th>Details</th>
+		</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Zabbix server is running</td><td><span class="green">Yes</span></td><td>Localhost: 10051</td>
+			</tr>
+			<tr>
+				<td>Number of hosts (enabled/disabled/templates)</td><td>25</td><td><span class="green">2</span>/<span class="red">0</span>/<span class="grey">23</span></td>
+			</tr>
+			<tr>
+				<td>Number of items (enabled/disabled/not supported)</td><td>67</td><td><span class="green">62</span>/<span class="red">2</span>/<span class="grey">3</span></td>
+			</tr>
+			<tr>
+				<td>Number of triggers (enabled/disabled/[problem/ok])</td><td>40</td><td>40/0/[<span class="red">0</span>/<span class="green">40</span>]</td>
+			</tr>
+			<tr>
+				<td>Number of users (online)</td><td>2</td><td><span class="green">1</span>]</td>
+			</tr>
+			<tr>
+				<td>Required server performance, new values per second</td><td>0.86</td><td>&ndash;</td>
+			</tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li>Updated 17:51:21</li></ul>
+	</div>
+
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head">
+		<h4>Host status</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<thead>
+		<tr>
+			<th>Host group</th>
+			<th>Without problems</th>
+			<th>With problems</th>
+			<th>Total</th>
+		</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Zabbix servers</td><td>2</td><td>0</td><td>2</td>
+			</tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li>Updated 09:28:45</li></ul>
+	</div>
+
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head">
+		<h4>Web monitoring</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		</div>
 		<table class="list-table">
 		<tbody>
 			<tr>
@@ -81,11 +147,13 @@
 			</tr>
 		</tbody>
 		</table>
-		<ul class="dashbrd-widget-footer"><li>Updated 09:28:45</li></ul>
+		<ul class="dashbrd-widget-foot"><li>Updated 09:28:45</li></ul>
 	</div>
 
 	<div class="dashbrd-widget">
-		Last 20 issues
+		<div class="dashbrd-widget-head">
+		<h4>Last 20 issues</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		</div>
 		<table class="list-table">
 		<tbody>
 			<tr>
@@ -93,11 +161,13 @@
 			</tr>
 		</tbody>
 		</table>
-		<ul class="dashbrd-widget-footer"><li>Updated 09:28:45</li></ul>
+		<ul class="dashbrd-widget-foot"><li>Updated 09:28:45</li></ul>
 	</div>
 
 	<div class="dashbrd-widget">
-		System status
+		<div class="dashbrd-widget-head">
+		<h4>System status</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		</div>
 		<table class="list-table">
 		<thead>
 		<tr>
@@ -116,7 +186,7 @@
 			</tr>
 		</tbody>
 		</table>
-		<ul class="dashbrd-widget-footer"><li>Updated 11:17:48</li></ul>
+		<ul class="dashbrd-widget-foot"><li>Updated 11:17:48</li></ul>
 	</div>
 
 	</article>
