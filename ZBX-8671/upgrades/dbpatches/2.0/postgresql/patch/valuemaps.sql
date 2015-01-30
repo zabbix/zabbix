@@ -1,0 +1,1 @@
+ALTER TABLE ONLY valuemaps ALTER valuemapid DROP DEFAULT;
