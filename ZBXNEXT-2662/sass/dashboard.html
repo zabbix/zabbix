@@ -30,7 +30,7 @@
 	<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
 	</div>
 	
-	<div>
+	<div class="dashbrd-widget">
 		Favorite screeens
 		<table class="list-table">
 		<tbody>
@@ -42,10 +42,10 @@
 			</tr>
 		</tbody>
 		</table>
-		<a href="#">Screens</a> <a href="#">Slide shows</a>
+		<ul class="dashbrd-widget-footer"><li><a href="#">Screens</a></li><li><a href="#">Slide shows</a></li></ul>
 	</div>
 
-	<div>
+	<div class="dashbrd-widget">
 		Favorite graphs
 		<table class="list-table">
 		<tbody>
@@ -54,10 +54,10 @@
 			</tr>
 		</tbody>
 		</table>
-		<a href="#">Graphs</a>
+		<ul style="text-align: right"><li style="display: inline"><a href="#">Graphs</a></li></ul>
 	</div>
 
-	<div>
+	<div class="dashbrd-widget">
 		Favorite maps
 		<table class="list-table">
 		<tbody>
@@ -69,44 +69,10 @@
 			</tr>
 		</tbody>
 		</table>
-		<a href="#">Maps</a>
+		<ul class="dashbrd-widget-footer"><li><a href="#">Maps</a></li></ul>
 	</div>
 
-	<div>
-		Status of Zabbix
-		<table class="list-table">
-		<thead>
-			<tr>
-				<th>Parameter</th>
-				<th>Value</th>
-				<th>Details</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td>Zabbix server is running</td><td><span class="green">Yes</span></td><td>localhost: 10051</td>
-			</tr>
-			<tr>
-				<td>Number of hosts (enabled/disabled/templates)</td><td>25</td><td><span class="green">2</span>/<span class="red">0</span>/<span class="grey">23</span></td>
-			</tr>
-			<tr>
-				<td>Number of items (enabled/disabled/not supported)</td><td>67</td><td><span class="green">62</span>/<span class="red">2</span>/<span class="grey">3</span></td>
-			</tr>
-			<tr>
-				<td>Number of triggers (enabled/disabled [problem/ok])</td><td>40</td><td>40/0[<span class="red">0</span>/<span class="green">40</span>]</td>
-			</tr>
-			<tr>
-				<td>Number of users (online)</td><td>2</td><td><span class="green">1</span></td>
-			</tr>
-			<tr>
-				<td>Required server performance, new values per second</td><td>0.86</td><td>&ndash;</td>
-			</tr>
-		</tbody>
-		</table>
-		Updated 17:51:21
-	</div>
-
-	<div>
+	<div class="dashbrd-widget">
 		Web monitoring
 		<table class="list-table">
 		<tbody>
@@ -115,10 +81,10 @@
 			</tr>
 		</tbody>
 		</table>
-		Updated 09:28:45
+		<ul class="dashbrd-widget-footer"><li>Updated 09:28:45</li></ul>
 	</div>
 
-	<div>
+	<div class="dashbrd-widget">
 		Last 20 issues
 		<table class="list-table">
 		<tbody>
@@ -127,10 +93,10 @@
 			</tr>
 		</tbody>
 		</table>
-		Updated 09:28:45
+		<ul class="dashbrd-widget-footer"><li>Updated 09:28:45</li></ul>
 	</div>
 
-	<div>
+	<div class="dashbrd-widget">
 		System status
 		<table class="list-table">
 		<thead>
@@ -150,7 +116,7 @@
 			</tr>
 		</tbody>
 		</table>
-		Updated 11:17:48
+		<ul class="dashbrd-widget-footer"><li>Updated 11:17:48</li></ul>
 	</div>
 
 	</article>
