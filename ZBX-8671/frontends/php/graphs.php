@@ -418,7 +418,7 @@ elseif (isset($_REQUEST['form'])) {
 		'graphid' => getRequest('graphid', 0),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'group_gid' => getRequest('group_gid', array()),
-		'hostid' => getRequest('hostid', 0),
+		'hostid' => $hostId,
 		'normal_only' => getRequest('normal_only')
 	);
 
