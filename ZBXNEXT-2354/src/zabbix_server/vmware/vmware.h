@@ -37,9 +37,9 @@ typedef struct
 	/* the counter id */
 	zbx_uint64_t		counterid;
 
-	/* the counter values for various instances                      */
-	/*    pair->first  - instance (can be NULL for aggregate values) */
-	/*    pair->second - value                                       */
+	/* the counter values for various instances */
+	/*    pair->first  - instance               */
+	/*    pair->second - value                  */
 	zbx_vector_ptr_pair_t	values;
 }
 zbx_vmware_perf_counter_t;
