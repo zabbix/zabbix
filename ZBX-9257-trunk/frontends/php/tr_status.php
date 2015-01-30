@@ -609,8 +609,6 @@ foreach ($triggers as $trigger) {
 		$hostName = new CSpan($triggerHost['name'], 'link_menu');
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
 
-		$hostDiv = new CDiv($hostName);
-
 		// add maintenance icon with hint if host is in maintenance
 		if ($triggerHost['maintenance_status']) {
 			$maintenanceIcon = new CDiv(null, 'icon-maintenance-inline');
@@ -635,15 +633,15 @@ foreach ($triggers as $trigger) {
 				$maintenanceIcon->addClass('pointer');
 			}
 
-			$hostDiv->addItem($maintenanceIcon);
+			$hostName->addItem($maintenanceIcon);
 		}
+
+		$hostList[] = $hostName;
 
 		// add comma after hosts, except last
 		if (next($trigger['hosts'])) {
-			$hostDiv->addItem(','.SPACE);
+			$hostList[] = ', ';
 		}
-
-		$hostList[] = $hostDiv;
 	}
 
 	// host
