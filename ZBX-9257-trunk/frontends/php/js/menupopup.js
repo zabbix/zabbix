@@ -570,7 +570,7 @@ function getMenuPopupServiceConfiguration(options) {
  * Get menu popup trigger section data.
  *
  * @param string options['triggerid']				trigger id
- * @param array  options['items']					link to trigger item history page (optional)
+ * @param object options['items']					link to trigger item history page (optional)
  * @param string options['items'][]['name']			item name
  * @param object options['items'][]['params']		item url parameters ("name" => "value")
  * @param object options['acknowledge']				link to acknowledge page (optional)
@@ -637,7 +637,7 @@ function getMenuPopupTrigger(options) {
 	};
 
 	// items
-	if (typeof options.items !== 'undefined' && options.items.length > 0) {
+	if (typeof options.items !== 'undefined' && objectSize(options.items) > 0) {
 		var items = [];
 
 		jQuery.each(options.items, function(i, item) {
