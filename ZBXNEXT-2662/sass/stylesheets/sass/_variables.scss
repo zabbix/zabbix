@@ -72,6 +72,9 @@ $h2-line-height: 1.2em;
 
 $font-h3-size: 0.917em; // 11px
 
+$font-h4-size: 1.167em; //14px
+$h4-line-height: 1.2em;
+
 $font-top-nav-size: 1.167em; // 14px
 
 $font-form-size: 1em; // Default 1em/12px 
@@ -101,6 +104,11 @@ $font-transform: uppercase;
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	color: $font-alt-color;
+}
+
+@mixin font-h4 {
+	font-size: $font-h4-size;
+	line-height: $h4-line-height;
 }
 
 @mixin font-form {
