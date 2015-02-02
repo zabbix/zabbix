@@ -29,10 +29,12 @@
 	<h1>Dashboard</h1>
 	<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
 	</div>
-	
+	<div class="table">
+	<div class="row">
+	<div class="cell">
 	<div class="dashbrd-widget">
 		<div class="dashbrd-widget-head">
-		<h4>Favorite screeens</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		<h4>Favorite screeens</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Expand"></button></li></ul>
 		</div>
 		<table class="list-table">
 		<tbody>
@@ -46,10 +48,9 @@
 		</table>
 		<ul class="dashbrd-widget-foot"><li><a href="#">Screens</a></li><li><a href="#">Slide shows</a></li></ul>
 	</div>
-
 	<div class="dashbrd-widget">
 		<div class="dashbrd-widget-head">
-		<h4>Favorite graphs</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		<h4>Favorite graphs</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Expand"></button></li></ul>
 		</div>
 		<table class="list-table">
 		<tbody>
@@ -60,10 +61,9 @@
 		</table>
 		<ul class="dashbrd-widget-foot"><li><a href="#">Graphs</a></li></ul>
 	</div>
-
 	<div class="dashbrd-widget">
 		<div class="dashbrd-widget-head">
-		<h4>Favorite maps</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		<h4>Favorite maps</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Expand"></button></li></ul>
 		</div>
 		<table class="list-table">
 		<tbody>
@@ -77,10 +77,11 @@
 		</table>
 		<ul class="dashbrd-widget-foot"><li><a href="#">Maps</a></li></ul>
 	</div>
-
+	</div>
+	<div class="cell">
 	<div class="dashbrd-widget">
 		<div class="dashbrd-widget-head">
-		<h4>Status of Zabbix</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		<h4>Status of Zabbix</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Expand"></button></li></ul>
 		</div>
 		<table class="list-table">
 		<thead>
@@ -104,7 +105,7 @@
 				<td>Number of triggers (enabled/disabled/[problem/ok])</td><td>40</td><td>40/0/[<span class="red">0</span>/<span class="green">40</span>]</td>
 			</tr>
 			<tr>
-				<td>Number of users (online)</td><td>2</td><td><span class="green">1</span>]</td>
+				<td>Number of users (online)</td><td>2</td><td><span class="green">1</span></td>
 			</tr>
 			<tr>
 				<td>Required server performance, new values per second</td><td>0.86</td><td>&ndash;</td>
@@ -113,10 +114,9 @@
 		</table>
 		<ul class="dashbrd-widget-foot"><li>Updated 17:51:21</li></ul>
 	</div>
-
 	<div class="dashbrd-widget">
 		<div class="dashbrd-widget-head">
-		<h4>Host status</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		<h4>Host status</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Expand"></button></li></ul>
 		</div>
 		<table class="list-table">
 		<thead>
@@ -135,10 +135,9 @@
 		</table>
 		<ul class="dashbrd-widget-foot"><li>Updated 09:28:45</li></ul>
 	</div>
-
 	<div class="dashbrd-widget">
 		<div class="dashbrd-widget-head">
-		<h4>Web monitoring</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		<h4>Web monitoring</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Expand"></button></li></ul>
 		</div>
 		<table class="list-table">
 		<tbody>
@@ -149,10 +148,9 @@
 		</table>
 		<ul class="dashbrd-widget-foot"><li>Updated 09:28:45</li></ul>
 	</div>
-
 	<div class="dashbrd-widget">
 		<div class="dashbrd-widget-head">
-		<h4>Last 20 issues</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		<h4>Last 20 issues</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Expand"></button></li></ul>
 		</div>
 		<table class="list-table">
 		<tbody>
@@ -163,10 +161,11 @@
 		</table>
 		<ul class="dashbrd-widget-foot"><li>Updated 09:28:45</li></ul>
 	</div>
-
+	</div>
+	<div class="cell">
 	<div class="dashbrd-widget">
 		<div class="dashbrd-widget-head">
-		<h4>System status</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Configuration"></button></li></ul>
+		<h4>System status</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-wigdet-collapse" title="Collapse"></button></li><li><button type="button" class="btn-wigdet-expand" title="Expand"></button></li></ul>
 		</div>
 		<table class="list-table">
 		<thead>
@@ -188,6 +187,24 @@
 		</table>
 		<ul class="dashbrd-widget-foot"><li>Updated 11:17:48</li></ul>
 	</div>
+	</div>
+	</div>
+	</div>
+
+	<ul class="action-menu" style="top: 280px; left: 750px">
+	<li><h3>Favourite screens</h3></li>
+	<li><a href="#">Add</a></li>
+	<li><a href="#">Remove<span class="arrow-right"></span></a></li>
+	<li><a href="#">Remove all</a></li>
+	<li><h3>Favourite slide shows</h3></li>
+	<li><a href="#">Add</a></li>
+	<li>Remove</li>
+	<li>Remove all</li>
+	</ul>
+
+	<ul class="action-menu" style="top: 328px; left: 945px">
+	<li><a href="#">Zabbix server</a></li>
+	</ul>
 
 	</article>
 	<footer>

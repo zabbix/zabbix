@@ -119,7 +119,6 @@ $font-transform: uppercase;
 @mixin list-table-header {
 	font-size: $font-h3-size;   
 	text-transform: $font-transform;
-	font-weight: bold;
 }
 
 //CSS3
@@ -130,9 +129,9 @@ $font-transform: uppercase;
 }
 
 @mixin action-menu-shadow {
-	-webkit-box-shadow: 0 4px 20px 0 rgba(60,60,60,0.2);
-	-moz-box-shadow: 0 4px 20px 0 rgba(60,60,60,0.2);
-	box-shadow: 0 4px 20px 0 rgba(60,60,60,0.2);
+	-webkit-box-shadow: 0 4px 20px 0 rgba(60,60,60,0.3);
+	-moz-box-shadow: 0 4px 20px 0 rgba(60,60,60,0.3);
+	box-shadow: 0 4px 20px 0 rgba(60,60,60,0.3);
 }
 
 @mixin tab-menu-shadow {
