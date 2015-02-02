@@ -2934,8 +2934,6 @@ static void	vmware_service_process_perf_entity_data(zbx_vmware_service_t *servic
 		counter = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='id']"
 				"/*[local-name()='counterId']");
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "[WDN] %s(%s) %s[%s]=%s", type, id, counter, instance, value);
-
 		if (NULL != value && NULL != counter)
 		{
 			ZBX_STR2UINT64(counterid, counter);
