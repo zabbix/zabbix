@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -144,6 +144,7 @@ int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
 
 int	CONFIG_VMWARE_FORKS		= 0;
 int	CONFIG_VMWARE_FREQUENCY		= 60;
+int	CONFIG_VMWARE_PERF_FREQUENCY	= 60;
 
 zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
@@ -435,6 +436,8 @@ static void	zbx_load_config()
 		{"StartVMwareCollectors",	&CONFIG_VMWARE_FORKS,			TYPE_INT,
 			PARM_OPT,	0,			250},
 		{"VMwareFrequency",		&CONFIG_VMWARE_FREQUENCY,		TYPE_INT,
+			PARM_OPT,	10,			SEC_PER_DAY},
+		{"VMwarePerfFrequency",		&CONFIG_VMWARE_PERF_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	10,			SEC_PER_DAY},
 		{"VMwareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
