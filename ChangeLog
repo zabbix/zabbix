@@ -56,7 +56,6 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 .D........ [ZBX-5166] replaced '-' with '\-' in man-pages (Andris)
 ...G...PS. [ZBX-8391] added stronger command-line parameter validation, revised help and version messages, revised man-pages for Zabbix server, proxy, agent, sender and get utilities (Andris)
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
-...G...... [ZBX-9183] fixed eventlog message collecting in case of error formatting the log message; thanks to Kodai Terashima (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 2.4.4rc1
@@ -68,6 +67,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, K
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+...G...... [ZBX-9183] fixed eventlog message collecting in case of error formatting the log message; thanks to Kodai Terashima (dimir)
 A.F....... [ZBX-9224] fixed audit log for failed login attempts (Oleg)
 ...G...... [ZBX-9233] fixed processing of bogus negative value of performance couter (igors)
 .......PS. [ZBXNEXT-2354] fixed VMware virtual machine network and disk transmission rates being reported in kilobytes rather than bytes (wiper)
@@ -102,7 +102,6 @@ A......... [ZBX-8950] fixed "selecIconMap" option in map.get method (Oleg)
 ..F....... [ZBX-8405] fixed typo in item key helper for system.cpu.num item description (asaveljevs)
 ..F....... [ZBX-8846] fixed non-existent page displaying (Oleg)
 ........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
-...G...... [ZBX-9183] fixed eventlog message collecting in case of error formatting the log message; thanks to Kodai Terashima (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 2.4.3
@@ -616,6 +615,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9183] fixed eventlog message collecting in case of error formatting the log message; thanks to Kodai Terashima (dimir)
 ...G...... [ZBX-9233] fixed processing of bogus negative value of performance couter (igors)
 .......PS. [ZBXNEXT-2354] fixed VMware virtual machine network and disk transmission rates being reported in kilobytes rather than bytes (wiper)
 A.F....... [ZBX-8448] fixed host and template permissions validation when an object belongs to both read and read-write groups (Ivo)
@@ -641,7 +641,6 @@ A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when gi
 ..F....... [ZBX-8405] fixed typo in item key helper for system.cpu.num item description (asaveljevs)
 ..F....... [ZBX-8846] fixed non-existent page displaying (Oleg)
 ........S. [ZBX-9126] fixed processing of trigger/graph prototypes in case when all item prototypes in trigger/graph prototypes were changed (Sasha)
-...G...... [ZBX-9183] fixed eventlog message collecting in case of error formatting the log message; thanks to Kodai Terashima (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.8
