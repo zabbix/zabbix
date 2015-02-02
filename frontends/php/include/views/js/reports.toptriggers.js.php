@@ -10,26 +10,28 @@
 
 		switch (period) {
 			case <?php echo REPORT_PERIOD_TODAY; ?>:
+				var dateTill = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+
 				newPeriod = {
 					'fromYear': date.getFullYear(),
 					'fromMonth': date.getMonth() + 1,
 					'fromDay': date.getDate(),
-					'tillYear': date.getFullYear(),
-					'tillMonth': date.getMonth() + 1,
-					'tillDay': date.getDate() + 1
+					'tillYear': dateTill.getFullYear(),
+					'tillMonth': dateTill.getMonth() + 1,
+					'tillDay': dateTill.getDate()
 				}
 				break;
 
 			case <?php echo REPORT_PERIOD_YESTERDAY; ?>:
-				date.setTime(date.getTime() - <?php echo SEC_PER_DAY; ?> * 1000);
+				var dateFrom = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1);
 
 				newPeriod = {
-					'fromYear': date.getFullYear(),
-					'fromMonth': date.getMonth() + 1,
-					'fromDay': date.getDate(),
+					'fromYear': dateFrom.getFullYear(),
+					'fromMonth': dateFrom.getMonth() + 1,
+					'fromDay': dateFrom.getDate(),
 					'tillYear': date.getFullYear(),
 					'tillMonth': date.getMonth() + 1,
-					'tillDay': date.getDate() + 1
+					'tillDay': date.getDate()
 				}
 				break;
 
@@ -50,12 +52,14 @@
 				break;
 
 			case <?php echo REPORT_PERIOD_CURRENT_MONTH; ?>:
+				var dateTill = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+
 				newPeriod = {
 					'fromYear': date.getFullYear(),
 					'fromMonth': date.getMonth() + 1,
 					'fromDay': '1',
-					'tillYear': date.getFullYear(),
-					'tillMonth': date.getMonth() + 2,
+					'tillYear': dateTill.getFullYear(),
+					'tillMonth': dateTill.getMonth() + 1,
 					'tillDay': '1'
 				}
 				break;
@@ -88,22 +92,14 @@
 				break;
 
 			case <?php echo REPORT_PERIOD_LAST_MONTH; ?>:
-				if (date.getMonth() == 0) {
-					// 11 month is december
-					date = new Date(date.getFullYear() - 1, 11, 31);
-				}
-				else {
-					date = new Date(date.getFullYear(), date.getMonth() - 1,
-						daysInMonth(date.getFullYear(), date.getMonth() - 1)
-					);
-				}
+				var dateFrom = new Date(date.getFullYear(), date.getMonth() - 1, 1);
 
 				newPeriod = {
-					'fromYear': date.getFullYear(),
-					'fromMonth': date.getMonth() + 1,
+					'fromYear': dateFrom.getFullYear(),
+					'fromMonth': dateFrom.getMonth() + 1,
 					'fromDay': '1',
 					'tillYear': date.getFullYear(),
-					'tillMonth': date.getMonth() + 2,
+					'tillMonth': date.getMonth() + 1,
 					'tillDay': '1'
 				}
 				break;
@@ -120,13 +116,15 @@
 				break;
 
 			default:
+				var dateTill = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+
 				newPeriod = {
 					'fromYear': date.getFullYear(),
 					'fromMonth': date.getMonth() + 1,
 					'fromDay': date.getDate(),
-					'tillYear': date.getFullYear(),
-					'tillMonth': date.getMonth() + 1,
-					'tillDay': date.getDate() + 1
+					'tillYear': dateTill.getFullYear(),
+					'tillMonth': dateTill.getMonth() + 1,
+					'tillDay': dateTill.getDate()
 				}
 		}
 
