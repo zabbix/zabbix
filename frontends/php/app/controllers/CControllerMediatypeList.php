@@ -22,7 +22,7 @@ class CControllerMediatypeList extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'sort' =>		'fatal|in host',
+			'sort' =>		'fatal|in description,type',
 			'sortorder' =>	'fatal|in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'uncheck' =>	'fatal|in 1'
 		);
@@ -41,8 +41,6 @@ class CControllerMediatypeList extends CController {
 	}
 
 	protected function doAction() {
-		$data['uncheck'] = $this->hasInput('uncheck');
-
 		$sortField = $this->getInput('sort', CProfile::get('web.media_types.php.sort', 'description'));
 		$sortOrder = $this->getInput('sortorder', CProfile::get('web.media_types.php.sortorder', ZBX_SORT_UP));
 
@@ -51,58 +49,56 @@ class CControllerMediatypeList extends CController {
 
 		$config = select_config();
 
-		$data['sort'] = $sortField;
-		$data['sortorder'] = $sortOrder;
+		$data = array(
+			'uncheck' => $this->hasInput('uncheck'),
+			'sort' => $sortField,
+			'sortorder' => $sortOrder
+		);
 
 		// get media types
 		$data['mediatypes'] = API::Mediatype()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
+			'output' => array('mediatypeid', 'description', 'type', 'smtp_server', 'smtp_helo', 'smtp_email',
+				'exec_path', 'gsm_modem', 'username', 'status'
+			),
+			'limit' => $config['search_limit'] + 1,
 			'editable' => true,
-			'limit' => $config['search_limit'] + 1
+			'preservekeys' => true
 		));
 
 		if ($data['mediatypes']) {
 			// get media types used in actions
 			$actions = API::Action()->get(array(
-				'mediatypeids' => zbx_objectValues($data['mediatypes'], 'mediatypeid'),
 				'output' => array('actionid', 'name'),
 				'selectOperations' => array('operationtype', 'opmessage'),
-				'preservekeys' => true
+				'mediatypeids' => array_keys($data['mediatypes'])
 			));
 
-			foreach ($data['mediatypes'] as $key => $mediaType) {
-				$data['mediatypes'][$key]['typeid'] = $data['mediatypes'][$key]['type'];
-				$data['mediatypes'][$key]['type'] = media_type2str($data['mediatypes'][$key]['type']);
-				$data['mediatypes'][$key]['listOfActions'] = array();
+			foreach ($data['mediatypes'] as &$mediaType) {
+				$mediaType['typeid'] = $mediaType['type'];
+				$mediaType['type'] = media_type2str($mediaType['type']);
+				$mediaType['listOfActions'] = array();
 
-				if ($actions) {
-					foreach ($actions as $actionId => $action) {
-						foreach ($action['operations'] as $operation) {
-							if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
-									&& $operation['opmessage']['mediatypeid'] == $mediaType['mediatypeid']) {
+				foreach ($actions as $action) {
+					foreach ($action['operations'] as $operation) {
+						if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
+								&& $operation['opmessage']['mediatypeid'] == $mediaType['mediatypeid']) {
 
-								$data['mediatypes'][$key]['listOfActions'][$actionId] = array(
-									'actionid' => $actionId,
-									'name' => $action['name']
-								);
-							}
+							$mediaType['listOfActions'][$action['actionid']] = array(
+								'actionid' => $action['actionid'],
+								'name' => $action['name']
+							);
 						}
 					}
-
-					order_result($data['mediatypes'][$key]['listOfActions'], 'name');
 				}
+
+				order_result($mediaType['listOfActions'], 'name');
 			}
+			unset($mediaType);
 
 			order_result($data['mediatypes'], $sortField, $sortOrder);
-
-			$data['paging'] = getPagingLine($data['mediatypes']);
-		}
-		else {
-			$arr = array();
-			$data['paging'] = getPagingLine($arr);
 		}
 
+		$data['paging'] = getPagingLine($data['mediatypes']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));

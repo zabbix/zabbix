@@ -22,7 +22,7 @@ class CControllerMediatypeDelete extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'mediatypeids' =>	'fatal|array_db media_type.mediatypeid|required'
+			'mediatypeids' =>	'fatal|required|array_db media_type.mediatypeid'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -45,15 +45,19 @@ class CControllerMediatypeDelete extends CController {
 	}
 
 	protected function doAction() {
-		$result = API::Mediatype()->delete($this->getInput('mediatypeids'));
+		$mediatypeids = $this->getInput('mediatypeids');
+
+		$result = API::Mediatype()->delete($mediatypeids);
+
+		$deleted = count($mediatypeids);
 
 		$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.list&uncheck=1');
 
 		if ($result) {
-			$response->setMessageOk(_('Media type deleted'));
+			$response->setMessageOk(_n('Media type deleted', 'Media types deleted', $deleted));
 		}
 		else {
-			$response->setMessageError(_('Cannot delete media type'));
+			$response->setMessageError(_n('Cannot delete media type', 'Cannot delete media types', $deleted));
 		}
 		$this->setResponse($response);
 	}
