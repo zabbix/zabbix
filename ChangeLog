@@ -67,6 +67,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, K
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+A.F....... [ZBX-9224] fixed audit log for failed login attempts (Oleg)
 ...G...... [ZBX-9233] fixed processing of bogus negative value of performance couter (igors)
 .......PS. [ZBXNEXT-2354] fixed VMware virtual machine network and disk transmission rates being reported in kilobytes rather than bytes (wiper)
 ..F....... [ZBX-8930] fixed map import displaying incorrect message when map had non-existing sub elements (Oleg)
