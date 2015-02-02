@@ -31,7 +31,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'nodeid' =>			array(T_ZBX_INT, O_OPT,	null,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-	'new_nodeid' =>		array(T_ZBX_STR, O_OPT, null,	DB_ID.NOT_ZERO,	'isset({save})', _('ID')),
+	'new_nodeid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO,	'isset({save})', _('ID')),
 	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})'),
 	'ip' =>				array(T_ZBX_IP,	 O_OPT, null,	null,			'isset({save})'),
 	'nodetype' =>		array(T_ZBX_INT, O_OPT, null,	IN(ZBX_NODE_CHILD.','.ZBX_NODE_MASTER.','.ZBX_NODE_LOCAL),
