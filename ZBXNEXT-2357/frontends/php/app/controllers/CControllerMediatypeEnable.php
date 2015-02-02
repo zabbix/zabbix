@@ -22,7 +22,7 @@ class CControllerMediatypeEnable extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'mediatypeids' =>	'fatal|array_db media_type.mediatypeid|required'
+			'mediatypeids' =>	'fatal|required|array_db media_type.mediatypeid'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -35,22 +35,19 @@ class CControllerMediatypeEnable extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			return false;
-		}
-
 		$mediatypes = API::Mediatype()->get(array(
 			'mediatypeids' => $this->getInput('mediatypeids'),
-			'countOutput' => true
+			'countOutput' => true,
+			'editable' => true
 		));
 
 		return ($mediatypes == count($this->getInput('mediatypeids')));
 	}
 
 	protected function doAction() {
-		$mediatypeids = $this->getInput('mediatypeids');
+		$update = array();
 
-		foreach ($mediatypeids as $mediatypeid) {
+		foreach ($this->getInput('mediatypeids') as $mediatypeid) {
 			$update[] = array(
 				'mediatypeid' => $mediatypeid,
 				'status' => MEDIA_TYPE_STATUS_ACTIVE

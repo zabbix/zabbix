@@ -37,16 +37,11 @@ class CControllerProxyHostDisable extends CController {
 	protected function checkPermissions() {
 		$proxies = API::Proxy()->get(array(
 			'proxyids' => $this->getInput('proxyids'),
-			'selectHosts' => array(),
 			'countOutput' => true,
 			'editable' => true
 		));
 
-		if ($proxies != count($this->getInput('proxyids'))) {
-			return false;
-		}
-
-		return true;
+		return ($proxies == count($this->getInput('proxyids')));
 	}
 
 	protected function doAction() {

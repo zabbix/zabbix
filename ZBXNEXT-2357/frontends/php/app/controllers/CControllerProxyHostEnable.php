@@ -41,11 +41,7 @@ class CControllerProxyHostEnable extends CController {
 			'editable' => true
 		));
 
-		if ($proxies != count($this->getInput('proxyids'))) {
-			return false;
-		}
-
-		return true;
+		return ($proxies == count($this->getInput('proxyids')));
 	}
 
 	protected function doAction() {
