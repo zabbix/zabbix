@@ -735,10 +735,9 @@ else {
 			}
 
 			$triggers = API::Trigger()->get(array(
-				'triggerids' => zbx_objectValues($events, 'objectid'),
+				'output' => array('triggerid', 'description', 'expression', 'priority', 'flags', 'url'),
 				'selectHosts' => array('hostid', 'name', 'status'),
-				'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
-				'output' => array('description', 'expression', 'priority', 'flags', 'url')
+				'triggerids' => zbx_objectValues($events, 'objectid')
 			));
 			$triggers = zbx_toHash($triggers, 'triggerid');
 
@@ -772,29 +771,6 @@ else {
 				$host = reset($trigger['hosts']);
 				$host = $hosts[$host['hostid']];
 
-				$usedHosts = array();
-				foreach ($trigger['hosts'] as $triggerHost) {
-					$usedHosts[$triggerHost['hostid']] = $triggerHost['name'];
-				}
-				$usedHostCount = count($usedHosts);
-
-				$triggerItems = array();
-
-				$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
-
-				foreach ($trigger['items'] as $item) {
-					$triggerItems[] = array(
-						'name' => ($usedHostCount > 1)
-							? $usedHosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded']
-							: $item['name_expanded'],
-						'params' => array(
-							'itemid' => $item['itemid'],
-							'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-								? HISTORY_GRAPH : HISTORY_VALUES
-						)
-					);
-				}
-
 				$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
 					'clock' => $event['clock'],
 					'ns' => $event['ns']
@@ -823,7 +799,7 @@ else {
 				else {
 					$triggerDescription = new CSpan($description, 'pointer link_menu');
 					$triggerDescription->setMenuPopup(
-						CMenuPopupHelper::getTrigger($trigger, $triggerItems, null, $event['clock'])
+						CMenuPopupHelper::getTrigger($trigger, null, $event['clock'])
 					);
 
 					// acknowledge

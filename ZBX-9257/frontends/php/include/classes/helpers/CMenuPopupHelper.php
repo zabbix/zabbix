@@ -356,9 +356,6 @@ class CMenuPopupHelper {
 	 * @param array  $trigger['hosts']				hosts, used by trigger expression
 	 * @param string $trigger['hosts'][]['hostid']	host id
 	 * @param string $trigger['url']				url
-	 * @param array  $items							trigger items (optional)
-	 * @param string $items[]['name']				item name
-	 * @param array  $items[]['params']				item url parameters ("name" => "value")
 	 * @param array  $acknowledge					acknowledge link parameters (optional)
 	 * @param string $acknowledge['eventid']		event id
 	 * @param string $acknowledge['screenid']		screen id (optional)
@@ -367,29 +364,62 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getTrigger(array $trigger, array $items = null, array $acknowledge = null, $eventTime = null) {
-		if ($items) {
-			CArrayHelper::sort($items, array('name'));
+	public static function getTrigger(array $trigger, array $acknowledge = null, $eventTime = null) {
+		$hosts = array();
+		$triggerItems = array();
+
+		$items = API::Item()->get(array(
+			'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
+			'selectHosts' => array('name'),
+			'triggerids' => array($trigger['triggerid'])
+		));
+
+		$items = CMacrosResolverHelper::resolveItemNames($items);
+
+		foreach ($items as &$item) {
+			$item['hostname'] = $item['hosts'][0]['name'];
 		}
+		unset($item);
+
+		CArrayHelper::sort($items, array('name', 'hostname', 'itemid'));
+
+		foreach ($trigger['hosts'] as $triggerHost) {
+			$hosts[$triggerHost['hostid']] = $triggerHost['name'];
+		}
+
+		$hostCount = count($hosts);
+
+		foreach ($items as $item) {
+			$triggerItems[] = array(
+				'name' => ($hostCount > 1)
+					? $hosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded']
+					: $item['name_expanded'],
+				'params' => array(
+					'itemid' => $item['itemid'],
+					'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+						? HISTORY_GRAPH
+						: HISTORY_VALUES
+				)
+			);
+		}
+
+		$host = reset($trigger['hosts']);
 
 		$data = array(
 			'type' => 'trigger',
 			'triggerid' => $trigger['triggerid'],
-			'items' => $items,
+			'items' => $triggerItems,
 			'acknowledge' => $acknowledge,
 			'eventTime' => $eventTime,
 			'configuration' => null,
-			'url' => resolveTriggerUrl($trigger)
+			'url' => resolveTriggerUrl($trigger),
+			'showEvents' => ($host['status'] == HOST_STATUS_MONITORED)
 		);
-
-		$host = reset($trigger['hosts']);
 
 		if (in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))
 				&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 			$data['configuration'] = array('hostid' => $host['hostid']);
 		}
-
-		$data['showEvents'] = ($host['status'] == HOST_STATUS_MONITORED);
 
 		return $data;
 	}

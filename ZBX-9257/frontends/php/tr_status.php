@@ -387,7 +387,6 @@ $triggers = API::Trigger()->get(array(
 		'maintenance_status',
 		'maintenance_type'
 	),
-	'selectItems' => array('itemid', 'hostid', 'key_', 'name', 'value_type'),
 	'selectDependencies' => API_OUTPUT_EXTEND,
 	'selectLastEvent' => true,
 	'expandDescription' => true,
@@ -522,29 +521,8 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 }
 
 foreach ($triggers as $trigger) {
-	$usedHosts = array();
-	foreach ($trigger['hosts'] as $host) {
-		$usedHosts[$host['hostid']] = $host['name'];
-	}
-	$usedHostCount = count($usedHosts);
-
-	$triggerItems = array();
-
-	$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
-
-	foreach ($trigger['items'] as $item) {
-		$triggerItems[] = array(
-			'name' => ($usedHostCount > 1) ? $usedHosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded'] : $item['name_expanded'],
-			'params' => array(
-				'itemid' => $item['itemid'],
-				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-					? HISTORY_GRAPH : HISTORY_VALUES
-			)
-		);
-	}
-
 	$description = new CSpan($trigger['description'], 'link_menu');
-	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $triggerItems));
+	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	if ($showDetails) {
 		$description = array(
