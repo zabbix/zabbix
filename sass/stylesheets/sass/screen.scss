@@ -171,30 +171,11 @@ ul.top-nav-icons input {
 	color: $font-white-color;
 	padding-right: 24px;
 	@include transition(color, background-color .2s ease);
+	@include placeholder($form-input-top-placeholder);
 
-	&::-webkit-input-placeholder {
-		color: $form-input-top-placeholder;
-	}
-
-	&::-moz-placeholder {
-		color: $form-input-top-placeholder;
-	}
-	&:-ms-input-placeholder {
-		color: $form-input-top-placeholder;
-	}
-
-	&:focus {
-
-		&::-webkit-input-placeholder {
-		color: $form-input-top-focus-placeholder;
-	}
-
-	&::-moz-placeholder {
-		color: $form-input-top-focus-placeholder;
-	}
-	&:-ms-input-placeholder {
-		color: $form-input-top-focus-placeholder;
-	}
+	&:focus + .btn-search {
+		@include opacity(1);
+		@include placeholder($form-input-top-focus-placeholder);
 	}
 }
 
@@ -690,31 +671,66 @@ button {
 	vertical-align: middle;
 	cursor: pointer;
 	@include transition(border-color, background .2s ease);
-	@extend %button-hover-active;
+
+	&:hover {
+		@extend %button-hover;
+	}
+
+	&:active {
+		@extend %button-active;
+	}
 
 	&.btn-alt {
 		@extend button;
 		background: $form-transparent-color;
 		color: $primary-color;
-		@extend %button-hover-active;
+
+		&:hover {
+			@extend %button-hover;
+		}
+
+		&:active {
+			@extend %button-active;
+		}
 	}
 
 	&.btn-conf {
 		background: $primary-color url(../img/icon-sprite.png) no-repeat -1px -145px;
 		@extend %button-icon-size;
-		@extend %button-hover-active;
+		
+		&:hover {
+			@extend %button-hover;
+		}
+
+		&:active {
+			@extend %button-active;
+		}
 	}
 
 	&.btn-max {
 		background: $primary-color url(../img/icon-sprite.png) no-repeat -1px -169px;
 		@extend %button-icon-size;
-		@extend %button-hover-active;
+		
+		&:hover {
+			@extend %button-hover;
+		}
+
+		&:active {
+			@extend %button-active;
+		}
 	}
 
 	&.btn-min {
 		background: $primary-color url(../img/icon-sprite.png) no-repeat -1px -193px;
 		@extend %button-icon-size;
-		@extend %button-hover-active;
+		
+		&:hover {
+			@extend %button-hover;
+		}
+
+		&:active {
+			@extend %button-active;
+		}
 	}
 
 
@@ -729,10 +745,17 @@ button {
 		padding: 0;
 		@include opacity(0.75);
 		@include transition(all .2s ease);
-
+		
 		&:hover {
-			background-color: darken($primary-color, 10%);
-			@include opacity(1);
+			@extend %btn-search-hover-focus;
+		}
+
+		&:active {
+			@extend %btn-search-hover-focus;
+		}
+
+		&:focus {
+			@extend %btn-search-hover-focus;
 		}
 	}
 
@@ -744,13 +767,11 @@ button {
 		@include transition(all .2s ease);
 
 		&:hover {
-			background-color: $form-transparent-color;
-			@include opacity(1);
+			@extend %btn-wigdet-hover-active;
 		}
 
 		&:active {
-			background-color: $form-transparent-color;
-			@include opacity(1);
+			@extend %btn-wigdet-hover-active;
 		}
     }
 
@@ -761,13 +782,11 @@ button {
 		@include opacity(0.75);
 
 		&:hover {
-			background-color: $form-transparent-color;
-			@include opacity(1);
+			@extend %btn-wigdet-hover-active;
 		}
 
 		&:active {
-			background-color: $form-transparent-color;
-			@include opacity(1);
+			@extend %btn-wigdet-hover-active;
 		}
     }
 
@@ -778,13 +797,11 @@ button {
 		@include opacity(0.75);
 
 		&:hover {
-			background-color: $form-transparent-color;
-			@include opacity(1);
+			@extend %btn-wigdet-hover-active;
 		}
 
 		&:active {
-			background-color: $form-transparent-color;
-			@include opacity(1);
+			@extend %btn-wigdet-hover-active;
 		}
     } 
 
@@ -828,18 +845,16 @@ button {
 	}
 }
 
-%button-hover-active {
-	&:hover {
-		background-color: darken($primary-color, 5%);
-		border-color: darken($primary-color, 5%);
-		color: $font-white-color;
-	}
+%button-hover {
+	background-color: darken($primary-color, 5%);
+	border-color: darken($primary-color, 5%);
+	color: $font-white-color;
+}
 
-	&:active {
-		background-color: $secondary-color;
-		border-color: $secondary-color;
-		color: $font-white-color;
-	}
+%button-active {
+	background-color: $secondary-color;
+	border-color: $secondary-color;
+	color: $font-white-color;
 }
 
 %button-icon-size {
@@ -853,6 +868,16 @@ button {
 	color: $form-disabled-color;
 	border-color: $form-disabled-color;
 	cursor: default;
+}
+
+%btn-search-hover-focus {
+	background-color: darken($primary-color, 10%);
+	@include opacity(1);
+}
+
+%btn-wigdet-hover-active {
+	background-color: $form-transparent-color;
+	@include opacity(1);
 }
 
 button[disabled] {

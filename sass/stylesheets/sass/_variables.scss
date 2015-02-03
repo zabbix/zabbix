@@ -146,16 +146,16 @@ $font-transform: uppercase;
 	filter: alpha(opacity=$opacity-ie);
 }
 
-@mixin placeholder {
-	::-webkit-input-placeholder {
-	color: $font-white-color;
-}
+@mixin placeholder($placehldr-color) {
+	&::-webkit-input-placeholder {
+		color: $placehldr-color;
+	}
 
-::-moz-placeholder {
-	color: $font-white-color;
-}
+	&::-moz-placeholder {
+		color: $placehldr-color;
+	}
 
-:-ms-input-placeholder {
-	color: $font-white-color;
-}
+	&:-ms-input-placeholder {
+		color: $placehldr-color;
+	}
 }
