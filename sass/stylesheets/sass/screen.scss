@@ -157,15 +157,19 @@ ul.top-nav-icons {
 	}
 }
 
+ul.top-nav-icons form {
+	position: relative;
+}
+
 ul.top-nav-icons input {
-	background: darken($primary-color, 10%) url(../img/icon-sprite.png) no-repeat 0 -1px;
-	//border-color: darken($primary-color, 10%);
+	background: darken($primary-color, 10%);
 	border: none;
-	width: 167px;
+	width: 169px;
 	height: 24px;
 	line-height: 24px;
 	margin: 6px 13px 0 0;
-	padding-left: 24px;
+	color: $font-white-color;
+	padding-right: 24px;
 	@include transition(color, background-color .2s ease);
 
 	&::-webkit-input-placeholder {
@@ -180,8 +184,6 @@ ul.top-nav-icons input {
 	}
 
 	&:focus {
-		background: $body-bgcolor url(../img/icon-sprite.png) no-repeat 0 -123px;
-		//border-color: $body-bgcolor;
 
 		&::-webkit-input-placeholder {
 		color: $form-input-top-focus-placeholder;
@@ -672,11 +674,6 @@ select {
 	}
 }
 
-ul.top-nav form input {
-	background: $primary-color;
-	@include transition(all .2s ease);
-}
-
 button::-moz-focus-inner {
     border: 0;
     padding: 0;
@@ -718,6 +715,25 @@ button {
 		background: $primary-color url(../img/icon-sprite.png) no-repeat -1px -193px;
 		@extend %button-icon-size;
 		@extend %button-hover-active;
+	}
+
+
+	&.btn-search {
+		background: darken($primary-color, 10%) url(../img/icon-sprite.png) no-repeat 1px -1px;
+		position: absolute;
+		border: none;
+		top: 7px;
+		right: 14px;
+		width: 24px;
+		min-height: 22px;
+		padding: 0;
+		@include opacity(0.75);
+		@include transition(all .2s ease);
+
+		&:hover {
+			background-color: darken($primary-color, 10%);
+			@include opacity(1);
+		}
 	}
 
     &.btn-widget-action {
