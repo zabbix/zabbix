@@ -135,9 +135,15 @@ $font-transform: uppercase;
 }
 
 @mixin transition($arguments...) {
-  -webkit-transition: $arguments;
-  -moz-transition: $arguments;
-  transition: $arguments;
+	-webkit-transition: $arguments;
+	-moz-transition: $arguments;
+	transition: $arguments;
+}
+
+@mixin opacity($opacity) {
+	opacity: $opacity;
+	$opacity-ie: $opacity * 100;
+	filter: alpha(opacity=$opacity-ie);
 }
 
 @mixin placeholder {
