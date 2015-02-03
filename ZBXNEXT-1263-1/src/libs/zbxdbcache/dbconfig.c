@@ -253,12 +253,15 @@ typedef struct
 	unsigned char	ipmi_available;
 	unsigned char	jmx_available;
 	unsigned char	status;
+	/* 'tls_connect' and 'tls_accept' must be respected even if encryption support is not compiled in */
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*tls_issuer;
 	const char	*tls_subject;
 	const char	*tls_psk_identity;
 	const char	*tls_psk;
+#endif
 }
 ZBX_DC_HOST;
 
@@ -424,6 +427,7 @@ typedef struct
 	zbx_vector_ptr_t	*time_triggers;
 	zbx_hashset_t		hosts;
 	zbx_hashset_t		hosts_h;		/* host */
+	zbx_hashset_t		hosts_p;		/* for searching proxies by 'host' name */
 	zbx_hashset_t		proxies;
 	zbx_hashset_t		host_inventories;
 	zbx_hashset_t		ipmihosts;
@@ -809,6 +813,30 @@ static ZBX_DC_HOST	*DCfind_host(const char *host)
 		return host_h->host_ptr;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DCfind_proxy                                                     *
+ *                                                                            *
+ * Purpose: Find a record with proxy details in configuration cache using the *
+ *          proxy name                                                        *
+ *                                                                            *
+ * Parameters: host - [IN] proxy name                                         *
+ *                                                                            *
+ * Return value: pointer to record if found or NULL otherwise                 *
+ *                                                                            *
+ ******************************************************************************/
+static ZBX_DC_HOST	*DCfind_proxy(const char *host)
+{
+	ZBX_DC_HOST_H	*host_p, host_p_local;
+
+	host_p_local.host = host;
+
+	if (NULL != (host_p = zbx_hashset_search(&config->hosts_p, &host_p_local)))
+		return host_p->host_ptr;
+	else
+		return NULL;
+}
+
 static int	DCstrpool_replace(int found, const char **curr, const char *new)
 {
 	if (1 == found)
@@ -1004,10 +1032,10 @@ static void	DCsync_hosts(DB_RESULT result)
 	ZBX_DC_HOST		*host;
 	ZBX_DC_IPMIHOST		*ipmihost;
 	ZBX_DC_PROXY		*proxy;
-	ZBX_DC_HOST_H		*host_h, host_h_local;
+	ZBX_DC_HOST_H		*host_h, host_h_local, *host_p, host_p_local;
 
 	int			found;
-	int			update_index;
+	int			update_index, update_index_p;
 	zbx_uint64_t		hostid, proxy_hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
@@ -1034,9 +1062,10 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		host = DCfind_id(&config->hosts, hostid, sizeof(ZBX_DC_HOST), &found);
 
-		/* see whether we should and can update hosts_h index at this point */
+		/* see whether we should and can update 'hosts_h' and 'hosts_p' indexes at this point */
 
 		update_index = 0;
+		update_index_p = 0;
 
 		if ((HOST_STATUS_MONITORED == status || HOST_STATUS_NOT_MONITORED == status) &&
 				(0 == found || 0 != strcmp(host->host, row[2])))
@@ -1061,16 +1090,41 @@ static void	DCsync_hosts(DB_RESULT result)
 			else
 				update_index = 1;
 		}
+		else if ((HOST_STATUS_PROXY_ACTIVE == status || HOST_STATUS_PROXY_PASSIVE == status) &&
+				(0 == found || 0 != strcmp(host->host, row[2])))
+		{
+			if (1 == found)
+			{
+				host_p_local.host = host->host;
+				host_p = zbx_hashset_search(&config->hosts_p, &host_p_local);
+
+				if (NULL != host_p && host == host_p->host_ptr)
+				{
+					zbx_strpool_release(host_p->host);
+					zbx_hashset_remove(&config->hosts_p, &host_p_local);
+				}
+			}
+
+			host_p_local.host = row[2];
+			host_p = zbx_hashset_search(&config->hosts_p, &host_p_local);
+
+			if (NULL != host_p)
+				host_p->host_ptr = host;
+			else
+				update_index_p = 1;
+		}
 
 		/* store new information in host structure */
 
 		host->proxy_hostid = proxy_hostid;
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		DCstrpool_replace(found, &host->tls_issuer, row[26]);
 		DCstrpool_replace(found, &host->tls_subject, row[27]);
 		DCstrpool_replace(found, &host->tls_psk_identity, row[28]);
 		DCstrpool_replace(found, &host->tls_psk, row[29]);
+#endif
 		host->tls_connect = (unsigned char)atoi(row[24]);
 		host->tls_accept = (unsigned char)atoi(row[25]);
 
@@ -1100,13 +1154,20 @@ static void	DCsync_hosts(DB_RESULT result)
 				host->data_expected_from = now;
 		}
 
-		/* update hosts_h index using new data, if not done already */
+		/* update 'hosts_h' and 'hosts_p' indexes using new data, if not done already */
 
 		if (1 == update_index)
 		{
 			host_h_local.host = zbx_strpool_acquire(host->host);
 			host_h_local.host_ptr = host;
 			zbx_hashset_insert(&config->hosts_h, &host_h_local, sizeof(ZBX_DC_HOST_H));
+		}
+
+		if (1 == update_index_p)
+		{
+			host_p_local.host = zbx_strpool_acquire(host->host);
+			host_p_local.host_ptr = host;
+			zbx_hashset_insert(&config->hosts_p, &host_p_local, sizeof(ZBX_DC_HOST_H));
 		}
 
 		/* IPMI hosts */
@@ -1223,14 +1284,26 @@ static void	DCsync_hosts(DB_RESULT result)
 				zbx_hashset_remove(&config->hosts_h, &host_h_local);
 			}
 		}
+		else if (HOST_STATUS_PROXY_ACTIVE == host->status || HOST_STATUS_PROXY_PASSIVE == host->status)
+		{
+			host_p_local.host = host->host;
+			host_p = zbx_hashset_search(&config->hosts_p, &host_p_local);
+
+			if (NULL != host_p && host == host_p->host_ptr)
+			{
+				zbx_strpool_release(host_p->host);
+				zbx_hashset_remove(&config->hosts_p, &host_p_local);
+			}
+		}
 
 		zbx_strpool_release(host->host);
 		zbx_strpool_release(host->name);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_strpool_release(host->tls_issuer);
 		zbx_strpool_release(host->tls_subject);
 		zbx_strpool_release(host->tls_psk_identity);
 		zbx_strpool_release(host->tls_psk);
-
+#endif
 		zbx_hashset_iter_remove(&iter);
 	}
 
@@ -2917,19 +2990,39 @@ void	DCsync_configuration(void)
 	csec = zbx_time() - sec;
 
 	sec = zbx_time();
-	if (NULL == (host_result = DBselect(
+	/* DBselect is a macro and embedding a directive within macro arguments is not portable. Therefore a */
+	/* repeated SQL query. */
+	if (NULL == (host_result =
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			DBselect(
 			"select hostid,proxy_hostid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
 				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
 				"errors_from,available,disable_until,snmp_errors_from,"
 				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
 				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
-				"status,name,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk"
+				"status,name,tls_connect,tls_accept"
+				",tls_issuer,tls_subject,tls_psk_identity,tls_psk"
 			" from hosts"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
+#else
+			DBselect(
+			"select hostid,proxy_hostid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
+				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
+				"errors_from,available,disable_until,snmp_errors_from,"
+				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
+				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
+				"status,name,tls_connect,tls_accept"
+			" from hosts"
+			" where status in (%d,%d,%d,%d)"
+				" and flags<>%d",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
+#endif
 	{
 		goto out;
 	}
@@ -3143,6 +3236,8 @@ void	DCsync_configuration(void)
 			config->hosts.num_data, config->hosts.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_h    : %d (%d slots)", __function_name,
 			config->hosts_h.num_data, config->hosts_h.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_p    : %d (%d slots)", __function_name,
+			config->hosts_p.num_data, config->hosts_p.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmihosts  : %d (%d slots)", __function_name,
 			config->ipmihosts.num_data, config->ipmihosts.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: %d (%d slots)", __function_name,
@@ -3587,6 +3682,7 @@ void	init_configuration_cache(void)
 
 	CREATE_HASHSET_EXT(config->items_hk, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, __config_host_h_hash, __config_host_h_compare);
+	CREATE_HASHSET_EXT(config->hosts_p, __config_host_h_hash, __config_host_h_compare);
 	CREATE_HASHSET_EXT(config->gmacros_m, __config_gmacro_m_hash, __config_gmacro_m_compare);
 	CREATE_HASHSET_EXT(config->hmacros_hm, __config_hmacro_hm_hash, __config_hmacro_hm_compare);
 	CREATE_HASHSET_EXT(config->interfaces_ht, __config_interface_ht_hash, __config_interface_ht_compare);
@@ -3773,11 +3869,12 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	dst_host->status = src_host->status;
 	dst_host->tls_connect = src_host->tls_connect;
 	dst_host->tls_accept = src_host->tls_accept;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	strscpy(dst_host->tls_issuer, src_host->tls_issuer);
 	strscpy(dst_host->tls_subject, src_host->tls_subject);
 	strscpy(dst_host->tls_psk_identity, src_host->tls_psk_identity);
 	strscpy(dst_host->tls_psk, src_host->tls_psk);
-
+#endif
 	if (NULL != (ipmihost = zbx_hashset_search(&config->ipmihosts, &src_host->hostid)))
 	{
 		dst_host->ipmi_authtype = ipmihost->ipmi_authtype;
@@ -5794,6 +5891,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 		strscpy(dst_proxy->host, host->host);
 		dst_proxy->tls_connect = host->tls_connect;
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		if (ZBX_TCP_SEC_TLS_CERT == host->tls_connect)
 		{
 			strscpy(dst_proxy->tls_arg1, host->tls_issuer);
@@ -5805,6 +5903,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 			strscpy(dst_proxy->tls_arg2, host->tls_psk);
 		}
 		else	/* ZBX_TCP_SEC_UNENCRYPTED */
+#endif
 		{
 			*dst_proxy->tls_arg1 = '\0';
 			*dst_proxy->tls_arg2 = '\0';
@@ -5816,8 +5915,10 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 		/* process_proxy(). So, this branch should never happen. */
 		*dst_proxy->host = '\0';
 		dst_proxy->tls_connect = ZBX_TCP_SEC_TLS_PSK;	/* set PSK to deliberately fail in this case */
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		*dst_proxy->tls_arg1 = '\0';
 		*dst_proxy->tls_arg2 = '\0';
+#endif
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 
