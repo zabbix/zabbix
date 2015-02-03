@@ -122,52 +122,22 @@ $font-transform: uppercase;
 }
 
 //CSS3
-@mixin list-table-shadow {
-	-webkit-box-shadow: 0 1px 1px 0 rgba(60,60,60,0.1);
-    -moz-box-shadow: 0 1px 1px 0 rgba(60,60,60,0.1);
-    box-shadow: 0 1px 1px 0 rgba(60,60,60,0.1);
+@mixin box-shadow($shadow) {
+	-webkit-box-shadow: $shadow;
+    -moz-box-shadow: $shadow;
+    box-shadow: $shadow;
 }
 
-@mixin action-menu-shadow {
-	-webkit-box-shadow: 0 4px 20px 0 rgba(60,60,60,0.3);
-	-moz-box-shadow: 0 4px 20px 0 rgba(60,60,60,0.3);
-	box-shadow: 0 4px 20px 0 rgba(60,60,60,0.3);
+@mixin border-radius($radius) {
+	-webkit-border-radius: $radius;
+	-moz-border-radius: $radius;
+	border-radius: $radius;
 }
 
-@mixin tab-menu-shadow {
-	-webkit-box-shadow: inset 0 -1px 1px 0 rgba(60,60,60,0.05);
-	-moz-box-shadow: inset 0 -1px 1px 0 rgba(60,60,60,0.05);
-	box-shadow: inset 0 -1px 1px 0 rgba(60,60,60,0.05);
-}
-
-@mixin border-radius {
-	-webkit-border-radius: 2px;
-	-moz-border-radius: 2px;
-	border-radius: 2px;
-}
-
-@mixin border-top-radius {
-	-webkit-border-radius: 2px 2px 0 0;
-	-moz-border-radius: 2px 2px 0 0;
-	border-radius: 2px 2px 0 0;
-}
-
-@mixin border-left-radius {
-	-webkit-border-radius: 2px 0 0 2px;
-	-moz-border-radius: 2px 0 0 2px;
-	border-radius: 2px 0 0 2px;
-}
-
-@mixin border-right-radius {
-	-webkit-border-radius: 0 2px 2px 0;
-	-moz-border-radius: 0 2px 2px 0;
-	border-radius: 0 2px 2px 0;
-}
-
-@mixin transition {
-	-webkit-transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-	-moz-transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-	transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+@mixin transition($arguments...) {
+  -webkit-transition: $arguments;
+  -moz-transition: $arguments;
+  transition: $arguments;
 }
 
 @mixin placeholder {
