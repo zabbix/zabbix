@@ -9,19 +9,6 @@
 			newPeriod = [];
 
 		switch (period) {
-			case <?php echo REPORT_PERIOD_TODAY; ?>:
-				var dateTill = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
-
-				newPeriod = {
-					'fromYear': date.getFullYear(),
-					'fromMonth': date.getMonth() + 1,
-					'fromDay': date.getDate(),
-					'tillYear': dateTill.getFullYear(),
-					'tillMonth': dateTill.getMonth() + 1,
-					'tillDay': dateTill.getDate()
-				}
-				break;
-
 			case <?php echo REPORT_PERIOD_YESTERDAY; ?>:
 				var dateFrom = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1);
 
@@ -36,10 +23,9 @@
 				break;
 
 			case <?php echo REPORT_PERIOD_CURRENT_WEEK; ?>:
-				var weekBegin = date.getTime() - (date.getDay() - 1) * <?php echo SEC_PER_DAY; ?> * 1000,
-					weekEnd = weekBegin + <?php echo SEC_PER_DAY; ?> * 1000 * 7,
-					dateFrom = new Date(date.setTime(weekBegin)),
-					dateTill = new Date(date.setTime(weekEnd));
+				var dayOfWeek = (date.getDay() == 0) ? 7 : date.getDay(),
+					dateFrom = new Date(date.getFullYear(), date.getMonth(), date.getDate() - dayOfWeek + 1),
+					dateTill = new Date(dateFrom.getFullYear(), dateFrom.getMonth(), dateFrom.getDate() + 7);
 
 				newPeriod = {
 					'fromYear': dateFrom.getFullYear(),
@@ -52,7 +38,7 @@
 				break;
 
 			case <?php echo REPORT_PERIOD_CURRENT_MONTH; ?>:
-				var dateTill = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+				var dateTill = new Date(date.getFullYear(), date.getMonth() + 1);
 
 				newPeriod = {
 					'fromYear': date.getFullYear(),
@@ -76,10 +62,9 @@
 				break;
 
 			case <?php echo REPORT_PERIOD_LAST_WEEK; ?>:
-				var lastWeekBegin = date.getTime() + ( - date.getDay() - 6) * <?php echo SEC_PER_DAY; ?> * 1000,
-					lastWeekEnd = lastWeekBegin + <?php echo SEC_PER_DAY; ?> * 1000 * 7,
-					dateFrom = new Date(date.setTime(lastWeekBegin)),
-					dateTill = new Date(date.setTime(lastWeekEnd));
+				var dayOfWeek = (date.getDay() == 0) ? 7 : date.getDay(),
+					dateFrom = new Date(date.getFullYear(), date.getMonth(), date.getDate() - dayOfWeek - 6),
+					dateTill = new Date(dateFrom.getFullYear(), dateFrom.getMonth(), dateFrom.getDate() + 7);
 
 				newPeriod = {
 					'fromYear': dateFrom.getFullYear(),
@@ -92,7 +77,7 @@
 				break;
 
 			case <?php echo REPORT_PERIOD_LAST_MONTH; ?>:
-				var dateFrom = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+				var dateFrom = new Date(date.getFullYear(), date.getMonth() - 1);
 
 				newPeriod = {
 					'fromYear': dateFrom.getFullYear(),
@@ -115,6 +100,7 @@
 				}
 				break;
 
+			case <?php echo REPORT_PERIOD_TODAY; ?>:
 			default:
 				var dateTill = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
 
