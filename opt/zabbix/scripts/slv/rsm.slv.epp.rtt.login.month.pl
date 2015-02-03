@@ -33,13 +33,13 @@ init_values();
 
 foreach (@$tlds_ref)
 {
-    $tld = $_;
+	$tld = $_;
 
-    my $lastclock = get_lastclock($tld, $cfg_key_out);
-    next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
+	my $lastclock = get_lastclock($tld, $cfg_key_out);
+	next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
-    process_slv_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, $probe_avail_limit,
-			\&check_item_value, MIN_LOGIN_ERROR, MAX_LOGIN_ERROR);
+	process_slv_monthly($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_delay, $probe_avail_limit,
+		\&check_item_value, MIN_LOGIN_ERROR, MAX_LOGIN_ERROR);
 }
 
 # unset TLD (for the logs)
@@ -51,7 +51,7 @@ slv_exit(SUCCESS);
 
 sub check_item_value
 {
-    my $value = shift;
+	my $value = shift;
 
-    return (is_service_error($value) == SUCCESS or $value > $cfg_max_value) ? FAIL : SUCCESS;
+	return (is_service_error($value) == SUCCESS or $value > $cfg_max_value) ? FAIL : SUCCESS;
 }

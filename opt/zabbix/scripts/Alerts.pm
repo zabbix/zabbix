@@ -13,13 +13,13 @@ use constant ALERTS_KEY => "new-alerts";
 
 sub add_alert
 {
-    my $value = shift;
+	my $value = shift;
 
-    $redis = Redis->new unless ($redis);
+	$redis = Redis->new unless ($redis);
 
-    die("Cannot connect to Redis server: $!\n") unless ($redis);
+	die("Cannot connect to Redis server: $!\n") unless ($redis);
 
-    $redis->lpush(ALERTS_KEY, $value);
+	$redis->lpush(ALERTS_KEY, $value);
 }
 
 1;

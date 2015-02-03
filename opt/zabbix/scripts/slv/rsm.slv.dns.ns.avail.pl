@@ -91,7 +91,7 @@ slv_exit(SUCCESS);
 
 sub check_item_value
 {
-    my $value = shift;
+	my $value = shift;
 
-    return (is_service_error($value) == SUCCESS or $value > $cfg_max_value) ? FAIL : SUCCESS;
+	return (is_service_error($value) == SUCCESS or $value > $cfg_max_value) ? FAIL : SUCCESS;
 }

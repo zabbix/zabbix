@@ -2,7 +2,7 @@
 #
 # DNSSEC rolling week
 
-use lib '/opt/zabbix/scripts';
+	use lib '/opt/zabbix/scripts';
 
 use strict;
 use warnings;
@@ -29,15 +29,15 @@ init_values();
 
 foreach (@$tlds_ref)
 {
-    $tld = $_;
+	$tld = $_;
 
-    my ($itemid_in, $itemid_out, $lastclock) = get_item_data($tld, $cfg_key_in, $cfg_key_out);
-    next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
+	my ($itemid_in, $itemid_out, $lastclock) = get_item_data($tld, $cfg_key_in, $cfg_key_out);
+	next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
-    my $downtime = get_downtime($itemid_in, $from, $till);
-    my $perc = sprintf("%.3f", $downtime * 100 / $cfg_sla);
+	my $downtime = get_downtime($itemid_in, $from, $till);
+	my $perc = sprintf("%.3f", $downtime * 100 / $cfg_sla);
 
-    push_value($tld, $cfg_key_out, $value_ts, $perc, "result: $perc% (down: $downtime minutes, sla: $cfg_sla, ", ts_str($value_ts), ")");
+	push_value($tld, $cfg_key_out, $value_ts, $perc, "result: $perc% (down: $downtime minutes, sla: $cfg_sla, ", ts_str($value_ts), ")");
 }
 
 # unset TLD (for the logs)

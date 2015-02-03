@@ -13,8 +13,8 @@ $OPTS{'test'} = 1;
 
 if (defined($OPTS{'debug'}))
 {
-    dbg("command-line parameters:");
-    dbg("$_ => ", $OPTS{$_}) foreach (keys(%OPTS));
+	dbg("command-line parameters:");
+	dbg("$_ => ", $OPTS{$_}) foreach (keys(%OPTS));
 }
 
 set_slv_config(get_rsm_config());
@@ -28,53 +28,53 @@ my $tlds_ref = defined($OPTS{'tld'}) ? [ $OPTS{'tld'} ] : get_tlds();
 
 foreach (@$tlds_ref)
 {
-    $tld = $_;
+	$tld = $_;
 
-    foreach my $service ('dns', 'rdds', 'epp')
-    {
-	next unless (SUCCESS == tld_service_enabled($tld, $service));
-
-	my $key = "rsm.slv.$service.avail";
-
-	my $itemid = get_itemid_by_host($tld, $key);
-	my $incidents = get_incidents($itemid, $from, $till);
-
-	foreach (@$incidents)
+	foreach my $service ('dns', 'rdds', 'epp')
 	{
-	    my $eventid = $_->{'eventid'};
-	    my $start = $_->{'start'};
-	    my $end = $_->{'end'};
-	    my $false_positive = $_->{'false_positive'};
+		next unless (SUCCESS == tld_service_enabled($tld, $service));
 
-	    my $time_condition = defined($end) ? "clock between $start and $end" : "clock>=$start";
+		my $key = "rsm.slv.$service.avail";
 
-	    my $rows_ref = db_select(
-		"select count(*)".
-		" from history_uint".
-		" where itemid=$itemid".
-	    		" and value=".DOWN.
-	    		" and ".sql_time_condition($start, $end));
+		my $itemid = get_itemid_by_host($tld, $key);
+		my $incidents = get_incidents($itemid, $from, $till);
 
-	    my $failed_tests = $rows_ref->[0]->[0];
+		foreach (@$incidents)
+		{
+			my $eventid = $_->{'eventid'};
+			my $start = $_->{'start'};
+			my $end = $_->{'end'};
+			my $false_positive = $_->{'false_positive'};
 
-	    my $status;
-	    if ($false_positive != 0)
-	    {
-		$status = 'FALSE POSITIVE';
-	    }
-	    elsif (not defined($end))
-	    {
-		$status = 'ACTIVE';
-	    }
-	    else
-	    {
-		$status = 'RESOLVED';
-	    }
+			my $time_condition = defined($end) ? "clock between $start and $end" : "clock>=$start";
 
-	    # "IncidentID,TLD,Status,StartTime,EndTime,FailedTestsWithinIncident"
-	    print("$eventid,$tld,$service,$status,$start,", (defined($end) ? $end : ""), ",$failed_tests\n");
+			my $rows_ref = db_select(
+				"select count(*)".
+				" from history_uint".
+				" where itemid=$itemid".
+					" and value=".DOWN.
+					" and ".sql_time_condition($start, $end));
+
+			my $failed_tests = $rows_ref->[0]->[0];
+
+			my $status;
+			if ($false_positive != 0)
+			{
+				$status = 'FALSE POSITIVE';
+			}
+			elsif (not defined($end))
+			{
+				$status = 'ACTIVE';
+			}
+			else
+			{
+				$status = 'RESOLVED';
+			}
+
+			# "IncidentID,TLD,Status,StartTime,EndTime,FailedTestsWithinIncident"
+			print("$eventid,$tld,$service,$status,$start,", (defined($end) ? $end : ""), ",$failed_tests\n");
+		}
 	}
-    }
 }
 
 # unset TLD (for the logs)
@@ -88,7 +88,7 @@ __END__
 
 get-incidents.pl - display incidents as a comma-separated list of details:
 
-	IncidentID,TLD,Status,StartTime,EndTime,FailedTestsWithinIncident
+IncidentID,TLD,Status,StartTime,EndTime,FailedTestsWithinIncident
 
 =head1 SYNOPSIS
 

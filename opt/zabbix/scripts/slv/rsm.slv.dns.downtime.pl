@@ -33,10 +33,10 @@ my $tlds_ref = get_tlds();
 # just collect itemids
 foreach (@$tlds_ref)
 {
-    $tld = $_; # set global variable here
+	$tld = $_; # set global variable here
 
-    # for future calculation of downtime
-    $tld_items{$tld} = get_itemid_by_host($tld, $cfg_key_in);
+	# for future calculation of downtime
+	$tld_items{$tld} = get_itemid_by_host($tld, $cfg_key_in);
 }
 
 init_values();
@@ -46,14 +46,14 @@ my $sth = get_downtime_prepare();
 
 foreach (keys(%tld_items))
 {
-    $tld = $_; # set global variable here
+	$tld = $_; # set global variable here
 
-    my $itemid = $tld_items{$tld};
+	my $itemid = $tld_items{$tld};
 
-    my $downtime = get_downtime_execute($sth, $itemid, $curmon_from, $curmon_till, 1); # ignore incidents
+	my $downtime = get_downtime_execute($sth, $itemid, $curmon_from, $curmon_till, 1); # ignore incidents
 
-    push_value($tld, $cfg_key_out, $value_ts, $downtime, "$downtime minutes of downtime from ",
-	       ts_str($curmon_from), " ($curmon_from) till ", ts_str($curmon_till), " ($curmon_till)");
+	push_value($tld, $cfg_key_out, $value_ts, $downtime, "$downtime minutes of downtime from ",
+		ts_str($curmon_from), " ($curmon_from) till ", ts_str($curmon_till), " ($curmon_till)");
 }
 
 # unset TLD (for the logs)

@@ -35,13 +35,13 @@ init_values();
 
 foreach (@$tlds_ref)
 {
-    $tld = $_; # set global variable here
+	$tld = $_; # set global variable here
 
-    my $lastclock = get_lastclock($tld, $cfg_key_out);
-    next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
+	my $lastclock = get_lastclock($tld, $cfg_key_out);
+	next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
-    process_slv_avail($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_minonline,
-		      $probe_avail_limit, $probes_ref, \&check_item_values);
+	process_slv_avail($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_minonline,
+		$probe_avail_limit, $probes_ref, \&check_item_values);
 }
 
 # unset TLD (for the logs)
@@ -55,14 +55,14 @@ slv_exit(SUCCESS);
 # FAIL - all values unsuccessful
 sub check_item_values
 {
-    my $values_ref = shift;
+	my $values_ref = shift;
 
-    return SUCCESS if (scalar(@$values_ref) == 0);
+	return SUCCESS if (scalar(@$values_ref) == 0);
 
-    foreach (@$values_ref)
-    {
-	return SUCCESS if ($_ >= $cfg_minns);
-    }
+	foreach (@$values_ref)
+	{
+		return SUCCESS if ($_ >= $cfg_minns);
+	}
 
-    return FAIL;
+	return FAIL;
 }

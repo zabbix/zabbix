@@ -35,59 +35,59 @@ init_values();
 
 foreach (@$tlds_ref)
 {
-    $tld = $_;
+	$tld = $_;
 
-    my $lastclock = get_lastclock($tld, $cfg_key_out);
-    next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
+	my $lastclock = get_lastclock($tld, $cfg_key_out);
+	next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
-    if ($online_probes < $cfg_minonline)
-    {
-	push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes online, $online_probes while $cfg_minonline required)");
-	next;
-    }
+	if ($online_probes < $cfg_minonline)
+	{
+		push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes online, $online_probes while $cfg_minonline required)");
+		next;
+	}
 
-    my $hostids_ref = probes2tldhostids($tld, $probes_ref);
-    if (scalar(@$hostids_ref) == 0)
-    {
-	wrn("no probe hosts found");
-	next;
-    }
+	my $hostids_ref = probes2tldhostids($tld, $probes_ref);
+	if (scalar(@$hostids_ref) == 0)
+	{
+		wrn("no probe hosts found");
+		next;
+	}
 
-    my $items_ref = get_items_by_hostids($hostids_ref, $cfg_key_in, 0); # incomplete key
-    if (scalar(@$items_ref) == 0)
-    {
-        wrn("no items ($cfg_key_in) found");
-        next;
-    }
+	my $items_ref = get_items_by_hostids($hostids_ref, $cfg_key_in, 0); # incomplete key
+	if (scalar(@$items_ref) == 0)
+	{
+		wrn("no items ($cfg_key_in) found");
+		next;
+	}
 
-    my $values_ref = get_values_by_items($items_ref);
-    if (scalar(@$values_ref) == 0)
-    {
-	wrn("no item values ($cfg_key_in) found");
-	next;
-    }
+	my $values_ref = get_values_by_items($items_ref);
+	if (scalar(@$values_ref) == 0)
+	{
+		wrn("no item values ($cfg_key_in) found");
+		next;
+	}
 
-    info("  itemid:", $_->[0], " value:", $_->[1]) foreach (@$values_ref);
+	info("  itemid:", $_->[0], " value:", $_->[1]) foreach (@$values_ref);
 
-    my $probes_with_values = get_probes_count($items_ref, $values_ref);
-    if ($probes_with_values < $cfg_minonline)
-    {
-	push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes with reults, $probes_with_values while $cfg_minonline required)");
-	next;
-    }
+	my $probes_with_values = get_probes_count($items_ref, $values_ref);
+	if ($probes_with_values < $cfg_minonline)
+	{
+		push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes with reults, $probes_with_values while $cfg_minonline required)");
+		next;
+	}
 
-    my $success_values = scalar(@$values_ref);
-    foreach (@$values_ref)
-    {
-	$success_values-- if (ZBX_EC_DNS_NS_ERRSIG == $_->[1]);
-    }
+	my $success_values = scalar(@$values_ref);
+	foreach (@$values_ref)
+	{
+		$success_values-- if (ZBX_EC_DNS_NS_ERRSIG == $_->[1]);
+	}
 
-    my $test_result = DOWN;
-    my $total_values = scalar(@$values_ref);
-    my $perc = $success_values * 100 / $total_values;
-    $test_result = UP if ($perc > SLV_UNAVAILABILITY_LIMIT);
+	my $test_result = DOWN;
+	my $total_values = scalar(@$values_ref);
+	my $perc = $success_values * 100 / $total_values;
+	$test_result = UP if ($perc > SLV_UNAVAILABILITY_LIMIT);
 
-    push_value($tld, $cfg_key_out, $value_ts, $test_result, avail_result_msg($test_result, $success_values, $total_values, $perc, $value_ts));
+	push_value($tld, $cfg_key_out, $value_ts, $test_result, avail_result_msg($test_result, $success_values, $total_values, $perc, $value_ts));
 }
 
 # unset TLD (for the logs)
@@ -99,43 +99,43 @@ slv_exit(SUCCESS);
 
 sub get_values_by_items
 {
-    my $items_ref = shift;
+	my $items_ref = shift;
 
-    my $items_str = "";
-    foreach (@$items_ref)
-    {
-	$items_str .= "," if ("" ne $items_str);
-	$items_str .= $_->{'itemid'};
-    }
+	my $items_str = "";
+	foreach (@$items_ref)
+	{
+		$items_str .= "," if ("" ne $items_str);
+		$items_str .= $_->{'itemid'};
+	}
 
-    my $rows_ref = db_select("select itemid,value from history where itemid in ($items_str) and clock between $from and $till");
+	my $rows_ref = db_select("select itemid,value from history where itemid in ($items_str) and clock between $from and $till");
 
-    my @values;
-    foreach my $row_ref (@$rows_ref)
-    {
-	push(@values, [$row_ref->[0], $row_ref->[1]]);
-    }
+	my @values;
+	foreach my $row_ref (@$rows_ref)
+	{
+		push(@values, [$row_ref->[0], $row_ref->[1]]);
+	}
 
-    return \@values;
+	return \@values;
 }
 
 sub get_probes_count
 {
-    my $items_ref = shift;
-    my $values_ref = shift;
+	my $items_ref = shift;
+	my $values_ref = shift;
 
-    my @hostids;
-    foreach my $value_ref (@$values_ref)
-    {
-	foreach my $item_ref (@$items_ref)
+	my @hostids;
+	foreach my $value_ref (@$values_ref)
 	{
-	    if ($value_ref->[0] == $item_ref->{'itemid'})
-	    {
-		push(@hostids, $item_ref->{'hostid'}) unless ($item_ref->{'hostid'} ~~ @hostids);
-		last;
-	    }
+		foreach my $item_ref (@$items_ref)
+		{
+			if ($value_ref->[0] == $item_ref->{'itemid'})
+			{
+				push(@hostids, $item_ref->{'hostid'}) unless ($item_ref->{'hostid'} ~~ @hostids);
+				last;
+			}
+		}
 	}
-    }
 
-    return scalar(@hostids);
+	return scalar(@hostids);
 }

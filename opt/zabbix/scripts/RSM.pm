@@ -11,17 +11,17 @@ my $config_file = '/opt/zabbix/scripts/rsm.conf';
 
 sub get_rsm_config
 {
-    my $config = Config::Tiny->new;
+	my $config = Config::Tiny->new;
 
-    $config = Config::Tiny->read($config_file);
+	$config = Config::Tiny->read($config_file);
 
-    unless (defined($config))
-    {
-	print STDERR (Config::Tiny->errstr(), "\n");
-	exit(-1);
-    }
+	unless (defined($config))
+	{
+		print STDERR (Config::Tiny->errstr(), "\n");
+		exit(-1);
+	}
 
-    return $config;
+	return $config;
 }
 
 1;

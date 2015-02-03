@@ -16,23 +16,23 @@ __usage() unless (__validate_input() == SUCCESS);
 my ($key_part, $macro, $sql);
 if ($OPTS{'type'} == 1)
 {
-    $key_part = 'rsm.dns.udp[%';
-    $macro = '{$RSM.DNS.UDP.DELAY}';
+	$key_part = 'rsm.dns.udp[%';
+	$macro = '{$RSM.DNS.UDP.DELAY}';
 }
 elsif ($OPTS{'type'} == 2)
 {
-    $key_part = 'rsm.dns.tcp[%';
-    $macro = '{$RSM.DNS.TCP.DELAY}';
+	$key_part = 'rsm.dns.tcp[%';
+	$macro = '{$RSM.DNS.TCP.DELAY}';
 }
 elsif ($OPTS{'type'} == 3)
 {
-    $key_part = 'rsm.rdds[%';
-    $macro = '{$RSM.RDDS.DELAY}';
+	$key_part = 'rsm.rdds[%';
+	$macro = '{$RSM.RDDS.DELAY}';
 }
 elsif ($OPTS{'type'} == 4)
 {
-    $key_part = 'rsm.epp[%';
-    $macro = '{$RSM.EPP.DELAY}';
+	$key_part = 'rsm.epp[%';
+	$macro = '{$RSM.EPP.DELAY}';
 }
 
 db_connect();
@@ -47,19 +47,19 @@ $sth->execute($OPTS{'delay'}, $macro) or die $dbh->errstr;
 
 sub __validate_input
 {
-    return FAIL unless ($OPTS{'type'} and $OPTS{'delay'});
-    return FAIL unless ($OPTS{'type'} >= 1 and $OPTS{'type'} <= 4);
-    return FAIL unless ($OPTS{'delay'} >= 60 and $OPTS{'delay'} <= 3600);
+	return FAIL unless ($OPTS{'type'} and $OPTS{'delay'});
+	return FAIL unless ($OPTS{'type'} >= 1 and $OPTS{'type'} <= 4);
+	return FAIL unless ($OPTS{'delay'} >= 60 and $OPTS{'delay'} <= 3600);
 
-    return SUCCESS;
+	return SUCCESS;
 }
 
 sub __usage
 {
-    print("usage: $0 <options>\n");
-    print("Options:\n");
-    print("    --type <n>      test type: 1 - DNS UDP, 2 - DNS TCP, 3 - RDDS, 4 - EPP\n");
-    print("    --delay <n>     test delay in seconds\n");
-    print("    --help          print this message\n");
-    exit(FAIL);
+	print("usage: $0 <options>\n");
+	print("Options:\n");
+	print("    --type <n>      test type: 1 - DNS UDP, 2 - DNS TCP, 3 - RDDS, 4 - EPP\n");
+	print("    --delay <n>     test delay in seconds\n");
+	print("    --help          print this message\n");
+	exit(FAIL);
 }

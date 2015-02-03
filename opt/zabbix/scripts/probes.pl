@@ -95,7 +95,7 @@ sub add_probe($$) {
     ########## Creating new Host Group
 
     print "Creating '$probe_name' host group: ";
-    
+
     $probe_hostgroup = create_group($probe_name);
 
     is_not_empty($probe_hostgroup, true);
@@ -118,7 +118,7 @@ sub add_probe($$) {
     is_not_empty($probe_tmpl_status, true);
 
     ########## Creating Probe host
-    
+
     print "Creating '$probe_name' host: ";
     $probe_host = create_host({'groups' => [{'groupid' => $probe_hostgroup}, {'groupid' => $probes_groupid}],
                                           'templates' => [{'templateid' => $probe_tmpl_status}],
@@ -193,13 +193,13 @@ sub delete_probe($) {
     check_probe_data($probe_host, "The probe host is not found", false);
 
     $probe_host_mon = get_host($probe_name.' - mon', false);
-                                                                     
+
     check_probe_data($probe_host_mon, "Probe monitoring host with name '$probe_name - mon' is not found", false);
-                                                                     
+
     $probe_tmpl = get_template('Template '.$probe_name, true, false);
-                                                                     
+
     check_probe_data($probe_tmpl, "Probe monitoring template with name 'Template $probe_name' is not found", false);
-                                                                     
+
     $probe_tmpl_status = get_template('Template '.$probe_name.' Status', false, false);
 
     check_probe_data($probe_tmpl_status, "Probe Status monitoring template with name 'Template $probe_name Status' is not found", false);
@@ -381,7 +381,7 @@ sub disable_probe($) {
 
     is_not_empty($result->{'proxyids'}, false);
 
-    ##########    
+    ##########
 
     print "The probe has been disabled successful\n";
     print "Do not forget to tune macros!\n";
@@ -468,8 +468,8 @@ sub validate_input {
 
     $msg  = "Probe name must be specified (--probe)\n" unless (defined($OPTS{'probe'}));
 
-    if ((defined($OPTS{'delete'}) and defined($OPTS{'disable'})) or 
-	(defined($OPTS{'delete'}) and defined($OPTS{'add'})) or 
+    if ((defined($OPTS{'delete'}) and defined($OPTS{'disable'})) or
+	(defined($OPTS{'delete'}) and defined($OPTS{'add'})) or
 	(defined($OPTS{'disable'}) and defined($OPTS{'add'}))) {
 	$msg .= "You need to choose only one option from --disable, --add, --delete\n";
     }
@@ -485,7 +485,7 @@ sub validate_input {
     if (defined($OPTS{'add'}) and !defined($OPTS{'resolver'})) {
         $OPTS{'resolver'} = '127.0.0.1';
     }
-    
+
     if (defined($OPTS{'add'}) and !defined($OPTS{'ip'})) {
         $msg .= "You need to specify IP of the new node using --ip option\n";
     }
@@ -494,7 +494,7 @@ sub validate_input {
     $OPTS{'ipv4'} = 0 unless defined($OPTS{'ipv4'});
     $OPTS{'ipv6'} = 0 unless defined($OPTS{'ipv6'});
     $OPTS{'rdds'} = 0 unless defined($OPTS{'rdds'});
-    
+
     if (defined($msg)) {
         print($msg);
         usage();
