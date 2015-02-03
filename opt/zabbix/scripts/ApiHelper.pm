@@ -22,7 +22,7 @@ use constant AH_ALARMED_DISABLED => 'DISABLED';
 use constant AH_SERVICE_AVAILABILITY_FILE => 'serviceAvailability';
 
 our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED ah_get_error ah_save_alarmed
-	ah_save_service_availability ah_save_incident);
+	ah_save_service_availability ah_save_incident ah_save_incident_json);
 
 my $error_string = "";
 
@@ -99,6 +99,7 @@ sub __write_file
 {
     my $full_path = shift;
     my $text = shift;
+    my $clock = shift;
 
     my $OUTFILE;
 
@@ -115,6 +116,8 @@ sub __write_file
     }
 
     close($OUTFILE);
+
+    utime($clock, $clock, $full_path) if (defined($clock));
 
     return AH_SUCCESS;
 }
@@ -149,6 +152,7 @@ sub ah_save_alarmed
     my $tld = shift;
     my $service = shift;
     my $status = shift;
+    my $clock = shift;
 
     my $alarmed_path = __make_base_path($tld, $service);
 
@@ -162,7 +166,7 @@ sub ah_save_alarmed
 
     $alarmed_path .= "/" . AH_ALARMED_FILE;
 
-    return __write_file($alarmed_path, $status);
+    return __write_file($alarmed_path, $status, $clock);
 }
 
 sub ah_save_service_availability
@@ -170,6 +174,7 @@ sub ah_save_service_availability
     my $tld = shift;
     my $service = shift;
     my $downtime = shift;
+    my $clock = shift;
 
     my $service_availability_path = __make_base_path($tld, $service);
 
@@ -183,7 +188,7 @@ sub ah_save_service_availability
 
     $service_availability_path .= "/" . AH_SERVICE_AVAILABILITY_FILE;
 
-    return __write_file($service_availability_path, $downtime);
+    return __write_file($service_availability_path, $downtime, $clock);
 }
 
 sub ah_save_incident
@@ -211,6 +216,33 @@ sub ah_save_incident
     return AH_FAIL unless (__apply_inc_end($inc_path, $end) == AH_SUCCESS);
 
     return __apply_inc_false_positive($inc_path, $false_positive);
+}
+
+sub ah_save_incident_json
+{
+    my $tld = shift;
+    my $service = shift;
+    my $eventid = shift; # incident is identified by event ID
+    my $start = shift;
+    my $json = shift;
+    my $clock = shift;
+
+    $tld = lc($tld);
+    $service = lc($service);
+
+    my $json_path = __make_inc_path($tld, $service, $start, $eventid);
+
+    make_path($json_path, {error => \my $err});
+
+    if (@$err)
+    {
+	__set_file_error($err);
+	return AH_FAIL;
+    }
+
+    $json_path .= "/$clock.$eventid.json";
+
+    return __write_file($json_path, "$json\n", $clock);
 }
 
 1;

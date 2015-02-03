@@ -50,26 +50,29 @@ use constant PROBE_KEY_AUTOMATIC => 'rsm.probe.status[automatic,%]'; # match all
 use constant AVAIL_SHIFT_BACK => 120; # seconds (must be divisible by 60 without remainder)
 use constant ROLLWEEK_SHIFT_BACK => 180; # seconds (must be divisible by 60 without remainder)
 
+use constant RESULT_TIMESTAMP_SHIFT => 29; # seconds (shift back from upper time bound of the period for the value timestamp)
+
 our ($result, $dbh, $tld);
 
 our %OPTS; # specified command-line options
 
 our @EXPORT = qw($result $dbh $tld %OPTS
 		SUCCESS FAIL UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR MIN_INFO_ERROR
-		MAX_INFO_ERROR
+		MAX_INFO_ERROR RESULT_TIMESTAMP_SHIFT
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
 		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt_high get_macro_dns_udp_rtt_low
 		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_macro_dns_udp_delay get_macro_dns_tcp_delay
 		get_macro_rdds_delay get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid_by_key get_itemid_by_host
-		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids get_lastclock get_tlds get_probes get_targets
-		get_all_items get_all_ns_items tld_service_enabled db_connect db_select set_slv_config
+		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids get_lastclock get_tlds get_probes get_nsips
+		get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_select set_slv_config
 		get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds minutes_last_month
 		get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
 		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_avail process_slv_ns_avail
 		process_slv_monthly get_results get_item_values check_lastclock sql_time_condition get_incidents
 		get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
+		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
 		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str usage);
 
 # configuration, set in set_slv_config()
@@ -380,8 +383,7 @@ sub get_lastclock
 	    " from items i,hosts h".
 	    " where i.hostid=h.hostid".
 	    	" and h.host='$host'".
-	    	" and i.key_='$key'".
-	    " limit 1";
+	    	" and i.key_='$key'";
     }
 
     my $rows_ref = db_select($sql);
@@ -476,12 +478,23 @@ sub get_probes
 }
 
 # get array of key nameservers ('i.ns.se,130.239.5.114', ...)
-sub get_targets
+sub get_nsips
 {
     my $host = shift;
-    my $cfg_key_out = shift;
+    my $key = shift;
+    my $templated = shift; # get the list from template
 
-    my $rows_ref = db_select("select key_ from items i,hosts h where i.hostid=h.hostid and h.host='$host' and i.key_ like '$cfg_key_out%'");
+    my $sql;
+    if (defined($templated))
+    {
+	$sql = "select key_ from items i,hosts h where i.hostid=h.hostid and h.host='Template $host' and i.key_ like '$key%'";
+    }
+    else
+    {
+	$sql = "select key_ from items i,hosts h where i.hostid=h.hostid and h.host='$host' and i.key_ like '$key%'";
+    }
+
+    my $rows_ref = db_select($sql);
 
     my @nss;
     foreach my $row_ref (@$rows_ref)
@@ -489,7 +502,7 @@ sub get_targets
 	push(@nss, get_ns_from_key($row_ref->[0]));
     }
 
-    fail("cannot find items ($cfg_key_out*) at host ($host)") if (scalar(@nss) == 0);
+    fail("cannot find items ($key*) at host ($host)") if (scalar(@nss) == 0);
 
     return \@nss;
 }
@@ -543,18 +556,23 @@ sub get_all_items
 # return itemids grouped by hosts:
 #
 # {
-#   hostid1 => {itemid1 => 'i.ns.se.,2001:67c:1010:5::53', itemid2 => 'g.ns.se.,130.239.5.114', ... },
-#   hostid2 => {itemid2 => 'i2.ns.se.,2001:67c:1010:5::54', itemid4 => 'g2.ns.se.,130.239.5.115', ... },
-#   ...
+#    'hostid1' => {
+#         'itemid1' => 'ns2,2620:0:2d0:270::1:201',
+#         'itemid2' => 'ns1,192.0.34.201'
+#    },
+#    'hostid2' => {
+#         'itemid3' => 'ns2,2620:0:2d0:270::1:201',
+#         'itemid4' => 'ns1,192.0.34.201'
+#    }
 # }
-sub get_all_ns_items
+sub get_nsip_items
 {
-    my $targets_ref = shift; # array reference of name servers ("name,IP")
+    my $nsips_ref = shift; # array reference of NS,IP pairs
     my $cfg_key_in = shift;
     my $tld = shift;
 
     my @keys;
-    push(@keys, "'" . $cfg_key_in . $_ . "]'") foreach (@$targets_ref);
+    push(@keys, "'" . $cfg_key_in . $_ . "]'") foreach (@$nsips_ref);
 
     my $keys_str = join(',', @keys);
 
@@ -630,6 +648,24 @@ sub get_tld_items
     fail("cannot find items ($cfg_key*) at host ($tld)") if (scalar(@items) == 0);
 
     return \@items;
+}
+
+sub tld_exists
+{
+    my $tld = shift;
+
+    my $rows_ref = db_select(
+	"select 1".
+	" from hosts h,hosts_groups hg,groups g".
+	" where h.hostid=hg.hostid".
+	    " and hg.groupid=g.groupid".
+	    " and g.name='TLDs'".
+	    " and h.status=0".
+	    " and h.host='$tld'");
+
+    return 0 if (scalar(@$rows_ref) == 0);
+
+    return 1;
 }
 
 sub tld_service_enabled
@@ -722,7 +758,7 @@ sub get_interval_bounds
 
     $till--;
 
-    return ($from, $till, $till - 29);
+    return ($from, $till, $till - RESULT_TIMESTAMP_SHIFT);
 }
 
 # Get bounds of the previous week shifted ROLLWEEK_SHIFT_BACK seconds back.
@@ -738,7 +774,7 @@ sub get_rollweek_bounds
 
     $till--;
 
-    return ($from, $till, $till - 29);
+    return ($from, $till, $till - RESULT_TIMESTAMP_SHIFT);
 }
 
 # Get bounds of previous month.
@@ -754,7 +790,7 @@ sub get_month_bounds
     $dt->subtract(months => 1);
     my $from = $dt->epoch;
 
-    return ($from, $till, $till - 29);
+    return ($from, $till, $till - RESULT_TIMESTAMP_SHIFT);
 }
 
 # Get bounds of current month.
@@ -830,7 +866,6 @@ sub get_online_probes
 
 	push(@hosts, \%h);
 	push(@hosts_mon, "'$host$host_postfix'");
-
     }
 
     return \@result if (scalar(@hosts_mon) == 0);
@@ -1048,7 +1083,7 @@ sub get_probe_times
 
 # Translate probe names to hostids of appropriate tld hosts.
 #
-# E. g., we have hosts (name/id):
+# E. g., we have hosts (host/hostid):
 #   "Probe2"		1
 #   "Probe12"		2
 #   "ORG Probe2"	100
@@ -1064,10 +1099,10 @@ sub probes2tldhostids
 
     my @result;
 
-    my $hosts_str = "";
+    my $hosts_str = '';
     foreach (@$probes_ref)
     {
-	$hosts_str .= " or " unless ($hosts_str eq "");
+	$hosts_str .= ' or ' unless ($hosts_str eq '');
 	$hosts_str .= "host='$tld $_'";
     }
 
@@ -1244,9 +1279,9 @@ sub process_slv_ns_monthly
     my $check_value_ref = shift;   # a pointer to subroutine to check if the value was successful
 
     # first we need to get the list of name servers
-    my $targets_ref = get_targets($tld, $cfg_key_out);
+    my $nsips_ref = get_nsips($tld, $cfg_key_out);
 
-    dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($targets_ref));
+    dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($nsips_ref));
 
     # %successful_values is a hash of name server as key and its number of successful results as a value. Name server is
     # represented by a string consisting of name and IP separated by comma. Each successful result means the IP was UP at
@@ -1257,7 +1292,7 @@ sub process_slv_ns_monthly
     # ...
     my %total_values;
     my %successful_values;
-    foreach my $ns (@$targets_ref)
+    foreach my $ns (@$nsips_ref)
     {
 	$total_values{$ns} = 0;
 	$successful_values{$ns} = 0;
@@ -1265,9 +1300,9 @@ sub process_slv_ns_monthly
 
     my $probes_ref = get_probes();
 
-    my $all_ns_items_ref = get_all_ns_items($targets_ref, $cfg_key_in, $tld);
+    my $nsip_items_ref = get_nsip_items($nsips_ref, $cfg_key_in, $tld);
 
-    dbg("using filter '$cfg_key_in' found next name server items:\n", Dumper($all_ns_items_ref));
+    dbg("using filter '$cfg_key_in' found next name server items:\n", Dumper($nsip_items_ref)) if (defined($OPTS{'debug'}));
 
     my $cur_from = $from;
     my ($interval, $cur_till);
@@ -1283,9 +1318,9 @@ sub process_slv_ns_monthly
 
 	my $hostids_ref = probes2tldhostids($tld, $online_probes_ref);
 
-	my $itemids_ref = __get_itemids_by_hostids($hostids_ref, $all_ns_items_ref);
+	my $itemids_ref = get_itemids_by_hostids($hostids_ref, $nsip_items_ref);
 
-	my $values_ref = __get_values($itemids_ref, [$cur_from, $cur_till], $all_ns_items_ref);
+	my $values_ref = get_nsip_values($itemids_ref, [$cur_from, $cur_till], $nsip_items_ref);
 
 	foreach my $ns (keys(%$values_ref))
 	{
@@ -1353,7 +1388,7 @@ sub process_slv_monthly
 
 	my $hostids_ref = probes2tldhostids($tld, $online_probes_ref);
 
-	my $itemids_ref = __get_itemids_by_hostids($hostids_ref, $all_items_ref);
+	my $itemids_ref = get_itemids_by_hostids($hostids_ref, $all_items_ref);
 
 	my $values_ref = __get_dbl_values($itemids_ref, $cur_from, $cur_till);
 
@@ -1468,18 +1503,18 @@ sub process_slv_ns_avail
     my $probe_avail_limit = shift; # max "last seen" of proxy
     my $check_value_ref = shift;
 
-    my $targets_ref = get_targets($tld, $cfg_key_out);
+    my $nsips_ref = get_nsips($tld, $cfg_key_out);
 
-    dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($targets_ref));
+    dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($nsips_ref));
 
     my $online_probes_ref = get_online_probes($from, $till, $probe_avail_limit, undef);
 
     my $online_probes_count = scalar(@$online_probes_ref);
 
-    my $all_ns_items_ref = get_all_ns_items($targets_ref, $cfg_key_in, $tld);
+    my $nsip_items_ref = get_nsip_items($nsips_ref, $cfg_key_in, $tld);
     my $hostids_ref = probes2tldhostids($tld, $online_probes_ref);
-    my $itemids_ref = __get_itemids_by_hostids($hostids_ref, $all_ns_items_ref);
-    my $values_ref = __get_values($itemids_ref, [$from, $till], $all_ns_items_ref);
+    my $itemids_ref = get_itemids_by_hostids($hostids_ref, $nsip_items_ref);
+    my $values_ref = get_nsip_values($itemids_ref, [$from, $till], $nsip_items_ref);
 
     wrn("no values of items ($cfg_key_in) at host $tld found in the database") if (scalar(keys(%$values_ref)) == 0);
 
@@ -1557,8 +1592,8 @@ sub get_results
 	my $hostitems = $items_ref->{$hostid};
 	foreach my $itemid (keys(%$hostitems))
 	{
-	    my $target = $items_ref->{$hostid}->{$itemid};
-	    $result{$target} = {'total' => 0, 'successful' => 0} unless (exists($result{$target}));
+	    my $nsip = $items_ref->{$hostid}->{$itemid};
+	    $result{$nsip} = {'total' => 0, 'successful' => 0} unless (exists($result{$nsip}));
 	}
     }
 
@@ -1566,24 +1601,24 @@ sub get_results
     {
 	my $times_ref = $probe_times_ref->{$probe};
 	my $hostids_ref = probes2tldhostids($tld, [$probe]);
-	my $itemids_ref = __get_itemids_by_hostids($hostids_ref, $items_ref);
-	my $values_ref = __get_values($itemids_ref, $times_ref, $items_ref);
+	my $itemids_ref = get_itemids_by_hostids($hostids_ref, $items_ref);
+	my $values_ref = get_nsip_values($itemids_ref, $times_ref, $items_ref);
 
-	foreach my $target (keys(%$values_ref))
+	foreach my $nsip (keys(%$values_ref))
 	{
-	    my $item_values_ref = $values_ref->{$target}->{'values'};
+	    my $item_values_ref = $values_ref->{$nsip}->{'values'};
 
 	    foreach (@$item_values_ref)
 	    {
-		$result{$target}->{'total'}++;
+		$result{$nsip}->{'total'}++;
 
 		if ($check_value_ref->($_) == SUCCESS)
 		{
-		    $result{$target}->{'successful'}++;
+		    $result{$nsip}->{'successful'}++;
 		}
 	    }
 
-	    dbg("[$probe] $target: ", $result{$target}->{'successful'}, "/", $result{$target}->{'total'});
+	    dbg("[$probe] $nsip: ", $result{$nsip}->{'successful'}, "/", $result{$nsip}->{'total'});
 	}
     }
 
@@ -1594,8 +1629,8 @@ sub get_results
 #
 # E. g.:
 #
-# '10010' => [205],
-# '10011' => [-102, 304]
+# '10010' => [1],
+# '10011' => [2, 0]
 # ...
 sub get_item_values
 {
@@ -1657,8 +1692,9 @@ sub __make_incident
     my %h;
 
     $h{'eventid'} = shift;
-    $h{'start'} = shift;
     $h{'false_positive'} = shift;
+    $h{'start'} = shift;
+    $h{'end'} = shift;
 
     return \%h;
 }
@@ -1694,13 +1730,13 @@ sub sql_time_condition
 #     {
 #         'eventid' => '5881',
 #         'start' => '1418272230',
-#         'end' => '1418273230'
-#         'false_positive' => '0',
+#         'end' => '1418273230',
+#         'false_positive' => '0'
 #     },
 #     {
 #         'eventid' => '6585',
 #         'start' => '1418280000',
-#         'false_positive' => '1',
+#         'false_positive' => '1'
 #     }
 # ]
 #
@@ -1778,7 +1814,7 @@ sub get_incidents
 	    # do not add 'value=TRIGGER_VALUE_TRUE' to SQL above just for corner case of 2 events at the same second
 	    if ($value == TRIGGER_VALUE_TRUE)
 	    {
-		push(@incidents, __make_incident($eventid, $clock, $false_positive));
+		push(@incidents, __make_incident($eventid, $false_positive, $clock));
 
 		$last_trigger_value = TRIGGER_VALUE_TRUE;
 	    }
@@ -1801,14 +1837,14 @@ sub get_incidents
 	my $clock = $row_ref->[1];
 	my $value = $row_ref->[2];
 	my $false_positive = $row_ref->[3];
-	
+
 	dbg("$eventid: clock:" . ts_str($clock) . " ($clock), value:$value, false_positive:$false_positive") if ($OPTS{'debug'});
 
 	next if ($value == $last_trigger_value);
 
 	if ($value == TRIGGER_VALUE_FALSE)
 	{
-	    # event that closes an incident
+	    # event that closes the incident
 	    my $idx = scalar(@incidents) - 1;
 
 	    $incidents[$idx]->{'end'} = $clock;
@@ -1816,12 +1852,13 @@ sub get_incidents
 	else
 	{
 	    # event that starts an incident
-	    push(@incidents, __make_incident($eventid, $clock, $false_positive));
+	    push(@incidents, __make_incident($eventid, $false_positive, $clock));
 	}
 
 	$last_trigger_value = $value;
     }
 
+    # DEBUG
     if ($OPTS{'debug'})
     {
 	foreach (@incidents)
@@ -1853,13 +1890,7 @@ sub get_downtime
     my $incidents;
     if ($ignore_incidents)
     {
-	my %h;
-
-	$h{'start'} = $from;
-	$h{'end'} = $till;
-	$h{'false_positive'} = 0;
-
-	push(@$incidents, \%h);
+	push(@$incidents, __make_incident(0, 0, $from, $till));
     }
     else
     {
@@ -2042,6 +2073,199 @@ sub get_current_value
     return $rows_ref->[0]->[0];
 }
 
+#
+# returns array of itemids: [itemid1, itemid2 ...]
+#
+sub get_itemids_by_hostids
+{
+    my $hostids_ref = shift;
+    my $all_items = shift;
+
+    my @result = ();
+
+    foreach my $hostid (@$hostids_ref)
+    {
+	unless ($all_items->{$hostid})
+	{
+	    dbg("\nhostid $hostid from:\n", Dumper($hostids_ref), "was not found in:\n", Dumper($all_items));
+	    fail("internal error: no hostid $hostid in input items");
+	}
+
+	foreach my $itemid (keys(%{$all_items->{$hostid}}))
+	{
+	    push(@result, $itemid);
+	}
+    }
+
+    return \@result;
+}
+
+# organize values from all probes grouped by nsip and return "nsip"->values hash
+#
+# {
+#     'ns1,192.0.34.201' => {
+#                   'itemid' => 23764,
+#                   'values' => [
+#                                 '-204.0000',
+#                                 '-204.0000',
+#                                 '-204.0000',
+#                                 '-204.0000',
+#                                 '-204.0000',
+# ...
+sub get_nsip_values
+{
+    my $itemids_ref = shift;
+    my $times_ref = shift; # from, till, ...
+    my $items_ref = shift;
+
+    my %result;
+
+    if (scalar(@$itemids_ref) != 0)
+    {
+	my $itemids_str = "";
+	foreach my $itemid (@$itemids_ref)
+	{
+	    $itemids_str .= "," unless ($itemids_str eq "");
+	    $itemids_str .= $itemid;
+	}
+
+	my $idx = 0;
+	my $times_count = scalar(@$times_ref);
+	while ($idx < $times_count)
+	{
+	    my $from = $times_ref->[$idx++];
+	    my $till = $times_ref->[$idx++];
+
+	    my $rows_ref = db_select("select itemid,value from history where itemid in ($itemids_str) and " . sql_time_condition($from, $till). " order by clock");
+
+	    foreach my $row_ref (@$rows_ref)
+	    {
+		my $itemid = $row_ref->[0];
+		my $value = $row_ref->[1];
+
+		my $nsip;
+		my $last = 0;
+		foreach my $hostid (keys(%$items_ref))
+		{
+		    foreach my $i (keys(%{$items_ref->{$hostid}}))
+		    {
+			if ($i == $itemid)
+			{
+			    $nsip = $items_ref->{$hostid}{$i};
+			    $last = 1;
+			    last;
+			}
+		    }
+		    last if ($last == 1);
+		}
+
+		fail("internal error: name server of item $itemid not found") unless (defined($nsip));
+
+		if (exists($result{$nsip}))
+		{
+		    push(@{$result{$nsip}->{'values'}}, $value);
+		}
+		else
+		{
+		    my %h;
+
+		    $h{'itemid'} = $itemid;
+		    $h{'values'} = [$value];
+
+		    $result{$nsip} = \%h;
+		}
+	    }
+	}
+    }
+
+    return \%result;
+}
+
+sub __get_valuemappings
+{
+    my $vmname = shift;
+
+    my $rows_ref = db_select("select m.value,m.newvalue from valuemaps v,mappings m where v.valuemapid=m.valuemapid and v.name='$vmname'");
+
+    my %result;
+    foreach my $row_ref (@$rows_ref)
+    {
+	$result{$row_ref->[0]} = $row_ref->[1];
+    }
+
+    return \%result;
+}
+
+sub get_valuemaps
+{
+    my $service = shift;
+
+    my $vmname;
+    if ($service eq 'dns' or $service eq 'dnssec')
+    {
+	$vmname = 'RSM DNS result';
+    }
+    elsif ($service eq 'rdds')
+    {
+	$vmname = 'RSM RDDS result';
+    }
+    elsif ($service eq 'epp')
+    {
+	$vmname = 'RSM EPP availability';
+    }
+    else
+    {
+	fail("service '$service' is unknown");
+    }
+
+    return __get_valuemappings($vmname);
+}
+
+sub get_statusmaps
+{
+    my $service = shift;
+
+    my $vmname;
+    if ($service eq 'dns' or $service eq 'dnssec' or $service eq 'epp')
+    {
+	$vmname = 'RSM DNS availability';
+    }
+    elsif ($service eq 'rdds')
+    {
+	$vmname = 'RSM RDDS availability';
+    }
+    else
+    {
+	fail("service '$service' is unknown");
+    }
+
+    return __get_valuemappings($vmname);
+}
+
+sub get_detailed_result
+{
+    my $maps = shift;
+    my $value = shift;
+
+    my $value_int = int($value);
+
+    return $value unless (exists($maps->{$value_int}));
+
+    return "$value, " . $maps->{$value_int};
+}
+
+sub get_result_string
+{
+    my $maps = shift;
+    my $value = shift;
+
+    my $value_int = int($value);
+
+    return $value unless (exists($maps->{$value_int}));
+
+    return $maps->{$value_int};
+}
+
 sub slv_exit
 {
     my $rv = shift;
@@ -2153,23 +2377,13 @@ my $log_open = 0;
 
 sub __func
 {
-    my $func;
-    my $i = 3;
+    my $depth = 4;
 
-    while ($i > 0)
-    {
-	$func = (caller($i))[3];
+    my $func = (caller($depth))[3];
 
-	if (defined($func))
-	{
-	    $func =~ s/^[^:]*::(.*)$/$1/;
-	    last;
-	}
+    $func =~ s/^[^:]*::(.*)$/$1/ if (defined($func));
 
-	$i--;
-    }
-
-    return "$func()" if (defined($func));
+    return "$func() " if (defined($func));
 
     return "";
 }
@@ -2206,7 +2420,7 @@ sub __log
 
 	if (defined($OPTS{'debug'}) or defined($OPTS{'test'}))
 	{
-		print(ts_str(), " [$priority] ", ($cur_tld eq "" ? "" : "$cur_tld:"), __func(), " $msg\n");
+		print(ts_str(), " [$priority] ", ($cur_tld eq "" ? "" : "$cur_tld: "), __func(), "$msg\n");
 		return;
 	}
 
@@ -2239,86 +2453,6 @@ sub __get_macro
     return $rows_ref->[0]->[0];
 }
 
-# organize values from all hosts grouped by target and return "target"->values hash
-#
-# E. g.:
-#
-# 'g.ns.se.,2001:6b0:e:3::1' => [205],
-# 'b.ns.se.,192.36.133.107' => [-202, 304],
-# ...
-#
-# or
-#
-# '' => [503, -203, ...],
-sub __get_values
-{
-    my $itemids_ref = shift;
-    my $times_ref = shift; # from, till, ...
-    my $items_ref = shift;
-
-    my %result;
-
-    if (scalar(@$itemids_ref) != 0)
-    {
-	my $itemids_str = "";
-	foreach my $itemid (@$itemids_ref)
-	{
-	    $itemids_str .= "," unless ($itemids_str eq "");
-	    $itemids_str .= $itemid;
-	}
-
-	my $idx = 0;
-	my $times_count = scalar(@$times_ref);
-	while ($idx < $times_count)
-	{
-	    my $from = $times_ref->[$idx++];
-	    my $till = $times_ref->[$idx++];
-
-	    my $rows_ref = db_select("select itemid,value from history where itemid in ($itemids_str) and clock between $from and $till order by clock");
-
-	    foreach my $row_ref (@$rows_ref)
-	    {
-		my $itemid = $row_ref->[0];
-		my $value = $row_ref->[1];
-
-		my $target;
-		my $last = 0;
-		foreach my $hostid (keys(%$items_ref))
-		{
-		    foreach my $i (keys(%{$items_ref->{$hostid}}))
-		    {
-			if ($i == $itemid)
-			{
-			    $target = $items_ref->{$hostid}{$i};
-			    $last = 1;
-			    last;
-			}
-		    }
-		    last if ($last == 1);
-		}
-
-		fail("internal error: name server of item $itemid not found") unless (defined($target));
-
-		if (exists($result{$target}))
-		{
-		    push(@{$result{$target}->{'values'}}, $value);
-		}
-		else
-		{
-		    my %h;
-
-		    $h{'itemid'} = $itemid;
-		    $h{'values'} = [$value];
-
-		    $result{$target} = \%h;
-		}
-	    }
-	}
-    }
-
-    return \%result;
-}
-
 # return an array reference of values of items for the particular period
 sub __get_dbl_values
 {
@@ -2342,33 +2476,6 @@ sub __get_dbl_values
 	foreach my $row_ref (@$rows_ref)
 	{
 	    push(@result, $row_ref->[0]);
-	}
-    }
-
-    return \@result;
-}
-
-#
-# returns: [itemid1, itemid2 ...]
-#
-sub __get_itemids_by_hostids
-{
-    my $hostids_ref = shift;
-    my $all_items = shift;
-
-    my @result = ();
-
-    foreach my $hostid (@$hostids_ref)
-    {
-	unless ($all_items->{$hostid})
-	{
-	    dbg("\nhostid $hostid from:\n", Dumper($hostids_ref), "was not found in:\n", Dumper($all_items));
-	    fail("internal error: no hostid $hostid in input items");
-	}
-
-	foreach my $itemid (keys(%{$all_items->{$hostid}}))
-	{
-	    push(@result, $itemid);
 	}
     }
 
