@@ -808,14 +808,17 @@ static int	zbx_get_eventlog_message6(LPCWSTR wsource, zbx_uint64_t *which, unsig
 				0 < VAR_EVENT_DATA_COUNT(renderedContent))
 			{
 				*out_message = zbx_strdcatf(*out_message, " The following information was included"
-						" with the event:");
+						" with the event: ");
 
 				for (i = 0; i < VAR_EVENT_DATA_COUNT(renderedContent); i++)
 				{
 					if (NULL != VAR_EVENT_DATA_STRING_ARRAY(renderedContent, i))
 					{
+						if (0 < i)
+							*out_message = zbx_strdcat(*out_message, "; ");
+
 						data = zbx_unicode_to_utf8(VAR_EVENT_DATA_STRING_ARRAY(renderedContent, i));
-						*out_message = zbx_strdcatf(*out_message, " %s", data);
+						*out_message = zbx_strdcatf(*out_message, "%s", data);
 						zbx_free(data);
 					}
 				}
