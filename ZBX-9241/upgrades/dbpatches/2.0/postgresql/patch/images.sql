@@ -1,0 +1,1 @@
+ALTER TABLE ONLY images ALTER imageid DROP DEFAULT;
