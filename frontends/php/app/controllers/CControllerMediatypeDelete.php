@@ -22,7 +22,7 @@ class CControllerMediatypeDelete extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'mediatypeids' =>	'fatal|required|array_db media_type.mediatypeid'
+			'mediatypeids' =>	'required|array_db media_type.mediatypeid'
 		);
 
 		$ret = $this->validateInput($fields);

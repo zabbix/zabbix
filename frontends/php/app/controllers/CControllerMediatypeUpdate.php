@@ -22,18 +22,18 @@ class CControllerMediatypeUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'mediatypeid' =>		'db media_type.mediatypeid|required|fatal',
-			'type' =>				'db media_type.type       |required|in '.implode(',', array_keys(media_type2str())),
-			'description' =>		'db media_type.description',
-			'smtp_server' =>		'db media_type.smtp_server',
-			'smtp_helo' =>			'db media_type.smtp_helo',
-			'smtp_email' =>			'db media_type.smtp_email',
-			'exec_path' =>			'db media_type.exec_path',
-			'gsm_modem' =>			'db media_type.gsm_modem',
-			'jabber_username' =>	'db media_type.username',
-			'eztext_username' =>	'db media_type.username',
-			'passwd' =>				'db media_type.passwd',
-			'status' =>				'db media_type.status     |in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
+			'mediatypeid' =>		'fatal|required|db media_type.mediatypeid',
+			'type' =>				'      required|db media_type.type       |in '.implode(',', array_keys(media_type2str())),
+			'description' =>		'               db media_type.description|not_empty',
+			'smtp_server' =>		'               db media_type.smtp_server',
+			'smtp_helo' =>			'               db media_type.smtp_helo',
+			'smtp_email' =>			'               db media_type.smtp_email',
+			'exec_path' =>			'               db media_type.exec_path',
+			'gsm_modem' =>			'               db media_type.gsm_modem',
+			'jabber_username' =>	'               db media_type.username',
+			'eztext_username' =>	'               db media_type.username',
+			'passwd' =>				'               db media_type.passwd',
+			'status' =>				'               db media_type.status     |in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 		);
 
 		$ret = $this->validateInput($fields);
@@ -68,7 +68,7 @@ class CControllerMediatypeUpdate extends CController {
 
 		$this->getInputs($mediatype, array('mediatypeid', 'type', 'description', 'status'));
 
-		switch($mediatype['type']) {
+		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
 				$this->getInputs($mediatype, array('smtp_server', 'smtp_helo', 'smtp_email'));
 				break;
