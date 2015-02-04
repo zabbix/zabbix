@@ -77,17 +77,17 @@ foreach ($data['scripts'] as $script) {
 		$scriptType,
 		$scriptExecuteOn,
 		zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
-		$script['userGroupName'] == null ?  _('All') : $script['userGroupName'],
-		$script['hostGroupName'] == null ?  _('All') : $script['hostGroupName'],
+		$script['userGroupName'] === null ?  _('All') : $script['userGroupName'],
+		$script['hostGroupName'] === null ?  _('All') : $script['hostGroupName'],
 		($script['host_access'] == PERM_READ_WRITE) ? _('Write') : _('Read')
 	));
 }
 
 // append table to form
 $scriptsForm->addItem(array(
-	$this->data['paging'],
+	$data['paging'],
 	$scriptsTable,
-	$this->data['paging'],
+	$data['paging'],
 	get_table_header(new CActionButtonList('action', 'scriptids', array(
 		'script.delete' => array('name' => _('Delete'), 'confirm' => _('Delete selected scripts?'))
 	)))
