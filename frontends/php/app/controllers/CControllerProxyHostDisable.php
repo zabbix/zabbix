@@ -22,7 +22,7 @@ class CControllerProxyHostDisable extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'proxyids' =>	'fatal|required|array_db hosts.hostid'
+			'proxyids' =>	'required|array_db hosts.hostid'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -35,41 +35,26 @@ class CControllerProxyHostDisable extends CController {
 	}
 
 	protected function checkPermissions() {
-		$proxies = API::Proxy()->get(array(
-			'proxyids' => $this->getInput('proxyids'),
-			'countOutput' => true,
-			'editable' => true
-		));
-
-		return ($proxies == count($this->getInput('proxyids')));
+		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
 	protected function doAction() {
-		$result = true;
-		$proxyids = $this->getInput('proxyids');
+		$hosts = API::Host()->get(array(
+			'output' => array('hostid'),
+			'filter' => array(
+				'proxy_hostid' => $this->getInput('proxyids'),
+				'status' => HOST_STATUS_MONITORED
+			)
+		));
 
-		DBstart();
-
-		$updated = 0;
-		foreach ($proxyids as $proxyid) {
-
-			$hosts = DBselect(
-				"SELECT h.hostid,h.status FROM hosts h WHERE h.proxy_hostid=$proxyid"
-			);
-
-			while ($host = DBfetch($hosts)) {
-				$status = $host['status'];
-				$updated++;
-
-				if ($status == HOST_STATUS_NOT_MONITORED) {
-					continue;
-				}
-
-				$result &= updateHostStatus($host['hostid'], HOST_STATUS_NOT_MONITORED);
-			}
+		foreach ($hosts as &$host) {
+			$host['status'] = HOST_STATUS_NOT_MONITORED;
 		}
+		unset($host);
 
-		$result = DBend($result);
+		$result = API::Host()->update($hosts);
+
+		$updated = count($hosts);
 
 		$response = new CControllerResponseRedirect('zabbix.php?action=proxy.list&uncheck=1');
 
