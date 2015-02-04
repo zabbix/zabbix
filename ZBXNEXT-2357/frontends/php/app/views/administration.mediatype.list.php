@@ -117,9 +117,9 @@ foreach ($data['mediatypes'] as $mediaType) {
 
 // append table to form
 $mediaTypeForm->addItem(array(
-	$this->data['paging'],
+	$data['paging'],
 	$mediaTypeTable,
-	$this->data['paging'],
+	$data['paging'],
 	get_table_header(new CActionButtonList('action', 'mediatypeids', array(
 		'mediatype.enable' => array('name' => _('Enable'), 'confirm' => _('Enable selected media types?')),
 		'mediatype.disable' => array('name' => _('Disable'), 'confirm' => _('Disable selected media types?')),
