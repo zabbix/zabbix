@@ -32,9 +32,10 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_email' =>			'db media_type.smtp_email',
 			'exec_path' =>			'db media_type.exec_path',
 			'gsm_modem' =>			'db media_type.gsm_modem',
-			'username' =>			'db media_type.username',
+			'jabber_username' =>	'db media_type.username',
+			'eztext_username' =>	'db media_type.username',
 			'passwd' =>				'db media_type.passwd',
-			'status' =>				'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED
+			'status' =>				'db media_type.status     |in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED
 		);
 
 		$ret = $this->validateInput($fields);
@@ -49,7 +50,9 @@ class CControllerMediatypeEdit extends CController {
 	protected function checkPermissions() {
 		if ($this->hasInput('mediatypeid')) {
 			$mediatypes = API::Mediatype()->get(array(
-				'output' => array('mediatypeid','type','description','smtp_server','smtp_helo','smtp_email','exec_path','gsm_modem','username','passwd','status'),
+				'output' => array('mediatypeid', 'type', 'description', 'smtp_server', 'smtp_helo', 'smtp_email',
+					'exec_path', 'gsm_modem', 'username', 'passwd', 'status'
+				),
 				'mediatypeids' => $this->getInput('mediatypeid'),
 				'editable' => true
 			));
@@ -70,37 +73,42 @@ class CControllerMediatypeEdit extends CController {
 	protected function doAction() {
 		// default values
 		$data = array(
-			'mediatypeid' => 0,
-			'type' => MEDIA_TYPE_EMAIL,
-			'description' => '',
-			'smtp_server' => 'localhost',
-			'smtp_helo' => 'localhost',
-			'smtp_email' => 'zabbix@localhost',
-			'exec_path' => '',
-			'gsm_modem' => '/dev/ttyS0',
-			'jabber_username' => 'user@server',
-			'eztext_username' => '',
-			'passwd' => '',
-			'status' => MEDIA_TYPE_STATUS_ACTIVE
+				'mediatypeid' => 0,
+				'type' => MEDIA_TYPE_EMAIL,
+				'description' => '',
+				'smtp_server' => 'localhost',
+				'smtp_helo' => 'localhost',
+				'smtp_email' => 'zabbix@localhost',
+				'exec_path' => '',
+				'gsm_modem' => '/dev/ttyS0',
+				'jabber_username' => 'user@server',
+				'eztext_username' => '',
+				'passwd' => '',
+				'status' => MEDIA_TYPE_STATUS_ACTIVE
 		);
 
 		// get values from the dabatase
 		if ($this->hasInput('mediatypeid')) {
-			$data = array(
-				'mediatypeid' => $this->mediatype['mediatypeid'],
-				'type' => $this->mediatype['type'],
-				'description' => $this->mediatype['description'],
-				'smtp_server' => $this->mediatype['smtp_server'],
-				'smtp_helo' => $this->mediatype['smtp_helo'],
-				'smtp_email' => $this->mediatype['smtp_email'],
-				'exec_path' => $this->mediatype['exec_path'],
-				'gsm_modem' => $this->mediatype['gsm_modem'],
-				'jabber_username' => 'user@server',
-				'eztext_username' => '',
-				'username' => $this->mediatype['username'],
-				'passwd' => $this->mediatype['passwd'],
-				'status' => $this->mediatype['status']
-			);
+			$data['mediatypeid'] = $this->mediatype['mediatypeid'];
+			$data['type'] = $this->mediatype['type'];
+			$data['description'] = $this->mediatype['description'];
+			$data['smtp_server'] = $this->mediatype['smtp_server'];
+			$data['smtp_helo'] = $this->mediatype['smtp_helo'];
+			$data['smtp_email'] = $this->mediatype['smtp_email'];
+			$data['exec_path'] = $this->mediatype['exec_path'];
+			$data['gsm_modem'] = $this->mediatype['gsm_modem'];
+			$data['passwd'] = $this->mediatype['passwd'];
+			$data['status'] = $this->mediatype['status'];
+
+			switch ($data['type']) {
+				case MEDIA_TYPE_JABBER:
+					$data['jabber_username'] = $this->mediatype['username'];
+					break;
+
+				case MEDIA_TYPE_EZ_TEXTING:
+					$data['eztext_username'] = $this->mediatype['username'];
+					break;
+			}
 		}
 
 		// overwrite with input variables
@@ -114,7 +122,6 @@ class CControllerMediatypeEdit extends CController {
 			'gsm_modem',
 			'jabber_username',
 			'eztext_username',
-			'username',
 			'passwd',
 			'status'
 		));
