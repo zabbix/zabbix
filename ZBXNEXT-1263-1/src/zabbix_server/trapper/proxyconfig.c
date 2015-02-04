@@ -23,8 +23,8 @@
 #include "proxy.h"
 
 #include "proxyconfig.h"
+#include "../../libs/zbxcrypto/tls_tcp_active.h"
 
-const char		*zbx_tls_connection_type_name(unsigned int type);
 extern unsigned int	configured_tls_accept_modes;
 
 /******************************************************************************
@@ -46,7 +46,7 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != get_active_proxy_id(jp, &proxy_hostid, host, &error))
+	if (SUCCEED != get_active_proxy_id(jp, &proxy_hostid, host, sock, &error))
 	{
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "proxy configuration request from active proxy on \"%s\" failed: %s",
@@ -107,7 +107,6 @@ void	recv_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (0 == (configured_tls_accept_modes & sock->connection_type))
 	{
 		char	*msg;
@@ -120,7 +119,7 @@ void	recv_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		zbx_free(msg);
 		goto out;
 	}
-#endif
+
 	process_proxyconfig(&jp_data);
 	zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
 out:

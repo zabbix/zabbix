@@ -26,6 +26,7 @@
 
 #include "proxyconfig.h"
 #include "../servercomms.h"
+#include "../../libs/zbxcrypto/tls.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 

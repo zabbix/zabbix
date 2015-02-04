@@ -83,10 +83,9 @@ typedef struct
 #elif defined(HAVE_OPENSSL)
 	SSL			*tls_ctx;
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	/* type of connection actually established: unencrypted, TLS with certificate, TLS with PSK */
-	unsigned int		connection_type;
-#endif
+	unsigned int 		connection_type;	/* type of connection actually established: */
+							/* ZBX_TCP_SEC_UNENCRYPTED, ZBX_TCP_SEC_TLS_PSK or */
+							/* ZBX_TCP_SEC_TLS_CERT */
 	int			timeout;
 	zbx_buf_type_t		buf_type;
 	unsigned char		accepted;

@@ -22,6 +22,7 @@
 #include "log.h"
 #include "tls.h"
 #include "tls_tcp.h"
+#include "tls_tcp_active.h"
 #include "db.h"
 
 #if defined(HAVE_POLARSSL)
@@ -591,9 +592,9 @@ int	zbx_tls_init_parent(void)
 void	zbx_tls_init_child(void)
 {
 	const char	*__function_name = "zbx_tls_init_child";
-	int		res;
 
 #if defined(HAVE_POLARSSL)
+	int		res;
 	char	*pers = NULL;
 	size_t	pers_len = 0;
 #endif
@@ -1097,9 +1098,10 @@ int	zbx_tls_free(void)
 int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
 {
 	const char	*__function_name = "zbx_tls_connect";
-	int		ret = FAIL, res;
+	int		ret = FAIL;
 
 #if defined(HAVE_POLARSSL)
+	int		res;
 	const x509_crt	*peer_cert;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1317,6 +1319,7 @@ out:
 	return ret;
 }
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_accept                                                   *
@@ -1339,10 +1342,11 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 {
 	const char		*__function_name = "zbx_tls_accept";
 	const ssl_ciphersuite_t	*info;
-	int			ret = FAIL, res;
+	int			ret = FAIL;
 
 #if defined(HAVE_POLARSSL)
-	const x509_crt	*peer_cert;
+	int			res;
+	const x509_crt		*peer_cert;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1553,6 +1557,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 	return ret;
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -1573,7 +1578,6 @@ void	zbx_tls_close(zbx_sock_t *s)
 #endif
 }
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_connection_type_name                                     *
@@ -1597,4 +1601,46 @@ const char	*zbx_tls_connection_type_name(unsigned int type)
 	else
 		return unknown;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_get_attr                                                 *
+ *                                                                            *
+ * Purpose: get connection type, certificate and PSK attributes from a        *
+ *          context of established connection                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tls_get_attr(const zbx_sock_t *s, zbx_tls_conn_attr_t *attr)
+{
+	attr->connection_type = s->connection_type;
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_UNENCRYPTED == s->connection_type)
+	{
+		attr->arg1 = NULL;
+		attr->arg1_len = 0;
+		attr->arg2 = NULL;
+		attr->arg2_len = 0;
+	}
 #endif
+#if defined(HAVE_POLARSSL)
+	else if (ZBX_TCP_SEC_TLS_CERT == s->connection_type)
+	{
+		const x509_crt	*peer_cert;
+
+		if (NULL == (peer_cert = ssl_get_peer_cert(s->tls_ctx)))
+			return FAIL;
+
+		/* TODO implement getting pointers to issuer and subject and their lengths */
+		return FAIL;
+	}
+	else if (ZBX_TCP_SEC_TLS_PSK == s->connection_type)
+	{
+		attr->arg1 = (char *)s->tls_ctx->psk_identity;
+		attr->arg1_len = s->tls_ctx->psk_identity_len;
+		attr->arg2 = NULL;
+		attr->arg2_len = 0;
+	}
+#endif
+	return SUCCEED;
+}

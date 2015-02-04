@@ -352,9 +352,9 @@ static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, sockle
 		return FAIL;
 	}
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+
 	s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
-#endif
+
 	return SUCCEED;
 }
 
@@ -1085,9 +1085,7 @@ int	zbx_tcp_accept(zbx_sock_t *s, unsigned int tls_accept)
 			return FAIL;
 		}
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
-#endif
 	}
 
 	return SUCCEED;

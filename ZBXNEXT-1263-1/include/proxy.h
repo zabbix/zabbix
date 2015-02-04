@@ -45,7 +45,8 @@ AGENT_VALUE
 	unsigned char	state;
 };
 
-int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char **error);
+int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, const zbx_sock_t *sock,
+		char **error);
 
 void	update_proxy_lastaccess(const zbx_uint64_t hostid);
 
