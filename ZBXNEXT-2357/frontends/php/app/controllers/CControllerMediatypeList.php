@@ -22,9 +22,9 @@ class CControllerMediatypeList extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'sort' =>		'fatal|in description,type',
-			'sortorder' =>	'fatal|in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck' =>	'fatal|in 1'
+			'sort' =>		'in description,type',
+			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>	'in 1'
 		);
 
 		$ret = $this->validateInput($fields);
