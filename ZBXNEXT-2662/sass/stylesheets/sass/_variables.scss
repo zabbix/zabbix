@@ -140,6 +140,12 @@ $font-transform: uppercase;
 	transition: $arguments;
 }
 
+@mixin box-sizing($sizing) {
+	-webkit-box-sizing: $sizing;
+	-moz-box-sizing: $sizing;
+	box-sizing: $sizing;
+}
+
 @mixin opacity($opacity) {
 	opacity: $opacity;
 	$opacity-ie: $opacity * 100;
