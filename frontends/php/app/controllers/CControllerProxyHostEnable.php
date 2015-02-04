@@ -35,7 +35,13 @@ class CControllerProxyHostEnable extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		$proxies = API::Proxy()->get(array(
+			'proxyids' => $this->getInput('proxyids'),
+			'countOutput' => true,
+			'editable' => true
+		));
+
+		return ($proxies == count($this->getInput('proxyids')));
 	}
 
 	protected function doAction() {
