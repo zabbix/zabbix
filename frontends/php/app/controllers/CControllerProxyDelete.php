@@ -45,15 +45,19 @@ class CControllerProxyDelete extends CController {
 	}
 
 	protected function doAction() {
-		$result = API::Proxy()->delete($this->getInput('proxyids'));
+		$proxyids = $this->getInput('proxyids');
+
+		$result = API::Proxy()->delete($proxyids);
+
+		$deleted = count($proxyids);
 
 		$response = new CControllerResponseRedirect('zabbix.php?action=proxy.list&uncheck=1');
 
 		if ($result) {
-			$response->setMessageOk(_('Proxy deleted'));
+			$response->setMessageOk(_n('Proxy deleted', 'Proxies deleted', $deleted));
 		}
 		else {
-			$response->setMessageError(_('Cannot delete proxy'));
+			$response->setMessageError(_n('Cannot delete proxy', 'Cannot delete proxies', $deleted));
 		}
 		$this->setResponse($response);
 	}
