@@ -821,10 +821,12 @@ class CHost extends CHostGeneral {
 		// fetch fields required to update host inventory
 		$inventories = array();
 		foreach ($hosts as $host) {
-			$inventory = $host['inventory'];
-			$inventory['hostid'] = $host['hostid'];
+			if (array_key_exists('inventory', $host)) {
+				$inventory = $host['inventory'];
+				$inventory['hostid'] = $host['hostid'];
 
-			$inventories[] = $inventory;
+				$inventories[] = $inventory;
+			}
 		}
 		$inventories = $this->extendObjects('host_inventory', $inventories, array('inventory_mode'));
 		$inventories = zbx_toHash($inventories, 'hostid');
