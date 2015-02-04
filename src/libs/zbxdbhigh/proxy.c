@@ -27,6 +27,7 @@
 #include "dbcache.h"
 #include "discovery.h"
 #include "zbxalgo.h"
+#include "../zbxcrypto/tls_tcp_active.h"
 
 typedef struct
 {
@@ -85,76 +86,59 @@ static zbx_history_table_t areg = {
  *                                                                            *
  * Function: get_active_proxy_id                                              *
  *                                                                            *
- * Purpose: extract a proxy name from JSON and find the proxy ID in database. *
- *          The proxy must be configured in active mode.                      *
+ * Purpose:                                                                   *
+ *     Extract a proxy name from JSON and find the proxy ID in configuration  *
+ *     cache, and check access rights. The proxy must be configured in active *
+ *     mode.                                                                  *
  *                                                                            *
- * Parameters: jp            - [IN] JSON with the proxy name                  *
- *             hostid        - [OUT] proxy host ID found in database          *
- *             host          - [IN] buffer with minimum size                  *
- *                                  'HOST_HOST_LEN_MAX'                       *
- *             error         - [OUT] error message                            *
+ * Parameters:                                                                *
+ *     jp      - [IN] JSON with the proxy name                                *
+ *     hostid  - [OUT] proxy host ID found in database                        *
+ *     host    - [OUT] buffer provided by caller with minimum size            *
+ *                     'HOST_HOST_LEN_MAX' for writing proxy name             *
+ *     sock    - [IN] connection socket context                               *
+ *     error   - [OUT] error message                                          *
  *                                                                            *
- * Return value:  SUCCEED - proxy ID was found in database                    *
- *                FAIL    - an error occurred (e.g. an unknown proxy or the   *
- *                          proxy is configured in passive mode               *
+ * Return value:                                                              *
+ *     SUCCEED - proxy ID was found in database                               *
+ *     FAIL    - an error occurred (e.g. an unknown proxy, the proxy is       *
+ *               configured in passive mode or access denied                  *
  *                                                                            *
  ******************************************************************************/
-int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char **error)
+int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, const zbx_sock_t *sock,
+		char **error)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*host_esc;
-	int		ret = FAIL, status;
+	zbx_uint64_t		hostid_tmp;
+	unsigned int		status, tls_accept;
+	char			*ch_error;
+	zbx_tls_conn_attr_t	attr;
 
-	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
 	{
-		char	*ch_error;
-
-		if (FAIL == zbx_check_hostname(host, &ch_error))
-		{
-			*error = zbx_dsprintf(*error, "invalid proxy name \"%s\": %s", host, ch_error);
-			zbx_free(ch_error);
-			return ret;
-		}
-
-		host_esc = DBdyn_escape_string(host);
-
-		result = DBselect(
-				"select hostid,status"
-				" from hosts"
-				" where host='%s'"
-					" and status in (%d,%d)",
-				host_esc, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE);
-
-		zbx_free(host_esc);
-
-		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
-		{
-			if (SUCCEED == is_uint31(row[1], &status))
-			{
-				if (HOST_STATUS_PROXY_ACTIVE == status)
-				{
-					ZBX_STR2UINT64(*hostid, row[0]);
-					ret = SUCCEED;
-				}
-				else
-				{
-					*error = zbx_dsprintf(*error, "proxy \"%s\" is configured in passive mode",
-							host);
-				}
-			}
-			else
-				THIS_SHOULD_NEVER_HAPPEN;
-		}
-		else
-			*error = zbx_dsprintf(*error, "proxy \"%s\" not found", host);
-
-		DBfree_result(result);
-	}
-	else
 		*error = zbx_strdup(*error, "missing name of proxy");
+		return FAIL;
+	}
 
-	return ret;
+	if (SUCCEED != zbx_check_hostname(host, &ch_error))
+	{
+		*error = zbx_dsprintf(*error, "invalid proxy name \"%s\": %s", host, ch_error);
+		zbx_free(ch_error);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_tls_get_attr(sock, &attr))
+	{
+		*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+	if (SUCCEED != DCcheck_active_permissions(host, HOST_STATUS_PROXY_ACTIVE, &attr, &hostid_tmp, error))
+		return FAIL;
+
+	*hostid = hostid_tmp;
+
+	return SUCCEED;
 }
 
 /******************************************************************************

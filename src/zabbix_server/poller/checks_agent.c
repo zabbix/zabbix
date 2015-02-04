@@ -62,15 +62,26 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		tls_arg1 = NULL;
 		tls_arg2 = NULL;
 	}
-	else if (ZBX_TCP_SEC_TLS_CERT == item->host.tls_connect)
+	else
 	{
-		tls_arg1 = item->host.tls_issuer;
-		tls_arg2 = item->host.tls_subject;
-	}
-	else	/* ZBX_TCP_SEC_TLS_PSK */
-	{
-		tls_arg1 = item->host.tls_psk_identity;
-		tls_arg2 = item->host.tls_psk;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		if (ZBX_TCP_SEC_TLS_CERT == item->host.tls_connect)
+		{
+			tls_arg1 = item->host.tls_issuer;
+			tls_arg2 = item->host.tls_subject;
+		}
+		else	/* ZBX_TCP_SEC_TLS_PSK */
+		{
+			tls_arg1 = item->host.tls_psk_identity;
+			tls_arg2 = item->host.tls_psk;
+		}
+#else
+		zbx_snprintf(buffer, sizeof(buffer), "A TLS connection is configured to be used with agent but support "
+				"for TLS was not not compiled in.");
+		SET_MSG_RESULT(result, strdup(buffer));
+		ret = NETWORK_ERROR;
+		goto out;
+#endif
 	}
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
@@ -126,6 +137,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, strdup(buffer));
 		ret = NETWORK_ERROR;
 	}
+out:
 	zbx_tcp_close(&s);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
