@@ -463,6 +463,7 @@ sass/dashboard.html -text
 sass/favicon.ico -text svneol=unset#image/x-icon
 sass/img/icon-sprite.png -text svneol=unset#image/png
 sass/img/zabbix.ico -text svneol=unset#image/x-icon
+sass/signin.html -text
 sass/touch-icon-192x192.png -text svneol=unset#image/png
 src/libs/zbxsysinfo/win32/wmi.cpp -text
 src/zabbix_java/lib/README svneol=native#text/plain

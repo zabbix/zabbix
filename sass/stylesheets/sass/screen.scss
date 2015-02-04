@@ -963,6 +963,73 @@ div.drag-icon {
 	background: url(../img/icon-sprite.png) no-repeat 0 -288px;
 }
 
+/* Sign in */
+div.signin-container {
+	background: $body-content-bgcolor;
+	width: 322px;
+	margin: 0 auto;
+	padding: 25px 28px 0 28px;
+	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
+
+	h1 {
+		border: none;
+		margin: 0 0 17px 0;
+		padding: 0;
+	}
+
+	ul li {
+		padding: 0 0 22px 0;
+		font-size: $font-top-nav-size;
+
+		&.sign-in-txt {
+			text-align: center;
+		}
+	}
+
+	label {
+		display: block;
+		margin: 0 0 2px 0;
+	}
+
+	input {
+
+		&[type="text"] {
+			@extend %signin-input;
+		}
+
+		&[type="password"] {
+			@extend %signin-input;
+		}
+	}
+
+	button {
+		font-size: $font-form-size;
+		min-height: 38px;
+		line-height: 38px;
+		width: 100%;
+	}
+}
+
+div.signin-logo {
+	margin-top: 50%;
+	margin: 0 auto;
+	width: 100px;
+	height: 50px;
+}
+
+div.signin-links {
+	width: 100%;
+	text-align: center;
+	margin: 22px 0 0 0;
+}
+
+%signin-input {
+	height: 38px;
+	line-height: 38px;
+	width: 100%;
+	@include box-sizing(border-box);
+}
+
 /* Dashboard */
 div.dashbrd-widget {
 	min-width: 250px;
