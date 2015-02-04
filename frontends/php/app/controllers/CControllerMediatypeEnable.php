@@ -45,17 +45,17 @@ class CControllerMediatypeEnable extends CController {
 	}
 
 	protected function doAction() {
-		$update = array();
+		$mediatypes = array();
 
 		foreach ($this->getInput('mediatypeids') as $mediatypeid) {
-			$update[] = array(
+			$mediatypes[] = array(
 				'mediatypeid' => $mediatypeid,
 				'status' => MEDIA_TYPE_STATUS_ACTIVE
 			);
 		}
-		$result = API::Mediatype()->update($update);
+		$result = API::Mediatype()->update($mediatypes);
 
-		$updated = count($update);
+		$updated = count($mediatypes);
 
 		$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.list&uncheck=1');
 

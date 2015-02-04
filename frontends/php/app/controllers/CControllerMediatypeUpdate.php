@@ -30,11 +30,11 @@ class CControllerMediatypeUpdate extends CController {
 			'smtp_email' =>			'db media_type.smtp_email',
 			'exec_path' =>			'db media_type.exec_path',
 			'gsm_modem' =>			'db media_type.gsm_modem',
-			'username' =>			'db media_type.username',
+			'jabber_username' =>	'db media_type.username',
+			'eztext_username' =>	'db media_type.username',
 			'passwd' =>				'db media_type.passwd',
 			'status' =>				'db media_type.status     |in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 		);
-
 
 		$ret = $this->validateInput($fields);
 
@@ -79,10 +79,16 @@ class CControllerMediatypeUpdate extends CController {
 				$this->getInputs($mediatype, array('gsm_modem'));
 				break;
 			case MEDIA_TYPE_JABBER:
-				$this->getInputs($mediatype, array('username', 'passwd'));
+				$this->getInputs($mediatype, array('passwd'));
+				if ($this->hasInput('jabber_username')) {
+					$mediatype['username'] = $this->getInput('jabber_username');
+				}
 				break;
 			case MEDIA_TYPE_EZ_TEXTING:
-				$this->getInputs($mediatype, array('username', 'passwd', 'exec_path'));
+				$this->getInputs($mediatype, array('passwd', 'exec_path'));
+				if ($this->hasInput('eztext_username')) {
+					$mediatype['username'] = $this->getInput('eztext_username');
+				}
 				break;
 		}
 

@@ -4,64 +4,49 @@
 		jQuery('#type').change(function() {
 			switch (jQuery(this).val()) {
 				case '<?php echo MEDIA_TYPE_EMAIL; ?>':
-					jQuery('#smtp_server').closest('li').css('display', '').removeClass('hidden');
-					jQuery('#smtp_helo').closest('li').css('display', '').removeClass('hidden');
-					jQuery('#smtp_email').closest('li').css('display', '').removeClass('hidden');
-					jQuery('#exec_path').closest('li').css('display', 'none');
-					jQuery('#gsm_modem').closest('li').css('display', 'none');
-					jQuery('#jabber_username').closest('li').css('display', 'none');
-					jQuery('#eztext_username').closest('li').css('display', 'none');
-					jQuery('#eztext_limit').closest('li').css('display', 'none');
+					jQuery('#smtp_server, #smtp_helo, #smtp_email')
+						.closest('li')
+						.css('display', '')
+						.removeClass('hidden');
+					jQuery('#exec_path, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #passwd')
+						.closest('li')
+						.css('display', 'none');
 					jQuery('#eztext_link').css('display', 'none');
-					jQuery('#passwd').closest('li').css('display', 'none');
 					break;
+
 				case '<?php echo MEDIA_TYPE_EXEC; ?>':
-					jQuery('#smtp_server').closest('li').css('display', 'none');
-					jQuery('#smtp_helo').closest('li').css('display', 'none');
-					jQuery('#smtp_email').closest('li').css('display', 'none');
 					jQuery('#exec_path').closest('li').css('display', '').removeClass('hidden');
-					jQuery('#gsm_modem').closest('li').css('display', 'none');
-					jQuery('#jabber_username').closest('li').css('display', 'none');
-					jQuery('#eztext_username').closest('li').css('display', 'none');
-					jQuery('#eztext_limit').closest('li').css('display', 'none');
+					jQuery('#smtp_server, #smtp_helo, #smtp_email, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #passwd')
+						.closest('li')
+						.css('display', 'none');
 					jQuery('#eztext_link').css('display', 'none');
-					jQuery('#passwd').closest('li').css('display', 'none');
 					break;
+
 				case '<?php echo MEDIA_TYPE_SMS; ?>':
-					jQuery('#smtp_server').closest('li').css('display', 'none');
-					jQuery('#smtp_helo').closest('li').css('display', 'none');
-					jQuery('#smtp_email').closest('li').css('display', 'none');
-					jQuery('#exec_path').closest('li').css('display', 'none');
 					jQuery('#gsm_modem').closest('li').css('display', '').removeClass('hidden');
-					jQuery('#jabber_username').closest('li').css('display', 'none');
-					jQuery('#eztext_username').closest('li').css('display', 'none');
-					jQuery('#eztext_limit').closest('li').css('display', 'none');
+					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #jabber_username, #eztext_username, #eztext_limit, #passwd')
+						.closest('li')
+						.css('display', 'none');
 					jQuery('#eztext_link').css('display', 'none');
-					jQuery('#passwd').closest('li').css('display', 'none');
 					break;
+
 				case '<?php echo MEDIA_TYPE_JABBER; ?>':
-					jQuery('#smtp_server').closest('li').css('display', 'none');
-					jQuery('#smtp_helo').closest('li').css('display', 'none');
-					jQuery('#smtp_email').closest('li').css('display', 'none');
-					jQuery('#exec_path').closest('li').css('display', 'none');
-					jQuery('#gsm_modem').closest('li').css('display', 'none');
-					jQuery('#jabber_username').closest('li').css('display', '').removeClass('hidden');
-					jQuery('#eztext_username').closest('li').css('display', 'none');
-					jQuery('#eztext_limit').closest('li').css('display', 'none');
+					jQuery('#jabber_username, #passwd').closest('li').css('display', '').removeClass('hidden');
+					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #eztext_username, #eztext_limit')
+						.closest('li')
+						.css('display', 'none');
 					jQuery('#eztext_link').css('display', 'none');
-					jQuery('#passwd').closest('li').css('display', '').removeClass('hidden');
 					break;
+
 				case '<?php echo MEDIA_TYPE_EZ_TEXTING; ?>':
-					jQuery('#smtp_server').closest('li').css('display', 'none');
-					jQuery('#smtp_helo').closest('li').css('display', 'none');
-					jQuery('#smtp_email').closest('li').css('display', 'none');
-					jQuery('#exec_path').closest('li').css('display', 'none');
-					jQuery('#gsm_modem').closest('li').css('display', 'none');
-					jQuery('#jabber_username').closest('li').css('display', 'none');
-					jQuery('#eztext_username').closest('li').css('display', '').removeClass('hidden');
-					jQuery('#eztext_limit').closest('li').css('display', '').removeClass('hidden');
+					jQuery('#eztext_username, #eztext_limit, #passwd')
+						.closest('li')
+						.css('display', '')
+						.removeClass('hidden');
 					jQuery('#eztext_link').css('display', '').removeClass('hidden');
-					jQuery('#passwd').closest('li').css('display', '').removeClass('hidden');
+					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #jabber_username')
+						.closest('li')
+						.css('display', 'none');
 					break;
 			}
 		});
