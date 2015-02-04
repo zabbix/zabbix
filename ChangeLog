@@ -67,6 +67,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, K
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+.......PS. [ZBX-9104] fixed repeated error messaging if ssh channel failed to close (igors)
 ...G...... [ZBX-9183] fixed eventlog message collecting in case of error formatting the log message; thanks to Kodai Terashima (dimir)
 A.F....... [ZBX-9224] fixed audit log for failed login attempts (Oleg)
 ...G...... [ZBX-9233] fixed processing of bogus negative value of performance couter (igors)
@@ -615,6 +616,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9104] fixed repeated error messaging if ssh channel failed to close (igors)
 ...G...... [ZBX-9183] fixed eventlog message collecting in case of error formatting the log message; thanks to Kodai Terashima (dimir)
 ...G...... [ZBX-9233] fixed processing of bogus negative value of performance couter (igors)
 .......PS. [ZBXNEXT-2354] fixed VMware virtual machine network and disk transmission rates being reported in kilobytes rather than bytes (wiper)
@@ -1815,6 +1817,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9104] fixed repeated error messaging if ssh channel failed to close (igors)
 ........S. [ZBX-8993] added check for a valid reference of a global regular expression in lld rules (igors)
 .......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
 A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
