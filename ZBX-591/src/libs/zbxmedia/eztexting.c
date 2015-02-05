@@ -219,8 +219,8 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s: could not set source interface option [%d]: %s",
-				__function_name, opt, curl_easy_strerror(err));
+			zbx_snprintf(error, max_error_len, "Could not set cURL option %d: [%s]",
+					opt, curl_easy_strerror(err));
 			goto clean;
 		}
 	}
