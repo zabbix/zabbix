@@ -22,19 +22,19 @@ class CControllerScriptUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'scriptid' =>			'db scripts.scriptid    |required|fatal',
-			'name' =>				'db scripts.name        |not_empty',
-			'type' =>				'db scripts.type        |in 0,1',
-			'execute_on' =>			'db scripts.execute_on  |in 0,1',
-			'command' =>			'db scripts.command',
-			'commandipmi' =>		'db scripts.command',
-			'description' =>		'db scripts.description',
-			'host_access' =>		'db scripts.host_access |in 0,1,2,3',
-			'groupid' =>			'db scripts.groupid',
-			'usrgrpid' =>			'db scripts.usrgrpid',
-			'hgstype' =>			'                        in 0,1',
-			'confirmation' =>		'db scripts.confirmation|not_empty',
-			'enable_confirmation' =>'in 1'
+			'scriptid' =>				'fatal|required|db scripts.scriptid',
+			'name' =>					'               db scripts.name',
+			'type' =>					'               db scripts.type        |in 0,1',
+			'execute_on' =>				'               db scripts.execute_on  |in 0,1',
+			'command' =>				'               db scripts.command',
+			'commandipmi' =>			'               db scripts.command',
+			'description' =>			'               db scripts.description',
+			'host_access' =>			'               db scripts.host_access |in 0,1,2,3',
+			'groupid' =>				'               db scripts.groupid',
+			'usrgrpid' =>				'               db scripts.usrgrpid',
+			'hgstype' =>				'                                       in 0,1',
+			'confirmation' =>			'               db scripts.confirmation|not_empty',
+			'enable_confirmation' =>	'                                       in 1'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -67,9 +67,12 @@ class CControllerScriptUpdate extends CController {
 	protected function doAction() {
 		$script = array();
 
-		$this->getInputs($script, array('scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid', 'groupid', 'host_access', 'confirmation'));
+		$this->getInputs($script, array('scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid',
+			'groupid', 'host_access', 'confirmation'
+		));
 
-		if ($this->getInput('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) == ZBX_SCRIPT_TYPE_IPMI && $this->hasInput('commandipmi')) {
+		if ($this->getInput('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) == ZBX_SCRIPT_TYPE_IPMI
+				&& $this->hasInput('commandipmi')) {
 			$script['command'] = $this->getInput('commandipmi');
 		}
 
@@ -83,7 +86,9 @@ class CControllerScriptUpdate extends CController {
 
 		if ($result) {
 			$scriptId = reset($result['scriptids']);
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCRIPT, ' Name ['.$this->getInput('name').'] id ['.$scriptId.']');
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCRIPT,
+				'Name ['.$this->getInput('name', '').'] id ['.$scriptId.']'
+			);
 		}
 
 		$result = DBend($result);
