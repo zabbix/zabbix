@@ -98,7 +98,7 @@ if (isset($_REQUEST['screenid'])) {
 if ($isExportData) {
 	$screens = getRequest('screens', array());
 	$export = new CConfigurationExport(array('screens' => $screens));
-	$export->setBuilder(new CConfigurationExportBuilder(ZABBIX_EXPORT_VERSION));
+	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
 	if (hasErrorMesssages()) {

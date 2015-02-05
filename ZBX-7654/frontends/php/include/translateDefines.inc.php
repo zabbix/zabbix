@@ -27,6 +27,7 @@ define('UNRESOLVED_MACRO_STRING', '*'._('UNKNOWN').'*');
 /**
  * Date and time formats.
  */
+define('DATE_TIME_FORMAT_SECONDS_XML', _('Y-m-d\TH:i:s\Z'));
 define('DATE_TIME_FORMAT_SECONDS', _('Y-m-d H:i:s'));
 define('DATE_TIME_FORMAT', _('Y-m-d H:i'));
 define('DATE_FORMAT', _('Y-m-d'));
