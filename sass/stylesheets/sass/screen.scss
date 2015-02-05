@@ -968,7 +968,7 @@ div.signin-container {
 	background: $body-content-bgcolor;
 	width: 322px;
 	margin: 0 auto;
-	padding: 25px 28px 0 28px;
+	padding: 20px 28px 0 28px;
 	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
 
 	h1 {
@@ -1011,15 +1011,18 @@ div.signin-container {
 }
 
 div.signin-logo {
-	margin-top: 50%;
 	margin: 0 auto;
-	width: 100px;
-	height: 50px;
+	margin-top: 5%;
+	margin-bottom: 25px;
+	width: 114px;
+	height: 30px;
+	background: url(../img/icon-sprite.png) no-repeat 0 -391px;
 }
 
 div.signin-links {
 	width: 100%;
 	text-align: center;
+	color: $font-alt-color;
 	margin: 22px 0 0 0;
 }
 
