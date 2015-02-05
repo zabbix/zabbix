@@ -22,16 +22,16 @@ class CControllerProxyUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'proxyid' =>		'db       hosts.hostid     |required|fatal',
-			'host' =>			'db       hosts.host       |not_empty',
-			'status' =>			'db       hosts.status     |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'interfaceid' =>    'db       interface.interfaceid',
-			'dns' =>			'db       interface.dns',
-			'ip' =>				'db       interface.ip',
-			'useip' =>			'db       interface.useip  |in 0,1',
-			'port' =>			'db       interface.port',
-			'proxy_hostids' =>	'array_db hosts.hostid',
-			'description' =>	'db       hosts.description'
+			'proxyid' =>		'fatal|required|db       hosts.hostid',
+			'host' =>			'               db       hosts.host',
+			'status' =>			'               db       hosts.status     |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
+			'interfaceid' =>    '               db       interface.interfaceid',
+			'dns' =>			'               db       interface.dns',
+			'ip' =>				'               db       interface.ip',
+			'useip' =>			'               db       interface.useip  |in 0,1',
+			'port' =>			'               db       interface.port',
+			'proxy_hostids' =>	'               array_db hosts.hostid',
+			'description' =>	'               db       hosts.description'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -73,7 +73,7 @@ class CControllerProxyUpdate extends CController {
 
 		DBstart();
 
-		if ($this->getInput('proxy_hostids', array())) {
+		if ($this->hasInput('proxy_hostids')) {
 			// skip discovered hosts
 			$proxy['hosts'] = API::Host()->get(array(
 				'output' => array('hostid'),
@@ -81,11 +81,16 @@ class CControllerProxyUpdate extends CController {
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 			));
 		}
+		else {
+			$proxy['hosts'] = array();
+		}
 
 		$result = API::Proxy()->update($proxy);
 
 		if ($result) {
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_PROXY, '['.$this->getInput('host').'] ['.reset($result['proxyids']).']');
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_PROXY,
+				'['.$this->getInput('host', '').'] ['.reset($result['proxyids']).']'
+			);
 		}
 
 		$result = DBend($result);
@@ -95,7 +100,9 @@ class CControllerProxyUpdate extends CController {
 			$response->setMessageOk(_('Proxy updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=proxy.edit&proxyid='.$this->getInput('proxyid'));
+			$response = new CControllerResponseRedirect(
+				'zabbix.php?action=proxy.edit&proxyid='.$this->getInput('proxyid')
+			);
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot update proxy'));
 		}
