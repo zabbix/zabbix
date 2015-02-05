@@ -672,7 +672,7 @@ button {
 	min-height: 24px;
 	vertical-align: middle;
 	cursor: pointer;
-	@include transition(border-color, background .2s ease);
+	@include transition(border-color, background-color .2s ease);
 
 	&:hover {
 		@extend %button-hover;
