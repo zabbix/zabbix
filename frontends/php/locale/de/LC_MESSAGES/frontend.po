@@ -10088,8 +10088,8 @@ msgstr ""
 #: include/classes/api/services/CHost.php:606
 #: include/classes/api/services/CHost.php:616
 #, c-format
-msgid "No groups for host \"%s\"."
-msgstr "Keine Gruppen für Host \"%s\"."
+msgid "No groups for host \"%1$s\"."
+msgstr "Keine Gruppen für Host \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:951
 msgid "No groups for hosts."
@@ -15756,8 +15756,8 @@ msgstr "Falsche Felder für Element."
 
 #: include/classes/api/services/CHost.php:565
 #, c-format
-msgid "Wrong fields for host \"%s\"."
-msgstr "Falsche Felder für Host \"%s\"."
+msgid "Wrong fields for host \"%1$s\"."
+msgstr "Falsche Felder für Host \"%1$s\"."
 
 #: include/classes/api/services/CImage.php:498
 #, c-format

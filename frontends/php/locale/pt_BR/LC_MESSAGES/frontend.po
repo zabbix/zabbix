@@ -10056,8 +10056,8 @@ msgstr "Nenhum gráfico encontrado."
 #: include/classes/api/services/CHost.php:606
 #: include/classes/api/services/CHost.php:616
 #, c-format
-msgid "No groups for host \"%s\"."
-msgstr "Nenhum grupo para o host \"%s\"."
+msgid "No groups for host \"%1$s\"."
+msgstr "Nenhum grupo para o host \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:951
 msgid "No groups for hosts."
@@ -15709,8 +15709,8 @@ msgstr "Campos errados para o elemento."
 
 #: include/classes/api/services/CHost.php:565
 #, c-format
-msgid "Wrong fields for host \"%s\"."
-msgstr "Campos errado para o host \"%s\"."
+msgid "Wrong fields for host \"%1$s\"."
+msgstr "Campos errado para o host \"%1$s\"."
 
 #: include/classes/api/services/CImage.php:498
 #, c-format
