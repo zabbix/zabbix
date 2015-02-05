@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-05 21:38+0200\n"
-"PO-Revision-Date: 2015-01-22 02:12+0300\n"
+"POT-Creation-Date: 2015-02-05 21:43+0200\n"
+"PO-Revision-Date: 2015-02-04 03:04+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1421885567.0\n"
+"X-POOTLE-MTIME: 1423011879.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2769,7 +2769,7 @@ msgstr "クリア"
 #: include/views/configuration.httpconf.list.php:149
 #: include/views/configuration.item.list.php:273
 msgid "Clear history"
-msgstr ""
+msgstr "ヒストリを削除"
 
 #: include/views/configuration.httpconf.edit.php:272
 #: include/views/configuration.item.edit.php:456
@@ -4369,7 +4369,7 @@ msgstr "ホストを無効にしますか？"
 #: include/views/administration.proxy.list.php:108
 #: include/views/configuration.hostgroups.list.php:160
 msgid "Disable hosts"
-msgstr ""
+msgstr "ホストを無効"
 
 #: include/views/configuration.hostgroups.list.php:161
 msgid "Disable hosts in the selected host groups?"
@@ -4984,7 +4984,7 @@ msgstr "ホストを有効にしますか？"
 #: include/views/administration.proxy.list.php:105
 #: include/views/configuration.hostgroups.list.php:159
 msgid "Enable hosts"
-msgstr ""
+msgstr "ホストを有効"
 
 #: include/views/administration.proxy.list.php:106
 msgid "Enable hosts monitored by selected proxies?"
@@ -5241,7 +5241,7 @@ msgstr "分解円グラフ"
 #: include/views/configuration.screen.list.php:68
 #: include/views/configuration.sysmap.list.php:66 templates.php:748
 msgid "Export"
-msgstr ""
+msgstr "エクスポート"
 
 #: events.php:298
 msgid "Export to CSV"
@@ -9965,7 +9965,7 @@ msgstr "グラフはありません。"
 #: include/classes/api/services/CHost.php:573
 #, c-format
 msgid "No groups for host \"%1$s\"."
-msgstr "ホスト\"%1$s\"にグループが設定されていません。"
+msgstr ""
 
 #: include/classes/api/services/CHost.php:974
 msgid "No groups for hosts."
@@ -14461,7 +14461,7 @@ msgstr "ユーザーに%1$sは利用できません。"
 
 #: include/views/administration.users.list.php:154
 msgid "Unblock"
-msgstr ""
+msgstr "ブロックを解除"
 
 #: include/views/administration.users.list.php:154
 msgid "Unblock selected users?"
@@ -15599,7 +15599,7 @@ msgstr "要素の設定が正しくありません。"
 #: include/classes/api/services/CHost.php:551
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
-msgstr "ホスト\"%1$s\"の設定が正しくありません。"
+msgstr ""
 
 #: include/classes/api/services/CImage.php:498
 #, c-format
@@ -16377,7 +16377,7 @@ msgstr "秒"
 
 #: include/classes/html/CActionButtonList.php:90
 msgid "selected"
-msgstr ""
+msgstr "選択"
 
 #: include/actions.inc.php:1152
 msgid "sent"

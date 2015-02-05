@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-05 21:38+0200\n"
-"PO-Revision-Date: 2015-01-20 10:44+0300\n"
+"POT-Creation-Date: 2015-02-05 21:43+0200\n"
+"PO-Revision-Date: 2015-02-04 15:52+0300\n"
 "Last-Translator: filipp.sudanov <filipp.sudanov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1421743448.0\n"
+"X-POOTLE-MTIME: 1423057960.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -6115,7 +6115,7 @@ msgstr "ОБЗОР ИНВЕНТАРНЫХ ДАННЫХ УЗЛА СЕТИ"
 
 #: include/classes/screens/CScreenHostTriggers.php:131
 msgid "HOST ISSUES"
-msgstr "СОБЫТИЯ У УЗЛА СЕТИ"
+msgstr "СОБЫТИЯ УЗЛА СЕТИ"
 
 #: include/discovery.inc.php:60
 #: include/views/administration.authentication.edit.php:48
@@ -6448,7 +6448,7 @@ msgstr "Обзор инвентарных данных узла сети"
 
 #: include/screens.inc.php:40
 msgid "Host issues"
-msgstr "События у узла сети"
+msgstr "События узла сети"
 
 #: include/views/configuration.sysmap.edit.php:83
 msgid "Host label type"
@@ -10092,7 +10092,7 @@ msgstr "Графики не найдены."
 #: include/classes/api/services/CHost.php:573
 #, c-format
 msgid "No groups for host \"%1$s\"."
-msgstr "Нет групп для узла сети \"%1$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHost.php:974
 msgid "No groups for hosts."
@@ -15755,7 +15755,7 @@ msgstr "Ошибочные поля для элемента."
 #: include/classes/api/services/CHost.php:551
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
-msgstr "Ошибочные поля для узла сети \"%1$s\"."
+msgstr ""
 
 #: include/classes/api/services/CImage.php:498
 #, c-format
