@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-30 11:36+0200\n"
+"POT-Creation-Date: 2015-02-05 21:48+0200\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1585,7 +1585,7 @@ msgstr "無法創建新組件"
 msgid "Cannot create template."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1317
+#: include/classes/api/services/CUser.php:1315
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "無法刪除Zabbix內部用戶 \"%1$s\", 試試停用那用戶."
@@ -3194,11 +3194,6 @@ msgstr[0] ""
 #: include/views/configuration.triggers.list.php:303
 msgid "Copy selected to ..."
 msgstr "複製所選的到 ..."
-
-#: include/classes/api/services/CUser.php:1076
-#, c-format
-msgid "Correct login \"%s\"."
-msgstr "正確登入\"%s\"."
 
 #: include/classes/api/services/CImage.php:393
 msgid "Could not save image!"
@@ -10194,7 +10189,7 @@ msgid "No permissions for screen \"%1$s\"."
 msgstr "不具篩選 \"%1$s\"的許可權."
 
 #: include/classes/api/services/CUser.php:996
-#: include/classes/api/services/CUser.php:1125
+#: include/classes/api/services/CUser.php:1123
 msgid "No permissions for system access."
 msgstr "沒有系統存取的許可權"
 
@@ -10292,7 +10287,7 @@ msgstr "沒有系統存取的許可權"
 #: include/classes/api/services/CUser.php:798
 #: include/classes/api/services/CUser.php:818
 #: include/classes/api/services/CUser.php:877
-#: include/classes/api/services/CUser.php:1282 include/func.inc.php:1662
+#: include/classes/api/services/CUser.php:1280 include/func.inc.php:1662
 msgid "No permissions to referred object or it does not exist!"
 msgstr "沒有所說的物件的許可權或其不存在!"
 
@@ -12890,7 +12885,7 @@ msgstr "服務"
 msgid "Services form a circular dependency."
 msgstr "服務形成了一個循環式迴圈."
 
-#: include/classes/api/services/CUser.php:1119
+#: include/classes/api/services/CUser.php:1117
 msgid "Session terminated, re-login, please."
 msgstr "連線期已中斷, 請重連."
 
@@ -14927,7 +14922,7 @@ msgstr ""
 msgid "User groups"
 msgstr "用户群組"
 
-#: include/classes/api/services/CUser.php:1295
+#: include/classes/api/services/CUser.php:1293
 msgid "User is not allowed to delete himself."
 msgstr "用戶是不允許刪除自己"
 

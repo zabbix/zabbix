@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-30 11:36+0200\n"
+"POT-Creation-Date: 2015-02-05 21:48+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -1601,7 +1601,7 @@ msgstr "Не може да се създаде нов елемент"
 msgid "Cannot create template."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1317
+#: include/classes/api/services/CUser.php:1315
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Не може да се изтрие Zabbix вътрешен потребител \"%1$s\", опитайте с изключване на този потребител."
@@ -3245,11 +3245,6 @@ msgstr[1] ""
 #: include/views/configuration.triggers.list.php:303
 msgid "Copy selected to ..."
 msgstr "Копиране на избраните в ..."
-
-#: include/classes/api/services/CUser.php:1076
-#, c-format
-msgid "Correct login \"%s\"."
-msgstr "Неправилен вход \"%s\"."
 
 #: include/classes/api/services/CImage.php:393
 msgid "Could not save image!"
@@ -10273,7 +10268,7 @@ msgid "No permissions for screen \"%1$s\"."
 msgstr "Нямате право на достъп до екран \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:996
-#: include/classes/api/services/CUser.php:1125
+#: include/classes/api/services/CUser.php:1123
 msgid "No permissions for system access."
 msgstr "Нямате право на достъп до системата."
 
@@ -10371,7 +10366,7 @@ msgstr "Нямате право на достъп до системата."
 #: include/classes/api/services/CUser.php:798
 #: include/classes/api/services/CUser.php:818
 #: include/classes/api/services/CUser.php:877
-#: include/classes/api/services/CUser.php:1282 include/func.inc.php:1662
+#: include/classes/api/services/CUser.php:1280 include/func.inc.php:1662
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Нямате право на достъп до посочения обект или той не съществува!"
 
@@ -12976,7 +12971,7 @@ msgstr "Услуги"
 msgid "Services form a circular dependency."
 msgstr "Услугите образуват кръгова зависимост."
 
-#: include/classes/api/services/CUser.php:1119
+#: include/classes/api/services/CUser.php:1117
 msgid "Session terminated, re-login, please."
 msgstr "Сесията е прекратена, моля влезте повторно в системата."
 
@@ -15026,7 +15021,7 @@ msgstr ""
 msgid "User groups"
 msgstr "Потребителски групи"
 
-#: include/classes/api/services/CUser.php:1295
+#: include/classes/api/services/CUser.php:1293
 msgid "User is not allowed to delete himself."
 msgstr "Не е позполено на потребителя да изтрие себе си."
 
