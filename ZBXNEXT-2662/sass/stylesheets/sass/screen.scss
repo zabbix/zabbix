@@ -130,7 +130,7 @@ ul.top-nav-icons {
 
 	a {
 		display: block;
-		width: 52px;
+		width: 38px;
 		height: 36px;
 		@include opacity(0.75);
 		@include transition(all .2s ease);
@@ -141,19 +141,20 @@ ul.top-nav-icons {
     }
 
 	a.top-nav-help {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat 9px -18px;
+		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -18px;
 	}
 
 	a.top-nav-print {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat 9px -42px;
+		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -42px;
 	}
 
 	a.top-nav-profile {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat 9px -66px;
+		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -66px;
 	}
 
 	a.top-nav-signout {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat 9px -91px;
+		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -91px;
+		width: 44px;
 	}
 }
 
@@ -259,7 +260,7 @@ div.header-title {
 		li {
 			display: block;
 			float: left;
-			padding: 0 0 0 13px;
+			padding: 0 0 0 14px;
 		}
 	}
 }
@@ -276,7 +277,7 @@ ul.object-group {
 	
 	li {
 		display: inline-block;
-		margin: 0 13px 0 0;
+		margin: 0 14px 0 0;
 	}
 
 	& a.selected {
@@ -428,6 +429,7 @@ span.radio-switch {
 }
 
 div.treeview-plus {
+	display: inline-block;
 	background: $body-content-bgcolor;
 	border: 1px solid $form-input-color;
 	cursor: pointer;
@@ -507,7 +509,7 @@ table.table-forms {
 		}
 
 		button {
-			margin: 0 13px 0 0;
+			margin: 0 14px 0 0;
 		}
 	}
 
@@ -892,7 +894,7 @@ div.action-buttons {
 	margin: 15px 0 0 0;
 
 	& button {
-		margin: 0 13px 0 0;
+		margin: 0 14px 0 0;
 	}
 }
 
@@ -986,7 +988,7 @@ div.signin-container {
 		}
 	}
 
-	label {
+	label {                                                                                                                                                                                                                                                                                                              
 		display: block;
 		margin: 0 0 2px 0;
 	}
@@ -1224,6 +1226,14 @@ span.status-grey {
 	text-transform: $font-transform;
 	text-align: center;
 	@include border-radius(2px); 
+}
+
+.green-bg {
+	background: $alert-green-bg-color;
+}
+
+.red-bg {
+	background: $alert-red-bg-color;
 }
 
 div.msg-good {
