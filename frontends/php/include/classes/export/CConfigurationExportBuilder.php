@@ -29,9 +29,9 @@ class CConfigurationExportBuilder {
 	/**
 	 * @param $version  current export version
 	 */
-	public function __construct($version) {
-		$this->data['version'] = $version;
-		$this->data['date'] = date('Y-m-d\TH:i:s\Z', time() - date('Z'));
+	public function __construct() {
+		$this->data['version'] = ZABBIX_EXPORT_VERSION;
+		$this->data['date'] = date(DATE_TIME_FORMAT_SECONDS_XML, time() - date('Z'));
 	}
 
 	/**

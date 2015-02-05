@@ -226,7 +226,7 @@ class C20ImportConverter extends CConverter {
 					array(
 						'macro' => $filterMacro,
 						'value' => $filterValue,
-						'operator' => CONDITION_OPERATOR_REGEXP,
+						'operator' => CONDITION_OPERATOR_REGEXP
 					)
 				)
 			);

@@ -141,7 +141,7 @@ $hostIds = getRequest('hosts', array());
  */
 if ($exportData) {
 	$export = new CConfigurationExport(array('hosts' => $hostIds));
-	$export->setBuilder(new CConfigurationExportBuilder(ZABBIX_EXPORT_VERSION));
+	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
 

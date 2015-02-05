@@ -77,7 +77,7 @@ class C10ImportConverter extends CConverter {
 	protected function convertTime(array $content) {
 		list($day, $month, $year) = explode('.', $content['date']);
 		list($hours, $minutes) = explode('.', $content['time']);
-		$content['date'] = date('Y-m-d\TH:i:s\Z', mktime($hours, $minutes, 0, $month, $day, $year));
+		$content['date'] = date(DATE_TIME_FORMAT_SECONDS_XML, mktime($hours, $minutes, 0, $month, $day, $year));
 
 		unset($content['time']);
 

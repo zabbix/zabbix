@@ -107,7 +107,7 @@ else {
 
 if ($isExportData) {
 	$export = new CConfigurationExport(array('maps' => getRequest('maps', array())));
-	$export->setBuilder(new CConfigurationExportBuilder(ZABBIX_EXPORT_VERSION));
+	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
 

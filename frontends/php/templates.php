@@ -99,7 +99,7 @@ $templateIds = getRequest('templates', array());
 
 if ($exportData) {
 	$export = new CConfigurationExport(array('templates' => $templateIds));
-	$export->setBuilder(new CConfigurationExportBuilder(ZABBIX_EXPORT_VERSION));
+	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
 
