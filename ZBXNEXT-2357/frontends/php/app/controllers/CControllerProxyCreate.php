@@ -67,7 +67,7 @@ class CControllerProxyCreate extends CController {
 
 		DBstart();
 
-		if ($this->getInput('proxy_hostids', array())) {
+		if ($this->hasInput('proxy_hostids')) {
 			// skip discovered hosts
 			$proxy['hosts'] = API::Host()->get(array(
 				'output' => array('hostid'),
@@ -79,7 +79,9 @@ class CControllerProxyCreate extends CController {
 		$result = API::Proxy()->create(array($proxy));
 
 		if ($result) {
-			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_PROXY, '['.$this->getInput('host').'] ['.reset($result['proxyids']).']');
+			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_PROXY,
+				'['.$this->getInput('host', '').'] ['.reset($result['proxyids']).']'
+			);
 		}
 
 		$result = DBend($result);
