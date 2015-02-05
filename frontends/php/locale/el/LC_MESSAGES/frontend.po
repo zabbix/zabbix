@@ -10059,8 +10059,8 @@ msgstr ""
 #: include/classes/api/services/CHost.php:606
 #: include/classes/api/services/CHost.php:616
 #, c-format
-msgid "No groups for host \"%s\"."
-msgstr "Χωρίς ομάδες για ξενιστή \"%s\"."
+msgid "No groups for host \"%1$s\"."
+msgstr "Χωρίς ομάδες για ξενιστή \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:951
 msgid "No groups for hosts."
@@ -15705,8 +15705,8 @@ msgstr "Λάθος πεδία για στοιχείο."
 
 #: include/classes/api/services/CHost.php:565
 #, c-format
-msgid "Wrong fields for host \"%s\"."
-msgstr "Λάθος πεδία για ξενιστή \"%s\"."
+msgid "Wrong fields for host \"%1$s\"."
+msgstr "Λάθος πεδία για ξενιστή \"%1$s\"."
 
 #: include/classes/api/services/CImage.php:498
 #, c-format

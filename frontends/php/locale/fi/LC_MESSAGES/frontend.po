@@ -10034,7 +10034,7 @@ msgstr ""
 #: include/classes/api/services/CHost.php:606
 #: include/classes/api/services/CHost.php:616
 #, c-format
-msgid "No groups for host \"%s\"."
+msgid "No groups for host \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CHost.php:951
@@ -15677,7 +15677,7 @@ msgstr ""
 
 #: include/classes/api/services/CHost.php:565
 #, c-format
-msgid "Wrong fields for host \"%s\"."
+msgid "Wrong fields for host \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CImage.php:498

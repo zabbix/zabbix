@@ -9982,8 +9982,8 @@ msgstr "グラフはありません。"
 #: include/classes/api/services/CHost.php:606
 #: include/classes/api/services/CHost.php:616
 #, c-format
-msgid "No groups for host \"%s\"."
-msgstr "ホスト\"%s\"にグループが設定されていません。"
+msgid "No groups for host \"%1$s\"."
+msgstr "ホスト\"%1$s\"にグループが設定されていません。"
 
 #: include/classes/api/services/CHost.php:951
 msgid "No groups for hosts."
@@ -15611,8 +15611,8 @@ msgstr "要素の設定が正しくありません。"
 
 #: include/classes/api/services/CHost.php:565
 #, c-format
-msgid "Wrong fields for host \"%s\"."
-msgstr "ホスト\"%s\"の設定が正しくありません。"
+msgid "Wrong fields for host \"%1$s\"."
+msgstr "ホスト\"%1$s\"の設定が正しくありません。"
 
 #: include/classes/api/services/CImage.php:498
 #, c-format
