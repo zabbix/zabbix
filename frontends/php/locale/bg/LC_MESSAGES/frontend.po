@@ -10072,8 +10072,8 @@ msgstr ""
 #: include/classes/api/services/CHost.php:606
 #: include/classes/api/services/CHost.php:616
 #, c-format
-msgid "No groups for host \"%s\"."
-msgstr "Няма групи за хост \"%s\"."
+msgid "No groups for host \"%1$s\"."
+msgstr "Няма групи за хост \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:951
 msgid "No groups for hosts."
@@ -15726,8 +15726,8 @@ msgstr "Грешни полета за елемент."
 
 #: include/classes/api/services/CHost.php:565
 #, c-format
-msgid "Wrong fields for host \"%s\"."
-msgstr "Грешни полета за хот \"%s\"."
+msgid "Wrong fields for host \"%1$s\"."
+msgstr "Грешни полета за хот \"%1$s\"."
 
 #: include/classes/api/services/CImage.php:498
 #, c-format
