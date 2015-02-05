@@ -22,7 +22,7 @@ class CControllerScriptDelete extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'scriptids' =>		'fatal|array_db scripts.scriptid|required'
+			'scriptids' =>	'required|array_db scripts.scriptid'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -45,25 +45,29 @@ class CControllerScriptDelete extends CController {
 	}
 
 	protected function doAction() {
+		$scriptids = $this->getInput('scriptids');
+
 		DBstart();
 
-		$result = API::Script()->delete($this->getInput('scriptids'));
+		$result = API::Script()->delete($scriptids);
 
 		if ($result) {
-			foreach ($this->getInput('scriptids') as $scriptid) {
+			foreach ($scriptids as $scriptid) {
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, _('Script').' ['.$scriptid.']');
 			}
 		}
 
 		$result = DBend($result);
 
+		$deleted = count($scriptids);
+
 		$response = new CControllerResponseRedirect('zabbix.php?action=script.list&uncheck=1');
 
 		if ($result) {
-			$response->setMessageOk(_('Script deleted'));
+			$response->setMessageOk(_n('Script deleted', 'Scripts deleted', $deleted));
 		}
 		else {
-			$response->setMessageError(_('Cannot delete script'));
+			$response->setMessageError(_n('Cannot delete script', 'Cannot delete scripts', $deleted));
 		}
 
 		$this->setResponse($response);
