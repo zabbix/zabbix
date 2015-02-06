@@ -1707,12 +1707,16 @@ int	check_vcenter_vm_cpu_ready(AGENT_REQUEST *request, const char *username, con
 	const char	*__function_name = "check_vcenter_vm_cpu_ready";
 
 	zbx_vmware_service_t	*service;
-	int			ret;
+	int			ret = SYSINFO_RET_FAIL;
 	const char		*url, *uuid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vmware_lock();
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
 
 	url = get_rparam(request, 0);
 	uuid = get_rparam(request, 1);
@@ -1720,8 +1724,10 @@ int	check_vcenter_vm_cpu_ready(AGENT_REQUEST *request, const char *username, con
 	if ('\0' == *uuid)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		goto unlock;
+		goto out;
 	}
+
+	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
@@ -1729,7 +1735,7 @@ int	check_vcenter_vm_cpu_ready(AGENT_REQUEST *request, const char *username, con
 	ret = vmware_service_get_vm_counter(service, uuid, "", "cpu/ready[summation]", 1, result);
 unlock:
 	zbx_vmware_unlock();
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
 
 	return ret;
