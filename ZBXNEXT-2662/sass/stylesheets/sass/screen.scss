@@ -14,6 +14,20 @@ body {
 	background: $body-bgcolor;
 	margin-bottom: 60px;
 	min-width: 950px;
+
+	&.pop-up {
+		min-width: initial;
+		margin-bottom: 0;
+
+		article {
+			padding: 13px;
+		}
+
+		h1 {
+			border-bottom: none;
+			padding: 0;
+		}
+	}
 }
 
 a {
@@ -268,7 +282,6 @@ div.header-title {
 /* Article */
 article {
 	padding: 0 13px 0 13px;
-	padding-bottom: 40px;
 }
 
 /* Obgect Group Navigation */
@@ -1234,6 +1247,18 @@ span.status-grey {
 
 .red-bg {
 	background: $alert-red-bg-color;
+}
+
+.info-bg {
+	background: $alert-info-bg-color;
+}
+
+.average-bg {
+	background: $alert-average-bg-color;
+}
+
+.warning-bg {
+	background: $alert-warning-bg-color;
 }
 
 div.msg-good {
