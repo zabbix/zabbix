@@ -59,6 +59,8 @@ extern char		*CONFIG_FILE;
 extern int		CONFIG_VMWARE_FREQUENCY;
 extern int		CONFIG_VMWARE_PERF_FREQUENCY;
 extern zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE;
+extern int		CONFIG_VMWARE_TIMEOUT;
+
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
 
@@ -914,7 +916,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 
 	const char	*__function_name = "vmware_service_authenticate";
 	char		xml[MAX_STRING_LEN], *error_object = NULL;
-	int		err, opt, timeout = 10, ret = FAIL;
+	int		err, opt, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, service->username, service->url);
 
@@ -925,7 +927,8 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, service->url)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)timeout)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT,
+					(long)CONFIG_VMWARE_TIMEOUT)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
