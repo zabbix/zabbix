@@ -3931,57 +3931,40 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCcheck_active_permissions                                       *
+ * Function: DCcheck_proxy_permissions                                        *
  *                                                                            *
  * Purpose:                                                                   *
- *     Check access rights for an active proxy, active checks from an agent,  *
- *     a trapper item and get host or proxy ID                                *
+ *     Check access rights for an active proxy and get the proxy ID           *
  *                                                                            *
  * Parameters:                                                                *
- *     host        - [IN] host or proxy name                                  *
- *     host_status - [IN] indicates whether the 'host' name refers to a host  *
- *                        or a proxy. Values:                                 *
- *                        HOST_STATUS_MONITORED - search for a host,          *
- *                        HOST_STATUS_PROXY_ACTIVE - search for a proxy.      *
- *     attr        - [IN] connection attributes                               *
- *     hostid      - [OUT] proxy or host ID found in configuration cache      *
- *     error       - [OUT] error message why access was denied                *
+ *     host   - [IN] proxy name                                               *
+ *     attr   - [IN] connection attributes                                    *
+ *     hostid - [OUT] proxy ID found in configuration cache                   *
+ *     error  - [OUT] error message why access was denied                     *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - access is allowed, FAIL - access denied                      *
  *                                                                            *
  * Comments:                                                                  *
- *     Generating error messages is done outside of configuration cache       *
+ *     Generating of error messages is done outside of configuration cache    *
  *     locking.                                                               *
  *                                                                            *
  ******************************************************************************/
-int	DCcheck_active_permissions(const char *host, int host_status, const zbx_tls_conn_attr_t *attr,
-		zbx_uint64_t *hostid, char **error)
+int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr, zbx_uint64_t *hostid,
+		char **error)
 {
-	const char		*h_txt;
 	const ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
 
-	if (HOST_STATUS_MONITORED == host_status)	/* search in hosts */
-	{
-		dc_host = DCfind_host(host);
-		h_txt = "host";
-	}
-	else						/* search in proxies */
-	{
-		dc_host = DCfind_proxy(host);
-		h_txt = "proxy";
-	}
-
-	if (NULL == dc_host)
+	if (NULL == (dc_host = DCfind_proxy(host)))
 	{
 		UNLOCK_CACHE;
-		*error = zbx_dsprintf(*error, "%s \"%s\" not found", h_txt, host);
+		*error = zbx_dsprintf(*error, "proxy \"%s\" not found", host);
 		return FAIL;
 	}
 
-	if (HOST_STATUS_PROXY_ACTIVE == host_status && HOST_STATUS_PROXY_ACTIVE != dc_host->status)
+	if (HOST_STATUS_PROXY_ACTIVE != dc_host->status)
 	{
 		UNLOCK_CACHE;
 		*error = zbx_dsprintf(*error, "proxy \"%s\" is configured in passive mode", host);
@@ -3991,27 +3974,29 @@ int	DCcheck_active_permissions(const char *host, int host_status, const zbx_tls_
 	if (0 == ((unsigned int)dc_host->tls_accept & attr->connection_type))
 	{
 		UNLOCK_CACHE;
-		*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for %s \"%s\"",
-				zbx_tls_connection_type_name(attr->connection_type), h_txt, host);
+		*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for proxy \"%s\"",
+				zbx_tls_connection_type_name(attr->connection_type), host);
 		return FAIL;
 	}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == attr->connection_type)
 	{
+		/* TODO RFC 4518 requires more sophisticated issuer matching */
 		if (strlen(dc_host->tls_issuer) != attr->arg1_len ||
-				0 != memcmp(dc_host->tls_issuer, attr->arg1, attr->arg1_len)) /* TODO standard requires more sophisticated matching */
+				0 != memcmp(dc_host->tls_issuer, attr->arg1, attr->arg1_len))
 		{
 			UNLOCK_CACHE;
-			*error = zbx_dsprintf(*error, "%s \"%s\" certificate issuer does not match", h_txt, host);
+			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate issuer does not match", host);
 			return FAIL;
 		}
 
+		/* TODO RFC 4518 requires more sophisticated subject matching */
 		if (strlen(dc_host->tls_subject) != attr->arg2_len ||
-				0 != memcmp(dc_host->tls_subject, attr->arg2, attr->arg2_len)) /* TODO standard requires more sophisticated matching */
+				0 != memcmp(dc_host->tls_subject, attr->arg2, attr->arg2_len))
 		{
 			UNLOCK_CACHE;
-			*error = zbx_dsprintf(*error, "%s \"%s\" certificate subject does not match", h_txt, host);
+			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate subject does not match", host);
 			return FAIL;
 		}
 	}
@@ -4021,7 +4006,7 @@ int	DCcheck_active_permissions(const char *host, int host_status, const zbx_tls_
 				0 != memcmp(dc_host->tls_psk_identity, attr->arg1, attr->arg1_len))
 		{
 			UNLOCK_CACHE;
-			*error = zbx_dsprintf(*error, "%s \"%s\" is using false PSK identity", h_txt, host);
+			*error = zbx_dsprintf(*error, "proxy \"%s\" is using false PSK identity", host);
 			return FAIL;
 		}
 	}
