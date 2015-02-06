@@ -2091,15 +2091,17 @@ void	calc_timestamp(const char *line, int *timestamp, const char *format)
 void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		AGENT_VALUE *values, size_t values_num, int *processed)
 {
-	const char	*__function_name = "process_mass_data";
-	AGENT_RESULT	agent;
-	DC_ITEM		*items = NULL;
-	zbx_host_key_t	*keys = NULL;
-	size_t		i;
-	zbx_uint64_t	*itemids = NULL, *lastlogsizes = NULL;
-	unsigned char	*states = NULL;
-	int		*lastclocks = NULL, *errcodes = NULL, *mtimes = NULL, *errcodes2 = NULL;
-	size_t		num = 0;
+	const char		*__function_name = "process_mass_data";
+	AGENT_RESULT		agent;
+	DC_ITEM			*items = NULL;
+	zbx_host_key_t		*keys = NULL;
+	size_t			i;
+	zbx_uint64_t		*itemids = NULL, *lastlogsizes = NULL, hostid_prev = 0;
+	unsigned char		*states = NULL;
+	int			*lastclocks = NULL, *errcodes = NULL, *mtimes = NULL, *errcodes2 = NULL,
+				flag_host_allow = 0;
+	size_t			num = 0;
+	zbx_tls_conn_attr_t	attr;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2162,6 +2164,90 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				zabbix_log(LOG_LEVEL_WARNING, "cannot process trapper item \"%s\": %s",
 						items[i].key_orig, zbx_tcp_strerror());
 				continue;
+			}
+		}
+
+		/* If data have come from a proxy then trust them (connection with the proxy has been already checked */
+		/* and it is the responsibility of proxy to check incoming data). If the data have come directly into */
+		/* trapper process (active check or trapper item) then check if the connection is allowed. */
+		/* It is enough to check connection type, and optionally, certificate issuer and subject, and PSK */
+		/* identity only for a host. No need to check it for every item if the host is the same. */
+
+		if (0 == proxy_hostid && NULL != sock)
+		{
+			if (hostid_prev == items[i].host.hostid)	/* host and connection already checked */
+			{
+				if (0 == flag_host_allow)
+					continue;
+			}
+			else
+			{
+				hostid_prev = items[i].host.hostid;
+
+				if (0 == ((unsigned int)items[i].host.tls_accept & sock->connection_type))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "connection of type \"%s\" is not allowed for "
+							"host \"%s\" item \"%s\" (not every rejected item might be "
+							"reported)",
+							zbx_tls_connection_type_name(sock->connection_type),
+							items[i].host.host, items[i].key_orig);
+					flag_host_allow = 0;
+					continue;
+				}
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type ||
+						ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+				{
+					if (SUCCEED != zbx_tls_get_attr(sock, &attr))
+					{
+						THIS_SHOULD_NEVER_HAPPEN;
+						flag_host_allow = 0;
+						continue;
+					}
+				}
+
+				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+				{
+					/* TODO RFC 4518 requires more sophisticated issuer matching */
+					if (strlen(items[i].host.tls_issuer) != attr.arg1_len ||
+							0 != memcmp(items[i].host.tls_issuer, attr.arg1,
+							attr.arg1_len))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "certificate issuer does not match for "
+								"host \"%s\" item \"%s\" (not every rejected item might"
+								" be reported)", items[i].host.host, items[i].key_orig);
+						flag_host_allow = 0;
+						continue;
+					}
+
+					/* TODO RFC 4518 requires more sophisticated subject matching */
+					if (strlen(items[i].host.tls_subject) != attr.arg2_len ||
+							0 != memcmp(items[i].host.tls_subject, attr.arg2,
+							attr.arg2_len))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "certificate subject does not match for "
+								"host \"%s\" item \"%s\" (not every rejected item might"
+								" be reported)", items[i].host.host, items[i].key_orig);
+						flag_host_allow = 0;
+						continue;
+					}
+				}
+				else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+				{
+					if (strlen(items[i].host.tls_psk_identity) != attr.arg1_len ||
+							0 != memcmp(items[i].host.tls_psk_identity, attr.arg1,
+							attr.arg1_len))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "false PSK identity for host \"%s\" item "
+								"\"%s\" (not every rejected item might be reported)",
+								items[i].host.host, items[i].key_orig);
+						flag_host_allow = 0;
+						continue;
+					}
+				}
+#endif
+				flag_host_allow = 1;
 			}
 		}
 
