@@ -213,11 +213,11 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.hardware']]"	\
 		"/*[local-name()='val']/*[local-name()='" property "']"
 
-#define ZBX_XPATH_VM_UUID()									\
+#define ZBX_XPATH_VM_UUID()										\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.uuid']]"		\
 		"/*[local-name()='val']"
 
-#define ZBX_XPATH_VM_INSTANCE_UUID()								\
+#define ZBX_XPATH_VM_INSTANCE_UUID()									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
 		"/*[local-name()='val']"
 
@@ -239,12 +239,8 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 		"/*[local-name()='val']/*[local-name()='" property "']"
 
 #define ZBX_XPATH_HV_STATUS()										\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='overallStatus']]"			\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='overallStatus']]"		\
 		"/*[local-name()='val']"
-
-#define ZBX_XPATH_VMWARE_EVENTS()									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='latestPage']]" 		\
-		"/*/*[local-name()='Event']"
 
 #define ZBX_XPATH_VMWARE_ABOUT(property)								\
 	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
