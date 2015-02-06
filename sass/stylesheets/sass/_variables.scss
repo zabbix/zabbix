@@ -49,6 +49,10 @@ $alert-red-bg-color: #f2dede; // Light Red
 $alert-red-border-color: #ebccd1; // Dark Red
 
 $alert-orange-color: #f37421; // Orange
+$alert-average-bg-color: #fbd5bc; // Light Orange
+
+$alert-info-bg-color: #d5ecf7;
+$alert-warning-bg-color: #fcf6d7; // Light Yellow
 
 $alert-grey-color: #828282; // Alert Grey
 $alert-grey-bg-color: #e0e0e0; // Alert Light Grey 
@@ -140,10 +144,10 @@ $font-transform: uppercase;
 	transition: $arguments;
 }
 
-@mixin box-sizing($sizing) {
-	-webkit-box-sizing: $sizing;
-	-moz-box-sizing: $sizing;
-	box-sizing: $sizing;
+@mixin box-sizing($box-model) {
+	-webkit-box-sizing: $box-model;
+	-moz-box-sizing: $box-model;
+	box-sizing: $box-model;
 }
 
 @mixin opacity($opacity) {
