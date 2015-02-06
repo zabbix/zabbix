@@ -679,8 +679,8 @@ class CHelpItems {
 					'description' => _('VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps')
 				),
 				array(
-					'key' => 'vmware.hv.perfcounter[<url>,<uuid>,<path>]',
-					'description' => _('VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path')
+					'key' => 'vmware.hv.perfcounter[<url>,<uuid>,<path>,<instance>]',
+					'description' => _('VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance')
 				),
 				array(
 					'key' => 'vmware.hv.status[<url>,<uuid>]',
@@ -759,8 +759,8 @@ class CHelpItems {
 					'description' => _('VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second')
 				),
 				array(
-					'key' => 'vmware.vm.perfcounter[<url>,<uuid>,<path>]',
-					'description' => _('VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path')
+					'key' => 'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]',
+					'description' => _('VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance')
 				),
 				array(
 					'key' => 'vmware.vm.powerstate[<url>,<uuid>]',
