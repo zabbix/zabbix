@@ -251,6 +251,8 @@ class CMacrosResolverHelper {
 	 * @static
 	 *
 	 * @param array $triggers
+	 * @param string $triggers[triggerid]['expression']
+	 * @param string $triggers[triggerid]['url']
 	 *
 	 * @return array
 	 */
