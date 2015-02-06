@@ -37,7 +37,7 @@ zbx_tls_conn_attr_t;
 
 const char	*zbx_tls_connection_type_name(unsigned int type);
 int		zbx_tls_get_attr(const zbx_sock_t *s, zbx_tls_conn_attr_t *attr);
-int		DCcheck_active_permissions(const char *host, int host_status, const zbx_tls_conn_attr_t *attr,
-		zbx_uint64_t *hostid, char **error);
+int		DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr, zbx_uint64_t *hostid,
+		char **error);
 
 #endif	/* ZABBIX_TLS_TCP_ACTIVE_H */

@@ -133,7 +133,7 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 		return FAIL;
 	}
 
-	if (SUCCEED != DCcheck_active_permissions(host, HOST_STATUS_PROXY_ACTIVE, &attr, &hostid_tmp, error))
+	if (SUCCEED != DCcheck_proxy_permissions(host, &attr, &hostid_tmp, error))
 		return FAIL;
 
 	*hostid = hostid_tmp;
