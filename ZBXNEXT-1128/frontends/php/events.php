@@ -735,10 +735,10 @@ else {
 			}
 
 			$triggers = API::Trigger()->get(array(
+				'output' => array('triggerid', 'description', 'expression', 'priority', 'flags', 'url'),
 				'triggerids' => zbx_objectValues($events, 'objectid'),
 				'selectHosts' => array('hostid', 'status'),
 				'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
-				'output' => array('description', 'expression', 'priority', 'flags', 'url'),
 				'preservekeys' => true
 			));
 
