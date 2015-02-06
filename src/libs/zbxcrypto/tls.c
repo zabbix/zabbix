@@ -393,7 +393,7 @@ static int	zbx_is_ciphersuite_all(const int *p)
  *          list of all supported ciphersuites                                *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_ciphersuites(int type, int **suites)
+static unsigned int	zbx_ciphersuites(int type, int **suites)
 {
 	const int		*supported_suites, *p;
 	int			*q;
@@ -448,6 +448,8 @@ static void	zbx_ciphersuites(int type, int **suites)
 	}
 
 	*q = 0;
+
+	return count;
 }
 #endif
 
@@ -595,8 +597,9 @@ void	zbx_tls_init_child(void)
 
 #if defined(HAVE_POLARSSL)
 	int		res;
-	char	*pers = NULL;
-	size_t	pers_len = 0;
+	unsigned int	cipher_count;
+	char		*pers = NULL;
+	size_t		pers_len = 0;
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -952,22 +955,29 @@ void	zbx_tls_init_child(void)
 
 	/* Certificate always comes from configuration file. Set up ciphersuites. */
 	if (NULL != my_cert)
-		zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_CERT, &ciphersuites_cert);
+	{
+		cipher_count = zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_CERT, &ciphersuites_cert);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): set up a list of %u certificate ciphersuites", __function_name,
+				cipher_count);
+	}
 
 	/* PSK can come from configuration file (in proxy, agentd, agent) and later from database (in server, proxy). */
 	/* Configure ciphersuites just in case they will be used. */
-	if (NULL != my_psk || 0 != (program_type & ZBX_PROGRAM_TYPE_PROXY) ||
-			0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (NULL != my_psk || 0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)))
 	{
-		zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_PSK, &ciphersuites_psk);
+		cipher_count = zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_PSK, &ciphersuites_psk);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): set up a list of %u PSK ciphersuites", __function_name,
+				cipher_count);
 	}
 
 	/* Sometimes we need to be ready for both certificate and PSK whichever comes in. Set up a combined list of */
 	/* ciphersuites. */
-	if ((NULL != my_cert && NULL != my_psk) || 0 != (program_type & ZBX_PROGRAM_TYPE_PROXY) ||
-			0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (NULL != my_cert && (NULL != my_psk ||
+			0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY))))
 	{
-		zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_CERT, &ciphersuites_all);
+		cipher_count = zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_ALL, &ciphersuites_all);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): set up a list of %u certificate and PSK ciphersuites",
+				__function_name, cipher_count);
 	}
 
 	entropy = zbx_malloc(entropy, sizeof(entropy_context));
