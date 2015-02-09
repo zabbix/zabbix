@@ -711,6 +711,10 @@ class CHelpItems {
 					'description' => _('Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				),
 				array(
+					'key' => 'vmware.vm.cpu.ready[<url>,<uuid>]',
+					'description' => _('VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				),
+				array(
 					'key' => 'vmware.vm.cpu.usage[<url>,<uuid>]',
 					'description' => _('VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				),
