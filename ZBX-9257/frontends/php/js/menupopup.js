@@ -594,7 +594,7 @@ function getMenuPopupTrigger(options) {
 
 	items[items.length] = {
 		label: t('Events'),
-		css: options.showEvents ? '' : 'ui-state-disabled',
+		css: (typeof options.showEvents !== 'undefined' && options.showEvents) ? '' : 'ui-state-disabled',
 		url: url.getUrl()
 	};
 
@@ -613,9 +613,8 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// configuration
-	if (typeof options.configuration !== 'undefined' && options.configuration !== null) {
-		var url = new Curl('triggers.php?triggerid=' + options.triggerid + '&hostid=' + options.configuration.hostid
-				+ '&form=update');
+	if (typeof options.configuration !== 'undefined' && options.configuration) {
+		var url = new Curl('triggers.php?form=update&triggerid=' + options.triggerid);
 
 		items[items.length] = {
 			label: t('Configuration'),

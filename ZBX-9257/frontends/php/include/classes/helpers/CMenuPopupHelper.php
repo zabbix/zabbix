@@ -374,10 +374,14 @@ class CMenuPopupHelper {
 	 */
 	public static function getTrigger(array $trigger, array $acknowledge = null, $eventTime = null) {
 		$hosts = array();
-		$triggerItems = array();
+		$showEvents = true;
 
-		foreach ($trigger['hosts'] as $triggerHost) {
-			$hosts[$triggerHost['hostid']] = $triggerHost['name'];
+		foreach ($trigger['hosts'] as $host) {
+			$hosts[$host['hostid']] = $host['name'];
+
+			if ($host['status'] != HOST_STATUS_MONITORED) {
+				$showEvents = false;
+			}
 		}
 
 		$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
@@ -390,9 +394,10 @@ class CMenuPopupHelper {
 		CArrayHelper::sort($trigger['items'], array('name', 'hostname', 'itemid'));
 
 		$hostCount = count($hosts);
+		$items = array();
 
 		foreach ($trigger['items'] as $item) {
-			$triggerItems[] = array(
+			$items[] = array(
 				'name' => ($hostCount > 1)
 					? $hosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded']
 					: $item['name_expanded'],
@@ -405,22 +410,22 @@ class CMenuPopupHelper {
 			);
 		}
 
-		$host = reset($trigger['hosts']);
-
 		$data = array(
 			'type' => 'trigger',
 			'triggerid' => $trigger['triggerid'],
-			'items' => $triggerItems,
+			'items' => $items,
 			'acknowledge' => $acknowledge,
 			'eventTime' => $eventTime,
-			'configuration' => null,
-			'url' => resolveTriggerUrl($trigger),
-			'showEvents' => ($host['status'] == HOST_STATUS_MONITORED)
+			'url' => resolveTriggerUrl($trigger)
 		);
+
+		if ($showEvents) {
+			$data['showEvents'] = true;
+		}
 
 		if (in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))
 				&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-			$data['configuration'] = array('hostid' => $host['hostid']);
+			$data['configuration'] = true;
 		}
 
 		return $data;
