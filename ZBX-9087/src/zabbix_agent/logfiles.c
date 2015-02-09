@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1380,6 +1380,132 @@ clean:
 
 /******************************************************************************
  *                                                                            *
+ * Function: process_log                                                      *
+ *                                                                            *
+ * Purpose: Match new records in logfile with regexp, transmit matching       *
+ *          records to Zabbix server                                          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     filename       - [IN] logfile name                                     *
+ *     lastlogsize    - [IN/OUT] offset from the beginning of the file        *
+ *     mtime          - [IN] file modification time for reporting to server   *
+ *     skip_old_data  - [IN/OUT] start from the beginning of the file or      *
+ *                      jump to the end                                       *
+ *     big_rec        - [IN/OUT] state variable to remember whether a long    *
+ *                      record is being processed                             *
+ *     incomplete     - [OUT] 0 - the last record ended with a newline,       *
+ *                      1 - there was no newline at the end of the last       *
+ *                      record.                                               *
+ *     encoding       - [IN] text string describing encoding.                 *
+ *                        The following encodings are recognized:             *
+ *                          "UNICODE"                                         *
+ *                          "UNICODEBIG"                                      *
+ *                          "UNICODEFFFE"                                     *
+ *                          "UNICODELITTLE"                                   *
+ *                          "UTF-16"   "UTF16"                                *
+ *                          "UTF-16BE" "UTF16BE"                              *
+ *                          "UTF-16LE" "UTF16LE"                              *
+ *                          "UTF-32"   "UTF32"                                *
+ *                          "UTF-32BE" "UTF32BE"                              *
+ *                          "UTF-32LE" "UTF32LE".                             *
+ *                        "" (empty string) means a single-byte character set.*
+ *     regexps        - [IN] array of regexps                                 *
+ *     regexps_num    - [IN] number of regexp                                 *
+ *     pattern        - [IN] pattern to match                                 *
+ *     p_count        - [IN/OUT] limit of records to be processed             *
+ *     s_count        - [IN/OUT] limit of records to be sent to server        *
+ *     process_value  - [IN] pointer to function process_value()              *
+ *     server         - [IN] server to send data to                           *
+ *     port           - [IN] port to send data to                             *
+ *     hostname       - [IN] hostname the data comes from                     *
+ *     key            - [IN] item key the data belongs to                     *
+ *                                                                            *
+ * Return value: returns SUCCEED on successful reading,                       *
+ *               FAIL on other cases                                          *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *           This function does not deal with log file rotation.              *
+ *                                                                            *
+ ******************************************************************************/
+static int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
+		int *big_rec, int *incomplete, const char *encoding, ZBX_REGEXP *regexps, int regexps_num,
+		const char *pattern, int *p_count, int *s_count, zbx_process_value_func_t process_value,
+		const char *server, unsigned short port, const char *hostname, const char *key)
+{
+	const char	*__function_name = "process_log";
+
+	int		f, ret = FAIL;
+	zbx_stat_t	buf;
+	zbx_uint64_t	l_size;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d",
+			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0);
+
+	if (0 != zbx_stat(filename, &buf))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", filename, zbx_strerror(errno));
+		goto out;
+	}
+
+	if (NULL != mtime)
+		*mtime = (int)buf.st_mtime;
+
+	if ((zbx_uint64_t)buf.st_size == *lastlogsize)
+	{
+		/* The file size has not changed. Nothing to do. Here we do not deal with a case of changing */
+		/* a logfile's content while keeping the same length. */
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot open '%s': %s", filename, zbx_strerror(errno));
+		goto out;
+	}
+
+	l_size = *lastlogsize;
+
+	if (1 == *skip_old_data)
+	{
+		l_size = (zbx_uint64_t)buf.st_size;
+		zabbix_log(LOG_LEVEL_DEBUG, "skipping old data in filename:'%s' to lastlogsize:" ZBX_FS_UI64,
+				filename, l_size);
+	}
+
+	if ((zbx_uint64_t)buf.st_size < l_size)		/* handle file truncation */
+		l_size = 0;
+
+	if ((zbx_offset_t)-1 != zbx_lseek(f, l_size, SEEK_SET))
+	{
+		*lastlogsize = l_size;
+		*skip_old_data = 0;
+
+		ret = zbx_read2(f, lastlogsize, mtime, big_rec, incomplete, encoding, regexps, regexps_num, pattern,
+				p_count, s_count, process_value, server, port, hostname, key);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to " ZBX_FS_UI64 " for '%s': %s",
+				l_size, filename, zbx_strerror(errno));
+	}
+
+	if (0 != close(f))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", filename, zbx_strerror(errno));
+		ret = FAIL;
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d ret:%s",
+			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_logrt                                                    *
  *                                                                            *
  * Purpose: Find new records in logfiles                                      *
@@ -1639,132 +1765,6 @@ int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error_count:%d", __function_name, zbx_result_string(ret),
 			*error_count);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: process_log                                                      *
- *                                                                            *
- * Purpose: Match new records in logfile with regexp, transmit matching       *
- *          records to Zabbix server                                          *
- *                                                                            *
- * Parameters:                                                                *
- *     filename       - [IN] logfile name                                     *
- *     lastlogsize    - [IN/OUT] offset from the beginning of the file        *
- *     mtime          - [IN] file modification time for reporting to server   *
- *     skip_old_data  - [IN/OUT] start from the beginning of the file or      *
- *                      jump to the end                                       *
- *     big_rec        - [IN/OUT] state variable to remember whether a long    *
- *                      record is being processed                             *
- *     incomplete     - [OUT] 0 - the last record ended with a newline,       *
- *                      1 - there was no newline at the end of the last       *
- *                      record.                                               *
- *     encoding       - [IN] text string describing encoding.                 *
- *                        The following encodings are recognized:             *
- *                          "UNICODE"                                         *
- *                          "UNICODEBIG"                                      *
- *                          "UNICODEFFFE"                                     *
- *                          "UNICODELITTLE"                                   *
- *                          "UTF-16"   "UTF16"                                *
- *                          "UTF-16BE" "UTF16BE"                              *
- *                          "UTF-16LE" "UTF16LE"                              *
- *                          "UTF-32"   "UTF32"                                *
- *                          "UTF-32BE" "UTF32BE"                              *
- *                          "UTF-32LE" "UTF32LE".                             *
- *                        "" (empty string) means a single-byte character set.*
- *     regexps        - [IN] array of regexps                                 *
- *     regexps_num    - [IN] number of regexp                                 *
- *     pattern        - [IN] pattern to match                                 *
- *     p_count        - [IN/OUT] limit of records to be processed             *
- *     s_count        - [IN/OUT] limit of records to be sent to server        *
- *     process_value  - [IN] pointer to function process_value()              *
- *     server         - [IN] server to send data to                           *
- *     port           - [IN] port to send data to                             *
- *     hostname       - [IN] hostname the data comes from                     *
- *     key            - [IN] item key the data belongs to                     *
- *                                                                            *
- * Return value: returns SUCCEED on successful reading,                       *
- *               FAIL on other cases                                          *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *           This function does not deal with log file rotation.              *
- *                                                                            *
- ******************************************************************************/
-int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
-		int *incomplete, const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern,
-		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
-		unsigned short port, const char *hostname, const char *key)
-{
-	const char	*__function_name = "process_log";
-
-	int		f, ret = FAIL;
-	zbx_stat_t	buf;
-	zbx_uint64_t	l_size;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d",
-			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0);
-
-	if (0 != zbx_stat(filename, &buf))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot stat '%s': %s", filename, zbx_strerror(errno));
-		goto out;
-	}
-
-	if (NULL != mtime)
-		*mtime = (int)buf.st_mtime;
-
-	if ((zbx_uint64_t)buf.st_size == *lastlogsize)
-	{
-		/* The file size has not changed. Nothing to do. Here we do not deal with a case of changing */
-		/* a logfile's content while keeping the same length. */
-		ret = SUCCEED;
-		goto out;
-	}
-
-	if (-1 == (f = zbx_open(filename, O_RDONLY)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot open '%s': %s", filename, zbx_strerror(errno));
-		goto out;
-	}
-
-	l_size = *lastlogsize;
-
-	if (1 == *skip_old_data)
-	{
-		l_size = (zbx_uint64_t)buf.st_size;
-		zabbix_log(LOG_LEVEL_DEBUG, "skipping old data in filename:'%s' to lastlogsize:" ZBX_FS_UI64,
-				filename, l_size);
-	}
-
-	if ((zbx_uint64_t)buf.st_size < l_size)		/* handle file truncation */
-		l_size = 0;
-
-	if ((zbx_offset_t)-1 != zbx_lseek(f, l_size, SEEK_SET))
-	{
-		*lastlogsize = l_size;
-		*skip_old_data = 0;
-
-		ret = zbx_read2(f, lastlogsize, mtime, big_rec, incomplete, encoding, regexps, regexps_num, pattern,
-				p_count, s_count, process_value, server, port, hostname, key);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to " ZBX_FS_UI64 " for '%s': %s",
-				l_size, filename, zbx_strerror(errno));
-	}
-
-	if (0 != close(f))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", filename, zbx_strerror(errno));
-		ret = FAIL;
-	}
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d ret:%s",
-			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0, zbx_result_string(ret));
 
 	return ret;
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,6 +101,13 @@ static int	lld_rows_get(char *value, char *filter, zbx_vector_ptr_t *lld_rows, c
 						f_regexp + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
 			}
 			DBfree_result(result);
+
+			if (0 == regexps_num)
+			{
+				*error = zbx_dsprintf(*error, "Global regular expression \"%s\" does not exist.",
+						f_regexp + 1);
+				goto out;
+			}
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() f_macro:'%s' f_regexp:'%s'", __function_name, f_macro, f_regexp);

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-28 11:18+0300\n"
+"POT-Creation-Date: 2015-01-15 18:24+0200\n"
 "PO-Revision-Date: 2013-01-22 19:22+0200\n"
 "Last-Translator: mario.rf.santos <mario.rf.santos@gmail.com>\n"
 "Language-Team: none\n"
@@ -1317,7 +1317,7 @@ msgstr "Não foi possível criar regra de descoberta"
 msgid "Cannot create group without name."
 msgstr "Não é possível criar grupo sem nome."
 
-#: api/classes/CHost.php:1775
+#: api/classes/CHost.php:1773
 msgid "Cannot create host group."
 msgstr "Não foi possível criar o grupo de hosts."
 
@@ -1397,7 +1397,7 @@ msgstr "Não foi possível eliminar grupo"
 msgid "Cannot delete host"
 msgstr "Não foi possível eliminar host"
 
-#: api/classes/CHost.php:1786
+#: api/classes/CHost.php:1784
 msgid "Cannot delete host group."
 msgstr "Não foi possível eliminar grupo de hosts."
 
@@ -1409,7 +1409,7 @@ msgstr "Não foi possível eliminar mapa de ícones"
 msgid "Cannot delete image"
 msgstr "Não foi possível eliminar imagem"
 
-#: api/classes/CHost.php:1879
+#: api/classes/CHost.php:1877
 msgid "Cannot delete inventory."
 msgstr "Não foi possível eliminar inventário."
 
@@ -1698,7 +1698,7 @@ msgstr "Não foi possível incluir o ficheiro de visualização \"%s\"."
 msgid "Cannot insert user media."
 msgstr "Não foi possível inserir média do utilizador."
 
-#: api/classes/CHost.php:1858
+#: api/classes/CHost.php:1856
 msgid "Cannot link template"
 msgstr "Não foi possível associar template"
 
@@ -1710,7 +1710,7 @@ msgstr ""
 msgid "Cannot logout."
 msgstr "Não foi possível terminar sessão."
 
-#: api/classes/CHost.php:1682
+#: api/classes/CHost.php:1680
 msgid "Cannot mass update host name."
 msgstr "Não foi possível actualizar em massa o nome do host."
 
@@ -1718,7 +1718,7 @@ msgstr "Não foi possível actualizar em massa o nome do host."
 msgid "Cannot mass update template name"
 msgstr "Não foi possível actualizar em massa do nome do template"
 
-#: api/classes/CHost.php:1672
+#: api/classes/CHost.php:1670
 msgid "Cannot mass update visible host name."
 msgstr "Não foi possível actualizar em massa o nome visível do host."
 
@@ -1824,7 +1824,7 @@ msgstr "Não foi possível desvincular e limpar os itens"
 msgid "Cannot unlink and clear triggers"
 msgstr "Não foi possível desvincular e limpar os triggers"
 
-#: api/classes/CHost.php:1849
+#: api/classes/CHost.php:1847
 msgid "Cannot unlink template"
 msgstr "Não foi possível desvincular o template"
 
@@ -2857,7 +2857,7 @@ msgstr "Slides personalizados"
 msgid "Czech (cs_CZ)"
 msgstr "Checo (cs_CZ)"
 
-#: include/classes/class.cchart.php:1227
+#: include/classes/class.cchart.php:1229
 msgid "D"
 msgstr "D"
 
@@ -2937,7 +2937,7 @@ msgstr "Linha tracejada"
 msgid "Data"
 msgstr "Dados"
 
-#: include/classes/class.cchart.php:2376 include/classes/class.cpie.php:702
+#: include/classes/class.cchart.php:2378 include/classes/class.cpie.php:702
 #, php-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Dados de %1$s. Foram gerados em %2$s seg."
@@ -3433,7 +3433,7 @@ msgstr "Eliminado: Regra de descoberta \"%1$s\" em \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Eliminado: Gráfico \"%1$s\" em \"%2$s\"."
 
-#: api/classes/CHost.php:2145
+#: api/classes/CHost.php:2143
 #, php-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Eliminado: Host \"%1$s\"."
@@ -4049,7 +4049,7 @@ msgstr "Condição da acção vazia."
 #: api/classes/CDiscoveryRule.php:567 api/classes/CGraph.php:693
 #: api/classes/CGraphPrototype.php:743 api/classes/CHostGroup.php:672
 #: api/classes/CHostGroup.php:729 api/classes/CHostInterface.php:642
-#: api/classes/CHost.php:2005 api/classes/CIconMap.php:409
+#: api/classes/CHost.php:2003 api/classes/CIconMap.php:409
 #: api/classes/CItem.php:930 api/classes/CItemPrototype.php:708
 #: api/classes/CProxy.php:547 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
@@ -4999,7 +4999,7 @@ msgstr "Grupos em manutenção"
 msgid "H.i"
 msgstr "H.i"
 
-#: include/classes/class.cchart.php:1233 include/classes/class.cchart.php:1292
+#: include/classes/class.cchart.php:1235 include/classes/class.cchart.php:1294
 #: include/page_header.php:486
 msgid "H:i"
 msgstr "H.i"
@@ -5176,7 +5176,7 @@ msgstr "Alinhamento horizontal"
 msgid "Host"
 msgstr "Host"
 
-#: api/classes/CHost.php:1695
+#: api/classes/CHost.php:1693
 #, php-format
 msgid "Host \"%1$s\" already exists."
 msgstr "O host \"%1$s\" já existe."
@@ -5334,7 +5334,7 @@ msgstr "Template do host"
 msgid "Host time"
 msgstr "Hora do host"
 
-#: api/classes/CHost.php:1573
+#: api/classes/CHost.php:1571
 msgid "Host update failed."
 msgstr "Não foi possível actualizar o host."
 
@@ -5960,7 +5960,7 @@ msgstr "Foram utilizados caracteres inválidos no nome do proxy \"%s\"."
 msgid "Incorrect characters used for Template name [ %1$s ]"
 msgstr "Foram utilizados caracteres inválidos para o nome do template [ %1$s ]"
 
-#: api/classes/CHost.php:1357 api/classes/CHost.php:1678
+#: api/classes/CHost.php:1357 api/classes/CHost.php:1676
 #, php-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Foram utilizados caracteres inválidos para o nome do host \"%s\"."
@@ -8215,7 +8215,7 @@ msgstr "Não foram definidos gráficos."
 msgid "No groups for host \"%s\"."
 msgstr "Não foram encontrados grupos para o host \"%s\"."
 
-#: api/classes/CHost.php:1664
+#: api/classes/CHost.php:1662
 msgid "No groups for hosts."
 msgstr "Não foram encontrados grupos para os hosts."
 
@@ -11544,7 +11544,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Template"
 
-#: api/classes/CHost.php:1700
+#: api/classes/CHost.php:1698
 #, php-format
 msgid "Template \"%1$s\" already exists."
 msgstr "O template \"%1$s\" já existe."
@@ -13262,8 +13262,8 @@ msgstr "Não foi especificado nenhum destino para a operação script global da 
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
 #: api/classes/CHostGroup.php:895 api/classes/CHostGroup.php:950
 #: api/classes/CHostGroup.php:995 api/classes/CHostGroup.php:1008
-#: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1604
-#: api/classes/CHost.php:1658 api/classes/CHost.php:1972
+#: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1602
+#: api/classes/CHost.php:1656 api/classes/CHost.php:1970
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
 #: api/classes/CMaintenance.php:727 api/classes/CScript.php:258
 #: api/classes/CScript.php:305 api/classes/CScript.php:367
@@ -13449,7 +13449,7 @@ msgstr "[Valor errado para o mês: \"%s\" ]"
 msgid "agent"
 msgstr "agente"
 
-#: include/classes/class.cchart.php:1764
+#: include/classes/class.cchart.php:1766
 #: include/classes/class.cpagefilter.php:631
 #: include/classes/screens/CScreenHostgroupTriggers.php:104
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
@@ -13491,7 +13491,7 @@ msgstr "como Verde"
 msgid "as Red"
 msgstr "como Vermelho"
 
-#: include/classes/class.cchart.php:1746 include/classes/class.cchart.php:1768
+#: include/classes/class.cchart.php:1748 include/classes/class.cchart.php:1770
 #: include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:129
@@ -13535,12 +13535,12 @@ msgstr "d M H:i:s"
 msgid "d.M"
 msgstr "d.M"
 
-#: include/classes/class.cchart.php:1230 include/classes/class.cchart.php:1283
+#: include/classes/class.cchart.php:1232 include/classes/class.cchart.php:1285
 msgid "d.m"
 msgstr "d.m"
 
-#: include/classes/class.cchart.php:1252 include/classes/class.cchart.php:1267
-#: include/classes/class.cchart.php:1286
+#: include/classes/class.cchart.php:1254 include/classes/class.cchart.php:1269
+#: include/classes/class.cchart.php:1288
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
@@ -13653,7 +13653,7 @@ msgstr "é"
 msgid "key is empty"
 msgstr ""
 
-#: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
+#: include/classes/class.cchart.php:1746 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
 msgid "last"
 msgstr "último"
@@ -13693,14 +13693,14 @@ msgstr "manutenção"
 msgid "map"
 msgstr "mapa"
 
-#: include/classes/class.cchart.php:1747 include/classes/class.cchart.php:1761
+#: include/classes/class.cchart.php:1749 include/classes/class.cchart.php:1763
 #: include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:130
 msgid "max"
 msgstr "máx"
 
-#: include/classes/class.cchart.php:1745 include/classes/class.cchart.php:1758
+#: include/classes/class.cchart.php:1747 include/classes/class.cchart.php:1760
 #: include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:39
 #: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:128
@@ -13749,7 +13749,7 @@ msgstr "tem de ser um utilizador LDAP válido"
 msgid "no"
 msgstr "não"
 
-#: include/blocks.inc.php:1440 include/classes/class.cchart.php:1825
+#: include/blocks.inc.php:1440 include/classes/class.cchart.php:1827
 #: include/classes/class.cpie.php:320 include/maps.inc.php:435
 #: include/maps.inc.php:479
 #, php-format

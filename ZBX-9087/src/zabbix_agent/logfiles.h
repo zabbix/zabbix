@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,11 +37,6 @@ struct	st_logfile
 	zbx_uint64_t	processed_size;	/* how far the Zabbix agent has analyzed the file */
 	md5_byte_t	md5buf[MD5_DIGEST_SIZE];	/* md5 sum of the initial part of the file */
 };
-
-int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data, int *big_rec,
-		int *incomplete, const char *encoding, ZBX_REGEXP *regexps, int regexps_num, const char *pattern,
-		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
-		unsigned short port, const char *hostname, const char *key);
 
 int	process_logrt(int is_logrt, char *filename, zbx_uint64_t *lastlogsize, int *mtime, unsigned char *skip_old_data,
 		int *big_rec, int *use_ino, int *error_count, struct st_logfile **logfiles_old, int *logfiles_num_old,
