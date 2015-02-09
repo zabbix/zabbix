@@ -114,6 +114,7 @@ $triggers = API::Trigger()->get(array(
 	'triggerids' => array_keys($triggersEventCount),
 	'output' => array('triggerid', 'description', 'expression', 'priority', 'flags', 'url', 'lastchange'),
 	'selectHosts' => array('hostid', 'status', 'name'),
+	'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
 	'expandDescription' => true,
 	'preservekeys' => true,
 	'nopermissions' => true

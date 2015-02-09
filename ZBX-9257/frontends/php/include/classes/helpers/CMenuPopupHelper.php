@@ -350,17 +350,25 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for trigger menu popup.
 	 *
-	 * @param array  $trigger						trigger data
-	 * @param string $trigger['triggerid']			trigger id
-	 * @param int    $trigger['flags']				trigger flags (TRIGGER_FLAG_DISCOVERY*)
-	 * @param array  $trigger['hosts']				hosts, used by trigger expression
-	 * @param string $trigger['hosts'][]['hostid']	host id
-	 * @param string $trigger['url']				url
-	 * @param array  $acknowledge					acknowledge link parameters (optional)
-	 * @param string $acknowledge['eventid']		event id
-	 * @param string $acknowledge['screenid']		screen id (optional)
-	 * @param string $acknowledge['backurl']		return url (optional)
-	 * @param string $eventTime						event navigation time parameter (optional)
+	 * @param array  $trigger							trigger data
+	 * @param string $trigger['triggerid']				trigger ID
+	 * @param int    $trigger['flags']					trigger flags (TRIGGER_FLAG_DISCOVERY*)
+	 * @param array  $trigger['hosts']					hosts, used by trigger expression
+	 * @param string $trigger['hosts'][]['hostid']		host ID
+	 * @param string $trigger['hosts'][]['name']		host name
+	 * @param string $trigger['hosts'][]['status']		host status
+	 * @param array  $trigger['items']					trigger items
+	 * @param string $trigger['items'][]['itemid']		item ID
+	 * @param string $trigger['items'][]['hostid']		host ID
+	 * @param string $trigger['items'][]['name']		item name
+	 * @param string $trigger['items'][]['key_']		item key
+	 * @param string $trigger['items'][]['value_type']	type of information of the item
+	 * @param string $trigger['url']					trigger URL
+	 * @param array  $acknowledge						acknowledge link parameters (optional)
+	 * @param string $acknowledge['eventid']			event ID
+	 * @param string $acknowledge['screenid']			screen ID (optional)
+	 * @param string $acknowledge['backurl']			return URL (optional)
+	 * @param string $eventTime							event navigation time parameter (optional)
 	 *
 	 * @return array
 	 */
@@ -368,28 +376,22 @@ class CMenuPopupHelper {
 		$hosts = array();
 		$triggerItems = array();
 
-		$items = API::Item()->get(array(
-			'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
-			'selectHosts' => array('name'),
-			'triggerids' => array($trigger['triggerid'])
-		));
-
-		$items = CMacrosResolverHelper::resolveItemNames($items);
-
-		foreach ($items as &$item) {
-			$item['hostname'] = $item['hosts'][0]['name'];
-		}
-		unset($item);
-
-		CArrayHelper::sort($items, array('name', 'hostname', 'itemid'));
-
 		foreach ($trigger['hosts'] as $triggerHost) {
 			$hosts[$triggerHost['hostid']] = $triggerHost['name'];
 		}
 
+		$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
+
+		foreach ($trigger['items'] as &$item) {
+			$item['hostname'] = $hosts[$item['hostid']];
+		}
+		unset($item);
+
+		CArrayHelper::sort($trigger['items'], array('name', 'hostname', 'itemid'));
+
 		$hostCount = count($hosts);
 
-		foreach ($items as $item) {
+		foreach ($trigger['items'] as $item) {
 			$triggerItems[] = array(
 				'name' => ($hostCount > 1)
 					? $hosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded']

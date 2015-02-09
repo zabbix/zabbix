@@ -387,6 +387,7 @@ $triggers = API::Trigger()->get(array(
 		'maintenance_status',
 		'maintenance_type'
 	),
+	'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
 	'selectDependencies' => API_OUTPUT_EXTEND,
 	'selectLastEvent' => true,
 	'expandDescription' => true,

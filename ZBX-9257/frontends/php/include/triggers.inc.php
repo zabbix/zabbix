@@ -1060,7 +1060,8 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 					'priority' => $trigger['priority'],
 					'flags' => $trigger['flags'],
 					'url' => $trigger['url'],
-					'hosts' => $trigger['hosts']
+					'hosts' => $trigger['hosts'],
+					'items' => $trigger['items']
 				);
 			}
 		}
