@@ -2749,7 +2749,8 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 						"virtualDisk/numberReadAveraged[average]",
 						"virtualDisk/numberWriteAveraged[average]",
 						"net/packetsRx[summation]", "net/packetsTx[summation]",
-						"net/received[average]", "net/transmitted[average]", NULL
+						"net/received[average]", "net/transmitted[average]",
+						"cpu/ready[summation]", NULL
 					};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
