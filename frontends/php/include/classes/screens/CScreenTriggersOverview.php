@@ -40,7 +40,7 @@ class CScreenTriggersOverview extends CScreenBase {
 
 		$options = array(
 			'output' => array(
-				'triggerid', 'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
+				'triggerid', 'expression', 'description', 'url', 'value', 'priority', 'lastchange', 'flags'
 			),
 			'selectHosts' => array('hostid', 'name', 'status'),
 			'hostids' => $hostIds,
