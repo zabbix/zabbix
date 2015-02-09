@@ -947,6 +947,7 @@ define('THEME_DEFAULT', 'default');
 define('ZBX_DEFAULT_THEME', 'originalblue');
 
 define('ZABBIX_HOMEPAGE', 'http://www.zabbix.com');
+define('ZBX_DEFAULT_URL', 'zabbix.php?action=dashboard.view');
 
 // non translatable date formats
 define('TIMESTAMP_FORMAT', 'YmdHis');

@@ -80,7 +80,7 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 		$request = getRequest('request');
 		$url = zbx_empty($request) ? CWebUser::$data['url'] : $request;
 		if (zbx_empty($url) || $url == $page['file']) {
-			$url = 'zabbix.php?action=dashboard.view';
+			$url = ZBX_DEFAULT_URL;
 		}
 		redirect($url);
 		exit;
