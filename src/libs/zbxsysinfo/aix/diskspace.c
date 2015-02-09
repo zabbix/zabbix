@@ -203,7 +203,17 @@ static const char	*zbx_get_vfs_name_by_type(int type)
 	extern struct vfs_ent	*getvfsbytype(int type);
 
 	struct vfs_ent	*vfs;
-	static char	*vfs_names[MNT_AIXLAST + 1] = {};
+	static char	**vfs_names = NULL;
+	static size_t	vfs_names_alloc = 0;
+
+	if (type + 1 > vfs_names_alloc)
+	{
+		size_t	num = type + 1;
+
+		vfs_names = zbx_realloc(vfs_names, sizeof(char *) * num);
+		memset(vfs_names + vfs_names_alloc, 0, sizeof(char *) * (num - vfs_names_alloc));
+		vfs_names_alloc = num;
+	}
 
 	if (NULL == vfs_names[type] && NULL != (vfs = getvfsbytype(type)))
 		vfs_names[type] = zbx_strdup(vfs_names[type], vfs->vfsent_name);
