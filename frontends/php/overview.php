@@ -226,7 +226,8 @@ if ($type == SHOW_TRIGGERS) {
 		'maintenance' => !$filter['showMaintenance'] ? false : null,
 		'monitored' => true,
 		'skipDependent' => true,
-		'sortfield' => 'description'
+		'sortfield' => 'description',
+		'preservekeys' => true
 	);
 
 	// trigger status filter
@@ -248,6 +249,8 @@ if ($type == SHOW_TRIGGERS) {
 	}
 
 	$triggers = API::Trigger()->get($options);
+
+	$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
 
 	$data['filter'] = $filter;
 	$data['hosts'] = $hosts;

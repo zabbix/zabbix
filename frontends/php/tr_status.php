@@ -395,6 +395,8 @@ $triggers = API::Trigger()->get(array(
 	'preservekeys' => true
 ));
 
+$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
+
 order_result($triggers, $sortField, $sortOrder);
 
 // sort trigger hosts by name
