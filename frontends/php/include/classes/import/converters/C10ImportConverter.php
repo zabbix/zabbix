@@ -141,6 +141,7 @@ class C10ImportConverter extends CConverter {
 			$host = $this->renameKey($host, 'name', 'host');
 			$host = $this->convertHostInterfaces($host);
 			$host = $this->convertHostProfiles($host);
+			$host = $this->convertHostApplications($host);
 			$host = $this->convertHostItems($host);
 			$host = $this->convertHostTriggers($host, $host['host']);
 			$host = $this->convertHostGraphs($host, $host['host']);
@@ -185,6 +186,7 @@ class C10ImportConverter extends CConverter {
 
 		foreach ($content['templates'] as &$template) {
 			$template = $this->renameKey($template, 'name', 'template');
+			$template = $this->convertHostApplications($template);
 			$template = $this->convertHostItems($template);
 			$template = $this->convertHostTriggers($template, $template['template']);
 			$template = $this->convertHostGraphs($template, $template['template']);
@@ -613,6 +615,29 @@ class C10ImportConverter extends CConverter {
 	}
 
 	/**
+	 * Convert application from items.
+	 *
+	 * @param array $host
+	 *
+	 * @return array
+	 */
+	protected function convertHostApplications(array $host) {
+		if ($host['items'] === '') {
+			return $host;
+		}
+
+		foreach ($host['items'] as $item) {
+			if (isset($item['applications']) && $item['applications'] !== '') {
+				foreach ($item['applications'] as $application) {
+					$host['applications'][] = array('name' => $application);
+				}
+			}
+		}
+
+		return $host;
+	}
+
+	/**
 	 * Convert item elements.
 	 *
 	 * @param array $host
@@ -620,7 +645,7 @@ class C10ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertHostItems(array $host) {
-		if (!isset($host['items']) || !$host['items']) {
+		if ($host['items'] === '') {
 			return $host;
 		}
 
