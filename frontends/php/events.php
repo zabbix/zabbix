@@ -736,9 +736,9 @@ else {
 
 			$triggers = API::Trigger()->get(array(
 				'output' => array('triggerid', 'description', 'expression', 'priority', 'flags', 'url'),
-				'triggerids' => zbx_objectValues($events, 'objectid'),
-				'selectHosts' => array('hostid', 'status'),
+				'selectHosts' => array('hostid', 'name', 'status'),
 				'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
+				'triggerids' => zbx_objectValues($events, 'objectid'),
 				'preservekeys' => true
 			));
 
@@ -774,21 +774,6 @@ else {
 				$host = reset($trigger['hosts']);
 				$host = $hosts[$host['hostid']];
 
-				$triggerItems = array();
-
-				$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
-
-				foreach ($trigger['items'] as $item) {
-					$triggerItems[] = array(
-						'name' => $item['name_expanded'],
-						'params' => array(
-							'itemid' => $item['itemid'],
-							'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-								? HISTORY_GRAPH : HISTORY_VALUES
-						)
-					);
-				}
-
 				$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
 					'clock' => $event['clock'],
 					'ns' => $event['ns']
@@ -817,7 +802,7 @@ else {
 				else {
 					$triggerDescription = new CSpan($description, 'pointer link_menu');
 					$triggerDescription->setMenuPopup(
-						CMenuPopupHelper::getTrigger($trigger, $triggerItems, null, $event['clock'])
+						CMenuPopupHelper::getTrigger($trigger, null, $event['clock'])
 					);
 
 					// acknowledge

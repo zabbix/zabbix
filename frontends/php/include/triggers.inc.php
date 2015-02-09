@@ -1074,7 +1074,8 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 					'priority' => $trigger['priority'],
 					'flags' => $trigger['flags'],
 					'url' => $trigger['url'],
-					'hosts' => array($host)
+					'hosts' => $trigger['hosts'],
+					'items' => $trigger['items']
 				);
 			}
 		}
@@ -1161,7 +1162,8 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  */
 function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 	$ack = $css = $style = null;
-	$desc = $triggerItems = $acknowledge = array();
+	$desc = array();
+	$acknowledge = array();
 
 	// for how long triggers should blink on status change (set by user in administration->general)
 	$config = select_config();
@@ -1199,27 +1201,6 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		// ok trigger
 		else {
 			$css = 'normal';
-		}
-
-		$dbItems = DBfetchArray(DBselect(
-			'SELECT DISTINCT i.itemid,i.hostid,i.name,i.key_,i.value_type'.
-			' FROM items i,functions f'.
-			' WHERE f.itemid=i.itemid'.
-				' AND f.triggerid='.zbx_dbstr($trigger['triggerid'])
-		));
-
-		$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
-
-		foreach ($dbItems as $dbItem) {
-			$triggerItems[] = array(
-				'name' => $dbItem['name_expanded'],
-				'params' => array(
-					'action' => in_array($dbItem['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-						? HISTORY_GRAPH : HISTORY_VALUES,
-					'itemid' => $dbItem['itemid'],
-					'period' => 3600
-				)
-			);
 		}
 
 		// dependency: triggers on which depends this
@@ -1278,7 +1259,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 	}
 
 	if ($trigger) {
-		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $triggerItems, $acknowledge));
+		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge));
 	}
 
 	return $column;

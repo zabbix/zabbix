@@ -570,7 +570,7 @@ function getMenuPopupServiceConfiguration(options) {
  * Get menu popup trigger section data.
  *
  * @param string options['triggerid']				trigger id
- * @param array  options['items']					link to trigger item history page (optional)
+ * @param object options['items']					link to trigger item history page (optional)
  * @param string options['items'][]['name']			item name
  * @param object options['items'][]['params']		item url parameters ("name" => "value")
  * @param object options['acknowledge']				link to acknowledge page (optional)
@@ -594,7 +594,7 @@ function getMenuPopupTrigger(options) {
 
 	items[items.length] = {
 		label: t('Events'),
-		css: options.showEvents ? '' : 'ui-state-disabled',
+		css: (typeof options.showEvents !== 'undefined' && options.showEvents) ? '' : 'ui-state-disabled',
 		url: url.getUrl()
 	};
 
@@ -613,9 +613,8 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// configuration
-	if (typeof options.configuration !== 'undefined' && options.configuration !== null) {
-		var url = new Curl('triggers.php?triggerid=' + options.triggerid + '&hostid=' + options.configuration.hostid
-				+ '&form=update');
+	if (typeof options.configuration !== 'undefined' && options.configuration) {
+		var url = new Curl('triggers.php?form=update&triggerid=' + options.triggerid);
 
 		items[items.length] = {
 			label: t('Configuration'),
@@ -637,7 +636,7 @@ function getMenuPopupTrigger(options) {
 	};
 
 	// items
-	if (typeof options.items !== 'undefined' && options.items.length > 0) {
+	if (typeof options.items !== 'undefined' && objectSize(options.items) > 0) {
 		var items = [];
 
 		jQuery.each(options.items, function(i, item) {
