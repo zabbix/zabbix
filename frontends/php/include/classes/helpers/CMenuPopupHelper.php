@@ -359,26 +359,64 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for trigger menu popup.
 	 *
-	 * @param array  $trigger						trigger data
-	 * @param string $trigger['triggerid']			trigger id
-	 * @param int    $trigger['flags']				trigger flags (TRIGGER_FLAG_DISCOVERY*)
-	 * @param array  $trigger['hosts']				hosts, used by trigger expression
-	 * @param string $trigger['hosts'][]['hostid']	host id
-	 * @param string $trigger['url']				url
-	 * @param array  $items							trigger items (optional)
-	 * @param string $items[]['name']				item name
-	 * @param array  $items[]['params']				item url parameters ("name" => "value")
-	 * @param array  $acknowledge					acknowledge link parameters (optional)
-	 * @param string $acknowledge['eventid']		event id
-	 * @param string $acknowledge['screenid']		screen id (optional)
-	 * @param string $acknowledge['backurl']		return url (optional)
-	 * @param string $eventTime						event navigation time parameter (optional)
+	 * @param array  $trigger							trigger data
+	 * @param string $trigger['triggerid']				trigger ID
+	 * @param int    $trigger['flags']					trigger flags (TRIGGER_FLAG_DISCOVERY*)
+	 * @param array  $trigger['hosts']					hosts, used by trigger expression
+	 * @param string $trigger['hosts'][]['hostid']		host ID
+	 * @param string $trigger['hosts'][]['name']		host name
+	 * @param string $trigger['hosts'][]['status']		host status
+	 * @param array  $trigger['items']					trigger items
+	 * @param string $trigger['items'][]['itemid']		item ID
+	 * @param string $trigger['items'][]['hostid']		host ID
+	 * @param string $trigger['items'][]['name']		item name
+	 * @param string $trigger['items'][]['key_']		item key
+	 * @param string $trigger['items'][]['value_type']	type of information of the item
+	 * @param string $trigger['url']					trigger URL
+	 * @param array  $acknowledge						acknowledge link parameters (optional)
+	 * @param string $acknowledge['eventid']			event ID
+	 * @param string $acknowledge['screenid']			screen ID (optional)
+	 * @param string $acknowledge['backurl']			return URL (optional)
+	 * @param string $eventTime							event navigation time parameter (optional)
 	 *
 	 * @return array
 	 */
-	public static function getTrigger(array $trigger, array $items = null, array $acknowledge = null, $eventTime = null) {
-		if ($items) {
-			CArrayHelper::sort($items, array('name'));
+	public static function getTrigger(array $trigger, array $acknowledge = null, $eventTime = null) {
+		$hosts = array();
+		$showEvents = true;
+
+		foreach ($trigger['hosts'] as $host) {
+			$hosts[$host['hostid']] = $host['name'];
+
+			if ($host['status'] != HOST_STATUS_MONITORED) {
+				$showEvents = false;
+			}
+		}
+
+		$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
+
+		foreach ($trigger['items'] as &$item) {
+			$item['hostname'] = $hosts[$item['hostid']];
+		}
+		unset($item);
+
+		CArrayHelper::sort($trigger['items'], array('name', 'hostname', 'itemid'));
+
+		$hostCount = count($hosts);
+		$items = array();
+
+		foreach ($trigger['items'] as $item) {
+			$items[] = array(
+				'name' => ($hostCount > 1)
+					? $hosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded']
+					: $item['name_expanded'],
+				'params' => array(
+					'itemid' => $item['itemid'],
+					'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+						? HISTORY_GRAPH
+						: HISTORY_VALUES
+				)
+			);
 		}
 
 		$data = array(
@@ -399,14 +437,13 @@ class CMenuPopupHelper {
 			$data['url'] = $trigger['url'];
 		}
 
-		$host = reset($trigger['hosts']);
-
+		if ($showEvents) {
+			$data['showEvents'] = true;
+		}
 		if (in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))
 				&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-			$data['configuration'] = array('hostid' => $host['hostid']);
+			$data['configuration'] = true;
 		}
-
-		$data['showEvents'] = ($host['status'] == HOST_STATUS_MONITORED);
 
 		return $data;
 	}
