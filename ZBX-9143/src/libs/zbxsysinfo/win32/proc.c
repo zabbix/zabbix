@@ -26,28 +26,7 @@
 #include "log.h"
 
 #define MAX_PROCESSES		4096
-/*#define MAX_MODULES		512*/
 #define MAX_NAME		256
-
-/* function 'zbx_get_processname' require 'baseName' with size 'MAX_NAME' */
-static int	zbx_get_processname(HANDLE hProcess, char *baseName)
-{
-	HMODULE	hMod;
-	DWORD	dwSize;
-	TCHAR	name[MAX_NAME];
-/*			if (0 != EnumProcessModules(hProcess, modList, sizeof(HMODULE) * MAX_MODULES, &dwSize))
-				if (0 != GetModuleBaseName(hProcess,modList[0],baseName,sizeof(baseName)))*/
-
-	if (0 == EnumProcessModules(hProcess, &hMod, sizeof(hMod), &dwSize))
-		return FAIL;
-
-	if (0 == GetModuleBaseName(hProcess, hMod, name, sizeof(name)))
-		return FAIL;
-
-	zbx_unicode_to_utf8_static(name, baseName, MAX_NAME);
-
-	return SUCCEED;
-}
 
 /* function 'zbx_get_process_username' require 'userName' with size 'MAX_NAME' */
 static int	zbx_get_process_username(HANDLE hProcess, char *userName)
@@ -57,8 +36,6 @@ static int	zbx_get_process_username(HANDLE hProcess, char *userName)
 	DWORD		sz = 0, nlen, dlen;
 	TCHAR		name[MAX_NAME], dom[MAX_NAME];
 	int		iUse, res = FAIL;
-
-	assert(userName);
 
 	/* clean result; */
 	*userName = '\0';
@@ -146,7 +123,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (0 != proc_ok && NULL != userName && '\0' != *userName)
 		{
-			hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe32.th32ProcessID);
+			hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pe32.th32ProcessID);
 
 			if (NULL == hProcess || SUCCEED != zbx_get_process_username(hProcess, uname) ||
 					0 != stricmp(uname, userName))
