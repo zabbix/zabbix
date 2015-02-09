@@ -68,6 +68,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, K
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+..F....... [ZBX-9087] fixed DB_ID validation expression to properly validate upper bound of received value and fixed various front-end forms not properly validating IDs (Krists, Ivo)
 .......PS. [ZBX-7719] added configurable timeout for VMware data gathering requests (wiper)
 ...G...... [ZBX-9241] fixed possible vfs.fs.discovery item crash on AIX systems (wiper)
 .......PS. [ZBX-9104] fixed repeated error messaging if ssh channel failed to close (igors)
@@ -619,6 +620,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9087] fixed DB_ID validation expression to properly validate upper bound of received value and fixed various front-end forms not properly validating IDs (Krists, Ivo)
 .......PS. [ZBX-7719] added configurable timeout for VMware data gathering requests (wiper)
 ...G...... [ZBX-9241] fixed possible vfs.fs.discovery item crash on AIX systems (wiper)
 .......PS. [ZBX-9104] fixed repeated error messaging if ssh channel failed to close (igors)
@@ -1822,6 +1824,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9087] fixed DB_ID validation expression to properly validate upper bound of received value and fixed various front-end forms not properly validating IDs (Krists, Ivo)
 ...G...... [ZBX-9241] fixed possible vfs.fs.discovery item crash on AIX systems (wiper)
 .......PS. [ZBX-9104] fixed repeated error messaging if ssh channel failed to close (igors)
 ........S. [ZBX-8993] added check for a valid reference of a global regular expression in lld rules (igors)
