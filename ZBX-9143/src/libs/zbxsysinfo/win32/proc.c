@@ -129,7 +129,6 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 					0 != stricmp(uname, userName))
 			{
 				proc_ok = 0;
-
 			}
 
 			if (NULL != hProcess)
