@@ -69,6 +69,9 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, K
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+..F....... [ZBX-9257] fixed displaying missing history links in trigger context menu (Ivo)
+..F....... [ZBX-9257] added missing host prefix before items in trigger context menu if trigger belongs to multiple hosts (Ivo)
+..F....... [ZBX-9257] changed displaying host list from vertical to horizontal if trigger belongs to multiple hosts in Monitoring->Trigger status page (Ivo)
 ........S. [ZBX-9285] fixed memory leak when processing host prototypes (Sasha)
 .......PS. [ZBX-9279] optimized VMware requests to reduce amount of transferred data (wiper)
 ..F....... [ZBX-9087] fixed DB_ID validation expression to properly validate upper bound of received value and fixed various front-end forms not properly validating IDs (Krists, Ivo)

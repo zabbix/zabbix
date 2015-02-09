@@ -43,6 +43,7 @@ class CScreenTriggersOverview extends CScreenBase {
 				'triggerid', 'expression', 'description', 'url', 'value', 'priority', 'lastchange', 'flags'
 			),
 			'selectHosts' => array('hostid', 'name', 'status'),
+			'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
 			'hostids' => $hostIds,
 			'monitored' => true,
 			'skipDependent' => true,

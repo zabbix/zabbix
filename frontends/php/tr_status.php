@@ -388,7 +388,7 @@ $triggers = API::Trigger()->get(array(
 		'maintenance_status',
 		'maintenance_type'
 	),
-	'selectItems' => array('itemid', 'hostid', 'key_', 'name', 'value_type'),
+	'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
 	'selectDependencies' => API_OUTPUT_EXTEND,
 	'selectLastEvent' => true,
 	'expandDescription' => true,
@@ -525,29 +525,8 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 }
 
 foreach ($triggers as $trigger) {
-	$usedHosts = array();
-	foreach ($trigger['hosts'] as $host) {
-		$usedHosts[$host['hostid']] = $host['name'];
-	}
-	$usedHostCount = count($usedHosts);
-
-	$triggerItems = array();
-
-	$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
-
-	foreach ($trigger['items'] as $item) {
-		$triggerItems[] = array(
-			'name' => ($usedHostCount > 1) ? $usedHosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded'] : $item['name_expanded'],
-			'params' => array(
-				'itemid' => $item['itemid'],
-				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-					? HISTORY_GRAPH : HISTORY_VALUES
-			)
-		);
-	}
-
 	$description = new CSpan($trigger['description'], 'link_menu');
-	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $triggerItems));
+	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	if ($showDetails) {
 		$description = array(
@@ -611,8 +590,6 @@ foreach ($triggers as $trigger) {
 		$hostName = new CSpan($triggerHost['name'], 'link_menu');
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
 
-		$hostDiv = new CDiv($hostName);
-
 		// add maintenance icon with hint if host is in maintenance
 		if ($triggerHost['maintenance_status']) {
 			$maintenanceIcon = new CDiv(null, 'icon-maintenance-inline');
@@ -637,16 +614,13 @@ foreach ($triggers as $trigger) {
 				$maintenanceIcon->addClass('pointer');
 			}
 
-			$hostDiv->addItem($maintenanceIcon);
+			$hostName->addItem($maintenanceIcon);
 		}
 
-		// add comma after hosts, except last
-		if (next($trigger['hosts'])) {
-			$hostDiv->addItem(','.SPACE);
-		}
-
-		$hostList[] = $hostDiv;
+		$hostList[] = $hostName;
+		$hostList[] = ', ';
 	}
+	array_pop($hostList);
 
 	// host
 	$hostColumn = new CCol($hostList);
