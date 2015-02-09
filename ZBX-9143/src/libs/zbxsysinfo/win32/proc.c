@@ -154,12 +154,12 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_ok = 0;
 
 			}
+
+			CloseHandle(hProcess);
 		}
 
 		if (0 != user_ok && 0 != proc_ok)
 			proccount++;
-
-		CloseHandle(hProcess);
 	}
 	while (Process32Next(hProcessSnap, &pe32));
 
