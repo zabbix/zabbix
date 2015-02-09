@@ -132,7 +132,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			}
 
-			CloseHandle(hProcess);
+			if (NULL != hProcess)
+				CloseHandle(hProcess);
 		}
 
 		if (0 != user_ok && 0 != proc_ok)
