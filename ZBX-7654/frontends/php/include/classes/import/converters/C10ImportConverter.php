@@ -622,7 +622,7 @@ class C10ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertHostApplications(array $host) {
-		if ($host['items'] === '') {
+		if (!isset($host['items']) || !$host['items']) {
 			return $host;
 		}
 
@@ -645,7 +645,7 @@ class C10ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertHostItems(array $host) {
-		if ($host['items'] === '') {
+		if (!isset($host['items']) || !$host['items']) {
 			return $host;
 		}
 
@@ -829,6 +829,9 @@ class C10ImportConverter extends CConverter {
 				}
 				unset($link);
 			}
+
+			$map['label_format'] = SYSMAP_LABEL_ADVANCED_OFF;
+			$map = $this->renameKey($map, 'backgroundid', 'background');
 		}
 		unset($map);
 
