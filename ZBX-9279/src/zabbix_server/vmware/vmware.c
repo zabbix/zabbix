@@ -976,6 +976,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 			goto out;
 
 		service->type = ZBX_VMWARE_TYPE_VSPHERE;
+		zbx_free(*error);
 	}
 
 	zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH, vmware_service_objects[service->type].session_manager,
