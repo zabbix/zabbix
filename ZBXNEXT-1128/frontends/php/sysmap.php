@@ -36,8 +36,8 @@ $fields = array(
 	'sysmapid' =>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 	'selementid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'sysmap' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({action})'),
-	'selements' =>	array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,		null),
-	'links' =>		array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,		null),
+	'selements' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'links' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	// actions
 	'action' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN('"update"'),	null),
 	'delete' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
