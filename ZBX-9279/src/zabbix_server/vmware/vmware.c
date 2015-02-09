@@ -1692,27 +1692,27 @@ out:
 static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL *easyhandle, const char *hvid,
 		char **data, char **error)
 {
-#	define ZBX_POST_hv_DETAILS 							\
-		ZBX_POST_VSPHERE_HEADER							\
-		"<ns0:RetrieveProperties>"						\
-			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"		\
-			"<ns0:specSet>"							\
-				"<ns0:propSet>"						\
-					"<ns0:type>HostSystem</ns0:type>"		\
-					"<ns0:pathSet>name</ns0:pathSet>"		\
-					"<ns0:pathSet>vm</ns0:pathSet>"			\
-					"<ns0:pathSet>summary.quickStats</ns0:pathSet>"	\
-					"<ns0:pathSet>summary.config</ns0:pathSet>"	\
-					"<ns0:pathSet>summary.hardware</ns0:pathSet>"	\
-					"<ns0:pathSet>parent</ns0:pathSet>"		\
-					"<ns0:pathSet>datastore</ns0:pathSet>"		\
-					"<ns0:pathSet>overallStatus</ns0:pathSet>"	\
-				"</ns0:propSet>"					\
-				"<ns0:objectSet>"					\
-					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"	\
-				"</ns0:objectSet>"					\
-			"</ns0:specSet>"						\
-		"</ns0:RetrieveProperties>"						\
+#	define ZBX_POST_hv_DETAILS 								\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RetrieveProperties>"							\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
+			"<ns0:specSet>"								\
+				"<ns0:propSet>"							\
+					"<ns0:type>HostSystem</ns0:type>"			\
+					"<ns0:pathSet>name</ns0:pathSet>"			\
+					"<ns0:pathSet>vm</ns0:pathSet>"				\
+					"<ns0:pathSet>summary.quickStats</ns0:pathSet>"		\
+					"<ns0:pathSet>summary.config</ns0:pathSet>"		\
+					"<ns0:pathSet>summary.hardware</ns0:pathSet>"		\
+					"<ns0:pathSet>summary.overallStatus</ns0:pathSet>"	\
+					"<ns0:pathSet>parent</ns0:pathSet>"			\
+					"<ns0:pathSet>datastore</ns0:pathSet>"			\
+				"</ns0:propSet>"						\
+				"<ns0:objectSet>"						\
+					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"		\
+				"</ns0:objectSet>"						\
+			"</ns0:specSet>"							\
+		"</ns0:RetrieveProperties>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_get_hv_data";

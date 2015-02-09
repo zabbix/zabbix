@@ -239,7 +239,7 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 		"/*[local-name()='val']/*[local-name()='" property "']"
 
 #define ZBX_XPATH_HV_STATUS()										\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='overallStatus']]"		\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.overallStatus']]"	\
 		"/*[local-name()='val']"
 
 #define ZBX_XPATH_VMWARE_ABOUT(property)								\
