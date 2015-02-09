@@ -101,56 +101,55 @@ if ($groupId && !API::HostGroup()->isWritable(array($groupId))) {
 }
 
 $hostId = getRequest('hostid');
-if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
-	if (hasRequest('parent_discoveryid')) {
-		// check whether discovery rule is editable by user
-		$discoveryRule = API::DiscoveryRule()->get(array(
-			'output' => array('name', 'itemid', 'hostid'),
-			'itemids' => getRequest('parent_discoveryid'),
-			'editable' => true
-		));
-		$discoveryRule = reset($discoveryRule);
-		if (!$discoveryRule) {
-			access_deny();
-		}
 
-		$hostId = $discoveryRule['hostid'];
-
-		// check whether graph prototype is editable by user
-		if (hasRequest('graphid')) {
-			$graphPrototype = (bool) API::GraphPrototype()->get(array(
-				'output' => array(),
-				'graphids' => getRequest('graphid'),
-				'editable' => true
-			));
-			if (!$graphPrototype) {
-				access_deny();
-			}
-		}
+if (hasRequest('parent_discoveryid')) {
+	// check whether discovery rule is editable by user
+	$discoveryRule = API::DiscoveryRule()->get(array(
+		'output' => array('name', 'itemid', 'hostid'),
+		'itemids' => getRequest('parent_discoveryid'),
+		'editable' => true
+	));
+	$discoveryRule = reset($discoveryRule);
+	if (!$discoveryRule) {
+		access_deny();
 	}
-	elseif (hasRequest('graphid')) {
-		// check whether graph is normal and editable by user
-		$graph = (bool) API::Graph()->get(array(
+
+	$hostId = $discoveryRule['hostid'];
+
+	// check whether graph prototype is editable by user
+	if (hasRequest('graphid')) {
+		$graphPrototype = (bool) API::GraphPrototype()->get(array(
 			'output' => array(),
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'graphids' => getRequest('graphid'),
 			'editable' => true
 		));
-		if (!$graph) {
+		if (!$graphPrototype) {
 			access_deny();
 		}
 	}
-	elseif ($hostId) {
-		// check whether host is editable by user
-		$host = (bool) API::Host()->get(array(
-			'output' => array(),
-			'hostids' => $hostId,
-			'templated_hosts' => true,
-			'editable' => true
-		));
-		if (!$host) {
-			access_deny();
-		}
+}
+elseif (hasRequest('graphid')) {
+	// check whether graph is normal and editable by user
+	$graph = (bool) API::Graph()->get(array(
+		'output' => array(),
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+		'graphids' => getRequest('graphid'),
+		'editable' => true
+	));
+	if (!$graph) {
+		access_deny();
+	}
+}
+elseif ($hostId) {
+	// check whether host is editable by user
+	$host = (bool) API::Host()->get(array(
+		'output' => array(),
+		'hostids' => $hostId,
+		'templated_hosts' => true,
+		'editable' => true
+	));
+	if (!$host) {
+		access_deny();
 	}
 }
 
