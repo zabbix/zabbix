@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+..F.....S. [ZBXNEXT-1128] added support of {HOST.*} and user macros in trigger URL (Sasha)
 .......PS. [ZBXNEXT-2619] added an item for VMware virtual machine CPU ready state monitoring (wiper)
 ..F....... [ZBXNEXT-1493] changed activity dropdowns at the bottom of various pages to buttons (Oleg)
 ....I..PS. [ZBXNEXT-1554] added multiple OID support to SNMP low-level discovery rules (wiper)

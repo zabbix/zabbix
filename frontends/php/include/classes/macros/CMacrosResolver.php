@@ -62,6 +62,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'source' => 'expression',
 			'method' => 'resolveTrigger'
 		),
+		'triggerUrl' => array(
+			'types' => array('trigger', 'host2', 'interface2', 'user'),
+			'source' => 'url',
+			'method' => 'resolveTrigger'
+		),
 		'eventDescription' => array(
 			'types' => array('host', 'interface', 'user', 'item', 'reference'),
 			'source' => 'description',
@@ -377,28 +382,35 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param string $triggers[$triggerId]['expression']
 	 * @param string $triggers[$triggerId]['description']			depend from config
 	 * @param string $triggers[$triggerId]['comments']				depend from config
+	 * @param string $triggers[$triggerId]['url']					depend from config
 	 *
 	 * @return array
 	 */
 	private function resolveTrigger(array $triggers) {
 		$macros = array(
 			'host' => array(),
+			'host2' => array(),
 			'interfaceWithoutPort' => array(),
 			'interface' => array(),
+			'interface2' => array(),
 			'item' => array()
 		);
-		$macroValues = $userMacrosData = array();
+		$macroValues = array();
+		$userMacrosData = array();
 
 		// get source field
 		$source = $this->getSource();
 
 		// get available functions
 		$hostMacrosAvailable = $this->isTypeAvailable('host');
+		$hostMacrosAvailable2 = $this->isTypeAvailable('host2');
 		$interfaceWithoutPortMacrosAvailable = $this->isTypeAvailable('interfaceWithoutPort');
 		$interfaceMacrosAvailable = $this->isTypeAvailable('interface');
+		$interfaceMacrosAvailable2 = $this->isTypeAvailable('interface2');
 		$itemMacrosAvailable = $this->isTypeAvailable('item');
 		$userMacrosAvailable = $this->isTypeAvailable('user');
 		$referenceMacrosAvailable = $this->isTypeAvailable('reference');
+		$triggerMacrosAvailable = $this->isTypeAvailable('trigger');
 
 		// find macros
 		foreach ($triggers as $triggerId => $trigger) {
@@ -430,6 +442,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
+			if ($hostMacrosAvailable2) {
+				$foundMacros = $this->findFunctionMacros(self::PATTERN_HOST_FUNCTION2, $trigger[$source]);
+				foreach ($foundMacros as $macro => $fNums) {
+					foreach ($fNums as $fNum) {
+						$macroValues[$triggerId][$this->getFunctionMacroName($macro, $fNum)] = UNRESOLVED_MACRO_STRING;
+
+						if (isset($functions[$fNum])) {
+							$macros['host2'][$functions[$fNum]][$macro][] = $fNum;
+						}
+					}
+				}
+			}
+
 			if ($interfaceWithoutPortMacrosAvailable) {
 				foreach ($this->findFunctionMacros(self::PATTERN_INTERFACE_FUNCTION_WITHOUT_PORT, $trigger[$source]) as $macro => $fNums) {
 					foreach ($fNums as $fNum) {
@@ -454,6 +479,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
+			if ($interfaceMacrosAvailable2) {
+				$foundMacros = $this->findFunctionMacros(self::PATTERN_INTERFACE_FUNCTION2, $trigger[$source]);
+				foreach ($foundMacros as $macro => $fNums) {
+					foreach ($fNums as $fNum) {
+						$macroValues[$triggerId][$this->getFunctionMacroName($macro, $fNum)] = UNRESOLVED_MACRO_STRING;
+
+						if (isset($functions[$fNum])) {
+							$macros['interface2'][$functions[$fNum]][$macro][] = $fNum;
+						}
+					}
+				}
+			}
+
 			if ($itemMacrosAvailable) {
 				foreach ($this->findFunctionMacros(self::PATTERN_ITEM_FUNCTION, $trigger[$source]) as $macro => $fNums) {
 					foreach ($fNums as $fNum) {
@@ -471,27 +509,45 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$macroValues[$triggerId][$macro] = $value;
 				}
 			}
+
+			if ($triggerMacrosAvailable) {
+				foreach ($this->findMacros(self::PATTERN_TRIGGER, array($trigger[$source])) as $macro) {
+					$macroValues[$triggerId][$macro] = $triggerId;
+				}
+			}
 		}
+
+		$patterns = array();
 
 		// get macro value
 		if ($hostMacrosAvailable) {
 			$macroValues = $this->getHostMacros($macros['host'], $macroValues);
+			$patterns[] = self::PATTERN_HOST_FUNCTION;
+		}
+
+		if ($hostMacrosAvailable2) {
+			$macroValues = $this->getHostMacros($macros['host2'], $macroValues);
+			$patterns[] = self::PATTERN_HOST_FUNCTION2;
 		}
 
 		if ($interfaceWithoutPortMacrosAvailable) {
 			$macroValues = $this->getIpMacros($macros['interfaceWithoutPort'], $macroValues, false);
+			$patterns[] = self::PATTERN_INTERFACE_FUNCTION_WITHOUT_PORT;
 		}
 
 		if ($interfaceMacrosAvailable) {
 			$macroValues = $this->getIpMacros($macros['interface'], $macroValues, true);
-			$patternInterfaceFunction = self::PATTERN_INTERFACE_FUNCTION;
+			$patterns[] = self::PATTERN_INTERFACE_FUNCTION;
 		}
-		else {
-			$patternInterfaceFunction = self::PATTERN_INTERFACE_FUNCTION_WITHOUT_PORT;
+
+		if ($interfaceMacrosAvailable2) {
+			$macroValues = $this->getIpMacros($macros['interface2'], $macroValues, true);
+			$patterns[] = self::PATTERN_INTERFACE_FUNCTION2;
 		}
 
 		if ($itemMacrosAvailable) {
 			$macroValues = $this->getItemMacros($macros['item'], $triggers, $macroValues);
+			$patterns[] = self::PATTERN_ITEM_FUNCTION;
 		}
 
 		if ($userMacrosData) {
@@ -518,15 +574,22 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					? array_merge($macroValues[$triggerId], $userMacro['macros'])
 					: $userMacro['macros'];
 			}
+			$patterns[] = ZBX_PREG_EXPRESSION_USER_MACROS;
 		}
+
+		if ($referenceMacrosAvailable) {
+			$patterns[] = '\$([1-9])';
+		}
+
+		if ($triggerMacrosAvailable) {
+			$patterns[] = self::PATTERN_TRIGGER;
+		}
+
+		$pattern = '/'.implode('|', $patterns).'/';
 
 		// replace macros to value
 		foreach ($triggers as $triggerId => $trigger) {
-			preg_match_all('/'.self::PATTERN_HOST_FUNCTION.
-								'|'.$patternInterfaceFunction.
-								'|'.self::PATTERN_ITEM_FUNCTION.
-								'|'.ZBX_PREG_EXPRESSION_USER_MACROS.
-								'|\$([1-9])/', $trigger[$source], $matches, PREG_OFFSET_CAPTURE);
+			preg_match_all($pattern, $trigger[$source], $matches, PREG_OFFSET_CAPTURE);
 
 			for ($i = count($matches[0]) - 1; $i >= 0; $i--) {
 				$matche = $matches[0][$i];
