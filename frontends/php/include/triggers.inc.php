@@ -2258,19 +2258,6 @@ function evalExpressionData($expression, $replaceFunctionMacros) {
 	return $result;
 }
 
-/**
- * Resolve {TRIGGER.ID} macro in trigger url.
- *
- * @param array  $trigger				trigger data with url and triggerid
- * @param int    $trigger['triggerid']
- * @param string $trigger['url']
- *
- * @return string
- */
-function resolveTriggerUrl($trigger) {
-	return str_replace('{TRIGGER.ID}', $trigger['triggerid'], $trigger['url']);
-}
-
 function convert($value) {
 	$value = trim($value);
 	if (!preg_match('/(?P<value>[\-+]?[0-9]+[.]?[0-9]*)(?P<mult>['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)/', $value, $arr)) {

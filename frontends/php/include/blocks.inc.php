@@ -941,8 +941,11 @@ function make_latest_issues(array $filter = array()) {
 		'selectLastEvent' => array('eventid', 'acknowledged', 'objectid', 'clock', 'ns'),
 		'sortfield' => $sortField,
 		'sortorder' => $sortOrder,
-		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT
+		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT,
+		'preservekeys' => true
 	)));
+
+	$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
 
 	// don't use withLastEventUnacknowledged and skipDependent because of performance issues
 	$triggersTotalCount = API::Trigger()->get(array_merge($options, array(
@@ -1101,7 +1104,7 @@ function make_latest_issues(array $filter = array()) {
 
 		// description
 		if (!zbx_empty($trigger['url'])) {
-			$description = new CLink($description, resolveTriggerUrl($trigger), null, null, true);
+			$description = new CLink($description, $trigger['url'], null, null, true);
 		}
 		else {
 			$description = new CSpan($description, 'pointer');
