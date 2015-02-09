@@ -24,7 +24,7 @@ class CControllerResponseFatal extends CControllerResponse {
 	private $messages = array();
 
 	public function __construct() {
-		$this->location = 'zabbix.php?action=dashboard.view';
+		$this->location = ZBX_DEFAULT_URL;
 		$this->messageError = 'Fatal error, please report to Zabbix Team';
 	}
 
