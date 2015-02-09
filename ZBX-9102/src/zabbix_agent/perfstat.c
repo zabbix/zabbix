@@ -394,26 +394,22 @@ void	collect_perfstat()
 			continue;
 		}
 
+		/* Negative values can occur when a counter rolls over. By default, this value entry does not appear  */
+		/* in the registry and Performance Monitor does not log data errors or notify the user that it has    */
+		/* received bad data; More info: https://support.microsoft.com/kb/177655/EN-US                        */
+
 		if (PDH_CALC_NEGATIVE_DENOMINATOR == pdh_status)
 		{
-			/* This counter type shows the average percentage of active time observed during the sample   */
-			/* interval. This is an inverse counter. Inverse counters are calculated by monitoring the    */
-			/* percentage of time that the service was inactive and then subtracting that value from 100  */
-			/* percent. The formula used to calculate the counter value is:                               */
-			/* (1 - (inactive time delta) / (total time delta)) x 100                                     */
-			/* For some unknown reason sometimes the collected row values indicate that inactive delta is */
-			/* greater than total time delta. There must be some kind of bug in how performance counters  */
-			/* work. When this happens function PdhCalculateCounterFromRawValue() returns error           */
-			/* PDH_CALC_NEGATIVE_DENOMINATOR. Basically this means that an item was inactive all the time */
-			/* so we set the return value to 0.0 and change status to indicate success.                   */
-			/* More info: technet.microsoft.com/en-us/library/cc757283(WS.10).aspx                        */
+			zabbix_log(LOG_LEVEL_DEBUG, "PDH_CALC_NEGATIVE_DENOMINATOR error occurred in counterpath '%s'."
+					" Value ignored", cptr->counterpath);
+			continue;
+		}
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() counterpath:'%s'"
-					" negative denominator error is treated as 0.0",
-					__function_name, cptr->counterpath);
-
-			pdh_status = ERROR_SUCCESS;
-			value.doubleValue = 0.0;	/* 100% inactive */
+		if (PDH_CALC_NEGATIVE_VALUE == pdh_status)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "PDH_CALC_NEGATIVE_VALUE error occurred in counterpath '%s'."
+					" Value ignored", cptr->counterpath);
+			continue;
 		}
 
 		if (ERROR_SUCCESS == pdh_status)

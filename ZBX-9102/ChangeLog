@@ -1,10 +1,28 @@
 Changes for 2.4.4rc1
 
 New features:
+.......PS. [ZBXNEXT-2354] separated VMware performance collector based statistic retrieval from VMware data retrieval and added items to monitor custom performance counters (wiper)
+A.F....... [ZBX-1357] enabled Chinese (China) locale to be displayed by default (Richlv)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, Korean, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+..F....... [ZBX-9087] fixed DB_ID validation expression to properly validate upper bound of received value and fixed various front-end forms not properly validating IDs (Krists, Ivo)
+.......PS. [ZBX-7719] added configurable timeout for VMware data gathering requests (wiper)
+...G...... [ZBX-9241] fixed possible vfs.fs.discovery item crash on AIX systems (wiper)
+.......PS. [ZBX-9104] fixed repeated error messaging if ssh channel failed to close (igors)
+...G...... [ZBX-9183] fixed eventlog message collecting in case of error formatting the log message; thanks to Kodai Terashima (dimir)
+A.F....... [ZBX-9224] fixed audit log for failed login attempts (Oleg)
+...G...... [ZBX-9233] fixed processing of bogus negative value of performance couter (igors)
+.......PS. [ZBXNEXT-2354] fixed VMware virtual machine network and disk transmission rates being reported in kilobytes rather than bytes (wiper)
+..F....... [ZBX-8930] fixed map import displaying incorrect message when map had non-existing sub elements (Oleg)
+A.F....... [ZBX-8448] fixed host and template permissions validation when an object belongs to both read and read-write groups (Ivo)
+..F....... [ZBX-8448] added read-only groups in host and template edit forms as grayed out when object belongs to both read and read-write groups (Ivo)
+..F....... [ZBX-8448] fixed template edit form losing host and template linkages by adding grayed out objects when they belong to both read and read-write groups (Ivo)
+..F....... [ZBX-8448] fixed trigger and trigger prototype "enable/disable" action when trigger belongs to read-only group (Ivo)
+..F....... [ZBX-9013] fixed action operation incorrect sorting in edit form which sometimes caused duplicate and missing operations (Ivo, Sasha)
+........S. [ZBX-8993] added check for a valid reference of a global regular expression in lld rules (igors)
+...G...... [ZBX-9218] fixed agent crash if error message is not set in loadable module (igors)
 .......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
 A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
 ..F....... [ZBX-9168] fixed incorrect keys and unified key parameters in the item key helper (Richlv)
@@ -537,9 +555,23 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.9rc1
 
 New features:
+.......PS. [ZBXNEXT-2354] separated VMware performance collector based statistic retrieval from VMware data retrieval and added items to monitor custom performance counters (wiper)
 A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9087] fixed DB_ID validation expression to properly validate upper bound of received value and fixed various front-end forms not properly validating IDs (Krists, Ivo)
+.......PS. [ZBX-7719] added configurable timeout for VMware data gathering requests (wiper)
+...G...... [ZBX-9241] fixed possible vfs.fs.discovery item crash on AIX systems (wiper)
+.......PS. [ZBX-9104] fixed repeated error messaging if ssh channel failed to close (igors)
+...G...... [ZBX-9183] fixed eventlog message collecting in case of error formatting the log message; thanks to Kodai Terashima (dimir)
+...G...... [ZBX-9233] fixed processing of bogus negative value of performance couter (igors)
+.......PS. [ZBXNEXT-2354] fixed VMware virtual machine network and disk transmission rates being reported in kilobytes rather than bytes (wiper)
+A.F....... [ZBX-8448] fixed host and template permissions validation when an object belongs to both read and read-write groups (Ivo)
+..F....... [ZBX-8448] added read-only groups in host and template edit forms as grayed out when object belongs to both read and read-write groups (Ivo)
+..F....... [ZBX-8448] fixed template edit form losing host and template linkages by adding grayed out objects when they belong to both read and read-write groups (Ivo)
+..F....... [ZBX-8448] fixed trigger and trigger prototype "enable/disable" action when trigger belongs to read-only group (Ivo)
+..F....... [ZBX-9013] fixed action operation incorrect sorting in edit form which sometimes caused duplicate and missing operations (Ivo, Sasha)
+........S. [ZBX-8993] added check for a valid reference of a global regular expression in lld rules (igors)
 .......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
 A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
 ..F....... [ZBX-9168] fixed incorrect keys and unified key parameters in the item key helper (Richlv)
@@ -1731,6 +1763,10 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9087] fixed DB_ID validation expression to properly validate upper bound of received value and fixed various front-end forms not properly validating IDs (Krists, Ivo)
+...G...... [ZBX-9241] fixed possible vfs.fs.discovery item crash on AIX systems (wiper)
+.......PS. [ZBX-9104] fixed repeated error messaging if ssh channel failed to close (igors)
+........S. [ZBX-8993] added check for a valid reference of a global regular expression in lld rules (igors)
 .......PS. [ZBX-9088] fixed parsing of SNMP traps for correct processing of delayed traps (igors)
 A......... [ZBX-9093] fixed API host.create method for MySQL strict mode when given partial data in "inventory" property (Ivo)
 ....I..... [ZBX-9168] fixed incorrect keys and added missing keys in the item key helper (Richlv)

@@ -777,6 +777,7 @@ elseif (isset($_REQUEST['form'])) {
 			'output' => API_OUTPUT_EXTEND
 		));
 		$dbHost = reset($dbHosts);
+		order_result($dbHost['groups'], 'name');
 
 		$dbHost['interfaces'] = API::HostInterface()->get(array(
 			'hostids' => $hostId,

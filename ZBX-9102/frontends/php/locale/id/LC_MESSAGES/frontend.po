@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:31+0200\n"
+"POT-Creation-Date: 2015-02-05 21:48+0200\n"
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -108,9 +108,9 @@ msgstr ""
 msgid "(0 - infinitely)"
 msgstr "(0 - tak terbatas)"
 
-#: include/views/configuration.host.edit.php:217
+#: include/views/configuration.host.edit.php:253
 #: include/views/configuration.hostgroups.list.php:31
-#: include/views/configuration.template.edit.php:121
+#: include/views/configuration.template.edit.php:157
 msgid "(Only super admins can create groups)"
 msgstr ""
 
@@ -126,8 +126,8 @@ msgstr "(dalam detik)"
 msgid "(minimum 60 seconds, 0 - use action default)"
 msgstr "(paling rendah 60 detik, 0 - gunakan aksi yang berlaku)"
 
-#: include/views/configuration.host.edit.php:399
-#: include/views/configuration.host.edit.php:420
+#: include/views/configuration.host.edit.php:435
+#: include/views/configuration.host.edit.php:456
 #: include/views/configuration.host.massupdate.php:162
 #: include/views/configuration.host.prototype.edit.php:153
 msgid "(no proxy)"
@@ -309,7 +309,7 @@ msgstr "Mengakui dinonaktifkan"
 #: include/views/configuration.action.edit.php:1068
 #: include/views/configuration.graph.edit.php:239
 #: include/views/configuration.host.discovery.edit.php:198
-#: include/views/configuration.host.edit.php:688
+#: include/views/configuration.host.edit.php:724
 #: include/views/configuration.host.prototype.edit.php:216
 #: include/views/configuration.item.edit.php:265
 #: include/views/configuration.item.massupdate.php:321
@@ -317,7 +317,7 @@ msgstr "Mengakui dinonaktifkan"
 #: include/views/configuration.services.edit.php:92
 #: include/views/configuration.services.edit.php:131
 #: include/views/configuration.slideconf.edit.php:52
-#: include/views/configuration.template.edit.php:409
+#: include/views/configuration.template.edit.php:459
 #: include/views/configuration.triggers.edit.php:155
 #: include/views/configuration.triggers.edit.php:282
 #: include/views/configuration.triggers.massupdate.php:88 tr_logform.php:274
@@ -352,12 +352,12 @@ msgstr "Aksi ditambahkan"
 msgid "Action deleted"
 msgstr "Aksi dihapus"
 
-#: actionconf.php:360
+#: actionconf.php:362
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 
-#: actionconf.php:359
+#: actionconf.php:361
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -447,12 +447,12 @@ msgstr "Aktif sampai"
 #: include/views/configuration.host.discovery.edit.php:237
 #: include/views/configuration.host.discovery.edit.php:326
 #: include/views/configuration.host.discovery.edit.php:371
-#: include/views/configuration.host.edit.php:260
-#: include/views/configuration.host.edit.php:277
-#: include/views/configuration.host.edit.php:293
-#: include/views/configuration.host.edit.php:308
-#: include/views/configuration.host.edit.php:730
-#: include/views/configuration.host.edit.php:897
+#: include/views/configuration.host.edit.php:296
+#: include/views/configuration.host.edit.php:313
+#: include/views/configuration.host.edit.php:329
+#: include/views/configuration.host.edit.php:344
+#: include/views/configuration.host.edit.php:766
+#: include/views/configuration.host.edit.php:933
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.host.prototype.edit.php:195
 #: include/views/configuration.host.prototype.edit.php:258
@@ -474,8 +474,8 @@ msgstr "Aktif sampai"
 #: include/views/configuration.slideconf.edit.php:118
 #: include/views/configuration.sysmap.edit.php:173
 #: include/views/configuration.sysmap.edit.php:200
-#: include/views/configuration.template.edit.php:456
-#: include/views/configuration.template.edit.php:495
+#: include/views/configuration.template.edit.php:506
+#: include/views/configuration.template.edit.php:545
 #: include/views/configuration.triggers.edit.php:81
 #: include/views/configuration.triggers.edit.php:104
 #: include/views/configuration.triggers.edit.php:318
@@ -587,8 +587,8 @@ msgstr "Agen"
 msgid "Agent host name defined in the configuration file. String value."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:268
-#: include/views/configuration.host.edit.php:352
+#: include/views/configuration.host.edit.php:304
+#: include/views/configuration.host.edit.php:388
 #: include/views/configuration.host.prototype.edit.php:107
 #: include/views/inventory.host.view.php:103
 msgid "Agent interfaces"
@@ -713,14 +713,14 @@ msgstr "Aplikasi telah diperbarui"
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplikasi dengan ID \"%1$s\" tidak tersedia pada \"%2$s\"."
 
-#: hosts.php:860 hosts.php:949 include/forms.inc.php:889
+#: hosts.php:861 hosts.php:950 include/forms.inc.php:889
 #: include/html.inc.php:361 include/html.inc.php:365
 #: include/views/configuration.application.list.php:47
-#: include/views/configuration.host.edit.php:446
+#: include/views/configuration.host.edit.php:482
 #: include/views/configuration.item.edit.php:400
 #: include/views/configuration.item.list.php:72
 #: include/views/configuration.item.prototype.list.php:53
-#: include/views/configuration.template.edit.php:196
+#: include/views/configuration.template.edit.php:246
 #: include/views/conf.import.php:32 include/views/inventory.host.view.php:229
 #: popup.php:55 search.php:140 search.php:169 search.php:197 search.php:394
 #: search.php:422 search.php:454 templates.php:509 templates.php:567
@@ -853,8 +853,8 @@ msgstr "Agustus"
 msgid "Authentication"
 msgstr "Otentikasi"
 
-#: include/views/configuration.host.edit.php:761
-#: include/views/configuration.host.edit.php:773
+#: include/views/configuration.host.edit.php:797
+#: include/views/configuration.host.edit.php:809
 #: include/views/configuration.host.prototype.edit.php:271
 msgid "Authentication algorithm"
 msgstr "Algoritma otentikasi"
@@ -918,7 +918,7 @@ msgstr ""
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:820
+#: include/views/configuration.host.edit.php:856
 #: include/views/configuration.host.massupdate.php:284
 #: include/views/configuration.host.prototype.edit.php:313
 msgid "Automatic"
@@ -933,7 +933,7 @@ msgstr "Pemetaan ikon otomatis"
 msgid "Automatic icon selection"
 msgstr "Pemilihan ikon otomatis"
 
-#: hosts.php:869
+#: hosts.php:870
 msgid "Availability"
 msgstr "Ketersediaan"
 
@@ -1111,7 +1111,7 @@ msgstr "KONFIGURASI GRUP HOST"
 msgid "CONFIGURATION OF HOST PROTOTYPES"
 msgstr ""
 
-#: hosts.php:699 hosts.php:764 hosts.php:816
+#: hosts.php:699 hosts.php:764 hosts.php:817
 msgid "CONFIGURATION OF HOSTS"
 msgstr "KONFIGURASI HOST"
 
@@ -1204,7 +1204,7 @@ msgstr "KONFIGURASI SEVERITIES TRIGGER"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:54
-#: include/views/configuration.triggers.massupdate.php:42 triggers.php:351
+#: include/views/configuration.triggers.massupdate.php:42 triggers.php:368
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "KONFIGURASI TRIGGER"
 
@@ -1357,12 +1357,11 @@ msgstr "Tidak dapat menambah grafik"
 msgid "Cannot add graph prototype"
 msgstr ""
 
-#: hostgroups.php:121 usergrps.php:196
+#: hostgroups.php:177 usergrps.php:196
 msgid "Cannot add group"
 msgstr "Tidak dapat menambah grup"
 
 #: include/classes/api/services/CTemplate.php:379
-#: include/classes/api/services/CTemplate.php:830
 msgid "Cannot add group."
 msgstr ""
 
@@ -1454,11 +1453,11 @@ msgstr "Tidak dapat menambah slide show"
 msgid "Cannot add template"
 msgstr "Tidak dapat menambah template"
 
-#: triggers.php:190 triggers.php:320 tr_logform.php:149
+#: triggers.php:207 triggers.php:337 tr_logform.php:149
 msgid "Cannot add trigger"
 msgstr "Tidak dapat menambah trigger"
 
-#: trigger_prototypes.php:172
+#: trigger_prototypes.php:190
 msgid "Cannot add trigger prototype"
 msgstr ""
 
@@ -1556,10 +1555,6 @@ msgstr "Tidak dapat membuat dependensi pada trigger itu sendiri."
 msgid "Cannot create discovery rule"
 msgstr "Tidak dapat membuat aturan discovery"
 
-#: include/classes/api/services/CHost.php:1065
-msgid "Cannot create host group."
-msgstr "Tidak dapat membuat grup host."
-
 #: adm.iconmapping.php:82
 msgid "Cannot create icon map"
 msgstr "Tidak dapat membuat ikon peta"
@@ -1587,7 +1582,7 @@ msgstr "Tidak dapat membuat elemen baru"
 msgid "Cannot create template."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1317
+#: include/classes/api/services/CUser.php:1315
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Tidak dapat menghapus user Zabbix internal \"%1$s\", coba non-aktifkan user tersebut."
@@ -1635,7 +1630,7 @@ msgstr "Tidak dapat menghapus grafik"
 msgid "Cannot delete graphs created by low level discovery."
 msgstr "Tidak dapat menghapus grafik yang dibuat oleh discovery tingkat bawah."
 
-#: hostgroups.php:171 hostgroups.php:193 usergrps.php:229 usergrps.php:260
+#: hostgroups.php:227 hostgroups.php:249 usergrps.php:229 usergrps.php:260
 #, fuzzy
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
@@ -1644,10 +1639,6 @@ msgstr[0] "Tidak dapat menghapus grup"
 #: hosts.php:632 hosts.php:645
 msgid "Cannot delete host"
 msgstr "Tidak dapat menghapus host"
-
-#: include/classes/api/services/CHost.php:1076
-msgid "Cannot delete host group."
-msgstr "Tidak dapat menghapus grup host."
 
 #: include/classes/api/services/CDiscoveryRule.php:443
 msgid "Cannot delete host prototype."
@@ -1665,7 +1656,7 @@ msgstr "Tidak dapat menghapus peta ikon"
 msgid "Cannot delete image"
 msgstr "Tidak dapat menghapus gambar"
 
-#: include/classes/api/services/CHost.php:1162
+#: include/classes/api/services/CHost.php:1151
 msgid "Cannot delete inventory."
 msgstr "Tidak dapat menghapus inventaris."
 
@@ -1728,7 +1719,7 @@ msgstr "Tidak dapat menghapus script. Script %1$s\" sedang digunakan pada operas
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
-#: actionconf.php:378
+#: actionconf.php:380
 msgid "Cannot delete selected actions"
 msgstr "Tidak dapat menghapus aksi yang dipilih"
 
@@ -1780,19 +1771,19 @@ msgstr "Tidak dapat menghapus trigger template \"%1$s:%2$s\"."
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr ""
 
-#: triggers.php:208
+#: triggers.php:225
 msgid "Cannot delete trigger"
 msgstr "Tidak dapat menghapus trigger"
 
-#: trigger_prototypes.php:187
+#: trigger_prototypes.php:205
 msgid "Cannot delete trigger prototype"
 msgstr "Tidak dapat menghapus prototipe trigger"
 
-#: trigger_prototypes.php:263
+#: trigger_prototypes.php:281
 msgid "Cannot delete trigger prototypes"
 msgstr ""
 
-#: triggers.php:332
+#: triggers.php:349
 msgid "Cannot delete triggers"
 msgstr "Tidak dapat menghapus trigger."
 
@@ -1812,7 +1803,7 @@ msgstr "Tidak dapat menghapus nilai peta"
 msgid "Cannot delete web scenario"
 msgstr ""
 
-#: actionconf.php:363
+#: actionconf.php:365
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1827,7 +1818,7 @@ msgid "Cannot disable discovery rules"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] ""
 
-#: hostgroups.php:243 hosts.php:676 proxies.php:192
+#: hostgroups.php:299 hosts.php:676 proxies.php:192
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] ""
@@ -1853,12 +1844,12 @@ msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] "Tidak dapat me-non-aktifkan tipe media"
 
-#: triggers.php:281
+#: triggers.php:298
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] ""
 
-#: trigger_prototypes.php:253
+#: trigger_prototypes.php:271
 msgid "Cannot disable trigger prototype"
 msgid_plural "Cannot disable trigger prototypes"
 msgstr[0] ""
@@ -1881,7 +1872,7 @@ msgstr ""
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
-#: actionconf.php:362
+#: actionconf.php:364
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -1896,7 +1887,7 @@ msgid "Cannot enable discovery rules"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] ""
 
-#: hostgroups.php:242 hosts.php:675 proxies.php:191
+#: hostgroups.php:298 hosts.php:675 proxies.php:191
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] ""
@@ -1922,12 +1913,12 @@ msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "Tidak dapat mengaktifkan tipe media"
 
-#: triggers.php:280
+#: triggers.php:297
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] ""
 
-#: trigger_prototypes.php:252
+#: trigger_prototypes.php:270
 msgid "Cannot enable trigger prototype"
 msgid_plural "Cannot enable trigger prototypes"
 msgstr[0] ""
@@ -1943,7 +1934,7 @@ msgid_plural "Cannot enable web scenarios"
 msgstr[0] ""
 
 #: include/classes/import/CXmlImport18.php:695
-#: include/classes/import/importers/CMapImporter.php:188
+#: include/classes/import/importers/CMapImporter.php:319
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan gambar latar \"%1$s\" used in map \"%2$s\"."
@@ -1955,7 +1946,7 @@ msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr "Tidak dapat menemukan grrafik \"%1$s\" yang digunakan pada layar \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:746
-#: include/classes/import/importers/CMapImporter.php:209
+#: include/classes/import/importers/CMapImporter.php:214
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan grup \"%1$s\" yang digunakan di peta \"%2$s\"."
@@ -1967,7 +1958,7 @@ msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr "Tidak dapat menemukan grup \"%1$s\" yang digunakan pada layar \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:760
-#: include/classes/import/importers/CMapImporter.php:217
+#: include/classes/import/importers/CMapImporter.php:222
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan host \"%1$s\" yang digunakan di peta \"%2$s\"."
@@ -1992,12 +1983,12 @@ msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "Tidak dapat menemukan host interface pada \"%1$s\" untuk kunci item \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:796
-#: include/classes/import/importers/CMapImporter.php:250
+#: include/classes/import/importers/CMapImporter.php:255
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan ikon \"%1$s\" yang digunakan pada peta \"%2$s\"."
 
-#: include/classes/import/importers/CMapImporter.php:180
+#: include/classes/import/importers/CMapImporter.php:309
 #, c-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan ikon peta \"%1$s\" yang digunakan pada peta \"%2$s\"."
@@ -2053,7 +2044,7 @@ msgstr "Tidak dapat menemukan item \"%1$s\" yang digunakan pada layar \"%2$s\"."
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\" yang telah diekspor."
 
-#: include/classes/import/importers/CMapImporter.php:201
+#: include/classes/import/importers/CMapImporter.php:206
 #, c-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan peta \"%1$s\" yang digunakan pada peta \"%2$s\"."
@@ -2081,8 +2072,8 @@ msgstr ""
 
 #: include/classes/import/CXmlImport18.php:774
 #: include/classes/import/CXmlImport18.php:822
-#: include/classes/import/importers/CMapImporter.php:228
-#: include/classes/import/importers/CMapImporter.php:273
+#: include/classes/import/importers/CMapImporter.php:233
+#: include/classes/import/importers/CMapImporter.php:278
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Tidak dapat menemukan trigger \"%1$s\" yang digunakan pada peta \"%2$s\"."
@@ -2105,7 +2096,7 @@ msgstr "Tidak dapat memformat Tree. Periksa struktur logika dalam service link."
 msgid "Cannot format tree."
 msgstr "Tidak dapat memformat tree."
 
-#: include/classes/api/services/CTemplate.php:795
+#: include/classes/api/services/CTemplate.php:801
 msgid "Cannot have empty visible template name."
 msgstr ""
 
@@ -2142,12 +2133,12 @@ msgstr ""
 msgid "Cannot insert user media."
 msgstr "Tidak bisa memasukkan media pengguna."
 
-#: include/classes/api/services/CHost.php:1140
+#: include/classes/api/services/CHost.php:1129
 msgid "Cannot link template"
 msgstr "Tidak dapat menghubungkan template"
 
-#: include/classes/api/services/CTemplate.php:917
-#: include/classes/api/services/CTemplate.php:932
+#: include/classes/api/services/CTemplate.php:888
+#: include/classes/api/services/CTemplate.php:902
 msgid "Cannot link template."
 msgstr ""
 
@@ -2159,19 +2150,19 @@ msgstr ""
 msgid "Cannot logout."
 msgstr "Tidak bisa logout."
 
-#: include/classes/api/services/CHost.php:961
+#: include/classes/api/services/CHost.php:984
 msgid "Cannot mass update host name."
 msgstr "Tidak dapat perbarui nama host secara masal."
 
-#: include/classes/api/services/CTemplate.php:1021
+#: include/classes/api/services/CTemplate.php:1015
 msgid "Cannot mass update template name."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:951
+#: include/classes/api/services/CHost.php:974
 msgid "Cannot mass update visible host name."
 msgstr "Tidak dapat perbarui nama host yang tampil secara masal."
 
-#: include/classes/api/services/CTemplate.php:986
+#: include/classes/api/services/CTemplate.php:980
 msgid "Cannot mass update visible template name."
 msgstr ""
 
@@ -2206,10 +2197,6 @@ msgstr ""
 
 #: include/views/js/monitoring.history.js.php:36
 msgid "Cannot remove all items, at least one item should remain."
-msgstr ""
-
-#: include/classes/api/services/CTemplate.php:843
-msgid "Cannot remove group."
 msgstr ""
 
 #: adm.macros.php:104
@@ -2260,8 +2247,8 @@ msgstr "Tidak dapat merubah \"templateid\" untuk layar \"%1$s\"."
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Tidak dapat merubah \"templateid\" untuk prototipe trigger \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:572
-#: include/classes/api/services/CHost.php:1015
+#: include/classes/api/services/CHost.php:605
+#: include/classes/api/services/CHost.php:1038
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr ""
 
@@ -2278,54 +2265,54 @@ msgstr "Tidak bisa merubah host untuk interface."
 msgid "Cannot unblock users"
 msgstr "Tidak dapat membuka blokir user"
 
-#: include/classes/api/services/CHostGeneral.php:512
+#: include/classes/api/services/CHostGeneral.php:516
 msgid "Cannot unlink and clear Web scenarios."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:565
+#: include/classes/api/services/CHostGeneral.php:569
 msgid "Cannot unlink and clear applications."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:339
+#: include/classes/api/services/CHostGeneral.php:343
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Tidak dapat membatalkan hubungan dan membersihkan aturan discovery"
 
-#: include/classes/api/services/CHostGeneral.php:456
+#: include/classes/api/services/CHostGeneral.php:460
 msgid "Cannot unlink and clear graph prototypes"
 msgstr "Tidak dapat membatalkan hubungan dan membersihkan prototipe grafik"
 
-#: include/classes/api/services/CHostGeneral.php:473
+#: include/classes/api/services/CHostGeneral.php:477
 msgid "Cannot unlink and clear graphs."
 msgstr "Tidak dapat membatalkan hubungan dan membersihkan grafik."
 
-#: include/classes/api/services/CHostGeneral.php:373
+#: include/classes/api/services/CHostGeneral.php:377
 msgid "Cannot unlink and clear item prototypes"
 msgstr "Tidak dapat membatalkan hubungan dan membersihkan prototipe item"
 
-#: include/classes/api/services/CHostGeneral.php:356
+#: include/classes/api/services/CHostGeneral.php:360
 msgid "Cannot unlink and clear items"
 msgstr "Tidak dapat membatalkan hubungan dan membersihkan item"
 
-#: include/classes/api/services/CHostGeneral.php:279
-#: include/classes/api/services/CHostGeneral.php:296
+#: include/classes/api/services/CHostGeneral.php:283
+#: include/classes/api/services/CHostGeneral.php:300
 msgid "Cannot unlink and clear triggers"
 msgstr "Tidak dapat membatalkan hubungan dan membersihkan trigger"
 
-#: include/classes/api/services/CHost.php:1115
+#: include/classes/api/services/CHost.php:1104
 msgid "Cannot unlink template"
 msgstr "Tidak dapat membatalkan hubungan template"
 
-#: include/classes/api/services/CTemplate.php:879
-#: include/classes/api/services/CTemplate.php:902
+#: include/classes/api/services/CTemplate.php:853
+#: include/classes/api/services/CTemplate.php:876
 msgid "Cannot unlink template."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:234
+#: include/classes/api/services/CHostGeneral.php:238
 #, fuzzy, c-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Tidak dapat membatalkan hubungan trigger \"%s\", memiliki item dari template yang tersisa ke host yang terhubung."
 
-#: include/classes/api/services/CHost.php:585
+#: include/classes/api/services/CHost.php:618
 #, c-format
 msgid "Cannot update \"%1$s\" for a discovered host."
 msgstr ""
@@ -2444,9 +2431,9 @@ msgstr "Tidak dapat perbarui grup"
 msgid "Cannot update group."
 msgstr "Tidak dapat perbarui grup."
 
-#: include/classes/api/services/CHostGroup.php:760
-#: include/classes/api/services/CHostGroup.php:818
-#: include/classes/api/services/CHostGroup.php:878
+#: include/classes/api/services/CHostGroup.php:900
+#: include/classes/api/services/CHostGroup.php:1003
+#: include/classes/api/services/CHostGroup.php:1144
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr ""
@@ -2550,21 +2537,21 @@ msgstr "Tidak dapat perbarui template"
 msgid "Cannot update templated applications."
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:750
-#: include/classes/api/services/CTemplate.php:1084
+#: include/classes/api/services/CTemplate.php:756
+#: include/classes/api/services/CTemplate.php:1132
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr ""
 
-#: triggers.php:186 triggers.php:247 tr_logform.php:124
+#: triggers.php:203 triggers.php:264 tr_logform.php:124
 msgid "Cannot update trigger"
 msgstr "Tidak dapat perbarui trigger"
 
-#: trigger_prototypes.php:167
+#: trigger_prototypes.php:185
 msgid "Cannot update trigger prototype"
 msgstr ""
 
-#: trigger_prototypes.php:214
+#: trigger_prototypes.php:232
 msgid "Cannot update trigger prototypes"
 msgstr ""
 
@@ -2742,7 +2729,7 @@ msgstr "Chinese (zh_TW)"
 msgid "Circular link cannot be created for map element \"%s\"."
 msgstr "Tautan melingkar tidak dapat dibuatkan untuk elemen map \"%s\"."
 
-#: include/classes/import/importers/CMapImporter.php:89
+#: include/classes/import/importers/CMapImporter.php:119
 #, c-format
 msgid "Circular reference in maps: %1$s."
 msgstr "Refensi melingkar pada map: %1$s."
@@ -2797,7 +2784,7 @@ msgstr "Jam"
 #: include/views/configuration.discovery.edit.php:89
 #: include/views/configuration.graph.edit.php:323
 #: include/views/configuration.host.discovery.edit.php:363
-#: include/views/configuration.host.edit.php:888
+#: include/views/configuration.host.edit.php:924
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:339
 #: include/views/configuration.httpconf.edit.php:320
@@ -2806,7 +2793,7 @@ msgstr "Jam"
 #: include/views/configuration.screen.edit.php:56
 #: include/views/configuration.slideconf.edit.php:110
 #: include/views/configuration.sysmap.edit.php:192
-#: include/views/configuration.template.edit.php:481
+#: include/views/configuration.template.edit.php:531
 #: include/views/configuration.triggers.edit.php:350
 msgid "Clone"
 msgstr "Klon"
@@ -3107,8 +3094,8 @@ msgid "Confirmation text"
 msgstr "Teks konfirmasi"
 
 #: include/views/administration.proxy.edit.php:54
-#: include/views/configuration.host.edit.php:252
-#: include/views/configuration.host.edit.php:339
+#: include/views/configuration.host.edit.php:288
+#: include/views/configuration.host.edit.php:375
 #: include/views/configuration.host.prototype.edit.php:94
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
@@ -3204,11 +3191,6 @@ msgstr[0] ""
 msgid "Copy selected to ..."
 msgstr "Salin yang dipilih ke ..."
 
-#: include/classes/api/services/CUser.php:1076
-#, c-format
-msgid "Correct login \"%s\"."
-msgstr "Login yang bernar \"%s\"."
-
 #: include/classes/api/services/CImage.php:393
 msgid "Could not save image!"
 msgstr "Tidak dapat menyimpan gambar!"
@@ -3254,7 +3236,7 @@ msgstr "Buat grafik (pilih host lebih dulu)"
 msgid "Create graph prototype"
 msgstr "Buat prototipe grafik"
 
-#: hosts.php:811
+#: hosts.php:812
 msgid "Create host"
 msgstr "Buat host"
 
@@ -3524,7 +3506,7 @@ msgstr "NON-AKTIFKAN"
 msgid "DISCOVERED"
 msgstr "DISCOVERED"
 
-#: events.php:456 hosts.php:829 include/views/administration.proxy.edit.php:60
+#: events.php:456 hosts.php:830 include/views/administration.proxy.edit.php:60
 #: include/views/inventory.host.view.php:57
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
@@ -3534,8 +3516,8 @@ msgid "DNS"
 msgstr "DNS"
 
 #: include/views/administration.proxy.edit.php:53
-#: include/views/configuration.host.edit.php:251
-#: include/views/configuration.host.edit.php:338
+#: include/views/configuration.host.edit.php:287
+#: include/views/configuration.host.edit.php:374
 #: include/views/configuration.host.prototype.edit.php:93
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
@@ -3755,8 +3737,8 @@ msgstr "Desimal"
 #: include/hosts.inc.php:37
 #: include/views/administration.general.iconmap.edit.php:133
 #: include/views/configuration.action.edit.php:407
-#: include/views/configuration.host.edit.php:254
-#: include/views/configuration.host.edit.php:341
+#: include/views/configuration.host.edit.php:290
+#: include/views/configuration.host.edit.php:377
 #: include/views/configuration.host.prototype.edit.php:96
 #: include/views/js/configuration.sysmaps.js.php:82
 #: include/views/js/configuration.sysmaps.js.php:138
@@ -3820,7 +3802,7 @@ msgstr "Hapus"
 msgid "Delete all elements that are not present in the XML file?"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:486
+#: include/views/configuration.template.edit.php:536
 msgid "Delete and clear"
 msgstr "Hapus dan bersihkan"
 
@@ -3828,7 +3810,7 @@ msgstr "Hapus dan bersihkan"
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Hapus dan bersihkan template yang dipilih? (Peringatan: semua host yang terhubung akan dibersihkan!)"
 
-#: include/views/configuration.template.edit.php:487
+#: include/views/configuration.template.edit.php:537
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Hapus dan bersihkan template? (Peringatan: semua host yang terhubung akan dibersihkan!)"
 
@@ -3918,7 +3900,7 @@ msgstr "Hapus layar?"
 msgid "Delete script?"
 msgstr "Hapus script?"
 
-#: hosts.php:1075 include/reports.inc.php:111 include/reports.inc.php:201
+#: hosts.php:1076 include/reports.inc.php:111 include/reports.inc.php:201
 #: include/reports.inc.php:244
 #: include/views/administration.general.regularexpressions.list.php:66
 #: include/views/administration.mediatypes.list.php:124
@@ -3995,11 +3977,11 @@ msgstr ""
 msgid "Delete selected host prototypes?"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:890
+#: include/views/configuration.host.edit.php:926
 msgid "Delete selected host?"
 msgstr "Hapus host yang dipilih?"
 
-#: hosts.php:1076
+#: hosts.php:1077
 msgid "Delete selected hosts?"
 msgstr "Hapus host yang dipilih?"
 
@@ -4098,7 +4080,7 @@ msgstr ""
 msgid "Delete slide show?"
 msgstr "Hapus slide show?"
 
-#: include/views/configuration.template.edit.php:483
+#: include/views/configuration.template.edit.php:533
 msgid "Delete template?"
 msgstr "Hapus template?"
 
@@ -4129,7 +4111,7 @@ msgstr "Dihapus: Aturan discovery \"%1$s\" pada \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Dihapus: Grafik \"%1$s\" on \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1443
+#: include/classes/api/services/CHost.php:1464
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Dihapus: Host \"%1$s\"."
@@ -4219,13 +4201,13 @@ msgstr "Status deployment"
 #: include/views/administration.proxy.edit.php:87
 #: include/views/administration.script.edit.php:69
 #: include/views/configuration.host.discovery.edit.php:256
-#: include/views/configuration.host.edit.php:394
+#: include/views/configuration.host.edit.php:430
 #: include/views/configuration.host.massupdate.php:153
 #: include/views/configuration.item.edit.php:431
 #: include/views/configuration.item.massupdate.php:558
 #: include/views/configuration.maintenance.edit.php:92
 #: include/views/configuration.maintenance.list.php:49
-#: include/views/configuration.template.edit.php:175
+#: include/views/configuration.template.edit.php:225
 #: include/views/configuration.triggers.edit.php:251
 #: include/views/inventory.host.view.php:198
 #: include/views/monitoring.triggerComment.php:39 popup.php:1294
@@ -4349,7 +4331,7 @@ msgstr "Non-aktifkan mode debug pada grup yang dipilih?"
 msgid "Disable host"
 msgstr "Non-aktifkan host"
 
-#: hosts.php:989
+#: hosts.php:990
 msgid "Disable host?"
 msgstr "Non-aktifkan host?"
 
@@ -4361,7 +4343,7 @@ msgstr "Non-aktifkan host pada grup host yang dipilih?"
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Non-aktifkan host yang dimonitor dengan proxy yang terpilih?"
 
-#: hosts.php:1071 include/views/administration.mediatypes.list.php:120
+#: hosts.php:1072 include/views/administration.mediatypes.list.php:120
 #: include/views/administration.proxy.list.php:106
 #: include/views/administration.usergroups.list.php:136
 #: include/views/configuration.action.list.php:100
@@ -4398,7 +4380,7 @@ msgstr "Non-aktifkan grup yang dipilih?"
 msgid "Disable selected host prototypes?"
 msgstr ""
 
-#: hosts.php:1072
+#: hosts.php:1073
 msgid "Disable selected hosts?"
 msgstr "Non-aktifkan host yang dipilih?"
 
@@ -4426,7 +4408,7 @@ msgstr "Non-aktifkan trigger yang dipilih?"
 msgid "Disable selected web scenarios?"
 msgstr ""
 
-#: auditlogs.php:142 dashboard.php:295 hosts.php:993
+#: auditlogs.php:142 dashboard.php:295 hosts.php:994
 #: include/discovery.inc.php:121 include/html.inc.php:336
 #: include/httptest.inc.php:46 include/items.inc.php:155
 #: include/items.inc.php:209 include/triggers.inc.php:1486
@@ -4439,7 +4421,7 @@ msgstr ""
 #: include/views/administration.users.list.php:143
 #: include/views/administration.users.list.php:144
 #: include/views/configuration.action.list.php:72
-#: include/views/configuration.host.edit.php:816
+#: include/views/configuration.host.edit.php:852
 #: include/views/configuration.host.massupdate.php:178
 #: include/views/configuration.host.massupdate.php:282
 #: include/views/configuration.host.prototype.edit.php:309
@@ -4467,7 +4449,7 @@ msgstr ""
 msgid "Discovered device"
 msgstr "Perangkat yang ditemukan"
 
-#: events.php:333 hosts.php:864 hosts.php:957 include/html.inc.php:351
+#: events.php:333 hosts.php:865 hosts.php:958 include/html.inc.php:351
 #: include/menu.inc.php:76 include/menu.inc.php:203
 #: include/views/configuration.action.list.php:34
 #: include/views/inventory.host.view.php:234
@@ -4558,8 +4540,8 @@ msgstr "Aturan penemuan diperbarui"
 #: include/html.inc.php:472 include/html.inc.php:476
 #: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
-#: include/views/configuration.host.edit.php:553
-#: include/views/configuration.template.edit.php:286
+#: include/views/configuration.host.edit.php:589
+#: include/views/configuration.template.edit.php:336
 #: include/views/conf.import.php:34 include/views/monitoring.discovery.php:33
 #: popup.php:107
 msgid "Discovery rules"
@@ -4636,19 +4618,19 @@ msgstr "Mati"
 msgid "Downtime"
 msgstr "Downtime"
 
-#: include/views/configuration.host.edit.php:306
+#: include/views/configuration.host.edit.php:342
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
 msgstr "Geser disini untuk merubah tipe interface ke tipe \"IPMI\"."
 
-#: include/views/configuration.host.edit.php:291
+#: include/views/configuration.host.edit.php:327
 msgid "Drag here to change the type of the interface to \"JMX\" type."
 msgstr "Geser disini untuk merubah tipe interface ke tipe \"JMX\"."
 
-#: include/views/configuration.host.edit.php:275
+#: include/views/configuration.host.edit.php:311
 msgid "Drag here to change the type of the interface to \"SNMP\" type."
 msgstr "Geser disini untuk merubah tipe interface ke tipe \"SNMP\"."
 
-#: include/views/configuration.host.edit.php:258
+#: include/views/configuration.host.edit.php:294
 msgid "Drag here to change the type of the interface to \"agent\" type."
 msgstr "Geser disini untuk merubah tipe interface ke tipe \"agent\""
 
@@ -4685,12 +4667,12 @@ msgstr ""
 msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:630
+#: include/classes/api/services/CHost.php:647
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "Duplikasi host. Host dengan nama \"%s\" sudah ada dalam data."
 
-#: include/classes/api/services/CHost.php:648
+#: include/classes/api/services/CHost.php:665
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Duplikasi host. Host dengan nama tampil \"%s\" sudah ada dalam data."
@@ -4856,7 +4838,7 @@ msgstr ""
 #: include/classes/api/services/CHostGroup.php:471
 #: include/classes/api/services/CHostGroup.php:548
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1291
+#: include/classes/api/services/CHost.php:1312
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:618
@@ -4964,7 +4946,7 @@ msgstr "Aktifkan pemberitahuan event"
 msgid "Enable host"
 msgstr "Aktifkan host"
 
-#: hosts.php:995
+#: hosts.php:996
 msgid "Enable host?"
 msgstr "Aktifkan host?"
 
@@ -4981,7 +4963,7 @@ msgstr "Aktifkan host yang termonitor pada proxies yang terpilih?"
 msgid "Enable internal housekeeping"
 msgstr ""
 
-#: hosts.php:1067 include/views/administration.mediatypes.list.php:116
+#: hosts.php:1068 include/views/administration.mediatypes.list.php:116
 #: include/views/administration.proxy.list.php:102
 #: include/views/administration.usergroups.list.php:132
 #: include/views/configuration.action.list.php:96
@@ -5018,7 +5000,7 @@ msgstr "Aktifkan grup yang dipilih?"
 msgid "Enable selected host prototypes?"
 msgstr ""
 
-#: hosts.php:1068 include/views/configuration.hostgroups.list.php:157
+#: hosts.php:1069 include/views/configuration.hostgroups.list.php:157
 msgid "Enable selected hosts?"
 msgstr "Aktifkan host yang dipilih?"
 
@@ -5046,7 +5028,7 @@ msgstr "Aktifkan trigger yang dipilih?"
 msgid "Enable selected web scenarios?"
 msgstr ""
 
-#: auditlogs.php:139 dashboard.php:295 hosts.php:985
+#: auditlogs.php:139 dashboard.php:295 hosts.php:986
 #: include/discovery.inc.php:120 include/html.inc.php:332
 #: include/httptest.inc.php:45 include/items.inc.php:154
 #: include/items.inc.php:206 include/triggers.inc.php:2320
@@ -5064,7 +5046,7 @@ msgstr ""
 #: include/views/configuration.action.list.php:78
 #: include/views/configuration.discovery.edit.php:76
 #: include/views/configuration.host.discovery.edit.php:260
-#: include/views/configuration.host.edit.php:425
+#: include/views/configuration.host.edit.php:461
 #: include/views/configuration.host.massupdate.php:177
 #: include/views/configuration.host.prototype.edit.php:158
 #: include/views/configuration.httpconf.edit.php:146
@@ -5235,7 +5217,7 @@ msgstr "Kadaluarsa"
 msgid "Exploded"
 msgstr "Meledak"
 
-#: hosts.php:1064 include/views/configuration.screen.list.php:68
+#: hosts.php:1065 include/views/configuration.screen.list.php:68
 #: include/views/configuration.sysmap.list.php:62 templates.php:667
 msgid "Export selected"
 msgstr "Ekspor yang dipilih"
@@ -5322,7 +5304,7 @@ msgstr "Gagal"
 msgid "Failed"
 msgstr "Gagal"
 
-#: include/classes/api/services/CTemplate.php:540
+#: include/classes/api/services/CTemplate.php:544
 msgid "Failed to update template."
 msgstr ""
 
@@ -5427,7 +5409,7 @@ msgstr ""
 msgid "Filled region"
 msgstr "Region diisi"
 
-#: events.php:395 hosts.php:834 include/forms.inc.php:616
+#: events.php:395 hosts.php:835 include/forms.inc.php:616
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
 #: include/views/common.filter.trigger.php:147
@@ -5565,8 +5547,8 @@ msgstr "Akses frontend telah diperbarui"
 msgid "Frontend messaging"
 msgstr "Sistem pesan frontend"
 
-#: include/views/configuration.host.edit.php:889
-#: include/views/configuration.template.edit.php:482
+#: include/views/configuration.host.edit.php:925
+#: include/views/configuration.template.edit.php:532
 msgid "Full clone"
 msgstr "Full clone"
 
@@ -5669,7 +5651,7 @@ msgstr "Skrip global"
 msgid "Global scripts"
 msgstr "Skrip global"
 
-#: hosts.php:1079
+#: hosts.php:1080
 #: include/views/administration.general.regularexpressions.list.php:70
 #: include/views/administration.mediatypes.list.php:128
 #: include/views/administration.proxy.list.php:114
@@ -5837,8 +5819,8 @@ msgstr ""
 
 #: include/html.inc.php:424 include/html.inc.php:428
 #: include/views/configuration.host.discovery.list.php:125
-#: include/views/configuration.host.edit.php:627
-#: include/views/configuration.template.edit.php:351 popup.php:91
+#: include/views/configuration.host.edit.php:663
+#: include/views/configuration.template.edit.php:401 popup.php:91
 msgid "Graph prototypes"
 msgstr "Prototipe grafik"
 
@@ -5876,12 +5858,12 @@ msgstr "Grafik dengan nama \"%1$s\" sudah ada dalam grafik atau prototipe grafik
 msgid "Graph with same name but other type exist."
 msgstr "Grafik dengan nama yang sama tetapi tipe lain sudah ada."
 
-#: dashboard.php:317 hosts.php:863 hosts.php:955 include/html.inc.php:435
+#: dashboard.php:317 hosts.php:864 hosts.php:956 include/html.inc.php:435
 #: include/html.inc.php:439 include/menu.inc.php:61
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:49
-#: include/views/configuration.host.edit.php:527
-#: include/views/configuration.template.edit.php:262
+#: include/views/configuration.host.edit.php:563
+#: include/views/configuration.template.edit.php:312
 #: include/views/conf.import.php:36 include/views/inventory.host.view.php:220
 #: include/views/inventory.host.view.php:233
 #: include/views/inventory.host.view.php:243 jsLoader.php:202 popup.php:87
@@ -5908,7 +5890,7 @@ msgstr "Greek (el_GR)"
 msgid "Grid"
 msgstr "Kisi-kisi"
 
-#: events.php:321 hostinventoriesoverview.php:90 hosts.php:819 httpmon.php:77
+#: events.php:321 hostinventoriesoverview.php:90 hosts.php:820 httpmon.php:77
 #: include/classes/html/CHostsInfo.php:105
 #: include/classes/html/CTriggersInfo.php:111
 #: include/classes/screens/CScreenHostgroupTriggers.php:66
@@ -5950,11 +5932,11 @@ msgstr "Grup \"%1$s\" tidak ada."
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Grup \"%1$s\" untuk host \"%2$s\" tidak ada."
 
-#: hostgroups.php:120 usergrps.php:195
+#: hostgroups.php:176 usergrps.php:195
 msgid "Group added"
 msgstr "Grup ditambah"
 
-#: hostgroups.php:171 hostgroups.php:192 usergrps.php:229 usergrps.php:260
+#: hostgroups.php:227 hostgroups.php:248 usergrps.php:229 usergrps.php:260
 #, fuzzy
 msgid "Group deleted"
 msgid_plural "Groups deleted"
@@ -5999,11 +5981,11 @@ msgstr "Grup berdasarkan"
 
 #: include/reports.inc.php:325 include/views/administration.users.edit.php:66
 #: include/views/administration.users.list.php:58
-#: include/views/configuration.host.edit.php:211
-#: include/views/configuration.host.edit.php:230
+#: include/views/configuration.host.edit.php:247
+#: include/views/configuration.host.edit.php:266
 #: include/views/configuration.host.prototype.edit.php:173
 #: include/views/configuration.host.prototype.edit.php:207
-#: include/views/configuration.template.edit.php:114
+#: include/views/configuration.template.edit.php:150
 #: include/views/conf.import.php:27
 msgid "Groups"
 msgstr "Grup"
@@ -6203,7 +6185,7 @@ msgstr "Luruskan horisontal"
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:58
 #: include/views/configuration.graph.list.php:54
-#: include/views/configuration.host.edit.php:671
+#: include/views/configuration.host.edit.php:707
 #: include/views/configuration.host.massupdate.php:335
 #: include/views/configuration.host.prototype.edit.php:160
 #: include/views/configuration.httpconf.list.php:44
@@ -6230,7 +6212,7 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Host"
 
-#: include/classes/api/services/CHost.php:974
+#: include/classes/api/services/CHost.php:997
 #: include/classes/api/services/CTemplate.php:471
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6275,12 +6257,12 @@ msgstr "Hitung host"
 msgid "Host deleted"
 msgstr "Host dihapus"
 
-#: hostgroups.php:240 hosts.php:673 proxies.php:189
+#: hostgroups.php:296 hosts.php:673 proxies.php:189
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] ""
 
-#: hostgroups.php:239 hosts.php:672 proxies.php:188
+#: hostgroups.php:295 hosts.php:672 proxies.php:188
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] ""
@@ -6353,7 +6335,7 @@ msgstr "Grup host"
 msgid "Host interface"
 msgstr "Antarmuka host"
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:877
+#: hostinventories.php:26 include/views/configuration.host.edit.php:913
 #: include/views/configuration.host.prototype.edit.php:322 jsLoader.php:204
 msgid "Host inventory"
 msgstr "Inventaris Host"
@@ -6458,7 +6440,7 @@ msgstr ""
 
 #: include/html.inc.php:448 include/html.inc.php:452
 #: include/views/configuration.host.discovery.list.php:101
-#: include/views/configuration.host.edit.php:646
+#: include/views/configuration.host.edit.php:682
 msgid "Host prototypes"
 msgstr ""
 
@@ -6490,7 +6472,7 @@ msgstr "Subnet mask host"
 msgid "Host time"
 msgstr "Waktu host"
 
-#: include/classes/api/services/CHost.php:848
+#: include/classes/api/services/CHost.php:875
 msgid "Host update failed."
 msgstr "Perbarui host gagal."
 
@@ -6498,28 +6480,28 @@ msgstr "Perbarui host gagal."
 msgid "Host updated"
 msgstr "Host diperbarui"
 
-#: include/classes/api/services/CTemplate.php:1047
+#: include/classes/api/services/CTemplate.php:1041
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:678
+#: include/classes/api/services/CHost.php:695
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "Host dengan nama yang sama \"%s\" sudah ada."
 
 #: include/classes/api/services/CTemplate.php:497
-#: include/classes/api/services/CTemplate.php:1012
+#: include/classes/api/services/CTemplate.php:1006
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:684
+#: include/classes/api/services/CHost.php:701
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Host dengan nama tampil yang sama \"%s\" sudah ada."
 
-#: hostinventoriesoverview.php:92 hosts.php:821 include/forms.inc.php:199
+#: hostinventoriesoverview.php:92 hosts.php:822 include/forms.inc.php:199
 #: include/forms.inc.php:884 include/items.inc.php:723
 #: include/menu.inc.php:109 include/menu.inc.php:162
 #: include/reports.inc.php:367 include/views/administration.proxy.edit.php:86
@@ -6544,7 +6526,7 @@ msgstr "Host & Grup"
 msgid "Hosts (m/n/t)"
 msgstr "Host (m/n/t)"
 
-#: include/views/configuration.template.edit.php:170
+#: include/views/configuration.template.edit.php:220
 msgid "Hosts / templates"
 msgstr "Host / template"
 
@@ -6605,7 +6587,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: events.php:455 hosts.php:830
+#: events.php:455 hosts.php:831
 #: include/views/administration.auditlogs.list.php:87
 #: include/views/administration.proxy.edit.php:59
 #: include/views/inventory.host.view.php:57
@@ -6618,8 +6600,8 @@ msgstr "IP"
 
 #: include/maps.inc.php:46 include/views/administration.proxy.edit.php:52
 #: include/views/configuration.discovery.edit.php:67
-#: include/views/configuration.host.edit.php:250
-#: include/views/configuration.host.edit.php:337
+#: include/views/configuration.host.edit.php:286
+#: include/views/configuration.host.edit.php:373
 #: include/views/configuration.host.prototype.edit.php:92
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
@@ -6658,7 +6640,7 @@ msgstr "Jarak IP tidak boleh kosong."
 #: include/views/administration.script.edit.php:45
 #: include/views/administration.script.list.php:53
 #: include/views/configuration.action.edit.php:728
-#: include/views/configuration.host.edit.php:781
+#: include/views/configuration.host.edit.php:817
 #: include/views/configuration.host.massupdate.php:337
 #: include/views/configuration.host.prototype.edit.php:278
 msgid "IPMI"
@@ -6672,8 +6654,8 @@ msgstr "Agen IPMI"
 msgid "IPMI authentication algorithm"
 msgstr "Algoritma otentikasi IPMI"
 
-#: include/views/configuration.host.edit.php:315
-#: include/views/configuration.host.edit.php:391
+#: include/views/configuration.host.edit.php:351
+#: include/views/configuration.host.edit.php:427
 #: include/views/configuration.host.prototype.edit.php:146
 #: include/views/inventory.host.view.php:162
 msgid "IPMI interfaces"
@@ -6930,7 +6912,7 @@ msgstr "Gambar untuk semua peta akan diperbarui!"
 msgid "Immediately"
 msgstr "Segera"
 
-#: hosts.php:812 include/views/configuration.screen.list.php:33
+#: hosts.php:813 include/views/configuration.screen.list.php:33
 #: include/views/configuration.sysmap.list.php:28
 #: include/views/conf.import.php:83 include/views/conf.import.php:88
 #: templates.php:490
@@ -6960,7 +6942,7 @@ msgstr "Tidak memungkinkan untuk menghapus baris dan kolom terakhir."
 
 #: include/classes/html/CTweenBox.php:73
 #: include/classes/html/CTweenBox.php:100
-#: include/views/configuration.template.edit.php:170
+#: include/views/configuration.template.edit.php:220
 msgid "In"
 msgstr "Dalam"
 
@@ -6968,12 +6950,12 @@ msgstr "Dalam"
 msgid "In group"
 msgstr "Dalam grup"
 
-#: include/views/configuration.host.edit.php:211
-#: include/views/configuration.template.edit.php:114
+#: include/views/configuration.host.edit.php:247
+#: include/views/configuration.template.edit.php:150
 msgid "In groups"
 msgstr "Dalam grup"
 
-#: hosts.php:981 include/html.inc.php:329
+#: hosts.php:982 include/html.inc.php:329
 #: include/views/configuration.maintenance.edit.php:168
 #: include/views/configuration.maintenance.edit.php:176
 msgid "In maintenance"
@@ -7190,8 +7172,8 @@ msgstr "Kesalahan hitung nilai SLA untuk service \"%1$s\"."
 msgid "Incorrect characters used for host \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:626
-#: include/classes/api/services/CHost.php:957
+#: include/classes/api/services/CHost.php:643
+#: include/classes/api/services/CHost.php:980
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Kesalahan karakter yang digunakan untuk nama host \"%s\"."
@@ -7202,7 +7184,7 @@ msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CTemplate.php:448
-#: include/classes/api/services/CTemplate.php:1055
+#: include/classes/api/services/CTemplate.php:1049
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr ""
@@ -7383,7 +7365,7 @@ msgstr "Kesalahan parameter interface DNS \"%s\" yang disediakan."
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Kesalahan port interface \"%s\" yang disediakan."
 
-#: include/classes/api/services/CHost.php:578
+#: include/classes/api/services/CHost.php:611
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "Kesalahan field inventori \"%s\"."
@@ -7603,7 +7585,7 @@ msgstr "Kesalahan sorder pengurutan untuk service \"%1$s\"."
 msgid "Incorrect source value."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:553
+#: include/classes/api/services/CHost.php:591
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr ""
@@ -7817,7 +7799,7 @@ msgstr "Instalasi"
 msgid "Installer name"
 msgstr "Nama installer"
 
-#: disc_prototypes.php:41 host_discovery.php:48 hosts.php:866
+#: disc_prototypes.php:41 host_discovery.php:48 hosts.php:867
 #: include/views/administration.proxy.edit.php:69 items.php:40
 msgid "Interface"
 msgstr "Interface"
@@ -8032,7 +8014,7 @@ msgstr "Pemberian nama view \"%s\" tidak sah. Karakter yang dibolehkan: \"a-z\" 
 msgid "Inventory"
 msgstr "Inventaris"
 
-#: include/classes/api/services/CHost.php:1181
+#: include/classes/api/services/CHost.php:1170
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr ""
@@ -8197,8 +8179,8 @@ msgstr ""
 
 #: include/html.inc.php:374 include/html.inc.php:378
 #: include/views/configuration.host.discovery.list.php:111
-#: include/views/configuration.host.edit.php:576
-#: include/views/configuration.template.edit.php:309 popup.php:95
+#: include/views/configuration.host.edit.php:612
+#: include/views/configuration.template.edit.php:359 popup.php:95
 msgid "Item prototypes"
 msgstr "Item prototipe"
 
@@ -8266,15 +8248,15 @@ msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\"."
 msgid "Item with key \"%1$s\" already exists."
 msgstr ""
 
-#: hosts.php:861 hosts.php:951 include/html.inc.php:385
+#: hosts.php:862 hosts.php:952 include/html.inc.php:385
 #: include/html.inc.php:389 include/items.inc.php:706
 #: include/reports.inc.php:117 include/reports.inc.php:250
 #: include/views/configuration.application.list.php:94
 #: include/views/configuration.graph.edit.php:284
 #: include/views/configuration.host.discovery.list.php:47
-#: include/views/configuration.host.edit.php:469
+#: include/views/configuration.host.edit.php:505
 #: include/views/configuration.item.list.php:42
-#: include/views/configuration.template.edit.php:220
+#: include/views/configuration.template.edit.php:270
 #: include/views/conf.import.php:33 include/views/inventory.host.view.php:231
 #: include/views/inventory.host.view.php:241 latest.php:347 popup.php:71
 #: queue.php:101 report6.php:44 search.php:141 search.php:173 search.php:198
@@ -8311,8 +8293,8 @@ msgstr "JMX"
 msgid "JMX agent"
 msgstr "Agen JMX"
 
-#: include/views/configuration.host.edit.php:300
-#: include/views/configuration.host.edit.php:378
+#: include/views/configuration.host.edit.php:336
+#: include/views/configuration.host.edit.php:414
 #: include/views/configuration.host.prototype.edit.php:133
 #: include/views/inventory.host.view.php:142
 msgid "JMX interfaces"
@@ -8625,9 +8607,9 @@ msgstr "Tautan"
 msgid "Link indicators"
 msgstr "Indikator tautan"
 
-#: include/views/configuration.host.edit.php:732
+#: include/views/configuration.host.edit.php:768
 #: include/views/configuration.host.prototype.edit.php:260
-#: include/views/configuration.template.edit.php:460
+#: include/views/configuration.template.edit.php:510
 msgid "Link new templates"
 msgstr ""
 
@@ -8657,11 +8639,11 @@ msgstr "Tautan ke template"
 msgid "Link with templates"
 msgstr "Tautan dengan template"
 
-#: include/views/configuration.host.edit.php:712
-#: include/views/configuration.host.edit.php:744
+#: include/views/configuration.host.edit.php:748
+#: include/views/configuration.host.edit.php:780
 #: include/views/configuration.host.prototype.edit.php:233
-#: include/views/configuration.template.edit.php:435
-#: include/views/configuration.template.edit.php:462 templates.php:516
+#: include/views/configuration.template.edit.php:485
+#: include/views/configuration.template.edit.php:512 templates.php:516
 msgid "Linked templates"
 msgstr "Template terhubung"
 
@@ -8892,9 +8874,9 @@ msgstr "Makro dengan hostmacroid \"%1$s\" tidak ada."
 #: adm.triggerdisplayoptions.php:80 adm.triggerseverities.php:87
 #: adm.valuemapping.php:133 adm.workingtime.php:68
 #: include/views/administration.general.macros.edit.php:31
-#: include/views/configuration.host.edit.php:794
+#: include/views/configuration.host.edit.php:830
 #: include/views/configuration.host.prototype.edit.php:285
-#: include/views/configuration.template.edit.php:472
+#: include/views/configuration.template.edit.php:522
 msgid "Macros"
 msgstr "Makro"
 
@@ -8970,7 +8952,7 @@ msgstr "Pemeliharaan tanpa koleksi data"
 msgid "Mandatory parameter is missing."
 msgstr "Parameter wajib telah hilang."
 
-#: include/views/configuration.host.edit.php:818
+#: include/views/configuration.host.edit.php:854
 #: include/views/configuration.host.massupdate.php:283
 #: include/views/configuration.host.prototype.edit.php:311
 msgid "Manual"
@@ -9071,7 +9053,7 @@ msgstr "Tandai yang dipilih"
 msgid "Mask"
 msgstr ""
 
-#: hosts.php:1066 include/views/configuration.item.list.php:273
+#: hosts.php:1067 include/views/configuration.item.list.php:273
 #: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.triggers.list.php:299
 #: include/views/configuration.triggers.massupdate.php:159
@@ -9412,7 +9394,7 @@ msgstr "Sen"
 msgid "Monday"
 msgstr "Senin"
 
-#: include/views/configuration.host.edit.php:423
+#: include/views/configuration.host.edit.php:459
 #: include/views/configuration.host.massupdate.php:168
 #: include/views/configuration.host.prototype.edit.php:155
 msgid "Monitored by proxy"
@@ -9500,7 +9482,7 @@ msgstr ""
 
 #: actionconf.php:37 actionconf.php:169 adm.regexps.php:37 adm.regexps.php:147
 #: adm.regexps.php:178 applications.php:38 disc_prototypes.php:42
-#: graphs.php:41 host_discovery.php:49 hosts.php:828 hosts.php:859
+#: graphs.php:41 host_discovery.php:49 hosts.php:829 hosts.php:860
 #: httpconf.php:44 httpmon.php:92 include/classes/setup/CSetupWizard.php:384
 #: include/forms.inc.php:591 include/hosts.inc.php:115
 #: include/reports.inc.php:169
@@ -9529,8 +9511,8 @@ msgstr ""
 #: include/views/configuration.graph.list.php:77
 #: include/views/configuration.host.discovery.edit.php:52
 #: include/views/configuration.host.discovery.list.php:46
-#: include/views/configuration.host.edit.php:688
-#: include/views/configuration.host.edit.php:736
+#: include/views/configuration.host.edit.php:724
+#: include/views/configuration.host.edit.php:772
 #: include/views/configuration.hostgroups.list.php:50
 #: include/views/configuration.host.prototype.edit.php:216
 #: include/views/configuration.host.prototype.list.php:48
@@ -9552,7 +9534,7 @@ msgstr ""
 #: include/views/configuration.sysmap.edit.php:41
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.sysmap.list.php:43
-#: include/views/configuration.template.edit.php:409
+#: include/views/configuration.template.edit.php:459
 #: include/views/configuration.triggers.edit.php:63
 #: include/views/configuration.triggers.edit.php:282
 #: include/views/configuration.triggers.list.php:102
@@ -9657,8 +9639,8 @@ msgstr "Element baru"
 msgid "New flexible interval"
 msgstr "Interval fleksibel baru"
 
-#: include/views/configuration.host.edit.php:215
-#: include/views/configuration.template.edit.php:119
+#: include/views/configuration.host.edit.php:251
+#: include/views/configuration.template.edit.php:155
 msgid "New group"
 msgstr "Grup baru"
 
@@ -9765,7 +9747,7 @@ msgstr "Tidak ada field \"ymax_type\" untuk grafik \"%s\"."
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr "Tidak ada field \"ymix_type\" untuk grafik \"%s\"."
 
-#: include/views/configuration.host.edit.php:388
+#: include/views/configuration.host.edit.php:424
 #: include/views/configuration.host.prototype.edit.php:143
 msgid "No IPMI interfaces found."
 msgstr ""
@@ -9774,7 +9756,7 @@ msgstr ""
 msgid "No IT services found."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:375
+#: include/views/configuration.host.edit.php:411
 #: include/views/configuration.host.prototype.edit.php:130
 msgid "No JMX interfaces found."
 msgstr ""
@@ -9787,7 +9769,7 @@ msgstr ""
 msgid "No SNMP community specified."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:362
+#: include/views/configuration.host.edit.php:398
 #: include/views/configuration.host.prototype.edit.php:117
 msgid "No SNMP interfaces found."
 msgstr ""
@@ -9818,7 +9800,7 @@ msgstr ""
 msgid "No actions found."
 msgstr "Tidak ada aksi yang ditemukan."
 
-#: include/views/configuration.host.edit.php:348
+#: include/views/configuration.host.edit.php:384
 #: include/views/configuration.host.prototype.edit.php:103
 msgid "No agent interfaces found."
 msgstr ""
@@ -9971,13 +9953,13 @@ msgstr ""
 msgid "No graphs found."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:598
-#: include/classes/api/services/CHost.php:608
+#: include/classes/api/services/CHost.php:566
+#: include/classes/api/services/CHost.php:573
 #, c-format
 msgid "No groups for host \"%s\"."
 msgstr "Tidak ada grup untuk host \"%s\"."
 
-#: include/classes/api/services/CHost.php:943
+#: include/classes/api/services/CHost.php:966
 msgid "No groups for hosts."
 msgstr "Tidak ada grup untuk host."
 
@@ -9986,7 +9968,7 @@ msgstr "Tidak ada grup untuk host."
 msgid "No groups for template \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:980
+#: include/classes/api/services/CTemplate.php:974
 msgid "No groups for template."
 msgstr ""
 
@@ -10031,7 +10013,7 @@ msgstr ""
 msgid "No host with hostid \"%s\"."
 msgstr "Tidak ada host dengan hostid \"%s\"."
 
-#: hostinventoriesoverview.php:95 hosts.php:856
+#: hostinventoriesoverview.php:95 hosts.php:857
 #: include/views/inventory.host.list.php:72 popup.php:732 popup.php:806
 #: search.php:129
 msgid "No hosts found."
@@ -10070,8 +10052,8 @@ msgstr "Tidak ada interface yang ditemukan."
 msgid "No interface provided for proxy \"%s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:602
-#: include/classes/api/services/CHost.php:620
+#: include/classes/api/services/CHost.php:631
+#: include/classes/api/services/CHost.php:637
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "Tidak ada interface untuk host \"%s\"."
@@ -10202,7 +10184,7 @@ msgid "No permissions for screen \"%1$s\"."
 msgstr "Tidak ada izin untuk layar \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:996
-#: include/classes/api/services/CUser.php:1125
+#: include/classes/api/services/CUser.php:1123
 msgid "No permissions for system access."
 msgstr "Tidak ada izin untuk akses sistem."
 
@@ -10226,21 +10208,23 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: include/classes/api/services/CGraphPrototype.php:679
 #: include/classes/api/services/CGraphPrototype.php:741
 #: include/classes/api/services/CHostBase.php:45
-#: include/classes/api/services/CHostGeneral.php:140
+#: include/classes/api/services/CHostGeneral.php:65
+#: include/classes/api/services/CHostGeneral.php:115
 #: include/classes/api/services/CHostGroup.php:484
 #: include/classes/api/services/CHostGroup.php:562
-#: include/classes/api/services/CHostGroup.php:747
-#: include/classes/api/services/CHostGroup.php:809
-#: include/classes/api/services/CHostGroup.php:863
-#: include/classes/api/services/CHostGroup.php:872
-#: include/classes/api/services/CHostGroup.php:895
+#: include/classes/api/services/CHostGroup.php:934
+#: include/classes/api/services/CHostGroup.php:964
+#: include/classes/api/services/CHostGroup.php:1091
+#: include/classes/api/services/CHostGroup.php:1193
+#: include/classes/api/services/CHostGroup.php:1220
 #: include/classes/api/services/CHostInterface.php:264
 #: include/classes/api/services/CHostInterface.php:280
 #: include/classes/api/services/CHostInterface.php:423
 #: include/classes/api/services/CHostInterface.php:647
-#: include/classes/api/services/CHost.php:530
-#: include/classes/api/services/CHost.php:613
-#: include/classes/api/services/CHost.php:1636
+#: include/classes/api/services/CHost.php:522
+#: include/classes/api/services/CHost.php:561
+#: include/classes/api/services/CHost.php:579
+#: include/classes/api/services/CHost.php:1657
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -10278,6 +10262,10 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: include/classes/api/services/CScreen.php:610
 #: include/classes/api/services/CService.php:1051
 #: include/classes/api/services/CService.php:1066
+#: include/classes/api/services/CTemplate.php:750
+#: include/classes/api/services/CTemplate.php:969
+#: include/classes/api/services/CTemplate.php:1095
+#: include/classes/api/services/CTemplate.php:1126
 #: include/classes/api/services/CTemplateScreen.php:568
 #: include/classes/api/services/CTemplateScreen.php:619
 #: include/classes/api/services/CTemplateScreen.php:671
@@ -10294,7 +10282,7 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: include/classes/api/services/CUser.php:798
 #: include/classes/api/services/CUser.php:818
 #: include/classes/api/services/CUser.php:877
-#: include/classes/api/services/CUser.php:1282 include/func.inc.php:1662
+#: include/classes/api/services/CUser.php:1280 include/func.inc.php:1662
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Tidak ada izin untuk objek yang dirujuk atau objek tidak ada!"
 
@@ -10368,7 +10356,7 @@ msgstr ""
 msgid "No status for proxy."
 msgstr ""
 
-#: triggers.php:323
+#: triggers.php:340
 msgid "No target selected"
 msgstr "Tidak ada sasaran yang dipilih"
 
@@ -10380,10 +10368,10 @@ msgstr "Tidak ada sasaran yang dipilih."
 msgid "No templates found."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:677
+#: include/views/configuration.host.edit.php:713
 #: include/views/configuration.host.prototype.edit.php:213
 #: include/views/configuration.host.prototype.edit.php:237
-#: include/views/configuration.template.edit.php:407
+#: include/views/configuration.template.edit.php:457
 msgid "No templates linked."
 msgstr ""
 
@@ -10795,8 +10783,9 @@ msgstr "Pada perubahan status trigger berkedip untuk"
 msgid "Once"
 msgstr "Sekali"
 
-#: include/classes/api/services/CHostGroup.php:825
-#: include/classes/api/services/CHostGroup.php:959
+#: include/classes/api/services/CHostGroup.php:1100
+#: include/classes/api/services/CHostGroup.php:1109
+#: include/classes/api/services/CHostGroup.php:1202
 msgid "One of the objects is left without a host group."
 msgstr ""
 
@@ -11014,9 +11003,9 @@ msgstr "Parameter konfigurasi lainnya"
 
 #: include/reports.inc.php:325
 #: include/views/administration.usergroups.edit.php:54
-#: include/views/configuration.host.edit.php:211
+#: include/views/configuration.host.edit.php:247
 #: include/views/configuration.maintenance.edit.php:176
-#: include/views/configuration.template.edit.php:114
+#: include/views/configuration.template.edit.php:150
 msgid "Other groups"
 msgstr "Grup lainnya"
 
@@ -11034,7 +11023,7 @@ msgstr "Host | Grup lainnya"
 msgid "Other parameters"
 msgstr "Parameter lainnya"
 
-#: include/views/configuration.template.edit.php:171
+#: include/views/configuration.template.edit.php:221
 msgid "Other | group"
 msgstr "Grup | lainnya"
 
@@ -11327,7 +11316,7 @@ msgstr "Pasif"
 #: include/views/configuration.action.edit.php:784
 #: include/views/configuration.host.discovery.edit.php:164
 #: include/views/configuration.host.discovery.edit.php:176
-#: include/views/configuration.host.edit.php:780
+#: include/views/configuration.host.edit.php:816
 #: include/views/configuration.host.prototype.edit.php:277
 #: include/views/configuration.httpconf.edit.php:169
 #: include/views/configuration.item.edit.php:170
@@ -11458,14 +11447,14 @@ msgid "Populates host inventory field"
 msgstr "Mengisi field inventaris host"
 
 #: authentication.php:41 disc_prototypes.php:82 host_discovery.php:85
-#: hosts.php:831 include/classes/setup/CSetupWizard.php:379
+#: hosts.php:832 include/classes/setup/CSetupWizard.php:379
 #: include/forms.inc.php:470
 #: include/views/administration.authentication.edit.php:71
 #: include/views/administration.proxy.edit.php:55
 #: include/views/configuration.action.edit.php:798
 #: include/views/configuration.host.discovery.edit.php:154
-#: include/views/configuration.host.edit.php:253
-#: include/views/configuration.host.edit.php:340
+#: include/views/configuration.host.edit.php:289
+#: include/views/configuration.host.edit.php:376
 #: include/views/configuration.host.prototype.edit.php:95
 #: include/views/configuration.item.edit.php:160
 #: include/views/configuration.item.massupdate.php:199
@@ -11585,8 +11574,8 @@ msgstr ""
 msgid "Private key file"
 msgstr "File kunci pribadi"
 
-#: include/views/configuration.host.edit.php:768
-#: include/views/configuration.host.edit.php:776
+#: include/views/configuration.host.edit.php:804
+#: include/views/configuration.host.edit.php:812
 #: include/views/configuration.host.prototype.edit.php:274
 msgid "Privilege level"
 msgstr "Tingkatan hak"
@@ -12018,7 +12007,7 @@ msgstr "Dibutuhkan kode status"
 msgid "Required string"
 msgstr "Dibutuhkan string"
 
-#: events.php:396 hosts.php:837 include/forms.inc.php:619
+#: events.php:396 hosts.php:838 include/forms.inc.php:619
 #: include/html.inc.php:209 include/reports.inc.php:127
 #: include/reports.inc.php:260 include/reports.inc.php:441
 #: include/views/administration.auditacts.list.php:51
@@ -12321,8 +12310,8 @@ msgstr "OID SNMP"
 msgid "SNMP community"
 msgstr "Komunitas SNMP"
 
-#: include/views/configuration.host.edit.php:285
-#: include/views/configuration.host.edit.php:365
+#: include/views/configuration.host.edit.php:321
+#: include/views/configuration.host.edit.php:401
 #: include/views/configuration.host.prototype.edit.php:120
 #: include/views/inventory.host.view.php:123
 msgid "SNMP interfaces"
@@ -12541,7 +12530,7 @@ msgstr "Layar diperbarui"
 #: dashboard.php:347 include/html.inc.php:460 include/html.inc.php:464
 #: include/menu.inc.php:66 include/menu.inc.php:189
 #: include/views/configuration.screen.list.php:38
-#: include/views/configuration.template.edit.php:372
+#: include/views/configuration.template.edit.php:422
 #: include/views/conf.import.php:37 include/views/inventory.host.view.php:221
 #: include/views/monitoring.screen.php:27
 #: include/views/monitoring.screen.php:77
@@ -12734,7 +12723,7 @@ msgstr "Pilih baris dengan nilai seperti"
 msgid "Selected"
 msgstr "Dipilih"
 
-#: actionconf.php:378
+#: actionconf.php:380
 msgid "Selected actions deleted"
 msgstr "Aksi yang dipilih dihapus"
 
@@ -12891,7 +12880,7 @@ msgstr "Service"
 msgid "Services form a circular dependency."
 msgstr "Form service dependensi melingkar."
 
-#: include/classes/api/services/CUser.php:1119
+#: include/classes/api/services/CUser.php:1117
 msgid "Session terminated, re-login, please."
 msgstr "Sesi dimatikan, mohon login kembali."
 
@@ -13260,7 +13249,7 @@ msgstr "State"
 msgid "State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service"
 msgstr ""
 
-#: events.php:458 events.php:473 hosts.php:868 httpdetails.php:134
+#: events.php:458 events.php:473 hosts.php:869 httpdetails.php:134
 #: httpmon.php:95 include/actions.inc.php:821 include/actions.inc.php:916
 #: include/actions.inc.php:972 include/classes/screens/CScreenActions.php:62
 #: include/classes/screens/CScreenActions.php:68
@@ -13554,13 +13543,13 @@ msgstr "Telnet"
 #: include/actions.inc.php:62 include/audit.inc.php:50
 #: include/forms.inc.php:597 include/forms.inc.php:914
 #: include/html.inc.php:323 include/views/configuration.template.edit.php:35
-#: include/views/configuration.template.edit.php:398
+#: include/views/configuration.template.edit.php:448
 #: include/views/configuration.triggers.list.php:121 report2.php:267
 #: search.php:393
 msgid "Template"
 msgstr "Template"
 
-#: include/classes/api/services/CHost.php:985
+#: include/classes/api/services/CHost.php:1008
 #: include/classes/api/services/CTemplate.php:461
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -13600,7 +13589,7 @@ msgstr "Template linkage"
 msgid "Template list"
 msgstr "Daftar template"
 
-#: include/views/configuration.template.edit.php:96 templates.php:55
+#: include/views/configuration.template.edit.php:95 templates.php:55
 msgid "Template name"
 msgstr "Nama template"
 
@@ -13622,23 +13611,23 @@ msgstr "Trigger template"
 msgid "Template updated"
 msgstr "Template diperbarui"
 
-#: include/classes/api/services/CTemplate.php:1034
+#: include/classes/api/services/CTemplate.php:1028
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:694
+#: include/classes/api/services/CHost.php:711
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "Template dengan nama yang sama \"%s\" sudah ada."
 
 #: include/classes/api/services/CTemplate.php:484
-#: include/classes/api/services/CTemplate.php:999
+#: include/classes/api/services/CTemplate.php:993
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:700
+#: include/classes/api/services/CHost.php:717
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Template dengan visible name yang sama \"%s\" sudah ada."
@@ -13647,9 +13636,9 @@ msgstr "Template dengan visible name yang sama \"%s\" sudah ada."
 msgid "Templated items"
 msgstr "Item yang memiliki template"
 
-#: hosts.php:867 include/menu.inc.php:158
+#: hosts.php:868 include/menu.inc.php:158
 #: include/views/configuration.copy.elements.php:47
-#: include/views/configuration.host.edit.php:747
+#: include/views/configuration.host.edit.php:783
 #: include/views/configuration.hostgroups.list.php:144
 #: include/views/configuration.host.massupdate.php:336
 #: include/views/configuration.host.prototype.edit.php:263
@@ -13788,7 +13777,7 @@ msgstr[0] "Ada \"%1$d\" grup dengan akses Internal GUI."
 msgid "Third"
 msgstr "Ketiga"
 
-#: include/views/configuration.host.edit.php:851
+#: include/views/configuration.host.edit.php:887
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Field ini secara otomatis diisi oleh item \"%s\"."
@@ -14022,7 +14011,7 @@ msgstr "Trigger \"%1$s\" diabaikan - aturan user."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Trigger \"%s\" milik template dengan linkage berbeda."
 
-#: triggers.php:190 triggers.php:320 tr_logform.php:149
+#: triggers.php:207 triggers.php:337 tr_logform.php:149
 msgid "Trigger added"
 msgstr "Trigger ditambah"
 
@@ -14034,7 +14023,7 @@ msgstr ""
 msgid "Trigger data storage period (in days)"
 msgstr ""
 
-#: triggers.php:208
+#: triggers.php:225
 msgid "Trigger deleted"
 msgstr "Trigger dihapus"
 
@@ -14042,7 +14031,7 @@ msgstr "Trigger dihapus"
 msgid "Trigger description"
 msgstr ""
 
-#: triggers.php:278
+#: triggers.php:295
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] ""
@@ -14055,7 +14044,7 @@ msgstr[0] ""
 msgid "Trigger displaying options"
 msgstr "Trigger menampilkan pilihan"
 
-#: triggers.php:277
+#: triggers.php:294
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] ""
@@ -14126,36 +14115,36 @@ msgstr ""
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr ""
 
-#: trigger_prototypes.php:172
+#: trigger_prototypes.php:190
 msgid "Trigger prototype added"
 msgstr ""
 
-#: trigger_prototypes.php:187
+#: trigger_prototypes.php:205
 msgid "Trigger prototype deleted"
 msgstr ""
 
-#: trigger_prototypes.php:250
+#: trigger_prototypes.php:268
 msgid "Trigger prototype disabled"
 msgid_plural "Trigger prototypes disabled"
 msgstr[0] ""
 
-#: trigger_prototypes.php:249
+#: trigger_prototypes.php:267
 msgid "Trigger prototype enabled"
 msgid_plural "Trigger prototypes enabled"
 msgstr[0] ""
 
-#: trigger_prototypes.php:167
+#: trigger_prototypes.php:185
 msgid "Trigger prototype updated"
 msgstr ""
 
 #: include/html.inc.php:399 include/html.inc.php:403
 #: include/views/configuration.host.discovery.list.php:118
-#: include/views/configuration.host.edit.php:603
-#: include/views/configuration.template.edit.php:330
+#: include/views/configuration.host.edit.php:639
+#: include/views/configuration.template.edit.php:380
 msgid "Trigger prototypes"
 msgstr "Prototipe trigger"
 
-#: trigger_prototypes.php:263
+#: trigger_prototypes.php:281
 msgid "Trigger prototypes deleted"
 msgstr ""
 
@@ -14163,7 +14152,7 @@ msgstr ""
 msgid "Trigger prototypes of"
 msgstr "Prototipe trigger dari"
 
-#: trigger_prototypes.php:214
+#: trigger_prototypes.php:232
 msgid "Trigger prototypes updated"
 msgstr ""
 
@@ -14187,7 +14176,7 @@ msgstr ""
 msgid "Trigger status \"Problem\""
 msgstr ""
 
-#: triggers.php:186 triggers.php:247 tr_logform.php:124
+#: triggers.php:203 triggers.php:264 tr_logform.php:124
 msgid "Trigger updated"
 msgstr "Trigger diperbarui"
 
@@ -14195,15 +14184,15 @@ msgstr "Trigger diperbarui"
 msgid "Trigger value"
 msgstr "Nilai trigger"
 
-#: hosts.php:862 hosts.php:953 include/forms.inc.php:582
+#: hosts.php:863 hosts.php:954 include/forms.inc.php:582
 #: include/html.inc.php:410 include/html.inc.php:414 include/menu.inc.php:51
 #: include/triggers.inc.php:1081
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:48
-#: include/views/configuration.host.edit.php:496
+#: include/views/configuration.host.edit.php:532
 #: include/views/configuration.item.list.php:66
 #: include/views/configuration.item.list.php:207
-#: include/views/configuration.template.edit.php:241
+#: include/views/configuration.template.edit.php:291
 #: include/views/configuration.triggers.list.php:77
 #: include/views/conf.import.php:35 include/views/inventory.host.view.php:213
 #: include/views/inventory.host.view.php:232
@@ -14221,7 +14210,7 @@ msgstr "Trigger"
 msgid "Triggers (e/d)[p/o]"
 msgstr ""
 
-#: triggers.php:332
+#: triggers.php:349
 msgid "Triggers deleted"
 msgstr "Trigger dihapus"
 
@@ -14529,14 +14518,14 @@ msgstr ""
 msgid "Unknown value type"
 msgstr "Tipe nilai tidak dikenal"
 
-#: include/views/configuration.host.edit.php:699
+#: include/views/configuration.host.edit.php:735
 #: include/views/configuration.host.prototype.edit.php:227
-#: include/views/configuration.template.edit.php:421
+#: include/views/configuration.template.edit.php:471
 msgid "Unlink"
 msgstr "Putuskan"
 
-#: include/views/configuration.host.edit.php:703
-#: include/views/configuration.template.edit.php:425
+#: include/views/configuration.host.edit.php:739
+#: include/views/configuration.template.edit.php:475
 msgid "Unlink and clear"
 msgstr "Putuskan dan bersihkan"
 
@@ -14548,52 +14537,52 @@ msgstr "Putuskan dari template"
 msgid "Unlink from templates"
 msgstr "Putuskan dari template"
 
-#: include/classes/api/services/CHostGeneral.php:570
+#: include/classes/api/services/CHostGeneral.php:574
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Aplikasi \"%1$s\" pada \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:348
+#: include/classes/api/services/CHostGeneral.php:352
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Aturan discovery \"%1$s\" pada \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:482
+#: include/classes/api/services/CHostGeneral.php:486
 #, c-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Grafik \"%1$s\" pada \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:465
+#: include/classes/api/services/CHostGeneral.php:469
 #, c-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Prototipe grafik \"%1$s\" pada \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:413
+#: include/classes/api/services/CHostGeneral.php:417
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:365
+#: include/classes/api/services/CHostGeneral.php:369
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Item \"%1$s\" pada \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:382
+#: include/classes/api/services/CHostGeneral.php:386
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Prototipe item \"%1$s\" pada \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:288
+#: include/classes/api/services/CHostGeneral.php:292
 #, c-format
 msgid "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Trigger \"%1$s\" pada \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:305
+#: include/classes/api/services/CHostGeneral.php:309
 #, c-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Diputus: Prototipe trigger \"%1$s\" pada \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:521
+#: include/classes/api/services/CHostGeneral.php:525
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -14682,7 +14671,7 @@ msgstr "Nyala"
 #: include/views/configuration.discovery.edit.php:87
 #: include/views/configuration.graph.edit.php:309
 #: include/views/configuration.host.discovery.edit.php:361
-#: include/views/configuration.host.edit.php:886
+#: include/views/configuration.host.edit.php:922
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.massupdate.php:342
 #: include/views/configuration.host.prototype.edit.php:337
@@ -14698,7 +14687,7 @@ msgstr "Nyala"
 #: include/views/configuration.slideconf.edit.php:108
 #: include/views/configuration.sysmap.constructor.php:62
 #: include/views/configuration.sysmap.edit.php:190
-#: include/views/configuration.template.edit.php:479
+#: include/views/configuration.template.edit.php:529
 #: include/views/configuration.triggers.edit.php:348
 #: include/views/configuration.triggers.massupdate.php:164
 #: include/views/js/adm.regexprs.edit.js.php:255
@@ -14928,7 +14917,7 @@ msgstr ""
 msgid "User groups"
 msgstr "Grup user"
 
-#: include/classes/api/services/CUser.php:1295
+#: include/classes/api/services/CUser.php:1293
 msgid "User is not allowed to delete himself."
 msgstr "User tidak diizinkan menghapus dirinya sendiri."
 
@@ -14993,7 +14982,7 @@ msgstr "User dengan alias \"%s\" sudah ada."
 
 #: include/views/administration.mediatypes.edit.php:84
 #: include/views/administration.mediatypes.list.php:68
-#: include/views/configuration.host.edit.php:779
+#: include/views/configuration.host.edit.php:815
 #: include/views/configuration.host.prototype.edit.php:276
 #: include/views/general.login.php:66 index.php:32
 msgid "Username"
@@ -15363,12 +15352,12 @@ msgstr ""
 
 #: include/views/configuration.host.edit.php:197
 #: include/views/configuration.host.prototype.edit.php:71
-#: include/views/configuration.template.edit.php:99
+#: include/views/configuration.template.edit.php:98
 #: include/views/inventory.host.view.php:44
 msgid "Visible name"
 msgstr "Nama terlihat"
 
-#: include/classes/api/services/CHost.php:641
+#: include/classes/api/services/CHost.php:658
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Nama terlihat tidak boleh kosong jika nama hostnya hilang."
 
@@ -15392,7 +15381,7 @@ msgstr ""
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Mohon maaf, jumlah maksimum yang mungkin dari unsur-unsur yang perlu diingat telah tercapai."
 
-#: hosts.php:865 hosts.php:959 include/menu.inc.php:41
+#: hosts.php:866 hosts.php:960 include/menu.inc.php:41
 #: include/views/inventory.host.view.php:208
 #: include/views/inventory.host.view.php:236
 #: include/views/inventory.host.view.php:245 search.php:139 search.php:145
@@ -15470,8 +15459,8 @@ msgid "Web scenario step number cannot be less than 1."
 msgstr ""
 
 #: httpmon.php:85 include/html.inc.php:484 include/html.inc.php:488
-#: include/views/configuration.host.edit.php:668
-#: include/views/configuration.template.edit.php:394
+#: include/views/configuration.host.edit.php:704
+#: include/views/configuration.template.edit.php:444
 msgid "Web scenarios"
 msgstr ""
 
@@ -15570,7 +15559,7 @@ msgstr "Field salah untuk dependensi untuk service \"%1$s\"."
 msgid "Wrong fields for element."
 msgstr "Field yang salah untuk elemen."
 
-#: include/classes/api/services/CHost.php:560
+#: include/classes/api/services/CHost.php:551
 #, c-format
 msgid "Wrong fields for host \"%s\"."
 msgstr "Field yang salah untuk host \"%s\"."
@@ -15778,8 +15767,8 @@ msgstr "Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\
 
 #: include/classes/api/services/CGraph.php:543
 #: include/classes/api/services/CGraphPrototype.php:558
-#: include/classes/api/services/CHost.php:879
-#: include/classes/api/services/CHost.php:937
+#: include/classes/api/services/CHost.php:902
+#: include/classes/api/services/CHost.php:960
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668
@@ -15791,8 +15780,7 @@ msgstr "Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\
 #: include/classes/api/services/CTemplate.php:566
 #: include/classes/api/services/CTemplate.php:593
 #: include/classes/api/services/CTemplate.php:741
-#: include/classes/api/services/CTemplate.php:974
-#: include/classes/api/services/CTemplate.php:1078
+#: include/classes/api/services/CTemplate.php:1120
 msgid "You do not have permission to perform this operation."
 msgstr "Anda tidak memiliki hak untuk melakukan operasi ini."
 
@@ -16160,7 +16148,7 @@ msgstr ""
 msgid "last"
 msgstr "terakhir"
 
-#: hosts.php:828 hosts.php:829 hosts.php:830 include/actions.inc.php:29
+#: hosts.php:829 hosts.php:830 hosts.php:831 include/actions.inc.php:29
 #: include/forms.inc.php:449 include/forms.inc.php:456
 #: include/forms.inc.php:463 include/forms.inc.php:470
 #: include/forms.inc.php:591 include/forms.inc.php:606

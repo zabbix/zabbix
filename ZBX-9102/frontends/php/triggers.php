@@ -93,15 +93,32 @@ $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIG
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 
 // validate permissions
-if (getRequest('triggerid')) {
+$triggerIds = getRequest('g_triggerid', array());
+if (!is_array($triggerIds)) {
+	$triggerIds = zbx_toArray($triggerIds);
+}
+
+$triggerId = getRequest('triggerid');
+if ($triggerId !== null) {
+	$triggerIds[] = $triggerId;
+}
+
+if ($triggerIds) {
 	$triggers = API::Trigger()->get(array(
-		'triggerids' => $_REQUEST['triggerid'],
+		'triggerids' => array_keys(array_flip($triggerIds)),
 		'output' => array('triggerid'),
 		'preservekeys' => true,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'editable' => true
 	));
-	if (!$triggers) {
+	if ($triggers) {
+		foreach ($triggerIds as $triggerId) {
+			if (!isset($triggers[$triggerId])) {
+				access_deny();
+			}
+		}
+	}
+	else {
 		access_deny();
 	}
 }
