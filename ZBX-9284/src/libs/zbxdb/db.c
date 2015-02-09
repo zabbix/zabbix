@@ -495,7 +495,7 @@ out:
 #if defined(HAVE_SQLITE3)
 void	zbx_create_sqlite3_mutex(const char *dbname)
 {
-	if (ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
+	if (SUCCEED != php_sem_get(&sqlite_access, dbname))
 	{
 		zbx_error("cannot create mutex for SQLite3");
 		exit(EXIT_FAILURE);
@@ -632,7 +632,7 @@ int	zbx_db_begin()
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute("%s", "begin;");
 #elif defined(HAVE_SQLITE3)
-	if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
+	if (SUCCEED != php_sem_acquire(&sqlite_access))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite3 database");
 		assert(0);
@@ -1047,7 +1047,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	PQclear(result);
 #elif defined(HAVE_SQLITE3)
-	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
+	if (0 == txn_level && SUCCEED != php_sem_acquire(&sqlite_access))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite3 database");
 		exit(EXIT_FAILURE);
@@ -1385,7 +1385,7 @@ error:
 	else	/* init rownum */
 		result->row_num = PQntuples(result->pg_result);
 #elif defined(HAVE_SQLITE3)
-	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
+	if (0 == txn_level && SUCCEED != php_sem_acquire(&sqlite_access))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite3 database");
 		exit(EXIT_FAILURE);

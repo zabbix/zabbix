@@ -185,7 +185,7 @@ int	CONFIG_PROXYCONFIG_FREQUENCY	= 3600;	/* 1h */
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 
 /* mutex for node syncs */
-ZBX_MUTEX	node_sync_access;
+ZBX_MUTEX	node_sync_access = ZBX_MUTEX_NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -594,7 +594,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 	DBclose();
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC))
+	if (FAIL == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC))
 	{
 		zbx_error("Unable to create mutex for node syncs");
 		exit(FAIL);

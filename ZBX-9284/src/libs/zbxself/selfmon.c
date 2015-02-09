@@ -45,10 +45,10 @@ zbx_selfmon_collector_t;
 static zbx_selfmon_collector_t	*collector = NULL;
 static int			shm_id;
 
-#define	LOCK_SM		zbx_mutex_lock(&sm_lock)
-#define	UNLOCK_SM	zbx_mutex_unlock(&sm_lock)
+#define LOCK_SM		zbx_mutex_lock(&sm_lock)
+#define UNLOCK_SM	zbx_mutex_unlock(&sm_lock)
 
-static ZBX_MUTEX	sm_lock;
+static ZBX_MUTEX	sm_lock = ZBX_MUTEX_NULL;
 
 extern char	*CONFIG_FILE;
 extern int	CONFIG_POLLER_FORKS;
@@ -239,7 +239,7 @@ void	init_selfmon_collector()
 		exit(FAIL);
 	}
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&sm_lock, ZBX_MUTEX_SELFMON))
+	if (FAIL == zbx_mutex_create_force(&sm_lock, ZBX_MUTEX_SELFMON))
 	{
 		zbx_error("unable to create mutex for a self-monitoring collector");
 		exit(FAIL);

@@ -24,8 +24,11 @@
 #include "log.h"
 #include "mutexs.h"
 
-ZBX_PERF_STAT_DATA	ppsd;
-static ZBX_MUTEX	perfstat_access = ZBX_MUTEX_NULL;
+ZBX_PERF_STAT_DATA		ppsd;
+static ZBX_MUTEX		perfstat_access = ZBX_MUTEX_NULL;
+
+#define LOCK_PERFCOUNTERS	zbx_mutex_lock(&perfstat_access)
+#define UNLOCK_PERFCOUNTERS	zbx_mutex_unlock(&perfstat_access)
 
 /******************************************************************************
  *                                                                            *
@@ -92,10 +95,10 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 			/* add the counter to the query */
 			pdh_status = zbx_PdhAddCounter(__function_name, cptr, ppsd.pdh_query, counterpath, &cptr->handle);
 
-			zbx_mutex_lock(&perfstat_access);
+			LOCK_PERFCOUNTERS;
 			cptr->next = ppsd.pPerfCounterList;
 			ppsd.pPerfCounterList = cptr;
-			zbx_mutex_unlock(&perfstat_access);
+			UNLOCK_PERFCOUNTERS;
 
 			if (ERROR_SUCCESS != pdh_status && PDH_CSTATUS_NO_INSTANCE != pdh_status)
 			{
@@ -142,7 +145,7 @@ void	remove_perf_counter(PERF_COUNTER_DATA *counter)
 	if (NULL == counter || NULL == ppsd.pPerfCounterList)
 		return;
 
-	zbx_mutex_lock(&perfstat_access);
+	LOCK_PERFCOUNTERS;
 
 	if (counter == ppsd.pPerfCounterList)
 	{
@@ -160,7 +163,7 @@ void	remove_perf_counter(PERF_COUNTER_DATA *counter)
 		}
 	}
 
-	zbx_mutex_unlock(&perfstat_access);
+	UNLOCK_PERFCOUNTERS;
 
 	PdhRemoveCounter(counter->handle);
 	zbx_free(counter->name);
@@ -173,7 +176,7 @@ static void	free_perf_counter_list()
 {
 	PERF_COUNTER_DATA	*cptr;
 
-	zbx_mutex_lock(&perfstat_access);
+	LOCK_PERFCOUNTERS;
 
 	while (NULL != ppsd.pPerfCounterList)
 	{
@@ -186,7 +189,7 @@ static void	free_perf_counter_list()
 		zbx_free(cptr);
 	}
 
-	zbx_mutex_unlock(&perfstat_access);
+	UNLOCK_PERFCOUNTERS;
 }
 
 /******************************************************************************
@@ -226,7 +229,7 @@ int	init_perf_collector(int multithreaded)
 
 	if (0 != multithreaded)
 	{
-		if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&perfstat_access, ZBX_MUTEX_PERFSTAT))
+		if (FAIL == zbx_mutex_create_force(&perfstat_access, ZBX_MUTEX_PERFSTAT))
 		{
 			zbx_error("cannot create mutex for performance counters");
 			exit(EXIT_FAILURE);
