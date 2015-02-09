@@ -615,12 +615,9 @@ foreach ($triggers as $trigger) {
 		}
 
 		$hostList[] = $hostName;
-
-		// add comma after hosts, except last
-		if (next($trigger['hosts'])) {
-			$hostList[] = ', ';
-		}
+		$hostList[] = ', ';
 	}
+	array_pop($hostList);
 
 	// host
 	$hostColumn = new CCol($hostList);
