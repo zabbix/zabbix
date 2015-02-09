@@ -78,8 +78,13 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 		}
 
 		$request = getRequest('request');
-		$url = zbx_empty($request) ? CWebUser::$data['url'] : $request;
-		if (zbx_empty($url) || $url == $page['file']) {
+		if (!zbx_empty($request)) {
+			$url = $request;
+		}
+		elseif (!zbx_empty(CWebUser::$data['url'])) {
+			$url = CWebUser::$data['url'];
+		}
+		else {
 			$url = ZBX_DEFAULT_URL;
 		}
 		redirect($url);
@@ -116,5 +121,5 @@ if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 	}
 }
 else {
-	redirect(zbx_empty(CWebUser::$data['url']) ? 'zabbix.php?action=dashboard.view' : CWebUser::$data['url']);
+	redirect(zbx_empty(CWebUser::$data['url']) ? ZBX_DEFAULT_URL : CWebUser::$data['url']);
 }
