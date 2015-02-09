@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-global $page, $DB;
+global $page, $DB, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 if (isset($page['title'])) {
 	$title = $page['title'];
@@ -49,7 +49,7 @@ CSS;
 	$pageHeader->addStyle($severityCss);
 
 	// perform Zabbix server check only for standard pages
-	if ($config['server_check_interval']) {
+	if ($config['server_check_interval'] && !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
 		$page['scripts'][] = 'servercheck.js';
 	}
 }
