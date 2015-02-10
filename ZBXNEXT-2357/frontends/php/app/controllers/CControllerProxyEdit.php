@@ -75,7 +75,7 @@ class CControllerProxyEdit extends CController {
 			$data['proxyid'] = $this->getInput('proxyid');
 
 			$proxies = API::Proxy()->get(array(
-				'output' => array('proxyid', 'host', 'status', 'description'),
+				'output' => array('host', 'status', 'description'),
 				'selectHosts' => array('hostid'),
 				'selectInterface' => array('interfaceid', 'dns', 'ip', 'useip', 'port'),
 				'proxyids' => $data['proxyid']

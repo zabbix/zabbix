@@ -5,35 +5,24 @@
 			var ipmi = (jQuery(this).val() == 1);
 
 			if (ipmi) {
-				jQuery('#execute_on')
-					.closest('li')
-					.css('display', 'none');
+				jQuery('#execute_on, #command').closest('li').addClass('hidden');
 
 				jQuery('#commandipmi')
 					.val(jQuery('#command').val())
 					.closest('li')
-					.css('display', '')
 					.removeClass('hidden');
-
-				jQuery('#command')
-					.closest('li')
-					.css('display', 'none');
 			}
 			else {
 				jQuery('#execute_on')
 					.closest('li')
-					.css('display', '')
 					.removeClass('hidden');
 
 				jQuery('#command')
 					.val(jQuery('#commandipmi').val())
 					.closest('li')
-					.css('display', '')
 					.removeClass('hidden');
 
-				jQuery('#commandipmi')
-					.closest('li')
-					.css('display', 'none');
+				jQuery('#commandipmi').closest('li').addClass('hidden');
 			}
 		});
 
