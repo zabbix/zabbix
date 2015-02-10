@@ -78,8 +78,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	HANDLE	hProcessSnap, hProcess;
 	PROCESSENTRY32	pe32;
 	int	proccount,
-		proc_ok = 0,
-		user_ok = 0;
+		proc_ok = 0;
 	char	*procName,
 		*userName,
 		baseName[MAX_PATH],
@@ -111,7 +110,6 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	do
 	{
 		proc_ok = 1;
-		user_ok = 1;
 
 		if (NULL != procName && '\0' != *procName)
 		{
@@ -135,10 +133,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				CloseHandle(hProcess);
 		}
 
-		if (0 != user_ok && 0 != proc_ok)
+		if (0 != proc_ok)
 			proccount++;
 	}
-	while (Process32Next(hProcessSnap, &pe32));
+	while (TRUE == Process32Next(hProcessSnap, &pe32));
 
 	CloseHandle(hProcessSnap);
 
@@ -379,7 +377,7 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 		}
 	}
-	while (Process32Next(hProcessSnap, &pe32));
+	while (TRUE == Process32Next(hProcessSnap, &pe32));
 
 	CloseHandle(hProcessSnap);
 
