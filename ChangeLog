@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9143] improved proc.num under Windows to handle more processes (dimir)
 ...G...... [ZBX-9232] fixed incomplete eventlog messages (igors)
 ........S. [ZBX-9285] fixed memory leak when processing host prototypes (Sasha)
 .......PS. [ZBX-9279] optimized VMware requests to reduce amount of transferred data (wiper)
