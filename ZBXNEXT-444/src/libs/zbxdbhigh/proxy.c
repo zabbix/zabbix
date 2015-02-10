@@ -696,8 +696,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	struct zbx_json_parse	jp_data, jp_row;
 	const char		*p, *pf;
 	zbx_uint64_t		recid, *p_recid = NULL;
-	zbx_vector_uint64_t	ins, moves, skip_items_fields;
-	char			*buf = NULL, *esc, *sql = NULL, *recs = NULL, is_items_table = 0;
+	zbx_vector_uint64_t	ins, moves;
+	char			*buf = NULL, *esc, *sql = NULL, *recs = NULL;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset,
 				recs_alloc = 20 * ZBX_KIBIBYTE, recs_offset = 0,
 				buf_alloc = 0;
@@ -708,6 +708,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	zbx_id_offset_t		id_offset, *p_id_offset = NULL;
 	zbx_db_insert_t		db_insert;
 	zbx_vector_ptr_t	values;
+	static zbx_vector_ptr_t	skip_fields;
+	static const ZBX_TABLE	*table_items = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, table->table);
 
@@ -744,10 +746,15 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	/*  26  | }                                         |                               */
 	/************************************************************************************/
 
-	if (0 == strcmp("items", table->table))
+	if (NULL == table_items)
 	{
-		is_items_table = 1;
-		zbx_vector_uint64_create(&skip_items_fields);
+		table_items = DBget_table("items");
+
+		/* do not update existing lastlogsize and mtime fields */
+		zbx_vector_ptr_create(&skip_fields);
+		zbx_vector_ptr_append(&skip_fields, (void *)DBget_field(table_items, "lastlogsize"));
+		zbx_vector_ptr_append(&skip_fields, (void *)DBget_field(table_items, "mtime"));
+		zbx_vector_ptr_sort(&skip_fields, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 	}
 
 	/* get table columns (line 3 in T1) */
@@ -761,23 +768,11 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	/* iterate column names (lines 4-6 in T1) */
 	while (NULL != (p = zbx_json_next_value_dyn(&jp_data, p, &buf, &buf_alloc, NULL)))
 	{
-		if (NULL == (fields[fields_count] = DBget_field(table, buf)))
+		if (NULL == (fields[fields_count++] = DBget_field(table, buf)))
 		{
 			*error = zbx_dsprintf(*error, "invalid field name \"%s.%s\"", table->table, buf);
 			goto out;
 		}
-
-		/* do not update lastlogsize and mtime of existing items */
-		if (0 != is_items_table && SUCCEED == str_in_list("lastlogsize,mtime", buf, ','))
-			zbx_vector_uint64_append(&skip_items_fields, fields_count);
-
-		fields_count++;
-	}
-
-	if (0 != is_items_table)
-	{
-		zbx_vector_uint64_sort(&skip_items_fields, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&skip_items_fields, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 
 	/* get the entries (line 8 in T1) */
@@ -1153,8 +1148,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				}
 
 				/* do not update existing lastlogsize and mtime fields */
-				if (0 != is_items_table && FAIL != zbx_vector_uint64_bsearch(&skip_items_fields, f,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				if (FAIL != zbx_vector_ptr_bsearch(&skip_fields, fields[f],
+						ZBX_DEFAULT_PTR_COMPARE_FUNC))
 				{
 					continue;
 				}
@@ -1239,9 +1234,6 @@ clean2:
 	zbx_free(recs);
 out:
 	zbx_free(buf);
-
-	if (0 != is_items_table)
-		zbx_vector_uint64_destroy(&skip_items_fields);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
