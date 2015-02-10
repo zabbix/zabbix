@@ -24,8 +24,8 @@ class CControllerScriptUpdate extends CController {
 		$fields = array(
 			'scriptid' =>				'fatal|required|db scripts.scriptid',
 			'name' =>					'               db scripts.name',
-			'type' =>					'               db scripts.type        |in 0,1',
-			'execute_on' =>				'               db scripts.execute_on  |in 0,1',
+			'type' =>					'               db scripts.type        |in '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.','.ZBX_SCRIPT_TYPE_IPMI,
+			'execute_on' =>				'               db scripts.execute_on  |in '.ZBX_SCRIPT_EXECUTE_ON_AGENT.','.ZBX_SCRIPT_EXECUTE_ON_SERVER,
 			'command' =>				'               db scripts.command',
 			'commandipmi' =>			'               db scripts.command',
 			'description' =>			'               db scripts.description',

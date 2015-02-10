@@ -22,19 +22,19 @@ class CControllerScriptEdit extends CController {
 
 	protected function checkInput() {
 		$fields = array(
-			'scriptid' =>			'db scripts.scriptid',
-			'name' =>				'db scripts.name',
-			'type' =>				'db scripts.type        |in 0,1',
-			'execute_on' =>			'db scripts.execute_on  |in 0,1',
-			'command' =>			'db scripts.command',
-			'commandipmi' =>		'db scripts.command',
-			'description' =>		'db scripts.description',
-			'host_access' =>		'db scripts.host_access |in 2,3',
-			'groupid' =>			'db scripts.groupid',
-			'usrgrpid' =>			'db scripts.usrgrpid',
-			'hgstype' =>			'                        in 0,1',
-			'confirmation' =>		'db scripts.confirmation',
-			'enable_confirmation' =>'                        in 1'
+			'scriptid' =>				'db scripts.scriptid',
+			'name' =>					'db scripts.name',
+			'type' =>					'db scripts.type        |in '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.','.ZBX_SCRIPT_TYPE_IPMI,
+			'execute_on' =>				'db scripts.execute_on  |in '.ZBX_SCRIPT_EXECUTE_ON_AGENT.','.ZBX_SCRIPT_EXECUTE_ON_SERVER,
+			'command' =>				'db scripts.command',
+			'commandipmi' =>			'db scripts.command',
+			'description' =>			'db scripts.description',
+			'host_access' =>			'db scripts.host_access |in 2,3',
+			'groupid' =>				'db scripts.groupid',
+			'usrgrpid' =>				'db scripts.usrgrpid',
+			'hgstype' =>				'                        in 0,1',
+			'confirmation' =>			'db scripts.confirmation',
+			'enable_confirmation' =>	'                        in 1'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -48,7 +48,7 @@ class CControllerScriptEdit extends CController {
 
 	protected function checkPermissions() {
 		if ($this->hasInput('scriptid')) {
-			return (bool)API::Script()->get(array(
+			return (bool) API::Script()->get(array(
 				'output' => array(),
 				'scriptids' => $this->getInput('scriptid'),
 				'editable' => true
@@ -65,7 +65,7 @@ class CControllerScriptEdit extends CController {
 			'scriptid' => 0,
 			'name' => '',
 			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-			'execute_on' => 0,
+			'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
 			'command' => '',
 			'commandipmi' => '',
 			'description' => '',
@@ -80,26 +80,26 @@ class CControllerScriptEdit extends CController {
 		// get values from the dabatase
 		if ($this->hasInput('scriptid')) {
 			$scripts = API::Script()->get(array(
-				'output' => array('scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid', 'groupid', 'host_access', 'confirmation'),
+				'output' => array('scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid',
+					'groupid', 'host_access', 'confirmation'
+				),
 				'scriptids' => $this->getInput('scriptid')
 			));
 			$script = $scripts[0];
 
-			$data = array(
-				'scriptid' => $script['scriptid'],
-				'name' => $script['name'],
-				'type' => $script['type'],
-				'execute_on' => $script['execute_on'],
-				'command' => $script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ? $script['command'] : '',
-				'commandipmi' => $script['type'] == ZBX_SCRIPT_TYPE_IPMI ? $script['command'] : '',
-				'description' => $script['description'],
-				'usrgrpid' => $script['usrgrpid'],
-				'groupid' => $script['groupid'],
-				'host_access' => $script['host_access'],
-				'confirmation' => $script['confirmation'],
-				'enable_confirmation' => $script['confirmation'] !== '',
-				'hgstype' => $script['groupid'] != 0 ? 1 : 0
-			);
+			$data['scriptid'] = $script['scriptid'];
+			$data['name'] = $script['name'];
+			$data['type'] = $script['type'];
+			$data['execute_on'] = $script['execute_on'];
+			$data['command'] = ($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) ? $script['command'] : '';
+			$data['commandipmi'] = ($script['type'] == ZBX_SCRIPT_TYPE_IPMI) ? $script['command'] : '';
+			$data['description'] = $script['description'];
+			$data['usrgrpid'] = $script['usrgrpid'];
+			$data['groupid'] = $script['groupid'];
+			$data['host_access'] = $script['host_access'];
+			$data['confirmation'] = $script['confirmation'];
+			$data['enable_confirmation'] = ($script['confirmation'] !== '');
+			$data['hgstype'] = ($script['groupid'] != 0) ? 1 : 0;
 		}
 
 		// overwrite with input variables
