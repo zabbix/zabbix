@@ -78,7 +78,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	HANDLE	hProcessSnap, hProcess;
 	PROCESSENTRY32	pe32;
 	int	proccount,
-		proc_ok = 0;
+		proc_ok;
 	char	*procName,
 		*userName,
 		baseName[MAX_PATH],
