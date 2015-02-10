@@ -233,6 +233,14 @@ typedef zbx_item_history_value_t	ZBX_DC_DELTAITEM;
 
 typedef struct
 {
+	const char	*tls_psk_identity;	/* pre-shared key identity		*/
+	const char	*tls_psk;		/* pre-shared key value (hex-string) 	*/
+	unsigned int	refcount;		/* reference count			*/
+}
+ZBX_DC_PSK;
+
+typedef struct
+{
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxy_hostid;
 	const char	*host;
@@ -260,8 +268,7 @@ typedef struct
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*tls_issuer;
 	const char	*tls_subject;
-	const char	*tls_psk_identity;
-	const char	*tls_psk;
+	ZBX_DC_PSK	*tls_dc_psk;
 #endif
 }
 ZBX_DC_HOST;
@@ -427,7 +434,7 @@ typedef struct
 	zbx_hashset_t		trigdeps;
 	zbx_vector_ptr_t	*time_triggers;
 	zbx_hashset_t		hosts;
-	zbx_hashset_t		hosts_h;		/* host */
+	zbx_hashset_t		hosts_h;		/* for searching hosts by 'host' name */
 	zbx_hashset_t		hosts_p;		/* for searching proxies by 'host' name */
 	zbx_hashset_t		proxies;
 	zbx_hashset_t		host_inventories;
@@ -443,6 +450,10 @@ typedef struct
 	zbx_hashset_t		interface_snmpitems;	/* interfaceid, itemids for SNMP trap items */
 	zbx_hashset_t		regexps;
 	zbx_hashset_t		expressions;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
+							/* by PSK identity */
+#endif
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
 	ZBX_DC_CONFIG_TABLE	*config;
@@ -1044,6 +1055,9 @@ static void	DCsync_hosts(DB_RESULT result)
 	time_t			now;
 	signed char		ipmi_authtype;
 	unsigned char		ipmi_privilege;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	ZBX_DC_PSK		*psk_i, psk_i_local;
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1123,8 +1137,89 @@ static void	DCsync_hosts(DB_RESULT result)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		DCstrpool_replace(found, &host->tls_issuer, row[26]);
 		DCstrpool_replace(found, &host->tls_subject, row[27]);
-		DCstrpool_replace(found, &host->tls_psk_identity, row[28]);
-		DCstrpool_replace(found, &host->tls_psk, row[29]);
+
+		/* maintain 'psks' index */
+
+		if (0 == found)
+			host->tls_dc_psk = NULL;
+
+		/* Either both PSK identity and PSK value must be non-empty or none. This should have been prevented */
+		/* by validation in frontend or API. */
+
+		if ('\0' != *row[28] && '\0' == *row[29])
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "empty PSK value for identity \"%s\"", row[28]);
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto done;
+		}
+
+		if ('\0' == *row[28])
+		{
+			if ('\0' != *row[29])
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "empty PSK identity with non-empty value");
+				THIS_SHOULD_NEVER_HAPPEN;
+				goto done;
+			}
+
+			if (0 == found || (1 == found && NULL == host->tls_dc_psk))	/* no PSK, no change */
+				goto done;
+		}
+
+		if (1 == found)
+		{
+			if (NULL != host->tls_dc_psk)
+			{
+				if (0 == strcmp(host->tls_dc_psk->tls_psk_identity, row[28]))	/* Same old PSK ? */
+				{
+					if (0 != strcmp(host->tls_dc_psk->tls_psk, row[29]))
+					{
+						DCstrpool_replace(1, &host->tls_dc_psk->tls_psk, row[29]);
+						zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"",
+								row[28]);
+					}
+
+					goto done;
+				}
+
+				/* PSK identity has changed. Unlink and delete the old identity and PSK. */
+
+				if (NULL != (psk_i = zbx_hashset_search(&config->psks,
+						host->tls_dc_psk->tls_psk_identity)) &&
+						0 == --(psk_i->refcount))
+				{
+					zbx_strpool_release(psk_i->tls_psk_identity);
+					zbx_strpool_release(psk_i->tls_psk);
+					zbx_hashset_remove(&config->psks, psk_i->tls_psk_identity);
+				}
+
+				host->tls_dc_psk = NULL;
+			}
+		}
+
+		if ('\0' == *row[28])	/* do not store empty PSK identity */
+			goto done;
+
+		/* The new PSK identity already stored ? */
+		if (NULL != (psk_i = zbx_hashset_search(&config->psks, row[28])))
+		{
+			if (0 != strcmp(psk_i->tls_psk, row[29]))
+			{
+				DCstrpool_replace(1, &psk_i->tls_psk, row[29]);
+				zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"", row[28]);
+			}
+
+			host->tls_dc_psk = psk_i;
+			psk_i->refcount++;
+			goto done;
+		}
+
+		/* store new PSK */
+		DCstrpool_replace(0, &psk_i_local.tls_psk_identity, row[28]);
+		DCstrpool_replace(0, &psk_i_local.tls_psk, row[29]);
+		host->tls_dc_psk = zbx_hashset_insert(&config->psks, &psk_i_local, sizeof(ZBX_DC_PSK));
+		host->tls_dc_psk->refcount = 1;
+done:
 #endif
 		host->tls_connect = (unsigned char)atoi(row[24]);
 		host->tls_accept = (unsigned char)atoi(row[25]);
@@ -1302,8 +1397,21 @@ static void	DCsync_hosts(DB_RESULT result)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_strpool_release(host->tls_issuer);
 		zbx_strpool_release(host->tls_subject);
-		zbx_strpool_release(host->tls_psk_identity);
-		zbx_strpool_release(host->tls_psk);
+
+		/* Maintain 'psks' index. Unlink and delete the PSK identity. */
+		if (NULL != host->tls_dc_psk)
+		{
+			if (NULL != (psk_i = zbx_hashset_search(&config->psks,
+					host->tls_dc_psk->tls_psk_identity)) &&
+					0 == --(psk_i->refcount))
+			{
+				zbx_strpool_release(psk_i->tls_psk_identity);
+				zbx_strpool_release(psk_i->tls_psk);
+				zbx_hashset_remove(&config->psks, psk_i->tls_psk_identity);
+			}
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
 #endif
 		zbx_hashset_iter_remove(&iter);
 	}
@@ -3239,6 +3347,10 @@ void	DCsync_configuration(void)
 			config->hosts_h.num_data, config->hosts_h.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_p    : %d (%d slots)", __function_name,
 			config->hosts_p.num_data, config->hosts_p.num_slots);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() psks       : %d (%d slots)", __function_name,
+			config->psks.num_data, config->psks.num_slots);
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmihosts  : %d (%d slots)", __function_name,
 			config->ipmihosts.num_data, config->ipmihosts.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: %d (%d slots)", __function_name,
@@ -3689,6 +3801,9 @@ void	init_configuration_cache(void)
 	CREATE_HASHSET_EXT(config->interfaces_ht, __config_interface_ht_hash, __config_interface_ht_compare);
 	CREATE_HASHSET_EXT(config->interface_snmpaddrs, __config_interface_addr_hash, __config_interface_addr_compare);
 	CREATE_HASHSET_EXT(config->regexps, __config_regexp_hash, __config_regexp_compare);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	CREATE_HASHSET_EXT(config->psks, ZBX_DEFAULT_STRING_HASH_FUNC, ZBX_DEFAULT_STR_COMPARE_FUNC);
+#endif
 
 	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
 	{
@@ -3873,8 +3988,8 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	strscpy(dst_host->tls_issuer, src_host->tls_issuer);
 	strscpy(dst_host->tls_subject, src_host->tls_subject);
-	strscpy(dst_host->tls_psk_identity, src_host->tls_psk_identity);
-	strscpy(dst_host->tls_psk, src_host->tls_psk);
+	strscpy(dst_host->tls_psk_identity, src_host->tls_dc_psk->tls_psk_identity);
+	strscpy(dst_host->tls_psk, src_host->tls_dc_psk->tls_psk);
 #endif
 	if (NULL != (ipmihost = zbx_hashset_search(&config->ipmihosts, &src_host->hostid)))
 	{
@@ -4002,8 +4117,8 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr,
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == attr->connection_type)
 	{
-		if (strlen(dc_host->tls_psk_identity) != attr->arg1_len ||
-				0 != memcmp(dc_host->tls_psk_identity, attr->arg1, attr->arg1_len))
+		if (strlen(dc_host->tls_dc_psk->tls_psk_identity) != attr->arg1_len ||
+				0 != memcmp(dc_host->tls_dc_psk->tls_psk_identity, attr->arg1, attr->arg1_len))
 		{
 			UNLOCK_CACHE;
 			*error = zbx_dsprintf(*error, "proxy \"%s\" is using false PSK identity", host);
@@ -5989,8 +6104,8 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 		}
 		else if (ZBX_TCP_SEC_TLS_PSK == host->tls_connect)
 		{
-			strscpy(dst_proxy->tls_arg1, host->tls_psk_identity);
-			strscpy(dst_proxy->tls_arg2, host->tls_psk);
+			strscpy(dst_proxy->tls_arg1, host->tls_dc_psk->tls_psk_identity);
+			strscpy(dst_proxy->tls_arg2, host->tls_dc_psk->tls_psk);
 		}
 		else	/* ZBX_TCP_SEC_UNENCRYPTED */
 #endif
