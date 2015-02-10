@@ -31,18 +31,22 @@ static const wchar_t	*RENDER_ITEMS[] = {
 	L"/Event/System/Level",
 	L"/Event/System/Keywords",
 	L"/Event/System/TimeCreated/@SystemTime",
-	L"Event/EventData/Data"
+	L"/Event/EventData/Data"
 };
 
 #define	RENDER_ITEMS_COUNT (sizeof(RENDER_ITEMS) / sizeof(const wchar_t *))
 
-#define	VAR_PROVIDER_NAME(p) (p[0].StringVal)
-#define	VAR_SOURCE_NAME(p) (p[1].StringVal)
-#define	VAR_RECORD_NUMBER(p) (p[2].UInt64Val)
-#define	VAR_EVENT_ID(p) (p[3].UInt16Val)
-#define	VAR_LEVEL(p) (p[4].ByteVal)
-#define	VAR_KEYWORDS(p) (p[5].UInt64Val)
-#define	VAR_TIME_CREATED(p) (p[6].FileTimeVal)
+#define	VAR_PROVIDER_NAME(p)			(p[0].StringVal)
+#define	VAR_SOURCE_NAME(p)			(p[1].StringVal)
+#define	VAR_RECORD_NUMBER(p)			(p[2].UInt64Val)
+#define	VAR_EVENT_ID(p)				(p[3].UInt16Val)
+#define	VAR_LEVEL(p)				(p[4].ByteVal)
+#define	VAR_KEYWORDS(p)				(p[5].UInt64Val)
+#define	VAR_TIME_CREATED(p)			(p[6].FileTimeVal)
+#define	VAR_EVENT_DATA_STRING(p)		(p[7].StringVal)
+#define	VAR_EVENT_DATA_STRING_ARRAY(p, i)	(p[7].StringArr[i])
+#define	VAR_EVENT_DATA_TYPE(p)			(p[7].Type)
+#define	VAR_EVENT_DATA_COUNT(p)			(p[7].Count)
 
 #define	EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
 
@@ -805,6 +809,39 @@ static int	zbx_get_eventlog_message6(const wchar_t *wsource, zbx_uint64_t *which
 				" the component on the local computer. If the event originated on another computer,"
 				" the display information had to be saved with the event.", *out_eventid,
 				NULL == *out_provider ? "" : *out_provider);
+
+		if (EvtVarTypeString == (VAR_EVENT_DATA_TYPE(renderedContent) & EVT_VARIANT_TYPE_MASK))
+		{
+			unsigned int	i;
+			char		*data = NULL;
+
+			if (0 != (VAR_EVENT_DATA_TYPE(renderedContent) & EVT_VARIANT_TYPE_ARRAY) &&
+				0 < VAR_EVENT_DATA_COUNT(renderedContent))
+			{
+				*out_message = zbx_strdcatf(*out_message, " The following information was included"
+						" with the event: ");
+
+				for (i = 0; i < VAR_EVENT_DATA_COUNT(renderedContent); i++)
+				{
+					if (NULL != VAR_EVENT_DATA_STRING_ARRAY(renderedContent, i))
+					{
+						if (0 < i)
+							*out_message = zbx_strdcat(*out_message, "; ");
+
+						data = zbx_unicode_to_utf8(VAR_EVENT_DATA_STRING_ARRAY(renderedContent, i));
+						*out_message = zbx_strdcatf(*out_message, "%s", data);
+						zbx_free(data);
+					}
+				}
+			}
+			else if (NULL != VAR_EVENT_DATA_STRING(renderedContent))
+			{
+				data = zbx_unicode_to_utf8(VAR_EVENT_DATA_STRING(renderedContent));
+				*out_message = zbx_strdcatf(*out_message, "The following information was included"
+						" with the event: %s", data);
+				zbx_free(data);
+			}
+		}
 	}
 
 	ret = SUCCEED;
