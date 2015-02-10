@@ -64,8 +64,8 @@ if ($templateid > 0 && !hasRequest('form_refresh')) {
 
 	// get template hosts from db
 	$hosts_linked_to = API::Host()->get(array(
+		'output' => array('hostid'),
 		'templateids' => $templateid,
-		'editable' => true,
 		'templated_hosts' => true
 	));
 
@@ -103,15 +103,50 @@ $templateList->addRow(_('Visible name'), $visiblenameTB);
 // get all Groups
 $group_tb = new CTweenBox($frmHost, 'groups', $groups, 10);
 $options = array(
-	'editable' => 1,
-	'output' => API_OUTPUT_EXTEND
+	'output' => API_OUTPUT_EXTEND,
+	'preservekeys' => true
 );
 $all_groups = API::HostGroup()->get($options);
 order_result($all_groups, 'name');
 
-foreach ($all_groups as $gnum => $group) {
-	$group_tb->addItem($group['groupid'], $group['name']);
+$groupsAllowed = API::HostGroup()->get(array(
+	'output' => array('groupid', 'name'),
+	'editable' => true,
+	'preservekeys' => true
+));
+order_result($groupsAllowed, 'name');
+
+if (getRequest('form') === 'update') {
+	// add existing template groups to list and, depending on permissions show name as enabled or disabled
+	$groupsInList = array();
+	$groups = array_combine($groups, $groups);
+
+	foreach ($all_groups as $group) {
+		if (isset($groups[$group['groupid']])) {
+			$group_tb->addItem($group['groupid'], $group['name'], true,
+				isset($groupsAllowed[$group['groupid']])
+			);
+			$groupsInList[] = $group['groupid'];
+		}
+	}
+
+	// then add other host groups that user has permissions to, if not yet added to list
+	foreach ($groupsAllowed as $group) {
+		if (!in_array($group['groupid'], $groupsInList)) {
+			$group_tb->addItem($group['groupid'], $group['name']);
+		}
+	}
 }
+else {
+	/*
+	 * When cloning a template or creating a new one, don't show read-only host groups in left box
+	 * show empty or posted groups in case of an error.
+	 */
+	foreach ($groupsAllowed as $group) {
+		$group_tb->addItem($group['groupid'], $group['name']);
+	}
+}
+
 $templateList->addRow(_('Groups'), $group_tb->get(_('In groups'), _('Other groups')));
 
 // FORM ITEM : new group text box [  ]
@@ -127,13 +162,15 @@ $templateList->addRow(SPACE, array($tmp_label, BR(), $newgroupTB), null, null, '
 // FORM ITEM : linked Hosts tween box [  ] [  ]
 $twb_groupid = get_request('twb_groupid', 0);
 if ($twb_groupid == 0) {
-	$gr = reset($all_groups);
+	$gr = reset($groupsAllowed);
 	$twb_groupid = $gr['groupid'];
 }
 $cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
-foreach ($all_groups as $gnum => $group) {
+foreach ($groupsAllowed as $group) {
 	$cmbGroups->addItem($group['groupid'], $group['name']);
 }
+
+$hosts_linked_to = array_combine($hosts_linked_to, $hosts_linked_to);
 
 $host_tb = new CTweenBox($frmHost, 'hosts', $hosts_linked_to, 20);
 
@@ -143,29 +180,43 @@ $params = array(
 	'templated_hosts' => 1,
 	'editable' => 1,
 	'output' => API_OUTPUT_EXTEND,
-	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+	'preservekeys' => true
 );
-$db_hosts = API::Host()->get($params);
-order_result($db_hosts, 'name');
+$hostsAllowedToAdd = API::Host()->get($params);
+order_result($hostsAllowedToAdd, 'name');
 
-foreach ($db_hosts as $hnum => $db_host) {
-	if (isset($hosts_linked_to[$db_host['hostid']])) {
+// add all except selected hosts
+foreach ($hostsAllowedToAdd as $host) {
+	if (isset($hosts_linked_to[$host['hostid']])) {
 		continue;
-	} // add all except selected hosts
-	$host_tb->addItem($db_host['hostid'], $db_host['name']);
+	}
+	$host_tb->addItem($host['hostid'], $host['name']);
 }
 
-// select selected hosts and add them
+// select allowed selected hosts
 $params = array(
+	'output' => array('hostid', 'name', 'flags'),
 	'hostids' => $hosts_linked_to,
 	'templated_hosts' => 1,
 	'editable' => 1,
-	'output' => API_OUTPUT_EXTEND
+	'output' => API_OUTPUT_EXTEND,
+	'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+	'preservekeys' => true
 );
-$db_hosts = API::Host()->get($params);
-order_result($db_hosts, 'name');
-foreach ($db_hosts as $hnum => $db_host) {
-	$host_tb->addItem($db_host['hostid'], $db_host['name'], null, ($db_host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL));
+$hostsAllowed = API::Host()->get($params);
+order_result($hostsAllowed, 'name');
+
+// select selected hosts including read only and add them
+$hostsAll = API::Host()->get(array(
+	'output' => array('hostid', 'name', 'flags'),
+	'hostids' => $hosts_linked_to,
+	'templated_hosts' => true
+));
+order_result($hostsAll, 'name');
+
+foreach ($hostsAll as $host) {
+	$host_tb->addItem($host['hostid'], $host['name'], true, isset($hostsAllowed[$host['hostid']]));
 }
 
 $templateList->addRow(_('Hosts / templates'), $host_tb->Get(_('In'), array(

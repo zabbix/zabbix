@@ -181,14 +181,50 @@ $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 // groups for normal hosts
 if (!$isDiscovered) {
-	$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups, 10);
-	$all_groups = API::HostGroup()->get(array(
+	// get user allowed host groups and sort them by name
+	$groupsAllowed = API::HostGroup()->get(array(
+		'output' => array('groupid', 'name'),
 		'editable' => true,
-		'output' => API_OUTPUT_EXTEND
+		'preservekeys' => true
 	));
-	order_result($all_groups, 'name');
-	foreach ($all_groups as $group) {
-		$grp_tb->addItem($group['groupid'], $group['name']);
+	order_result($groupsAllowed, 'name');
+
+	$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups);
+
+	if (getRequest('form') === 'update') {
+		// get other host groups that user has also read permissions and sort by name
+		$all_groups = API::HostGroup()->get(array(
+			'output' => array('groupid', 'name'),
+			'preservekeys' => true
+		));
+		order_result($all_groups, 'name');
+
+		// add existing host groups to list and, depending on permissions show name as enabled or disabled
+		$groupsInList = array();
+		$host_groups = array_combine($host_groups, $host_groups);
+
+		foreach ($all_groups as $group) {
+			if (isset($host_groups[$group['groupid']])) {
+				$grp_tb->addItem($group['groupid'], $group['name'], true,
+					isset($groupsAllowed[$group['groupid']])
+				);
+				$groupsInList[$group['groupid']] = $group['groupid'];
+			}
+		}
+
+		// then add other host groups that user has permissions to, if not yet added to list
+		foreach ($groupsAllowed as $group) {
+			if (!isset($groupsInList[$group['groupid']])) {
+				$grp_tb->addItem($group['groupid'], $group['name']);
+			}
+		}
+	}
+	else {
+		// when cloning a host or creating a new one, don't show read-only host groups in left box
+		// show empty or posted groups in case of an error
+		foreach ($groupsAllowed as $group) {
+			$grp_tb->addItem($group['groupid'], $group['name']);
+		}
 	}
 
 	$hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));
