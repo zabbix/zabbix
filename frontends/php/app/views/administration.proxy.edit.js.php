@@ -4,15 +4,10 @@
 		jQuery('#status').change(function() {
 			var active = (jQuery(this).val() == 5);
 			if (active) {
-				jQuery('#ip')
-					.closest('li')
-					.css('display', 'none');
+				jQuery('#ip').closest('li').addClass('hidden');
 			}
 			else {
-				jQuery('#ip')
-					.closest('li')
-					.css('display', '')
-					.removeClass('hidden');
+				jQuery('#ip').closest('li').removeClass('hidden');
 			}
 		});
 		// clone button, special processing because of list of hosts
