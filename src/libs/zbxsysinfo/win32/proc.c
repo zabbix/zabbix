@@ -96,8 +96,6 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (INVALID_HANDLE_VALUE == (hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
 		return SYSINFO_RET_FAIL;
 	}
 
