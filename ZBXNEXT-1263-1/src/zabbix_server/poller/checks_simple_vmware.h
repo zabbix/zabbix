@@ -39,6 +39,12 @@ int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, 
 		AGENT_RESULT *result);
 int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_fullname(AGENT_REQUEST *request, const char *username, const char *password,
@@ -63,6 +69,12 @@ int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, const char *u
 		AGENT_RESULT *result);
 int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_uptime(AGENT_REQUEST *request, const char *username, const char *password,
@@ -71,22 +83,12 @@ int	check_vcenter_hv_version(AGENT_REQUEST *request, const char *username, const
 		AGENT_RESULT *result);
 int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
-int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result);
-int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result);
-int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result);
-int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result);
-int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result);
-int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result);
 
 int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_vm_cpu_ready(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
@@ -118,6 +120,8 @@ int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, con
 		AGENT_RESULT *result);
 int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_storage_unshared(AGENT_REQUEST *request, const char *username, const char *password,
@@ -135,8 +139,6 @@ int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, const char *username,
 int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result);
-int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
