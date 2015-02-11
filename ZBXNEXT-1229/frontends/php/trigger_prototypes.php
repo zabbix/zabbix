@@ -45,8 +45,7 @@ $fields = array(
 	'expr_temp' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'),
 	'expr_target_single' =>	array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'),
 	'dependencies' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'new_dependence' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({add_dependence})'),
-	'rem_dependence' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'new_dependency' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'),
 	'g_triggerid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'showdisabled' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	// actions
@@ -65,8 +64,7 @@ $fields = array(
 	'replace_expression' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'remove_expression' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'test_expression' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'add_dependence' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'del_dependence' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'add_dependency' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'group_enable' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'group_disable' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'group_delete' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -151,7 +149,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'status' => getRequest('status'),
 		'comments' => getRequest('comments'),
 		'url' => getRequest('url'),
-		'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
+		'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
+		'dependencies' => zbx_toObject(getRequest('dependencies', array()), 'triggerid')
 	);
 
 	if (hasRequest('update')) {
@@ -179,6 +178,16 @@ elseif (hasRequest('delete') && hasRequest('triggerid')) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
 	show_messages($result, _('Trigger prototype deleted'), _('Cannot delete trigger prototype'));
+}
+elseif (hasRequest('add_dependency') && hasRequest('new_dependency')) {
+	if (!hasRequest('dependencies')) {
+		$_REQUEST['dependencies'] = array();
+	}
+	foreach (getRequest('new_dependency') as $triggerId) {
+		if (!uint_in_array($triggerId, getRequest('dependencies'))) {
+			$_REQUEST['dependencies'][] = $triggerId;
+		}
+	}
 }
 elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massupdate' && hasRequest('massupdate') && hasRequest('g_triggerid')) {
 	$triggerIds = getRequest('g_triggerid');
@@ -292,6 +301,7 @@ else {
 		'sortorder' => $sortOrder,
 		'config' => $config
 	);
+
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	// get triggers

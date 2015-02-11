@@ -373,7 +373,6 @@ else {
 
 	$data = array(
 		'showdisabled' => getRequest('showdisabled', 1),
-		'parent_discoveryid' => null,
 		'triggers' => array(),
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,

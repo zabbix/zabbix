@@ -59,6 +59,10 @@ switch ($srctbl) {
 		$page['title'] = _('Triggers');
 		$min_user_type = USER_TYPE_ZABBIX_USER;
 		break;
+	case 'trigger_prototypes':
+		$page['title'] = _('Trigger prototyes');
+		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+		break;
 	case 'usrgrp':
 		$page['title'] = _('User groups');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
@@ -140,6 +144,7 @@ if ($min_user_type > CWebUser::$data['type']) {
 $allowedSrcFields = array(
 	'users'					=> '"usergrpid", "alias", "fullname", "userid"',
 	'triggers'				=> '"description", "triggerid", "expression"',
+	'trigger_prototypes'	=> '"description", "triggerid", "expression"',
 	'items'					=> '"itemid", "name"',
 	'graphs'				=> '"graphid", "name"',
 	'graph_prototypes'		=> '"graphid", "name"',
@@ -959,44 +964,71 @@ elseif ($srctbl === 'help_items') {
 	$table->show();
 }
 /*
- * Triggers
+ * Triggers and trigger prototypes
  */
-elseif ($srctbl === 'triggers') {
+elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 	$config = select_config();
 
 	$form = new CForm();
 	$form->setName('triggerform');
 	$form->setAttribute('id', 'triggers');
 
-	$table = new CTableInfo(_('No triggers found.'));
+	$triggerPrototypesPopup = ($srctbl === 'trigger_prototypes');
+
+	$table = new CTableInfo($triggerPrototypesPopup ? _('No trigger prototypes found.') : _('No triggers found.'));
 
 	$table->setHeader(array(
-		$multiselect ? new CCheckBox('all_triggers', null, "checkAll('".$form->getName()."', 'all_triggers', 'triggers');") : null,
+		$multiselect
+			? new CCheckBox('all_triggers', null, "checkAll('".$form->getName()."', 'all_triggers', 'triggers');")
+			: null,
 		_('Name'),
 		_('Severity'),
 		_('Status')
 	));
 
 	$options = array(
+		'output' => array('triggerid', 'expression', 'description', 'status', 'priority', 'state'),
+		'selectHosts' => array('name'),
+		'selectDependencies' => array('triggerid', 'expression', 'description'),
 		'hostids' => $hostid,
-		'output' => array('triggerid', 'description', 'expression', 'priority', 'status', 'state'),
-		'selectHosts' => array('hostid', 'name'),
-		'selectDependencies' => API_OUTPUT_EXTEND,
 		'expandDescription' => true
 	);
-	if (is_null($hostid)) {
-		$options['groupids'] = $groupid;
+
+	if ($triggerPrototypesPopup) {
+		if ($writeonly !== null) {
+			$options['editable'] = true;
+		}
+
+		if ($templated !== null) {
+			$options['templated'] = $templated;
+		}
+
+		$triggers = API::TriggerPrototype()->get($options);
 	}
-	if (!is_null($writeonly)) {
-		$options['editable'] = true;
+	else {
+		if ($hostid === null) {
+			$options['groupids'] = $groupid;
+		}
+
+		if ($writeonly !== null) {
+			$options['editable'] = true;
+		}
+
+		if ($templated !== null) {
+			$options['templated'] = $templated;
+		}
+
+		if ($withMonitoredTriggers) {
+			$options['monitored'] = true;
+		}
+
+		if ($normalOnly) {
+			$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+		}
+
+		$triggers = API::Trigger()->get($options);
 	}
-	if (!is_null($templated)) {
-		$options['templated'] = $templated;
-	}
-	if ($withMonitoredTriggers) {
-		$options['monitored'] = true;
-	}
-	$triggers = API::Trigger()->get($options);
+
 	order_result($triggers, 'description');
 
 	if ($multiselect) {
