@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2014-02-03 08:45+0300\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1209,7 +1209,7 @@ msgstr "Impossible d'ajouter l'expression rationnelle"
 msgid "Cannot add scenario"
 msgstr "Impossible d'ajouter le scénario"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "Impossible d'ajouter l'écran"
 
@@ -1457,7 +1457,7 @@ msgstr[1] "Impossible de supprimer les expressions rationnelles"
 msgid "Cannot delete scenario"
 msgstr "Impossible de supprimer le scénario"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "Impossible de supprimer l'écran"
 
@@ -1982,7 +1982,7 @@ msgstr "Impossible de mettre à jour l'expression rationnelle"
 msgid "Cannot update scenario"
 msgstr "Impossible de mettre à jour le scénario"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "Impossible de mettre à jour l'écran"
 
@@ -10561,7 +10561,7 @@ msgstr "Écran \"%1$s\" sauté - règle utilisateur."
 msgid "Screen \"%1$s\" updated."
 msgstr "Écran \"%1$s\" mis à jour."
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Écran ajouté"
 
@@ -10569,7 +10569,7 @@ msgstr "Écran ajouté"
 msgid "Screen cell configuration"
 msgstr "Configuration cellule écran"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Écran supprimé"
 
@@ -10581,7 +10581,7 @@ msgstr "Un élément d'écran existe déjà dans la même cellule."
 msgid "Screen should contain at least one row and column."
 msgstr "Un écran doit contenir au moins une ligne et une colonne."
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Écran mis à jour"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2014-06-08 10:44+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1221,7 +1221,7 @@ msgstr "Не вдалося додати регулярний вираз"
 msgid "Cannot add scenario"
 msgstr "Не вдалося додати сценарій"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "Не вдалося додати комплексний екран"
 
@@ -1471,7 +1471,7 @@ msgstr[3] "Не вдалося видалити регулярні вирази"
 msgid "Cannot delete scenario"
 msgstr "Не вдалося оновити сценарій"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "Не вдалося видалити комплексний екран"
 
@@ -1998,7 +1998,7 @@ msgstr "Не вдалося оновити регулярний вираз"
 msgid "Cannot update scenario"
 msgstr "Не вдалося оновити сценарій"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "Не вдалося оновити комплексний екран"
 
@@ -10589,7 +10589,7 @@ msgstr "Комплексний екран \"%1$s\" пропущено - прав
 msgid "Screen \"%1$s\" updated."
 msgstr "Комплексний екран \"%1$s\" оновлено."
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Комплексний екран додано"
 
@@ -10597,7 +10597,7 @@ msgstr "Комплексний екран додано"
 msgid "Screen cell configuration"
 msgstr "Налаштування елемента комплексного екрану"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Комплексний екран видалено"
 
@@ -10609,7 +10609,7 @@ msgstr "Елемент комплексного екрану в цій же ко
 msgid "Screen should contain at least one row and column."
 msgstr "Комплексний екран повинен містити як мінімум один рядок та стовпчик."
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Комплексний екран оновлено"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2013-10-01 08:35+0300\n"
 "Last-Translator: volter <volker27@gmx.at>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1220,7 +1220,7 @@ msgstr "Kann regulären Ausdruck nicht hinzufügen"
 msgid "Cannot add scenario"
 msgstr "Kann Szenario nicht hinzufügen"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "Kann Übersichtstafel nicht hinzufügen"
 
@@ -1470,7 +1470,7 @@ msgstr[1] "Kann regulären Ausdruck nicht löschen"
 msgid "Cannot delete scenario"
 msgstr "Kann Szenario nicht löschen"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "Kann Übersichtstafel nicht löschen"
 
@@ -1993,7 +1993,7 @@ msgstr "Kann regulären Ausdruck nicht ändern"
 msgid "Cannot update scenario"
 msgstr "Kann Szenario nicht ändern"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "Kann Übersichtstafel nicht ändern"
 
@@ -10615,7 +10615,7 @@ msgstr "Tafel \"%1$s\" übersprungen -- Benutzerregel."
 msgid "Screen \"%1$s\" updated."
 msgstr "Übersichtstafel \"%1$s\" geändert."
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Übersichtstafel hinzugefügt"
 
@@ -10623,7 +10623,7 @@ msgstr "Übersichtstafel hinzugefügt"
 msgid "Screen cell configuration"
 msgstr "Zelleneinstellung"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Übersichtstafel gelöscht"
 
@@ -10635,7 +10635,7 @@ msgstr "Tafel-Element existiert schon in dieser Zelle."
 msgid "Screen should contain at least one row and column."
 msgstr "Übersichtstafel sollte zumindest eine Zeile und Spalte haben."
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Übersichtstafel geändert"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -1210,7 +1210,7 @@ msgstr "Не може да се добави регулярен израз"
 msgid "Cannot add scenario"
 msgstr "Не може да се добави сценарий"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "Не може да се добави екран"
 
@@ -1460,7 +1460,7 @@ msgstr[1] "Не може да се изтрият регулярните изр�
 msgid "Cannot delete scenario"
 msgstr "Не може да се изтрие сценария"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "Не може да се изтрие екрана"
 
@@ -1984,7 +1984,7 @@ msgstr "Не може да се актуализират регуларните 
 msgid "Cannot update scenario"
 msgstr "Не може да се актуализира сценария"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "Не може да се актуализира екрана"
 
@@ -10583,7 +10583,7 @@ msgstr "Екран \"%1$s\" пропуснато - потребителско п
 msgid "Screen \"%1$s\" updated."
 msgstr "Екран \"%1$s\" актуализиран."
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Екран добавен"
 
@@ -10591,7 +10591,7 @@ msgstr "Екран добавен"
 msgid "Screen cell configuration"
 msgstr "Конфигуриране на екран"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Екран изтрит"
 
@@ -10603,7 +10603,7 @@ msgstr "Елемент от екрана в една и съща клетка в
 msgid "Screen should contain at least one row and column."
 msgstr "Екрана трябва да съдържа най-малко един ред и колона."
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Екран актуализиран"
 

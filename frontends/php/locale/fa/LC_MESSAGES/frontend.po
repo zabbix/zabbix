@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2014-04-07 06:17+0300\n"
 "Last-Translator: Starless boi <mohammadsharifi666@gmail.com>\n"
 "Language-Team: none\n"
@@ -1202,7 +1202,7 @@ msgstr "عبارت منظم نمی تواند اضافه شود"
 msgid "Cannot add scenario"
 msgstr "سناریو نمی تواند اضافه شود"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "صفحه نمایش نمی تواند اضافه شود"
 
@@ -1449,7 +1449,7 @@ msgstr[0] ""
 msgid "Cannot delete scenario"
 msgstr "سناریو نمی تواند حذف شود"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "صفحه نمایش نمی تواند حذف شود"
 
@@ -1970,7 +1970,7 @@ msgstr "عبارت منظم نمی تواند بروز شود"
 msgid "Cannot update scenario"
 msgstr "سناریو نمی تواند بروز شود"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "صفحه نمایش نمی تواند بروز شود"
 
@@ -10533,7 +10533,7 @@ msgstr ""
 msgid "Screen \"%1$s\" updated."
 msgstr ""
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr ""
 
@@ -10541,7 +10541,7 @@ msgstr ""
 msgid "Screen cell configuration"
 msgstr "پیکربندی سلول‌های صفحات نمایش"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr ""
 
@@ -10553,7 +10553,7 @@ msgstr ""
 msgid "Screen should contain at least one row and column."
 msgstr ""
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr ""
 

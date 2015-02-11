@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2013-01-22 19:22+0200\n"
 "Last-Translator: mario.rf.santos <mario.rf.santos@gmail.com>\n"
 "Language-Team: none\n"
@@ -1207,7 +1207,7 @@ msgstr "Não foi possível adicionar expressão regular"
 msgid "Cannot add scenario"
 msgstr "Não foi possível adicionar cenário"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "Não foi possível adicionar ecrã"
 
@@ -1455,7 +1455,7 @@ msgstr[1] "Não foi possível eliminar expressões regulares"
 msgid "Cannot delete scenario"
 msgstr "Não foi possível eliminar cenário"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "Não foi possível eliminar ecrã"
 
@@ -1978,7 +1978,7 @@ msgstr "Não foi possível actualizar a expressão regular"
 msgid "Cannot update scenario"
 msgstr "Não foi possível actualizar o cenário"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "Não foi possível actualizar o ecrã"
 
@@ -10557,7 +10557,7 @@ msgstr "Ecrã \"%1$s\" ignorado - regra de utilizador."
 msgid "Screen \"%1$s\" updated."
 msgstr "Ecrã \"%1$s\" actualizado."
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Ecrã adicionado"
 
@@ -10565,7 +10565,7 @@ msgstr "Ecrã adicionado"
 msgid "Screen cell configuration"
 msgstr "Configuração de célula do ecrã"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Ecrã eliminado"
 
@@ -10577,7 +10577,7 @@ msgstr "Já existe um item do ecrã na mesma célula."
 msgid "Screen should contain at least one row and column."
 msgstr "Um ecrã deve conter pelo menos uma linha e uma coluna."
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Ecrã actualizado"
 

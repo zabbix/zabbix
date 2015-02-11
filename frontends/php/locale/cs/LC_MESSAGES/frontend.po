@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2013-10-23 00:21+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1215,7 +1215,7 @@ msgstr "Nelze přidat regulární výraz"
 msgid "Cannot add scenario"
 msgstr "Nelze přidat scénář"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "Nelze přidat obrazovku"
 
@@ -1464,7 +1464,7 @@ msgstr[2] "Nelze smazat regulární výrazy"
 msgid "Cannot delete scenario"
 msgstr "Nelze smazat scénář"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr ""
 
@@ -1989,7 +1989,7 @@ msgstr "Nelze upravit regulární výraz"
 msgid "Cannot update scenario"
 msgstr "Nelze upravit scénář"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "Nelze upravit obrazovku"
 
@@ -10563,7 +10563,7 @@ msgstr ""
 msgid "Screen \"%1$s\" updated."
 msgstr ""
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Obrazovka byla přidána"
 
@@ -10571,7 +10571,7 @@ msgstr "Obrazovka byla přidána"
 msgid "Screen cell configuration"
 msgstr "Nastavení buňky obrazovky"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Obrazovka byla smazána"
 
@@ -10583,7 +10583,7 @@ msgstr ""
 msgid "Screen should contain at least one row and column."
 msgstr ""
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Obrazovka byla aktualizována"
 

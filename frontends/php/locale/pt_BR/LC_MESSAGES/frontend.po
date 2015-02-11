@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2014-04-12 03:02+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1212,7 +1212,7 @@ msgstr "Não foi possível atualizar expressão regular"
 msgid "Cannot add scenario"
 msgstr "Cenário não foi incluído"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "Tela não foi incluída"
 
@@ -1460,7 +1460,7 @@ msgstr[1] "Não foi possível remover expressões regulares"
 msgid "Cannot delete scenario"
 msgstr "Cenário não foi removido"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "Não foi possível excluir a tela"
 
@@ -1984,7 +1984,7 @@ msgstr "Não foi possível atualizar expressão regular"
 msgid "Cannot update scenario"
 msgstr "Cenário não foi atualizado"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "Tela não foi atualizada"
 
@@ -10571,7 +10571,7 @@ msgstr "A tela \"%1$s\" foi ignorada - regra de usuário."
 msgid "Screen \"%1$s\" updated."
 msgstr "A tela \"%1$s\" foi atualizada."
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Tela incluída"
 
@@ -10579,7 +10579,7 @@ msgstr "Tela incluída"
 msgid "Screen cell configuration"
 msgstr "Configuração de célula de tela"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Tela removida"
 
@@ -10591,7 +10591,7 @@ msgstr "Já existe um item da tela na mesma célula."
 msgid "Screen should contain at least one row and column."
 msgstr "Uma tela deve conter pelo menos uma linha e uma coluna."
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Tela atualizada"
 

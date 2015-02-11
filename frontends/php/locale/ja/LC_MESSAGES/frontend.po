@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2014-03-25 02:18+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -1203,7 +1203,7 @@ msgstr "正規表現を追加できません"
 msgid "Cannot add scenario"
 msgstr "シナリオを追加できません"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "スクリーンを追加できません"
 
@@ -1450,7 +1450,7 @@ msgstr[0] "正規表現を削除できません"
 msgid "Cannot delete scenario"
 msgstr "シナリオを削除できません"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "スクリーンを削除できません"
 
@@ -1971,7 +1971,7 @@ msgstr "正規表現を更新できません"
 msgid "Cannot update scenario"
 msgstr "シナリオを更新できません"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "スクリーンを更新できません"
 
@@ -10544,7 +10544,7 @@ msgstr "スクリーン\"%1$s\"はスキップされました - ユーザの指�
 msgid "Screen \"%1$s\" updated."
 msgstr "スクリーン\"%1$s\"を更新しました。"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "スクリーンを追加しました"
 
@@ -10552,7 +10552,7 @@ msgstr "スクリーンを追加しました"
 msgid "Screen cell configuration"
 msgstr "スクリーンセルの設定"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "スクリーンを削除しました"
 
@@ -10564,7 +10564,7 @@ msgstr "同じセルにスクリーンの要素がすでに存在します。"
 msgid "Screen should contain at least one row and column."
 msgstr "スクリーンは少なくとも1つ以上の行か列を設定する必要があります。"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "スクリーンを更新しました"
 
