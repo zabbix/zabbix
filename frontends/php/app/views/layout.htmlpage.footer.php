@@ -23,9 +23,7 @@ show_messages();
 if ($data['fullscreen'] == 0) {
 	$table = new CTable(null, 'textwhite bold maxwidth ui-widget-header ui-corner-all page_footer');
 
-	$conString = ($data['userid'] == 0)
-			? _('Not connected')
-			: _s('Connected as \'%1$s\'', $data['alias']);
+	$conString = _s('Connected as \'%1$s\'', $data['user']['alias']);
 
 	$table->addRow(array(
 		new CCol(new CLink(
@@ -41,7 +39,7 @@ if ($data['fullscreen'] == 0) {
 	$table->show();
 }
 
-if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode']) && CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
 	CProfiler::getInstance()->show();
 }
