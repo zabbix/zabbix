@@ -37,9 +37,11 @@
 
 #include "daemon.h"
 #include "../../libs/zbxcrypto/tls.h"
+#include "../../libs/zbxcrypto/tls_tcp_active.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+extern size_t		(*find_psk_in_cache)(const unsigned char *, unsigned char *, size_t);
 
 /******************************************************************************
  *                                                                            *
@@ -659,6 +661,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
+	find_psk_in_cache = DCget_psk_by_identity;
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
