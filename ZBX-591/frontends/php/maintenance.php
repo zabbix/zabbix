@@ -63,8 +63,8 @@ $fields = array(
 	'new_timeperiod_start_date_minute' =>	array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null),
 	'new_timeperiod' =>						array(T_ZBX_STR, O_OPT, null,	null,		'isset({add_timeperiod})'),
 	'timeperiods' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'del_timeperiodid' =>					array(null,      O_OPT, P_ACT,	DB_ID,		null),
-	'edit_timeperiodid' =>					array(null,      O_OPT, P_ACT,	DB_ID,		null),
+	'del_timeperiodid' =>					array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'edit_timeperiodid' =>					array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'twb_groupid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// actions
 	'action' =>								array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"maintenance.massdelete"'), null),

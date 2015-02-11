@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-30 11:36+0200\n"
+"POT-Creation-Date: 2015-02-05 21:48+0200\n"
 "PO-Revision-Date: 2013-10-10 08:35+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -1597,7 +1597,7 @@ msgstr "Não foi possivel criar novo elemento"
 msgid "Cannot create template."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1317
+#: include/classes/api/services/CUser.php:1315
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Não é possível eliminar o utilizador interno do Zabbix \"%1$s\", tente desactivar esse utilizador."
@@ -3236,11 +3236,6 @@ msgstr[1] ""
 #: include/views/configuration.triggers.list.php:303
 msgid "Copy selected to ..."
 msgstr "Copiar seleccionados para ..."
-
-#: include/classes/api/services/CUser.php:1076
-#, c-format
-msgid "Correct login \"%s\"."
-msgstr "Login correcto \"%s\"."
 
 #: include/classes/api/services/CImage.php:393
 msgid "Could not save image!"
@@ -10253,7 +10248,7 @@ msgid "No permissions for screen \"%1$s\"."
 msgstr "Sem permissões para o ecrã \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:996
-#: include/classes/api/services/CUser.php:1125
+#: include/classes/api/services/CUser.php:1123
 msgid "No permissions for system access."
 msgstr "Sem permissões para acesso ao sistema."
 
@@ -10351,7 +10346,7 @@ msgstr "Sem permissões para acesso ao sistema."
 #: include/classes/api/services/CUser.php:798
 #: include/classes/api/services/CUser.php:818
 #: include/classes/api/services/CUser.php:877
-#: include/classes/api/services/CUser.php:1282 include/func.inc.php:1662
+#: include/classes/api/services/CUser.php:1280 include/func.inc.php:1662
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Sem permissões para o objecto referenciado ou o objecto não existe!"
 
@@ -12950,7 +12945,7 @@ msgstr "Serviços"
 msgid "Services form a circular dependency."
 msgstr "Os serviços formam uma dependência circular."
 
-#: include/classes/api/services/CUser.php:1119
+#: include/classes/api/services/CUser.php:1117
 msgid "Session terminated, re-login, please."
 msgstr "A sessão foi terminada, por favor, inicie a sessão novamente."
 
@@ -14998,7 +14993,7 @@ msgstr ""
 msgid "User groups"
 msgstr "Grupos de utilizadores"
 
-#: include/classes/api/services/CUser.php:1295
+#: include/classes/api/services/CUser.php:1293
 msgid "User is not allowed to delete himself."
 msgstr "Um utilizador não pode eliminar-se a si próprio."
 

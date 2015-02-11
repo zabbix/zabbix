@@ -211,33 +211,37 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 		"/*[local-name()='val']/*[local-name()='storage']/*[local-name()='" property "']"
 
 #define ZBX_XPATH_VM_HARDWARE(property)									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config']]"			\
-		"/*[local-name()='val']/*[local-name()='hardware']/*[local-name()='" property "']"
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.hardware']]"	\
+		"/*[local-name()='val']/*[local-name()='" property "']"
+
+#define ZBX_XPATH_VM_UUID()										\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.uuid']]"		\
+		"/*[local-name()='val']"
+
+#define ZBX_XPATH_VM_INSTANCE_UUID()									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
+		"/*[local-name()='val']"
 
 #define ZBX_XPATH_HV_QUICKSTATS(property)								\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
-		"/*[local-name()='val']/*[local-name()='quickStats']/*[local-name()='" property "']"
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.quickStats']]"	\
+		"/*[local-name()='val']/*[local-name()='" property "']"
 
 #define ZBX_XPATH_HV_CONFIG(property)									\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
-		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='" property "']"
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.config']]"		\
+		"/*[local-name()='val']/*[local-name()='" property "']"
 
 #define ZBX_XPATH_HV_CONFIG_PRODUCT(property)								\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
-		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='product']"		\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.config']]"		\
+		"/*[local-name()='val']/*[local-name()='product']"					\
 		"/*[local-name()='" property "']"
 
 #define ZBX_XPATH_HV_HARDWARE(property)									\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
-		"/*[local-name()='val']/*[local-name()='hardware']/*[local-name()='" property "']"
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.hardware']]"		\
+		"/*[local-name()='val']/*[local-name()='" property "']"
 
 #define ZBX_XPATH_HV_STATUS()										\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
-		"/*[local-name()='val']/*[local-name()='overallStatus']"
-
-#define ZBX_XPATH_VMWARE_EVENTS()									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='latestPage']]" 		\
-		"/*/*[local-name()='Event']"
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.overallStatus']]"	\
+		"/*[local-name()='val']"
 
 #define ZBX_XPATH_VMWARE_ABOUT(property)								\
 	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"

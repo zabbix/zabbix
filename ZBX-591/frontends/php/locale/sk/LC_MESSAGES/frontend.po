@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-30 11:36+0200\n"
+"POT-Creation-Date: 2015-02-05 21:48+0200\n"
 "PO-Revision-Date: 2015-01-03 07:40+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1612,7 +1612,7 @@ msgstr "Nie je možné vytvoriť nový prvok"
 msgid "Cannot create template."
 msgstr "Nie je možné vytvoriť šablónu."
 
-#: include/classes/api/services/CUser.php:1317
+#: include/classes/api/services/CUser.php:1315
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Nie je možné zmazať interného Zabbix používateľa \"%1$s\", skúste ho vypnúť."
@@ -3278,11 +3278,6 @@ msgstr[2] "Kopírovať %1$s prvkov do ..."
 #: include/views/configuration.triggers.list.php:303
 msgid "Copy selected to ..."
 msgstr "Kopírovať vybrané do ..."
-
-#: include/classes/api/services/CUser.php:1076
-#, c-format
-msgid "Correct login \"%s\"."
-msgstr "Správny login \"%s\"."
 
 #: include/classes/api/services/CImage.php:393
 msgid "Could not save image!"
@@ -10310,7 +10305,7 @@ msgid "No permissions for screen \"%1$s\"."
 msgstr "Žiadne oprávnenia pre obrazovku \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:996
-#: include/classes/api/services/CUser.php:1125
+#: include/classes/api/services/CUser.php:1123
 msgid "No permissions for system access."
 msgstr "Žiadne oprávnenia pre prístup do systému."
 
@@ -10408,7 +10403,7 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: include/classes/api/services/CUser.php:798
 #: include/classes/api/services/CUser.php:818
 #: include/classes/api/services/CUser.php:877
-#: include/classes/api/services/CUser.php:1282 include/func.inc.php:1662
+#: include/classes/api/services/CUser.php:1280 include/func.inc.php:1662
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Žiadne oprávnenia k odkazovanému objektu alebo objekt neexistuje!"
 
@@ -13008,7 +13003,7 @@ msgstr "Služby"
 msgid "Services form a circular dependency."
 msgstr "Služby tvoria kruhovú závislosť."
 
-#: include/classes/api/services/CUser.php:1119
+#: include/classes/api/services/CUser.php:1117
 msgid "Session terminated, re-login, please."
 msgstr "Sedenie ukončené, prosím prihláste sa znovu."
 
@@ -15067,7 +15062,7 @@ msgstr "Používateľská skupina pre správu o nedostupnej databáze \"%1$s\"."
 msgid "User groups"
 msgstr "Používateľské skupiny"
 
-#: include/classes/api/services/CUser.php:1295
+#: include/classes/api/services/CUser.php:1293
 msgid "User is not allowed to delete himself."
 msgstr "Používateľ nemá dovolené zmazať sám seba."
 

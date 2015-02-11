@@ -113,8 +113,8 @@ while ($row = DBfetch($result)) {
 $triggers = API::Trigger()->get(array(
 	'triggerids' => array_keys($triggersEventCount),
 	'output' => array('triggerid', 'description', 'expression', 'priority', 'flags', 'url', 'lastchange'),
-	'selectItems' => array('hostid', 'name', 'value_type', 'key_'),
 	'selectHosts' => array('hostid', 'status', 'name'),
+	'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
 	'expandDescription' => true,
 	'preservekeys' => true,
 	'nopermissions' => true
@@ -125,22 +125,6 @@ $hostIds = array();
 foreach ($triggers as $triggerId => $trigger) {
 	$hostIds[$trigger['hosts'][0]['hostid']] = $trigger['hosts'][0]['hostid'];
 
-	$triggerItems = array();
-
-	$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
-
-	foreach ($trigger['items'] as $item) {
-		$triggerItems[] = array(
-			'name' => $item['name_expanded'],
-			'params' => array(
-				'itemid' => $item['itemid'],
-				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-					? HISTORY_GRAPH : HISTORY_VALUES
-			)
-		);
-	}
-
-	$triggers[$triggerId]['items'] = $triggerItems;
 	$triggers[$triggerId]['cnt_event'] = $triggersEventCount[$triggerId];
 }
 
@@ -169,7 +153,7 @@ foreach ($triggers as $trigger) {
 	$hostName->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 	$triggerDescription = new CSpan($trigger['description'], 'link_menu');
-	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $trigger['items']));
+	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	$table->addRow(array(
 		$hostName,
