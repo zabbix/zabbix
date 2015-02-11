@@ -1,11 +1,5 @@
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		<?php if (isset($ZBX_PAGE_POST_JS)): ?>
-			<?php foreach ($ZBX_PAGE_POST_JS as $script): ?>
-				<?php echo $script."\n"; ?>
-			<?php endforeach ?>
-		<?php endif ?>
-
 		<?php if (defined('ZBX_PAGE_DO_REFRESH') && CWebUser::$data['refresh']): ?>
 			PageRefresh.init(<?php echo CWebUser::$data['refresh'] * 1000; ?>);
 		<?php endif ?>

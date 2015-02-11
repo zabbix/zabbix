@@ -94,33 +94,20 @@ function local_generateFooter($fullscreen) {
 function local_showMessage() {
 	global $ZBX_MESSAGES;
 
-	if (!isset($_SESSION['messageOk']) && !isset($_SESSION['messageError'])) {
-		return;
-	}
+	if (array_key_exists('messageOk', $_SESSION) || array_key_exists('messageError', $_SESSION)) {
+		if (array_key_exists('messages', $_SESSION)) {
+			$ZBX_MESSAGES = $_SESSION['messages'];
+			unset($_SESSION['messages']);
+		}
 
-	$messageOk = null;
-	$messageError = null;
-
-	if (isset($_SESSION['messages'])) {
-		$ZBX_MESSAGES = $_SESSION['messages'];
-		unset($_SESSION['messages']);
+		if (array_key_exists('messageOk', $_SESSION)) {
+			show_messages(true, $_SESSION['messageOk']);
+		}
+		else {
+			show_messages(false, null, $_SESSION['messageError']);
+		}
+		unset($_SESSION['messageOk'], $_SESSION['messageError']);
 	}
-	if (isset($_SESSION['messageOk'])) {
-		$messageOk = $_SESSION['messageOk'];
-		unset($_SESSION['messageOk']);
-	}
-	if (isset($_SESSION['messageError'])) {
-		$messageError = $_SESSION['messageError'];
-		unset($_SESSION['messageError']);
-	}
-
-	if ($messageOk !== null) {
-		show_messages(true, $messageOk);
-	}
-	else {
-		show_messages(false, null, $messageError);
-	}
-
 }
 
 local_generateHeader($data);
@@ -129,11 +116,9 @@ echo $data['javascript']['pre'];
 echo $data['main_block'];
 
 // Add post JS code
-echo "<script type=\"text/javascript\">\n";
-echo "jQuery(document).ready(function() {\n";
-echo $data['javascript']['post'];
-echo "});\n";
-echo "</script>\n";
+if ($data['javascript']['post'] !== '') {
+	insert_js($data['javascript']['post'], true);
+}
 
 local_generateFooter($data['fullscreen']);
 
