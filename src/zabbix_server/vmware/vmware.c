@@ -63,6 +63,7 @@ extern int		CONFIG_VMWARE_TIMEOUT;
 
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
+extern char		*CONFIG_SOURCE_IP;
 
 #define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_mem_malloc_func, \
 		__vm_mem_realloc_func, __vm_mem_free_func)
@@ -933,6 +934,15 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 		goto out;
+	}
+
+	if (NULL != CONFIG_SOURCE_IP)
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
+		{
+			*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+			goto out;
+		}
 	}
 
 	if (ZBX_VMWARE_TYPE_UNKNOWN == service->type)
