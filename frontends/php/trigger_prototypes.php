@@ -269,7 +269,7 @@ if (hasRequest('action') && getRequest('action') == 'triggerprototype.massupdate
 	$triggersView->show();
 }
 elseif (isset($_REQUEST['form'])) {
-	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($exprAction));
+	$triggersView = new CView('configuration.trigger.prototype.edit', getTriggerFormData($exprAction));
 	$triggersView->render();
 	$triggersView->show();
 }
