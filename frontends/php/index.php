@@ -29,7 +29,7 @@ $page['file'] = 'index.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'name' =>		array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,		'isset({enter})', _('Username')),
+	'name' =>		array(T_ZBX_STR, O_NO,	null,	null,		'isset({enter})', _('Username')),
 	'password' =>	array(T_ZBX_STR, O_OPT, null,	null,			'isset({enter})'),
 	'sessionid' =>	array(T_ZBX_STR, O_OPT, null,	null,			null),
 	'reconnect' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 65535), null),
