@@ -1201,7 +1201,9 @@ static void	DCsync_hosts(DB_RESULT result)
 			goto done;
 
 		/* The new PSK identity already stored ? */
-		if (NULL != (psk_i = zbx_hashset_search(&config->psks, row[28])))
+
+		psk_i_local.tls_psk_identity = row[28];
+		if (NULL != (psk_i = zbx_hashset_search(&config->psks, &psk_i_local)))
 		{
 			if (0 != strcmp(psk_i->tls_psk, row[29]))
 			{
@@ -1215,10 +1217,11 @@ static void	DCsync_hosts(DB_RESULT result)
 		}
 
 		/* store new PSK */
+
 		DCstrpool_replace(0, &psk_i_local.tls_psk_identity, row[28]);
 		DCstrpool_replace(0, &psk_i_local.tls_psk, row[29]);
+		psk_i_local.refcount = 1;
 		host->tls_dc_psk = zbx_hashset_insert(&config->psks, &psk_i_local, sizeof(ZBX_DC_PSK));
-		host->tls_dc_psk->refcount = 1;
 done:
 #endif
 		host->tls_connect = (unsigned char)atoi(row[24]);
@@ -3724,6 +3727,23 @@ static int	__config_regexp_compare(const void *d1, const void *d2)
 	return r1->name == r2->name ? 0 : strcmp(r1->name, r2->name);
 }
 
+static zbx_hash_t	__config_psk_hash(const void *data)
+{
+	const ZBX_DC_PSK	*psk_i = (const ZBX_DC_PSK *)data;
+
+	return ZBX_DEFAULT_STRING_HASH_ALGO(psk_i->tls_psk_identity, strlen(psk_i->tls_psk_identity),
+			ZBX_DEFAULT_HASH_SEED);
+}
+
+static int	__config_psk_compare(const void *d1, const void *d2)
+{
+	const ZBX_DC_PSK	*psk_1 = (const ZBX_DC_PSK *)d1;
+	const ZBX_DC_PSK	*psk_2 = (const ZBX_DC_PSK *)d2;
+
+	return psk_1->tls_psk_identity == psk_2->tls_psk_identity ? 0 : strcmp(psk_1->tls_psk_identity,
+			psk_2->tls_psk_identity);
+}
+
 void	init_configuration_cache(void)
 {
 	const char	*__function_name = "init_configuration_cache";
@@ -3802,7 +3822,7 @@ void	init_configuration_cache(void)
 	CREATE_HASHSET_EXT(config->interface_snmpaddrs, __config_interface_addr_hash, __config_interface_addr_compare);
 	CREATE_HASHSET_EXT(config->regexps, __config_regexp_hash, __config_regexp_compare);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	CREATE_HASHSET_EXT(config->psks, ZBX_DEFAULT_STRING_HASH_FUNC, ZBX_DEFAULT_STR_COMPARE_FUNC);
+	CREATE_HASHSET_EXT(config->psks, __config_psk_hash, __config_psk_compare);
 #endif
 
 	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
@@ -4132,6 +4152,49 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr,
 
 	return SUCCEED;
 }
+
+#if defined(HAVE_POLARSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_psk_by_identity                                            *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     Find PSK with the specified identity in configuration cache            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     psk_identity - [IN] PSK identity to search for ('\0' terminated)       *
+ *     psk_buf      - [OUT] output buffer for PSK value                       *
+ *     psk_buf_len  - [IN] output buffer size                                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *     PSK length in bytes if PSK found. 0 - if PSK not found.                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     ATTENTION! This function's address and arguments are described and     *
+ *     used in file src/libs/zbxcrypto/tls.c for calling this function by     *
+ *     pointer. If you ever change this DCget_psk_by_identity() function      *
+ *     arguments or return value do not forget to synchronize changes with    *
+ *     the src/libs/zbxcrypto/tls.c.                                          *
+ *                                                                            *
+ ******************************************************************************/
+size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, size_t psk_buf_len)
+{
+	const ZBX_DC_PSK	*psk_i;
+	ZBX_DC_PSK		psk_i_local;
+	size_t			psk_len = 0;
+
+	LOCK_CACHE;
+
+	psk_i_local.tls_psk_identity = (const char *)psk_identity;
+
+	if (NULL != (psk_i = zbx_hashset_search(&config->psks, &psk_i_local)))
+		psk_len = zbx_strlcpy((char *)psk_buf, psk_i->tls_psk, psk_buf_len);
+
+	UNLOCK_CACHE;
+
+	return psk_len;
+}
+#endif
 
 static void	DCget_interface(DC_INTERFACE *dst_interface, const ZBX_DC_INTERFACE *src_interface)
 {
