@@ -100,7 +100,7 @@ if ($groupId && !API::HostGroup()->isWritable(array($groupId))) {
 	access_deny();
 }
 
-$hostId = getRequest('hostid');
+$hostId = getRequest('hostid', 0);
 
 if (hasRequest('parent_discoveryid')) {
 	// check whether discovery rule is editable by user
@@ -450,7 +450,7 @@ elseif (isset($_REQUEST['form'])) {
 		$data['templates'] = array();
 
 		// if no host has been selected for the navigation panel, use the first graph host
-		if (empty($data['hostid'])) {
+		if ($data['hostid'] == 0) {
 			$host = reset($graph['hosts']);
 			$data['hostid'] = $host['hostid'];
 		}
@@ -599,7 +599,7 @@ elseif (isset($_REQUEST['form'])) {
 	$data['items'] = array_values($data['items']);
 
 	// is template
-	$data['is_template'] = isTemplate($data['hostid']);
+	$data['is_template'] = ($data['hostid'] == 0) ? false : isTemplate($data['hostid']);
 
 	// render view
 	$graphView = new CView('configuration.graph.edit', $data);
@@ -617,7 +617,7 @@ else {
 
 	$data = array(
 		'pageFilter' => $pageFilter,
-		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : getRequest('hostid'),
+		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : $hostId,
 		'parent_discoveryid' => isset($discoveryRule) ? $discoveryRule['itemid'] : null,
 		'graphs' => array(),
 		'discovery_rule' => isset($discoveryRule) ? $discoveryRule : null,
@@ -627,8 +627,8 @@ else {
 
 	// get graphs
 	$options = array(
-		'hostids' => $data['hostid'] ? $data['hostid'] : null,
-		'groupids' => (!$data['hostid'] && $pageFilter->groupid > 0) ? $pageFilter->groupid : null,
+		'hostids' => ($data['hostid'] == 0) ? null : $data['hostid'],
+		'groupids' => ($data['hostid'] == 0 && $pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 		'discoveryids' => isset($discoveryRule) ? $discoveryRule['itemid'] : null,
 		'editable' => true,
 		'output' => array('graphid', 'name', 'graphtype'),
@@ -654,8 +654,8 @@ else {
 		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),
 		'output' => array('graphid', 'name', 'templateid', 'graphtype', 'width', 'height'),
 		'selectDiscoveryRule' => array('itemid', 'name'),
-		'selectHosts' => $data['hostid'] ? null : array('name'),
-		'selectTemplates' => $data['hostid'] ? null : array('name')
+		'selectHosts' => ($data['hostid'] == 0) ? array('name') : null,
+		'selectTemplates' => ($data['hostid'] == 0) ? array('name') : null
 	);
 
 	$data['graphs'] = empty($_REQUEST['parent_discoveryid'])
