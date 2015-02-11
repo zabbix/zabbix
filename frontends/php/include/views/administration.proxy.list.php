@@ -96,27 +96,21 @@ foreach ($this->data['proxies'] as $proxy) {
 	));
 }
 
-// create go buttons
-$goComboBox = new CComboBox('action');
-
-$goOption = new CComboItem('proxy.massenable', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable hosts monitored by selected proxies?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('proxy.massdisable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable hosts monitored by selected proxies?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('proxy.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected proxies?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
-
 // append table to form
-$proxyForm->addItem(array($this->data['paging'], $proxyTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$proxyForm->addItem(array(
+	$this->data['paging'],
+	$proxyTable,
+	$this->data['paging'],
+	get_table_header(new CActionButtonList('action', 'hosts', array(
+		'proxy.massenable' => array('name' => _('Enable hosts'),
+			'confirm' => _('Enable hosts monitored by selected proxies?')
+		),
+		'proxy.massdisable' => array('name' => _('Disable hosts'),
+			'confirm' => _('Disable hosts monitored by selected proxies?')
+		),
+		'proxy.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected proxies?'))
+	)))
+));
 
 // append form to widget
 $proxyWidget->addItem($proxyForm);

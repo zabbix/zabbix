@@ -644,6 +644,9 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	{
 		/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
 		/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
+		if (0 != (command->flags & CF_MODULE) && 0 == ISSET_MSG(result))
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Item is not supported."));
+
 		goto notsupported;
 	}
 
