@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 23:40+0200\n"
-"PO-Revision-Date: 2015-01-19 20:32+0300\n"
+"POT-Creation-Date: 2015-02-11 23:46+0200\n"
+"PO-Revision-Date: 2015-02-11 19:18+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1421692375.0\n"
+"X-POOTLE-MTIME: 1423675124.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2857,7 +2857,7 @@ msgstr "Wyczyść"
 #: include/views/configuration.httpconf.list.php:149
 #: include/views/configuration.item.list.php:273
 msgid "Clear history"
-msgstr ""
+msgstr "Wyczyść historię"
 
 #: include/views/configuration.httpconf.edit.php:272
 #: include/views/configuration.item.edit.php:456
@@ -4462,7 +4462,7 @@ msgstr "Wyłączyć hosta?"
 #: include/views/administration.proxy.list.php:108
 #: include/views/configuration.hostgroups.list.php:160
 msgid "Disable hosts"
-msgstr ""
+msgstr "Wyłącz hosty"
 
 #: include/views/configuration.hostgroups.list.php:161
 msgid "Disable hosts in the selected host groups?"
@@ -5081,7 +5081,7 @@ msgstr "Włączyć hosta?"
 #: include/views/administration.proxy.list.php:105
 #: include/views/configuration.hostgroups.list.php:159
 msgid "Enable hosts"
-msgstr ""
+msgstr "Włącz hosty"
 
 #: include/views/administration.proxy.list.php:106
 msgid "Enable hosts monitored by selected proxies?"
@@ -5338,7 +5338,7 @@ msgstr "Rozwinięty"
 #: include/views/configuration.screen.list.php:68
 #: include/views/configuration.sysmap.list.php:66 templates.php:748
 msgid "Export"
-msgstr ""
+msgstr "Eksport"
 
 #: events.php:298
 msgid "Export to CSV"
@@ -14609,7 +14609,7 @@ msgstr "Niedostępne dla użytkowników z %1$s."
 
 #: include/views/administration.users.list.php:154
 msgid "Unblock"
-msgstr ""
+msgstr "Odblokuj"
 
 #: include/views/administration.users.list.php:154
 msgid "Unblock selected users?"
@@ -16545,7 +16545,7 @@ msgstr "sekundy"
 
 #: include/classes/html/CActionButtonList.php:90
 msgid "selected"
-msgstr ""
+msgstr "wybrane"
 
 #: include/actions.inc.php:1152
 msgid "sent"
