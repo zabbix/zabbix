@@ -34,8 +34,6 @@ class CControllerSystemWarning extends CController {
 			unset($_SESSION['messages']);
 		}
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Fatal error'));
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }

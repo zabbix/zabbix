@@ -23,10 +23,9 @@ $pageHeader->addCssInit();
 $pageHeader->display();
 
 $warning = new CWarning(_('Fatal error, please report to Zabbix Team'), $data['messages']);
-$buttons = new CButton('back', _('Go to dashboard'),
+$warning->setButtons(new CButton('back', _('Go to dashboard'),
 	'javascript: document.location = "zabbix.php?action=dashboard.view"',
 	'button'
-);
-$warning->setButtons($buttons);
+));
 
 $warning->show();
