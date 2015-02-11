@@ -646,8 +646,8 @@ static int	compare_nth_field(const ZBX_FIELD **fields, const char *rec_data, int
 	}
 	while (n >= i);
 
-	*last_n = i;				/* Preserve number of field and its start position */
-	*last_pos = (size_t)(p - rec_data);	/* across calls to avoid searching from start. */
+	*last_n = i;				/* preserve number of field and its start position */
+	*last_pos = (size_t)(p - rec_data);	/* across calls to avoid searching from start */
 
 	if (0 == is_null)	/* value in JSON is not NULL */
 	{
@@ -690,15 +690,14 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 {
 	const char		*__function_name = "process_proxyconfig_table";
 
-	int			f, fields_count = 0, insert, is_null, i, ret = FAIL, id_field_nr = 0,
-				move_out = 0, move_field_nr = 0;
+	int			f, fields_count = 0, insert, is_null, i, ret = FAIL, id_field_nr = 0, move_out = 0,
+				move_field_nr = 0;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
-	char			*buf = NULL, *esc;
 	const char		*p, *pf;
 	zbx_uint64_t		recid, *p_recid = NULL;
 	zbx_vector_uint64_t	ins, moves;
-	char			*sql = NULL, *recs = NULL;
+	char			*buf = NULL, *esc, *sql = NULL, *recs = NULL;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset,
 				recs_alloc = 20 * ZBX_KIBIBYTE, recs_offset = 0,
 				buf_alloc = 0;
@@ -709,6 +708,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	zbx_id_offset_t		id_offset, *p_id_offset = NULL;
 	zbx_db_insert_t		db_insert;
 	zbx_vector_ptr_t	values;
+	static zbx_vector_ptr_t	skip_fields;
+	static const ZBX_TABLE	*table_items = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, table->table);
 
@@ -744,6 +745,17 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	/*  25  |         ...                               | ...tables                     */
 	/*  26  | }                                         |                               */
 	/************************************************************************************/
+
+	if (NULL == table_items)
+	{
+		table_items = DBget_table("items");
+
+		/* do not update existing lastlogsize and mtime fields */
+		zbx_vector_ptr_create(&skip_fields);
+		zbx_vector_ptr_append(&skip_fields, (void *)DBget_field(table_items, "lastlogsize"));
+		zbx_vector_ptr_append(&skip_fields, (void *)DBget_field(table_items, "mtime"));
+		zbx_vector_ptr_sort(&skip_fields, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	}
 
 	/* get table columns (line 3 in T1) */
 	if (FAIL == zbx_json_brackets_by_name(jp_obj, "fields", &jp_data))
@@ -998,7 +1010,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	/* iterate the entries (lines 9, 14 and 19 in T1) */
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
-		int	rec_differ = 0;			/* how many fields differ */
+		int	rec_differ = 0;	/* how many fields differ */
 		int	last_n = 0;
 		size_t	tmp_offset = sql_offset, last_pos = 0;
 
@@ -1133,6 +1145,13 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					*error = zbx_dsprintf(*error, "column \"%s.%s\" cannot be null",
 							table->table, fields[f]->name);
 					goto clean;
+				}
+
+				/* do not update existing lastlogsize and mtime fields */
+				if (FAIL != zbx_vector_ptr_bsearch(&skip_fields, fields[f],
+						ZBX_DEFAULT_PTR_COMPARE_FUNC))
+				{
+					continue;
 				}
 
 				if (0 == (field_differ = compare_nth_field(fields, recs + p_id_offset->offset, f, buf,
@@ -1846,6 +1865,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 
 	typedef struct
 	{
+		zbx_uint64_t	lastlogsize;
 		size_t		psource;
 		size_t		pvalue;
 		int		clock;
@@ -1853,7 +1873,9 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 		int		timestamp;
 		int		severity;
 		int		logeventid;
+		int		mtime;
 		unsigned char	state;
+		unsigned char	meta;
 	}
 	zbx_history_data_t;
 
@@ -1882,7 +1904,8 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	proxy_get_lastid("proxy_history", "history_lastid", &id);
 try_again:
 	zbx_snprintf(sql, sizeof(sql),
-			"select id,itemid,clock,ns,timestamp,source,severity,value,logeventid,state"
+			"select id,itemid,clock,ns,timestamp,source,severity,"
+				"value,logeventid,state,lastlogsize,mtime,meta"
 			" from proxy_history"
 			" where id>" ZBX_FS_UI64
 			" order by id",
@@ -1925,12 +1948,16 @@ try_again:
 		ZBX_STR2UINT64(itemids[data_num], row[1]);
 
 		hd = &data[data_num++];
+
 		hd->clock = atoi(row[2]);
 		hd->ns = atoi(row[3]);
 		hd->timestamp = atoi(row[4]);
 		hd->severity = atoi(row[6]);
 		hd->logeventid = atoi(row[8]);
-		hd->state = (unsigned char)atoi(row[9]);
+		ZBX_STR2UCHAR(hd->state, row[9]);
+		ZBX_STR2UINT64(hd->lastlogsize, row[10]);
+		hd->mtime = atoi(row[11]);
+		ZBX_STR2UCHAR(hd->meta, row[12]);
 
 		len1 = strlen(row[5]) + 1;
 		len2 = strlen(row[7]) + 1;
@@ -1973,24 +2000,42 @@ try_again:
 
 		zbx_json_addobject(j, NULL);
 
+		hd = &data[i];
+
 		zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, dc_items[i].host.host, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(j, ZBX_PROTO_TAG_KEY, dc_items[i].key_orig, ZBX_JSON_TYPE_STRING);
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, data[i].clock);
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, data[i].ns);
-		if (0 != data[i].timestamp)
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGTIMESTAMP, data[i].timestamp);
-		if ('\0' != string_buffer[data[i].psource])
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, hd->clock);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, hd->ns);
+
+		/* meta information update record does not need those */
+		if (0 == hd->meta)
 		{
-			zbx_json_addstring(j, ZBX_PROTO_TAG_LOGSOURCE, &string_buffer[data[i].psource],
-					ZBX_JSON_TYPE_STRING);
+			if (0 != hd->timestamp)
+				zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGTIMESTAMP, hd->timestamp);
+
+			if ('\0' != string_buffer[hd->psource])
+			{
+				zbx_json_addstring(j, ZBX_PROTO_TAG_LOGSOURCE, &string_buffer[hd->psource],
+						ZBX_JSON_TYPE_STRING);
+			}
+
+			if (0 != hd->severity)
+				zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGSEVERITY, hd->severity);
+
+			zbx_json_addstring(j, ZBX_PROTO_TAG_VALUE, &string_buffer[hd->pvalue], ZBX_JSON_TYPE_STRING);
+
+			if (0 != hd->logeventid)
+				zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGEVENTID, hd->logeventid);
 		}
-		if (0 != data[i].severity)
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGSEVERITY, data[i].severity);
-		zbx_json_addstring(j, ZBX_PROTO_TAG_VALUE, &string_buffer[data[i].pvalue], ZBX_JSON_TYPE_STRING);
-		if (0 != data[i].logeventid)
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGEVENTID, data[i].logeventid);
-		if (0 != data[i].state)
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_STATE, data[i].state);
+
+		if (0 != hd->state)
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_STATE, hd->state);
+
+		if (ITEM_VALUE_TYPE_LOG == dc_items[i].value_type)
+		{
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_LASTLOGSIZE, hd->lastlogsize);
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_MTIME, hd->mtime);
+		}
 
 		zbx_json_close(j);
 
@@ -2156,6 +2201,10 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				items[i].host.maintenance_from <= values[i].ts.sec)
 			continue;
 
+		/* empty values are only allowed for meta information update packets */
+		if (ITEM_VALUE_TYPE_LOG != items[i].value_type && NULL == values[i].value)
+			continue;
+
 		if (ITEM_TYPE_AGGREGATE == items[i].type || ITEM_TYPE_CALCULATED == items[i].type)
 			continue;
 
@@ -2181,7 +2230,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			}
 		}
 
-		if (ITEM_STATE_NOTSUPPORTED == values[i].state || 0 == strcmp(values[i].value, ZBX_NOTSUPPORTED))
+		if (ITEM_STATE_NOTSUPPORTED == values[i].state ||
+				(NULL != values[i].value && 0 == strcmp(values[i].value, ZBX_NOTSUPPORTED)))
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &values[i].ts,
@@ -2213,8 +2263,10 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 					log->logeventid = values[i].logeventid;
 					log->lastlogsize = values[i].lastlogsize;
 					log->mtime = values[i].mtime;
+					log->meta = values[i].meta;
 
-					calc_timestamp(log->value, &log->timestamp, items[i].logtimefmt);
+					if (NULL != log->value)
+						calc_timestamp(log->value, &log->timestamp, items[i].logtimefmt);
 				}
 
 				items[i].state = ITEM_STATE_NORMAL;
@@ -2387,12 +2439,27 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, av->key, sizeof(av->key)))
 			continue;
 
-		if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &tmp, &tmp_alloc))
-			continue;
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_STATE, &tmp, &tmp_alloc))
+			av->state = (unsigned char)atoi(tmp);
 
-		av->value = zbx_strdup(av->value, tmp);
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &tmp, &tmp_alloc))
+		{
+			av->value = zbx_strdup(av->value, tmp);
+		}
+		else
+		{
+			/* meta information update (lastlogsize and mtime) packet is missing value tag */
 
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, &tmp, &tmp_alloc))
+			if (ITEM_STATE_NOTSUPPORTED == av->state)
+			{
+				/* unsupported items cannot have NULL-string error message */
+				continue;
+			}
+
+			av->meta = 1;
+		}
+
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc))
 			is_uint64(tmp, &av->lastlogsize);
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc))
@@ -2409,9 +2476,6 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LOGEVENTID, &tmp, &tmp_alloc))
 			av->logeventid = atoi(tmp);
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_STATE, &tmp, &tmp_alloc))
-			av->state = (unsigned char)atoi(tmp);
 
 		values_num++;
 
