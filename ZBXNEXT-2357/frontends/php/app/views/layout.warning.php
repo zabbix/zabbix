@@ -20,6 +20,4 @@
 
 header('Content-Type: text/html; charset=UTF-8');
 
-echo "<html><body>\n";
 echo $data['main_block'];
-echo "</body></html>\n";
