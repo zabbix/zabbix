@@ -52,8 +52,8 @@
  *              name - name of mutex (index for nix system)                   *
  *              forced - remove mutex if exists (only for nix)                *
  *                                                                            *
- * Return value: If the function succeeds, then return SUCCEED,               *
- *               FAIL on an error                                             *
+ * Return value: If the function succeeds, then return ZBX_MUTEX_OK,          *
+ *               ZBX_MUTEX_ERROR on an error                                  *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -66,8 +66,8 @@ int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char fo
 
 	if (NULL == (*mutex = CreateMutex(NULL, FALSE, name)))
 	{
-		zbx_error("error on mutex creation: %s", strerror_from_system(GetLastError()));
-		return FAIL;
+		zbx_error("error on mutex creating: %s", strerror_from_system(GetLastError()));
+		return ZBX_MUTEX_ERROR;
 	}
 
 #else
@@ -86,7 +86,7 @@ int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char fo
 		if (-1 == (sem_key = ftok(".", (int)'z')))
 		{
 			zbx_error("cannot create IPC key for path '.': %s", zbx_strerror(errno));
-			return FAIL;
+			return ZBX_MUTEX_ERROR;
 		}
 	}
 lbl_create:
@@ -100,7 +100,7 @@ lbl_create:
 			if (-1 == semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
 			{
 				zbx_error("semaphore [%i] error in semctl(SETVAL): %s", name, zbx_strerror(errno));
-				return FAIL;
+				return ZBX_MUTEX_ERROR;
 
 			}
 
@@ -155,12 +155,12 @@ lbl_create:
 		}
 
 		zbx_error("semaphore [%i] not initialized", name);
-		return FAIL;
+		return ZBX_MUTEX_ERROR;
 	}
 	else
 	{
 		zbx_error("cannot create Semaphore: %s", zbx_strerror(errno));
-		return FAIL;
+		return ZBX_MUTEX_ERROR;
 	}
 lbl_return:
 	*mutex = name;
@@ -168,7 +168,7 @@ lbl_return:
 
 #endif	/* _WINDOWS */
 
-	return SUCCEED;
+	return ZBX_MUTEX_OK;
 }
 
 /******************************************************************************
@@ -274,12 +274,12 @@ int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 {
 #ifdef _WINDOWS
 	if (ZBX_MUTEX_NULL == *mutex)
-		return SUCCEED;
+		return ZBX_MUTEX_OK;
 
 	if (0 == CloseHandle(*mutex))
 	{
 		zbx_error("error on mutex destroying: %s", strerror_from_system(GetLastError()));
-		return FAIL;
+		return ZBX_MUTEX_ERROR;
 	}
 #else
 	if (0 == --mutexes)
@@ -288,7 +288,7 @@ int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 
 	*mutex = ZBX_MUTEX_NULL;
 
-	return SUCCEED;
+	return ZBX_MUTEX_OK;
 }
 
 #if defined(HAVE_SQLITE3)
@@ -348,7 +348,7 @@ int	php_sem_get(PHP_MUTEX *sem_ptr, const char *path_name)
 	{
 		zbx_error("%s(): cannot create IPC key for path '%s': %s",
 				__function_name, path_name, zbx_strerror(errno));
-		return FAIL;
+		return PHP_MUTEX_ERROR;
 	}
 
 	/* Get/create the semaphore.  Note that we rely on the semaphores
@@ -360,7 +360,7 @@ int	php_sem_get(PHP_MUTEX *sem_ptr, const char *path_name)
 	if (-1 == (semid = semget(sem_key, 3, 0660 | IPC_CREAT)))
 	{
 		zbx_error("%s(): failed for key 0x%lx: %s", __function_name, sem_key, zbx_strerror(errno));
-		return FAIL;
+		return PHP_MUTEX_ERROR;
 	}
 
 	/* Find out how many processes are using this semaphore.  Note
@@ -434,7 +434,7 @@ int	php_sem_get(PHP_MUTEX *sem_ptr, const char *path_name)
 
 	sem_ptr->semid = semid;
 
-	return SUCCEED;
+	return PHP_MUTEX_OK;
 }
 
 static int	php_sysvsem_semop(PHP_MUTEX *sem_ptr, int acquire)
@@ -444,12 +444,12 @@ static int	php_sysvsem_semop(PHP_MUTEX *sem_ptr, int acquire)
 	assert(sem_ptr);
 
 	if (-1 == sem_ptr->semid)
-		return SUCCEED;
+		return PHP_MUTEX_OK;
 
 	if (0 == acquire && 0 == sem_ptr->count)
 	{
 		zbx_error("SysV semaphore (id %d) is not currently acquired", sem_ptr->semid);
-		return FAIL;
+		return PHP_MUTEX_ERROR;
 	}
 
 	sop.sem_num = SYSVSEM_SEM;
@@ -462,13 +462,13 @@ static int	php_sysvsem_semop(PHP_MUTEX *sem_ptr, int acquire)
 		{
 			zbx_error("php_sysvsem_semop(): failed to %s semaphore (id %d): %s",
 					(acquire ? "acquire" : "release"), sem_ptr->semid, zbx_strerror(errno));
-			return FAIL;
+			return PHP_MUTEX_ERROR;
 		}
 	}
 
 	sem_ptr->count -= (acquire ? -1 : 1);
 
-	return SUCCEED;
+	return PHP_MUTEX_OK;
 }
 
 int	php_sem_acquire(PHP_MUTEX *sem_ptr)
@@ -492,7 +492,7 @@ int	php_sem_remove(PHP_MUTEX *sem_ptr)
 	assert(sem_ptr);
 
 	if (-1 == sem_ptr->semid)
-		return SUCCEED;
+		return PHP_MUTEX_OK;
 
 	/* Decrement the usage count. */
 
@@ -512,22 +512,22 @@ int	php_sem_remove(PHP_MUTEX *sem_ptr)
 	if (-1 == semop(sem_ptr->semid, sop, opcnt))
 	{
 		zbx_error("%s(): failed for (id %d): %s", __function_name, sem_ptr->semid, zbx_strerror(errno));
-		return FAIL;
+		return PHP_MUTEX_ERROR;
 	}
 
 	un.buf = &buf;
 	if (-1 == semctl(sem_ptr->semid, 0, IPC_STAT, un))
 	{
 		zbx_error("%s(): SysV semaphore (id %d) does not (any longer) exist", __function_name, sem_ptr->semid);
-		return FAIL;
+		return PHP_MUTEX_ERROR;
 	}
 
 	if (-1 == semctl(sem_ptr->semid, 0, IPC_RMID, un))
-		return FAIL;
+		return PHP_MUTEX_ERROR;
 
 	sem_ptr->semid = -1;
 
-	return SUCCEED;
+	return PHP_MUTEX_OK;
 }
 
 #endif	/* HAVE_SQLITE3 */

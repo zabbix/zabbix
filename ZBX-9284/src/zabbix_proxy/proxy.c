@@ -185,7 +185,7 @@ int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 int	CONFIG_SERVER_STARTUP_TIME	= 0;
 
 /* mutex for node syncs; not used in proxy */
-ZBX_MUTEX	node_sync_access = ZBX_MUTEX_NULL;
+ZBX_MUTEX	node_sync_access;
 
 /******************************************************************************
  *                                                                            *

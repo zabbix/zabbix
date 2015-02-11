@@ -25,6 +25,9 @@
 #	define ZBX_MUTEX		HANDLE
 #	define ZBX_MUTEX_NULL		NULL
 
+#	define ZBX_MUTEX_ERROR		0
+#	define ZBX_MUTEX_OK		1
+
 #	define ZBX_MUTEX_NAME		wchar_t *
 
 #	define ZBX_MUTEX_LOG		TEXT("ZBX_MUTEX_LOG")
@@ -33,7 +36,10 @@
 #else	/* not _WINDOWS */
 
 #	define ZBX_MUTEX		int
-#	define ZBX_MUTEX_NULL		-1
+#	define ZBX_MUTEX_NULL		0
+
+#	define ZBX_MUTEX_ERROR		-1
+#	define ZBX_MUTEX_OK		1
 
 #	define ZBX_MUTEX_NAME		int
 
@@ -69,6 +75,9 @@ int	zbx_mutex_destroy(ZBX_MUTEX *mutex);
 /*********************************************************/
 /*** PHP Semaphore functions using System V semaphores ***/
 /*********************************************************/
+
+#define PHP_MUTEX_OK	1
+#define PHP_MUTEX_ERROR	0
 
 typedef struct
 {
