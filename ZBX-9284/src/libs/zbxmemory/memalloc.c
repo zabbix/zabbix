@@ -91,8 +91,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#define LOCK_INFO	if (1 == info->use_lock) zbx_mutex_lock(&info->mem_lock)
-#define UNLOCK_INFO	if (1 == info->use_lock) zbx_mutex_unlock(&info->mem_lock)
+#define LOCK_INFO	if (info->use_lock) zbx_mutex_lock(&info->mem_lock)
+#define UNLOCK_INFO	if (info->use_lock) zbx_mutex_unlock(&info->mem_lock)
 
 static void	*ALIGN4(void *ptr);
 static void	*ALIGN8(void *ptr);
@@ -637,7 +637,7 @@ void	zbx_mem_destroy(zbx_mem_info_t *info)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() descr:'%s'", __function_name, info->mem_descr);
 
-	if (1 == info->use_lock)
+	if (info->use_lock)
 		zbx_mutex_destroy(&info->mem_lock);
 
 	if (-1 == shmctl(info->shm_id, IPC_RMID, 0))
