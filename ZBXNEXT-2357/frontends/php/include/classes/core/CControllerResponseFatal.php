@@ -20,13 +20,7 @@
 
 class CControllerResponseFatal extends CControllerResponse {
 
-	private $location;
 	private $messages = array();
-
-	public function __construct() {
-		$this->location = ZBX_DEFAULT_URL;
-		$this->messageError = 'Fatal error, please report to Zabbix Team';
-	}
 
 	public function getLocation() {
 		return $this->location;

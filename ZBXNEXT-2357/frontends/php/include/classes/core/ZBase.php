@@ -456,7 +456,7 @@ class ZBase {
 		// Controller returned fatal error
 		else if ($response instanceof CControllerResponseFatal) {
 			header('Content-Type: text/html; charset=UTF-8');
-			$response->addMessage('Fatal error in controller:'.$router->getAction());
+			$response->addMessage('Fatal error in controller: '.$router->getAction());
 			$_SESSION['messages'] = $response->getMessages();
 			redirect('zabbix.php?action=system.warning');
 		}
