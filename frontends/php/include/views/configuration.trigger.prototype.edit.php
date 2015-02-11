@@ -253,11 +253,17 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 	}
 	array_pop($hostNames);
 
-	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 		$description = new CLink(
 			array($hostNames, NAME_DELIMITER, CHtml::encode($dependency['description'])),
-			'trigger_prototypes.php?form=update'.url_param('parent_discoveryid').
-				'&triggerid='.$dependency['triggerid']
+			'trigger_prototypes.php?form=update'.url_param('parent_discoveryid').'&triggerid='.$dependency['triggerid']
+		);
+		$description->setAttribute('target', '_blank');
+	}
+	elseif ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+		$description = new CLink(
+			array($hostNames, NAME_DELIMITER, CHtml::encode($dependency['description'])),
+			'triggers.php?form=update&triggerid='.$dependency['triggerid']
 		);
 		$description->setAttribute('target', '_blank');
 	}
@@ -273,21 +279,19 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 	$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
 	$dependenciesTable->addRow($row);
 }
-$dependenciesFormList->addRow(
-	_('Dependencies'),
+
+$addButton = new CButton('add_deptrigger', _('Add'), 'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid'.
+		'&reference=deptrigger&multiselect=1&with_triggers=1&normal_only=1", 1000, 700);',
+	'link_menu'
+);
+$addPrototypeButton = new CButton('add_depprototrigger', _('Add prototype'),
+	'return PopUp("popup.php?srctbl=trigger_prototypes&srcfld1=triggerid&reference=deptrigger'.
+		'&multiselect=1", 1000, 700);',
+	'link_menu'
+);
+$dependenciesFormList->addRow(_('Dependencies'),
 	new CDiv(
-		array(
-			$dependenciesTable,
-			new CButton('bnt1', _('Add'),
-				'return PopUp("popup.php?'.
-					'srctbl=triggers'.
-					'&srcfld1=triggerid'.
-					'&reference=deptrigger'.
-					'&multiselect=1'.
-					'&with_triggers=1", 1000, 700);',
-				'link_menu'
-			)
-		),
+		array($dependenciesTable, $addButton, SPACE, SPACE, SPACE, $addPrototypeButton),
 		'objectgroup inlineblock border_dotted ui-corner-all'
 	)
 );
