@@ -102,7 +102,7 @@ class CRouter {
 	 * @return string
 	 */
 	public function calculateRoute() {
-		if (isset($this->routes[$this->action]))
+		if (array_key_exists($this->action, $this->routes))
 		{
 			$this->controller = $this->routes[$this->action][0];
 			$this->layout = $this->routes[$this->action][1];
