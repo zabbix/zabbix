@@ -861,7 +861,7 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->data_type = atoi(row[14]);
 }
 
-const ZBX_TABLE *DBget_table(const char *tablename)
+const ZBX_TABLE	*DBget_table(const char *tablename)
 {
 	int	t;
 
@@ -874,7 +874,7 @@ const ZBX_TABLE *DBget_table(const char *tablename)
 	return NULL;
 }
 
-const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
+const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname)
 {
 	int	f;
 
