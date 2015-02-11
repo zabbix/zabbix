@@ -297,25 +297,18 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 channel_close:
 	/* close an active data channel */
 	exitcode = 127;
-	while (0 != (rc = libssh2_channel_close(channel)))
-	{
-		switch (rc)
-		{
-			case LIBSSH2_ERROR_EAGAIN:
-				waitsocket(s.socket, session);
-				continue;
-			default:
-				libssh2_session_last_error(session, &ssherr, NULL, 0);
-				zabbix_log(LOG_LEVEL_WARNING, "%s() cannot close generic session channel: %s",
-						__function_name, ssherr);
-				break;
-		}
-	}
+	while (LIBSSH2_ERROR_EAGAIN == (rc = libssh2_channel_close(channel)))
+		waitsocket(s.socket, session);
 
-	if (0 == rc)
+	if (0 != rc)
+	{
+		libssh2_session_last_error(session, &ssherr, NULL, 0);
+		zabbix_log(LOG_LEVEL_WARNING, "%s() cannot close generic session channel: %s", __function_name, ssherr);
+	}
+	else
 		exitcode = libssh2_channel_get_exit_status(channel);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() exitcode: %d bytecount: %d",
-			__function_name, exitcode, bytecount);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() exitcode:%d bytecount:%d", __function_name, exitcode, bytecount);
 
 	libssh2_channel_free(channel);
 	channel = NULL;

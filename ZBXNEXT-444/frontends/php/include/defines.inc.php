@@ -932,7 +932,7 @@ define('WIDGET_WEB_OVERVIEW',		'webovr');
 define('WIDGET_ZABBIX_STATUS',		'stszbx');
 
 // validation
-define('DB_ID',		"({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
+define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");
 define('NOT_EMPTY',	"({}!='')&&");
 define('NOT_ZERO',	"({}!=0)&&");
 
