@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-05 21:38+0200\n"
+"POT-Creation-Date: 2015-02-11 23:40+0200\n"
 "PO-Revision-Date: 2015-01-19 20:32+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -32,7 +32,7 @@ msgstr[0] "%1$d dzień"
 msgstr[1] "%1$d dni"
 msgstr[2] "%1$d dni"
 
-#: include/blocks.inc.php:1146
+#: include/blocks.inc.php:1149
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
@@ -150,7 +150,7 @@ msgstr "(brak proxy)"
 msgid "(with warnings)"
 msgstr "(z ostrzeżeniami)"
 
-#: include/blocks.inc.php:1348
+#: include/blocks.inc.php:1351
 msgid "-"
 msgstr "-"
 
@@ -158,11 +158,11 @@ msgstr "-"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[POTWIERDZENIE ZBIOROWE]----"
 
-#: include/triggers.inc.php:2105 include/triggers.inc.php:2106
-#: include/triggers.inc.php:2107 include/triggers.inc.php:2109
-#: include/triggers.inc.php:2111 include/triggers.inc.php:2114
-#: include/triggers.inc.php:2118 include/triggers.inc.php:2119
-#: include/triggers.inc.php:2131
+#: include/triggers.inc.php:2086 include/triggers.inc.php:2087
+#: include/triggers.inc.php:2088 include/triggers.inc.php:2090
+#: include/triggers.inc.php:2092 include/triggers.inc.php:2095
+#: include/triggers.inc.php:2099 include/triggers.inc.php:2100
+#: include/triggers.inc.php:2112
 msgid "0 or 1"
 msgstr "0 lub 1"
 
@@ -263,13 +263,13 @@ msgid "Account is blocked for %s seconds"
 msgstr "Konto zostało zablokowane na %s sekund"
 
 #: events.php:476 include/actions.inc.php:186 include/actions.inc.php:374
-#: include/blocks.inc.php:1026 include/blocks.inc.php:1321
+#: include/blocks.inc.php:1029 include/blocks.inc.php:1324
 #: include/events.inc.php:197 include/events.inc.php:272
 #: include/views/configuration.action.edit.php:1080
 msgid "Ack"
 msgstr "Potwierdzone"
 
-#: acknow.php:233 jsLoader.php:181 tr_status.php:678
+#: acknow.php:233 jsLoader.php:181 tr_status.php:654
 msgid "Acknowledge"
 msgstr "Potwierdzenie"
 
@@ -289,7 +289,7 @@ msgstr "Potwierdź i wróć"
 msgid "Acknowledge status"
 msgstr "Stan potwierdzenia"
 
-#: include/events.inc.php:182 tr_status.php:296 tr_status.php:689
+#: include/events.inc.php:182 tr_status.php:296 tr_status.php:665
 msgid "Acknowledged"
 msgstr "Potwierdzone"
 
@@ -397,7 +397,7 @@ msgstr "Operacje akcji"
 msgid "Action updated"
 msgstr "Zaktualizowano akcję"
 
-#: events.php:477 include/blocks.inc.php:1027 include/blocks.inc.php:1322
+#: events.php:477 include/blocks.inc.php:1030 include/blocks.inc.php:1325
 #: include/events.inc.php:198 include/menu.inc.php:185
 #: include/views/configuration.action.list.php:40
 msgid "Actions"
@@ -513,7 +513,7 @@ msgstr "Aktywne do"
 #: include/views/js/configuration.sysmaps.js.php:406
 #: include/views/monitoring.history.php:131 jsLoader.php:182
 #: popup_bitem.php:177 popup_media.php:145 popup_period.php:148
-#: tr_logform.php:262 tr_logform.php:356 tr_status.php:733
+#: tr_logform.php:262 tr_logform.php:356 tr_status.php:709
 msgid "Add"
 msgstr "Dodaj"
 
@@ -582,7 +582,7 @@ msgstr "Administracja"
 msgid "Advanced labels"
 msgstr "Zaawansowane etykiety"
 
-#: include/blocks.inc.php:1024 include/blocks.inc.php:1319
+#: include/blocks.inc.php:1027 include/blocks.inc.php:1322
 #: include/events.inc.php:196 include/events.inc.php:272
 #: include/events.inc.php:275 tr_status.php:294
 msgid "Age"
@@ -669,7 +669,7 @@ msgstr "Dopuszczalne hosty"
 msgid "Amount of memory size in bytes. If mode is missing total is used."
 msgstr "Ilość pamięci w bajtach. Jeżeli nie podano trybu, ilość ogółem."
 
-#: include/triggers.inc.php:1558
+#: include/triggers.inc.php:1539
 #: include/views/configuration.action.edit.php:127
 #: include/views/configuration.action.edit.php:1027
 #: include/views/configuration.host.discovery.edit.php:278
@@ -1078,7 +1078,7 @@ msgstr "Jaśniejsza"
 msgid "Bulgarian (bg_BG)"
 msgstr "Bułgarski (bg_BG)"
 
-#: tr_status.php:818
+#: tr_status.php:794
 msgid "Bulk acknowledge"
 msgstr "Potwierdzenie zbiorowe"
 
@@ -1459,7 +1459,7 @@ msgstr "Nie można dodać proxy"
 msgid "Cannot add regular expression"
 msgstr "Nie można dodać wyrażenia regularnego"
 
-#: screenconf.php:169
+#: screenconf.php:166
 msgid "Cannot add screen"
 msgstr "Nie można dodać ekranu"
 
@@ -1742,7 +1742,7 @@ msgstr[0] "Nie można usunąć wyrażenia regularnego"
 msgstr[1] "Nie można usunąć wyrażeń regularnych"
 msgstr[2] "Nie można usunąć wyrażeń regularnych"
 
-#: screenconf.php:240
+#: screenconf.php:237
 msgid "Cannot delete screen"
 msgstr "Nie można usunąć ekranu"
 
@@ -2608,7 +2608,7 @@ msgstr "Nie można zaktualizować proxy na wykrytym hoście \"%1$s\"."
 msgid "Cannot update regular expression"
 msgstr "Nie można zaktualizować wyrażenia regularnego"
 
-#: screenconf.php:134 screenedit.php:231 screenedit.php:248
+#: screenconf.php:131 screenedit.php:231 screenedit.php:248
 msgid "Cannot update screen"
 msgstr "Nie można zaktualizować ekranu"
 
@@ -2683,11 +2683,11 @@ msgstr "Podpis"
 msgid "Case sensitive"
 msgstr "Rozróżnianie wielkości liter"
 
-#: include/classes/items/CHelpItems.php:797
+#: include/classes/items/CHelpItems.php:809
 msgid "Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string."
 msgstr "Wyłapuje wszystkie pułapki SNMP z adresów zgodnych z wyrażeniem regularnym. Domyślnie wyrażenie jest puste."
 
-#: include/classes/items/CHelpItems.php:793
+#: include/classes/items/CHelpItems.php:805
 msgid "Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface."
 msgstr "Wyłapuje wszystkie pułapki SNMP, które nie zostały wyłapane przez żadną z pozycji snmptrap[] z adresów interfejsu."
 
@@ -2714,7 +2714,7 @@ msgid "Change password"
 msgstr "Zmień hasło"
 
 #: include/forms.inc.php:416 include/items.inc.php:125
-#: include/triggers.inc.php:2082 include/views/configuration.item.edit.php:216
+#: include/triggers.inc.php:2063 include/views/configuration.item.edit.php:216
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "Znak"
@@ -3023,7 +3023,7 @@ msgstr "Warunki"
 msgid "Configuration"
 msgstr "Konfiguracja"
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:879
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Statystyki cache'a konfiguracji. Cache - bufor (tryby: pfree, total, used, free)."
 
@@ -3677,7 +3677,7 @@ msgstr "Linia przerywana"
 msgid "Data"
 msgstr "Dane"
 
-#: include/classes/items/CHelpItems.php:903
+#: include/classes/items/CHelpItems.php:915
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Statystyki cache'a danych. Cache - jedna z wartości (tryby: all, float, uint, str, log, text), historia (tryby: pfree, total, used, free), trend (tryby: pfree, total, used, free), tekst (tryby: pfree, total, used, free)."
 
@@ -4292,14 +4292,14 @@ msgstr "Zabroń"
 msgid "Dependencies"
 msgstr "Zależności"
 
-#: include/triggers.inc.php:1251 tr_status.php:577
+#: include/triggers.inc.php:1232 tr_status.php:558
 msgid "Dependent"
 msgstr "Zależny"
 
-#: include/triggers.inc.php:1231
+#: include/triggers.inc.php:1212
 #: include/views/configuration.services.edit.php:121
 #: include/views/configuration.triggers.list.php:125 popup.php:1034
-#: tr_status.php:561
+#: tr_status.php:542
 msgid "Depends on"
 msgstr "Zależy od"
 
@@ -4524,7 +4524,7 @@ msgstr "Wyłączyć wybrane scenariusze sieci www?"
 #: auditlogs.php:144 dashboard.php:295 include/discovery.inc.php:121
 #: include/html.inc.php:341 include/httptest.inc.php:46
 #: include/items.inc.php:155 include/items.inc.php:209
-#: include/triggers.inc.php:1502 include/triggers.inc.php:2340
+#: include/triggers.inc.php:1483 include/triggers.inc.php:2308
 #: include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:100
 #: include/views/administration.usergroups.list.php:58
@@ -4601,7 +4601,7 @@ msgid "Discovery object"
 msgstr "Obiekt wykrywania"
 
 #: include/actions.inc.php:68 include/audit.inc.php:43
-#: include/blocks.inc.php:1278 include/forms.inc.php:1094
+#: include/blocks.inc.php:1281 include/forms.inc.php:1094
 #: include/views/configuration.discovery.edit.php:80
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
@@ -4721,7 +4721,7 @@ msgstr "Zrobione"
 msgid "Dot"
 msgstr "Kropka"
 
-#: include/blocks.inc.php:1280
+#: include/blocks.inc.php:1283
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr "Nie działa"
@@ -5151,7 +5151,7 @@ msgstr "Włączyć wybrane scenariusze sieci www?"
 #: auditlogs.php:141 dashboard.php:295 include/discovery.inc.php:120
 #: include/html.inc.php:337 include/httptest.inc.php:45
 #: include/items.inc.php:154 include/items.inc.php:206
-#: include/triggers.inc.php:2337
+#: include/triggers.inc.php:2305
 #: include/views/administration.mediatypes.edit.php:95
 #: include/views/administration.mediatypes.list.php:99
 #: include/views/administration.usergroups.edit.php:64
@@ -5233,7 +5233,7 @@ msgstr "Potwierdzanie zdarzeń wyłączone"
 msgid "Event details"
 msgstr "Szczegóły zdarzenia"
 
-#: include/triggers.inc.php:1500
+#: include/triggers.inc.php:1481
 msgid "Event generation"
 msgstr "Generowanie zdarzeń"
 
@@ -5344,7 +5344,7 @@ msgstr ""
 msgid "Export to CSV"
 msgstr "Eksportuj do pliku CSV"
 
-#: include/triggers.inc.php:1497
+#: include/triggers.inc.php:1478
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.regularexpressions.edit.php:67
 #: include/views/administration.general.regularexpressions.edit.php:76
@@ -5419,7 +5419,7 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "Niepowodzenie"
 
-#: include/actions.inc.php:1382 include/blocks.inc.php:1191
+#: include/actions.inc.php:1382 include/blocks.inc.php:1194
 msgid "Failed"
 msgstr "Niepowodzenie"
 
@@ -5754,7 +5754,7 @@ msgstr "Uzyskaj pomoc"
 msgid "Get timing of loading full web page. Default path is /"
 msgstr "Pobierz czas ładowania pełnej strony www. Domyślna ścieżka to /"
 
-#: include/triggers.inc.php:1633 tr_testexpr.php:35
+#: include/triggers.inc.php:1614 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr "Podane wyrażenie nie jest makrem"
 
@@ -6268,15 +6268,15 @@ msgstr "Ułożenie poziome"
 #: httpconf.php:318 httpconf.php:376 httpconf.php:427 httpmon.php:78
 #: httpmon.php:91 include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:691 include/blocks.inc.php:746
-#: include/blocks.inc.php:1011 include/blocks.inc.php:1021
-#: include/blocks.inc.php:1317 include/classes/api/services/CHttpTest.php:417
+#: include/blocks.inc.php:1014 include/blocks.inc.php:1024
+#: include/blocks.inc.php:1320 include/classes/api/services/CHttpTest.php:417
 #: include/classes/screens/CScreenEvents.php:40
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
 #: include/classes/setup/CSetupWizard.php:365 include/forms.inc.php:543
 #: include/html.inc.php:348 include/maps.inc.php:24
-#: include/triggers.inc.php:1120 include/triggers.inc.php:1488
+#: include/triggers.inc.php:1121 include/triggers.inc.php:1469
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:58
 #: include/views/configuration.graph.list.php:54
@@ -6371,7 +6371,7 @@ msgstr[2] "Włączono hosty"
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:287 include/blocks.inc.php:475
-#: include/blocks.inc.php:1189 include/forms.inc.php:500
+#: include/blocks.inc.php:1192 include/forms.inc.php:500
 #: include/maps.inc.php:25 include/views/administration.script.edit.php:83
 #: include/views/administration.script.list.php:43
 #: include/views/configuration.hostgroups.edit.php:67
@@ -7410,7 +7410,7 @@ msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s
 msgstr "Błędna wartość podążaj za dowiązaniami dla kroku \"%1$s\" scenariusza sieci www \"%2$s\"."
 
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1634 tr_testexpr.php:36
+#: include/triggers.inc.php:1615 tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "Wykorzystano błędną funkcję"
 
@@ -7877,8 +7877,8 @@ msgstr "Błędna pozycja minimalna y dla wykresu \"%1$s\"."
 msgid "Indonesian (id_ID)"
 msgstr "Indonezyjski (id_ID)"
 
-#: include/actions.inc.php:1128 include/blocks.inc.php:1025
-#: include/blocks.inc.php:1320 include/classes/html/CFormList.php:72
+#: include/actions.inc.php:1128 include/blocks.inc.php:1028
+#: include/blocks.inc.php:1323 include/classes/html/CFormList.php:72
 #: include/classes/screens/CScreenActions.php:134
 #: include/views/administration.auditacts.list.php:77
 #: include/views/configuration.host.discovery.list.php:55
@@ -8145,8 +8145,8 @@ msgstr "Tryb inwentarzowy"
 msgid "Is online?"
 msgstr "Czy jest zalogowany?"
 
-#: include/blocks.inc.php:1013 include/blocks.inc.php:1022
-#: include/blocks.inc.php:1318
+#: include/blocks.inc.php:1016 include/blocks.inc.php:1025
+#: include/blocks.inc.php:1321
 msgid "Issue"
 msgstr "Problem"
 
@@ -8624,7 +8624,7 @@ msgstr "Ostatnie 365 dni"
 msgid "Last 7 days"
 msgstr "Ostatnie 7 dni"
 
-#: include/blocks.inc.php:1023 tr_status.php:293
+#: include/blocks.inc.php:1026 tr_status.php:293
 msgid "Last change"
 msgstr "Ostatnia zmiana"
 
@@ -8827,7 +8827,7 @@ msgid "Location longitude"
 msgstr "Wysokość geograficzna"
 
 #: include/forms.inc.php:417 include/items.inc.php:127
-#: include/triggers.inc.php:2083 include/views/configuration.item.edit.php:217
+#: include/triggers.inc.php:2064 include/views/configuration.item.edit.php:217
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "Log"
@@ -9069,11 +9069,11 @@ msgstr "Typ utrzymania"
 msgid "Maintenance updated"
 msgstr "Zaktualizowano utrzymanie"
 
-#: include/blocks.inc.php:1054 tr_status.php:627
+#: include/blocks.inc.php:1057 tr_status.php:606
 msgid "Maintenance with data collection"
 msgstr "Utrzymanie ze zbieraniem danych"
 
-#: include/blocks.inc.php:1053 tr_status.php:626
+#: include/blocks.inc.php:1056 tr_status.php:605
 msgid "Maintenance without data collection"
 msgstr "Utrzymanie bez zbierania danych"
 
@@ -9584,7 +9584,7 @@ msgstr "Najbardziej zajęte wyzwalacze top 100"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1501
+#: include/triggers.inc.php:1482
 msgid "Multiple PROBLEM events"
 msgstr "Wielokrotne zdarzenia typu PROBLEM"
 
@@ -9808,8 +9808,8 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr "Dalej"
 
-#: events.php:811 include/events.inc.php:355 include/events.inc.php:373
-#: include/func.inc.php:1993 include/triggers.inc.php:1503
+#: events.php:798 include/events.inc.php:355 include/events.inc.php:373
+#: include/func.inc.php:1993 include/triggers.inc.php:1484
 #: include/views/administration.users.list.php:76
 #: include/views/administration.users.list.php:79
 #: include/views/configuration.httpconf.list.php:122
@@ -10034,11 +10034,11 @@ msgstr "nie znaleziono reguł wykrywania."
 msgid "No errors found."
 msgstr "Nie znaleziono błędów."
 
-#: include/blocks.inc.php:1099 include/blocks.inc.php:1339 tr_status.php:699
+#: include/blocks.inc.php:1102 include/blocks.inc.php:1342 tr_status.php:675
 msgid "No events"
 msgstr "Brak zdarzeń"
 
-#: events.php:405 include/blocks.inc.php:1019
+#: events.php:405 include/blocks.inc.php:1022
 #: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:191
 msgid "No events found."
 msgstr "Nie znaleziono zdarzeń."
@@ -10529,7 +10529,7 @@ msgstr "Brak wyzwalacza z triggerid \"%1$s\"."
 msgid "No triggers defined."
 msgstr "Nie zdefiniowano żadnych wyzwalaczy."
 
-#: include/triggers.inc.php:1083
+#: include/triggers.inc.php:1084
 #: include/views/configuration.triggers.list.php:68
 #: include/views/monitoring.overview.triggers.php:115
 #: include/views/reports.toptriggers.php:156 popup.php:971 report2.php:391
@@ -10557,7 +10557,7 @@ msgstr "Nie znaleziono map wartości."
 msgid "No values found."
 msgstr "Nie znaleziono wartości."
 
-#: httpmon.php:89 include/blocks.inc.php:1187
+#: httpmon.php:89 include/blocks.inc.php:1190
 #: include/views/configuration.httpconf.list.php:58
 msgid "No web scenarios found."
 msgstr "Nie znaleziono scenariuszy sieci www."
@@ -10572,7 +10572,7 @@ msgid "None"
 msgstr "Brak"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1500 include/views/monitoring.history.php:242
+#: include/triggers.inc.php:1481 include/views/monitoring.history.php:242
 #: popup.php:1376
 msgid "Normal"
 msgstr "Normalny"
@@ -10682,19 +10682,19 @@ msgstr "Liczba węzłów inode dla wolumenu. Jeżeli mode jest puste zostanie u�
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Liczba pozycji (włączonych/wyłączonych/niewspieranych)"
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:851
 msgid "Number of items in Zabbix database."
 msgstr "Liczba pozycji w bazie danych Zabbix."
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:871
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Liczba pozycji w historii proxy, które jeszcze nie zostały wysłane do serwera"
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:875
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Liczba pozycji kolejki, które zostały opóźnione od \"od\" do \"do\" sekund włącznie."
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:847
 msgid "Number of monitored hosts"
 msgstr "Liczba monitorowanych hostów"
 
@@ -10711,7 +10711,7 @@ msgstr "Liczba rdzeni procesora dla hipernadzorcy VMware, <url> - URL usługi VM
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Liczba wątków procesora hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
-#: include/classes/items/CHelpItems.php:707
+#: include/classes/items/CHelpItems.php:711
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Liczba procesorów maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
@@ -10759,11 +10759,11 @@ msgstr "Liczba prawidłowo odebranych wartości V (zgodnych z operatorem O) dla 
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Liczba wyzwalaczy (włączonych/wyłączonych [problem/ok])"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:895
 msgid "Number of triggers in Zabbix database."
 msgstr "Liczba wyzwalaczy w bazie danych Zabbix."
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:855
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Liczba niewspieranych pozycji w bazie danych Zabbix."
 
@@ -10776,47 +10776,47 @@ msgstr "Liczba użytkowników (zalogowanych)"
 msgid "Number of users connected. Command who is used on agent side."
 msgstr "Liczba podłączonych użytkowników. Po stronie agenta używana jest komenda who."
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:819
 msgid "Number of values stored in table HISTORY."
 msgstr "Liczba wartości zapisanych w tabeli HISTORY."
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:823
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Liczba wartości zapisanych w tabeli HISTORY_LOG."
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:827
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Liczba wartości zapisanych w tabeli HISTORY_STR."
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:831
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Liczba wartości zapisanych w tabeli HISTORY_TEXT."
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:835
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Liczba wartości zapisanych w tabeli HISTORYUINT."
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:887
 msgid "Number of values stored in table TRENDS."
 msgstr "Liczba wartości zapisanych w tabeli TRENDS."
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:891
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Liczba wartości zapisanych w tabeli TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:699
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Liczba maszyn wirtualnych hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
 #: include/forms.inc.php:415 include/items.inc.php:123
-#: include/triggers.inc.php:2081 include/views/configuration.item.edit.php:215
+#: include/triggers.inc.php:2062 include/views/configuration.item.edit.php:215
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "Numerycznie (zmiennoprzecinkowo)"
 
-#: include/triggers.inc.php:2080 include/triggers.inc.php:2096
-#: include/triggers.inc.php:2100 include/triggers.inc.php:2110
-#: include/triggers.inc.php:2115 include/triggers.inc.php:2120
+#: include/triggers.inc.php:2061 include/triggers.inc.php:2077
+#: include/triggers.inc.php:2081 include/triggers.inc.php:2091
+#: include/triggers.inc.php:2096 include/triggers.inc.php:2101
 msgid "Numeric (integer 64bit)"
 msgstr "Numerycznie (liczba całkowita 64bitowa)"
 
@@ -10901,7 +10901,7 @@ msgstr "Październik"
 msgid "Off"
 msgstr "Wyłączone"
 
-#: include/actions.inc.php:1379 include/blocks.inc.php:1190
+#: include/actions.inc.php:1379 include/blocks.inc.php:1193
 #: include/classes/html/CTriggersInfo.php:115
 #: include/views/administration.users.list.php:85 report2.php:396
 #: report3.php:83
@@ -11065,7 +11065,7 @@ msgstr "Operacje"
 msgid "Operator"
 msgstr "Operator"
 
-#: include/triggers.inc.php:1558
+#: include/triggers.inc.php:1539
 #: include/views/configuration.action.edit.php:128
 #: include/views/configuration.action.edit.php:1028
 #: include/views/configuration.host.discovery.edit.php:279
@@ -12143,7 +12143,7 @@ msgstr "Wymagane są uprawnienia do hosta"
 msgid "Required performance (vps)"
 msgstr "Wymagana wydajność (vps)"
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:883
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Wymagana wydajność serwera Zabbix, podana w nowych wartościach na sekundę."
 
@@ -12257,7 +12257,7 @@ msgstr "Odtwórz tylko nagłówki"
 msgid "Retry"
 msgstr "Ponów"
 
-#: include/classes/items/CHelpItems.php:909
+#: include/classes/items/CHelpItems.php:921
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Zwraca pierwszą kolumnę pierwszego wiersza wyniku zapytania SQL."
 
@@ -12265,11 +12265,11 @@ msgstr "Zwraca pierwszą kolumnę pierwszego wiersza wyniku zapytania SQL."
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Zwraca czas odpowiedzi na ping ICMP w sekundach. Przykład: 0.02"
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:843
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Zwraca dostępność określonych typów kontroli na hoście. Wartość tej pozycji odpowiada ikonom dostępności na liście hostów. Poprawne typy to: agent, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:839
 msgid "Returns current maintenance status of the host."
 msgstr "Zwraca bieżący stan utrzymania dla hosta."
 
@@ -12283,7 +12283,7 @@ msgstr "Zwraca szczegółowe informacje o hoście. Ciąg znaków"
 msgid "Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com"
 msgstr "Zwraca nazwę hosta (lub nazwę NetBIOS (domyślną) w Windows). Ciąg znaków. Przykład zwracanej wartości: www.zabbix.com"
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:859
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Zwraca informacje związane z bramą Java Zabbixa. Poprawne parametry to: ping, version."
 
@@ -12653,7 +12653,7 @@ msgstr "Pominięto ekran \"%1$s\" - reguła użytkownika."
 msgid "Screen \"%1$s\" updated."
 msgstr "Zaktualizowano ekran \"%1$s\"."
 
-#: screenconf.php:168
+#: screenconf.php:165
 msgid "Screen added"
 msgstr "Dodano ekran"
 
@@ -12661,7 +12661,7 @@ msgstr "Dodano ekran"
 msgid "Screen cell configuration"
 msgstr "Konfiguracja komórki ekranu"
 
-#: screenconf.php:240
+#: screenconf.php:237
 msgid "Screen deleted"
 msgstr "Usunięto ekran"
 
@@ -12669,7 +12669,7 @@ msgstr "Usunięto ekran"
 msgid "Screen should contain at least one row and column."
 msgstr "Ekran powinien zawierać przynajmniej jeden wiersz i kolumnę."
 
-#: screenconf.php:133 screenedit.php:231 screenedit.php:248
+#: screenconf.php:130 screenedit.php:231 screenedit.php:248
 msgid "Screen updated"
 msgstr "Zaktualizowano ekran"
 
@@ -13031,7 +13031,7 @@ msgstr "Sesja zakończona, proszę zalogować się ponownie."
 
 #: events.php:474 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:150
-#: include/triggers.inc.php:1495 include/views/configuration.item.list.php:148
+#: include/triggers.inc.php:1476 include/views/configuration.item.list.php:148
 #: include/views/configuration.trigger.prototype.list.php:60
 #: include/views/configuration.triggers.edit.php:253
 #: include/views/configuration.triggers.list.php:71
@@ -13051,7 +13051,7 @@ msgstr "Poziom (malejąco)"
 #: include/reports.inc.php:440
 #: include/views/configuration.application.list.php:60
 #: include/views/js/configuration.sysmaps.js.php:26 report2.php:419
-#: tr_status.php:733 tr_status.php:738
+#: tr_status.php:709 tr_status.php:714
 msgid "Show"
 msgstr "Wyświetl"
 
@@ -13383,7 +13383,7 @@ msgstr "Podstawowe pozycje"
 msgid "Start in"
 msgstr "Uruchom w"
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:815
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Czas startu serwera Zabbix. Znacznik czasu Unix (timestamp)."
 
@@ -13828,7 +13828,7 @@ msgid "Test string"
 msgstr "Testowy ciąg znaków"
 
 #: include/forms.inc.php:418 include/items.inc.php:129
-#: include/triggers.inc.php:2084 include/views/configuration.item.edit.php:218
+#: include/triggers.inc.php:2065 include/views/configuration.item.edit.php:218
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "Tekst"
@@ -13970,7 +13970,7 @@ msgstr "Do"
 #: events.php:454 events.php:470 include/acknow.inc.php:49
 #: include/actions.inc.php:1122 include/actions.inc.php:1145
 #: include/actions.inc.php:1218 include/actions.inc.php:1236
-#: include/blocks.inc.php:1015 include/classes/screens/CScreenActions.php:32
+#: include/blocks.inc.php:1018 include/classes/screens/CScreenActions.php:32
 #: include/classes/screens/CScreenActions.php:38
 #: include/classes/screens/CScreenActions.php:44
 #: include/classes/screens/CScreenActions.php:128
@@ -13996,11 +13996,11 @@ msgstr "Czas (rosnąco)"
 msgid "Time (descending)"
 msgstr "Czas (malejąco)"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:863
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage."
 msgstr "Czas, jaki konkretny proces lub grupa procesów Zabbix (identyfikowany przez <type> i <num>) spędza w stanie <state> w procentach."
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:867
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr "Czas ostatniego dostępu do proxy. Name - nazwa proxy. Param - ostatni dostęp. Znacznik czasu Unix (timestamp)."
 
@@ -14093,7 +14093,7 @@ msgstr "Czas ogółem: %s"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Transakcja nie została zamknięta. Przerywanie..."
 
-#: include/classes/items/CHelpItems.php:913
+#: include/classes/items/CHelpItems.php:925
 msgid "Transform SQL query result into a JSON object for low-level discovery."
 msgstr "Przekształca rezultat zapytania SQL na obiekt JSON dla niskopoziomowych reguł wykrywania."
 
@@ -14129,7 +14129,7 @@ msgstr "Trendy"
 
 #: events.php:332 events.php:374 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:486
-#: include/maps.inc.php:26 include/triggers.inc.php:1492
+#: include/maps.inc.php:26 include/triggers.inc.php:1473
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:73
 #: include/views/configuration.services.edit.php:96
@@ -14350,7 +14350,7 @@ msgid "Trigger value"
 msgstr "Wartość wyzwalacza"
 
 #: include/forms.inc.php:587 include/html.inc.php:415 include/html.inc.php:419
-#: include/menu.inc.php:51 include/triggers.inc.php:1095
+#: include/menu.inc.php:51 include/triggers.inc.php:1096
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:48
 #: include/views/configuration.host.edit.php:536
@@ -14625,7 +14625,7 @@ msgstr "Jednostki"
 #: include/actions.inc.php:41 include/actions.inc.php:96
 #: include/actions.inc.php:113 include/actions.inc.php:149
 #: include/actions.inc.php:928 include/actions.inc.php:1474
-#: include/blocks.inc.php:1192 include/classes/html/CHostsInfo.php:120
+#: include/blocks.inc.php:1195 include/classes/html/CHostsInfo.php:120
 #: include/discovery.inc.php:131 include/discovery.inc.php:168
 #: include/events.inc.php:47 include/events.inc.php:78
 #: include/graphs.inc.php:37 include/graphs.inc.php:67
@@ -14639,7 +14639,7 @@ msgstr "Jednostki"
 #: include/perm.inc.php:53 include/regexp.inc.php:221
 #: include/screens.inc.php:57 include/triggers.inc.php:66
 #: include/triggers.inc.php:179 include/triggers.inc.php:198
-#: include/triggers.inc.php:2337 include/triggers.inc.php:2343
+#: include/triggers.inc.php:2305 include/triggers.inc.php:2311
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:196
 msgid "Unknown"
@@ -14658,11 +14658,11 @@ msgstr "Nieznany błąd"
 msgid "Unknown function."
 msgstr "Nieznana funkcja."
 
-#: include/triggers.inc.php:1632 popup_trexpr.php:651 tr_testexpr.php:34
+#: include/triggers.inc.php:1613 popup_trexpr.php:651 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "Nieznana pozycja hosta, taka pozycja nie istnieje na wybranym hoście"
 
-#: include/triggers.inc.php:1631 tr_testexpr.php:33
+#: include/triggers.inc.php:1612 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr "Nieznany host, taki host nie istnieje w systemie"
 
@@ -14802,7 +14802,7 @@ msgstr "Niewspierany parametr \"%2$s\" dla filtra akcji \"%1$s\"."
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
 msgstr "Niewspierany parametr \"%2$s\" dla filtra reguły wykrywania \"%1$s\"."
 
-#: include/blocks.inc.php:1279
+#: include/blocks.inc.php:1282
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr "Działa"
@@ -14893,8 +14893,8 @@ msgid "Updated status of host"
 msgstr "Zaktualizowano stan hosta"
 
 #: include/blocks.inc.php:464 include/blocks.inc.php:814
-#: include/blocks.inc.php:886 include/blocks.inc.php:1143
-#: include/blocks.inc.php:1245 include/blocks.inc.php:1295
+#: include/blocks.inc.php:886 include/blocks.inc.php:1146
+#: include/blocks.inc.php:1248 include/blocks.inc.php:1298
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, c-format
 msgid "Updated: %s"
@@ -14955,7 +14955,7 @@ msgstr "Mapy wyższego poziomu"
 msgid "Uptime"
 msgstr "Czas pracy"
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:899
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Czas działania serwera Zabbix w sekundach."
 
@@ -15178,7 +15178,7 @@ msgstr "Użytkownicy (zalogowani)"
 msgid "Users unblocked"
 msgstr "Odblokowano użytkowników"
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:911
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Statystyki cache'a VMware. Poprawne tryby to: total, free, pfree, used i pused."
 
@@ -15226,6 +15226,10 @@ msgstr "Statystyki wejścia sieci hipernadzorcy VMware, <url> - URL usługi VMwa
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Statystyki wyjścia sieci hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware, <mode> - bps"
 
+#: include/classes/items/CHelpItems.php:683
+msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Częstotliwość procesora hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
@@ -15238,7 +15242,7 @@ msgstr "Model procesora hipernadzorcy VMware, <url> - URL usługi VMware, <uuid>
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Użycie procesora hipernadzorcy VMware w Hz, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Stan hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
@@ -15246,7 +15250,7 @@ msgstr "Stan hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa ho
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Rozmiar ogółem pamięci hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Czas działania hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
@@ -15258,7 +15262,7 @@ msgstr "Rozmiar używanej pamięci hipernadzorcy VMware, <url> - URL usługi VMw
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nazwa dostawcy hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:695
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Wersja hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
@@ -15266,91 +15270,99 @@ msgstr "Wersja hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa 
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Pełna nazwa serwisu VMware, <url> - URL serwisu VMware"
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:703
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Wersja serwisu VMware, <url> - URL serwisu VMware"
 
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:727
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Rozmiar pamięci balonowej maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:775
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Używana przestrzeń danych maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:723
+#: include/classes/items/CHelpItems.php:731
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Rozmiar skompresowanej pamięci maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:779
+#: include/classes/items/CHelpItems.php:791
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Statystyki odczytu urządzeń dyskowych maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <instance> - instancja urządzenia dyskowego, <mode> - bps/ops - bajty/operacje na sekundę"
 
-#: include/classes/items/CHelpItems.php:783
+#: include/classes/items/CHelpItems.php:795
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Statystyki zapisu urządzeń dyskowych maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <instance> - instancja urządzenia dyskowego, <mode> - bps/ops - bajty/operacje na sekundę"
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Statystyki systemu plików maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <fsname> - nazwa systemu plików, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:747
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Użycie pamięci gościa maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:751
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Użycie pamięci hosta maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:723
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Nazwa hipernadzorcy maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:703
+#: include/classes/items/CHelpItems.php:707
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Nazwa maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:759
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Statystyki wejścia interfejsu sieciowego maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <instance> - instancja interfejsu sieciowego, <mode> - bps/pps - bajty/pakiety na sekundę"
 
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:763
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Statystyki wyjścia interfejsu sieciowego maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <instance> - instancja interfejsu sieciowego, <mode> - bps/pps - bajty/pakiety na sekundę"
 
-#: include/classes/items/CHelpItems.php:759
+#: include/classes/items/CHelpItems.php:767
+msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:771
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Stan zasilania maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:727
+#: include/classes/items/CHelpItems.php:735
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Rozmiar pamięci prywatnej maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:711
+#: include/classes/items/CHelpItems.php:715
+msgid "VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:719
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Użycie procesora maszyny wirtualnej VMware w Hz, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:731
+#: include/classes/items/CHelpItems.php:739
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Rozmiar pamięci współdzielonej maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:735
+#: include/classes/items/CHelpItems.php:743
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Rozmiar pamięci swapowanej maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:747
+#: include/classes/items/CHelpItems.php:755
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Rozmiar pamięci ogółem maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:767
+#: include/classes/items/CHelpItems.php:779
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Nieużywana przestrzeń danych maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:771
+#: include/classes/items/CHelpItems.php:783
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Niewspółdzielona przestrzeń danych maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
-#: include/classes/items/CHelpItems.php:775
+#: include/classes/items/CHelpItems.php:787
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Czas działania maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
@@ -15410,11 +15422,11 @@ msgstr "Wartość \"%2$s\" z \"%1$s\" ma zbyt dużo cyfr przed kropką: nie moż
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr "Wartość \"%2$s\" z \"%1$s\" jest zbyt długa: nie może być więcej cyfr niż %3$s przed kropką i więcej cyfr niż %4$s po kropce."
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:907
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Efektywność cache'a wartości. Prawidłowe parametry to: requests, hits i misses."
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:903
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Statystyki cache'a wartości. Poprawne tryby to: total, free, pfree, used i pused."
 
@@ -15903,10 +15915,10 @@ msgstr "Rok"
 msgid "Yearly"
 msgstr "Rocznie"
 
-#: events.php:811 include/blocks.inc.php:835
+#: events.php:798 include/blocks.inc.php:835
 #: include/classes/html/CServerInfo.php:32 include/events.inc.php:358
 #: include/events.inc.php:376 include/func.inc.php:1993
-#: include/triggers.inc.php:1503
+#: include/triggers.inc.php:1484
 #: include/views/administration.users.list.php:75
 #: include/views/configuration.httpconf.list.php:122
 #: include/views/js/adm.regexprs.edit.js.php:139
