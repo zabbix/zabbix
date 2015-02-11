@@ -358,7 +358,7 @@ typedef struct
 ZBX_DC_CONFIG;
 
 static ZBX_DC_CONFIG	*config = NULL;
-static ZBX_MUTEX	config_lock;
+static ZBX_MUTEX	config_lock = ZBX_MUTEX_NULL;
 static zbx_mem_info_t	*config_mem;
 
 extern unsigned char	daemon_type;
