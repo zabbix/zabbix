@@ -48,7 +48,7 @@ static int			shm_id;
 #define	LOCK_SM		zbx_mutex_lock(&sm_lock)
 #define	UNLOCK_SM	zbx_mutex_unlock(&sm_lock)
 
-static ZBX_MUTEX	sm_lock;
+static ZBX_MUTEX	sm_lock = ZBX_MUTEX_NULL;
 
 extern char	*CONFIG_FILE;
 extern int	CONFIG_POLLER_FORKS;

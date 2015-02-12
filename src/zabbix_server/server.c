@@ -204,7 +204,7 @@ char	**CONFIG_LOAD_MODULE		= NULL;
 int	CONFIG_SNMP_BULK_REQUESTS	= 1;
 
 /* mutex for node syncs */
-ZBX_MUTEX	node_sync_access;
+ZBX_MUTEX	node_sync_access = ZBX_MUTEX_NULL;
 
 /******************************************************************************
  *                                                                            *
