@@ -201,6 +201,7 @@ class ZBase {
 	private function getIncludePaths() {
 		return array(
 			$this->rootDir.'/include/classes/core',
+			$this->rootDir.'/include/classes/mvc',
 			$this->rootDir.'/include/classes/api',
 			$this->rootDir.'/include/classes/api/services',
 			$this->rootDir.'/include/classes/api/managers',
