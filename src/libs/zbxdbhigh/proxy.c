@@ -1879,7 +1879,8 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	}
 	zbx_history_data_t;
 
-	char				sql[144];
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
 	DB_RESULT			result;
 	DB_ROW				row;
 	static char			*string_buffer = NULL;
@@ -1903,7 +1904,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 
 	proxy_get_lastid("proxy_history", "history_lastid", &id);
 try_again:
-	zbx_snprintf(sql, sizeof(sql),
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select id,itemid,clock,ns,timestamp,source,severity,"
 				"value,logeventid,state,lastlogsize,mtime,meta"
 			" from proxy_history"
@@ -1912,6 +1913,8 @@ try_again:
 			id);
 
 	result = DBselectN(sql, records_lim);
+
+	zbx_free(sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
