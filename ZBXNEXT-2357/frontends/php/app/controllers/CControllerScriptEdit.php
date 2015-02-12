@@ -47,6 +47,10 @@ class CControllerScriptEdit extends CController {
 	}
 
 	protected function checkPermissions() {
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
 		if ($this->hasInput('scriptid')) {
 			return (bool) API::Script()->get(array(
 				'output' => array(),
@@ -54,9 +58,8 @@ class CControllerScriptEdit extends CController {
 				'editable' => true
 			));
 		}
-		else {
-			return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
-		}
+
+		return true;
 	}
 
 	protected function doAction() {

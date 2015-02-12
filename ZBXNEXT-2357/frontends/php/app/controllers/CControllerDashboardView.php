@@ -37,15 +37,15 @@ class CControllerDashboardView extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
 	protected function doAction() {
-		$rules = API::DRule()->get(array(
+		$show_discovery_widget = ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN && (bool) API::DRule()->get(array(
 			'output' => array(),
 			'filter' => array('status' => DRULE_STATUS_ACTIVE),
 			'limit' => 1
-		));
+		)));
 
 		$data = array(
 			'fullscreen' => $this->getInput('fullscreen', 0),
@@ -54,7 +54,7 @@ class CControllerDashboardView extends CController {
 			'favourite_maps' => getFavouriteMaps(),
 			'favourite_screens' => getFavouriteScreens(),
 			'show_status_widget' => ($this->getUserType() == USER_TYPE_SUPER_ADMIN),
-			'show_discovery_widget' => (bool) $rules
+			'show_discovery_widget' => $show_discovery_widget
 		);
 
 		$response = new CControllerResponseData($data);

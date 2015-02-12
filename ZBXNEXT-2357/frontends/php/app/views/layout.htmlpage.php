@@ -21,8 +21,8 @@
 require_once 'include/menu.inc.php';
 
 function local_generateHeader($data) {
-// Only needed for zbx_construct_menu;
-global $page;
+	// only needed for zbx_construct_menu
+	global $page;
 
 	header('Content-Type: text/html; charset=UTF-8');
 

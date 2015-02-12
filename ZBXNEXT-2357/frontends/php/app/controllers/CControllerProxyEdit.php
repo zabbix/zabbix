@@ -44,6 +44,10 @@ class CControllerProxyEdit extends CController {
 	}
 
 	protected function checkPermissions() {
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
 		if ($this->hasInput('proxyid')) {
 			return (bool) API::Proxy()->get(array(
 				'output' => array(),
@@ -51,9 +55,8 @@ class CControllerProxyEdit extends CController {
 				'editable' => true
 			));
 		}
-		else {
-			return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
-		}
+
+		return true;
 	}
 
 	protected function doAction() {

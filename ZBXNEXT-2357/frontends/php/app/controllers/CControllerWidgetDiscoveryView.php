@@ -27,7 +27,7 @@ class CControllerWidgetDiscoveryView extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN);
 	}
 
 	protected function doAction() {

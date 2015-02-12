@@ -57,6 +57,10 @@ class CControllerScriptUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
 		return (bool) API::Script()->get(array(
 			'output' => array(),
 			'scriptids' => $this->getInput('scriptid'),

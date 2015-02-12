@@ -40,6 +40,10 @@ class CControllerMapView extends CController {
 	}
 
 	protected function checkPermissions() {
+		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
+			return false;
+		}
+
 		$maps = API::Map()->get(array(
 			'output' => array('sysmapid', 'name'),
 			'preservekeys' => true
