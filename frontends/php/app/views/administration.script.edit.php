@@ -25,7 +25,7 @@ $scriptsWidget = new CWidget();
 $scriptsWidget->addPageHeader(_('CONFIGURATION OF SCRIPTS'));
 
 $scriptForm = new CForm();
-$scriptForm->setName('scripts');
+$scriptForm->setAttribute('id', 'scriptForm');
 $scriptForm->addVar('form', 1);
 $scriptForm->addVar('scriptid', $data['scriptid']);
 

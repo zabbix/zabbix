@@ -10,6 +10,7 @@
 				jQuery('#ip').closest('li').removeClass('hidden');
 			}
 		});
+
 		// clone button, special processing because of list of hosts
 		jQuery('#clone').click(function() {
 			var url = new Curl('zabbix.php?action=proxy.edit');
@@ -21,6 +22,15 @@
 			url.setArgument('useip', jQuery('input[name=useip]:checked').val());
 			url.setArgument('port', jQuery('#port').val());
 			redirect(url.getUrl(), 'post', 'action');
+		});
+
+		// trim spaces on sumbit
+		jQuery('#proxyForm').submit(function() {
+			jQuery('#host').val(jQuery.trim(jQuery('#host').val()));
+			jQuery('#ip').val(jQuery.trim(jQuery('#ip').val()));
+			jQuery('#dns').val(jQuery.trim(jQuery('#dns').val()));
+			jQuery('#port').val(jQuery.trim(jQuery('#port').val()));
+			jQuery('#description').val(jQuery.trim(jQuery('#description').val()));
 		});
 	});
 </script>
