@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+...GI..PS. [ZBXNEXT-444] improved log file monitoring by saving log file meta information which was previously lost during agent restart (dimir)
 ..F.....S. [ZBXNEXT-1128] added support of {HOST.*} and user macros in trigger URL (igors, Sasha)
 .......PS. [ZBXNEXT-2619] added an item for VMware virtual machine CPU ready state monitoring (wiper)
 ..F....... [ZBXNEXT-1493] changed activity dropdowns at the bottom of various pages to buttons (Oleg)
@@ -69,6 +70,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, K
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
+.......PS. [ZBX-591] added interface (SourceIP) for outgoing connection in web monitoring, alerts(Ez Texting), vmware monitoring and simple checks(https services) (igors)
 ...G...... [ZBX-9143] improved proc.num under Windows to handle more processes (dimir)
 ...G...... [ZBX-9232] fixed incomplete eventlog messages (igors)
 ..F....... [ZBX-9257] fixed displaying missing history links in trigger context menu (Ivo)
