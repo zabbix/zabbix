@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
 $groups = API::HostGroup()->get(array(
 	'output' => array('groupid', 'name'),
 	'groupids' => $data['filter']['groupids'],

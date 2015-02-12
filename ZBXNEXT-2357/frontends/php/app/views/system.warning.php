@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
 $pageHeader = new CPageHeader(_('Something wrong hapenned'));
 $pageHeader->addCssInit();
 $pageHeader->display();

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $this->includeJSfile('app/views/administration.mediatype.edit.js.php');
 
 $mediaTypeWidget = new CWidget();
