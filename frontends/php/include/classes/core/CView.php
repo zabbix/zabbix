@@ -201,7 +201,11 @@ class CView {
 	 * @return string Java Script code
 	 */
 	public function getPostJS() {
-		return implode("\n", $this->jsIncludePost);
+		if ($this->jsIncludePost) {
+			return get_js(implode("\n", $this->jsIncludePost));
+		}
+
+		return '';
 	}
 
 	/**
