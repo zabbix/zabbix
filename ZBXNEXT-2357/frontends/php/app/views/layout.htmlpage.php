@@ -35,7 +35,13 @@ function local_generateHeader($data) {
 	$pageHeader = new CView('layout.htmlpage.header', $data);
 	echo $pageHeader->getOutput();
 
-	$pageTop = new CView('layout.htmlpage.top', $data);
+	$pageTop = new CView('layout.htmlpage.top', array(
+		'fullscreen' => $data['fullscreen'],
+		'user' => array(
+			'debug_mode' => CWebUser::$data['debug_mode'],
+			'is_guest' => CWebUser::isGuest()
+		)
+	));
 	echo $pageTop->getOutput();
 
 	if ($data['fullscreen'] == 0) {
