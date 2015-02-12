@@ -30,6 +30,16 @@ body {
 	}
 }
 
+fieldset {
+	border: 1px solid #e9edf2;
+	padding: 0 10px 10px 15px;
+}
+
+legend {
+	margin-left: -5px;
+	padding: 0 5px 0 5px;
+}
+
 a {
 	text-decoration: none;
 	color: $link-color;
@@ -414,14 +424,16 @@ span.radio-switch {
 	line-height: 22px;
 	border: 1px solid $form-input-color;
 	text-decoration: none;
-	color: $font-color;
+	color: $link-color;
 	@include transition(background .2s ease);
 
 	&:hover {
+		color: $link-hover-color;
 		background: lighten($primary-color, 55%);
 	}
 
 	&:active {
+		color: $link-active-color;
 		background: lighten($primary-color, 50%);
 	}
 
@@ -514,6 +526,10 @@ div.form-btns {
 table.table-forms {
 	//margin: 0 auto;
 	width: 100%;
+
+	label {
+		color: $font-color;
+	}
 	
 	tfoot {
 
@@ -610,6 +626,20 @@ input {
 	}
 
 	&[type="search"] {
+		height: 22px;
+		line-height: 22px;
+		padding: 0 0 0 5px;
+		@extend %form-input-style;
+	}
+
+	&[type="number"] {
+		height: 22px;
+		line-height: 22px;
+		padding: 0 0 0 5px;
+		@extend %form-input-style;
+	}
+
+	&[type="email"] {
 		height: 22px;
 		line-height: 22px;
 		padding: 0 0 0 5px;
@@ -821,6 +851,7 @@ button {
     } 
 
 	&.btn-grey {
+		margin-top: -2px;
 		background: $form-transparent-color;
 		color: $font-color;
 		border-color: $form-input-color;
@@ -1124,7 +1155,7 @@ ul.dashbrd-widget-foot {
 } 
 
 /* Action Menus, Pop-up Menus */
-ul.action-menu {
+.action-menu {
 	position: absolute;
 	z-index: 1000;
 	padding: 7px 15px 7px 15px;
@@ -1156,7 +1187,6 @@ ul.action-menu {
 		display: block;
 		height: 24px;
 		line-height: 24px;
-		color: $font-color;
 		text-decoration: none;
 		padding: 0 15px 0 15px;
 		margin: 0 -15px 0 -15px;
@@ -1176,6 +1206,10 @@ ul.action-menu {
 			right: 10px;
 			top: 8px;
 		}
+	}
+
+	tfoot {
+		text-align: right;
 	}
 }
 
