@@ -114,11 +114,7 @@ local_generateHeader($data);
 local_showMessage();
 echo $data['javascript']['pre'];
 echo $data['main_block'];
-
-// Add post JS code
-if ($data['javascript']['post'] !== '') {
-	insert_js($data['javascript']['post'], true);
-}
+echo $data['javascript']['post'];
 
 local_generateFooter($data['fullscreen']);
 
