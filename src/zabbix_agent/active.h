@@ -65,16 +65,27 @@ extern int	CONFIG_LISTEN_PORT;
 #	endif
 #endif	/* _WINDOWS */
 
+/* NB! Next list must fit in unsigned char (see ZBX_ACTIVE_METRIC "flags" field below). */
+#define ZBX_METRIC_FLAG_PERSISTENT	0x01	/* do not overwrite old values when adding to the buffer */
+#define ZBX_METRIC_FLAG_NEW		0x02	/* new metric, just added */
+#define ZBX_METRIC_FLAG_LOG_LOG		0x04	/* log[ */
+#define ZBX_METRIC_FLAG_LOG_LOGRT	0x08	/* logrt[ */
+#define ZBX_METRIC_FLAG_LOG_EVENTLOG	0x10	/* eventlog[ */
+#define ZBX_METRIC_FLAG_LOG			/* item value type is log, one of the above */	\
+		(ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT | ZBX_METRIC_FLAG_LOG_EVENTLOG)
+
 typedef struct
 {
-	char			*key, *key_orig;
+	char			*key;
+	char			*key_orig;
 	zbx_uint64_t		lastlogsize;
 	int			refresh;
 	int			nextcheck;
-/* must be long for fseek() */
 	int			mtime;
 	unsigned char		skip_old_data;	/* for processing [event]log metrics */
+	unsigned char		flags;
 	unsigned char		state;
+	unsigned char		refresh_unsupported;	/* re-check notsupported item */
 	int			big_rec;	/* for logfile reading: 0 - normal record, 1 - long unfinished record */
 	int			use_ino;	/* 0 - do not use inodes (on FAT, FAT32) */
 						/* 1 - use inodes (up to 64-bit) (various UNIX file systems, NTFS) */
@@ -106,15 +117,17 @@ typedef struct
 	zbx_timespec_t	ts;
 	int		logeventid;
 	int		mtime;
-	unsigned char	persistent;
+	unsigned char	flags;
 }
 ZBX_ACTIVE_BUFFER_ELEMENT;
 
 typedef struct
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*data;
-	int	count, pcount, lastsent;
-	int	first_error;
+	int				count;
+	int				pcount;
+	int				lastsent;
+	int				first_error;
 }
 ZBX_ACTIVE_BUFFER;
 
