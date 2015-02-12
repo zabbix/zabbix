@@ -23,6 +23,10 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerWidgetWebView extends CController {
 
+	protected function init() {
+		$this->disableSIDValidation();
+	}
+
 	protected function checkInput() {
 		return true;
 	}

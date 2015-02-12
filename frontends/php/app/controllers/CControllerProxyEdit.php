@@ -21,6 +21,10 @@
 
 class CControllerProxyEdit extends CController {
 
+	protected function init() {
+		$this->disableSIDValidation();
+	}
+
 	protected function checkInput() {
 		$fields = array(
 			'proxyid' =>		'db       hosts.hostid',
@@ -63,6 +67,7 @@ class CControllerProxyEdit extends CController {
 	protected function doAction() {
 		// default values
 		$data = array(
+			'sid' => $this->getUserSID(),
 			'proxyid' => 0,
 			'host' => '',
 			'status' => HOST_STATUS_PROXY_ACTIVE,

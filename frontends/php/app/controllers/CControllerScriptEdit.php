@@ -21,6 +21,10 @@
 
 class CControllerScriptEdit extends CController {
 
+	protected function init() {
+		$this->disableSIDValidation();
+	}
+
 	protected function checkInput() {
 		$fields = array(
 			'scriptid' =>				'db scripts.scriptid',
@@ -66,6 +70,7 @@ class CControllerScriptEdit extends CController {
 	protected function doAction() {
 		// default values
 		$data = array(
+			'sid' => $this->getUserSID(),
 			'scriptid' => 0,
 			'name' => '',
 			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,

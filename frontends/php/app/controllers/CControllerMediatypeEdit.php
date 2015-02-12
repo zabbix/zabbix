@@ -23,6 +23,10 @@ class CControllerMediatypeEdit extends CController {
 
 	private $mediatype = array();
 
+	protected function init() {
+		$this->disableSIDValidation();
+	}
+
 	protected function checkInput() {
 		$fields = array(
 			'mediatypeid' =>		'db media_type.mediatypeid',
@@ -75,6 +79,7 @@ class CControllerMediatypeEdit extends CController {
 	protected function doAction() {
 		// default values
 		$data = array(
+				'sid' => $this->getUserSID(),
 				'mediatypeid' => 0,
 				'type' => MEDIA_TYPE_EMAIL,
 				'description' => '',

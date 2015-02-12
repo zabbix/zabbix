@@ -23,6 +23,10 @@ class CControllerDiscoveryView extends CController {
 
 	private $sysmapid;
 
+	protected function init() {
+		$this->disableSIDValidation();
+	}
+
 	protected function checkInput() {
 		$fields = array(
 			'druleid' =>	'db drules.druleid',

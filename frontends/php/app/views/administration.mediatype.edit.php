@@ -109,7 +109,7 @@ else {
 	$cloneButton = new CSimpleButton(_('Clone'));
 	$cloneButton->setAttribute('id', 'clone');
 	$deleteButton = new CRedirectButton(_('Delete'),
-		'zabbix.php?action=mediatype.delete&mediatypeids[]='.$data['mediatypeid'],
+		'zabbix.php?action=mediatype.delete&sid='.$data['sid'].'&mediatypeids[]='.$data['mediatypeid'],
 		_('Delete media type?')
 	);
 	$deleteButton->setAttribute('id', 'delete');

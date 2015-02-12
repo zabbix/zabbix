@@ -21,6 +21,10 @@
 
 class CControllerProxyList extends CController {
 
+	protected function init() {
+		$this->disableSIDValidation();
+	}
+
 	protected function checkInput() {
 		$fields = array(
 			'sort' =>		'in host',
