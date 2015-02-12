@@ -46,7 +46,7 @@ extern int		server_num, process_num;
 static int		shm_id;
 int 			my_diskstat_shmid = NONEXISTENT_SHMID;
 ZBX_DISKDEVICES_DATA	*diskdevices = NULL;
-ZBX_MUTEX		diskstats_lock;
+ZBX_MUTEX		diskstats_lock = ZBX_MUTEX_NULL;
 #endif
 
 /******************************************************************************
