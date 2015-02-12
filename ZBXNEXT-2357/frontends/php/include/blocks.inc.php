@@ -733,7 +733,7 @@ function make_latest_issues(array $filter = array()) {
 			)));
 
 			// ack
-			$ack = getEventAckState($trigger['lastEvent'], empty($filter['backUrl']) ? true : $filter['backUrl'],
+			$ack = getEventAckState($trigger['lastEvent'], $filter['backUrl'],
 				true, $ackParams
 			);
 		}
@@ -836,7 +836,7 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 		// ack
 		if ($config['event_ack_enable']) {
 			$ack = isset($trigger['event']['eventid'])
-				? getEventAckState($trigger['event'], true, true, $ackParams)
+				? getEventAckState($trigger['event'], 'zabbix.php?action=dashboard.view', true, $ackParams)
 				: _('No events');
 		}
 		else {
