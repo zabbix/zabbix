@@ -126,7 +126,7 @@ class CController {
 	public function getUserSID() {
 		$sessionid = CWebUser::getSessionCookie();
 
-		if ($sessionid === null || strlen ($sessionid) < 16) {
+		if ($sessionid === null || strlen($sessionid) < 16) {
 			return null;
 		}
 
@@ -258,23 +258,11 @@ class CController {
 	protected function checkSID() {
 		$sessionid = CWebUser::getSessionCookie();
 
-		if ($sessionid === null) {
+		if ($sessionid === null || !isset($_REQUEST['sid'])) {
 			return false;
 		}
 
-		if (!isset($_REQUEST['sid'])) {
-			return false;
-		}
-
-		if (strlen($_REQUEST['sid']) != 16) {
-			return false;
-		}
-
-		if ($_REQUEST['sid'] !== substr($sessionid, 16, 16)) {
-			return false;
-		}
-
-		return true;
+		return ($_REQUEST['sid'] === substr($sessionid, 16, 16));
 	}
 
 	/**

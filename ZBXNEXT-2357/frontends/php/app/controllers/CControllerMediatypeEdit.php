@@ -79,19 +79,19 @@ class CControllerMediatypeEdit extends CController {
 	protected function doAction() {
 		// default values
 		$data = array(
-				'sid' => $this->getUserSID(),
-				'mediatypeid' => 0,
-				'type' => MEDIA_TYPE_EMAIL,
-				'description' => '',
-				'smtp_server' => 'localhost',
-				'smtp_helo' => 'localhost',
-				'smtp_email' => 'zabbix@localhost',
-				'exec_path' => '',
-				'gsm_modem' => '/dev/ttyS0',
-				'jabber_username' => 'user@server',
-				'eztext_username' => '',
-				'passwd' => '',
-				'status' => MEDIA_TYPE_STATUS_ACTIVE
+			'sid' => $this->getUserSID(),
+			'mediatypeid' => 0,
+			'type' => MEDIA_TYPE_EMAIL,
+			'description' => '',
+			'smtp_server' => 'localhost',
+			'smtp_helo' => 'localhost',
+			'smtp_email' => 'zabbix@localhost',
+			'exec_path' => '',
+			'gsm_modem' => '/dev/ttyS0',
+			'jabber_username' => 'user@server',
+			'eztext_username' => '',
+			'passwd' => '',
+			'status' => MEDIA_TYPE_STATUS_ACTIVE
 		);
 
 		// get values from the dabatase
