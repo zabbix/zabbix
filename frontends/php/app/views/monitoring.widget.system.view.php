@@ -18,5 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
 $widget = make_system_status($data['filter']);
 $widget->show();

@@ -18,25 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-global $page, $DB, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-if (isset($page['title'])) {
-	$title = $page['title'];
-}
-else if (isset($data['page']['title'])) {
-	$title = $data['page']['title'];
-}
-else {
-	$title = _('Zabbix');
-}
+global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-$pageHeader = new CPageHeader($title);
+$pageHeader = new CPageHeader($data['page']['title']);
 $pageHeader->addCssInit();
+
+$scripts = array();
 
 $css = ZBX_DEFAULT_THEME;
 if (!empty($DB['DB'])) {
 	$config = select_config();
-	$css = getUserTheme(CWebUser::$data);
+	$css = getUserTheme($data['user']);
 
 	$severityCss = <<<CSS
 .disaster { background: #{$config['severity_color_5']} !important; }
@@ -50,28 +43,22 @@ CSS;
 
 	// perform Zabbix server check only for standard pages
 	if ($config['server_check_interval'] && !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
-		$page['scripts'][] = 'servercheck.js';
+		$scripts[] = 'servercheck.js';
 	}
 }
 $css = CHtml::encode($css);
 $pageHeader->addCssFile('styles/themes/'.$css.'/main.css');
 
-if (isset($page['file']) && $page['file'] == 'sysmap.php') {
-	$pageHeader->addCssFile('imgstore.php?css=1&output=css');
-}
 $pageHeader->addJsFile('js/browsers.js');
 $pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');
 
 // show GUI messages in pages with menus and in fullscreen mode
 $showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || $_REQUEST['fullscreen'] == 1) ? 1 : 0;
-$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&showGuiMessaging='.$showGuiMessaging;
+$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.$data['user']['lang'].'&showGuiMessaging='.$showGuiMessaging;
 $pageHeader->addJsFile($path);
 
-if (!empty($page['scripts']) && is_array($page['scripts'])) {
-	foreach ($page['scripts'] as $script) {
-		$path .= '&amp;files[]='.$script;
-	}
-	$pageHeader->addJsFile($path);
+if ($scripts) {
+	$pageHeader->addJsFile('jsLoader.php?'.'files[]='.implode('&amp;files[]=', $scripts));
 }
 
 foreach ($data['javascript']['files'] as $path) {

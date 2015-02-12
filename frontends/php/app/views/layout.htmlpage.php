@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once 'include/menu.inc.php';
 
 function local_generateHeader($data) {
@@ -32,7 +33,18 @@ function local_generateHeader($data) {
 
 	zbx_construct_menu($main_menu, $sub_menus, $page, $data['controller']['action']);
 
-	$pageHeader = new CView('layout.htmlpage.header', $data);
+	$pageHeader = new CView('layout.htmlpage.header', array(
+		'javascript' => array(
+			'files' => $data['javascript']['files']
+		),
+		'page' => array(
+			'title' => $data['page']['title']
+		),
+		'user' => array(
+			'lang' => CWebUser::$data['lang'],
+			'theme' => CWebUser::$data['theme']
+		)
+	));
 	echo $pageHeader->getOutput();
 
 	$pageTop = new CView('layout.htmlpage.top', array(
@@ -45,9 +57,13 @@ function local_generateHeader($data) {
 	echo $pageTop->getOutput();
 
 	if ($data['fullscreen'] == 0) {
-		$data['main_menu'] = $main_menu;
-		$data['sub_menus'] = $sub_menus;
-		$pageMenu = new CView('layout.htmlpage.menu', $data);
+		$pageMenu = new CView('layout.htmlpage.menu', array(
+			'menu' => array(
+				'main_menu' => $main_menu,
+				'sub_menus' => $sub_menus,
+				'selected' => $page['menu']
+			)
+		));
 		echo $pageMenu->getOutput();
 
 		// create history
@@ -58,7 +74,7 @@ function local_generateHeader($data) {
 		)));
 		$table->show();
 
-		// Should be replaced with addPostJS() at some point
+		// should be replaced with addPostJS() at some point
 		zbx_add_post_js('initMessages({});');
 
 		// if a user logs in after several unsuccessful attempts, display a warning
