@@ -24,26 +24,30 @@ if ($data['fullscreen'] == 0) {
 	$support = new CLink(_('Get support'), 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 	$support->setTarget('_blank');
 
-	$printview = new CLink(_('Print'), '', 'small_font print-link', null, 'nosid');
+	$page_header_r_col = array($help, '|', $support, '|');
 
-	$page_header_r_col = array($help, '|', $support, '|', $printview, '|');
+	$page_header_r_col[] = new CLink(_('Print'), '', 'small_font print-link', null, 'nosid');
+	$page_header_r_col[] = '|';
 
-	if (!CWebUser::isGuest()) {
-		array_push($page_header_r_col, new CLink(_('Profile'), 'profile.php', 'small_font', null, 'nosid'), '|');
+	if (!$data['user']['is_guest']) {
+		$page_header_r_col[] = new CLink(_('Profile'), 'profile.php', 'small_font', null, 'nosid');
+		$page_header_r_col[] = '|';
 	}
 
-	if (isset(CWebUser::$data['debug_mode']) && CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 		$debug = new CLink(_('Debug'), '#debug', 'small_font', null, 'nosid');
 		$d_script = " if (!isset('state', this)) { this.state = 'none'; }".
 			" if (this.state == 'none') { this.state = 'block'; }".
 			" else { this.state = 'none'; }".
 			" showHideByName('zbx_debug_info', this.state);";
 		$debug->setAttribute('onclick', 'javascript: '.$d_script);
-		array_push($page_header_r_col, $debug, '|');
+
+		$page_header_r_col[] = $debug;
+		$page_header_r_col[] = '|';
 	}
 
-	if (CWebUser::isGuest()) {
-		$page_header_r_col[] = array(new CLink(_('Login'), 'index.php?reconnect=1', 'small_font', null, null));
+	if ($data['user']['is_guest']) {
+		$page_header_r_col[] = new CLink(_('Login'), 'index.php?reconnect=1', 'small_font', null, null);
 	}
 	else {
 		// it is not possible to logout from HTTP authentication
@@ -56,11 +60,10 @@ if ($data['fullscreen'] == 0) {
 		else {
 			$logout =  new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, null);
 		}*/
-		$logout =  new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, null);
-		array_push($page_header_r_col, $logout);
+		$page_header_r_col[] = new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, null);
 	}
 
-	$logo = new CLink(new CDiv(SPACE, 'zabbix_logo'), 'http://www.zabbix.com/', 'image', null, 'nosid');
+	$logo = new CLink(new CDiv(null, 'zabbix_logo'), 'http://www.zabbix.com/', 'image', null, 'nosid');
 	$logo->setTarget('_blank');
 
 	$top_page_row = array(
@@ -68,11 +71,9 @@ if ($data['fullscreen'] == 0) {
 		new CCol($page_header_r_col, 'maxwidth page_header_r')
 	);
 
-	unset($logo, $page_header_r_col, $help, $support);
+	unset($logo, $page_header_r_col, $help, $support, $debug);
 
 	$table = new CTable(null, 'maxwidth page_header');
-	$table->setCellSpacing(0);
-	$table->setCellPadding(5);
 	$table->addRow($top_page_row);
 	$table->show();
 }
