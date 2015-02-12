@@ -25,7 +25,7 @@ $mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'));
 
 // create form
 $mediaTypeForm = new CForm();
-$mediaTypeForm->setName('mediaTypeForm');
+$mediaTypeForm->setAttribute('id', 'mediaTypeForm');
 $mediaTypeForm->addVar('form', 1);
 $mediaTypeForm->addVar('mediatypeid', $data['mediatypeid']);
 

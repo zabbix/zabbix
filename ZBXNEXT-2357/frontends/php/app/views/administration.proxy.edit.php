@@ -25,7 +25,7 @@ $proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'));
 
 // create form
 $proxyForm = new CForm();
-$proxyForm->setName('proxyForm');
+$proxyForm->setAttribute('id', 'proxyForm');
 $proxyForm->addVar('proxyid', $data['proxyid']);
 if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
