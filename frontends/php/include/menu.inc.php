@@ -314,7 +314,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 
 	$denied_page_requested = false;
 	$page_exists = false;
-	$deny = !defined('ZBX_PAGE_NO_AUTHORIZATION');
+	$deny = false;
 
 	foreach ($ZBX_MENU as $label => $menu) {
 		$show_menu = true;

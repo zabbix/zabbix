@@ -19,8 +19,6 @@
 **/
 
 
-define('ZBX_PAGE_NO_AUTHORIZATION', true);
-
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
