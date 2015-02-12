@@ -55,6 +55,7 @@ global $page;
 			else {
 				$url->setArgument('ddreset', 1);
 			}
+			$url->removeArgument('sid');
 
 			$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl(), $sub_page['class'].' nowrap', null, false);
 			if ($sub_page['selected']) {
