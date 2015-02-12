@@ -25,7 +25,7 @@
 #include "log.h"
 
 /*
- * 3.0 maintenance database patches
+ * 3.0 development database patches
  */
 
 #ifndef HAVE_SQLITE3
@@ -65,6 +65,7 @@ static int	DBpatch_2050001(void)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert SNMP discovery OID \"%s\":"
 					" resulting OID is too long", row[1]);
+			rc = ZBX_DB_OK;
 		}
 		else
 		{
@@ -91,39 +92,60 @@ out:
 
 static int	DBpatch_2050002(void)
 {
+	const ZBX_FIELD	field = {"lastlogsize", "0", NULL, NULL, 0, ZBX_TYPE_UINT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_history", &field);
+}
+
+static int	DBpatch_2050003(void)
+{
+	const ZBX_FIELD	field = {"mtime", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_history", &field);
+}
+
+static int	DBpatch_2050004(void)
+{
+	const ZBX_FIELD	field = {"meta", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_history", &field);
+}
+
+static int	DBpatch_2050005(void)
+{
 	const ZBX_FIELD field = {"tls_connect", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050003(void)
+static int	DBpatch_2050006(void)
 {
 	const ZBX_FIELD field = {"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050004(void)
+static int	DBpatch_2050007(void)
 {
 	const ZBX_FIELD field = {"tls_issuer", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050005(void)
+static int	DBpatch_2050008(void)
 {
 	const ZBX_FIELD field = {"tls_subject", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
-static int	DBpatch_2050006(void)
+static int	DBpatch_2050009(void)
 {
 	const ZBX_FIELD field = {"tls_psk_identity", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050007(void)
+static int	DBpatch_2050010(void)
 {
 	const ZBX_FIELD field = {"tls_psk", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -144,5 +166,8 @@ DBPATCH_ADD(2050004, 0, 1)
 DBPATCH_ADD(2050005, 0, 1)
 DBPATCH_ADD(2050006, 0, 1)
 DBPATCH_ADD(2050007, 0, 1)
+DBPATCH_ADD(2050008, 0, 1)
+DBPATCH_ADD(2050009, 0, 1)
+DBPATCH_ADD(2050010, 0, 1)
 
 DBPATCH_END()
