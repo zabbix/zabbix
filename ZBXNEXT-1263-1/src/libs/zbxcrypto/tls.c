@@ -1377,7 +1377,8 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 	return SUCCEED;
 out:
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
+			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
 }
 
@@ -1616,7 +1617,8 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 	return SUCCEED;
 out:
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
+			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
 }
 #endif
