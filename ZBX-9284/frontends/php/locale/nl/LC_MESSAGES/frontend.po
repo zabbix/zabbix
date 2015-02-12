@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2013-10-11 14:13+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -1211,7 +1211,7 @@ msgstr "Kan reguliere expressie niet toevoegen"
 msgid "Cannot add scenario"
 msgstr "Kan scenario niet toevoegen"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "Kan scherm niet toevoegen"
 
@@ -1459,7 +1459,7 @@ msgstr[1] "Kan reguliere expressies niet verwijderen"
 msgid "Cannot delete scenario"
 msgstr "Kan scenario niet verwijderen"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "Kan scherm niet verwijderen"
 
@@ -1982,7 +1982,7 @@ msgstr "Kan reguliere expressie niet bijwerken"
 msgid "Cannot update scenario"
 msgstr "Kan scenario niet bijwerken"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "Kan scherm niet bijwerken"
 
@@ -10570,7 +10570,7 @@ msgstr ""
 msgid "Screen \"%1$s\" updated."
 msgstr ""
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Scherm toegevoegd"
 
@@ -10578,7 +10578,7 @@ msgstr "Scherm toegevoegd"
 msgid "Screen cell configuration"
 msgstr "Scherm cel configuratie"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Scherm verwijderd"
 
@@ -10590,7 +10590,7 @@ msgstr ""
 msgid "Screen should contain at least one row and column."
 msgstr ""
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Scherm bijgewerkt"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2013-11-05 22:47+0300\n"
 "Last-Translator: Jonathan <linuxgurugamer@gmail.com>\n"
 "Language-Team: RedPrairie\n"
@@ -1208,7 +1208,7 @@ msgstr "Cannot add regular expression"
 msgid "Cannot add scenario"
 msgstr "Cannot add scenario"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "Cannot add screen"
 
@@ -1456,7 +1456,7 @@ msgstr[1] "Cannot delete regular expressions"
 msgid "Cannot delete scenario"
 msgstr "Cannot delete scenario"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "Cannot delete screen"
 
@@ -1979,7 +1979,7 @@ msgstr "Cannot update regular expression"
 msgid "Cannot update scenario"
 msgstr "Cannot update scenario"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "Cannot update screen"
 
@@ -10558,7 +10558,7 @@ msgstr "Screen \"%1$s\" skipped - user rule."
 msgid "Screen \"%1$s\" updated."
 msgstr "Screen \"%1$s\" updated."
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Screen added"
 
@@ -10566,7 +10566,7 @@ msgstr "Screen added"
 msgid "Screen cell configuration"
 msgstr "Screen cell configuration"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Screen deleted"
 
@@ -10578,7 +10578,7 @@ msgstr "Screen item in same cell already exists."
 msgid "Screen should contain at least one row and column."
 msgstr "Screen should contain at least one row and column."
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Screen updated"
 

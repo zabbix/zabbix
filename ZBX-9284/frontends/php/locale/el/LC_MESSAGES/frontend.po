@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2013-11-08 09:29+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -1213,7 +1213,7 @@ msgstr "Αδύνατη η προσθήκη κανονικής έκφρασης"
 msgid "Cannot add scenario"
 msgstr "Αδύνατη η προσθήκη σεναρίου"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "Αδύνατη η προσθήκη οθόνης"
 
@@ -1461,7 +1461,7 @@ msgstr[1] "Αδύνατη η διαγραφή κανονικών έκφράσε�
 msgid "Cannot delete scenario"
 msgstr "Αδύνατη η διαγραφή σεναρίου"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "Αδύνατη η διαγραφή οθόνης"
 
@@ -1984,7 +1984,7 @@ msgstr "Αδύνατη η ενημέρωση κανονικής έκφρασης
 msgid "Cannot update scenario"
 msgstr "Αδύνατη η ενημέρωση σεναρίου"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "Αδύνατη η ενημέρωση οθόνης"
 
@@ -10566,7 +10566,7 @@ msgstr "Οθόνη \"%1$s\" παραλείφθηκε - κανόνας χρήστ
 msgid "Screen \"%1$s\" updated."
 msgstr "Οθόνη \"%1$s\" ενημερώθηκε."
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Οθόνη προστέθηκε"
 
@@ -10574,7 +10574,7 @@ msgstr "Οθόνη προστέθηκε"
 msgid "Screen cell configuration"
 msgstr "Διαμόρφωση κυττάρου οθόνης"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Οθόνη διεγράφη"
 
@@ -10586,7 +10586,7 @@ msgstr "Υπάρχει ήδη συλλέκτης οθόνης σε ίδιο κε
 msgid "Screen should contain at least one row and column."
 msgstr "Η οθόνη πρέπει να περιέχει τουλάχιστον μία γραμμή και στήλη."
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Οθόνη ενημερώθηκε"
 

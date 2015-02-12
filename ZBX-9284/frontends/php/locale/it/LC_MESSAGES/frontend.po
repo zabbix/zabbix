@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2014-11-10 16:48+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1209,7 +1209,7 @@ msgstr "Impossibile aggiungere l'espressione regolare"
 msgid "Cannot add scenario"
 msgstr "Impossibile aggiungere lo scenario"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "Impossibile aggiungere la schermata"
 
@@ -1457,7 +1457,7 @@ msgstr[1] "Impossibile rimuovere le espressioni regolari"
 msgid "Cannot delete scenario"
 msgstr "Impossibile rimuovere lo scenario"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "Impossibile rimuovere la schermata"
 
@@ -1980,7 +1980,7 @@ msgstr "Impossibile aggiornare l'espressione regolare"
 msgid "Cannot update scenario"
 msgstr "Impossibile aggiornare lo scenario"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "Impossibile aggiornare la schermata"
 
@@ -10559,7 +10559,7 @@ msgstr "Schermata \"%1$s\" saltata - regola utente."
 msgid "Screen \"%1$s\" updated."
 msgstr "Schermata \"%1$s\" aggiornata."
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Schermata aggiunta"
 
@@ -10567,7 +10567,7 @@ msgstr "Schermata aggiunta"
 msgid "Screen cell configuration"
 msgstr "Configurazione cella schermata"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Schermata rimossa"
 
@@ -10579,7 +10579,7 @@ msgstr "Un item della schermata nella stessa cella esiste già."
 msgid "Screen should contain at least one row and column."
 msgstr "La schermata deve contenere almeno una riga e una colonna."
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Schermata aggiornata"
 

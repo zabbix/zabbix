@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2013-01-23 18:56+0200\n"
 "Last-Translator: jeppe <jeppe@arabuusimiehet.com>\n"
 "Language-Team: none\n"
@@ -1207,7 +1207,7 @@ msgstr ""
 msgid "Cannot add scenario"
 msgstr ""
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr ""
 
@@ -1455,7 +1455,7 @@ msgstr[1] ""
 msgid "Cannot delete scenario"
 msgstr ""
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr ""
 
@@ -1978,7 +1978,7 @@ msgstr ""
 msgid "Cannot update scenario"
 msgstr ""
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr ""
 
@@ -10546,7 +10546,7 @@ msgstr ""
 msgid "Screen \"%1$s\" updated."
 msgstr ""
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr ""
 
@@ -10554,7 +10554,7 @@ msgstr ""
 msgid "Screen cell configuration"
 msgstr ""
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr ""
 
@@ -10566,7 +10566,7 @@ msgstr ""
 msgid "Screen should contain at least one row and column."
 msgstr ""
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr ""
 

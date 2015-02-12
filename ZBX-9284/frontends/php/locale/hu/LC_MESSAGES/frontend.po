@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2013-10-14 13:57+0300\n"
 "Last-Translator: halt <kisst@bgk.bme.hu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1210,7 +1210,7 @@ msgstr "Reguláris kifejezés hozzáadása nem sikerült"
 msgid "Cannot add scenario"
 msgstr "Nem lehet hozzáadni a scenario-t"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "Képernyő létrehozása sikertelen"
 
@@ -1458,7 +1458,7 @@ msgstr[1] "Reguláris kifejezések törlése nem sikerült"
 msgid "Cannot delete scenario"
 msgstr "Nem lehet törölni a scenario-t"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr ""
 
@@ -1981,7 +1981,7 @@ msgstr "Reguláris kifejezés frissítése nem sikerült"
 msgid "Cannot update scenario"
 msgstr "Nem lehet frissíteni a scenario-t"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "Képernyő frissítése sikertelen"
 
@@ -10550,7 +10550,7 @@ msgstr ""
 msgid "Screen \"%1$s\" updated."
 msgstr ""
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Képernyő létrehozva"
 
@@ -10558,7 +10558,7 @@ msgstr "Képernyő létrehozva"
 msgid "Screen cell configuration"
 msgstr "Képernyő cella konfigurálása"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Képernyő törölve"
 
@@ -10570,7 +10570,7 @@ msgstr ""
 msgid "Screen should contain at least one row and column."
 msgstr ""
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Képernyő frissítve"
 

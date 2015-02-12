@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2013-08-16 03:47+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1205,7 +1205,7 @@ msgstr "无法添加正则表达式"
 msgid "Cannot add scenario"
 msgstr "无法添加方案"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "无法添加筛选"
 
@@ -1452,7 +1452,7 @@ msgstr[0] "无法删除正则表达式 "
 msgid "Cannot delete scenario"
 msgstr "无法删除方案"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "无法删除筛选"
 
@@ -1973,7 +1973,7 @@ msgstr "无法更新正则表达式"
 msgid "Cannot update scenario"
 msgstr "无法更新方案"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "无法更新筛选"
 
@@ -10546,7 +10546,7 @@ msgstr "略过筛选\"%1$s\"-用户规则."
 msgid "Screen \"%1$s\" updated."
 msgstr "筛选\"%1$s\"已更新."
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "筛选已添加"
 
@@ -10554,7 +10554,7 @@ msgstr "筛选已添加"
 msgid "Screen cell configuration"
 msgstr "筛选格位配置"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "筛选已删除"
 
@@ -10566,7 +10566,7 @@ msgstr "筛选项目于相同格位中已存在."
 msgid "Screen should contain at least one row and column."
 msgstr "筛选应包含至少一个行和列."
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "筛选已更新"
 

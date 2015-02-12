@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2012-10-30 11:01+0200\n"
 "Last-Translator: busel7 <bonny.useful@gmail.com>\n"
 "Language-Team: none\n"
@@ -1201,7 +1201,7 @@ msgstr "Tidak dapat menambah ekspresi reguler"
 msgid "Cannot add scenario"
 msgstr "Tidak dapat menambah skenario"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "Tidak dapat menambah layar"
 
@@ -1448,7 +1448,7 @@ msgstr[0] "Tidak dapat menghapus ekspresi reguler"
 msgid "Cannot delete scenario"
 msgstr "Tidak dapat menghapus skenario"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "Tidak dapat menghapus layar"
 
@@ -1969,7 +1969,7 @@ msgstr "Tidak dapat perbarui ekspresi regular"
 msgid "Cannot update scenario"
 msgstr "Tidak dapat perbarui skenario"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "Tidak dapat perbarui layar"
 
@@ -10541,7 +10541,7 @@ msgstr "Layar \"%1$s\" diabaikan - aturan user."
 msgid "Screen \"%1$s\" updated."
 msgstr "Layar \"%1$s\" diperbarui."
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Layar ditambah"
 
@@ -10549,7 +10549,7 @@ msgstr "Layar ditambah"
 msgid "Screen cell configuration"
 msgstr "Konfigurasi sel layar"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Layar dihapus"
 
@@ -10561,7 +10561,7 @@ msgstr "Item layar dalam sel yang sama sudah ada."
 msgid "Screen should contain at least one row and column."
 msgstr "Layar seharusnya memiliki setidaknya satu baris dan kolom."
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Layar diperbarui"
 

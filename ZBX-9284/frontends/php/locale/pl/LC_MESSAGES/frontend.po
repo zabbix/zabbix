@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-15 18:24+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2015-01-19 20:15+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1215,7 +1215,7 @@ msgstr "Nie można dodać wyrażenia regularnego"
 msgid "Cannot add scenario"
 msgstr "Nie można dodać scenariusza"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "Nie można dodać ekranu"
 
@@ -1464,7 +1464,7 @@ msgstr[2] "Nie można usunąć wyrażeń regularnych"
 msgid "Cannot delete scenario"
 msgstr "Nie można usunąć scenariusza"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "Nie można usunąć ekranu"
 
@@ -1989,7 +1989,7 @@ msgstr "Nie można zaktualizować wyrażenia regularnego"
 msgid "Cannot update scenario"
 msgstr "Nie można zaktualizować scenariusza"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "Nie można zaktualizować ekranu"
 
@@ -10575,7 +10575,7 @@ msgstr "Pominięto ekran \"%1$s\" - reguła użytkownika."
 msgid "Screen \"%1$s\" updated."
 msgstr "Zaktualizowano ekran \"%1$s\"."
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Dodano ekran"
 
@@ -10583,7 +10583,7 @@ msgstr "Dodano ekran"
 msgid "Screen cell configuration"
 msgstr "Konfiguracja komórki ekranu"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Usunięto ekran"
 
@@ -10595,7 +10595,7 @@ msgstr "W tej komórce już jest element ekranu."
 msgid "Screen should contain at least one row and column."
 msgstr "Ekran powinien zawierać przynajmniej jeden wiersz i kolumnę."
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Zaktualizowano ekran"
 

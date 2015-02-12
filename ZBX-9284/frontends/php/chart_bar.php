@@ -38,7 +38,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'hostids'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		null),
 		'groupids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		null),
 
-		'items'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID,			NULL),
+		'items'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,			NULL),
 
 		'title'=>			array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 		'xlabel'=>			array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
