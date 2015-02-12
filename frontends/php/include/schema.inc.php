@@ -5826,6 +5826,67 @@ return array(
 			),
 		),
 	),
+	'application_prototype' => array(
+		'key' => 'application_prototypeid',
+		'fields' => array(
+			'application_prototypeid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			),
+			'hostid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid',
+			),
+			'name' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+		),
+	),
+	'application_prototype_template' => array(
+		'key' => 'application_prototypeid,templateid',
+		'fields' => array(
+			'application_prototypeid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'application_prototype',
+				'ref_field' => 'application_prototypeid',
+			),
+			'templateid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'application_prototype',
+				'ref_field' => 'application_prototypeid',
+			),
+		),
+	),
+	'item_application_prototype' => array(
+		'key' => 'application_prototypeid,itemid',
+		'fields' => array(
+			'application_prototypeid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'application_prototype',
+				'ref_field' => 'application_prototypeid',
+			),
+			'itemid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
+			),
+		),
+	),
 	'dbversion' => array(
 		'key' => '',
 		'fields' => array(
