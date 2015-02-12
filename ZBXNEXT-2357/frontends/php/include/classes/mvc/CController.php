@@ -53,8 +53,24 @@ class CController {
 	 */
 	public $input = array();
 
+	/**
+	 * SID validation flag, if true SID must be validated.
+	 *
+	 * @var bool
+	 */
+	private $validateSID = true;
+
 	public function __construct() {
 		session_start();
+		$this->init();
+	}
+
+	/**
+	 * Initialization function that can be overwritten later.
+	 *
+	 * @return var
+	 */
+	protected function init() {
 	}
 
 	/**
@@ -100,6 +116,21 @@ class CController {
 	 */
 	public function getUserType() {
 		return CWebUser::getType();
+	}
+
+	/**
+	 * Return user SID, first 16 bytes of session ID.
+	 *
+	 * @return var
+	 */
+	public function getUserSID() {
+		$sessionid = CWebUser::getSessionCookie();
+
+		if ($sessionid === null || strlen ($sessionid) < 16) {
+			return null;
+		}
+
+		return substr($sessionid, 16, 16);
 	}
 
 	/**
@@ -211,6 +242,42 @@ class CController {
 	}
 
 	/**
+	 * Validate session ID (SID).
+	 *
+	 * @return var
+	 */
+	public function disableSIDvalidation() {
+		$this->validateSID = false;
+	}
+
+	/**
+	 * Validate session ID (SID).
+	 *
+	 * @return var
+	 */
+	protected function checkSID() {
+		$sessionid = CWebUser::getSessionCookie();
+
+		if ($sessionid === null) {
+			return false;
+		}
+
+		if (!isset($_REQUEST['sid'])) {
+			return false;
+		}
+
+		if (strlen($_REQUEST['sid']) != 16) {
+			return false;
+		}
+
+		if ($_REQUEST['sid'] !== substr($sessionid, 16, 16)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Execute action and generate response object. The function must present in inherited controller.
 	 *
 	 * @return var
@@ -225,6 +292,10 @@ class CController {
 	 * @return var
 	 */
 	final public function run() {
+		if ($this->validateSID && !$this->checkSID()) {
+			access_deny(ACCESS_DENY_PAGE);
+		}
+
 		if ($this->checkInput()) {
 			if ($this->checkPermissions() !== true) {
 				access_deny(ACCESS_DENY_PAGE);

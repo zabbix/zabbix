@@ -20,6 +20,7 @@
 
 
 class CControllerDashboardSort extends CController {
+
 	protected function checkInput() {
 		$fields = array(
 			'grid' =>	'fatal|required|json'

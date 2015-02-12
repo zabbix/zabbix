@@ -21,6 +21,10 @@
 
 class CControllerReportStatus extends CController {
 
+	protected function init() {
+		$this->disableSIDValidation();
+	}
+
 	protected function checkInput() {
 		return true;
 	}

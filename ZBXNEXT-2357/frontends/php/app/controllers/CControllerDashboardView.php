@@ -23,6 +23,10 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerDashboardView extends CController {
 
+	protected function init() {
+		$this->disableSIDValidation();
+	}
+
 	protected function checkInput() {
 		$fields = array(
 			'fullscreen' =>	'in 0,1'

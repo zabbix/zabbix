@@ -128,7 +128,7 @@ else {
 	$updateButton->setAttribute('id', 'update');
 	$cloneButton = new CSimpleButton(_('Clone'));
 	$cloneButton->setAttribute('id', 'clone');
-	$deleteButton = new CRedirectButton(_('Delete'), 'zabbix.php?action=script.delete&scriptids[]='.$data['scriptid'],_('Delete script?'));
+	$deleteButton = new CRedirectButton(_('Delete'), 'zabbix.php?action=script.delete&sid='.$data['sid'].'&scriptids[]='.$data['scriptid'],_('Delete script?'));
 	$deleteButton->setAttribute('id', 'delete');
 
 	$scriptForm->addItem(makeFormFooter(

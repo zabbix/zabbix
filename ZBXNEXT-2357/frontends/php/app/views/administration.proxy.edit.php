@@ -109,7 +109,7 @@ else {
 	$updateButton->setAttribute('id', 'update');
 	$cloneButton = new CSimpleButton(_('Clone'));
 	$cloneButton->setAttribute('id', 'clone');
-	$deleteButton = new CRedirectButton(_('Delete'), 'zabbix.php?action=proxy.delete&proxyids[]='.$data['proxyid'],_('Delete proxy?'));
+	$deleteButton = new CRedirectButton(_('Delete'), 'zabbix.php?action=proxy.delete&sid='.$data['sid'].'&proxyids[]='.$data['proxyid'], _('Delete proxy?'));
 	$deleteButton->setAttribute('id', 'delete');
 
 	$proxyForm->addItem(makeFormFooter(

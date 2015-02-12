@@ -23,6 +23,10 @@ class CControllerMapView extends CController {
 
 	private $sysmapid;
 
+	protected function init() {
+		$this->disableSIDValidation();
+	}
+
 	protected function checkInput() {
 		$fields = array(
 			'sysmapid' =>		'db sysmaps.sysmapid',
