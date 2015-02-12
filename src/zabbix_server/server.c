@@ -185,7 +185,7 @@ int	CONFIG_PROXYCONFIG_FREQUENCY	= 3600;	/* 1h */
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 
 /* mutex for node syncs */
-ZBX_MUTEX	node_sync_access;
+ZBX_MUTEX	node_sync_access = ZBX_MUTEX_NULL;
 
 /******************************************************************************
  *                                                                            *
