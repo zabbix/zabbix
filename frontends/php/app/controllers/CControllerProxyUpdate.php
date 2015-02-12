@@ -54,6 +54,10 @@ class CControllerProxyUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
 		return (bool) API::Proxy()->get(array(
 			'output' => array(),
 			'proxyids' => $this->getInput('proxyid'),

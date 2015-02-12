@@ -48,6 +48,10 @@ class CControllerMediatypeEdit extends CController {
 	}
 
 	protected function checkPermissions() {
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
 		if ($this->hasInput('mediatypeid')) {
 			$mediatypes = API::Mediatype()->get(array(
 				'output' => array('mediatypeid', 'type', 'description', 'smtp_server', 'smtp_helo', 'smtp_email',
@@ -62,12 +66,9 @@ class CControllerMediatypeEdit extends CController {
 			}
 
 			$this->mediatype = $mediatypes[0];
+		}
 
-			return true;
-		}
-		else {
-			return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
-		}
+		return true;
 	}
 
 	protected function doAction() {

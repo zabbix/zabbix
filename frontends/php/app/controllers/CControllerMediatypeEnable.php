@@ -35,6 +35,10 @@ class CControllerMediatypeEnable extends CController {
 	}
 
 	protected function checkPermissions() {
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
 		$mediatypes = API::Mediatype()->get(array(
 			'mediatypeids' => $this->getInput('mediatypeids'),
 			'countOutput' => true,
