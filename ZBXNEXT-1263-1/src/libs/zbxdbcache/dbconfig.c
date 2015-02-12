@@ -4008,8 +4008,17 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	strscpy(dst_host->tls_issuer, src_host->tls_issuer);
 	strscpy(dst_host->tls_subject, src_host->tls_subject);
-	strscpy(dst_host->tls_psk_identity, src_host->tls_dc_psk->tls_psk_identity);
-	strscpy(dst_host->tls_psk, src_host->tls_dc_psk->tls_psk);
+
+	if (NULL == src_host->tls_dc_psk)
+	{
+		*dst_host->tls_psk_identity = '\0';
+		*dst_host->tls_psk = '\0';
+	}
+	else
+	{
+		strscpy(dst_host->tls_psk_identity, src_host->tls_dc_psk->tls_psk_identity);
+		strscpy(dst_host->tls_psk, src_host->tls_dc_psk->tls_psk);
+	}
 #endif
 	if (NULL != (ipmihost = zbx_hashset_search(&config->ipmihosts, &src_host->hostid)))
 	{
@@ -4137,11 +4146,21 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr,
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == attr->connection_type)
 	{
-		if (strlen(dc_host->tls_dc_psk->tls_psk_identity) != attr->arg1_len ||
-				0 != memcmp(dc_host->tls_dc_psk->tls_psk_identity, attr->arg1, attr->arg1_len))
+		if (NULL != dc_host->tls_dc_psk)
+		{
+			if (strlen(dc_host->tls_dc_psk->tls_psk_identity) != attr->arg1_len ||
+					0 != memcmp(dc_host->tls_dc_psk->tls_psk_identity, attr->arg1, attr->arg1_len))
+			{
+				UNLOCK_CACHE;
+				*error = zbx_dsprintf(*error, "proxy \"%s\" is using false PSK identity", host);
+				return FAIL;
+			}
+		}
+		else
 		{
 			UNLOCK_CACHE;
-			*error = zbx_dsprintf(*error, "proxy \"%s\" is using false PSK identity", host);
+			*error = zbx_dsprintf(*error, "active proxy \"%s\" is connecting with PSK but there is no PSK "
+					"in DB for this proxy", host);
 			return FAIL;
 		}
 	}
@@ -6165,7 +6184,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 			strscpy(dst_proxy->tls_arg1, host->tls_issuer);
 			strscpy(dst_proxy->tls_arg2, host->tls_subject);
 		}
-		else if (ZBX_TCP_SEC_TLS_PSK == host->tls_connect)
+		else if (ZBX_TCP_SEC_TLS_PSK == host->tls_connect && NULL != host->tls_dc_psk)
 		{
 			strscpy(dst_proxy->tls_arg1, host->tls_dc_psk->tls_psk_identity);
 			strscpy(dst_proxy->tls_arg2, host->tls_dc_psk->tls_psk);
