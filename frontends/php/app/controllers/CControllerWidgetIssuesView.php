@@ -35,7 +35,8 @@ class CControllerWidgetIssuesView extends CController {
 			'groupids' => null,
 			'maintenance' => null,
 			'severity' => null,
-			'extAck' => 0
+			'extAck' => 0,
+			'backUrl' => 'zabbix.php?action=dashboard.view'
 		);
 
 		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
