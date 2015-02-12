@@ -111,6 +111,105 @@ static int	DBpatch_2050004(void)
 	return DBadd_field("proxy_history", &field);
 }
 
+static int	DBpatch_2050005(void)
+{
+	const ZBX_TABLE table =
+			{"application_prototype", "application_prototypeid", 0,
+				{
+					{"application_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050006(void)
+{
+	return DBcreate_index("application_prototype", "application_prototype_1", "hostid", 0);
+}
+
+static int	DBpatch_2050007(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("application_prototype", 1, &field);
+}
+
+static int	DBpatch_2050008(void)
+{
+	const ZBX_TABLE table =
+			{"application_prototype_template", "application_prototypeid,templateid", 0,
+				{
+					{"application_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050009(void)
+{
+	return DBcreate_index("application_prototype_template", "application_prototype_template_1", "templateid", 0);
+}
+
+static int	DBpatch_2050010(void)
+{
+	const ZBX_FIELD	field = {"application_prototypeid", NULL, "application_prototype", "application_prototypeid",
+			0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("application_prototype_template", 1, &field);
+}
+
+static int	DBpatch_2050011(void)
+{
+	const ZBX_FIELD	field = {"templateid", NULL, "application_prototype", "application_prototypeid",
+			0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("application_prototype_template", 2, &field);
+}
+
+static int	DBpatch_2050012(void)
+{
+	const ZBX_TABLE table =
+			{"item_application_prototype", "application_prototypeid,itemid", 0,
+				{
+					{"application_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050013(void)
+{
+	return DBcreate_index("item_application_prototype", "item_application_prototype_1", "itemid", 0);
+}
+
+static int	DBpatch_2050014(void)
+{
+	const ZBX_FIELD	field = {"application_prototypeid", NULL, "application_prototype", "application_prototypeid",
+			0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_application_prototype", 1, &field);
+}
+
+static int	DBpatch_2050015(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_application_prototype", 2, &field);
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -122,5 +221,16 @@ DBPATCH_ADD(2050001, 0, 1)
 DBPATCH_ADD(2050002, 0, 1)
 DBPATCH_ADD(2050003, 0, 1)
 DBPATCH_ADD(2050004, 0, 1)
+DBPATCH_ADD(2050005, 0, 1)
+DBPATCH_ADD(2050006, 0, 1)
+DBPATCH_ADD(2050007, 0, 1)
+DBPATCH_ADD(2050008, 0, 1)
+DBPATCH_ADD(2050009, 0, 1)
+DBPATCH_ADD(2050010, 0, 1)
+DBPATCH_ADD(2050011, 0, 1)
+DBPATCH_ADD(2050012, 0, 1)
+DBPATCH_ADD(2050013, 0, 1)
+DBPATCH_ADD(2050014, 0, 1)
+DBPATCH_ADD(2050015, 0, 1)
 
 DBPATCH_END()

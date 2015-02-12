@@ -1279,7 +1279,24 @@ FIELD		|macro		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|itemid
 
+TABLE|application_prototype|application_prototypeid|ZBX_DATA
+FIELD		|application_prototypeid	|t_id		|	|NOT NULL	|0
+FIELD		|hostid				|t_id		|	|NOT NULL	|0	|1|hosts
+FIELD		|name				|t_varchar(64)	|''	|NOT NULL	|0
+INDEX		|1		|hostid
+
+TABLE|application_prototype_template|application_prototypeid,templateid|ZBX_DATA
+FIELD		|application_prototypeid	|t_id	|	|NOT NULL	|0	|1|application_prototype
+FIELD		|templateid			|t_id	|	|NOT NULL	|0	|2|application_prototype|application_prototypeid
+INDEX		|1		|templateid
+
+TABLE|item_application_prototype|application_prototypeid,itemid|ZBX_DATA
+FIELD		|application_prototypeid	|t_id	|	|NOT NULL	|0	|1|application_prototype
+FIELD		|itemid				|t_id	|	|NOT NULL	|0	|2|items
+INDEX		|1		|itemid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2050004	|2050004
+ROW		|2050015	|2050015
+
