@@ -23,7 +23,13 @@ $pageHeader = new CPageHeader(_('Something wrong hapenned'));
 $pageHeader->addCssInit();
 $pageHeader->display();
 
-$warning = new CWarning(_('Fatal error, please report to Zabbix Team'), $data['messages']);
+$messages = array();
+foreach ($data['messages'] as $message) {
+	$messages[] = $message;
+	$messages[] = BR();
+}
+
+$warning = new CWarning(_('Fatal error, please report to Zabbix Team'), $messages);
 $warning->setButtons(new CButton('back', _('Go to dashboard'),
 	'javascript: document.location = "zabbix.php?action=dashboard.view"',
 	'button'
