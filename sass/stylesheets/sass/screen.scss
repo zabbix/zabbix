@@ -78,7 +78,7 @@ h4 {
 }
 
 sup {
-	font-size: 0.917em;
+	font-size: $font-h3-size;
 	color: $font-alt-color;
 }
 
@@ -92,13 +92,13 @@ background: $secondary-color;
 margin: 0 0 13px 0;
 }
 
-div.top-nav-container {
+.top-nav-container {
 	height: 36px;
 	line-height: 35px;
 	background: $primary-color;
 }
 
-ul.top-nav {
+.top-nav {
 	font-size: $font-top-nav-size;
 	background: $primary-color;
 
@@ -159,58 +159,58 @@ ul.top-nav-icons {
 		@include opacity(0.75);
 		@include transition(all .2s ease);
 
-    &:hover {
-    	@include opacity(1);
-    }
+		&:hover {
+			@include opacity(1);
+		}
     }
 
-	a.top-nav-help {
+	.top-nav-help {
 		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -18px;
 	}
 
-	a.top-nav-print {
+	.top-nav-print {
 		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -42px;
 	}
 
-	a.top-nav-profile {
+	.top-nav-profile {
 		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -66px;
 	}
 
-	a.top-nav-signout {
+	.top-nav-signout {
 		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -91px;
 		width: 44px;
 	}
-}
 
-ul.top-nav-icons form {
-	position: relative;
-}
+	form {
+		position: relative;
+	}
 
-ul.top-nav-icons input {
-	background: darken($primary-color, 10%);
-	border: none;
-	width: 169px;
-	height: 24px;
-	line-height: 24px;
-	margin: 6px 13px 0 0;
-	color: $font-white-color;
-	padding-right: 24px;
-	@include transition(color, background-color .2s ease);
-	@include placeholder($form-input-top-placeholder);
+	input {
+		background: darken($primary-color, 10%);
+		border: none;
+		width: 169px;
+		height: 24px;
+		line-height: 24px;
+		margin: 6px 13px 0 0;
+		color: $font-white-color;
+		padding-right: 24px;
+		@include transition(color, background-color .2s ease);
+		@include placeholder($form-input-top-placeholder);
 
-	&:focus + .btn-search {
-		@include opacity(1);
-		@include placeholder($form-input-top-focus-placeholder);
+		&:focus + .btn-search {
+			@include opacity(1);
+			@include placeholder($form-input-top-focus-placeholder);
+		}
 	}
 }
 
-div.top-subnav-container {
+.top-subnav-container {
 	height: 36px;
 	line-height: 36px;
 	background: $secondary-color;
 }
 
-ul.top-subnav {
+.top-subnav {
 	background: $secondary-color;
 
 	li {
@@ -220,7 +220,7 @@ ul.top-subnav {
 	}
 }
 
-ul.top-subnav a {
+.top-subnav a {
 	padding: 5px 8px 5px 8px;
 	color: $link-topsubnav-color;
 
@@ -236,28 +236,28 @@ ul.top-subnav a {
 	}
 }
 
-span.arrow-up {
+.arrow-up {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
 	border-bottom: 4px solid $link-alt-color;
 }
 
-span.arrow-down {
+.arrow-down {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
 	border-top: 4px solid $link-alt-color;
 }
 
-span.arrow-left {
+.arrow-left {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
 	border-right: 4px solid $font-color;
 }
 
-span.arrow-right {
+.arrow-right {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
@@ -272,7 +272,7 @@ span.arrow-right {
 	display: inline-block;
 }
 
-div.header-title {
+.header-title {
 	position: relative;
 	margin: 0 0 12px 0;
 
@@ -295,7 +295,7 @@ article {
 }
 
 /* Obgect Group Navigation */
-ul.object-group {
+.object-group {
 	margin: 0 0 11px 0;
 	
 	li {
@@ -303,12 +303,12 @@ ul.object-group {
 		margin: 0 14px 0 0;
 	}
 
-	& a.selected {
+	.selected {
 		font-weight: bold;
 		background: #eee;
 	}
 
-	span.arrow-right {
+	.arrow-right {
 		border-left-color: $font-color;
 	}
 }
@@ -331,7 +331,7 @@ footer {
 	}	
 }
 
-a.logo {
+.logo {
 	display: block;
 	width: 94px;
 	height: 25px;
@@ -341,7 +341,7 @@ a.logo {
 }
 
 /* Tables */
-table.list-table {
+.list-table {
 	width: 100%;
     background: $body-content-bgcolor;
     @include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
@@ -399,7 +399,7 @@ table.list-table {
 	}
 }
 
-div.table-paging {
+.table-paging {
 	text-align: center;
 	background: $body-content-bgcolor;
 	padding: 7px 5px 7px 5px;
@@ -411,7 +411,7 @@ div.table-paging {
 	}
 }
 
-span.radio-switch {
+.radio-switch {
 	cursor: pointer;
 	@extend %paging-btn;
 }
@@ -453,7 +453,7 @@ span.radio-switch {
 	}
 }
 
-div.treeview-plus {
+.treeview-plus {
 	display: inline-block;
 	background: $body-content-bgcolor;
 	border: 1px solid $form-input-color;
@@ -475,24 +475,24 @@ div.treeview-plus {
 	}
 }
 
-div.table {
+.table {
 	display: table;
 }
 
-div.row {
+.row {
 	display: table-row;
 }
 
-div.cell {
+.cell {
 	display: table-cell;
 }
 
 /* Filters */
-div.filter-container {
+.filter-container {
 	text-align: center;
 }
 
-span.subfilter-enabled {
+.subfilter-enabled {
 	display: inline-block;
 	position: relative;
 	padding: 0 9px 0 6px;
@@ -509,13 +509,13 @@ span.subfilter-enabled {
 }
 
 /* Forms */
-div.table-forms-container {
+.table-forms-container {
 	padding: 0 10px 10px 10px;
 	background: $body-content-bgcolor;
 	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
 }
 
-div.form-btns {
+.form-btns {
 	//text-align: center;
 
 	button {
@@ -523,7 +523,7 @@ div.form-btns {
 	}
 }
 
-table.table-forms {
+.table-forms {
 	//margin: 0 auto;
 	width: 100%;
 
@@ -533,7 +533,7 @@ table.table-forms {
 	
 	tfoot {
 
-		td.table-forms-td-right {
+		.table-forms-td-right {
 			padding-top: 5px;
 		}
 
@@ -542,11 +542,11 @@ table.table-forms {
 		}
 	}
 
-	tr.table-forms-tr-new {
+	.table-forms-tr-new {
 		background: $alert-green-bg-color;
 	}
 
-	td.table-forms-td-left {
+	.table-forms-td-left {
 		padding: 5px 0 5px 0;
 		text-align: right;
 		vertical-align: top;
@@ -560,7 +560,7 @@ table.table-forms {
 		}
 	}
 
-	td.table-forms-td-right {
+	.table-forms-td-right {
 		padding: 5px 0 5px 10px;
 		vertical-align: middle;
 		width: 85%;
@@ -582,7 +582,7 @@ table.table-forms {
 	}
 }
 
-div.table-forms-separator {
+.table-forms-separator {
 	margin: 5px 0 0 0;
 	border: 1px solid $table-hordivider-color;
 }
@@ -595,7 +595,7 @@ div.table-forms-separator {
 	}
 }
 
-ul.list-check-radio {
+.list-check-radio {
 
 	li {
 		padding: 0 0 7px 0;
@@ -612,37 +612,27 @@ ul.list-check-radio {
 input {
 	
 	&[type="text"] {
-		height: 22px;
-		line-height: 22px;
-		padding: 0 0 0 5px;
+		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
 	&[type="password"] {
-		height: 22px;
-		line-height: 22px;
-		padding: 0 0 0 5px;
+		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
 	&[type="search"] {
-		height: 22px;
-		line-height: 22px;
-		padding: 0 0 0 5px;
+		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
 	&[type="number"] {
-		height: 22px;
-		line-height: 22px;
-		padding: 0 0 0 5px;
+		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
 	&[type="email"] {
-		height: 22px;
-		line-height: 22px;
-		padding: 0 0 0 5px;
+		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
@@ -686,6 +676,12 @@ select {
 	width: 13px;
 	height: 13px;
 	background: none;
+}
+
+%form-input-height-padding {
+	height: 22px;
+	line-height: 22px;
+	padding: 0 0 0 5px;
 }
 
 %form-input-style {
@@ -881,11 +877,11 @@ button {
 			color: $link-color;
 		}
 
-		& span.arrow-up {
+		.arrow-up {
 			border-bottom-color: $font-white-color;
 		}
 
-		& span.arrow-down {
+		.arrow-down {
 			border-top-color: $font-white-color;
 		}
 	}
@@ -934,21 +930,21 @@ button[disabled] {
 	}
 }
 
-div.action-buttons {
+.action-buttons {
 	margin: 15px 0 0 0;
 
-	& button {
+	button {
 		margin: 0 14px 0 0;
 	}
 }
 
-div.tabs-nav-container {
+.tabs-nav-container {
 	height: 36px;
 	line-height: 36px;
 	margin: 0 0 15px 0;
 }
 
-ul.ui-tabs-nav {
+.ui-tabs-nav {
 	height: 36px;
 	line-height: 36px;
 	margin: 0 -10px 15px -10px;
@@ -983,7 +979,7 @@ ul.ui-tabs-nav {
 	}
 }
 
-div.input-help-wrapper {
+.input-help-wrapper {
 	position: relative;
 	display: inline-block;
 }
@@ -1002,7 +998,7 @@ div.input-help-wrapper {
 	}
 }
 
-div.drag-icon {
+.drag-icon {
 	@extend %button-icon-size;
 	margin-left: -9px;
 	cursor: move;
@@ -1010,7 +1006,7 @@ div.drag-icon {
 }
 
 /* Sign in */
-div.signin-container {
+.signin-container {
 	background: $body-content-bgcolor;
 	width: 322px;
 	margin: 0 auto;
@@ -1056,7 +1052,7 @@ div.signin-container {
 	}
 }
 
-div.signin-logo {
+.signin-logo {
 	margin: 0 auto;
 	margin-top: 5%;
 	margin-bottom: 25px;
@@ -1065,7 +1061,7 @@ div.signin-logo {
 	background: url(../img/icon-sprite.png) no-repeat 0 -391px;
 }
 
-div.signin-links {
+.signin-links {
 	width: 100%;
 	text-align: center;
 	color: $font-alt-color;
@@ -1080,13 +1076,13 @@ div.signin-links {
 }
 
 /* Dashboard */
-div.dashbrd-widget {
+.dashbrd-widget {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
 	background: $body-content-bgcolor;
 	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
 
-	table.list-table {
+	.list-table {
 		@include box-shadow(none);
 
 		th {
@@ -1125,7 +1121,7 @@ div.dashbrd-widget {
 	padding-left: 10px;
 }
 
-div.dashbrd-widget-head {
+.dashbrd-widget-head {
 	cursor: move;
 	position: relative;
 	padding: 8px 10px 8px 10px;
@@ -1143,7 +1139,7 @@ div.dashbrd-widget-head {
 	}
 }
 
-ul.dashbrd-widget-foot {
+.dashbrd-widget-foot {
 	text-align: right;
 	color: $font-alt-color;
 	margin: 0 10px 0 10px;
@@ -1216,51 +1212,51 @@ ul.dashbrd-widget-foot {
 /* Alerts */
 .green {
 	color: $alert-green-color;
+
+	&:hover {
+		@extend .green;
+	}
 }
 
 .red {
 	color: $alert-red-color;
+
+	&:hover {
+		@extend .red;
+	}
 }
 
 .orange {
 	color: $alert-orange-color;
+
+	&:hover {
+		@extend .orange;
+	}
 }
 
 .grey {
 	color: $alert-grey-color;
+
+	&:hover {
+		@extend .grey;
+	}
 }
 
-a.green {
-	@extend .green;
-}
-
-a.red {
-	@extend .red;
-}
-
-a.orange {
-	@extend .orange;
-}
-
-a.grey {
-	@extend .grey;
-}
-
-span.status-green {
+.status-green {
 	@extend .green;
 	border: 1px solid $alert-green-border-color;
 	background: $alert-green-bg-color;
 	@extend %status;
 }
 
-span.status-red {
+.status-red {
 	@extend .red;
 	border: 1px solid $alert-red-border-color;
 	background: $alert-red-bg-color;
 	@extend %status;
 }
 
-span.status-grey {
+.status-grey {
 	@extend .grey;
 	border: 1px solid $alert-grey-border-color;
 	background: $alert-grey-bg-color;
@@ -1295,14 +1291,14 @@ span.status-grey {
 	background: $alert-warning-bg-color;
 }
 
-div.msg-good {
+.msg-good {
 	@extend .green;
 	border: 1px solid $alert-green-border-color;
 	background: $alert-green-bg-color;
 	@extend %msg;
 }
 
-div.msg-bad {
+.msg-bad {
 	@extend .red;
 	border: 1px solid $alert-red-border-color;
 	background: $alert-red-bg-color;
@@ -1317,7 +1313,7 @@ div.msg-bad {
 }
 
 /* Close/Remove icon */
-span.msg-close-btn {
+.msg-close-btn {
 	position: absolute;
 	right: 0;
 	width: 24px;
@@ -1330,7 +1326,7 @@ span.msg-close-btn {
 	}
 }
 
-a.form-remove-btn {
+.form-remove-btn {
 	display: block;
 	width: 24px;
 	height: 24px;
@@ -1342,6 +1338,7 @@ a.form-remove-btn {
 
 	&:hover {
 		background: lighten($primary-color, 55%);
+		text-decoration: none;
 	}
 
 	&:active {
@@ -1349,7 +1346,7 @@ a.form-remove-btn {
 	}
 }
 
-span.subfilter-disable-btn {
+.subfilter-disable-btn {
 	width: 20px;
 	height: 20px;
 	display: inline-block;
