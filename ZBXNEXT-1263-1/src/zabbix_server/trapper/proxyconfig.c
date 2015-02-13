@@ -25,8 +25,6 @@
 #include "proxyconfig.h"
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
 
-extern unsigned int	configured_tls_accept_modes;
-
 /******************************************************************************
  *                                                                            *
  * Function: send_proxyconfig                                                 *
@@ -107,18 +105,8 @@ void	recv_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	if (0 == (configured_tls_accept_modes & sock->connection_type))
-	{
-		char	*msg;
-
-		msg = zbx_dsprintf(NULL, "configuration update from server over connection of type \"%s\" is not "
-				"allowed", zbx_tls_connection_type_name(sock->connection_type));
-
-		zabbix_log(LOG_LEVEL_WARNING, "%s by proxy configuration parameter \"TLSAccept\"", msg);
-		zbx_send_response(sock, FAIL, msg, CONFIG_TIMEOUT);
-		zbx_free(msg);
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update"))
 		goto out;
-	}
 
 	process_proxyconfig(&jp_data);
 	zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
