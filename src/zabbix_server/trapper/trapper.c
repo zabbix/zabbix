@@ -119,6 +119,12 @@ static void	send_proxyhistory(zbx_sock_t *sock)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "history data request"))
+	{
+		/* do not send any reply to server in this case as the server expects history data */
+		goto out1;
+	}
+
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
@@ -148,7 +154,7 @@ out:
 	zbx_json_free(&j);
 	zbx_free(info);
 	zbx_free(error);
-
+out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 

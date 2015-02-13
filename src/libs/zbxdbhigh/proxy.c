@@ -29,6 +29,8 @@
 #include "zbxalgo.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 
+extern unsigned int	configured_tls_accept_modes;
+
 typedef struct
 {
 	const char		*field;
@@ -137,6 +139,49 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 		return FAIL;
 
 	*hostid = hostid_tmp;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_access_passive_proxy                                       *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     Check access rights to a passive proxy for the given connection and    *
+ *     send a response if denied.                                             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     sock          - [IN] connection socket context                         *
+ *     send_response - [IN] to send or not to send a response to server.      *
+ *                          Value: ZBX_SEND_RESPONSE or                       *
+ *                          ZBX_DO_NOT_SEND_RESPONSE                          *
+ *     req           - [IN] request, included into error message              *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - access is allowed                                            *
+ *     FAIL    - access is denied                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	check_access_passive_proxy(zbx_sock_t *sock, int send_response, const char *req)
+{
+	if (0 == (configured_tls_accept_modes & sock->connection_type))
+	{
+		char	*msg;
+
+		msg = zbx_dsprintf(NULL, "%s from server over connection of type \"%s\" is not allowed", req,
+				zbx_tls_connection_type_name(sock->connection_type));
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s by proxy configuration parameter \"TLSAccept\"", msg);
+
+		if (ZBX_SEND_RESPONSE == send_response)
+			zbx_send_response(sock, FAIL, msg, CONFIG_TIMEOUT);
+
+		zbx_free(msg);
+		return FAIL;
+	}
+
+	/* TODO add certificate issuer and subject checking if required */
 
 	return SUCCEED;
 }

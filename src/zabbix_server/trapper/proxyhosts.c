@@ -77,6 +77,12 @@ void	send_host_availability(zbx_sock_t *sock)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "host availability data request"))
+	{
+		/* do not send any reply to server in this case as the server expects host availability data */
+		goto out1;
+	}
+
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	get_host_availability_data(&j);
@@ -99,6 +105,6 @@ out:
 	zbx_json_free(&j);
 	zbx_free(info);
 	zbx_free(error);
-
+out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

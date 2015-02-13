@@ -47,6 +47,7 @@ AGENT_VALUE;
 
 int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, const zbx_sock_t *sock,
 		char **error);
+int	check_access_passive_proxy(zbx_sock_t *sock, int send_response, const char *req);
 
 void	update_proxy_lastaccess(const zbx_uint64_t hostid);
 

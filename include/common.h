@@ -1089,4 +1089,6 @@ int	parse_serveractive_element(char *str, char **host, unsigned short *port, uns
 #define ZBX_SESSION_ACTIVE	0
 #define ZBX_SESSION_PASSIVE	1
 
+#define ZBX_DO_NOT_SEND_RESPONSE	0
+#define ZBX_SEND_RESPONSE		1
 #endif
