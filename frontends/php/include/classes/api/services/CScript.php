@@ -385,30 +385,18 @@ class CScript extends CApiService {
 		}
 
 		$dbFields = array('command' => null, 'name' => null);
-		$names = array();
 
 		foreach ($scripts as $script) {
 			if (!check_db_fields($dbFields, $script)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for script.'));
 			}
-			if (zbx_empty($script['name'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty name for script.'));
-			}
-			if (isset($names[$script['name']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate script name "%1$s".', $script['name']));
-			}
 
-			$names[$script['name']] = $script['name'];
-		}
-
-		$dbScripts = $this->get(array(
-			'output' => array('name'),
-			'filter' => array('name' => $names),
-			'nopermissions' => true,
-			'limit' => 1
-		));
-		if ($dbScript = reset($dbScripts)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $dbScript['name']));
+			if ($script['name'] === '') {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Script name cannot be empty.'));
+			}
+			if ($script['command'] === '') {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Script command cannot be empty.'));
+			}
 		}
 	}
 
@@ -433,8 +421,6 @@ class CScript extends CApiService {
 		$scripts = zbx_toHash($scripts, 'scriptid');
 		$scriptIds = array_keys($scripts);
 
-		$names = array();
-
 		$dbScripts = $this->get(array(
 			'scriptids' => $scriptIds,
 			'output' => array('scriptid'),
@@ -447,30 +433,13 @@ class CScript extends CApiService {
 			}
 
 			if (isset($script['name'])) {
-				if (zbx_empty($script['name'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty name for script.'));
+				if ($script['name'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Script name cannot be empty.'));
 				}
-				if (isset($names[$script['name']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate script name "%1$s".', $script['name']));
-				}
-
-				$names[$script['name']] = $script['name'];
 			}
-		}
 
-		if ($names) {
-			$dbScripts = $this->get(array(
-				'output' => array('scriptid', 'name'),
-				'filter' => array('name' => $names),
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-
-			foreach ($dbScripts as $dbScript) {
-				if (!isset($scripts[$dbScript['scriptid']])
-						|| bccomp($scripts[$dbScript['scriptid']]['scriptid'], $dbScript['scriptid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $dbScript['name']));
-				}
+			if (isset($script['command']) && $script['command'] === '') {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Script command cannot be empty.'));
 			}
 		}
 	}
