@@ -41,13 +41,26 @@ legend {
 }
 
 a {
-	text-decoration: none;
-	color: $link-color;
-	@include transition(color .2s ease);
+	
+	&:link {
+		text-decoration: none;
+		color: $link-color;
+		@include transition(color .2s ease);
+	}
+
+	&:visited {
+		text-decoration: none;
+		color: $link-visited-color;
+	}
 
 	&:hover {
 		text-decoration: underline;
 		color: $link-hover-color;
+	}
+
+	&:active {
+		text-decoration: underline;
+		color: $link-active-color;
 	}
 
 	&.link-dotted {
@@ -1159,7 +1172,6 @@ button[disabled] {
 	color: $font-alt-color;
 	background: $body-content-bgcolor;
 	border: 1px solid $underline-color;
-	@include border-radius(2px);
 	@include box-shadow(0 4px 20px 0 rgba(60,60,60,0.3));
 
 	li {
@@ -1204,8 +1216,31 @@ button[disabled] {
 		}
 	}
 
+	.table-forms-td-left {
+		text-align: left;
+		width: auto;
+	}
+
+	.table-forms-td-right {
+		width: auto;
+	}
+
 	tfoot {
 		text-align: right;
+
+		button {
+			margin: 0 0 0 14px;
+		}
+	}
+
+	fieldset {
+		margin-left: -10px;
+	}
+
+	.dashbrd-widget-head {
+		color: $font-color;
+		margin: -7px -15px 0 -15px;
+		padding: 8px 10px 8px 15px;
 	}
 }
 
