@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+..F....... [ZBXNEXT-2357] added MVC framework, some pages already take advantage of the framework (Alexei, Sasha)
 ...GI..PS. [ZBXNEXT-444] improved log file monitoring by saving log file meta information which was previously lost during agent restart (dimir)
 ..F.....S. [ZBXNEXT-1128] added support of {HOST.*} and user macros in trigger URL (igors, Sasha)
 .......PS. [ZBXNEXT-2619] added an item for VMware virtual machine CPU ready state monitoring (wiper)

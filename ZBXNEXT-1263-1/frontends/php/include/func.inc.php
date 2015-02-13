@@ -1382,23 +1382,12 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
 
 // creates header col for sorting in table header
 function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
-	global $page;
-
 	$sortorder = ($sortField == $tabfield && $sortOrder == ZBX_SORT_UP) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
 	$link = CUrlFactory::getContextUrl();
 
 	$link->setArgument('sort', $tabfield);
 	$link->setArgument('sortorder', $sortorder);
-
-	$url = $link->getUrl();
-
-	if ($page['type'] != PAGE_TYPE_HTML && defined('ZBX_PAGE_MAIN_HAT')) {
-		$script = "javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."', '".$url."');";
-	}
-	else {
-		$script = 'javascript: redirect("'.$url.'");';
-	}
 
 	zbx_value2array($obj);
 	$cont = new CSpan();
@@ -1423,7 +1412,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 		}
 	}
 	$col = new CCol(array($cont, $img), 'nowrap hover_grey');
-	$col->setAttribute('onclick', $script);
+	$col->setAttribute('onclick', 'javascript: redirect("'.$link->getUrl().'");');
 
 	return $col;
 }
@@ -1442,7 +1431,16 @@ function getPageNumber() {
 	$pageNumber = getRequest('page');
 	if (!$pageNumber) {
 		$lastPage = CProfile::get('web.paging.lastpage');
-		$pageNumber = ($lastPage == $page['file']) ? CProfile::get('web.paging.page', 1) : 1;
+		// For MVC pages $page is not set so we use action instead
+		if (isset($page['file']) && $lastPage == $page['file']) {
+			$pageNumber = CProfile::get('web.paging.page', 1);
+		}
+		elseif (isset($_REQUEST['action']) && $lastPage == $_REQUEST['action']) {
+			$pageNumber = CProfile::get('web.paging.page', 1);
+		}
+		else {
+			$pageNumber = 1;
+		}
 	}
 
 	return $pageNumber;
@@ -1481,8 +1479,15 @@ function getPagingLine(&$items) {
 
 	$start = ($currentPage - 1) * $rowsPerPage;
 
-	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
-	CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
+	// For MVC pages $page is not set
+	if (isset($page['file'])) {
+		CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
+		CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
+	}
+	elseif (isset($_REQUEST['action'])) {
+		CProfile::update('web.paging.lastpage', $_REQUEST['action'], PROFILE_TYPE_STR);
+		CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
+	}
 
 	// trim array with items to contain items for current page
 	$items = array_slice($items, $start, $rowsPerPage, true);
@@ -1689,7 +1694,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 				);
 			}
 			$buttons[] = new CButton('back', _('Go to dashboard'),
-				'javascript: document.location = "dashboard.php"', 'button'
+				'javascript: document.location = "zabbix.php?action=dashboard.view"', 'button'
 			);
 		}
 		// if the user is not logged in - offer to login
@@ -1743,7 +1748,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES;
 
 	if (!defined('PAGE_HEADER_LOADED')) {
-		return null;
+//		return null;
 	}
 	if (defined('ZBX_API_REQUEST')) {
 		return null;
