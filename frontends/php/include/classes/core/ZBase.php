@@ -457,7 +457,14 @@ class ZBase {
 		// Controller returned fatal error
 		else if ($response instanceof CControllerResponseFatal) {
 			header('Content-Type: text/html; charset=UTF-8');
-			$response->addMessage('Fatal error in controller: '.$router->getAction());
+			$response->addMessage('Controller: '.$router->getAction());
+			ksort($_REQUEST);
+			foreach ($_REQUEST as $key => $value) {
+				// do not output SID
+				if ($key != 'sid') {
+					$response->addMessage($key.': '.$value);
+				}
+			}
 			$_SESSION['messages'] = $response->getMessages();
 			redirect('zabbix.php?action=system.warning');
 		}
