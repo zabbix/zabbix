@@ -748,7 +748,7 @@ foreach ($triggers as $trigger) {
 			$statusSpan = new CCol($eventStatusSpan);
 			$statusSpan->setColSpan(2);
 
-			$ack = getEventAckState($event, true);
+			$ack = getEventAckState($event, $page['file']);
 
 			$ackCheckBox = ($event['acknowledged'] == 0 && $event['value'] == TRIGGER_VALUE_TRUE)
 				? new CCheckBox('events['.$event['eventid'].']', 'no', null, $event['eventid'])
