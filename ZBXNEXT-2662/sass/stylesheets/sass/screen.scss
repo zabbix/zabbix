@@ -12,7 +12,7 @@ body {
 	@include font-body;
 	color: $font-color;
 	background: $body-bgcolor;
-	margin-bottom: 60px;
+	margin-bottom: 90px;
 	min-width: 950px;
 
 	&.pop-up {
@@ -31,7 +31,7 @@ body {
 }
 
 fieldset {
-	border: 1px solid #e9edf2;
+	border: 1px solid $underline-color;
 	padding: 0 10px 10px 15px;
 }
 
@@ -41,7 +41,7 @@ legend {
 }
 
 a {
-	
+
 	&:link {
 		text-decoration: none;
 		color: $link-color;
@@ -1172,7 +1172,7 @@ button[disabled] {
 	color: $font-alt-color;
 	background: $body-content-bgcolor;
 	border: 1px solid $underline-color;
-	@include box-shadow(0 4px 20px 0 rgba(60,60,60,0.3));
+	@include box-shadow(0 5px 20px 0 rgba(60,60,60,0.3));
 
 	li {
 		height: 24px;
@@ -1181,6 +1181,32 @@ button[disabled] {
 		&:first-child h3 {
 			border-top: 0;
 		}
+
+		a {
+			display: block;
+			height: 24px;
+			line-height: 24px;
+			text-decoration: none;
+			padding: 0 15px 0 15px;
+			margin: 0 -15px 0 -15px;
+			position: relative;
+			@include transition(background .2s ease);
+
+			&:hover {
+				background: lighten($primary-color, 55%);
+			}
+
+			&:active {
+				background: lighten($primary-color, 50%);
+			}
+
+			span {
+				position: absolute;
+				right: 10px;
+				top: 8px;
+			}
+		}
+
 	}
 
 	h3 {
@@ -1191,31 +1217,6 @@ button[disabled] {
 		margin: 0 -15px 0 -15px;
 	}
 
-	a {
-		display: block;
-		height: 24px;
-		line-height: 24px;
-		text-decoration: none;
-		padding: 0 15px 0 15px;
-		margin: 0 -15px 0 -15px;
-		position: relative;
-		@include transition(background .2s ease);
-
-		&:hover {
-			background: lighten($primary-color, 55%);
-		}
-
-		&:active {
-			background: lighten($primary-color, 50%);
-		}
-
-		span {
-			position: absolute;
-			right: 10px;
-			top: 8px;
-		}
-	}
-
 	.table-forms-td-left {
 		text-align: left;
 		width: auto;
@@ -1223,13 +1224,17 @@ button[disabled] {
 
 	.table-forms-td-right {
 		width: auto;
+
+		//td {
+		//	vertical-align: bottom;
+		//}
 	}
 
 	tfoot {
 		text-align: right;
 
 		button {
-			margin: 0 0 0 14px;
+			margin: 4px 0 0 14px;
 		}
 	}
 
@@ -1239,8 +1244,9 @@ button[disabled] {
 
 	.dashbrd-widget-head {
 		color: $font-color;
-		margin: -7px -15px 0 -15px;
-		padding: 8px 10px 8px 15px;
+		margin: -7px -15px 6px -15px;
+		padding: 12px 10px 8px 15px;
+		//background: #eee;
 	}
 }
 
