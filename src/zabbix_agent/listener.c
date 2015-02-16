@@ -133,7 +133,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		if (SUCCEED == ret || EINTR == zbx_sock_last_error())
 			continue;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "failed to accept an incoming connection: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection%s", zbx_tcp_strerror());
 
 		if (local_request_failed++ > 1000)
 		{

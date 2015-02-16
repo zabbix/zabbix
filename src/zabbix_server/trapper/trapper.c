@@ -698,7 +698,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		}
 		else if (EINTR != zbx_sock_last_error())
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection%s",
 					zbx_tcp_strerror());
 		}
 	}
