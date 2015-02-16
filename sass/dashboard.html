@@ -196,17 +196,18 @@
 	<li><a href="#">Add</a></li>
 	<li><a href="#">Remove<span class="arrow-right"></span></a></li>
 	<li><a href="#">Remove all</a></li>
+	<li><div></div></li>
 	<li><h3>Favourite slide shows</h3></li>
 	<li><a href="#">Add</a></li>
-	<li>Remove</li>
-	<li>Remove all</li>
+	<li><span>Remove</span></li>
+	<li><span>Remove all</span></li>
 	</ul>
 
 	<ul class="action-menu" style="top: 328px; left: 945px">
 	<li><a href="#">Zabbix server</a></li>
 	</ul>
 
-	<div class="action-menu" style="top: 428px; left: 945px">
+	<div class="overlay-dialogue" style="top: 428px; left: 945px">
 	<div class="dashbrd-widget-head"><h4>Edit map element</h4></div>
 	<table class="table-forms">
 		<tfoot>
@@ -218,7 +219,11 @@
 		<tbody>
 		<tr>
 		<td class="table-forms-td-left"><label for="HostName">Type</label></td>
-		<td class="table-forms-td-right"><input type="text" id="HostName"></td>
+		<td class="table-forms-td-right"><select size="1" name="elementtype" id="elementType"><option value="0">Host</option><option value="1">Map</option><option value="2">Trigger</option><option value="3">Host group</option></select></td>
+		</tr>
+		<tr>
+		<td class="table-forms-td-left">Show</td>
+		<td class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> IP address</label></li></ul></td>
 		</tr>
 		<tr>
 		<td class="table-forms-td-left"><label for="VisibleName">Label</label></td>
@@ -992,7 +997,7 @@
 		</tr>
 		<tr>
 		<td class="table-forms-td-left"><label for="HostName">Coordinates</label></td>
-		<td class="table-forms-td-right"><input type="number" id="HostName" style="width: 50px"> <label>X</label>&nbsp;&nbsp;<input type="number" id="HostName" style="width: 50px"> <label>Y</label></td>
+		<td class="table-forms-td-right"><input type="number" id="HostName"> <label>X</label>&nbsp;&nbsp;<input type="number" id="HostName"> <label>Y</label></td>
 		</tr>
 		<tr>
 		<!--<td class="table-forms-td-left"></td>-->

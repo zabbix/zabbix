@@ -253,14 +253,14 @@ ul.top-nav-icons {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-bottom: 4px solid $link-alt-color;
+	border-bottom: 4px solid $font-color;
 }
 
 .arrow-down {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-top: 4px solid $link-alt-color;
+	border-top: 4px solid $font-color;
 }
 
 .arrow-left {
@@ -357,7 +357,7 @@ footer {
 .list-table {
 	width: 100%;
     background: $body-content-bgcolor;
-    @include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
+    @include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
 	
 	thead th {
 		@include list-table-header;
@@ -370,8 +370,23 @@ footer {
 	    color: $font-alt-color;
 	    white-space: nowrap;
 
+	    .arrow-up {
+	    	position: absolute;
+	    	top: 45%;
+	    	margin: 0 0 0 4px;
+	    	border-bottom-color: $font-alt-color;
+	    }
+
+	    .arrow-down {
+	    	position: absolute;
+	    	top: 45%;
+	    	margin: 0 0 0 4px;
+	    	border-top-color: $font-alt-color;
+	    }
+
 	    a {
 	    	display: block;
+	    	position: relative;
 	    	color: $link-alt-color;
 	    	margin: -1em;
 	    	padding: 1em;
@@ -381,10 +396,6 @@ footer {
 	    		color: $link-alt-hover-color;
 	    		text-decoration: none;
 	    		background: lighten($primary-color, 56%)
-	    	}
-
-	    	& span {
-	    		margin: 0 0 0 4px;
 	    	}	    
 	    }
 	}
@@ -417,7 +428,7 @@ footer {
 	background: $body-content-bgcolor;
 	padding: 7px 5px 7px 5px;
 	border-top: 1px solid $table-hordivider-color;
-	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
+	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
 
 	a {
 		@extend %paging-btn;
@@ -525,7 +536,7 @@ footer {
 .table-forms-container {
 	padding: 0 10px 10px 10px;
 	background: $body-content-bgcolor;
-	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
+	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
 }
 
 .form-btns {
@@ -539,10 +550,7 @@ footer {
 .table-forms {
 	//margin: 0 auto;
 	width: 100%;
-
-	label {
-		color: $font-color;
-	}
+	color: $font-color;
 	
 	tfoot {
 
@@ -1024,7 +1032,7 @@ button[disabled] {
 	width: 322px;
 	margin: 0 auto;
 	padding: 20px 28px 0 28px;
-	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
+	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
 
 	h1 {
 		border: none;
@@ -1093,7 +1101,7 @@ button[disabled] {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
 	background: $body-content-bgcolor;
-	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
+	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
 
 	.list-table {
 		@include box-shadow(none);
@@ -1175,17 +1183,12 @@ button[disabled] {
 	@include box-shadow(0 5px 20px 0 rgba(60,60,60,0.3));
 
 	li {
-		height: 24px;
-		line-height: 24px;
-
-		&:first-child h3 {
-			border-top: 0;
-		}
 
 		a {
 			display: block;
 			height: 24px;
 			line-height: 24px;
+			color: $font-color;
 			text-decoration: none;
 			padding: 0 15px 0 15px;
 			margin: 0 -15px 0 -15px;
@@ -1193,29 +1196,46 @@ button[disabled] {
 			@include transition(background .2s ease);
 
 			&:hover {
-				background: lighten($primary-color, 55%);
+				background: lighten($underline-color, 10%);
 			}
 
 			&:active {
-				background: lighten($primary-color, 50%);
+				background: lighten($underline-color, 10%);
 			}
 
 			span {
 				position: absolute;
 				right: 10px;
 				top: 8px;
+				height: auto;
+				line-height: auto;
 			}
 		}
 
+		span {
+			height: 24px;
+			line-height: 24px;
+		}
+
+		div {
+			border-top: 1px solid $body-bgcolor;
+			margin: 7px -15px 7px -15px;
+		}
 	}
 
 	h3 {
 		height: 24px;
 		line-height: 24px;
-		border-top: 1px solid $body-bgcolor;
-		padding: 0 15px 0 15px;
-		margin: 0 -15px 0 -15px;
 	}
+}
+
+.overlay-dialogue {
+	position: absolute;
+	z-index: 1000;
+	padding: 7px 15px 7px 15px;
+	background: $body-content-bgcolor;
+	border: 1px solid $underline-color;
+	@include box-shadow(0 5px 20px 0 rgba(60,60,60,0.3));
 
 	.table-forms-td-left {
 		text-align: left;
@@ -1224,10 +1244,6 @@ button[disabled] {
 
 	.table-forms-td-right {
 		width: auto;
-
-		//td {
-		//	vertical-align: bottom;
-		//}
 	}
 
 	tfoot {
@@ -1243,10 +1259,8 @@ button[disabled] {
 	}
 
 	.dashbrd-widget-head {
-		color: $font-color;
 		margin: -7px -15px 6px -15px;
 		padding: 12px 10px 8px 15px;
-		//background: #eee;
 	}
 }
 
