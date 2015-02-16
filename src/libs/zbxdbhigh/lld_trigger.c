@@ -1506,6 +1506,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 
 			zbx_vector_ptr_create(&db_trigger->functions);
 			zbx_vector_ptr_create(&db_trigger->dependencies);
+			zbx_vector_ptr_create(&db_trigger->dependants);
 
 			zbx_vector_ptr_append(&db_triggers, db_trigger);
 		}
