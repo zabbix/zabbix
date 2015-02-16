@@ -49,7 +49,7 @@ $fields = array(
 	'user_groups' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
 	'user_groups_to_del' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'user_medias' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
-	'user_medias_to_del' =>	array(T_ZBX_STR, O_OPT, null,	DB_ID,		null),
+	'user_medias_to_del' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'new_groups' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'new_media' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'enable_media' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
@@ -364,7 +364,7 @@ $_REQUEST['filter_usrgrpid'] = getRequest('filter_usrgrpid', CProfile::get('web.
 CProfile::update('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROFILE_TYPE_ID);
 
 if (!empty($_REQUEST['form'])) {
-	$userId = getRequest('userid');
+	$userId = getRequest('userid', 0);
 
 	$data = getUserFormData($userId, $config);
 

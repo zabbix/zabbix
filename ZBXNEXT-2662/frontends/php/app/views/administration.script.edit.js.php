@@ -5,42 +5,32 @@
 			var ipmi = (jQuery(this).val() == 1);
 
 			if (ipmi) {
-				jQuery('#execute_on')
-					.closest('li')
-					.css('display', 'none');
+				jQuery('#execute_on, #command').closest('li').addClass('hidden');
 
 				jQuery('#commandipmi')
 					.val(jQuery('#command').val())
 					.closest('li')
-					.css('display', '')
 					.removeClass('hidden');
-
-				jQuery('#command')
-					.closest('li')
-					.css('display', 'none');
 			}
 			else {
 				jQuery('#execute_on')
 					.closest('li')
-					.css('display', '')
 					.removeClass('hidden');
 
 				jQuery('#command')
 					.val(jQuery('#commandipmi').val())
 					.closest('li')
-					.css('display', '')
 					.removeClass('hidden');
 
-				jQuery('#commandipmi')
-					.closest('li')
-					.css('display', 'none');
+				jQuery('#commandipmi').closest('li').addClass('hidden');
 			}
 		});
 
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#scriptid, #delete, #clone').remove();
-			jQuery('#update').val(<?php echo CJs::encodeJson(_('Add')); ?>).attr({id: 'add', name: 'add'});
+			jQuery('#update span').text(<?php echo CJs::encodeJson(_('Add')); ?>);
+			jQuery('#update').val('script.create').attr({id: 'add'});
 			jQuery('#cancel').addClass('ui-corner-left');
 			jQuery('#name').focus();
 		});
@@ -51,7 +41,7 @@
 		}).keyup();
 
 		// enable confirmation checkbox
-		jQuery('#enableConfirmation').change(function() {
+		jQuery('#enable_confirmation').change(function() {
 			if (this.checked) {
 				jQuery('#confirmation').removeAttr('disabled').keyup();
 			}
@@ -76,5 +66,12 @@
 				}
 			})
 			.trigger('change');
+
+		// trim spaces on sumbit
+		jQuery('#scriptForm').submit(function() {
+			jQuery('#name').val(jQuery.trim(jQuery('#name').val()));
+			jQuery('#command').val(jQuery.trim(jQuery('#command').val()));
+			jQuery('#description').val(jQuery.trim(jQuery('#description').val()));
+		});
 	});
 </script>
