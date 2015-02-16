@@ -433,6 +433,14 @@ footer {
 	a {
 		@extend %paging-btn;
 	}
+
+	.arrow-left {
+		border-right-color: $link-color;
+	}
+
+	.arrow-right {
+		border-left-color: $link-color;
+	}
 }
 
 .radio-switch {
@@ -870,18 +878,26 @@ button {
 	&.btn-grey {
 		margin-top: -2px;
 		background: $form-transparent-color;
-		color: $font-color;
+		color: $link-color;
 		border-color: $form-input-color;
 
 		&:hover {
-			color: $font-color;
 			background: lighten($primary-color, 55%);
+			color: $link-color;
 			border-color: $form-input-color;
 		}
 
 		&:active {
-			color: $font-color;
 			background: lighten($primary-color, 50%);
+			color: $link-color;
+		}
+
+		.arrow-left {
+			border-right-color: $link-color;
+		}
+
+		.arrow-right {
+			border-left-color: $link-color;
 		}
 	}
 
@@ -1267,34 +1283,34 @@ button[disabled] {
 /* Alerts */
 .green {
 	color: $alert-green-color;
+}
 
-	&:hover {
-		@extend .green;
-	}
+a.green {
+	@extend .green;
 }
 
 .red {
 	color: $alert-red-color;
+}
 
-	&:hover {
-		@extend .red;
-	}
+a.red {
+	@extend .red;
 }
 
 .orange {
 	color: $alert-orange-color;
+}
 
-	&:hover {
-		@extend .orange;
-	}
+a.orange {
+	@extend .orange;
 }
 
 .grey {
 	color: $alert-grey-color;
+}
 
-	&:hover {
-		@extend .grey;
-	}
+a.grey {
+	@extend .grey;
 }
 
 .status-green {
