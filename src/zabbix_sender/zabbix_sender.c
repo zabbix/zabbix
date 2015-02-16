@@ -25,6 +25,7 @@
 #include "log.h"
 #include "zbxgetopt.h"
 #include "zbxjson.h"
+#include "../libs/zbxcrypto/tls.h"
 
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_sender";
@@ -343,8 +344,12 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	signal(SIGALRM, send_signal_handler);
 #endif
 
+	/* The connect mode can specify TLS with PSK but here we do not know PSK details. Therefore we put NULL in */
+	/* the last 2 arguments. zbx_tls_connect() will find out PSK in this case. If the connect mode specifies */
+	/* TLS with certificate then also NULLs are ok, as the sender does not verify server certificate issuer and */
+	/* subject. */
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port,
-			GET_SENDER_TIMEOUT, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
+			GET_SENDER_TIMEOUT, configured_tls_connect_mode, NULL, NULL)))
 	{
 		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sentdval_args->json.buffer)))
 		{
@@ -379,6 +384,24 @@ static void    zbx_load_config(const char *config_file)
 			PARM_OPT,	0,			0},
 		{"Hostname",			&cfg_hostname,				TYPE_STRING,
 			PARM_OPT,	0,			0},
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		{"TLSConnect",			&CONFIG_TLS_CONNECT,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCaFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCaPath",			&CONFIG_TLS_CA_PATH,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCrlFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCertFile",			&CONFIG_TLS_CERT_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPskFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPskIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+#endif
 		{NULL}
 	};
 
@@ -685,6 +708,9 @@ int	main(int argc, char **argv)
 	sentdval_args.server = ZABBIX_SERVER;
 	sentdval_args.port = ZABBIX_SERVER_PORT;
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child();
+#endif
 	zbx_json_init(&sentdval_args.json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addarray(&sentdval_args.json, ZBX_PROTO_TAG_DATA);
@@ -899,6 +925,9 @@ exit:
 				" Use option -vv for more detailed output." : "");
 	}
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_free();
+#endif
 	zabbix_close_log();
 
 	if (FAIL == ret)
