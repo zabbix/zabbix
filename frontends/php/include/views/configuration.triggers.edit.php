@@ -300,12 +300,8 @@ $dependenciesFormList->addRow(
 		array(
 			$dependenciesTable,
 			new CButton('bnt1', _('Add'),
-				'return PopUp("popup.php?'.
-					'srctbl=triggers'.
-					'&srcfld1=triggerid'.
-					'&reference=deptrigger'.
-					'&multiselect=1'.
-					'&with_triggers=1", 1000, 700);',
+				'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
+					'&with_triggers=1&noempty=0", 1000, 700);',
 				'link_menu'
 			)
 		),

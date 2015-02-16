@@ -280,13 +280,14 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 	$dependenciesTable->addRow($row);
 }
 
-$addButton = new CButton('add_deptrigger', _('Add'), 'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid'.
-		'&reference=deptrigger&multiselect=1&with_triggers=1&normal_only=1", 1000, 700);',
+$addButton = new CButton('add_deptrigger', _('Add'),
+	'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
+		'&with_triggers=1&normal_only=1&noempty=0", 1000, 700);',
 	'link_menu'
 );
 $addPrototypeButton = new CButton('add_depprototrigger', _('Add prototype'),
 	'return PopUp("popup.php?srctbl=trigger_prototypes&srcfld1=triggerid&reference=deptrigger'.
-		'&multiselect=1", 1000, 700);',
+		'&multiselect=1&noempty=0", 1000, 700);',
 	'link_menu'
 );
 $dependenciesFormList->addRow(_('Dependencies'),
