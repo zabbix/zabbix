@@ -545,36 +545,18 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
  * @throws InvalidArgumentException	if an element of $otherButtons contain something other than CButtonInterface
  */
 function makeFormFooter(CButtonInterface $mainButton = null, array $otherButtons = array()) {
-	if ($mainButton) {
-		$mainButton->main();
-		$mainButton->setButtonClass('jqueryinput shadow');
-	}
-
 	foreach ($otherButtons as $button) {
-		if (!$button instanceof CButtonInterface) {
-			throw new InvalidArgumentException('Each element of $otherButtons must be an instance of CButtonInterface');
-		}
-
-		// buttons will inherit the styles from the containing div, so only the shadow class is required
-		$button->setButtonClass('shadow');
+		$button->addClass('btn-alt');
 	}
 
-	$otherButtonDiv = new CDiv($otherButtons, 'dd left');
-	$otherButtonDiv->useJQueryStyle();
+	$buttons = array();
+	if ($mainButton !== null) {
+		$buttons[] = $mainButton;
+	}
 
-	return new CDiv(
-		new CDiv(
-			new CDiv(
-				array(
-					new CDiv($mainButton, 'dt right'),
-					$otherButtonDiv
-				),
-				'formrow'
-			),
-			'formtable'
-		),
-		'objectgroup footer ui-widget-content ui-corner-all'
-	);
+	$buttons[] = $otherButtons;
+
+	return new CDiv($buttons, 'form-btns');
 }
 
 /**

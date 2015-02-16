@@ -215,6 +215,7 @@ if ($type == SHOW_TRIGGERS) {
 			'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
 		),
 		'selectHosts' => array('hostid', 'name', 'status'),
+		'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
 		'hostids' => $hostIds,
 		'search' => ($filter['txtSelect'] !== '') ? array('description' => $filter['txtSelect']) : null,
 		'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
@@ -225,7 +226,8 @@ if ($type == SHOW_TRIGGERS) {
 		'maintenance' => !$filter['showMaintenance'] ? false : null,
 		'monitored' => true,
 		'skipDependent' => true,
-		'sortfield' => 'description'
+		'sortfield' => 'description',
+		'preservekeys' => true
 	);
 
 	// trigger status filter
@@ -247,6 +249,8 @@ if ($type == SHOW_TRIGGERS) {
 	}
 
 	$triggers = API::Trigger()->get($options);
+
+	$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
 
 	$data['filter'] = $filter;
 	$data['hosts'] = $hosts;

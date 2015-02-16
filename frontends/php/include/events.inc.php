@@ -178,7 +178,7 @@ function make_event_details($event, $trigger) {
 	if ($config['event_ack_enable']) {
 		// to make resulting link not have hint with acknowledges
 		$event['acknowledges'] = count($event['acknowledges']);
-		$ack = getEventAckState($event, true);
+		$ack = getEventAckState($event, $page['file']);
 		$table->addRow(array(_('Acknowledged'), $ack));
 	}
 
@@ -242,7 +242,7 @@ function make_small_eventlist($startEvent) {
 			$event['acknowledged']
 		);
 
-		$ack = getEventAckState($event, true);
+		$ack = getEventAckState($event, $page['file']);
 
 		$table->addRow(array(
 			new CLink(
@@ -303,7 +303,7 @@ function make_popup_eventlist($triggerId, $eventId) {
 			$eventStatusSpan,
 			$duration,
 			zbx_date2age($event['clock']),
-			getEventAckState($event, false, false)
+			getEventAckState($event, null, false)
 		));
 	}
 
@@ -319,13 +319,13 @@ function make_popup_eventlist($triggerId, $eventId) {
  * @param int			$event['eventid']
  * @param int			$event['objectid']
  * @param array			$event['acknowledges']
- * @param bool|string	$backUrl if true, add backurl param to link with current page file name
+ * @param string		$url if not null, add url param to link with current page file name
  * @param bool			$isLink  if true, return link otherwise span
  * @param array			$params  additional params for link
  *
  * @return array|CLink|CSpan|null|string
  */
-function getEventAckState($event, $backUrl = false, $isLink = true, $params = array()) {
+function getEventAckState($event, $url = null, $isLink = true, $params = array()) {
 	$config = select_config();
 
 	if (!$config['event_ack_enable']) {
@@ -333,17 +333,11 @@ function getEventAckState($event, $backUrl = false, $isLink = true, $params = ar
 	}
 
 	if ($isLink) {
-		if (!empty($backUrl)) {
-			if (is_bool($backUrl)) {
-				global $page;
-				$backurl = '&backurl='.$page['file'];
-			}
-			else {
-				$backurl = '&backurl='.$backUrl;
-			}
+		if ($url === null) {
+			$backurl = '';
 		}
 		else {
-			$backurl = '';
+			$backurl = '&backurl='.urlencode($url);
 		}
 
 		$additionalParams = '';

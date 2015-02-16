@@ -569,7 +569,7 @@ $itemForm->addItem($itemTab);
 // append buttons to form
 $itemForm->addItem(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
-	array(new CButtonCancel(url_param('groupid').url_param('hostid').url_param('config')))
+	array(new CButtonCancel(url_param('groupid').url_param('hostid')))
 ));
 $itemWidget->addItem($itemForm);
 

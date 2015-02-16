@@ -31,8 +31,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION		EXCEPTION
 $fields = array(
 	'sysmapid' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,				null),
-	'selements' =>		array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,				null),
-	'links' =>			array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,				null),
+	'selements' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
+	'links' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
 	'noselements' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),			null),
 	'nolinks' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),			null),
 	'nocalculations' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),			null),
