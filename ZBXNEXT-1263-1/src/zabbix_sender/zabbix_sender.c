@@ -34,6 +34,12 @@ const char	syslog_app_name[] = "zabbix_sender";
 const char	*usage_message[] = {
 	"[-v] -z server [-p port] [-I IP-address] -s host -k key -o value",
 	"[-v] -z server [-p port] [-I IP-address] [-T] [-r] -i input-file",
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"[-v] -z server [-p port] [-I IP-address] --tls-connect=cert (--tls-ca-file=ca_file | --tls-ca-path=ca_path) [--tls-crl-file=crl_file] --tls-cert-file=cert_file --tls-key-file=key_file -s host -k key -o value",
+	"[-v] -z server [-p port] [-I IP-address] --tls-connect=cert (--tls-ca-file=ca_file | --tls-ca-path=ca_path) [--tls-crl-file=crl_file] --tls-cert-file=cert_file --tls-key-file=key_file [-T] [-r] -i input-file",
+	"[-v] -z server [-p port] [-I IP-address] --tls-connect=psk --tls-psk-identity=psk_identity --tls-psk-file=psk_file -s host -k key -o value",
+	"[-v] -z server [-p port] [-I IP-address] --tls-connect=psk --tls-psk-identity=psk_identity --tls-psk-file=psk_file [-T] [-r] -i input-file",
+#endif
 	"[-v] -c config-file -s host -k key -o value",
 	"[-v] -c config-file [-T] [-r] -i input-file",
 	"-h",
@@ -46,7 +52,7 @@ unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
 const char	*help_message[] = {
 	"Utility for sending monitoring data to Zabbix server or proxy.",
 	"",
-	"Options:",
+	"General options:",
 	"  -c --config config-file              Absolute path to Zabbix agentd configuration file",
 	"",
 	"  -z --zabbix-server server            Hostname or IP address of Zabbix server or proxy to send data to",
@@ -73,7 +79,43 @@ const char	*help_message[] = {
 	"  -h --help                            Display this help message",
 	"  -V --version                         Display version number",
 	"",
-	"Example: zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43",
+	"TLS connection options:",
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"  --tls-connect                        How to connect to server or proxy. Values:",
+	"                                           unencrypted - connect without encryption",
+	"                                           psk         - connect using TLS and a pre-shared key",
+	"                                           cert        - connect using TLS and a certificate",
+	"",
+	"  --tls-ca-file                        Full pathname of a file containing the top-level CA(s) certificates for",
+	"                                       peer certificate verification",
+	"",
+	"  --tls-ca-path                        Full path of a directory containing the top-level CA(s) certificates for",
+	"                                       peer certificate verification. Overrides '--tls-ca-file' parameter",
+	"",
+	"  --tls-crl-file                       Full pathname of a file containing revoked certificates",
+	"",
+	"  --tls-cert-file                      Full pathname of a file containing the certificate or certificate chain",
+	"",
+	"  --tls-key-file                       Full pathname of a file containing the private key",
+	"",
+	"  --tls-psk-identity                   Unique, case sensitive string used to identify the pre-shared key",
+	"",
+	"  --tls-psk-file                       Full pathname of a file containing the pre-shared key",
+#else
+	"  Not available. This Zabbix sender was compiled without TLS support",
+#endif
+	"",
+	"Example(s):",
+	"    zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43",
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"",
+	"    zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43 --tls-connect=psk \\",
+	"        --tls-psk-identity=\"PSK ID Zabbix agentd\" --tls-psk-file=/home/zabbix/zabbix_agentd.psk",
+	"",
+	"    zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43 --tls-connect=cert \\",
+	"        --tls-ca-file=/home/zabbix/zabbix_ca_file --tls-cert-file=/home/zabbix/zabbix_agentd.crt \\",
+	"        --tls-key-file=/home/zabbix/zabbix_agentd.key",
+#endif
 	NULL	/* end of text */
 };
 
@@ -81,7 +123,6 @@ const char	*help_message[] = {
 unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
 unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;	/* not used in zabbix_sender, just for */
 									/* linking with tls.c */
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 char	*CONFIG_TLS_CONNECT		= NULL;
 char	*CONFIG_TLS_ACCEPT		= NULL; /* not used in zabbix_sender, just for linking with tls.c */
 char	*CONFIG_TLS_CA_FILE		= NULL;
@@ -91,7 +132,6 @@ char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
 char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
-#endif
 
 /* COMMAND LINE OPTIONS */
 
@@ -111,6 +151,14 @@ static struct zbx_option	longopts[] =
 	{"verbose",		0,	NULL,	'v'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
+	{"tls-connect",		1,	NULL,	'1'},
+	{"tls-ca-file",		1,	NULL,	'2'},
+	{"tls-ca-path",		1,	NULL,	'3'},
+	{"tls-crl-file",	1,	NULL,	'4'},
+	{"tls-cert-file",	1,	NULL,	'5'},
+	{"tls-key-file",	1,	NULL,	'6'},
+	{"tls-psk-identity",	1,	NULL,	'7'},
+	{"tls-psk-file",	1,	NULL,	'8'},
 	{NULL}
 };
 
@@ -384,7 +432,6 @@ static void    zbx_load_config(const char *config_file)
 			PARM_OPT,	0,			0},
 		{"Hostname",			&cfg_hostname,				TYPE_STRING,
 			PARM_OPT,	0,			0},
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		{"TLSConnect",			&CONFIG_TLS_CONNECT,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCaFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
@@ -401,7 +448,6 @@ static void    zbx_load_config(const char *config_file)
 			PARM_OPT,	0,			0},
 		{"TLSPskIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-#endif
 		{NULL}
 	};
 
@@ -527,6 +573,45 @@ static void	parse_commandline(int argc, char **argv)
 				else if (LOG_LEVEL_DEBUG > CONFIG_LOG_LEVEL)
 					CONFIG_LOG_LEVEL = LOG_LEVEL_DEBUG;
 				break;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			case '1':
+				CONFIG_TLS_CONNECT = zbx_strdup(CONFIG_TLS_CONNECT, zbx_optarg);
+				break;
+			case '2':
+				CONFIG_TLS_CA_FILE = zbx_strdup(CONFIG_TLS_CA_FILE, zbx_optarg);
+				break;
+			case '3':
+				CONFIG_TLS_CA_PATH = zbx_strdup(CONFIG_TLS_CA_PATH, zbx_optarg);
+				break;
+			case '4':
+				CONFIG_TLS_CRL_FILE = zbx_strdup(CONFIG_TLS_CRL_FILE, zbx_optarg);
+				break;
+			case '5':
+				CONFIG_TLS_CERT_FILE = zbx_strdup(CONFIG_TLS_CERT_FILE, zbx_optarg);
+				break;
+			case '6':
+				CONFIG_TLS_KEY_FILE = zbx_strdup(CONFIG_TLS_KEY_FILE, zbx_optarg);
+				break;
+			case '7':
+				CONFIG_TLS_PSK_IDENTITY = zbx_strdup(CONFIG_TLS_PSK_IDENTITY, zbx_optarg);
+				break;
+			case '8':
+				CONFIG_TLS_PSK_FILE = zbx_strdup(CONFIG_TLS_PSK_FILE, zbx_optarg);
+				break;
+#else
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+				zbx_error("TLS parameters cannot be used: Zabbix sender was compiled without TLS "
+						"support.");
+				exit(EXIT_FAILURE);
+				break;
+#endif
 			default:
 				usage();
 				exit(EXIT_FAILURE);
@@ -710,6 +795,15 @@ int	main(int argc, char **argv)
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
+#else
+	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CA_PATH ||
+			NULL != CONFIG_TLS_CRL_FILE || NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
+			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix sender was compiled without TLS "
+				"support.");
+		goto exit;
+	}
 #endif
 	zbx_json_init(&sentdval_args.json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
