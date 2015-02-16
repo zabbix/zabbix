@@ -52,10 +52,6 @@ class CWebUser {
 				throw new Exception();
 			}
 
-			if (empty(self::$data['url'])) {
-				self::$data['url'] = CProfile::get('web.menu.view.last', 'index.php');
-			}
-
 			$result = (bool) self::$data;
 
 			if (isset(self::$data['attempt_failed']) && self::$data['attempt_failed']) {
