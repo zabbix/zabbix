@@ -24,6 +24,9 @@
 #	error "This module is only available for Windows OS"
 #endif
 
+#define EVT_VARIANT_TYPE_ARRAY	128
+#define EVT_VARIANT_TYPE_MASK	0x7f
+
 /* Structures from winevt.h file */
 typedef HANDLE EVT_HANDLE, *PEVT_HANDLE;
 
