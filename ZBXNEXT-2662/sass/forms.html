@@ -34,38 +34,24 @@
 	<div class="table-forms-container">
 	
 	<ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li><a href="#">Templates</a></li><li class="ui-tabs-active"><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
-<!--
-	<div class="tabs-nav">
-	<a href="#" class="selected">Host</a><a href="#">Templates</a><a href="#">IPMI</a><a href="#">Macros</a><a href="#">Host inventory</a>
-	</div>-->
-		<table class="table-forms">
-		<!--<tfoot>
-		<tr>
-		<td class="table-forms-td-left"></td>
-		<td class="table-forms-td-right"><button type="button">Update</button><button type="button" class="btn-alt">Clone</button><button type="button" class="btn-alt">Full clone</button><button type="button" class="btn-alt">Delete</button><button type="button" class="btn-alt">Cancel</button></td>
-		</tr>
-		</tfoot>-->
-		<tbody>
-		<tr>
-		<td class="table-forms-td-left"><label for="HostName">Host name</label></td>
-		<td class="table-forms-td-right"><div class="input-help-wrapper"><input type="text" id="HostName"><span class="help-icon"></span></div><div class="red margin-top">You can't leave this empty.</div></td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label for="VisibleName">Visible name</label></td><td class="table-forms-td-right"><input type="text" id="VisibleName"></td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label>Groups</label></td>
-		<td class="table-forms-td-right">
+
+		<ul class="table-forms">
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Host name</label></div><div class="table-forms-td-right"><div class="input-help-wrapper"><input type="text" id="HostName"><span class="help-icon"></span></div><div class="red margin-top">You can't leave this empty.</div></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="VisibleName">Visible name</label></div><div class="table-forms-td-right"><input type="text" id="VisibleName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label>Groups</label></div><div class="table-forms-td-right">
 		<table><tbody><tr>
-		<td><label for="InGroups">In groups</label></td><td>&nbsp;</td><td><label for="OtherGroups">Other groups</label></td></tr><tr><td><select id="InGroups" size="10" class="select-multiple" multiple><option>Zabbix servers</option><option>Zabbix servers</option></select></td><td><button type="button" class="btn-grey"><span class="arrow-left"></span></button><button type="button" class="btn-grey"><span class="arrow-right"></span></button></td><td><select id="OtherGroups" size="10" class="select-multiple" multiple><option>Discovered hosts</option><option>Linux servers</option><option>Templates</option></select></td></tr></tbody></table></td>
-		</tr>
-		<tr class="table-forms-tr-new">
-		<td class="table-forms-td-left"><label for="Groups">New group</label></td>
-		<td class="table-forms-td-right"><input type="text" id="Groups"></td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label>Agent interfaces</label></td>
-		<td class="table-forms-td-right">
+		<td><label for="InGroups">In groups</label></td><td>&nbsp;</td><td><label for="OtherGroups">Other groups</label></td></tr><tr><td><select id="InGroups" size="10" class="select-multiple" multiple><option>Zabbix servers</option><option>Zabbix servers</option></select></td><td><button type="button" class="btn-grey"><span class="arrow-left"></span></button><button type="button" class="btn-grey"><span class="arrow-right"></span></button></td><td><select id="OtherGroups" size="10" class="select-multiple" multiple><option>Discovered hosts</option><option>Linux servers</option><option>Templates</option></select></td></tr></tbody></table></div>
+		</li>
+		<li class="table-forms-tr-new">
+		<div class="table-forms-td-left"><label for="Groups">New group</label></div><div class="table-forms-td-right"><input type="text" id="Groups"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label>Agent interfaces</label></div><div class="table-forms-td-right">
 		<table><tbody>
 		<tr>
 		<td>&nbsp;</td><td><label for="IpAddress">IP address</label></td><td><label for="DnsName">DNS name</label></td><td><label>Connect to</label</td><td><label for="Port">Port</label></td><td><label>Default</label></td><td>&nbsp;</td>	
@@ -77,11 +63,10 @@
 		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><div><span class="radio-switch paging-selected">IP</span><span class="radio-switch">DNS</span></div><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#" class="form-remove-btn">&times;</a></td>
 		</tr>
 		<tr>
-		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><div><span class="radio-switch">IP</span><span class="radio-switch paging-selected">DNS</span></div><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td>&nbsp;</td><td><a href="" class="link-dotted">Add</a></td></tr></tbody></table><!--<div class="table-forms-separator"></div>-->
-		</td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label for="snmp">SNMP interfaces</label></td><td class="table-forms-td-right">
+		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><div><span class="radio-switch">IP</span><span class="radio-switch paging-selected">DNS</span></div><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td>&nbsp;</td><td><a href="" class="link-dotted">Add</a></td></tr></tbody></table><!--<div class="table-forms-separator"></div>--></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="snmp">SNMP interfaces</label></div><div class="table-forms-td-right">
 		<table><tbody>
 		<tr>
 		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"><div class="margin-top"><label for="BulkReq1"><input type="checkbox" id="BulkReq1" checked> Use bulk requests</label></div></td><td><input type="text" id="DnsName"></td><td><div><span class="radio-switch paging-selected">IP</span><span class="radio-switch">DNS</span></div><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#" class="form-remove-btn">&times;</a></td>
@@ -89,41 +74,36 @@
 		<tr>
 		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"><div class="margin-top"><label for="BulkReq2"><input type="checkbox" id="BulkReq2" checked> Use bulk requests</label></div></td><td><input type="text" id="DnsName"></td><td><div><span class="radio-switch paging-selected">IP</span><span class="radio-switch">DNS</span></div><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#" class="form-remove-btn">&times;</a></td>
 		</tr><tr><td>&nbsp;</td><td><a href="" class="link-dotted">Add</a></td></tr>
-		</tbody></table><!--<div class="table-forms-separator"></div>-->
-		</td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label for="jmx">JMX interfaces</label></td>
-		<td class="table-forms-td-right">
+		</tbody></table><!--<div class="table-forms-separator"></div>--></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="jmx">JMX interfaces</label></div><div class="table-forms-td-right">
 		<table><tbody>
 		<tr><td><a href="" class="link-dotted">Add</a></td></tr>
-		</tbody></table>
-		</td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label for="ipmi">IPMI interfaces</label></td>
-		<td class="table-forms-td-right">
+		</tbody></table></div>
+		</li>
+		<li><div class="table-forms-td-left"><label for="ipmi">IPMI interfaces</label></div><div class="table-forms-td-right">
 		<table><tbody>
 		<tr><td><a href="" class="link-dotted">Add</a></td></tr>
-		</tbody></table>
-		</td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label for="descr">Description</label></td><td class="table-forms-td-right"><textarea name="" id="descr" cols="50" rows="1" onfocus="this.style.height='60px';" style="height: 17px"></textarea></td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label for="MonitorProxy">Monitored by proxy</label></td><td class="table-forms-td-right"><select id="MonitorProxy"><option>(no proxy)</option><option>(no proxy)</option><option>(no proxy)</option></select></td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label for="Enabled">Enabled</label></td><td class="table-forms-td-right""><input type="checkbox" id="Enabled"></td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left">Device uniqueness criteria</td><td class="table-forms-td-right""><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> IP address</label></li><li><label for="ZbbAgent"><input type="radio" id="ZbbAgent"> Zabbix agent "system.uname" Source Han Sans is available in weights spanning ExtraLight, Light, Normal, Regular, Medium, Bold and Heavy. Heavy and ExtraLight were designed by hand, however the middle weights were created via software interpolation, Adobe said. Overall, Adobe is releasing 42 fonts, taking into account seven full font weights and region-specific subsets for screen and print.</label></li><li><label for="ZbbAgent2"><input type="checkbox" id="ZbbAgent2"> Zabbix agent "system.uname" Source Han Sans is available in weights spanning ExtraLight, Light, Normal, Regular, Medium, Bold and Heavy. Heavy and ExtraLight were designed by hand, however the middle weights were created via software interpolation, Adobe said. Overall, Adobe is releasing 42 fonts, taking into account seven full font weights and region-specific subsets for screen and print.</label></li></ul></td>
-		</tr>
-		</tbody>
-		</table>
-		<table class="table-forms"><tfoot><tr><td class="table-forms-td-left">&nbsp;</td>
-		<td class="table-forms-td-right"><button type="button">Update</button><button type="button" class="btn-alt">Clone</button><button type="button" class="btn-alt">Full clone</button><button type="button" class="btn-alt">Delete</button><button type="button" class="btn-alt">Cancel</button></td></tr></tfoot></table>
+		</tbody></table></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="descr">Description</label></div><div class="table-forms-td-right"><textarea name="" id="descr" cols="50" rows="1" onfocus="this.style.height='60px';" style="height: 17px"></textarea></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="MonitorProxy">Monitored by proxy</label></div><div class="table-forms-td-right"><select id="MonitorProxy"><option>(no proxy)</option><option>(no proxy)</option><option>(no proxy)</option></select></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="Enabled">Enabled</label></div><div class="table-forms-td-right"><input type="checkbox" id="Enabled"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left">Device uniqueness criteria</div><div class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> IP address</label></li><li><label for="ZbbAgent"><input type="radio" id="ZbbAgent"> Zabbix agent "system.uname" Source Han Sans is available in weights spanning ExtraLight, Light, Normal, Regular, Medium, Bold and Heavy. Heavy and ExtraLight were designed by hand, however the middle weights were created via software interpolation, Adobe said. Overall, Adobe is releasing 42 fonts, taking into account seven full font weights and region-specific subsets for screen and print.</label></li><li><label for="ZbbAgent2"><input type="checkbox" id="ZbbAgent2"> Zabbix agent "system.uname" Source Han Sans is available in weights spanning ExtraLight, Light, Normal, Regular, Medium, Bold and Heavy. Heavy and ExtraLight were designed by hand, however the middle weights were created via software interpolation, Adobe said. Overall, Adobe is releasing 42 fonts, taking into account seven full font weights and region-specific subsets for screen and print.</label></li></ul></div>
+		</li>
+		</ul>
+		<ul class="table-forms">
+		<li><div class="table-forms-td-left">&nbsp;</div><div class="table-forms-td-right tfoot-buttons"><button type="button">Update</button><button type="button" class="btn-alt">Clone</button><button type="button" class="btn-alt">Full clone</button><button type="button" class="btn-alt">Delete</button><button type="button" class="btn-alt">Cancel</button></div>
+		</li>
+		</ul>
 	</div>
 	</form>
 	</article>

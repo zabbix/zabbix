@@ -69,6 +69,10 @@ a {
 		&:hover {
 			text-decoration: none;
 		}
+
+		&:active {
+			text-decoration: none;
+		}
 	}
 }
 
@@ -557,8 +561,13 @@ footer {
 
 .table-forms {
 	//margin: 0 auto;
+	display: table;
 	width: 100%;
 	color: $font-color;
+
+	li {
+		display: table-row;
+	}
 	
 	tfoot {
 
@@ -571,11 +580,16 @@ footer {
 		}
 	}
 
+	.tfoot-buttons {
+		@extend tfoot;
+	}
+
 	.table-forms-tr-new {
 		background: $alert-green-bg-color;
 	}
 
 	.table-forms-td-left {
+		display: table-cell;
 		padding: 5px 0 5px 0;
 		text-align: right;
 		vertical-align: top;
@@ -590,6 +604,7 @@ footer {
 	}
 
 	.table-forms-td-right {
+		display: table-cell;
 		padding: 5px 0 5px 10px;
 		vertical-align: middle;
 		width: 85%;
@@ -627,6 +642,7 @@ footer {
 .list-check-radio {
 
 	li {
+		display: block;
 		padding: 0 0 7px 0;
 	}
 
@@ -1414,6 +1430,7 @@ a.grey {
 
 	&:active {
 		background: lighten($primary-color, 50%);
+		text-decoration: none;
 	}
 }
 
