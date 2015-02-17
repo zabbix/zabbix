@@ -135,7 +135,17 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		if (NULL != (regex = get_rparam(&request, 0)))
 		{
 			if ('@' == *regex)
+			{
 				DCget_expressions_by_name(&regexps, regex + 1);
+
+				if (0 == regexps.values_num)
+				{
+					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL,
+							"Global regular expression \"%s\" does not exist.", regex + 1));
+					errcodes[i] = NOTSUPPORTED;
+					goto next;
+				}
+			}
 
 			if (SUCCEED != regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE))
 				goto next;

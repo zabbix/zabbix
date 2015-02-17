@@ -28,6 +28,7 @@ $proxyWidget = new CWidget();
 // create new proxy button
 $createForm = new CForm('get');
 $createForm->cleanItems();
+$controls = new CList();
 $controls->addItem(new CRedirectButton(_('Create proxy'), 'zabbix.php?action=proxy.edit'));
 $createForm->addItem($controls);
 $proxyWidget->setTitle(_('Proxies'));
