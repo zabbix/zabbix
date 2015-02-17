@@ -2147,7 +2147,7 @@ static void	lld_trigger_cache_add_trigger(zbx_hashset_t *cache, zbx_lld_trigger_
 			zbx_vector_uint64_append(childids, trigger_ref->triggerid);
 			zbx_vector_uint64_append(parentids, trigger_ref->triggerid);
 
-			trigger_node = lld_trigger_cache_append(cache, trigger_ref->triggerid, NULL);
+			lld_trigger_cache_append(cache, trigger_ref->triggerid, NULL);
 		}
 	}
 
