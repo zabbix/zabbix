@@ -604,8 +604,8 @@ static void	lld_dependencies_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vecto
  * Purpose: returns the list of items which are related to the trigger        *
  *          prototypes                                                        *
  *                                                                            *
- * Parameters: parent_triggerid - [IN] a vector of trigger prototypes         *
- *             items            - [OUT] sorted list of items                  *
+ * Parameters: trigger_prototypes - [IN] a vector of trigger prototypes       *
+ *             items              - [OUT] sorted list of items                *
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *items)
@@ -1167,14 +1167,12 @@ static void 	lld_trigger_dependency_make(zbx_lld_trigger_prototype_t *trigger_pr
 
 						zbx_vector_ptr_append(&trigger->dependencies, dependency);
 					}
-
 				}
 
 				zbx_vector_ptr_append(&dep_trigger->dependants, trigger);
 
 				dependency->trigger_up = dep_trigger;
 				dependency->flags = ZBX_FLAG_LLD_DEPENDENCY_DISCOVERED;
-
 			}
 			else
 			{
@@ -2034,7 +2032,7 @@ int	zbx_lld_trigger_ref_compare_func(const void *d1, const void *d2)
 
 	ZBX_RETURN_IF_NOT_EQUAL(n1->trigger_ref.triggerid, n2->trigger_ref.triggerid);
 
-	/* Don't check pointer if id matches. If the reference was loaded from database it will not have pointer */
+	/* Don't check pointer if id matches. If the reference was loaded from database it will not have pointer. */
 	if (0 != n1->trigger_ref.triggerid)
 		return 0;
 
@@ -2049,7 +2047,7 @@ int	zbx_lld_trigger_node_compare_func(const void *d1, const void *d2)
 	const zbx_lld_trigger_node_t	*n1 = *(const zbx_lld_trigger_node_t **)d1;
 	const zbx_lld_trigger_node_t	*n2 = *(const zbx_lld_trigger_node_t **)d2;
 
-	/* sort in ascending order, but ensure that existing triggers are firest */
+	/* sort in ascending order, but ensure that existing triggers are first */
 	if (0 != n1->trigger_ref.triggerid && 0 == n2->trigger_ref.triggerid)
 		return -1;
 
@@ -2059,7 +2057,7 @@ int	zbx_lld_trigger_node_compare_func(const void *d1, const void *d2)
 	/* compare ids */
 	ZBX_RETURN_IF_NOT_EQUAL(n1->trigger_ref.triggerid, n2->trigger_ref.triggerid);
 
-	/* Don't check pointer if id matches. If the reference was loaded from database it will not have pointer */
+	/* Don't check pointer if id matches. If the reference was loaded from database it will not have pointer. */
 	if (0 != n1->trigger_ref.triggerid)
 		return 0;
 
@@ -2182,6 +2180,8 @@ static void	lld_trigger_cache_add_trigger(zbx_hashset_t *cache, zbx_lld_trigger_
  ******************************************************************************/
 static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *triggers)
 {
+	const char		*__function_name = "lld_trigger_cache_init";
+
 	zbx_vector_uint64_t	parentids, childids;
 	int			i, j;
 	char			*sql = NULL;
@@ -2190,6 +2190,8 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 	DB_ROW			row;
 	zbx_lld_trigger_ref_t	*trigger_ref;
 	zbx_lld_trigger_node_t	*trigger_node, trigger_node_local;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_hashset_create(cache, triggers->values_num, zbx_lld_trigger_ref_hash_func,
 			zbx_lld_trigger_ref_compare_func);
@@ -2204,9 +2206,9 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 
 		for (j = 0; j < trigger->dependencies.values_num; j++)
 		{
-			zbx_lld_dependency_t	*dep = (zbx_lld_dependency_t *)trigger->dependencies.values[j];
+			zbx_lld_dependency_t	*dependency = (zbx_lld_dependency_t *)trigger->dependencies.values[j];
 
-			if (0 == dep->triggerdepid)
+			if (0 == dependency->triggerdepid)
 			{
 				lld_trigger_cache_add_trigger(cache, trigger, &childids, &parentids);
 				break;
@@ -2335,6 +2337,8 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 
 	zbx_vector_uint64_destroy(&childids);
 	zbx_vector_uint64_destroy(&parentids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -2403,12 +2407,12 @@ static void	lld_trigger_dependency_delete(zbx_lld_trigger_ref_t *from, zbx_lld_t
 	/* remove the dependency */
 	for (i = 0; i < trigger->dependencies.values_num; i++)
 	{
-		zbx_lld_dependency_t	*dep = (zbx_lld_dependency_t *)trigger->dependencies.values[i];
+		zbx_lld_dependency_t	*dependency = (zbx_lld_dependency_t *)trigger->dependencies.values[i];
 
-		if ((NULL != dep->trigger_up && dep->trigger_up == to->trigger) ||
-				(0 != dep->triggerid_up && dep->triggerid_up == to->triggerid))
+		if ((NULL != dependency->trigger_up && dependency->trigger_up == to->trigger) ||
+				(0 != dependency->triggerid_up && dependency->triggerid_up == to->triggerid))
 		{
-			zbx_free(dep);
+			zbx_free(dependency);
 			zbx_vector_ptr_remove(&trigger->dependencies, i);
 
 			break;
@@ -2523,12 +2527,16 @@ static int	lld_trigger_dependencies_iter(zbx_hashset_t *cache, zbx_vector_ptr_t 
  ******************************************************************************/
 static void	lld_trigger_dependencies_validate(zbx_vector_ptr_t *triggers, char **error)
 {
+	const char			*__function_name = "lld_trigger_dependencies_validate";
+
 	zbx_hashset_t			cache;
 	zbx_hashset_iter_t		iter;
 	zbx_lld_trigger_node_t		*trigger_node, *trigger_node_child;
 	zbx_lld_trigger_node_iter_t	node_iter = {0};
 	zbx_vector_ptr_t		nodes;
 	int				i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	lld_trigger_cache_init(&cache, triggers);
 
@@ -2579,6 +2587,8 @@ static void	lld_trigger_dependencies_validate(zbx_vector_ptr_t *triggers, char *
 
 	zbx_vector_ptr_destroy(&nodes);
 	zbx_trigger_cache_clean(&cache);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
