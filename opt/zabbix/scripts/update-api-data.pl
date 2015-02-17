@@ -110,7 +110,7 @@ foreach (@$tlds_ref)
 		{
 			if (defined($OPTS{'dry-run'}))
 			{
-				info(uc($service), " DISABLED");
+				prnt(uc($service), " DISABLED");
 			}
 			else
 			{
@@ -135,7 +135,7 @@ foreach (@$tlds_ref)
 
 		if (defined($OPTS{'dry-run'}))
 		{
-			info(uc($service), " service availability $downtime ($clock)");
+			prnt(uc($service), " service availability $downtime (", ts_str($clock), ")");
 		}
 		else
 		{
@@ -160,7 +160,7 @@ foreach (@$tlds_ref)
 
 		if (defined($OPTS{'dry-run'}))
 		{
-			info(uc($service), " alarmed:$alarmed_status");
+			prnt(uc($service), " alarmed:$alarmed_status");
 		}
 		else
 		{
@@ -198,20 +198,11 @@ foreach (@$tlds_ref)
 			my $event_end = $_->{'end'};
 			my $false_positive = $_->{'false_positive'};
 
-			my $start = $from if (defined($from) and $event_start < $from);
-			my $end = $till if (defined($till) and not defined($event_end));
+			my $start = undef;
+			my $end = undef;
 
-			if (defined($OPTS{'dry-run'}))
-			{
-				info(uc($service), " incident id:$eventid start:$event_start end:" . ($event_end ? $event_end : "ACTIVE") . " fp:$false_positive");
-			}
-			else
-			{
-				if (ah_save_incident($tld, $service, $eventid, $event_start, $event_end, $false_positive) != AH_SUCCESS)
-				{
-					fail("cannot save incident: ", ah_get_error());
-				}
-			}
+			$start = $from if (defined($from) and $event_start < $from);
+			$end = $till if (defined($till) and not defined($event_end));
 
 			# get results within incidents
 			my $rows_ref = db_select(
@@ -222,6 +213,9 @@ foreach (@$tlds_ref)
 				" order by clock");
 
 			my @test_results;
+
+			my $status_up = 0;
+			my $status_down = 0;
 
 			foreach my $row_ref (@$rows_ref)
 			{
@@ -237,12 +231,40 @@ foreach (@$tlds_ref)
 				$result->{'start'} = $clock - $interval + RESULT_TIMESTAMP_SHIFT + 1; # we need to start at 0
 				$result->{'end'} = $clock + RESULT_TIMESTAMP_SHIFT;
 
+				if (defined($OPTS{'dry-run'}))
+				{
+					if ($value == UP)
+					{
+						$status_up++;
+					}
+					elsif ($value == DOWN)
+					{
+						$status_down++;
+					}
+					else
+					{
+						fail("invalid status: $value");
+					}
+				}
+
 				push(@test_results, $result);
 			}
 
 			my $test_results_count = scalar(@test_results);
 
 			fail("no results found within incident: eventid:$eventid clock:$event_start") if ($test_results_count == 0);
+
+			if (defined($OPTS{'dry-run'}))
+			{
+				prnt(uc($service), " incident id:$eventid start:", ts_str($event_start), " end:" . ($event_end ? ts_str($event_end) : "ACTIVE") . " fp:$false_positive successful:$status_up failed:$status_down");
+			}
+			else
+			{
+				if (ah_save_incident($tld, $service, $eventid, $event_start, $event_end, $false_positive) != AH_SUCCESS)
+				{
+					fail("cannot save incident: ", ah_get_error());
+				}
+			}
 
 			my $values_from = $test_results[0]->{'start'};
 			my $values_till = $test_results[$test_results_count - 1]->{'end'};
@@ -317,7 +339,7 @@ foreach (@$tlds_ref)
 
 					if (defined($OPTS{'dry-run'}))
 					{
-						info(JSON->new->utf8(1)->pretty(1)->encode($tr_ref), "-----------------------------------------------------------");
+						prnt_json($tr_ref);
 					}
 					else
 					{
@@ -406,7 +428,7 @@ foreach (@$tlds_ref)
 
 					if (defined($OPTS{'dry-run'}))
 					{
-						info(JSON->new->utf8(1)->pretty(1)->encode($tr_ref), "-----------------------------------------------------------\n") if (defined($OPTS{'debug'}));
+						prnt_json($tr_ref);
 					}
 					else
 					{
@@ -898,6 +920,25 @@ sub __get_probe_statuses
 	}
 
 	return \%result;
+}
+
+sub prnt
+{
+	print((defined($tld) ? "$tld: " : ''), join('', @_), "\n");
+}
+
+sub prnt_json
+{
+	my $tr_ref = shift;
+
+	if (defined($OPTS{'debug'}))
+	{
+		dbg(JSON->new->utf8(1)->pretty(1)->encode($tr_ref), "-----------------------------------------------------------");
+	}
+	else
+	{
+		prnt(ts_str($tr_ref->{'clock'}), " ", $tr_ref->{'status'});
+	}
 }
 
 __END__
