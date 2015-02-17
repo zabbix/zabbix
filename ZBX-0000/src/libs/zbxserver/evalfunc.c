@@ -29,9 +29,9 @@ int	cmp_double(double a, double b)
 	return fabs(a - b) < TRIGGER_EPSILON ? SUCCEED : FAIL;
 }
 
-static int	get_function_parameter_uint(zbx_uint64_t hostid, const char *parameters, int Nparam, int *value, int *flag)
+static int	get_function_parameter_uint31(zbx_uint64_t hostid, const char *parameters, int Nparam, int *value, int *flag)
 {
-	const char	*__function_name = "get_function_parameter_uint";
+	const char	*__function_name = "get_function_parameter_uint31";
 	char		*parameter = NULL;
 	int		res = FAIL;
 
@@ -63,6 +63,39 @@ static int	get_function_parameter_uint(zbx_uint64_t hostid, const char *paramete
 
 	if (SUCCEED == res)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() flag:%d value:%d", __function_name, *flag, *value);
+clean:
+	zbx_free(parameter);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
+static int	get_function_parameter_uint64(zbx_uint64_t hostid, const char *parameters, int Nparam, zbx_uint64_t *value, int *flag)
+{
+	const char	*__function_name = "get_function_parameter_uint64";
+	char		*parameter = NULL;
+	int		res = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __function_name, parameters, Nparam);
+
+	parameter = zbx_malloc(parameter, FUNCTION_PARAMETER_LEN_MAX);
+
+	if (0 != get_param(parameters, Nparam, parameter, FUNCTION_PARAMETER_LEN_MAX))
+		goto clean;
+
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, &hostid, NULL, NULL, NULL,
+			&parameter, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0))
+	{
+		if (SUCCEED == is_uint64(parameter, value))
+		{
+			*flag = ZBX_FLAG_SEC;
+			res = SUCCEED;
+		}
+	}
+
+	if (SUCCEED == res)
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() flag:%d value:" ZBX_FS_UI64, __function_name, *flag, *value);
 clean:
 	zbx_free(parameter);
 
@@ -311,11 +344,12 @@ clean:
 #define OP_LT	4
 #define OP_LE	5
 #define OP_LIKE	6
-#define OP_MAX	7
+#define OP_BAND	7
+#define OP_MAX	8
 
-static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *value, const char *arg2)
+static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *value, const char *arg2, const char *arg2_2)
 {
-	zbx_uint64_t	value_uint64 = 0, arg2_uint64;
+	zbx_uint64_t	value_uint64 = 0, arg2_uint64, arg2_2_uint64;
 	double		value_double = 0, arg2_double;
 
 	switch (value_type)
@@ -349,6 +383,18 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 					break;
 				case OP_LE:
 					if (value_uint64 <= arg2_uint64)
+						return SUCCEED;
+					break;
+				case OP_BAND:
+					if (NULL != arg2_2)
+					{
+						if (SUCCEED != is_uint64(arg2_2, &arg2_2_uint64))
+							return FAIL;
+					}
+					else
+						arg2_2_uint64 = arg2_uint64;
+
+					if (arg2_uint64 == (value_uint64 & arg2_2_uint64))
 						return SUCCEED;
 					break;
 			}
@@ -416,7 +462,7 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 	return FAIL;
 }
 
-static int	evaluate_COUNT_local(DB_ITEM *item, int op, int arg1, const char *arg2, int *count)
+static int	evaluate_COUNT_local(DB_ITEM *item, int op, int arg1, const char *arg2, const char *arg2_2, int *count)
 {
 	int	h_num;
 
@@ -447,7 +493,7 @@ static int	evaluate_COUNT_local(DB_ITEM *item, int op, int arg1, const char *arg
 		lastvalue = (NULL == item->h_lastvalue[h_num] ? item->lastvalue[h_num] :
 				item->h_lastvalue[h_num]);
 
-		if (SUCCEED == evaluate_COUNT_one(item->value_type, op, lastvalue, arg2))
+		if (SUCCEED == evaluate_COUNT_one(item->value_type, op, lastvalue, arg2, arg2_2))
 			(*count)++;
 	}
 
@@ -464,6 +510,11 @@ static int	evaluate_COUNT_local(DB_ITEM *item, int op, int arg1, const char *arg
  *             parameters - up to four comma-separated fields:                *
  *                            (1) number of seconds/values                    *
  *                            (2) value to compare with (optional)            *
+ *                                Exception is for comparison operator "band".*
+ *                                With "band" this parameter is mandatory and *
+ *                                can take one of 2 forms:                    *
+ *                                  - value_to_compare_with/mask              *
+ *                                  - mask                                    *
  *                            (3) comparison operator (optional)              *
  *                            (4) time shift (optional)                       *
  *                                                                            *
@@ -478,7 +529,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	const char	*__function_name = "evaluate_COUNT";
 	int		arg1, flag, op, numeric_search, nparams, count = 0, h_num, res = FAIL;
 	int		time_shift = 0, time_shift_flag;
-	char		*arg2 = NULL, *arg3 = NULL;
+	char		*arg2 = NULL, *arg2_2 = NULL, *arg3 = NULL;
 	char		**h_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -489,7 +540,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	if (4 < (nparams = num_param(parameters)))
 		goto exit;
 
-	if (FAIL == get_function_parameter_uint(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
 		goto exit;
 
 	if (2 <= nparams && FAIL == get_function_parameter_str(item->hostid, parameters, 2, &arg2))
@@ -518,6 +569,16 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 			op = OP_LE;
 		else if (0 == strcmp(arg3, "like"))
 			op = OP_LIKE;
+		else if (0 == strcmp(arg3, "band"))
+		{
+			op = OP_BAND;
+
+			if (NULL != (arg2_2 = strchr(arg2, '/')))
+			{
+				*arg2_2 = '\0';	/* end of the 1st part of the 2nd parameter (number to compare with) */
+				arg2_2++;	/* start of the 2nd part of the 2nd parameter (mask) */
+			}
+		}
 		else
 			fail = 1;
 
@@ -538,7 +599,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 
 	if (4 <= nparams)
 	{
-		if (FAIL == get_function_parameter_uint(item->hostid, parameters, 4, &time_shift, &time_shift_flag) ||
+		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 4, &time_shift, &time_shift_flag) ||
 				ZBX_FLAG_SEC != time_shift_flag)
 		{
 			goto clean;
@@ -565,7 +626,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	{
 		if (ZBX_FLAG_VALUES == flag)
 		{
-			if (0 == time_shift && SUCCEED == evaluate_COUNT_local(item, op, arg1, arg2, &count))
+			if (0 == time_shift && SUCCEED == evaluate_COUNT_local(item, op, arg1, arg2, arg2_2, &count))
 				goto skip_get_history;
 
 			h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
@@ -594,7 +655,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 
 		for (h_num = 0; NULL != h_value[h_num]; h_num++)
 		{
-			if (NULL == arg2 || SUCCEED == evaluate_COUNT_one(item->value_type, op, h_value[h_num], arg2))
+			if (NULL == arg2 || SUCCEED == evaluate_COUNT_one(item->value_type, op, h_value[h_num], arg2, arg2_2))
 				count++;
 		}
 		DBfree_history(h_value);
@@ -620,6 +681,7 @@ exit:
 #undef OP_LT
 #undef OP_LE
 #undef OP_LIKE
+#undef OP_BAND
 #undef OP_MAX
 
 /******************************************************************************
@@ -653,14 +715,14 @@ static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto clean;
 
-	if (FAIL == get_function_parameter_uint(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
 		goto clean;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (FAIL == get_function_parameter_uint(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
+		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
 			goto clean;
 		if (ZBX_FLAG_SEC != time_shift_flag)
 			goto clean;
@@ -748,14 +810,14 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto clean;
 
-	if (FAIL == get_function_parameter_uint(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
 		goto clean;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (FAIL == get_function_parameter_uint(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
+		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
 			goto clean;
 		if (ZBX_FLAG_SEC != time_shift_flag)
 			goto clean;
@@ -826,7 +888,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 
 	if (0 == strcmp(function, "last"))
 	{
-		if (FAIL == get_function_parameter_uint(item->hostid, parameters, 1, &arg1, &flag) || ZBX_FLAG_VALUES != flag)
+		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || ZBX_FLAG_VALUES != flag)
 		{
 			arg1 = 1;
 			flag = ZBX_FLAG_VALUES;
@@ -834,7 +896,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 
 		if (2 == num_param(parameters))
 		{
-			if (SUCCEED == get_function_parameter_uint(item->hostid, parameters, 2, &time_shift, &time_shift_flag) &&
+			if (SUCCEED == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag) &&
 					ZBX_FLAG_SEC == time_shift_flag)
 			{
 				now -= time_shift;
@@ -948,14 +1010,14 @@ static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto clean;
 
-	if (FAIL == get_function_parameter_uint(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
 		goto clean;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (FAIL == get_function_parameter_uint(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
+		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
 			goto clean;
 		if (ZBX_FLAG_SEC != time_shift_flag)
 			goto clean;
@@ -1050,14 +1112,14 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto clean;
 
-	if (FAIL == get_function_parameter_uint(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
 		goto clean;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (FAIL == get_function_parameter_uint(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
+		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
 			goto clean;
 		if (ZBX_FLAG_SEC != time_shift_flag)
 			goto clean;
@@ -1152,14 +1214,14 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
 	if (2 < (nparams = num_param(parameters)))
 		goto clean;
 
-	if (FAIL == get_function_parameter_uint(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
 		goto clean;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
-		if (FAIL == get_function_parameter_uint(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
+		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
 			goto clean;
 		if (ZBX_FLAG_SEC != time_shift_flag)
 			goto clean;
@@ -1252,7 +1314,7 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 	if (1 < num_param(parameters))
 		goto clean;
 
-	if (FAIL == get_function_parameter_uint(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
 		goto clean;
 
 	if (ZBX_FLAG_SEC != flag)
@@ -1610,7 +1672,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	if (FAIL == get_function_parameter_str(item->hostid, parameters, 1, &arg1))
 		goto exit;
 
-	if (FAIL == get_function_parameter_uint(item->hostid, parameters, 2, &arg2, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &arg2, &flag))
 	{
 		arg2 = 1;
 		flag = ZBX_FLAG_VALUES;
@@ -1774,7 +1836,7 @@ static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, 
 	if (1 < num_param(parameters))
 		goto clean;
 
-	if (FAIL == get_function_parameter_uint(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
 		goto clean;
 
 	if (ZBX_FLAG_SEC != flag)
@@ -1804,6 +1866,66 @@ static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, 
 	}
 
 	res = SUCCEED;
+clean:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_BAND                                                    *
+ *                                                                            *
+ * Purpose: evaluate logical bitwise function 'and' for the item              *
+ *                                                                            *
+ * Parameters: value - buffer of size MAX_BUFFER_LEN                          *
+ *             item - item (performance metric)                               *
+ *             parameters - up to 3 comma-separated fields:                   *
+ *                            (1) same as the 1st parameter for function      *
+ *                                evaluate_LAST() (see documentation of       *
+ *                                trigger function last()),                   *
+ *                            (2) mask to bitwise AND with (mandatory),       *
+ *                            (3) same as the 2nd parameter for function      *
+ *                                evaluate_LAST() (see documentation of       *
+ *                                trigger function last()).                   *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_BAND(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+{
+	const char	*__function_name = "evaluate_BAND";
+	char		*last_parameters = NULL;
+	int		mask_flag, nparams, res = FAIL;
+	zbx_uint64_t	last_uint64, mask;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (ITEM_VALUE_TYPE_UINT64 != item->value_type)
+		goto clean;
+
+	if (3 < (nparams = num_param(parameters)))
+		goto clean;
+
+	if (FAIL == get_function_parameter_uint64(item->hostid, parameters, 2, &mask, &mask_flag) ||
+			ZBX_FLAG_SEC != mask_flag)
+	{
+		goto clean;
+	}
+
+	/* prepare the 1st and the 3rd parameter for passing to evaluate_LAST() */
+	last_parameters = zbx_strdup(NULL, parameters);
+	remove_param(last_parameters, 2);
+
+	if (SUCCEED == evaluate_LAST(value, item, "last", last_parameters, now))
+	{
+		ZBX_STR2UINT64(last_uint64, value);
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, last_uint64 & (zbx_uint64_t)mask);
+		res = SUCCEED;
+	}
+
+	zbx_free(last_parameters);
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
@@ -1934,6 +2056,10 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	else if (0 == strcmp(function, "logsource"))
 	{
 		ret = evaluate_LOGSOURCE(value, item, function, parameter, now);
+	}
+	else if (0 == strcmp(function, "band"))
+	{
+		ret = evaluate_BAND(value, item, function, parameter, now);
 	}
 	else
 	{
