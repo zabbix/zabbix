@@ -25,7 +25,7 @@ if (defined($OPTS{'service'}))
 {
 	if ($OPTS{'service'} ne 'dns' and $OPTS{'service'} ne 'dnssec' and $OPTS{'service'} ne 'rdds' and $OPTS{'service'} ne 'epp')
 	{
-		print($OPTS{'service'}, ": unknown service\n");
+		prnt($OPTS{'service'}, ": unknown service");
 		usage();
 	}
 
@@ -224,6 +224,7 @@ foreach (@$tlds_ref)
 
 				my $result;
 
+				$result->{'tld'} = $tld;
 				$result->{'status'} = get_result_string($cfg_dns_statusmaps, $value);
 				$result->{'clock'} = $clock;
 
@@ -335,15 +336,13 @@ foreach (@$tlds_ref)
 						}
 					}
 
-					my $json = encode_json($tr_ref);
-
 					if (defined($OPTS{'dry-run'}))
 					{
 						prnt_json($tr_ref);
 					}
 					else
 					{
-						if (ah_save_incident_json($tld, $service, $eventid, $event_start, $json, $tr_ref->{'clock'}) != AH_SUCCESS)
+						if (ah_save_incident_json($tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
 						{
 							fail("cannot save incident: ", ah_get_error());
 						}
@@ -424,15 +423,13 @@ foreach (@$tlds_ref)
 						}
 					}
 
-					my $json = encode_json($tr_ref);
-
 					if (defined($OPTS{'dry-run'}))
 					{
 						prnt_json($tr_ref);
 					}
 					else
 					{
-						if (ah_save_incident_json($tld, $service, $eventid, $event_start, $json, $tr_ref->{'clock'}) != AH_SUCCESS)
+						if (ah_save_incident_json($tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
 						{
 							fail("cannot save incident: ", ah_get_error());
 						}
