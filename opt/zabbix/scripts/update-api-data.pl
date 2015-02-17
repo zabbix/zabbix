@@ -100,6 +100,8 @@ else
 	$tlds_ref = get_tlds();
 }
 
+prnt("selected period: ", selected_period($from, $till)) if (defined($OPTS{'dry-run'}));
+
 foreach (@$tlds_ref)
 {
 	$tld = $_;
@@ -257,7 +259,8 @@ foreach (@$tlds_ref)
 
 			if (defined($OPTS{'dry-run'}))
 			{
-				prnt(uc($service), " incident id:$eventid start:", ts_str($event_start), " end:" . ($event_end ? ts_str($event_end) : "ACTIVE") . " fp:$false_positive successful:$status_up failed:$status_down");
+				prnt(uc($service), " incident id:$eventid start:", ts_str($event_start), " end:" . ($event_end ? ts_str($event_end) : "ACTIVE") . " fp:$false_positive");
+				prnt(uc($service), " listing successful:$status_up failed:$status_down");
 			}
 			else
 			{
@@ -390,7 +393,7 @@ foreach (@$tlds_ref)
 					}
 				}
 
-				# get results from probes: number of working Name Servers
+				# get results from probes: working services (rdds43, rdds80)
 				my $itemids_ref = __get_itemids($tld, $cfg_rdds_key_status);
 				my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
 
@@ -936,6 +939,18 @@ sub prnt_json
 	{
 		prnt(ts_str($tr_ref->{'clock'}), " ", $tr_ref->{'status'});
 	}
+}
+
+sub selected_period
+{
+	my $from = shift;
+	my $till = shift;
+
+	return "till " . ts_str($till) if (!$from and $till);
+	return "from " . ts_str($from) if ($from and !$till);
+	return "from " . ts_str($from) . " till " . ts_str($till) if ($from and $till);
+
+	return "eternity";
 }
 
 __END__
