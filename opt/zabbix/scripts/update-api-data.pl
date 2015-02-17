@@ -44,7 +44,6 @@ my $cfg_dns_interval;
 my $cfg_dns_minns;
 my $cfg_dns_key_status;
 my $cfg_dns_key_rtt;
-my $cfg_dns_statusmaps;
 my $cfg_dns_valuemaps;
 
 my $cfg_rdds_interval;
@@ -58,27 +57,28 @@ my $cfg_rdds_valuemaps;
 
 my $cfg_epp_interval;
 
+my $cfg_dns_statusmaps = get_statusmaps('dns');
+
 my %services_hash = map { $_ => 1 } @services;
 
 if (exists($services_hash{'dns'}) or exists($services_hash{'dnssec'}))
 {
 	$cfg_dns_interval = get_macro_dns_udp_delay();
 	$cfg_dns_minns = get_macro_minns();
+	$cfg_dns_valuemaps = get_valuemaps('dns');
 	$cfg_dns_key_status = 'rsm.dns.udp[{$RSM.TLD}]'; # 0 - down, 1 - up
 	$cfg_dns_key_rtt = 'rsm.dns.udp.rtt[{$RSM.TLD},';
-	$cfg_dns_statusmaps = get_statusmaps('dns');
-	$cfg_dns_valuemaps = get_valuemaps('dns');
 }
 if (exists($services_hash{'rdds'}))
 {
 	$cfg_rdds_interval = get_macro_rdds_delay();
+	$cfg_rdds_valuemaps = get_valuemaps('rdds');
 	$cfg_rdds_key_status = 'rsm.rdds[{$RSM.TLD}'; # 0 - down, 1 - up, 2 - only 43, 3 - only 80
 	$cfg_rdds_key_43_rtt = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
 	$cfg_rdds_key_43_ip = 'rsm.rdds.43.ip[{$RSM.TLD}]';
 	$cfg_rdds_key_43_upd = 'rsm.rdds.43.upd[{$RSM.TLD}]';
 	$cfg_rdds_key_80_rtt = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
 	$cfg_rdds_key_80_ip = 'rsm.rdds.80.ip[{$RSM.TLD}]';
-	$cfg_rdds_valuemaps = get_valuemaps('rdds');
 }
 if (exists($services_hash{'epp'}))
 {
