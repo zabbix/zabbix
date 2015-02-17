@@ -25,6 +25,8 @@ if ($data['uncheck']) {
 
 $mediaTypeWidget = new CWidget();
 
+$createForm = new CForm('get');
+
 // create new media type button
 $controls = new CList();
 $controls->addItem(new CSubmit('form', _('Create media type')));
