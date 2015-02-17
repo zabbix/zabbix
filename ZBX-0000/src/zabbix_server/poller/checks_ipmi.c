@@ -240,13 +240,20 @@ static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t
 	zbx_ipmi_sensor_t	*s;
 	char			id[IPMI_SENSOR_ID_SZ];
 	enum ipmi_str_type_e	id_type;
-	int			id_sz, sz;
+	int			id_sz, sz, reading_type;
 	char			full_name[MAX_STRING_LEN];
 
 	id_sz = ipmi_sensor_get_id_length(sensor);
 	memset(id, 0, sizeof(id));
 	ipmi_sensor_get_id(sensor, id, sizeof(id));
 	id_type = ipmi_sensor_get_id_type(sensor);
+	reading_type = ipmi_sensor_get_event_reading_type(sensor);
+
+	if (IPMI_EVENT_READING_TYPE_THRESHOLD != reading_type && IPMI_SENSOR_ID_SZ >= id_sz)
+	{
+		if (0 != isdigit(id[id_sz - 2]))
+			id[id_sz - 2] = '\0';
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __function_name,
 			sensor_id_to_str(id_str, sizeof(id_str), id, id_type, id_sz), h->ip, h->port);
@@ -265,7 +272,7 @@ static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t
 	s->id_type = id_type;
 	s->id_sz = id_sz;
 	memset(&s->value, 0, sizeof(s->value));
-	s->reading_type = ipmi_sensor_get_event_reading_type(sensor);
+	s->reading_type = reading_type;
 	s->type = ipmi_sensor_get_sensor_type(sensor);
 
 	ipmi_sensor_get_name(s->sensor, full_name, sizeof(full_name));
