@@ -155,6 +155,16 @@ class ZBase {
 				catch (ConfigFileException $e) {}
 				break;
 		}
+
+		// new MVC processing, otherwise we continue execution old style
+		if (hasRequest('action')) {
+			$router = new CRouter(getRequest('action'));
+			if ($router->getController() <> null) {
+				CProfiler::getInstance()->start();
+				$this->processRequest();
+				exit;
+			}
+		}
 	}
 
 	/**
@@ -191,6 +201,7 @@ class ZBase {
 	private function getIncludePaths() {
 		return array(
 			$this->rootDir.'/include/classes/core',
+			$this->rootDir.'/include/classes/mvc',
 			$this->rootDir.'/include/classes/api',
 			$this->rootDir.'/include/classes/api/services',
 			$this->rootDir.'/include/classes/api/managers',
@@ -230,13 +241,16 @@ class ZBase {
 			$this->rootDir.'/include/classes/html/interfaces',
 			$this->rootDir.'/include/classes/parsers',
 			$this->rootDir.'/include/classes/parsers/results',
+			$this->rootDir.'/include/classes/controllers',
 			$this->rootDir.'/include/classes/routing',
 			$this->rootDir.'/include/classes/json',
 			$this->rootDir.'/include/classes/user',
 			$this->rootDir.'/include/classes/setup',
 			$this->rootDir.'/include/classes/regexp',
 			$this->rootDir.'/include/classes/ldap',
-			$this->rootDir.'/include/classes/pagefilter'
+			$this->rootDir.'/include/classes/pagefilter',
+			$this->rootDir.'/local/app/controllers',
+			$this->rootDir.'/app/controllers'
 		);
 	}
 
@@ -387,5 +401,72 @@ class ZBase {
 
 		// enable debug mode in the API
 		API::getWrapper()->debug = CWebUser::getDebugMode();
+	}
+
+	/**
+	 * Process request and generate response. Main entry for all processing.
+	 */
+	private function processRequest() {
+		$router = new CRouter(getRequest('action'));
+
+		$controller = $router->getController();
+
+		$controller = new $controller();
+		$controller->setAction($router->getAction());
+		$response = $controller->run();
+
+		// Controller returned data
+		if ($response instanceof CControllerResponseData) {
+			// if no view defined we pass data directly to layout
+			if ($router->getView() === null) {
+				$layout = new CView($router->getLayout(), $response->getData());
+				echo $layout->getOutput();
+			}
+			else {
+				$view = new CView($router->getView(), $response->getData());
+				$data['page']['title'] = $response->getTitle();
+				$data['controller']['action'] = $router->getAction();
+				$data['main_block'] = $view->getOutput();
+				$data['fullscreen'] = isset($_REQUEST['fullscreen']) && $_REQUEST['fullscreen'] == 1 ? 1 : 0;
+				$data['javascript']['files'] = $view->getAddedJS();
+				$data['javascript']['pre'] = $view->getIncludedJS();
+				$data['javascript']['post'] = $view->getPostJS();
+				$layout = new CView($router->getLayout(), $data);
+				echo $layout->getOutput();
+			}
+		}
+		// Controller returned redirect to another page
+		else if ($response instanceof CControllerResponseRedirect) {
+			header('Content-Type: text/html; charset=UTF-8');
+			if ($response->getMessageOk() !== null) {
+				$_SESSION['messageOk'] = $response->getMessageOk();
+			}
+			if ($response->getMessageError() !== null) {
+				$_SESSION['messageError'] = $response->getMessageError();
+			}
+			global $ZBX_MESSAGES;
+			if (isset($ZBX_MESSAGES)) {
+				$_SESSION['messages'] = $ZBX_MESSAGES;
+			}
+			if ($response->getFormData() !== null) {
+				$_SESSION['formData'] = $response->getFormData();
+			}
+
+			redirect($response->getLocation());
+		}
+		// Controller returned fatal error
+		else if ($response instanceof CControllerResponseFatal) {
+			header('Content-Type: text/html; charset=UTF-8');
+			$response->addMessage('Controller: '.$router->getAction());
+			ksort($_REQUEST);
+			foreach ($_REQUEST as $key => $value) {
+				// do not output SID
+				if ($key != 'sid') {
+					$response->addMessage($key.': '.$value);
+				}
+			}
+			$_SESSION['messages'] = $response->getMessages();
+			redirect('zabbix.php?action=system.warning');
+		}
 	}
 }
