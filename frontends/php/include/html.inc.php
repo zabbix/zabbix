@@ -197,13 +197,19 @@ function get_icon($type, $params = array()) {
 
 		case 'fullscreen':
 			$url = new CUrl();
-			$url->setArgument('fullscreen', $params['fullscreen'] ? '0' : '1');
 
-			$icon = new CIcon(
-				$params['fullscreen'] ? _('Normal view') : _('Fullscreen'),
-				'fullscreen'
-			);
-			$icon->addAction('onclick', "document.location = '".$url->getUrl()."';");
+			if ($params['fullscreen'] == 0) {
+				$url->setArgument('fullscreen', '1');
+
+				$icon = new CRedirectButton(SPACE, $url->getUrl());
+				$icon->addClass(ZBX_STYLE_BTN_MAX);
+			}
+			else {
+				$url->setArgument('fullscreen', '0');
+
+				$icon = new CRedirectButton(SPACE, $url->getUrl());
+				$icon->addClass(ZBX_STYLE_BTN_MIN);
+			}
 
 			return $icon;
 
@@ -549,14 +555,23 @@ function makeFormFooter(CButtonInterface $mainButton = null, array $otherButtons
 		$button->addClass('btn-alt');
 	}
 
-	$buttons = array();
+	$buttons = new Clist(null, 'table-forms');
+
 	if ($mainButton !== null) {
-		$buttons[] = $mainButton;
+		$buttons->addItem(array(
+			new CDiv($mainButton, ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+			new CDiv($otherButtons, ZBX_STYLE_TABLE_FORMS_TD_RIGHT))
+		);
+	}
+	else {
+		$buttons->addItem(array(
+			new CDiv(SPACE, ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+			new CDiv($otherButtons, ZBX_STYLE_TABLE_FORMS_TD_RIGHT))
+		);
 	}
 
-	$buttons[] = $otherButtons;
-
-	return new CDiv($buttons, 'form-btns');
+//	return new CDiv($buttons, 'form-btns');
+	return $buttons;
 }
 
 /**

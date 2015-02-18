@@ -983,6 +983,8 @@ define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // CSS styles
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
+define('ZBX_STYLE_BTN_MAX', 'btn-max');
+define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_HIDDEN', 'hidden');

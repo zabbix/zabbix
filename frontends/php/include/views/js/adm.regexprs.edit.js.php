@@ -446,7 +446,6 @@
 			$('#regexpid, #clone, #delete').remove();
 			$('#update').button('option', 'label', <?php echo CJs::encodeJson(_('Add')); ?>)
 				.attr({id: 'add', name: 'add'});
-			$('#cancel').addClass('ui-corner-left');
 			$('#name').focus();
 
 			for (var id in zabbixRegExp.expressions) {
