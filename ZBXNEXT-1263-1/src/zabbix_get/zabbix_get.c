@@ -152,6 +152,9 @@ static char	shortopts[] = "s:p:k:I:hV";
  ******************************************************************************/
 static void	get_signal_handler(int sig)
 {
+	if (SIGPIPE == sig)	/* this signal is raised when peer closes connection because of access restrictions */
+		return;
+
 	if (SIGALRM == sig)
 		zbx_error("Timeout while executing operation");
 
@@ -171,10 +174,11 @@ static void	get_signal_handler(int sig)
  *             key  - item's key                                              *
  *                                                                            *
  ******************************************************************************/
-static void	get_value(const char *source_ip, const char *host, unsigned short port, const char *key)
+static int	get_value(const char *source_ip, const char *host, unsigned short port, const char *key)
 {
 	zbx_sock_t	s;
-	int		ret;
+	int		ret = SUCCEED;
+	ssize_t		bytes_received = -1;
 	char		request[1024];
 
 	/* The connect mode can specify TLS with PSK but here we do not know PSK details. Therefore we put NULL in */
@@ -188,7 +192,7 @@ static void	get_value(const char *source_ip, const char *host, unsigned short po
 
 		if (SUCCEED == (ret = zbx_tcp_send(&s, request)))
 		{
-			if (SUCCEED == (ret = SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0))))
+			if (0 < (bytes_received = zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
 			{
 				if (0 == strcmp(s.buffer, ZBX_NOTSUPPORTED) && sizeof(ZBX_NOTSUPPORTED) < s.read_bytes)
 				{
@@ -201,13 +205,26 @@ static void	get_value(const char *source_ip, const char *host, unsigned short po
 					printf("%s\n", s.buffer);
 				}
 			}
+			else
+			{
+				if (0 == bytes_received)
+					zbx_error("Check access restrictions in Zabbix agent configuration");
+				ret = FAIL;
+			}
 		}
 
 		zbx_tcp_close(&s);
-	}
 
-	if (FAIL == ret)
+		if (SUCCEED != ret && 0 != bytes_received)
+		{
+			zbx_error("Get value error: %s", zbx_tcp_strerror());
+			zbx_error("Check access restrictions in Zabbix agent configuration");
+		}
+	}
+	else
 		zbx_error("Get value error: %s", zbx_tcp_strerror());
+
+	return ret;
 }
 
 /******************************************************************************
@@ -346,7 +363,10 @@ int	main(int argc, char **argv)
 	}
 
 	if (FAIL == ret)
+	{
 		printf("Try '%s --help' for more information.\n", progname);
+		goto out;
+	}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
@@ -357,19 +377,18 @@ int	main(int argc, char **argv)
 	{
 		zbx_error("TLS parameters cannot be used: 'zabbix_get' was compiled without TLS support.");
 		ret = FAIL;
+		goto out;
 	}
 #endif
-	if (SUCCEED == ret)
-	{
 #if !defined(_WINDOWS)
-		signal(SIGINT,  get_signal_handler);
-		signal(SIGTERM, get_signal_handler);
-		signal(SIGQUIT, get_signal_handler);
-		signal(SIGALRM, get_signal_handler);
+	signal(SIGINT,  get_signal_handler);
+	signal(SIGTERM, get_signal_handler);
+	signal(SIGQUIT, get_signal_handler);
+	signal(SIGALRM, get_signal_handler);
+	signal(SIGPIPE, get_signal_handler);
 #endif
-		get_value(source_ip, host, port, key);
-	}
-
+	ret = get_value(source_ip, host, port, key);
+out:
 	zbx_free(host);
 	zbx_free(key);
 	zbx_free(source_ip);
