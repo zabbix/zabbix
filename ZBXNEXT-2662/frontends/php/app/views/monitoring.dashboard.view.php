@@ -30,12 +30,6 @@ $icon = new CIcon(
 );
 $icon->addAction('onclick', 'document.location = "dashconf.php";');
 
-$dashboardWidget->addHeader(_('PERSONAL DASHBOARD'), array(
-	$icon,
-	SPACE,
-	get_icon('fullscreen', array('fullscreen' => $data['fullscreen']))
-));
-
 $dashboardWidget->setTitle(_('Dashboard'));
 $controls = new CList();
 $controls->addItem($icon);
@@ -56,7 +50,9 @@ $icon->setMenuPopup(CMenuPopupHelper::getFavouriteGraphs());
 $favouriteGraphs = new CCollapsibleUiWidget(WIDGET_FAVOURITE_GRAPHS, $data['favourite_graphs']);
 $favouriteGraphs->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.state', true);
 $favouriteGraphs->setHeader(_('Favourite graphs'), $icon);
-$favouriteGraphs->setFooter(new CLink(_('Graphs').' &raquo;', 'charts.php', 'highlight'), true);
+$favouriteGraphs->setFooter(new CList (
+	new CLink(_('Graphs'), 'charts.php', 'highlight')
+));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.col', 0);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.row', 0);
@@ -70,7 +66,9 @@ $icon->setMenuPopup(CMenuPopupHelper::getFavouriteMaps());
 $favouriteMaps = new CCollapsibleUiWidget(WIDGET_FAVOURITE_MAPS, $data['favourite_maps']);
 $favouriteMaps->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.state', true);
 $favouriteMaps->setHeader(_('Favourite maps'), $icon);
-$favouriteMaps->setFooter(new CLink(_('Maps').' &raquo;', 'zabbix.php?action=map.view', 'highlight'), true);
+$favouriteMaps->setFooter(new CList(
+	new CLink(_('Maps'), 'zabbix.php?action=map.view', 'highlight')
+));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.col', 0);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.row', 2);
@@ -84,16 +82,11 @@ $icon->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
 $favouriteScreens = new CCollapsibleUiWidget(WIDGET_FAVOURITE_SCREENS, $data['favourite_screens']);
 $favouriteScreens->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.state', true);
 $favouriteScreens->setHeader(_('Favourite screens'), $icon);
-$favouriteScreens->setFooter(
-	array(
-		new CLink(_('Screens').' &raquo;', 'screens.php', 'highlight'),
-		SPACE,
-		SPACE,
-		SPACE,
-		new CLink(_('Slide shows').' &raquo;', 'slides.php', 'highlight')
-	),
-	true
-);
+$footer = new CList(array(
+		new CLink(_('Screens'), 'screens.php', 'highlight'),
+		new CLink(_('Slide shows'), 'slides.php', 'highlight')
+	));
+$favouriteScreens->setFooter($footer);
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.col', 0);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.row', 1);
