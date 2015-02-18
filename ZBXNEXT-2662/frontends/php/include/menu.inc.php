@@ -363,7 +363,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				// permition check
 				$deny &= (CWebUser::$data['type'] < $menu['user_type'] || CWebUser::$data['type'] < $sub_page['user_type']);
 
-				$menu_class = 'active';
+				$menu_class = 'selected';
 				$page_exists = true;
 				$page['menu'] = $label;
 				$row['selected'] = true;
@@ -393,9 +393,8 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 		else {
 			$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'].'?action='.$sub_menus[$label][$menu['default_page_id']]['menu_action'];
 		}
-		$mmenu_entry = new CCol($menu['label'], $menu_class);
+		$mmenu_entry = new CTag('li', 'yes', new CLink($menu['label'], $menu_url), $menu_class);
 		$mmenu_entry->setAttribute('id', $label);
-		$mmenu_entry->addAction('onclick', 'javascript: redirect(\''.$menu_url.'\');');
 		$mmenu_entry->addAction('onmouseover', 'javascript: MMenu.mouseOver(\''.$label.'\');');
 		$mmenu_entry->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
 		array_push($main_menu, $mmenu_entry);

@@ -127,7 +127,7 @@ var MMenu = {
 	showSubMenu: function(show_label) {
 		var menu_div = $('sub_' + show_label);
 		if (!is_null(menu_div)) {
-			$(show_label).className = 'active';
+			$(show_label).className = 'selected';
 			menu_div.show();
 			for (var key in this.menus) {
 				if (key == show_label) {
