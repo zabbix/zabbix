@@ -70,7 +70,8 @@ class CUiWidget extends CDiv {
 		$this->id = $id;
 		$this->body = $body ? array($body) : array();
 
-		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget ui-tabs');
+//		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget ui-tabs');
+		parent::__construct(null, 'dashbrd-widget');
 
 		$this->setAttribute('id', $this->id.'_widget');
 	}
@@ -88,9 +89,10 @@ class CUiWidget extends CDiv {
 			$caption = SPACE;
 		}
 
-		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header header');
+		$this->header = new CDiv(null, 'dashbrd-widget-head header');
 
-		$this->header->addItem(array($icons, $caption));
+		$this->header->addItem(new CTag('h4', 'yes', $caption));
+		$this->header->addItem($icons);
 	}
 
 	/**
@@ -119,8 +121,9 @@ class CUiWidget extends CDiv {
 	 * @param string|array|CTag $footer
 	 * @param bool				$right
 	 */
-	public function setFooter($footer, $right = false) {
-		$this->footer = new CDiv($footer, 'nowrap ui-corner-all ui-widget-header footer '.($right ? ' right' : ' left'));
+	public function setFooter($list) {
+		$this->footer = $list;
+		$this->footer->addClass('dashbrd-widget-foot');
 	}
 
 	/**
