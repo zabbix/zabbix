@@ -104,6 +104,45 @@ foreach ($this->data['triggers'] as $trigger) {
 			'&triggerid='.$triggerid
 	);
 
+	if (count($trigger['dependencies']) > 0) {
+		$description[] = array(BR(), bold(_('Depends on').NAME_DELIMITER));
+		$triggerDependencies = array();
+
+		foreach ($trigger['dependencies'] as $dependency) {
+			$depTrigger = $data['dependencyTriggers'][$dependency['triggerid']];
+			$hostNames = array();
+
+			foreach ($depTrigger['hosts'] as $host) {
+				$hostNames[] = CHtml::encode($host['name']);
+				$hostNames[] = ', ';
+			}
+			array_pop($hostNames);
+
+			if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$host = reset($depTrigger['hosts']);
+				$triggerDependencies[] = new CLink(
+					array($hostNames, NAME_DELIMITER, CHtml::encode($depTrigger['description'])),
+					'trigger_prototypes.php?form=update'.url_param('parent_discoveryid')
+						.'&triggerid='.$depTrigger['triggerid'],
+					triggerIndicatorStyle($depTrigger['status'])
+				);
+			}
+			elseif ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				$host = reset($depTrigger['hosts']);
+				$triggerDependencies[] = new CLink(
+					array($hostNames, NAME_DELIMITER, CHtml::encode($depTrigger['description'])),
+					'triggers.php?form=update&hostid='.$host['hostid'].'&triggerid='.$depTrigger['triggerid'],
+					triggerIndicatorStyle($depTrigger['status'])
+				);
+			}
+
+			$triggerDependencies[] = BR();
+		}
+		array_pop($triggerDependencies);
+
+		$description = array_merge($description, array(new CDiv($triggerDependencies, 'dependencies')));
+	}
+
 	// status
 	$status = new CLink(
 		triggerIndicator($trigger['status']),
