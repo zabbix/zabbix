@@ -55,7 +55,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->grid = array(); // vertical & horizontal grids params
 		$this->gridLinesCount = array(); // How many grids to draw
 		$this->gridStep = array(); // grid step
-		$this->gridPixels = 25; // optimal grid size
+		$this->gridPixels = 50; // optimal grid size
 		$this->gridPixelsVert = 40;
 	}
 
@@ -1058,116 +1058,6 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
-	private function calcTimeInterval() {
-		$this->grid['horizontal'] = array('sub' => array(), 'main' => array());
-
-		// align to the closest human time interval
-		$raw_time_interval = ($this->gridPixels*$this->period)/$this->sizeX;
-		$intervals = array(
-			array('main' => 3600, 'sub' => 60),			// 1 minute
-			array('main' => 3600, 'sub' => 120),		// 5 minutes
-			array('main' => 3600, 'sub' => 300),		// 5 minutes
-			array('main' => 3600, 'sub' => 900),		// 15 minutes
-			array('main' => 3600, 'sub' => 1800),		// 30 minutes
-			array('main' => 86400, 'sub' => 3600),		// 1 hour
-			array('main' => 86400, 'sub' => 10800),		// 3 hours
-			array('main' => 86400, 'sub' => 21600),		// 6 hours
-			array('main' => 86400, 'sub' => 43200),		// 12 hours
-			array('main' => 604800, 'sub' => 86400),	// 1 day
-			array('main' => 1209600, 'sub' => 604800),	// 1 week
-			array('main' => 2419200, 'sub' => 1209600),	// 2 weeks
-			array('main' => 4838400, 'sub' => 2419200),	// 4 weeks
-			array('main' => 9676800, 'sub' => 4838400),	// 8 weeks
-			array('main' => 19353600, 'sub' => 9676800)	// 16 weeks
-		);
-
-		$dist = 19353600; //def week;
-		$sub_interval = 0;
-		$main_interval = 0;
-
-		foreach ($intervals as $int) {
-			$t = abs($int['sub'] - $raw_time_interval);
-
-			if ($t < $dist) {
-				$dist = $t;
-				$sub_interval = $int['sub'];
-				$main_interval = $int['main'];
-			}
-		}
-
-		// sub
-		$intervalX = ($sub_interval * $this->sizeX) / $this->period;
-
-		if ($sub_interval > SEC_PER_DAY) {
-			$offset = (7 - date('w', $this->from_time)) * SEC_PER_DAY;
-			$offset += $this->diffTZ;
-
-			$next = $this->from_time + $offset;
-
-			$offset = mktime(0, 0, 0, date('m', $next), date('d', $next), date('Y', $next)) - $this->from_time;
-			$offsetX = $offset * ($this->sizeX / $this->period);
-		}
-		else {
-			$offset = $sub_interval - (($this->from_time + date('Z', $this->from_time)) % $sub_interval);
-			$offsetX = ($offset * $this->sizeX) / $this->period;
-		}
-
-		$vline_count = floor(($this->period-$offset) / $sub_interval);
-
-		$start_i = 0;
-		if ($offsetX < 12) {
-			$start_i++;
-		}
-
-		while (($this->sizeX - ($offsetX + ($vline_count*$intervalX))) < 12) {
-			$vline_count--;
-		}
-
-		$sub = &$this->grid['horizontal']['sub'];
-		$sub['interval'] = $sub_interval;
-		$sub['linecount'] = $vline_count;
-		$sub['intervalx'] = $intervalX;
-		$sub['offset'] = $offset;
-		$sub['offsetx'] = $offsetX;
-		$sub['start'] = $start_i;
-
-		// main
-		$intervalX = ($main_interval * $this->sizeX) / $this->period;
-
-		if ($main_interval > SEC_PER_DAY) {
-			$offset = (7 - date('w', $this->from_time)) * SEC_PER_DAY;
-			$offset += $this->diffTZ;
-			$next = $this->from_time + $offset;
-
-			$offset = mktime(0, 0, 0, date('m', $next), date('d', $next), date('Y', $next)) - $this->from_time;
-			$offsetX = $offset * ($this->sizeX / $this->period);
-		}
-		else {
-			$offset = $main_interval - (($this->from_time + (date('Z', $this->from_time))) % $main_interval);
-			$offset += $this->diffTZ;
-			$offsetX = $offset * ($this->sizeX / $this->period);
-		}
-
-		$vline_count = floor(($this->period-$offset) / $main_interval);
-
-		$start_i = 0;
-		if ($offsetX < 12) {
-			$start_i++;
-		}
-
-		while (($this->sizeX - ($offsetX + ($vline_count*$intervalX))) < 12) {
-			$vline_count--;
-		}
-
-		$main = &$this->grid['horizontal']['main'];
-		$main['interval'] = $main_interval;
-		$main['linecount'] = $vline_count;
-		$main['intervalx'] = $intervalX;
-		$main['offset'] = $offset;
-		$main['offsetx'] = $offsetX;
-		$main['start'] = $start_i;
-	}
-
 	/********************************************************************************************************/
 	// DRAW ELEMENTS
 	/********************************************************************************************************/
@@ -1303,167 +1193,269 @@ class CLineGraphDraw extends CGraphDraw {
 	}
 
 	private function drawTimeGrid() {
-		$this->calcTimeInterval();
-		$this->drawSubTimeGrid();
+		$beginEndTimeFormat = (date('Y', $this->stime) != date('Y', $this->to_time))
+			? DATE_FORMAT
+			: DATE_TIME_FORMAT_SHORT;
+
+		// begin date
+		$this->drawBeginEndTimePeriod($this->stime, $beginEndTimeFormat, 0);
+
+		// between date
+		$this->calculateTimeInterval();
+		$this->drawBetweenData();
+
+		// end date
+		$this->drawBeginEndTimePeriod($this->to_time, $beginEndTimeFormat, $this->sizeX);
 	}
 
-	private function drawSubTimeGrid() {
-		$main_interval = $this->grid['horizontal']['main']['interval'];
-		$main_intervalX = $this->grid['horizontal']['main']['intervalx'];
-		$main_offset = $this->grid['horizontal']['main']['offset'];
-
-		$sub = &$this->grid['horizontal']['sub'];
-		$interval = $sub['interval'];
-		$vline_count = $sub['linecount'];
-		$intervalX = $sub['intervalx'];
-
-		$offset = $sub['offset'];
-		$offsetX = $sub['offsetx'];
-		$start_i = $sub['start'];
-
-		if ($interval == $main_interval) {
-			return;
-		}
-
-		$test_dims = imageTextSize(7, 90, 'WWW');
-		for ($i = $start_i; $i <= $vline_count; $i++) {
-			$new_time = $this->from_time + $i * $interval + $offset;
-			$new_pos = $i * $intervalX + $offsetX;
-
-			// dayLightSave
-			if ($interval > SEC_PER_HOUR) {
-				$tz = date('Z', $this->from_time) - date('Z', $new_time);
-				$new_time += $tz;
-			}
-
-			// main interval checks
-			if ($interval < SEC_PER_HOUR && date('i', $new_time) == 0) {
-				$this->drawMainPeriod($new_time, $new_pos);
-				continue;
-			}
-
-			if ($interval >= SEC_PER_HOUR && $interval < SEC_PER_DAY && date('H', $new_time) == '00') {
-				$this->drawMainPeriod($new_time, $new_pos);
-				continue;
-			}
-
-			if ($interval == SEC_PER_DAY && date('N', $new_time) == 7) {
-				$this->drawMainPeriod($new_time, $new_pos);
-				continue;
-			}
-
-			if ($interval > SEC_PER_DAY && ($i * $interval % $main_interval + $offset) == $main_offset) {
-				$this->drawMainPeriod($new_time, $new_pos);
-				continue;
-			}
-
-			dashedLine(
-				$this->im,
-				$this->shiftXleft + $new_pos,
-				$this->shiftY,
-				$this->shiftXleft + $new_pos,
-				$this->sizeY + $this->shiftY,
-				$this->getColor($this->graphtheme['gridcolor'], 0)
-			);
-
-			if ($main_intervalX < floor(($main_interval / $interval) * $intervalX)) {
-				continue;
-			}
-			elseif ($main_intervalX < (ceil($main_interval / $interval + 1) * $test_dims['width'])) {
-				continue;
-			}
-
-			if ($interval == SEC_PER_DAY) {
-				$date_format = _('D');
-			}
-			elseif ($interval > SEC_PER_DAY) {
-				$date_format = _('d.m');
-			}
-			elseif ($interval < SEC_PER_DAY) {
-				$date_format = _('H:i');
-			}
-
-			$str = zbx_date2str($date_format, $new_time);
-			$dims = imageTextSize(7, 90, $str);
-
-			imageText(
-				$this->im,
-				7,
-				90,
-				$this->shiftXleft + $new_pos+round($dims['width'] / 2),
-				$this->sizeY + $this->shiftY + $dims['height'] + 6,
-				$this->getColor($this->graphtheme['textcolor'], 0),
-				$str
-			);
-		}
-
-		// first && last
-		// start
-		$str = zbx_date2str(_('d.m H:i'), $this->stime);
-		$dims = imageTextSize(8, 90, $str);
+	private function drawBeginEndTimePeriod($value, $format, $position) {
+		$point = zbx_date2str(_($format), $value);
+		$element = imageTextSize(8, 90, $point);
 		imageText(
 			$this->im,
 			8,
 			90,
-			$this->shiftXleft + round($dims['width'] / 2),
-			$this->sizeY + $this->shiftY + $dims['height'] + 6,
+			$this->shiftXleft + $position + round($element['width'] / 2),
+			$this->sizeY + $this->shiftY + $element['height'] + 6,
 			$this->getColor($this->graphtheme['highlightcolor'], 0),
-			$str
-		);
-
-		// end
-		$endtime = $this->to_time;
-
-		$str = zbx_date2str(_('d.m H:i'), $endtime);
-		$dims = imageTextSize(8, 90, $str);
-		imageText(
-			$this->im,
-			8,
-			90,
-			$this->sizeX + $this->shiftXleft + round($dims['width'] / 2),
-			$this->sizeY + $this->shiftY + $dims['height'] + 6,
-			$this->getColor($this->graphtheme['highlightcolor'], 0),
-			$str
+			$point
 		);
 	}
 
-	private function drawMainPeriod($new_time, $new_pos) {
-		if (date('H',$new_time) == 0) {
-			if (date('Hi', $new_time) == 0) {
-				$date_format = _('d.m');
+	private function drawMainPeriod($value, $position) {
+		if (date('H', $value) == 0) {
+			if (date('Hi', $value) == 0) {
+				$format = _('d.m');
 			}
 			else {
-				$date_format = _('d.m H:i');
+				$format = _('d.m H:i');
 			}
-
-			$color = $this->graphtheme['highlightcolor'];
 		}
 		else {
-			$date_format = _('H:i');
-			$color = $this->graphtheme['highlightcolor'];
+			$format = _('H:i');
 		}
 
-		$str = zbx_date2str($date_format, $new_time);
+		$str = zbx_date2str($format, $value);
 		$dims = imageTextSize(8, 90, $str);
 
 		imageText(
 			$this->im,
 			8,
 			90,
-			$this->shiftXleft + $new_pos + round($dims['width'] / 2),
+			$this->shiftXleft + $position + round($dims['width'] / 2),
 			$this->sizeY + $this->shiftY + $dims['height'] + 6,
-			$this->getColor($color, 0),
+			$this->getColor($this->graphtheme['highlightcolor'], 0),
 			$str
 		);
 
 		dashedLine(
 			$this->im,
-			$this->shiftXleft + $new_pos,
+			$this->shiftXleft + $position,
 			$this->shiftY,
-			$this->shiftXleft + $new_pos,
+			$this->shiftXleft + $position,
 			$this->sizeY + $this->shiftY,
 			$this->getColor($this->graphtheme['maingridcolor'], 0)
 		);
+	}
+
+	private function drawSubPeriod($value, $format, $position) {
+		$point = zbx_date2str($format, $value);
+		$element = imageTextSize(7, 90, $point);
+
+		imageText(
+			$this->im,
+			7,
+			90,
+			$this->shiftXleft + $position + round($element['width'] / 2),
+			$this->sizeY + $this->shiftY + $element['height'] + 6,
+			$this->getColor($this->graphtheme['textcolor'], 0),
+			$point
+		);
+
+		dashedLine(
+			$this->im,
+			$this->shiftXleft + $position,
+			$this->shiftY,
+			$this->shiftXleft + $position,
+			$this->sizeY + $this->shiftY,
+			$this->getColor($this->graphtheme['gridcolor'], 0)
+		);
+	}
+
+	private function calculateTimeInterval() {
+		$timeInterval = ($this->gridPixels * $this->period) / $this->sizeX;
+		$intervals = array(
+			array('main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN),			// 1 hour and 1 minute
+			array('main' => SEC_PER_HOUR, 'sub' => SEC_PER_TWO_MIN),		// 1 hour and 2 minutes
+			array('main' => SEC_PER_HOUR, 'sub' => SEC_PER_FIVE_MIN),		// 1 hour and 5 minutes
+			array('main' => SEC_PER_HOUR, 'sub' => SEC_PER_FIFTEEN_MIN),	// 1 hour and 15 minutes
+			array('main' => SEC_PER_HOUR, 'sub' => SEC_PER_THIRTY_MIN),		// 1 hour and 30 minutes
+			array('main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR),			// 1 day and 1 hours
+			array('main' => SEC_PER_DAY, 'sub' => SEC_PER_THREE_HOUR),		// 1 day and 3 hours
+			array('main' => SEC_PER_DAY, 'sub' => SEC_PER_SIX_HOUR),		// 1 day and 6 hours
+			array('main' => SEC_PER_DAY, 'sub' => SEC_PER_TWELVE_HOUR),		// 1 day and 12 hours
+			array('main' => SEC_PER_WEEK, 'sub' => SEC_PER_DAY),			// 1 week and 1 day
+			array('main' => SEC_PER_TWO_WEEK, 'sub' => SEC_PER_WEEK),		// 2 weeks and 1 week
+			array('main' => SEC_PER_MONTH, 'sub' => SEC_PER_HALF_MONTH),	// 30 days and 15 days
+			array('main' => SEC_PER_QUARTER, 'sub' => SEC_PER_MONTH),		// 90 days and 30 days
+			array('main' => SEC_PER_HALF_YEAR, 'sub' => SEC_PER_MONTH),		// half year and 30 days
+			array('main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH),			// 1 year and 30 days
+			array('main' => SEC_PER_YEAR, 'sub' => SEC_PER_QUARTER),		// 1 year and 90 days
+			array('main' => SEC_PER_FIVE_YEAR, 'sub' => SEC_PER_YEAR)		// 5 years and 1 year
+		);
+
+		// default values
+		$distance = SEC_PER_FIVE_YEAR;
+		$mainInterval = 0;
+		$subInterval = 0;
+
+		foreach ($intervals as $interval) {
+			$time = abs($interval['sub'] - $timeInterval);
+
+			if ($time < $distance) {
+				$distance = $time;
+				$subInterval = $interval['sub'];
+				$mainInterval = $interval['main'];
+			}
+		}
+
+		// sub
+		$intervalX = ($subInterval * $this->sizeX) / $this->period;
+
+		if ($subInterval > SEC_PER_DAY) {
+			$offset = (7 - date('w', $this->from_time)) * SEC_PER_DAY;
+			$offset += $this->diffTZ;
+
+			$next = $this->from_time + $offset;
+
+			$offset = mktime(0, 0, 0, date('m', $next), date('d', $next), date('Y', $next)) - $this->from_time;
+			$offsetX = $offset * ($this->sizeX / $this->period);
+		}
+		else {
+			$offset = $subInterval - (($this->from_time + date('Z', $this->from_time)) % $subInterval);
+			$offsetX = ($offset * $this->sizeX) / $this->period;
+		}
+
+		$lineCount = floor(($this->period-$offset) / $subInterval);
+
+		$startI = 0;
+		if ($offsetX < 12) {
+			$startI++;
+		}
+
+		while (($this->sizeX - ($offsetX + ($lineCount*$intervalX))) < 12) {
+			$lineCount--;
+		}
+
+		$sub = &$this->grid['horizontal']['sub'];
+		$sub['interval'] = $subInterval;
+		$sub['linecount'] = $lineCount;
+		$sub['intervalx'] = $intervalX;
+		$sub['offset'] = $offset;
+		$sub['offsetx'] = $offsetX;
+		$sub['start'] = $startI;
+
+		// main
+		$intervalX = ($mainInterval * $this->sizeX) / $this->period;
+
+		if ($mainInterval > SEC_PER_DAY) {
+			$offset = (7 - date('w', $this->from_time)) * SEC_PER_DAY;
+			$offset += $this->diffTZ;
+			$next = $this->from_time + $offset;
+
+			$offset = mktime(0, 0, 0, date('m', $next), date('d', $next), date('Y', $next)) - $this->from_time;
+			$offsetX = $offset * ($this->sizeX / $this->period);
+		}
+		else {
+			$offset = $mainInterval - (($this->from_time + (date('Z', $this->from_time))) % $mainInterval);
+			$offset += $this->diffTZ;
+			$offsetX = $offset * ($this->sizeX / $this->period);
+		}
+
+		$lineCount = floor(($this->period-$offset) / $mainInterval);
+
+		$startI = 0;
+		if ($offsetX < 12) {
+			$startI++;
+		}
+
+		while (($this->sizeX - ($offsetX + ($lineCount * $intervalX))) < 12) {
+			$lineCount--;
+		}
+
+		$main = &$this->grid['horizontal']['main'];
+		$main['interval'] = $mainInterval;
+		$main['linecount'] = $lineCount;
+		$main['intervalx'] = $intervalX;
+		$main['offset'] = $offset;
+		$main['offsetx'] = $offsetX;
+		$main['start'] = $startI;
+	}
+
+	private function drawBetweenData() {
+		$subInterval = $this->grid['horizontal']['sub']['interval'];
+		$subIntervalX = $this->grid['horizontal']['sub']['intervalx'];
+		$subOffset = $this->grid['horizontal']['sub']['offset'];
+		$mainInterval = $this->grid['horizontal']['main']['interval'];
+		$mainIntervalX = $this->grid['horizontal']['main']['intervalx'];
+		$mainOffset = $this->grid['horizontal']['main']['offset'];
+
+		if ($subInterval == $mainInterval) {
+			return;
+		}
+
+		$elementSize = imageTextSize(7, 90, 'WWW');
+		for ($i = $this->grid['horizontal']['sub']['start']; $i <= $this->grid['horizontal']['sub']['linecount']; $i++) {
+			$newTime = $this->from_time + $i * $subInterval + $subOffset;
+			$position = $i * $subIntervalX + $this->grid['horizontal']['sub']['offsetx'];
+
+			// dayLightSave
+			if ($subInterval > SEC_PER_HOUR) {
+				$tz = date('Z', $this->from_time) - date('Z', $newTime);
+				$newTime += $tz;
+			}
+
+			// main interval checks
+			if ($subInterval < SEC_PER_HOUR && date('i', $newTime) == 0) {
+				$this->drawMainPeriod($newTime, $position);
+				continue;
+			}
+
+			if ($subInterval >= SEC_PER_HOUR && date('H', $newTime) == '00'
+					&& $subInterval < SEC_PER_DAY) {
+				$this->drawMainPeriod($newTime, $position);
+				continue;
+			}
+
+			if ($subInterval == SEC_PER_DAY && date('N', $newTime) == 7) {
+				$this->drawMainPeriod($newTime, $position);
+				continue;
+			}
+
+			if ($subInterval > SEC_PER_DAY && ($i * $subInterval % $mainInterval + $subOffset) == $mainOffset) {
+				$this->drawMainPeriod($newTime, $position);
+				continue;
+			}
+
+			if ($mainIntervalX < floor(($mainInterval / $subInterval) * $subIntervalX)) {
+				continue;
+			}
+			elseif ($mainIntervalX < (ceil($mainInterval / $subInterval + 1) * $elementSize['width'])) {
+				continue;
+			}
+
+			if ($subInterval == SEC_PER_DAY) {
+				$format = _('D');
+			}
+			elseif ($subInterval > SEC_PER_DAY) {
+				$format = _('d.m');
+			}
+			elseif ($subInterval < SEC_PER_DAY) {
+				$format = _('H:i');
+			}
+
+			$this->drawSubPeriod($newTime, $format, $position);
+		}
 	}
 
 	private function drawSides() {
