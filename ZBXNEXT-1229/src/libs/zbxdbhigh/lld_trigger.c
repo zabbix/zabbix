@@ -2102,14 +2102,16 @@ static zbx_lld_trigger_node_t	*lld_trigger_cache_append(zbx_hashset_t *cache, zb
  * Purpose: add trigger and all triggers related to it to trigger dependency  *
  *          validation cache.                                                 *
  *                                                                            *
- * Parameters: cache     - [IN] the trigger cache                             *
- *             trigger   - [IN] the trigger to add                            *
- *             childids  - [OUT] identifiers of generic trigger dependants    *
- *             parentids - [OUT] identifiers of generic triggers dependencies *
+ * Parameters: cache           - [IN] the trigger cache                       *
+ *             trigger         - [IN] the trigger to add                      *
+ *             triggerids_up   - [OUT] identifiers of generic trigger         *
+ *                                     dependants                             *
+ *             triggerids_down - [OUT] identifiers of generic trigger         *
+ *                                     dependencies                           *
  *                                                                            *
  ******************************************************************************/
 static void	lld_trigger_cache_add_trigger(zbx_hashset_t *cache, zbx_lld_trigger_t *trigger,
-		zbx_vector_uint64_t *childids, zbx_vector_uint64_t *parentids)
+		zbx_vector_uint64_t *triggerids_up, zbx_vector_uint64_t *triggerids_down)
 {
 	zbx_lld_trigger_ref_t	*trigger_ref;
 	zbx_lld_trigger_node_t	*trigger_node, trigger_node_local;
@@ -2140,27 +2142,33 @@ static void	lld_trigger_cache_add_trigger(zbx_hashset_t *cache, zbx_lld_trigger_
 
 		zbx_vector_ptr_append(&trigger_node->dependencies, trigger_ref);
 
-		if (NULL == trigger_ref->trigger && NULL == zbx_hashset_search(cache, trigger_ref))
+		if (NULL == trigger_ref->trigger)
 		{
-			zbx_vector_uint64_append(childids, trigger_ref->triggerid);
-			zbx_vector_uint64_append(parentids, trigger_ref->triggerid);
+			trigger_node_local.trigger_ref.triggerid = trigger_ref->triggerid;
+			trigger_node_local.trigger_ref.trigger = NULL;
 
-			lld_trigger_cache_append(cache, trigger_ref->triggerid, NULL);
+			if (NULL == zbx_hashset_search(cache, &trigger_node_local))
+			{
+				zbx_vector_uint64_append(triggerids_up, trigger_ref->triggerid);
+				zbx_vector_uint64_append(triggerids_down, trigger_ref->triggerid);
+
+				lld_trigger_cache_append(cache, trigger_ref->triggerid, NULL);
+			}
 		}
 	}
 
 	if (0 != trigger->triggerid)
-		zbx_vector_uint64_append(childids, trigger->triggerid);
+		zbx_vector_uint64_append(triggerids_up, trigger->triggerid);
 
 	for (i = 0; i < trigger->dependants.values_num; i++)
-		lld_trigger_cache_add_trigger(cache, trigger->dependants.values[i], childids, parentids);
+		lld_trigger_cache_add_trigger(cache, trigger->dependants.values[i], triggerids_up, triggerids_down);
 
 	for (i = 0; i < trigger->dependencies.values_num; i++)
 	{
 		dependency = (zbx_lld_dependency_t *)trigger->dependencies.values[i];
 
 		if (NULL != dependency->trigger_up)
-			lld_trigger_cache_add_trigger(cache, dependency->trigger_up, childids, parentids);
+			lld_trigger_cache_add_trigger(cache, dependency->trigger_up, triggerids_up, triggerids_down);
 	}
 }
 
@@ -2182,7 +2190,7 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 {
 	const char		*__function_name = "lld_trigger_cache_init";
 
-	zbx_vector_uint64_t	parentids, childids;
+	zbx_vector_uint64_t	triggerids_up, triggerids_down;
 	int			i, j;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
@@ -2196,8 +2204,8 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 	zbx_hashset_create(cache, triggers->values_num, zbx_lld_trigger_ref_hash_func,
 			zbx_lld_trigger_ref_compare_func);
 
-	zbx_vector_uint64_create(&parentids);
-	zbx_vector_uint64_create(&childids);
+	zbx_vector_uint64_create(&triggerids_down);
+	zbx_vector_uint64_create(&triggerids_up);
 
 	/* add all triggers with new dependencies to trigger cache */
 	for (i = 0; i < triggers->values_num; i++)
@@ -2209,32 +2217,32 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 			zbx_lld_dependency_t	*dependency = (zbx_lld_dependency_t *)trigger->dependencies.values[j];
 
 			if (0 == dependency->triggerdepid)
-			{
-				lld_trigger_cache_add_trigger(cache, trigger, &childids, &parentids);
 				break;
-			}
 		}
+
+		if (j != trigger->dependencies.values_num)
+			lld_trigger_cache_add_trigger(cache, trigger, &triggerids_up, &triggerids_down);
 	}
 
 	/* keep trying to load generic dependants/dependencies until there are nothing to load */
-	while (0 != childids.values_num || 0 != parentids.values_num)
+	while (0 != triggerids_up.values_num || 0 != triggerids_down.values_num)
 	{
-		/* load dependencies ('up') */
-		if (0 != parentids.values_num)
+		/* load dependants */
+		if (0 != triggerids_down.values_num)
 		{
 			sql_offset = 0;
-			zbx_vector_uint64_sort(&parentids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			zbx_vector_uint64_uniq(&parentids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_sort(&triggerids_down, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(&triggerids_down, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"select td.triggerid_down,td.triggerid_up"
 					" from trigger_depends td"
 					" left join triggers t on t.triggerid=td.triggerid_up"
 					" where t.flags<>%d and", ZBX_FLAG_DISCOVERY_PROTOTYPE);
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_down", parentids.values,
-					parentids.values_num);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_down",
+					triggerids_down.values, triggerids_down.values_num);
 
-			zbx_vector_uint64_clear(&parentids);
+			zbx_vector_uint64_clear(&triggerids_down);
 
 			result = DBselect("%s", sql);
 
@@ -2288,29 +2296,29 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 				if (1 == new_node)
 				{
 					/* if the trigger was added to cache, we must check its dependencies */
-					zbx_vector_uint64_append(&childids, child->trigger_ref.triggerid);
-					zbx_vector_uint64_append(&parentids, child->trigger_ref.triggerid);
+					zbx_vector_uint64_append(&triggerids_up, child->trigger_ref.triggerid);
+					zbx_vector_uint64_append(&triggerids_down, child->trigger_ref.triggerid);
 				}
 			}
 
 			DBfree_result(result);
 		}
 
-		/* load dependants ('down') */
-		if (0 != childids.values_num)
+		/* load dependencies */
+		if (0 != triggerids_up.values_num)
 		{
 			sql_offset = 0;
-			zbx_vector_uint64_sort(&childids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			zbx_vector_uint64_uniq(&childids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_sort(&triggerids_up, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(&triggerids_up, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select td.triggerid_down"
 					" from trigger_depends td"
 					" left join triggers t on t.triggerid=td.triggerid_down"
 					" where t.flags<>%d and", ZBX_FLAG_DISCOVERY_PROTOTYPE);
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_up", childids.values,
-					childids.values_num);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_up", triggerids_up.values,
+					triggerids_up.values_num);
 
-			zbx_vector_uint64_clear(&childids);
+			zbx_vector_uint64_clear(&triggerids_up);
 
 			result = DBselect("%s", sql);
 
@@ -2324,8 +2332,8 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 				trigger_node = lld_trigger_cache_append(cache, trigger_node_local.trigger_ref.triggerid,
 						NULL);
 
-				zbx_vector_uint64_append(&childids, trigger_node_local.trigger_ref.triggerid);
-				zbx_vector_uint64_append(&parentids, trigger_node_local.trigger_ref.triggerid);
+				zbx_vector_uint64_append(&triggerids_up, trigger_node_local.trigger_ref.triggerid);
+				zbx_vector_uint64_append(&triggerids_down, trigger_node_local.trigger_ref.triggerid);
 			}
 
 			DBfree_result(result);
@@ -2335,8 +2343,8 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 
 	zbx_free(sql);
 
-	zbx_vector_uint64_destroy(&childids);
-	zbx_vector_uint64_destroy(&parentids);
+	zbx_vector_uint64_destroy(&triggerids_up);
+	zbx_vector_uint64_destroy(&triggerids_down);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
