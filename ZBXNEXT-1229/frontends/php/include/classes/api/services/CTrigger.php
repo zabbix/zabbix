@@ -1122,6 +1122,8 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
+	 * Updates trigger records in database.
+	 *
 	 * @param array $triggers
 	 */
 	protected function updateReal(array $triggers) {

@@ -990,11 +990,16 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 		'output' => array('triggerid', 'expression', 'description', 'status', 'priority', 'state'),
 		'selectHosts' => array('name'),
 		'selectDependencies' => array('triggerid', 'expression', 'description'),
-		'hostids' => $hostid,
 		'expandDescription' => true
 	);
 
 	if ($triggerPrototypesPopup) {
+		if ($parentDiscoveryId) {
+			$options['discoveryids'] = array($parentDiscoveryId);
+		}
+		else {
+			$options['hostids'] = array($hostid);
+		}
 		if ($writeonly !== null) {
 			$options['editable'] = true;
 		}
@@ -1008,6 +1013,9 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 	else {
 		if ($hostid === null) {
 			$options['groupids'] = $groupid;
+		}
+		else {
+			$options['hostids'] = array($hostid);
 		}
 
 		if ($writeonly !== null) {
@@ -1067,8 +1075,8 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 				BR()
 			);
 
-			foreach ($trigger['dependencies'] as $dependentTrigger) {
-				$description[] = array(CMacrosResolverHelper::resolveTriggerName($dependentTrigger), BR());
+			foreach ($trigger['dependencies'] as $dependency) {
+				$description[] = array(CMacrosResolverHelper::resolveTriggerName($dependency), BR());
 			}
 		}
 

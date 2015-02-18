@@ -267,9 +267,6 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 		);
 		$description->setAttribute('target', '_blank');
 	}
-	else {
-		$description = array($hostNames, NAME_DELIMITER, $dependency['description']);
-	}
 
 	$row = new CRow(array($description, new CButton('remove', _('Remove'),
 		'javascript: removeDependency("'.$dependency['triggerid'].'");',
@@ -280,14 +277,14 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 	$dependenciesTable->addRow($row);
 }
 
-$addButton = new CButton('add_deptrigger', _('Add'),
+$addButton = new CButton('add_dep_trigger', _('Add'),
 	'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
 		'&with_triggers=1&normal_only=1&noempty=0", 1000, 700);',
 	'link_menu'
 );
-$addPrototypeButton = new CButton('add_depprototrigger', _('Add prototype'),
+$addPrototypeButton = new CButton('add_dep_trigger_prototype', _('Add prototype'),
 	'return PopUp("popup.php?srctbl=trigger_prototypes&srcfld1=triggerid&reference=deptrigger'.
-		'&multiselect=1&noempty=0", 1000, 700);',
+		url_param('parent_discoveryid').'&multiselect=1&noempty=0", 1000, 700);',
 	'link_menu'
 );
 $dependenciesFormList->addRow(_('Dependencies'),

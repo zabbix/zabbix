@@ -321,13 +321,52 @@ else {
 	$data['paging'] = getPagingLine($data['triggers']);
 
 	$data['triggers'] = API::TriggerPrototype()->get(array(
+		'output' => array('triggerid', 'expression', 'description', 'status', 'priority', 'templateid'),
+		'selectHosts' => array('hostid', 'host', 'name'),
+		'selectItems' => array('itemid', 'type', 'hostid', 'key_', 'status', 'flags'),
+		'selectFunctions' => array('functionid', 'itemid', 'function', 'parameter'),
+		'selectDependencies' => array('triggerid', 'description'),
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => API_OUTPUT_EXTEND,
-		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
-		'selectFunctions' => API_OUTPUT_EXTEND
 	));
 	order_result($data['triggers'], $sortField, $sortOrder);
+
+	$depTriggerIds = array();
+	foreach ($data['triggers'] as $trigger) {
+		foreach ($trigger['dependencies'] as $depTrigger) {
+			$depTriggerIds[$depTrigger['triggerid']] = $depTrigger['triggerid'];
+		}
+	}
+
+	$dependencyTriggers = array();
+	if ($depTriggerIds) {
+		$dependencyTriggers = API::Trigger()->get(array(
+			'output' => array('triggerid', 'flags', 'description', 'status'),
+			'selectHosts' => array('hostid', 'name'),
+			'triggerids' => $depTriggerIds,
+			'filter' => array(
+				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE)
+			),
+			'preservekeys' => true
+		));
+
+		// sort dependencies
+		foreach ($data['triggers'] as &$trigger) {
+			if (count($trigger['dependencies']) > 1) {
+				order_result($trigger['dependencies'], 'description', ZBX_SORT_UP);
+			}
+		}
+		unset($trigger);
+
+		// sort dependency trigger hosts
+		foreach ($dependencyTriggers as &$trigger) {
+			if (count($dependencyTriggers[$trigger['triggerid']]['hosts']) > 1) {
+				order_result($dependencyTriggers[$trigger['triggerid']]['hosts'], 'name', ZBX_SORT_UP);
+			}
+		}
+		unset($trigger);
+	}
+
+	$data['dependencyTriggers'] = $dependencyTriggers;
 
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
