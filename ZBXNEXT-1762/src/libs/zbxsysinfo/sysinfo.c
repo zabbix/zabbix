@@ -674,7 +674,9 @@ zbx_log_t	*add_log_result(AGENT_RESULT *result, const char *value)
 	log = zbx_malloc(NULL, sizeof(zbx_log_t));
 
 	zbx_log_init(log);
-	log->value = zbx_strdup(log->value, value);
+
+	if (NULL != value)
+		log->value = zbx_strdup(log->value, value);
 
 	for (i = 0; NULL != result->logs && NULL != result->logs[i]; i++)
 		;
@@ -769,7 +771,8 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 			ret = SUCCEED;
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			zbx_replace_invalid_utf8(c);
+			if (NULL != c)
+				zbx_replace_invalid_utf8(c);
 			add_log_result(result, c);
 			ret = SUCCEED;
 			break;

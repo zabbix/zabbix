@@ -287,7 +287,10 @@ if (hasRequest('action') && getRequest('action') == 'triggerprototype.massupdate
 	$triggersView->show();
 }
 elseif (isset($_REQUEST['form'])) {
-	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($exprAction));
+	$data = getTriggerFormData($exprAction);
+	$data['hostid'] = $discoveryRule['hostid'];
+
+	$triggersView = new CView('configuration.triggers.edit', $data);
 	$triggersView->render();
 	$triggersView->show();
 }

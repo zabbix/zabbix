@@ -32,6 +32,21 @@
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
 
+
+void	zbx_proxyconfig_sigusr_handler(int flags)
+{
+	if (ZBX_RTC_CONFIG_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
+	{
+		if (0 < zbx_sleep_get_remainder())
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
+			zbx_wakeup();
+		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "configuration cache reloading is already in progress");
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: process_configuration_sync                                       *
@@ -135,6 +150,8 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	zbx_set_sigusr_handler(zbx_proxyconfig_sigusr_handler);
 
 	for (;;)
 	{

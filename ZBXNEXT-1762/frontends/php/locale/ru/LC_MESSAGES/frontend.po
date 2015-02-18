@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-05 21:43+0200\n"
+"POT-Creation-Date: 2015-02-11 23:40+0200\n"
 "PO-Revision-Date: 2015-02-04 15:52+0300\n"
 "Last-Translator: filipp.sudanov <filipp.sudanov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -32,7 +32,7 @@ msgstr[0] "%1$d день"
 msgstr[1] "%1$d дня"
 msgstr[2] "%1$d дней"
 
-#: include/blocks.inc.php:1146
+#: include/blocks.inc.php:1149
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
@@ -150,7 +150,7 @@ msgstr "(без прокси)"
 msgid "(with warnings)"
 msgstr "(с предупреждениями)"
 
-#: include/blocks.inc.php:1348
+#: include/blocks.inc.php:1351
 msgid "-"
 msgstr "-"
 
@@ -158,11 +158,11 @@ msgstr "-"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[ВВЕДЕНО КАК МАССОВОЕ ПОДТВЕРЖДЕНИЕ]----"
 
-#: include/triggers.inc.php:2105 include/triggers.inc.php:2106
-#: include/triggers.inc.php:2107 include/triggers.inc.php:2109
-#: include/triggers.inc.php:2111 include/triggers.inc.php:2114
-#: include/triggers.inc.php:2118 include/triggers.inc.php:2119
-#: include/triggers.inc.php:2131
+#: include/triggers.inc.php:2086 include/triggers.inc.php:2087
+#: include/triggers.inc.php:2088 include/triggers.inc.php:2090
+#: include/triggers.inc.php:2092 include/triggers.inc.php:2095
+#: include/triggers.inc.php:2099 include/triggers.inc.php:2100
+#: include/triggers.inc.php:2112
 msgid "0 or 1"
 msgstr "0 или 1"
 
@@ -263,13 +263,13 @@ msgid "Account is blocked for %s seconds"
 msgstr "Аккаунт заблокирован на %s секунд"
 
 #: events.php:476 include/actions.inc.php:186 include/actions.inc.php:374
-#: include/blocks.inc.php:1026 include/blocks.inc.php:1321
+#: include/blocks.inc.php:1029 include/blocks.inc.php:1324
 #: include/events.inc.php:197 include/events.inc.php:272
 #: include/views/configuration.action.edit.php:1080
 msgid "Ack"
 msgstr "Подтверждено"
 
-#: acknow.php:233 jsLoader.php:181 tr_status.php:678
+#: acknow.php:233 jsLoader.php:181 tr_status.php:654
 msgid "Acknowledge"
 msgstr "Подтвердить"
 
@@ -289,7 +289,7 @@ msgstr "Подтвердить и вернуться"
 msgid "Acknowledge status"
 msgstr "Состояние подтверждения"
 
-#: include/events.inc.php:182 tr_status.php:296 tr_status.php:689
+#: include/events.inc.php:182 tr_status.php:296 tr_status.php:665
 msgid "Acknowledged"
 msgstr "Подтверждено"
 
@@ -397,7 +397,7 @@ msgstr "Операции действия"
 msgid "Action updated"
 msgstr "Действие обновлено"
 
-#: events.php:477 include/blocks.inc.php:1027 include/blocks.inc.php:1322
+#: events.php:477 include/blocks.inc.php:1030 include/blocks.inc.php:1325
 #: include/events.inc.php:198 include/menu.inc.php:185
 #: include/views/configuration.action.list.php:40
 msgid "Actions"
@@ -513,7 +513,7 @@ msgstr "Активно до"
 #: include/views/js/configuration.sysmaps.js.php:406
 #: include/views/monitoring.history.php:131 jsLoader.php:182
 #: popup_bitem.php:177 popup_media.php:145 popup_period.php:148
-#: tr_logform.php:262 tr_logform.php:356 tr_status.php:733
+#: tr_logform.php:262 tr_logform.php:356 tr_status.php:709
 msgid "Add"
 msgstr "Добавить"
 
@@ -582,7 +582,7 @@ msgstr "Администрирование"
 msgid "Advanced labels"
 msgstr "Расширенные подписи"
 
-#: include/blocks.inc.php:1024 include/blocks.inc.php:1319
+#: include/blocks.inc.php:1027 include/blocks.inc.php:1322
 #: include/events.inc.php:196 include/events.inc.php:272
 #: include/events.inc.php:275 tr_status.php:294
 msgid "Age"
@@ -669,7 +669,7 @@ msgstr "Разрешенные узлы сети"
 msgid "Amount of memory size in bytes. If mode is missing total is used."
 msgstr "Объем памяти в байтах. Если режим не указан, используется total."
 
-#: include/triggers.inc.php:1558
+#: include/triggers.inc.php:1539
 #: include/views/configuration.action.edit.php:127
 #: include/views/configuration.action.edit.php:1027
 #: include/views/configuration.host.discovery.edit.php:278
@@ -1078,7 +1078,7 @@ msgstr "Светлее"
 msgid "Bulgarian (bg_BG)"
 msgstr "Болгарский (bg_BG)"
 
-#: tr_status.php:818
+#: tr_status.php:794
 msgid "Bulk acknowledge"
 msgstr "Массовое подтверждение"
 
@@ -1459,7 +1459,7 @@ msgstr "Не удалось добавить прокси"
 msgid "Cannot add regular expression"
 msgstr "Не удалось добавить регулярное выражение"
 
-#: screenconf.php:169
+#: screenconf.php:166
 msgid "Cannot add screen"
 msgstr "Не удалось добавить комплексный экран"
 
@@ -1742,7 +1742,7 @@ msgstr[0] "Не удалось удалить регулярное выраже�
 msgstr[1] "Не удалось удалить регулярные выражения"
 msgstr[2] "Не удалось удалить регулярные выражения"
 
-#: screenconf.php:240
+#: screenconf.php:237
 msgid "Cannot delete screen"
 msgstr "Не удалось удалить комплексный экран"
 
@@ -2608,7 +2608,7 @@ msgstr "Не удалось обновить прокси для обнаруж�
 msgid "Cannot update regular expression"
 msgstr "Не удалось обновить регулярное выражение"
 
-#: screenconf.php:134 screenedit.php:231 screenedit.php:248
+#: screenconf.php:131 screenedit.php:231 screenedit.php:248
 msgid "Cannot update screen"
 msgstr "Не удалось обновить комплексный экран"
 
@@ -2683,11 +2683,11 @@ msgstr "Заголовок"
 msgid "Case sensitive"
 msgstr "Регистрозависимое"
 
-#: include/classes/items/CHelpItems.php:797
+#: include/classes/items/CHelpItems.php:809
 msgid "Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:793
+#: include/classes/items/CHelpItems.php:805
 msgid "Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface."
 msgstr ""
 
@@ -2714,7 +2714,7 @@ msgid "Change password"
 msgstr "Изменить пароль"
 
 #: include/forms.inc.php:416 include/items.inc.php:125
-#: include/triggers.inc.php:2082 include/views/configuration.item.edit.php:216
+#: include/triggers.inc.php:2063 include/views/configuration.item.edit.php:216
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "Символ"
@@ -3023,7 +3023,7 @@ msgstr "Условия"
 msgid "Configuration"
 msgstr "Настройка"
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:879
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr ""
 
@@ -3676,7 +3676,7 @@ msgstr "Пунктирная линия"
 msgid "Data"
 msgstr "Данные"
 
-#: include/classes/items/CHelpItems.php:903
+#: include/classes/items/CHelpItems.php:915
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
@@ -4291,14 +4291,14 @@ msgstr "Запрещено"
 msgid "Dependencies"
 msgstr "Зависимости"
 
-#: include/triggers.inc.php:1251 tr_status.php:577
+#: include/triggers.inc.php:1232 tr_status.php:558
 msgid "Dependent"
 msgstr "Зависимость"
 
-#: include/triggers.inc.php:1231
+#: include/triggers.inc.php:1212
 #: include/views/configuration.services.edit.php:121
 #: include/views/configuration.triggers.list.php:125 popup.php:1034
-#: tr_status.php:561
+#: tr_status.php:542
 msgid "Depends on"
 msgstr "Зависит от"
 
@@ -4523,7 +4523,7 @@ msgstr "Деактивировать выбранные веб-сценарии?
 #: auditlogs.php:144 dashboard.php:295 include/discovery.inc.php:121
 #: include/html.inc.php:341 include/httptest.inc.php:46
 #: include/items.inc.php:155 include/items.inc.php:209
-#: include/triggers.inc.php:1502 include/triggers.inc.php:2340
+#: include/triggers.inc.php:1483 include/triggers.inc.php:2308
 #: include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:100
 #: include/views/administration.usergroups.list.php:58
@@ -4600,7 +4600,7 @@ msgid "Discovery object"
 msgstr "Объект обнаружения"
 
 #: include/actions.inc.php:68 include/audit.inc.php:43
-#: include/blocks.inc.php:1278 include/forms.inc.php:1094
+#: include/blocks.inc.php:1281 include/forms.inc.php:1094
 #: include/views/configuration.discovery.edit.php:80
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
@@ -4720,7 +4720,7 @@ msgstr "Готово"
 msgid "Dot"
 msgstr "Точечная линия"
 
-#: include/blocks.inc.php:1280
+#: include/blocks.inc.php:1283
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr "Недоступно"
@@ -5150,7 +5150,7 @@ msgstr "Активировать выбранные веб-сценарии?"
 #: auditlogs.php:141 dashboard.php:295 include/discovery.inc.php:120
 #: include/html.inc.php:337 include/httptest.inc.php:45
 #: include/items.inc.php:154 include/items.inc.php:206
-#: include/triggers.inc.php:2337
+#: include/triggers.inc.php:2305
 #: include/views/administration.mediatypes.edit.php:95
 #: include/views/administration.mediatypes.list.php:99
 #: include/views/administration.usergroups.edit.php:64
@@ -5232,7 +5232,7 @@ msgstr "Подтверждение событий отключено"
 msgid "Event details"
 msgstr "Детали события"
 
-#: include/triggers.inc.php:1500
+#: include/triggers.inc.php:1481
 msgid "Event generation"
 msgstr "Генерация события"
 
@@ -5343,7 +5343,7 @@ msgstr ""
 msgid "Export to CSV"
 msgstr "Экспорт в CSV"
 
-#: include/triggers.inc.php:1497
+#: include/triggers.inc.php:1478
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.regularexpressions.edit.php:67
 #: include/views/administration.general.regularexpressions.edit.php:76
@@ -5418,7 +5418,7 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "Ошибка"
 
-#: include/actions.inc.php:1382 include/blocks.inc.php:1191
+#: include/actions.inc.php:1382 include/blocks.inc.php:1194
 msgid "Failed"
 msgstr "Неудачно"
 
@@ -5753,7 +5753,7 @@ msgstr "Поддержка"
 msgid "Get timing of loading full web page. Default path is /"
 msgstr "Получение времени загрузки всей веб-страницы. Путь по умолчанию - /"
 
-#: include/triggers.inc.php:1633 tr_testexpr.php:35
+#: include/triggers.inc.php:1614 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr "Заданное выражение не является макросом"
 
@@ -6267,15 +6267,15 @@ msgstr "Выравнивание по горизонтали"
 #: httpconf.php:318 httpconf.php:376 httpconf.php:427 httpmon.php:78
 #: httpmon.php:91 include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:691 include/blocks.inc.php:746
-#: include/blocks.inc.php:1011 include/blocks.inc.php:1021
-#: include/blocks.inc.php:1317 include/classes/api/services/CHttpTest.php:417
+#: include/blocks.inc.php:1014 include/blocks.inc.php:1024
+#: include/blocks.inc.php:1320 include/classes/api/services/CHttpTest.php:417
 #: include/classes/screens/CScreenEvents.php:40
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
 #: include/classes/setup/CSetupWizard.php:365 include/forms.inc.php:543
 #: include/html.inc.php:348 include/maps.inc.php:24
-#: include/triggers.inc.php:1120 include/triggers.inc.php:1488
+#: include/triggers.inc.php:1121 include/triggers.inc.php:1469
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:58
 #: include/views/configuration.graph.list.php:54
@@ -6370,7 +6370,7 @@ msgstr[2] "Узлы сети активированы"
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:287 include/blocks.inc.php:475
-#: include/blocks.inc.php:1189 include/forms.inc.php:500
+#: include/blocks.inc.php:1192 include/forms.inc.php:500
 #: include/maps.inc.php:25 include/views/administration.script.edit.php:83
 #: include/views/administration.script.list.php:43
 #: include/views/configuration.hostgroups.edit.php:67
@@ -7409,7 +7409,7 @@ msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s
 msgstr "Некорректное значение следования перенаправлениям для шага \"%1$s\" веб-сценария \"%2$s\"."
 
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1634 tr_testexpr.php:36
+#: include/triggers.inc.php:1615 tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "Использована некорректная функция"
 
@@ -7876,8 +7876,8 @@ msgstr "Некорректный y мин элемент данных для г�
 msgid "Indonesian (id_ID)"
 msgstr "Индонезийский (id_ID)"
 
-#: include/actions.inc.php:1128 include/blocks.inc.php:1025
-#: include/blocks.inc.php:1320 include/classes/html/CFormList.php:72
+#: include/actions.inc.php:1128 include/blocks.inc.php:1028
+#: include/blocks.inc.php:1323 include/classes/html/CFormList.php:72
 #: include/classes/screens/CScreenActions.php:134
 #: include/views/administration.auditacts.list.php:77
 #: include/views/configuration.host.discovery.list.php:55
@@ -8144,8 +8144,8 @@ msgstr "Режим инвентарных данных"
 msgid "Is online?"
 msgstr "В системе?"
 
-#: include/blocks.inc.php:1013 include/blocks.inc.php:1022
-#: include/blocks.inc.php:1318
+#: include/blocks.inc.php:1016 include/blocks.inc.php:1025
+#: include/blocks.inc.php:1321
 msgid "Issue"
 msgstr "Проблема"
 
@@ -8624,7 +8624,7 @@ msgstr "Последние 365 дней"
 msgid "Last 7 days"
 msgstr "Последние 7 дней"
 
-#: include/blocks.inc.php:1023 tr_status.php:293
+#: include/blocks.inc.php:1026 tr_status.php:293
 msgid "Last change"
 msgstr "Последнее изменение"
 
@@ -8827,7 +8827,7 @@ msgid "Location longitude"
 msgstr "Размещение (долгота)"
 
 #: include/forms.inc.php:417 include/items.inc.php:127
-#: include/triggers.inc.php:2083 include/views/configuration.item.edit.php:217
+#: include/triggers.inc.php:2064 include/views/configuration.item.edit.php:217
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "Журнал (лог)"
@@ -9069,11 +9069,11 @@ msgstr "Тип обслуживания"
 msgid "Maintenance updated"
 msgstr "Обслуживание обновлено"
 
-#: include/blocks.inc.php:1054 tr_status.php:627
+#: include/blocks.inc.php:1057 tr_status.php:606
 msgid "Maintenance with data collection"
 msgstr "Обслуживание со сбором данных"
 
-#: include/blocks.inc.php:1053 tr_status.php:626
+#: include/blocks.inc.php:1056 tr_status.php:605
 msgid "Maintenance without data collection"
 msgstr "Обслуживание без сбора данных"
 
@@ -9584,7 +9584,7 @@ msgstr "100 наиболее активных триггеров"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1501
+#: include/triggers.inc.php:1482
 msgid "Multiple PROBLEM events"
 msgstr "Множественные события ПРОБЛЕМА"
 
@@ -9808,8 +9808,8 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr "Следующая"
 
-#: events.php:811 include/events.inc.php:355 include/events.inc.php:373
-#: include/func.inc.php:1993 include/triggers.inc.php:1503
+#: events.php:798 include/events.inc.php:355 include/events.inc.php:373
+#: include/func.inc.php:1993 include/triggers.inc.php:1484
 #: include/views/administration.users.list.php:76
 #: include/views/administration.users.list.php:79
 #: include/views/configuration.httpconf.list.php:122
@@ -10034,11 +10034,11 @@ msgstr "Правила обнаружения не найдены."
 msgid "No errors found."
 msgstr "Ошибки не найдены."
 
-#: include/blocks.inc.php:1099 include/blocks.inc.php:1339 tr_status.php:699
+#: include/blocks.inc.php:1102 include/blocks.inc.php:1342 tr_status.php:675
 msgid "No events"
 msgstr "Нет событий"
 
-#: events.php:405 include/blocks.inc.php:1019
+#: events.php:405 include/blocks.inc.php:1022
 #: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:191
 msgid "No events found."
 msgstr "События не найдены."
@@ -10529,7 +10529,7 @@ msgstr "Нет триггера с triggerid \"%1$s\"."
 msgid "No triggers defined."
 msgstr "Триггеры не заданы."
 
-#: include/triggers.inc.php:1083
+#: include/triggers.inc.php:1084
 #: include/views/configuration.triggers.list.php:68
 #: include/views/monitoring.overview.triggers.php:115
 #: include/views/reports.toptriggers.php:156 popup.php:971 report2.php:391
@@ -10557,7 +10557,7 @@ msgstr "Преобразования значений не найдены."
 msgid "No values found."
 msgstr "Значения не найдены."
 
-#: httpmon.php:89 include/blocks.inc.php:1187
+#: httpmon.php:89 include/blocks.inc.php:1190
 #: include/views/configuration.httpconf.list.php:58
 msgid "No web scenarios found."
 msgstr "Веб-сценарии не найдены."
@@ -10572,7 +10572,7 @@ msgid "None"
 msgstr "Пусто"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1500 include/views/monitoring.history.php:242
+#: include/triggers.inc.php:1481 include/views/monitoring.history.php:242
 #: popup.php:1376
 msgid "Normal"
 msgstr "Нормальный"
@@ -10682,19 +10682,19 @@ msgstr "Количество inode у указанного раздела. Ес�
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Количество элементов данных (активированных/деактивированных/неподдерживаемых)"
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:851
 msgid "Number of items in Zabbix database."
 msgstr "Количество элементов данных в базе данных Zabbix."
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:871
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Количество элементов данных в истории прокси, которые еще не были отправлены на сервер"
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:875
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Количество элементов данных в очереди, которые задерживаются от и до секунд, включительно."
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:847
 msgid "Number of monitored hosts"
 msgstr "Количество наблюдаемых узлов сети"
 
@@ -10711,7 +10711,7 @@ msgstr ""
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:707
+#: include/classes/items/CHelpItems.php:711
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -10759,11 +10759,11 @@ msgstr "Количество успешно полученных значени�
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Количество триггеров (активированных/деактивированных [проблема/ок])"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:895
 msgid "Number of triggers in Zabbix database."
 msgstr "Количество триггеров в базе данных Zabbix."
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:855
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Количество неподдерживаемых элементов данных в базе данных Zabbix."
 
@@ -10776,47 +10776,47 @@ msgstr "Количество пользователей (в сети)"
 msgid "Number of users connected. Command who is used on agent side."
 msgstr "Количество подключенных пользователей. Используется команда who на стороне агента."
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:819
 msgid "Number of values stored in table HISTORY."
 msgstr "Количество значений записанных в таблице HISTORY."
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:823
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Количество значений записанных в таблице HISTORY_LOG."
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:827
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Количество значений записанных в таблице HISTORY_STR."
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:831
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Количество значений записанных в таблице HISTORY_TEXT."
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:835
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Количество значений записанных в таблице HISTORY_UINT."
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:887
 msgid "Number of values stored in table TRENDS."
 msgstr "Количество значений записанных в таблице TRENDS."
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:891
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Количество значений записанных в таблице TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:699
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Количество виртуальных машин на VMware гипервизоре, <url> - VMware service URL, <uuid> - имя хоста VMware гипервизора"
 
 #: include/forms.inc.php:415 include/items.inc.php:123
-#: include/triggers.inc.php:2081 include/views/configuration.item.edit.php:215
+#: include/triggers.inc.php:2062 include/views/configuration.item.edit.php:215
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "Числовой (с плавающей точкой)"
 
-#: include/triggers.inc.php:2080 include/triggers.inc.php:2096
-#: include/triggers.inc.php:2100 include/triggers.inc.php:2110
-#: include/triggers.inc.php:2115 include/triggers.inc.php:2120
+#: include/triggers.inc.php:2061 include/triggers.inc.php:2077
+#: include/triggers.inc.php:2081 include/triggers.inc.php:2091
+#: include/triggers.inc.php:2096 include/triggers.inc.php:2101
 msgid "Numeric (integer 64bit)"
 msgstr "Числовой (целое 64бит)"
 
@@ -10901,7 +10901,7 @@ msgstr "Октябрь"
 msgid "Off"
 msgstr "Выкл"
 
-#: include/actions.inc.php:1379 include/blocks.inc.php:1190
+#: include/actions.inc.php:1379 include/blocks.inc.php:1193
 #: include/classes/html/CTriggersInfo.php:115
 #: include/views/administration.users.list.php:85 report2.php:396
 #: report3.php:83
@@ -11065,7 +11065,7 @@ msgstr "Операции"
 msgid "Operator"
 msgstr "Оператор"
 
-#: include/triggers.inc.php:1558
+#: include/triggers.inc.php:1539
 #: include/views/configuration.action.edit.php:128
 #: include/views/configuration.action.edit.php:1028
 #: include/views/configuration.host.discovery.edit.php:279
@@ -12144,7 +12144,7 @@ msgstr "Требуемые права доступа к узлам сети"
 msgid "Required performance (vps)"
 msgstr "Требуемое быстродействие (знч/сек)"
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:883
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Требуемая производительность Zabbix сервера, в ожидаемом новых значениях в секунду."
 
@@ -12258,7 +12258,7 @@ msgstr "Загружать только заголовки"
 msgid "Retry"
 msgstr "Повтор"
 
-#: include/classes/items/CHelpItems.php:909
+#: include/classes/items/CHelpItems.php:921
 msgid "Return first column of the first row of the SQL query result."
 msgstr ""
 
@@ -12266,11 +12266,11 @@ msgstr ""
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Возвращает время ответа на ICMP ping в секундах. Например: 0.02"
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:843
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:839
 msgid "Returns current maintenance status of the host."
 msgstr "Возвращает текущее состояние обслуживания узла сети."
 
@@ -12284,7 +12284,7 @@ msgstr "Возвращает подробную информацию о узле
 msgid "Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:859
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr ""
 
@@ -12654,7 +12654,7 @@ msgstr "Комплексный экран \"%1$s\" пропущен - прави
 msgid "Screen \"%1$s\" updated."
 msgstr "Комплексный экран \"%1$s\" обновлен."
 
-#: screenconf.php:168
+#: screenconf.php:165
 msgid "Screen added"
 msgstr "Комплексный экран добавлен"
 
@@ -12662,7 +12662,7 @@ msgstr "Комплексный экран добавлен"
 msgid "Screen cell configuration"
 msgstr "Настройка элемента комплексного экрана"
 
-#: screenconf.php:240
+#: screenconf.php:237
 msgid "Screen deleted"
 msgstr "Комплексный экран удален"
 
@@ -12670,7 +12670,7 @@ msgstr "Комплексный экран удален"
 msgid "Screen should contain at least one row and column."
 msgstr "Комплексный экран должен содержать по крайней мере одну строку и колонку."
 
-#: screenconf.php:133 screenedit.php:231 screenedit.php:248
+#: screenconf.php:130 screenedit.php:231 screenedit.php:248
 msgid "Screen updated"
 msgstr "Комплексный экран обновлен"
 
@@ -13032,7 +13032,7 @@ msgstr "Сессия завершена, пожалуйста, зайдите п
 
 #: events.php:474 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:150
-#: include/triggers.inc.php:1495 include/views/configuration.item.list.php:148
+#: include/triggers.inc.php:1476 include/views/configuration.item.list.php:148
 #: include/views/configuration.trigger.prototype.list.php:60
 #: include/views/configuration.triggers.edit.php:253
 #: include/views/configuration.triggers.list.php:71
@@ -13052,7 +13052,7 @@ msgstr "Важность (в порядке убывания)"
 #: include/reports.inc.php:440
 #: include/views/configuration.application.list.php:60
 #: include/views/js/configuration.sysmaps.js.php:26 report2.php:419
-#: tr_status.php:733 tr_status.php:738
+#: tr_status.php:709 tr_status.php:714
 msgid "Show"
 msgstr "Показать"
 
@@ -13384,7 +13384,7 @@ msgstr "Стандартные элементы данных"
 msgid "Start in"
 msgstr "Начинать в"
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:815
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Время запуска Zabbix сервера, Unix timestamp."
 
@@ -13829,7 +13829,7 @@ msgid "Test string"
 msgstr "Тестовая строка"
 
 #: include/forms.inc.php:418 include/items.inc.php:129
-#: include/triggers.inc.php:2084 include/views/configuration.item.edit.php:218
+#: include/triggers.inc.php:2065 include/views/configuration.item.edit.php:218
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "Текст"
@@ -13971,7 +13971,7 @@ msgstr "До"
 #: events.php:454 events.php:470 include/acknow.inc.php:49
 #: include/actions.inc.php:1122 include/actions.inc.php:1145
 #: include/actions.inc.php:1218 include/actions.inc.php:1236
-#: include/blocks.inc.php:1015 include/classes/screens/CScreenActions.php:32
+#: include/blocks.inc.php:1018 include/classes/screens/CScreenActions.php:32
 #: include/classes/screens/CScreenActions.php:38
 #: include/classes/screens/CScreenActions.php:44
 #: include/classes/screens/CScreenActions.php:128
@@ -13997,11 +13997,11 @@ msgstr "Время (в порядке возрастания)"
 msgid "Time (descending)"
 msgstr "Время (в порядке убывания)"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:863
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:867
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr "Время последнего доступа к прокси. Имя - имя прокси. Параметр - lastaccess. Unix timestamp."
 
@@ -14094,7 +14094,7 @@ msgstr "Всего затрачено времени: %s"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Транзакция не была закрыта. Отмена..."
 
-#: include/classes/items/CHelpItems.php:913
+#: include/classes/items/CHelpItems.php:925
 msgid "Transform SQL query result into a JSON object for low-level discovery."
 msgstr ""
 
@@ -14130,7 +14130,7 @@ msgstr "Динамика изменений"
 
 #: events.php:332 events.php:374 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:486
-#: include/maps.inc.php:26 include/triggers.inc.php:1492
+#: include/maps.inc.php:26 include/triggers.inc.php:1473
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:73
 #: include/views/configuration.services.edit.php:96
@@ -14351,7 +14351,7 @@ msgid "Trigger value"
 msgstr "Значение триггера"
 
 #: include/forms.inc.php:587 include/html.inc.php:415 include/html.inc.php:419
-#: include/menu.inc.php:51 include/triggers.inc.php:1095
+#: include/menu.inc.php:51 include/triggers.inc.php:1096
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:48
 #: include/views/configuration.host.edit.php:536
@@ -14625,7 +14625,7 @@ msgstr "Единица измерения"
 #: include/actions.inc.php:41 include/actions.inc.php:96
 #: include/actions.inc.php:113 include/actions.inc.php:149
 #: include/actions.inc.php:928 include/actions.inc.php:1474
-#: include/blocks.inc.php:1192 include/classes/html/CHostsInfo.php:120
+#: include/blocks.inc.php:1195 include/classes/html/CHostsInfo.php:120
 #: include/discovery.inc.php:131 include/discovery.inc.php:168
 #: include/events.inc.php:47 include/events.inc.php:78
 #: include/graphs.inc.php:37 include/graphs.inc.php:67
@@ -14639,7 +14639,7 @@ msgstr "Единица измерения"
 #: include/perm.inc.php:53 include/regexp.inc.php:221
 #: include/screens.inc.php:57 include/triggers.inc.php:66
 #: include/triggers.inc.php:179 include/triggers.inc.php:198
-#: include/triggers.inc.php:2337 include/triggers.inc.php:2343
+#: include/triggers.inc.php:2305 include/triggers.inc.php:2311
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:196
 msgid "Unknown"
@@ -14658,11 +14658,11 @@ msgstr "Неизвестная ошибка"
 msgid "Unknown function."
 msgstr "Неизвестная функция."
 
-#: include/triggers.inc.php:1632 popup_trexpr.php:651 tr_testexpr.php:34
+#: include/triggers.inc.php:1613 popup_trexpr.php:651 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "Неизвестный элемент данных узла сети, такого элемента данных нет у выбранного узла сети"
 
-#: include/triggers.inc.php:1631 tr_testexpr.php:33
+#: include/triggers.inc.php:1612 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr "Неизвестный узел сети, такого узла сети нет в системе"
 
@@ -14802,7 +14802,7 @@ msgstr "Неподдерживаемый параметр \"%2$s\" для фил
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
 msgstr "Неподдерживаемый параметр \"%2$s\" для фильтра правила обнаружения \"%1$s\"."
 
-#: include/blocks.inc.php:1279
+#: include/blocks.inc.php:1282
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr "Доступно"
@@ -14893,8 +14893,8 @@ msgid "Updated status of host"
 msgstr "Состояние узла сети обновлено"
 
 #: include/blocks.inc.php:464 include/blocks.inc.php:814
-#: include/blocks.inc.php:886 include/blocks.inc.php:1143
-#: include/blocks.inc.php:1245 include/blocks.inc.php:1295
+#: include/blocks.inc.php:886 include/blocks.inc.php:1146
+#: include/blocks.inc.php:1248 include/blocks.inc.php:1298
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, c-format
 msgid "Updated: %s"
@@ -14955,7 +14955,7 @@ msgstr "Карты верхнего уровня"
 msgid "Uptime"
 msgstr "Доступен"
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:899
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Время работы процесса Zabbix сервера в секундах."
 
@@ -15178,7 +15178,7 @@ msgstr "Пользователи (в сети)"
 msgid "Users unblocked"
 msgstr "Разблокированные пользователи"
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:911
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Статистика VMware кэша. Возможные режимы: total, free, pfree, used и pused."
 
@@ -15226,6 +15226,10 @@ msgstr ""
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr ""
 
+#: include/classes/items/CHelpItems.php:683
+msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
@@ -15238,7 +15242,7 @@ msgstr ""
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -15246,7 +15250,7 @@ msgstr ""
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -15258,7 +15262,7 @@ msgstr ""
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:695
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -15266,91 +15270,99 @@ msgstr ""
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:703
 msgid "VMware service version, <url> - VMware service URL"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:727
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:775
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:723
+#: include/classes/items/CHelpItems.php:731
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:779
+#: include/classes/items/CHelpItems.php:791
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:783
+#: include/classes/items/CHelpItems.php:795
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:747
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:751
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:723
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:703
+#: include/classes/items/CHelpItems.php:707
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:759
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:763
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:759
-msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
-
-#: include/classes/items/CHelpItems.php:727
-msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
-
-#: include/classes/items/CHelpItems.php:711
-msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
-
-#: include/classes/items/CHelpItems.php:731
-msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
-
-#: include/classes/items/CHelpItems.php:735
-msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
-
-#: include/classes/items/CHelpItems.php:747
-msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
-
 #: include/classes/items/CHelpItems.php:767
-msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:771
+msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:735
+msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:715
+msgid "VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:719
+msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:739
+msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:743
+msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:755
+msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:779
+msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:783
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:775
+#: include/classes/items/CHelpItems.php:787
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -15410,11 +15422,11 @@ msgstr ""
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:907
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Эффективность кэша значений. Допустимые параметры: requests, hits и misses."
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:903
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Статистика кэша значений. Допустимые значения: total, free, pfree, used и pused."
 
@@ -15903,10 +15915,10 @@ msgstr "Год"
 msgid "Yearly"
 msgstr "Ежегодно"
 
-#: events.php:811 include/blocks.inc.php:835
+#: events.php:798 include/blocks.inc.php:835
 #: include/classes/html/CServerInfo.php:32 include/events.inc.php:358
 #: include/events.inc.php:376 include/func.inc.php:1993
-#: include/triggers.inc.php:1503
+#: include/triggers.inc.php:1484
 #: include/views/administration.users.list.php:75
 #: include/views/configuration.httpconf.list.php:122
 #: include/views/js/adm.regexprs.edit.js.php:139

@@ -806,7 +806,7 @@ else {
 					);
 
 					// acknowledge
-					$ack = getEventAckState($event, true);
+					$ack = getEventAckState($event, $page['file']);
 
 					// add colors and blinking to span depending on configuration and trigger parameters
 					$statusSpan = new CSpan(trigger_value2str($event['value']));
