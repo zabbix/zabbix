@@ -5834,12 +5834,12 @@ return array(
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 			),
-			'hostid' => array(
+			'itemid' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid',
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
 			),
 			'name' => array(
 				'null' => false,
@@ -5884,6 +5884,25 @@ return array(
 				'length' => 20,
 				'ref_table' => 'items',
 				'ref_field' => 'itemid',
+			),
+		),
+	),
+	'application_discovery' => array(
+		'key' => 'applicationid',
+		'fields' => array(
+			'applicationid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'applications',
+				'ref_field' => 'applicationid',
+			),
+			'application_prototypeid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'application_prototype',
+				'ref_field' => 'application_prototypeid',
 			),
 		),
 	),

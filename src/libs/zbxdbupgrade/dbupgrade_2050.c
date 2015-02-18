@@ -117,7 +117,7 @@ static int	DBpatch_2050005(void)
 			{"application_prototype", "application_prototypeid", 0,
 				{
 					{"application_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{0}
 				},
@@ -129,12 +129,12 @@ static int	DBpatch_2050005(void)
 
 static int	DBpatch_2050006(void)
 {
-	return DBcreate_index("application_prototype", "application_prototype_1", "hostid", 0);
+	return DBcreate_index("application_prototype", "application_prototype_1", "itemid", 0);
 }
 
 static int	DBpatch_2050007(void)
 {
-	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("application_prototype", 1, &field);
 }
@@ -210,6 +210,43 @@ static int	DBpatch_2050015(void)
 	return DBadd_foreign_key("item_application_prototype", 2, &field);
 }
 
+static int	DBpatch_2050016(void)
+{
+	const ZBX_TABLE table =
+			{"application_discovery", "applicationid", 0,
+				{
+					{"applicationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"application_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050017(void)
+{
+	return DBcreate_index("application_discovery", "application_discovery_1", "application_prototypeid", 0);
+}
+
+static int	DBpatch_2050018(void)
+{
+	const ZBX_FIELD	field = {"applicationid", NULL, "applications", "applicationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("application_discovery", 1, &field);
+}
+
+static int	DBpatch_2050019(void)
+{
+	const ZBX_FIELD	field = {"application_prototypeid", NULL, "application_prototype", "application_prototypeid",
+			0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("application_discovery", 2, &field);
+}
+
+
 #endif
 
 DBPATCH_START(2050)
@@ -232,5 +269,9 @@ DBPATCH_ADD(2050012, 0, 1)
 DBPATCH_ADD(2050013, 0, 1)
 DBPATCH_ADD(2050014, 0, 1)
 DBPATCH_ADD(2050015, 0, 1)
+DBPATCH_ADD(2050016, 0, 1)
+DBPATCH_ADD(2050017, 0, 1)
+DBPATCH_ADD(2050018, 0, 1)
+DBPATCH_ADD(2050019, 0, 1)
 
 DBPATCH_END()
