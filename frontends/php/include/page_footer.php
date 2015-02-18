@@ -25,9 +25,6 @@ require_once dirname(__FILE__).'/config.inc.php';
 if (!isset($page)) {
 	global $page;
 }
-if (!isset($ZBX_PAGE_POST_JS)) {
-	global $ZBX_PAGE_POST_JS;
-}
 
 if (!defined('PAGE_HEADER_LOADED')) {
 	define('PAGE_HEADER_LOADED', 1);
@@ -92,6 +89,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$table->show();
 	}
 
+	insertPagePostJs();
 	require_once 'include/views/js/common.init.js.php';
 
 	echo '</body>'."\n".
