@@ -32,45 +32,44 @@
 
 	<div class="overlay-dialogue" style="top: 130px; left: 13px">
 	<div class="dashbrd-widget-head"><h4>Edit map element</h4></div>
-	<table class="table-forms">
-		<tfoot>
-		<tr>
-		<td class="table-forms-td-left"></td>
-		<td class="table-forms-td-right"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Remove</button><button type="button">Apply</button></td>
-		</tr>
-		</tfoot>
-		<tbody>
-		<tr>
-		<td class="table-forms-td-left"><label for="HostName">Type</label></td>
-		<td class="table-forms-td-right"><select size="1" name="elementtype" id="elementType"><option value="0">Host</option><option value="1">Map</option><option value="2">Trigger</option><option value="3">Host group</option></select></td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left">Show</td>
-		<td class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> Host group</label></li><li><label for="IpAddr"><input type="radio" id="IpAddr"> Host group elements</label></li></ul></td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left">Area type</td>
-		<td class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> Fit to map</label></li><li><label for="IpAddr"><input type="radio" id="IpAddr"> Custom size</label></li></ul></td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label for="VisibleName">Label</label></td>
-		<td class="table-forms-td-right"><textarea id="VisibleName"></textarea></td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label for="HostName">Label location</label></td>
-		<td class="table-forms-td-right"><select><option>Bottom</option></select></td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label for="HostName">Host</label></td>
-		<td class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label for="HostName">Application</label></td>
-		<td class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></td>
-		</tr>
-		<tr>
-		<!--<td class="table-forms-td-left"></td>-->
-		<td class="table-forms-td-right" colspan="2"><fieldset><legend>Icons</legend><table><tbody><tr><td colspan="2"><label for="UseIconmap"><input type="checkbox" id="UseIconmap"> Automatic icon selection</label></td></tr><tr><td><label>Default</label><br>
+	<ul class="table-forms" style="width: auto">
+		<!--<tfoot>
+		<li>
+		<div class="table-forms-td-left"></div>
+		<div class="table-forms-td-right"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Remove</button><button type="button">Apply</button></div>
+		</li>
+		</tfoot>-->
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Type</label></div>
+		<div class="table-forms-td-right"><select size="1" name="elementtype" id="elementType"><option value="0">Host</option><option value="1">Map</option><option value="2">Trigger</option><option value="3">Host group</option></select></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left">Show</div>
+		<div class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> Host group</label></li><li><label for="IpAddr"><input type="radio" id="IpAddr"> Host group elements</label></li></ul></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left">Area type</div>
+		<div class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> Fit to map</label></li><li><label for="IpAddr"><input type="radio" id="IpAddr"> Custom size</label></li></ul></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="VisibleName">Label</label></div>
+		<div class="table-forms-td-right"><textarea id="VisibleName"></textarea></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Label location</label></div>
+		<div class="table-forms-td-right"><select><option>Bottom</option></select></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Host</label></div>
+		<div class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Application</label></div>
+		<div class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></div>
+		</li>
+		<li>
+		<!--<div class="table-forms-td-left"></div>-->
+		<div class="table-forms-td-right"><fieldset><legend>Icons</legend><table><tbody><tr><td colspan="2"><label for="UseIconmap"><input type="checkbox" id="UseIconmap"> Automatic icon selection</label></td></tr><tr><td><label>Default</label><br>
 		<select>
 		    <option value="2">Cloud_(24)</option>
 		    <option value="3">Cloud_(48)</option>
@@ -820,27 +819,26 @@
             <option value="186">Zabbix_server_3D_(64)</option>
             <option value="187">Zabbix_server_3D_(96)</option>
             <option value="185">Zabbix_server_3D_(128)</option>
-        </select></td></tr></tbody></table></fieldset></td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label for="HostName">Coordinates</label></td>
-		<td class="table-forms-td-right"><input type="number" id="HostName"> <label>X</label>&nbsp;&nbsp;<input type="number" id="HostName"> <label>Y</label></td>
-		</tr>
-		<tr>
-		<!--<td class="table-forms-td-left"></td>-->
-		<td class="table-forms-td-right" colspan="2"><fieldset><legend>URLs</legend><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td><a href="#" class="link-dotted">Add</a></td><td></td></tr></tbody></table></fieldset></td>
-		</tr>
-		</tbody>
-	</table>
+        </select></td></tr></tbody></table></fieldset></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Coordinates</label></div>
+		<div class="table-forms-td-right"><input type="number" id="HostName"> <label>X</label>&nbsp;&nbsp;<input type="number" id="HostName"> <label>Y</label></div>
+		</li>
+		<li>
+		<!--<div class="table-forms-td-left"></div>-->
+		<div class="table-forms-td-right"><fieldset><legend>URLs</legend><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td><a href="#" class="link-dotted">Add</a></td><td></td></tr></tbody></table></fieldset></div>
+		</li>
+	</ul>
 	</div>
-
+<!--
 	<div class="overlay-dialogue" style="top: 130px; left: 570px">
 	<div class="dashbrd-widget-head"><h4>Mass update elements (2)</h4></div>
 	<table class="table-forms">
 		<tfoot>
 		<tr>
-		<td class="table-forms-td-left"></td>
-		<td class="table-forms-td-right"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Remove</button><button type="button">Apply</button></td>
+		<div class="table-forms-td-left"></td>
+		<div class="table-forms-td-right"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Remove</button><button type="button">Apply</button></td>
 		</tr>
 		</tfoot>
 		<tbody>
@@ -895,31 +893,31 @@
 		</td>
 		</tr>
 		<tr>
-		<td class="table-forms-td-left">Show</td>
-		<td class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> Host group</label></li><li><label for="IpAddr"><input type="radio" id="IpAddr"> Host group elements</label></li></ul></td>
+		<div class="table-forms-td-left">Show</td>
+		<div class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> Host group</label></li><li><label for="IpAddr"><input type="radio" id="IpAddr"> Host group elements</label></li></ul></td>
 		</tr>
 		<tr>
-		<td class="table-forms-td-left">Area type</td>
-		<td class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> Fit to map</label></li><li><label for="IpAddr"><input type="radio" id="IpAddr"> Custom size</label></li></ul></td>
+		<div class="table-forms-td-left">Area type</td>
+		<div class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> Fit to map</label></li><li><label for="IpAddr"><input type="radio" id="IpAddr"> Custom size</label></li></ul></td>
 		</tr>
 		<tr>
-		<td class="table-forms-td-left"><label for="VisibleName">Label</label></td>
-		<td class="table-forms-td-right"><textarea id="VisibleName"></textarea></td>
+		<div class="table-forms-td-left"><label for="VisibleName">Label</label></td>
+		<div class="table-forms-td-right"><textarea id="VisibleName"></textarea></td>
 		</tr>
 		<tr>
-		<td class="table-forms-td-left"><label for="HostName">Label location</label></td>
-		<td class="table-forms-td-right"><select><option>Bottom</option></select></td>
+		<div class="table-forms-td-left"><label for="HostName">Label location</label></td>
+		<div class="table-forms-td-right"><select><option>Bottom</option></select></td>
 		</tr>
 		<tr>
-		<td class="table-forms-td-left"><label for="HostName">Host</label></td>
-		<td class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></td>
+		<div class="table-forms-td-left"><label for="HostName">Host</label></td>
+		<div class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></td>
 		</tr>
 		<tr>
-		<td class="table-forms-td-left"><label for="HostName">Application</label></td>
-		<td class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></td>
+		<div class="table-forms-td-left"><label for="HostName">Application</label></td>
+		<div class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></td>
 		</tr>
 		<tr>
-		<!--<td class="table-forms-td-left"></td>-->
+		<!--<div class="table-forms-td-left"></td>--><!--
 		<td class="table-forms-td-right" colspan="2"><fieldset><legend>Icons</legend><table><tbody><tr><td colspan="2"><label for="UseIconmap"><input type="checkbox" id="UseIconmap"> Automatic icon selection</label></td></tr><tr><td><label>Default</label><br>
 		<select>
 		    <option value="2">Cloud_(24)</option>
@@ -1673,16 +1671,15 @@
         </select></td></tr></tbody></table></fieldset></td>
 		</tr>
 		<tr>
-		<td class="table-forms-td-left"><label for="HostName">Coordinates</label></td>
-		<td class="table-forms-td-right"><input type="number" id="HostName"> <label>X</label>&nbsp;&nbsp;<input type="number" id="HostName"> <label>Y</label></td>
+		<div class="table-forms-td-left"><label for="HostName">Coordinates</label></td>
+		<div class="table-forms-td-right"><input type="number" id="HostName"> <label>X</label>&nbsp;&nbsp;<input type="number" id="HostName"> <label>Y</label></td>
 		</tr>
 		<tr>
-		<!--<td class="table-forms-td-left"></td>-->
-		<td class="table-forms-td-right" colspan="2"><fieldset><legend>URLs</legend><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td><a href="#" class="link-dotted">Add</a></td><td></td></tr></tbody></table></fieldset></td>
-		</tr>
-		</tbody>
-	</table>
-	</div>
+		<!--<div class="table-forms-td-left"></td>--><!--
+		<td class="table-forms-td-right" colspan="2"><fieldset><legend>URLs</legend><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td><a href="#" class="link-dotted">Add</a></td><td></td></tr></tbody></table></fieldset></div>
+		</li>
+	</ul>
+	</div>-->
 
 	</article>
 	<footer>

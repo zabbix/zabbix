@@ -14,20 +14,6 @@ body {
 	background: $body-bgcolor;
 	margin-bottom: 90px;
 	min-width: 950px;
-
-	&.pop-up {
-		min-width: initial;
-		margin-bottom: 0;
-
-		article {
-			padding: 13px;
-		}
-
-		h1 {
-			border-bottom: none;
-			padding: 0;
-		}
-	}
 }
 
 fieldset {
@@ -296,7 +282,7 @@ ul.top-nav-icons {
 	ul {
 		position: absolute;
 		right: 0;
-		bottom: 5px;
+		bottom: 6px;
 
 		li {
 			display: block;
@@ -618,6 +604,11 @@ footer {
 			 	padding: 5px 0px 5px 0;
 			 }
 
+			 &.center {
+			 	text-align: center;
+			 	vertical-align: middle;
+			 }
+
 			.btn-grey {
 				margin: 5px 0 5px 0;
 				display: block;
@@ -691,8 +682,8 @@ input {
 }
 
 textarea {
-	height: 12px;
-	line-height: 12px;
+	//height: 12px;
+	//line-height: 12px;
 	padding: 5px 0 0 5px;
 	overflow: auto;
 	resize: vertical;
@@ -1177,7 +1168,7 @@ button[disabled] {
 .dashbrd-widget-head {
 	cursor: move;
 	position: relative;
-	padding: 8px 10px 8px 10px;
+	padding: 8px 60px 8px 10px;
 
 	ul {
 		position: absolute;
@@ -1293,6 +1284,33 @@ button[disabled] {
 	.dashbrd-widget-head {
 		margin: -7px -15px 6px -15px;
 		padding: 12px 10px 8px 15px;
+	}
+}
+
+.pop-up {
+	min-width: initial;
+	margin-bottom: 0;
+
+	article {
+		padding: 13px;
+	}
+
+	h1 {
+		border-bottom: none;
+		padding: 0;
+	}
+
+	.header-title {
+		
+		ul {
+			position: absolute;
+			right: 0;
+			bottom: 0;
+		}
+	}
+
+	.dashbrd-widget-head {
+		padding: 8px 10px 8px 10px;
 	}
 }
 
