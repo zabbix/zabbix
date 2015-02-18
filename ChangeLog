@@ -1,7 +1,7 @@
 Changes for 2.2.9rc1
 
 New features:
-.......PS. [ZBXNEXT-2354] separated VMware performance collector based statistic retrieval from VMware data retrieval and added items to monitor custom performance counters (wiper)
+.......PST [ZBXNEXT-2354] separated VMware performance collector based statistic retrieval from VMware data retrieval and added items to monitor custom performance counters (wiper)
 A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
@@ -162,7 +162,7 @@ A......... [ZBX-8603] fixed web scenario fields "http_proxy" and "retries" not u
 ........S. [ZBX-8415] fixed possible server crash on lld hosts or host groups update (dimir, Sasha)
 ...G...... [ZBX-8236] fixed few memory leaks in Windows agent (wiper)
 A......... [ZBX-8563] added field "logtimefmt" to exported items (Krists)
-.......PS. [ZBX-7621] changed virtual machine disk and network discovery to use device name instead of instance id in discovered item name (wiper)
+.......PST [ZBX-7621] changed virtual machine disk and network discovery to use device name instead of instance id in discovered item name (wiper)
 .......PS. [ZBX-8338] fixed SNMP walking code so that it intelligently chooses either a string or numeric representation for an OID index (asaveljevs)
 ..F....... [ZBX-8577] added wmi.get[] to the list of suggested items (asaveljevs)
 ..F....... [ZBX-8216] fixed screen import error (Andrejs)
