@@ -868,6 +868,8 @@ define('ZBX_SOCKET_BYTES_LIMIT',    1048576);   // socket response size limit, 1
 // value is also used in servercheck.js file
 define('SERVER_CHECK_INTERVAL', 10);
 
+define('DATE_TIME_FORMAT_SECONDS_XML', 'Y-m-d\TH:i:s\Z');
+
 // XML export|import tags
 define('XML_TAG_MACRO',				'macro');
 define('XML_TAG_HOST',				'host');
