@@ -24,15 +24,9 @@ $this->addJSfile('js/class.pmaster.js');
 $dashboardWidget = new CWidget(null, 'dashboard');
 $dashboardWidget->setClass('header');
 
-$icon = new CIcon(
-	_s('Configure (Filter %s)', $data['filter_enabled'] == 1 ? _('Enabled') : _('Disabled')),
-	$data['filter_enabled'] == 1 ? 'iconconfig_hl' : 'iconconfig'
-);
-$icon->addAction('onclick', 'document.location = "dashconf.php";');
-
 $dashboardWidget->setTitle(_('Dashboard'));
 $controls = new CList();
-$controls->addItem($icon);
+$controls->addItem(get_icon('dashconf'));
 $controls->addItem(get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))));
 $dashboardWidget->setControls($controls);
 
