@@ -246,6 +246,12 @@ static int	DBpatch_2050019(void)
 	return DBadd_foreign_key("application_discovery", 2, &field);
 }
 
+static int	DBpatch_2050020(void)
+{
+	const ZBX_FIELD field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("applications", &field);
+}
 
 #endif
 
@@ -273,5 +279,6 @@ DBPATCH_ADD(2050016, 0, 1)
 DBPATCH_ADD(2050017, 0, 1)
 DBPATCH_ADD(2050018, 0, 1)
 DBPATCH_ADD(2050019, 0, 1)
+DBPATCH_ADD(2050020, 0, 1)
 
 DBPATCH_END()
