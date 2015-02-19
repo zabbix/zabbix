@@ -67,7 +67,7 @@ Changes for 2.4.4rc1
 New features:
 .......PS. [ZBXNEXT-2354] separated VMware performance collector based statistic retrieval from VMware data retrieval and added items to monitor custom performance counters (wiper)
 A.F....... [ZBX-1357] enabled Chinese (China) locale to be displayed by default (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, Korean, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, Korean, Polish, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
@@ -629,7 +629,7 @@ Changes for 2.2.9rc1
 
 New features:
 .......PS. [ZBXNEXT-2354] separated VMware performance collector based statistic retrieval from VMware data retrieval and added items to monitor custom performance counters (wiper)
-A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Japanese, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ...G...PS. [ZBX-9284] added zabbix log file locking to avoid incomplete logging on log file rotation (igors)
