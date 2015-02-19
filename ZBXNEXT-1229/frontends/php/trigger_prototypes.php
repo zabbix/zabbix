@@ -154,8 +154,46 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	);
 
 	if (hasRequest('update')) {
-		$trigger['triggerid'] = getRequest('triggerid');
-		$result = API::TriggerPrototype()->update($trigger);
+		// Update only changed fields.
+
+		$oldTriggerPrototype = API::TriggerPrototype()->get(array(
+			'output' => array('triggerid'),
+			'triggerids' => getRequest('triggerid'),
+			'selectDependencies' => array('triggerid')
+		));
+		if (!$oldTriggerPrototype) {
+			access_deny();
+		}
+
+		$oldTriggerPrototype = reset($oldTriggerPrototype);
+		$oldTriggerPrototype['dependencies'] = zbx_toHash(zbx_objectValues($oldTriggerPrototype['dependencies'], 'triggerid'));
+
+		$newDependencies = $trigger['dependencies'];
+		$oldDependencies = $oldTriggerPrototype['dependencies'];
+
+		unset($trigger['dependencies']);
+		unset($oldTriggerPrototype['dependencies']);
+
+		$triggerToUpdate = array_diff_assoc($trigger, $oldTriggerPrototype);
+		$triggerToUpdate['triggerid'] = getRequest('triggerid');
+
+		// dependencies
+		$updateDepencencies = false;
+		if (count($newDependencies) != count($oldDependencies)) {
+			$updateDepencencies = true;
+		}
+		else {
+			foreach ($newDependencies as $dependency) {
+				if (!isset($oldDependencies[$dependency['triggerid']])) {
+					$updateDepencencies = true;
+				}
+			}
+		}
+		if ($updateDepencencies) {
+			$triggerToUpdate['dependencies'] = $newDependencies;
+		}
+
+		$result = API::TriggerPrototype()->update($triggerToUpdate);
 
 		show_messages($result, _('Trigger prototype updated'), _('Cannot update trigger prototype'));
 	}
@@ -189,27 +227,27 @@ elseif (hasRequest('add_dependency') && hasRequest('new_dependency')) {
 		}
 	}
 }
-elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massupdate' && hasRequest('massupdate') && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massupdate'
+		&& hasRequest('massupdate') && hasRequest('g_triggerid')) {
 	$triggerIds = getRequest('g_triggerid');
 	$visible = getRequest('visible');
 
-	$result = false;
-	if (isset($visible['priority'])) {
-		$priority = getRequest('priority');
+	$triggersToUpdate = array();
 
-		foreach ($triggerIds as $triggerId) {
-			$result = API::TriggerPrototype()->update(array(
-				'triggerid' => $triggerId,
-				'priority' => $priority
-			));
-			if (!$result) {
-				break;
-			}
+	foreach ($triggerIds as $triggerId) {
+		$trigger = array('triggerid' => $triggerId);
+
+		if (isset($visible['priority'])) {
+			$trigger['priority'] = getRequest('priority');
 		}
+		if (isset($visible['dependencies'])) {
+			$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', array()), 'triggerid');
+		}
+
+		$triggersToUpdate[] = $trigger;
 	}
-	else {
-		$result = true;
-	}
+
+	$result = (bool) API::Trigger()->update($triggersToUpdate);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['g_triggerid']);
@@ -270,10 +308,10 @@ elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massde
 /*
  * Display
  */
-if (hasRequest('action') && getRequest('action') == 'triggerprototype.massupdateform' && hasRequest('g_triggerid')) {
+if (hasRequest('action') && getRequest('action') === 'triggerprototype.massupdateform' && hasRequest('g_triggerid')) {
 	$data = getTriggerMassupdateFormData();
 	$data['action'] = 'triggerprototype.massupdate';
-	$triggersView = new CView('configuration.triggers.massupdate', $data);
+	$triggersView = new CView('configuration.trigger.prototype.massupdate', $data);
 	$triggersView->render();
 	$triggersView->show();
 }

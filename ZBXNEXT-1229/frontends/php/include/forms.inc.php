@@ -1323,11 +1323,15 @@ function getTriggerMassupdateFormData() {
 
 	// get dependencies
 	$data['dependencies'] = API::Trigger()->get(array(
-		'triggerids' => $data['dependencies'],
 		'output' => array('triggerid', 'flags', 'description'),
-		'preservekeys' => true,
-		'selectHosts' => array('hostid', 'name')
+		'selectHosts' => array('hostid', 'name'),
+		'triggerids' => $data['dependencies'],
+		'filter' => array(
+			'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED)
+		),
+		'preservekeys' => true
 	));
+
 	foreach ($data['dependencies'] as &$dependency) {
 		if (count($dependency['hosts']) > 1) {
 			order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
