@@ -247,7 +247,7 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 		$triggersToUpdate[] = $trigger;
 	}
 
-	$result = (bool) API::Trigger()->update($triggersToUpdate);
+	$result = (bool) API::TriggerPrototype()->update($triggersToUpdate);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['g_triggerid']);
