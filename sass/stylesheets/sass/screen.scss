@@ -708,6 +708,7 @@ select {
 	@extend %form-input-style;
 
 	&.select-multiple {
+		width: 300px;
 		height: auto;
 		padding: 5px;
 	}
