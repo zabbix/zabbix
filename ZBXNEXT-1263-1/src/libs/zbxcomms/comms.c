@@ -644,9 +644,10 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char 
 
 	while (written < len)
 	{
-		/* send by chunks no larger than 16384 bytes because RFC 6066 says: */
-		/* ".... TLS specifies a fixed maximum plaintext fragment length of 2^14 bytes." */
-		if (ZBX_TCP_ERROR == (i = zbx_tls_write(s, data + written, MIN((len - written), 16384))))
+		/* TODO: maybe we will need to send by chunks no larger than 16384 bytes because RFC 6066 says: */
+		/* ".... TLS specifies a fixed maximum plaintext fragment length of 2^14 bytes."		*/
+		/* if (ZBX_TCP_ERROR == (i = zbx_tls_write(s, data + written, MIN((int)(len - written), 16384)))) */
+		if (ZBX_TCP_ERROR == (i = zbx_tls_write(s, data + written, len - written)))
 		{
 			ret = FAIL;
 			goto cleanup;
