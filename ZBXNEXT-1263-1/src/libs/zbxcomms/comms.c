@@ -623,20 +623,19 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char 
 
 	if (0 != (flags & ZBX_TCP_PROTOCOL))
 	{
-		static char	header_buf[ZBX_TCP_HEADER_LEN + sizeof(len64_le)];
-		static int	copied = 0;
-
-		if (0 == copied)
+		/* write header */
+		/* TODO combine sending of Zabbix protocol header and sending of data length into one operation for */
+		/* better TLS efficiency */
+		if (ZBX_TCP_ERROR == zbx_tls_write(s, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 		{
-			memcpy(header_buf, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN);
-			copied = 1;
+			ret = FAIL;
+			goto cleanup;
 		}
 
 		len64_le = zbx_htole_uint64((zbx_uint64_t)len);
-		memcpy(header_buf + ZBX_TCP_HEADER_LEN, &len64_le, sizeof(len64_le));
 
-		/* write header and data length */
-		if (ZBX_TCP_ERROR == zbx_tls_write(s, header_buf, sizeof(header_buf)))
+		/* write data length */
+		if (ZBX_TCP_ERROR == zbx_tls_write(s, (char *)&len64_le, sizeof(len64_le)))
 		{
 			ret = FAIL;
 			goto cleanup;
@@ -645,9 +644,8 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char 
 
 	while (written < len)
 	{
-		/* send by chunks no larger than 16384 bytes because RFC 6066 says:		*/
-		/*     "TLS specifies a fixed maximum plaintext fragment length of 2^14 bytes."	*/
-		/* (this restriction will be also applied to sending unencrypted data)		*/
+		/* send by chunks no larger than 16384 bytes because RFC 6066 says: */
+		/* ".... TLS specifies a fixed maximum plaintext fragment length of 2^14 bytes." */
 		if (ZBX_TCP_ERROR == (i = zbx_tls_write(s, data + written, MIN((len - written), 16384))))
 		{
 			ret = FAIL;
