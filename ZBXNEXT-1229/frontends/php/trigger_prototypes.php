@@ -311,12 +311,17 @@ elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massde
 if (hasRequest('action') && getRequest('action') === 'triggerprototype.massupdateform' && hasRequest('g_triggerid')) {
 	$data = getTriggerMassupdateFormData();
 	$data['action'] = 'triggerprototype.massupdate';
+	$data['hostid'] = $discoveryRule['hostid'];
+
 	$triggersView = new CView('configuration.trigger.prototype.massupdate', $data);
 	$triggersView->render();
 	$triggersView->show();
 }
 elseif (isset($_REQUEST['form'])) {
-	$triggersView = new CView('configuration.trigger.prototype.edit', getTriggerFormData($exprAction));
+	$data = getTriggerFormData($exprAction);
+	$data['hostid'] = $discoveryRule['hostid'];
+
+	$triggersView = new CView('configuration.trigger.prototype.edit', $data);
 	$triggersView->render();
 	$triggersView->show();
 }
