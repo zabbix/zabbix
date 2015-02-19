@@ -452,11 +452,10 @@ $macrosView = new CView('common.macros', array(
 ));
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 
-$frmHost->addItem($divTabs);
 
 // Footer
 if ($data['templateId'] != 0 && $data['form'] !== 'full_clone') {
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -473,10 +472,12 @@ if ($data['templateId'] != 0 && $data['form'] !== 'full_clone') {
 	));
 }
 else {
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('groupid')))
 	));
 }
+
+$frmHost->addItem($divTabs);
 
 return $frmHost;

@@ -110,11 +110,10 @@ $scriptFormList->addRow($confirmationLabel, array(
 
 $scriptView = new CTabView();
 $scriptView->addTab('scripts', _('Script'), $scriptFormList);
-$scriptForm->addItem($scriptView);
 
 // footer
 if (isset($_REQUEST['scriptid'])) {
-	$scriptForm->addItem(makeFormFooter(
+	$scriptView->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CButton('clone', _('Clone')),
@@ -124,12 +123,13 @@ if (isset($_REQUEST['scriptid'])) {
 	));
 }
 else {
-	$scriptForm->addItem(makeFormFooter(
+	$scriptView->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
 
+$scriptForm->addItem($scriptView);
 $scriptsWidget->addItem($scriptForm);
 
 return $scriptsWidget;

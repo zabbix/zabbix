@@ -45,12 +45,11 @@ $screenFormList->addRow(_('Rows'), new CNumericBox('vsize', $this->data['vsize']
 // append tabs to form
 $screenTab = new CTabView();
 $screenTab->addTab('screenTab', _('Screen'), $screenFormList);
-$screenForm->addItem($screenTab);
 
 // append buttons to form
 if (isset($this->data['screenid']))
 {
-	$screenForm->addItem(makeFormFooter(
+	$screenTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -60,11 +59,13 @@ if (isset($this->data['screenid']))
 	));
 }
 else {
-	$screenForm->addItem(makeFormFooter(
+	$screenTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('templateid')))
 	));
 }
+
+$screenForm->addItem($screenTab);
 
 $screenWidget->addItem($screenForm);
 return $screenWidget;

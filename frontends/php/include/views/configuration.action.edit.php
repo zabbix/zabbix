@@ -1107,12 +1107,11 @@ if (!hasRequest('form_refresh')) {
 $actionTabs->addTab('actionTab', _('Action'), $actionFormList);
 $actionTabs->addTab('conditionTab', _('Conditions'), $conditionFormList);
 $actionTabs->addTab('operationTab', _('Operations'), $operationFormList);
-$actionForm->addItem($actionTabs);
 
 // append buttons to form
 $others = array();
 if (!empty($this->data['actionid'])) {
-	$actionForm->addItem(makeFormFooter(
+	$actionTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CButton('clone', _('Clone')),
@@ -1125,12 +1124,13 @@ if (!empty($this->data['actionid'])) {
 	));
 }
 else {
-	$actionForm->addItem(makeFormFooter(
+	$actionTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('actiontype')))
 	));
 }
 
+$actionForm->addItem($actionTabs);
 
 // append form to widget
 $actionWidget->addItem($actionForm);

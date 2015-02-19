@@ -185,11 +185,10 @@ if (!$this->data['form_refresh']) {
 $maintenanceTab->addTab('maintenanceTab', _('Maintenance'), $maintenanceFormList);
 $maintenanceTab->addTab('periodsTab', _('Periods'), $maintenancePeriodFormList);
 $maintenanceTab->addTab('hostTab', _('Hosts & Groups'), $hostsAndGroupsFormList);
-$maintenanceForm->addItem($maintenanceTab);
 
 // append buttons to form
 if (isset($this->data['maintenanceid'])) {
-	$maintenanceForm->addItem(makeFormFooter(
+	$maintenanceTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -199,12 +198,13 @@ if (isset($this->data['maintenanceid'])) {
 	));
 }
 else {
-	$maintenanceForm->addItem(makeFormFooter(
+	$maintenanceTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
 
+$maintenanceForm->addItem($maintenanceTab);
 $maintenanceWidget->addItem($maintenanceForm);
 
 return $maintenanceWidget;

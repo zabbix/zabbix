@@ -41,7 +41,6 @@ $commentFormList->addRow(_('Description'), $commentTextArea);
 // append tabs to form
 $commentTab = new CTabView();
 $commentTab->addTab('commentTab', _s('Description for "%s".', $this->data['trigger']['description']), $commentFormList);
-$commentForm->addItem($commentTab);
 
 // append buttons to form
 $updateButton = new CSubmit('update', _('Update'));
@@ -58,7 +57,9 @@ if ($this->data['isCommentExist']) {
 	array_unshift($buttons, $editButton);
 }
 
-$commentForm->addItem(makeFormFooter($updateButton, $buttons));
+$commentTab->setFooter(makeFormFooter($updateButton, $buttons));
+
+$commentForm->addItem($commentTab);
 
 $commentWidget->addItem($commentForm);
 

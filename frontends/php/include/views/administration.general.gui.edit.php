@@ -60,7 +60,9 @@ $guiView->addTab('gui', _('GUI'), $guiTab);
 
 $guiForm = new CForm();
 $guiForm->setName('guiForm');
+
+$guiView->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
+
 $guiForm->addItem($guiView);
-$guiForm->addItem(makeFormFooter(new CSubmit('update', _('Update'))));
 
 return $guiForm;

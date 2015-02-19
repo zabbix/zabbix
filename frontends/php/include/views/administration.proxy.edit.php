@@ -89,11 +89,10 @@ $proxyFormList->addRow(_('Description'), new CTextArea('description', $this->dat
 // append tabs to form
 $proxyTab = new CTabView();
 $proxyTab->addTab('proxyTab', _('Proxy'), $proxyFormList);
-$proxyForm->addItem($proxyTab);
 
 // append buttons to form
 if ($this->data['proxyid']) {
-	$proxyForm->addItem(makeFormFooter(
+	$proxyTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -103,12 +102,13 @@ if ($this->data['proxyid']) {
 	));
 }
 else {
-	$proxyForm->addItem(makeFormFooter(
+	$proxyTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
 
+$proxyForm->addItem($proxyTab);
 // append form to widget
 $proxyWidget->addItem($proxyForm);
 

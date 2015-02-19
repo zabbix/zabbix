@@ -100,11 +100,10 @@ $slideFormList->addRow(_('Slides'), new CDiv($slideTable, 'objectgroup inlineblo
 // append tabs to form
 $slideTab = new CTabView();
 $slideTab->addTab('slideTab', _('Slide'), $slideFormList);
-$slideForm->addItem($slideTab);
 
 // append buttons to form
 if (isset($this->data['slideshowid'])) {
-	$slideForm->addItem(makeFormFooter(
+	$slideTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -114,12 +113,13 @@ if (isset($this->data['slideshowid'])) {
 	));
 }
 else {
-	$slideForm->addItem(makeFormFooter(
+	$slideTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
 
+$slideForm->addItem($slideTab);
 $slideWidget->addItem($slideForm);
 
 return $slideWidget;

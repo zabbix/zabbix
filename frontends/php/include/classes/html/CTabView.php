@@ -24,6 +24,7 @@ class CTabView extends CDiv {
 	protected $id = 'tabs';
 	protected $tabs = array();
 	protected $headers = array();
+	protected $footer = null;
 	protected $selectedTab = null;
 
 	/**
@@ -67,6 +68,10 @@ class CTabView extends CDiv {
 		$this->headers[$id] = $header;
 		$this->tabs[$id] = new CDiv($body);
 		$this->tabs[$id]->attr('id', zbx_formatDomId($id));
+	}
+
+	public function setFooter($footer) {
+		$this->footer = $footer;
 	}
 
 	public function toString($destroy = true) {
@@ -113,6 +118,8 @@ class CTabView extends CDiv {
 				.css("visibility", "visible");'
 			);
 		}
+
+		$this->addItem($this->footer);
 
 		return parent::toString($destroy);
 	}

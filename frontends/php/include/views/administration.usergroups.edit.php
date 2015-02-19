@@ -139,12 +139,9 @@ if (!$this->data['form_refresh']) {
 $userGroupTab->addTab('userGroupTab', _('User group'), $userGroupFormList);
 $userGroupTab->addTab('permissionsTab', _('Permissions'), $permissionsFormList);
 
-// append tab to form
-$userGroupForm->addItem($userGroupTab);
-
 // append buttons to form
 if (isset($this->data['usrgrpid'])) {
-	$userGroupForm->addItem(makeFormFooter(
+	$userGroupTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('usrgrpid')),
@@ -153,12 +150,14 @@ if (isset($this->data['usrgrpid'])) {
 	));
 }
 else {
-	$userGroupForm->addItem(makeFormFooter(
+	$userGroupTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
 
+// append tab to form
+$userGroupForm->addItem($userGroupTab);
 // append form to widget
 $userGroupWidget->addItem($userGroupForm);
 

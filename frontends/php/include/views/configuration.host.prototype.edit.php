@@ -321,8 +321,6 @@ $inventoryFormList->addRow('', $clearFixDiv);
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
 
-$frmHost->addItem($divTabs);
-
 /*
  * footer
  */
@@ -333,7 +331,7 @@ if (isset($hostPrototype['hostid'])) {
 	);
 	$btnDelete->setEnabled($hostPrototype['templateid'] == 0);
 
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array (
 			new CSubmit('clone', _('Clone')),
@@ -343,12 +341,13 @@ if (isset($hostPrototype['hostid'])) {
 	));
 }
 else {
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('parent_discoveryid')))
 	));
 }
 
+$frmHost->addItem($divTabs);
 $widget->addItem($frmHost);
 
 return $widget;

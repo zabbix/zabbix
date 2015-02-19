@@ -40,9 +40,6 @@ $createForm->addItem($controls);
 $hostGroupWidget->setTitle(_('Host groups'));
 $hostGroupWidget->setControls($createForm);
 
-// header
-$hostGroupWidget->addHeader(_('Host groups'));
-
 // create form
 $hostGroupForm = new CForm();
 $hostGroupForm->setName('hostgroupForm');

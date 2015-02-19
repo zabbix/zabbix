@@ -564,13 +564,14 @@ $itemFormList->addRow(
 // append tabs to form
 $itemTab = new CTabView();
 $itemTab->addTab('itemTab', _('Mass update'), $itemFormList);
-$itemForm->addItem($itemTab);
 
 // append buttons to form
-$itemForm->addItem(makeFormFooter(
+$itemTab->setFooter(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
 	array(new CButtonCancel(url_param('groupid').url_param('hostid')))
 ));
+
+$itemForm->addItem($itemTab);
 $itemWidget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';

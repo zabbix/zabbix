@@ -43,11 +43,10 @@ $applicationFormList->addRow(_('Name'), $nameTextBox);
 // append tabs to form
 $applicationTab = new CTabView();
 $applicationTab->addTab('applicationTab', _('Application'), $applicationFormList);
-$applicationForm->addItem($applicationTab);
 
 // append buttons to form
 if (!empty($this->data['applicationid'])) {
-	$applicationForm->addItem(makeFormFooter(
+	$applicationTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -57,11 +56,13 @@ if (!empty($this->data['applicationid'])) {
 	));
 }
 else {
-	$applicationForm->addItem(makeFormFooter(
+	$applicationTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('hostid')))
 	));
 }
+
+$applicationForm->addItem($applicationTab);
 
 // append form to widget
 $applicationWidget->addItem($applicationForm);

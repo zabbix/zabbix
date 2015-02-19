@@ -95,10 +95,12 @@ $severityView->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFo
 
 $severityForm = new CForm();
 $severityForm->setName('triggerDisplayOptions');
-$severityForm->addItem($severityView);
-$severityForm->addItem(makeFormFooter(
+
+$severityView->setFooter(makeFormFooter(
 	new CSubmit('update', _('Update')),
 	array(new CButton('resetDefaults', _('Reset defaults')))
 ));
+
+$severityForm->addItem($severityView);
 
 return $severityForm;

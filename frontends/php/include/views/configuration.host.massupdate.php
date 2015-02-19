@@ -337,13 +337,14 @@ $hostTab->addTab('hostTab', _('Host'), $hostFormList);
 $hostTab->addTab('templatesTab', _('Templates'), $templatesFormList);
 $hostTab->addTab('ipmiTab', _('IPMI'), $ipmiFormList);
 $hostTab->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
-$hostView->addItem($hostTab);
 
 // append buttons to form
-$hostView->addItem(makeFormFooter(
+$hostTab->setFooter(makeFormFooter(
 	new CSubmit('masssave', _('Update')),
 	array(new CButtonCancel(url_param('groupid')))
 ));
+
+$hostView->addItem($hostTab);
 
 $hostWidget->addItem($hostView);
 

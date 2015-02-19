@@ -117,12 +117,12 @@ $dashconfFormList->addRow(_('Problem display'), $extAckComboBox);
 $dashconfTab = new CTabView();
 $dashconfTab->addTab('dashconfTab', _('Filter'), $dashconfFormList);
 
-$dashconfForm->addItem($dashconfTab);
-$dashconfForm->addItem(makeFormFooter(
+$dashconfTab->setFooter(makeFormFooter(
 	new CSubmit('update', _('Update')),
 	array(new CButtonCancel())
 ));
 
+$dashconfForm->addItem($dashconfTab);
 $dashconfWidget->addItem($dashconfForm);
 
 return $dashconfWidget;

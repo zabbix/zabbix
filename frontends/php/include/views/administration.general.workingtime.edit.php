@@ -29,7 +29,8 @@ $workingTimeView->addTab('workingTime', _('Working time'), $workingTimeTab);
 
 $workingTimeForm = new CForm();
 $workingTimeForm->setName('workingTimeForm');
+$workingTimeView->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
+
 $workingTimeForm->addItem($workingTimeView);
-$workingTimeForm->addItem(makeFormFooter(new CSubmit('update', _('Update'))));
 
 return $workingTimeForm;
