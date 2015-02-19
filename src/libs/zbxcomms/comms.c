@@ -1315,23 +1315,28 @@ out:
 static ssize_t	zbx_tls_read(zbx_sock_t *s, char *buf, size_t len)
 {
 #if defined(HAVE_POLARSSL)	/* TODO add other defined SSL libraries */
-	if (NULL == s->tls_ctx)
+	if (NULL == s->tls_ctx)		/* unencrypted connection */
 	{
 #endif
 		ssize_t	res;
 
-		res = ZBX_TCP_READ(s->socket, buf, len);
+		if (ZBX_TCP_ERROR == (res = ZBX_TCP_READ(s->socket, buf, len)))
+		{
+			zbx_set_tcp_strerror("ZBX_TCP_READ() failed: %s",
+					strerror_from_system((unsigned long)zbx_sock_last_error()));
+		}
+
 		return res;
 
 #if defined(HAVE_POLARSSL)	/* TODO add other defined SSL libraries */
 	}
-	else
+	else	/* TLS connection */
 	{
 		int	res;
 
 		do
 		{
-			res = ssl_read(s->tls_ctx, buf, len);
+			res = ssl_read(s->tls_ctx, (unsigned char *)buf, len);
 		}
 		while (POLARSSL_ERR_NET_WANT_READ == res);
 
@@ -1340,12 +1345,12 @@ static ssize_t	zbx_tls_read(zbx_sock_t *s, char *buf, size_t len)
 			char	err[128];	/* 128 bytes are enough for PolarSSL error messages */
 
 			polarssl_strerror(res, err, sizeof(err));
-			zabbix_log(LOG_LEVEL_DEBUG, "zbx_tls_read(): ssl_read(): %s", err);
+			zbx_set_tcp_strerror("ssl_read() failed: %s", err);
 
 			/* TODO propagate 'close notify' to caller ? Close socket ? */
 			/* if (POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY == res) */
 
-			return ZBX_TCP_ERROR;	/* TODO too simple - here the real PolarSSL error code is lost. */
+			return ZBX_TCP_ERROR;
 		}
 		else
 			return (ssize_t)res;
@@ -1514,10 +1519,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout)
 	}
 out:
 	if (ZBX_TCP_ERROR == nbytes)
-	{
-		zbx_set_tcp_strerror("ZBX_TCP_READ() failed: %s", strerror_from_system(zbx_sock_last_error()));	/* TODO modify error reporting for TLS case */
 		total_bytes = FAIL;
-	}
 cleanup:
 	if (0 != timeout)
 		zbx_tcp_timeout_cleanup(s);
