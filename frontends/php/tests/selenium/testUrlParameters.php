@@ -1042,14 +1042,6 @@ class testUrlParameters extends CWebTest {
 						)
 					),
 					array(
-						'url' => 'hostinventoriesoverview.php?groupid=4&groupby=-1',
-						'text_not_present' => 'HOST INVENTORY OVERVIEW',
-						'text_present' => array(
-							'ERROR: Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "groupby" field.'
-						)
-					),
-					array(
 						'url' => 'hostinventoriesoverview.php',
 						'text_present' => 'HOST INVENTORY OVERVIEW'
 					)
