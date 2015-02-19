@@ -35,6 +35,15 @@ zabbix_sender \- Zabbix sender utility
 .RB [ \-v ]
 .B \-c
 .I config\-file
+.B \-k
+.I key
+.B \-o
+.I value
+.br
+.B zabbix_sender
+.RB [ \-v ]
+.B \-c
+.I config\-file
 .B \-s
 .I host
 .B \-k
@@ -80,6 +89,7 @@ Specify source IP address.
 .IP "\fB\-s\fR, \fB\-\-host\fR \fIhost\fR"
 Specify host name the item belongs to (as registered in Zabbix frontend).
 Host IP address and DNS name will not work.
+When used together with \fB\-\-config\fR, overrides \fBHostname\fR parameter specified in agentd configuration file.
 .IP "\fB\-k\fR, \fB\-\-key\fR \fIkey\fR"
 Specify item key to send value to.
 .IP "\fB\-o\fR, \fB\-\-value\fR \fIvalue\fR"
@@ -111,6 +121,12 @@ If data was sent, but processing of at least one of the values failed, the exit 
 If data sending failed, the exit status is 1.
 
 .SH "EXAMPLES"
+\fBzabbix_sender \-c /usr/local/etc/zabbix_agentd.conf \-k mysql.queries \-o 342.45\fR
+.br
+.RS
+Send \fB342.45\fR as the value for \fBmysql.queries\fR item of monitored host. Use monitored host and Zabbix server defined in agent daemon configuration file.
+.RE
+
 \fBzabbix_sender \-c /usr/local/etc/zabbix_agentd.conf \-s "Monitored Host" \-k mysql.queries \-o 342.45\fR
 .br
 .RS
