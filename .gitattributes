@@ -524,6 +524,7 @@ sass/dashboard.html -text
 sass/favicon.ico -text svneol=unset#image/x-icon
 sass/img/icon-sprite.png -text svneol=unset#image/png
 sass/overlay-dialog.html -text
+sass/overlay-dialog_with_tables.html -text
 sass/popup.html -text
 sass/signin.html -text
 sass/touch-icon-192x192.png -text svneol=unset#image/png

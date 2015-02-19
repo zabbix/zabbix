@@ -614,6 +614,12 @@ footer {
 				display: block;
 			}
 		}
+
+		//label {
+		//	display: block;
+		//	height: 24px;
+		//	line-height: 24px;
+		//}
 	}
 }
 
@@ -648,26 +654,31 @@ footer {
 input {
 	
 	&[type="text"] {
+		width: 300px;
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
 	&[type="password"] {
+		width: 300px;
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
 	&[type="search"] {
+		width: 300px;
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
 	&[type="number"] {
+		width: 300px;
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
 	&[type="email"] {
+		width: 300px;
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
@@ -684,9 +695,10 @@ input {
 textarea {
 	//height: 12px;
 	//line-height: 12px;
+	width: 300px;
+	height: 50px;
 	padding: 5px 0 0 5px;
 	overflow: auto;
-	resize: vertical;
 	@extend %form-input-style;
 }
 
@@ -838,8 +850,8 @@ button {
 
     &.btn-widget-action {
     	border: 0;
-    	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat -1px -265px;
-		@extend %button-icon-size;
+    	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat 3px -262px;
+		@extend %button-widget-icon-size;
 		@include opacity(0.75);
 		@include transition(all .2s ease);
 
@@ -854,8 +866,8 @@ button {
 
     &.btn-wigdet-collapse {
     	border: 0;
-    	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat 1px -217px;
-		@extend %button-icon-size;
+    	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat 2px -214px;
+		@extend %button-widget-icon-size;
 		@include opacity(0.75);
 
 		&:hover {
@@ -869,8 +881,8 @@ button {
 
     &.btn-wigdet-expand {
     	border: 0;
-    	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat 1px -241px;
-		@extend %button-icon-size;
+    	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat 2px -238px;
+		@extend %button-widget-icon-size;
 		@include opacity(0.75);
 
 		&:hover {
@@ -946,6 +958,12 @@ button {
 %button-icon-size {
 	width: 24px;
 	height: 24px;
+	padding: 0;
+}
+
+%button-widget-icon-size {
+	width: 30px;
+	height: 28px;
 	padding: 0;
 }
 
@@ -1172,8 +1190,8 @@ button[disabled] {
 
 	ul {
 		position: absolute;
-		top: 5px;
-		right: 5px;
+		top: 0;
+		right: 0;
 
 		li {
 			display: block;
@@ -1186,7 +1204,7 @@ button[disabled] {
 .dashbrd-widget-foot {
 	text-align: right;
 	color: $font-alt-color;
-	margin: 0 10px 0 10px;
+	margin: 0 10px;
 
 	li {
 		display: inline-block;
@@ -1198,7 +1216,7 @@ button[disabled] {
 .action-menu {
 	position: absolute;
 	z-index: 1000;
-	padding: 7px 15px 7px 15px;
+	padding: 5px 10px;
 	min-width: 166px;
 	color: $font-alt-color;
 	background: $body-content-bgcolor;
@@ -1213,8 +1231,8 @@ button[disabled] {
 			line-height: 24px;
 			color: $font-color;
 			text-decoration: none;
-			padding: 0 15px 0 15px;
-			margin: 0 -15px 0 -15px;
+			padding: 0 10px;
+			margin: 0 -10px;
 			position: relative;
 			@include transition(background .2s ease);
 
@@ -1242,7 +1260,7 @@ button[disabled] {
 
 		div {
 			border-top: 1px solid $body-bgcolor;
-			margin: 7px -15px 7px -15px;
+			margin: 5px -10px;
 		}
 	}
 
@@ -1255,10 +1273,22 @@ button[disabled] {
 .overlay-dialogue {
 	position: absolute;
 	z-index: 1000;
-	padding: 7px 15px 7px 15px;
+	padding: 10px;
 	background: $body-content-bgcolor;
 	border: 1px solid $underline-color;
 	@include box-shadow(0 5px 20px 0 rgba(60,60,60,0.3));
+
+	.list-table {
+		@include box-shadow(none);
+
+		th {
+			@extend %dashbrd-widget-td;
+		}
+		
+		td {
+			@extend %dashbrd-widget-td;
+		}
+	}
 
 	.table-forms-td-left {
 		text-align: left;
@@ -1301,7 +1331,7 @@ button[disabled] {
 	}
 
 	.header-title {
-		
+
 		ul {
 			position: absolute;
 			right: 0;
@@ -1384,6 +1414,10 @@ a.grey {
 	background: $alert-red-bg-color;
 }
 
+.normal-bg {
+	@extend .green-bg;
+}
+
 .info-bg {
 	background: $alert-info-bg-color;
 }
@@ -1418,27 +1452,18 @@ a.grey {
 }
 
 /* Close/Remove icon */
-.msg-close-btn {
-	position: absolute;
-	right: 0;
-	width: 24px;
-	height: 24px;
-	line-height: 24px;
-	@extend %close-icon;
 
-	&:hover {
-		cursor: pointer;
-	}
-}
-
-.form-remove-btn {
+%close-icon {
 	display: block;
 	width: 24px;
 	height: 24px;
 	line-height: 24px;
-	//position: absolute;
-	//right: 0;
-	@extend %close-icon;
+	text-align: center;
+	font-size: $font-h2-size;
+	font-weight: bold;
+	text-decoration: none;
+	cursor: pointer;
+	@include border-radius(2px);
 	@include transition(background .2s ease);
 
 	&:hover {
@@ -1452,9 +1477,20 @@ a.grey {
 	}
 }
 
+.overlay-close-btn {
+	float: right;
+	margin: -5px -5px;
+	@extend %close-icon;
+}
+
+.form-remove-btn {
+	@extend %close-icon;
+}
+
 .subfilter-disable-btn {
 	width: 20px;
 	height: 20px;
+	line-height: 20px;
 	display: inline-block;
 	position: absolute;
 	top: 0;
@@ -1462,23 +1498,13 @@ a.grey {
 	color: $font-white-color;
 	background: $form-disabled-color;
 	@extend %close-icon;
-	@include transition(background .2s ease);
 
 	&:hover {
-		cursor: pointer;
 		background: darken($form-disabled-color, 5%);
 	}
 
 	&:active {
-		cursor: pointer;
+
 		background: darken($form-disabled-color, 10%);
 	}
-}
-
-%close-icon {
-	text-align: center;
-	font-size: $font-h2-size;
-	font-weight: bold;
-	text-decoration: none;
-	@include border-radius(2px);
 }

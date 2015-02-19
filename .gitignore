@@ -97,7 +97,6 @@ misc/images/pngcrushoutput.txt
 /nbproject
 sass/.sass-cache
 sass/forms_with_tables.html
-sass/overlay-dialog_with_tables.html
 sass/stylesheets/*.css
 sass/stylesheets/*.map
 src/Makefile
