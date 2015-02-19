@@ -602,6 +602,16 @@ static ssize_t	zbx_tls_write(zbx_sock_t *s, const char *buf, size_t len)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
+ * Comments:                                                                  *
+ *     RFC 5246 "The Transport Layer Security (TLS) Protocol. Version 1.2"    *
+ *     says: "The record layer fragments information blocks into TLSPlaintext *
+ *     records carrying data in chunks of 2^14 bytes or less.".               *
+ *                                                                            *
+ *     This function combines sending of Zabbix protocol header (5 bytes),    *
+ *     data length (8 bytes) and at least part of the message into one block  *
+ *     of up to 16384 bytes for efficiency. The same is applied for sending   *
+ *     unencrypted messages.                                                  *
+ *                                                                            *
  ******************************************************************************/
 
 #define ZBX_TCP_HEADER_DATA	"ZBXD"
@@ -611,6 +621,8 @@ static ssize_t	zbx_tls_write(zbx_sock_t *s, const char *buf, size_t len)
 
 int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char flags, int timeout)
 {
+#define ZBX_TCP_MAX_FIRST_MSG_LEN	16384
+
 	zbx_uint64_t	len64_le;
 	ssize_t		i = 0;
 	size_t		written = 0;
@@ -623,30 +635,31 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char 
 
 	if (0 != (flags & ZBX_TCP_PROTOCOL))
 	{
-		/* write header */
-		/* TODO combine sending of Zabbix protocol header and sending of data length into one operation for */
-		/* better TLS efficiency */
-		if (ZBX_TCP_ERROR == zbx_tls_write(s, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
-		{
-			ret = FAIL;
-			goto cleanup;
-		}
+		char	header_buf[ZBX_TCP_MAX_FIRST_MSG_LEN];	/* Buffer is allocated on stack with a hope that it   */
+								/* will be short-lived in CPU cache. Static buffer is */
+								/* not used on purpose.				      */
+		size_t	take_bytes;
+
+		memcpy(header_buf, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN);
 
 		len64_le = zbx_htole_uint64((zbx_uint64_t)len);
+		memcpy(header_buf + ZBX_TCP_HEADER_LEN, &len64_le, sizeof(len64_le));
 
-		/* write data length */
-		if (ZBX_TCP_ERROR == zbx_tls_write(s, (char *)&len64_le, sizeof(len64_le)))
+		take_bytes = MIN(len, ZBX_TCP_MAX_FIRST_MSG_LEN - ZBX_TCP_HEADER_LEN - sizeof(len64_le));
+		memcpy(header_buf + ZBX_TCP_HEADER_LEN + sizeof(len64_le), data, take_bytes);
+
+		if (ZBX_TCP_ERROR == (i = zbx_tls_write(s, header_buf, ZBX_TCP_HEADER_LEN + sizeof(len64_le) +
+				take_bytes)))
 		{
 			ret = FAIL;
 			goto cleanup;
 		}
+
+		written += (size_t)i - ZBX_TCP_HEADER_LEN - sizeof(len64_le);
 	}
 
 	while (written < len)
 	{
-		/* TODO: maybe we will need to send by chunks no larger than 16384 bytes because RFC 6066 says: */
-		/* ".... TLS specifies a fixed maximum plaintext fragment length of 2^14 bytes."		*/
-		/* if (ZBX_TCP_ERROR == (i = zbx_tls_write(s, data + written, MIN((int)(len - written), 16384)))) */
 		if (ZBX_TCP_ERROR == (i = zbx_tls_write(s, data + written, len - written)))
 		{
 			ret = FAIL;
@@ -659,6 +672,8 @@ cleanup:
 		zbx_tcp_timeout_cleanup(s);
 
 	return ret;
+
+#undef ZBX_TCP_MAX_FIRST_MSG_LEN
 }
 
 /******************************************************************************
