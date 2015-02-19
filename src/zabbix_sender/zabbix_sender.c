@@ -33,6 +33,7 @@ const char	syslog_app_name[] = "zabbix_sender";
 const char	*usage_message[] = {
 	"[-v] -z server [-p port] [-I IP-address] -s host -k key -o value",
 	"[-v] -z server [-p port] [-I IP-address] [-T] [-r] -i input-file",
+	"[-v] -c config-file -k key -o value",
 	"[-v] -c config-file -s host -k key -o value",
 	"[-v] -c config-file [-T] [-r] -i input-file",
 	"-h",
@@ -52,7 +53,9 @@ const char	*help_message[] = {
 	"  -I --source-address IP-address       Specify source IP address",
 	"",
 	"  -s --host host                       Specify host name the item belongs to (as registered in Zabbix front-end).",
-	"                                       Host IP address and DNS name will not work",
+	"                                       Host IP address and DNS name will not work.",
+	"                                       When used together with --config, overrides \"Hostname\" parameter",
+	"                                       specified in agentd configuration file",
 	"  -k --key key                         Specify item key",
 	"  -o --value value                     Specify item value",
 	"",
@@ -553,6 +556,7 @@ static void	parse_commandline(int argc, char **argv)
 	/*   c  -  -  -  -  i  -  r  -  -  0x214   */
 	/*   c  -  -  -  -  i  T  -  -  -  0x218   */
 	/*   c  -  -  -  -  i  T  r  -  -  0x21c   */
+	/*   c  -  -  k  o  -  -  -  -  -  0x260   */
 	/*   c  -  s  k  o  -  -  -  -  -  0x2e0   */
 
 	if (0 == opt_c + opt_z)
@@ -601,7 +605,7 @@ static void	parse_commandline(int argc, char **argv)
 	}
 
 	if ((1 == opt_z && 0 == opt_i && ! (0x1e0 <= opt_mask && opt_mask <= 0x1e3)) ||
-			(1 == opt_c && 0 == opt_i && 0x2e0 != opt_mask))
+			(1 == opt_c && 0 == opt_i && 0x260 != opt_mask && 0x2e0 != opt_mask))
 	{
 		zbx_error("too few or mutually exclusive options used");
 		usage();
