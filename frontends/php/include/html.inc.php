@@ -178,17 +178,13 @@ function get_icon($type, $params = array()) {
 	switch ($type) {
 		case 'favourite':
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
-				$icon = new CIcon(
-					_('Remove from favourites'),
-					'iconminus'
-				);
+				$icon = new CRedirectButton(SPACE, null);
+				$icon->addClass(ZBX_STYLE_BTN_CONF);
 				$icon->addAction('onclick', 'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
-				$icon = new CIcon(
-					_('Add to favourites'),
-					'iconplus'
-				);
+				$icon = new CRedirectButton(SPACE, null);
+				$icon->addClass(ZBX_STYLE_BTN_CONF);
 				$icon->addAction('onclick', 'add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			$icon->setAttribute('id', 'addrm_fav');
@@ -213,8 +209,23 @@ function get_icon($type, $params = array()) {
 
 			return $icon;
 
+		case 'dashconf':
+
+			$icon = new CRedirectButton(SPACE, 'dashconf.php');
+			$icon->addClass(ZBX_STYLE_BTN_CONF);
+
+			return $icon;
+
+		case 'overviewhelp':
+
+			$icon = new CRedirectButton(SPACE, null);
+			$icon->addClass(ZBX_STYLE_BTN_CONF);
+
+			return $icon;
+
 		case 'reset':
-			$icon = new CIcon(_('Reset'), 'iconreset');
+			$icon = new CRedirectButton(SPACE, null);
+			$icon->addClass(ZBX_STYLE_BTN_CONF);
 			$icon->addAction('onclick', 'timeControl.objectReset();');
 
 			return $icon;

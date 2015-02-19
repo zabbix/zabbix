@@ -58,19 +58,18 @@ if ($this->data['config']['blink_period'] > 0) {
 
 $hintTable->addRow(array(new CCol(SPACE), _('No trigger')));
 
-$help = new CIcon(null, 'iconhelp');
-$help->setHint($hintTable);
-
-// header right
-$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
-$controls->addItem($help);
-
 // header left
 $styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit()');
 $styleComboBox->addItem(STYLE_TOP, _('Top'));
 $styleComboBox->addItem(STYLE_LEFT, _('Left'));
 
 $controls->additem(array(_('Hosts location').SPACE, $styleComboBox));
+
+// header right
+$help = get_icon('overviewhelp');
+$help->setHint($hintTable);
+$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
+$controls->addItem($help);
 
 $headerForm->addItem($controls);
 $overviewWidget->setControls($headerForm);

@@ -297,14 +297,11 @@ else {
 		}
 	}
 
-	$controls = new CList();
-
-	$controls->addItem(get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))));
-	$eventsWidget->setControls($frmForm);
-
 	$frmForm->addVar('fullscreen', getRequest('fullscreen'));
 	$frmForm->addVar('stime', $stime);
 	$frmForm->addVar('period', $period);
+
+	$controls = new CList();
 
 	// add host and group filters to the form
 	if ($source == EVENT_SOURCE_TRIGGERS) {
@@ -324,6 +321,7 @@ else {
 	}
 
 	$controls->addItem(new CSubmit('csv_export', _('Export to CSV')));
+	$controls->addItem(get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))));
 
 	$frmForm->addItem($controls);
 	$eventsWidget->setControls($frmForm);

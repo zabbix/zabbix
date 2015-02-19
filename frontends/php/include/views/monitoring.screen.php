@@ -59,10 +59,6 @@ else {
 		CProfile::update('web.screens.elementid', $screen['screenid'] , PROFILE_TYPE_ID);
 	}
 
-	// page header
-	$controls->addItem(get_icon('favourite', array('fav' => 'web.favorite.screenids', 'elname' => 'screenid', 'elid' => $screen['screenid'])));
-	$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
-
 	// append screens combobox to page header
 	$headerForm->setName('headerForm');
 	$headerForm->addVar('fullscreen', $this->data['fullscreen']);
@@ -94,6 +90,10 @@ else {
 		$controls->addItem(array( _('Group').SPACE, $pageFilter->getGroupsCB()));
 		$controls->addItem(array( _('Host').SPACE, $pageFilter->getHostsCB()));
 	}
+
+	// page header
+	$controls->addItem(get_icon('favourite', array('fav' => 'web.favorite.screenids', 'elname' => 'screenid', 'elid' => $screen['screenid'])));
+	$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
 
 	$headerForm->addItem($controls);
 
