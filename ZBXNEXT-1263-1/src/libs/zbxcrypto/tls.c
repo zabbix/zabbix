@@ -299,7 +299,8 @@ out:
  *          version range                                                     *
  *                                                                            *
  * Comments:                                                                  *
- *          RC4 and weak encryptions are discarded                            *
+ *          RFC 7465 "Prohibiting RC4 Cipher Suites" requires that RC4 should *
+ *          never be used. Also, discard weak encryptions.                    *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_is_ciphersuite_cert(const int *p)
@@ -334,7 +335,8 @@ static int	zbx_is_ciphersuite_cert(const int *p)
  *          supported for the specified TLS version range                     *
  *                                                                            *
  * Comments:                                                                  *
- *          RC4 and weak encryptions are discarded                            *
+ *          RFC 7465 "Prohibiting RC4 Cipher Suites" requires that RC4 should *
+ *          never be used. Also, discard weak encryptions.                    *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_is_ciphersuite_psk(const int *p)
@@ -367,7 +369,8 @@ static int	zbx_is_ciphersuite_psk(const int *p)
  *          supported for the specified TLS version range                     *
  *                                                                            *
  * Comments:                                                                  *
- *          RC4 and weak encryptions are discarded                            *
+ *          RFC 7465 "Prohibiting RC4 Cipher Suites" requires that RC4 should *
+ *          never be used. Also, discard weak encryptions.                    *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_is_ciphersuite_all(const int *p)
