@@ -735,11 +735,10 @@ if ($this->data['screen']['templateid'] == 0 && in_array($resourceType, $resourc
 $screenTab = new CTabView();
 $screenTab->setAttribute('style', 'text-align: left;');
 $screenTab->addTab('screenTab', _('Screen cell configuration'), $screenFormList);
-$screenForm->addItem($screenTab);
 
 // append buttons to form
 if (isset($_REQUEST['screenitemid'])) {
-	$screenForm->addItem(makeFormFooter(
+	$screenTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array (
 			new CButtonDelete(null, url_param('form').url_param('screenid').url_param('screenitemid')),
@@ -748,10 +747,12 @@ if (isset($_REQUEST['screenitemid'])) {
 	));
 }
 else {
-	$screenForm->addItem(makeFormFooter(
+	$screenTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('screenid')))
 	));
 }
+
+$screenForm->addItem($screenTab);
 
 return $screenForm;

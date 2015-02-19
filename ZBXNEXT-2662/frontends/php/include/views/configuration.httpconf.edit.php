@@ -251,8 +251,6 @@ $httpTab->addTab('scenarioTab', _('Scenario'), $httpFormList);
 $httpTab->addTab('stepTab', _('Steps'), $httpStepFormList);
 $httpTab->addTab('authenticationTab', _('Authentication'), $httpAuthenticationFormList);
 
-$httpForm->addItem($httpTab);
-
 // append buttons to form
 if (!empty($this->data['httptestid'])) {
 	$buttons = array(new CSubmit('clone', _('Clone')));
@@ -276,14 +274,16 @@ if (!empty($this->data['httptestid'])) {
 
 	$buttons[] = new CButtonCancel();
 
-	$httpForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$httpTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
-	$httpForm->addItem(makeFormFooter(
+	$httpTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
+
+$httpForm->addItem($httpTab);
 $httpWidget->addItem($httpForm);
 
 $this->data['agentVisibility'] = array();

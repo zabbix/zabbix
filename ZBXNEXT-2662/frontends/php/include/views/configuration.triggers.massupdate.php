@@ -157,14 +157,14 @@ if (empty($this->data['parent_discoveryid'])) {
 // append tabs to form
 $triggersTab = new CTabView();
 $triggersTab->addTab('triggersTab', _('Mass update'), $triggersFormList);
-$triggersForm->addItem($triggersTab);
 
 // append buttons to form
-$triggersForm->addItem(makeFormFooter(
+$triggersTab->setFooter(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
 	array(new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid'))))
 ));
 
+$triggersForm->addItem($triggersTab);
 $triggersWidget->addItem($triggersForm);
 
 return $triggersWidget;

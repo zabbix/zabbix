@@ -284,7 +284,6 @@ if (!$this->data['form_refresh']) {
 $servicesTab->addTab('servicesTab', _('Service'), $servicesFormList);
 $servicesTab->addTab('servicesDependenciesTab', _('Dependencies'), $servicesDependenciesFormList);
 $servicesTab->addTab('servicesTimeTab', _('Time'), $servicesTimeFormList);
-$servicesForm->addItem($servicesTab);
 
 // append buttons to form
 if ($service['serviceid']) {
@@ -296,17 +295,19 @@ if ($service['serviceid']) {
 		));
 	}
 
-	$servicesForm->addItem(makeFormFooter(
+	$servicesTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update'), 'javascript: document.forms[0].action += \'?saction=1\';'),
 		$buttons
 	));
 }
 else {
-	$servicesForm->addItem(makeFormFooter(
+	$servicesTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add'), 'javascript: document.forms[0].action += \'?saction=1\';'),
 		array(new CButtonCancel())
 	));
 }
+
+$servicesForm->addItem($servicesTab);
 
 // append form to widget
 $servicesWidget->addItem($servicesForm);

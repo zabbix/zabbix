@@ -71,10 +71,10 @@ $severityView->addTab('severities', _('Trigger severities'), $severityTab);
 
 $severityForm = new CForm();
 $severityForm->setName('triggerSeverity');
-$severityForm->addItem($severityView);
-$severityForm->addItem(makeFormFooter(
+$severityView->setFooter(makeFormFooter(
 	new CSubmit('update', _('Update')),
 	array(new CButton('resetDefaults', _('Reset defaults')))
 ));
+$severityForm->addItem($severityView);
 
 return $severityForm;

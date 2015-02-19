@@ -65,11 +65,10 @@ $hostGroupFormList->addRow(_('Hosts'), $hostsComboBox->get(_('Hosts in'), array(
 // append tabs to form
 $hostGroupTab = new CTabView();
 $hostGroupTab->addTab('hostgroupTab', _('Host group'), $hostGroupFormList);
-$hostGroupForm->addItem($hostGroupTab);
 
 // append buttons to form
 if ($this->data['groupid'] == 0) {
-	$hostGroupForm->addItem(makeFormFooter(
+	$hostGroupTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
@@ -80,7 +79,7 @@ else {
 		$deleteButton->attr('disabled', 'disabled');
 	}
 
-	$hostGroupForm->addItem(makeFormFooter(
+	$hostGroupTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -89,6 +88,8 @@ else {
 		)
 	));
 }
+
+$hostGroupForm->addItem($hostGroupTab);
 
 $hostGroupWidget->addItem($hostGroupForm);
 

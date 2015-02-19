@@ -328,9 +328,6 @@ if (isset($userMessagingFormList)) {
 	$userTab->addTab('messagingTab', _('Messaging'), $userMessagingFormList);
 }
 
-// append tab to form
-$userForm->addItem($userTab);
-
 // append buttons to form
 if ($data['userid'] != 0) {
 	$buttons = array(
@@ -346,14 +343,17 @@ if ($data['userid'] != 0) {
 		array_unshift($buttons, $deleteButton);
 	}
 
-	$userForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$userTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
-	$userForm->addItem(makeFormFooter(
+	$userTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
+
+// append tab to form
+$userForm->addItem($userTab);
 
 // append form to widget
 $userWidget->addItem($userForm);

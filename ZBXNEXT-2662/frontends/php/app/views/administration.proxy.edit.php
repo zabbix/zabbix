@@ -89,7 +89,6 @@ $proxyFormList->addRow(_('Description'), new CTextArea('description', $data['des
 // append tabs to form
 $proxyTab = new CTabView();
 $proxyTab->addTab('proxyTab', _('Proxy'), $proxyFormList);
-$proxyForm->addItem($proxyTab);
 
 // append buttons to form
 $cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list');
@@ -99,7 +98,7 @@ if ($data['proxyid'] == 0) {
 	$addButton = new CSubmitButton(_('Add'), 'action', 'proxy.create');
 	$addButton->setAttribute('id', 'add');
 
-	$proxyForm->addItem(makeFormFooter(
+	$proxyTab->setFooter(makeFormFooter(
 		$addButton,
 		array($cancelButton)
 	));
@@ -115,7 +114,7 @@ else {
 	);
 	$deleteButton->setAttribute('id', 'delete');
 
-	$proxyForm->addItem(makeFormFooter(
+	$proxyTab->setFooter(makeFormFooter(
 		$updateButton,
 		array(
 			$cloneButton,
@@ -125,7 +124,7 @@ else {
 	));
 }
 
-// append form to widget
+$proxyForm->addItem($proxyTab);
 $proxyWidget->addItem($proxyForm);
 
 $proxyWidget->show();

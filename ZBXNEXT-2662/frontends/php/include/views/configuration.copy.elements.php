@@ -111,14 +111,14 @@ $triggersTab->addTab('triggersTab',
 	_n('Copy %1$s element to...', 'Copy %1$s elements to...', count($this->data['elements'])),
 	$triggersFormList
 );
-$triggersForm->addItem($triggersTab);
 
 // append buttons to form
-$triggersForm->addItem(makeFormFooter(
+$triggersTab->setFooter(makeFormFooter(
 	new CSubmit('copy', _('Copy')),
 	array(new CButtonCancel(url_param('groupid').url_param('hostid')))
 ));
 
+$triggersForm->addItem($triggersTab);
 $triggersWidget->addItem($triggersForm);
 
 return $triggersWidget;

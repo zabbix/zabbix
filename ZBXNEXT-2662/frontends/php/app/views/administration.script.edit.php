@@ -108,7 +108,6 @@ $scriptFormList->addRow($confirmationLabel, array(
 
 $scriptView = new CTabView();
 $scriptView->addTab('scripts', _('Script'), $scriptFormList);
-$scriptForm->addItem($scriptView);
 
 // footer
 $cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=script.list');
@@ -118,7 +117,7 @@ if ($data['scriptid'] == 0) {
 	$addButton = new CSubmitButton(_('Add'), 'action', 'script.create');
 	$addButton->setAttribute('id', 'add');
 
-	$scriptForm->addItem(makeFormFooter(
+	$scriptView->setFooter(makeFormFooter(
 		$addButton,
 		array($cancelButton)
 	));
@@ -134,7 +133,7 @@ else {
 	);
 	$deleteButton->setAttribute('id', 'delete');
 
-	$scriptForm->addItem(makeFormFooter(
+	$scriptView->setFooter(makeFormFooter(
 		$updateButton,
 		array(
 			$cloneButton,
@@ -144,6 +143,7 @@ else {
 	));
 }
 
+$scriptForm->addItem($scriptView);
 $scriptsWidget->addItem($scriptForm);
 
 $scriptsWidget->show();

@@ -152,10 +152,11 @@ $houseKeeperView->addTab('houseKeeper', _('Housekeeping'), $houseKeeperTab);
 
 $houseKeeperForm = new CForm();
 $houseKeeperForm->setName('houseKeeperForm');
-$houseKeeperForm->addItem($houseKeeperView);
-$houseKeeperForm->addItem(makeFormFooter(
+$houseKeeperView->setFooter(makeFormFooter(
 	new CSubmit('update', _('Update')),
 	array(new CButton('resetDefaults', _('Reset defaults')))
 ));
+
+$houseKeeperForm->addItem($houseKeeperView);
 
 return $houseKeeperForm;

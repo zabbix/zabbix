@@ -932,14 +932,13 @@ $clearFixDiv->addStyle('clear: both;');
 $inventoryFormList->addRow('', $clearFixDiv);
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
-$frmHost->addItem($divTabs);
 
 /*
  * footer
  */
 // Do not display the clone and delete buttons for clone forms and new host forms.
 if ($data['hostId'] && !$cloneOrFullClone) {
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -950,11 +949,13 @@ if ($data['hostId'] && !$cloneOrFullClone) {
 	));
 }
 else {
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('groupid')))
 	));
 }
+
+$frmHost->addItem($divTabs);
 
 $hostWidget->addItem($frmHost);
 

@@ -443,7 +443,6 @@ $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 // append tabs to form
 $itemTab = new CTabView();
 $itemTab->addTab('itemTab', $this->data['caption'], $itemFormList);
-$itemForm->addItem($itemTab);
 
 // append buttons to form
 if ($this->data['itemid'] != 0) {
@@ -467,14 +466,16 @@ if ($this->data['itemid'] != 0) {
 
 	$buttons[] = new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'));
 
-	$itemForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$itemTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
-	$itemForm->addItem(makeFormFooter(
+	$itemTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')))
 	));
 }
+
+$itemForm->addItem($itemTab);
 $itemWidget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';

@@ -101,22 +101,22 @@ else {
 	// append tabs to form
 	$httpPopupTab = new CTabView();
 	$httpPopupTab->addTab('scenarioStepTab', _('Step of web scenario'), $httpPopupFormList);
-	$httpPopupForm->addItem($httpPopupTab);
 
 	// append buttons to form
 	if (hasRequest('stepid')) {
-		$httpPopupForm->addItem(makeFormFooter(
+		$httpPopupTab->setFooter(makeFormFooter(
 			new CSubmit('update', _('Update')),
 			array(new CButtonCancel(null, 'close_window();'))
 		));
 	}
 	else {
-		$httpPopupForm->addItem(makeFormFooter(
+		$httpPopupTab->setFooter(makeFormFooter(
 			new CSubmit('add', _('Add')),
 			array(new CButtonCancel(null, 'close_window();'))
 		));
 	}
 
+	$httpPopupForm->addItem($httpPopupTab);
 	$httpPopupWidget->addItem($httpPopupForm);
 }
 

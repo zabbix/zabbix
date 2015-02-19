@@ -98,12 +98,9 @@ $mediaTypeFormList->addRow(_('Enabled'), new CCheckBox('status', MEDIA_TYPE_STAT
 $mediaTypeTab = new CTabView();
 $mediaTypeTab->addTab('mediaTypeTab', _('Media type'), $mediaTypeFormList);
 
-// append tab to form
-$mediaTypeForm->addItem($mediaTypeTab);
-
 // append buttons to form
 if (!empty($this->data['mediatypeid'])) {
-	$mediaTypeForm->addItem(makeFormFooter(
+	$mediaTypeTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CButtonDelete(
@@ -115,11 +112,14 @@ if (!empty($this->data['mediatypeid'])) {
 	));
 }
 else {
-	$mediaTypeForm->addItem(makeFormFooter(
+	$mediaTypeTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('config')))
 	));
 }
+
+// append tab to form
+$mediaTypeForm->addItem($mediaTypeTab);
 
 // append form to widget
 $mediaTypeWidget->addItem($mediaTypeForm);

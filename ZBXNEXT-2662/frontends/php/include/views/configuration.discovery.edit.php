@@ -78,12 +78,11 @@ $discoveryFormList->addRow(_('Enabled'), new CCheckBox('status', $status, null, 
 // append tabs to form
 $discoveryTabs = new CTabView();
 $discoveryTabs->addTab('druleTab', _('Discovery rule'), $discoveryFormList);
-$discoveryForm->addItem($discoveryTabs);
 
 // append buttons to form
 if (isset($this->data['druleid']))
 {
-	$discoveryForm->addItem(makeFormFooter(
+	$discoveryTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -93,12 +92,13 @@ if (isset($this->data['druleid']))
 	));
 }
 else {
-	$discoveryForm->addItem(makeFormFooter(
+	$discoveryTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
 
+$discoveryForm->addItem($discoveryTabs);
 $discoveryWidget->addItem($discoveryForm);
 
 return $discoveryWidget;

@@ -119,14 +119,14 @@ $expressionFormList->addRow('N', new CTextBox('value', $this->data['value'], 10)
 // append tabs to form
 $expressionTab = new CTabView();
 $expressionTab->addTab('expressionTab', _('Trigger expression condition'), $expressionFormList);
-$expressionForm->addItem($expressionTab);
 
 // append buttons to form
-$expressionForm->addItem(makeFormFooter(
+$expressionTab->setFooter(makeFormFooter(
 	new CSubmit('insert', _('Insert')),
 	array(new CButtonCancel(url_params(array('parent_discoveryid', 'dstfrm', 'dstfld1')))
 )));
 
+$expressionForm->addItem($expressionTab);
 $expressionWidget->addItem($expressionForm);
 
 return $expressionWidget;

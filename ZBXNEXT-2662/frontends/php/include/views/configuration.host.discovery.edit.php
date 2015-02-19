@@ -343,7 +343,6 @@ if (!hasRequest('form_refresh')) {
 }
 $itemTab->addTab('itemTab', $this->data['caption'], $itemFormList);
 $itemTab->addTab('macroTab', _('Filters'), $conditionFormList);
-$itemForm->addItem($itemTab);
 
 // append buttons to form
 if (!empty($this->data['itemid'])) {
@@ -358,14 +357,16 @@ if (!empty($this->data['itemid'])) {
 
 	$buttons[] = new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'));
 
-	$itemForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$itemTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
-	$itemForm->addItem(makeFormFooter(
+	$itemTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')))
 	));
 }
+
+$itemForm->addItem($itemTab);
 $itemWidget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.edit.js.php';

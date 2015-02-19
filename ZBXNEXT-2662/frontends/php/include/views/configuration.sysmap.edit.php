@@ -182,11 +182,10 @@ $sysmapList->addRow(_('URLs'), new CDiv($urlTable, 'objectgroup inlineblock bord
 // append sysmap to form
 $sysmapTab = new CTabView();
 $sysmapTab->addTab('sysmapTab', _('Map'), $sysmapList);
-$sysmapForm->addItem($sysmapTab);
 
 // append buttons to form
 if (hasRequest('sysmapid') && getRequest('sysmapid') > 0) {
-	$sysmapForm->addItem(makeFormFooter(
+	$sysmapTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array (
 			new	CButton('clone', _('Clone')),
@@ -196,12 +195,13 @@ if (hasRequest('sysmapid') && getRequest('sysmapid') > 0) {
 	));
 }
 else {
-	$sysmapForm->addItem(makeFormFooter(
+	$sysmapTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
 
+$sysmapForm->addItem($sysmapTab);
 
 // append form to widget
 $sysmapWidget->addItem($sysmapForm);

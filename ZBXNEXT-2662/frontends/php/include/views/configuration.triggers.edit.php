@@ -331,9 +331,6 @@ if (empty($this->data['parent_discoveryid'])) {
 	$triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
 }
 
-// append tabs to form
-$triggersForm->addItem($triggersTab);
-
 // append buttons to form
 if (!empty($this->data['triggerid'])) {
 	$deleteButton = new CButtonDelete(
@@ -344,7 +341,7 @@ if (!empty($this->data['triggerid'])) {
 		$deleteButton->setAttribute('disabled', 'disabled');
 	}
 
-	$triggersForm->addItem(makeFormFooter(
+	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -354,11 +351,14 @@ if (!empty($this->data['triggerid'])) {
 	));
 }
 else {
-	$triggersForm->addItem(makeFormFooter(
+	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid'))))
 	));
 }
+
+// append tabs to form
+$triggersForm->addItem($triggersTab);
 
 $triggersWidget->addItem($triggersForm);
 

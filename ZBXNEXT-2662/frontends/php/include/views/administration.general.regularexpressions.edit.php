@@ -109,11 +109,10 @@ if (!$data['form_refresh']) {
 }
 $regExpView->addTab('expr', _('Expressions'), $exprTab);
 $regExpView->addTab('test', _('Test'), $testTab);
-$form->addItem($regExpView);
 
 // footer
 if (isset($data['regexpid'])) {
-	$form->addItem(makeFormFooter(
+	$regExpView->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CButton('clone', _('Clone')),
@@ -126,13 +125,13 @@ if (isset($data['regexpid'])) {
 	));
 }
 else {
-	$form->addItem(makeFormFooter(
+	$regExpView->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
 
-// append form to widget
+$form->addItem($regExpView);
 $regExpWidget->addItem($form);
 
 return $regExpWidget;

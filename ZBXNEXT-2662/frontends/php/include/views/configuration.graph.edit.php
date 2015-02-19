@@ -302,7 +302,6 @@ $chartImage->preload();
 $graphPreviewTable = new CTable(null, 'center maxwidth');
 $graphPreviewTable->addRow(new CDiv($chartImage, null, 'previewChar'));
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
-$graphForm->addItem($graphTab);
 
 // append buttons to form
 if (!empty($this->data['graphid'])) {
@@ -317,7 +316,7 @@ if (!empty($this->data['graphid'])) {
 		$deleteButton->setEnabled(false);
 	}
 
-	$graphForm->addItem(makeFormFooter(
+	$graphTab->setFooter(makeFormFooter(
 		$updateButton,
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -327,7 +326,7 @@ if (!empty($this->data['graphid'])) {
 	));
 }
 else {
-	$graphForm->addItem(makeFormFooter(
+	$graphTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('parent_discoveryid')))
 	));
@@ -336,6 +335,8 @@ else {
 // insert js (depended from some variables inside the file)
 insert_show_color_picker_javascript();
 require_once dirname(__FILE__).'/js/configuration.graph.edit.js.php';
+
+$graphForm->addItem($graphTab);
 
 // append form to widget
 $graphWidget->addItem($graphForm);
