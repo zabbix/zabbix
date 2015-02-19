@@ -60,7 +60,7 @@ switch ($srctbl) {
 		$min_user_type = USER_TYPE_ZABBIX_USER;
 		break;
 	case 'trigger_prototypes':
-		$page['title'] = _('Trigger prototyes');
+		$page['title'] = _('Trigger prototypes');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 		break;
 	case 'usrgrp':
