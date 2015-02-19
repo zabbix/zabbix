@@ -196,6 +196,11 @@ abstract class CHostGeneral extends CHostBase {
 				'templateids' => $hostTplIds['templateid'],
 				'hostids' => $hostTplIds['hostid']
 			));
+
+			API::TriggerPrototype()->syncTemplateDependencies(array(
+				'templateids' => $hostTplIds['templateid'],
+				'hostids' => $hostTplIds['hostid']
+			));
 		}
 
 		return $hostsLinkageInserts;
