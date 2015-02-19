@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-02-11 23:22+0200\n"
-"PO-Revision-Date: 2015-01-08 13:49+0300\n"
+"PO-Revision-Date: 2015-02-18 06:15+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1420717746.0\n"
+"X-POOTLE-MTIME: 1424232929.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -15049,7 +15049,7 @@ msgstr "VMwareハイパーバイザーネットワーク出力統計、<url> - V
 
 #: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
+msgstr "VMwareハイパーバイザーのパフォーマンスカウンター、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名、<path> - パフォーマンスカウンターのパス、<instance> - パフォーマンスカウンターのインスタンス"
 
 #: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -15145,7 +15145,7 @@ msgstr "VMware仮想マシンネットワークインターフェース出力統
 
 #: include/classes/items/CHelpItems.php:763
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
+msgstr "VMware仮想マシンのパフォーマンスカウンター、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<path> - パフォーマンスカウンターのパス、<instance> - パフォーマンスカウンターのインスタンス"
 
 #: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"

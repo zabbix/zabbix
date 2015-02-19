@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-02-11 23:22+0200\n"
-"PO-Revision-Date: 2015-02-13 00:44+0300\n"
+"PO-Revision-Date: 2015-02-15 09:21+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1423781048.0\n"
+"X-POOTLE-MTIME: 1423984870.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -400,7 +400,7 @@ msgstr "Operácie akcie"
 
 #: actionconf.php:152
 msgid "Action updated"
-msgstr "Akcia bola aktualizovaná"
+msgstr "Akcia aktualizovaná"
 
 #: events.php:477 include/blocks.inc.php:1005 include/blocks.inc.php:1300
 #: include/events.inc.php:198 include/menu.inc.php:185
@@ -732,7 +732,7 @@ msgstr "Chyba aplikácie."
 
 #: applications.php:111
 msgid "Application updated"
-msgstr "Aplikácia bola aktualizovaná"
+msgstr "Aplikácia aktualizovaná"
 
 #: include/classes/api/services/CItemGeneral.php:397
 #, c-format
@@ -4312,7 +4312,7 @@ msgstr "Poznámka pre \"%s\"."
 
 #: tr_comments.php:83
 msgid "Description updated"
-msgstr "Poznámka bola aktualizovaná"
+msgstr "Poznámka aktualizovaná"
 
 #: include/actions.inc.php:971 include/blocks.inc.php:805
 #: include/func.inc.php:1790
@@ -5905,7 +5905,7 @@ msgstr "Prototyp grafu zmazaný"
 
 #: include/classes/screens/CScreenLldGraph.php:176
 msgid "Graph prototype not found."
-msgstr "Prototyp grafu nenajdený."
+msgstr "Prototyp grafu nenájdený."
 
 #: graphs.php:230
 msgid "Graph prototype updated"
@@ -9322,7 +9322,7 @@ msgstr "Pamäťový limit: %s"
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:399
 msgid "Memory used by a process. <name> process name (default: \"all processes\"). <user> user name (default: \"all users\"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). Example: proc.mem[,root]."
-msgstr "Pamäť používaná procesom. <name> meno procesu (predvolene: \"all processes\"). <user> meno používateľa (predvolene: \"all users\"). <mode> možné hodnoty: avg, max, min, sum (predvolene). <cmdline> filterovanie príkazového riadku (podporuje regulárne výrazy). Príklad: proc.mem[,root]."
+msgstr "Pamäť používaná procesom. <name> meno procesu (predvolene: \"all processes\"). <user> meno používateľa (predvolene: \"all users\"). <mode> možné hodnoty: avg, max, min, sum (predvolene). <cmdline> filtrovanie príkazového riadku (podporuje regulárne výrazy). Príklad: proc.mem[,root]."
 
 #: dashboard.php:310 dashboard.php:324 dashboard.php:338 dashboard.php:364
 #: dashboard.php:388 dashboard.php:411 dashboard.php:434 dashboard.php:457
@@ -9718,7 +9718,7 @@ msgstr "Sieťová mapa bola zmazaná"
 
 #: sysmaps.php:168
 msgid "Network map updated"
-msgstr "Sieťová mapa bola aktualizovaná"
+msgstr "Sieťová mapa aktualizovaná"
 
 #: maps.php:25
 msgid "Network maps"
@@ -11198,7 +11198,7 @@ msgstr "PHP always_populate_raw_post_data"
 
 #: include/classes/setup/CFrontendSetup.php:354
 msgid "PHP always_populate_raw_post_data must be set to -1."
-msgstr "PHP always_populate_raw_post_data musí byť nastavený na -1."
+msgstr "PHP always_populate_raw_post_data musí byť nastavené na -1."
 
 #: include/classes/setup/CFrontendSetup.php:291
 msgid "PHP bcmath"

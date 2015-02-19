@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-02-11 23:22+0200\n"
-"PO-Revision-Date: 2014-11-03 21:37+0300\n"
+"PO-Revision-Date: 2015-02-16 09:19+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1415043443.0\n"
+"X-POOTLE-MTIME: 1424071187.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2303,7 +2303,7 @@ msgstr "Не удалось отправить команду, проверьт�
 #: include/classes/api/services/CHostGroup.php:429
 #, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Не удалось установить \"%1$s\" для группы узлов сети \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:242
 #, c-format
@@ -2419,7 +2419,7 @@ msgstr "Не удалось обновить \"%1$s\" для действия \"
 #: include/classes/api/services/CHostGroup.php:490
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"%1$s\" для группы узлов сети \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:206
 #, c-format
@@ -3012,7 +3012,7 @@ msgstr "Настройка"
 
 #: include/classes/items/CHelpItems.php:875
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
-msgstr ""
+msgstr "Статистика кэша конфигурации. Кэш - buffer (режимы: pfree, total, used, free)."
 
 #: conf.import.php:25
 msgid "Configuration import"
@@ -6716,11 +6716,11 @@ msgstr "IP адрес"
 
 #: include/classes/validators/CIPValidator.php:43
 msgid "IP address cannot be empty."
-msgstr ""
+msgstr "IP адрес не может быть пустым."
 
 #: include/classes/validators/CIPRangeValidator.php:62
 msgid "IP address range cannot be empty."
-msgstr ""
+msgstr "Диапазон IP адресов не может быть пустым."
 
 #: include/classes/api/services/CHostInterface.php:292
 msgid "IP and DNS cannot be empty for host interface."
@@ -6734,7 +6734,7 @@ msgstr "Диапазон IP адресов"
 #: include/classes/validators/CIPRangeValidator.php:80
 #, c-format
 msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit."
-msgstr ""
+msgstr "Диапазон IP адресов \"%1$s\" выходит за \"%2$s\" ограничение адресов."
 
 #: include/classes/api/services/CDRule.php:215
 msgid "IP range cannot be empty."
@@ -7107,7 +7107,7 @@ msgstr "Некорректное SNMP community."
 #: include/classes/api/services/CHttpTest.php:893
 #, c-format
 msgid "Incorrect SSL verify host value for web scenario \"%1$s\"."
-msgstr ""
+msgstr "Некорректное значение проверки SSL хоста для веб-сценария \"%1$s\"."
 
 #: include/classes/api/services/CHttpTest.php:884
 #, c-format
@@ -7710,7 +7710,7 @@ msgstr "Некорректное состояние."
 
 #: include/classes/api/services/CScreenItem.php:643
 msgid "Incorrect style provided for screen element."
-msgstr ""
+msgstr "Указан некорректный стиль для элемента комплексного экрана."
 
 #: include/classes/api/services/CTemplateScreen.php:598
 msgid "Incorrect template screen ID."
@@ -7994,22 +7994,22 @@ msgstr "Интервал (в сек)"
 #: include/classes/validators/CIPValidator.php:49
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
-msgstr ""
+msgstr "Ошибочный IP адрес \"%1$s\"."
 
 #: include/classes/validators/CIPValidator.php:37
 #, c-format
 msgid "Invalid IP address \"%1$s\": must be a string."
-msgstr ""
+msgstr "Ошибочный IP адрес \"%1$s\": должен быть строкой."
 
 #: include/classes/validators/CIPRangeValidator.php:72
 #, c-format
 msgid "Invalid IP address range \"%1$s\"."
-msgstr ""
+msgstr "Ошибочный диапазон IP адресов \"%1$s\"."
 
 #: include/classes/validators/CIPRangeValidator.php:56
 #, c-format
 msgid "Invalid IP address range \"%1$s\": must be a string."
-msgstr ""
+msgstr "Ошибочный диапазон IP адресов \"%1$s\": должен быть строкой."
 
 #: include/classes/core/CJsonRpc.php:170
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -11194,11 +11194,11 @@ msgstr "ПЕРСОНАЛЬНАЯ ПАНЕЛЬ"
 
 #: include/classes/setup/CFrontendSetup.php:350
 msgid "PHP always_populate_raw_post_data"
-msgstr ""
+msgstr "PHP always_populate_raw_post_data"
 
 #: include/classes/setup/CFrontendSetup.php:354
 msgid "PHP always_populate_raw_post_data must be set to -1."
-msgstr ""
+msgstr "PHP always_populate_raw_post_data должен быть равен -1."
 
 #: include/classes/setup/CFrontendSetup.php:291
 msgid "PHP bcmath"
@@ -11206,7 +11206,7 @@ msgstr "PHP bcmath"
 
 #: include/classes/setup/CFrontendSetup.php:295
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
-msgstr ""
+msgstr "Расширение PHP bcmath отсутствует (параметр конфигурации PHP --enable-bcmath)."
 
 #: include/classes/setup/CFrontendSetup.php:547
 msgid "PHP ctype"
@@ -11214,7 +11214,7 @@ msgstr "PHP ctype"
 
 #: include/classes/setup/CFrontendSetup.php:551
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
-msgstr ""
+msgstr "Расширение PHP ctype отсутствует (параметр конфигурации PHP --enable-ctype)."
 
 #: include/classes/setup/CFrontendSetup.php:229
 msgid "PHP databases support"
@@ -11266,7 +11266,7 @@ msgstr "PHP libxml"
 
 #: include/classes/setup/CFrontendSetup.php:490
 msgid "PHP libxml extension missing."
-msgstr ""
+msgstr "Расширение PHP libxml отсутствует."
 
 #: include/classes/setup/CFrontendSetup.php:308
 msgid "PHP mbstring"
@@ -11274,11 +11274,11 @@ msgstr "PHP mbstring"
 
 #: include/classes/setup/CFrontendSetup.php:312
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)."
-msgstr ""
+msgstr "Расширение PHP mbstring отсутствует (параметр конфигурации PHP --enable-mbstring)."
 
 #: include/classes/setup/CFrontendSetup.php:329
 msgid "PHP mbstring.func_overload"
-msgstr ""
+msgstr "PHP mbstring.func_overload"
 
 #: include/classes/setup/CFrontendSetup.php:172
 msgid "PHP option max_execution_time"
@@ -11310,11 +11310,11 @@ msgstr "PHP session auto start"
 
 #: include/classes/setup/CFrontendSetup.php:585
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")."
-msgstr ""
+msgstr "Автоматический старт PHP сессий должен быть отключен (PHP директива \"session.auto_start\")."
 
 #: include/classes/setup/CFrontendSetup.php:568
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)."
-msgstr ""
+msgstr "Расширение PHP session отсутствует (параметр конфигурации PHP --enable-session)."
 
 #: include/classes/setup/CFrontendSetup.php:367
 msgid "PHP sockets"
@@ -11322,11 +11322,11 @@ msgstr "PHP sockets"
 
 #: include/classes/setup/CFrontendSetup.php:371
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)."
-msgstr ""
+msgstr "Расширение PHP sockets отсутствует (параметр конфигурации PHP --enable-sockets)."
 
 #: include/classes/setup/CFrontendSetup.php:333
 msgid "PHP string function overloading must be disabled."
-msgstr ""
+msgstr "Перегрузка функции PHP string должна быть отключена."
 
 #: include/classes/setup/CFrontendSetup.php:206
 msgid "PHP time zone"
@@ -11342,7 +11342,7 @@ msgstr "PHP xmlreader"
 
 #: include/classes/setup/CFrontendSetup.php:524
 msgid "PHP xmlreader extension missing."
-msgstr ""
+msgstr "Расширение PHP xmlreader отсутствует."
 
 #: include/classes/setup/CFrontendSetup.php:503
 msgid "PHP xmlwriter"
@@ -11350,7 +11350,7 @@ msgstr "PHP xmlwriter"
 
 #: include/classes/setup/CFrontendSetup.php:507
 msgid "PHP xmlwriter extension missing."
-msgstr ""
+msgstr "Расширение PHP xmlwriter отсутствует."
 
 #: include/discovery.inc.php:61
 #: include/views/js/configuration.discovery.edit.js.php:177
@@ -14004,7 +14004,7 @@ msgstr "Тип времени"
 
 #: include/classes/setup/CFrontendSetup.php:210
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
-msgstr ""
+msgstr "Не задан часовой пояс в PHP (параметр конфигурации \"date.timezone\")."
 
 #: include/views/configuration.httpconf.edit.php:208
 #: include/views/configuration.httpconf.popup.php:97 popup_httpstep.php:43
@@ -15157,11 +15157,11 @@ msgstr "Статистика VMware кэша. Возможные режимы: t
 
 #: include/classes/items/CHelpItems.php:603
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
-msgstr ""
+msgstr "Состояние кластера VMware,<url> - сервисный URL VMware, <имя> - имя кластера VMware"
 
 #: include/classes/items/CHelpItems.php:607
 msgid "VMware event log, <url> - VMware service URL"
-msgstr ""
+msgstr "Журнал событий VMware, <url> - сервисный URL VMware"
 
 #: include/classes/items/CHelpItems.php:659
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
