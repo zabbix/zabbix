@@ -307,9 +307,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 
 
 	protected function createConverter() {
-		return new C20ImportConverter(
-			new C20TriggerConverter(new CFunctionMacroParser(), new CMacroParser('#'))
-		);
+		return new C20ImportConverter(new C20TriggerConverter());
 	}
 
 }

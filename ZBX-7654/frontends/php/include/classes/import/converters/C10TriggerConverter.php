@@ -25,14 +25,22 @@
 class C10TriggerConverter extends CConverter {
 
 	/**
+	 * A parser for function macros.
+	 *
+	 * @var CFunctionMacroParser
+	 */
+	protected $functionMacroParser;
+
+	/**
 	 * Converted used to convert simple check item keys.
 	 *
 	 * @var CConverter
 	 */
 	protected $itemKeyConverter;
 
-	public function __construct(CConverter $itemKeyConverter) {
-		$this->itemKeyConverter = $itemKeyConverter;
+	public function __construct() {
+		$this->functionMacroParser = new CFunctionMacroParser(array('18_simple_checks' => true));
+		$this->itemKeyConverter = new C10ItemKeyConverter();
 	}
 
 	/**
@@ -43,21 +51,31 @@ class C10TriggerConverter extends CConverter {
 	 * @return string
 	 */
 	public function convert($expression) {
-		// During the refactoring this conversion code has been taken from CXmlImport18.php and it's functionality
-		// has been left unchanged. It has lots of issues.
-		// To convert the expressions correctly, this method needs to implement a trigger parser.
-		$expressionParts = explode(':', $expression);
-		$keyName = explode(',', $expressionParts[1], 2);
-		if (count($keyName) == 2) {
-			$keyValue = explode('.', $keyName[1], 2);
-			$key = $keyName[0].",".$keyValue[0];
+		$new_expression = '';
 
-			$newKey = $this->itemKeyConverter->convert($key);
+		for ($pos = 0; isset($expression[$pos]); $pos++) {
+			if ($expression[$pos] == '{') {
+				$result = $this->functionMacroParser->parse($expression, $pos);
 
-			$expression = str_replace($key, $newKey, $expression);
+				if ($result) {
+					$new_expression .= '{'.
+						$result->expression['host'].':'.
+						$this->itemKeyConverter->convert($result->expression['item']).'.'.
+						$result->expression['function'].
+					'}';
+
+					$pos += $result->length - 1;
+				}
+				else {
+					$new_expression .= $expression[$pos];
+				}
+			}
+			else {
+				$new_expression .= $expression[$pos];
+			}
 		}
 
-		return $expression;
+		return $new_expression;
 	}
 
 }
