@@ -98,6 +98,7 @@ margin: 0 0 13px 0;
 .top-nav-container {
 	height: 36px;
 	line-height: 35px;
+	position: relative;
 	background: $primary-color;
 }
 
@@ -587,6 +588,17 @@ footer {
 			height: 24px;
 			line-height: 24px;
 		}
+
+		input {
+
+			&[type="checkbox"] {
+				top: -6px;
+			}
+
+			&[type="radio"] {
+				top: -6px;
+			}
+		}
 	}
 
 	.table-forms-td-right {
@@ -629,11 +641,8 @@ footer {
 }
 
 .margin-top {
-	margin: 2px 0 0 0;
-
-	input[type="checkbox"] {
-		margin: 8px 0 0 0;
-	}
+	display: block;
+	margin: 4px 0 0 0;
 }
 
 .list-check-radio {
@@ -654,31 +663,26 @@ footer {
 input {
 	
 	&[type="text"] {
-		width: 300px;
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
 	&[type="password"] {
-		width: 300px;
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
 	&[type="search"] {
-		width: 300px;
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
 	&[type="number"] {
-		width: 300px;
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
 	&[type="email"] {
-		width: 300px;
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
@@ -1298,6 +1302,14 @@ button[disabled] {
 
 	.table-forms-td-right {
 		width: auto;
+
+		td {
+			vertical-align: middle;
+
+			label {
+				display: block;
+			}
+		}
 	}
 
 	tfoot {
@@ -1415,6 +1427,10 @@ a.grey {
 	background: $alert-red-bg-color;
 }
 
+.na-bg {
+	background: $alert-na-bg-color;
+}
+
 .normal-bg {
 	@extend .green-bg;
 }
@@ -1429,6 +1445,14 @@ a.grey {
 
 .warning-bg {
 	background: $alert-warning-bg-color;
+}
+
+.high-bg {
+	background: $alert-high-bg-color;
+}
+
+.disaster-bg {
+	background: $alert-disaster-bg-color;
 }
 
 .msg-good {
@@ -1460,6 +1484,7 @@ a.grey {
 	height: 24px;
 	line-height: 24px;
 	text-align: center;
+	color: $font-alt-color;
 	font-size: $font-h2-size;
 	font-weight: bold;
 	text-decoration: none;
@@ -1479,9 +1504,17 @@ a.grey {
 }
 
 .overlay-close-btn {
+	//position: absolute;
+	//top: 0;
+	//right: 0;
+	color: $font-alt-color;
 	float: right;
 	margin: -5px -5px;
 	@extend %close-icon;
+}
+
+a.overlay-close-btn {
+	@extend .overlay-close-btn; 
 }
 
 .form-remove-btn {
