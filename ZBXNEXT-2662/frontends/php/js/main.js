@@ -365,7 +365,7 @@ var jqBlink = {
 var hintBox = {
 
 	createBox: function(e, target, hintText, className, isStatic) {
-		var box = jQuery('<div></div>').addClass('hintbox');
+		var box = jQuery('<div></div>').addClass('overlay-dialogue');
 
 		if (typeof hintText === 'string') {
 			hintText = hintText.replace(/\n/g, '<br />');
@@ -379,12 +379,8 @@ var hintBox = {
 		}
 
 		if (isStatic) {
-			var close_link = jQuery('<div>' + locale['S_CLOSE'] + '</div>')
-				.addClass('link')
-				.css({
-					'text-align': 'right',
-					'border-bottom': '1px #333 solid'
-				}).click(function() {
+			var close_link = jQuery('<a href="#" class="overlay-close-btn">×</a>')
+				.click(function() {
 					hintBox.hideHint(e, target, true);
 				});
 			box.prepend(close_link);
