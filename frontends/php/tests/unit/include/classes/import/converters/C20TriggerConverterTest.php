@@ -71,7 +71,7 @@ class C20TriggerConverterTest extends PHPUnit_Framework_TestCase {
 	 * @param $expectedConvertedExpression
 	 */
 	public function testConvert($expression, $expectedConvertedExpression) {
-		$converter = new C20TriggerConverter(new CFunctionMacroParser(), new CMacroParser('#'));
+		$converter = new C20TriggerConverter();
 		$this->assertEquals($expectedConvertedExpression, $converter->convert($expression));
 	}
 

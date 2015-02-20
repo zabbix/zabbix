@@ -24,13 +24,27 @@ class C10TriggerConverterTest extends PHPUnit_Framework_TestCase {
 	public function dataProvider() {
 		return array(
 			array('{h1:item.last(0)}=0', '{h1:item.last(0)}=0'),
+			array(
+				'{h1:vfs.fs.size[/var/tmp,pfree].last("#1")}=0 | {h1:vfs.fs.size[/tmp,pfree].last(0)}=0',
+				'{h1:vfs.fs.size[/var/tmp,pfree].last("#1")}=0 | {h1:vfs.fs.size[/tmp,pfree].last(0)}=0'
+			),
 			array('{h1:ftp.item.last(0)}=0', '{h1:ftp.item.last(0)}=0'),
 			array('{h1:ftp,1.last(0)}=0', '{h1:net.tcp.service[ftp,,1].last(0)}=0'),
-			array('{h1:ftp,1.last(0)}=0&{h1:ftp,1.last(0)}=0', '{h1:net.tcp.service[ftp,,1].last(0)}=0&{h1:net.tcp.service[ftp,,1].last(0)}=0'),
+			array(
+				'{h1:ftp,1.last(0)} = 0 & {h1:ftp,1.last(0)} = 0',
+				'{h1:net.tcp.service[ftp,,1].last(0)} = 0 & {h1:net.tcp.service[ftp,,1].last(0)} = 0'
+			),
+			array(
+				'{h1:ntp,{$PORT.NTP}.last(0)}#0 & {h1:ssh,{$PORT.SSH}.last(0)}',
+				'{h1:net.tcp.service[ntp,,{$PORT.NTP}].last(0)}#0 & {h1:net.tcp.service[ssh,,{$PORT.SSH}].last(0)}'
+			),
 
-			// these test cases are incorrect but are added to preserve the historical behavior
-			array('{h1:ftp.last(0)}=0', '{h1:ftp.last(0)}=0'),
-			array('{h1:ftp,1.last(0)}=0&{h1:ftp,2.last(0)}=0', '{h1:net.tcp.service[ftp,,1].last(0)}=0&{h1:ftp,2.last(0)}=0'),
+			array('{h1:ftp.last(0)}=0', '{h1:net.tcp.service[ftp].last(0)}=0'),
+			array('{h1:ftp,.last(0)}=0', '{h1:net.tcp.service[ftp].last(0)}=0'),
+			array(
+				'{h1:ftp,1.last(0)}=0&{h1:ftp,2.last(0)}=0',
+				'{h1:net.tcp.service[ftp,,1].last(0)}=0&{h1:net.tcp.service[ftp,,2].last(0)}=0'
+			)
 		);
 	}
 
@@ -41,7 +55,7 @@ class C10TriggerConverterTest extends PHPUnit_Framework_TestCase {
 	 * @param $expectedResult
 	 */
 	public function testConvert($expression, $expectedResult) {
-		$converter = new C10TriggerConverter(new C10ItemKeyConverter());
+		$converter = new C10TriggerConverter();
 		$result = $converter->convert($expression);
 
 		$this->assertEquals($expectedResult, $result);

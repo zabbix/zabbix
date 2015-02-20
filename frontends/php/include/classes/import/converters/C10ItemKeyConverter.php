@@ -24,6 +24,17 @@
  */
 class C10ItemKeyConverter extends CConverter {
 
+	/**
+	 * Parser for user macros.
+	 *
+	 * @var CMacroParser
+	 */
+	protected $userMacroParser;
+
+	public function __construct() {
+		$this->userMacroParser = new CMacroParser('$');
+	}
+
 	public function convert($value) {
 		$keys = array('tcp', 'ftp', 'http', 'imap', 'ldap', 'nntp', 'ntp', 'pop', 'smtp', 'ssh');
 
@@ -34,7 +45,31 @@ class C10ItemKeyConverter extends CConverter {
 		$parts = explode(',', $value);
 		if (count($parts) <= 2) {
 			$key = $parts[0];
-			$port = isset($parts[1]) ? ',,'.$parts[1] : '';
+
+			if (isset($parts[1]) && $parts[1] !== '') {
+				// user macro
+				$result = $this->userMacroParser->parse($parts[1], 0);
+
+				if ($result !== false && !isset($parts[1][$result->length])) {
+					$port = ',,'.$parts[1];
+				}
+				// numeric parameter or empty parameter
+				else {
+					$pos = 0;
+					while (isset($parts[1][$pos]) && $parts[1][$pos] > '0' && $parts[1][$pos] < '9') {
+						$pos++;
+					}
+
+					if (isset($parts[1][$pos])) {
+						return $value;
+					}
+
+					$port = ',,'.$parts[1];
+				}
+			}
+			else {
+				$port = '';
+			}
 
 			if (in_array($key, $keys)) {
 				return 'net.tcp.service['.$key.$port.']';

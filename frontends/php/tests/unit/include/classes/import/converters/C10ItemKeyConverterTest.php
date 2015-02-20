@@ -22,25 +22,16 @@
 class C10ItemKeyConverterTest extends PHPUnit_Framework_TestCase {
 
 	public function dataProvider() {
-		$keys = array(
-			'tcp',
-			'ftp',
-			'http',
-			'imap',
-			'ldap',
-			'nntp',
-			'ntp',
-			'pop',
-			'smtp',
-			'ssh'
-		);
+		$keys = array('tcp', 'ftp', 'http', 'imap', 'ldap', 'nntp', 'ntp', 'pop', 'smtp', 'ssh');
 
 		$data = array();
 		foreach ($keys as $key) {
 			$data[] = array($key, 'net.tcp.service['.$key.']');
+			$data[] = array($key.',', 'net.tcp.service['.$key.']');
 			$data[] = array($key.',1', 'net.tcp.service['.$key.',,1]');
 			$data[] = array($key.',{$PORT}', 'net.tcp.service['.$key.',,{$PORT}]');
 			$data[] = array($key.'_perf', 'net.tcp.service.perf['.$key.']');
+			$data[] = array($key.'_perf,', 'net.tcp.service.perf['.$key.']');
 			$data[] = array($key.'_perf,1', 'net.tcp.service.perf['.$key.',,1]');
 			$data[] = array($key.'_perf,{$PORT}', 'net.tcp.service.perf['.$key.',,{$PORT}]');
 		}
