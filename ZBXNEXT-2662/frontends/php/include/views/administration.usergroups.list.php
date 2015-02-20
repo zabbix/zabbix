@@ -53,17 +53,17 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 	$userGroupId = $usrgrp['usrgrpid'];
 
 	$debugMode = ($usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
-		? new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisabledebug&usrgrpid='.$userGroupId, 'orange')
-		: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenabledebug&usrgrpid='.$userGroupId, 'green');
+		? new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisabledebug&usrgrpid='.$userGroupId, ZBX_STYLE_ORANGE_DOTTED)
+		: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenabledebug&usrgrpid='.$userGroupId, ZBX_STYLE_GREEN_DOTTED);
 
 	// gui access
 	$guiAccess = user_auth_type2str($usrgrp['gui_access']);
-	$guiAccessStyle = 'green';
+	$guiAccessStyle = ZBX_STYLE_GREEN_DOTTED;
 	if ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_INTERNAL) {
-		$guiAccessStyle = 'orange';
+		$guiAccessStyle = ZBX_STYLE_ORANGE_DOTTED;
 	}
 	if ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-		$guiAccessStyle = 'red';
+		$guiAccessStyle = ZBX_STYLE_RED_DOTTED;
 	}
 
 	if (granted2update_group($userGroupId)) {
@@ -78,12 +78,12 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 		);
 
 		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
-			? new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisable&usrgrpid='.$userGroupId, 'green')
-			: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenable&usrgrpid='.$userGroupId, 'red');
+			? new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisable&usrgrpid='.$userGroupId, ZBX_STYLE_GREEN_DOTTED)
+			: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenable&usrgrpid='.$userGroupId, ZBX_STYLE_RED_DOTTED);
 	}
 	else {
 		$guiAccess = new CSpan($guiAccess, $guiAccessStyle);
-		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED) ? new CSpan(_('Enabled'), 'green') : new CSpan(_('Disabled'), 'red');
+		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED) ? new CSpan(_('Enabled'), ZBX_STYLE_GREEN) : new CSpan(_('Disabled'), ZBX_STYLE_RED);
 	}
 
 	if (isset($usrgrp['users'])) {
@@ -109,7 +109,7 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 			$users[] = new CLink(getUserFullname($user),
 				'users.php?form=update&userid='.$user['userid'],
 				($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $user['users_status'] == GROUP_STATUS_DISABLED)
-					? 'red' : 'green'
+					? ZBX_STYLE_RED_DOTTED : ZBX_STYLE_GREEN_DOTTED
 			);
 		}
 	}

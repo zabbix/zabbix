@@ -223,13 +223,13 @@ function itemIndicator($status, $state = null) {
  */
 function itemIndicatorStyle($status, $state = null) {
 	if ($status == ITEM_STATUS_ACTIVE) {
-		return ($state == ITEM_STATE_NOTSUPPORTED) ? 'grey' : 'green';
+		return ($state == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY_DOTTED : ZBX_STYLE_GREEN_DOTTED;
 	}
 	elseif ($status == ITEM_STATUS_DISABLED) {
-		return 'red';
+		return ZBX_STYLE_RED_DOTTED;
 	}
 
-	return 'grey';
+	return ZBX_STYLE_GREY_DOTTED;
 }
 
 /**

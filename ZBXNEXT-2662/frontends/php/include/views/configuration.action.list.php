@@ -81,13 +81,13 @@ if ($this->data['actions']) {
 		if ($action['status'] == ACTION_STATUS_DISABLED) {
 			$status = new CLink(_('Disabled'),
 				'actionconf.php?action=action.massenable&g_actionid[]='.$action['actionid'].url_param('eventsource'),
-				'red'
+				ZBX_STYLE_RED_DOTTED
 			);
 		}
 		else {
 			$status = new CLink(_('Enabled'),
 				'actionconf.php?action=action.massdisable&g_actionid[]='.$action['actionid'].url_param('eventsource'),
-				'green'
+				ZBX_STYLE_GREEN_DOTTED
 			);
 		}
 

@@ -199,6 +199,8 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	echo $pageMenu->getOutput();
 }
 
+echo '<article>';
+
 // unset multiple variables
 unset($ZBX_MENU, $table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
 

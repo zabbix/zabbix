@@ -1268,7 +1268,6 @@ function getActionCommands(array $alerts) {
 
 function get_actions_hint_by_eventid($eventid, $status = null) {
 	$tab_hint = new CTableInfo(_('No actions found.'));
-	$tab_hint->setAttribute('style', 'width: 300px;');
 	$tab_hint->setHeader(array(
 		_('User'),
 		_('Details'),

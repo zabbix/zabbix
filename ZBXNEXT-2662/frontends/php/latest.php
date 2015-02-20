@@ -587,7 +587,7 @@ foreach ($items as $key => $item){
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			? new CSpan($item['key_expanded'], ZBX_STYLE_GREEN)
-			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], ZBX_STYLE_GREEN);
+			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], ZBX_STYLE_GREEN_DOTTED);
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
@@ -775,7 +775,7 @@ foreach ($items as $item) {
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			? new CSpan($item['key_expanded'], 'enabled')
-			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], ZBX_STYLE_GREEN);
+			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], ZBX_STYLE_GREEN_DOTTED);
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {

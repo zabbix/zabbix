@@ -103,7 +103,7 @@ foreach ($this->data['graphs'] as $graph) {
 	if (!empty($graph['templateid'])) {
 		$realHosts = get_realhosts_by_graphid($graph['templateid']);
 		$realHosts = DBfetch($realHosts);
-		$name[] = new CLink($realHosts['name'], 'graphs.php?hostid='.$realHosts['hostid'], ZBX_STYLE_GREY);
+		$name[] = new CLink($realHosts['name'], 'graphs.php?hostid='.$realHosts['hostid'], ZBX_STYLE_GREY_DOTTED);
 		$name[] = NAME_DELIMITER;
 		$name[] = new CLink(
 			$graph['name'],
@@ -121,7 +121,7 @@ foreach ($this->data['graphs'] as $graph) {
 		$name[] = new CLink(
 			$graph['discoveryRule']['name'],
 			'host_discovery.php?form=update&itemid='.$graph['discoveryRule']['itemid'],
-			ZBX_STYLE_ORANGE
+			ZBX_STYLE_ORANGE_DOTTED
 		);
 		$name[] = NAME_DELIMITER;
 		$name[] = new CSpan($graph['name']);

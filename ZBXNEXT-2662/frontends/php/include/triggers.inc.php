@@ -21,16 +21,16 @@
 
 function getSeverityStyle($severity, $type = true) {
 	$styles = array(
-		TRIGGER_SEVERITY_DISASTER => 'disaster',
-		TRIGGER_SEVERITY_HIGH => 'high',
-		TRIGGER_SEVERITY_AVERAGE => 'average',
-		TRIGGER_SEVERITY_WARNING => 'warning',
-		TRIGGER_SEVERITY_INFORMATION => 'information',
-		TRIGGER_SEVERITY_NOT_CLASSIFIED => 'not_classified'
+		TRIGGER_SEVERITY_DISASTER => 'disaster-bg',
+		TRIGGER_SEVERITY_HIGH => 'high-bg',
+		TRIGGER_SEVERITY_AVERAGE => 'average-bg',
+		TRIGGER_SEVERITY_WARNING => 'warning-bg',
+		TRIGGER_SEVERITY_INFORMATION => 'info-bg',
+		TRIGGER_SEVERITY_NOT_CLASSIFIED => ''
 	);
 
 	if (!$type) {
-		return 'normal';
+		return '';
 	}
 	elseif (isset($styles[$severity])) {
 		return $styles[$severity];
@@ -2322,13 +2322,13 @@ function triggerIndicator($status, $state = null) {
  */
 function triggerIndicatorStyle($status, $state = null) {
 	if ($status == TRIGGER_STATUS_ENABLED) {
-		return ($state == TRIGGER_STATE_UNKNOWN) ? ZBX_STYLE_GREY : ZBX_STYLE_GREEN;
+		return ($state == TRIGGER_STATE_UNKNOWN) ? ZBX_STYLE_GREY_DOTTED : ZBX_STYLE_GREEN_DOTTED;
 	}
 	elseif ($status == TRIGGER_STATUS_DISABLED) {
-		return ZBX_STYLE_RED;
+		return ZBX_STYLE_RED_DOTTED;
 	}
 
-	return ZBX_STYLE_GREY;
+	return ZBX_STYLE_GREY_DOTTED;
 }
 
 /**
