@@ -816,7 +816,6 @@ function make_latest_issues(array $filter = array()) {
  */
 function makeTriggersPopup(array $triggers, array $ackParams, array $actions, array $config) {
 	$popupTable = new CTableInfo();
-	$popupTable->setAttribute('style', 'width: 400px;');
 	$popupTable->setHeader(array(
 		_('Host'),
 		_('Issue'),

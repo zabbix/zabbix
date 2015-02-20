@@ -55,7 +55,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	$name = array();
 	if ($hostPrototype['templateid']) {
 		$sourceTemplate = $hostPrototype['sourceTemplate'];
-		$name[] = new CLink($sourceTemplate['name'], '?parent_discoveryid='.$hostPrototype['sourceDiscoveryRuleId'], ZBX_STYLE_GREY);
+		$name[] = new CLink($sourceTemplate['name'], '?parent_discoveryid='.$hostPrototype['sourceDiscoveryRuleId'], ZBX_STYLE_GREY_DOTTED);
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($hostPrototype['name'], '?form=update&parent_discoveryid='.$discoveryRule['itemid'].'&hostid='.$hostPrototype['hostid']);
@@ -71,7 +71,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		foreach ($hostPrototype['templates'] as $template) {
 
 			$caption = array();
-			$caption[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'], ZBX_STYLE_GREY);
+			$caption[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'], ZBX_STYLE_GREY_DOTTED);
 
 			$linkedTemplates = $this->data['linkedTemplates'][$template['templateid']]['parentTemplates'];
 			if ($linkedTemplates) {
@@ -79,7 +79,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 				$caption[] = ' (';
 				foreach ($linkedTemplates as $tpl) {
-					$caption[] = new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid'], ZBX_STYLE_GREY);
+					$caption[] = new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid'], ZBX_STYLE_GREY_DOTTED);
 					$caption[] = ', ';
 				}
 				array_pop($caption);

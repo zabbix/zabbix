@@ -135,13 +135,13 @@ function discovery_status2str($status = null) {
 function discovery_status2style($status) {
 	switch ($status) {
 		case DRULE_STATUS_ACTIVE:
-			$status = 'off';
+			$status = ZBX_STYLE_GREEN_DOTTED;
 			break;
 		case DRULE_STATUS_DISABLED:
-			$status = 'on';
+			$status = ZBX_STYLE_RED_DOTTED;
 			break;
 		default:
-			$status = 'unknown';
+			$status = ZBX_STYLE_GREY_DOTTED;
 			break;
 	}
 

@@ -86,7 +86,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			$description[] = new CLink(
 				CHtml::encode($real_host['name']),
 				'triggers.php?hostid='.$real_host['hostid'],
-				ZBX_STYLE_GREY
+				ZBX_STYLE_GREY_DOTTED
 			);
 
 			$description[] = NAME_DELIMITER;
@@ -97,7 +97,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$description[] = new CLink(
 			CHtml::encode($trigger['discoveryRule']['name']),
 			'trigger_prototypes.php?parent_discoveryid='.$trigger['discoveryRule']['itemid'],
-			ZBX_STYLE_ORANGE
+			ZBX_STYLE_ORANGE_DOTTED
 		);
 		$description[] = NAME_DELIMITER.$trigger['description'];
 	}

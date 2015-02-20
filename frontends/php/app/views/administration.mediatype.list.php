@@ -105,8 +105,8 @@ foreach ($data['mediatypes'] as $mediaType) {
 		'&mediatypeids[]='.$mediaType['mediatypeid'];
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
-		? new CLink(_('Enabled'), $statusLink, 'green')
-		: new CLink(_('Disabled'), $statusLink, 'red');
+		? new CLink(_('Enabled'), $statusLink, ZBX_STYLE_GREEN_DOTTED)
+		: new CLink(_('Disabled'), $statusLink, ZBX_STYLE_RED_DOTTED);
 
 	// append row
 	$mediaTypeTable->addRow(array(

@@ -65,28 +65,31 @@ function local_generateHeader($data) {
 			)
 		));
 		echo $pageMenu->getOutput();
-
-		// should be replaced with addPostJS() at some point
-		zbx_add_post_js('initMessages({});');
-
-		// if a user logs in after several unsuccessful attempts, display a warning
-		if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
-			$attempip = CProfile::get('web.login.attempt.ip', '');
-			$attempdate = CProfile::get('web.login.attempt.clock', 0);
-
-			$error_msg = _n('%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s.',
-				'%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s.',
-				$attempip,
-				zbx_date2str(DATE_FORMAT, $attempdate),
-				zbx_date2str(TIME_FORMAT, $attempdate),
-				$failedAttempts
-			);
-			error($error_msg);
-
-			CProfile::update('web.login.attempt.failed', 0, PROFILE_TYPE_INT);
-		}
-		show_messages();
 	}
+
+	echo '<article>';
+
+	// should be replaced with addPostJS() at some point
+	zbx_add_post_js('initMessages({});');
+
+	// if a user logs in after several unsuccessful attempts, display a warning
+	if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
+		$attempip = CProfile::get('web.login.attempt.ip', '');
+		$attempdate = CProfile::get('web.login.attempt.clock', 0);
+
+		$error_msg = _n('%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s.',
+			'%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s.',
+			$attempip,
+			zbx_date2str(DATE_FORMAT, $attempdate),
+			zbx_date2str(TIME_FORMAT, $attempdate),
+			$failedAttempts
+		);
+		error($error_msg);
+
+		CProfile::update('web.login.attempt.failed', 0, PROFILE_TYPE_INT);
+	}
+
+	show_messages();
 }
 
 function local_generateFooter($fullscreen) {

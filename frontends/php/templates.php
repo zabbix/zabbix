@@ -675,7 +675,7 @@ else {
 				$linkedTemplatesOutput[] = ', ';
 			}
 
-			$linkedTemplatesOutput[] = new CLink($linkedTemplate['name'], $url, ZBX_STYLE_GREY);
+			$linkedTemplatesOutput[] = new CLink($linkedTemplate['name'], $url, ZBX_STYLE_GREY_DOTTED);
 		}
 
 		$i = 0;
@@ -701,12 +701,12 @@ else {
 
 			switch ($linkedToHost['status']) {
 				case HOST_STATUS_NOT_MONITORED:
-					$style = ZBX_STYLE_RED;
+					$style = ZBX_STYLE_RED_DOTTED;
 					$url = 'hosts.php?form=update&hostid='.$linkedToHost['objectid'].'&groupid='.$_REQUEST['groupid'];
 					break;
 
 				case HOST_STATUS_TEMPLATE:
-					$style = ZBX_STYLE_GREY;
+					$style = ZBX_STYLE_GREY_DOTTED;
 					$url = 'templates.php?form=update&templateid='.$linkedToHost['objectid'];
 					break;
 

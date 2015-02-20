@@ -265,7 +265,6 @@ function make_popup_eventlist($triggerId, $eventId) {
 	$config = select_config();
 
 	$table = new CTableInfo();
-	$table->setAttribute('style', 'width: 400px;');
 
 	// if acknowledges are turned on, we show 'ack' column
 	if ($config['event_ack_enable']) {
@@ -346,10 +345,10 @@ function getEventAckState($event, $url = null, $isLink = true, $params = array()
 		}
 
 		if ($event['acknowledged'] == 0) {
-			$ack = new CLink(_('No'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, ZBX_STYLE_RED);
+			$ack = new CLink(_('No'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, ZBX_STYLE_RED_DOTTED);
 		}
 		else {
-			$ackLink = new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, ZBX_STYLE_GREEN);
+			$ackLink = new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, ZBX_STYLE_GREEN_DOTTED);
 			if (is_array($event['acknowledges'])) {
 				$ackLinkHints = makeAckTab($event);
 				if (!empty($ackLinkHints)) {

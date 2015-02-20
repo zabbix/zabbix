@@ -73,7 +73,7 @@ foreach ($this->data['groups'] as $group) {
 			$hostsOutput[] = ', ';
 		}
 
-		$hostsOutput[] = new CLink($template['name'], $url, ZBX_STYLE_GREY);
+		$hostsOutput[] = new CLink($template['name'], $url, ZBX_STYLE_GREY_DOTTED);
 	}
 
 	if ($group['hosts'] && $i < $this->data['config']['max_in_table']) {
@@ -96,7 +96,7 @@ foreach ($this->data['groups'] as $group) {
 
 			switch ($host['status']) {
 				case HOST_STATUS_NOT_MONITORED:
-					$style = ZBX_STYLE_RED;
+					$style = ZBX_STYLE_RED_DOTTED;
 					$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
 					break;
 
@@ -142,7 +142,7 @@ foreach ($this->data['groups'] as $group) {
 		new CCheckBox('groups['.$group['groupid'].']', null, null, $group['groupid']),
 		$name,
 		array(
-			array(new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'], ZBX_STYLE_GREY), CViewHelper::showNum($templateCount)),
+			array(new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'], ZBX_STYLE_GREY_DOTTED), CViewHelper::showNum($templateCount)),
 			BR(),
 			array(new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), CViewHelper::showNum($hostCount))
 		),

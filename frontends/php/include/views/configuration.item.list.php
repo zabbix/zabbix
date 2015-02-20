@@ -88,7 +88,7 @@ foreach ($this->data['items'] as $item) {
 		$description[] = new CLink(
 			CHtml::encode($item['discoveryRule']['name']),
 			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'],
-			ZBX_STYLE_ORANGE
+			ZBX_STYLE_ORANGE_DOTTED
 		);
 		$description[] = NAME_DELIMITER.$item['name_expanded'];
 	}
