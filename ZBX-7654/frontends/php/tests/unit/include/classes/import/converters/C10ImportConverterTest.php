@@ -1817,7 +1817,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 	}
 
 	protected function createConverter() {
-		return new C10ImportConverter(new C10ItemKeyConverter(), new C10TriggerConverter());
+		return new C10ImportConverter();
 	}
 
 }

@@ -38,9 +38,9 @@ class C10ImportConverter extends CConverter {
 	 */
 	protected $triggerConverter;
 
-	public function __construct(CConverter $itemKeyConverter, CConverter $triggerConverter) {
-		$this->itemKeyConverter = $itemKeyConverter;
-		$this->triggerConverter = $triggerConverter;
+	public function __construct() {
+		$this->itemKeyConverter = new C10ItemKeyConverter();
+		$this->triggerConverter = new C10TriggerConverter();
 	}
 
 	public function convert($value) {

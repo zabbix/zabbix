@@ -31,8 +31,8 @@ class C20ImportConverter extends CConverter {
 	 */
 	protected $triggerExpressionConverter;
 
-	public function __construct(CConverter $triggerExpressionConverter) {
-		$this->triggerExpressionConverter = $triggerExpressionConverter;
+	public function __construct() {
+		$this->triggerExpressionConverter = new C20TriggerConverter();
 	}
 
 	public function convert($value) {
