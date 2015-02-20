@@ -31,19 +31,21 @@ class C10ItemKeyConverter extends CConverter {
 			'pop_perf', 'smtp_perf', 'ssh_perf'
 		);
 
-		$value = explode(',', $value);
-		$key = $value[0];
-		$port = isset($value[1]) ? $value[1] : '';
+		$parts = explode(',', $value);
+		if (count($parts) <= 2) {
+			$key = $parts[0];
+			$port = isset($parts[1]) ? $parts[1] : '';
 
-		if (in_array($key, $keys)) {
-			$key = 'net.tcp.service['.$key.',,'.$port.']';
-		}
-		elseif (in_array($key, $perfKeys)) {
-			list($key, $perfSuffix) = explode('_', $key);
-			$key = 'net.tcp.service.perf['.$key.',,'.$port.']';
+			if (in_array($key, $keys)) {
+				return 'net.tcp.service['.$key.',,'.$port.']';
+			}
+			elseif (in_array($key, $perfKeys)) {
+				list($key, $perfSuffix) = explode('_', $key);
+				return 'net.tcp.service.perf['.$key.',,'.$port.']';
+			}
 		}
 
-		return $key;
+		return $value;
 	}
 
 }
