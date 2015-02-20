@@ -238,9 +238,13 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.hardware']]"		\
 		"/*[local-name()='val']/*[local-name()='" property "']"
 
-#define ZBX_XPATH_HV_STATUS()										\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.overallStatus']]"	\
-		"/*[local-name()='val']"
+#define ZBX_XPATH_HV_SENSOR_STATUS(sensor)								\
+	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name']"					\
+		"[text()='runtime.healthSystemRuntime.systemHealthInfo']]"				\
+		"/*[local-name()='val']/*[local-name()='numericSensorInfo']"				\
+		"[*[local-name()='name'][text()='" sensor "']]"						\
+		"/*[local-name()='healthState']/*[local-name()='key']"
+
 
 #define ZBX_XPATH_VMWARE_ABOUT(property)								\
 	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
