@@ -1371,6 +1371,9 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 			array(
 				array(
 					'name' => 'Linux servers'
+				),
+				array(
+					'name' => 'Templates'
 				)
 			),
 			$adapter->getGroups()
@@ -1384,17 +1387,27 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						array (
 							'type' => 1,
 							'useip' => '1',
-							'ip' => '0.0.0.0',
-							'dns' => '',
+							'ip' => '10.0.0.6',
+							'dns' => 'localhost',
 							'port' => '10050',
 							'interface_ref' => 'if0',
 							'main' => 1,
 							'bulk' => 1
 						),
+//						array (								// ??? IPMI interface
+//							'type' => 3,
+//							'useip' => '0',
+//							'ip' => '',
+//							'dns' => '10.0.0.7',
+//							'port' => '623',
+//							'interface_ref' => 'if1',
+//							'main' => 1,
+//							'bulk' => 1
+//						)
 					),
 					'host' => 'host',
 					'status' => '0',
-					'ipmi_authtype' => '-1',
+					'ipmi_authtype' => '0',
 					'ipmi_privilege' => '2',
 					'ipmi_username' => '',
 					'ipmi_password' => '',
@@ -1404,11 +1417,365 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						array(
 							'name' => 'Linux servers'
 						)
-					),
-				),
+					)
+				)
 			),
 			$adapter->getHosts()
 		);
+
+		$this->assertEquals(
+			array(
+				array(
+					'macros' => array(
+						array(
+							'value' => '21',
+							'macro' => '{$PORT.FTP}'
+						),
+						array(
+							'value' => '22',
+							'macro' => '{$PORT.SSH}'
+						)
+					),
+					'host' => 'Template_Linux',
+					'groups' =>	array(
+						array(
+							'name' => 'Templates'
+						)
+					)
+				),
+				array(
+					'macros' => array(),
+					'host' => 'Template_Simple',
+					'groups' =>	array(
+						array(
+							'name' => 'Templates'
+						)
+					)
+				)
+			),
+			$adapter->getTemplates()
+		);
+
+		$this->assertEquals(
+			array(
+				'Template_Linux' => array(
+					'vfs.fs.size[/' => array(						// 'vfs.fs.size[/,pfree]'
+						'type' => '0',
+						'value_type' => '0',
+						'ipmi_sensor' => '',
+						'delay' => '30',
+						'history' => '7',
+						'trends' => '365',
+						'status' => '0',
+						'data_type' => '0',
+						'units' => '%',
+						'multiplier' => '0',
+						'delta' => '0',
+						'formula' => '1',
+						'lastlogsize' => '0',						// <-- ???
+						'logtimefmt' => '',
+						'delay_flex' => '',
+						'authtype' => '0',
+						'username' => '',
+						'password' => '',
+						'publickey' => '',
+						'privatekey' => '',
+						'params' => '',
+						'trapper_hosts' => '',
+						'snmp_community' => '',
+						'snmp_oid' => '',
+						'snmp_port' => '161',
+						'snmpv3_securityname' => '',
+						'snmpv3_securitylevel' => '0',
+						'snmpv3_authpassphrase' => '',
+						'snmpv3_privpassphrase' => '',
+						'valuemapid' => '0',
+						'applications' => array(
+							array(
+								'name' => 'Filesystem'
+							),
+							array(
+								'name' => 'Availability'
+							)
+						),
+						'name' => 'Free disk space on $1 in %',
+						'key_' => 'vfs.fs.size[/'					// 'vfs.fs.size[/,pfree]'
+					)
+				),
+				'Template_Simple' => array(
+					'net.tcp.service[ftp,,21]' => array
+					(
+						'type' => '3',
+						'value_type' => '3',
+						'ipmi_sensor' => '',
+						'delay' => '30',
+						'history' => '90',
+						'trends' => '365',
+						'status' => '0',
+						'data_type' => '0',
+						'units' => '',
+						'multiplier' => '0',
+						'delta' => '0',
+						'formula' => '1',
+						'lastlogsize' => '0',						// <-- ???
+						'logtimefmt' => '',
+						'delay_flex' => '',
+						'authtype' => '0',
+						'username' => '',
+						'password' => '',
+						'publickey' => '',
+						'privatekey' => '',
+						'params' => '',
+						'trapper_hosts' => '',
+						'snmp_community' => '',
+						'snmp_oid' => '',
+						'snmp_port' => '161',
+						'snmpv3_securityname' => '',
+						'snmpv3_securitylevel' => '0',
+						'snmpv3_authpassphrase' => '',
+						'snmpv3_privpassphrase' => '',
+						'valuemapid' => '0',
+						'applications' => array(
+							array(
+								'name' => 'Simple checks'
+							)
+						),
+						'name' => 'FTP check',
+						'key_' => 'net.tcp.service[ftp,,21]'
+					),
+					'net.tcp.service[ftp,,{$PORT.FTP}]' => array
+					(
+						'type' => '3',
+						'value_type' => '3',
+						'ipmi_sensor' => '',
+						'delay' => '30',
+						'history' => '90',
+						'trends' => '365',
+						'status' => '0',
+						'data_type' => '0',
+						'units' => '',
+						'multiplier' => '0',
+						'delta' => '0',
+						'formula' => '1',
+						'lastlogsize' => '0',						// <-- ???
+						'logtimefmt' => '',
+						'delay_flex' => '',
+						'authtype' => '0',
+						'username' => '',
+						'password' => '',
+						'publickey' => '',
+						'privatekey' => '',
+						'params' => '',
+						'trapper_hosts' => '',
+						'snmp_community' => '',
+						'snmp_oid' => '',
+						'snmp_port' => '161',
+						'snmpv3_securityname' => '',
+						'snmpv3_securitylevel' => '0',
+						'snmpv3_authpassphrase' => '',
+						'snmpv3_privpassphrase' => '',
+						'valuemapid' => '0',
+						'applications' => array(
+							array(
+								'name' => 'Simple checks'
+							)
+						),
+						'name' => 'FTP check with macro',
+						'key_' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
+					)
+				)
+			),
+			$adapter->getItems()
+		);
+
+		$this->assertEquals(
+			array(
+				'Template_Linux' => array(
+					'Filesystem' => array(
+						'name' => 'Filesystem'
+					),
+					'Availability' => array(
+						'name' => 'Availability'
+					),
+				),
+				'Template_Simple' => array(
+					'Simple checks' => array(
+						'name' => 'Simple checks'
+					)
+				)
+			),
+			$adapter->getApplications()
+		);
+
+		$this->assertEquals(
+			array(
+				array(
+					'type' => '0',
+					'expression' => '{Template_Linux:vfs.fs.size[/.last(0)}<10',		// '{Template_Linux:vfs.fs.size[/,pfree].last(0)}<10'
+					'url' => 'http://www.zabbix.com/',
+					'status' => '0',
+					'priority' => '4',
+					'comments' => 'test comments',
+					'description' => 'Low free disk space on {HOSTNAME} volume /'
+				),
+				array(
+					'type' => '1',
+					'expression' => '{Template_Simple:net.tcp.service[ftp,,21].last(0)}<>0 or {Template_Simple:ftp,{$PORT.FTP}.last(0)}<>0',		// '{Template_Simple:net.tcp.service[ftp,,21].last(0)}<>0 or {Template_Simple:net.tcp.service[ftp,,{$PORT.FTP}].last(0)}<>0'
+					'url' => 'triggers.php',
+					'status' => '1',
+					'priority' => '3',
+					'comments' => 'comments',
+					'description' => 'simple triggert'
+				)
+			),
+			$adapter->getTriggers()
+		);
+
+		$this->assertEquals(
+			array(
+				array(
+					'name' => 'simple graph fixed',
+					'width' => '755',
+					'height' => '332',
+					'ymin_type' => '1',
+					'ymax_type' => '1',
+					'show_work_period' => '1',
+					'show_triggers' => '1',
+					'yaxismin' => '5.5000',
+					'yaxismax' => '95.6000',
+					'show_legend' => '0',
+					'show_3d' => '0',
+					'percent_left' => '25.5000',
+					'percent_right' => '27.6000',
+					'ymin_item_1' => '',						// ???
+					'ymax_item_1' => '',						// ???
+					'graphtype' => '0',
+					'gitems' => array(
+						array(
+							'item' => array(
+								'host' => 'Template_Simple',
+								'key' => 'net.tcp.service[ftp,,21]'
+							),
+							'drawtype' => '0',
+							'sortorder' => '0',
+							'color' => '3333FF',
+							'yaxisside' => '0',
+							'calc_fnc' => '7',
+							'type' => '0'
+						),
+						array(
+							'item' => array(
+								'host' => 'Template_Simple',
+								'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
+							),
+							'drawtype' => '1',
+							'sortorder' => '1',
+							'color' => '009999',
+							'yaxisside' => '1',
+							'calc_fnc' => '4',
+							'type' => '0'
+						)
+					)
+				),
+				array(
+					'name' => 'simple graph',
+					'width' => '900',
+					'height' => '200',
+					'ymin_type' => '0',
+					'ymax_type' => '0',
+					'show_work_period' => '0',
+					'show_triggers' => '0',
+					'yaxismin' => '0.0000',
+					'yaxismax' => '100.0000',
+					'show_legend' => '0',
+					'show_3d' => '0',
+					'percent_left' => '0.0000',
+					'percent_right' => '0.0000',
+					'ymin_item_1' => '',						// ???
+					'ymax_item_1' => '',						// ???
+					'graphtype' => '0',
+					'gitems' => array(
+						array(
+							'item' => array(
+								'host' => 'Template_Simple',
+								'key' => 'net.tcp.service[ftp,,21]'
+							),
+							'drawtype' => '0',
+							'sortorder' => '0',
+							'color' => '3333FF',
+							'yaxisside' => '0',
+							'calc_fnc' => '2',
+							'type' => '0'
+						),
+						array(
+							'item' => array(
+								'host' => 'Template_Simple',
+								'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
+							),
+							'drawtype' => '0',
+							'sortorder' => '1',
+							'color' => '009999',
+							'yaxisside' => '0',
+							'calc_fnc' => '2',
+							'type' => '0'
+						)
+					)
+				),
+				array(
+					'name' => 'simple graph min/max',
+					'width' => '1024',
+					'height' => '768',
+					'ymin_type' => '2',
+					'ymax_type' => '2',
+					'show_work_period' => '1',
+					'show_triggers' => '1',
+					'yaxismin' => '0.0000',
+					'yaxismax' => '0.0000',
+					'show_legend' => '0',
+					'show_3d' => '0',
+					'percent_left' => '0.0000',
+					'percent_right' => '0.0000',
+					'ymin_item_1' => array(
+						'host' => 'Template_Simple',
+						'key' => 'net.tcp.service[ftp,,21]'
+					),
+					'ymax_item_1' => array(
+						'host' => 'Template_Simple',
+						'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
+					),
+					'graphtype' => '1',
+					'gitems' => array(
+						array(
+							'item' => array(
+								'host' => 'Template_Simple',
+								'key' => 'net.tcp.service[ftp,,21]'
+							),
+							'drawtype' => '0',
+							'sortorder' => '0',
+							'color' => '3333FF',
+							'yaxisside' => '0',
+							'calc_fnc' => '2',
+							'type' => '0'
+						),
+						array(
+							'item' => array(
+								'host' => 'Template_Simple',
+								'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
+							),
+							'drawtype' => '0',
+							'sortorder' => '1',
+							'color' => '009999',
+							'yaxisside' => '0',
+							'calc_fnc' => '2',
+							'type' => '0'
+						)
+					)
+				)
+			),
+			$adapter->getGraphs()
+		);
+
+//		echo print_r($adapter->getGraphs(), true);
 	}
 
 	public function testUnsupportedVersion() {
