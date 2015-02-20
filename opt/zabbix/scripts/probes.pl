@@ -7,6 +7,7 @@ use warnings;
 use Getopt::Long;
 use Data::Dumper;
 use RSM;
+use TLD_constants qw(:general :templates :api :config);
 use TLDs;
 
 use constant LINUX_TEMPLATEID => 10001;
@@ -66,8 +67,7 @@ sub add_probe($$) {
     print "Trying to add '".$probe_name."' probe...\n";
 
     if (is_probe_exist($probe_name)) {
-	print "The probe with name '".$probe_name."' already exists!\n";
-	exit;
+	print "The probe with name '".$probe_name."' already exists! Trying to enable it\n";
     }
 
     ###### Checking and creating required groups and templates
@@ -123,6 +123,7 @@ sub add_probe($$) {
     $probe_host = create_host({'groups' => [{'groupid' => $probe_hostgroup}, {'groupid' => $probes_groupid}],
                                           'templates' => [{'templateid' => $probe_tmpl_status}],
                                           'host' => $probe_name,
+                                          'status' => HOST_STATUS_MONITORED,
                                           'proxy_hostid' => $probe,
                                           'interfaces' => [{'type' => 1, 'main' => true, 'useip' => true,
                                                             'ip'=> '127.0.0.1',
@@ -137,6 +138,7 @@ sub add_probe($$) {
     $probe_host_mon = create_host({'groups' => [{'groupid' => $probes_mon_groupid}],
                                           'templates' => [{'templateid' => $probe_tmpl_health}],
                                           'host' => $probe_name.' - mon',
+                                          'status' => HOST_STATUS_MONITORED,
                                           'interfaces' => [{'type' => 1, 'main' => true, 'useip' => true,
                                                             'ip'=> $probe_ip,
                                                             'dns' => '', 'port' => '10050'}]
@@ -164,6 +166,7 @@ sub add_probe($$) {
                                           'templates' => [{'templateid' => $main_templateid}, {'templateid' => $probe_tmpl}],
                                           'host' => $tld_name.' '.$probe_name,
                                           'proxy_hostid' => $probe,
+                                          'status' => HOST_STATUS_MONITORED,
                                           'interfaces' => [{'type' => 1, 'main' => true, 'useip' => true, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
 
 	is_not_empty($tld_host, false);

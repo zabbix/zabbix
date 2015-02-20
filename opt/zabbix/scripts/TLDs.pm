@@ -46,7 +46,8 @@ sub check_api_error($) {
 sub get_proxies_list {
     my $proxies_list;
 
-    $proxies_list = $zabbix->get('proxy',{'output' => ['proxyid', 'host'], 'selectInterfaces' => ['ip'], 'preservekeys' => 1 });
+    $proxies_list = $zabbix->get('proxy',{'output' => ['proxyid', 'host'], 'selectInterfaces' => ['ip'],
+					  'filter' => {'status' => HOST_STATUS_PROXY_PASSIVE}, 'preservekeys' => 1 });
 
     return $proxies_list;
 }
@@ -456,12 +457,23 @@ sub create_passive_proxy($$) {
     my $probe_name = shift;
     my $probe_ip = shift;
 
-    my $result = $zabbix->create('proxy', {'host' => $probe_name, 'status' => HOST_STATUS_PROXY_PASSIVE,
+    my $probe = get_probe($probe_name, false);
+
+    if (defined($probe->{'proxyid'})) {
+	my $result = $zabbix->update('proxy', {'proxyid' => $probe->{'proxyid'}, 'status' => HOST_STATUS_PROXY_PASSIVE,
+                                        'interfaces' => [{'ip' => $probe_ip, 'dns' => '', 'useip' => true, 'port' => '10051'}]});
+
+	if (scalar($result->{'proxyids'})) {
+            return $result->{'proxyids'}[0];
+        }
+    }
+    else {
+        my $result = $zabbix->create('proxy', {'host' => $probe_name, 'status' => HOST_STATUS_PROXY_PASSIVE,
                                         'interfaces' => [{'ip' => $probe_ip, 'dns' => '', 'useip' => true, 'port' => '10051'}],
                                         'hosts' => []});
-
-    if (scalar($result->{'proxyids'})) {
-	return $result->{'proxyids'}[0];
+	if (scalar($result->{'proxyids'})) {
+	    return $result->{'proxyids'}[0];
+	}
     }
 
     return;
