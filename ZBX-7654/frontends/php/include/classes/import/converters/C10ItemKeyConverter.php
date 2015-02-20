@@ -34,14 +34,14 @@ class C10ItemKeyConverter extends CConverter {
 		$parts = explode(',', $value);
 		if (count($parts) <= 2) {
 			$key = $parts[0];
-			$port = isset($parts[1]) ? $parts[1] : '';
+			$port = isset($parts[1]) ? ',,'.$parts[1] : '';
 
 			if (in_array($key, $keys)) {
-				return 'net.tcp.service['.$key.',,'.$port.']';
+				return 'net.tcp.service['.$key.$port.']';
 			}
 			elseif (in_array($key, $perfKeys)) {
 				list($key, $perfSuffix) = explode('_', $key);
-				return 'net.tcp.service.perf['.$key.',,'.$port.']';
+				return 'net.tcp.service.perf['.$key.$port.']';
 			}
 		}
 
