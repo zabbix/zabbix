@@ -24,14 +24,10 @@
  */
 class CImportConverterFactory extends CRegistryFactory {
 
-	public function __construct(array $objects = array()) {
-		parent::__construct(array_merge(array(
-			'1.0' => function() {
-				return new C10ImportConverter(new C10ItemKeyConverter(), new C10TriggerConverter());
-			},
-			'2.0' => function() {
-				return new C20ImportConverter(new C20TriggerConverter());
-			}
-		), $objects));
+	public function __construct() {
+		parent::__construct(array(
+			'1.0' => new C10ImportConverter(),
+			'2.0' => new C20ImportConverter()
+		));
 	}
 }
