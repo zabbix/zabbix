@@ -987,8 +987,8 @@ void	zbx_tls_init_child(void)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded pre-shared key", __function_name);
 	}
 
-	/* 'TLSPskIdentity' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, */
-	/* zabbix_agent.conf). Configure identity to be used with the pre-shared key. */
+	/* 'TLSPskIdentity' parameter (in zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). Configure */
+	/* identity to be used with the pre-shared key. */
 	if (NULL != CONFIG_TLS_PSK_IDENTITY && '\0' != *CONFIG_TLS_PSK_IDENTITY)
 	{
 		/* PSK identity must be a valid UTF-8 string (RFC4279 says Unicode) */
