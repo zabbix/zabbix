@@ -39,15 +39,12 @@ class C10ItemKeyConverterTest extends PHPUnit_Framework_TestCase {
 		foreach ($keys as $key) {
 			$data[] = array($key, 'net.tcp.service['.$key.',,]');
 			$data[] = array($key.',1', 'net.tcp.service['.$key.',,1]');
-			$data[] = array($key.',{$PORT}', 'net.tcp.service['.$key.',,{$PORT}]');
 			$data[] = array($key.'_perf', 'net.tcp.service.perf['.$key.',,]');
 			$data[] = array($key.'_perf,1', 'net.tcp.service.perf['.$key.',,1]');
-			$data[] = array($key.'_perf,{$PORT}', 'net.tcp.service.perf['.$key.',,{$PORT}]');
 		}
 
 		// keys that shouldn't be converted
 		$data[] = array('myitem', 'myitem');
-		$data[] = array('ftp,10,20', 'ftp,10,20');
 
 		return $data;
 	}

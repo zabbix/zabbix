@@ -25,15 +25,35 @@
 class C10ItemKeyConverter extends CConverter {
 
 	public function convert($value) {
-		$keys = array('tcp', 'ftp', 'http', 'imap', 'ldap', 'nntp', 'ntp', 'pop', 'smtp', 'ssh');
+		$keys = array(
+			'tcp',
+			'ftp',
+			'http',
+			'imap',
+			'ldap',
+			'nntp',
+			'ntp',
+			'pop',
+			'smtp',
+			'ssh'
+		);
 
-		$perfKeys = array('tcp_perf', 'ftp_perf', 'http_perf', 'imap_perf', 'ldap_perf', 'nntp_perf', 'ntp_perf',
-			'pop_perf', 'smtp_perf', 'ssh_perf'
+		$perfKeys = array(
+			'tcp_perf',
+			'ftp_perf',
+			'http_perf',
+			'imap_perf',
+			'ldap_perf',
+			'nntp_perf',
+			'ntp_perf',
+			'pop_perf',
+			'smtp_perf',
+			'ssh_perf'
 		);
 
 		$value = explode(',', $value);
 		$key = $value[0];
-		$port = isset($value[1]) ? $value[1] : '';
+		$port = (isset($value[1])) ? $value[1] : '';
 
 		if (in_array($key, $keys)) {
 			$key = 'net.tcp.service['.$key.',,'.$port.']';

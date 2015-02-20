@@ -26,18 +26,11 @@ class C10TriggerConverterTest extends PHPUnit_Framework_TestCase {
 			array('{h1:item.last(0)}=0', '{h1:item.last(0)}=0'),
 			array('{h1:ftp.item.last(0)}=0', '{h1:ftp.item.last(0)}=0'),
 			array('{h1:ftp,1.last(0)}=0', '{h1:net.tcp.service[ftp,,1].last(0)}=0'),
-			array(
-				'{h1:ftp,1.last(0)} = 0 & {h1:ftp,1.last(0)} = 0',
-				'{h1:net.tcp.service[ftp,,1].last(0)} = 0 & {h1:net.tcp.service[ftp,,1].last(0)} = 0'
-			),
-			array(
-				'{h1:ntp,{$PORT.NTP}.last(0)}#0 & {h1:ssh,{$PORT.SSH}.last(0)}',
-				'{h1:net.tcp.service[ntp,,{$PORT.NTP}].last(0)}#0 & {h1:net.tcp.service[ssh,,{$PORT.SSH}].last(0)}'
-			),
+			array('{h1:ftp,1.last(0)}=0&{h1:ftp,1.last(0)}=0', '{h1:net.tcp.service[ftp,,1].last(0)}=0&{h1:net.tcp.service[ftp,,1].last(0)}=0'),
 
 			// these test cases are incorrect but are added to preserve the historical behavior
-			array('{h1:ftp.last(0)}=0', '{h1:ftp.last(0)}=0'),																		// ???
-			array('{h1:ftp,1.last(0)}=0&{h1:ftp,2.last(0)}=0', '{h1:net.tcp.service[ftp,,1].last(0)}=0&{h1:ftp,2.last(0)}=0'),		// ???
+			array('{h1:ftp.last(0)}=0', '{h1:ftp.last(0)}=0'),
+			array('{h1:ftp,1.last(0)}=0&{h1:ftp,2.last(0)}=0', '{h1:net.tcp.service[ftp,,1].last(0)}=0&{h1:ftp,2.last(0)}=0'),
 		);
 	}
 
