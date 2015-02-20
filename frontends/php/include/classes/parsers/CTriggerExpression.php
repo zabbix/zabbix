@@ -550,8 +550,7 @@ class CTriggerExpression {
 	private function parseFunctionMacro() {
 		$startPos = $this->pos;
 
-		$parser = new CFunctionMacroParser();
-		$result = $parser->parse($this->expression, $this->pos);
+		$result = $this->functionMacroParser->parse($this->expression, $this->pos);
 
 		if (!$result) {
 			return false;
