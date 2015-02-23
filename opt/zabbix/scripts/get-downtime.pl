@@ -5,15 +5,15 @@ use lib '/opt/zabbix/scripts';
 use RSM;
 use RSMSLV;
 
-parse_opts("tld=s", "from=n", "till=n", "service=s");
+parse_opts('tld=s', 'from=n', 'till=n', 'service=s');
 
-if (defined($OPTS{'debug'}))
+if (opt('debug'))
 {
 	dbg("command-line parameters:");
-	dbg("$_ => ", $OPTS{$_}) foreach (keys(%OPTS));
+	dbg("$_ => ", getopt($_)) foreach (optkeys());
 }
 
-unless (defined($OPTS{'service'}))
+unless (opt('service'))
 {
 	print("Option --service not specified\n");
 	usage(2);
@@ -21,27 +21,27 @@ unless (defined($OPTS{'service'}))
 
 my ($key, $service_type);
 
-if ($OPTS{'service'} eq 'dns')
+if (getopt('service') eq 'dns')
 {
 	$key = 'rsm.slv.dns.avail';
 }
-elsif ($OPTS{'service'} eq 'dns-ns')
+elsif (getopt('service') eq 'dns-ns')
 {
 	$key = 'rsm.slv.dns.ns.avail[';
 }
-elsif ($OPTS{'service'} eq 'rdds')
+elsif (getopt('service') eq 'rdds')
 {
 	$service_type = 'rdds';
 	$key = 'rsm.slv.rdds.avail';
 }
-elsif ($OPTS{'service'} eq 'epp')
+elsif (getopt('service') eq 'epp')
 {
 	$service_type = 'epp';
 	$key = 'rsm.slv.epp.avail';
 }
 else
 {
-	print("Invalid name of service specified \"", $OPTS{'service'}, "\"\n");
+	print("Invalid service specified \"", getopt('service'), "\"\n");
 	usage(2);
 }
 
@@ -51,8 +51,8 @@ db_connect();
 
 my ($from, $till, @bounds);
 
-$from = $OPTS{'from'};
-$till = $OPTS{'till'};
+$from = getopt('from');
+$till = getopt('till');
 
 unless (defined($from) and defined($till))
 {
@@ -63,7 +63,7 @@ unless (defined($from) and defined($till))
 	$till = $bounds[1] unless (defined($till));
 }
 
-my $tlds_ref = defined($OPTS{'tld'}) ? [ $OPTS{'tld'} ] : get_tlds($service_type);
+my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds($service_type);
 
 foreach (@$tlds_ref)
 {

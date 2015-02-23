@@ -9,27 +9,27 @@ use ApiHelper;
 use JSON::XS;
 use Data::Dumper;
 
-parse_opts("tld=s", "service=s", "from=n", "till=n", "dry-run");
+parse_opts('tld=s', 'service=s', 'from=n', 'till=n', 'dry-run');
 
 # do not write any logs
-$OPTS{'test'} = 1;
+setopt('test');
 
-if (defined($OPTS{'debug'}))
+if (opt('debug'))
 {
 	dbg("command-line parameters:");
-	dbg("$_ => ", $OPTS{$_}) foreach (keys(%OPTS));
+	dbg("$_ => ", getopt($_)) foreach (optkeys());
 }
 
 my @services;
-if (defined($OPTS{'service'}))
+if (opt('service'))
 {
-	if ($OPTS{'service'} ne 'dns' and $OPTS{'service'} ne 'dnssec' and $OPTS{'service'} ne 'rdds' and $OPTS{'service'} ne 'epp')
+	if (getopt('service') ne 'dns' and getopt('service') ne 'dnssec' and getopt('service') ne 'rdds' and getopt('service') ne 'epp')
 	{
-		prnt($OPTS{'service'}, ": unknown service");
+		print(getopt('service'), ": unknown service\n");
 		usage();
 	}
 
-	push(@services, lc($OPTS{'service'}));
+	push(@services, lc(getopt('service')));
 }
 else
 {
@@ -85,22 +85,22 @@ if (exists($services_hash{'epp'}))
 	$cfg_epp_interval = get_macro_epp_delay();
 }
 
-my $from = $OPTS{'from'};
-my $till = $OPTS{'till'};
+my $from = getopt('from');
+my $till = getopt('till');
 
 my $tlds_ref;
-if (defined($OPTS{'tld'}))
+if (opt('tld'))
 {
-	fail("TLD ", $OPTS{'tld'}, " does not exist.") if (tld_exists($OPTS{'tld'}) == 0);
+	fail("TLD ", getopt('tld'), " does not exist.") if (tld_exists(getopt('tld')) == 0);
 
-	$tlds_ref = [ $OPTS{'tld'} ];
+	$tlds_ref = [ getopt('tld') ];
 }
 else
 {
 	$tlds_ref = get_tlds();
 }
 
-prnt("selected period: ", selected_period($from, $till)) if (defined($OPTS{'dry-run'}));
+prnt("selected period: ", selected_period($from, $till)) if (opt('dry-run') or opt('debug'));
 
 foreach (@$tlds_ref)
 {
@@ -110,7 +110,7 @@ foreach (@$tlds_ref)
 	{
 		if (tld_service_enabled($tld, $service) != SUCCESS)
 		{
-			if (defined($OPTS{'dry-run'}))
+			if (opt('dry-run'))
 			{
 				prnt(uc($service), " DISABLED");
 			}
@@ -135,7 +135,7 @@ foreach (@$tlds_ref)
 
 		my $clock = get_lastclock($tld, "rsm.slv.$service.rollweek");
 
-		if (defined($OPTS{'dry-run'}))
+		if (opt('dry-run'))
 		{
 			prnt(uc($service), " service availability $downtime (", ts_str($clock), ")");
 		}
@@ -160,7 +160,7 @@ foreach (@$tlds_ref)
 			}
 		}
 
-		if (defined($OPTS{'dry-run'}))
+		if (opt('dry-run'))
 		{
 			prnt(uc($service), " alarmed:$alarmed_status");
 		}
@@ -234,7 +234,7 @@ foreach (@$tlds_ref)
 				$result->{'start'} = $clock - $interval + RESULT_TIMESTAMP_SHIFT + 1; # we need to start at 0
 				$result->{'end'} = $clock + RESULT_TIMESTAMP_SHIFT;
 
-				if (defined($OPTS{'dry-run'}))
+				if (opt('dry-run'))
 				{
 					if ($value == UP)
 					{
@@ -257,7 +257,7 @@ foreach (@$tlds_ref)
 
 			fail("no results found within incident: eventid:$eventid clock:$event_start") if ($test_results_count == 0);
 
-			if (defined($OPTS{'dry-run'}))
+			if (opt('dry-run'))
 			{
 				prnt(uc($service), " incident id:$eventid start:", ts_str($event_start), " end:" . ($event_end ? ts_str($event_end) : "ACTIVE") . " fp:$false_positive");
 				prnt(uc($service), " listing successful:$status_up failed:$status_down");
@@ -290,14 +290,12 @@ foreach (@$tlds_ref)
 
 						my ($ns, $ip) = split(',', $nsip);
 
-						dbg("  ", scalar(keys(%$endvalues_ref)), " values for $nsip:") if (defined($OPTS{'debug'}));
+						dbg("  ", scalar(keys(%$endvalues_ref)), " values for $nsip:") if (opt('debug'));
 
 						my $test_result_index = 0;
 
 						foreach my $clock (sort(keys(%$endvalues_ref))) # must be sorted by clock
 						{
-							#dbg(Dumper($endvalues_ref->{$clock})) if (defined($OPTS{'debug'}));
-
 							fail("no status of value (probe:$probe service:$service clock:$clock) found in the database") if ($clock < $test_results[$test_result_index]->{'start'});
 
 							# move to corresponding test result
@@ -339,7 +337,7 @@ foreach (@$tlds_ref)
 						}
 					}
 
-					if (defined($OPTS{'dry-run'}))
+					if (opt('dry-run'))
 					{
 						prnt_json($tr_ref);
 					}
@@ -356,7 +354,7 @@ foreach (@$tlds_ref)
 			{
 				my $values_ref = __get_rdds_test_values($rdds_dbl_items_ref, $rdds_str_items_ref, $values_from, $values_till);
 
-				dbg(Dumper($values_ref)) if (defined($OPTS{'debug'}));
+				dbg(Dumper($values_ref)) if (opt('debug'));
 
 				# run through values from probes (ordered by clock)
 				foreach my $probe (keys(%$values_ref))
@@ -369,13 +367,13 @@ foreach (@$tlds_ref)
 					{
 						my $endvalues_ref = $ports_ref->{$port};
 
-						dbg("  ", scalar(keys(%$endvalues_ref)), " values for $port:") if (defined($OPTS{'debug'}));
+						dbg("  ", scalar(keys(%$endvalues_ref)), " values for $port:") if (opt('debug'));
 
 						my $test_result_index = 0;
 
 						foreach my $clock (sort(keys(%$endvalues_ref))) # must be sorted by clock
 						{
-							#dbg(Dumper($endvalues_ref->{$clock}))if (defined($OPTS{'debug'}));
+							#dbg(Dumper($endvalues_ref->{$clock}))if (opt('debug'));
 
 							fail("no status of the value (probe:$probe service:$service clock:$clock) found in the database") if ($clock < $test_results[$test_result_index]->{'start'});
 
@@ -426,7 +424,7 @@ foreach (@$tlds_ref)
 						}
 					}
 
-					if (defined($OPTS{'dry-run'}))
+					if (opt('dry-run'))
 					{
 						prnt_json($tr_ref);
 					}
@@ -931,7 +929,7 @@ sub prnt_json
 {
 	my $tr_ref = shift;
 
-	if (defined($OPTS{'debug'}))
+	if (opt('debug'))
 	{
 		dbg(JSON->new->utf8(1)->pretty(1)->encode($tr_ref), "-----------------------------------------------------------");
 	}

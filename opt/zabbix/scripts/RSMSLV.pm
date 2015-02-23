@@ -56,7 +56,7 @@ our ($result, $dbh, $tld);
 
 our %OPTS; # specified command-line options
 
-our @EXPORT = qw($result $dbh $tld %OPTS
+our @EXPORT = qw($result $dbh $tld
 		SUCCESS FAIL UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR MIN_INFO_ERROR
 		MAX_INFO_ERROR RESULT_TIMESTAMP_SHIFT
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
@@ -73,7 +73,7 @@ our @EXPORT = qw($result $dbh $tld %OPTS
 		process_slv_monthly get_results get_item_values check_lastclock sql_time_condition get_incidents
 		get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
 		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
-		dbg info wrn fail slv_exit exit_if_running trim parse_opts ts_str usage);
+		dbg info wrn fail slv_exit exit_if_running trim parse_opts opt getopt setopt optkeys ts_str usage);
 
 # configuration, set in set_slv_config()
 my $config = undef;
@@ -1154,7 +1154,7 @@ sub push_value
 #
 sub send_values
 {
-	if (defined($OPTS{'debug'}) or defined($OPTS{'test'}))
+	if (opt('debug') or opt('test'))
 	{
 		# $tld is a global variable which is used in info()
 		my $saved_tld = $tld;
@@ -1302,7 +1302,7 @@ sub process_slv_ns_monthly
 
 	my $nsip_items_ref = get_nsip_items($nsips_ref, $cfg_key_in, $tld);
 
-	dbg("using filter '$cfg_key_in' found next name server items:\n", Dumper($nsip_items_ref)) if (defined($OPTS{'debug'}));
+	dbg("using filter '$cfg_key_in' found next name server items:\n", Dumper($nsip_items_ref)) if (opt('debug'));
 
 	my $cur_from = $from;
 	my ($interval, $cur_till);
@@ -1676,7 +1676,7 @@ sub check_lastclock
 	my $value_ts = shift;
 	my $interval = shift;
 
-	return SUCCESS if (defined($OPTS{'debug'}) or defined($OPTS{'test'}));
+	return SUCCESS if (opt('debug') or opt('test'));
 
 	if ($lastclock + $interval > $value_ts)
 	{
@@ -1809,7 +1809,7 @@ sub get_incidents
 			my $value = $row_ref->[2];
 			my $false_positive = $row_ref->[3];
 
-			dbg("pre-incident $eventid: clock:" . ts_str($clock) . " ($clock), value:$value, false_positive:$false_positive") if ($OPTS{'debug'});
+			dbg("pre-incident $eventid: clock:" . ts_str($clock) . " ($clock), value:$value, false_positive:$false_positive") if (opt('debug'));
 
 			# do not add 'value=TRIGGER_VALUE_TRUE' to SQL above just for corner case of 2 events at the same second
 			if ($value == TRIGGER_VALUE_TRUE)
@@ -1838,7 +1838,7 @@ sub get_incidents
 		my $value = $row_ref->[2];
 		my $false_positive = $row_ref->[3];
 
-		dbg("$eventid: clock:" . ts_str($clock) . " ($clock), value:$value, false_positive:$false_positive") if ($OPTS{'debug'});
+		dbg("$eventid: clock:" . ts_str($clock) . " ($clock), value:$value, false_positive:$false_positive") if (opt('debug'));
 
 		next if ($value == $last_trigger_value);
 
@@ -1859,7 +1859,7 @@ sub get_incidents
 	}
 
 	# DEBUG
-	if ($OPTS{'debug'})
+	if (opt('debug'))
 	{
 		foreach (@incidents)
 		{
@@ -2280,7 +2280,7 @@ sub slv_exit
 
 sub exit_if_running
 {
-	return if (defined($OPTS{'debug'}) or defined($OPTS{'test'}));
+	return if (opt('debug') or opt('test'));
 
 	my $filename = __get_pidfile();
 
@@ -2309,7 +2309,7 @@ sub exit_if_running
 
 sub dbg
 {
-	return unless (defined($OPTS{'debug'}));
+	return unless (opt('debug'));
 
 	__log('debug', join('', @_));
 }
@@ -2343,8 +2343,37 @@ sub trim
 
 sub parse_opts
 {
-	GetOptions(\%OPTS, "help!", "test!", "debug!", @_) or pod2usage(2);
-	pod2usage(1) if ($OPTS{'help'});
+	GetOptions(\%OPTS, 'help!', 'test!', 'debug!', @_) or pod2usage(2);
+	pod2usage(1) if (opt('help'));
+}
+
+sub opt
+{
+	my $key = shift;
+
+	return defined($OPTS{$key});
+}
+
+sub getopt
+{
+	my $key = shift;
+
+	return $OPTS{$key};
+}
+
+sub setopt
+{
+	my $key = shift;
+	my $value = shift;
+
+	$value = 1 unless (defined($value));
+
+	$OPTS{$key} = $value;
+}
+
+sub optkeys
+{
+	return keys(%OPTS);
 }
 
 sub ts_str
@@ -2418,7 +2447,7 @@ sub __log
 
 	my $cur_tld = $tld || "";
 
-	if (defined($OPTS{'debug'}) or defined($OPTS{'test'}))
+	if (opt('debug') or opt('test'))
 	{
 		print(ts_str(), " [$priority] ", ($cur_tld eq "" ? "" : "$cur_tld: "), __func(), "$msg\n");
 		return;

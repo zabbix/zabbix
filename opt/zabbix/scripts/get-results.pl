@@ -7,18 +7,18 @@ use lib '/opt/zabbix/scripts';
 use RSM;
 use RSMSLV;
 
-parse_opts("tld=s", "from=n", "till=n", "service=s");
+parse_opts('tld=s', 'from=n', 'till=n', 'service=s');
 
 # do not write any logs
-$OPTS{'test'} = 1;
+setopt('test');
 
-if (defined($OPTS{'debug'}))
+if (opt('debug'))
 {
 	dbg("command-line parameters:");
-	dbg("$_ => ", $OPTS{$_}) foreach (keys(%OPTS));
+	dbg("$_ => ", getopt($_)) foreach (optkeys());
 }
 
-unless (defined($OPTS{'service'}))
+unless (opt('service'))
 {
 	print("Option --service not specified\n");
 	usage(2);
@@ -30,8 +30,8 @@ db_connect();
 
 my ($key, $cfg_max_value, $service_type, $delay, $eomonth);
 
-my $from = $OPTS{'from'};
-my $till = $OPTS{'till'};
+my $from = getopt('from');
+my $till = getopt('till');
 my $value_ts = $till;
 
 # calculate estimated total number of tests this month unless at least one time bound specified
@@ -47,49 +47,49 @@ unless (defined($from) and defined($till))
 	$eomonth = $bounds[2];
 }
 
-if ($OPTS{'service'} eq 'tcp-dns-rtt')
+if (getopt('service') eq 'tcp-dns-rtt')
 {
 	$key = 'rsm.dns.tcp.rtt[{$RSM.TLD},';
 	$cfg_max_value = get_macro_dns_tcp_rtt_low();
 	$delay = get_macro_dns_tcp_delay() if ($calculate_month_total != 0);
 	$service_type = 'DNS';
 }
-elsif ($OPTS{'service'} eq 'udp-dns-rtt')
+elsif (getopt('service') eq 'udp-dns-rtt')
 {
 	$key = 'rsm.dns.udp.rtt[{$RSM.TLD},';
 	$cfg_max_value = get_macro_dns_udp_rtt_low();
 	$delay = get_macro_dns_udp_delay() if ($calculate_month_total != 0);
 	$service_type = 'DNS';
 }
-elsif ($OPTS{'service'} eq 'dns-upd')
+elsif (getopt('service') eq 'dns-upd')
 {
 	$key = 'rsm.dns.udp.upd[{$RSM.TLD},';
 	$cfg_max_value = get_macro_dns_update_time();
 	$delay = get_macro_dns_udp_delay() if ($calculate_month_total != 0);
 	$service_type = 'EPP';
 }
-elsif ($OPTS{'service'} eq 'rdds43-rtt')
+elsif (getopt('service') eq 'rdds43-rtt')
 {
 	$key = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
 	$cfg_max_value = get_macro_rdds_rtt_low();
 	$delay = get_macro_rdds_delay() if ($calculate_month_total != 0);
 	$service_type = 'RDDS';
 }
-elsif ($OPTS{'service'} eq 'rdds80-rtt')
+elsif (getopt('service') eq 'rdds80-rtt')
 {
 	$key = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
 	$cfg_max_value = get_macro_rdds_rtt_low();
 	$delay = get_macro_rdds_delay() if ($calculate_month_total != 0);
 	$service_type = 'RDDS';
 }
-elsif ($OPTS{'service'} eq 'rdds-upd')
+elsif (getopt('service') eq 'rdds-upd')
 {
 	$key = 'rsm.rdds.43.upd[{$RSM.TLD}]';
 	$cfg_max_value = get_macro_rdds_rtt_low();
 	$delay = get_macro_rdds_delay() if ($calculate_month_total != 0);
 	$service_type = 'EPP';
 }
-elsif ($OPTS{'service'} eq 'epp-login-rtt')
+elsif (getopt('service') eq 'epp-login-rtt')
 {
 	my $command = 'login';
 	$key = 'rsm.epp.rtt[{$RSM.TLD},' . $command . ']';
@@ -97,7 +97,7 @@ elsif ($OPTS{'service'} eq 'epp-login-rtt')
 	$delay = get_macro_epp_delay() if ($calculate_month_total != 0);
 	$service_type = 'EPP';
 }
-elsif ($OPTS{'service'} eq 'epp-info-rtt')
+elsif (getopt('service') eq 'epp-info-rtt')
 {
 	my $command = 'info';
 	$key = 'rsm.epp.rtt[{$RSM.TLD},' . $command . ']';
@@ -105,7 +105,7 @@ elsif ($OPTS{'service'} eq 'epp-info-rtt')
 	$delay = get_macro_epp_delay() if ($calculate_month_total != 0);
 	$service_type = 'EPP';
 }
-elsif ($OPTS{'service'} eq 'epp-update-rtt')
+elsif (getopt('service') eq 'epp-update-rtt')
 {
 	my $command = 'update';
 	$key = 'rsm.epp.rtt[{$RSM.TLD},' . $command . ']';
@@ -115,14 +115,14 @@ elsif ($OPTS{'service'} eq 'epp-update-rtt')
 }
 else
 {
-	print("Invalid name of service specified \"", $OPTS{'service'}, "\"\n");
+	print("Invalid service specified \"", getopt('service'), "\"\n");
 	usage(2);
 }
 
 my $probe_avail_limit = get_macro_probe_avail_limit();
 my $probes_ref = get_probes($service_type);
 my $probe_times_ref = get_probe_times($from, $till, $probe_avail_limit, $probes_ref);
-my $tlds_ref = defined($OPTS{'tld'}) ? [ $OPTS{'tld'} ] : get_tlds($service_type);
+my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds($service_type);
 
 foreach (@$tlds_ref)
 {

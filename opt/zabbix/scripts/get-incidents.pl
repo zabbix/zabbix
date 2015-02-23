@@ -9,22 +9,22 @@ use RSMSLV;
 parse_opts("tld=s", "from=n", "till=n");
 
 # do not write any logs
-$OPTS{'test'} = 1;
+setopt('test');
 
-if (defined($OPTS{'debug'}))
+if (opt('debug'))
 {
 	dbg("command-line parameters:");
-	dbg("$_ => ", $OPTS{$_}) foreach (keys(%OPTS));
+	dbg("$_ => ", getopt($_)) foreach (optkeys());
 }
 
 set_slv_config(get_rsm_config());
 
 db_connect();
 
-my $from = $OPTS{'from'};
-my $till = $OPTS{'till'};
+my $from = getopt('from');
+my $till = getopt('till');
 
-my $tlds_ref = defined($OPTS{'tld'}) ? [ $OPTS{'tld'} ] : get_tlds();
+my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds();
 
 foreach (@$tlds_ref)
 {
