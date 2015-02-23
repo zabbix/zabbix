@@ -223,7 +223,6 @@ unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;	/* not used 
 char	*CONFIG_TLS_CONNECT		= NULL; /* not used in server, just for linking with tls.c */
 char	*CONFIG_TLS_ACCEPT		= NULL; /* not used in server, just for linking with tls.c */
 char	*CONFIG_TLS_CA_FILE		= NULL;
-char	*CONFIG_TLS_CA_PATH		= NULL;
 char	*CONFIG_TLS_CRL_FILE		= NULL;
 char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
@@ -597,8 +596,6 @@ static void	zbx_load_config(void)
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		{"TLSCaFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCaPath",			&CONFIG_TLS_CA_PATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCrlFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},

@@ -47,7 +47,6 @@ extern unsigned int	configured_tls_accept_modes;
 extern char	*CONFIG_TLS_CONNECT;
 extern char	*CONFIG_TLS_ACCEPT;
 extern char	*CONFIG_TLS_CA_FILE;
-extern char	*CONFIG_TLS_CA_PATH;
 extern char	*CONFIG_TLS_CRL_FILE;
 extern char	*CONFIG_TLS_CERT_FILE;
 extern char	*CONFIG_TLS_KEY_FILE;

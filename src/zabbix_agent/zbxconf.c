@@ -67,7 +67,6 @@ unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;
 char	*CONFIG_TLS_CONNECT		= NULL;
 char	*CONFIG_TLS_ACCEPT		= NULL;
 char	*CONFIG_TLS_CA_FILE		= NULL;
-char	*CONFIG_TLS_CA_PATH		= NULL;
 char	*CONFIG_TLS_CRL_FILE		= NULL;
 char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;

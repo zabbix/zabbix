@@ -716,8 +716,6 @@ static void	zbx_load_config(int requirement)
 			PARM_OPT,	0,			0},
 		{"TLSCaFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCaPath",			&CONFIG_TLS_CA_PATH,			TYPE_STRING,
-			PARM_OPT,	0,			0},
 		{"TLSCrlFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCertFile",			&CONFIG_TLS_CERT_FILE,			TYPE_STRING,
