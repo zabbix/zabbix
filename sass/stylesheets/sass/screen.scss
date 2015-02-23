@@ -1480,9 +1480,9 @@ a.grey {
 
 %close-icon {
 	display: block;
-	width: 24px;
-	height: 24px;
-	line-height: 24px;
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
 	text-align: center;
 	color: $font-alt-color;
 	font-size: $font-h2-size;
@@ -1504,12 +1504,11 @@ a.grey {
 }
 
 .overlay-close-btn {
-	//position: absolute;
-	//top: 0;
-	//right: 0;
-	color: $font-alt-color;
-	float: right;
-	margin: -5px -5px;
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	//float: right;
+	//margin: -5px -5px;
 	@extend %close-icon;
 }
 
@@ -1519,6 +1518,10 @@ a.overlay-close-btn {
 
 .form-remove-btn {
 	@extend %close-icon;
+}
+
+a.form-remove-btn {
+	@extend .form-remove-btn;
 }
 
 .subfilter-disable-btn {
