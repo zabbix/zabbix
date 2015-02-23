@@ -32,7 +32,7 @@ const char	syslog_app_name[] = "zabbix_get";
 const char	*usage_message[] = {
 	"-s host-name-or-IP [-p port-number] [-I IP-address] -k item-key",
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"-s host-name-or-IP [-p port-number] [-I IP-address] --tls-connect=cert (--tls-ca-file=ca_file | --tls-ca-path=ca_path) [--tls-crl-file=crl_file] --tls-cert-file=cert_file --tls-key-file=key_file -k item-key",
+	"-s host-name-or-IP [-p port-number] [-I IP-address] --tls-connect=cert --tls-ca-file=ca_file [--tls-crl-file=crl_file] --tls-cert-file=cert_file --tls-key-file=key_file -k item-key",
 	"-s host-name-or-IP [-p port-number] [-I IP-address] --tls-connect=psk --tls-psk-identity=psk_identity --tls-psk-file=psk_file -k item-key",
 #endif
 	"-h",
@@ -65,8 +65,6 @@ const char	*help_message[] = {
 	"  --tls-ca-file                      Full pathname of a file containing the top-level CA(s) certificates for",
 	"                                     peer certificate verification",
 	"",
-	"  --tls-ca-path                      Full path of a directory containing the top-level CA(s) certificates for",
-	"                                     peer certificate verification. Overrides '--tls-ca-file' parameter",
 	"  --tls-crl-file                     Full pathname of a file containing revoked certificates",
 	"",
 	"  --tls-cert-file                    Full pathname of a file containing the certificate or certificate chain",
@@ -101,7 +99,6 @@ unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;	/* not used 
 char	*CONFIG_TLS_CONNECT		= NULL;
 char	*CONFIG_TLS_ACCEPT		= NULL;	/* not used in zabbix_get, just for linking with tls.c */
 char	*CONFIG_TLS_CA_FILE		= NULL;
-char	*CONFIG_TLS_CA_PATH		= NULL;
 char	*CONFIG_TLS_CRL_FILE		= NULL;
 char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
@@ -121,7 +118,6 @@ struct zbx_option	longopts[] =
 	{"version",		0,	NULL,	'V'},
 	{"tls-connect",		1,	NULL,	'1'},
 	{"tls-ca-file",		1,	NULL,	'2'},
-	{"tls-ca-path",		1,	NULL,	'3'},
 	{"tls-crl-file",	1,	NULL,	'4'},
 	{"tls-cert-file",	1,	NULL,	'5'},
 	{"tls-key-file",	1,	NULL,	'6'},
@@ -290,9 +286,6 @@ int	main(int argc, char **argv)
 			case '2':
 				CONFIG_TLS_CA_FILE = zbx_strdup(CONFIG_TLS_CA_FILE, zbx_optarg);
 				break;
-			case '3':
-				CONFIG_TLS_CA_PATH = zbx_strdup(CONFIG_TLS_CA_PATH, zbx_optarg);
-				break;
 			case '4':
 				CONFIG_TLS_CRL_FILE = zbx_strdup(CONFIG_TLS_CRL_FILE, zbx_optarg);
 				break;
@@ -311,7 +304,6 @@ int	main(int argc, char **argv)
 #else
 			case '1':
 			case '2':
-			case '3':
 			case '4':
 			case '5':
 			case '6':
@@ -371,8 +363,8 @@ int	main(int argc, char **argv)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 #else
-	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CA_PATH ||
-			NULL != CONFIG_TLS_CRL_FILE || NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
+	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
+			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
 			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
 	{
 		zbx_error("TLS parameters cannot be used: 'zabbix_get' was compiled without TLS support.");

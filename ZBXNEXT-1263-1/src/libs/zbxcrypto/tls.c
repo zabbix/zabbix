@@ -57,7 +57,6 @@ extern unsigned char	process_type, program_type;
 extern char		*CONFIG_TLS_CONNECT;
 extern char		*CONFIG_TLS_ACCEPT;
 extern char		*CONFIG_TLS_CA_FILE;
-extern char		*CONFIG_TLS_CA_PATH;
 extern char		*CONFIG_TLS_CRL_FILE;
 extern char		*CONFIG_TLS_CERT_FILE;
 extern char		*CONFIG_TLS_KEY_FILE;
@@ -714,54 +713,8 @@ void	zbx_tls_init_child(void)
 		zbx_free(s);
 	}
 
-	/* 'TLSCaPath' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
-	/* Try to configure the CA path first, it overrides the CA file parameter. */
-	if (NULL != CONFIG_TLS_CA_PATH && '\0' != *CONFIG_TLS_CA_PATH)
-	{
-		ca_cert = zbx_malloc(ca_cert, sizeof(x509_crt));
-		x509_crt_init(ca_cert);
-
-		if (0 != (res = x509_crt_parse_path(ca_cert, CONFIG_TLS_CA_PATH)))
-		{
-			if (0 > res)
-			{
-				zbx_tls_error_msg(res, "", &err_msg);
-				zabbix_log(LOG_LEVEL_CRIT, "cannot parse CA certificate(s) in directory \"%s\": %s",
-						CONFIG_TLS_CA_PATH, err_msg);
-				zbx_free(err_msg);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "cannot parse %d CA certificate(s) in directory \"%s\"", res,
-						CONFIG_TLS_CA_PATH);
-			}
-
-			zbx_tls_free();
-			exit(EXIT_FAILURE);
-		}
-
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		{
-			/* x509_crt_info() uses a fixed buffer and there is no way to know how large this buffer */
-			/* should be to accumulate all info. */
-			if (-1 != x509_crt_info(work_buf, sizeof(work_buf), "", ca_cert))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded CA certificate(s) from directory"
-						" (output may be truncated):\n%s", __function_name, work_buf);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot print CA certificate(s) info",
-						__function_name);
-				zbx_tls_free();
-				exit(EXIT_FAILURE);
-			}
-		}
-	}
-
 	/* 'TLSCaFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
-	/* Load CA file if CA path is not configured. */
-	if (NULL == ca_cert && NULL != CONFIG_TLS_CA_FILE && '\0' != *CONFIG_TLS_CA_FILE)
+	if (NULL != CONFIG_TLS_CA_FILE && '\0' != *CONFIG_TLS_CA_FILE)
 	{
 		ca_cert = zbx_malloc(ca_cert, sizeof(x509_crt));
 		x509_crt_init(ca_cert);

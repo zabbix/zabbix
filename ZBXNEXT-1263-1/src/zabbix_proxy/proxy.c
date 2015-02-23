@@ -226,7 +226,6 @@ unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;
 char	*CONFIG_TLS_CONNECT		= NULL;
 char	*CONFIG_TLS_ACCEPT		= NULL;
 char	*CONFIG_TLS_CA_FILE		= NULL;
-char	*CONFIG_TLS_CA_PATH		= NULL;
 char	*CONFIG_TLS_CRL_FILE		= NULL;
 char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
@@ -634,8 +633,6 @@ static void	zbx_load_config(void)
 		{"TLSAccept",			&CONFIG_TLS_ACCEPT,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"TLSCaFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"TLSCaPath",			&CONFIG_TLS_CA_PATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCrlFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
