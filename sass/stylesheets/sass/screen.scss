@@ -827,6 +827,45 @@ button {
 		}
 	}
 
+	&.btn-add-fav {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat -49px -1px;
+		@extend %button-icon-size;
+		
+		&:hover {
+			@extend %button-hover;
+		}
+
+		&:active {
+			@extend %button-active;
+		}
+	}
+
+	&.btn-remove-fav {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat -49px -25px;
+		@extend %button-icon-size;
+		
+		&:hover {
+			@extend %button-hover;
+		}
+
+		&:active {
+			@extend %button-active;
+		}
+	}
+
+	&.btn-action {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat -49px -49px;
+		@extend %button-icon-size;
+		
+		&:hover {
+			@extend %button-hover;
+		}
+
+		&:active {
+			@extend %button-active;
+		}
+	}
+
 
 	&.btn-search {
 		background: darken($primary-color, 10%) url(../img/icon-sprite.png) no-repeat 1px -1px;
@@ -1328,6 +1367,12 @@ button[disabled] {
 		margin: -7px -15px 6px -15px;
 		padding: 12px 10px 8px 15px;
 	}
+
+	.maps-container {
+		max-height: 128px;
+		overflow-y: auto;
+		margin-left: -10px;
+	}
 }
 
 .pop-up {
@@ -1476,6 +1521,20 @@ a.grey {
 	@include border-radius(2px);
 }
 
+.msg-bad-global {
+	position: fixed;
+	bottom: 0;
+	z-index: 10000;
+	width: 100%;
+	padding: 10px 12px;
+	text-align: center;
+	color: $font-white-color;
+	font-size: $font-top-nav-size;
+	border-top: 1px solid darken($alert-disaster-bg-color, 3%);
+	@include box-shadow(-1px 0 2px 0 rgba(60,60,60,0.5));
+	@extend .disaster-bg;
+}
+
 /* Close/Remove icon */
 
 %close-icon {
@@ -1507,8 +1566,6 @@ a.grey {
 	position: absolute;
 	top: 2px;
 	right: 2px;
-	//float: right;
-	//margin: -5px -5px;
 	@extend %close-icon;
 }
 
