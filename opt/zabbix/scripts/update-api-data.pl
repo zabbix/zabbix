@@ -88,6 +88,8 @@ if (exists($services_hash{'epp'}))
 my $from = getopt('from');
 my $till = getopt('till');
 
+my $now = time();
+
 my $tlds_ref;
 if (opt('tld'))
 {
@@ -100,7 +102,7 @@ else
 	$tlds_ref = get_tlds();
 }
 
-prnt("selected period: ", selected_period($from, $till)) if (opt('dry-run') or opt('debug'));
+__prnt("selected period: ", __selected_period($from, $till), ' (now:', ts_str($now), " ($now))") if (opt('dry-run') or opt('debug'));
 
 foreach (@$tlds_ref)
 {
@@ -112,7 +114,7 @@ foreach (@$tlds_ref)
 		{
 			if (opt('dry-run'))
 			{
-				prnt(uc($service), " DISABLED");
+				__prnt(uc($service), " DISABLED");
 			}
 			else
 			{
@@ -137,7 +139,7 @@ foreach (@$tlds_ref)
 
 		if (opt('dry-run'))
 		{
-			prnt(uc($service), " service availability $downtime (", ts_str($clock), ")");
+			__prnt(uc($service), " service availability $downtime (", ts_str($clock), ")");
 		}
 		else
 		{
@@ -147,8 +149,9 @@ foreach (@$tlds_ref)
 			}
 		}
 
+		dbg("getting current $service availability");
+
 		# get availability
-		my $now = time();
 		my $incidents = get_incidents($avail_itemid, $now);
 
 		my $alarmed_status = AH_ALARMED_NO;
@@ -162,7 +165,7 @@ foreach (@$tlds_ref)
 
 		if (opt('dry-run'))
 		{
-			prnt(uc($service), " alarmed:$alarmed_status");
+			__prnt(uc($service), " alarmed:$alarmed_status");
 		}
 		else
 		{
@@ -200,11 +203,21 @@ foreach (@$tlds_ref)
 			my $event_end = $_->{'end'};
 			my $false_positive = $_->{'false_positive'};
 
-			my $start = undef;
-			my $end = undef;
+			my $start = $event_start;
+			my $end = $event_end;
 
-			$start = $from if (defined($from) and $event_start < $from);
-			$end = $till if (defined($till) and not defined($event_end));
+			if (defined($from) and $from > $event_start)
+			{
+				$start = $from;
+			}
+
+			if (defined($till))
+			{
+				if (not defined($event_end) or (defined($event_end) and $till < $event_end))
+				{
+					$end = $till;
+				}
+			}
 
 			# get results within incidents
 			my $rows_ref = db_select(
@@ -259,8 +272,8 @@ foreach (@$tlds_ref)
 
 			if (opt('dry-run'))
 			{
-				prnt(uc($service), " incident id:$eventid start:", ts_str($event_start), " end:" . ($event_end ? ts_str($event_end) : "ACTIVE") . " fp:$false_positive");
-				prnt(uc($service), " listing successful:$status_up failed:$status_down");
+				__prnt(uc($service), " incident id:$eventid start:", ts_str($event_start), " end:" . ($event_end ? ts_str($event_end) : "ACTIVE") . " fp:$false_positive");
+				__prnt(uc($service), " listing successful:$status_up failed:$status_down");
 			}
 			else
 			{
@@ -339,7 +352,7 @@ foreach (@$tlds_ref)
 
 					if (opt('dry-run'))
 					{
-						prnt_json($tr_ref);
+						__prnt_json($tr_ref);
 					}
 					else
 					{
@@ -426,7 +439,7 @@ foreach (@$tlds_ref)
 
 					if (opt('dry-run'))
 					{
-						prnt_json($tr_ref);
+						__prnt_json($tr_ref);
 					}
 					else
 					{
@@ -920,12 +933,12 @@ sub __get_probe_statuses
 	return \%result;
 }
 
-sub prnt
+sub __prnt
 {
 	print((defined($tld) ? "$tld: " : ''), join('', @_), "\n");
 }
 
-sub prnt_json
+sub __prnt_json
 {
 	my $tr_ref = shift;
 
@@ -935,11 +948,11 @@ sub prnt_json
 	}
 	else
 	{
-		prnt(ts_str($tr_ref->{'clock'}), " ", $tr_ref->{'status'});
+		__prnt(ts_str($tr_ref->{'clock'}), " ", $tr_ref->{'status'});
 	}
 }
 
-sub selected_period
+sub __selected_period
 {
 	my $from = shift;
 	my $till = shift;
@@ -948,7 +961,7 @@ sub selected_period
 	return "from " . ts_str($from) if ($from and !$till);
 	return "from " . ts_str($from) . " till " . ts_str($till) if ($from and $till);
 
-	return "eternity";
+	return "any time";
 }
 
 __END__
