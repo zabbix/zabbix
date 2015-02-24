@@ -67,6 +67,7 @@ Changes for 2.4.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-8875] fixed undefined index in screens with dynamic graph prototype and simple graph prototype elements when host is not selected (Ivo)
 ..F....... [ZBX-9203] fixed host scripts menu popup not properly displaying script name when name contains HTML tags (Ivo)
 
 --------------------------------------------------------------------------------
