@@ -632,6 +632,7 @@ static int	zbx_psk_hex2bin(const unsigned char *p_hex, unsigned char *buf, int b
  *                                                                            *
  * Comments:                                                                  *
  *     A callback function, its arguments are defined in PolarSSL.            *
+ *     Used only in server and proxy.                                         *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_psk_callback(void *par, ssl_context *tls_ctx, const unsigned char *psk_identity,
@@ -713,6 +714,93 @@ static int	zbx_psk_callback(void *par, ssl_context *tls_ctx, const unsigned char
 	}
 
 	return -1;
+}
+#elif defined(HAVE_GNUTLS)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_psk_callback                                                 *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *    find and set the requested pre-shared key upon GnuTLS request           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     session      - [IN] not used                                           *
+ *     psk_identity - [IN] PSK identity for which the PSK should be searched  *
+ *                         and set                                            *
+ *     key          - [OUT pre-shared key allocated and set                   *
+ *                                                                            *
+ * Return value:                                                              *
+ *      0  - required PSK successfully found and set                          *
+ *     -1 - an error occurred.                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     A callback function, its arguments are defined in GnuTLS.              *
+ *     Used in all programs accepting connections.                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_psk_callback(gnutls_session_t session, const char *psk_identity, gnutls_datum_t *key)
+{
+	const char	*__function_name = "zbx_psk_callback";
+	char		*psk;
+	size_t		psk_len = 0;
+	int		psk_bin_len;
+	unsigned char	tls_psk_hex[HOST_TLS_PSK_LEN_MAX], psk_buf[HOST_TLS_PSK_LEN/2];
+
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): requested PSK-identity: \"%s\"", __function_name, psk_identity);
+
+	/* try PSK from configuration file first (it is already in binary form) */
+
+	if (0 < my_psk_identity_len && 0 == strcmp(my_psk_identity, psk_identity))
+	{
+		psk = my_psk;
+		psk_len = my_psk_len;
+	}
+	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_SERVER)))
+	{
+		/* search the required PSK in configuration cache */
+
+		/* call the function DCget_psk_by_identity() by pointer */
+		if (0 < find_psk_in_cache((const unsigned char *)psk_identity, tls_psk_hex, HOST_TLS_PSK_LEN_MAX))
+		{
+			/* convert PSK to binary form */
+			if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
+			{
+				/* this should have been prevented by validation in frontend or API */
+				zabbix_log(LOG_LEVEL_WARNING, "cannot convert PSK to binary form for PSK identity "
+						"\"%s\"", psk_identity);
+				return -1;	/* fail */
+			}
+
+			psk = (char *)psk_buf;
+			psk_len = (size_t)psk_bin_len;
+		}
+		else
+		{
+			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find requested PSK-identity: \"%s\"",
+						__function_name, psk_identity);
+			}
+		}
+	}
+
+	if (0 < psk_len)
+	{
+		if (NULL == (key->data = gnutls_malloc(psk_len)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot allocate %zu bytes of memory for PSK with identity "
+					"\"%s\"", psk_len, psk_identity);
+			return -1;	/* fail */
+		}
+
+		memcpy(key->data, psk, psk_len);
+		key->size = (unsigned int)psk_len;
+
+		return 0;	/* success */
+	}
+
+	return -1;	/* PSK not found */
 }
 #endif
 
@@ -1161,34 +1249,11 @@ void	zbx_tls_init_child(void)
 	}
 
 	/* 'TLSPskIdentity' and 'TLSPskFile' parameters used in zabbix_proxy.conf, zabbix_agentd.conf, */
-	/* zabbix_agent.conf). Load pre-shared key and identity to be used with the pre-shared key. */
+	/* zabbix_agent.conf. Load pre-shared key and identity to be used with the pre-shared key. */
 
 	if (NULL != CONFIG_TLS_PSK_FILE)
 	{
 		gnutls_datum_t	key;
-
-		/* allocate here only PSK credential stores which do not change (e.g. for proxy communication with */
-		/* server) */
-
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_AGENTD |
-				ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)) &&
-				0 != (res = gnutls_psk_allocate_client_credentials(&my_psk_client_creds)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "gnutls_psk_allocate_client_credentials() failed: %d: %s",
-					res, gnutls_strerror(res));
-			zbx_tls_free();
-			exit(EXIT_FAILURE);
-		}
-
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_PASSIVE | ZBX_PROGRAM_TYPE_AGENTD |
-				ZBX_PROGRAM_TYPE_AGENT)) &&
-				0 != (res = gnutls_psk_allocate_server_credentials(&my_psk_server_creds)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "gnutls_psk_allocate_server_credentials() failed: %d: %s", res,
-					gnutls_strerror(res));
-			zbx_tls_free();
-			exit(EXIT_FAILURE);
-		}
 
 		/* PSK identity must be a valid UTF-8 string (RFC4279 says Unicode) */
 		if (SUCCEED != zbx_is_utf8(CONFIG_TLS_PSK_IDENTITY))
@@ -1207,18 +1272,47 @@ void	zbx_tls_init_child(void)
 		key.data = (unsigned char *)my_psk;
 		key.size = (unsigned int)my_psk_len;
 
+		/* allocate here only PSK credential stores which do not change (e.g. for proxy communication with */
+		/* server) */
+
 		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_AGENTD |
 				ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)))
 		{
+			if (0 != (res = gnutls_psk_allocate_client_credentials(&my_psk_client_creds)))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "gnutls_psk_allocate_client_credentials() failed: %d: %s",
+						res, gnutls_strerror(res));
+				zbx_tls_free();
+				exit(EXIT_FAILURE);
+			}
+
 			/* TODO docs say 'my_psk_identity' should be prepared with "SASLprep" profile of "stringprep" */
 			if (GNUTLS_E_SUCCESS != (res = gnutls_psk_set_client_credentials(my_psk_client_creds,
-				my_psk_identity, &key, GNUTLS_PSK_KEY_RAW)))
+					my_psk_identity, &key, GNUTLS_PSK_KEY_RAW)))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "gnutls_psk_set_client_credentials() failed: %d: %s", res,
 						gnutls_strerror(res));
 				zbx_tls_free();
 				exit(EXIT_FAILURE);
 			}
+		}
+
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_PASSIVE | ZBX_PROGRAM_TYPE_AGENTD |
+				ZBX_PROGRAM_TYPE_AGENT)))
+		{
+			if (0 != (res = gnutls_psk_allocate_server_credentials(&my_psk_server_creds)))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "gnutls_psk_allocate_server_credentials() failed: %d: %s",
+						res, gnutls_strerror(res));
+				zbx_tls_free();
+				exit(EXIT_FAILURE);
+			}
+
+			/* Apparently GnuTLS does not provide API for setting up static server credentials (with a */
+			/* fixed PSK identity and key) for a passive proxy, agent and agentd. The only possibility */
+			/* seems to set up credentials dynamically for each incoming connection using a callback */
+			/* function. */
+			gnutls_psk_set_server_credentials_function(my_psk_server_creds, zbx_psk_callback);
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded pre-shared key and identity", __function_name);
