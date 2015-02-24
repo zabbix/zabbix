@@ -1,3 +1,16 @@
+Changes for 2.4.5rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-9203] fixed host scripts menu popup not properly displaying script name when name contains HTML tags (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.4
+
+2.4.4rc1 was released as 2.4.4 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.4.4rc1
 
 New features:
