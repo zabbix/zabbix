@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-28 12:40+0200\n"
+"POT-Creation-Date: 2015-02-11 23:03+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1378,7 +1378,7 @@ msgstr ""
 msgid "Cannot add regular expression"
 msgstr ""
 
-#: screenconf.php:172
+#: screenconf.php:169
 msgid "Cannot add screen"
 msgstr "스크린을 추가할 수 없습니다"
 
@@ -1649,7 +1649,7 @@ msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] ""
 
-#: screenconf.php:225
+#: screenconf.php:222
 msgid "Cannot delete screen"
 msgstr ""
 
@@ -2443,7 +2443,7 @@ msgstr ""
 msgid "Cannot update regular expression"
 msgstr ""
 
-#: screenconf.php:151
+#: screenconf.php:148
 msgid "Cannot update screen"
 msgstr "스크린을 갱신할 수 없습니다"
 
@@ -2521,11 +2521,11 @@ msgstr ""
 msgid "Case sensitive"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:797
+#: include/classes/items/CHelpItems.php:805
 msgid "Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:793
+#: include/classes/items/CHelpItems.php:801
 msgid "Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface."
 msgstr ""
 
@@ -2842,7 +2842,7 @@ msgstr "조건"
 msgid "Configuration"
 msgstr "설정"
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:871
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr ""
 
@@ -3482,7 +3482,7 @@ msgstr "파선"
 msgid "Data"
 msgstr "데이터"
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:907
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
@@ -10224,19 +10224,19 @@ msgstr ""
 msgid "Number of items (monitored/disabled/not supported)"
 msgstr "아이템 수(감시/미감시/취득불가)"
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:843
 msgid "Number of items in Zabbix database."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:863
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:867
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:839
 msgid "Number of monitored hosts"
 msgstr ""
 
@@ -10253,7 +10253,7 @@ msgstr ""
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:707
+#: include/classes/items/CHelpItems.php:711
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -10301,11 +10301,11 @@ msgstr ""
 msgid "Number of triggers (enabled/disabled) [problem/ok]"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:887
 msgid "Number of triggers in Zabbix database."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:847
 msgid "Number of unsupported items in Zabbix database."
 msgstr ""
 
@@ -10318,35 +10318,35 @@ msgstr "사용자 수 (온라인)"
 msgid "Number of users connected. Command who is used on agent side."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:815
 msgid "Number of values stored in table HISTORY."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:819
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:823
 msgid "Number of values stored in table HISTORY_STR."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:827
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:831
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:879
 msgid "Number of values stored in table TRENDS."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:883
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:699
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -11630,7 +11630,7 @@ msgstr ""
 msgid "Required performance (vps)"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:875
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr ""
 
@@ -11750,7 +11750,7 @@ msgstr "재실행"
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:835
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr ""
 
@@ -11764,7 +11764,7 @@ msgstr ""
 msgid "Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:851
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr ""
 
@@ -12174,7 +12174,7 @@ msgstr ""
 msgid "Screen \"%1$s\" updated."
 msgstr ""
 
-#: screenconf.php:172
+#: screenconf.php:169
 msgid "Screen added"
 msgstr "스크린을 추가하였습니다"
 
@@ -12182,7 +12182,7 @@ msgstr "스크린을 추가하였습니다"
 msgid "Screen cell configuration"
 msgstr "스크린 셀 설정"
 
-#: screenconf.php:225
+#: screenconf.php:222
 msgid "Screen deleted"
 msgstr "스크린을 삭제하였습니다"
 
@@ -12190,7 +12190,7 @@ msgstr "스크린을 삭제하였습니다"
 msgid "Screen should contain at least one row and column."
 msgstr ""
 
-#: screenconf.php:151
+#: screenconf.php:148
 msgid "Screen updated"
 msgstr "스크린을 갱신하였습니다"
 
@@ -12875,7 +12875,7 @@ msgstr ""
 msgid "Start in"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:811
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr ""
 
@@ -13491,11 +13491,11 @@ msgstr ""
 msgid "Time (descending)"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:855
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:859
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr ""
 
@@ -14351,7 +14351,7 @@ msgstr ""
 msgid "Uptime"
 msgstr "가동 시간"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:891
 msgid "Uptime of Zabbix server process in seconds."
 msgstr ""
 
@@ -14562,7 +14562,7 @@ msgstr "사용자 (온라인)"
 msgid "Users unblocked"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:903
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr ""
 
@@ -14610,6 +14610,10 @@ msgstr ""
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr ""
 
+#: include/classes/items/CHelpItems.php:683
+msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
@@ -14622,7 +14626,7 @@ msgstr ""
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:683
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -14630,7 +14634,7 @@ msgstr ""
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -14642,7 +14646,7 @@ msgstr ""
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:695
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -14650,91 +14654,95 @@ msgstr ""
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:703
 msgid "VMware service version, <url> - VMware service URL"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:723
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:771
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:723
+#: include/classes/items/CHelpItems.php:727
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:779
+#: include/classes/items/CHelpItems.php:787
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:783
+#: include/classes/items/CHelpItems.php:791
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:795
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:743
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:747
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:719
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:703
+#: include/classes/items/CHelpItems.php:707
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:755
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:759
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:759
-msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
-
-#: include/classes/items/CHelpItems.php:727
-msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
-
-#: include/classes/items/CHelpItems.php:711
-msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
-
-#: include/classes/items/CHelpItems.php:731
-msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
-
-#: include/classes/items/CHelpItems.php:735
-msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
-
-#: include/classes/items/CHelpItems.php:747
-msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+#: include/classes/items/CHelpItems.php:763
+msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:767
-msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:771
-msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+#: include/classes/items/CHelpItems.php:731
+msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:715
+msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:735
+msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:739
+msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:751
+msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:775
+msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:779
+msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:783
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -14794,11 +14802,11 @@ msgstr ""
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:899
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:895
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr ""
 
