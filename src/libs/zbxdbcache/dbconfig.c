@@ -4172,7 +4172,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr,
 	return SUCCEED;
 }
 
-#if defined(HAVE_POLARSSL)
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: DCget_psk_by_identity                                            *

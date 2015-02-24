@@ -33,6 +33,7 @@
 #	include <polarssl/debug.h>
 #elif defined(HAVE_GNUTLS)
 #	include <gnutls/gnutls.h>
+#	include <gnutls/x509.h>
 #elif defined(HAVE_OPENSSL)
 #	include <openssl/ssl.h>
 #endif
@@ -62,6 +63,16 @@ extern char		*CONFIG_TLS_CERT_FILE;
 extern char		*CONFIG_TLS_KEY_FILE;
 extern char		*CONFIG_TLS_PSK_FILE;
 extern char		*CONFIG_TLS_PSK_IDENTITY;
+
+static char		*my_psk			= NULL;
+static size_t		my_psk_len		= 0;
+static char		*my_psk_identity	= NULL;
+static size_t		my_psk_identity_len	= 0;
+
+/* Pointer to DCget_psk_by_identity() initialized at runtime. This is a workaround for linking. */
+/* Server and proxy link with src/libs/zbxdbcache/dbconfig.o where DCget_psk_by_identity() resides */
+/* but other components (e.g. agent) do not link dbconfig.o. */
+size_t			(*find_psk_in_cache)(const unsigned char *, unsigned char *, size_t) = NULL;
 #endif
 
 #if defined(HAVE_POLARSSL)
@@ -69,10 +80,6 @@ static x509_crt		*ca_cert		= NULL;
 static x509_crl		*crl			= NULL;
 static x509_crt		*my_cert		= NULL;
 static pk_context	*my_priv_key		= NULL;
-static char		*my_psk			= NULL;
-static size_t		my_psk_len		= 0;
-static char		*my_psk_identity	= NULL;
-static size_t		my_psk_identity_len	= 0;
 static entropy_context	*entropy		= NULL;
 static ctr_drbg_context	*ctr_drbg		= NULL;
 static char		*err_msg		= NULL;
@@ -80,10 +87,10 @@ static int		*ciphersuites_cert	= NULL;
 static int		*ciphersuites_psk	= NULL;
 static int		*ciphersuites_all	= NULL;
 static char		work_buf[SSL_MAX_CONTENT_LEN + 1];
-/* Pointer to DCget_psk_by_identity() initialized at runtime. This is a workaround for linking. */
-/* Server and proxy link with src/libs/zbxdbcache/dbconfig.o where DCget_psk_by_identity() resides */
-/* but other components (e.g. agent) do not link dbconfig.o. */
-size_t			(*find_psk_in_cache)(const unsigned char *, unsigned char *, size_t) = NULL;
+#elif defined(HAVE_GNUTLS)
+static gnutls_certificate_credentials_t	my_cert_creds		= NULL;
+static gnutls_psk_client_credentials_t	my_psk_client_creds	= NULL;
+static gnutls_psk_server_credentials_t	my_psk_server_creds	= NULL;
 #endif
 
 #if defined(HAVE_POLARSSL)
@@ -153,7 +160,33 @@ static void	zbx_tls_error_msg(int error_code, const char *msg, char **error)
 }
 #endif
 
-#if defined(HAVE_POLARSSL)
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_parameter_not_empty                                          *
+ *                                                                            *
+ * Purpose: enforce if a configuration parameter is defined it must not be    *
+ *          empty                                                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_parameter_not_empty(const char *param, const char *param_name)
+{
+	if (NULL != param)
+	{
+		while ('\0' != *param)
+		{
+			if (0 == isspace(*param++))
+				return;
+		}
+
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"%s\" is defined but empty", param_name);
+		zbx_tls_free();
+		exit(EXIT_FAILURE);
+	}
+}
+#endif
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_validate_config                                          *
@@ -163,41 +196,105 @@ static void	zbx_tls_error_msg(int error_code, const char *msg, char **error)
  ******************************************************************************/
 static void	zbx_tls_validate_config(void)
 {
+	/* parse and validate 'TLSConnect' parameter used in zabbix_proxy.conf, zabbix_agentd.conf */
+
+	zbx_parameter_not_empty(CONFIG_TLS_CONNECT, "TLSConnect");
+
+	if (NULL != CONFIG_TLS_CONNECT)
+	{
+		if (0 == strcmp(CONFIG_TLS_CONNECT, ZBX_TCP_SEC_UNENCRYPTED_TXT))
+			configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
+		else if (0 == strcmp(CONFIG_TLS_CONNECT, ZBX_TCP_SEC_TLS_CERT_TXT))
+			configured_tls_connect_mode = ZBX_TCP_SEC_TLS_CERT;
+		else if (0 == strcmp(CONFIG_TLS_CONNECT, ZBX_TCP_SEC_TLS_PSK_TXT))
+			configured_tls_connect_mode = ZBX_TCP_SEC_TLS_PSK;
+		else
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "invalid value of \"TLSConnect\" parameter");
+			goto out;
+		}
+	}
+
+	/* parse and validate 'TLSAccept' parameter used in zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf */
+
+	zbx_parameter_not_empty(CONFIG_TLS_ACCEPT, "TLSAccept");
+
+	if (NULL != CONFIG_TLS_ACCEPT)
+	{
+		char	*s, *p, *delim;
+
+		configured_tls_accept_modes = 0;
+		p = s = zbx_strdup(NULL, CONFIG_TLS_ACCEPT);
+
+		while (1)
+		{
+			delim = (NULL == p ? NULL : strchr(p, ','));
+			if (NULL != delim)
+				*delim = '\0';
+
+			if (0 == strcmp(p, ZBX_TCP_SEC_UNENCRYPTED_TXT))
+				configured_tls_accept_modes |= ZBX_TCP_SEC_UNENCRYPTED;
+			else if (0 == strcmp(p, ZBX_TCP_SEC_TLS_CERT_TXT))
+				configured_tls_accept_modes |= ZBX_TCP_SEC_TLS_CERT;
+			else if (0 == strcmp(p, ZBX_TCP_SEC_TLS_PSK_TXT))
+				configured_tls_accept_modes |= ZBX_TCP_SEC_TLS_PSK;
+			else
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "invalid value of \"TLSAccept\" parameter");
+				zbx_free(s);
+				goto out;
+			}
+
+			if (NULL == p || NULL == delim)
+				break;
+
+			*delim = ',';
+			p = delim + 1;
+		}
+
+		zbx_free(s);
+	}
+
 	/* either both a certificate and a private key must be defined or none of them */
 
-	if (NULL != my_cert && NULL == my_priv_key)
+	zbx_parameter_not_empty(CONFIG_TLS_CA_FILE, "TLSCaFile");
+	zbx_parameter_not_empty(CONFIG_TLS_CRL_FILE, "TLSCrlFile");
+	zbx_parameter_not_empty(CONFIG_TLS_CERT_FILE, "TLSCertFile");
+	zbx_parameter_not_empty(CONFIG_TLS_KEY_FILE, "TLSKeyFile");
+
+	if (NULL != CONFIG_TLS_CERT_FILE && NULL == CONFIG_TLS_KEY_FILE)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCertFile\" is defined but \"TLSKeyFile\" is"
 				" not defined");
 		goto out;
 	}
 
-	if (NULL == my_cert && NULL != my_priv_key)
+	if (NULL != CONFIG_TLS_KEY_FILE && NULL == CONFIG_TLS_CERT_FILE)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSKeyFile\" is defined but \"TLSCertFile\" is"
 				" not defined");
 		goto out;
 	}
 
-	/* CA file or directory must be defined only together with a certificate */
+	/* CA file must be defined ionly together with a certificate */
 
-	if (NULL != my_cert && NULL == ca_cert)
+	if (NULL != CONFIG_TLS_CERT_FILE && NULL == CONFIG_TLS_CA_FILE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCertFile\" is defined but neither \"TLSCaFile\""
-				" nor \"TLSCaPath\" is defined");
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCertFile\" is defined but \"TLSCaFile\" is not"
+				" defined");
 		goto out;
 	}
 
-	if (NULL == my_cert && NULL != ca_cert)
+	if (NULL != CONFIG_TLS_CA_FILE && NULL == CONFIG_TLS_CERT_FILE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCaFile\" or \"TLSCaPath\" is defined but "
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCaFile\" is defined but "
 				"\"TLSCertFile\" and \"TLSKeyFile\" are not defined");
 		goto out;
 	}
 
 	/* CRL file must be defined only together with a certificate */
 
-	if (NULL == my_cert && NULL != crl)
+	if (NULL == CONFIG_TLS_CERT_FILE && NULL != CONFIG_TLS_CRL_FILE)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCrlFile\" is defined but \"TLSCertFile\" and "
 				"\"TLSKeyFile\" are not defined");
@@ -206,14 +303,17 @@ static void	zbx_tls_validate_config(void)
 
 	/* either both a PSK and a PSK-identity must be defined or none of them */
 
-	if (NULL != my_psk && NULL == my_psk_identity)
+	zbx_parameter_not_empty(CONFIG_TLS_PSK_FILE, "TLSPskFile");
+	zbx_parameter_not_empty(CONFIG_TLS_PSK_IDENTITY, "TLSPskIdentity");
+
+	if (NULL != CONFIG_TLS_PSK_FILE && NULL == CONFIG_TLS_PSK_IDENTITY)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPskFile\" is defined but \"TLSPskIdentity\" is"
 				" not defined");
 		goto out;
 	}
 
-	if (NULL == my_psk && NULL != my_psk_identity)
+	if (NULL != CONFIG_TLS_PSK_IDENTITY && NULL == CONFIG_TLS_PSK_FILE)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPskIdentity\" is defined but \"TLSPskFile\" is"
 				" not defined");
@@ -228,22 +328,21 @@ static void	zbx_tls_validate_config(void)
 		/* 'TLSConnect' will be silently ignored on agentd, if active checks are not configured */
 		/* (i.e. 'ServerActive' is not specified. */
 
-		if ((NULL != my_cert || NULL != my_psk) && (NULL == CONFIG_TLS_CONNECT ||
-				(NULL != CONFIG_TLS_CONNECT && '\0' == *CONFIG_TLS_CONNECT)))
+		if ((NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_PSK_FILE) && NULL == CONFIG_TLS_CONNECT)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "certificate or pre-shared key (PSK) is configured but parameter "
 					"\"TLSConnect\" is not defined");
 			goto out;
 		}
 
-		if (0 != (configured_tls_connect_mode & ZBX_TCP_SEC_TLS_CERT) && NULL == my_cert)
+		if (0 != (configured_tls_connect_mode & ZBX_TCP_SEC_TLS_CERT) && NULL == CONFIG_TLS_CERT_FILE)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "parameter \"TLSConnect\" value requires a certificate but it is not"
 					" configured");
 			goto out;
 		}
 
-		if (0 != (configured_tls_connect_mode & ZBX_TCP_SEC_TLS_PSK) && NULL == my_psk)
+		if (0 != (configured_tls_connect_mode & ZBX_TCP_SEC_TLS_PSK) && NULL == CONFIG_TLS_PSK_FILE)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "parameter \"TLSConnect\" value requires a pre-shared key (PSK) but "
 					"it is not configured");
@@ -258,22 +357,21 @@ static void	zbx_tls_validate_config(void)
 	{
 		/* 'TLSAccept' is the master parameter to be matched by certificate and PSK parameters */
 
-		if ((NULL != my_cert || NULL != my_psk) && (NULL == CONFIG_TLS_ACCEPT ||
-				(NULL != CONFIG_TLS_ACCEPT && '\0' == *CONFIG_TLS_ACCEPT)))
+		if ((NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_PSK_FILE) && NULL == CONFIG_TLS_ACCEPT)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "certificate or pre-shared key (PSK) is configured but parameter "
 					"\"TLSAccept\" is not defined");
 			goto out;
 		}
 
-		if (0 != (configured_tls_accept_modes & ZBX_TCP_SEC_TLS_CERT) && NULL == my_cert)
+		if (0 != (configured_tls_accept_modes & ZBX_TCP_SEC_TLS_CERT) && NULL == CONFIG_TLS_CERT_FILE)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "parameter \"TLSAccept\" value requires a certificate but it is not"
 					" configured");
 			goto out;
 		}
 
-		if (0 != (configured_tls_accept_modes & ZBX_TCP_SEC_TLS_PSK) && NULL == my_psk)
+		if (0 != (configured_tls_accept_modes & ZBX_TCP_SEC_TLS_PSK) && NULL == CONFIG_TLS_PSK_FILE)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "parameter \"TLSAccept\" value requires a pre-shared key (PSK) but "
 					"it is not configured");
@@ -459,7 +557,7 @@ static unsigned int	zbx_ciphersuites(int type, int **suites)
 }
 #endif
 
-#if defined(HAVE_POLARSSL)
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_psk_hex2bin                                                  *
@@ -618,6 +716,87 @@ static int	zbx_psk_callback(void *par, ssl_context *tls_ctx, const unsigned char
 }
 #endif
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_read_psk_file                                                *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *    Read a pre-shared key from a configured file and convert it from        *
+ *    textual representation (ASCII hex digit string) to a binary             *
+ *    representation (byte string)                                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_read_psk_file(void)
+{
+	FILE		*f;
+	size_t		len;
+	char		*p;
+	int		len_bin;
+	unsigned int	i;
+	char		buf[HOST_TLS_PSK_LEN_MAX + 2];	/* up to 512 bytes of hex-digits, maybe 1-2 bytes for '\n', */
+							/* 1 byte for terminating '\0' */
+	char		buf_bin[HOST_TLS_PSK_LEN/2];	/* up to 256 bytes of binary PSK */
+
+	if (NULL == (f = fopen(CONFIG_TLS_PSK_FILE, "r")))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot open file \"%s\": %s", CONFIG_TLS_PSK_FILE, zbx_strerror(errno));
+		goto out;
+	}
+
+	if (NULL == fgets(buf, (int)sizeof(buf), f))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot read from file \"%s\": %s", CONFIG_TLS_PSK_FILE,
+				zbx_strerror(errno));
+		goto out;
+	}
+
+	if (0 != fclose(f))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot close file \"%s\": %s", CONFIG_TLS_PSK_FILE, zbx_strerror(errno));
+		goto out;
+	}
+
+	if (NULL != (p = strchr(buf, '\n')))
+		*p = '\0';
+
+	if (0 == (len = strlen(buf)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "file \"%s\" is empty", CONFIG_TLS_PSK_FILE);
+		goto out;
+	}
+
+#if defined(HAVE_POLARSSL)
+	/* Currently PolarSSL supports up to 32 bytes long PSKs, but with other libraries we can support up */
+	/* to 256 bytes. Check both limits for safer code. */
+	if (POLARSSL_PSK_MAX_LEN * 2 < len || HOST_TLS_PSK_LEN < len)
+#elif defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (HOST_TLS_PSK_LEN < len)
+#endif
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "PSK in file \"%s\" is too large", CONFIG_TLS_PSK_FILE);
+		goto out;
+	}
+
+	if (0 >= (len_bin = zbx_psk_hex2bin((unsigned char *)buf, (unsigned char *)buf_bin, sizeof(buf_bin))))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid PSK in file \"%s\"", CONFIG_TLS_PSK_FILE);
+		goto out;
+	}
+
+	my_psk_len = (size_t)len_bin;
+	my_psk = zbx_malloc(my_psk, my_psk_len);
+
+	for (i = 0; i < my_psk_len; i++)
+		my_psk[i] = buf_bin[i];
+
+	return;
+out:
+	zbx_tls_free();
+	exit(EXIT_FAILURE);
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_init_parent                                              *
@@ -647,74 +826,19 @@ int	zbx_tls_init_parent(void)
  ******************************************************************************/
 void	zbx_tls_init_child(void)
 {
-	const char	*__function_name = "zbx_tls_init_child";
-
 #if defined(HAVE_POLARSSL)
+	const char	*__function_name = "zbx_tls_init_child";
 	int		res;
 	unsigned int	cipher_count;
 	char		*pers = NULL;
 	size_t		pers_len = 0;
-#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-#if defined(HAVE_POLARSSL)
-	/* parse 'TLSConnect' configuration parameter (in zabbix_proxy.conf, zabbix_agentd.conf) */
-	if (NULL != CONFIG_TLS_CONNECT && '\0' != *CONFIG_TLS_CONNECT)
-	{
-		if (0 == strcmp(CONFIG_TLS_CONNECT, ZBX_TCP_SEC_UNENCRYPTED_TXT))
-			configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
-		else if (0 == strcmp(CONFIG_TLS_CONNECT, ZBX_TCP_SEC_TLS_CERT_TXT))
-			configured_tls_connect_mode = ZBX_TCP_SEC_TLS_CERT;
-		else if (0 == strcmp(CONFIG_TLS_CONNECT, ZBX_TCP_SEC_TLS_PSK_TXT))
-			configured_tls_connect_mode = ZBX_TCP_SEC_TLS_PSK;
-		else
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "invalid value of \"TLSConnect\" parameter");
-			zbx_tls_free();
-			exit(EXIT_FAILURE);
-		}
-	}
 
-	/* parse 'TLSAccept' configuration parameter (in zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf) */
-	if (NULL != CONFIG_TLS_ACCEPT && '\0' != *CONFIG_TLS_ACCEPT)
-	{
-		char	*s, *p, *delim;
-
-		configured_tls_accept_modes = 0;
-		p = s = zbx_strdup(NULL, CONFIG_TLS_ACCEPT);
-
-		while (1)
-		{
-			delim = (NULL == p ? NULL : strchr(p, ','));
-			if (NULL != delim)
-				*delim = '\0';
-
-			if (0 == strcmp(p, ZBX_TCP_SEC_UNENCRYPTED_TXT))
-				configured_tls_accept_modes |= ZBX_TCP_SEC_UNENCRYPTED;
-			else if (0 == strcmp(p, ZBX_TCP_SEC_TLS_CERT_TXT))
-				configured_tls_accept_modes |= ZBX_TCP_SEC_TLS_CERT;
-			else if (0 == strcmp(p, ZBX_TCP_SEC_TLS_PSK_TXT))
-				configured_tls_accept_modes |= ZBX_TCP_SEC_TLS_PSK;
-			else
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "invalid value of \"TLSAccept\" parameter");
-				zbx_free(s);
-				zbx_tls_free();
-				exit(EXIT_FAILURE);
-			}
-
-			if (NULL == p || NULL == delim)
-				break;
-
-			*delim = ',';
-			p = delim + 1;
-		}
-
-		zbx_free(s);
-	}
+	zbx_tls_validate_config();
 
 	/* 'TLSCaFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
-	if (NULL != CONFIG_TLS_CA_FILE && '\0' != *CONFIG_TLS_CA_FILE)
+	if (NULL != CONFIG_TLS_CA_FILE)
 	{
 		ca_cert = zbx_malloc(ca_cert, sizeof(x509_crt));
 		x509_crt_init(ca_cert);
@@ -759,7 +883,7 @@ void	zbx_tls_init_child(void)
 
 	/* 'TLSCrlFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
 	/* Load CRL (certificate revocation list) file. */
-	if (NULL != CONFIG_TLS_CRL_FILE && '\0' != *CONFIG_TLS_CRL_FILE)
+	if (NULL != CONFIG_TLS_CRL_FILE)
 	{
 		crl = zbx_malloc(crl, sizeof(x509_crl));
 		x509_crl_init(crl);
@@ -803,7 +927,7 @@ void	zbx_tls_init_child(void)
 
 	/* 'TLSCertFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
 	/* Load certificate. */
-	if (NULL != CONFIG_TLS_CERT_FILE && '\0' != *CONFIG_TLS_CERT_FILE)
+	if (NULL != CONFIG_TLS_CERT_FILE)
 	{
 		my_cert = zbx_malloc(my_cert, sizeof(x509_crt));
 		x509_crt_init(my_cert);
@@ -847,7 +971,7 @@ void	zbx_tls_init_child(void)
 
 	/* 'TLSKeyFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
 	/* Load private key. */
-	if (NULL != CONFIG_TLS_KEY_FILE && '\0' != *CONFIG_TLS_KEY_FILE)
+	if (NULL != CONFIG_TLS_KEY_FILE)
 	{
 		my_priv_key = zbx_malloc(my_priv_key, sizeof(pk_context));
 		pk_init(my_priv_key);
@@ -870,79 +994,15 @@ void	zbx_tls_init_child(void)
 
 	/* 'TLSPskFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
 	/* Load pre-shared key. */
-	if (NULL != CONFIG_TLS_PSK_FILE && '\0' != *CONFIG_TLS_PSK_FILE)
+	if (NULL != CONFIG_TLS_PSK_FILE)
 	{
-		FILE		*f;
-		size_t		len;
-		char		*p;
-		int		len_bin;
-		unsigned int	i;
-		char		buf[HOST_TLS_PSK_LEN_MAX + 2];	/* up to 512 bytes of hex-digits, maybe 1-2 bytes */
-								/* for '\n', 1 byte for terminating '\0' */
-		char		buf_bin[HOST_TLS_PSK_LEN/2];	/* up to 256 bytes of binary PSK */
-
-		if (NULL == (f = fopen(CONFIG_TLS_PSK_FILE, "r")))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot open file \"%s\": %s", CONFIG_TLS_PSK_FILE,
-					zbx_strerror(errno));
-			zbx_tls_free();
-			exit(EXIT_FAILURE);
-		}
-
-		if (NULL == fgets(buf, (int)sizeof(buf), f))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot read from file \"%s\": %s", CONFIG_TLS_PSK_FILE,
-					zbx_strerror(errno));
-			zbx_tls_free();
-			exit(EXIT_FAILURE);
-		}
-
-		if (0 != fclose(f))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot close file \"%s\": %s", CONFIG_TLS_PSK_FILE,
-					zbx_strerror(errno));
-			zbx_tls_free();
-			exit(EXIT_FAILURE);
-		}
-
-		if (NULL != (p = strchr(buf, '\n')))
-			*p = '\0';
-
-		if (0 == (len = strlen(buf)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "file \"%s\" is empty", CONFIG_TLS_PSK_FILE);
-			zbx_tls_free();
-			exit(EXIT_FAILURE);
-		}
-
-		/* Currently PolarSSL supports up to 32 bytes long PSKs, but with other libraries we can support up */
-		/* to 256 bytes. Check both limits for safer code. */
-		if (POLARSSL_PSK_MAX_LEN * 2 < len || HOST_TLS_PSK_LEN < len)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "PSK in file \"%s\" is too large", CONFIG_TLS_PSK_FILE);
-			zbx_tls_free();
-			exit(EXIT_FAILURE);
-		}
-
-		if (0 >= (len_bin = zbx_psk_hex2bin((unsigned char *)buf, (unsigned char *)buf_bin, sizeof(buf_bin))))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "invalid PSK in file \"%s\"", CONFIG_TLS_PSK_FILE);
-			zbx_tls_free();
-			exit(EXIT_FAILURE);
-		}
-
-		my_psk_len = (size_t)len_bin;
-		my_psk = zbx_malloc(my_psk, my_psk_len);
-
-		for (i = 0; i < my_psk_len; i++)
-			my_psk[i] = buf_bin[i];
-
+		zbx_read_psk_file();
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded pre-shared key", __function_name);
 	}
 
 	/* 'TLSPskIdentity' parameter (in zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). Configure */
 	/* identity to be used with the pre-shared key. */
-	if (NULL != CONFIG_TLS_PSK_IDENTITY && '\0' != *CONFIG_TLS_PSK_IDENTITY)
+	if (NULL != CONFIG_TLS_PSK_IDENTITY)
 	{
 		/* PSK identity must be a valid UTF-8 string (RFC4279 says Unicode) */
 		if (SUCCEED != zbx_is_utf8(CONFIG_TLS_PSK_IDENTITY))
@@ -958,8 +1018,6 @@ void	zbx_tls_init_child(void)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded pre-shared key\'s identity", __function_name);
 	}
-
-	zbx_tls_validate_config();
 
 	/* Certificate always comes from configuration file. Set up ciphersuites. */
 	if (NULL != my_cert)
@@ -1007,17 +1065,167 @@ void	zbx_tls_init_child(void)
 	zbx_guaranteed_memset(pers, 0, pers_len);
 	zbx_free(pers);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
 #elif defined(HAVE_GNUTLS)
+	const char	*__function_name = "zbx_tls_init_child";
+	int		res;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_tls_validate_config();
+
 	if (GNUTLS_E_SUCCESS != gnutls_global_init())
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize GnuTLS library");
 		exit(EXIT_FAILURE);
 	}
-#elif defined(HAVE_OPENSSL)
-	SSL_load_error_strings();
-	SSL_library_init();
-#endif
+
+	zabbix_log(LOG_LEVEL_DEBUG, "GnuTLS library v.%s initialized", gnutls_check_version(NULL));
+
+	/* need to allocate certificate credentials store ? */
+
+	if (NULL != CONFIG_TLS_CERT_FILE)
+	{
+		if (0 != (res = gnutls_certificate_allocate_credentials(&my_cert_creds)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "gnutls_certificate_allocate_credentials() failed: %d: %s", res,
+					gnutls_strerror(res));
+			zbx_tls_free();
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	/* 'TLSCaFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf) */
+	if (NULL != CONFIG_TLS_CA_FILE)
+	{
+		if (0 < (res = gnutls_certificate_set_x509_trust_file(my_cert_creds, CONFIG_TLS_CA_FILE,
+				GNUTLS_X509_FMT_PEM)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "loaded %d CA certificate(s) from file \"%s\"", res,
+					CONFIG_TLS_CA_FILE);
+		}
+		else if (0 == res)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "no CA certificate(s) in file \"%s\"", CONFIG_TLS_CA_FILE);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot parse CA certificate(s) in file \"%s\": %d: %s",
+				CONFIG_TLS_CA_FILE, res, gnutls_strerror(res));
+			zbx_tls_free();
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	/* 'TLSCrlFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
+	/* Load CRL (certificate revocation list) file. */
+	if (NULL != CONFIG_TLS_CRL_FILE)
+	{
+		if (0 < (res = gnutls_certificate_set_x509_crl_file(my_cert_creds, CONFIG_TLS_CRL_FILE,
+				GNUTLS_X509_FMT_PEM)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "loaded %d certificate(s) from CRL file \"%s\"", res,
+					CONFIG_TLS_CRL_FILE);
+		}
+		else if (0 == res)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "no certificate(s) in CRL \"%s\"", CONFIG_TLS_CRL_FILE);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot parse CRL file \"%s\": %d: %s", CONFIG_TLS_CRL_FILE, res,
+					gnutls_strerror(res));
+			zbx_tls_free();
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	/* 'TLSCertFile' and 'TLSKeyFile' parameters (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, */
+	/* zabbix_agent.conf). Load certificate and private key. */
+	if (NULL != CONFIG_TLS_CERT_FILE)
+	{
+		if (GNUTLS_E_SUCCESS != gnutls_certificate_set_x509_key_file(my_cert_creds, CONFIG_TLS_CERT_FILE,
+				CONFIG_TLS_KEY_FILE, GNUTLS_X509_FMT_PEM))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot load certificate or private key from file \"%s\" or \"%s\": "
+					"%d: %s", CONFIG_TLS_CERT_FILE, CONFIG_TLS_KEY_FILE, res, gnutls_strerror(res));
+			zbx_tls_free();
+			exit(EXIT_FAILURE);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded certificate and private key",
+					__function_name);
+		}
+	}
+
+	/* 'TLSPskIdentity' and 'TLSPskFile' parameters used in zabbix_proxy.conf, zabbix_agentd.conf, */
+	/* zabbix_agent.conf). Load pre-shared key and identity to be used with the pre-shared key. */
+
+	if (NULL != CONFIG_TLS_PSK_FILE)
+	{
+		gnutls_datum_t	key;
+
+		/* allocate here only PSK credential stores which do not change (e.g. for proxy communication with */
+		/* server) */
+
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_AGENTD |
+				ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)) &&
+				0 != (res = gnutls_psk_allocate_client_credentials(&my_psk_client_creds)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "gnutls_psk_allocate_client_credentials() failed: %d: %s",
+					res, gnutls_strerror(res));
+			zbx_tls_free();
+			exit(EXIT_FAILURE);
+		}
+
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_PASSIVE | ZBX_PROGRAM_TYPE_AGENTD |
+				ZBX_PROGRAM_TYPE_AGENT)) &&
+				0 != (res = gnutls_psk_allocate_server_credentials(&my_psk_server_creds)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "gnutls_psk_allocate_server_credentials() failed: %d: %s", res,
+					gnutls_strerror(res));
+			zbx_tls_free();
+			exit(EXIT_FAILURE);
+		}
+
+		/* PSK identity must be a valid UTF-8 string (RFC4279 says Unicode) */
+		if (SUCCEED != zbx_is_utf8(CONFIG_TLS_PSK_IDENTITY))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPskIdentity\" value is not a valid "
+					"UTF-8 string");
+			zbx_tls_free();
+			exit(EXIT_FAILURE);
+		}
+
+		my_psk_identity = CONFIG_TLS_PSK_IDENTITY;
+		my_psk_identity_len = strlen(my_psk_identity);
+
+		zbx_read_psk_file();
+
+		key.data = (unsigned char *)my_psk;
+		key.size = (unsigned int)my_psk_len;
+
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_AGENTD |
+				ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)))
+		{
+			/* TODO docs say 'my_psk_identity' should be prepared with "SASLprep" profile of "stringprep" */
+			if (GNUTLS_E_SUCCESS != (res = gnutls_psk_set_client_credentials(my_psk_client_creds,
+				my_psk_identity, &key, GNUTLS_PSK_KEY_RAW)))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "gnutls_psk_set_client_credentials() failed: %d: %s", res,
+						gnutls_strerror(res));
+				zbx_tls_free();
+				exit(EXIT_FAILURE);
+			}
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded pre-shared key and identity", __function_name);
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+#endif
 }
 
 /******************************************************************************
@@ -1082,6 +1290,22 @@ int	zbx_tls_free(void)
 	zbx_free(ciphersuites_cert);
 	zbx_free(ciphersuites_all);
 #elif defined(HAVE_GNUTLS)
+	if (NULL != my_cert_creds)
+		gnutls_certificate_free_credentials(my_cert_creds);
+
+	if (NULL != my_psk_client_creds)
+		gnutls_psk_free_client_credentials(my_psk_client_creds);
+
+	if (NULL != my_psk_server_creds)
+		gnutls_psk_free_server_credentials(my_psk_server_creds);
+
+	if (NULL != my_psk)
+	{
+		zbx_guaranteed_memset(my_psk, 0, my_psk_len);
+		my_psk_len = 0;
+		zbx_free(my_psk);
+	}
+
 	gnutls_global_deinit();
 #elif defined(HAVE_OPENSSL)
 	/* TODO there is no ERR_free_strings() in my libssl. Commented out temporarily. */
@@ -1360,12 +1584,12 @@ out:
 int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 {
 	const char		*__function_name = "zbx_tls_accept";
-	const ssl_ciphersuite_t	*info;
 	int			ret = FAIL;
 
 #if defined(HAVE_POLARSSL)
 	int			res;
 	const x509_crt		*peer_cert;
+	const ssl_ciphersuite_t	*info;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
