@@ -67,6 +67,7 @@ Changes for 2.4.5rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-9283] improved proc_info item (Windows only) to get more information about the processes (dimir)
 ..F....... [ZBX-8875] fixed undefined index in screens with dynamic graph prototype and simple graph prototype elements when host is not selected (Ivo)
 ..F....... [ZBX-9203] fixed host scripts menu popup not properly displaying script name when name contains HTML tags (Ivo)
 
@@ -646,6 +647,7 @@ New features:
 A.F....... [ZBX-1357] updated Japanese, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9283] improved proc_info item (Windows only) to get more information about the processes (dimir)
 ...G...PS. [ZBX-9284] added zabbix log file locking to avoid incomplete logging on log file rotation (igors)
 ...G...... [ZBX-9143] improved proc.num under Windows to handle more processes (dimir)
 ...G...... [ZBX-9232] fixed incomplete eventlog messages (igors)
