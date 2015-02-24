@@ -926,41 +926,41 @@ button {
 		@include transition(all .2s ease);
 
 		&:hover {
-			@extend %btn-wigdet-hover-active;
+			@extend %btn-widget-hover-active;
 		}
 
 		&:active {
-			@extend %btn-wigdet-hover-active;
+			@extend %btn-widget-hover-active;
 		}
     }
 
-    &.btn-wigdet-collapse {
+    &.btn-widget-collapse {
     	border: 0;
     	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat 2px -214px;
 		@extend %button-widget-icon-size;
 		@include opacity(0.75);
 
 		&:hover {
-			@extend %btn-wigdet-hover-active;
+			@extend %btn-widget-hover-active;
 		}
 
 		&:active {
-			@extend %btn-wigdet-hover-active;
+			@extend %btn-widget-hover-active;
 		}
     }
 
-    &.btn-wigdet-expand {
+    &.btn-widget-expand {
     	border: 0;
     	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat 2px -238px;
 		@extend %button-widget-icon-size;
 		@include opacity(0.75);
 
 		&:hover {
-			@extend %btn-wigdet-hover-active;
+			@extend %btn-widget-hover-active;
 		}
 
 		&:active {
-			@extend %btn-wigdet-hover-active;
+			@extend %btn-widget-hover-active;
 		}
     } 
 
@@ -1049,7 +1049,7 @@ button {
 	@include opacity(1);
 }
 
-%btn-wigdet-hover-active {
+%btn-widget-hover-active {
 	background-color: $form-transparent-color;
 	@include opacity(1);
 }
