@@ -190,27 +190,6 @@ class CHostInterface extends CApiService {
 	}
 
 	/**
-	 * Check if host interface exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('hostinterface.exists method is deprecated.');
-
-		$hostInterface = $this->get(array(
-			'output' => array('interfaceid'),
-			'filter' => zbx_array_mintersect(array('interfaceid', 'hostid', 'ip', 'dns'), $object),
-			'limit' => 1
-		));
-
-		return (bool) $hostInterface;
-	}
-
-	/**
 	 * Check interfaces input.
 	 *
 	 * @param array  $interfaces

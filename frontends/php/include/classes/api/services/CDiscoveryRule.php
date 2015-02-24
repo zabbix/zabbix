@@ -273,37 +273,6 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
-	 * Check if low-level discovery rule exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('discoveryrule.exists method is deprecated.');
-
-		$options = array(
-			'output' => array('itemid'),
-			'filter' => array('key_' => $object['key_']),
-			'limit' => 1
-		);
-
-		if (isset($object['hostid'])) {
-			$options['hostids'] = $object['hostid'];
-		}
-
-		if (isset($object['host'])) {
-			$options['filter']['host'] = $object['host'];
-		}
-
-		$dicoveryRule = $this->get($options);
-
-		return (bool) $dicoveryRule;
-	}
-
-	/**
 	 * Add DiscoveryRule.
 	 *
 	 * @param array $items
