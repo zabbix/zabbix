@@ -879,6 +879,19 @@ button {
 		}
 	}
 
+	&.btn-reset {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat -49px -97px;
+		@extend %button-icon-size;
+		
+		&:hover {
+			@extend %button-hover;
+		}
+
+		&:active {
+			@extend %button-active;
+		}
+	}
+
 
 	&.btn-search {
 		background: darken($primary-color, 10%) url(../img/icon-sprite.png) no-repeat 1px -1px;
@@ -1535,6 +1548,7 @@ a.grey {
 }
 
 .msg-bad-global {
+	display: none;
 	position: fixed;
 	bottom: 0;
 	z-index: 10000;
