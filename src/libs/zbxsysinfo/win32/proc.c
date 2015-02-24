@@ -377,8 +377,25 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (0 == stricmp(baseName, proc_name))
 		{
-			if (NULL != (hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE,
-					pe32.th32ProcessID)))
+			DWORD			access;
+			const OSVERSIONINFOEX	*vi;
+
+			if (NULL == (vi = zbx_win_getversion()))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot retrieve system version."));
+				ret = SYSINFO_RET_FAIL;
+				break;
+			}
+
+			if (6 > vi->dwMajorVersion)
+			{
+				/* PROCESS_QUERY_LIMITED_INFORMATION is not supported on Windows Server 2003 and XP */
+				access = PROCESS_QUERY_INFORMATION;
+			}
+			else
+				access = PROCESS_QUERY_LIMITED_INFORMATION;
+
+			if (NULL != (hProcess = OpenProcess(access, FALSE, pe32.th32ProcessID)))
 			{
 				ret = GetProcessAttribute(hProcess, attr_id, type_id, counter++, &value);
 
