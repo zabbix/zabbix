@@ -656,6 +656,8 @@ class C10ImportConverter extends CConverter {
 			$item['key'] = $this->itemKeyConverter->convert($item['key']);
 
 			$item = $this->wrapChildren($item, 'applications', 'name');
+
+			unset($item['lastlogsize']);
 		}
 		unset($item);
 
@@ -682,6 +684,10 @@ class C10ImportConverter extends CConverter {
 			$graph = $this->renameKey($graph, 'ymax_item_key', 'ymax_item_1');
 			$graph = $this->convertGraphItemReference($graph, 'ymin_item_1');
 			$graph = $this->convertGraphItemReference($graph, 'ymax_item_1');
+
+			if ($graph['type'] == GRAPH_TYPE_NORMAL || $graph['type'] == GRAPH_TYPE_STACKED) {
+				unset($graph['show_legend']);
+			}
 
 			foreach ($graph['graph_items'] as &$graphItem) {
 				$graphItem = $this->convertGraphItemReference($graphItem, 'item', $hostName);
