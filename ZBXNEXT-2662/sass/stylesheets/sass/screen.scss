@@ -354,7 +354,7 @@ footer {
 		@include list-table-header;
 		height: 100%;
 		overflow: hidden;
-	    padding: 7px 5px 7px 5px;
+	    padding: 8px 5px 8px 5px;
 	    vertical-align: middle;
 	    border-bottom: 2px solid $table-hordivider-color;
 	    text-align: left;
@@ -531,6 +531,34 @@ footer {
 	}
 }
 
+.filter-forms {
+	margin: 0 auto;
+	text-align: center;
+	background: $white;
+	//width: 100%;
+	//@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
+
+	.cell {
+		white-space: nowrap;
+		text-align: left;
+		padding: 0 15px 0 15px;
+		border-right: 1px solid #e9edf2;
+
+		&:last-child {
+			border-right: none;
+		}
+
+		button {
+			margin-left: 0;
+			margin-right: 0;
+		}
+	}
+
+	button {
+		margin: 0 7px;
+	}
+}
+
 /* Forms */
 .table-forms-container {
 	padding: 0 10px 10px 10px;
@@ -633,6 +661,10 @@ footer {
 		//	line-height: 24px;
 		//}
 	}
+}
+
+.center {
+	text-align: center;
 }
 
 .table-forms-separator {
@@ -991,23 +1023,28 @@ button {
 	}
 
 	&.filter-trigger {
+		position: relative;
 		@include border-radius(2px 2px 0 0);
 		min-width: 94px;
 
 		&.filter-active {
 			background: $body-content-bgcolor;
-			border-top-color: $underline-color;
-			border-left-color: $underline-color;
-			border-right-color: $underline-color;
-			border-bottom-color: $body-content-bgcolor;
+			border: none;
 			color: $link-color;
-		}
+			@include box-shadow(0 -1px 1px 0 rgba(60,60,60,0.08));
 
-		.arrow-up {
-			border-bottom-color: $font-white-color;
+			.arrow-up {
+				position: absolute;
+				top: 50%;
+				margin: 0 0 0 4px;
+				border-bottom-color: $link-color;
+			}
 		}
 
 		.arrow-down {
+			position: absolute;
+			top: 50%;
+			margin: 0 0 0 4px;
 			border-top-color: $font-white-color;
 		}
 	}

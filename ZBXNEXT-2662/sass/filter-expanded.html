@@ -31,32 +31,45 @@
 	</div>
 		<ul class="object-group"><li><a href="">All hosts</a></li><li><span class="arrow-right"></span></li><li>Zabbix server:</li><li class="green">Enabled</li><li><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></li><li><a href="">Applications</a>&nbsp;<sup>11</sup></li><li><a href="" class="selected">Items</a>&nbsp;<sup>67</sup></li><li><a href="">Triggers</a>&nbsp;<sup>41</sup></li><li><a href="">Graphs</a>&nbsp;<sup>11</sup></li><li><a href="">Discovery rules</a>&nbsp;<sup>2</sup></li><li><a href="">Web scenarios</a></li></ul>
 	<div class="filter-container">
-	<button type="button" class="filter-trigger filter-active">Filter&nbsp;<span class="arrow-up"></span></button>
+	<button type="button" class="filter-trigger filter-active">Filter<span class="arrow-up"></span></button>
 	</div>
 	<form>
-
-	<table class="table-forms">
-	    <tfoot>
-	    	<tr><td class="table-forms-td-left" colspan="4"><button type="button">Filter</button><button type="button" class="btn-alt">Reset</button></td></tr>
-	    </tfoot> 
-		<tbody>
-			<tr>
-				<td class="table-forms-td-left"><label for="Groups">Host group</label> <input type="text" id="Groups" placeholder="Type to search"> <button type="button" class="btn-grey">Select</button></td><td><label for="Groups">Type</label> <select id="Groups"><option>fsdfsdfsdfsfsf</option></select></td><td><label for="Groups">Type of information</label> <select id="Groups"><option>fsdfsdfsdfsfsf</option></select></td><td><label for="Groups">State</label> <select id="Groups"><option>fsdfsdfsdfsfsf</option></select></td>
-			</tr>
-			<tr>
-				<td class="table-forms-td-left"><label for="Groups">Host</label> <input type="text" id="Groups" placeholder="Type to search"> <button type="button" class="btn-grey">Select</button></td><td><label for="Groups">Upadte interval</label> <input type="text" id="Groups"> sec</td><td><label for="Groups">History</label> <input type="text" id="Groups"> days</td><td><label for="Groups">Status</label> <select id="Groups"><option>fsdfsdfsdfsfsf</option></select></td>
-			</tr>
-			<tr>
-				<td class="table-forms-td-left"><label for="Groups">Application</label> <input type="text" id="Groups"> <button type="button" class="btn-grey">Select</button></td><td>&nbsp;</td><td><label for="Groups">Trends</label> <input type="text" id="Groups"> days</td><td><label for="Groups">Triggers</label> <select id="Groups"><option>fsdfsdfsdfsfsf</option></select></td>
-			</tr>
-			<tr>
-				<td class="table-forms-td-left"><label for="Groups">Name like</label> <input type="text" id="Groups"></td><td>&nbsp;</td><td>&nbsp;</td><td><label for="Groups">Template</label> <select id="Groups"><option>fsdfsdfsdfsfsf</option></select></td>
-			</tr>
-			<tr>
-				<td class="table-forms-td-left"><label for="Groups">Key like</label> <input type="text" id="Groups"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
-			</tr>
-		</tbody>
-	</table>
+	<div class="table-forms-container">
+	<div class="table filter-forms">
+	<div class="row">
+	<div class="cell">
+	<ul class="table-forms">
+	<li><div class="table-forms-td-left"><label for="Groups">Host group</label></div><div class="table-forms-td-right"><input type="text" id="Groups" placeholder="Type to search"> <button type="button" class="btn-grey">Select</button></div></li>
+	<li><div class="table-forms-td-left"><label for="Groups">Host</label></div><div class="table-forms-td-right"><input type="text" id="Groups" placeholder="Type to search"> <button type="button" class="btn-grey">Select</button></div></li>
+	<li><div class="table-forms-td-left"><label for="Groups">Application</label></div><div class="table-forms-td-right"><input type="text" id="Groups" placeholder="Type to search"> <button type="button" class="btn-grey">Select</button></div></li>
+	<li><div class="table-forms-td-left"><label for="Groups">Name like</label></div><div class="table-forms-td-right"><input type="text" id="Groups"></div></li>
+	<li><div class="table-forms-td-left"><label for="Groups">Key like</label></div><div class="table-forms-td-right"><input type="text" id="Groups"></div></li>
+	</ul>
+	</div>
+	<div class="cell">
+	<ul class="table-forms">
+	<li><div class="table-forms-td-left"><label for="Groups">Type</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select></div></li>
+	<li><div class="table-forms-td-left"><label for="Groups">Update interval</label></div><div class="table-forms-td-right"><input type="text" id="Groups"> sec</div></li>
+	</ul>
+	</div>
+	<div class="cell">
+	<ul class="table-forms">
+	<li><div class="table-forms-td-left"><label for="Groups">Type of information</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select></div></li>
+	<li><div class="table-forms-td-left"><label for="Groups">History</label></div><div class="table-forms-td-right"><input type="text" id="Groups"> days</div></li>
+	<li><div class="table-forms-td-left"><label for="Groups">Trends</label></div><div class="table-forms-td-right"><input type="text" id="Groups"> days</div></li>
+	</ul>
+	</div>
+	<div class="cell">
+	<ul class="table-forms">
+	<li><div class="table-forms-td-left"><label for="Groups">State</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select></div></li>
+	<li><div class="table-forms-td-left"><label for="Groups">Status</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select></div></li>
+	<li><div class="table-forms-td-left"><label for="Groups">Triggers</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select></div></li>
+	<li><div class="table-forms-td-left"><label for="Groups">Template</label></div><div class="table-forms-td-right"><select id="Groups"><option>fsdfsdfsdfsfsf</option></select></div></li>
+	</ul>
+	</div>
+	</div>
+	</div>
+	<div class="filter-forms"><button type="button">Filter</button><button type="button" class="btn-alt">Reset</button></div></div><h4>Subfilter <span>affects only filtered data</span></h4>
 	<table class="list-table">
 	<tbody>
 		<tr>
