@@ -650,6 +650,7 @@ New features:
 A.F....... [ZBX-1357] updated Japanese, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9281] fixed undefined offset in template screens when resource is URL (Ivo)
 ..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
 ...G...... [ZBX-9283] improved proc_info item (Windows only) to get more information about the processes (dimir)
 ...G...PS. [ZBX-9284] added zabbix log file locking to avoid incomplete logging on log file rotation (igors)
@@ -1861,6 +1862,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9281] fixed undefined offset in template screens when resource is URL (Ivo)
 ..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
 ...G...PS. [ZBX-9284] added zabbix log file locking to avoid incomplete logging on log file rotation (igors)
 ..F....... [ZBX-9087] fixed DB_ID validation expression to properly validate upper bound of received value and fixed various front-end forms not properly validating IDs (Krists, Ivo)
