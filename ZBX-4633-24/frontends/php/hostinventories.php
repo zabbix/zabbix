@@ -186,14 +186,13 @@ else {
 		// checking if correct inventory field is specified for filter
 		$possibleInventoryFields = getHostInventories();
 		$possibleInventoryFields = zbx_toHash($possibleInventoryFields, 'db_field');
-		if (!empty($data['filterField'])
-				&& !empty($data['filterFieldValue'])
+		if ($data['filterField'] !== '' && $data['filterFieldValue'] !== ''
 				&& !isset($possibleInventoryFields[$data['filterField']])) {
 			error(_s('Impossible to filter by inventory field "%s", which does not exist.', $data['filterField']));
 		}
 		else {
 			// if we are filtering by field, this field is also required
-			if (!empty($data['filterField']) && !empty($data['filterFieldValue'])) {
+			if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '') {
 				$requiredInventoryFields[] = $data['filterField'];
 			}
 
