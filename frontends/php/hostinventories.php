@@ -246,7 +246,7 @@ else {
 
 			order_result($data['hosts'], $sortField, $sortOrder);
 
-			$data['hosts'] = array_slice($data['hosts'], 0, $config['search_limit'] + 1);
+			$data['hosts'] = array_slice($data['hosts'], 0, $data['config']['search_limit'] + 1);
 		}
 	}
 
