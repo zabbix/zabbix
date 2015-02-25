@@ -9,7 +9,7 @@ use ApiHelper;
 use JSON::XS;
 use Data::Dumper;
 
-parse_opts('tld=s', 'service=s', 'from=n', 'till=n', 'dry-run');
+parse_opts('tld=s', 'service=s', 'period=n', 'dry-run');
 
 # do not write any logs
 setopt('test');
@@ -41,21 +41,25 @@ set_slv_config(get_rsm_config());
 db_connect();
 
 my $cfg_dns_interval;
+my $cfg_dns_valuemaps;
 my $cfg_dns_minns;
 my $cfg_dns_key_status;
 my $cfg_dns_key_rtt;
-my $cfg_dns_valuemaps;
 
 my $cfg_rdds_interval;
+my $cfg_rdds_valuemaps;
 my $cfg_rdds_key_status;
 my $cfg_rdds_key_43_rtt;
 my $cfg_rdds_key_43_ip;
 my $cfg_rdds_key_43_upd;
 my $cfg_rdds_key_80_rtt;
 my $cfg_rdds_key_80_ip;
-my $cfg_rdds_valuemaps;
 
 my $cfg_epp_interval;
+my $cfg_epp_valuemaps;
+my $cfg_epp_key_status;
+my $cfg_epp_key_ip;
+my $cfg_epp_key_rtt;
 
 my $cfg_dns_statusmaps = get_statusmaps('dns');
 
@@ -83,10 +87,13 @@ if (exists($services_hash{'rdds'}))
 if (exists($services_hash{'epp'}))
 {
 	$cfg_epp_interval = get_macro_epp_delay();
+	$cfg_epp_valuemaps = get_valuemaps('epp');
+	$cfg_epp_key_status = 'rsm.epp[{$RSM.TLD},'; # 0 - down, 1 - up
+	$cfg_epp_key_ip = 'rsm.epp.ip[{$RSM.TLD}]';
+	$cfg_epp_key_rtt = 'rsm.epp.rtt[{$RSM.TLD},';
 }
 
-my $from = getopt('from');
-my $till = getopt('till');
+my $period = getopt('period');
 
 my $now = time();
 
@@ -102,7 +109,7 @@ else
 	$tlds_ref = get_tlds();
 }
 
-__prnt("selected period: ", __selected_period($from, $till), ' (now:', ts_str($now), " ($now))") if (opt('dry-run') or opt('debug'));
+my $check_back = $now - 1800; # check back for latest availability data
 
 foreach (@$tlds_ref)
 {
@@ -127,15 +134,16 @@ foreach (@$tlds_ref)
 			next;
 		}
 
-		# working item
-		my $avail_key = "rsm.slv.$service.avail";
-		my $avail_itemid = get_itemid_by_host($tld, $avail_key);
+		my $hostid = get_hostid($tld);
+		my $avail_itemid = get_itemid_by_hostid($hostid, "rsm.slv.$service.avail");
+		my $rollweek_itemid = get_itemid_by_hostid($hostid, "rsm.slv.$service.rollweek");
 
-		my ($rollweek_from, $rollweek_till) = get_rollweek_bounds();
+		my ($downtime, $clock) = __get_last_rollweek($rollweek_itemid, $check_back);
 
-		my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
+		my $till = $clock + RESULT_TIMESTAMP_SHIFT; # include the whole minute
+		my $from = $till - $period * 60 + 1;
 
-		my $clock = get_lastclock($tld, "rsm.slv.$service.rollweek");
+		__prnt("selecting period: ", __selected_period($from, $till)) if (opt('dry-run') or opt('debug'));
 
 		if (opt('dry-run'))
 		{
@@ -175,23 +183,25 @@ foreach (@$tlds_ref)
 			}
 		}
 
-		my ($nsips_ref, $dns_items_ref, $rdds_dbl_items_ref, $rdds_str_items_ref, $interval);
+		my ($nsips_ref, $dns_items_ref, $rdds_dbl_items_ref, $rdds_str_items_ref, $epp_dbl_items_ref, $epp_str_items_ref, $interval);
 
 		if ($service eq 'dns' or $service eq 'dnssec')
 		{
+			$interval = $cfg_dns_interval;
 			$nsips_ref = get_nsips($tld, $cfg_dns_key_rtt, 1); # templated
 			$dns_items_ref = __get_dns_itemids($nsips_ref, $cfg_dns_key_rtt, $tld);
-			$interval = $cfg_dns_interval;
 		}
 		elsif ($service eq 'rdds')
 		{
+			$interval = $cfg_rdds_interval;
 			$rdds_dbl_items_ref = __get_rdds_dbl_itemids($tld);
 			$rdds_str_items_ref = __get_rdds_str_itemids($tld);
-			$interval = $cfg_rdds_interval;
 		}
 		elsif ($service eq 'epp')
 		{
 			$interval = $cfg_epp_interval;
+			$epp_dbl_items_ref = __get_epp_dbl_itemids($tld);
+			$epp_str_items_ref = __get_epp_str_itemids($tld);
 		}
 
 		$incidents = get_incidents($avail_itemid, $from, $till);
@@ -326,7 +336,7 @@ foreach (@$tlds_ref)
 				}
 
 				# get results from probes: number of working Name Servers
-				my $itemids_ref = __get_itemids($tld, $cfg_dns_key_status);
+				my $itemids_ref = __get_status_itemids($tld, $cfg_dns_key_status);
 				my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
 
 				foreach my $tr_ref (@test_results)
@@ -405,7 +415,7 @@ foreach (@$tlds_ref)
 				}
 
 				# get results from probes: working services (rdds43, rdds80)
-				my $itemids_ref = __get_itemids($tld, $cfg_rdds_key_status);
+				my $itemids_ref = __get_status_itemids($tld, $cfg_rdds_key_status);
 				my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
 
 				foreach my $tr_ref (@test_results)
@@ -453,6 +463,10 @@ foreach (@$tlds_ref)
 			elsif ($service eq 'epp')
 			{
 				dbg("EPP results calculation is not implemented yet");
+
+				my $values_ref = __get_epp_test_values($epp_dbl_items_ref, $epp_str_items_ref, $values_from, $values_till);
+
+				dbg(Dumper($values_ref)) if (opt('debug'));
 			}
 			else
 			{
@@ -540,7 +554,7 @@ sub __get_dns_test_values
 	return \%result;
 }
 
-sub __find_rdds_probe_key_by_itemid
+sub __find_probe_key_by_itemid
 {
 	my $itemid = shift;
 	my $items_ref = shift;
@@ -634,7 +648,7 @@ sub __get_rdds_test_values
 		my $value = $row_ref->[1];
 		my $clock = $row_ref->[2];
 
-		my ($probe, $key) = __find_rdds_probe_key_by_itemid($itemid, $rdds_dbl_items_ref);
+		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_dbl_items_ref);
 
 		fail("internal error: item $key (itemid:$itemid) or Probe is unknown") unless (defined($probe) and defined($key));
 
@@ -652,7 +666,7 @@ sub __get_rdds_test_values
 		my $value = $row_ref->[1];
 		my $clock = $row_ref->[2];
 
-		my ($probe, $key) = __find_rdds_probe_key_by_itemid($itemid, $rdds_str_items_ref);
+		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_str_items_ref);
 
 		fail("internal error: item $key (itemid:$itemid) or Probe is unknown") unless (defined($probe) and defined($key));
 
@@ -660,6 +674,95 @@ sub __get_rdds_test_values
 		my $type = __get_rdds_str_type($key);
 
 		$result{$probe}->{$port}->{$clock}->{$type} = $value;
+	}
+
+	return \%result;
+}
+
+# values are organized like this:
+# {
+#         'WashingtonDC' => {
+#                 '1418994206' => {
+#                               'ip' => '192.0.34.201',
+#                               'login' => '127.0000',
+#                               'update' => '366.0000'
+#                               'info' => '366.0000'
+#                 },
+#                 '1418994456' => {
+#                               'ip' => '192.0.34.202',
+#                               'login' => '121.0000',
+#                               'update' => '263.0000'
+#                               'info' => '321.0000'
+#                 },
+# ...
+sub __get_epp_test_values
+{
+	my $epp_dbl_items_ref = shift;
+	my $epp_str_items_ref = shift;
+	my $start = shift;
+	my $end = shift;
+
+	my %result;
+
+	# generate list if itemids
+	my $dbl_itemids_str = '';
+	foreach my $probe (keys(%$epp_dbl_items_ref))
+	{
+		my $itemids_ref = $epp_dbl_items_ref->{$probe};
+
+		foreach my $itemid (keys(%$itemids_ref))
+		{
+			$dbl_itemids_str .= ',' unless ($dbl_itemids_str eq '');
+			$dbl_itemids_str .= $itemid;
+		}
+	}
+
+	my $str_itemids_str = '';
+	foreach my $probe (keys(%$epp_str_items_ref))
+	{
+		my $itemids_ref = $epp_str_items_ref->{$probe};
+
+		foreach my $itemid (keys(%$itemids_ref))
+		{
+			$str_itemids_str .= ',' unless ($str_itemids_str eq '');
+			$str_itemids_str .= $itemid;
+		}
+	}
+
+	return \%result if ($dbl_itemids_str eq '' or $str_itemids_str eq '');
+
+	my $dbl_rows_ref = db_select("select itemid,value,clock from history where itemid in ($dbl_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+
+	foreach my $row_ref (@$dbl_rows_ref)
+	{
+		my $itemid = $row_ref->[0];
+		my $value = $row_ref->[1];
+		my $clock = $row_ref->[2];
+
+		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $epp_dbl_items_ref);
+
+		fail("internal error: item $key (itemid:$itemid) or Probe is unknown") unless (defined($probe) and defined($key));
+
+		my $type = __get_epp_dbl_type($key);
+
+		$result{$probe}->{$clock}->{$type} = get_detailed_result($cfg_epp_valuemaps, $value);
+	}
+
+	my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+
+	foreach my $row_ref (@$str_rows_ref)
+	{
+		my $itemid = $row_ref->[0];
+		my $value = $row_ref->[1];
+		my $clock = $row_ref->[2];
+
+		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $epp_str_items_ref);
+
+		fail("internal error: item $key (itemid:$itemid) or Probe is unknown") unless (defined($probe) and defined($key));
+
+		my $type = __get_epp_str_type($key);
+
+		$result{$probe}->{$clock}->{$type} = $value;
 	}
 
 	return \%result;
@@ -728,17 +831,29 @@ sub __get_rdds_dbl_type
 {
 	my $key = shift;
 
-	# rsm.rdds.43.rtt... rsm.rdds.43.upd[... <-- returns rtt, or upd
+	# rsm.rdds.43.rtt... rsm.rdds.43.upd[... <-- returns "rtt" or "upd"
 	return substr($key, 12, 3);
 }
 
 sub __get_rdds_str_type
 {
+	# NB! This is done for consistency, perhaps in the future there will be more string items, not just "ip".
+	return 'ip';
+}
+
+sub __get_epp_dbl_type
+{
 	my $key = shift;
 
-	# rsm.rdds.43.ip[... <-- returns 'ip'
+	chop($key); # remove last char ']'
 
-	# NB! This is done for consistency, perhaps in the future there will be more string items, not just 'ip'.
+	# rsm.epp.rtt[{$RSM.TLD},login <-- returns "login" (other options: "update", "info")
+        return substr($key, 23);
+}
+
+sub __get_epp_str_type
+{
+	# NB! This is done for consistency, perhaps in the future there will be more string items, not just "ip".
 	return 'ip';
 }
 
@@ -760,7 +875,7 @@ sub __get_rdds_dbl_itemids
 {
 	my $tld = shift;
 
-	return __get_rdds_itemids($tld, "'$cfg_rdds_key_43_rtt','$cfg_rdds_key_80_rtt','$cfg_rdds_key_43_upd'");
+	return __get_itemids_by_complete_key($tld, $cfg_rdds_key_43_rtt, $cfg_rdds_key_80_rtt, $cfg_rdds_key_43_upd);
 }
 
 # return itemids of string items grouped by Probes:
@@ -779,13 +894,29 @@ sub __get_rdds_str_itemids
 {
 	my $tld = shift;
 
-	return __get_rdds_itemids($tld, "'$cfg_rdds_key_43_ip','$cfg_rdds_key_80_ip'");
+	return __get_itemids_by_complete_key($tld, $cfg_rdds_key_43_ip, $cfg_rdds_key_80_ip);
 }
 
-sub __get_rdds_itemids
+sub __get_epp_dbl_itemids
 {
 	my $tld = shift;
-	my $keys_str = shift;
+
+	return __get_itemids_by_incomplete_key($tld, $cfg_epp_key_rtt);
+}
+
+sub __get_epp_str_itemids
+{
+	my $tld = shift;
+
+	return __get_itemids_by_complete_key($tld, $cfg_epp_key_ip);
+}
+
+# $keys_str - list of complete keys
+sub __get_itemids_by_complete_key
+{
+	my $tld = shift;
+
+	my $keys_str = "'" . join("','", @_) . "'";
 
 	my $rows_ref = db_select(
 		"select h.host,i.itemid,i.key_".
@@ -797,7 +928,7 @@ sub __get_rdds_itemids
 
 	my %result;
 
-	my $tld_length = length($tld) + 1; # skip white space
+	my $tld_length = length($tld) + 1; # white space
 	foreach my $row_ref (@$rows_ref)
 	{
 		my $host = $row_ref->[0];
@@ -815,6 +946,42 @@ sub __get_rdds_itemids
 	return \%result;
 }
 
+# call this function with list of incomplete keys after $tld, e. g.:
+# __get_itemids_by_incomplete_key("example", "aaa[", "bbb[", ...)
+sub __get_itemids_by_incomplete_key
+{
+	my $tld = shift;
+
+	my $keys_cond = "(key_ like '" . join("%' or key_ like '", @_) . "%')";
+
+	my $rows_ref = db_select(
+		"select h.host,i.itemid,i.key_".
+		" from items i,hosts h".
+		" where i.hostid=h.hostid".
+			" and h.host like '$tld %'".
+			" and i.templateid is not null".
+			" and $keys_cond");
+
+	my %result;
+
+	my $tld_length = length($tld) + 1; # white space
+	foreach my $row_ref (@$rows_ref)
+	{
+		my $host = $row_ref->[0];
+		my $itemid = $row_ref->[1];
+		my $key = $row_ref->[2];
+
+		# remove TLD from host name to get just the Probe name
+		my $probe = substr($host, $tld_length);
+
+		$result{$probe}->{$itemid} = $key;
+	}
+
+	fail("cannot find items ('", join("','", @_), "') at host ($tld *)") if (scalar(keys(%result)) == 0);
+
+	return \%result;
+}
+
 # returns hash reference of Probe=>itemid of specified key
 #
 # {
@@ -822,7 +989,7 @@ sub __get_rdds_itemids
 #    'London' => 'itemid2',
 #    ...
 # }
-sub __get_itemids
+sub __get_status_itemids
 {
 	my $tld = shift;
 	my $key = shift;
@@ -933,6 +1100,18 @@ sub __get_probe_statuses
 	return \%result;
 }
 
+sub __get_last_rollweek
+{
+	my $itemid = shift;
+	my $from = shift;
+
+	my $rows_ref = db_select("select value,clock from history where itemid=$itemid and " . sql_time_condition($from). " order by clock desc limit 1");
+
+	return (undef, undef) unless (scalar(@$rows_ref) == 1);
+
+	return ($rows_ref->[0]->[0], $rows_ref->[0]->[1]);
+}
+
 sub __prnt
 {
 	print((defined($tld) ? "$tld: " : ''), join('', @_), "\n");
@@ -972,7 +1151,7 @@ update-api-data.pl - save information about the incidents to a filesystem
 
 =head1 SYNOPSIS
 
-update-api-data.pl --service <dns|dnssec|rdds|epp> [--tld tld] [--from timestamp] [--till timestamp] [--dry-run] [--debug] [--help]
+update-api-data.pl --service <dns|dnssec|rdds|epp> [--tld tld] [--period minutes] [--dry-run] [--debug] [--help]
 
 =head1 OPTIONS
 
@@ -986,14 +1165,10 @@ Specify the name of the service: dns, dnssec, rdds or epp.
 
 Process only specified TLD. By default all TLDs will be processed.
 
-=item B<--from> timestamp
+=item B<--period> minutes
 
-Optionally specify the beginning of period for getting incidents. In case of ongoing
-incident at the specified time it will be displayed with full details. E. g.:
-
-=item B<--till> timestamp
-
-Optionally specify the end of period for getting incidents.
+Specify number of minutes of the period of calculation. This period is up to the latest available
+data in the database.
 
 =item B<--dry-run>
 
@@ -1017,7 +1192,7 @@ program to provide it for users in convenient way.
 
 =head1 EXAMPLES
 
-./update-api-data.pl --tld example --from $(date -d '-10 min' +%s)
+./update-api-data.pl --tld example --period 10
 
 This will update API data of the last 10 minutes of DNS, DNSSEC, RDDS and EPP services of TLD example.
 

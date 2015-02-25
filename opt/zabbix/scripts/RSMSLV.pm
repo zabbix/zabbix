@@ -63,7 +63,7 @@ our @EXPORT = qw($result $dbh $tld
 		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt_high get_macro_dns_udp_rtt_low
 		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_macro_dns_udp_delay get_macro_dns_tcp_delay
 		get_macro_rdds_delay get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
-		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items
+		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items get_hostid
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid_by_key get_itemid_by_host
 		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids get_lastclock get_tlds get_probes get_nsips
 		get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_select set_slv_config
@@ -648,6 +648,17 @@ sub get_tld_items
 	fail("cannot find items ($cfg_key*) at host ($tld)") if (scalar(@items) == 0);
 
 	return \@items;
+}
+
+sub get_hostid
+{
+	my $host = shift;
+
+	my $rows_ref = db_select("select hostid from hosts where host='$host'");
+
+	fail("cannot get host ID of host '$host'") unless (scalar(@$rows_ref) == 1);
+
+	return $rows_ref->[0]->[0];
 }
 
 sub tld_exists
