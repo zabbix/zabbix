@@ -246,7 +246,8 @@ class C10ImportConverter extends CConverter {
 				if ($item['type'] == ITEM_TYPE_IPMI) {
 					$hasIpmiItem = true;
 				}
-				if ($item['type'] == ITEM_TYPE_SNMPV1 || $item['type'] == ITEM_TYPE_SNMPV2C || $item['type'] == ITEM_TYPE_SNMPV3) {
+				if ($item['type'] == ITEM_TYPE_SNMPV1 || $item['type'] == ITEM_TYPE_SNMPV2C
+						|| $item['type'] == ITEM_TYPE_SNMPV3) {
 					$snmpItems[] = $item;
 				}
 			}
