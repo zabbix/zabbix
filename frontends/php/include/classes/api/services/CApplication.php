@@ -578,19 +578,6 @@ class CApplication extends CApiService {
 			$result = $relationMap->mapMany($result, $templateApplications, 'templateids');
 		}
 
-		// adding hosts (deprecated)
-		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'applicationid', 'hostid');
-			$hosts = API::Host()->get(array(
-				'output' => $options['selectHosts'],
-				'hostids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'templated_hosts' => true,
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $hosts, 'hosts');
-		}
-
 		// adding one host
 		if ($options['selectHost'] !== null) {
 			$relationMap = $this->createRelationMap($result, 'applicationid', 'hostid');
