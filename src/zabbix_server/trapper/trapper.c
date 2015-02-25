@@ -80,7 +80,7 @@ static void	recv_proxyhistory(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, &error)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "history data from active proxy on \"%s\" failed: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse history data from active proxy at \"%s\": %s",
 				get_ip_by_socket(sock), error);
 		goto out;
 	}
@@ -111,8 +111,8 @@ static void	send_proxyhistory(zbx_sock_t *sock)
 
 	struct zbx_json	j;
 	zbx_uint64_t	lastid;
-	int		records;
-	char		*info = NULL, *error = NULL;
+	int		records, ret = SUCCEED;
+	char		*info = NULL, *error = NULL, *msg = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -126,25 +126,31 @@ static void	send_proxyhistory(zbx_sock_t *sock)
 
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
-	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
+	if (SUCCEED != (ret = zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "error while sending history data to server: %s", zbx_tcp_strerror());
+		msg = zbx_dsprintf(msg, "%s", zbx_tcp_strerror());
 		goto out;
 	}
 
-	if (SUCCEED != zbx_recv_response(sock, &info, CONFIG_TIMEOUT, &error))
+	if (SUCCEED != (ret = zbx_recv_response(sock, &info, CONFIG_TIMEOUT, &error)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "sending history data to server: error:\"%s\", info:\"%s\"",
-				ZBX_NULL2EMPTY_STR(error), ZBX_NULL2EMPTY_STR(info));
+		msg = zbx_dsprintf(msg, "%s; info: %s", ZBX_NULL2EMPTY_STR(error), ZBX_NULL2EMPTY_STR(info));
 		goto out;
 	}
 
 	if (0 != records)
 		proxy_set_hist_lastid(lastid);
 out:
+	if (SUCCEED != ret)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send history data to server at \"%s\": %s",
+				get_ip_by_socket(sock), msg);
+	}
+
 	zbx_json_free(&j);
 	zbx_free(info);
 	zbx_free(error);
+	zbx_free(msg);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -173,7 +179,7 @@ static void	recv_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, &error)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "heartbeat from active proxy on \"%s\" failed: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse heartbeat from active proxy at \"%s\": %s",
 				get_ip_by_socket(sock), error);
 		goto out;
 	}
@@ -461,11 +467,14 @@ out:
 
 static void	active_passive_misconfig(zbx_sock_t *sock)
 {
-	const char	*msg = "misconfiguration error: the proxy is running in the active mode but server sends "
-			"requests to it as to proxy in passive mode";
+	char   *msg = NULL;
+
+	msg = zbx_dsprintf(msg, "misconfiguration error: the proxy is running in the active mode but server at \"%s\""
+			" sends requests to it as to proxy in passive mode", get_ip_by_socket(sock));
 
 	zabbix_log(LOG_LEVEL_WARNING, "%s", msg);
 	zbx_send_response(sock, FAIL, msg, CONFIG_TIMEOUT);
+	zbx_free(msg);
 }
 
 static int	process_trap(zbx_sock_t	*sock, char *s)
@@ -499,9 +508,9 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 				}
 				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server,"
-							" datalen " ZBX_FS_SIZE_T,
-							(zbx_fs_size_t)(jp.end - jp.start + 1));
+					zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server"
+							" at \"%s\", datalen " ZBX_FS_SIZE_T,
+							get_ip_by_socket(sock), (zbx_fs_size_t)(jp.end - jp.start + 1));
 					recv_proxyconfig(sock, &jp);
 				}
 				else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_ACTIVE))
