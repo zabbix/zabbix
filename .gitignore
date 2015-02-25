@@ -99,6 +99,7 @@ sass/.sass-cache
 sass/forms_with_tables.html
 sass/stylesheets/*.css
 sass/stylesheets/*.map
+sass/stylesheets/sass/screen2.scss
 src/Makefile
 src/Makefile.in
 src/libs/Makefile
