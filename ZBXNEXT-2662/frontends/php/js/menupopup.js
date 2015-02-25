@@ -914,7 +914,7 @@ jQuery(function($) {
 
 			menuPopup = $('<ul>', {
 				id: id,
-				'class': 'action-menu'
+				'class': 'action-menu action-menu-top'
 			});
 
 			// create sections
@@ -980,7 +980,7 @@ jQuery(function($) {
 				.mouseleave(function() {
 					menuPopup.data('is-active', false);
 
-					closeInactiveMenuPopup(menuPopup, 1000);
+					closeInactiveMenuPopup(menuPopup, 500);
 				})
 				.position({
 					of: (opener.prop('tagName') === 'AREA') ? mapContainer : event,
@@ -1058,7 +1058,7 @@ jQuery(function($) {
 			if (!menuPopup.data('is-active')) {
 				menuPopup.data('is-active', false);
 
-				$('.action-menu', menuPopup).each(function() {
+				$('.action-menu-top', menuPopup).each(function() {
 					$(this).menu('collapseAll', null, true);
 				});
 
