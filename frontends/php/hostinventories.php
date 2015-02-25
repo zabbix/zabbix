@@ -182,8 +182,7 @@ else{
 				'output' => array('hostid', 'name', 'status'),
 				'selectInventory' => $requiredInventoryFields,
 				'withInventory' => true,
-				'selectGroups' => API_OUTPUT_EXTEND,
-				'limit' => ($data['config']['search_limit'] + 1)
+				'selectGroups' => API_OUTPUT_EXTEND
 			);
 			if ($data['pageFilter']->groupid > 0) {
 				$options['groupids'] = $data['pageFilter']->groupid;
@@ -216,6 +215,8 @@ else{
 			}
 
 			order_result($data['hosts'], getPageSortField('name'), getPageSortOrder());
+
+			$data['hosts'] = array_slice($data['hosts'], 0, $data['config']['search_limit'] + 1);
 		}
 
 	}
