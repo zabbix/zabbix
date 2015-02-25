@@ -206,6 +206,12 @@ else {
 				$options['groupids'] = $data['pageFilter']->groupid;
 			}
 
+			if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '') {
+				$options['searchInventory'] = array(
+					$data['filterField'] => array($data['filterFieldValue'])
+				);
+			}
+
 			$data['hosts'] = API::Host()->get($options);
 
 			// copy some inventory fields to the uppers array level for sorting
@@ -218,17 +224,12 @@ else {
 				$data['hosts'][$num]['pr_tag'] = $host['inventory']['tag'];
 				$data['hosts'][$num]['pr_macaddress_a'] = $host['inventory']['macaddress_a'];
 
-				// if we are filtering by inventory field
-				if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '') {
-					// must we filter exactly or using a substring (both are case insensitive)
+				// filter exact matches
+				if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '' && $data['filterExact'] != 0) {
 					$haystack = mb_strtolower($data['hosts'][$num]['inventory'][$data['filterField']]);
 					$needle = mb_strtolower($data['filterFieldValue']);
 
-					$match = ($data['filterExact'] == 0)
-						? (mb_strpos($haystack, $needle) !== false)
-						: ($haystack === $needle);
-
-					if (!$match) {
+					if ($haystack !== $needle) {
 						unset($data['hosts'][$num]);
 					}
 				}
