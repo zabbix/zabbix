@@ -96,7 +96,6 @@ class CTrigger extends CTriggerGeneral {
 			'excludeSearch'					=> null,
 			'searchWildcardsEnabled'		=> null,
 			// output
-			'expandData'					=> null,
 			'expandDescription'				=> null,
 			'expandComment'					=> null,
 			'expandExpression'				=> null,
@@ -117,8 +116,6 @@ class CTrigger extends CTriggerGeneral {
 			'limitSelects'					=> null
 		);
 		$options = zbx_array_merge($defOptions, $options);
-
-		$this->checkDeprecatedParam($options, 'expandData');
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -473,92 +470,7 @@ class CTrigger extends CTriggerGeneral {
 			$result = zbx_cleanHashes($result);
 		}
 
-		// unset extra fields
-		$extraFields = array('state', 'expression');
-		if ($options['expandData'] === null) {
-			$extraFields[] = 'hostname';
-		}
-		$result = $this->unsetExtraFields($result, $extraFields, $options['output']);
-
-		return $result;
-	}
-
-	/**
-	 * Get trigger by host name, host ID, trigger expression and trigger description.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array  $triggerData multidimensional array with trigger objects
-	 * @param string $triggerData[0,...]['expression']
-	 * @param array  $triggerData[0,...]['host']
-	 * @param string $triggerData[0,...]['hostid'] OPTIONAL
-	 * @param string $triggerData[0,...]['description'] OPTIONAL
-	 *
-	 * @return array
-	 */
-	public function getObjects(array $triggerData) {
-		$this->deprecated('trigger.getobjects method is deprecated.');
-
-		$options = array(
-			'output' => API_OUTPUT_EXTEND,
-			'filter' => $triggerData
-		);
-
-		// expression is checked later
-		unset($options['filter']['expression']);
-
-		$result = $this->get($options);
-
-		if (isset($triggerData['expression'])) {
-			foreach ($result as $tnum => $trigger) {
-				$tmpExp = explode_exp($trigger['expression']);
-
-				if (strcmp(trim($tmpExp, ' '), trim($triggerData['expression'], ' ')) != 0) {
-					unset($result[$tnum]);
-				}
-			}
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Check if trigger exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array $object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('trigger.exists method is deprecated.');
-
-		$keyFields = array(array('hostid', 'host'), 'description');
-
-		$result = false;
-
-		if (!isset($object['hostid']) && !isset($object['host'])) {
-			$expressionData = new CTriggerExpression();
-			if (!$expressionData->parse($object['expression'])) {
-				return false;
-			}
-			$expressionHosts = $expressionData->getHosts();
-			$object['host'] = reset($expressionHosts);
-		}
-
-		$triggers = $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'filter' => array_merge(zbx_array_mintersect($keyFields, $object), array('flags' => null)),
-		));
-
-		foreach ($triggers as $trigger) {
-			$tmpExp = explode_exp($trigger['expression']);
-			if (strcmp($tmpExp, $object['expression']) == 0) {
-				$result = true;
-				break;
-			}
-		}
+		$result = $this->unsetExtraFields($result, array('state', 'expression'), $options['output']);
 
 		return $result;
 	}
@@ -1682,23 +1594,8 @@ class CTrigger extends CTriggerGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['countOutput'] === null) {
-			// expandData
-			if (!is_null($options['expandData'])) {
-				$sqlParts['select']['hostname'] = 'h.name AS hostname';
-				$sqlParts['select']['host'] = 'h.host';
-				$sqlParts['select']['hostid'] = 'h.hostid';
-				$sqlParts['from']['functions'] = 'functions f';
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['from']['hosts'] = 'hosts h';
-				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-			}
-
-			if ($options['expandDescription'] !== null) {
-				$sqlParts = $this->addQuerySelect($this->fieldId('expression'), $sqlParts);
-			}
+		if ($options['countOutput'] === null && $options['expandDescription'] !== null) {
+			$sqlParts = $this->addQuerySelect($this->fieldId('expression'), $sqlParts);
 		}
 
 		return $sqlParts;
