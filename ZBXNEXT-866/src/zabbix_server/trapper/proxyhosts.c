@@ -45,7 +45,7 @@ void	recv_host_availability(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, &error)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "host availability data from active proxy on \"%s\" failed: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse host availability data from active proxy at \"%s\": %s",
 				get_ip_by_socket(sock), error);
 		goto out;
 	}
@@ -73,7 +73,8 @@ void	send_host_availability(zbx_sock_t *sock)
 	const char	*__function_name = "send_host_availability";
 
 	struct zbx_json	j;
-	char		*info = NULL, *error = NULL;
+	char		*info = NULL, *error = NULL, *msg = NULL;
+	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -83,22 +84,25 @@ void	send_host_availability(zbx_sock_t *sock)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() [%s]", __function_name, j.buffer);
 
-	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
+	if (SUCCEED != (ret = zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "error while sending host availability data to server: %s",
-				zbx_tcp_strerror());
+		msg = zbx_dsprintf(msg, "%s", zbx_tcp_strerror());
 		goto out;
 	}
 
-	if (SUCCEED != zbx_recv_response(sock, &info, CONFIG_TIMEOUT, &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "sending host availability data to server: error:\"%s\", info:\"%s\"",
-				ZBX_NULL2EMPTY_STR(error), ZBX_NULL2EMPTY_STR(info));
-	}
+	if (SUCCEED != (ret = zbx_recv_response(sock, &info, CONFIG_TIMEOUT, &error)))
+		msg = zbx_dsprintf(msg, "%s; info: %s", ZBX_NULL2EMPTY_STR(error), ZBX_NULL2EMPTY_STR(info));
 out:
+	if (SUCCEED != ret)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send host availability data to server at \"%s\": %s",
+				get_ip_by_socket(sock), msg);
+	}
+
 	zbx_json_free(&j);
 	zbx_free(info);
 	zbx_free(error);
+	zbx_free(msg);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
