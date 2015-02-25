@@ -126,7 +126,7 @@ class C20ImportConverter extends CConverter {
 		}
 
 		foreach ($host['interfaces'] as &$interface) {
-			if (!isset($interface['bulk'])) {
+			if (!isset($interface['bulk']) && $interface['type'] == INTERFACE_TYPE_SNMP) {
 				$interface['bulk'] = SNMP_BULK_ENABLED;
 			}
 		}
