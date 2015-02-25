@@ -143,7 +143,7 @@ foreach (@$tlds_ref)
 		my $till = $clock + RESULT_TIMESTAMP_SHIFT; # include the whole minute
 		my $from = $till - $period * 60 + 1;
 
-		__prnt("selecting period: ", __selected_period($from, $till)) if (opt('dry-run') or opt('debug'));
+		__prnt(uc($service), " period: ", __selected_period($from, $till)) if (opt('dry-run') or opt('debug'));
 
 		if (opt('dry-run'))
 		{
