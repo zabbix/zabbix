@@ -214,25 +214,34 @@ else {
 
 			$data['hosts'] = API::Host()->get($options);
 
-			// copy some inventory fields to the uppers array level for sorting
-			// and filter out hosts if we are using filter
-			foreach ($data['hosts'] as $num => $host) {
-				$data['hosts'][$num]['pr_name'] = $host['inventory']['name'];
-				$data['hosts'][$num]['pr_type'] = $host['inventory']['type'];
-				$data['hosts'][$num]['pr_os'] = $host['inventory']['os'];
-				$data['hosts'][$num]['pr_serialno_a'] = $host['inventory']['serialno_a'];
-				$data['hosts'][$num]['pr_tag'] = $host['inventory']['tag'];
-				$data['hosts'][$num]['pr_macaddress_a'] = $host['inventory']['macaddress_a'];
+			// filter exact matches
+			if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '' && $data['filterExact'] != 0) {
+				$needle = mb_strtolower($data['filterFieldValue']);
 
-				// filter exact matches
-				if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '' && $data['filterExact'] != 0) {
+				foreach ($data['hosts'] as $num => $host) {
 					$haystack = mb_strtolower($data['hosts'][$num]['inventory'][$data['filterField']]);
-					$needle = mb_strtolower($data['filterFieldValue']);
 
 					if ($haystack !== $needle) {
 						unset($data['hosts'][$num]);
 					}
 				}
+			}
+
+			$sort_fields = array(
+				'pr_name' => 'name',
+				'pr_type' => 'type',
+				'pr_os' => 'os',
+				'pr_serialno_a' => 'serialno_a',
+				'pr_tag' => 'tag',
+				'pr_macaddress_a' => 'macaddress_a'
+			);
+
+			if (array_key_exists($sortField, $sort_fields)) {
+				// copying an inventory field into the upper array level for sorting
+				foreach ($data['hosts'] as &$host) {
+					$host[$sortField] = $host['inventory'][$sort_fields[$sortField]];
+				}
+				unset($host);
 			}
 
 			order_result($data['hosts'], $sortField, $sortOrder);
