@@ -68,7 +68,7 @@ New features:
 
 Bug fixes:
 ...G...... [ZBX-9283] improved proc_info item (Windows only) to get more information about the processes (dimir)
-..F....... [ZBX-8875] fixed undefined index in screens with dynamic graph prototype and simple graph prototype elements when host is not selected (Ivo)
+..F....... [ZBX-8875] fixed undefined index in screens with dynamic graph prototype elements when host is not selected (Ivo)
 ..F....... [ZBX-9203] fixed host scripts menu popup not properly displaying script name when name contains HTML tags (Ivo)
 
 --------------------------------------------------------------------------------
