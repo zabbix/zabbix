@@ -669,7 +669,9 @@ class CTemplateScreen extends CScreen {
 									$item['name'], $template['name']));
 							}
 
-							$screenItem['resourceid'] = $resourceItemsMap[$rid];
+							if ($rid) {
+								$screenItem['resourceid'] = $resourceItemsMap[$rid];
+							}
 					}
 
 
