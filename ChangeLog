@@ -67,6 +67,7 @@ Changes for 2.4.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-9286] fixed configuration.import, when trigger expression have a user macro (Oleg)
 ...G...... [ZBX-9283] improved proc_info item (Windows only) to get more information about the processes (dimir)
 ..F....... [ZBX-8875] fixed undefined index in screens with dynamic graph prototype elements when host is not selected (Ivo)
 ..F....... [ZBX-9203] fixed host scripts menu popup not properly displaying script name when name contains HTML tags (Ivo)
