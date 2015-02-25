@@ -200,17 +200,10 @@ else {
 				'output' => array('hostid', 'name', 'status'),
 				'selectInventory' => $requiredInventoryFields,
 				'withInventory' => true,
-				'selectGroups' => API_OUTPUT_EXTEND,
-				'limit' => ($data['config']['search_limit'] + 1)
+				'selectGroups' => API_OUTPUT_EXTEND
 			);
 			if ($data['pageFilter']->groupid > 0) {
 				$options['groupids'] = $data['pageFilter']->groupid;
-			}
-
-			if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '') {
-				$options['searchInventory'] = array(
-					$data['filterField'] => array($data['filterFieldValue'])
-				);
 			}
 
 			$data['hosts'] = API::Host()->get($options);
@@ -225,18 +218,25 @@ else {
 				$data['hosts'][$num]['pr_tag'] = $host['inventory']['tag'];
 				$data['hosts'][$num]['pr_macaddress_a'] = $host['inventory']['macaddress_a'];
 
-				// filter exact matches
-				if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '' && $data['filterExact'] != 0) {
+				// if we are filtering by inventory field
+				if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '') {
+					// must we filter exactly or using a substring (both are case insensitive)
 					$haystack = mb_strtolower($data['hosts'][$num]['inventory'][$data['filterField']]);
 					$needle = mb_strtolower($data['filterFieldValue']);
 
-					if ($haystack !== $needle) {
+					$match = ($data['filterExact'] == 0)
+						? (mb_strpos($haystack, $needle) !== false)
+						: ($haystack === $needle);
+
+					if (!$match) {
 						unset($data['hosts'][$num]);
 					}
 				}
 			}
 
 			order_result($data['hosts'], $sortField, $sortOrder);
+
+			$data['hosts'] = array_slice($data['hosts'], 0, $config['search_limit'] + 1);
 		}
 	}
 
