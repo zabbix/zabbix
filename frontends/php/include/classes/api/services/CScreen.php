@@ -329,28 +329,6 @@ class CScreen extends CApiService {
 	}
 
 	/**
-	 * Check if screen exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $data) {
-		$this->deprecated('screen.exists method is deprecated.');
-
-		$screen = $this->get(array(
-			'output' => array('screenid'),
-			'filter' => zbx_array_mintersect(array(array('screenid', 'name')), $data),
-			'preservekeys' => true,
-			'limit' => 1
-		));
-
-		return (bool) $screen;
-	}
-
-	/**
 	 * Validates the input parameters for the create() method.
 	 *
 	 * @throws APIException if the input is invalid

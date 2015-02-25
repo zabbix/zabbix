@@ -166,37 +166,6 @@ class CDRule extends CApiService {
 	return $result;
 	}
 
-	/**
-	 * Check if discovery rule exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('drule.exists method is deprecated.');
-
-		$options = array(
-			'output' => array('druleid'),
-			'filter' => array(),
-			'limit' => 1
-		);
-
-		if (isset($object['name'])) {
-			$options['filter']['name'] = $object['name'];
-		}
-
-		if (isset($object['druleids'])) {
-			$options['druleids'] = zbx_toArray($object['druleids']);
-		}
-
-		$dRule = $this->get($options);
-
-		return (bool) $dRule;
-	}
-
 	public function checkInput(array &$dRules) {
 		$dRules = zbx_toArray($dRules);
 
