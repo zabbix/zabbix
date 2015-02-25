@@ -111,17 +111,17 @@ function getFavouriteGraphsData() {
 function getFavouriteGraphs() {
 	$data = getFavouriteGraphsData();
 
-	$favourites = new CList(null, 'favorites', _('No graphs added.'));
+	$favourites = new CTableInfo(_('No graphs added.'));
 
 	if ($data['graphs']) {
 		foreach ($data['graphs'] as $graph) {
-			$favourites->addItem(new CLink($graph['label'], 'charts.php?graphid='.$graph['id']), 'nowrap');
+			$favourites->addRow(array(new CLink($graph['label'], 'charts.php?graphid='.$graph['id'])));
 		}
 	}
 
 	if ($data['simpleGraphs']) {
 		foreach ($data['simpleGraphs'] as $item) {
-			$favourites->addItem(new CLink($item['label'], 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$item['id']), 'nowrap');
+			$favourites->addRow(array(new CLink($item['label'], 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$item['id'])));
 		}
 	}
 
@@ -169,11 +169,11 @@ function getFavouriteMapsData() {
 function getFavouriteMaps() {
 	$data = getFavouriteMapsData();
 
-	$favourites = new CList(null, 'favorites', _('No maps added.'));
+	$favourites = new CTableInfo(_('No maps added.'));
 
 	if ($data) {
 		foreach ($data as $map) {
-			$favourites->addItem(new CLink($map['label'], 'zabbix.php?action=map.view&sysmapid='.$map['id']), 'nowrap');
+			$favourites->addRow(array(new CLink($map['label'], 'zabbix.php?action=map.view&sysmapid='.$map['id'])));
 		}
 	}
 
@@ -248,17 +248,17 @@ function getFavouriteScreensData() {
 function getFavouriteScreens() {
 	$data = getFavouriteScreensData();
 
-	$favourites = new CList(null, 'favorites', _('No screens added.'));
+	$favourites = new CTableInfo(_('No screens added.'));
 
 	if ($data['screens']) {
 		foreach ($data['screens'] as $screen) {
-			$favourites->addItem(new CLink($screen['label'], 'screens.php?elementid='.$screen['id']), 'nowrap');
+			$favourites->addRow(array(new CLink($screen['label'], 'screens.php?elementid='.$screen['id'])));
 		}
 	}
 
 	if ($data['slideshows']) {
 		foreach ($data['slideshows'] as $slideshow) {
-			$favourites->addItem(new CLink($slideshow['label'], 'slides.php?elementid='.$slideshow['id']), 'nowrap');
+			$favourites->addRow(array(new CLink($slideshow['label'], 'slides.php?elementid='.$slideshow['id'])));
 		}
 	}
 

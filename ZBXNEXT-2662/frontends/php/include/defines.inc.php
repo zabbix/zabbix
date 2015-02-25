@@ -982,16 +982,21 @@ define('HISTORY_LATEST', 'showlatest');
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // CSS styles
+define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
 define('ZBX_STYLE_BTN_CONF', 'btn-conf');
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_BTN_MAX', 'btn-max');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
+define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DOTTED', 'link-dotted');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_DOTTED', 'green '.ZBX_STYLE_DOTTED);
 define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_GREY_DOTTED', 'grey '.ZBX_STYLE_DOTTED);
 define('ZBX_STYLE_HIDDEN', 'hidden');
+define('ZBX_STYLE_HIGH_BG', 'high-bg');
+define('ZBX_STYLE_INFO_BG', 'info-bg');
+define('ZBX_STYLE_NA_BG', 'na-bg');
 define('ZBX_STYLE_ORANGE', 'orange');
 define('ZBX_STYLE_ORANGE_DOTTED', 'orange '.ZBX_STYLE_DOTTED);
 define('ZBX_STYLE_RED', 'red');
@@ -1003,6 +1008,10 @@ define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
 define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
 define('ZBX_STYLE_TABLE_FORMS_TR_NEW', 'table-forms-tr-new');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
+define('ZBX_STYLE_WARNING_BG', 'warning-bg');
+define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action');
+define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
+define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');

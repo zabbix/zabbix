@@ -126,7 +126,7 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 						}
 					});
 
-					obj.closest('.menuPopup').fadeOut(100);
+					obj.closest('.action-menu').fadeOut(100);
 					obj.remove();
 				}
 			};
@@ -141,7 +141,7 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 				clickCallback: function() {
 					PopUp(addParams, 800, 450);
 
-					jQuery(this).closest('.menuPopup').fadeOut(100);
+					jQuery(this).closest('.action-menu').fadeOut(100);
 				}
 			},
 			{
@@ -160,7 +160,7 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 						}
 					});
 
-					jQuery(this).closest('.menuPopup').fadeOut(100);
+					jQuery(this).closest('.action-menu').fadeOut(100);
 				}
 			}
 		]
@@ -521,7 +521,7 @@ function getMenuPopupRefresh(options) {
 					}
 				});
 
-				obj.closest('.menuPopup').fadeOut(100);
+				obj.closest('.action-menu').fadeOut(100);
 			}
 		};
 	});
@@ -570,7 +570,7 @@ function getMenuPopupServiceConfiguration(options) {
 				label: t('Delete'),
 				url: new Curl('services.php?delete=1&serviceid=' + options.serviceid).getUrl(),
 				clickCallback: function() {
-					jQuery(this).closest('.menuPopup').fadeOut(100);
+					jQuery(this).closest('.action-menu').fadeOut(100);
 
 					return confirm(sprintf(t('Delete service "%1$s"?'), options.name));
 				}
@@ -709,7 +709,7 @@ function getMenuPopupTriggerLog(options) {
 				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
 			);
 
-			jQuery(this).closest('.menuPopup').fadeOut(100);
+			jQuery(this).closest('.action-menu').fadeOut(100);
 		}
 	};
 
@@ -729,7 +729,7 @@ function getMenuPopupTriggerLog(options) {
 						'titlebar=no, resizable=yes, scrollbars=yes'
 					);
 
-					jQuery(this).closest('.menuPopup').fadeOut(100);
+					jQuery(this).closest('.action-menu').fadeOut(100);
 				}
 			};
 		});
@@ -782,7 +782,7 @@ function getMenuPopupTriggerMacro(options) {
 
 				expressionInput.val(expression.string);
 
-				jQuery(this).closest('.menuPopup').fadeOut(100);
+				jQuery(this).closest('.action-menu').fadeOut(100);
 			}
 		};
 	});
@@ -856,7 +856,7 @@ function getMenuPopupScriptData(scripts, hostId) {
 
 						cancelEvent(e);
 
-						jQuery(this).closest('.menuPopup').fadeOut(100);
+						jQuery(this).closest('.action-menu').fadeOut(100);
 					}
 				};
 			});
@@ -894,7 +894,7 @@ jQuery(function($) {
 			var display = menuPopup.css('display');
 
 			// hide all menu popups
-			jQuery('.menuPopup').css('display', 'none');
+			jQuery('.action-menu').css('display', 'none');
 
 			if (display === 'block') {
 				menuPopup.fadeOut(0);
@@ -912,32 +912,25 @@ jQuery(function($) {
 		else {
 			id = new Date().getTime();
 
-			menuPopup = $('<div>', {
+			menuPopup = $('<ul>', {
 				id: id,
-				'class': 'menuPopup'
+				'class': 'action-menu'
 			});
 
 			// create sections
 			if (sections.length > 0) {
+
 				$.each(sections, function(i, section) {
-					var sectionTitleBox = $('<div>', {
-							'class': 'title'
-						}),
-						sectionTitleText = $('<div>', {
-							'class': 'text',
-							text: section.label
-						}),
-						sectionMenu = $('<ul>', {
-							'class': 'menu'
-						});
+					var h3 = $('<h3>').text(section.label);
+					var sectionItem = $('<li>').append(h3);
+
+					menuPopup.append(sectionItem);
 
 					if (section.items.length > 0) {
 						$.each(section.items, function(i, item) {
-							sectionMenu.append(createMenuItem(item));
+							menuPopup.append(createMenuItem(item));
 						});
 					}
-
-					menuPopup.append(sectionTitleBox.append(sectionTitleText), sectionMenu);
 				});
 			}
 
@@ -947,7 +940,7 @@ jQuery(function($) {
 			}
 
 			// build jQuery Menu
-			$('.menu', menuPopup).menu();
+			menuPopup.menu();
 
 			// set menu popup for map area
 			if (opener.prop('tagName') === 'AREA') {
@@ -973,7 +966,7 @@ jQuery(function($) {
 			}
 
 			// hide all menu popups
-			jQuery('.menuPopup').css('display', 'none');
+			jQuery('.action-menu').css('display', 'none');
 
 			// display
 			menuPopup
@@ -1040,7 +1033,7 @@ jQuery(function($) {
 		item.append(link);
 
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {
-			var menu = $('<ul>');
+			var menu = $('<ul>', {'class' : 'action-menu'} );
 
 			$.each(options.items, function(i, item) {
 				menu.append(createMenuItem(item));
@@ -1065,7 +1058,7 @@ jQuery(function($) {
 			if (!menuPopup.data('is-active')) {
 				menuPopup.data('is-active', false);
 
-				$('.menu', menuPopup).each(function() {
+				$('.action-menu', menuPopup).each(function() {
 					$(this).menu('collapseAll', null, true);
 				});
 

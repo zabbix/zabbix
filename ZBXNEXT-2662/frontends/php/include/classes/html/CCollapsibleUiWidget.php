@@ -44,13 +44,18 @@ class CCollapsibleUiWidget extends CUiWidget {
 	public function setHeader($caption = null, $icons = SPACE) {
 		zbx_value2array($icons);
 
-		$icon = new CIcon(
-			_('Show').'/'._('Hide'),
-			$this->open ? 'arrowup' : 'arrowdown'
-		);
+		$icon = new CRedirectButton(SPACE, null);
+		if($this->open) {
+			$icon->addClass(ZBX_STYLE_BTN_WIDGET_COLLAPSE);
+			$icon->setTitle(_('Hide'));
+		}
+		else {
+			$icon->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND);
+			$icon->setTitle(_('Open'));
+		}
 		$icon->addAction('onclick', 'changeWidgetState(this, "'.$this->id.'");');
 		$icon->setAttribute('id', $this->id.'_icon');
-		array_unshift($icons, $icon);
+		array_push($icons, $icon);
 
 		parent::setHeader($caption, $icons);
 	}

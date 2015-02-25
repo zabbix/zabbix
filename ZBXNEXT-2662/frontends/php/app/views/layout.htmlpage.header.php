@@ -68,4 +68,4 @@ foreach ($data['javascript']['files'] as $path) {
 $pageHeader->display();
 
 echo "<body class=\"$css\">";
-echo "<div id=\"message-global-wrap\"><div id=\"message-global\"></div></div>";
+echo "<div class=\"msg-bad-global\" id=\"msg-bad-global\"></div>";

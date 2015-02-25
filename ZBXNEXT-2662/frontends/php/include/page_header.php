@@ -178,7 +178,7 @@ CSS;
 	$pageHeader->display();
 ?>
 <body>
-<div id="message-global-wrap"><div id="message-global"></div></div>
+<div class="msg-bad-global" id="msg-bad-global"></div>
 <?php
 }
 
@@ -199,7 +199,9 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	echo $pageMenu->getOutput();
 }
 
-echo '<article>';
+if ($page['type'] == PAGE_TYPE_HTML) {
+	echo '<article>';
+}
 
 // unset multiple variables
 unset($ZBX_MENU, $table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);

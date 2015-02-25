@@ -278,7 +278,6 @@ foreach ($groups as $group) {
 	// if hostgroup contains problematic hosts, hint should be built
 	if ($hosts_data[$group['groupid']]['problematic']) {
 		$table_inf = new CTableInfo();
-		$table_inf->setAttribute('style', 'width: 400px;');
 
 		// set trigger severities as table header starting from highest severity
 		$header = array();
