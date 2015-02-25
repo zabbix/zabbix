@@ -641,16 +641,16 @@ function changeFlickerState(id, titleWhenVisible, titleWhenHidden) {
 
 function changeWidgetState(obj, widgetId) {
 	var widgetObj = jQuery('#' + widgetId + '_widget'),
-		css = switchElementClass(obj, 'arrowup', 'arrowdown'),
+		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'),
 		state = 0;
 
-	if (css === 'arrowdown') {
+	if (css === 'btn-widget-expand') {
 		jQuery('.body', widgetObj).slideUp(50);
-		jQuery('.footer', widgetObj).slideUp(50);
+		jQuery('.dashbrd-widget-foot', widgetObj).slideUp(50);
 	}
 	else {
 		jQuery('.body', widgetObj).slideDown(50);
-		jQuery('.footer', widgetObj).slideDown(50);
+		jQuery('.dashbrd-widget-foot', widgetObj).slideDown(50);
 
 		state = 1;
 	}

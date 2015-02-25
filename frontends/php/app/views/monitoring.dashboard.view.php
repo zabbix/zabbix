@@ -36,8 +36,9 @@ $dashboardWidget->setControls($controls);
 $dashboardGrid = array(array(), array(), array());
 $widgetRefreshParams = array();
 
-// favourite graphs
-$icon = new CIcon(_('Menu'), 'iconmenu');
+$icon = new CRedirectButton(SPACE, null);
+$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
+$icon->setTitle(_('Action'));
 $icon->setAttribute('id', 'favouriteGraphs');
 $icon->setMenuPopup(CMenuPopupHelper::getFavouriteGraphs());
 
@@ -53,7 +54,9 @@ $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.row', 0);
 $dashboardGrid[$col][$row] = $favouriteGraphs;
 
 // favourite maps
-$icon = new CIcon(_('Menu'), 'iconmenu');
+$icon = new CRedirectButton(SPACE, null);
+$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
+$icon->setTitle(_('Action'));
 $icon->setAttribute('id', 'favouriteMaps');
 $icon->setMenuPopup(CMenuPopupHelper::getFavouriteMaps());
 
@@ -73,6 +76,12 @@ $icon = new CIcon(_('Menu'), 'iconmenu');
 $icon->setAttribute('id', 'favouriteScreens');
 $icon->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
 
+$icon = new CRedirectButton(SPACE, null);
+$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
+$icon->setTitle(_('Action'));
+$icon->setAttribute('id', 'favouriteMaps');
+$icon->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
+
 $favouriteScreens = new CCollapsibleUiWidget(WIDGET_FAVOURITE_SCREENS, $data['favourite_screens']);
 $favouriteScreens->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.state', true);
 $favouriteScreens->setHeader(_('Favourite screens'), $icon);
@@ -90,7 +99,9 @@ $dashboardGrid[$col][$row] = $favouriteScreens;
 if ($data['show_status_widget']) {
 	$rate = CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.rf_rate', 60);
 
-	$icon = new CIcon(_('Menu'), 'iconmenu');
+	$icon = new CRedirectButton(SPACE, null);
+	$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
+	$icon->setTitle(_('Action'));
 	$icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_ZABBIX_STATUS, $rate));
 
 	$zabbixStatus = new CCollapsibleUiWidget(WIDGET_ZABBIX_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
@@ -114,7 +125,9 @@ if ($data['show_status_widget']) {
 // system status
 $rate = CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.rf_rate', 60);
 
-$icon = new CIcon(_('Menu'), 'iconmenu');
+$icon = new CRedirectButton(SPACE, null);
+$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
+$icon->setTitle(_('Action'));
 $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_SYSTEM_STATUS, $rate));
 
 $systemStatus = new CCollapsibleUiWidget(WIDGET_SYSTEM_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
@@ -137,7 +150,9 @@ $widgetRefreshParams[WIDGET_SYSTEM_STATUS] = array(
 // host status
 $rate = CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.rf_rate', 60);
 
-$icon = new CIcon(_('Menu'), 'iconmenu');
+$icon = new CRedirectButton(SPACE, null);
+$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
+$icon->setTitle(_('Action'));
 $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_HOST_STATUS, $rate));
 
 $hostStatus = new CCollapsibleUiWidget(WIDGET_HOST_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
@@ -160,7 +175,9 @@ $widgetRefreshParams[WIDGET_HOST_STATUS] = array(
 // last issues
 $rate = CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.rf_rate', 60);
 
-$icon = new CIcon(_('Menu'), 'iconmenu');
+$icon = new CRedirectButton(SPACE, null);
+$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
+$icon->setTitle(_('Action'));
 $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_LAST_ISSUES, $rate));
 
 $lastIssues = new CCollapsibleUiWidget(WIDGET_LAST_ISSUES, new CSpan(_('Loading...'), 'textcolorstyles'));
@@ -183,7 +200,9 @@ $widgetRefreshParams[WIDGET_LAST_ISSUES] = array(
 // web monitoring
 $rate = CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.rf_rate', 60);
 
-$icon = new CIcon(_('Menu'), 'iconmenu');
+$icon = new CRedirectButton(SPACE, null);
+$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
+$icon->setTitle(_('Action'));
 $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_WEB_OVERVIEW, $rate));
 
 $webMonitoring = new CCollapsibleUiWidget(WIDGET_WEB_OVERVIEW, new CSpan(_('Loading...'), 'textcolorstyles'));
@@ -207,7 +226,9 @@ $widgetRefreshParams[WIDGET_WEB_OVERVIEW] = array(
 if ($data['show_discovery_widget']) {
 	$rate = CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.rf_rate', 60);
 
-	$icon = new CIcon(_('Menu'), 'iconmenu');
+	$icon = new CRedirectButton(SPACE, null);
+	$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
+	$icon->setTitle(_('Action'));
 	$icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_DISCOVERY_STATUS, $rate));
 
 	$discoveryStatus = new CCollapsibleUiWidget(WIDGET_DISCOVERY_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
@@ -233,15 +254,15 @@ foreach ($dashboardGrid as $key => $val) {
 	ksort($dashboardGrid[$key]);
 }
 
-$dashboardTable = new CTable();
-$dashboardTable->addRow(
+$dashboardRow = new CDiv(
 	array(
-		new CDiv($dashboardGrid[0], 'column'),
-		new CDiv($dashboardGrid[1], 'column'),
-		new CDiv($dashboardGrid[2], 'column')
+		new CDiv($dashboardGrid[0], 'cell'),
+		new CDiv($dashboardGrid[1], 'cell'),
+		new CDiv($dashboardGrid[2], 'cell')
 	),
-	'top'
+	'row'
 );
+$dashboardTable = new CDiv($dashboardRow, 'table');
 
 $dashboardWidget->addItem($dashboardTable);
 $dashboardWidget->show();
