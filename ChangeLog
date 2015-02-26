@@ -68,6 +68,7 @@ Changes for 2.4.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-9268] fixed misleading message in discovered object indicator tooltip when deletion date is in the past (Ivo)
 ..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
 ..F....... [ZBX-9286] fixed configuration.import, when trigger expression have a user macro (Oleg)
 ...G...... [ZBX-9283] improved proc_info item (Windows only) to get more information about the processes (dimir)
