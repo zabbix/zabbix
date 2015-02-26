@@ -128,7 +128,7 @@ foreach ($this->data['items'] as $item) {
 			$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
 
 			// Check if item should've been deleted in the past.
-			if ($currentTime - $item['itemDiscovery']['ts_delete'] > 0) {
+			if ($currentTime > $item['itemDiscovery']['ts_delete']) {
 				$deleteError->setHint(_s(
 					'The item is not discovered anymore and will be deleted the next time discovery rule is processed.'
 				));

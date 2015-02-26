@@ -130,7 +130,7 @@ foreach ($this->data['groups'] as $group) {
 		$info = new CDiv(SPACE, 'status_icon iconwarning');
 
 		// Check if host group should've been deleted in the past.
-		if ($currentTime - $group['groupDiscovery']['ts_delete'] > 0) {
+		if ($currentTime > $group['groupDiscovery']['ts_delete']) {
 			$info->setHint(_s(
 				'The host group is not discovered anymore and will be deleted the next time discovery rule is processed.'
 			));

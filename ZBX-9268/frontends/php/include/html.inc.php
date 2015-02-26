@@ -555,7 +555,7 @@ function getAvailabilityTable($host, $currentTime) {
 		$deleteError = new CDiv(SPACE, 'status_icon status_icon_extra iconwarning');
 
 		// Check if host should've been deleted in the past.
-		if ($currentTime - $host['hostDiscovery']['ts_delete'] > 0) {
+		if ($currentTime > $host['hostDiscovery']['ts_delete']) {
 			$deleteError->setHint(_s(
 				'The host is not discovered anymore and will be deleted the next time discovery rule is processed.'
 			));
