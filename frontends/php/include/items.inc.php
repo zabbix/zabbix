@@ -703,11 +703,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 	order_result($hostNames);
 
 	if ($viewMode == STYLE_TOP) {
-		$header = array(new CCol(_('Items'), 'center'));
-		foreach ($hostNames as $hostName) {
-			$header[] = new CCol($hostName, 'vertical_rotation');
-		}
-		$table->setHeader($header, 'vertical_header');
+		$table->setHeader(array(_('Items')) + $hostNames, 'vertical_header');
 
 		foreach ($items as $descr => $ithosts) {
 			$tableRow = array(nbsp($descr));
@@ -720,9 +716,9 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 	else {
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
-		$header = array(new CCol(_('Hosts'), 'center'));
+		$header = array(_('Hosts'));
 		foreach ($items as $descr => $ithosts) {
-			$header[] = new CCol($descr, 'vertical_rotation');
+			$header[] = $descr;
 		}
 		$table->setHeader($header, 'vertical_header');
 

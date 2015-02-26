@@ -30,7 +30,7 @@ function getSeverityStyle($severity, $type = true) {
 	);
 
 	if (!$type) {
-		return '';
+		return ZBX_STYLE_NORMAL_BG;
 	}
 	elseif (isset($styles[$severity])) {
 		return $styles[$severity];
@@ -1093,13 +1093,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 	if ($viewMode == STYLE_TOP) {
 		// header
-		$header = array(new CCol(_('Triggers'), 'center'));
-
-		foreach ($hostNames as $hostName) {
-			$header[] = new CCol($hostName, 'vertical_rotation');
-		}
-
-		$triggerTable->setHeader($header, 'vertical_header');
+		$triggerTable->setHeader(array(_('Triggers')) + $hostNames, 'vertical_header');
 
 		// data
 		foreach ($data as $description => $triggerHosts) {
@@ -1118,10 +1112,10 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 	}
 	else {
 		// header
-		$header = array(new CCol(_('Host'), 'center'));
+		$header = array(_('Host'));
 
 		foreach ($data as $description => $triggerHosts) {
-			$header[] = new CCol($description, 'vertical_rotation');
+			$header[] = $description;
 		}
 
 		$triggerTable->setHeader($header, 'vertical_header');
