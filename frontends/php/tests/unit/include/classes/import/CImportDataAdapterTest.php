@@ -1391,8 +1391,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'dns' => 'localhost',
 							'port' => '10050',
 							'interface_ref' => 'if0',
-							'main' => 1,
-							'bulk' => 1
+							'main' => 1
 						),
 //						array (								// ??? IPMI interface
 //							'type' => 3,
@@ -1472,7 +1471,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'multiplier' => '0',
 						'delta' => '0',
 						'formula' => '1',
-						'lastlogsize' => '0',						// <-- ???
 						'logtimefmt' => '',
 						'delay_flex' => '',
 						'authtype' => '0',
@@ -1517,7 +1515,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'multiplier' => '0',
 						'delta' => '0',
 						'formula' => '1',
-						'lastlogsize' => '0',						// <-- ???
 						'logtimefmt' => '',
 						'delay_flex' => '',
 						'authtype' => '0',
@@ -1557,7 +1554,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'multiplier' => '0',
 						'delta' => '0',
 						'formula' => '1',
-						'lastlogsize' => '0',						// <-- ???
 						'logtimefmt' => '',
 						'delay_flex' => '',
 						'authtype' => '0',
@@ -1643,7 +1639,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'show_triggers' => '1',
 					'yaxismin' => '5.5000',
 					'yaxismax' => '95.6000',
-					'show_legend' => '0',
 					'show_3d' => '0',
 					'percent_left' => '25.5000',
 					'percent_right' => '27.6000',
@@ -1687,7 +1682,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'show_triggers' => '0',
 					'yaxismin' => '0.0000',
 					'yaxismax' => '100.0000',
-					'show_legend' => '0',
 					'show_3d' => '0',
 					'percent_left' => '0.0000',
 					'percent_right' => '0.0000',
@@ -1731,7 +1725,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'show_triggers' => '1',
 					'yaxismin' => '0.0000',
 					'yaxismax' => '0.0000',
-					'show_legend' => '0',
 					'show_3d' => '0',
 					'percent_left' => '0.0000',
 					'percent_right' => '0.0000',
