@@ -179,12 +179,14 @@ function get_icon($type, $params = array()) {
 		case 'favourite':
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = new CRedirectButton(SPACE, null);
-				$icon->addClass(ZBX_STYLE_BTN_CONF);
+				$icon->addClass(ZBX_STYLE_BTN_REMOVE_FAV);
+				$icon->setTitle(_('Remove from favourites'));
 				$icon->addAction('onclick', 'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
 				$icon = new CRedirectButton(SPACE, null);
-				$icon->addClass(ZBX_STYLE_BTN_CONF);
+				$icon->addClass(ZBX_STYLE_BTN_ADD_FAV);
+				$icon->setTitle(_('Add to favourites'));
 				$icon->addAction('onclick', 'add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			$icon->setAttribute('id', 'addrm_fav');
@@ -198,12 +200,14 @@ function get_icon($type, $params = array()) {
 				$url->setArgument('fullscreen', '1');
 
 				$icon = new CRedirectButton(SPACE, $url->getUrl());
+				$icon->setTitle(_('Fullscreen'));
 				$icon->addClass(ZBX_STYLE_BTN_MAX);
 			}
 			else {
 				$url->setArgument('fullscreen', '0');
 
 				$icon = new CRedirectButton(SPACE, $url->getUrl());
+				$icon->setTitle(_('Normal view'));
 				$icon->addClass(ZBX_STYLE_BTN_MIN);
 			}
 
@@ -213,19 +217,21 @@ function get_icon($type, $params = array()) {
 
 			$icon = new CRedirectButton(SPACE, 'dashconf.php');
 			$icon->addClass(ZBX_STYLE_BTN_CONF);
+			$icon->setTitle(_('Configure'));
 
 			return $icon;
 
 		case 'overviewhelp':
 
 			$icon = new CRedirectButton(SPACE, null);
-			$icon->addClass(ZBX_STYLE_BTN_CONF);
+			$icon->addClass(ZBX_STYLE_BTN_INFO);
 
 			return $icon;
 
 		case 'reset':
 			$icon = new CRedirectButton(SPACE, null);
-			$icon->addClass(ZBX_STYLE_BTN_CONF);
+			$icon->addClass(ZBX_STYLE_BTN_RESET);
+			$icon->setTitle(_('Reset'));
 			$icon->addAction('onclick', 'timeControl.objectReset();');
 
 			return $icon;

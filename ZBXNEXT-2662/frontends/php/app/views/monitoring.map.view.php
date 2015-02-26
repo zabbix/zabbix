@@ -61,28 +61,23 @@ if ($data['maps']) {
 	$imgMap->setMap($actionMap->getName());
 	$mapTable->addRow($imgMap);
 
-	$icons = array(
+	$controls->addItem(
 		get_icon('favourite', array(
 			'fav' => 'web.favorite.sysmapids',
 			'elname' => 'sysmapid',
 			'elid' => $data['sysmapid']
-		)),
-		'&nbsp'
+		))
 	);
 }
 else {
 	$mapTable = new CTable(_('No maps found.'), 'map map-container');
 	$mapTable->setAttribute('style', 'margin-top: 4px;');
-
-	$icons = array();
 }
 
-$icons[] = get_icon('fullscreen', array('fullscreen' => $data['fullscreen']));
-
-$controls->addItem($icon);
-$controls->addItem($fsIcon);
+$controls->addItem(get_icon('fullscreen', array('fullscreen' => $data['fullscreen'])));
 
 $headerMapForm->addItem($controls);
+$mapWidget->setTitle(_('Network maps'));
 $mapWidget->setControls($headerMapForm);
 
 $mapWidget->addItem($mapTable);

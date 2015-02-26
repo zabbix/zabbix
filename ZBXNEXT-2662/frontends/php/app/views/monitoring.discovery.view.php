@@ -26,12 +26,14 @@ $discoveryHeaderForm = new CForm('get');
 $discoveryHeaderForm->setName('slideHeaderForm');
 $discoveryHeaderForm->addVar('action', 'discovery.view');
 $discoveryHeaderForm->addVar('fullscreen', $data['fullscreen']);
-$discoveryWidget->addPageHeader(_('STATUS OF DISCOVERY'), get_icon('fullscreen', array('fullscreen' => $data['fullscreen'])));
 
+$discoveryWidget->setTitle(_('STATUS OF DISCOVERY'));
+$controls = new CList();
 $discoveryRulesComboBox = $data['pageFilter']->getDiscoveryCB();
-
-$discoveryHeaderForm->addItem(array(_('Discovery rule').SPACE, $discoveryRulesComboBox));
-$discoveryWidget->addHeader(_('Discovery rules'), $discoveryHeaderForm);
+$controls->addItem(array(_('Discovery rule').SPACE, $discoveryRulesComboBox));
+$controls->addItem(get_icon('fullscreen', array('fullscreen' => $data['fullscreen'])));
+$discoveryHeaderForm->addItem($controls);
+$discoveryWidget->setControls($discoveryHeaderForm);
 
 // create table
 $discoveryTable = new CTableInfo(_('No discovered devices found.'));

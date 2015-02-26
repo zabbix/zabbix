@@ -983,10 +983,14 @@ define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // CSS styles
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
+define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav');
 define('ZBX_STYLE_BTN_CONF', 'btn-conf');
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
+define('ZBX_STYLE_BTN_INFO', 'btn-info');
 define('ZBX_STYLE_BTN_MAX', 'btn-max');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
+define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
+define('ZBX_STYLE_BTN_RESET', 'btn-reset');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DOTTED', 'link-dotted');
 define('ZBX_STYLE_GREEN', 'green');
@@ -997,6 +1001,7 @@ define('ZBX_STYLE_HIDDEN', 'hidden');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
 define('ZBX_STYLE_NA_BG', 'na-bg');
+define('ZBX_STYLE_NORMAL_BG', 'normal-bg');
 define('ZBX_STYLE_ORANGE', 'orange');
 define('ZBX_STYLE_ORANGE_DOTTED', 'orange '.ZBX_STYLE_DOTTED);
 define('ZBX_STYLE_RED', 'red');

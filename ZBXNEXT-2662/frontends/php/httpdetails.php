@@ -111,19 +111,13 @@ $itemHistory = Manager::History()->getLast($items);
  */
 $httpdetailsWidget = new CWidget();
 $httpdetailsWidget->setTitle(
-	array(
-		_('DETAILS OF WEB SCENARIO'),
-		SPACE,
-		bold(CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])),
-		isset($httpTestData['lastcheck']) ? ' ['.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $httpTestData['lastcheck']).']' : null
-	)
+	_('DETAILS OF WEB SCENARIO').':'.SPACE.
+	CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])
 );
-$httpdetailsWidget->setControls(
-	array(
-		get_icon('reset', array('id' => getRequest('httptestid'))),
-		get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
-	)
-);
+$controls = new CList();
+$controls->addItem(get_icon('reset', array('id' => getRequest('httptestid'))));
+$controls->addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
+$httpdetailsWidget->setControls($controls);
 
 // append table to widget
 $httpdetailsTable = new CTableInfo();

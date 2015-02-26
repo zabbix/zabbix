@@ -33,7 +33,7 @@ $controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsC
 $controls->addItem(array(_('Type').SPACE, $typeComboBox));
 
 // hint table
-$hintTable = new CTableInfo(null, 'tableinfo tableinfo-overview-hint');
+$hintTable = new CTableInfo();
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$hintTable->addRow(array(getSeverityCell($severity, $this->data['config']), _('PROBLEM')));
 }
