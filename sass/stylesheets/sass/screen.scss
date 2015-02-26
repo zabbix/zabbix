@@ -78,6 +78,11 @@ h3 {
 
 h4 {
 	@include font-h4;
+
+	span {
+		font-size: $font-body-size;
+		color: $blue-grey;
+	}
 }
 
 sup {
@@ -541,10 +546,15 @@ footer {
 	.cell {
 		white-space: nowrap;
 		text-align: left;
-		padding: 0 15px 0 15px;
+		padding: 0 20px 0 20px;
 		border-right: 1px solid #e9edf2;
 
+		&:first-child {
+			padding-left: 0;
+		}
+
 		&:last-child {
+			padding-right: 0;
 			border-right: none;
 		}
 
@@ -564,6 +574,10 @@ footer {
 	padding: 0 10px 10px 10px;
 	background: $body-content-bgcolor;
 	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
+
+	.filter-forms {
+		padding: 20px 0 5px 0;
+	}
 }
 
 .form-btns {
