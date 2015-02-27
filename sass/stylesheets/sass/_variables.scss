@@ -1,6 +1,7 @@
 $red: #e33734;
 $light-red: #ed9898;
 $lighter-red: #fccacf;
+$alt-red: #fc5151;
 
 $orange: #f24f1d;
 $light-orange: #fca990;
@@ -14,10 +15,13 @@ $green: #429e47;
 $light-green: #a5d6a7;
 $lighter-green: #c5e3c6;
 
+$primary-blue: #0275b8;
+$secondary-blue: #013e61;
+
 $blue: #0298e3;
 $light-blue: #81d2f7;
 $lighter-blue: #b1e3fa;
-$lightest-blue: #def1fa;
+$alt-blue: #e8f4fa;
 
 $blue-grey: #768d99;
 $light-blue-grey: #acbbc2;
@@ -28,84 +32,31 @@ $grey: #737373;
 $light-grey: #ebebeb;
 $lighter-grey: #f2f2f2;
 
-$white: #ffffff;
-
 $indigo-black: #1f2c33;
-
+$white: #fff;
 $transparent: transparent;
-
-
-
-
-// MAIN ELEMENT COLORS
-$primary-color: #1e71ad; // Blue
-$secondary-color: #1e3d61; // Dark Blue 
-$body-bgcolor: #e9edf2; // Grey Blue
-$body-content-bgcolor: #fff; // Body Content White
-$underline-color: #d0d4d9; 
-
 
 // LINK COLORS
 $link-color: #3071ab; // Blue
-$link-hover-color: #3071ab; // Blue
-$link-active-color: #3071ab;// // Blue
-$link-visited-color: #3071ab; // Blue
+$link-hover-color: #3071ab;
+$link-active-color: #3071ab;
+$link-visited-color: #3071ab;
 
-$link-alt-color: #4f86a8; // Alt Blue
-$link-alt-hover-color: #4f86a8; // Alt Blue
-$link-alt-active-color: #4f86a8; // Alt Blue
-$link-alt-visited-color: #4f86a8; // Alt Blue
+$link-topnav-color: #bfdced; // Nav Blue
+$link-topnav-hover-color: #fff;
+$link-topnav-active-color: #fff;
+$link-topnav-visited-color: #bfdced;
 
-$link-topnav-color: #bfdbea; // Nav Light Blue
-$link-topnav-hover-color: #fff; // Nav White
-$link-topnav-active-color: #fff; // Nav White
-$link-topnav-visited-color: #bfdbea; // Nav White
+$link-topsubnav-color: #bfced7; // SubNav Blue
+$link-topsubnav-hover-color: #fff;
+$link-topsubnav-active-color: #fff;
+$link-topsubnav-visited-color: #bfced7;
 
-$link-topsubnav-color: #bfced7; // SubNav Light Blue
-$link-topsubnav-hover-color: #fff; // SubNav White
-$link-topsubnav-active-color: #fff; // SubNav White
-$link-topsubnav-visited-color: #bfced7; // SubNav Light Blue
-
-// TABLE COLORS
-$table-hordivider-color: #e9edf2; // Grey Blue
-$table-tr-selected-color: #ffffcc; // Yellow
-
-
-// FORM COLORS
-$form-transparent-color: transparent;
-$form-disabled-color: #c4c8cc; // Disabled Light Grey 
-$form-input-color: #b8bbbf; // Light Grey
-$form-input-top-placeholder: #c5d8e5; // Search Light Blue
-$form-input-top-focus-placeholder: #a9a9a9; // Search Grey
-
-// ALERT COLORS
-$alert-green-color: #3a8a43; // Green
-$alert-green-bg-color: #dff0d8; // Light Green
-$alert-green-border-color: #ccdebd; // Dark Green
-
-$alert-red-color: #a83331; // Red
-$alert-red-bg-color: #f2dede; // Light Red
-$alert-red-border-color: #ebccd1; // Dark Red
-
-$alert-orange-color: #f37421; // Orange
-$alert-average-bg-color: #fad7c0; // Light Orange
-
-$alert-na-bg-color: #e3e4e5; // Grey
-$alert-info-bg-color: #d2ecf7; // Cyan
-$alert-warning-bg-color: #fcf5de; // Light Yellow
-$alert-high-bg-color: #ebccd1; // Dark Red
-$alert-disaster-bg-color: #cf534e; // Dark Red
-
-$alert-grey-color: #828282; // Alert Grey
-$alert-grey-bg-color: #e0e0e0; // Alert Light Grey 
-$alert-grey-border-color: #cfcfcf; // Alert Dark Grey
+$form-input-top-placeholder: #c5d8e5;
+$form-input-top-focus-placeholder: #a9a9a9;
 
 // TYPOGRAPHY
 $font-stack: Arial, Tahoma, Verdana, sans-serif;
-
-$font-color: #1f2c33; // Navy Black
-$font-alt-color: #828282; // Alt Grey
-$font-white-color: #fff; // Alt White
 
 $font-body-size: 75%; // Default 1em/12px
 $body-line-height: 1.4em;
@@ -149,7 +100,7 @@ $font-transform: uppercase;
 @mixin font-h3 {
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
-	color: $font-alt-color;
+	color: $blue-grey;
 }
 
 @mixin font-h4 {

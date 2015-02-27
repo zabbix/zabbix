@@ -10,14 +10,14 @@ html {
 
 body {
 	@include font-body;
-	color: $font-color;
-	background: $body-bgcolor;
+	color: $indigo-black;
+	background: $lightest-blue-grey;
 	margin-bottom: 90px;
 	min-width: 950px;
 }
 
 fieldset {
-	border: 1px solid $underline-color;
+	border: 1px solid $lighter-blue-grey;
 	padding: 0 10px 10px 15px;
 }
 
@@ -64,7 +64,7 @@ a {
 
 h1 {
 	@include font-h1;
-	border-bottom: 1px solid $underline-color;
+	border-bottom: 1px solid $lighter-blue-grey;
 	padding: 0 0 5px 0;
 }
 
@@ -87,7 +87,7 @@ h4 {
 
 sup {
 	font-size: $font-h3-size;
-	color: $font-alt-color;
+	color: $blue-grey;
 }
 
 /* Main Navigation */
@@ -96,7 +96,7 @@ header {
 }
 
 nav {
-background: $secondary-color;
+background: $secondary-blue;
 margin: 0 0 13px 0;
 }
 
@@ -104,12 +104,12 @@ margin: 0 0 13px 0;
 	height: 36px;
 	line-height: 35px;
 	position: relative;
-	background: $primary-color;
+	background: $primary-blue;
 }
 
 .top-nav {
 	font-size: $font-top-nav-size;
-	background: $primary-color;
+	background: $primary-blue;
 
 	li {
 		display: block;
@@ -131,11 +131,11 @@ margin: 0 0 13px 0;
 				line-height: 0;
 				border-left: 7px solid transparent;
 				border-right: 7px solid transparent;
-				border-bottom: 7px solid $secondary-color;
+				border-bottom: 7px solid $secondary-blue;
 			}
 
 			a, a:hover {
-				color: $link-topnav-hover-color;
+				color: $link-topnav-active-color;
 			}
 	    }
 	}
@@ -174,19 +174,19 @@ ul.top-nav-icons {
     }
 
 	.top-nav-help {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -18px;
+		background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -18px;
 	}
 
 	.top-nav-print {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -42px;
+		background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -42px;
 	}
 
 	.top-nav-profile {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -66px;
+		background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -66px;
 	}
 
 	.top-nav-signout {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -91px;
+		background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -91px;
 		width: 44px;
 	}
 
@@ -195,13 +195,13 @@ ul.top-nav-icons {
 	}
 
 	input {
-		background: darken($primary-color, 10%);
+		background: darken($primary-blue, 5%);
 		border: none;
 		width: 169px;
 		height: 24px;
 		line-height: 24px;
 		margin: 6px 13px 0 0;
-		color: $font-white-color;
+		color: $white;
 		padding-right: 24px;
 		@include transition(color, background-color .2s ease);
 		@include placeholder($form-input-top-placeholder);
@@ -216,21 +216,21 @@ ul.top-nav-icons {
 .top-subnav-container {
 	height: 36px;
 	line-height: 36px;
-	background: $secondary-color;
+	background: $secondary-blue;
 }
 
 .top-subnav {
-	background: $secondary-color;
+	background: $secondary-blue;
 
 	li {
 		display: block;
 		float: left;
-		padding: 0 5px 0 5px;
+		padding: 0 5px;
 	}
 }
 
 .top-subnav a {
-	padding: 5px 8px 5px 8px;
+	padding: 5px 8px;
 	color: $link-topsubnav-color;
 
 	&:hover {
@@ -240,8 +240,8 @@ ul.top-nav-icons {
 
 	&.selected {
 		@include border-radius(2px);
-		background: darken($secondary-color, 10%);
-		color: $link-topsubnav-hover-color;
+		background: lighten($secondary-blue, 10%);
+		color: $link-topsubnav-active-color;
 	}
 }
 
@@ -249,28 +249,28 @@ ul.top-nav-icons {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-bottom: 4px solid $font-color;
+	border-bottom: 4px solid $indigo-black;
 }
 
 .arrow-down {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-top: 4px solid $font-color;
+	border-top: 4px solid $indigo-black;
 }
 
 .arrow-left {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
-	border-right: 4px solid $font-color;
+	border-right: 4px solid $indigo-black;
 }
 
 .arrow-right {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
-	border-left: 4px solid $font-color;
+	border-left: 4px solid $indigo-black;
 }
 
 %arrow {
@@ -300,7 +300,7 @@ ul.top-nav-icons {
 
 /* Article */
 article {
-	padding: 0 13px 0 13px;
+	padding: 0 13px;
 }
 
 /* Obgect Group Navigation */
@@ -318,7 +318,7 @@ article {
 	}
 
 	.arrow-right {
-		border-left-color: $font-color;
+		border-left-color: $indigo-black;
 	}
 }
 
@@ -329,15 +329,7 @@ footer {
     width: 100%;
     height: 60px;
 	text-align: center;
-	color: $font-alt-color;
-
-	a {
-		color: $link-alt-color;
-
-		&:hover {
-			color: $link-alt-hover-color;
-		}
-	}	
+	color: $blue-grey;
 }
 
 .logo {
@@ -352,46 +344,52 @@ footer {
 /* Tables */
 .list-table {
 	width: 100%;
-    background: $body-content-bgcolor;
-    @include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
+    background: $white;
+    @include box-shadow(0 1px 1px 0 rgba(118,141,153,0.15));
 	
 	thead th {
 		@include list-table-header;
 		height: 100%;
 		overflow: hidden;
-	    padding: 8px 5px 8px 5px;
+	    padding: 8px 5px 7px 5px;
 	    vertical-align: middle;
-	    border-bottom: 2px solid $table-hordivider-color;
+	    border-bottom: 2px solid $lightest-blue-grey;
 	    text-align: left;
-	    color: $font-alt-color;
+	    color: $blue-grey;
 	    white-space: nowrap;
 
 	    .arrow-up {
 	    	position: absolute;
 	    	top: 45%;
 	    	margin: 0 0 0 4px;
-	    	border-bottom-color: $font-alt-color;
+	    	border-bottom-color: $blue-grey;
 	    }
 
 	    .arrow-down {
 	    	position: absolute;
 	    	top: 45%;
 	    	margin: 0 0 0 4px;
-	    	border-top-color: $font-alt-color;
+	    	border-top-color: $blue-grey;
 	    }
 
 	    a {
 	    	display: block;
 	    	position: relative;
-	    	color: $link-alt-color;
+	    	//color: $link-alt-color;
 	    	margin: -1em;
 	    	padding: 1em;
 	    	@include transition(background .2s ease);
 
 	    	&:hover {
-	    		color: $link-alt-hover-color;
+	    		//color: $link-alt-hover-color;
 	    		text-decoration: none;
-	    		background: lighten($primary-color, 56%)
+	    		background: $alt-blue;
+	    		//background: lighten($primary-blue, 56%);
+	    	}
+
+	    	&:active {
+	    		text-decoration: none;
+	    		background: darken($alt-blue, 5%);
 	    	}	    
 	    }
 	}
@@ -400,11 +398,12 @@ footer {
 		@include transition(background .2s ease);
 
 		&:hover {
-			background: lighten($primary-color, 56%);
+			background: $alt-blue;
+			//background: lighten($primary-blue, 56%);
 		}
 
 		&.row-selected {
-			background: $table-tr-selected-color;
+			background: $lighter-yellow;
 		}
 
 		&:last-child td {
@@ -415,16 +414,16 @@ footer {
 	td {
 		padding: 8px 5px 8px 5px;
 		vertical-align: middle;
-		border-bottom: 1px solid $table-hordivider-color;
+		border-bottom: 1px solid $lightest-blue-grey;
 	}
 }
 
 .table-paging {
 	text-align: center;
-	background: $body-content-bgcolor;
-	padding: 7px 5px 7px 5px;
-	border-top: 1px solid $table-hordivider-color;
-	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
+	background: $white;
+	padding: 7px 5px;
+	border-top: 1px solid $lightest-blue-grey;
+	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.15));
 
 	a {
 		@extend %paging-btn;
@@ -450,19 +449,21 @@ footer {
 	padding: 0 14px;
 	min-height: 22px;
 	line-height: 22px;
-	border: 1px solid $form-input-color;
+	border: 1px solid $light-blue-grey;
 	text-decoration: none;
 	color: $link-color;
 	@include transition(background .2s ease);
 
 	&:hover {
 		color: $link-hover-color;
-		background: lighten($primary-color, 55%);
+		background: $alt-blue;
+		//background: lighten($primary-blue, 55%);
 	}
 
 	&:active {
 		color: $link-active-color;
-		background: lighten($primary-color, 50%);
+		background: darken($alt-blue, 5%);
+		//background: lighten($primary-blue, 50%);
 	}
 
 	&:first-child {
@@ -475,16 +476,16 @@ footer {
 
 	&.paging-selected {
 		cursor: default;
-		color: $font-white-color;
-		border-color: $form-input-color;
-		background: $form-input-color;
+		color: $white;
+		border-color: $light-blue-grey;
+		background: $light-blue-grey;
 	}
 }
 
 .treeview-plus {
 	display: inline-block;
-	background: $body-content-bgcolor;
-	border: 1px solid $form-input-color;
+	background: $white;
+	border: 1px solid $light-blue-grey;
 	cursor: pointer;
 	width: 10px;
 	height: 10px;
@@ -495,11 +496,13 @@ footer {
 	@include border-radius(2px);
 
 	&:hover {
-		background: lighten($primary-color, 55%);
+		background: $alt-blue;
+		//background: lighten($primary-blue, 55%);
 	}
 
 	&:active {
-		background: lighten($primary-color, 50%);
+		background: darken($alt-blue, 5%);
+		//background: lighten($primary-blue, 50%);
 	}
 }
 
@@ -526,11 +529,11 @@ footer {
 	padding: 0 9px 0 6px;
 	height: 20px;
 	line-height: 20px;
-	background: $form-disabled-color;
+	background: $light-blue-grey;
 	@include border-radius(2px);
 
 	a {
-		color: $font-color;
+		color: $indigo-black;
 		text-decoration: none;
 		cursor: default;
 	}
@@ -541,12 +544,12 @@ footer {
 	text-align: center;
 	background: $white;
 	//width: 100%;
-	//@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
+	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.15));
 
 	.cell {
 		white-space: nowrap;
 		text-align: left;
-		padding: 0 20px 0 20px;
+		padding: 0 20px;
 		border-right: 1px solid #e9edf2;
 
 		&:first-child {
@@ -572,11 +575,11 @@ footer {
 /* Forms */
 .table-forms-container {
 	padding: 0 10px 10px 10px;
-	background: $body-content-bgcolor;
-	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
+	background: $white;
+	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.15));
 
 	.filter-forms {
-		padding: 20px 0 5px 0;
+		padding: 20px 0 0 0;
 	}
 }
 
@@ -592,7 +595,7 @@ footer {
 	//margin: 0 auto;
 	display: table;
 	width: 100%;
-	color: $font-color;
+	color: $indigo-black;
 
 	li {
 		display: table-row;
@@ -614,12 +617,12 @@ footer {
 	}
 
 	.table-forms-tr-new {
-		background: $alert-green-bg-color;
+		background: $lighter-green;
 	}
 
 	.table-forms-td-left {
 		display: table-cell;
-		padding: 5px 0 5px 0;
+		padding: 5px 0;
 		text-align: right;
 		vertical-align: top;
 		width: 15%;
@@ -655,7 +658,7 @@ footer {
 			position: relative;
 
 			 &.td-drag-icon {
-			 	padding: 5px 0px 5px 0;
+			 	padding: 5px 0px;
 			 }
 
 			 &.center {
@@ -664,7 +667,7 @@ footer {
 			 }
 
 			.btn-grey {
-				margin: 5px 0 5px 0;
+				margin: 5px 0;
 				display: block;
 			}
 		}
@@ -683,7 +686,7 @@ footer {
 
 .table-forms-separator {
 	margin: 5px 0 0 0;
-	border: 1px solid $table-hordivider-color;
+	border: 1px solid $lightest-blue-grey;
 }
 
 .margin-top {
@@ -785,13 +788,13 @@ select {
 
 %form-input-style {
 	@include border-radius(2px);
-	border: 1px solid $form-input-color;
-	background: $body-content-bgcolor;
+	border: 1px solid $light-blue-grey;
+	background: $white;
 	@include font-form;
 	@include transition(border-color .2s ease);
 
 	&:focus {
-		border-color: $primary-color;
+		border-color: $primary-blue;
 	}
 }
 
@@ -802,10 +805,10 @@ button::-moz-focus-inner {
 
 button {
 	@include border-radius(2px);
-	background-color: $primary-color;
-	color: $font-white-color;
+	background-color: $primary-blue;
+	color: $white;
 	font-family: $font-stack;
-	border: 1px solid $primary-color;
+	border: 1px solid $primary-blue;
 	padding: 0 11px;
 	min-height: 24px;
 	vertical-align: middle;
@@ -822,8 +825,8 @@ button {
 
 	&.btn-alt {
 		@extend button;
-		background: $form-transparent-color;
-		color: $primary-color;
+		background: $transparent;
+		color: $primary-blue;
 
 		&:hover {
 			@extend %button-hover;
@@ -835,7 +838,7 @@ button {
 	}
 
 	&.btn-conf {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat -1px -145px;
+		background: $primary-blue url(../img/icon-sprite.png) no-repeat -1px -145px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -848,7 +851,7 @@ button {
 	}
 
 	&.btn-max {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat -1px -169px;
+		background: $primary-blue url(../img/icon-sprite.png) no-repeat -1px -169px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -861,7 +864,7 @@ button {
 	}
 
 	&.btn-min {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat -1px -193px;
+		background: $primary-blue url(../img/icon-sprite.png) no-repeat -1px -193px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -874,7 +877,7 @@ button {
 	}
 
 	&.btn-add-fav {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat -49px -1px;
+		background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -1px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -887,7 +890,7 @@ button {
 	}
 
 	&.btn-remove-fav {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat -49px -25px;
+		background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -25px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -900,7 +903,7 @@ button {
 	}
 
 	&.btn-action {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat -49px -49px;
+		background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -49px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -913,7 +916,7 @@ button {
 	}
 
 	&.btn-info {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat -49px -73px;
+		background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -73px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -926,7 +929,7 @@ button {
 	}
 
 	&.btn-reset {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat -49px -97px;
+		background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -97px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -940,7 +943,7 @@ button {
 
 
 	&.btn-search {
-		background: darken($primary-color, 10%) url(../img/icon-sprite.png) no-repeat 1px -1px;
+		background: darken($primary-blue, 5%) url(../img/icon-sprite.png) no-repeat 1px -1px;
 		position: absolute;
 		border: none;
 		top: 7px;
@@ -966,7 +969,7 @@ button {
 
     &.btn-widget-action {
     	border: 0;
-    	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat 3px -262px;
+    	background: $transparent url(../img/icon-sprite.png) no-repeat 3px -262px;
 		@extend %button-widget-icon-size;
 		@include opacity(0.75);
 		@include transition(all .2s ease);
@@ -982,7 +985,7 @@ button {
 
     &.btn-widget-collapse {
     	border: 0;
-    	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat 2px -214px;
+    	background: $transparent url(../img/icon-sprite.png) no-repeat 2px -214px;
 		@extend %button-widget-icon-size;
 		@include opacity(0.75);
 
@@ -997,7 +1000,7 @@ button {
 
     &.btn-widget-expand {
     	border: 0;
-    	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat 2px -238px;
+    	background: $transparent url(../img/icon-sprite.png) no-repeat 2px -238px;
 		@extend %button-widget-icon-size;
 		@include opacity(0.75);
 
@@ -1012,18 +1015,20 @@ button {
 
 	&.btn-grey {
 		margin-top: -2px;
-		background: $form-transparent-color;
+		background: $transparent;
 		color: $link-color;
-		border-color: $form-input-color;
+		border-color: $light-blue-grey;
 
 		&:hover {
-			background: lighten($primary-color, 55%);
+			background: $alt-blue;
+			//background: lighten($primary-blue, 55%);
 			color: $link-color;
-			border-color: $form-input-color;
+			border-color: $light-blue-grey;
 		}
 
 		&:active {
-			background: lighten($primary-color, 50%);
+			background: darken($alt-blue, 5%);
+			//background: lighten($primary-blue, 50%);
 			color: $link-color;
 		}
 
@@ -1042,10 +1047,10 @@ button {
 		min-width: 94px;
 
 		&.filter-active {
-			background: $body-content-bgcolor;
+			background: $white;
 			border: none;
 			color: $link-color;
-			@include box-shadow(0 -1px 1px 0 rgba(60,60,60,0.08));
+			@include box-shadow(0 -1px 1px 0 rgba(118,141,153,0.08));
 
 			.arrow-up {
 				position: absolute;
@@ -1059,21 +1064,21 @@ button {
 			position: absolute;
 			top: 50%;
 			margin: 0 0 0 4px;
-			border-top-color: $font-white-color;
+			border-top-color: $white;
 		}
 	}
 }
 
 %button-hover {
-	background-color: darken($primary-color, 5%);
-	border-color: darken($primary-color, 5%);
-	color: $font-white-color;
+	background-color: darken($primary-blue, 5%);
+	border-color: darken($primary-blue, 5%);
+	color: $white;
 }
 
 %button-active {
-	background-color: $secondary-color;
-	border-color: $secondary-color;
-	color: $font-white-color;
+	background-color: $secondary-blue;
+	border-color: $secondary-blue;
+	color: $white;
 }
 
 %button-icon-size {
@@ -1089,19 +1094,19 @@ button {
 }
 
 %button-disabled {
-	background: $form-transparent-color;
-	color: $form-disabled-color;
-	border-color: $form-disabled-color;
+	background: $transparent;
+	color: $light-blue-grey;
+	border-color: $lighter-blue-grey;
 	cursor: default;
 }
 
 %btn-search-hover-focus {
-	background-color: darken($primary-color, 10%);
+	background-color: darken($primary-blue, 5%);
 	@include opacity(1);
 }
 
 %btn-widget-hover-active {
-	background-color: $form-transparent-color;
+	background-color: $transparent;
 	@include opacity(1);
 }
 
@@ -1109,6 +1114,10 @@ button[disabled] {
 	@extend %button-disabled;
 
 	&:hover {
+		@extend %button-disabled;
+	}
+
+	&:active {
 		@extend %button-disabled;
 	}
 }
@@ -1131,14 +1140,14 @@ button[disabled] {
 	height: 36px;
 	line-height: 36px;
 	margin: 0 -10px 15px -10px;
-	border-bottom: 1px solid $table-hordivider-color;
-	@include box-shadow(inset 0 -1px 1px 0 rgba(60,60,60,0.05));
+	border-bottom: 1px solid $lightest-blue-grey;
+	@include box-shadow(inset 0 -1px 1px 0 rgba(118,141,153,0.05));
 
 	li {
 		display: inline-block;
 
 		a {
-			padding: 11px 13px 11px 13px;
+			padding: 11px 13px;
 		} 
 
 		&.ui-tabs-active:first-child {
@@ -1146,17 +1155,17 @@ button[disabled] {
 		}
 
 		&.ui-tabs-active {
-			border-left: 1px solid $table-hordivider-color;
-			border-right: 1px solid $table-hordivider-color;
+			border-left: 1px solid $lightest-blue-grey;
+			border-right: 1px solid $lightest-blue-grey;
 			a {
 				padding: 8px 13px 11px 13px;
 				font-weight: bold;
-				background: $body-content-bgcolor;
-				color: $font-color;
+				background: $white;
+				color: $indigo-black;
 				text-decoration: none;
 				cursor: default;
-				border-top: 3px solid $primary-color;
-				border-bottom: 3px solid $body-content-bgcolor;
+				border-top: 3px solid $primary-blue;
+				border-bottom: 3px solid $white;
 			}
 		}
 	}
@@ -1190,11 +1199,11 @@ button[disabled] {
 
 /* Sign in */
 .signin-container {
-	background: $body-content-bgcolor;
+	background: $white;
 	width: 322px;
 	margin: 0 auto;
 	padding: 20px 28px 0 28px;
-	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
+	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.15));
 
 	h1 {
 		border: none;
@@ -1247,7 +1256,7 @@ button[disabled] {
 .signin-links {
 	width: 100%;
 	text-align: center;
-	color: $font-alt-color;
+	color: $blue-grey;
 	margin: 22px 0 0 0;
 }
 
@@ -1262,8 +1271,8 @@ button[disabled] {
 .dashbrd-widget {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
-	background: $body-content-bgcolor;
-	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
+	background: $white;
+	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.15));
 
 	.list-table {
 		@include box-shadow(none);
@@ -1283,7 +1292,7 @@ button[disabled] {
 			}
 
 			&:last-child td {
-				border-bottom: 1px solid $table-hordivider-color;
+				border-bottom: 1px solid $lightest-blue-grey;
 			}
 		}
 	}
@@ -1291,11 +1300,11 @@ button[disabled] {
 
 %nothing-to-show {
 	text-align: center;
-	color: $font-alt-color;
+	color: $blue-grey;
 	@include transition(0s);
 
 	td:hover {
-		background: $body-content-bgcolor;
+		background: $white;
 	}
 }
 
@@ -1324,7 +1333,7 @@ button[disabled] {
 
 .dashbrd-widget-foot {
 	text-align: right;
-	color: $font-alt-color;
+	color: $blue-grey;
 	margin: 0 10px;
 
 	li {
@@ -1339,10 +1348,10 @@ button[disabled] {
 	z-index: 1000;
 	padding: 5px 10px;
 	min-width: 166px;
-	color: $font-alt-color;
-	background: $body-content-bgcolor;
-	border: 1px solid $underline-color;
-	@include box-shadow(0 5px 20px 0 rgba(60,60,60,0.3));
+	color: $blue-grey;
+	background: $white;
+	border: 1px solid $lighter-blue-grey;
+	@include box-shadow(0 5px 20px 0 rgba(118,141,153,0.3));
 
 	li {
 
@@ -1350,7 +1359,7 @@ button[disabled] {
 			display: block;
 			height: 24px;
 			line-height: 24px;
-			color: $font-color;
+			color: $indigo-black;
 			text-decoration: none;
 			padding: 0 10px;
 			margin: 0 -10px;
@@ -1358,11 +1367,11 @@ button[disabled] {
 			@include transition(background .2s ease);
 
 			&:hover {
-				background: lighten($underline-color, 10%);
+				background: $lighter-grey;
 			}
 
 			&:active {
-				background: lighten($underline-color, 10%);
+				background: $lighter-grey;
 			}
 
 			span {
@@ -1380,7 +1389,7 @@ button[disabled] {
 		}
 
 		div {
-			border-top: 1px solid $body-bgcolor;
+			border-top: 1px solid $lightest-blue-grey;
 			margin: 5px -10px;
 		}
 	}
@@ -1395,9 +1404,9 @@ button[disabled] {
 	position: absolute;
 	z-index: 1000;
 	padding: 10px;
-	background: $body-content-bgcolor;
-	border: 1px solid $underline-color;
-	@include box-shadow(0 5px 20px 0 rgba(60,60,60,0.3));
+	background: $white;
+	border: 1px solid $lighter-blue-grey;
+	@include box-shadow(0 5px 20px 0 rgba(118,141,153,0.3));
 
 	.list-table {
 		@include box-shadow(none);
@@ -1475,13 +1484,13 @@ button[disabled] {
 	}
 
 	.dashbrd-widget-head {
-		padding: 8px 10px 8px 10px;
+		padding: 8px 10px;
 	}
 }
 
 /* Alerts */
 .green {
-	color: $alert-green-color;
+	color: $green;
 }
 
 a.green {
@@ -1489,7 +1498,7 @@ a.green {
 }
 
 .red {
-	color: $alert-red-color;
+	color: $red;
 }
 
 a.red {
@@ -1497,7 +1506,7 @@ a.red {
 }
 
 .orange {
-	color: $alert-orange-color;
+	color: $orange;
 }
 
 a.orange {
@@ -1505,7 +1514,7 @@ a.orange {
 }
 
 .grey {
-	color: $alert-grey-color;
+	color: $blue-grey;
 }
 
 a.grey {
@@ -1514,22 +1523,22 @@ a.grey {
 
 .status-green {
 	@extend .green;
-	border: 1px solid $alert-green-border-color;
-	background: $alert-green-bg-color;
+	border: 1px solid $light-green;
+	background: $lighter-green;
 	@extend %status;
 }
 
 .status-red {
 	@extend .red;
-	border: 1px solid $alert-red-border-color;
-	background: $alert-red-bg-color;
+	border: 1px solid $light-red;
+	background: $lighter-red;
 	@extend %status;
 }
 
 .status-grey {
 	@extend .grey;
-	border: 1px solid $alert-grey-border-color;
-	background: $alert-grey-bg-color;
+	border: 1px solid $light-blue-grey;
+	background: $lighter-blue-grey;
 	@extend %status;
 }
 
@@ -1542,15 +1551,15 @@ a.grey {
 }
 
 .green-bg {
-	background: $alert-green-bg-color;
+	background: $green;
 }
 
 .red-bg {
-	background: $alert-red-bg-color;
+	background: $red;
 }
 
 .na-bg {
-	background: $alert-na-bg-color;
+	background: $blue-grey;
 }
 
 .normal-bg {
@@ -1558,36 +1567,36 @@ a.grey {
 }
 
 .info-bg {
-	background: $alert-info-bg-color;
+	background: $blue;
 }
 
 .average-bg {
-	background: $alert-average-bg-color;
+	background: $orange;
 }
 
 .warning-bg {
-	background: $alert-warning-bg-color;
+	background: $yellow;
 }
 
 .high-bg {
-	background: $alert-high-bg-color;
+	background: $alt-red;
 }
 
 .disaster-bg {
-	background: $alert-disaster-bg-color;
+	background: $red;
 }
 
 .msg-good {
 	@extend .green;
-	border: 1px solid $alert-green-border-color;
-	background: $alert-green-bg-color;
+	border: 1px solid $light-green;
+	background: $lighter-green;
 	@extend %msg;
 }
 
 .msg-bad {
 	@extend .red;
-	border: 1px solid $alert-red-border-color;
-	background: $alert-red-bg-color;
+	border: 1px solid $light-red;
+	background: $lighter-red;
 	@extend %msg;
 }
 
@@ -1604,13 +1613,12 @@ a.grey {
 	bottom: 0;
 	z-index: 10000;
 	width: 100%;
-	padding: 10px 12px;
+	padding: 7px 5px;
 	text-align: center;
-	color: $font-white-color;
-	font-size: $font-top-nav-size;
-	border-top: 1px solid darken($alert-disaster-bg-color, 3%);
-	@include box-shadow(-1px 0 2px 0 rgba(60,60,60,0.5));
-	@extend .disaster-bg;
+	background: $light-yellow;
+	color: $indigo-black;
+	border: 1px solid $yellow;
+	@include box-shadow(-1px 0 2px 0 rgba(118,141,153,0.15));
 }
 
 /* Close/Remove icon */
@@ -1621,7 +1629,7 @@ a.grey {
 	height: 16px;
 	line-height: 16px;
 	text-align: center;
-	color: $font-alt-color;
+	color: $light-blue-grey;
 	font-size: $font-h2-size;
 	font-weight: bold;
 	text-decoration: none;
@@ -1630,12 +1638,14 @@ a.grey {
 	@include transition(background .2s ease);
 
 	&:hover {
-		background: lighten($primary-color, 55%);
+		background: $lighter-grey;
+		//background: lighten($primary-blue, 55%);
 		text-decoration: none;
 	}
 
 	&:active {
-		background: lighten($primary-color, 50%);
+		background: darken($lighter-grey, 5%);
+		//background: lighten($primary-blue, 50%);
 		text-decoration: none;
 	}
 }
@@ -1667,16 +1677,16 @@ a.form-remove-btn {
 	position: absolute;
 	top: 0;
 	right: -16px;
-	color: $font-white-color;
-	background: $form-disabled-color;
+	color: $white;
+	background: $light-blue-grey;
 	@extend %close-icon;
 
 	&:hover {
-		background: darken($form-disabled-color, 5%);
+		background: darken($light-blue-grey, 5%);
 	}
 
 	&:active {
 
-		background: darken($form-disabled-color, 10%);
+		background: darken($light-blue-grey, 10%);
 	}
 }
