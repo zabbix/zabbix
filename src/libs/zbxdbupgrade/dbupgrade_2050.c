@@ -213,7 +213,7 @@ static int	DBpatch_2050015(void)
 static int	DBpatch_2050016(void)
 {
 	const ZBX_TABLE table =
-			{"application_discovery", "applicationid", 0,
+			{"application_discovery", "applicationid,application_prototypeid", 0,
 				{
 					{"applicationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"application_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
