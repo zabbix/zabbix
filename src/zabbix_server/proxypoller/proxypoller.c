@@ -228,16 +228,14 @@ static int	process_proxy(void)
 
 				if (SUCCEED == (ret = send_data_to_proxy(&proxy, &s, j.buffer)))
 				{
-					char	*info = NULL, *error = NULL;
+					char	*error = NULL;
 
-					if (SUCCEED != (ret = zbx_recv_response(&s, &info, 0, &error)))
+					if (SUCCEED != (ret = zbx_recv_response(&s, 0, &error)))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy"
-								" \"%s\" at \"%s\": %s; info: %s",
-								proxy.host, get_ip_by_socket(&s),
-								ZBX_NULL2EMPTY_STR(error), ZBX_NULL2EMPTY_STR(info));
+								" \"%s\" at \"%s\": %s",
+								proxy.host, get_ip_by_socket(&s), error);
 					}
-					zbx_free(info);
 					zbx_free(error);
 				}
 

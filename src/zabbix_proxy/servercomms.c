@@ -144,40 +144,29 @@ exit:
  *                                                                            *
  * Purpose: send data to server                                               *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j, char **error)
 {
 	const char	*__function_name = "put_data_to_server";
 
-	char		*info = NULL, *err = NULL;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)j->buffer_size);
 
-	if (SUCCEED != send_data_to_server(sock, j->buffer))
-		goto out;
-
-	if (SUCCEED != zbx_recv_response(sock, &info, 0, &err))
+	if (SUCCEED != zbx_tcp_send(sock, j->buffer))
 	{
-		*error = zbx_dsprintf(*error, "error:\"%s\", info:\"%s\"", ZBX_NULL2EMPTY_STR(err),
-				ZBX_NULL2EMPTY_STR(info));
+		*error = zbx_strdup(*error, zbx_tcp_strerror());
 		goto out;
 	}
 
+	if (SUCCEED != zbx_recv_response(sock, 0, error))
+		goto out;
+
 	ret = SUCCEED;
 out:
-	zbx_free(info);
-	zbx_free(err);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
