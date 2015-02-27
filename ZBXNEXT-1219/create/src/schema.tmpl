@@ -1296,7 +1296,7 @@ FIELD		|application_prototypeid	|t_id	|	|NOT NULL	|0	|1|application_prototype
 FIELD		|itemid				|t_id	|	|NOT NULL	|0	|2|items
 INDEX		|1				|itemid
 
-TABLE|application_discovery|applicationid|ZBX_DATA
+TABLE|application_discovery|applicationid,application_prototypeid|ZBX_DATA
 FIELD		|applicationid			|t_id	|	|NOT NULL	|0	|1|applications
 FIELD		|application_prototypeid	|t_id	|	|NOT NULL	|0	|2|application_prototype	|application_prototypeid	|RESTRICT
 INDEX		|1				|application_prototypeid
