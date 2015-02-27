@@ -33,9 +33,8 @@ const char	syslog_app_name[] = "zabbix_sender";
 const char	*usage_message[] = {
 	"[-v] -z server [-p port] [-I IP-address] -s host -k key -o value",
 	"[-v] -z server [-p port] [-I IP-address] [-T] [-r] -i input-file",
-	"[-v] -c config-file -k key -o value",
-	"[-v] -c config-file -s host -k key -o value",
-	"[-v] -c config-file [-T] [-r] -i input-file",
+	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-s host] -k key -o value",
+	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-T] [-r] -i input-file",
 	"-h",
 	"-V",
 	NULL	/* end of text */
@@ -528,49 +527,89 @@ static void	parse_commandline(int argc, char **argv)
 
 	/* check for mutually exclusive options    */
 
-	/* Allowed option combinations.            */
-	/* Option 'v' is always optional.          */
-	/*   c  z  s  k  o  i  T  r  p  I opt_mask */
-	/* ------------------------------ -------- */
-	/*   -  z  -  -  -  i  -  -  -  -  0x110   */
-	/*   -  z  -  -  -  i  -  -  -  I  0x111   */
-	/*   -  z  -  -  -  i  -  -  p  -  0x112   */
-	/*   -  z  -  -  -  i  -  -  p  I  0x113   */
-	/*   -  z  -  -  -  i  -  r  -  -  0x114   */
-	/*   -  z  -  -  -  i  -  r  -  I  0x115   */
-	/*   -  z  -  -  -  i  -  r  p  -  0x116   */
-	/*   -  z  -  -  -  i  -  r  p  I  0x117   */
-	/*   -  z  -  -  -  i  T  -  -  -  0x118   */
-	/*   -  z  -  -  -  i  T  -  -  I  0x119   */
-	/*   -  z  -  -  -  i  T  -  p  -  0x11a   */
-	/*   -  z  -  -  -  i  T  -  p  I  0x11b   */
-	/*   -  z  -  -  -  i  T  r  -  -  0x11c   */
-	/*   -  z  -  -  -  i  T  r  -  I  0x11d   */
-	/*   -  z  -  -  -  i  T  r  p  -  0x11e   */
-	/*   -  z  -  -  -  i  T  r  p  I  0x11f   */
-	/*   -  z  s  k  o  -  -  -  -  -  0x1e0   */
-	/*   -  z  s  k  o  -  -  -  -  I  0x1e1   */
-	/*   -  z  s  k  o  -  -  -  p  -  0x1e2   */
-	/*   -  z  s  k  o  -  -  -  p  I  0x1e3   */
-	/*   c  -  -  -  -  i  -  -  -  -  0x210   */
-	/*   c  -  -  -  -  i  -  r  -  -  0x214   */
-	/*   c  -  -  -  -  i  T  -  -  -  0x218   */
-	/*   c  -  -  -  -  i  T  r  -  -  0x21c   */
-	/*   c  -  -  k  o  -  -  -  -  -  0x260   */
-	/*   c  -  s  k  o  -  -  -  -  -  0x2e0   */
+	/* Allowed option combinations.                             */
+	/* Option 'v' is always optional.                           */
+	/*   c  z  s  k  o  i  T  r  p  I opt_mask comment          */
+	/* ------------------------------ -------- -------          */
+	/*   -  z  -  -  -  i  -  -  -  -  0x110   !c i             */
+	/*   -  z  -  -  -  i  -  -  -  I  0x111                    */
+	/*   -  z  -  -  -  i  -  -  p  -  0x112                    */
+	/*   -  z  -  -  -  i  -  -  p  I  0x113                    */
+	/*   -  z  -  -  -  i  -  r  -  -  0x114                    */
+	/*   -  z  -  -  -  i  -  r  -  I  0x115                    */
+	/*   -  z  -  -  -  i  -  r  p  -  0x116                    */
+	/*   -  z  -  -  -  i  -  r  p  I  0x117                    */
+	/*   -  z  -  -  -  i  T  -  -  -  0x118                    */
+	/*   -  z  -  -  -  i  T  -  -  I  0x119                    */
+	/*   -  z  -  -  -  i  T  -  p  -  0x11a                    */
+	/*   -  z  -  -  -  i  T  -  p  I  0x11b                    */
+	/*   -  z  -  -  -  i  T  r  -  -  0x11c                    */
+	/*   -  z  -  -  -  i  T  r  -  I  0x11d                    */
+	/*   -  z  -  -  -  i  T  r  p  -  0x11e                    */
+	/*   -  z  -  -  -  i  T  r  p  I  0x11f                    */
+	/*                                                          */
+	/*   -  z  s  k  o  -  -  -  -  -  0x1e0   !c !i            */
+	/*   -  z  s  k  o  -  -  -  -  I  0x1e1                    */
+	/*   -  z  s  k  o  -  -  -  p  -  0x1e2                    */
+	/*   -  z  s  k  o  -  -  -  p  I  0x1e3                    */
+	/*                                                          */
+	/*   c  -  -  -  -  i  -  -  -  -  0x210   c i              */
+	/*   c  -  -  -  -  i  -  -  -  I  0x211                    */
+	/*   c  -  -  -  -  i  -  -  p  -  0x212                    */
+	/*   c  -  -  -  -  i  -  -  p  I  0x213                    */
+	/*   c  -  -  -  -  i  -  r  -  -  0x214                    */
+	/*   c  -  -  -  -  i  -  r  -  I  0x215                    */
+	/*   c  -  -  -  -  i  -  r  p  -  0x216                    */
+	/*   c  -  -  -  -  i  -  r  p  I  0x217                    */
+	/*   c  -  -  -  -  i  T  -  -  -  0x218                    */
+	/*   c  -  -  -  -  i  T  -  -  I  0x219                    */
+	/*   c  -  -  -  -  i  T  -  p  -  0x21a                    */
+	/*   c  -  -  -  -  i  T  -  p  I  0x21b                    */
+	/*   c  -  -  -  -  i  T  r  -  -  0x21c                    */
+	/*   c  -  -  -  -  i  T  r  -  I  0x21d                    */
+	/*   c  -  -  -  -  i  T  r  p  -  0x21e                    */
+	/*   c  -  -  -  -  i  T  r  p  I  0x21f                    */
+	/*                                                          */
+	/*   c  -  -  k  o  -  -  -  -  -  0x260   c !i             */
+	/*   c  -  -  k  o  -  -  -  -  I  0x261                    */
+	/*   c  -  -  k  o  -  -  -  p  -  0x262                    */
+	/*   c  -  -  k  o  -  -  -  p  I  0x263                    */
+	/*   c  -  s  k  o  -  -  -  -  -  0x2e0                    */
+	/*   c  -  s  k  o  -  -  -  -  I  0x2e1                    */
+	/*   c  -  s  k  o  -  -  -  p  -  0x2e2                    */
+	/*   c  -  s  k  o  -  -  -  p  I  0x2e3                    */
+	/*                                                          */
+	/*   c  z  -  -  -  i  -  -  -  -  0x310   c i (continues)  */
+	/*   c  z  -  -  -  i  -  -  -  I  0x311                    */
+	/*   c  z  -  -  -  i  -  -  p  -  0x312                    */
+	/*   c  z  -  -  -  i  -  -  p  I  0x313                    */
+	/*   c  z  -  -  -  i  -  r  -  -  0x314                    */
+	/*   c  z  -  -  -  i  -  r  -  I  0x315                    */
+	/*   c  z  -  -  -  i  -  r  p  -  0x316                    */
+	/*   c  z  -  -  -  i  -  r  p  I  0x317                    */
+	/*   c  z  -  -  -  i  T  -  -  -  0x318                    */
+	/*   c  z  -  -  -  i  T  -  -  I  0x319                    */
+	/*   c  z  -  -  -  i  T  -  p  -  0x31a                    */
+	/*   c  z  -  -  -  i  T  -  p  I  0x31b                    */
+	/*   c  z  -  -  -  i  T  r  -  -  0x31c                    */
+	/*   c  z  -  -  -  i  T  r  -  I  0x31d                    */
+	/*   c  z  -  -  -  i  T  r  p  -  0x31e                    */
+	/*   c  z  -  -  -  i  T  r  p  I  0x31f                    */
+	/*                                                          */
+	/*   c  z  -  k  o  -  -  -  -  -  0x360   c !i (continues) */
+	/*   c  z  -  k  o  -  -  -  -  I  0x361                    */
+	/*   c  z  -  k  o  -  -  -  p  -  0x362                    */
+	/*   c  z  -  k  o  -  -  -  p  I  0x363                    */
+	/*   c  z  s  k  o  -  -  -  -  -  0x3e0                    */
+	/*   c  z  s  k  o  -  -  -  -  I  0x3e1                    */
+	/*   c  z  s  k  o  -  -  -  p  -  0x3e2                    */
+	/*   c  z  s  k  o  -  -  -  p  I  0x3e3                    */
 
 	if (0 == opt_c + opt_z)
 	{
 		zbx_error("either '-c' or '-z' option must be specified");
 		usage();
 		printf("Try '%s --help' for more information.\n", progname);
-		exit(EXIT_FAILURE);
-	}
-
-	if (1 < opt_c + opt_z)
-	{
-		zbx_error("either '-c' or '-z' option must be specified but not both");
-		usage();
 		exit(EXIT_FAILURE);
 	}
 
@@ -595,17 +634,19 @@ static void	parse_commandline(int argc, char **argv)
 	if (0 < opt_cap_i)
 		opt_mask |= 0x01;
 
-	if (1 == opt_i && ((1 == opt_z && ! (0x110 <= opt_mask && opt_mask <= 0x11f)) ||
-			(1 == opt_c && 0x210 != opt_mask && 0x214 != opt_mask && 0x218 != opt_mask &&
-			0x21c != opt_mask)))
-	{
-		zbx_error("option '-i' can be used only with '-T' and '-r' options");
-		usage();
-		exit(EXIT_FAILURE);
-	}
-
-	if ((1 == opt_z && 0 == opt_i && ! (0x1e0 <= opt_mask && opt_mask <= 0x1e3)) ||
-			(1 == opt_c && 0 == opt_i && 0x260 != opt_mask && 0x2e0 != opt_mask))
+	if (
+			(0 == opt_c && 1 == opt_i &&	/* !c i */
+					! (0x110 <= opt_mask && opt_mask <= 0x11f)) ||
+			(0 == opt_c && 0 == opt_i &&	/* !c !i */
+					! (0x1e0 <= opt_mask && opt_mask <= 0x1e3)) ||
+			(1 == opt_c && 1 == opt_i &&	/* c i */
+					! ((0x210 <= opt_mask && opt_mask <= 0x21f) ||
+					(0x310 <= opt_mask && opt_mask <= 0x31f))) ||
+			(1 == opt_c && 0 == opt_i &&	/* c !i */
+					! ((0x260 <= opt_mask && opt_mask <= 0x263) ||
+					(0x2e0 <= opt_mask && opt_mask <= 0x2e3) ||
+					(0x360 <= opt_mask && opt_mask <= 0x363) ||
+					(0x3e0 <= opt_mask && opt_mask <= 0x3e3))))
 	{
 		zbx_error("too few or mutually exclusive options used");
 		usage();
