@@ -136,9 +136,11 @@ foreach (@$tlds_ref)
 
 		my $hostid = get_hostid($tld);
 		my $avail_itemid = get_itemid_by_hostid($hostid, "rsm.slv.$service.avail");
-		my $rollweek_itemid = get_itemid_by_hostid($hostid, "rsm.slv.$service.rollweek");
 
-		my ($downtime, $clock) = __get_last_rollweek($rollweek_itemid, $check_back);
+
+		my ($rollweek_from, $rollweek_till) = get_rollweek_bounds();
+		my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
+		my $clock = get_lastclock($tld, "rsm.slv.$service.rollweek");
 
 		my $till = $clock + RESULT_TIMESTAMP_SHIFT; # include the whole minute
 		my $from = $till - $period * 60 + 1;
@@ -1098,18 +1100,6 @@ sub __get_probe_statuses
 	}
 
 	return \%result;
-}
-
-sub __get_last_rollweek
-{
-	my $itemid = shift;
-	my $from = shift;
-
-	my $rows_ref = db_select("select value,clock from history where itemid=$itemid and " . sql_time_condition($from). " order by clock desc limit 1");
-
-	return (undef, undef) unless (scalar(@$rows_ref) == 1);
-
-	return ($rows_ref->[0]->[0], $rows_ref->[0]->[1]);
 }
 
 sub __prnt
