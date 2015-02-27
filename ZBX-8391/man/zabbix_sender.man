@@ -35,6 +35,14 @@ zabbix_sender \- Zabbix sender utility
 .RB [ \-v ]
 .B \-c
 .I config\-file
+.RB [ \-z
+.IR server ]
+.RB [ \-p
+.IR port ]
+.RB [ \-I
+.IR IP-address ]
+.RB [ \-s
+.IR host ]
 .B \-k
 .I key
 .B \-o
@@ -44,21 +52,16 @@ zabbix_sender \- Zabbix sender utility
 .RB [ \-v ]
 .B \-c
 .I config\-file
-.B \-s
-.I host
-.B \-k
-.I key
-.B \-o
-.I value
-.br
-.B zabbix_sender
-.RB [ \-v ]
-.B \-c
-.I config\-file
+.RB [ \-z
+.IR server ]
+.RB [ \-p
+.IR port ]
+.RB [ \-I
+.IR IP-address ]
 .RB [ \-T ]
 .RB [ \-r ]
 .B \-i
-.I input\-file
+.I input-file
 .br
 .B zabbix_sender \-h
 .br
@@ -81,11 +84,14 @@ First entry from the \fBServerActive\fR parameter is used.
 .IP "\fB\-z\fR, \fB\-\-zabbix\-server\fR \fIserver\fR"
 Hostname or IP address of Zabbix server.
 If a host is monitored by a proxy, proxy hostname or IP address should be used instead.
+When used together with \fB\-\-config\fR, overrides first entry of \fBServerActive\fR parameter specified in agentd configuration file.
 .IP "\fB\-p\fR, \fB\-\-port\fR \fIport\fR"
 Specify port number of Zabbix server trapper running on the server.
 Default is 10051.
+When used together with \fB\-\-config\fR, overrides the port of first entry of \fBServerActive\fR parameter specified in agentd configuration file.
 .IP "\fB\-I\fR, \fB\-\-source\-address\fR \fIIP\-address\fR"
 Specify source IP address.
+When used together with \fB\-\-config\fR, overrides \fBSourceIP\fR parameter specified in agentd configuration file.
 .IP "\fB\-s\fR, \fB\-\-host\fR \fIhost\fR"
 Specify host name the item belongs to (as registered in Zabbix frontend).
 Host IP address and DNS name will not work.
