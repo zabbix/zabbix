@@ -65,16 +65,14 @@ out:
  *                                                                            *
  * Purpose: send hosts availability data from proxy                           *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 void	send_host_availability(zbx_sock_t *sock)
 {
 	const char	*__function_name = "send_host_availability";
 
 	struct zbx_json	j;
-	char		*info = NULL, *error = NULL, *msg = NULL;
-	int		ret = SUCCEED;
+	int		ret = FAIL;
+	char		*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -84,25 +82,25 @@ void	send_host_availability(zbx_sock_t *sock)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() [%s]", __function_name, j.buffer);
 
-	if (SUCCEED != (ret = zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT)))
+	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
 	{
-		msg = zbx_dsprintf(msg, "%s", zbx_tcp_strerror());
+		error = zbx_strdup(error, zbx_tcp_strerror());
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_recv_response(sock, &info, CONFIG_TIMEOUT, &error)))
-		msg = zbx_dsprintf(msg, "%s; info: %s", ZBX_NULL2EMPTY_STR(error), ZBX_NULL2EMPTY_STR(info));
+	if (SUCCEED != zbx_recv_response(sock, CONFIG_TIMEOUT, &error))
+		goto out;
+
+	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send host availability data to server at \"%s\": %s",
-				get_ip_by_socket(sock), msg);
+				get_ip_by_socket(sock), error);
 	}
 
 	zbx_json_free(&j);
-	zbx_free(info);
 	zbx_free(error);
-	zbx_free(msg);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
