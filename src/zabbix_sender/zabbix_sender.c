@@ -32,9 +32,9 @@ const char	syslog_app_name[] = "zabbix_sender";
 
 const char	*usage_message[] = {
 	"[-v] -z server [-p port] [-I IP-address] -s host -k key -o value",
-	"[-v] -z server [-p port] [-I IP-address] [-T] [-r] -i input-file",
+	"[-v] -z server [-p port] [-I IP-address] [-s host] [-T] [-r] -i input-file",
 	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-s host] -k key -o value",
-	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-T] [-r] -i input-file",
+	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-s host] [-T] [-r] -i input-file",
 	"-h",
 	"-V",
 	NULL	/* end of text */
@@ -547,6 +547,22 @@ static void	parse_commandline(int argc, char **argv)
 	/*   -  z  -  -  -  i  T  r  -  I  0x11d                    */
 	/*   -  z  -  -  -  i  T  r  p  -  0x11e                    */
 	/*   -  z  -  -  -  i  T  r  p  I  0x11f                    */
+	/*   -  z  s  -  -  i  -  -  -  -  0x190                    */
+	/*   -  z  s  -  -  i  -  -  -  I  0x191                    */
+	/*   -  z  s  -  -  i  -  -  p  -  0x192                    */
+	/*   -  z  s  -  -  i  -  -  p  I  0x193                    */
+	/*   -  z  s  -  -  i  -  r  -  -  0x194                    */
+	/*   -  z  s  -  -  i  -  r  -  I  0x195                    */
+	/*   -  z  s  -  -  i  -  r  p  -  0x196                    */
+	/*   -  z  s  -  -  i  -  r  p  I  0x197                    */
+	/*   -  z  s  -  -  i  T  -  -  -  0x198                    */
+	/*   -  z  s  -  -  i  T  -  -  I  0x199                    */
+	/*   -  z  s  -  -  i  T  -  p  -  0x19a                    */
+	/*   -  z  s  -  -  i  T  -  p  I  0x19b                    */
+	/*   -  z  s  -  -  i  T  r  -  -  0x19c                    */
+	/*   -  z  s  -  -  i  T  r  -  I  0x19d                    */
+	/*   -  z  s  -  -  i  T  r  p  -  0x19e                    */
+	/*   -  z  s  -  -  i  T  r  p  I  0x19f                    */
 	/*                                                          */
 	/*   -  z  s  k  o  -  -  -  -  -  0x1e0   !c !i            */
 	/*   -  z  s  k  o  -  -  -  -  I  0x1e1                    */
@@ -579,7 +595,23 @@ static void	parse_commandline(int argc, char **argv)
 	/*   c  -  s  k  o  -  -  -  p  -  0x2e2                    */
 	/*   c  -  s  k  o  -  -  -  p  I  0x2e3                    */
 	/*                                                          */
-	/*   c  z  -  -  -  i  -  -  -  -  0x310   c i (continues)  */
+	/*   c  -  s  -  -  i  -  -  -  -  0x290   c i (continues)  */
+	/*   c  -  s  -  -  i  -  -  -  I  0x291                    */
+	/*   c  -  s  -  -  i  -  -  p  -  0x292                    */
+	/*   c  -  s  -  -  i  -  -  p  I  0x293                    */
+	/*   c  -  s  -  -  i  -  r  -  -  0x294                    */
+	/*   c  -  s  -  -  i  -  r  -  I  0x295                    */
+	/*   c  -  s  -  -  i  -  r  p  -  0x296                    */
+	/*   c  -  s  -  -  i  -  r  p  I  0x297                    */
+	/*   c  -  s  -  -  i  T  -  -  -  0x298                    */
+	/*   c  -  s  -  -  i  T  -  -  I  0x299                    */
+	/*   c  -  s  -  -  i  T  -  p  -  0x29a                    */
+	/*   c  -  s  -  -  i  T  -  p  I  0x29b                    */
+	/*   c  -  s  -  -  i  T  r  -  -  0x29c                    */
+	/*   c  -  s  -  -  i  T  r  -  I  0x29d                    */
+	/*   c  -  s  -  -  i  T  r  p  -  0x29e                    */
+	/*   c  -  s  -  -  i  T  r  p  I  0x29f                    */
+	/*   c  z  -  -  -  i  -  -  -  -  0x310                    */
 	/*   c  z  -  -  -  i  -  -  -  I  0x311                    */
 	/*   c  z  -  -  -  i  -  -  p  -  0x312                    */
 	/*   c  z  -  -  -  i  -  -  p  I  0x313                    */
@@ -595,6 +627,22 @@ static void	parse_commandline(int argc, char **argv)
 	/*   c  z  -  -  -  i  T  r  -  I  0x31d                    */
 	/*   c  z  -  -  -  i  T  r  p  -  0x31e                    */
 	/*   c  z  -  -  -  i  T  r  p  I  0x31f                    */
+	/*   c  z  s  -  -  i  -  -  -  -  0x390                    */
+	/*   c  z  s  -  -  i  -  -  -  I  0x391                    */
+	/*   c  z  s  -  -  i  -  -  p  -  0x392                    */
+	/*   c  z  s  -  -  i  -  -  p  I  0x393                    */
+	/*   c  z  s  -  -  i  -  r  -  -  0x394                    */
+	/*   c  z  s  -  -  i  -  r  -  I  0x395                    */
+	/*   c  z  s  -  -  i  -  r  p  -  0x396                    */
+	/*   c  z  s  -  -  i  -  r  p  I  0x397                    */
+	/*   c  z  s  -  -  i  T  -  -  -  0x398                    */
+	/*   c  z  s  -  -  i  T  -  -  I  0x399                    */
+	/*   c  z  s  -  -  i  T  -  p  -  0x39a                    */
+	/*   c  z  s  -  -  i  T  -  p  I  0x39b                    */
+	/*   c  z  s  -  -  i  T  r  -  -  0x39c                    */
+	/*   c  z  s  -  -  i  T  r  -  I  0x39d                    */
+	/*   c  z  s  -  -  i  T  r  p  -  0x39e                    */
+	/*   c  z  s  -  -  i  T  r  p  I  0x39f                    */
 	/*                                                          */
 	/*   c  z  -  k  o  -  -  -  -  -  0x360   c !i (continues) */
 	/*   c  z  -  k  o  -  -  -  -  I  0x361                    */
@@ -636,14 +684,17 @@ static void	parse_commandline(int argc, char **argv)
 
 	if (
 			(0 == opt_c && 1 == opt_i &&	/* !c i */
-					! (0x110 <= opt_mask && opt_mask <= 0x11f)) ||
+					!((0x110 <= opt_mask && opt_mask <= 0x11f) ||
+					(0x190 <= opt_mask && opt_mask <= 0x19f))) ||
 			(0 == opt_c && 0 == opt_i &&	/* !c !i */
-					! (0x1e0 <= opt_mask && opt_mask <= 0x1e3)) ||
+					!(0x1e0 <= opt_mask && opt_mask <= 0x1e3)) ||
 			(1 == opt_c && 1 == opt_i &&	/* c i */
-					! ((0x210 <= opt_mask && opt_mask <= 0x21f) ||
-					(0x310 <= opt_mask && opt_mask <= 0x31f))) ||
+					!((0x210 <= opt_mask && opt_mask <= 0x21f) ||
+					(0x310 <= opt_mask && opt_mask <= 0x31f) ||
+					(0x290 <= opt_mask && opt_mask <= 0x29f) ||
+					(0x390 <= opt_mask && opt_mask <= 0x39f))) ||
 			(1 == opt_c && 0 == opt_i &&	/* c !i */
-					! ((0x260 <= opt_mask && opt_mask <= 0x263) ||
+					!((0x260 <= opt_mask && opt_mask <= 0x263) ||
 					(0x2e0 <= opt_mask && opt_mask <= 0x2e3) ||
 					(0x360 <= opt_mask && opt_mask <= 0x363) ||
 					(0x3e0 <= opt_mask && opt_mask <= 0x3e3))))

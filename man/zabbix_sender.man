@@ -26,6 +26,8 @@ zabbix_sender \- Zabbix sender utility
 .IR port ]
 .RB [ \-I
 .IR IP\-address ]
+.RB [ \-s
+.IR host ]
 .RB [ \-T ]
 .RB [ \-r ]
 .B \-i
@@ -58,6 +60,8 @@ zabbix_sender \- Zabbix sender utility
 .IR port ]
 .RB [ \-I
 .IR IP-address ]
+.RB [ \-s
+.IR host ]
 .RB [ \-T ]
 .RB [ \-r ]
 .B \-i
