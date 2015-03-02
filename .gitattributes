@@ -200,6 +200,7 @@ frontends/php/images/gradients/table_head2_bb.gif -text
 frontends/php/images/gradients/table_head_bb.gif -text
 frontends/php/include/classes/helpers/CViewHelper.php -text
 frontends/php/include/classes/html/CColHeader.php -text
+frontends/php/include/classes/html/CFilter.php -text
 frontends/php/include/classes/html/CRowHeader.php -text
 frontends/php/include/classes/html/CSup.php -text
 frontends/php/include/classes/mvc/CController.php -text
