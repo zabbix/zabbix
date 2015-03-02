@@ -1,0 +1,4 @@
+ALTER TABLE regexps ALTER COLUMN regexpid SET WITH DEFAULT NULL
+/
+REORG TABLE regexps
+/
