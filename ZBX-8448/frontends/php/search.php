@@ -155,12 +155,28 @@ foreach ($hosts as $hnum => $host) {
 
 	$style = $host['status'] == HOST_STATUS_NOT_MONITORED ? 'on' : null;
 
-	$group = reset($host['groups']);
-	$link = 'groupid='.$group['groupid'].'&hostid='.$hostid.'&switch_node='.id2nodeid($hostid);
-
 	$caption = make_decoration($host['name'], $search);
 
 	if ($admin && isset($rw_hosts[$hostid])) {
+		if (count($host['groups']) > 1) {
+			$groups = API::HostGroup()->get(array(
+				'output' => array('groupid'),
+				'groupids' => zbx_objectValues($host['groups'], 'groupid'),
+				'editable' => true,
+				'preservekeys' => true
+			));
+
+			foreach ($host['groups'] as $num => &$group) {
+				if (!isset($groups[$group['groupid']])) {
+					unset($host['groups'][$num]);
+				}
+			}
+			unset($group);
+		}
+
+		$group = reset($host['groups']);
+		$link = 'groupid='.$group['groupid'].'&hostid='.$hostid.'&switch_node='.id2nodeid($hostid);
+
 		$host_link = new CLink($caption, 'hosts.php?form=update&'.$link, $style);
 		$applications_link = array(
 			new CLink(_('Applications'), 'applications.php?'.$link),
@@ -188,6 +204,9 @@ foreach ($hosts as $hnum => $host) {
 		);
 	}
 	else {
+		$group = reset($host['groups']);
+		$link = 'groupid='.$group['groupid'].'&hostid='.$hostid.'&switch_node='.id2nodeid($hostid);
+
 		$host_link = new CSpan($caption, $style);
 		$applications_link = _('Applications').' ('.$host['applications'].')';
 		$items_link = _('Items').' ('.$host['items'].')';
