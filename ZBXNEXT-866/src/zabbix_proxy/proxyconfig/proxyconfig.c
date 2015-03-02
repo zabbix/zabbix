@@ -51,16 +51,6 @@ void	zbx_proxyconfig_sigusr_handler(int flags)
  *                                                                            *
  * Function: process_configuration_sync                                       *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	process_configuration_sync(size_t *data_size)
 {
@@ -68,7 +58,7 @@ static void	process_configuration_sync(size_t *data_size)
 
 	zbx_sock_t	sock;
 	struct		zbx_json_parse jp;
-	char		value[16];
+	char		value[16], *error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -77,8 +67,12 @@ static void	process_configuration_sync(size_t *data_size)
 
 	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY); /* retry till have a connection */
 
-	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG))
+	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
+				get_ip_by_socket(&sock), error);
 		goto out;
+	}
 
 	if ('\0' == *sock.buffer)
 	{
@@ -119,6 +113,8 @@ static void	process_configuration_sync(size_t *data_size)
 	process_proxyconfig(&jp);
 out:
 	disconnect_server(&sock);
+
+	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
