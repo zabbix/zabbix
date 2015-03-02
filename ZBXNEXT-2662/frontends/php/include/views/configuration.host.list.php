@@ -34,35 +34,22 @@ $controls->addItem(array(_('Group').SPACE, $data['pageFilter']->getGroupsCB()));
 $frmForm->addItem($controls);
 $hostWidget->setControls($frmForm);
 
-// filter
-$filterTable = new CTable('', 'filter filter-center');
-$filterTable->addRow(array(
-	array(array(bold(_('Name')),' '._('like').' '), new CTextBox('filter_host', $data['filter']['host'], 20)),
-	array(array(bold(_('DNS')),' '._('like').' '), new CTextBox('filter_dns', $data['filter']['dns'], 20)),
-	array(array(bold(_('IP')),' '._('like').' '), new CTextBox('filter_ip', $data['filter']['ip'], 20)),
-	array(bold(_('Port').' '), new CTextBox('filter_port', $data['filter']['port'], 20))
-));
+// Filter
+$filter = new CFilter();
+$filterColumn1 = new CFormList();
+$filterColumn1->addRow(_('Name like'), new CTextBox('filter_host', $data['filter']['host'], 20));
+$filter->addColumn($filterColumn1);
+$filterColumn2 = new CFormList();
+$filterColumn2->addRow(_('DNS like'), new CTextBox('filter_dns', $data['filter']['dns'], 20));
+$filter->addColumn($filterColumn2);
+$filterColumn3 = new CFormList();
+$filterColumn3->addRow(_('IP like'), new CTextBox('filter_ip', $data['filter']['ip'], 20));
+$filter->addColumn($filterColumn3);
+$filterColumn4 = new CFormList();
+$filterColumn4->addRow(_('Port like'), new CTextBox('filter_port', $data['filter']['port'], 20));
+$filter->addColumn($filterColumn4);
 
-$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();',
-	'jqueryinput shadow'
-);
-$filterButton->main();
-
-$resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();',
-	'jqueryinput shadow'
-);
-
-$divButtons = new CDiv(array($filterButton, $resetButton));
-$divButtons->addStyle('padding: 4px 0;');
-
-$filterTable->addRow(new CCol($divButtons, 'controls', 4));
-
-$filterForm = new CForm('get');
-$filterForm->setAttribute('name', 'zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
-$filterForm->addItem($filterTable);
-
-$hostWidget->addFlicker($filterForm, CProfile::get('web.hosts.filter.state', 0));
+$hostWidget->addItem($filter);
 
 // table hosts
 $form = new CForm();

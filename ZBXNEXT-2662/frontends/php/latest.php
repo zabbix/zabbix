@@ -339,90 +339,74 @@ if ($filter['groupids'] !== null) {
 $latestWidget = new CWidget(null, 'latest-mon');
 $latestWidget->setTitle(_('Latest data'));
 
-$filterForm = new CForm('get');
-$filterForm->setAttribute('name',' zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
 
-$filterTable = new CTable(null, 'filter');
-$filterTable->setCellPadding(0);
-$filterTable->setCellSpacing(0);
+// Filter
+$filterForm = new CFilter();
 
-$filterTable->addRow(
-	array(
-		new CCol(bold(_('Host groups')), 'label'),
-		new CCol(new CMultiSelect(
-			array(
-				'name' => 'groupids[]',
-				'objectName' => 'hostGroup',
-				'data' => $multiSelectHostGroupData,
-				'popup' => array(
-					'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
-						'&srcfld1=groupid&multiselect=1',
-					'width' => 450,
-					'height' => 450
-				)
-			)),
-			'inputcol'
-		),
-		new CCol(bold(_('Name')), 'label'),
-		new CCol(new CTextBox('select', $filter['select'], 40), 'inputcol'),
-	)
+$filterColumn1 = new CFormList();
+$filterColumn1->addRow(
+	_('Host groups'),
+	new CMultiSelect(
+		array(
+			'name' => 'groupids[]',
+			'objectName' => 'hostGroup',
+			'data' => $multiSelectHostGroupData,
+			'popup' => array(
+				'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
+					'&srcfld1=groupid&multiselect=1',
+				'width' => 450,
+				'height' => 450
+			)
+	))
 );
-
-$filterTable->addRow(
-	array(
-		new CCol(bold(_('Hosts')), 'label'),
-		new CCol(new CMultiSelect(
+$filterColumn1->addRow(
+		_('Hosts'),
+		new CMultiSelect(
 			array(
 				'name' => 'hostids[]',
 				'objectName' => 'hosts',
 				'data' => $multiSelectHostData,
 				'popup' => array(
-					'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
+					'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=hostids_&srcfld1=hostid'.
 						'&real_hosts=1&multiselect=1',
 					'width' => 450,
 					'height' => 450
 				)
-			)),
-			'inputcol'
-		),
-		new CCol(bold(_('Show items without data')), 'label'),
-		new CCol(new CCheckBox('show_without_data', $filter['showWithoutData'], null, 1), 'inputcol')
+			)
+		)
+);
+$filterColumn1->addRow(
+	_('Application'),
+	array(
+		new CTextBox('application', $filter['application']),
+		new CButton('application_name', _('Select'),
+			'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
+				'&with_applications=1&dstfrm='.$filterForm->getName().'");',
+			'button-form'
+		)
 	)
 );
 
-$filterTable->addRow(array(
-	new CCol(bold(_('Application')), 'label'),
-	new CCol(
-		array(
-			new CTextBox('application', $filter['application']),
-			new CButton('application_name', _('Select'),
-				'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
-					'&with_applications=1&dstfrm='.$filterForm->getName().'");',
-				'button-form'
-			)
-		),
-		'inputcol'
-	),
-	new CCol(bold(_('Show details')), 'label'),
-	new CCol(new CCheckBox('show_details', $filter['showDetails'], null, 1), 'inputcol'),
-));
-
-$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();',
-	'jqueryinput shadow'
+$filterColumn2 = new CFormList();
+$filterColumn2->addRow(
+	_('Name'),
+	new CTextBox('select', $filter['select'], 40)
 );
-$filterButton->main();
+$filterColumn2->addRow(
+	_('Show items without data'),
+	new CCheckBox('show_without_data', $filter['showWithoutData'], null, 1)
+);
+$filterColumn2->addRow(
+	_('Show details'),
+	new CCheckBox('show_details', $filter['showDetails'], null, 1)
+);
 
-$resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput shadow');
+$filterForm->addColumn($filterColumn1);
+$filterForm->addColumn($filterColumn2);
 
-$divButtons = new CDiv(array($filterButton, $resetButton));
-$divButtons->setAttribute('style', 'padding: 4px 0px;');
+$latestWidget->addItem($filterForm);
+// End of Filter
 
-$filterTable->addRow(new CCol($divButtons, 'controls', 4));
-
-$filterForm->addItem($filterTable);
-
-$latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 0));
 $latestWidget->setTitle(_('Latest data'));
 $controls = new CList();
 $controls->addItem(get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))));
