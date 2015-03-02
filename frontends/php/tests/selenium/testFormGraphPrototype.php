@@ -645,7 +645,7 @@ class testFormGraphPrototype extends CWebTest {
 				$this->assertVisible('yaxismin');
 				$this->assertAttribute("//input[@id='yaxismin']/@maxlength", '255');
 				$this->assertAttribute("//input[@id='yaxismin']/@size", '7');
-				$this->assertAttribute("//input[@id='yaxismin']/@value", '0.00');
+				$this->assertAttribute("//input[@id='yaxismin']/@value", '0');
 				break;
 			case 'Calculated':
 				$this->assertElementNotPresent('ymin_name');
@@ -673,7 +673,7 @@ class testFormGraphPrototype extends CWebTest {
 				$this->assertVisible('yaxismax');
 				$this->assertAttribute("//input[@id='yaxismax']/@maxlength", '255');
 				$this->assertAttribute("//input[@id='yaxismax']/@size", '7');
-				$this->assertAttribute("//input[@id='yaxismax']/@value", '100.00');
+				$this->assertAttribute("//input[@id='yaxismax']/@value", '100');
 				break;
 			case 'Calculated':
 				$this->assertElementNotPresent('ymax_name');
