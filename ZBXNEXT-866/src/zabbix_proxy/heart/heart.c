@@ -33,16 +33,6 @@ extern int		server_num, process_num;
  *                                                                            *
  * Function: send_heartbeat                                                   *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	send_heartbeat(void)
 {
@@ -78,14 +68,6 @@ static int	send_heartbeat(void)
  * Function: main_heart_loop                                                  *
  *                                                                            *
  * Purpose: periodically send heartbeat message to the server                 *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(heart_thread, args)

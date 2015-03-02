@@ -131,14 +131,6 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
  *                                                                            *
  * Purpose: periodically sends history and events to the server               *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: never returns                                                    *
- *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(datasender_thread, args)
 {
