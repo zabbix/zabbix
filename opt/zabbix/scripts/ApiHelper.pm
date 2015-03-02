@@ -110,25 +110,27 @@ sub __apply_inc_end
 {
 	my $inc_path = shift;
 	my $end = shift;
+	my $lastclock = shift;
 
 	my $end_path = "$inc_path/".AH_END_FILE;
 
-	return __write_file($end_path, AH_INCIDENT_ACTIVE) unless (defined($end));
+	return __write_file($end_path, AH_INCIDENT_ACTIVE, $lastclock) unless (defined($end));
 
 	my $dt = DateTime->from_epoch('epoch' => $end);
 	my $f = DateTime::Format::RFC3339->new();
 
-	return __write_file($end_path, $f->format_datetime($dt));
+	return __write_file($end_path, $f->format_datetime($dt), $end);
 }
 
 sub __apply_inc_false_positive
 {
 	my $inc_path = shift;
 	my $false_positive = shift;
+	my $lastclock = shift;
 
 	my $false_positive_path = "$inc_path/".AH_FALSE_POSITIVE_FILE;
 
-	return __write_file($false_positive_path, $false_positive == 0 ? AH_NOT_FALSE_POSITIVE : AH_FALSE_POSITIVE);
+	return __write_file($false_positive_path, $false_positive == 0 ? AH_NOT_FALSE_POSITIVE : AH_FALSE_POSITIVE, $lastclock);
 }
 
 sub ah_save_alarmed
@@ -183,6 +185,7 @@ sub ah_save_incident
 	my $start = shift;
 	my $end = shift;
 	my $false_positive = shift;
+	my $lastclock = shift;
 
 	$tld = lc($tld);
 	$service = lc($service);
@@ -197,9 +200,9 @@ sub ah_save_incident
 		return AH_FAIL;
 	}
 
-	return AH_FAIL unless (__apply_inc_end($inc_path, $end) == AH_SUCCESS);
+	return AH_FAIL unless (__apply_inc_end($inc_path, $end, $lastclock) == AH_SUCCESS);
 
-	return __apply_inc_false_positive($inc_path, $false_positive);
+	return __apply_inc_false_positive($inc_path, $false_positive, $lastclock);
 }
 
 sub ah_save_incident_json

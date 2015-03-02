@@ -137,23 +137,23 @@ foreach (@$tlds_ref)
 		my $hostid = get_hostid($tld);
 		my $avail_itemid = get_itemid_by_hostid($hostid, "rsm.slv.$service.avail");
 
-
+		# we need down time in minutes, not percent, that's why we can't use "rsm.slv.$service.rollweek" value
 		my ($rollweek_from, $rollweek_till) = get_rollweek_bounds();
 		my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
-		my $clock = get_lastclock($tld, "rsm.slv.$service.rollweek");
+		my $lastclock = get_lastclock($tld, "rsm.slv.$service.rollweek");
 
-		my $till = $clock + RESULT_TIMESTAMP_SHIFT; # include the whole minute
+		my $till = $lastclock + RESULT_TIMESTAMP_SHIFT; # include the whole minute
 		my $from = $till - $period * 60 + 1;
 
 		__prnt(uc($service), " period: ", __selected_period($from, $till)) if (opt('dry-run') or opt('debug'));
 
 		if (opt('dry-run'))
 		{
-			__prnt(uc($service), " service availability $downtime (", ts_str($clock), ")");
+			__prnt(uc($service), " service availability $downtime (", ts_str($lastclock), ")");
 		}
 		else
 		{
-			if (ah_save_service_availability($tld, $service, $downtime, $clock) != AH_SUCCESS)
+			if (ah_save_service_availability($tld, $service, $downtime, $lastclock) != AH_SUCCESS)
 			{
 				fail("cannot save service availability: ", ah_get_error());
 			}
@@ -179,7 +179,7 @@ foreach (@$tlds_ref)
 		}
 		else
 		{
-			if (ah_save_alarmed($tld, $service, $alarmed_status, $clock) != AH_SUCCESS)
+			if (ah_save_alarmed($tld, $service, $alarmed_status, $lastclock) != AH_SUCCESS)
 			{
 				fail("cannot save alarmed: ", ah_get_error());
 			}
@@ -289,7 +289,7 @@ foreach (@$tlds_ref)
 			}
 			else
 			{
-				if (ah_save_incident($tld, $service, $eventid, $event_start, $event_end, $false_positive) != AH_SUCCESS)
+				if (ah_save_incident($tld, $service, $eventid, $event_start, $event_end, $false_positive, $lastclock) != AH_SUCCESS)
 				{
 					fail("cannot save incident: ", ah_get_error());
 				}
