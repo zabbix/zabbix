@@ -1212,7 +1212,7 @@ int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const 
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_STR_RESULT(result))
 	{
-		if (0 == strcmp(result->str, "gray"))
+		if (0 == strcmp(result->str, "gray") || 0 == strcmp(result->str, "unknown"))
 			SET_UI64_RESULT(result, 0);
 		else if (0 == strcmp(result->str, "green"))
 			SET_UI64_RESULT(result, 1);
