@@ -113,7 +113,7 @@ int	zbx_recv_response(zbx_sock_t *sock, int timeout, char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = zbx_tcp_recv_to(sock, timeout)))
+	if (SUCCEED != zbx_tcp_recv_to(sock, timeout))
 	{
 		/* since we have successfully sent data earlier, we assume the other */
 		/* side is just too busy processing our data if there is no response */
@@ -130,13 +130,13 @@ int	zbx_recv_response(zbx_sock_t *sock, int timeout, char **error)
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_json_open(sock->buffer, &jp)))
+	if (SUCCEED != zbx_json_open(sock->buffer, &jp))
 	{
 		*error = zbx_strdup(*error, zbx_json_strerror());
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value))))
+	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)))
 	{
 		*error = zbx_strdup(*error, "no \"" ZBX_PROTO_TAG_RESPONSE "\" tag");
 		goto out;
