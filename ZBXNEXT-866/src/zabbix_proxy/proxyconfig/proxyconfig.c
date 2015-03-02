@@ -82,13 +82,15 @@ static void	process_configuration_sync(size_t *data_size)
 
 	if ('\0' == *sock.buffer)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: empty string received");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
+				get_ip_by_socket(&sock), "empty string received");
 		goto out;
 	}
 
 	if (SUCCEED != zbx_json_open(sock.buffer, &jp))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
+				get_ip_by_socket(&sock), zbx_json_strerror());
 		goto out;
 	}
 
@@ -102,10 +104,11 @@ static void	process_configuration_sync(size_t *data_size)
 		char	*info = NULL;
 		size_t	info_alloc = 0;
 
-		zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc);
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc))
+			info = zbx_dsprintf(info, "negative response \"%s\"", value);
 
-		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: %s",
-				ZBX_NULL2EMPTY_STR(info));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
+				get_ip_by_socket(&sock), info);
 		zbx_free(info);
 		goto out;
 	}
