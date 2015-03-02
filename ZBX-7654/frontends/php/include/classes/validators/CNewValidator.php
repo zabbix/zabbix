@@ -192,6 +192,39 @@ class CNewValidator {
 					}
 					break;
 
+				/*
+				 * 'required_if' => array(
+				 *     <param1> => true,
+				 *     <param2> => array(<values>),
+				 *     ...
+				 *  )
+				 */
+				case 'required_if':
+					if (array_key_exists($field, $this->input)) {
+						break;
+					}
+
+					$required = true;
+
+					foreach ($params as $field2 => $values) {
+						$required = (array_key_exists($field2, $this->input)
+							&& ($values === true || in_array($this->input[$field2], $values)));
+
+						if (!$required) {
+							break;
+						}
+					}
+
+					if ($required && !array_key_exists($field, $this->input)) {
+						$this->addError($fatal, _s('Field "%1$s" is mandatory.', $field));
+						return false;
+					}
+//					elseif (!$required && array_key_exists($field, $this->input)) {
+//						$this->addError($fatal, _s('Field "%1$s" must be missing.', $field));
+//						return false;
+//					}
+					break;
+
 				default:
 					// the message can be not translated because it is an internal error
 					$this->addError($fatal, 'Invalid validation rule "'.$rule.'".');

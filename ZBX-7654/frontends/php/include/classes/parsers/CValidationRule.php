@@ -55,7 +55,8 @@ class CValidationRule {
 							$is_empty = false;
 							$rule = array();
 
-							if (!$this->parseRequired($buffer, $pos, $rule)				// required
+							if (!$this->parseRequiredIf($buffer, $pos, $rule)			// required_if
+									&& !$this->parseRequired($buffer, $pos, $rule)		// required
 									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
 									&& !$this->parseJson($buffer, $pos, $rule)			// json
 									&& !$this->parseIn($buffer, $pos, $rule)			// in
@@ -321,6 +322,62 @@ class CValidationRule {
 			'table' => $table,
 			'field' => $field
 		);
+
+		return true;
+	}
+
+	/**
+	 * required_if <field1>[=<value1>[,...,<valueN>]]][ ... [<fieldN>[=<value1>[,...,<valueN>]]]]
+	 *
+	 * 'required_if' => array(
+	 *     'field1' => true / array('<value1>'[, ..., '<valueN>'])
+	 *     'field2' => true / array('<value1>'[, ..., '<valueN>'])
+	 * )
+	 */
+	private function parseRequiredIf($buffer, &$pos, &$rules) {
+		$i = $pos;
+		$rule = array();
+
+		if (0 != strncmp(substr($buffer, $i), 'required_if ', 12)) {
+			return false;
+		}
+
+		$i += 12;
+
+		do {
+			while (isset($buffer[$i]) && $buffer[$i] == ' ') {
+				$i++;
+			}
+
+			if (!isset($buffer[$i]) || $buffer[$i] == '|') {
+				break;
+			}
+
+			$field = '';
+
+			if (!$this->parseField($buffer, $i, $field)) {
+				return false;
+			}
+
+			if (isset($buffer[$i]) && $buffer[$i] == '=') {
+				$i++;
+				$rule[$field] = array();
+
+				if (!$this->parseValues($buffer, $i, $rule[$field])) {
+					return false;
+				}
+			}
+			else {
+				$rule[$field] = true;
+			}
+		} while (isset($buffer[$i]) && $buffer[$i] == ' ');
+
+		if (!$rule) {
+			return false;
+		}
+
+		$pos = $i;
+		$rules['required_if'] = $rule;
 
 		return true;
 	}
