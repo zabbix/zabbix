@@ -1091,4 +1091,15 @@ int	parse_serveractive_element(char *str, char **host, unsigned short *port, uns
 
 #define ZBX_DO_NOT_SEND_RESPONSE	0
 #define ZBX_SEND_RESPONSE		1
+
+/* Do not forget to synchronize HOST_TLS_* definitions with DB schema ! */
+#define HOST_TLS_ISSUER_LEN		4096				/* for up to 1024 UTF-8 characters */
+#define HOST_TLS_ISSUER_LEN_MAX		(HOST_TLS_ISSUER_LEN + 1)
+#define HOST_TLS_SUBJECT_LEN		4096				/* for up to 1024 UTF-8 characters */
+#define HOST_TLS_SUBJECT_LEN_MAX	(HOST_TLS_SUBJECT_LEN + 1)
+#define HOST_TLS_PSK_IDENTITY_LEN	512				/* for up to 128 UTF-8 characters */
+#define HOST_TLS_PSK_IDENTITY_LEN_MAX	(HOST_TLS_PSK_IDENTITY_LEN + 1)
+#define HOST_TLS_PSK_LEN		512				/* for up to 256 hex-encoded bytes (ASCII) */
+#define HOST_TLS_PSK_LEN_MAX		(HOST_TLS_PSK_LEN + 1)
+
 #endif
