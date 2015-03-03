@@ -58,6 +58,16 @@ jQuery(function($) {
 
 			if (empty(isSelfRefresh)) {
 				isSelfRefresh = false;
+
+				/*
+				 * Automatic refresh, if page is set to refresh. Get current "(now!)" time. If current time is manually
+				 * set and is not "(now!)", jsrpc.php will not be called at all.
+				 */
+				var requestTime = timeControl.timeline.endtime();
+			}
+			else {
+				// Manual refresh from timebar. Get current user set time.
+				var requestTime = timeControl.timeline.usertime();
 			}
 
 			// set actual timestamp
@@ -68,6 +78,7 @@ jQuery(function($) {
 			ajaxUrl.setArgument('method', 'screen.get');
 			ajaxUrl.setArgument('mode', screen.mode);
 			ajaxUrl.setArgument('timestamp', screen.timestampActual);
+			ajaxUrl.setArgument('requestTime', requestTime - 1);
 			ajaxUrl.setArgument('flickerfreeScreenId', id);
 			ajaxUrl.setArgument('pageFile', screen.pageFile);
 			ajaxUrl.setArgument('screenid', screen.screenid);

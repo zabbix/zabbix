@@ -176,7 +176,8 @@ class CScreenBase {
 				'profileIdx2' => $this->profileIdx2,
 				'updateProfile' => $this->updateProfile,
 				'period' => !empty($options['period']) ? $options['period'] : null,
-				'stime' => !empty($options['stime']) ? $options['stime'] : null
+				'stime' => !empty($options['stime']) ? $options['stime'] : null,
+				'requestTime' => isset($options['requestTime']) ? $options['requestTime'] : null
 			));
 		}
 
@@ -339,6 +340,7 @@ class CScreenBase {
 				: ZBX_PERIOD_DEFAULT;
 		}
 		else {
+			// Period is set from URL by jsrpc.
 			if ($options['period'] < ZBX_MIN_PERIOD) {
 				show_message(_n('Minimum time period to display is %1$s hour.',
 						'Minimum time period to display is %1$s hours.', (int) ZBX_MIN_PERIOD / SEC_PER_HOUR));
@@ -354,8 +356,8 @@ class CScreenBase {
 			CProfile::update($options['profileIdx'].'.period', $options['period'], PROFILE_TYPE_INT, $options['profileIdx2']);
 		}
 
-		// stime
-		$time = time();
+		// Get user set time from URL when request was formed or get current time if page is beeing freshly loaded.
+		$time = isset($options['requestTime']) ? $options['requestTime'] : time();
 		$usertime = null;
 		$stimeNow = null;
 		$isNow = 0;
