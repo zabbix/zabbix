@@ -121,6 +121,18 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 
 		zbx_free(cmd);
 	}
+	else if (MEDIA_TYPE_REMEDY == mediatype->type)
+	{
+		char	*error_dyn = NULL;
+
+		res = zbx_remedy_process_alert(alert, mediatype, &error_dyn);
+
+		if (NULL != error_dyn)
+		{
+			zbx_strlcpy(error, error_dyn, max_error_len);
+			zbx_free(error_dyn);
+		}
+	}
 	else
 	{
 		zbx_snprintf(error, max_error_len, "unsupported media type [%d]", mediatype->type);
@@ -173,7 +185,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 		result = DBselect(
 				"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid,"
 				"mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,"
-				"mt.gsm_modem,mt.username,mt.passwd,a.retries"
+				"mt.gsm_modem,mt.username,mt.passwd,a.retries,a.eventid,a.userid"
 				" from alerts a,media_type mt"
 				" where a.mediatypeid=mt.mediatypeid"
 					" and a.status=%d"
@@ -203,6 +215,8 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 			mediatype.passwd = row[15];
 
 			alert.retries = atoi(row[16]);
+			ZBX_STR2UINT64(alert.eventid, row[17]);
+			ZBX_STR2UINT64(alert.userid, row[18]);
 
 			*error = '\0';
 			res = execute_action(&alert, &mediatype, error, sizeof(error));

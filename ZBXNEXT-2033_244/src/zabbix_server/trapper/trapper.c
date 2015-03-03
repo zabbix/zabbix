@@ -34,8 +34,12 @@
 #include "proxydiscovery.h"
 #include "proxyautoreg.h"
 #include "proxyhosts.h"
+#include "zbxmedia.h"
 
 #include "daemon.h"
+
+#define ZBX_MEDIA_RESPONSE_QUERY	0
+#define ZBX_MEDIA_RESPONSE_ACKNOWLEDGE	1
 
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
@@ -282,14 +286,15 @@ static int	queue_compare_by_nextcheck_asc(void **d1, void **d2)
  *                                                                            *
  * Parameters:  sessionid    - [IN] the session id to validate                *
  *              access_level - [IN] the required access rights                *
+ *              userid       - [OUT] the user id (optional)                   *
  *                                                                            *
  * Return value:  SUCCEED - the session is active and user has the required   *
  *                          access rights.                                    *
- *                FAIL    - the session is not active or usr has not enough   *
+ *                FAIL    - the session is not active or user has not enough  *
  *                          access rights.                                    *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_session_validate(const char *sessionid, int access_level)
+static int	zbx_session_validate(const char *sessionid, int access_level, zbx_uint64_t *userid)
 {
 	char		*sessionid_esc;
 	int		ret = FAIL;
@@ -299,7 +304,7 @@ static int	zbx_session_validate(const char *sessionid, int access_level)
 	sessionid_esc = DBdyn_escape_string(sessionid);
 
 	result = DBselect(
-			"select null"
+			"select u.userid"
 			" from users u,sessions s"
 			" where u.userid=s.userid"
 				" and s.status=%d"
@@ -308,7 +313,12 @@ static int	zbx_session_validate(const char *sessionid, int access_level)
 			ZBX_SESSION_ACTIVE, sessionid_esc, access_level);
 
 	if (NULL != (row = DBfetch(result)))
+	{
 		ret = SUCCEED;
+
+		if (NULL != userid)
+			ZBX_STR2UINT64(*userid, row[0]);
+	}
 	DBfree_result(result);
 
 	zbx_free(sessionid_esc);
@@ -342,7 +352,7 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
-		FAIL == zbx_session_validate(sessionid, USER_TYPE_SUPER_ADMIN))
+		FAIL == zbx_session_validate(sessionid, USER_TYPE_SUPER_ADMIN, NULL))
 	{
 		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
@@ -459,6 +469,232 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: format_media_response                                            *
+ *                                                                            *
+ * Purpose: formats media.query, media.acknowledge request response from      *
+ *          vector containing tickets (zbx_ticket_t)                          *
+ *                                                                            *
+ * Parameters:  json           - [OUT] the JSON output buffer                 *
+ *              tickets        - [IN] the vector containing returned tickets  *
+ *              response_type  - [IN] the type of response that returned the  *
+ *                                    tickets vector (ZBX_REMEDY_RESPONSE_*)  *
+ *                                                                            *
+ * Comments: This function allocates resources in json buffer which must be   *
+ *           freed later with zbx_json_free() function.                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	format_media_response(struct zbx_json *json, zbx_vector_ptr_t *tickets, int response_type)
+{
+	int	i;
+	char	buf[32];
+
+	zbx_json_init(json, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+	zbx_json_addarray(json, ZBX_PROTO_TAG_DATA);
+
+	for (i = 0; i < tickets->values_num; i++)
+	{
+		zbx_ticket_t	*ticket = tickets->values[i];
+
+		zbx_json_addobject(json, NULL);
+		zbx_json_adduint64(json, "eventid", ticket->eventid);
+
+		zbx_json_addstring(json, "externalid", (NULL != ticket->ticketid ? ticket->ticketid : ""),
+				ZBX_JSON_TYPE_STRING);
+
+		zbx_json_addstring(json, "status", (NULL != ticket->status ? ticket->status : ""),
+				ZBX_JSON_TYPE_STRING);
+
+		zbx_json_addstring(json, "error", (NULL != ticket->error ? ticket->error : ""),
+				ZBX_JSON_TYPE_STRING);
+
+		zbx_json_addstring(json, "assignee", (NULL != ticket->assignee ? ticket->assignee : ""),
+				ZBX_JSON_TYPE_STRING);
+
+		zbx_snprintf(buf, sizeof(buf), "%d", ticket->clock);
+		zbx_json_addstring(json, "clock", buf, ZBX_JSON_TYPE_INT);
+
+		if (ZBX_MEDIA_RESPONSE_QUERY != response_type)
+			zbx_json_adduint64(json, "new", ticket->is_new);
+
+		zbx_json_close(json);
+	}
+	zbx_json_close(json);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: recv_media_query                                                 *
+ *                                                                            *
+ * Purpose: process media query request                                       *
+ *                                                                            *
+ * Parameters:  sock  - [IN] the request socket                               *
+ *              jp    - [IN] the request data                                 *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	recv_media_query(zbx_sock_t *sock, struct zbx_json_parse *jp)
+{
+	const char		*__function_name = "recv_media_query";
+	int			ret = FAIL;
+	char			event[MAX_STRING_LEN], sessionid[MAX_STRING_LEN], *error = NULL;
+	const char		*pnext = NULL;
+	struct zbx_json		json;
+	struct zbx_json_parse	json_event;
+	zbx_vector_uint64_t	eventids;
+	zbx_vector_ptr_t	tickets;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
+		FAIL == zbx_session_validate(sessionid, USER_TYPE_ZABBIX_USER, NULL))
+	{
+		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
+		goto out;
+	}
+
+	if (FAIL == (zbx_json_brackets_by_name(jp, "eventids", &json_event)))
+	{
+		zbx_send_response_raw(sock, ret, "Missing eventids field", CONFIG_TIMEOUT);
+		goto out;
+	}
+
+	zbx_vector_uint64_create(&eventids);
+	zbx_vector_ptr_create(&tickets);
+
+	while (NULL != (pnext = zbx_json_next_value(&json_event, pnext, event, sizeof(event), NULL)))
+	{
+		zbx_uint64_t	eventid;
+
+		ZBX_STR2UINT64(eventid, event);
+		zbx_vector_uint64_append(&eventids, eventid);
+	}
+
+	if (SUCCEED != (ret = zbx_remedy_query_events(&eventids, &tickets, &error)))
+	{
+		zbx_send_response_raw(sock, ret, error, CONFIG_TIMEOUT);
+		zbx_free(error);
+		goto clean;
+	}
+
+	format_media_response(&json, &tickets, ZBX_MEDIA_RESPONSE_QUERY);
+
+	zbx_tcp_send_raw(sock, json.buffer);
+
+	zbx_json_free(&json);
+clean:
+	zbx_vector_ptr_clean(&tickets, (zbx_mem_free_func_t)zbx_free_ticket);
+	zbx_vector_ptr_destroy(&tickets);
+	zbx_vector_uint64_destroy(&eventids);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: recv_media_acknowledge                                           *
+ *                                                                            *
+ * Purpose: process media acknowledge request                                 *
+ *                                                                            *
+ * Parameters:  sock  - [IN] the request socket                               *
+ *              jp    - [IN] the request data                                 *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	recv_media_acknowledge(zbx_sock_t *sock, struct zbx_json_parse *jp)
+{
+	const char		*__function_name = "recv_media_query";
+	int			ret = FAIL;
+	char			sessionid[MAX_STRING_LEN], *error = NULL;
+	const char		*pnext = NULL;
+	struct zbx_json		json;
+	struct zbx_json_parse	json_events, json_ack;
+	zbx_vector_ptr_t	tickets, acknowledges;
+	zbx_uint64_t		userid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
+		FAIL == zbx_session_validate(sessionid, USER_TYPE_ZABBIX_USER, &userid))
+	{
+		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
+		goto out;
+	}
+
+	if (FAIL == (zbx_json_brackets_by_name(jp, "events", &json_events)))
+	{
+		zbx_send_response_raw(sock, ret, "Missing events field", CONFIG_TIMEOUT);
+		goto out;
+	}
+
+	zbx_vector_ptr_create(&acknowledges);
+	zbx_vector_ptr_create(&tickets);
+
+	while (NULL != (pnext = zbx_json_next(&json_events, pnext)))
+	{
+		zbx_acknowledge_t	*ack;
+		char			*subject = NULL, *message = NULL, *eventid = NULL;
+		size_t			subject_size = 0, message_size = 0, eventid_size = 0;
+
+		if (FAIL == zbx_json_brackets_open(pnext, &json_ack))
+		{
+			zbx_send_response_raw(sock, ret, "Failed to parse data", CONFIG_TIMEOUT);
+			goto clean;
+		}
+
+		if (FAIL == zbx_json_value_by_name_dyn(&json_ack, "eventid", &eventid, &eventid_size) ||
+				FAIL == zbx_json_value_by_name_dyn(&json_ack, "subject", &subject, &subject_size) ||
+				FAIL == zbx_json_value_by_name_dyn(&json_ack, "message", &message, &message_size))
+		{
+			zbx_free(subject);
+			zbx_free(message);
+			zbx_free(eventid);
+
+			zbx_send_response_raw(sock, ret, "Failed to parse data", CONFIG_TIMEOUT);
+			goto clean;
+		}
+
+		ack = zbx_malloc(NULL, sizeof(zbx_acknowledge_t));
+		ZBX_STR2UINT64(ack->eventid, eventid);
+		ack->subject = subject;
+		ack->message = message;
+
+		zbx_vector_ptr_append(&acknowledges, ack);
+
+		zbx_free(eventid);
+	}
+
+	if (SUCCEED != (ret = zbx_remedy_acknowledge_events(userid, &acknowledges, &tickets, &error)))
+	{
+		zbx_send_response_raw(sock, ret, error, CONFIG_TIMEOUT);
+		zbx_free(error);
+		goto clean;
+	}
+
+	format_media_response(&json, &tickets, ZBX_MEDIA_RESPONSE_ACKNOWLEDGE);
+
+	zbx_tcp_send_raw(sock, json.buffer);
+
+	zbx_json_free(&json);
+clean:
+	zbx_vector_ptr_clean(&tickets, (zbx_mem_free_func_t)zbx_free_ticket);
+	zbx_vector_ptr_destroy(&tickets);
+
+	zbx_vector_ptr_clean(&acknowledges, (zbx_mem_free_func_t)zbx_free_acknowledge);
+	zbx_vector_ptr_destroy(&acknowledges);
+out:
+	return ret;
+}
+
 static void	active_passive_misconfig(zbx_sock_t *sock)
 {
 	const char	*msg = "misconfiguration error: the proxy is running in the active mode but server sends "
@@ -564,6 +800,16 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 			{
 				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 					ret = recv_getqueue(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_MEDIA_QUERY))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					ret = recv_media_query(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_MEDIA_ACKNOWLEDGE))
+			{
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+					ret = recv_media_acknowledge(sock, &jp);
 			}
 			else
 				zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);

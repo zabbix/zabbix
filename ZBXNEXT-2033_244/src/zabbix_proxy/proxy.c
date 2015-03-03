@@ -203,6 +203,8 @@ char	**CONFIG_LOAD_MODULE		= NULL;
 
 char	*CONFIG_USER			= NULL;
 
+int	CONFIG_REMEDY_SERVICE_TIMEOUT	= 20;
+
 /* web monitoring */
 #ifdef HAVE_LIBCURL
 char	*CONFIG_SSL_CA_LOCATION		= NULL;

@@ -35,6 +35,56 @@ static int	DBpatch_2020000(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2020002(void)
+{
+	const ZBX_TABLE	table = {"ticket", "ticketid", 0,
+		{
+			{"ticketid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+			{"externalid", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+			{"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+			{"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+			{"clock", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+			{"new", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+			{NULL}
+		},
+		NULL
+	};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2020003(void)
+{
+	return DBcreate_index("ticket", "ticket_1", "eventid", 0);
+}
+
+static int	DBpatch_2020004(void)
+{
+	return DBcreate_index("ticket", "ticket_2", "triggerid,clock", 0);
+}
+
+static int	DBpatch_2020005(void)
+{
+	return DBcreate_index("ticket", "ticket_3", "externalid,new", 0);
+}
+
+static int	DBpatch_2020006(void)
+{
+	const ZBX_FIELD field = {"externalid", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("ticket", &field);
+}
+
+static int	DBpatch_2020007(void)
+{
+	return DBdrop_index("ticket", "ticket_1");
+}
+
+static int	DBpatch_2020008(void)
+{
+	return DBcreate_index("ticket", "ticket_1", "eventid,clock", 0);
+}
+
 #endif
 
 DBPATCH_START(2020)
@@ -42,5 +92,12 @@ DBPATCH_START(2020)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(2020000, 0, 1)
+DBPATCH_ADD(2020002, 0, 1)
+DBPATCH_ADD(2020003, 0, 1)
+DBPATCH_ADD(2020004, 0, 1)
+DBPATCH_ADD(2020005, 0, 1)
+DBPATCH_ADD(2020006, 0, 1)
+DBPATCH_ADD(2020007, 0, 1)
+DBPATCH_ADD(2020008, 0, 1)
 
 DBPATCH_END()
