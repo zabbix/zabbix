@@ -74,7 +74,7 @@ void	disconnect_server(zbx_sock_t *sock)
  *                                                                            *
  * Purpose: get configuration and other data from server                      *
  *                                                                            *
- * Return value: SUCCESS - processed successfully                             *
+ * Return value: SUCCEED - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
@@ -120,7 +120,7 @@ exit:
  *                                                                            *
  * Purpose: send data to server                                               *
  *                                                                            *
- * Return value: SUCCESS - processed successfully                             *
+ * Return value: SUCCEED - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
