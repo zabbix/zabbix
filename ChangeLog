@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+.......PS. [ZBXNEXT-866] fixed error messages to display IP address for connections between server and proxy (igors)
 A......... [ZBXNEXT-2724] removed deprecated all "exists" and "getObjects" API methods, "expandData" parameter in various *.get methods and "selectHosts" parameter from application.get method (Ivo)
 ..F....... [ZBXNEXT-2357] added MVC framework, some pages already take advantage of the framework (Alexei, Sasha)
 ...GI..PS. [ZBXNEXT-444] improved log file monitoring by saving log file meta information which was previously lost during agent restart (dimir)
