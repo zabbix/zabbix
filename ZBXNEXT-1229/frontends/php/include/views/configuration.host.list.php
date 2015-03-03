@@ -87,6 +87,8 @@ $table->setHeader(array(
 	_('Availability')
 ));
 
+$currentTime = time();
+
 foreach ($data['hosts'] as $host) {
 	$interface = reset($host['interfaces']);
 
@@ -208,7 +210,7 @@ foreach ($data['hosts'] as $host) {
 		$hostInterface,
 		new CCol($hostTemplates, 'wraptext'),
 		$status,
-		getAvailabilityTable($host)
+		getAvailabilityTable($host, $currentTime)
 	));
 }
 

@@ -63,32 +63,6 @@ int	connect_to_server(zbx_sock_t *sock, int timeout, int retry_interval)
 	return res;
 }
 
-static int	send_data_to_server(zbx_sock_t *sock, const char *data)
-{
-	int	res;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In send_data_to_server() [%s]", data);
-
-	if (FAIL == (res = zbx_tcp_send(sock, data)))
-		zabbix_log(LOG_LEVEL_ERR, "Error while sending data to the server [%s]", zbx_tcp_strerror());
-
-	return res;
-}
-
-static int	recv_data_from_server(zbx_sock_t *sock)
-{
-	int	res;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In recv_data_from_server()");
-
-	if (FAIL == (res = zbx_tcp_recv(sock)))
-		zabbix_log(LOG_LEVEL_ERR, "Error while receiving answer from server [%s]", zbx_tcp_strerror());
-	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Received [%s] from server", sock->buffer);
-
-	return res;
-}
-
 void	disconnect_server(zbx_sock_t *sock)
 {
 	zbx_tcp_close(sock);
@@ -100,17 +74,11 @@ void	disconnect_server(zbx_sock_t *sock)
  *                                                                            *
  * Purpose: get configuration and other data from server                      *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: SUCCESS - processed successfully                             *
+ * Return value: SUCCEED - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-int	get_data_from_server(zbx_sock_t *sock, const char *request)
+int	get_data_from_server(zbx_sock_t *sock, const char *request, char **error)
 {
 	const char	*__function_name = "get_data_from_server";
 
@@ -123,11 +91,19 @@ int	get_data_from_server(zbx_sock_t *sock, const char *request)
 	zbx_json_addstring(&j, "request", request, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, "host", CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
-	if (FAIL == send_data_to_server(sock, j.buffer))
+	if (SUCCEED != zbx_tcp_send(sock, j.buffer))
+	{
+		*error = zbx_strdup(*error, zbx_tcp_strerror());
 		goto exit;
+	}
 
-	if (FAIL == recv_data_from_server(sock))
+	if (SUCCEED != zbx_tcp_recv(sock))
+	{
+		*error = zbx_strdup(*error, zbx_tcp_strerror());
 		goto exit;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Received [%s] from server", sock->buffer);
 
 	ret = SUCCEED;
 exit:
@@ -144,40 +120,29 @@ exit:
  *                                                                            *
  * Purpose: send data to server                                               *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: SUCCESS - processed successfully                             *
+ * Return value: SUCCEED - processed successfully                             *
  *               FAIL - an error occurred                                     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j, char **error)
 {
 	const char	*__function_name = "put_data_to_server";
 
-	char		*info = NULL, *err = NULL;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)j->buffer_size);
 
-	if (SUCCEED != send_data_to_server(sock, j->buffer))
-		goto out;
-
-	if (SUCCEED != zbx_recv_response(sock, &info, 0, &err))
+	if (SUCCEED != zbx_tcp_send(sock, j->buffer))
 	{
-		*error = zbx_dsprintf(*error, "error:\"%s\", info:\"%s\"", ZBX_NULL2EMPTY_STR(err),
-				ZBX_NULL2EMPTY_STR(info));
+		*error = zbx_strdup(*error, zbx_tcp_strerror());
 		goto out;
 	}
 
+	if (SUCCEED != zbx_recv_response(sock, 0, error))
+		goto out;
+
 	ret = SUCCEED;
 out:
-	zbx_free(info);
-	zbx_free(err);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
