@@ -34,7 +34,6 @@ $triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGER PROTOTYPES'));
 $triggersForm = new CForm();
 $triggersForm->setName('triggersForm');
 $triggersForm->addVar('form', $this->data['form']);
-$triggersForm->addVar('hostid', $this->data['hostid']);
 $triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 $triggersForm->addVar('input_method', $this->data['input_method']);
 $triggersForm->addVar('toggle_input_method', '');
@@ -142,7 +141,7 @@ if ($this->data['input_method'] == IM_TREE) {
 	$expressionTable->setHeader(array(
 		$this->data['limited'] ? null : _('Target'),
 		_('Expression'),
-		null,
+		_('Error'),
 		$this->data['limited'] ? null : _('Action')
 	));
 
@@ -163,6 +162,29 @@ if ($this->data['input_method'] == IM_TREE) {
 				$triggerCheckbox = null;
 			}
 
+			if (!isset($e['expression']['levelErrors'])) {
+				$errorImg = new CImg('images/general/ok_icon.png', 'expression_no_errors');
+				$errorImg->setHint(_('No errors found.'));
+			}
+			else {
+				$allowedTesting = false;
+				$errorImg = new CImg('images/general/error2.png', 'expression_errors');
+				$errorTexts = array();
+
+				if (is_array($e['expression']['levelErrors'])) {
+					foreach ($e['expression']['levelErrors'] as $expVal => $errTxt) {
+						if (count($errorTexts) > 0) {
+							array_push($errorTexts, BR());
+						}
+						array_push($errorTexts, $expVal, ':', $errTxt);
+					}
+				}
+
+				$errorImg->setHint($errorTexts, 'left');
+			}
+
+			$errorColumn = new CCol($errorImg, 'center');
+
 			// templated trigger
 			if ($this->data['limited']) {
 				// make all links inside inactive
@@ -175,7 +197,7 @@ if ($this->data['input_method'] == IM_TREE) {
 				}
 			}
 
-			$row = new CRow(array($triggerCheckbox, $e['list'], null, isset($deleteUrl) ? $deleteUrl : null));
+			$row = new CRow(array($triggerCheckbox, $e['list'], $errorColumn, isset($deleteUrl) ? $deleteUrl : null));
 			$expressionTable->addRow($row);
 		}
 	}
@@ -279,12 +301,12 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 
 $addButton = new CButton('add_dep_trigger', _('Add'),
 	'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
-		'&with_triggers=1&normal_only=1&noempty=0", 1000, 700);',
+		'&with_triggers=1&normal_only=1&noempty=1", 1000, 700);',
 	'link_menu'
 );
 $addPrototypeButton = new CButton('add_dep_trigger_prototype', _('Add prototype'),
 	'return PopUp("popup.php?srctbl=trigger_prototypes&srcfld1=triggerid&reference=deptrigger'.
-		url_param('parent_discoveryid').'&multiselect=1&noempty=0", 1000, 700);',
+		url_param('parent_discoveryid').'&multiselect=1", 1000, 700);',
 	'link_menu'
 );
 $dependenciesFormList->addRow(_('Dependencies'),
@@ -301,7 +323,7 @@ $triggersForm->addItem($triggersTab);
 // append buttons to form
 if (!empty($this->data['triggerid'])) {
 	$deleteButton = new CButtonDelete(_('Delete trigger prototype?'),
-		url_params(array('form', 'groupid', 'hostid', 'triggerid', 'parent_discoveryid'))
+		url_params(array('form', 'triggerid', 'parent_discoveryid'))
 	);
 
 	if ($this->data['limited']) {
@@ -313,14 +335,14 @@ if (!empty($this->data['triggerid'])) {
 		array(
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
-			new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid')))
+			new CButtonCancel(url_param('parent_discoveryid'))
 		)
 	));
 }
 else {
 	$triggersForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid'))))
+		array(new CButtonCancel(url_param('parent_discoveryid')))
 	));
 }
 
