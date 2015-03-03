@@ -1297,93 +1297,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $SSH2_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $SSH2_LIBS"
 
-	dnl Check for PolarSSL libpolarssl [by default - skip]
-	LIBPOLARSSL_CHECK_CONFIG([no])
-	if test "x$want_polarssl" = "xyes"; then
-		if test "x$have_tls" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one TLS library (--with-polarssl, --with-gnutls or --with-openssl).])
-		fi
-
-		if test "x$found_polarssl" != "xyes"; then
-			AC_MSG_ERROR([PolarSSL library libpolarssl not found])
-		else
-			have_tls="PolarSSL"
-		fi
-	fi
-	CFLAGS="$CFLAGS $POLARSSL_CFLAGS"
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $POLARSSL_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $POLARSSL_LIBS"
-
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $POLARSSL_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $POLARSSL_LIBS"
-
-	AGENT_LDFLAGS="$AGENT_LDFLAGS $POLARSSL_LDFLAGS"
-	AGENT_LIBS="$AGENT_LIBS $POLARSSL_LIBS"
-
-	ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $POLARSSL_LDFLAGS"
-	ZBXGET_LIBS="$ZBXGET_LIBS $POLARSSL_LIBS"
-
-	SENDER_LDFLAGS="$SENDER_LDFLAGS $POLARSSL_LDFLAGS"
-	SENDER_LIBS="$SENDER_LIBS $POLARSSL_LIBS"
-
-	dnl Check for GnuTLS libgnutls [by default - skip]
-	LIBGNUTLS_CHECK_CONFIG([no])
-	if test "x$want_gnutls" = "xyes"; then
-		if test "x$have_tls" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one TLS library (--with-polarssl, --with-gnutls or --with-openssl).])
-		fi
-
-		if test "x$found_gnutls" != "xyes"; then
-			AC_MSG_ERROR([GnuTLS library libgnutls not found])
-		else
-			have_tls="GnuTLS"
-		fi
-	fi
-	CFLAGS="$CFLAGS $GNUTLS_CFLAGS"
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $GNUTLS_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $GNUTLS_LIBS"
-
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $GNUTLS_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $GNUTLS_LIBS"
-
-	AGENT_LDFLAGS="$AGENT_LDFLAGS $GNUTLS_LDFLAGS"
-	AGENT_LIBS="$AGENT_LIBS $GNUTLS_LIBS"
-
-	ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $GNUTLS_LDFLAGS"
-	ZBXGET_LIBS="$ZBXGET_LIBS $GNUTLS_LIBS"
-
-	SENDER_LDFLAGS="$SENDER_LDFLAGS $GNUTLS_LDFLAGS"
-	SENDER_LIBS="$SENDER_LIBS $GNUTLS_LIBS"
-
-	dnl Check for OpenSSL libssl [by default - skip]
-	LIBOPENSSL_CHECK_CONFIG([no])
-	if test "x$want_openssl" = "xyes"; then
-		if test "x$have_tls" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one TLS library (--with-polarssl, --with-gnutls or --with-openssl).])
-		fi
-
-		if test "x$found_openssl" != "xyes"; then
-			AC_MSG_ERROR([OpenSSL library libssl not found])
-		else
-			have_tls="OpenSSL"
-		fi
-	fi
-	CFLAGS="$CFLAGS $OPENSSL_CFLAGS"
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $OPENSSL_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $OPENSSL_LIBS"
-
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $OPENSSL_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $OPENSSL_LIBS"
-
-	AGENT_LDFLAGS="$AGENT_LDFLAGS $OPENSSL_LDFLAGS"
-	AGENT_LIBS="$AGENT_LIBS $OPENSSL_LIBS"
-
-	ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $OPENSSL_LDFLAGS"
-	ZBXGET_LIBS="$ZBXGET_LIBS $OPENSSL_LIBS"
-
-	SENDER_LDFLAGS="$SENDER_LDFLAGS $OPENSSL_LDFLAGS"
-	SENDER_LIBS="$SENDER_LIBS $OPENSSL_LIBS"
-
 	found_openipmi="no"
 	dnl Check for libOpenIPMI [by default - skip]
 	LIBOPENIPMI_CHECK_CONFIG([no])
@@ -1401,6 +1314,93 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $OPENIPMI_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $OPENIPMI_LIBS"
 fi
+
+dnl Check for PolarSSL libpolarssl [by default - skip]
+LIBPOLARSSL_CHECK_CONFIG([no])
+if test "x$want_polarssl" = "xyes"; then
+	if test "x$have_tls" != "xno"; then
+		AC_MSG_ERROR([You can configure for only one TLS library (--with-polarssl, --with-gnutls or --with-openssl).])
+	fi
+
+	if test "x$found_polarssl" != "xyes"; then
+		AC_MSG_ERROR([PolarSSL library libpolarssl not found])
+	else
+			have_tls="PolarSSL"
+	fi
+fi
+CFLAGS="$CFLAGS $POLARSSL_CFLAGS"
+SERVER_LDFLAGS="$SERVER_LDFLAGS $POLARSSL_LDFLAGS"
+SERVER_LIBS="$SERVER_LIBS $POLARSSL_LIBS"
+
+PROXY_LDFLAGS="$PROXY_LDFLAGS $POLARSSL_LDFLAGS"
+PROXY_LIBS="$PROXY_LIBS $POLARSSL_LIBS"
+
+AGENT_LDFLAGS="$AGENT_LDFLAGS $POLARSSL_LDFLAGS"
+AGENT_LIBS="$AGENT_LIBS $POLARSSL_LIBS"
+
+ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $POLARSSL_LDFLAGS"
+ZBXGET_LIBS="$ZBXGET_LIBS $POLARSSL_LIBS"
+
+SENDER_LDFLAGS="$SENDER_LDFLAGS $POLARSSL_LDFLAGS"
+SENDER_LIBS="$SENDER_LIBS $POLARSSL_LIBS"
+
+dnl Check for GnuTLS libgnutls [by default - skip]
+LIBGNUTLS_CHECK_CONFIG([no])
+if test "x$want_gnutls" = "xyes"; then
+	if test "x$have_tls" != "xno"; then
+		AC_MSG_ERROR([You can configure for only one TLS library (--with-polarssl, --with-gnutls or --with-openssl).])
+	fi
+
+	if test "x$found_gnutls" != "xyes"; then
+		AC_MSG_ERROR([GnuTLS library libgnutls not found])
+	else
+		have_tls="GnuTLS"
+	fi
+fi
+CFLAGS="$CFLAGS $GNUTLS_CFLAGS"
+SERVER_LDFLAGS="$SERVER_LDFLAGS $GNUTLS_LDFLAGS"
+SERVER_LIBS="$SERVER_LIBS $GNUTLS_LIBS"
+
+PROXY_LDFLAGS="$PROXY_LDFLAGS $GNUTLS_LDFLAGS"
+PROXY_LIBS="$PROXY_LIBS $GNUTLS_LIBS"
+
+AGENT_LDFLAGS="$AGENT_LDFLAGS $GNUTLS_LDFLAGS"
+AGENT_LIBS="$AGENT_LIBS $GNUTLS_LIBS"
+
+ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $GNUTLS_LDFLAGS"
+ZBXGET_LIBS="$ZBXGET_LIBS $GNUTLS_LIBS"
+
+SENDER_LDFLAGS="$SENDER_LDFLAGS $GNUTLS_LDFLAGS"
+SENDER_LIBS="$SENDER_LIBS $GNUTLS_LIBS"
+
+dnl Check for OpenSSL libssl [by default - skip]
+LIBOPENSSL_CHECK_CONFIG([no])
+if test "x$want_openssl" = "xyes"; then
+	if test "x$have_tls" != "xno"; then
+		AC_MSG_ERROR([You can configure for only one TLS library (--with-polarssl, --with-gnutls or --with-openssl).])
+	fi
+
+	if test "x$found_openssl" != "xyes"; then
+		AC_MSG_ERROR([OpenSSL library libssl not found])
+	else
+		have_tls="OpenSSL"
+	fi
+fi
+CFLAGS="$CFLAGS $OPENSSL_CFLAGS"
+SERVER_LDFLAGS="$SERVER_LDFLAGS $OPENSSL_LDFLAGS"
+SERVER_LIBS="$SERVER_LIBS $OPENSSL_LIBS"
+
+PROXY_LDFLAGS="$PROXY_LDFLAGS $OPENSSL_LDFLAGS"
+PROXY_LIBS="$PROXY_LIBS $OPENSSL_LIBS"
+
+AGENT_LDFLAGS="$AGENT_LDFLAGS $OPENSSL_LDFLAGS"
+AGENT_LIBS="$AGENT_LIBS $OPENSSL_LIBS"
+
+ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $OPENSSL_LDFLAGS"
+ZBXGET_LIBS="$ZBXGET_LIBS $OPENSSL_LIBS"
+
+SENDER_LDFLAGS="$SENDER_LDFLAGS $OPENSSL_LDFLAGS"
+SENDER_LIBS="$SENDER_LIBS $OPENSSL_LIBS"
 
 if test "x$java" = "xyes"; then
 	AC_CHECK_PROGS([JAVAC], [javac], [no])
