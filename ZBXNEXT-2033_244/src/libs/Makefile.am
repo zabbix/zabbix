@@ -48,6 +48,7 @@ PROXY_SUBDIRS = \
 	zbxmemory \
 	zbxserver \
 	zbxicmpping \
+	zbxmedia \
 	zbxself
 else
 if AGENT
