@@ -576,7 +576,7 @@ function getItemFilterForm(&$items) {
 					'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
 					'&with_applications=1'.
 					'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
-					.', 550, 450, "application");',
+					.', 0, 0, "application");',
 				'button-form'
 			)
 		), 'col1'),

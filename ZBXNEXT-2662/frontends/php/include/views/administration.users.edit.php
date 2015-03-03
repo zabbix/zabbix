@@ -66,7 +66,7 @@ if (!$this->data['is_profile']) {
 		array(
 			$lstGroups,
 			new CButton('add_group', _('Add'),
-				'return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups", 450, 450);', 'button-form top'),
+				'return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups");', 'button-form top'),
 			BR(),
 			(count($this->data['user_groups']) > 0)
 				? new CSubmit('del_user_group', _('Delete selected'), null, 'button-form')
@@ -211,12 +211,12 @@ if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TY
 			new CSpan($media['period'], 'nowrap'),
 			$mediaSeverity,
 			$status,
-			new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'", 550, 400);', 'link_menu'))
+			new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'");', 'link_menu'))
 		);
 	}
 
 	$userMediaFormList->addRow(_('Media'), array($mediaTableInfo,
-		new CButton('add_media', _('Add'), 'return PopUp("popup_media.php?dstfrm='.$userForm->getName().'", 550, 400);', 'link_menu'),
+		new CButton('add_media', _('Add'), 'return PopUp("popup_media.php?dstfrm='.$userForm->getName().'");', 'link_menu'),
 		SPACE,
 		SPACE,
 		(count($this->data['user_medias']) > 0) ? new CSubmit('del_user_media', _('Delete selected'), null, 'link_menu') : null

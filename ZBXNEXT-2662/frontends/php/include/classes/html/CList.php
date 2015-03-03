@@ -51,6 +51,10 @@ class CList extends CTag {
 		return $value;
 	}
 
+	public function isEmpty() {
+		return $this->emptyList;
+	}
+
 	public function addItem($value, $class = null, $id = null) {
 		if (!is_null($value) && $this->emptyList) {
 			$this->emptyList = false;

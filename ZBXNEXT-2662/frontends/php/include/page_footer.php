@@ -56,17 +56,17 @@ if (in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))) {
 	}
 }
 
-if ($page['type'] == PAGE_TYPE_HTML) {
+if ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 	echo '</article>'."\n";
 	echo '<footer>'."\n";
 	echo '<a href="http://www.zabbix.com" target="_blank" class="logo"></a>'."\n";
 	echo 'Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" target="_blank">Zabbix SIA</a>'."\n";
 	echo '</footer>'."\n";
-
-	insertPagePostJs();
-	require_once 'include/views/js/common.init.js.php';
-
-	echo '</body>'."\n".
-		'</html>'."\n";
 }
+
+insertPagePostJs();
+require_once 'include/views/js/common.init.js.php';
+
+echo '</body>'."\n".
+	'</html>'."\n";
 exit;

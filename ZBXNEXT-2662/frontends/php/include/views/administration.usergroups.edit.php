@@ -105,7 +105,7 @@ $permissionsTable->addRow(array(
 	array(
 		new CButton('add_read_write', _('Add'),
 			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_READ_WRITE."', 450, 450);",
+				'&permission='.PERM_READ_WRITE."');",
 			'button-form'
 		),
 		new CSubmit('del_read_write', _('Delete selected'), null, 'button-form')
@@ -113,7 +113,7 @@ $permissionsTable->addRow(array(
 	array(
 		new CButton('add_read_only', _('Add'),
 			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_READ."', 450, 450);",
+				'&permission='.PERM_READ."');",
 			'button-form'
 		),
 		new CSubmit('del_read_only', _('Delete selected'), null, 'button-form')
@@ -121,7 +121,7 @@ $permissionsTable->addRow(array(
 	array(
 		new CButton('add_deny', _('Add'),
 			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_DENY."', 450, 450);",
+				'&permission='.PERM_DENY."');",
 			'button-form'
 		),
 		new CSubmit('del_deny', _('Delete selected'), null, 'button-form')

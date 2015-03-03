@@ -242,7 +242,7 @@ $itemsTable->setHeader(array(
 $addButton = new CButton('add_item', _('Add'),
 	'return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
 		($this->data['normal_only'] ? '&normal_only=1' : '').
-		'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam(), 800, 600);',
+		'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam());',
 	'link_menu'
 );
 
@@ -253,7 +253,7 @@ if ($this->data['parent_discoveryid']) {
 			url_param($this->data['graphtype'], false, 'graphtype').
 			url_param('parent_discoveryid').
 			($this->data['normal_only'] ? '&normal_only=1' : '').
-			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1", 800, 600);',
+			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");',
 		'link_menu'
 	);
 }
