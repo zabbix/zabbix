@@ -21,24 +21,37 @@
 
 class CFilter extends CTag {
 
-	protected $columns = array();
+	private $filterid;
+	private $columns = array();
+	private $form;
 
-	public function __construct() {
+	public function __construct($filterid) {
 		parent::__construct('div', 'yes');
 		$this->attr('class', 'table-forms-container');
 		$this->attr('id', 'filter-space');
+		$this->filterid = $filterid;
 		$this->columns = array();
+
+		$this->form = new CForm('get');
+		$this->form->setAttribute('name', 'zbx_filter');
+		$this->form->setAttribute('id', 'zbx_filter');
+		$this->form->addVar('ddreset', 1);
+		$this->form->addVar('uncheck', 1);
+
 	}
 
 	public function addColumn($column) {
 		$this->columns[] = $column;
 	}
 
+	public function addVar($name, $value) {
+		$this->form->addVar($name, $value);
+	}
+
 	private function getHeader() {
 		$switch = new CDiv(null, 'filter-container');
 		$button = new CSimpleButton(array(_('Filter'), new CSpan(null, 'arrow-up', 'filter-arrow')), 'filter-trigger filter-active');
 		$button->setAttribute('id', 'filter-mode');
-//		$button->addAction('onclick', 'javascript: $("filter-mode").toggleClass("filter-active");  $("filter-container").toggle();');
 		$button->addAction('onclick', 'javascript: jQuery("#filter-space").toggle(); jQuery("#filter-mode").toggleClass("filter-active"); jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");');
 		$switch->addItem($button);
 
@@ -84,16 +97,10 @@ class CFilter extends CTag {
 	}
 
 	public function endToString() {
-		$form = new CForm('get');
-		$form->setAttribute('name', 'zbx_filter');
-		$form->setAttribute('id', 'zbx_filter');
-		$form->addVar('ddreset', 1);
-		$form->addVar('uncheck', 1);
+		$this->form->addItem($this->getTable());
+		$this->form->addItem($this->getButtons());
 
-		$form->addItem($this->getTable());
-		$form->addItem($this->getButtons());
-
-		$ret = $form->toString();
+		$ret = $this->form->toString();
 
 		$ret .= parent::endToString();
 		return $ret;
