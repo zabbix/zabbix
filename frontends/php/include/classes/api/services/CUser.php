@@ -1063,7 +1063,7 @@ class CUser extends CApiService {
 				' WHERE userid='.zbx_dbstr($userInfo['userid'])
 			);
 
-			add_audit(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _s('Login failed "%s".', $name));
+			add_audit(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _s('Login failed "%s".', $name), $userInfo['userid']);
 			self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
 		}
 
@@ -1072,8 +1072,6 @@ class CUser extends CApiService {
 		DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status)'.
 			' VALUES ('.zbx_dbstr($sessionid).','.zbx_dbstr($userInfo['userid']).','.time().','.ZBX_SESSION_ACTIVE.')'
 		);
-
-		add_audit(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _s('Correct login "%s".', $name));
 
 		$userData = $this->_getUserData($userInfo['userid']);
 		$userData['sessionid'] = $sessionid;

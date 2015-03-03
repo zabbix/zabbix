@@ -208,37 +208,23 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	));
 }
 
-// create go button
-$goComboBox = new CComboBox('action');
-
-$goOption = new CComboItem('trigger.massenable', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected triggers?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('trigger.massdisable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected triggers?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('trigger.massupdateform', _('Mass update'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('trigger.masscopyto', _('Copy selected to ...'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('trigger.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected triggers?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-
-zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
-zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
-$triggersForm->addItem(array($this->data['paging'], $triggersTable, $this->data['paging'],
-	get_table_header(array($goComboBox, $goButton))
+$triggersForm->addItem(array(
+	$this->data['paging'],
+	$triggersTable,
+	$this->data['paging'],
+	get_table_header(new CActionButtonList('action', 'g_triggerid',
+		array(
+			'trigger.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected triggers?')),
+			'trigger.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected triggers?')),
+			'trigger.masscopyto' =>  array('name' => _('Copy')),
+			'trigger.massupdateform' => array('name' => _('Mass update')),
+			'trigger.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected triggers?'))
+		),
+		$this->data['hostid']
+	))
 ));
 
 // append form to widget

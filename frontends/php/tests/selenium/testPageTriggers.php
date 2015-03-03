@@ -34,9 +34,7 @@ class testPageTriggers extends CWebTest {
 	* @dataProvider data
 	*/
 	public function testPageTriggers_CheckLayout($data) {
-		// Go to the list of triggers
 		$this->zbxTestLogin('triggers.php?hostid='.$data['hostid']);
-		// We are in the list of items
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 		$this->zbxTestTextPresent('Triggers');
