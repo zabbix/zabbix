@@ -115,28 +115,29 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	));
 }
 
-// create go buttons
-$goComboBox = new CComboBox('action');
-$goOption = new CComboItem('hostprototype.massenable', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected host prototypes?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('hostprototype.massdisable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected host prototypes?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('hostprototype.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected host prototypes?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "group_hostid";');
-zbx_add_post_js('chkbxRange.prefix = "'.$discoveryRule['itemid'].'";');
 zbx_add_post_js('cookie.prefix = "'.$discoveryRule['itemid'].'";');
 
 // append table to form
-$itemForm->addItem(array($this->data['paging'], $hostTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$itemForm->addItem(array(
+	$this->data['paging'],
+	$hostTable,
+	$this->data['paging'],
+	get_table_header(
+	new CActionButtonList('action', 'group_hostid',
+		array(
+			'hostprototype.massenable' => array('name' => _('Enable'),
+				'confirm' => _('Enable selected host prototypes?')
+			),
+			'hostprototype.massdisable' => array('name' => _('Disable'),
+				'confirm' => _('Disable selected host prototypes?')
+			),
+			'hostprototype.massdelete' => array('name' => _('Delete'),
+				'confirm' => _('Delete selected host prototypes?')
+			)
+		),
+		$discoveryRule['itemid']
+	))
+));
 
 // append form to widget
 $itemsWidget->addItem($itemForm);

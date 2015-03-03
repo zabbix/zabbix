@@ -9,6 +9,7 @@ DESC_H = zabbix_get_desc.h
 RESOURCE_RC = resource.rc
 RESOURCE_RES = zabbix_get.res
 OBJS  = ..\..\..\src\libs\zbxcommon\comms.o \
+	..\..\..\src\libs\zbxcommon\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
 	..\..\..\src\libs\zbxcommon\str.o \
 	..\..\..\src\libs\zbxcommon\xml.o \
@@ -42,6 +43,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 
 ..\..\..\src\libs\zbxcommon\comms.o: ..\..\..\src\libs\zbxcommon\comms.c
 	$(CC) ..\..\..\src\libs\zbxcommon\comms.c /Fo"..\..\..\src\libs\zbxcommon\comms.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxcommon\iprange.o: ..\..\..\src\libs\zbxcommon\iprange.c
+	$(CC) ..\..\..\src\libs\zbxcommon\iprange.c /Fo"..\..\..\src\libs\zbxcommon\iprange.o" $(CFLAGS)
 
 ..\..\..\src\libs\zbxcommon\misc.o: ..\..\..\src\libs\zbxcommon\misc.c
 	$(CC) ..\..\..\src\libs\zbxcommon\misc.c /Fo"..\..\..\src\libs\zbxcommon\misc.o" $(CFLAGS)

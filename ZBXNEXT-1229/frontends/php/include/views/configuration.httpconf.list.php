@@ -135,34 +135,25 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 	));
 }
 
-// create go buttons
-$goComboBox = new CComboBox('action');
-
-$goOption = new CComboItem('httptest.massenable', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected web scenarios?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('httptest.massdisable', _('Disable selected'));
-$goOption->setAttribute('confirm',_('Disable selected web scenarios?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('httptest.massclearhistory', _('Clear history for selected'));
-$goOption->setAttribute('confirm', _('Delete history of selected web scenarios?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('httptest.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected web scenarios?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-
-zbx_add_post_js('chkbxRange.pageGoName = "group_httptestid";');
-zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
-$httpForm->addItem(array($this->data['paging'], $httpTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$httpForm->addItem(array(
+	$this->data['paging'],
+	$httpTable,
+	$this->data['paging'],
+	get_table_header(new CActionButtonList('action', 'group_httptestid',
+		array(
+			'httptest.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')),
+			'httptest.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')),
+			'httptest.massclearhistory' => array('name' => _('Clear history'),
+				'confirm' => _('Delete history of selected web scenarios?')
+			),
+			'httptest.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?'))
+		),
+		$this->data['hostid']
+	))
+));
 
 // append form to widget
 $httpWidget->addItem($httpForm);

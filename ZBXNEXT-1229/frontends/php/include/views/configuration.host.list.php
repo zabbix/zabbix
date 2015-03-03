@@ -212,29 +212,15 @@ foreach ($data['hosts'] as $host) {
 	));
 }
 
-$goBox = new CComboBox('action');
-
-$goBox->addItem('host.export', _('Export selected'));
-
-$goBox->addItem('host.massupdateform', _('Mass update'));
-$goOption = new CComboItem('host.massenable', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected hosts?'));
-$goBox->addItem($goOption);
-
-$goOption = new CComboItem('host.massdisable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable selected hosts?'));
-$goBox->addItem($goOption);
-
-$goOption = new CComboItem('host.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected hosts?'));
-$goBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-
-zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
-
-$form->addItem(array($data['paging'], $table, $data['paging'], get_table_header(array($goBox, $goButton))));
+$form->addItem(array($data['paging'], $table, $data['paging'], get_table_header(new CActionButtonList('action', 'hosts',
+	array(
+		'host.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected hosts?')),
+		'host.massdisable' => array('name' => _('Disable'), 'confirm' =>  _('Disable selected hosts?')),
+		'host.export' => array('name' => _('Export')),
+		'host.massupdateform' => array('name' => _('Mass update')),
+		'host.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected hosts?'))
+	)
+))));
 
 $hostWidget->addItem($form);
 
