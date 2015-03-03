@@ -381,7 +381,7 @@ table.flicker a { color: #0BF; }
 td.flicker_c { cursor: pointer; }
 
 /* acknowledgements */
-table.ack_msgs { width: 70%; background-color: #EEEEEE; padding: 0; border: 0 solid; }
+table.ack_msgs { width: 70%; background-color: #EEEEEE; padding: 0; border: 0 solid; margin: 20px auto; }
 table.ack_msgs tr.title {
 	height: 14px; vertical-align: middle; color: #FFFFFF;
 	background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x;

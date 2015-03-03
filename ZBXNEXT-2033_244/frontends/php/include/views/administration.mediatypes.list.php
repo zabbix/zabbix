@@ -68,6 +68,13 @@ foreach ($this->data['mediatypes'] as $mediaType) {
 			$details = _('Username').NAME_DELIMITER.'"'.$mediaType['username'].'"';
 			break;
 
+		case MEDIA_TYPE_REMEDY:
+			$details =
+				_('Remedy Service URL').NAME_DELIMITER.'"'.$mediaType['smtp_server'].'", '.
+				_('Username').NAME_DELIMITER.'"'.$mediaType['username'].'", '.
+				_('Company name').NAME_DELIMITER.'"'.$mediaType['exec_path'].'"';
+			break;
+
 		default:
 			$details = '';
 			break;

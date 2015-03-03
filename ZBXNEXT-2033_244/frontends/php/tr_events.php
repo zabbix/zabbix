@@ -107,6 +107,28 @@ $triggerDetailsWidget->setHeader(_('Event source details'));
 $eventDetailsWidget = new CUiWidget('hat_eventdetails', make_event_details($event, $trigger));
 $eventDetailsWidget->setHeader(_('Event details'));
 
+// ticket details
+$ticketDetailsWidget = null;
+CRemedyService::init(array('triggerSeverity' => $trigger['priority']));
+
+if (CRemedyService::$enabled) {
+	$ticket = CRemedyService::mediaQuery($event['eventid']);
+
+	if ($ticket) {
+		$ticketTable = new CTableInfo();
+
+		$ticketTable->addRow(array(_('Ticket'), $ticket['link']));
+		if ($ticket['assignee']) {
+			$ticketTable->addRow(array(_('Assignee'), $ticket['assignee']));
+		}
+		$ticketTable->addRow(array(_('Status'), $ticket['status']));
+		$ticketTable->addRow(array(_('Created'), $ticket['created']));
+
+		$ticketDetailsWidget = new CUIWidget('hat_ticketdetails', $ticketTable);
+		$ticketDetailsWidget->setHeader(_('Ticket details'));
+	}
+}
+
 // if acknowledges are not disabled in configuration, let's show them
 if ($config['event_ack_enable']) {
 	$eventAcknowledgesWidget = new CCollapsibleUiWidget('hat_eventack', makeAckTab($event));
@@ -135,7 +157,7 @@ $eventHistoryWidget->setHeader(_('Event list [previous 20]'));
 $eventTab = new CTable();
 $eventTab->addRow(
 	array(
-		new CDiv(array($triggerDetailsWidget, $eventDetailsWidget), 'column'),
+		new CDiv(array($triggerDetailsWidget, $eventDetailsWidget, $ticketDetailsWidget), 'column'),
 		new CDiv(
 			array(
 				$eventAcknowledgesWidget, $actionMessagesWidget, $actionCommandWidget, $eventHistoryWidget

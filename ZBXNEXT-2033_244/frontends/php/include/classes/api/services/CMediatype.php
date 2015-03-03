@@ -46,7 +46,6 @@ class CMediatype extends CApiService {
 	 */
 	public function get($options = array()) {
 		$result = array();
-		$userType = self::$userData['type'];
 
 		$sqlParts = array(
 			'select'	=> array('media_type' => 'mt.mediatypeid'),
@@ -72,6 +71,7 @@ class CMediatype extends CApiService {
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectUsers'				=> null,
+			'selectMedia'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -82,11 +82,11 @@ class CMediatype extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// permission check
-		if (USER_TYPE_SUPER_ADMIN == $userType) {
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
 		}
-		elseif (is_null($options['editable']) && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+		elseif ($options['editable'] === null && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
 		}
-		elseif (!is_null($options['editable']) || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		elseif ($options['editable'] !== null && self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN) {
 			return array();
 		}
 
@@ -162,125 +162,67 @@ class CMediatype extends CApiService {
 	}
 
 	/**
-	 * Add Media types
+	 * Add Media types.
 	 *
-	 * @param array $mediatypes
-	 * @param string $mediatypes['type']
-	 * @param string $mediatypes['description']
-	 * @param string $mediatypes['smtp_server']
-	 * @param string $mediatypes['smtp_helo']
-	 * @param string $mediatypes['smtp_email']
-	 * @param string $mediatypes['exec_path']
-	 * @param string $mediatypes['gsm_modem']
-	 * @param string $mediatypes['username']
-	 * @param string $mediatypes['passwd']
-	 * @param int $mediatypes['status']
-	 * @return array|boolean
+	 * @param array		$mediaTypes
+	 * @param string	$mediaTypes['type']				E-mail, Script, SMS, Jabber, Ez Texting and Remedy Service
+	 * @param string	$mediaTypes['description']		Name of the media type
+	 * @param string	$mediaTypes['smtp_server']		Used for e-mail and Remedy Service URL
+	 * @param string	$mediaTypes['smtp_helo']		Used for e-mail and Remedy Service Proxy
+	 * @param string	$mediaTypes['smtp_email']		Used for e-mail only
+	 * @param string	$mediaTypes['exec_path']		Used for scripts, Ez Texting, Remedy Service company name
+	 * @param string	$mediaTypes['gsm_modem']		Used for SMS only
+	 * @param string	$mediaTypes['username']			Used for Jabber, Ez Texting and Remedy Service
+	 * @param string	$mediaTypes['passwd']			Used for Jabber, Ez Texting and Remedy Service
+	 * @param int		$mediaTypes['status']			Enabled or disabled
+	 *
+	 * @return array
 	 */
-	public function create($mediatypes) {
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create media types.'));
-		}
+	public function create($mediaTypes) {
+		$mediaTypes = zbx_toArray($mediaTypes);
 
-		$mediatypes = zbx_toArray($mediatypes);
+		$this->validateCreate($mediaTypes);
 
-		foreach ($mediatypes as $mediatype) {
-			$mediatypeDbFields = array(
-				'type' => null,
-				'description' => null
-			);
-			if (!check_db_fields($mediatypeDbFields, $mediatype)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for media type.'));
-			}
+		$mediaTypeIds = DB::insert('media_type', $mediaTypes);
 
-			if (in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING))
-					&& (!isset($mediatype['passwd']) || empty($mediatype['passwd']))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Password required for media type.'));
-			}
-
-			$mediatypeExist = $this->get(array(
-				'filter' => array('description' => $mediatype['description']),
-				'output' => API_OUTPUT_EXTEND
-			));
-			if (!empty($mediatypeExist)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%s" already exists.', $mediatypeExist[0]['description']));
-			}
-		}
-
-		$mediatypeids = DB::insert('media_type', $mediatypes);
-
-		return array('mediatypeids' => $mediatypeids);
+		return array('mediatypeids' => $mediaTypeIds);
 	}
 
 	/**
-	 * Update Media types
+	 * Update Media types.
 	 *
-	 * @param array $mediatypes
-	 * @param string $mediatypes['type']
-	 * @param string $mediatypes['description']
-	 * @param string $mediatypes['smtp_server']
-	 * @param string $mediatypes['smtp_helo']
-	 * @param string $mediatypes['smtp_email']
-	 * @param string $mediatypes['exec_path']
-	 * @param string $mediatypes['gsm_modem']
-	 * @param string $mediatypes['username']
-	 * @param string $mediatypes['passwd']
-	 * @param int $mediatypes['status']
+	 * @param array		$mediaTypes
+	 * @param string	$mediaTypes['type']				E-mail, Script, SMS, Jabber, Ez Texting and Remedy Service
+	 * @param string	$mediaTypes['description']		Name of the media type
+	 * @param string	$mediaTypes['smtp_server']		Used for e-mail and Remedy Service URL
+	 * @param string	$mediaTypes['smtp_helo']		Used for e-mail and Remedy Service Proxy
+	 * @param string	$mediaTypes['smtp_email']		Used for e-mail only
+	 * @param string	$mediaTypes['exec_path']		Used for scripts, Ez Texting, Remedy Service company name
+	 * @param string	$mediaTypes['gsm_modem']		Used for SMS only
+	 * @param string	$mediaTypes['username']			Used for Jabber, Ez Texting and Remedy Service
+	 * @param string	$mediaTypes['passwd']			Used for Jabber, Ez Texting and Remedy Service
+	 * @param int		$mediaTypes['status']			Enabled or disabled
+	 *
 	 * @return array
 	 */
-	public function update($mediatypes) {
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can edit media types.'));
-		}
+	public function update($mediaTypes) {
+		$mediaTypes = zbx_toArray($mediaTypes);
 
-		$mediatypes = zbx_toArray($mediatypes);
+		$this->validateUpdate($mediaTypes);
 
 		$update = array();
-		foreach ($mediatypes as $mediatype) {
-			$mediatypeDbFields = array(
-				'mediatypeid' => null
+		foreach ($mediaTypes as $mediaType) {
+			$update[] = array(
+				'values' => $mediaType,
+				'where' => array('mediatypeid' => $mediaType['mediatypeid'])
 			);
-			if (!check_db_fields($mediatypeDbFields, $mediatype)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for media type.'));
-			}
-
-			if (isset($mediatype['description'])) {
-				$options = array(
-					'filter' => array('description' => $mediatype['description']),
-					'preservekeys' => true,
-					'output' => array('mediatypeid')
-				);
-				$existMediatypes = $this->get($options);
-				$existMediatype = reset($existMediatypes);
-
-				if ($existMediatype && bccomp($existMediatype['mediatypeid'], $mediatype['mediatypeid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%s" already exists.', $mediatype['description']));
-				}
-			}
-
-			if (array_key_exists('passwd', $mediatype) && empty($mediatype['passwd'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Password required for media type.'));
-			}
-
-			if (array_key_exists('type', $mediatype) && !in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING))) {
-				$mediatype['passwd'] = '';
-			}
-
-			$mediatypeid = $mediatype['mediatypeid'];
-			unset($mediatype['mediatypeid']);
-
-			if (!empty($mediatype)) {
-				$update[] = array(
-					'values' => $mediatype,
-					'where' => array('mediatypeid' => $mediatypeid)
-				);
-			}
 		}
 
 		DB::update('media_type', $update);
-		$mediatypeids = zbx_objectValues($mediatypes, 'mediatypeid');
 
-		return array('mediatypeids' => $mediatypeids);
+		$mediaTypeIds = zbx_objectValues($mediaTypes, 'mediatypeid');
+
+		return array('mediatypeids' => $mediaTypeIds);
 	}
 
 	/**
@@ -310,6 +252,239 @@ class CMediatype extends CApiService {
 		return array('mediatypeids' => $mediatypeids);
 	}
 
+	/**
+	 * Validate media type data on Create method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $mediaTypes
+	 */
+	protected function validateCreate(array $mediaTypes) {
+		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create media types.'));
+		}
+
+		if (!$mediaTypes) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$typeValidator = new CLimitedSetValidator(array(
+			'values' => array_keys(media_type2str())
+		));
+		$statusValidator = new CLimitedSetValidator(array(
+			'values' => array(MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED)
+		));
+
+		$requiredFields = array('type', 'description');
+
+		foreach ($mediaTypes as $mediaType) {
+			// check if required keys are set and they are not empty
+			$missingKeys = checkRequiredKeys($mediaType, $requiredFields);
+			if ($missingKeys) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Media type missing parameters: %1$s',
+					implode(', ', $missingKeys)
+				));
+			}
+			else {
+				foreach ($requiredFields as $field) {
+					if (zbx_empty($mediaType[$field])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Field "%1$s" is missing a value for media type "%2$s".',
+							$field,
+							$mediaType['description']
+						));
+					}
+				}
+			}
+
+			// check if media type already exists
+			$dbMediaTypeExists = API::getApiService()->select($this->tableName(), array(
+				'output' => array('description'),
+				'filter' => array('description' => $mediaType['description'])
+			));
+
+			if ($dbMediaTypeExists) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Media type "%1$s" already exists.',
+					$dbMediaTypeExists[0]['description']
+				));
+			}
+
+			// validate type
+			if (!$typeValidator->validate($mediaType['type'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Media type "%1$s" has incorrect value for field "%2$s".',
+					$mediaType['type'],
+					'type'
+				));
+			}
+
+			// check other fields depending on each type
+			$this->checkRequiredFieldsByType($mediaType);
+
+			// validate optional field
+			if (isset($mediaType['status']) && !$statusValidator->validate($mediaType['status'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Media type "%1$s" has incorrect value for field "%2$s".',
+					$mediaType['description'],
+					'status'
+				));
+			}
+		}
+	}
+
+	/**
+	 * Validate media type data on Update method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $mediaTypes
+	 */
+	protected function validateUpdate(array $mediaTypes) {
+		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can update media types.'));
+		}
+
+		if (!$mediaTypes) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$requiredFields = array('mediatypeid');
+
+		foreach ($mediaTypes as $mediaType) {
+			$missingKeys = checkRequiredKeys($mediaType, $requiredFields);
+			if ($missingKeys) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Media type missing parameters: %1$s',
+					implode(', ', $missingKeys)
+				));
+			}
+		}
+
+		$mediaTypeIds = zbx_objectValues($mediaTypes, 'mediatypeid');
+
+		$dbMediaTypes = $this->get(array(
+			'mediatypeids' => $mediaTypeIds,
+			'countOutput' => true
+		));
+
+		if ($dbMediaTypes != count($mediaTypes)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _(
+				'No permissions to referred object or it does not exist!'
+			));
+		}
+
+		$typeValidator = new CLimitedSetValidator(array(
+			'values' => array_keys(media_type2str())
+		));
+		$statusValidator = new CLimitedSetValidator(array(
+			'values' => array(MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED)
+		));
+
+		$dbMediaTypes = API::getApiService()->select($this->tableName(), array(
+			'output' => array('mediatypeid', 'type', 'description', 'status'),
+			'mediatypeids' => $mediaTypeIds,
+			'preservekeys' => true
+		));
+
+		foreach ($mediaTypes as $mediaType) {
+			// if description changed, check if matches any of existing descriptions
+			if (isset($mediaType['description'])
+					&& $dbMediaTypes[$mediaType['mediatypeid']]['description'] != $mediaType['description']) {
+				foreach ($dbMediaTypes as $dbMediaType) {
+					if ($dbMediaType['description'] === $mediaType['description']) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Media type "%1$s" already exists.',
+							$mediaType['description']
+						));
+					}
+				}
+			}
+			// use description from DB in other error messages
+			else {
+				$mediaType['description'] = $dbMediaTypes[$mediaType['mediatypeid']]['description'];
+			}
+
+			// when changing type, validate new required fields just like in create method
+			if (isset($mediaType['type'])
+					&& $dbMediaTypes[$mediaType['mediatypeid']]['type'] != $mediaType['type']) {
+				if (!$typeValidator->validate($mediaType['type'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Media type "%1$s" has incorrect value for field "%2$s".',
+						$mediaType['description'],
+						'type'
+					));
+				}
+
+				$this->checkRequiredFieldsByType($mediaType);
+			}
+
+			// validate input on status change
+			if (isset($mediaType['status'])
+					&& $dbMediaTypes[$mediaType['mediatypeid']]['status'] != $mediaType['status']
+					&& !$statusValidator->validate($mediaType['status'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Media type "%1$s" has incorrect value for field "%2$s".',
+					$mediaType['description'],
+					'status'
+				));
+			}
+		}
+	}
+
+	/**
+	 * Check required fields by type.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array		$mediaType
+	 * @param string	$mediaType['type']				E-mail, Script, SMS, Jabber, Ez Texting and Remedy Service
+	 * @param string	$mediatype['description']		Name of the media type
+	 */
+	protected function checkRequiredFieldsByType(array $mediaType) {
+		$messageTextLimitValidator = new CLimitedSetValidator(array(
+			'values' => array(EZ_TEXTING_LIMIT_USA, EZ_TEXTING_LIMIT_CANADA)
+		));
+
+		$requiredFieldsByType = array(
+			MEDIA_TYPE_EMAIL => array('smtp_server', 'smtp_helo', 'smtp_email'),
+			MEDIA_TYPE_EXEC => array('exec_path'),
+			MEDIA_TYPE_SMS => array('gsm_modem'),
+			MEDIA_TYPE_JABBER => array('username', 'passwd'),
+			MEDIA_TYPE_EZ_TEXTING => array('exec_path', 'username', 'passwd'),
+			MEDIA_TYPE_REMEDY => array('smtp_server', 'exec_path', 'username', 'passwd')
+		);
+
+		foreach ($requiredFieldsByType[$mediaType['type']] as $field) {
+			// check if fields set on Create method
+			if (!isset($mediaType[$field])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Field "%1$s" required for media type "%2$s".',
+					$field,
+					$mediaType['description']
+				));
+			}
+			elseif (isset($mediaType[$field]) && zbx_empty($mediaType[$field])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Field "%1$s" is missing a value for media type "%2$s".',
+					$field,
+					$mediaType['description']
+				));
+			}
+			elseif (isset($mediaType[$field])
+					&& $mediaType['type'] == MEDIA_TYPE_EZ_TEXTING
+					&& $field == 'exec_path'
+					&&!$messageTextLimitValidator->validate($mediaType[$field])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Media type "%1$s" has incorrect value for field "%2$s".',
+					$mediaType['description'],
+					$field
+				));
+			}
+		}
+	}
+
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -322,6 +497,17 @@ class CMediatype extends CApiService {
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $users, 'users');
+		}
+
+		// adding media
+		if ($options['selectMedia'] !== null && $options['selectMedia'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'mediatypeid', 'mediaid', 'media');
+			$media = API::UserMedia()->get(array(
+				'output' => $options['selectMedia'],
+				'mediaids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $media, 'media');
 		}
 
 		return $result;

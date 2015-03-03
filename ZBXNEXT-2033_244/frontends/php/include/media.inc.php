@@ -25,7 +25,8 @@ function media_type2str($type = null) {
 		MEDIA_TYPE_EXEC => _('Script'),
 		MEDIA_TYPE_SMS => _('SMS'),
 		MEDIA_TYPE_JABBER => _('Jabber'),
-		MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')
+		MEDIA_TYPE_EZ_TEXTING => _('Ez Texting'),
+		MEDIA_TYPE_REMEDY => _('Remedy Service')
 	);
 
 	if ($type === null) {
