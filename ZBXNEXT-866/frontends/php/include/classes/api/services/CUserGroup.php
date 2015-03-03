@@ -167,63 +167,6 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Get user groups by name.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array  $groupData
-	 * @param string $groupData['name']
-	 *
-	 * @return array
-	 */
-	public function getObjects(array $groupData) {
-		$this->deprecated('usergroup.getobjects method is deprecated.');
-
-		$result = array();
-		$usrgrpids = array();
-
-		$res = DBselect(
-			'SELECT g.usrgrpid'.
-			' FROM usrgrp g'.
-			' WHERE g.name='.zbx_dbstr($groupData['name'])
-		);
-
-		while ($group = DBfetch($res)) {
-			$usrgrpids[$group['usrgrpid']] = $group['usrgrpid'];
-		}
-
-		if ($usrgrpids) {
-			$result = $this->get(array(
-				'output' => API_OUTPUT_EXTEND,
-				'usrgrpids' => $usrgrpids
-			));
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Check if user group exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('usergroup.exists method is deprecated.');
-
-		$userGroup = $this->get(array(
-			'output' => array('usrgrpid'),
-			'filter' => array('name' => $object['name']),
-			'limit' => 1,
-		));
-
-		return (bool) $userGroup;
-	}
-
-	/**
 	 * Create UserGroups.
 	 *
 	 * @param array $usrgrps

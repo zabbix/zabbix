@@ -299,6 +299,8 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 					"io_write_b", "io_write_op", "io_other_b", "io_other_op", NULL},
 			*typeList[] = {"min", "max", "avg", "sum", NULL};
 	double		value;
+	DWORD		access;
+	const OSVERSIONINFOEX	*vi;
 	int		counter, attr_id, type_id, ret = SYSINFO_RET_OK;
 
 	if (3 < request->nparam)
@@ -359,6 +361,20 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
+	if (NULL == (vi = zbx_win_getversion()))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot retrieve system version."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (6 > vi->dwMajorVersion)
+	{
+		/* PROCESS_QUERY_LIMITED_INFORMATION is not supported on Windows Server 2003 and XP */
+		access = PROCESS_QUERY_INFORMATION;
+	}
+	else
+		access = PROCESS_QUERY_LIMITED_INFORMATION;
+
 	pe32.dwSize = sizeof(PROCESSENTRY32);
 
 	if (FALSE == Process32First(hProcessSnap, &pe32))
@@ -377,24 +393,6 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (0 == stricmp(baseName, proc_name))
 		{
-			DWORD			access;
-			const OSVERSIONINFOEX	*vi;
-
-			if (NULL == (vi = zbx_win_getversion()))
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot retrieve system version."));
-				ret = SYSINFO_RET_FAIL;
-				break;
-			}
-
-			if (6 > vi->dwMajorVersion)
-			{
-				/* PROCESS_QUERY_LIMITED_INFORMATION is not supported on Windows Server 2003 and XP */
-				access = PROCESS_QUERY_INFORMATION;
-			}
-			else
-				access = PROCESS_QUERY_LIMITED_INFORMATION;
-
 			if (NULL != (hProcess = OpenProcess(access, FALSE, pe32.th32ProcessID)))
 			{
 				ret = GetProcessAttribute(hProcess, attr_id, type_id, counter++, &value);

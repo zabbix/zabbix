@@ -186,14 +186,13 @@ else {
 		// checking if correct inventory field is specified for filter
 		$possibleInventoryFields = getHostInventories();
 		$possibleInventoryFields = zbx_toHash($possibleInventoryFields, 'db_field');
-		if (!empty($data['filterField'])
-				&& !empty($data['filterFieldValue'])
+		if ($data['filterField'] !== '' && $data['filterFieldValue'] !== ''
 				&& !isset($possibleInventoryFields[$data['filterField']])) {
 			error(_s('Impossible to filter by inventory field "%s", which does not exist.', $data['filterField']));
 		}
 		else {
 			// if we are filtering by field, this field is also required
-			if (!empty($data['filterField']) && !empty($data['filterFieldValue'])) {
+			if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '') {
 				$requiredInventoryFields[] = $data['filterField'];
 			}
 
@@ -201,39 +200,53 @@ else {
 				'output' => array('hostid', 'name', 'status'),
 				'selectInventory' => $requiredInventoryFields,
 				'withInventory' => true,
-				'selectGroups' => API_OUTPUT_EXTEND,
-				'limit' => ($data['config']['search_limit'] + 1)
+				'selectGroups' => API_OUTPUT_EXTEND
 			);
 			if ($data['pageFilter']->groupid > 0) {
 				$options['groupids'] = $data['pageFilter']->groupid;
 			}
 
+			if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '') {
+				$options['searchInventory'] = array(
+					$data['filterField'] => array($data['filterFieldValue'])
+				);
+			}
+
 			$data['hosts'] = API::Host()->get($options);
 
-			// copy some inventory fields to the uppers array level for sorting
-			// and filter out hosts if we are using filter
-			foreach ($data['hosts'] as $num => $host) {
-				$data['hosts'][$num]['pr_name'] = $host['inventory']['name'];
-				$data['hosts'][$num]['pr_type'] = $host['inventory']['type'];
-				$data['hosts'][$num]['pr_os'] = $host['inventory']['os'];
-				$data['hosts'][$num]['pr_serialno_a'] = $host['inventory']['serialno_a'];
-				$data['hosts'][$num]['pr_tag'] = $host['inventory']['tag'];
-				$data['hosts'][$num]['pr_macaddress_a'] = $host['inventory']['macaddress_a'];
+			// filter exact matches
+			if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '' && $data['filterExact'] != 0) {
+				$needle = mb_strtolower($data['filterFieldValue']);
 
-				// if we are filtering by inventory field
-				if (!empty($data['filterField']) && !empty($data['filterFieldValue'])) {
-					// must we filter exactly or using a substring (both are case insensitive)
+				foreach ($data['hosts'] as $num => $host) {
 					$haystack = mb_strtolower($data['hosts'][$num]['inventory'][$data['filterField']]);
-					$needle = mb_strtolower($data['filterFieldValue']);
 
-					$match = $data['filterExact'] ? ($haystack === $needle) : (mb_strpos($haystack, $needle) !== false);
-					if (!$match) {
+					if ($haystack !== $needle) {
 						unset($data['hosts'][$num]);
 					}
 				}
 			}
 
+			$sort_fields = array(
+				'pr_name' => 'name',
+				'pr_type' => 'type',
+				'pr_os' => 'os',
+				'pr_serialno_a' => 'serialno_a',
+				'pr_tag' => 'tag',
+				'pr_macaddress_a' => 'macaddress_a'
+			);
+
+			if (array_key_exists($sortField, $sort_fields)) {
+				// copying an inventory field into the upper array level for sorting
+				foreach ($data['hosts'] as &$host) {
+					$host[$sortField] = $host['inventory'][$sort_fields[$sortField]];
+				}
+				unset($host);
+			}
+
 			order_result($data['hosts'], $sortField, $sortOrder);
+
+			$data['hosts'] = array_slice($data['hosts'], 0, $data['config']['search_limit'] + 1);
 		}
 	}
 
