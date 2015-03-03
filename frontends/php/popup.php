@@ -397,6 +397,9 @@ if (isset($onlyHostid)) {
 /*
  * Display table header
  */
+$widget = new CWidget();
+$widget->setTitle($page['title']);
+
 $frmTitle = new CForm();
 if ($monitoredHosts) {
 	$frmTitle->addVar('monitored_hosts', 1);
@@ -461,6 +464,9 @@ for ($i = 1; $i <= $srcfldCount; $i++) {
 /*
  * Only host id
  */
+
+$controls = new CList();
+
 if (isset($onlyHostid)) {
 	$only_hosts = API::Host()->get(array(
 		'hostids' => $hostid,
@@ -474,7 +480,7 @@ if (isset($onlyHostid)) {
 	$cmbHosts->addItem($hostid, $host['name']);
 	$cmbHosts->setEnabled(false);
 	$cmbHosts->setAttribute('title', _('You can not switch hosts for current selection.'));
-	$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $cmbHosts));
+	$controls->addItem(array(SPACE, _('Host'), SPACE, $cmbHosts));
 }
 else {
 	// show Group dropdown in header for these specified sources
@@ -482,7 +488,7 @@ else {
 		'templates', 'hosts', 'host_templates'
 	);
 	if (str_in_array($srctbl, $showGroupCmbBox) && ($srctbl !== 'item_prototypes' || !$parentDiscoveryId)) {
-		$frmTitle->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB()));
+		$controls->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB()));
 	}
 
 	// show Type dropdown in header for help items
@@ -494,13 +500,13 @@ else {
 			$cmbTypes->addItem($type, item_type2str($type));
 		}
 
-		$frmTitle->addItem(array(_('Type'), SPACE, $cmbTypes));
+		$controls->addItem(array(_('Type'), SPACE, $cmbTypes));
 	}
 
 	// show Host dropdown in header for these specified sources
 	$showHostCmbBox = array('triggers', 'items', 'applications', 'graphs', 'graph_prototypes', 'item_prototypes');
 	if (str_in_array($srctbl, $showHostCmbBox) && ($srctbl !== 'item_prototypes' || !$parentDiscoveryId)) {
-		$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $pageFilter->getHostsCB()));
+		$controls->addItem(array(SPACE, _('Host'), SPACE, $pageFilter->getHostsCB()));
 	}
 }
 
@@ -515,11 +521,14 @@ if (str_in_array($srctbl, array('applications', 'triggers'))) {
 		$epmtyScript .= get_window_opener($dstfrm, $dstfld3, $value3);
 		$epmtyScript .= ' close_window(); return false;';
 
-		$frmTitle->addItem(array(SPACE, new CButton('empty', _('Empty'), $epmtyScript)));
+		$controls->addItem(array(SPACE, new CButton('empty', _('Empty'), $epmtyScript)));
 	}
 }
 
-show_table_header($page['title'], $frmTitle);
+if (!$controls->isEmpty()) {
+	$frmTitle->addItem($controls);
+}
+$widget->setControls($frmTitle);
 
 insert_js_function('addSelectedValues');
 insert_js_function('addValues');
@@ -579,7 +588,8 @@ if ($srctbl == 'usrgrp') {
 	}
 
 	$form->addItem($table);
-	$form->show();
+	$widget->addItem($form);
+	$widget->show();
 }
 /*
  * Users
@@ -646,7 +656,8 @@ elseif ($srctbl == 'users') {
 	}
 
 	$form->addItem($table);
-	$form->show();
+	$widget->addItem($form);
+	$widget->show();
 }
 
 /*
@@ -720,7 +731,8 @@ elseif ($srctbl == 'templates') {
 	insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
 
 	$form->addItem($table);
-	$form->show();
+	$widget->addItem($form);
+	$widget->show();
 }
 
 /*
@@ -794,7 +806,8 @@ elseif ($srctbl == 'hosts') {
 	insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
 
 	$form->addItem($table);
-	$form->show();
+	$widget->addItem($form);
+	$widget->show();
 }
 
 /*
@@ -869,7 +882,8 @@ elseif ($srctbl == 'host_templates') {
 	insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
 
 	$form->addItem($table);
-	$form->show();
+	$widget->addItem($form);
+	$widget->show();
 }
 
 /*
@@ -939,7 +953,8 @@ elseif ($srctbl == 'host_groups') {
 	insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
 
 	$form->addItem($table);
-	$form->show();
+	$widget->addItem($form);
+	$widget->show();
 }
 
 /*
@@ -956,7 +971,8 @@ elseif ($srctbl === 'help_items') {
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
 		$table->addRow(array($name, $helpItem['description']));
 	}
-	$table->show();
+	$widget->addItem($table);
+	$widget->show();
 }
 /*
  * Triggers
@@ -1073,7 +1089,8 @@ elseif ($srctbl === 'triggers') {
 	}
 
 	$form->addItem($table);
-	$form->show();
+	$widget->addItem($form);
+	$widget->show();
 }
 
 /*
@@ -1209,7 +1226,8 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 	}
 
 	$form->addItem($table);
-	$form->show();
+	$widget->addItem($form);
+	$widget->show();
 }
 
 /*
@@ -1278,7 +1296,8 @@ elseif ($srctbl == 'applications') {
 	insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
 
 	$form->addItem($table);
-	$form->show();
+	$widget->addItem($form);
+	$widget->show();
 }
 
 /*
@@ -1393,7 +1412,8 @@ elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
 	}
 
 	$form->addItem($table);
-	$form->show();
+	$widget->addItem($form);
+	$widget->show();
 }
 /*
  * Sysmaps
@@ -1460,7 +1480,8 @@ elseif ($srctbl == 'sysmaps') {
 	}
 
 	$form->addItem($table);
-	$form->show();
+	$widget->addItem($form);
+	$widget->show();
 }
 /*
  * Slides
@@ -1522,7 +1543,8 @@ elseif ($srctbl == 'slides') {
 	}
 
 	$form->addItem($table);
-	$form->show();
+	$widget->addItem($form);
+	$widget->show();
 }
 /*
  * Screens
@@ -1582,7 +1604,8 @@ elseif ($srctbl == 'screens') {
 	}
 
 	$form->addItem($table);
-	$form->show();
+	$widget->addItem($form);
+	$widget->show();
 }
 /*
  * Screens 2
@@ -1610,7 +1633,8 @@ elseif ($srctbl == 'screens2') {
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
 		$table->addRow($name);
 	}
-	$table->show();
+	$widget->addItem($table);
+	$widget->show();
 }
 
 /*
@@ -1632,7 +1656,8 @@ elseif ($srctbl === 'drules') {
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
 		$table->addRow($name);
 	}
-	$table->show();
+	$widget->addItem($table);
+	$widget->show();
 }
 /*
  * Discovery checks
@@ -1658,7 +1683,8 @@ elseif ($srctbl === 'dchecks') {
 			$table->addRow($name);
 		}
 	}
-	$table->show();
+	$widget->addItem($table);
+	$widget->show();
 }
 /*
  * Proxies
@@ -1680,7 +1706,8 @@ elseif ($srctbl == 'proxies') {
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
 		$table->addRow($name);
 	}
-	$table->show();
+	$widget->addItem($table);
+	$widget->show();
 }
 /*
  * Scripts
@@ -1767,7 +1794,8 @@ elseif ($srctbl == 'scripts') {
 	}
 
 	$form->addItem($table);
-	$form->show();
+	$widget->addItem($form);
+	$widget->show();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

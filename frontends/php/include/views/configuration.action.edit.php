@@ -262,7 +262,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			new CTextBox('drule', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=drules&srcfld1=druleid&srcfld2=name'.
-					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=drule", 450, 450);',
+					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=drule");',
 				'button-form'
 			)
 		);
@@ -274,7 +274,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			new CTextBox('dcheck', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=dchecks&srcfld1=dcheckid&srcfld2=name'.
-					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=dcheck&writeonly=1", 450, 450);',
+					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=dcheck&writeonly=1");',
 				'button-form'
 			)
 		);
@@ -585,7 +585,7 @@ if (!empty($this->data['new_operation'])) {
 			$usrgrpList->attr('style', 'min-width: 310px;');
 			$usrgrpList->setAttribute('id', 'opmsgUsrgrpList');
 
-			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1", 450, 450)', 'link_menu');
+			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")', 'link_menu');
 			$addUsrgrpBtn->attr('id', 'addusrgrpbtn');
 			$usrgrpList->addRow(new CRow(new CCol($addUsrgrpBtn, null, 2), null, 'opmsgUsrgrpListFooter'));
 
@@ -594,7 +594,7 @@ if (!empty($this->data['new_operation'])) {
 			$userList->attr('style', 'min-width: 310px;');
 			$userList->setAttribute('id', 'opmsgUserList');
 
-			$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1", 450, 450)', 'link_menu');
+			$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")', 'link_menu');
 			$addUserBtn->attr('id', 'adduserbtn');
 			$userList->addRow(new CRow(new CCol($addUserBtn, null, 2), null, 'opmsgUserListFooter'));
 

@@ -381,7 +381,7 @@ $filterColumn1->addRow(
 		new CTextBox('application', $filter['application']),
 		new CButton('application_name', _('Select'),
 			'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
-				'&with_applications=1&dstfrm='.$filterForm->getName().'");',
+				'&with_applications=1&dstfrm=zbx_filter");',
 			'button-form'
 		)
 	)

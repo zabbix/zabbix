@@ -87,7 +87,7 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 			$caption = new CSpan($item['caption'], 'link');
 			$caption->onClick('return PopUp("popup_bitem.php?config='.BR_DISTRIBUTION_MULTIPLE_PERIODS.
 				'&list_name=items&dstfrm='.$reportForm->GetName().url_param($item, false).
-				url_param($id, false, 'gid').'", 550, 400, "graph_item_form");'
+				url_param($id, false, 'gid').'", 0, 0, "graph_item_form");'
 			);
 
 			$description = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
@@ -117,7 +117,7 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 	$reportForm->addRow(_('Items'), array(
 		$items_table,
 		new CButton('add_item', _('Add'), 'return PopUp("popup_bitem.php?config='.BR_DISTRIBUTION_MULTIPLE_PERIODS.
-			'&dstfrm='.$reportForm->getName().'", 800, 400, "graph_item_form");'
+			'&dstfrm='.$reportForm->getName().'", 0, 0, "graph_item_form");'
 		),
 		$delete_button
 	));
@@ -185,7 +185,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 				$period['report_timesince'].'&report_timetill='.$period['report_timetill'].'&color='.$period['color'];
 
 			$caption = new CSpan($period['caption'], 'link');
-			$caption->addAction('onclick', "return PopUp('".$edit_link."',840,340,'period_form');");
+			$caption->addAction('onclick', "return PopUp('".$edit_link."', 0, 0, 'period_form');");
 
 			$periods_table->addRow(array(
 				new CCheckBox('group_pid['.$pid.']'),
@@ -208,7 +208,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 	$reportForm->addRow(_('Period'), array(
 		$periods_table,
 		new CButton('add_period', _('Add'), 'return PopUp("popup_period.php?config='.BR_DISTRIBUTION_MULTIPLE_ITEMS.
-			'&dstfrm='.$reportForm->getName().'", 840, 340, "period_form");'
+			'&dstfrm='.$reportForm->getName().'", 0, 0, "period_form");'
 		),
 		$delete_button
 	));
@@ -221,7 +221,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 		foreach ($items as $id => &$item) {
 			$caption = new CSpan($item['caption'], 'link');
 			$caption->onClick('return PopUp("popup_bitem.php?config='.BR_DISTRIBUTION_MULTIPLE_ITEMS.'&list_name=items'.
-				'&dstfrm='.$reportForm->GetName().url_param($item, false).url_param($id, false, 'gid').'", 550, 400, "'.
+				'&dstfrm='.$reportForm->GetName().url_param($item, false).url_param($id, false, 'gid').'", 0, 0, "'.
 				'graph_item_form");'
 			);
 
@@ -250,7 +250,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 	$reportForm->addRow(_('Items'), array(
 		$items_table,
 		new CButton('add_item',_('Add'), "return PopUp('popup_bitem.php?config=".BR_DISTRIBUTION_MULTIPLE_ITEMS.
-			"&dstfrm=".$reportForm->getName()."', 550, 400, 'graph_item_form');"
+			"&dstfrm=".$reportForm->getName()."', 0, 0, 'graph_item_form');"
 		),
 		$delete_button
 	));

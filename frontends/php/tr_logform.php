@@ -244,7 +244,7 @@ if (hasRequest('sform')) {
 	$ctb->setAttribute('disabled', 'disabled');
 
 	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item".
-		"&srctbl=items&srcfld1=itemid&srcfld2=name',800,450);";
+		"&srctbl=items&srcfld1=itemid&srcfld2=name');";
 	$cbtn = new CSubmit('select_item', _('Select'), $script);
 
 	$frmTRLog->addRow(_('Item'), array($ctb, $cbtn));
