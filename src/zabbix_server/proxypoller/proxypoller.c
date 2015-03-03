@@ -213,28 +213,29 @@ static int	process_proxy(void)
 
 			if (SUCCEED != (ret = get_proxyconfig_data(proxy.hostid, &j, &error)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot collect proxy configuration: %s", error);
+				zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
+						proxy.host, error);
 				zbx_free(error);
 
 				goto network_error;
 			}
 
-			zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\", datalen "
-					ZBX_FS_SIZE_T, proxy.host, (zbx_fs_size_t)j.buffer_size);
-
 			if (SUCCEED == (ret = connect_to_proxy(&proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
 			{
+				zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\","
+						" datalen " ZBX_FS_SIZE_T,
+						proxy.host, get_ip_by_socket(&s), (zbx_fs_size_t)j.buffer_size);
+
 				if (SUCCEED == (ret = send_data_to_proxy(&proxy, &s, j.buffer)))
 				{
-					char	*info = NULL, *error = NULL;
+					char	*error = NULL;
 
-					if (SUCCEED != (ret = zbx_recv_response(&s, &info, 0, &error)))
+					if (SUCCEED != (ret = zbx_recv_response(&s, 0, &error)))
 					{
-						zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy configuration, "
-								"error:\"%s\", info:\"%s\"", ZBX_NULL2EMPTY_STR(error),
-								ZBX_NULL2EMPTY_STR(info));
+						zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy"
+								" \"%s\" at \"%s\": %s",
+								proxy.host, get_ip_by_socket(&s), error);
 					}
-					zbx_free(info);
 					zbx_free(error);
 				}
 

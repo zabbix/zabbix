@@ -46,8 +46,8 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != get_active_proxy_id(jp, &proxy_hostid, host, &error))
 	{
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
-		zabbix_log(LOG_LEVEL_WARNING, "proxy configuration request from active proxy on \"%s\" failed: %s",
-				get_ip_by_socket(sock), error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data request from active proxy at"
+				" \"%s\": %s", get_ip_by_socket(sock), error);
 		goto out;
 	}
 
@@ -58,18 +58,22 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != get_proxyconfig_data(proxy_hostid, &j, &error))
 	{
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
-		zabbix_log(LOG_LEVEL_WARNING, "cannot collect proxy configuration: %s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",
+				host, get_ip_by_socket(sock), error);
 		goto clean;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\", datalen " ZBX_FS_SIZE_T,
-			host, (zbx_fs_size_t)j.buffer_size);
+	zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen " ZBX_FS_SIZE_T,
+			host, get_ip_by_socket(sock), (zbx_fs_size_t)j.buffer_size);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", j.buffer);
 
 	alarm(CONFIG_TIMEOUT);
 
 	if (SUCCEED != zbx_tcp_send(sock, j.buffer))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration: %s", zbx_tcp_strerror());
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy \"%s\" at \"%s\": %s",
+				host, get_ip_by_socket(sock), zbx_tcp_strerror());
+	}
 
 	alarm(0);
 clean:
@@ -99,7 +103,8 @@ void	recv_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid proxy configuration data: %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data received from server at"
+				" \"%s\": %s", get_ip_by_socket(sock), zbx_json_strerror());
 		zbx_send_response(sock, ret, zbx_json_strerror(), CONFIG_TIMEOUT);
 	}
 	else
