@@ -341,7 +341,7 @@ $latestWidget->setTitle(_('Latest data'));
 
 
 // Filter
-$filterForm = new CFilter();
+$filterForm = new CFilter('web.latest.filter.state');
 
 $filterColumn1 = new CFormList();
 $filterColumn1->addRow(

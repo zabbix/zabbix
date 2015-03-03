@@ -35,7 +35,7 @@ $frmForm->addItem($controls);
 $hostWidget->setControls($frmForm);
 
 // Filter
-$filter = new CFilter();
+$filter = new CFilter('web.hosts.filter.state');
 $filterColumn1 = new CFormList();
 $filterColumn1->addRow(_('Name like'), new CTextBox('filter_host', $data['filter']['host'], 20));
 $filter->addColumn($filterColumn1);
