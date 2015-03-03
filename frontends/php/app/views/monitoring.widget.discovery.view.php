@@ -41,14 +41,12 @@ foreach ($drules as &$drule) {
 }
 unset($drule);
 
-$header = array(
-	new CCol(_('Discovery rule')),
-	new CCol(_x('Up', 'discovery results in dashboard')),
-	new CCol(_x('Down', 'discovery results in dashboard'))
-);
-
 $table = new CTableInfo();
-$table->setHeader($header, 'header');
+$table->setHeader(array(
+	_('Discovery rule'),
+	_x('Up', 'discovery results in dashboard'),
+	_x('Down', 'discovery results in dashboard')
+));
 
 foreach ($drules as $drule) {
 	$table->addRow(array(
