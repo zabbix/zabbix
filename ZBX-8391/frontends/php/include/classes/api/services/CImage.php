@@ -159,47 +159,6 @@ class CImage extends CApiService {
 	}
 
 	/**
-	 * Get images.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array  $image
-	 * @param string $image['name']
-	 * @param string $image['hostid']
-	 *
-	 * @return array
-	 */
-	public function getObjects(array $imageData) {
-		$this->deprecated('image.getobjects method is deprecated.');
-
-		return $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'filter' => $imageData
-		));
-	}
-
-	/**
-	 * Check if image exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('image.exists method is deprecated.');
-
-		$image = $this->get(array(
-			'output' => array('imageid'),
-			'filter' => zbx_array_mintersect(array(array('imageid', 'name'), 'imagetype'), $object),
-			'limit' => 1
-		));
-
-		return (bool) $image;
-	}
-
-	/**
 	 * Add images.
 	 *
 	 * @param array $images ['name' => string, 'image' => string, 'imagetype' => int]

@@ -1,6 +1,8 @@
 Changes for 2.5.0
 
 New features:
+.......PS. [ZBXNEXT-866] fixed error messages to display IP address for connections between server and proxy (igors)
+A......... [ZBXNEXT-2724] removed deprecated all "exists" and "getObjects" API methods, "expandData" parameter in various *.get methods and "selectHosts" parameter from application.get method (Ivo)
 ..F....... [ZBXNEXT-2357] added MVC framework, some pages already take advantage of the framework (Alexei, Sasha)
 ...GI..PS. [ZBXNEXT-444] improved log file monitoring by saving log file meta information which was previously lost during agent restart (dimir)
 ..F.....S. [ZBXNEXT-1128] added support of {HOST.*} and user macros in trigger URL (igors, Sasha)
@@ -60,6 +62,24 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 .D........ [ZBX-5166] replaced '-' with '\-' in man-pages (Andris)
 ...G...PS. [ZBX-8391] added stronger command-line parameter validation, revised help and version messages, revised man-pages for Zabbix server, proxy, agent, sender and get utilities (Andris)
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.5rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-9268] fixed misleading message in discovered object indicator tooltip when deletion date is in the past (Ivo)
+..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
+..F....... [ZBX-9286] fixed configuration.import, when trigger expression have a user macro (Oleg)
+...G...... [ZBX-9283] improved proc_info item (Windows only) to get more information about the processes (dimir)
+..F....... [ZBX-8875] fixed undefined index in screens with dynamic graph prototype elements when host is not selected (Ivo)
+..F....... [ZBX-9203] fixed host scripts menu popup not properly displaying script name when name contains HTML tags (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.4
+
+2.4.4rc1 was released as 2.4.4 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.4.4rc1
@@ -632,6 +652,9 @@ New features:
 A.F....... [ZBX-1357] updated Japanese, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9281] fixed undefined offset in template screens when resource is URL (Ivo)
+..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
+...G...... [ZBX-9283] improved proc_info item (Windows only) to get more information about the processes (dimir)
 ...G...PS. [ZBX-9284] added zabbix log file locking to avoid incomplete logging on log file rotation (igors)
 ...G...... [ZBX-9143] improved proc.num under Windows to handle more processes (dimir)
 ...G...... [ZBX-9232] fixed incomplete eventlog messages (igors)
@@ -1841,6 +1864,8 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9281] fixed undefined offset in template screens when resource is URL (Ivo)
+..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
 ...G...PS. [ZBX-9284] added zabbix log file locking to avoid incomplete logging on log file rotation (igors)
 ..F....... [ZBX-9087] fixed DB_ID validation expression to properly validate upper bound of received value and fixed various front-end forms not properly validating IDs (Krists, Ivo)
 ...G...... [ZBX-9241] fixed possible vfs.fs.discovery item crash on AIX systems (wiper)
