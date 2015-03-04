@@ -110,8 +110,9 @@ if ($triggerId !== null) {
 
 // Validate permissions to a group of triggers for mass enable/disable actions.
 $triggerIds = getRequest('g_triggerid', array());
+$triggerIds = zbx_toArray($triggerIds);
 
-if ($triggerIds && !API::Trigger()->isWritable(zbx_toArray($triggerIds))) {
+if ($triggerIds && !API::Trigger()->isWritable($triggerIds)) {
 	access_deny();
 }
 
