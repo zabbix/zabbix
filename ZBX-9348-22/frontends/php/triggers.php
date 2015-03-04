@@ -86,35 +86,31 @@ $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIG
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 $_REQUEST['go'] = get_request('go', 'none');
 
-// validate permissions
-$triggerIds = getRequest('g_triggerid', array());
-if (!is_array($triggerIds)) {
-	$triggerIds = zbx_toArray($triggerIds);
-}
-if (!zbx_empty(getRequest('triggerid'))) {
-	$triggerIds[] = getRequest('triggerid');
-}
+// Validate permissions to single trigger.
+$triggerId = getRequest('triggerid');
 
-if ($triggerIds) {
-	$triggers = API::Trigger()->get(array(
+if ($triggerId !== null) {
+	$trigger = API::Trigger()->get(array(
+		'triggerids' => array($triggerId),
 		'output' => array('triggerid'),
-		'triggerids' => array_keys(array_flip($triggerIds)),
-		'preservekeys' => true,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'editable' => true
 	));
 
-	if ($triggers) {
-		foreach ($triggerIds as $triggerId) {
-			if (!isset($triggers[$triggerId])) {
-				access_deny();
-			}
-		}
-	}
-	else {
+	if (!$trigger) {
 		access_deny();
 	}
 }
+
+// Validate permissions to a group of triggers for mass enable/disable actions.
+$triggerIds = getRequest('g_triggerid', array());
+$triggerIds = zbx_toArray($triggerIds);
+
+if ($triggerIds && !API::Trigger()->isWritable($triggerIds)) {
+	access_deny();
+}
+
+// Validate permissions to host.
 if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
 	access_deny();
 }
