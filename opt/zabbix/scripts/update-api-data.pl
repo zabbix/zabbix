@@ -135,7 +135,16 @@ foreach (@$tlds_ref)
 		}
 
 		my $hostid = get_hostid($tld);
-		my $avail_itemid = get_itemid_by_hostid($hostid, "rsm.slv.$service.avail");
+		my $key = "rsm.slv.$service.avail";
+		my $avail_itemid = get_itemid_by_hostid($hostid, $key);
+
+		if ($avail_itemid < 0)
+		{
+			fail("misconfiguration: service $service enabled but item \"$key\" not found at host \"$tld\"") if ($avail_itemid == E_ID_NONEXIST);
+			fail("misconfiguration: multiple items with key \"$key\" found at host \"$tld\"") if ($avail_itemid == E_ID_MULTIPLE);
+
+			fail("cannot get ID of $service item ($key) at host \"$tld\": unknown error");
+		}
 
 		# we need down time in minutes, not percent, that's why we can't use "rsm.slv.$service.rollweek" value
 		my ($rollweek_from, $rollweek_till) = get_rollweek_bounds();

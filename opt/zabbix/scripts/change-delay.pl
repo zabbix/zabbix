@@ -52,9 +52,9 @@ $sth->execute(getopt('delay'), $macro) or die $dbh->errstr;
 
 sub __validate_input
 {
-	return FAIL unless (getopt('type') and getopt('delay'));
-	return FAIL unless (getopt('type') >= 1 and getopt('type') <= 4);
-	return FAIL unless (getopt('delay') >= 60 and getopt('delay') <= 3600);
+	return E_FAIL unless (getopt('type') and getopt('delay'));
+	return E_FAIL unless (getopt('type') >= 1 and getopt('type') <= 4);
+	return E_FAIL unless (getopt('delay') >= 60 and getopt('delay') <= 3600);
 
 	return SUCCESS;
 }

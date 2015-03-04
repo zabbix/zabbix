@@ -16,7 +16,10 @@ use Sys::Syslog;
 use Data::Dumper;
 
 use constant SUCCESS => 0;
-use constant FAIL => 1;
+use constant E_FAIL => -1;
+use constant E_ID_NONEXIST => -2;
+use constant E_ID_MULTIPLE => -3;
+
 use constant UP => 1;
 use constant DOWN => 0;
 use constant ONLINE => 1;
@@ -57,8 +60,8 @@ our ($result, $dbh, $tld);
 our %OPTS; # specified command-line options
 
 our @EXPORT = qw($result $dbh $tld
-		SUCCESS FAIL UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR MIN_INFO_ERROR
-		MAX_INFO_ERROR RESULT_TIMESTAMP_SHIFT
+		SUCCESS E_FAIL E_ID_NONEXIST E_ID_MULTIPLE UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR
+		MAX_LOGIN_ERROR MIN_INFO_ERROR MAX_INFO_ERROR RESULT_TIMESTAMP_SHIFT
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
 		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt_high get_macro_dns_udp_rtt_low
 		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_macro_dns_udp_delay get_macro_dns_tcp_delay
@@ -278,12 +281,7 @@ sub get_itemid_by_key
 {
 	my $key = shift;
 
-	my $rows_ref = db_select("select itemid from items where key_='$key'");
-
-	fail("cannot find item ($key)") if (scalar(@$rows_ref) == 0);
-	fail("more than one item ($key)") if (scalar(@$rows_ref) > 1);
-
-	return $rows_ref->[0]->[0];
+	return __get_itemid_by_sql("select itemid from items where key_='$key'");
 }
 
 sub get_itemid_by_host
@@ -309,12 +307,7 @@ sub get_itemid_by_hostid
 	my $hostid = shift;
 	my $key = shift;
 
-	my $rows_ref = db_select("select itemid from items where hostid=$hostid and key_='$key'");
-
-	fail("cannot find item ($key) at host (id:$hostid)") if (scalar(@$rows_ref) == 0);
-	fail("more than one item ($key) at host (id:$hostid)") if (scalar(@$rows_ref) > 1);
-
-	return $rows_ref->[0]->[0];
+	return __get_itemid_by_sql("select itemid from items where hostid=$hostid and key_='$key'");
 }
 
 sub get_itemid_like_by_hostid
@@ -322,12 +315,19 @@ sub get_itemid_like_by_hostid
 	my $hostid = shift;
 	my $key = shift;
 
-	my $rows_ref = db_select("select itemid from items where hostid=$hostid and key_ like '$key'");
+	return __get_itemid_by_sql("select itemid from items where hostid=$hostid and key_ like '$key'");
+}
 
-	fail("cannot find item ($key) at host (id:$hostid)") if (scalar(@$rows_ref) == 0);
-	fail("more than one item ($key) at host (id:$hostid)") if (scalar(@$rows_ref) > 1);
+sub __get_itemid_by_sql
+{
+	my $sql = shift;
 
-	return $rows_ref->[0]->[0];
+	my $rows_ref = db_select($sql);
+
+	return E_ID_NONEXIST if (scalar(@$rows_ref) == 0);
+        return E_ID_MULTIPLE if (scalar(@$rows_ref) > 1);
+
+        return $rows_ref->[0]->[0];
 }
 
 sub get_itemids
@@ -342,7 +342,7 @@ sub get_itemids
 	    		" and h.host='$host'".
 			" and i.key_ like '$key_part%'");
 
-	fail("cannot find items ($key_part*) at host ($host)") if (scalar(@$rows_ref) == 0);
+	fail("cannot find items ($key_part%) at host ($host)") if (scalar(@$rows_ref) == 0);
 
 	my %result;
 
@@ -698,9 +698,9 @@ sub tld_service_enabled
 			" and h.host='$host'".
 			" and hm.macro='$macro'");
 
-	fail("host '$host' macro '$macro' not found") if (scalar(@$rows_ref) == 0);
+	fail("macro \"$macro\" does not exist at host \"$host\"") if (scalar(@$rows_ref) == 0);
 
-	return ($rows_ref->[0]->[0] == 0 ? FAIL : SUCCESS);
+	return ($rows_ref->[0]->[0] == 0 ? E_FAIL : SUCCESS);
 }
 
 sub handle_db_error
@@ -967,7 +967,16 @@ sub get_online_probes
 		$hostid = $reachable_probes{$host};
 
 		# get itemid
-		my $itemid = get_itemid_by_hostid($hostid, PROBE_KEY_MANUAL);
+		my $key = PROBE_KEY_MANUAL;
+		my $itemid = get_itemid_by_hostid($hostid, $key);
+
+		if ($itemid < 0)
+                {
+                        fail("misconfiguration: no item \"$key\" to check manual online status found at probe host \"$host\"") if ($itemid == E_ID_NONEXIST);
+                        fail("misconfiguration: multiple items \"$key\" to check manual online status found at probe host \"$host\"") if ($itemid == E_ID_MULTIPLE);
+
+                        fail("cannot get ID of item \"$key\" at probe host \"$host\": unknown error");
+                }
 
 		$rows_ref = db_select("select value from history_uint where itemid=$itemid and clock between $from and $till order by clock");
 
@@ -989,9 +998,11 @@ sub get_online_probes
 
 		if ($no_values == 1)
 		{
-			# We did not get any values between $from and $till, consider the last value.
+			# we did not get any values between $from and $till, consider lastvalue
 
 			my $lastvalue = get_current_value($itemid);
+
+			fail("no item \"$key\" to check manual online status found at probe host \"$host\"") if (defined($lastvalue) and $lastvalue == E_FAIL);
 
 			if (defined($lastvalue) and $lastvalue == DOWN)
 			{
@@ -1004,7 +1015,16 @@ sub get_online_probes
 
 		# Probe is considered manually up, check automatic status.
 
-		$itemid = get_itemid_like_by_hostid($hostid, PROBE_KEY_AUTOMATIC);
+		$key = PROBE_KEY_AUTOMATIC;
+		$itemid = get_itemid_like_by_hostid($hostid, $key);
+
+		if ($itemid < 0)
+                {
+                        fail("misconfiguration: no item \"$key\" to check automatic online status found at probe host \"$host\"") if ($itemid == E_ID_NONEXIST);
+                        fail("misconfiguration: multiple items \"$key\" to check automatic online status found at probe host \"$host\"") if ($itemid == E_ID_MULTIPLE);
+
+                        fail("cannot get ID of item \"$key\" at probe host \"$host\": unknown error");
+                }
 
 		$rows_ref = db_select("select value from history_uint where itemid=$itemid and clock between $from and $till order by clock");
 
@@ -1026,7 +1046,7 @@ sub get_online_probes
 
 		if ($no_values == 1)
 		{
-			# We did not get any values between $from and $till, consider lastvalue
+			# we did not get any values between $from and $till, consider lastvalue
 
 			my $lastvalue = get_current_value($itemid);
 
@@ -1071,14 +1091,14 @@ sub get_probe_times
 		{
 			dbg("$probe reachable times: ", join(',', @$times_ref));
 
-			$times_ref = __get_probestatus_times($hostid, $times_ref, PROBE_KEY_MANUAL);
+			$times_ref = __get_probestatus_times($probe, $hostid, $times_ref, PROBE_KEY_MANUAL);
 		}
 
 		if (scalar(@$times_ref) != 0)
 		{
 			dbg("$probe manual probestatus times: ", join(',', @$times_ref));
 
-			$times_ref = __get_probestatus_times($hostid, $times_ref, PROBE_KEY_AUTOMATIC);
+			$times_ref = __get_probestatus_times($probe, $hostid, $times_ref, PROBE_KEY_AUTOMATIC);
 		}
 
 		if (scalar(@$times_ref) != 0)
@@ -1274,7 +1294,7 @@ sub is_service_error
 
 	return SUCCESS if ($error <= MAX_SERVICE_ERROR);
 
-	return FAIL;
+	return E_FAIL;
 }
 
 sub process_slv_ns_monthly
@@ -1692,7 +1712,7 @@ sub check_lastclock
 	if ($lastclock + $interval > $value_ts)
 	{
 		dbg("lastclock:$lastclock value calculation not needed");
-		return FAIL;
+		return E_FAIL;
 	}
 
 	return SUCCESS;
@@ -2072,13 +2092,17 @@ sub avail_result_msg
 	return sprintf("$result_str (%d/%d positive, %.3f%%, %s)", $success_values, $total_results, $perc, ts_str($value_ts));
 }
 
+#
+# returns:
+# E_FAIL      - no such item in database
+# otherwise - lastvalue (undef if lastvalue == NULL)
 sub get_current_value
 {
 	my $itemid = shift;
 
 	my $rows_ref = db_select("select lastvalue from items where itemid=$itemid");
 
-	fail("cannot find item (itemid:$itemid) in configuration") if (scalar(@$rows_ref) == 0);
+	return E_FAIL if (scalar(@$rows_ref) == 0);
 
 	# undef in case lastvalue=NULL
 	return $rows_ref->[0]->[0];
@@ -2339,7 +2363,7 @@ sub fail
 {
 	__log('err', join('', @_));
 
-	exit(FAIL);
+	exit(E_FAIL);
 }
 
 sub trim
@@ -2611,6 +2635,7 @@ sub __get_reachable_times
 
 sub __get_probestatus_times
 {
+	my $probe = shift;
 	my $hostid = shift;
 	my $times_ref = shift; # input
 	my $key = shift;
@@ -2628,6 +2653,14 @@ sub __get_probestatus_times
 	else
 	{
 		$itemid = get_itemid_by_hostid($hostid, $key);
+	}
+
+	if ($itemid < 0)
+	{
+		fail("misconfiguration: no item \"$key\" at probe host \"$probe\"") if ($itemid == E_ID_NONEXIST);
+		fail("misconfiguration: multiple items \"$key\" at probe host \"$probe\"") if ($itemid == E_ID_MULTIPLE);
+
+		fail("cannot get ID of item \"$key\" at probe host \"$probe\": unknown error");
 	}
 
 	$rows_ref = db_select("select value from history_uint where itemid=$itemid and clock<" . $times_ref->[0] . " order by clock desc limit 1");
@@ -2691,7 +2724,16 @@ sub __get_configvalue
 	my $diff = $hour;
 	my $value = undef;
 
-	my $itemid = get_itemid_by_key("$item_prefix.configvalue[$item_param]");
+	my $key = "$item_prefix.configvalue[$item_param]";
+	my $itemid = get_itemid_by_key($key);
+
+	if ($itemid < 0)
+	{
+		fail("configuration item \"$key\" not found") if ($itemid == E_ID_NONEXIST);
+		fail("more than one configuration item \"$key\" found") if ($itemid == E_ID_MULTIPLE);
+
+		fail("cannot get ID of configuration item \"$key\": unknown error");
+	}
 
 	while (not $value and $diff < $month)
 	{

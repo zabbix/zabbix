@@ -50,7 +50,7 @@ send_values();
 slv_exit(SUCCESS);
 
 # SUCCESS - no values or at least one successful value
-# FAIL - all values unsuccessful
+# E_FAIL  - all values unsuccessful
 sub check_item_values
 {
 	my $values_ref = shift;
@@ -62,5 +62,5 @@ sub check_item_values
 		return SUCCESS if ($_ == UP);
 	}
 
-	return FAIL;
+	return E_FAIL;
 }
