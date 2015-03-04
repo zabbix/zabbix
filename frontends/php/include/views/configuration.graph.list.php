@@ -43,6 +43,9 @@ else {
 
 	$createForm->addVar('hostid', $this->data['hostid']);
 
+	$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+	$controls->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
+
 	if (!empty($this->data['hostid'])) {
 		$controls->addItem(new CSubmit('form', _('Create graph')));
 	}
@@ -51,9 +54,6 @@ else {
 		$createGraphButton->setEnabled(false);
 		$controls->addItem($createGraphButton);
 	}
-
-	$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-	$controls->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 	if (!empty($this->data['hostid'])) {
 		$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid']));
