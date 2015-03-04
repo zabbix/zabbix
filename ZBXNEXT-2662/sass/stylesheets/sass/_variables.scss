@@ -162,3 +162,10 @@ $font-transform: uppercase;
 		color: $placehldr-color;
 	}
 }
+
+@mixin transform($rotate) {
+	-webkit-transform: $rotate;
+	-moz-transform: $rotate;
+	-ms-transform: $rotate;
+	transform: $rotate;
+}
