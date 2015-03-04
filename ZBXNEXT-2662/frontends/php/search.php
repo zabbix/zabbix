@@ -68,11 +68,8 @@ $search = getRequest('search', '');
 if (zbx_empty($search)) {
 	$search = _('Search pattern is empty');
 }
-$searchWidget->setClass('header');
-$searchWidget->addHeader(array(
-	_('SEARCH').NAME_DELIMITER,
-	bold($search)
-), SPACE);
+
+$searchWidget->setTitle(_('Search').':'.SPACE.$search);
 
 // FIND Hosts
 $params = array(
@@ -234,7 +231,7 @@ foreach ($hosts as $hnum => $host) {
 $searchHostWidget = new CCollapsibleUiWidget('search_hosts', $table);
 $searchHostWidget->open = (bool) CProfile::get('web.search.hats.search_hosts.state', true);
 $searchHostWidget->setHeader(_('Hosts'));
-$searchHostWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
+$searchHostWidget->setFooter(new CList(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)));
 
 $searchWidget->addItem(new CDiv($searchHostWidget));
 //----------------
@@ -336,7 +333,7 @@ foreach ($hostGroups as $hnum => $group) {
 $searchHostGroupWidget = new CCollapsibleUiWidget('search_hostgroup', $table);
 $searchHostGroupWidget->open = (bool) CProfile::get('web.search.hats.search_hostgroup.state', true);
 $searchHostGroupWidget->setHeader(_('Host groups'));
-$searchHostGroupWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
+$searchHostGroupWidget->setFooter(new CList(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)));
 
 $searchWidget->addItem(new CDiv($searchHostGroupWidget));
 //----------------
@@ -482,7 +479,7 @@ if ($admin) {
 	$searchTemplateWidget = new CCollapsibleUiWidget('search_templates', $table);
 	$searchTemplateWidget->open = (bool) CProfile::get('web.search.hats.search_templates.state', true);
 	$searchTemplateWidget->setHeader(_('Templates'));
-	$searchTemplateWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
+	$searchTemplateWidget->setFooter(new CList(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)));
 
 	$searchWidget->addItem(new CDiv($searchTemplateWidget));
 }
