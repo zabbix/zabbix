@@ -402,6 +402,10 @@ footer {
 			background: $lighter-yellow;
 		}
 
+		&.nothing-to-show {
+				@extend %nothing-to-show;
+			}
+
 		&:last-child td {
 			border-bottom: none;
 		}
@@ -601,6 +605,17 @@ footer {
 
 .multiselect-button {
 	float: left;
+}
+
+.zoom {
+
+	a {
+		margin: 0 4px;
+	}
+}
+
+.nav_links {
+	@extend .zoom;
 }
 
 /* Forms */
@@ -1317,10 +1332,6 @@ button[disabled] {
 		}
 
 		tbody tr {
-
-			&.nothing-to-show {
-				@extend %nothing-to-show;
-			}
 
 			&:last-child td {
 				border-bottom: 1px solid $lightest-blue-grey;
