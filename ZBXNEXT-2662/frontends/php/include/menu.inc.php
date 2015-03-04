@@ -395,8 +395,9 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 		}
 		$mmenu_entry = new CTag('li', 'yes', new CLink($menu['label'], $menu_url), $menu_class);
 		$mmenu_entry->setAttribute('id', $label);
-		$mmenu_entry->addAction('onmouseover', 'javascript: MMenu.mouseOver(\''.$label.'\');');
-		$mmenu_entry->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
+// click to navigate to other sections, uncomment for old-style navigation
+//		$mmenu_entry->addAction('onmouseover', 'javascript: MMenu.mouseOver(\''.$label.'\');');
+//		$mmenu_entry->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
 		array_push($main_menu, $mmenu_entry);
 	}
 
