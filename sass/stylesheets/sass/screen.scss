@@ -48,17 +48,18 @@ a {
 		text-decoration: underline;
 		color: $link-active-color;
 	}
+}
 
-	&.link-dotted {
-		border-bottom: 1px dotted;
+.link-dotted {
+	border-bottom: 1px dotted;
+	cursor: pointer;
 
-		&:hover {
-			text-decoration: none;
-		}
+	&:hover {
+		text-decoration: none;
+	}
 
-		&:active {
-			text-decoration: none;
-		}
+	&:active {
+		text-decoration: none;
 	}
 }
 
@@ -91,13 +92,8 @@ sup {
 }
 
 /* Main Navigation */
-header {
-	margin: 0 0 12px 0;
-}
-
 nav {
 background: $secondary-blue;
-margin: 0 0 13px 0;
 }
 
 .top-nav-container {
@@ -300,7 +296,7 @@ ul.top-nav-icons {
 
 /* Article */
 article {
-	padding: 0 13px;
+	padding: 13px 13px 0 13px;
 }
 
 /* Obgect Group Navigation */
