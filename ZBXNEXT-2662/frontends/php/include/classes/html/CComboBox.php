@@ -28,7 +28,6 @@ class CComboBox extends CTag {
 		$this->tag_end = '';
 		$this->attr('id', zbx_formatDomId($name));
 		$this->attr('name', $name);
-		$this->attr('class', ZBX_STYLE_SELECT_MULTIPLE);
 		$this->attr('size', 1);
 		$this->value = $value;
 		$this->attr('onchange', $action);

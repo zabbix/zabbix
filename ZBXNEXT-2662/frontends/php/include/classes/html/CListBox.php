@@ -24,6 +24,7 @@ class CListBox extends CComboBox {
 	public function __construct($name = 'listbox', $value = null, $size = 5, $action = null) {
 		parent::__construct($name, null, $action);
 		$this->attr('multiple', 'multiple');
+		$this->attr('class', ZBX_STYLE_SELECT_MULTIPLE);
 		$this->attr('size', $size);
 		$this->setValue($value);
 	}
