@@ -49,6 +49,11 @@ if (!$service) {
 	access_deny();
 }
 
+$widget = new CWidget();
+$widget->setTitle(_('IT SERVICES AVAILABILITY REPORT').':'.SPACE.$service['name']);
+
+$controls = new Clist();
+
 $form = new CForm();
 $form->setMethod('get');
 $form->addVar('serviceid', $_REQUEST['serviceid']);
@@ -58,7 +63,7 @@ $cmbPeriod->addItem('daily', _('Daily'));
 $cmbPeriod->addItem('weekly', _('Weekly'));
 $cmbPeriod->addItem('monthly', _('Monthly'));
 $cmbPeriod->addItem('yearly', _('Yearly'));
-$form->addItem(array(SPACE._('Period').SPACE, $cmbPeriod));
+$controls->addItem(array(SPACE._('Period').SPACE, $cmbPeriod));
 
 if ($period != 'yearly') {
 	$cmbYear = new CComboBox('year', $year, 'submit();');
@@ -66,16 +71,11 @@ if ($period != 'yearly') {
 	for ($y = (date('Y') - YEAR_LEFT_SHIFT); $y <= date('Y'); $y++) {
 		$cmbYear->addItem($y, $y);
 	}
-	$form->addItem(array(SPACE._('Year').SPACE, $cmbYear));
+	$controls->addItem(array(SPACE._('Year').SPACE, $cmbYear));
 }
 
-show_table_header(array(
-	_('IT SERVICES AVAILABILITY REPORT'),
-	SPACE.'"',
-	new CLink($service['name'], 'srv_status.php?showgraph=1&serviceid='.$service['serviceid']),
-	'"'
-	), $form
-);
+$form->addItem($controls);
+$widget->setControls($form);
 
 $table = new CTableInfo();
 
@@ -85,7 +85,7 @@ switch ($period) {
 	case 'yearly':
 		$from = date('Y') - YEAR_LEFT_SHIFT;
 		$to = date('Y');
-		array_unshift($header, new CCol(_('Year'), 'center'));
+		array_unshift($header, _('Year'));
 
 		function get_time($y) {
 			return mktime(0, 0, 0, 1, 1, $y);
@@ -102,7 +102,7 @@ switch ($period) {
 	case 'monthly':
 		$from = 1;
 		$to = 12;
-		array_unshift($header, new CCol(_('Month'), 'center'));
+		array_unshift($header, _('Month'));
 
 		function get_time($m) {
 			global $year;
@@ -120,7 +120,7 @@ switch ($period) {
 	case 'daily':
 		$from = 1;
 		$to = DAY_IN_YEAR;
-		array_unshift($header, new CCol(_('Day'), 'center'));
+		array_unshift($header, _('Day'));
 
 		function get_time($d) {
 			global $year;
@@ -139,7 +139,7 @@ switch ($period) {
 	default:
 		$from = 0;
 		$to = 52;
-		array_unshift($header, new CCol(_('From'), 'center'), new CCol(_('Till'), 'center'));
+		array_unshift($header, _('From'), _('Till'));
 
 		function get_time($w) {
 			static $beg;
@@ -163,8 +163,6 @@ switch ($period) {
 		}
 		break;
 }
-
-$table->setHeader($header);
 
 $intervals = array();
 for ($t = $from; $t <= $to; $t++) {
@@ -223,6 +221,7 @@ foreach ($sla['sla'] as $intervalSla) {
 		($service['showsla']) ? new CSpan($service['goodsla']) : '-'
 	));
 }
-$table->show();
+$widget->addItem($table);
+$widget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

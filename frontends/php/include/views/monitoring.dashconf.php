@@ -34,11 +34,11 @@ $dashconfFormList = new CFormList('dashconfFormList');
 
 // append filter status to form list
 if ($this->data['isFilterEnable']) {
-	$filterStatusSpan = new CSpan(_('Enabled'), 'green underline pointer');
+	$filterStatusSpan = new CSpan(_('Enabled'), ZBX_STYLE_GREEN_DOTTED);
 	$filterStatusSpan->setAttribute('onclick', "create_var('".$dashconfForm->getName()."', 'filterEnable', 0, true);");
 }
 else {
-	$filterStatusSpan = new CSpan(_('Disabled'), 'red underline pointer');
+	$filterStatusSpan = new CSpan(_('Disabled'), ZBX_STYLE_RED_DOTTED);
 	$filterStatusSpan->setAttribute('onclick', "$('dashform').enable(); create_var('".$dashconfForm->getName()."', 'filterEnable', 1, true);");
 }
 $dashconfFormList->addRow(_('Dashboard filter'), $filterStatusSpan);
