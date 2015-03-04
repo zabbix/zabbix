@@ -63,6 +63,7 @@ extern int		CONFIG_VMWARE_TIMEOUT;
 
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
+extern char		*CONFIG_SOURCE_IP;
 
 #define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_mem_malloc_func, \
 		__vm_mem_realloc_func, __vm_mem_free_func)
@@ -71,7 +72,7 @@ extern int		server_num, process_num;
 #define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
 #define ZBX_VMWARE_SERVICE_TTL	SEC_PER_DAY
 
-static ZBX_MUTEX	vmware_lock;
+static ZBX_MUTEX	vmware_lock = ZBX_MUTEX_NULL;
 
 static zbx_mem_info_t	*vmware_mem = NULL;
 
@@ -935,6 +936,15 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		goto out;
 	}
 
+	if (NULL != CONFIG_SOURCE_IP)
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
+		{
+			*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+			goto out;
+		}
+	}
+
 	if (ZBX_VMWARE_TYPE_UNKNOWN == service->type)
 	{
 		/* try to detect the service type first using vCenter service manager object */
@@ -979,6 +989,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 			goto out;
 
 		service->type = ZBX_VMWARE_TYPE_VSPHERE;
+		zbx_free(*error);
 	}
 
 	zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH, vmware_service_objects[service->type].session_manager,
@@ -1497,7 +1508,9 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 			"<ns0:specSet>"							\
 				"<ns0:propSet>"						\
 					"<ns0:type>VirtualMachine</ns0:type>"		\
-					"<ns0:pathSet>config</ns0:pathSet>"		\
+					"<ns0:pathSet>config.hardware</ns0:pathSet>"	\
+					"<ns0:pathSet>config.uuid</ns0:pathSet>"	\
+					"<ns0:pathSet>config.instanceUuid</ns0:pathSet>"\
 					"<ns0:pathSet>summary</ns0:pathSet>"		\
 					"<ns0:pathSet>guest</ns0:pathSet>"		\
 				"</ns0:propSet>"					\
@@ -1569,7 +1582,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 
 	zbx_vmware_vm_t	*vm;
 	char		*value;
-	const char	*uuid_xpath[3] = {NULL, ZBX_XPATH_LN1("uuid"), ZBX_XPATH_LN1("instanceUuid")};
+	const char	*uuid_xpath[3] = {NULL, ZBX_XPATH_VM_UUID(), ZBX_XPATH_VM_INSTANCE_UUID()};
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __function_name, id);
@@ -1708,24 +1721,27 @@ out:
 static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL *easyhandle, const char *hvid,
 		char **data, char **error)
 {
-#	define ZBX_POST_hv_DETAILS 							\
-		ZBX_POST_VSPHERE_HEADER							\
-		"<ns0:RetrieveProperties>"						\
-			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"		\
-			"<ns0:specSet>"							\
-				"<ns0:propSet>"						\
-					"<ns0:type>HostSystem</ns0:type>"		\
-					"<ns0:pathSet>name</ns0:pathSet>"		\
-					"<ns0:pathSet>vm</ns0:pathSet>"			\
-					"<ns0:pathSet>summary</ns0:pathSet>"		\
-					"<ns0:pathSet>parent</ns0:pathSet>"		\
-					"<ns0:pathSet>datastore</ns0:pathSet>"		\
-				"</ns0:propSet>"					\
-				"<ns0:objectSet>"					\
-					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"	\
-				"</ns0:objectSet>"					\
-			"</ns0:specSet>"						\
-		"</ns0:RetrieveProperties>"						\
+#	define ZBX_POST_hv_DETAILS 								\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RetrieveProperties>"							\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
+			"<ns0:specSet>"								\
+				"<ns0:propSet>"							\
+					"<ns0:type>HostSystem</ns0:type>"			\
+					"<ns0:pathSet>name</ns0:pathSet>"			\
+					"<ns0:pathSet>vm</ns0:pathSet>"				\
+					"<ns0:pathSet>summary.quickStats</ns0:pathSet>"		\
+					"<ns0:pathSet>summary.config</ns0:pathSet>"		\
+					"<ns0:pathSet>summary.hardware</ns0:pathSet>"		\
+					"<ns0:pathSet>summary.overallStatus</ns0:pathSet>"	\
+					"<ns0:pathSet>parent</ns0:pathSet>"			\
+					"<ns0:pathSet>datastore</ns0:pathSet>"			\
+				"</ns0:propSet>"						\
+				"<ns0:objectSet>"						\
+					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"		\
+				"</ns0:objectSet>"						\
+			"</ns0:specSet>"							\
+		"</ns0:RetrieveProperties>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_get_hv_data";
@@ -3068,8 +3084,6 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 		error = zbx_strdup(error, "cannot initialize cURL library");
 		goto out;
 	}
-
-	zbx_vector_ptr_create(&entities);
 
 	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER2);

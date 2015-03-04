@@ -944,6 +944,8 @@ else {
 		));
 	}
 
+	$currentTime = time();
+
 	foreach ($hosts as $host) {
 		$interface = reset($host['interfaces']);
 
@@ -1056,7 +1058,7 @@ else {
 			$hostInterface,
 			new CCol($hostTemplates, 'wraptext'),
 			$status,
-			getAvailabilityTable($host)
+			getAvailabilityTable($host, $currentTime)
 		));
 	}
 

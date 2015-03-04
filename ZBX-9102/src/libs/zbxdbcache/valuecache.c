@@ -60,7 +60,7 @@ static time_t (*vc_time)(time_t *) = time;
 
 static zbx_mem_info_t	*vc_mem = NULL;
 
-static ZBX_MUTEX	vc_lock;
+static ZBX_MUTEX	vc_lock = ZBX_MUTEX_NULL;
 
 /* flag indicating that the cache was explicitly locked by this process */
 static int	vc_locked = 0;
