@@ -12,7 +12,7 @@ use constant AH_BASE_DIR => '/opt/zabbix/sla';
 
 use constant AH_INCIDENT_ACTIVE => 'ACTIVE';
 use constant AH_END_FILE => 'end';
-use constant AH_FALSE_POSITIVE_FILE => 'false_positive';
+use constant AH_FALSE_POSITIVE_FILE => 'falsePositive';
 use constant AH_FALSE_POSITIVE => 'YES';
 use constant AH_NOT_FALSE_POSITIVE => 'NO';
 use constant AH_ALARMED_FILE => 'alarmed';
