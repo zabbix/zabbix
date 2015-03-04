@@ -190,10 +190,13 @@ ob_end_flush();
 /*
  * Display
  */
-show_table_header(array(_('ALARM ACKNOWLEDGES').NAME_DELIMITER, ($bulk ? ' BULK ACKNOWLEDGE ' : $eventTriggerName)));
+
+$widget = new CWidget();
+$widget->setTitle(_('Alarm acknowledges').SPACE.($bulk ? 'Bulk acknowledge ' : $eventTriggerName));
 
 echo BR();
 
+$acknowledgesTable = null;
 if ($bulk) {
 	$title = _('Acknowledge alarm by');
 	$saveAndReturnLabel = _('Acknowledge and return');
@@ -207,19 +210,16 @@ else {
 	);
 
 	if ($acknowledges) {
-		$acknowledgesTable = new CTable(null, 'ack_msgs');
-		$acknowledgesTable->setAlign('center');
+		$acknowledgesTable = new CTableInfo();
+		$acknowledgesTable->setHeader(array(_('Time'), _('User'), _('Message')));
 
 		while ($acknowledge = DBfetch($acknowledges)) {
 			$acknowledgesTable->addRow(array(
-				new CCol(getUserFullname($acknowledge), 'user'),
-				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock']), 'time')),
-				'title'
-			);
-			$acknowledgesTable->addRow(new CCol(zbx_nl2br($acknowledge['message']), null, 2), 'msg');
+				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock']),
+				getUserFullname($acknowledge),
+				zbx_nl2br($acknowledge['message'])
+			));
 		}
-
-		$acknowledgesTable->show();
 	}
 
 	if ($eventAcknowledged) {
@@ -234,33 +234,34 @@ else {
 	}
 }
 
-$messageTable = new CFormTable($title.' "'.getUserFullname(CWebUser::$data).'"');
-$messageTable->addClass('acknowledge-edit');
+$form = new CForm();
 
 $backURL = getRequest('backurl');
-$messageTable->addVar('backurl', $backURL);
+$form->addVar('backurl', $backURL);
 
 if ($backURL === 'tr_events.php' || $backURL === 'events.php') {
-	$messageTable->addVar('triggerid', getRequest('triggerid'));
-	$messageTable->addVar('source', EVENT_SOURCE_TRIGGERS);
+	$form->addVar('triggerid', getRequest('triggerid'));
+	$form->addVar('source', EVENT_SOURCE_TRIGGERS);
 }
 elseif ($backURL === 'screenedit.php' || $backURL === 'screens.php') {
-	$messageTable->addVar('screenid', $_REQUEST['screenid']);
+	$form->addVar('screenid', $_REQUEST['screenid']);
 }
 
 if (hasRequest('eventid')) {
-	$messageTable->addVar('eventid', getRequest('eventid'));
+	$form->addVar('eventid', getRequest('eventid'));
 }
 elseif (hasRequest('triggers')) {
 	foreach (getRequest('triggers') as $triggerId) {
-		$messageTable->addVar('triggers['.$triggerId.']', $triggerId);
+		$form->addVar('triggers['.$triggerId.']', $triggerId);
 	}
 }
 elseif (hasRequest('events')) {
 	foreach (getRequest('events') as $eventId) {
-		$messageTable->addVar('events['.$eventId.']', $eventId);
+		$form->addVar('events['.$eventId.']', $eventId);
 	}
 }
+
+$formList = new CFormList();
 
 $message = new CTextArea('message', '', array(
 	'rows' => ZBX_TEXTAREA_STANDARD_ROWS,
@@ -269,14 +270,35 @@ $message = new CTextArea('message', '', array(
 ));
 $message->attr('autofocus', 'autofocus');
 
-$messageTable->addRow(_('Message'), $message);
-$messageTable->addItemToBottomRow(new CSubmit('saveandreturn', $saveAndReturnLabel));
+$formList->addRow(_('Message'), $message);
 
-if (!$bulk) {
-	$messageTable->addItemToBottomRow(new CSubmit('save', $saveLabel));
+// append tabs to form
+$ackTab = new CTabView();
+$ackTab->addTab('ackTab', _('Acknowledge'), $formList);
+if ($acknowledgesTable !== null) {
+	$ackTab->addTab('ackListTab', _('List'), $acknowledgesTable);
 }
 
-$messageTable->addItemToBottomRow(new CButtonCancel(url_params(array('backurl', 'eventid', 'triggerid', 'screenid'))));
-$messageTable->show();
+if (!$bulk) {
+	$ackTab->setFooter(makeFormFooter(
+		new CSubmit('saveandreturn', $saveAndReturnLabel),
+		array(
+			new CSubmit('save', $saveLabel),
+			new CButtonCancel(url_params(array('backurl', 'eventid', 'triggerid', 'screenid')))
+		)
+	));
+}
+else {
+	$ackTab->setFooter(makeFormFooter(
+		new CSubmit('saveandreturn', $saveAndReturnLabel),
+		array(
+			new CButtonCancel(url_params(array('backurl', 'eventid', 'triggerid', 'screenid')))
+		)
+	));
+}
+
+$form->addItem($ackTab);
+$widget->addItem($form);
+$widget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
