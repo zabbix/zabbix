@@ -572,6 +572,41 @@ footer {
 	}
 }
 
+.multiselect-wrapper {
+	position: relative;
+}
+
+.multiselect {
+	@extend %form-input-height-padding;
+	@extend %form-input-style;
+	@extend .multiselect-button;
+	position: relative;
+	margin-right: 3px;
+
+	&.active {
+		border-color: $primary-blue;
+	}
+
+	input[type="text"] {
+		position: absolute;
+		z-index: 10;
+		top: 0;
+		left: 0;
+		border: none;
+		background: none;
+
+	}
+
+	ul li {
+		display: inline-block;
+		margin: 1px 16px 0 0;
+	}
+}
+
+.multiselect-button {
+	float: left;
+}
+
 /* Forms */
 .table-forms-container {
 	padding: 0 10px 10px 10px;

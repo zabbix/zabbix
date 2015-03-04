@@ -39,9 +39,36 @@
 	<div class="row">
 	<div class="cell">
 	<ul class="table-forms">
-	<li><div class="table-forms-td-left"><label for="Groups">Host group</label></div><div class="table-forms-td-right"><input type="text" id="Groups" placeholder="Type to search"> <button type="button" class="btn-grey">Select</button></div></li>
-	<li><div class="table-forms-td-left"><label for="Groups">Host</label></div><div class="table-forms-td-right"><input type="text" id="Groups" placeholder="Type to search"> <button type="button" class="btn-grey">Select</button></div></li>
-	<li><div class="table-forms-td-left"><label for="Groups">Application</label></div><div class="table-forms-td-right"><input type="text" id="Groups" placeholder="Type to search"> <button type="button" class="btn-grey">Select</button></div></li>
+	<li><div class="table-forms-td-left"><label for="Groups">Host group</label></div><div class="table-forms-td-right">
+	<div class="multiselect-wrapper">
+	<div class="multiselect"><input type="text" style="" value="">
+      <div class="selected">
+        <ul style="">
+          <li data-id=""><span class="subfilter-enabled">Discovered hosts<span class="subfilter-disable-btn">&times;</span></span></li>
+          <li data-id=""><span class="subfilter-enabled">Linux servers<span class="subfilter-disable-btn">&times;</span></span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="multiselect-button"><button type="button" class="btn-grey">Select</button></div>
+    </div>
+    </div>
+	</li>
+	<li><div class="table-forms-td-left"><label for="Groups">Host group</label></div><div class="table-forms-td-right">
+	<div class="multiselect-wrapper">
+	<div class="multiselect"><input type="text" style="" value="">
+      <div class="selected">
+        <ul style="">
+          <li data-id=""><span class="subfilter-enabled">Discovered hosts<span class="subfilter-disable-btn">&times;</span></span></li>
+          <li data-id=""><span class="subfilter-enabled">Linux servers<span class="subfilter-disable-btn">&times;</span></span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="multiselect-button"><button type="button" class="btn-grey">Select</button></div>
+    </div>
+    </div>
+	</li>
+	<li><div class="table-forms-td-left"><label for="Groups">Host</label></div><div class="table-forms-td-right"><input type="text" id="Groups" placeholder="Search"> <button type="button" class="btn-grey">Select</button></div></li>
+	<li><div class="table-forms-td-left"><label for="Groups">Application</label></div><div class="table-forms-td-right"><input type="text" id="Groups" placeholder="Search"> <button type="button" class="btn-grey">Select</button></div></li>
 	<li><div class="table-forms-td-left"><label for="Groups">Name like</label></div><div class="table-forms-td-right"><input type="text" id="Groups"></div></li>
 	<li><div class="table-forms-td-left"><label for="Groups">Key like</label></div><div class="table-forms-td-right"><input type="text" id="Groups"></div></li>
 	</ul>
@@ -70,6 +97,7 @@
 	</div>
 	</div>
 	<div class="filter-forms"><button type="button">Filter</button><button type="button" class="btn-alt">Reset</button></div></div>
+	<div class="filter-forms"><a href="#" class="link-dotted">1h</a> <a href="#" class="link-dotted">2h</a> <a href="#" class="link-dotted">3h</a> <a href="#" class="link-dotted">6h</a> <a href="#" class="link-dotted">12h</a> <a href="#" class="link-dotted">1d</a> <a href="#" class="link-dotted">7d</a> <a href="#" class="link-dotted">14d</a> <a href="#" class="link-dotted">1m</a> <a href="#" class="link-dotted">3m</a> <a href="#" class="link-dotted">6m</a> <a href="#" class="link-dotted">1y</a> <a href="#" class="link-dotted">All</a><div style="height: 24px; background: #eee">dfssaaaadfsd</div></div>
 	<table class="list-table">
 	<tbody>
 	    <tr>
