@@ -70,28 +70,29 @@ zbx_buf_type_t;
 
 typedef struct
 {
-	ZBX_SOCKET		socket;
-	ZBX_SOCKET		socket_orig;
-	size_t			read_bytes;
-	char			*buffer;
-	char			*error;
-	char			*next_line;
+	ZBX_SOCKET			socket;
+	ZBX_SOCKET			socket_orig;
+	size_t				read_bytes;
+	char				*buffer;
+	char				*error;
+	char				*next_line;
 #if defined(HAVE_POLARSSL)
-	ssl_context		*tls_ctx;
+	ssl_context			*tls_ctx;
 #elif defined(HAVE_GNUTLS)
-	gnutls_session_t	tls_ctx;
+	gnutls_session_t		tls_ctx;
+	gnutls_psk_client_credentials_t	tls_psk_client_creds;
 #elif defined(HAVE_OPENSSL)
-	SSL			*tls_ctx;
+	SSL				*tls_ctx;
 #endif
-	unsigned int 		connection_type;	/* type of connection actually established: */
-							/* ZBX_TCP_SEC_UNENCRYPTED, ZBX_TCP_SEC_TLS_PSK or */
-							/* ZBX_TCP_SEC_TLS_CERT */
-	int			timeout;
-	zbx_buf_type_t		buf_type;
-	unsigned char		accepted;
-	int			num_socks;
-	ZBX_SOCKET		sockets[ZBX_SOCKET_COUNT];
-	char			buf_stat[ZBX_STAT_BUF_LEN];
+	unsigned int 			connection_type;	/* type of connection actually established: */
+								/* ZBX_TCP_SEC_UNENCRYPTED, ZBX_TCP_SEC_TLS_PSK or */
+								/* ZBX_TCP_SEC_TLS_CERT */
+	int				timeout;
+	zbx_buf_type_t			buf_type;
+	unsigned char			accepted;
+	int				num_socks;
+	ZBX_SOCKET			sockets[ZBX_SOCKET_COUNT];
+	char				buf_stat[ZBX_STAT_BUF_LEN];
 }
 zbx_sock_t;
 

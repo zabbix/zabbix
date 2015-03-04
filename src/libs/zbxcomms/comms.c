@@ -548,7 +548,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 static ssize_t	zbx_tls_write(zbx_sock_t *s, const char *buf, size_t len)
 {
-#if defined(HAVE_POLARSSL)	/* TODO add other defined SSL libraries */
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (NULL == s->tls_ctx)		/* unencrypted connection */
 	{
 #endif
@@ -561,10 +561,11 @@ static ssize_t	zbx_tls_write(zbx_sock_t *s, const char *buf, size_t len)
 		}
 
 		return res;
-#if defined(HAVE_POLARSSL)	/* TODO add other defined SSL libraries */
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	}
 	else	/* TLS connection */
 	{
+#if defined(HAVE_POLARSSL)
 		int	res;
 
 		do
@@ -587,6 +588,26 @@ static ssize_t	zbx_tls_write(zbx_sock_t *s, const char *buf, size_t len)
 		}
 		else
 			return (ssize_t)res;
+#elif defined(HAVE_GNUTLS)
+		ssize_t	res;
+
+		do
+		{
+			res = gnutls_record_send(s->tls_ctx, buf, len);
+		}
+		while (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res);
+
+		if (0 > res)
+		{
+			zbx_set_tcp_strerror("gnutls_record_send() failed: %zd %s", res, gnutls_strerror(res));
+
+			/* TODO propagate 'close notify' to caller ? Close socket ? */
+
+			return ZBX_TCP_ERROR;
+		}
+		else
+			return (ssize_t)res;
+#endif
 	}
 #endif
 }
@@ -1314,7 +1335,7 @@ out:
 
 static ssize_t	zbx_tls_read(zbx_sock_t *s, char *buf, size_t len)
 {
-#if defined(HAVE_POLARSSL)	/* TODO add other defined SSL libraries */
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (NULL == s->tls_ctx)		/* unencrypted connection */
 	{
 #endif
@@ -1328,10 +1349,11 @@ static ssize_t	zbx_tls_read(zbx_sock_t *s, char *buf, size_t len)
 
 		return res;
 
-#if defined(HAVE_POLARSSL)	/* TODO add other defined SSL libraries */
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	}
 	else	/* TLS connection */
 	{
+#if defined(HAVE_POLARSSL)
 		int	res;
 
 		do
@@ -1354,6 +1376,26 @@ static ssize_t	zbx_tls_read(zbx_sock_t *s, char *buf, size_t len)
 		}
 		else
 			return (ssize_t)res;
+#elif defined(HAVE_GNUTLS)
+		ssize_t	res;
+
+		do
+		{
+			res = gnutls_record_recv(s->tls_ctx, buf, len);
+		}
+		while (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res);	/* TODO maybe GNUTLS_E_REHANDSHAKE */
+
+		if (0 > res)
+		{
+			zbx_set_tcp_strerror("gnutls_record_recv() failed: %zd %s", res, gnutls_strerror(res));
+
+			/* TODO propagate 'close notify' to caller ? Close socket ? */
+
+			return ZBX_TCP_ERROR;
+		}
+		else
+			return (ssize_t)res;
+#endif
 	}
 #endif
 }
