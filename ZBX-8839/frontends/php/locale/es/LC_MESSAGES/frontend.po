@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-02 03:54+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2014-09-13 22:34+0300\n"
 "Last-Translator: lucho <luislopez72@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1209,7 +1209,7 @@ msgstr "No es posible añadir la expresión regular"
 msgid "Cannot add scenario"
 msgstr "No es posible añadir el escenario"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "No es posible añadir la pantalla"
 
@@ -1320,7 +1320,7 @@ msgstr "No se pudo crear la regla de descubrimiento"
 msgid "Cannot create group without name."
 msgstr "No se puede crear un grupo sin nombre."
 
-#: api/classes/CHost.php:1775
+#: api/classes/CHost.php:1773
 msgid "Cannot create host group."
 msgstr "No se puede crear un grupo de equipos"
 
@@ -1400,7 +1400,7 @@ msgstr "No es posible eliminar el grupo"
 msgid "Cannot delete host"
 msgstr "No es posible eliminar el equipo"
 
-#: api/classes/CHost.php:1786
+#: api/classes/CHost.php:1784
 msgid "Cannot delete host group."
 msgstr "No es posible eliminar el grupo de equipos"
 
@@ -1412,7 +1412,7 @@ msgstr "No es posible eliminar el mapa de iconos"
 msgid "Cannot delete image"
 msgstr "No es posible eliminar la imágen"
 
-#: api/classes/CHost.php:1879
+#: api/classes/CHost.php:1877
 msgid "Cannot delete inventory."
 msgstr "No es posible eliminar el inventario"
 
@@ -1458,7 +1458,7 @@ msgstr[1] "No es posible eliminar las expresiones regulares"
 msgid "Cannot delete scenario"
 msgstr "No es posible eliminar el escenario"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "No es posible eliminar la pantalla"
 
@@ -1701,7 +1701,7 @@ msgstr "No se pudo incluir el fichero de vistas \"%s\"."
 msgid "Cannot insert user media."
 msgstr "No se pudo insertar el medio del usuario."
 
-#: api/classes/CHost.php:1858
+#: api/classes/CHost.php:1856
 msgid "Cannot link template"
 msgstr "No se puede linkar plantilla"
 
@@ -1714,7 +1714,7 @@ msgstr "No se pudo iniciar sesión"
 msgid "Cannot logout."
 msgstr "Imposible cerrar sesión"
 
-#: api/classes/CHost.php:1682
+#: api/classes/CHost.php:1680
 msgid "Cannot mass update host name."
 msgstr "No se pudo realizar la actualización masiva de los nombres de servidores."
 
@@ -1722,7 +1722,7 @@ msgstr "No se pudo realizar la actualización masiva de los nombres de servidore
 msgid "Cannot mass update template name"
 msgstr "No se pudo realizar la actualización masiva de los nombres de las plantillas."
 
-#: api/classes/CHost.php:1672
+#: api/classes/CHost.php:1670
 msgid "Cannot mass update visible host name."
 msgstr "No se pudo realizar la actualización masiva de los servidores visibles."
 
@@ -1828,7 +1828,7 @@ msgstr "No se pudieron desenlazar y limpiar los ítems."
 msgid "Cannot unlink and clear triggers"
 msgstr "No se pudo desenlazar y limpiar los disparadores."
 
-#: api/classes/CHost.php:1849
+#: api/classes/CHost.php:1847
 msgid "Cannot unlink template"
 msgstr "No se pudo desenlazar la plantilla."
 
@@ -1982,7 +1982,7 @@ msgstr "No se pudo actualizar la expresión regular"
 msgid "Cannot update scenario"
 msgstr "No se pudo actualizar el escenario"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "No se pudo actualizar la pantalla"
 
@@ -3443,7 +3443,7 @@ msgstr "Eliminada: Regla de descubrimiento \"%1$s\" en \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "Eliminado: Gráfico \"%1$s\" en \"%2$s\"."
 
-#: api/classes/CHost.php:2145
+#: api/classes/CHost.php:2143
 #, php-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Eliminado: Servidor \"%1$s\"."
@@ -4064,7 +4064,7 @@ msgstr "Condición de acción vacía."
 #: api/classes/CDiscoveryRule.php:567 api/classes/CGraph.php:693
 #: api/classes/CGraphPrototype.php:743 api/classes/CHostGroup.php:672
 #: api/classes/CHostGroup.php:729 api/classes/CHostInterface.php:642
-#: api/classes/CHost.php:2005 api/classes/CIconMap.php:409
+#: api/classes/CHost.php:2003 api/classes/CIconMap.php:409
 #: api/classes/CItem.php:930 api/classes/CItemPrototype.php:708
 #: api/classes/CProxy.php:547 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
@@ -5192,7 +5192,7 @@ msgstr "Alineación horizontal"
 msgid "Host"
 msgstr "Servidor"
 
-#: api/classes/CHost.php:1695
+#: api/classes/CHost.php:1693
 #, php-format
 msgid "Host \"%1$s\" already exists."
 msgstr "El servidor \"%1$s\" ya existe."
@@ -5350,7 +5350,7 @@ msgstr "Plantilla del equipo"
 msgid "Host time"
 msgstr "Hora del equipo"
 
-#: api/classes/CHost.php:1573
+#: api/classes/CHost.php:1571
 msgid "Host update failed."
 msgstr "Error en actualización del equipo."
 
@@ -5977,7 +5977,7 @@ msgstr "Ha usado caracteres inválidos para el nombre del proxy \"%s\"."
 msgid "Incorrect characters used for Template name [ %1$s ]"
 msgstr "Ha usado caracteres inválidos para el nombre de plantilla [ %1$s ]"
 
-#: api/classes/CHost.php:1357 api/classes/CHost.php:1678
+#: api/classes/CHost.php:1357 api/classes/CHost.php:1676
 #, php-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Ha usado caracteres inválidos para el nombre de equipo \"%s\"."
@@ -8233,7 +8233,7 @@ msgstr ""
 msgid "No groups for host \"%s\"."
 msgstr ""
 
-#: api/classes/CHost.php:1664
+#: api/classes/CHost.php:1662
 msgid "No groups for hosts."
 msgstr "Sin grupos para equipos."
 
@@ -10575,7 +10575,7 @@ msgstr ""
 msgid "Screen \"%1$s\" updated."
 msgstr ""
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "Pantalla añadida"
 
@@ -10583,7 +10583,7 @@ msgstr "Pantalla añadida"
 msgid "Screen cell configuration"
 msgstr "Configuración de la celda de la pantalla"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "Pantalla eliminada"
 
@@ -10595,7 +10595,7 @@ msgstr ""
 msgid "Screen should contain at least one row and column."
 msgstr ""
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "Pantalla actualizada"
 
@@ -11562,7 +11562,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Plantilla"
 
-#: api/classes/CHost.php:1700
+#: api/classes/CHost.php:1698
 #, php-format
 msgid "Template \"%1$s\" already exists."
 msgstr ""
@@ -13280,8 +13280,8 @@ msgstr ""
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
 #: api/classes/CHostGroup.php:895 api/classes/CHostGroup.php:950
 #: api/classes/CHostGroup.php:995 api/classes/CHostGroup.php:1008
-#: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1604
-#: api/classes/CHost.php:1658 api/classes/CHost.php:1972
+#: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1602
+#: api/classes/CHost.php:1656 api/classes/CHost.php:1970
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
 #: api/classes/CMaintenance.php:727 api/classes/CScript.php:258
 #: api/classes/CScript.php:305 api/classes/CScript.php:367

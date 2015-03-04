@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-02 03:54+0200\n"
+"POT-Creation-Date: 2015-02-11 23:02+0200\n"
 "PO-Revision-Date: 2013-08-16 03:47+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1205,7 +1205,7 @@ msgstr "无法添加正则表达式"
 msgid "Cannot add scenario"
 msgstr "无法添加方案"
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Cannot add screen"
 msgstr "无法添加筛选"
 
@@ -1315,7 +1315,7 @@ msgstr "无法创建发现规则"
 msgid "Cannot create group without name."
 msgstr "无法创建无名称组"
 
-#: api/classes/CHost.php:1775
+#: api/classes/CHost.php:1773
 msgid "Cannot create host group."
 msgstr "无法创建主机组."
 
@@ -1395,7 +1395,7 @@ msgstr "无法删除组"
 msgid "Cannot delete host"
 msgstr "无法删除主机"
 
-#: api/classes/CHost.php:1786
+#: api/classes/CHost.php:1784
 msgid "Cannot delete host group."
 msgstr "无法删除主机组."
 
@@ -1407,7 +1407,7 @@ msgstr "无法删除图示对应"
 msgid "Cannot delete image"
 msgstr "无法删除图片"
 
-#: api/classes/CHost.php:1879
+#: api/classes/CHost.php:1877
 msgid "Cannot delete inventory."
 msgstr "无法删除资产纪录."
 
@@ -1452,7 +1452,7 @@ msgstr[0] "无法删除正则表达式 "
 msgid "Cannot delete scenario"
 msgstr "无法删除方案"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Cannot delete screen"
 msgstr "无法删除筛选"
 
@@ -1693,7 +1693,7 @@ msgstr "不能包含视图文件\"%s\"."
 msgid "Cannot insert user media."
 msgstr "不能插入用户示警媒体"
 
-#: api/classes/CHost.php:1858
+#: api/classes/CHost.php:1856
 msgid "Cannot link template"
 msgstr "无法连结模板"
 
@@ -1705,7 +1705,7 @@ msgstr ""
 msgid "Cannot logout."
 msgstr "不能登出"
 
-#: api/classes/CHost.php:1682
+#: api/classes/CHost.php:1680
 msgid "Cannot mass update host name."
 msgstr "不能大量更新主机名称."
 
@@ -1713,7 +1713,7 @@ msgstr "不能大量更新主机名称."
 msgid "Cannot mass update template name"
 msgstr "不能大量更新模板名称"
 
-#: api/classes/CHost.php:1672
+#: api/classes/CHost.php:1670
 msgid "Cannot mass update visible host name."
 msgstr "不能大量更新可见主机名称"
 
@@ -1819,7 +1819,7 @@ msgstr "无法取消关联并清除项目"
 msgid "Cannot unlink and clear triggers"
 msgstr "无法取消关联并清除触发器"
 
-#: api/classes/CHost.php:1849
+#: api/classes/CHost.php:1847
 msgid "Cannot unlink template"
 msgstr "无法取消关联模板"
 
@@ -1973,7 +1973,7 @@ msgstr "无法更新正则表达式"
 msgid "Cannot update scenario"
 msgstr "无法更新方案"
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Cannot update screen"
 msgstr "无法更新筛选"
 
@@ -3427,7 +3427,7 @@ msgstr "已删除: 发现发现 \"%1$s\" 于 \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "已删除: 图形 \"%1$s\" 于 \"%2$s\"."
 
-#: api/classes/CHost.php:2145
+#: api/classes/CHost.php:2143
 #, php-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "已删除: 主机 \"%1$s\"."
@@ -4043,7 +4043,7 @@ msgstr "空的动作条件."
 #: api/classes/CDiscoveryRule.php:567 api/classes/CGraph.php:693
 #: api/classes/CGraphPrototype.php:743 api/classes/CHostGroup.php:672
 #: api/classes/CHostGroup.php:729 api/classes/CHostInterface.php:642
-#: api/classes/CHost.php:2005 api/classes/CIconMap.php:409
+#: api/classes/CHost.php:2003 api/classes/CIconMap.php:409
 #: api/classes/CItem.php:930 api/classes/CItemPrototype.php:708
 #: api/classes/CProxy.php:547 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
@@ -5170,7 +5170,7 @@ msgstr "横向对齐"
 msgid "Host"
 msgstr "主机"
 
-#: api/classes/CHost.php:1695
+#: api/classes/CHost.php:1693
 #, php-format
 msgid "Host \"%1$s\" already exists."
 msgstr "主机 \"%1$s\" 已存在."
@@ -5328,7 +5328,7 @@ msgstr "主机模板"
 msgid "Host time"
 msgstr "主机时间"
 
-#: api/classes/CHost.php:1573
+#: api/classes/CHost.php:1571
 msgid "Host update failed."
 msgstr "主机更新失败."
 
@@ -5954,7 +5954,7 @@ msgstr "不正确的字符用于代理节点\"%s\"."
 msgid "Incorrect characters used for Template name [ %1$s ]"
 msgstr "不正确的字符用于模板名称[ %1$s ]"
 
-#: api/classes/CHost.php:1357 api/classes/CHost.php:1678
+#: api/classes/CHost.php:1357 api/classes/CHost.php:1676
 #, php-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "不正确的字符用于主机名称\"%s\"."
@@ -8205,7 +8205,7 @@ msgstr "没有已定义的图形."
 msgid "No groups for host \"%s\"."
 msgstr "没有主机[%s]的组"
 
-#: api/classes/CHost.php:1664
+#: api/classes/CHost.php:1662
 msgid "No groups for hosts."
 msgstr "没有主机组"
 
@@ -10546,7 +10546,7 @@ msgstr "略过筛选\"%1$s\"-用户规则."
 msgid "Screen \"%1$s\" updated."
 msgstr "筛选\"%1$s\"已更新."
 
-#: screenconf.php:178
+#: screenconf.php:175
 msgid "Screen added"
 msgstr "筛选已添加"
 
@@ -10554,7 +10554,7 @@ msgstr "筛选已添加"
 msgid "Screen cell configuration"
 msgstr "筛选格位配置"
 
-#: screenconf.php:226
+#: screenconf.php:223
 msgid "Screen deleted"
 msgstr "筛选已删除"
 
@@ -10566,7 +10566,7 @@ msgstr "筛选项目于相同格位中已存在."
 msgid "Screen should contain at least one row and column."
 msgstr "筛选应包含至少一个行和列."
 
-#: screenconf.php:153
+#: screenconf.php:150
 msgid "Screen updated"
 msgstr "筛选已更新"
 
@@ -11533,7 +11533,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "模板"
 
-#: api/classes/CHost.php:1700
+#: api/classes/CHost.php:1698
 #, php-format
 msgid "Template \"%1$s\" already exists."
 msgstr "模板 \"%1$s\" 已存在."
@@ -13246,8 +13246,8 @@ msgstr "您没有指定目标为动作操作的全局脚本\"%s\"."
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
 #: api/classes/CHostGroup.php:895 api/classes/CHostGroup.php:950
 #: api/classes/CHostGroup.php:995 api/classes/CHostGroup.php:1008
-#: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1604
-#: api/classes/CHost.php:1658 api/classes/CHost.php:1972
+#: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1602
+#: api/classes/CHost.php:1656 api/classes/CHost.php:1970
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
 #: api/classes/CMaintenance.php:727 api/classes/CScript.php:258
 #: api/classes/CScript.php:305 api/classes/CScript.php:367

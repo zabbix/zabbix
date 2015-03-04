@@ -879,7 +879,7 @@ define('ZBX_TEXTAREA_BIG_WIDTH',		524);
 define('ZBX_TEXTAREA_STANDARD_ROWS',	7);
 
 // validation
-define('DB_ID',		"({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
+define('DB_ID',		"({}>=0&&bccomp({},\"100000000000000000\")<0)&&");
 define('NOT_EMPTY',	"({}!='')&&");
 define('NOT_ZERO',	"({}!=0)&&");
 define('NO_TRIM',	'NO_TRIM');
