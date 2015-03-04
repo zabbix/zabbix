@@ -5847,30 +5847,18 @@ return array(
 				'ref_table' => 'items',
 				'ref_field' => 'itemid',
 			),
-			'name' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-		),
-	),
-	'application_prototype_template' => array(
-		'key' => 'application_prototypeid,templateid',
-		'fields' => array(
-			'application_prototypeid' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'application_prototype',
-				'ref_field' => 'application_prototypeid',
-			),
 			'templateid' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'application_prototype',
 				'ref_field' => 'application_prototypeid',
+			),
+			'name' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
 			),
 		),
 	),
@@ -5894,7 +5882,7 @@ return array(
 		),
 	),
 	'application_discovery' => array(
-		'key' => 'applicationid',
+		'key' => 'applicationid,application_prototypeid',
 		'fields' => array(
 			'applicationid' => array(
 				'null' => false,

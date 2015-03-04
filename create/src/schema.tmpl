@@ -1283,13 +1283,10 @@ INDEX		|1		|itemid
 TABLE|application_prototype|application_prototypeid|ZBX_DATA
 FIELD		|application_prototypeid	|t_id		|	|NOT NULL	|0
 FIELD		|itemid				|t_id		|	|NOT NULL	|0	|1|items
-FIELD		|name				|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|templateid			|t_id		|	|NOT NULL	|0	|2|application_prototype|application_prototypeid
+FIELD		|name				|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1				|itemid
-
-TABLE|application_prototype_template|application_prototypeid,templateid|ZBX_DATA
-FIELD		|application_prototypeid	|t_id	|	|NOT NULL	|0	|1|application_prototype
-FIELD		|templateid			|t_id	|	|NOT NULL	|0	|2|application_prototype|application_prototypeid
-INDEX		|1				|templateid
+INDEX		|2				|templateid
 
 TABLE|item_application_prototype|application_prototypeid,itemid|ZBX_DATA
 FIELD		|application_prototypeid	|t_id	|	|NOT NULL	|0	|1|application_prototype
@@ -1304,5 +1301,5 @@ INDEX		|1				|application_prototypeid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2050020	|2050020
+ROW		|2050018	|2050018
 
