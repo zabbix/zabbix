@@ -386,28 +386,6 @@ class CTemplateScreen extends CScreen {
 		return $result;
 	}
 
-	/**
-	 * Check if template screen exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('templatescreen.exists method is deprecated.');
-
-		$templateScreen = $this->get(array(
-			'output' => array('screenid'),
-			'filter' => zbx_array_mintersect(array(array('screenid', 'name'), 'templateid'), $object),
-			'preservekeys' => true,
-			'limit' => 1
-		));
-
-		return (bool) $templateScreen;
-	}
-
 	public function copy(array $data) {
 		$screenIds = $data['screenIds'] = zbx_toArray($data['screenIds']);
 		$templateIds = $data['templateIds'] = zbx_toArray($data['templateIds']);

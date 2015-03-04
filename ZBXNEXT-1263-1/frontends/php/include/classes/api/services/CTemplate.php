@@ -292,47 +292,6 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Get template by template name and ID.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array  $templateData
-	 * @param string $templateData['host']
-	 * @param string $templateData['templateid']
-	 *
-	 * @return array
-	 */
-	public function getObjects(array $templateData) {
-		$this->deprecated('template.getobjects method is deprecated.');
-
-		return $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'filter' => $templateData
-		));
-	}
-
-	/**
-	 * Check if template exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('template.exists method is deprecated.');
-
-		$template = $this->get(array(
-			'output' => array('templateid'),
-			'filter' => zbx_array_mintersect(array(array('templateid', 'host', 'name')), $object),
-			'limit' => 1
-		));
-
-		return (bool) $template;
-	}
-
-	/**
 	 * Add template.
 	 *
 	 * @param array $templates

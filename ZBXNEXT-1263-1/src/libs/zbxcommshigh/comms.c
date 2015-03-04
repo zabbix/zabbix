@@ -82,55 +82,42 @@ int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int pr
  * Purpose: read a response message (in JSON format) from socket, optionally  *
  *          extract "info" value.                                             *
  *                                                                            *
- * Parameters: sock       - [IN] socket descriptor                            *
- *             info       - [IN/OUT] pointer to "info" value location or NULL *
- *             timeout    - [IN] timeout for this operation                   *
- *             error      - [IN/OUT] pointer to error message                 *
+ * Parameters: sock    - [IN] socket descriptor                               *
+ *             timeout - [IN] timeout for this operation                      *
+ *             error   - [OUT] pointer to error message                       *
  *                                                                            *
- * Return value: SUCCEED - "response":"success" response successfully         *
- *                         retrieved                                          *
- *               NETWORK_ERROR - network related error occurred               *
- *               FAIL - otherwise                                             *
+ * Return value: SUCCEED - "response":"success" successfully retrieved        *
+ *               FAIL    - otherwise                                          *
  * Comments:                                                                  *
  *     Allocates memory.                                                      *
- *                                                                            *
- *     If 'info' parameter is NULL pointer then this function does not        *
- *     examine the response message for "info".                               *
- *                                                                            *
- *     If 'info' parameter is not a NULL pointer and:                         *
- *        - the "info" value is present in the response message then this     *
- *          function allocates a dynamic memory buffer, copies the "info"     *
- *          value into the buffer and writes the buffer address into location *
- *          pointed to by "info" parameter.                                   *
- *        - the "info" value is not present in the response message then this *
- *          function writes NULL into location pointed to by "info" parameter.*
  *                                                                            *
  *     If an error occurs, the function allocates dynamic memory for an error *
  *     message and writes its address into location pointed to by "error"     *
  *     parameter.                                                             *
  *                                                                            *
- *     IMPORTANT: it is a responsibility of the caller to release the "info"  *
- *                and "error" memory !                                        *
+ *     When the "info" value is present in the response message then function *
+ *     copies the "info" value into the "error" buffer as additional          *
+ *     information                                                            *
+ *                                                                            *
+ *     IMPORTANT: it is a responsibility of the caller to release the         *
+ *                "error" memory !                                            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_recv_response(zbx_sock_t *sock, char **info, int timeout, char **error)
+int	zbx_recv_response(zbx_sock_t *sock, int timeout, char **error)
 {
 	const char		*__function_name = "zbx_recv_response";
 
 	struct zbx_json_parse	jp;
-	char			value[16], *info_buf = NULL;
-	size_t			info_buf_alloc = 0;
-	int			ret = SUCCEED, invalid_format = 0;
+	char			value[16];
+	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != (ret = zbx_tcp_recv_to(sock, timeout)))
+	if (SUCCEED != zbx_tcp_recv_to(sock, timeout))
 	{
 		/* since we have successfully sent data earlier, we assume the other */
 		/* side is just too busy processing our data if there is no response */
-		*error = zbx_dsprintf(*error, "no response: network error");
-		zabbix_log(LOG_LEVEL_DEBUG, "did not receive response from host");
-		ret = NETWORK_ERROR;
+		*error = zbx_strdup(*error, zbx_tcp_strerror());
 		goto out;
 	}
 
@@ -139,49 +126,37 @@ int	zbx_recv_response(zbx_sock_t *sock, char **info, int timeout, char **error)
 	/* deal with empty string here because zbx_json_open() does not produce an error message in this case */
 	if ('\0' == *sock->buffer)
 	{
-		*error = zbx_dsprintf(*error, "invalid response format: empty string received");
-		invalid_format = 1;
+		*error = zbx_strdup(*error, "empty string received");
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_json_open(sock->buffer, &jp)))
+	if (SUCCEED != zbx_json_open(sock->buffer, &jp))
 	{
-		*error = zbx_dsprintf(*error, "invalid response format: not a valid JSON: %s", zbx_json_strerror());
-		invalid_format = 1;
+		*error = zbx_strdup(*error, zbx_json_strerror());
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value))))
+	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)))
 	{
-		*error = zbx_dsprintf(*error, "invalid response format: no \"" ZBX_PROTO_TAG_RESPONSE "\" tag");
-		invalid_format = 1;
+		*error = zbx_strdup(*error, "no \"" ZBX_PROTO_TAG_RESPONSE "\" tag");
 		goto out;
 	}
 
 	if (0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
 	{
-		*error = zbx_dsprintf(*error, "negative response: \"%s\"", value);
-		ret = FAIL;
-	}
+		char	*info = NULL;
+		size_t	info_alloc = 0;
 
-	if (NULL != info)
-	{
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info_buf, &info_buf_alloc))
-		{
-			*info = NULL;
-			zbx_free(info_buf);
-		}
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc))
+			*error = zbx_strdup(*error, info);
 		else
-			*info = info_buf;
+			*error = zbx_dsprintf(*error, "negative response \"%s\"", value);
+		zbx_free(info);
+		goto out;
 	}
-out:
-	if (0 != invalid_format)
-	{
-		if (NULL != info)
-			*info = NULL;
 
-		ret = FAIL;
-	}
+	ret = SUCCEED;
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
