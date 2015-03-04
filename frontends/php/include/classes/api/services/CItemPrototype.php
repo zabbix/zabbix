@@ -265,37 +265,6 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
-	 * Check if item prototype exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array $object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('itemprototype.exists method is deprecated.');
-
-		$options = array(
-			'output' => array('itemid'),
-			'filter' => array('key_' => $object['key_']),
-			'limit' => 1
-		);
-
-		if (isset($object['hostid'])) {
-			$options['hostids'] = $object['hostid'];
-		}
-
-		if (isset($object['host'])) {
-			$options['filter']['host'] = $object['host'];
-		}
-
-		$itemPrototype = $this->get($options);
-
-		return (bool) $itemPrototype;
-	}
-
-	/**
 	 * Check item prototype data and set flags field.
 	 *
 	 * @param array $items passed by reference

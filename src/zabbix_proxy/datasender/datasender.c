@@ -37,16 +37,6 @@ extern int		server_num, process_num;
  *                                                                            *
  * Function: host_availability_sender                                         *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	host_availability_sender(struct zbx_json *j)
 {
@@ -66,7 +56,10 @@ static void	host_availability_sender(struct zbx_json *j)
 		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
 
 		if (SUCCEED != put_data_to_server(&sock, j, &error))
-			zabbix_log(LOG_LEVEL_WARNING, "sending host availability data to server failed: %s", error);
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot send host availability data to server at \"%s\": %s",
+					get_ip_by_socket(&sock), error);
+		}
 
 		zbx_free(error);
 		disconnect_server(&sock);
@@ -78,16 +71,6 @@ static void	host_availability_sender(struct zbx_json *j)
 /******************************************************************************
  *                                                                            *
  * Function: history_sender                                                   *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	history_sender(struct zbx_json *j, int *records, const char *tag,
@@ -125,7 +108,8 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
 		if (SUCCEED != (ret = put_data_to_server(&sock, j, &error)))
 		{
 			*records = 0;
-			zabbix_log(LOG_LEVEL_WARNING, "sending data to server failed: %s", error);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot send history data to server at \"%s\": %s",
+					get_ip_by_socket(&sock), error);
 		}
 
 		zbx_free(error);
@@ -147,14 +131,6 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
  * Function: main_datasender_loop                                             *
  *                                                                            *
  * Purpose: periodically sends history and events to the server               *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(datasender_thread, args)
