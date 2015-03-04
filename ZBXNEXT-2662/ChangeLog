@@ -92,7 +92,7 @@ A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discov
 
 Bug fixes:
 ...G...PS. [ZBX-9284] added zabbix log file locking to avoid incomplete logging on log file rotation (igors)
-.......PS. [ZBX-591] added interface (SourceIP) for outgoing connection in web monitoring, alerts(Ez Texting), vmware monitoring and simple checks(https services) (igors)
+.......PS. [ZBX-591] added interface (SourceIP) for outgoing connection in web monitoring, alerts (Ez Texting), VMware monitoring and simple checks (HTTPS services) (igors)
 ...G...... [ZBX-9143] improved proc.num under Windows to handle more processes (dimir)
 ...G...... [ZBX-9232] fixed incomplete eventlog messages (igors)
 ..F....... [ZBX-9257] fixed displaying missing history links in trigger context menu (Ivo)
