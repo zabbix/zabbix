@@ -5848,7 +5848,7 @@ return array(
 				'ref_field' => 'itemid',
 			),
 			'templateid' => array(
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'application_prototype',
