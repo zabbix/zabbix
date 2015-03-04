@@ -24,16 +24,20 @@ $overview = $this->data['overview'];
 $filter = $this->data['filter'];
 $config = $this->data['config'];
 
-$filterForm = new CFormTable(null, null, 'get');
-$filterForm->setTableClass('formtable old-filter');
-$filterForm->setAttribute('name', 'zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
+$filterForm = new CFilter('web.tr_status.filter.state');
+
+//$filterForm = new CFormTable(null, null, 'get');
+//$filterForm->setTableClass('formtable old-filter');
+//$filterForm->setAttribute('name', 'zbx_filter');
+//$filterForm->setAttribute('id', 'zbx_filter');
 $filterForm->addVar('fullscreen', $filter['fullScreen']);
 $filterForm->addVar('groupid', $filter['groupId']);
 $filterForm->addVar('hostid', $filter['hostId']);
 
+$column = new CFormList();
+
 // trigger status
-$filterForm->addRow(_('Triggers status'), new CComboBox('show_triggers', $filter['showTriggers'], null, array(
+$column->addRow(_('Triggers status'), new CComboBox('show_triggers', $filter['showTriggers'], null, array(
 	TRIGGERS_OPTION_ALL => _('Any'),
 	TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problem'),
 	TRIGGERS_OPTION_IN_PROBLEM => _('Problem')
@@ -41,7 +45,7 @@ $filterForm->addRow(_('Triggers status'), new CComboBox('show_triggers', $filter
 
 // ack status
 if ($config['event_ack_enable']) {
-	$filterForm->addRow(_('Acknowledge status'), new CComboBox('ack_status', $filter['ackStatus'], null, array(
+	$column->addRow(_('Acknowledge status'), new CComboBox('ack_status', $filter['ackStatus'], null, array(
 		ZBX_ACK_STS_ANY => _('Any'),
 		ZBX_ACK_STS_WITH_UNACK => _('With unacknowledged events'),
 		ZBX_ACK_STS_WITH_LAST_UNACK => _('With last event unacknowledged')
@@ -59,7 +63,7 @@ if (!$overview) {
 			_n('Show unacknowledged (%1$s day)', 'Show unacknowledged (%1$s days)', $config['event_expire'])
 		);
 	}
-	$filterForm->addRow(_('Events'), $eventsComboBox);
+	$column->addRow(_('Events'), $eventsComboBox);
 }
 
 // min severity
@@ -67,7 +71,7 @@ $severityNames = array();
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$severityNames[] = getSeverityName($severity, $config);
 }
-$filterForm->addRow(_('Minimum trigger severity'),
+$column->addRow(_('Minimum trigger severity'),
 	new CComboBox('show_severity', $filter['showSeverity'], null, $severityNames)
 );
 
@@ -85,17 +89,17 @@ $statusChangeCheckBox->addStyle('vertical-align: middle;');
 
 $daysSpan = new CSpan(_('days'));
 $daysSpan->addStyle('vertical-align: middle;');
-$filterForm->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan));
+$column->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan));
 
 // name
-$filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $filter['txtSelect'], 40));
+$column->addRow(_('Filter by name'), new CTextBox('txt_select', $filter['txtSelect'], 40));
 
 // application
-$filterForm->addRow(_('Filter by application'), array(
+$column->addRow(_('Filter by application'), array(
 	new CTextBox('application', $filter['application'], 40),
 	new CButton('application_name', _('Select'),
 		'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1'.
-		'&dstfrm='.$filterForm->getName().'");',
+		'&dstfrm=zbx_filter");',
 		'button-form'
 	)
 ));
@@ -127,20 +131,18 @@ foreach ($inventoryFilters as $field) {
 $inventoryFilterTable->addRow(
 	new CCol(new CButton('inventory_add', _('Add'), null, 'link_menu element-table-add'), null, 3)
 );
-$filterForm->addRow(_('Filter by host inventory'), $inventoryFilterTable);
+$column->addRow(_('Filter by host inventory'), $inventoryFilterTable);
 
 // maintenance filter
-$filterForm->addRow(_('Show hosts in maintenance'),
+$column->addRow(_('Show hosts in maintenance'),
 	new CCheckBox('show_maintenance', $filter['showMaintenance'], null, 1)
 );
 
 // show details
 if (!$overview) {
-	$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filter['showDetails'], null, 1));
+	$column->addRow(_('Show details'), new CCheckBox('show_details', $filter['showDetails'], null, 1));
 }
 
-// buttons
-$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
-$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();'));
+$filterForm->addColumn($column);
 
 return $filterForm;
