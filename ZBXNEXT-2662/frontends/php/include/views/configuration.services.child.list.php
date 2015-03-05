@@ -32,7 +32,7 @@ if (!empty($this->data['service'])) {
 }
 
 // create table
-$servicesChildTable = new CTableInfo(_('No IT services found.'));
+$servicesChildTable = new CTableInfo();
 $servicesChildTable->setHeader(array(
 	new CCheckBox('all_services', null, "javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');"),
 	_('Service'),

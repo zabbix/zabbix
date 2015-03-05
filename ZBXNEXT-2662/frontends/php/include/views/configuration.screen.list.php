@@ -43,7 +43,7 @@ $screenForm->setName('screenForm');
 $screenForm->addVar('templateid', $this->data['templateid']);
 
 // create table
-$screenTable = new CTableInfo(_('No screens found.'));
+$screenTable = new CTableInfo();
 $screenTable->setHeader(array(
 	new CCheckBox('all_screens', null, "checkAll('".$screenForm->getName()."', 'all_screens', 'screens');"),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),

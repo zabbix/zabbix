@@ -39,7 +39,7 @@ $proxyForm = new CForm('get');
 $proxyForm->setName('proxyForm');
 
 // create table
-$proxyTable = new CTableInfo(_('No proxies found.'));
+$proxyTable = new CTableInfo();
 $proxyTable->setHeader(array(
 	new CCheckBox('all_hosts', null, "checkAll('".$proxyForm->getName()."', 'all_hosts', 'proxyids');"),
 	make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder']),

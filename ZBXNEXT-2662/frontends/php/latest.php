@@ -418,7 +418,7 @@ $form->setName('items');
 $form->addItem(new CVar('action', HISTORY_BATCH_GRAPH, 'action-hidden'));
 
 // table
-$table = new CTableInfo(($filterSet) ? _('No values found.') : _('Specify some filter condition to see the values.'));
+$table = new CTableInfo(($filterSet) ? null : _('Specify some filter condition to see the values.'));
 
 if ($singleHostSelected) {
 	$hostHeader = null;

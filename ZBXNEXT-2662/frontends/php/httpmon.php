@@ -86,7 +86,7 @@ $httpmon_wdgt->setTitle(_('WEB monitoring'));
 $httpmon_wdgt->setControls($r_form);
 
 // TABLE
-$table = new CTableInfo(_('No web scenarios found.'));
+$table = new CTableInfo();
 $table->SetHeader(array(
 	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname', $sortField, $sortOrder) : null,
 	make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),

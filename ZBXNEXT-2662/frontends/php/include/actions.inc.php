@@ -1117,7 +1117,7 @@ function getActionMessages(array $alerts) {
 		'preservekeys' => true
 	));
 
-	$table = new CTableInfo(_('No actions found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(
 		_('Time'),
 		_('Type'),
@@ -1213,7 +1213,7 @@ function getActionMessages(array $alerts) {
  * @return CTableInfo
  */
 function getActionCommands(array $alerts) {
-	$table = new CTableInfo(_('No actions found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(
 		_('Time'),
 		_('Status'),
@@ -1267,7 +1267,7 @@ function getActionCommands(array $alerts) {
 }
 
 function get_actions_hint_by_eventid($eventid, $status = null) {
-	$tab_hint = new CTableInfo(_('No actions found.'));
+	$tab_hint = new CTableInfo();
 	$tab_hint->setHeader(array(
 		_('User'),
 		_('Details'),

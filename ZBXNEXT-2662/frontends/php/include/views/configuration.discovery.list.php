@@ -34,7 +34,7 @@ $discoveryForm = new CForm();
 $discoveryForm->setName('druleForm');
 
 // create table
-$discoveryTable = new CTableInfo(_('No discovery rules found.'));
+$discoveryTable = new CTableInfo();
 $discoveryTable->setHeader(array(
 	new CCheckBox('all_drules', null, "checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');"),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),

@@ -92,7 +92,7 @@ $controls->addItem(array(_('Grouping by').SPACE, $inventoryFieldsComboBox));
 $r_form->addItem($controls);
 $hostinvent_wdgt->setControls($r_form);
 
-$table = new CTableInfo(_('No hosts found.'));
+$table = new CTableInfo();
 $table->setHeader(
 	array(
 		make_sorting_header($groupFieldTitle === '' ? _('Field') : $groupFieldTitle, 'inventory_field',

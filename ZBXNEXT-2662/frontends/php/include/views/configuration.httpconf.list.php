@@ -47,7 +47,7 @@ $httpForm = new CForm();
 $httpForm->setName('scenarios');
 $httpForm->addVar('hostid', $this->data['hostid']);
 
-$httpTable = new CTableInfo(_('No web scenarios found.'));
+$httpTable = new CTableInfo();
 $httpTable->setHeader(array(
 	new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
 	($this->data['hostid'] == 0)

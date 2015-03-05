@@ -39,7 +39,7 @@ $discoveryForm->setName('discovery');
 $discoveryForm->addVar('hostid', $this->data['hostid']);
 
 // create table
-$discoveryTable = new CTableInfo(_('No discovery rules found.'));
+$discoveryTable = new CTableInfo();
 
 $discoveryTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');"),

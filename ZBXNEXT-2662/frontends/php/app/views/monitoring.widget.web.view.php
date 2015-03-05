@@ -41,7 +41,7 @@ $availableHosts = API::Host()->get(array(
 ));
 $availableHostIds = array_keys($availableHosts);
 
-$table = new CTableInfo(_('No web scenarios found.'));
+$table = new CTableInfo();
 $table->setHeader(array(
 	_('Host group'),
 	_('Ok'),

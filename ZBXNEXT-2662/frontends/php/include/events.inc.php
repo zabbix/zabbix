@@ -188,7 +188,7 @@ function make_event_details($event, $trigger) {
 function make_small_eventlist($startEvent) {
 	$config = select_config();
 
-	$table = new CTableInfo(_('No events found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(
 		_('Time'),
 		_('Status'),

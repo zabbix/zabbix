@@ -122,7 +122,7 @@ $params = array(
 $overalCount = API::Host()->get($params);
 $viewCount = count($hosts);
 
-$table = new CTableInfo(_('No hosts found.'));
+$table = new CTableInfo();
 $table->setHeader(array(
 	new CColHeader(_('Host')),
 	new CColHeader(_('IP')),
@@ -276,7 +276,7 @@ $header = array(
 	$admin ? new CColHeader(_('Templates')) : null,
 );
 
-$table = new CTableInfo(_('No host groups found.'));
+$table = new CTableInfo();
 $table->setHeader($header);
 
 foreach ($hostGroups as $hnum => $group) {
@@ -396,7 +396,7 @@ if ($admin) {
 		new CColHeader(_('Web')),
 	);
 
-	$table = new CTableInfo(_('No templates found.'));
+	$table = new CTableInfo();
 	$table->setHeader($header);
 
 	foreach ($templates as $tnum => $template) {

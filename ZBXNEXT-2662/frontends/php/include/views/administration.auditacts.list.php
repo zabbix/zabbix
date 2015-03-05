@@ -66,7 +66,7 @@ $auditForm = new CForm('get');
 $auditForm->setName('auditForm');
 
 // create table
-$auditTable = new CTableInfo(_('No action log entries found.'));
+$auditTable = new CTableInfo();
 $auditTable->setHeader(array(
 	_('Time'),
 	_('Action'),

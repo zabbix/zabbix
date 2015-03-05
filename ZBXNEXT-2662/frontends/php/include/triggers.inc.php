@@ -1081,7 +1081,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		}
 	}
 
-	$triggerTable = new CTableInfo(_('No triggers found.'));
+	$triggerTable = new CTableInfo();
 
 	if (empty($hostNames)) {
 		return $triggerTable;

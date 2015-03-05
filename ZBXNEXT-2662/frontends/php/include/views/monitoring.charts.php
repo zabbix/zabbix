@@ -70,7 +70,7 @@ else {
 		'timeline' => $screen->timeline
 	));
 
-	$chartsWidget->addItem(new CTableInfo(_('No graphs found.')));
+	$chartsWidget->addItem(new CTableInfo());
 }
 
 return $chartsWidget;

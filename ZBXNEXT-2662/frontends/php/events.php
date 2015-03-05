@@ -391,7 +391,7 @@ else {
 	$scroll->setAttribute('id', 'scrollbar_cntr');
 	$eventsWidget->addFlicker($scroll, CProfile::get('web.events.filter.state', 0));
 
-	$table = new CTableInfo(_('No events found.'));
+	$table = new CTableInfo();
 }
 
 // trigger events

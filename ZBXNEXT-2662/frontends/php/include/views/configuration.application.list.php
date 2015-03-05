@@ -53,7 +53,7 @@ $applicationForm = new CForm();
 $applicationForm->setName('applicationForm');
 
 // create table
-$applicationTable = new CTableInfo(_('No applications found.'));
+$applicationTable = new CTableInfo();
 $applicationTable->setHeader(array(
 	new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');"),
 	($this->data['hostid'] > 0) ? null : _('Host'),

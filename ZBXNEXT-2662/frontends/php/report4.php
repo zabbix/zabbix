@@ -67,7 +67,7 @@ $widget->setTitle(_('Notifications'));
 
 // if no media types were defined, we have nothing to show
 if (zbx_empty($media_types)) {
-	$table = new CTableInfo(_('No notifications found.'));
+	$table = new CTableInfo();
 	$widget->addItem($table);
 	$widget->show();
 }

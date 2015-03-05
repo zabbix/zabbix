@@ -75,7 +75,7 @@ $queueWidget = new CWidget();
 $queueWidget->setTitle(_('Queue of items to be updated'));
 $queueWidget->setControls($form);
 
-$table = new CTableInfo(_('The queue is empty.'));
+$table = new CTableInfo();
 
 $severityConfig = select_config();
 

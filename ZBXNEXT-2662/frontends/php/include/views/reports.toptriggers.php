@@ -153,7 +153,7 @@ $topTriggers->addFlicker($filterForm, CProfile::get('web.toptriggers.filter.stat
 $topTriggers->setTitle(_('Most busy triggers Top 100'));
 
 // table
-$table = new CTableInfo(_('No triggers found.'));
+$table = new CTableInfo();
 $table->setHeader(array(
 	_('Host'),
 	_('Trigger'),

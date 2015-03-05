@@ -107,7 +107,7 @@ if ($this->data['config']['dropdown_first_entry']) {
 	);
 }
 else {
-	$dataTable = new CTableInfo(_('No triggers found.'));
+	$dataTable = new CTableInfo();
 }
 
 $overviewWidget->addItem($dataTable);

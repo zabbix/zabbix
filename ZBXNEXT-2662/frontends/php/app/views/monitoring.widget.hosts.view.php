@@ -19,7 +19,7 @@
 **/
 
 
-$table = new CTableInfo(_('No host groups found.'));
+$table = new CTableInfo();
 $table->setHeader(array(
 	_('Host group'),
 	_('Without problems'),

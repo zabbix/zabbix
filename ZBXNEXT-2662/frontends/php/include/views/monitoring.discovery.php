@@ -35,7 +35,7 @@ $discoveryHeaderForm->addItem($controls);
 $discoveryWidget->setControls($discoveryHeaderForm);
 
 // create table
-$discoveryTable = new CTableInfo(_('No discovered devices found.'));
+$discoveryTable = new CTableInfo();
 $discoveryTable->makeVerticalRotation();
 
 $discoveredDeviceCol = make_sorting_header(_('Discovered device'), 'ip', $this->data['sort'], $this->data['sortorder']);

@@ -577,7 +577,7 @@ else {
 	$form = new CForm();
 	$form->setName('templates');
 
-	$table = new CTableInfo(_('No templates found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(
 		new CCheckBox('all_templates', null, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
 		make_sorting_header(_('Templates'), 'name', $sortField, $sortOrder),
