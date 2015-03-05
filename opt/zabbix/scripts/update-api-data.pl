@@ -170,15 +170,15 @@ foreach (@$tlds_ref)
 		{
 			if ($avail_itemid == E_ID_NONEXIST)
 			{
-				wrn("configuration error: service $service enabled but item \"$key\" not found at host \"$tld\"");
+				wrn("configuration error: service $service enabled but item \"$key\" not found");
 			}
-			else if ($avail_itemid == E_ID_MULTIPLE)
+			elsif ($avail_itemid == E_ID_MULTIPLE)
 			{
-				wrn("configuration error: multiple items with key \"$key\" found at host \"$tld\"");
+				wrn("configuration error: multiple items with key \"$key\" found");
 			}
 			else
 			{
-				wrn("cannot get ID of $service item ($key) at host \"$tld\": unknown error");
+				wrn("cannot get ID of $service item ($key): unknown error");
 			}
 
 			next;
