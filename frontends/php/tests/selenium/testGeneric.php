@@ -119,7 +119,7 @@ class testGeneric extends CWebTest {
 	/**
 	* @dataProvider provider
 	*/
-	public function testPage($url, $title) {
+	public function testGeneric_Pages($url, $title) {
 		$this->zbxTestLogin($url);
 		$this->checkTitle($title);
 		$this->zbxTestTextNotPresent($this->failIfExists);
