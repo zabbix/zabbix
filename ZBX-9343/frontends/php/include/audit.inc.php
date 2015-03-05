@@ -149,7 +149,11 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 	}
 }
 
-function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $details = null) {
+function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $details = null, $userId = null) {
+	if ($userId === null) {
+		$userId = CWebUser::$data['userid'];
+	}
+
 	if (mb_strlen($resourcename) > 255) {
 		$resourcename = mb_substr($resourcename, 0, 252).'...';
 	}
@@ -157,7 +161,7 @@ function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $
 	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 
 	$values = array(
-		'userid' => CWebUser::$data['userid'],
+		'userid' => $userId,
 		'clock' => time(),
 		'ip' => substr($ip, 0, 39),
 		'action' => $action,
