@@ -9,7 +9,7 @@ use ApiHelper;
 use JSON::XS;
 use Data::Dumper;
 
-parse_opts('tld=s', 'service=s', 'period=n', 'dry-run');
+parse_opts('tld=s', 'service=s', 'period=n', 'ignore-file=s', 'dry-run');
 
 # do not write any logs
 setopt('test');
@@ -25,7 +25,7 @@ if (opt('service'))
 {
 	if (getopt('service') ne 'dns' and getopt('service') ne 'dnssec' and getopt('service') ne 'rdds' and getopt('service') ne 'epp')
 	{
-		print(getopt('service'), ": unknown service\n");
+		print("Error: \"", getopt('service'), "\" - unknown service\n");
 		usage();
 	}
 
@@ -34,6 +34,28 @@ if (opt('service'))
 else
 {
 	push(@services, 'dns', 'dnssec', 'rdds', 'epp');
+}
+
+if (opt('tld') and opt('ignore-file'))
+{
+	print("Error: options --tld and --ignore-file cannot be used together\n");
+	usage();
+}
+
+my %ignore_hash;
+
+if (opt('ignore-file'))
+{
+	my $ignore_file = getopt('ignore-file');
+
+	my $handle;
+	fail("cannot open ignore file \"$ignore_file\": $!") unless open($handle, '<', $ignore_file);
+
+	chomp(my @lines = <$handle>);
+
+	close($handle);
+
+	%ignore_hash = map { $_ => 1 } @lines;
 }
 
 set_slv_config(get_rsm_config());
@@ -114,6 +136,9 @@ my $check_back = $now - 1800; # check back for latest availability data
 foreach (@$tlds_ref)
 {
 	$tld = $_;
+
+	print("$tld is ", (__tld_ignored($tld) == SUCCESS ? "" : "not "), "ignored\n");
+	next;
 
 	foreach my $service (@services)
 	{
@@ -1168,6 +1193,15 @@ sub __selected_period
 	return "any time";
 }
 
+sub __tld_ignored
+{
+	my $tld = shift;
+
+	return SUCCESS if (exists($ignore_hash{$tld}));
+
+	return E_FAIL;
+}
+
 __END__
 
 =head1 NAME
@@ -1176,19 +1210,27 @@ update-api-data.pl - save information about the incidents to a filesystem
 
 =head1 SYNOPSIS
 
-update-api-data.pl --service <dns|dnssec|rdds|epp> [--tld tld] [--period minutes] [--dry-run] [--debug] [--help]
+update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--period <minutes>] [--dry-run] [--debug] [--help]
 
 =head1 OPTIONS
 
 =over 8
 
-=item B<--service> name
+=item B<--service> service
 
-Specify the name of the service: dns, dnssec, rdds or epp.
+Process only specified service. Service must be one of: dns, dnssec, rdds or epp.
 
 =item B<--tld> tld
 
-Process only specified TLD. By default all TLDs will be processed.
+Process only specified TLD. If not specified all TLDs will be processed.
+
+This option cannot be used together with option --ignore-file.
+
+=item B<--ignore-file> file
+
+Specify file containing the list of TLDs that should be ignored. TLDs are specified one per line.
+
+This option cannot be used together with option --tld.
 
 =item B<--period> minutes
 
