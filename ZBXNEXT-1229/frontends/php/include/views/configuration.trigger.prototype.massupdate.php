@@ -32,7 +32,6 @@ if (!empty($data['parent_discoveryid'])) {
 
 $triggersForm = new CForm();
 $triggersForm->setName('triggersForm');
-$triggersForm->addVar('hostid', $data['hostid']);
 $triggersForm->addVar('action', $data['action']);
 $triggersForm->addVar('parent_discoveryid', $data['parent_discoveryid']);
 
@@ -101,12 +100,12 @@ foreach ($data['dependencies'] as $dependency) {
 
 $addButton = new CButton('add_dep_trigger', _('Add'), 'return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency'.
 		'&reference=deptrigger&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid'.
-		'&multiselect=1&with_triggers=1&normal_only=1&noempty=0", 1000, 700);',
+		'&multiselect=1&with_triggers=1&normal_only=1&noempty=1", 1000, 700);',
 	'link_menu'
 );
 $addPrototypeButton = new CButton('add_dep_trigger_prototype', _('Add prototype'), 'return PopUp("popup.php?'.
 		'dstfrm=massupdate&dstact=add_dependency&reference=deptrigger&dstfld1=new_dependency&srctbl=trigger_prototypes'.
-		'&objname=triggers&srcfld1=triggerid'.url_param('parent_discoveryid').'&multiselect=1&noempty=0", 1000, 700);',
+		'&objname=triggers&srcfld1=triggerid'.url_param('parent_discoveryid').'&multiselect=1", 1000, 700);',
 	'link_menu'
 );
 
@@ -133,7 +132,7 @@ $triggersForm->addItem($triggersTab);
 // append buttons to form
 $triggersForm->addItem(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
-	array(new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid'))))
+	array(new CButtonCancel(url_param('parent_discoveryid')))
 ));
 
 $triggersWidget->addItem($triggersForm);

@@ -102,7 +102,7 @@ $dependenciesDiv = new CDiv(
 		new CButton('btn1', _('Add'),
 			'return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
 				'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
-				'&with_triggers=1&noempty=0", 1000, 700);',
+				'&with_triggers=1&noempty=1", 1000, 700);',
 			'link_menu'
 		)
 	),
@@ -127,7 +127,7 @@ $triggersForm->addItem($triggersTab);
 // append buttons to form
 $triggersForm->addItem(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
-	array(new CButtonCancel(url_params(array('groupid', 'hostid'))))
+	array(new CButtonCancel(url_param('hostid')))
 ));
 
 $triggersWidget->addItem($triggersForm);
