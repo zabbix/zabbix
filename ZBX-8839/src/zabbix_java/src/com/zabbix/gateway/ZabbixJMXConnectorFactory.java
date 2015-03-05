@@ -45,10 +45,12 @@ class ZabbixJMXConnectorFactory
 
 	private static class DaemonThreadFactory implements ThreadFactory
 	{
+		private ThreadFactory f = Executors.defaultThreadFactory();
+
 		@Override
 		public Thread newThread(Runnable r)
 		{
-			Thread t = Executors.defaultThreadFactory().newThread(r);
+			Thread t = f.newThread(r);
 
 			t.setDaemon(true);
 
