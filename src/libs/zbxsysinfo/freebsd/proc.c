@@ -138,10 +138,15 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
 			if (0 == errno)
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
-			else
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
-						zbx_strerror(errno)));
+			{
+				/* specified user does not exist */
+
+				SET_UI64_RESULT(result, 0);
+				return SYSINFO_RET_OK;
+			}
+
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+					zbx_strerror(errno)));
 
 			return SYSINFO_RET_FAIL;
 		}
@@ -396,10 +401,15 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
 			if (0 == errno)
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
-			else
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
-						zbx_strerror(errno)));
+			{
+				/* specified user does not exist */
+
+				SET_UI64_RESULT(result, 0);
+				return SYSINFO_RET_OK;
+			}
+
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+					zbx_strerror(errno)));
 
 			return SYSINFO_RET_FAIL;
 		}

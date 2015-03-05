@@ -98,8 +98,10 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user information."));
-			return SYSINFO_RET_FAIL;
+			/* cannot obtain user information or specified user does not exist */
+
+			SET_UI64_RESULT(result, 0);
+			return SYSINFO_RET_OK;
 		}
 	}
 	else
@@ -300,8 +302,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user information."));
-			return SYSINFO_RET_FAIL;
+			/* cannot obtain user information or specified user does not exist */
+
+			SET_UI64_RESULT(result, 0);
+			return SYSINFO_RET_OK;
 		}
 	}
 	else
