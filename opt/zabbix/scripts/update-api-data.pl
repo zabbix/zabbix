@@ -335,7 +335,7 @@ foreach (@$tlds_ref)
 
 			if ($test_results_count == 0)
 			{
-				wrn("no results found within incident: eventid:$eventid clock:$event_start");
+				wrn("$service: no results within incident (id:$eventid clock:$event_start)");
 				last;
 			}
 
