@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 23:03+0200\n"
+"POT-Creation-Date: 2015-03-05 19:00+0200\n"
 "PO-Revision-Date: 2014-02-03 09:00+0300\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1151,7 +1151,7 @@ msgstr "CONFIGURATION DES SÉVÉRITÉS DES DÉCLENCHEURS"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:54
-#: include/views/configuration.triggers.massupdate.php:42 triggers.php:352
+#: include/views/configuration.triggers.massupdate.php:42 triggers.php:348
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "CONFIGURATION DES DÉCLENCHEURS"
 
@@ -1410,7 +1410,7 @@ msgstr "Impossible d'ajouter le diaporama"
 msgid "Cannot add template"
 msgstr "Impossible d'ajouter le modèle"
 
-#: triggers.php:199 triggers.php:322 tr_logform.php:148
+#: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Cannot add trigger"
 msgstr "Impossible d'ajouter le déclencheur"
 
@@ -1734,7 +1734,7 @@ msgstr "Impossible de supprimer le déclencheur d'un modèle \"%1$s:%2$s\"."
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Impossible de supprimer le scénario web \"%1$s\" provenant d'un modèle."
 
-#: triggers.php:213
+#: triggers.php:209
 msgid "Cannot delete trigger"
 msgstr "Impossible de supprimer le déclencheur"
 
@@ -1750,7 +1750,7 @@ msgstr "Impossible d'effacer les prototypes de déclencheur"
 msgid "Cannot delete trigger."
 msgstr "Impossible de supprimer le déclencheur."
 
-#: triggers.php:334
+#: triggers.php:330
 msgid "Cannot delete triggers"
 msgstr "Impossible de supprimer les déclencheurs"
 
@@ -1822,7 +1822,7 @@ msgid_plural "Cannot disable media types"
 msgstr[0] "Impossible de désactiver le type de média"
 msgstr[1] "Impossible de désactiver les types de média"
 
-#: triggers.php:292
+#: triggers.php:288
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] "Impossible de désactiver le déclencheur"
@@ -1902,7 +1902,7 @@ msgid_plural "Cannot enable media types"
 msgstr[0] "Impossible d'activer le type de média"
 msgstr[1] "Impossible d'activer les types de média"
 
-#: triggers.php:291
+#: triggers.php:287
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] "Impossible d'activer le déclencheur"
@@ -2329,7 +2329,7 @@ msgstr "Impossible de mettre à jour \"templateid\" pour le prototype de graphiq
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Impossible de mettre à jour la valeur \"templateid\" pour l'écran \"%1$s\"."
 
-#: api/classes/CTemplateScreen.php:635
+#: api/classes/CTemplateScreen.php:637
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "Impossible de mettre à jour \"templateid\" pour l'écran modèle \"%1$s\"."
@@ -2517,7 +2517,7 @@ msgstr "Impossible de mettre à jour une application provenant d'un modèle."
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Impossible de mettre à jour les modèles sur l'hôte découvert \"%1$s\"."
 
-#: triggers.php:195 triggers.php:253 tr_logform.php:113
+#: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Cannot update trigger"
 msgstr "Impossible de mettre à jour le déclencheur"
 
@@ -4802,7 +4802,7 @@ msgstr "Réponse vide reçue du serveur Zabbix \"%1$s\"."
 msgid "Empty screen ID for screen."
 msgstr ""
 
-#: api/classes/CTemplateScreen.php:602
+#: api/classes/CTemplateScreen.php:604
 msgid "Empty screen ID for template screen."
 msgstr ""
 
@@ -7140,7 +7140,7 @@ msgstr "ID de prototype d'hôte incorrect."
 msgid "Incorrect image index."
 msgstr "Index d'image incorrect."
 
-#: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:549
+#: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:551
 msgid "Incorrect input parameters."
 msgstr "Paramètres d'entrée incorrects."
 
@@ -7371,7 +7371,7 @@ msgstr "État incorrect pour le service \"%1$s\"."
 msgid "Incorrect status."
 msgstr "État incorrect."
 
-#: api/classes/CTemplateScreen.php:603
+#: api/classes/CTemplateScreen.php:605
 msgid "Incorrect template screen ID."
 msgstr ""
 
@@ -9468,7 +9468,7 @@ msgstr "\"%1$s\" non fourni dans le prototype d'hôte."
 msgid "No \"%1$s\" given for screen."
 msgstr ""
 
-#: api/classes/CTemplateScreen.php:601
+#: api/classes/CTemplateScreen.php:603
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr ""
@@ -9953,8 +9953,8 @@ msgstr "Aucune permission pour l'accès au système."
 #: api/classes/CScreen.php:619 api/classes/CService.php:1255
 #: api/classes/CService.php:1270 api/classes/CTemplate.php:800
 #: api/classes/CTemplate.php:996 api/classes/CTemplate.php:1121
-#: api/classes/CTemplateScreen.php:573 api/classes/CTemplateScreen.php:624
-#: api/classes/CTemplateScreen.php:676 api/classes/CTemplateScreen.php:682
+#: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
+#: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
 #: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1914
 #: api/classes/CTriggerPrototype.php:553 api/classes/CTriggerPrototype.php:644
@@ -10043,7 +10043,7 @@ msgstr ""
 msgid "No status for proxy."
 msgstr "Aucun état pour le proxy."
 
-#: triggers.php:328
+#: triggers.php:324
 msgid "No target selected"
 msgstr "Aucune cible sélectionnée"
 
@@ -12200,7 +12200,7 @@ msgstr "Écran"
 msgid "Screen \"%1$s\" added."
 msgstr "Écran \"%1$s\" ajouté."
 
-#: api/classes/CTemplateScreen.php:700
+#: api/classes/CTemplateScreen.php:702
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
 msgstr "L'écran \"%1$s\" existe déjà dans le modèle \"%2$2\"."
 
@@ -13311,7 +13311,7 @@ msgstr "Liste de modèles"
 msgid "Template name"
 msgstr "Nom du modèle"
 
-#: api/classes/CTemplateScreen.php:582 api/classes/CTemplateScreen.php:651
+#: api/classes/CTemplateScreen.php:584 api/classes/CTemplateScreen.php:653
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr ""
@@ -13729,7 +13729,7 @@ msgstr "Déclencheur \"%1$s\" sauté - règle utilisateur."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Le déclencheur \"%s\" appartient à des modèles avec des liens différents."
 
-#: triggers.php:199 triggers.php:322 tr_logform.php:148
+#: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Trigger added"
 msgstr "Déclencheur ajouté"
 
@@ -13745,11 +13745,11 @@ msgstr "Commentaires du déclencheur"
 msgid "Trigger data storage period (in days)"
 msgstr ""
 
-#: triggers.php:213
+#: triggers.php:209
 msgid "Trigger deleted"
 msgstr "Déclencheur supprimé"
 
-#: triggers.php:289
+#: triggers.php:285
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] ""
@@ -13763,7 +13763,7 @@ msgstr[1] ""
 msgid "Trigger displaying options"
 msgstr "Options d'affichage des déclencheurs"
 
-#: triggers.php:288
+#: triggers.php:284
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] ""
@@ -13889,7 +13889,7 @@ msgstr "Sévérités des déclencheurs"
 msgid "Trigger severity"
 msgstr "Sévérité du déclencheur"
 
-#: triggers.php:195 triggers.php:253 tr_logform.php:113
+#: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Trigger updated"
 msgstr "Déclencheur mis à jour"
 
@@ -13922,7 +13922,7 @@ msgstr "Déclencheurs"
 msgid "Triggers (e/d)[p/o]"
 msgstr ""
 
-#: triggers.php:334
+#: triggers.php:330
 msgid "Triggers deleted"
 msgstr "Déclencheurs supprimés"
 

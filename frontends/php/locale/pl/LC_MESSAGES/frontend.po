@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 23:03+0200\n"
+"POT-Creation-Date: 2015-03-05 19:00+0200\n"
 "PO-Revision-Date: 2015-01-19 20:17+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1161,7 +1161,7 @@ msgstr "KONFIGURACJA POZIOMÓW WYZWALACZY"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:54
-#: include/views/configuration.triggers.massupdate.php:42 triggers.php:352
+#: include/views/configuration.triggers.massupdate.php:42 triggers.php:348
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "KONFIGURACJA WYZWALACZY"
 
@@ -1420,7 +1420,7 @@ msgstr "Nie można dodać pokazu slajdów"
 msgid "Cannot add template"
 msgstr "Nie można dodać szablonu"
 
-#: triggers.php:199 triggers.php:322 tr_logform.php:148
+#: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Cannot add trigger"
 msgstr "Nie można dodać wyzwalacza"
 
@@ -1745,7 +1745,7 @@ msgstr "Nie można usunąć wyzwalacza pochodzącego z szablonu \"%1$s:%2$s\"."
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Nie można usunąć scenariusza sieci www \"%1$s\" pochodzącego z szablonu."
 
-#: triggers.php:213
+#: triggers.php:209
 msgid "Cannot delete trigger"
 msgstr "Nie można usunąć wyzwalacza"
 
@@ -1761,7 +1761,7 @@ msgstr "Nie można usunąć prototypów wyzwalaczy"
 msgid "Cannot delete trigger."
 msgstr "Nie można usunąć wyzwalacza."
 
-#: triggers.php:334
+#: triggers.php:330
 msgid "Cannot delete triggers"
 msgstr "Nie można usunąć wyzwalaczy"
 
@@ -1841,7 +1841,7 @@ msgstr[0] "Nie można wyłączyć typu mediów"
 msgstr[1] "Nie można wyłączyć typów mediów"
 msgstr[2] "Nie można wyłączyć typów mediów"
 
-#: triggers.php:292
+#: triggers.php:288
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] "Nie można wyłączyć wyzwalacza"
@@ -1933,7 +1933,7 @@ msgstr[0] "Nie można włączyć typu mediów"
 msgstr[1] "Nie można włączyć typów mediów"
 msgstr[2] "Nie można włączyć typów mediów"
 
-#: triggers.php:291
+#: triggers.php:287
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] "Nie można włączyć wyzwalacza"
@@ -2366,7 +2366,7 @@ msgstr "Nie można zaktualizować \"templateid\" dla prototypu wykresu \"%1$s\".
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Nie można zaktualizować \"templateid\" dla ekranu \"%1$s\"."
 
-#: api/classes/CTemplateScreen.php:635
+#: api/classes/CTemplateScreen.php:637
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "Nie można zaktualizować \"templateid\" dla ekranu szablonu \"%1$s\"."
@@ -2552,7 +2552,7 @@ msgstr "Nie można zaktualizować aplikacji pochodzących z szablonu."
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Nie można zaktualizować szablonów na wykrytym hoście \"%1$s\"."
 
-#: triggers.php:195 triggers.php:253 tr_logform.php:113
+#: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Cannot update trigger"
 msgstr "Nie można zaktualizować wyzwalacza"
 
@@ -4841,7 +4841,7 @@ msgstr "Pusta odpowiedź otrzymana z serwera Zabbix \"%1$s\"."
 msgid "Empty screen ID for screen."
 msgstr "Puste ID ekranu dla ekranu."
 
-#: api/classes/CTemplateScreen.php:602
+#: api/classes/CTemplateScreen.php:604
 msgid "Empty screen ID for template screen."
 msgstr "Puste ID ekranu dla szablonu ekranu."
 
@@ -7183,7 +7183,7 @@ msgstr "Błędne ID prototypu hosta."
 msgid "Incorrect image index."
 msgstr "Błędny indeks obrazu."
 
-#: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:549
+#: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:551
 msgid "Incorrect input parameters."
 msgstr "Błędne parametry wejściowe."
 
@@ -7414,7 +7414,7 @@ msgstr "Błędny stan dla serwisu \"%1$s\"."
 msgid "Incorrect status."
 msgstr "Błędny stan."
 
-#: api/classes/CTemplateScreen.php:603
+#: api/classes/CTemplateScreen.php:605
 msgid "Incorrect template screen ID."
 msgstr "Błędny ID ekranu szablonu."
 
@@ -9524,7 +9524,7 @@ msgstr "Nie podano \"%1$s\" dla prototypu hosta."
 msgid "No \"%1$s\" given for screen."
 msgstr "Nie podano \"%1$s\" dla ekranu."
 
-#: api/classes/CTemplateScreen.php:601
+#: api/classes/CTemplateScreen.php:603
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr "Nie podano \"%1$s\" dla ekranu szablonu."
@@ -10009,8 +10009,8 @@ msgstr "Brak uprawnień dla dostępu do systemu."
 #: api/classes/CScreen.php:619 api/classes/CService.php:1255
 #: api/classes/CService.php:1270 api/classes/CTemplate.php:800
 #: api/classes/CTemplate.php:996 api/classes/CTemplate.php:1121
-#: api/classes/CTemplateScreen.php:573 api/classes/CTemplateScreen.php:624
-#: api/classes/CTemplateScreen.php:676 api/classes/CTemplateScreen.php:682
+#: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
+#: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
 #: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1914
 #: api/classes/CTriggerPrototype.php:553 api/classes/CTriggerPrototype.php:644
@@ -10099,7 +10099,7 @@ msgstr "Nie znaleziono slajdów."
 msgid "No status for proxy."
 msgstr "Brak stanu dla proxy."
 
-#: triggers.php:328
+#: triggers.php:324
 msgid "No target selected"
 msgstr "Nie wybrano żadnego celu"
 
@@ -12257,7 +12257,7 @@ msgstr "Ekran"
 msgid "Screen \"%1$s\" added."
 msgstr "Dodano ekran \"%1$s\"."
 
-#: api/classes/CTemplateScreen.php:700
+#: api/classes/CTemplateScreen.php:702
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
 msgstr "Ekran \"%1$s\" już istnieje w szablonie \"%2$2\"."
 
@@ -13368,7 +13368,7 @@ msgstr "Lista szablonów"
 msgid "Template name"
 msgstr "Nazwa szablonu"
 
-#: api/classes/CTemplateScreen.php:582 api/classes/CTemplateScreen.php:651
+#: api/classes/CTemplateScreen.php:584 api/classes/CTemplateScreen.php:653
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "Ekran szablonu \"%1$s\" już istnieje."
@@ -13789,7 +13789,7 @@ msgstr "Pominięto wyzwalacz \"%1$s\" - reguła użytkownika."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Wyzwalacz \"%s\" należy do szablonów z różnymi połączeniami."
 
-#: triggers.php:199 triggers.php:322 tr_logform.php:148
+#: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Trigger added"
 msgstr "Dodano wyzwalacz"
 
@@ -13805,11 +13805,11 @@ msgstr "Komentarze do wyzwalacza"
 msgid "Trigger data storage period (in days)"
 msgstr "Okres przechowywania danych wyzwalaczy (w dniach)"
 
-#: triggers.php:213
+#: triggers.php:209
 msgid "Trigger deleted"
 msgstr "Usunięto wyzwalacz"
 
-#: triggers.php:289
+#: triggers.php:285
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] "Wyłączono wyzwalacz"
@@ -13824,7 +13824,7 @@ msgstr[2] "Wyłączono wyzwalacze"
 msgid "Trigger displaying options"
 msgstr "Opcje wyświetlania wyzwalaczy"
 
-#: triggers.php:288
+#: triggers.php:284
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] "Włączono wyzwalacz"
@@ -13953,7 +13953,7 @@ msgstr "Poziomy wyzwalacza"
 msgid "Trigger severity"
 msgstr "Poziom wyzwalacza"
 
-#: triggers.php:195 triggers.php:253 tr_logform.php:113
+#: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Trigger updated"
 msgstr "Zaktualizowano wyzwalacz"
 
@@ -13987,7 +13987,7 @@ msgstr "Wyzwalacze"
 msgid "Triggers (e/d)[p/o]"
 msgstr "Wyzwalacze (wł/wył)[on/off]"
 
-#: triggers.php:334
+#: triggers.php:330
 msgid "Triggers deleted"
 msgstr "Usunięto wyzwalacze"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 23:03+0200\n"
+"POT-Creation-Date: 2015-03-05 19:00+0200\n"
 "PO-Revision-Date: 2013-10-10 08:35+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -1150,7 +1150,7 @@ msgstr "CONFIGURAÇÃO DE SEVERIDADES DE TRIGGERS"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:54
-#: include/views/configuration.triggers.massupdate.php:42 triggers.php:352
+#: include/views/configuration.triggers.massupdate.php:42 triggers.php:348
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "CONFIGURAÇÃO DE TRIGGERS"
 
@@ -1409,7 +1409,7 @@ msgstr "Não foi possível adicionar slideshow"
 msgid "Cannot add template"
 msgstr "Não foi possível adicionar template"
 
-#: triggers.php:199 triggers.php:322 tr_logform.php:148
+#: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Cannot add trigger"
 msgstr "Não foi possível adicionar trigger"
 
@@ -1733,7 +1733,7 @@ msgstr "Não foi possível eliminar trigger \"%1$s:%2$s\" do template."
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr ""
 
-#: triggers.php:213
+#: triggers.php:209
 msgid "Cannot delete trigger"
 msgstr "Não foi possível eliminar trigger"
 
@@ -1749,7 +1749,7 @@ msgstr ""
 msgid "Cannot delete trigger."
 msgstr "Não foi possível eliminar trigger."
 
-#: triggers.php:334
+#: triggers.php:330
 msgid "Cannot delete triggers"
 msgstr "Não foi possível eliminar triggers"
 
@@ -1822,7 +1822,7 @@ msgid_plural "Cannot disable media types"
 msgstr[0] "Não foi possível desactivar tipo de média"
 msgstr[1] "Não foi possível desactivar tipo de média"
 
-#: triggers.php:292
+#: triggers.php:288
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] ""
@@ -1903,7 +1903,7 @@ msgid_plural "Cannot enable media types"
 msgstr[0] "Não foi possível activar tipo de média"
 msgstr[1] "Não foi possível activar tipo de média"
 
-#: triggers.php:291
+#: triggers.php:287
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] ""
@@ -2330,7 +2330,7 @@ msgstr ""
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Não foi possível actualizar \"templateid\" para o ecrã \"%1$s\"."
 
-#: api/classes/CTemplateScreen.php:635
+#: api/classes/CTemplateScreen.php:637
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr ""
@@ -2516,7 +2516,7 @@ msgstr ""
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr ""
 
-#: triggers.php:195 triggers.php:253 tr_logform.php:113
+#: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Cannot update trigger"
 msgstr "Não foi possível actualizar o trigger"
 
@@ -4801,7 +4801,7 @@ msgstr ""
 msgid "Empty screen ID for screen."
 msgstr ""
 
-#: api/classes/CTemplateScreen.php:602
+#: api/classes/CTemplateScreen.php:604
 msgid "Empty screen ID for template screen."
 msgstr ""
 
@@ -7139,7 +7139,7 @@ msgstr ""
 msgid "Incorrect image index."
 msgstr "Índice de imagem inválido."
 
-#: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:549
+#: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:551
 msgid "Incorrect input parameters."
 msgstr ""
 
@@ -7370,7 +7370,7 @@ msgstr "O estado do serviço \"%1$s\" é inválido."
 msgid "Incorrect status."
 msgstr "Estado inválido."
 
-#: api/classes/CTemplateScreen.php:603
+#: api/classes/CTemplateScreen.php:605
 msgid "Incorrect template screen ID."
 msgstr ""
 
@@ -9469,7 +9469,7 @@ msgstr ""
 msgid "No \"%1$s\" given for screen."
 msgstr ""
 
-#: api/classes/CTemplateScreen.php:601
+#: api/classes/CTemplateScreen.php:603
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr ""
@@ -9954,8 +9954,8 @@ msgstr "Sem permissões para acesso ao sistema."
 #: api/classes/CScreen.php:619 api/classes/CService.php:1255
 #: api/classes/CService.php:1270 api/classes/CTemplate.php:800
 #: api/classes/CTemplate.php:996 api/classes/CTemplate.php:1121
-#: api/classes/CTemplateScreen.php:573 api/classes/CTemplateScreen.php:624
-#: api/classes/CTemplateScreen.php:676 api/classes/CTemplateScreen.php:682
+#: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
+#: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
 #: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1914
 #: api/classes/CTriggerPrototype.php:553 api/classes/CTriggerPrototype.php:644
@@ -10044,7 +10044,7 @@ msgstr ""
 msgid "No status for proxy."
 msgstr ""
 
-#: triggers.php:328
+#: triggers.php:324
 msgid "No target selected"
 msgstr "Não foi seleccionado nenhum destino"
 
@@ -12201,7 +12201,7 @@ msgstr "Ecrã"
 msgid "Screen \"%1$s\" added."
 msgstr "Ecrã \"%1$s\" adicionado."
 
-#: api/classes/CTemplateScreen.php:700
+#: api/classes/CTemplateScreen.php:702
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
 msgstr "O ecrã \"%1$s\" já existe no template \"%2$2\"."
 
@@ -13312,7 +13312,7 @@ msgstr "Lista de templates"
 msgid "Template name"
 msgstr "Nome do template"
 
-#: api/classes/CTemplateScreen.php:582 api/classes/CTemplateScreen.php:651
+#: api/classes/CTemplateScreen.php:584 api/classes/CTemplateScreen.php:653
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr ""
@@ -13730,7 +13730,7 @@ msgstr "O trigger \"%1$s\" foi ignorado - regra de utilizador."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "O trigger \"%s\" pertence a templates com diferentes associações."
 
-#: triggers.php:199 triggers.php:322 tr_logform.php:148
+#: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Trigger added"
 msgstr "Trigger adicionado"
 
@@ -13746,11 +13746,11 @@ msgstr "Comentários do trigger"
 msgid "Trigger data storage period (in days)"
 msgstr ""
 
-#: triggers.php:213
+#: triggers.php:209
 msgid "Trigger deleted"
 msgstr "Trigger eliminado"
 
-#: triggers.php:289
+#: triggers.php:285
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] ""
@@ -13764,7 +13764,7 @@ msgstr[1] ""
 msgid "Trigger displaying options"
 msgstr "Opções de visualização do trigger"
 
-#: triggers.php:288
+#: triggers.php:284
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] ""
@@ -13890,7 +13890,7 @@ msgstr "Severidades do trigger"
 msgid "Trigger severity"
 msgstr "Severidade do trigger"
 
-#: triggers.php:195 triggers.php:253 tr_logform.php:113
+#: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Trigger updated"
 msgstr "Trigger actualizado"
 
@@ -13923,7 +13923,7 @@ msgstr "Triggers"
 msgid "Triggers (e/d)[p/o]"
 msgstr ""
 
-#: triggers.php:334
+#: triggers.php:330
 msgid "Triggers deleted"
 msgstr "Triggers eliminados"
 

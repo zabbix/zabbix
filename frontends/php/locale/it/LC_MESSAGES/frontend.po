@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 23:03+0200\n"
+"POT-Creation-Date: 2015-03-05 19:00+0200\n"
 "PO-Revision-Date: 2014-10-02 08:42+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1151,7 +1151,7 @@ msgstr "CONFIGURAZIONE SEVERITY DEI TRIGGER"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:54
-#: include/views/configuration.triggers.massupdate.php:42 triggers.php:352
+#: include/views/configuration.triggers.massupdate.php:42 triggers.php:348
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "CONFIGURAZIONE TRIGGER"
 
@@ -1410,7 +1410,7 @@ msgstr "Impossibile aggiungere la presentazione"
 msgid "Cannot add template"
 msgstr "Impossibile aggiungere il template"
 
-#: triggers.php:199 triggers.php:322 tr_logform.php:148
+#: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Cannot add trigger"
 msgstr "Impossibile aggiungere il trigger"
 
@@ -1734,7 +1734,7 @@ msgstr "Impossibile rimuovere i trigger \"%1$s:%2$s\" basati su template."
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Impossibile rimuovere scenario web con template \"%1$s\"."
 
-#: triggers.php:213
+#: triggers.php:209
 msgid "Cannot delete trigger"
 msgstr "Impossibile rimuovere il trigger"
 
@@ -1750,7 +1750,7 @@ msgstr "Non posso cancellare il trigger prototipo"
 msgid "Cannot delete trigger."
 msgstr "Impossibile rimuovere il trigger."
 
-#: triggers.php:334
+#: triggers.php:330
 msgid "Cannot delete triggers"
 msgstr "Impossibile rimuovere i trigger"
 
@@ -1822,7 +1822,7 @@ msgid_plural "Cannot disable media types"
 msgstr[0] "Impossibile disabilitare tipo di supporto"
 msgstr[1] "Impossibile disabilitare tipo di supporto"
 
-#: triggers.php:292
+#: triggers.php:288
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] "Impossibile disabilitare trigger"
@@ -1902,7 +1902,7 @@ msgid_plural "Cannot enable media types"
 msgstr[0] "Impossibile abilitare tipo di supporto"
 msgstr[1] "Impossibile abilitare tipo di supporto"
 
-#: triggers.php:291
+#: triggers.php:287
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] "Impossibile abilitare trigger"
@@ -2329,7 +2329,7 @@ msgstr "Impossibile aggiornare \"templateid\" per il prototipo di grafico \"%1$s
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Impossibile aggiornare \"templateid\" per la schermata \"%1$s\"."
 
-#: api/classes/CTemplateScreen.php:635
+#: api/classes/CTemplateScreen.php:637
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "Impossibile aggiornare \"templateid\" per il template schermata \"%1$s\"."
@@ -2515,7 +2515,7 @@ msgstr "Impossibile aggiornare applicazioni con template."
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Impossibile aggiornare template su host discoverato \"%1$s\"."
 
-#: triggers.php:195 triggers.php:253 tr_logform.php:113
+#: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Cannot update trigger"
 msgstr "Impossibile aggiornare il trigger"
 
@@ -4800,7 +4800,7 @@ msgstr "Risposta vuota ricevuta dal server Zabbix \"%1$s\"."
 msgid "Empty screen ID for screen."
 msgstr "ID schermata assente per la schermata"
 
-#: api/classes/CTemplateScreen.php:602
+#: api/classes/CTemplateScreen.php:604
 msgid "Empty screen ID for template screen."
 msgstr "ID schermata assente per il template schermata."
 
@@ -7138,7 +7138,7 @@ msgstr "ID prototipo host errato."
 msgid "Incorrect image index."
 msgstr "Indice immagine errato."
 
-#: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:549
+#: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:551
 msgid "Incorrect input parameters."
 msgstr "Parametri di input non corretti."
 
@@ -7369,7 +7369,7 @@ msgstr "Stato del servizio \"%1$s\" errato."
 msgid "Incorrect status."
 msgstr "Stato errato."
 
-#: api/classes/CTemplateScreen.php:603
+#: api/classes/CTemplateScreen.php:605
 msgid "Incorrect template screen ID."
 msgstr "Template ID schermata non corretto."
 
@@ -9466,7 +9466,7 @@ msgstr "Nessun \"%1$s\" fornito per il prototipo host."
 msgid "No \"%1$s\" given for screen."
 msgstr "Nessun \"%1$s\" fornito per la schermata."
 
-#: api/classes/CTemplateScreen.php:601
+#: api/classes/CTemplateScreen.php:603
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr "Nessun \"%1$s\" fornito per il template schermata."
@@ -9951,8 +9951,8 @@ msgstr "Nessun permesso per l'accesso al sistema."
 #: api/classes/CScreen.php:619 api/classes/CService.php:1255
 #: api/classes/CService.php:1270 api/classes/CTemplate.php:800
 #: api/classes/CTemplate.php:996 api/classes/CTemplate.php:1121
-#: api/classes/CTemplateScreen.php:573 api/classes/CTemplateScreen.php:624
-#: api/classes/CTemplateScreen.php:676 api/classes/CTemplateScreen.php:682
+#: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
+#: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
 #: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1914
 #: api/classes/CTriggerPrototype.php:553 api/classes/CTriggerPrototype.php:644
@@ -10041,7 +10041,7 @@ msgstr "Nessuna presentazione trovata."
 msgid "No status for proxy."
 msgstr "Nessuno stato per il proxy."
 
-#: triggers.php:328
+#: triggers.php:324
 msgid "No target selected"
 msgstr "Nessun target selezionato"
 
@@ -12198,7 +12198,7 @@ msgstr "Schermata"
 msgid "Screen \"%1$s\" added."
 msgstr "Schermata \"%1$s\" aggiunta."
 
-#: api/classes/CTemplateScreen.php:700
+#: api/classes/CTemplateScreen.php:702
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
 msgstr "La schermata \"%1$s\" esiste già nel template \"%2$2\"."
 
@@ -13309,7 +13309,7 @@ msgstr "Lista template"
 msgid "Template name"
 msgstr "Nome template"
 
-#: api/classes/CTemplateScreen.php:582 api/classes/CTemplateScreen.php:651
+#: api/classes/CTemplateScreen.php:584 api/classes/CTemplateScreen.php:653
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "Template schermata \"%1$s\" gia' presente."
@@ -13727,7 +13727,7 @@ msgstr "Trigger \"%1$s\" saltato - regola utente."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Il trigger \"%s\" appartiene a template con differenti collegamenti."
 
-#: triggers.php:199 triggers.php:322 tr_logform.php:148
+#: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Trigger added"
 msgstr "Trigger aggiunto"
 
@@ -13743,11 +13743,11 @@ msgstr "Commenti trigger"
 msgid "Trigger data storage period (in days)"
 msgstr "Periodo storicizzazione dati Trigger (in giorni)"
 
-#: triggers.php:213
+#: triggers.php:209
 msgid "Trigger deleted"
 msgstr "Trigger rimosso"
 
-#: triggers.php:289
+#: triggers.php:285
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] "Trigger disabilitato"
@@ -13761,7 +13761,7 @@ msgstr[1] "Trigger disabilitati"
 msgid "Trigger displaying options"
 msgstr "Opzioni di visualizzazione trigger"
 
-#: triggers.php:288
+#: triggers.php:284
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] "Trigger abilitato"
@@ -13887,7 +13887,7 @@ msgstr "Severity trigger"
 msgid "Trigger severity"
 msgstr "Severity trigger"
 
-#: triggers.php:195 triggers.php:253 tr_logform.php:113
+#: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Trigger updated"
 msgstr "Trigger aggiornato"
 
@@ -13920,7 +13920,7 @@ msgstr "Trigger"
 msgid "Triggers (e/d)[p/o]"
 msgstr "Trigger (e/d)[p/o]"
 
-#: triggers.php:334
+#: triggers.php:330
 msgid "Triggers deleted"
 msgstr "Trigger rimossi"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 23:03+0200\n"
+"POT-Creation-Date: 2015-03-05 19:00+0200\n"
 "PO-Revision-Date: 2014-11-03 10:13+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1161,7 +1161,7 @@ msgstr "НАСТРОЙКА ВАЖНОСТЕЙ ТРИГГЕРОВ"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:54
-#: include/views/configuration.triggers.massupdate.php:42 triggers.php:352
+#: include/views/configuration.triggers.massupdate.php:42 triggers.php:348
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "НАСТРОЙКА ТРИГГЕРОВ"
 
@@ -1420,7 +1420,7 @@ msgstr "Не удалось добавить слайд-шоу"
 msgid "Cannot add template"
 msgstr "Не удалось добавить шаблон"
 
-#: triggers.php:199 triggers.php:322 tr_logform.php:148
+#: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Cannot add trigger"
 msgstr "Не удалось добавить триггер"
 
@@ -1745,7 +1745,7 @@ msgstr "Не удалось удалить шаблонный триггер \"%
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Не удалось удалить шаблонный веб-сценарий \"%1$s\"."
 
-#: triggers.php:213
+#: triggers.php:209
 msgid "Cannot delete trigger"
 msgstr "Не удалось удалить триггер"
 
@@ -1761,7 +1761,7 @@ msgstr "Не удалось удалить прототипы триггеров
 msgid "Cannot delete trigger."
 msgstr "Не удалось удалить триггер."
 
-#: triggers.php:334
+#: triggers.php:330
 msgid "Cannot delete triggers"
 msgstr "Не удалось удалить триггеры"
 
@@ -1841,7 +1841,7 @@ msgstr[0] "Не удалось отключить способ оповещен�
 msgstr[1] "Не удалось отключить способы оповещения"
 msgstr[2] "Не удалось отключить способы оповещения"
 
-#: triggers.php:292
+#: triggers.php:288
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] "Не удалось деактивировать триггер"
@@ -1933,7 +1933,7 @@ msgstr[0] "Не удалось включить способ оповещени�
 msgstr[1] "Не удалось включить способы оповещения"
 msgstr[2] "Не удалось включить способы оповещения"
 
-#: triggers.php:291
+#: triggers.php:287
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] "Не удалось активировать триггер"
@@ -2366,7 +2366,7 @@ msgstr "Не удалось обновить \"templateid\" у прототип�
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Не удалось обновить \"templateid\" для комплексного экрана \"%1$s\"."
 
-#: api/classes/CTemplateScreen.php:635
+#: api/classes/CTemplateScreen.php:637
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "Не удалось обновить \"templateid\" у шаблонного комплексного экрана \"%1$s\"."
@@ -2552,7 +2552,7 @@ msgstr "Не удалось обновить шаблонные группы э�
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Не удалось обновить шаблоны для обнаруженного узла сети \"%1$s\"."
 
-#: triggers.php:195 triggers.php:253 tr_logform.php:113
+#: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Cannot update trigger"
 msgstr "Не удалось обновить триггер"
 
@@ -4840,7 +4840,7 @@ msgstr "Получен пустой ответ от Zabbix сервера \"%1$s
 msgid "Empty screen ID for screen."
 msgstr "Пустой ID комплексного экрана."
 
-#: api/classes/CTemplateScreen.php:602
+#: api/classes/CTemplateScreen.php:604
 msgid "Empty screen ID for template screen."
 msgstr "Пусто ID комплексного экрана для шаблонного комплексного экрана."
 
@@ -7182,7 +7182,7 @@ msgstr "Некорректный ID прототипа узла сети."
 msgid "Incorrect image index."
 msgstr "Некорректный номер изображения."
 
-#: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:549
+#: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:551
 msgid "Incorrect input parameters."
 msgstr "Некорректные входные параметры."
 
@@ -7413,7 +7413,7 @@ msgstr "Некорректное состояние для услуги \"%1$s\"
 msgid "Incorrect status."
 msgstr "Некорректное состояние."
 
-#: api/classes/CTemplateScreen.php:603
+#: api/classes/CTemplateScreen.php:605
 msgid "Incorrect template screen ID."
 msgstr "Некорректный ID шаблонного комплексоного экрана."
 
@@ -9524,7 +9524,7 @@ msgstr "Не задано \"%1$s\" для прототипа узла сети."
 msgid "No \"%1$s\" given for screen."
 msgstr "Не задан \"%1$s\" для комплексного экрана."
 
-#: api/classes/CTemplateScreen.php:601
+#: api/classes/CTemplateScreen.php:603
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr "Не задан \"%1$s\" для шаблонного комплексного экрана."
@@ -10009,8 +10009,8 @@ msgstr "Нет прав доступа в систему."
 #: api/classes/CScreen.php:619 api/classes/CService.php:1255
 #: api/classes/CService.php:1270 api/classes/CTemplate.php:800
 #: api/classes/CTemplate.php:996 api/classes/CTemplate.php:1121
-#: api/classes/CTemplateScreen.php:573 api/classes/CTemplateScreen.php:624
-#: api/classes/CTemplateScreen.php:676 api/classes/CTemplateScreen.php:682
+#: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
+#: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
 #: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1914
 #: api/classes/CTriggerPrototype.php:553 api/classes/CTriggerPrototype.php:644
@@ -10099,7 +10099,7 @@ msgstr "Слайды не найдены."
 msgid "No status for proxy."
 msgstr "Нет состояния для прокси."
 
-#: triggers.php:328
+#: triggers.php:324
 msgid "No target selected"
 msgstr "Цель не выбрана"
 
@@ -12258,7 +12258,7 @@ msgstr "Комплексный экран"
 msgid "Screen \"%1$s\" added."
 msgstr "Комплексный экран \"%1$s\" добавлен."
 
-#: api/classes/CTemplateScreen.php:700
+#: api/classes/CTemplateScreen.php:702
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
 msgstr "Комплексный экран \"%1$s\" уже существует у шаблона \"%2$2\"."
 
@@ -13369,7 +13369,7 @@ msgstr "Список шаблонов"
 msgid "Template name"
 msgstr "Имя шаблона"
 
-#: api/classes/CTemplateScreen.php:582 api/classes/CTemplateScreen.php:651
+#: api/classes/CTemplateScreen.php:584 api/classes/CTemplateScreen.php:653
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "Шаблонный комплексный экран \"%1$s\" уже существует."
@@ -13790,7 +13790,7 @@ msgstr "Триггер \"%1$s\" пропущен - правило пользов
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Триггер \"%s\" принадлежит шаблонам с разными связями."
 
-#: triggers.php:199 triggers.php:322 tr_logform.php:148
+#: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Trigger added"
 msgstr "Триггер добавлен"
 
@@ -13806,11 +13806,11 @@ msgstr "Комментарии к триггеру"
 msgid "Trigger data storage period (in days)"
 msgstr "Период хранения данных о триггерах (в днях)"
 
-#: triggers.php:213
+#: triggers.php:209
 msgid "Trigger deleted"
 msgstr "Триггер удален"
 
-#: triggers.php:289
+#: triggers.php:285
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] "Триггер деактивирован"
@@ -13825,7 +13825,7 @@ msgstr[2] "Триггеры деактивированы"
 msgid "Trigger displaying options"
 msgstr "Опции отображения триггера"
 
-#: triggers.php:288
+#: triggers.php:284
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] "Триггер активирован"
@@ -13954,7 +13954,7 @@ msgstr "Важности триггеров"
 msgid "Trigger severity"
 msgstr "Важность триггера"
 
-#: triggers.php:195 triggers.php:253 tr_logform.php:113
+#: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Trigger updated"
 msgstr "Триггер обновлен"
 
@@ -13987,7 +13987,7 @@ msgstr "Триггеры"
 msgid "Triggers (e/d)[p/o]"
 msgstr "Триггеры (а/д)[п/о]"
 
-#: triggers.php:334
+#: triggers.php:330
 msgid "Triggers deleted"
 msgstr "Триггеры удалены"
 

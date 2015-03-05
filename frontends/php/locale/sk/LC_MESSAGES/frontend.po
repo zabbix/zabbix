@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 23:03+0200\n"
+"POT-Creation-Date: 2015-03-05 19:00+0200\n"
 "PO-Revision-Date: 2015-02-13 00:45+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1161,7 +1161,7 @@ msgstr "NASTAVENIE ZÁVAŽNOSTÍ SPÚŠŤAČOV"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:54
-#: include/views/configuration.triggers.massupdate.php:42 triggers.php:352
+#: include/views/configuration.triggers.massupdate.php:42 triggers.php:348
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "NASTAVENIE SPÚŠŤAČOV"
 
@@ -1420,7 +1420,7 @@ msgstr "Nie je možné pridať prezentáciu"
 msgid "Cannot add template"
 msgstr "Nie je možné pridať šablónu"
 
-#: triggers.php:199 triggers.php:322 tr_logform.php:148
+#: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Cannot add trigger"
 msgstr "Nie je možné pridať spúšťač"
 
@@ -1745,7 +1745,7 @@ msgstr "Nie je možné zmazať spúšťač \"%1$s:%2$s\" patriaci šablóne."
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Nie je možné zmazať web scenár \"%1$s\" patriaci šablóne."
 
-#: triggers.php:213
+#: triggers.php:209
 msgid "Cannot delete trigger"
 msgstr "Nie je možné zmazať spúštač"
 
@@ -1761,7 +1761,7 @@ msgstr "Nie je možné zmazať prototypy spúšťačov"
 msgid "Cannot delete trigger."
 msgstr "Nie je možné zmazať spúšťač."
 
-#: triggers.php:334
+#: triggers.php:330
 msgid "Cannot delete triggers"
 msgstr "Nie je možné zmazať spúšťače"
 
@@ -1842,7 +1842,7 @@ msgstr[0] "Nie je možné zakázať typ média"
 msgstr[1] "Nie je možné zakázať typ média"
 msgstr[2] "Nie je možné zakázať typ média"
 
-#: triggers.php:292
+#: triggers.php:288
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] "Nie je možné vypnúť spúšťač"
@@ -1934,7 +1934,7 @@ msgstr[0] "Nie je možné povoliť typ média"
 msgstr[1] "Nie je možné povoliť typ média"
 msgstr[2] "Nie je možné povoliť typ média"
 
-#: triggers.php:291
+#: triggers.php:287
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] "Nie je možné povoliť spúšťač"
@@ -2367,7 +2367,7 @@ msgstr "Nie je možné aktualizovať \"templateid\" pre prototyp grafu \"%1$s\".
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Nie je možné aktualizovať \"templateid\" pre obrazovku \"%1$s\"."
 
-#: api/classes/CTemplateScreen.php:635
+#: api/classes/CTemplateScreen.php:637
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "Nie je možné aktualizovať \"templateid\" pre šablónu obrazovky \"%1$s\"."
@@ -2553,7 +2553,7 @@ msgstr "Nie je možné aktualizovať aplikácie patriace šablóne."
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Nie je možné aktualizovať šablóny pre zisteného hosta \"%1$s\"."
 
-#: triggers.php:195 triggers.php:253 tr_logform.php:113
+#: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Cannot update trigger"
 msgstr "Nie je možné aktualizovať spúšťač"
 
@@ -4842,7 +4842,7 @@ msgstr "Prázdna odpoveď prijatá zo Zabbix servera \"%1$s\"."
 msgid "Empty screen ID for screen."
 msgstr "Prázdne ID obrazovky pre obrazovku."
 
-#: api/classes/CTemplateScreen.php:602
+#: api/classes/CTemplateScreen.php:604
 msgid "Empty screen ID for template screen."
 msgstr "Prázdne ID obrazovky pre šablónu obrazovky."
 
@@ -7184,7 +7184,7 @@ msgstr "Neplatné ID prototypu hosta."
 msgid "Incorrect image index."
 msgstr "Neplatný obrázkový index."
 
-#: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:549
+#: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:551
 msgid "Incorrect input parameters."
 msgstr "Neplatné vstupné parametre."
 
@@ -7415,7 +7415,7 @@ msgstr "Neplatný stav pre službu \"%1$s\"."
 msgid "Incorrect status."
 msgstr "Neplatný stav."
 
-#: api/classes/CTemplateScreen.php:603
+#: api/classes/CTemplateScreen.php:605
 msgid "Incorrect template screen ID."
 msgstr "Neplatné ID šablóny obrazovky."
 
@@ -9525,7 +9525,7 @@ msgstr "Žiadne \"%1$s\" dané pre prototyp hosta."
 msgid "No \"%1$s\" given for screen."
 msgstr "Žiadne \"%1$s\" dané pre obrazovku."
 
-#: api/classes/CTemplateScreen.php:601
+#: api/classes/CTemplateScreen.php:603
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr "Žiadne \"%1$s\" dané pre šablónu obrazovky."
@@ -10010,8 +10010,8 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: api/classes/CScreen.php:619 api/classes/CService.php:1255
 #: api/classes/CService.php:1270 api/classes/CTemplate.php:800
 #: api/classes/CTemplate.php:996 api/classes/CTemplate.php:1121
-#: api/classes/CTemplateScreen.php:573 api/classes/CTemplateScreen.php:624
-#: api/classes/CTemplateScreen.php:676 api/classes/CTemplateScreen.php:682
+#: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
+#: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
 #: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1914
 #: api/classes/CTriggerPrototype.php:553 api/classes/CTriggerPrototype.php:644
@@ -10100,7 +10100,7 @@ msgstr "Nenájdené žiadne slajdy."
 msgid "No status for proxy."
 msgstr "Žiaden stav pre proxy."
 
-#: triggers.php:328
+#: triggers.php:324
 msgid "No target selected"
 msgstr "Nie je vybraný cieľ"
 
@@ -12258,7 +12258,7 @@ msgstr "Obrazovka"
 msgid "Screen \"%1$s\" added."
 msgstr "Obrazovka \"%1$s\" pridaná."
 
-#: api/classes/CTemplateScreen.php:700
+#: api/classes/CTemplateScreen.php:702
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
 msgstr "Obrazovka \"%1$s\" už existuje v šablóne \"%2$2\"."
 
@@ -13369,7 +13369,7 @@ msgstr "Zoznam šablón"
 msgid "Template name"
 msgstr "Meno šablóny"
 
-#: api/classes/CTemplateScreen.php:582 api/classes/CTemplateScreen.php:651
+#: api/classes/CTemplateScreen.php:584 api/classes/CTemplateScreen.php:653
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "Šablóna obrazovky \"%1$s\" už existuje."
@@ -13790,7 +13790,7 @@ msgstr "Spúšťač \"%1$s\" preskočený - používateľské pravidlo."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Spúšťač \"%s\" patrí k šablónam s rôznymi spojeniami."
 
-#: triggers.php:199 triggers.php:322 tr_logform.php:148
+#: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Trigger added"
 msgstr "Spúšťač pridaný"
 
@@ -13806,11 +13806,11 @@ msgstr "Poznámky k spúšťaču"
 msgid "Trigger data storage period (in days)"
 msgstr "Perióda uloženia údajov spúšťačov (v dňoch)"
 
-#: triggers.php:213
+#: triggers.php:209
 msgid "Trigger deleted"
 msgstr "Spúšťač zmazaný"
 
-#: triggers.php:289
+#: triggers.php:285
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] "Spúštač vypnutý"
@@ -13825,7 +13825,7 @@ msgstr[2] "Spúštače vypnuté"
 msgid "Trigger displaying options"
 msgstr "Zobrazovacie možnosti spúšťačov"
 
-#: triggers.php:288
+#: triggers.php:284
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] "Spúštač povolený"
@@ -13954,7 +13954,7 @@ msgstr "Závažnosti spúšťačov"
 msgid "Trigger severity"
 msgstr "Závažnosť spúšťača"
 
-#: triggers.php:195 triggers.php:253 tr_logform.php:113
+#: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Trigger updated"
 msgstr "Spúšťač aktualizovaný"
 
@@ -13987,7 +13987,7 @@ msgstr "Spúšťače"
 msgid "Triggers (e/d)[p/o]"
 msgstr "Spúšťače (pov./zak.)[p/o]"
 
-#: triggers.php:334
+#: triggers.php:330
 msgid "Triggers deleted"
 msgstr "Spúšťače zmazané"
 

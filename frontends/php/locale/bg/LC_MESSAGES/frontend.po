@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 23:03+0200\n"
+"POT-Creation-Date: 2015-03-05 19:00+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -1152,7 +1152,7 @@ msgstr "КОНФИГУРАЦИЯ ВАЖНОСТ НА ТРИГЕР "
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:54
-#: include/views/configuration.triggers.massupdate.php:42 triggers.php:352
+#: include/views/configuration.triggers.massupdate.php:42 triggers.php:348
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "КОНФИГУРАЦИЯ НА ТРИГЕРИ"
 
@@ -1411,7 +1411,7 @@ msgstr "Не може да се добави слайдшоу"
 msgid "Cannot add template"
 msgstr "Не може да се добави шаблон"
 
-#: triggers.php:199 triggers.php:322 tr_logform.php:148
+#: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Cannot add trigger"
 msgstr "Не може да се добави тригер"
 
@@ -1737,7 +1737,7 @@ msgstr "Не може да се изтрие шаблонния тригер \"%
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Не може да се изтрие шаблон на уеб сценарий \"%1$s\"."
 
-#: triggers.php:213
+#: triggers.php:209
 msgid "Cannot delete trigger"
 msgstr "Не може да се изтрие тригера"
 
@@ -1753,7 +1753,7 @@ msgstr ""
 msgid "Cannot delete trigger."
 msgstr "Не може да се изтрие тригера."
 
-#: triggers.php:334
+#: triggers.php:330
 msgid "Cannot delete triggers"
 msgstr "Не може да се изтрият тригерите"
 
@@ -1826,7 +1826,7 @@ msgid_plural "Cannot disable media types"
 msgstr[0] "Не може да се изключи метод на уведомление"
 msgstr[1] "Не може да се изключи метод на уведомление"
 
-#: triggers.php:292
+#: triggers.php:288
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] ""
@@ -1908,7 +1908,7 @@ msgid_plural "Cannot enable media types"
 msgstr[0] "Не може да се активира метод на уведомление"
 msgstr[1] "Не може да се активира метод на уведомление"
 
-#: triggers.php:291
+#: triggers.php:287
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] ""
@@ -2335,7 +2335,7 @@ msgstr ""
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Не може да се актуализира \"templateid\" за екран \"%1$s\"."
 
-#: api/classes/CTemplateScreen.php:635
+#: api/classes/CTemplateScreen.php:637
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr ""
@@ -2522,7 +2522,7 @@ msgstr ""
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr ""
 
-#: triggers.php:195 triggers.php:253 tr_logform.php:113
+#: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Cannot update trigger"
 msgstr "Не може да се актуализира тригера"
 
@@ -4811,7 +4811,7 @@ msgstr ""
 msgid "Empty screen ID for screen."
 msgstr ""
 
-#: api/classes/CTemplateScreen.php:602
+#: api/classes/CTemplateScreen.php:604
 msgid "Empty screen ID for template screen."
 msgstr ""
 
@@ -7156,7 +7156,7 @@ msgstr ""
 msgid "Incorrect image index."
 msgstr "Неправилен индекс на изображение."
 
-#: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:549
+#: api/classes/CScreen.php:375 api/classes/CTemplateScreen.php:551
 msgid "Incorrect input parameters."
 msgstr ""
 
@@ -7387,7 +7387,7 @@ msgstr "Неправилно състояние за услуга  \"%1$s\"."
 msgid "Incorrect status."
 msgstr "Неправилно състояние."
 
-#: api/classes/CTemplateScreen.php:603
+#: api/classes/CTemplateScreen.php:605
 msgid "Incorrect template screen ID."
 msgstr ""
 
@@ -9488,7 +9488,7 @@ msgstr ""
 msgid "No \"%1$s\" given for screen."
 msgstr ""
 
-#: api/classes/CTemplateScreen.php:601
+#: api/classes/CTemplateScreen.php:603
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr ""
@@ -9973,8 +9973,8 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CScreen.php:619 api/classes/CService.php:1255
 #: api/classes/CService.php:1270 api/classes/CTemplate.php:800
 #: api/classes/CTemplate.php:996 api/classes/CTemplate.php:1121
-#: api/classes/CTemplateScreen.php:573 api/classes/CTemplateScreen.php:624
-#: api/classes/CTemplateScreen.php:676 api/classes/CTemplateScreen.php:682
+#: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
+#: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
 #: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1914
 #: api/classes/CTriggerPrototype.php:553 api/classes/CTriggerPrototype.php:644
@@ -10063,7 +10063,7 @@ msgstr ""
 msgid "No status for proxy."
 msgstr ""
 
-#: triggers.php:328
+#: triggers.php:324
 msgid "No target selected"
 msgstr "Не е избрана цел"
 
@@ -12226,7 +12226,7 @@ msgstr "Екран"
 msgid "Screen \"%1$s\" added."
 msgstr "Екран \"%1$s\" добавен."
 
-#: api/classes/CTemplateScreen.php:700
+#: api/classes/CTemplateScreen.php:702
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
 msgstr "Екран \"%1$s\" вече съществува в шаблон \"%2$2\"."
 
@@ -13337,7 +13337,7 @@ msgstr "Списък на шаблони"
 msgid "Template name"
 msgstr "Име на шаблон"
 
-#: api/classes/CTemplateScreen.php:582 api/classes/CTemplateScreen.php:651
+#: api/classes/CTemplateScreen.php:584 api/classes/CTemplateScreen.php:653
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr ""
@@ -13756,7 +13756,7 @@ msgstr "Тригер \"%1$s\" пропуснат - потребителско п
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Тригер \"%s\" принадлежи към шаблони с различни връзки."
 
-#: triggers.php:199 triggers.php:322 tr_logform.php:148
+#: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Trigger added"
 msgstr "Тригер добавен"
 
@@ -13772,11 +13772,11 @@ msgstr "Коментари към тригер"
 msgid "Trigger data storage period (in days)"
 msgstr ""
 
-#: triggers.php:213
+#: triggers.php:209
 msgid "Trigger deleted"
 msgstr "Тригер изтрит"
 
-#: triggers.php:289
+#: triggers.php:285
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] ""
@@ -13790,7 +13790,7 @@ msgstr[1] ""
 msgid "Trigger displaying options"
 msgstr "Преглед на опциите на тригер"
 
-#: triggers.php:288
+#: triggers.php:284
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] ""
@@ -13916,7 +13916,7 @@ msgstr "Важност на тригер "
 msgid "Trigger severity"
 msgstr "Важност на тригер "
 
-#: triggers.php:195 triggers.php:253 tr_logform.php:113
+#: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Trigger updated"
 msgstr "Тригер актуализиран"
 
@@ -13949,7 +13949,7 @@ msgstr "Тригери"
 msgid "Triggers (e/d)[p/o]"
 msgstr ""
 
-#: triggers.php:334
+#: triggers.php:330
 msgid "Triggers deleted"
 msgstr "Тригери изтрити"
 
