@@ -24,6 +24,38 @@
 #include "dbcache.h"
 #include "zbxserver.h"
 
+static char	*get_conflicting_template_names(const char *key, const zbx_vector_uint64_t *templateids)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql = NULL;
+	size_t		sql_alloc = 256, sql_offset=0;
+	char		*template_names = NULL, *esc;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hostid"
+			" from items"
+			" where");
+
+	esc = DBdyn_escape_string(key);
+	DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "key_", (const char **)&esc, 1);
+	zbx_free(esc);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset," and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
+			templateids->values, templateids->values_num);
+
+	result = DBselectN(sql, templateids->values_num);
+
+	while (NULL != (row = DBfetch(result)))
+		template_names = zbx_strdcatf(template_names, "\"%s\", ", zbx_host_string(atoi(row[0])));
+
+	zbx_rtrim(template_names, ", ");
+
+	DBfree_result(result);
+
+	return template_names;
+}
 /******************************************************************************
  *                                                                            *
  * Function: validate_linked_templates                                        *
@@ -74,9 +106,13 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 
 		if (NULL != (row = DBfetch(result)))
 		{
+			char	*template_names;
+
 			ret = FAIL;
+			template_names = get_conflicting_template_names(row[0], templateids);
 			zbx_snprintf(error, max_error_len,
-					"template with item key \"%s\" already linked to the host", row[0]);
+					"templates %s have the same item key \"%s\"", template_names, row[0]);
+			zbx_free(template_names);
 		}
 		DBfree_result(result);
 	}
@@ -4624,7 +4660,8 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	if (SUCCEED != (res = validate_linked_templates(&templateids, error, sizeof(error))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot link template: %s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot link template to host \"%s\": %s",
+				zbx_host_string(hostid), error);
 		goto clean;
 	}
 
