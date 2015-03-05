@@ -9,12 +9,14 @@ use ApiHelper;
 use JSON::XS;
 use Data::Dumper;
 
-use constant ROOT_ZONE_DIR => 'zz--root';	# map root zone name (.) to something human readable
+use constant ROOT_ZONE_DIR => 'zz--root'; # map root zone name (.) to something human readable
 
-parse_opts('tld=s', 'service=s', 'period=n', 'ignore-file=s', 'dry-run');
+parse_opts('tld=s', 'service=s', 'period=n', 'ignore-file=s');
 
 # do not write any logs
-setopt('test');
+setopt('nolog');
+
+exit_if_running();
 
 if (opt('debug'))
 {
@@ -1251,7 +1253,7 @@ This option cannot be used together with option --tld.
 
 =item B<--period> minutes
 
-Specify number of minutes of the period of calculation. This period is up to the latest available
+Specify number of minutes of the period of calculation. This period is up till the latest available
 data in the database.
 
 =item B<--dry-run>

@@ -84,7 +84,7 @@ my $config = undef;
 # whether additional alerts through Redis are enabled, disable in config passed with set_slv_config()
 my $alerts_enabled = 1;
 
-# make sure only one copy of script runs (unless in test mode)
+# this will be used for making sure only one copy of script runs (see function exit_if_running())
 my $pidfile;
 use constant PID_DIR => '/tmp';
 
@@ -1185,7 +1185,7 @@ sub push_value
 #
 sub send_values
 {
-	if (opt('debug') or opt('test'))
+	if (opt('dry-run'))
 	{
 		# $tld is a global variable which is used in info()
 		my $saved_tld = $tld;
@@ -1707,7 +1707,7 @@ sub check_lastclock
 	my $value_ts = shift;
 	my $interval = shift;
 
-	return SUCCESS if (opt('debug') or opt('test'));
+	return SUCCESS if (opt('dry-run'));
 
 	if ($lastclock + $interval > $value_ts)
 	{
@@ -2315,7 +2315,7 @@ sub slv_exit
 
 sub exit_if_running
 {
-	return if (opt('debug') or opt('test'));
+	return if (opt('dry-run'));
 
 	my $filename = __get_pidfile();
 
@@ -2363,7 +2363,7 @@ sub fail
 {
 	__log('err', join('', @_));
 
-	exit(E_FAIL);
+	slv_exit(E_FAIL);
 }
 
 sub trim
@@ -2378,7 +2378,7 @@ sub trim
 
 sub parse_opts
 {
-	GetOptions(\%OPTS, 'help!', 'test!', 'debug!', @_) or pod2usage(2);
+	GetOptions(\%OPTS, 'help!', 'dry-run!', 'nolog!', 'debug!', @_) or pod2usage(2);
 	pod2usage(1) if (opt('help'));
 }
 
@@ -2485,7 +2485,7 @@ sub __log
 
 	my $cur_tld = $tld || "";
 
-	if (opt('debug') or opt('test'))
+	if (opt('dry-run') or opt('nolog'))
 	{
 		print {$stdout ? *STDOUT : *STDERR} (ts_str(), " [$priority] ", ($cur_tld eq "" ? "" : "$cur_tld: "), __func(), "$msg\n");
 		return;
