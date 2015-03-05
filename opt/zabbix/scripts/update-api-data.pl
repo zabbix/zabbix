@@ -9,6 +9,8 @@ use ApiHelper;
 use JSON::XS;
 use Data::Dumper;
 
+use constant ROOT_ZONE_DIR => 'zz--root';	# map root zone name (.) to something human readable
+
 parse_opts('tld=s', 'service=s', 'period=n', 'ignore-file=s', 'dry-run');
 
 # do not write any logs
@@ -137,6 +139,10 @@ foreach (@$tlds_ref)
 {
 	$tld = $_;
 
+	my $api_tld = $tld;
+
+	$api_tld = ROOT_ZONE_DIR if ($tld eq ".");
+
 	if (__tld_ignored($tld) == SUCCESS)
 	{
 		dbg("tld \"$tld\" ignored");
@@ -153,7 +159,7 @@ foreach (@$tlds_ref)
 			}
 			else
 			{
-				if (ah_save_alarmed($tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
+				if (ah_save_alarmed($api_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
 				{
 					fail("cannot save alarmed: ", ah_get_error());
 				}
@@ -200,7 +206,7 @@ foreach (@$tlds_ref)
 		}
 		else
 		{
-			if (ah_save_service_availability($tld, $service, $downtime, $lastclock) != AH_SUCCESS)
+			if (ah_save_service_availability($api_tld, $service, $downtime, $lastclock) != AH_SUCCESS)
 			{
 				fail("cannot save service availability: ", ah_get_error());
 			}
@@ -226,7 +232,7 @@ foreach (@$tlds_ref)
 		}
 		else
 		{
-			if (ah_save_alarmed($tld, $service, $alarmed_status, $lastclock) != AH_SUCCESS)
+			if (ah_save_alarmed($api_tld, $service, $alarmed_status, $lastclock) != AH_SUCCESS)
 			{
 				fail("cannot save alarmed: ", ah_get_error());
 			}
@@ -340,7 +346,7 @@ foreach (@$tlds_ref)
 			}
 			else
 			{
-				if (ah_save_incident($tld, $service, $eventid, $event_start, $event_end, $false_positive, $lastclock) != AH_SUCCESS)
+				if (ah_save_incident($api_tld, $service, $eventid, $event_start, $event_end, $false_positive, $lastclock) != AH_SUCCESS)
 				{
 					fail("cannot save incident: ", ah_get_error());
 				}
@@ -427,7 +433,7 @@ foreach (@$tlds_ref)
 					}
 					else
 					{
-						if (ah_save_incident_json($tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
+						if (ah_save_incident_json($api_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
 						{
 							fail("cannot save incident: ", ah_get_error());
 						}
@@ -522,7 +528,7 @@ foreach (@$tlds_ref)
 					}
 					else
 					{
-						if (ah_save_incident_json($tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
+						if (ah_save_incident_json($api_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
 						{
 							fail("cannot save incident: ", ah_get_error());
 						}
