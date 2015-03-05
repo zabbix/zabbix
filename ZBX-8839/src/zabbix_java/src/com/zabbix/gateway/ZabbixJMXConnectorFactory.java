@@ -71,6 +71,8 @@ class ZabbixJMXConnectorFactory
 			{
 				try
 				{
+					logger.trace("making a call to JMXConnectorFactory.connect('{}')", url);
+
 					JMXConnector jmxc = JMXConnectorFactory.connect(url, env);
 
 					logger.trace("call to JMXConnectorFactory.connect('{}') successful", url);
