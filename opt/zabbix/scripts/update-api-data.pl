@@ -140,10 +140,12 @@ foreach (@$tlds_ref)
 
 		if ($avail_itemid < 0)
 		{
-			fail("misconfiguration: service $service enabled but item \"$key\" not found at host \"$tld\"") if ($avail_itemid == E_ID_NONEXIST);
-			fail("misconfiguration: multiple items with key \"$key\" found at host \"$tld\"") if ($avail_itemid == E_ID_MULTIPLE);
+			wrn("configuration error: service $service enabled but item \"$key\" not found at host \"$tld\"") if ($avail_itemid == E_ID_NONEXIST);
+			wrn("configuration error: multiple items with key \"$key\" found at host \"$tld\"") if ($avail_itemid == E_ID_MULTIPLE);
 
-			fail("cannot get ID of $service item ($key) at host \"$tld\": unknown error");
+			wrn("cannot get ID of $service item ($key) at host \"$tld\": unknown error");
+
+			next;
 		}
 
 		# we need down time in minutes, not percent, that's why we can't use "rsm.slv.$service.rollweek" value
@@ -280,7 +282,7 @@ foreach (@$tlds_ref)
 					}
 					else
 					{
-						fail("invalid status: $value");
+						wrn("invalid status: $value");
 					}
 				}
 
@@ -289,7 +291,11 @@ foreach (@$tlds_ref)
 
 			my $test_results_count = scalar(@test_results);
 
-			fail("no results found within incident: eventid:$eventid clock:$event_start") if ($test_results_count == 0);
+			if ($test_results_count == 0)
+			{
+				wrn("no results found within incident: eventid:$eventid clock:$event_start");
+				last;
+			}
 
 			if (opt('dry-run'))
 			{
@@ -330,12 +336,20 @@ foreach (@$tlds_ref)
 
 						foreach my $clock (sort(keys(%$endvalues_ref))) # must be sorted by clock
 						{
-							fail("no status of value (probe:$probe service:$service clock:$clock) found in the database") if ($clock < $test_results[$test_result_index]->{'start'});
+							if ($clock < $test_results[$test_result_index]->{'start'})
+							{
+								wrn("no status of value (probe:$probe service:$service clock:$clock) found in the database");
+								next;
+							}
 
 							# move to corresponding test result
 							$test_result_index++ while ($test_result_index < $test_results_count and $clock > $test_results[$test_result_index]->{'end'});
 
-							fail("no status of value (probe:$probe service:$service clock:$clock) found in the database") if ($test_result_index == $test_results_count);
+							if ($test_result_index == $test_results_count)
+							{
+								wrn("no status of value (probe:$probe service:$service clock:$clock) found in the database");
+								next;
+							}
 
 							my $tr_ref = $test_results[$test_result_index];
 
@@ -409,12 +423,20 @@ foreach (@$tlds_ref)
 						{
 							#dbg(Dumper($endvalues_ref->{$clock}))if (opt('debug'));
 
-							fail("no status of the value (probe:$probe service:$service clock:$clock) found in the database") if ($clock < $test_results[$test_result_index]->{'start'});
+							if ($clock < $test_results[$test_result_index]->{'start'})
+							{
+								wrn("no status of the value (probe:$probe service:$service clock:$clock) found in the database");
+								next;
+							}
 
 							# move to corresponding test result
 							$test_result_index++ while ($test_result_index < $test_results_count and $clock > $test_results[$test_result_index]->{'end'});
 
-							fail("no status of the value (probe:$probe service:$service clock:$clock) found in the database") if ($test_result_index == $test_results_count);
+							if ($test_result_index == $test_results_count)
+							{
+								wrn("no status of the value (probe:$probe service:$service clock:$clock) found in the database");
+								next;
+							}
 
 							my $tr_ref = $test_results[$test_result_index];
 
@@ -556,7 +578,11 @@ sub __get_dns_test_values
 				last if ($last == 1);
 			}
 
-			fail("internal error: Name Server,IP pair of item $itemid not found") unless (defined($nsip));
+			unless (defined($nsip))
+			{
+				wrn("internal error: Name Server,IP pair of item $itemid not found");
+				next;
+			}
 
 			$result{$probe}->{$nsip}->{$clock} = $value;
 		}
@@ -661,7 +687,7 @@ sub __get_rdds_test_values
 
 		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_dbl_items_ref);
 
-		fail("internal error: item $key (itemid:$itemid) or Probe is unknown") unless (defined($probe) and defined($key));
+		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
 
 		my $port = __get_rdds_port($key);
 		my $type = __get_rdds_dbl_type($key);
@@ -679,7 +705,7 @@ sub __get_rdds_test_values
 
 		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_str_items_ref);
 
-		fail("internal error: item $key (itemid:$itemid) or Probe is unknown") unless (defined($probe) and defined($key));
+		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
 
 		my $port = __get_rdds_port($key);
 		my $type = __get_rdds_str_type($key);
@@ -752,7 +778,7 @@ sub __get_epp_test_values
 
 		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $epp_dbl_items_ref);
 
-		fail("internal error: item $key (itemid:$itemid) or Probe is unknown") unless (defined($probe) and defined($key));
+		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
 
 		my $type = __get_epp_dbl_type($key);
 
@@ -769,7 +795,7 @@ sub __get_epp_test_values
 
 		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $epp_str_items_ref);
 
-		fail("internal error: item $key (itemid:$itemid) or Probe is unknown") unless (defined($probe) and defined($key));
+		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
 
 		my $type = __get_epp_str_type($key);
 

@@ -2458,6 +2458,7 @@ sub __log
 	my $msg = shift;
 
 	my $priority;
+	my $stdout = 1;
 
 	if ($syslog_priority eq 'info')
 	{
@@ -2465,10 +2466,12 @@ sub __log
 	}
 	elsif ($syslog_priority eq 'err')
 	{
+		$stdout = 0;
 		$priority = 'ERR';
 	}
 	elsif ($syslog_priority eq 'warning')
 	{
+		$stdout = 0;
 		$priority = 'WRN';
 	}
 	elsif ($syslog_priority eq 'debug')
@@ -2484,7 +2487,7 @@ sub __log
 
 	if (opt('debug') or opt('test'))
 	{
-		print(ts_str(), " [$priority] ", ($cur_tld eq "" ? "" : "$cur_tld: "), __func(), "$msg\n");
+		print {$stdout ? *STDOUT : *STDERR} (ts_str(), " [$priority] ", ($cur_tld eq "" ? "" : "$cur_tld: "), __func(), "$msg\n");
 		return;
 	}
 
