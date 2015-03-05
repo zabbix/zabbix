@@ -1317,7 +1317,7 @@ Continue processing API data from the timestamp of the last run with --continue.
 run with --continue all available data will be processed. The continue token is saved per each
 TLD-service pair separately.
 
-Note, that continue token will not be updated if this option specified with --dry-run.
+Note, that continue token will not be updated if this option was specified together with --dry-run.
 
 This option cannot be used together with option --period.
 
