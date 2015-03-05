@@ -81,6 +81,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'searchWildcardsEnabled'		=> null,
 			// output
 			'expandExpression'				=> null,
+			'expandData'					=> null,
 			'output'						=> API_OUTPUT_EXTEND,
 			'selectGroups'					=> null,
 			'selectHosts'					=> null,
@@ -97,6 +98,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'limitSelects'					=> null
 		);
 		$options = zbx_array_merge($defOptions, $options);
+
+		$this->checkDeprecatedParam($options, 'expandData');
 
 		// editable + permission check
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -1309,6 +1312,36 @@ class CTriggerPrototype extends CTriggerGeneral {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Adds additional SQL depending on options specified.
+	 *
+	 * @param string	$tableName
+	 * @param string	$tableAlias
+	 * @param array		$options
+	 * @param array		$sqlParts
+	 *
+	 * @return array
+	 */
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if (!$options['countOutput'] !== null) {
+			// expandData
+			if ($options['expandData'] !== null) {
+				$sqlParts['select']['host'] = 'h.host';
+				$sqlParts['select']['hostid'] = 'h.hostid';
+				$sqlParts['from']['functions'] = 'functions f';
+				$sqlParts['from']['items'] = 'items i';
+				$sqlParts['from']['hosts'] = 'hosts h';
+				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
+				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+			}
+		}
+
+		return $sqlParts;
 	}
 
 	/**

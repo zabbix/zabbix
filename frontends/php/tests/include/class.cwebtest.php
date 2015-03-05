@@ -83,8 +83,15 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 			$this->setBrowserUrl('http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/');
 		}
 
+		/*
+		if (!DBConnect($error)) {
+			$this->assertTrue(FALSE, 'Unable to connect to the database: '.$error);
+			exit;
+		}
+		*/
+
 		if (!isset($DB['DB'])) {
-			DBconnect($error);
+			DBConnect($error);
 		}
 	}
 

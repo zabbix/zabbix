@@ -45,7 +45,7 @@ void	recv_areg_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, &error)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot parse autoregistration data from active proxy at \"%s\": %s",
+		zabbix_log(LOG_LEVEL_WARNING, "autoregistration data from active proxy on \"%s\" failed: %s",
 				get_ip_by_socket(sock), error);
 		goto out;
 	}
@@ -65,6 +65,8 @@ out:
  *                                                                            *
  * Purpose: send auto-registration data from proxy to a server                *
  *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
  ******************************************************************************/
 void	send_areg_data(zbx_sock_t *sock)
 {
@@ -72,8 +74,8 @@ void	send_areg_data(zbx_sock_t *sock)
 
 	struct zbx_json	j;
 	zbx_uint64_t	lastid;
-	int		records, ret = FAIL;
-	char		*error = NULL;
+	int		records;
+	char		*info = NULL, *error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -89,25 +91,23 @@ void	send_areg_data(zbx_sock_t *sock)
 
 	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
 	{
-		error = zbx_strdup(error, zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "error while sending auto-registration data to server: %s",
+				zbx_tcp_strerror());
 		goto out;
 	}
 
-	if (SUCCEED != zbx_recv_response(sock, CONFIG_TIMEOUT, &error))
+	if (SUCCEED != zbx_recv_response(sock, &info, CONFIG_TIMEOUT, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "sending auto-registration data to server: error:\"%s\", info:\"%s\"",
+				ZBX_NULL2EMPTY_STR(error), ZBX_NULL2EMPTY_STR(info));
 		goto out;
+	}
 
 	if (0 != records)
 		proxy_set_areg_lastid(lastid);
-
-	ret = SUCCEED;
 out:
-	if (SUCCEED != ret)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send auto-registration data to server at \"%s\": %s",
-				get_ip_by_socket(sock), error);
-	}
-
 	zbx_json_free(&j);
+	zbx_free(info);
 	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

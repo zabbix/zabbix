@@ -28,9 +28,7 @@ $ZBX_MENU = array(
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
-				'url' => 'zabbix.php',
-				'action' => 'dashboard.view',
-				'active_if' => array('dashboard.view'),
+				'url' => 'dashboard.php',
 				'label' => _('Dashboard'),
 				'sub_pages' => array('dashconf.php')
 			),
@@ -69,16 +67,12 @@ $ZBX_MENU = array(
 				'sub_pages' => array('slides.php')
 			),
 			array(
-				'url' => 'zabbix.php',
-				'action' => 'map.view',
-				'active_if' => array('map.view'),
+				'url' => 'maps.php',
 				'label' => _('Maps'),
 				'sub_pages' => array('map.php')
 			),
 			array(
-				'url' => 'zabbix.php',
-				'action' => 'discovery.view',
-				'active_if' => array('discovery.view'),
+				'url' => 'discovery.php',
 				'label' => _('Discovery'),
 				'user_type' => USER_TYPE_ZABBIX_ADMIN
 			),
@@ -122,9 +116,7 @@ $ZBX_MENU = array(
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
-				'url' => 'zabbix.php',
-				'action' => 'report.status',
-				'active_if' => array('report.status'),
+				'url' => 'report1.php',
 				'label' => _('Status of Zabbix'),
 				'user_type' => USER_TYPE_SUPER_ADMIN
 			),
@@ -238,9 +230,7 @@ $ZBX_MENU = array(
 				)
 			),
 			array(
-				'url' => 'zabbix.php',
-				'action' => 'proxy.list',
-				'active_if' => array('proxy.edit', 'proxy.list'),
+				'url' => 'proxies.php',
 				'label' => _('Proxies')
 			),
 			array(
@@ -253,15 +243,11 @@ $ZBX_MENU = array(
 				'sub_pages' => array('users.php', 'popup_usrgrp.php')
 			),
 			array(
-				'url' => 'zabbix.php',
-				'action' => 'mediatype.list',
-				'active_if' => array('mediatype.edit', 'mediatype.list'),
+				'url' => 'media_types.php',
 				'label' => _('Media types')
 			),
 			array(
-				'url' => 'zabbix.php',
-				'action' => 'script.list',
-				'active_if' => array('script.edit', 'script.list'),
+				'url' => 'scripts.php',
 				'label' => _('Scripts')
 			),
 			array(
@@ -309,12 +295,12 @@ $ZBX_MENU = array(
  *	'label' =  submenu title, if missing, menu skipped, but remembered as last visited page.
  *	'sub_pages' = collection of pages for displaying but not remembered as last visited.
  */
-function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
+function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 	global $ZBX_MENU;
 
 	$denied_page_requested = false;
 	$page_exists = false;
-	$deny = false;
+	$deny = !defined('ZBX_PAGE_NO_AUTHORIZATION');
 
 	foreach ($ZBX_MENU as $label => $menu) {
 		$show_menu = true;
@@ -346,18 +332,11 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			$row = array(
 				'menu_text' => isset($sub_page['label']) ? $sub_page['label'] : '',
 				'menu_url' => $sub_page['url'],
-				'menu_action' => array_key_exists('action', $sub_page) ? $sub_page['action'] : null,
 				'class' => 'highlight',
 				'selected' => false
 			);
-
-			if ($action == null) {
-				$sub_menu_active = ($page['file'] == $sub_page['url']);
-				$sub_menu_active |= (isset($sub_page['sub_pages']) && str_in_array($page['file'], $sub_page['sub_pages']));
-			}
-			else {
-				$sub_menu_active = array_key_exists('active_if', $sub_page) && str_in_array($action, $sub_page['active_if']);
-			}
+			$sub_menu_active = ($page['file'] == $sub_page['url']);
+			$sub_menu_active |= (isset($sub_page['sub_pages']) && str_in_array($page['file'], $sub_page['sub_pages']));
 
 			if ($sub_menu_active) {
 				// permition check
@@ -387,12 +366,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			continue;
 		}
 
-		if ($sub_menus[$label][$menu['default_page_id']]['menu_action'] === null) {
-			$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'];
-		}
-		else {
-			$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'].'?action='.$sub_menus[$label][$menu['default_page_id']]['menu_action'];
-		}
+		$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'];
 		$mmenu_entry = new CCol($menu['label'], $menu_class);
 		$mmenu_entry->setAttribute('id', $label);
 		$mmenu_entry->addAction('onclick', 'javascript: redirect(\''.$menu_url.'\');');

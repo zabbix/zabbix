@@ -1,5 +1,7 @@
 <script type="text/javascript">
 	jQuery(function($) {
+		chkbxRange.pageGoName = "itemids";
+
 		/**
 		 * Make so that all visible table rows would alternate colors
 		 */

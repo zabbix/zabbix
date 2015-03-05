@@ -34,8 +34,15 @@ class testPageEvents extends CWebTest {
 		$this->zbxTestTextPresent('Group');
 		$this->zbxTestTextPresent('Host');
 		$this->zbxTestTextPresent('Source');
+		$this->zbxTestTextPresent('Filter');
 		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextPresent(array('Time', 'Host', 'Description', 'Status', 'Severity', 'Duration', 'Ack', 'Actions'));
+		// table header
+		if (0 == DBcount('select * from events where source='.EVENT_SOURCE_TRIGGERS)) {
+			$this->zbxTestTextPresent('No events defined.');
+		}
+		else {
+			$this->zbxTestTextPresent(array('Time', 'Description', 'Status', 'Severity', 'Duration', 'Ack', 'Actions'));
+		}
 	}
 
 	public function testPageEvents_Discovery_CheckLayout() {
@@ -46,8 +53,15 @@ class testPageEvents extends CWebTest {
 		$this->zbxTestCheckTitle('Latest events \[refreshed every 30 sec.\]');
 		$this->zbxTestTextPresent('HISTORY OF EVENTS');
 		$this->zbxTestTextPresent('Source');
+		$this->zbxTestTextPresent('Filter');
 		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextPresent(array('Time', 'IP', 'DNS', 'Description', 'Status'));
+		// table header
+		if (0 == DBcount('select * from events where source='.EVENT_SOURCE_DISCOVERY)) {
+			$this->zbxTestTextPresent('No events defined.');
+		}
+		else {
+			$this->zbxTestTextPresent(array('Time', 'IP', 'DNS', 'Description', 'Status'));
+		}
 	}
 
 	public function testPageEvents_Triggers_NoHostNames() {

@@ -100,6 +100,7 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 
 			$screenItem['resourceid'] = $itemId;
 			$screenItem['screenitemid'] = $itemId;
+			$screenItem['url'] = $this->screenitem['url'];
 
 			$screenItems[] = $screenItem;
 		}

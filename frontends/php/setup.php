@@ -21,8 +21,6 @@
 
 require_once dirname(__FILE__).'/include/classes/core/Z.php';
 
-$page['file'] = 'setup.php';
-
 try {
 	Z::getInstance()->run(ZBase::EXEC_MODE_SETUP);
 }

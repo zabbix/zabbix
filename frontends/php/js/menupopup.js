@@ -119,12 +119,7 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 				clickCallback: function() {
 					var obj = jQuery(this);
 
-					sendAjaxData('zabbix.php?action=dashboard.favourite&operation=delete', {
-						data: {
-							object: favouriteObj,
-							'objectids[]': [item.id]
-						}
-					});
+					rm4favorites(favouriteObj, item.id);
 
 					obj.closest('.menuPopup').fadeOut(100);
 					obj.remove();
@@ -153,12 +148,7 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 				label: t('Remove all'),
 				css: (removeItems.length == 0) ? 'ui-state-disabled' : '',
 				clickCallback: function() {
-					sendAjaxData('zabbix.php?action=dashboard.favourite&operation=delete', {
-						data: {
-							object: favouriteObj,
-							'objectids[]': [0]
-						}
-					});
+					rm4favorites(favouriteObj, 0);
 
 					jQuery(this).closest('.menuPopup').fadeOut(100);
 				}
@@ -398,7 +388,7 @@ function getMenuPopupMap(options) {
 
 		// submap
 		if (typeof options.gotos.submap !== 'undefined') {
-			var url = new Curl('zabbix.php?action=map.view');
+			var url = new Curl('maps.php');
 
 			jQuery.each(options.gotos.submap, function(name, value) {
 				url.setArgument(name, value);
@@ -486,28 +476,14 @@ function getMenuPopupRefresh(options) {
 				var obj = jQuery(this),
 					currentRate = obj.data('value');
 
-
-				// it is a quick solution for slide refresh multiplier, should be replaced with slide.refresh or similar
-				if (options.multiplier) {
-					sendAjaxData('slides.php', {
-						data: jQuery.extend({}, params, {
-							widgetName: options.widgetName,
-							widgetRefreshRate: currentRate
-						}),
-						dataType: 'script',
-						success: function(js) { js }
-					});
-				}
-				else {
-					sendAjaxData('zabbix.php?action=dashboard.widget', {
-						data: jQuery.extend({}, params, {
-							widget: options.widgetName,
-							refreshrate: currentRate
-						}),
-						dataType: 'script',
-						success: function(js) { js }
-					});
-				}
+				sendAjaxData({
+					data: jQuery.extend({}, params, {
+						widgetName: options.widgetName,
+						widgetRefreshRate: currentRate
+					}),
+					dataType: 'script',
+					success: function(js) { js }
+				});
 
 				jQuery('a', obj.closest('ul')).each(function() {
 					var a = jQuery(this),
@@ -594,7 +570,7 @@ function getMenuPopupServiceConfiguration(options) {
  * Get menu popup trigger section data.
  *
  * @param string options['triggerid']				trigger id
- * @param object options['items']					link to trigger item history page (optional)
+ * @param array  options['items']					link to trigger item history page (optional)
  * @param string options['items'][]['name']			item name
  * @param object options['items'][]['params']		item url parameters ("name" => "value")
  * @param object options['acknowledge']				link to acknowledge page (optional)
@@ -618,7 +594,7 @@ function getMenuPopupTrigger(options) {
 
 	items[items.length] = {
 		label: t('Events'),
-		css: (typeof options.showEvents !== 'undefined' && options.showEvents) ? '' : 'ui-state-disabled',
+		css: options.showEvents ? '' : 'ui-state-disabled',
 		url: url.getUrl()
 	};
 
@@ -637,8 +613,9 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// configuration
-	if (typeof options.configuration !== 'undefined' && options.configuration) {
-		var url = new Curl('triggers.php?form=update&triggerid=' + options.triggerid);
+	if (typeof options.configuration !== 'undefined' && options.configuration !== null) {
+		var url = new Curl('triggers.php?triggerid=' + options.triggerid + '&hostid=' + options.configuration.hostid
+				+ '&form=update');
 
 		items[items.length] = {
 			label: t('Configuration'),
@@ -660,7 +637,7 @@ function getMenuPopupTrigger(options) {
 	};
 
 	// items
-	if (typeof options.items !== 'undefined' && objectSize(options.items) > 0) {
+	if (typeof options.items !== 'undefined' && options.items.length > 0) {
 		var items = [];
 
 		jQuery.each(options.items, function(i, item) {

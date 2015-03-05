@@ -589,26 +589,22 @@ function set_color_by_name(id, color) {
 	set_color(color);
 }
 
-/**
- * Add object to the list of favourites.
- */
-function add2favorites(object, objectid) {
-	sendAjaxData('zabbix.php?action=favourite.create', {
+function add2favorites(favobj, favid) {
+	sendAjaxData({
 		data: {
-			object: object,
-			objectid: objectid
+			favobj: favobj,
+			favid: favid,
+			favaction: 'add'
 		}
 	});
 }
 
-/**
- * Remove object from the list of favourites. Remove all favourites if objectid==0.
- */
-function rm4favorites(object, objectid) {
-	sendAjaxData('zabbix.php?action=favourite.delete', {
+function rm4favorites(favobj, favid) {
+	sendAjaxData({
 		data: {
-			object: object,
-			objectid: objectid
+			favobj: favobj,
+			favid: favid,
+			favaction: 'remove'
 		}
 	});
 }
@@ -631,7 +627,7 @@ function changeFlickerState(id, titleWhenVisible, titleWhenHidden) {
 
 	jQuery('#flicker_title').html(title);
 
-	sendAjaxData(location.href, {
+	sendAjaxData({
 		data: {
 			filterState: state
 		}
@@ -659,10 +655,10 @@ function changeWidgetState(obj, widgetId) {
 		state = 1;
 	}
 
-	sendAjaxData('zabbix.php?action=dashboard.widget', {
+	sendAjaxData({
 		data: {
-			widget: widgetId,
-			state: state
+			widgetName: widgetId,
+			widgetState: state
 		}
 	});
 }
@@ -670,18 +666,18 @@ function changeWidgetState(obj, widgetId) {
 /**
  * Send ajax data.
  *
- * @param string url
  * @param object options
  */
-function sendAjaxData(url, options) {
-	var url = new Curl(url);
-	url.setArgument('output', 'ajax');
-	url.addSID();
+function sendAjaxData(options) {
+	var url = new Curl(location.href);
+	url.setQuery('?output=ajax');
 
-	options.type = 'post';
-	options.url = url.getUrl();
+	var defaults = {
+		type: 'post',
+		url: url.getUrl()
+	};
 
-	jQuery.ajax(options);
+	jQuery.ajax(jQuery.extend({}, defaults, options));
 }
 
 /**

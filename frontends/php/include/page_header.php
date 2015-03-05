@@ -272,16 +272,9 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 				$sub_page['menu_text'] = SPACE;
 			}
 
-			$url = new CUrl($sub_page['menu_url']);
-			if ($sub_page['menu_action'] !== null) {
-				$url->setArgument('action', $sub_page['menu_action']);
-			}
-			else {
-				$url->setArgument('ddreset', 1);
-			}
-			$url->removeArgument('sid');
+			$sub_page['menu_url'] .= '?ddreset=1';
 
-			$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl(), $sub_page['class'].' nowrap', null, false);
+			$sub_menu_item = new CLink($sub_page['menu_text'], $sub_page['menu_url'], $sub_page['class'].' nowrap');
 			if ($sub_page['selected']) {
 				$sub_menu_item = new CSpan($sub_menu_item, 'active nowrap');
 			}

@@ -40,15 +40,13 @@ class CScreenTriggersOverview extends CScreenBase {
 
 		$options = array(
 			'output' => array(
-				'triggerid', 'expression', 'description', 'url', 'value', 'priority', 'lastchange', 'flags'
+				'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
 			),
 			'selectHosts' => array('hostid', 'name', 'status'),
-			'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
 			'hostids' => $hostIds,
 			'monitored' => true,
 			'skipDependent' => true,
-			'sortfield' => 'description',
-			'preservekeys' => true
+			'sortfield' => 'description'
 		);
 
 		// application filter
@@ -62,8 +60,6 @@ class CScreenTriggersOverview extends CScreenBase {
 		}
 
 		$triggers = API::Trigger()->get($options);
-
-		$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
 
 		return $this->getOutput(getTriggersOverview($hosts, $triggers, $this->pageFile, $this->screenitem['style'],
 			$this->screenid

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 23:40+0200\n"
+"POT-Creation-Date: 2015-01-15 18:42+0200\n"
 "PO-Revision-Date: 2013-12-10 22:17+0300\n"
 "Last-Translator: Robert <szenasy.robert@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -31,7 +31,7 @@ msgid_plural "%1$d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/blocks.inc.php:1149
+#: include/blocks.inc.php:1146
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
@@ -111,9 +111,9 @@ msgstr ""
 msgid "(0 - infinitely)"
 msgstr "(0 - végtelen)"
 
-#: include/views/configuration.host.edit.php:256
+#: include/views/configuration.host.edit.php:229
 #: include/views/configuration.hostgroups.list.php:31
-#: include/views/configuration.template.edit.php:119
+#: include/views/configuration.template.edit.php:121
 msgid "(Only super admins can create groups)"
 msgstr ""
 
@@ -129,8 +129,8 @@ msgstr "(másodpercekben)"
 msgid "(minimum 60 seconds, 0 - use action default)"
 msgstr "(minimum 60 másodperc, 0 - alapértelmezett használata)"
 
-#: include/views/configuration.host.edit.php:438
-#: include/views/configuration.host.edit.php:459
+#: include/views/configuration.host.edit.php:410
+#: include/views/configuration.host.edit.php:431
 #: include/views/configuration.host.massupdate.php:165
 #: include/views/configuration.host.prototype.edit.php:153
 msgid "(no proxy)"
@@ -140,7 +140,7 @@ msgstr "(nincs proxy)"
 msgid "(with warnings)"
 msgstr ""
 
-#: include/blocks.inc.php:1351
+#: include/blocks.inc.php:1348
 msgid "-"
 msgstr ""
 
@@ -148,11 +148,11 @@ msgstr ""
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[CSOPORTOS VISSZAIGAZOLÁS]----"
 
-#: include/triggers.inc.php:2086 include/triggers.inc.php:2087
-#: include/triggers.inc.php:2088 include/triggers.inc.php:2090
-#: include/triggers.inc.php:2092 include/triggers.inc.php:2095
-#: include/triggers.inc.php:2099 include/triggers.inc.php:2100
-#: include/triggers.inc.php:2112
+#: include/triggers.inc.php:2105 include/triggers.inc.php:2106
+#: include/triggers.inc.php:2107 include/triggers.inc.php:2109
+#: include/triggers.inc.php:2111 include/triggers.inc.php:2114
+#: include/triggers.inc.php:2118 include/triggers.inc.php:2119
+#: include/triggers.inc.php:2131
 msgid "0 or 1"
 msgstr "0 vagy 1"
 
@@ -253,13 +253,13 @@ msgid "Account is blocked for %s seconds"
 msgstr "A fiók %s másidpercig zárolva."
 
 #: events.php:476 include/actions.inc.php:186 include/actions.inc.php:374
-#: include/blocks.inc.php:1029 include/blocks.inc.php:1324
+#: include/blocks.inc.php:1026 include/blocks.inc.php:1321
 #: include/events.inc.php:197 include/events.inc.php:272
 #: include/views/configuration.action.edit.php:1080
 msgid "Ack"
 msgstr "Nyugtázom"
 
-#: acknow.php:233 jsLoader.php:181 tr_status.php:654
+#: acknow.php:233 jsLoader.php:181 tr_status.php:678
 msgid "Acknowledge"
 msgstr "Visszaigazolás"
 
@@ -279,7 +279,7 @@ msgstr "Nyugtázás és visszatérés"
 msgid "Acknowledge status"
 msgstr "Nyugtázás állapota"
 
-#: include/events.inc.php:182 tr_status.php:296 tr_status.php:665
+#: include/events.inc.php:182 tr_status.php:296 tr_status.php:689
 msgid "Acknowledged"
 msgstr "Nyugtázva"
 
@@ -315,7 +315,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:1107
 #: include/views/configuration.graph.edit.php:239
 #: include/views/configuration.host.discovery.edit.php:198
-#: include/views/configuration.host.edit.php:733
+#: include/views/configuration.host.edit.php:705
 #: include/views/configuration.host.prototype.edit.php:216
 #: include/views/configuration.item.edit.php:268
 #: include/views/configuration.item.massupdate.php:321
@@ -323,7 +323,7 @@ msgstr ""
 #: include/views/configuration.services.edit.php:96
 #: include/views/configuration.services.edit.php:135
 #: include/views/configuration.slideconf.edit.php:52
-#: include/views/configuration.template.edit.php:384
+#: include/views/configuration.template.edit.php:411
 #: include/views/configuration.triggers.edit.php:155
 #: include/views/configuration.triggers.edit.php:282
 #: include/views/configuration.triggers.massupdate.php:88 tr_logform.php:273
@@ -358,13 +358,13 @@ msgstr "Eljárás hozzáadva"
 msgid "Action deleted"
 msgstr "Eljárás törölve"
 
-#: actionconf.php:362
+#: actionconf.php:360
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: actionconf.php:361
+#: actionconf.php:359
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -385,7 +385,7 @@ msgstr "Eljárás műveletei"
 msgid "Action updated"
 msgstr "Eljárás frissítve"
 
-#: events.php:477 include/blocks.inc.php:1030 include/blocks.inc.php:1325
+#: events.php:477 include/blocks.inc.php:1027 include/blocks.inc.php:1322
 #: include/events.inc.php:198 include/menu.inc.php:185
 #: include/views/configuration.action.list.php:40
 msgid "Actions"
@@ -423,21 +423,21 @@ msgstr "Aktív eddig"
 #: include/views/administration.general.iconmap.edit.php:119
 #: include/views/administration.general.iconmap.edit.php:154
 #: include/views/administration.general.image.edit.php:63
-#: include/views/administration.general.regularexpressions.edit.php:72
-#: include/views/administration.general.regularexpressions.edit.php:81
-#: include/views/administration.general.regularexpressions.edit.php:125
+#: include/views/administration.general.regularexpressions.edit.php:47
+#: include/views/administration.general.regularexpressions.edit.php:56
+#: include/views/administration.general.regularexpressions.edit.php:100
 #: include/views/administration.general.valuemapping.edit.php:41
 #: include/views/administration.general.valuemapping.edit.php:69
-#: include/views/administration.mediatypes.edit.php:116
+#: include/views/administration.mediatypes.edit.php:119
 #: include/views/administration.proxy.edit.php:107
 #: include/views/administration.script.edit.php:128
 #: include/views/administration.usergroups.edit.php:106
 #: include/views/administration.usergroups.edit.php:114
 #: include/views/administration.usergroups.edit.php:122
 #: include/views/administration.usergroups.edit.php:157
-#: include/views/administration.users.edit.php:68
-#: include/views/administration.users.edit.php:219
-#: include/views/administration.users.edit.php:353
+#: include/views/administration.users.edit.php:69
+#: include/views/administration.users.edit.php:220
+#: include/views/administration.users.edit.php:357
 #: include/views/common.filter.trigger.php:128
 #: include/views/common.macros.php:69
 #: include/views/configuration.action.edit.php:358
@@ -455,12 +455,12 @@ msgstr "Aktív eddig"
 #: include/views/configuration.host.discovery.edit.php:237
 #: include/views/configuration.host.discovery.edit.php:326
 #: include/views/configuration.host.discovery.edit.php:365
-#: include/views/configuration.host.edit.php:299
-#: include/views/configuration.host.edit.php:316
-#: include/views/configuration.host.edit.php:332
-#: include/views/configuration.host.edit.php:347
-#: include/views/configuration.host.edit.php:783
-#: include/views/configuration.host.edit.php:954
+#: include/views/configuration.host.edit.php:271
+#: include/views/configuration.host.edit.php:288
+#: include/views/configuration.host.edit.php:304
+#: include/views/configuration.host.edit.php:319
+#: include/views/configuration.host.edit.php:755
+#: include/views/configuration.host.edit.php:926
 #: include/views/configuration.hostgroups.edit.php:73
 #: include/views/configuration.host.prototype.edit.php:195
 #: include/views/configuration.host.prototype.edit.php:258
@@ -482,8 +482,8 @@ msgstr "Aktív eddig"
 #: include/views/configuration.slideconf.edit.php:118
 #: include/views/configuration.sysmap.edit.php:173
 #: include/views/configuration.sysmap.edit.php:200
-#: include/views/configuration.template.edit.php:437
-#: include/views/configuration.template.edit.php:477
+#: include/views/configuration.template.edit.php:464
+#: include/views/configuration.template.edit.php:504
 #: include/views/configuration.triggers.edit.php:81
 #: include/views/configuration.triggers.edit.php:104
 #: include/views/configuration.triggers.edit.php:318
@@ -501,7 +501,7 @@ msgstr "Aktív eddig"
 #: include/views/js/configuration.sysmaps.js.php:406
 #: include/views/monitoring.history.php:131 jsLoader.php:182
 #: popup_bitem.php:177 popup_media.php:145 popup_period.php:148
-#: tr_logform.php:262 tr_logform.php:356 tr_status.php:709
+#: tr_logform.php:262 tr_logform.php:356 tr_status.php:733
 msgid "Add"
 msgstr "Hozzáadás"
 
@@ -570,7 +570,7 @@ msgstr "Adminisztráció"
 msgid "Advanced labels"
 msgstr ""
 
-#: include/blocks.inc.php:1027 include/blocks.inc.php:1322
+#: include/blocks.inc.php:1024 include/blocks.inc.php:1319
 #: include/events.inc.php:196 include/events.inc.php:272
 #: include/events.inc.php:275 tr_status.php:294
 msgid "Age"
@@ -595,8 +595,8 @@ msgstr "Ügynök"
 msgid "Agent host name defined in the configuration file. String value."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:307
-#: include/views/configuration.host.edit.php:391
+#: include/views/configuration.host.edit.php:279
+#: include/views/configuration.host.edit.php:363
 #: include/views/configuration.host.prototype.edit.php:107
 #: include/views/inventory.host.view.php:103
 msgid "Agent interfaces"
@@ -610,7 +610,7 @@ msgstr ""
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
 msgstr ""
 
-#: include/hosts.inc.php:114 include/views/administration.users.edit.php:50
+#: include/hosts.inc.php:114 include/views/administration.users.edit.php:51
 #: include/views/administration.users.list.php:54 popup.php:595 users.php:44
 msgid "Alias"
 msgstr "Másodlagos név"
@@ -657,7 +657,7 @@ msgstr "Engedélyezett hosztok"
 msgid "Amount of memory size in bytes. If mode is missing total is used."
 msgstr ""
 
-#: include/triggers.inc.php:1539
+#: include/triggers.inc.php:1558
 #: include/views/configuration.action.edit.php:127
 #: include/views/configuration.action.edit.php:1027
 #: include/views/configuration.host.discovery.edit.php:278
@@ -724,16 +724,16 @@ msgstr ""
 
 #: include/forms.inc.php:893 include/html.inc.php:366 include/html.inc.php:370
 #: include/views/configuration.application.list.php:47
-#: include/views/configuration.host.edit.php:485
+#: include/views/configuration.host.edit.php:457
 #: include/views/configuration.host.list.php:78
 #: include/views/configuration.host.list.php:93
 #: include/views/configuration.item.edit.php:406
 #: include/views/configuration.item.list.php:72
 #: include/views/configuration.item.prototype.list.php:53
-#: include/views/configuration.template.edit.php:169
+#: include/views/configuration.template.edit.php:196
 #: include/views/conf.import.php:32 include/views/inventory.host.view.php:229
 #: popup.php:55 search.php:140 search.php:169 search.php:197 search.php:394
-#: search.php:422 search.php:454 templates.php:591 templates.php:649
+#: search.php:422 search.php:454 templates.php:514 templates.php:572
 msgid "Applications"
 msgstr "Alkalmazások"
 
@@ -865,8 +865,8 @@ msgstr "Augusztus"
 msgid "Authentication"
 msgstr "Authentikáció"
 
-#: include/views/configuration.host.edit.php:818
-#: include/views/configuration.host.edit.php:830
+#: include/views/configuration.host.edit.php:790
+#: include/views/configuration.host.edit.php:802
 #: include/views/configuration.host.prototype.edit.php:271
 msgid "Authentication algorithm"
 msgstr "Autentikációs algoritmus"
@@ -909,11 +909,11 @@ msgstr ""
 msgid "Auto registration"
 msgstr "Automatikus regisztráció"
 
-#: include/views/administration.users.edit.php:163
+#: include/views/administration.users.edit.php:164
 msgid "Auto-login"
 msgstr "Automatikus belépés"
 
-#: include/views/administration.users.edit.php:164 profile.php:50 users.php:61
+#: include/views/administration.users.edit.php:165 profile.php:50 users.php:61
 msgid "Auto-logout (min 90 seconds)"
 msgstr "Automatikus kijelentkezés (minimum 90 mp)"
 
@@ -930,7 +930,7 @@ msgstr ""
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:877
+#: include/views/configuration.host.edit.php:849
 #: include/views/configuration.host.massupdate.php:287
 #: include/views/configuration.host.prototype.edit.php:313
 msgid "Automatic"
@@ -1064,7 +1064,7 @@ msgstr "Világosabb"
 msgid "Bulgarian (bg_BG)"
 msgstr ""
 
-#: tr_status.php:794
+#: tr_status.php:818
 msgid "Bulk acknowledge"
 msgstr "Csoportos visszaigazolás"
 
@@ -1179,8 +1179,7 @@ msgstr "HÁLÓZATI TÉRKÉPEK KONFIGURÁLÁSA"
 msgid "CONFIGURATION OF PROXIES"
 msgstr "PROXY KONFIGURÁLÁSA"
 
-#: include/views/administration.general.regularexpressions.edit.php:47
-#: include/views/administration.general.regularexpressions.list.php:45
+#: adm.regexps.php:221
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
 msgstr "REGULÁRIS KIFEJEZÉSEK KONFIGURÁLÁSA"
 
@@ -1200,7 +1199,7 @@ msgstr "SCRIPTEK KONFIGURÁLÁSA"
 msgid "CONFIGURATION OF SLIDE SHOWS"
 msgstr "BEMUTATÓK KONFIGURÁLÁSA"
 
-#: templates.php:434 templates.php:576
+#: templates.php:434 templates.php:499
 msgid "CONFIGURATION OF TEMPLATES"
 msgstr "SABLONOK KONFIGURÁLÁSA"
 
@@ -1216,7 +1215,7 @@ msgstr ""
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:43
-#: include/views/configuration.triggers.massupdate.php:42 triggers.php:376
+#: include/views/configuration.triggers.massupdate.php:42 triggers.php:359
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "TRIGGEREK KONFIGURÁLÁSA"
 
@@ -1300,7 +1299,7 @@ msgstr "Kanada (136 karakter)"
 
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:128 include/js.inc.php:171
-#: include/views/administration.general.regularexpressions.edit.php:83
+#: include/views/administration.general.regularexpressions.edit.php:58
 #: include/views/configuration.action.edit.php:1088
 #: include/views/configuration.action.edit.php:1097
 #: include/views/configuration.maintenance.edit.php:147
@@ -1369,11 +1368,12 @@ msgstr "Grafikon hozzáadása nem sikerült"
 msgid "Cannot add graph prototype"
 msgstr ""
 
-#: hostgroups.php:183 usergrps.php:196
+#: hostgroups.php:121 usergrps.php:196
 msgid "Cannot add group"
 msgstr "Csoport létrehozása sikertelen"
 
 #: include/classes/api/services/CTemplate.php:379
+#: include/classes/api/services/CTemplate.php:830
 msgid "Cannot add group."
 msgstr ""
 
@@ -1445,7 +1445,7 @@ msgstr "Proxy létrehozása sikertelen"
 msgid "Cannot add regular expression"
 msgstr "Reguláris kifejezés hozzáadása nem sikerült"
 
-#: screenconf.php:166
+#: screenconf.php:169
 msgid "Cannot add screen"
 msgstr "Képernyő létrehozása sikertelen"
 
@@ -1465,11 +1465,11 @@ msgstr "Bemutató hozzáadása sikertelen"
 msgid "Cannot add template"
 msgstr "A mintát nem lehet létrehozni"
 
-#: triggers.php:215 triggers.php:345 tr_logform.php:149
+#: triggers.php:198 triggers.php:328 tr_logform.php:149
 msgid "Cannot add trigger"
 msgstr "Triggerek létrehozása sikertelen"
 
-#: trigger_prototypes.php:184
+#: trigger_prototypes.php:166
 msgid "Cannot add trigger prototype"
 msgstr ""
 
@@ -1567,6 +1567,10 @@ msgstr ""
 msgid "Cannot create discovery rule"
 msgstr ""
 
+#: include/classes/api/services/CHost.php:1073
+msgid "Cannot create host group."
+msgstr ""
+
 #: adm.iconmapping.php:82
 msgid "Cannot create icon map"
 msgstr ""
@@ -1594,7 +1598,7 @@ msgstr "Nem hozható létre új elem."
 msgid "Cannot create template."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1315
+#: include/classes/api/services/CUser.php:1317
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr ""
@@ -1658,7 +1662,7 @@ msgstr "A grafikonok törlése nem sikerült"
 msgid "Cannot delete graphs created by low level discovery."
 msgstr ""
 
-#: hostgroups.php:228 hostgroups.php:250 usergrps.php:229 usergrps.php:260
+#: hostgroups.php:171 hostgroups.php:193 usergrps.php:229 usergrps.php:260
 #, fuzzy
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
@@ -1668,6 +1672,10 @@ msgstr[1] "Csoport törlése sikertelen"
 #: hosts.php:632 hosts.php:645
 msgid "Cannot delete host"
 msgstr "Hoszt törlése sikertelen"
+
+#: include/classes/api/services/CHost.php:1084
+msgid "Cannot delete host group."
+msgstr "Hoszt csoport törlése sikertelen."
 
 #: include/classes/api/services/CDiscoveryRule.php:443
 msgid "Cannot delete host prototype."
@@ -1685,7 +1693,7 @@ msgstr ""
 msgid "Cannot delete image"
 msgstr "Nem sikerült a képet törölni"
 
-#: include/classes/api/services/CHost.php:1159
+#: include/classes/api/services/CHost.php:1170
 msgid "Cannot delete inventory."
 msgstr ""
 
@@ -1728,7 +1736,7 @@ msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Reguláris kifejezés törlése nem sikerült"
 msgstr[1] "Reguláris kifejezés törlése nem sikerült"
 
-#: screenconf.php:237
+#: screenconf.php:240
 msgid "Cannot delete screen"
 msgstr ""
 
@@ -1750,7 +1758,7 @@ msgstr ""
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
-#: actionconf.php:380
+#: actionconf.php:378
 msgid "Cannot delete selected actions"
 msgstr ""
 
@@ -1802,19 +1810,19 @@ msgstr ""
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr ""
 
-#: triggers.php:233
+#: triggers.php:216
 msgid "Cannot delete trigger"
 msgstr "Trigger törlése sikertelen"
 
-#: trigger_prototypes.php:199
+#: trigger_prototypes.php:181
 msgid "Cannot delete trigger prototype"
 msgstr ""
 
-#: trigger_prototypes.php:276
+#: trigger_prototypes.php:258
 msgid "Cannot delete trigger prototypes"
 msgstr ""
 
-#: triggers.php:357
+#: triggers.php:340
 msgid "Cannot delete triggers"
 msgstr "Triggerek törlése sikertelen"
 
@@ -1834,7 +1842,7 @@ msgstr "Az érték-hozzárendelést nem lehet törölni"
 msgid "Cannot delete web scenario"
 msgstr ""
 
-#: actionconf.php:365
+#: actionconf.php:363
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1852,7 +1860,7 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] ""
 msgstr[1] ""
 
-#: hostgroups.php:300 hosts.php:676 proxies.php:192
+#: hostgroups.php:243 hosts.php:676 proxies.php:192
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] ""
@@ -1882,13 +1890,13 @@ msgid_plural "Cannot disable media types"
 msgstr[0] ""
 msgstr[1] ""
 
-#: triggers.php:306
+#: triggers.php:289
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: trigger_prototypes.php:266
+#: trigger_prototypes.php:248
 msgid "Cannot disable trigger prototype"
 msgid_plural "Cannot disable trigger prototypes"
 msgstr[0] ""
@@ -1914,7 +1922,7 @@ msgstr ""
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
-#: actionconf.php:364
+#: actionconf.php:362
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -1932,7 +1940,7 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] ""
 msgstr[1] ""
 
-#: hostgroups.php:299 hosts.php:675 proxies.php:191
+#: hostgroups.php:242 hosts.php:675 proxies.php:191
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] ""
@@ -1962,13 +1970,13 @@ msgid_plural "Cannot enable media types"
 msgstr[0] ""
 msgstr[1] ""
 
-#: triggers.php:305
+#: triggers.php:288
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: trigger_prototypes.php:265
+#: trigger_prototypes.php:247
 msgid "Cannot enable trigger prototype"
 msgid_plural "Cannot enable trigger prototypes"
 msgstr[0] ""
@@ -1987,7 +1995,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: include/classes/import/CXmlImport18.php:695
-#: include/classes/import/importers/CMapImporter.php:318
+#: include/classes/import/importers/CMapImporter.php:188
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
 msgstr ""
@@ -1999,7 +2007,7 @@ msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
 msgstr ""
 
 #: include/classes/import/CXmlImport18.php:746
-#: include/classes/import/importers/CMapImporter.php:213
+#: include/classes/import/importers/CMapImporter.php:209
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
 msgstr ""
@@ -2011,7 +2019,7 @@ msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
 msgstr ""
 
 #: include/classes/import/CXmlImport18.php:760
-#: include/classes/import/importers/CMapImporter.php:221
+#: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr ""
@@ -2036,12 +2044,12 @@ msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr ""
 
 #: include/classes/import/CXmlImport18.php:796
-#: include/classes/import/importers/CMapImporter.php:254
+#: include/classes/import/importers/CMapImporter.php:250
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/importers/CMapImporter.php:308
+#: include/classes/import/importers/CMapImporter.php:180
 #, c-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr ""
@@ -2097,7 +2105,7 @@ msgstr ""
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/importers/CMapImporter.php:205
+#: include/classes/import/importers/CMapImporter.php:201
 #, c-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr ""
@@ -2125,8 +2133,8 @@ msgstr ""
 
 #: include/classes/import/CXmlImport18.php:774
 #: include/classes/import/CXmlImport18.php:822
-#: include/classes/import/importers/CMapImporter.php:232
-#: include/classes/import/importers/CMapImporter.php:277
+#: include/classes/import/importers/CMapImporter.php:228
+#: include/classes/import/importers/CMapImporter.php:273
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr ""
@@ -2149,7 +2157,7 @@ msgstr ""
 msgid "Cannot format tree."
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:801
+#: include/classes/api/services/CTemplate.php:795
 msgid "Cannot have empty visible template name."
 msgstr ""
 
@@ -2188,12 +2196,12 @@ msgstr ""
 msgid "Cannot insert user media."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1137
+#: include/classes/api/services/CHost.php:1148
 msgid "Cannot link template"
 msgstr "Minta csatolása sikertelen"
 
-#: include/classes/api/services/CTemplate.php:888
-#: include/classes/api/services/CTemplate.php:902
+#: include/classes/api/services/CTemplate.php:917
+#: include/classes/api/services/CTemplate.php:932
 msgid "Cannot link template."
 msgstr ""
 
@@ -2205,19 +2213,19 @@ msgstr ""
 msgid "Cannot logout."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:992
+#: include/classes/api/services/CHost.php:969
 msgid "Cannot mass update host name."
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:1023
+#: include/classes/api/services/CTemplate.php:1021
 msgid "Cannot mass update template name."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:982
+#: include/classes/api/services/CHost.php:959
 msgid "Cannot mass update visible host name."
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:988
+#: include/classes/api/services/CTemplate.php:986
 msgid "Cannot mass update visible template name."
 msgstr ""
 
@@ -2252,6 +2260,10 @@ msgstr ""
 
 #: include/views/js/monitoring.history.js.php:36
 msgid "Cannot remove all items, at least one item should remain."
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:843
+msgid "Cannot remove group."
 msgstr ""
 
 #: adm.macros.php:104
@@ -2302,8 +2314,8 @@ msgstr ""
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:616
-#: include/classes/api/services/CHost.php:1046
+#: include/classes/api/services/CHost.php:583
+#: include/classes/api/services/CHost.php:1023
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr ""
 
@@ -2320,49 +2332,49 @@ msgstr ""
 msgid "Cannot unblock users"
 msgstr "Felhasználói-státusz engedélyezése sikertelen"
 
-#: include/classes/api/services/CHostGeneral.php:516
+#: include/classes/api/services/CHostGeneral.php:512
 msgid "Cannot unlink and clear Web scenarios."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:569
+#: include/classes/api/services/CHostGeneral.php:565
 msgid "Cannot unlink and clear applications."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:343
+#: include/classes/api/services/CHostGeneral.php:339
 msgid "Cannot unlink and clear discovery rules"
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:460
+#: include/classes/api/services/CHostGeneral.php:456
 msgid "Cannot unlink and clear graph prototypes"
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:477
+#: include/classes/api/services/CHostGeneral.php:473
 msgid "Cannot unlink and clear graphs."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:377
+#: include/classes/api/services/CHostGeneral.php:373
 msgid "Cannot unlink and clear item prototypes"
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:360
+#: include/classes/api/services/CHostGeneral.php:356
 msgid "Cannot unlink and clear items"
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:283
-#: include/classes/api/services/CHostGeneral.php:300
+#: include/classes/api/services/CHostGeneral.php:279
+#: include/classes/api/services/CHostGeneral.php:296
 msgid "Cannot unlink and clear triggers"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1112
+#: include/classes/api/services/CHost.php:1123
 msgid "Cannot unlink template"
 msgstr "Minta leválasztása sikertelen"
 
-#: include/classes/api/services/CTemplate.php:853
-#: include/classes/api/services/CTemplate.php:876
+#: include/classes/api/services/CTemplate.php:879
+#: include/classes/api/services/CTemplate.php:902
 msgid "Cannot unlink template."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:238
+#: include/classes/api/services/CHostGeneral.php:234
 #, c-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr ""
@@ -2372,7 +2384,7 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:491
+#: include/classes/api/services/CHostGroup.php:490
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
 msgstr ""
@@ -2387,7 +2399,7 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:596
+#: include/classes/api/services/CHost.php:558
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr ""
@@ -2436,7 +2448,7 @@ msgstr ""
 msgid "Cannot update a discovered graph."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:506
+#: include/classes/api/services/CHostGroup.php:505
 msgid "Cannot update a discovered host group."
 msgstr ""
 
@@ -2478,7 +2490,7 @@ msgstr "A grafikon frissítése nem sikerült"
 msgid "Cannot update graph prototype"
 msgstr ""
 
-#: hostgroups.php:74 usergrps.php:189
+#: hostgroups.php:72 usergrps.php:189
 msgid "Cannot update group"
 msgstr "Csoport frissítése sikertelen"
 
@@ -2486,9 +2498,9 @@ msgstr "Csoport frissítése sikertelen"
 msgid "Cannot update group."
 msgstr "Csoport frissítése sikertelen."
 
-#: include/classes/api/services/CHostGroup.php:901
-#: include/classes/api/services/CHostGroup.php:1004
-#: include/classes/api/services/CHostGroup.php:1145
+#: include/classes/api/services/CHostGroup.php:760
+#: include/classes/api/services/CHostGroup.php:818
+#: include/classes/api/services/CHostGroup.php:878
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr ""
@@ -2568,7 +2580,7 @@ msgstr ""
 msgid "Cannot update regular expression"
 msgstr "Reguláris kifejezés frissítése nem sikerült"
 
-#: screenconf.php:131 screenedit.php:231 screenedit.php:248
+#: screenconf.php:134 screenedit.php:231 screenedit.php:248
 msgid "Cannot update screen"
 msgstr "Képernyő frissítése sikertelen"
 
@@ -2592,21 +2604,21 @@ msgstr "Minta frissítése sikertelen"
 msgid "Cannot update templated applications."
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:756
-#: include/classes/api/services/CTemplate.php:1086
+#: include/classes/api/services/CTemplate.php:750
+#: include/classes/api/services/CTemplate.php:1084
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr ""
 
-#: triggers.php:211 triggers.php:272 tr_logform.php:124
+#: triggers.php:194 triggers.php:255 tr_logform.php:124
 msgid "Cannot update trigger"
 msgstr "A triggert nem lehet frissíteni"
 
-#: trigger_prototypes.php:179
+#: trigger_prototypes.php:161
 msgid "Cannot update trigger prototype"
 msgstr ""
 
-#: trigger_prototypes.php:227
+#: trigger_prototypes.php:209
 msgid "Cannot update trigger prototypes"
 msgstr ""
 
@@ -2638,16 +2650,16 @@ msgstr ""
 msgid "Caption"
 msgstr "Felirat"
 
-#: include/views/administration.general.regularexpressions.edit.php:69
-#: include/views/administration.general.regularexpressions.edit.php:79
+#: include/views/administration.general.regularexpressions.edit.php:44
+#: include/views/administration.general.regularexpressions.edit.php:54
 msgid "Case sensitive"
 msgstr "Kis/nagybetű érzékeny"
 
-#: include/classes/items/CHelpItems.php:809
+#: include/classes/items/CHelpItems.php:797
 msgid "Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:805
+#: include/classes/items/CHelpItems.php:793
 msgid "Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface."
 msgstr ""
 
@@ -2669,12 +2681,12 @@ msgstr "Módosít"
 
 #: include/views/administration.authentication.edit.php:108
 #: include/views/administration.mediatypes.edit.php:69
-#: include/views/administration.users.edit.php:95
+#: include/views/administration.users.edit.php:96
 msgid "Change password"
 msgstr "Jelszó módosítása"
 
 #: include/forms.inc.php:416 include/items.inc.php:125
-#: include/triggers.inc.php:2063 include/views/configuration.item.edit.php:216
+#: include/triggers.inc.php:2082 include/views/configuration.item.edit.php:216
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "Betű"
@@ -2786,7 +2798,7 @@ msgstr "Kínai (zh_TW)"
 msgid "Circular link cannot be created for map element \"%s\"."
 msgstr ""
 
-#: include/classes/import/importers/CMapImporter.php:116
+#: include/classes/import/importers/CMapImporter.php:89
 #, c-format
 msgid "Circular reference in maps: %1$s."
 msgstr ""
@@ -2814,15 +2826,15 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
-#: include/views/configuration.httpconf.list.php:149
-#: include/views/configuration.item.list.php:273
-msgid "Clear history"
-msgstr ""
-
 #: include/views/configuration.httpconf.edit.php:272
 #: include/views/configuration.item.edit.php:456
 msgid "Clear history and trends"
 msgstr ""
+
+#: include/views/configuration.httpconf.list.php:149
+#: include/views/configuration.item.list.php:279
+msgid "Clear history for selected"
+msgstr "Kijelölt elem előzményeinek törlése"
 
 #: include/views/configuration.host.massupdate.php:222
 msgid "Clear when unlinking"
@@ -2833,7 +2845,7 @@ msgid "Clock"
 msgstr "Óra"
 
 #: include/views/administration.general.iconmap.edit.php:146
-#: include/views/administration.general.regularexpressions.edit.php:114
+#: include/views/administration.general.regularexpressions.edit.php:89
 #: include/views/administration.proxy.edit.php:99
 #: include/views/administration.script.edit.php:120
 #: include/views/configuration.action.edit.php:1118
@@ -2841,7 +2853,7 @@ msgstr "Óra"
 #: include/views/configuration.discovery.edit.php:89
 #: include/views/configuration.graph.edit.php:323
 #: include/views/configuration.host.discovery.edit.php:350
-#: include/views/configuration.host.edit.php:945
+#: include/views/configuration.host.edit.php:917
 #: include/views/configuration.hostgroups.edit.php:86
 #: include/views/configuration.host.prototype.edit.php:339
 #: include/views/configuration.httpconf.edit.php:258
@@ -2850,7 +2862,7 @@ msgstr "Óra"
 #: include/views/configuration.screen.edit.php:56
 #: include/views/configuration.slideconf.edit.php:110
 #: include/views/configuration.sysmap.edit.php:192
-#: include/views/configuration.template.edit.php:462
+#: include/views/configuration.template.edit.php:489
 #: include/views/configuration.triggers.edit.php:350
 msgid "Clone"
 msgstr "Klón"
@@ -2983,7 +2995,7 @@ msgstr "Feltételek"
 msgid "Configuration"
 msgstr "Konfiguráció"
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:867
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr ""
 
@@ -3151,8 +3163,8 @@ msgid "Confirmation text"
 msgstr ""
 
 #: include/views/administration.proxy.edit.php:54
-#: include/views/configuration.host.edit.php:292
-#: include/views/configuration.host.edit.php:378
+#: include/views/configuration.host.edit.php:264
+#: include/views/configuration.host.edit.php:350
 #: include/views/configuration.host.prototype.edit.php:94
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
@@ -3223,9 +3235,6 @@ msgid "Coordinates"
 msgstr ""
 
 #: include/views/configuration.copy.elements.php:118
-#: include/views/configuration.graph.list.php:162
-#: include/views/configuration.item.list.php:276
-#: include/views/configuration.triggers.list.php:222
 msgid "Copy"
 msgstr "Másolás"
 
@@ -3235,6 +3244,17 @@ msgid "Copy %1$s element to..."
 msgid_plural "Copy %1$s elements to..."
 msgstr[0] ""
 msgstr[1] ""
+
+#: include/views/configuration.graph.list.php:156
+#: include/views/configuration.item.list.php:276
+#: include/views/configuration.triggers.list.php:225
+msgid "Copy selected to ..."
+msgstr "Kiválasztott másolása ..."
+
+#: include/classes/api/services/CUser.php:1076
+#, c-format
+msgid "Correct login \"%s\"."
+msgstr ""
 
 #: include/classes/api/services/CImage.php:393
 msgid "Could not save image!"
@@ -3346,7 +3366,7 @@ msgstr "Script létrehozása"
 msgid "Create slide show"
 msgstr ""
 
-#: templates.php:571
+#: templates.php:494
 msgid "Create template"
 msgstr ""
 
@@ -3574,8 +3594,8 @@ msgid "DNS"
 msgstr "DNS"
 
 #: include/views/administration.proxy.edit.php:53
-#: include/views/configuration.host.edit.php:291
-#: include/views/configuration.host.edit.php:377
+#: include/views/configuration.host.edit.php:263
+#: include/views/configuration.host.edit.php:349
 #: include/views/configuration.host.prototype.edit.php:93
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
@@ -3624,7 +3644,7 @@ msgstr "Szaggatott vonal"
 msgid "Data"
 msgstr "Adat"
 
-#: include/classes/items/CHelpItems.php:915
+#: include/classes/items/CHelpItems.php:903
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
@@ -3795,8 +3815,8 @@ msgstr "Decimális"
 #: include/hosts.inc.php:31
 #: include/views/administration.general.iconmap.edit.php:133
 #: include/views/configuration.action.edit.php:426
-#: include/views/configuration.host.edit.php:294
-#: include/views/configuration.host.edit.php:380
+#: include/views/configuration.host.edit.php:266
+#: include/views/configuration.host.edit.php:352
 #: include/views/configuration.host.prototype.edit.php:96
 #: include/views/js/configuration.sysmaps.js.php:82
 #: include/views/js/configuration.sysmaps.js.php:138
@@ -3851,31 +3871,8 @@ msgstr "Késleltetve"
 
 #: include/classes/html/CButtonDelete.php:25
 #: include/views/administration.auditlogs.list.php:47
-#: include/views/administration.general.regularexpressions.list.php:90
-#: include/views/administration.mediatypes.list.php:121
-#: include/views/administration.proxy.list.php:111
-#: include/views/administration.script.list.php:92
-#: include/views/administration.usergroups.list.php:143
-#: include/views/administration.users.list.php:155
-#: include/views/configuration.action.list.php:111
-#: include/views/configuration.application.list.php:118
-#: include/views/configuration.discovery.list.php:73
-#: include/views/configuration.graph.list.php:164
-#: include/views/configuration.host.discovery.list.php:154
-#: include/views/configuration.hostgroups.list.php:163
-#: include/views/configuration.host.list.php:221
-#: include/views/configuration.host.prototype.list.php:134
-#: include/views/configuration.httpconf.list.php:152
-#: include/views/configuration.item.list.php:278
-#: include/views/configuration.item.prototype.list.php:124
-#: include/views/configuration.maintenance.list.php:84
-#: include/views/configuration.screen.list.php:70
-#: include/views/configuration.slideconf.list.php:60
-#: include/views/configuration.sysmap.list.php:67
-#: include/views/configuration.trigger.prototype.list.php:148
-#: include/views/configuration.triggers.edit.php:162
-#: include/views/configuration.triggers.list.php:224 jsLoader.php:108
-#: jsLoader.php:186 templates.php:749 tr_logform.php:291 tr_logform.php:317
+#: include/views/configuration.triggers.edit.php:162 jsLoader.php:108
+#: jsLoader.php:186 tr_logform.php:291 tr_logform.php:317
 msgid "Delete"
 msgstr "Törlés"
 
@@ -3883,15 +3880,15 @@ msgstr "Törlés"
 msgid "Delete all elements that are not present in the XML file?"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:467 templates.php:750
+#: include/views/configuration.template.edit.php:494
 msgid "Delete and clear"
 msgstr "Törlés ÉS kiürítés"
 
-#: templates.php:751
+#: templates.php:679
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Figyelmeztetés: Ez a művelet törli a kijelölt mintákat és eltávolítja az érintett elemeket az összes csatolt hosztról"
 
-#: include/views/configuration.template.edit.php:468
+#: include/views/configuration.template.edit.php:495
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr ""
 
@@ -3921,7 +3918,7 @@ msgstr ""
 msgid "Delete graph?"
 msgstr "Grafikon törlése?"
 
-#: include/views/configuration.item.list.php:274
+#: include/views/configuration.item.list.php:280
 msgid "Delete history of selected items?"
 msgstr "Kijelölt elemek előzményeinek törlése?"
 
@@ -3965,7 +3962,7 @@ msgstr ""
 msgid "Delete proxy?"
 msgstr ""
 
-#: include/views/administration.general.regularexpressions.edit.php:116
+#: include/views/administration.general.regularexpressions.edit.php:91
 msgid "Delete regular expression?"
 msgstr "Töröljem a reguláris kifejezést?"
 
@@ -3979,24 +3976,47 @@ msgstr "Script törlése?"
 
 #: include/reports.inc.php:111 include/reports.inc.php:201
 #: include/reports.inc.php:244
+#: include/views/administration.general.regularexpressions.list.php:66
+#: include/views/administration.mediatypes.list.php:124
+#: include/views/administration.proxy.list.php:110
+#: include/views/administration.script.list.php:89
 #: include/views/administration.usergroups.edit.php:111
 #: include/views/administration.usergroups.edit.php:119
 #: include/views/administration.usergroups.edit.php:127
-#: include/views/administration.users.edit.php:72
-#: include/views/administration.users.edit.php:222
+#: include/views/administration.usergroups.list.php:148
+#: include/views/administration.users.edit.php:73
+#: include/views/administration.users.edit.php:223
+#: include/views/administration.users.list.php:155
+#: include/views/configuration.action.list.php:114
+#: include/views/configuration.application.list.php:116
+#: include/views/configuration.discovery.list.php:76
+#: include/views/configuration.graph.list.php:159
+#: include/views/configuration.host.discovery.list.php:150
+#: include/views/configuration.hostgroups.list.php:164
+#: include/views/configuration.host.list.php:228
+#: include/views/configuration.host.prototype.list.php:128
+#: include/views/configuration.httpconf.list.php:153
+#: include/views/configuration.item.list.php:283
+#: include/views/configuration.item.prototype.list.php:120
+#: include/views/configuration.maintenance.list.php:81
+#: include/views/configuration.screen.list.php:70
+#: include/views/configuration.slideconf.list.php:57
+#: include/views/configuration.sysmap.list.php:64
+#: include/views/configuration.trigger.prototype.list.php:146
+#: include/views/configuration.triggers.list.php:228 templates.php:674
 msgid "Delete selected"
 msgstr "Kiválasztott törlése"
 
-#: include/views/configuration.action.list.php:111
+#: include/views/configuration.action.list.php:115
 msgid "Delete selected actions?"
 msgstr ""
 
-#: include/views/configuration.application.list.php:118
+#: include/views/configuration.application.list.php:117
 msgid "Delete selected applications?"
 msgstr "Törli a kiválasztott alkalmazásokat?"
 
-#: include/views/configuration.discovery.list.php:73
-#: include/views/configuration.host.discovery.list.php:155
+#: include/views/configuration.discovery.list.php:77
+#: include/views/configuration.host.discovery.list.php:151
 msgid "Delete selected discovery rules?"
 msgstr "Törli a kijelölt felderítési szabályokat?"
 
@@ -4004,11 +4024,11 @@ msgstr "Törli a kijelölt felderítési szabályokat?"
 msgid "Delete selected elements?"
 msgstr ""
 
-#: include/views/configuration.graph.list.php:165
+#: include/views/configuration.graph.list.php:162
 msgid "Delete selected graph prototypes?"
 msgstr ""
 
-#: include/views/configuration.graph.list.php:166
+#: include/views/configuration.graph.list.php:162
 msgid "Delete selected graphs?"
 msgstr "Törli a kiválasztott grafikonokat?"
 
@@ -4017,11 +4037,11 @@ msgstr "Törli a kiválasztott grafikonokat?"
 msgid "Delete selected group?"
 msgstr "Törli a kiválasztott csoportokat?"
 
-#: include/views/administration.usergroups.list.php:143
+#: include/views/administration.usergroups.list.php:149
 msgid "Delete selected groups?"
 msgstr "Törli a kiválasztott csoportokat?"
 
-#: include/views/configuration.hostgroups.list.php:163
+#: include/views/configuration.hostgroups.list.php:165
 msgid "Delete selected host groups?"
 msgstr ""
 
@@ -4029,15 +4049,15 @@ msgstr ""
 msgid "Delete selected host prototype?"
 msgstr ""
 
-#: include/views/configuration.host.prototype.list.php:135
+#: include/views/configuration.host.prototype.list.php:129
 msgid "Delete selected host prototypes?"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:947
+#: include/views/configuration.host.edit.php:919
 msgid "Delete selected host?"
 msgstr "Törli a kiválasztott hosztokat?"
 
-#: include/views/configuration.host.list.php:221
+#: include/views/configuration.host.list.php:229
 msgid "Delete selected hosts?"
 msgstr "Törli a kijelölt hosztokat?"
 
@@ -4045,27 +4065,27 @@ msgstr "Törli a kijelölt hosztokat?"
 msgid "Delete selected image?"
 msgstr "Kijelölt kép törlése?"
 
-#: include/views/configuration.item.prototype.list.php:125
+#: include/views/configuration.item.prototype.list.php:121
 msgid "Delete selected item prototypes?"
 msgstr ""
 
-#: include/views/configuration.item.list.php:278
+#: include/views/configuration.item.list.php:284
 msgid "Delete selected items?"
 msgstr "Kijelölt elemek törlése?"
 
-#: include/views/configuration.maintenance.list.php:84
+#: include/views/configuration.maintenance.list.php:82
 msgid "Delete selected maintenance periods?"
 msgstr "Kijelölt karbantartási időszak törlése?"
 
-#: include/views/configuration.sysmap.list.php:67
+#: include/views/configuration.sysmap.list.php:65
 msgid "Delete selected maps?"
 msgstr "Törli a kjelölt térképeket?"
 
-#: include/views/administration.mediatypes.edit.php:109
+#: include/views/administration.mediatypes.edit.php:110
 msgid "Delete selected media type?"
 msgstr ""
 
-#: include/views/administration.mediatypes.list.php:121
+#: include/views/administration.mediatypes.list.php:125
 msgid "Delete selected media types?"
 msgstr ""
 
@@ -4073,39 +4093,39 @@ msgstr ""
 msgid "Delete selected proxies?"
 msgstr "Törli a kiválasztott proxykat?"
 
-#: include/views/administration.general.regularexpressions.list.php:90
+#: include/views/administration.general.regularexpressions.list.php:67
 msgid "Delete selected regular expressions?"
 msgstr "Töröljem a kiválasztott reguláris kifejezéseket?"
 
-#: include/views/configuration.screen.list.php:70
+#: include/views/configuration.screen.list.php:71
 msgid "Delete selected screens?"
 msgstr ""
 
-#: include/views/administration.script.list.php:92
+#: include/views/administration.script.list.php:90
 msgid "Delete selected scripts?"
 msgstr "Törli a kiválasztott szkripteket?"
 
-#: include/views/configuration.slideconf.list.php:60
+#: include/views/configuration.slideconf.list.php:58
 msgid "Delete selected slide shows?"
 msgstr ""
 
-#: templates.php:749
+#: templates.php:675
 msgid "Delete selected templates?"
 msgstr "Törli a kijelölt mintákat?"
 
-#: include/views/configuration.trigger.prototype.list.php:149
+#: include/views/configuration.trigger.prototype.list.php:147
 msgid "Delete selected trigger prototypes?"
 msgstr ""
 
-#: include/views/configuration.triggers.list.php:224
+#: include/views/configuration.triggers.list.php:229
 msgid "Delete selected triggers?"
 msgstr "Törli a kijelölt triggereket?"
 
-#: include/views/administration.users.edit.php:341
+#: include/views/administration.users.edit.php:343
 msgid "Delete selected user?"
 msgstr "Törli a kiválasztott felhasználót?"
 
-#: include/views/administration.users.list.php:155
+#: include/views/administration.users.list.php:156
 msgid "Delete selected users?"
 msgstr "Törli a kiválasztott felhasználókat?"
 
@@ -4120,9 +4140,13 @@ msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/views/configuration.httpconf.list.php:152
+#: include/views/configuration.httpconf.list.php:154
 msgid "Delete selected web scenarios?"
 msgstr ""
+
+#: templates.php:678
+msgid "Delete selected with linked elements"
+msgstr "Törli a kijelölteket a csatolt elemekkel együtt?"
 
 #: jsLoader.php:187
 #, c-format
@@ -4133,7 +4157,7 @@ msgstr ""
 msgid "Delete slide show?"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:464
+#: include/views/configuration.template.edit.php:491
 msgid "Delete template?"
 msgstr ""
 
@@ -4168,7 +4192,7 @@ msgstr ""
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1472
+#: include/classes/api/services/CHost.php:1451
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr ""
@@ -4213,7 +4237,7 @@ msgstr ""
 msgid "Deleted: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/views/administration.general.regularexpressions.edit.php:78
+#: include/views/administration.general.regularexpressions.edit.php:53
 msgid "Delimiter"
 msgstr "Elválasztó"
 
@@ -4238,14 +4262,14 @@ msgstr "Hozzáférés megtagadva"
 msgid "Dependencies"
 msgstr ""
 
-#: include/triggers.inc.php:1232 tr_status.php:558
+#: include/triggers.inc.php:1251 tr_status.php:577
 msgid "Dependent"
 msgstr "Függő"
 
-#: include/triggers.inc.php:1212
+#: include/triggers.inc.php:1231
 #: include/views/configuration.services.edit.php:121
 #: include/views/configuration.triggers.list.php:125 popup.php:1034
-#: tr_status.php:542
+#: tr_status.php:561
 msgid "Depends on"
 msgstr "Függőség"
 
@@ -4258,13 +4282,13 @@ msgstr ""
 #: include/views/administration.proxy.edit.php:87
 #: include/views/administration.script.edit.php:69
 #: include/views/configuration.host.discovery.edit.php:256
-#: include/views/configuration.host.edit.php:433
+#: include/views/configuration.host.edit.php:405
 #: include/views/configuration.host.massupdate.php:156
 #: include/views/configuration.item.edit.php:437
 #: include/views/configuration.item.massupdate.php:558
 #: include/views/configuration.maintenance.edit.php:92
 #: include/views/configuration.maintenance.list.php:49
-#: include/views/configuration.template.edit.php:148
+#: include/views/configuration.template.edit.php:175
 #: include/views/configuration.triggers.edit.php:251
 #: include/views/inventory.host.view.php:198
 #: include/views/monitoring.triggerComment.php:39 popup.php:1298
@@ -4373,27 +4397,14 @@ msgid "Dimension (cols x rows)"
 msgstr "Méret (sorok és oszlopok)"
 
 #: include/views/administration.auditlogs.list.php:49
-#: include/views/administration.mediatypes.list.php:120
-#: include/views/administration.usergroups.list.php:136
-#: include/views/configuration.action.list.php:110
-#: include/views/configuration.application.list.php:115
-#: include/views/configuration.discovery.list.php:72
-#: include/views/configuration.host.discovery.list.php:151
-#: include/views/configuration.host.list.php:218
-#: include/views/configuration.host.prototype.list.php:131
-#: include/views/configuration.httpconf.list.php:148
-#: include/views/configuration.item.list.php:272
-#: include/views/configuration.item.prototype.list.php:121
-#: include/views/configuration.trigger.prototype.list.php:144
-#: include/views/configuration.triggers.list.php:221
 msgid "Disable"
 msgstr "Letiltás"
 
-#: include/views/administration.usergroups.list.php:140
+#: include/views/administration.usergroups.list.php:144
 msgid "Disable debug mode"
 msgstr ""
 
-#: include/views/administration.usergroups.list.php:141
+#: include/views/administration.usergroups.list.php:145
 msgid "Disable debug mode in selected groups?"
 msgstr "Letiltja a hibakereső módot a kiválasztott csoportok számára?"
 
@@ -4405,82 +4416,95 @@ msgstr "Hoszt tiltása"
 msgid "Disable host?"
 msgstr ""
 
-#: include/views/administration.proxy.list.php:108
-#: include/views/configuration.hostgroups.list.php:160
-msgid "Disable hosts"
-msgstr ""
-
 #: include/views/configuration.hostgroups.list.php:161
 msgid "Disable hosts in the selected host groups?"
 msgstr ""
 
-#: include/views/administration.proxy.list.php:109
+#: include/views/administration.proxy.list.php:107
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Letiltja a hosztokat a kiválasztott proxykon?"
 
+#: include/views/administration.mediatypes.list.php:120
+#: include/views/administration.proxy.list.php:106
+#: include/views/administration.usergroups.list.php:136
 #: include/views/configuration.action.list.php:110
+#: include/views/configuration.application.list.php:112
+#: include/views/configuration.discovery.list.php:72
+#: include/views/configuration.host.discovery.list.php:146
+#: include/views/configuration.hostgroups.list.php:160
+#: include/views/configuration.host.list.php:224
+#: include/views/configuration.host.prototype.list.php:124
+#: include/views/configuration.httpconf.list.php:145
+#: include/views/configuration.item.list.php:269
+#: include/views/configuration.item.prototype.list.php:116
+#: include/views/configuration.trigger.prototype.list.php:139
+#: include/views/configuration.triggers.list.php:218
+msgid "Disable selected"
+msgstr "Kiválasztott tiltása"
+
+#: include/views/configuration.action.list.php:111
 msgid "Disable selected actions?"
 msgstr ""
 
-#: include/views/configuration.application.list.php:116
+#: include/views/configuration.application.list.php:113
 msgid "Disable selected applications?"
 msgstr "Letiltja a kiválasztott alkalmazásokat?"
 
-#: include/views/configuration.discovery.list.php:72
-#: include/views/configuration.host.discovery.list.php:152
+#: include/views/configuration.discovery.list.php:73
+#: include/views/configuration.host.discovery.list.php:147
 msgid "Disable selected discovery rules?"
 msgstr "Letiltja a kijelölt felderítési szabályokat?"
 
-#: include/views/administration.usergroups.list.php:136
+#: include/views/administration.usergroups.list.php:137
 msgid "Disable selected groups?"
 msgstr "Tiltja a kiválasztott felhasználókat?"
 
-#: include/views/configuration.host.prototype.list.php:132
+#: include/views/configuration.host.prototype.list.php:125
 msgid "Disable selected host prototypes?"
 msgstr ""
 
-#: include/views/configuration.host.list.php:218
+#: include/views/configuration.host.list.php:225
 msgid "Disable selected hosts?"
 msgstr "Letiltja a kijelölt hosztokat?"
 
-#: include/views/configuration.item.prototype.list.php:122
+#: include/views/configuration.item.prototype.list.php:117
 msgid "Disable selected item prototypes?"
 msgstr ""
 
-#: include/views/configuration.item.list.php:272
+#: include/views/configuration.item.list.php:270
 msgid "Disable selected items?"
 msgstr "Kijelölt elemek tiltása?"
 
-#: include/views/administration.mediatypes.list.php:120
+#: include/views/administration.mediatypes.list.php:121
 msgid "Disable selected media types?"
 msgstr ""
 
-#: include/views/configuration.trigger.prototype.list.php:145
+#: include/views/configuration.trigger.prototype.list.php:140
 msgid "Disable selected trigger prototypes?"
 msgstr ""
 
-#: include/views/configuration.triggers.list.php:221
+#: include/views/configuration.triggers.list.php:219
 msgid "Disable selected triggers?"
 msgstr "Letiltja a kijelölt triggereket?"
 
-#: include/views/configuration.httpconf.list.php:148
+#: include/views/configuration.httpconf.list.php:146
 msgid "Disable selected web scenarios?"
 msgstr ""
 
 #: auditlogs.php:144 dashboard.php:295 include/discovery.inc.php:121
 #: include/html.inc.php:341 include/httptest.inc.php:46
 #: include/items.inc.php:155 include/items.inc.php:209
-#: include/triggers.inc.php:1483 include/triggers.inc.php:2308
+#: include/triggers.inc.php:1502 include/triggers.inc.php:2340
 #: include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:100
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
 #: include/views/administration.usergroups.list.php:87
-#: include/views/administration.users.edit.php:186
+#: include/views/administration.users.edit.php:187
 #: include/views/administration.users.list.php:143
 #: include/views/administration.users.list.php:144
 #: include/views/configuration.action.list.php:81
-#: include/views/configuration.host.edit.php:873
+#: include/views/configuration.host.edit.php:845
 #: include/views/configuration.host.list.php:143
 #: include/views/configuration.host.massupdate.php:181
 #: include/views/configuration.host.massupdate.php:285
@@ -4516,7 +4540,7 @@ msgstr "Felderített eszköz"
 #: include/views/inventory.host.view.php:234
 #: include/views/inventory.host.view.php:244 search.php:144 search.php:185
 #: search.php:201 search.php:399 search.php:442 search.php:459
-#: templates.php:596 templates.php:659
+#: templates.php:519 templates.php:582
 msgid "Discovery"
 msgstr "Felderítés"
 
@@ -4547,7 +4571,7 @@ msgid "Discovery object"
 msgstr ""
 
 #: include/actions.inc.php:68 include/audit.inc.php:43
-#: include/blocks.inc.php:1281 include/forms.inc.php:1094
+#: include/blocks.inc.php:1278 include/forms.inc.php:1094
 #: include/views/configuration.discovery.edit.php:80
 #: include/views/monitoring.discovery.php:32
 msgid "Discovery rule"
@@ -4603,8 +4627,8 @@ msgstr "Felderítési szabály frissítve"
 #: include/html.inc.php:477 include/html.inc.php:481
 #: include/views/configuration.discovery.list.php:29
 #: include/views/configuration.host.discovery.list.php:32
-#: include/views/configuration.host.edit.php:594
-#: include/views/configuration.template.edit.php:259
+#: include/views/configuration.host.edit.php:566
+#: include/views/configuration.template.edit.php:286
 #: include/views/conf.import.php:34 include/views/monitoring.discovery.php:33
 #: popup.php:107
 msgid "Discovery rules"
@@ -4623,11 +4647,11 @@ msgstr "Felderítés állapota"
 msgid "Display OK triggers for"
 msgstr ""
 
-#: latest.php:891
+#: latest.php:889
 msgid "Display graph"
 msgstr ""
 
-#: latest.php:890
+#: latest.php:888
 msgid "Display stacked graph"
 msgstr ""
 
@@ -4665,7 +4689,7 @@ msgstr ""
 msgid "Dot"
 msgstr "Pontozott vonal"
 
-#: include/blocks.inc.php:1283
+#: include/blocks.inc.php:1280
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr ""
@@ -4682,19 +4706,19 @@ msgstr ""
 msgid "Downtime"
 msgstr "Kiesés"
 
-#: include/views/configuration.host.edit.php:345
+#: include/views/configuration.host.edit.php:317
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:330
+#: include/views/configuration.host.edit.php:302
 msgid "Drag here to change the type of the interface to \"JMX\" type."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:314
+#: include/views/configuration.host.edit.php:286
 msgid "Drag here to change the type of the interface to \"SNMP\" type."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:297
+#: include/views/configuration.host.edit.php:269
 msgid "Drag here to change the type of the interface to \"agent\" type."
 msgstr ""
 
@@ -4731,12 +4755,12 @@ msgstr ""
 msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:655
+#: include/classes/api/services/CHost.php:638
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:673
+#: include/classes/api/services/CHost.php:656
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr ""
@@ -4791,7 +4815,7 @@ msgstr "ESEMÉNYEK"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr ""
 
-#: include/views/administration.users.edit.php:214
+#: include/views/administration.users.edit.php:215
 #: include/views/configuration.action.edit.php:437
 #: include/views/configuration.action.edit.php:452
 #: include/views/configuration.maintenance.edit.php:112
@@ -4894,10 +4918,10 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:637
 #: include/classes/api/services/CGraph.php:529
 #: include/classes/api/services/CGraphPrototype.php:545
-#: include/classes/api/services/CHostGroup.php:472
-#: include/classes/api/services/CHostGroup.php:549
+#: include/classes/api/services/CHostGroup.php:471
+#: include/classes/api/services/CHostGroup.php:548
 #: include/classes/api/services/CHostInterface.php:412
-#: include/classes/api/services/CHost.php:1320
+#: include/classes/api/services/CHost.php:1299
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:606
@@ -4982,19 +5006,6 @@ msgid "Empty web scenario ID."
 msgstr ""
 
 #: include/views/administration.auditlogs.list.php:48
-#: include/views/administration.mediatypes.list.php:119
-#: include/views/administration.usergroups.list.php:135
-#: include/views/configuration.action.list.php:109
-#: include/views/configuration.application.list.php:114
-#: include/views/configuration.discovery.list.php:71
-#: include/views/configuration.host.discovery.list.php:148
-#: include/views/configuration.host.list.php:217
-#: include/views/configuration.host.prototype.list.php:128
-#: include/views/configuration.httpconf.list.php:147
-#: include/views/configuration.item.list.php:271
-#: include/views/configuration.item.prototype.list.php:118
-#: include/views/configuration.trigger.prototype.list.php:141
-#: include/views/configuration.triggers.list.php:220
 msgid "Enable"
 msgstr "Engedélyezés"
 
@@ -5002,11 +5013,11 @@ msgstr "Engedélyezés"
 msgid "Enable confirmation"
 msgstr ""
 
-#: include/views/administration.usergroups.list.php:137
+#: include/views/administration.usergroups.list.php:140
 msgid "Enable debug mode"
 msgstr ""
 
-#: include/views/administration.usergroups.list.php:138
+#: include/views/administration.usergroups.list.php:141
 msgid "Enable debug mode in selected groups?"
 msgstr "Engedélyezi a hibakereső módot a kiválasztott csoportok számára?"
 
@@ -5022,12 +5033,7 @@ msgstr "Hoszt engedélyezése"
 msgid "Enable host?"
 msgstr ""
 
-#: include/views/administration.proxy.list.php:105
-#: include/views/configuration.hostgroups.list.php:159
-msgid "Enable hosts"
-msgstr ""
-
-#: include/views/administration.proxy.list.php:106
+#: include/views/administration.proxy.list.php:103
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "Engedélyezi a hosztokat a kiválasztott proxykon?"
 
@@ -5042,60 +5048,78 @@ msgstr "Engedélyezi a hosztokat a kiválasztott proxykon?"
 msgid "Enable internal housekeeping"
 msgstr ""
 
-#: include/views/configuration.action.list.php:109
+#: include/views/administration.mediatypes.list.php:116
+#: include/views/administration.proxy.list.php:102
+#: include/views/administration.usergroups.list.php:132
+#: include/views/configuration.action.list.php:106
+#: include/views/configuration.application.list.php:108
+#: include/views/configuration.discovery.list.php:68
+#: include/views/configuration.host.discovery.list.php:142
+#: include/views/configuration.hostgroups.list.php:156
+#: include/views/configuration.host.list.php:220
+#: include/views/configuration.host.prototype.list.php:120
+#: include/views/configuration.httpconf.list.php:141
+#: include/views/configuration.item.list.php:265
+#: include/views/configuration.item.prototype.list.php:112
+#: include/views/configuration.trigger.prototype.list.php:135
+#: include/views/configuration.triggers.list.php:214
+msgid "Enable selected"
+msgstr "Kijelölt engedélyezése"
+
+#: include/views/configuration.action.list.php:107
 msgid "Enable selected actions?"
 msgstr ""
 
-#: include/views/configuration.application.list.php:114
+#: include/views/configuration.application.list.php:109
 msgid "Enable selected applications?"
 msgstr ""
 
-#: include/views/configuration.discovery.list.php:71
-#: include/views/configuration.host.discovery.list.php:149
+#: include/views/configuration.discovery.list.php:69
+#: include/views/configuration.host.discovery.list.php:143
 msgid "Enable selected discovery rules?"
 msgstr "Engedélyezi a kijelölt felderítési szabályokat?"
 
-#: include/views/administration.usergroups.list.php:135
+#: include/views/administration.usergroups.list.php:133
 msgid "Enable selected groups?"
 msgstr "Engedélyezi a kiválasztott felhasználókat?"
 
-#: include/views/configuration.host.prototype.list.php:129
+#: include/views/configuration.host.prototype.list.php:121
 msgid "Enable selected host prototypes?"
 msgstr ""
 
-#: include/views/configuration.hostgroups.list.php:159
-#: include/views/configuration.host.list.php:217
+#: include/views/configuration.hostgroups.list.php:157
+#: include/views/configuration.host.list.php:221
 msgid "Enable selected hosts?"
 msgstr ""
 
-#: include/views/configuration.item.prototype.list.php:119
+#: include/views/configuration.item.prototype.list.php:113
 msgid "Enable selected item prototypes?"
 msgstr ""
 
-#: include/views/configuration.item.list.php:271
+#: include/views/configuration.item.list.php:266
 msgid "Enable selected items?"
 msgstr "Kijelölt elemek engedélyezése?"
 
-#: include/views/administration.mediatypes.list.php:119
+#: include/views/administration.mediatypes.list.php:117
 msgid "Enable selected media types?"
 msgstr ""
 
-#: include/views/configuration.trigger.prototype.list.php:142
+#: include/views/configuration.trigger.prototype.list.php:136
 msgid "Enable selected trigger prototypes?"
 msgstr ""
 
-#: include/views/configuration.triggers.list.php:220
+#: include/views/configuration.triggers.list.php:215
 msgid "Enable selected triggers?"
 msgstr "Engedélyezi a kijelölt triggereket?"
 
-#: include/views/configuration.httpconf.list.php:147
+#: include/views/configuration.httpconf.list.php:142
 msgid "Enable selected web scenarios?"
 msgstr ""
 
 #: auditlogs.php:141 dashboard.php:295 include/discovery.inc.php:120
 #: include/html.inc.php:337 include/httptest.inc.php:45
 #: include/items.inc.php:154 include/items.inc.php:206
-#: include/triggers.inc.php:2305
+#: include/triggers.inc.php:2337
 #: include/views/administration.mediatypes.edit.php:95
 #: include/views/administration.mediatypes.list.php:99
 #: include/views/administration.usergroups.edit.php:64
@@ -5103,14 +5127,14 @@ msgstr ""
 #: include/views/administration.usergroups.list.php:57
 #: include/views/administration.usergroups.list.php:82
 #: include/views/administration.usergroups.list.php:87
-#: include/views/administration.users.edit.php:182
+#: include/views/administration.users.edit.php:183
 #: include/views/administration.users.list.php:143
 #: include/views/administration.users.list.php:144
 #: include/views/configuration.action.edit.php:61
 #: include/views/configuration.action.list.php:87
 #: include/views/configuration.discovery.edit.php:76
 #: include/views/configuration.host.discovery.edit.php:260
-#: include/views/configuration.host.edit.php:464
+#: include/views/configuration.host.edit.php:436
 #: include/views/configuration.host.list.php:135
 #: include/views/configuration.host.massupdate.php:180
 #: include/views/configuration.host.prototype.edit.php:158
@@ -5177,7 +5201,7 @@ msgstr ""
 msgid "Event details"
 msgstr "Esemény részletei"
 
-#: include/triggers.inc.php:1481
+#: include/triggers.inc.php:1500
 msgid "Event generation"
 msgstr "Esemény generálás"
 
@@ -5278,21 +5302,21 @@ msgstr ""
 msgid "Exploded"
 msgstr "Bontott kör"
 
-#: include/views/configuration.host.list.php:219
+#: include/views/configuration.host.list.php:217
 #: include/views/configuration.screen.list.php:68
-#: include/views/configuration.sysmap.list.php:66 templates.php:748
-msgid "Export"
-msgstr ""
+#: include/views/configuration.sysmap.list.php:62 templates.php:672
+msgid "Export selected"
+msgstr "Kijelölt(ek) exportálása"
 
 #: events.php:298
 msgid "Export to CSV"
 msgstr ""
 
-#: include/triggers.inc.php:1478
+#: include/triggers.inc.php:1497
 #: include/views/administration.general.iconmap.edit.php:41
-#: include/views/administration.general.regularexpressions.edit.php:67
-#: include/views/administration.general.regularexpressions.edit.php:76
-#: include/views/administration.general.regularexpressions.edit.php:98
+#: include/views/administration.general.regularexpressions.edit.php:42
+#: include/views/administration.general.regularexpressions.edit.php:51
+#: include/views/administration.general.regularexpressions.edit.php:73
 #: include/views/configuration.item.list.php:150
 #: include/views/configuration.trigger.prototype.list.php:62
 #: include/views/configuration.triggers.edit.php:142
@@ -5321,15 +5345,15 @@ msgstr "A kifejezés nem lehet üres"
 msgid "Expression constructor"
 msgstr ""
 
-#: include/views/administration.general.regularexpressions.edit.php:68
-#: include/views/administration.general.regularexpressions.edit.php:77
-#: include/views/administration.general.regularexpressions.edit.php:98
+#: include/views/administration.general.regularexpressions.edit.php:43
+#: include/views/administration.general.regularexpressions.edit.php:52
+#: include/views/administration.general.regularexpressions.edit.php:73
 msgid "Expression type"
 msgstr "Kifejezés típusa"
 
-#: include/views/administration.general.regularexpressions.edit.php:73
-#: include/views/administration.general.regularexpressions.edit.php:105
-#: include/views/administration.general.regularexpressions.list.php:56
+#: include/views/administration.general.regularexpressions.edit.php:48
+#: include/views/administration.general.regularexpressions.edit.php:80
+#: include/views/administration.general.regularexpressions.list.php:32
 msgid "Expressions"
 msgstr "Kifejezések"
 
@@ -5363,11 +5387,11 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "Hiba"
 
-#: include/actions.inc.php:1382 include/blocks.inc.php:1194
+#: include/actions.inc.php:1382 include/blocks.inc.php:1191
 msgid "Failed"
 msgstr "Hiba"
 
-#: include/classes/api/services/CTemplate.php:544
+#: include/classes/api/services/CTemplate.php:540
 msgid "Failed to update template."
 msgstr ""
 
@@ -5613,12 +5637,12 @@ msgstr ""
 msgid "Frontend access updated"
 msgstr ""
 
-#: include/views/administration.users.edit.php:233
+#: include/views/administration.users.edit.php:234
 msgid "Frontend messaging"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:946
-#: include/views/configuration.template.edit.php:463
+#: include/views/configuration.host.edit.php:918
+#: include/views/configuration.template.edit.php:490
 msgid "Full clone"
 msgstr "Teljes klón"
 
@@ -5647,12 +5671,10 @@ msgid "GSM modem"
 msgstr "GSM modem"
 
 #: adm.gui.php:90 adm.housekeeper.php:125 adm.iconmapping.php:110
-#: adm.images.php:135 adm.macros.php:158 adm.other.php:70
+#: adm.images.php:135 adm.macros.php:158 adm.other.php:70 adm.regexps.php:201
 #: adm.triggerdisplayoptions.php:85 adm.triggerseverities.php:81
 #: adm.valuemapping.php:128 adm.workingtime.php:56
 #: include/views/administration.general.gui.edit.php:59
-#: include/views/administration.general.regularexpressions.edit.php:30
-#: include/views/administration.general.regularexpressions.list.php:27
 msgid "GUI"
 msgstr "GUI"
 
@@ -5698,7 +5720,7 @@ msgstr "Támogatás"
 msgid "Get timing of loading full web page. Default path is /"
 msgstr ""
 
-#: include/triggers.inc.php:1614 tr_testexpr.php:35
+#: include/triggers.inc.php:1633 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr ""
 
@@ -5713,6 +5735,33 @@ msgstr ""
 #: popup.php:115
 msgid "Global scripts"
 msgstr ""
+
+#: include/views/administration.general.regularexpressions.list.php:70
+#: include/views/administration.mediatypes.list.php:128
+#: include/views/administration.proxy.list.php:114
+#: include/views/administration.script.list.php:93
+#: include/views/administration.usergroups.list.php:152
+#: include/views/administration.users.list.php:159
+#: include/views/configuration.action.list.php:118
+#: include/views/configuration.application.list.php:120
+#: include/views/configuration.discovery.list.php:80
+#: include/views/configuration.graph.list.php:166
+#: include/views/configuration.host.discovery.list.php:154
+#: include/views/configuration.hostgroups.list.php:168
+#: include/views/configuration.host.list.php:232
+#: include/views/configuration.host.prototype.list.php:132
+#: include/views/configuration.httpconf.list.php:157
+#: include/views/configuration.item.list.php:287
+#: include/views/configuration.item.prototype.list.php:124
+#: include/views/configuration.maintenance.list.php:85
+#: include/views/configuration.screen.list.php:74
+#: include/views/configuration.slideconf.list.php:61
+#: include/views/configuration.sysmap.list.php:68
+#: include/views/configuration.trigger.prototype.list.php:150
+#: include/views/configuration.triggers.list.php:232 latest.php:892
+#: templates.php:682 tr_status.php:820
+msgid "Go"
+msgstr "Mehet"
 
 #: jsLoader.php:201
 msgid "Go to"
@@ -5853,8 +5902,8 @@ msgstr ""
 
 #: include/html.inc.php:429 include/html.inc.php:433
 #: include/views/configuration.host.discovery.list.php:125
-#: include/views/configuration.host.edit.php:670
-#: include/views/configuration.template.edit.php:324 popup.php:91
+#: include/views/configuration.host.edit.php:642
+#: include/views/configuration.template.edit.php:351 popup.php:91
 msgid "Graph prototypes"
 msgstr ""
 
@@ -5895,16 +5944,16 @@ msgstr ""
 #: dashboard.php:320 include/html.inc.php:440 include/html.inc.php:444
 #: include/menu.inc.php:61 include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:49
-#: include/views/configuration.host.edit.php:568
+#: include/views/configuration.host.edit.php:540
 #: include/views/configuration.host.list.php:81
 #: include/views/configuration.host.list.php:100
-#: include/views/configuration.template.edit.php:235
+#: include/views/configuration.template.edit.php:262
 #: include/views/conf.import.php:36 include/views/inventory.host.view.php:220
 #: include/views/inventory.host.view.php:233
 #: include/views/inventory.host.view.php:243 jsLoader.php:202 popup.php:87
 #: search.php:137 search.php:143 search.php:181 search.php:200 search.php:223
 #: search.php:277 search.php:330 search.php:397 search.php:434 search.php:457
-#: templates.php:594 templates.php:655
+#: templates.php:517 templates.php:578
 msgid "Graphs"
 msgstr "Grafikonok"
 
@@ -5948,12 +5997,12 @@ msgstr ""
 #: include/views/monitoring.overview.items.php:29
 #: include/views/monitoring.overview.triggers.php:31
 #: include/views/monitoring.screen.php:96
-#: include/views/monitoring.slides.php:82 popup.php:485 templates.php:579
+#: include/views/monitoring.slides.php:82 popup.php:485 templates.php:502
 #: tr_status.php:218
 msgid "Group"
 msgstr "Csoport"
 
-#: include/classes/api/services/CHostGroup.php:581
+#: include/classes/api/services/CHostGroup.php:580
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr ""
@@ -5968,11 +6017,11 @@ msgstr ""
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr ""
 
-#: hostgroups.php:182 usergrps.php:195
+#: hostgroups.php:120 usergrps.php:195
 msgid "Group added"
 msgstr "Csoport létrehozva"
 
-#: hostgroups.php:228 hostgroups.php:249 usergrps.php:229 usergrps.php:260
+#: hostgroups.php:171 hostgroups.php:192 usergrps.php:229 usergrps.php:260
 #, fuzzy
 msgid "Group deleted"
 msgid_plural "Groups deleted"
@@ -6008,7 +6057,7 @@ msgstr ""
 msgid "Group prototypes"
 msgstr ""
 
-#: hostgroups.php:73 usergrps.php:188
+#: hostgroups.php:71 usergrps.php:188
 msgid "Group updated"
 msgstr "Csoport frissítve"
 
@@ -6016,13 +6065,13 @@ msgstr "Csoport frissítve"
 msgid "Grouping by"
 msgstr ""
 
-#: include/reports.inc.php:325 include/views/administration.users.edit.php:65
+#: include/reports.inc.php:325 include/views/administration.users.edit.php:66
 #: include/views/administration.users.list.php:58
-#: include/views/configuration.host.edit.php:250
-#: include/views/configuration.host.edit.php:270
+#: include/views/configuration.host.edit.php:223
+#: include/views/configuration.host.edit.php:242
 #: include/views/configuration.host.prototype.edit.php:173
 #: include/views/configuration.host.prototype.edit.php:207
-#: include/views/configuration.template.edit.php:112
+#: include/views/configuration.template.edit.php:114
 #: include/views/conf.import.php:27
 msgid "Groups"
 msgstr "Csoportok"
@@ -6212,19 +6261,19 @@ msgstr "Vízszintes igazítás"
 #: httpconf.php:318 httpconf.php:376 httpconf.php:427 httpmon.php:78
 #: httpmon.php:91 include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:691 include/blocks.inc.php:746
-#: include/blocks.inc.php:1014 include/blocks.inc.php:1024
-#: include/blocks.inc.php:1320 include/classes/api/services/CHttpTest.php:417
+#: include/blocks.inc.php:1011 include/blocks.inc.php:1021
+#: include/blocks.inc.php:1317 include/classes/api/services/CHttpTest.php:417
 #: include/classes/screens/CScreenEvents.php:40
 #: include/classes/screens/CScreenHostgroupTriggers.php:126
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
 #: include/classes/setup/CSetupWizard.php:365 include/forms.inc.php:543
 #: include/html.inc.php:348 include/maps.inc.php:24
-#: include/triggers.inc.php:1121 include/triggers.inc.php:1469
+#: include/triggers.inc.php:1120 include/triggers.inc.php:1488
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:58
 #: include/views/configuration.graph.list.php:54
-#: include/views/configuration.host.edit.php:716
+#: include/views/configuration.host.edit.php:688
 #: include/views/configuration.host.massupdate.php:336
 #: include/views/configuration.host.prototype.edit.php:160
 #: include/views/configuration.httpconf.list.php:44
@@ -6253,7 +6302,7 @@ msgid_plural "Hosts"
 msgstr[0] "Hoszt"
 msgstr[1] "Hoszt"
 
-#: include/classes/api/services/CHost.php:1005
+#: include/classes/api/services/CHost.php:982
 #: include/classes/api/services/CTemplate.php:471
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6298,13 +6347,13 @@ msgstr ""
 msgid "Host deleted"
 msgstr "Hoszt törölve"
 
-#: hostgroups.php:297 hosts.php:673 proxies.php:189
+#: hostgroups.php:240 hosts.php:673 proxies.php:189
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: hostgroups.php:296 hosts.php:672 proxies.php:188
+#: hostgroups.php:239 hosts.php:672 proxies.php:188
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] ""
@@ -6312,7 +6361,7 @@ msgstr[1] ""
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:287 include/blocks.inc.php:475
-#: include/blocks.inc.php:1192 include/forms.inc.php:500
+#: include/blocks.inc.php:1189 include/forms.inc.php:500
 #: include/maps.inc.php:25 include/views/administration.script.edit.php:83
 #: include/views/administration.script.list.php:43
 #: include/views/configuration.hostgroups.edit.php:67
@@ -6326,23 +6375,23 @@ msgid "Host group"
 msgstr "Hoszt csoport"
 
 #: include/classes/api/services/CHostGroup.php:437
-#: include/classes/api/services/CHostGroup.php:450
-#: include/classes/api/services/CHostGroup.php:521
+#: include/classes/api/services/CHostGroup.php:449
+#: include/classes/api/services/CHostGroup.php:520
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:613
+#: include/classes/api/services/CHostGroup.php:612
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:594
+#: include/classes/api/services/CHostGroup.php:593
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:568
+#: include/classes/api/services/CHostGroup.php:567
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr ""
@@ -6360,7 +6409,7 @@ msgid "Host group label type"
 msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:424
-#: include/classes/api/services/CHostGroup.php:513
+#: include/classes/api/services/CHostGroup.php:512
 msgid "Host group name cannot be empty."
 msgstr ""
 
@@ -6379,7 +6428,7 @@ msgstr "Hoszt csoportok"
 msgid "Host interface"
 msgstr ""
 
-#: hostinventories.php:26 include/views/configuration.host.edit.php:934
+#: hostinventories.php:26 include/views/configuration.host.edit.php:906
 #: include/views/configuration.host.prototype.edit.php:322 jsLoader.php:204
 msgid "Host inventory"
 msgstr ""
@@ -6486,7 +6535,7 @@ msgstr ""
 
 #: include/html.inc.php:453 include/html.inc.php:457
 #: include/views/configuration.host.discovery.list.php:101
-#: include/views/configuration.host.edit.php:690
+#: include/views/configuration.host.edit.php:662
 msgid "Host prototypes"
 msgstr ""
 
@@ -6518,7 +6567,7 @@ msgstr ""
 msgid "Host time"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:883
+#: include/classes/api/services/CHost.php:856
 msgid "Host update failed."
 msgstr ""
 
@@ -6526,23 +6575,23 @@ msgstr ""
 msgid "Host updated"
 msgstr "Hoszt frissítve"
 
-#: include/classes/api/services/CTemplate.php:1049
+#: include/classes/api/services/CTemplate.php:1047
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:703
+#: include/classes/api/services/CHost.php:686
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr ""
 
 #: include/classes/api/services/CTemplate.php:497
-#: include/classes/api/services/CTemplate.php:1014
+#: include/classes/api/services/CTemplate.php:1012
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:709
+#: include/classes/api/services/CHost.php:692
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr ""
@@ -6574,7 +6623,7 @@ msgstr ""
 msgid "Hosts (m/n/t)"
 msgstr "Hosztok (m/n/mi)"
 
-#: include/views/configuration.template.edit.php:143
+#: include/views/configuration.template.edit.php:170
 msgid "Hosts / templates"
 msgstr ""
 
@@ -6610,12 +6659,10 @@ msgid "Hours"
 msgstr "Órák"
 
 #: adm.gui.php:91 adm.housekeeper.php:126 adm.iconmapping.php:111
-#: adm.images.php:136 adm.macros.php:159 adm.other.php:71
+#: adm.images.php:136 adm.macros.php:159 adm.other.php:71 adm.regexps.php:202
 #: adm.triggerdisplayoptions.php:86 adm.triggerseverities.php:82
 #: adm.valuemapping.php:129 adm.workingtime.php:57
 #: include/views/administration.general.housekeeper.edit.php:151
-#: include/views/administration.general.regularexpressions.edit.php:31
-#: include/views/administration.general.regularexpressions.list.php:28
 msgid "Housekeeping"
 msgstr ""
 
@@ -6650,8 +6697,8 @@ msgstr "IP"
 
 #: include/maps.inc.php:46 include/views/administration.proxy.edit.php:52
 #: include/views/configuration.discovery.edit.php:67
-#: include/views/configuration.host.edit.php:290
-#: include/views/configuration.host.edit.php:376
+#: include/views/configuration.host.edit.php:262
+#: include/views/configuration.host.edit.php:348
 #: include/views/configuration.host.prototype.edit.php:92
 #: include/views/inventory.host.view.php:96
 #: include/views/inventory.host.view.php:115
@@ -6690,7 +6737,7 @@ msgstr ""
 #: include/views/administration.script.edit.php:45
 #: include/views/administration.script.list.php:53
 #: include/views/configuration.action.edit.php:760
-#: include/views/configuration.host.edit.php:838
+#: include/views/configuration.host.edit.php:810
 #: include/views/configuration.host.massupdate.php:338
 #: include/views/configuration.host.prototype.edit.php:278
 msgid "IPMI"
@@ -6704,8 +6751,8 @@ msgstr "IPMI agent"
 msgid "IPMI authentication algorithm"
 msgstr "IPMI autentikációs algoritmus"
 
-#: include/views/configuration.host.edit.php:354
-#: include/views/configuration.host.edit.php:430
+#: include/views/configuration.host.edit.php:326
+#: include/views/configuration.host.edit.php:402
 #: include/views/configuration.host.prototype.edit.php:146
 #: include/views/inventory.host.view.php:162
 msgid "IPMI interfaces"
@@ -6875,11 +6922,9 @@ msgstr ""
 
 #: adm.gui.php:93 adm.housekeeper.php:128 adm.iconmapping.php:113
 #: adm.iconmapping.php:176 adm.images.php:138 adm.macros.php:161
-#: adm.other.php:73 adm.triggerdisplayoptions.php:88
+#: adm.other.php:73 adm.regexps.php:204 adm.triggerdisplayoptions.php:88
 #: adm.triggerseverities.php:84 adm.valuemapping.php:131
 #: adm.workingtime.php:59
-#: include/views/administration.general.regularexpressions.edit.php:33
-#: include/views/administration.general.regularexpressions.list.php:30
 msgid "Icon mapping"
 msgstr ""
 
@@ -6948,12 +6993,10 @@ msgid "Image updated"
 msgstr "Kép frissítve"
 
 #: adm.gui.php:92 adm.housekeeper.php:127 adm.iconmapping.php:112
-#: adm.images.php:137 adm.macros.php:160 adm.other.php:72
+#: adm.images.php:137 adm.macros.php:160 adm.other.php:72 adm.regexps.php:203
 #: adm.triggerdisplayoptions.php:87 adm.triggerseverities.php:83
 #: adm.valuemapping.php:130 adm.workingtime.php:58
 #: include/views/administration.general.image.list.php:29
-#: include/views/administration.general.regularexpressions.edit.php:32
-#: include/views/administration.general.regularexpressions.list.php:29
 #: include/views/conf.import.php:39
 msgid "Images"
 msgstr "Képek"
@@ -6970,7 +7013,7 @@ msgstr "Azonnal"
 #: include/views/configuration.screen.list.php:33
 #: include/views/configuration.sysmap.list.php:28
 #: include/views/conf.import.php:83 include/views/conf.import.php:89
-#: templates.php:572
+#: templates.php:495
 msgid "Import"
 msgstr "Import"
 
@@ -6997,7 +7040,7 @@ msgstr ""
 
 #: include/classes/html/CTweenBox.php:73
 #: include/classes/html/CTweenBox.php:100
-#: include/views/configuration.template.edit.php:143
+#: include/views/configuration.template.edit.php:170
 msgid "In"
 msgstr "-ban/-ben"
 
@@ -7005,8 +7048,8 @@ msgstr "-ban/-ben"
 msgid "In group"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:250
-#: include/views/configuration.template.edit.php:112
+#: include/views/configuration.host.edit.php:223
+#: include/views/configuration.template.edit.php:114
 msgid "In groups"
 msgstr ""
 
@@ -7227,8 +7270,8 @@ msgstr ""
 msgid "Incorrect characters used for host \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:651
-#: include/classes/api/services/CHost.php:988
+#: include/classes/api/services/CHost.php:634
+#: include/classes/api/services/CHost.php:965
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr ""
@@ -7239,7 +7282,7 @@ msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CTemplate.php:448
-#: include/classes/api/services/CTemplate.php:1057
+#: include/classes/api/services/CTemplate.php:1055
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr ""
@@ -7349,7 +7392,7 @@ msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s
 msgstr ""
 
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1615 tr_testexpr.php:36
+#: include/triggers.inc.php:1634 tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "Hibás funkció"
 
@@ -7420,7 +7463,7 @@ msgstr ""
 msgid "Incorrect interface port \"%s\" provided."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:622
+#: include/classes/api/services/CHost.php:589
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr ""
@@ -7640,7 +7683,7 @@ msgstr ""
 msgid "Incorrect source value."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:591
+#: include/classes/api/services/CHost.php:553
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr ""
@@ -7816,8 +7859,8 @@ msgstr ""
 msgid "Indonesian (id_ID)"
 msgstr ""
 
-#: include/actions.inc.php:1128 include/blocks.inc.php:1028
-#: include/blocks.inc.php:1323 include/classes/html/CFormList.php:72
+#: include/actions.inc.php:1128 include/blocks.inc.php:1025
+#: include/blocks.inc.php:1320 include/classes/html/CFormList.php:72
 #: include/classes/screens/CScreenActions.php:134
 #: include/views/administration.auditacts.list.php:77
 #: include/views/configuration.host.discovery.list.php:55
@@ -8067,7 +8110,7 @@ msgstr ""
 msgid "Inventory"
 msgstr "Leltár"
 
-#: include/classes/api/services/CHost.php:1178
+#: include/classes/api/services/CHost.php:1189
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr ""
@@ -8084,8 +8127,8 @@ msgstr ""
 msgid "Is online?"
 msgstr "Bejelentkezve?"
 
-#: include/blocks.inc.php:1016 include/blocks.inc.php:1025
-#: include/blocks.inc.php:1321
+#: include/blocks.inc.php:1013 include/blocks.inc.php:1022
+#: include/blocks.inc.php:1318
 msgid "Issue"
 msgstr "Eredmény"
 
@@ -8240,8 +8283,8 @@ msgstr ""
 
 #: include/html.inc.php:379 include/html.inc.php:383
 #: include/views/configuration.host.discovery.list.php:111
-#: include/views/configuration.host.edit.php:617
-#: include/views/configuration.template.edit.php:282 popup.php:95
+#: include/views/configuration.host.edit.php:589
+#: include/views/configuration.template.edit.php:309 popup.php:95
 msgid "Item prototypes"
 msgstr ""
 
@@ -8314,16 +8357,16 @@ msgstr ""
 #: include/views/configuration.application.list.php:94
 #: include/views/configuration.graph.edit.php:284
 #: include/views/configuration.host.discovery.list.php:47
-#: include/views/configuration.host.edit.php:508
+#: include/views/configuration.host.edit.php:480
 #: include/views/configuration.host.list.php:79
 #: include/views/configuration.host.list.php:96
 #: include/views/configuration.item.list.php:42
-#: include/views/configuration.template.edit.php:193
+#: include/views/configuration.template.edit.php:220
 #: include/views/conf.import.php:33 include/views/inventory.host.view.php:231
 #: include/views/inventory.host.view.php:241 latest.php:343 popup.php:71
 #: queue.php:103 report6.php:44 search.php:141 search.php:173 search.php:198
-#: search.php:395 search.php:426 search.php:455 templates.php:592
-#: templates.php:651
+#: search.php:395 search.php:426 search.php:455 templates.php:515
+#: templates.php:574
 msgid "Items"
 msgstr "Elemek"
 
@@ -8355,8 +8398,8 @@ msgstr ""
 msgid "JMX agent"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:339
-#: include/views/configuration.host.edit.php:417
+#: include/views/configuration.host.edit.php:311
+#: include/views/configuration.host.edit.php:389
 #: include/views/configuration.host.prototype.edit.php:133
 #: include/views/inventory.host.view.php:142
 msgid "JMX interfaces"
@@ -8506,7 +8549,7 @@ msgstr "Cimke"
 msgid "Label location"
 msgstr "Cimke elhelyezkedése"
 
-#: include/views/administration.users.edit.php:143
+#: include/views/administration.users.edit.php:144
 msgid "Language"
 msgstr "Nyelv"
 
@@ -8558,7 +8601,7 @@ msgstr "Utolsó 365 nap"
 msgid "Last 7 days"
 msgstr "Utolsó 7 nap"
 
-#: include/blocks.inc.php:1026 tr_status.php:293
+#: include/blocks.inc.php:1023 tr_status.php:293
 msgid "Last change"
 msgstr "Aktuális változás"
 
@@ -8673,9 +8716,9 @@ msgstr "Kapcsolat"
 msgid "Link indicators"
 msgstr "Kapcsolatjelzők"
 
-#: include/views/configuration.host.edit.php:785
+#: include/views/configuration.host.edit.php:757
 #: include/views/configuration.host.prototype.edit.php:260
-#: include/views/configuration.template.edit.php:441
+#: include/views/configuration.template.edit.php:468
 msgid "Link new templates"
 msgstr ""
 
@@ -8705,15 +8748,15 @@ msgstr ""
 msgid "Link with templates"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:763
-#: include/views/configuration.host.edit.php:799
+#: include/views/configuration.host.edit.php:735
+#: include/views/configuration.host.edit.php:771
 #: include/views/configuration.host.prototype.edit.php:233
-#: include/views/configuration.template.edit.php:416
-#: include/views/configuration.template.edit.php:443 templates.php:598
+#: include/views/configuration.template.edit.php:443
+#: include/views/configuration.template.edit.php:470 templates.php:521
 msgid "Linked templates"
 msgstr "Csatolt minták"
 
-#: templates.php:599
+#: templates.php:522
 msgid "Linked to"
 msgstr "Csatolva"
 
@@ -8761,7 +8804,7 @@ msgid "Location longitude"
 msgstr ""
 
 #: include/forms.inc.php:417 include/items.inc.php:127
-#: include/triggers.inc.php:2064 include/views/configuration.item.edit.php:217
+#: include/triggers.inc.php:2083 include/views/configuration.item.edit.php:217
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "Napló"
@@ -8931,15 +8974,13 @@ msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr ""
 
 #: adm.gui.php:95 adm.housekeeper.php:130 adm.iconmapping.php:115
-#: adm.images.php:140 adm.macros.php:163 adm.other.php:75
+#: adm.images.php:140 adm.macros.php:163 adm.other.php:75 adm.regexps.php:206
 #: adm.triggerdisplayoptions.php:90 adm.triggerseverities.php:86
 #: adm.valuemapping.php:133 adm.workingtime.php:61
 #: include/views/administration.general.macros.edit.php:31
-#: include/views/administration.general.regularexpressions.edit.php:35
-#: include/views/administration.general.regularexpressions.list.php:32
-#: include/views/configuration.host.edit.php:851
+#: include/views/configuration.host.edit.php:823
 #: include/views/configuration.host.prototype.edit.php:285
-#: include/views/configuration.template.edit.php:453
+#: include/views/configuration.template.edit.php:480
 msgid "Macros"
 msgstr "Makrók"
 
@@ -9003,11 +9044,11 @@ msgstr "Karbantartás típusa"
 msgid "Maintenance updated"
 msgstr "Karbantartás frissítve"
 
-#: include/blocks.inc.php:1057 tr_status.php:606
+#: include/blocks.inc.php:1054 tr_status.php:627
 msgid "Maintenance with data collection"
 msgstr ""
 
-#: include/blocks.inc.php:1056 tr_status.php:605
+#: include/blocks.inc.php:1053 tr_status.php:626
 msgid "Maintenance without data collection"
 msgstr ""
 
@@ -9015,7 +9056,7 @@ msgstr ""
 msgid "Mandatory parameter is missing."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:875
+#: include/views/configuration.host.edit.php:847
 #: include/views/configuration.host.massupdate.php:286
 #: include/views/configuration.host.prototype.edit.php:311
 msgid "Manual"
@@ -9117,11 +9158,11 @@ msgstr "Válaszott megjelölése"
 msgid "Mask"
 msgstr ""
 
-#: include/views/configuration.host.list.php:220
-#: include/views/configuration.item.list.php:277
+#: include/views/configuration.host.list.php:219
+#: include/views/configuration.item.list.php:273
 #: include/views/configuration.item.massupdate.php:566
-#: include/views/configuration.trigger.prototype.list.php:147
-#: include/views/configuration.triggers.list.php:223
+#: include/views/configuration.trigger.prototype.list.php:143
+#: include/views/configuration.triggers.list.php:222
 #: include/views/configuration.triggers.massupdate.php:159
 msgid "Mass update"
 msgstr "Tömeges frissítés"
@@ -9203,8 +9244,8 @@ msgctxt "May short"
 msgid "May"
 msgstr ""
 
-#: include/views/administration.users.edit.php:218
-#: include/views/administration.users.edit.php:299 popup_media.php:27
+#: include/views/administration.users.edit.php:219
+#: include/views/administration.users.edit.php:300 popup_media.php:27
 msgid "Media"
 msgstr "Eszköztípus"
 
@@ -9292,11 +9333,11 @@ msgstr "Üzenet eljárások"
 msgid "Message text limit"
 msgstr ""
 
-#: include/views/administration.users.edit.php:239
+#: include/views/administration.users.edit.php:240
 msgid "Message timeout"
 msgstr ""
 
-#: include/views/administration.users.edit.php:234
+#: include/views/administration.users.edit.php:235
 msgid "Message timeout (seconds)"
 msgstr ""
 
@@ -9304,7 +9345,7 @@ msgstr ""
 msgid "Messages"
 msgstr ""
 
-#: include/views/administration.users.edit.php:328
+#: include/views/administration.users.edit.php:329
 msgid "Messaging"
 msgstr ""
 
@@ -9457,7 +9498,7 @@ msgstr ""
 msgid "Monday"
 msgstr "Hétfő"
 
-#: include/views/configuration.host.edit.php:462
+#: include/views/configuration.host.edit.php:434
 #: include/views/configuration.host.massupdate.php:171
 #: include/views/configuration.host.prototype.edit.php:155
 msgid "Monitored by proxy"
@@ -9514,7 +9555,7 @@ msgstr "Leggyakoribb trigger-ek (top 100)"
 msgid "Mozilla Firefox"
 msgstr ""
 
-#: include/triggers.inc.php:1482
+#: include/triggers.inc.php:1501
 msgid "Multiple PROBLEM events"
 msgstr ""
 
@@ -9551,8 +9592,8 @@ msgstr ""
 #: include/views/administration.general.iconmap.edit.php:29
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.image.edit.php:34
-#: include/views/administration.general.regularexpressions.edit.php:62
-#: include/views/administration.general.regularexpressions.list.php:55
+#: include/views/administration.general.regularexpressions.edit.php:37
+#: include/views/administration.general.regularexpressions.list.php:31
 #: include/views/administration.general.valuemapping.edit.php:35
 #: include/views/administration.general.valuemapping.list.php:24
 #: include/views/administration.mediatypes.edit.php:35
@@ -9573,8 +9614,8 @@ msgstr ""
 #: include/views/configuration.graph.list.php:77
 #: include/views/configuration.host.discovery.edit.php:52
 #: include/views/configuration.host.discovery.list.php:46
-#: include/views/configuration.host.edit.php:733
-#: include/views/configuration.host.edit.php:791
+#: include/views/configuration.host.edit.php:705
+#: include/views/configuration.host.edit.php:763
 #: include/views/configuration.hostgroups.list.php:50
 #: include/views/configuration.host.list.php:43
 #: include/views/configuration.host.list.php:77
@@ -9598,7 +9639,7 @@ msgstr ""
 #: include/views/configuration.sysmap.edit.php:41
 #: include/views/configuration.sysmap.edit.php:137
 #: include/views/configuration.sysmap.list.php:43
-#: include/views/configuration.template.edit.php:384
+#: include/views/configuration.template.edit.php:411
 #: include/views/configuration.trigger.prototype.list.php:61
 #: include/views/configuration.triggers.edit.php:63
 #: include/views/configuration.triggers.edit.php:282
@@ -9618,7 +9659,7 @@ msgstr ""
 msgid "Name"
 msgstr "Név"
 
-#: include/views/administration.users.edit.php:51
+#: include/views/administration.users.edit.php:52
 #: include/views/administration.users.list.php:55 popup.php:596 users.php:45
 msgctxt "user first name"
 msgid "Name"
@@ -9704,8 +9745,8 @@ msgstr ""
 msgid "New flexible interval"
 msgstr "Új, változó intervallum"
 
-#: include/views/configuration.host.edit.php:254
-#: include/views/configuration.template.edit.php:117
+#: include/views/configuration.host.edit.php:227
+#: include/views/configuration.template.edit.php:119
 msgid "New group"
 msgstr "Új csoport"
 
@@ -9721,7 +9762,7 @@ msgstr "Új adatsor a grafikonhoz"
 msgid "New media"
 msgstr "Új eszköztípus"
 
-#: include/views/administration.general.regularexpressions.list.php:43
+#: adm.regexps.php:217
 msgid "New regular expression"
 msgstr "Új reguláris kifejezés"
 
@@ -9738,8 +9779,8 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr ""
 
-#: events.php:798 include/events.inc.php:355 include/events.inc.php:373
-#: include/func.inc.php:1993 include/triggers.inc.php:1484
+#: events.php:811 include/events.inc.php:355 include/events.inc.php:373
+#: include/func.inc.php:1993 include/triggers.inc.php:1503
 #: include/views/administration.users.list.php:76
 #: include/views/administration.users.list.php:79
 #: include/views/configuration.httpconf.list.php:122
@@ -9812,7 +9853,7 @@ msgstr ""
 msgid "No \"ymin_type\" field for graph \"%s\"."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:427
+#: include/views/configuration.host.edit.php:399
 #: include/views/configuration.host.prototype.edit.php:143
 msgid "No IPMI interfaces found."
 msgstr ""
@@ -9821,7 +9862,7 @@ msgstr ""
 msgid "No IT services found."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:414
+#: include/views/configuration.host.edit.php:386
 #: include/views/configuration.host.prototype.edit.php:130
 msgid "No JMX interfaces found."
 msgstr ""
@@ -9834,7 +9875,7 @@ msgstr ""
 msgid "No SNMP community specified."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:401
+#: include/views/configuration.host.edit.php:373
 #: include/views/configuration.host.prototype.edit.php:117
 msgid "No SNMP interfaces found."
 msgstr ""
@@ -9865,7 +9906,7 @@ msgstr ""
 msgid "No actions found."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:387
+#: include/views/configuration.host.edit.php:359
 #: include/views/configuration.host.prototype.edit.php:103
 msgid "No agent interfaces found."
 msgstr ""
@@ -9964,11 +10005,11 @@ msgstr ""
 msgid "No errors found."
 msgstr ""
 
-#: include/blocks.inc.php:1102 include/blocks.inc.php:1342 tr_status.php:675
+#: include/blocks.inc.php:1099 include/blocks.inc.php:1339 tr_status.php:699
 msgid "No events"
 msgstr ""
 
-#: events.php:405 include/blocks.inc.php:1022
+#: events.php:405 include/blocks.inc.php:1019
 #: include/classes/screens/CScreenEvents.php:37 include/events.inc.php:191
 msgid "No events found."
 msgstr ""
@@ -10018,13 +10059,13 @@ msgstr ""
 msgid "No graphs found."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:566
-#: include/classes/api/services/CHost.php:573
+#: include/classes/api/services/CHost.php:606
+#: include/classes/api/services/CHost.php:616
 #, c-format
-msgid "No groups for host \"%1$s\"."
+msgid "No groups for host \"%s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:974
+#: include/classes/api/services/CHost.php:951
 msgid "No groups for hosts."
 msgstr ""
 
@@ -10033,7 +10074,7 @@ msgstr ""
 msgid "No groups for template \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:982
+#: include/classes/api/services/CTemplate.php:980
 msgid "No groups for template."
 msgstr ""
 
@@ -10117,8 +10158,8 @@ msgstr ""
 msgid "No interface provided for proxy \"%s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:639
-#: include/classes/api/services/CHost.php:645
+#: include/classes/api/services/CHost.php:610
+#: include/classes/api/services/CHost.php:628
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr ""
@@ -10188,7 +10229,7 @@ msgstr ""
 msgid "No matches found"
 msgstr ""
 
-#: include/views/administration.users.edit.php:178
+#: include/views/administration.users.edit.php:179
 msgid "No media found."
 msgstr ""
 
@@ -10249,7 +10290,7 @@ msgid "No permissions for screen \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CUser.php:996
-#: include/classes/api/services/CUser.php:1123
+#: include/classes/api/services/CUser.php:1125
 msgid "No permissions for system access."
 msgstr ""
 
@@ -10273,23 +10314,21 @@ msgstr ""
 #: include/classes/api/services/CGraphPrototype.php:679
 #: include/classes/api/services/CGraphPrototype.php:741
 #: include/classes/api/services/CHostBase.php:45
-#: include/classes/api/services/CHostGeneral.php:65
-#: include/classes/api/services/CHostGeneral.php:115
-#: include/classes/api/services/CHostGroup.php:485
-#: include/classes/api/services/CHostGroup.php:563
-#: include/classes/api/services/CHostGroup.php:935
-#: include/classes/api/services/CHostGroup.php:965
-#: include/classes/api/services/CHostGroup.php:1092
-#: include/classes/api/services/CHostGroup.php:1194
-#: include/classes/api/services/CHostGroup.php:1221
+#: include/classes/api/services/CHostGeneral.php:140
+#: include/classes/api/services/CHostGroup.php:484
+#: include/classes/api/services/CHostGroup.php:562
+#: include/classes/api/services/CHostGroup.php:747
+#: include/classes/api/services/CHostGroup.php:809
+#: include/classes/api/services/CHostGroup.php:863
+#: include/classes/api/services/CHostGroup.php:872
+#: include/classes/api/services/CHostGroup.php:895
 #: include/classes/api/services/CHostInterface.php:264
 #: include/classes/api/services/CHostInterface.php:280
 #: include/classes/api/services/CHostInterface.php:423
 #: include/classes/api/services/CHostInterface.php:647
-#: include/classes/api/services/CHost.php:522
-#: include/classes/api/services/CHost.php:561
-#: include/classes/api/services/CHost.php:579
-#: include/classes/api/services/CHost.php:1665
+#: include/classes/api/services/CHost.php:530
+#: include/classes/api/services/CHost.php:621
+#: include/classes/api/services/CHost.php:1644
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -10327,8 +10366,6 @@ msgstr ""
 #: include/classes/api/services/CScreen.php:610
 #: include/classes/api/services/CService.php:1051
 #: include/classes/api/services/CService.php:1066
-#: include/classes/api/services/CTemplate.php:741
-#: include/classes/api/services/CTemplate.php:750
 #: include/classes/api/services/CTemplateScreen.php:568
 #: include/classes/api/services/CTemplateScreen.php:619
 #: include/classes/api/services/CTemplateScreen.php:671
@@ -10345,7 +10382,7 @@ msgstr ""
 #: include/classes/api/services/CUser.php:798
 #: include/classes/api/services/CUser.php:818
 #: include/classes/api/services/CUser.php:877
-#: include/classes/api/services/CUser.php:1280 include/func.inc.php:1661
+#: include/classes/api/services/CUser.php:1282 include/func.inc.php:1661
 msgid "No permissions to referred object or it does not exist!"
 msgstr ""
 
@@ -10379,7 +10416,7 @@ msgstr ""
 msgid "No recipients for action operation message."
 msgstr ""
 
-#: include/views/administration.general.regularexpressions.list.php:52
+#: include/views/administration.general.regularexpressions.list.php:28
 msgid "No regular expressions found."
 msgstr ""
 
@@ -10419,7 +10456,7 @@ msgstr ""
 msgid "No status for proxy."
 msgstr ""
 
-#: triggers.php:348
+#: triggers.php:331
 msgid "No target selected"
 msgstr "Nincs cél kiválasztva"
 
@@ -10427,14 +10464,14 @@ msgstr "Nincs cél kiválasztva"
 msgid "No target selected."
 msgstr ""
 
-#: popup.php:660 search.php:403 templates.php:587
+#: popup.php:660 search.php:403 templates.php:510
 msgid "No templates found."
 msgstr ""
 
-#: include/views/configuration.host.edit.php:722
+#: include/views/configuration.host.edit.php:694
 #: include/views/configuration.host.prototype.edit.php:213
 #: include/views/configuration.host.prototype.edit.php:237
-#: include/views/configuration.template.edit.php:382
+#: include/views/configuration.template.edit.php:409
 msgid "No templates linked."
 msgstr ""
 
@@ -10459,7 +10496,7 @@ msgstr ""
 msgid "No triggers defined."
 msgstr ""
 
-#: include/triggers.inc.php:1084
+#: include/triggers.inc.php:1083
 #: include/views/configuration.triggers.list.php:68
 #: include/views/monitoring.overview.triggers.php:115
 #: include/views/reports.toptriggers.php:156 popup.php:971 report2.php:391
@@ -10487,7 +10524,7 @@ msgstr ""
 msgid "No values found."
 msgstr ""
 
-#: httpmon.php:89 include/blocks.inc.php:1190
+#: httpmon.php:89 include/blocks.inc.php:1187
 #: include/views/configuration.httpconf.list.php:58
 msgid "No web scenarios found."
 msgstr ""
@@ -10502,7 +10539,7 @@ msgid "None"
 msgstr "Nincs"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1481 include/views/monitoring.history.php:242
+#: include/triggers.inc.php:1500 include/views/monitoring.history.php:242
 #: popup.php:1376
 msgid "Normal"
 msgstr "Normál"
@@ -10612,19 +10649,19 @@ msgstr ""
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:839
 msgid "Number of items in Zabbix database."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:859
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:863
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:835
 msgid "Number of monitored hosts"
 msgstr ""
 
@@ -10641,7 +10678,7 @@ msgstr ""
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:711
+#: include/classes/items/CHelpItems.php:707
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -10689,11 +10726,11 @@ msgstr ""
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:883
 msgid "Number of triggers in Zabbix database."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:843
 msgid "Number of unsupported items in Zabbix database."
 msgstr ""
 
@@ -10706,47 +10743,47 @@ msgstr "Felhasználók száma (bejelentkezve)"
 msgid "Number of users connected. Command who is used on agent side."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:807
 msgid "Number of values stored in table HISTORY."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:811
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:815
 msgid "Number of values stored in table HISTORY_STR."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:819
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:823
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:875
 msgid "Number of values stored in table TRENDS."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:879
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:699
+#: include/classes/items/CHelpItems.php:695
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
 #: include/forms.inc.php:415 include/items.inc.php:123
-#: include/triggers.inc.php:2062 include/views/configuration.item.edit.php:215
+#: include/triggers.inc.php:2081 include/views/configuration.item.edit.php:215
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "Numerikus (lebegőpontos)"
 
-#: include/triggers.inc.php:2061 include/triggers.inc.php:2077
-#: include/triggers.inc.php:2081 include/triggers.inc.php:2091
-#: include/triggers.inc.php:2096 include/triggers.inc.php:2101
+#: include/triggers.inc.php:2080 include/triggers.inc.php:2096
+#: include/triggers.inc.php:2100 include/triggers.inc.php:2110
+#: include/triggers.inc.php:2115 include/triggers.inc.php:2120
 msgid "Numeric (integer 64bit)"
 msgstr "Numerikus (64 bites egész szám)"
 
@@ -10831,7 +10868,7 @@ msgstr "Október"
 msgid "Off"
 msgstr "KIKAPCSOL"
 
-#: include/actions.inc.php:1379 include/blocks.inc.php:1193
+#: include/actions.inc.php:1379 include/blocks.inc.php:1190
 #: include/classes/html/CTriggersInfo.php:115
 #: include/views/administration.users.list.php:85 report2.php:396
 #: report3.php:83
@@ -10848,13 +10885,12 @@ msgstr "BEKAPCSOL"
 msgid "On status change triggers blink for"
 msgstr ""
 
-#: include/views/administration.users.edit.php:237
+#: include/views/administration.users.edit.php:238
 msgid "Once"
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:1101
-#: include/classes/api/services/CHostGroup.php:1110
-#: include/classes/api/services/CHostGroup.php:1203
+#: include/classes/api/services/CHostGroup.php:825
+#: include/classes/api/services/CHostGroup.php:959
 msgid "One of the objects is left without a host group."
 msgstr ""
 
@@ -10995,7 +11031,7 @@ msgstr "Műveletek"
 msgid "Operator"
 msgstr "Operátor"
 
-#: include/triggers.inc.php:1539
+#: include/triggers.inc.php:1558
 #: include/views/configuration.action.edit.php:128
 #: include/views/configuration.action.edit.php:1028
 #: include/views/configuration.host.discovery.edit.php:279
@@ -11058,13 +11094,11 @@ msgid "Original blue"
 msgstr "Eredeti kék"
 
 #: adm.gui.php:100 adm.housekeeper.php:135 adm.iconmapping.php:120
-#: adm.images.php:145 adm.macros.php:168 adm.other.php:80
+#: adm.images.php:145 adm.macros.php:168 adm.other.php:80 adm.regexps.php:211
 #: adm.triggerdisplayoptions.php:95 adm.triggerseverities.php:91
 #: adm.valuemapping.php:138 adm.workingtime.php:66
 #: include/classes/html/CTweenBox.php:76
 #: include/classes/html/CTweenBox.php:103
-#: include/views/administration.general.regularexpressions.edit.php:40
-#: include/views/administration.general.regularexpressions.list.php:37
 msgid "Other"
 msgstr "Egyéb"
 
@@ -11074,9 +11108,9 @@ msgstr ""
 
 #: include/reports.inc.php:325
 #: include/views/administration.usergroups.edit.php:54
-#: include/views/configuration.host.edit.php:250
+#: include/views/configuration.host.edit.php:223
 #: include/views/configuration.maintenance.edit.php:176
-#: include/views/configuration.template.edit.php:112
+#: include/views/configuration.template.edit.php:114
 msgid "Other groups"
 msgstr ""
 
@@ -11094,7 +11128,7 @@ msgstr ""
 msgid "Other parameters"
 msgstr "Egyéb paraméterek"
 
-#: include/views/configuration.template.edit.php:144
+#: include/views/configuration.template.edit.php:171
 msgid "Other | group"
 msgstr ""
 
@@ -11370,14 +11404,14 @@ msgstr ""
 #: httpconf.php:59 include/classes/setup/CSetupWizard.php:326
 #: include/views/administration.mediatypes.edit.php:81
 #: include/views/administration.mediatypes.edit.php:85
-#: include/views/administration.users.edit.php:82
-#: include/views/administration.users.edit.php:100
-#: include/views/administration.users.edit.php:104
+#: include/views/administration.users.edit.php:83
+#: include/views/administration.users.edit.php:101
+#: include/views/administration.users.edit.php:105
 #: include/views/configuration.action.edit.php:783
 #: include/views/configuration.action.edit.php:816
 #: include/views/configuration.host.discovery.edit.php:164
 #: include/views/configuration.host.discovery.edit.php:176
-#: include/views/configuration.host.edit.php:837
+#: include/views/configuration.host.edit.php:809
 #: include/views/configuration.host.prototype.edit.php:277
 #: include/views/configuration.httpconf.edit.php:131
 #: include/views/configuration.item.edit.php:173
@@ -11389,7 +11423,7 @@ msgstr ""
 msgid "Password"
 msgstr "Jelszó"
 
-#: include/views/administration.users.edit.php:86
+#: include/views/administration.users.edit.php:87
 msgid "Password (once again)"
 msgstr "Jelszó (ismétlés)"
 
@@ -11470,11 +11504,11 @@ msgid "Periods"
 msgstr ""
 
 #: include/views/administration.usergroups.edit.php:140
-#: include/views/administration.users.edit.php:325
+#: include/views/administration.users.edit.php:326
 msgid "Permissions"
 msgstr ""
 
-#: include/views/administration.users.edit.php:323
+#: include/views/administration.users.edit.php:324
 msgid "Permissions can be assigned for user groups only."
 msgstr ""
 
@@ -11494,12 +11528,12 @@ msgstr ""
 msgid "Plain text"
 msgstr "Szöveg"
 
-#: include/views/administration.users.edit.php:252
-#: include/views/administration.users.edit.php:281
+#: include/views/administration.users.edit.php:253
+#: include/views/administration.users.edit.php:282
 msgid "Play"
 msgstr ""
 
-#: include/views/administration.users.edit.php:240
+#: include/views/administration.users.edit.php:241
 msgid "Play sound"
 msgstr ""
 
@@ -11529,8 +11563,8 @@ msgstr ""
 #: include/views/administration.proxy.edit.php:55
 #: include/views/configuration.action.edit.php:830
 #: include/views/configuration.host.discovery.edit.php:154
-#: include/views/configuration.host.edit.php:293
-#: include/views/configuration.host.edit.php:379
+#: include/views/configuration.host.edit.php:265
+#: include/views/configuration.host.edit.php:351
 #: include/views/configuration.host.list.php:46
 #: include/views/configuration.host.prototype.edit.php:95
 #: include/views/configuration.item.edit.php:163
@@ -11651,8 +11685,8 @@ msgstr ""
 msgid "Private key file"
 msgstr "Privát kulcsfájl"
 
-#: include/views/configuration.host.edit.php:825
-#: include/views/configuration.host.edit.php:833
+#: include/views/configuration.host.edit.php:797
+#: include/views/configuration.host.edit.php:805
 #: include/views/configuration.host.prototype.edit.php:274
 msgid "Privilege level"
 msgstr ""
@@ -11826,7 +11860,7 @@ msgstr ""
 msgid "Recipient(s)"
 msgstr "Címzett(ek)"
 
-#: include/views/administration.users.edit.php:249
+#: include/views/administration.users.edit.php:250
 msgid "Recovery"
 msgstr ""
 
@@ -11839,7 +11873,7 @@ msgstr "Üzenet a helyreállásról"
 msgid "Recovery subject"
 msgstr "Visszaállás tárgya"
 
-#: include/views/administration.users.edit.php:167 profile.php:53 users.php:64
+#: include/views/administration.users.edit.php:168 profile.php:53 users.php:64
 msgid "Refresh (in seconds)"
 msgstr "Frissités (másodpercben)"
 
@@ -11910,12 +11944,10 @@ msgid "Regular expression updated"
 msgstr "Reguláris kifejezés frissítve"
 
 #: adm.gui.php:94 adm.housekeeper.php:129 adm.iconmapping.php:114
-#: adm.images.php:139 adm.macros.php:162 adm.other.php:74
+#: adm.images.php:139 adm.macros.php:162 adm.other.php:74 adm.regexps.php:205
 #: adm.triggerdisplayoptions.php:89 adm.triggerseverities.php:85
 #: adm.valuemapping.php:132 adm.workingtime.php:60
-#: include/views/administration.general.regularexpressions.edit.php:34
-#: include/views/administration.general.regularexpressions.list.php:31
-#: include/views/administration.general.regularexpressions.list.php:49
+#: include/views/administration.general.regularexpressions.list.php:22
 msgid "Regular expressions"
 msgstr "Reguláris kifejezések"
 
@@ -12073,7 +12105,7 @@ msgstr ""
 msgid "Required performance (vps)"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:871
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr ""
 
@@ -12145,8 +12177,8 @@ msgstr "Válaszkód"
 msgid "Response time"
 msgstr "Válaszidő"
 
-#: include/views/administration.general.regularexpressions.edit.php:98
-#: include/views/administration.general.regularexpressions.edit.php:99
+#: include/views/administration.general.regularexpressions.edit.php:73
+#: include/views/administration.general.regularexpressions.edit.php:74
 #: tr_testexpr.php:137 tr_testexpr.php:181
 msgid "Result"
 msgstr "Eredmény"
@@ -12187,7 +12219,7 @@ msgstr ""
 msgid "Retry"
 msgstr "Újra"
 
-#: include/classes/items/CHelpItems.php:921
+#: include/classes/items/CHelpItems.php:909
 msgid "Return first column of the first row of the SQL query result."
 msgstr ""
 
@@ -12195,11 +12227,11 @@ msgstr ""
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:831
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:827
 msgid "Returns current maintenance status of the host."
 msgstr ""
 
@@ -12213,7 +12245,7 @@ msgstr ""
 msgid "Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:847
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr ""
 
@@ -12251,7 +12283,7 @@ msgstr "Sorok száma"
 msgid "Rows"
 msgstr "Sorok"
 
-#: include/views/administration.users.edit.php:168 profile.php:54 users.php:65
+#: include/views/administration.users.edit.php:169 profile.php:54 users.php:65
 msgid "Rows per page"
 msgstr "Sorok oldalanként"
 
@@ -12397,8 +12429,8 @@ msgstr "SNMP OID"
 msgid "SNMP community"
 msgstr "SNMP jelszó (community)"
 
-#: include/views/configuration.host.edit.php:324
-#: include/views/configuration.host.edit.php:404
+#: include/views/configuration.host.edit.php:296
+#: include/views/configuration.host.edit.php:376
 #: include/views/configuration.host.prototype.edit.php:120
 #: include/views/inventory.host.view.php:123
 msgid "SNMP interfaces"
@@ -12583,7 +12615,7 @@ msgstr ""
 msgid "Screen \"%1$s\" updated."
 msgstr ""
 
-#: screenconf.php:165
+#: screenconf.php:168
 msgid "Screen added"
 msgstr "Képernyő létrehozva"
 
@@ -12591,7 +12623,7 @@ msgstr "Képernyő létrehozva"
 msgid "Screen cell configuration"
 msgstr "Képernyő cella konfigurálása"
 
-#: screenconf.php:237
+#: screenconf.php:240
 msgid "Screen deleted"
 msgstr "Képernyő törölve"
 
@@ -12599,20 +12631,20 @@ msgstr "Képernyő törölve"
 msgid "Screen should contain at least one row and column."
 msgstr ""
 
-#: screenconf.php:130 screenedit.php:231 screenedit.php:248
+#: screenconf.php:133 screenedit.php:231 screenedit.php:248
 msgid "Screen updated"
 msgstr "Képernyő frissítve"
 
 #: dashboard.php:350 include/html.inc.php:465 include/html.inc.php:469
 #: include/menu.inc.php:66 include/menu.inc.php:189
 #: include/views/configuration.screen.list.php:38
-#: include/views/configuration.template.edit.php:345
+#: include/views/configuration.template.edit.php:372
 #: include/views/conf.import.php:37 include/views/inventory.host.view.php:221
 #: include/views/monitoring.screen.php:27
 #: include/views/monitoring.screen.php:77
 #: include/views/monitoring.slides.php:29 popup.php:79 popup.php:103
 #: search.php:138 search.php:224 search.php:398 search.php:438 search.php:458
-#: templates.php:595 templates.php:657
+#: templates.php:518 templates.php:580
 msgid "Screens"
 msgstr "Képernyők"
 
@@ -12722,7 +12754,7 @@ msgstr ""
 msgid "Secondary POC screen name"
 msgstr ""
 
-#: include/views/administration.users.edit.php:238
+#: include/views/administration.users.edit.php:239
 msgid "Seconds"
 msgstr "Másodpercek"
 
@@ -12798,7 +12830,7 @@ msgstr "A következő értéket tartalmazó sorok kiválasztása"
 msgid "Selected"
 msgstr "Kijelölt"
 
-#: actionconf.php:380
+#: actionconf.php:378
 msgid "Selected actions deleted"
 msgstr ""
 
@@ -12955,13 +12987,13 @@ msgstr "Szolgáltatások"
 msgid "Services form a circular dependency."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1117
+#: include/classes/api/services/CUser.php:1119
 msgid "Session terminated, re-login, please."
 msgstr ""
 
 #: events.php:474 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:150
-#: include/triggers.inc.php:1476 include/views/configuration.item.list.php:148
+#: include/triggers.inc.php:1495 include/views/configuration.item.list.php:148
 #: include/views/configuration.trigger.prototype.list.php:60
 #: include/views/configuration.triggers.edit.php:253
 #: include/views/configuration.triggers.list.php:71
@@ -12981,7 +13013,7 @@ msgstr ""
 #: include/reports.inc.php:440
 #: include/views/configuration.application.list.php:60
 #: include/views/js/configuration.sysmaps.js.php:26 report2.php:419
-#: tr_status.php:709 tr_status.php:714
+#: tr_status.php:733 tr_status.php:738
 msgid "Show"
 msgstr "Megjelenít"
 
@@ -13311,7 +13343,7 @@ msgstr ""
 msgid "Start in"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:803
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr ""
 
@@ -13425,8 +13457,8 @@ msgstr ""
 msgid "Steps"
 msgstr "Lépések száma"
 
-#: include/views/administration.users.edit.php:253
-#: include/views/administration.users.edit.php:282
+#: include/views/administration.users.edit.php:254
+#: include/views/administration.users.edit.php:283
 msgid "Stop"
 msgstr ""
 
@@ -13496,7 +13528,7 @@ msgstr "Vasárnap"
 msgid "Support"
 msgstr ""
 
-#: include/views/administration.users.edit.php:52
+#: include/views/administration.users.edit.php:53
 #: include/views/administration.users.list.php:56 popup.php:597 users.php:46
 msgid "Surname"
 msgstr "Vezetéknév"
@@ -13524,7 +13556,7 @@ msgstr "Svéd (sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr ""
 
-#: include/users.inc.php:83 include/views/administration.users.edit.php:148
+#: include/users.inc.php:83 include/views/administration.users.edit.php:149
 msgid "System default"
 msgstr "Alapértelmezett"
 
@@ -13615,14 +13647,14 @@ msgstr ""
 
 #: include/actions.inc.php:62 include/audit.inc.php:50
 #: include/forms.inc.php:602 include/forms.inc.php:918
-#: include/html.inc.php:328 include/views/configuration.template.edit.php:34
-#: include/views/configuration.template.edit.php:373
+#: include/html.inc.php:328 include/views/configuration.template.edit.php:35
+#: include/views/configuration.template.edit.php:400
 #: include/views/configuration.trigger.prototype.list.php:79 report2.php:267
 #: search.php:393
 msgid "Template"
 msgstr "Minta"
 
-#: include/classes/api/services/CHost.php:1016
+#: include/classes/api/services/CHost.php:993
 #: include/classes/api/services/CTemplate.php:461
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -13662,7 +13694,7 @@ msgstr "Minta csatolások"
 msgid "Template list"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:73 templates.php:55
+#: include/views/configuration.template.edit.php:96 templates.php:55
 msgid "Template name"
 msgstr ""
 
@@ -13684,23 +13716,23 @@ msgstr ""
 msgid "Template updated"
 msgstr "Minta frissítve"
 
-#: include/classes/api/services/CTemplate.php:1036
+#: include/classes/api/services/CTemplate.php:1034
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:719
+#: include/classes/api/services/CHost.php:702
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr ""
 
 #: include/classes/api/services/CTemplate.php:484
-#: include/classes/api/services/CTemplate.php:1001
+#: include/classes/api/services/CTemplate.php:999
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:725
+#: include/classes/api/services/CHost.php:708
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr ""
@@ -13710,15 +13742,15 @@ msgid "Templated items"
 msgstr "Elemek mintából"
 
 #: include/menu.inc.php:158 include/views/configuration.copy.elements.php:47
-#: include/views/configuration.host.edit.php:804
+#: include/views/configuration.host.edit.php:776
 #: include/views/configuration.hostgroups.list.php:144
 #: include/views/configuration.host.list.php:85
 #: include/views/configuration.host.massupdate.php:337
 #: include/views/configuration.host.prototype.edit.php:263
 #: include/views/configuration.host.prototype.list.php:49
 #: include/views/conf.import.php:29 popup.php:39 search.php:280 search.php:309
-#: search.php:314 search.php:321 search.php:485 templates.php:581
-#: templates.php:590
+#: search.php:314 search.php:321 search.php:485 templates.php:504
+#: templates.php:513
 msgid "Templates"
 msgstr "Minták"
 
@@ -13728,7 +13760,7 @@ msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr ""
 
 #: include/views/administration.authentication.edit.php:138
-#: include/views/administration.general.regularexpressions.edit.php:106
+#: include/views/administration.general.regularexpressions.edit.php:81
 #: include/views/configuration.triggers.edit.php:221 tr_testexpr.php:25
 #: tr_testexpr.php:128 tr_testexpr.php:184
 msgid "Test"
@@ -13746,17 +13778,17 @@ msgstr ""
 msgid "Test data"
 msgstr "Teszt adat"
 
-#: include/views/administration.general.regularexpressions.edit.php:94
+#: include/views/administration.general.regularexpressions.edit.php:69
 msgid "Test expressions"
 msgstr ""
 
 #: adm.regexps.php:38
-#: include/views/administration.general.regularexpressions.edit.php:91
+#: include/views/administration.general.regularexpressions.edit.php:66
 msgid "Test string"
 msgstr "Teszt szöveg"
 
 #: include/forms.inc.php:418 include/items.inc.php:129
-#: include/triggers.inc.php:2065 include/views/configuration.item.edit.php:218
+#: include/triggers.inc.php:2084 include/views/configuration.item.edit.php:218
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "Szöveg"
@@ -13834,7 +13866,7 @@ msgstr ""
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr ""
 
-#: include/views/administration.users.edit.php:150
+#: include/views/administration.users.edit.php:151
 msgid "Theme"
 msgstr "Téma"
 
@@ -13849,7 +13881,7 @@ msgstr[1] ""
 msgid "Third"
 msgstr "Harmadik"
 
-#: include/views/configuration.host.edit.php:908
+#: include/views/configuration.host.edit.php:880
 #, c-format
 msgid "This field is automatically populated by item \"%s\"."
 msgstr ""
@@ -13895,7 +13927,7 @@ msgstr "-ig"
 #: events.php:454 events.php:470 include/acknow.inc.php:49
 #: include/actions.inc.php:1122 include/actions.inc.php:1145
 #: include/actions.inc.php:1218 include/actions.inc.php:1236
-#: include/blocks.inc.php:1018 include/classes/screens/CScreenActions.php:32
+#: include/blocks.inc.php:1015 include/classes/screens/CScreenActions.php:32
 #: include/classes/screens/CScreenActions.php:38
 #: include/classes/screens/CScreenActions.php:44
 #: include/classes/screens/CScreenActions.php:128
@@ -13921,11 +13953,11 @@ msgstr ""
 msgid "Time (descending)"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:851
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:855
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr ""
 
@@ -14018,7 +14050,7 @@ msgstr ""
 msgid "Transaction has not been closed. Aborting..."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:925
+#: include/classes/items/CHelpItems.php:913
 msgid "Transform SQL query result into a JSON object for low-level discovery."
 msgstr ""
 
@@ -14054,7 +14086,7 @@ msgstr "Trendek"
 
 #: events.php:332 events.php:374 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:486
-#: include/maps.inc.php:26 include/triggers.inc.php:1473
+#: include/maps.inc.php:26 include/triggers.inc.php:1492
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:73
 #: include/views/configuration.services.edit.php:96
@@ -14089,7 +14121,7 @@ msgstr ""
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr ""
 
-#: triggers.php:215 triggers.php:345 tr_logform.php:149
+#: triggers.php:198 triggers.php:328 tr_logform.php:149
 msgid "Trigger added"
 msgstr "Trigger létrehozva"
 
@@ -14101,7 +14133,7 @@ msgstr ""
 msgid "Trigger data storage period (in days)"
 msgstr ""
 
-#: triggers.php:233
+#: triggers.php:216
 msgid "Trigger deleted"
 msgstr "Trigger törölve"
 
@@ -14109,23 +14141,21 @@ msgstr "Trigger törölve"
 msgid "Trigger description"
 msgstr ""
 
-#: triggers.php:303
+#: triggers.php:286
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] ""
 msgstr[1] ""
 
 #: adm.gui.php:99 adm.housekeeper.php:134 adm.iconmapping.php:119
-#: adm.images.php:144 adm.macros.php:167 adm.other.php:79
+#: adm.images.php:144 adm.macros.php:167 adm.other.php:79 adm.regexps.php:210
 #: adm.triggerdisplayoptions.php:94 adm.triggerseverities.php:90
 #: adm.valuemapping.php:137 adm.workingtime.php:65
-#: include/views/administration.general.regularexpressions.edit.php:39
-#: include/views/administration.general.regularexpressions.list.php:36
 #: include/views/administration.general.triggerDisplayOptions.edit.php:94
 msgid "Trigger displaying options"
 msgstr ""
 
-#: triggers.php:302
+#: triggers.php:285
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] ""
@@ -14197,38 +14227,38 @@ msgstr ""
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr ""
 
-#: trigger_prototypes.php:184
+#: trigger_prototypes.php:166
 msgid "Trigger prototype added"
 msgstr ""
 
-#: trigger_prototypes.php:199
+#: trigger_prototypes.php:181
 msgid "Trigger prototype deleted"
 msgstr ""
 
-#: trigger_prototypes.php:263
+#: trigger_prototypes.php:245
 msgid "Trigger prototype disabled"
 msgid_plural "Trigger prototypes disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: trigger_prototypes.php:262
+#: trigger_prototypes.php:244
 msgid "Trigger prototype enabled"
 msgid_plural "Trigger prototypes enabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: trigger_prototypes.php:179
+#: trigger_prototypes.php:161
 msgid "Trigger prototype updated"
 msgstr ""
 
 #: include/html.inc.php:404 include/html.inc.php:408
 #: include/views/configuration.host.discovery.list.php:118
-#: include/views/configuration.host.edit.php:645
-#: include/views/configuration.template.edit.php:303
+#: include/views/configuration.host.edit.php:617
+#: include/views/configuration.template.edit.php:330
 msgid "Trigger prototypes"
 msgstr ""
 
-#: trigger_prototypes.php:276
+#: trigger_prototypes.php:258
 msgid "Trigger prototypes deleted"
 msgstr ""
 
@@ -14236,21 +14266,19 @@ msgstr ""
 msgid "Trigger prototypes of"
 msgstr ""
 
-#: trigger_prototypes.php:227
+#: trigger_prototypes.php:209
 msgid "Trigger prototypes updated"
 msgstr ""
 
 #: adm.gui.php:98 adm.housekeeper.php:133 adm.iconmapping.php:118
-#: adm.images.php:143 adm.macros.php:166 adm.other.php:78
+#: adm.images.php:143 adm.macros.php:166 adm.other.php:78 adm.regexps.php:209
 #: adm.triggerdisplayoptions.php:93 adm.triggerseverities.php:89
 #: adm.valuemapping.php:136 adm.workingtime.php:64
-#: include/views/administration.general.regularexpressions.edit.php:38
-#: include/views/administration.general.regularexpressions.list.php:35
 #: include/views/administration.general.triggerSeverity.edit.php:70
 msgid "Trigger severities"
 msgstr ""
 
-#: include/actions.inc.php:54 include/views/administration.users.edit.php:289
+#: include/actions.inc.php:54 include/views/administration.users.edit.php:290
 msgid "Trigger severity"
 msgstr "Trigger súlyosság"
 
@@ -14262,7 +14290,7 @@ msgstr ""
 msgid "Trigger status \"Problem\""
 msgstr ""
 
-#: triggers.php:211 triggers.php:272 tr_logform.php:124
+#: triggers.php:194 triggers.php:255 tr_logform.php:124
 msgid "Trigger updated"
 msgstr "Trigger frissítve"
 
@@ -14271,15 +14299,15 @@ msgid "Trigger value"
 msgstr "Trigger érték"
 
 #: include/forms.inc.php:587 include/html.inc.php:415 include/html.inc.php:419
-#: include/menu.inc.php:51 include/triggers.inc.php:1096
+#: include/menu.inc.php:51 include/triggers.inc.php:1095
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:48
-#: include/views/configuration.host.edit.php:536
+#: include/views/configuration.host.edit.php:508
 #: include/views/configuration.host.list.php:80
 #: include/views/configuration.host.list.php:97
 #: include/views/configuration.item.list.php:66
 #: include/views/configuration.item.list.php:207
-#: include/views/configuration.template.edit.php:214
+#: include/views/configuration.template.edit.php:241
 #: include/views/configuration.triggers.list.php:50
 #: include/views/conf.import.php:35 include/views/inventory.host.view.php:213
 #: include/views/inventory.host.view.php:232
@@ -14289,7 +14317,7 @@ msgstr "Trigger érték"
 #: include/views/monitoring.overview.triggers.php:27 jsLoader.php:220
 #: popup.php:59 search.php:135 search.php:142 search.php:177 search.php:199
 #: search.php:221 search.php:275 search.php:328 search.php:396 search.php:430
-#: search.php:456 templates.php:593 templates.php:653 tr_status.php:226
+#: search.php:456 templates.php:516 templates.php:576 tr_status.php:226
 msgid "Triggers"
 msgstr "Trigger-ek"
 
@@ -14297,7 +14325,7 @@ msgstr "Trigger-ek"
 msgid "Triggers (e/d)[p/o]"
 msgstr ""
 
-#: triggers.php:357
+#: triggers.php:340
 msgid "Triggers deleted"
 msgstr "Triggerek törölve"
 
@@ -14444,7 +14472,7 @@ msgstr ""
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:169
+#: include/views/administration.users.edit.php:170
 msgid "URL (after login)"
 msgstr "URL (belépés után)"
 
@@ -14522,16 +14550,16 @@ msgstr ""
 msgid "Unacknowledged only"
 msgstr ""
 
-#: include/views/administration.users.edit.php:105
+#: include/views/administration.users.edit.php:106
 #, c-format
 msgid "Unavailable for users with %1$s."
 msgstr ""
 
-#: include/views/administration.users.list.php:154
-msgid "Unblock"
-msgstr ""
+#: include/views/administration.users.list.php:151
+msgid "Unblock selected"
+msgstr "Zárolás feloldása"
 
-#: include/views/administration.users.list.php:154
+#: include/views/administration.users.list.php:152
 msgid "Unblock selected users?"
 msgstr "Engedélyezi a kijelölt zárolt felhasználókat?"
 
@@ -14545,7 +14573,7 @@ msgstr "Egységek"
 #: include/actions.inc.php:41 include/actions.inc.php:96
 #: include/actions.inc.php:113 include/actions.inc.php:149
 #: include/actions.inc.php:928 include/actions.inc.php:1474
-#: include/blocks.inc.php:1195 include/classes/html/CHostsInfo.php:120
+#: include/blocks.inc.php:1192 include/classes/html/CHostsInfo.php:120
 #: include/discovery.inc.php:131 include/discovery.inc.php:168
 #: include/events.inc.php:47 include/events.inc.php:78
 #: include/graphs.inc.php:37 include/graphs.inc.php:67
@@ -14559,7 +14587,7 @@ msgstr "Egységek"
 #: include/perm.inc.php:53 include/regexp.inc.php:221
 #: include/screens.inc.php:57 include/triggers.inc.php:66
 #: include/triggers.inc.php:179 include/triggers.inc.php:198
-#: include/triggers.inc.php:2305 include/triggers.inc.php:2311
+#: include/triggers.inc.php:2337 include/triggers.inc.php:2343
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:196
 msgid "Unknown"
@@ -14578,11 +14606,11 @@ msgstr ""
 msgid "Unknown function."
 msgstr ""
 
-#: include/triggers.inc.php:1613 popup_trexpr.php:651 tr_testexpr.php:34
+#: include/triggers.inc.php:1632 popup_trexpr.php:651 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr ""
 
-#: include/triggers.inc.php:1612 tr_testexpr.php:33
+#: include/triggers.inc.php:1631 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr ""
 
@@ -14603,14 +14631,14 @@ msgstr ""
 msgid "Unknown value type"
 msgstr "Ismeretlen érték típus"
 
-#: include/views/configuration.host.edit.php:741
+#: include/views/configuration.host.edit.php:713
 #: include/views/configuration.host.prototype.edit.php:227
-#: include/views/configuration.template.edit.php:393
+#: include/views/configuration.template.edit.php:420
 msgid "Unlink"
 msgstr "Leválasztás"
 
-#: include/views/configuration.host.edit.php:742
-#: include/views/configuration.template.edit.php:394
+#: include/views/configuration.host.edit.php:714
+#: include/views/configuration.template.edit.php:421
 msgid "Unlink and clear"
 msgstr "Leválasztás és kiürítés"
 
@@ -14622,52 +14650,52 @@ msgstr "Eltávolítás a sablonból"
 msgid "Unlink from templates"
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:574
+#: include/classes/api/services/CHostGeneral.php:570
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:352
+#: include/classes/api/services/CHostGeneral.php:348
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:486
+#: include/classes/api/services/CHostGeneral.php:482
 #, c-format
 msgid "Unlinked: Graph \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:469
+#: include/classes/api/services/CHostGeneral.php:465
 #, c-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:417
+#: include/classes/api/services/CHostGeneral.php:413
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:369
+#: include/classes/api/services/CHostGeneral.php:365
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:386
+#: include/classes/api/services/CHostGeneral.php:382
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:292
+#: include/classes/api/services/CHostGeneral.php:288
 #, c-format
 msgid "Unlinked: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:309
+#: include/classes/api/services/CHostGeneral.php:305
 #, c-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHostGeneral.php:525
+#: include/classes/api/services/CHostGeneral.php:521
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -14722,7 +14750,7 @@ msgstr ""
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/blocks.inc.php:1282
+#: include/blocks.inc.php:1279
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr ""
@@ -14740,7 +14768,7 @@ msgstr ""
 #: include/views/administration.general.image.edit.php:54
 #: include/views/administration.general.macros.edit.php:33
 #: include/views/administration.general.other.edit.php:50
-#: include/views/administration.general.regularexpressions.edit.php:112
+#: include/views/administration.general.regularexpressions.edit.php:87
 #: include/views/administration.general.triggerDisplayOptions.edit.php:100
 #: include/views/administration.general.triggerSeverity.edit.php:76
 #: include/views/administration.general.valuemapping.edit.php:60
@@ -14749,14 +14777,14 @@ msgstr ""
 #: include/views/administration.proxy.edit.php:97
 #: include/views/administration.script.edit.php:118
 #: include/views/administration.usergroups.edit.php:148
-#: include/views/administration.users.edit.php:349
+#: include/views/administration.users.edit.php:353
 #: include/views/configuration.action.edit.php:1095
 #: include/views/configuration.action.edit.php:1116
 #: include/views/configuration.application.edit.php:51
 #: include/views/configuration.discovery.edit.php:87
 #: include/views/configuration.graph.edit.php:309
 #: include/views/configuration.host.discovery.edit.php:361
-#: include/views/configuration.host.edit.php:943
+#: include/views/configuration.host.edit.php:915
 #: include/views/configuration.hostgroups.edit.php:84
 #: include/views/configuration.host.massupdate.php:344
 #: include/views/configuration.host.prototype.edit.php:337
@@ -14772,7 +14800,7 @@ msgstr ""
 #: include/views/configuration.slideconf.edit.php:108
 #: include/views/configuration.sysmap.constructor.php:62
 #: include/views/configuration.sysmap.edit.php:190
-#: include/views/configuration.template.edit.php:460
+#: include/views/configuration.template.edit.php:487
 #: include/views/configuration.triggers.edit.php:348
 #: include/views/configuration.triggers.massupdate.php:164
 #: include/views/js/adm.regexprs.edit.js.php:255
@@ -14813,8 +14841,8 @@ msgid "Updated status of host"
 msgstr "Hoszt frissített státusza"
 
 #: include/blocks.inc.php:464 include/blocks.inc.php:814
-#: include/blocks.inc.php:886 include/blocks.inc.php:1146
-#: include/blocks.inc.php:1248 include/blocks.inc.php:1298
+#: include/blocks.inc.php:886 include/blocks.inc.php:1143
+#: include/blocks.inc.php:1245 include/blocks.inc.php:1295
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, c-format
 msgid "Updated: %s"
@@ -14875,7 +14903,7 @@ msgstr "Felsőbb szintű térképek"
 msgid "Uptime"
 msgstr "Üzemidő"
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:887
 msgid "Uptime of Zabbix server process in seconds."
 msgstr ""
 
@@ -14904,7 +14932,7 @@ msgstr ""
 #: include/audit.inc.php:24 include/classes/setup/CSetupWizard.php:319
 #: include/hosts.inc.php:61 include/views/administration.auditlogs.list.php:56
 #: include/views/administration.auditlogs.list.php:89
-#: include/views/administration.users.edit.php:297
+#: include/views/administration.users.edit.php:298
 #: include/views/configuration.action.edit.php:593
 #: include/views/configuration.httpconf.edit.php:130
 msgid "User"
@@ -14923,7 +14951,7 @@ msgstr "Új felhasználó felvéve"
 msgid "User agent string"
 msgstr ""
 
-#: include/views/administration.users.edit.php:315
+#: include/views/administration.users.edit.php:316
 msgid "User can't change type for himself"
 msgstr ""
 
@@ -15008,7 +15036,7 @@ msgstr ""
 msgid "User groups"
 msgstr "Felhasználói csoportok"
 
-#: include/classes/api/services/CUser.php:1293
+#: include/classes/api/services/CUser.php:1295
 msgid "User is not allowed to delete himself."
 msgstr ""
 
@@ -15056,8 +15084,8 @@ msgstr ""
 msgid "User sessions"
 msgstr ""
 
-#: include/views/administration.users.edit.php:315
-#: include/views/administration.users.edit.php:319
+#: include/views/administration.users.edit.php:316
+#: include/views/administration.users.edit.php:320
 #: include/views/administration.users.list.php:57
 msgid "User type"
 msgstr "Felhasználó típus"
@@ -15073,7 +15101,7 @@ msgstr ""
 
 #: include/views/administration.mediatypes.edit.php:84
 #: include/views/administration.mediatypes.list.php:68
-#: include/views/configuration.host.edit.php:836
+#: include/views/configuration.host.edit.php:808
 #: include/views/configuration.host.prototype.edit.php:276
 #: include/views/general.login.php:66 index.php:32
 msgid "Username"
@@ -15096,7 +15124,7 @@ msgstr "Felhasználók (bejelentkezve)"
 msgid "Users unblocked"
 msgstr "Felhasználói-zárolás megszüntetve"
 
-#: include/classes/items/CHelpItems.php:911
+#: include/classes/items/CHelpItems.php:899
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr ""
 
@@ -15144,10 +15172,6 @@ msgstr ""
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:683
-msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
-
 #: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
@@ -15160,7 +15184,7 @@ msgstr ""
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:687
+#: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -15168,7 +15192,7 @@ msgstr ""
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:691
+#: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -15180,7 +15204,7 @@ msgstr ""
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:695
+#: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
@@ -15188,99 +15212,91 @@ msgstr ""
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:703
+#: include/classes/items/CHelpItems.php:699
 msgid "VMware service version, <url> - VMware service URL"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:727
+#: include/classes/items/CHelpItems.php:719
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:775
+#: include/classes/items/CHelpItems.php:763
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:731
+#: include/classes/items/CHelpItems.php:723
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:791
+#: include/classes/items/CHelpItems.php:779
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:795
+#: include/classes/items/CHelpItems.php:783
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:799
+#: include/classes/items/CHelpItems.php:787
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:747
+#: include/classes/items/CHelpItems.php:739
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:743
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:723
+#: include/classes/items/CHelpItems.php:715
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:707
+#: include/classes/items/CHelpItems.php:703
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:759
+#: include/classes/items/CHelpItems.php:751
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:755
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:767
-msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
-
-#: include/classes/items/CHelpItems.php:771
+#: include/classes/items/CHelpItems.php:759
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:735
+#: include/classes/items/CHelpItems.php:727
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:715
-msgid "VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
-
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:711
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:731
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:735
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:747
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:779
+#: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:783
+#: include/classes/items/CHelpItems.php:771
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:775
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
@@ -15340,11 +15356,11 @@ msgstr ""
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:907
+#: include/classes/items/CHelpItems.php:895
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:903
+#: include/classes/items/CHelpItems.php:891
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr ""
 
@@ -15390,11 +15406,9 @@ msgid "Value map with valuemapid \"%1$s\" does not exist."
 msgstr ""
 
 #: adm.gui.php:96 adm.housekeeper.php:131 adm.iconmapping.php:116
-#: adm.images.php:141 adm.macros.php:164 adm.other.php:76
+#: adm.images.php:141 adm.macros.php:164 adm.other.php:76 adm.regexps.php:207
 #: adm.triggerdisplayoptions.php:91 adm.triggerseverities.php:87
 #: adm.valuemapping.php:134 adm.valuemapping.php:200 adm.workingtime.php:62
-#: include/views/administration.general.regularexpressions.edit.php:36
-#: include/views/administration.general.regularexpressions.list.php:33
 #: include/views/administration.general.valuemapping.edit.php:54
 msgid "Value mapping"
 msgstr "Érték-hozzárendelés"
@@ -15457,12 +15471,12 @@ msgstr ""
 
 #: include/views/configuration.host.edit.php:209
 #: include/views/configuration.host.prototype.edit.php:71
-#: include/views/configuration.template.edit.php:76
+#: include/views/configuration.template.edit.php:99
 #: include/views/inventory.host.view.php:44
 msgid "Visible name"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:666
+#: include/classes/api/services/CHost.php:649
 msgid "Visible name cannot be empty if host name is missing."
 msgstr ""
 
@@ -15493,8 +15507,8 @@ msgstr ""
 #: include/views/inventory.host.view.php:236
 #: include/views/inventory.host.view.php:245 search.php:139 search.php:145
 #: search.php:189 search.php:202 search.php:225 search.php:278 search.php:331
-#: search.php:400 search.php:446 search.php:460 templates.php:597
-#: templates.php:661
+#: search.php:400 search.php:446 search.php:460 templates.php:520
+#: templates.php:584
 msgid "Web"
 msgstr "Web"
 
@@ -15581,9 +15595,9 @@ msgid "Web scenario updated"
 msgstr ""
 
 #: httpmon.php:85 include/html.inc.php:489 include/html.inc.php:493
-#: include/views/configuration.host.edit.php:712
+#: include/views/configuration.host.edit.php:684
 #: include/views/configuration.httpconf.list.php:46
-#: include/views/configuration.template.edit.php:367
+#: include/views/configuration.template.edit.php:394
 msgid "Web scenarios"
 msgstr ""
 
@@ -15651,11 +15665,9 @@ msgid "Wizard"
 msgstr ""
 
 #: adm.gui.php:97 adm.housekeeper.php:132 adm.iconmapping.php:117
-#: adm.images.php:142 adm.macros.php:165 adm.other.php:77
+#: adm.images.php:142 adm.macros.php:165 adm.other.php:77 adm.regexps.php:208
 #: adm.triggerdisplayoptions.php:92 adm.triggerseverities.php:88
 #: adm.valuemapping.php:135 adm.workingtime.php:31 adm.workingtime.php:63
-#: include/views/administration.general.regularexpressions.edit.php:37
-#: include/views/administration.general.regularexpressions.list.php:34
 #: include/views/administration.general.workingtime.edit.php:25
 #: include/views/administration.general.workingtime.edit.php:28
 msgid "Working time"
@@ -15680,9 +15692,9 @@ msgstr ""
 msgid "Wrong fields for element."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:551
+#: include/classes/api/services/CHost.php:565
 #, c-format
-msgid "Wrong fields for host \"%1$s\"."
+msgid "Wrong fields for host \"%s\"."
 msgstr ""
 
 #: include/classes/api/services/CImage.php:498
@@ -15831,10 +15843,10 @@ msgstr "Év"
 msgid "Yearly"
 msgstr "Évi"
 
-#: events.php:798 include/blocks.inc.php:835
+#: events.php:811 include/blocks.inc.php:835
 #: include/classes/html/CServerInfo.php:32 include/events.inc.php:358
 #: include/events.inc.php:376 include/func.inc.php:1993
-#: include/triggers.inc.php:1484
+#: include/triggers.inc.php:1503
 #: include/views/administration.users.list.php:75
 #: include/views/configuration.httpconf.list.php:122
 #: include/views/js/adm.regexprs.edit.js.php:139
@@ -15845,7 +15857,7 @@ msgstr "Igen"
 msgid "Yesterday"
 msgstr ""
 
-#: include/views/administration.users.edit.php:139
+#: include/views/administration.users.edit.php:140
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr ""
 
@@ -15882,8 +15894,8 @@ msgstr ""
 
 #: include/classes/api/services/CGraph.php:543
 #: include/classes/api/services/CGraphPrototype.php:558
-#: include/classes/api/services/CHost.php:910
-#: include/classes/api/services/CHost.php:968
+#: include/classes/api/services/CHost.php:887
+#: include/classes/api/services/CHost.php:945
 #: include/classes/api/services/CMaintenance.php:550
 #: include/classes/api/services/CMaintenance.php:656
 #: include/classes/api/services/CMaintenance.php:668
@@ -15894,8 +15906,9 @@ msgstr ""
 #: include/classes/api/services/CTemplate.php:430
 #: include/classes/api/services/CTemplate.php:566
 #: include/classes/api/services/CTemplate.php:593
-#: include/classes/api/services/CTemplate.php:976
-#: include/classes/api/services/CTemplate.php:1080
+#: include/classes/api/services/CTemplate.php:741
+#: include/classes/api/services/CTemplate.php:974
+#: include/classes/api/services/CTemplate.php:1078
 msgid "You do not have permission to perform this operation."
 msgstr ""
 
@@ -16389,7 +16402,7 @@ msgstr ""
 #: include/classes/setup/CFrontendSetup.php:598
 #: include/classes/setup/CFrontendSetup.php:599
 #: include/classes/setup/CFrontendSetup.php:615
-#: include/views/administration.users.edit.php:204
+#: include/views/administration.users.edit.php:205
 msgid "off"
 msgstr ""
 
@@ -16407,7 +16420,7 @@ msgstr ""
 #: include/classes/setup/CFrontendSetup.php:581
 #: include/classes/setup/CFrontendSetup.php:598
 #: include/classes/setup/CFrontendSetup.php:615
-#: include/views/administration.users.edit.php:204
+#: include/views/administration.users.edit.php:205
 #: include/views/monitoring.hostscreen.php:54
 msgid "on"
 msgstr ""
@@ -16455,10 +16468,6 @@ msgstr "mp"
 #: include/views/administration.general.triggerDisplayOptions.edit.php:91
 msgid "seconds"
 msgstr "másodperc"
-
-#: include/classes/html/CActionButtonList.php:90
-msgid "selected"
-msgstr ""
 
 #: include/actions.inc.php:1152
 msgid "sent"

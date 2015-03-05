@@ -627,8 +627,7 @@
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();
-			jQuery('#update').button('option', 'label', <?php echo CJs::encodeJson(_('Add')); ?>)
-				.attr({id: 'add', name: 'add'});
+			jQuery('#update').val(<?php echo CJs::encodeJson(_('Add')); ?>).attr({id: 'add', name: 'add'});
 
 			var operationIdNameRegex = /operations\[\d+\]\[operationid\]/;
 			jQuery('input[name^=operations]').each(function() {
