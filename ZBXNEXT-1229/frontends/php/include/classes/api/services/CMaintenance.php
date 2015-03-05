@@ -253,30 +253,6 @@ class CMaintenance extends CApiService {
 		return $result;
 	}
 
-
-	/**
-	 * Check if maintenance exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('maintenance.exists method is deprecated.');
-
-		$keyFields = array(array('maintenanceid', 'name'));
-
-		$maintenance = $this->get(array(
-			'output' => array('maintenanceid'),
-			'filter' => zbx_array_mintersect($keyFields, $object),
-			'limit' => 1
-		));
-
-		return (bool) $maintenance;
-	}
-
 	/**
 	 * Add maintenances.
 	 *

@@ -35,17 +35,18 @@
 #define ZBX_REQUEST_HOST_PORT		4
 
 /* DBget_item_value() */
-#define ZBX_REQUEST_HOST_HOST		101
-#define ZBX_REQUEST_HOST_NAME		102
-#define ZBX_REQUEST_HOST_DESCRIPTION	103
-#define ZBX_REQUEST_ITEM_ID		104
-#define ZBX_REQUEST_ITEM_NAME		105
-#define ZBX_REQUEST_ITEM_NAME_ORIG	106
-#define ZBX_REQUEST_ITEM_KEY		107
-#define ZBX_REQUEST_ITEM_KEY_ORIG	108
-#define ZBX_REQUEST_ITEM_DESCRIPTION	109
-#define ZBX_REQUEST_PROXY_NAME		110
-#define ZBX_REQUEST_PROXY_DESCRIPTION	111
+#define ZBX_REQUEST_HOST_ID		101
+#define ZBX_REQUEST_HOST_HOST		102
+#define ZBX_REQUEST_HOST_NAME		103
+#define ZBX_REQUEST_HOST_DESCRIPTION	104
+#define ZBX_REQUEST_ITEM_ID		105
+#define ZBX_REQUEST_ITEM_NAME		106
+#define ZBX_REQUEST_ITEM_NAME_ORIG	107
+#define ZBX_REQUEST_ITEM_KEY		108
+#define ZBX_REQUEST_ITEM_KEY_ORIG	109
+#define ZBX_REQUEST_ITEM_DESCRIPTION	110
+#define ZBX_REQUEST_PROXY_NAME		111
+#define ZBX_REQUEST_PROXY_DESCRIPTION	112
 
 /* DBget_history_log_value() */
 #define ZBX_REQUEST_ITEM_LOG_DATE	201
@@ -818,6 +819,10 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	{
 		switch (request)
 		{
+			case ZBX_REQUEST_HOST_ID:
+				*replace_to = zbx_strdup(*replace_to, row[0]);
+				ret = SUCCEED;
+				break;
 			case ZBX_REQUEST_HOST_HOST:
 				*replace_to = zbx_strdup(*replace_to, row[2]);
 				ret = SUCCEED;
@@ -1620,6 +1625,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_HOST_DNS			"{HOST.DNS}"
 #define MVAR_HOST_CONN			"{HOST.CONN}"
 #define MVAR_HOST_HOST			"{HOST.HOST}"
+#define MVAR_HOST_ID			"{HOST.ID}"
 #define MVAR_HOST_IP			"{HOST.IP}"
 #define MVAR_IPADDRESS			"{IPADDRESS}"			/* deprecated */
 #define MVAR_HOST_METADATA		"{HOST.METADATA}"
@@ -1800,7 +1806,7 @@ static const char	*ex_macros[] =
 	MVAR_PROFILE_TAG, MVAR_PROFILE_MACADDRESS, MVAR_PROFILE_HARDWARE, MVAR_PROFILE_SOFTWARE,
 	MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION, MVAR_PROFILE_NOTES,
 	MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_HOST_NAME, MVAR_HOST_DESCRIPTION, MVAR_PROXY_NAME, MVAR_PROXY_DESCRIPTION,
-	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_HOST_PORT, MVAR_IPADDRESS,
+	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_HOST_PORT, MVAR_IPADDRESS, MVAR_HOST_ID,
 	MVAR_ITEM_ID, MVAR_ITEM_NAME, MVAR_ITEM_NAME_ORIG, MVAR_ITEM_DESCRIPTION,
 	MVAR_ITEM_KEY, MVAR_ITEM_KEY_ORIG, MVAR_TRIGGER_KEY,
 	MVAR_ITEM_LASTVALUE,
@@ -3222,8 +3228,50 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		{
 			if (EVENT_OBJECT_TRIGGER == event->object)
 			{
-				if (0 == strcmp(m, MVAR_TRIGGER_ID))
+				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				{
+					cache_trigger_hostids(&hostids, event->trigger.expression);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_ID))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_ID);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_HOST))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_HOST);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_NAME))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_NAME);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_IP))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_IP);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_DNS))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_DNS);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_CONN))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_CONN);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_PORT))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_PORT);
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_ID))
+				{
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
+				}
 			}
 		}
 		else if (0 != (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_PARAMS_FIELD | MACRO_TYPE_LLD_FILTER)))

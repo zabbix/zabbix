@@ -444,7 +444,8 @@
 		// it's needed because after clone all expressions should be added as new for cloned reg. exp
 		$('#clone').click(function() {
 			$('#regexpid, #clone, #delete').remove();
-			$('#update').val(<?php echo CJs::encodeJson(_('Add')); ?>).attr({id: 'add', name: 'add'});
+			$('#update').button('option', 'label', <?php echo CJs::encodeJson(_('Add')); ?>)
+				.attr({id: 'add', name: 'add'});
 			$('#cancel').addClass('ui-corner-left');
 			$('#name').focus();
 
