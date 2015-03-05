@@ -137,8 +137,11 @@ foreach (@$tlds_ref)
 {
 	$tld = $_;
 
-	print("$tld is ", (__tld_ignored($tld) == SUCCESS ? "" : "not "), "ignored\n");
-	next;
+	if (__tld_ignored($tld) == SUCCESS)
+	{
+		dbg("tld \"$tld\" ignored");
+		next;
+	}
 
 	foreach my $service (@services)
 	{
