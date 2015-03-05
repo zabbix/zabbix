@@ -76,7 +76,8 @@ our @EXPORT = qw($result $dbh $tld
 		process_slv_monthly get_results get_item_values check_lastclock sql_time_condition get_incidents
 		get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
 		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
-		dbg info wrn fail slv_exit exit_if_running trim parse_opts opt getopt setopt optkeys ts_str usage);
+		dbg info wrn fail slv_exit exit_if_running trim parse_opts opt getopt setopt optkeys ts_str write_file
+		usage);
 
 # configuration, set in set_slv_config()
 my $config = undef;
@@ -2422,6 +2423,24 @@ sub ts_str
 	$mon++;
 
 	return sprintf("%4.2d/%2.2d/%2.2d %2.2d:%2.2d:%2.2d", $year, $mon, $mday, $hour, $min, $sec);
+}
+
+sub write_file
+{
+	my $full_path = shift;
+	my $text = shift;
+
+	my $OUTFILE;
+
+	return E_FAIL unless (open($OUTFILE, '>', $full_path));
+
+	my $rv = print { $OUTFILE } $text;
+
+	close($OUTFILE);
+
+	return E_FAIL unless ($rv);
+
+	return SUCCESS;
 }
 
 sub usage

@@ -21,8 +21,8 @@ use constant AH_ALARMED_NO => 'NO';
 use constant AH_ALARMED_DISABLED => 'DISABLED';
 use constant AH_SERVICE_AVAILABILITY_FILE => 'serviceAvailability';
 
-our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED ah_get_error ah_save_alarmed
-		ah_save_service_availability ah_save_incident ah_save_incident_json);
+our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_BASE_DIR AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED ah_get_error
+		ah_save_alarmed ah_save_service_availability ah_save_incident ah_save_incident_json);
 
 my $error_string = "";
 

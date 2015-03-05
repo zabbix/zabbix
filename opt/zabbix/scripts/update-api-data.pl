@@ -10,8 +10,9 @@ use JSON::XS;
 use Data::Dumper;
 
 use constant ROOT_ZONE_DIR => 'zz--root'; # map root zone name (.) to something human readable
+use constant CONTINUE_FILE => 'last_update.txt'; # name of the file containing the timestamp of the last run with --continue
 
-parse_opts('tld=s', 'service=s', 'period=n', 'ignore-file=s');
+parse_opts('tld=s', 'service=s', 'period=n', 'continue!', 'ignore-file=s');
 
 # do not write any logs
 setopt('nolog');
@@ -43,6 +44,12 @@ else
 if (opt('tld') and opt('ignore-file'))
 {
 	print("Error: options --tld and --ignore-file cannot be used together\n");
+	usage();
+}
+
+if (opt('period') and opt('continue'))
+{
+	print("Error: options --period and --continue cannot be used together\n");
 	usage();
 }
 
@@ -197,8 +204,41 @@ foreach (@$tlds_ref)
 		my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
 		my $lastclock = get_lastclock($tld, "rsm.slv.$service.rollweek");
 
+		my ($continue_clock, $continue_file);
+
+		if (opt('continue'))
+		{
+			$continue_file = AH_BASE_DIR."/$api_tld/$service/".CONTINUE_FILE;
+			my $handle;
+
+			if (-e $continue_file)
+			{
+				fail("cannot open continue file $continue_file\": $!") unless (open($handle, '<', $continue_file));
+
+				chomp(my @lines = <$handle>);
+
+				close($handle);
+
+				$continue_clock = $lines[0];
+			}
+		}
+
 		my $till = $lastclock + RESULT_TIMESTAMP_SHIFT; # include the whole minute
-		my $from = $till - $period * 60 + 1;
+		my $from;
+
+		if (defined($continue_clock))
+		{
+			$from = $continue_clock;
+		}
+		elsif (defined($period))
+		{
+			$from = $till - $period * 60 + 1;
+		}
+
+		if (defined($from))
+		{
+			fail("option --continue used too soon, please wait till new data is available in the database") if ($from > $till);
+		}
 
 		__prnt(uc($service), " period: ", __selected_period($from, $till)) if (opt('dry-run') or opt('debug'));
 
@@ -382,7 +422,7 @@ foreach (@$tlds_ref)
 						{
 							if ($clock < $test_results[$test_result_index]->{'start'})
 							{
-								wrn("no status of value (probe:$probe service:$service clock:$clock) found in the database");
+								wrn("no aggregated result of $service test of $nsip (probe:$probe service:$service time:", ts_str($clock), ") found in the database");
 								next;
 							}
 
@@ -391,7 +431,7 @@ foreach (@$tlds_ref)
 
 							if ($test_result_index == $test_results_count)
 							{
-								wrn("no status of value (probe:$probe service:$service clock:$clock) found in the database");
+								wrn("no aggregated result of $service test of $nsip (probe:$probe service:$service time:", ts_str($clock), ") found in the database");
 								next;
 							}
 
@@ -469,7 +509,7 @@ foreach (@$tlds_ref)
 
 							if ($clock < $test_results[$test_result_index]->{'start'})
 							{
-								wrn("no status of the value (probe:$probe service:$service clock:$clock) found in the database");
+								wrn("no aggregated result of $service$port test (probe:$probe service:$service time:", ts_str($clock), ") found in the database");
 								next;
 							}
 
@@ -478,7 +518,7 @@ foreach (@$tlds_ref)
 
 							if ($test_result_index == $test_results_count)
 							{
-								wrn("no status of the value (probe:$probe service:$service clock:$clock) found in the database");
+								wrn("no aggregated result of $service$port test (probe:$probe service:$service time:", ts_str($clock), ") found in the database");
 								next;
 							}
 
@@ -549,6 +589,19 @@ foreach (@$tlds_ref)
 			{
 				fail("THIS SHOULD NEVER HAPPEN (unknown service \"$service\")");
 			}
+		}
+
+		if (defined($continue_file) and not opt('dry-run'))
+		{
+			my $updated = $till + 1;
+
+			unless (write_file($continue_file, $updated) == SUCCESS)
+			{
+				wrn("cannot update continue file \"$continue_file\": $!");
+				next;
+			}
+
+			dbg("$service: updated till ", ts_str($updated));
 		}
 	}
 }
@@ -882,7 +935,7 @@ sub __get_dns_itemids
 
 	my %result;
 
-	my $tld_length = length($tld) + 1; # skip white space
+	my $tld_length = length($tld) + 1; # white space
 	foreach my $row_ref (@$rows_ref)
 	{
 		my $host = $row_ref->[0];
@@ -1092,7 +1145,7 @@ sub __get_status_itemids
 
 	my %result;
 
-	my $tld_length = length($tld) + 1; # skip white space
+	my $tld_length = length($tld) + 1; # white space
 	foreach my $row_ref (@$rows_ref)
 	{
 		my $host = $row_ref->[0];
@@ -1229,7 +1282,7 @@ update-api-data.pl - save information about the incidents to a filesystem
 
 =head1 SYNOPSIS
 
-update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--period <minutes>] [--dry-run] [--debug] [--help]
+update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--period <minutes>|--continue] [--dry-run] [--debug] [--help]
 
 =head1 OPTIONS
 
@@ -1255,6 +1308,18 @@ This option cannot be used together with option --tld.
 
 Specify number of minutes of the period of calculation. This period is up till the latest available
 data in the database.
+
+This option cannot be used together with option --continue.
+
+=item B<--continue>
+
+Continue processing API data from the timestamp of the last run with --continue. In case of first
+run with --continue all available data will be processed. The continue token is saved per each
+TLD-service pair separately.
+
+Note, that continue token will not be updated if this option specified with --dry-run.
+
+This option cannot be used together with option --period.
 
 =item B<--dry-run>
 
