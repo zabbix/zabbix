@@ -219,7 +219,7 @@ static int	DBpatch_2050016(void)
 static int	DBpatch_2050017(void)
 {
 	const ZBX_FIELD	field = {"application_prototypeid", NULL, "application_prototype", "application_prototypeid",
-			0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+			0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("application_discovery", 2, &field);
 }
