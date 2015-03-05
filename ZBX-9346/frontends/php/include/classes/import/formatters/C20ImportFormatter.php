@@ -247,6 +247,13 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['triggers'] as $trigger) {
 				CArrayHelper::convertFieldToArray($trigger, 'dependencies');
 
+				if ($trigger['dependencies']) {
+					foreach ($trigger['dependencies'] as &$dependency) {
+						$dependency['expression'] = $this->triggerExpressionConverter->convert($dependency['expression']);
+					}
+					unset($dependency);
+				}
+
 				$trigger['expression'] = $this->triggerExpressionConverter->convert($trigger['expression']);
 
 				$triggersData[] = $this->renameTriggerFields($trigger);
