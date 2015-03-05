@@ -219,7 +219,7 @@ function get_user_history() {
 		CWebUser::$data['last_page'] = array('title' => $history['title4'], 'url' => $history['url4']);
 	}
 	else {
-		CWebUser::$data['last_page'] = array('title' => _('Dashboard'), 'url' => 'zabbix.php?action=dashboard.view');
+		CWebUser::$data['last_page'] = array('title' => _('Dashboard'), 'url' => 'dashboard.php');
 	}
 
 	for ($i = 1; $i < 6; $i++) {

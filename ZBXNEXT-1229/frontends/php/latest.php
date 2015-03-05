@@ -29,6 +29,8 @@ $page['hist_arg'] = array('groupids', 'hostids', 'filter_set');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['scripts'] = array('multiselect.js');
 
+define('ZBX_PAGE_MAIN_HAT', 'hat_latest');
+
 if (PAGE_TYPE_HTML == $page['type']) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
 }
@@ -882,13 +884,14 @@ foreach ($hosts as $hostId => $dbHost) {
 	}
 }
 
-$form->addItem(array(
-	$table,
-	get_table_header(new CActionButtonList('graphtype', 'itemids', array(
-		GRAPH_TYPE_STACKED => array('name' => _('Display stacked graph')),
-		GRAPH_TYPE_NORMAL => array('name' => _('Display graph'))
-	)))
+$goBox = new CComboBox('graphtype', GRAPH_TYPE_STACKED, null, array(
+	GRAPH_TYPE_STACKED => _('Display stacked graph'),
+	GRAPH_TYPE_NORMAL => _('Display graph')
 ));
+$goBox->setAttribute('id', 'action');
+$goButton = new CSubmit('goButton', _('Go').' (0)');
+
+$form->addItem(array($table, get_table_header(array($goBox, $goButton))));
 
 $latestWidget->addItem($form);
 $latestWidget->show();

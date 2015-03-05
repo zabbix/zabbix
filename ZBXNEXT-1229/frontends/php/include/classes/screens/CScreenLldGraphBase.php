@@ -143,8 +143,7 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 			'width' => $this->screenitem['width'],
 			'dynamic' => $this->screenitem['dynamic'],
 			'halign' => $this->screenitem['halign'],
-			'valign' => $this->screenitem['valign'],
-			'url' => ''
+			'valign' => $this->screenitem['valign']
 		);
 	}
 

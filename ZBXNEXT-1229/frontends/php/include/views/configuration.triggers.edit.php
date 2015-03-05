@@ -38,8 +38,7 @@ $triggersForm->addVar('hostid', $this->data['hostid']);
 $triggersForm->addVar('input_method', $this->data['input_method']);
 $triggersForm->addVar('toggle_input_method', '');
 $triggersForm->addVar('remove_expression', '');
-
-if ($data['triggerid'] !== null) {
+if (!empty($this->data['triggerid'])) {
 	$triggersForm->addVar('triggerid', $this->data['triggerid']);
 }
 
@@ -302,7 +301,7 @@ $dependenciesFormList->addRow(
 			$dependenciesTable,
 			new CButton('bnt1', _('Add'),
 				'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
-					'&with_triggers=1&noempty=1", 1000, 700);',
+					'&with_triggers=1&noempty=0", 1000, 700);',
 				'link_menu'
 			)
 		),
@@ -317,7 +316,7 @@ $triggersForm->addItem($triggersTab);
 // append buttons to form
 if (!empty($this->data['triggerid'])) {
 	$deleteButton = new CButtonDelete(_('Delete trigger?'),
-		url_params(array('form', 'hostid', 'triggerid'))
+		url_params(array('form', 'groupid', 'hostid', 'triggerid'))
 	);
 	if ($this->data['limited']) {
 		$deleteButton->setAttribute('disabled', 'disabled');
@@ -328,14 +327,14 @@ if (!empty($this->data['triggerid'])) {
 		array(
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
-			new CButtonCancel(url_param('hostid'))
+			new CButtonCancel(url_params(array('groupid', 'hostid')))
 		)
 	));
 }
 else {
 	$triggersForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('hostid')))
+		array(new CButtonCancel(url_params(array('groupid', 'hostid'))))
 	));
 }
 

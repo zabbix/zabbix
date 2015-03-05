@@ -21,43 +21,18 @@
 
 require_once dirname(__FILE__).'/js/adm.regexprs.edit.js.php';
 
-$regExpWidget = new CWidget();
-
-$generalComboBox = new CComboBox('configDropDown', 'adm.regexps.php',
-	'redirect(this.options[this.selectedIndex].value);'
-);
-$generalComboBox->addItems(array(
-	'adm.gui.php' => _('GUI'),
-	'adm.housekeeper.php' => _('Housekeeping'),
-	'adm.images.php' => _('Images'),
-	'adm.iconmapping.php' => _('Icon mapping'),
-	'adm.regexps.php' => _('Regular expressions'),
-	'adm.macros.php' => _('Macros'),
-	'adm.valuemapping.php' => _('Value mapping'),
-	'adm.workingtime.php' => _('Working time'),
-	'adm.triggerseverities.php' => _('Trigger severities'),
-	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-	'adm.other.php' => _('Other')
-));
-
-$headerForm = new CForm();
-$headerForm->cleanItems();
-$headerForm->addItem($generalComboBox);
-
-$regExpWidget->addPageHeader(_('CONFIGURATION OF REGULAR EXPRESSIONS'), $headerForm);
+zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($this->get('expressions'))).');');
 
 $form = new CForm();
 $form->attr('id', 'zabbixRegExpForm');
 $form->addVar('form', 1);
-$form->addVar('regexpid', $data['regexpid']);
-
-zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($data['expressions'])).');');
+$form->addVar('regexpid', $this->data['regexpid']);
 
 /*
  * Expressions tab
  */
 $exprTab = new CFormList('exprTab');
-$nameTextBox = new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
+$nameTextBox = new CTextBox('name', $this->get('name'), ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
 $nameTextBox->attr('autofocus', 'autofocus');
 $exprTab->addRow(_('Name'), $nameTextBox);
 
@@ -88,7 +63,7 @@ $exprTab->addRow(null, new CDiv(array($exprForm, $exprFormFooter), 'objectgroup 
  * Test tab
  */
 $testTab = new CFormList('testTab');
-$testTab->addRow(_('Test string'), new CTextArea('test_string', $data['test_string']));
+$testTab->addRow(_('Test string'), new CTextArea('test_string', $this->get('test_string')));
 $preloaderDiv = new CDiv(null, 'preloader', 'testPreloader');
 $preloaderDiv->addStyle('display: none');
 $testTab->addRow(SPACE, array(new CButton('testExpression', _('Test expressions')), $preloaderDiv));
@@ -99,7 +74,7 @@ $tabExp->setHeader(array(_('Expression'), _('Expression type'), _('Result')));
 $testTab->addRow(_('Result'), $tabExp);
 
 $regExpView = new CTabView();
-if (!$data['form_refresh']) {
+if (!$this->data['form_refresh']) {
 	$regExpView->setSelected(0);
 }
 $regExpView->addTab('expr', _('Expressions'), $exprTab);
@@ -107,7 +82,7 @@ $regExpView->addTab('test', _('Test'), $testTab);
 $form->addItem($regExpView);
 
 // footer
-if (isset($data['regexpid'])) {
+if (isset($this->data['regexpid'])) {
 	$form->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
@@ -127,7 +102,4 @@ else {
 	));
 }
 
-// append form to widget
-$regExpWidget->addItem($form);
-
-return $regExpWidget;
+return $form;

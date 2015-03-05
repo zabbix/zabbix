@@ -25,84 +25,57 @@ class CMapImporter extends CImporter {
 	 * Import maps.
 	 *
 	 * @param array $maps
+	 *
+	 * @return void
 	 */
 	public function import(array $maps) {
 		$maps = zbx_toHash($maps, 'name');
 
 		$this->checkCircularMapReferences($maps);
-		$maps = $this->resolveMapElementReferences($maps);
 
-		/*
-		 * Get all importable maps with removed elements and links. First import maps and then update maps with
-		 * elements and links from import file. This way we make sure we are able to resolve any references
-		 * between maps and links that are imported.
-		 */
-		$mapsWithoutElements = $this->getMapsWithoutElements($maps);
+		do {
+			$im = $this->getIndependentMaps($maps);
 
-		$mapsToProcess = array('createMissing' => array(), 'updateExisting' => array());
+			$mapsToCreate = array();
+			$mapsToUpdate = array();
+			foreach ($im as $name) {
+				$map = $maps[$name];
+				unset($maps[$name]);
 
-		foreach ($mapsWithoutElements as $mapName => $mapWithoutElements) {
-			$mapId = $this->referencer->resolveMap($mapWithoutElements['name']);
-			if ($mapId) {
-				// Update sysmapid in source map too.
-				$mapWithoutElements['sysmapid'] = $mapId;
-				$maps[$mapName]['sysmapid'] = $mapId;
+				$map = $this->resolveMapReferences($map);
 
-				$mapsToProcess['updateExisting'][] = $mapWithoutElements;
-			}
-			else {
-				$mapsToProcess['createMissing'][] = $mapWithoutElements;
-			}
-		}
-
-		if ($this->options['maps']['createMissing'] && $mapsToProcess['createMissing']) {
-			$newMapIds = API::Map()->create($mapsToProcess['createMissing']);
-			foreach ($mapsToProcess['createMissing'] as $num => $map) {
-				$mapId = $newMapIds['sysmapids'][$num];
-				$this->referencer->addMapRef($map['name'], $mapId);
-
-				$maps[$map['name']]['sysmapid'] = $mapId;
-			}
-		}
-
-		if ($this->options['maps']['updateExisting'] && $mapsToProcess['updateExisting']) {
-			API::Map()->update($mapsToProcess['updateExisting']);
-		}
-
-		// Form an array of maps that need to be updated with elements and links, respecting the create/update options.
-		$mapsToUpdate = array();
-		foreach ($mapsToProcess as $mapActionKey => $mapArray) {
-			if ($this->options['maps'][$mapActionKey] && $mapsToProcess[$mapActionKey]) {
-				foreach ($mapArray as $mapItem) {
-					$map = array(
-						'sysmapid' => $maps[$mapItem['name']]['sysmapid'],
-						'name' => $mapItem['name'],
-						'selements' => $maps[$mapItem['name']]['selements'],
-						'links' => $maps[$mapItem['name']]['links']
-					);
-					$map = $this->resolveMapReferences($map);
-
-					// Remove the map name so API does not make an update query to the database.
-					unset($map['name']);
+				if ($mapId = $this->referencer->resolveMap($map['name'])) {
+					$map['sysmapid'] = $mapId;
 					$mapsToUpdate[] = $map;
 				}
+				else {
+					$mapsToCreate[] = $map;
+				}
 			}
-		}
 
-		if ($mapsToUpdate) {
-			API::Map()->update($mapsToUpdate);
-		}
+			if ($this->options['maps']['createMissing'] && $mapsToCreate) {
+				$newMapIds = API::Map()->create($mapsToCreate);
+				foreach ($mapsToCreate as $num => $map) {
+					$mapId = $newMapIds['sysmapids'][$num];
+					$this->referencer->addMapRef($map['name'], $mapId);
+				}
+			}
+			if ($this->options['maps']['updateExisting'] && $mapsToUpdate) {
+				API::Map()->update($mapsToUpdate);
+			}
+		} while (!empty($im));
 	}
 
 	/**
 	 * Check if map elements have circular references.
 	 * Circular references can be only in map elements that represent another map.
 	 *
+	 * @throws Exception
 	 * @see checkCircularRecursive
 	 *
-	 * @throws Exception if circular reference found.
-	 *
 	 * @param array $maps
+	 *
+	 * @return void
 	 */
 	protected function checkCircularMapReferences(array $maps) {
 		foreach ($maps as $mapName => $map) {
@@ -123,39 +96,37 @@ class CMapImporter extends CImporter {
 	 * Recursive function for searching for circular map references.
 	 * If circular reference exist it return array with map elements with circular reference.
 	 *
-	 * @param array $element	Map element to inspect on current recursive loop.
-	 * @param array $maps		All maps where circular references should be searched.
-	 * @param array $checked	Map names that already were processed, should contain unique values
-	 *							if no circular references exist.
+	 * @param array $element map element to inspect on current recursive loop
+	 * @param array $maps    all maps where circular references should be searched
+	 * @param array $checked map names that already were processed,
+	 *                       should contain unique values if no circular references exist
 	 *
 	 * @return array|bool
 	 */
 	protected function checkCircularRecursive(array $element, array $maps, array $checked) {
-		// If element is not a map element, recursive reference cannot happen.
+		// if element is not map element, recursive reference cannot happen
 		if ($element['elementtype'] != SYSMAP_ELEMENT_TYPE_MAP) {
 			return false;
 		}
 
 		$elementMapName = $element['element']['name'];
 
-		// If current element map name is already in list of checked map names, circular reference exists.
+		// if current element map name is already in list of checked map names,
+		// circular reference exists
 		if (in_array($elementMapName, $checked)) {
-			/*
-			 * To have a nice result containing only maps that have circular reference,
-			 * remove everything that was added before repeated map name.
-			 */
+			// to have nice result containing only maps that have circular reference,
+			// remove everything that was added before repeated map name
 			$checked = array_slice($checked, array_search($elementMapName, $checked));
-
-			// Add repeated name to have nice loop like m1->m2->m3->m1.
+			// add repeated name to have nice loop like m1->m2->m3->m1
 			$checked[] = $elementMapName;
-
 			return $checked;
 		}
 		else {
 			$checked[] = $elementMapName;
 		}
 
-		// Find maps that reference the current element, and if one has selements, check all of them recursively.
+		// we need to find maps that reference the current element
+		// and if one has selements, check all of them recursively
 		if (!empty($maps[$elementMapName]['selements'])) {
 			foreach ($maps[$elementMapName]['selements'] as $selement) {
 				return $this->checkCircularRecursive($selement, $maps, $checked);
@@ -166,24 +137,30 @@ class CMapImporter extends CImporter {
 	}
 
 	/**
-	 * Return maps without their elements.
+	 * Get maps that don't have map elements that reference not existing map i.e. map elements references can be resolved.
+	 * Returns array with map names.
 	 *
 	 * @param array $maps
 	 *
 	 * @return array
 	 */
-	protected function getMapsWithoutElements(array $maps) {
-		foreach ($maps as &$map) {
-			if (array_key_exists('selements', $map)) {
-				unset($map['selements']);
+	protected function getIndependentMaps(array $maps) {
+		foreach ($maps as $num => $map) {
+			if (empty($map['selements'])) {
+				continue;
 			}
-			if (array_key_exists('links', $map)) {
-				unset($map['links']);
+
+			foreach ($map['selements'] as $selement) {
+				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
+					if (!$this->referencer->resolveMap($selement['element']['name'])) {
+						unset($maps[$num]);
+						continue 2;
+					}
+				}
 			}
 		}
-		unset($map);
 
-		return $maps;
+		return zbx_objectValues($maps, 'name');
 	}
 
 	/**
@@ -196,6 +173,25 @@ class CMapImporter extends CImporter {
 	 * @return array
 	 */
 	protected function resolveMapReferences(array $map) {
+		// resolve icon map
+		if (!empty($map['iconmap'])) {
+			$map['iconmapid'] = $this->referencer->resolveIconMap($map['iconmap']['name']);
+			if (!$map['iconmapid']) {
+				throw new Exception(_s('Cannot find icon map "%1$s" used in map "%2$s".', $map['iconmap']['name'], $map['name']));
+			}
+		}
+
+		if (!empty($map['background'])) {
+			$image = getImageByIdent($map['background']);
+
+			if (!$image) {
+				throw new Exception(_s('Cannot find background image "%1$s" used in map "%2$s".',
+					$map['background']['name'], $map['name']
+				));
+			}
+			$map['backgroundid'] = $image['imageid'];
+		}
+
 		if (isset($map['selements'])) {
 			foreach ($map['selements'] as &$selement) {
 				switch ($selement['elementtype']) {
@@ -288,42 +284,5 @@ class CMapImporter extends CImporter {
 		}
 
 		return $map;
-	}
-
-	/**
-	 * Resolves the iconmap and background images for the maps.
-	 *
-	 * @throws Exception if icon map or background image is not found.
-	 *
-	 * @param array $maps
-	 *
-	 * @return array
-	 */
-	protected function resolveMapElementReferences(array $maps) {
-		foreach ($maps as &$map) {
-			if ($map['iconmap']) {
-				$map['iconmapid'] = $this->referencer->resolveIconMap($map['iconmap']['name']);
-
-				if (!$map['iconmapid']) {
-					throw new Exception(_s('Cannot find icon map "%1$s" used in map "%2$s".',
-						$map['iconmap']['name'], $map['name']
-					));
-				}
-			}
-
-			if ($map['background']) {
-				$image = getImageByIdent($map['background']);
-
-				if (!$image) {
-					throw new Exception(_s('Cannot find background image "%1$s" used in map "%2$s".',
-						$map['background']['name'], $map['name']
-					));
-				}
-				$map['backgroundid'] = $image['imageid'];
-			}
-		}
-		unset($map);
-
-		return $maps;
 	}
 }

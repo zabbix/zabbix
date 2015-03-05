@@ -147,15 +147,15 @@ if (isset($this->data['usrgrpid'])) {
 	$userGroupForm->addItem(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
-			new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('usrgrpid')),
-			new CButtonCancel()
+			new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('usrgrpid').url_param('config')),
+			new CButtonCancel(url_param('config'))
 		)
 	));
 }
 else {
 	$userGroupForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		array(new CButtonCancel(url_param('config')))
 	));
 }
 

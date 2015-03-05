@@ -32,24 +32,19 @@
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
 
-
-void	zbx_proxyconfig_sigusr_handler(int flags)
-{
-	if (ZBX_RTC_CONFIG_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
-	{
-		if (0 < zbx_sleep_get_remainder())
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
-			zbx_wakeup();
-		}
-		else
-			zabbix_log(LOG_LEVEL_WARNING, "configuration cache reloading is already in progress");
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: process_configuration_sync                                       *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	process_configuration_sync(size_t *data_size)
@@ -58,7 +53,7 @@ static void	process_configuration_sync(size_t *data_size)
 
 	zbx_sock_t	sock;
 	struct		zbx_json_parse jp;
-	char		value[16], *error = NULL;
+	char		value[16];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -67,24 +62,18 @@ static void	process_configuration_sync(size_t *data_size)
 
 	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY); /* retry till have a connection */
 
-	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
-				get_ip_by_socket(&sock), error);
+	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG))
 		goto out;
-	}
 
 	if ('\0' == *sock.buffer)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
-				get_ip_by_socket(&sock), "empty string received");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: empty string received");
 		goto out;
 	}
 
 	if (SUCCEED != zbx_json_open(sock.buffer, &jp))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
-				get_ip_by_socket(&sock), zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: %s", zbx_json_strerror());
 		goto out;
 	}
 
@@ -98,23 +87,20 @@ static void	process_configuration_sync(size_t *data_size)
 		char	*info = NULL;
 		size_t	info_alloc = 0;
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc))
-			info = zbx_dsprintf(info, "negative response \"%s\"", value);
+		zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc);
 
-		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
-				get_ip_by_socket(&sock), info);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: %s",
+				ZBX_NULL2EMPTY_STR(info));
 		zbx_free(info);
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server at \"%s\", datalen " ZBX_FS_SIZE_T,
-			get_ip_by_socket(&sock), (zbx_fs_size_t)*data_size);
+	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server, datalen " ZBX_FS_SIZE_T,
+			(zbx_fs_size_t)*data_size);
 
 	process_proxyconfig(&jp);
 out:
 	disconnect_server(&sock);
-
-	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -149,8 +135,6 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	zbx_set_sigusr_handler(zbx_proxyconfig_sigusr_handler);
 
 	for (;;)
 	{

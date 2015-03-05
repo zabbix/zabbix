@@ -22,10 +22,9 @@
 #include "zbxdbupgrade.h"
 #include "dbupgrade.h"
 #include "sysinfo.h"
-#include "log.h"
 
 /*
- * 3.0 development database patches
+ * 3.0 maintenance database patches
  */
 
 #ifndef HAVE_SQLITE3
@@ -60,22 +59,11 @@ static int	DBpatch_2050001(void)
 
 		zbx_snprintf_alloc(&oid, &oid_alloc, &oid_offset, "discovery[{#SNMPVALUE},%s]", param);
 
-		/* 255 - ITEM_SNMP_OID_LEN */
-		if (255 < oid_offset && 255 < zbx_strlen_utf8(oid))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot convert SNMP discovery OID \"%s\":"
-					" resulting OID is too long", row[1]);
-			rc = ZBX_DB_OK;
-		}
-		else
-		{
-			oid_esc = DBdyn_escape_string(oid);
+		oid_esc = DBdyn_escape_string(oid);
 
-			rc = DBexecute("update items set snmp_oid='%s' where itemid=%s", oid_esc, row[0]);
+		rc = DBexecute("update items set snmp_oid='%s' where itemid=%s", oid_esc, row[0]);
 
-			zbx_free(oid_esc);
-		}
-
+		zbx_free(oid_esc);
 		zbx_free(param);
 
 		if (ZBX_DB_OK > rc)
@@ -90,27 +78,6 @@ out:
 	return ret;
 }
 
-static int	DBpatch_2050002(void)
-{
-	const ZBX_FIELD	field = {"lastlogsize", "0", NULL, NULL, 0, ZBX_TYPE_UINT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("proxy_history", &field);
-}
-
-static int	DBpatch_2050003(void)
-{
-	const ZBX_FIELD	field = {"mtime", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("proxy_history", &field);
-}
-
-static int	DBpatch_2050004(void)
-{
-	const ZBX_FIELD	field = {"meta", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("proxy_history", &field);
-}
-
 #endif
 
 DBPATCH_START(2050)
@@ -119,8 +86,5 @@ DBPATCH_START(2050)
 
 DBPATCH_ADD(2050000, 0, 1)
 DBPATCH_ADD(2050001, 0, 1)
-DBPATCH_ADD(2050002, 0, 1)
-DBPATCH_ADD(2050003, 0, 1)
-DBPATCH_ADD(2050004, 0, 1)
 
 DBPATCH_END()

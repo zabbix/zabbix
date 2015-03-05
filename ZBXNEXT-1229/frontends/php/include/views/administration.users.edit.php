@@ -33,10 +33,11 @@ else {
 // create form
 $userForm = new CForm();
 $userForm->setName('userForm');
+$userForm->addVar('config', getRequest('config', 0));
 $userForm->addVar('form', $this->data['form']);
 
-if ($data['userid'] != 0) {
-	$userForm->addVar('userid', $data['userid']);
+if (isset($_REQUEST['userid'])) {
+	$userForm->addVar('userid', $this->data['userid']);
 }
 
 /*
@@ -77,7 +78,7 @@ if (!$this->data['is_profile']) {
 
 // append password to form list
 if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
-	if ($data['userid'] == 0 || isset($this->data['change_password'])) {
+	if (!$this->data['userid'] || isset($this->data['change_password'])) {
 		$userFormList->addRow(
 			_('Password'),
 			new CPassBox('password1', $this->data['password1'], ZBX_TEXTBOX_SMALL_SIZE)
@@ -310,7 +311,7 @@ if (!$this->data['is_profile']) {
 	$userTypeComboBox->addItem(USER_TYPE_ZABBIX_ADMIN, user_type2str(USER_TYPE_ZABBIX_ADMIN));
 	$userTypeComboBox->addItem(USER_TYPE_SUPER_ADMIN, user_type2str(USER_TYPE_SUPER_ADMIN));
 
-	if ($data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
+	if (isset($this->data['userid']) && bccomp(CWebUser::$data['userid'], $this->data['userid']) == 0) {
 		$userTypeComboBox->setEnabled(false);
 		$permissionsFormList->addRow(_('User type'), array($userTypeComboBox, SPACE, new CSpan(_('User can\'t change type for himself'))));
 		$userForm->addVar('user_type', $this->data['user_type']);
@@ -332,14 +333,17 @@ if (isset($userMessagingFormList)) {
 $userForm->addItem($userTab);
 
 // append buttons to form
-if ($data['userid'] != 0) {
+if (isset($this->data['userid'])) {
 	$buttons = array(
-		new CButtonCancel()
+		new CButtonCancel(url_param('config'))
 	);
 
 	if (!$this->data['is_profile']) {
-		$deleteButton = new CButtonDelete(_('Delete selected user?'), url_param('form').url_param('userid'));
-		if (bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
+		$deleteButton = new CButtonDelete(
+			_('Delete selected user?'),
+			url_param('form').url_param('userid').url_param('config')
+		);
+		if (bccomp(CWebUser::$data['userid'], $this->data['userid']) == 0) {
 			$deleteButton->setAttribute('disabled', 'disabled');
 		}
 
@@ -351,7 +355,7 @@ if ($data['userid'] != 0) {
 else {
 	$userForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		array(new CButtonCancel(url_param('config')))
 	));
 }
 

@@ -62,20 +62,21 @@ foreach ($this->data['screens'] as $screen) {
 	));
 }
 
-// buttons
-$buttonsArray = array();
-if (!$this->data['templateid']) {
-	$buttonsArray['screen.export'] = array('name' => _('Export'));
+// create go button
+$goComboBox = new CComboBox('action');
+if (empty($this->data['templateid'])) {
+	$goComboBox->addItem('screen.export', _('Export selected'));
 }
-$buttonsArray['screen.massdelete'] = array('name' => _('Delete'), 'confirm' => _('Delete selected screens?'));
+$goOption = new CComboItem('screen.massdelete', _('Delete selected'));
+$goOption->setAttribute('confirm', _('Delete selected screens?'));
+$goComboBox->addItem($goOption);
+
+$goButton = new CSubmit('goButton', _('Go').' (0)');
+$goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "screens";');
 
 // append table to form
-$screenForm->addItem(array(
-	$this->data['paging'],
-	$screenTable,
-	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'screens', $buttonsArray))
-));
+$screenForm->addItem(array($this->data['paging'], $screenTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $screenWidget->addItem($screenForm);

@@ -60,12 +60,6 @@ abstract class CHostGeneral extends CHostBase {
 
 		// link templates
 		if (!empty($data['templates_link'])) {
-			if (!API::Host()->isWritable($allHostIds)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
 			$this->link(zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid'), $allHostIds);
 		}
 
@@ -110,10 +104,12 @@ abstract class CHostGeneral extends CHostBase {
 	public function massRemove(array $data) {
 		$allHostIds = array_merge($data['hostids'], $data['templateids']);
 
-		if (!API::Host()->isWritable($allHostIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+		if (isset($data['groupids'])) {
+			API::HostGroup()->massRemove(array(
+				'hostids' => $data['hostids'],
+				'templateids' => $data['templateids'],
+				'groupids' => zbx_toArray($data['groupids'])
+			));
 		}
 
 		if (!empty($data['templateids_link'])) {
@@ -136,14 +132,14 @@ abstract class CHostGeneral extends CHostBase {
 			API::UserMacro()->delete($hostMacroIds);
 		}
 
-		if (isset($data['groupids'])) {
-			API::HostGroup()->massRemove($data);
-		}
-
 		return array($this->pkOption() => $data[$this->pkOption()]);
 	}
 
 	protected function link(array $templateIds, array $targetIds) {
+		if (!API::Host()->isWritable($targetIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		$hostsLinkageInserts = parent::link($templateIds, $targetIds);
 
 		foreach ($hostsLinkageInserts as $hostTplIds){

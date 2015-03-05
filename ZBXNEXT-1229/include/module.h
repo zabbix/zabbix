@@ -65,7 +65,6 @@ typedef struct
 	int		severity;
 	int		logeventid;
 	int		mtime;
-	unsigned char	meta;	/* meta information update (log size and mtime) */
 }
 zbx_log_t;
 

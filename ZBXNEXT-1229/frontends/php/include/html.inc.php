@@ -347,7 +347,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 
 		$list->addItem(array(bold(_('Host').NAME_DELIMITER), new CLink($name, 'hosts.php?form=update&hostid='.$dbHost['hostid'])));
 		$list->addItem($status);
-		$list->addItem(getAvailabilityTable($dbHost, time()));
+		$list->addItem(getAvailabilityTable($dbHost));
 	}
 
 	if (!empty($dbDiscovery)) {
@@ -545,12 +545,11 @@ function makeFormFooter(CButtonInterface $mainButton = null, array $otherButtons
 /**
  * Returns zbx, snmp, jmx, ipmi availability status icons and the discovered host lifetime indicator.
  *
- * @param array  $host			an array of host data
- * @param string $currentTime	current Unix timestamp
+ * @param type $host
  *
  * @return CDiv
  */
-function getAvailabilityTable($host, $currentTime) {
+function getAvailabilityTable($host) {
 	$arr = array('zbx', 'snmp', 'jmx', 'ipmi');
 
 	// for consistency in foreach loop
@@ -578,22 +577,12 @@ function getAvailabilityTable($host, $currentTime) {
 	// discovered host lifetime indicator
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete']) {
 		$deleteError = new CDiv(SPACE, 'status_icon status_icon_extra iconwarning');
-
-		// Check if host should've been deleted in the past.
-		if ($currentTime > $host['hostDiscovery']['ts_delete']) {
-			$deleteError->setHint(_s(
-				'The host is not discovered anymore and will be deleted the next time discovery rule is processed.'
-			));
-		}
-		else {
-			$deleteError->setHint(_s(
-				'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-				zbx_date2age($host['hostDiscovery']['ts_delete']),
-				zbx_date2str(DATE_FORMAT, $host['hostDiscovery']['ts_delete']),
-				zbx_date2str(TIME_FORMAT, $host['hostDiscovery']['ts_delete'])
-			));
-		}
-
+		$deleteError->setHint(_s(
+			'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+			zbx_date2age($host['hostDiscovery']['ts_delete']),
+			zbx_date2str(DATE_FORMAT, $host['hostDiscovery']['ts_delete']),
+			zbx_date2str(TIME_FORMAT, $host['hostDiscovery']['ts_delete'])
+		));
 		$ad->addItem($deleteError);
 	}
 

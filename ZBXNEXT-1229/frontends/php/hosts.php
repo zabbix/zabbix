@@ -759,44 +759,26 @@ elseif (hasRequest('form')) {
 
 	if ($data['hostId']) {
 		$dbHosts = API::Host()->get(array(
-			'output' => array('hostid', 'proxy_hostid', 'host', 'name', 'status', 'ipmi_authtype', 'ipmi_privilege',
-				'ipmi_username', 'ipmi_password', 'flags', 'description'
-			),
-			'selectGroups' => array('groupid', 'name'),
+			'hostids' => $data['hostId'],
+			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => array('templateid', 'name'),
-			'selectMacros' => array('hostmacroid', 'macro', 'value'),
-			'selectDiscoveryRule' => array('name', 'itemid'),
+			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectInventory' => true,
-			'hostids' => array($data['hostId'])
+			'selectDiscoveryRule' => array('name', 'itemid'),
+			'output' => API_OUTPUT_EXTEND
 		));
 		$dbHost = reset($dbHosts);
-		CArrayHelper::sort($dbHost['groups'], array('name'));
 
 		$dbHost['interfaces'] = API::HostInterface()->get(array(
-			'output' => array('interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'bulk'),
+			'hostids' => $data['hostId'],
+			'output' => API_OUTPUT_EXTEND,
 			'selectItems' => array('type'),
-			'hostids' => array($data['hostId']),
 			'sortfield' => 'interfaceid',
 			'preservekeys' => true
 		));
 
 		$data['dbHost'] = $dbHost;
 	}
-
-	// get user allowed host groups and sort them by name
-	$data['groupsAllowed'] = API::HostGroup()->get(array(
-		'output' => array('groupid', 'name'),
-		'editable' => true,
-		'preservekeys' => true
-	));
-	CArrayHelper::sort($data['groupsAllowed'], array('name'));
-
-	// get other host groups that user has also read permissions and sort by name
-	$data['groupsAll'] = API::HostGroup()->get(array(
-		'output' => array('groupid', 'name'),
-		'preservekeys' => true
-	));
-	CArrayHelper::sort($data['groupsAll'], array('name'));
 
 	$hostView = new CView('configuration.host.edit', $data);
 }

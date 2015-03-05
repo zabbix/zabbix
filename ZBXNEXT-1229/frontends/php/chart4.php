@@ -40,17 +40,17 @@ if (!hasRequest('triggerid')) {
 	fatal_error(_('No triggers defined.'));
 }
 
-$dbTriggers = API::Trigger()->get(array(
-	'output' => array('description'),
+$dbTrigger = API::Trigger()->get(array(
 	'triggerids' => getRequest('triggerid'),
+	'output' => API_OUTPUT_EXTEND,
 	'expandDescription' => true
 ));
-
-if (!$dbTriggers) {
+if (!$dbTrigger) {
 	access_deny();
 }
-
-$dbTrigger = reset($dbTriggers);
+else {
+	$dbTrigger = reset($dbTrigger);
+}
 
 /*
  * Display

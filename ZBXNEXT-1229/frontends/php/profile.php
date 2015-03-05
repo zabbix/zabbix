@@ -97,7 +97,7 @@ elseif (isset($_REQUEST['del_user_media'])) {
 // primary actions
 elseif (isset($_REQUEST['cancel'])) {
 	ob_end_clean();
-	redirect(ZBX_DEFAULT_URL);
+	redirect(CWebUser::$data['last_page']['url']);
 }
 elseif (hasRequest('update')) {
 	$auth_type = getUserAuthenticationType(CWebUser::$data['userid']);
@@ -174,7 +174,7 @@ elseif (hasRequest('update')) {
 			DBend(true);
 			ob_end_clean();
 
-			redirect(ZBX_DEFAULT_URL);
+			redirect(CWebUser::$data['last_page']['url']);
 		}
 		else {
 			show_messages($result, _('User updated'), _('Cannot update user'));

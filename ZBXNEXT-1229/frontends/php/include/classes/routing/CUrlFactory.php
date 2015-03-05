@@ -69,9 +69,18 @@ class CUrlFactory {
 		'maintenance.php' => array(
 			'remove' => array('maintenanceid')
 		),
+		'media_types.php' => array(
+			'remove' => array('mediatypeid')
+		),
+		'proxies.php' => array(
+			'remove' => array('proxyid')
+		),
 		'screenconf.php' => array(
 			'remove' => array('screenid'),
 			'add' => array('templateid')
+		),
+		'scripts.php' => array(
+			'remove' => array('scriptid')
 		),
 		'slideconf.php' => array(
 			'remove' => array('slideshowid')
@@ -97,7 +106,7 @@ class CUrlFactory {
 			'remove' => array('userid')
 		),
 		'__default' => array(
-			'remove' => array('cancel', 'form', 'delete')
+			'remove' => array('action', 'cancel', 'form', 'delete')
 		)
 	);
 
@@ -137,7 +146,7 @@ class CUrlFactory {
 	protected static function resolveConfig() {
 		global $page;
 
-		if (isset($page['file']) && isset(self::$contextConfigs[$page['file']])) {
+		if (isset(self::$contextConfigs[$page['file']])) {
 			return array_merge_recursive(self::$contextConfigs['__default'], self::$contextConfigs[$page['file']]);
 		}
 

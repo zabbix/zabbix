@@ -96,6 +96,19 @@ function encodeValues(&$value, $encodeTwice = true) {
 	}
 }
 
+// add JavaScript for calling after page loading
+function zbx_add_post_js($script) {
+	global $ZBX_PAGE_POST_JS;
+
+	if ($ZBX_PAGE_POST_JS === null) {
+		$ZBX_PAGE_POST_JS = array();
+	}
+
+	if (!in_array($script, $ZBX_PAGE_POST_JS)) {
+		$ZBX_PAGE_POST_JS[] = $script;
+	}
+}
+
 function insert_show_color_picker_javascript() {
 	global $SHOW_COLOR_PICKER_SCRIPT_INSERTED;
 
@@ -452,23 +465,18 @@ function get_js($script, $jQueryDocumentReady = false) {
 		: '<script type="text/javascript">'."\n".$script."\n".'</script>';
 }
 
-// add JavaScript for calling after page loading
-function zbx_add_post_js($script) {
-	global $ZBX_PAGE_POST_JS;
-
-	if ($ZBX_PAGE_POST_JS === null) {
-		$ZBX_PAGE_POST_JS = array();
-	}
-
-	if (!in_array($script, $ZBX_PAGE_POST_JS)) {
-		$ZBX_PAGE_POST_JS[] = $script;
-	}
-}
-
 function insertPagePostJs() {
 	global $ZBX_PAGE_POST_JS;
 
 	if ($ZBX_PAGE_POST_JS) {
-		echo get_js(implode("\n", $ZBX_PAGE_POST_JS), true);
+		$js = '';
+
+		foreach ($ZBX_PAGE_POST_JS as $script) {
+			$js .= $script."\n";
+		}
+
+		if ($js) {
+			echo get_js($js, true);
+		}
 	}
 }

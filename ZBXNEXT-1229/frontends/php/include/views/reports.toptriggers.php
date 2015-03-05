@@ -170,7 +170,7 @@ foreach ($this->data['triggers'] as $trigger) {
 	$hostName->setMenuPopup(CMenuPopupHelper::getHost($this->data['hosts'][$hostId], $this->data['scripts'][$hostId]));
 
 	$triggerDescription = new CSpan($trigger['description'], 'link_menu');
-	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
+	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $trigger['items']));
 
 	$table->addRow(array(
 		$hostName,

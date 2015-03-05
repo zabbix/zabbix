@@ -203,7 +203,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function, const char *parameters,
-		time_t now, char **error)
+		time_t now)
 {
 	const char		*__function_name = "evaluate_LOGEVENTID";
 
@@ -227,15 +227,7 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function,
 		goto out;
 
 	if ('@' == *arg1)
-	{
 		DCget_expressions_by_name(&regexps, arg1 + 1);
-
-		if (0 == regexps.values_num)
-		{
-			*error = zbx_dsprintf(*error, "global regular expression \"%s\" does not exist", arg1 + 1);
-			goto out;
-		}
-	}
 
 	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, &ts, &vc_value))
 	{
@@ -252,9 +244,9 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function,
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
-out:
-	zbx_free(arg1);
 
+	zbx_free(arg1);
+out:
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_ptr_destroy(&regexps);
 
@@ -1587,8 +1579,7 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 	return FAIL;
 }
 
-static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now,
-		char **error)
+static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_STR";
 	char				*arg1 = NULL;
@@ -1637,15 +1628,7 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 	}
 
 	if ((ZBX_FUNC_REGEXP == func || ZBX_FUNC_IREGEXP == func) && '@' == *arg1)
-	{
 		DCget_expressions_by_name(&regexps, arg1 + 1);
-
-		if (0 == regexps.values_num)
-		{
-			*error = zbx_dsprintf(*error, "global regular expression \"%s\" does not exist", arg1 + 1);
-			goto out;
-		}
-	}
 
 	if (ZBX_FLAG_SEC == flag)
 		seconds = arg2;
@@ -1971,7 +1954,7 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "str") || 0 == strcmp(function, "regexp") || 0 == strcmp(function, "iregexp"))
 	{
-		ret = evaluate_STR(value, item, function, parameter, now, error);
+		ret = evaluate_STR(value, item, function, parameter, now);
 	}
 	else if (0 == strcmp(function, "strlen"))
 	{
@@ -1988,7 +1971,7 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "logeventid"))
 	{
-		ret = evaluate_LOGEVENTID(value, item, function, parameter, now, error);
+		ret = evaluate_LOGEVENTID(value, item, function, parameter, now);
 	}
 	else if (0 == strcmp(function, "logseverity"))
 	{
