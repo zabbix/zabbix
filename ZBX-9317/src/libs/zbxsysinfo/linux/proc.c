@@ -201,7 +201,7 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
  * Function: byte_value_from_proc_file                                        *
  *                                                                            *
  * Purpose: Read amount of memory in bytes from a string in /proc file.       *
- *          For example, reading "VmSize:   176712 kB" from  /proc/1/status   *
+ *          For example, reading "VmSize:   176712 kB" from /proc/1/status    *
  *          will produce a result 176712*1024 = 180953088 bytes               *
  *                                                                            *
  * Parameters:                                                                *
@@ -210,13 +210,13 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
  *     bytes - [OUT] result in bytes                                          *
  *                                                                            *
  * Return value: SUCCEED - successful reading,                                *
- *               NOSUPPORTED - the search string was not found. For example,  *
- *                             /proc/NNN/status files for kernel threads do   *
- *                             not contain "VmSize:" string.                  *
+ *               NOTSUPPORTED - the search string was not found. For example, *
+ *                              /proc/NNN/status files for kernel threads do  *
+ *                              not contain "VmSize:" string.                 *
  *               FAIL - the search string was found but could not be parsed.  *
  *                                                                            *
  ******************************************************************************/
-static int byte_value_from_proc_file(FILE *f, const char *s, zbx_uint64_t *bytes)
+static int	byte_value_from_proc_file(FILE *f, const char *s, zbx_uint64_t *bytes)
 {
 	char	buf[MAX_STRING_LEN], *p, *p_unit;
 	size_t	sz;
@@ -265,7 +265,7 @@ static int byte_value_from_proc_file(FILE *f, const char *s, zbx_uint64_t *bytes
 	return ret;
 }
 
-static int get_total_memory(zbx_uint64_t *total_memory)
+static int	get_total_memory(zbx_uint64_t *total_memory)
 {
 	FILE	*f;
 	int	ret = FAIL;
@@ -323,10 +323,15 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
 			if (0 == errno)
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
-			else
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
-						zbx_strerror(errno)));
+			{
+				/* specified user does not exist */
+
+				SET_UI64_RESULT(result, 0);
+				return SYSINFO_RET_OK;
+			}
+
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+					zbx_strerror(errno)));
 
 			return SYSINFO_RET_FAIL;
 		}
@@ -615,7 +620,7 @@ out:
 
 	if ((0 == proccount && 0 != mem_type_tried) || 0 != invalid_read)
 	{
-		char	*s = NULL;
+		char	*s;
 
 		s = zbx_strdup(NULL, mem_type_search);
 		zbx_rtrim(s, ":\t");
@@ -683,10 +688,15 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
 			if (0 == errno)
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
-			else
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
-						zbx_strerror(errno)));
+			{
+				/* specified user does not exist */
+
+				SET_UI64_RESULT(result, 0);
+				return SYSINFO_RET_OK;
+			}
+
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+					zbx_strerror(errno)));
 
 			return SYSINFO_RET_FAIL;
 		}
