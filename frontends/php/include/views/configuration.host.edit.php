@@ -76,7 +76,7 @@ if ($data['hostId'] && (!hasRequest('form_refresh') || $cloningDiscoveredHost)) 
 	$ipmiPassword = $dbHost['ipmi_password'];
 
 	$macros = order_macros($dbHost['macros'], 'macro');
-	$hostGroups = zbx_objectValues($dbHost['groups'], 'groupid');
+	$groupIds = zbx_objectValues($dbHost['groups'], 'groupid');
 
 	if ($cloningDiscoveredHost) {
 		$status = getRequest('status', HOST_STATUS_NOT_MONITORED);
@@ -120,9 +120,9 @@ if ($data['hostId'] && (!hasRequest('form_refresh') || $cloningDiscoveredHost)) 
 	$newGroupName = '';
 }
 else {
-	$hostGroups = getRequest('groups', array());
-	if ($data['groupId'] != 0 && !$hostGroups) {
-		$hostGroups[] = $data['groupId'];
+	$groupIds = getRequest('groups', array());
+	if ($data['groupId'] != 0 && !$groupIds) {
+		$groupIds[] = $data['groupId'];
 	}
 
 	$newGroupName = getRequest('newgroup', '');
@@ -208,19 +208,46 @@ $hostList->addRow(_('Host name'), $hostTB);
 $visiblenameTB = new CTextBox('visiblename', $visibleName, ZBX_TEXTBOX_STANDARD_SIZE, $isDiscovered, 128);
 $hostList->addRow(_('Visible name'), $visiblenameTB);
 
-// groups for normal hosts
 if (!$isDiscovered) {
-	$grp_tb = new CTweenBox($frmHost, 'groups', $hostGroups, 10);
-	$all_groups = API::HostGroup()->get(array(
-		'editable' => true,
-		'output' => API_OUTPUT_EXTEND
-	));
-	order_result($all_groups, 'name');
-	foreach ($all_groups as $group) {
-		$grp_tb->addItem($group['groupid'], $group['name']);
+	// groups for normal hosts
+
+	$groupIds = array_combine($groupIds, $groupIds);
+
+	$groupsTB = new CTweenBox($frmHost, 'groups', $groupIds, 10);
+
+	if ($data['form'] === 'update') {
+		// Add existing host groups to list and, depending on permissions show name as enabled or disabled.
+
+		$groupsInList = array();
+
+		foreach ($data['groupsAll'] as $group) {
+			if (isset($groupIds[$group['groupid']])) {
+				$groupsTB->addItem($group['groupid'], $group['name'], true,
+					isset($data['groupsAllowed'][$group['groupid']])
+				);
+				$groupsInList[$group['groupid']] = true;
+			}
+		}
+
+		// Add other host groups that user has permissions to, if not yet added to the list.
+		foreach ($data['groupsAllowed'] as $group) {
+			if (!isset($groupsInList[$group['groupid']])) {
+				$groupsTB->addItem($group['groupid'], $group['name']);
+			}
+		}
+	}
+	else {
+		/*
+		 * When cloning a host or creating a new one, don't show read-only host groups in left box. Show empty or posted
+		 * groups in case of an error.
+		 */
+
+		foreach ($data['groupsAllowed'] as $group) {
+			$groupsTB->addItem($group['groupid'], $group['name']);
+		}
 	}
 
-	$hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));
+	$hostList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
 
 	$newgroupTB = new CTextBox('newgroup', $newGroupName, ZBX_TEXTBOX_SMALL_SIZE);
 	$newgroupTB->setAttribute('maxlength', 64);
@@ -231,8 +258,9 @@ if (!$isDiscovered) {
 	}
 	$hostList->addRow(null, array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, 'new');
 }
-// groups for discovered hosts
 else {
+	// groups for discovered hosts
+
 	$groupBox = new CComboBox('groups');
 	$groupBox->setAttribute('readonly', true);
 	$groupBox->setAttribute('size', 10);

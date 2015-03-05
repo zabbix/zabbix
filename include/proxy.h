@@ -28,14 +28,12 @@
 
 #define ZBX_MAX_HRECORDS	1000
 
-#define AGENT_VALUE	struct zbx_agent_value_t
-
-AGENT_VALUE
+typedef struct
 {
 	zbx_timespec_t	ts;
 	char		host_name[HOST_HOST_LEN_MAX];
 	char		key[ITEM_KEY_LEN * 4 + 1];
-	char		*value;
+	char		*value;	/* NULL in case of meta record (see "meta" field below) */
 	char		*source;
 	zbx_uint64_t	lastlogsize;
 	int		mtime;
@@ -43,7 +41,9 @@ AGENT_VALUE
 	int		severity;
 	int		logeventid;
 	unsigned char	state;
-};
+	unsigned char	meta;	/* meta information update (log size and mtime) */
+}
+AGENT_VALUE;
 
 int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char **error);
 

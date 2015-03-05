@@ -53,6 +53,8 @@ $hostGroupTable->setHeader(array(
 	_('Info')
 ));
 
+$currentTime = time();
+
 foreach ($this->data['groups'] as $group) {
 	$hostsOutput = array();
 	$i = 0;
@@ -126,12 +128,21 @@ foreach ($this->data['groups'] as $group) {
 	// info, discovered item lifetime indicator
 	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete']) {
 		$info = new CDiv(SPACE, 'status_icon iconwarning');
-		$info->setHint(_s(
-			'The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($group['groupDiscovery']['ts_delete']),
-			zbx_date2str(DATE_FORMAT, $group['groupDiscovery']['ts_delete']),
-			zbx_date2str(TIME_FORMAT, $group['groupDiscovery']['ts_delete'])
-		));
+
+		// Check if host group should've been deleted in the past.
+		if ($currentTime > $group['groupDiscovery']['ts_delete']) {
+			$info->setHint(_s(
+				'The host group is not discovered anymore and will be deleted the next time discovery rule is processed.'
+			));
+		}
+		else {
+			$info->setHint(_s(
+				'The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+				zbx_date2age($group['groupDiscovery']['ts_delete']),
+				zbx_date2str(DATE_FORMAT, $group['groupDiscovery']['ts_delete']),
+				zbx_date2str(TIME_FORMAT, $group['groupDiscovery']['ts_delete'])
+			));
+		}
 	}
 	else {
 		$info = '';
@@ -150,27 +161,19 @@ foreach ($this->data['groups'] as $group) {
 	));
 }
 
-// create go button
-$goComboBox = new CComboBox('action');
-
-$goOption = new CComboItem('hostgroup.massenable', _('Enable selected'));
-$goOption->setAttribute('confirm', _('Enable selected hosts?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('hostgroup.massdisable', _('Disable selected'));
-$goOption->setAttribute('confirm', _('Disable hosts in the selected host groups?'));
-$goComboBox->addItem($goOption);
-
-$goOption = new CComboItem('hostgroup.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected host groups?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "groups";');
-
 // append table to form
-$hostGroupForm->addItem(array($this->data['paging'], $hostGroupTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$hostGroupForm->addItem(array(
+	$this->data['paging'],
+	$hostGroupTable,
+	$this->data['paging'],
+	get_table_header(new CActionButtonList('action', 'groups', array(
+		'hostgroup.massenable' => array('name' => _('Enable hosts'), 'confirm' => _('Enable selected hosts?')),
+		'hostgroup.massdisable' => array('name' => _('Disable hosts'),
+			'confirm' => _('Disable hosts in the selected host groups?')
+		),
+		'hostgroup.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected host groups?'))
+	)))
+));
 
 // append form to widget
 $hostGroupWidget->addItem($hostGroupForm);

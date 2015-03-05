@@ -203,27 +203,6 @@ class CDService extends CApiService {
 	return $result;
 	}
 
-	/**
-	 * Check if discovered service exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('dservice.exists method is deprecated.');
-
-		$service = $this->get(array(
-			'output' => array('dserviceid'),
-			'filter' => zbx_array_mintersect(array(array('dserviceid')), $object),
-			'limit' => 1
-		));
-
-		return (bool) $service;
-	}
-
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
