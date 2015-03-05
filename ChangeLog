@@ -1,6 +1,7 @@
 Changes for 2.4.5rc1
 
 New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 .......PS. [ZBX-9344] fixed infinite looping in telnet.run[] in case there is no password prompt (asaveljevs, dimir)
