@@ -100,57 +100,56 @@ if ($groupId && !API::HostGroup()->isWritable(array($groupId))) {
 	access_deny();
 }
 
-$hostId = getRequest('hostid');
-if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
-	if (hasRequest('parent_discoveryid')) {
-		// check whether discovery rule is editable by user
-		$discoveryRule = API::DiscoveryRule()->get(array(
-			'output' => array('name', 'itemid', 'hostid'),
-			'itemids' => getRequest('parent_discoveryid'),
-			'editable' => true
-		));
-		$discoveryRule = reset($discoveryRule);
-		if (!$discoveryRule) {
-			access_deny();
-		}
+$hostId = getRequest('hostid', 0);
 
-		$hostId = $discoveryRule['hostid'];
-
-		// check whether graph prototype is editable by user
-		if (hasRequest('graphid')) {
-			$graphPrototype = (bool) API::GraphPrototype()->get(array(
-				'output' => array(),
-				'graphids' => getRequest('graphid'),
-				'editable' => true
-			));
-			if (!$graphPrototype) {
-				access_deny();
-			}
-		}
+if (hasRequest('parent_discoveryid')) {
+	// check whether discovery rule is editable by user
+	$discoveryRule = API::DiscoveryRule()->get(array(
+		'output' => array('name', 'itemid', 'hostid'),
+		'itemids' => getRequest('parent_discoveryid'),
+		'editable' => true
+	));
+	$discoveryRule = reset($discoveryRule);
+	if (!$discoveryRule) {
+		access_deny();
 	}
-	elseif (hasRequest('graphid')) {
-		// check whether graph is normal and editable by user
-		$graph = (bool) API::Graph()->get(array(
+
+	$hostId = $discoveryRule['hostid'];
+
+	// check whether graph prototype is editable by user
+	if (hasRequest('graphid')) {
+		$graphPrototype = (bool) API::GraphPrototype()->get(array(
 			'output' => array(),
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'graphids' => getRequest('graphid'),
 			'editable' => true
 		));
-		if (!$graph) {
+		if (!$graphPrototype) {
 			access_deny();
 		}
 	}
-	elseif ($hostId) {
-		// check whether host is editable by user
-		$host = (bool) API::Host()->get(array(
-			'output' => array(),
-			'hostids' => $hostId,
-			'templated_hosts' => true,
-			'editable' => true
-		));
-		if (!$host) {
-			access_deny();
-		}
+}
+elseif (hasRequest('graphid')) {
+	// check whether graph is normal and editable by user
+	$graph = (bool) API::Graph()->get(array(
+		'output' => array(),
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+		'graphids' => getRequest('graphid'),
+		'editable' => true
+	));
+	if (!$graph) {
+		access_deny();
+	}
+}
+elseif ($hostId) {
+	// check whether host is editable by user
+	$host = (bool) API::Host()->get(array(
+		'output' => array(),
+		'hostids' => $hostId,
+		'templated_hosts' => true,
+		'editable' => true
+	));
+	if (!$host) {
+		access_deny();
 	}
 }
 
@@ -418,7 +417,7 @@ elseif (isset($_REQUEST['form'])) {
 		'graphid' => getRequest('graphid', 0),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'group_gid' => getRequest('group_gid', array()),
-		'hostid' => getRequest('hostid', 0),
+		'hostid' => $hostId,
 		'normal_only' => getRequest('normal_only')
 	);
 
@@ -451,7 +450,7 @@ elseif (isset($_REQUEST['form'])) {
 		$data['templates'] = array();
 
 		// if no host has been selected for the navigation panel, use the first graph host
-		if (empty($data['hostid'])) {
+		if ($data['hostid'] == 0) {
 			$host = reset($graph['hosts']);
 			$data['hostid'] = $host['hostid'];
 		}
@@ -600,7 +599,7 @@ elseif (isset($_REQUEST['form'])) {
 	$data['items'] = array_values($data['items']);
 
 	// is template
-	$data['is_template'] = isTemplate($data['hostid']);
+	$data['is_template'] = ($data['hostid'] == 0) ? false : isTemplate($data['hostid']);
 
 	// render view
 	$graphView = new CView('configuration.graph.edit', $data);
@@ -618,7 +617,7 @@ else {
 
 	$data = array(
 		'pageFilter' => $pageFilter,
-		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : getRequest('hostid'),
+		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : $hostId,
 		'parent_discoveryid' => isset($discoveryRule) ? $discoveryRule['itemid'] : null,
 		'graphs' => array(),
 		'discovery_rule' => isset($discoveryRule) ? $discoveryRule : null,
@@ -628,8 +627,8 @@ else {
 
 	// get graphs
 	$options = array(
-		'hostids' => $data['hostid'] ? $data['hostid'] : null,
-		'groupids' => (!$data['hostid'] && $pageFilter->groupid > 0) ? $pageFilter->groupid : null,
+		'hostids' => ($data['hostid'] == 0) ? null : $data['hostid'],
+		'groupids' => ($data['hostid'] == 0 && $pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 		'discoveryids' => isset($discoveryRule) ? $discoveryRule['itemid'] : null,
 		'editable' => true,
 		'output' => array('graphid', 'name', 'graphtype'),
@@ -655,8 +654,8 @@ else {
 		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),
 		'output' => array('graphid', 'name', 'templateid', 'graphtype', 'width', 'height'),
 		'selectDiscoveryRule' => array('itemid', 'name'),
-		'selectHosts' => $data['hostid'] ? null : array('name'),
-		'selectTemplates' => $data['hostid'] ? null : array('name')
+		'selectHosts' => ($data['hostid'] == 0) ? array('name') : null,
+		'selectTemplates' => ($data['hostid'] == 0) ? array('name') : null
 	);
 
 	$data['graphs'] = empty($_REQUEST['parent_discoveryid'])
