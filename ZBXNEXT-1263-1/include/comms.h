@@ -81,6 +81,7 @@ typedef struct
 #elif defined(HAVE_GNUTLS)
 	gnutls_session_t		tls_ctx;
 	gnutls_psk_client_credentials_t	tls_psk_client_creds;
+	gnutls_psk_server_credentials_t	tls_psk_server_creds;
 #elif defined(HAVE_OPENSSL)
 	SSL				*tls_ctx;
 #endif
