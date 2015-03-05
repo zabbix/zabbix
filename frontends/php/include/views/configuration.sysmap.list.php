@@ -36,7 +36,7 @@ $sysmapForm = new CForm();
 $sysmapForm->setName('frm_maps');
 
 // create table
-$sysmapTable = new CTableInfo(_('No maps found.'));
+$sysmapTable = new CTableInfo();
 $sysmapTable->setHeader(array(
 	new CCheckBox('all_maps', null, "checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');"),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),

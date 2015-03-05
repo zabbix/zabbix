@@ -26,10 +26,6 @@ $config = $this->data['config'];
 
 $filterForm = new CFilter('web.tr_status.filter.state');
 
-//$filterForm = new CFormTable(null, null, 'get');
-//$filterForm->setTableClass('formtable old-filter');
-//$filterForm->setAttribute('name', 'zbx_filter');
-//$filterForm->setAttribute('id', 'zbx_filter');
 $filterForm->addVar('fullscreen', $filter['fullScreen']);
 $filterForm->addVar('groupid', $filter['groupId']);
 $filterForm->addVar('hostid', $filter['hostId']);

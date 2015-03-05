@@ -53,7 +53,7 @@ $triggersForm->setName('triggersForm');
 $triggersForm->addVar('hostid', $this->data['hostid']);
 
 // create table
-$triggersTable = new CTableInfo(_('No triggers found.'));
+$triggersTable = new CTableInfo();
 $triggersTable->setHeader(array(
 	new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
 	make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),

@@ -268,11 +268,11 @@ if (hasRequest('sform')) {
 		array($ctb, BR(), $cbIregexp, 'iregexp', SPACE, $cbAdd, SPACE, $cbOr, SPACE, $exp_select, SPACE, $cb)
 	);
 
-	$keyTable = new CTableInfo(null);
+	$keyTable = new CTableInfo();
 	$keyTable->setAttribute('id', 'key_list');
 	$keyTable->setHeader(array(_('Keyword'), _('Type'), _('Action')));
 
-	$table = new CTableInfo(null);
+	$table = new CTableInfo();
 	$table->setAttribute('id', 'exp_list');
 	$table->setHeader(array(_('Expression'), _('Type'), _('Position'), _('Action')));
 

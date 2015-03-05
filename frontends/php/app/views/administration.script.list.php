@@ -37,7 +37,7 @@ $scriptsForm = new CForm();
 $scriptsForm->setName('scriptsForm');
 $scriptsForm->setAttribute('id', 'scripts');
 
-$scriptsTable = new CTableInfo(_('No scripts found.'));
+$scriptsTable = new CTableInfo();
 $scriptsTable->setHeader(array(
 	new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');"),
 	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),

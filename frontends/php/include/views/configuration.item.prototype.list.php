@@ -40,7 +40,7 @@ $itemForm->addVar('hostid', $this->data['hostid']);
 $itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
-$itemTable = new CTableInfo(_('No item prototypes found.'));
+$itemTable = new CTableInfo();
 
 $itemTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),

@@ -37,7 +37,7 @@ if (empty($this->data['screens'])) {
 	$headerForm->addItem($controls);
 	$screenWidget->setControls($headerForm);
 	$screenWidget->addItem(BR());
-	$screenWidget->addItem(new CTableInfo(_('No screens found.')));
+	$screenWidget->addItem(new CTableInfo());
 
 	$screenBuilder = new CScreenBuilder();
 	CScreenBuilder::insertScreenStandardJs(array(

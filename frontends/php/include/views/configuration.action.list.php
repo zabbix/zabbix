@@ -46,7 +46,7 @@ $actionForm = new CForm();
 $actionForm->setName('actionForm');
 
 // create table
-$actionTable = new CTableInfo(_('No actions found.'));
+$actionTable = new CTableInfo();
 $actionTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$actionForm->getName()."', 'all_items', 'g_actionid');"),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),

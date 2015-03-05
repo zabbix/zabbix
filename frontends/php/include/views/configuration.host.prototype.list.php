@@ -41,7 +41,7 @@ $itemForm->setName('hosts');
 $itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
-$hostTable = new CTableInfo(_('No host prototypes found.'));
+$hostTable = new CTableInfo();
 
 $hostTable->setHeader(array(
 	new CCheckBox('all_hosts', null, "checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');"),

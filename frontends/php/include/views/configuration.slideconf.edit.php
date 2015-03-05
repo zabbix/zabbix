@@ -41,7 +41,7 @@ $slideFormList->addRow(_('Name'), $nameTextBox);
 $slideFormList->addRow(_('Default delay (in seconds)'), new CNumericBox('delay', $this->data['delay'], 5, false, false, false));
 
 // append slide table
-$slideTable = new CTableInfo(null, 'formElementTable');
+$slideTable = new CTableInfo();
 $slideTable->setAttribute('style', 'min-width: 312px;');
 $slideTable->setAttribute('id', 'slideTable');
 $slideTable->setHeader(array(

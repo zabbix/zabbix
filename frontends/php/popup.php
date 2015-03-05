@@ -542,7 +542,7 @@ if ($srctbl == 'usrgrp') {
 	$form->setName('usrgrpform');
 	$form->setAttribute('id', 'usrgrps');
 
-	$table = new CTableInfo(_('No user groups found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(
 		$multiselect ? new CCheckBox('all_usrgrps', null, "javascript: checkAll('".$form->getName()."', 'all_usrgrps', 'usrgrps');") : null,
 		_('Name')
@@ -599,7 +599,7 @@ elseif ($srctbl == 'users') {
 	$form->setName('userform');
 	$form->setAttribute('id', 'users');
 
-	$table = new CTableInfo(_('No users found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(
 		($multiselect ? new CCheckBox('all_users', null, "javascript: checkAll('".$form->getName()."', 'all_users', 'users');") : null),
 		_('Alias'),
@@ -668,7 +668,7 @@ elseif ($srctbl == 'templates') {
 	$form->setName('templateform');
 	$form->setAttribute('id', 'templates');
 
-	$table = new CTableInfo(_('No templates found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(($multiselect ? new CCheckBox('all_templates', null,
 		"javascript: checkAll('".$form->getName()."', 'all_templates', 'templates');") : null), _('Name')
 	));
@@ -743,7 +743,7 @@ elseif ($srctbl == 'hosts') {
 	$form->setName('hostform');
 	$form->setAttribute('id', 'hosts');
 
-	$table = new CTableInfo(_('No hosts found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(($multiselect ? new CCheckBox('all_hosts', null,
 		"javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');") : null), _('Name')
 	));
@@ -818,7 +818,7 @@ elseif ($srctbl == 'host_templates') {
 	$form->setName('hosttemplateform');
 	$form->setAttribute('id', 'hosts');
 
-	$table = new CTableInfo(_('No hosts found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(($multiselect ? new CCheckBox('all_hosts', null,
 		"javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');") : null), _('Name')
 	));
@@ -894,7 +894,7 @@ elseif ($srctbl == 'host_groups') {
 	$form->setName('hostGroupsform');
 	$form->setAttribute('id', 'hostGroups');
 
-	$table = new CTableInfo(_('No host groups found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(($multiselect ? new CCheckBox('all_hostgroups', null,
 		"javascript: checkAll('".$form->getName()."', 'all_hostgroups', 'hostGroups');") : null), _('Name')
 	));
@@ -961,7 +961,7 @@ elseif ($srctbl == 'host_groups') {
  * Help items
  */
 elseif ($srctbl === 'help_items') {
-	$table = new CTableInfo(_('No item keys found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(_('Key'), _('Name')));
 
 	$helpItems = new CHelpItems();
@@ -984,7 +984,7 @@ elseif ($srctbl === 'triggers') {
 	$form->setName('triggerform');
 	$form->setAttribute('id', 'triggers');
 
-	$table = new CTableInfo(_('No triggers found.'));
+	$table = new CTableInfo();
 
 	$table->setHeader(array(
 		$multiselect ? new CCheckBox('all_triggers', null, "checkAll('".$form->getName()."', 'all_triggers', 'triggers');") : null,
@@ -1103,7 +1103,7 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 
 	$itemPrototypesPopup = ($srctbl === 'item_prototypes');
 
-	$table = new CTableInfo($itemPrototypesPopup ? _('No item prototypes found.') : _('No items found.'));
+	$table = new CTableInfo();
 	$header = array(
 		$pageFilter->hostsAll ? _('Host') : null,
 		$multiselect
@@ -1238,7 +1238,7 @@ elseif ($srctbl == 'applications') {
 	$form->setName('applicationform');
 	$form->setAttribute('id', 'applications');
 
-	$table = new CTableInfo(_('No applications found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(($multiselect ? new CCheckBox('all_applications', null,
 		"javascript: checkAll('".$form->getName()."', 'all_applications', 'applications');") : null), _('Name')
 	));
@@ -1310,7 +1310,7 @@ elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
 
 	$graphPrototypesPopup = ($srctbl === 'graph_prototypes');
 
-	$table = new CTableInfo($graphPrototypesPopup ? _('No graph prototypes found.') : _('No graphs found.'));
+	$table = new CTableInfo();
 	if ($multiselect) {
 		$header = array(
 			array(new CCheckBox('all_graphs', null,
@@ -1423,7 +1423,7 @@ elseif ($srctbl == 'sysmaps') {
 	$form->setName('sysmapform');
 	$form->setAttribute('id', 'sysmaps');
 
-	$table = new CTableInfo(_('No maps found.'));
+	$table = new CTableInfo();
 
 	if ($multiselect) {
 		$header = array(array(new CCheckBox('all_sysmaps', null, "javascript: checkAll('".$form->getName()."', 'all_sysmaps', 'sysmaps');"), _('Name')));
@@ -1493,7 +1493,7 @@ elseif ($srctbl == 'slides') {
 	$form->setName('slideform');
 	$form->setAttribute('id', 'slides');
 
-	$table = new CTableInfo(_('No slides found.'));
+	$table = new CTableInfo();
 
 	if ($multiselect) {
 		$header = array(array(new CCheckBox('all_slides', null, "javascript: checkAll('".$form->getName()."', 'all_slides', 'slides');"), _('Name')),);
@@ -1556,7 +1556,7 @@ elseif ($srctbl == 'screens') {
 	$form->setName('screenform');
 	$form->setAttribute('id', 'screens');
 
-	$table = new CTableInfo(_('No screens found.'));
+	$table = new CTableInfo();
 
 	if ($multiselect) {
 		$header = array(
@@ -1613,7 +1613,7 @@ elseif ($srctbl == 'screens') {
 elseif ($srctbl == 'screens2') {
 	require_once dirname(__FILE__).'/include/screens.inc.php';
 
-	$table = new CTableInfo(_('No screens found.'));
+	$table = new CTableInfo();
 	$table->setHeader(_('Name'));
 
 	$screens = API::Screen()->get(array(
@@ -1641,7 +1641,7 @@ elseif ($srctbl == 'screens2') {
  * Discovery rules
  */
 elseif ($srctbl === 'drules') {
-	$table = new CTableInfo(_('No discovery rules found.'));
+	$table = new CTableInfo();
 	$table->setHeader(_('Name'));
 
 	$dRules = API::DRule()->get(array(
@@ -1663,7 +1663,7 @@ elseif ($srctbl === 'drules') {
  * Discovery checks
  */
 elseif ($srctbl === 'dchecks') {
-	$table = new CTableInfo(_('No discovery rules found.'));
+	$table = new CTableInfo();
 	$table->setHeader(_('Name'));
 
 	$dRules = API::DRule()->get(array(
@@ -1690,7 +1690,7 @@ elseif ($srctbl === 'dchecks') {
  * Proxies
  */
 elseif ($srctbl == 'proxies') {
-	$table = new CTableInfo(_('No proxies found.'));
+	$table = new CTableInfo();
 	$table->setHeader(_('Name'));
 
 	$result = DBselect(
@@ -1717,7 +1717,7 @@ elseif ($srctbl == 'scripts') {
 	$form->setName('scriptform');
 	$form->attr('id', 'scripts');
 
-	$table = new CTableInfo(_('No scripts found.'));
+	$table = new CTableInfo();
 
 	if ($multiselect) {
 		$header = array(

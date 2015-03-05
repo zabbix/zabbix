@@ -57,7 +57,7 @@ $triggersForm->setName('triggersForm');
 $triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
-$triggersTable = new CTableInfo(_('No trigger prototypes found.'));
+$triggersTable = new CTableInfo();
 $triggersTable->setHeader(array(
 	new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
 	make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),

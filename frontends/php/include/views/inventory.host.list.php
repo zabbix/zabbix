@@ -68,7 +68,7 @@ $filterForm->setAttribute('id', 'zbx_filter');
 $filterForm->addItem($filterTable);
 $hostInventoryWidget->addFlicker($filterForm, CProfile::get('web.hostinventories.filter.state', 0));
 
-$table = new CTableInfo(_('No hosts found.'));
+$table = new CTableInfo();
 $table->setHeader(array(
 	make_sorting_header(_('Host'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Group'),

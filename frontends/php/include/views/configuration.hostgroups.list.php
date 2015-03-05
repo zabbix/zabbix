@@ -45,7 +45,7 @@ $hostGroupForm = new CForm();
 $hostGroupForm->setName('hostgroupForm');
 
 // create table
-$hostGroupTable = new CTableInfo(_('No host groups found.'));
+$hostGroupTable = new CTableInfo();
 $hostGroupTable->setHeader(array(
 	new CCheckBox('all_groups', null, "checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');"),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),

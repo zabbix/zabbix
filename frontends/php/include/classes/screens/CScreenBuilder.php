@@ -312,7 +312,7 @@ class CScreenBuilder {
 	 */
 	public function show() {
 		if (empty($this->screen)) {
-			return new CTableInfo(_('No screens found.'));
+			return new CTableInfo();
 		}
 
 		$skipedFields = array();

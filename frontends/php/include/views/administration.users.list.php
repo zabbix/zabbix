@@ -47,7 +47,7 @@ $usersForm = new CForm();
 $usersForm->setName('userForm');
 
 // create users table
-$usersTable = new CTableInfo(_('No users found.'));
+$usersTable = new CTableInfo();
 $usersTable->setHeader(array(
 	new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');"),
 	make_sorting_header(_('Alias'), 'alias', $this->data['sort'], $this->data['sortorder']),

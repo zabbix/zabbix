@@ -139,8 +139,8 @@ class CTable extends CTag {
 
 	public function endToString() {
 		$ret = '';
-		if ($this->rownum == 0 && isset($this->message)) {
-			$ret = $this->prepareRow(new CCol($this->message, 'message'));
+		if ($this->rownum == 0 && $this->message !== null) {
+			$ret = $this->prepareRow(new CCol($this->message), 'nothing-to-show');
 			$ret = $ret->toString();
 		}
 		$ret .= $this->footer;

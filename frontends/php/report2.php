@@ -173,7 +173,7 @@ if ($triggerData) {
 	$controls->addItem($triggerData['description']);
 	$reportWidget->setControls($controls);
 
-	$table = new CTableInfo(null, 'graph');
+	$table = new CTableInfo();
 	$table->addRow(new CImg('chart4.php?triggerid='.$_REQUEST['triggerid']));
 
 	$reportWidget->addItem(BR());
@@ -387,7 +387,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	/*
 	 * Triggers
 	 */
-	$triggerTable = new CTableInfo(_('No triggers found.'));
+	$triggerTable = new CTableInfo();
 	$triggerTable->setHeader(array(
 		($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) ? _('Host') : null,
 		_('Name'),

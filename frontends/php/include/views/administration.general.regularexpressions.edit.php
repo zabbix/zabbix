@@ -98,7 +98,7 @@ $preloaderDiv = new CDiv(null, 'preloader', 'testPreloader');
 $preloaderDiv->addStyle('display: none');
 $testTab->addRow(SPACE, array(new CButton('testExpression', _('Test expressions')), $preloaderDiv));
 
-$tabExp = new CTableInfo(null);
+$tabExp = new CTableInfo();
 $tabExp->attr('id', 'testResultTable');
 $tabExp->setHeader(array(_('Expression'), _('Expression type'), _('Result')));
 $testTab->addRow(_('Result'), $tabExp);

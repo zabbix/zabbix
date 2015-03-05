@@ -123,7 +123,7 @@ class CScreenActions extends CScreenBase {
 		$sortorderSpan = new CSpan(SPACE, ($sortorder === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
 
 		// create alert table
-		$actionTable = new CTableInfo(_('No action log entries found.'));
+		$actionTable = new CTableInfo();
 		$actionTable->setHeader(array(
 			($sortfield === 'clock') ? array($sortfieldSpan, $sortorderSpan) : _('Time'),
 			_('Action'),

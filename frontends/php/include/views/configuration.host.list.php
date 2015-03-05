@@ -55,7 +55,7 @@ $hostWidget->addItem($filter);
 $form = new CForm();
 $form->setName('hosts');
 
-$table = new CTableInfo(_('No hosts found.'));
+$table = new CTableInfo();
 $table->setHeader(array(
 	new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');"),
 	make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),

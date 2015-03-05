@@ -84,7 +84,7 @@ if ($this->data['slideshows']) {
 	else {
 		$slideHeaderForm->addItem($controls);
 		$slideshowWidget->setControls($slideHeaderForm);
-		$slideshowWidget->addItem(new CTableInfo(_('No slides found.')));
+		$slideshowWidget->addItem(new CTableInfo());
 	}
 }
 else {
@@ -96,7 +96,7 @@ else {
 		)
 	);
 	$slideshowWidget->addItem(BR());
-	$slideshowWidget->addItem(new CTableInfo(_('No slide shows found.')));
+	$slideshowWidget->addItem(new CTableInfo());
 }
 
 if ($this->data['elementId'] && isset($this->data['element'])) {

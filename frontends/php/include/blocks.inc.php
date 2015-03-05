@@ -273,7 +273,7 @@ function make_system_status($filter) {
 		$ackParams['screenid'] = $filter['screenid'];
 	}
 
-	$table = new CTableInfo(_('No host groups found.'));
+	$table = new CTableInfo();
 
 	// set trigger severities as table header starting from highest severity
 	$header = array();
@@ -669,7 +669,7 @@ function make_latest_issues(array $filter = array()) {
 		$lastChangeHeaderDiv->addStyle('float: left');
 	}
 
-	$table = new CTableInfo(_('No events found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(
 		($showSortIndicator && ($filter['sortfield'] === 'hostname')) ? array($hostHeaderDiv, $sortDiv) : _('Host'),
 		($showSortIndicator && ($filter['sortfield'] === 'priority')) ? array($issueHeaderDiv, $sortDiv) : _('Issue'),
