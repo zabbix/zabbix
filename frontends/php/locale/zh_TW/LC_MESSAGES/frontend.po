@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 23:02+0200\n"
+"POT-Creation-Date: 2015-03-05 18:19+0200\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1843,7 +1843,7 @@ msgstr "無法更新\"templateid\"給圖形\"%1$s\"."
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
 msgstr "無法更新\"templateid\"給項目\"%1$s\"."
 
-#: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:739
+#: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:741
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "無法更新\"templateid\"給篩選\"%1$s\"."
@@ -8445,8 +8445,8 @@ msgstr "沒有系統存取的許可權"
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
 #: api/classes/CScreen.php:578 api/classes/CService.php:1252
-#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
-#: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
+#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:777
+#: api/classes/CTemplateScreen.php:798 api/classes/CTemplateScreen.php:804
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
 #: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:811
 #: api/classes/CTriggerPrototype.php:898 api/classes/CUserMacro.php:824
@@ -10523,12 +10523,12 @@ msgstr "篩選"
 msgid "Screen \"%1$s\" added."
 msgstr "篩選 \"%1$s\" 已新增."
 
-#: api/classes/CTemplateScreen.php:816
+#: api/classes/CTemplateScreen.php:818
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
 msgstr "篩選\"%1$s\"已存在於模板\"%2$2\"中."
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
-#: api/classes/CTemplateScreen.php:711 api/classes/CTemplateScreen.php:762
+#: api/classes/CTemplateScreen.php:713 api/classes/CTemplateScreen.php:764
 #, php-format
 msgid "Screen \"%1$s\" already exists."
 msgstr "篩選\"%1$s\"已存在."
@@ -13059,8 +13059,8 @@ msgstr "錯誤的媒介類型欄位"
 msgid "Wrong fields for proxy \"%s\"."
 msgstr "錯誤的系統代理程式欄位\"%s\"."
 
-#: api/classes/CScreen.php:432 api/classes/CTemplateScreen.php:706
-#: api/classes/CTemplateScreen.php:744
+#: api/classes/CScreen.php:432 api/classes/CTemplateScreen.php:708
+#: api/classes/CTemplateScreen.php:746
 #, php-format
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr "錯誤的篩選欄位\"%1$s\"."
@@ -13254,7 +13254,7 @@ msgstr "您沒有指定目標為動作操作的全域腳本\"%s\"."
 #: api/classes/CScript.php:417 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
 #: api/classes/CTemplate.php:1266 api/classes/CTemplate.php:1298
-#: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:734
+#: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:736
 #: api/classes/CWebCheck.php:523
 msgid "You do not have permission to perform this operation."
 msgstr "您沒有許可權來完成此操作."

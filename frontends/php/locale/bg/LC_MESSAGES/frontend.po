@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 23:02+0200\n"
+"POT-Creation-Date: 2015-03-05 18:19+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -1853,7 +1853,7 @@ msgstr "Не може да се актуализира \"templateid\" за гр�
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
 msgstr "Не може да се актуализира \"templateid\" за елемент на данните \"%1$s\"."
 
-#: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:739
+#: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:741
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Не може да се актуализира \"templateid\" за екран \"%1$s\"."
@@ -8476,8 +8476,8 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
 #: api/classes/CScreen.php:578 api/classes/CService.php:1252
-#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
-#: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
+#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:777
+#: api/classes/CTemplateScreen.php:798 api/classes/CTemplateScreen.php:804
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
 #: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:811
 #: api/classes/CTriggerPrototype.php:898 api/classes/CUserMacro.php:824
@@ -10560,12 +10560,12 @@ msgstr "Екран"
 msgid "Screen \"%1$s\" added."
 msgstr "Екран \"%1$s\" добавен."
 
-#: api/classes/CTemplateScreen.php:816
+#: api/classes/CTemplateScreen.php:818
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
 msgstr "Екран \"%1$s\" вече съществува в шаблон \"%2$2\"."
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
-#: api/classes/CTemplateScreen.php:711 api/classes/CTemplateScreen.php:762
+#: api/classes/CTemplateScreen.php:713 api/classes/CTemplateScreen.php:764
 #, php-format
 msgid "Screen \"%1$s\" already exists."
 msgstr "Екран \"%1$s\" вече съществува."
@@ -13102,8 +13102,8 @@ msgstr "Грешни полета за метод на уведомление."
 msgid "Wrong fields for proxy \"%s\"."
 msgstr "Грешни полета за прокси \"%s\"."
 
-#: api/classes/CScreen.php:432 api/classes/CTemplateScreen.php:706
-#: api/classes/CTemplateScreen.php:744
+#: api/classes/CScreen.php:432 api/classes/CTemplateScreen.php:708
+#: api/classes/CTemplateScreen.php:746
 #, php-format
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr "Грешни полета за екран \"%1$s\"."
@@ -13298,7 +13298,7 @@ msgstr "Вие не сте уточнили цели за глобален ск�
 #: api/classes/CScript.php:417 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
 #: api/classes/CTemplate.php:1266 api/classes/CTemplate.php:1298
-#: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:734
+#: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:736
 #: api/classes/CWebCheck.php:523
 msgid "You do not have permission to perform this operation."
 msgstr "Вие нямате права за извършване на тази операция."
