@@ -402,7 +402,7 @@ function getMenuPopupMap(options) {
 
 		// events
 		if (typeof options.gotos.events !== 'undefined') {
-			var url = new Curl('events.php?source=0');
+			var url = new Curl('events.php?filter_set=1&source=0');
 
 			jQuery.each(options.gotos.events, function(name, value) {
 				url.setArgument(name, value);
