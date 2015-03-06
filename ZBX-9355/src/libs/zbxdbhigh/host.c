@@ -32,6 +32,8 @@ static char	*get_conflicting_template_names(const char *key, const zbx_vector_ui
 	size_t		sql_alloc = 256, sql_offset=0;
 	char		*template_names = NULL, *esc;
 
+	sql = zbx_malloc(sql, sql_alloc);
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hostid"
 			" from items"
@@ -53,6 +55,7 @@ static char	*get_conflicting_template_names(const char *key, const zbx_vector_ui
 	zbx_rtrim(template_names, ", ");
 
 	DBfree_result(result);
+	zbx_free(sql);
 
 	return template_names;
 }
