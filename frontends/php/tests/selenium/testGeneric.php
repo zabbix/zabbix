@@ -25,7 +25,7 @@ class testGeneric extends CWebTest {
 	public static function provider() {
 		return array(
 			// monitoring
-			array('dashboard.php',					'Dashboard'),
+			array('zabbix.php?action=dashboard.view',					'Dashboard'),
 			array('dashconf.php',					'Dashboard configuration'),
 
 			array('overview.php',												'Overview \[refreshed every 30 sec.\]'),
@@ -45,8 +45,8 @@ class testGeneric extends CWebTest {
 			array('charts.php',						'Custom graphs \[refreshed every 30 sec.\]'),
 			array('screens.php',					'Custom screens \[refreshed every 30 sec.\]'),
 			array('slides.php',						'Custom slides \[refreshed every 30 sec.\]'),
-			array('maps.php',						'Network maps \[refreshed every 30 sec.\]'),
-			array('discovery.php',					'Status of discovery'),
+			array('zabbix.php?action=map.view',							'Network maps \[refreshed every 30 sec.\]'),
+			array('zabbix.php?action=discovery.view',					'Status of discovery'),
 			array('srv_status.php',					'IT services \[refreshed every 30 sec.\]'),
 
 			// inventory
@@ -54,7 +54,7 @@ class testGeneric extends CWebTest {
 			array('hostinventories.php',			'Host inventory'),
 
 			// reports
-			array('report1.php',										'Status of Zabbix'),
+			array('zabbix.php?action=report.status',					'Status of Zabbix'),
 			array('report2.php',										'Availability report'),
 			array('toptriggers.php',									'Most busy triggers top 100'),
 			array('toptriggers.php?severities[0]=0&filter_set=Filter',	'Most busy triggers top 100'),
@@ -97,12 +97,12 @@ class testGeneric extends CWebTest {
 			array('adm.triggerdisplayoptions.php',	'Configuration of trigger displaying options'),
 			array('adm.other.php',					'Other configuration parameters'),
 
-			array('proxies.php',					'Configuration of proxies'),
+			array('zabbix.php?action=proxy.list',						'Configuration of proxies'),
 			array('authentication.php',				'Configuration of authentication'),
 			array('usergrps.php',					'Configuration of user groups'),
 			array('users.php',						'Configuration of users'),
-			array('media_types.php',				'Configuration of media types'),
-			array('scripts.php',					'Configuration of scripts'),
+			array('zabbix.php?action=mediatype.list',					'Configuration of media types'),
+			array('zabbix.php?action=script.list',						'Configuration of scripts'),
 			array('auditlogs.php',					'Audit log'),
 			array('auditacts.php',					'Action log'),
 
