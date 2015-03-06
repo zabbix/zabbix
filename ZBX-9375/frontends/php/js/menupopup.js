@@ -409,7 +409,7 @@ function getMenuPopupMap(options) {
 			});
 
 			gotos[gotos.length] = {
-				label: t('Latest events'),
+				label: t('Events'),
 				css: options.gotos.showEvents ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
@@ -587,7 +587,7 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?filter_set=1&triggerid=' + options.triggerid + '&source=0');
+	var url = new Curl('events.php?filter_set=1&source=0&triggerid=' + options.triggerid);
 	if (typeof options.eventTime !== 'undefined') {
 		url.setArgument('nav_time', options.eventTime);
 	}
