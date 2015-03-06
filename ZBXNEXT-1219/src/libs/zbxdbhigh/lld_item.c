@@ -2047,8 +2047,12 @@ static void	lld_item_application_prototypes_get(const zbx_vector_ptr_t *item_pro
 				sizeof(zbx_lld_item_application_ref_t));
 
 		ZBX_STR2UINT64(application_prototypeid, row[0]);
-		index = zbx_vector_ptr_search(application_prototypes, &application_prototypeid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		if (FAIL == (index = zbx_vector_ptr_search(application_prototypes, &application_prototypeid,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
 		item_application_prototype->application_prototype = application_prototypes->values[index];
 		item_application_prototype->applicationid = 0;
 
