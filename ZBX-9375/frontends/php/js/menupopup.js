@@ -289,7 +289,7 @@ function getMenuPopupHost(options) {
  * @param array  options['gotos']['showTriggers']	display "Triggers" link enabled or disabled
  * @param array  options['gotos']['submap']			link to submap page with url parameters ("name" => "value")
  * @param array  options['gotos']['events']			link to events page with url parameters ("name" => "value")
- * @param array  options['gotos']['showEvents']		display "Latest events" link enabled or disabled
+ * @param array  options['gotos']['showEvents']		display "Events" link enabled or disabled
  * @param array  options['urls']					local and global map urls (optional)
  * @param string options['url'][]['label']			url label
  * @param string options['url'][]['url']			url
