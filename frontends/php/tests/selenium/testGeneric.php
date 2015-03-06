@@ -126,11 +126,10 @@ class testGeneric extends CWebTest {
 	/**
 	* @dataProvider provider
 	*/
-	public function testGeneric_Pages($a, $b) {
-		$this->zbxTestLogin($a);
-		$this->zbxTestCheckTitle($b);
+	public function testGeneric_Pages($url, $title) {
+		$this->zbxTestLogin($url);
+		$this->zbxTestCheckTitle($title);
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestCheckMandatoryStrings();
 	}
-
 }
