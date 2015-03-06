@@ -603,19 +603,132 @@ footer {
 	}
 }
 
+// Timeline
 .multiselect-button {
 	float: left;
 }
 
-.zoom {
+.scrollbar {
+	position: relative;
+	margin: 0 auto;
+	line-height: 1em;
+	height: 52px;
+}
 
-	a {
-		margin: 0 4px;
+.sublevel {
+	height: 22px;
+	border: 1px solid $lightest-blue-grey;
+	
+	button {
+
+		&:first-child {
+			float: left;
+		}
+
+		&:last-child {
+			float: right;
+		}
 	}
 }
 
-.nav_links {
-	@extend .zoom;
+.info {
+	height: 14px;
+
+	.zoom {
+		float: left;
+		white-space: nowrap;
+
+		a {
+			margin: 0 4px;
+		}
+	}
+
+	.timeline {
+		float: right;
+		white-space: nowrap;
+	}
+}
+
+.overlevel {
+	position: absolute;
+	top: 14px;
+	left: 28px;
+	height: 24px;
+}
+
+.bar {
+	position: absolute;
+	z-index: 1;
+	height: 22px;
+	border: 1px solid $light-blue-grey;
+	@include border-radius(2px);
+}
+
+.icon {
+	position: relative;
+	height: 22px;
+	background: $white;
+	cursor: move;
+	@include border-radius(2px);
+
+	&:hover {
+		background: $alt-blue;
+	}
+
+	&:active {
+		background: darken($alt-blue, 5%);
+	}
+
+	.center {
+		height: 22px;
+		background: url(../img/icon-sprite.png) no-repeat 0 -288px;
+		text-align: center;
+	}
+}
+
+.ghost {
+	position: absolute;
+	top: 0;
+	height: 22px;
+	line-height: 22px;
+	border: 1px solid $light-blue-grey;
+	@include border-radius(2px);
+}
+
+.left_arr {
+	position: absolute;
+	top: 0;
+	width: auto;
+	height: 22px;
+	line-height: 22px;
+	z-index: 99;
+	cursor: e-resize;
+}
+
+.right_arr {
+	@extend .left_arr;
+}
+
+.subline {
+	height: 14px;
+
+	.nav_links {
+		float: left;
+		@extend .zoom;
+
+		a {
+			margin: 0 4px;
+		} 
+	}
+
+	.period {
+		float: right;
+		text-align: right;
+	}
+
+	.info_period {
+		@extend .period;
+	}
 }
 
 /* Forms */
