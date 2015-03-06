@@ -1481,23 +1481,16 @@ void	zbx_tls_free(void)
 		my_psk_server_creds = NULL;
 	}
 
-	if (NULL != ciphersuites_cert)
-	{
-		gnutls_priority_deinit(ciphersuites_cert);
-		ciphersuites_cert = NULL;
-	}
+	/* In GnuTLS versions 2.8.x (RHEL 6 uses v.2.8.5 ?) gnutls_priority_init() in case of error does not release */
+	/* memory allocated for 'ciphersuites_psk' but releasing it by gnutls_priority_deinit() causes crash. In     */
+	/* GnuTLS versions 3.0.x - 3.1.x (RHEL 7 uses v.3.1.18 ?) gnutls_priority_init() in case of error does       */
+	/* release memory allocated for 'ciphersuites_psk' but does not set pointer to NULL. Newer GnuTLS versions   */
+	/* (e.g. 3.3.8) in case of error in gnutls_priority_init() do release memory and set pointer to NULL.        */
+	/* Therefore we cannot reliably release this memory using the pointer. So, we leave the memory to be cleaned */
+	/* up by OS - we are in the process of exiting and the data is not secret. */
 
-	if (NULL != ciphersuites_psk)
-	{
-		gnutls_priority_deinit(ciphersuites_psk);
-		ciphersuites_psk = NULL;
-	}
-
-	if (NULL != ciphersuites_all)
-	{
-		gnutls_priority_deinit(ciphersuites_all);
-		ciphersuites_all = NULL;
-	}
+	/* do not release 'ciphersuites_cert', 'ciphersuites_psk' and 'ciphersuites_all' here using */
+	/* gnutls_priority_deinit() */
 
 	if (NULL != my_psk)
 	{
