@@ -119,7 +119,9 @@ order_result($groupsAllowed, 'name');
 if (getRequest('form') === 'update') {
 	// add existing template groups to list and, depending on permissions show name as enabled or disabled
 	$groupsInList = array();
-	$groups = array_combine($groups, $groups);
+	if ($groups) {
+		$groups = array_combine($groups, $groups);
+	}
 
 	foreach ($all_groups as $group) {
 		if (isset($groups[$group['groupid']])) {
@@ -170,7 +172,9 @@ foreach ($groupsAllowed as $group) {
 	$cmbGroups->addItem($group['groupid'], $group['name']);
 }
 
-$hosts_linked_to = array_combine($hosts_linked_to, $hosts_linked_to);
+if ($hosts_linked_to) {
+	$hosts_linked_to = array_combine($hosts_linked_to, $hosts_linked_to);
+}
 
 $host_tb = new CTweenBox($frmHost, 'hosts', $hosts_linked_to, 20);
 

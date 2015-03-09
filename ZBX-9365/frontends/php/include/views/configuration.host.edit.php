@@ -109,6 +109,7 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
 	$ipmi_password = $dbHost['ipmi_password'];
 
 	$macros = order_macros($dbHost['macros'], 'macro');
+	var_dump($dbHost['groups']);
 	$host_groups = zbx_objectValues($dbHost['groups'], 'groupid');
 
 	$hostInventory = $dbHost['inventory'];
@@ -201,7 +202,9 @@ if (!$isDiscovered) {
 
 		// add existing host groups to list and, depending on permissions show name as enabled or disabled
 		$groupsInList = array();
-		$host_groups = array_combine($host_groups, $host_groups);
+		if ($host_groups) {
+			$host_groups = array_combine($host_groups, $host_groups);
+		}
 
 		foreach ($all_groups as $group) {
 			if (isset($host_groups[$group['groupid']])) {
