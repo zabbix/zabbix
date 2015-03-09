@@ -48,7 +48,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct dirent	*entries;
 	struct passwd	*usrinfo;
 	psinfo_t	psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
-	int		fd = -1, do_task, proccount = 0;
+	int		fd = -1, do_task, proccount = 0, invalid_user = 0;
 	zbx_uint64_t	mem_size = 0, byte_value = 0;
 	double		pct_size = 0.0, pct_value = 0.0;
 	size_t		*p_value;
@@ -68,18 +68,14 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			if (0 == errno)
+			if (0 != errno)
 			{
-				/* specified user does not exist */
-
-				SET_UI64_RESULT(result, 0);
-				return SYSINFO_RET_OK;
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+						zbx_strerror(errno)));
+				return SYSINFO_RET_FAIL;
 			}
 
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
-					zbx_strerror(errno)));
-
-			return SYSINFO_RET_FAIL;
+			invalid_user = 1;
 		}
 	}
 	else
@@ -121,6 +117,9 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		return SYSINFO_RET_FAIL;
 	}
+
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
 
 	if (NULL == (dir = opendir("/proc")))
 	{
@@ -174,7 +173,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			/* % of system memory used by process, measured in 16-bit binary fractions in the range */
 			/* 0.0 - 1.0 with the binary point to the right of the most significant bit. 1.0 == 0x8000 */
-			pct_value = (double)((int)psinfo.pr_pctmem * 100)/32768.0;
+			pct_value = (double)((int)psinfo.pr_pctmem * 100) / 32768.0;
 
 			if (0 != proccount++)
 			{
@@ -193,18 +192,18 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	closedir(dir);
 	if (-1 != fd)
 		close(fd);
-
+out:
 	if (NULL != p_value)
 	{
 		if (ZBX_DO_AVG == do_task)
-			SET_DBL_RESULT(result, proccount == 0 ? 0.0 : (double)mem_size / (double)proccount);
+			SET_DBL_RESULT(result, 0 == proccount ? 0.0 : (double)mem_size / (double)proccount);
 		else
 			SET_UI64_RESULT(result, mem_size);
 	}
 	else
 	{
 		if (ZBX_DO_AVG == do_task)
-			SET_DBL_RESULT(result, proccount == 0 ? 0.0 : pct_size / (double)proccount);
+			SET_DBL_RESULT(result, 0 == proccount ? 0.0 : pct_size / (double)proccount);
 		else
 			SET_DBL_RESULT(result, pct_size);
 	}
@@ -220,9 +219,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_stat_t	buf;
 	struct passwd	*usrinfo;
 	psinfo_t	psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
-	int		fd = -1;
-	int		zbx_proc_stat;
-	zbx_uint64_t	proccount = 0;
+	int		fd = -1, proccount = 0, invalid_user = 0, zbx_proc_stat;
 
 	if (4 < request->nparam)
 	{
@@ -239,18 +236,14 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			if (0 == errno)
+			if (0 != errno)
 			{
-				/* specified user does not exist */
-
-				SET_UI64_RESULT(result, 0);
-				return SYSINFO_RET_OK;
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
+						zbx_strerror(errno)));
+				return SYSINFO_RET_FAIL;
 			}
 
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
-					zbx_strerror(errno)));
-
-			return SYSINFO_RET_FAIL;
+			invalid_user = 1;
 		}
 	}
 	else
@@ -273,6 +266,9 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	proccomm = get_rparam(request, 3);
+
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
 
 	if (NULL == (dir = opendir("/proc")))
 	{
@@ -317,7 +313,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	closedir(dir);
 	if (-1 != fd)
 		close(fd);
-
+out:
 	SET_UI64_RESULT(result, proccount);
 
 	return SYSINFO_RET_OK;
