@@ -249,7 +249,7 @@ class CMenuPopupHelper {
 
 			foreach (array_values($scripts) as $script) {
 				$data['scripts'][] = array(
-					'name' => $script['name'],
+					'name' => CHtml::encode($script['name']),
 					'scriptid' => $script['scriptid'],
 					'confirmation' => $script['confirmation']
 				);
@@ -295,7 +295,7 @@ class CMenuPopupHelper {
 
 			foreach (array_values($scripts) as $script) {
 				$data['scripts'][] = array(
-					'name' => $script['name'],
+					'name' => CHtml::encode($script['name']),
 					'scriptid' => $script['scriptid'],
 					'confirmation' => $script['confirmation']
 				);
