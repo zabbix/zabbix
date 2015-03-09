@@ -77,7 +77,7 @@ require_once dirname(__FILE__).'/../page_header.php';
 									<button type="submit" class="button jqueryinput" name="enter" id="enter" value="<?php echo _('Sign in'); ?>"><?php echo _('Sign in'); ?></button>
 									<?php if (CWebUser::$data['userid'] > 0) { ?>
 										<span style="margin-left: 14px;">
-												<a class="highlight underline" href="dashboard.php"><?php echo _('Login as Guest'); ?></a>
+												<a class="highlight underline" href="<?php echo ZBX_DEFAULT_URL; ?>"><?php echo _('Login as Guest'); ?></a>
 											</span>
 									<?php } ?>
 								</li>
