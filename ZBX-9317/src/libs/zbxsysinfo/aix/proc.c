@@ -81,7 +81,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct passwd		*usrinfo;
 	struct procentry64	procentry;
 	pid_t			pid = 0;
-	int			do_task, mem_type_code, proccount = 0;
+	int			do_task, mem_type_code, proccount = 0, invalid_user = 0;
 	zbx_uint64_t		mem_size = 0, byte_value = 0;
 	double			pct_size = 0.0, pct_value = 0.0;
 
@@ -97,12 +97,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL != param && '\0' != *param)
 	{
 		if (NULL == (usrinfo = getpwnam(param)))
-		{
-			/* cannot obtain user information or specified user does not exist */
-
-			SET_UI64_RESULT(result, 0);
-			return SYSINFO_RET_OK;
-		}
+			invalid_user = 1;
 	}
 	else
 		usrinfo = NULL;
@@ -171,6 +166,9 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		return SYSINFO_RET_FAIL;
 	}
+
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
 
 	while (0 < getprocs64(&procentry, (int)sizeof(struct procentry64), NULL, 0, &pid, 1))
 	{
@@ -250,7 +248,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				pct_size = pct_value;
 		}
         }
-
+out:
 	if (ZBX_PMEM != mem_type_code)
 	{
 		if (ZBX_DO_AVG == do_task)
@@ -261,7 +259,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		if (ZBX_DO_AVG == do_task)
-			SET_DBL_RESULT(result, proccount == 0 ? 0.0 : pct_size / (double)proccount);
+			SET_DBL_RESULT(result, 0 == proccount ? 0.0 : pct_size / (double)proccount);
 		else
 			SET_DBL_RESULT(result, pct_size);
 	}
@@ -286,8 +284,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct passwd		*usrinfo;
 	struct procentry64	procentry;
 	pid_t			pid = 0;
-	int			zbx_proc_stat;
-	zbx_uint64_t		proccount = 0;
+	int			proccount = 0, invalid_user = 0, zbx_proc_stat;
 
 	if (4 < request->nparam)
 	{
@@ -301,12 +298,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL != param && '\0' != *param)
 	{
 		if (NULL == (usrinfo = getpwnam(param)))
-		{
-			/* cannot obtain user information or specified user does not exist */
-
-			SET_UI64_RESULT(result, 0);
-			return SYSINFO_RET_OK;
-		}
+			invalid_user = 1;
 	}
 	else
 		usrinfo = NULL;
@@ -329,6 +321,9 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	proccomm = get_rparam(request, 3);
 
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
+
 	while (0 < getprocs64(&procentry, (int)sizeof(struct procentry64), NULL, 0, &pid, 1))
 	{
 		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, procentry.pi_comm))
@@ -345,7 +340,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		proccount++;
         }
-
+out:
 	SET_UI64_RESULT(result, proccount);
 
 	return SYSINFO_RET_OK;

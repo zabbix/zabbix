@@ -24,22 +24,18 @@
 
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	DIR	*dir;
-	int	proc;
-
+	DIR		*dir;
+	int		proc;
 	struct dirent	*entries;
 	zbx_stat_t	buf;
 	struct passwd	*usrinfo;
 	struct prpsinfo	psinfo;
-
-	char	filename[MAX_STRING_LEN];
-
-	char	*procname, *proccomm, *param;
-
-	double	memsize = -1;
-	int	pgsize = getpagesize();
-	int	proccount = 0, do_task;
-	pid_t	curr_pid = getpid();
+	char		filename[MAX_STRING_LEN];
+	char		*procname, *proccomm, *param;
+	double		memsize = -1;
+	int		pgsize = getpagesize();
+	int		proccount = 0, invalid_user = 0, do_task;
+	pid_t		curr_pid = getpid();
 
 	if (4 < request->nparam)
 	{
@@ -53,12 +49,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL != param && '\0' != *param)
 	{
 		if (NULL == (usrinfo = getpwnam(param)))
-		{
-			/* cannot obtain user information or specified user does not exist */
-
-			SET_UI64_RESULT(result, 0);
-			return SYSINFO_RET_OK;
-		}
+			invalid_user = 1;
 	}
 	else
 		usrinfo = NULL;
@@ -80,6 +71,9 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	proccomm = get_rparam(request, 3);
+
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
 
 	if (NULL == (dir = opendir("/proc")))
 	{
@@ -145,7 +139,7 @@ lbl_skip_procces:
 		/* incorrect process name */
 		memsize = 0;
 	}
-
+out:
 	if (ZBX_DO_AVG == do_task)
 		SET_DBL_RESULT(result, 0 == proccount ? 0 : memsize / (double)proccount);
 	else
@@ -156,20 +150,16 @@ lbl_skip_procces:
 
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	DIR	*dir;
-	int	proc;
-
+	DIR		*dir;
+	int		proc;
 	struct  dirent	*entries;
 	zbx_stat_t	buf;
 	struct passwd	*usrinfo;
 	struct prpsinfo	psinfo;
-
-	char	filename[MAX_STRING_LEN];
-
-	char	*procname, *proccomm, *param;
-
-	int	proccount = 0, zbx_proc_stat;
-	pid_t	curr_pid = getpid();
+	char		filename[MAX_STRING_LEN];
+	char		*procname, *proccomm, *param;
+	int		proccount = 0, invalid_user = 0, zbx_proc_stat;
+	pid_t		curr_pid = getpid();
 
 	if (4 < request->nparam)
 	{
@@ -183,12 +173,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL != param && '\0' != *param)
 	{
 		if (NULL == (usrinfo = getpwnam(param)))
-		{
-			/* cannot obtain user information or specified user does not exist */
-
-			SET_UI64_RESULT(result, 0);
-			return SYSINFO_RET_OK;
-		}
+			invalid_user = 1;
 	}
 	else
 		usrinfo = NULL;
@@ -210,6 +195,9 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	proccomm = get_rparam(request, 3);
+
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
 
 	if (NULL == (dir = opendir("/proc")))
 	{
@@ -259,7 +247,7 @@ lbl_skip_procces:
 	}
 
 	closedir(dir);
-
+out:
 	SET_UI64_RESULT(result, proccount);
 
 	return SYSINFO_RET_OK;
