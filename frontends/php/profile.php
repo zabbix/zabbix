@@ -54,7 +54,7 @@ $fields = array(
 	'rows_per_page' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999), 'isset({update})', _('Rows per page')),
 	'change_password' =>	array(T_ZBX_STR, O_OPT, null, null, null),
 	'user_medias' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, null),
-	'user_medias_to_del' =>	array(T_ZBX_STR, O_OPT, null, DB_ID, null),
+	'user_medias_to_del' =>	array(T_ZBX_STR, O_OPT, null, null, null),
 	'new_media' =>			array(T_ZBX_STR, O_OPT, null, null, null),
 	'enable_media' =>		array(T_ZBX_INT, O_OPT, null, null, null),
 	'disable_media' =>		array(T_ZBX_INT, O_OPT, null, null, null),
@@ -97,7 +97,7 @@ elseif (isset($_REQUEST['del_user_media'])) {
 // primary actions
 elseif (isset($_REQUEST['cancel'])) {
 	ob_end_clean();
-	redirect(CWebUser::$data['last_page']['url']);
+	redirect(ZBX_DEFAULT_URL);
 }
 elseif (hasRequest('update')) {
 	$auth_type = getUserAuthenticationType(CWebUser::$data['userid']);
@@ -174,7 +174,7 @@ elseif (hasRequest('update')) {
 			DBend(true);
 			ob_end_clean();
 
-			redirect(CWebUser::$data['last_page']['url']);
+			redirect(ZBX_DEFAULT_URL);
 		}
 		else {
 			show_messages($result, _('User updated'), _('Cannot update user'));
