@@ -310,7 +310,6 @@ article {
 
 	.selected {
 		font-weight: bold;
-		background: #eee;
 	}
 
 	.arrow-right {
@@ -371,16 +370,13 @@ footer {
 	    a {
 	    	display: block;
 	    	position: relative;
-	    	//color: $link-alt-color;
 	    	margin: -1em;
 	    	padding: 1em;
 	    	@include transition(background .2s ease);
 
 	    	&:hover {
-	    		//color: $link-alt-hover-color;
 	    		text-decoration: none;
 	    		background: $alt-blue;
-	    		//background: lighten($primary-blue, 56%);
 	    	}
 
 	    	&:active {
@@ -395,7 +391,6 @@ footer {
 
 		&:hover {
 			background: $alt-blue;
-			//background: lighten($primary-blue, 56%);
 		}
 
 		&.row-selected {
@@ -457,13 +452,11 @@ footer {
 	&:hover {
 		color: $link-hover-color;
 		background: $alt-blue;
-		//background: lighten($primary-blue, 55%);
 	}
 
 	&:active {
 		color: $link-active-color;
 		background: darken($alt-blue, 5%);
-		//background: lighten($primary-blue, 50%);
 	}
 
 	&:first-child {
@@ -497,12 +490,10 @@ footer {
 
 	&:hover {
 		background: $alt-blue;
-		//background: lighten($primary-blue, 55%);
 	}
 
 	&:active {
 		background: darken($alt-blue, 5%);
-		//background: lighten($primary-blue, 50%);
 	}
 }
 
@@ -543,8 +534,6 @@ footer {
 	margin: 0 auto;
 	text-align: center;
 	background: $white;
-	//width: 100%;
-	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.15));
 
 	.cell {
 		white-space: nowrap;
@@ -613,21 +602,35 @@ footer {
 	margin: 0 auto;
 	line-height: 1em;
 	height: 52px;
+
+	.selected {
+		font-weight: bold;
+	}
 }
 
 .sublevel {
 	height: 22px;
-	border: 1px solid $lightest-blue-grey;
+	border: 1px solid $light-grey;
+	background: $lighter-grey;
+	margin: 5px 0;
+	@include border-radius(2px);
 	
 	button {
 
 		&:first-child {
 			float: left;
+			margin-left: -1px;
 		}
 
 		&:last-child {
 			float: right;
+			margin-right: -1px;
 		}
+	}
+
+	.btn-grey {
+		background: $white;
+		margin-top: -1px;
 	}
 }
 
@@ -654,6 +657,7 @@ footer {
 	top: 14px;
 	left: 28px;
 	height: 24px;
+	margin: 5px 0;
 }
 
 .bar {
@@ -680,9 +684,10 @@ footer {
 	}
 
 	.center {
+		width: 22px;
 		height: 22px;
-		background: url(../img/icon-sprite.png) no-repeat 0 -288px;
-		text-align: center;
+		background: url(../img/icon-sprite.png) no-repeat center -121px;
+		margin: 0 auto;
 	}
 }
 
@@ -697,12 +702,13 @@ footer {
 
 .left_arr {
 	position: absolute;
-	top: 0;
+	top: 1px;
 	width: auto;
 	height: 22px;
 	line-height: 22px;
+	padding: 0 5px;
 	z-index: 99;
-	cursor: e-resize;
+	cursor: e-resize
 }
 
 .right_arr {
@@ -724,6 +730,7 @@ footer {
 	.period {
 		float: right;
 		text-align: right;
+		margin-left: 8px;
 	}
 
 	.info_period {
@@ -1180,14 +1187,12 @@ button {
 
 		&:hover {
 			background: $alt-blue;
-			//background: lighten($primary-blue, 55%);
 			color: $link-color;
 			border-color: $light-blue-grey;
 		}
 
 		&:active {
 			background: darken($alt-blue, 5%);
-			//background: lighten($primary-blue, 50%);
 			color: $link-color;
 		}
 
@@ -1794,13 +1799,11 @@ a.grey {
 
 	&:hover {
 		background: $lighter-grey;
-		//background: lighten($primary-blue, 55%);
 		text-decoration: none;
 	}
 
 	&:active {
 		background: darken($lighter-grey, 5%);
-		//background: lighten($primary-blue, 50%);
 		text-decoration: none;
 	}
 }
