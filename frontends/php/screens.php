@@ -50,8 +50,7 @@ $fields = array(
 	// ajax
 	'filterState' => array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
-	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT,	IN('"add","remove"'), null)
+	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
 
@@ -97,33 +96,6 @@ if (hasRequest('filterState')) {
 if (isset($_REQUEST['favobj'])) {
 	if (getRequest('favobj') === 'timeline' && hasRequest('elementid') && hasRequest('period')) {
 		navigation_bar_calc('web.screens', $_REQUEST['elementid'], true);
-	}
-
-	if (str_in_array($_REQUEST['favobj'], array('screenid', 'slideshowid'))) {
-		$result = false;
-
-		DBstart();
-
-		if ($_REQUEST['favaction'] == 'add') {
-			$result = CFavorite::add('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
-			if ($result) {
-				echo '$("addrm_fav").title = "'._('Remove from favourites').'";'."\n".
-					'$("addrm_fav").onclick = function() { rm4favorites("'.$_REQUEST['favobj'].'", "'.$_REQUEST['favid'].'"); }'."\n";
-			}
-		}
-		elseif ($_REQUEST['favaction'] == 'remove') {
-			$result = CFavorite::remove('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
-			if ($result) {
-				echo '$("addrm_fav").title = "'._('Add to favourites').'";'."\n".
-					'$("addrm_fav").onclick = function() { add2favorites("'.$_REQUEST['favobj'].'", "'.$_REQUEST['favid'].'"); }'."\n";
-			}
-		}
-
-		$result = DBend($result);
-
-		if ($page['type'] == PAGE_TYPE_JS && $result) {
-			echo 'switchElementClass("addrm_fav", "iconminus", "iconplus");';
-		}
 	}
 
 	// saving fixed/dynamic setting to profile

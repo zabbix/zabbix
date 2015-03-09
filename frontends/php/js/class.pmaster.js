@@ -392,8 +392,8 @@ var CDoll = Class.create({
 								});
 							});
 
-							sendAjaxData({
-								data: {widgetSort: Object.toJSON(widgetPositions)}
+							sendAjaxData('zabbix.php?action=dashboard.sort', {
+								data: {grid: Object.toJSON(widgetPositions)}
 							});
 						}
 					}

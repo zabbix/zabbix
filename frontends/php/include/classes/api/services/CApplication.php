@@ -81,9 +81,7 @@ class CApplication extends CApiService {
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
-			'expandData'				=> null,
 			'selectHost'				=> null,
-			'selectHosts'				=> null,
 			'selectItems'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
@@ -93,9 +91,6 @@ class CApplication extends CApiService {
 			'limit'						=> null
 		);
 		$options = zbx_array_merge($defOptions, $options);
-
-		$this->checkDeprecatedParam($options, 'expandData');
-		$this->checkDeprecatedParam($options, 'selectHosts');
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -239,27 +234,6 @@ class CApplication extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Check if application exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('application.exists method is deprecated.');
-
-		$application = $this->get(array(
-			'output' => array('applicationid'),
-			'filter' => zbx_array_mintersect(array(array('hostid', 'host'), 'name'), $object),
-			'limit' => 1
-		));
-
-		return (bool) $application;
 	}
 
 	public function checkInput(&$applications, $method) {
@@ -585,25 +559,6 @@ class CApplication extends CApiService {
 		return array('applicationids' => $applicationIds);
 	}
 
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		if ($options['countOutput'] === null) {
-			// expandData
-			if (!is_null($options['expandData'])) {
-				$sqlParts['select']['host'] = 'h.host';
-				$sqlParts['from']['hosts'] = 'hosts h';
-				$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
-			}
-
-			if ($options['selectHosts'] !== null) {
-				$sqlParts = $this->addQuerySelect('a.hostid', $sqlParts);
-			}
-		}
-
-		return $sqlParts;
-	}
-
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -621,19 +576,6 @@ class CApplication extends CApiService {
 				$templateApplications[$templateApplication['application_templateid']] = $templateApplication['templateid'];
 			}
 			$result = $relationMap->mapMany($result, $templateApplications, 'templateids');
-		}
-
-		// adding hosts (deprecated)
-		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'applicationid', 'hostid');
-			$hosts = API::Host()->get(array(
-				'output' => $options['selectHosts'],
-				'hostids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'templated_hosts' => true,
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
 		// adding one host
