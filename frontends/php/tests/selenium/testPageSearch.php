@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageSearch extends CWebTest {
 
 	public function testPageSearch_FindZabbixServer() {
-		$this->zbxTestLogin('dashboard.php');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->input_type('search', 'ЗАББИКС Сервер');
 		$this->keyPress('search', "\\13");
 		$this->wait();
@@ -46,7 +46,7 @@ class testPageSearch extends CWebTest {
 	}
 
 	public function testPageSearch_FindNone() {
-		$this->zbxTestLogin('dashboard.php');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->input_type('search', '%');
 		$this->keyPress('search', "\\13");
 		$this->wait();
