@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageSearch extends CWebTest {
 	public function testPageHosts_FindZabbixServer() {
 		$this->zbxTestLogin('dashboard.php');
-		$this->input_type('search', "ЗАББИКС Сервер");
+		$this->input_type('search', 'ЗАББИКС Сервер');
 		$this->keyPress('search', "\\13");
 		$this->wait();
 		$this->checkTitle('Search');
@@ -46,24 +46,10 @@ class testPageSearch extends CWebTest {
 
 	public function testPageHosts_FindNone() {
 		$this->zbxTestLogin('dashboard.php');
-		$this->input_type('search', "_");
+		$this->input_type('search', '%');
 		$this->keyPress('search', "\\13");
 		$this->wait();
 		$this->checkTitle('Search');
-		$this->zbxTestTextNotPresent('Displaying 1 of 1 found');
-		$this->zbxTestTextNotPresent('ЗАББИКС Сервер');
-		$this->zbxTestTextPresent('Displaying 0 of 0 found');
-		$this->zbxTestTextPresent('...');
-	}
-
-	public function testPageHosts_FindNone2() {
-		$this->zbxTestLogin('dashboard.php');
-		$this->input_type('search', "%");
-		$this->keyPress('search', "\\13");
-		$this->wait();
-		$this->checkTitle('Search');
-		$this->zbxTestTextNotPresent('Displaying 1 of 1 found');
-		$this->zbxTestTextNotPresent('ЗАББИКС Сервер');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
 		$this->zbxTestTextPresent('...');
 	}
