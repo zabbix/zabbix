@@ -198,7 +198,9 @@ $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 // groups for normal hosts
 if (!$isDiscovered) {
-	$hostGroups = array_combine($hostGroups, $hostGroups);
+	if ($hostGroups) {
+		$hostGroups = array_combine($hostGroups, $hostGroups);
+	}
 	$grp_tb = new CTweenBox($frmHost, 'groups', $hostGroups, 10);
 
 	// get user allowed host groups and sort them by name
