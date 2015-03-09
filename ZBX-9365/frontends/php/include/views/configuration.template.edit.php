@@ -172,10 +172,6 @@ foreach ($groupsAllowed as $group) {
 	$cmbGroups->addItem($group['groupid'], $group['name']);
 }
 
-if ($hosts_linked_to) {
-	$hosts_linked_to = array_combine($hosts_linked_to, $hosts_linked_to);
-}
-
 $host_tb = new CTweenBox($frmHost, 'hosts', $hosts_linked_to, 20);
 
 // get hosts from selected twb_groupid combo
