@@ -658,6 +658,14 @@ footer {
 	left: 28px;
 	height: 24px;
 	margin: 5px 0;
+
+	.arrow-left {
+		border-right-color: $light-blue-grey;
+	}
+
+	.arrow-right {
+		border-left-color: $light-blue-grey;
+	}
 }
 
 .bar {
@@ -708,7 +716,7 @@ footer {
 	line-height: 22px;
 	padding: 0 5px;
 	z-index: 99;
-	cursor: e-resize
+	cursor: e-resize;
 }
 
 .right_arr {
