@@ -109,7 +109,6 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
 	$ipmi_password = $dbHost['ipmi_password'];
 
 	$macros = order_macros($dbHost['macros'], 'macro');
-	var_dump($dbHost['groups']);
 	$host_groups = zbx_objectValues($dbHost['groups'], 'groupid');
 
 	$hostInventory = $dbHost['inventory'];
