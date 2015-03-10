@@ -957,11 +957,6 @@ $encryptionOut->addItem(HOST_ENCRYPTION_PSK, _('PSK'));
 $encryptionOut->addItem(HOST_ENCRYPTION_CERTIFICATE, _('Certificate'));
 $encryptionFormList->addRow(_('Outgoing encryption'), $encryptionOut);
 
-$encryptionOutIssuer = new CTextBox('tls_issuer', $tls_issuer, ZBX_TEXTBOX_STANDARD_SIZE);
-$encryptionFormList->addRow(_('Issuer'), $encryptionOutIssuer);
-
-$encryptionOutSubject = new CTextBox('tls_subject', $tls_subject, ZBX_TEXTBOX_STANDARD_SIZE);
-$encryptionFormList->addRow(_('Subject'), $encryptionOutSubject);
 
 $encryptionIn = array();
 $encryptionIn1 = new CCheckBox('tls_in_none', $tls_accept & 1 == 1);
@@ -977,12 +972,17 @@ $encryptionIn[] = array($encryptionIn3, 'Certificate');
 
 $encryptionFormList->addRow(_('Incoming encryption'), $encryptionIn);
 
-$encryptionPSKIdentity = new CTextBox('tls_psk_identity', $tls_psk_identity, ZBX_TEXTBOX_STANDARD_SIZE);
+$encryptionOutIssuer = new CTextBox('tls_issuer', $tls_issuer, 64);
+$encryptionFormList->addRow(_('Issuer'), $encryptionOutIssuer);
+
+$encryptionOutSubject = new CTextBox('tls_subject', $tls_subject, 64);
+$encryptionFormList->addRow(_('Subject'), $encryptionOutSubject);
+
+$encryptionPSKIdentity = new CTextBox('tls_psk_identity', $tls_psk_identity, 64);
 $encryptionFormList->addRow(_('Identity'), $encryptionPSKIdentity);
 
-$encryptionInPSK = new CTextBox('tls_psk', $tls_psk, ZBX_TEXTBOX_STANDARD_SIZE);
+$encryptionInPSK = new CTextBox('tls_psk', $tls_psk, 64);
 $encryptionFormList->addRow(_('PSK'), $encryptionInPSK);
-
 
 $divTabs->addTab('encryptionTab', _('Encryption'), $encryptionFormList);
 
