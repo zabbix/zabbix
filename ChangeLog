@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-9343] fixed user ID being zero in audit logs for login/logout actions (Ivo)
 ..F....... [ZBX-9375] renamed "Latest events" to "Events" in menu popup for trigger map elements and fixed its link not setting corresponding trigger in filter (Ivo)
 ...G...PS. [ZBX-9251] added missing socket closing to avoid large number of opened sockets (igors)
 .......PS. [ZBX-9344] fixed infinite looping in telnet.run[] in case there is no password prompt (asaveljevs, dimir)
