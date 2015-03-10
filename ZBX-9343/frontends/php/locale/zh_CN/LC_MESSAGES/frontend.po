@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 23:22+0200\n"
+"POT-Creation-Date: 2015-03-05 19:21+0200\n"
 "PO-Revision-Date: 2015-01-15 03:50+0300\n"
 "Last-Translator: Wayne Wang <net_use@bzhy.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -716,7 +716,7 @@ msgstr "应用集已更新"
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "ID为 \"%1$s\"的应用集不在 \"%2$s\" 之中."
 
-#: hosts.php:861 hosts.php:950 include/forms.inc.php:889
+#: hosts.php:861 hosts.php:952 include/forms.inc.php:889
 #: include/html.inc.php:361 include/html.inc.php:365
 #: include/views/configuration.application.list.php:47
 #: include/views/configuration.host.edit.php:482
@@ -1207,7 +1207,7 @@ msgstr "触发器严重性的组态"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:54
-#: include/views/configuration.triggers.massupdate.php:42 triggers.php:368
+#: include/views/configuration.triggers.massupdate.php:42 triggers.php:363
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "触发器的组态"
 
@@ -1456,7 +1456,7 @@ msgstr "无法添加简报片展示"
 msgid "Cannot add template"
 msgstr "无法添加模板"
 
-#: triggers.php:207 triggers.php:337 tr_logform.php:149
+#: triggers.php:202 triggers.php:332 tr_logform.php:149
 msgid "Cannot add trigger"
 msgstr "无法添加触发器"
 
@@ -1772,7 +1772,7 @@ msgstr "无法删除模板化触发器 \"%1$s:%2$s\"."
 msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "无法删除模板的 web 场景 \"%1$s\"."
 
-#: triggers.php:225
+#: triggers.php:220
 msgid "Cannot delete trigger"
 msgstr "无法删除触发器"
 
@@ -1784,7 +1784,7 @@ msgstr "无法删除触发器原型"
 msgid "Cannot delete trigger prototypes"
 msgstr "无法删除触发器样板"
 
-#: triggers.php:349
+#: triggers.php:344
 msgid "Cannot delete triggers"
 msgstr "无法删除触发器"
 
@@ -1844,7 +1844,7 @@ msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] "无法禁用消息介质类型"
 
-#: triggers.php:298
+#: triggers.php:293
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] "无法禁用触发器"
@@ -1912,7 +1912,7 @@ msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "无法启用消息介质类型"
 
-#: triggers.php:297
+#: triggers.php:292
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] "无法启用触发器"
@@ -2542,7 +2542,7 @@ msgstr "无法更新被模板化的应用程序."
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "对于被自动发现的主机 \"%1$s\"无法更新其模板"
 
-#: triggers.php:203 triggers.php:264 tr_logform.php:124
+#: triggers.php:198 triggers.php:259 tr_logform.php:124
 msgid "Cannot update trigger"
 msgstr "无法更新触发器"
 
@@ -2762,7 +2762,7 @@ msgid "Clear history and trends"
 msgstr "清除历史和趋势"
 
 #: include/views/configuration.httpconf.list.php:149
-#: include/views/configuration.item.list.php:279
+#: include/views/configuration.item.list.php:290
 msgid "Clear history for selected"
 msgstr "清除所选的历史"
 
@@ -3186,7 +3186,7 @@ msgid_plural "Copy %1$s elements to..."
 msgstr[0] "复制元素%1$s到..."
 
 #: include/views/configuration.graph.list.php:156
-#: include/views/configuration.item.list.php:276
+#: include/views/configuration.item.list.php:287
 #: include/views/configuration.triggers.list.php:303
 msgid "Copy selected to ..."
 msgstr "复制所选的到 ..."
@@ -3840,7 +3840,7 @@ msgstr "删除数据图样板？"
 msgid "Delete graph?"
 msgstr "删除图形?"
 
-#: include/views/configuration.item.list.php:280
+#: include/views/configuration.item.list.php:291
 msgid "Delete history of selected items?"
 msgstr "删除所选的项目的历史资料?"
 
@@ -3900,7 +3900,7 @@ msgstr "删除屏幕?"
 msgid "Delete script?"
 msgstr "删除脚本?"
 
-#: hosts.php:1076 include/reports.inc.php:111 include/reports.inc.php:201
+#: hosts.php:1078 include/reports.inc.php:111 include/reports.inc.php:201
 #: include/reports.inc.php:244
 #: include/views/administration.general.regularexpressions.list.php:66
 #: include/views/administration.mediatypes.list.php:124
@@ -3918,10 +3918,10 @@ msgstr "删除脚本?"
 #: include/views/configuration.discovery.list.php:76
 #: include/views/configuration.graph.list.php:159
 #: include/views/configuration.host.discovery.list.php:150
-#: include/views/configuration.hostgroups.list.php:164
+#: include/views/configuration.hostgroups.list.php:175
 #: include/views/configuration.host.prototype.list.php:128
 #: include/views/configuration.httpconf.list.php:153
-#: include/views/configuration.item.list.php:283
+#: include/views/configuration.item.list.php:294
 #: include/views/configuration.item.prototype.list.php:120
 #: include/views/configuration.maintenance.list.php:81
 #: include/views/configuration.screen.list.php:70
@@ -3965,7 +3965,7 @@ msgstr "删除所选的群组?"
 msgid "Delete selected groups?"
 msgstr "删除所选的群组?"
 
-#: include/views/configuration.hostgroups.list.php:165
+#: include/views/configuration.hostgroups.list.php:176
 msgid "Delete selected host groups?"
 msgstr "删除所选的主机群组?"
 
@@ -3981,7 +3981,7 @@ msgstr "删除所选定的主机样板?"
 msgid "Delete selected host?"
 msgstr "删除所选的主机?"
 
-#: hosts.php:1077
+#: hosts.php:1079
 msgid "Delete selected hosts?"
 msgstr "删除所选的主机?"
 
@@ -3993,7 +3993,7 @@ msgstr "删除所选的图像?"
 msgid "Delete selected item prototypes?"
 msgstr "删除所选定的监控项目样板?"
 
-#: include/views/configuration.item.list.php:284
+#: include/views/configuration.item.list.php:295
 msgid "Delete selected items?"
 msgstr "删除所选的监控项?"
 
@@ -4331,11 +4331,11 @@ msgstr "停用所选的群组的调试模式?"
 msgid "Disable host"
 msgstr "停用主机"
 
-#: hosts.php:990
+#: hosts.php:992
 msgid "Disable host?"
 msgstr "停用主机?"
 
-#: include/views/configuration.hostgroups.list.php:161
+#: include/views/configuration.hostgroups.list.php:172
 msgid "Disable hosts in the selected host groups?"
 msgstr "停用所选的主机群组中的主机?"
 
@@ -4343,17 +4343,17 @@ msgstr "停用所选的主机群组中的主机?"
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "停用所选的系统代理程式所监测的主机?"
 
-#: hosts.php:1072 include/views/administration.mediatypes.list.php:120
+#: hosts.php:1074 include/views/administration.mediatypes.list.php:120
 #: include/views/administration.proxy.list.php:106
 #: include/views/administration.usergroups.list.php:136
 #: include/views/configuration.action.list.php:100
 #: include/views/configuration.application.list.php:112
 #: include/views/configuration.discovery.list.php:72
 #: include/views/configuration.host.discovery.list.php:146
-#: include/views/configuration.hostgroups.list.php:160
+#: include/views/configuration.hostgroups.list.php:171
 #: include/views/configuration.host.prototype.list.php:124
 #: include/views/configuration.httpconf.list.php:145
-#: include/views/configuration.item.list.php:269
+#: include/views/configuration.item.list.php:280
 #: include/views/configuration.item.prototype.list.php:116
 #: include/views/configuration.triggers.list.php:292
 msgid "Disable selected"
@@ -4380,7 +4380,7 @@ msgstr "停用所选的群组?"
 msgid "Disable selected host prototypes?"
 msgstr "禁用所选定的主机样板？"
 
-#: hosts.php:1073
+#: hosts.php:1075
 msgid "Disable selected hosts?"
 msgstr "停用所选的主机?"
 
@@ -4388,7 +4388,7 @@ msgstr "停用所选的主机?"
 msgid "Disable selected item prototypes?"
 msgstr "禁用所选择的监控项目样板?"
 
-#: include/views/configuration.item.list.php:270
+#: include/views/configuration.item.list.php:281
 msgid "Disable selected items?"
 msgstr "停用所选的项目?"
 
@@ -4408,7 +4408,7 @@ msgstr "停用所选的触发器?"
 msgid "Disable selected web scenarios?"
 msgstr "禁用所选定的web场景？"
 
-#: auditlogs.php:142 dashboard.php:295 hosts.php:994
+#: auditlogs.php:142 dashboard.php:295 hosts.php:996
 #: include/discovery.inc.php:121 include/html.inc.php:336
 #: include/httptest.inc.php:46 include/items.inc.php:155
 #: include/items.inc.php:209 include/triggers.inc.php:1467
@@ -4449,7 +4449,7 @@ msgstr "被发现的"
 msgid "Discovered device"
 msgstr "已探索到的装置"
 
-#: events.php:333 hosts.php:865 hosts.php:958 include/html.inc.php:351
+#: events.php:333 hosts.php:865 hosts.php:960 include/html.inc.php:351
 #: include/menu.inc.php:76 include/menu.inc.php:203
 #: include/views/configuration.action.list.php:34
 #: include/views/inventory.host.view.php:234
@@ -4946,7 +4946,7 @@ msgstr "启用事件知悉"
 msgid "Enable host"
 msgstr "启用主机"
 
-#: hosts.php:996
+#: hosts.php:998
 msgid "Enable host?"
 msgstr "启用主机?"
 
@@ -4963,17 +4963,17 @@ msgstr "启用受所选的系统代理程式所监测的主机?"
 msgid "Enable internal housekeeping"
 msgstr "启用内部的管家"
 
-#: hosts.php:1068 include/views/administration.mediatypes.list.php:116
+#: hosts.php:1070 include/views/administration.mediatypes.list.php:116
 #: include/views/administration.proxy.list.php:102
 #: include/views/administration.usergroups.list.php:132
 #: include/views/configuration.action.list.php:96
 #: include/views/configuration.application.list.php:108
 #: include/views/configuration.discovery.list.php:68
 #: include/views/configuration.host.discovery.list.php:142
-#: include/views/configuration.hostgroups.list.php:156
+#: include/views/configuration.hostgroups.list.php:167
 #: include/views/configuration.host.prototype.list.php:120
 #: include/views/configuration.httpconf.list.php:141
-#: include/views/configuration.item.list.php:265
+#: include/views/configuration.item.list.php:276
 #: include/views/configuration.item.prototype.list.php:112
 #: include/views/configuration.triggers.list.php:285
 msgid "Enable selected"
@@ -5000,7 +5000,7 @@ msgstr "启用所选的群组?"
 msgid "Enable selected host prototypes?"
 msgstr "启用所选定的主机样板"
 
-#: hosts.php:1069 include/views/configuration.hostgroups.list.php:157
+#: hosts.php:1071 include/views/configuration.hostgroups.list.php:168
 msgid "Enable selected hosts?"
 msgstr "启用所选的主机?"
 
@@ -5008,7 +5008,7 @@ msgstr "启用所选的主机?"
 msgid "Enable selected item prototypes?"
 msgstr "启用所选定的监控项目样板？"
 
-#: include/views/configuration.item.list.php:266
+#: include/views/configuration.item.list.php:277
 msgid "Enable selected items?"
 msgstr "启用所选的项目?"
 
@@ -5028,7 +5028,7 @@ msgstr "启用所选的触发器?"
 msgid "Enable selected web scenarios?"
 msgstr "启用所选定的web场景?"
 
-#: auditlogs.php:139 dashboard.php:295 hosts.php:986
+#: auditlogs.php:139 dashboard.php:295 hosts.php:988
 #: include/discovery.inc.php:120 include/html.inc.php:332
 #: include/httptest.inc.php:45 include/items.inc.php:154
 #: include/items.inc.php:206 include/triggers.inc.php:2301
@@ -5217,7 +5217,7 @@ msgstr "过期的"
 msgid "Exploded"
 msgstr "爆发的"
 
-#: hosts.php:1065 include/views/configuration.screen.list.php:68
+#: hosts.php:1067 include/views/configuration.screen.list.php:68
 #: include/views/configuration.sysmap.list.php:62 templates.php:667
 msgid "Export selected"
 msgstr "汇出所选的"
@@ -5231,7 +5231,7 @@ msgstr "汇出到CSV"
 #: include/views/administration.general.regularexpressions.edit.php:42
 #: include/views/administration.general.regularexpressions.edit.php:51
 #: include/views/administration.general.regularexpressions.edit.php:73
-#: include/views/configuration.item.list.php:150
+#: include/views/configuration.item.list.php:161
 #: include/views/configuration.triggers.edit.php:142
 #: include/views/configuration.triggers.edit.php:153
 #: include/views/configuration.triggers.list.php:103 trigger_prototypes.php:40
@@ -5651,7 +5651,7 @@ msgstr "全域脚本"
 msgid "Global scripts"
 msgstr "全域脚本"
 
-#: hosts.php:1080
+#: hosts.php:1082
 #: include/views/administration.general.regularexpressions.list.php:70
 #: include/views/administration.mediatypes.list.php:128
 #: include/views/administration.proxy.list.php:114
@@ -5663,10 +5663,10 @@ msgstr "全域脚本"
 #: include/views/configuration.discovery.list.php:80
 #: include/views/configuration.graph.list.php:166
 #: include/views/configuration.host.discovery.list.php:154
-#: include/views/configuration.hostgroups.list.php:168
+#: include/views/configuration.hostgroups.list.php:179
 #: include/views/configuration.host.prototype.list.php:132
 #: include/views/configuration.httpconf.list.php:157
-#: include/views/configuration.item.list.php:287
+#: include/views/configuration.item.list.php:298
 #: include/views/configuration.item.prototype.list.php:124
 #: include/views/configuration.maintenance.list.php:85
 #: include/views/configuration.screen.list.php:74
@@ -5858,7 +5858,7 @@ msgstr "图表名称 \"%1$s\" 已经存在在图表或者图表原型."
 msgid "Graph with same name but other type exist."
 msgstr "同名但不同类型的图形已存在."
 
-#: dashboard.php:317 hosts.php:864 hosts.php:956 include/html.inc.php:435
+#: dashboard.php:317 hosts.php:864 hosts.php:958 include/html.inc.php:435
 #: include/html.inc.php:439 include/menu.inc.php:61
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:49
@@ -6510,7 +6510,7 @@ msgstr "可视名称同样为 \"%s\" 的主机已存在."
 #: include/views/configuration.graph.list.php:76
 #: include/views/configuration.host.discovery.list.php:50
 #: include/views/configuration.hostgroups.edit.php:63
-#: include/views/configuration.hostgroups.list.php:146
+#: include/views/configuration.hostgroups.list.php:157
 #: include/views/conf.import.php:28 include/views/inventory.host.list.php:27
 #: include/views/monitoring.dashconf.php:87 latest.php:382 popup.php:35
 #: popup.php:43 search.php:237 search.php:279 search.php:299 search.php:304
@@ -6931,7 +6931,7 @@ msgstr "汇入文件"
 msgid "Imported successfully"
 msgstr "已成功汇入"
 
-#: hostinventories.php:192
+#: hostinventories.php:191
 #, c-format
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "不可能以不存在的资产纪录栏位\"%s\"来过滤."
@@ -6955,7 +6955,7 @@ msgstr "在...群组之中"
 msgid "In groups"
 msgstr "在...群组之中"
 
-#: hosts.php:982 include/html.inc.php:329
+#: hosts.php:984 include/html.inc.php:329
 #: include/views/configuration.maintenance.edit.php:168
 #: include/views/configuration.maintenance.edit.php:176
 msgid "In maintenance"
@@ -8248,7 +8248,7 @@ msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" ."
 msgid "Item with key \"%1$s\" already exists."
 msgstr "键值为\"%1$s\"的项目已经存在."
 
-#: hosts.php:862 hosts.php:952 include/html.inc.php:385
+#: hosts.php:862 hosts.php:954 include/html.inc.php:385
 #: include/html.inc.php:389 include/items.inc.php:706
 #: include/reports.inc.php:117 include/reports.inc.php:250
 #: include/views/configuration.application.list.php:94
@@ -9053,7 +9053,7 @@ msgstr "标记所选"
 msgid "Mask"
 msgstr "掩码"
 
-#: hosts.php:1067 include/views/configuration.item.list.php:273
+#: hosts.php:1069 include/views/configuration.item.list.php:284
 #: include/views/configuration.item.massupdate.php:566
 #: include/views/configuration.triggers.list.php:299
 #: include/views/configuration.triggers.massupdate.php:159
@@ -9205,7 +9205,7 @@ msgstr "被一个进程使用的内存.<name>进程名（默认:\"所有进程\"
 
 #: dashboard.php:310 dashboard.php:324 dashboard.php:338 dashboard.php:364
 #: dashboard.php:388 dashboard.php:411 dashboard.php:434 dashboard.php:457
-#: dashboard.php:487 include/views/configuration.item.list.php:235
+#: dashboard.php:487 include/views/configuration.item.list.php:246
 #: include/views/monitoring.slides.php:42
 msgid "Menu"
 msgstr "选单"
@@ -9520,7 +9520,7 @@ msgstr "NTLM"
 #: include/views/configuration.httpconf.popup.php:86
 #: include/views/configuration.item.edit.php:52
 #: include/views/configuration.item.list.php:65
-#: include/views/configuration.item.list.php:149
+#: include/views/configuration.item.list.php:160
 #: include/views/configuration.item.prototype.list.php:47
 #: include/views/configuration.maintenance.edit.php:39
 #: include/views/configuration.maintenance.list.php:44
@@ -10354,7 +10354,7 @@ msgstr "未发现幻灯片"
 msgid "No status for proxy."
 msgstr "没有状态代理."
 
-#: triggers.php:340
+#: triggers.php:335
 msgid "No target selected"
 msgstr "没有选择目标"
 
@@ -12884,7 +12884,7 @@ msgstr "连线期已中断, 请重连."
 
 #: events.php:474 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:149
-#: include/triggers.inc.php:1460 include/views/configuration.item.list.php:148
+#: include/triggers.inc.php:1460 include/views/configuration.item.list.php:159
 #: include/views/configuration.triggers.edit.php:253
 #: include/views/configuration.triggers.list.php:100
 #: include/views/configuration.triggers.massupdate.php:69 popup.php:972
@@ -13265,7 +13265,7 @@ msgstr "服务的状态.0-正在运行,1-暂停,2-将要启动,3-将要暂停,4-
 #: include/views/configuration.host.prototype.list.php:50
 #: include/views/configuration.httpconf.list.php:71
 #: include/views/configuration.item.list.php:73
-#: include/views/configuration.item.list.php:151
+#: include/views/configuration.item.list.php:162
 #: include/views/configuration.item.massupdate.php:405
 #: include/views/configuration.item.prototype.list.php:54
 #: include/views/configuration.triggers.list.php:104 popup_media.php:134
@@ -13637,7 +13637,7 @@ msgstr "模板的项目"
 #: hosts.php:868 include/menu.inc.php:158
 #: include/views/configuration.copy.elements.php:47
 #: include/views/configuration.host.edit.php:783
-#: include/views/configuration.hostgroups.list.php:144
+#: include/views/configuration.hostgroups.list.php:155
 #: include/views/configuration.host.massupdate.php:336
 #: include/views/configuration.host.prototype.edit.php:263
 #: include/views/configuration.host.prototype.list.php:49
@@ -13718,15 +13718,23 @@ msgstr "前端不匹配Zabbix数据库."
 msgid "The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator."
 msgstr "前端不匹配Zabbix数据库.当前数据库版本(强制/可选):%d/%d. 需要的版本为: %d.  联系你的系统管理员."
 
-#: include/views/configuration.hostgroups.list.php:130
+#: include/views/configuration.hostgroups.list.php:140
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "被发现的主机组丢失它将在%1$s (on %2$s at %3$s)被删除."
 
-#: include/html.inc.php:556
+#: include/views/configuration.hostgroups.list.php:135
+msgid "The host group is not discovered anymore and will be deleted the next time discovery rule is processed."
+msgstr ""
+
+#: include/html.inc.php:565
 #, c-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "被发现的主机丢失它将于%1$s (on %2$s at %3$s)后被删除."
+
+#: include/html.inc.php:560
+msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
+msgstr ""
 
 #: include/classes/api/services/CImage.php:433
 #, c-format
@@ -13740,10 +13748,14 @@ msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
 msgstr[0] "图片被应用于拓扑图 %1$s上."
 
-#: include/views/configuration.item.list.php:128
+#: include/views/configuration.item.list.php:138
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "已无法探索此项目了, 将删除于%1$s (在%2$s在%3$s)."
+
+#: include/views/configuration.item.list.php:133
+msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
+msgstr ""
 
 #: queue.php:78
 msgid "The queue is empty."
@@ -14009,7 +14021,7 @@ msgstr "略过触发器\"%1$s\"-用户规则."
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "触发器\"%s\"属于有不同连结的模板."
 
-#: triggers.php:207 triggers.php:337 tr_logform.php:149
+#: triggers.php:202 triggers.php:332 tr_logform.php:149
 msgid "Trigger added"
 msgstr "触发器已添加"
 
@@ -14021,7 +14033,7 @@ msgstr "触发器不能依赖从它继承的一个触发器."
 msgid "Trigger data storage period (in days)"
 msgstr "触发器数据存储周期(单位天)"
 
-#: triggers.php:225
+#: triggers.php:220
 msgid "Trigger deleted"
 msgstr "触发器已删除"
 
@@ -14029,7 +14041,7 @@ msgstr "触发器已删除"
 msgid "Trigger description"
 msgstr "触发器描述"
 
-#: triggers.php:295
+#: triggers.php:290
 msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] "触发器已禁用"
@@ -14042,7 +14054,7 @@ msgstr[0] "触发器已禁用"
 msgid "Trigger displaying options"
 msgstr "触发器显示选项"
 
-#: triggers.php:294
+#: triggers.php:289
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] "触发器已启用"
@@ -14174,7 +14186,7 @@ msgstr "触发器状态 \"OK\""
 msgid "Trigger status \"Problem\""
 msgstr "触发器状态\"Problem\""
 
-#: triggers.php:203 triggers.php:264 tr_logform.php:124
+#: triggers.php:198 triggers.php:259 tr_logform.php:124
 msgid "Trigger updated"
 msgstr "触发器已更新"
 
@@ -14182,14 +14194,14 @@ msgstr "触发器已更新"
 msgid "Trigger value"
 msgstr "触发器值"
 
-#: hosts.php:863 hosts.php:954 include/forms.inc.php:582
+#: hosts.php:863 hosts.php:956 include/forms.inc.php:582
 #: include/html.inc.php:410 include/html.inc.php:414 include/menu.inc.php:51
 #: include/triggers.inc.php:1082
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:48
 #: include/views/configuration.host.edit.php:532
 #: include/views/configuration.item.list.php:66
-#: include/views/configuration.item.list.php:207
+#: include/views/configuration.item.list.php:218
 #: include/views/configuration.template.edit.php:291
 #: include/views/configuration.triggers.list.php:77
 #: include/views/conf.import.php:35 include/views/inventory.host.view.php:213
@@ -14208,7 +14220,7 @@ msgstr "触发器"
 msgid "Triggers (e/d)[p/o]"
 msgstr "触发器 (e/d)[p/o]"
 
-#: triggers.php:349
+#: triggers.php:344
 msgid "Triggers deleted"
 msgstr "触发器已删除"
 
@@ -15387,7 +15399,7 @@ msgstr "设置"
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "我们很抱歉, 已经到了可记住的最大可能的组件数量."
 
-#: hosts.php:866 hosts.php:960 include/menu.inc.php:41
+#: hosts.php:866 hosts.php:962 include/menu.inc.php:41
 #: include/views/inventory.host.view.php:208
 #: include/views/inventory.host.view.php:236
 #: include/views/inventory.host.view.php:245 search.php:139 search.php:145
@@ -16029,7 +16041,7 @@ msgstr "d.m H:i"
 msgid "days"
 msgstr "日"
 
-#: include/html.inc.php:603
+#: include/html.inc.php:614
 msgid "dd"
 msgstr "dd"
 
@@ -16101,7 +16113,7 @@ msgctxt "hour short"
 msgid "h"
 msgstr "h"
 
-#: include/html.inc.php:616 include/views/configuration.services.edit.php:243
+#: include/html.inc.php:627 include/views/configuration.services.edit.php:243
 #: include/views/configuration.services.edit.php:249
 msgid "hh"
 msgstr "hh"
@@ -16213,7 +16225,7 @@ msgstr "最小"
 msgid "minimum 60 seconds"
 msgstr "最少60秒"
 
-#: include/html.inc.php:608 include/html.inc.php:621
+#: include/html.inc.php:619 include/html.inc.php:632
 #: include/views/configuration.services.edit.php:246
 #: include/views/configuration.services.edit.php:252
 msgid "mm"
@@ -16417,6 +16429,6 @@ msgctxt "year short"
 msgid "y"
 msgstr "y"
 
-#: include/html.inc.php:612
+#: include/html.inc.php:623
 msgid "yyyy"
 msgstr "yyy"
