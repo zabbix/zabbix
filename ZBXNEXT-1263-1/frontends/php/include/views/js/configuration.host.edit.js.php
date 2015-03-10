@@ -335,6 +335,36 @@
 			hostInterfacesManager.setUseipForInterface(interfaceId[0], jQuery(this).val());
 		});
 
+		jQuery('#tls_connect').change(function() {
+			var is_certificate = (jQuery(this).val() == 4),
+				is_psk = (jQuery(this).val() == 2) || jQuery('#tls_in_psk').is(":checked");
+
+			if (is_certificate) {
+				jQuery('#tls_issuer, #tls_subject').prop('disabled', false);
+			}
+			else {
+				jQuery('#tls_issuer, #tls_subject').prop('disabled', true);
+			}
+
+			if (is_psk) {
+				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', false);
+			}
+			else {
+				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', true);
+			}
+		});
+
+		jQuery('#tls_in_psk').change(function() {
+			var	is_psk = (jQuery(this).val() == 2) || jQuery('#tls_in_psk').is(":checked");
+
+			if (is_psk) {
+				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', false);
+			}
+			else {
+				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', true);
+			}
+		});
+
 		jQuery('#agentInterfaces, #SNMPInterfaces, #JMXInterfaces, #IPMIInterfaces').parent().droppable({
 			tolerance: 'pointer',
 			drop: function(event, ui) {
@@ -428,6 +458,17 @@
 		jQuery('#mass_replace_tpls').on('change', function() {
 			jQuery('#mass_clear_tpls').prop('disabled', !this.checked);
 		}).change();
+
+		// refresh field visibility on document load
+		jQuery('#tls_connect, #tls_psk_out').trigger('change');
+
+		jQuery('#hostForm').submit(function() {
+			var tls_accept = parseInt(jQuery('#tls_in_none').val()) +
+				parseInt(2*jQuery('#tls_in_psk').val()) +
+				parseInt(4*jQuery('#tls_in_cert').val());
+
+			jQuery('#tls_accept').val(tls_accept);
+		});
 	});
 
 	function getHostInterfaceNumericType(typeName) {

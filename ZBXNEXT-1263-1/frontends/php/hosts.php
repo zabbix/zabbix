@@ -67,6 +67,12 @@ $fields = array(
 	'ipmi_privilege' =>	array(T_ZBX_INT, O_OPT, null,			BETWEEN(0, 5), null),
 	'ipmi_username' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
 	'ipmi_password' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
+	'tls_accept' =>		array(T_ZBX_INT, O_OPT, null,			BETWEEN(0, 7), null),
+	'tls_connect' =>	array(T_ZBX_INT, O_OPT, null,			BETWEEN(0, 4), null),
+	'tls_issuer' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'tls_psk' =>		array(T_ZBX_STR, O_OPT, null,			HEX(),		null),
+	'tls_psk_identity' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'tls_subject' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'mass_replace_tpls' => array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'mass_clear_tpls' => array(T_ZBX_STR, O_OPT, null,			null,		null),
 	'inventory_mode' => array(T_ZBX_INT, O_OPT, null,
@@ -485,6 +491,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'ipmi_privilege' => getRequest('ipmi_privilege'),
 				'ipmi_username' => getRequest('ipmi_username'),
 				'ipmi_password' => getRequest('ipmi_password'),
+				'tls_accept' => getRequest('tls_accept'),
+				'tls_connect' => getRequest('tls_connect'),
+				'tls_issuer' => getRequest('tls_issuer'),
+				'tls_psk' => getRequest('tls_psk'),
+				'tls_psk_identity' => getRequest('tls_psk_identity'),
+				'tls_subject' => getRequest('tls_subject'),
 				'groups' => $groups,
 				'templates' => $templates,
 				'interfaces' => $interfaces,
@@ -760,7 +772,8 @@ elseif (hasRequest('form')) {
 	if ($data['hostId']) {
 		$dbHosts = API::Host()->get(array(
 			'output' => array('hostid', 'proxy_hostid', 'host', 'name', 'status', 'ipmi_authtype', 'ipmi_privilege',
-				'ipmi_username', 'ipmi_password', 'flags', 'description'
+				'ipmi_username', 'ipmi_password', 'flags', 'description',
+				'tls_connect', 'tls_accept', 'tls_psk', 'tls_psk_identity', 'tls_issuer', 'tls_subject'
 			),
 			'selectGroups' => array('groupid', 'name'),
 			'selectParentTemplates' => array('templateid', 'name'),

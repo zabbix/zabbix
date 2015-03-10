@@ -75,6 +75,13 @@ if ($data['hostId'] && (!hasRequest('form_refresh') || $cloningDiscoveredHost)) 
 	$ipmiUsername = $dbHost['ipmi_username'];
 	$ipmiPassword = $dbHost['ipmi_password'];
 
+	$tls_accept = $dbHost['tls_accept'];
+	$tls_connect = $dbHost['tls_connect'];
+	$tls_issuer = $dbHost['tls_issuer'];
+	$tls_psk = $dbHost['tls_psk'];
+	$tls_psk_identity = $dbHost['tls_psk_identity'];
+	$tls_subject = $dbHost['tls_subject'];
+
 	$macros = order_macros($dbHost['macros'], 'macro');
 	$groupIds = zbx_objectValues($dbHost['groups'], 'groupid');
 
@@ -141,6 +148,12 @@ else {
 	$templateIds = getRequest('templates', array());
 	$clearTemplates = getRequest('clear_templates', array());
 	$description = getRequest('description', '');
+	$tls_accept = getRequest('tls_accept', 0);
+	$tls_connect = getRequest('tls_connect', 0);
+	$tls_issuer = getRequest('tls_issuer', '');
+	$tls_psk = getRequest('tls_psk', '');
+	$tls_psk_identity = getRequest('tls_psk_identity', '');
+	$tls_subject = getRequest('tls_subject', '');
 
 	if ($data['hostId'] == 0 && !hasRequest('form_refresh')) {
 		$status = HOST_STATUS_MONITORED;
@@ -176,7 +189,9 @@ if (!hasRequest('form_refresh')) {
 
 $frmHost = new CForm();
 $frmHost->setName('web.hosts.host.php.');
+$frmHost->setAttribute('id', 'hostForm');
 $frmHost->addVar('form', $data['form']);
+$frmHost->addVar('tls_accept', 0);
 
 $frmHost->addVar('clear_templates', $clearTemplates);
 
@@ -932,6 +947,45 @@ $clearFixDiv->addStyle('clear: both;');
 $inventoryFormList->addRow('', $clearFixDiv);
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
+
+
+$encryptionFormList = new CFormList('encryption');
+
+$encryptionOut = new CComboBox('tls_connect', $tls_connect);
+$encryptionOut->addItem(HOST_ENCRYPTION_NONE, _('No encryption'));
+$encryptionOut->addItem(HOST_ENCRYPTION_PSK, _('PSK'));
+$encryptionOut->addItem(HOST_ENCRYPTION_CERTIFICATE, _('Certificate'));
+$encryptionFormList->addRow(_('Outgoing encryption'), $encryptionOut);
+
+$encryptionOutIssuer = new CTextBox('tls_issuer', $tls_issuer, ZBX_TEXTBOX_STANDARD_SIZE);
+$encryptionFormList->addRow(_('Issuer'), $encryptionOutIssuer);
+
+$encryptionOutSubject = new CTextBox('tls_subject', $tls_subject, ZBX_TEXTBOX_STANDARD_SIZE);
+$encryptionFormList->addRow(_('Subject'), $encryptionOutSubject);
+
+$encryptionIn = array();
+$encryptionIn1 = new CCheckBox('tls_in_none', $tls_accept & 1 == 1);
+$encryptionIn[] = array($encryptionIn1, 'No encryption');
+$encryptionIn[] = BR();
+
+$encryptionIn2 = new CCheckBox('tls_in_psk', $tls_accept & 2 == 2);
+$encryptionIn[] = array($encryptionIn2, 'PSK');
+$encryptionIn[] = BR();
+
+$encryptionIn3 = new CCheckBox('tls_in_cert', $tls_accept & 4 == 4);
+$encryptionIn[] = array($encryptionIn3, 'Certificate');
+
+$encryptionFormList->addRow(_('Incoming encryption'), $encryptionIn);
+
+$encryptionPSKIdentity = new CTextBox('tls_psk_identity', $tls_psk_identity, ZBX_TEXTBOX_STANDARD_SIZE);
+$encryptionFormList->addRow(_('Identity'), $encryptionPSKIdentity);
+
+$encryptionInPSK = new CTextBox('tls_psk', $tls_psk, ZBX_TEXTBOX_STANDARD_SIZE);
+$encryptionFormList->addRow(_('PSK'), $encryptionInPSK);
+
+
+$divTabs->addTab('encryptionTab', _('Encryption'), $encryptionFormList);
+
 $frmHost->addItem($divTabs);
 
 /*
