@@ -20,47 +20,34 @@
 
 
 /**
- * An object that can perform a sequential conversion using an array of conversions.
+ * XML array validator.
  */
-class CConverterChain  {
+class CXmlArrayValidator {
 
-	/**
-	 * Converters to use.
-	 *
-	 * @var CConverter[]
-	 */
-	protected $converters = array();
+	private $error;
 
-	/**
-	 * Convert the data starting from the converter given in $startFrom.
-	 *
-	 * @param mixed     $data
-	 * @param string    $startFrom
-	 *
-	 * @return mixed
-	 */
-	public function convert($data, $startFrom) {
-		$convert = false;
-		foreach ($this->converters as $key => $converter) {
-			if ($key === $startFrom) {
-				$convert = true;
+	public function validate($name, array $array) {
+		$i = 0;
+
+		foreach ($array as $key => $value) {
+			$postFix = ($i == 0) ? '' : $i;
+			$validKey = $name.$postFix;
+
+			if ($key !== $validKey) {
+				$this->error = _s('unexpected tag "%1$s"', $key);
+				break;
 			}
 
-			if ($convert) {
-				$data = $converter->convert($data);
-			}
+			$i++;
 		}
-
-		return $data;
 	}
 
 	/**
-	 * Add a new converter to the chain.
+	 * Returns array of error messages.
 	 *
-	 * @param string $name
-	 * @param CConverter $converter
+	 * @return array
 	 */
-	public function addConverter($name, CConverter $converter) {
-		$this->converters[$name] = $converter;
+	public function getError() {
+		return $this->error;
 	}
 }

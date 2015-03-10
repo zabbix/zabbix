@@ -56,18 +56,11 @@ class CImportDataAdapter {
 	 * Set the data and initialize the adapter.
 	 *
 	 * @param array $data   import data
-	 *
-	 * @throws InvalidArgumentException     if the data is invalid
 	 */
 	public function load(array $data) {
 		$version = $data['zabbix_export']['version'];
 
 		if ($this->currentVersion != $version) {
-			// check if this import version is supported
-			if (!$this->converterChain->hasConverter($version)) {
-				throw new InvalidArgumentException(_s('Unsupported import version "%1$s"', $version));
-			}
-
 			$data = $this->converterChain->convert($data, $version);
 		}
 
