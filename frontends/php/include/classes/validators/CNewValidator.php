@@ -219,10 +219,18 @@ class CNewValidator {
 						$this->addError($fatal, _s('Field "%1$s" is mandatory.', $field));
 						return false;
 					}
-//					elseif (!$required && array_key_exists($field, $this->input)) {
-//						$this->addError($fatal, _s('Field "%1$s" must be missing.', $field));
-//						return false;
-//					}
+					break;
+
+				/*
+				 * 'string' => true
+				 */
+				case 'string':
+					if (array_key_exists($field, $this->input) && !is_string($this->input[$field])) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": a character string is expected.', $field)
+						);
+						return false;
+					}
 					break;
 
 				default:
