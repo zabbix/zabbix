@@ -55,7 +55,8 @@ class CValidationRule {
 							$is_empty = false;
 							$rule = array();
 
-							if (!$this->parseRequiredIf($buffer, $pos, $rule)			// required_if
+							if (!$this->parseString($buffer, $pos, $rule)				// string
+									&& !$this->parseRequiredIf($buffer, $pos, $rule)	// required_if
 									&& !$this->parseRequired($buffer, $pos, $rule)		// required
 									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
 									&& !$this->parseJson($buffer, $pos, $rule)			// json
@@ -114,6 +115,22 @@ class CValidationRule {
 	 */
 	public function getError() {
 		return $this->error;
+	}
+
+	/**
+	 * string
+	 *
+	 * 'string' => true
+	 */
+	private function parseString($buffer, &$pos, &$rule) {
+		if (0 != strncmp(substr($buffer, $pos), 'string', 6)) {
+			return false;
+		}
+
+		$pos += 6;
+		$rule['string'] = true;
+
+		return true;
 	}
 
 	/**
