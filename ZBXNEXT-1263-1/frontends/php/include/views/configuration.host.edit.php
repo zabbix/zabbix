@@ -959,15 +959,15 @@ $encryptionFormList->addRow(_('Outgoing encryption'), $encryptionOut);
 
 
 $encryptionIn = array();
-$encryptionIn1 = new CCheckBox('tls_in_none', $tls_accept & 1 == 1);
+$encryptionIn1 = new CCheckBox('tls_in_none', ($tls_accept & 1) == 1);
 $encryptionIn[] = array($encryptionIn1, 'No encryption');
 $encryptionIn[] = BR();
 
-$encryptionIn2 = new CCheckBox('tls_in_psk', $tls_accept & 2 == 2);
+$encryptionIn2 = new CCheckBox('tls_in_psk', ($tls_accept & 2) == 2);
 $encryptionIn[] = array($encryptionIn2, 'PSK');
 $encryptionIn[] = BR();
 
-$encryptionIn3 = new CCheckBox('tls_in_cert', $tls_accept & 4 == 4);
+$encryptionIn3 = new CCheckBox('tls_in_cert', ($tls_accept & 4) == 4);
 $encryptionIn[] = array($encryptionIn3, 'Certificate');
 
 $encryptionFormList->addRow(_('Incoming encryption'), $encryptionIn);
