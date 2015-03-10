@@ -335,9 +335,9 @@
 			hostInterfacesManager.setUseipForInterface(interfaceId[0], jQuery(this).val());
 		});
 
-		jQuery('#tls_connect').change(function() {
-			var is_certificate = (jQuery(this).val() == 4),
-				is_psk = (jQuery(this).val() == 2) || jQuery('#tls_in_psk').is(":checked");
+		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
+			var is_certificate = (jQuery('#tls_connect').val() == 4) || jQuery('#tls_in_cert').is(":checked"),
+				is_psk = (jQuery('#tls_connect').val() == 2) || jQuery('#tls_in_psk').is(":checked");
 
 			if (is_certificate) {
 				jQuery('#tls_issuer, #tls_subject').prop('disabled', false);
@@ -345,17 +345,6 @@
 			else {
 				jQuery('#tls_issuer, #tls_subject').prop('disabled', true);
 			}
-
-			if (is_psk) {
-				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', false);
-			}
-			else {
-				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', true);
-			}
-		});
-
-		jQuery('#tls_in_psk').change(function() {
-			var	is_psk = (jQuery(this).is(":checked") || jQuery('#tls_connect').val() == 2);
 
 			if (is_psk) {
 				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', false);
