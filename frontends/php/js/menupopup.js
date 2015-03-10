@@ -289,7 +289,7 @@ function getMenuPopupHost(options) {
  * @param array  options['gotos']['showTriggers']	display "Triggers" link enabled or disabled
  * @param array  options['gotos']['submap']			link to submap page with url parameters ("name" => "value")
  * @param array  options['gotos']['events']			link to events page with url parameters ("name" => "value")
- * @param array  options['gotos']['showEvents']		display "Latest events" link enabled or disabled
+ * @param array  options['gotos']['showEvents']		display "Events" link enabled or disabled
  * @param array  options['urls']					local and global map urls (optional)
  * @param string options['url'][]['label']			url label
  * @param string options['url'][]['url']			url
@@ -402,14 +402,14 @@ function getMenuPopupMap(options) {
 
 		// events
 		if (typeof options.gotos.events !== 'undefined') {
-			var url = new Curl('events.php?source=0');
+			var url = new Curl('events.php?filter_set=1&source=0');
 
 			jQuery.each(options.gotos.events, function(name, value) {
 				url.setArgument(name, value);
 			});
 
 			gotos[gotos.length] = {
-				label: t('Latest events'),
+				label: t('Events'),
 				css: options.gotos.showEvents ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
@@ -587,7 +587,7 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?filter_set=1&triggerid=' + options.triggerid + '&source=0');
+	var url = new Curl('events.php?filter_set=1&source=0&triggerid=' + options.triggerid);
 	if (typeof options.eventTime !== 'undefined') {
 		url.setArgument('nav_time', options.eventTime);
 	}
