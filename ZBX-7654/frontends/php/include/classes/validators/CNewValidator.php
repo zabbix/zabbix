@@ -73,52 +73,16 @@ class CNewValidator {
 		foreach ($rules as $rule => $params) {
 			switch ($rule) {
 				/*
-				 * 'fatal' => true
+				 * 'array_db' => array(
+				 *     'table' => <table_name>,
+				 *     'field' => <field_name>
+				 * )
 				 */
-				case 'fatal':
-					// nothing to do
-					break;
-
-				/*
-				 * 'not_empty' => true
-				 */
-				case 'not_empty':
-					if (array_key_exists($field, $this->input) && $this->input[$field] === '') {
-						$this->addError($fatal, _s('Incorrect value for field "%1$s": cannot be empty.', $field));
-						return false;
-					}
-					break;
-
-				case 'json':
+				case 'array_db':
 					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || !CJs::decodeJson($this->input[$field])) {
-							$this->addError($fatal,
-								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-								// TODO: stringify($this->input[$field]) ???
-							);
-							return false;
-						}
-					}
-					break;
+						if (!is_array($this->input[$field])
+								|| !$this->is_array_db($this->input[$field], $params['table'], $params['field'])) {
 
-				/*
-				 * 'in' => array(<values)
-				 */
-				case 'in':
-					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || !in_array($this->input[$field], $params)) {
-							$this->addError($fatal,
-								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-								// TODO: stringify($this->input[$field]) ???
-							);
-							return false;
-						}
-					}
-					break;
-
-				case 'id':
-					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || !$this->is_id($this->input[$field])) {
 							$this->addError($fatal,
 								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
 								// TODO: stringify($this->input[$field]) ???
@@ -144,26 +108,6 @@ class CNewValidator {
 					break;
 
 				/*
-				 * 'array_db' => array(
-				 *     'table' => <table_name>,
-				 *     'field' => <field_name>
-				 * )
-				 */
-				case 'array_db':
-					if (array_key_exists($field, $this->input)) {
-						if (!is_array($this->input[$field])
-								|| !$this->is_array_db($this->input[$field], $params['table'], $params['field'])) {
-
-							$this->addError($fatal,
-								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
-								// TODO: stringify($this->input[$field]) ???
-							);
-							return false;
-						}
-					}
-					break;
-
-				/*
 				 * 'db' => array(
 				 *     'table' => <table_name>,
 				 *     'field' => <field_name>
@@ -179,6 +123,62 @@ class CNewValidator {
 							);
 							return false;
 						}
+					}
+					break;
+
+				/*
+				 * 'fatal' => true
+				 */
+				case 'fatal':
+					// nothing to do
+					break;
+
+				case 'id':
+					if (array_key_exists($field, $this->input)) {
+						if (!is_string($this->input[$field]) || !$this->is_id($this->input[$field])) {
+							$this->addError($fatal,
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
+							);
+							return false;
+						}
+					}
+					break;
+
+				/*
+				 * 'in' => array(<values)
+				 */
+				case 'in':
+					if (array_key_exists($field, $this->input)) {
+						if (!is_string($this->input[$field]) || !in_array($this->input[$field], $params)) {
+							$this->addError($fatal,
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
+							);
+							return false;
+						}
+					}
+					break;
+
+				case 'json':
+					if (array_key_exists($field, $this->input)) {
+						if (!is_string($this->input[$field]) || !CJs::decodeJson($this->input[$field])) {
+							$this->addError($fatal,
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
+							);
+							return false;
+						}
+					}
+					break;
+
+				/*
+				 * 'not_empty' => true
+				 */
+				case 'not_empty':
+					if (array_key_exists($field, $this->input) && $this->input[$field] === '') {
+						$this->addError($fatal, _s('Incorrect value for field "%1$s": cannot be empty.', $field));
+						return false;
 					}
 					break;
 
