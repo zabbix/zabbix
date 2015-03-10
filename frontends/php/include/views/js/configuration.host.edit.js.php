@@ -452,9 +452,17 @@
 		jQuery('#tls_connect, #tls_psk_out').trigger('change');
 
 		jQuery('#hostForm').submit(function() {
-			var tls_accept = parseInt(jQuery('#tls_in_none').val()) +
-				parseInt(2*jQuery('#tls_in_psk').val()) +
-				parseInt(4*jQuery('#tls_in_cert').val());
+			var tls_accept = 0;
+
+			if (jQuery('#tls_in_none').is(":checked")) {
+				tls_accept += 1;
+			}
+			if (jQuery('#tls_in_psk').is(":checked")) {
+				tls_accept += 2;
+			}
+			if (jQuery('#tls_in_cert').is(":checked")) {
+				tls_accept += 4;
+			}
 
 			jQuery('#tls_accept').val(tls_accept);
 		});
