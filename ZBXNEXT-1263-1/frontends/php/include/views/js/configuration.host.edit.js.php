@@ -355,7 +355,7 @@
 		});
 
 		jQuery('#tls_in_psk').change(function() {
-			var	is_psk = (jQuery(this).val() == 2) || jQuery('#tls_in_psk').is(":checked");
+			var	is_psk = (jQuery(this).is(":checked") || jQuery('#tls_connect').val() == 2);
 
 			if (is_psk) {
 				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', false);
