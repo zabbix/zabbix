@@ -979,7 +979,7 @@ $encryptionOutSubject = new CTextBox('tls_subject', $tls_subject, 64);
 $encryptionFormList->addRow(_('Subject'), $encryptionOutSubject);
 
 $encryptionPSKIdentity = new CTextBox('tls_psk_identity', $tls_psk_identity, 64);
-$encryptionFormList->addRow(_('Identity'), $encryptionPSKIdentity);
+$encryptionFormList->addRow(_('PSK identity'), $encryptionPSKIdentity);
 
 $encryptionInPSK = new CTextBox('tls_psk', $tls_psk, 64);
 $encryptionFormList->addRow(_('PSK'), $encryptionInPSK);
