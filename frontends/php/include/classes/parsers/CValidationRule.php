@@ -19,6 +19,7 @@
 **/
 
 class CValidationRule {
+
 	const STATE_BEGIN = 0;
 	const STATE_END = 1;
 
@@ -109,136 +110,59 @@ class CValidationRule {
 	}
 
 	/**
-	 * Returns the error message if validation rule is invalid.
+	 * array_db <table>.<field>
 	 *
-	 * @return string
+	 * 'array_db' => array(
+	 *     'table' => '<table>',
+	 *     'field' => '<field>'
+	 * )
 	 */
-	public function getError() {
-		return $this->error;
-	}
-
-	/**
-	 * string
-	 *
-	 * 'string' => true
-	 */
-	private function parseString($buffer, &$pos, &$rule) {
-		if (0 != strncmp(substr($buffer, $pos), 'string', 6)) {
-			return false;
-		}
-
-		$pos += 6;
-		$rule['string'] = true;
-
-		return true;
-	}
-
-	/**
-	 * fatal
-	 *
-	 * 'fatal' => true
-	 */
-	private function parseFatal($buffer, &$pos, &$rule) {
-		if (0 != strncmp(substr($buffer, $pos), 'fatal', 5)) {
-			return false;
-		}
-
-		$pos += 5;
-		$rule['fatal'] = true;
-
-		return true;
-	}
-
-	/**
-	 * required
-	 *
-	 * 'required' => true
-	 */
-	private function parseRequired($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'required', 8)) {
-			return false;
-		}
-
-		$pos += 8;
-		$rules['required'] = true;
-
-		return true;
-	}
-
-	/**
-	 * not_empty
-	 *
-	 * 'not_empty' => true
-	 */
-	private function parseNotEmpty($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'not_empty', 9)) {
-			return false;
-		}
-
-		$pos += 9;
-		$rules['not_empty'] = true;
-
-		return true;
-	}
-
-	/**
-	 * json
-	 *
-	 * 'json' => true
-	 */
-	private function parseJson($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'json', 4)) {
-			return false;
-		}
-
-		$pos += 4;
-		$rules['json'] = true;
-
-		return true;
-	}
-
-	/**
-	 * in <value1>[,...,<valueN>]
-	 *
-	 * 'in' => array('<value1>', ..., '<valueN>')
-	 */
-	private function parseIn($buffer, &$pos, &$rules) {
+	private function parseArrayDB($buffer, &$pos, &$rules) {
 		$i = $pos;
 
-		if (0 != strncmp(substr($buffer, $i), 'in ', 3)) {
+		if (0 != strncmp(substr($buffer, $i), 'array_db ', 9)) {
 			return false;
 		}
 
-		$i += 3;
+		$i += 9;
 
 		while (isset($buffer[$i]) && $buffer[$i] == ' ') {
 			$i++;
 		}
 
-		$values = array();
+		$table = '';
 
-		if (!$this->parseValues($buffer, $i, $values)) {
+		if (!$this->parseField($buffer, $i, $table) || !isset($buffer[$i]) || $buffer[$i++] != '.') {
+			return false;
+		}
+
+		$field = '';
+
+		if (!$this->parseField($buffer, $i, $field)) {
 			return false;
 		}
 
 		$pos = $i;
-		$rules['in'] = $values;
+		$rules['array_db'] = array(
+			'table' => $table,
+			'field' => $field
+		);
 
 		return true;
 	}
 
 	/**
-	 * id
+	 * array_id
 	 *
-	 * 'id' => true
+	 * 'array_id' => true
 	 */
-	private function parseId($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'id', 2)) {
+	private function parseArrayId($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'array_id', 8)) {
 			return false;
 		}
 
-		$pos += 2;
-		$rules['id'] = true;
+		$pos += 8;
+		$rules['array_id'] = true;
 
 		return true;
 	}
@@ -286,59 +210,111 @@ class CValidationRule {
 	}
 
 	/**
-	 * array_id
+	 * fatal
 	 *
-	 * 'array_id' => true
+	 * 'fatal' => true
 	 */
-	private function parseArrayId($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'array_id', 8)) {
+	private function parseFatal($buffer, &$pos, &$rule) {
+		if (0 != strncmp(substr($buffer, $pos), 'fatal', 5)) {
 			return false;
 		}
 
-		$pos += 8;
-		$rules['array_id'] = true;
+		$pos += 5;
+		$rule['fatal'] = true;
 
 		return true;
 	}
 
 	/**
-	 * array_db <table>.<field>
+	 * id
 	 *
-	 * 'array_db' => array(
-	 *     'table' => '<table>',
-	 *     'field' => '<field>'
-	 * )
+	 * 'id' => true
 	 */
-	private function parseArrayDB($buffer, &$pos, &$rules) {
-		$i = $pos;
-
-		if (0 != strncmp(substr($buffer, $i), 'array_db ', 9)) {
+	private function parseId($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'id', 2)) {
 			return false;
 		}
 
-		$i += 9;
+		$pos += 2;
+		$rules['id'] = true;
+
+		return true;
+	}
+
+	/**
+	 * in <value1>[,...,<valueN>]
+	 *
+	 * 'in' => array('<value1>', ..., '<valueN>')
+	 */
+	private function parseIn($buffer, &$pos, &$rules) {
+		$i = $pos;
+
+		if (0 != strncmp(substr($buffer, $i), 'in ', 3)) {
+			return false;
+		}
+
+		$i += 3;
 
 		while (isset($buffer[$i]) && $buffer[$i] == ' ') {
 			$i++;
 		}
 
-		$table = '';
+		$values = array();
 
-		if (!$this->parseField($buffer, $i, $table) || !isset($buffer[$i]) || $buffer[$i++] != '.') {
-			return false;
-		}
-
-		$field = '';
-
-		if (!$this->parseField($buffer, $i, $field)) {
+		if (!$this->parseValues($buffer, $i, $values)) {
 			return false;
 		}
 
 		$pos = $i;
-		$rules['array_db'] = array(
-			'table' => $table,
-			'field' => $field
-		);
+		$rules['in'] = $values;
+
+		return true;
+	}
+
+	/**
+	 * json
+	 *
+	 * 'json' => true
+	 */
+	private function parseJson($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'json', 4)) {
+			return false;
+		}
+
+		$pos += 4;
+		$rules['json'] = true;
+
+		return true;
+	}
+
+	/**
+	 * not_empty
+	 *
+	 * 'not_empty' => true
+	 */
+	private function parseNotEmpty($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'not_empty', 9)) {
+			return false;
+		}
+
+		$pos += 9;
+		$rules['not_empty'] = true;
+
+		return true;
+	}
+
+	/**
+	 * required
+	 *
+	 * 'required' => true
+	 */
+	private function parseRequired($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'required', 8)) {
+			return false;
+		}
+
+		$pos += 8;
+		$rules['required'] = true;
 
 		return true;
 	}
@@ -395,6 +371,22 @@ class CValidationRule {
 
 		$pos = $i;
 		$rules['required_if'] = $rule;
+
+		return true;
+	}
+
+	/**
+	 * string
+	 *
+	 * 'string' => true
+	 */
+	private function parseString($buffer, &$pos, &$rule) {
+		if (0 != strncmp(substr($buffer, $pos), 'string', 6)) {
+			return false;
+		}
+
+		$pos += 6;
+		$rule['string'] = true;
 
 		return true;
 	}
@@ -459,4 +451,14 @@ class CValidationRule {
 
 		return true;
 	}
+
+	/**
+	 * Returns the error message if validation rule is invalid.
+	 *
+	 * @return string
+	 */
+	public function getError() {
+		return $this->error;
+	}
+
 }
