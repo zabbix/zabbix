@@ -437,13 +437,15 @@ else {
 	$data['paging'] = getPagingLine($data['triggers']);
 
 	$data['triggers'] = API::Trigger()->get(array(
-		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => API_OUTPUT_EXTEND,
+		'output' => array(
+			'triggerid', 'expression', 'description', 'status', 'state', 'priority', 'templateid', 'error'
+		),
+		'selectHosts' => array('hostid', 'host'),
 		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
-		'selectFunctions' => API_OUTPUT_EXTEND,
+		'selectFunctions' => array('functionid', 'itemid', 'function', 'parameter'),
 		'selectDependencies' => array('triggerid', 'description'),
-		'selectDiscoveryRule' => API_OUTPUT_EXTEND
+		'selectDiscoveryRule' => array('itemid', 'name'),
+		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
 	));
 
 	if ($sortField === 'status') {
