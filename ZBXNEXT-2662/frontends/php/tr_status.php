@@ -247,9 +247,9 @@ $filterFormView = new CView('common.filter.trigger', array(
 	),
 	'config' => $config
 ));
-$filterForm = $filterFormView->render();
 
-$triggerWidget->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 0));
+$filterForm = $filterFormView->render();
+$triggerWidget->addItem($filterForm);
 
 /*
  * Form

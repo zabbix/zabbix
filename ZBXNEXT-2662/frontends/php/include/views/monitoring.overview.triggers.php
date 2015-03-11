@@ -96,7 +96,7 @@ $filterFormView = new CView('common.filter.trigger', array(
 ));
 $filterForm = $filterFormView->render();
 
-$overviewWidget->addFlicker($filterForm, CProfile::get('web.overview.filter.state', 0));
+$overviewWidget->addItem($filterForm);
 
 // data table
 if ($this->data['config']['dropdown_first_entry']) {
