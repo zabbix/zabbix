@@ -24,35 +24,30 @@
 #include "dbcache.h"
 #include "zbxserver.h"
 
-static char	*get_conflicting_template_names(const char *key, const zbx_vector_uint64_t *templateids)
+static char	*get_template_names(const zbx_vector_uint64_t *templateids)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset=0;
-	char		*template_names = NULL, *esc;
+	char		*sql = NULL, *template_names = NULL;
+	size_t		sql_alloc = 256, sql_offset=0, tmp_alloc = 64, tmp_offset = 0;
 
 	sql = zbx_malloc(sql, sql_alloc);
+	template_names = zbx_malloc(template_names, tmp_alloc);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hostid"
-			" from items"
+			"select host"
+			" from hosts"
 			" where");
 
-	esc = DBdyn_escape_string(key);
-	DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "key_", (const char **)&esc, 1);
-	zbx_free(esc);
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset," and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 			templateids->values, templateids->values_num);
 
-	result = DBselectN(sql, templateids->values_num);
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
-		template_names = zbx_strdcatf(template_names, "\"%s\", ", zbx_host_string(atoi(row[0])));
+		zbx_snprintf_alloc(&template_names, &tmp_alloc, &tmp_offset, "\"%s\", ", row[0]);
 
-	zbx_rtrim(template_names, ", ");
+	template_names[tmp_offset-2] = '\0';
 
 	DBfree_result(result);
 	zbx_free(sql);
@@ -112,7 +107,7 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 			char	*template_names;
 
 			ret = FAIL;
-			template_names = get_conflicting_template_names(row[0], templateids);
+			template_names = get_template_names(templateids);
 			zbx_snprintf(error, max_error_len,
 					"templates %s have the same item key \"%s\"", template_names, row[0]);
 			zbx_free(template_names);
