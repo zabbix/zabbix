@@ -957,7 +957,6 @@ $encryptionOut->addItem(HOST_ENCRYPTION_PSK, _('PSK'));
 $encryptionOut->addItem(HOST_ENCRYPTION_CERTIFICATE, _('Certificate'));
 $encryptionFormList->addRow(_('Outgoing encryption'), $encryptionOut);
 
-
 $encryptionIn = array();
 $encryptionIn1 = new CCheckBox('tls_in_none', ($tls_accept & 1) == 1);
 $encryptionIn[] = array($encryptionIn1, 'No encryption');

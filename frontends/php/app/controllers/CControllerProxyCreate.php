@@ -30,7 +30,13 @@ class CControllerProxyCreate extends CController {
 			'useip' =>			'db       interface.useip  |in 0,1',
 			'port' =>			'db       interface.port',
 			'proxy_hostids' =>	'array_db hosts.hostid',
-			'description' =>	'db       hosts.description'
+			'description' =>	'db       hosts.description',
+			'tls_accept' => 	'db       hosts.tls_accept     |in 0,1,2,3,4,5,6,7',
+			'tls_connect' => 	'db       hosts.tls_connect    |in 0,1,2,3,4,5,6,7',
+			'tls_issuer' => 	'db       hosts.tls_issuer',
+			'tls_psk' =>		'db       hosts.tls_psk',
+			'tls_psk_identity'=>'db       hosts.tls_psk_identity',
+			'tls_subject' => 	'db       hosts.tls_subject'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -59,7 +65,8 @@ class CControllerProxyCreate extends CController {
 	protected function doAction() {
 		$proxy = array();
 
-		$this->getInputs($proxy, array('host', 'description', 'status'));
+		$this->getInputs($proxy, array('host', 'description', 'status', 'tls_accept', 'tls_connect',
+			'tls_issuer', 'tls_psk', 'tls_psk_identity', 'tls_subject'));
 
 		if ($this->getInput('status', HOST_STATUS_PROXY_ACTIVE) == HOST_STATUS_PROXY_PASSIVE) {
 			$proxy['interface'] = array();

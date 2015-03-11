@@ -36,7 +36,13 @@ class CControllerProxyEdit extends CController {
 			'useip' =>			'db       interface.useip      |in 0,1',
 			'port' =>			'db       interface.port',
 			'proxy_hostids' =>	'array_db hosts.hostid',
-			'description' =>	'db       hosts.description'
+			'description' =>	'db       hosts.description',
+			'tls_accept' => 	'db       hosts.tls_accept     |in 0,1,2,3,4,5,6,7',
+			'tls_connect' => 	'db       hosts.tls_connect    |in 0,1,2,3,4,5,6,7',
+			'tls_issuer' => 	'db       hosts.tls_issuer',
+			'tls_psk' =>		'db       hosts.tls_psk',
+			'tls_psk_identity'=>'db       hosts.tls_psk_identity',
+			'tls_subject' => 	'db       hosts.tls_subject'
 		);
 
 		$ret = $this->validateInput($fields);
@@ -76,7 +82,13 @@ class CControllerProxyEdit extends CController {
 			'useip' => '1',
 			'port' => '10051',
 			'proxy_hostids' => array(),
-			'description' => ''
+			'description' => '',
+			'tls_accept' => 0,
+			'tls_connect' => 0,
+			'tls_issuer' => '',
+			'tls_psk' => '',
+			'tls_psk_identity' => '',
+			'tls_subject' => ''
 		);
 
 		// get values from the dabatase
@@ -84,7 +96,7 @@ class CControllerProxyEdit extends CController {
 			$data['proxyid'] = $this->getInput('proxyid');
 
 			$proxies = API::Proxy()->get(array(
-				'output' => array('host', 'status', 'description'),
+				'output' => array('host', 'status', 'description', 'tls_accept', 'tls_connect', 'tls_issuer', 'tls_psk', 'tls_psk_identity', 'tls_subject'),
 				'selectHosts' => array('hostid'),
 				'selectInterface' => array('interfaceid', 'dns', 'ip', 'useip', 'port'),
 				'proxyids' => $data['proxyid']
@@ -93,6 +105,12 @@ class CControllerProxyEdit extends CController {
 
 			$data['host'] = $proxy['host'];
 			$data['status'] = $proxy['status'];
+			$data['tls_accept'] = $proxy['tls_accept'];
+			$data['tls_connect'] = $proxy['tls_connect'];
+			$data['tls_issuer'] = $proxy['tls_issuer'];
+			$data['tls_psk'] = $proxy['tls_psk'];
+			$data['tls_psk_identity'] = $proxy['tls_psk_identity'];
+			$data['tls_subject'] = $proxy['tls_subject'];
 			if ($data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 				$data['interfaceid'] = $proxy['interface']['interfaceid'];
 				$data['dns'] = $proxy['interface']['dns'];
@@ -113,6 +131,12 @@ class CControllerProxyEdit extends CController {
 		$data['port'] = $this->getInput('port', $data['port']);
 		$data['proxy_hostids'] = $this->getInput('proxy_hostids', $data['proxy_hostids']);
 		$data['description'] = $this->getInput('description', $data['description']);
+		$data['tls_accept'] = $this->getInput('tls_accept', $data['tls_accept']);
+		$data['tls_connect'] = $this->getInput('tls_connect', $data['tls_connect']);
+		$data['tls_issuer'] = $this->getInput('tls_issuer', $data['tls_issuer']);
+		$data['tls_psk'] = $this->getInput('tls_psk', $data['tls_psk']);
+		$data['tls_psk_identity'] = $this->getInput('tls_psk_identity', $data['tls_psk_identity']);
+		$data['tls_subject'] = $this->getInput('tls_subject', $data['tls_subject']);
 
 		if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && $this->hasInput('interfaceid')) {
 			$data['interfaceid'] = $this->getInput('interfaceid');
