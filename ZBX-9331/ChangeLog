@@ -1,7 +1,7 @@
 Changes for 2.5.0
 
 New features:
-.......PS. [ZBXNEXT-866] fixed error messages to display IP address for connections between server and proxy (igors)
+.......PS. [ZBXNEXT-866] added IP address in the messages about connections between server and proxy (igors)
 A......... [ZBXNEXT-2724] removed deprecated all "exists" and "getObjects" API methods, "expandData" parameter in various *.get methods and "selectHosts" parameter from application.get method (Ivo)
 ..F....... [ZBXNEXT-2357] added MVC framework, some pages already take advantage of the framework (Alexei, Sasha)
 ...GI..PS. [ZBXNEXT-444] improved log file monitoring by saving log file meta information which was previously lost during agent restart (dimir)
@@ -27,6 +27,8 @@ A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent, updated outdated
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
+...G...... [ZBX-8513] changed vm.memory.size[available] key on AIX to return the sum of free and cached memory (wiper)
 ...G...PS. [ZBX-8993] added check for a valid reference of a global regular expression for snmptrap[], log[], logrt[] and eventlog[] items and logeventid(), regexp() and iregexp() trigger functions (igors)
 ..F....... [ZBX-8698] fixed "Unlink and clear" button being displayed when cloning or full cloning host or template and fixed spacing between "Name" and "Action" in "Linked templates" block in template edit form (Ivo, Krists)
 ..F....... [ZBX-9018] fixed updating of "config" table in Administration -> General pages (Oleg, Sasha)
@@ -67,8 +69,15 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 Changes for 2.4.5rc1
 
 New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-9343] fixed user ID being zero in audit logs for login/logout actions (Ivo)
+..F....... [ZBX-9375] renamed "Latest events" to "Events" in menu popup for trigger map elements and fixed its link not setting corresponding trigger in filter (Ivo)
+...G...PS. [ZBX-9251] added missing socket closing to avoid large number of opened sockets (igors)
+.......PS. [ZBX-9344] fixed infinite looping in telnet.run[] in case there is no password prompt (asaveljevs, dimir)
+..F....... [ZBX-9369] removed validation of DB_ID from user profile for removed medias and fixed incorrect DB_ID validation for arrays in bar reports page (Ivo)
+..F....... [ZBX-9348] fixed possibility to enable/disable LLD trigger (Ivo)
 ..F....... [ZBX-9268] fixed misleading message in discovered object indicator tooltip when deletion date is in the past (Ivo)
 ..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
 ..F....... [ZBX-9286] fixed configuration.import, when trigger expression have a user macro (Oleg)
@@ -92,9 +101,9 @@ A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discov
 
 Bug fixes:
 ...G...PS. [ZBX-9284] added zabbix log file locking to avoid incomplete logging on log file rotation (igors)
-.......PS. [ZBX-591] added interface (SourceIP) for outgoing connection in web monitoring, alerts(Ez Texting), vmware monitoring and simple checks(https services) (igors)
+.......PS. [ZBX-591] added interface (SourceIP) for outgoing connection in web monitoring, alerts (Ez Texting), VMware monitoring and simple checks (HTTPS services) (igors)
 ...G...... [ZBX-9143] improved proc.num under Windows to handle more processes (dimir)
-...G...... [ZBX-9232] fixed incomplete eventlog messages (igors)
+...G...... [ZBX-9232] fixed processing of eventlog messages to avoid incomplete messaging for events which description could not be found (igors)
 ..F....... [ZBX-9257] fixed displaying missing history links in trigger context menu (Ivo)
 ..F....... [ZBX-9257] added missing host prefix before items in trigger context menu if trigger belongs to multiple hosts (Ivo)
 ..F....... [ZBX-9257] changed displaying host list from vertical to horizontal if trigger belongs to multiple hosts in Monitoring->Trigger status page (Ivo)
@@ -652,12 +661,13 @@ New features:
 A.F....... [ZBX-1357] updated Japanese, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9344] fixed infinite looping in telnet.run[] in case there is no password prompt (asaveljevs, dimir)
 ..F....... [ZBX-9281] fixed undefined offset in template screens when resource is URL (Ivo)
 ..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
 ...G...... [ZBX-9283] improved proc_info item (Windows only) to get more information about the processes (dimir)
 ...G...PS. [ZBX-9284] added zabbix log file locking to avoid incomplete logging on log file rotation (igors)
 ...G...... [ZBX-9143] improved proc.num under Windows to handle more processes (dimir)
-...G...... [ZBX-9232] fixed incomplete eventlog messages (igors)
+...G...... [ZBX-9232] fixed processing of eventlog messages to avoid incomplete messaging for events which description could not be found (igors)
 ........S. [ZBX-9285] fixed memory leak when processing host prototypes (Sasha)
 .......PS. [ZBX-9279] optimized VMware requests to reduce amount of transferred data (wiper)
 ..F....... [ZBX-9087] fixed DB_ID validation expression to properly validate upper bound of received value and fixed various front-end forms not properly validating IDs (Krists, Ivo)
@@ -1864,6 +1874,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9344] fixed infinite looping in telnet.run[] in case there is no password prompt (asaveljevs, dimir)
 ..F....... [ZBX-9281] fixed undefined offset in template screens when resource is URL (Ivo)
 ..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
 ...G...PS. [ZBX-9284] added zabbix log file locking to avoid incomplete logging on log file rotation (igors)
