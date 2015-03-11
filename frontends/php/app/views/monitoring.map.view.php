@@ -35,7 +35,7 @@ if ($data['maps']) {
 	$controls = new CList();
 	$headerMapForm->addVar('action', 'map.view');
 	$headerMapForm->addVar('fullscreen', $data['fullscreen']);
-	$controls->addItem(array(_('Maps').SPACE, $mapComboBox));
+	$controls->addItem(array(_('Map').SPACE, $mapComboBox));
 
 	$controls->addItem(array(_('Minimum severity').SPACE, $data['pageFilter']->getSeveritiesMinCB()));
 
