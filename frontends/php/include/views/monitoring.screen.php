@@ -21,7 +21,10 @@
 
 $screenWidget = new CWidget();
 $screenWidget->setTitle(_('Screens'));
-$screenWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.screens.filter.state', 1));
+
+$formFilter = new CFilter('web.screens.filter.state');
+$formFilter->addNavigator();
+$screenWidget->addItem($formFilter);
 
 // header form
 $configComboBox = new CComboBox('config', 'screens.php', 'javascript: redirect(this.options[this.selectedIndex].value);');

@@ -31,8 +31,6 @@ $controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsC
 $controls->addItem(array(_('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 $controls->addItem(array(_('Graph').SPACE, $this->data['pageFilter']->getGraphsCB()));
 
-$chartsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.charts.filter.state', 1));
-
 if ($this->data['graphid']) {
 	$controls->addItem(get_icon('favourite', array('fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid'])));
 	$controls->addItem(get_icon('reset', array('id' => $this->data['graphid'])));
@@ -44,6 +42,10 @@ else {
 
 $chartForm->addItem($controls);
 $chartsWidget->setControls($chartForm);
+
+$filterForm = new CFilter('web.charts.filter.state');
+$filterForm->addNavigator();
+$chartsWidget->addItem($filterForm);
 
 if (!empty($this->data['graphid'])) {
 	// append chart to widget

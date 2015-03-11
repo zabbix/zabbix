@@ -326,13 +326,9 @@ else {
 	$frmForm->addItem($controls);
 	$eventsWidget->setControls($frmForm);
 
-	$filterForm = null;
+	$filterForm = new CFilter('web.events.filter.state');
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
-		$filterForm = new CFormTable(null, null, 'get');
-		$filterForm->setTableClass('formtable old-filter');
-		$filterForm->setAttribute('name', 'zbx_filter');
-		$filterForm->setAttribute('id', 'zbx_filter');
 		$filterForm->addVar('triggerid', $triggerId);
 		$filterForm->addVar('stime', $stime);
 		$filterForm->addVar('period', $period);
@@ -359,13 +355,15 @@ else {
 			$trigger = '';
 		}
 
-		$filterForm->addRow(new CRow(array(
-			new CCol(_('Trigger'), 'form_row_l'),
-			new CCol(array(
+		$filterColumn = new CFormList();
+
+		$filterColumn->addRow(
+			_('Trigger'),
+			array(
 				new CTextBox('trigger', $trigger, 96, true),
 				new CButton('btn1', _('Select'),
 					'return PopUp("popup.php?'.
-						'dstfrm='.$filterForm->getName().
+						'dstfrm=zbx_filter'.
 						'&dstfld1=triggerid'.
 						'&dstfld2=trigger'.
 						'&srctbl=triggers'.
@@ -375,21 +373,17 @@ else {
 						'&monitored_hosts=1'.
 						'&with_monitored_triggers=1'.
 						($pageFilter->hostid ? '&only_hostid='.$pageFilter->hostid : '').
-						'");',
-					'button-form'
+						'");'
 				)
-			), 'form_row_r')
-		)));
+			)
+		);
 
-		$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
-		$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
+		$filterForm->addColumn($filterColumn);
 	}
 
-	$eventsWidget->addFlicker($filterForm, CProfile::get('web.events.filter.state', 0));
+	$filterForm->addNavigator();
 
-	$scroll = new CDiv();
-	$scroll->setAttribute('id', 'scrollbar_cntr');
-	$eventsWidget->addFlicker($scroll, CProfile::get('web.events.filter.state', 0));
+	$eventsWidget->addItem($filterForm);
 
 	$table = new CTableInfo();
 }
