@@ -394,7 +394,7 @@ else {
 		'selectItems' => array('itemid', 'type', 'hostid', 'key_', 'status', 'flags'),
 		'selectFunctions' => array('functionid', 'itemid', 'function', 'parameter'),
 		'selectDependencies' => array('triggerid', 'description'),
-		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
+		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
 	));
 	order_result($data['triggers'], $sortField, $sortOrder);
 
