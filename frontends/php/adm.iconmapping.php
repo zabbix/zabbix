@@ -104,7 +104,7 @@ elseif (isset($_REQUEST['clone'])) {
  * Display
  */
 $iconMapWidget = new CWidget();
-$iconMapWidget->setTitle(_('Configuration of icon mapping'));
+$iconMapWidget->setTitle(_('Icon mapping'));
 
 $generalComboBox = new CComboBox('configDropDown', 'adm.iconmapping.php', 'redirect(this.options[this.selectedIndex].value);');
 $generalComboBox->addItems(array(
@@ -175,8 +175,6 @@ if (isset($_REQUEST['form'])) {
 	$iconMapView = new CView('administration.general.iconmap.edit', $data);
 }
 else {
-	$iconMapWidget->addHeader(_('Icon mapping'));
-
 	$data['iconmaps'] = API::IconMap()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,

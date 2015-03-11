@@ -151,7 +151,7 @@ if (hasRequest('update')) {
  * Display
  */
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->setTitle(_('Configuration of macros'));
+$cnf_wdgt->setTitle(_('Macros'));
 
 $form = new CForm();
 $form->cleanItems();
