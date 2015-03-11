@@ -66,7 +66,8 @@ class CValidationRule {
 									&& !$this->parseFatal($buffer, $pos, $rule)			// fatal
 									&& !$this->parseDB($buffer, $pos, $rule)			// db
 									&& !$this->parseArrayId($buffer, $pos, $rule)		// array_id
-									&& !$this->parseArrayDB($buffer, $pos, $rule)) {	// array_db
+									&& !$this->parseArrayDB($buffer, $pos, $rule)		// array_db
+									&& !$this->parseArray($buffer, $pos, $rule)) {		// array
 
 								// incorrect validation rule
 								break 3;
@@ -107,6 +108,22 @@ class CValidationRule {
 		}
 
 		return $rules;
+	}
+
+	/**
+	 * array
+	 *
+	 * 'array' => true
+	 */
+	private function parseArray($buffer, &$pos, &$rule) {
+		if (0 != strncmp(substr($buffer, $pos), 'array', 5)) {
+			return false;
+		}
+
+		$pos += 5;
+		$rule['array'] = true;
+
+		return true;
 	}
 
 	/**
