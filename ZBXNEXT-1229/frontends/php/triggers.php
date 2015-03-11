@@ -453,37 +453,31 @@ else {
 		order_result($data['triggers'], $sortField, $sortOrder);
 	}
 
-	$dependencyIds = array();
+	$depTriggerIds = array();
 	foreach ($data['triggers'] as $trigger) {
 		foreach ($trigger['dependencies'] as $depTrigger) {
-			$dependencyIds[$depTrigger['triggerid']] = $depTrigger['triggerid'];
+			$depTriggerIds[$depTrigger['triggerid']] = true;
 		}
 	}
 
 	$dependencyTriggers = array();
-	if ($dependencyIds) {
+	if ($depTriggerIds) {
 		$dependencyTriggers = API::Trigger()->get(array(
-			'triggerids' => $dependencyIds,
-			'output' => array('triggerid', 'flags', 'description', 'status'),
+			'output' => array('triggerid', 'description', 'status', 'flags'),
 			'selectHosts' => array('hostid', 'name'),
+			'triggerids' => array_keys($depTriggerIds),
 			'preservekeys' => true
 		));
 
-		// sort dependencies
 		foreach ($data['triggers'] as &$trigger) {
-			if (count($trigger['dependencies']) > 1) {
-				order_result($trigger['dependencies'], 'description', ZBX_SORT_UP);
-			}
+			order_result($trigger['dependencies'], 'description', ZBX_SORT_UP);
 		}
 		unset($trigger);
 
-		// sort dependency trigger hosts
-		foreach ($dependencyTriggers as &$trigger) {
-			if (count($dependencyTriggers[$trigger['triggerid']]['hosts']) > 1) {
-				order_result($dependencyTriggers[$trigger['triggerid']]['hosts'], 'name', ZBX_SORT_UP);
-			}
+		foreach ($dependencyTriggers as &$dependencyTrigger) {
+			order_result($dependencyTrigger['hosts'], 'name', ZBX_SORT_UP);
 		}
-		unset($trigger);
+		unset($dependencyTrigger);
 	}
 
 	$data['dependencyTriggers'] = $dependencyTriggers;
