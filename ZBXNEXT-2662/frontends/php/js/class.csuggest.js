@@ -388,6 +388,7 @@ showSuggests: function(){
 	}
 
 	this.dom.suggest.style.display = 'block';
+	this.dom.suggest.style.position = 'fixed';
 },
 
 hideSuggests: function(){

@@ -24,6 +24,7 @@ class CFilter extends CTag {
 	private $filterid;
 	private $columns = array();
 	private $form;
+	private $navigator = false;
 
 	public function __construct($filterid) {
 		parent::__construct('div', 'yes');
@@ -42,6 +43,10 @@ class CFilter extends CTag {
 
 	public function addColumn($column) {
 		$this->columns[] = $column;
+	}
+
+	public function addNavigator() {
+		$this->navigator = true;
 	}
 
 	public function addVar($name, $value) {
@@ -72,6 +77,10 @@ class CFilter extends CTag {
 	}
 
 	private function getButtons() {
+		if (count($this->columns) == 0) {
+			return null;
+		}
+
 		$buttons = new CDiv(null, 'filter-forms');
 
 		$url = new cUrl();
@@ -98,7 +107,12 @@ class CFilter extends CTag {
 
 	public function endToString() {
 		$this->form->addItem($this->getTable());
+
 		$this->form->addItem($this->getButtons());
+
+		if($this->navigator) {
+			$this->form->addItem(new CDiv(null, null, 'scrollbar_cntr'));
+		}
 
 		$ret = $this->form->toString();
 

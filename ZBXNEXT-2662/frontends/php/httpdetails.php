@@ -249,8 +249,10 @@ echo BR();
 
 // create graphs widget
 $graphsWidget = new CWidget();
-$graphsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.httpdetails.filter.state', 0));
-$graphsWidget->addItem(SPACE);
+
+$filterForm = new CFilter('web.httpdetails.filter.state');
+$filterForm->addNavigator();
+$graphsWidget->addItem($filterForm);
 
 $graphTable = new CTableInfo();
 $graphTable->setAttribute('id', 'graph');
