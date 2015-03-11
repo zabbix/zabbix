@@ -185,6 +185,17 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					)
 				)
 			),
+			array('array', '',
+				array(
+					'array' => true
+				)
+			),
+			array('array|required', '',
+				array(
+					'array' => true,
+					'required' => true
+				)
+			),
 			array('in graphid,itemid,screenid,slideshowid,sysmapid|fatal|required', '',
 				array(
 					'in' => array('graphid', 'itemid', 'screenid', 'slideshowid', 'sysmapid'),

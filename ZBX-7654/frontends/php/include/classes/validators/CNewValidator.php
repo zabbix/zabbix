@@ -73,6 +73,18 @@ class CNewValidator {
 		foreach ($rules as $rule => $params) {
 			switch ($rule) {
 				/*
+				 * 'array' => true
+				 */
+				case 'array':
+					if (array_key_exists($field, $this->input) && !is_array($this->input[$field])) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": an array is expected.', $field)
+						);
+						return false;
+					}
+					break;
+
+				/*
 				 * 'array_db' => array(
 				 *     'table' => <table_name>,
 				 *     'field' => <field_name>
