@@ -244,28 +244,29 @@ elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])
 		}
 	}
 }
-elseif (hasRequest('action') && getRequest('action') == 'trigger.massupdate' && hasRequest('massupdate') && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
+		&& hasRequest('massupdate') && hasRequest('g_triggerid')) {
+	$result = true;
 	$visible = getRequest('visible', array());
 
-	// update triggers
-	$triggersToUpdate = array();
-	foreach (getRequest('g_triggerid') as $triggerid) {
-		$trigger = array('triggerid' => $triggerid);
+	if ($visible) {
+		$triggersToUpdate = array();
 
-		if (isset($visible['priority'])) {
-			$trigger['priority'] = getRequest('priority');
-		}
-		if (isset($visible['dependencies'])) {
-			$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', array()), 'triggerid');
+		foreach (getRequest('g_triggerid') as $triggerid) {
+			$trigger = array('triggerid' => $triggerid);
+
+			if (isset($visible['priority'])) {
+				$trigger['priority'] = getRequest('priority');
+			}
+			if (isset($visible['dependencies'])) {
+				$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', array()), 'triggerid');
+			}
+
+			$triggersToUpdate[] = $trigger;
 		}
 
-		$triggersToUpdate[] = $trigger;
+		$result = (bool) API::Trigger()->update($triggersToUpdate);
 	}
-
-	DBstart();
-
-	$result = API::Trigger()->update($triggersToUpdate);
-	$result = DBend($result);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['g_triggerid']);
