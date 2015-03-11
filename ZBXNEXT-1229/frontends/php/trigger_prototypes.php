@@ -167,7 +167,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'status' => getRequest('status'),
 		'comments' => getRequest('comments'),
 		'url' => getRequest('url'),
-		'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
 		'dependencies' => zbx_toObject(getRequest('dependencies', array()), 'triggerid')
 	);
 
@@ -175,22 +174,26 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		// Update only changed fields.
 
 		$oldTriggerPrototype = API::TriggerPrototype()->get(array(
-			'output' => array('triggerid'),
-			'triggerids' => getRequest('triggerid'),
-			'selectDependencies' => array('triggerid')
+			'output' => array(
+				'expression', 'description', 'priority', 'status', 'type', 'comments', 'url', 'dependencies'
+			),
+			'selectDependencies' => array('triggerid'),
+			'triggerids' => getRequest('triggerid')
 		));
 		if (!$oldTriggerPrototype) {
 			access_deny();
 		}
 
 		$oldTriggerPrototype = reset($oldTriggerPrototype);
-		$oldTriggerPrototype['dependencies'] = zbx_toHash(zbx_objectValues($oldTriggerPrototype['dependencies'], 'triggerid'));
+		$oldTriggerPrototype['dependencies'] = zbx_toHash(
+			zbx_objectValues($oldTriggerPrototype['dependencies'], 'triggerid')
+		);
+		$oldTriggerPrototype['expression'] = explode_exp($oldTriggerPrototype['expression']);
 
 		$newDependencies = $trigger['dependencies'];
 		$oldDependencies = $oldTriggerPrototype['dependencies'];
 
-		unset($trigger['dependencies']);
-		unset($oldTriggerPrototype['dependencies']);
+		unset($trigger['dependencies'], $oldTriggerPrototype['dependencies']);
 
 		$triggerToUpdate = array_diff_assoc($trigger, $oldTriggerPrototype);
 		$triggerToUpdate['triggerid'] = getRequest('triggerid');
@@ -216,6 +219,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		show_messages($result, _('Trigger prototype updated'), _('Cannot update trigger prototype'));
 	}
 	else {
+		$trigger['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+
 		$result = API::TriggerPrototype()->create($trigger);
 
 		show_messages($result, _('Trigger prototype added'), _('Cannot add trigger prototype'));

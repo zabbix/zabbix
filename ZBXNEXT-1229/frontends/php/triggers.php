@@ -167,10 +167,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if (hasRequest('update')) {
 		// update only changed fields
+
 		$oldTrigger = API::Trigger()->get(array(
-			'triggerids' => getRequest('triggerid'),
-			'output' => API_OUTPUT_EXTEND,
-			'selectDependencies' => array('triggerid')
+			'output' => array(
+				'expression', 'description', 'priority', 'status', 'type', 'comments', 'url', 'dependencies'
+			),
+			'selectDependencies' => array('triggerid'),
+			'triggerids' => getRequest('triggerid')
 		));
 		if (!$oldTrigger) {
 			access_deny();
@@ -178,11 +181,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$oldTrigger = reset($oldTrigger);
 		$oldTrigger['dependencies'] = zbx_toHash(zbx_objectValues($oldTrigger['dependencies'], 'triggerid'));
+		$oldTrigger['expression'] = explode_exp($oldTrigger['expression']);
 
 		$newDependencies = $trigger['dependencies'];
 		$oldDependencies = $oldTrigger['dependencies'];
-		unset($trigger['dependencies']);
-		unset($oldTrigger['dependencies']);
+
+		unset($trigger['dependencies'], $oldTrigger['dependencies']);
 
 		$triggerToUpdate = array_diff_assoc($trigger, $oldTrigger);
 		$triggerToUpdate['triggerid'] = getRequest('triggerid');
@@ -202,11 +206,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if ($updateDepencencies) {
 			$triggerToUpdate['dependencies'] = $newDependencies;
 		}
+
 		$result = API::Trigger()->update($triggerToUpdate);
+
 		show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 	}
 	else {
 		$result = API::Trigger()->create($trigger);
+
 		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 	}
 
