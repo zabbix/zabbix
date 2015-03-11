@@ -45,32 +45,44 @@ class CXmlValidator {
 	 * @param array $data	import data
 	 */
 	public function validate($data) {
+		$this->validateZabbixExport($data);
 		$this->validateMainParameters($data);
 		$this->validateVersion($data);
 		$this->validateByVersion($data);
 	}
 
 	/**
-	 * Validate main zabbix_export parameter.
+	 * Validate zabbix_export parameter.
+	 *
+	 * @param array $data	import data
+	 *
+	 * @throws Exception	if the data is invalid
+	 */
+	private function validateZabbixExport($data) {
+		$validator = new CNewValidator($data, array('zabbix_export' =>	'required|array'));
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception($errors[0]);
+		}
+	}
+
+	/**
+	 * Validate main zabbix_export parameters.
 	 *
 	 * @param array $data	import data
 	 *
 	 * @throws Exception	if the data is invalid
 	 */
 	private function validateMainParameters($data) {
-		if (isset($data['zabbix_export']) && is_array($data['zabbix_export'])) {
-			$validationRules = array(
-				'version' =>	'required|string',
-				'date' =>		'required|string',
-				'time' =>		'required|string'
-			);
-			$validator = new CNewValidator($data['zabbix_export'], $validationRules);
-			foreach ($validator->getAllErrors() as $error) {
-				throw new Exception($error);
-			}
-		}
-		else {
-			throw new Exception(_s('Not valid Zabbix export data format.'));
+		$validationRules = array(
+			'version' =>	'required|string',
+			'date' =>		'required|string',
+			'time' =>		'required|string'
+		);
+		$validator = new CNewValidator($data['zabbix_export'], $validationRules);
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "zabbix_export": %1$s', $errors[0]));
 		}
 	}
 

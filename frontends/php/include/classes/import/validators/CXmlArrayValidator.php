@@ -25,6 +25,7 @@
 class CXmlArrayValidator {
 
 	private $error;
+	private $errorSeqNum;
 
 	public function validate($name, array $array) {
 		$i = 0;
@@ -35,6 +36,7 @@ class CXmlArrayValidator {
 
 			if ($key !== $validKey) {
 				$this->error = _s('unexpected tag "%1$s"', $key);
+				$this->errorSeqNum = $i++;
 				break;
 			}
 
@@ -43,11 +45,20 @@ class CXmlArrayValidator {
 	}
 
 	/**
-	 * Returns array of error messages.
+	 * Returns error message.
 	 *
-	 * @return array
+	 * @return string
 	 */
 	public function getError() {
 		return $this->error;
+	}
+
+	/**
+	 * Returns the sequence number of the problem element.
+	 *
+	 * @return string
+	 */
+	public function getErrorSeqNum() {
+		return $this->errorSeqNum;
 	}
 }
