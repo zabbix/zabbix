@@ -123,7 +123,7 @@ catch (Exception $e) {
  * Display
  */
 $valueMapWidget = new CWidget();
-$valueMapWidget->setTitle(_('Configuration of value mapping'));
+$valueMapWidget->setTitle(_('Value mapping'));
 
 $generalComboBox = new CComboBox('configDropDown', 'adm.valuemapping.php', 'redirect(this.options[this.selectedIndex].value);');
 $generalComboBox->addItems(array(
@@ -199,9 +199,6 @@ else {
 	$data = array(
 		'valuemaps' => array()
 	);
-
-	$valueMapWidget->addHeader(_('Value mapping'));
-	$valueMapWidget->addItem(BR());
 
 	$dbValueMaps = DBselect('SELECT v.valuemapid,v.name FROM valuemaps v');
 
