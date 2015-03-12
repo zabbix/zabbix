@@ -54,33 +54,34 @@ AC_HELP_STRING([--with-polarssl@<:@=DIR@:>@],[use PolarSSL package @<:@default=n
 
   if test "x$want_polarssl" = "xyes"; then
      AC_MSG_CHECKING(for PolarSSL support)
+
      if test "x$_libpolarssl_dir" = "xno"; then
-       if test -f /usr/include/polarssl/ssl.h; then
-         POLARSSL_CFLAGS=-I/usr/include/polarssl
-         POLARSSL_LDFLAGS=-L/usr/lib
-         POLARSSL_LIBS="-lpolarssl"
-         found_polarssl="yes"
-       elif test -f /usr/local/include/polarssl/ssl.h; then
-         POLARSSL_CFLAGS=-I/usr/local/include/polarssl
+       if test -f /usr/local/include/polarssl/ssl.h; then
+         POLARSSL_CFLAGS=-I/usr/local/include
          POLARSSL_LDFLAGS=-L/usr/local/lib
          POLARSSL_LIBS="-lpolarssl"
          found_polarssl="yes"
-       else #libraries are not found in default directories
+       elif test -f /usr/include/polarssl/ssl.h; then
+         POLARSSL_CFLAGS=-I/usr/include
+         POLARSSL_LDFLAGS=-L/usr/lib
+         POLARSSL_LIBS="-lpolarssl"
+         found_polarssl="yes"
+       else			# libraries are not found in default directories
          found_polarssl="no"
          AC_MSG_RESULT(no)
-       fi # test -f /usr/include/polarssl/ssl.h; then
-     else # test "x$_libpolarssl_dir" = "xno"; then
+       fi
+     else
        if test -f $_libpolarssl_dir/include/polarssl/ssl.h; then
-	 POLARSSL_CFLAGS=-I$_libpolarssl_dir/include/polarssl
+	 POLARSSL_CFLAGS=-I$_libpolarssl_dir/include
          POLARSSL_LDFLAGS=-L$_libpolarssl_dir/lib
          POLARSSL_LIBS="-lpolarssl"
          found_polarssl="yes"
-       else #if test -f $_libpolarssl_dir/include/polarssl/ssl.h; then
+       else
          found_polarssl="no"
          AC_MSG_RESULT(no)
-       fi #test -f $_libpolarssl_dir/include/polarssl/ssl.h; then
-     fi #if test "x$_libpolarssl_dir" = "xno"; then
-  fi # if test "x$want_polarssl" = "xyes"; then
+       fi
+     fi
+  fi
 
   if test "x$found_polarssl" = "xyes"; then
     am_save_cflags="$CFLAGS"
