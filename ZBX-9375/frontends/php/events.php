@@ -744,9 +744,15 @@ else {
 
 			// fetch hosts
 			$hosts = array();
-			foreach ($triggers as $trigger) {
+			foreach ($triggers as &$trigger) {
 				$hosts[] = reset($trigger['hosts']);
+
+				// Add already filtered read and read-write 'groupid' and 'hostid' to pass to menu pop-up "Events" link.
+				$trigger['groupid'] = $pageFilter->groupid;
+				$trigger['hostid'] = $pageFilter->hostid;
 			}
+			unset($trigger);
+
 			$hostids = zbx_objectValues($hosts, 'hostid');
 
 			$hosts = API::Host()->get(array(

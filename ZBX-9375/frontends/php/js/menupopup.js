@@ -570,6 +570,8 @@ function getMenuPopupServiceConfiguration(options) {
  * Get menu popup trigger section data.
  *
  * @param string options['triggerid']				trigger id
+ * @param string options['groupid']					group id
+ * @param string options['hostid']					host id
  * @param object options['items']					link to trigger item history page (optional)
  * @param string options['items'][]['name']			item name
  * @param object options['items'][]['params']		item url parameters ("name" => "value")
@@ -587,7 +589,9 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?filter_set=1&source=0&triggerid=' + options.triggerid);
+	var url = new Curl('events.php?filter_set=1&source=0&groupid=' + options.groupid + '&hostid=' + options.hostid +
+		'&triggerid=' + options.triggerid
+	);
 	if (typeof options.eventTime !== 'undefined') {
 		url.setArgument('nav_time', options.eventTime);
 	}
