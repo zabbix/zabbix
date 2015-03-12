@@ -129,7 +129,7 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 	foreach ($triggers as $trigger) {
 		foreach ($trigger['hosts'] as $host) {
 			if ($host['status'] == HOST_STATUS_MONITORED) {
-				$monitoredHostIds[$host['hostid']] = $host['hostid'];
+				$monitoredHostIds[$host['hostid']] = true;
 			}
 		}
 	}
@@ -138,7 +138,7 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 		$monitoredHosts = API::Host()->get(array(
 			'output' => array('hostid'),
 			'selectGroups' => array('groupid'),
-			'hostids' => $monitoredHostIds,
+			'hostids' => array_keys($monitoredHostIds),
 			'preservekeys' => true
 		));
 	}

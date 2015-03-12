@@ -148,7 +148,7 @@ $monitoredHostIds = array();
 foreach ($triggers as $trigger) {
 	foreach ($trigger['hosts'] as $host) {
 		if ($host['status'] == HOST_STATUS_MONITORED) {
-			$monitoredHostIds[$host['hostid']] = $host['hostid'];
+			$monitoredHostIds[$host['hostid']] = true;
 		}
 	}
 }
@@ -157,7 +157,7 @@ if ($monitoredHostIds) {
 	$monitoredHosts = API::Host()->get(array(
 		'output' => array('hostid'),
 		'selectGroups' => array('groupid'),
-		'hostids' => $monitoredHostIds,
+		'hostids' => array_keys($monitoredHostIds),
 		'preservekeys' => true
 	));
 }
