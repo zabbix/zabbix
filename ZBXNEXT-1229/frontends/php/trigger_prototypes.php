@@ -162,11 +162,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$trigger = array(
 		'expression' => getRequest('expression'),
 		'description' => getRequest('description'),
-		'type' => getRequest('type'),
-		'priority' => getRequest('priority'),
-		'status' => getRequest('status'),
-		'comments' => getRequest('comments'),
 		'url' => getRequest('url'),
+		'status' => getRequest('status'),
+		'priority' => getRequest('priority'),
+		'comments' => getRequest('comments'),
+		'type' => getRequest('type'),
 		'dependencies' => zbx_toObject(getRequest('dependencies', array()), 'triggerid')
 	);
 
@@ -175,7 +175,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$oldTriggerPrototype = API::TriggerPrototype()->get(array(
 			'output' => array(
-				'expression', 'description', 'priority', 'status', 'type', 'comments', 'url', 'dependencies'
+				'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'
 			),
 			'selectDependencies' => array('triggerid'),
 			'triggerids' => getRequest('triggerid')

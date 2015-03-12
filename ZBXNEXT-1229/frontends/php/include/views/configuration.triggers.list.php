@@ -121,7 +121,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	}
 
 	if ($trigger['dependencies']) {
-		$description[] = array(BR(), bold(_('Depends on').NAME_DELIMITER));
+		$description[] = array(BR(), bold(_('Depends on').':'));
 		$triggerDependencies = array();
 
 		foreach ($trigger['dependencies'] as $dependency) {

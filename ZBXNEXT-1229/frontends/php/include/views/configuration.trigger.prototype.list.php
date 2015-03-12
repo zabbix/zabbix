@@ -105,7 +105,7 @@ foreach ($this->data['triggers'] as $trigger) {
 	);
 
 	if ($trigger['dependencies']) {
-		$description[] = array(BR(), bold(_('Depends on').NAME_DELIMITER));
+		$description[] = array(BR(), bold(_('Depends on').':'));
 		$triggerDependencies = array();
 
 		foreach ($trigger['dependencies'] as $dependency) {
@@ -118,8 +118,8 @@ foreach ($this->data['triggers'] as $trigger) {
 			if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$triggerDependencies[] = new CLink(
 					$depTriggerDescription,
-					'trigger_prototypes.php?form=update'.url_param('parent_discoveryid')
-					.'&triggerid='.$depTrigger['triggerid'],
+					'trigger_prototypes.php?form=update'.url_param('parent_discoveryid').
+						'&triggerid='.$depTrigger['triggerid'],
 					triggerIndicatorStyle($depTrigger['status'])
 				);
 			}
