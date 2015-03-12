@@ -33,14 +33,14 @@ class C10XmlValidator {
 		$this->validateDateTimeFormat($content['date'], $content['time']);
 
 		// prepare content
-		$arrayKeys = array('hosts', 'dependencies');
+		$arrayKeys = array('hosts', 'dependencies', 'screens');
 		$newArray = new CXmlValidatorConverters();
 		$content = $newArray->convertEmpStrToArr($arrayKeys, $content);
 
 		$this->validateHosts($content);
 		$this->validateTriggerDependencies($content);
 //		$this->validateSysmaps($content);
-//		$this->validateScreens($content);
+		$this->validateScreens($content);
 	}
 
 	/**
@@ -560,12 +560,128 @@ class C10XmlValidator {
 				$arrayValidator->validate('depends', $dependency);
 
 				if ($arrayValidator->getError()) {
-					throw new Exception(_s('Cannot parse XML tag "zabbix_export/dependencies/dependency(%1$s)/depends(%2$s)": %3$s.',
+					throw new Exception(_s(
+						'Cannot parse XML tag "zabbix_export/dependencies/dependency(%1$s)/depends(%2$s)": %3$s.',
 						$dependencyNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError()
 					));
 				}
 
 				$dependencyNumber++;
+			}
+		}
+	}
+
+	/**
+	 * Main screen validation.
+	 *
+	 * @param array $content	import data
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	private function validateScreens($content) {
+		if (array_key_exists('screens', $content)) {
+			if ($content['screens']) {
+				$arrayValidator = new CXmlArrayValidator();
+				$arrayValidator->validate('screen', $content['screens']);
+
+				if ($arrayValidator->getError()) {
+					throw new Exception(_s('Cannot parse XML tag "zabbix_export/screens/screen(%1$s)": %2$s.',
+						$arrayValidator->getErrorSeqNum(), $arrayValidator->getError()
+					));
+				}
+
+				$screenNumber = 1;
+				foreach ($content['screens'] as $screen) {
+					$arrayKeys = array('screenitems');
+					$newArray = new CXmlValidatorConverters();
+					$screen = $newArray->convertEmpStrToArr($arrayKeys, $screen);
+
+					$validationRules = array(
+						'name' =>			'required|string',
+						'hsize' =>			'required|string',
+						'vsize' =>			'required|string',
+						'screenitems' =>	'required|array'
+					);
+
+					$validator = new CNewValidator($screen, $validationRules);
+
+					if ($validator->isError()) {
+						$errors = $validator->getAllErrors();
+						throw new Exception(_s('Cannot parse XML tag "zabbix_export/screens/screen(%1$s)": %2$s',
+							$screenNumber, $errors[0]
+						));
+					}
+
+					// unexpected tag validation
+					$arrayDiff = array_diff_key($screen, $validator->getValidInput());
+					if ($arrayDiff) {
+						throw new Exception(_s(
+							'Cannot parse XML tag "zabbix_export/screens/screen(%1$s)": unexpected tag "%2$s".',
+							$screenNumber, key($arrayDiff)
+						));
+					}
+
+					// child elements validation
+					$this->validateScreenItems($screen, $screenNumber);
+
+					$screenNumber++;
+				}
+			}
+			else {
+				throw new Exception(_('Incorrect "screen" definition.'));
+			}
+		}
+	}
+
+	/**
+	 * Screen items validation.
+	 *
+	 * @param array $screen			screen data
+	 * @param int	$screenNumber	screen number
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateScreenItems($screen, $screenNumber) {
+		if ($screen['screenitems']) {
+			$arrayValidator = new CXmlArrayValidator();
+			$arrayValidator->validate('screenitem', $screen['screenitems']);
+
+			if ($arrayValidator->getError()) {
+				throw new Exception(_s(
+					'Cannot parse XML tag "zabbix_export/screens/screen(%1$s)/screenitems/screenitem(%2$s)": %3$s.',
+					$screenNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+				);
+			}
+
+			$screenitemNumber = 1;
+			foreach ($screen['screenitems'] as $screenitem) {
+				$validationRules = array(
+					'resourcetype' =>	'required|string',
+					'resourceid' =>		'required',
+					'width' =>			'required|string',
+					'height' =>			'required|string',
+					'x' =>				'required|string',
+					'y' =>				'required|string',
+					'colspan' =>		'required|string',
+					'rowspan' =>		'required|string',
+					'elements' =>		'required|string',
+					'valign' =>			'required|string',
+					'halign' =>			'required|string',
+					'style' =>			'required|string',
+					'dynamic' =>		'required|string'
+				);
+
+				$validator = new CNewValidator($screenitem, $validationRules);
+
+				if ($validator->isError()) {
+					$errors = $validator->getAllErrors();
+					throw new Exception(_s(
+						'Cannot parse XML tag "zabbix_export/screens/screen(%1$s)/screenitems/screenitem(%2$s)": %3$s',
+						$screenNumber, $screenitemNumber, $errors[0]
+					));
+				}
+
+				$screenitemNumber++;
 			}
 		}
 	}
