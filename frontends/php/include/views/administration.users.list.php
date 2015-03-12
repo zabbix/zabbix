@@ -25,11 +25,6 @@ $usersWidget->setTitle(_('Users'));
 $createForm = new CForm('get');
 $createForm->cleanItems();
 $controls = new CList();
-$configurationComboBox = new CComboBox('config', 'users.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-$configurationComboBox->addItem('usergrps.php', _('User groups'));
-$configurationComboBox->addItem('users.php', _('Users'));
-$controls->addItem($configurationComboBox);
-
 $userGroupComboBox = new CComboBox('filter_usrgrpid', $_REQUEST['filter_usrgrpid'], 'submit()');
 $userGroupComboBox->addItem(0, _('All'));
 

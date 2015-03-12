@@ -21,17 +21,6 @@
 $auditWidget = new CWidget();
 $auditWidget->setTitle(_('Audit log'));
 
-// header
-$configForm = new CForm('get');
-$controls = new CList();
-$configComboBox = new CComboBox('config', 'auditlogs.php');
-$configComboBox->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
-$configComboBox->addItem('auditlogs.php', _('Audit log'));
-$configComboBox->addItem('auditacts.php', _('Action log'));
-$controls->addItem($configComboBox);
-$configForm->addItem($controls);
-$auditWidget->setControls($configForm);
-
 // create filter
 $filterForm = new CForm('get');
 $filterForm->setAttribute('name', 'zbx_filter');

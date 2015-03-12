@@ -142,6 +142,21 @@ $ZBX_MENU = array(
 				'sub_pages' => array('popup_period.php', 'popup_bitem.php', 'chart_bar.php')
 			),
 			array(
+				'url' => 'auditlogs.php',
+				'label' => _('Audit'),
+				'user_type' => USER_TYPE_ZABBIX_ADMIN
+			),
+			array(
+				'url' => 'auditacts.php',
+				'label' => _('Action log'),
+				'user_type' => USER_TYPE_ZABBIX_ADMIN
+			),
+			array(
+				'url' => 'report4.php',
+				'label' => _('Notifications'),
+				'user_type' => USER_TYPE_ZABBIX_ADMIN
+			),
+			array(
 				'url' => 'popup.php'
 			),
 			array(
@@ -249,8 +264,11 @@ $ZBX_MENU = array(
 			),
 			array(
 				'url' => 'usergrps.php',
-				'label' => _('Users'),
-				'sub_pages' => array('users.php', 'popup_usrgrp.php')
+				'label' => _('User groups')
+			),
+			array(
+				'url' => 'users.php',
+				'label' => _('Users')
 			),
 			array(
 				'url' => 'zabbix.php',
@@ -265,21 +283,8 @@ $ZBX_MENU = array(
 				'label' => _('Scripts')
 			),
 			array(
-				'url' => 'auditlogs.php',
-				'label' => _('Audit'),
-				'sub_pages' => array('auditacts.php')
-			),
-			array(
 				'url' => 'queue.php',
 				'label' => _('Queue')
-			),
-			array(
-				'url' => 'report4.php',
-				'label' => _('Notifications')
-			),
-			array(
-				'url' => 'setup.php',
-				'label' => _('Installation')
 			)
 		)
 	),
