@@ -64,11 +64,13 @@ if ($zabbixServer->getError()) {
 
 // create filter form
 $form = new CForm('get');
+$controls = new CList();
 $cmbMode = new CComboBox('config', $config, 'submit();');
 $cmbMode->addItem(QUEUE_OVERVIEW, _('Overview'));
 $cmbMode->addItem(QUEUE_OVERVIEW_BY_PROXY, _('Overview by proxy'));
 $cmbMode->addItem(QUEUE_DETAILS, _('Details'));
-$form->addItem($cmbMode);
+$controls->addItem($cmbMode);
+$form->addItem($controls);
 
 // display table
 $queueWidget = new CWidget();
