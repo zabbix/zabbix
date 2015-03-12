@@ -3,6 +3,7 @@ Changes for 2.2.10rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-9368] fixed possible SQL errors when linking of several templates (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.9
