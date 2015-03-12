@@ -31,6 +31,12 @@ class C10XmlValidator {
 	 */
 	public function validate($content) {
 		$this->validateDateTimeFormat($content['date'], $content['time']);
+
+		// prepare content
+		$arrayKeys = array('hosts', 'dependencies');
+		$newArray = new CXmlValidatorConverters();
+		$content = $newArray->convertEmpStrToArr($arrayKeys, $content);
+
 		$this->validateHosts($content);
 //		$this->validateSysmaps($content);
 //		$this->validateScreens($content);
@@ -61,8 +67,8 @@ class C10XmlValidator {
 	 * @throws Exception		if structure or values is invalid
 	 */
 	protected function validateHosts($content) {
-		if (isset($content['hosts'])) {
-			if (is_array($content['hosts']) && $content['hosts']) {
+		if (array_key_exists('hosts', $content)) {
+			if ($content['hosts']) {
 				$arrayValidator = new CXmlArrayValidator();
 				$arrayValidator->validate('host', $content['hosts']);
 
@@ -74,6 +80,10 @@ class C10XmlValidator {
 
 				$hostNumber = 1;
 				foreach ($content['hosts'] as $host) {
+					$arrayKeys = array('triggers', 'items', 'templates', 'graphs', 'macros');
+					$newArray = new CXmlValidatorConverters();
+					$host = $newArray->convertEmpStrToArr($arrayKeys, $host);
+
 					$validationRules = array(
 						'name' =>			'required|string',
 						'proxy_hostid' =>	'required|string',
@@ -90,11 +100,11 @@ class C10XmlValidator {
 						'ipmi_username' =>	'required|string',
 						'ipmi_password' =>	'required|string',
 						'groups' =>			'required|array',
-						'triggers' =>		'required',
-						'items' =>			'required',
-						'templates' =>		'required',
-						'graphs' =>			'required',
-						'macros' =>			'required',
+						'triggers' =>		'required|array',
+						'items' =>			'required|array',
+						'templates' =>		'required|array',
+						'graphs' =>			'required|array',
+						'macros' =>			'required|array',
 						'dependencies' =>	''
 					);
 
@@ -154,83 +164,82 @@ class C10XmlValidator {
 	 * @throws Exception	if structure is invalid
 	 */
 	protected function validateItems($host, $hostNumber) {
-		if ((is_array($host['items']) && $host['items']) || $host['items'] === '') {
-			if ($host['items'] !== '') {
-				$arrayValidator = new CXmlArrayValidator();
-				$arrayValidator->validate('item', $host['items']);
+		if ($host['items']) {
+			$arrayValidator = new CXmlArrayValidator();
+			$arrayValidator->validate('item', $host['items']);
 
-				if ($arrayValidator->getError()) {
-					throw new Exception(_s(
-						'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/items/item(%2$s)": %3$s.',
-						$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
-					);
-				}
-
-				$itemNumber = 1;
-				foreach ($host['items'] as $item) {
-					$validationRules = array(
-						'type' =>					'required|string',
-						'key' =>					'required|string',
-						'value_type' =>				'required|string',
-						'description' =>			'required|string',
-						'ipmi_sensor' =>			'required|string',
-						'delay' =>					'required|string',
-						'history' =>				'required|string',
-						'trends' =>					'required|string',
-						'status' =>					'required|string',
-						'data_type' =>				'required|string',
-						'units' =>					'required|string',
-						'multiplier' =>				'required|string',
-						'delta' =>					'required|string',
-						'formula' =>				'required|string',
-						'lastlogsize' =>			'required|string',
-						'logtimefmt' =>				'required|string',
-						'delay_flex' =>				'required|string',
-						'authtype' =>				'required|string',
-						'username' =>				'required|string',
-						'password' =>				'required|string',
-						'publickey' =>				'required|string',
-						'privatekey' =>				'required|string',
-						'params' =>					'required|string',
-						'trapper_hosts' =>			'required|string',
-						'snmp_community' =>			'required|string',
-						'snmp_oid' =>				'required|string',
-						'snmp_port' =>				'required|string',
-						'snmpv3_securityname' =>	'required|string',
-						'snmpv3_securitylevel' =>	'required|string',
-						'snmpv3_authpassphrase' =>	'required|string',
-						'snmpv3_privpassphrase' =>	'required|string',
-						'valuemapid' =>				'required|string',
-						'applications' =>			'required'
-					);
-
-					$validator = new CNewValidator($item, $validationRules);
-
-					if ($validator->isError()) {
-						$errors = $validator->getAllErrors();
-						throw new Exception(_s(
-							'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/items/item(%2$s)": %3$s',
-							$hostNumber, $itemNumber, $errors[0]
-						));
-					}
-
-					// unexpected tag validation
-					$arrayDiff = array_diff_key($item, $validator->getValidInput());
-					if ($arrayDiff) {
-						throw new Exception(_s(
-							'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/items/item(%2$s)": unexpected tag "%3$s".',
-							$hostNumber, $itemNumber, key($arrayDiff)
-						));
-					}
-
-					$this->validateApplications($item, $hostNumber, $itemNumber);
-
-					$itemNumber++;
-				}
+			if ($arrayValidator->getError()) {
+				throw new Exception(_s(
+					'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/items/item(%2$s)": %3$s.',
+					$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+				);
 			}
-		}
-		else {
-			throw new Exception(_s('Incorrect "items" definition for host "%1$s".', $host['name']));
+
+			$itemNumber = 1;
+			foreach ($host['items'] as $item) {
+				$arrayKeys = array('applications');
+				$newArray = new CXmlValidatorConverters();
+				$item = $newArray->convertEmpStrToArr($arrayKeys, $item);
+
+				$validationRules = array(
+					'type' =>					'required|string',
+					'key' =>					'required|string',
+					'value_type' =>				'required|string',
+					'description' =>			'required|string',
+					'ipmi_sensor' =>			'required|string',
+					'delay' =>					'required|string',
+					'history' =>				'required|string',
+					'trends' =>					'required|string',
+					'status' =>					'required|string',
+					'data_type' =>				'required|string',
+					'units' =>					'required|string',
+					'multiplier' =>				'required|string',
+					'delta' =>					'required|string',
+					'formula' =>				'required|string',
+					'lastlogsize' =>			'required|string',
+					'logtimefmt' =>				'required|string',
+					'delay_flex' =>				'required|string',
+					'authtype' =>				'required|string',
+					'username' =>				'required|string',
+					'password' =>				'required|string',
+					'publickey' =>				'required|string',
+					'privatekey' =>				'required|string',
+					'params' =>					'required|string',
+					'trapper_hosts' =>			'required|string',
+					'snmp_community' =>			'required|string',
+					'snmp_oid' =>				'required|string',
+					'snmp_port' =>				'required|string',
+					'snmpv3_securityname' =>	'required|string',
+					'snmpv3_securitylevel' =>	'required|string',
+					'snmpv3_authpassphrase' =>	'required|string',
+					'snmpv3_privpassphrase' =>	'required|string',
+					'valuemapid' =>				'required|string',
+					'applications' =>			'required|array'
+				);
+
+				$validator = new CNewValidator($item, $validationRules);
+
+				if ($validator->isError()) {
+					$errors = $validator->getAllErrors();
+					throw new Exception(_s(
+						'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/items/item(%2$s)": %3$s',
+						$hostNumber, $itemNumber, $errors[0]
+					));
+				}
+
+				// unexpected tag validation
+				$arrayDiff = array_diff_key($item, $validator->getValidInput());
+				if ($arrayDiff) {
+					throw new Exception(_s(
+						'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/items/item(%2$s)": unexpected tag "%3$s".',
+						$hostNumber, $itemNumber, key($arrayDiff)
+					));
+				}
+
+				$this->validateApplications($item, $hostNumber, $itemNumber);
+
+				$itemNumber++;
+			}
 		}
 	}
 
@@ -243,55 +252,50 @@ class C10XmlValidator {
 	 * @throws Exception	if structure is invalid
 	 */
 	protected function validateTriggers($host, $hostNumber) {
-		if ((is_array($host['triggers']) && $host['triggers']) || $host['triggers'] === '') {
-			if ($host['triggers'] !== '') {
-				$arrayValidator = new CXmlArrayValidator();
-				$arrayValidator->validate('trigger', $host['triggers']);
+		if ($host['triggers']) {
+			$arrayValidator = new CXmlArrayValidator();
+			$arrayValidator->validate('trigger', $host['triggers']);
 
-				if ($arrayValidator->getError()) {
-					throw new Exception(_s(
-						'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/triggers/trigger(%2$s)": %3$s.',
-						$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
-					);
-				}
-
-				$triggerNumber = 1;
-				foreach ($host['triggers'] as $trigger) {
-					$validationRules = array(
-						'description' =>	'required|string',
-						'type' =>			'required|string',
-						'expression' =>		'required|string',
-						'url' =>			'required|string',
-						'status' =>			'required|string',
-						'priority' =>		'required|string',
-						'comments' =>		'required|string'
-					);
-
-					$validator = new CNewValidator($trigger, $validationRules);
-
-					if ($validator->isError()) {
-						$errors = $validator->getAllErrors();
-						throw new Exception(_s(
-							'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/triggers/trigger(%2$s)": %3$s',
-							$hostNumber, $triggerNumber, $errors[0]
-						));
-					}
-
-					// unexpected tag validation
-					$arrayDiff = array_diff_key($trigger, $validator->getValidInput());
-					if ($arrayDiff) {
-						throw new Exception(_s(
-							'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/triggers/trigger(%2$s)": unexpected tag "%3$s".',
-							$hostNumber, $triggerNumber, key($arrayDiff)
-						));
-					}
-
-					$triggerNumber++;
-				}
+			if ($arrayValidator->getError()) {
+				throw new Exception(_s(
+					'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/triggers/trigger(%2$s)": %3$s.',
+					$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+				);
 			}
-		}
-		else {
-			throw new Exception(_s('Incorrect "triggers" definition for host "%1$s".', $host['name']));
+
+			$triggerNumber = 1;
+			foreach ($host['triggers'] as $trigger) {
+				$validationRules = array(
+					'description' =>	'required|string',
+					'type' =>			'required|string',
+					'expression' =>		'required|string',
+					'url' =>			'required|string',
+					'status' =>			'required|string',
+					'priority' =>		'required|string',
+					'comments' =>		'required|string'
+				);
+
+				$validator = new CNewValidator($trigger, $validationRules);
+
+				if ($validator->isError()) {
+					$errors = $validator->getAllErrors();
+					throw new Exception(_s(
+						'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/triggers/trigger(%2$s)": %3$s',
+						$hostNumber, $triggerNumber, $errors[0]
+					));
+				}
+
+				// unexpected tag validation
+				$arrayDiff = array_diff_key($trigger, $validator->getValidInput());
+				if ($arrayDiff) {
+					throw new Exception(_s(
+						'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/triggers/trigger(%2$s)": unexpected tag "%3$s".',
+						$hostNumber, $triggerNumber, key($arrayDiff)
+					));
+				}
+
+				$triggerNumber++;
+			}
 		}
 	}
 
@@ -304,21 +308,16 @@ class C10XmlValidator {
 	 * @throws Exception	if structure is invalid
 	 */
 	protected function validateLinkedTemplates($host, $hostNumber) {
-		if ((is_array($host['templates']) && $host['templates']) || $host['templates'] === '') {
-			if ($host['templates'] !== '') {
-				$arrayValidator = new CXmlArrayValidator();
-				$arrayValidator->validate('template', $host['templates']);
+		if ($host['templates']) {
+			$arrayValidator = new CXmlArrayValidator();
+			$arrayValidator->validate('template', $host['templates']);
 
-				if ($arrayValidator->getError()) {
-					throw new Exception(_s(
-						'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/templates/template(%2$s)": %3$s.',
-						$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
-					);
-				}
+			if ($arrayValidator->getError()) {
+				throw new Exception(_s(
+					'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/templates/template(%2$s)": %3$s.',
+					$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+				);
 			}
-		}
-		else {
-			throw new Exception(_s('Incorrect "templates" definition for host "%1$s".', $host['name']));
 		}
 	}
 
@@ -331,65 +330,60 @@ class C10XmlValidator {
 	 * @throws Exception	if structure is invalid
 	 */
 	protected function validateGraphs($host, $hostNumber) {
-		if ((is_array($host['graphs']) && $host['graphs']) || $host['graphs'] === '') {
-			if ($host['graphs'] !== '') {
-				$arrayValidator = new CXmlArrayValidator();
-				$arrayValidator->validate('graph', $host['graphs']);
+		if ($host['graphs']) {
+			$arrayValidator = new CXmlArrayValidator();
+			$arrayValidator->validate('graph', $host['graphs']);
 
-				if ($arrayValidator->getError()) {
-					throw new Exception(_s(
-						'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/graphs/graph(%2$s)": %3$s.',
-						$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
-					);
-				}
-
-				$graphNumber = 1;
-				foreach ($host['graphs'] as $graph) {
-					$validationRules = array(
-						'name' =>				'required|string',
-						'width' =>				'required|string',
-						'height' =>				'required|string',
-						'ymin_type' =>			'required|string',
-						'ymax_type' =>			'required|string',
-						'ymin_item_key' =>		'required|string',
-						'ymax_item_key' =>		'required|string',
-						'show_work_period' =>	'required|string',
-						'show_triggers' =>		'required|string',
-						'graphtype' =>			'required|string',
-						'yaxismin' =>			'required|string',
-						'yaxismax' =>			'required|string',
-						'show_legend' =>		'required|string',
-						'show_3d' =>			'required|string',
-						'percent_left' =>		'required|string',
-						'percent_right' =>		'required|string',
-						'graph_elements' =>		'required|array'
-					);
-
-					$validator = new CNewValidator($graph, $validationRules);
-
-					if ($validator->isError()) {
-						$errors = $validator->getAllErrors();
-						throw new Exception(_s(
-							'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/graphs/graph(%2$s)": %3$s',
-							$hostNumber, $graphNumber, $errors[0]
-						));
-					}
-
-					// unexpected tag validation
-					$arrayDiff = array_diff_key($graph, $validator->getValidInput());
-					if ($arrayDiff) {
-						throw new Exception(_s(
-							'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/graphs/graph(%2$s)": unexpected tag "%3$s".',
-							$hostNumber, $graphNumber, key($arrayDiff)
-						));
-					}
-
-					$graphNumber++;
-				}
+			if ($arrayValidator->getError()) {
+				throw new Exception(_s(
+					'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/graphs/graph(%2$s)": %3$s.',
+					$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+				);
 			}
-		}
-		else {
-			throw new Exception(_s('Incorrect "graphs" definition for host "%1$s".', $host['name']));
+
+			$graphNumber = 1;
+			foreach ($host['graphs'] as $graph) {
+				$validationRules = array(
+					'name' =>				'required|string',
+					'width' =>				'required|string',
+					'height' =>				'required|string',
+					'ymin_type' =>			'required|string',
+					'ymax_type' =>			'required|string',
+					'ymin_item_key' =>		'required|string',
+					'ymax_item_key' =>		'required|string',
+					'show_work_period' =>	'required|string',
+					'show_triggers' =>		'required|string',
+					'graphtype' =>			'required|string',
+					'yaxismin' =>			'required|string',
+					'yaxismax' =>			'required|string',
+					'show_legend' =>		'required|string',
+					'show_3d' =>			'required|string',
+					'percent_left' =>		'required|string',
+					'percent_right' =>		'required|string',
+					'graph_elements' =>		'required|array'
+				);
+
+				$validator = new CNewValidator($graph, $validationRules);
+
+				if ($validator->isError()) {
+					$errors = $validator->getAllErrors();
+					throw new Exception(_s(
+						'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/graphs/graph(%2$s)": %3$s',
+						$hostNumber, $graphNumber, $errors[0]
+					));
+				}
+
+				// unexpected tag validation
+				$arrayDiff = array_diff_key($graph, $validator->getValidInput());
+				if ($arrayDiff) {
+					throw new Exception(_s(
+						'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/graphs/graph(%2$s)": unexpected tag "%3$s".',
+						$hostNumber, $graphNumber, key($arrayDiff)
+					));
+				}
+
+				$graphNumber++;
+			}
 		}
 	}
 
@@ -402,50 +396,45 @@ class C10XmlValidator {
 	 * @throws Exception	if structure is invalid
 	 */
 	protected function validateMacro($host, $hostNumber) {
-		if ((is_array($host['macros']) && $host['macros']) || $host['macros'] === '') {
-			if ($host['macros'] !== '') {
-				$arrayValidator = new CXmlArrayValidator();
-				$arrayValidator->validate('macro', $host['macros']);
+		if ($host['macros']) {
+			$arrayValidator = new CXmlArrayValidator();
+			$arrayValidator->validate('macro', $host['macros']);
 
-				if ($arrayValidator->getError()) {
-					throw new Exception(_s(
-						'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/macros/macro(%2$s)": %3$s.',
-						$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
-					);
-				}
-
-				$macroNumber = 1;
-				foreach ($host['macros'] as $macro) {
-					$validationRules = array(
-						'value' =>	'required|string',
-						'name' =>	'required|string'
-					);
-
-					$validator = new CNewValidator($macro, $validationRules);
-
-					if ($validator->isError()) {
-						$errors = $validator->getAllErrors();
-						throw new Exception(_s(
-							'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/macros/macro(%2$s)": %3$s',
-							$hostNumber, $macroNumber, $errors[0]
-						));
-					}
-
-					// unexpected tag validation
-					$arrayDiff = array_diff_key($macro, $validator->getValidInput());
-					if ($arrayDiff) {
-						throw new Exception(_s(
-							'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/macros/macro(%2$s)": unexpected tag "%3$s".',
-							$hostNumber, $macroNumber, key($arrayDiff)
-						));
-					}
-
-					$macroNumber++;
-				}
+			if ($arrayValidator->getError()) {
+				throw new Exception(_s(
+					'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/macros/macro(%2$s)": %3$s.',
+					$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+				);
 			}
-		}
-		else {
-			throw new Exception(_s('Incorrect "macros" definition for host "%1$s".', $host['name']));
+
+			$macroNumber = 1;
+			foreach ($host['macros'] as $macro) {
+				$validationRules = array(
+					'value' =>	'required|string',
+					'name' =>	'required|string'
+				);
+
+				$validator = new CNewValidator($macro, $validationRules);
+
+				if ($validator->isError()) {
+					$errors = $validator->getAllErrors();
+					throw new Exception(_s(
+						'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/macros/macro(%2$s)": %3$s',
+						$hostNumber, $macroNumber, $errors[0]
+					));
+				}
+
+				// unexpected tag validation
+				$arrayDiff = array_diff_key($macro, $validator->getValidInput());
+				if ($arrayDiff) {
+					throw new Exception(_s(
+						'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/macros/macro(%2$s)": unexpected tag "%3$s".',
+						$hostNumber, $macroNumber, key($arrayDiff)
+					));
+				}
+
+				$macroNumber++;
+			}
 		}
 	}
 
@@ -459,21 +448,16 @@ class C10XmlValidator {
 	 * @throws Exception	if structure is invalid
 	 */
 	protected function validateApplications($item, $hostNumber, $itemNumber) {
-		if ((is_array($item['applications']) && $item['applications']) || $item['applications'] === '') {
-			if ($item['applications'] !== '') {
-				$arrayValidator = new CXmlArrayValidator();
-				$arrayValidator->validate('application', $item['applications']);
+		if ($item['applications']) {
+			$arrayValidator = new CXmlArrayValidator();
+			$arrayValidator->validate('application', $item['applications']);
 
-				if ($arrayValidator->getError()) {
-					throw new Exception(_s(
-						'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/items/item(%2$s)/applications/application(%3$s)": %4$s.',
-						$hostNumber, $itemNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
-					);
-				}
+			if ($arrayValidator->getError()) {
+				throw new Exception(_s(
+					'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/items/item(%2$s)/applications/application(%3$s)": %4$s.',
+					$hostNumber, $itemNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+				);
 			}
-		}
-		else {
-			throw new Exception(_s('Incorrect "applications" definition for host "%1$s".', $host));
 		}
 	}
 
