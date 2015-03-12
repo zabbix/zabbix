@@ -36,7 +36,7 @@ class CXmlArrayValidator {
 
 			if ($key !== $validKey) {
 				$this->error = _s('unexpected tag "%1$s"', $key);
-				$this->errorSeqNum = $i++;
+				$this->errorSeqNum = $i + 1;
 				break;
 			}
 
