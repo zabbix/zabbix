@@ -382,6 +382,8 @@ class C10XmlValidator {
 					));
 				}
 
+				$this->validateGraphElements($graph, $hostNumber, $graphNumber);
+
 				$graphNumber++;
 			}
 		}
@@ -458,6 +460,62 @@ class C10XmlValidator {
 					$hostNumber, $itemNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
 				);
 			}
+		}
+	}
+
+	/**
+	 * Graph element validation.
+	 *
+	 * @param array $graph			graph data
+	 * @param int	$hostNumber		host number
+	 * @param int	$graphNumber	graph number
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateGraphElements($graph, $hostNumber, $graphNumber) {
+		$arrayValidator = new CXmlArrayValidator();
+		$arrayValidator->validate('graph_element', $graph['graph_elements']);
+
+		if ($arrayValidator->getError()) {
+			throw new Exception(_s(
+				'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/graphs/graph(%2$s)/graph_elements/graph_element(%3$s)": %4$s.',
+				$hostNumber, $graphNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+			);
+		}
+
+		$graphElementNumber = 1;
+		foreach ($graph['graph_elements'] as $graphElement) {
+			$validationRules = array(
+				'item' =>			'required|string',
+				'drawtype' =>		'required|string',
+				'sortorder' =>		'required|string',
+				'color' =>			'required|string',
+				'yaxisside' =>		'required|string',
+				'calc_fnc' =>		'required|string',
+				'type' =>			'required|string',
+				'periods_cnt' =>	'required|string'
+			);
+
+			$validator = new CNewValidator($graphElement, $validationRules);
+
+			if ($validator->isError()) {
+				$errors = $validator->getAllErrors();
+				throw new Exception(_s(
+					'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/graphs/graph(%2$s)/graph_elements/graph_element(%3$s)": %4$s',
+					$hostNumber, $graphNumber, $graphElementNumber, $errors[0]
+				));
+			}
+
+			// unexpected tag validation
+			$arrayDiff = array_diff_key($graphElement, $validator->getValidInput());
+			if ($arrayDiff) {
+				throw new Exception(_s(
+					'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/graphs/graph(%2$s)/graph_elements/graph_element(%3$s)": unexpected tag "%3$s".',
+					$hostNumber, $graphNumber, $graphElementNumber, key($arrayDiff)
+				));
+			}
+
+			$graphElementNumber++;
 		}
 	}
 
