@@ -284,6 +284,12 @@ class C20ImportFormatter extends CImportFormatter {
 
 				foreach ($map['selements'] as &$selement) {
 					CArrayHelper::convertFieldToArray($selement, 'urls');
+
+					if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+						$selement['element']['expression'] = $this->triggerExpressionConverter->convert(
+							$selement['element']['expression']
+						);
+					}
 				}
 				unset($selement);
 
@@ -291,6 +297,13 @@ class C20ImportFormatter extends CImportFormatter {
 
 				foreach ($map['links'] as &$link) {
 					CArrayHelper::convertFieldToArray($link, 'linktriggers');
+
+					foreach ($link['linktriggers'] as &$linktrigger) {
+						$linktrigger['trigger']['expression'] = $this->triggerExpressionConverter->convert(
+							$linktrigger['trigger']['expression']
+						);
+					}
+					unset($linktrigger);
 				}
 				unset($link);
 
