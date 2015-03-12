@@ -38,6 +38,7 @@ class C10XmlValidator {
 		$content = $newArray->convertEmpStrToArr($arrayKeys, $content);
 
 		$this->validateHosts($content);
+		$this->validateTriggerDependencies($content);
 //		$this->validateSysmaps($content);
 //		$this->validateScreens($content);
 	}
@@ -127,8 +128,6 @@ class C10XmlValidator {
 
 					$hostNumber++;
 				}
-
-//				$this->validateTriggerDependencies($content);
 			}
 			else {
 				throw new Exception(_('Incorrect "hosts" definition.'));
@@ -522,38 +521,51 @@ class C10XmlValidator {
 	/**
 	 * Trigger dependencies validation.
 	 *
-	 * @param array $host	host data
+	 * @param array $content	import data
 	 *
 	 * @throws Exception	if structure is invalid
 	 */
 	protected function validateTriggerDependencies($content) {
-		if (isset($content['dependencies'])) {
-			if ((is_array($content['dependencies']) && $content['dependencies']) || $content['dependencies'] === '') {
-				if ($content['dependencies'] !== '') {
-					$arrayValidator = new CXmlArrayValidator();
-					$arrayValidator->validate('dependency', $content['dependencies']);
+		if (array_key_exists('dependencies', $content)) {
+			$arrayValidator = new CXmlArrayValidator();
+			$arrayValidator->validate('dependency', $content['dependencies']);
 
-					if ($arrayValidator->getError()) {
-						throw new Exception(_s('Incorrect "trigger dedependencies" definition: %1$s',
-							$arrayValidator->getError()
-						));
-					}
-
-					foreach ($content['dependencies'] as $dependency) {
-						$validationRules = array(
-							'description' => 'required|string'
-						);
-
-						$validator = new CNewValidator($dependency, $validationRules);
-
-						foreach ($validator->getAllErrors() as $error) {
-							throw new Exception(_s('Incorrect "trigger dedependencies" definition: %2$s', $error));
-						}
-					}
-				}
+			if ($arrayValidator->getError()) {
+				throw new Exception(_s('Cannot parse XML tag "zabbix_export/dependencies/dependency(%1$s)": %2$s.',
+					$arrayValidator->getErrorSeqNum(), $arrayValidator->getError()
+				));
 			}
-			else {
-				throw new Exception(_('Incorrect "trigger dedependencies" definition.'));
+
+			$dependencyNumber = 1;
+			foreach ($content['dependencies'] as $dependency) {
+				$validationRules = array(
+					'description' =>	'required|string',
+					'depends' =>		'required'
+				);
+
+				$validator = new CNewValidator($dependency, $validationRules);
+
+				if ($validator->isError()) {
+					$errors = $validator->getAllErrors();
+					throw new Exception(_s(
+						'Cannot parse XML tag "zabbix_export/dependencies/dependency(%1$s)": %2$s', $dependencyNumber,
+						$errors[0]
+					));
+				}
+
+				// unexpected tag validation
+				unset($dependency['description']);
+
+				$arrayValidator = new CXmlArrayValidator();
+				$arrayValidator->validate('depends', $dependency);
+
+				if ($arrayValidator->getError()) {
+					throw new Exception(_s('Cannot parse XML tag "zabbix_export/dependencies/dependency(%1$s)/depends(%2$s)": %3$s.',
+						$dependencyNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError()
+					));
+				}
+
+				$dependencyNumber++;
 			}
 		}
 	}
