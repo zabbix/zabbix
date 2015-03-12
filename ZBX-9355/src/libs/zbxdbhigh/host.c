@@ -47,7 +47,7 @@ static char	*get_template_names(const zbx_vector_uint64_t *templateids)
 	while (NULL != (row = DBfetch(result)))
 		zbx_snprintf_alloc(&template_names, &tmp_alloc, &tmp_offset, "\"%s\", ", row[0]);
 
-	template_names[tmp_offset-2] = '\0';
+	template_names[tmp_offset - 2] = '\0';
 
 	DBfree_result(result);
 	zbx_free(sql);
@@ -104,13 +104,8 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 
 		if (NULL != (row = DBfetch(result)))
 		{
-			char	*template_names;
-
 			ret = FAIL;
-			template_names = get_template_names(templateids);
-			zbx_snprintf(error, max_error_len,
-					"templates %s have the same item key \"%s\"", template_names, row[0]);
-			zbx_free(template_names);
+			zbx_snprintf(error, max_error_len, "conflicting item key \"%s\" found", row[0]);
 		}
 		DBfree_result(result);
 	}
@@ -2120,7 +2115,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
  *             templateids - [IN] array of template IDs                       *
- *
+ *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
@@ -4630,7 +4625,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 	zbx_vector_uint64_t	templateids;
 	zbx_uint64_t		hosttemplateid;
 	int			i, res = SUCCEED;
-	char			error[MAX_STRING_LEN];
+	char			error[MAX_STRING_LEN], *template_names;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -4658,15 +4653,23 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	if (SUCCEED != (res = validate_linked_templates(&templateids, error, sizeof(error))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot link template to host \"%s\": %s",
-				zbx_host_string(hostid), error);
+		template_names = get_template_names(lnk_templateids);
+
+		zabbix_log(LOG_LEVEL_WARNING, "cannot link template(s) %s to host \"%s\": %s",
+				template_names, zbx_host_string(hostid), error);
+
+		zbx_free(template_names);
 		goto clean;
 	}
 
 	if (SUCCEED != (res = validate_host(hostid, lnk_templateids, error, sizeof(error))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot link template to host \"%s\": %s",
-				zbx_host_string(hostid), error);
+		template_names = get_template_names(lnk_templateids);
+
+		zabbix_log(LOG_LEVEL_WARNING, "cannot link template(s) %s to host \"%s\": %s",
+				template_names, zbx_host_string(hostid), error);
+
+		zbx_free(template_names);
 		goto clean;
 	}
 
