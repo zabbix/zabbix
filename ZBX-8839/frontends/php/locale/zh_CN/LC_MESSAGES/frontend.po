@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 23:02+0200\n"
+"POT-Creation-Date: 2015-03-05 18:19+0200\n"
 "PO-Revision-Date: 2013-08-16 03:47+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1843,7 +1843,7 @@ msgstr "无法为图形 \"%1$s\"更新\"模板号\"。"
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
 msgstr "无法为项目 \"%1$s\"更新\"模板号\"。"
 
-#: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:739
+#: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:741
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "无法为筛选器 \"%1$s\"更新\"模板号\"。"
@@ -8445,8 +8445,8 @@ msgstr "没有系统访问的许可权"
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
 #: api/classes/CScreen.php:578 api/classes/CService.php:1252
-#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
-#: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
+#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:777
+#: api/classes/CTemplateScreen.php:798 api/classes/CTemplateScreen.php:804
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
 #: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:811
 #: api/classes/CTriggerPrototype.php:898 api/classes/CUserMacro.php:824
@@ -10523,12 +10523,12 @@ msgstr "筛选"
 msgid "Screen \"%1$s\" added."
 msgstr "筛选 \"%1$s\" 已添加."
 
-#: api/classes/CTemplateScreen.php:816
+#: api/classes/CTemplateScreen.php:818
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
 msgstr "筛选\"%1$s\"已存在于模板\"%2$2\"中."
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
-#: api/classes/CTemplateScreen.php:711 api/classes/CTemplateScreen.php:762
+#: api/classes/CTemplateScreen.php:713 api/classes/CTemplateScreen.php:764
 #, php-format
 msgid "Screen \"%1$s\" already exists."
 msgstr "筛选\"%1$s\"已存在."
@@ -13059,8 +13059,8 @@ msgstr "错误的媒体类型字段"
 msgid "Wrong fields for proxy \"%s\"."
 msgstr "错误的代理节点字段\"%s\"."
 
-#: api/classes/CScreen.php:432 api/classes/CTemplateScreen.php:706
-#: api/classes/CTemplateScreen.php:744
+#: api/classes/CScreen.php:432 api/classes/CTemplateScreen.php:708
+#: api/classes/CTemplateScreen.php:746
 #, php-format
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr "错误的筛选字段\"%1$s\"."
@@ -13254,7 +13254,7 @@ msgstr "您没有指定目标为动作操作的全局脚本\"%s\"."
 #: api/classes/CScript.php:417 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
 #: api/classes/CTemplate.php:1266 api/classes/CTemplate.php:1298
-#: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:734
+#: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:736
 #: api/classes/CWebCheck.php:523
 msgid "You do not have permission to perform this operation."
 msgstr "您没有许可权来完成此操作."

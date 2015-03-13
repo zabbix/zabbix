@@ -362,7 +362,7 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 
 	sz = sizeof(buf);
 	offset = 0;
-	while (ZBX_TCP_ERROR != (rc == telnet_read(socket_fd, buf, &sz, &offset)))
+	while (ZBX_TCP_ERROR != (rc = telnet_read(socket_fd, buf, &sz, &offset)))
 	{
 		if (':' == telnet_lastchar(buf, offset))
 			break;

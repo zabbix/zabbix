@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-11 23:02+0200\n"
+"POT-Creation-Date: 2015-03-05 18:19+0200\n"
 "PO-Revision-Date: 2013-04-29 23:58+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1851,7 +1851,7 @@ msgstr "\"%1$s\" grafiği için \"templateid\" güncellenemiyor."
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
 msgstr "\"%1$s\" öğesi için \"templateid\" güncellenemiyor."
 
-#: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:739
+#: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:741
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "\"%1$s\" ekranı için \"templateid\" güncellenemiyor."
@@ -8458,8 +8458,8 @@ msgstr "Sistem erişimi için izin yok."
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
 #: api/classes/CScreen.php:578 api/classes/CService.php:1252
-#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
-#: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
+#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:777
+#: api/classes/CTemplateScreen.php:798 api/classes/CTemplateScreen.php:804
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
 #: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:811
 #: api/classes/CTriggerPrototype.php:898 api/classes/CUserMacro.php:824
@@ -10538,12 +10538,12 @@ msgstr "Ekran"
 msgid "Screen \"%1$s\" added."
 msgstr ""
 
-#: api/classes/CTemplateScreen.php:816
+#: api/classes/CTemplateScreen.php:818
 msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
 msgstr ""
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
-#: api/classes/CTemplateScreen.php:711 api/classes/CTemplateScreen.php:762
+#: api/classes/CTemplateScreen.php:713 api/classes/CTemplateScreen.php:764
 #, php-format
 msgid "Screen \"%1$s\" already exists."
 msgstr ""
@@ -13079,8 +13079,8 @@ msgstr "İletişim aracı tipi için yanlış alanlar."
 msgid "Wrong fields for proxy \"%s\"."
 msgstr "\"%s\" vekil sunucusu için yanlış alanlar."
 
-#: api/classes/CScreen.php:432 api/classes/CTemplateScreen.php:706
-#: api/classes/CTemplateScreen.php:744
+#: api/classes/CScreen.php:432 api/classes/CTemplateScreen.php:708
+#: api/classes/CTemplateScreen.php:746
 #, php-format
 msgid "Wrong fields for screen \"%1$s\"."
 msgstr ""
@@ -13274,7 +13274,7 @@ msgstr "\"%s\" eylem işlem genel betiği için hedef belirtmemişsiniz."
 #: api/classes/CScript.php:417 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
 #: api/classes/CTemplate.php:1266 api/classes/CTemplate.php:1298
-#: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:734
+#: api/classes/CTemplate.php:1532 api/classes/CTemplateScreen.php:736
 #: api/classes/CWebCheck.php:523
 msgid "You do not have permission to perform this operation."
 msgstr ""

@@ -695,3 +695,19 @@ INSERT INTO hosts (host, name, status, hostid) VALUES ('Template inheritance tes
 INSERT INTO hosts_groups (hostid, groupid, hostgroupid) VALUES (30001, 4, 30001);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 30001, 30000);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (30000, 30001, 30000);
+
+-- testPageHistory_CheckLayout
+
+INSERT INTO hosts (hostid, host, name, status) VALUES (15003, 'testPageHistory_CheckLayout', 'testPageHistory_CheckLayout', 0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15003, 15003, 4);
+INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15005, 15003, 1, '127.0.0.1', 1, '10050', 1);
+
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, data_type, name, key_, delay, history, trends, status, units, valuemapid, flags) VALUES (15085, 15003, 15005, 0, 3, 0, 'item_testPageHistory_CheckLayout_Numeric_Unsigned', 'numeric_unsigned[item_testpagehistory_checklayout]', 30, 90, 365, 0, '', NULL, 0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history, trends, status, units, valuemapid, flags) VALUES (15086, 15003, 15005, 0, 0,    'item_testPageHistory_CheckLayout_Numeric_Float'   , 'numeric_float[item_testpagehistory_checklayout]'   , 30, 90, 365, 0, '', NULL, 0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15087, 15003, 15005, 0, 1,    'item_testPageHistory_CheckLayout_Character'       , 'character[item_testpagehistory_checklayout]'       , 30, 90,      0,           0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15088, 15003, 15005, 0, 4,    'item_testPageHistory_CheckLayout_Text'            , 'text[item_testpagehistory_checklayout]'            , 30, 90,      0,           0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15089, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Log'             , 'log[item_testpagehistory_checklayout]'             , 30, 90,      0,           0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15090, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Log_2'           , 'log[item_testpagehistory_checklayout, 2]'          , 30, 90,      0,           0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15091, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Eventlog'        , 'eventlog[item_testpagehistory_checklayout]'        , 30, 90,      0,           0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15092, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Eventlog_2'      , 'eventlog[item_testpagehistory_checklayout, 2]'     , 30, 90,      0,           0);
+
