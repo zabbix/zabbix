@@ -67,7 +67,7 @@ class ZabbixItem
 
 	public String getArgument(int index)
 	{
-		if (null == args || !(1 <= index && index <= args.size()))
+		if (null == args || 1 > index || index > args.size())
 			throw new IndexOutOfBoundsException("bad argument index for key '" + key + "': " + index);
 		else
 			return args.get(index - 1);
