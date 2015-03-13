@@ -54,8 +54,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	char			*procname, *proccomm, *param;
 	struct passwd		*usrinfo;
-	zbx_uint64_t		proccount = 0;
-	int			zbx_proc_stat, i, count, idx = 0;
+	int			proccount = 0, invalid_user = 0, zbx_proc_stat, i, count, idx = 0;
 	struct pst_status	pst[ZBX_BURST];
 
 	if (4 < request->nparam)
@@ -75,13 +74,14 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			if (0 == errno)
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
-			else
+			if (0 != errno)
+			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
-						zbx_strerror(errno)));
+							zbx_strerror(errno)));
+				return SYSINFO_RET_FAIL;
+			}
 
-			return SYSINFO_RET_FAIL;
+			invalid_user = 1;
 		}
 	}
 	else
@@ -105,6 +105,9 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	proccomm = get_rparam(request, 3);
 	if (NULL != proccomm && '\0' == *proccomm)
 		proccomm = NULL;
+
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
 
 	memset(pst, 0, sizeof(pst));
 
@@ -136,7 +139,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain process information."));
 		return SYSINFO_RET_FAIL;
 	}
-
+out:
 	SET_UI64_RESULT(result, proccount);
 
 	return SYSINFO_RET_OK;
