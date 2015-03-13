@@ -367,7 +367,8 @@ else {
 		'triggers' => array(),
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'config' => $config
+		'config' => $config,
+		'dependencyTriggers' => array()
 	);
 
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
@@ -405,30 +406,41 @@ else {
 		}
 	}
 
-	$dependencyTriggers = array();
 	if ($depTriggerIds) {
+		$dependencyTriggers = array();
+		$dependencyTriggerPrototypes = array();
+
+		$depTriggerIds = array_keys($depTriggerIds);
+
 		$dependencyTriggers = API::Trigger()->get(array(
 			'output' => array('triggerid', 'description', 'status', 'flags'),
 			'selectHosts' => array('hostid', 'name'),
-			'triggerids' => array_keys($depTriggerIds),
+			'triggerids' => $depTriggerIds,
 			'filter' => array(
-				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE)
+				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)
 			),
 			'preservekeys' => true
 		));
+
+		$dependencyTriggerPrototypes = API::TriggerPrototype()->get(array(
+			'output' => array('triggerid', 'description', 'status', 'flags'),
+			'selectHosts' => array('hostid', 'name'),
+			'triggerids' => $depTriggerIds,
+			'preservekeys' => true
+		));
+
+		$data['dependencyTriggers'] = $dependencyTriggers + $dependencyTriggerPrototypes;
 
 		foreach ($data['triggers'] as &$trigger) {
 			order_result($trigger['dependencies'], 'description', ZBX_SORT_UP);
 		}
 		unset($trigger);
 
-		foreach ($dependencyTriggers as &$dependencyTrigger) {
+		foreach ($data['dependencyTriggers'] as &$dependencyTrigger) {
 			order_result($dependencyTrigger['hosts'], 'name', ZBX_SORT_UP);
 		}
 		unset($dependencyTrigger);
 	}
-
-	$data['dependencyTriggers'] = $dependencyTriggers;
 
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
