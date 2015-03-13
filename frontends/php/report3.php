@@ -164,6 +164,8 @@ switch ($period) {
 		break;
 }
 
+$table->setHeader($header);
+
 $intervals = array();
 for ($t = $from; $t <= $to; $t++) {
 	if (($start = get_time($t)) > time()) {
