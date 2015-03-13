@@ -268,22 +268,18 @@ $dependenciesTable->setHeader(array(_('Name'), _('Action')));
 foreach ($this->data['db_dependencies'] as $dependency) {
 	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
-	$hostNames = array();
-	foreach ($dependency['hosts'] as $host) {
-		$hostNames[] = CHtml::encode($host['name']);
-		$hostNames[] = ', ';
-	}
-	array_pop($hostNames);
+	$depTriggerDescription = CHtml::encode(
+		implode(', ', zbx_objectValues($dependency['hosts'], 'name')).NAME_DELIMITER.$dependency['description']
+	);
 
 	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$description = new CLink(
-			array($hostNames, NAME_DELIMITER, CHtml::encode($dependency['description'])),
-			'triggers.php?form=update&hostid='.$dependency['hostid'].'&triggerid='.$dependency['triggerid']
+		$description = new CLink($depTriggerDescription,
+			'triggers.php?form=update&triggerid='.$dependency['triggerid']
 		);
 		$description->setAttribute('target', '_blank');
 	}
 	else {
-		$description = array($hostNames, NAME_DELIMITER, $dependency['description']);
+		$description = $depTriggerDescription;
 	}
 
 	$row = new CRow(array($description, new CButton('remove', _('Remove'),
