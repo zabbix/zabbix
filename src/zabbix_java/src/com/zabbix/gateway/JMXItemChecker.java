@@ -20,7 +20,6 @@
 package com.zabbix.gateway;
 
 import java.util.HashMap;
-import java.util.Vector;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
@@ -29,7 +28,6 @@ import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.json.*;
@@ -88,8 +86,7 @@ class JMXItemChecker extends ItemChecker
 				env.put(JMXConnector.CREDENTIALS, new String[] {username, password});
 			}
 
-			logger.debug("connecting to JMX agent at {}", url);
-			jmxc = JMXConnectorFactory.connect(url, env);
+			jmxc = ZabbixJMXConnectorFactory.connect(url, env);
 			mbsc = jmxc.getMBeanServerConnection();
 
 			for (String key : keys)
