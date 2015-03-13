@@ -1,6 +1,7 @@
 Changes for 2.2.10rc1
 
 New features:
+.....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
 A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
@@ -1230,6 +1231,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.15rc1
 
 New features:
+.....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
