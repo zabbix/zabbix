@@ -27,6 +27,10 @@ $controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsC
 $rForm->addItem($controls);
 $hostInventoryWidget->setControls($rForm);
 
+$filterForm = new CFilter('web.hostinventories.filter.state');
+
+$filterColumn = new CFormList();
+
 $filterTable = new CTable('', 'filter filter-center');
 // getting inventory fields to make a drop down
 $inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
