@@ -263,8 +263,12 @@ static void	zbx_parameter_not_empty(const char *param, const char *param_name)
 static void	zbx_tls_validate_config(void)
 {
 	/* parse and validate 'TLSConnect' parameter used in zabbix_proxy.conf, zabbix_agentd.conf */
+	/* and '--tls-connect' parameter used in zabbix_get and zabbix_sender */
 
-	zbx_parameter_not_empty(CONFIG_TLS_CONNECT, "TLSConnect");
+	if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+		zbx_parameter_not_empty(CONFIG_TLS_CONNECT, "--tls-connect");
+	else
+		zbx_parameter_not_empty(CONFIG_TLS_CONNECT, "TLSConnect");
 
 	if (NULL != CONFIG_TLS_CONNECT)
 	{
@@ -276,7 +280,11 @@ static void	zbx_tls_validate_config(void)
 			configured_tls_connect_mode = ZBX_TCP_SEC_TLS_PSK;
 		else
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "invalid value of \"TLSConnect\" parameter");
+			if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+				zabbix_log(LOG_LEVEL_CRIT, "invalid value of \"--tls-connect\" parameter");
+			else
+				zabbix_log(LOG_LEVEL_CRIT, "invalid value of \"TLSConnect\" parameter");
+
 			goto out;
 		}
 	}
@@ -323,38 +331,80 @@ static void	zbx_tls_validate_config(void)
 
 	/* either both a certificate and a private key must be defined or none of them */
 
-	zbx_parameter_not_empty(CONFIG_TLS_CA_FILE, "TLSCaFile");
-	zbx_parameter_not_empty(CONFIG_TLS_CRL_FILE, "TLSCrlFile");
-	zbx_parameter_not_empty(CONFIG_TLS_CERT_FILE, "TLSCertFile");
-	zbx_parameter_not_empty(CONFIG_TLS_KEY_FILE, "TLSKeyFile");
+	if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+	{
+		zbx_parameter_not_empty(CONFIG_TLS_CA_FILE, "--tls-ca-file");
+		zbx_parameter_not_empty(CONFIG_TLS_CRL_FILE, "--tls-crl-file");
+		zbx_parameter_not_empty(CONFIG_TLS_CERT_FILE, "--tls-cert-file");
+		zbx_parameter_not_empty(CONFIG_TLS_KEY_FILE, "--tls-key-file");
+	}
+	else
+	{
+		zbx_parameter_not_empty(CONFIG_TLS_CA_FILE, "TLSCaFile");
+		zbx_parameter_not_empty(CONFIG_TLS_CRL_FILE, "TLSCrlFile");
+		zbx_parameter_not_empty(CONFIG_TLS_CERT_FILE, "TLSCertFile");
+		zbx_parameter_not_empty(CONFIG_TLS_KEY_FILE, "TLSKeyFile");
+	}
 
 	if (NULL != CONFIG_TLS_CERT_FILE && NULL == CONFIG_TLS_KEY_FILE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCertFile\" is defined but \"TLSKeyFile\" is"
-				" not defined");
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-cert-file\" is defined but "
+					"\"--tls-key-file\" is not defined");
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCertFile\" is defined but "
+					"\"TLSKeyFile\" is not defined");
+		}
 		goto out;
 	}
 
 	if (NULL != CONFIG_TLS_KEY_FILE && NULL == CONFIG_TLS_CERT_FILE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSKeyFile\" is defined but \"TLSCertFile\" is"
-				" not defined");
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-key-file\" is defined but "
+					"\"--tls-cert-file\" is not defined");
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSKeyFile\" is defined but "
+					"\"TLSCertFile\" is not defined");
+		}
 		goto out;
 	}
 
-	/* CA file must be defined ionly together with a certificate */
+	/* CA file must be defined only together with a certificate */
 
 	if (NULL != CONFIG_TLS_CERT_FILE && NULL == CONFIG_TLS_CA_FILE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCertFile\" is defined but \"TLSCaFile\" is not"
-				" defined");
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-cert-file\" is defined but "
+					"\"--tls-ca-file\" is not defined");
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCertFile\" is defined but "
+					"\"TLSCaFile\" is not defined");
+		}
 		goto out;
 	}
 
 	if (NULL != CONFIG_TLS_CA_FILE && NULL == CONFIG_TLS_CERT_FILE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCaFile\" is defined but "
-				"\"TLSCertFile\" and \"TLSKeyFile\" are not defined");
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-ca-file\" is defined but "
+					"\"--tls-cert-file\" and \"--tls-key-file\" are not defined");
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCaFile\" is defined but "
+					"\"TLSCertFile\" and \"TLSKeyFile\" are not defined");
+		}
 		goto out;
 	}
 
@@ -362,41 +412,81 @@ static void	zbx_tls_validate_config(void)
 
 	if (NULL == CONFIG_TLS_CERT_FILE && NULL != CONFIG_TLS_CRL_FILE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCrlFile\" is defined but \"TLSCertFile\" and "
-				"\"TLSKeyFile\" are not defined");
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-crl-file\" is defined but "
+					"\"--tls-cert-file\" and \"--tls-key-file\" are not defined");
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCrlFile\" is defined but "
+					"\"TLSCertFile\" and \"TLSKeyFile\" are not defined");
+		}
 		goto out;
 	}
 
 	/* either both a PSK and a PSK-identity must be defined or none of them */
 
-	zbx_parameter_not_empty(CONFIG_TLS_PSK_FILE, "TLSPskFile");
-	zbx_parameter_not_empty(CONFIG_TLS_PSK_IDENTITY, "TLSPskIdentity");
+	if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+	{
+		zbx_parameter_not_empty(CONFIG_TLS_PSK_FILE, "--tls-psk-file");
+		zbx_parameter_not_empty(CONFIG_TLS_PSK_IDENTITY, "--tls-psk-identity");
+	}
+	else
+	{
+		zbx_parameter_not_empty(CONFIG_TLS_PSK_FILE, "TLSPskFile");
+		zbx_parameter_not_empty(CONFIG_TLS_PSK_IDENTITY, "TLSPskIdentity");
+	}
 
 	if (NULL != CONFIG_TLS_PSK_FILE && NULL == CONFIG_TLS_PSK_IDENTITY)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPskFile\" is defined but \"TLSPskIdentity\" is"
-				" not defined");
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-psk-file\" is defined but "
+					"\"--tls-psk-identity\" is not defined");
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPskFile\" is defined but "
+					"\"TLSPskIdentity\" is not defined");
+		}
 		goto out;
 	}
 
 	if (NULL != CONFIG_TLS_PSK_IDENTITY && NULL == CONFIG_TLS_PSK_FILE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPskIdentity\" is defined but \"TLSPskFile\" is"
-				" not defined");
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-psk-identity\" is defined but "
+					"\"--tls-psk-file\" is not defined");
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPskIdentity\" is defined but "
+					"\"TLSPskFile\" is not defined");
+		}
 		goto out;
 	}
 
 	/* PSK identity must be a valid UTF-8 string (RFC4279 says Unicode) */
 	if (NULL != CONFIG_TLS_PSK_IDENTITY && SUCCEED != zbx_is_utf8(CONFIG_TLS_PSK_IDENTITY))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPskIdentity\" value is not a valid UTF-8 "
-				"string");
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-psk-identity\" value is not a valid "
+					"UTF-8 string");
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPskIdentity\" value is not a valid "
+					"UTF-8 string");
+		}
 		goto out;
 	}
 
 	/* agentd and active proxy specific validation */
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) || 0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
+	if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_PROXY_ACTIVE)))
 	{
 		/* 'TLSConnect' is the master parameter to be matched by certificate and PSK parameters. */
 		/* 'TLSConnect' will be silently ignored on agentd, if active checks are not configured */
@@ -426,8 +516,7 @@ static void	zbx_tls_validate_config(void)
 
 	/* agentd, agent and passive proxy specific validation */
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) || 0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE) ||
-			0 != (program_type & ZBX_PROGRAM_TYPE_AGENT))
+	if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_PROXY_PASSIVE | ZBX_PROGRAM_TYPE_AGENT)))
 	{
 		/* 'TLSAccept' is the master parameter to be matched by certificate and PSK parameters */
 
@@ -2260,8 +2349,7 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 	if (0 != (tls_accept & ZBX_TCP_SEC_TLS_PSK))
 	{
 		/* for agentd and agent the only possibility is a PSK from configuration file */
-		if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) ||
-				0 != (program_type & ZBX_PROGRAM_TYPE_AGENT)) &&
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_AGENT)) &&
 				0 != (res = ssl_set_psk(s->tls_ctx, (const unsigned char *)my_psk, my_psk_len,
 				(const unsigned char *)my_psk_identity, my_psk_identity_len)))
 		{
@@ -2270,8 +2358,7 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 			zbx_free(s->tls_ctx);
 			goto out;
 		}
-		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY) ||
-				0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		else if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_SERVER)))
 		{
 			/* For server or proxy a PSK can come from configuration file or database. */
 			/* Set up a callback function for finding the requested PSK. */
@@ -2447,8 +2534,7 @@ out:
 	if (0 != (tls_accept & ZBX_TCP_SEC_TLS_PSK))
 	{
 		/* for agentd and agent the only possibility is a PSK from configuration file */
-		if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) ||
-				0 != (program_type & ZBX_PROGRAM_TYPE_AGENT)) &&
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_AGENT)) &&
 				GNUTLS_E_SUCCESS != (res = gnutls_credentials_set(s->tls_ctx, GNUTLS_CRD_PSK,
 				my_psk_server_creds)))
 		{
@@ -2456,8 +2542,7 @@ out:
 					res, gnutls_strerror(res));
 			goto out;
 		}
-		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY) ||
-				0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		else if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_SERVER)))
 		{
 			/* For server or proxy a PSK can come from configuration file or database. */
 			/* Set up a callback function for finding the requested PSK. */
