@@ -1509,7 +1509,7 @@ function getPagingLine(&$items) {
 	}
 	if ($currentPage > 1) {
 		$url->setArgument('page', $currentPage - 1);
-		$tags[] = new CLink(_('Previous'), $url->getUrl());
+		$tags[] = new CLink(new CSpan(null, 'arrow-left'), $url->getUrl());
 	}
 	for ($p = $startPage; $p <= $pagesCount; $p++) {
 		$url->setArgument('page', $p);
@@ -1517,7 +1517,7 @@ function getPagingLine(&$items) {
 	}
 	if ($currentPage < $pagesCount) {
 		$url->setArgument('page', $currentPage + 1);
-		$tags[] = new CLink(_('Next'), $url->getUrl());
+		$tags[] = new CLink(new CSpan(null, 'arrow-right'), $url->getUrl());
 	}
 	if ($p < $pagesCount) {
 		$url->setArgument('page', $pagesCount);
