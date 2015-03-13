@@ -1738,7 +1738,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 //				$msg_tab->show();
 // TODO remove old code, make new one
 
-				$msg = new CDiv($msg, 'msg-good');
+				$msg = new CDiv($msg, $bool ? 'msg-good' : 'msg-bad');
 				$msg->show();
 				break;
 		}
