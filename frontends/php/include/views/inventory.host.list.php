@@ -27,11 +27,11 @@ $controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsC
 $rForm->addItem($controls);
 $hostInventoryWidget->setControls($rForm);
 
+// filter
 $filterForm = new CFilter('web.hostinventories.filter.state');
 
 $filterColumn = new CFormList();
 
-$filterTable = new CTable('', 'filter filter-center');
 // getting inventory fields to make a drop down
 $inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
 $inventoryFieldsComboBox = new CComboBox('filter_field', $this->data['filterField']);
@@ -44,33 +44,18 @@ foreach ($inventoryFields as $inventoryField) {
 $exactComboBox = new CComboBox('filter_exact', $this->data['filterExact']);
 $exactComboBox->addItem('0', _('like'));
 $exactComboBox->addItem('1', _('exactly'));
-$filterTable->addRow(array(
-	array(
-		array(bold(_('Field')), ' ', $inventoryFieldsComboBox),
+
+$filterColumn->addRow(
+		_('Field'),
 		array(
+			$inventoryFieldsComboBox,
 			$exactComboBox,
 			new CTextBox('filter_field_value', $this->data['filterFieldValue'], 20)
-		),
-	),
-), 'host-inventories');
+		)
+);
 
-$filter = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput shadow');
-$filter->main();
-
-$reset = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput shadow');
-
-$divButtons = new CDiv(array($filter, $reset));
-$divButtons->setAttribute('style', 'padding: 4px 0px;');
-
-$footerCol = new CCol($divButtons, 'controls');
-
-$filterTable->addRow($footerCol);
-
-$filterForm = new CForm('get');
-$filterForm->setAttribute('name', 'zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
-$filterForm->addItem($filterTable);
-$hostInventoryWidget->addFlicker($filterForm, CProfile::get('web.hostinventories.filter.state', 0));
+$filterForm->addColumn($filterColumn);
+$hostInventoryWidget->addItem($filterForm);
 
 $table = new CTableInfo();
 $table->setHeader(array(
