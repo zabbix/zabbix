@@ -36,20 +36,19 @@ typedef struct
 	char			*formula;
 	char			*logtimefmt;
 	char			*params;
+	char			*ipmi_sensor;
 	char			*snmp_community;
 	char			*snmp_oid;
-	char			*port;
-	char			*ipmi_sensor;
 	char			*snmpv3_securityname;
 	char			*snmpv3_authpassphrase;
 	char			*snmpv3_privpassphrase;
+	char			*snmpv3_contextname;
 	char			*username;
 	char			*password;
 	char			*publickey;
 	char			*privatekey;
 	char			*description;
-	char			*snmpv3_contextname;
-
+	char			*port;
 	int			delay;
 	int			history;
 	int			trends;
@@ -170,16 +169,14 @@ typedef struct
 {
 	zbx_uint64_t		applicationid;
 	zbx_uint64_t		parentid;
-	char			*name;
-
-	const zbx_lld_row_t	*lld_row;
-
-#define ZBX_FLAG_LLD_APPLICATION_UNSET				__UINT64_C(0x0000000000000000)
-#define ZBX_FLAG_LLD_APPLICATION_DISCOVERED			__UINT64_C(0x0000000000000001)
-#define ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME			__UINT64_C(0x0000000000000002)
-#define ZBX_FLAG_LLD_APPLICATION_INVALID			__UINT64_C(0x0000000100000000)
-#define ZBX_FLAG_LLD_APPLICATION_ADDDISCOVERY			__UINT64_C(0x0000000200000000)
+#define ZBX_FLAG_LLD_APPLICATION_UNSET		__UINT64_C(0x0000000000000000)
+#define ZBX_FLAG_LLD_APPLICATION_DISCOVERED	__UINT64_C(0x0000000000000001)
+#define ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME	__UINT64_C(0x0000000000000002)
+#define ZBX_FLAG_LLD_APPLICATION_INVALID	__UINT64_C(0x0000000100000000)
+#define ZBX_FLAG_LLD_APPLICATION_ADDDISCOVERY	__UINT64_C(0x0000000200000000)
 	zbx_uint64_t		flags;
+	char			*name;
+	const zbx_lld_row_t	*lld_row;
 }
 zbx_lld_application_t;
 
@@ -214,14 +211,13 @@ typedef struct
 	zbx_uint64_t			itemappid;
 	zbx_lld_item_ref_t		item_ref;
 	zbx_lld_application_ref_t	application_ref;
-
-#define ZBX_FLAG_LLD_ITEM_APPLICATION_UNSET			__UINT64_C(0x0000000000000000)
-#define ZBX_FLAG_LLD_ITEM_APPLICATION_DISCOVERED		__UINT64_C(0x0000000000000001)
+#define ZBX_FLAG_LLD_ITEM_APPLICATION_UNSET		__UINT64_C(0x0000000000000000)
+#define ZBX_FLAG_LLD_ITEM_APPLICATION_DISCOVERED	__UINT64_C(0x0000000000000001)
 	zbx_uint64_t			flags;
 }
 zbx_lld_item_application_t;
 
-/* application index by prototypeid and lld row*/
+/* application index by prototypeid and lld row */
 typedef struct
 {
 	zbx_uint64_t		application_prototypeid;
@@ -230,7 +226,6 @@ typedef struct
 }
 zbx_lld_application_index_t;
 
-
 /* items index hashset support functions */
 static zbx_hash_t	lld_item_index_hash_func(const void *data)
 {
@@ -238,7 +233,7 @@ static zbx_hash_t	lld_item_index_hash_func(const void *data)
 	zbx_hash_t		hash;
 
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&item_index->parent_itemid);
-	return zbx_hash_modfnv(&item_index->lld_row, sizeof(zbx_lld_row_t *), hash);
+	return zbx_hash_modfnv(&item_index->lld_row, sizeof(item_index->lld_row), hash);
 }
 
 static int	lld_item_index_compare_func(const void *d1, const void *d2)
@@ -259,7 +254,7 @@ static zbx_hash_t	lld_application_index_hash_func(const void *data)
 	zbx_hash_t			hash;
 
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&application_index->application_prototypeid);
-	return zbx_hash_modfnv(&application_index->lld_row, sizeof(zbx_lld_row_t *), hash);
+	return zbx_hash_modfnv(&application_index->lld_row, sizeof(application_index->lld_row), hash);
 }
 
 static int	lld_application_index_compare_func(const void *d1, const void *d2)
@@ -284,7 +279,7 @@ static int	lld_application_ref_compare_func(const void *d1, const void *d2)
 	return memcmp(d1, d2, sizeof(zbx_lld_application_ref_t));
 }
 
-/* string pointer hashset (used to check for duplicated item keys) support functions */
+/* string pointer hashset (used to check for duplicate item keys) support functions */
 static zbx_hash_t	lld_items_keys_hash_func(const void *data)
 {
 	return ZBX_DEFAULT_STRING_HASH_FUNC(*(char **)data);
@@ -295,16 +290,14 @@ static int	lld_items_keys_compare_func(const void *d1, const void *d2)
 	return ZBX_DEFAULT_STR_COMPARE_FUNC(d1, d2);
 }
 
-
 /* items - applications hashset support */
 static zbx_hash_t	lld_item_application_hash_func(const void *data)
 {
 	const zbx_lld_item_application_t	*item_application = data;
 	zbx_hash_t				hash;
 
-	hash = zbx_hash_modfnv(&item_application->item_ref, sizeof(zbx_lld_item_ref_t), ZBX_DEFAULT_HASH_SEED);
-
-	return zbx_hash_modfnv(&item_application->application_ref, sizeof(zbx_lld_application_ref_t), hash);
+	hash = zbx_hash_modfnv(&item_application->item_ref, sizeof(item_application->item_ref), ZBX_DEFAULT_HASH_SEED);
+	return zbx_hash_modfnv(&item_application->application_ref, sizeof(item_application->application_ref), hash);
 }
 
 static int	lld_item_application_compare_func(const void *d1, const void *d2)
@@ -319,7 +312,6 @@ static int	lld_item_application_compare_func(const void *d1, const void *d2)
 			sizeof(zbx_lld_application_ref_t));
 }
 
-/* */
 static void	lld_application_prototype_free(zbx_lld_application_prototype_t *application_prototype)
 {
 	zbx_free(application_prototype->name);
@@ -332,7 +324,6 @@ static void	lld_application_free(zbx_lld_application_t *application)
 	zbx_free(application);
 }
 
-
 static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 {
 	zbx_free(item_prototype->name);
@@ -343,25 +334,25 @@ static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 	zbx_free(item_prototype->formula);
 	zbx_free(item_prototype->logtimefmt);
 	zbx_free(item_prototype->params);
+	zbx_free(item_prototype->ipmi_sensor);
 	zbx_free(item_prototype->snmp_community);
 	zbx_free(item_prototype->snmp_oid);
-	zbx_free(item_prototype->port);
-	zbx_free(item_prototype->ipmi_sensor);
 	zbx_free(item_prototype->snmpv3_securityname);
 	zbx_free(item_prototype->snmpv3_authpassphrase);
 	zbx_free(item_prototype->snmpv3_privpassphrase);
+	zbx_free(item_prototype->snmpv3_contextname);
 	zbx_free(item_prototype->username);
 	zbx_free(item_prototype->password);
 	zbx_free(item_prototype->publickey);
 	zbx_free(item_prototype->privatekey);
 	zbx_free(item_prototype->description);
-	zbx_free(item_prototype->snmpv3_contextname);
+	zbx_free(item_prototype->port);
 
+	zbx_vector_ptr_destroy(&item_prototype->lld_rows);
 
 	zbx_vector_ptr_clear_ext(&item_prototype->applications, zbx_default_mem_free_func);
 	zbx_vector_ptr_destroy(&item_prototype->applications);
 
-	zbx_vector_ptr_destroy(&item_prototype->lld_rows);
 	zbx_free(item_prototype);
 }
 
@@ -397,7 +388,7 @@ static void	lld_item_free(zbx_lld_item_t *item)
  ******************************************************************************/
 static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *items)
 {
-	const char	*__function_name = "lld_items_get";
+	const char		*__function_name = "lld_items_get";
 
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -501,7 +492,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		item->units = zbx_strdup(NULL, row[14]);
 		item->units_orig = NULL;
 
-		if ((unsigned char)atoi(row[15]) !=item_prototype-> multiplier)
+		if ((unsigned char)atoi(row[15]) != item_prototype->multiplier)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_MULTIPLIER;
 
 		if ((unsigned char)atoi(row[16]) != item_prototype->delta)
@@ -791,7 +782,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
  *          prototype and lld data row                                        *
  *                                                                            *
  * Parameters: item_prototype - [IN] the item prototype                       *
- *             jp_row         - [IN] json fragment containing lld data row    *
+ *             lld_row        - [IN] the lld row                              *
  *             item           - [IN] an existing item or NULL                 *
  *             items          - [IN/OUT] sorted list of items                 *
  *                                                                            *
@@ -799,7 +790,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 static void	lld_item_make(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
 		zbx_lld_item_t *item, zbx_vector_ptr_t *items)
 {
-	const char	*__function_name = "lld_make_item";
+	const char		*__function_name = "lld_item_make";
 
 	char			*buffer = NULL;
 	struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
@@ -977,9 +968,8 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 			zbx_vector_ptr_append(&item_prototype->lld_rows, lld_rows->values[j]);
 	}
 
-	/* Iterate in reverse order because usually the items are created in the same order */
-	/* as incoming lld rows. Iterating in reverse optimizes lld_row removal from        */
-	/* item prototypes.                                                                 */
+	/* Iterate in reverse order because usually the items are created in the same order as     */
+	/* incoming lld rows. Iterating in reverse optimizes lld_row removal from item prototypes. */
 	for (i = items->values_num - 1; i >= 0; i--)
 	{
 		item = (zbx_lld_item_t *)items->values[i];
@@ -1036,7 +1026,7 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d items", __function_name, items->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d items", __function_name, items->values_num);
 }
 
 /******************************************************************************
@@ -1051,7 +1041,7 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 static void	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prototypes, const
 		zbx_vector_ptr_t *items)
 {
-	const char	*__function_name = "lld_items_save";
+	const char			*__function_name = "lld_items_save";
 
 	int				index, i, new_items = 0, upd_items = 0;
 	zbx_lld_item_t			*item;
@@ -1305,8 +1295,7 @@ static void	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_pro
 				{
 					value_esc = DBdyn_escape_string(item_prototype->snmpv3_securityname);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-							"%ssnmpv3_securityname='%s'", d,
-							value_esc);
+							"%ssnmpv3_securityname='%s'", d, value_esc);
 					zbx_free(value_esc);
 					d = ",";
 				}
@@ -1479,10 +1468,11 @@ static void	lld_applications_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 			lld_application_ref_compare_func);
 
 	zbx_hashset_iter_reset(items_applications, &iter);
+
 	while (NULL != (item_application = zbx_hashset_iter_next(&iter)))
 	{
-		if (0 == (item_application->flags && ZBX_FLAG_LLD_ITEM_APPLICATION_DISCOVERED))
-				continue;
+		if (0 == (item_application->flags & ZBX_FLAG_LLD_ITEM_APPLICATION_DISCOVERED))
+			continue;
 
 		application_ref_local = item_application->application_ref;
 
@@ -1495,7 +1485,7 @@ static void	lld_applications_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 	/* Count new applications and application discoveries.                      */
 	/* Note that an application might have been discovered by another lld rule. */
 	/* In this case the discovered items will be linked to this application and */
-	/* new application discovery record, linking the prototype to the this      */
+	/* new application discovery record, linking the prototype to this          */
 	/* application, will be created.                                            */
 	for (i = 0; i < applications->values_num; i++)
 	{
@@ -1571,7 +1561,7 @@ static void	lld_applications_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 
 	zbx_hashset_destroy(&applications_used);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d unused applications", __function_name,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d unused applications", __function_name,
 			unused_applicationids->values_num);
 }
 
@@ -1601,6 +1591,7 @@ static void	lld_items_applications_save(zbx_hashset_t *items_applications)
 
 	/* count new item-application links */
 	zbx_hashset_iter_reset(items_applications, &iter);
+
 	while (NULL != (item_application = zbx_hashset_iter_next(&iter)))
 	{
 		if (0 == item_application->itemappid)
@@ -1614,6 +1605,7 @@ static void	lld_items_applications_save(zbx_hashset_t *items_applications)
 	}
 
 	zbx_hashset_iter_reset(items_applications, &iter);
+
 	while (NULL != (item_application = zbx_hashset_iter_next(&iter)))
 	{
 		if (0 != item_application->itemappid)
@@ -1647,7 +1639,7 @@ static void	lld_items_applications_save(zbx_hashset_t *items_applications)
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from items_applications where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from items_applications where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemappid", del_itemappids.values,
 				del_itemappids.values_num);
 
@@ -1708,6 +1700,7 @@ static void	lld_applications_remove_unused(zbx_vector_uint64_t *unused_applicati
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", unused_applicationids->values,
 			unused_applicationids->values_num);
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_prototypeid",
@@ -1726,7 +1719,8 @@ static void	lld_applications_remove_unused(zbx_vector_uint64_t *unused_applicati
 			" from items_applications ia,items i"
 			" where ia.itemid=i.itemid"
 				" and i.flags=%d"
-				" and", ZBX_FLAG_DISCOVERY_CREATED);
+				" and",
+			ZBX_FLAG_DISCOVERY_CREATED);
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ia.applicationid",
 			unused_applicationids->values, unused_applicationids->values_num);
@@ -1745,13 +1739,14 @@ static void	lld_applications_remove_unused(zbx_vector_uint64_t *unused_applicati
 	}
 	DBfree_result(result);
 
-	if (0 != unused_applicationids->values)
+	if (0 != unused_applicationids->values_num)
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"delete from applications"
 				" where flags=%d"
-				" and", ZBX_FLAG_DISCOVERY_CREATED);
+				" and",
+				ZBX_FLAG_DISCOVERY_CREATED);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid",
 				unused_applicationids->values, unused_applicationids->values_num);
 
@@ -1868,7 +1863,9 @@ static void	lld_remove_lost_resources(const zbx_vector_ptr_t *application_protot
 
 		/* iterate through items applications and find applications that are linked */
 		/* to items that will be removed                                            */
+
 		zbx_hashset_iter_reset(items_applications, &iter);
+
 		while (NULL != (item_application = zbx_hashset_iter_next(&iter)))
 		{
 			if (0 == item_application->item_ref.itemid)
@@ -1900,7 +1897,7 @@ static void	lld_remove_lost_resources(const zbx_vector_ptr_t *application_protot
 	zbx_vector_uint64_destroy(&lc_itemids);
 	zbx_vector_uint64_destroy(&del_itemids);
 out:
-zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *lld_rows,
@@ -1971,7 +1968,8 @@ static void	lld_application_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_p
 	result = DBselect(
 			"select application_prototypeid,name"
 			" from application_prototype"
-			" where itemid=" ZBX_FS_UI64, lld_ruleid);
+			" where itemid=" ZBX_FS_UI64,
+			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1988,7 +1986,7 @@ static void	lld_application_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_p
 
 	zbx_vector_ptr_sort(application_prototypes, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d prototypes", __function_name, application_prototypes->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d prototypes", __function_name, application_prototypes->values_num);
 }
 
 /******************************************************************************
@@ -2000,11 +1998,11 @@ static void	lld_application_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_p
  *                                                                            *
  * Parameters: item_prototypes        - [IN/OUT] item prototypes              *
  *             application_prototypes - [IN] the application prototypes       *
- *                                            defined for the discovery rule  *
+ *                                           defined for the discovery rule   *
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_application_prototypes_get(const zbx_vector_ptr_t *item_prototypes,
-		zbx_vector_ptr_t *application_prototypes)
+		const zbx_vector_ptr_t *application_prototypes)
 {
 	const char			*__function_name = "lld_item_application_prototypes_get";
 	DB_RESULT			result;
@@ -2030,14 +2028,13 @@ static void	lld_item_application_prototypes_get(const zbx_vector_ptr_t *item_pro
 		zbx_vector_uint64_append(&item_prototypeids, item_prototype->itemid);
 	}
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select application_prototypeid,itemid"
 			" from item_application_prototype"
-			" where ");
+			" where");
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid",
 			item_prototypeids.values, item_prototypeids.values_num);
-
 
 	result = DBselect("%s", sql);
 
@@ -2047,12 +2044,14 @@ static void	lld_item_application_prototypes_get(const zbx_vector_ptr_t *item_pro
 				sizeof(zbx_lld_item_application_ref_t));
 
 		ZBX_STR2UINT64(application_prototypeid, row[0]);
+
 		if (FAIL == (index = zbx_vector_ptr_search(application_prototypes, &application_prototypeid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
+
 		item_application_prototype->application_prototype = application_prototypes->values[index];
 		item_application_prototype->applicationid = 0;
 
@@ -2067,10 +2066,10 @@ static void	lld_item_application_prototypes_get(const zbx_vector_ptr_t *item_pro
 	/* get item prototype links to real applications */
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select applicationid,itemid"
 			" from items_applications"
-			" where ");
+			" where");
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid",
 			item_prototypeids.values, item_prototypeids.values_num);
@@ -2120,11 +2119,12 @@ static void	lld_applications_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *appl
 
 	result = DBselect(
 			"select a.applicationid,a.name,ap.application_prototypeid"
-			" from applications a, application_discovery ad, application_prototype ap, items i"
+			" from applications a,application_discovery ad,application_prototype ap,items i"
 			" where i.itemid= " ZBX_FS_UI64
 				" and ap.itemid=i.itemid"
 				" and ad.application_prototypeid=ap.application_prototypeid"
-				" and a.applicationid=ad.applicationid", lld_ruleid);
+				" and a.applicationid=ad.applicationid",
+			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2141,7 +2141,7 @@ static void	lld_applications_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *appl
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d applications", __function_name, applications->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d applications", __function_name, applications->values_num);
 }
 
 static int	lld_applications_compare(const void *d1, const void *d2)
@@ -2239,8 +2239,10 @@ static void	lld_applications_make(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 	for (i = 0; i < application_prototypes->values_num; i++)
 	{
 		for (j = 0; j < lld_rows->values_num; j++)
+		{
 			lld_application_make(application_prototypes->values[i], lld_rows->values[j], applications,
 					applications_index);
+		}
 	}
 
 	if (0 == applications->values_num)
@@ -2301,7 +2303,7 @@ out:
 	zbx_free(sql);
 	zbx_vector_str_destroy(&application_names);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d applications", __function_name, applications->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d applications", __function_name, applications->values_num);
 }
 
 /******************************************************************************
@@ -2325,10 +2327,11 @@ static void	lld_items_applications_get(zbx_uint64_t lld_ruleid, zbx_hashset_t *i
 
 	result = DBselect(
 			"select ia.itemappid,ia.itemid,ia.applicationid"
-			" from items_applications ia, item_discovery id1, item_discovery id2"
+			" from items_applications ia,item_discovery id1,item_discovery id2"
 			" where id2.parent_itemid=" ZBX_FS_UI64
 				" and id1.itemid=ia.itemid"
-				" and id1.parent_itemid=id2.itemid", lld_ruleid);
+				" and id1.parent_itemid=id2.itemid",
+			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2341,7 +2344,7 @@ static void	lld_items_applications_get(zbx_uint64_t lld_ruleid, zbx_hashset_t *i
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d links", __function_name, items_applications->num_data);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d links", __function_name, items_applications->num_data);
 }
 
 /******************************************************************************
@@ -2354,8 +2357,8 @@ static void	lld_items_applications_get(zbx_uint64_t lld_ruleid, zbx_hashset_t *i
  *             items              - [IN] the items                            *
  *             applications       - [IN] the applications                     *
  *             applications_index - [IN] the application index by             *
- *             items_applications - [IN/OUT] the item-application links       *
  *                                       prototype id and lld row             *
+ *             items_applications - [IN/OUT] the item-application links       *
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_applications_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *items,
@@ -2424,9 +2427,7 @@ static void	lld_items_applications_make(const zbx_vector_ptr_t *item_prototypes,
 					item_application_local.application_ref.application = application;
 				}
 				else
-				{
 					item_application_local.application_ref.application = NULL;
-				}
 			}
 			else
 			{
@@ -2445,7 +2446,7 @@ static void	lld_items_applications_make(const zbx_vector_ptr_t *item_prototypes,
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d links", __function_name, items_applications->num_data);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d links", __function_name, items_applications->num_data);
 }
 
 /******************************************************************************
@@ -2521,6 +2522,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		item_prototype->description = zbx_strdup(NULL, row[34]);
 		ZBX_DBROW2UINT64(item_prototype->interfaceid, row[35]);
 		item_prototype->snmpv3_contextname = zbx_strdup(NULL, row[36]);
+
 		zbx_vector_ptr_create(&item_prototype->lld_rows);
 		zbx_vector_ptr_create(&item_prototype->applications);
 
@@ -2530,7 +2532,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 
 	zbx_vector_ptr_sort(item_prototypes, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d prototypes", __function_name, item_prototypes->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d prototypes", __function_name, item_prototypes->values_num);
 }
 
 /******************************************************************************
