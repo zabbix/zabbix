@@ -1305,7 +1305,7 @@ static void	DBdelete_applications(zbx_vector_uint64_t *applicationids)
 	if (0 == applicationids->values_num)
 		goto out;
 
-	/* don't delete applications used in web scenarious */
+	/* don't delete applications used in web scenarios */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct applicationid"
 			" from httptest"
@@ -1320,8 +1320,7 @@ static void	DBdelete_applications(zbx_vector_uint64_t *applicationids)
 		ZBX_STR2UINT64(applicationid, row[0]);
 
 		index = zbx_vector_uint64_bsearch(applicationids, applicationid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		if (FAIL != index)
-			zbx_vector_uint64_remove(applicationids, index);
+		zbx_vector_uint64_remove(applicationids, index);
 	}
 	DBfree_result(result);
 
@@ -1344,8 +1343,7 @@ static void	DBdelete_applications(zbx_vector_uint64_t *applicationids)
 		ZBX_STR2UINT64(applicationid, row[0]);
 
 		index = zbx_vector_uint64_bsearch(applicationids, applicationid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		if (FAIL != index)
-			zbx_vector_uint64_remove(applicationids, index);
+		zbx_vector_uint64_remove(applicationids, index);
 	}
 	DBfree_result(result);
 
@@ -1700,6 +1698,7 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, const zbx_vector_uint64
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
+ *                                                                            *
  *           This function does not remove applications discovered by         *
  *           application prototypes.                                          *
  *           Use DBdelete_template_discovered_applications() for that.        *
@@ -1707,12 +1706,12 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, const zbx_vector_uint64
  ******************************************************************************/
 static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
-	const char	*__function_name = "DBdelete_template_applications";
+	const char		*__function_name = "DBdelete_template_applications";
 
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t		id;
 	zbx_vector_uint64_t	applicationids, apptemplateids;
 
@@ -1775,11 +1774,10 @@ out:
  * Purpose: delete discovered host applications that belong to an unlinked    *
  *          template and don't have any discovered items linked to them       *
  *                                                                            *
- * Parameters: hostid      - [IN] an array of discovered application IDs      *
- *             templateids - [IN] an array of template IDs                    *
+ * Parameters: discoveredappids - [IN] an array of discovered application IDs *
  *                                                                            *
- * Comments: Items belonging to the unlinked templates must be removed        *
- *           before calling this function.                                    *
+ * Comments: Items belonging to the unlinked templates must be removed before *
+ *           calling this function.                                           *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_template_discovered_applications(zbx_vector_uint64_t *discoveredappids)
@@ -1796,18 +1794,12 @@ static void	DBdelete_template_discovered_applications(zbx_vector_uint64_t *disco
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* find discovered applications that belong to unlinked templates */
-	/* and has other items linked to them                             */
+	/* and have other items linked to them                            */
+
 	zbx_vector_uint64_sort(discoveredappids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct ia.applicationid"
-			" from items_applications ia, applications a"
-			" where ia.applicationid=a.applicationid"
-				" and a.flags=%d"
-				" and",
-			ZBX_FLAG_DISCOVERY_CREATED);
-
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ia.applicationid", discoveredappids->values,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct applicationid from items_applications where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", discoveredappids->values,
 			discoveredappids->values_num);
 
 	result = DBselect("%s", sql);
@@ -1819,16 +1811,12 @@ static void	DBdelete_template_discovered_applications(zbx_vector_uint64_t *disco
 		index = zbx_vector_uint64_bsearch(discoveredappids, applicationid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_remove(discoveredappids, index);
 	}
-
 	DBfree_result(result);
 
 	if (0 != discoveredappids->values_num)
 	{
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"delete from applications"
-				" where");
-
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from applications where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", discoveredappids->values,
 				discoveredappids->values_num);
 
@@ -2162,10 +2150,8 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
  *             templateids - [IN] array of template IDs                       *
- *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -2196,9 +2182,9 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *                                                                            *
  * Purpose: get applications discovered on the host by specified templates    *
  *                                                                            *
- * Parameters: hostid          - [IN] host identifier                         *
- *             del_templateids - [IN] array of template IDs                   *
- *             applicationids  - [OUT] array of application IDs               *
+ * Parameters: hostid         - [IN] host identifier                          *
+ *             templateids    - [IN] array of template IDs                    *
+ *             applicationids - [OUT] array of application IDs                *
  *                                                                            *
  ******************************************************************************/
 static void	get_discovered_applications_by_hostid_templates(zbx_uint64_t hostid,
@@ -2230,8 +2216,8 @@ static void	get_discovered_applications_by_hostid_templates(zbx_uint64_t hostid,
 		ZBX_STR2UINT64(applicationid, row[0]);
 		zbx_vector_uint64_append(applicationids, applicationid);
 	}
-
 	DBfree_result(result);
+
 	zbx_free(sql);
 }
 
@@ -2255,10 +2241,9 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 
 	char			*sql = NULL;
 	size_t			sql_alloc = 128, sql_offset = 0;
-	zbx_vector_uint64_t	templateids;
+	zbx_vector_uint64_t	templateids, discoveredappids;
 	int			i, index, res = SUCCEED;
 	char			error[MAX_STRING_LEN];
-	zbx_vector_uint64_t	discoveredappids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2344,7 +2329,8 @@ static void	zbx_application_clean(zbx_application_t *application)
  *                                                                            *
  * Purpose: copy application prototypes from templates to host                *
  *                                                                            *
- * Parameters: hostid - [IN] host id                                          *
+ * Parameters: hostid      - [IN] host id                                     *
+ *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Comments: The host items must be already copied.                           *
  *                                                                            *
@@ -2357,7 +2343,6 @@ static void	DBcopy_template_application_prototypes(zbx_uint64_t hostid, const zb
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 	zbx_db_insert_t	db_insert;
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2410,19 +2395,20 @@ out:
  *                                                                            *
  * Purpose: copy application prototypes from templates to host                *
  *                                                                            *
- * Parameters: hostid - [IN] host id                                          *
+ * Parameters: hostid      - [IN] host id                                     *
+ *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Comments: The host items and application prototypes must be already copied.*
  *                                                                            *
  ******************************************************************************/
 static void	DBcopy_template_item_application_prototypes(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
-	const char		*__function_name = "DBcopy_template_item_application_prototypes";
-	DB_RESULT		result;
-	DB_ROW			row;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_db_insert_t		db_insert;
+	const char	*__function_name = "DBcopy_template_item_application_prototypes";
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	zbx_db_insert_t	db_insert;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
