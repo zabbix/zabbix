@@ -2826,19 +2826,14 @@ void	zbx_tls_close(zbx_sock_t *s)
  ******************************************************************************/
 const char	*zbx_tls_connection_type_name(unsigned int type)
 {
-	static const char	*unencrypted = "unencrypted";
-	static const char	*tls_psk = "TLS with PSK";
-	static const char	*tls_cert = "TLS with certificate";
-	static const char	*unknown = "unknown";
-
 	if (ZBX_TCP_SEC_UNENCRYPTED == type)
-		return unencrypted;
+		return "unencrypted";
 	else if (ZBX_TCP_SEC_TLS_CERT == type)
-		return tls_cert;
+		return "TLS with certificate";
 	else if (ZBX_TCP_SEC_TLS_PSK == type)
-		return tls_psk;
+		return "TLS with PSK";
 	else
-		return unknown;
+		return "unknown";
 }
 
 /******************************************************************************
