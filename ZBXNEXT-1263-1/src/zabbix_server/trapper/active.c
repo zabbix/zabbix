@@ -25,6 +25,7 @@
 #include "zbxregexp.h"
 
 #include "active.h"
+#include "../../libs/zbxcrypto/tls_tcp_active.h"
 
 extern unsigned char	program_type;
 
@@ -44,8 +45,8 @@ extern unsigned char	program_type;
  * Comments: NB! adds host to the database if it does not exist               *
  *                                                                            *
  ******************************************************************************/
-static int	get_hostid_by_host(const char *host, const char *ip, unsigned short port, const char *host_metadata,
-		zbx_uint64_t *hostid, char *error)
+static int	get_hostid_by_host(const zbx_sock_t *sock, const char *host, const char *ip, unsigned short port,
+		const char *host_metadata, zbx_uint64_t *hostid, char *error)
 {
 	const char	*__function_name = "get_hostid_by_host";
 
@@ -66,7 +67,7 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 	host_esc = DBdyn_escape_string(host);
 
 	result = DBselect(
-			"select hostid,status"
+			"select hostid,status,tls_accept,tls_issuer,tls_subject,tls_psk_identity"
 			" from hosts"
 			" where host='%s'"
 				" and status in (%d,%d)"
@@ -78,7 +79,59 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 	{
 		if (HOST_STATUS_MONITORED == atoi(row[1]))
 		{
+			unsigned int		tls_accept;
+			zbx_tls_conn_attr_t	attr;
+
+			tls_accept = (unsigned int)atoi(row[2]);
+
+			if (0 == (tls_accept & sock->connection_type))
+			{
+				zbx_snprintf(error, MAX_STRING_LEN, "connection of type \"%s\" is not allowed for host "
+						"\"%s\"", zbx_tls_connection_type_name(sock->connection_type), host);
+				goto done;
+			}
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			if ((ZBX_TCP_SEC_TLS_CERT == sock->connection_type ||
+					ZBX_TCP_SEC_TLS_PSK == sock->connection_type) &&
+					SUCCEED != zbx_tls_get_attr(sock, &attr))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+
+				zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host \"%s\"",
+						host);
+				goto done;
+			}
+
+			if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+			{
+				/* TODO RFC 4518 requires more sophisticated issuer matching */
+				if (strlen(row[3]) != attr.arg1_len || 0 != memcmp(row[3], attr.arg1, attr.arg1_len))
+				{
+					zbx_snprintf(error, MAX_STRING_LEN, "certificate issuer does not match for "
+							"host \"%s\"", host);
+					goto done;
+				}
+
+				/* TODO RFC 4518 requires more sophisticated subject matching */
+				if (strlen(row[4]) != attr.arg2_len || 0 != memcmp(row[4], attr.arg2, attr.arg2_len))
+				{
+					zbx_snprintf(error, MAX_STRING_LEN, "certificate subject does not match for "
+							"host \"%s\"", host);
+					goto done;
+				}
+			}
+			else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+			{
+				if (strlen(row[5]) != attr.arg1_len || 0 != memcmp(row[5], attr.arg1, attr.arg1_len))
+				{
+					zbx_snprintf(error, MAX_STRING_LEN, "false PSK identity for host \"%s\"", host);
+					goto done;
+				}
+			}
+#endif
 			ZBX_STR2UINT64(*hostid, row[0]);
+
 			ret = SUCCEED;
 		}
 		else
@@ -105,7 +158,7 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 
 		DBcommit();
 	}
-
+done:
 	DBfree_result(result);
 
 	zbx_free(host_esc);
@@ -180,7 +233,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 	strscpy(ip, get_ip_by_socket(sock));
 
 	/* no host metadata in older versions of agent */
-	if (FAIL == get_hostid_by_host(host, ip, ZBX_DEFAULT_AGENT_PORT, "", &hostid, error))
+	if (FAIL == get_hostid_by_host(sock, host, ip, ZBX_DEFAULT_AGENT_PORT, "", &hostid, error))
 		goto out;
 
 	zbx_vector_uint64_create(&itemids);
@@ -391,7 +444,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (FAIL == is_ushort(tmp, &port))
 		port = ZBX_DEFAULT_AGENT_PORT;
 
-	if (FAIL == get_hostid_by_host(host, ip, port, host_metadata, &hostid, error))
+	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, &hostid, error))
 		goto error;
 
 	zbx_vector_uint64_create(&itemids);
