@@ -39,7 +39,7 @@ class C10XmlValidator {
 
 		$this->validateHosts($content);
 		$this->validateTriggerDependencies($content);
-//		$this->validateSysmaps($content);
+		$this->validateSysmaps($content);
 		$this->validateScreens($content);
 	}
 
@@ -628,7 +628,7 @@ class C10XmlValidator {
 				}
 			}
 			else {
-				throw new Exception(_('Incorrect "screen" definition.'));
+				throw new Exception(_('Incorrect "screens" definition.'));
 			}
 		}
 	}
@@ -668,7 +668,8 @@ class C10XmlValidator {
 					'valign' =>			'required|string',
 					'halign' =>			'required|string',
 					'style' =>			'required|string',
-					'dynamic' =>		'required|string'
+					'dynamic' =>		'required|string',
+					'url' =>			''
 				);
 
 				$validator = new CNewValidator($screenitem, $validationRules);
@@ -682,6 +683,125 @@ class C10XmlValidator {
 				}
 
 				$screenitemNumber++;
+			}
+		}
+	}
+
+	/**
+	 * Main maps validation.
+	 *
+	 * @param array $content	import data
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateSysmaps($content) {
+		if (array_key_exists('sysmaps', $content)) {
+			if ($content['sysmaps']) {
+				$arrayValidator = new CXmlArrayValidator();
+				$arrayValidator->validate('sysmap', $content['sysmaps']);
+
+				if ($arrayValidator->getError()) {
+					throw new Exception(_s('Cannot parse XML tag "zabbix_export/sysmaps/sysmap(%1$s)": %2$s.',
+						$arrayValidator->getErrorSeqNum(), $arrayValidator->getError()
+					));
+				}
+
+				$sysmapNumber = 1;
+				foreach ($content['sysmaps'] as $sysmap) {
+					$arrayKeys = array('selements', 'links');
+					$newArray = new CXmlValidatorConverters();
+					$sysmap = $newArray->convertEmpStrToArr($arrayKeys, $sysmap);
+
+					$validationRules = array(
+						'selements' =>		'required|array',
+						'links' =>			'required|array',
+						'name' =>			'required|string',
+						'width' =>			'required|string',
+						'height' =>			'required|string',
+						'backgroundid' =>	'',
+						'label_type' =>		'required|string',
+						'label_location' =>	'required|string',
+						'highlight' =>		'required|string',
+						'expandproblem' =>	'required|string',
+						'markelements' =>	'required|string',
+						'show_unack' =>		'required|string'
+					);
+
+					$validator = new CNewValidator($sysmap, $validationRules);
+
+					if ($validator->isError()) {
+						$errors = $validator->getAllErrors();
+						throw new Exception(_s('Cannot parse XML tag "zabbix_export/sysmaps/sysmap(%1$s)": %2$s',
+							$sysmapNumber, $errors[0]
+						));
+					}
+
+					// unexpected tag validation
+					$arrayDiff = array_diff_key($sysmap, $validator->getValidInput());
+					if ($arrayDiff) {
+						throw new Exception(_s(
+							'Cannot parse XML tag "zabbix_export/sysmaps/sysmap(%1$s)": unexpected tag "%2$s".',
+							$sysmapNumber, key($arrayDiff)
+						));
+					}
+
+					// child elements validation
+					$this->validateSelements($sysmap, $sysmapNumber);
+
+					$sysmapNumber++;
+				}
+			}
+			else {
+				throw new Exception(_('Incorrect "sysmaps" definition.'));
+			}
+		}
+	}
+
+	/**
+	 * Map selements validation.
+	 *
+	 * @param array $sysmap			map data
+	 * @param int	$sysmapNumber	map number
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateSelements($sysmap, $sysmapNumber) {
+		if ($sysmap['selements']) {
+			$arrayValidator = new CXmlArrayValidator();
+			$arrayValidator->validate('selement', $sysmap['selements']);
+
+			if ($arrayValidator->getError()) {
+				throw new Exception(_s(
+					'Cannot parse XML tag "zabbix_export/sysmaps/sysmap(%1$s)/selements/selement(%2$s)": %3$s.',
+					$sysmapNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+				);
+			}
+
+			$selementNumber = 1;
+			foreach ($sysmap['selements'] as $selement) {
+				$validationRules = array(
+					'selementid' =>		'',
+					'elementid' =>		'',
+					'elementtype' =>	'required|string',
+					'iconid_off' =>		'',
+					'iconid_unknown' =>	'',
+					'label' =>			'required|string',
+					'label_location' =>	'',
+					'x' =>				'required|string',
+					'y' =>				'required|string'
+				);
+
+				$validator = new CNewValidator($selement, $validationRules);
+
+				if ($validator->isError()) {
+					$errors = $validator->getAllErrors();
+					throw new Exception(_s(
+						'Cannot parse XML tag "zabbix_export/sysmaps/sysmap(%1$s)/selements/selement(%2$s)": %3$s',
+						$sysmapNumber, $selementNumber, $errors[0]
+					));
+				}
+
+				$selementNumber++;
 			}
 		}
 	}
