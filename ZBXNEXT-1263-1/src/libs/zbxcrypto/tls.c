@@ -54,20 +54,21 @@ extern unsigned int	configured_tls_connect_mode;
 extern unsigned int	configured_tls_accept_modes;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-extern unsigned char	process_type, program_type;
-extern char		*CONFIG_TLS_CONNECT;
-extern char		*CONFIG_TLS_ACCEPT;
-extern char		*CONFIG_TLS_CA_FILE;
-extern char		*CONFIG_TLS_CRL_FILE;
-extern char		*CONFIG_TLS_CERT_FILE;
-extern char		*CONFIG_TLS_KEY_FILE;
-extern char		*CONFIG_TLS_PSK_FILE;
-extern char		*CONFIG_TLS_PSK_IDENTITY;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern char				*CONFIG_TLS_CONNECT;
+extern char				*CONFIG_TLS_ACCEPT;
+extern char				*CONFIG_TLS_CA_FILE;
+extern char				*CONFIG_TLS_CRL_FILE;
+extern char				*CONFIG_TLS_CERT_FILE;
+extern char				*CONFIG_TLS_KEY_FILE;
+extern char				*CONFIG_TLS_PSK_FILE;
+extern char				*CONFIG_TLS_PSK_IDENTITY;
 
-static char		*my_psk			= NULL;
-static size_t		my_psk_len		= 0;
-static char		*my_psk_identity	= NULL;
-static size_t		my_psk_identity_len	= 0;
+ZBX_THREAD_LOCAL static char		*my_psk			= NULL;
+ZBX_THREAD_LOCAL static size_t		my_psk_len		= 0;
+ZBX_THREAD_LOCAL static char		*my_psk_identity	= NULL;
+ZBX_THREAD_LOCAL static size_t		my_psk_identity_len	= 0;
 
 /* Pointer to DCget_psk_by_identity() initialized at runtime. This is a workaround for linking. */
 /* Server and proxy link with src/libs/zbxdbcache/dbconfig.o where DCget_psk_by_identity() resides */
@@ -76,27 +77,27 @@ size_t			(*find_psk_in_cache)(const unsigned char *, unsigned char *, size_t) = 
 #endif
 
 #if defined(HAVE_POLARSSL)
-static x509_crt		*ca_cert		= NULL;
-static x509_crl		*crl			= NULL;
-static x509_crt		*my_cert		= NULL;
-static pk_context	*my_priv_key		= NULL;
-static entropy_context	*entropy		= NULL;
-static ctr_drbg_context	*ctr_drbg		= NULL;
-static char		*err_msg		= NULL;
-static int		*ciphersuites_cert	= NULL;
-static int		*ciphersuites_psk	= NULL;
-static int		*ciphersuites_all	= NULL;
-static char		work_buf[SSL_MAX_CONTENT_LEN + 1];
+ZBX_THREAD_LOCAL static x509_crt		*ca_cert		= NULL;
+ZBX_THREAD_LOCAL static x509_crl		*crl			= NULL;
+ZBX_THREAD_LOCAL static x509_crt		*my_cert		= NULL;
+ZBX_THREAD_LOCAL static pk_context		*my_priv_key		= NULL;
+ZBX_THREAD_LOCAL static entropy_context		*entropy		= NULL;
+ZBX_THREAD_LOCAL static ctr_drbg_context	*ctr_drbg		= NULL;
+ZBX_THREAD_LOCAL static char			*err_msg		= NULL;
+ZBX_THREAD_LOCAL static int			*ciphersuites_cert	= NULL;
+ZBX_THREAD_LOCAL static int			*ciphersuites_psk	= NULL;
+ZBX_THREAD_LOCAL static int			*ciphersuites_all	= NULL;
+ZBX_THREAD_LOCAL static char			work_buf[SSL_MAX_CONTENT_LEN + 1];
 #elif defined(HAVE_GNUTLS)
-static gnutls_certificate_credentials_t	my_cert_creds		= NULL;
-static gnutls_psk_client_credentials_t	my_psk_client_creds	= NULL;
-static gnutls_psk_server_credentials_t	my_psk_server_creds	= NULL;
-static gnutls_priority_t		ciphersuites_cert	= NULL;
-static gnutls_priority_t		ciphersuites_psk	= NULL;
-static gnutls_priority_t		ciphersuites_all	= NULL;
+ZBX_THREAD_LOCAL static gnutls_certificate_credentials_t	my_cert_creds		= NULL;
+ZBX_THREAD_LOCAL static gnutls_psk_client_credentials_t		my_psk_client_creds	= NULL;
+ZBX_THREAD_LOCAL static gnutls_psk_server_credentials_t		my_psk_server_creds	= NULL;
+ZBX_THREAD_LOCAL static gnutls_priority_t			ciphersuites_cert	= NULL;
+ZBX_THREAD_LOCAL static gnutls_priority_t			ciphersuites_psk	= NULL;
+ZBX_THREAD_LOCAL static gnutls_priority_t			ciphersuites_all	= NULL;
 #elif defined(HAVE_OPENSSL)
-static const SSL_METHOD	*method = NULL;
-static SSL_CTX		*ctx = NULL;
+ZBX_THREAD_LOCAL static const SSL_METHOD	*method = NULL;
+ZBX_THREAD_LOCAL static SSL_CTX			*ctx = NULL;
 #endif
 
 #if defined(HAVE_POLARSSL)
@@ -272,6 +273,8 @@ static void	zbx_tls_validate_config(void)
 
 	if (NULL != CONFIG_TLS_CONNECT)
 	{
+		/* 'configured_tls_connect_mode' is shared between threads on MS Windows */
+
 		if (0 == strcmp(CONFIG_TLS_CONNECT, ZBX_TCP_SEC_UNENCRYPTED_TXT))
 			configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
 		else if (0 == strcmp(CONFIG_TLS_CONNECT, ZBX_TCP_SEC_TLS_CERT_TXT))
@@ -295,9 +298,12 @@ static void	zbx_tls_validate_config(void)
 
 	if (NULL != CONFIG_TLS_ACCEPT)
 	{
-		char	*s, *p, *delim;
+		char		*s, *p, *delim;
+		unsigned int	accept_modes_tmp = 0;	/* 'configured_tls_accept_modes' is shared between threads on */
+							/* MS Windows. To avoid races make a local temporary */
+							/* variable, modify it and write into */
+							/* 'configured_tls_accept_modes' when done. */
 
-		configured_tls_accept_modes = 0;
 		p = s = zbx_strdup(NULL, CONFIG_TLS_ACCEPT);
 
 		while (1)
@@ -307,11 +313,11 @@ static void	zbx_tls_validate_config(void)
 				*delim = '\0';
 
 			if (0 == strcmp(p, ZBX_TCP_SEC_UNENCRYPTED_TXT))
-				configured_tls_accept_modes |= ZBX_TCP_SEC_UNENCRYPTED;
+				accept_modes_tmp |= ZBX_TCP_SEC_UNENCRYPTED;
 			else if (0 == strcmp(p, ZBX_TCP_SEC_TLS_CERT_TXT))
-				configured_tls_accept_modes |= ZBX_TCP_SEC_TLS_CERT;
+				accept_modes_tmp |= ZBX_TCP_SEC_TLS_CERT;
 			else if (0 == strcmp(p, ZBX_TCP_SEC_TLS_PSK_TXT))
-				configured_tls_accept_modes |= ZBX_TCP_SEC_TLS_PSK;
+				accept_modes_tmp |= ZBX_TCP_SEC_TLS_PSK;
 			else
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "invalid value of \"TLSAccept\" parameter");
@@ -325,6 +331,8 @@ static void	zbx_tls_validate_config(void)
 			*delim = ',';
 			p = delim + 1;
 		}
+
+		configured_tls_accept_modes = accept_modes_tmp;
 
 		zbx_free(s);
 	}
