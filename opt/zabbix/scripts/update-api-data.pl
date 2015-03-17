@@ -9,9 +9,7 @@ use ApiHelper;
 use JSON::XS;
 use Data::Dumper;
 
-use constant ROOT_ZONE_DIR => 'zz--root'; # map root zone name (.) to something human readable
-use constant CONTINUE_FILE => 'last_update.txt'; # name of the file containing the timestamp of the last run with --continue
-
+use constant AUDIT_RESOURCE_INCIDENT => 32;
 parse_opts('tld=s', 'service=s', 'period=n', 'continue!', 'ignore-file=s');
 
 # do not write any logs
@@ -148,9 +146,7 @@ foreach (@$tlds_ref)
 {
 	$tld = $_;
 
-	my $api_tld = $tld;
-
-	$api_tld = ROOT_ZONE_DIR if ($tld eq ".");
+	my $api_tld = ah_get_api_tld($tld);
 
 	if (__tld_ignored($tld) == SUCCESS)
 	{
@@ -208,7 +204,7 @@ foreach (@$tlds_ref)
 
 		if (opt('continue'))
 		{
-			$continue_file = AH_BASE_DIR."/$api_tld/$service/".CONTINUE_FILE;
+			my $continue_file = ah_get_continue_file($api_tld, $service);
 			my $handle;
 
 			if (-e $continue_file)
@@ -608,6 +604,11 @@ foreach (@$tlds_ref)
 
 # unset TLD (for the logs)
 $tld = undef;
+
+unless (opt('dry-run'))
+{
+	__update_false_positives();
+}
 
 slv_exit(SUCCESS);
 
@@ -1272,6 +1273,43 @@ sub __tld_ignored
 	return SUCCESS if (exists($ignore_hash{$tld}));
 
 	return E_FAIL;
+}
+
+sub __update_false_positives
+{
+	# now check for possible false_positive change in front-end
+	my $last_audit = ah_get_last_audit();
+	my $maxclock = 0;
+	my $rows_ref = db_select(
+		"select substring(details,1,locate(':',details)-1) as eventid,max(clock) as clock".
+		" from auditlog".
+		" where resourcetype=".AUDIT_RESOURCE_INCIDENT.
+			" and clock>$last_audit".
+		" group by eventid");
+
+	foreach my $row_ref (@$rows_ref)
+	{
+		my $eventid = $row_ref->[0];
+		my $clock = $row_ref->[1];
+
+		$maxclock = $clock if ($clock > $maxclock);
+
+		my $rows_ref = db_select("select objectid,clock,false_positive from events where eventid=$eventid");
+
+		fail("cannot get event with ID $eventid") unless (scalar(@$rows_ref) == 1);
+
+		my $triggerid = $rows_ref->[0]->[0];
+		my $event_clock = $rows_ref->[0]->[1];
+		my $false_positive = $rows_ref->[0]->[2];
+
+		my ($tld, $service) = get_tld_by_trigger($triggerid);
+
+		print("$eventid\t$service\t".ts_str($event_clock)."\t".ts_str($clock)."\tfp:$false_positive\t$tld\n");
+
+		fail("cannot update false_positive status of event with ID $eventid") unless (ah_save_false_positive($tld, $service, $eventid, $event_clock, $false_positive, $clock) == AH_SUCCESS);
+	}
+
+	ah_save_audit($maxclock) unless ($maxclock == 0);
 }
 
 __END__

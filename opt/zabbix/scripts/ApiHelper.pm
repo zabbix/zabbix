@@ -21,8 +21,15 @@ use constant AH_ALARMED_NO => 'NO';
 use constant AH_ALARMED_DISABLED => 'DISABLED';
 use constant AH_SERVICE_AVAILABILITY_FILE => 'serviceAvailability';
 
-our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_BASE_DIR AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED ah_get_error
-		ah_save_alarmed ah_save_service_availability ah_save_incident ah_save_incident_json);
+use constant AH_ROOT_ZONE_DIR => 'zz--root';			# map root zone name (.) to something human readable
+use constant AH_CONTINUE_FILE => 'last_update.txt';		# name of the file containing the timestamp of the last
+								# run with --continue
+use constant AH_AUDIT_FILE => AH_BASE_DIR.'/last_audit.txt';	# name of the file containing the timestamp of the last
+								# auditlog entry that was checked (false_positive change)
+
+our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED ah_get_error
+		ah_save_alarmed ah_save_service_availability ah_save_incident ah_save_false_positive
+		ah_save_incident_json ah_get_continue_file ah_get_api_tld ah_get_last_audit ah_save_audit);
 
 my $error_string = "";
 
@@ -126,11 +133,11 @@ sub __apply_inc_false_positive
 {
 	my $inc_path = shift;
 	my $false_positive = shift;
-	my $lastclock = shift;
+	my $clock = shift;
 
 	my $false_positive_path = "$inc_path/".AH_FALSE_POSITIVE_FILE;
 
-	return __write_file($false_positive_path, $false_positive == 0 ? AH_NOT_FALSE_POSITIVE : AH_FALSE_POSITIVE, $lastclock);
+	return __write_file($false_positive_path, $false_positive == 0 ? AH_NOT_FALSE_POSITIVE : AH_FALSE_POSITIVE, $clock);
 }
 
 sub ah_save_alarmed
@@ -202,7 +209,32 @@ sub ah_save_incident
 
 	return AH_FAIL unless (__apply_inc_end($inc_path, $end, $lastclock) == AH_SUCCESS);
 
-	return __apply_inc_false_positive($inc_path, $false_positive, $lastclock);
+	return __apply_inc_false_positive($inc_path, $false_positive, $start);
+}
+
+sub ah_save_false_positive
+{
+	my $tld = shift;
+	my $service = shift;
+	my $eventid = shift; # incident is identified by event ID
+	my $start = shift;
+	my $false_positive = shift;
+	my $clock = shift;
+
+	$tld = lc($tld);
+        $service = lc($service);
+
+	my $inc_path = __make_inc_path($tld, $service, $start, $eventid);
+
+	make_path($inc_path, {error => \my $err});
+
+	if (@$err)
+	{
+		__set_file_error($err);
+		return AH_FAIL;
+	}
+
+	return __apply_inc_false_positive($inc_path, $false_positive, $clock);
 }
 
 sub ah_save_incident_json
@@ -230,6 +262,50 @@ sub ah_save_incident_json
 	$json_path .= "/$clock.$eventid.json";
 
 	return __write_file($json_path, "$json\n", $clock);
+}
+
+sub ah_get_continue_file
+{
+	my $tld = shift;
+	my $service = shift;
+
+	return AH_BASE_DIR."/$tld/$service/".AH_CONTINUE_FILE;
+}
+
+sub ah_get_api_tld
+{
+	my $tld = shift;
+
+	return AH_ROOT_ZONE_DIR if ($tld eq ".");
+
+	return $tld;
+}
+
+# get the time of last audit log entry that was checked
+sub ah_get_last_audit
+{
+	my $audit_file = AH_AUDIT_FILE;
+	my $handle;
+
+	if (-e $audit_file)
+	{
+		fail("cannot open last audit check file $audit_file\": $!") unless (open($handle, '<', $audit_file));
+
+		chomp(my @lines = <$handle>);
+
+		close($handle);
+
+		return $lines[0];
+	}
+
+	return 0;
+}
+
+sub ah_save_audit
+{
+	my $clock = shift;
+
+	return __write_file(AH_AUDIT_FILE, $clock);
 }
 
 1;

@@ -76,6 +76,7 @@ our @EXPORT = qw($result $dbh $tld
 		process_slv_monthly get_results get_item_values check_lastclock sql_time_condition get_incidents
 		get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
 		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
+		get_tld_by_trigger
 		dbg info wrn fail slv_exit exit_if_running trim parse_opts opt getopt setopt optkeys ts_str write_file
 		usage);
 
@@ -2300,6 +2301,33 @@ sub get_result_string
 	return $value unless (exists($maps->{$value_int}));
 
 	return $maps->{$value_int};
+}
+
+# returns (tld, service)
+sub get_tld_by_trigger
+{
+	my $triggerid = shift;
+
+	my $rows_ref = db_select("select distinct itemid from functions where triggerid=$triggerid");
+
+	my $itemid = $rows_ref->[0]->[0];
+
+	fail("cannot get item by triggerid $triggerid") unless ($itemid);
+
+	dbg("itemid:$itemid");
+
+	$rows_ref = db_select("select hostid,substring(key_,9,locate('.avail',key_)-9) as service from items where itemid=$itemid");
+
+	my $hostid = $rows_ref->[0]->[0];
+	my $service = $rows_ref->[0]->[1];
+
+	fail("cannot get TLD by itemid $itemid") unless ($hostid);
+
+	dbg("hostid:$hostid");
+
+	$rows_ref = db_select("select host from hosts where hostid=$hostid");
+
+	return ($rows_ref->[0]->[0], $service);
 }
 
 sub slv_exit
