@@ -148,24 +148,15 @@ class CTrigger extends CTriggerGeneral {
 
 			sort($options['groupids']);
 
-			if ($options['groupCount'] === null) {
-				$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM functions f,items i,hosts_groups hg'.
-					' WHERE t.triggerid=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND i.hostid=hg.hostid'.
-						' AND '.dbConditionInt('hg.groupid', $options['groupids']).
-				')';
-			}
-			else {
-				$sqlParts['from']['functions'] = 'functions f';
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-				$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-				$sqlParts['where']['groupid'] = dbConditionInt('hg.groupid', $options['groupids']);
+			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
+			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+			$sqlParts['where']['groupid'] = dbConditionInt('hg.groupid', $options['groupids']);
+
+			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
 			}
 		}
@@ -187,21 +178,13 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			if ($options['groupCount'] === null) {
-				$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM functions f,items i'.
-					' WHERE t.triggerid=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND '.dbConditionInt('i.hostid', $options['hostids']).
-				')';
-			}
-			else {
-				$sqlParts['from']['functions'] = 'functions f';
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
-				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
+			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+
+			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['i'] = 'i.hostid';
 			}
 		}
