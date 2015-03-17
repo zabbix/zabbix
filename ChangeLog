@@ -4,7 +4,6 @@ New features:
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
-A.F....... [ZBX-9102] fixed performance issue in "System status" dashboard widget and trigger.get method performing poorly when used with options "groupids" and "hostids" (Ivo)
 A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
 ....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
 ........S. [ZBX-9368] fixed possible SQL errors when linking of several templates (Sasha)
