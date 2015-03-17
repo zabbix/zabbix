@@ -4,6 +4,7 @@ New features:
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
 ..F....... [ZBX-9102] fixed "System status" dashboard widget performing poorly (Ivo)
 A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
 ....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
@@ -1236,6 +1237,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
 A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
 ....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
 ........S. [ZBX-9368] fixed possible SQL errors when linking of several templates (Sasha)
