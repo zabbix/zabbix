@@ -356,7 +356,7 @@ if (isset($_REQUEST['form'])) {
 	$data['config'] = select_config();
 
 	// render view
-	$itemView = new CView('configuration.item.edit', $data);
+	$itemView = new CView('configuration.item.prototype.edit', $data);
 	$itemView->render();
 	$itemView->show();
 }
