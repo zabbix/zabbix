@@ -374,11 +374,14 @@ else {
 
 	// get triggers
 	$sortfield = getPageSortField('description');
+	$sortorder = getPageSortOrder();
+
 	if ($data['pageFilter']->hostsSelected) {
 		$options = array(
 			'editable' => true,
 			'output' => array('triggerid'),
 			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
 			'limit' => $config['search_limit'] + 1
 		);
 		if (empty($data['showdisabled'])) {
@@ -409,10 +412,10 @@ else {
 	));
 
 	if ($sortfield === 'status') {
-		orderTriggersByStatus($data['triggers'], getPageSortOrder());
+		orderTriggersByStatus($data['triggers'], $sortorder);
 	}
 	else {
-		order_result($data['triggers'], $sortfield, getPageSortOrder());
+		order_result($data['triggers'], $sortfield, $sortorder);
 	}
 
 	// get real hosts
