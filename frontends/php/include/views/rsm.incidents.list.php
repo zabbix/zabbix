@@ -195,9 +195,6 @@ if (isset($this->data['tld'])) {
 	$rsmWidget->additem($infoBlock);
 }
 
-$incidentPage = new CTabView(array('remember' => true));
-$incidentPage->setSelected($this->data['type']);
-
 $headers = array(
 	_('Incident ID'),
 	_('Status'),
@@ -214,6 +211,9 @@ $rddsTab = new CDiv();
 $eppTab = new CDiv();
 
 if (isset($this->data['tld'])) {
+	$incidentPage = new CTabView(array('remember' => true));
+	$incidentPage->setSelected($this->data['type']);
+
 	// DNS
 	if (isset($this->data['dns']['events'])) {
 		$dnsInfoTable = new CTable(null, 'incidents-info');
@@ -517,18 +517,16 @@ if (isset($this->data['tld'])) {
 	else {
 		$eppTab->additem(new CDiv(bold(_('EPP is disabled.')), 'red center'));
 	}
+
+	$incidentPage->addTab('dnsTab', _('DNS'), $dnsTab);
+	$incidentPage->addTab('dnssecTab', _('DNSSEC'), $dnssecTab);
+	$incidentPage->addTab('rddsTab', _('RDDS'), $rddsTab);
+	$incidentPage->addTab('eppTab', _('EPP'), $eppTab);
+
 }
 else {
-	$dnsTab->additem(new CDiv(_($noData), 'center'));
-	$dnssecTab->additem(new CDiv(_($noData), 'center'));
-	$rddsTab->additem(new CDiv(_($noData), 'center'));
-	$eppTab->additem(new CDiv(_($noData), 'center'));
+	$incidentPage = new CTableInfo(_('No TLD defined.'));
 }
-
-$incidentPage->addTab('dnsTab', _('DNS'), $dnsTab);
-$incidentPage->addTab('dnssecTab', _('DNSSEC'), $dnssecTab);
-$incidentPage->addTab('rddsTab', _('RDDS'), $rddsTab);
-$incidentPage->addTab('eppTab', _('EPP'), $eppTab);
 
 $rsmWidget->addItem($incidentPage);
 
