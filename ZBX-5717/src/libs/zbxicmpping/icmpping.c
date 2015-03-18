@@ -335,7 +335,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 						host->min = sec;
 					if (0 == host->rcv || host->max < sec)
 						host->max = sec;
-					host->avg = (host->avg * host->rcv + sec) / (host->rcv + 1);
+					host->sum += sec;
 					host->rcv++;
 				}
 			}
