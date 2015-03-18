@@ -21,10 +21,8 @@
 
 $itemWidget = new CWidget();
 
-$host = $this->data['host'];
-
 if (!empty($this->data['hostid'])) {
-	$itemWidget->addItem(get_header_host_table('items', $this->data['hostid']));
+	$itemWidget->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 
 $itemWidget->addPageHeader($this->data['page_header']);
@@ -34,6 +32,7 @@ $itemForm = new CForm();
 $itemForm->setName('itemForm');
 $itemForm->addVar('form', $this->data['form']);
 $itemForm->addVar('hostid', $this->data['hostid']);
+$itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 if (!empty($this->data['itemid'])) {
 	$itemForm->addVar('itemid', $this->data['itemid']);
@@ -311,44 +310,10 @@ $itemFormList->addRow(_('New flexible interval'), array($newFlexInt, $maxFlexMsg
 
 $keepHistory = array();
 $keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
-
-if ($data['config']['hk_history_global']
-		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
-	$keepHistory[] = ' '._x('Overridden by', 'item_form').' ';
-
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
-		$link->setAttribute('target', '_blank');
-		$keepHistory[] = $link;
-	}
-	else {
-		$keepHistory[] = _x('global housekeeping settings', 'item_form');
-	}
-
-	$keepHistory[] = ' ('._n('%1$s day', '%1$s days', $data['config']['hk_history']).')';
-}
-
 $itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
 
 $keepTrend = array();
 $keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
-
-if ($data['config']['hk_trends_global']
-		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
-	$keepTrend[] = ' '._x('Overridden by', 'item_form').' ';
-
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
-		$link->setAttribute('target', '_blank');
-		$keepTrend[] = $link;
-	}
-	else {
-		$keepTrend[] = _x('global housekeeping settings', 'item_form');
-	}
-
-	$keepTrend[] = ' ('._n('%1$s day', '%1$s days', $data['config']['hk_trends']).')';
-}
-
 $itemFormList->addRow(_('Trend storage period (in days)'), $keepTrend, false, 'row_trends');
 $itemFormList->addRow(_('Log time format'),
 	new CTextBox('logtimefmt', $this->data['logtimefmt'], ZBX_TEXTBOX_SMALL_SIZE, $this->data['limited'], 64),
@@ -405,29 +370,6 @@ foreach ($this->data['db_applications'] as $application) {
 }
 $itemFormList->addRow(_('Applications'), $applicationComboBox);
 
-// append populate host to form list
-$hostInventoryFieldComboBox = new CComboBox('inventory_link');
-$hostInventoryFieldComboBox->addItem(0, '-'._('None').'-', $this->data['inventory_link'] == '0' ? 'yes' : null);
-
-// a list of available host inventory fields
-foreach ($this->data['possibleHostInventories'] as $fieldNo => $fieldInfo) {
-	if (isset($this->data['alreadyPopulated'][$fieldNo])) {
-		$enabled = isset($this->data['item']['inventory_link'])
-			? $this->data['item']['inventory_link'] == $fieldNo
-			: $this->data['inventory_link'] == $fieldNo && !hasRequest('clone');
-	}
-	else {
-		$enabled = true;
-	}
-	$hostInventoryFieldComboBox->addItem(
-		$fieldNo,
-		$fieldInfo['title'],
-		$this->data['inventory_link'] == $fieldNo && $enabled ? 'yes' : null,
-		$enabled ? 'yes' : 'no'
-	);
-}
-$itemFormList->addRow(_('Populates host inventory field'), $hostInventoryFieldComboBox, false, 'row_inventory_link');
-
 // append description to form list
 $description = new CTextArea('description', $this->data['description']);
 $description->addStyle('margin-top: 5px;');
@@ -446,30 +388,24 @@ $itemForm->addItem($itemTab);
 if ($this->data['itemid'] != 0) {
 	$buttons = array(new CSubmit('clone', _('Clone')));
 
-	if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
-		$buttons[] = new CButtonQMessage(
-			'del_history',
-			_('Clear history and trends'),
-			_('History clearing can take a long time. Continue?')
+	if (!$this->data['limited']) {
+		$buttons[] = new CButtonDelete(_('Delete item prototype?'),
+			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'))
 		);
 	}
 
-	if (!$this->data['limited']) {
-		$buttons[] = new CButtonDelete(_('Delete item?'), url_params(array('form', 'groupid', 'itemid', 'hostid')));
-	}
-
-	$buttons[] = new CButtonCancel(url_param('groupid').url_param('hostid'));
+	$buttons[] = new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'));
 
 	$itemForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$itemForm->addItem(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('groupid').url_param('hostid')))
+		array(new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')))
 	));
 }
 $itemWidget->addItem($itemForm);
 
-require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
+require_once dirname(__FILE__).'/js/configuration.item.prototype.edit.js.php';
 
 return $itemWidget;
