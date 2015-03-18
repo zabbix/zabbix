@@ -335,7 +335,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		$list->addItem(array(new CLink(_('All hosts'), 'hosts.php?hostid='.$dbHost['hostid'].url_param('groupid'))));
 	}
 
-	$list->addItem('›');
+	$list->addItem(new CSpan(null, 'arrow-right'));
 
 	/*
 	 * Name
