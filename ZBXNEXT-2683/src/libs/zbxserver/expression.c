@@ -2323,6 +2323,21 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			}
 		}
 
+		/* handle user macro parameters */
+		if ('$' == bl[1] && '[' == c)
+		{
+			int	len;
+
+			*br = c;
+
+			if (SUCCEED != get_user_macro_parameter_len(br, &len))
+				break;
+
+			br += len + 2;
+			c = *br;
+			*br = '\0';
+		}
+
 		if (0 != (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY)))
 		{
 			const DB_EVENT	*c_event;
@@ -4167,6 +4182,139 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __function_name, zbx_result_string(ret), *data);
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_macro_parameter_discovery_macros                      *
+ *                                                                            *
+ * Purpose: substitute discover macros inside user macro parameters           *
+ *                                                                            *
+ * Parameters: data   - [IN/OUT] pointer to a buffer                          *
+ *             jp_row - [IN] discovery data                                   *
+ *                                                                            *
+ * Comments: This function is used to substitute discovery macros in user     *
+ *           macro parameters before substituting the rest of discovery       *
+ *           macros in trigger expression.                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	substitute_macro_parameter_discovery_macros(char **data, struct zbx_json_parse *jp_row)
+{
+#define ZBX_PARSE_STATE_NORMAL		0
+#define ZBX_PARSE_STATE_USERMACRO	1
+#define ZBX_PARSE_STATE_PARAMS		2
+#define ZBX_PARSE_STATE_PARAMS_QUOTED	3
+
+	const char	*__function_name = "substitute_discovery_macros";
+
+	char		*replace_to = NULL, c;
+	size_t		l, r, replace_to_alloc = 0;
+	int		rc, state = ZBX_PARSE_STATE_NORMAL;
+
+	for (l = 0; '\0' != (*data)[l]; l++)
+	{
+		printf("\t%d: %s\n", state, *data + l);
+		if (ZBX_PARSE_STATE_NORMAL == state)
+		{
+			/* normal state - loop until user macro starts */
+			if ('{' == (*data)[l] && '$' == (*data)[l + 1])
+			{
+				l++;
+				state = ZBX_PARSE_STATE_USERMACRO;
+			}
+
+			continue;
+		}
+
+		if (ZBX_PARSE_STATE_USERMACRO == state)
+		{
+			if ('}' == (*data)[l])
+			{
+				if ('[' == (*data)[l + 1])
+				{
+					l++;
+					state = ZBX_PARSE_STATE_PARAMS;
+				}
+				else
+					state = ZBX_PARSE_STATE_NORMAL;
+			}
+
+			continue;
+		}
+
+		if (ZBX_PARSE_STATE_PARAMS == state)
+		{
+			if (']' == (*data)[l])
+			{
+				/* user macro parameter ends */
+				state = ZBX_PARSE_STATE_NORMAL;
+				continue;
+			}
+
+			if ('"' == (*data)[l])
+			{
+				/* quoted data inside user macro parameter starts */
+				state = ZBX_PARSE_STATE_PARAMS_QUOTED;
+				continue;
+			}
+		}
+
+		if (ZBX_PARSE_STATE_PARAMS_QUOTED == state)
+		{
+			if ('"' == (*data)[l])
+			{
+				/* quoted data inside user macro parameter ends */
+				state = ZBX_PARSE_STATE_PARAMS;
+				continue;
+			}
+
+			if ('\\' == (*data)[l] && '"' == (*data)[l + 1])
+			{
+				/* skip escaped quotes */
+				l++;
+				continue;
+			}
+		}
+
+		/* continue until discovery macro has been found */
+		if ('{' != (*data)[l] || '#' != (*data)[l + 1])
+			continue;
+
+		/* process discovery macro */
+		r = l;
+
+		for (r += 2; SUCCEED == is_macro_char((*data)[r]); r++)
+			;
+
+		if ('}' != (*data)[r])
+			continue;
+
+		c = (*data)[r + 1];
+		(*data)[r + 1] = '\0';
+
+		if (SUCCEED != (rc = zbx_json_value_by_name_dyn(jp_row, &(*data)[l], &replace_to, &replace_to_alloc)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot substitute macro \"%s\": not found in value set",
+					__function_name, *data + l);
+		}
+
+		(*data)[r + 1] = c;
+
+		if (SUCCEED == rc)
+		{
+			char	*replace_to_esc;
+
+			replace_to_esc = zbx_dyn_escape_string(replace_to, "\"");
+			zbx_replace_string(data, l, &r, replace_to);
+			zbx_free(replace_to_esc);
+		}
+
+		l = r;
+	}
+
+	zbx_free(replace_to);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
 }
 
 typedef struct

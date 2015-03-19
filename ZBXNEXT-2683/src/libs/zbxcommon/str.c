@@ -3337,3 +3337,58 @@ void	zbx_trim_str_list(char *list, char delimiter)
 	}
 	*out = '\0';
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_user_macro_parameter_len                                     *
+ *                                                                            *
+ * Purpose: calculates length of the user macro parameter (not including      *
+ *          '[' and ']' )                                                     *
+ *                                                                            *
+ * Parameters: param  - [IN] the user macro parameter                         *
+ *             itemid - [OUT] the user macro parameter length                 *
+ *                                                                            *
+ * Return value: SUCCEED - the user macro parameter length was calculated     *
+ *                         successfully                                       *
+ *               FALSE   - the user macro parameter parsing failed            *
+ *                                                                            *
+ ******************************************************************************/
+int	get_user_macro_parameter_len(const char *param, int *len)
+{
+	const char	*p;
+	/* parser state: 0 - normal, 1 - inside quoted string */
+	int		state = 0;
+
+	if ('[' == *param)
+		param++;
+
+	for (p = param; '\0' != *p; p++)
+	{
+		if (0 == state)
+		{
+			if (']' == *p)
+				break;
+
+			if ('"' == *p)
+				state = 1;
+		}
+		else
+		{
+			if ('\\' == *p && '"' == p[1])
+			{
+				p++;
+				continue;
+			}
+
+			if ('"' == *p)
+				state = 0;
+		}
+	}
+
+	if ('\0' == *p)
+		return FAIL;
+
+	*len = p - param;
+
+	return SUCCEED;
+}

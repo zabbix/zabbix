@@ -811,6 +811,7 @@ void	del_zeroes(char *s);
 int	get_param(const char *param, int num, char *buf, size_t max_len);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
+int	get_user_macro_parameter_len(const char *param, int *len);
 
 /******************************************************************************
  *                                                                            *

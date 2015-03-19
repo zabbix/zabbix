@@ -6055,9 +6055,10 @@ clean:
 	return ret;
 }
 
-static void	DCget_global_macro(const char *macro, char **replace_to)
+static int	DCget_global_macro(const char *macro, char **replace_to)
 {
 	const char	*__function_name = "DCget_global_macro";
+	int		ret = FAIL;
 
 	ZBX_DC_GMACRO_M	*gmacro_m, gmacro_m_local;
 
@@ -6067,23 +6068,40 @@ static void	DCget_global_macro(const char *macro, char **replace_to)
 
 	if (NULL != (gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local)))
 	{
-		zbx_free(*replace_to);
-		*replace_to = strdup(gmacro_m->gmacro_ptr->value);
+		*replace_to = zbx_strdup(*replace_to, gmacro_m->gmacro_ptr->value);
+		ret = SUCCEED;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to)
 {
 	const char	*__function_name = "DCget_user_macro";
+	const char	*params;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __function_name, macro);
 
 	LOCK_CACHE;
 
-	if (FAIL == DCget_host_macro(hostids, host_num, macro, replace_to))
-		DCget_global_macro(macro, replace_to);
+	if (FAIL == DCget_host_macro(hostids, host_num, macro, replace_to) &&
+		FAIL == DCget_global_macro(macro, replace_to) &&
+		NULL != (params = strchr(macro, '[')))
+	{
+		char	*default_macro;
+
+		/* if the macro has parameters, check the default value without parameters */
+		default_macro = zbx_malloc(NULL, params - macro + 1);
+		memcpy(default_macro, macro, params - macro);
+		default_macro[params - macro] = '\0';
+
+		if (FAIL == DCget_host_macro(hostids, host_num, default_macro, replace_to))
+			DCget_global_macro(default_macro, replace_to);
+
+		zbx_free(default_macro);
+	}
 
 	UNLOCK_CACHE;
 

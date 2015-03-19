@@ -636,6 +636,9 @@ static void 	lld_trigger_make(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_
 	trigger = lld_trigger_get(triggers, &lld_row->item_links);
 
 	expression = zbx_strdup(expression, expression_proto);
+
+	substitute_macro_parameter_discovery_macros(&expression, jp_row);
+
 	if (SUCCEED != substitute_discovery_macros(&expression, jp_row, ZBX_MACRO_NUMERIC, err, sizeof(err)))
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s trigger: %s.\n",

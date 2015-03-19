@@ -162,7 +162,7 @@ void	zbx_umc_add_expression(zbx_hashset_t *cache, zbx_uint64_t objectid, const c
 	zbx_umc_object_t	*pobject;
 	zbx_ptr_pair_t		pair = {NULL, NULL};
 	const char		*br = expression, *bl;
-	int 			len;
+	int 			len, param_len;
 
 	pobject = zbx_hashset_search(cache, &objectid);
 
@@ -181,7 +181,27 @@ void	zbx_umc_add_expression(zbx_hashset_t *cache, zbx_uint64_t objectid, const c
 			pobject = zbx_hashset_insert(cache, &object, sizeof(zbx_umc_object_t));
 		}
 
-		len = br - bl + 1;
+		br++;
+		len = br - bl;
+
+		/* check for macro parameters and add parameterized macro if necessary */
+		if ('[' == *br)
+		{
+			if (FAIL == get_user_macro_parameter_len(br, &param_len))
+				break;
+
+			pair.first = zbx_malloc(NULL, len + param_len + 3);
+			memcpy(pair.first, bl, len + param_len + 2);
+			((char *)pair.first)[len + param_len + 2] = '\0';
+
+			if (FAIL != zbx_vector_ptr_pair_search(&pobject->macros, pair, ZBX_DEFAULT_STR_COMPARE_FUNC))
+			{
+				zbx_free(pair.first);
+				continue;
+			}
+
+			zbx_vector_ptr_pair_append_ptr(&pobject->macros, &pair);
+		}
 
 		pair.first = zbx_malloc(NULL, len + 1);
 		memcpy(pair.first, bl, len);
@@ -250,15 +270,32 @@ const char	*zbx_umc_get_macro_value(zbx_hashset_t *cache, zbx_uint64_t objectid,
 	zbx_umc_object_t	*pobject;
 	zbx_ptr_pair_t		pair;
 	int			index;
+	const char		*params, *value = NULL;
 
 	if (NULL != (pobject = zbx_hashset_search(cache, &objectid)))
 	{
 		pair.first = (char *)macro;
 
 		if (FAIL != (index = zbx_vector_ptr_pair_bsearch(&pobject->macros, pair, ZBX_DEFAULT_STR_COMPARE_FUNC)))
-			return pobject->macros.values[index].second;
+			value = pobject->macros.values[index].second;
+
+		/* if we failed to expand parameterized macro, try it without parameters */
+		if (NULL == value && NULL != (params = strchr(macro, '[')))
+		{
+			pair.first = zbx_malloc(NULL, params - macro + 1);
+			memcpy(pair.first, macro, params - macro);
+			((char *)pair.first)[params - macro] = '\0';
+
+			if (FAIL != (index = zbx_vector_ptr_pair_bsearch(&pobject->macros, pair,
+					ZBX_DEFAULT_STR_COMPARE_FUNC)))
+			{
+				value = pobject->macros.values[index].second;
+			}
+
+			zbx_free(pair.first);
+		}
 	}
 
-	return NULL;
+	return value;
 }
 
