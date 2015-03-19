@@ -340,7 +340,7 @@ footer {
 .list-table {
 	width: 100%;
     background: $white;
-    @include box-shadow(0 1px 1px 0 rgba(118,141,153,0.15));
+    @include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
 	
 	thead th {
 		@include list-table-header;
@@ -418,7 +418,7 @@ footer {
 	background: $white;
 	padding: 7px 5px;
 	border-top: 1px solid $lightest-blue-grey;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.15));
+	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
 
 	a {
 		@extend %paging-btn;
@@ -750,7 +750,7 @@ footer {
 .table-forms-container {
 	padding: 0 10px 10px 10px;
 	background: $white;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.15));
+	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
 
 	.filter-forms {
 		padding: 20px 0 0 0;
@@ -910,6 +910,11 @@ input {
 		@extend %form-input-style;
 	}
 
+	&[type="time"] {
+		@extend %form-input-height-padding;
+		@extend %form-input-style;
+	}
+
 	&[type="checkbox"] {
 		@extend %form-check-radio-style;
 	}
@@ -957,7 +962,7 @@ select {
 %form-input-height-padding {
 	height: 22px;
 	line-height: 22px;
-	padding: 0 0 0 5px;
+	padding: 0 5px;
 }
 
 %form-input-style {
@@ -1375,7 +1380,7 @@ button[disabled] {
 	width: 322px;
 	margin: 0 auto;
 	padding: 20px 28px 0 28px;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.15));
+	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
 
 	h1 {
 		border: none;
@@ -1444,7 +1449,7 @@ button[disabled] {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
 	background: $white;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.15));
+	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
 
 	.list-table {
 		@include box-shadow(none);
@@ -1535,11 +1540,11 @@ button[disabled] {
 			@include transition(background .2s ease);
 
 			&:hover {
-				background: $lighter-grey;
+				background: $light-grey;
 			}
 
 			&:active {
-				background: $lighter-grey;
+				background: $light-grey;
 			}
 
 			span {
@@ -1653,6 +1658,76 @@ button[disabled] {
 
 	.dashbrd-widget-head {
 		padding: 8px 10px;
+	}
+}
+
+.calendar {
+	width: 200px;
+
+	table {
+		width: 100%;
+		margin: 5px 0;
+
+		thead {
+			text-transform: $font-transform;
+			color: $blue-grey;
+		}
+
+		tbody {
+			text-align: center;
+
+			td {
+				padding: 4px;
+				@include transition(background-color .2s ease);
+
+				&:hover {
+					background: $light-grey;
+					cursor: pointer;
+				}
+			}
+		}
+	}
+}
+
+.calendar-header {
+	text-align: center;
+
+	.btn-grey {
+		border: none;
+	}
+}
+
+.calendar-year {
+	height: 24px;
+
+	button:first-child {
+		float: left;
+	}
+
+	button:last-child {
+		float: right;
+	}
+}
+
+.calendar-month {
+	@extend .calendar-year;
+}
+
+.calendar-time {
+	text-align: center;
+
+	input[type="text"] {
+		width: 22px;
+	}
+}
+
+.calendar-footer {
+	margin-top: 10px;
+	text-align: right;
+
+	.btn-grey {
+		float: left;
+		margin-top: 0;
 	}
 }
 
