@@ -378,13 +378,13 @@ calendar.prototype = {
 
 	setday: function(e, day, month, year) {
 		if (!is_null(this.clndr_selectedday)) {
-			this.clndr_selectedday.removeClassName('na-bg');
+			this.clndr_selectedday.removeClassName('selected');
 		}
 		var selectedday = Event.element(e);
 		Element.extend(selectedday);
 
 		this.clndr_selectedday = selectedday;
-		this.clndr_selectedday.addClassName('na-bg');
+		this.clndr_selectedday.addClassName('selected');
 		this.day = day;
 		this.month = month;
 		this.year = year;
@@ -540,7 +540,7 @@ calendar.prototype = {
 				if (this.sdt.getFullYear() == this.cdt.getFullYear()
 						&& this.sdt.getMonth() == this.cdt.getMonth()
 						&& this.sdt.getDate() == this.cdt.getDate()) {
-					td.addClassName('na-bg');
+					td.addClassName('selected');
 					this.clndr_selectedday = td;
 				}
 
