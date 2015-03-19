@@ -1664,6 +1664,15 @@ button[disabled] {
 .calendar {
 	width: 200px;
 
+	.selected {
+		background: $blue-grey;
+		color: $white;
+
+		&:hover {
+			@extend .selected;
+		}
+	}
+
 	table {
 		width: 100%;
 		margin: 5px 0;
@@ -1834,6 +1843,10 @@ a.grey {
 	border: 1px solid $light-green;
 	background: $lighter-green;
 	@extend %msg;
+
+	.link-dotted {
+		@extend .green;
+	}
 }
 
 .msg-bad {
@@ -1841,10 +1854,37 @@ a.grey {
 	border: 1px solid $light-red;
 	background: $lighter-red;
 	@extend %msg;
+
+	.link-dotted {
+		@extend .red;
+	}
+}
+
+.msg-details {
+	font-size: $font-form-size;
+	text-align: left;
+
+	.link-dotted {
+		position: absolute;
+		top: 7px;
+		left: 12px
+	}
+
+	ul {
+		margin: 8px 0 0 0;
+		font-size: $font-form-size;
+
+		li {
+			margin: 0.5em 0 0 0; 
+		}
+	}
+
 }
 
 %msg {
+	font-size: $font-top-nav-size;
 	padding: 7px 12px;
+	margin: 0 0 12px 0;
 	text-align: center;
 	position: relative;
 	@include border-radius(2px);
