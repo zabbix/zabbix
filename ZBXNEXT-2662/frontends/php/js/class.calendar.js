@@ -378,13 +378,13 @@ calendar.prototype = {
 
 	setday: function(e, day, month, year) {
 		if (!is_null(this.clndr_selectedday)) {
-			this.clndr_selectedday.removeClassName('selected');
+			this.clndr_selectedday.removeClassName('na-bg');
 		}
 		var selectedday = Event.element(e);
 		Element.extend(selectedday);
 
 		this.clndr_selectedday = selectedday;
-		this.clndr_selectedday.addClassName('selected');
+		this.clndr_selectedday.addClassName('na-bg');
 		this.day = day;
 		this.month = month;
 		this.year = year;
@@ -540,7 +540,7 @@ calendar.prototype = {
 				if (this.sdt.getFullYear() == this.cdt.getFullYear()
 						&& this.sdt.getMonth() == this.cdt.getMonth()
 						&& this.sdt.getDate() == this.cdt.getDate()) {
-					td.addClassName('selected');
+					td.addClassName('na-bg');
 					this.clndr_selectedday = td;
 				}
 
@@ -554,7 +554,7 @@ calendar.prototype = {
 	calendarcreate: function(parentNodeid) {
 		this.clndr_calendar = document.createElement('div');
 		Element.extend(this.clndr_calendar);
-		this.clndr_calendar.className = 'calendar';
+		this.clndr_calendar.className = 'overlay-dialogue calendar';
 		this.clndr_calendar.hide();
 
 		if (typeof(parentNodeid) == 'undefined') {
@@ -565,17 +565,15 @@ calendar.prototype = {
 		}
 
 		/*
-		 * Calendar hat
+		 * Calendar header
 		 */
 		var line_div = document.createElement('div');
 		this.clndr_calendar.appendChild(line_div);
+		line_div.className = 'calendar-header';
 		var table = document.createElement('table');
 		line_div.appendChild(table);
 
-		table.setAttribute('cellpadding', '2');
-		table.setAttribute('cellspacing', '0');
-		table.setAttribute('width', '100%');
-		table.className = 'calendarhat';
+		table.className = 'calendar-year';
 
 		//  year
 		var tbody = document.createElement('tbody');
@@ -590,7 +588,7 @@ calendar.prototype = {
 		this.clndr_yeardown = document.createElement('span');
 		td.appendChild(this.clndr_yeardown);
 
-		this.clndr_yeardown.className = 'clndr_left_arrow';
+		this.clndr_yeardown.className = 'arrow-left';
 		this.clndr_yeardown.appendChild(document.createTextNode(String.fromCharCode(0x00AB)));
 
 		var td = document.createElement('td');
@@ -609,7 +607,7 @@ calendar.prototype = {
 		this.clndr_yearup = document.createElement('span');
 		td.appendChild(this.clndr_yearup);
 
-		this.clndr_yearup.className = 'clndr_right_arrow';
+		this.clndr_yearup.className = 'arrow-right';
 		this.clndr_yearup.appendChild(document.createTextNode(String.fromCharCode(0x00BB)));
 
 		// month
@@ -622,7 +620,7 @@ calendar.prototype = {
 		this.clndr_monthdown = document.createElement('span');
 		td.appendChild(this.clndr_monthdown);
 
-		this.clndr_monthdown.className = 'clndr_left_arrow';
+		this.clndr_monthdown.className = 'arrow-left';
 		this.clndr_monthdown.appendChild(document.createTextNode(String.fromCharCode(0x00AB)));
 
 		var td = document.createElement('td');
@@ -642,7 +640,7 @@ calendar.prototype = {
 		this.clndr_monthup = document.createElement('span');
 		td.appendChild(this.clndr_monthup);
 
-		this.clndr_monthup.className = 'clndr_right_arrow';
+		this.clndr_monthup.className = 'arrow-right';
 
 		this.clndr_monthup.appendChild(document.createTextNode(String.fromCharCode(0x00BB)));
 
@@ -650,44 +648,37 @@ calendar.prototype = {
 		var table = document.createElement('table');
 		line_div.appendChild(table);
 
-		table.setAttribute('cellpadding', '2');
-		table.setAttribute('cellspacing', '0');
-		table.setAttribute('width', '100%');
-		table.className = 'calendarhat';
-
-		var tbody = document.createElement('tbody');
+		var tbody = document.createElement('thead');
 		table.appendChild(tbody);
 
 		var tr = document.createElement('tr');
 		tbody.appendChild(tr);
 
-		tr.className='header';
-
-		var td = document.createElement('td');
+		var td = document.createElement('th');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode(locale['S_MONDAY_SHORT_BIG']));
 
-		var td = document.createElement('td');
+		var td = document.createElement('th');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode(locale['S_TUESDAY_SHORT_BIG']));
 
-		var td = document.createElement('td');
+		var td = document.createElement('th');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode(locale['S_WEDNESDAY_SHORT_BIG']));
 
-		var td = document.createElement('td');
+		var td = document.createElement('th');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode(locale['S_THURSDAY_SHORT_BIG']));
 
-		var td = document.createElement('td');
+		var td = document.createElement('th');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode(locale['S_FRIDAY_SHORT_BIG']));
 
-		var td = document.createElement('td');
+		var td = document.createElement('th');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode(locale['S_SATURDAY_SHORT_BIG']));
 
-		var td = document.createElement('td');
+		var td = document.createElement('th');
 		tr.appendChild(td);
 		td.appendChild(document.createTextNode(locale['S_SUNDAY_SHORT_BIG']));
 
@@ -703,7 +694,7 @@ calendar.prototype = {
 		 * Hours & minutes
 		 */
 		var line_div = document.createElement('div');
-		line_div.className = 'calendartime';
+		line_div.className = 'calendar-time';
 
 		// hour
 		this.clndr_hour = document.createElement('input');
@@ -723,46 +714,29 @@ calendar.prototype = {
 		this.clndr_minute.onchange = function() { validateDatePartBox(this, 0, 59, 2); };
 		this.clndr_minute.className = 'calendar_textbox';
 
-		// column 1
-		var column1 = document.createElement('td');
-		column1.setAttribute('width', '27%');
-		column1.setAttribute('align', 'right');
-		column1.appendChild(document.createTextNode(locale['S_TIME']));
-		// column 2
-		var column2 = document.createElement('td');
-		column2.setAttribute('width', '46%');
-		column2.setAttribute('align', 'center');
-		column2.appendChild(this.clndr_hour);
-		column2.appendChild(document.createTextNode(' : '));
-		column2.appendChild(this.clndr_minute);
-		// column 3
-		var column3 = document.createElement('td');
-		column3.setAttribute('width', '27%');
-		column3.appendChild(document.createTextNode(' '));
-		// table
-		var row = document.createElement('tr');
-		row.appendChild(column1);
-		row.appendChild(column2);
-		row.appendChild(column3);
-		var table = document.createElement('table');
-		table.setAttribute('width', '100%');
-		var tbody = document.createElement('tbody');
-		table.appendChild(tbody);
-		tbody.appendChild(row);
-		line_div.appendChild(table);
+		line_div.appendChild(document.createTextNode(locale['S_TIME'] + " "));
+		line_div.appendChild(this.clndr_hour);
+		line_div.appendChild(document.createTextNode(' : '));
+		line_div.appendChild(this.clndr_minute);
+		this.clndr_calendar.appendChild(line_div);
+
+		/*
+		 * Footer
+		 */
+		var line_div = document.createElement('div');
+		line_div.className = 'calendar-footer';
 
 		// now
-		this.clndr_now = document.createElement('input');
+		this.clndr_now = document.createElement('button');
+		this.clndr_now.className = 'btn-grey';
 		this.clndr_now.setAttribute('type', 'button');
 		this.clndr_now.setAttribute('value', locale['S_NOW']);
-		this.clndr_now.setAttribute('style', 'float:left;margin:0px 3px;');
+		this.clndr_now.appendChild(document.createTextNode(locale['S_NOW']));
 		line_div.appendChild(this.clndr_now);
 
 		// done
-		this.clndr_done = document.createElement('input');
-		this.clndr_done.setAttribute('type', 'button');
-		this.clndr_done.setAttribute('value', locale['S_DONE']);
-		this.clndr_done.setAttribute('style', 'float:right;margin:0px 3px;');
+		this.clndr_done = document.createElement('button');
+		this.clndr_done.appendChild(document.createTextNode(locale['S_DONE']));
 		line_div.appendChild(this.clndr_done);
 		this.clndr_calendar.appendChild(line_div);
 	}
