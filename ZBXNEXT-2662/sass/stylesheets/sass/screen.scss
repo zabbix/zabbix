@@ -509,6 +509,10 @@ footer {
 	display: table-cell;
 }
 
+.vertical {
+	@include transform(270deg);
+}
+
 /* Filters */
 .filter-container {
 	text-align: center;
@@ -1872,7 +1876,7 @@ a.grey {
 
 	ul {
 		margin: 8px 0 0 0;
-		font-size: $font-form-size;
+		font-size: $font-msg-reset-size;
 
 		li {
 			margin: 0.5em 0 0 0; 
@@ -1882,12 +1886,16 @@ a.grey {
 }
 
 %msg {
-	//font-size: $font-top-nav-size;
+	font-size: $font-top-nav-size;
 	padding: 7px 12px;
 	margin: 0 0 12px 0;
 	text-align: center;
 	position: relative;
 	@include border-radius(2px);
+
+	.overlay-close-btn {
+		font-size: $font-top-nav-size;
+	}
 }
 
 .msg-bad-global {
