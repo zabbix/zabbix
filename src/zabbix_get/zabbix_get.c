@@ -173,7 +173,7 @@ static void	get_signal_handler(int sig)
 static int	get_value(const char *source_ip, const char *host, unsigned short port, const char *key)
 {
 	zbx_sock_t	s;
-	int		ret = SUCCEED;
+	int		ret;
 	ssize_t		bytes_received = -1;
 	char		request[1024];
 
