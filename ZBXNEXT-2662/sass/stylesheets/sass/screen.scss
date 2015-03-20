@@ -1523,7 +1523,7 @@ button[disabled] {
 .action-menu {
 	position: absolute;
 	z-index: 1000;
-	padding: 5px 10px;
+	padding: 5px 15px;
 	min-width: 166px;
 	color: $blue-grey;
 	background: $white;
@@ -1538,8 +1538,8 @@ button[disabled] {
 			line-height: 24px;
 			color: $indigo-black;
 			text-decoration: none;
-			padding: 0 10px;
-			margin: 0 -10px;
+			padding: 0 15px;
+			margin: 0 -15px;
 			position: relative;
 			@include transition(background .2s ease);
 
@@ -1567,7 +1567,7 @@ button[disabled] {
 
 		div {
 			border-top: 1px solid $lightest-blue-grey;
-			margin: 5px -10px;
+			margin: 5px -15px;
 		}
 	}
 
@@ -1580,7 +1580,7 @@ button[disabled] {
 .overlay-dialogue {
 	position: absolute;
 	z-index: 1000;
-	padding: 10px;
+	padding: 15px;
 	background: $white;
 	border: 1px solid $lighter-blue-grey;
 	@include box-shadow(0 5px 20px 0 rgba(118,141,153,0.3));
@@ -1627,14 +1627,26 @@ button[disabled] {
 	}
 
 	.dashbrd-widget-head {
-		margin: -7px -15px 6px -15px;
-		padding: 12px 10px 8px 15px;
+		margin: -15px -15px 6px -15px;
+		padding: 12px 30px 12px 15px;
 	}
 
 	.maps-container {
 		max-height: 128px;
 		overflow-y: auto;
 		margin-left: -10px;
+	}
+}
+
+.overlay-dialogue-body {
+	margin: 0 0 50px 0;
+}
+
+.overlay-dialogue-footer {
+	text-align: right;
+
+	button {
+		margin: 0 0 0 14px;
 	}
 }
 
@@ -1941,6 +1953,7 @@ a.grey {
 
 .overlay-close-btn {
 	position: absolute;
+	z-index: 15000;
 	top: 2px;
 	right: 2px;
 	@extend %close-icon;
