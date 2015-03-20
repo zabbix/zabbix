@@ -1747,7 +1747,7 @@ button[disabled] {
 }
 
 .calendar-footer {
-	margin-top: 10px;
+	margin: 26px 0 0 0;
 	text-align: right;
 
 	.btn-grey {
@@ -1928,9 +1928,9 @@ a.grey {
 
 %close-icon {
 	display: block;
-	width: 16px;
-	height: 16px;
-	line-height: 16px;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
 	text-align: center;
 	color: $light-blue-grey;
 	font-size: $font-h2-size;
@@ -1953,10 +1953,11 @@ a.grey {
 
 .overlay-close-btn {
 	position: absolute;
-	z-index: 15000;
-	top: 2px;
-	right: 2px;
+	z-index: 10000;
+	top: 0;
+	right: 0;
 	@extend %close-icon;
+	@include border-radius(0 0 0 2px);
 }
 
 a.overlay-close-btn {
