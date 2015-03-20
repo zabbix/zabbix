@@ -165,8 +165,8 @@ $font-transform: uppercase;
 }
 
 @mixin transform($rotate) {
-	-webkit-transform: $rotate;
-	-moz-transform: $rotate;
-	-ms-transform: $rotate;
-	transform: $rotate;
+	-webkit-transform: rotate($rotate);
+	-moz-transform: rotate($rotate);
+	-ms-transform: rotate($rotate);
+	transform: rotate($rotate);
 }
