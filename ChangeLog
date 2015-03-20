@@ -4,6 +4,7 @@ New features:
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
+A.F....... [ZBX-9365] fixed array_combine() function giving a warning message for PHP versions < 5.4.0 (Ivo)
 ..F....... [ZBX-9402] fixed trigger list sorting (Ivo)
 ..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
 ..F....... [ZBX-9102] fixed "System status" dashboard widget performing poorly (Ivo)
