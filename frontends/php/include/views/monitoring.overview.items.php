@@ -85,8 +85,7 @@ $filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset'), 'chkbxRang
 $overviewWidget->addFlicker($filterForm, CProfile::get('web.overview.filter.state', 0));
 
 // data table
-$config = select_config();
-if ($config['dropdown_first_entry']) {
+if ($data['pageFilter']->groupsSelected) {
 	$dataTable = getItemsDataOverview(array_keys($this->data['pageFilter']->hosts), $this->data['applicationIds'],
 		$this->data['view_style']
 	);
