@@ -1718,28 +1718,32 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 				break;
 			case PAGE_TYPE_HTML:
 			default:
-				$msg_tab = new CTable($msg, ($bool ? 'msgok' : 'msgerr'));
-				$msg_tab->setCellPadding(0);
-				$msg_tab->setCellSpacing(0);
-
-				$row = array();
-
-				$msg_col = new CCol(bold($msg), 'msg_main msg');
-				$msg_col->setAttribute('id', 'page_msg');
-				$row[] = $msg_col;
-
+				$msgBox = new CDiv(null, $bool ? 'msg-good' : 'msg-bad', 'global-message');
+				$msgBox->addItem($msg);
 				if (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) {
-					$msg_details = new CDiv(_('Details'), 'blacklink');
-					$msg_details->setAttribute('onclick', 'javascript: showHide("msg_messages", IE ? "block" : "table");');
-					$msg_details->setAttribute('title', _('Maximize').'/'._('Minimize'));
-					array_unshift($row, new CCol($msg_details, 'clr'));
-				}
-				$msg_tab->addRow($row);
-//				$msg_tab->show();
-// TODO remove old code, make new one
+					$msgDetails = new CDiv(null, 'msg-details');
+					$link = new CLink(_('Details'), null, 'link-dotted', null, true);
+					$link->setAttribute('onclick', 'javascript: showHide("msg_messages", IE ? "block" : "table");');
+					$link->setAttribute('title', _('Maximize').'/'._('Minimize'));
+					$msgDetails->addItem($link);
 
-				$msg = new CDiv($msg, $bool ? 'msg-good' : 'msg-bad');
-				$msg->show();
+					$list = new CList(null);
+					$list->setAttribute('id', 'msg_messages');
+					$list->setAttribute('style', 'display: none;');
+					foreach($ZBX_MESSAGES as $msg) {
+						$list->addItem($msg['type'].'&nbsp;'.$msg['message']);
+					}
+					$msgDetails->addItem($list);
+
+					$msgBox->addItem($msgDetails);
+
+				}
+				$close = new CLink('×', null, 'overlay-close-btn', null, true);
+				$close->setAttribute('onclick', 'javascript: showHide("global-message", IE ? "block" : "table");');
+				$close->setAttribute('title', _('Close'));
+				$msgBox->addItem($close);
+
+				$msgBox->show();
 				break;
 		}
 	}
@@ -1766,29 +1770,6 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 			foreach ($ZBX_MESSAGES as $msg) {
 				echo '['.$msg['type'].'] '.$msg['message']."\n";
 			}
-		}
-		else {
-			$lst_error = new CList(null,'messages');
-			foreach ($ZBX_MESSAGES as $msg) {
-				$lst_error->addItem($msg['message'], $msg['type']);
-				$bool = ($bool && 'error' !== strtolower($msg['type']));
-			}
-			$msg_show = 6;
-			$msg_count = count($ZBX_MESSAGES);
-			if ($msg_count > $msg_show) {
-				$msg_count = $msg_show * 16;
-				$lst_error->setAttribute('style', 'height: '.$msg_count.'px;');
-			}
-			$tab = new CTable(null, ($bool ? 'msgok' : 'msgerr'));
-			$tab->setCellPadding(0);
-			$tab->setCellSpacing(0);
-			$tab->setAttribute('id', 'msg_messages');
-			$tab->setAttribute('style', 'width: 100%;');
-			if (isset($msg_tab) && $bool) {
-				$tab->setAttribute('style', 'display: none;');
-			}
-			$tab->addRow(new CCol($lst_error, 'msg'));
-			$tab->show();
 		}
 		$ZBX_MESSAGES = null;
 	}
