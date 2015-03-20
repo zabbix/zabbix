@@ -28,7 +28,7 @@ LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.l
 
 !INCLUDE Makefile_tls.inc
 
-all: $(PREBUILD) $(PROGNAME) $(POSTBUILD)
+all: $(PROGNAME) $(POSTBUILD)
 
 clean:
 # break this down because del has limit for command-line args length (NMAKE : fatal error U1077: 'del' : return code '0x1')
@@ -36,16 +36,14 @@ clean:
 	del $(RESOURCE_RES) $(MESSAGES_H) $(PROGNAME) messages.rc MSG00001.bin $(TARGETNAME).manifest 2>nul
 
 $(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_RES)
+	if not exist $(TARGETDIR) @mkdir $(TARGETDIR)
 	$(LINKER) $(OBJS) $(RESOURCE_RES) /OUT:$(PROGNAME) $(LFLAGS) $(LIBS)
 	$(MT) /outputresource:"$(PROGNAME);#1" /manifest $(TARGETNAME).manifest /nologo
 
 $(TARGETDIR)\zabbix_sender.h: $(SOURCEDIR)\zabbix_sender.h
 	copy $(SOURCEDIR)\zabbix_sender.h $(TARGETDIR)
 
-$(PREBUILD):
-	if not exist $(TARGETDIR) @mkdir $(TARGETDIR)
-	
-$(POSTBUILD): $(TARGETDIR)\zabbix_sender.h
+post-build: $(TARGETDIR)\zabbix_sender.h
 	del $(TARGETDIR)\zabbix_sender.exp 2>NUL
 	
 !INCLUDE Makefile_targets.inc
