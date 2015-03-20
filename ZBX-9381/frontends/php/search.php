@@ -167,7 +167,7 @@ foreach ($hosts as $hnum => $host) {
 			));
 
 			foreach ($host['groups'] as $num => &$group) {
-				if (!isset($groups[$group['groupid']])) {
+				if (!array_key_exists($group['groupid'], $groups)) {
 					unset($host['groups'][$num]);
 				}
 			}
