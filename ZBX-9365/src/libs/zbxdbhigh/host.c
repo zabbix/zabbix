@@ -4606,7 +4606,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	for (i = 0; i < lnk_templateids->values_num; i++)
 	{
-		if (FAIL != zbx_vector_uint64_bsearch(&templateids, lnk_templateids->values[i],
+		if (FAIL != zbx_vector_uint64_search(&templateids, lnk_templateids->values[i],
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
 			/* template already linked */

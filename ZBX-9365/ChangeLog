@@ -1,3 +1,22 @@
+Changes for 2.2.10rc1
+
+New features:
+.....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
+
+Bug fixes:
+..F....... [ZBX-9402] fixed trigger list sorting (Ivo)
+..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
+..F....... [ZBX-9102] fixed "System status" dashboard widget performing poorly (Ivo)
+A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
+....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
+........S. [ZBX-9368] fixed possible SQL errors when linking of several templates (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.9
+
+2.2.9rc1 was released as 2.2.9 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.9rc1
 
 New features:
@@ -1215,9 +1234,14 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.15rc1
 
 New features:
+.....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
+A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
+....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
+........S. [ZBX-9368] fixed possible SQL errors when linking of several templates (Sasha)
 .......PS. [ZBX-9344] fixed infinite looping in telnet.run[] in case there is no password prompt (asaveljevs, dimir)
 ..F....... [ZBX-9281] fixed undefined offset in template screens when resource is URL (Ivo)
 ..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
