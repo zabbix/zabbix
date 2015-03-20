@@ -16,16 +16,6 @@ body {
 	min-width: 950px;
 }
 
-fieldset {
-	border: 1px solid $lighter-blue-grey;
-	padding: 0 10px 10px 15px;
-}
-
-legend {
-	margin-left: -5px;
-	padding: 0 5px 0 5px;
-}
-
 a {
 
 	&:link {
@@ -950,6 +940,16 @@ select {
 	}
 }
 
+fieldset {
+	border: 1px solid $lighter-blue-grey;
+	padding: 0 10px 10px 15px;
+}
+
+legend {
+	margin-left: -5px;
+	padding: 0 5px 0 5px;
+}
+
 %form-check-radio-style {
 	margin: 0;
 	padding: 0;
@@ -982,8 +982,8 @@ select {
 }
 
 button::-moz-focus-inner {
-    border: 0;
-    padding: 0;
+	border: 0;
+	padding: 0;
 }
 
 button {
@@ -1004,6 +1004,10 @@ button {
 
 	&:active {
 		@extend %button-active;
+	}
+
+	&:focus {
+		@extend %focus-outline;
 	}
 
 	&.btn-alt {
@@ -1993,3 +1997,7 @@ a.form-remove-btn {
 		background: darken($light-blue-grey, 10%);
 	}
 }
+
+ %focus-outline {
+ 	outline: thin dotted $indigo-black;
+ }
