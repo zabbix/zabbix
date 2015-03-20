@@ -1,9 +1,18 @@
 Changes for 2.4.5rc1
 
 New features:
+.....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9395] fixed overview triggers and data page to display results when the option to select first dropdown entry is set to "None" and a group is selected (Ivo)
+..F....... [ZBX-9402] fixed trigger list sorting (Ivo)
+..F....... [ZBX-9102] fixed "System status" dashboard widget performing poorly (Ivo)
+A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
+....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
+........S. [ZBX-9368] fixed possible SQL errors when linking of several templates (Sasha)
+A.F....... [ZBX-9343] fixed user ID being zero in audit logs for login/logout actions (Ivo)
+..F....... [ZBX-9375] renamed "Latest events" to "Events" in menu popup for trigger map elements and fixed its link not setting corresponding trigger in filter (Ivo)
 ...G...PS. [ZBX-9251] added missing socket closing to avoid large number of opened sockets (igors)
 .......PS. [ZBX-9344] fixed infinite looping in telnet.run[] in case there is no password prompt (asaveljevs, dimir)
 ..F....... [ZBX-9369] removed validation of DB_ID from user profile for removed medias and fixed incorrect DB_ID validation for arrays in bar reports page (Ivo)
@@ -582,6 +591,25 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.10rc1
+
+New features:
+.....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
+
+Bug fixes:
+..F....... [ZBX-9402] fixed trigger list sorting (Ivo)
+..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
+..F....... [ZBX-9102] fixed "System status" dashboard widget performing poorly (Ivo)
+A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
+....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
+........S. [ZBX-9368] fixed possible SQL errors when linking of several templates (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.9
+
+2.2.9rc1 was released as 2.2.9 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.2.9rc1
@@ -1801,9 +1829,14 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.15rc1
 
 New features:
+.....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
+A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
+....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
+........S. [ZBX-9368] fixed possible SQL errors when linking of several templates (Sasha)
 .......PS. [ZBX-9344] fixed infinite looping in telnet.run[] in case there is no password prompt (asaveljevs, dimir)
 ..F....... [ZBX-9281] fixed undefined offset in template screens when resource is URL (Ivo)
 ..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
