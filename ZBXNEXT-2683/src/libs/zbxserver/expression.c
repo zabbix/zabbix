@@ -4304,8 +4304,15 @@ void	substitute_macro_parameter_discovery_macros(char **data, struct zbx_json_pa
 		{
 			char	*replace_to_esc;
 
-			replace_to_esc = zbx_dyn_escape_string(replace_to, "\"");
-			zbx_replace_string(data, l, &r, replace_to);
+			if (ZBX_PARSE_STATE_PARAMS == state)
+			{
+				replace_to_esc = zbx_strdup(NULL, replace_to);
+				quote_key_param(&replace_to_esc, 0);
+			}
+			else
+				replace_to_esc = zbx_dyn_escape_string(replace_to, "\"");
+
+			zbx_replace_string(data, l, &r, replace_to_esc);
 			zbx_free(replace_to_esc);
 		}
 
