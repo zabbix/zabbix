@@ -979,7 +979,9 @@ class CHostGroup extends CApiService {
 
 		// Collect both given host and template IDs.
 		$currentObjectIds = array_merge($hostIds, $templateIds);
-		$currentObjectIds = array_combine($currentObjectIds, $currentObjectIds);
+		if ($currentObjectIds) {
+			$currentObjectIds = array_combine($currentObjectIds, $currentObjectIds);
+		}
 
 		// Collect both host and template IDs that also belong to given groups, but are not given in parameters.
 		$objectIdsToRemove = array();
