@@ -539,7 +539,7 @@ foreach ($triggers as $trigger) {
 	if (!empty($trigger['dependencies'])) {
 		$dependenciesTable = new CTableInfo();
 		$dependenciesTable->setAttribute('style', 'width: 200px;');
-		$dependenciesTable->addRow(bold(_('Depends on').NAME_DELIMITER));
+		$dependenciesTable->addRow(bold(_('Depends on').':'));
 
 		foreach ($trigger['dependencies'] as $dependency) {
 			$dependenciesTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
@@ -555,7 +555,7 @@ foreach ($triggers as $trigger) {
 	$dependency = false;
 	$dependenciesTable = new CTableInfo();
 	$dependenciesTable->setAttribute('style', 'width: 200px;');
-	$dependenciesTable->addRow(bold(_('Dependent').NAME_DELIMITER));
+	$dependenciesTable->addRow(bold(_('Dependent').':'));
 	if (!empty($triggerIdsDown[$trigger['triggerid']])) {
 		$depTriggers = CMacrosResolverHelper::resolveTriggerNameByIds($triggerIdsDown[$trigger['triggerid']]);
 
