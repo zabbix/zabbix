@@ -4,6 +4,7 @@ New features:
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
+...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
 A.F....... [ZBX-9365] fixed array_combine() function giving a warning message for PHP versions < 5.4.0 (Ivo)
 ..F....... [ZBX-9402] fixed trigger list sorting (Ivo)
 ..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
@@ -1239,6 +1240,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
 ..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
 A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
 ....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
