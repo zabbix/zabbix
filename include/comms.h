@@ -26,9 +26,10 @@ typedef int	ssize_t;
 #	else
 typedef long	ssize_t;
 #	endif
+#endif
 
 #if defined(HAVE_POLARSSL)
-#	ifdef uint32_t
+#	if defined(_WINDOWS) && defined(uint32_t)
 #		undef uint32_t
 #	endif
 #	include <polarssl/ssl.h>
@@ -38,6 +39,7 @@ typedef long	ssize_t;
 #	include <openssl/ssl.h>
 #endif
 
+#if defined(_WINDOWS)
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
 #	define zbx_sock_close(s)	if (ZBX_SOCK_ERROR != (s)) closesocket(s)
