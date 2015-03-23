@@ -746,7 +746,6 @@ int	main(int argc, char **argv)
 						APPLICATION_NAME, CONFIG_HOSTNAME);
 			}
 #endif
-
 			break;
 	}
 
