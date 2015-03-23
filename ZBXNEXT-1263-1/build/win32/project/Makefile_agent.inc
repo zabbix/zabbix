@@ -81,7 +81,7 @@ all: $(PROGNAME)
 clean:
 # break this down because del has limit for command-line args length (NMAKE : fatal error U1077: 'del' : return code '0x1')
 	del $(OBJS) 2>nul
-	del $(RESOURCE_RES) $(MESSAGES_H) $(PROGNAME) messages.rc MSG00001.bin $(TARGETNAME).manifest $(IDBPATH) $(PDBPATH) 2>nul
+	del $(RESOURCE_RES) $(MESSAGES_H) $(PROGNAME) messages.rc MSG00001.bin $(TARGETNAME).manifest $(PDBPATH) $(IDBPATH) 2>nul
 
 $(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_RES)
 	$(LINKER) $(OBJS) $(RESOURCE_RES) /OUT:$(PROGNAME) $(LFLAGS) $(LIBS)
