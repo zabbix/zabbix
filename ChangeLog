@@ -1,6 +1,7 @@
 Changes for 2.2.10rc1
 
 New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese and Japanese translations; thanks to Zabbix translators (Richlv)
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
@@ -23,7 +24,7 @@ Changes for 2.2.9rc1
 
 New features:
 .......PS. [ZBXNEXT-2354] separated VMware performance collector based statistic retrieval from VMware data retrieval and added items to monitor custom performance counters (wiper)
-A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Japanese, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 .......PS. [ZBX-9344] fixed infinite looping in telnet.run[] in case there is no password prompt (asaveljevs, dimir)

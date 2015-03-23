@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:53+0200\n"
-"PO-Revision-Date: 2015-02-18 06:16+0300\n"
+"POT-Creation-Date: 2015-03-23 22:57+0200\n"
+"PO-Revision-Date: 2015-03-23 04:43+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1424232961.0\n"
+"X-POOTLE-MTIME: 1427078587.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:504 api/classes/CMaintenance.php:509
@@ -8112,7 +8112,7 @@ msgstr "言語"
 
 #: include/forms.inc.php:1743 include/maintenances.inc.php:122
 msgid "Last"
-msgstr "最新"
+msgstr "最終週"
 
 #: include/func.inc.php:1877
 msgctxt "page navigation"
