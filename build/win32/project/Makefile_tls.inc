@@ -1,34 +1,33 @@
 !IF "$(TLS)" != ""
 
+!IF "$(TLS)" != "polarssl" && "$(TLS)" != "gnutls"
+!ERROR Specified TLS target "$(TLS)" is not supported (supported: polarssl, gnutls).
+!ENDIF
+
 !IF "$(TLSINCDIR)" == ""
-!ERROR TLS include directory TLSINCDIR not specified (e. g. TLSINCDIR=\tmp\mbedtls-1.3.10\include).
+!ERROR Please specify directory containing TLS header files (e. g. TLSINCDIR=\somepath\include).
 !ENDIF
 
 !IF !EXISTS($(TLSINCDIR))
 !ERROR Specified TLS include directory "$(TLSINCDIR)" does not exist.
 !ENDIF
 
-!IF "$(TLSLIBDIR)" == ""
-!ERROR TLS library directory TLSLIBDIR not specified (e. g. TLSLIBDIR=\tmp\mbedtls-1.3.10\library).
+!IF "$(TLSLIB)" == ""
+!ERROR Path to TLS library (TLSLIB) not specified (e. g. TLSLIB=\somepath\library.lib).
 !ENDIF
 
-!IF !EXISTS($(TLSLIBDIR))
-!ERROR Specified TLS library directory "$(TLSLIBDIR)" does not exist.
+!IF !EXISTS($(TLSLIB))
+!ERROR Specified TLS library "$(TLSLIB)" does not exist.
 !ENDIF
 
 !IF "$(TLS)" == "polarssl"
-TLSLIBRARY = $(TLSLIBDIR)\mbedtls.lib
 CFLAGS = $(CFLAGS) /DHAVE_POLARSSL
-!ELSE
-!ERROR Specified TLS target "$(TLS)" is not supported (supported: polarssl).
+!ELSEIF "$(TLS)" == "gnutls"
+CFLAGS = $(CFLAGS) /DHAVE_GNUTLS
 !ENDIF
 
-!IF !EXISTS($(TLSLIBRARY))
-!ERROR TLS library "$(TLSLIBRARY)" not found.
-!ENDIF
-
-INCS = $(INCS) /I $(TLSINCDIR)
+INCS = $(INCS) /I "$(TLSINCDIR)"
 OBJS = $(OBJS) ..\..\..\src\libs\zbxcrypto\tls.o
-LIBS = $(LIBS) $(TLSLIBRARY)
+LIBS = $(LIBS) "$(TLSLIB)"
 
 !ENDIF
