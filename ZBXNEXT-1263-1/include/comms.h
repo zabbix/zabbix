@@ -20,6 +20,13 @@
 #ifndef ZABBIX_COMMS_H
 #define ZABBIX_COMMS_H
 
+#if defined(_WINDOWS)
+#	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
+typedef int	ssize_t;
+#	else
+typedef long	ssize_t;
+#	endif
+
 #if defined(HAVE_POLARSSL)
 #	ifdef uint32_t
 #		undef uint32_t
@@ -30,13 +37,6 @@
 #elif defined(HAVE_OPENSSL)
 #	include <openssl/ssl.h>
 #endif
-
-#if defined(_WINDOWS)
-#	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
-typedef int	ssize_t;
-#	else
-typedef long	ssize_t;
-#	endif
 
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
