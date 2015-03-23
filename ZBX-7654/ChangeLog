@@ -1,6 +1,8 @@
 Changes for 2.5.0
 
 New features:
+.......PS. [ZBXNEXT-866] added IP address in the messages about connections between server and proxy (igors)
+A......... [ZBXNEXT-2724] removed deprecated all "exists" and "getObjects" API methods, "expandData" parameter in various *.get methods and "selectHosts" parameter from application.get method (Ivo)
 ..F....... [ZBXNEXT-2357] added MVC framework, some pages already take advantage of the framework (Alexei, Sasha)
 ...GI..PS. [ZBXNEXT-444] improved log file monitoring by saving log file meta information which was previously lost during agent restart (dimir)
 ..F.....S. [ZBXNEXT-1128] added support of {HOST.*} and user macros in trigger URL (igors, Sasha)
@@ -25,6 +27,8 @@ A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent, updated outdated
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+...G...... [ZBX-9317] changed proc.mem[] and proc.num[] to return 0 if the specified user does not exist (asaveljevs)
+...G...... [ZBX-8513] changed vm.memory.size[available] key on AIX to return the sum of free and cached memory (wiper)
 ...G...PS. [ZBX-8993] added check for a valid reference of a global regular expression for snmptrap[], log[], logrt[] and eventlog[] items and logeventid(), regexp() and iregexp() trigger functions (igors)
 ..F....... [ZBX-8698] fixed "Unlink and clear" button being displayed when cloning or full cloning host or template and fixed spacing between "Name" and "Action" in "Linked templates" block in template edit form (Ivo, Krists)
 ..F....... [ZBX-9018] fixed updating of "config" table in Administration -> General pages (Oleg, Sasha)
@@ -62,19 +66,53 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
 
 --------------------------------------------------------------------------------
+Changes for 2.4.5rc1
+
+New features:
+.....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
+A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
+A.F....... [ZBX-9365] fixed array_combine() function giving a warning message for PHP versions < 5.4.0 (Ivo)
+..F....... [ZBX-9395] fixed overview triggers and data page to display results when the option to select first dropdown entry is set to "None" and a group is selected (Ivo)
+..F....... [ZBX-9402] fixed trigger list sorting (Ivo)
+..F....... [ZBX-9102] fixed "System status" dashboard widget performing poorly (Ivo)
+A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
+....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
+........S. [ZBX-9368] fixed possible SQL errors when linking of several templates (Sasha)
+A.F....... [ZBX-9343] fixed user ID being zero in audit logs for login/logout actions (Ivo)
+..F....... [ZBX-9375] renamed "Latest events" to "Events" in menu popup for trigger map elements and fixed its link not setting corresponding trigger in filter (Ivo)
+...G...PS. [ZBX-9251] added missing socket closing to avoid large number of opened sockets (igors)
+.......PS. [ZBX-9344] fixed infinite looping in telnet.run[] in case there is no password prompt (asaveljevs, dimir)
+..F....... [ZBX-9369] removed validation of DB_ID from user profile for removed medias and fixed incorrect DB_ID validation for arrays in bar reports page (Ivo)
+..F....... [ZBX-9348] fixed possibility to enable/disable LLD trigger (Ivo)
+..F....... [ZBX-9268] fixed misleading message in discovered object indicator tooltip when deletion date is in the past (Ivo)
+..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
+..F....... [ZBX-9286] fixed configuration.import, when trigger expression have a user macro (Oleg)
+...G...... [ZBX-9283] improved proc_info item (Windows only) to get more information about the processes (dimir)
+..F....... [ZBX-8875] fixed undefined index in screens with dynamic graph prototype elements when host is not selected (Ivo)
+..F....... [ZBX-9203] fixed host scripts menu popup not properly displaying script name when name contains HTML tags (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.4
+
+2.4.4rc1 was released as 2.4.4 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.4.4rc1
 
 New features:
 .......PS. [ZBXNEXT-2354] separated VMware performance collector based statistic retrieval from VMware data retrieval and added items to monitor custom performance counters (wiper)
 A.F....... [ZBX-1357] enabled Chinese (China) locale to be displayed by default (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, Korean, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Japanese, Korean, Polish, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discovery and action conditions (Ivo, Sasha, Wiper)
 
 Bug fixes:
 ...G...PS. [ZBX-9284] added zabbix log file locking to avoid incomplete logging on log file rotation (igors)
-.......PS. [ZBX-591] added interface (SourceIP) for outgoing connection in web monitoring, alerts(Ez Texting), vmware monitoring and simple checks(https services) (igors)
+.......PS. [ZBX-591] added interface (SourceIP) for outgoing connection in web monitoring, alerts (Ez Texting), VMware monitoring and simple checks (HTTPS services) (igors)
 ...G...... [ZBX-9143] improved proc.num under Windows to handle more processes (dimir)
-...G...... [ZBX-9232] fixed incomplete eventlog messages (igors)
+...G...... [ZBX-9232] fixed processing of eventlog messages to avoid incomplete messaging for events which description could not be found (igors)
 ..F....... [ZBX-9257] fixed displaying missing history links in trigger context menu (Ivo)
 ..F....... [ZBX-9257] added missing host prefix before items in trigger context menu if trigger belongs to multiple hosts (Ivo)
 ..F....... [ZBX-9257] changed displaying host list from vertical to horizontal if trigger belongs to multiple hosts in Monitoring->Trigger status page (Ivo)
@@ -625,16 +663,41 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.10rc1
+
+New features:
+.....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
+
+Bug fixes:
+...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
+A.F....... [ZBX-9365] fixed array_combine() function giving a warning message for PHP versions < 5.4.0 (Ivo)
+..F....... [ZBX-9402] fixed trigger list sorting (Ivo)
+..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
+..F....... [ZBX-9102] fixed "System status" dashboard widget performing poorly (Ivo)
+A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
+....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
+........S. [ZBX-9368] fixed possible SQL errors when linking of several templates (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.9
+
+2.2.9rc1 was released as 2.2.9 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.9rc1
 
 New features:
 .......PS. [ZBXNEXT-2354] separated VMware performance collector based statistic retrieval from VMware data retrieval and added items to monitor custom performance counters (wiper)
-A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Japanese, Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9344] fixed infinite looping in telnet.run[] in case there is no password prompt (asaveljevs, dimir)
+..F....... [ZBX-9281] fixed undefined offset in template screens when resource is URL (Ivo)
+..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
+...G...... [ZBX-9283] improved proc_info item (Windows only) to get more information about the processes (dimir)
 ...G...PS. [ZBX-9284] added zabbix log file locking to avoid incomplete logging on log file rotation (igors)
 ...G...... [ZBX-9143] improved proc.num under Windows to handle more processes (dimir)
-...G...... [ZBX-9232] fixed incomplete eventlog messages (igors)
+...G...... [ZBX-9232] fixed processing of eventlog messages to avoid incomplete messaging for events which description could not be found (igors)
 ........S. [ZBX-9285] fixed memory leak when processing host prototypes (Sasha)
 .......PS. [ZBX-9279] optimized VMware requests to reduce amount of transferred data (wiper)
 ..F....... [ZBX-9087] fixed DB_ID validation expression to properly validate upper bound of received value and fixed various front-end forms not properly validating IDs (Krists, Ivo)
@@ -1838,9 +1901,18 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.15rc1
 
 New features:
+.....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
+..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
+A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
+....I....T [ZBX-9331] changed value type of system.stat[kthr,*] items in "Template OS AIX" to float and added them to "Performance" application (asaveljevs)
+........S. [ZBX-9368] fixed possible SQL errors when linking of several templates (Sasha)
+.......PS. [ZBX-9344] fixed infinite looping in telnet.run[] in case there is no password prompt (asaveljevs, dimir)
+..F....... [ZBX-9281] fixed undefined offset in template screens when resource is URL (Ivo)
+..F....... [ZBX-4633] fixed host inventories not displaying all filtered results when record count exceeds global limit (Ivo)
 ...G...PS. [ZBX-9284] added zabbix log file locking to avoid incomplete logging on log file rotation (igors)
 ..F....... [ZBX-9087] fixed DB_ID validation expression to properly validate upper bound of received value and fixed various front-end forms not properly validating IDs (Krists, Ivo)
 ...G...... [ZBX-9241] fixed possible vfs.fs.discovery item crash on AIX systems (wiper)

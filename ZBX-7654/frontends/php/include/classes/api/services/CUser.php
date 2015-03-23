@@ -1063,7 +1063,9 @@ class CUser extends CApiService {
 				' WHERE userid='.zbx_dbstr($userInfo['userid'])
 			);
 
-			add_audit(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _s('Login failed "%s".', $name), $userInfo['userid']);
+			add_audit_details(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, $userInfo['userid'], '',
+				_s('Login failed "%s".', $name), $userInfo['userid']
+			);
 			self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
 		}
 

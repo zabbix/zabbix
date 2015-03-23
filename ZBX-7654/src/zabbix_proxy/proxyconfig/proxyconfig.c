@@ -51,16 +51,6 @@ void	zbx_proxyconfig_sigusr_handler(int flags)
  *                                                                            *
  * Function: process_configuration_sync                                       *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	process_configuration_sync(size_t *data_size)
 {
@@ -68,7 +58,7 @@ static void	process_configuration_sync(size_t *data_size)
 
 	zbx_sock_t	sock;
 	struct		zbx_json_parse jp;
-	char		value[16];
+	char		value[16], *error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -77,18 +67,24 @@ static void	process_configuration_sync(size_t *data_size)
 
 	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY); /* retry till have a connection */
 
-	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG))
+	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
+				get_ip_by_socket(&sock), error);
 		goto out;
+	}
 
 	if ('\0' == *sock.buffer)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: empty string received");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
+				get_ip_by_socket(&sock), "empty string received");
 		goto out;
 	}
 
 	if (SUCCEED != zbx_json_open(sock.buffer, &jp))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
+				get_ip_by_socket(&sock), zbx_json_strerror());
 		goto out;
 	}
 
@@ -102,20 +98,23 @@ static void	process_configuration_sync(size_t *data_size)
 		char	*info = NULL;
 		size_t	info_alloc = 0;
 
-		zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc);
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_INFO, &info, &info_alloc))
+			info = zbx_dsprintf(info, "negative response \"%s\"", value);
 
-		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server: %s",
-				ZBX_NULL2EMPTY_STR(info));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
+				get_ip_by_socket(&sock), info);
 		zbx_free(info);
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server, datalen " ZBX_FS_SIZE_T,
-			(zbx_fs_size_t)*data_size);
+	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server at \"%s\", datalen " ZBX_FS_SIZE_T,
+			get_ip_by_socket(&sock), (zbx_fs_size_t)*data_size);
 
 	process_proxyconfig(&jp);
 out:
 	disconnect_server(&sock);
+
+	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

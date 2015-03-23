@@ -182,27 +182,6 @@ class CDHost extends CApiService {
 	return $result;
 	}
 
-	/**
-	 * Check if discovered host exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('dhost.exists method is deprecated.');
-
-		$dHost = $this->get(array(
-			'output' => array('dhostid'),
-			'filter' => zbx_array_mintersect(array(array('dhostid')), $object),
-			'limit' => 1
-		));
-
-		return (bool) $dHost;
-	}
-
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 

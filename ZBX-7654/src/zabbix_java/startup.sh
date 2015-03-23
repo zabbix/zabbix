@@ -37,6 +37,9 @@ fi
 if [ -n "$START_POLLERS" ]; then
 	ZABBIX_OPTIONS="$ZABBIX_OPTIONS -Dzabbix.startPollers=$START_POLLERS"
 fi
+if [ -n "$TIMEOUT" ]; then
+	ZABBIX_OPTIONS="$ZABBIX_OPTIONS -Dzabbix.timeout=$TIMEOUT -Dsun.rmi.transport.tcp.responseTimeout=${TIMEOUT}000"
+fi
 
 # uncomment to enable remote monitoring of the standard JMX objects on the Zabbix Java Gateway itself
 # JAVA_OPTIONS="$JAVA_OPTIONS -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=12345
