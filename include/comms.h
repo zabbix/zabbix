@@ -146,7 +146,7 @@ int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int pr
 #define zbx_send_response_raw(sock, result, info, timeout) \
 		zbx_send_response_ext(sock, result, info, 0, timeout)
 
-int	zbx_recv_response(zbx_sock_t *sock, char **info, int timeout, char **error);
+int	zbx_recv_response(zbx_sock_t *sock, int timeout, char **error);
 
 #if defined(HAVE_IPV6)
 #define zbx_getnameinfo(sa, host, hostlen, serv, servlen, flags)						\

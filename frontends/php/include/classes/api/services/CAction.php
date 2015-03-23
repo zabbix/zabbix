@@ -498,27 +498,6 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Check if action exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('action.exists method is deprecated.');
-
-		$action = $this->get(array(
-			'output' => array('actionid'),
-			'filter' => zbx_array_mintersect(array(array('actionid', 'name')), $object),
-			'limit' => 1
-		));
-
-		return (bool) $action;
-	}
-
-	/**
 	 * Add actions
 	 *
 	 * @param array $actions multidimensional array with actions data
@@ -1838,9 +1817,6 @@ class CAction extends CApiService {
 		);
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 

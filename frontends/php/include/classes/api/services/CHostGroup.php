@@ -365,46 +365,6 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * Get host groups by name.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array $hostgroupData
-	 * @param array $hostgroupData['name']
-	 *
-	 * @return array
-	 */
-	public function getObjects(array $hostgroupData) {
-		$this->deprecated('hostgroup.getobjects method is deprecated.');
-
-		return $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'filter' => $hostgroupData
-		));
-	}
-
-	/**
-	 * Check if host group exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('hostgroup.exists method is deprecated.');
-
-		$hostGroup = $this->get(array(
-			'output' => array('groupid'),
-			'filter' => zbx_array_mintersect(array('name', 'groupid'), $object),
-			'limit' => 1
-		));
-
-		return (bool) $hostGroup;
-	}
-
-	/**
 	 * Create host groups.
 	 *
 	 * @param array $groups array with host group names
@@ -980,7 +940,9 @@ class CHostGroup extends CApiService {
 
 		// Collect both given host and template IDs.
 		$currentObjectIds = array_merge($hostIds, $templateIds);
-		$currentObjectIds = array_combine($currentObjectIds, $currentObjectIds);
+		if ($currentObjectIds) {
+			$currentObjectIds = array_combine($currentObjectIds, $currentObjectIds);
+		}
 
 		// Collect both host and template IDs that also belong to given groups, but are not given in parameters.
 		$objectIdsToRemove = array();

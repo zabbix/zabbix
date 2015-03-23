@@ -253,30 +253,6 @@ class CMaintenance extends CApiService {
 		return $result;
 	}
 
-
-	/**
-	 * Check if maintenance exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('maintenance.exists method is deprecated.');
-
-		$keyFields = array(array('maintenanceid', 'name'));
-
-		$maintenance = $this->get(array(
-			'output' => array('maintenanceid'),
-			'filter' => zbx_array_mintersect($keyFields, $object),
-			'limit' => 1
-		));
-
-		return (bool) $maintenance;
-	}
-
 	/**
 	 * Add maintenances.
 	 *
@@ -387,13 +363,17 @@ class CMaintenance extends CApiService {
 			}
 
 			// validate timeperiods
-			if (empty($maintenance['timeperiods'])) {
+			if (!array_key_exists('timeperiods', $maintenance) || !is_array($maintenance['timeperiods'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 			}
 
 			$insert[$mnum] = $maintenance;
 
 			foreach ($maintenance['timeperiods'] as $timeperiod) {
+				if (!is_array($timeperiod)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
+				}
+
 				$dbFields = array(
 					'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
 					'period' => SEC_PER_HOUR,
@@ -524,8 +504,14 @@ class CMaintenance extends CApiService {
 			}
 
 			// validate timeperiods
-			if (empty($maintenance['timeperiods'])) {
+			if (!array_key_exists('timeperiods', $maintenance) || !is_array($maintenance['timeperiods'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
+			}
+
+			foreach ($maintenance['timeperiods'] as $timeperiod) {
+				if (!is_array($timeperiod)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
+				}
 			}
 
 			$hostids = array_merge($hostids, $maintenance['hostids']);
