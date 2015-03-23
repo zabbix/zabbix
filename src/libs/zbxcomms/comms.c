@@ -40,6 +40,10 @@
 #	define SOCK_CLOEXEC 0	/* SOCK_CLOEXEC is Linux-specific, available since 2.6.23 */
 #endif
 
+#if defined(HAVE_OPENSSL)
+extern ZBX_THREAD_LOCAL char	info_buf[256];
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_strerror                                                 *
@@ -611,6 +615,43 @@ static ssize_t	zbx_tls_write(zbx_sock_t *s, const char *buf, size_t len)
 		}
 		else
 			return (ssize_t)res;
+#elif defined(HAVE_OPENSSL)
+		int	res;
+
+		/* TODO: should we process SSL_ERROR_WANT_READ or set SSL_MODE_AUTO_RETRY ? */
+		/* (see "man SSL_write") */
+
+		if (0 < (res = SSL_write(s->tls_ctx, buf, (int)len)))
+		{
+			return (ssize_t)res;	/* success */
+		}
+		else
+		{
+			int	error_code;
+
+			error_code = SSL_get_error(s->tls_ctx, res);
+
+			if (0 == res && SSL_ERROR_ZERO_RETURN == error_code)
+			{
+				zbx_set_tcp_strerror("connection closed during write");
+
+				return ZBX_TCP_ERROR;
+			}
+			else
+			{
+				char	*error = NULL;
+				size_t	error_alloc = 0, error_offset = 0;
+
+				info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_callback() messages */
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "TLS write returned error code "
+						"%d:", error_code);
+				zbx_tls_error_msg(&error, &error_alloc, &error_offset);
+				zbx_set_tcp_strerror("%s: %s", error, info_buf);
+				zbx_free(error);
+
+				return ZBX_TCP_ERROR;
+			}
+		}
 #endif
 	}
 #endif
@@ -1399,6 +1440,43 @@ static ssize_t	zbx_tls_read(zbx_sock_t *s, char *buf, size_t len)
 		}
 		else
 			return (ssize_t)res;
+#elif defined(HAVE_OPENSSL)
+		int	res;
+
+		/* TODO: should we process SSL_ERROR_WANT_READ or set SSL_MODE_AUTO_RETRY ? */
+		/* (see "man SSL_read") */
+
+		if (0 < (res = SSL_read(s->tls_ctx, buf, len)))
+		{
+			return (ssize_t)res;	/* success */
+		}
+		else
+		{
+			int	error_code;
+
+			error_code = SSL_get_error(s->tls_ctx, res);
+
+			if (0 == res && SSL_ERROR_ZERO_RETURN == error_code)
+			{
+				zbx_set_tcp_strerror("connection closed during read");
+
+				return ZBX_TCP_ERROR;
+			}
+			else
+			{
+				char	*error = NULL;
+				size_t	error_alloc = 0, error_offset = 0;
+
+				info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_callback() messages */
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "TLS read returned error code "
+						"%d:", error_code);
+				zbx_tls_error_msg(&error, &error_alloc, &error_offset);
+				zbx_set_tcp_strerror("%s: %s", error, info_buf);
+				zbx_free(error);
+
+				return ZBX_TCP_ERROR;
+			}
+		}
 #endif
 	}
 #endif

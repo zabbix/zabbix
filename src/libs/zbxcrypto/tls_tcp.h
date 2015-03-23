@@ -24,4 +24,8 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept);
 void	zbx_tls_close(zbx_sock_t *s);
 
+#if defined(HAVE_OPENSSL)
+void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset);
+#endif
+
 #endif	/* ZABBIX_TLS_TCP_H */
