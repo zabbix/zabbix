@@ -737,15 +737,6 @@ int	main(int argc, char **argv)
 			break;
 		default:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
-#ifdef _WINDOWS
-			if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
-			{
-				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
-						APPLICATION_NAME, CONFIG_HOSTNAME);
-				zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]",
-						APPLICATION_NAME, CONFIG_HOSTNAME);
-			}
-#endif
 			break;
 	}
 
