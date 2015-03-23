@@ -1348,7 +1348,7 @@ function getTriggerMassupdateFormData() {
 	}
 	unset($dependency);
 
-	order_result($data['dependencies'], 'description');
+	order_result($data['dependencies'], 'description', ZBX_SORT_UP);
 
 	return $data;
 }
