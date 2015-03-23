@@ -262,7 +262,7 @@ static void	zbx_tls_error_msg(int error_code, const char *msg, char **error)
 	*error = zbx_dsprintf(*error, "%s%s", msg, err);
 }
 #elif defined(HAVE_OPENSSL)
-static void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset)
+void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset)
 {
 	unsigned long	error_code;
 	const char	*file, *data;
@@ -3115,6 +3115,17 @@ out:	/* an error occured */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
+	return ret;
+
+#elif defined(HAVE_OPENSSL)
+	const char	*__function_name = "zbx_tls_accept";
+	int		ret = FAIL, res;
+	size_t		error_alloc = 0, error_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	/* TODO fill in implementation */
+
 	return ret;
 #endif
 }
