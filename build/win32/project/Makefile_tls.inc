@@ -1,33 +1,77 @@
 !IF "$(TLS)" != ""
 
-!IF "$(TLS)" != "polarssl" && "$(TLS)" != "gnutls"
-!ERROR Specified TLS target "$(TLS)" is not supported (supported: polarssl, gnutls).
+!IF "$(TLS)" != "polarssl" && "$(TLS)" != "gnutls" && "$(TLS)" != "openssl"
+!ERROR Specified TLS target "$(TLS)" is not supported (supported: polarssl, gnutls, openssl).
 !ENDIF
 
 !IF "$(TLSINCDIR)" == ""
-!ERROR Please specify directory containing TLS header files (e. g. TLSINCDIR=\somepath\include).
+!ERROR Please specify directory containing TLS header files (e. g. TLSINCDIR="\somepath\include").
 !ENDIF
 
-!IF !EXISTS($(TLSINCDIR))
-!ERROR Specified TLS include directory "$(TLSINCDIR)" does not exist.
+!IF !EXISTS("$(TLSINCDIR)")
+!ERROR Specified directory "$(TLSINCDIR)" does not exist.
 !ENDIF
 
-!IF "$(TLSLIB)" == ""
-!ERROR Path to TLS library (TLSLIB) not specified (e. g. TLSLIB=\somepath\library.lib).
+!IF "$(TLS)" == "openssl"
+!IF ("$(TLSLIBDIR)" != "" && "$(TLSLIB2)" != "") || ("$(TLSLIB)" != "" && "$(TLSLIB2)" == "") || ("$(TLSLIB)" == "" && "$(TLSLIB2)" != "")
+!ERROR Please specify either TLSLIBDIR or both TLSLIB and TLSLIB2 (e. g. TLSLIBDIR="\somepath\lib" or TLSLIB="\somepath\libeay32.lib" TLSLIB2="\somepath\ssleay32.lib").
+!ENDIF
+!ELSE
+!IF ("$(TLSLIBDIR)" == "" && "$(TLSLIB)" == "") || ("$(TLSLIBDIR)" != "" && "$(TLSLIB)" != "")
+!ERROR Please specify only one of TLSLIBDIR or TLSLIB (e. g. TLSLIBDIR="\somepath\lib" or TLSLIB="\somepath\lib\some.lib").
+!ENDIF
 !ENDIF
 
-!IF !EXISTS($(TLSLIB))
-!ERROR Specified TLS library "$(TLSLIB)" does not exist.
+!IF "$(TLSLIBDIR)" != "" && !EXISTS("$(TLSLIBDIR)")
+!ERROR Specified directory "$(TLSLIBDIR)" does not exist.
 !ENDIF
 
+!IF "$(TLSLIBDIR)" != ""
+!IF "$(TLS)" == "openssl"
+ADDMSG = You may specify path to libraries using TLSLIB="\somepath\libeay32.lib" TLSLIB2="\somepath\ssleay32.lib"
+!ELSE
+ADDMSG = You may specify path to library using TLSLIB="\somepath\lib\some.lib"
+!ENDIF
+!ENDIF
+
+### PolarSSL ###
 !IF "$(TLS)" == "polarssl"
+!IF "$(TLSLIBDIR)" != ""
+TLSLIB = $(TLSLIBDIR)\mbedtls.lib
+!ENDIF
+!IF !EXISTS("$(TLSLIB)")
+!ERROR TLS library "$(TLSLIB)" not found. $(ADDMSG)
+!ENDIF
+LIBS = $(LIBS) "$(TLSLIB)"
 CFLAGS = $(CFLAGS) /DHAVE_POLARSSL
+### GnuTLS ###
 !ELSEIF "$(TLS)" == "gnutls"
+!IF "$(TLSLIBDIR)" != ""
+TLSLIB = $(TLSLIBDIR)\libgnutls.dll.a
+!ENDIF
+!IF !EXISTS("$(TLSLIB)")
+!ERROR TLS library "$(TLSLIB)" not found. $(ADDMSG)
+!ENDIF
+!MESSAGE TLSLIB=$(TLSLIB)
+LIBS = $(LIBS) "$(TLSLIB)"
 CFLAGS = $(CFLAGS) /DHAVE_GNUTLS
+### OpenSSL ###
+!ELSEIF "$(TLS)" == "openssl"
+!IF "$(TLSLIBDIR)" != ""
+TLSLIB = $(TLSLIBDIR)\libeay32.lib
+TLSLIB2 = $(TLSLIBDIR)\ssleay32.lib
+!ENDIF
+!IF !EXISTS("$(TLSLIB)")
+!ERROR TLS library "$(TLSLIB)" not found. $(ADDMSG)
+!ENDIF
+!IF !EXISTS("$(TLSLIB2)")
+!ERROR TLS library "$(TLSLIB2)" not found. $(ADDMSG)
+!ENDIF
+LIBS = $(LIBS) "$(TLSLIB)" "$(TLSLIB2)"
+CFLAGS = $(CFLAGS) /DHAVE_OPENSSL
 !ENDIF
 
 INCS = $(INCS) /I "$(TLSINCDIR)"
 OBJS = $(OBJS) ..\..\..\src\libs\zbxcrypto\tls.o
-LIBS = $(LIBS) "$(TLSLIB)"
 
 !ENDIF
