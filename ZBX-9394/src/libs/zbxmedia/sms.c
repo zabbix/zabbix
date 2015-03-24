@@ -26,11 +26,12 @@
 
 static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 {
-	int	i = 0, wlen = 0, len, ret = SUCCEED;
+	const char	*__function_name = "write_gsm";
+	int		i, wlen, len, ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s]", __function_name, str);
 
 	len = strlen(str);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "write to GSM modem [%s]", str);
 
 	for (wlen = 0; wlen < len; wlen += i)
 	{
@@ -50,10 +51,13 @@ static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 		}
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
-static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char *expect, char *error, int max_error_len)
+static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char *expect, char *error,
+		int max_error_len)
 {
 	const char	*__function_name = "check_modem_result";
 	char		rcv[0xff];
@@ -83,9 +87,9 @@ static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char
 			*sbuf = buffer;
 		}
 	}
-	while (*sbuf < *ebuf && ret == FAIL);
+	while (*sbuf < *ebuf && FAIL == ret);
 
-	if (ret == FAIL && error)
+	if (FAIL == ret && NULL != error)
 		zbx_snprintf(error, max_error_len, "Expected [%s] received [%s]", expect, rcv);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -116,9 +120,11 @@ static int	read_gsm(int fd, const char *expect, char *error, int max_error_len, 
 	/* wait for response from modem */
 	FD_ZERO(&fdset);
 	FD_SET(fd, &fdset);
+
 	while (1)
 	{
 		i = select(fd + 1, &fdset, NULL, NULL, &tv);
+
 		if (-1 == i)
 		{
 			if (EINTR == errno)
@@ -197,7 +203,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 		{NULL		, NULL		, 0}
 	};
 
-	zbx_sms_scenario	*step = NULL;
+	zbx_sms_scenario	*step;
 	struct termios		options, old_options;
 	int			f, ret = SUCCEED;
 
@@ -218,11 +224,9 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	memset(&options, 0, sizeof(options));
 
 	options.c_iflag = IGNCR | INLCR | ICRNL;
-
 #ifdef ONOCR
 	options.c_oflag = ONOCR;
-#endif	/* ONOCR */
-
+#endif
 	options.c_cflag = old_options.c_cflag | CRTSCTS | CS8 | CLOCAL | CREAD;
 	options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
 	options.c_cc[VMIN] = 0;
