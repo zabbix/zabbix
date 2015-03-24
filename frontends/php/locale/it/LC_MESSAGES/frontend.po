@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 23:02+0200\n"
-"PO-Revision-Date: 2014-11-10 17:46+0300\n"
+"POT-Creation-Date: 2015-03-24 14:19+0200\n"
+"PO-Revision-Date: 2015-03-16 16:45+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1415634384.0\n"
+"X-POOTLE-MTIME: 1426517101.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2261,7 +2261,7 @@ msgstr "Impossibile inviare comando, controlla connessione al server Zabbix \"%1
 #: include/classes/api/services/CHostGroup.php:429
 #, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Impossibile definire \"%1$s\" per il gruppo host \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:242
 #, c-format
@@ -2377,7 +2377,7 @@ msgstr "Impossibile aggiornate \"%1$s\" per l'azione \"%2$s\"."
 #: include/classes/api/services/CHostGroup.php:490
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Impossibile aggiornare \"%1$s\" per il gruppo host \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:206
 #, c-format
@@ -6664,11 +6664,11 @@ msgstr "Indirizzo IP"
 
 #: include/classes/validators/CIPValidator.php:43
 msgid "IP address cannot be empty."
-msgstr ""
+msgstr "L'indirizzo IP non puo' essere vuoto."
 
 #: include/classes/validators/CIPRangeValidator.php:62
 msgid "IP address range cannot be empty."
-msgstr ""
+msgstr "L'intervallo di indirizzamento IP non puo' essere vuoto."
 
 #: include/classes/api/services/CHostInterface.php:292
 msgid "IP and DNS cannot be empty for host interface."
@@ -6682,7 +6682,7 @@ msgstr "Intervallo IP"
 #: include/classes/validators/CIPRangeValidator.php:80
 #, c-format
 msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit."
-msgstr ""
+msgstr "L'intervallo IP \"%1$s\" eccede \"%2$s\" i limiti di indirizzamento."
 
 #: include/classes/api/services/CDRule.php:215
 msgid "IP range cannot be empty."
@@ -7303,12 +7303,12 @@ msgstr "Caricamento file errato."
 #: include/classes/api/services/CAction.php:1825
 #, c-format
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
-msgstr ""
+msgstr "Filtro errato \"condizione ID formula\" per azione \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:888
 #, c-format
 msgid "Incorrect filter condition formula ID for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Filtro errato \"condizione ID formula\" per la regola di discovery \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:880
 #, c-format
@@ -7328,7 +7328,7 @@ msgstr "Filtro non corretto per l'operatore condizione sulla regola di discovery
 #: include/classes/api/services/CAction.php:1817
 #, c-format
 msgid "Incorrect filter condition type for action \"%1$s\"."
-msgstr ""
+msgstr "Errato filtro \"tipo di condizione\" per azione \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:838
 #, c-format
@@ -7343,7 +7343,7 @@ msgstr "Intervallo flessibile errato nell'item \"%1$s\". L'intervallo flessibile
 #: include/classes/api/services/CHttpTest.php:684
 #, c-format
 msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s\"."
-msgstr ""
+msgstr "Errato \"flusso reindirizzamento valore\" per passo \"%1$s\" di scenario web \"%2$s\"."
 
 #: include/classes/triggers/CTextTriggerConstructor.php:113
 #: include/triggers.inc.php:1599 tr_testexpr.php:36
@@ -7358,7 +7358,7 @@ msgstr "ID grafico \"%1$s\" non corretto per elemento schermata."
 #: include/classes/api/services/CScreenItem.php:713
 #, c-format
 msgid "Incorrect graph prototype ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Errato grafico prototipo ID \"%1$s\" fornito per elemento schermata."
 
 #: include/classes/api/services/CHostPrototype.php:396
 #: include/classes/api/services/CHostPrototype.php:403
@@ -7439,7 +7439,7 @@ msgstr "Fornita chiave item \"%1$s\" errata per l'espressione del trigger in \"%
 #: include/classes/api/services/CScreenItem.php:750
 #, c-format
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
-msgstr ""
+msgstr "Errato item prototipo ID \"%1$s\" fornito per elemento schermata."
 
 #: include/classes/validators/CFunctionValidator.php:254
 #, c-format
@@ -7942,22 +7942,22 @@ msgstr "Intervallo (in sec)"
 #: include/classes/validators/CIPValidator.php:49
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
-msgstr ""
+msgstr "Indirizzo IP non valido \"%1$s\"."
 
 #: include/classes/validators/CIPValidator.php:37
 #, c-format
 msgid "Invalid IP address \"%1$s\": must be a string."
-msgstr ""
+msgstr "Indirizzo IP non valido \"%1$s\": deve essere una stringa."
 
 #: include/classes/validators/CIPRangeValidator.php:72
 #, c-format
 msgid "Invalid IP address range \"%1$s\"."
-msgstr ""
+msgstr "Intervallo IP non valido \"%1$s\"."
 
 #: include/classes/validators/CIPRangeValidator.php:56
 #, c-format
 msgid "Invalid IP address range \"%1$s\": must be a string."
-msgstr ""
+msgstr "Intervallo IP non valido \"%1$s\": deve essere una stringa."
 
 #: include/classes/core/CJsonRpc.php:170
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -9774,27 +9774,27 @@ msgstr "Nessun \"%1$s\" fornito per scenario web."
 #: include/classes/api/services/CAction.php:1836
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
-msgstr ""
+msgstr "Nessun \"%2$s\" dato per la \"condizione filtro\" sull'azione \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:896
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Nessun \"%2$s\" dato per la \"condizione filtro\" sulla regola di discovery \"%1$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:208
 #, c-format
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
-msgstr "Nessun \"%2$s\" fornito per il prototipo host \"%1$s\"."
+msgstr "Nessun \"%2$s\" dato per la \"condizione filtro\" sulla regola di discovery \"%1$s\"."
 
 #: include/classes/api/services/CAction.php:1786
 #, c-format
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
-msgstr ""
+msgstr "Nessun \"%2$s\" dato per il filtro sull'azione \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:864
 #, c-format
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Nessun \"%2$s\" dato per il filtro sulla regola di discovery \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1913
 #, c-format
@@ -9997,7 +9997,7 @@ msgstr "Nessun item del grafico con graphid \"%s\"."
 
 #: include/classes/api/services/CScreenItem.php:534
 msgid "No graph prototype ID provided for screen element."
-msgstr ""
+msgstr "Nessun ID grafico prototipo fornito per l'elemento schermata."
 
 #: include/views/configuration.graph.list.php:73 popup.php:1290
 msgid "No graph prototypes found."
@@ -10128,7 +10128,7 @@ msgstr "Nessun item key trovato."
 
 #: include/classes/api/services/CScreenItem.php:544
 msgid "No item prototype ID provided for screen element."
-msgstr ""
+msgstr "Nessun ID item prototipo fornito per l'elemento schermata."
 
 #: include/views/configuration.item.prototype.list.php:43 popup.php:1085
 msgid "No item prototypes found."
@@ -10221,7 +10221,7 @@ msgstr "Nessun permesso per il template \"%1$s\"."
 #: include/classes/import/CXmlImport18.php:1760
 #, c-format
 msgid "No permission for trigger \"%1$s\"."
-msgstr ""
+msgstr "Nessuna permesso per il trigger \"%1$s\"."
 
 #: slides.php:91
 msgid "No permissions"
@@ -10230,7 +10230,7 @@ msgstr "Nessun permesso"
 #: include/classes/import/CXmlImport18.php:1126
 #, c-format
 msgid "No permissions for host group \"%1$s\"."
-msgstr ""
+msgstr "Nessuna permesso per il gruppo host \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:679
 #, c-format
@@ -11884,7 +11884,7 @@ msgstr "L'espressione regolare non esiste."
 
 #: adm.regexps.php:68 include/regexp.inc.php:119
 msgid "Regular expression must be a string"
-msgstr ""
+msgstr "La \"regular expression\" deve essere una stringa"
 
 #: adm.regexps.php:135
 msgid "Regular expression updated"
@@ -12446,7 +12446,7 @@ msgstr "Password chiave SSL"
 
 #: include/views/configuration.httpconf.edit.php:175
 msgid "SSL verify host"
-msgstr ""
+msgstr "SSL verifica host"
 
 #: include/views/configuration.httpconf.edit.php:172
 msgid "SSL verify peer"
@@ -13789,7 +13789,7 @@ msgstr "Il gruppo host non è stato più discoverato e sarà rimosso in %1$s (il
 
 #: include/views/configuration.hostgroups.list.php:135
 msgid "The host group is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "Il gruppo host non e' piu' rilevato dalla discovery e verra' eliminato alla successiva esecuzione della regola di discovery."
 
 #: include/html.inc.php:565
 #, c-format
@@ -13798,7 +13798,7 @@ msgstr "L'host non è stato più discoverato e sarà rimosso in %1$s (il %2$s al
 
 #: include/html.inc.php:560
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "L'host non e' piu' rilevato dalla discovery e verra' eliminato alla successiva esecuzione della regola di discovery."
 
 #: include/classes/api/services/CImage.php:433
 #, c-format
@@ -13821,7 +13821,7 @@ msgstr "L'item non è più rilevato da discovery e sarà rimosso in %1$s (il %2$
 
 #: include/views/configuration.item.list.php:133
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "L'item non e' piu' rilevato dalla discovery e verra' eliminato alla successiva esecuzione della regola di discovery."
 
 #: queue.php:78
 msgid "The queue is empty."
@@ -14471,7 +14471,7 @@ msgstr "Il nome del parametro URL è vuoto."
 #: include/classes/api/services/CMap.php:467
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%s\"."
-msgstr ""
+msgstr "URL deve contenere entrambe i campi \"nome\" e \"url\" per la mappa \"%s\"."
 
 #: include/views/configuration.sysmap.edit.php:180
 #: include/views/js/configuration.sysmaps.js.php:179 jsLoader.php:221
@@ -14691,12 +14691,12 @@ msgstr "Parametro \"%1$s\" non supportato per il prototipo gruppo."
 #: include/classes/api/services/CAction.php:1837
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
-msgstr ""
+msgstr "Parametro non supportato \"%2$s\" per la \"condizione filtro\" dell'azione \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:897
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Parametro non supportato \"%2$s\" per la \"condizione filtro\" della regola di discovery \"%1$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:209
 #, c-format
@@ -14711,12 +14711,12 @@ msgstr "Parametro \"%2$s\" non supportato per l'inventario host del prototipo ho
 #: include/classes/api/services/CAction.php:1787
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
-msgstr ""
+msgstr "Parametro non supportato \"%2$s\" per il filtro dell'azione \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:865
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Parametro non supportato \"%2$s\" per il filtro della regola di discovery \"%1$s\"."
 
 #: include/blocks.inc.php:1258
 msgctxt "discovery results in dashboard"
