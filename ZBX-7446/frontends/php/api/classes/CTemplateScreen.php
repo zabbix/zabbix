@@ -521,7 +521,9 @@ class CTemplateScreen extends CScreen {
 								);
 							}
 
-							$screenItem['resourceid'] = $resourceItemsMap[$rid];
+							if ($rid) {
+								$screenItem['resourceid'] = $resourceItemsMap[$rid];
+							}
 					}
 
 					$insertScreenItems[] = $screenItem;
