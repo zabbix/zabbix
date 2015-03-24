@@ -333,11 +333,14 @@ footer {
     @include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
 	
 	thead th {
-		@include list-table-header;
+		font-size: $font-h3-size;
+		text-transform: $font-transform;
+		letter-spacing: 0.0688em;
+		text-rendering: optimizeLegibility;
 		height: 100%;
 		overflow: hidden;
 	    padding: 8px 5px 7px 5px;
-	    vertical-align: middle;
+	    vertical-align: bottom;
 	    border-bottom: 2px solid $lightest-blue-grey;
 	    text-align: left;
 	    color: $blue-grey;
@@ -373,6 +376,15 @@ footer {
 	    		text-decoration: none;
 	    		background: darken($alt-blue, 5%);
 	    	}	    
+	    }
+
+	    &.vertical {
+	    	overflow: initial!important;
+
+	    	div {
+	    		@include transform(/*translate(13px, 29px) */rotate(315deg));
+	    		position: relative;
+	    	}
 	    }
 	}
 
@@ -497,10 +509,6 @@ footer {
 
 .cell {
 	display: table-cell;
-}
-
-.vertical {
-	@include transform(270deg);
 }
 
 /* Filters */
@@ -853,8 +861,9 @@ footer {
 }
 
 .table-forms-separator {
-	margin: 5px 0 0 0;
-	border: 1px solid $lightest-blue-grey;
+	display: inline-block;
+	padding: 0 0 5px 0;
+	border-bottom: 2px solid $lightest-blue-grey;
 }
 
 .margin-top {
@@ -1823,15 +1832,15 @@ a.grey {
 }
 
 .green-bg {
-	background: $green;
+	background: $new-green;
 }
 
 .red-bg {
-	background: $red;
+	background: $new-red;
 }
 
 .na-bg {
-	background: $blue-grey;
+	background: $new-blue-grey;
 }
 
 .normal-bg {
@@ -1839,23 +1848,23 @@ a.grey {
 }
 
 .info-bg {
-	background: $blue;
+	background: $new-blue;
 }
 
 .average-bg {
-	background: $orange;
+	background: $new-orange;
 }
 
 .warning-bg {
-	background: $yellow;
+	background: $new-yellow;
 }
 
 .high-bg {
-	background: $alt-red;
+	background: $new-deep-orange;
 }
 
 .disaster-bg {
-	background: $red;
+	background: $new-red;
 }
 
 .msg-good {
@@ -1867,6 +1876,10 @@ a.grey {
 	.link-dotted {
 		@extend .green;
 	}
+
+	.overlay-close-btn {
+		color: $light-green;
+	}
 }
 
 .msg-bad {
@@ -1877,6 +1890,10 @@ a.grey {
 
 	.link-dotted {
 		@extend .red;
+	}
+
+	.overlay-close-btn {
+		color: $light-red;
 	}
 }
 
@@ -1924,7 +1941,7 @@ a.grey {
 	text-align: center;
 	background: $light-yellow;
 	color: $indigo-black;
-	border: 1px solid $yellow;
+	border-top: 1px solid $yellow;
 	@include box-shadow(-1px 0 2px 0 rgba(118,141,153,0.15));
 }
 
