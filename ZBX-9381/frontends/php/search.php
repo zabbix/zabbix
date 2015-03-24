@@ -158,6 +158,11 @@ foreach ($hosts as $hnum => $host) {
 	$caption = make_decoration($host['name'], $search);
 
 	if ($admin && isset($rw_hosts[$hostid])) {
+		/*
+		 * If host belongs to multiple groups, find a group that user has write permissions and then
+		 * add 'groupid' in URL. Otherwise adding a group with read permissions will give "no permissions" error in
+		 * configuration page.
+		 */
 		if (CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN && count($host['groups']) > 1) {
 			$groups = API::HostGroup()->get(array(
 				'output' => array('groupid'),
