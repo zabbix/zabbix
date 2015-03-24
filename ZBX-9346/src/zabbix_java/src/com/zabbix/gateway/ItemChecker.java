@@ -19,7 +19,7 @@
 
 package com.zabbix.gateway;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.json.*;
 
@@ -48,7 +48,7 @@ abstract class ItemChecker
 	public static final String JSON_RESPONSE_SUCCESS = "success";
 
 	protected JSONObject request;
-	protected Vector<String> keys;
+	protected ArrayList<String> keys;
 
 	protected ItemChecker(JSONObject request) throws ZabbixException
 	{
@@ -57,7 +57,7 @@ abstract class ItemChecker
 		try
 		{
 			JSONArray jsonKeys = request.getJSONArray(JSON_TAG_KEYS);
-			keys = new Vector<String>();
+			keys = new ArrayList<String>();
 
 			for (int i = 0; i < jsonKeys.length(); i++)
 				keys.add(jsonKeys.getString(i));

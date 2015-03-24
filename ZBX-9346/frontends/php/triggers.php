@@ -399,6 +399,7 @@ else {
 			'editable' => true,
 			'output' => array('triggerid'),
 			'sortfield' => $sortField,
+			'sortorder' => $sortOrder,
 			'limit' => $config['search_limit'] + 1
 		);
 		if (empty($data['showdisabled'])) {
