@@ -146,8 +146,7 @@ $userFormList->addRow(
 
 // append themes to form list
 $themes = array_merge(array(THEME_DEFAULT => _('System default')), Z::getThemes());
-$themeComboBox = new CComboBox('theme', $this->data['theme'], null, $themes);
-$userFormList->addRow(_('Theme'), $themeComboBox);
+$userFormList->addRow(_('Theme'), new CComboBox('theme', $this->data['theme'], null, $themes));
 
 // append auto-login & auto-logout to form list
 $autologoutCheckBox = new CCheckBox('autologout_visible', isset($this->data['autologout']) ? 'yes': 'no');
@@ -233,10 +232,14 @@ if ($this->data['is_profile']) {
 	$userMessagingFormList->addRow(_('Frontend messaging'), new CCheckBox('messages[enabled]', $this->data['messages']['enabled'], null, 1));
 	$userMessagingFormList->addRow(_('Message timeout (seconds)'), new CNumericBox('messages[timeout]', $this->data['messages']['timeout'], 5), false, 'timeout_row');
 
-	$repeatSound = new CComboBox('messages[sounds.repeat]', $this->data['messages']['sounds.repeat'], 'javascript: if (IE) { submit(); }');
-	$repeatSound->addItem(1, _('Once'));
-	$repeatSound->addItem(10, '10 '._('Seconds'));
-	$repeatSound->addItem(-1, _('Message timeout'));
+	$repeatSound = new CComboBox('messages[sounds.repeat]', $this->data['messages']['sounds.repeat'],
+		'javascript: if (IE) { submit(); }',
+		array(
+			1 => _('Once'),
+			10 => '10 '._('Seconds'),
+			-1 => _('Message timeout')
+		)
+	);
 	$userMessagingFormList->addRow(_('Play sound'), $repeatSound, false, 'repeat_row');
 
 	$soundList = new CComboBox('messages[sounds.recovery]', $this->data['messages']['sounds.recovery']);
@@ -305,10 +308,11 @@ if (!$this->data['is_profile']) {
 	 */
 	$permissionsFormList = new CFormList('permissionsFormList');
 
-	$userTypeComboBox = new CComboBox('user_type', $this->data['user_type'], 'submit();');
-	$userTypeComboBox->addItem(USER_TYPE_ZABBIX_USER, user_type2str(USER_TYPE_ZABBIX_USER));
-	$userTypeComboBox->addItem(USER_TYPE_ZABBIX_ADMIN, user_type2str(USER_TYPE_ZABBIX_ADMIN));
-	$userTypeComboBox->addItem(USER_TYPE_SUPER_ADMIN, user_type2str(USER_TYPE_SUPER_ADMIN));
+	$userTypeComboBox = new CComboBox('user_type', $this->data['user_type'], 'submit();', array(
+		USER_TYPE_ZABBIX_USER => user_type2str(USER_TYPE_ZABBIX_USER),
+		USER_TYPE_ZABBIX_ADMIN => user_type2str(USER_TYPE_ZABBIX_ADMIN),
+		USER_TYPE_SUPER_ADMIN => user_type2str(USER_TYPE_SUPER_ADMIN)
+	));
 
 	if ($data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
 		$userTypeComboBox->setEnabled(false);

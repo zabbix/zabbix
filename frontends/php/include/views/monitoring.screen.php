@@ -23,11 +23,14 @@ $screenWidget = new CWidget();
 $screenWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.screens.filter.state', 1));
 
 // header form
-$configComboBox = new CComboBox('config', 'screens.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-$configComboBox->addItem('screens.php', _('Screens'));
-$configComboBox->addItem('slides.php', _('Slide shows'));
 $headerForm = new CForm();
-$headerForm->addItem($configComboBox);
+$headerForm->addItem(new CComboBox('config', 'screens.php',
+	'javascript: redirect(this.options[this.selectedIndex].value);',
+	array(
+		'screens.php' => _('Screens'),
+		'slides.php' => _('Slide shows')
+	)
+));
 
 if (empty($this->data['screens'])) {
 	$screenWidget->addPageHeader(_('SCREENS'), $headerForm);

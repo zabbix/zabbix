@@ -176,16 +176,16 @@ $hostFormList->addRow(
 );
 
 // append status to form list
-$statusComboBox = new CComboBox('status', $data['status']);
-$statusComboBox->addItem(HOST_STATUS_MONITORED, _('Enabled'));
-$statusComboBox->addItem(HOST_STATUS_NOT_MONITORED, _('Disabled'));
 $hostFormList->addRow(
 	array(
 		_('Status'),
 		SPACE,
 		new CVisibilityBox('visible[status]', isset($data['visible']['status']), 'status', _('Original'))
 	),
-	$statusComboBox
+	$statusComboBox = new CComboBox('status', $data['status'], null, array(
+		HOST_STATUS_MONITORED => _('Enabled'),
+		HOST_STATUS_NOT_MONITORED => _('Disabled')
+	))
 );
 
 $templatesFormList = new CFormList('templatesFormList');
@@ -238,26 +238,22 @@ $templatesFormList->addRow(
 $ipmiFormList = new CFormList('ipmiFormList');
 
 // append ipmi to form list
-$ipmiAuthtypeComboBox = new CComboBox('ipmi_authtype', $data['ipmi_authtype']);
-$ipmiAuthtypeComboBox->addItems(ipmiAuthTypes());
 $ipmiFormList->addRow(
 	array(
 		_('IPMI authentication algorithm'),
 		SPACE,
 		new CVisibilityBox('visible[ipmi_authtype]', isset($data['visible']['ipmi_authtype']), 'ipmi_authtype', _('Original'))
 	),
-	$ipmiAuthtypeComboBox
+	new CComboBox('ipmi_authtype', $data['ipmi_authtype'], null, ipmiAuthTypes())
 );
 
-$ipmiPrivilegeComboBox = new CComboBox('ipmi_privilege', $data['ipmi_privilege']);
-$ipmiPrivilegeComboBox->addItems(ipmiPrivileges());
 $ipmiFormList->addRow(
 	array(
 		_('IPMI privilege level'),
 		SPACE,
 		new CVisibilityBox('visible[ipmi_privilege]', isset($data['visible']['ipmi_privilege']), 'ipmi_privilege', _('Original'))
 	),
-	$ipmiPrivilegeComboBox
+	new CComboBox('ipmi_privilege', $data['ipmi_privilege'], null, ipmiPrivileges())
 );
 
 $ipmiFormList->addRow(
@@ -281,17 +277,17 @@ $ipmiFormList->addRow(
 $inventoryFormList = new CFormList('inventoryFormList');
 
 // append inventories to form list
-$inventoryModesComboBox = new CComboBox('inventory_mode', $data['inventory_mode']);
-$inventoryModesComboBox->addItem(HOST_INVENTORY_DISABLED, _('Disabled'));
-$inventoryModesComboBox->addItem(HOST_INVENTORY_MANUAL, _('Manual'));
-$inventoryModesComboBox->addItem(HOST_INVENTORY_AUTOMATIC, _('Automatic'));
 $inventoryFormList->addRow(
 	array(
 		_('Inventory mode'),
 		SPACE,
 		new CVisibilityBox('visible[inventory_mode]', isset($data['visible']['inventory_mode']), 'inventory_mode', _('Original'))
 	),
-	$inventoryModesComboBox
+	$inventoryModesComboBox = new CComboBox('inventory_mode', $data['inventory_mode'], null, array(
+		HOST_INVENTORY_DISABLED => _('Disabled'),
+		HOST_INVENTORY_MANUAL => _('Manual'),
+		HOST_INVENTORY_AUTOMATIC => _('Automatic')
+	))
 );
 
 $hostInventoryTable = DB::getSchema('host_inventory');

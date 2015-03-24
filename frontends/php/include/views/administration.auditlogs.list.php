@@ -23,11 +23,13 @@ $auditWidget = new CWidget();
 
 // header
 $configForm = new CForm('get');
-$configComboBox = new CComboBox('config', 'auditlogs.php');
-$configComboBox->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
-$configComboBox->addItem('auditlogs.php', _('Audit log'));
-$configComboBox->addItem('auditacts.php', _('Action log'));
-$configForm->addItem($configComboBox);
+$configForm->addItem(new CComboBox('config', 'auditlogs.php',
+	'javascript: redirect(this.options[this.selectedIndex].value);',
+	array(
+		'auditlogs.php' => _('Audit log'),
+		'auditacts.php' => _('Action log')
+	)
+));
 $auditWidget->addPageHeader(_('AUDIT LOG'), $configForm);
 $auditWidget->addHeader(_('Audit log'));
 $auditWidget->addHeaderRowNumber();
@@ -38,18 +40,20 @@ $filterForm->setAttribute('name', 'zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
 $filterTable = new CTable('', 'filter filter-center');
 
-$actionComboBox = new CComboBox('action', $this->data['action']);
-$actionComboBox->addItem(-1, _('All'));
-$actionComboBox->addItem(AUDIT_ACTION_LOGIN, _('Login'));
-$actionComboBox->addItem(AUDIT_ACTION_LOGOUT, _('Logout'));
-$actionComboBox->addItem(AUDIT_ACTION_ADD, _('Add'));
-$actionComboBox->addItem(AUDIT_ACTION_UPDATE, _('Update'));
-$actionComboBox->addItem(AUDIT_ACTION_DELETE, _('Delete'));
-$actionComboBox->addItem(AUDIT_ACTION_ENABLE, _('Enable'));
-$actionComboBox->addItem(AUDIT_ACTION_DISABLE, _('Disable'));
+$actionComboBox = new CComboBox('action', $this->data['action'], null, array(
+	-1 => _('All'),
+	AUDIT_ACTION_LOGIN => _('Login'),
+	AUDIT_ACTION_LOGOUT => _('Logout'),
+	AUDIT_ACTION_ADD => _('Add'),
+	AUDIT_ACTION_UPDATE => _('Update'),
+	AUDIT_ACTION_DELETE => _('Delete'),
+	AUDIT_ACTION_ENABLE => _('Enable'),
+	AUDIT_ACTION_DISABLE => _('Disable')
+));
 
-$resourceComboBox = new CComboBox('resourcetype', $this->data['resourcetype']);
-$resourceComboBox->addItems(array(-1 => _('All')) + audit_resource2str());
+$resourceComboBox = new CComboBox('resourcetype', $this->data['resourcetype'], null,
+	array(-1 => _('All')) + audit_resource2str()
+);
 
 $filterTable->addRow(array(
 	array(

@@ -78,7 +78,6 @@ else {
 }
 
 // append resource types to form list
-$resourceTypeComboBox = new CComboBox('resourcetype', $resourceType, 'submit()');
 $screenResources = screen_resources();
 if ($this->data['screen']['templateid']) {
 	unset(
@@ -90,8 +89,7 @@ if ($this->data['screen']['templateid']) {
 		$screenResources[SCREEN_RESOURCE_TRIGGERS_INFO], $screenResources[SCREEN_RESOURCE_TRIGGERS_OVERVIEW]
 	);
 }
-$resourceTypeComboBox->addItems($screenResources);
-$screenFormList->addRow(_('Resource'), $resourceTypeComboBox);
+$screenFormList->addRow(_('Resource'), new CComboBox('resourcetype', $resourceType, 'submit()', $screenResources));
 
 /*
  * Screen item: Graph
@@ -597,11 +595,11 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 		}
 	}
 
-	$styleComboBox = new CComboBox('style', $style, 'javascript: submit();');
-	$styleComboBox->addItem(TIME_TYPE_LOCAL, _('Local time'));
-	$styleComboBox->addItem(TIME_TYPE_SERVER, _('Server time'));
-	$styleComboBox->addItem(TIME_TYPE_HOST, _('Host time'));
-	$screenFormList->addRow(_('Time type'), $styleComboBox);
+	$screenFormList->addRow(_('Time type'), new CComboBox('style', $style, 'javascript: submit();', array(
+		TIME_TYPE_LOCAL => _('Local time'),
+		TIME_TYPE_SERVER => _('Server time'),
+		TIME_TYPE_HOST => _('Host time')
+	)));
 
 	if (TIME_TYPE_HOST == $style) {
 		$screenFormList->addVar('resourceid', $resourceId);
