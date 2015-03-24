@@ -1242,6 +1242,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...PS. [ZBX-9251] added missing socket closing to avoid large number of opened sockets (igors)
 ...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
 ..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
 A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
