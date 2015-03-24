@@ -158,7 +158,7 @@ foreach ($hosts as $hnum => $host) {
 	$caption = make_decoration($host['name'], $search);
 
 	if ($admin && isset($rw_hosts[$hostid])) {
-		if (count($host['groups']) > 1) {
+		if (CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN && count($host['groups']) > 1) {
 			$groups = API::HostGroup()->get(array(
 				'output' => array('groupid'),
 				'groupids' => zbx_objectValues($host['groups'], 'groupid'),
