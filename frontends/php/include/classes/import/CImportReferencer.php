@@ -758,7 +758,6 @@ class CImportReferencer {
 
 			$dbTriggers = API::Trigger()->get(array(
 				'output' => array('triggerid', 'expression', 'description'),
-				'expandExpression' => true,
 				'filter' => array(
 					'description' => array_keys($this->triggers),
 					'flags' => array(
@@ -771,8 +770,9 @@ class CImportReferencer {
 			));
 
 			foreach ($dbTriggers as $dbTrigger) {
-				if (isset($this->triggers[$dbTrigger['description']][$dbTrigger['expression']])) {
-					$this->triggersRefs[$dbTrigger['description']][$dbTrigger['expression']] = $dbTrigger['triggerid'];
+				$dbTriggerExpression = explode_exp($dbTrigger['expression']);
+				if (isset($this->triggers[$dbTrigger['description']][$dbTriggerExpression])) {
+					$this->triggersRefs[$dbTrigger['description']][$dbTriggerExpression] = $dbTrigger['triggerid'];
 				}
 			}
 		}

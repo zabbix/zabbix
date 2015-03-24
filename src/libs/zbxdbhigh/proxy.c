@@ -499,7 +499,7 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 
 		if (SUCCEED != get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests))
 		{
-			*error = zbx_dsprintf(*error, "failed to get data from table %s", table->table);
+			*error = zbx_dsprintf(*error, "failed to get data from table \"%s\"", table->table);
 			goto out;
 		}
 	}

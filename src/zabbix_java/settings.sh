@@ -33,3 +33,11 @@ PID_FILE="/tmp/zabbix_java.pid"
 # Range: 1-1000
 # Default:
 # START_POLLERS=5
+
+### Option: zabbix.timeout
+#	How long to wait for network operations.
+#
+# Mandatory: no
+# Range: 1-30
+# Default:
+# TIMEOUT=3

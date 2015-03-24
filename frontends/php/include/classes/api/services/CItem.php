@@ -386,58 +386,6 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * Get items by item key and hostid.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array  $itemData
-	 * @param string $itemData['key_']
-	 * @param string $itemData['hostid']
-	 *
-	 * @return array
-	 */
-	public function getObjects(array $itemData) {
-		$this->deprecated('item.getobjects method is deprecated.');
-
-		return $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'webitems' => true,
-			'filter' => $itemData
-		));
-	}
-
-	/**
-	 * Check if item exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array $object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('item.exists method is deprecated.');
-
-		$options = array(
-			'output' => array('itemid'),
-			'filter' => array('key_' => $object['key_']),
-			'webitems' => true,
-			'limit' => 1
-		);
-
-		if (isset($object['hostid'])) {
-			$options['hostids'] = $object['hostid'];
-		}
-		if (isset($object['host'])) {
-			$options['filter']['host'] = $object['host'];
-		}
-
-		$item = $this->get($options);
-
-		return (bool) $item;
-	}
-
-	/**
 	 * Create item.
 	 *
 	 * @param $items
