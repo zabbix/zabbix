@@ -43,6 +43,7 @@ class C20ImportConverter extends CConverter {
 		$content = $this->convertHosts($content);
 		$content = $this->convertTemplates($content);
 		$content = $this->convertTriggers($content);
+		$content = $this->convertScreens($content);
 
 		$value['zabbix_export'] = $content;
 
@@ -151,6 +152,36 @@ class C20ImportConverter extends CConverter {
 			$trigger['expression'] = $this->triggerExpressionConverter->convert($trigger['expression']);
 		}
 		unset($trigger);
+
+		return $content;
+	}
+
+	/**
+	 * Convert screen elements.
+	 *
+	 * @param array $content
+	 *
+	 * @return array
+	 */
+	protected function convertScreens(array $content) {
+		if (!isset($content['screens']) || !$content['screens']) {
+			return $content;
+		}
+
+		foreach ($content['screens'] as &$screen) {
+			if (isset($screen['screen_items']) && $screen['screen_items']) {
+				foreach ($screen['screen_items'] as &$screenItem) {
+					if ($screenItem['rowspan'] == 0) {
+						$screenItem['rowspan'] = 1;
+					}
+					if ($screenItem['colspan'] == 0) {
+						$screenItem['colspan'] = 1;
+					}
+				}
+				unset($screenItem);
+			}
+		}
+		unset($screen);
 
 		return $content;
 	}
