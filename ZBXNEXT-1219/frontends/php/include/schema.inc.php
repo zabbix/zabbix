@@ -5863,8 +5863,13 @@ return array(
 		),
 	),
 	'item_application_prototype' => array(
-		'key' => 'application_prototypeid,itemid',
+		'key' => 'itemapplicationprototypeid',
 		'fields' => array(
+			'itemapplicationprototypeid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			),
 			'application_prototypeid' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
