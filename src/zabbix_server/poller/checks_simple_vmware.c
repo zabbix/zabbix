@@ -1207,11 +1207,12 @@ int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH, ZBX_XPATH_HV_STATUS(), result);
+	ret = get_vcenter_stat(request, username, password, ZBX_OPT_XPATH,
+			ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State"), result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_STR_RESULT(result))
 	{
-		if (0 == strcmp(result->str, "gray"))
+		if (0 == strcmp(result->str, "gray") || 0 == strcmp(result->str, "unknown"))
 			SET_UI64_RESULT(result, 0);
 		else if (0 == strcmp(result->str, "green"))
 			SET_UI64_RESULT(result, 1);

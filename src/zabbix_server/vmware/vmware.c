@@ -1707,9 +1707,10 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 					"<ns0:pathSet>summary.quickStats</ns0:pathSet>"		\
 					"<ns0:pathSet>summary.config</ns0:pathSet>"		\
 					"<ns0:pathSet>summary.hardware</ns0:pathSet>"		\
-					"<ns0:pathSet>summary.overallStatus</ns0:pathSet>"	\
 					"<ns0:pathSet>parent</ns0:pathSet>"			\
 					"<ns0:pathSet>datastore</ns0:pathSet>"			\
+					"<ns0:pathSet>runtime.healthSystemRuntime."		\
+							"systemHealthInfo</ns0:pathSet>"	\
 				"</ns0:propSet>"						\
 				"<ns0:objectSet>"						\
 					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"		\
