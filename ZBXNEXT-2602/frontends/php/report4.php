@@ -100,12 +100,12 @@ else {
 	$form->addItem($cmbMedia);
 
 	$form->addItem(SPACE._('Period').SPACE);
-	$cmbPeriod = new CComboBox('period', $period, 'submit();');
-	$cmbPeriod->addItem('daily', _('Daily'));
-	$cmbPeriod->addItem('weekly', _('Weekly'));
-	$cmbPeriod->addItem('monthly', _('Monthly'));
-	$cmbPeriod->addItem('yearly', _('Yearly'));
-	$form->addItem($cmbPeriod);
+	$form->addItem(new CComboBox('period', $period, 'submit();', array(
+		'daily' => _('Daily'),
+		'weekly' => _('Weekly'),
+		'monthly' => _('Monthly'),
+		'yearly' => _('Yearly')
+	)));
 
 	if ($period != 'yearly') {
 		$form->addItem(SPACE._('Year').SPACE);

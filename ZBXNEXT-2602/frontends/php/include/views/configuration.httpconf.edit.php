@@ -113,9 +113,9 @@ $httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status
 $httpAuthenticationFormList = new CFormList('httpAuthenticationFormList');
 
 // Authentication type
-$authenticationComboBox = new CComboBox('authentication', $this->data['authentication']);
-$authenticationComboBox->addItems(httptest_authentications());
-$httpAuthenticationFormList->addRow(_('HTTP authentication'), $authenticationComboBox);
+$httpAuthenticationFormList->addRow(_('HTTP authentication'),
+	new CComboBox('authentication', $this->data['authentication'], null, httptest_authentications())
+);
 
 $httpAuthenticationUserTB = new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64);
 $httpAuthenticationPasswordTB = new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64);

@@ -25,10 +25,13 @@ $slideshowWidget = new CWidget('hat_slides');
 $slideHeaderForm = new CForm('get');
 $slideHeaderForm->setName('slideHeaderForm');
 
-$configComboBox = new CComboBox('config', 'slides.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-$configComboBox->addItem('screens.php', _('Screens'));
-$configComboBox->addItem('slides.php', _('Slide shows'));
-$slideHeaderForm->addItem($configComboBox);
+$slideHeaderForm->addItem(new CComboBox('config', 'slides.php',
+	'javascript: redirect(this.options[this.selectedIndex].value);',
+	array(
+		'screens.php' => _('Screens'),
+		'slides.php' => _('Slide shows')
+	)
+));
 
 if ($this->data['slideshows']) {
 	$favouriteIcon = $this->data['screen']

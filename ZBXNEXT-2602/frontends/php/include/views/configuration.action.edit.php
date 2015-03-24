@@ -122,11 +122,15 @@ if ($this->data['action']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSIO
 	$formula->addClass('hidden');
 }
 
-$calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['filter']['evaltype'], 'processTypeOfCalculation()');
-$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And/Or'));
-$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('And'));
-$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('Or'));
-$calculationTypeComboBox->addItem(CONDITION_EVAL_TYPE_EXPRESSION, _('Custom expression'));
+$calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['filter']['evaltype'],
+	'processTypeOfCalculation()',
+	array(
+		CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+		CONDITION_EVAL_TYPE_AND => _('And'),
+		CONDITION_EVAL_TYPE_OR => _('Or'),
+		CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+	)
+);
 $calculationTypeComboBox->setAttribute('id', 'evaltype');
 
 $conditionFormList->addRow(
@@ -233,10 +237,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_TRIGGER_VALUE:
-		$condition = new CComboBox('new_condition[value]');
+		$triggerValues = array();
 		foreach (array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE) as $triggerValue) {
-			$condition->addItem($triggerValue, trigger_value2str($triggerValue));
+			$triggerValues[$triggerValue] = trigger_value2str($triggerValue);
 		}
+		$condition = new CComboBox('new_condition[value]', null, null, $triggerValues);
 		break;
 
 	case CONDITION_TYPE_TIME_PERIOD:
@@ -244,12 +249,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_TRIGGER_SEVERITY:
-		$condition = new CComboBox('new_condition[value]');
 		$severityNames = array();
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severityNames[] = getSeverityName($severity, $this->data['config']);
 		}
-		$condition->addItems($severityNames);
+		$condition = new CComboBox('new_condition[value]', null, null, $severityNames);
 		break;
 
 	case CONDITION_TYPE_MAINTENANCE:
@@ -301,10 +305,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$discoveryCheckTypes = discovery_check_type2str();
 		order_result($discoveryCheckTypes);
 
-		$condition = new CComboBox('new_condition[value]');
-		foreach ($discoveryCheckTypes as $key => $discoveryCheckType) {
-			$condition->addItem($key, $discoveryCheckType);
-		}
+		$condition = new CComboBox('new_condition[value]', null, null, $discoveryCheckTypes);
 		break;
 
 	case CONDITION_TYPE_DSERVICE_PORT:
@@ -756,12 +757,17 @@ if (!empty($this->data['new_operation'])) {
 			$newOperationsTable->addRow(array(_('Target list'), $cmdList), 'indent_top');
 
 			// type
-			$typeComboBox = new CComboBox('new_operation[opcommand][type]', $this->data['new_operation']['opcommand']['type'], 'javascript: showOpTypeForm();');
-			$typeComboBox->addItem(ZBX_SCRIPT_TYPE_IPMI, _('IPMI'));
-			$typeComboBox->addItem(ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, _('Custom script'));
-			$typeComboBox->addItem(ZBX_SCRIPT_TYPE_SSH, _('SSH'));
-			$typeComboBox->addItem(ZBX_SCRIPT_TYPE_TELNET, _('Telnet'));
-			$typeComboBox->addItem(ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT, _('Global script'));
+			$typeComboBox = new CComboBox('new_operation[opcommand][type]',
+				$this->data['new_operation']['opcommand']['type'],
+				'javascript: showOpTypeForm();',
+				array(
+					ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
+					ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
+					ZBX_SCRIPT_TYPE_SSH => _('SSH'),
+					ZBX_SCRIPT_TYPE_TELNET => _('Telnet'),
+					ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT => _('Global script')
+				)
+			);
 
 			$userScriptId = new CVar('new_operation[opcommand][scriptid]', $this->data['new_operation']['opcommand']['scriptid']);
 			$userScriptName = new CTextBox('new_operation[opcommand][script]', $this->data['new_operation']['opcommand']['script'], 32, true);
@@ -779,9 +785,14 @@ if (!empty($this->data['new_operation'])) {
 			$newOperationsTable->addRow(array(_('Execute on'), new CDiv($executeOnRadioButton, 'objectgroup border_dotted ui-corner-all inlineblock')), 'class_opcommand_execute_on hidden indent_both');
 
 			// ssh
-			$authTypeComboBox = new CComboBox('new_operation[opcommand][authtype]', $this->data['new_operation']['opcommand']['authtype'], 'javascript: showOpTypeAuth();');
-			$authTypeComboBox->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
-			$authTypeComboBox->addItem(ITEM_AUTHTYPE_PUBLICKEY, _('Public key'));
+			$authTypeComboBox = new CComboBox('new_operation[opcommand][authtype]',
+				$this->data['new_operation']['opcommand']['authtype'],
+				'javascript: showOpTypeAuth();',
+				array(
+					ITEM_AUTHTYPE_PASSWORD => _('Password'),
+					ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+				)
+			);
 
 			$newOperationsTable->addRow(
 				array(
@@ -1021,11 +1032,16 @@ if (!empty($this->data['new_operation'])) {
 			$i++;
 		}
 
-		$calcTypeComboBox = new CComboBox('new_operation[evaltype]', $this->data['new_operation']['evaltype'], 'submit()');
+		$calcTypeComboBox = new CComboBox('new_operation[evaltype]',
+			$this->data['new_operation']['evaltype'],
+			'submit()',
+			array(
+				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+				CONDITION_EVAL_TYPE_AND => _('And'),
+				CONDITION_EVAL_TYPE_OR => _('Or')
+			)
+		);
 		$calcTypeComboBox->attr('id', 'operationEvaltype');
-		$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND_OR, _('And/Or'));
-		$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_AND, _('And'));
-		$calcTypeComboBox->addItem(CONDITION_EVAL_TYPE_OR, _('Or'));
 
 		$newOperationsTable->addRow(array(
 				_('Type of calculation'),
@@ -1075,10 +1091,10 @@ if (!empty($this->data['new_operation'])) {
 		array_push($rowCondition, $operationConditionComboBox);
 
 		if ($new_opcondition['conditiontype'] == CONDITION_TYPE_EVENT_ACKNOWLEDGED) {
-			$operationConditionValueComboBox = new CComboBox('new_opcondition[value]', $new_opcondition['value']);
-			$operationConditionValueComboBox->addItem(0, _('Not Ack'));
-			$operationConditionValueComboBox->addItem(1, _('Ack'));
-			$rowCondition[] = $operationConditionValueComboBox;
+			$rowCondition[] = new CComboBox('new_opcondition[value]', $new_opcondition['value'], null, array(
+				0 => _('Not Ack'),
+				1 => _('Ack')
+			));
 		}
 		$newOperationConditionTable->addRow($rowCondition);
 
