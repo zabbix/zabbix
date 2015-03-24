@@ -462,46 +462,6 @@ class CHost extends CHostGeneral {
 		return $result;
 	}
 
-	/**
-	 * Get hosts by name.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array  $hostData
-	 * @param string $hostData['host']
-	 *
-	 * @return array
-	 */
-	public function getObjects(array $hostData) {
-		$this->deprecated('host.getobjects method is deprecated.');
-
-		return $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'filter' => $hostData
-		));
-	}
-
-	/**
-	 * Check if host exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('host.exists method is deprecated.');
-
-		$host = $this->get(array(
-			'output' => array('hostid'),
-			'filter' => zbx_array_mintersect(array(array('hostid', 'host', 'name')), $object),
-			'limit' => 1
-		));
-
-		return (bool) $host;
-	}
-
 	protected function checkInput(&$hosts, $method) {
 		$create = ($method == 'create');
 		$update = ($method == 'update');

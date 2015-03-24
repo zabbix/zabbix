@@ -32,9 +32,9 @@ const char	syslog_app_name[] = "zabbix_sender";
 
 const char	*usage_message[] = {
 	"[-v] -z server [-p port] [-I IP-address] -s host -k key -o value",
-	"[-v] -z server [-p port] [-I IP-address] [-T] [-r] -i input-file",
-	"[-v] -c config-file -s host -k key -o value",
-	"[-v] -c config-file [-T] [-r] -i input-file",
+	"[-v] -z server [-p port] [-I IP-address] [-s host] [-T] [-r] -i input-file",
+	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-s host] -k key -o value",
+	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-s host] [-T] [-r] -i input-file",
 	"-h",
 	"-V",
 	NULL	/* end of text */
@@ -46,13 +46,21 @@ const char	*help_message[] = {
 	"Options:",
 	"  -c --config config-file              Absolute path to Zabbix agentd configuration file",
 	"",
-	"  -z --zabbix-server server            Hostname or IP address of Zabbix server or proxy to send data to",
+	"  -z --zabbix-server server            Hostname or IP address of Zabbix server or proxy to send data to.",
+	"                                       When used together with --config, overrides first entry of \"ServerActive\"",
+	"                                       parameter specified in agentd configuration file",
 	"  -p --port port                       Specify port number of trapper process of Zabbix server or proxy.",
+	"                                       When used together with --config, overrides the port of the first entry of",
+	"                                       \"ServerActive\" parameter specified in agentd configuration file",
 	"                                       Default is " ZBX_DEFAULT_SERVER_PORT_STR,
 	"  -I --source-address IP-address       Specify source IP address",
+	"                                       When used together with --config, overrides \"SourceIP\" parameter",
+	"                                       specified in agentd configuration file",
 	"",
 	"  -s --host host                       Specify host name the item belongs to (as registered in Zabbix front-end).",
-	"                                       Host IP address and DNS name will not work",
+	"                                       Host IP address and DNS name will not work.",
+	"                                       When used together with --config, overrides \"Hostname\" parameter",
+	"                                       specified in agentd configuration file",
 	"  -k --key key                         Specify item key",
 	"  -o --value value                     Specify item value",
 	"",
@@ -525,48 +533,137 @@ static void	parse_commandline(int argc, char **argv)
 
 	/* check for mutually exclusive options    */
 
-	/* Allowed option combinations.            */
-	/* Option 'v' is always optional.          */
-	/*   c  z  s  k  o  i  T  r  p  I opt_mask */
-	/* ------------------------------ -------- */
-	/*   -  z  -  -  -  i  -  -  -  -  0x110   */
-	/*   -  z  -  -  -  i  -  -  -  I  0x111   */
-	/*   -  z  -  -  -  i  -  -  p  -  0x112   */
-	/*   -  z  -  -  -  i  -  -  p  I  0x113   */
-	/*   -  z  -  -  -  i  -  r  -  -  0x114   */
-	/*   -  z  -  -  -  i  -  r  -  I  0x115   */
-	/*   -  z  -  -  -  i  -  r  p  -  0x116   */
-	/*   -  z  -  -  -  i  -  r  p  I  0x117   */
-	/*   -  z  -  -  -  i  T  -  -  -  0x118   */
-	/*   -  z  -  -  -  i  T  -  -  I  0x119   */
-	/*   -  z  -  -  -  i  T  -  p  -  0x11a   */
-	/*   -  z  -  -  -  i  T  -  p  I  0x11b   */
-	/*   -  z  -  -  -  i  T  r  -  -  0x11c   */
-	/*   -  z  -  -  -  i  T  r  -  I  0x11d   */
-	/*   -  z  -  -  -  i  T  r  p  -  0x11e   */
-	/*   -  z  -  -  -  i  T  r  p  I  0x11f   */
-	/*   -  z  s  k  o  -  -  -  -  -  0x1e0   */
-	/*   -  z  s  k  o  -  -  -  -  I  0x1e1   */
-	/*   -  z  s  k  o  -  -  -  p  -  0x1e2   */
-	/*   -  z  s  k  o  -  -  -  p  I  0x1e3   */
-	/*   c  -  -  -  -  i  -  -  -  -  0x210   */
-	/*   c  -  -  -  -  i  -  r  -  -  0x214   */
-	/*   c  -  -  -  -  i  T  -  -  -  0x218   */
-	/*   c  -  -  -  -  i  T  r  -  -  0x21c   */
-	/*   c  -  s  k  o  -  -  -  -  -  0x2e0   */
+	/* Allowed option combinations.                             */
+	/* Option 'v' is always optional.                           */
+	/*   c  z  s  k  o  i  T  r  p  I opt_mask comment          */
+	/* ------------------------------ -------- -------          */
+	/*   -  z  -  -  -  i  -  -  -  -  0x110   !c i             */
+	/*   -  z  -  -  -  i  -  -  -  I  0x111                    */
+	/*   -  z  -  -  -  i  -  -  p  -  0x112                    */
+	/*   -  z  -  -  -  i  -  -  p  I  0x113                    */
+	/*   -  z  -  -  -  i  -  r  -  -  0x114                    */
+	/*   -  z  -  -  -  i  -  r  -  I  0x115                    */
+	/*   -  z  -  -  -  i  -  r  p  -  0x116                    */
+	/*   -  z  -  -  -  i  -  r  p  I  0x117                    */
+	/*   -  z  -  -  -  i  T  -  -  -  0x118                    */
+	/*   -  z  -  -  -  i  T  -  -  I  0x119                    */
+	/*   -  z  -  -  -  i  T  -  p  -  0x11a                    */
+	/*   -  z  -  -  -  i  T  -  p  I  0x11b                    */
+	/*   -  z  -  -  -  i  T  r  -  -  0x11c                    */
+	/*   -  z  -  -  -  i  T  r  -  I  0x11d                    */
+	/*   -  z  -  -  -  i  T  r  p  -  0x11e                    */
+	/*   -  z  -  -  -  i  T  r  p  I  0x11f                    */
+	/*   -  z  s  -  -  i  -  -  -  -  0x190                    */
+	/*   -  z  s  -  -  i  -  -  -  I  0x191                    */
+	/*   -  z  s  -  -  i  -  -  p  -  0x192                    */
+	/*   -  z  s  -  -  i  -  -  p  I  0x193                    */
+	/*   -  z  s  -  -  i  -  r  -  -  0x194                    */
+	/*   -  z  s  -  -  i  -  r  -  I  0x195                    */
+	/*   -  z  s  -  -  i  -  r  p  -  0x196                    */
+	/*   -  z  s  -  -  i  -  r  p  I  0x197                    */
+	/*   -  z  s  -  -  i  T  -  -  -  0x198                    */
+	/*   -  z  s  -  -  i  T  -  -  I  0x199                    */
+	/*   -  z  s  -  -  i  T  -  p  -  0x19a                    */
+	/*   -  z  s  -  -  i  T  -  p  I  0x19b                    */
+	/*   -  z  s  -  -  i  T  r  -  -  0x19c                    */
+	/*   -  z  s  -  -  i  T  r  -  I  0x19d                    */
+	/*   -  z  s  -  -  i  T  r  p  -  0x19e                    */
+	/*   -  z  s  -  -  i  T  r  p  I  0x19f                    */
+	/*                                                          */
+	/*   -  z  s  k  o  -  -  -  -  -  0x1e0   !c !i            */
+	/*   -  z  s  k  o  -  -  -  -  I  0x1e1                    */
+	/*   -  z  s  k  o  -  -  -  p  -  0x1e2                    */
+	/*   -  z  s  k  o  -  -  -  p  I  0x1e3                    */
+	/*                                                          */
+	/*   c  -  -  -  -  i  -  -  -  -  0x210   c i              */
+	/*   c  -  -  -  -  i  -  -  -  I  0x211                    */
+	/*   c  -  -  -  -  i  -  -  p  -  0x212                    */
+	/*   c  -  -  -  -  i  -  -  p  I  0x213                    */
+	/*   c  -  -  -  -  i  -  r  -  -  0x214                    */
+	/*   c  -  -  -  -  i  -  r  -  I  0x215                    */
+	/*   c  -  -  -  -  i  -  r  p  -  0x216                    */
+	/*   c  -  -  -  -  i  -  r  p  I  0x217                    */
+	/*   c  -  -  -  -  i  T  -  -  -  0x218                    */
+	/*   c  -  -  -  -  i  T  -  -  I  0x219                    */
+	/*   c  -  -  -  -  i  T  -  p  -  0x21a                    */
+	/*   c  -  -  -  -  i  T  -  p  I  0x21b                    */
+	/*   c  -  -  -  -  i  T  r  -  -  0x21c                    */
+	/*   c  -  -  -  -  i  T  r  -  I  0x21d                    */
+	/*   c  -  -  -  -  i  T  r  p  -  0x21e                    */
+	/*   c  -  -  -  -  i  T  r  p  I  0x21f                    */
+	/*                                                          */
+	/*   c  -  -  k  o  -  -  -  -  -  0x260   c !i             */
+	/*   c  -  -  k  o  -  -  -  -  I  0x261                    */
+	/*   c  -  -  k  o  -  -  -  p  -  0x262                    */
+	/*   c  -  -  k  o  -  -  -  p  I  0x263                    */
+	/*   c  -  s  k  o  -  -  -  -  -  0x2e0                    */
+	/*   c  -  s  k  o  -  -  -  -  I  0x2e1                    */
+	/*   c  -  s  k  o  -  -  -  p  -  0x2e2                    */
+	/*   c  -  s  k  o  -  -  -  p  I  0x2e3                    */
+	/*                                                          */
+	/*   c  -  s  -  -  i  -  -  -  -  0x290   c i (continues)  */
+	/*   c  -  s  -  -  i  -  -  -  I  0x291                    */
+	/*   c  -  s  -  -  i  -  -  p  -  0x292                    */
+	/*   c  -  s  -  -  i  -  -  p  I  0x293                    */
+	/*   c  -  s  -  -  i  -  r  -  -  0x294                    */
+	/*   c  -  s  -  -  i  -  r  -  I  0x295                    */
+	/*   c  -  s  -  -  i  -  r  p  -  0x296                    */
+	/*   c  -  s  -  -  i  -  r  p  I  0x297                    */
+	/*   c  -  s  -  -  i  T  -  -  -  0x298                    */
+	/*   c  -  s  -  -  i  T  -  -  I  0x299                    */
+	/*   c  -  s  -  -  i  T  -  p  -  0x29a                    */
+	/*   c  -  s  -  -  i  T  -  p  I  0x29b                    */
+	/*   c  -  s  -  -  i  T  r  -  -  0x29c                    */
+	/*   c  -  s  -  -  i  T  r  -  I  0x29d                    */
+	/*   c  -  s  -  -  i  T  r  p  -  0x29e                    */
+	/*   c  -  s  -  -  i  T  r  p  I  0x29f                    */
+	/*   c  z  -  -  -  i  -  -  -  -  0x310                    */
+	/*   c  z  -  -  -  i  -  -  -  I  0x311                    */
+	/*   c  z  -  -  -  i  -  -  p  -  0x312                    */
+	/*   c  z  -  -  -  i  -  -  p  I  0x313                    */
+	/*   c  z  -  -  -  i  -  r  -  -  0x314                    */
+	/*   c  z  -  -  -  i  -  r  -  I  0x315                    */
+	/*   c  z  -  -  -  i  -  r  p  -  0x316                    */
+	/*   c  z  -  -  -  i  -  r  p  I  0x317                    */
+	/*   c  z  -  -  -  i  T  -  -  -  0x318                    */
+	/*   c  z  -  -  -  i  T  -  -  I  0x319                    */
+	/*   c  z  -  -  -  i  T  -  p  -  0x31a                    */
+	/*   c  z  -  -  -  i  T  -  p  I  0x31b                    */
+	/*   c  z  -  -  -  i  T  r  -  -  0x31c                    */
+	/*   c  z  -  -  -  i  T  r  -  I  0x31d                    */
+	/*   c  z  -  -  -  i  T  r  p  -  0x31e                    */
+	/*   c  z  -  -  -  i  T  r  p  I  0x31f                    */
+	/*   c  z  s  -  -  i  -  -  -  -  0x390                    */
+	/*   c  z  s  -  -  i  -  -  -  I  0x391                    */
+	/*   c  z  s  -  -  i  -  -  p  -  0x392                    */
+	/*   c  z  s  -  -  i  -  -  p  I  0x393                    */
+	/*   c  z  s  -  -  i  -  r  -  -  0x394                    */
+	/*   c  z  s  -  -  i  -  r  -  I  0x395                    */
+	/*   c  z  s  -  -  i  -  r  p  -  0x396                    */
+	/*   c  z  s  -  -  i  -  r  p  I  0x397                    */
+	/*   c  z  s  -  -  i  T  -  -  -  0x398                    */
+	/*   c  z  s  -  -  i  T  -  -  I  0x399                    */
+	/*   c  z  s  -  -  i  T  -  p  -  0x39a                    */
+	/*   c  z  s  -  -  i  T  -  p  I  0x39b                    */
+	/*   c  z  s  -  -  i  T  r  -  -  0x39c                    */
+	/*   c  z  s  -  -  i  T  r  -  I  0x39d                    */
+	/*   c  z  s  -  -  i  T  r  p  -  0x39e                    */
+	/*   c  z  s  -  -  i  T  r  p  I  0x39f                    */
+	/*                                                          */
+	/*   c  z  -  k  o  -  -  -  -  -  0x360   c !i (continues) */
+	/*   c  z  -  k  o  -  -  -  -  I  0x361                    */
+	/*   c  z  -  k  o  -  -  -  p  -  0x362                    */
+	/*   c  z  -  k  o  -  -  -  p  I  0x363                    */
+	/*   c  z  s  k  o  -  -  -  -  -  0x3e0                    */
+	/*   c  z  s  k  o  -  -  -  -  I  0x3e1                    */
+	/*   c  z  s  k  o  -  -  -  p  -  0x3e2                    */
+	/*   c  z  s  k  o  -  -  -  p  I  0x3e3                    */
 
 	if (0 == opt_c + opt_z)
 	{
 		zbx_error("either '-c' or '-z' option must be specified");
 		usage();
 		printf("Try '%s --help' for more information.\n", progname);
-		exit(EXIT_FAILURE);
-	}
-
-	if (1 < opt_c + opt_z)
-	{
-		zbx_error("either '-c' or '-z' option must be specified but not both");
-		usage();
 		exit(EXIT_FAILURE);
 	}
 
@@ -591,17 +688,22 @@ static void	parse_commandline(int argc, char **argv)
 	if (0 < opt_cap_i)
 		opt_mask |= 0x01;
 
-	if (1 == opt_i && ((1 == opt_z && ! (0x110 <= opt_mask && opt_mask <= 0x11f)) ||
-			(1 == opt_c && 0x210 != opt_mask && 0x214 != opt_mask && 0x218 != opt_mask &&
-			0x21c != opt_mask)))
-	{
-		zbx_error("option '-i' can be used only with '-T' and '-r' options");
-		usage();
-		exit(EXIT_FAILURE);
-	}
-
-	if ((1 == opt_z && 0 == opt_i && ! (0x1e0 <= opt_mask && opt_mask <= 0x1e3)) ||
-			(1 == opt_c && 0 == opt_i && 0x2e0 != opt_mask))
+	if (
+			(0 == opt_c && 1 == opt_i &&	/* !c i */
+					!((0x110 <= opt_mask && opt_mask <= 0x11f) ||
+					(0x190 <= opt_mask && opt_mask <= 0x19f))) ||
+			(0 == opt_c && 0 == opt_i &&	/* !c !i */
+					!(0x1e0 <= opt_mask && opt_mask <= 0x1e3)) ||
+			(1 == opt_c && 1 == opt_i &&	/* c i */
+					!((0x210 <= opt_mask && opt_mask <= 0x21f) ||
+					(0x310 <= opt_mask && opt_mask <= 0x31f) ||
+					(0x290 <= opt_mask && opt_mask <= 0x29f) ||
+					(0x390 <= opt_mask && opt_mask <= 0x39f))) ||
+			(1 == opt_c && 0 == opt_i &&	/* c !i */
+					!((0x260 <= opt_mask && opt_mask <= 0x263) ||
+					(0x2e0 <= opt_mask && opt_mask <= 0x2e3) ||
+					(0x360 <= opt_mask && opt_mask <= 0x363) ||
+					(0x3e0 <= opt_mask && opt_mask <= 0x3e3))))
 	{
 		zbx_error("too few or mutually exclusive options used");
 		usage();
