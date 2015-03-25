@@ -114,8 +114,7 @@ class C10XmlValidator {
 						'items' =>			'required|array',
 						'templates' =>		'required|array',
 						'graphs' =>			'required|array',
-						'macros' =>			'required|array',
-						'dependencies' =>	''
+						'macros' =>			'required|array'
 					);
 
 					$validator = new CNewValidator($host, $validationRules);
