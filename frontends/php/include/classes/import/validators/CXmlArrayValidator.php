@@ -31,17 +31,18 @@ class CXmlArrayValidator {
 		$i = 0;
 
 		foreach ($array as $key => $value) {
-			$postFix = ($i == 0) ? '' : $i;
-			$validKey = $name.$postFix;
+			$postfix = ($i == 0) ? '' : $i;
 
-			if ($key !== $validKey) {
+			if ($key !== $name.$postfix) {
 				$this->error = _s('unexpected tag "%1$s"', $key);
 				$this->errorSeqNum = $i + 1;
-				break;
+				return false;
 			}
 
 			$i++;
 		}
+
+		return true;
 	}
 
 	/**

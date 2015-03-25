@@ -25,11 +25,18 @@
 class C10XmlValidator {
 
 	/**
+	 * @var CXmlArrayValidator
+	 */
+	protected $arrayValidator;
+
+	/**
 	 * Base validation function.
 	 *
 	 * @param array $content	import data
 	 */
 	public function validate($content) {
+		$this->arrayValidator = new CXmlArrayValidator();
+
 		$this->validateDate($content['date']);
 		$this->validateTime($content['time']);
 
@@ -79,12 +86,9 @@ class C10XmlValidator {
 	protected function validateHosts($content) {
 		if (array_key_exists('hosts', $content)) {
 			if ($content['hosts']) {
-				$arrayValidator = new CXmlArrayValidator();
-				$arrayValidator->validate('host', $content['hosts']);
-
-				if ($arrayValidator->getError()) {
+				if (!$this->arrayValidator->validate('host', $content['hosts'])) {
 					throw new Exception(_s('Cannot parse XML tag "zabbix_export/hosts/host(%1$s)": %2$s.',
-						$arrayValidator->getErrorSeqNum(), $arrayValidator->getError()
+						$this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError()
 					));
 				}
 
@@ -149,12 +153,9 @@ class C10XmlValidator {
 	 * @throws Exception	if structure is invalid
 	 */
 	protected function validateGroups($host, $hostNumber) {
-		$arrayValidator = new CXmlArrayValidator();
-		$arrayValidator->validate('group', $host['groups']);
-
-		if ($arrayValidator->getError()) {
+		if (!$this->arrayValidator->validate('group', $host['groups'])) {
 			throw new Exception(_s('Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/groups/group(%2$s)": %3$s.',
-				$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError()
+				$hostNumber, $this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError()
 			));
 		}
 	}
@@ -169,13 +170,10 @@ class C10XmlValidator {
 	 */
 	protected function validateItems($host, $hostNumber) {
 		if ($host['items']) {
-			$arrayValidator = new CXmlArrayValidator();
-			$arrayValidator->validate('item', $host['items']);
-
-			if ($arrayValidator->getError()) {
+			if (!$this->arrayValidator->validate('item', $host['items'])) {
 				throw new Exception(_s(
 					'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/items/item(%2$s)": %3$s.',
-					$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+					$hostNumber, $this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError())
 				);
 			}
 
@@ -257,13 +255,10 @@ class C10XmlValidator {
 	 */
 	protected function validateTriggers($host, $hostNumber) {
 		if ($host['triggers']) {
-			$arrayValidator = new CXmlArrayValidator();
-			$arrayValidator->validate('trigger', $host['triggers']);
-
-			if ($arrayValidator->getError()) {
+			if (!$this->arrayValidator->validate('trigger', $host['triggers'])) {
 				throw new Exception(_s(
 					'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/triggers/trigger(%2$s)": %3$s.',
-					$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+					$hostNumber, $this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError())
 				);
 			}
 
@@ -313,13 +308,10 @@ class C10XmlValidator {
 	 */
 	protected function validateLinkedTemplates($host, $hostNumber) {
 		if ($host['templates']) {
-			$arrayValidator = new CXmlArrayValidator();
-			$arrayValidator->validate('template', $host['templates']);
-
-			if ($arrayValidator->getError()) {
+			if (!$this->arrayValidator->validate('template', $host['templates'])) {
 				throw new Exception(_s(
 					'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/templates/template(%2$s)": %3$s.',
-					$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+					$hostNumber, $this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError())
 				);
 			}
 		}
@@ -335,13 +327,10 @@ class C10XmlValidator {
 	 */
 	protected function validateGraphs($host, $hostNumber) {
 		if ($host['graphs']) {
-			$arrayValidator = new CXmlArrayValidator();
-			$arrayValidator->validate('graph', $host['graphs']);
-
-			if ($arrayValidator->getError()) {
+			if (!$this->arrayValidator->validate('graph', $host['graphs'])) {
 				throw new Exception(_s(
 					'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/graphs/graph(%2$s)": %3$s.',
-					$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+					$hostNumber, $this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError())
 				);
 			}
 
@@ -403,13 +392,10 @@ class C10XmlValidator {
 	 */
 	protected function validateMacro($host, $hostNumber) {
 		if ($host['macros']) {
-			$arrayValidator = new CXmlArrayValidator();
-			$arrayValidator->validate('macro', $host['macros']);
-
-			if ($arrayValidator->getError()) {
+			if (!$this->arrayValidator->validate('macro', $host['macros'])) {
 				throw new Exception(_s(
 					'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/macros/macro(%2$s)": %3$s.',
-					$hostNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+					$hostNumber, $this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError())
 				);
 			}
 
@@ -455,13 +441,11 @@ class C10XmlValidator {
 	 */
 	protected function validateApplications($item, $hostNumber, $itemNumber) {
 		if ($item['applications']) {
-			$arrayValidator = new CXmlArrayValidator();
-			$arrayValidator->validate('application', $item['applications']);
-
-			if ($arrayValidator->getError()) {
+			if (!$this->arrayValidator->validate('application', $item['applications'])) {
 				throw new Exception(_s(
 					'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/items/item(%2$s)/applications/application(%3$s)": %4$s.',
-					$hostNumber, $itemNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+					$hostNumber, $itemNumber, $this->arrayValidator->getErrorSeqNum(),
+					$this->arrayValidator->getError())
 				);
 			}
 		}
@@ -477,13 +461,10 @@ class C10XmlValidator {
 	 * @throws Exception	if structure is invalid
 	 */
 	protected function validateGraphElements($graph, $hostNumber, $graphNumber) {
-		$arrayValidator = new CXmlArrayValidator();
-		$arrayValidator->validate('graph_element', $graph['graph_elements']);
-
-		if ($arrayValidator->getError()) {
+		if (!$this->arrayValidator->validate('graph_element', $graph['graph_elements'])) {
 			throw new Exception(_s(
 				'Cannot parse XML tag "zabbix_export/hosts/host(%1$s)/graphs/graph(%2$s)/graph_elements/graph_element(%3$s)": %4$s.',
-				$hostNumber, $graphNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+				$hostNumber, $graphNumber, $this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError())
 			);
 		}
 
@@ -532,12 +513,9 @@ class C10XmlValidator {
 	 */
 	protected function validateTriggerDependencies($content) {
 		if (array_key_exists('dependencies', $content)) {
-			$arrayValidator = new CXmlArrayValidator();
-			$arrayValidator->validate('dependency', $content['dependencies']);
-
-			if ($arrayValidator->getError()) {
+			if (!$this->arrayValidator->validate('dependency', $content['dependencies'])) {
 				throw new Exception(_s('Cannot parse XML tag "zabbix_export/dependencies/dependency(%1$s)": %2$s.',
-					$arrayValidator->getErrorSeqNum(), $arrayValidator->getError()
+					$this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError()
 				));
 			}
 
@@ -561,13 +539,10 @@ class C10XmlValidator {
 				// unexpected tag validation
 				unset($dependency['description']);
 
-				$arrayValidator = new CXmlArrayValidator();
-				$arrayValidator->validate('depends', $dependency);
-
-				if ($arrayValidator->getError()) {
+				if (!$this->arrayValidator->validate('depends', $dependency)) {
 					throw new Exception(_s(
 						'Cannot parse XML tag "zabbix_export/dependencies/dependency(%1$s)/depends(%2$s)": %3$s.',
-						$dependencyNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError()
+						$dependencyNumber, $this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError()
 					));
 				}
 
@@ -586,12 +561,9 @@ class C10XmlValidator {
 	private function validateScreens($content) {
 		if (array_key_exists('screens', $content)) {
 			if ($content['screens']) {
-				$arrayValidator = new CXmlArrayValidator();
-				$arrayValidator->validate('screen', $content['screens']);
-
-				if ($arrayValidator->getError()) {
+				if (!$this->arrayValidator->validate('screen', $content['screens'])) {
 					throw new Exception(_s('Cannot parse XML tag "zabbix_export/screens/screen(%1$s)": %2$s.',
-						$arrayValidator->getErrorSeqNum(), $arrayValidator->getError()
+						$this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError()
 					));
 				}
 
@@ -645,13 +617,10 @@ class C10XmlValidator {
 	 */
 	protected function validateScreenItems($screen, $screenNumber) {
 		if ($screen['screenitems']) {
-			$arrayValidator = new CXmlArrayValidator();
-			$arrayValidator->validate('screenitem', $screen['screenitems']);
-
-			if ($arrayValidator->getError()) {
+			if (!$this->arrayValidator->validate('screenitem', $screen['screenitems'])) {
 				throw new Exception(_s(
 					'Cannot parse XML tag "zabbix_export/screens/screen(%1$s)/screenitems/screenitem(%2$s)": %3$s.',
-					$screenNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+					$screenNumber, $this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError())
 				);
 			}
 
@@ -699,12 +668,9 @@ class C10XmlValidator {
 	protected function validateSysmaps($content) {
 		if (array_key_exists('sysmaps', $content)) {
 			if ($content['sysmaps']) {
-				$arrayValidator = new CXmlArrayValidator();
-				$arrayValidator->validate('sysmap', $content['sysmaps']);
-
-				if ($arrayValidator->getError()) {
+				if (!$this->arrayValidator->validate('sysmap', $content['sysmaps'])) {
 					throw new Exception(_s('Cannot parse XML tag "zabbix_export/sysmaps/sysmap(%1$s)": %2$s.',
-						$arrayValidator->getErrorSeqNum(), $arrayValidator->getError()
+						$this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError()
 					));
 				}
 
@@ -766,13 +732,10 @@ class C10XmlValidator {
 	 */
 	protected function validateSelements($sysmap, $sysmapNumber) {
 		if ($sysmap['selements']) {
-			$arrayValidator = new CXmlArrayValidator();
-			$arrayValidator->validate('selement', $sysmap['selements']);
-
-			if ($arrayValidator->getError()) {
+			if (!$this->arrayValidator->validate('selement', $sysmap['selements'])) {
 				throw new Exception(_s(
 					'Cannot parse XML tag "zabbix_export/sysmaps/sysmap(%1$s)/selements/selement(%2$s)": %3$s.',
-					$sysmapNumber, $arrayValidator->getErrorSeqNum(), $arrayValidator->getError())
+					$sysmapNumber, $this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError())
 				);
 			}
 
