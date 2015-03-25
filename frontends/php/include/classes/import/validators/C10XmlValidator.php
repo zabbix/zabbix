@@ -34,9 +34,8 @@ class C10XmlValidator {
 		$this->validateTime($content['time']);
 
 		// prepare content
-		$arrayKeys = array('hosts', 'dependencies', 'screens');
 		$newArray = new CXmlValidatorConverters();
-		$content = $newArray->convertEmpStrToArr($arrayKeys, $content);
+		$content = $newArray->convertEmpStrToArr(array('hosts', 'dependencies', 'screens'), $content);
 
 		$this->validateHosts($content);
 		$this->validateTriggerDependencies($content);

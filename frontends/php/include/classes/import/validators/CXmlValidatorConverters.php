@@ -28,17 +28,17 @@ class CXmlValidatorConverters {
 	 * Convert empty strings to array.
 	 *
 	 * @param array $keys
-	 * @param array $array
+	 * @param array $data
 	 *
 	 * @return array
 	 */
-	public function convertEmpStrToArr($keys, $array) {
-		foreach($keys as $key) {
-			if (array_key_exists($key, $array) && $array[$key] === '') {
-				$array[$key] = array();
+	public function convertEmpStrToArr(array $keys, $data) {
+		foreach ($keys as $key) {
+			if (array_key_exists($key, $data) && $data[$key] === '') {
+				$data[$key] = array();
 			}
 		}
 
-		return $array;
+		return $data;
 	}
 }
