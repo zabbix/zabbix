@@ -30,7 +30,8 @@ class C10XmlValidator {
 	 * @param array $content	import data
 	 */
 	public function validate($content) {
-		$this->validateDateTimeFormat($content['date'], $content['time']);
+		$this->validateDate($content['date']);
+		$this->validateTime($content['time']);
 
 		// prepare content
 		$arrayKeys = array('hosts', 'dependencies', 'screens');
@@ -44,19 +45,28 @@ class C10XmlValidator {
 	}
 
 	/**
-	 * Validate date and time formats.
+	 * Validate date format.
 	 *
 	 * @param string $date	export date
+	 *
+	 * @throws Exception	if the date is invalid
+	 */
+	protected function validateDate($date) {
+		if (!preg_match('/^(0[1-9]|[1-2][0-9]|3[01]).(0[1-9]|1[0-2]).[0-9]{2}$/', $date)) {
+			throw new Exception(_('Incorrect date format: DD.MM.YY is expected.'));
+		}
+	}
+
+	/**
+	 * Validate time format.
+	 *
 	 * @param string $time	export time
 	 *
-	 * @throws Exception	if the date or time is invalid
+	 * @throws Exception	if the time is invalid
 	 */
-	protected function validateDateTimeFormat($date, $time) {
-		if (!preg_match('/^(0[1-9]|[1-2][0-9]|3[0-1]).(0[1-9]|1[0-2]).[0-9]{2}$/', $date)) {
-			throw new Exception(('Incorrect date format, supported only DD.MM.YY.'));
-		}
+	protected function validateTime($time) {
 		if (!preg_match('/(2[0-3]|[01][0-9]).[0-5][0-9]/', $time)) {
-			throw new Exception(('Incorrect time format, supported only HH.MM.'));
+			throw new Exception(('Incorrect time format: HH.MM is expected.'));
 		}
 	}
 
