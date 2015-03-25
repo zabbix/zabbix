@@ -1832,15 +1832,15 @@ a.grey {
 }
 
 .green-bg {
-	background: $new-green;
+	background: $alt-green;
 }
 
 .red-bg {
-	background: $new-red;
+	background: $alt-red;
 }
 
 .na-bg {
-	background: $new-blue-grey;
+	background: $alt-blue-grey;
 }
 td.na-bg {
 	border-left: none;
@@ -1858,35 +1858,35 @@ td.normal-bg {
 }
 
 .info-bg {
-	background: $new-blue;
+	background: $alt-dark-blue;
 }
 td.info-bg {
 	@extend td.na-bg;
 }
 
 .average-bg {
-	background: $new-orange;
+	background: $alt-orange;
 }
 td.average-bg {
 	@extend td.na-bg;
 }
 
 .warning-bg {
-	background: $new-yellow;
+	background: $alt-yellow;
 }
 td.warning-bg {
 	@extend td.na-bg;
 }
 
 .high-bg {
-	background: $new-deep-orange;
+	background: $alt-dark-orange;
 }
 td.high-bg {
 	@extend td.na-bg;
 }
 
 .disaster-bg {
-	background: $new-red;
+	background: $alt-red;
 }
 td.disaster-bg {
 	@extend td.na-bg;
