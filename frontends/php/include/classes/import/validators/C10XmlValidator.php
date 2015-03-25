@@ -30,19 +30,26 @@ class C10XmlValidator {
 	protected $arrayValidator;
 
 	/**
+	 * @var CXmlValidatorConverters
+	 */
+	protected $validatorConverters;
+
+	/**
 	 * Base validation function.
 	 *
 	 * @param array $content	import data
 	 */
 	public function validate($content) {
 		$this->arrayValidator = new CXmlArrayValidator();
+		$this->validatorConverters = new CXmlValidatorConverters();
 
 		$this->validateDate($content['date']);
 		$this->validateTime($content['time']);
 
 		// prepare content
-		$newArray = new CXmlValidatorConverters();
-		$content = $newArray->convertEmpStrToArr(array('hosts', 'dependencies', 'sysmaps', 'screens'), $content);
+		$content = $this->validatorConverters->convertEmpStrToArr(
+			array('hosts', 'dependencies', 'sysmaps', 'screens'), $content
+		);
 
 		$fields = array(
 			'hosts' =>			'array',
@@ -58,10 +65,18 @@ class C10XmlValidator {
 			throw new Exception(_s('Cannot parse XML tag "zabbix_export": %1$s', $errors[0]));
 		}
 
-		$this->validateHosts($content);
-		$this->validateDependencies($content);
-		$this->validateSysmaps($content);
-		$this->validateScreens($content);
+		if (array_key_exists('hosts', $content)) {
+			$this->validateHosts($content['hosts']);
+		}
+		if (array_key_exists('dependencies', $content)) {
+			$this->validateDependencies($content['dependencies']);
+		}
+		if (array_key_exists('sysmaps', $content)) {
+			$this->validateSysmaps($content['sysmaps']);
+		}
+		if (array_key_exists('screens', $content)) {
+			$this->validateScreens($content['screens']);
+		}
 	}
 
 	/**
@@ -93,26 +108,22 @@ class C10XmlValidator {
 	/**
 	 * Hosts validation.
 	 *
-	 * @param array $content	import data
+	 * @param array $hosts	import data
 	 *
-	 * @throws Exception		if structure or values is invalid
+	 * @throws Exception	if structure or values is invalid
 	 */
-	protected function validateHosts($content) {
-		if (!array_key_exists('hosts', $content)) {
-			return;
-		}
-
-		if (!$this->arrayValidator->validate('host', $content['hosts'])) {
+	protected function validateHosts($hosts) {
+		if (!$this->arrayValidator->validate('host', $hosts)) {
 			throw new Exception(_s('Cannot parse XML tag "zabbix_export/hosts/host(%1$s)": %2$s.',
 				$this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError()
 			));
 		}
 
 		$hostNumber = 1;
-		foreach ($content['hosts'] as $host) {
-			$arrayKeys = array('triggers', 'items', 'templates', 'graphs', 'macros');
-			$newArray = new CXmlValidatorConverters();
-			$host = $newArray->convertEmpStrToArr($arrayKeys, $host);
+		foreach ($hosts as $host) {
+			$host = $this->validatorConverters->convertEmpStrToArr(
+				array('groups', 'triggers', 'items', 'templates', 'graphs', 'macros'), $host
+			);
 
 			$validationRules = array(
 				'name' =>			'required|string',
@@ -193,9 +204,7 @@ class C10XmlValidator {
 
 			$itemNumber = 1;
 			foreach ($host['items'] as $item) {
-				$arrayKeys = array('applications');
-				$newArray = new CXmlValidatorConverters();
-				$item = $newArray->convertEmpStrToArr($arrayKeys, $item);
+				$item = $this->validatorConverters->convertEmpStrToArr(array('applications'), $item);
 
 				$validationRules = array(
 					'type' =>					'required|string',
@@ -521,23 +530,19 @@ class C10XmlValidator {
 	/**
 	 * Trigger dependencies validation.
 	 *
-	 * @param array $content	import data
+	 * @param array $dependencies	import data
 	 *
-	 * @throws Exception	if structure is invalid
+	 * @throws Exception			if structure is invalid
 	 */
-	protected function validateDependencies($content) {
-		if (!array_key_exists('dependencies', $content)) {
-			return;
-		}
-
-		if (!$this->arrayValidator->validate('dependency', $content['dependencies'])) {
+	protected function validateDependencies($dependencies) {
+		if (!$this->arrayValidator->validate('dependency', $dependencies)) {
 			throw new Exception(_s('Cannot parse XML tag "zabbix_export/dependencies/dependency(%1$s)": %2$s.',
 				$this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError()
 			));
 		}
 
 		$dependencyNumber = 1;
-		foreach ($content['dependencies'] as $dependency) {
+		foreach ($dependencies as $dependency) {
 			$validationRules = array(
 				'description' =>	'required|string',
 				'depends' =>		'required'
@@ -570,26 +575,20 @@ class C10XmlValidator {
 	/**
 	 * Main screen validation.
 	 *
-	 * @param array $content	import data
+	 * @param array $screens	import data
 	 *
-	 * @throws Exception	if structure is invalid
+	 * @throws Exception		if structure is invalid
 	 */
-	private function validateScreens($content) {
-		if (!array_key_exists('screens', $content)) {
-			return;
-		}
-
-		if (!$this->arrayValidator->validate('screen', $content['screens'])) {
+	private function validateScreens($screens) {
+		if (!$this->arrayValidator->validate('screen', $screens)) {
 			throw new Exception(_s('Cannot parse XML tag "zabbix_export/screens/screen(%1$s)": %2$s.',
 				$this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError()
 			));
 		}
 
 		$screenNumber = 1;
-		foreach ($content['screens'] as $screen) {
-			$arrayKeys = array('screenitems');
-			$newArray = new CXmlValidatorConverters();
-			$screen = $newArray->convertEmpStrToArr($arrayKeys, $screen);
+		foreach ($screens as $screen) {
+			$screen = $this->validatorConverters->convertEmpStrToArr(array('screenitems'), $screen);
 
 			$validationRules = array(
 				'name' =>			'required|string',
@@ -677,26 +676,20 @@ class C10XmlValidator {
 	/**
 	 * Main maps validation.
 	 *
-	 * @param array $content	import data
+	 * @param array $sysmaps	import data
 	 *
-	 * @throws Exception	if structure is invalid
+	 * @throws Exception		if structure is invalid
 	 */
-	protected function validateSysmaps($content) {
-		if (!array_key_exists('sysmaps', $content)) {
-			return;
-		}
-
-		if (!$this->arrayValidator->validate('sysmap', $content['sysmaps'])) {
+	protected function validateSysmaps($sysmaps) {
+		if (!$this->arrayValidator->validate('sysmap', $sysmaps)) {
 			throw new Exception(_s('Cannot parse XML tag "zabbix_export/sysmaps/sysmap(%1$s)": %2$s.',
 				$this->arrayValidator->getErrorSeqNum(), $this->arrayValidator->getError()
 			));
 		}
 
 		$sysmapNumber = 1;
-		foreach ($content['sysmaps'] as $sysmap) {
-			$arrayKeys = array('selements', 'links');
-			$newArray = new CXmlValidatorConverters();
-			$sysmap = $newArray->convertEmpStrToArr($arrayKeys, $sysmap);
+		foreach ($sysmaps as $sysmap) {
+			$sysmap = $this->validatorConverters->convertEmpStrToArr(array('selements', 'links'), $sysmap);
 
 			$validationRules = array(
 				'selements' =>		'required|array',
