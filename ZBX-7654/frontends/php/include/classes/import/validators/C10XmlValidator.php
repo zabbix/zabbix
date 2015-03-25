@@ -138,9 +138,6 @@ class C10XmlValidator {
 					$hostNumber++;
 				}
 			}
-			else {
-				throw new Exception(_('Incorrect "hosts" definition.'));
-			}
 		}
 	}
 
@@ -636,9 +633,6 @@ class C10XmlValidator {
 					$screenNumber++;
 				}
 			}
-			else {
-				throw new Exception(_('Incorrect "screens" definition.'));
-			}
 		}
 	}
 
@@ -759,9 +753,6 @@ class C10XmlValidator {
 
 					$sysmapNumber++;
 				}
-			}
-			else {
-				throw new Exception(_('Incorrect "sysmaps" definition.'));
 			}
 		}
 	}
