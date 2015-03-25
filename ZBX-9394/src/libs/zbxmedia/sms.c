@@ -238,7 +238,21 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	{
 		if (NULL != step->message)
 		{
-			if (FAIL == (ret = write_gsm(f, step->message, error, max_error_len)))
+			if (message == step->message)
+			{
+				char	*tmp;
+
+				tmp = zbx_strdup(NULL, message);
+				zbx_remove_chars(tmp, "\r");
+
+				ret = write_gsm(f, tmp, error, max_error_len);
+
+				zbx_free(tmp);
+			}
+			else
+				ret = write_gsm(f, step->message, error, max_error_len);
+
+			if (FAIL == ret)
 				break;
 		}
 
