@@ -42,7 +42,21 @@ class C10XmlValidator {
 
 		// prepare content
 		$newArray = new CXmlValidatorConverters();
-		$content = $newArray->convertEmpStrToArr(array('hosts', 'dependencies', 'screens'), $content);
+		$content = $newArray->convertEmpStrToArr(array('hosts', 'dependencies', 'sysmaps', 'screens'), $content);
+
+		$fields = array(
+			'hosts' =>			'array',
+			'dependencies' =>	'array',
+			'sysmaps' =>		'array',
+			'screens' =>		'array'
+		);
+
+		$validator = new CNewValidator($content, $fields);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "zabbix_export": %1$s', $errors[0]));
+		}
 
 		$this->validateHosts($content);
 		$this->validateTriggerDependencies($content);
