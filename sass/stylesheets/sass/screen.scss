@@ -1843,7 +1843,11 @@ a.grey {
 	background: $new-blue-grey;
 }
 td.na-bg {
-	border-left: 1px dotted $white;
+	border-left: none;
+
+	~ td.na-bg {
+		border-left: 1px dotted $white;
+	}
 }
 
 .normal-bg {
