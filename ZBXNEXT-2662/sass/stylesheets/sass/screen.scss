@@ -991,7 +991,6 @@ legend {
 }
 
 button::-moz-focus-inner {
-	border: 0;
 	padding: 0;
 }
 
@@ -1013,10 +1012,6 @@ button {
 
 	&:active {
 		@extend %button-active;
-	}
-
-	&:focus {
-		@extend %focus-outline;
 	}
 
 	&.btn-alt {
@@ -2039,7 +2034,3 @@ a.form-remove-btn {
 		background: darken($light-blue-grey, 10%);
 	}
 }
-
- %focus-outline {
- 	outline: thin dotted $indigo-black;
- }
