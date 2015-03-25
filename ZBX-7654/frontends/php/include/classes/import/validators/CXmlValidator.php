@@ -48,7 +48,7 @@ class CXmlValidator {
 		$this->validateZabbixExport($data);
 		$this->validateMainParameters($data);
 		$this->validateVersion($data);
-		$this->validateByVersion($data);
+		$this->validateContent($data);
 	}
 
 	/**
@@ -59,7 +59,11 @@ class CXmlValidator {
 	 * @throws Exception	if the data is invalid
 	 */
 	private function validateZabbixExport($data) {
-		$validator = new CNewValidator($data, array('zabbix_export' =>	'required|array'));
+		$fields = array(
+			'zabbix_export' =>	'required|array',
+		);
+		$validator = new CNewValidator($data, $fields);
+
 		if ($validator->isError()) {
 			$errors = $validator->getAllErrors();
 			throw new Exception($errors[0]);
@@ -74,12 +78,13 @@ class CXmlValidator {
 	 * @throws Exception	if the data is invalid
 	 */
 	private function validateMainParameters($data) {
-		$validationRules = array(
+		$fields = array(
 			'version' =>	'required|string',
 			'date' =>		'required|string',
 			'time' =>		'required|string'
 		);
-		$validator = new CNewValidator($data['zabbix_export'], $validationRules);
+		$validator = new CNewValidator($data['zabbix_export'], $fields);
+
 		if ($validator->isError()) {
 			$errors = $validator->getAllErrors();
 			throw new Exception(_s('Cannot parse XML tag "zabbix_export": %1$s', $errors[0]));
@@ -94,10 +99,8 @@ class CXmlValidator {
 	 * @throws Exception	if the data is invalid
 	 */
 	private function validateVersion($data) {
-		$version = $data['zabbix_export']['version'];
-
-		if (!array_key_exists($version, $this->versionValidators)) {
-			throw new Exception(_s('Unsupported import version "%1$s".', $version));
+		if (!array_key_exists($data['zabbix_export']['version'], $this->versionValidators)) {
+			throw new Exception(_s('Unsupported import version "%1$s".', $data['zabbix_export']['version']));
 		}
 	}
 
@@ -106,8 +109,7 @@ class CXmlValidator {
 	 *
 	 * @param array $data	import data
 	 */
-	private function validateByVersion($data) {
-		$content = $data['zabbix_export'];
-		$this->versionValidators[$content['version']]->validate($content);
+	private function validateContent($data) {
+		$this->versionValidators[$data['zabbix_export']['version']]->validate($data['zabbix_export']);
 	}
 }
