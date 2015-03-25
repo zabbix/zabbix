@@ -1842,29 +1842,50 @@ a.grey {
 .na-bg {
 	background: $new-blue-grey;
 }
+td.na-bg {
+	border-left: 1px dotted $white;
+}
 
 .normal-bg {
 	@extend .green-bg;
+}
+td.normal-bg {
+	@extend td.na-bg;
 }
 
 .info-bg {
 	background: $new-blue;
 }
+td.info-bg {
+	@extend td.na-bg;
+}
 
 .average-bg {
 	background: $new-orange;
+}
+td.average-bg {
+	@extend td.na-bg;
 }
 
 .warning-bg {
 	background: $new-yellow;
 }
+td.warning-bg {
+	@extend td.na-bg;
+}
 
 .high-bg {
 	background: $new-deep-orange;
 }
+td.high-bg {
+	@extend td.na-bg;
+}
 
 .disaster-bg {
 	background: $new-red;
+}
+td.disaster-bg {
+	@extend td.na-bg;
 }
 
 .msg-good {
