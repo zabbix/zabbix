@@ -381,15 +381,6 @@ footer {
 	    		background: darken($alt-blue, 5%);
 	    	}	    
 	    }
-
-	    &.vertical {
-	    	overflow: initial!important;
-
-	    	div {
-	    		@include transform(/*translate(13px, 29px) */rotate(315deg));
-	    		position: relative;
-	    	}
-	    }
 	}
 
 	tbody tr {
@@ -933,6 +924,11 @@ input {
 	&[type="radio"] {
 		@extend %form-check-radio-style;
 	}
+
+	&[disabled] {
+		background: $lighter-grey;
+		@extend %disabled;
+	} 
 }
 
 textarea {
@@ -943,6 +939,11 @@ textarea {
 	padding: 5px 0 0 5px;
 	overflow: auto;
 	@extend %form-input-style;
+
+	&[disabled] {
+		background: $lighter-grey;
+		@extend %disabled;
+	} 
 }
 
 select {
@@ -955,6 +956,11 @@ select {
 		height: auto;
 		padding: 5px;
 	}
+
+	&[disabled] {
+		background: $lighter-grey;
+		@extend %disabled;
+	} 
 }
 
 fieldset {
@@ -989,7 +995,6 @@ legend {
 %form-input-style {
 	@include border-radius(2px);
 	border: 1px solid $light-blue-grey;
-	background: $white;
 	@include font-form;
 	@include transition(border-color .2s ease);
 
@@ -1290,8 +1295,7 @@ button {
 	padding: 0;
 }
 
-%button-disabled {
-	background: $transparent;
+%disabled {
 	color: $light-blue-grey;
 	border-color: $lighter-blue-grey;
 	cursor: default;
@@ -1308,14 +1312,17 @@ button {
 }
 
 button[disabled] {
-	@extend %button-disabled;
+	@extend %disabled;
+	background: $transparent;
 
 	&:hover {
-		@extend %button-disabled;
+		@extend %disabled;
+		background: $transparent;
 	}
 
 	&:active {
-		@extend %button-disabled;
+		@extend %disabled;
+		background: $transparent;
 	}
 }
 
