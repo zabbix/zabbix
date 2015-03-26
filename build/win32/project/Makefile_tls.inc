@@ -16,6 +16,10 @@
 !IF ("$(TLSLIBDIR)" != "" && "$(TLSLIB2)" != "") || ("$(TLSLIB)" != "" && "$(TLSLIB2)" == "") || ("$(TLSLIB)" == "" && "$(TLSLIB2)" != "")
 !ERROR Please specify either TLSLIBDIR or both TLSLIB and TLSLIB2 (e. g. TLSLIBDIR="\somepath\lib" or TLSLIB="\somepath\libeay32.lib" TLSLIB2="\somepath\ssleay32.lib").
 !ENDIF
+!ELSEIF "$(TLS)" == "gnutls"
+!IF "$(TLSLIB)" == ""
+!ERROR Please specify full path to static GnuTLS library e. g. TLSLIB="\somepath\some.lib"
+!ENDIF
 !ELSE
 !IF ("$(TLSLIBDIR)" == "" && "$(TLSLIB)" == "") || ("$(TLSLIBDIR)" != "" && "$(TLSLIB)" != "")
 !ERROR Please specify only one of TLSLIBDIR or TLSLIB (e. g. TLSLIBDIR="\somepath\lib" or TLSLIB="\somepath\lib\some.lib").
@@ -39,21 +43,9 @@ ADDMSG = You may specify path to library using TLSLIB="\somepath\lib\some.lib"
 !IF "$(TLSLIBDIR)" != ""
 TLSLIB = $(TLSLIBDIR)\mbedtls.lib
 !ENDIF
-!IF !EXISTS("$(TLSLIB)")
-!ERROR TLS library "$(TLSLIB)" not found. $(ADDMSG)
-!ENDIF
-LIBS = $(LIBS) "$(TLSLIB)"
 CFLAGS = $(CFLAGS) /DHAVE_POLARSSL
 ### GnuTLS ###
 !ELSEIF "$(TLS)" == "gnutls"
-!IF "$(TLSLIBDIR)" != ""
-TLSLIB = $(TLSLIBDIR)\libgnutls.dll.a
-!ENDIF
-!IF !EXISTS("$(TLSLIB)")
-!ERROR TLS library "$(TLSLIB)" not found. $(ADDMSG)
-!ENDIF
-!MESSAGE TLSLIB=$(TLSLIB)
-LIBS = $(LIBS) "$(TLSLIB)"
 CFLAGS = $(CFLAGS) /DHAVE_GNUTLS
 ### OpenSSL ###
 !ELSEIF "$(TLS)" == "openssl"
@@ -61,14 +53,20 @@ CFLAGS = $(CFLAGS) /DHAVE_GNUTLS
 TLSLIB = $(TLSLIBDIR)\libeay32.lib
 TLSLIB2 = $(TLSLIBDIR)\ssleay32.lib
 !ENDIF
+CFLAGS = $(CFLAGS) /DHAVE_OPENSSL
+!ENDIF
+
 !IF !EXISTS("$(TLSLIB)")
 !ERROR TLS library "$(TLSLIB)" not found. $(ADDMSG)
 !ENDIF
+
+!IF "$(TLS)" == "openssl"
 !IF !EXISTS("$(TLSLIB2)")
 !ERROR TLS library "$(TLSLIB2)" not found. $(ADDMSG)
 !ENDIF
 LIBS = $(LIBS) "$(TLSLIB)" "$(TLSLIB2)"
-CFLAGS = $(CFLAGS) /DHAVE_OPENSSL
+!ELSE
+LIBS = $(LIBS) "$(TLSLIB)"
 !ENDIF
 
 INCS = $(INCS) /I "$(TLSINCDIR)"
