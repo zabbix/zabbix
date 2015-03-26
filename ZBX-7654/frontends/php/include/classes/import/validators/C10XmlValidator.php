@@ -89,7 +89,7 @@ class C10XmlValidator {
 	 */
 	protected function validateDate($date) {
 		if (!preg_match('/^(0[1-9]|[1-2][0-9]|3[01]).(0[1-9]|1[0-2]).[0-9]{2}$/', $date)) {
-			throw new Exception(_('Incorrect date format: DD.MM.YY is expected.'));
+			throw new Exception(_s('Incorrect date format: %1$s.', _('DD.MM.YY is expected')));
 		}
 	}
 
@@ -102,7 +102,7 @@ class C10XmlValidator {
 	 */
 	protected function validateTime($time) {
 		if (!preg_match('/(2[0-3]|[01][0-9]).[0-5][0-9]/', $time)) {
-			throw new Exception(('Incorrect time format: HH.MM is expected.'));
+			throw new Exception(_s('Incorrect time format: %1$s.', _('HH.MM is expected')));
 		}
 	}
 
@@ -659,7 +659,7 @@ class C10XmlValidator {
 
 		$sysmapNumber = 1;
 		foreach ($sysmaps as $sysmap) {
-			$subpath = $path.'/sysmap('.$sysmapNumber+=.')';
+			$subpath = $path.'/sysmap('.$sysmapNumber++.')';
 
 			$sysmap = $this->validatorConverters->convertEmpStrToArr(array('selements', 'links'), $sysmap);
 
