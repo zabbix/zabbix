@@ -173,3 +173,10 @@ $font-transform: uppercase;
 	-ms-transform: $transforms;
 	transform: $transforms;
 }
+
+@mixin rotate($rotate: 0) {
+	-webkit-transform: rotate($rotate +deg);
+	-moz-transform: rotate($rotate +deg);
+	-ms-transform: rotate($rotate +deg);
+	transform: rotate($rotate +deg);
+}
