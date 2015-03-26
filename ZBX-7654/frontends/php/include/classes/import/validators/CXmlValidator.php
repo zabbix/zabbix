@@ -45,20 +45,6 @@ class CXmlValidator {
 	 * @param array $data	import data
 	 */
 	public function validate($data) {
-		$this->validateZabbixExport($data);
-		$this->validateMainParameters($data);
-		$this->validateVersion($data);
-		$this->validateContent($data);
-	}
-
-	/**
-	 * Validate zabbix_export parameter.
-	 *
-	 * @param array $data	import data
-	 *
-	 * @throws Exception	if the data is invalid
-	 */
-	private function validateZabbixExport($data) {
 		$fields = array(
 			'zabbix_export' =>	'required|array',
 		);
@@ -68,48 +54,45 @@ class CXmlValidator {
 			$errors = $validator->getAllErrors();
 			throw new Exception($errors[0]);
 		}
+
+		$this->validateMainParameters($data['zabbix_export'], 'zabbix_export');
+		$this->versionValidators[$data['zabbix_export']['version']]->validate($data['zabbix_export'], 'zabbix_export');
 	}
 
 	/**
 	 * Validate main zabbix_export parameters.
 	 *
-	 * @param array $data	import data
+	 * @param array  $zabbix_export	import data
+	 * @param string $path			XML path
 	 *
-	 * @throws Exception	if the data is invalid
+	 * @throws Exception			if the data is invalid
 	 */
-	private function validateMainParameters($data) {
+	private function validateMainParameters(array $zabbix_export, $path) {
 		$fields = array(
 			'version' =>	'required|string',
 			'date' =>		'required|string',
 			'time' =>		'required|string'
 		);
-		$validator = new CNewValidator($data['zabbix_export'], $fields);
+		$validator = new CNewValidator($zabbix_export, $fields);
 
 		if ($validator->isError()) {
 			$errors = $validator->getAllErrors();
-			throw new Exception(_s('Cannot parse XML tag "zabbix_export": %1$s', $errors[0]));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
 		}
+
+		$this->validateVersion($zabbix_export['version']);
 	}
 
 	/**
 	 * Check if this import version is supported.
 	 *
-	 * @param array $data	import data
+	 * @param array $version	version data
 	 *
-	 * @throws Exception	if the data is invalid
+	 * @throws Exception		if the data is invalid
 	 */
-	private function validateVersion($data) {
-		if (!array_key_exists($data['zabbix_export']['version'], $this->versionValidators)) {
-			throw new Exception(_s('Unsupported import version "%1$s".', $data['zabbix_export']['version']));
+	private function validateVersion($version) {
+		if (!array_key_exists($version, $this->versionValidators)) {
+			throw new Exception(_s('Unsupported import version "%1$s".', $version));
 		}
-	}
-
-	/**
-	 * Run XML validators.
-	 *
-	 * @param array $data	import data
-	 */
-	private function validateContent($data) {
-		$this->versionValidators[$data['zabbix_export']['version']]->validate($data['zabbix_export']);
 	}
 }
