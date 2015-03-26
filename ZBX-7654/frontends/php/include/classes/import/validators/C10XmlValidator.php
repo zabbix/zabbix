@@ -123,8 +123,7 @@ class C10XmlValidator {
 
 		$hostNumber = 1;
 		foreach ($hosts as $key => $host) {
-			$subpath = $path.'/host('.$hostNumber.')';
-			$hostNumber++;
+			$subpath = $path.'/host('.$hostNumber++.')';
 
 			$fields = array($key => 'array');
 
@@ -225,8 +224,7 @@ class C10XmlValidator {
 
 		$itemNumber = 1;
 		foreach ($items as $item) {
-			$subpath = $path.'/item('.$itemNumber.')';
-			$itemNumber++;
+			$subpath = $path.'/item('.$itemNumber++.')';
 
 			$item = $this->validatorConverters->convertEmpStrToArr(array('applications'), $item);
 
@@ -303,8 +301,7 @@ class C10XmlValidator {
 
 		$triggerNumber = 1;
 		foreach ($triggers as $trigger) {
-			$subpath = $path.'/trigger('.$triggerNumber.')';
-			$triggerNumber++;
+			$subpath = $path.'/trigger('.$triggerNumber++.')';
 
 			$validationRules = array(
 				'description' =>	'required|string',
@@ -365,8 +362,7 @@ class C10XmlValidator {
 
 		$graphNumber = 1;
 		foreach ($graphs as $graph) {
-			$subpath = $path.'/graph('.$graphNumber.')';
-			$graphNumber++;
+			$subpath = $path.'/graph('.$graphNumber++.')';
 
 			$validationRules = array(
 				'name' =>				'required|string',
@@ -425,8 +421,7 @@ class C10XmlValidator {
 
 		$macroNumber = 1;
 		foreach ($macros as $macro) {
-			$subpath = $path.'/macro('.$macroNumber.')';
-			$macroNumber++;
+			$subpath = $path.'/macro('.$macroNumber++.')';
 
 			$validationRules = array(
 				'value' =>	'required|string',
@@ -482,8 +477,7 @@ class C10XmlValidator {
 
 		$graphElementNumber = 1;
 		foreach ($graph_elements as $graph_element) {
-			$subpath = $path.'graph_element('.$graphElementNumber.')';
-			$graphElementNumber++;
+			$subpath = $path.'graph_element('.$graphElementNumber++.')';
 
 			$validationRules = array(
 				'item' =>			'required|string',
@@ -529,8 +523,7 @@ class C10XmlValidator {
 
 		$dependencyNumber = 1;
 		foreach ($dependencies as $dependency) {
-			$subpath = $path.'/dependency('.$dependencyNumber.')';
-			$dependencyNumber++;
+			$subpath = $path.'/dependency('.$dependencyNumber++.')';
 
 			$validationRules = array(
 				'description' =>	'required|string',
@@ -572,8 +565,7 @@ class C10XmlValidator {
 
 		$screenNumber = 1;
 		foreach ($screens as $screen) {
-			$subpath = $path.'/screen('.$screenNumber.')';
-			$screenNumber++;
+			$subpath = $path.'/screen('.$screenNumber++.')';
 
 			$screen = $this->validatorConverters->convertEmpStrToArr(array('screenitems'), $screen);
 
@@ -622,8 +614,7 @@ class C10XmlValidator {
 
 		$screenitemNumber = 1;
 		foreach ($screenitems as $screenitem) {
-			$subpath = $path.'/screenitem('.$screenitemNumber.')';
-			$screenitemNumber++;
+			$subpath = $path.'/screenitem('.$screenitemNumber++.')';
 
 			$validationRules = array(
 				'resourcetype' =>	'required|string',
@@ -668,8 +659,7 @@ class C10XmlValidator {
 
 		$sysmapNumber = 1;
 		foreach ($sysmaps as $sysmap) {
-			$subpath = $path.'/sysmap('.$sysmapNumber.')';
-			$sysmapNumber++;
+			$subpath = $path.'/sysmap('.$sysmapNumber+=.')';
 
 			$sysmap = $this->validatorConverters->convertEmpStrToArr(array('selements', 'links'), $sysmap);
 
@@ -726,8 +716,7 @@ class C10XmlValidator {
 
 		$selementNumber = 1;
 		foreach ($selements as $selement) {
-			$subpath = $path.'/selement('.$selementNumber.')';
-			$selementNumber++;
+			$subpath = $path.'/selement('.$selementNumber++.')';
 
 			$validationRules = array(
 				'selementid' =>		'',
