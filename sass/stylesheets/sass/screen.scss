@@ -224,6 +224,10 @@ ul.top-nav-icons {
 		text-decoration: none;
 	}
 
+	&:active {
+		text-decoration: none;
+	}
+
 	&.selected {
 		@include border-radius(2px);
 		background: lighten($secondary-blue, 10%);
@@ -413,6 +417,10 @@ footer {
 		vertical-align: middle;
 		border-bottom: 1px solid $lightest-blue-grey;
 	}
+
+	.vertical_rotation_inner {
+		@include rotate(270);
+	} 
 }
 
 .table-paging {
