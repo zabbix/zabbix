@@ -34,9 +34,8 @@
 	$search->setAttribute('autocomplete', 'off');
 	$search->addClass('search');
 
-	$button = new CRedirectButton(SPACE, null, null, 'btn-search');
+	$button = new CSubmitButton(SPACE, null, null, 'btn-search');
 	$form->AddItem(array($search, $button));
-	'<li><form method="get" action="search.php" accept-charset="utf-8"><input class="input text search" id="search" name="search" value="za" size="20" maxlength="255" autocomplete="off" type="text"></form></li>';
 	$icons->addItem($form);
 
 	$help = new CLink(SPACE, 'http://www.zabbix.com/documentation/', 'top-nav-help');
