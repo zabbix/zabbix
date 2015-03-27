@@ -368,7 +368,7 @@ footer {
 	    border-bottom: 2px solid $lightest-blue-grey;
 	    text-align: left;
 	    color: $blue-grey;
-	    white-space: nowrap;
+	    //white-space: nowrap;
 
 	    .arrow-up {
 	    	position: absolute;
@@ -1832,6 +1832,12 @@ button[disabled] {
 		float: left;
 		margin-top: 0;
 	}
+}
+
+/* Maps, Graphs */
+.box_on {
+	position: absolute;
+	z-index: 99;
 }
 
 /* Alerts */
