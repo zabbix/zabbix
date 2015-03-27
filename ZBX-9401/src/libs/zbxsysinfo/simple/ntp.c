@@ -47,10 +47,6 @@
 #define NTP_SERVER            4        /* NTP server response */
 #define NTP_BROADCAST         5        /* NTP server broadcast */
 
-#define NTP_INSANITY     3600.0        /* Errors beyond this are hopeless */
-#define RESET_MIN            15        /* Minimum period between resets */
-#define ABSCISSA            3.0        /* Scale factor for standard errors */
-
 typedef struct
 {
 	unsigned char
@@ -72,16 +68,19 @@ ntp_data;
 
 static void	make_packet(ntp_data *data)
 {
-	data->status	= NTP_LI_FUDGE << 6;
-	data->stratum	= NTP_STRATUM;
-	data->reference = data->dispersion = 0.0;
+	data->status = NTP_LI_FUDGE << 6;
+	data->stratum = NTP_STRATUM;
+	data->reference = 0;
+	data->dispersion = 0;
 
-	data->version	= NTP_VERSION;
-	data->mode	= 1;
-	data->polling	= NTP_POLLING;
-	data->precision	= NTP_PRECISION;
-	data->receive	= data->originate = 0.0;
-	data->current	= data->transmit = zbx_current_time();
+	data->version = NTP_VERSION;
+	data->mode = NTP_ACTIVE;
+	data->polling = NTP_POLLING;
+	data->precision = NTP_PRECISION;
+	data->originate = 0;
+	data->receive = 0;
+	data->current = zbx_current_time();
+	data->transmit = data->current;
 }
 
 static void	pack_ntp(unsigned char *packet, int length, ntp_data *data)
