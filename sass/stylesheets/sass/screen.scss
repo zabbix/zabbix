@@ -928,7 +928,14 @@ input {
 	&[disabled] {
 		background: $lighter-grey;
 		@extend %disabled;
-	} 
+	}
+
+	&[readonly] {
+		background: $lighter-grey;
+		color: $indigo-black!important;
+		cursor: text!important;
+		@extend %disabled;
+	}  
 }
 
 textarea {
@@ -943,7 +950,14 @@ textarea {
 	&[disabled] {
 		background: $lighter-grey;
 		@extend %disabled;
-	} 
+	}
+
+	&[readonly] {
+		background: $lighter-grey;
+		color: $indigo-black!important;
+		cursor: text!important;
+		@extend %disabled;
+	}   
 }
 
 select {
@@ -960,7 +974,14 @@ select {
 	&[disabled] {
 		background: $lighter-grey;
 		@extend %disabled;
-	} 
+	}
+
+	&[readonly] {
+		background: $lighter-grey;
+		color: $indigo-black!important;
+		cursor: text!important;
+		@extend %disabled;
+	}   
 }
 
 fieldset {
@@ -993,7 +1014,6 @@ legend {
 }
 
 %form-input-style {
-	@include border-radius(2px);
 	border: 1px solid $light-blue-grey;
 	@include font-form;
 	@include transition(border-color .2s ease);
@@ -1551,7 +1571,7 @@ button[disabled] {
 	color: $blue-grey;
 	background: $white;
 	border: 1px solid $lighter-blue-grey;
-	@include box-shadow(0 5px 20px 0 rgba(118,141,153,0.3));
+	@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
 
 	li {
 
@@ -1598,6 +1618,12 @@ button[disabled] {
 		height: 24px;
 		line-height: 24px;
 	}
+}
+
+.search-suggest {
+	@extend .action-menu;
+	min-width: initial;
+	border-top: none;
 }
 
 .overlay-dialogue {
