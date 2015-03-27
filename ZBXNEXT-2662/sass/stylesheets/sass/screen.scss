@@ -160,7 +160,7 @@ ul.top-nav-icons {
 				float: none;
 
 				a {
-					opacity: initial;
+					opacity: inherit;
 					width: inherit;
 				}
 			}
@@ -1513,6 +1513,13 @@ button[disabled] {
 }
 
 /* Dashboard */
+.widget-placeholder {
+
+	.cell {
+		min-width: 250px;
+	}
+}
+
 .dashbrd-widget {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
@@ -1596,7 +1603,7 @@ button[disabled] {
 
 	li {
 		display: block;
-		
+
 		a {
 			display: block;
 			height: 24px;
