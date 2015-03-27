@@ -30,11 +30,6 @@ class C10XmlValidator {
 	protected $arrayValidator;
 
 	/**
-	 * @var CXmlValidatorConverters
-	 */
-	protected $validatorConverters;
-
-	/**
 	 * Base validation function.
 	 *
 	 * @param array  $zabbix_export	import data
@@ -42,15 +37,9 @@ class C10XmlValidator {
 	 */
 	public function validate(array $zabbix_export, $path) {
 		$this->arrayValidator = new CXmlArrayValidator();
-		$this->validatorConverters = new CXmlValidatorConverters();
 
 		$this->validateDate($zabbix_export['date']);
 		$this->validateTime($zabbix_export['time']);
-
-		// prepare content
-		$zabbix_export = $this->validatorConverters->convertEmpStrToArr(
-			array('hosts', 'dependencies', 'sysmaps', 'screens'), $zabbix_export
-		);
 
 		$fields = array(
 			'hosts' =>			'array',
@@ -144,10 +133,6 @@ class C10XmlValidator {
 	 * @throws Exception	if structure or values is invalid
 	 */
 	protected function validateHost(array $host, $path) {
-		$host = $this->validatorConverters->convertEmpStrToArr(
-			array('groups', 'triggers', 'items', 'templates', 'graphs', 'macros'), $host
-		);
-
 		$validationRules = array(
 			'name' =>			'required|string',
 			'proxy_hostid' =>	'required|string',
@@ -268,8 +253,6 @@ class C10XmlValidator {
 	 * @throws Exception	if structure is invalid
 	 */
 	protected function validateItem(array $item, $path) {
-		$item = $this->validatorConverters->convertEmpStrToArr(array('applications'), $item);
-
 		$validationRules = array(
 			'type' =>					'required|string',
 			'key' =>					'required|string',
@@ -456,8 +439,6 @@ class C10XmlValidator {
 	 * @throws Exception	if structure is invalid
 	 */
 	protected function validateGraph(array $graph, $path) {
-		$graph = $this->validatorConverters->convertEmpStrToArr(array('graph_elements'), $graph);
-
 		$validationRules = array(
 			'name' =>				'required|string',
 			'width' =>				'required|string',
@@ -754,8 +735,6 @@ class C10XmlValidator {
 		foreach ($screens as $screen) {
 			$subpath = $path.'/screen('.$screenNumber++.')';
 
-			$screen = $this->validatorConverters->convertEmpStrToArr(array('screenitems'), $screen);
-
 			$validationRules = array(
 				'name' =>			'required|string',
 				'hsize' =>			'required|string',
@@ -867,8 +846,6 @@ class C10XmlValidator {
 	 * @throws Exception		if structure is invalid
 	 */
 	protected function validateSysmap(array $sysmap, $path) {
-		$sysmap = $this->validatorConverters->convertEmpStrToArr(array('selements', 'links'), $sysmap);
-
 		$validationRules = array(
 			'selements' =>		'array',
 			'links' =>			'required|array',

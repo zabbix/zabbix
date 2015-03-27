@@ -20,23 +20,28 @@
 
 
 /**
- * Prepare input data before validation.
+ * Base XML preprocessor class.
  */
-class CXmlValidatorConverters {
+class CXmlPreprocessor {
+
+	public function __construct() {
+		$this->versionPreprocessors = array(
+			'1.0' => new C10XmlPreprocessor()
+//			'2.0' => new C10ImportConverter(),
+//			'3.0' => new C10ImportConverter()
+		);
+	}
 
 	/**
-	 * Convert empty strings to array.
-	 *
-	 * @param array $keys
 	 * @param array $data
-	 *
-	 * @return array
 	 */
-	public function convertEmpStrToArr(array $keys, $data) {
-		foreach ($keys as $key) {
-			if (array_key_exists($key, $data) && $data[$key] === '') {
-				$data[$key] = array();
-			}
+	public function transform(array $data) {
+		if (array_key_exists('zabbix_export', $data)
+				&& array_key_exists('version', $data['zabbix_export'])
+				&& is_string($data['zabbix_export']['version'])
+				&& array_key_exists($data['zabbix_export']['version'], $this->versionPreprocessors)) {
+
+			$data = $this->versionPreprocessors[$data['zabbix_export']['version']]->transform($data);
 		}
 
 		return $data;
