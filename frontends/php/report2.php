@@ -204,13 +204,13 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	/*
 	 * Filter
 	 */
-	$filterForm = new CFormTable();
-	$filterForm->setTableClass('formtable old-filter');
-	$filterForm->setAttribute('name', 'zbx_filter');
-	$filterForm->setAttribute('id', 'zbx_filter');
+	$filterForm = new CFilter();
 	$filterForm->addVar('config', $availabilityReportMode);
 	$filterForm->addVar('filter_timesince', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timesince']));
 	$filterForm->addVar('filter_timetill', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timetill']));
+
+	$filterColumn1 = new CFormList();
+	$filterColumn2 = new CFormList();
 
 	// report by template
 	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
@@ -244,7 +244,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		foreach ($groups as $group) {
 			$groupsComboBox->addItem($group['groupid'], $group['name']);
 		}
-		$filterForm->addRow(_('Template group'), $groupsComboBox);
+		$filterColumn1->addRow(_('Template group'), $groupsComboBox);
 
 		// filter template
 		$templateComboBox = new CComboBox('filter_hostid', $_REQUEST['filter_hostid'], 'javascript: submit();');
@@ -263,7 +263,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 
 			$templateComboBox->addItem($template['templateid'], $template['name']);
 		}
-		$filterForm->addRow(_('Template'), $templateComboBox);
+		$filterColumn1->addRow(_('Template'), $templateComboBox);
 
 		// filter trigger
 		$triggerComboBox = new CComboBox('tpl_triggerid', getRequest('tpl_triggerid', 0), 'javascript: submit()');
@@ -296,7 +296,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			unset($triggerOptions['filter']['templateid']);
 		}
 
-		$filterForm->addRow(_('Template trigger'), $triggerComboBox);
+		$filterColumn1->addRow(_('Template trigger'), $triggerComboBox);
 
 		// filter host group
 		$hostGroupsComboBox = new CComboBox('hostgroupid', getRequest('hostgroupid', 0), 'javascript: submit()');
@@ -318,7 +318,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			unset($triggerOptions['groupids']);
 		}
 
-		$filterForm->addRow(_('Filter by host group'), $hostGroupsComboBox);
+		$filterColumn1->addRow(_('Filter by host group'), $hostGroupsComboBox);
 	}
 
 	// report by host
@@ -337,7 +337,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		foreach ($groups as $group) {
 			$groupsComboBox->addItem($group['groupid'], $group['name']);
 		}
-		$filterForm->addRow(_('Host group'), $groupsComboBox);
+		$filterColumn1->addRow(_('Host group'), $groupsComboBox);
 
 		// filter host
 		$hostsComboBox = new CComboBox('filter_hostid', $_REQUEST['filter_hostid'], 'javascript: submit();');
@@ -355,7 +355,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		foreach ($hosts as $host) {
 			$hostsComboBox->addItem($host['hostid'], $host['name']);
 		}
-		$filterForm->addRow(_('Host'), $hostsComboBox);
+		$filterColumn1->addRow(_('Host'), $hostsComboBox);
 
 		// trigger options
 		if (!empty($_REQUEST['filter_groupid']) || !$config['dropdown_first_entry']) {
@@ -376,13 +376,12 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	$filterPeriodTable->addRow($timeSinceRow);
 	$filterPeriodTable->addRow($timeTillRow);
 
-	$filterForm->addRow(_('Period'), $filterPeriodTable);
+	$filterColumn2->addRow(_('Period'), $filterPeriodTable);
 
-	// filter buttons
-	$filterForm->addItemToBottomRow(new CSubmit('filter_set',_('Filter')));
-	$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
+	$filterForm->addColumn($filterColumn1);
+	$filterForm->addColumn($filterColumn2);
 
-	$reportWidget->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
+	$reportWidget->addItem($filterForm);
 
 	/*
 	 * Triggers
@@ -420,7 +419,6 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		));
 	}
 
-	$reportWidget->addItem(BR());
 	$reportWidget->addItem(array($triggerTable, $paging));
 	$reportWidget->show();
 }
