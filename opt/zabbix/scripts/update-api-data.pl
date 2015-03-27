@@ -10,7 +10,7 @@ use JSON::XS;
 use Data::Dumper;
 
 use constant AUDIT_RESOURCE_INCIDENT => 32;
-parse_opts('tld=s', 'service=s', 'period=n', 'continue!', 'ignore-file=s');
+parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s');
 
 # do not write any logs
 setopt('nolog');
@@ -23,32 +23,21 @@ if (opt('debug'))
 	dbg("$_ => ", getopt($_)) foreach (optkeys());
 }
 
+__validate_input();
+
+my $opt_period = getopt('period');
+my $opt_from = getopt('from') - (getopt('from') % 60);
+
+dbg("option \"from\" truncated to the beginnin of a minute: $opt_from") if ($opt_from != getopt('from'));
+
 my @services;
 if (opt('service'))
 {
-	if (getopt('service') ne 'dns' and getopt('service') ne 'dnssec' and getopt('service') ne 'rdds' and getopt('service') ne 'epp')
-	{
-		print("Error: \"", getopt('service'), "\" - unknown service\n");
-		usage();
-	}
-
 	push(@services, lc(getopt('service')));
 }
 else
 {
 	push(@services, 'dns', 'dnssec', 'rdds', 'epp');
-}
-
-if (opt('tld') and opt('ignore-file'))
-{
-	print("Error: options --tld and --ignore-file cannot be used together\n");
-	usage();
-}
-
-if (opt('period') and opt('continue'))
-{
-	print("Error: options --period and --continue cannot be used together\n");
-	usage();
 }
 
 my %ignore_hash;
@@ -124,8 +113,6 @@ if (exists($services_hash{'epp'}))
 	$cfg_epp_key_rtt = 'rsm.epp.rtt[{$RSM.TLD},';
 }
 
-my $period = getopt('period');
-
 my $now = time();
 
 my $tlds_ref;
@@ -139,8 +126,6 @@ else
 {
 	$tlds_ref = get_tlds();
 }
-
-my $check_back = $now - 1800; # check back for latest availability data
 
 foreach (@$tlds_ref)
 {
@@ -219,16 +204,25 @@ foreach (@$tlds_ref)
 			}
 		}
 
-		my $till = $lastclock + RESULT_TIMESTAMP_SHIFT; # include the whole minute
+		my $till;
 		my $from;
 
 		if (defined($continue_clock))
 		{
+			$till = $lastclock + RESULT_TIMESTAMP_SHIFT; # include the whole minute
 			$from = $continue_clock;
 		}
-		elsif (defined($period))
+		elsif (defined($opt_from))
 		{
-			$from = $till - $period * 60 + 1;
+			# include the whole minute
+			$from = $opt_from - ($opt_from % 60);
+			$till = $opt_from + $opt_period * 60 - 1;
+		}
+		elsif (defined($opt_period))
+		{
+			# include the whole minute
+			$till = $lastclock + RESULT_TIMESTAMP_SHIFT;
+			$from = $till - $opt_period * 60 + 1;
 		}
 
 		if (defined($from))
@@ -1312,6 +1306,42 @@ sub __update_false_positives
 	ah_save_audit($maxclock) unless ($maxclock == 0);
 }
 
+sub __validate_input
+{
+	if (opt('service'))
+	{
+		if (getopt('service') ne 'dns' and getopt('service') ne 'dnssec' and getopt('service') ne 'rdds' and getopt('service') ne 'epp')
+		{
+			print("Error: \"", getopt('service'), "\" - unknown service\n");
+			usage();
+		}
+	}
+
+	if (opt('tld') and opt('ignore-file'))
+	{
+		print("Error: options --tld and --ignore-file cannot be used together\n");
+		usage();
+	}
+
+	if (opt('period') and opt('continue'))
+	{
+		print("Error: options --period and --continue cannot be used together\n");
+		usage();
+	}
+
+	if (opt('from') and opt('continue'))
+        {
+                print("Error: options --from and --continue cannot be used together\n");
+                usage();
+        }
+
+	if (opt('from') and not opt('period'))
+        {
+                print("Error: option --from can only be used together with --period\n");
+                usage();
+        }
+}
+
 __END__
 
 =head1 NAME
@@ -1320,7 +1350,7 @@ update-api-data.pl - save information about the incidents to a filesystem
 
 =head1 SYNOPSIS
 
-update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--period <minutes>|--continue] [--dry-run] [--debug] [--help]
+update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--period <minutes> [--from <timestamp>]|--continue] [--dry-run] [--debug] [--help]
 
 =head1 OPTIONS
 
@@ -1346,6 +1376,15 @@ This option cannot be used together with option --tld.
 
 Specify number of minutes of the period of calculation. This period is up till the latest available
 data in the database.
+
+This option cannot be used together with option --continue.
+
+=item B<--from> timestamp
+
+Specify the beginning of the period to process as Unix timestamp. The period length is controlled
+by option --period.
+
+This option can only be used together with option --period.
 
 This option cannot be used together with option --continue.
 
