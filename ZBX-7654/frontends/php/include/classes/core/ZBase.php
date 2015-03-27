@@ -224,6 +224,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/import',
 			$this->rootDir.'/include/classes/import/converters',
 			$this->rootDir.'/include/classes/import/importers',
+			$this->rootDir.'/include/classes/import/preprocessors',
 			$this->rootDir.'/include/classes/import/readers',
 			$this->rootDir.'/include/classes/import/validators',
 			$this->rootDir.'/include/classes/items',
