@@ -24,7 +24,9 @@ class CFilter extends CTag {
 	private $filterid;
 	private $columns = array();
 	private $form;
+	private $footer = null;
 	private $navigator = false;
+	private $name = 'zbx_filter';
 
 	public function __construct($filterid) {
 		parent::__construct('div', 'yes');
@@ -34,15 +36,23 @@ class CFilter extends CTag {
 		$this->columns = array();
 
 		$this->form = new CForm('get');
-		$this->form->setAttribute('name', 'zbx_filter');
-		$this->form->setAttribute('id', 'zbx_filter');
+		$this->form->setAttribute('name', $this->name);
+		$this->form->setAttribute('id', $this->name);
 		$this->form->addVar('ddreset', 1);
 		$this->form->addVar('uncheck', 1);
 
 	}
 
+	public function getName() {
+		return $this->name;
+	}
+
 	public function addColumn($column) {
 		$this->columns[] = $column;
+	}
+
+	public function setFooter($footer) {
+		$this->footer = $footer;
 	}
 
 	public function addNavigator() {
@@ -113,6 +123,9 @@ class CFilter extends CTag {
 
 		if($this->navigator) {
 			$this->form->addItem(new CDiv(null, null, 'scrollbar_cntr'));
+		}
+		if($this->footer !== null) {
+			$this->form->addItem($this->footer);
 		}
 
 		$ret = $this->form->toString();
