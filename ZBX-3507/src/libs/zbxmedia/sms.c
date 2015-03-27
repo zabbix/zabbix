@@ -163,6 +163,9 @@ static int	read_gsm(int fd, const char *expect, char *error, int max_error_len, 
 		while (0 < (nbytes = read(fd, ebuf, buffer + sizeof(buffer) - 1 - ebuf)))
 		{
 			ebuf += nbytes;
+			*ebuf = '\0';
+
+			zabbix_log(LOG_LEVEL_DEBUG, "Read attempt #%d from GSM modem [%s]", i, ebuf - nbytes);
 
 			do
 			{
