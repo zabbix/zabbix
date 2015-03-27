@@ -81,6 +81,14 @@ sup {
 	color: $blue-grey;
 }
 
+b {
+	font-weight: bold;
+}
+
+strong {
+	@extend b;
+}
+
 /* Main Navigation */
 nav {
 background: $secondary-blue;
@@ -145,6 +153,13 @@ ul.top-nav-icons {
 	li {
 		display: block;
 		float: left;
+
+		.search-suggest {
+
+			li {
+				float: none;
+			}
+		}
 	}
 
 	a {
@@ -508,6 +523,7 @@ footer {
 
 .cell {
 	display: table-cell;
+	vertical-align: top;
 }
 
 /* Filters */
@@ -1624,6 +1640,15 @@ button[disabled] {
 	@extend .action-menu;
 	min-width: initial;
 	border-top: none;
+
+	li {
+		float: none;
+
+		a {
+			opacity: initial;
+			width: inherit;
+		}
+	}
 }
 
 .overlay-dialogue {
