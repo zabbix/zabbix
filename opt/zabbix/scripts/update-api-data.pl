@@ -10,7 +10,7 @@ use JSON::XS;
 use Data::Dumper;
 
 use constant AUDIT_RESOURCE_INCIDENT => 32;
-parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s');
+parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s');
 
 # do not write any logs
 setopt('nolog');
@@ -23,10 +23,15 @@ if (opt('debug'))
 	dbg("$_ => ", getopt($_)) foreach (optkeys());
 }
 
+set_slv_config(get_rsm_config());
+
+db_connect();
+
 __validate_input();
 
 my $opt_period = getopt('period');
-my $opt_from = getopt('from') - (getopt('from') % 60);
+my $opt_from = getopt('from') - (getopt('from') % 60);	# use the whole minute
+my $opt_probe = getopt('probe');
 
 dbg("option \"from\" truncated to the beginnin of a minute: $opt_from") if ($opt_from != getopt('from'));
 
@@ -55,10 +60,6 @@ if (opt('ignore-file'))
 
 	%ignore_hash = map { $_ => 1 } @lines;
 }
-
-set_slv_config(get_rsm_config());
-
-db_connect();
 
 my $cfg_dns_interval;
 my $cfg_dns_valuemaps;
@@ -276,19 +277,19 @@ foreach (@$tlds_ref)
 		{
 			$interval = $cfg_dns_interval;
 			$nsips_ref = get_nsips($tld, $cfg_dns_key_rtt, 1); # templated
-			$dns_items_ref = __get_dns_itemids($nsips_ref, $cfg_dns_key_rtt, $tld);
+			$dns_items_ref = __get_dns_itemids($nsips_ref, $cfg_dns_key_rtt, $tld, $opt_probe);
 		}
 		elsif ($service eq 'rdds')
 		{
 			$interval = $cfg_rdds_interval;
-			$rdds_dbl_items_ref = __get_rdds_dbl_itemids($tld);
-			$rdds_str_items_ref = __get_rdds_str_itemids($tld);
+			$rdds_dbl_items_ref = __get_rdds_dbl_itemids($tld, $opt_probe);
+			$rdds_str_items_ref = __get_rdds_str_itemids($tld, $opt_probe);
 		}
 		elsif ($service eq 'epp')
 		{
 			$interval = $cfg_epp_interval;
-			$epp_dbl_items_ref = __get_epp_dbl_itemids($tld);
-			$epp_str_items_ref = __get_epp_str_itemids($tld);
+			$epp_dbl_items_ref = __get_epp_dbl_itemids($tld, $opt_probe);
+			$epp_str_items_ref = __get_epp_str_itemids($tld, $opt_probe);
 		}
 
 		$incidents = get_incidents($avail_itemid, $from, $till);
@@ -914,17 +915,20 @@ sub __get_dns_itemids
 	my $nsips_ref = shift; # array reference of NS,IP pairs
 	my $key = shift;
 	my $tld = shift;
+	my $probe = shift;
 
 	my @keys;
 	push(@keys, "'" . $key . $_ . "]'") foreach (@$nsips_ref);
 
 	my $keys_str = join(',', @keys);
 
+	my $host_value = ($probe ? "$tld $probe" : "$tld %");
+
 	my $rows_ref = db_select(
 		"select h.host,i.itemid,i.key_".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
-			" and h.host like '$tld %'".
+			" and h.host like '$host_value'".
 			" and i.templateid is not null".
 			" and i.key_ in ($keys_str)");
 
@@ -938,9 +942,9 @@ sub __get_dns_itemids
 		my $key = $row_ref->[2];
 
 		# remove TLD from host name to get just the Probe name
-		my $probe = substr($host, $tld_length);
+		my $_probe = ($probe ? $probe : substr($host, $tld_length));
 
-		$result{$probe}->{$itemid} = get_ns_from_key($key);
+		$result{$_probe}->{$itemid} = get_ns_from_key($key);
 	}
 
 	fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
@@ -1003,8 +1007,9 @@ sub __get_epp_str_type
 sub __get_rdds_dbl_itemids
 {
 	my $tld = shift;
+	my $probe = shift;
 
-	return __get_itemids_by_complete_key($tld, $cfg_rdds_key_43_rtt, $cfg_rdds_key_80_rtt, $cfg_rdds_key_43_upd);
+	return __get_itemids_by_complete_key($tld, $probe, $cfg_rdds_key_43_rtt, $cfg_rdds_key_80_rtt, $cfg_rdds_key_43_upd);
 }
 
 # return itemids of string items grouped by Probes:
@@ -1022,36 +1027,42 @@ sub __get_rdds_dbl_itemids
 sub __get_rdds_str_itemids
 {
 	my $tld = shift;
+	my $probe = shift;
 
-	return __get_itemids_by_complete_key($tld, $cfg_rdds_key_43_ip, $cfg_rdds_key_80_ip);
+	return __get_itemids_by_complete_key($tld, $probe, $cfg_rdds_key_43_ip, $cfg_rdds_key_80_ip);
 }
 
 sub __get_epp_dbl_itemids
 {
 	my $tld = shift;
+	my $probe = shift;
 
-	return __get_itemids_by_incomplete_key($tld, $cfg_epp_key_rtt);
+	return __get_itemids_by_incomplete_key($tld, $probe, $cfg_epp_key_rtt);
 }
 
 sub __get_epp_str_itemids
 {
 	my $tld = shift;
+	my $probe = shift;
 
-	return __get_itemids_by_complete_key($tld, $cfg_epp_key_ip);
+	return __get_itemids_by_complete_key($tld, $probe, $cfg_epp_key_ip);
 }
 
 # $keys_str - list of complete keys
 sub __get_itemids_by_complete_key
 {
 	my $tld = shift;
+	my $probe = shift;
 
 	my $keys_str = "'" . join("','", @_) . "'";
+
+	my $host_value = ($probe ? "$tld $probe" : "$tld %");
 
 	my $rows_ref = db_select(
 		"select h.host,i.itemid,i.key_".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
-			" and h.host like '$tld %'".
+			" and h.host like '$host_value'".
 			" and i.key_ in ($keys_str)".
 			" and i.templateid is not null");
 
@@ -1065,9 +1076,9 @@ sub __get_itemids_by_complete_key
 		my $key = $row_ref->[2];
 
 		# remove TLD from host name to get just the Probe name
-		my $probe = substr($host, $tld_length);
+		my $_probe = ($probe ? $probe : substr($host, $tld_length));
 
-		$result{$probe}->{$itemid} = $key;
+		$result{$_probe}->{$itemid} = $key;
 	}
 
 	fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
@@ -1080,14 +1091,17 @@ sub __get_itemids_by_complete_key
 sub __get_itemids_by_incomplete_key
 {
 	my $tld = shift;
+	my $probe = shift;
 
 	my $keys_cond = "(key_ like '" . join("%' or key_ like '", @_) . "%')";
+
+	my $host_value = ($probe ? "$tld $probe" : "$tld %");
 
 	my $rows_ref = db_select(
 		"select h.host,i.itemid,i.key_".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
-			" and h.host like '$tld %'".
+			" and h.host like '$host_value'".
 			" and i.templateid is not null".
 			" and $keys_cond");
 
@@ -1101,9 +1115,9 @@ sub __get_itemids_by_incomplete_key
 		my $key = $row_ref->[2];
 
 		# remove TLD from host name to get just the Probe name
-		my $probe = substr($host, $tld_length);
+		my $_probe = ($probe ? $probe : substr($host, $tld_length));
 
-		$result{$probe}->{$itemid} = $key;
+		$result{$_probe}->{$itemid} = $key;
 	}
 
 	fail("cannot find items ('", join("','", @_), "') at host ($tld *)") if (scalar(keys(%result)) == 0);
@@ -1340,6 +1354,40 @@ sub __validate_input
                 print("Error: option --from can only be used together with --period\n");
                 usage();
         }
+
+	if (opt('probe'))
+	{
+		if (not opt('dry-run'))
+		{
+			print("Error: option --probe can only be used together with --dry-run\n");
+			usage();
+		}
+
+		my $probe = getopt('probe');
+
+		my $probes_ref = get_probes();
+		my $valid = 0;
+
+		foreach my $name (keys(%$probes_ref))
+		{
+			if ($name eq $probe)
+			{
+				$valid = 1;
+				last;
+			}
+		}
+
+		if ($valid == 0)
+		{
+			print("Error: unknown probe \"$probe\"\n");
+			print("\nAvailable probes:\n");
+			foreach my $name (keys(%$probes_ref))
+			{
+				print("  $name\n");
+			}
+			exit(E_FAIL);
+		}
+        }
 }
 
 __END__
@@ -1350,7 +1398,7 @@ update-api-data.pl - save information about the incidents to a filesystem
 
 =head1 SYNOPSIS
 
-update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--period <minutes> [--from <timestamp>]|--continue] [--dry-run] [--debug] [--help]
+update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--period <minutes> [--from <timestamp>]|--continue] [--dry-run [--probe name]] [--debug] [--help]
 
 =head1 OPTIONS
 
@@ -1397,6 +1445,12 @@ TLD-service pair separately.
 Note, that continue token will not be updated if this option was specified together with --dry-run.
 
 This option cannot be used together with option --period.
+
+=item B<--probe> name
+
+Only process data from specified probe.
+
+This option can only be used for debugging purposes and must be used together with option --dry-run .
 
 =item B<--dry-run>
 
