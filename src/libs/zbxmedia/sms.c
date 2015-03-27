@@ -26,11 +26,12 @@
 
 static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 {
-	int	i = 0, wlen = 0, len, ret = SUCCEED;
+	const char	*__function_name = "write_gsm";
+	int		i, wlen, len, ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s'", __function_name, str);
 
 	len = strlen(str);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "write to GSM modem [%s]", str);
 
 	for (wlen = 0; wlen < len; wlen += i)
 	{
@@ -50,10 +51,13 @@ static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 		}
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
-static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char *expect, char *error, int max_error_len)
+static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char *expect, char *error,
+		int max_error_len)
 {
 	const char	*__function_name = "check_modem_result";
 	char		rcv[0xff];
@@ -83,9 +87,9 @@ static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char
 			*sbuf = buffer;
 		}
 	}
-	while (*sbuf < *ebuf && ret == FAIL);
+	while (*sbuf < *ebuf && FAIL == ret);
 
-	if (ret == FAIL && error)
+	if (FAIL == ret && NULL != error)
 		zbx_snprintf(error, max_error_len, "Expected [%s] received [%s]", expect, rcv);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -226,7 +230,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 		{NULL		, NULL		, 0}
 	};
 
-	zbx_sms_scenario	*step = NULL;
+	zbx_sms_scenario	*step;
 	struct termios		options, old_options;
 	int			f, ret = SUCCEED;
 
@@ -247,11 +251,9 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	memset(&options, 0, sizeof(options));
 
 	options.c_iflag = IGNCR | INLCR | ICRNL;
-
 #ifdef ONOCR
 	options.c_oflag = ONOCR;
-#endif	/* ONOCR */
-
+#endif
 	options.c_cflag = old_options.c_cflag | CRTSCTS | CS8 | CLOCAL | CREAD;
 	options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
 	options.c_cc[VMIN] = 0;
@@ -263,7 +265,21 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	{
 		if (NULL != step->message)
 		{
-			if (FAIL == (ret = write_gsm(f, step->message, error, max_error_len)))
+			if (message == step->message)
+			{
+				char	*tmp;
+
+				tmp = zbx_strdup(NULL, message);
+				zbx_remove_chars(tmp, "\r");
+
+				ret = write_gsm(f, tmp, error, max_error_len);
+
+				zbx_free(tmp);
+			}
+			else
+				ret = write_gsm(f, step->message, error, max_error_len);
+
+			if (FAIL == ret)
 				break;
 		}
 
