@@ -29,7 +29,7 @@ static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 	const char	*__function_name = "write_gsm";
 	int		i, wlen, len, ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s]", __function_name, str);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s'", __function_name, str);
 
 	len = strlen(str);
 
