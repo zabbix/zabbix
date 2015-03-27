@@ -204,7 +204,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	/*
 	 * Filter
 	 */
-	$filterForm = new CFilter();
+	$filterForm = new CFilter('web.avail_report.filter.state');
 	$filterForm->addVar('config', $availabilityReportMode);
 	$filterForm->addVar('filter_timesince', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timesince']));
 	$filterForm->addVar('filter_timetill', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timetill']));
