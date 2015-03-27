@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 23:02+0200\n"
-"PO-Revision-Date: 2015-02-18 06:15+0300\n"
+"POT-Creation-Date: 2015-03-24 14:19+0200\n"
+"PO-Revision-Date: 2015-03-23 04:29+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1424232929.0\n"
+"X-POOTLE-MTIME: 1427077783.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -5475,7 +5475,7 @@ msgstr "第1週"
 #: include/func.inc.php:1513
 msgctxt "page navigation"
 msgid "First"
-msgstr "第1週"
+msgstr "最初"
 
 #: include/views/js/configuration.sysmaps.js.php:42
 msgid "Fit to map"
@@ -8457,12 +8457,12 @@ msgstr "言語"
 
 #: include/forms.inc.php:1714 include/maintenances.inc.php:115
 msgid "Last"
-msgstr "最新"
+msgstr "最終週"
 
 #: include/func.inc.php:1553
 msgctxt "page navigation"
 msgid "Last"
-msgstr "最新"
+msgstr "最後"
 
 #: dashboard.php:439
 #, c-format
@@ -13723,7 +13723,7 @@ msgstr "ホストグループが発見されなくなったため%1$sに削除�
 
 #: include/views/configuration.hostgroups.list.php:135
 msgid "The host group is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "ホストグループが発見されなくなったため次のディスカバリルール処理時に削除されます。"
 
 #: include/html.inc.php:565
 #, c-format
@@ -13732,7 +13732,7 @@ msgstr "ホストが発見されなくなったため%1$sに削除されます�
 
 #: include/html.inc.php:560
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "ホストが発見されなくなったため次のディスカバリルール処理時に削除されます。"
 
 #: include/classes/api/services/CImage.php:433
 #, c-format
@@ -13753,7 +13753,7 @@ msgstr "アイテムが発見されなくなったため%1$sに削除されま�
 
 #: include/views/configuration.item.list.php:133
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "アイテムが発見されなくなったため次のディスカバリルール処理時に削除されます。"
 
 #: queue.php:78
 msgid "The queue is empty."
