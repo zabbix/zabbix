@@ -158,6 +158,11 @@ ul.top-nav-icons {
 
 			li {
 				float: none;
+
+				a {
+					opacity: initial;
+					width: inherit;
+				}
 			}
 		}
 	}
@@ -1590,7 +1595,8 @@ button[disabled] {
 	@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
 
 	li {
-
+		display: block;
+		
 		a {
 			display: block;
 			height: 24px;
@@ -1640,15 +1646,6 @@ button[disabled] {
 	@extend .action-menu;
 	min-width: initial;
 	border-top: none;
-
-	li {
-		float: none;
-
-		a {
-			opacity: initial;
-			width: inherit;
-		}
-	}
 }
 
 .overlay-dialogue {
