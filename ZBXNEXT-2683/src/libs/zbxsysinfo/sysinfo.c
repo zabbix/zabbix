@@ -23,6 +23,7 @@
 #include "log.h"
 #include "cfg.h"
 #include "alias.h"
+#include "zbxalgo.h"
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
@@ -371,17 +372,39 @@ static void	add_request_param(AGENT_REQUEST *request, char *pvalue)
  ******************************************************************************/
 int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 {
-	int	i, ret = FAIL;
-	char	*key = NULL, *params = NULL;
+	int			i, ret = FAIL, size;
+	char			*key = NULL, *params = NULL, *param = NULL;
+	const char		*ptr;
+	zbx_vector_str_t	params_list;
+
+	zbx_vector_str_create(&params_list);
 
 	switch (parse_command_dyn(itemkey, &key, &params))
 	{
 		case ZBX_COMMAND_WITH_PARAMS:
-			if (0 == (request->nparam = num_param(params)))
-				goto out;	/* key is badly formatted */
+			ptr = params;
+			size = strlen(ptr);
+
+			while (0 < size && NULL != (ptr = zbx_params_extract_next_parameter(ptr, &size, "[]", "[]",
+					&param)))
+			{
+				zbx_vector_str_append(&params_list, param);
+				param = NULL;
+				ptr++;
+			}
+
+			if (0 == params_list.values_num || 0 != size)
+			{
+				zbx_vector_str_clear_ext(&params_list, zbx_default_mem_free_func);
+				goto out;
+			}
+
+			request->nparam = params_list.values_num;
 			request->params = zbx_malloc(request->params, request->nparam * sizeof(char *));
-			for (i = 0; i < request->nparam; i++)
-				request->params[i] = get_param_dyn(params, i + 1);
+
+			for (i = 0; i < params_list.values_num; i++)
+				request->params[i] = params_list.values[i];
+
 			break;
 		case ZBX_COMMAND_ERROR:
 			goto out;	/* key is badly formatted */
@@ -393,6 +416,8 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 out:
 	zbx_free(params);
 	zbx_free(key);
+
+	zbx_vector_str_destroy(&params_list);
 
 	return ret;
 }

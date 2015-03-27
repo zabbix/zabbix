@@ -3337,3 +3337,605 @@ void	zbx_trim_str_list(char *list, char delimiter)
 	}
 	*out = '\0';
 }
+
+/*
+ * Parameter list parsing
+ */
+
+static const char	*params_parse_parameter(const char *params, int *size, const char *closure,
+		const char *nested_closure);
+
+static char	*params_extract_parameter(const char *params, int *size, const char *closure,
+		const char *nested_closure, int level, char *output);
+
+/******************************************************************************
+ *                                                                            *
+ * Function: params_parse_quoted_parameter                                    *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     parses quoted parameter from parameter list and returns a pointer to   *
+ *     the next character after the parsed parameter                          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     params - [IN] the parameters to parse                                  *
+ *     size   - [IN/OUT] the number of characters left to parse               *
+ *                                                                            *
+ * Return value:                                                              *
+ *     A pointer to the next character after the parsed parameter, or NULL    *
+ *     if the parsing failed (unmatched quotes).                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     The quotes inside quoted parameter can be escaped with \ character.    *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*params_parse_quoted_parameter(const char *params, int *size)
+{
+	/* skip the initial quote */
+	if (0 == --(*size))
+		return NULL;
+	params++;
+
+	while ('"' != *params)
+	{
+		if ('\\' == *params)
+		{
+			/* skip escaped character */
+			params++;
+			if (0 == --(*size))
+				return NULL;
+		}
+
+		if (0 == --(*size))
+			return NULL;
+		params++;
+	}
+
+	/* skip the ending quote and whitespace after it */
+	do
+	{
+		params++;
+		(*size)--;
+	}
+	while (' ' == *params && 0 < *size);
+
+	return params;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: params_extract_quoted_parameter                                  *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     extracts quoted paramter from the specified string                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     params - [IN] the parameter to parse                                   *
+ *     size   - [IN/OUT] the number of characters left to parse               *
+ *     level  - [IN] nesting level when parsing nested parameters             *
+ *     output - [OUT] the extracted parameter                                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *     A pointer to the next character in output buffer or NULL if the        *
+ *     the parsing failed (unmatched quotes).                                 *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     This function is used by params_extract_parameter() function and       *
+ *     should not be used directly.                                           *
+ *                                                                            *
+ *     This function assumes that output buffer has the required size and.    *
+ *     does not any output size checks. So the output buffer size must be     *
+ *     at least the specified size + 1 for terminating zero character.        *
+ *                                                                            *
+ *     When parsing nested parameter the quotes are stripped from first (0)   *
+ *     level output parameter. For lower nesting levels the quotes are kept.  *
+ *     Also the whitespace before and after quoted character is stripped as   *
+ *     well.                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static char	*params_extract_quoted_parameter(const char *params, int *size, int level, char *output)
+{
+	/* skip the initial quote */
+	params++;
+	(*size)--;
+
+	/* add quote to output parameter on lower nesting levels */
+	if (0 < level)
+		*output++ = '"';
+
+	while ('"' != *params)
+	{
+		if (0 == *size)
+			return NULL;
+
+		if ('\\' == *params)
+		{
+			/* unescape quote */
+			if (1 < *size && '"' == params[1])
+			{
+				/* on lower nesting levels the quotes stay escaped */
+				if (0 < level)
+					*output++ = *params;
+
+				params++;
+				(*size)--;
+			}
+		}
+
+		*output++ = *params++;
+		(*size)--;
+	}
+
+	/* skip the trailing quote and the following whitespace */
+	do
+	{
+		params++;
+		(*size)--;
+	}
+	while (' ' == *params && 0 < *size);
+
+	/* add quote to output parameter on lower nesting levels */
+	if (0 < level)
+		*output++ = '"';
+
+	return output;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: params_parse_nested_parameter                                    *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     parses nested (array) parameter from parameter list and returns        *
+ *     a pointer to the next character after the parsed parameter             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     params  - [IN] the paramters to parse                                  *
+ *     size    - [IN/OUT] the number of characters left to parse              *
+ *     closure - [IN] an array containing left and right closure characters   *
+ *                    for the nested (array) parameters                       *
+ *                                                                            *
+ * Return value:                                                              *
+ *     A pointer to the next character after the parsed parameter, or NULL    *
+ *     if the parsing failed.                                                 *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     The parameter delimiter is ',' .                                       *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*params_parse_nested_parameter(const char *params, int *size, const char *closure)
+{
+	/* skip the opening character */
+	if (0 == --(*size))
+		return NULL;
+	params++;
+
+	/* iterate through nested (array) parameter parameters */
+	while (NULL != (params = params_parse_parameter(params, size, closure, closure)))
+	{
+		if (closure[1] == *params)
+		{
+			/* The next character is closing character - finish parsing. */
+			/* Skip the closing character with the following whitespace. */
+			do
+			{
+				params++;
+				(*size)--;
+			}
+			while (' ' == *params && 0 < (*size));
+
+			return params;
+		}
+		else if (',' == *params)
+		{
+			/* the next character is ',' = continue to iterate through parameters */
+			if (0 == --(*size))
+				return NULL;
+			params++;
+		}
+		else
+			return NULL;
+	}
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: params_extract_nested_parameter                                  *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     extracts nested (array) parameter from the specified stirng            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     params  - [IN] the paramters to parse                                  *
+ *     size    - [IN/OUT] the number of characters left to parse              *
+ *     closure - [IN] an array containing left and right closure characters   *
+ *                    for the nested (array) parameters                       *
+ *     level   - [IN] nesting level when parsing nested parameters            *
+ *     output  - [OUT] the extracted parameter                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *     A pointer to the next character in output buffer or NULL if the        *
+ *     the parsing failed.                                                    *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     This function is used by params_extract_parameter() function and       *
+ *     should not be used directly.                                           *
+ *                                                                            *
+ *     The parameter delimiter is ',' .                                       *
+ *                                                                            *
+ *     This function assumes that output buffer has the required size and.    *
+ *     does not any output size checks. So the output buffer size must be     *
+ *     at least the specified size + 1 for terminating zero character.        *
+ *                                                                            *
+ *     When parsing nested (array) parameter the opening/closing characters   *
+ *     are stripped from first (0) level output parameter. For lower nesting  *
+ *     levels the opening/closing characters are kept intact. Also the        *
+ *     whitespace before and after quoted character is stripped as well.      *
+ *                                                                            *
+ ******************************************************************************/
+static  char	*params_extract_nested_parameter(const char *params, int *size,  const char *closure, int level,
+		char *output)
+{
+	int	last_size;;
+
+	/* skip the opening character and the following whitespace */
+	do
+	{
+		params++;
+		(*size)--;
+	}
+	while (' ' == *params && 0 < *size);
+
+	/* add opening character on lower nesting levels */
+	if (0 < level)
+		*output++ = closure[0];
+
+	while (0 != *size)
+	{
+		/* extract the next parameter of the nested (array) parameter */
+		last_size = *size;
+		if (NULL == (output = params_extract_parameter(params, size, closure, closure, level + 1, output)))
+			return NULL;
+
+		/* shift params to point to the next character after the parsed parameter */
+		params += last_size - *size;
+
+		if (0 == *size)
+			return NULL;
+
+		if (closure[1] == *params)
+		{
+			/* The next character is closing character - finish parsing. */
+			/* Skip the closing character with the following whitespace. */
+			do
+			{
+				params++;
+				(*size)--;
+			}
+			while (' ' == *params && 0 < *size);
+
+			/* add closing character on lower nesting levels */
+			if (0 < level)
+				*output++ = closure[1];
+
+			return output;
+		}
+
+		/* The next character after parsed parameter of a nested (array) parameter */
+		/* must be either closing character (checked earlier) or delimiter.        */
+		if (',' != *params)
+			return NULL;
+
+		/* continue to iterate through parameters */
+		*output++ = *params++;
+		(*size)--;
+
+		last_size = *size;
+	}
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: params_parse_unquoted_parameter                                  *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     parses unquoted parameter from parameter list and returns a pointer to *
+ *     the next character after the parsed parameter                          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     params         - [IN] the parameters to parse                          *
+ *     size           - [IN/OUT] the number of characters left to parse       *
+ *     closure        - [IN] an array containing left and right closure       *
+ *                           characters for the whole parameter string or     *
+ *                           NULL                                             *
+ *     nested_closure - [IN] an array containing left and right closure       *
+ *                           characters for the nested (array) parameters     *
+ *                                                                            *
+ * Return value:                                                              *
+ *     A pointer to the next character after the parsed parameter, or NULL    *
+ *     if the parsing failed.                                                 *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     The parameter delimiter is ',' .                                       *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*params_parse_unquoted_parameter(const char *params, int *size, const char *closure,
+		const char *nested_closure)
+{
+	char	closure_right;
+
+	/* if nested (array) character closure is defined, check if the parameter is nested (array) parameter */
+	if (NULL != nested_closure && nested_closure[0] == *params)
+		return params_parse_nested_parameter(params, size, nested_closure);
+
+	closure_right = (NULL == closure ? '\0' : closure[1]);
+
+	/* parse simple unquoted parameter */
+	while (0 < *size && ',' != *params && closure_right != *params)
+	{
+		params++;
+		(*size)--;
+	}
+
+	return params;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: params_extract_unquoted_parameter                                *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     extracts unquoted parameter from the specified stirng                  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     params         - [IN] the parameters to parse                          *
+ *     size           - [IN/OUT] the number of characters left to parse       *
+ *     closure        - [IN] an array containing left and right closure       *
+ *                           characters for the whole parameter string or     *
+ *                           NULL                                             *
+ *     nested_closure - [IN] an array containing left and right closure       *
+ *                           characters for the nested (array) parameters     *
+ *     level          - [IN] nesting level when parsing nested parameters     *
+ *     output         - [OUT] the extracted parameter                         *
+ *                                                                            *
+ * Return value:                                                              *
+ *     A pointer to the next character in output buffer or NULL if the        *
+ *     the parsing failed.                                                    *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     This function is used by params_extract_parameter() function and       *
+ *     should not be used directly.                                           *
+ *                                                                            *
+ *     The parameter delimiter is ',' .                                       *
+ *                                                                            *
+ *     This function assumes that output buffer has the required size and.    *
+ *     does not any output size checks. So the output buffer size must be     *
+ *     at least the specified size + 1 for terminating zero character.        *
+ *                                                                            *
+ ******************************************************************************/
+static char	*params_extract_unquoted_parameter(const char *params, int *size, const char *closure,
+		const char *nested_closure, int level, char *output)
+{
+	char	closure_right;
+
+	/* if nested (array) character closure is defined, check if the parameter is nested (array) parameter */
+	if (NULL != nested_closure && nested_closure[0] == *params)
+		return params_extract_nested_parameter(params, size, nested_closure, level, output);
+
+	closure_right = (NULL == closure ? '\0' : closure[1]);
+
+	/* extract simple unquoted parameter */
+	while (0 < *size && ',' != *params && closure_right != *params)
+	{
+		*output++ = *params++;
+		(*size)--;
+	}
+
+	return output;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: params_parse_parameter                                           *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     parses parameter from parameter list and returns a pointer to the next *
+ *     character after the parsed parameter                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     params         - [IN] the parameters to parse                          *
+ *     size           - [IN/OUT] the number of characters left to parse       *
+ *     closure        - [IN] an array containing left and right closure       *
+ *                           characters for the whole parameter string or     *
+ *                           NULL                                             *
+ *     nested_closure - [IN] an array containing left and right closure       *
+ *                           characters for the nested (array) parameters     *
+ *                                                                            *
+ * Return value:                                                              *
+ *     A pointer to the next character after the parsed parameter, or NULL    *
+ *     if the parsing failed.                                                 *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     The parameter delimiter is ',' .                                       *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*params_parse_parameter(const char *params, int *size, const char *closure,
+		const char *nested_closure)
+{
+	const char	*next;
+
+	/* skip the initial whitespace */
+	while (' ' == *params && 0 < *size)
+	{
+		params++;
+		(*size)--;
+	}
+
+	/* check for the empty last parameter */
+	if (0 == *size)
+		return params;
+
+	if ('"' == *params)
+		next = params_parse_quoted_parameter(params, size);
+	else
+		next = params_parse_unquoted_parameter(params, size, closure, nested_closure);
+
+	/* if the parsing failed or we are at end of the parameter list - return the result */
+	if (NULL == next || 0 == *size)
+		return next;
+
+	/* a parameter should end with ',' or (if specifed) closing character */
+	if (',' == *next || (NULL != closure && closure[1] == *next))
+		return next;
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: params_extract_parameter                                         *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     extracts parameter from the specified stirng                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     params         - [IN] the parameters to parse                          *
+ *     size           - [IN/OUT] the number of characters left to parse       *
+ *     closure        - [IN] an array containing left and right closure       *
+ *                           characters for the whole parameter string or     *
+ *                           NULL                                             *
+ *     nested_closure - [IN] an array containing left and right closure       *
+ *                           characters for the nested (array) parameters     *
+ *     level          - [IN] nesting level when parsing nested parameters     *
+ *     output         - [OUT] the extracted parameter                         *
+ *                                                                            *
+ * Return value:                                                              *
+ *     A pointer to the next character in output buffer or NULL if the        *
+ *     the parsing failed.                                                    *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     This function is used by params_extract_parameter() function and       *
+ *     should not be used directly.                                           *
+ *                                                                            *
+ *     The parameter delimiter is ',' .                                       *
+ *                                                                            *
+ *     This function assumes that output buffer has the required size and.    *
+ *     does not any output size checks. So the output buffer size must be     *
+ *     at least the specified size + 1 for terminating zero character.        *
+ *                                                                            *
+ ******************************************************************************/
+static char	*params_extract_parameter(const char *params, int *size, const char *closure,
+		const char *nested_closure, int level, char *output)
+{
+	/* skip the initial whitespace */
+	while (' ' == *params && 0 < *size)
+	{
+		params++;
+		(*size)--;
+	}
+
+	/* extract he parameter */
+	if ('"' == *params)
+		return params_extract_quoted_parameter(params, size, level, output);
+	else
+		return params_extract_unquoted_parameter(params, size, closure, nested_closure, level, output);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_params_parse_next_parameter                                  *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     parses the next parameter and returns a pointer to the next character  *
+ *     after the parsed parameter                                             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     params         - [IN] the parameters to parse                          *
+ *     size           - [IN/OUT]  the number of characters left to parse      *
+ *     closure        - [IN] an array containing left and right closure       *
+ *                           characters for the whole parameter string or     *
+ *                           NULL                                             *
+ *     nested_closure - [IN] an array containing left and right closure       *
+ *                           characters for the nested (array) parameters     *
+ *                           or NULL                                          *
+ *                                                                            *
+ * Return value:                                                              *
+ *     A pointer to the next character after the parsed parameter, or NULL    *
+ *     if the parsing failed.                                                 *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     The parameter delimiter is ',' .                                       *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_params_parse_next_parameter(const char *params, int *size, const char *closure,
+		const char *nested_closure)
+{
+	const char	*next;
+
+	if (NULL == (next = params_parse_parameter(params, size, closure, nested_closure)))
+		return NULL;
+
+	if (0 == *size || ',' == *next)
+		return next;
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_params_extract_next_parameter                                *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     extracts the next parameter and returns a pointer to the next          *
+ *     character after the parsed parameter                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     params         - [IN] the parameters to parse                          *
+ *     size           - [IN/OUT] the number of characters left to parse       *
+ *     closure        - [IN] an array containing left and right closure       *
+ *                           characters for the whole parameter string or     *
+ *                           NULL                                             *
+ *     nested_closure - [IN] an array containing left and right closure       *
+ *                           characters for the nested (array) parameters     *
+ *                           or NULL                                          *
+ *     output         - [OUT] the extracted parameter                         *
+ *                                                                            *
+ * Return value:                                                              *
+ *     A pointer to the next character after the parsed parameter, or NULL    *
+ *     if the parsing failed.                                                 *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     The parameter delimiter is ',' .                                       *
+ *                                                                            *
+ *     This function allocates memory to store output parameter (reallocating *
+ *     if non null pointer was given), which must be freed by the caller.     *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_params_extract_next_parameter(const char *params, int *size, const char *closure,
+		const char *nested_closure, char **output)
+{
+	const char	*next;
+	char		*end;
+	int		parse_size = *size;
+
+	/* first parse the next parameter to find it's maximum size */
+	if (NULL == (next = zbx_params_parse_next_parameter(params, &parse_size, closure, nested_closure)))
+		return NULL;
+
+	*output = zbx_realloc(*output, next - params + 1);
+
+	/* extract the next parameter */
+	if (NULL != (end = params_extract_parameter(params, size, closure, nested_closure, 0, *output)))
+	{
+		*end = '\0';
+		return next;
+	}
+
+	zbx_free(*output);
+
+	return NULL;
+}
+

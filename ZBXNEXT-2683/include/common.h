@@ -812,6 +812,12 @@ int	get_param(const char *param, int num, char *buf, size_t max_len);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
 
+const char	*zbx_params_extract_next_parameter(const char *params, int *size, const char *closure,
+		const char *nested_closure, char **output);
+const char	*zbx_params_parse_next_parameter(const char *params, int *size, const char *closure,
+		const char *nested_closure);
+
+
 /******************************************************************************
  *                                                                            *
  * Purpose: replaces an item key, SNMP OID or their parameters                *
