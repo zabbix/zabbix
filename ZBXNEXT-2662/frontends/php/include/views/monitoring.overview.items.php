@@ -79,7 +79,7 @@ $filter->addColumn($column);
 $overviewWidget->addItem($filter);
 
 // data table
-if ($this->data['config']['dropdown_first_entry']) {
+if ($data['pageFilter']->groupsSelected) {
 	$dataTable = getItemsDataOverview(array_keys($this->data['pageFilter']->hosts), $this->data['applicationIds'],
 		$this->data['view_style']
 	);

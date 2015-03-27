@@ -99,7 +99,7 @@ $filterForm = $filterFormView->render();
 $overviewWidget->addItem($filterForm);
 
 // data table
-if ($this->data['config']['dropdown_first_entry']) {
+if ($data['pageFilter']->groupsSelected) {
 	global $page;
 
 	$dataTable = getTriggersOverview($this->data['hosts'], $this->data['triggers'], $page['file'],
