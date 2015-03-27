@@ -261,7 +261,7 @@ $dashboardRow = new CDiv(
 	),
 	'row'
 );
-$dashboardTable = new CDiv($dashboardRow, 'table');
+$dashboardTable = new CDiv($dashboardRow, 'table widget-placeholder');
 
 $dashboardWidget->addItem($dashboardTable);
 $dashboardWidget->show();
