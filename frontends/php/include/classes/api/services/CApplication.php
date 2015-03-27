@@ -289,15 +289,17 @@ class CApplication extends CApiService {
 				}
 			}
 
-			// check for "templateid", because it is not allowed
-			if (array_key_exists('templateid', $application)) {
-				if ($update) {
-					$error = _s('Cannot update "templateid" for application "%1$s".', $application['name']);
-				}
-				else {
-					$error = _s('Cannot set "templateid" for application "%1$s".', $application['name']);
-				}
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			if ($update) {
+				$this->checkNoParameters(
+					$application, array('templateid', 'flags'), _('Cannot update "%1$s" for application "%2$s".'),
+					$application['name']
+				);
+			}
+			elseif ($create) {
+				$this->checkNoParameters(
+					$application, array('templateid', 'flags'), _('Cannot set "%1$s" for application "%2$s".'),
+					$application['name']
+				);
 			}
 
 			// check on operating with templated applications
@@ -343,6 +345,11 @@ class CApplication extends CApiService {
 	public function create(array $applications) {
 		$applications = zbx_toArray($applications);
 		$this->checkInput($applications, __FUNCTION__);
+
+		foreach ($applications as &$application) {
+			$application['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+		}
+		unset($application);
 
 		$appManager = new CApplicationManager();
 		$applications = $appManager->create($applications);

@@ -370,6 +370,20 @@ foreach ($this->data['db_applications'] as $application) {
 }
 $itemFormList->addRow(_('Applications'), $applicationComboBox);
 
+// Append application prototypes to form list.
+$itemFormList->addRow(_('New application prototype'),
+	new CTextBox('new_application_prototype', $data['new_application_prototype'], ZBX_TEXTBOX_STANDARD_SIZE),
+	false, null, 'new'
+);
+$application_prototype_listbox = new CListBox('application_prototypes[]', $data['application_prototypes'], 6);
+$application_prototype_listbox->addItem(0, '-'._('None').'-');
+foreach ($data['db_application_prototypes'] as $application_prototype) {
+	// Application prototype list consists of unique names in one discovery rule.
+	$name = CHtml::encode($application_prototype['name']);
+	$application_prototype_listbox->addItem($name, $name);
+}
+$itemFormList->addRow(_('Application prototypes'), $application_prototype_listbox);
+
 // append description to form list
 $description = new CTextArea('description', $this->data['description']);
 $description->addStyle('margin-top: 5px;');

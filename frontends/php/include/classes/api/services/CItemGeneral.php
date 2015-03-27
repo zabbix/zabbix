@@ -136,7 +136,7 @@ abstract class CItemGeneral extends CApiService {
 				'hostids' => zbx_objectValues($dbItems, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
-				'selectApplications' => array('applicationid'),
+				'selectApplications' => array('applicationid', 'flags'),
 				'preservekeys' => true
 			));
 		}
@@ -156,7 +156,7 @@ abstract class CItemGeneral extends CApiService {
 				'hostids' => zbx_objectValues($items, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
-				'selectApplications' => array('applicationid'),
+				'selectApplications' => array('applicationid', 'flags'),
 				'preservekeys' => true
 			));
 		}
@@ -190,7 +190,7 @@ abstract class CItemGeneral extends CApiService {
 				$this->checkPartialValidator($item, $updateDiscoveredValidator, $dbItem);
 			}
 
-			$items = $this->extendObjects($this->tableName(), $items, array('name'));
+			$items = $this->extendObjects($this->tableName(), $items, array('name', 'flags'));
 		}
 
 		foreach ($items as $inum => &$item) {
@@ -411,10 +411,22 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
-			// check that the given applications belong to the item's host
 			if (isset($item['applications']) && $item['applications']) {
+				/*
+				 * 'flags' is available for update and item prototypes.
+				 * Don't allow discovered or any other application types for item prototypes in 'applications' option.
+				 */
+				if (array_key_exists('flags', $fullItem) && $fullItem['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					foreach ($host['applications'] as $num => $application) {
+						if ($application['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
+							unset($host['applications'][$num]);
+						}
+					}
+				}
+
+				// check that the given applications belong to the item's host
 				$dbApplicationIds = zbx_objectValues($host['applications'], 'applicationid');
-				foreach($item['applications'] as $appId) {
+				foreach ($item['applications'] as $appId) {
 					if (!in_array($appId, $dbApplicationIds)) {
 						$error = _s('Application with ID "%1$s" is not available on "%2$s".', $appId, $host['name']);
 						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
