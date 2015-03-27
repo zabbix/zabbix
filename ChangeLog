@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese and Japanese translations; th
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
+........S. [ZBX-3507] fixed SMS sending with Huawei GSM modems (asaveljevs)
 ...G...PS. [ZBX-9251] added missing socket closing to avoid large number of opened sockets (igors)
 .......PS. [ZBX-7446] fixed vmware.hv.status item always returning 0 (gray) status (wiper)
 ...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
@@ -1243,6 +1244,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-3507] fixed SMS sending with Huawei GSM modems (asaveljevs)
 ...G...PS. [ZBX-9251] added missing socket closing to avoid large number of opened sockets (igors)
 ...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
 ..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
