@@ -8,7 +8,7 @@ Bug fixes:
 ........S. [ZBX-9394] fixed SMS sending with Teltonika modems (asaveljevs)
 ........S. [ZBX-3507] fixed SMS sending with Huawei GSM modems (asaveljevs)
 .......PS. [ZBX-7446] fixed vmware.hv.status item always returning 0 (gray) status (wiper)
-A......... [ZBX-9346] fixed importing trigger dependencies that contain older expression format (Ivo)
+A......... [ZBX-9346] fixed importing trigger dependencies and maps that contain the triggers expressions with old style operators (Ivo)
 ...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
 A.F....... [ZBX-9365] fixed array_combine() function giving a warning message for PHP versions < 5.4.0 (Ivo)
 ..F....... [ZBX-9395] fixed overview triggers and data page to display results when the option to select first dropdown entry is set to "None" and a group is selected (Ivo)
