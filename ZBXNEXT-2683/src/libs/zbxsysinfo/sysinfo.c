@@ -55,18 +55,18 @@ static ZBX_METRIC	*commands = NULL;
  *                                                                            *
  * Function: parse_command_dyn                                                *
  *                                                                            *
- * Purpose: parses item key and splits it into command and parameters         *
+ * Purpose: parses item key, extracts the key value and locates parameter     *
+ *          starting position and size                                        *
  *                                                                            *
  * Return value: ZBX_COMMAND_ERROR - error                                    *
  *               ZBX_COMMAND_WITHOUT_PARAMS - command without parameters      *
  *               ZBX_COMMAND_WITH_PARAMS - command with parameters            *
  *                                                                            *
  ******************************************************************************/
-static int	parse_command_dyn(const char *command, char **cmd, char **param)
+static int	parse_command_dyn(const char *command, char **cmd, const char **param, int *size)
 {
 	const char	*pl, *pr;
-	size_t		cmd_alloc = 0, param_alloc = 0,
-			cmd_offset = 0, param_offset = 0;
+	size_t		cmd_alloc = 0, cmd_offset = 0;
 
 	for (pl = command; SUCCEED == is_key_char(*pl); pl++)
 		;
@@ -78,7 +78,8 @@ static int	parse_command_dyn(const char *command, char **cmd, char **param)
 
 	if ('\0' == *pl)	/* no parameters specified */
 	{
-		zbx_strncpy_alloc(param, &param_alloc, &param_offset, "", 0);
+		*param = pl;
+		size = 0;
 		return ZBX_COMMAND_WITHOUT_PARAMS;
 	}
 
@@ -91,7 +92,8 @@ static int	parse_command_dyn(const char *command, char **cmd, char **param)
 	if (']' != *--pr)
 		return ZBX_COMMAND_ERROR;
 
-	zbx_strncpy_alloc(param, &param_alloc, &param_offset, pl, pr - pl);
+	*param = pl;
+	*size = pr - pl;
 
 	return ZBX_COMMAND_WITH_PARAMS;
 }
@@ -373,27 +375,31 @@ static void	add_request_param(AGENT_REQUEST *request, char *pvalue)
 int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 {
 	int			i, ret = FAIL, size;
-	char			*key = NULL, *params = NULL, *param = NULL;
-	const char		*ptr;
+	char			*key = NULL, *param = NULL;
+	const char		*params;
 	zbx_vector_str_t	params_list;
 
 	zbx_vector_str_create(&params_list);
 
-	switch (parse_command_dyn(itemkey, &key, &params))
+	switch (parse_command_dyn(itemkey, &key, &params, &size))
 	{
 		case ZBX_COMMAND_WITH_PARAMS:
-			ptr = params;
-			size = strlen(ptr);
 
-			while (0 < size && NULL != (ptr = zbx_params_extract_next_parameter(ptr, &size, "[]", "[]",
-					&param)))
+			while (NULL != (params = zbx_params_extract_next_parameter(params, &size, "[]", "[]", &param)))
 			{
 				zbx_vector_str_append(&params_list, param);
 				param = NULL;
-				ptr++;
+
+				if (0 == size)
+					break;
+
+				/* skip the delimiter character */
+				params++;
+				size--;
 			}
 
-			if (0 == params_list.values_num || 0 != size)
+			/* after successful parse there should be 0 characters left to parse */
+			if (0 != size)
 			{
 				zbx_vector_str_clear_ext(&params_list, zbx_default_mem_free_func);
 				goto out;
@@ -410,11 +416,11 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 			goto out;	/* key is badly formatted */
 	}
 
-	request->key = zbx_strdup(NULL, key);
+	request->key = key;
+	key = NULL;
 
 	ret = SUCCEED;
 out:
-	zbx_free(params);
 	zbx_free(key);
 
 	zbx_vector_str_destroy(&params_list);
