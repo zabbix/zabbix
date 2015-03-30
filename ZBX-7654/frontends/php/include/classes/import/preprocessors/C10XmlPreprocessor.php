@@ -31,7 +31,7 @@ class C10XmlPreprocessor {
 	 */
 	public function transform(array $data) {
 		$pathes = array(
-			array('^zabbix_export$', '^(hosts|dependencies|sysmaps|screens)$'),
+			array('^zabbix_export$', '^(hosts|dependencies|sysmaps|screens|images)$'),
 			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^(groups|triggers|items|templates|graphs|macros)$'),
 			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^items$', '^item[0-9]*', '^applications$'),
 			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^graphs$', '^graph[0-9]*', '^graph_elements$'),

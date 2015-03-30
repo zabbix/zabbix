@@ -374,14 +374,62 @@ class C20XmlValidator {
 	}
 
 	/**
-	 * Images validation.
+	 * Main images validation.
 	 *
-	 * @param array $images	import data
+	 * @param array  $images	images data
+	 * @param string $path		XML path
 	 *
-	 * @throws Exception	if structure or values is invalid
+	 * @throws Exception		if structure is invalid
 	 */
-	protected function validateImages(array $images) {
-		
+	protected function validateImages(array $images, $path) {
+		if (!$this->arrayValidator->validate('image', $images)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/image('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$imageNumber = 1;
+		foreach ($images as $key => $image) {
+			$subpath = $path.'/image('.$imageNumber++.')';
+
+			$validator = new CNewValidator($images, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			$this->validateImage($image, $subpath);
+		}
+	}
+
+	/**
+	 * Image validation.
+	 *
+	 * @param array  $image		image data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateImage(array $image, $path) {
+		$validationRules = array(
+			'name' =>			'required|string',
+			'imagetype' =>		'required|string',
+			'encodedImage' =>	'required|string'
+		);
+
+		$validator = new CNewValidator($image, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($image, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
 	}
 
 	/**
