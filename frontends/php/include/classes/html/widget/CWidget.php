@@ -21,12 +21,10 @@
 
 class CWidget {
 
-	public $flicker_state;
 	private $css_class;
 	private $title = null;
 	private $controls = null;
 	private $headers;
-	private $flicker = array();
 
 	/**
 	 * The contents of the body of the widget.
@@ -55,7 +53,6 @@ class CWidget {
 			$bodyId = 'widget_'.(int)($sec % 10).(int)($usec * 1000);
 		}
 		$this->bodyId = $bodyId;
-		$this->flicker_state = 1; // 0 - closed, 1 - opened
 		$this->css_class = 'header_wide';
 		$this->setRootClass($rootClass);
 	}
@@ -82,14 +79,6 @@ class CWidget {
 		$this->headers[] = array('left' => $left, 'right' => $right);
 	}
 
-	public function addFlicker($items = null, $flickerState = false) {
-		if (!is_null($items)) {
-			$this->flicker[] = $items;
-		}
-
-		$this->flicker_state = $flickerState;
-	}
-
 	public function addItem($items = null) {
 		if (!is_null($items)) {
 			$this->body[] = $items;
@@ -104,53 +93,7 @@ class CWidget {
 		if (!empty($this->headers)) {
 			$widget[] = $this->createHeader();
 		}
-		if (!empty($this->flicker)) {
-			$flicker_domid = 'flicker_'.$this->bodyId;
-			$flicker_tab = new CTable();
-			$flicker_tab->setAttribute('width', '100%');
-			$flicker_tab->setCellPadding(0);
-			$flicker_tab->setCellSpacing(0);
 
-			$div = new CDiv($this->flicker, null, $flicker_domid);
-			if (!$this->flicker_state) {
-				$div->setAttribute('style', 'display: none;');
-			}
-
-			$icon_l = new CDiv(SPACE.SPACE, ($this->flicker_state ? 'dbl_arrow_up' : 'dbl_arrow_down'), 'flicker_icon_l');
-			$icon_l->setAttribute('title', _('Maximize').'/'._('Minimize'));
-
-			$icon_r = new CDiv(SPACE.SPACE, ($this->flicker_state ? 'dbl_arrow_up' : 'dbl_arrow_down'), 'flicker_icon_r');
-			$icon_r->setAttribute('title', _('Maximize').'/'._('Minimize'));
-
-			$icons_row = new CTable(null, 'textwhite');
-
-			$flickerTitleWhenVisible = _('Hide filter');
-			$flickerTitleWhenHidden = _('Show filter');
-
-			$flickerTitle = $this->flicker_state ? $flickerTitleWhenVisible : $flickerTitleWhenHidden;
-
-			$icons_row->addRow(array($icon_l, new CSpan(SPACE.$flickerTitle.SPACE, null, 'flicker_title'), $icon_r));
-
-			$thin_tab = $this->createFlicker($icons_row);
-			$thin_tab->attr('id', 'filter_icon');
-			$thin_tab->addAction('onclick', "javascript: changeFlickerState(".
-				"'".$flicker_domid."', ".
-				CJs::encodeJson($flickerTitleWhenVisible).", ".
-				CJs::encodeJson($flickerTitleWhenHidden).
-			");");
-
-			$flicker_tab->addRow($thin_tab, 'textcolorstyles pointer');
-			$flicker_tab->addRow($div);
-
-			$widget[] = new CDiv($flicker_tab, 'filter-container');
-		}
-/*
-		$div = new CDiv($this->body, 'w');
-		$div->setAttribute('id', $this->bodyId);
-
-		$widget[] = $div;
-
-		return new CDiv($widget, $this->getRootClass());*/
 		return array($widget, $this->body);
 	}
 
@@ -208,23 +151,6 @@ class CWidget {
 		$td_r = new CCol($col2, 'header_r right');
 		$row = array(new CCol($col1, 'header_l left'), $td_r);
 		return $row;
-	}
-
-	private function createFlicker($col1, $col2 = null) {
-		$table = new CTable(null, 'textwhite maxwidth middle flicker');
-		$table->setCellSpacing(0);
-		$table->setCellPadding(1);
-		if (!is_null($col2)) {
-			$td_r = new CCol($col2, 'flicker_r');
-			$td_r->setAttribute('align','right');
-			$table->addRow(array(new CCol($col1,'flicker_l'), $td_r));
-		}
-		else {
-			$td_c = new CCol($col1, 'flicker_c');
-			$td_c->setAttribute('align', 'center');
-			$table->addRow($td_c);
-		}
-		return $table;
 	}
 
 	public function setRootClass($rootClass) {
