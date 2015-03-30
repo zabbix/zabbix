@@ -430,7 +430,7 @@ foreach (@$tlds_ref)
 
 							$tr_ref->{'probes'}->{$probe}->{'status'} = 'No result' unless (exists($tr_ref->{'probes'}->{$probe}->{'status'}));
 
-							$tr_ref->{'probes'}->{$probe}->{'details'}->{$ns}->{$clock} = {'rtt' => get_detailed_result($cfg_dns_valuemaps, $endvalues_ref->{$clock}), 'ip' => $ip};
+							push(@{$tr_ref->{'probes'}->{$probe}->{'details'}->{$ns}}, {'clock' => $clock, 'rtt' => get_detailed_result($cfg_dns_valuemaps, $endvalues_ref->{$clock}), 'ip' => $ip});
 						}
 					}
 				}
