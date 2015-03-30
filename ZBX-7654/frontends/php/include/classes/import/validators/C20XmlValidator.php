@@ -363,14 +363,97 @@ class C20XmlValidator {
 	}
 
 	/**
-	 * Screens validation.
+	 * Main screen validation.
 	 *
-	 * @param array $screens	import data
+	 * @param array  $screens	import data
+	 * @param string $path		XML path
 	 *
-	 * @throws Exception	if structure or values is invalid
+	 * @throws Exception		if structure is invalid
 	 */
-	protected function validateScreens(array $screens) {
-		
+	private function validateScreens(array $screens, $path) {
+		if (!$this->arrayValidator->validate('screen', $screens)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/screen('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$screenNumber = 1;
+		foreach ($screens as $screen) {
+			$subpath = $path.'/screen('.$screenNumber++.')';
+
+			$validationRules = array(
+				'name' =>			'required|string',
+				'hsize' =>			'required|string',
+				'vsize' =>			'required|string',
+				'screen_items' =>	'array'
+			);
+
+			$validator = new CNewValidator($screen, $validationRules);
+
+			if ($validator->isError()) {
+				$errors = $validator->getAllErrors();
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $subpath, $errors[0]));
+			}
+
+			// unexpected tag validation
+			$arrayDiff = array_diff_key($screen, $validator->getValidInput());
+			if ($arrayDiff) {
+				$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, $error));
+			}
+
+			// child elements validation
+			if (array_key_exists('screen_items', $screen)) {
+				$this->validateScreenItems($screen['screen_items'], $subpath.'/screenitems');
+			}
+		}
+	}
+
+	/**
+	 * Screen items validation.
+	 *
+	 * @param array  $screenitems	screenitems data
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception			if structure is invalid
+	 */
+	protected function validateScreenItems(array $screenitems, $path) {
+		if (!$this->arrayValidator->validate('screen_item', $screenitems)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/screenitem('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$screenitemNumber = 1;
+		foreach ($screenitems as $screenitem) {
+			$subpath = $path.'/screenitem('.$screenitemNumber++.')';
+
+			$validationRules = array(
+				'resourcetype' =>	'required|string',
+				'resource' =>		'required',
+				'width' =>			'required|string',
+				'height' =>			'required|string',
+				'x' =>				'required|string',
+				'y' =>				'required|string',
+				'colspan' =>		'required|string',
+				'rowspan' =>		'required|string',
+				'elements' =>		'required|string',
+				'valign' =>			'required|string',
+				'halign' =>			'required|string',
+				'style' =>			'required|string',
+				'dynamic' =>		'required|string',
+				'url' =>			'string',
+				'application' =>	'string',
+				'max_columns' =>	'string'
+			);
+
+			$validator = new CNewValidator($screenitem, $validationRules);
+
+			if ($validator->isError()) {
+				$errors = $validator->getAllErrors();
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $subpath, $errors[0]));
+			}
+		}
 	}
 
 	/**
