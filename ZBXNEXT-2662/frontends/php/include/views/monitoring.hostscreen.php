@@ -20,10 +20,11 @@
 
 
 $screenWidget = new CWidget();
-$screenWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.hostscreen.filter.state', 1));
 
-$form = new CForm('get');
+$form = new CFilter('web.hostscreen.filter.state');
 $form->addVar('fullscreen', $this->data['fullscreen']);
+$form->addNavigator();
+
 $screenWidget->addItem($form);
 
 if (empty($this->data['screen']) || empty($this->data['host'])) {
@@ -37,9 +38,9 @@ if (empty($this->data['screen']) || empty($this->data['host'])) {
 	));
 }
 else {
-	$screenWidget->setTitle(_('Screens'));
-	$screenWidget->setControls(array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
-	$screenWidget->addItem(BR());
+	$screenWidget->setTitle(array($this->data['screen']['name'], SPACE, _('on'), SPACE, new CSpan($this->data['host']['name'], ZBX_STYLE_ORANGE)));
+
+	$controls = new CList();
 
 	// host screen list
 	if (!empty($this->data['screens'])) {
@@ -52,7 +53,9 @@ else {
 			$screenComboBox->addItem('host_screen.php?hostid='.$this->data['hostid'].'&screenid='.$screen['screenid'], $screen['name']);
 		}
 
-		$screenWidget->addHeader(array($this->data['screen']['name'], SPACE, _('on'), SPACE, new CSpan($this->data['host']['name'], ZBX_STYLE_ORANGE)), $screenComboBox);
+		$controls->addItem($screenComboBox);
+		$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
+		$screenWidget->setControls($controls);
 	}
 
 	// append screens to widget
