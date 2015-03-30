@@ -204,6 +204,9 @@ typedef struct
 	char		*server;
 	unsigned short	port;
 	struct zbx_json	json;
+#if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	ZBX_THREAD_SENDVAL_TLS_ARGS	tls_vars;
+#endif
 }
 ZBX_THREAD_SENDVAL_ARGS;
 
@@ -391,6 +394,11 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	assert(((zbx_thread_args_t *)args)->args);
 
 	sentdval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
+
+#if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	/* take TLS data passed from 'main' thread */
+	zbx_tls_take_vars(&sentdval_args->tls_vars);
+#endif
 
 #if !defined(_WINDOWS)
 	signal(SIGINT,  send_signal_handler);
@@ -899,6 +907,11 @@ int	main(int argc, char **argv)
 				"support.");
 		goto exit;
 	}
+#endif
+
+#if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	/* prepare to pass necessary TLS data to 'send_value' thread (to be started soon) */
+	zbx_tls_pass_vars(&sentdval_args.tls_vars);
 #endif
 	zbx_json_init(&sentdval_args.json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
