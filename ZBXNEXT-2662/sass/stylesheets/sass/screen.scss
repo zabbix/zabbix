@@ -770,13 +770,13 @@ footer {
 
 /* Forms */
 .table-forms-container {
-	padding: 0 10px 10px 10px;
+	padding: 10px 10px 10px 10px;
 	background: $white;
 	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
 
-	.filter-forms {
-		padding: 20px 0 0 0;
-	}
+	//.filter-forms {
+	//	padding: 20px 0 0 0;
+	//}
 }
 
 .form-btns {
@@ -1384,7 +1384,7 @@ button[disabled] {
 .ui-tabs-nav {
 	height: 36px;
 	line-height: 36px;
-	margin: 0 -10px 15px -10px;
+	margin: -10px -10px 10px -10px;
 	border-bottom: 1px solid $lightest-blue-grey;
 	@include box-shadow(inset 0 -1px 1px 0 rgba(118,141,153,0.05));
 
@@ -1834,10 +1834,21 @@ button[disabled] {
 	}
 }
 
-/* Maps, Graphs */
+/* Maps, Screens, Graphs */
 .box_on {
 	position: absolute;
 	z-index: 99;
+}
+
+.screen-table {
+	width: 100%;
+
+	td {
+		border: 1px dashed $lighter-blue-grey;
+		text-align: center;
+		vertical-align: middle;
+		padding: 3px;
+	}
 }
 
 /* Alerts */
