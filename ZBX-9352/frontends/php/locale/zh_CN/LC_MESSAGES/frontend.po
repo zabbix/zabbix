@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-05 18:19+0200\n"
+"POT-Creation-Date: 2015-03-23 22:50+0200\n"
 "PO-Revision-Date: 2013-08-16 03:47+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
-#: api/classes/CMaintenance.php:571 api/classes/CMaintenance.php:576
+#: api/classes/CMaintenance.php:575 api/classes/CMaintenance.php:580
 #: maintenance.php:153 maintenance.php:165 services.php:193 services.php:207
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
@@ -336,13 +336,13 @@ msgctxt "maintenance status"
 msgid "Active"
 msgstr "作用中"
 
-#: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:571
+#: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:575
 #: include/views/configuration.maintenance.edit.php:81 maintenance.php:147
 #: maintenance.php:153
 msgid "Active since"
 msgstr "作用中自从"
 
-#: api/classes/CMaintenance.php:463 api/classes/CMaintenance.php:576
+#: api/classes/CMaintenance.php:463 api/classes/CMaintenance.php:580
 #: include/views/configuration.maintenance.edit.php:121 maintenance.php:161
 #: maintenance.php:165
 msgid "Active till"
@@ -672,11 +672,12 @@ msgstr "于"
 msgid "At (hour:minute)"
 msgstr "于(时:分)"
 
-#: api/classes/CMaintenance.php:403 api/classes/CMaintenance.php:595
+#: api/classes/CMaintenance.php:403 api/classes/CMaintenance.php:605
 msgid "At least one host or group should be selected."
 msgstr "应该选择至少一个主机或组."
 
-#: api/classes/CMaintenance.php:473 api/classes/CMaintenance.php:586
+#: api/classes/CMaintenance.php:473 api/classes/CMaintenance.php:480
+#: api/classes/CMaintenance.php:590 api/classes/CMaintenance.php:595
 msgid "At least one maintenance period must be created."
 msgstr "必须创建至少一个维护期间."
 
@@ -6173,7 +6174,7 @@ msgstr "不正确的条件参数."
 msgid "Incorrect parameters for icon map update method \"%s\"."
 msgstr "不正确的图示对应更新方法\"%s\"参数."
 
-#: api/classes/CMaintenance.php:448 api/classes/CMaintenance.php:635
+#: api/classes/CMaintenance.php:448 api/classes/CMaintenance.php:645
 msgid "Incorrect parameters for maintenance."
 msgstr "予维护不正确的参数."
 
@@ -7308,12 +7309,12 @@ msgstr "宏已更新"
 msgid "Maintenance"
 msgstr "维护"
 
-#: api/classes/CMaintenance.php:453 api/classes/CMaintenance.php:565
+#: api/classes/CMaintenance.php:453 api/classes/CMaintenance.php:569
 #, php-format
 msgid "Maintenance \"%s\" already exists."
 msgstr "维护\"%s\"已存在."
 
-#: api/classes/CMaintenance.php:468 api/classes/CMaintenance.php:581
+#: api/classes/CMaintenance.php:468 api/classes/CMaintenance.php:585
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
 msgstr "维护期间\"Active since\"值不能晚于 \"Active till\"."
 
@@ -8438,8 +8439,8 @@ msgstr "没有系统访问的许可权"
 #: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
 #: api/classes/CItem.php:947 api/classes/CItemPrototype.php:726
 #: api/classes/CMaintenance.php:391 api/classes/CMaintenance.php:416
-#: api/classes/CMaintenance.php:429 api/classes/CMaintenance.php:537
-#: api/classes/CMaintenance.php:554 api/classes/CMaintenance.php:621
+#: api/classes/CMaintenance.php:429 api/classes/CMaintenance.php:541
+#: api/classes/CMaintenance.php:558 api/classes/CMaintenance.php:631
 #: api/classes/CMapElement.php:519 api/classes/CMapElement.php:575
 #: api/classes/CMap.php:551 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
@@ -13248,8 +13249,8 @@ msgstr "您没有指定目标为动作操作的全局脚本\"%s\"."
 #: api/classes/CHostGroup.php:995 api/classes/CHostGroup.php:1008
 #: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1602
 #: api/classes/CHost.php:1656 api/classes/CHost.php:1970
-#: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
-#: api/classes/CMaintenance.php:727 api/classes/CScript.php:258
+#: api/classes/CMaintenance.php:618 api/classes/CMaintenance.php:725
+#: api/classes/CMaintenance.php:737 api/classes/CScript.php:258
 #: api/classes/CScript.php:305 api/classes/CScript.php:367
 #: api/classes/CScript.php:417 api/classes/CTemplate.php:974
 #: api/classes/CTemplate.php:1066 api/classes/CTemplate.php:1126
