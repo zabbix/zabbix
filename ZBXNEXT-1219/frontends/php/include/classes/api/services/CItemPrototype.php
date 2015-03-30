@@ -467,6 +467,26 @@ class CItemPrototype extends CItemGeneral {
 		// records that will be added or replaced with in item_application_prototype table
 		$new_records = array();
 
+		// Get discovery rule IDs for all items.
+		$itemids_with_application_prototypes = array();
+
+		foreach ($items as $item) {
+			if (isset($item['applicationPrototypes']) && is_array($item['applicationPrototypes'])
+					&& !array_key_exists('ruleid', $item)) {
+				$itemids_with_application_prototypes[$item['itemid']] = true;
+			}
+		}
+
+		if ($itemids_with_application_prototypes) {
+			$discovery_rules = DBfetchArray(DBselect(
+				'SELECT id.itemid,id.parent_itemid'.
+				' FROM item_discovery id'.
+				' WHERE '.dbConditionInt('id.itemid', array_keys($itemids_with_application_prototypes))
+			));
+			$discovery_rules = zbx_toHash($discovery_rules, 'itemid');
+		}
+
+		// Process application prototypes.
 		foreach ($items as $item) {
 			/*
 			 * 'applicationPrototypes' is an array of 'name' properties. It can also be an empty array in case
@@ -474,16 +494,11 @@ class CItemPrototype extends CItemGeneral {
 			 */
 			if (isset($item['applicationPrototypes']) && is_array($item['applicationPrototypes'])) {
 				// Get discovery rule ID for current item prototype, if it is not yet set.
-				if (isset($item['ruleid'])) {
+				if (array_key_exists('ruleid', $item)) {
 					$discovery_ruleid = $item['ruleid'];
 				}
 				else {
-					$discovery_rule = DBfetch(DBselect(
-						'SELECT id.parent_itemid'.
-						' FROM item_discovery id'.
-						' WHERE id.itemid='.zbx_dbstr($item['itemid'])
-					));
-					$discovery_ruleid = $discovery_rule['parent_itemid'];
+					$discovery_ruleid = $discovery_rules[$item['itemid']]['parent_itemid'];
 				}
 
 				// Get currently linked application prototypes to current item prototype.
@@ -585,7 +600,7 @@ class CItemPrototype extends CItemGeneral {
 
 		DB::replace('item_application_prototype', $old_records, $new_records);
 
-		// Find and delete application prototype from database that are no longer linked to any item prototypes.
+		// Find and delete application prototypes from database that are no longer linked to any item prototypes.
 		if ($application_prototypes_to_remove) {
 			$db_application_prototypes = DBfetchArray(DBselect(
 				'SELECT ap.application_prototypeid'.
