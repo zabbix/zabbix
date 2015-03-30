@@ -37,7 +37,8 @@ class C20XmlPreprocessor {
 			),
 			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^items$', '^item[0-9]*',
 				'^(applications|valuemap)$'
-			)
+			),
+			array('^zabbix_export$', '^screens$', '^screen[0-9]*', '^screen_items$')
 		);
 
 		foreach ($pathes as $path) {

@@ -804,7 +804,7 @@ class C10XmlValidator {
 				'halign' =>			'required|string',
 				'style' =>			'required|string',
 				'dynamic' =>		'required|string',
-				'url' =>			''
+				'url' =>			'string'
 			);
 
 			$validator = new CNewValidator($screenitem, $validationRules);
