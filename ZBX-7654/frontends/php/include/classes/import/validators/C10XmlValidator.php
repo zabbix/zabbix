@@ -38,8 +38,12 @@ class C10XmlValidator {
 	public function validate(array $zabbix_export, $path) {
 		$this->arrayValidator = new CXmlArrayValidator();
 
-		$this->validateDate($zabbix_export['date']);
-		$this->validateTime($zabbix_export['time']);
+		if (array_key_exists('date', $zabbix_export)) {
+			$this->validateDate($zabbix_export['date']);
+		}
+		if (array_key_exists('time', $zabbix_export)) {
+			$this->validateTime($zabbix_export['time']);
+		}
 
 		$fields = array(
 			'hosts' =>			'array',
@@ -91,7 +95,7 @@ class C10XmlValidator {
 	 */
 	protected function validateTime($time) {
 		if (!preg_match('/(2[0-3]|[01][0-9]).[0-5][0-9]/', $time)) {
-			throw new Exception(_s('Incorrect time format: %1$s.', _('HH.MM is expected')));
+			throw new Exception(_s('Incorrect time format: %1$s.', _('hh.mm is expected')));
 		}
 	}
 
