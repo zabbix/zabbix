@@ -75,10 +75,10 @@ if ($this->data['slideshows']) {
 		$slideHeaderForm->addItem($controls);
 		$slideshowWidget->setControls($slideHeaderForm);
 
-		$scrollDiv = new CDiv();
-		$scrollDiv->setAttribute('id', 'scrollbar_cntr');
-		$slideshowWidget->addFlicker($scrollDiv, CProfile::get('web.slides.filter.state', 1));
-		$slideshowWidget->addFlicker(BR(), CProfile::get('web.slides.filter.state', 1));
+		$formFilter = new CFilter('web.slides.filter.state');
+		$formFilter->addNavigator();
+		$slideshowWidget->addItem($formFilter);
+
 		$slideshowWidget->addItem(new CSpan(_('Loading...'), 'textcolorstyles'));
 	}
 	else {
