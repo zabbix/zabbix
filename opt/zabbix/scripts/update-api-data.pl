@@ -575,6 +575,76 @@ foreach (@$tlds_ref)
 				my $values_ref = __get_epp_test_values($epp_dbl_items_ref, $epp_str_items_ref, $values_from, $values_till);
 
 				dbg(Dumper($values_ref)) if (opt('debug'));
+
+				foreach my $probe (keys(%$values_ref))
+				{
+					my $endvalues_ref = $values_ref->{$probe};
+
+					my $test_result_index = 0;
+
+					foreach my $clock (sort(keys(%$endvalues_ref))) # must be sorted by clock
+					{
+						if ($clock < $test_results[$test_result_index]->{'start'})
+						{
+							wrn("no aggregated result of $service test (probe:$probe service:$service time:", ts_str($clock), ") found in the database");
+							next;
+						}
+
+						# move to corresponding test result
+						$test_result_index++ while ($test_result_index < $test_results_count and $clock > $test_results[$test_result_index]->{'end'});
+
+						if ($test_result_index == $test_results_count)
+						{
+							wrn("no aggregated result of $service test (probe:$probe service:$service time:", ts_str($clock), ") found in the database");
+							next;
+						}
+
+						my $tr_ref = $test_results[$test_result_index];
+
+						$tr_ref->{'probes'}->{$probe}->{'status'} = 'No result' unless (exists($tr_ref->{'probes'}->{$probe}->{'status'}));
+
+						$tr_ref->{'probes'}->{$probe}->{'details'}->{$clock} = $endvalues_ref->{$clock};
+					}
+				}
+
+				# get results from probes: EPP down (0) or up (1)
+				my $itemids_ref = __get_status_itemids($tld, $cfg_epp_key_status);
+                                my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
+
+				foreach my $tr_ref (@test_results)
+                                {
+                                        # set status
+                                        my $tr_start = $tr_ref->{'start'};
+                                        my $tr_end = $tr_ref->{'end'};
+
+                                        delete($tr_ref->{'start'});
+                                        delete($tr_ref->{'end'});
+
+                                        my $probes_ref = $tr_ref->{'probes'};
+					foreach my $probe (keys(%$probes_ref))
+					{
+						foreach my $status_ref (@{$statuses_ref->{$probe}})
+                                                {
+                                                        next if ($status_ref->{'clock'} < $tr_start);
+                                                        last if ($status_ref->{'clock'} > $tr_end);
+
+                                                        $tr_ref->{'probes'}->{$probe}->{'status'} = ($status_ref->{'value'} == 1 ? "Up" : "Down");
+                                                }
+					}
+
+					if (opt('dry-run'))
+                                        {
+                                                __prnt_json($tr_ref);
+                                        }
+                                        else
+                                        {
+                                                if (ah_save_incident_json($api_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
+                                                {
+                                                        fail("cannot save incident: ", ah_get_error());
+                                                }
+                                        }
+				}
+
 			}
 			else
 			{
