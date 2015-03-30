@@ -182,7 +182,7 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 					process_value(item->itemid, NULL, &value_dbl, ts, SUCCEED, NULL);
 					break;
 				case ICMPPINGLOSS:
-					value_dbl = 100 * ((host->cnt - host->rcv) / (double)host->cnt);
+					value_dbl = (100 * (host->cnt - host->rcv)) / (double)host->cnt;
 					process_value(item->itemid, NULL, &value_dbl, ts, SUCCEED, NULL);
 					break;
 			}
