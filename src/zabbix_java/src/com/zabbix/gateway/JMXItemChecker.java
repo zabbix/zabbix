@@ -202,7 +202,7 @@ class JMXItemChecker extends ItemChecker
 			if (isPrimitiveAttributeType(dataObject.getClass()))
 				return dataObject.toString();
 			else
-				throw new ZabbixException("data object type is not primitive: %s" + dataObject.getClass());
+				throw new ZabbixException("data object type is not primitive: %s", dataObject.getClass());
 		}
 
 		if (dataObject instanceof CompositeData)

@@ -520,21 +520,6 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 		memset(&host, 0, sizeof(host));
 		zbx_script_init(&script);
 
-		ZBX_STR2UINT64(host.hostid, row[0]);
-
-		if (0 != host.hostid)
-		{
-			strscpy(host.host, row[1]);
-#ifdef HAVE_OPENIPMI
-			host.ipmi_authtype = (signed char)atoi(row[12]);
-			host.ipmi_privilege = (unsigned char)atoi(row[13]);
-			strscpy(host.ipmi_username, row[14]);
-			strscpy(host.ipmi_password, row[15]);
-#endif
-		}
-		else
-			rc = get_dynamic_hostid(event, &host, error, sizeof(error));
-
 		script.type = (unsigned char)atoi(row[2]);
 
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
@@ -544,13 +529,31 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 					&script.command, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 		}
 
+		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
+			script.execute_on = (unsigned char)atoi(row[4]);
+
+		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT != script.type || ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
+		{
+			ZBX_STR2UINT64(host.hostid, row[0]);
+
+			if (0 != host.hostid)
+			{
+				strscpy(host.host, row[1]);
+#ifdef HAVE_OPENIPMI
+				host.ipmi_authtype = (signed char)atoi(row[12]);
+				host.ipmi_privilege = (unsigned char)atoi(row[13]);
+				strscpy(host.ipmi_username, row[14]);
+				strscpy(host.ipmi_password, row[15]);
+#endif
+			}
+			else
+				rc = get_dynamic_hostid(event, &host, error, sizeof(error));
+		}
+
 		if (SUCCEED == rc)
 		{
 			switch (script.type)
 			{
-				case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-					script.execute_on = (unsigned char)atoi(row[4]);
-					break;
 				case ZBX_SCRIPT_TYPE_SSH:
 					script.authtype = (unsigned char)atoi(row[6]);
 					script.publickey = zbx_strdup(script.publickey, row[9]);
