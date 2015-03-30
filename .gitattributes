@@ -527,6 +527,7 @@ sass/img/icon-sprite.png -text svneol=unset#image/png
 sass/overlay-dialog.html -text
 sass/overlay-dialog_with_tables.html -text
 sass/popup.html -text
+sass/screens-edit.html -text
 sass/signin.html -text
 sass/touch-icon-192x192.png -text svneol=unset#image/png
 src/libs/zbxsysinfo/win32/wmi.cpp -text
