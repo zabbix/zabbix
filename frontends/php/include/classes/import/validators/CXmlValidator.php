@@ -33,9 +33,9 @@ class CXmlValidator {
 
 	public function __construct() {
 		$this->versionValidators = array(
-			'1.0' => new C10XmlValidator()
-//			'2.0' => new C10ImportConverter(),
-//			'3.0' => new C10ImportConverter()
+			'1.0' => new C10XmlValidator(),
+			'2.0' => new C20XmlValidator()
+//			'3.0' => new C30XmlValidator()
 		);
 	}
 
@@ -70,8 +70,8 @@ class CXmlValidator {
 	private function validateMainParameters(array $zabbix_export, $path) {
 		$fields = array(
 			'version' =>	'required|string',
-			'date' =>		'required|string',
-			'time' =>		'required|string'
+			'date' =>		'string',
+			'time' =>		'string'
 		);
 		$validator = new CNewValidator($zabbix_export, $fields);
 
