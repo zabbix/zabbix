@@ -3577,3 +3577,83 @@ int	zbx_tls_get_attr(const zbx_sock_t *s, zbx_tls_conn_attr_t *attr)
 #endif
 	return SUCCEED;
 }
+
+#if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_pass_vars                                                *
+ *                                                                            *
+ * Purpose: pass some TLS variables from one thread to other                  *
+ *                                                                            *
+ * Comments: used in Zabbix sender on MS Windows                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tls_pass_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args)
+{
+#if defined(HAVE_POLARSSL)
+	args->my_psk = my_psk;
+	args->my_psk_len = my_psk_len;
+	args->my_psk_identity = my_psk_identity;
+	args->my_psk_identity_len = my_psk_identity_len;
+	args->ca_cert = ca_cert;
+	args->crl = crl;
+	args->my_cert = my_cert;
+	args->my_priv_key = my_priv_key;
+	args->entropy = entropy;
+	args->ctr_drbg = ctr_drbg;
+	args->ciphersuites_cert = ciphersuites_cert;
+	args->ciphersuites_psk = ciphersuites_psk;
+#elif defined(HAVE_GNUTLS)
+	args->my_cert_creds = my_cert_creds;
+	args->my_psk_client_creds = my_psk_client_creds;
+	args->ciphersuites_cert = ciphersuites_cert;
+	args->ciphersuites_psk = ciphersuites_psk;
+#elif defined(HAVE_OPENSSL)
+	args->ctx_cert = ctx_cert;
+	args->ctx_psk = ctx_psk;
+	args->psk_identity_for_cb = psk_identity_for_cb;
+	args->psk_identity_len_for_cb = psk_identity_len_for_cb;
+	args->psk_for_cb = psk_for_cb;
+	args->psk_len_for_cb = psk_len_for_cb;
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_take_vars                                                *
+ *                                                                            *
+ * Purpose: pass some TLS variables from one thread to other                  *
+ *                                                                            *
+ * Comments: used in Zabbix sender on MS Windows                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args)
+{
+#if defined(HAVE_POLARSSL)
+	my_psk = args->my_psk;
+	my_psk_len = args->my_psk_len;
+	my_psk_identity = args->my_psk_identity;
+	my_psk_identity_len = args->my_psk_identity_len;
+	ca_cert = args->ca_cert;
+	crl = args->crl;
+	my_cert = args->my_cert;
+	my_priv_key = args->my_priv_key;
+	entropy = args->entropy;
+	ctr_drbg = args->ctr_drbg;
+	ciphersuites_cert = args->ciphersuites_cert;
+	ciphersuites_psk = args->ciphersuites_psk;
+#elif defined(HAVE_GNUTLS)
+	my_cert_creds = args->my_cert_creds;
+	my_psk_client_creds = args->my_psk_client_creds;
+	ciphersuites_cert = args->ciphersuites_cert;
+	ciphersuites_psk = args->ciphersuites_psk;
+#elif defined(HAVE_OPENSSL)
+	ctx_cert = args->ctx_cert;
+	ctx_psk = args->ctx_psk;
+	psk_identity_for_cb = args->psk_identity_for_cb;
+	psk_identity_len_for_cb = args->psk_identity_len_for_cb;
+	psk_for_cb = args->psk_for_cb;
+	psk_len_for_cb = args->psk_len_for_cb;
+#endif
+}
+#endif
