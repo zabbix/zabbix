@@ -136,9 +136,8 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 		else
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "host [%s] cnt=%d rcv=%d"
-					" min=" ZBX_FS_DBL " max=" ZBX_FS_DBL " avg=" ZBX_FS_DBL,
-					host->addr, host->cnt, host->rcv, host->min, host->max,
-					0 != host->rcv ? host->sum / host->rcv : 0.0);
+					" min=" ZBX_FS_DBL " max=" ZBX_FS_DBL " sum=" ZBX_FS_DBL,
+					host->addr, host->cnt, host->rcv, host->min, host->max, host->sum);
 		}
 
 		for (i = first_index; i < last_index; i++)
