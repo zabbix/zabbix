@@ -385,8 +385,16 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 	{
 		case ZBX_COMMAND_WITH_PARAMS:
 
-			while (NULL != (params = zbx_params_extract_next_parameter(params, &size, "[]", "[]", &param)))
+			while (1)
 			{
+
+				if (NULL == (params = zbx_params_extract_next_parameter(params, &size, "[]", "[]",
+						&param)))
+				{
+					zbx_vector_str_clear_ext(&params_list, zbx_default_mem_free_func);
+					goto out;
+				}
+
 				zbx_vector_str_append(&params_list, param);
 				param = NULL;
 
@@ -396,13 +404,6 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 				/* skip the delimiter character */
 				params++;
 				size--;
-			}
-
-			/* after successful parse there should be 0 characters left to parse */
-			if (0 != size)
-			{
-				zbx_vector_str_clear_ext(&params_list, zbx_default_mem_free_func);
-				goto out;
 			}
 
 			request->nparam = params_list.values_num;

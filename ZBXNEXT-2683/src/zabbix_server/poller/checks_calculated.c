@@ -150,12 +150,12 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 {
 	const char	*__function_name = "calcitem_evaluate_expression";
 	function_t	*f = NULL;
-	char		*buf, replace[16], *errstr = NULL;
+	char		*buf = NULL, replace[16], *errstr = NULL;
 	int		i, ret = SUCCEED;
 	time_t		now;
 	zbx_host_key_t	*keys = NULL;
 	DC_ITEM		*items = NULL;
-	int		*errcodes = NULL;
+	int		*errcodes = NULL, size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -170,7 +170,8 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 	{
 		f = &exp->functions[i];
 
-		buf = get_param_dyn(f->params, 1);	/* for first parameter result is not NULL */
+		size = strlen(f->params);
+		zbx_params_extract_next_parameter(f->params, &size, "()", NULL, &buf);
 
 		if (SUCCEED != parse_host_key(buf, &f->host, &f->key))
 		{

@@ -162,7 +162,7 @@ void	zbx_umc_add_expression(zbx_hashset_t *cache, zbx_uint64_t objectid, const c
 	zbx_umc_object_t	*pobject;
 	zbx_ptr_pair_t		pair = {NULL, NULL};
 	const char		*br = expression, *bl;
-	int 			len;
+	int 			len, param_len;
 
 	pobject = zbx_hashset_search(cache, &objectid);
 
@@ -181,7 +181,27 @@ void	zbx_umc_add_expression(zbx_hashset_t *cache, zbx_uint64_t objectid, const c
 			pobject = zbx_hashset_insert(cache, &object, sizeof(zbx_umc_object_t));
 		}
 
-		len = br - bl + 1;
+		br++;
+		len = br - bl;
+
+		/* check for macro parameters and add parameterized macro if necessary */
+		if ('[' == *br)
+		{
+			if (FAIL == zbx_macro_get_parameter_len(br, &param_len))
+				break;
+
+			pair.first = zbx_malloc(NULL, len + param_len + 3);
+			memcpy(pair.first, bl, len + param_len + 2);
+			((char *)pair.first)[len + param_len + 2] = '\0';
+
+			if (FAIL != zbx_vector_ptr_pair_search(&pobject->macros, pair, ZBX_DEFAULT_STR_COMPARE_FUNC))
+			{
+				zbx_free(pair.first);
+				continue;
+			}
+
+			zbx_vector_ptr_pair_append_ptr(&pobject->macros, &pair);
+		}
 
 		pair.first = zbx_malloc(NULL, len + 1);
 		memcpy(pair.first, bl, len);

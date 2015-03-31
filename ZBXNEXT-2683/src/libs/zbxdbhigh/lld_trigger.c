@@ -628,7 +628,7 @@ static void 	lld_trigger_make(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_
 	const char		*__function_name = "lld_trigger_make";
 
 	zbx_lld_trigger_t	*trigger = NULL;
-	char			*buffer = NULL, *expression = NULL, err[64];
+	char			*buffer = NULL, *expression = NULL, *err = NULL;
 	struct zbx_json_parse	*jp_row = &lld_row->jp_row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -636,10 +636,12 @@ static void 	lld_trigger_make(zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_
 	trigger = lld_trigger_get(triggers, &lld_row->item_links);
 
 	expression = zbx_strdup(expression, expression_proto);
-	if (SUCCEED != substitute_discovery_macros(&expression, jp_row, ZBX_MACRO_NUMERIC, err, sizeof(err)))
+
+	if (SUCCEED != substitute_expression_discovery_macros(&expression, jp_row, &err))
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s trigger: %s.\n",
 				(NULL != trigger ? "update" : "create"), err);
+		zbx_free(err);
 		goto out;
 	}
 

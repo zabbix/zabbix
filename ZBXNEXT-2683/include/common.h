@@ -1088,6 +1088,10 @@ void	zbx_trim_str_list(char *list, char delimiter);
 
 int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
 
+int	zbx_strcmp_null(const char *s1, const char *s2);
+int	zbx_macro_parse_dyn(const char *macro, char **name, char **param);
+int	zbx_macro_get_parameter_len(const char *param, int *len);
+
 #define ZBX_SESSION_ACTIVE	0
 #define ZBX_SESSION_PASSIVE	1
 

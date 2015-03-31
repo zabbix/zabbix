@@ -243,13 +243,13 @@ static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups
 {
 	const char	*__function_name = "aggregate_get_items";
 
-	char		*group, *esc;
+	char		*group = NULL, *esc;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	itemid;
 	char		*sql = NULL;
 	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
-	int		num, n;
+	int		size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groups:'%s' itemkey:'%s'", __function_name, groups, itemkey);
 
@@ -271,33 +271,36 @@ static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups
 
 	zbx_free(esc);
 
-	num = num_param(groups);
-
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and g.name in (");
 
-	for (n = 1; n <= num; n++)
+	size = strlen(groups);
+
+	while (1)
 	{
-		if (NULL == (group = get_param_dyn(groups, n)))
-			continue;
+		if (NULL != (groups = zbx_params_extract_next_parameter(groups, &size, "[]", NULL, &group)))
+			goto out;
 
 		esc = DBdyn_escape_string(group);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "'%s'", esc);
-
-		if (n != num)
-			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "'%s',", esc);
 
 		zbx_free(esc);
 		zbx_free(group);
+
+		if (0 == size)
+			break;
+
+		size--;
+		groups++;
 	}
+
+	sql_offset--;
 
 	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 
 	result = DBselect("%s", sql);
 
-	zbx_free(sql);
-
-	while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
 		zbx_vector_uint64_append(itemids, itemid);
@@ -305,6 +308,8 @@ static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups
 	DBfree_result(result);
 
 	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+out:
+	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

@@ -1907,8 +1907,7 @@ size_t	zbx_hex2binary(char *io)
 int	str_in_list(const char *list, const char *value, char delimiter)
 {
 	const char	*end;
-	int		ret = FAIL;
-	size_t		len;
+	int		ret = FAIL, len;
 
 	len = strlen(value);
 
@@ -3338,6 +3337,61 @@ void	zbx_trim_str_list(char *list, char delimiter)
 	*out = '\0';
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_macro_get_parameter_len                                      *
+ *                                                                            *
+ * Purpose: calculates length of the user macro parameter (not including      *
+ *          '[' and ']' )                                                     *
+ *                                                                            *
+ * Parameters: param  - [IN] the user macro parameter                         *
+ *             itemid - [OUT] the user macro parameter length                 *
+ *                                                                            *
+ * Return value: SUCCEED - the user macro parameter length was calculated     *
+ *                         successfully                                       *
+ *               FALSE   - the user macro parameter parsing failed            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_macro_get_parameter_len(const char *param, int *len)
+{
+	const char	*p;
+	/* parser state: 0 - normal, 1 - inside quoted string */
+	int		state = 0;
+
+	if ('[' == *param)
+		param++;
+
+	for (p = param; '\0' != *p; p++)
+	{
+		if (0 == state)
+		{
+			if (']' == *p)
+				break;
+
+			if ('"' == *p)
+				state = 1;
+		}
+		else
+		{
+			if ('\\' == *p && '"' == p[1])
+			{
+				p++;
+				continue;
+			}
+
+			if ('"' == *p)
+				state = 0;
+		}
+	}
+
+	if ('\0' == *p)
+		return FAIL;
+
+	*len = p - param;
+
+	return SUCCEED;
+}
+
 /*
  * Parameter list parsing
  */
@@ -3939,3 +3993,74 @@ const char	*zbx_params_extract_next_parameter(const char *params, int *size, con
 	return NULL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strcmp_null                                                  *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     compares two strings where any of them can be a NULL pointer           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_strcmp_null(const char *s1, const char *s2)
+{
+	if (NULL == s1)
+		return NULL == s2 ? 0 : -1;
+
+	if (NULL == s2)
+		return NULL == s1 ? 0 : 1;
+
+	return strcmp(s1, s2);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_macro_parse_dyn                                              *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     parses user macro {$MACRO}[<param>] into {$MACRO} and <param> strings  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     macro - [IN] the macro to parse                                        *
+ *     name  - [OUT] the macro name                                           *
+ *     param - [OUT] the macro parameter, NULL for macros without parameters  *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - the macro was parsed successfully                            *
+ *     FAIL    - the macro parsing failed, invalid parameter syntax           *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_macro_parse_dyn(const char *macro, char **name, char **param)
+{
+	const char	*ptr;
+
+	if (NULL != (ptr = strchr(macro, '[')))
+	{
+		char	*end;
+		int	size;
+
+		if (NULL != (end = strrchr(++ptr, ']')))
+		{
+			size = end - ptr;
+
+			zbx_params_extract_next_parameter(ptr, &size, "[]", NULL, param);
+			if (0 != size)
+				zbx_free(*param);
+		}
+
+		if (NULL == *param)
+			return FAIL;
+
+		*name = zbx_realloc(*name, ptr - macro);
+		zbx_strlcpy(*name, macro, ptr - macro);
+	}
+	else
+	{
+		*name = zbx_strdup(*name, macro);
+		zbx_free(*param);
+	}
+
+	return SUCCEED;
+}
