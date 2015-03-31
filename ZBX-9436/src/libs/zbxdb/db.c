@@ -28,7 +28,8 @@
 
 static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
 static int	txn_error = 0;	/* failed transaction */
-static int	txn_init = 0;	/* connecting to db */
+static int	db_init = 0;	/* connecting to the database */
+static int	txn_reconn = 0;	/* reconnection to the database during a transaction */
 
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
@@ -215,7 +216,12 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	char		*p, *path = NULL;
 #endif
 
-	txn_init = 1;
+	db_init = 1;
+	if (0 != txn_level)
+	{
+		txn_error = 1;
+		txn_reconn = 1;
+	}
 
 #if defined(HAVE_IBM_DB2)
 	connect = zbx_strdup(connect, "PROTOCOL=TCPIP;");
@@ -487,7 +493,7 @@ out:
 	if (ZBX_DB_OK != ret)
 		zbx_db_close();
 
-	txn_init = 0;
+	db_init = 0;
 
 	return ret;
 }
@@ -666,6 +672,15 @@ int	zbx_db_commit()
 		assert(0);
 	}
 
+	if (0 != txn_reconn)
+	{
+		/* database server rolls back any active transaction on reconnect */
+		txn_error = 0;
+		txn_level--;
+		txn_reconn = 0;
+		return ZBX_DB_OK;
+	}
+
 	if (1 == txn_error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "commit called on failed transaction, doing a rollback instead");
@@ -716,6 +731,15 @@ int	zbx_db_rollback()
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: rollback without transaction."
 				" Please report it to Zabbix Team.");
 		assert(0);
+	}
+
+	if (0 != txn_reconn)
+	{
+		/* database server rolls back any active transaction on reconnect */
+		txn_error = 0;
+		txn_level--;
+		txn_reconn = 0;
+		return ZBX_DB_OK;
 	}
 
 	last_txn_error = txn_error;
@@ -797,13 +821,13 @@ int	zbx_db_statement_prepare(const char *sql)
 	sword	err;
 	int	ret = ZBX_DB_OK;
 
-	if (0 == txn_init && 0 == txn_level)
+	if (0 == db_init && 0 == txn_level)
 		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
 
-	if (1 == txn_error)
+	if (0 == db_init && 0 != txn_error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] within failed transaction", txn_level);
-		return ZBX_DB_FAIL;
+		return ZBX_DB_OK;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
@@ -811,7 +835,7 @@ int	zbx_db_statement_prepare(const char *sql)
 	if (OCI_SUCCESS != (err = zbx_oracle_statement_prepare(sql)))
 		ret = OCI_handle_sql_error(ERR_Z3005, err, sql);
 
-	if (ZBX_DB_FAIL == ret && 0 < txn_level)
+	if (0 == db_init && ZBX_DB_FAIL == ret && 0 != txn_level)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
 		txn_error = 1;
@@ -825,10 +849,10 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 	sword	err;
 	int	ret = ZBX_DB_OK;
 
-	if (1 == txn_error)
+	if (0 == db_init && 0 != txn_error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] within failed transaction", txn_level);
-		return ZBX_DB_FAIL;
+		return ZBX_DB_OK;
 	}
 
 	switch (type)
@@ -849,7 +873,7 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 	if (OCI_SUCCESS != err)
 		ret = OCI_handle_sql_error(ERR_Z3007, err, NULL);
 
-	if (ZBX_DB_FAIL == ret && 0 < txn_level)
+	if (0 == db_init && ZBX_DB_FAIL == ret && 0 != txn_level)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "query failed, setting transaction as failed");
 		txn_error = 1;
@@ -866,10 +890,10 @@ int	zbx_db_statement_execute()
 	ub4	nrows;
 	int	ret;
 
-	if (1 == txn_error)
+	if (0 == db_init && 0 != txn_error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] within failed transaction", txn_level);
-		ret = ZBX_DB_FAIL;
+		ret = ZBX_DB_OK;
 		goto out;
 	}
 
@@ -878,7 +902,7 @@ int	zbx_db_statement_execute()
 	else
 		ret = (int)nrows;
 
-	if (ZBX_DB_FAIL == ret && 0 < txn_level)
+	if (0 == db_init && ZBX_DB_FAIL == ret && 0 != txn_level)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "query failed, setting transaction as failed");
 		txn_error = 1;
@@ -927,13 +951,12 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	if (0 == txn_init && 0 == txn_level)
+	if (0 == db_init && 0 == txn_level)
 		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
 
-	if (1 == txn_error)
+	if (0 == db_init && 0 != txn_error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
-		ret = ZBX_DB_FAIL;
 		goto clean;
 	}
 
@@ -1092,7 +1115,7 @@ lbl_exec:
 			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
-	if (ZBX_DB_FAIL == ret && 0 < txn_level)
+	if (0 == db_init && ZBX_DB_FAIL == ret && 0 != txn_level)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
 		txn_error = 1;
@@ -1135,7 +1158,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	if (1 == txn_error)
+	if (0 == db_init && 0 != txn_error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
 		goto clean;
@@ -1430,7 +1453,7 @@ lbl_get_table:
 			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
-	if (NULL == result && 0 < txn_level)
+	if (0 == db_init && NULL == result && 0 != txn_level)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
 		txn_error = 1;
