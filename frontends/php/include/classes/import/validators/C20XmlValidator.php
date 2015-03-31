@@ -307,7 +307,7 @@ class C20XmlValidator {
 			'applications' =>			'array',
 			'valuemap' =>				'array',
 			'logtimefmt' =>				'string',
-			'interface_ref' =>			'string',
+			'interface_ref' =>			'string'
 		);
 
 		$validator = new CNewValidator($item, $validationRules);
@@ -354,12 +354,175 @@ class C20XmlValidator {
 	/**
 	 * Graphs validation.
 	 *
-	 * @param array $graphs	import data
+	 * @param array  $graphs	graphs data
+	 * @param string $path		XML path
 	 *
-	 * @throws Exception	if structure or values is invalid
+	 * @throws Exception		if structure is invalid
 	 */
-	protected function validateGraphs(array $graphs) {
-		
+	protected function validateGraphs(array $graphs, $path) {
+		if (!$this->arrayValidator->validate('graph', $graphs)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/graph('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$graphNumber = 1;
+		foreach ($graphs as $key => $graph) {
+			$subpath = $path.'/graph('.$graphNumber++.')';
+
+			$validator = new CNewValidator($graphs, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			$this->validateGraph($graph, $subpath);
+		}
+	}
+
+	/**
+	 * Graph validation.
+	 *
+	 * @param array  $graph	graph data
+	 * @param string $path	XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateGraph(array $graph, $path) {
+		$validationRules = array(
+			'name' =>				'required|string',
+			'width' =>				'required|string',
+			'height' =>				'required|string',
+			'yaxismin' =>			'required|string',
+			'yaxismax' =>			'required|string',
+			'show_work_period' =>	'required|string',
+			'show_triggers' =>		'required|string',
+			'type' =>				'required|string',
+			'show_legend' =>		'required|string',
+			'show_3d' =>			'required|string',
+			'percent_left' =>		'required|string',
+			'percent_right' =>		'required|string',
+			'ymin_item_1' =>		'',
+			'ymin_type_1' =>		'required|string',
+			'ymax_item_1' =>		'',
+			'ymax_type_1' =>		'required|string',
+			'graph_items' =>		'array'
+		);
+
+		$validator = new CNewValidator($graph, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($graph, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+
+		if (array_key_exists('graph_items', $graph)) {
+			$this->validateGraphItems($graph['graph_items'], $path.'/graph_items');
+		}
+	}
+
+	/**
+	 * Graph items validation.
+	 *
+	 * @param array  $graph_items		graph_items data
+	 * @param string $path				XML path
+	 *
+	 * @throws Exception				if structure is invalid
+	 */
+	protected function validateGraphItems(array $graph_items, $path) {
+		if (!$this->arrayValidator->validate('graph_item', $graph_items)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/graph_item('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$graphElementNumber = 1;
+		foreach ($graph_items as $key => $graph_item) {
+			$subpath = $path.'/graph_item('.$graphElementNumber++.')';
+
+			$validator = new CNewValidator($graph_items, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			$this->validateGraphItem($graph_item, $subpath);
+		}
+	}
+
+	/**
+	 * Graph item validation.
+	 *
+	 * @param array  $graph_item	graph_item data
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception			if structure is invalid
+	 */
+	protected function validateGraphItem(array $graph_item, $path) {
+		$validationRules = array(
+			'sortorder' =>	'required|string',
+			'drawtype' =>	'required|string',
+			'color' =>		'required|string',
+			'yaxisside' =>	'required|string',
+			'calc_fnc' =>	'required|string',
+			'type' =>		'required|string',
+			'item' =>		'required|array'
+		);
+
+		$validator = new CNewValidator($graph_item, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($graph_item, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+
+		// child elements validation
+		if (array_key_exists('item', $graph_item)) {
+			$this->validateGraphItemData($graph_item['item'], $path.'/item');
+		}
+	}
+
+	/**
+	 * Graph item data validation.
+	 *
+	 * @param array  $item	$item data
+	 * @param string $path	XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateGraphItemData(array $item, $path) {
+		$validationRules = array(
+			'host' =>	'required|string',
+			'key' =>	'required|string'
+		);
+
+		$validator = new CNewValidator($item, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($item, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
 	}
 
 	/**
