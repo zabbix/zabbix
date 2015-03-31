@@ -35,7 +35,11 @@ class C20XmlPreprocessor {
 			array('^zabbix_export$', '^hosts$',
 				'^host[0-9]*', '^(templates|groups|interfaces|applications|items|discovery_rules|macros|inventory)$'
 			),
-			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^items$', '^item[0-9]*',
+			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^items$', '^item[0-9]*', '^(applications|valuemap)$'),
+			array('^zabbix_export$', '^templates$',
+				'^template[0-9]*', '^(templates|groups|applications|items|discovery_rules|macros|screens)$'
+			),
+			array('^zabbix_export$', '^templates$', '^template[0-9]*', '^items$', '^item[0-9]*',
 				'^(applications|valuemap)$'
 			),
 			array('^zabbix_export$', '^screens$', '^screen[0-9]*', '^screen_items$')
