@@ -51,6 +51,16 @@ typedef SOCKET	ZBX_SOCKET;
 typedef int	ZBX_SOCKET;
 #endif
 
+#if defined(HAVE_IPV6)
+#	define ZBX_SOCKADDR	struct sockaddr_storage
+#else
+#	define ZBX_SOCKADDR	struct sockaddr_in
+#endif
+
+#if !defined(ZBX_SOCKLEN_T)
+#	define ZBX_SOCKLEN_T	socklen_t
+#endif
+
 typedef enum
 {
 	ZBX_TCP_ERR_NETWORK = 1,
@@ -126,12 +136,8 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 typedef struct
 {
 	ZBX_SOCKET	socket;
-#ifdef HAVE_IPV6
-	struct addrinfo	*ai;	/* address information for the host this socket is meant to communicate with */
-#else
-	struct hostent	*hp;
-	unsigned short	port;
-#endif
+	ZBX_SOCKADDR	addr;		/* address information for the host this socket is meant to communicate with */
+	ZBX_SOCKLEN_T	addrlen;
 	size_t		read_bytes;
 	char		buf_stat[ZBX_STAT_BUF_LEN];
 	int		timeout;

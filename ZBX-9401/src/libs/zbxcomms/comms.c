@@ -21,16 +21,6 @@
 #include "comms.h"
 #include "log.h"
 
-#if defined(HAVE_IPV6)
-#	define ZBX_SOCKADDR struct sockaddr_storage
-#else
-#	define ZBX_SOCKADDR struct sockaddr_in
-#endif
-
-#if !defined(ZBX_SOCKLEN_T)
-#	define ZBX_SOCKLEN_T socklen_t
-#endif
-
 #if !defined(SOCK_CLOEXEC)
 #	define SOCK_CLOEXEC 0	/* SOCK_CLOEXEC is Linux-specific, available since 2.6.23 */
 #endif
@@ -1365,7 +1355,7 @@ static void	zbx_udp_timeout_cleanup(zbx_udp_sock_t *s)
 int	zbx_udp_create(zbx_udp_sock_t *s, const char *source_ip, const char *ip, unsigned short port)
 {
 	int		ret = FAIL;
-	struct addrinfo	hints;
+	struct addrinfo	*ai = NULL, hints;
 	struct addrinfo	*ai_bind = NULL;
 	char		service[8];
 
@@ -1378,14 +1368,13 @@ int	zbx_udp_create(zbx_udp_sock_t *s, const char *source_ip, const char *ip, uns
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM;
 
-	if (0 != getaddrinfo(ip, service, &hints, &s->ai))
+	if (0 != getaddrinfo(ip, service, &hints, &ai))
 	{
 		zbx_set_tcp_strerror("cannot resolve [%s]", ip);
 		goto out;
 	}
 
-	if (ZBX_SOCK_ERROR == (s->socket = socket(s->ai->ai_family, s->ai->ai_socktype | SOCK_CLOEXEC,
-				s->ai->ai_protocol)))
+	if (ZBX_SOCK_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype | SOCK_CLOEXEC, ai->ai_protocol)))
 	{
 		zbx_set_tcp_strerror("cannot create socket [[%s]:%d]: %s",
 				ip, port, strerror_from_system(zbx_sock_last_error()));
@@ -1407,20 +1396,25 @@ int	zbx_udp_create(zbx_udp_sock_t *s, const char *source_ip, const char *ip, uns
 		if (0 != getaddrinfo(source_ip, NULL, &hints, &ai_bind))
 		{
 			zbx_set_tcp_strerror("invalid source IP address [%s]", source_ip);
+			zbx_udp_close(s);
 			goto out;
 		}
 
 		if (ZBX_TCP_ERROR == bind(s->socket, ai_bind->ai_addr, ai_bind->ai_addrlen))
 		{
 			zbx_set_tcp_strerror("bind() failed: %s", strerror_from_system(zbx_sock_last_error()));
+			zbx_udp_close(s);
 			goto out;
 		}
 	}
 
+	memcpy(&s->addr, ai->ai_addr, ai->ai_addrlen);
+	s->addrlen = ai->ai_addrlen;
+
 	ret = SUCCEED;
 out:
-	if (FAIL == ret)
-		zbx_udp_close(s);
+	if (NULL != ai)
+		freeaddrinfo(ai);
 
 	if (NULL != ai_bind)
 		freeaddrinfo(ai_bind);
@@ -1430,11 +1424,13 @@ out:
 #else
 int	zbx_udp_create(zbx_udp_sock_t *s, const char *source_ip, const char *ip, unsigned short port)
 {
+	struct hostent	*hp;
+
 	ZBX_TCP_START();
 
 	zbx_udp_clean(s);
 
-	if (NULL == (s->hp = gethostbyname(ip)))
+	if (NULL == (hp = gethostbyname(ip)))
 	{
 #if defined(_WINDOWS)
 		zbx_set_tcp_strerror("gethostbyname() failed for '%s': %s", ip, strerror_from_system(WSAGetLastError()));
@@ -1445,8 +1441,6 @@ int	zbx_udp_create(zbx_udp_sock_t *s, const char *source_ip, const char *ip, uns
 #endif
 		return FAIL;
 	}
-
-	s->port = port;
 
 	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0)))
 	{
@@ -1477,6 +1471,12 @@ int	zbx_udp_create(zbx_udp_sock_t *s, const char *source_ip, const char *ip, uns
 		}
 	}
 
+	s->addr.sin_family = AF_INET;
+	s->addr.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr))->s_addr;
+	s->addr.sin_port = htons(port);
+
+	s->addrlen = sizeof(s->addr);
+
 	return SUCCEED;
 }
 #endif	/* HAVE_IPV6 */
@@ -1493,24 +1493,14 @@ int	zbx_udp_create(zbx_udp_sock_t *s, const char *source_ip, const char *ip, uns
  ******************************************************************************/
 int	zbx_udp_send(zbx_udp_sock_t *s, const char *data, size_t len, int timeout)
 {
-	int		ret = SUCCEED;
-#ifndef HAVE_IPV6
-	ZBX_SOCKADDR	addr;
-#endif
+	int	ret = SUCCEED;
+
 	ZBX_TCP_START();
 
 	if (0 != timeout)
 		zbx_udp_timeout_set(s, timeout);
 
-#ifndef HAVE_IPV6
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = ((struct in_addr *)(s->hp->h_addr))->s_addr;
-	addr.sin_port = htons(s->port);
-
-	if (ZBX_TCP_ERROR == sendto(s->socket, data, len, 0, (struct sockaddr *)&addr, sizeof(addr)))
-#else
-	if (ZBX_TCP_ERROR == sendto(s->socket, data, len, 0, (struct sockaddr *)s->ai->ai_addr, s->ai->ai_addrlen))
-#endif
+	if (ZBX_TCP_ERROR == sendto(s->socket, data, len, 0, (struct sockaddr *)&s->addr, s->addrlen))
 	{
 		zbx_set_tcp_strerror("sendto() failed: %s", strerror_from_system(zbx_sock_last_error()));
 		ret = FAIL;
@@ -1562,10 +1552,6 @@ int	zbx_udp_recv(zbx_udp_sock_t *s, int timeout)
  ******************************************************************************/
 void	zbx_udp_close(zbx_udp_sock_t *s)
 {
-#ifdef HAVE_IPV6
-	if (NULL != s->ai)
-		freeaddrinfo(s->ai);
-#endif
 	zbx_sock_close(s->socket);
 
 	zbx_udp_timeout_cleanup(s);
