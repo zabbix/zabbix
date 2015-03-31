@@ -221,7 +221,7 @@ class C20XmlValidator {
 			$this->validateTriggers($host['triggers'], $path.'/triggers');
 		}
 		if (array_key_exists('templates', $host)) {
-			$this->validateTemplates($host['templates'], $path.'/templates');
+			$this->validateLinkedTemplates($host['templates'], $path.'/templates');
 		}
 		if (array_key_exists('graphs', $host)) {
 			$this->validateGraphs($host['graphs'], $path.'/graphs');
@@ -397,7 +397,7 @@ class C20XmlValidator {
 			$this->validateTriggers($template['triggers'], $path.'/triggers');
 		}
 		if (array_key_exists('templates', $template)) {
-			$this->validateTemplates($template['templates'], $path.'/templates');
+			$this->validateLinkedTemplates($template['templates'], $path.'/templates');
 		}
 		if (array_key_exists('graphs', $template)) {
 			$this->validateGraphs($template['graphs'], $path.'/graphs');
@@ -410,12 +410,65 @@ class C20XmlValidator {
 	/**
 	 * Triggers validation.
 	 *
-	 * @param array $triggers	import data
+	 * @param array  $triggers	triggers data
+	 * @param string $path		XML path
 	 *
-	 * @throws Exception	if structure or values is invalid
+	 * @throws Exception		if structure is invalid
 	 */
-	protected function validateTriggers(array $triggers) {
-		
+	protected function validateTriggers(array $triggers, $path) {
+		if (!$this->arrayValidator->validate('trigger', $triggers)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/trigger('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$triggerNumber = 1;
+		foreach ($triggers as $key => $trigger) {
+			$subpath = $path.'/trigger('.$triggerNumber++.')';
+
+			$validator = new CNewValidator($triggers, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			$this->validateTrigger($trigger, $subpath);
+		}
+	}
+
+	/**
+	 * Trigger validation.
+	 *
+	 * @param array  $trigger	trigger data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateTrigger(array $trigger, $path) {
+		$validationRules = array(
+			'expression' =>		'required|string',
+			'name' =>			'required|string',
+			'url' =>			'required|string',
+			'status' =>			'required|string',
+			'priority' =>		'required|string',
+			'description' =>	'required|string',
+			'type' =>			'required|string',
+			'dependencies' =>	'required|array'
+		);
+
+		$validator = new CNewValidator($trigger, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($trigger, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
 	}
 
 	/**
@@ -841,6 +894,63 @@ class C20XmlValidator {
 					$subpath, _('a character string is expected')
 				));
 			}
+		}
+	}
+
+	/**
+	 * Linked templates validation.
+	 *
+	 * @param array  $templates	linked templates data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateLinkedTemplates(array $templates, $path) {
+		if (!$this->arrayValidator->validate('template', $templates)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/template('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$templateNumber = 1;
+		foreach ($templates as $key => $template) {
+			$subpath = $path.'/template('.$templateNumber++.')';
+
+			$validator = new CNewValidator($templates, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			$this->validateLinkedTemplate($template, $subpath);
+		}
+	}
+
+	/**
+	 * Linked template validation.
+	 *
+	 * @param array  $template	linked template data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateLinkedTemplate(array $template, $path) {
+		$validationRules = array(
+			'name2' =>	'required|string'
+		);
+
+		$validator = new CNewValidator($template, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($template, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
 		}
 	}
 }
