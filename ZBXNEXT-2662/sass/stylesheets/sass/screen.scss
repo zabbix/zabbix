@@ -89,6 +89,14 @@ strong {
 	@extend b;
 }
 
+ol {
+	list-style: decimal;
+
+	li {
+		padding: 0 0 7px 0;
+	} 
+}
+
 /* Main Navigation */
 nav {
 background: $secondary-blue;
@@ -155,6 +163,7 @@ ul.top-nav-icons {
 		float: left;
 
 		.search-suggest {
+			min-width: 166px;
 
 			li {
 				float: none;
@@ -1442,7 +1451,46 @@ button[disabled] {
 	background: url(../img/icon-sprite.png) no-repeat 0 -288px;
 }
 
-/* Sign in */
+/* Sign in, Installation */
+
+.setup-container  {
+	background: $white;
+	width: 766px;
+	margin: 0 auto;
+	padding: 20px 28px;
+	vertical-align: top;
+	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+
+	h1 {
+		border: none;
+		margin: 0 0 10px 0;
+		padding: 0;
+	}
+}
+
+.setup-left {
+	float: left;
+	width: 198px;
+	padding-right: 10px;
+
+	ul {
+
+		li {
+			padding: 0 0 7px 0;
+		}
+	}
+}
+
+.setup-right {
+	width: auto;
+	margin-left: 198px; 
+}
+
+.setup-right-body {
+	height: 400px;
+	overflow-y: auto;
+}
+
 .signin-container {
 	background: $white;
 	width: 322px;
@@ -1653,6 +1701,20 @@ button[disabled] {
 	@extend .action-menu;
 	min-width: initial;
 	border-top: none;
+
+	li {
+		height: 24px;
+		line-height: 24px;
+		color: $indigo-black;
+		padding: 0 15px;
+		margin: 0 -15px;
+		cursor: pointer;
+		@include transition(background .2s ease);
+
+		&.suggest-hover {
+			background: $light-grey;
+		}
+	}
 }
 
 .overlay-dialogue {
