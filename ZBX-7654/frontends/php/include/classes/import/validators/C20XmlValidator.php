@@ -214,6 +214,9 @@ class C20XmlValidator {
 		if (array_key_exists('groups', $host)) {
 			$this->validateGroups($host['groups'], $path.'/groups');
 		}
+		if (array_key_exists('interfaces', $host)) {
+			$this->validateInterfaces($host['interfaces'], $path.'/interfaces');
+		}
 		if (array_key_exists('items', $host)) {
 			$this->validateItems($host['items'], $path.'/items');
 		}
@@ -231,6 +234,68 @@ class C20XmlValidator {
 		}
 		if (array_key_exists('applications', $host)) {
 			$this->validateApplications($host['applications'], $path.'/applications');
+		}
+	}
+
+	/**
+	 * Interfaces validation.
+	 *
+	 * @param array $interfaces	import data
+	 *
+	 * @throws Exception		if structure or values is invalid
+	 */
+	protected function validateInterfaces(array $interfaces, $path) {
+		if (!$this->arrayValidator->validate('interface', $interfaces)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/interface('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$interfaceNumber = 1;
+		foreach ($interfaces as $key => $interface) {
+			$subpath = $path.'/interface('.$interfaceNumber++.')';
+
+			$validator = new CNewValidator($interfaces, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			$this->validateInterface($interface, $subpath);
+		}
+	}
+
+	/**
+	 * Interface validation.
+	 *
+	 * @param array $interfaces	import data
+	 *
+	 * @throws Exception		if structure or values is invalid
+	 */
+	protected function validateInterface(array $interface, $path) {
+		$validationRules = array(
+			'default' =>		'required|string',
+			'type' =>			'required|string',
+			'useip' =>			'required|string',
+			'ip' =>				'string',
+			'dns' =>			'string',
+			'port' =>			'required|string',
+			'bulk' =>			'string',
+			'interface_ref' =>	'required|string'
+		);
+
+		$validator = new CNewValidator($interface, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($interface, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
 		}
 	}
 
@@ -917,9 +982,7 @@ class C20XmlValidator {
 	 * @throws Exception	if structure is invalid
 	 */
 	protected function validateApplication(array $application, $path) {
-		$validationRules = array(
-			'name' =>	'required|string'
-		);
+		$validationRules = array('name' => 'required|string');
 
 		$validator = new CNewValidator($application, $validationRules);
 
