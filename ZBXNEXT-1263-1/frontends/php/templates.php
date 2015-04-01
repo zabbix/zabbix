@@ -528,8 +528,13 @@ if (hasRequest('form')) {
 		$hostIdsLinkedTo = getRequest('hosts', array());
 	}
 
-	$data['groupIds'] = array_combine($data['groupIds'], $data['groupIds']);
-	$hostIdsLinkedTo = array_combine($hostIdsLinkedTo, $hostIdsLinkedTo);
+	if ($data['groupIds']) {
+		$data['groupIds'] = array_combine($data['groupIds'], $data['groupIds']);
+	}
+
+	if ($hostIdsLinkedTo) {
+		$hostIdsLinkedTo = array_combine($hostIdsLinkedTo, $hostIdsLinkedTo);
+	}
 
 	// Select allowed selected hosts.
 	$data['hostsAllowed'] = API::Host()->get(array(
