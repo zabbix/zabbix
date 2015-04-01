@@ -278,8 +278,8 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
 
 	// macros
-	$macrosView = new CView('common.macros', array(
-		'macros' => $parentHost['macros'],
+	$macrosView = new CView('hostmacros', array(
+		'macros' => array_values($parentHost['macros']),
 		'readonly' => true
 	));
 	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());

@@ -121,27 +121,6 @@ if (hasRequest('update')) {
 /*
  * Display
  */
-$form = new CForm();
-$form->cleanItems();
-$cmbConf = new CComboBox('configDropDown', 'adm.macros.php', 'redirect(this.options[this.selectedIndex].value);');
-$cmbConf->addItems(array(
-	'adm.gui.php' => _('GUI'),
-	'adm.housekeeper.php' => _('Housekeeping'),
-	'adm.images.php' => _('Images'),
-	'adm.iconmapping.php' => _('Icon mapping'),
-	'adm.regexps.php' => _('Regular expressions'),
-	'adm.macros.php' => _('Macros'),
-	'adm.valuemapping.php' => _('Value mapping'),
-	'adm.workingtime.php' => _('Working time'),
-	'adm.triggerseverities.php' => _('Trigger severities'),
-	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-	'adm.other.php' => _('Other')
-));
-$form->addItem($cmbConf);
-
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF MACROS'), $form);
-
 $data = array();
 
 if (hasRequest('form_refresh')) {
@@ -152,7 +131,7 @@ else {
 		'output' => array('globalmacroid', 'macro', 'value'),
 		'globalmacro' => true
 	));
-	$data['macros'] = order_macros($data['macros'], 'macro');
+	$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
 }
 
 if (!$data['macros']) {
@@ -162,9 +141,8 @@ if (!$data['macros']) {
 	);
 }
 
-$macrosForm = new CView('administration.general.macros.edit', $data);
-$cnf_wdgt->addItem($macrosForm->render());
-
-$cnf_wdgt->show();
+$view = new CView('administration.general.macros.edit', $data);
+$view->render();
+$view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
