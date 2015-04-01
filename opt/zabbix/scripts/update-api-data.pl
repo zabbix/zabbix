@@ -1362,11 +1362,14 @@ sub __update_false_positives
 	# now check for possible false_positive change in front-end
 	my $last_audit = ah_get_last_audit();
 	my $maxclock = 0;
+
+	# substring(details,1,8)!='Incident'" - to ignore old "details" format (dropped in December 2014)
 	my $rows_ref = db_select(
-		"select substring(details,1,locate(':',details)-1) as eventid,max(clock) as clock".
+		"select substring(details,1,locate(':',details)-1) as eventid,max(clock)".
 		" from auditlog".
 		" where resourcetype=".AUDIT_RESOURCE_INCIDENT.
 			" and clock>$last_audit".
+			" and substring(details,1,8)!='Incident'".
 		" group by eventid");
 
 	foreach my $row_ref (@$rows_ref)
@@ -1376,17 +1379,17 @@ sub __update_false_positives
 
 		$maxclock = $clock if ($clock > $maxclock);
 
-		my $rows_ref = db_select("select objectid,clock,false_positive from events where eventid=$eventid");
+		my $rows_ref2 = db_select("select objectid,clock,false_positive from events where eventid=$eventid");
 
-		fail("cannot get event with ID $eventid") unless (scalar(@$rows_ref) == 1);
+		fail("cannot get event with ID $eventid") unless (scalar(@$rows_ref2) == 1);
 
-		my $triggerid = $rows_ref->[0]->[0];
-		my $event_clock = $rows_ref->[0]->[1];
-		my $false_positive = $rows_ref->[0]->[2];
+		my $triggerid = $rows_ref2->[0]->[0];
+		my $event_clock = $rows_ref2->[0]->[1];
+		my $false_positive = $rows_ref2->[0]->[2];
 
 		my ($tld, $service) = get_tld_by_trigger($triggerid);
 
-		print("$eventid\t$service\t".ts_str($event_clock)."\t".ts_str($clock)."\tfp:$false_positive\t$tld\n");
+		dbg("auditlog message: $eventid\t$service\t".ts_str($event_clock)."\t".ts_str($clock)."\tfp:$false_positive\t$tld\n");
 
 		fail("cannot update false_positive status of event with ID $eventid") unless (ah_save_false_positive($tld, $service, $eventid, $event_clock, $false_positive, $clock) == AH_SUCCESS);
 	}
