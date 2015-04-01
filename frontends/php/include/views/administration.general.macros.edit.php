@@ -25,9 +25,7 @@ $macrosForm->setName('macrosForm');
 // tab
 $macrosTab = new CTabView();
 
-$macrosView = new CView('common.macros', array(
-	'macros' => $this->get('macros')
-));
+$macrosView = new CView('common.macros', $data);
 $macrosTab->addTab('macros', _('Macros'), $macrosView->render());
 
 $saveButton = new CSubmit('update', _('Update'));

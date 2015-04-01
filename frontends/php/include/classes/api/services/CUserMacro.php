@@ -272,9 +272,17 @@ class CUserMacro extends CApiService {
 
 		$this->validateCreateGlobal($globalMacros);
 
-		$globalmacroids = DB::insert('globalmacro', $globalMacros);
+		$globalMacroIds = DB::insert('globalmacro', $globalMacros);
 
-		return array('globalmacroids' => $globalmacroids);
+		$globalMacroId = reset($globalMacroIds);
+		foreach ($globalMacros as $globalMacro) {
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO,
+				$globalMacroId, $globalMacro['macro'].' &rArr; '.$globalMacro['value'], null, null, null
+			);
+			$globalMacroId = next($globalMacroIds);
+		}
+
+		return array('globalmacroids' => $globalMacroIds);
 	}
 
 	/**
@@ -321,16 +329,22 @@ class CUserMacro extends CApiService {
 
 		// update macros
 		$data = array();
-		foreach ($globalMacros as $gmacro) {
-			$globalMacroId = $gmacro['globalmacroid'];
-			unset($gmacro['globalmacroid']);
-
+		foreach ($globalMacros as $globalMacro) {
 			$data[] = array(
-				'values'=> $gmacro,
-				'where'=> array('globalmacroid' => $globalMacroId)
+				'values'=> array(
+					'macro' => $globalMacro['macro'],
+					'value' => $globalMacro['value']
+				),
+				'where'=> array('globalmacroid' => $globalMacro['globalmacroid'])
 			);
 		}
 		DB::update('globalmacro', $data);
+
+		foreach ($globalMacros as $globalMacro) {
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO,
+				$globalMacro['globalmacroid'], $globalMacro['macro'].' &rArr; '.$globalMacro['value'], null, null, null
+			);
+		}
 
 		return array('globalmacroids' => zbx_objectValues($globalMacros, 'globalmacroid'));
 	}
@@ -363,8 +377,19 @@ class CUserMacro extends CApiService {
 
 		$this->validateDeleteGlobal($globalMacroIds);
 
+		$globalMacros = API::getApiService()->select('globalmacro', array(
+			'output' => array('globalmacroid', 'macro', 'value'),
+			'globalmacroids' => $globalMacroIds
+		));
+
 		// delete macros
 		DB::delete('globalmacro', array('globalmacroid' => $globalMacroIds));
+
+		foreach ($globalMacros as $globalMacro) {
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO,
+				$globalMacro['globalmacroid'], $globalMacro['macro'].' &rArr; '.$globalMacro['value'], null, null, null
+			);
+		}
 
 		return array('globalmacroids' => $globalMacroIds);
 	}

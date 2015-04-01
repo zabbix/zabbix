@@ -29,122 +29,92 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'macros_rem'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'macros'=>					array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
-	'macro_new'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
-	'value_new'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
-	'macro_add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'macros'		=> array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
 	// actions
-	'update'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
+	'update'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'form_refresh'	=> array(T_ZBX_INT, O_OPT,	null,	null,	null)
 );
 check_fields($fields);
 
 /*
  * Actions
  */
-$result = true;
 if (hasRequest('update')) {
-	try {
+	$dbMacros = API::UserMacro()->get(array(
+		'output' => array('globalmacroid', 'macro', 'value'),
+		'globalmacro' => true,
+		'preservekeys' => true
+	));
+
+	$macros = getRequest('macros', array());
+
+	// remove empty new macro lines
+	foreach ($macros as $idx => $macro) {
+		if (!array_key_exists('globalmacroid', $macro)
+				&& $macro['macro'] === '' && $macro['value'] === '') {
+
+			unset($macros[$idx]);
+		}
+	}
+
+	foreach ($macros as &$macro) {
+		// transform macros to uppercase {$aaa} => {$AAA}
+		$macro['macro'] = mb_strtoupper($macro['macro']);
+	}
+	unset($macro);
+
+	// update
+	$macrosToUpdate = array();
+	foreach ($macros as $idx => $macro) {
+		if (array_key_exists('globalmacroid', $macro)
+				&& array_key_exists($macro['globalmacroid'], $dbMacros)) {
+
+			$dbMacro = $dbMacros[$macro['globalmacroid']];
+
+			// remove item from new macros array
+			unset($macros[$idx], $dbMacros[$macro['globalmacroid']]);
+
+			// if the macro is unchanged - skip it
+			if ($dbMacro['macro'] === $macro['macro'] && $dbMacro['value'] === $macro['value']) {
+				continue;
+			}
+
+			$macrosToUpdate[] = $macro;
+		}
+	}
+
+	if ($macrosToUpdate || $dbMacros || $macros) {
 		DBstart();
 
-		$globalMacros = API::UserMacro()->get(array(
-			'globalmacro' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-
-		$newMacros = getRequest('macros', array());
-
-		// remove empty new macro lines
-		foreach ($newMacros as $number => $newMacro) {
-			if (!isset($newMacro['globalmacroid']) && zbx_empty($newMacro['macro']) && zbx_empty($newMacro['value'])) {
-				unset($newMacros[$number]);
-			}
-		}
-
-		$duplicatedMacros = array();
-		foreach ($newMacros as $number => $newMacro) {
-			// transform macros to uppercase {$aaa} => {$AAA}
-			$newMacros[$number]['macro'] = mb_strtoupper($newMacro['macro']);
-		}
+		$result = true;
 
 		// update
-		$macrosToUpdate = array();
-		foreach ($newMacros as $number => $newMacro) {
-			if (isset($newMacro['globalmacroid']) && isset($globalMacros[$newMacro['globalmacroid']])) {
-
-				$dbGlobalMacro = $globalMacros[$newMacro['globalmacroid']];
-
-				// remove item from new macros array
-				unset($newMacros[$number]);
-				unset($globalMacros[$newMacro['globalmacroid']]);
-
-				// if the macro is unchanged - skip it
-				if ($dbGlobalMacro == $newMacro) {
-					continue;
-				}
-
-				$macrosToUpdate[$newMacro['globalmacroid']] = $newMacro;
-			}
-		}
-		if (!empty($macrosToUpdate)) {
-			if (!API::UserMacro()->updateGlobal($macrosToUpdate)) {
-				throw new Exception(_('Cannot update macro.'));
-			}
-			foreach ($macrosToUpdate as $macro) {
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.'&rArr;'.SPACE.$macro['value'], null, null, null);
-			}
+		if ($macrosToUpdate) {
+			$result = (bool) API::UserMacro()->updateGlobal($macrosToUpdate);
 		}
 
-		// delete the remaining global macros
-		if ($globalMacros) {
-			$ids = zbx_objectValues($globalMacros, 'globalmacroid');
-			if (!API::UserMacro()->deleteGlobal($ids)) {
-				throw new Exception(_('Cannot remove macro.'));
-			}
-			foreach ($globalMacros as $macro) {
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.'&rArr;'.SPACE.$macro['value'], null, null, null);
-			}
+		// deletehe
+		if ($dbMacros) {
+			$result = $result && (bool) API::UserMacro()->deleteGlobal(array_keys($dbMacros));
 		}
 
 		// create
-		if (!empty($newMacros)) {
-			// mark marcos as new
-			foreach ($newMacros as $number => $macro) {
-				$_REQUEST['macros'][$number]['type'] = 'new';
-			}
-
-			$newMacrosIds = API::UserMacro()->createGlobal(array_values($newMacros));
-			if (!$newMacrosIds) {
-				throw new Exception(_('Cannot add macro.'));
-			}
-			$newMacrosCreated = API::UserMacro()->get(array(
-				'globalmacroids' => $newMacrosIds['globalmacroids'],
-				'globalmacro' => 1,
-				'output' => API_OUTPUT_EXTEND
-			));
-			foreach ($newMacrosCreated as $macro) {
-				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.'&rArr;'.SPACE.$macro['value'], null, null, null);
-			}
+		if ($macros) {
+			$result = $result && (bool) API::UserMacro()->createGlobal(array_values($macros));
 		}
 
-		// reload macros after updating to properly display them in the form
-		$_REQUEST['macros'] = API::UserMacro()->get(array(
-			'globalmacro' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
+		$result = DBend($result);
+		show_messages($result, _('Macros updated'), _('Cannot update macros'));
 
-		$result = true;
-		DBend(true);
-		show_message(_('Macros updated'));
-	}
-	catch (Exception $e) {
-		$result = false;
-		DBend(false);
-		error($e->getMessage());
-		show_error_message(_('Cannot update macros'));
+		if ($result) {
+			// reload macros after updating to properly display them in the form
+			$_REQUEST['macros'] = API::UserMacro()->get(array(
+				'output' => array('globalmacroid', 'macro', 'value'),
+				'globalmacro' => true,
+				'preservekeys' => true
+			));
+			$_REQUEST['macros'] = order_macros($_REQUEST['macros'], 'macro');
+		}
 	}
 }
 
@@ -173,29 +143,25 @@ $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF MACROS'), $form);
 
 $data = array();
-$data['form_refresh'] = getRequest('form_refresh', 0);
-$data['macros'] = array();
 
-if ($data['form_refresh']) {
+if (hasRequest('form_refresh')) {
 	$data['macros'] = getRequest('macros', array());
 }
 else {
 	$data['macros'] = API::UserMacro()->get(array(
-		'output' => API_OUTPUT_EXTEND,
-		'globalmacro' => 1
+		'output' => array('globalmacroid', 'macro', 'value'),
+		'globalmacro' => true
 	));
-}
-if (empty($data['macros'])) {
-	$data['macros'] = array(
-		0 => array(
-			'macro' => '',
-			'value' => ''
-		)
-	);
-}
-if ($result) {
 	$data['macros'] = order_macros($data['macros'], 'macro');
 }
+
+if (!$data['macros']) {
+	$data['macros'][] = array(
+		'macro' => '',
+		'value' => ''
+	);
+}
+
 $macrosForm = new CView('administration.general.macros.edit', $data);
 $cnf_wdgt->addItem($macrosForm->render());
 
