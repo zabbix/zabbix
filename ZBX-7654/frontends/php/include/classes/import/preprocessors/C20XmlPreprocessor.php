@@ -42,7 +42,8 @@ class C20XmlPreprocessor {
 			array('^zabbix_export$', '^templates$', '^template[0-9]*', '^items$', '^item[0-9]*',
 				'^(applications|valuemap)$'
 			),
-			array('^zabbix_export$', '^screens$', '^screen[0-9]*', '^screen_items$')
+			array('^zabbix_export$', '^screens$', '^screen[0-9]*', '^screen_items$'),
+			array('^zabbix_export$', '^triggers$', '^trigger[0-9]*', '^dependencies$')
 		);
 
 		foreach ($pathes as $path) {
