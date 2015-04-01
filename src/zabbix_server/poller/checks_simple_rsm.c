@@ -3765,12 +3765,12 @@ out:
 		if (SUCCEED != rtt_result(rtt1, rtt1_limit) || SUCCEED != rtt_result(rtt2, rtt2_limit) ||
 				SUCCEED != rtt_result(rtt3, rtt3_limit))
 		{
-			/* up */
+			/* down */
 			zbx_add_value_uint(item, item->nextcheck, 0);
 		}
 		else
 		{
-			/* down */
+			/* up */
 			zbx_add_value_uint(item, item->nextcheck, 1);
 		}
 	}

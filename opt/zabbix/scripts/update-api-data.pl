@@ -30,10 +30,14 @@ db_connect();
 __validate_input();
 
 my $opt_period = getopt('period');
-my $opt_from = getopt('from') - (getopt('from') % 60);	# use the whole minute
 my $opt_probe = getopt('probe');
+my $opt_from = getopt('from');
 
-dbg("option \"from\" truncated to the beginnin of a minute: $opt_from") if ($opt_from != getopt('from'));
+if (defined($opt_from))
+{
+	$opt_from -= ($opt_from % 60);	# use the whole minute
+	dbg("option \"from\" truncated to the beginnin of a minute: $opt_from") if ($opt_from != getopt('from'));
+}
 
 my @services;
 if (opt('service'))
