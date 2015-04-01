@@ -2358,8 +2358,7 @@ sub exit_if_running
 	# pid file exists and has valid pid
 	if (my $pid = $pidfile->running())
 	{
-		wrn("already running (pid:$pid)");
-		exit(SUCCESS);
+		fail("already running (pid:$pid)");
 	}
 
 	# pid file exists but the pid in it is invalid
