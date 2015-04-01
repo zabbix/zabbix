@@ -194,7 +194,7 @@ foreach (@$tlds_ref)
 
 		if (opt('continue'))
 		{
-			my $continue_file = ah_get_continue_file($api_tld, $service);
+			$continue_file = ah_get_continue_file($api_tld, $service);
 			my $handle;
 
 			if (-e $continue_file)
@@ -658,7 +658,7 @@ foreach (@$tlds_ref)
 
 		if (defined($continue_file) and not opt('dry-run'))
 		{
-			my $updated = $till + 1;
+			my $updated = (defined($till) ? $till : $lastclock + RESULT_TIMESTAMP_SHIFT) + 1;	# include the whole minute
 
 			unless (write_file($continue_file, $updated) == SUCCESS)
 			{
