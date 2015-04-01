@@ -294,6 +294,13 @@ class CItemPrototype extends CItemGeneral {
 							'Missing "name" field for application prototype in item prototype "%1$s".', $item['name']
 						));
 					}
+
+					if (array_key_exists('templateid', $application_prototype)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Cannot set "templateid" field for application prototype in item prototype "%1$s".',
+							$item['name']
+						));
+					}
 				}
 
 				// Check that "name" field has no duplicate values for application prototypes.
@@ -378,7 +385,10 @@ class CItemPrototype extends CItemGeneral {
 					if (!in_array($application_prototype['name'], $names)) {
 						$application_prototypes_to_create[] = array(
 							'itemid' => $item['ruleid'],
-							'name' => $application_prototype['name']
+							'name' => $application_prototype['name'],
+							'templateid' => array_key_exists('templateid', $application_prototype)
+								? $application_prototype['templateid']
+								: null
 						);
 					}
 				}
@@ -552,7 +562,10 @@ class CItemPrototype extends CItemGeneral {
 						if (!in_array($application_prototype['name'], $names)) {
 							$application_prototypes_to_create[] = array(
 								'itemid' => $discovery_ruleid,
-								'name' => $application_prototype['name']
+								'name' => $application_prototype['name'],
+								'templateid' => array_key_exists('templateid', $application_prototype)
+									? $application_prototype['templateid']
+									: null
 							);
 						}
 					}
