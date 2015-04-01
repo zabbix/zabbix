@@ -1911,6 +1911,7 @@ void	zbx_tls_init_child(void)
 		my_psk_identity_len = strlen(my_psk_identity);
 
 		zbx_read_psk_file();
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded pre-shared key", __function_name);
 	}
 
 	/* set up ciphersuites */
@@ -3253,7 +3254,8 @@ out:	/* an error occured */
 
 	if ((ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK) == (tls_accept & (ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK)))
 	{
-		/* common case in trapper - be ready for all types of incoming connections */
+		/* common case in trapper - be ready for all types of incoming connections but possible also in */
+		/* agentd/agent listener */
 
 		if (NULL != ctx_all)
 		{
@@ -3265,7 +3267,7 @@ out:	/* an error occured */
 				goto out;
 			}
 		}
-		else
+		else if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_AGENT)))
 		{
 			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "not ready for both certificate and "
 					"PSK-based incoming connection:");
@@ -3275,6 +3277,25 @@ out:	/* an error occured */
 			if (NULL == ctx_psk)
 				zbx_snprintf_alloc(error, &error_alloc, &error_offset, " PSK not loaded");
 
+			goto out;
+		}
+
+		/* Server or proxy with no certificate configured. PSK is always assumed to be configured on server */
+		/* or proxy because PSK can come from database. */
+
+		if (NULL != ctx_psk)
+		{
+			if (NULL == (s->tls_ctx = SSL_new(ctx_psk)))
+			{
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "cannot create context to accept"
+						" connection:");
+				zbx_tls_error_msg(error, &error_alloc, &error_offset);
+				goto out;
+			}
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
 			goto out;
 		}
 	}
@@ -3358,7 +3379,7 @@ out:	/* an error occured */
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
 	}
-	else if (0 != strncmp("NONE", cipher_name, 4))
+	else if (0 != strncmp("NONE", cipher_name, 4))		/* TODO list explicitly certificate ciphers */
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
 
