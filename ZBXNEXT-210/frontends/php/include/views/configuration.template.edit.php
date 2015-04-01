@@ -444,11 +444,16 @@ $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 // } TEMPLATES
 
 // macros
-if (empty($macros)) {
-	$macros = array(array('macro' => '', 'value' => ''));
+if (!$macros) {
+	$macros[] = array(
+		'macro' => '',
+		'value' => ''
+	);
 }
-$macrosView = new CView('common.macros', array(
-	'macros' => $macros
+
+$macrosView = new CView('hostmacros', array(
+	'macros' => array_values($macros),
+	'readonly' => false
 ));
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 

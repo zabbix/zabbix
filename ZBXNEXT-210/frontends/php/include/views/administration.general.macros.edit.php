@@ -19,20 +19,80 @@
 **/
 
 
-$macrosForm = new CForm();
-$macrosForm->setName('macrosForm');
+require_once dirname(__FILE__).'/js/administration.general.macros.edit.js.php';
 
-// tab
-$macrosTab = new CTabView();
+$header_form = new CForm();
+$header_form->cleanItems();
+$header_form->addItem(new CComboBox('configDropDown', 'adm.macros.php',
+	'redirect(this.options[this.selectedIndex].value);',
+	array(
+		'adm.gui.php' => _('GUI'),
+		'adm.housekeeper.php' => _('Housekeeping'),
+		'adm.images.php' => _('Images'),
+		'adm.iconmapping.php' => _('Icon mapping'),
+		'adm.regexps.php' => _('Regular expressions'),
+		'adm.macros.php' => _('Macros'),
+		'adm.valuemapping.php' => _('Value mapping'),
+		'adm.workingtime.php' => _('Working time'),
+		'adm.triggerseverities.php' => _('Trigger severities'),
+		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
+		'adm.other.php' => _('Other')
+	)
+));
 
-$macrosView = new CView('common.macros', $data);
-$macrosTab->addTab('macros', _('Macros'), $macrosView->render());
+$widget = new CWidget();
+$widget->addPageHeader(_('CONFIGURATION OF MACROS'), $header_form);
+
+$table = new CTable(SPACE, 'formElementTable');
+$table->setAttribute('id', 'tbl_macros');
+$table->addRow(array(_('Macro'), SPACE, _('Value'), SPACE));
+
+// fields
+foreach ($data['macros'] as $i => $macro) {
+	$macro_input = new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, false, 64);
+	$macro_input->addClass('macro');
+	$macro_input->setAttribute('placeholder', '{$MACRO}');
+
+	$value_input = new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255);
+	$value_input->setAttribute('placeholder', _('value'));
+
+	$remove_button = array(new CButton('macros['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove'));
+	if (array_key_exists('globalmacroid', $macro)) {
+		$remove_button[] = new CVar('macros['.$i.'][globalmacroid]', $macro['globalmacroid'],
+			'macros_'.$i.'_globalmacroid'
+		);
+	}
+
+	$row = array($macro_input, '&rArr;', $value_input, $remove_button);
+	$table->addRow($row, 'form_row');
+}
+
+// buttons
+$buttons_column = new CCol(new CButton('macro_add', _('Add'), null, 'link_menu element-table-add'));
+$buttons_column->setAttribute('colspan', 5);
+
+$buttons_row = new CRow();
+$buttons_row->setAttribute('id', 'row_new_macro');
+$buttons_row->addItem($buttons_column);
+
+$table->addRow($buttons_row);
+
+// form list
+$macros_form_list = new CFormList('macrosFormList');
+$macros_form_list->addRow($table);
+
+$tab_view = new CTabView();
+$tab_view->addTab('macros', _('Macros'), $macros_form_list);
 
 $saveButton = new CSubmit('update', _('Update'));
 $saveButton->attr('data-removed-count', 0);
 $saveButton->main();
 
-$macrosForm->addItem($macrosTab);
-$macrosForm->addItem(makeFormFooter(null, array($saveButton)));
+$form = new CForm();
+$form->setName('macrosForm');
+$form->addItem($tab_view);
+$form->addItem(makeFormFooter(null, array($saveButton)));
 
-return $macrosForm;
+$widget->addItem($form);
+
+return $widget;
