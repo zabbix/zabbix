@@ -1456,9 +1456,11 @@ button[disabled] {
 .setup-container  {
 	background: $white;
 	width: 766px;
+	height: 440px;
 	margin: 0 auto;
 	padding: 20px 28px;
 	vertical-align: top;
+	position: relative;
 	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
 
 	h1 {
@@ -1474,9 +1476,16 @@ button[disabled] {
 	padding-right: 10px;
 
 	ul {
+		margin: -4px 0 0 -28px;
 
 		li {
-			padding: 0 0 7px 0;
+			padding: 4px 0 4px 28px;
+
+			&.setup-left-current {
+				border-left: 3px solid $primary-blue;
+				color: $blue-grey;
+				padding-left: 25px;
+			}
 		}
 	}
 }
@@ -1487,8 +1496,34 @@ button[disabled] {
 }
 
 .setup-right-body {
-	height: 400px;
+	height: 360px;
+	//border: 1px solid #000;
 	overflow-y: auto;
+
+	.table-forms-td-left {
+		text-align: left;
+		width: auto;
+	}
+
+	.table-forms-td-right {
+		width: 100%;
+	}
+}
+
+.setup-footer {
+	position: absolute;
+	bottom: 21px;
+	width: 766px;
+	text-align: right;
+
+	button {
+		margin: 0 0 0 14px;
+
+		&:first-child {
+			margin: 0;
+			float: left;
+		}
+	}
 }
 
 .signin-container {

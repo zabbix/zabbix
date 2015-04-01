@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Zabbix</title>
+		<link rel="stylesheet" href="stylesheets/screen.css">
+        <link rel="icon" href="favicon.ico">
+        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+        <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+	</head>
+<body>
+	<header role="banner">
+		<div><div class="signin-logo"></div></div>
+	</header>
+	<article>
+
+		<form>
+		<div class="setup-container">
+		<div class="setup-left">
+		<ul>
+		<li class="setup-left-current">Welcome</li>
+		<li>Check for pre-requisites</li>
+		<li>Configure DB connection</li>
+		<li>Zabbix server details</li>
+		<li>Pre-installation summary</li>
+		<li>Install</li>
+		</ul>
+		</div>
+		<div class="setup-right">
+		<div class="setup-right-body">
+		Welcome to Zabbix 3.0
+		</div>
+		</div>
+	<div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Back</button><button type="button">Next step</button></div>
+	</ul>
+	</div>
+	</form>
+	<div class="signin-links">Licensed under <a href="#">GPL v2</a></div>
+
+	<br>
+
+
+	<form>
+		<div class="setup-container">
+		<div class="setup-left">
+		<ul>
+		<li class="grey">Welcome</li>
+		<li class="setup-left-current">Check for pre-requisites</li>
+		<li>Configure DB connection</li>
+		<li>Zabbix server details</li>
+		<li>Pre-installation summary</li>
+		<li>Install</li>
+		</ul>
+		</div>
+		<div class="setup-right">
+		<h1>Check for pre-requisites</h1>
+		<div class="setup-right-body">
+		<table class="list-table">
+  <thead>
+  	<tr>
+  		<th></th>
+  		<th>Current value</th>
+  		<th>Required</th>
+  		<th></th>
+  	</tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>PHP version</td>
+      <td>5.4.4-14+deb7u14</td>
+      <td>5.3.0</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP option memory_limit</td>
+      <td>128M</td>
+      <td>128M</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP option post_max_size</td>
+      <td>16M</td>
+      <td>16M</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP option upload_max_filesize</td>
+      <td>2M</td>
+      <td>2M</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP option max_execution_time</td>
+      <td>300</td>
+      <td>300</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP option max_input_time</td>
+      <td>300</td>
+      <td>300</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP time zone</td>
+      <td>Europe/Riga</td>
+      <td>&nbsp;</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP databases support</td>
+      <td>MySQL</td>
+      <td>&nbsp;</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP bcmath</td>
+      <td>on</td>
+      <td>&nbsp;</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP mbstring</td>
+      <td>on</td>
+      <td>&nbsp;</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP mbstring.func_overload</td>
+      <td>off</td>
+      <td>off</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP sockets</td>
+      <td>on</td>
+      <td>&nbsp;</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP gd</td>
+      <td>2.0</td>
+      <td>2.0</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP gd PNG support</td>
+      <td>on</td>
+      <td>&nbsp;</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP gd JPEG support</td>
+      <td>on</td>
+      <td>&nbsp;</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP gd FreeType support</td>
+      <td>on</td>
+      <td>&nbsp;</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP libxml</td>
+      <td>2.8.0</td>
+      <td>2.6.15</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP xmlwriter</td>
+      <td>on</td>
+      <td>&nbsp;</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP xmlreader</td>
+      <td>on</td>
+      <td>&nbsp;</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP ctype</td>
+      <td>on</td>
+      <td>&nbsp;</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP session</td>
+      <td>on</td>
+      <td>&nbsp;</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP session auto start</td>
+      <td>off</td>
+      <td>off</td>
+      <td class="green">OK</td>
+    </tr>
+    <tr>
+      <td>PHP gettext</td>
+      <td>on</td>
+      <td>&nbsp;</td>
+      <td class="green">OK</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+	</div>
+	<div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Back</button><button type="button">Next step</button></div>
+	</div>
+	</form>
+	<div class="signin-links">Licensed under <a href="#">GPL v2</a></div>
+
+
+
+	<br>
+
+
+
+	<form>
+		<div class="setup-container">
+		<div class="setup-left">
+		<ul>
+		<li class="grey">Welcome</li>
+		<li class="grey">Check for pre-requisites</li>
+		<li class="setup-left-current">Configure DB connection</li>
+		<li>Zabbix server details</li>
+		<li>Pre-installation summary</li>
+		<li>Install</li>
+		</ul>
+		</div>
+		<div class="setup-right">
+		<h1>Configure DB connection</h1>
+		<div class="setup-right-body">
+		Please create database manually, and set the configuration parameters for connection to this database.<br>Press "Test connection" button when done.
+		<ul class="table-forms">
+		<li><div class="table-forms-td-left"><label for="HostName">Databese type</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="localhost"></div></li>
+	    <li><div class="table-forms-td-left"><label for="HostName">Database host</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="localhost"></div></li>
+	    <li><div class="table-forms-td-left"><label for="HostName">Database port</label></div><div class="table-forms-td-right"><input type="number" id="HostName" value="0"> 0&ndash;use default port</div></li>
+	    <li><div class="table-forms-td-left"><label for="HostName">Database name</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="zabbix"></div></li>
+	    <li><div class="table-forms-td-left"><label for="HostName">User</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="root"></div></li>
+	    <li><div class="table-forms-td-left"><label for="HostName">Password</label></div><div class="table-forms-td-right"><input type="password" id="HostName"></div></li>
+	    <li><div class="table-forms-td-left"><label for=""></label></div><div class="table-forms-td-right"><button type="button" class="btn-grey">Test connection</button></div></li>
+	    </ul>
+	    </div>
+	    </div>
+	    <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Back</button><button type="button">Next step</button></div>
+	    </div>
+	</form>
+	<div class="signin-links">Licensed under <a href="#">GPL v2</a></div>
+
+
+	<br>
+
+
+	<form>
+		<div class="setup-container">
+		<div class="setup-left">
+		<ul>
+		<li class="grey">Welcome</li>
+		<li class="grey">Check for pre-requisites</li>
+		<li class="grey">Configure DB connection</li>
+		<li class="setup-left-current">Zabbix server details</li>
+		<li>Pre-installation summary</li>
+		<li>Install</li>
+		</ul>
+		</div>
+		<div class="setup-right">
+		<h1>Zabbix server details</h1>
+		<div class="setup-right-body">
+		Please enter host name or host IP address and port number of Zabbix server, as well as the name of the installation (optional).
+       <ul class="table-forms">
+       <li><div class="table-forms-td-left"><label for="HostName">Host</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="localhost"></div></li>
+       <li><div class="table-forms-td-left"><label for="HostName">Port</label></div><div class="table-forms-td-right"><input type="number" id="HostName" value="10051"></div></li>
+       <li><div class="table-forms-td-left"><label for="HostName">Name</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value=""></div></li>
+       </ul>
+       </div>
+	   </div>
+	   <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Back</button><button type="button">Next step</button></div>
+	   </div>
+	</form>
+	<div class="signin-links">Licensed under <a href="#">GPL v2</a></div>
+
+	<br>
+
+
+<form>
+		<div class="setup-container">
+		<div class="setup-left">
+		<ul>
+		<li class="grey">Welcome</li>
+		<li class="grey">Check for pre-requisites</li>
+		<li class="grey">Configure DB connection</li>
+		<li class="grey">Zabbix server details</li>
+		<li class="setup-left-current">Pre-installation summary</li>
+		<li>Install</li>
+		</ul>
+		</div>
+		<div class="setup-right">
+		<h1>Pre-installation summary</h1>
+		<div class="setup-right-body">
+		Please check configuration parameters. If all is correct, press "Next" button, or "Previous" button to change configuration parameters.
+       <ul class="table-forms">
+       <li><div class="table-forms-td-left"><label for="HostName">Database type</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="MySQL"></div></li>
+	   <li><div class="table-forms-td-left"><label for="HostName">Database server</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="localhost"></div></li>
+	   <li><div class="table-forms-td-left"><label for="HostName">Database port</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="default"></div></li>
+	   <li><div class="table-forms-td-left"><label for="HostName">Database name</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="zabbix"></div></li>
+	   <li><div class="table-forms-td-left"><label for="HostName">Database user</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="root"></div></li>
+	   <li><div class="table-forms-td-left"><label for="HostName">Database password</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value=""></div></li>
+	   <li></li>
+	   <li><div class="table-forms-td-left"><label for="HostName">Zabbix server</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="localhost"></div></li>
+	   <li><div class="table-forms-td-left"><label for="HostName">Zabbix server port</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="10051"></div></li>
+	   <li><div class="table-forms-td-left"><label for="HostName">Zabbix server name</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value=""></div></li>
+       </ul>
+	   </div>
+	   </div>
+	   <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Back</button><button type="button">Next step</button></div>
+	   </div>
+	</form>
+	<div class="signin-links">Licensed under <a href="#">GPL v2</a></div>
+
+	<br>
+
+
+	<form>
+		<div class="setup-container">
+		<div class="setup-left">
+		<ul>
+		<li class="grey">Welcome</li>
+		<li class="grey">Check for pre-requisites</li>
+		<li class="grey">Configure DB connection</li>
+		<li class="grey">Zabbix server details</li>
+		<li class="grey">Pre-installation summary</li>
+		<li class="setup-left-current">Install</li>
+		</ul>
+		</div>
+		<div class="setup-right">
+		<h1>Install</h1>
+		<div class="setup-right-body">
+		Configuration file "/home/user/2.4.1/frontends/php/conf/zabbix.conf.php" created: OK
+		Congratulations on successful installation of Zabbix frontend.
+		When done, press the "Finish" button
+		</div>
+		</div>
+	    <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Back</button><button type="button">Get started!</button></div>
+	    </div>
+	</form>
+	<div class="signin-links">Licensed under <a href="#">GPL v2</a></div>
+	</article>
+	<footer>
+	Zabbix 3.0. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" target="_blank">Zabbix SIA</a>
+	</footer>
+</body>
+</html>
