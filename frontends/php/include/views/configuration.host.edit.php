@@ -224,10 +224,11 @@ $visiblenameTB = new CTextBox('visiblename', $visibleName, ZBX_TEXTBOX_STANDARD_
 $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 if (!$isDiscovered) {
+	if ($groupIds) {
+		$groupIds = array_combine($groupIds, $groupIds);
+	}
+
 	// groups for normal hosts
-
-	$groupIds = array_combine($groupIds, $groupIds);
-
 	$groupsTB = new CTweenBox($frmHost, 'groups', $groupIds, 10);
 
 	if ($data['form'] === 'update') {
