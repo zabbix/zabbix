@@ -1047,7 +1047,7 @@ static void	DCsync_hosts(DB_RESULT result)
 	ZBX_DC_HOST_H		*host_h, host_h_local, *host_p, host_p_local;
 
 	int			found;
-	int			update_index, update_index_p;
+	int			update_index_h, update_index_p;
 	zbx_uint64_t		hostid, proxy_hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
@@ -1079,7 +1079,7 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* see whether we should and can update 'hosts_h' and 'hosts_p' indexes at this point */
 
-		update_index = 0;
+		update_index_h = 0;
 		update_index_p = 0;
 
 		if ((HOST_STATUS_MONITORED == status || HOST_STATUS_NOT_MONITORED == status) &&
@@ -1103,7 +1103,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			if (NULL != host_h)
 				host_h->host_ptr = host;
 			else
-				update_index = 1;
+				update_index_h = 1;
 		}
 		else if ((HOST_STATUS_PROXY_ACTIVE == status || HOST_STATUS_PROXY_PASSIVE == status) &&
 				(0 == found || 0 != strcmp(host->host, row[2])))
@@ -1138,13 +1138,68 @@ static void	DCsync_hosts(DB_RESULT result)
 		DCstrpool_replace(found, &host->tls_issuer, row[26]);
 		DCstrpool_replace(found, &host->tls_subject, row[27]);
 
-		/* maintain 'psks' index */
+		/* maintain 'config->psks' in configuration cache */
 
-		if (0 == found)
-			host->tls_dc_psk = NULL;
+		/* cases to cover (PSKid means PSK identity):                                */
+		/*                                  Incoming data record                     */
+		/*                                  /                   \                    */
+		/*                                new                   new                  */
+		/*                               PSKid                 PSKid                 */
+		/*                             non-empty               empty                 */
+		/*                             /      \                /    \                */
+		/*                            /        \              /      \               */
+		/*                       'host'        'host'      'host'    'host'          */
+		/*                       record        record      record    record          */
+		/*                        has           has         has       has            */
+		/*                     non-empty       empty     non-empty  empty PSK        */
+		/*                        PSK           PSK         PSK      |     \         */
+		/*                       /   \           |           |       |      \        */
+		/*                      /     \          |           |       |       \       */
+		/*                     /       \         |           |       |        \      */
+		/*            new PSKid       new PSKid  |           |   existing     new    */
+		/*             same as         differs   |           |    record     record  */
+		/*            old PSKid         from     |           |      |          |     */
+		/*           /    |           old PSKid  |           |     done        |     */
+		/*          /     |              |       |           |                 |     */
+		/*   new PSK    new PSK        delete    |        delete               |     */
+		/*    value      value        old PSKid  |       old PSKid             |     */
+		/*   same as    differs       and value  |       and value             |     */
+		/*     old       from         from psks  |       from psks             |     */
+		/*      |        old          hashset    |        hashset              |     */
+		/*     done       /           (if ref    |        (if ref              |     */
+		/*               /            count=0)   |        count=0)             |     */
+		/*              /              /     \  /|           \                /      */
+		/*             /              /--------- |            \              /       */
+		/*            /              /         \ |             \            /        */
+		/*       delete          new PSKid   new PSKid         set pointer in        */
+		/*       old PSK          already     not in           'hosts' record        */
+		/*        value           in psks      psks             to NULL PSK          */
+		/*        from            hashset     hashset                |               */
+		/*       string            /   \          \                 done             */
+		/*        pool            /     \          \                                 */
+		/*         |             /       \          \                                */
+		/*       change    PSK value   PSK value    insert                           */
+		/*      PSK value  in hashset  in hashset  new PSKid                         */
+		/*      for this    same as     differs    and value                         */
+		/*       PSKid      new PSK     from new   into psks                         */
+		/*         |        value      PSK value    hashset                          */
+		/*        done        \           |            /                             */
+		/*                     \       replace        /                              */
+		/*                      \      PSK value     /                               */
+		/*                       \     in hashset   /                                */
+		/*                        \    with new    /                                 */
+		/*                         \   PSK value  /                                  */
+		/*                          \     |      /                                   */
+		/*                           \    |     /                                    */
+		/*                            set pointer                                    */
+		/*                            in 'host'                                      */
+		/*                            record to                                      */
+		/*                            new PSKid                                      */
+		/*                                |                                          */
+		/*                               done                                        */
 
-		/* Either both PSK identity and PSK value must be non-empty or none. This should have been prevented */
-		/* by validation in frontend or API. */
+		/* Detect errors: PSK identity without PSK value or vice versa. This should have been prevented by */
+		/* validation in frontend or API. Do not update cache in case of error. */
 
 		if ('\0' != *row[28] && '\0' == *row[29])
 		{
@@ -1153,7 +1208,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			goto done;
 		}
 
-		if ('\0' == *row[28])
+		if ('\0' == *row[28])				/* new PSKid empty */
 		{
 			if ('\0' != *row[29])
 			{
@@ -1162,18 +1217,46 @@ static void	DCsync_hosts(DB_RESULT result)
 				goto done;
 			}
 
-			if (0 == found || (1 == found && NULL == host->tls_dc_psk))	/* no PSK, no change */
+			/* new PSKid and value empty */
+
+			if (0 == found)				/* new host with empty PSK */
+			{
+				host->tls_dc_psk = NULL;
 				goto done;
+			}
+
+			if (NULL == host->tls_dc_psk)		/* existing host with empty PSK */
+				goto done;
+
+			/* Existing host with non-empty PSK. Unlink and delete PSK. */
+
+			psk_i_local.tls_psk_identity = host->tls_dc_psk->tls_psk_identity;
+
+			if (NULL != (psk_i = zbx_hashset_search(&config->psks, &psk_i_local)) &&
+					0 == --(psk_i->refcount))
+			{
+				zbx_strpool_release(psk_i->tls_psk_identity);
+				zbx_strpool_release(psk_i->tls_psk);
+				zbx_hashset_remove(&config->psks, &psk_i_local);
+			}
+
+			host->tls_dc_psk = NULL;
+			goto done;
 		}
+
+		/* non-empty new PSKid and value */
 
 		if (1 == found)
 		{
-			if (NULL != host->tls_dc_psk)
+			if (NULL != host->tls_dc_psk)		/* 'host' record has non-empty PSK */
 			{
-				if (0 == strcmp(host->tls_dc_psk->tls_psk_identity, row[28]))	/* Same old PSK ? */
+				if (0 == strcmp(host->tls_dc_psk->tls_psk_identity, row[28]))	/* new PSKid same as */
+												/* old PSKid */
 				{
-					if (0 != strcmp(host->tls_dc_psk->tls_psk, row[29]))
+					if (0 != strcmp(host->tls_dc_psk->tls_psk, row[29]))	/* new PSK value */
+												/* differs from old */
 					{
+						/* change underlying PSK value and 'config->psks' is updated, too */
 						DCstrpool_replace(1, &host->tls_dc_psk->tls_psk, row[29]);
 						zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"",
 								row[28]);
@@ -1182,30 +1265,31 @@ static void	DCsync_hosts(DB_RESULT result)
 					goto done;
 				}
 
-				/* PSK identity has changed. Unlink and delete the old identity and PSK. */
+				/* New PSKid differs from old PSKid. Unlink and delete old PSK. */
 
-				if (NULL != (psk_i = zbx_hashset_search(&config->psks,
-						host->tls_dc_psk->tls_psk_identity)) &&
+				psk_i_local.tls_psk_identity = host->tls_dc_psk->tls_psk_identity;
+
+				if (NULL != (psk_i = zbx_hashset_search(&config->psks, &psk_i_local)) &&
 						0 == --(psk_i->refcount))
 				{
 					zbx_strpool_release(psk_i->tls_psk_identity);
 					zbx_strpool_release(psk_i->tls_psk);
-					zbx_hashset_remove(&config->psks, psk_i->tls_psk_identity);
+					zbx_hashset_remove(&config->psks, &psk_i_local);
 				}
 
 				host->tls_dc_psk = NULL;
 			}
 		}
 
-		if ('\0' == *row[28])	/* do not store empty PSK identity */
-			goto done;
-
-		/* The new PSK identity already stored ? */
+		/* New PSK identity already stored ? */
 
 		psk_i_local.tls_psk_identity = row[28];
+
 		if (NULL != (psk_i = zbx_hashset_search(&config->psks, &psk_i_local)))
 		{
-			if (0 != strcmp(psk_i->tls_psk, row[29]))
+			/* new PSKid already in psks hashset */
+
+			if (0 != strcmp(psk_i->tls_psk, row[29]))	/* PSKid stored but PSK value is different */
 			{
 				DCstrpool_replace(1, &psk_i->tls_psk, row[29]);
 				zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"", row[28]);
@@ -1216,7 +1300,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			goto done;
 		}
 
-		/* store new PSK */
+		/* insert new PSKid and value into psks hashset */
 
 		DCstrpool_replace(0, &psk_i_local.tls_psk_identity, row[28]);
 		DCstrpool_replace(0, &psk_i_local.tls_psk, row[29]);
@@ -1255,7 +1339,7 @@ done:
 
 		/* update 'hosts_h' and 'hosts_p' indexes using new data, if not done already */
 
-		if (1 == update_index)
+		if (1 == update_index_h)
 		{
 			host_h_local.host = zbx_strpool_acquire(host->host);
 			host_h_local.host_ptr = host;
@@ -1404,16 +1488,15 @@ done:
 		/* Maintain 'psks' index. Unlink and delete the PSK identity. */
 		if (NULL != host->tls_dc_psk)
 		{
-			if (NULL != (psk_i = zbx_hashset_search(&config->psks,
-					host->tls_dc_psk->tls_psk_identity)) &&
+			psk_i_local.tls_psk_identity = host->tls_dc_psk->tls_psk_identity;
+
+			if (NULL != (psk_i = zbx_hashset_search(&config->psks, &psk_i_local)) &&
 					0 == --(psk_i->refcount))
 			{
 				zbx_strpool_release(psk_i->tls_psk_identity);
 				zbx_strpool_release(psk_i->tls_psk);
-				zbx_hashset_remove(&config->psks, psk_i->tls_psk_identity);
+				zbx_hashset_remove(&config->psks, &psk_i_local);
 			}
-			else
-				THIS_SHOULD_NEVER_HAPPEN;
 		}
 #endif
 		zbx_hashset_iter_remove(&iter);
