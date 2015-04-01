@@ -229,6 +229,9 @@ class C20XmlValidator {
 		if (array_key_exists('macros', $host)) {
 			$this->validateMacros($host['macros'], $path.'/macros');
 		}
+		if (array_key_exists('applications', $host)) {
+			$this->validateApplications($host['applications'], $path.'/applications');
+		}
 	}
 
 	/**
@@ -404,6 +407,12 @@ class C20XmlValidator {
 		}
 		if (array_key_exists('macros', $template)) {
 			$this->validateMacros($template['macros'], $path.'/macros');
+		}
+		if (array_key_exists('screens', $template)) {
+			$this->validateScreens($template['screens'], $path.'/screens');
+		}
+		if (array_key_exists('applications', $template)) {
+			$this->validateApplications($template['applications'], $path.'/applications');
 		}
 	}
 
@@ -894,6 +903,36 @@ class C20XmlValidator {
 					$subpath, _('a character string is expected')
 				));
 			}
+
+			$this->validateApplication($application, $subpath);
+		}
+	}
+
+	/**
+	 * Application validation.
+	 *
+	 * @param array  $application	application data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateApplication(array $application, $path) {
+		$validationRules = array(
+			'name' =>	'required|string'
+		);
+
+		$validator = new CNewValidator($application, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($application, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
 		}
 	}
 
@@ -936,7 +975,7 @@ class C20XmlValidator {
 	 */
 	protected function validateLinkedTemplate(array $template, $path) {
 		$validationRules = array(
-			'name2' =>	'required|string'
+			'name' =>	'required|string'
 		);
 
 		$validator = new CNewValidator($template, $validationRules);
