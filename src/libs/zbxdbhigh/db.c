@@ -120,6 +120,8 @@ void	DBclose()
  * Return value: same as zbx_db_connect()                                     *
  *                                                                            *
  ******************************************************************************/
+extern int	CONFIG_LOG_LEVEL;
+
 int	DBconnect(int flag)
 {
 	const char	*__function_name = "DBconnect";
@@ -127,6 +129,7 @@ int	DBconnect(int flag)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __function_name, flag);
 
+	zabbix_set_log_level(LOG_LEVEL_DEBUG);
 
 	while (ZBX_DB_OK != (err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
 			CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT)))
@@ -143,6 +146,8 @@ int	DBconnect(int flag)
 		zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in %d seconds.", ZBX_DB_WAIT_DOWN);
 		zbx_sleep(ZBX_DB_WAIT_DOWN);
 	}
+
+	zabbix_set_log_level(CONFIG_LOG_LEVEL);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, err);
 
