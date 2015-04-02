@@ -220,9 +220,6 @@ class C20XmlValidator {
 		if (array_key_exists('items', $host)) {
 			$this->validateItems($host['items'], $path.'/items');
 		}
-		if (array_key_exists('triggers', $host)) {
-			$this->validateTriggers($host['triggers'], $path.'/triggers');
-		}
 		if (array_key_exists('templates', $host)) {
 			$this->validateLinkedTemplates($host['templates'], $path.'/templates');
 		}
@@ -234,6 +231,9 @@ class C20XmlValidator {
 		}
 		if (array_key_exists('applications', $host)) {
 			$this->validateApplications($host['applications'], $path.'/applications');
+		}
+		if (array_key_exists('inventory', $host)) {
+			$this->validateInventory($host['inventory'], $path.'/inventory');
 		}
 	}
 
@@ -460,9 +460,6 @@ class C20XmlValidator {
 		}
 		if (array_key_exists('items', $template)) {
 			$this->validateItems($template['items'], $path.'/items');
-		}
-		if (array_key_exists('triggers', $template)) {
-			$this->validateTriggers($template['triggers'], $path.'/triggers');
 		}
 		if (array_key_exists('templates', $template)) {
 			$this->validateLinkedTemplates($template['templates'], $path.'/templates');
@@ -1037,9 +1034,7 @@ class C20XmlValidator {
 	 * @throws Exception	if structure is invalid
 	 */
 	protected function validateLinkedTemplate(array $template, $path) {
-		$validationRules = array(
-			'name' =>	'required|string'
-		);
+		$validationRules = array('name' => 'required|string');
 
 		$validator = new CNewValidator($template, $validationRules);
 
@@ -1053,6 +1048,105 @@ class C20XmlValidator {
 		if ($arrayDiff) {
 			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+	}
+
+	/**
+	 * Inventory validation.
+	 *
+	 * @param array $Inventory	import data
+	 *
+	 * @throws Exception		if structure or values is invalid
+	 */
+	protected function validateInventory(array $inventory, $path) {
+		if ($inventory) {
+			$validationRules = array(
+				'inventory_mode' =>		'required|string',
+				'type' =>				'required|string',
+				'type_full' =>			'required|string',
+				'name' =>				'required|string',
+				'alias' =>				'required|string',
+				'os' =>					'required|string',
+				'os_full' =>			'required|string',
+				'os_short' =>			'required|string',
+				'serialno_a' =>			'required|string',
+				'serialno_b' =>			'required|string',
+				'tag' =>				'required|string',
+				'asset_tag' =>			'required|string',
+				'macaddress_a' =>		'required|string',
+				'macaddress_b' =>		'required|string',
+				'hardware' =>			'required|string',
+				'hardware_full' =>		'required|string',
+				'software' =>			'required|string',
+				'software_full' =>		'required|string',
+				'software_app_a' =>		'required|string',
+				'software_app_b' =>		'required|string',
+				'software_app_c' =>		'required|string',
+				'software_app_d' =>		'required|string',
+				'software_app_e' =>		'required|string',
+				'contact' =>			'required|string',
+				'location' =>			'required|string',
+				'location_lat' =>		'required|string',
+				'location_lon' =>		'required|string',
+				'notes' =>				'required|string',
+				'chassis' =>			'required|string',
+				'model' =>				'required|string',
+				'hw_arch' =>			'required|string',
+				'vendor' =>				'required|string',
+				'contract_number' =>	'required|string',
+				'installer_name' =>		'required|string',
+				'deployment_status' =>	'required|string',
+				'url_a' =>				'required|string',
+				'url_b' =>				'required|string',
+				'url_c' =>				'required|string',
+				'host_networks' =>		'required|string',
+				'host_netmask' =>		'required|string',
+				'host_router' =>		'required|string',
+				'oob_ip' =>				'required|string',
+				'oob_netmask' =>		'required|string',
+				'oob_router' =>			'required|string',
+				'date_hw_purchase' =>	'required|string',
+				'date_hw_install' =>	'required|string',
+				'date_hw_expiry' =>		'required|string',
+				'date_hw_decomm' =>		'required|string',
+				'site_address_a' =>		'required|string',
+				'site_address_b' =>		'required|string',
+				'site_address_c' =>		'required|string',
+				'site_city' =>			'required|string',
+				'site_state' =>			'required|string',
+				'site_country' =>		'required|string',
+				'site_zip' =>			'required|string',
+				'site_rack' =>			'required|string',
+				'site_notes' =>			'required|string',
+				'poc_1_name' =>			'required|string',
+				'poc_1_email' =>		'required|string',
+				'poc_1_phone_a' =>		'required|string',
+				'poc_1_phone_b' =>		'required|string',
+				'poc_1_cell' =>			'required|string',
+				'poc_1_screen' =>		'required|string',
+				'poc_1_notes' =>		'required|string',
+				'poc_2_name' =>			'required|string',
+				'poc_2_email' =>		'required|string',
+				'poc_2_phone_a' =>		'required|string',
+				'poc_2_phone_b' =>		'required|string',
+				'poc_2_cell' =>			'required|string',
+				'poc_2_screen' =>		'required|string',
+				'poc_2_notes' =>		'required|string'
+			);
+
+			$validator = new CNewValidator($inventory, $validationRules);
+
+			if ($validator->isError()) {
+				$errors = $validator->getAllErrors();
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+			}
+
+			// unexpected tag validation
+			$arrayDiff = array_diff_key($inventory, $validator->getValidInput());
+			if ($arrayDiff) {
+				$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+			}
 		}
 	}
 }
