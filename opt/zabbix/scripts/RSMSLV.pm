@@ -2286,9 +2286,9 @@ sub get_detailed_result
 
 	my $value_int = int($value);
 
-	return $value unless (exists($maps->{$value_int}));
+	return $value_int unless (exists($maps->{$value_int}));
 
-	return "$value, " . $maps->{$value_int};
+	return "$value_int, " . $maps->{$value_int};
 }
 
 sub get_result_string
@@ -2298,7 +2298,7 @@ sub get_result_string
 
 	my $value_int = int($value);
 
-	return $value unless (exists($maps->{$value_int}));
+	return $value_int unless (exists($maps->{$value_int}));
 
 	return $maps->{$value_int};
 }

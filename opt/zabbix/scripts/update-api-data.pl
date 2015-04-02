@@ -434,7 +434,7 @@ foreach (@$tlds_ref)
 
 							$tr_ref->{'probes'}->{$probe}->{'status'} = 'No result' unless (exists($tr_ref->{'probes'}->{$probe}->{'status'}));
 
-							push(@{$tr_ref->{'probes'}->{$probe}->{'details'}->{$ns}}, {'clock' => $clock, 'rtt' => get_detailed_result($cfg_dns_valuemaps, $endvalues_ref->{$clock}), 'ip' => $ip});
+							push(@{$tr_ref->{'probes'}->{$probe}->{'details'}->{$ns}}, {'clock' => $clock, 'rtt' => $endvalues_ref->{$clock}, 'ip' => $ip});
 						}
 					}
 				}
@@ -751,7 +751,7 @@ sub __get_dns_test_values
 				next;
 			}
 
-			$result{$probe}->{$nsip}->{$clock} = $value;
+			$result{$probe}->{$nsip}->{$clock} = get_detailed_result($cfg_dns_valuemaps, $value);
 		}
 	}
 
@@ -859,7 +859,7 @@ sub __get_rdds_test_values
 		my $port = __get_rdds_port($key);
 		my $type = __get_rdds_dbl_type($key);
 
-		$result{$probe}->{$port}->{$clock}->{$type} = ($type eq 'rtt' ? get_detailed_result($cfg_rdds_valuemaps, $value) : $value);
+		$result{$probe}->{$port}->{$clock}->{$type} = ($type eq 'rtt') ? get_detailed_result($cfg_rdds_valuemaps, $value) : int($value);
 	}
 
 	my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
