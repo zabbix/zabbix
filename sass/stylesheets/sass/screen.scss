@@ -97,6 +97,10 @@ ol {
 	} 
 }
 
+p {
+	margin: 0 0 1em 0;
+}
+
 /* Main Navigation */
 nav {
 background: $secondary-blue;
@@ -1045,6 +1049,7 @@ legend {
 
 %form-input-style {
 	border: 1px solid $light-blue-grey;
+	background-color: $white;
 	@include font-form;
 	@include transition(border-color .2s ease);
 
@@ -1496,7 +1501,7 @@ button[disabled] {
 }
 
 .setup-right-body {
-	height: 360px;
+	height: 355px;
 	//border: 1px solid #000;
 	overflow-y: auto;
 
@@ -1941,10 +1946,16 @@ button[disabled] {
 	width: 100%;
 
 	td {
-		border: 1px dashed $lighter-blue-grey;
 		text-align: center;
 		vertical-align: middle;
 		padding: 3px;
+	}
+}
+
+.dashed-border {
+
+	td {
+		border: 1px dashed $lighter-blue-grey;
 	}
 }
 
