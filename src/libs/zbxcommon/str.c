@@ -474,6 +474,39 @@ void	zbx_lrtrim(char *str, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_lskip_chars                                                  *
+ *                                                                            *
+ * Purpose: skip given characters going forward                               *
+ *                                                                            *
+ * Parameters: ptr - current string pointer                                   *
+ *             charlist - null terminated list of characters                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_lskip_chars(const char **ptr, const char *charlist)
+{
+	while ('\0' != **ptr && NULL != strchr(charlist, **ptr))
+		(*ptr)++;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_rskip_chars                                                  *
+ *                                                                            *
+ * Purpose: skip given characters going backward, up to the given lower bound *
+ *                                                                            *
+ * Parameters: ptr - current string pointer                                   *
+ *             str - beginning of the string                                  *
+ *             charlist - null terminated list of characters                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rskip_chars(const char **ptr, const char *str, const char *charlist)
+{
+	while (str <= *ptr && NULL != strchr(charlist, **ptr))
+		(*ptr)--;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_remove_chars                                                 *
  *                                                                            *
  * Purpose: Remove characters 'charlist' from the whole string                *

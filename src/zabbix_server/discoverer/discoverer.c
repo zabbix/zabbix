@@ -451,7 +451,7 @@ static void	process_rule(DB_DRULE *drule)
 
 	DB_DHOST	dhost;
 	int		host_status, now;
-	char		ip[INTERFACE_IP_LEN_MAX], *start, *comma, dns[INTERFACE_DNS_LEN_MAX];
+	char		ip[INTERFACE_IP_LEN_MAX], *start, *last, c, *comma, dns[INTERFACE_DNS_LEN_MAX];
 	int		ipaddress[8];
 	zbx_iprange_t	iprange;
 
@@ -460,7 +460,15 @@ static void	process_rule(DB_DRULE *drule)
 	for (start = drule->iprange; '\0' != *start;)
 	{
 		if (NULL != (comma = strchr(start, ',')))
-			*comma = '\0';
+			last = comma - 1;
+		else
+			last = start + strlen(start) - 1;
+
+		zbx_lskip_chars((const char **)&start, " ");
+		zbx_rskip_chars((const char **)&last, start, " ");
+
+		c = *(last + 1);
+		*(last + 1) = '\0';
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() range:'%s'", __function_name, start);
 
@@ -532,7 +540,7 @@ static void	process_rule(DB_DRULE *drule)
 next:
 		if (NULL != comma)
 		{
-			*comma = ',';
+			*(last + 1) = c;
 			start = comma + 1;
 		}
 		else
