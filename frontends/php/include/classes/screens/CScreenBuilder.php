@@ -338,7 +338,7 @@ class CScreenBuilder {
 		// create screen table
 		$screenTable = new CTable();
 		$screenTable->setAttribute('class',
-			in_array($this->mode, array(SCREEN_MODE_PREVIEW, SCREEN_MODE_SLIDESHOW)) ? 'screen_view' : 'screen-table'
+			in_array($this->mode, array(SCREEN_MODE_PREVIEW, SCREEN_MODE_SLIDESHOW)) ? 'screen-table' : 'screen-table dashed-border'
 		);
 		$screenTable->setAttribute('id', self::makeScreenTableId($this->screen['screenid']));
 
