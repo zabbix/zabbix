@@ -443,7 +443,7 @@ function copyItems($srcHostId, $dstHostId) {
 function copyApplications($srcHostId, $dstHostId) {
 	$apps_to_clone = API::Application()->get(array(
 		'hostids' => $srcHostId,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('name'),
 		'inherited' => false
 	));
 	if (empty($apps_to_clone)) {
