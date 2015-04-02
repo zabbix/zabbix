@@ -71,7 +71,7 @@ $body-line-height: 1.4em;
 $font-h1-size: 1.750em; // 21px
 $h1-line-height: 1.2em;
 
-$font-h2-size: 1.500em; // 18px
+$font-h2-size: 1.5em; // 18px
 $h2-line-height: 1.2em;
 
 $font-h3-size: 0.917em; // 11px
@@ -80,6 +80,10 @@ $font-h4-size: 1.333em; //16px
 $h4-line-height: 1.2em;
 
 $font-top-nav-size: 1.167em; // 14px
+
+$font-setup-title: 7em; // 84px
+$setup-title-line-height: 0.8em;
+$font-setup-sup-title: 0.250em; // 21px
 
 $font-form-size: 1em; // Default 1em/12px 
 $font-msg-reset-size: 0.850em; // Default 1em/12px
@@ -120,6 +124,11 @@ $font-transform: uppercase;
 
 @mixin font-form {
 	font: $font-form-size $font-stack;
+}
+
+@mixin font-setup-title {
+	font-size: $font-setup-title;
+	line-height: $setup-title-line-height;
 }
 
 //CSS3
