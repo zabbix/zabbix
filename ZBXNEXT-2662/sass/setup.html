@@ -33,7 +33,7 @@
 		</div>
 		<div class="setup-right">
 		<div class="setup-right-body">
-		Welcome to Zabbix 3.0
+		<div class="setup-title"><span>Welcome to</span>Zabbix 3.0</div>
 		</div>
 		</div>
 	<div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Back</button><button type="button">Next step</button></div>
@@ -109,25 +109,25 @@
     <tr>
       <td>PHP time zone</td>
       <td>Europe/Riga</td>
-      <td>&nbsp;</td>
+      <td></td>
       <td class="green">OK</td>
     </tr>
     <tr>
       <td>PHP databases support</td>
       <td>MySQL</td>
-      <td>&nbsp;</td>
+      <td></td>
       <td class="green">OK</td>
     </tr>
     <tr>
       <td>PHP bcmath</td>
       <td>on</td>
-      <td>&nbsp;</td>
+      <td></td>
       <td class="green">OK</td>
     </tr>
     <tr>
       <td>PHP mbstring</td>
       <td>on</td>
-      <td>&nbsp;</td>
+      <td></td>
       <td class="green">OK</td>
     </tr>
     <tr>
@@ -139,7 +139,7 @@
     <tr>
       <td>PHP sockets</td>
       <td>on</td>
-      <td>&nbsp;</td>
+      <td></td>
       <td class="green">OK</td>
     </tr>
     <tr>
@@ -151,19 +151,19 @@
     <tr>
       <td>PHP gd PNG support</td>
       <td>on</td>
-      <td>&nbsp;</td>
+      <td></td>
       <td class="green">OK</td>
     </tr>
     <tr>
       <td>PHP gd JPEG support</td>
       <td>on</td>
-      <td>&nbsp;</td>
+      <td></td>
       <td class="green">OK</td>
     </tr>
     <tr>
       <td>PHP gd FreeType support</td>
       <td>on</td>
-      <td>&nbsp;</td>
+      <td></td>
       <td class="green">OK</td>
     </tr>
     <tr>
@@ -175,25 +175,25 @@
     <tr>
       <td>PHP xmlwriter</td>
       <td>on</td>
-      <td>&nbsp;</td>
+      <td></td>
       <td class="green">OK</td>
     </tr>
     <tr>
       <td>PHP xmlreader</td>
       <td>on</td>
-      <td>&nbsp;</td>
+      <td></td>
       <td class="green">OK</td>
     </tr>
     <tr>
       <td>PHP ctype</td>
       <td>on</td>
-      <td>&nbsp;</td>
+      <td></td>
       <td class="green">OK</td>
     </tr>
     <tr>
       <td>PHP session</td>
       <td>on</td>
-      <td>&nbsp;</td>
+      <td></td>
       <td class="green">OK</td>
     </tr>
     <tr>
@@ -205,7 +205,7 @@
     <tr>
       <td>PHP gettext</td>
       <td>on</td>
-      <td>&nbsp;</td>
+      <td></td>
       <td class="green">OK</td>
     </tr>
   </tbody>
@@ -238,19 +238,19 @@
 		<div class="setup-right">
 		<h1>Configure DB connection</h1>
 		<div class="setup-right-body">
-		Please create database manually, and set the configuration parameters for connection to this database.<br>Press "Test connection" button when done.
+		<p>Please create database manually, and set the configuration parameters for connection to this database. Press "Test connection" button when done.</p>
 		<ul class="table-forms">
-		<li><div class="table-forms-td-left"><label for="HostName">Databese type</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="localhost"></div></li>
-	    <li><div class="table-forms-td-left"><label for="HostName">Database host</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="localhost"></div></li>
-	    <li><div class="table-forms-td-left"><label for="HostName">Database port</label></div><div class="table-forms-td-right"><input type="number" id="HostName" value="0"> 0&ndash;use default port</div></li>
-	    <li><div class="table-forms-td-left"><label for="HostName">Database name</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="zabbix"></div></li>
-	    <li><div class="table-forms-td-left"><label for="HostName">User</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="root"></div></li>
-	    <li><div class="table-forms-td-left"><label for="HostName">Password</label></div><div class="table-forms-td-right"><input type="password" id="HostName"></div></li>
-	    <li><div class="table-forms-td-left"><label for=""></label></div><div class="table-forms-td-right"><button type="button" class="btn-grey">Test connection</button></div></li>
+		<li><div class="table-forms-td-left"><label for="DBType">Databese type</label></div><div class="table-forms-td-right"><input type="text" id="DBType" value="localhost"></div></li>
+	    <li><div class="table-forms-td-left"><label for="DBHost">Database host</label></div><div class="table-forms-td-right"><input type="text" id="DBHost" value="localhost"></div></li>
+	    <li><div class="table-forms-td-left"><label for="DBPort">Database port</label></div><div class="table-forms-td-right"><input type="text" id="DBPort" value="0"> <span class="grey">0&ndash;use default port</span></div></li>
+	    <li><div class="table-forms-td-left"><label for="DBName">Database name</label></div><div class="table-forms-td-right"><input type="text" id="DBName" value="zabbix"></div></li>
+	    <li><div class="table-forms-td-left"><label for="User">User</label></div><div class="table-forms-td-right"><input type="text" id="User" value="root"></div></li>
+	    <li><div class="table-forms-td-left"><label for="Password">Password</label></div><div class="table-forms-td-right"><input type="password" id="Password"></div></li>
+	    <li><div class="table-forms-td-left"><label for=""></label></div><div class="table-forms-td-right"><button type="button" class="btn-alt">Test connection</button></div></li>
 	    </ul>
 	    </div>
 	    </div>
-	    <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Back</button><button type="button">Next step</button></div>
+	    <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Back</button><button type="button" disabled>Next step</button></div>
 	    </div>
 	</form>
 	<div class="signin-links">Licensed under <a href="#">GPL v2</a></div>
@@ -274,11 +274,11 @@
 		<div class="setup-right">
 		<h1>Zabbix server details</h1>
 		<div class="setup-right-body">
-		Please enter host name or host IP address and port number of Zabbix server, as well as the name of the installation (optional).
+		<p>Please enter host name or host IP address and port number of Zabbix server, as well as the name of the installation (optional).</p>
        <ul class="table-forms">
-       <li><div class="table-forms-td-left"><label for="HostName">Host</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="localhost"></div></li>
-       <li><div class="table-forms-td-left"><label for="HostName">Port</label></div><div class="table-forms-td-right"><input type="number" id="HostName" value="10051"></div></li>
-       <li><div class="table-forms-td-left"><label for="HostName">Name</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value=""></div></li>
+       <li><div class="table-forms-td-left"><label for="ServerHost">Host</label></div><div class="table-forms-td-right"><input type="text" id="ServerHost" value="localhost"></div></li>
+       <li><div class="table-forms-td-left"><label for="ServerPort">Port</label></div><div class="table-forms-td-right"><input type="text" id="ServerPort" value="10051"></div></li>
+       <li><div class="table-forms-td-left"><label for="ServerName">Name</label></div><div class="table-forms-td-right"><input type="text" id="ServerName" value=""> <span class="grey">Optional</span></div></li>
        </ul>
        </div>
 	   </div>
@@ -305,7 +305,7 @@
 		<div class="setup-right">
 		<h1>Pre-installation summary</h1>
 		<div class="setup-right-body">
-		Please check configuration parameters. If all is correct, press "Next" button, or "Previous" button to change configuration parameters.
+		<p>Please check configuration parameters. If all is correct, press "Next step", or "Back" to change configuration parameters.</p>
        <ul class="table-forms">
        <li><div class="table-forms-td-left"><label for="HostName">Database type</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="MySQL"></div></li>
 	   <li><div class="table-forms-td-left"><label for="HostName">Database server</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="localhost"></div></li>
@@ -344,11 +344,10 @@
 		<h1>Install</h1>
 		<div class="setup-right-body">
 		Configuration file "/home/user/2.4.1/frontends/php/conf/zabbix.conf.php" created: OK
-		Congratulations on successful installation of Zabbix frontend.
-		When done, press the "Finish" button
+		Congratulations on successful installation of Zabbix frontend. When done, press "Finish".
 		</div>
 		</div>
-	    <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Back</button><button type="button">Get started!</button></div>
+	    <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Back</button><button type="button">Finish</button></div>
 	    </div>
 	</form>
 	<div class="signin-links">Licensed under <a href="#">GPL v2</a></div>

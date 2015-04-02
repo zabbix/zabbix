@@ -1515,6 +1515,19 @@ button[disabled] {
 	}
 }
 
+.setup-title {
+	color: #768d99;
+	height: 350px;
+	display: table-cell;
+	vertical-align: middle;
+	@include font-setup-title;
+
+	span {
+		display: block;
+		font-size: $font-setup-sup-title;
+	}
+}
+
 .setup-footer {
 	position: absolute;
 	bottom: 21px;
