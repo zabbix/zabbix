@@ -576,7 +576,7 @@ foreach (@$tlds_ref)
 
 								my $service_only = ($port eq "43" ? 2 : 3); # 0 - down, 1 - up, 2 - only 43, 3 - only 80
 
-								$tr_ref->{'ports'}->{$port}->{$probe}->{'status'} = ($status_ref->{'value'} == 1 or $status_ref->{'value'} == $service_only ? "Up" : "Down");
+								$tr_ref->{'ports'}->{$port}->{$probe}->{'status'} = (($status_ref->{'value'} == 1 or $status_ref->{'value'} == $service_only) ? "Up" : "Down");
 							}
 						}
 					}
