@@ -29,13 +29,11 @@ db_connect();
 
 __validate_input();
 
-my $opt_period = getopt('period');
-my $opt_probe = getopt('probe');
 my $opt_from = getopt('from');
 
 if (defined($opt_from))
 {
-	$opt_from -= ($opt_from % 60);	# use the whole minute
+	$opt_from = truncate_from($opt_from);	# use the whole minute
 	dbg("option \"from\" truncated to the beginnin of a minute: $opt_from") if ($opt_from != getopt('from'));
 }
 
@@ -136,7 +134,7 @@ foreach (@$tlds_ref)
 {
 	$tld = $_;
 
-	my $api_tld = ah_get_api_tld($tld);
+	my $ah_tld = ah_get_api_tld($tld);
 
 	if (__tld_ignored($tld) == SUCCESS)
 	{
@@ -154,7 +152,7 @@ foreach (@$tlds_ref)
 			}
 			else
 			{
-				if (ah_save_alarmed($api_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
+				if (ah_save_alarmed($ah_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
 				{
 					fail("cannot save alarmed: ", ah_get_error());
 				}
@@ -194,7 +192,7 @@ foreach (@$tlds_ref)
 
 		if (opt('continue'))
 		{
-			$continue_file = ah_get_continue_file($api_tld, $service);
+			$continue_file = ah_get_continue_file($ah_tld, $service);
 			my $handle;
 
 			if (-e $continue_file)
@@ -209,33 +207,55 @@ foreach (@$tlds_ref)
 			}
 		}
 
-		my $till;
-		my $from;
+		my ($from, $till);
+		if (opt('continue'))
+		{
+			if (defined($continue_clock))
+			{
+				$from = $continue_clock;
+			}
 
-		if (defined($continue_clock))
-		{
-			$till = $lastclock + RESULT_TIMESTAMP_SHIFT; # include the whole minute
-			$from = $continue_clock;
+			if (opt('period'))
+			{
+				if (not defined($from))
+				{
+					$from = truncate_from(__get_min_clock($tld, $service));
+
+					if ($from == 0)
+					{
+						wrn("skip $service: no data in the database yet");
+						next;
+					}
+				}
+
+				$till = $from + getopt('period') * 60 - 1;
+			}
+			else
+			{
+				$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
+			}
 		}
-		elsif (defined($opt_from))
+		elsif (opt('from'))
 		{
-			# include the whole minute
-			$from = $opt_from - ($opt_from % 60);
-			$till = $opt_from + $opt_period * 60 - 1;
-		}
-		elsif (defined($opt_period))
-		{
-			# include the whole minute
-			$till = $lastclock + RESULT_TIMESTAMP_SHIFT;
-			$from = $till - $opt_period * 60 + 1;
+			$from = $opt_from;
+
+			if (opt('period'))
+			{
+				$till = $from + getopt('period') * 60 - 1;
+			}
+			else
+			{
+				$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
+			}
 		}
 
-		if (defined($from))
+		if ((defined($from) and $from > $lastclock))
 		{
-			fail("option --continue used too soon, please wait till new data is available in the database") if ($from > $till);
+			wrn("given time period (", __selected_period($from, $till), ") is in the future");
+			next;
 		}
 
-		__prnt(uc($service), " period: ", __selected_period($from, $till)) if (opt('dry-run') or opt('debug'));
+		__prnt("period: ", __selected_period($from, $till), " (", uc($service), ")") if (opt('dry-run') or opt('debug'));
 
 		if (opt('dry-run'))
 		{
@@ -243,7 +263,7 @@ foreach (@$tlds_ref)
 		}
 		else
 		{
-			if (ah_save_service_availability($api_tld, $service, $downtime, $lastclock) != AH_SUCCESS)
+			if (ah_save_service_availability($ah_tld, $service, $downtime, $lastclock) != AH_SUCCESS)
 			{
 				fail("cannot save service availability: ", ah_get_error());
 			}
@@ -269,7 +289,7 @@ foreach (@$tlds_ref)
 		}
 		else
 		{
-			if (ah_save_alarmed($api_tld, $service, $alarmed_status, $lastclock) != AH_SUCCESS)
+			if (ah_save_alarmed($ah_tld, $service, $alarmed_status, $lastclock) != AH_SUCCESS)
 			{
 				fail("cannot save alarmed: ", ah_get_error());
 			}
@@ -281,19 +301,19 @@ foreach (@$tlds_ref)
 		{
 			$interval = $cfg_dns_interval;
 			$nsips_ref = get_nsips($tld, $cfg_dns_key_rtt, 1); # templated
-			$dns_items_ref = __get_dns_itemids($nsips_ref, $cfg_dns_key_rtt, $tld, $opt_probe);
+			$dns_items_ref = __get_dns_itemids($nsips_ref, $cfg_dns_key_rtt, $tld, getopt('probe'));
 		}
 		elsif ($service eq 'rdds')
 		{
 			$interval = $cfg_rdds_interval;
-			$rdds_dbl_items_ref = __get_rdds_dbl_itemids($tld, $opt_probe);
-			$rdds_str_items_ref = __get_rdds_str_itemids($tld, $opt_probe);
+			$rdds_dbl_items_ref = __get_rdds_dbl_itemids($tld, getopt('probe'));
+			$rdds_str_items_ref = __get_rdds_str_itemids($tld, getopt('probe'));
 		}
 		elsif ($service eq 'epp')
 		{
 			$interval = $cfg_epp_interval;
-			$epp_dbl_items_ref = __get_epp_dbl_itemids($tld, $opt_probe);
-			$epp_str_items_ref = __get_epp_str_itemids($tld, $opt_probe);
+			$epp_dbl_items_ref = __get_epp_dbl_itemids($tld, getopt('probe'));
+			$epp_str_items_ref = __get_epp_str_itemids($tld, getopt('probe'));
 		}
 
 		$incidents = get_incidents($avail_itemid, $from, $till);
@@ -383,7 +403,7 @@ foreach (@$tlds_ref)
 			}
 			else
 			{
-				if (ah_save_incident($api_tld, $service, $eventid, $event_start, $event_end, $false_positive, $lastclock) != AH_SUCCESS)
+				if (ah_save_incident($ah_tld, $service, $eventid, $event_start, $event_end, $false_positive, $lastclock) != AH_SUCCESS)
 				{
 					fail("cannot save incident: ", ah_get_error());
 				}
@@ -470,7 +490,7 @@ foreach (@$tlds_ref)
 					}
 					else
 					{
-						if (ah_save_incident_json($api_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
+						if (ah_save_incident_json($ah_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
 						{
 							fail("cannot save incident: ", ah_get_error());
 						}
@@ -565,7 +585,7 @@ foreach (@$tlds_ref)
 					}
 					else
 					{
-						if (ah_save_incident_json($api_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
+						if (ah_save_incident_json($ah_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
 						{
 							fail("cannot save incident: ", ah_get_error());
 						}
@@ -642,7 +662,7 @@ foreach (@$tlds_ref)
                                         }
                                         else
                                         {
-                                                if (ah_save_incident_json($api_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
+                                                if (ah_save_incident_json($ah_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
                                                 {
                                                         fail("cannot save incident: ", ah_get_error());
                                                 }
@@ -1414,21 +1434,9 @@ sub __validate_input
 		usage();
 	}
 
-	if (opt('period') and opt('continue'))
-	{
-		print("Error: options --period and --continue cannot be used together\n");
-		usage();
-	}
-
-	if (opt('from') and opt('continue'))
+	if (opt('continue') and opt('from'))
         {
-                print("Error: options --from and --continue cannot be used together\n");
-                usage();
-        }
-
-	if (opt('from') and not opt('period'))
-        {
-                print("Error: option --from can only be used together with --period\n");
+                print("Error: options --continue and --from cannot be used together\n");
                 usage();
         }
 
@@ -1467,6 +1475,57 @@ sub __validate_input
         }
 }
 
+sub __sql_arr_to_str
+{
+	my $rows_ref = shift;
+
+	my @arr;
+	foreach my $row_ref (@$rows_ref)
+        {
+                push(@arr, $row_ref->[0]);
+	}
+
+	return join(',', @arr);
+}
+
+sub __get_min_clock
+{
+	my $tld = shift;
+	my $service = shift;
+
+	my $key_condition;
+	if ($service eq 'dns' or $service eq 'dnssec')
+	{
+		$key_condition = "key_='$cfg_dns_key_status'";
+	}
+	elsif ($service eq 'rdds')
+	{
+		$key_condition = "key_ like '$cfg_rdds_key_status%'";
+	}
+	elsif ($service eq 'epp')
+	{
+		$key_condition = "key_='$cfg_epp_key_status'";
+	}
+
+	my $rows_ref = db_select("select hostid from hosts where host like '$tld %'");
+
+	return 0 if (scalar(@$rows_ref) == 0);
+
+	my $hostids_str = __sql_arr_to_str($rows_ref);
+
+	$rows_ref = db_select("select itemid from items where $key_condition and templateid is not NULL and hostid in ($hostids_str)");
+
+	return 0 if (scalar(@$rows_ref) == 0);
+
+	my $itemids_str = __sql_arr_to_str($rows_ref);
+
+	$rows_ref = db_select("select min(clock) from history_uint where itemid in ($itemids_str)");
+
+	return 0 if (scalar(@$rows_ref) == 0);
+
+	return $rows_ref->[0]->[0];
+}
+
 __END__
 
 =head1 NAME
@@ -1475,7 +1534,7 @@ update-api-data.pl - save information about the incidents to a filesystem
 
 =head1 SYNOPSIS
 
-update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--period <minutes> [--from <timestamp>]|--continue] [--dry-run [--probe name]] [--debug] [--help]
+update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--from <timestamp>|--continue] [--period] [--dry-run [--probe name]] [--debug] [--help]
 
 =head1 OPTIONS
 
@@ -1499,25 +1558,22 @@ This option cannot be used together with option --tld.
 
 =item B<--period> minutes
 
-Specify number of minutes of the period of calculation. This period is up till the latest available
-data in the database.
-
-This option cannot be used together with option --continue.
+Specify number of minutes of the period of calculation. The start of the priod can be controlled
+using options --continue (continue from the last time --continue was used) or --from (see below).
 
 =item B<--from> timestamp
 
-Specify the beginning of the period to process as Unix timestamp. The period length is controlled
-by option --period.
-
-This option can only be used together with option --period.
+Specify the beginning of the period of calculation as Unix timestamp. The period length can be
+controlled using option --period otherwise the whole period up to the latest data available in the
+database will be processed.
 
 This option cannot be used together with option --continue.
 
 =item B<--continue>
 
-Continue processing API data from the timestamp of the last run with --continue. In case of first
-run with --continue all available data will be processed. The continue token is saved per each
-TLD-service pair separately.
+Continue calculation from the timestamp of the last run with --continue. In case of first run with
+--continue all available data will be calculated. The continue token is saved per each TLD-service
+pair separately.
 
 Note, that continue token will not be updated if this option was specified together with --dry-run.
 
@@ -1525,7 +1581,7 @@ This option cannot be used together with option --period.
 
 =item B<--probe> name
 
-Only process data from specified probe.
+Only calculate data from specified probe.
 
 This option can only be used for debugging purposes and must be used together with option --dry-run .
 

@@ -76,7 +76,7 @@ our @EXPORT = qw($result $dbh $tld
 		process_slv_monthly get_results get_item_values check_lastclock sql_time_condition get_incidents
 		get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
 		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
-		get_tld_by_trigger
+		get_tld_by_trigger truncate_from
 		dbg info wrn fail slv_exit exit_if_running trim parse_opts opt getopt setopt optkeys ts_str write_file
 		usage);
 
@@ -2328,6 +2328,14 @@ sub get_tld_by_trigger
 	$rows_ref = db_select("select host from hosts where hostid=$hostid");
 
 	return ($rows_ref->[0]->[0], $service);
+}
+
+sub truncate_from
+{
+	my $ts = shift;
+
+	# truncate to the beginning of the minute
+	return $ts - ($ts % 60);
 }
 
 sub slv_exit
