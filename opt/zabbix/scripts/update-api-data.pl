@@ -248,6 +248,12 @@ foreach (@$tlds_ref)
 				$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
 			}
 		}
+		elsif (opt('period'))
+		{
+			# only period specified
+			$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
+			$from = $till - getopt('period') * 60 + 1;
+		}
 
 		if ((defined($from) and $from > $lastclock))
 		{
@@ -512,15 +518,11 @@ foreach (@$tlds_ref)
 
 					foreach my $port (keys(%$ports_ref))
 					{
-						my $endvalues_ref = $ports_ref->{$port};
-
-						dbg("  ", scalar(keys(%$endvalues_ref)), " values for $port:") if (opt('debug'));
-
 						my $test_result_index = 0;
 
-						foreach my $clock (sort(keys(%$endvalues_ref))) # must be sorted by clock
+						foreach my $endvalues_ref (@{$ports_ref->{$port}})
 						{
-							#dbg(Dumper($endvalues_ref->{$clock}))if (opt('debug'));
+							my $clock = $endvalues_ref->{'clock'};
 
 							if ($clock < $test_results[$test_result_index]->{'start'})
 							{
@@ -541,7 +543,7 @@ foreach (@$tlds_ref)
 
 							$tr_ref->{'ports'}->{$port}->{$probe}->{'status'} = 'No result' unless (exists($tr_ref->{'ports'}->{$port}->{$probe}->{'status'}));
 
-							$tr_ref->{'ports'}->{$port}->{$probe}->{'details'}->{$clock} = $endvalues_ref->{$clock};
+							push(@{$tr_ref->{'ports'}->{$port}->{$probe}->{'details'}}, $endvalues_ref);
 						}
 					}
 				}
@@ -835,8 +837,6 @@ sub __get_rdds_test_values
 	my $start = shift;
 	my $end = shift;
 
-	my %result;
-
 	# generate list if itemids
 	my $dbl_itemids_str = '';
 	foreach my $probe (keys(%$rdds_dbl_items_ref))
@@ -862,7 +862,12 @@ sub __get_rdds_test_values
 		}
 	}
 
+	my %result;
+
 	return \%result if ($dbl_itemids_str eq '' or $str_itemids_str eq '');
+
+	# we need pre_result to combine IP and RTT to single test result
+	my %pre_result;
 
 	my $dbl_rows_ref = db_select("select itemid,value,clock from history where itemid in ($dbl_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
 
@@ -879,7 +884,7 @@ sub __get_rdds_test_values
 		my $port = __get_rdds_port($key);
 		my $type = __get_rdds_dbl_type($key);
 
-		$result{$probe}->{$port}->{$clock}->{$type} = ($type eq 'rtt') ? get_detailed_result($cfg_rdds_valuemaps, $value) : int($value);
+		$pre_result{$probe}->{$port}->{$clock}->{$type} = ($type eq 'rtt') ? get_detailed_result($cfg_rdds_valuemaps, $value) : int($value);
 	}
 
 	my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
@@ -897,7 +902,26 @@ sub __get_rdds_test_values
 		my $port = __get_rdds_port($key);
 		my $type = __get_rdds_str_type($key);
 
-		$result{$probe}->{$port}->{$clock}->{$type} = $value;
+		$pre_result{$probe}->{$port}->{$clock}->{$type} = $value;
+	}
+
+	foreach my $probe (keys(%pre_result))
+	{
+		foreach my $port (keys(%{$pre_result{$probe}}))
+		{
+			foreach my $clock (keys(%{$pre_result{$probe}->{$port}}))
+			{
+				my $h;
+				my $clock_ref = $pre_result{$probe}->{$port}->{$clock};
+				foreach my $key (sort(keys(%{$pre_result{$probe}->{$port}->{$clock}})))	# must be sorted by clock
+				{
+					$h->{$key} = $clock_ref->{$key};
+				}
+				$h->{'clock'} = $clock;
+
+				push(@{$result{$probe}->{$port}}, $h);
+			}
+		}
 	}
 
 	return \%result;
