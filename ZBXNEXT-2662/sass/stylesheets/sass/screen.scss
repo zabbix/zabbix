@@ -443,6 +443,7 @@ footer {
 	}
 
 	.vertical_rotation_inner {
+		white-space: nowrap;
 		@include rotate(270);
 	} 
 }
@@ -528,6 +529,25 @@ footer {
 
 	&:active {
 		background: darken($alt-blue, 5%);
+	}
+}
+
+.treeview {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+	text-align: center;
+	//margin-left: -5px;
+	//background: #eee;
+
+	.arrow-right {
+		border-left-color: $blue-grey;
+	}
+
+	.arrow-down {
+		margin-bottom: 2px;
+		border-top-color: $blue-grey;
 	}
 }
 
@@ -1618,6 +1638,13 @@ button[disabled] {
 
 	.cell {
 		min-width: 250px;
+
+		&:last-child {
+
+			.dashbrd-widget {
+				margin: 0 0 10px 0;
+			}
+		}
 	}
 }
 
