@@ -75,7 +75,7 @@ if ($data['hostId'] && (!hasRequest('form_refresh') || $cloningDiscoveredHost)) 
 	$ipmiUsername = $dbHost['ipmi_username'];
 	$ipmiPassword = $dbHost['ipmi_password'];
 
-	$macros = order_macros($dbHost['macros'], 'macro');
+	$macros = $dbHost['macros'];
 	$groupIds = zbx_objectValues($dbHost['groups'], 'groupid');
 
 	if ($cloningDiscoveredHost) {
@@ -149,6 +149,11 @@ else {
 		$status = getRequest('status', HOST_STATUS_NOT_MONITORED);
 	}
 }
+
+if ($data['show_inherited_macros']) {
+	$macros = mergeInheritedMacros($macros, getInheritedMacros($templateIds));
+}
+$macros = array_values(order_macros($macros, 'macro'));
 
 $mainInterfaces = getRequest('mainInterfaces', array());
 foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $interfaceType) {
@@ -849,7 +854,8 @@ if (!$macros) {
 }
 
 $macrosView = new CView('hostmacros', array(
-	'macros' => array_values($macros),
+	'macros' => $macros,
+	'show_inherited_macros' => $data['show_inherited_macros'],
 	'readonly' => $isDiscovered
 ));
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());

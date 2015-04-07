@@ -59,6 +59,7 @@ $fields = array(
 	'newgroup'			=> array(T_ZBX_STR, O_OPT, null,		null,	null),
 	'description'		=> array(T_ZBX_STR, O_OPT, null,		null,	null),
 	'macros'			=> array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
+	'show_inherited_macros' => array(T_ZBX_INT, O_OPT, null,	IN(array(0,1)), null),
 	// actions
 	'action'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"template.export","template.massdelete","template.massdeleteclear"'),
@@ -107,6 +108,11 @@ if ($exportData) {
 	}
 
 	exit;
+}
+
+// remove inherited macros data (actions: 'add', 'update' and 'form')
+if (hasRequest('macros')) {
+	$_REQUEST['macros'] = cleanInheritedMacros($_REQUEST['macros']);
 }
 
 /*
@@ -439,7 +445,8 @@ if (hasRequest('form')) {
 	$data = array(
 		'form' => getRequest('form'),
 		'groupId' => getRequest('groupid', 0),
-		'groupIds' => getRequest('groups', array())
+		'groupIds' => getRequest('groups', array()),
+		'show_inherited_macros' => getRequest('show_inherited_macros', 0)
 	);
 
 	if ($templateId) {

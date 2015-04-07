@@ -278,8 +278,15 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
 
 	// macros
+	$macros = $parentHost['macros'];
+	if ($data['show_inherited_macros']) {
+		$macros = mergeInheritedMacros($macros, getInheritedMacros(zbx_objectValues($hostPrototype['templates'], 'templateid')));
+	}
+	$macros = array_values(order_macros($macros, 'macro'));
+
 	$macrosView = new CView('hostmacros', array(
-		'macros' => array_values($parentHost['macros']),
+		'macros' => $macros,
+		'show_inherited_macros' => $data['show_inherited_macros'],
 		'readonly' => true
 	));
 	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());

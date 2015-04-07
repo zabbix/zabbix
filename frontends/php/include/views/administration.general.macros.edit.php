@@ -43,9 +43,9 @@ $header_form->addItem(new CComboBox('configDropDown', 'adm.macros.php',
 $widget = new CWidget();
 $widget->addPageHeader(_('CONFIGURATION OF MACROS'), $header_form);
 
-$table = new CTable(SPACE, 'formElementTable');
+$table = new CTable(null, 'formElementTable');
 $table->setAttribute('id', 'tbl_macros');
-$table->addRow(array(_('Macro'), SPACE, _('Value'), SPACE));
+$table->addRow(array(_('Macro'), '', _('Value'), ''));
 
 // fields
 foreach ($data['macros'] as $i => $macro) {
@@ -56,14 +56,12 @@ foreach ($data['macros'] as $i => $macro) {
 	$value_input = new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255);
 	$value_input->setAttribute('placeholder', _('value'));
 
-	$remove_button = array(new CButton('macros['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove'));
+	$button_cell = array(new CButton('macros['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove'));
 	if (array_key_exists('globalmacroid', $macro)) {
-		$remove_button[] = new CVar('macros['.$i.'][globalmacroid]', $macro['globalmacroid'],
-			'macros_'.$i.'_globalmacroid'
-		);
+		$button_cell[] = new CVar('macros['.$i.'][globalmacroid]', $macro['globalmacroid']);
 	}
 
-	$row = array($macro_input, '&rArr;', $value_input, $remove_button);
+	$row = array($macro_input, '&rArr;', $value_input, $button_cell);
 	$table->addRow($row, 'form_row');
 }
 
