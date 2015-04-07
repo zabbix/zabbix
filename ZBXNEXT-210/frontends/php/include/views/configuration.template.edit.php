@@ -55,9 +55,14 @@ if ($data['templateId'] != 0 && !hasRequest('form_refresh')) {
 		$visiblename = '';
 	}
 
-	$macros = order_macros($this->data['dbTemplate']['macros'], 'macro');
+	$macros = $this->data['dbTemplate']['macros'];
 	$templateIds = $this->data['original_templates'];
 }
+
+if ($data['show_inherited_macros']) {
+	$macros = mergeInheritedMacros($macros, getInheritedMacros($templateIds));
+}
+$macros = array_values(order_macros($macros, 'macro'));
 
 $clear_templates = array_intersect($clear_templates, array_keys($this->data['original_templates']));
 $clear_templates = array_diff($clear_templates, array_keys($templateIds));
@@ -452,7 +457,8 @@ if (!$macros) {
 }
 
 $macrosView = new CView('hostmacros', array(
-	'macros' => array_values($macros),
+	'macros' => $macros,
+	'show_inherited_macros' => $data['show_inherited_macros'],
 	'readonly' => false
 ));
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());

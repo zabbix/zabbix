@@ -74,6 +74,7 @@ $fields = array(
 	'host_inventory' =>	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	null,		null),
 	'macros' =>			array(T_ZBX_STR, O_OPT, P_SYS,			null,		null),
 	'visible' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
+	'show_inherited_macros' => array(T_ZBX_INT, O_OPT, null, IN(array(0,1)), null),
 	// actions
 	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 							IN('"host.export","host.massdelete","host.massdisable","host.massenable","host.massupdate"'.
@@ -173,6 +174,11 @@ $filter['ip'] = CProfile::get('web.hosts.filter_ip', '');
 $filter['dns'] = CProfile::get('web.hosts.filter_dns', '');
 $filter['host'] = CProfile::get('web.hosts.filter_host', '');
 $filter['port'] = CProfile::get('web.hosts.filter_port', '');
+
+// remove inherited macros data (actions: 'add', 'update' and 'form')
+if (hasRequest('macros')) {
+	$_REQUEST['macros'] = cleanInheritedMacros($_REQUEST['macros']);
+}
 
 /*
  * Actions
@@ -753,7 +759,8 @@ elseif (hasRequest('form')) {
 	$data = array(
 		'form' => getRequest('form'),
 		'hostId' => getRequest('hostid', 0),
-		'groupId' => getRequest('groupid', 0)
+		'groupId' => getRequest('groupid', 0),
+		'show_inherited_macros' => getRequest('show_inherited_macros', 0)
 	);
 
 	if ($data['hostId']) {

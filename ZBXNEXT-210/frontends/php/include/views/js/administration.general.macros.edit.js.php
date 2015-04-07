@@ -13,27 +13,27 @@
 	</tr>
 </script>
 <script type="text/javascript">
-	jQuery(function() {
-		jQuery('#tbl_macros').on('click', 'button.element-table-remove', function() {
-			var e = jQuery(this);
+	jQuery(function($) {
+		$('#tbl_macros').on('click', 'button.element-table-remove', function() {
+			var e = $(this);
 
 			// check if the macro has an hidden ID element, if it does - increment the deleted macro counter
 			var macroNum = e.attr('id').split('_')[1];
-			if (jQuery('#macros_' + macroNum + '_globalmacroid').length) {
-				var count = jQuery('#update').data('removedCount') + 1;
-				jQuery('#update').data('removedCount', count);
+			if ($('#macros_' + macroNum + '_globalmacroid').length) {
+				var count = $('#update').data('removedCount') + 1;
+				$('#update').data('removedCount', count);
 			}
 		});
 
-		jQuery('#update').click(function() {
-			var removedCount = jQuery(this).data('removedCount');
+		$('#update').click(function() {
+			var removedCount = $(this).data('removedCount');
 
 			if (removedCount) {
 				return confirm(<?php echo CJs::encodeJson(_('Are you sure you want to delete')); ?> + ' ' + removedCount + ' ' + <?php echo CJs::encodeJson(_('macro(s)')); ?>+'?');
 			}
 		});
 
-		jQuery('#tbl_macros').dynamicRows({
+		$('#tbl_macros').dynamicRows({
 			template: '#macroRow'
 		});
 	});
