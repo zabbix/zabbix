@@ -886,8 +886,6 @@ int	is_ip(const char *ip)
  *                                                                            *
  * Return value: FAIL - out of range, SUCCEED - within the range              *
  *                                                                            *
- * Comments: optional spaces are allowed between ip ranges                    *
- *                                                                            *
  ******************************************************************************/
 int	ip_in_list(const char *list, const char *ip)
 {
@@ -897,7 +895,7 @@ int	ip_in_list(const char *list, const char *ip)
 	zbx_iprange_t	iprange;
 	char		*address = NULL;
 	size_t		address_alloc = 0, address_offset;
-	const char	*comma, *last;
+	const char	*ptr;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' ip:'%s'", __function_name, list, ip);
@@ -910,35 +908,25 @@ int	ip_in_list(const char *list, const char *ip)
 #endif
 	iprange_first(&iprange, ipaddress);
 
-	while ('\0' != *list)
+	for (ptr = list; '\0' != *ptr; list = ptr + 1)
 	{
-		if (NULL != (comma = strchr(list, ',')))
-			last = comma - 1;
-		else
-			last = list + strlen(list) - 1;
-
-		zbx_lskip_chars(&list, " ");
-		zbx_rskip_chars(&last, list, " ");
+		if (NULL == (ptr = strchr(list, ',')))
+			ptr = list + strlen(list);
 
 		address_offset = 0;
-		zbx_strncpy_alloc(&address, &address_alloc, &address_offset, list, last - list + 1);
+		zbx_strncpy_alloc(&address, &address_alloc, &address_offset, list, ptr - list);
 
 		if (SUCCEED != iprange_parse(&iprange, address))
-			goto next;
+			continue;
 #ifndef HAVE_IPV6
 		if (ZBX_IPRANGE_V6 == iprange.type)
-			goto next;
+			continue;
 #endif
 		if (SUCCEED == iprange_validate(&iprange, ipaddress))
 		{
 			ret = SUCCEED;
 			break;
 		}
-next:
-		if (NULL != comma)
-			list = comma + 1;
-		else
-			break;
 	}
 
 	zbx_free(address);
