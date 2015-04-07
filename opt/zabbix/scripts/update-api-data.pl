@@ -257,7 +257,7 @@ foreach (@$tlds_ref)
 
 		if ((defined($from) and $from > $lastclock))
 		{
-			wrn("given time period (", __selected_period($from, $till), ") is in the future");
+			wrn(uc($service), ": given time period (", __selected_period($from, $till), ") is in the future from the latest data available (", ts_str($lastclock), ")");
 			next;
 		}
 
