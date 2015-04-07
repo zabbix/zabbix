@@ -147,9 +147,9 @@ sub ah_save_alarmed
 	my $status = shift;
 	my $clock = shift;
 
-	my $alarmed_path = __make_base_path($tld, $service);
+	my $base_path = __make_base_path($tld, $service);
 
-	make_path($alarmed_path, {error => \my $err});
+	make_path($base_path, {error => \my $err});
 
 	if (@$err)
 	{
@@ -157,7 +157,19 @@ sub ah_save_alarmed
 		return AH_FAIL;
 	}
 
-	$alarmed_path .= "/" . AH_ALARMED_FILE;
+	my $alarmed_path = "$base_path/" . AH_ALARMED_FILE;
+
+	# if service is disabled there should be no availability file
+	if ($status eq AH_ALARMED_DISABLED)
+	{
+		my $avail_path = "$base_path/" . AH_SERVICE_AVAILABILITY_FILE;;
+
+		if ((-e $avail_path) and not unlink($avail_path))
+		{
+			__set_file_error($!);
+			return AH_FAIL;
+		}
+	}
 
 	return __write_file($alarmed_path, $status, $clock);
 }
