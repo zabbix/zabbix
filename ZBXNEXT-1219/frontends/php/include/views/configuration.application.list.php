@@ -75,6 +75,13 @@ foreach ($this->data['applications'] as $application) {
 		$name[] = NAME_DELIMITER;
 		$name[] = $application['name'];
 	}
+	elseif ($application['discoveryRule']) {
+		$name = array(new CLink(CHtml::encode($application['discoveryRule']['name']),
+			'disc_prototypes.php?parent_discoveryid='.$application['discoveryRule']['itemid'],
+			'parent-discovery'
+		));
+		$name[] = NAME_DELIMITER.$application['name'];
+	}
 	else {
 		$name = new CLink(
 			$application['name'],
@@ -85,8 +92,13 @@ foreach ($this->data['applications'] as $application) {
 		);
 	}
 
+	$checkBox = new CCheckBox('applications['.$application['applicationid'].']', null, null,
+		$application['applicationid']
+	);
+	$checkBox->setEnabled(!$application['discoveryRule']);
+
 	$applicationTable->addRow(array(
-		new CCheckBox('applications['.$application['applicationid'].']', null, null, $application['applicationid']),
+		$checkBox,
 		($this->data['hostid'] > 0) ? null : $application['host']['name'],
 		$name,
 		array(

@@ -319,7 +319,8 @@ else {
 			'applicationids' => $applicationIds,
 			'output' => API_OUTPUT_EXTEND,
 			'selectItems' => array('itemid'),
-			'selectHost' => array('hostid', 'name')
+			'selectHost' => array('hostid', 'name'),
+			'selectDiscoveryRule' => array('itemid', 'name')
 		));
 
 		order_result($data['applications'], $sortField, $sortOrder);

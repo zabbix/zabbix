@@ -83,6 +83,7 @@ class CApplication extends CApiService {
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectHost'				=> null,
 			'selectItems'				=> null,
+			'selectDiscoveryRule'		=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -608,6 +609,33 @@ class CApplication extends CApiService {
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $items, 'items');
+		}
+
+		// adding discovery rule
+		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+
+			$dbRules = DBselect(
+				'SELECT ad.applicationid,ap.itemid'.
+				' FROM application_discovery ad,application_prototype ap,applications a'.
+				' WHERE '.dbConditionInt('ad.applicationid', array_keys($result)).
+					' AND ad.application_prototypeid=ap.application_prototypeid'.
+					' AND a.applicationid=ad.applicationid'.
+					' AND a.flags='.ZBX_FLAG_DISCOVERY_CREATED
+			);
+
+			while ($rule = DBfetch($dbRules)) {
+				$relationMap->addRelation($rule['applicationid'], $rule['itemid']);
+			}
+
+			$discoveryRules = API::DiscoveryRule()->get(array(
+				'output' => $options['selectDiscoveryRule'],
+				'itemids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+
+			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
 		return $result;
