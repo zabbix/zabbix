@@ -1407,13 +1407,13 @@ sub __update_false_positives
 	my $last_audit = ah_get_last_audit();
 	my $maxclock = 0;
 
-	# substring(details,1,8)!='Incident'" - to ignore old "details" format (dropped in December 2014)
+	# '%Incident [%]% - ignore old "details" format (dropped in December 2014)
 	my $rows_ref = db_select(
 		"select substring(details,1,locate(':',details)-1) as eventid,max(clock)".
 		" from auditlog".
 		" where resourcetype=".AUDIT_RESOURCE_INCIDENT.
 			" and clock>$last_audit".
-			" and substring(details,1,8)!='Incident'".
+			" and details not like '%Incident [%]%'".
 		" group by eventid");
 
 	foreach my $row_ref (@$rows_ref)
