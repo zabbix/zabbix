@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese and Japanese translations; th
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
+........S. [ZBX-9355] added host name and names of conflicting templates to the error message when templates fail to link due to a duplicate item, fixed linking of templates containing web scenarious (igors)
 ........S. [ZBX-9352] fixed execution of remote commands on the server in case trigger expression contains multiple hosts (asaveljevs)
 ........S. [ZBX-3507] fixed SMS sending with Huawei GSM modems (asaveljevs)
 ...G...PS. [ZBX-9251] added missing socket closing to avoid large number of opened sockets (igors)
