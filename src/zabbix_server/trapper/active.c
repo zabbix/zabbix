@@ -66,7 +66,9 @@ static int	get_hostid_by_host(const zbx_sock_t *sock, const char *host, const ch
 
 	host_esc = DBdyn_escape_string(host);
 
-	result = DBselect(
+	result =
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		DBselect(
 			"select hostid,status,tls_accept,tls_issuer,tls_subject,tls_psk_identity"
 			" from hosts"
 			" where host='%s'"
@@ -74,7 +76,16 @@ static int	get_hostid_by_host(const zbx_sock_t *sock, const char *host, const ch
 				" and flags<>%d"
 				" and proxy_hostid is null",
 			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
-
+#else
+		DBselect(
+			"select hostid,status,tls_accept"
+			" from hosts"
+			" where host='%s'"
+				" and status in (%d,%d)"
+				" and flags<>%d"
+				" and proxy_hostid is null",
+			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+#endif
 	if (NULL != (row = DBfetch(result)))
 	{
 		if (HOST_STATUS_MONITORED == atoi(row[1]))
