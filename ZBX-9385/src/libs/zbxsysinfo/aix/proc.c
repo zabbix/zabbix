@@ -29,9 +29,7 @@ static int	check_procstate(struct procentry64 *procentry, int zbx_proc_stat)
 	switch (zbx_proc_stat)
 	{
 		case ZBX_PROC_STAT_RUN:
-			return SRUN == procentry->pi_state ? SUCCEED : FAIL;
-		case ZBX_PROC_STAT_SLEEP:
-			return SSLEEP == procentry->pi_state ? SUCCEED : FAIL;
+			return SACTIVE == procentry->pi_state ? SUCCEED : FAIL;
 		case ZBX_PROC_STAT_ZOMB:
 			return SZOMB == procentry->pi_state ? SUCCEED : FAIL;
 	}
@@ -180,13 +178,22 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	param = get_rparam(request, 2);
 
 	if (NULL == param || '\0' == *param || 0 == strcmp(param, "all"))
+	{
 		zbx_proc_stat = ZBX_PROC_STAT_ALL;
+	}
 	else if (0 == strcmp(param, "run"))
+	{
 		zbx_proc_stat = ZBX_PROC_STAT_RUN;
+	}
 	else if (0 == strcmp(param, "sleep"))
-		zbx_proc_stat = ZBX_PROC_STAT_SLEEP;
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Sleep parameter is not supported."));
+		return SYSINFO_RET_FAIL;
+	}
 	else if (0 == strcmp(param, "zomb"))
+	{
 		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
+	}
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
