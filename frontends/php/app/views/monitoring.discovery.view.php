@@ -49,7 +49,7 @@ $header = array(
 );
 
 foreach ($data['services'] as $name => $foo) {
-	$header[] = new CCol($name, 'vertical_rotation');
+	$header[] = new CColHeader($name, 'vertical_rotation');
 }
 $discoveryTable->setHeader($header, 'vertical_header');
 

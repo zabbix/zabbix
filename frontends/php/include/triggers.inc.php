@@ -1093,7 +1093,12 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 	if ($viewMode == STYLE_TOP) {
 		// header
-		$triggerTable->setHeader(array(_('Triggers')) + $hostNames, 'vertical_header');
+		$header = array(_('Triggers'));
+
+		foreach ($hostNames as $hostName) {
+			$header[] = new CColHeader($hostName, 'vertical_rotation');
+		}
+		$triggerTable->setHeader($header, 'vertical_header');
 
 		// data
 		foreach ($data as $description => $triggerHosts) {
@@ -1115,7 +1120,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		$header = array(_('Host'));
 
 		foreach ($data as $description => $triggerHosts) {
-			$header[] = $description;
+			$header[] = new CColHeader($description, 'vertical_rotation');
 		}
 
 		$triggerTable->setHeader($header, 'vertical_header');
