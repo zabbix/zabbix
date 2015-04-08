@@ -1015,6 +1015,7 @@ textarea {
 select {
 	height: 24px;
 	line-height: 24px;
+	background-color: $white;
 	@extend %form-input-style;
 
 	&.select-multiple {
@@ -1067,7 +1068,6 @@ legend {
 
 %form-input-style {
 	border: 1px solid $light-blue-grey;
-	background-color: $white;
 	@include font-form;
 	@include transition(border-color .2s ease);
 
