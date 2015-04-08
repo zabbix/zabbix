@@ -142,7 +142,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestTextPresent($host['name']);
 	}
 
-	// Filter returns nothing
+	// filter returns nothing
 	public function testPageHosts_FilterNone() {
 		$this->zbxTestLogin('hosts.php');
 
@@ -152,24 +152,6 @@ class testPageHosts extends CWebTest {
 		$this->input_type('filter_host', '1928379128ksdhksdjfh');
 		$this->zbxTestClickWait('filter');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
-	}
-
-	public function testPageHosts_FilterNone1() {
-		$this->zbxTestLogin('hosts.php');
-
-		// Reset filter
-		$this->zbxTestClick('reset');
-
-		$this->input_type('filter_host', '_');
-		$this->zbxTestClickWait('filter');
-		$this->zbxTestTextPresent('Displaying 0 of 0 found');
-	}
-
-	public function testPageHosts_FilterNone2() {
-		$this->zbxTestLogin('hosts.php');
-
-		// Reset filter
-		$this->zbxTestClick('reset');
 
 		$this->input_type('filter_host', '%');
 		$this->zbxTestClickWait('filter');

@@ -39,7 +39,7 @@ $fields = array(
 		'isset({config})&&({config}==3)&&isset({report_show})&&!isset({hostids})'),
 	'itemid' =>				array(T_ZBX_INT, O_OPT, null,			DB_ID.NOT_ZERO,
 		'isset({config})&&({config}==3)&&isset({report_show})'),
-	'items' =>				array(T_ZBX_STR, O_OPT,	null,			DB_ID,
+	'items' =>				array(T_ZBX_STR, O_OPT,	null,			null,
 		'isset({report_show})&&!isset({delete_period})&&(isset({config})&&({config}!=3)||!isset({config}))',
 		_('Items')),
 	'new_graph_item' =>		array(T_ZBX_STR, O_OPT,	null,			null,			null),

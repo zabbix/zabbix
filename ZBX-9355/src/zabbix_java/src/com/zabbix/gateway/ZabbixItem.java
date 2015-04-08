@@ -19,13 +19,13 @@
 
 package com.zabbix.gateway;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 class ZabbixItem
 {
 	private String key = null;
 	private String keyId = null;
-	private Vector<String> args = null;
+	private ArrayList<String> args = null;
 
 	public ZabbixItem(String key)
 	{
@@ -67,10 +67,10 @@ class ZabbixItem
 
 	public String getArgument(int index)
 	{
-		if (null == args || !(1 <= index && index <= args.size()))
+		if (null == args || 1 > index || index > args.size())
 			throw new IndexOutOfBoundsException("bad argument index for key '" + key + "': " + index);
 		else
-			return args.elementAt(index - 1);
+			return args.get(index - 1);
 	}
 
 	public int getArgumentCount()
@@ -78,9 +78,9 @@ class ZabbixItem
 		return null == args ? 0 : args.size();
 	}
 
-	private Vector<String> parseArguments(String keyArgs)
+	private ArrayList<String> parseArguments(String keyArgs)
 	{
-		Vector<String> args = new Vector<String>();
+		ArrayList<String> args = new ArrayList<String>();
 
 		while (true)
 		{
