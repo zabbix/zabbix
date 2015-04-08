@@ -1994,6 +1994,10 @@ button[disabled] {
 
 	td {
 		border: 1px dashed $lighter-blue-grey;
+
+		td {
+			border: none;
+		}
 	}
 }
 
