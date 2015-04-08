@@ -32,18 +32,27 @@ class C20XmlPreprocessor {
 	public function transform(array $data) {
 		$pathes = array(
 			array('^zabbix_export$', '^(groups|hosts|templates|triggers|graphs|screens|images|maps)$'),
-			array('^zabbix_export$', '^hosts$',
-				'^host[0-9]*', '^(templates|groups|interfaces|applications|items|discovery_rules|macros|inventory)$'
+			array('^zabbix_export$', '^hosts$', '^host[0-9]*',
+				'^(templates|groups|interfaces|applications|items|discovery_rules|macros|inventory)$'
 			),
 			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^items$', '^item[0-9]*', '^(applications|valuemap)$'),
-			array('^zabbix_export$', '^templates$',
-				'^template[0-9]*', '^(templates|groups|applications|items|discovery_rules|macros|screens)$'
+			array('^zabbix_export$', '^templates$', '^template[0-9]*',
+				'^(templates|groups|applications|items|discovery_rules|macros|screens)$'
 			),
 			array('^zabbix_export$', '^templates$', '^template[0-9]*', '^items$', '^item[0-9]*',
 				'^(applications|valuemap)$'
 			),
 			array('^zabbix_export$', '^screens$', '^screen[0-9]*', '^screen_items$'),
-			array('^zabbix_export$', '^triggers$', '^trigger[0-9]*', '^dependencies$')
+			array('^zabbix_export$', '^triggers$', '^trigger[0-9]*', '^dependencies$'),
+			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
+				'^(item_prototypes|trigger_prototypes|graph_prototypes|host_prototypes)$'
+			),
+			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
+				'^host_prototypes$', '^host_prototype[0-9]*', '^(group_prototypes|templates)$'
+			),
+			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
+				'^item_prototypes', '^item_prototype[0-9]*', '^(applications|valuemap)$'
+			)
 		);
 
 		foreach ($pathes as $path) {

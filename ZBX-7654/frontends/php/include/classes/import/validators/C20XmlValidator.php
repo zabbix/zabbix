@@ -211,9 +211,8 @@ class C20XmlValidator {
 		}
 
 		// child elements validation
-		if (array_key_exists('groups', $host)) {
-			$this->validateGroups($host['groups'], $path.'/groups');
-		}
+		$this->validateGroups($host['groups'], $path.'/groups');
+
 		if (array_key_exists('interfaces', $host)) {
 			$this->validateInterfaces($host['interfaces'], $path.'/interfaces');
 		}
@@ -234,6 +233,9 @@ class C20XmlValidator {
 		}
 		if (array_key_exists('inventory', $host)) {
 			$this->validateInventory($host['inventory'], $path.'/inventory');
+		}
+		if (array_key_exists('discovery_rules', $host)) {
+			$this->validateDiscoveryRules($host['discovery_rules'], $path.'/discovery_rules');
 		}
 	}
 
@@ -455,9 +457,8 @@ class C20XmlValidator {
 		}
 
 		// child elements validation
-		if (array_key_exists('groups', $template)) {
-			$this->validateGroups($template['groups'], $path.'/groups');
-		}
+		$this->validateGroups($template['groups'], $path.'/groups');
+
 		if (array_key_exists('items', $template)) {
 			$this->validateItems($template['items'], $path.'/items');
 		}
@@ -614,6 +615,7 @@ class C20XmlValidator {
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
 		}
 
+		// child elements validation
 		if (array_key_exists('graph_items', $graph)) {
 			$this->validateGraphItems($graph['graph_items'], $path.'/graph_items');
 		}
@@ -682,9 +684,7 @@ class C20XmlValidator {
 		}
 
 		// child elements validation
-		if (array_key_exists('item', $graph_item)) {
-			$this->validateGraphItemData($graph_item['item'], $path.'/item');
-		}
+		$this->validateGraphItemData($graph_item['item'], $path.'/item');
 	}
 
 	/**
@@ -1147,6 +1147,543 @@ class C20XmlValidator {
 				$error = _s('unexpected tag "%1$s"', key($arrayDiff));
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
 			}
+		}
+	}
+
+	/**
+	 * Discovery rules validation.
+	 *
+	 * @param array  $discoveryRules	import data
+	 * @param string $path				XML path
+	 *
+	 * @throws Exception	if structure or values is invalid
+	 */
+	protected function validateDiscoveryRules(array $discoveryRules, $path) {
+		if (!$this->arrayValidator->validate('discovery_rule', $discoveryRules)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/discovery_rule('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$discoveryRuleNumber = 1;
+		foreach ($discoveryRules as $key => $discoveryRule) {
+			$subpath = $path.'/discovery_rule('.$discoveryRuleNumber++.')';
+
+			$validator = new CNewValidator($discoveryRules, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			$this->validateDiscoveryRule($discoveryRule, $subpath);
+		}
+	}
+
+	/**
+	 * Discovery rule validation.
+	 *
+	 * @param array  $discoveryRule		import data
+	 * @param string $path				XML path
+	 *
+	 * @throws Exception	if structure or values is invalid
+	 */
+	protected function validateDiscoveryRule(array $discoveryRule, $path) {
+		$validationRules = array(
+			'name' =>					'required|string',
+			'type' =>					'required|string',
+			'snmp_community' =>			'required|string',
+			'snmp_oid' =>				'required|string',
+			'key' =>					'required|string',
+			'delay' =>					'required|string',
+			'status' =>					'required|string',
+			'allowed_hosts' =>			'required|string',
+			'snmpv3_contextname' =>		'string',
+			'snmpv3_securityname' =>	'required|string',
+			'snmpv3_securitylevel' =>	'required|string',
+			'snmpv3_authprotocol' =>	'string',
+			'snmpv3_authpassphrase' =>	'required|string',
+			'snmpv3_privprotocol' =>	'',
+			'snmpv3_privpassphrase' =>	'required|string',
+			'delay_flex' =>				'required|string',
+			'params' =>					'required|string',
+			'ipmi_sensor' =>			'required|string',
+			'authtype' =>				'required|string',
+			'username' =>				'required|string',
+			'password' =>				'required|string',
+			'publickey' =>				'required|string',
+			'privatekey' =>				'required|string',
+			'port' =>					'required|string',
+			'filter' =>					'required',
+			'lifetime' =>				'required|string',
+			'description' =>			'required|string',
+			'interface_ref' =>			'required|string',
+			'item_prototypes' =>		'required|array',
+			'trigger_prototypes' =>		'required|array',
+			'graph_prototypes' =>		'required|array',
+			'host_prototypes' =>		'array'
+		);
+
+		$validator = new CNewValidator($discoveryRule, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// child elements validation
+		if (array_key_exists('item_prototypes', $discoveryRule)) {
+			$this->validateItemPrototypes($discoveryRule['item_prototypes'], $path.'/item_prototypes');
+		}
+		if (array_key_exists('trigger_prototypes', $discoveryRule)) {
+			$this->validateTriggerPrototypes($discoveryRule['trigger_prototypes'], $path.'/trigger_prototypes');
+		}
+		if (array_key_exists('graph_prototypes', $discoveryRule)) {
+			$this->validateGraphPrototypes($discoveryRule['graph_prototypes'], $path.'/graph_prototypes');
+		}
+		if (array_key_exists('host_prototypes', $discoveryRule)) {
+			$this->validateHostPrototypes($discoveryRule['host_prototypes'], $path.'/host_prototypes');
+		}
+	}
+
+	/**
+	 * Items validation.
+	 *
+	 * @param array  $items	items data
+	 * @param string $path	XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateItemPrototypes(array $items, $path) {
+		if (!$this->arrayValidator->validate('item_prototype', $items)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/item_prototype('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$itemNumber = 1;
+		foreach ($items as $key => $item) {
+			$subpath = $path.'/item_prototype('.$itemNumber++.')';
+
+			$validator = new CNewValidator($items, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			$this->validateItemPrototype($item, $subpath);
+		}
+	}
+
+	/**
+	 * Item validation.
+	 *
+	 * @param array  $item	item data
+	 * @param string $path	XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateItemPrototype(array $item, $path) {
+		$validationRules = array(
+			'name' =>					'required|string',
+			'type' =>					'required|string',
+			'snmp_community' =>			'required|string',
+			'multiplier' =>				'required|string',
+			'snmp_oid' =>				'required|string',
+			'key' =>					'required|string',
+			'delay' =>					'required|string',
+			'history' =>				'required|string',
+			'trends' =>					'required|string',
+			'status' =>					'required|string',
+			'value_type' =>				'required|string',
+			'allowed_hosts' =>			'',
+			'units' =>					'required|string',
+			'delta' =>					'required|string',
+			'snmpv3_contextname' =>		'string',
+			'snmpv3_securityname' =>	'required|string',
+			'snmpv3_securitylevel' =>	'required|string',
+			'snmpv3_authprotocol' =>	'string',
+			'snmpv3_authpassphrase' =>	'required|string',
+			'snmpv3_privprotocol' =>	'',
+			'snmpv3_privpassphrase' =>	'required|string',
+			'formula' =>				'required|string',
+			'delay_flex' =>				'required|string',
+			'params' =>					'required|string',
+			'ipmi_sensor' =>			'required|string',
+			'data_type' =>				'required|string',
+			'authtype' =>				'required|string',
+			'username' =>				'required|string',
+			'password' =>				'required|string',
+			'publickey' =>				'required|string',
+			'privatekey' =>				'required|string',
+			'port' =>					'required|string',
+			'description' =>			'required|string',
+			'inventory_link' =>			'required|string',
+			'applications' =>			'array',
+			'valuemap' =>				'array',
+			'logtimefmt' =>				'string',
+			'interface_ref' =>			'string'
+		);
+
+		$validator = new CNewValidator($item, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($item, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+	}
+
+	/**
+	 * Trigger prototypes validation.
+	 *
+	 * @param array  $triggers	trigger prototypes data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateTriggerPrototypes(array $triggers, $path) {
+		if (!$this->arrayValidator->validate('trigger_prototype', $triggers)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/trigger_prototype('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$triggerNumber = 1;
+		foreach ($triggers as $key => $trigger) {
+			$subpath = $path.'/trigger_prototype('.$triggerNumber++.')';
+
+			$validator = new CNewValidator($triggers, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			$this->validateTriggerPrototype($trigger, $subpath);
+		}
+	}
+
+	/**
+	 * Trigger prototype validation.
+	 *
+	 * @param array  $trigger	trigger prototype data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateTriggerPrototype(array $trigger, $path) {
+		$validationRules = array(
+			'expression' =>		'required|string',
+			'name' =>			'required|string',
+			'url' =>			'required|string',
+			'status' =>			'required|string',
+			'priority' =>		'required|string',
+			'description' =>	'required|string',
+			'type' =>			'required|string'
+		);
+
+		$validator = new CNewValidator($trigger, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($trigger, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+	}
+
+	/**
+	 * Graph prototypes validation.
+	 *
+	 * @param array  $graphs	graph prototypes data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateGraphPrototypes(array $graphs, $path) {
+		if (!$this->arrayValidator->validate('graph_prototype', $graphs)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/graph_prototype('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$graphNumber = 1;
+		foreach ($graphs as $key => $graph) {
+			$subpath = $path.'/graph_prototype('.$graphNumber++.')';
+
+			$validator = new CNewValidator($graphs, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			$this->validateGraphPrototype($graph, $subpath);
+		}
+	}
+
+	/**
+	 * Graph prototype validation.
+	 *
+	 * @param array  $graph	graph prototype data
+	 * @param string $path	XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateGraphPrototype(array $graph, $path) {
+		$validationRules = array(
+			'name' =>				'required|string',
+			'width' =>				'required|string',
+			'height' =>				'required|string',
+			'yaxismin' =>			'required|string',
+			'yaxismax' =>			'required|string',
+			'show_work_period' =>	'required|string',
+			'show_triggers' =>		'required|string',
+			'type' =>				'required|string',
+			'show_legend' =>		'required|string',
+			'show_3d' =>			'required|string',
+			'percent_left' =>		'required|string',
+			'percent_right' =>		'required|string',
+			'ymin_item_1' =>		'',
+			'ymin_type_1' =>		'required|string',
+			'ymax_item_1' =>		'',
+			'ymax_type_1' =>		'required|string',
+			'graph_items' =>		'array'
+		);
+
+		$validator = new CNewValidator($graph, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($graph, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+
+		// child elements validation
+		if (array_key_exists('graph_items', $graph)) {
+			$this->validateGraphItems($graph['graph_items'], $path.'/graph_items');
+		}
+	}
+
+	/**
+	 * Host prototypes validation.
+	 *
+	 * @param array  $hosts		host prototypes data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateHostPrototypes(array $hosts, $path) {
+		if (!$this->arrayValidator->validate('host_prototype', $hosts)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/host_prototype('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$hostNumber = 1;
+		foreach ($hosts as $key => $host) {
+			$subpath = $path.'/host_prototype('.$hostNumber++.')';
+
+			$validator = new CNewValidator($hosts, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			$this->validateHostPrototype($host, $subpath);
+		}
+	}
+
+	/**
+	 * Host prototype validation.
+	 *
+	 * @param array  $host	import data
+	 * @param string $path	XML path
+	 *
+	 * @throws Exception	if structure or values is invalid
+	 */
+	protected function validateHostPrototype(array $host, $path) {
+		$validationRules = array(
+			'host' =>				'required|string',
+			'name' =>				'required|string',
+			'status' =>				'required|string',
+			'group_links' =>		'required|array',
+			'group_prototypes' =>	'required|array',
+			'templates' =>			'required|array'
+		);
+
+		$validator = new CNewValidator($host, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// child elements validation
+		$this->validateGroupLinks($host['group_links'], $path.'/group_links');
+
+		if ($host['templates']) {
+			$this->validateGroupPrototypes($host['group_prototypes'], $path.'/group_prototypes');
+		}
+		if ($host['templates']) {
+			$this->validateLinkedTemplates($host['templates'], $path.'/templates');
+		}
+	}
+
+	/**
+	 * Group links validation.
+	 *
+	 * @param array  $groups	group links data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateGroupLinks(array $groups, $path) {
+		if (!$this->arrayValidator->validate('group_link', $groups)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/group_link('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$groupNumber = 1;
+		foreach ($groups as $key => $group) {
+			$subpath = $path.'/group_link('.$groupNumber++.')';
+
+			$validator = new CNewValidator($groups, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			// child elements validation
+			$this->validateGroupLink($group, $subpath);
+		}
+	}
+
+	/**
+	 * Group link validation.
+	 *
+	 * @param array  $group		group link data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateGroupLink(array $links, $path) {
+		if (!$this->arrayValidator->validate('group', $links)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/group('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$linkNumber = 1;
+		foreach ($links as $key => $link) {
+			$subpath = $path.'/group('.$linkNumber++.')';
+
+			$validator = new CNewValidator($links, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			// child elements validation
+			$this->validateGroupLinkData($link, $subpath);
+		}
+	}
+
+	/**
+	 * Group link data validation.
+	 *
+	 * @param array  $data		group link data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateGroupLinkData(array $data, $path) {
+		$validationRules = array('name' => 'required|string');
+
+		$validator = new CNewValidator($data, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($data, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+	}
+
+	/**
+	 * Group prototypes validation.
+	 *
+	 * @param array  $groups	group prototypes data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateGroupPrototypes(array $groups, $path) {
+		if (!$this->arrayValidator->validate('group_prototype', $groups)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/group_prototype('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$groupNumber = 1;
+		foreach ($groups as $key => $group) {
+			$subpath = $path.'/group_prototype('.$groupNumber++.')';
+
+			$validator = new CNewValidator($groups, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			// child elements validation
+			$this->validateGroupPrototype($group, $subpath);
+		}
+	}
+
+	/**
+	 * Group prototype validation.
+	 *
+	 * @param array  $group		group prototype data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateGroupPrototype(array $group, $path) {
+		$validationRules = array('name' => 'required|string');
+
+		$validator = new CNewValidator($group, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($group, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
 		}
 	}
 }
