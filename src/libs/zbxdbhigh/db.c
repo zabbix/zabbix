@@ -32,9 +32,6 @@
 extern char	ZBX_PG_ESCAPE_BACKSLASH;
 #endif
 
-extern int	txn_level;
-extern int	txn_error;
-
 static int	connection_failure;
 
 void	DBclose(void)
