@@ -33,7 +33,9 @@ else {
 	$table->setAttribute('id', 'tbl_macros');
 	$actions_col = $data['readonly'] ? null : '';
 	if ($data['show_inherited_macros']) {
-		$table->addRow(array(_('Macro'), '', _('Value'), $actions_col, '', _('Template value'), '', _('Global value')));
+		$table->addRow(array(_('Macro'), '', _('Effective value'), $actions_col, '', _('Template value'), '',
+			_('Global value')
+		));
 	}
 	else {
 		$table->addRow(array(_('Macro'), '', _('Value'), $actions_col));
@@ -43,80 +45,75 @@ else {
 	foreach ($data['macros'] as $i => $macro) {
 		$macro_input = new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, false, 64);
 		$macro_input->setReadOnly(
-			$data['readonly'] || ($data['show_inherited_macros'] && ($macro['type'] & 0x01))	/* 0x01 - INHERITED */
+			$data['readonly'] || ($data['show_inherited_macros'] && ($macro['type'] & 0x01/* INHERITED */))
 		);
 		$macro_input->addClass('macro');
 		$macro_input->setAttribute('placeholder', '{$MACRO}');
 
-		$value_input = new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255);
-		$value_input->setReadOnly(
-			$data['readonly'] || ($data['show_inherited_macros'] && !($macro['type'] & 0x02))	/* 0x02 - HOSTMACRO */
-		);
-		$value_input->setAttribute('placeholder', _('value'));
-
-		$button_cell = null;
+		$macro_cell = array($macro_input);
 		if (!$data['readonly']) {
-			if ($data['show_inherited_macros']) {
-				if ($macro['type'] & 0x01) {
-					if ($macro['type'] & 0x02) {
-						$button_cell = array(
-							new CButton('macros['.$i.'][change]', _('Remove'), null, 'link_menu element-table-change')
-						);
-					}
-					else {
-						$button_cell = array(
-							new CButton('macros['.$i.'][change]', _('Change'), null, 'link_menu element-table-change')
-						);
-					}
-				}
-				else {
-					$button_cell = array(
-						new CButton('macros['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')
-					);
-				}
-			}
-			else {
-				$button_cell = array(
-					new CButton('macros['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')
-				);
-			}
 			if (array_key_exists('hostmacroid', $macro)) {
-				$button_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
+				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
 			}
-			if ($data['show_inherited_macros']) {
-				$button_cell[] = new CVar('macros['.$i.'][type]', $macro['type']);
+
+			if ($data['show_inherited_macros'] && ($macro['type'] & 0x01/* INHERITED */)) {
+				$macro_cell[] = new CVar('macros['.$i.'][inherited][value]',
+					array_key_exists('template', $macro) ? $macro['template']['value'] : $macro['global']['value']
+				);
 			}
 		}
 
-		$row = array($macro_input, '&rArr;', $value_input, $button_cell);
+		if ($data['show_inherited_macros']) {
+			$macro_cell[] = new CVar('macros['.$i.'][type]', $macro['type']);
+		}
+
+		$value_input = new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255);
+		$value_input->setReadOnly(
+			$data['readonly'] || ($data['show_inherited_macros'] && !($macro['type'] & 0x02/* HOSTMACRO */))
+		);
+		$value_input->setAttribute('placeholder', _('value'));
+
+		$row = array($macro_cell, '&rArr;', $value_input);
+
+		if (!$data['readonly']) {
+			if ($data['show_inherited_macros']) {
+				if (($macro['type'] & 0x03) == 0x03/* INHERITED | HOSTMACRO */) {
+					$row[] = new CButton('macros['.$i.'][change]', _('Remove'), null, 'link_menu element-table-change');
+				}
+				elseif ($macro['type'] & 0x01/* INHERITED */) {
+					$row[] = new CButton('macros['.$i.'][change]', _('Change'), null, 'link_menu element-table-change');
+				}
+				else {
+					$row[] = new CButton('macros['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove');
+				}
+			}
+			else {
+				$row[] = new CButton('macros['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove');
+			}
+		}
 
 		if ($data['show_inherited_macros']) {
 			if (array_key_exists('template', $macro)) {
 				$row[] = '&lArr;';
-				$value = new CTextBox('macros['.$i.'][template][value]', $macro['template']['value'], 40, true, 64);
-				if ($macro['template']['rights'] == PERM_READ_WRITE) {
-					$value->setHint(new CLink($macro['template']['name'],
-						'templates.php?form=update&templateid='.$macro['template']['templateid']
-					));
-				}
-				else {
-					$value->setHint($macro['template']['name']);
-				}
-				$row[] = $value;
-
+				$row[] = new CDiv(array(
+					new CLink(
+						CHtml::encode($macro['template']['name']),
+						'templates.php?form=update&templateid='.$macro['template']['templateid'],
+						'unknown'
+					),
+					NAME_DELIMITER.'"'.$macro['template']['value'].'"'
+				), 'macro-value');
 			}
 			else {
-				$row[] = '';
-				$row[] = '';
+				array_push($row, '', new CDiv(null, 'macro-value'));
 			}
 
 			if (array_key_exists('global', $macro)) {
 				$row[] = '&lArr;';
-				$row[] = new CTextBox('macros['.$i.'][global][value]', $macro['global']['value'], 40, true, 64);
+				$row[] = new CDiv('"'.$macro['global']['value'].'"', 'macro-value');
 			}
 			else {
-				$row[] = '';
-				$row[] = '';
+				array_push($row, '', new CDiv(null, 'macro-value'));
 			}
 		}
 

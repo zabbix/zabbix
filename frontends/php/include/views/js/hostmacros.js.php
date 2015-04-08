@@ -25,20 +25,11 @@
 			var macroNum = $(this).attr('id').split('_')[1];
 
 			if ($('#macros_' + macroNum + '_type').val() & 0x02/* HOSTMACRO */) {
-				var value;
-
-				if ($('#macros_' + macroNum + '_template_value').length) {
-					value = $('#macros_' + macroNum + '_template_value').val();
-				}
-				else {
-					value = $('#macros_' + macroNum + '_global_value').val();
-				}
-
 				$('#macros_' + macroNum + '_type')
 					.val($('#macros_' + macroNum + '_type').val() & (~0x02/* HOSTMACRO */));
 				$('#macros_' + macroNum + '_value')
 					.attr('readonly', 'readonly')
-					.val(value);
+					.val($('#macros_' + macroNum + '_inherited_value').val());
 				$('#macros_' + macroNum + '_change')
 					.text(<?php echo CJs::encodeJson(_('Change')); ?>);
 			}
