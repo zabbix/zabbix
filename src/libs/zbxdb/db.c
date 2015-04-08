@@ -28,7 +28,6 @@
 
 static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
 static int	txn_error = 0;	/* failed transaction */
-static int	txn_init = 0;	/* connecting to db */
 
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
@@ -211,7 +210,7 @@ static int	is_recoverable_mysql_error(void)
  ******************************************************************************/
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
-	int		ret = ZBX_DB_OK;
+	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_IBM_DB2)
 	char		*connect = NULL;
 #elif defined(HAVE_ORACLE)
@@ -225,7 +224,15 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	char		*p, *path = NULL;
 #endif
 
-	txn_init = 1;
+	/* Allow executing statements during a connection initialization. Make sure to mark transaction as failed. */
+	if (0 != txn_level)
+		txn_error = 1;
+
+	last_txn_error = txn_error;
+	last_txn_level = txn_level;
+
+	txn_error = 0;
+	txn_level = 0;
 
 #if defined(HAVE_IBM_DB2)
 	connect = zbx_strdup(connect, "PROTOCOL=TCPIP;");
@@ -506,7 +513,8 @@ out:
 	if (ZBX_DB_OK != ret)
 		zbx_db_close();
 
-	txn_init = 0;
+	txn_error = last_txn_error;
+	txn_level = last_txn_level;
 
 	return ret;
 }
@@ -825,7 +833,7 @@ int	zbx_db_statement_prepare(const char *sql)
 	sword	err;
 	int	ret = ZBX_DB_OK;
 
-	if (0 == txn_init && 0 == txn_level)
+	if (0 == txn_level)
 		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
 
 	if (1 == txn_error)
@@ -985,7 +993,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	if (0 == txn_init && 0 == txn_level)
+	if (0 == txn_level)
 		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
 
 	if (1 == txn_error)
