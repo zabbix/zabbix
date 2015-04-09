@@ -38,9 +38,6 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 /*      DDDDDDDDDDD - the ID itself                            */
 /***************************************************************/
 
-extern int	txn_level;
-extern int	txn_error;
-
 /******************************************************************************
  *                                                                            *
  * Function: __DBnode                                                         *
