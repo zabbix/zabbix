@@ -139,6 +139,13 @@ class C20XmlValidator {
 
 		$validator = new CNewValidator($group, $validationRules);
 
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($group, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+
 		if ($validator->isError()) {
 			$errors = $validator->getAllErrors();
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
@@ -208,6 +215,13 @@ class C20XmlValidator {
 		if ($validator->isError()) {
 			$errors = $validator->getAllErrors();
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($host, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
 		}
 
 		// child elements validation
@@ -394,6 +408,7 @@ class C20XmlValidator {
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
 		}
 
+		// child elements validation
 		if (array_key_exists('applications', $item)) {
 			$this->validateApplications($item['applications'], $path.'/applications');
 		}
@@ -454,6 +469,13 @@ class C20XmlValidator {
 		if ($validator->isError()) {
 			$errors = $validator->getAllErrors();
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($template, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
 		}
 
 		// child elements validation
@@ -766,22 +788,20 @@ class C20XmlValidator {
 	/**
 	 * Screen items validation.
 	 *
-	 * @param array  $screenitems	screenitems data
+	 * @param array  $screenItems	screen items data
 	 * @param string $path			XML path
 	 *
 	 * @throws Exception			if structure is invalid
 	 */
-	protected function validateScreenItems(array $screenitems, $path) {
-		if (!$this->arrayValidator->validate('screen_item', $screenitems)) {
+	protected function validateScreenItems(array $screenItems, $path) {
+		if (!$this->arrayValidator->validate('screen_item', $screenItems)) {
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
-				$path.'/screenitem('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+				$path.'/screen_item('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
 			));
 		}
 
-		$screenitemNumber = 1;
-		foreach ($screenitems as $screenitem) {
-			$subpath = $path.'/screenitem('.$screenitemNumber++.')';
-
+		$screenItemNumber = 1;
+		foreach ($screenItems as $screenItem) {
 			$validationRules = array(
 				'resourcetype' =>	'required|string',
 				'resource' =>		'required',
@@ -796,16 +816,24 @@ class C20XmlValidator {
 				'halign' =>			'required|string',
 				'style' =>			'required|string',
 				'dynamic' =>		'required|string',
+				'sort_triggers' =>	'required|string',
 				'url' =>			'string',
 				'application' =>	'string',
 				'max_columns' =>	'string'
 			);
 
-			$validator = new CNewValidator($screenitem, $validationRules);
+			$validator = new CNewValidator($screenItem, $validationRules);
 
 			if ($validator->isError()) {
 				$errors = $validator->getAllErrors();
-				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $subpath, $errors[0]));
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+			}
+
+			// unexpected tag validation
+			$arrayDiff = array_diff_key($screenItem, $validator->getValidInput());
+			if ($arrayDiff) {
+				$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
 			}
 		}
 	}
@@ -873,11 +901,117 @@ class C20XmlValidator {
 	 * Maps validation.
 	 *
 	 * @param array $maps	import data
+	 * @param string $path	XML path
 	 *
 	 * @throws Exception	if structure or values is invalid
 	 */
-	protected function validateMaps(array $maps) {
-		
+	protected function validateMaps(array $maps, $path) {
+		if (!$this->arrayValidator->validate('map', $maps)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/map('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$mapNumber = 1;
+		foreach ($maps as $key => $map) {
+			$subpath = $path.'/map('.$mapNumber++.')';
+
+			$validator = new CNewValidator($maps, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			$this->validateMap($map, $subpath);
+		}
+	}
+
+	/**
+	 * Map validation.
+	 *
+	 * @param array  $map	import data
+	 * @param string $path	XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateMap(array $map, $path) {
+		$validationRules = array(
+			'name' =>					'required|string',
+			'width' =>					'required|string',
+			'height' =>					'required|string',
+			'label_type' =>				'required|string',
+			'label_location' =>			'required|string',
+			'highlight' =>				'required|string',
+			'expandproblem' =>			'required|string',
+			'markelements' =>			'required|string',
+			'show_unack' =>				'required|string',
+			'severity_min' =>			'string',
+			'grid_size' =>				'required|string',
+			'grid_show' =>				'required|string',
+			'grid_align' =>				'required|string',
+			'label_format' =>			'required|string',
+			'label_type_host' =>		'required|string',
+			'label_type_hostgroup' =>	'required|string',
+			'label_type_trigger' =>		'required|string',
+			'label_type_map' =>			'required|string',
+			'label_type_image' =>		'required|string',
+			'label_string_host' =>		'required|string',
+			'label_string_hostgroup' =>	'required|string',
+			'label_string_trigger' =>	'required|string',
+			'label_string_map' =>		'required|string',
+			'label_string_image' =>		'required|string',
+			'expand_macros' =>			'required|string',
+			'background' =>				'required|array',
+			'iconmap' =>				'required|array',
+			'urls' =>					'required|array',
+			'selements' =>				'required|array',
+			'links' =>					'required|array'
+		);
+
+		$validator = new CNewValidator($map, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($map, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+
+		// child elements validation
+		if ($map['background']) {
+			$this->validateBackground($map['background'], $path.'/background');
+		}
+	}
+
+	/**
+	 * Map Background validation.
+	 *
+	 * @param array  $background	background data
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateBackground(array $background, $path) {
+		$validationRules = array('name' => 'required|string');
+
+		$validator = new CNewValidator($background, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($background, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
 	}
 
 	/**
