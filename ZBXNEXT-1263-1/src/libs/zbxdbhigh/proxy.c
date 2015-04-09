@@ -2307,9 +2307,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 				{
 					/* TODO RFC 4518 requires more sophisticated issuer matching */
-					if (strlen(items[i].host.tls_issuer) != attr.arg1_len ||
-							0 != memcmp(items[i].host.tls_issuer, attr.arg1,
-							attr.arg1_len))
+					if ('\0' != *items[i].host.tls_issuer &&
+							0 != strcmp(items[i].host.tls_issuer, attr.issuer))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "certificate issuer does not match for "
 								"host \"%s\" item \"%s\" (not every rejected item might"
@@ -2319,9 +2318,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 					}
 
 					/* TODO RFC 4518 requires more sophisticated subject matching */
-					if (strlen(items[i].host.tls_subject) != attr.arg2_len ||
-							0 != memcmp(items[i].host.tls_subject, attr.arg2,
-							attr.arg2_len))
+					if ('\0' != *items[i].host.tls_subject &&
+							0 != strcmp(items[i].host.tls_subject, attr.subject))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "certificate subject does not match for "
 								"host \"%s\" item \"%s\" (not every rejected item might"
@@ -2332,15 +2330,15 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				}
 				else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 				{
-					if (strlen(items[i].host.tls_psk_identity) != attr.arg1_len ||
-							0 != memcmp(items[i].host.tls_psk_identity, attr.arg1,
-							attr.arg1_len))
+					if (strlen(items[i].host.tls_psk_identity) != attr.psk_identity_len ||
+							0 != memcmp(items[i].host.tls_psk_identity, attr.psk_identity,
+							attr.psk_identity_len))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "false PSK identity for host \"%s\" item "
 								"\"%s\" (not every rejected item might be reported). "
 								"Configured identity: \"%s\". Received identity: "
 								"\"%s\"", items[i].host.host, items[i].key_orig,
-								items[i].host.tls_psk_identity, attr.arg1);
+								items[i].host.tls_psk_identity, attr.psk_identity);
 						flag_host_allow = 0;
 						continue;
 					}

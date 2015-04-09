@@ -4210,8 +4210,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr,
 	if (ZBX_TCP_SEC_TLS_CERT == attr->connection_type)
 	{
 		/* TODO RFC 4518 requires more sophisticated issuer matching */
-		if (strlen(dc_host->tls_issuer) != attr->arg1_len ||
-				0 != memcmp(dc_host->tls_issuer, attr->arg1, attr->arg1_len))
+		if ('\0' != *dc_host->tls_issuer && 0 != strcmp(dc_host->tls_issuer, attr->issuer))
 		{
 			UNLOCK_CACHE;
 			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate issuer does not match", host);
@@ -4219,8 +4218,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr,
 		}
 
 		/* TODO RFC 4518 requires more sophisticated subject matching */
-		if (strlen(dc_host->tls_subject) != attr->arg2_len ||
-				0 != memcmp(dc_host->tls_subject, attr->arg2, attr->arg2_len))
+		if ('\0' != *dc_host->tls_subject && 0 != strcmp(dc_host->tls_subject, attr->subject))
 		{
 			UNLOCK_CACHE;
 			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate subject does not match", host);
@@ -4231,8 +4229,9 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr,
 	{
 		if (NULL != dc_host->tls_dc_psk)
 		{
-			if (strlen(dc_host->tls_dc_psk->tls_psk_identity) != attr->arg1_len ||
-					0 != memcmp(dc_host->tls_dc_psk->tls_psk_identity, attr->arg1, attr->arg1_len))
+			if (strlen(dc_host->tls_dc_psk->tls_psk_identity) != attr->psk_identity_len ||
+					0 != memcmp(dc_host->tls_dc_psk->tls_psk_identity, attr->psk_identity,
+					attr->psk_identity_len))
 			{
 				UNLOCK_CACHE;
 				*error = zbx_dsprintf(*error, "proxy \"%s\" is using false PSK identity", host);
