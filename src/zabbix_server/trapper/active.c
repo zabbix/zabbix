@@ -117,7 +117,7 @@ static int	get_hostid_by_host(const zbx_sock_t *sock, const char *host, const ch
 			if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 			{
 				/* TODO RFC 4518 requires more sophisticated issuer matching */
-				if (strlen(row[3]) != attr.arg1_len || 0 != memcmp(row[3], attr.arg1, attr.arg1_len))
+				if ('\0' != *row[3] && 0 != strcmp(row[3], attr.issuer))
 				{
 					zbx_snprintf(error, MAX_STRING_LEN, "certificate issuer does not match for "
 							"host \"%s\"", host);
@@ -125,7 +125,7 @@ static int	get_hostid_by_host(const zbx_sock_t *sock, const char *host, const ch
 				}
 
 				/* TODO RFC 4518 requires more sophisticated subject matching */
-				if (strlen(row[4]) != attr.arg2_len || 0 != memcmp(row[4], attr.arg2, attr.arg2_len))
+				if ('\0' != *row[4] && 0 != strcmp(row[4], attr.subject))
 				{
 					zbx_snprintf(error, MAX_STRING_LEN, "certificate subject does not match for "
 							"host \"%s\"", host);
@@ -134,7 +134,8 @@ static int	get_hostid_by_host(const zbx_sock_t *sock, const char *host, const ch
 			}
 			else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 			{
-				if (strlen(row[5]) != attr.arg1_len || 0 != memcmp(row[5], attr.arg1, attr.arg1_len))
+				if (strlen(row[5]) != attr.psk_identity_len ||
+						0 != memcmp(row[5], attr.psk_identity, attr.psk_identity_len))
 				{
 					zbx_snprintf(error, MAX_STRING_LEN, "false PSK identity for host \"%s\"", host);
 					goto done;

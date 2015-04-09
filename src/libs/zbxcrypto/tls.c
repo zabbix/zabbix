@@ -3516,56 +3516,52 @@ int	zbx_tls_get_attr(const zbx_sock_t *s, zbx_tls_conn_attr_t *attr)
 {
 	attr->connection_type = s->connection_type;
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_UNENCRYPTED == s->connection_type)
-	{
-		attr->arg1 = NULL;
-		attr->arg1_len = 0;
-		attr->arg2 = NULL;
-		attr->arg2_len = 0;
-	}
-#endif
 #if defined(HAVE_POLARSSL)
-	else if (ZBX_TCP_SEC_TLS_CERT == s->connection_type)
+	if (ZBX_TCP_SEC_TLS_CERT == s->connection_type)
 	{
 		const x509_crt	*peer_cert;
+		int		res;
 
 		if (NULL == (peer_cert = ssl_get_peer_cert(s->tls_ctx)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "no peer certificate, ssl_get_peer_cert() returned NULL");
 			return FAIL;
+		}
 
-		/* TODO implement getting pointers to issuer and subject and their lengths */
-		return FAIL;
+		if (0 >= (res = x509_dn_gets(attr->issuer, sizeof(attr->issuer), &peer_cert->issuer)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get issuer distinguished name, x509_dn_gets() returned "
+					"%d", res);
+			return FAIL;
+		}
+
+		if (0 >= (res = x509_dn_gets(attr->subject, sizeof(attr->subject), &peer_cert->subject)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get subject distinguished name, x509_dn_gets() returned "
+					"%d", res);
+			return FAIL;
+		}
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == s->connection_type)
 	{
-		attr->arg1 = (char *)s->tls_ctx->psk_identity;
-		attr->arg1_len = s->tls_ctx->psk_identity_len;
-		attr->arg2 = NULL;
-		attr->arg2_len = 0;
+		attr->psk_identity = (char *)s->tls_ctx->psk_identity;
+		attr->psk_identity_len = s->tls_ctx->psk_identity_len;
 	}
 #elif defined(HAVE_GNUTLS)
-	else if (ZBX_TCP_SEC_TLS_CERT == s->connection_type)
+	if (ZBX_TCP_SEC_TLS_CERT == s->connection_type)
 	{
 		/* TODO implement getting pointers to issuer and subject and their lengths */
 		return FAIL;
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == s->connection_type)
 	{
-		if (NULL != (attr->arg1 = gnutls_psk_server_get_username(s->tls_ctx)))
-		{
-			attr->arg1_len = strlen(attr->arg1);
-		}
+		if (NULL != (attr->psk_identity = gnutls_psk_server_get_username(s->tls_ctx)))
+			attr->psk_identity_len = strlen(attr->psk_identity);
 		else
-		{
-			attr->arg1_len = 0;
 			return FAIL;
-		}
-
-		attr->arg2 = NULL;
-		attr->arg2_len = 0;
 	}
 #elif defined(HAVE_OPENSSL)
-	else if (ZBX_TCP_SEC_TLS_CERT == s->connection_type)
+	if (ZBX_TCP_SEC_TLS_CERT == s->connection_type)
 	{
 		/* TODO implement getting pointers to issuer and subject and their lengths */
 		return FAIL;
@@ -3576,24 +3572,13 @@ int	zbx_tls_get_attr(const zbx_sock_t *s, zbx_tls_conn_attr_t *attr)
 
 		if (NULL != (sess = SSL_get_session(s->tls_ctx)))
 		{
-			if (NULL != (attr->arg1 = sess->psk_identity))
-			{
-				attr->arg1_len = strlen(attr->arg1);
-			}
+			if (NULL != (attr->psk_identity = sess->psk_identity))
+				attr->psk_identity_len = strlen(attr->psk_identity);
 			else
-			{
-				attr->arg1_len = 0;
 				return FAIL;
-			}
-
-			attr->arg2 = NULL;
-			attr->arg2_len = 0;
 		}
 		else
-		{
-			attr->arg1_len = 0;
 			return FAIL;
-		}
 	}
 #endif
 	return SUCCEED;

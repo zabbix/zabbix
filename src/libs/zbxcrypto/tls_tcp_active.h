@@ -25,12 +25,10 @@ typedef struct
 	unsigned int	connection_type;	/* Values: ZBX_TCP_SEC_UNENCRYPTED, ZBX_TCP_SEC_TLS_PSK or */
 						/* ZBX_TCP_SEC_TLS_CERT. */
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	const char	*arg1;			/* For passing 'tls_issuer' or 'tls_psk_identity' depending */
-						/* on the value of 'connection_type'. */
-	size_t		arg1_len;
-	const char	*arg2;			/* For passing 'tls_subject' or NULL depending on the value */
-						/* of 'connection_type'. */
-	size_t		arg2_len;
+	const char	*psk_identity;
+	size_t		psk_identity_len;
+	char		issuer[HOST_TLS_ISSUER_LEN_MAX];
+	char		subject[HOST_TLS_SUBJECT_LEN_MAX];
 #endif
 }
 zbx_tls_conn_attr_t;
