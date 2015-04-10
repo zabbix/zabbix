@@ -64,17 +64,10 @@ static char	*proc_argv(pid_t pid)
 
 int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*procname, *proccomm, *param, *args;
-	int	do_task, pagesize, count, i,
-		proc_ok, comm_ok,
-		op, arg;
-
-	double	value = 0.0,
-		memsize = 0;
-	int	proccount = 0;
-
-	size_t	sz;
-
+	char			*procname, *proccomm, *param, *args;
+	int			do_task, pagesize, count, i, proccount = 0, invalid_user = 0, proc_ok, comm_ok, op, arg;
+	double			value = 0.0, memsize = 0;
+	size_t			sz;
 	struct kinfo_proc2	*proc, *pproc;
 	struct passwd		*usrinfo;
 
@@ -93,13 +86,14 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			if (0 == errno)
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
-			else
+			if (0 != errno)
+			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 						zbx_strerror(errno)));
+				return SYSINFO_RET_FAIL;
+			}
 
-			return SYSINFO_RET_FAIL;
+			invalid_user = 1;
 		}
 	}
 	else
@@ -122,6 +116,9 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	proccomm = get_rparam(request, 3);
+
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
 
 	pagesize = getpagesize();
 
@@ -169,9 +166,7 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (proc_ok && comm_ok)
 		{
-			value = pproc->p_vm_tsize
-				+ pproc->p_vm_dsize
-				+ pproc->p_vm_ssize;
+			value = pproc->p_vm_tsize + pproc->p_vm_dsize + pproc->p_vm_ssize;
 			value *= pagesize;
 
 			if (0 == proccount++)
@@ -187,9 +182,9 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 		}
 	}
-
+out:
 	if (ZBX_DO_AVG == do_task)
-		SET_DBL_RESULT(result, proccount == 0 ? 0 : memsize / proccount);
+		SET_DBL_RESULT(result, 0 == proccount ? 0 : memsize / proccount);
 	else
 		SET_UI64_RESULT(result, memsize);
 
@@ -198,15 +193,10 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*procname, *proccomm, *param, *args;
-	int	zbx_proc_stat, count, i,
-		proc_ok, stat_ok, comm_ok,
-		op, arg;
-
-	int	proccount = 0;
-
-	size_t	sz;
-
+	char			*procname, *proccomm, *param, *args;
+	int			proccount = 0, invalid_user = 0, zbx_proc_stat;
+	int			count, i, proc_ok, stat_ok, comm_ok, op, arg;
+	size_t			sz;
 	struct kinfo_proc2	*proc, *pproc;
 	struct passwd		*usrinfo;
 
@@ -225,13 +215,14 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			if (0 == errno)
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
-			else
+			if (0 != errno)
+			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 						zbx_strerror(errno)));
+				return SYSINFO_RET_FAIL;
+			}
 
-			return SYSINFO_RET_FAIL;
+			invalid_user = 1;
 		}
 	}
 	else
@@ -254,6 +245,9 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	proccomm = get_rparam(request, 3);
+
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
 
 	if (NULL == kd && NULL == (kd = kvm_open(NULL, NULL, NULL, KVM_NO_FILES, NULL)))
 	{
@@ -287,21 +281,22 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL == procname || '\0' == *procname || 0 == strcmp(procname, pproc->p_comm))
 			proc_ok = 1;
 
-		if (zbx_proc_stat != ZBX_PROC_STAT_ALL)
+		if (ZBX_PROC_STAT_ALL != zbx_proc_stat)
 		{
-			switch (zbx_proc_stat) {
-			case ZBX_PROC_STAT_RUN:
-				if (pproc->p_stat == LSRUN || pproc->p_stat == LSONPROC)
-					stat_ok = 1;
-				break;
-			case ZBX_PROC_STAT_SLEEP:
-				if (pproc->p_stat == LSSLEEP)
-					stat_ok = 1;
-				break;
-			case ZBX_PROC_STAT_ZOMB:
-				if (pproc->p_stat == SZOMB || pproc->p_stat == LSDEAD)
-					stat_ok = 1;
-				break;
+			switch (zbx_proc_stat)
+			{
+				case ZBX_PROC_STAT_RUN:
+					if (LSRUN == pproc->p_stat || LSONPROC == pproc->p_stat)
+						stat_ok = 1;
+					break;
+				case ZBX_PROC_STAT_SLEEP:
+					if (LSSLEEP == pproc->p_stat)
+						stat_ok = 1;
+					break;
+				case ZBX_PROC_STAT_ZOMB:
+					if (SZOMB == pproc->p_stat || LSDEAD == pproc->p_stat)
+						stat_ok = 1;
+					break;
 			}
 		}
 		else
@@ -321,7 +316,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (proc_ok && stat_ok && comm_ok)
 			proccount++;
 	}
-
+out:
 	SET_UI64_RESULT(result, proccount);
 
 	return SYSINFO_RET_OK;

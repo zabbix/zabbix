@@ -204,7 +204,6 @@ $tranStrings = array(
 		'Host inventory' => _('Host inventory'),
 		'Host screens' => _('Host screens'),
 		'Latest data' => _('Latest data'),
-		'Latest events' => _('Latest events'),
 		'Latest values' => _('Latest values'),
 		'Last hour graph' => _('Last hour graph'),
 		'Last month graph' => _('Last month graph'),

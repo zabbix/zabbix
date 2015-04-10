@@ -524,6 +524,7 @@ int     SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	SET_STR_RESULT(result, zbx_strdup(NULL, buffer));
 
 	zbx_vector_str_destroy(&addresses);
+	close(s);
 
 	return SYSINFO_RET_OK;
 }
