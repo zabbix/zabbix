@@ -283,6 +283,53 @@ void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset)
 }
 #endif
 
+#if defined(HAVE_POLARSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_cert_error_msg                                           *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     Compose a certificate validation error message by decoding PolarSSL    *
+ *     ssl_get_verify_result() return value                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     flags   - [IN] result returned by PolarSSL ssl_get_verify_result()     *
+ *     error   - [OUT] dynamically allocated memory with error message        *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_tls_cert_error_msg(unsigned int flags, char **error)
+{
+	const unsigned int	bits[] = { BADCERT_EXPIRED, BADCERT_REVOKED, BADCERT_CN_MISMATCH,
+				BADCERT_NOT_TRUSTED, BADCRL_NOT_TRUSTED,
+				BADCRL_EXPIRED, BADCERT_MISSING, BADCERT_SKIP_VERIFY, BADCERT_OTHER,
+				BADCERT_FUTURE, BADCRL_FUTURE, 0 };
+	const char		*msgs[] = { "expired", "revoked", "Common Name mismatch",
+				"self-signed or not signed by trusted CA", "CRL not signed by trusted CA",
+				"CRL expired", "certificate missing", "verification skipped", "other reason",
+				"validity starts in future", "CRL validity starts in future" };
+	int			i = 0, k = 0;
+
+	*error = zbx_strdup(*error, "invalid peer certificate: ");
+
+	while (0 != flags && 0 != bits[i])
+	{
+		if (0 != (flags & bits[i]))
+		{
+			flags &= ~bits[i];	/* reset the checked bit to detect no-more-set-bits without checking */
+						/* every bit */
+			if (0 != k)
+				*error = zbx_strdcat(*error, ", ");
+			else
+				k = 1;
+
+			*error = zbx_strdcat(*error, msgs[i]);
+		}
+
+		i++;
+	}
+}
+#endif
+
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
@@ -797,6 +844,76 @@ static unsigned int	zbx_ciphersuites(int type, int **suites)
 	*q = 0;
 
 	return count;
+}
+#endif
+
+#if defined(HAVE_POLARSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_verify_issuer_subject                                    *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     verify peer certificate issuer and subject                             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     cert    - [IN] certificate to verify                                   *
+ *     issuer  - [IN] required issuer (don't care if NULL or empty string)    *
+ *     subject - [IN] required subject (don't care if NULL or empty string)   *
+ *     error   - [OUT] dynamically allocated memory with error message        *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED or FAIL                                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_tls_verify_issuer_subject(const x509_crt *cert, const char *issuer, const char *subject,
+		char **error)
+{
+	int		res, issuer_mismatch = 0, subject_mismatch = 0;
+	size_t		error_alloc = 0, error_offset = 0;
+	char		tls_issuer[HOST_TLS_ISSUER_LEN_MAX], tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
+
+	if (NULL != issuer && '\0' != *issuer)
+	{
+		if (0 >= (res = x509_dn_gets(tls_issuer, sizeof(tls_issuer), &cert->issuer)))
+		{
+			*error = zbx_dsprintf(*error, "cannot get issuer distinguished name, x509_dn_gets() returned "
+					"%d", res);
+			return FAIL;
+		}
+
+		if (0 != strcmp(tls_issuer, issuer))	/* TODO RFC 4518 requires more sophisticated issuer matching */
+			issuer_mismatch = 1;
+	}
+
+	if (NULL != subject && '\0' != *subject)
+	{
+		if (0 >= (res = x509_dn_gets(tls_subject, sizeof(tls_subject), &cert->subject)))
+		{
+			*error = zbx_dsprintf(*error, "cannot get subject distinguished name, x509_dn_gets() returned "
+					"%d", res);
+			return FAIL;
+		}
+
+		if (0 != strcmp(tls_subject, subject))	/* TODO RFC 4518 requires more sophisticated issuer matching */
+			subject_mismatch = 1;
+	}
+
+	if (1 == issuer_mismatch || 1 == subject_mismatch)
+	{
+		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "peer certificate issuer \"%s\", subject \"%s\"",
+				tls_issuer, tls_subject);
+	}
+
+	if (1 == issuer_mismatch)
+		zbx_snprintf_alloc(error, &error_alloc, &error_offset, ", required issuer \"%s\"", issuer);
+
+	if (1 == subject_mismatch)
+		zbx_snprintf_alloc(error, &error_alloc, &error_offset, ", required subject \"%s\"", subject);
+
+	if (1 == issuer_mismatch || 1 == subject_mismatch)
+		return FAIL;
+	else
+		return SUCCEED;
 }
 #endif
 
@@ -2126,14 +2243,18 @@ void	zbx_tls_free(void)
  *     error       - [OUT] dynamically allocated memory with error message    *
  *     tls_connect - [IN]  how to connect. Allowed values:                    *
  *                         ZBX_TCP_SEC_TLS_CERT, ZBX_TCP_SEC_TLS_PSK.         *
- *     tls_arg1    - [IN]  'tls_issuer' or 'tls_psk_identity' depending on    *
- *                         value of 'tls_connect'.                            *
- *     tls_arg2    - [IN]  'tls_subject' or 'tls_psk' depending on value of   *
+ *     tls_arg1    - [IN]  required issuer of peer certificate (may be NULL   *
+ *                         or empty string if not important) or PSK identity  *
+ *                         to connect with depending on value of              *
  *                         'tls_connect'.                                     *
+ *     tls_arg2    - [IN]  required subject of peer certificate (may be NULL  *
+ *                         or empty string if not important) or PSK           *
+ *                         (in hex-string) to connect with depending on value *
+ *                         of 'tls_connect'.                                  *
  *                                                                            *
- * Return value: SUCCEED on successful TLS handshake with a valid certificate *
- *               or PSK                                                       *
- *               FAIL - an error occurred                                     *
+ * Return value:                                                              *
+ *     SUCCEED - successful TLS handshake with a valid certificate or PSK     *
+ *     FAIL - an error occurred                                               *
  *                                                                            *
  ******************************************************************************/
 int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
@@ -2141,7 +2262,6 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 #if defined(HAVE_POLARSSL)
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
-	const x509_crt	*peer_cert;
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
@@ -2279,64 +2399,41 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
+		const x509_crt	*peer_cert;
+
+		if (NULL == (peer_cert = ssl_get_peer_cert(s->tls_ctx)))
+		{
+			*error = zbx_strdup(*error, "no peer certificate");
+			zbx_tls_close(s);
+			goto out;
+		}
+
 		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		{
 			/* log peer certificate information for debugging */
 
-			if (NULL == (peer_cert = ssl_get_peer_cert(s->tls_ctx)) || -1 == x509_crt_info(work_buf,
-					sizeof(work_buf), "", peer_cert))
+			if (-1 == x509_crt_info(work_buf, sizeof(work_buf), "", peer_cert))
 			{
 				*error = zbx_strdup(*error, "cannot get peer certificate info");
-				ssl_free(s->tls_ctx);
-				zbx_free(s->tls_ctx);
+				zbx_tls_close(s);
 				goto out;
 			}
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): peer certificate:\n%s", __function_name, work_buf);
 		}
 
-		/* validate peer certificate TODO: Issuer and Subject validation */
+		/* validate peer certificate */
 
 		if (0 != (res = ssl_get_verify_result(s->tls_ctx)))
 		{
-			int	k = 0;
+			zbx_tls_cert_error_msg((unsigned int)res, error);
+			zbx_tls_close(s);
+			goto out;
+		}
 
-			*error = zbx_strdup(*error, "invalid peer certificate: ");
-
-			if (0 != (BADCERT_EXPIRED & res))
-			{
-				*error = zbx_strdcat(*error, "expired");
-				k++;
-			}
-
-			if (0 != (BADCERT_REVOKED & res))
-			{
-				if (0 != k)
-					*error = zbx_strdcat(*error, ", ");
-
-				*error = zbx_strdcat(*error, "revoked");
-				k++;
-			}
-
-			if (0 != (BADCERT_CN_MISMATCH & res))
-			{
-				if (0 != k)
-					*error = zbx_strdcat(*error, ", ");
-
-				*error = zbx_strdcat(*error, "Common Name mismatch");
-				k++;
-			}
-
-			if (0 != (BADCERT_NOT_TRUSTED & res))
-			{
-				if (0 != k)
-					*error = zbx_strdcat(*error, ", ");
-
-				*error = zbx_strdcat(*error, "self-signed or not signed by a trusted CA");
-			}
-
-			ssl_free(s->tls_ctx);
-			zbx_free(s->tls_ctx);
+		if (SUCCEED != zbx_tls_verify_issuer_subject(peer_cert, tls_arg1, tls_arg2, error))
+		{
+			zbx_tls_close(s);
 			goto out;
 		}
 
@@ -2768,13 +2865,13 @@ out:
  * Parameters:                                                                *
  *     s          - [IN]  socket with opened connection                       *
  *     error      - [OUT] dynamically allocated memory with error message     *
- *     tls_accept - [IN]  what connection to accept. Can be be either         *
+ *     tls_accept - [IN]  type of connection to accept. Can be be either      *
  *                        ZBX_TCP_SEC_TLS_CERT or ZBX_TCP_SEC_TLS_PSK, or     *
  *                        a bitwise 'OR' of both.                             *
  *                                                                            *
- * Return value: SUCCEED on successful TLS handshake with a valid certificate *
- *               or PSK                                                       *
- *               FAIL - an error occurred                                     *
+ * Return value:                                                              *
+ *     SUCCEED - successful TLS handshake with a valid certificate or PSK     *
+ *     FAIL - an error occurred                                               *
  *                                                                            *
  ******************************************************************************/
 int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
@@ -2936,56 +3033,20 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 					sizeof(work_buf), "", peer_cert))
 			{
 				*error = zbx_strdup(*error, "cannot get peer certificate info");
-				ssl_free(s->tls_ctx);
-				zbx_free(s->tls_ctx);
+				zbx_tls_close(s);
 				goto out;
 			}
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): peer certificate:\n%s", __function_name, work_buf);
 		}
 
-		/* validate peer certificate TODO: Issuer and Subject validation */
+		/* Validate peer certificate. Issuer and Subject has to be validated later, after data have been */
+		/* received and host name is known. */
 
 		if (0 != (res = ssl_get_verify_result(s->tls_ctx)))
 		{
-			int	k = 0;
-
-			*error = zbx_strdup(*error, "invalid peer certificate: ");
-
-			if (0 != (BADCERT_EXPIRED & res))
-			{
-				*error = zbx_strdcat(*error, "expired");
-				k++;
-			}
-
-			if (0 != (BADCERT_REVOKED & res))
-			{
-				if (0 != k)
-					*error = zbx_strdcat(*error, ", ");
-
-				*error = zbx_strdcat(*error, "revoked");
-				k++;
-			}
-
-			if (0 != (BADCERT_CN_MISMATCH & res))
-			{
-				if (0 != k)
-					*error = zbx_strdcat(*error, ", ");
-
-				*error = zbx_strdcat(*error, "Common Name mismatch");
-				k++;
-			}
-
-			if (0 != (BADCERT_NOT_TRUSTED & res))
-			{
-				if (0 != k)
-					*error = zbx_strdcat(*error, ", ");
-
-				*error = zbx_strdcat(*error, "self-signed or not signed by a trusted CA");
-			}
-
-			ssl_free(s->tls_ctx);
-			zbx_free(s->tls_ctx);
+			zbx_tls_cert_error_msg((unsigned int)res, error);
+			zbx_tls_close(s);
 			goto out;
 		}
 	}
@@ -3510,6 +3571,10 @@ const char	*zbx_tls_connection_type_name(unsigned int type)
  *                                                                            *
  * Purpose: get connection type, certificate and PSK attributes from a        *
  *          context of established connection                                 *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     This function can be used only on server-side of TLS connection        *
+ *     (GnuTLS makes it asymmetric)                                           *
  *                                                                            *
  ******************************************************************************/
 int	zbx_tls_get_attr(const zbx_sock_t *s, zbx_tls_conn_attr_t *attr)
