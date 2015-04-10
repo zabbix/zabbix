@@ -219,10 +219,16 @@ static void	zbx_tcp_timeout_set(zbx_sock_t *s, int timeout)
 	timeout *= 1000;
 
 	if (ZBX_TCP_ERROR == setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout)))
-		zbx_set_tcp_strerror("setsockopt() failed: %s", strerror_from_system(zbx_sock_last_error()));
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "setsockopt() failed for SO_RCVTIMEO: %s",
+				strerror_from_system(zbx_sock_last_error()));
+	}
 
 	if (ZBX_TCP_ERROR == setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout)))
-		zbx_set_tcp_strerror("setsockopt() failed: %s", strerror_from_system(zbx_sock_last_error()));
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "setsockopt() failed for SO_SNDTIMEO: %s",
+				strerror_from_system(zbx_sock_last_error()));
+	}
 #else
 	alarm(timeout);
 #endif
