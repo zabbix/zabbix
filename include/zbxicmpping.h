@@ -24,7 +24,7 @@ typedef struct
 {
 	char	*addr;
 	double	min;
-	double	avg;
+	double	sum;
 	double	max;
 	int	rcv;
 	int	cnt;
