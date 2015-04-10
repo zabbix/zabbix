@@ -372,18 +372,48 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if (!empty($items[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
+			$item_prototypeids = array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+
 			if ($clear) {
-				$result = API::Itemprototype()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]), true);
-				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear item prototypes'));
+				// This will include deletion of linked application prototypes.
+				$result = API::Itemprototype()->delete($item_prototypeids, true);
+
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear item prototypes'));
+				}
 			}
-			else{
+			else {
 				DB::update('items', array(
 					'values' => array('templateid' => 0),
-					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]))
+					'where' => array('itemid' => $item_prototypeids)
 				));
 
 				foreach ($items[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $item) {
 					info(_s('Unlinked: Item prototype "%1$s" on "%2$s".', $item['name'], $item['host']));
+				}
+
+				/*
+				 * Convert templated application prototypes to normal application prototypes
+				 * who are linked to these item prototypes.
+				 */
+				$application_prototypes = DBfetchArray(DBselect(
+					'SELECT ap.application_prototypeid'.
+					' FROM application_prototype ap'.
+					' WHERE EXISTS ('.
+						'SELECT NULL'.
+						' FROM item_application_prototype iap'.
+						' WHERE '.dbConditionInt('iap.itemid', $item_prototypeids).
+							' AND iap.application_prototypeid=ap.application_prototypeid'.
+					')'
+				));
+
+				if ($application_prototypes) {
+					$application_prototypeids = zbx_objectValues($application_prototypes, 'application_prototypeid');
+
+					DB::update('application_prototype', array(
+						'values' => array('templateid' => 0),
+						'where' => array('application_prototypeid' => $application_prototypeids)
+					));
 				}
 			}
 		}
@@ -569,9 +599,43 @@ abstract class CHostGeneral extends CHostBase {
 					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear applications.'));
 				}
 			}
-			else{
+			else {
 				foreach ($applicationTemplates as $application) {
 					info(_s('Unlinked: Application "%1$s" on "%2$s".', $application['name'], $application['host']));
+				}
+			}
+		}
+
+		/*
+		 * Process discovered applications when parent is a host, not template.
+		 * If a discovered application has no longer linked items, remove them.
+		 */
+		if ($targetids) {
+			$discovered_applications = API::Application()->get(array(
+				'output' => array('applicationid'),
+				'hostids' => $targetids,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
+				'preservekeys' => true
+			));
+
+			if ($discovered_applications) {
+				$discovered_applications = API::Application()->get(array(
+					'output' => array('applicationid'),
+					'selectItems' => array('itemid'),
+					'applicationids' => array_keys($discovered_applications),
+					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED)
+				));
+
+				$applications_to_delete = array();
+
+				foreach ($discovered_applications as $discovered_application) {
+					if (!$discovered_application['items']) {
+						$applications_to_delete[$discovered_application['applicationid']] = true;
+					}
+				}
+
+				if ($applications_to_delete) {
+					API::Application()->delete(array_keys($applications_to_delete), true);
 				}
 			}
 		}
