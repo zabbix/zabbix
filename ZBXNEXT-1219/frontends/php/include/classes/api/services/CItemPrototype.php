@@ -465,9 +465,6 @@ class CItemPrototype extends CItemGeneral {
 			DB::insert('items_applications', $itemApplications);
 		}
 
-		// application prototype names that need to be created in database
-		$application_prototypes_to_create = array();
-
 		// application prototypes that are no longer linked to items will be deleted from database
 		$application_prototypes_to_remove = array();
 
@@ -499,7 +496,7 @@ class CItemPrototype extends CItemGeneral {
 		// Process application prototypes.
 		foreach ($items as $item) {
 			/*
-			 * 'applicationPrototypes' is an array of 'name' properties. It can also be an empty array in case
+			 * "applicationPrototypes" is an array of "name" properties. It can also be an empty array in case
 			 * application prototypes should be unlinked from item prototypes.
 			 */
 			if (isset($item['applicationPrototypes']) && is_array($item['applicationPrototypes'])) {
@@ -511,46 +508,59 @@ class CItemPrototype extends CItemGeneral {
 					$discovery_ruleid = $discovery_rules[$item['itemid']]['parent_itemid'];
 				}
 
-				// Get currently linked application prototypes to current item prototype.
+				/*
+				 * Get currently linked application prototypes to current item prototype together
+				 * existing application prototypes in this discovery rule. There cannot be unlinked
+				 * application prototypes.
+				 */
 				$db_item_application_prototypes = DBfetchArray(DBselect(
-					'SELECT DISTINCT ap.application_prototypeid,ap.name,iap.itemapplicationprototypeid'.
+					'SELECT DISTINCT ap.application_prototypeid,ap.name,ap.templateid,iap.itemapplicationprototypeid'.
 					' FROM application_prototype ap,item_application_prototype iap'.
 					' WHERE ap.application_prototypeid=iap.application_prototypeid'.
 						' AND ap.itemid='.zbx_dbstr($discovery_ruleid).
 						' AND iap.itemid='.zbx_dbstr($item['itemid'])
 				));
 
-				// Gather all item_application_prototype records for each item.
+				// Gather all item application prototype records in $old_records for each item.
 				foreach ($db_item_application_prototypes as $item_application_prototype) {
 					$id = $item_application_prototype['itemapplicationprototypeid'];
+					$application_prototypeid = $item_application_prototype['application_prototypeid'];
 
 					$old_records[$id] = array(
 						'itemapplicationprototypeid' => $id,
-						'application_prototypeid' => $item_application_prototype['application_prototypeid'],
+						'application_prototypeid' => $application_prototypeid,
 						'itemid' => $item['itemid']
 					);
 				}
 
-				// Compare which application prototypes should be linked (but first created) and which should be unlinked.
-				$db_item_application_prototypes = zbx_toHash($db_item_application_prototypes, 'name');
-				$new_application_prototypes = zbx_toHash($item['applicationPrototypes'], 'name');
+				$application_prototypes = zbx_toHash($item['applicationPrototypes'], 'name');
 
 				/*
 				 * Check given application prototype names if they exist in database. If they exist, return IDs.
 				 * Other application prototypes will be created later.
 				 */
 				$db_application_prototypes = DBfetchArray(DBselect(
-					'SELECT ap.application_prototypeid,ap.name'.
+					'SELECT ap.application_prototypeid,ap.name,ap.templateid'.
 					' FROM application_prototype ap'.
 					' WHERE ap.itemid='.zbx_dbstr($discovery_ruleid).
-						' AND '.dbConditionString('ap.name', array_keys($new_application_prototypes))
+						' AND '.dbConditionString('ap.name', array_keys($application_prototypes))
 				));
 
-				$names = zbx_objectValues($db_application_prototypes, 'name');
+				$db_application_prototypes = zbx_toHash($db_application_prototypes, 'name');
+				$names = array_keys($db_application_prototypes);
 
-				// Cycle each application prototype and check if it exists. If not, we will create it.
+				// New application prototype names that need to be created in database.
 				$application_prototypes_to_create = array();
-				foreach ($new_application_prototypes as $application_prototype) {
+
+				// An array that contains "application_prototypeid" as key and "templateid" as value.
+				$application_prototypes_to_update = array();
+
+				/*
+				 * Cycle each application prototype and check if it exists. If not, we will create it. Else for existing
+				 * application prototypes check only if template ID has changed. No other parameters can change.
+				 * Otherwise application prototypes are deleted or stay unchanged.
+				 */
+				foreach ($application_prototypes as $application_prototype) {
 					if (!in_array($application_prototype['name'], $names)) {
 						$application_prototypes_to_create[] = array(
 							'itemid' => $discovery_ruleid,
@@ -560,17 +570,33 @@ class CItemPrototype extends CItemGeneral {
 								: null
 						);
 					}
+					elseif (array_key_exists('templateid', $application_prototype)) {
+						$db_application_prototype = $db_application_prototypes[$application_prototype['name']];
+
+						if ($db_application_prototype != $application_prototype['templateid']) {
+							$id = $db_application_prototype['application_prototypeid'];
+
+							$application_prototypes_to_update[$id] = $application_prototype['templateid'];
+						}
+					}
 				}
 
-				// Collect already existing application prototype IDs
+				// Collect already existing application prototype IDs.
 				foreach ($db_application_prototypes as $application_prototype) {
+					$application_prototypeid = $application_prototype['application_prototypeid'];
+					$new_application_prototype = $application_prototypes[$application_prototype['name']];
+
+					$templateid = array_key_exists('templateid', $new_application_prototype)
+						? $new_application_prototype['templateid']
+						: 0;
+
 					$new_records[] = array(
-						'application_prototypeid' => $application_prototype['application_prototypeid'],
+						'application_prototypeid' => $application_prototypeid,
 						'itemid' => $item['itemid']
 					);
 				}
 
-				// Create new application prototypes, get new IDs and add them to new records.
+				// Create new application prototypes, get new IDs.
 				if ($application_prototypes_to_create) {
 					$ids = DB::insert('application_prototype', $application_prototypes_to_create);
 
@@ -582,12 +608,24 @@ class CItemPrototype extends CItemGeneral {
 					}
 				}
 
+				// Update application prototype template IDs.
+				if ($application_prototypes_to_update) {
+					foreach ($application_prototypes_to_update as $application_prototypeid => $templateid) {
+						DB::update('application_prototype', array(
+							'values' => array('templateid' => $templateid),
+							'where' => array('application_prototypeid' => $application_prototypeid)
+						));
+					}
+				}
+
 				/*
 				 * Collect application prototype IDs that will be unlinked from item prototypes, in case those
 				 * application prototypes should be permanently deleted when no longer linked to any item prototypes.
 				 */
+				$db_item_application_prototypes = zbx_toHash($db_item_application_prototypes, 'name');
+
 				$application_prototypes_to_unlink = array_diff_key($db_item_application_prototypes,
-					$new_application_prototypes
+					$application_prototypes
 				);
 				foreach ($application_prototypes_to_unlink as $application_prototype) {
 					$application_prototypes_to_remove[$application_prototype['application_prototypeid']] = true;
@@ -740,6 +778,7 @@ class CItemPrototype extends CItemGeneral {
 			$createdItems[$item['itemid']] = $item['itemid'];
 		}
 		if ($createdItems) {
+			// This API call will also make sure that discovered applications are no longer linked to other items.
 			API::Item()->delete($createdItems, true);
 		}
 

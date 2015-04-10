@@ -644,7 +644,42 @@ class CItem extends CItemGeneral {
 			'resourcetype' => array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_CLOCK)
 		));
 
+		/*
+		 * Find discovered applications for items or created items. Delete items and re-check if discovered applications
+		 * are no longer linked to other items.
+		 */
+		$discovered_applications = API::Application()->get(array(
+			'output' => array('applicationid'),
+			'itemids' => $itemIds,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
+			'preservekeys' => true
+		));
+
 		DB::delete('items', array('itemid' => $itemIds));
+
+		if ($discovered_applications) {
+			$applicationids = array_keys($discovered_applications);
+
+			$discovered_applications = API::Application()->get(array(
+				'output' => array('applicationid'),
+				'selectItems' => array('itemid'),
+				'applicationids' => $applicationids,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED)
+			));
+
+			$applications_to_delete = array();
+
+			foreach ($discovered_applications as $discovered_application) {
+				if (!$discovered_application['items']) {
+					$applications_to_delete[$discovered_application['applicationid']] = true;
+				}
+			}
+
+			if ($applications_to_delete) {
+				API::Application()->delete(array_keys($applications_to_delete), true);
+			}
+		}
+
 		DB::delete('profiles', array(
 			'idx' => 'web.favorite.graphids',
 			'source' => 'itemid',
