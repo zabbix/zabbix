@@ -91,7 +91,7 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_free << ZBX_PERFSTAT_PAGE_SHIFT);
+	SET_UI64_RESULT(result, (m.real_free + m.numperm) << ZBX_PERFSTAT_PAGE_SHIFT);
 
 	return SYSINFO_RET_OK;
 }
@@ -106,7 +106,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_DBL_RESULT(result, m.real_free / (double)m.real_total * 100);
+	SET_DBL_RESULT(result, (m.real_free + m.numperm) / (double)m.real_total * 100);
 
 	return SYSINFO_RET_OK;
 }
