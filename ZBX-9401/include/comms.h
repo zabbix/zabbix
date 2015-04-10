@@ -51,16 +51,6 @@ typedef SOCKET	ZBX_SOCKET;
 typedef int	ZBX_SOCKET;
 #endif
 
-#if defined(HAVE_IPV6)
-#	define ZBX_SOCKADDR	struct sockaddr_storage
-#else
-#	define ZBX_SOCKADDR	struct sockaddr_in
-#endif
-
-#if !defined(ZBX_SOCKLEN_T)
-#	define ZBX_SOCKLEN_T	socklen_t
-#endif
-
 typedef enum
 {
 	ZBX_TCP_ERR_NETWORK = 1,
@@ -132,22 +122,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 
 char    *get_ip_by_socket(zbx_sock_t *s);
 int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty);
-
-typedef struct
-{
-	ZBX_SOCKET	socket;
-	ZBX_SOCKADDR	addr;		/* address information for the host this socket is meant to communicate with */
-	ZBX_SOCKLEN_T	addrlen;
-	size_t		read_bytes;
-	char		buf_stat[ZBX_STAT_BUF_LEN];
-	int		timeout;
-}
-zbx_udp_sock_t;
-
-int	zbx_udp_create(zbx_udp_sock_t *s, const char *source_ip, const char *ip, unsigned short port);
-int	zbx_udp_send(zbx_udp_sock_t *s, const char *data, size_t len, int timeout);
-int	zbx_udp_recv(zbx_udp_sock_t *s, int timeout);
-void	zbx_udp_close(zbx_udp_sock_t *s);
 
 #define ZBX_DEFAULT_FTP_PORT		21
 #define ZBX_DEFAULT_SSH_PORT		22

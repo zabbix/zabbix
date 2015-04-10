@@ -143,29 +143,29 @@ out:
 
 int	check_ntp(char *host, unsigned short port, int timeout, int *value_int)
 {
-	zbx_udp_sock_t	s;
+	zbx_sock_t	s;
 	int		ret;
-	char		request[NTP_PACKET_SIZE];
+	char		request[NTP_PACKET_SIZE], *response = NULL;
 	ntp_data	data;
 
 	*value_int = 0;
 
-	if (SUCCEED == (ret = zbx_udp_create(&s, CONFIG_SOURCE_IP, host, port)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
 	{
 		make_packet(&data);
 
 		pack_ntp(&data, (unsigned char *)request, sizeof(request));
 
-		if (SUCCEED == (ret = zbx_udp_send(&s, request, sizeof(request), timeout)))
+		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, request)))
 		{
-			if (SUCCEED == (ret = zbx_udp_recv(&s, timeout)))
+			if (SUCCEED == (ret = zbx_tcp_recv(&s, &response)))
 			{
 				*value_int = (SUCCEED == unpack_ntp(&data, (unsigned char *)request,
-						(unsigned char *)s.buf_stat, s.read_bytes));
+						(unsigned char *)response, strlen(response)));
 			}
 		}
 
-		zbx_udp_close(&s);
+		zbx_tcp_close(&s);
 	}
 
 	if (FAIL == ret)
