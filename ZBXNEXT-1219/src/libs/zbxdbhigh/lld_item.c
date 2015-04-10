@@ -172,9 +172,9 @@ typedef struct
 #define ZBX_FLAG_LLD_APPLICATION_UNSET		__UINT64_C(0x0000000000000000)
 #define ZBX_FLAG_LLD_APPLICATION_DISCOVERED	__UINT64_C(0x0000000000000001)
 #define ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME	__UINT64_C(0x0000000000000002)
-#define ZBX_FLAG_LLD_APPLICATION_INVALID	__UINT64_C(0x0000000100000000)
-#define ZBX_FLAG_LLD_APPLICATION_ADDDISCOVERY	__UINT64_C(0x0000000200000000)
+#define ZBX_FLAG_LLD_APPLICATION_ADDDISCOVERY	__UINT64_C(0x0000000100000000)
 	zbx_uint64_t		flags;
+	int			items_num;
 	char			*name;
 	const zbx_lld_row_t	*lld_row;
 }
@@ -183,16 +183,16 @@ zbx_lld_application_t;
 /* reference to an item either by its id (existing items) or structure (new items) */
 typedef struct
 {
-	zbx_uint64_t		itemid;
-	const zbx_lld_item_t	*item;
+	zbx_uint64_t	itemid;
+	zbx_lld_item_t	*item;
 }
 zbx_lld_item_ref_t;
 
 /* reference to an application either by its id (existing applications) or structure (new applications) */
 typedef struct
 {
-	zbx_uint64_t			applicationid;
-	const zbx_lld_application_t	*application;
+	zbx_uint64_t		applicationid;
+	zbx_lld_application_t	*application;
 }
 zbx_lld_application_ref_t;
 
@@ -1491,6 +1491,9 @@ static void	lld_applications_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 	{
 		application = (zbx_lld_application_t *)applications->values[i];
 
+		if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_DISCOVERED))
+			continue;
+
 		if (0 == application->applicationid)
 			new_applications++;
 
@@ -2136,6 +2139,7 @@ static void	lld_applications_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *appl
 
 		application->flags = ZBX_FLAG_LLD_APPLICATION_UNSET;
 		application->lld_row = NULL;
+		application->items_num = 0;
 
 		zbx_vector_ptr_append(applications, application);
 	}
@@ -2191,6 +2195,7 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 		application->name = application_local.name;
 		application->flags = ZBX_FLAG_LLD_APPLICATION_ADDDISCOVERY;
 		application->lld_row = lld_row;
+		application->items_num = 0;
 
 		zbx_vector_ptr_append(applications, application);
 	}
@@ -2293,8 +2298,8 @@ static void	lld_applications_make(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 			}
 			else
 			{
-				/* conflicting application name, mark as invalid */
-				application->flags = ZBX_FLAG_LLD_APPLICATION_INVALID;
+				/* conflicting application name, reset discovert flags */
+				application->flags = ZBX_FLAG_LLD_APPLICATION_UNSET;
 			}
 		}
 	}
@@ -2305,6 +2310,56 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d applications", __function_name, applications->values_num);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_applications_validate                                        *
+ *                                                                            *
+ * Purpose: validates discovered applications by checking if they have any    *
+ *          items linked to them                                              *
+ *                                                                            *
+ * Parameters: applications       - [IN] the applications                     *
+ *             items_applications - [IN/OUT] the item-application links       *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_applications_validate(zbx_vector_ptr_t *applications, zbx_hashset_t *items_applications)
+{
+	const char			*__function_name = "lld_applications_validate";
+	zbx_hashset_iter_t		iter;
+	zbx_lld_item_application_t	*item_application;
+	int				i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (0 == applications->values_num)
+		goto out;
+
+	/* count linked items per application */
+	zbx_hashset_iter_reset(items_applications, &iter);
+
+	while (NULL != (item_application = zbx_hashset_iter_next(&iter)))
+	{
+		if (0 == (item_application->flags & ZBX_FLAG_LLD_ITEM_APPLICATION_DISCOVERED))
+			continue;
+
+		if (NULL == item_application->application_ref.application)
+			continue;
+
+		item_application->application_ref.application->items_num++;
+	}
+
+	/* reset discovery flags for applications with no items */
+	for (i = 0; i < applications->values_num; i++)
+	{
+		zbx_lld_application_t	*application = (zbx_lld_application_t *)applications->values[i];
+
+		if (0 == application->items_num)
+			application->flags = ZBX_FLAG_LLD_APPLICATION_UNSET;
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -2418,7 +2473,7 @@ static void	lld_items_applications_make(const zbx_vector_ptr_t *item_prototypes,
 
 				application = application_index->application;
 
-				if (0 != (application->flags & ZBX_FLAG_LLD_APPLICATION_INVALID))
+				if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_DISCOVERED))
 					continue;
 
 				if (0 == (item_application_local.application_ref.applicationid =
@@ -2587,6 +2642,7 @@ void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_p
 
 	lld_items_applications_get(lld_ruleid, &items_applications);
 	lld_items_applications_make(&item_prototypes, &items, &applications, &applications_index, &items_applications);
+	lld_applications_validate(&applications, &items_applications);
 
 	DBbegin();
 
