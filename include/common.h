@@ -1082,6 +1082,13 @@ void	zbx_trim_str_list(char *list, char delimiter);
 
 int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
 
+int	zbx_strcmp_null(const char *s1, const char *s2);
+
+int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length);
+int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r);
+char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
+char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote);
+
 #define ZBX_SESSION_ACTIVE	0
 #define ZBX_SESSION_PASSIVE	1
 

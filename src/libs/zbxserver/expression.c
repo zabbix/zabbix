@@ -4146,6 +4146,46 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 			if (SUCCEED == rc)
 				zbx_replace_string(data, l, &r, replace_to);
 		}
+		/* substitute user macro context */
+		else if (0 == (flags & ZBX_MACRO_CONTEXT) && '$' == (*data)[l + 1])
+		{
+			int	macro_r, context_l, context_r, force_quote = 0;
+			char	*context, *context_esc;
+
+			if (FAIL == zbx_user_macro_parse(*data + l, &macro_r, &context_l, &context_r))
+				continue;
+
+			if (0 == context_l)
+			{
+				/* user macro without context, skip it */
+				l += macro_r;
+				continue;
+			}
+
+			force_quote = ('"' == (*data)[l + context_l]);
+
+			context = zbx_user_macro_unquote_context_dyn(*data + l + context_l, context_r - context_l + 1);
+
+			if (FAIL == substitute_discovery_macros(&context, jp_row, ZBX_MACRO_CONTEXT, error,
+					max_error_len))
+			{
+				zbx_free(context);
+				ret = FAIL;
+				break;
+			}
+
+			context_esc = zbx_user_macro_quote_context_dyn(context, force_quote);
+
+			r = l + context_r;
+			zbx_replace_string(data, l + context_l, &r, context_esc);
+
+			zbx_free(context_esc);
+			zbx_free(context);
+
+			/* move cursor to the end of user macro */
+			while ('}' != (*data)[r++])
+				;
+		}
 		/* substitute LLD macros, located in the item key parameters in simple macros */
 		/* e.g. {Zabbix server:ifAlias[{#SNMPINDEX}].last(0)}                         */
 		else if (0 != (flags & ZBX_MACRO_SIMPLE))
