@@ -3307,11 +3307,9 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
  ******************************************************************************/
 void	zbx_trim_str_list(char *list, char delimiter)
 {
-	char	*whitespace = " \t";	/* NB! strchr(3): "terminating null byte is considered part of the string" */
-	char	*out, *in;
-
-	if (NULL == list || '\0' == *list)
-		return;
+	/* NB! strchr(3): "terminating null byte is considered part of the string" */
+	const char	*whitespace = " \t";
+	char		*out, *in;
 
 	out = in = list;
 
