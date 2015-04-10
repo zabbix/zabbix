@@ -96,6 +96,43 @@
  *   6) Destroy the user macro cache with zbx_umc_destroy() function.
  */
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_umc_free_macro                                               *
+ *                                                                            *
+ * Purpose: frees user macro cache macro                                      *
+ *                                                                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_umc_free_macro(zbx_umc_macro_t *macro)
+{
+	zbx_free(macro->name);
+	zbx_free(macro->context);
+	zbx_free(macro->value);
+	zbx_free(macro);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: umc_compare_macro                                                *
+ *                                                                            *
+ * Purpose: compares two user macros                                          *
+ *                                                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_umc_compare_macro(const void *d1, const void *d2)
+{
+	zbx_umc_macro_t	*m1 = *(zbx_umc_macro_t **)d1;
+	zbx_umc_macro_t	*m2 = *(zbx_umc_macro_t **)d2;
+	int		ret;
+
+	if (0 != (ret = strcmp(m1->name, m2->name)))
+		return ret;
+
+	return zbx_strcmp_null(m1->context, m2->context);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_umc_init                                                     *
@@ -105,7 +142,6 @@
  * Parameters: cache  - [IN] the user macro cache                             *
  *                                                                            *
  ******************************************************************************/
-
 void	zbx_umc_init(zbx_hashset_t *cache)
 {
 	zbx_hashset_create(cache, 10, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -124,23 +160,14 @@ void	zbx_umc_destroy(zbx_hashset_t *cache)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_umc_object_t	*object;
-	int			i;
 
 	zbx_hashset_iter_reset(cache, &iter);
 
 	while (NULL != (object = zbx_hashset_iter_next(&iter)))
 	{
 		zbx_vector_uint64_destroy(&object->hostids);
-
-		for (i = 0; i < object->macros.values_num; i++)
-		{
-			zbx_ptr_pair_t	*pair = (zbx_ptr_pair_t *)&object->macros.values[i];
-
-			zbx_free(pair->first);
-			if (NULL != pair->second)
-				zbx_free(pair->second);
-		}
-		zbx_vector_ptr_pair_destroy(&object->macros);
+		zbx_vector_ptr_clear_ext(&object->macros, (zbx_clean_func_t)zbx_umc_free_macro);
+		zbx_vector_ptr_destroy(&object->macros);
 	}
 
 	zbx_hashset_destroy(cache);
@@ -159,45 +186,47 @@ void	zbx_umc_destroy(zbx_hashset_t *cache)
  ******************************************************************************/
 void	zbx_umc_add_expression(zbx_hashset_t *cache, zbx_uint64_t objectid, const char *expression)
 {
-	zbx_umc_object_t	*pobject;
-	zbx_ptr_pair_t		pair = {NULL, NULL};
+	zbx_umc_object_t	*object;
+	zbx_umc_macro_t		*macro, macro_local = {NULL};
 	const char		*br = expression, *bl;
-	int 			len;
+	int			length;
 
-	pobject = zbx_hashset_search(cache, &objectid);
+	object = zbx_hashset_search(cache, &objectid);
 
 	while (NULL != (bl = strstr(br, "{$")))
 	{
-		if (NULL == (br = strchr(bl, '}')))
+		char	*name = NULL, *context = NULL;
+
+		if (SUCCEED != zbx_user_macro_parse_dyn(bl, &name, &context, &length))
 			break;
 
-		if (NULL == pobject)
+		if (NULL == object)
 		{
-			zbx_umc_object_t	object = {objectid};
+			zbx_umc_object_t	object_local = {objectid};
 
-			zbx_vector_uint64_create(&object.hostids);
-			zbx_vector_ptr_pair_create(&object.macros);
+			zbx_vector_uint64_create(&object_local.hostids);
+			zbx_vector_ptr_create(&object_local.macros);
 
-			pobject = zbx_hashset_insert(cache, &object, sizeof(zbx_umc_object_t));
+			object = zbx_hashset_insert(cache, &object_local, sizeof(zbx_umc_object_t));
 		}
 
-		len = br - bl + 1;
+		br = bl + length;
 
-		pair.first = zbx_malloc(NULL, len + 1);
-		memcpy(pair.first, bl, len);
-		((char *)pair.first)[len] = '\0';
+		macro_local.name = name;
+		macro_local.context = context;
 
-		if (FAIL != zbx_vector_ptr_pair_search(&pobject->macros, pair, ZBX_DEFAULT_STR_COMPARE_FUNC))
+		if (FAIL != zbx_vector_ptr_search(&object->macros, &macro_local, zbx_umc_compare_macro))
 		{
-			zbx_free(pair.first);
+			zbx_free(macro_local.name);
+			zbx_free(macro_local.context);
 			continue;
 		}
 
-		zbx_vector_ptr_pair_append_ptr(&pobject->macros, &pair);
-	}
+		macro = (zbx_umc_macro_t *)zbx_malloc(NULL, sizeof(zbx_umc_macro_t));
+		*macro = macro_local;
 
-	if (NULL != pobject)
-		zbx_vector_ptr_pair_sort(&pobject->macros, ZBX_DEFAULT_STR_COMPARE_FUNC);
+		zbx_vector_ptr_append(&object->macros, macro);
+	}
 }
 
 /******************************************************************************
@@ -222,7 +251,7 @@ void	zbx_umc_add_hostids(zbx_hashset_t *cache, zbx_uint64_t objectid, const zbx_
 		zbx_umc_object_t	object = {objectid};
 
 		zbx_vector_uint64_create(&object.hostids);
-		zbx_vector_ptr_pair_create(&object.macros);
+		zbx_vector_ptr_create(&object.macros);
 
 		pobject = zbx_hashset_insert(cache, &object, sizeof(zbx_umc_object_t));
 	}
@@ -247,18 +276,23 @@ void	zbx_umc_add_hostids(zbx_hashset_t *cache, zbx_uint64_t objectid, const zbx_
  ******************************************************************************/
 const char	*zbx_umc_get_macro_value(zbx_hashset_t *cache, zbx_uint64_t objectid, const char *macro)
 {
-	zbx_umc_object_t	*pobject;
-	zbx_ptr_pair_t		pair;
+	zbx_umc_object_t	*object;
+	zbx_umc_macro_t		macro_local = {NULL};
 	int			index;
+	const char		*value = NULL;
 
-	if (NULL != (pobject = zbx_hashset_search(cache, &objectid)))
+	if (NULL == (object = zbx_hashset_search(cache, &objectid)) ||
+			SUCCEED != zbx_user_macro_parse_dyn(macro, &macro_local.name, &macro_local.context, NULL))
 	{
-		pair.first = (char *)macro;
-
-		if (FAIL != (index = zbx_vector_ptr_pair_bsearch(&pobject->macros, pair, ZBX_DEFAULT_STR_COMPARE_FUNC)))
-			return pobject->macros.values[index].second;
+		return NULL;
 	}
 
-	return NULL;
+	if (FAIL != (index = zbx_vector_ptr_bsearch(&object->macros, &macro_local, zbx_umc_compare_macro)))
+		value = ((zbx_umc_macro_t *)object->macros.values[index])->value;
+
+	zbx_free(macro_local.context);
+	zbx_free(macro_local.name);
+
+	return value;
 }
 

@@ -111,6 +111,20 @@ static int	DBpatch_2050004(void)
 	return DBadd_field("proxy_history", &field);
 }
 
+static int	DBpatch_2050005(void)
+{
+	const ZBX_FIELD	field = {"macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("globalmacro", &field);
+}
+
+static int	DBpatch_2050006(void)
+{
+	const ZBX_FIELD	field = {"macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hostmacro", &field);
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -122,5 +136,7 @@ DBPATCH_ADD(2050001, 0, 1)
 DBPATCH_ADD(2050002, 0, 1)
 DBPATCH_ADD(2050003, 0, 1)
 DBPATCH_ADD(2050004, 0, 1)
+DBPATCH_ADD(2050005, 0, 1)
+DBPATCH_ADD(2050006, 0, 1)
 
 DBPATCH_END()

@@ -633,14 +633,14 @@ INDEX		|2		|theme
 
 TABLE|globalmacro|globalmacroid|ZBX_DATA
 FIELD		|globalmacroid	|t_id		|	|NOT NULL	|0
-FIELD		|macro		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|macro		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|macro
 
 TABLE|hostmacro|hostmacroid|ZBX_DATA
 FIELD		|hostmacroid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
-FIELD		|macro		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|macro		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|hostid,macro
 
@@ -1282,4 +1282,4 @@ INDEX		|1		|itemid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2050004	|2050004
+ROW		|2050006	|2050006
