@@ -392,8 +392,8 @@ class C20XmlValidator {
 			'port' =>					'required|string',
 			'description' =>			'required|string',
 			'inventory_link' =>			'required|string',
-			'applications' =>			'array',
-			'valuemap' =>				'array',
+			'applications' =>			'required|array',
+			'valuemap' =>				'required|array',
 			'logtimefmt' =>				'string',
 			'interface_ref' =>			'string'
 		);
@@ -413,8 +413,11 @@ class C20XmlValidator {
 		}
 
 		// child elements validation
-		if (array_key_exists('applications', $item)) {
+		if (array_key_exists('applications', $item) && $item['applications']) {
 			$this->validateApplications($item['applications'], $path.'/applications');
+		}
+		if (array_key_exists('valuemap', $item) && $item['valuemap']) {
+			$this->validateValueMap($item['valuemap'], $path.'/valuemap');
 		}
 	}
 
@@ -1981,8 +1984,8 @@ class C20XmlValidator {
 			'port' =>					'required|string',
 			'description' =>			'required|string',
 			'inventory_link' =>			'required|string',
-			'applications' =>			'array',
-			'valuemap' =>				'array',
+			'applications' =>			'required|array',
+			'valuemap' =>				'required|array',
 			'logtimefmt' =>				'string',
 			'interface_ref' =>			'string'
 		);
@@ -1999,6 +2002,14 @@ class C20XmlValidator {
 		if ($arrayDiff) {
 			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+
+		// child elements validation
+		if (array_key_exists('applications', $item) && $item['applications']) {
+			$this->validateApplications($item['applications'], $path.'/applications');
+		}
+		if (array_key_exists('valuemap', $item) && $item['valuemap']) {
+			$this->validateValueMap($item['valuemap'], $path.'/valuemap');
 		}
 	}
 
@@ -2347,6 +2358,33 @@ class C20XmlValidator {
 
 		// unexpected tag validation
 		$arrayDiff = array_diff_key($group, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+	}
+
+
+	/**
+	 * Value map validation.
+	 *
+	 * @param array  $valueMap	value map
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateValueMap(array $valueMap, $path) {
+		$validationRules = array('name' => 'required|string');
+
+		$validator = new CNewValidator($valueMap, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($valueMap, $validator->getValidInput());
 		if ($arrayDiff) {
 			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
