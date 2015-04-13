@@ -779,9 +779,9 @@ function triggerExpression($trigger, $html = false) {
 				$function_data += $trigger['hosts'][$function_data['hostid']];
 
 				if ($html) {
-					$style = ($function_data['status'] == ITEM_STATUS_DISABLED) ? 'disabled' : 'unknown';
+					$style = ($function_data['status'] == ITEM_STATUS_DISABLED) ? 'red' : 'grey';
 					if ($function_data['status'] == ITEM_STATUS_ACTIVE) {
-						$style = 'enabled';
+						$style = 'green';
 					}
 
 					if ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST) {
@@ -2354,13 +2354,13 @@ function triggerIndicator($status, $state = null) {
  */
 function triggerIndicatorStyle($status, $state = null) {
 	if ($status == TRIGGER_STATUS_ENABLED) {
-		return ($state == TRIGGER_STATE_UNKNOWN) ? 'grey' : 'green';
+		return ($state == TRIGGER_STATE_UNKNOWN) ? ZBX_STYLE_GREY : ZBX_STYLE_GREEN;
 	}
 	elseif ($status == TRIGGER_STATUS_DISABLED) {
-		return 'red';
+		return ZBX_STYLE_RED;
 	}
 
-	return 'grey';
+	return ZBX_STYLE_GREY;
 }
 
 /**
