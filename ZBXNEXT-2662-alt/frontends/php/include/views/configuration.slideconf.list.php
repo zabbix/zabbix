@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,19 +51,14 @@ foreach ($this->data['slides'] as $slide) {
 	));
 }
 
-// create go button
-$goComboBox = new CComboBox('action');
-
-$goOption = new CComboItem('slideshow.massdelete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected slide shows?'));
-$goComboBox->addItem($goOption);
-
-$goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
-zbx_add_post_js('chkbxRange.pageGoName = "shows";');
-
 // append table to form
-$slideForm->addItem(array($slidesTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$slideForm->addItem(array(
+	$slidesTable,
+	$this->data['paging'],
+	get_table_header(new CActionButtonList('action', 'shows', array(
+		'slideshow.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected slide shows?'))
+	)))
+));
 
 // append form to widget
 $slideWidget->addItem($slideForm);

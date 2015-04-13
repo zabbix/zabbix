@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -430,13 +430,16 @@ $pageFilter = new CPageFilter(array(
 ));
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
-if (isset($_REQUEST['form'])) {
+if (hasRequest('form')) {
 
 	if ($templateId = getRequest('templateid', 0)) {
 		$templateWidget->addItem(get_header_host_table('', $templateId));
 	}
 
-	$data = array();
+	$data = array(
+		'form' => getRequest('form'),
+		'groupId' => getRequest('groupid', 0)
+	);
 
 	if ($templateId) {
 		$dbTemplates = API::Template()->get(array(
@@ -657,24 +660,13 @@ else {
 		));
 	}
 
-	$goBox = new CComboBox('action');
-
-	$goBox->addItem('template.export', _('Export selected'));
-
-	$goOption = new CComboItem('template.massdelete', _('Delete selected'));
-	$goOption->setAttribute('confirm', _('Delete selected templates?'));
-	$goBox->addItem($goOption);
-
-	$goOption = new CComboItem('template.massdeleteclear', _('Delete selected with linked elements'));
-	$goOption->setAttribute('confirm', _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'));
-	$goBox->addItem($goOption);
-
-	$goButton = new CSubmit('goButton', _('Go').' (0)');
-	$goButton->setAttribute('id', 'goButton');
-
-	zbx_add_post_js('chkbxRange.pageGoName = "templates";');
-
-	$footer = get_table_header(array($goBox, $goButton));
+	$footer = get_table_header(new CActionButtonList('action', 'templates', array(
+		'template.export' => array('name' => _('Export')),
+		'template.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected templates?')),
+		'template.massdeleteclear' => array('name' => _('Delete and clear'),
+			'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)')
+		)
+	)));
 
 	$form->addItem(array($table, $paging, $footer));
 	$templateWidget->addItem($form);
