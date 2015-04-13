@@ -479,7 +479,7 @@ div.table-forms-container {
 }
 
 div.form-btns {
-	text-align: center;
+	//text-align: center;
 
 	button {
 		margin: 10px 6px 5px 6px;
@@ -487,12 +487,12 @@ div.form-btns {
 }
 
 table.table-forms {
-	margin: 0 auto;
+	//margin: 0 auto;
+	width: 100%;
 	
 	tfoot {
 
 		td.table-forms-td-right {
-			//background: lighten($primary-color, 56%);
 			padding-top: 5px;
 		}
 
@@ -509,6 +509,8 @@ table.table-forms {
 		padding: 5px 0 5px 0;
 		text-align: right;
 		vertical-align: top;
+		width: 15%;
+		white-space: nowrap;
 
 		label {
 			display: block;
@@ -520,6 +522,7 @@ table.table-forms {
 	td.table-forms-td-right {
 		padding: 5px 0 5px 10px;
 		vertical-align: middle;
+		width: 85%;
 
 		td {
 			padding: 5px 5px 5px 0;
@@ -778,26 +781,33 @@ div.tabs-nav-container {
 ul.ui-tabs-nav {
 	height: 36px;
 	line-height: 36px;
-	text-align: center;
 	margin: 0 -10px 15px -10px;
 	border-bottom: 1px solid $table-hordivider-color;
+	@include tab-menu-shadow;
 
 	li {
 		display: inline-block;
 
 		a {
-			padding: 10px 13px 9px 13px;
+			padding: 11px 13px 11px 13px;
+		} 
+
+		&.ui-tabs-active:first-child {
+			border-left: 0;
 		}
 
 		&.ui-tabs-active {
-
+			border-left: 1px solid $table-hordivider-color;
+			border-right: 1px solid $table-hordivider-color;
 			a {
+				padding: 8px 13px 11px 13px;
 				font-weight: bold;
 				background: $body-content-bgcolor;
 				color: $font-color;
 				text-decoration: none;
 				cursor: default;
-				border-bottom: 3px solid $primary-color;
+				border-top: 3px solid $primary-color;
+				border-bottom: 3px solid $body-content-bgcolor;
 			}
 		}
 	}
@@ -828,6 +838,24 @@ div.drag-icon {
 	cursor: move;
 	background: url(../img/icon-sprite.png) no-repeat 0 -288px;
 }
+
+/* Dashboard */
+div.dashbrd-widget {
+	margin: 0 0 10px 0;
+	padding: 10px;
+	background: $body-content-bgcolor;
+	@include list-table-shadow;
+}
+
+ul.dashbrd-widget-footer {
+	text-align: right;
+	color: $font-alt-color;
+
+	li {
+		display: inline-block;
+		padding-left: 13px;
+	}
+} 
 
 /* Action Menus, Pop-up Menus */
 ul.action-menu {

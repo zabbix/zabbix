@@ -33,18 +33,18 @@
 	<form>
 	<div class="table-forms-container">
 	
-	<ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
+	<ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li><a href="#">Templates</a></li><li class="ui-tabs-active"><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
 <!--
 	<div class="tabs-nav">
 	<a href="#" class="selected">Host</a><a href="#">Templates</a><a href="#">IPMI</a><a href="#">Macros</a><a href="#">Host inventory</a>
 	</div>-->
 		<table class="table-forms">
-		<tfoot>
+		<!--<tfoot>
 		<tr>
 		<td class="table-forms-td-left"></td>
 		<td class="table-forms-td-right"><button type="button">Update</button><button type="button" class="btn-alt">Clone</button><button type="button" class="btn-alt">Full clone</button><button type="button" class="btn-alt">Delete</button><button type="button" class="btn-alt">Cancel</button></td>
 		</tr>
-		</tfoot>
+		</tfoot>-->
 		<tbody>
 		<tr>
 		<td class="table-forms-td-left"><label for="HostName">Host name</label></td>
@@ -77,7 +77,7 @@
 		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><div><span class="radio-switch paging-selected">IP</span><span class="radio-switch">DNS</span></div><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#" class="form-remove-btn">&times;</a></td>
 		</tr>
 		<tr>
-		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><div><span class="radio-switch">IP</span><span class="radio-switch paging-selected">DNS</span></div><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td>&nbsp;</td><td><a href="">Add</a></td></tr></tbody></table><div class="table-forms-separator"></div>
+		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><div><span class="radio-switch">IP</span><span class="radio-switch paging-selected">DNS</span></div><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td>&nbsp;</td><td><a href="">Add</a></td></tr></tbody></table><!--<div class="table-forms-separator"></div>-->
 		</td>
 		</tr>
 		<tr>
@@ -89,7 +89,7 @@
 		<tr>
 		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"><div class="margin-top"><label for="BulkReq2"><input type="checkbox" id="BulkReq2" checked> Use bulk requests</label></div></td><td><input type="text" id="DnsName"></td><td><div><span class="radio-switch paging-selected">IP</span><span class="radio-switch">DNS</span></div><input type="radio"><input type="radio"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><a href="#" class="form-remove-btn">&times;</a></td>
 		</tr><tr><td>&nbsp;</td><td><a href="">Add</a></td></tr>
-		</tbody></table><div class="table-forms-separator"></div>
+		</tbody></table><!--<div class="table-forms-separator"></div>-->
 		</td>
 		</tr>
 		<tr>
@@ -122,14 +122,14 @@
 		</tr>
 		</tbody>
 		</table>
-		<div class="form-btns">
-		<button type="button">Update</button><button type="button" class="btn-alt">Clone</button><button type="button" class="btn-alt">Full clone</button><button type="button" class="btn-alt">Delete</button><button type="button" class="btn-alt">Cancel</button>
-		</div>
+
+		<table class="table-forms"><tfoot><tr><td class="table-forms-td-left">&nbsp;</td>
+		<td class="table-forms-td-right"><button type="button">Update</button><button type="button" class="btn-alt">Clone</button><button type="button" class="btn-alt">Full clone</button><button type="button" class="btn-alt">Delete</button><button type="button" class="btn-alt">Cancel</button></td></tr></tfoot></table>
 	</div>
 	</form>
-
+<!--
 	<ul class="action-menu" style="top: 200px; left: 100px"><li><h3>Favorite screens</h3></li><li><a href="#">Add</a></li><li><a href="#">Remove<span class="arrow-right"></span></a></li><li><a href="#">Remove all</a></li><li><h3>Favorite slide shows</h3></li><li><a href="#">Add</a></li><li>Remove</li><li>Remove all</li></ul>
-	<ul class="action-menu" style="top: 248px; left: 295px"><li><a href="#">Remove</a></li></ul>
+	<ul class="action-menu" style="top: 248px; left: 295px"><li><a href="#">Remove</a></li></ul>-->
 	</article>
 	<footer>
 	<a href="http://www.zabbix.com" target="_blank" class="logo"></a>
