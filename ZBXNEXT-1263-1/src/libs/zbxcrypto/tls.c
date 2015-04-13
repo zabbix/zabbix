@@ -106,7 +106,7 @@ ZBX_THREAD_LOCAL static char			*psk_identity_for_cb	= NULL;
 ZBX_THREAD_LOCAL static size_t			psk_identity_len_for_cb	= 0;
 ZBX_THREAD_LOCAL static char			*psk_for_cb		= NULL;
 ZBX_THREAD_LOCAL static size_t			psk_len_for_cb		= 0;
-/* buffer for messages produced by zbx_openssl_info_callback() */
+/* buffer for messages produced by zbx_openssl_info_cb() */
 ZBX_THREAD_LOCAL char				info_buf[256];
 #endif
 
@@ -140,15 +140,16 @@ static void	zbx_tls_make_personalization_string(char **pers, size_t *len)
 #if defined(HAVE_POLARSSL)
 /******************************************************************************
  *                                                                            *
- * Function: polarssl_debug                                                   *
+ * Function: polarssl_debug_cb                                                *
  *                                                                            *
  * Purpose: write a PolarSSL debug message into Zabbix log                    *
  *                                                                            *
  * Comments:                                                                  *
  *     Parameter 'tls_ctx' is not used but cannot be removed because this is  *
  *     a callback function, its arguments are defined in PolarSSL.            *
+ *                                                                            *
  ******************************************************************************/
-static void	polarssl_debug(void *tls_ctx, int level, const char *str)
+static void	polarssl_debug_cb(void *tls_ctx, int level, const char *str)
 {
 	char	msg[1024];	/* Apparently 1024 bytes is the longest message which can come from PolarSSL 1.3.9 */
 
@@ -160,14 +161,15 @@ static void	polarssl_debug(void *tls_ctx, int level, const char *str)
 #elif defined(HAVE_GNUTLS)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_gnutls_debug                                                 *
+ * Function: zbx_gnutls_debug_cb                                              *
  *                                                                            *
  * Purpose: write a GnuTLS debug message into Zabbix log                      *
  *                                                                            *
  * Comments:                                                                  *
  *     This is a callback function, its arguments are defined in GnuTLS.      *
+ *                                                                            *
  ******************************************************************************/
-static void	zbx_gnutls_debug(int level, const char* str)
+static void	zbx_gnutls_debug_cb(int level, const char* str)
 {
 	char	msg[1024];
 
@@ -180,14 +182,15 @@ static void	zbx_gnutls_debug(int level, const char* str)
 #if GNUTLS_VERSION_NUMBER >= 0x030000
 /******************************************************************************
  *                                                                            *
- * Function: zbx_gnutls_audit                                                 *
+ * Function: zbx_gnutls_audit_cb                                              *
  *                                                                            *
  * Purpose: write a GnuTLS audit message into Zabbix log                      *
  *                                                                            *
  * Comments:                                                                  *
  *     This is a callback function, its arguments are defined in GnuTLS.      *
+ *                                                                            *
  ******************************************************************************/
-static void	zbx_gnutls_audit(gnutls_session_t session, const char* str)
+static void	zbx_gnutls_audit_cb(gnutls_session_t session, const char* str)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "GnuTLS audit: \"%s\"", str);
 }
@@ -197,14 +200,15 @@ static void	zbx_gnutls_audit(gnutls_session_t session, const char* str)
 #if defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_openssl_info_callback                                        *
+ * Function: zbx_openssl_info_cb                                              *
  *                                                                            *
  * Purpose: get state, alert, error information on TLS connection             *
  *                                                                            *
  * Comments:                                                                  *
- *     This is a callback function, its arguments are defined in OpenSSL,     *
+ *     This is a callback function, its arguments are defined in OpenSSL.     *
+ *                                                                            *
  ******************************************************************************/
-static void	zbx_openssl_info_callback(const SSL *ssl, int where, int ret)
+static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
 {
 	const char	*direction, *rw, *handshake;
 
@@ -335,8 +339,8 @@ static void	zbx_tls_cert_error_msg(unsigned int flags, char **error)
  *                                                                            *
  * Function: zbx_parameter_not_empty                                          *
  *                                                                            *
- * Purpose: enforce if a configuration parameter is defined it must not be    *
- *          empty                                                             *
+ * Purpose:                                                                   *
+ *     Enforce if a configuration parameter is defined it must not be empty   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_parameter_not_empty(const char *param, const char *param_name)
@@ -974,7 +978,7 @@ static int	zbx_psk_hex2bin(const unsigned char *p_hex, unsigned char *buf, int b
 #if defined(HAVE_POLARSSL)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_psk_callback                                                 *
+ * Function: zbx_psk_cb                                                       *
  *                                                                            *
  * Purpose:                                                                   *
  *    find and set the requested pre-shared key upon PolarSSL request         *
@@ -995,10 +999,10 @@ static int	zbx_psk_hex2bin(const unsigned char *p_hex, unsigned char *buf, int b
  *     Used only in server and proxy.                                         *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_psk_callback(void *par, ssl_context *tls_ctx, const unsigned char *psk_identity,
+static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_identity,
 		size_t psk_identity_len)
 {
-	const char	*__function_name = "zbx_psk_callback";
+	const char	*__function_name = "zbx_psk_cb";
 	unsigned char	*psk;
 	size_t		psk_len = 0;
 	int		psk_bin_len;
@@ -1078,7 +1082,7 @@ static int	zbx_psk_callback(void *par, ssl_context *tls_ctx, const unsigned char
 #elif defined(HAVE_GNUTLS)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_psk_callback                                                 *
+ * Function: zbx_psk_cb                                                       *
  *                                                                            *
  * Purpose:                                                                   *
  *    find and set the requested pre-shared key upon GnuTLS request           *
@@ -1098,9 +1102,9 @@ static int	zbx_psk_callback(void *par, ssl_context *tls_ctx, const unsigned char
  *     Used in all programs accepting connections.                            *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_psk_callback(gnutls_session_t session, const char *psk_identity, gnutls_datum_t *key)
+static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls_datum_t *key)
 {
-	const char	*__function_name = "zbx_psk_callback";
+	const char	*__function_name = "zbx_psk_cb";
 	char		*psk;
 	size_t		psk_len = 0;
 	int		psk_bin_len;
@@ -1165,7 +1169,7 @@ static int	zbx_psk_callback(gnutls_session_t session, const char *psk_identity, 
 #elif defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_psk_client_callback                                          *
+ * Function: zbx_psk_client_cb                                                *
  *                                                                            *
  * Purpose:                                                                   *
  *    set pre-shared key for outgoing TLS connection upon OpenSSL request     *
@@ -1191,10 +1195,10 @@ static int	zbx_psk_callback(gnutls_session_t session, const char *psk_identity, 
  *     by this callback function. We use global variables to pass this info.  *
  *                                                                            *
  ******************************************************************************/
-static unsigned int	zbx_psk_client_callback(SSL *ssl, const char *hint, char *identity,
+static unsigned int	zbx_psk_client_cb(SSL *ssl, const char *hint, char *identity,
 		unsigned int max_identity_len, unsigned char *psk, unsigned int max_psk_len)
 {
-	const char	*__function_name = "zbx_psk_client_callback";
+	const char	*__function_name = "zbx_psk_client_cb";
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
@@ -1224,7 +1228,7 @@ static unsigned int	zbx_psk_client_callback(SSL *ssl, const char *hint, char *id
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_psk_server_callback                                          *
+ * Function: zbx_psk_server_cb                                                *
  *                                                                            *
  * Purpose:                                                                   *
  *    set pre-shared key for incoming TLS connection upon OpenSSL request     *
@@ -1244,10 +1248,10 @@ static unsigned int	zbx_psk_client_callback(SSL *ssl, const char *hint, char *id
  *     Used in all programs accepting incoming TLS PSK connections.           *
  *                                                                            *
  ******************************************************************************/
-static unsigned int	zbx_psk_server_callback(SSL *ssl, const char *identity, unsigned char *psk,
+static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned char *psk,
 		unsigned int max_psk_len)
 {
-	const char	*__function_name = "zbx_psk_server_callback";
+	const char	*__function_name = "zbx_psk_server_cb";
 	char		*psk_loc;
 	size_t		psk_len = 0;
 	int		psk_bin_len;
@@ -1849,7 +1853,7 @@ void	zbx_tls_init_child(void)
 			/* fixed PSK identity and key) for a passive proxy, agent and agentd. The only possibility */
 			/* seems to set up credentials dynamically for each incoming connection using a callback */
 			/* function. */
-			gnutls_psk_set_server_credentials_function(my_psk_server_creds, zbx_psk_callback);
+			gnutls_psk_set_server_credentials_function(my_psk_server_creds, zbx_psk_cb);
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded pre-shared key and identity", __function_name);
@@ -2069,33 +2073,33 @@ void	zbx_tls_init_child(void)
 	/* set up info and PSK callbacks */
 
 	if (NULL != ctx_cert)
-		SSL_CTX_set_info_callback(ctx_cert, zbx_openssl_info_callback);
+		SSL_CTX_set_info_callback(ctx_cert, zbx_openssl_info_cb);
 
 	if (NULL != ctx_psk)
 	{
-		SSL_CTX_set_info_callback(ctx_psk, zbx_openssl_info_callback);
+		SSL_CTX_set_info_callback(ctx_psk, zbx_openssl_info_cb);
 
 		if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD |
 				ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)))
 		{
-			SSL_CTX_set_psk_client_callback(ctx_psk, zbx_psk_client_callback);
+			SSL_CTX_set_psk_client_callback(ctx_psk, zbx_psk_client_cb);
 		}
 
 		if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD |
 				ZBX_PROGRAM_TYPE_AGENT)))
 		{
-			SSL_CTX_set_psk_server_callback(ctx_psk, zbx_psk_server_callback);
+			SSL_CTX_set_psk_server_callback(ctx_psk, zbx_psk_server_cb);
 		}
 	}
 
 	if (NULL != ctx_all)
 	{
-		SSL_CTX_set_info_callback(ctx_all, zbx_openssl_info_callback);
+		SSL_CTX_set_info_callback(ctx_all, zbx_openssl_info_cb);
 
 		if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD |
 				ZBX_PROGRAM_TYPE_AGENT)))
 		{
-			SSL_CTX_set_psk_server_callback(ctx_all, zbx_psk_server_callback);
+			SSL_CTX_set_psk_server_callback(ctx_all, zbx_psk_server_cb);
 		}
 	}
 
@@ -2306,10 +2310,9 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
 	{
-		/* Set our own debug function 'polarssl_debug()' as a callback function. The 3rd parameter of */
-		/* ssl_set_dbg() we set to NULL. During a calback, the 3rd parameter will be passed to our function */
-		/* 'polarssl_debug()' as the 1st parameter, but it will be ignored in 'polarssl_debug()'. */
-		ssl_set_dbg(s->tls_ctx, polarssl_debug, NULL);
+		/* Set our own debug callback function. The 3rd parameter of ssl_set_dbg() we set to NULL. It will be */
+		/* passed as the 1st parameter to our callback function and will be ignored there. */
+		ssl_set_dbg(s->tls_ctx, polarssl_debug_cb, NULL);
 
 		/* For Zabbix LOG_LEVEL_TRACE, PolarSSL debug level 3 seems the best. Recompile with 4 (apparently */
 		/* the highest PolarSSL debug level) to dump also network raw bytes. */
@@ -2595,8 +2598,8 @@ out:
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
 	{
-		/* set our own debug function 'zbx_gnutls_debug()' as a callback function */
-		gnutls_global_set_log_function(zbx_gnutls_debug);
+		/* set our own debug callback function */
+		gnutls_global_set_log_function(zbx_gnutls_debug_cb);
 
 		/* for Zabbix LOG_LEVEL_TRACE, GnuTLS debug level 4 seems the best */
 		/* (the highest GnuTLS debug level is 9) */
@@ -2606,8 +2609,8 @@ out:
 		gnutls_global_set_log_level(0);		/* restore default log level */
 
 #if GNUTLS_VERSION_NUMBER >= 0x030000
-	/* set our own function 'zbx_gnutls_audit()' as a callback function to log issues into Zabbix log */
-	gnutls_global_set_audit_log_function(zbx_gnutls_audit);
+	/* set our own callback function to log issues into Zabbix log */
+	gnutls_global_set_audit_log_function(zbx_gnutls_audit_cb);
 #endif
 
 	/* on MS Windows gl_fd_to_handle() may be necessary to convert s->socket */
@@ -2792,7 +2795,7 @@ out:	/* an error occured */
 
 	/* TLS handshake */
 
-	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_callback() messages */
+	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 
 	if (1 != (res = SSL_connect(s->tls_ctx)))
 	{
@@ -2917,10 +2920,9 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
 	{
-		/* Set our own debug function 'polarssl_debug()' as a callback function. The 3rd parameter of */
-		/* ssl_set_dbg() we set to NULL. During a calback, the 3rd parameter will be passed to our function */
-		/* 'polarssl_debug()' as the 1st parameter, but it will be ignored in 'polarssl_debug()'. */
-		ssl_set_dbg(s->tls_ctx, polarssl_debug, NULL);
+		/* Set our own debug callback function. The 3rd parameter of ssl_set_dbg() we set to NULL. It will be */
+		/* passed as the 1st parameter to our callback function and will be ignored there. */
+		ssl_set_dbg(s->tls_ctx, polarssl_debug_cb, NULL);
 
 		/* For Zabbix LOG_LEVEL_TRACE, PolarSSL debug level 3 seems the best. Recompile with 4 (apparently */
 		/* the highest PolarSSL debug level) to dump also network raw bytes. */
@@ -2972,7 +2974,7 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 		{
 			/* For server or proxy a PSK can come from configuration file or database. */
 			/* Set up a callback function for finding the requested PSK. */
-			ssl_set_psk_cb(s->tls_ctx, zbx_psk_callback, NULL);
+			ssl_set_psk_cb(s->tls_ctx, zbx_psk_cb, NULL);
 		}
 	}
 
@@ -3134,7 +3136,7 @@ out:
 				goto out;
 			}
 
-			gnutls_psk_set_server_credentials_function(s->tls_psk_server_creds, zbx_psk_callback);
+			gnutls_psk_set_server_credentials_function(s->tls_psk_server_creds, zbx_psk_cb);
 
 			if (GNUTLS_E_SUCCESS != (res = gnutls_credentials_set(s->tls_ctx, GNUTLS_CRD_PSK,
 					s->tls_psk_server_creds)))
@@ -3194,8 +3196,8 @@ out:
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
 	{
-		/* set our own debug function 'zbx_gnutls_debug()' as a callback function */
-		gnutls_global_set_log_function(zbx_gnutls_debug);
+		/* set our own debug callback function */
+		gnutls_global_set_log_function(zbx_gnutls_debug_cb);
 
 		/* for Zabbix LOG_LEVEL_TRACE, GnuTLS debug level 4 seems the best */
 		/* (the highest GnuTLS debug level is 9) */
@@ -3205,8 +3207,8 @@ out:
 		gnutls_global_set_log_level(0);		/* restore default log level */
 
 #if GNUTLS_VERSION_NUMBER >= 0x030000
-	/* set our own function 'zbx_gnutls_audit()' as a callback function to log issues into Zabbix log */
-	gnutls_global_set_audit_log_function(zbx_gnutls_audit);
+	/* set our own callback function to log issues into Zabbix log */
+	gnutls_global_set_audit_log_function(zbx_gnutls_audit_cb);
 #endif
 
 	/* on MS Windows gl_fd_to_handle() may be necessary to convert s->socket */
@@ -3423,7 +3425,7 @@ out:	/* an error occured */
 
 	/* TLS handshake */
 
-	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_callback() messages */
+	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 
 	if (1 != (res = SSL_accept(s->tls_ctx)))
 	{

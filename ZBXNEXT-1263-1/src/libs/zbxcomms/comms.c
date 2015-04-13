@@ -642,7 +642,7 @@ static ssize_t	zbx_tls_write(zbx_sock_t *s, const char *buf, size_t len)
 				char	*error = NULL;
 				size_t	error_alloc = 0, error_offset = 0;
 
-				info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_callback() messages */
+				info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "TLS write returned error code "
 						"%d:", error_code);
 				zbx_tls_error_msg(&error, &error_alloc, &error_offset);
@@ -1467,7 +1467,7 @@ static ssize_t	zbx_tls_read(zbx_sock_t *s, char *buf, size_t len)
 				char	*error = NULL;
 				size_t	error_alloc = 0, error_offset = 0;
 
-				info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_callback() messages */
+				info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "TLS read returned error code "
 						"%d:", error_code);
 				zbx_tls_error_msg(&error, &error_alloc, &error_offset);
