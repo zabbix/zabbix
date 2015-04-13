@@ -981,6 +981,7 @@ define('HISTORY_LATEST', 'showlatest');
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // CSS styles
+define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_HIDDEN', 'hidden');
@@ -988,6 +989,11 @@ define('ZBX_STYLE_ORANGE', 'orange');
 define('ZBX_STYLE_RED', 'red');
 define('ZBX_STYLE_SELECT_MULTIPLE', 'select-multiple');
 define('ZBX_STYLE_TABLE_FORMS', 'table-forms');
+define('ZBX_STYLE_TABLE_FORMS_CONTAINER', 'table-forms-container');
+define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
+define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
+define('ZBX_STYLE_TABLE_FORMS_TR_NEW', 'table-forms-tr-new');
+define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');
