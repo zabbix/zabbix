@@ -429,6 +429,27 @@ span.radio-switch {
 	}
 }
 
+div.treeview-plus {
+	background: $body-content-bgcolor;
+	border: 1px solid $form-input-color;
+	cursor: pointer;
+	width: 10px;
+	height: 10px;
+	line-height: 10px;
+	text-align: center;
+	font-size: $font-top-nav-size;
+	font-weight: bold;
+	@include border-radius;
+
+	&:hover {
+		background: lighten($primary-color, 55%);
+	}
+
+	&:active {
+		background: lighten($primary-color, 50%);
+	}
+}
+
 /* Filters */
 div.filter-container {
 	text-align: center;
@@ -438,8 +459,8 @@ span.subfilter-enabled {
 	display: inline-block;
 	position: relative;
 	padding: 0 9px 0 6px;
-	height: 24px;
-	line-height: 24px;
+	height: 20px;
+	line-height: 20px;
 	background: $form-disabled-color;
 	@include border-radius;
 
@@ -746,7 +767,7 @@ div.tabs-nav-container {
 	margin: 0 0 15px 0;
 }
 
-ul.tabs-nav {
+ul.ui-tabs-nav {
 	height: 36px;
 	line-height: 36px;
 	text-align: center;
@@ -754,21 +775,24 @@ ul.tabs-nav {
 	border-bottom: 1px solid $table-hordivider-color;
 
 	li {
-		display: inline;
-	}
+		display: inline-block;
 
-	a {
-		padding: 10px 13px 9px 13px;
-
-		&.selected {
-			font-weight: bold;
-			background: $body-content-bgcolor;
-			color: $font-color;
-			text-decoration: none;
-			cursor: default;
-			border-bottom: 3px solid $primary-color;
+		a {
+			padding: 10px 13px 9px 13px;
 		}
-    }
+
+		&.ui-tabs-active {
+
+			a {
+				font-weight: bold;
+				background: $body-content-bgcolor;
+				color: $font-color;
+				text-decoration: none;
+				cursor: default;
+				border-bottom: 3px solid $primary-color;
+			}
+		}
+	}
 }
 
 div.input-help-wrapper {
@@ -902,7 +926,7 @@ span.status-grey {
 %status {
 	padding: 2px 4px;
 	font-size: $font-h3-size;
-	text-transform: uppercase;
+	text-transform: $font-transform;
 	text-align: center;
 	@include border-radius; 
 }
@@ -932,6 +956,9 @@ div.msg-bad {
 span.msg-close-btn {
 	position: absolute;
 	right: 0;
+	width: 24px;
+	height: 24px;
+	line-height: 24px;
 	@extend %close-icon;
 
 	&:hover {
@@ -941,6 +968,9 @@ span.msg-close-btn {
 
 a.form-remove-btn {
 	display: block;
+	width: 24px;
+	height: 24px;
+	line-height: 24px;
 	//position: absolute;
 	//right: 0;
 	@extend %close-icon;
@@ -955,10 +985,12 @@ a.form-remove-btn {
 }
 
 span.subfilter-disable-btn {
+	width: 20px;
+	height: 20px;
 	display: inline-block;
 	position: absolute;
 	top: 0;
-	right: -21px;
+	right: -16px;
 	color: $font-white-color;
 	background: $form-disabled-color;
 	@extend %close-icon;
@@ -975,9 +1007,6 @@ span.subfilter-disable-btn {
 }
 
 %close-icon {
-	width: 24px;
-	height: 24px;
-	line-height: 24px;
 	text-align: center;
 	font-size: $font-h2-size;
 	font-weight: bold;
