@@ -12,18 +12,55 @@ body {
 	@include font-body;
 	color: $font-color;
 	background: $body-bgcolor;
-	margin-bottom: 60px;
+	margin-bottom: 90px;
 	min-width: 950px;
+
+	&.pop-up {
+		min-width: initial;
+		margin-bottom: 0;
+
+		article {
+			padding: 13px;
+		}
+
+		h1 {
+			border-bottom: none;
+			padding: 0;
+		}
+	}
+}
+
+fieldset {
+	border: 1px solid $underline-color;
+	padding: 0 10px 10px 15px;
+}
+
+legend {
+	margin-left: -5px;
+	padding: 0 5px 0 5px;
 }
 
 a {
-	text-decoration: none;
-	color: $link-color;
-	@include transition(color .2s ease);
+
+	&:link {
+		text-decoration: none;
+		color: $link-color;
+		@include transition(color .2s ease);
+	}
+
+	&:visited {
+		text-decoration: none;
+		color: $link-visited-color;
+	}
 
 	&:hover {
 		text-decoration: underline;
 		color: $link-hover-color;
+	}
+
+	&:active {
+		text-decoration: underline;
+		color: $link-active-color;
 	}
 
 	&.link-dotted {
@@ -54,7 +91,7 @@ h4 {
 }
 
 sup {
-	font-size: 0.917em;
+	font-size: $font-h3-size;
 	color: $font-alt-color;
 }
 
@@ -68,13 +105,13 @@ background: $secondary-color;
 margin: 0 0 13px 0;
 }
 
-div.top-nav-container {
+.top-nav-container {
 	height: 36px;
 	line-height: 35px;
 	background: $primary-color;
 }
 
-ul.top-nav {
+.top-nav {
 	font-size: $font-top-nav-size;
 	background: $primary-color;
 
@@ -130,81 +167,63 @@ ul.top-nav-icons {
 
 	a {
 		display: block;
-		width: 52px;
+		width: 38px;
 		height: 36px;
 		@include opacity(0.75);
 		@include transition(all .2s ease);
 
-    &:hover {
-    	@include opacity(1);
+		&:hover {
+			@include opacity(1);
+		}
     }
-    }
 
-	a.top-nav-help {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat 9px -18px;
+	.top-nav-help {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -18px;
 	}
 
-	a.top-nav-print {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat 9px -42px;
+	.top-nav-print {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -42px;
 	}
 
-	a.top-nav-profile {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat 9px -66px;
+	.top-nav-profile {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -66px;
 	}
 
-	a.top-nav-signout {
-		background: $primary-color url(../img/icon-sprite.png) no-repeat 9px -91px;
-	}
-}
-
-ul.top-nav-icons form {
-	position: relative;
-}
-
-ul.top-nav-icons input {
-	background: darken($primary-color, 10%);
-	border: none;
-	width: 169px;
-	height: 24px;
-	line-height: 24px;
-	margin: 6px 13px 0 0;
-	color: $font-white-color;
-	padding-right: 24px;
-	@include transition(color, background-color .2s ease);
-
-	&::-webkit-input-placeholder {
-		color: $form-input-top-placeholder;
+	.top-nav-signout {
+		background: $primary-color url(../img/icon-sprite.png) no-repeat 7px -91px;
+		width: 44px;
 	}
 
-	&::-moz-placeholder {
-		color: $form-input-top-placeholder;
-	}
-	&:-ms-input-placeholder {
-		color: $form-input-top-placeholder;
+	form {
+		position: relative;
 	}
 
-	&:focus {
+	input {
+		background: darken($primary-color, 10%);
+		border: none;
+		width: 169px;
+		height: 24px;
+		line-height: 24px;
+		margin: 6px 13px 0 0;
+		color: $font-white-color;
+		padding-right: 24px;
+		@include transition(color, background-color .2s ease);
+		@include placeholder($form-input-top-placeholder);
 
-		&::-webkit-input-placeholder {
-		color: $form-input-top-focus-placeholder;
-	}
-
-	&::-moz-placeholder {
-		color: $form-input-top-focus-placeholder;
-	}
-	&:-ms-input-placeholder {
-		color: $form-input-top-focus-placeholder;
-	}
+		&:focus + .btn-search {
+			@include opacity(1);
+			@include placeholder($form-input-top-focus-placeholder);
+		}
 	}
 }
 
-div.top-subnav-container {
+.top-subnav-container {
 	height: 36px;
 	line-height: 36px;
 	background: $secondary-color;
 }
 
-ul.top-subnav {
+.top-subnav {
 	background: $secondary-color;
 
 	li {
@@ -214,7 +233,7 @@ ul.top-subnav {
 	}
 }
 
-ul.top-subnav a {
+.top-subnav a {
 	padding: 5px 8px 5px 8px;
 	color: $link-topsubnav-color;
 
@@ -230,28 +249,28 @@ ul.top-subnav a {
 	}
 }
 
-span.arrow-up {
+.arrow-up {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-bottom: 4px solid $link-alt-color;
+	border-bottom: 4px solid $font-color;
 }
 
-span.arrow-down {
+.arrow-down {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-top: 4px solid $link-alt-color;
+	border-top: 4px solid $font-color;
 }
 
-span.arrow-left {
+.arrow-left {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
 	border-right: 4px solid $font-color;
 }
 
-span.arrow-right {
+.arrow-right {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
@@ -266,7 +285,7 @@ span.arrow-right {
 	display: inline-block;
 }
 
-div.header-title {
+.header-title {
 	position: relative;
 	margin: 0 0 12px 0;
 
@@ -278,7 +297,7 @@ div.header-title {
 		li {
 			display: block;
 			float: left;
-			padding: 0 0 0 13px;
+			padding: 0 0 0 14px;
 		}
 	}
 }
@@ -286,24 +305,23 @@ div.header-title {
 /* Article */
 article {
 	padding: 0 13px 0 13px;
-	padding-bottom: 40px;
 }
 
 /* Obgect Group Navigation */
-ul.object-group {
+.object-group {
 	margin: 0 0 11px 0;
 	
 	li {
 		display: inline-block;
-		margin: 0 13px 0 0;
+		margin: 0 14px 0 0;
 	}
 
-	& a.selected {
+	.selected {
 		font-weight: bold;
 		background: #eee;
 	}
 
-	span.arrow-right {
+	.arrow-right {
 		border-left-color: $font-color;
 	}
 }
@@ -326,7 +344,7 @@ footer {
 	}	
 }
 
-a.logo {
+.logo {
 	display: block;
 	width: 94px;
 	height: 25px;
@@ -336,10 +354,10 @@ a.logo {
 }
 
 /* Tables */
-table.list-table {
+.list-table {
 	width: 100%;
     background: $body-content-bgcolor;
-    @include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
+    @include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
 	
 	thead th {
 		@include list-table-header;
@@ -352,8 +370,23 @@ table.list-table {
 	    color: $font-alt-color;
 	    white-space: nowrap;
 
+	    .arrow-up {
+	    	position: absolute;
+	    	top: 45%;
+	    	margin: 0 0 0 4px;
+	    	border-bottom-color: $font-alt-color;
+	    }
+
+	    .arrow-down {
+	    	position: absolute;
+	    	top: 45%;
+	    	margin: 0 0 0 4px;
+	    	border-top-color: $font-alt-color;
+	    }
+
 	    a {
 	    	display: block;
+	    	position: relative;
 	    	color: $link-alt-color;
 	    	margin: -1em;
 	    	padding: 1em;
@@ -363,10 +396,6 @@ table.list-table {
 	    		color: $link-alt-hover-color;
 	    		text-decoration: none;
 	    		background: lighten($primary-color, 56%)
-	    	}
-
-	    	& span {
-	    		margin: 0 0 0 4px;
 	    	}	    
 	    }
 	}
@@ -394,19 +423,27 @@ table.list-table {
 	}
 }
 
-div.table-paging {
+.table-paging {
 	text-align: center;
 	background: $body-content-bgcolor;
 	padding: 7px 5px 7px 5px;
 	border-top: 1px solid $table-hordivider-color;
-	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
+	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
 
 	a {
 		@extend %paging-btn;
 	}
+
+	.arrow-left {
+		border-right-color: $link-color;
+	}
+
+	.arrow-right {
+		border-left-color: $link-color;
+	}
 }
 
-span.radio-switch {
+.radio-switch {
 	cursor: pointer;
 	@extend %paging-btn;
 }
@@ -419,14 +456,16 @@ span.radio-switch {
 	line-height: 22px;
 	border: 1px solid $form-input-color;
 	text-decoration: none;
-	color: $font-color;
+	color: $link-color;
 	@include transition(background .2s ease);
 
 	&:hover {
+		color: $link-hover-color;
 		background: lighten($primary-color, 55%);
 	}
 
 	&:active {
+		color: $link-active-color;
 		background: lighten($primary-color, 50%);
 	}
 
@@ -446,7 +485,8 @@ span.radio-switch {
 	}
 }
 
-div.treeview-plus {
+.treeview-plus {
+	display: inline-block;
 	background: $body-content-bgcolor;
 	border: 1px solid $form-input-color;
 	cursor: pointer;
@@ -467,24 +507,24 @@ div.treeview-plus {
 	}
 }
 
-div.table {
+.table {
 	display: table;
 }
 
-div.row {
+.row {
 	display: table-row;
 }
 
-div.cell {
+.cell {
 	display: table-cell;
 }
 
 /* Filters */
-div.filter-container {
+.filter-container {
 	text-align: center;
 }
 
-span.subfilter-enabled {
+.subfilter-enabled {
 	display: inline-block;
 	position: relative;
 	padding: 0 9px 0 6px;
@@ -501,13 +541,13 @@ span.subfilter-enabled {
 }
 
 /* Forms */
-div.table-forms-container {
+.table-forms-container {
 	padding: 0 10px 10px 10px;
 	background: $body-content-bgcolor;
-	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
+	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
 }
 
-div.form-btns {
+.form-btns {
 	//text-align: center;
 
 	button {
@@ -515,26 +555,27 @@ div.form-btns {
 	}
 }
 
-table.table-forms {
+.table-forms {
 	//margin: 0 auto;
 	width: 100%;
+	color: $font-color;
 	
 	tfoot {
 
-		td.table-forms-td-right {
+		.table-forms-td-right {
 			padding-top: 5px;
 		}
 
 		button {
-			margin: 0 13px 0 0;
+			margin: 0 14px 0 0;
 		}
 	}
 
-	tr.table-forms-tr-new {
+	.table-forms-tr-new {
 		background: $alert-green-bg-color;
 	}
 
-	td.table-forms-td-left {
+	.table-forms-td-left {
 		padding: 5px 0 5px 0;
 		text-align: right;
 		vertical-align: top;
@@ -548,7 +589,7 @@ table.table-forms {
 		}
 	}
 
-	td.table-forms-td-right {
+	.table-forms-td-right {
 		padding: 5px 0 5px 10px;
 		vertical-align: middle;
 		width: 85%;
@@ -570,7 +611,7 @@ table.table-forms {
 	}
 }
 
-div.table-forms-separator {
+.table-forms-separator {
 	margin: 5px 0 0 0;
 	border: 1px solid $table-hordivider-color;
 }
@@ -583,7 +624,7 @@ div.table-forms-separator {
 	}
 }
 
-ul.list-check-radio {
+.list-check-radio {
 
 	li {
 		padding: 0 0 7px 0;
@@ -600,23 +641,27 @@ ul.list-check-radio {
 input {
 	
 	&[type="text"] {
-		height: 22px;
-		line-height: 22px;
-		padding: 0 0 0 5px;
+		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
 	&[type="password"] {
-		height: 22px;
-		line-height: 22px;
-		padding: 0 0 0 5px;
+		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
 	&[type="search"] {
-		height: 22px;
-		line-height: 22px;
-		padding: 0 0 0 5px;
+		@extend %form-input-height-padding;
+		@extend %form-input-style;
+	}
+
+	&[type="number"] {
+		@extend %form-input-height-padding;
+		@extend %form-input-style;
+	}
+
+	&[type="email"] {
+		@extend %form-input-height-padding;
 		@extend %form-input-style;
 	}
 
@@ -662,6 +707,12 @@ select {
 	background: none;
 }
 
+%form-input-height-padding {
+	height: 22px;
+	line-height: 22px;
+	padding: 0 0 0 5px;
+}
+
 %form-input-style {
 	@include border-radius(2px);
 	border: 1px solid $form-input-color;
@@ -689,32 +740,67 @@ button {
 	min-height: 24px;
 	vertical-align: middle;
 	cursor: pointer;
-	@include transition(border-color, background .2s ease);
-	@extend %button-hover-active;
+	@include transition(border-color, background-color .2s ease);
+
+	&:hover {
+		@extend %button-hover;
+	}
+
+	&:active {
+		@extend %button-active;
+	}
 
 	&.btn-alt {
 		@extend button;
 		background: $form-transparent-color;
 		color: $primary-color;
-		@extend %button-hover-active;
+
+		&:hover {
+			@extend %button-hover;
+		}
+
+		&:active {
+			@extend %button-active;
+		}
 	}
 
 	&.btn-conf {
 		background: $primary-color url(../img/icon-sprite.png) no-repeat -1px -145px;
 		@extend %button-icon-size;
-		@extend %button-hover-active;
+		
+		&:hover {
+			@extend %button-hover;
+		}
+
+		&:active {
+			@extend %button-active;
+		}
 	}
 
 	&.btn-max {
 		background: $primary-color url(../img/icon-sprite.png) no-repeat -1px -169px;
 		@extend %button-icon-size;
-		@extend %button-hover-active;
+		
+		&:hover {
+			@extend %button-hover;
+		}
+
+		&:active {
+			@extend %button-active;
+		}
 	}
 
 	&.btn-min {
 		background: $primary-color url(../img/icon-sprite.png) no-repeat -1px -193px;
 		@extend %button-icon-size;
-		@extend %button-hover-active;
+		
+		&:hover {
+			@extend %button-hover;
+		}
+
+		&:active {
+			@extend %button-active;
+		}
 	}
 
 
@@ -729,10 +815,17 @@ button {
 		padding: 0;
 		@include opacity(0.75);
 		@include transition(all .2s ease);
-
+		
 		&:hover {
-			background-color: darken($primary-color, 10%);
-			@include opacity(1);
+			@extend %btn-search-hover-focus;
+		}
+
+		&:active {
+			@extend %btn-search-hover-focus;
+		}
+
+		&:focus {
+			@extend %btn-search-hover-focus;
 		}
 	}
 
@@ -744,13 +837,11 @@ button {
 		@include transition(all .2s ease);
 
 		&:hover {
-			background-color: $form-transparent-color;
-			@include opacity(1);
+			@extend %btn-wigdet-hover-active;
 		}
 
 		&:active {
-			background-color: $form-transparent-color;
-			@include opacity(1);
+			@extend %btn-wigdet-hover-active;
 		}
     }
 
@@ -761,13 +852,11 @@ button {
 		@include opacity(0.75);
 
 		&:hover {
-			background-color: $form-transparent-color;
-			@include opacity(1);
+			@extend %btn-wigdet-hover-active;
 		}
 
 		&:active {
-			background-color: $form-transparent-color;
-			@include opacity(1);
+			@extend %btn-wigdet-hover-active;
 		}
     }
 
@@ -778,30 +867,37 @@ button {
 		@include opacity(0.75);
 
 		&:hover {
-			background-color: $form-transparent-color;
-			@include opacity(1);
+			@extend %btn-wigdet-hover-active;
 		}
 
 		&:active {
-			background-color: $form-transparent-color;
-			@include opacity(1);
+			@extend %btn-wigdet-hover-active;
 		}
     } 
 
 	&.btn-grey {
+		margin-top: -2px;
 		background: $form-transparent-color;
-		color: $font-color;
+		color: $link-color;
 		border-color: $form-input-color;
 
 		&:hover {
-			color: $font-color;
 			background: lighten($primary-color, 55%);
+			color: $link-color;
 			border-color: $form-input-color;
 		}
 
 		&:active {
-			color: $font-color;
 			background: lighten($primary-color, 50%);
+			color: $link-color;
+		}
+
+		.arrow-left {
+			border-right-color: $link-color;
+		}
+
+		.arrow-right {
+			border-left-color: $link-color;
 		}
 	}
 
@@ -818,28 +914,26 @@ button {
 			color: $link-color;
 		}
 
-		& span.arrow-up {
+		.arrow-up {
 			border-bottom-color: $font-white-color;
 		}
 
-		& span.arrow-down {
+		.arrow-down {
 			border-top-color: $font-white-color;
 		}
 	}
 }
 
-%button-hover-active {
-	&:hover {
-		background-color: darken($primary-color, 5%);
-		border-color: darken($primary-color, 5%);
-		color: $font-white-color;
-	}
+%button-hover {
+	background-color: darken($primary-color, 5%);
+	border-color: darken($primary-color, 5%);
+	color: $font-white-color;
+}
 
-	&:active {
-		background-color: $secondary-color;
-		border-color: $secondary-color;
-		color: $font-white-color;
-	}
+%button-active {
+	background-color: $secondary-color;
+	border-color: $secondary-color;
+	color: $font-white-color;
 }
 
 %button-icon-size {
@@ -855,6 +949,16 @@ button {
 	cursor: default;
 }
 
+%btn-search-hover-focus {
+	background-color: darken($primary-color, 10%);
+	@include opacity(1);
+}
+
+%btn-wigdet-hover-active {
+	background-color: $form-transparent-color;
+	@include opacity(1);
+}
+
 button[disabled] {
 	@extend %button-disabled;
 
@@ -863,21 +967,21 @@ button[disabled] {
 	}
 }
 
-div.action-buttons {
+.action-buttons {
 	margin: 15px 0 0 0;
 
-	& button {
-		margin: 0 13px 0 0;
+	button {
+		margin: 0 14px 0 0;
 	}
 }
 
-div.tabs-nav-container {
+.tabs-nav-container {
 	height: 36px;
 	line-height: 36px;
 	margin: 0 0 15px 0;
 }
 
-ul.ui-tabs-nav {
+.ui-tabs-nav {
 	height: 36px;
 	line-height: 36px;
 	margin: 0 -10px 15px -10px;
@@ -912,7 +1016,7 @@ ul.ui-tabs-nav {
 	}
 }
 
-div.input-help-wrapper {
+.input-help-wrapper {
 	position: relative;
 	display: inline-block;
 }
@@ -931,21 +1035,91 @@ div.input-help-wrapper {
 	}
 }
 
-div.drag-icon {
+.drag-icon {
 	@extend %button-icon-size;
 	margin-left: -9px;
 	cursor: move;
 	background: url(../img/icon-sprite.png) no-repeat 0 -288px;
 }
 
+/* Sign in */
+.signin-container {
+	background: $body-content-bgcolor;
+	width: 322px;
+	margin: 0 auto;
+	padding: 20px 28px 0 28px;
+	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
+
+	h1 {
+		border: none;
+		margin: 0 0 17px 0;
+		padding: 0;
+	}
+
+	ul li {
+		padding: 0 0 22px 0;
+		font-size: $font-top-nav-size;
+
+		&.sign-in-txt {
+			text-align: center;
+		}
+	}
+
+	label {                                                                                                                                                                                                                                                                                                              
+		display: block;
+		margin: 0 0 2px 0;
+	}
+
+	input {
+
+		&[type="text"] {
+			@extend %signin-input;
+		}
+
+		&[type="password"] {
+			@extend %signin-input;
+		}
+	}
+
+	button {
+		font-size: $font-form-size;
+		min-height: 38px;
+		line-height: 38px;
+		width: 100%;
+	}
+}
+
+.signin-logo {
+	margin: 0 auto;
+	margin-top: 5%;
+	margin-bottom: 25px;
+	width: 114px;
+	height: 30px;
+	background: url(../img/icon-sprite.png) no-repeat 0 -391px;
+}
+
+.signin-links {
+	width: 100%;
+	text-align: center;
+	color: $font-alt-color;
+	margin: 22px 0 0 0;
+}
+
+%signin-input {
+	height: 38px;
+	line-height: 38px;
+	width: 100%;
+	@include box-sizing(border-box);
+}
+
 /* Dashboard */
-div.dashbrd-widget {
+.dashbrd-widget {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
 	background: $body-content-bgcolor;
-	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
+	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.15));
 
-	table.list-table {
+	.list-table {
 		@include box-shadow(none);
 
 		th {
@@ -984,7 +1158,7 @@ div.dashbrd-widget {
 	padding-left: 10px;
 }
 
-div.dashbrd-widget-head {
+.dashbrd-widget-head {
 	cursor: move;
 	position: relative;
 	padding: 8px 10px 8px 10px;
@@ -1002,7 +1176,7 @@ div.dashbrd-widget-head {
 	}
 }
 
-ul.dashbrd-widget-foot {
+.dashbrd-widget-foot {
 	text-align: right;
 	color: $font-alt-color;
 	margin: 0 10px 0 10px;
@@ -1014,7 +1188,7 @@ ul.dashbrd-widget-foot {
 } 
 
 /* Action Menus, Pop-up Menus */
-ul.action-menu {
+.action-menu {
 	position: absolute;
 	z-index: 1000;
 	padding: 7px 15px 7px 15px;
@@ -1022,50 +1196,87 @@ ul.action-menu {
 	color: $font-alt-color;
 	background: $body-content-bgcolor;
 	border: 1px solid $underline-color;
-	@include border-radius(2px);
-	@include box-shadow(0 4px 20px 0 rgba(60,60,60,0.3));
+	@include box-shadow(0 5px 20px 0 rgba(60,60,60,0.3));
 
 	li {
-		height: 24px;
-		line-height: 24px;
 
-		&:first-child h3 {
-			border-top: 0;
+		a {
+			display: block;
+			height: 24px;
+			line-height: 24px;
+			color: $font-color;
+			text-decoration: none;
+			padding: 0 15px 0 15px;
+			margin: 0 -15px 0 -15px;
+			position: relative;
+			@include transition(background .2s ease);
+
+			&:hover {
+				background: lighten($underline-color, 10%);
+			}
+
+			&:active {
+				background: lighten($underline-color, 10%);
+			}
+
+			span {
+				position: absolute;
+				right: 10px;
+				top: 8px;
+				height: auto;
+				line-height: auto;
+			}
+		}
+
+		span {
+			height: 24px;
+			line-height: 24px;
+		}
+
+		div {
+			border-top: 1px solid $body-bgcolor;
+			margin: 7px -15px 7px -15px;
 		}
 	}
 
 	h3 {
 		height: 24px;
 		line-height: 24px;
-		border-top: 1px solid $body-bgcolor;
-		padding: 0 15px 0 15px;
-		margin: 0 -15px 0 -15px;
+	}
+}
+
+.overlay-dialogue {
+	position: absolute;
+	z-index: 1000;
+	padding: 7px 15px 7px 15px;
+	background: $body-content-bgcolor;
+	border: 1px solid $underline-color;
+	@include box-shadow(0 5px 20px 0 rgba(60,60,60,0.3));
+
+	.table-forms-td-left {
+		text-align: left;
+		width: auto;
 	}
 
-	a {
-		display: block;
-		height: 24px;
-		line-height: 24px;
-		color: $font-color;
-		text-decoration: none;
-		padding: 0 15px 0 15px;
-		margin: 0 -15px 0 -15px;
-		position: relative;
-		@include transition(background .2s ease);
+	.table-forms-td-right {
+		width: auto;
+	}
 
-		&:hover {
-			background: lighten($primary-color, 55%);
-		}
+	tfoot {
+		text-align: right;
 
-		&:active {
-			background: lighten($primary-color, 50%);
+		button {
+			margin: 4px 0 0 14px;
 		}
+	}
 
-		span {
-			position: absolute;
-			right: 10px;
-			top: 8px;
-		}
+	fieldset {
+		margin-left: -10px;
+	}
+
+	.dashbrd-widget-head {
+		margin: -7px -15px 6px -15px;
+		padding: 12px 10px 8px 15px;
 	}
 }
 
@@ -1074,49 +1285,49 @@ ul.action-menu {
 	color: $alert-green-color;
 }
 
-.red {
-	color: $alert-red-color;
-}
-
-.orange {
-	color: $alert-orange-color;
-}
-
-.grey {
-	color: $alert-grey-color;
-}
-
 a.green {
 	@extend .green;
+}
+
+.red {
+	color: $alert-red-color;
 }
 
 a.red {
 	@extend .red;
 }
 
+.orange {
+	color: $alert-orange-color;
+}
+
 a.orange {
 	@extend .orange;
+}
+
+.grey {
+	color: $alert-grey-color;
 }
 
 a.grey {
 	@extend .grey;
 }
 
-span.status-green {
+.status-green {
 	@extend .green;
 	border: 1px solid $alert-green-border-color;
 	background: $alert-green-bg-color;
 	@extend %status;
 }
 
-span.status-red {
+.status-red {
 	@extend .red;
 	border: 1px solid $alert-red-border-color;
 	background: $alert-red-bg-color;
 	@extend %status;
 }
 
-span.status-grey {
+.status-grey {
 	@extend .grey;
 	border: 1px solid $alert-grey-border-color;
 	background: $alert-grey-bg-color;
@@ -1131,14 +1342,34 @@ span.status-grey {
 	@include border-radius(2px); 
 }
 
-div.msg-good {
+.green-bg {
+	background: $alert-green-bg-color;
+}
+
+.red-bg {
+	background: $alert-red-bg-color;
+}
+
+.info-bg {
+	background: $alert-info-bg-color;
+}
+
+.average-bg {
+	background: $alert-average-bg-color;
+}
+
+.warning-bg {
+	background: $alert-warning-bg-color;
+}
+
+.msg-good {
 	@extend .green;
 	border: 1px solid $alert-green-border-color;
 	background: $alert-green-bg-color;
 	@extend %msg;
 }
 
-div.msg-bad {
+.msg-bad {
 	@extend .red;
 	border: 1px solid $alert-red-border-color;
 	background: $alert-red-bg-color;
@@ -1153,7 +1384,7 @@ div.msg-bad {
 }
 
 /* Close/Remove icon */
-span.msg-close-btn {
+.msg-close-btn {
 	position: absolute;
 	right: 0;
 	width: 24px;
@@ -1166,7 +1397,7 @@ span.msg-close-btn {
 	}
 }
 
-a.form-remove-btn {
+.form-remove-btn {
 	display: block;
 	width: 24px;
 	height: 24px;
@@ -1178,6 +1409,7 @@ a.form-remove-btn {
 
 	&:hover {
 		background: lighten($primary-color, 55%);
+		text-decoration: none;
 	}
 
 	&:active {
@@ -1185,7 +1417,7 @@ a.form-remove-btn {
 	}
 }
 
-span.subfilter-disable-btn {
+.subfilter-disable-btn {
 	width: 20px;
 	height: 20px;
 	display: inline-block;
