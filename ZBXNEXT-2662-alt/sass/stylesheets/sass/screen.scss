@@ -19,7 +19,7 @@ body {
 a {
 	text-decoration: none;
 	color: $link-color;
-	@include transition;
+	@include transition(color .2s ease);
 
 	&:hover {
 		text-decoration: underline;
@@ -130,6 +130,7 @@ ul.top-nav-icons {
 		height: 36px;
 		opacity: 0.75;
 		-ms-filter:"alpha(opacity=75)";
+		@include transition(all .2s ease);
 
     &:hover {
     	opacity: 1;
@@ -215,7 +216,7 @@ ul.top-subnav a {
 	}
 
 	&.selected {
-		@include border-radius;
+		@include border-radius(2px);
 		background: darken($secondary-color, 10%);
 		color: $link-topsubnav-hover-color;
 	}
@@ -330,13 +331,13 @@ a.logo {
 table.list-table {
 	width: 100%;
     background: $body-content-bgcolor;
-    @include list-table-shadow;
+    @include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
 	
 	thead th {
 		@include list-table-header;
 		height: 100%;
 		overflow: hidden;
-	    padding: 8px 5px 8px 5px;
+	    padding: 7px 5px 7px 5px;
 	    vertical-align: middle;
 	    border-bottom: 2px solid $table-hordivider-color;
 	    text-align: left;
@@ -348,7 +349,7 @@ table.list-table {
 	    	color: $link-alt-color;
 	    	margin: -1em;
 	    	padding: 1em;
-	    	@include transition;
+	    	@include transition(background .2s ease);
 
 	    	&:hover {
 	    		color: $link-alt-hover-color;
@@ -363,7 +364,7 @@ table.list-table {
 	}
 
 	tbody tr {
-		@include transition;
+		@include transition(background .2s ease);
 
 		&:hover {
 			background: lighten($primary-color, 56%);
@@ -390,7 +391,7 @@ div.table-paging {
 	background: $body-content-bgcolor;
 	padding: 7px 5px 7px 5px;
 	border-top: 1px solid $table-hordivider-color;
-	@include list-table-shadow;
+	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
 
 	a {
 		@extend %paging-btn;
@@ -411,7 +412,7 @@ span.radio-switch {
 	border: 1px solid $form-input-color;
 	text-decoration: none;
 	color: $font-color;
-	@include transition;
+	@include transition(background .2s ease);
 
 	&:hover {
 		background: lighten($primary-color, 55%);
@@ -422,11 +423,11 @@ span.radio-switch {
 	}
 
 	&:first-child {
-		@include border-left-radius;
+		@include border-radius(2px 0 0 2px);
 	}
 
 	&:last-child {
-		@include border-right-radius;
+		@include border-radius(0 2px 2px 0);
 	}
 
 	&.paging-selected {
@@ -447,7 +448,7 @@ div.treeview-plus {
 	text-align: center;
 	font-size: $font-top-nav-size;
 	font-weight: bold;
-	@include border-radius;
+	@include border-radius(2px);
 
 	&:hover {
 		background: lighten($primary-color, 55%);
@@ -482,7 +483,7 @@ span.subfilter-enabled {
 	height: 20px;
 	line-height: 20px;
 	background: $form-disabled-color;
-	@include border-radius;
+	@include border-radius(2px);
 
 	a {
 		color: $font-color;
@@ -495,7 +496,7 @@ span.subfilter-enabled {
 div.table-forms-container {
 	padding: 0 10px 10px 10px;
 	background: $body-content-bgcolor;
-	@include list-table-shadow;
+	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
 }
 
 div.form-btns {
@@ -659,11 +660,11 @@ select {
 }
 
 %form-input-style {
-	@include border-radius;
+	@include border-radius(2px);
 	border: 1px solid $form-input-color;
 	background: $body-content-bgcolor;
 	@include font-form;
-	@include transition;
+	@include transition(border-color .2s ease);
 
 	&:focus {
 		border-color: $primary-color;
@@ -672,6 +673,7 @@ select {
 
 ul.top-nav form input {
 	background: $primary-color;
+	@include transition(all .2s ease);
 }
 
 button::-moz-focus-inner {
@@ -680,7 +682,7 @@ button::-moz-focus-inner {
 }
 
 button {
-	@include border-radius;
+	@include border-radius(2px);
 	background-color: $primary-color;
 	color: $font-white-color;
 	font-family: $font-stack;
@@ -689,7 +691,7 @@ button {
 	min-height: 24px;
 	vertical-align: middle;
 	cursor: pointer;
-	@include transition;
+	@include transition(border-color, background .2s ease);
 	@extend %button-hover-active;
 
 	&.btn-alt {
@@ -723,6 +725,7 @@ button {
 		@extend %button-icon-size;
 		opacity: 0.75;
 		-ms-filter:"alpha(opacity=75)";
+		@include transition(all .2s ease);
 
 		&:hover {
 			background-color: $form-transparent-color;
@@ -796,7 +799,7 @@ button {
 	}
 
 	&.filter-trigger {
-		@include border-top-radius;
+		@include border-radius(2px 2px 0 0);
 		min-width: 94px;
 
 		&.filter-active {
@@ -872,7 +875,7 @@ ul.ui-tabs-nav {
 	line-height: 36px;
 	margin: 0 -10px 15px -10px;
 	border-bottom: 1px solid $table-hordivider-color;
-	@include tab-menu-shadow;
+	@include box-shadow(inset 0 -1px 1px 0 rgba(60,60,60,0.05));
 
 	li {
 		display: inline-block;
@@ -933,12 +936,10 @@ div.dashbrd-widget {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
 	background: $body-content-bgcolor;
-	@include list-table-shadow;
+	@include box-shadow(0 1px 1px 0 rgba(60,60,60,0.1));
 
 	table.list-table {
-		-webkit-box-shadow: none;
-		-moz-box-shadow: none;
-		box-shadow: none;
+		@include box-shadow(none);
 
 		th {
 			@extend %dashbrd-widget-td;
@@ -947,11 +948,33 @@ div.dashbrd-widget {
 		td {
 			@extend %dashbrd-widget-td;
 		}
+
+		tbody tr {
+
+			&.nothing-to-show {
+				@extend %nothing-to-show;
+			}
+
+			&:last-child td {
+				border-bottom: 1px solid $table-hordivider-color;
+			}
+		}
+	}
+}
+
+%nothing-to-show {
+	text-align: center;
+	color: $font-alt-color;
+	@include transition(0s);
+
+	td:hover {
+		background: $body-content-bgcolor;
 	}
 }
 
 %dashbrd-widget-td {
-	padding: 8px 10px 8px 10px;
+	padding-right: 10px;
+	padding-left: 10px;
 }
 
 div.dashbrd-widget-head {
@@ -992,8 +1015,8 @@ ul.action-menu {
 	color: $font-alt-color;
 	background: $body-content-bgcolor;
 	border: 1px solid $underline-color;
-	@include border-radius;
-	@include action-menu-shadow;
+	@include border-radius(2px);
+	@include box-shadow(0 4px 20px 0 rgba(60,60,60,0.3));
 
 	li {
 		height: 24px;
@@ -1021,6 +1044,7 @@ ul.action-menu {
 		padding: 0 15px 0 15px;
 		margin: 0 -15px 0 -15px;
 		position: relative;
+		@include transition(background .2s ease);
 
 		&:hover {
 			background: lighten($primary-color, 55%);
@@ -1097,7 +1121,7 @@ span.status-grey {
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	text-align: center;
-	@include border-radius; 
+	@include border-radius(2px); 
 }
 
 div.msg-good {
@@ -1118,7 +1142,7 @@ div.msg-bad {
 	padding: 7px 12px;
 	text-align: center;
 	position: relative;
-	@include border-radius;
+	@include border-radius(2px);
 }
 
 /* Close/Remove icon */
@@ -1143,6 +1167,7 @@ a.form-remove-btn {
 	//position: absolute;
 	//right: 0;
 	@extend %close-icon;
+	@include transition(background .2s ease);
 
 	&:hover {
 		background: lighten($primary-color, 55%);
@@ -1163,6 +1188,7 @@ span.subfilter-disable-btn {
 	color: $font-white-color;
 	background: $form-disabled-color;
 	@extend %close-icon;
+	@include transition(background .2s ease);
 
 	&:hover {
 		cursor: pointer;
@@ -1180,5 +1206,5 @@ span.subfilter-disable-btn {
 	font-size: $font-h2-size;
 	font-weight: bold;
 	text-decoration: none;
-	@include border-radius;
+	@include border-radius(2px);
 }
