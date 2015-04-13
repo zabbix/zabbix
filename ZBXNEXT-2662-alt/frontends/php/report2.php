@@ -159,7 +159,7 @@ $triggerData = isset($_REQUEST['triggerid'])
 	: null;
 
 $reportWidget = new CWidget();
-$reportWidget->addPageHeader(_('AVAILABILITY REPORT'));
+$reportWidget->setTitle(_('Availability report'));
 
 if ($triggerData) {
 	$triggerData = reset($triggerData);

@@ -24,7 +24,7 @@ $mediaTypeWidget = new CWidget();
 // create new media type button
 $createForm = new CForm('get');
 $createForm->addItem(new CSubmit('form', _('Create media type')));
-$mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'), $createForm);
+$mediaTypeWidget->setTitle(_('Media types'), $createForm);
 $mediaTypeWidget->addHeader(_('Media types'));
 
 // create form

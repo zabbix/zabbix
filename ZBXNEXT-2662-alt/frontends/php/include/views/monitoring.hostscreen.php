@@ -27,7 +27,7 @@ $form->addVar('fullscreen', $this->data['fullscreen']);
 $screenWidget->addItem($form);
 
 if (empty($this->data['screen']) || empty($this->data['host'])) {
-	$screenWidget->addPageHeader(_('SCREENS'));
+	$screenWidget->setTitle(_('Screens'));
 	$screenWidget->addItem(BR());
 	$screenWidget->addItem(new CTableInfo(_('No screens found.')));
 
@@ -37,7 +37,7 @@ if (empty($this->data['screen']) || empty($this->data['host'])) {
 	));
 }
 else {
-	$screenWidget->addPageHeader(_('SCREENS'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
+	$screenWidget->setTitle(_('Screens'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
 	$screenWidget->addItem(BR());
 
 	// host screen list

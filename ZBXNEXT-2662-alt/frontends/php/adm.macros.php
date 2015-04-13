@@ -169,7 +169,7 @@ $cmbConf->addItems(array(
 $form->addItem($cmbConf);
 
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF MACROS'), $form);
+$cnf_wdgt->setTitle(_('Configuration of macros'), $form);
 
 $data = array();
 $data['form_refresh'] = getRequest('form_refresh', 0);

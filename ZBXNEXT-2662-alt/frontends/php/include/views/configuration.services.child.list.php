@@ -22,7 +22,7 @@
 include(dirname(__FILE__).'/js/configuration.services.child.list.js.php');
 
 $servicesChildWidget = new CWidget();
-$servicesChildWidget->addPageHeader(_('IT service dependencies'));
+$servicesChildWidget->setTitle(_('IT service dependencies'));
 
 // create form
 $servicesChildForm = new CForm();

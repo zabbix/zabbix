@@ -32,7 +32,7 @@ if (!empty($this->data['templateid'])) {
 else {
 	$createForm->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=screen")'));
 }
-$screenWidget->addPageHeader(_('CONFIGURATION OF SCREENS'), $createForm);
+$screenWidget->setTitle(_('Screens'), $createForm);
 
 // header
 $screenWidget->addHeader(_('Screens'));

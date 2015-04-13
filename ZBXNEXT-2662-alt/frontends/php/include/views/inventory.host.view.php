@@ -20,7 +20,7 @@
 
 
 $hostInventoryWidget = new CWidget(null, 'inventory-host');
-$hostInventoryWidget->addPageHeader(_('HOST INVENTORY'), SPACE);
+$hostInventoryWidget->setTitle(_('Host inventory'));
 
 /*
  * Overview tab

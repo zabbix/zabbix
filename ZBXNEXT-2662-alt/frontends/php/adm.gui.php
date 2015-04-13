@@ -102,7 +102,7 @@ $cmbConf = new CComboBox('configDropDown', 'adm.gui.php', 'redirect(this.options
 $form->addItem($cmbConf);
 
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF GUI'), $form);
+$cnf_wdgt->setTitle(_('GUI'), $form);
 
 $config = select_config();
 

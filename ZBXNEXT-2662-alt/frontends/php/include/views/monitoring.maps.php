@@ -72,6 +72,6 @@ if (!empty($this->data['maps'])) {
 }
 
 $mapWidget->addItem($mapTable);
-$mapWidget->addPageHeader(_('NETWORK MAPS'), array($icon, SPACE, $fsIcon));
+$mapWidget->setTitle(_('Maps'), array($icon, SPACE, $fsIcon));
 
 return $mapWidget;

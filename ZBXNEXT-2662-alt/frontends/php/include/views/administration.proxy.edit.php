@@ -19,7 +19,7 @@
 **/
 
 $proxyWidget = new CWidget();
-$proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'));
+$proxyWidget->setTitle(_('Proxies'));
 
 // create form
 $proxyForm = new CForm();

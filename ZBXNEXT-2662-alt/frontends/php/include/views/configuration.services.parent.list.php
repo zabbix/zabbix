@@ -22,7 +22,7 @@
 include('include/views/js/configuration.services.edit.js.php');
 
 $servicesParentWidget = new CWidget();
-$servicesParentWidget->addPageHeader(_('IT service parent'));
+$servicesParentWidget->setTitle(_('IT service parent'));
 
 // create form
 $servicesParentForm = new CForm();

@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 
 $actionWidget = new CWidget(null, 'action-edit');
-$actionWidget->addPageHeader(_('CONFIGURATION OF ACTIONS'));
+$actionWidget->setTitle(_('Actions'));
 
 // create form
 $actionForm = new CForm();

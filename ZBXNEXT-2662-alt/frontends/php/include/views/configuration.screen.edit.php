@@ -20,7 +20,7 @@
 
 
 $screenWidget = new CWidget();
-$screenWidget->addPageHeader(_('CONFIGURATION OF SCREENS'));
+$screenWidget->setTitle(_('Screens'));
 if (!empty($this->data['templateid'])) {
 	$screenWidget->addItem(get_header_host_table('screens', $this->data['templateid']));
 }

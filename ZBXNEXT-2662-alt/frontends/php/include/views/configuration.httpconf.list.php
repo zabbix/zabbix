@@ -36,7 +36,7 @@ else {
 	$httpWidget->addItem(get_header_host_table('web', $this->data['hostid']));
 }
 
-$httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'), $createForm);
+$httpWidget->setTitle(_('Web monitoring'), $createForm);
 
 // header
 $filterForm = new CForm('get');

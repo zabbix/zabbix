@@ -145,7 +145,7 @@ if (!isset($_REQUEST['form'])) {
 }
 
 $valueMapWidget = new CWidget();
-$valueMapWidget->addPageHeader(_('CONFIGURATION OF VALUE MAPPING'), $valueMapForm);
+$valueMapWidget->setTitle(_('Configuration of value mapping'), $valueMapForm);
 
 if (isset($_REQUEST['form'])) {
 	$data = array(

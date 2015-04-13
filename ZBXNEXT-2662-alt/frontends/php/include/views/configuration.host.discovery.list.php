@@ -26,7 +26,7 @@ $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
 $createForm->addItem(new CSubmit('form', _('Create discovery rule')));
-$discoveryWidget->addPageHeader(_('CONFIGURATION OF DISCOVERY RULES'), $createForm);
+$discoveryWidget->setTitle(_('Discovery rules'), $createForm);
 
 // header
 $discoveryWidget->addHeader(_('Discovery rules'));

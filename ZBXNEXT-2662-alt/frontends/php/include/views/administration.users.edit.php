@@ -23,11 +23,11 @@ include('include/views/js/administration.users.edit.js.php');
 
 if ($this->data['is_profile']) {
 	$userWidget = new CWidget(null, 'profile');
-	$userWidget->addPageHeader(_('USER PROFILE').NAME_DELIMITER.$this->data['name'].' '.$this->data['surname']);
+	$userWidget->setTitle(_('User profile').NAME_DELIMITER.$this->data['name'].' '.$this->data['surname']);
 }
 else {
 	$userWidget = new CWidget();
-	$userWidget->addPageHeader(_('CONFIGURATION OF USERS'));
+	$userWidget->setTitle(_('Users'));
 }
 
 // create form

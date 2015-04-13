@@ -93,7 +93,7 @@ $cmbConf = new CComboBox('configDropDown', 'adm.triggerseverities.php',
 $form->addItem($cmbConf);
 
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF TRIGGER SEVERITIES'), $form);
+$cnf_wdgt->setTitle(_('Configuration of trigger severities'), $form);
 
 $config = select_config();
 

@@ -27,7 +27,7 @@ $service = $this->data['service'];
 
 $servicesWidget = new CWidget();
 $servicesWidget->setRootClass('services-edit');
-$servicesWidget->addPageHeader(_('CONFIGURATION OF IT SERVICES'));
+$servicesWidget->setTitle(_('Configuration of IT services'));
 
 // create form
 $servicesForm = new CForm();

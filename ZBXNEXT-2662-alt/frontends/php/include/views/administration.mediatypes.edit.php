@@ -20,7 +20,7 @@
 
 
 $mediaTypeWidget = new CWidget();
-$mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'));
+$mediaTypeWidget->setTitle(_('Media types'));
 
 // create form
 $mediaTypeForm = new CForm();

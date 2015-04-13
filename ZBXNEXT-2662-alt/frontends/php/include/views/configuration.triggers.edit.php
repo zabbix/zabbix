@@ -34,10 +34,10 @@ if (!empty($this->data['hostid'])) {
 }
 
 if (!empty($this->data['parent_discoveryid'])) {
-	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGER PROTOTYPES'));
+	$triggersWidget->setTitle(_('Trigger prototypes'));
 }
 else {
-	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'));
+	$triggersWidget->setTitle(_('Triggers'));
 }
 
 // create form

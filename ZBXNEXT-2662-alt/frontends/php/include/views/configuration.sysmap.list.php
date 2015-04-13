@@ -27,7 +27,7 @@ $createForm->cleanItems();
 $createForm->addItem(new CSubmit('form', _('Create map')));
 $createForm->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=map")'));
 
-$sysmapWidget->addPageHeader(_('CONFIGURATION OF NETWORK MAPS'), $createForm);
+$sysmapWidget->setTitle(_('Maps'), $createForm);
 
 // create form
 $sysmapForm = new CForm();

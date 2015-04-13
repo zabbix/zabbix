@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
 $discoveryWidget = new CWidget();
-$discoveryWidget->addPageHeader(_('CONFIGURATION OF DISCOVERY RULES'));
+$discoveryWidget->setTitle(_('Discovery rules'));
 
 // create form
 $discoveryForm = new CForm();

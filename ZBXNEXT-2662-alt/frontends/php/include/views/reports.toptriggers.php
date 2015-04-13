@@ -150,7 +150,7 @@ $filterTable->addRow(new CCol($divButtons, 'controls', 4));
 $filterForm->addItem($filterTable);
 
 $topTriggers->addFlicker($filterForm, CProfile::get('web.toptriggers.filter.state', 0));
-$topTriggers->addPageHeader(_('MOST BUSY TRIGGERS TOP 100'));
+$topTriggers->setTitle(_('Most busy triggers Top 100'));
 
 // table
 $table = new CTableInfo(_('No triggers found.'));

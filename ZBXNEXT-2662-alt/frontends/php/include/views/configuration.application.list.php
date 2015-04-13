@@ -37,7 +37,7 @@ else {
 	$applicationWidget->addItem(get_header_host_table('applications', $this->data['hostid']));
 }
 
-$applicationWidget->addPageHeader(_('CONFIGURATION OF APPLICATIONS'), $createForm);
+$applicationWidget->setTitle(_('Applications'), $createForm);
 
 // create widget header
 $filterForm = new CForm('get');

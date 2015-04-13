@@ -33,7 +33,7 @@ else {
 }
 $createForm->addItem($tmpItem);
 
-$hostGroupWidget->addPageHeader(_('CONFIGURATION OF HOST GROUPS'), $createForm);
+$hostGroupWidget->setTitle(_('Host groups'), $createForm);
 
 // header
 $hostGroupWidget->addHeader(_('Host groups'));

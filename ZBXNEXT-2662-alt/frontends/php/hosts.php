@@ -695,7 +695,7 @@ $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = getRequest('hostid', 0);
 
 if (hasRequest('action') && getRequest('action') == 'host.massupdateform' && hasRequest('hosts')) {
-	$hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'));
+	$hostsWidget->setTitle(_('Hosts'));
 
 	$data = array(
 		'hosts' => getRequest('hosts'),
@@ -755,7 +755,7 @@ if (hasRequest('action') && getRequest('action') == 'host.massupdateform' && has
 	$hostsWidget->addItem($hostForm->render());
 }
 elseif (isset($_REQUEST['form'])) {
-	$hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'));
+	$hostsWidget->setTitle(_('Hosts'));
 
 	$data = array();
 	if ($hostId = getRequest('hostid', 0)) {
@@ -803,13 +803,15 @@ else {
 
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
-	$frmForm->addItem(new CDiv(array(
+	$controls = new CList(array(
 		new CSubmit('form', _('Create host')),
 		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
-	)));
+	));
+	$frmForm->addItem($controls);
+
 	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid'], 'filter_groupid_id'));
 
-	$hostsWidget->addPageHeader(_('CONFIGURATION OF HOSTS'), $frmForm);
+	$hostsWidget->setTitle(_('Hosts'), $frmForm);
 
 	$frmGroup = new CForm('get');
 	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));

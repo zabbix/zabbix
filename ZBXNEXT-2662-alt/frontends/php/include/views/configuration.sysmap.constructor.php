@@ -22,7 +22,7 @@
 include('include/views/js/configuration.sysmaps.js.php');
 
 $sysmapWidget = new CWidget();
-$sysmapWidget->addPageHeader(_('CONFIGURATION OF NETWORK MAPS'));
+$sysmapWidget->setTitle(_('Network maps'));
 
 // create menu
 $addIcon = new CIcon(_('Add element'), 'iconplus');
@@ -79,7 +79,7 @@ $menuTable->addRow(array(
 	$saveButton
 ));
 
-$sysmapWidget->addPageHeader($menuTable);
+$sysmapWidget->setTitle($menuTable);
 
 // create map
 $backgroundImage = new CImg('images/general/tree/zero.gif', 'Sysmap');
