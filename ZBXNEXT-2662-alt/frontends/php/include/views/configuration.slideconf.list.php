@@ -27,7 +27,6 @@ $createForm->cleanItems();
 $createForm->addItem(new CSubmit('form', _('Create slide show')));
 $slideWidget->addPageHeader(_('CONFIGURATION OF SLIDE SHOWS'), $createForm);
 $slideWidget->addHeader(_('Slide shows'));
-$slideWidget->addHeaderRowNumber();
 
 // create form
 $slideForm = new CForm();

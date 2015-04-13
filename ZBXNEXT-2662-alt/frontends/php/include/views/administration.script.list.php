@@ -26,7 +26,6 @@ $createForm->addItem(new CSubmit('form', _('Create script')));
 
 $scriptsWidget->addPageHeader(_('CONFIGURATION OF SCRIPTS'), $createForm);
 $scriptsWidget->addHeader(_('Scripts'));
-$scriptsWidget->addHeaderRowNumber();
 
 $scriptsForm = new CForm();
 $scriptsForm->setName('scriptsForm');

@@ -44,11 +44,12 @@ $filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroup
 $filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 $httpWidget->addHeader(_('Web scenarios'), $filterForm);
+/*
 $httpWidget->addHeaderRowNumber(array(
 	'[ ',
 	new CLink($this->data['showDisabled'] ? _('Hide disabled web scenarios') : _('Show disabled web scenarios'),
 	'?showdisabled='.($this->data['showDisabled'] ? 0 : 1), null), ' ]'
-));
+));*/
 
 // create form
 $httpForm = new CForm();

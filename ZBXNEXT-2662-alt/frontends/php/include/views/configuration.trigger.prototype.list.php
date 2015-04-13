@@ -37,6 +37,7 @@ $triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGER PROTOTYPES'), $create
 $triggersWidget->addHeader(array(_('Trigger prototypes of').SPACE,
 	new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')
 ));
+/*
 $triggersWidget->addHeaderRowNumber(array(
 	'[ ',
 	new CLink(
@@ -47,6 +48,7 @@ $triggersWidget->addHeaderRowNumber(array(
 	),
 	' ]'
 ));
+*/
 
 // create form
 $triggersForm = new CForm();

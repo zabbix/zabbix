@@ -27,7 +27,6 @@ $createForm->cleanItems();
 $createForm->addItem(new CSubmit('form', _('Create proxy')));
 $proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'), $createForm);
 $proxyWidget->addHeader(_('Proxies'));
-$proxyWidget->addHeaderRowNumber();
 
 // create form
 $proxyForm = new CForm('get');

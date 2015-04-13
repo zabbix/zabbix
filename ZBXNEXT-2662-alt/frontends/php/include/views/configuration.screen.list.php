@@ -36,7 +36,6 @@ $screenWidget->addPageHeader(_('CONFIGURATION OF SCREENS'), $createForm);
 
 // header
 $screenWidget->addHeader(_('Screens'));
-$screenWidget->addHeaderRowNumber();
 
 // create form
 $screenForm = new CForm();

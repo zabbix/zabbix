@@ -334,7 +334,6 @@ else {
 	}
 
 	$eventsWidget->addHeader(_('Events'), $headerForm);
-	$eventsWidget->addHeaderRowNumber();
 
 	$filterForm = null;
 

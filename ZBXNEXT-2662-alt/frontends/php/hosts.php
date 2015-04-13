@@ -815,7 +815,6 @@ else {
 	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 
 	$hostsWidget->addHeader(_('Hosts'), $frmGroup);
-	$hostsWidget->addHeaderRowNumber();
 	$hostsWidget->setRootClass('host-list');
 
 	// filter

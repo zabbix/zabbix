@@ -48,6 +48,7 @@ $filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroup
 $filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 $triggersWidget->addHeader(_('Triggers'), $filterForm);
+/*
 $triggersWidget->addHeaderRowNumber(array(
 	'[ ',
 	new CLink(
@@ -57,7 +58,7 @@ $triggersWidget->addHeaderRowNumber(array(
 			'&showdisabled='.($this->data['showdisabled'] ? 0 : 1)
 	),
 	' ]'
-));
+));*/
 
 // create form
 $triggersForm = new CForm();

@@ -38,7 +38,6 @@ $filterForm = new CForm('get');
 $filterForm->addItem(array(_('Event source'), SPACE, $sourceComboBox));
 
 $actionWidget->addHeader(_('Actions'), $filterForm);
-$actionWidget->addHeaderRowNumber();
 
 // create form
 $actionForm = new CForm();

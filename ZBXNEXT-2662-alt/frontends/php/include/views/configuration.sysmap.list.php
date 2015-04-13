@@ -34,7 +34,6 @@ $sysmapForm = new CForm();
 $sysmapForm->setName('frm_maps');
 
 $sysmapWidget->addHeader(_('Maps'));
-$sysmapWidget->addHeaderRowNumber();
 
 // create table
 $sysmapTable = new CTableInfo(_('No maps found.'));
