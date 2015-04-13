@@ -2390,6 +2390,20 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 	{
 		if (POLARSSL_ERR_NET_WANT_READ != res && POLARSSL_ERR_NET_WANT_WRITE != res)
 		{
+			if (POLARSSL_ERR_X509_CERT_VERIFY_FAILED == res)
+			{
+				/* Standard PolarSSL error message might not be very informative in this case. For */
+				/* example, if certificate validity starts in future, PolarSSL 1.3.9 would produce a */
+				/* message "X509 - Certificate verification failed, e.g. CRL, CA or signature check */
+				/* failed" which does not give a precise reason. Here we try to get more detailed */
+				/* reason why peer certificate was rejected by using some knowledge about PolarSSL */
+				/* internals. */
+				zbx_tls_cert_error_msg((unsigned int)s->tls_ctx->session_negotiate->verify_result,
+						error);
+				zbx_tls_close(s);
+				goto out;
+			}
+
 			zbx_tls_error_msg(res, "ssl_handshake(): ", error);
 			ssl_free(s->tls_ctx);
 			zbx_free(s->tls_ctx);
@@ -2422,14 +2436,8 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): peer certificate:\n%s", __function_name, work_buf);
 		}
 
-		/* validate peer certificate */
-
-		if (0 != (res = ssl_get_verify_result(s->tls_ctx)))
-		{
-			zbx_tls_cert_error_msg((unsigned int)res, error);
-			zbx_tls_close(s);
-			goto out;
-		}
+		/* Basic validation of peer certificate was done during handshake. If required validate peer */
+		/* certificate issuer and subject. */
 
 		if (SUCCEED != zbx_tls_verify_issuer_subject(peer_cert, tls_arg1, tls_arg2, error))
 		{
@@ -2996,6 +3004,20 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 	{
 		if (POLARSSL_ERR_NET_WANT_READ != res && POLARSSL_ERR_NET_WANT_WRITE != res)
 		{
+			if (POLARSSL_ERR_X509_CERT_VERIFY_FAILED == res)
+			{
+				/* Standard PolarSSL error message might not be very informative in this case. For */
+				/* example, if certificate validity starts in future, PolarSSL 1.3.9 would produce a */
+				/* message "X509 - Certificate verification failed, e.g. CRL, CA or signature check */
+				/* failed" which does not give a precise reason. Here we try to get more detailed */
+				/* reason why peer certificate was rejected by using some knowledge about PolarSSL */
+				/* internals. */
+				zbx_tls_cert_error_msg((unsigned int)s->tls_ctx->session_negotiate->verify_result,
+						error);
+				zbx_tls_close(s);
+				goto out;
+			}
+
 			zbx_tls_error_msg(res, "ssl_handshake(): ", error);
 			ssl_free(s->tls_ctx);
 			zbx_free(s->tls_ctx);
@@ -3040,15 +3062,8 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): peer certificate:\n%s", __function_name, work_buf);
 		}
 
-		/* Validate peer certificate. Issuer and Subject has to be validated later, after data have been */
-		/* received and host name is known. */
-
-		if (0 != (res = ssl_get_verify_result(s->tls_ctx)))
-		{
-			zbx_tls_cert_error_msg((unsigned int)res, error);
-			zbx_tls_close(s);
-			goto out;
-		}
+		/* Basic validation of peer certificate was done during handshake. Issuer and Subject have to be */
+		/* validated later, after data have been received and sender type and host name is known. */
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s)", __function_name,
