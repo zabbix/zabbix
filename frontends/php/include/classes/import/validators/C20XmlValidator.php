@@ -1005,6 +1005,9 @@ class C20XmlValidator {
 		if ($map['links']) {
 			$this->validateMapLinks($map['links'], $path.'/links');
 		}
+		if ($map['selements']) {
+			$this->validateSelements($map['selements'], $path.'/selements');
+		}
 	}
 
 	/**
@@ -1250,7 +1253,6 @@ class C20XmlValidator {
 		$this->validateMapLinkTriggerData($trigger['trigger'], $path.'/trigger');
 	}
 
-
 	/**
 	 * Map link trigger data validation.
 	 *
@@ -1274,6 +1276,262 @@ class C20XmlValidator {
 
 		// unexpected tag validation
 		$arrayDiff = array_diff_key($trigger, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+	}
+
+	/**
+	 * Map selements validation.
+	 *
+	 * @param array  $selements	selements data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateSelements(array $selements, $path) {
+		if (!$this->arrayValidator->validate('selement', $selements)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/selement('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$selementNumber = 1;
+		foreach ($selements as $key => $selement) {
+			$subpath = $path.'/selement('.$selementNumber++.')';
+
+			$validator = new CNewValidator($selements, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			// child elements validation
+			$this->validateSelement($selement, $subpath);
+		}
+	}
+
+	/**
+	 * Map selement validation.
+	 *
+	 * @param array  $selement	selement data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateSelement(array $selement, $path) {
+		$validationRules = array(
+			'elementtype' =>		'required|string',
+			'label' =>				'required|string',
+			'label_location' =>		'required|string',
+			'x' =>					'required|string',
+			'y' =>					'required|string',
+			'elementsubtype' =>		'required|string',
+			'areatype' =>			'required|string',
+			'width' =>				'required|string',
+			'height' =>				'required|string',
+			'viewtype' =>			'required|string',
+			'use_iconmap' =>		'required|string',
+			'selementid' =>			'required|string',
+			'element' =>			'required',
+			'icon_off' =>			'required|array',
+			'icon_on' =>			'required|array',
+			'icon_disabled' =>		'required|array',
+			'icon_maintenance' =>	'required|array',
+			'application' =>		'string',
+			'urls' =>				'required|array'
+		);
+
+		$validator = new CNewValidator($selement, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($selement, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+
+		// child elements validation
+		if ($selement['icon_on']) {
+			$this->validateIconOn($selement['icon_on'], $path.'/icon_on');
+		}
+		if ($selement['icon_off']) {
+			$this->validateIconOff($selement['icon_off'], $path.'/icon_off');
+		}
+		if ($selement['icon_disabled']) {
+			$this->validateIconDisabled($selement['icon_disabled'], $path.'/icon_disabled');
+		}
+		if ($selement['icon_maintenance']) {
+			$this->validateIconMaintenance($selement['icon_maintenance'], $path.'/icon_maintenance');
+		}
+		if ($selement['urls']) {
+			$this->validateSelementUrls($selement['urls'], $path.'/urls');
+		}
+	}
+
+	/**
+	 * Selement IconOn validation.
+	 *
+	 * @param array  $iconOn	iconOn data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateIconOn(array $iconOn, $path) {
+		$validationRules = array('name' => 'required|string');
+
+		$validator = new CNewValidator($iconOn, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($iconOn, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+	}
+
+	/**
+	 * Selement IconOff validation.
+	 *
+	 * @param array  $iconOff		iconOff data
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateIconOff(array $iconOff, $path) {
+		$validationRules = array('name' => 'required|string');
+
+		$validator = new CNewValidator($iconOff, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($iconOff, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+	}
+
+	/**
+	 * Selement IconDisabled validation.
+	 *
+	 * @param array  $iconDisabled	iconDisabled data
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateIconDisabled(array $iconDisabled, $path) {
+		$validationRules = array('name' => 'required|string');
+
+		$validator = new CNewValidator($iconDisabled, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($iconDisabled, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+	}
+
+	/**
+	 * Selement IconMaintenance validation.
+	 *
+	 * @param array  $iconMaintenance	iconMaintenance data
+	 * @param string $path				XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateIconMaintenance(array $iconMaintenance, $path) {
+		$validationRules = array('name' => 'required|string');
+
+		$validator = new CNewValidator($iconMaintenance, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($iconMaintenance, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+	}
+
+	/**
+	 * Selement urls validation.
+	 *
+	 * @param array  $urls		urls data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateSelementUrls(array $urls, $path) {
+		if (!$this->arrayValidator->validate('url', $urls)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/url('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$urlNumber = 1;
+		foreach ($urls as $key => $url) {
+			$subpath = $path.'/url('.$urlNumber++.')';
+
+			$validator = new CNewValidator($urls, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			// child elements validation
+			$this->validateSelementUrl($url, $subpath);
+		}
+	}
+
+	/**
+	 * Selement urls validation.
+	 *
+	 * @param array  $url	url data
+	 * @param string $path	XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateSelementUrl(array $url, $path) {
+		$validationRules = array(
+			'name' =>	'required|string',
+			'url' =>	'required|string'
+		);
+
+		$validator = new CNewValidator($url, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($url, $validator->getValidInput());
 		if ($arrayDiff) {
 			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
