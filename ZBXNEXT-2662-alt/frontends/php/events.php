@@ -286,6 +286,7 @@ else {
 	$frmForm->addVar('period', $period, 'period_csv');
 	$frmForm->addVar('page', getPageNumber(), 'page_csv');
 
+
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		if ($triggerId) {
 			$frmForm->addVar('triggerid', $triggerId, 'triggerid_csv');
@@ -295,45 +296,37 @@ else {
 			$frmForm->addVar('hostid', getRequest('hostid'), 'hostid_csv');
 		}
 	}
-	$frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
 
-	$eventsWidget->setControls(
-		array(
-			$frmForm,
-			SPACE,
-			get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen')))
-		)
-	);
+	$controls = new CList();
 
-	$headerForm = new CForm('get');
-	$headerForm->addVar('fullscreen', getRequest('fullscreen'));
-	$headerForm->addVar('stime', $stime);
-	$headerForm->addVar('period', $period);
+	$controls->addItem(get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))));
+	$eventsWidget->setControls($frmForm);
+
+	$frmForm->addVar('fullscreen', getRequest('fullscreen'));
+	$frmForm->addVar('stime', $stime);
+	$frmForm->addVar('period', $period);
 
 	// add host and group filters to the form
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		if (getRequest('triggerid') != 0) {
-			$headerForm->addVar('triggerid', getRequest('triggerid'), 'triggerid_filter');
+			$frmForm->addVar('triggerid', getRequest('triggerid'), 'triggerid_filter');
 		}
 
-		$headerForm->addItem(array(
-			_('Group').SPACE,
-			$pageFilter->getGroupsCB()
-		));
-		$headerForm->addItem(array(
-			SPACE._('Host').SPACE,
-			$pageFilter->getHostsCB()
-		));
+		$controls->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+		$controls->addItem(array(_('Host').SPACE, $pageFilter->getHostsCB()));
 	}
 
 	if ($allow_discovery) {
 		$cmbSource = new CComboBox('source', $source, 'submit()');
 		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, _('Trigger'));
 		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
-		$headerForm->addItem(array(SPACE._('Source').SPACE, $cmbSource));
+		$controls->addItem(array(_('Source').SPACE, $cmbSource));
 	}
 
-	$eventsWidget->addHeader(_('Events'), $headerForm);
+	$controls->addItem(new CSubmit('csv_export', _('Export to CSV')));
+
+	$frmForm->addItem($controls);
+	$eventsWidget->setControls($frmForm);
 
 	$filterForm = null;
 
