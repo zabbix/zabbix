@@ -177,7 +177,7 @@ CSS;
 
 	$pageHeader->display();
 ?>
-<body class="<?php echo $css; ?>">
+<body>
 <div id="message-global-wrap"><div id="message-global"></div></div>
 <?php
 }
@@ -335,7 +335,8 @@ echo '<header role="banner">
 			<ul class="top-subnav"><li><a href="adm.gui.php">General</a></li><li><a href="proxies.php">Proxies</a></li><li><a href="authentication.php">Authentication</a></li><li><a href="usergrps.php">Users</a></li><li><a href="media_types.php">Media types</a></li><li><a href="scripts.php">Scripts</a></li><li><a href="auditlogs.php">Audit</a></li><li><a href="queue.php">Queue</a></li><li><a href="report4.php">Notifications</a></li><li><a href="services.setup.php">Installation</a></li></ul>
 			</div>
 		</nav>
-	</header>';
+	</header>
+	<article>';
 }
 
 // unset multiple variables

@@ -25,10 +25,11 @@ $graphWidget = new CWidget();
 $createForm = new CForm('get');
 $createForm->cleanItems();
 if (!empty($this->data['parent_discoveryid'])) {
+	$graphWidget->setTitle(_('Graph prototypes'));
+
 	$createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 	$createForm->addItem(new CSubmit('form', _('Create graph prototype')));
 
-	$graphWidget->setTitle(_('Graph prototypes'));
 	$graphWidget->setControls($createForm);
 	$graphWidget->addHeader(array(_('Graph prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')));
 
@@ -37,6 +38,8 @@ if (!empty($this->data['parent_discoveryid'])) {
 	}
 }
 else {
+	$graphWidget->setTitle(_('Graphs'));
+
 	$createForm->addVar('hostid', $this->data['hostid']);
 
 	if (!empty($this->data['hostid'])) {
@@ -48,7 +51,6 @@ else {
 		$createForm->addItem($createGraphButton);
 	}
 
-	$graphWidget->setTitle(_('Graphs'));
 	$graphWidget->setControls($createForm);
 
 	$filterForm = new CForm('get');

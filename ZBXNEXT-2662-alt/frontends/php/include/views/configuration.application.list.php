@@ -18,34 +18,35 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $applicationWidget = new CWidget();
+$applicationWidget->setTitle(_('Applications'));
 
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addVar('hostid', $this->data['hostid']);
+
+$controls = new CList();
+
+$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+$controls->addItem(array(_('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 // append host summary to widget header
 if (empty($this->data['hostid'])) {
 	$createButton = new CSubmit('form', _('Create application (select host first)'));
 	$createButton->setEnabled(false);
-	$createForm->addItem($createButton);
+	$controls->addItem($createButton);
 }
 else {
-	$createForm->addItem(new CSubmit('form', _('Create application')));
+	$controls->addItem(new CSubmit('form', _('Create application')));
 
-	$applicationWidget->addItem(get_header_host_table('applications', $this->data['hostid']));
 }
 
-$applicationWidget->setTitle(_('Applications'));
 $applicationWidget->setControls($createForm);
 
-// create widget header
-$filterForm = new CForm('get');
-$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
-$applicationWidget->addHeader(_('Applications'), $filterForm);
+$createForm->addItem($controls);
+$applicationWidget->setControls($createForm);
+
+$applicationWidget->addItem(get_header_host_table('applications', $this->data['hostid']));
 
 // create form
 $applicationForm = new CForm();

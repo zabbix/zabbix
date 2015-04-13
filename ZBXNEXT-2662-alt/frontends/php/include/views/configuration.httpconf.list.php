@@ -18,39 +18,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $httpWidget = new CWidget();
+$httpWidget->setTitle(_('Web monitoring'));
 
 $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
 
+$controls = new CList();
+$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+$controls->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
+
 if (empty($this->data['hostid'])) {
 	$createButton = new CSubmit('form', _('Create web scenario (select host first)'));
 	$createButton->setEnabled(false);
-	$createForm->addItem($createButton);
+	$controls->addItem($createButton);
 }
 else {
-	$createForm->addItem(new CSubmit('form', _('Create web scenario')));
-
+	$controls->addItem(new CSubmit('form', _('Create web scenario')));
 	$httpWidget->addItem(get_header_host_table('web', $this->data['hostid']));
 }
 
-$httpWidget->setTitle(_('Web monitoring'));
+$createForm->addItem($controls);
 $httpWidget->setControls($createForm);
-
-// header
-$filterForm = new CForm('get');
-$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
-
-$httpWidget->addHeader(_('Web scenarios'), $filterForm);
-/*
-$httpWidget->addHeaderRowNumber(array(
-	'[ ',
-	new CLink($this->data['showDisabled'] ? _('Hide disabled web scenarios') : _('Show disabled web scenarios'),
-	'?showdisabled='.($this->data['showDisabled'] ? 0 : 1), null), ' ]'
-));*/
 
 // create form
 $httpForm = new CForm();

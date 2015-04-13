@@ -18,29 +18,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
 $itemsWidget = new CWidget(null, 'item-list');
+$itemsWidget->setTitle(_('Items'));
 
 // create new item button
 $createForm = new CForm('get');
 $createForm->cleanItems();
+$controls = new CList();
 
 if (empty($this->data['hostid'])) {
 	$createButton = new CSubmit('form', _('Create item (select host first)'));
 	$createButton->setEnabled(false);
-	$createForm->addItem($createButton);
+	$controls->addItem($createButton);
 }
 else {
 	$createForm->addVar('hostid', $this->data['hostid']);
-	$createForm->addItem(new CSubmit('form', _('Create item')));
+	$controls->addItem(new CSubmit('form', _('Create item')));
 }
-$itemsWidget->setTitle(_('Items'));
+$createForm->addItem($controls);
 $itemsWidget->setControls($createForm);
-
-// header
-$itemsWidget->addHeader(_('Items'));
 
 if (!empty($this->data['hostid'])) {
 	$itemsWidget->addItem(get_header_host_table('items', $this->data['hostid']));

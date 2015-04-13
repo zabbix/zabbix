@@ -144,12 +144,14 @@ class CWidget {
 
 			$widget[] = $flicker_tab;
 		}
+/*
 		$div = new CDiv($this->body, 'w');
 		$div->setAttribute('id', $this->bodyId);
 
 		$widget[] = $div;
 
-		return new CDiv($widget, $this->getRootClass());
+		return new CDiv($widget, $this->getRootClass());*/
+		return array($widget, $this->body);
 	}
 
 	public function show() {

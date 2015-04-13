@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $triggersWidget = new CWidget(null, 'trigger-list');
+$triggersWidget->setTitle(_('Triggers'));
 
 // append host summary to widget header
 if ($this->data['hostid']) {
@@ -31,35 +31,21 @@ $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
 
+$controls = new CList();
+$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+$controls->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
+
 if (!$this->data['hostid']) {
 	$createButton = new CSubmit('form', _('Create trigger (select host first)'));
 	$createButton->setEnabled(false);
-	$createForm->addItem($createButton);
+	$controls->addItem($createButton);
 }
 else {
-	$createForm->addItem(new CSubmit('form', _('Create trigger')));
+	$controls->addItem(new CSubmit('form', _('Create trigger')));
 }
 
-$triggersWidget->setTitle(_('Triggers'));
+$createForm->addItem($controls);
 $triggersWidget->setControls($createForm);
-
-// create widget header
-$filterForm = new CForm('get');
-$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
-
-$triggersWidget->addHeader(_('Triggers'), $filterForm);
-/*
-$triggersWidget->addHeaderRowNumber(array(
-	'[ ',
-	new CLink(
-		$this->data['showdisabled'] ? _('Hide disabled triggers') : _('Show disabled triggers'),
-		'triggers.php?'.
-			'hostid='.$this->data['hostid'].
-			'&showdisabled='.($this->data['showdisabled'] ? 0 : 1)
-	),
-	' ]'
-));*/
 
 // create form
 $triggersForm = new CForm();
