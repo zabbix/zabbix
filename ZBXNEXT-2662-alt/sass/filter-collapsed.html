@@ -23,7 +23,7 @@
 	<article>
 	<div class="header-title">
 	<h1>Dashboard</h1>
-	<form><ul><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
+	<form><ul><li><label>Group</label for="groupid">&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
 	</div>
 		<ul class="object-group"><li><a href="">All hosts</a></li><li>&rsaquo;</li><li>Zabbix server:</li><li class="green">Enabled</li><li><a href="">Applications</a>&nbsp;<sup>11</sup></li><li><a href="" class="selected">Items</a>&nbsp;<sup>67</sup></li><li><a href="">Triggers</a>&nbsp;<sup>41</sup></li><li><a href="">Graphs</a>&nbsp;<sup>11</sup></li><li><a href="">Discovery rules</a>&nbsp;<sup>2</sup></li><li><a href="">Web scenarios</a></li></ul>
 	<div class="filter-container">
@@ -34,7 +34,7 @@
 		<thead>
 			<tr>
 				<th><input type="checkbox"></th>
-				<th><a href="">Name</a>&nbsp;<span class="arrow-down"></span></th>
+				<th><a href="">Name<span class="arrow-down"></span></a></th>
 				<th>Applications&nbsp;<span class="arrow-up"></span></th>
 				<th>Items</th>
 				<th>Triggers</th>
@@ -59,7 +59,7 @@
 				<td><a href="">Web</a></td>
 				<td>127.0.01: 10050</td>
 				<td><a href="">Template App Zabbix Server</a>, <a href="">Template OS Linux (Template Zabbix Agent)</a></td>
-				<td><a href="">Enabled</a></td>
+				<td><a href="" class="green">Enabled</a></td>
 				<td>Zabbix</td>
 			</tr>
 			<tr class="row-selected">
@@ -73,7 +73,7 @@
 				<td><a href="">Web</a></td>
 				<td>127.0.01: 10050</td>
 				<td><a href="">Template App Zabbix Server</a>, <a href="">Template OS Linux (Template Zabbix Agent)</a></td>
-				<td><a href="">Enabled</a></td>
+				<td><a href="" class="red">Enabled</a></td>
 				<td>Zabbix</td>
 			</tr>
 			<tr>
@@ -234,14 +234,14 @@
 	</table>
 	</form>
 	<div class="table-paging">
-	<a href="#">Previous</a><a href="">1</a><a href="#" class="paging-selected">2</a><a href="#">3</a><a href="#">Next</a>
+	<a href="#">Previous</a><a href="#">1</a><a href="#" class="paging-selected">2</a><a href="#">3</a><a href="#">Next</a>
 	</div>
 	<div class="action-buttons">
 		<button type="button" class="btn-alt" disabled>Enable</button><button type="button" class="btn-alt">Disable</button><button type="button" class="btn-alt">Clear history</button><button type="button" class="btn-alt">Delete</button><button type="button" class="btn-alt">Copy&#133;</button><button type="button" class="btn-alt">Mass update</button>
 	</div>
 	</form>
-	<div class="msg-good">Well done! You successfully added new parameters. <span style="font-size: 1.5em">&times;</span></div>
-	<div class="msg-bad">Oh snap! Check form fields and try submitting again. <span style="font-size: 1.5em">&times;</span></div>
+	<div class="msg-good">Well done! You successfully added new parameters. <span style="font-size: 1.500em; font-weight: bold">&times;</span></div>
+	<div class="msg-bad">Oh snap! Check form fields and try submitting again. <span style="font-size: 1.500em; font-weight: bold">&times;</span></div>
 	</article>
 	<footer>
 	<a href="http://www.zabbix.com" target="_blank" class="logo"></a>

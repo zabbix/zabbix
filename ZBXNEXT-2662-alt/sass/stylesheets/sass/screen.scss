@@ -62,7 +62,7 @@ div.top-nav-container {
 }
 
 ul.top-nav {
-	font-size: 1.167em;
+	font-size: $font-top-nav-size;
 	background: $primary-color;
 
 	li {
@@ -122,12 +122,11 @@ ul.top-nav-icons {
 		opacity: 0.75;
 		-ms-filter:"alpha(opacity=75)";
 
-		&:hover {
-			opacity: 1;
-			-ms-filter:"alpha(opacity=100)";
-			@include transition;	
-		}
-	}
+    &:hover {
+    	opacity: 1;
+    	-ms-filter:"alpha(opacity=100)";
+    }
+    }
 
 	a.top-nav-help {
 		background: $primary-color url(../img/icon-sprite.png) no-repeat 9px -18px;
@@ -145,6 +144,20 @@ ul.top-nav-icons {
 		background: $primary-color url(../img/icon-sprite.png) no-repeat 9px -91px;
 	}
 }
+
+ul.top-nav-icons input {
+	background: darken($primary-color, 5%) url(../img/icon-sprite.png) no-repeat 0 0;
+	border-color: darken($primary-color, 5%);
+	width: 167px;
+	margin: 5px 15px 0 0;
+	padding-left: 24px;
+
+	&:focus {
+		background: $body-bgcolor url(../img/icon-sprite.png) no-repeat 0 -122px;
+		border-color: $body-bgcolor;
+	}
+}
+
 
 div.top-subnav-container {
 	height: 36px;
@@ -206,13 +219,13 @@ div.header-title {
 
 	& ul {
 		position: absolute;
-		right: 13px;
+		right: 0;
 		bottom: 5px;
 
 		& li {
 			display: block;
 			float: left;
-			padding: 0 0 0 10px;
+			padding: 0 0 0 15px;
 		}
 	}
 }
@@ -242,7 +255,6 @@ footer {
 	position: absolute;
     bottom: 0;
     width: 100%;
-    /* Set the fixed height of the footer here */
     height: 60px;
 	text-align: center;
 	color: $font-alt-color;
@@ -313,12 +325,11 @@ div.table-paging {
 	padding: 7px 5px 7px 5px;
 
 	a {
-		@include border-radius;
-		margin: 0 5px 0 5px;
 		display: inline-block;
+		margin-left: -1px;
 		padding: 0 14px;
-		min-height: 24px;
-		line-height: 24px;
+		min-height: 22px;
+		line-height: 22px;
 		border: 1px solid $form-input-color;
 		text-decoration: none;
 		@include transition;
@@ -329,6 +340,14 @@ div.table-paging {
 
 		&:active {
 			background: lighten($primary-color, 50%);
+		}
+
+		&:first-child {
+			@include border-left-radius;
+		}
+
+		&:last-child {
+			@include border-right-radius;
 		}
 
 		&.paging-selected {
@@ -436,7 +455,7 @@ button {
 	}
 
 	&.filter-trigger {
-		@include top-border-radius;
+		@include border-top-radius;
 		min-width: 94px;
 
 		&.filter-active {
@@ -489,7 +508,7 @@ div.action-buttons {
 	margin: 15px 0 0 0;
 
 	& button {
-		margin: 0 10px 0 0;
+		margin: 0 15px 0 0;
 	}
 }
 
@@ -498,7 +517,15 @@ div.action-buttons {
 	color: $alert-green-color;
 }
 
+a.green {
+	color: $alert-green-color;
+}
+
 .red {
+	color: $alert-red-color;
+}
+
+a.red {
 	color: $alert-red-color;
 }
 
@@ -508,6 +535,7 @@ div.action-buttons {
 	background: $alert-green-bg-color;
 	padding: 7px 12px;
 	text-align: center;
+	position: relative;
 	@include border-radius; 
 }
 
