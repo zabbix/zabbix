@@ -19,17 +19,15 @@
 			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
 			</div>
 		</nav>
-		<div class="header-title">
-		<h1>Dashboard</h1>
-		<form>
-		<ul><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul>
-		</form>
-		</div>
 	</header>
 	<article>
+	<div class="header-title">
+	<h1>Dashboard</h1>
+	<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
+	</div>
 		<ul class="object-group"><li><a href="">All hosts</a></li><li>&rsaquo;</li><li>Zabbix server:</li><li class="green">Enabled</li><li><a href="">Applications</a>&nbsp;<sup>11</sup></li><li><a href="" class="selected">Items</a>&nbsp;<sup>67</sup></li><li><a href="">Triggers</a>&nbsp;<sup>41</sup></li><li><a href="">Graphs</a>&nbsp;<sup>11</sup></li><li><a href="">Discovery rules</a>&nbsp;<sup>2</sup></li><li><a href="">Web scenarios</a></li></ul>
-	<div class="filter">
-	<button type="button" class="filter-trigger filter-active">Filter</button>
+	<div class="filter-container">
+	<button type="button" class="filter-trigger filter-active">Filter&nbsp;<span class="arrow-up"></span></button>
 	</div>
 	<form>
 	<table class="list-table">
@@ -67,8 +65,8 @@
 		<thead>
 			<tr>
 				<th><input type="checkbox"></th>
-				<th><a href="">Name</a></th>
-				<th>Applications</th>
+				<th><a href="">Name<span class="arrow-down"></span></a></th>
+				<th><a href="">Applications<span class="arrow-up"></span></a></th>
 				<th>Items</th>
 				<th>Triggers</th>
 				<th>Graphs</th>
@@ -267,7 +265,7 @@
 	</table>
 	</form>
 	<div class="table-paging">
-	<a href="#">Previous</a><a href="">1</a><a href="#">2</a><a href="#">3</a><a href="#">Next</a>
+	<a href="#">Previous</a><a href="#">1</a><a href="#" class="paging-selected">2</a><a href="#">3</a><a href="#">Next</a>
 	</div>
 	<div class="action-buttons">
 		<button type="button" class="btn-alt" disabled>Enable</button><button type="button" class="btn-alt">Disable</button><button type="button" class="btn-alt">Clear history</button><button type="button" class="btn-alt">Delete</button><button type="button" class="btn-alt">Copy&#133;</button><button type="button" class="btn-alt">Mass update</button>
