@@ -253,12 +253,12 @@ div.header-title {
 	position: relative;
 	margin: 0 0 12px 0;
 
-	& ul {
+	ul {
 		position: absolute;
 		right: 0;
 		bottom: 5px;
 
-		& li {
+		li {
 			display: block;
 			float: left;
 			padding: 0 0 0 13px;
@@ -432,6 +432,22 @@ span.radio-switch {
 /* Filters */
 div.filter-container {
 	text-align: center;
+}
+
+span.subfilter-enabled {
+	display: inline-block;
+	position: relative;
+	padding: 0 9px 0 6px;
+	height: 24px;
+	line-height: 24px;
+	background: $form-disabled-color;
+	@include border-radius;
+
+	a {
+		color: $font-color;
+		text-decoration: none;
+		cursor: default;
+	}
 }
 
 /* Forms */
@@ -781,28 +797,6 @@ div.drag-icon {
 	background: url(../img/icon-sprite.png) no-repeat 0 -288px;
 }
 
-a.form-remove-btn {
-	display: block;
-	position: absolute;
-	right: 0;
-	width: 24px;
-	height: 24px;
-	line-height: 24px;
-	text-align: center;
-	font-weight: bold;
-	font-size: $font-h2-size;
-	text-decoration: none;
-	@include border-radius;
-
-	&:hover {
-		background: lighten($primary-color, 55%);
-	}
-
-	&:active {
-		background: lighten($primary-color, 50%);
-	}
-}
-
 /* Action Menus, Pop-up Menus */
 ul.action-menu {
 	position: absolute;
@@ -927,22 +921,66 @@ div.msg-bad {
 	@extend %msg;
 }
 
+%msg {
+	padding: 7px 12px;
+	text-align: center;
+	position: relative;
+	@include border-radius;
+}
+
+/* Close/Remove icon */
 span.msg-close-btn {
-	font-size: $font-h2-size;
-	font-weight: bold;
 	position: absolute;
-	padding: 5px;
 	right: 0;
-	background: #999;
+	@extend %close-icon;
 
 	&:hover {
 		cursor: pointer;
 	}
 }
 
-%msg {
-	padding: 7px 12px;
+a.form-remove-btn {
+	display: block;
+	//position: absolute;
+	//right: 0;
+	@extend %close-icon;
+
+	&:hover {
+		background: lighten($primary-color, 55%);
+	}
+
+	&:active {
+		background: lighten($primary-color, 50%);
+	}
+}
+
+span.subfilter-disable-btn {
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	right: -21px;
+	color: $font-white-color;
+	background: $form-disabled-color;
+	@extend %close-icon;
+
+	&:hover {
+		cursor: pointer;
+		background: darken($form-disabled-color, 5%);
+	}
+
+	&:active {
+		cursor: pointer;
+		background: darken($form-disabled-color, 10%);
+	}
+}
+
+%close-icon {
+	width: 24px;
+	height: 24px;
+	line-height: 24px;
 	text-align: center;
-	position: relative;
+	font-size: $font-h2-size;
+	font-weight: bold;
+	text-decoration: none;
 	@include border-radius;
 }
