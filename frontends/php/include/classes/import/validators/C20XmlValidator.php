@@ -123,6 +123,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateGroup($group, $subpath);
 		}
 	}
@@ -177,6 +178,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateHost($host, $subpath);
 		}
 	}
@@ -277,6 +279,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateInterface($interface, $subpath);
 		}
 	}
@@ -340,6 +343,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateItem($item, $subpath);
 		}
 	}
@@ -438,6 +442,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateTemplate($template, $subpath);
 		}
 	}
@@ -526,6 +531,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateTrigger($trigger, $subpath);
 		}
 	}
@@ -590,6 +596,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateGraph($graph, $subpath);
 		}
 	}
@@ -668,6 +675,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateGraphItem($graph_item, $subpath);
 		}
 	}
@@ -863,6 +871,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateImage($image, $subpath);
 		}
 	}
@@ -922,6 +931,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateMap($map, $subpath);
 		}
 	}
@@ -986,6 +996,15 @@ class C20XmlValidator {
 		if ($map['background']) {
 			$this->validateBackground($map['background'], $path.'/background');
 		}
+		if ($map['iconmap']) {
+			$this->validateIconMap($map['iconmap'], $path.'/iconmap');
+		}
+		if ($map['urls']) {
+			$this->validateMapUrls($map['urls'], $path.'/urls');
+		}
+		if ($map['links']) {
+			$this->validateMapLinks($map['links'], $path.'/links');
+		}
 	}
 
 	/**
@@ -1008,6 +1027,253 @@ class C20XmlValidator {
 
 		// unexpected tag validation
 		$arrayDiff = array_diff_key($background, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+	}
+
+	/**
+	 * Map icon map validation.
+	 *
+	 * @param array  $iconMap	icon map data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateIconMap(array $iconMap, $path) {
+		$validationRules = array('name' => 'required|string');
+
+		$validator = new CNewValidator($iconMap, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($iconMap, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+	}
+
+	/**
+	 * Map urls validation.
+	 *
+	 * @param array  $urls		urls data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateMapUrls(array $urls, $path) {
+		if (!$this->arrayValidator->validate('url', $urls)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/url('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$urlNumber = 1;
+		foreach ($urls as $key => $url) {
+			$subpath = $path.'/url('.$urlNumber++.')';
+
+			$validator = new CNewValidator($urls, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			// child elements validation
+			$this->validateMapUrl($url, $subpath);
+		}
+	}
+
+	/**
+	 * Map urls validation.
+	 *
+	 * @param array  $url	url data
+	 * @param string $path	XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateMapUrl(array $url, $path) {
+		$validationRules = array(
+			'name' =>			'required|string',
+			'url' =>			'required|string',
+			'elementtype' =>	'required|string'
+		);
+
+		$validator = new CNewValidator($url, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($url, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+	}
+
+	/**
+	 * Map links validation.
+	 *
+	 * @param array  $links		links data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateMapLinks(array $links, $path) {
+		if (!$this->arrayValidator->validate('link', $links)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/link('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$linkNumber = 1;
+		foreach ($links as $key => $link) {
+			$subpath = $path.'/link('.$linkNumber++.')';
+
+			$validator = new CNewValidator($links, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			// child elements validation
+			$this->validateMapLink($link, $subpath);
+		}
+	}
+
+	/**
+	 * Map link validation.
+	 *
+	 * @param array  $link	link data
+	 * @param string $path	XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateMapLink(array $link, $path) {
+		$validationRules = array(
+			'drawtype' =>		'required|string',
+			'color' =>			'required|string',
+			'label' =>			'required|string',
+			'selementid1' =>	'required|string',
+			'selementid2' =>	'required|string',
+			'linktriggers' =>	'required|array'
+		);
+
+		$validator = new CNewValidator($link, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($link, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+
+		// child elements validation
+		if ($link['linktriggers']) {
+			$this->validateMapLinkTriggers($link['linktriggers'], $path.'/linktriggers');
+		}
+	}
+
+	/**
+	 * Map link triggers validation.
+	 *
+	 * @param array  $triggers		triggers data
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception		if structure is invalid
+	 */
+	protected function validateMapLinkTriggers(array $triggers, $path) {
+		if (!$this->arrayValidator->validate('linktrigger', $triggers)) {
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.',
+				$path.'/linktrigger('.$this->arrayValidator->getErrorSeqNum().')', $this->arrayValidator->getError()
+			));
+		}
+
+		$triggerNumber = 1;
+		foreach ($triggers as $key => $trigger) {
+			$subpath = $path.'/linktrigger('.$triggerNumber++.')';
+
+			$validator = new CNewValidator($triggers, array($key => 'array'));
+
+			if ($validator->isError()) {
+				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
+			}
+
+			// child elements validation
+			$this->validateMapLinkTrigger($trigger, $subpath);
+		}
+	}
+
+	/**
+	 * Map link trigger validation.
+	 *
+	 * @param array  $trigger	trigger data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateMapLinkTrigger(array $trigger, $path) {
+		$validationRules = array(
+			'drawtype' =>	'required|string',
+			'color' =>		'required|string',
+			'trigger' =>	'required|array'
+		);
+
+		$validator = new CNewValidator($trigger, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($trigger, $validator->getValidInput());
+		if ($arrayDiff) {
+			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
+		}
+
+		// child elements validation
+		$this->validateMapLinkTriggerData($trigger['trigger'], $path.'/trigger');
+	}
+
+
+	/**
+	 * Map link trigger data validation.
+	 *
+	 * @param array  $trigger	trigger data
+	 * @param string $path		XML path
+	 *
+	 * @throws Exception	if structure is invalid
+	 */
+	protected function validateMapLinkTriggerData(array $trigger, $path) {
+		$validationRules = array(
+			'description' =>	'required|string',
+			'expression' =>		'required|string'
+		);
+
+		$validator = new CNewValidator($trigger, $validationRules);
+
+		if ($validator->isError()) {
+			$errors = $validator->getAllErrors();
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
+		}
+
+		// unexpected tag validation
+		$arrayDiff = array_diff_key($trigger, $validator->getValidInput());
 		if ($arrayDiff) {
 			$error = _s('unexpected tag "%1$s"', key($arrayDiff));
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
@@ -1039,6 +1305,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateMacro($macro, $subpath);
 		}
 	}
@@ -1100,6 +1367,7 @@ class C20XmlValidator {
 				));
 			}
 
+			// child elements validation
 			$this->validateApplication($application, $subpath);
 		}
 	}
@@ -1155,6 +1423,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateLinkedTemplate($template, $subpath);
 		}
 	}
@@ -1309,6 +1578,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateDiscoveryRule($discoveryRule, $subpath);
 		}
 	}
@@ -1404,6 +1674,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateItemPrototype($item, $subpath);
 		}
 	}
@@ -1498,6 +1769,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateTriggerPrototype($trigger, $subpath);
 		}
 	}
@@ -1561,6 +1833,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateGraphPrototype($graph, $subpath);
 		}
 	}
@@ -1639,6 +1912,7 @@ class C20XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateHostPrototype($host, $subpath);
 		}
 	}

@@ -44,6 +44,7 @@ class C20XmlPreprocessor {
 			),
 			array('^zabbix_export$', '^screens$', '^screen[0-9]*', '^screen_items$'),
 			array('^zabbix_export$', '^maps$', '^map[0-9]*', '^(background|urls|iconmap|selements|links)$'),
+			array('^zabbix_export$', '^maps$', '^map[0-9]*', '^links$', '^link[0-9]*', '^linktriggers$'),
 			array('^zabbix_export$', '^triggers$', '^trigger[0-9]*', '^dependencies$'),
 			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
 				'^(item_prototypes|trigger_prototypes|graph_prototypes|host_prototypes)$'
