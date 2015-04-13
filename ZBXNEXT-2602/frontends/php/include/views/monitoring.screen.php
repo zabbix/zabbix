@@ -24,8 +24,7 @@ $screenWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get(
 
 // header form
 $headerForm = new CForm();
-$headerForm->addItem(new CComboBox('config', 'screens.php',
-	'javascript: redirect(this.options[this.selectedIndex].value);',
+$headerForm->addItem(new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'screens.php' => _('Screens'),
 		'slides.php' => _('Slide shows')

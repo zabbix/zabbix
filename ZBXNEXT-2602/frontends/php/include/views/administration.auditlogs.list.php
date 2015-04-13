@@ -23,8 +23,7 @@ $auditWidget = new CWidget();
 
 // header
 $configForm = new CForm('get');
-$configForm->addItem(new CComboBox('config', 'auditlogs.php',
-	'javascript: redirect(this.options[this.selectedIndex].value);',
+$configForm->addItem(new CComboBox('config', 'auditlogs.php', 'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'auditlogs.php' => _('Audit log'),
 		'auditacts.php' => _('Action log')

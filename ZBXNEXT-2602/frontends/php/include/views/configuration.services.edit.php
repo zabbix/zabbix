@@ -260,8 +260,7 @@ else {
 	$servicesForm->addVar('new_service_time[note]', '');
 }
 
-$timeTypeComboBox = new CComboBox('new_service_time[type]', $this->data['new_service_time']['type'],
-	'javascript: document.forms[0].action += \'?form=1\'; submit();',
+$timeTypeComboBox = new CComboBox('new_service_time[type]', $this->data['new_service_time']['type'], 'submit()',
 	array(
 		SERVICE_TIME_TYPE_UPTIME => _('Uptime'),
 		SERVICE_TIME_TYPE_DOWNTIME => _('Downtime'),

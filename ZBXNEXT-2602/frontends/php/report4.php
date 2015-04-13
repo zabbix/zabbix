@@ -86,7 +86,7 @@ else {
 	$form->setMethod('get');
 
 	$form->addItem(SPACE._('Media type').SPACE);
-	$cmbMedia = new CComboBox('media_type', $media_type, 'submit();');
+	$cmbMedia = new CComboBox('media_type', $media_type, 'submit()');
 	$cmbMedia->addItem(0, _('all'));
 
 	foreach ($media_types as $media_type_id => $media_type_description) {
@@ -100,7 +100,7 @@ else {
 	$form->addItem($cmbMedia);
 
 	$form->addItem(SPACE._('Period').SPACE);
-	$form->addItem(new CComboBox('period', $period, 'submit();', array(
+	$form->addItem(new CComboBox('period', $period, 'submit()', array(
 		'daily' => _('Daily'),
 		'weekly' => _('Weekly'),
 		'monthly' => _('Monthly'),

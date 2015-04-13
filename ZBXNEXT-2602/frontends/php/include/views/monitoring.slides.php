@@ -25,8 +25,7 @@ $slideshowWidget = new CWidget('hat_slides');
 $slideHeaderForm = new CForm('get');
 $slideHeaderForm->setName('slideHeaderForm');
 
-$slideHeaderForm->addItem(new CComboBox('config', 'slides.php',
-	'javascript: redirect(this.options[this.selectedIndex].value);',
+$slideHeaderForm->addItem(new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'screens.php' => _('Screens'),
 		'slides.php' => _('Slide shows')
