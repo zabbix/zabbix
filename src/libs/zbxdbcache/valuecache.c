@@ -594,7 +594,6 @@ out:
 	return ret;
 }
 
-
 /*********************************************************************************
  *                                                                               *
  * Function: vc_db_read_value                                                    *
@@ -2136,7 +2135,7 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
  * Function: vch_item_cache_values_by_time_and_count                          *
  *                                                                            *
  * Purpose: cache the specified number of history data values for time period *
- *          since timeshift                                                   *
+ *          since timestamp                                                   *
  *                                                                            *
  * Parameters: item      - [IN] the item                                      *
  *             seconds   - [IN] the time period                               *
@@ -2163,7 +2162,6 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seco
 	/* check if the requested period is in the cached range */
 	if (0 != item->active_range && update_end - start <= item->active_range)
 		return SUCCEED;
-
 
 	/* find if the cache should be updated to cover the required count */
 	if (NULL != item->head)
@@ -2228,6 +2226,7 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seco
 
 		zbx_history_record_vector_destroy(&records, item->value_type);
 	}
+
 	return ret;
 }
 
@@ -2387,6 +2386,7 @@ static void	vch_item_get_values_by_time_and_count(zbx_vc_item_t *item, zbx_vecto
 	}
 
 	/* fill the values vector with item history values until the <count> values are read */
+	/* or no more values within specified time period                                    */
 	while (1)
 	{
 		while (index >= chunk->first_value)
@@ -2879,7 +2879,7 @@ out:
 				zbx_vector_history_record_sort(values,
 						(zbx_compare_func_t)vc_history_record_compare_desc_func);
 
-				/* count based requests returns requested values + the rest of values being      */
+				/* count based requests return requested values + the rest of values being       */
 				/* within the same second as the last value - so drop the values outside request */
 				/* range                                                                         */
 				while (count < values->values_num)
