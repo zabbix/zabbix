@@ -182,7 +182,7 @@ $hostFormList->addRow(
 		SPACE,
 		new CVisibilityBox('visible[status]', isset($data['visible']['status']), 'status', _('Original'))
 	),
-	$statusComboBox = new CComboBox('status', $data['status'], null, array(
+	new CComboBox('status', $data['status'], null, array(
 		HOST_STATUS_MONITORED => _('Enabled'),
 		HOST_STATUS_NOT_MONITORED => _('Disabled')
 	))
@@ -283,7 +283,7 @@ $inventoryFormList->addRow(
 		SPACE,
 		new CVisibilityBox('visible[inventory_mode]', isset($data['visible']['inventory_mode']), 'inventory_mode', _('Original'))
 	),
-	$inventoryModesComboBox = new CComboBox('inventory_mode', $data['inventory_mode'], null, array(
+	new CComboBox('inventory_mode', $data['inventory_mode'], null, array(
 		HOST_INVENTORY_DISABLED => _('Disabled'),
 		HOST_INVENTORY_MANUAL => _('Manual'),
 		HOST_INVENTORY_AUTOMATIC => _('Automatic')

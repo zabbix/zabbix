@@ -595,7 +595,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 		}
 	}
 
-	$screenFormList->addRow(_('Time type'), new CComboBox('style', $style, 'javascript: submit();', array(
+	$screenFormList->addRow(_('Time type'), new CComboBox('style', $style, 'submit()', array(
 		TIME_TYPE_LOCAL => _('Local time'),
 		TIME_TYPE_SERVER => _('Server time'),
 		TIME_TYPE_HOST => _('Host time')

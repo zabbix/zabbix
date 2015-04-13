@@ -111,12 +111,14 @@ unset($this->data['labelTypes'][MAP_LABEL_TYPE_CUSTOM]);
 $sysmapList->addRow(_('Icon label type'), new CComboBox('label_type', $this->data['sysmap']['label_type'], null, $this->data['labelTypes']));
 
 // append icon label location to form list
-$sysmapList->addRow(_('Icon label location'), new CComboBox('label_location', $this->data['sysmap']['label_location'], null, array(
-	0 => _('Bottom'),
-	1 => _('Left'),
-	2 => _('Right'),
-	3 => _('Top')
-)));
+$sysmapList->addRow(_('Icon label location'), new CComboBox('label_location', $data['sysmap']['label_location'], null,
+	array(
+		0 => _('Bottom'),
+		1 => _('Left'),
+		2 => _('Right'),
+		3 => _('Top')
+	)
+));
 
 // append show unack to form list
 $showUnackComboBox = new CComboBox('show_unack', $this->data['sysmap']['show_unack'], null, array(

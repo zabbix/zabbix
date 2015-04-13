@@ -131,7 +131,6 @@ $calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['filt
 		CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
 	)
 );
-$calculationTypeComboBox->setAttribute('id', 'evaltype');
 
 $conditionFormList->addRow(
 	_('Type of calculation'),
@@ -757,9 +756,8 @@ if (!empty($this->data['new_operation'])) {
 			$newOperationsTable->addRow(array(_('Target list'), $cmdList), 'indent_top');
 
 			// type
-			$typeComboBox = new CComboBox('new_operation[opcommand][type]',
-				$this->data['new_operation']['opcommand']['type'],
-				'javascript: showOpTypeForm();',
+			$typeComboBox = new CComboBox('new_operation[opcommand][type]', $data['new_operation']['opcommand']['type'],
+				'showOpTypeForm()',
 				array(
 					ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
 					ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
@@ -787,7 +785,7 @@ if (!empty($this->data['new_operation'])) {
 			// ssh
 			$authTypeComboBox = new CComboBox('new_operation[opcommand][authtype]',
 				$this->data['new_operation']['opcommand']['authtype'],
-				'javascript: showOpTypeAuth();',
+				'showOpTypeAuth()',
 				array(
 					ITEM_AUTHTYPE_PASSWORD => _('Password'),
 					ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
@@ -1032,9 +1030,7 @@ if (!empty($this->data['new_operation'])) {
 			$i++;
 		}
 
-		$calcTypeComboBox = new CComboBox('new_operation[evaltype]',
-			$this->data['new_operation']['evaltype'],
-			'submit()',
+		$calcTypeComboBox = new CComboBox('new_operation[evaltype]', $data['new_operation']['evaltype'], 'submit()',
 			array(
 				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
 				CONDITION_EVAL_TYPE_AND => _('And'),
@@ -1078,17 +1074,20 @@ if (!empty($this->data['new_operation'])) {
 		}
 
 		$rowCondition = array();
-		$conditionTypeComboBox = new CComboBox('new_opcondition[conditiontype]', $new_opcondition['conditiontype'], 'submit()');
-		foreach ($allowedOpConditions as $opcondition) {
-			$conditionTypeComboBox->addItem($opcondition, condition_type2str($opcondition));
-		}
-		array_push($rowCondition, $conditionTypeComboBox);
 
-		$operationConditionComboBox = new CComboBox('new_opcondition[operator]');
-		foreach (get_operators_by_conditiontype($new_opcondition['conditiontype']) as $operationCondition) {
-			$operationConditionComboBox->addItem($operationCondition, condition_operator2str($operationCondition));
+		$condition_types = array();
+		foreach ($allowedOpConditions as $opcondition) {
+			$condition_types[$opcondition] = condition_type2str($opcondition);
 		}
-		array_push($rowCondition, $operationConditionComboBox);
+		$rowCondition[] = new CComboBox('new_opcondition[conditiontype]', $new_opcondition['conditiontype'], 'submit()',
+			$condition_types
+		);
+
+		$operators = array();
+		foreach (get_operators_by_conditiontype($new_opcondition['conditiontype']) as $operation_condition) {
+			$operators[$operation_condition] = condition_operator2str($operation_condition);
+		}
+		$rowCondition[] = new CComboBox('new_opcondition[operator]', null, null, $operators);
 
 		if ($new_opcondition['conditiontype'] == CONDITION_TYPE_EVENT_ACKNOWLEDGED) {
 			$rowCondition[] = new CComboBox('new_opcondition[value]', $new_opcondition['value'], null, array(

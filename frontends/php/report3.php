@@ -56,7 +56,7 @@ $form->addVar('serviceid', $_REQUEST['serviceid']);
 
 $form->addItem(array(
 	SPACE._('Period').SPACE,
-	new CComboBox('period', $period, 'submit();', array(
+	new CComboBox('period', $period, 'submit()', array(
 		'daily' => _('Daily'),
 		'weekly' => _('Weekly'),
 		'monthly' => _('Monthly'),

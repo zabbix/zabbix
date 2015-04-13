@@ -44,7 +44,7 @@ else {
 $dashconfFormList->addRow(_('Dashboard filter'), $filterStatusSpan);
 
 // append host groups to form list
-$hostGroupsComboBox = new CComboBox('grpswitch', $this->data['grpswitch'], 'submit();', array(
+$hostGroupsComboBox = new CComboBox('grpswitch', $this->data['grpswitch'], 'submit()', array(
 	0 => _('All'),
 	1 => _('Selected')
 ));

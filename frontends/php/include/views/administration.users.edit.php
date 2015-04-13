@@ -233,7 +233,7 @@ if ($this->data['is_profile']) {
 	$userMessagingFormList->addRow(_('Message timeout (seconds)'), new CNumericBox('messages[timeout]', $this->data['messages']['timeout'], 5), false, 'timeout_row');
 
 	$repeatSound = new CComboBox('messages[sounds.repeat]', $this->data['messages']['sounds.repeat'],
-		'javascript: if (IE) { submit(); }',
+		'if (IE) { submit() }',
 		array(
 			1 => _('Once'),
 			10 => '10 '._('Seconds'),
