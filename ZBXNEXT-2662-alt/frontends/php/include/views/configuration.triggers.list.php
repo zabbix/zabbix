@@ -202,7 +202,7 @@ zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 $triggersForm->addItem(array(
 	$triggersTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'g_triggerid',
+	new CActionButtonList('action', 'g_triggerid',
 		array(
 			'trigger.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected triggers?')),
 			'trigger.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected triggers?')),
@@ -211,7 +211,7 @@ $triggersForm->addItem(array(
 			'trigger.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected triggers?'))
 		),
 		$this->data['hostid']
-	))
+	)
 ));
 
 // append form to widget

@@ -142,7 +142,7 @@ zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 $discoveryForm->addItem(array(
 	$discoveryTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'g_hostdruleid',
+	new CActionButtonList('action', 'g_hostdruleid',
 		array(
 			'discoveryrule.massenable' => array('name' => _('Enable'),
 				'confirm' =>_('Enable selected discovery rules?')
@@ -155,7 +155,7 @@ $discoveryForm->addItem(array(
 			)
 		),
 		$this->data['hostid']
-	))
+	)
 ));
 
 // append form to widget

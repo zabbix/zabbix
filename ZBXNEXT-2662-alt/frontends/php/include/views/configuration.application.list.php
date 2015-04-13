@@ -109,7 +109,7 @@ zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 $applicationForm->addItem(array(
 	$applicationTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'applications',
+	new CActionButtonList('action', 'applications',
 		array(
 			'application.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected applications?')),
 			'application.massdisable' => array('name' => _('Disable'),
@@ -118,7 +118,7 @@ $applicationForm->addItem(array(
 			'application.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected applications?'))
 		),
 		$this->data['hostid']
-	))
+	)
 ));
 
 // append form to widget

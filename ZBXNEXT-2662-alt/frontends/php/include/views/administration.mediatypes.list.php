@@ -115,11 +115,11 @@ foreach ($this->data['mediatypes'] as $mediaType) {
 $mediaTypeForm->addItem(array(
 	$mediaTypeTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'mediatypeids', array(
+	new CActionButtonList('action', 'mediatypeids', array(
 		'mediatype.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected media types?')),
 		'mediatype.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected media types?')),
 		'mediatype.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected media types?'))
-	)))
+	))
 ));
 
 // append form to widget

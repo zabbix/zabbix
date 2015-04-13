@@ -133,7 +133,7 @@ zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 $httpForm->addItem(array(
 	$httpTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'group_httptestid',
+	new CActionButtonList('action', 'group_httptestid',
 		array(
 			'httptest.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')),
 			'httptest.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')),
@@ -143,7 +143,7 @@ $httpForm->addItem(array(
 			'httptest.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?'))
 		),
 		$this->data['hostid']
-	))
+	)
 ));
 
 // append form to widget

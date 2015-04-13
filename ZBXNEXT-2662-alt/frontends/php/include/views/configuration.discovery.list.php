@@ -66,11 +66,11 @@ foreach ($data['drules'] as $drule) {
 $discoveryForm->addItem(array(
 	$discoveryTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'g_druleid', array(
+	new CActionButtonList('action', 'g_druleid', array(
 		'drule.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected discovery rules?')),
 		'drule.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected discovery rules?')),
 		'drule.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected discovery rules?'))
-	)))
+	))
 ));
 
 // append form to widget

@@ -886,10 +886,10 @@ foreach ($hosts as $hostId => $dbHost) {
 
 $form->addItem(array(
 	$table,
-	get_table_header(new CActionButtonList('graphtype', 'itemids', array(
+	new CActionButtonList('graphtype', 'itemids', array(
 		GRAPH_TYPE_STACKED => array('name' => _('Display stacked graph')),
 		GRAPH_TYPE_NORMAL => array('name' => _('Display graph'))
-	)))
+	))
 ));
 
 $latestWidget->addItem($form);

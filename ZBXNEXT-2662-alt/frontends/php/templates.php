@@ -660,13 +660,13 @@ else {
 		));
 	}
 
-	$footer = get_table_header(new CActionButtonList('action', 'templates', array(
+	$footer = new CActionButtonList('action', 'templates', array(
 		'template.export' => array('name' => _('Export')),
 		'template.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected templates?')),
 		'template.massdeleteclear' => array('name' => _('Delete and clear'),
 			'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)')
 		)
-	)));
+	));
 
 	$form->addItem(array($table, $paging, $footer));
 	$templateWidget->addItem($form);

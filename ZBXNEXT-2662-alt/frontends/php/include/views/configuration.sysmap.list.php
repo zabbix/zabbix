@@ -59,11 +59,10 @@ foreach ($this->data['maps'] as $map) {
 $sysmapForm->addItem(array(
 	$sysmapTable,
 	$this->data['paging'],
-	get_table_header(
 	new CActionButtonList('action', 'maps', array(
 		'map.export' => array('name' => _('Export')),
 		'map.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected maps?'))
-	)))
+	))
 ));
 
 // append form to widget
