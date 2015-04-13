@@ -102,8 +102,9 @@ class CTable extends CTag {
 		else {
 			$value = new CRowHeader($value, $class);
 		}
-		$value = new CTag('thead', 'yes', $value);
 		$this->colnum = $value->itemsCount();
+
+		$value = new CTag('thead', 'yes', $value);
 		$this->header = $value->toString();
 	}
 

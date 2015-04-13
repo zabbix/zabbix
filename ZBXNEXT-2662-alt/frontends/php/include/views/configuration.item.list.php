@@ -79,7 +79,7 @@ foreach ($this->data['items'] as $item) {
 		$description[] = new CLink(
 			CHtml::encode($item['template_host']['name']),
 			'?hostid='.$item['template_host']['hostid'].'&filter_set=1',
-			'unknown'
+			'grey'
 		);
 		$description[] = NAME_DELIMITER;
 	}
@@ -154,7 +154,7 @@ foreach ($this->data['items'] as $item) {
 		$triggerDescription = array();
 		if ($trigger['templateid'] > 0) {
 			if (!isset($this->data['triggerRealHosts'][$trigger['triggerid']])) {
-				$triggerDescription[] = new CSpan('HOST', 'unknown');
+				$triggerDescription[] = new CSpan('HOST', 'grey');
 				$triggerDescription[] = ':';
 			}
 			else {
@@ -162,7 +162,7 @@ foreach ($this->data['items'] as $item) {
 				$triggerDescription[] = new CLink(
 					CHtml::encode($realHost['name']),
 					'triggers.php?hostid='.$realHost['hostid'],
-					'unknown'
+					'grey'
 				);
 				$triggerDescription[] = ':';
 			}

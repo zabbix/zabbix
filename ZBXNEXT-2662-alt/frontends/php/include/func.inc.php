@@ -1393,32 +1393,18 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 
 	$url = $link->getUrl();
 
-	if ($page['type'] != PAGE_TYPE_HTML && defined('ZBX_PAGE_MAIN_HAT')) {
-		$script = "javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."', '".$url."');";
-	}
-	else {
-		$script = 'javascript: redirect("'.$url.'");';
-	}
-
 	zbx_value2array($obj);
-	$cont = new CSpan();
-
-	foreach ($obj as $el) {
-		$cont->addItem($el);
-	}
-	$cont->addItem(SPACE);
 
 	$arrow = null;
 	if ($tabfield == $sortField) {
 		if ($sortorder == ZBX_SORT_UP) {
-			$arrow = new CSpan(SPACE, 'arrow-down');
+			$arrow = new CSpan(null, 'arrow-down');
 		}
 		else {
-			$arrow = new CSpan(SPACE, 'arrow-up');
+			$arrow = new CSpan(null, 'arrow-up');
 		}
 	}
-	$col = new CColHeader(array($obj, SPACE, $arrow));
-	$col->setAttribute('onclick', $script);
+	$col = new CColHeader(array(new CLink(array($obj, $arrow), $url)));
 
 	return $col;
 }

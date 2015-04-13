@@ -223,13 +223,13 @@ function itemIndicator($status, $state = null) {
  */
 function itemIndicatorStyle($status, $state = null) {
 	if ($status == ITEM_STATUS_ACTIVE) {
-		return ($state == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : 'green';
+		return ($state == ITEM_STATE_NOTSUPPORTED) ? 'grey' : 'green';
 	}
 	elseif ($status == ITEM_STATUS_DISABLED) {
 		return 'red';
 	}
 
-	return 'unknown';
+	return 'grey';
 }
 
 /**
