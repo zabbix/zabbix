@@ -752,6 +752,17 @@ div.drag-icon {
 	background: url(../img/icon-sprite.png) no-repeat 0 -288px;
 }
 
+a.form-remove-btn {
+	display: block;
+	width: 24px;
+	height: 24px;
+	line-height: 24px;
+	text-align: center;
+	font-weight: bold;
+	font-size: $font-h2-size;
+	text-decoration: none;
+}
+
 /* Alerts */
 .green {
 	color: $alert-green-color;
