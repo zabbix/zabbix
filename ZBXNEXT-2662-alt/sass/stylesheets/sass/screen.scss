@@ -25,6 +25,10 @@ a {
 		text-decoration: underline;
 		color: $link-hover-color;
 	}
+
+	&.link-dotted {
+		text-decoration: dotted;
+	}
 }
 
 h1 {
@@ -454,6 +458,18 @@ div.treeview-plus {
 	}
 }
 
+div.table {
+	display: table;
+}
+
+div.row {
+	display: table-row;
+}
+
+div.cell {
+	display: table-cell;
+}
+
 /* Filters */
 div.filter-container {
 	text-align: center;
@@ -723,7 +739,7 @@ button {
 
     &.btn-wigdet-collapse {
     	border: 0;
-    	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat 1px -216px;
+    	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat 1px -217px;
 		@extend %button-icon-size;
 		opacity: 0.75;
 		-ms-filter:"alpha(opacity=75)";
@@ -743,7 +759,7 @@ button {
 
     &.btn-wigdet-expand {
     	border: 0;
-    	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat 1px -240px;
+    	background: $form-transparent-color url(../img/icon-sprite.png) no-repeat 1px -241px;
 		@extend %button-icon-size;
 
 		opacity: 0.75;
@@ -914,24 +930,39 @@ div.drag-icon {
 
 /* Dashboard */
 div.dashbrd-widget {
-	margin: 0 0 10px 0;
-	//padding: 7px 10px 10px 10px;
+	min-width: 250px;
+	margin: 0 10px 10px 0;
 	background: $body-content-bgcolor;
 	@include list-table-shadow;
 
 	table.list-table {
-		//margin: 0 -10px 0 -10px;
+		-webkit-box-shadow: none;
+		-moz-box-shadow: none;
+		box-shadow: none;
+
+		th {
+			@extend %dashbrd-widget-td;
+		}
+		
+		td {
+			@extend %dashbrd-widget-td;
+		}
 	}
+}
+
+%dashbrd-widget-td {
+	padding: 8px 10px 8px 10px;
 }
 
 div.dashbrd-widget-head {
 	cursor: move;
 	position: relative;
+	padding: 8px 10px 8px 10px;
 
 	ul {
 		position: absolute;
-		top: 0;
-		right: 0;
+		top: 5px;
+		right: 5px;
 
 		li {
 			display: block;
@@ -944,6 +975,7 @@ div.dashbrd-widget-head {
 ul.dashbrd-widget-foot {
 	text-align: right;
 	color: $font-alt-color;
+	margin: 0 10px 0 10px;
 
 	li {
 		display: inline-block;
@@ -966,6 +998,18 @@ ul.action-menu {
 	li {
 		height: 24px;
 		line-height: 24px;
+
+		&:first-child h3 {
+			border-top: 0;
+		}
+	}
+
+	h3 {
+		height: 24px;
+		line-height: 24px;
+		border-top: 1px solid $body-bgcolor;
+		padding: 0 15px 0 15px;
+		margin: 0 -15px 0 -15px;
 	}
 
 	a {
@@ -991,11 +1035,6 @@ ul.action-menu {
 			right: 10px;
 			top: 8px;
 		}
-	}
-
-	h3 {
-		height: 24px;
-		line-height: 24px;
 	}
 }
 
