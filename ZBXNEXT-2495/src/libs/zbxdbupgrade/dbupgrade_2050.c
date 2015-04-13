@@ -111,6 +111,16 @@ static int	DBpatch_2050004(void)
 	return DBadd_field("proxy_history", &field);
 }
 
+static int	DBpatch_2050005(void)
+{
+	return DBdrop_index("triggers", "triggers_2");
+}
+
+static int	DBpatch_2050006(void)
+{
+	return DBcreate_index("triggers", "triggers_2", "value,lastchange", 0);
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -122,5 +132,7 @@ DBPATCH_ADD(2050001, 0, 1)
 DBPATCH_ADD(2050002, 0, 1)
 DBPATCH_ADD(2050003, 0, 1)
 DBPATCH_ADD(2050004, 0, 1)
+DBPATCH_ADD(2050005, 0, 0)
+DBPATCH_ADD(2050006, 0, 0)
 
 DBPATCH_END()
