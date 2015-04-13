@@ -1109,7 +1109,7 @@ int	zbx_tcp_accept(zbx_sock_t *s, unsigned int tls_accept)
 
 	if (ZBX_TCP_ERROR == select(n + 1, &sock_set, NULL, NULL, NULL))
 	{
-		zbx_set_tcp_strerror(": select() failed: %s", strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("select() failed: %s", strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
 	}
 
@@ -1124,7 +1124,7 @@ int	zbx_tcp_accept(zbx_sock_t *s, unsigned int tls_accept)
 	nlen = sizeof(serv_addr);
 	if (ZBX_SOCK_ERROR == (accepted_socket = (ZBX_SOCKET)accept(s->sockets[i], (struct sockaddr *)&serv_addr, &nlen)))
 	{
-		zbx_set_tcp_strerror(": accept() failed: %s", strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("accept() failed: %s", strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
 	}
 
@@ -1142,7 +1142,7 @@ int	zbx_tcp_accept(zbx_sock_t *s, unsigned int tls_accept)
 
 			if (SUCCEED != zbx_tls_accept(s, &error, tls_accept))
 			{
-				zbx_set_tcp_strerror(" from %s: %s", get_ip_by_socket(s), error);
+				zbx_set_tcp_strerror("from %s: %s", get_ip_by_socket(s), error);
 				zbx_tcp_unaccept(s);
 				zbx_free(error);
 				return FAIL;
@@ -1150,13 +1150,13 @@ int	zbx_tcp_accept(zbx_sock_t *s, unsigned int tls_accept)
 		}
 		else
 		{
-			zbx_set_tcp_strerror(" from %s: TLS connections are not allowed by configuration.",
+			zbx_set_tcp_strerror("from %s: TLS connections are not allowed by configuration.",
 					get_ip_by_socket(s));
 			zbx_tcp_unaccept(s);
 			return FAIL;
 		}
 #else
-		zbx_set_tcp_strerror(" from %s: support for TLS was not compiled in.", get_ip_by_socket(s));
+		zbx_set_tcp_strerror("from %s: support for TLS was not compiled in.", get_ip_by_socket(s));
 		zbx_tcp_unaccept(s);
 		return FAIL;
 #endif
@@ -1165,7 +1165,7 @@ int	zbx_tcp_accept(zbx_sock_t *s, unsigned int tls_accept)
 	{
 		if (0 == (tls_accept & ZBX_TCP_SEC_UNENCRYPTED))
 		{
-			zbx_set_tcp_strerror(" from %s: unencrypted connections are not allowed.", get_ip_by_socket(s));
+			zbx_set_tcp_strerror("from %s: unencrypted connections are not allowed.", get_ip_by_socket(s));
 			zbx_tcp_unaccept(s);
 			return FAIL;
 		}
