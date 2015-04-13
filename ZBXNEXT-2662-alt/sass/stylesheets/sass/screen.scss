@@ -446,18 +446,22 @@ table.table-forms {
 		}
 	}
 
+	tr.table-forms-tr-new {
+		background: $alert-green-bg-color;
+	}
+
 	td.table-forms-td-left {
-		padding: 0 0 10px 0;
+		padding: 5 0 5px 0;
 		text-align: right;
 		vertical-align: top;
 	}
 
 	td.table-forms-td-right {
-		padding: 0 0 10px 10px;
+		padding: 5px 0 5px 10px;
 		vertical-align: top;
 
 		td {
-			padding: 0 10px 0 0;
+			padding: 5px 10px 5px 0;
 			vertical-align: middle;
 
 			.btn-grey {
@@ -469,6 +473,14 @@ table.table-forms {
 
 	label {
 		display: block;
+	}
+
+	span.arrow-left {
+		border-right-color: $font-color;
+	}
+
+	span.arrow-right {
+		border-left-color: $font-color;
 	}
 }
 
@@ -720,6 +732,13 @@ div.input-help-wrapper {
 		background: url(../img/icon-sprite.png) no-repeat 0 -336px;
 		cursor: pointer;
 	}
+}
+
+span.drag-icon {
+	@extend %button-icon-size;
+	display: block;
+	cursor: move;
+	background: url(../img/icon-sprite.png) no-repeat 0 -288px;
 }
 
 /* Alerts */
