@@ -924,6 +924,10 @@ jQuery(function($) {
 					var h3 = $('<h3>').text(section.label);
 					var sectionItem = $('<li>').append(h3);
 
+					// add section delimited for all sections except first one
+					if (i > 0) {
+						menuPopup.append($('<li>').append($('<div>')));
+					}
 					menuPopup.append(sectionItem);
 
 					if (section.items.length > 0) {
@@ -1009,11 +1013,20 @@ jQuery(function($) {
 			link = $('<a>');
 
 		if (typeof options.label !== 'undefined') {
-			link.html(options.label);
+			if (typeof options.items !== 'undefined' && options.items.length > 0) {
+				// if submenu exists
+				link.html(options.label + '<span class="arrow-right"></span>');
+			}
+			else {
+				link.html(options.label);
+			}
 		}
 
 		if (typeof options.url !== 'undefined') {
 			link.attr('href', options.url);
+		}
+		else {
+			link.attr('href', 'javascript:void(0);');
 		}
 
 		if (typeof options.data !== 'undefined' && objectSize(options.data) > 0) {
