@@ -440,8 +440,7 @@ div.table-forms-container {
 }
 
 table.table-forms {
-	margin-left: auto;
-	margin-right: auto;
+	margin: 0 auto;
 	
 	tfoot {
 
@@ -475,9 +474,14 @@ table.table-forms {
 		padding: 5px 0 5px 10px;
 		vertical-align: middle;
 
+		label {
+			display: block;
+		}
+
 		td {
-			padding: 5px 10px 5px 0;
+			padding: 5px 5px 5px 0;
 			vertical-align: top;
+			position: relative;
 
 			 &.td-drag-icon {
 			 	padding: 5px 0px 5px 0;
@@ -494,6 +498,14 @@ table.table-forms {
 div.table-forms-separator {
 	margin: 5px 0 0 0;
 	border: 1px solid $table-hordivider-color;
+}
+
+.margin-top {
+	margin: 2px 0 0 0;
+}
+
+label.margin-top {
+	margin: 4px 0 0 0;
 }
 
 input {
@@ -755,6 +767,8 @@ div.drag-icon {
 
 a.form-remove-btn {
 	display: block;
+	position: absolute;
+	right: 0;
 	width: 24px;
 	height: 24px;
 	line-height: 24px;
@@ -858,9 +872,4 @@ span.msg-close-btn {
 	text-align: center;
 	position: relative;
 	@include border-radius;
-}
-
-div.form-error-msg {
-	@extend .red;
-	margin: 2px 0 0 0;
 }
