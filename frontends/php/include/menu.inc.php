@@ -319,7 +319,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 
 	$denied_page_requested = false;
 	$page_exists = false;
-	$deny = false;
+	$deny = true;
 
 	foreach ($ZBX_MENU as $label => $menu) {
 		$show_menu = true;
@@ -365,7 +365,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			}
 
 			if ($sub_menu_active) {
-				// permition check
+				// permission check
 				$deny &= (CWebUser::$data['type'] < $menu['user_type'] || CWebUser::$data['type'] < $sub_page['user_type']);
 
 				$menu_class = 'selected';
