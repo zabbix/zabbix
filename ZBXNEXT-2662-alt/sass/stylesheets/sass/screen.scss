@@ -474,10 +474,6 @@ table.table-forms {
 		padding: 5px 0 5px 10px;
 		vertical-align: middle;
 
-		label {
-			display: block;
-		}
-
 		td {
 			padding: 5px 5px 5px 0;
 			vertical-align: top;
@@ -502,10 +498,24 @@ div.table-forms-separator {
 
 .margin-top {
 	margin: 2px 0 0 0;
+
+	input[type="checkbox"] {
+		margin: 8px 0 0 0;
+	}
 }
 
-label.margin-top {
-	margin: 4px 0 0 0;
+ul.list-check-radio {
+
+	li {
+		padding: 0 0 7px 0;
+	}
+
+	label {
+		padding: 0 0 0 15px;
+		display: inline-block;
+		text-indent: -15px;
+		max-width: 600px;
+	}
 }
 
 input {
