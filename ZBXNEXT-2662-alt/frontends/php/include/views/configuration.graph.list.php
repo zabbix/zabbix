@@ -24,14 +24,15 @@ $graphWidget = new CWidget();
 // create new graph button
 $createForm = new CForm('get');
 $createForm->cleanItems();
+
+$controls = new CList();
+
 if (!empty($this->data['parent_discoveryid'])) {
-	$graphWidget->setTitle(_('Graph prototypes'));
+	$graphWidget->setTitle(_('Graph prototypes of') . SPACE . $this->data['discovery_rule']['name']);
 
 	$createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-	$createForm->addItem(new CSubmit('form', _('Create graph prototype')));
+	$controls->addItem(new CSubmit('form', _('Create graph prototype')));
 
-	$graphWidget->setControls($createForm);
-	$graphWidget->addHeader(array(_('Graph prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')));
 
 	if (!empty($this->data['hostid'])) {
 		$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
@@ -43,26 +44,24 @@ else {
 	$createForm->addVar('hostid', $this->data['hostid']);
 
 	if (!empty($this->data['hostid'])) {
-		$createForm->addItem(new CSubmit('form', _('Create graph')));
+		$controls->addItem(new CSubmit('form', _('Create graph')));
 	}
 	else {
 		$createGraphButton = new CSubmit('form', _('Create graph (select host first)'));
 		$createGraphButton->setEnabled(false);
-		$createForm->addItem($createGraphButton);
+		$controls->addItem($createGraphButton);
 	}
 
-	$graphWidget->setControls($createForm);
-
-	$filterForm = new CForm('get');
-	$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-	$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
-
-	$graphWidget->addHeader(_('Graphs'), $filterForm);
+	$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+	$controls->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 	if (!empty($this->data['hostid'])) {
 		$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid']));
 	}
 }
+
+$createForm->addItem($controls);
+$graphWidget->setControls($createForm);
 
 // create form
 $graphForm = new CForm();
