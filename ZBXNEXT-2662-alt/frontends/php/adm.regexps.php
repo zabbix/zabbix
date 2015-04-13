@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/regexp.inc.php';
 
 $page['title'] = _('Configuration of regular expressions');
 $page['file'] = 'adm.regexps.php';
-$page['hist_arg'] = array();
 $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';

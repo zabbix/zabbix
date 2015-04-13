@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/include/images.inc.php';
 
 $page['title'] = _('Configuration of images');
 $page['file'] = 'adm.images.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

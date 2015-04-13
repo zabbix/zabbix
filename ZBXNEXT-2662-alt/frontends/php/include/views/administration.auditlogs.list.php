@@ -118,7 +118,7 @@ foreach ($this->data['actions'] as $action) {
 }
 
 // append table to form
-$auditForm->addItem(array($this->data['paging'], $auditTable, $this->data['paging']));
+$auditForm->addItem(array($auditTable, $this->data['paging']));
 
 // append navigation bar js
 $objData = array(

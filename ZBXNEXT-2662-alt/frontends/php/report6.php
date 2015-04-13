@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/include/reports.inc.php';
 
 $page['title']	= _('Bar reports');
 $page['file']	= 'report6.php';
-$page['hist_arg'] = array('period');
 $page['scripts'] = array('class.calendar.js');
 
 require_once dirname(__FILE__).'/include/page_header.php';

@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Trigger description');
 $page['file'] = 'tr_comments.php';
-$page['hist_arg'] = array('triggerid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

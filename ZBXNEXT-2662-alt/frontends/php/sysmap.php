@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
-$page['hist_arg'] = array('sysmapid');
 $page['scripts'] = array('class.cmap.js', 'class.cviewswitcher.js', 'multiselect.js');
 $page['type'] = detect_page_type();
 

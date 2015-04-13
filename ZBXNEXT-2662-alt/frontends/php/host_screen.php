@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 $page['title'] = _('Host screens');
 $page['file'] = 'screens.php';
-$page['hist_arg'] = array('elementid');
 $page['scripts'] = array('effects.js', 'dragdrop.js', 'class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of web monitoring');
 $page['file'] = 'httpconf.php';
 $page['scripts'] = array('class.cviewswitcher.js');
-$page['hist_arg'] = array('groupid', 'hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

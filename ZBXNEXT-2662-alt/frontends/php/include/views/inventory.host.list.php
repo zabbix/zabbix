@@ -106,7 +106,7 @@ foreach ($this->data['hosts'] as $host) {
 	$table->addRow($row);
 }
 
-$table = array($this->data['paging'], $table, $this->data['paging']);
+$table = array($table, $this->data['paging']);
 $hostInventoryWidget->addItem($table);
 
 return $hostInventoryWidget;

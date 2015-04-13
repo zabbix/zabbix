@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Status of Web monitoring');
 $page['file'] = 'httpmon.php';
-$page['hist_arg'] = array('groupid', 'hostid');
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
@@ -194,7 +193,7 @@ else {
 	getPagingLine($tmp);
 }
 
-$httpmon_wdgt->addItem(array($paging, $table, $paging));
+$httpmon_wdgt->addItem(array($table, $paging));
 $httpmon_wdgt->show();
 
 

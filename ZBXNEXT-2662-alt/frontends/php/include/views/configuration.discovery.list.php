@@ -82,7 +82,7 @@ $goButton->setAttribute('id','goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "g_druleid";');
 
 // append table to form
-$discoveryForm->addItem(array($this->data['paging'], $discoveryTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$discoveryForm->addItem(array($discoveryTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $discoveryWidget->addItem($discoveryForm);

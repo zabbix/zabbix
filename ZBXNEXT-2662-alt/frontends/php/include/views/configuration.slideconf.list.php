@@ -63,7 +63,7 @@ $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "shows";');
 
 // append table to form
-$slideForm->addItem(array($this->data['paging'], $slidesTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$slideForm->addItem(array($slidesTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $slideWidget->addItem($slideForm);

@@ -242,7 +242,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	$table->setCellSpacing(0);
 	$table->setCellPadding(5);
 	$table->addRow($top_page_row);
-	$table->show();
+//	$table->show();
 
 	$menu_table = new CTable(null, 'menu pointer');
 	$menu_table->setCellSpacing(0);
@@ -308,25 +308,28 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 	if ($page['file'] != 'index.php' && CWebUser::$data['userid'] > 0) {
 		$searchForm = new CView('general.search');
-		$search_div = $searchForm->render();
+//		$search_div = $searchForm->render();
 	}
 
 	$sub_menu_table->addRow(array($menu_divs, $search_div));
 	$page_menu->addItem($sub_menu_table);
-	$page_menu->show();
-}
-
-// create history
-if (isset($page['hist_arg']) && CWebUser::$data['alias'] != ZBX_GUEST_USER && $page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
-	$table = new CTable(null, 'history left');
-	$table->addRow(new CRow(array(
-		new CCol(_('History').':', 'caption'),
-		get_user_history()
-	)));
-	$table->show();
-}
-elseif ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
-	echo BR();
+//	$page_menu->show();
+echo '<header role="banner">
+		<nav role="navigation">
+			<div class="top-nav-container">
+			<ul class="top-nav"><li class="selected"><a href="dashboard.php">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="hosts.php">Configuration</a></li><li><a href="proxies.php">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text" placeholder="Search"></form></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-print" title="Print"></a></li><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			</div>
+			<div class="top-subnav-container">
+			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
+			</div>
+		</nav>
+		<div class="header-title">
+		<h1>Dashboard</h1>
+		<form>
+		<ul><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul>
+		</form>
+		</div>
+	</header>';
 }
 
 // unset multiple variables
