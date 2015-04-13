@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Zabbix | Hosts</title>
+		<link rel="stylesheet" href="stylesheets/screen.css">
+        <link rel="icon" href="favicon.ico">
+        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+        <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+	</head>
+<body>
+	<header role="banner">
+		<nav role="navigation">
+			<div class="top-nav-container">
+			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text" placeholder="Search"></form></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-print" title="Print"></a></li><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			</div>
+			<div class="top-subnav-container">
+			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
+			</div>
+		</nav>
+	</header>
+	<article>
+	<div class="header-title">
+	<h1>Dashboard</h1>
+	<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
+	</div>
+	
+	<div>
+		Favorite screeens
+		<table class="list-table">
+		<tbody>
+			<tr>
+				<td><a href="#">Zabbix server</a></td>
+			</tr>
+			<tr>
+				<td><a href="#">My 2nd megaserver</a></td>
+			</tr>
+		</tbody>
+		</table>
+		<a href="#">Screens</a> <a href="#">Slide shows</a>
+	</div>
+
+	<div>
+		Favorite graphs
+		<table class="list-table">
+		<tbody>
+			<tr>
+				<td>No graphs added</td>
+			</tr>
+		</tbody>
+		</table>
+		<a href="#">Graphs</a>
+	</div>
+
+	<div>
+		Favorite maps
+		<table class="list-table">
+		<tbody>
+			<tr>
+				<td><a href="#">Local network</a></td>
+			</tr>
+			<tr>
+				<td><a href="#">HQ main network</a></td>
+			</tr>
+		</tbody>
+		</table>
+		<a href="#">Maps</a>
+	</div>
+
+	<div>
+		Status of Zabbix
+		<table class="list-table">
+		<thead>
+			<tr>
+				<th>Parameter</th>
+				<th>Value</th>
+				<th>Details</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Zabbix server is running</td><td><span class="green">Yes</span></td><td>localhost: 10051</td>
+			</tr>
+			<tr>
+				<td>Number of hosts (enabled/disabled/templates)</td><td>25</td><td><span class="green">2</span>/<span class="red">0</span>/<span class="grey">23</span></td>
+			</tr>
+			<tr>
+				<td>Number of items (enabled/disabled/not supported)</td><td>67</td><td><span class="green">62</span>/<span class="red">2</span>/<span class="grey">3</span></td>
+			</tr>
+			<tr>
+				<td>Number of triggers (enabled/disabled [problem/ok])</td><td>40</td><td>40/0[<span class="red">0</span>/<span class="green">40</span>]</td>
+			</tr>
+			<tr>
+				<td>Number of users (online)</td><td>2</td><td><span class="green">1</span></td>
+			</tr>
+			<tr>
+				<td>Required server performance, new values per second</td><td>0.86</td><td>&ndash;</td>
+			</tr>
+		</tbody>
+		</table>
+		Updated 17:51:21
+	</div>
+
+	<div>
+		Web monitoring
+		<table class="list-table">
+		<tbody>
+			<tr>
+				<td>No web scenarios found</td>
+			</tr>
+		</tbody>
+		</table>
+		Updated 09:28:45
+	</div>
+
+	<div>
+		Last 20 issues
+		<table class="list-table">
+		<tbody>
+			<tr>
+				<td>No events found</td>
+			</tr>
+		</tbody>
+		</table>
+		Updated 09:28:45
+	</div>
+
+	<div>
+		System status
+		<table class="list-table">
+		<thead>
+		<tr>
+			<th>Host group</th>
+			<th>Disaster</th>
+			<th>High</th>
+			<th>Average</th>
+			<th>Warning</th>
+			<th>Info</th>
+			<th>Not classified</th>
+		</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><a href="#">Zabbix servers</a></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+			</tr>
+		</tbody>
+		</table>
+		Updated 11:17:48
+	</div>
+
+	</article>
+	<footer>
+	<a href="http://www.zabbix.com" target="_blank" class="logo"></a>
+	Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" target="_blank">Zabbix SIA</a>
+	</footer>
+</body>
+</html>
