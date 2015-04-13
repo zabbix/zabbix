@@ -213,7 +213,8 @@ else {
 	$right = new CTable();
 	$right->addRow($header['right']);
 
-	$historyWidget->setTitle($header['left'], $right);
+	$historyWidget->setTitle($header['left']);
+	$historyWidget->setControls($right);
 	$historyWidget->addItem(BR());
 
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {

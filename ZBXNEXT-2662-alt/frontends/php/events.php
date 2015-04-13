@@ -273,6 +273,7 @@ else {
 	}
 
 	$eventsWidget = new CWidget();
+	$eventsWidget->setTitle(_('Events'));
 
 	$csvDisabled = true;
 
@@ -296,8 +297,7 @@ else {
 	}
 	$frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
 
-	$eventsWidget->setTitle(
-		_('History of events').SPACE.'['.zbx_date2str(DATE_TIME_FORMAT_SECONDS).']',
+	$eventsWidget->setControls(
 		array(
 			$frmForm,
 			SPACE,

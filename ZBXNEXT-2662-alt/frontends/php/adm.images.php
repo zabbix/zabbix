@@ -129,6 +129,8 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['imageid'])) {
  */
 $form = new CForm();
 $form->cleanItems();
+$controls = new CList();
+
 $generalComboBox = new CComboBox('configDropDown', 'adm.images.php', 'redirect(this.options[this.selectedIndex].value);');
 $generalComboBox->addItems(array(
 	'adm.gui.php' => _('GUI'),
@@ -143,17 +145,19 @@ $generalComboBox->addItems(array(
 	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 	'adm.other.php' => _('Other')
 ));
-$form->addItem($generalComboBox);
+$controls->addItem($generalComboBox);
 
 if (!isset($_REQUEST['form'])) {
 	$imageType = getRequest('imagetype', IMAGE_TYPE_ICON);
 
 	$form->addVar('imagetype', $imageType);
-	$form->addItem(new CSubmit('form',  ($imageType == IMAGE_TYPE_ICON) ? _('Create icon') : _('Create background')));
+	$controls->addItem(new CSubmit('form',  ($imageType == IMAGE_TYPE_ICON) ? _('Create icon') : _('Create background')));
 }
+$form->addItem($controls);
 
 $imageWidget = new CWidget();
-$imageWidget->setTitle(_('CONFIGURATION OF IMAGES'), $form);
+$imageWidget->setTitle(_('Images'));
+$imageWidget->setControls($form);
 
 $data = array(
 	'form' => getRequest('form'),

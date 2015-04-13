@@ -317,10 +317,22 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 echo '<header role="banner">
 		<nav role="navigation">
 			<div class="top-nav-container">
-			<ul class="top-nav"><li class="selected"><a href="dashboard.php">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="hosts.php">Configuration</a></li><li><a href="proxies.php">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text" placeholder="Search"></form></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-print" title="Print"></a></li><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			<ul class="top-nav"><li class="selected"><a href="dashboard.php">Monitoring</a></li><li><a href="hostinventoriesoverview.php">Inventory</a></li><li><a href="report1.php">Reports</a></li><li><a href="hosts.php">Configuration</a></li><li><a href="proxies.php">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text" placeholder="Search"></form></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-print" title="Print"></a></li><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
 			</div>
 			<div class="top-subnav-container">
-			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
+			<ul class="top-subnav"><li><a href="dashboard.php" class="selected">Dashboard</a></li><li><a href="overview.php">Overview</a></li><li><a href="httpmon.php">Web</a></li><li><a href="latest.php">Latest data</a></li><li><a href="tr_status.php">Triggers</a></li><li><a href="events.php">Events</a></li><li><a href="charts.php">Graphs</a></li><li><a href="screens.php">Screens</a></li><li><a href="maps.php">Maps</a></li><li><a href="discovery.php">Discovery</a></li><li><a href="srv_status.php">IT services</a></li></ul>
+			</div>
+			<div class="top-subnav-container">
+			<ul class="top-subnav"><li><a href="report1.php">Status of Zabbix</a></li><li><a href="report2.php">Availability report</a></li><li><a href="toptriggers.php">Triggers top 100</a></li><li><a href="report6.php">Bar reports</a></li></ul>
+			</div>
+			<div class="top-subnav-container">
+			<ul class="top-subnav"><li><a href="hostinventoriesoverview.php">Inv: Overview</a></li><li><a href="hostinventories.php">Inv: Hosts</a></li></ul>
+			</div>
+			<div class="top-subnav-container">
+			<ul class="top-subnav"><li><a href="hostgroups.php">Host groups</a></li><li><a href="templates.php">Templates</a></li><li><a href="hosts.php">Hosts</a></li><li><a href="maintenance.php">Maintenance</a></li><li><a href="actionconf.php">Actions</a></li><li><a href="screenconf.php">Screens</a></li><li><a href="slideconf.php">Slide shows</a></li><li><a href="sysmaps.php">Maps</a></li><li><a href="discoveryconf.php">Discovery</a></li><li><a href="services.php">IT Services</a></li></ul>
+			</div>
+			<div class="top-subnav-container">
+			<ul class="top-subnav"><li><a href="adm.gui.php">General</a></li><li><a href="proxies.php">Proxies</a></li><li><a href="authentication.php">Authentication</a></li><li><a href="usergrps.php">Users</a></li><li><a href="media_types.php">Media types</a></li><li><a href="scripts.php">Scripts</a></li><li><a href="auditlogs.php">Audit</a></li><li><a href="queue.php">Queue</a></li><li><a href="report4.php">Notifications</a></li><li><a href="services.setup.php">Installation</a></li></ul>
 			</div>
 		</nav>
 	</header>';

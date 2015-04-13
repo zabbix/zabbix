@@ -18,29 +18,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $usersWidget = new CWidget();
+$usersWidget->setTitle(_('Users'));
 
 // append page header to widget
 $createForm = new CForm('get');
 $createForm->cleanItems();
+$controls = new CList();
 $configurationComboBox = new CComboBox('config', 'users.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 $configurationComboBox->addItem('usergrps.php', _('User groups'));
 $configurationComboBox->addItem('users.php', _('Users'));
-$createForm->addItem(array($configurationComboBox, new CSubmit('form', _('Create user'))));
-$usersWidget->setTitle(_('Users'), $createForm);
+$controls->addItem($configurationComboBox);
 
-// append form header to widget
-$userGroupListForm = new CForm('get');
 $userGroupComboBox = new CComboBox('filter_usrgrpid', $_REQUEST['filter_usrgrpid'], 'submit()');
 $userGroupComboBox->addItem(0, _('All'));
 
 foreach ($this->data['userGroups'] as $userGroup) {
 	$userGroupComboBox->addItem($userGroup['usrgrpid'], $userGroup['name']);
 }
-$userGroupListForm->addItem(array(_('User group').SPACE, $userGroupComboBox));
+$controls->addItem(array(_('User group').SPACE, $userGroupComboBox));
+$controls->addItem(new CSubmit('form', _('Create user')));
 
-$usersWidget->addHeader(_('Users'), $userGroupListForm);
+$createForm->addItem($controls);
+$usersWidget->setControls($createForm);
 
 // create form
 $usersForm = new CForm();

@@ -150,8 +150,12 @@ if (hasRequest('update')) {
 /*
  * Display
  */
+$cnf_wdgt = new CWidget();
+$cnf_wdgt->setTitle(_('Configuration of macros'));
+
 $form = new CForm();
 $form->cleanItems();
+$controls = new CList();
 $cmbConf = new CComboBox('configDropDown', 'adm.macros.php', 'redirect(this.options[this.selectedIndex].value);');
 $cmbConf->addItems(array(
 	'adm.gui.php' => _('GUI'),
@@ -166,10 +170,10 @@ $cmbConf->addItems(array(
 	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 	'adm.other.php' => _('Other')
 ));
-$form->addItem($cmbConf);
+$controls->addItem($cmbConf);
+$form->addItem($controls);
 
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->setTitle(_('Configuration of macros'), $form);
+$cnf_wdgt->setControls($form);
 
 $data = array();
 $data['form_refresh'] = getRequest('form_refresh', 0);

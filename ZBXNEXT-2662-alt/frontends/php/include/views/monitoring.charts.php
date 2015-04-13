@@ -29,16 +29,16 @@ $chartForm->addItem(array(SPACE._('Graph').SPACE, $this->data['pageFilter']->get
 $chartsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.charts.filter.state', 1));
 
 if ($this->data['graphid']) {
-	$chartsWidget->setTitle(_('Graphs'), array(
+	$chartsWidget->setTitle(_('Graphs'));
+	$chartsWidget->setControls(array(
 		get_icon('favourite', array('fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid'])),
-		SPACE,
 		get_icon('reset', array('id' => $this->data['graphid'])),
-		SPACE,
 		get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))
 	));
 }
 else {
-	$chartsWidget->setTitle(_('Graphs'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
+	$chartsWidget->setTitle(_('Graphs'));
+	$chartsWidget->setControls(array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
 }
 
 $chartsWidget->addHeader(

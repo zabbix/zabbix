@@ -40,7 +40,8 @@ else {
 	$createForm->addItem(new CSubmit('form', _('Create trigger')));
 }
 
-$triggersWidget->setTitle(_('Triggers'), $createForm);
+$triggersWidget->setTitle(_('Triggers'));
+$triggersWidget->setControls($createForm);
 
 // create widget header
 $filterForm = new CForm('get');
