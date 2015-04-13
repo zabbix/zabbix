@@ -207,7 +207,7 @@ foreach ($this->data['items'] as $item) {
 		$triggerInfo = new CSpan(_('Triggers'), 'link_menu');
 		$triggerInfo->setHint($triggerHintTable);
 		$triggerInfo = array($triggerInfo);
-		$triggerInfo[] = ' ('.count($item['triggers']).')';
+		$triggerInfo[] = CViewHelper::showNum(count($item['triggers']));
 
 		$triggerHintTable = array();
 	}

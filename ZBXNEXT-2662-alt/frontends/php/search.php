@@ -127,21 +127,21 @@ $viewCount = count($hosts);
 
 $table = new CTableInfo(_('No hosts found.'));
 $table->setHeader(array(
-	new CCol(_('Host')),
-	new CCol(_('IP')),
-	new CCol(_('DNS')),
-	new CCol(_('Latest data')),
-	new CCol(_('Triggers')),
-	new CCol(_('Events')),
-	new CCol(_('Graphs')),
-	new CCol(_('Screens')),
-	new CCol(_('Web')),
-	new CCol(_('Applications')),
-	new CCol(_('Items')),
-	new CCol(_('Triggers')),
-	new CCol(_('Graphs')),
-	new CCol(_('Discovery')),
-	new CCol(_('Web'))
+	new CColHeader(_('Host')),
+	new CColHeader(_('IP')),
+	new CColHeader(_('DNS')),
+	new CColHeader(_('Latest data')),
+	new CColHeader(_('Triggers')),
+	new CColHeader(_('Events')),
+	new CColHeader(_('Graphs')),
+	new CColHeader(_('Screens')),
+	new CColHeader(_('Web')),
+	new CColHeader(_('Applications')),
+	new CColHeader(_('Items')),
+	new CColHeader(_('Triggers')),
+	new CColHeader(_('Graphs')),
+	new CColHeader(_('Discovery')),
+	new CColHeader(_('Web'))
 ));
 
 foreach ($hosts as $hnum => $host) {
@@ -166,27 +166,27 @@ foreach ($hosts as $hnum => $host) {
 
 		$applications_link = array(
 			new CLink(_('Applications'), 'applications.php?'.$link),
-			' ('.$host['applications'].')'
+			CViewHelper::showNum($host['applications'])
 		);
 		$items_link = array(
 			new CLink(_('Items'), 'items.php?filter_set=1&'.$link),
-			' ('.$host['items'].')'
+			CViewHelper::showNum($host['items'])
 		);
 		$triggers_link = array(
 			new CLink(_('Triggers'), 'triggers.php?'.$link),
-			' ('.$host['triggers'].')'
+			CViewHelper::showNum($host['triggers'])
 		);
 		$graphs_link = array(
 			new CLink(_('Graphs'), 'graphs.php?'.$link),
-			' ('.$host['graphs'].')'
+			CViewHelper::showNum($host['graphs'])
 		);
 		$discoveryLink = array(
 			new CLink(_('Discovery'), 'host_discovery.php?'.$link),
-			' ('.$host['discoveries'].')'
+			CViewHelper::showNum($host['discoveries'])
 		);
 		$httpTestsLink = array(
 			new CLink(_('Web'), 'httpconf.php?'.$link),
-			' ('.$host['httpTests'].')'
+			CViewHelper::showNum($host['httpTests'])
 		);
 	}
 	else {
@@ -269,14 +269,14 @@ $overalCount = API::HostGroup()->get($params);
 $viewCount = count($hostGroups);
 
 $header = array(
-	new CCol(_('Host group')),
-	new CCol(_('Latest data')),
-	new CCol(_('Triggers')),
-	new CCol(_('Events')),
-	new CCol(_('Graphs')),
-	new CCol(_('Web')),
-	$admin ? new CCol(_('Hosts')) : null,
-	$admin ? new CCol(_('Templates')) : null,
+	new CColHeader(_('Host group')),
+	new CColHeader(_('Latest data')),
+	new CColHeader(_('Triggers')),
+	new CColHeader(_('Events')),
+	new CColHeader(_('Graphs')),
+	new CColHeader(_('Web')),
+	$admin ? new CColHeader(_('Hosts')) : null,
+	$admin ? new CColHeader(_('Templates')) : null,
 );
 
 $table = new CTableInfo(_('No host groups found.'));
@@ -296,21 +296,21 @@ foreach ($hostGroups as $hnum => $group) {
 			if ($group['hosts']) {
 				$hostsLink = array(
 					new CLink(_('Hosts'), 'hosts.php?groupid='.$hostgroupid),
-					' ('.$group['hosts'].')'
+					CViewHelper::showNum($group['hosts'])
 				);
 			}
 			else {
-				$hostsLink = _('Hosts').' (0)';
+				$hostsLink = _('Hosts');
 			}
 
 			if ($group['templates']) {
 				$templatesLink = array(
 					new CLink(_('Templates'), 'templates.php?groupid='.$hostgroupid),
-					' ('.$group['templates'].')'
+					CViewHelper::showNum($group['templates'])
 				);
 			}
 			else {
-				$templatesLink = _('Templates').' (0)';
+				$templatesLink = _('Templates');
 			}
 
 			$hgroup_link = new CLink($caption, 'hostgroups.php?form=update&'.$link);
@@ -389,14 +389,14 @@ if ($admin) {
 	$viewCount = count($templates);
 
 	$header = array(
-		new CCol(_('Template')),
-		new CCol(_('Applications')),
-		new CCol(_('Items')),
-		new CCol(_('Triggers')),
-		new CCol(_('Graphs')),
-		new CCol(_('Screens')),
-		new CCol(_('Discovery')),
-		new CCol(_('Web')),
+		new CColHeader(_('Template')),
+		new CColHeader(_('Applications')),
+		new CColHeader(_('Items')),
+		new CColHeader(_('Triggers')),
+		new CColHeader(_('Graphs')),
+		new CColHeader(_('Screens')),
+		new CColHeader(_('Discovery')),
+		new CColHeader(_('Web')),
 	);
 
 	$table = new CTableInfo(_('No templates found.'));
@@ -419,31 +419,31 @@ if ($admin) {
 
 			$applications_link = array(
 				new CLink(_('Applications'), 'applications.php?'.$link),
-				' ('.$template['applications'].')'
+				CViewHelper::showNum($host['applications'])
 			);
 			$items_link = array(
 				new CLink(_('Items'), 'items.php?filter_set=1&'.$link),
-				' ('.$template['items'].')'
+				CViewHelper::showNum($host['items'])
 			);
 			$triggers_link = array(
 				new CLink(_('Triggers'), 'triggers.php?'.$link),
-				' ('.$template['triggers'].')'
+				CViewHelper::showNum($host['triggers'])
 			);
 			$graphs_link = array(
 				new CLink(_('Graphs'), 'graphs.php?'.$link),
-				' ('.$template['graphs'].')'
+				CViewHelper::showNum($host['graphs'])
 			);
 			$screensLink = array(
 				new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid),
-				' ('.$template['screens'].')'
+				CViewHelper::showNum($host['screens'])
 			);
 			$discoveryLink = array(
 				new CLink(_('Discovery'), 'host_discovery.php?'.$link),
-				' ('.$template['discoveries'].')'
+				CViewHelper::showNum($host['discoveries'])
 			);
 			$httpTestsLink = array(
 				new CLink(_('Web'), 'httpconf.php?'.$link),
-				' ('.$template['httpTests'].')'
+				CViewHelper::showNum($host['httpTests'])
 			);
 		}
 		else {
