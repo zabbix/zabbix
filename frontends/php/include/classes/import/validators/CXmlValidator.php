@@ -34,8 +34,8 @@ class CXmlValidator {
 	public function __construct() {
 		$this->versionValidators = array(
 			'1.0' => new C10XmlValidator(),
-			'2.0' => new C20XmlValidator()
-//			'3.0' => new C30XmlValidator()
+			'2.0' => new C20XmlValidator(),
+			'3.0' => new C30XmlValidator()
 		);
 	}
 

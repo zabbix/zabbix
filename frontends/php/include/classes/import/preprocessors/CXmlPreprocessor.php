@@ -27,8 +27,8 @@ class CXmlPreprocessor {
 	public function __construct() {
 		$this->versionPreprocessors = array(
 			'1.0' => new C10XmlPreprocessor(),
-			'2.0' => new C20XmlPreprocessor()
-//			'3.0' => new C10ImportConverter()
+			'2.0' => new C20XmlPreprocessor(),
+			'3.0' => new C30XmlPreprocessor()
 		);
 	}
 
