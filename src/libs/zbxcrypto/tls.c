@@ -1444,6 +1444,124 @@ static void	zbx_log_ciphersuites(const char *title, const SSL *ctx)
 }
 #endif
 
+#if defined(HAVE_GNUTLS)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_log_peer_cert                                                *
+ *                                                                            *
+ * Purpose: write peer certificate information into Zabbix log for debugging  *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - no errors                                                    *
+ *     FAIL - an error occurred                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_log_peer_cert(const gnutls_session_t session, char **error)
+{
+	if (GNUTLS_CRT_X509 == gnutls_certificate_type_get(session))
+	{
+		const char		*__function_name = "zbx_log_peer_cert";
+		int			res;
+		unsigned int		cert_list_size = 0;
+		const gnutls_datum_t	*cert_list;
+		gnutls_x509_crt_t	cert;
+		gnutls_datum_t		cert_print;
+
+		if (NULL == (cert_list = gnutls_certificate_get_peers(session, &cert_list_size)))
+		{
+			*error = zbx_dsprintf(*error, "%s(): gnutls_certificate_get_peers() returned NULL",
+					__function_name);
+			return FAIL;
+		}
+
+		if (0 == cert_list_size)
+		{
+			*error = zbx_dsprintf(*error, "%s(): gnutls_certificate_get_peers() returned 0 certificates",
+					__function_name);
+			return FAIL;
+		}
+
+		if (GNUTLS_E_SUCCESS != (res = gnutls_x509_crt_init(&cert)))
+		{
+			*error = zbx_dsprintf(*error, "%s(): gnutls_x509_crt_init() failed: %d %s", __function_name,
+					res, gnutls_strerror(res));
+			return FAIL;
+		}
+
+		/* the 1st element of list is peer certificate */
+
+		if (GNUTLS_E_SUCCESS != (res = gnutls_x509_crt_import(cert, &cert_list[0], GNUTLS_X509_FMT_DER)))
+		{
+			*error = zbx_dsprintf(*error, "%s(): gnutls_x509_crt_import() failed: %d %s", __function_name,
+					res, gnutls_strerror(res));
+			gnutls_x509_crt_deinit(cert);
+			return FAIL;
+		}
+
+		if (GNUTLS_E_SUCCESS != (res = gnutls_x509_crt_print(cert, GNUTLS_CRT_PRINT_ONELINE, &cert_print)))
+		{
+			*error = zbx_dsprintf(*error, "%s(): gnutls_x509_crt_print() failed: %d %s", __function_name,
+					res, gnutls_strerror(res));
+			gnutls_x509_crt_deinit(cert);
+			return FAIL;
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "peer certificate: %s", cert_print.data);
+
+		gnutls_free(cert_print.data);
+		gnutls_x509_crt_deinit(cert);
+	}
+
+	return SUCCEED;
+}
+#endif
+
+#if defined(HAVE_GNUTLS)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_verify_peer_cert                                             *
+ *                                                                            *
+ * Purpose: basic verification of peer certificate                            *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - verification successful                                      *
+ *     FAIL - invalid certificate or an error occurred                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_verify_peer_cert(const gnutls_session_t session, char **error)
+{
+	const char	*__function_name = "zbx_verify_peer_cert";
+	int		res;
+	unsigned int	status;
+	gnutls_datum_t	status_print;
+
+	if (GNUTLS_E_SUCCESS != (res = gnutls_certificate_verify_peers2(session, &status)))
+	{
+		*error = zbx_dsprintf(*error, "%s(): gnutls_certificate_verify_peers2() failed: %d %s",
+				__function_name, res, gnutls_strerror(res));
+		return FAIL;
+	}
+
+	if (GNUTLS_E_SUCCESS != (res = gnutls_certificate_verification_status_print(status,
+			gnutls_certificate_type_get(session), &status_print, 0)))
+	{
+		*error = zbx_dsprintf(*error, "%s(): gnutls_certificate_verification_status_print() failed: %d "
+				"%s", __function_name, res, gnutls_strerror(res));
+		return FAIL;
+	}
+
+	if (0 != status)
+		*error = zbx_dsprintf(*error, "invalid peer certificate: %s", status_print.data);
+
+	gnutls_free(status_print.data);
+
+	if (0 == status)
+		return SUCCEED;
+	else
+		return FAIL;
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_init_parent                                              *
@@ -2664,9 +2782,26 @@ out:
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
-		/* TODO log peer certificate information for debugging */
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			/* log peer certificate information for debugging */
 
-		/* validate peer certificate TODO: Issuer and Subject validation */
+			if (SUCCEED != zbx_log_peer_cert(s->tls_ctx, error))
+			{
+				zbx_tls_close(s);
+				goto out1;
+			}
+		}
+
+		/* verify peer certificate */
+
+		if (SUCCEED != zbx_verify_peer_cert(s->tls_ctx, error))
+		{
+			zbx_tls_close(s);
+			goto out1;
+		}
+
+		/* TODO: verify peer certificate Issuer and Subject */
 
 		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
 	}
@@ -2699,7 +2834,7 @@ out:	/* an error occured */
 		gnutls_psk_free_client_credentials(s->tls_psk_client_creds);
 		s->tls_psk_client_creds = NULL;
 	}
-
+out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
@@ -3266,9 +3401,25 @@ out:
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
 
-		/* TODO log some certificate debug info here */
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			/* log peer certificate information for debugging */
+			if (SUCCEED != zbx_log_peer_cert(s->tls_ctx, error))
+			{
+				zbx_tls_close(s);
+				goto out1;
+			}
+		}
 
-		/* validate peer certificate TODO: Issuer and Subject validation */
+		/* verify peer certificate */
+
+		if (SUCCEED != zbx_verify_peer_cert(s->tls_ctx, error))
+		{
+			zbx_tls_close(s);
+			goto out1;
+		}
+
+		/* TODO: verify peer certificate Issuer and Subject */
 	}
 	else if (GNUTLS_CRD_PSK == creds)
 	{
@@ -3318,7 +3469,7 @@ out:	/* an error occured */
 		gnutls_psk_free_server_credentials(s->tls_psk_server_creds);
 		s->tls_psk_server_creds = NULL;
 	}
-
+out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
