@@ -1015,10 +1015,10 @@ jQuery(function($) {
 		if (typeof options.label !== 'undefined') {
 			if (typeof options.items !== 'undefined' && options.items.length > 0) {
 				// if submenu exists
-				link.html(options.label + '<span class="arrow-right"></span>');
+				link.html(jQuery.escapeHtml(options.label) + '<span class="arrow-right"></span>');
 			}
 			else {
-				link.html(options.label);
+				link.html(jQuery.escapeHtml(options.label));
 			}
 		}
 
