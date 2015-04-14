@@ -22,7 +22,7 @@
 $hostWidget = new CWidget(null, 'host-list');
 $hostWidget->setTitle(_('Hosts'));
 
-$frmForm = new CForm();
+$frmForm = new CForm('get');
 $frmForm->cleanItems();
 
 $controls = new CList();
@@ -78,18 +78,23 @@ foreach ($data['hosts'] as $host) {
 
 	$applications = array(new CLink(_('Applications'),
 		'applications.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
-		CViewHelper::showNum($host['applications']));
+		CViewHelper::showNum($host['applications'])
+	);
 	$items = array(new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$host['hostid']),
-		CViewHelper::showNum($host['items']));
-	$triggers = array(new CLink(_('Triggers'),
-		'triggers.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
-		CViewHelper::showNum($host['triggers']));
+		CViewHelper::showNum($host['items'])
+	);
+	$triggers = array(new CLink(_('Triggers'), 'triggers.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+		CViewHelper::showNum($host['triggers'])
+	);
 	$graphs = array(new CLink(_('Graphs'), 'graphs.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
-		CViewHelper::showNum($host['graphs']));
+		CViewHelper::showNum($host['graphs'])
+	);
 	$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$host['hostid']),
-		CViewHelper::showNum($host['discoveries']));
+		CViewHelper::showNum($host['discoveries'])
+	);
 	$httpTests = array(new CLink(_('Web'), 'httpconf.php?&hostid='.$host['hostid']),
-		CViewHelper::showNum($host['httpTests']));
+		CViewHelper::showNum($host['httpTests'])
+	);
 
 	$description = array();
 
@@ -199,7 +204,6 @@ foreach ($data['hosts'] as $host) {
 }
 
 $form->addItem(array(
-	$data['paging'],
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'hosts',

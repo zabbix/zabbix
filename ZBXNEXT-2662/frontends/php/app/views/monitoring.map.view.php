@@ -20,6 +20,7 @@
 
 
 $mapWidget = new CWidget('hat_maps');
+$mapWidget->setTitle(_('Maps'));
 
 if ($data['maps']) {
 	$mapTable = new CTable(null, 'map map-container');
@@ -32,11 +33,11 @@ if ($data['maps']) {
 
 	$headerMapForm = new CForm('get');
 	$headerMapForm->cleanItems();
-	$controls = new CList();
 	$headerMapForm->addVar('action', 'map.view');
 	$headerMapForm->addVar('fullscreen', $data['fullscreen']);
-	$controls->addItem(array(_('Map').SPACE, $mapComboBox));
 
+	$controls = new CList();
+	$controls->addItem(array(_('Map').SPACE, $mapComboBox));
 	$controls->addItem(array(_('Minimum severity').SPACE, $data['pageFilter']->getSeveritiesMinCB()));
 
 	// get map parent maps
@@ -61,13 +62,11 @@ if ($data['maps']) {
 	$imgMap->setMap($actionMap->getName());
 	$mapTable->addRow($imgMap);
 
-	$controls->addItem(
-		get_icon('favourite', array(
-			'fav' => 'web.favorite.sysmapids',
-			'elname' => 'sysmapid',
-			'elid' => $data['sysmapid']
-		))
-	);
+	$controls->addItem(get_icon('favourite', array(
+		'fav' => 'web.favorite.sysmapids',
+		'elname' => 'sysmapid',
+		'elid' => $data['sysmapid']
+	)));
 }
 else {
 	$mapTable = new CTable(_('No maps found.'), 'map map-container');
@@ -77,7 +76,6 @@ else {
 $controls->addItem(get_icon('fullscreen', array('fullscreen' => $data['fullscreen'])));
 
 $headerMapForm->addItem($controls);
-$mapWidget->setTitle(_('Network maps'));
 $mapWidget->setControls($headerMapForm);
 
 $mapWidget->addItem($mapTable);

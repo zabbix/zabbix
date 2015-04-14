@@ -1389,8 +1389,6 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 	$link->setArgument('sort', $tabfield);
 	$link->setArgument('sortorder', $sortorder);
 
-	$url = $link->getUrl();
-
 	zbx_value2array($obj);
 
 	$arrow = null;
@@ -1403,7 +1401,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 		}
 	}
 
-	$col = new CColHeader(array(new CLink(array($obj, $arrow), $url)));
+	$col = new CColHeader(array(new CLink(array($obj, $arrow), $link->getUrl())));
 
 	return $col;
 }

@@ -25,15 +25,14 @@ if ($data['uncheck']) {
 
 $mediaTypeWidget = new CWidget();
 
+// create new media type button
 $createForm = new CForm('get');
 
-// create new media type button
 $controls = new CList();
-$controls->addItem(new CSubmit('form', _('Create media type')));
+$controls->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'));
 $createForm->addItem($controls);
 $mediaTypeWidget->setTitle(_('Media types'));
 $mediaTypeWidget->setControls($createForm);
-
 
 // create form
 $mediaTypeForm = new CForm();
@@ -121,14 +120,13 @@ foreach ($data['mediatypes'] as $mediaType) {
 
 // append table to form
 $mediaTypeForm->addItem(array(
-	$data['paging'],
 	$mediaTypeTable,
 	$data['paging'],
-	get_table_header(new CActionButtonList('action', 'mediatypeids', array(
+	new CActionButtonList('action', 'mediatypeids', array(
 		'mediatype.enable' => array('name' => _('Enable'), 'confirm' => _('Enable selected media types?')),
 		'mediatype.disable' => array('name' => _('Disable'), 'confirm' => _('Disable selected media types?')),
 		'mediatype.delete' => array('name' => _('Delete'), 'confirm' => _('Delete selected media types?'))
-	)))
+	))
 ));
 
 // append form to widget
