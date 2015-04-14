@@ -52,7 +52,7 @@ if (!$service) {
 $widget = new CWidget();
 $widget->setTitle(_('IT SERVICES AVAILABILITY REPORT').':'.SPACE.$service['name']);
 
-$controls = new Clist();
+$controls = new CList();
 
 $form = new CForm();
 $form->setMethod('get');

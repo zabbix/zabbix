@@ -94,10 +94,9 @@ foreach ($data['proxies'] as $proxy) {
 
 // append table to form
 $proxyForm->addItem(array(
-	$data['paging'],
 	$proxyTable,
 	$data['paging'],
-	get_table_header(new CActionButtonList('action', 'proxyids', array(
+	new CActionButtonList('action', 'proxyids', array(
 		'proxy.hostenable' => array('name' => _('Enable hosts'),
 			'confirm' => _('Enable hosts monitored by selected proxies?')
 		),
@@ -105,7 +104,7 @@ $proxyForm->addItem(array(
 			'confirm' => _('Disable hosts monitored by selected proxies?')
 		),
 		'proxy.delete' => array('name' => _('Delete'), 'confirm' => _('Delete selected proxies?'))
-	)))
+	))
 ));
 
 // append form to widget

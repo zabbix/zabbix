@@ -572,7 +572,7 @@ function makeFormFooter(CButtonInterface $mainButton = null, array $otherButtons
 		$button->addClass('btn-alt');
 	}
 
-	$buttons = new Clist(null, 'table-forms');
+	$buttons = new CList(null, 'table-forms');
 
 	if ($mainButton !== null) {
 		$buttons->addItem(array(

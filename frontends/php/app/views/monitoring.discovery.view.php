@@ -20,19 +20,19 @@
 
 
 $discoveryWidget = new CWidget('hat_discovery');
+$discoveryWidget->setTitle(_('Status of discovery'));
 
 // create header form
+$controls = new CList();
+$controls->addItem(array(_('Discovery rule'), SPACE, $data['pageFilter']->getDiscoveryCB()));
+$controls->addItem(get_icon('fullscreen', array('fullscreen' => $data['fullscreen'])));
+
 $discoveryHeaderForm = new CForm('get');
 $discoveryHeaderForm->setName('slideHeaderForm');
 $discoveryHeaderForm->addVar('action', 'discovery.view');
 $discoveryHeaderForm->addVar('fullscreen', $data['fullscreen']);
-
-$discoveryWidget->setTitle(_('STATUS OF DISCOVERY'));
-$controls = new CList();
-$discoveryRulesComboBox = $data['pageFilter']->getDiscoveryCB();
-$controls->addItem(array(_('Discovery rule').SPACE, $discoveryRulesComboBox));
-$controls->addItem(get_icon('fullscreen', array('fullscreen' => $data['fullscreen'])));
 $discoveryHeaderForm->addItem($controls);
+
 $discoveryWidget->setControls($discoveryHeaderForm);
 
 // create table

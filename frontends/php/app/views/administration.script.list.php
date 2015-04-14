@@ -87,12 +87,11 @@ foreach ($data['scripts'] as $script) {
 
 // append table to form
 $scriptsForm->addItem(array(
-	$data['paging'],
 	$scriptsTable,
 	$data['paging'],
-	get_table_header(new CActionButtonList('action', 'scriptids', array(
+	new CActionButtonList('action', 'scriptids', array(
 		'script.delete' => array('name' => _('Delete'), 'confirm' => _('Delete selected scripts?'))
-	)))
+	))
 ));
 
 // append form to widget
