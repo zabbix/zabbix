@@ -66,11 +66,11 @@ foreach ($this->data['users'] as $user) {
 		$onlineTime = ($user['autologout'] == 0 || ZBX_USER_ONLINE_TIME < $user['autologout']) ? ZBX_USER_ONLINE_TIME : $user['autologout'];
 
 		$online = (($session['lastaccess'] + $onlineTime) >= time())
-			? new CCol(_('Yes').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')', 'enabled')
-			: new CCol(_('No').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')', 'disabled');
+			? new CCol(_('Yes').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')', ZBX_STYLE_GREEN)
+			: new CCol(_('No').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')', ZBX_STYLE_RED);
 	}
 	else {
-		$online = new CCol(_('No'), 'disabled');
+		$online = new CCol(_('No'), ZBX_STYLE_RED);
 	}
 
 	// blocked
@@ -101,7 +101,7 @@ foreach ($this->data['users'] as $user) {
 			$userGroup['name'],
 			'usergrps.php?form=update&usrgrpid='.$userGroup['usrgrpid'],
 			($userGroup['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $userGroup['users_status'] == GROUP_STATUS_DISABLED)
-				? 'disabled' : 'enabled'
+				? ZBX_STYLE_RED . ' ' . ZBX_STYLE_DOTTED : ZBX_STYLE_GREEN . ' ' . ZBX_STYLE_DOTTED
 		);
 	}
 
