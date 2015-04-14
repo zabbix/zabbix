@@ -391,7 +391,6 @@ showSuggests: function(){
 	}
 
 	this.dom.suggest.style.display = 'block';
-	this.dom.suggest.style.position = 'fixed';
 },
 
 hideSuggests: function(){
@@ -407,7 +406,7 @@ positionSuggests: function(){
 	var dims = getDimensions(this.dom.input);
 
 	this.dom.suggest.style.top = (pos.top+dims.height)+'px';
-	this.dom.suggest.style.left = pos.left+'px';
+	this.dom.suggest.style.left = '0px';
 },
 
 newSugTab: function(needle){
