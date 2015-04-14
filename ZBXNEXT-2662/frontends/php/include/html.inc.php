@@ -622,6 +622,7 @@ function getAvailabilityTable($host, $currentTime) {
 				break;
 		}
 		$ad[] = $ai;
+		$ad[] = ' ';
 	}
 
 	// discovered host lifetime indicator
@@ -644,7 +645,10 @@ function getAvailabilityTable($host, $currentTime) {
 		}
 
 		$ad[] = $deleteError;
+		$ad[] = ' ';
 	}
+
+	array_pop($ad);
 
 	return $ad;
 }
