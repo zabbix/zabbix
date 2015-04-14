@@ -1457,6 +1457,10 @@ function getPagingLine(&$items) {
 	$itemsCount = count($items);
 	$pagesCount = ($itemsCount > 0) ? ceil($itemsCount / $rowsPerPage) : 1;
 
+	if ($pagesCount == 1) {
+		return null;
+	}
+
 	$currentPage = getPageNumber();
 	if ($currentPage < 1) {
 		$currentPage = 1;
@@ -1494,33 +1498,38 @@ function getPagingLine(&$items) {
 
 	$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
 
-	if ($pagesCount == 1) {
-		return null;
-	}
-
 	$tags = array();
 
 	$url = CUrlFactory::getContextUrl();
 	if ($startPage > 1) {
 		$url->setArgument('page', 1);
-		$tags[] = new CLink(_('First'), $url->getUrl());
+		$tags[] = new CLink(_('First'), $url->getUrl(), null, null, true);
 	}
+
 	if ($currentPage > 1) {
 		$url->setArgument('page', $currentPage - 1);
-		$tags[] = new CLink(new CSpan(null, 'arrow-left'), $url->getUrl());
+		$tags[] = new CLink(new CSpan(null, 'arrow-left'), $url->getUrl(), null, null, true);
 	}
+
 	for ($p = $startPage; $p <= $pagesCount; $p++) {
+		if ($p > $endPage) {
+			break;
+		}
+
 		$url->setArgument('page', $p);
-		$tags[] = new CLink($p, $url->getUrl(), $p == $currentPage ? 'paging-selected' : null);
+		$tags[] = new CLink($p, $url->getUrl(), $p == $currentPage ? 'paging-selected' : null, null, true);
 	}
+
 	if ($currentPage < $pagesCount) {
 		$url->setArgument('page', $currentPage + 1);
-		$tags[] = new CLink(new CSpan(null, 'arrow-right'), $url->getUrl());
+		$tags[] = new CLink(new CSpan(null, 'arrow-right'), $url->getUrl(), null, null, true);
 	}
+
 	if ($p < $pagesCount) {
 		$url->setArgument('page', $pagesCount);
-		$tags[] = new CLink(_('Last'), $url->getUrl());
+		$tags[] = new CLink(_('Last'), $url->getUrl(), null, null, true);
 	}
+
 	return new CDiv($tags, 'table-paging');
 }
 
