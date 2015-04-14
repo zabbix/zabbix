@@ -162,6 +162,16 @@ typedef struct
 	/* with daily_range and the daily range is reset.             */
 	int		daily_range;
 
+	/* The oldest timestamp that is guaranteed to be covered by   */
+	/* the cached values. It can be larger than the request range.*/
+	/* Initially it is the the lowest boundary of time based      */
+	/* request or the timestamp of the first (earliest) value of  */
+	/* count based request.                                       */
+	/* When the cached values exceeds the request range and the   */
+	/* 'expired' values are dropped this timestamp is set to the  */
+	/* timestamp of the last (oldest) dropped value plus 1.       */
+	int		timestamp_from;
+
 	/* The number of cache hits for this item.                    */
 	/* Used to evaluate if the item must be dropped from cache    */
 	/* in low memory situation.                                   */
@@ -1691,6 +1701,10 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 				}
 			}
 
+			/* the guaranteed earliest cached timestamp will be the timestamp of */
+			/* last (oldest) removed value + 1                                   */
+			item->timestamp_from = chunk->slots[chunk->last_value].timestamp.sec + 1;
+
 			vch_item_remove_chunk(item, chunk);
 
 			chunk = next;
@@ -1733,7 +1747,14 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 			/* we can't add it to keep cache consistency. In this case reset the cached all   */
 			/* flag and return success.                                                       */
 			if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
+			{
 				item->status = 0;
+
+				/* if the value has greater timestamp than the guaranteed cached */
+				/* boundary then reset the boundary to the value timestamp + 1   */
+				if (item->timestamp_from < value->timestamp.sec)
+					item->timestamp_from = value->timestamp.sec + 1;
+			}
 
 			ret = SUCCEED;
 			goto out;
@@ -1883,7 +1904,7 @@ out:
  *             seconds   - [IN] the time period to retrieve data for          *
  *             timestamp - [IN] the requested period end timestamp            *
  *                                                                            *
- * Return value:  >=0    - the number of values read from database            *
+ * Return value:  >=0    - the number ofq values read from database            *
  *                FAIL   - an error occurred while trying to cache values     *
  *                                                                            *
  * Comments: This function checks if the requested value range is cached and  *
@@ -1901,7 +1922,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 	update_end = ZBX_VC_TIME();
 
 	/* check if the requested period is in the cached range */
-	if (0 != item->active_range && update_end - start <= item->active_range)
+	if (0 != item->timestamp_from && start >= item->timestamp_from)
 		return SUCCEED;
 
 	/* find if the cache should be updated to cover the required range */
@@ -1941,7 +1962,13 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 				ret = vch_item_add_values_at_tail(item, records.values, records.values_num);
 
 				if (SUCCEED == ret)
+				{
 					ret = records.values_num;
+
+					if (item->timestamp_from < update_end - update_seconds)
+						item->timestamp_from = update_end - update_seconds + 1;
+
+				}
 			}
 			/* when updating cache with time based request we can always reset status flags */
 			/* flag even if the requested period contains no data                           */
@@ -2030,7 +2057,12 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
 		if (SUCCEED == ret && 0 < records.values_num)
 		{
 			if (SUCCEED == (ret = vch_item_add_values_at_tail(item, records.values, records.values_num)))
+			{
 				ret = records.values_num;
+
+				if (item->timestamp_from < item->tail->slots[item->tail->first_value].timestamp.sec)
+					item->timestamp_from = item->tail->slots[item->tail->first_value].timestamp.sec;
+			}
 		}
 
 		zbx_history_record_vector_destroy(&records, item->value_type);
@@ -2108,7 +2140,12 @@ static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 		ret = vch_item_add_values_at_tail(item, records.values, records.values_num);
 
 		if (SUCCEED == ret)
+		{
 			ret = records.values_num;
+
+			if (item->timestamp_from < item->tail->slots[item->tail->first_value].timestamp.sec)
+				item->timestamp_from = item->tail->slots[item->tail->first_value].timestamp.sec;
+		}
 	}
 	zbx_history_record_vector_destroy(&records, item->value_type);
 
