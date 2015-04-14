@@ -503,10 +503,17 @@ footer {
 	}
 
 	&.paging-selected {
-		cursor: default;
 		color: $white;
 		border-color: $light-blue-grey;
 		background: $light-blue-grey;
+
+		&:hover {
+			background: darken($light-blue-grey, 5%);
+		}
+
+		&:active {
+			background: darken($light-blue-grey, 10%);
+		}
 	}
 }
 
