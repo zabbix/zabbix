@@ -1511,11 +1511,7 @@ function getPagingLine(&$items) {
 		$tags[] = new CLink(new CSpan(null, 'arrow-left'), $url->getUrl(), null, null, true);
 	}
 
-	for ($p = $startPage; $p <= $pagesCount; $p++) {
-		if ($p > $endPage) {
-			break;
-		}
-
+	for ($p = $startPage; $p <= $endPage; $p++) {
 		$url->setArgument('page', $p);
 		$tags[] = new CLink($p, $url->getUrl(), $p == $currentPage ? 'paging-selected' : null, null, true);
 	}
