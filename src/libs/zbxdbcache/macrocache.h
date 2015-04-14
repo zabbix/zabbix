@@ -23,7 +23,7 @@
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 
-/* user macro structure used to store user macros in user macro cache*/
+/* user macro structure used to store user macros in user macro cache */
 typedef struct
 {
 	char	*name;

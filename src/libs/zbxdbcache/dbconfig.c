@@ -903,7 +903,7 @@ static void	config_gmacro_add_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *
  * Purpose: removes global macro index                                        *
  *                                                                            *
  * Parameters: gmacro_index - [IN/OUT] a global macro index hashset           *
- *             macro        - [IN] the macro name                             *
+ *             gmacro       - [IN] the macro to remove                        *
  *                                                                            *
  ******************************************************************************/
 static void	config_gmacro_remove_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *gmacro)
@@ -933,16 +933,16 @@ static void	config_gmacro_remove_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACR
  *                                                                            *
  * Purpose: adds host macro index                                             *
  *                                                                            *
- * Parameters: gmacro_index - [IN/OUT] a host macro index hashset             *
- *             gmacro       - [IN] the macro to index                         *
+ * Parameters: hmacro_index - [IN/OUT] a host macro index hashset             *
+ *             hmacro       - [IN] the macro to index                         *
  *                                                                            *
  ******************************************************************************/
 static void	config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *hmacro)
 {
 	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
 
-	hmacro_hm_local.macro = hmacro->macro;
 	hmacro_hm_local.hostid = hmacro->hostid;
+	hmacro_hm_local.macro = hmacro->macro;
 
 	if (NULL == (hmacro_hm = zbx_hashset_search(hmacro_index, &hmacro_hm_local)))
 	{
@@ -959,10 +959,10 @@ static void	config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *
  *                                                                            *
  * Function: config_hmacro_remove_index                                       *
  *                                                                            *
- * Purpose: removes global macro index                                        *
+ * Purpose: removes host macro index                                          *
  *                                                                            *
  * Parameters: hmacro_index - [IN/OUT] a host macro index hashset             *
- *             macro        - [IN] the macro name                             *
+ *             hmacro       - [IN] the macro name to remove                   *
  *                                                                            *
  ******************************************************************************/
 static void	config_hmacro_remove_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *hmacro)
@@ -970,8 +970,8 @@ static void	config_hmacro_remove_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACR
 	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
 	int			index;
 
-	hmacro_hm_local.macro = hmacro->macro;
 	hmacro_hm_local.hostid = hmacro->hostid;
+	hmacro_hm_local.macro = hmacro->macro;
 
 	if (NULL != (hmacro_hm = zbx_hashset_search(hmacro_index, &hmacro_hm_local)))
 	{
@@ -1607,10 +1607,9 @@ static void	DCsync_hmacros(DB_RESULT result)
 		else
 			DCstrpool_replace(found, &hmacro->context, context);
 
-		/* update hmacros_hm index using new data, if not done already */
+		/* update hmacros_hm index using new data */
 		if (1 == update_index)
 			config_hmacro_add_index(&config->hmacros_hm, hmacro);
-
 	}
 
 	/* remove deleted hostmacros from buffer */
@@ -6104,10 +6103,8 @@ static int	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *mac
 
 	int			i, j, ret = FAIL;
 	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
-	ZBX_DC_HTMPL		*htmpl;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s' context:'%s'", __function_name, macro,
-			NULL == context ? "" : context);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s' context:'%s'", __function_name, macro, ZBX_NULL2STR(context));
 
 	if (0 == host_num)
 		goto clean;
@@ -6143,6 +6140,7 @@ static int	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *mac
 
 	if (FAIL == ret)
 	{
+		ZBX_DC_HTMPL		*htmpl;
 		zbx_vector_uint64_t	templateids;
 
 		zbx_vector_uint64_create(&templateids);
@@ -6178,8 +6176,7 @@ static void	DCget_global_macro(const char *macro, const char *context, char **re
 
 	ZBX_DC_GMACRO_M	*gmacro_m, gmacro_m_local;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s' context:'%s'", __function_name, macro,
-			NULL == context ? "" : context);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s' context:'%s'", __function_name, macro, ZBX_NULL2STR(context));
 
 	gmacro_m_local.macro = macro;
 
@@ -6210,21 +6207,21 @@ static void	DCget_global_macro(const char *macro, const char *context, char **re
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to)
 {
 	const char	*__function_name = "DCget_user_macro";
-	char		*name = NULL, *param = NULL;
+	char		*name = NULL, *context = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __function_name, macro);
 
-	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &param, NULL))
+	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL))
 		goto out;
 
 	LOCK_CACHE;
 
-	if (FAIL == DCget_host_macro(hostids, host_num, name, param, replace_to))
-		DCget_global_macro(name, param, replace_to);
+	if (FAIL == DCget_host_macro(hostids, host_num, name, context, replace_to))
+		DCget_global_macro(name, context, replace_to);
 
 	UNLOCK_CACHE;
 
-	zbx_free(param);
+	zbx_free(context);
 	zbx_free(name);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
