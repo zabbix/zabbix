@@ -577,8 +577,10 @@ static int	vc_db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_ty
 		goto out;
 	}
 
-	/* drop data from the last second and read the whole second again  */
-	/* to ensure that data is cached by seconds                        */
+	/* Drop data from the last second and read the whole second again     */
+	/* to ensure that data is cached by seconds.                          */
+	/* Because the initial select has limit option (DBselectN()) we have  */
+	/* to perform another select to read the last second data.            */
 	end_timestamp = values->values[values->values_num - 1].timestamp.sec;
 
 	while (0 < values->values_num && values->values[values->values_num - 1].timestamp.sec == end_timestamp)
@@ -2169,10 +2171,6 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seco
 		zbx_vc_chunk_t	*chunk;
 		int		index;
 
-		/* the cache contents covers the requested range */
-		if (timestamp - seconds + 1 >= item->tail->slots[item->tail->first_value].timestamp.sec)
-			return SUCCEED;
-
 		if (SUCCEED == vch_item_get_last_value(item, timestamp, &chunk, &index))
 		{
 			cached_records = index - chunk->first_value + 1;
@@ -2756,19 +2754,22 @@ int	zbx_vc_add_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 	{
 		zbx_history_record_t	record = {*timestamp, *value};
 
-		vc_item_addref(item);
+		if (0 == (item->state & ZBX_ITEM_STATE_REMOVE_PENDING))
+		{
+			vc_item_addref(item);
 
-		/* If the new value type does not match the item's type in cache we can't  */
-		/* change the cache because other processes might still be accessing it    */
-		/* at the same time. The only thing that can be done - mark it for removal */
-		/* so it could be added later with new type.                               */
-		/* Also mark it for removal if the value adding failed. In this case we    */
-		/* won't have the latest data in cache - so the requests must go directly  */
-		/* to the database.                                                        */
-		if (item->value_type != value_type || FAIL == (ret = vch_item_add_value_at_head(item, &record)))
-			item->state |= ZBX_ITEM_STATE_REMOVE_PENDING;
+			/* If the new value type does not match the item's type in cache we can't  */
+			/* change the cache because other processes might still be accessing it    */
+			/* at the same time. The only thing that can be done - mark it for removal */
+			/* so it could be added later with new type.                               */
+			/* Also mark it for removal if the value adding failed. In this case we    */
+			/* won't have the latest data in cache - so the requests must go directly  */
+			/* to the database.                                                        */
+			if (item->value_type != value_type || FAIL == (ret = vch_item_add_value_at_head(item, &record)))
+				item->state |= ZBX_ITEM_STATE_REMOVE_PENDING;
 
-		vc_item_release(item);
+			vc_item_release(item);
+		}
 	}
 
 	vc_try_unlock();
