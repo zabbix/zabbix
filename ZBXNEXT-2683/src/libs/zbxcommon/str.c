@@ -1907,7 +1907,8 @@ size_t	zbx_hex2binary(char *io)
 int	str_in_list(const char *list, const char *value, char delimiter)
 {
 	const char	*end;
-	int		ret = FAIL, len;
+	int		ret = FAIL;
+	size_t		len;
 
 	len = strlen(value);
 
@@ -1915,7 +1916,7 @@ int	str_in_list(const char *list, const char *value, char delimiter)
 	{
 		if (NULL != (end = strchr(list, delimiter)))
 		{
-			ret = (len == end - list && 0 == strncmp(list, value, len) ? SUCCEED : FAIL);
+			ret = (len == (size_t)(end - list) && 0 == strncmp(list, value, len) ? SUCCEED : FAIL);
 			list = end + 1;
 		}
 		else
@@ -3382,9 +3383,9 @@ int	zbx_strcmp_null(const char *s1, const char *s2)
  ******************************************************************************/
 int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r)
 {
-	int	i ;
+	int	i;
 
-	/* find the end of macro name by skipping ${ characters and iterating through */
+	/* find the end of macro name by skipping {$ characters and iterating through */
 	/* valid macro name characters                                                */
 	for (i = 2; SUCCEED == is_macro_char(macro[i]); i++)
 		;
@@ -3407,6 +3408,7 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
 		;
 
 	*context_l = i;
+
 	if ('"' == macro[i])
 	{
 		/* process quoted context */
@@ -3446,7 +3448,7 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_macro_parse_dyn                                              *
+ * Function: zbx_user_macro_parse_dyn                                         *
  *                                                                            *
  * Purpose:                                                                   *
  *     parses user macro {$MACRO:<context>} into {$MACRO} and <context>       *
@@ -3479,7 +3481,7 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
 		ptr = macro + context_l;
 
 		/* find the context separator ':' by stripping spaces before context */
-		while(' ' == *(--ptr))
+		while (' ' == *(--ptr))
 			;
 
 		/* extract the macro name and close with '}' character */
@@ -3511,13 +3513,13 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
  *     extracts the macro context unquoting if necessary                      *
  *                                                                            *
  * Parameters:                                                                *
- *     context - [IN] the macro context inside an user macro                  *
+ *     context - [IN] the macro context inside a user macro                   *
  *     len     - [IN] the macro context length (including quotes for quoted   *
  *                    contexts)                                               *
  *                                                                            *
  * Return value:                                                              *
- *     A string containing extracted macro context. This string is must be    *
- *     freed by the caller.                                                   *
+ *     A string containing extracted macro context. This string must be freed *
+ *     by the caller.                                                         *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_user_macro_unquote_context_dyn(const char *context, int len)
@@ -3538,8 +3540,8 @@ char	*zbx_user_macro_unquote_context_dyn(const char *context, int len)
 	{
 		if (1 == quoted && '\\' == *context && '"' == context[1])
 		{
-			len--;
 			context++;
+			len--;
 		}
 
 		*ptr++ = *context++;
@@ -3566,8 +3568,8 @@ char	*zbx_user_macro_unquote_context_dyn(const char *context, int len)
  *     force_quote - [IN] if non zero then context quoting is enforced        *
  *                                                                            *
  * Return value:                                                              *
- *     A string containing quoted macro context. This string is must be       *
- *     freed by the caller.                                                   *
+ *     A string containing quoted macro context. This string must be freed by *
+ *     the caller.                                                            *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
@@ -3575,7 +3577,6 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 	int		len, quotes = 0;
 	char		*buffer, *ptr_buffer;
 	const char	*ptr_context;
-
 
 	for (ptr_context = context; ' ' == *ptr_context; ptr_context++)
 		;
