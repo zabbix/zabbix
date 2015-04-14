@@ -541,9 +541,9 @@ footer {
 
 .treeview {
 	display: inline-block;
-	width: 16px;
-	height: 16px;
-	line-height: 16px;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
 	text-align: center;
 
 	.arrow-right {
@@ -553,6 +553,14 @@ footer {
 	.arrow-down {
 		margin-bottom: 2px;
 		border-top-color: $blue-grey;
+	}
+
+	&:hover .arrow-right {
+		border-left-color: $link-color;
+	}
+
+	&:hover .arrow-down {
+		border-top-color: $link-color;
 	}
 }
 
