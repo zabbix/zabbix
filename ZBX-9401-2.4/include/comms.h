@@ -71,7 +71,6 @@ typedef struct
 	char		buf_stat[ZBX_STAT_BUF_LEN];
 	char		*buffer;
 	unsigned char	accepted;
-	char		*error;
 	char		*next_line;
 	int		timeout;
 }
@@ -121,7 +120,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 
 int	zbx_udp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout);
 int	zbx_udp_send(zbx_sock_t *s, const char *data, size_t data_len, int timeout);
-int	zbx_udp_recv(zbx_sock_t *s, char **data, size_t *data_len, int timeout);
+int	zbx_udp_recv(zbx_sock_t *s, int timeout);
 void	zbx_udp_close(zbx_sock_t *s);
 
 #define ZBX_DEFAULT_FTP_PORT		21

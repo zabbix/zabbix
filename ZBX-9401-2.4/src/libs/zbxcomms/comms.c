@@ -1491,14 +1491,14 @@ int	zbx_udp_send(zbx_sock_t *s, const char *data, size_t data_len, int timeout)
 	return ret;
 }
 
-int	zbx_udp_recv(zbx_sock_t *s, char **data, size_t *data_len, int timeout)
+int	zbx_udp_recv(zbx_sock_t *s, int timeout)
 {
 	char	buffer[65508];	/* maximum payload for UDP over IPv4 is 65507 bytes */
 	ssize_t	read_bytes;
 
 	ZBX_TCP_START();
 
-	zbx_free(s->buf_dyn);
+	zbx_tcp_free(s);
 
 	if (0 != timeout)
 		zbx_tcp_timeout_set(s, timeout);
@@ -1515,19 +1515,18 @@ int	zbx_udp_recv(zbx_sock_t *s, char **data, size_t *data_len, int timeout)
 	if (sizeof(s->buf_stat) > read_bytes)
 	{
 		s->buf_type = ZBX_BUF_TYPE_STAT;
-		*data = s->buf_stat;
+		s->buffer = s->buf_stat;
 	}
 	else
 	{
 		s->buf_type = ZBX_BUF_TYPE_DYN;
-		s->buf_dyn = zbx_malloc(s->buf_dyn, read_bytes + 1);
-		*data = s->buf_dyn;
+		s->buffer = zbx_malloc(s->buffer, read_bytes + 1);
 	}
 
 	buffer[read_bytes] = '\0';
-	memcpy(*data, buffer, read_bytes + 1);
+	memcpy(s->buffer, buffer, read_bytes + 1);
 
-	*data_len = read_bytes;
+	s->read_bytes = (size_t)read_bytes;
 
 	return SUCCEED;
 }
