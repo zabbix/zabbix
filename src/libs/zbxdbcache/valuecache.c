@@ -2202,6 +2202,7 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seco
 
 		if (SUCCEED == ret && update_end > timestamp)
 		{
+			/* fill in possible gap between requested period and what we have in cache */
 			ret = vc_db_read_values_by_time(item->itemid, item->value_type, &records,
 					update_end - timestamp, update_end, &queries);
 		}
