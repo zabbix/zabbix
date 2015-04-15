@@ -6106,11 +6106,13 @@ static int	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *mac
 
 	int			i, j, ret = FAIL;
 	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
+	ZBX_DC_HTMPL		*htmpl;
+	zbx_vector_uint64_t	templateids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s' context:'%s'", __function_name, macro, ZBX_NULL2STR(context));
 
 	if (0 == host_num)
-		goto clean;
+		goto out;
 
 	hmacro_hm_local.macro = macro;
 
@@ -6130,7 +6132,7 @@ static int	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *mac
 					{
 						*replace_to = zbx_strdup(*replace_to, hmacro->value);
 						ret = SUCCEED;
-						break;
+						goto out;
 					}
 
 					/* check for the default (without parameters) macro value */
@@ -6141,32 +6143,26 @@ static int	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *mac
 		}
 	}
 
-	if (FAIL == ret)
+	zbx_vector_uint64_create(&templateids);
+	zbx_vector_uint64_reserve(&templateids, 32);
+
+	for (i = 0; i < host_num; i++)
 	{
-		ZBX_DC_HTMPL		*htmpl;
-		zbx_vector_uint64_t	templateids;
-
-		zbx_vector_uint64_create(&templateids);
-		zbx_vector_uint64_reserve(&templateids, 32);
-
-		for (i = 0; i < host_num; i++)
+		if (NULL != (htmpl = zbx_hashset_search(&config->htmpls, &hostids[i])))
 		{
-			if (NULL != (htmpl = zbx_hashset_search(&config->htmpls, &hostids[i])))
-			{
-				for (j = 0; j < htmpl->templateids.values_num; j++)
-					zbx_vector_uint64_append(&templateids, htmpl->templateids.values[j]);
-			}
+			for (j = 0; j < htmpl->templateids.values_num; j++)
+				zbx_vector_uint64_append(&templateids, htmpl->templateids.values[j]);
 		}
-
-		if (0 != templateids.values_num)
-		{
-			zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			ret = DCget_host_macro(templateids.values, templateids.values_num, macro, context, replace_to);
-		}
-
-		zbx_vector_uint64_destroy(&templateids);
 	}
-clean:
+
+	if (0 != templateids.values_num)
+	{
+		zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		ret = DCget_host_macro(templateids.values, templateids.values_num, macro, context, replace_to);
+	}
+
+	zbx_vector_uint64_destroy(&templateids);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
