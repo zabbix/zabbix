@@ -3390,6 +3390,10 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
 	for (i = 2; SUCCEED == is_macro_char(macro[i]); i++)
 		;
 
+	/* check for empty macro name */
+	if (2 == i)
+		return FAIL;
+
 	if ('}' == macro[i])
 	{
 		/* no macro context specified, parsing done */
@@ -3411,13 +3415,15 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
 
 	if ('"' == macro[i])
 	{
+		i++;
+
 		/* process quoted context */
-		for (i++; '"' != macro[i]; i++)
+		for (; '"' != macro[i]; i++)
 		{
 			if ('\0' == macro[i])
 				return FAIL;
 
-			if ('\\' == macro[i])
+			if ('\\' == macro[i] && '"' == macro[i + 1])
 				i++;
 		}
 
