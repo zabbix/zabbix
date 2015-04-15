@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,11 +92,6 @@ retry:
 	return args;
 }
 
-/*
- *	proc.mem[<process_name><,user_name><,mode><,command_line><,memory_type>]
- *		<mode> : *sum, avg, max, min
- */
-
 int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_SIZE	1
@@ -108,7 +103,7 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_SSIZE	7
 
 	char		*procname, *proccomm, *param, *args, *mem_type = NULL;
-	int		do_task, pagesize, count, i, proccount = 0, mem_type_code, mib[4];
+	int		do_task, pagesize, count, i, proccount = 0, invalid_user = 0, mem_type_code, mib[4];
 	unsigned int	mibs;
 	zbx_uint64_t	mem_size = 0, byte_value = 0;
 	double		pct_size = 0.0, pct_value = 0.0;
@@ -137,13 +132,14 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			if (0 == errno)
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
-			else
+			if (0 != errno)
+			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 						zbx_strerror(errno)));
+				return SYSINFO_RET_FAIL;
+			}
 
-			return SYSINFO_RET_FAIL;
+			invalid_user = 1;
 		}
 	}
 	else
@@ -201,6 +197,9 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		return SYSINFO_RET_FAIL;
 	}
+
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
 
 	pagesize = getpagesize();
 
@@ -332,18 +331,18 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	zbx_free(proc);
-
+out:
 	if (ZBX_PMEM != mem_type_code)
 	{
 		if (ZBX_DO_AVG == do_task)
-			SET_DBL_RESULT(result, proccount == 0 ? 0.0 : (double)mem_size / (double)proccount);
+			SET_DBL_RESULT(result, 0 == proccount ? 0.0 : (double)mem_size / (double)proccount);
 		else
 			SET_UI64_RESULT(result, mem_size);
 	}
 	else
 	{
 		if (ZBX_DO_AVG == do_task)
-			SET_DBL_RESULT(result, proccount == 0 ? 0.0 : pct_size / (double)proccount);
+			SET_DBL_RESULT(result, 0 == proccount ? 0.0 : pct_size / (double)proccount);
 		else
 			SET_DBL_RESULT(result, pct_size);
 	}
@@ -359,24 +358,12 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #undef ZBX_SSIZE
 }
 
-/*
- *	proc.num[<process_name><,user_name><,state><,command_line>]
- *		<state> : *all, sleep, zomb, run
- *
- *	Tested: FreeBSD 6.2_i386, 7.0_i386;
- */
-
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*procname, *proccomm, *param, *args;
-	int	zbx_proc_stat, count, i,
-		proc_ok, stat_ok, comm_ok,
-		mib[4], mibs;
-
-	int	proccount = 0;
-
-	size_t	sz;
-
+	char			*procname, *proccomm, *param, *args;
+	int			proccount = 0, invalid_user = 0, zbx_proc_stat;
+	int			count, i, proc_ok, stat_ok, comm_ok, mib[4], mibs;
+	size_t			sz;
 	struct kinfo_proc	*proc = NULL;
 	struct passwd		*usrinfo;
 
@@ -395,13 +382,14 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			if (0 == errno)
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
-			else
+			if (0 != errno)
+			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 						zbx_strerror(errno)));
+				return SYSINFO_RET_FAIL;
+			}
 
-			return SYSINFO_RET_FAIL;
+			invalid_user = 1;
 		}
 	}
 	else
@@ -424,6 +412,9 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	proccomm = get_rparam(request, 3);
+
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_PROC;
@@ -505,7 +496,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			proccount++;
 	}
 	zbx_free(proc);
-
+out:
 	SET_UI64_RESULT(result, proccount);
 
 	return SYSINFO_RET_OK;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 
 $workingTimeTab = new CFormList('scriptsTab');
-$wtTextBox = new CTextBox('work_period', $this->data['config']['work_period'], ZBX_TEXTBOX_STANDARD_SIZE);
+$wtTextBox = new CTextBox('work_period', $data['work_period'], ZBX_TEXTBOX_STANDARD_SIZE);
 $wtTextBox->attr('autofocus', 'autofocus');
 $workingTimeTab->addRow(_('Working time'), $wtTextBox);
 

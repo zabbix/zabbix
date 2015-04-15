@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -524,6 +524,7 @@ int     SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	SET_STR_RESULT(result, zbx_strdup(NULL, buffer));
 
 	zbx_vector_str_destroy(&addresses);
+	close(s);
 
 	return SYSINFO_RET_OK;
 }

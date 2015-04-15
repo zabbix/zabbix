@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,9 +59,6 @@ $fields = array(
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,			null),
-	// import
-	'rules' =>			array(T_ZBX_STR, O_OPT, null,	DB_ID,			null),
-	'import' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	// sort and sortorder
 	'sort' =>					array(T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null),
 	'sortorder' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)

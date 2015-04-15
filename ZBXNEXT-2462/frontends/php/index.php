@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@
 **/
 
 
-define('ZBX_PAGE_NO_AUTHORIZATION', true);
-
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
@@ -29,7 +27,7 @@ $page['file'] = 'index.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'name' =>		array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,		'isset({enter})', _('Username')),
+	'name' =>		array(T_ZBX_STR, O_NO,	null,	null,		'isset({enter})', _('Username')),
 	'password' =>	array(T_ZBX_STR, O_OPT, null,	null,			'isset({enter})'),
 	'sessionid' =>	array(T_ZBX_STR, O_OPT, null,	null,			null),
 	'reconnect' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 65535), null),
@@ -42,7 +40,9 @@ check_fields($fields);
 // logout
 if (isset($_REQUEST['reconnect'])) {
 	DBstart();
-	add_audit(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, _('Manual Logout'));
+	add_audit_details(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', _('Manual Logout'),
+		CWebUser::$data['userid']
+	);
 	DBend(true);
 	CWebUser::logout();
 	redirect('index.php');
@@ -78,9 +78,14 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 		}
 
 		$request = getRequest('request');
-		$url = zbx_empty($request) ? CWebUser::$data['url'] : $request;
-		if (zbx_empty($url) || $url == $page['file']) {
-			$url = 'dashboard.php';
+		if (!zbx_empty($request)) {
+			$url = $request;
+		}
+		elseif (!zbx_empty(CWebUser::$data['url'])) {
+			$url = CWebUser::$data['url'];
+		}
+		else {
+			$url = ZBX_DEFAULT_URL;
 		}
 		redirect($url);
 		exit;
@@ -116,5 +121,5 @@ if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 	}
 }
 else {
-	redirect(zbx_empty(CWebUser::$data['url']) ? 'dashboard.php' : CWebUser::$data['url']);
+	redirect(zbx_empty(CWebUser::$data['url']) ? ZBX_DEFAULT_URL : CWebUser::$data['url']);
 }

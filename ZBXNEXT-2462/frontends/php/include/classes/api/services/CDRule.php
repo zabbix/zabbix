@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -166,37 +166,6 @@ class CDRule extends CApiService {
 	return $result;
 	}
 
-	/**
-	 * Check if discovery rule exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('drule.exists method is deprecated.');
-
-		$options = array(
-			'output' => array('druleid'),
-			'filter' => array(),
-			'limit' => 1
-		);
-
-		if (isset($object['name'])) {
-			$options['filter']['name'] = $object['name'];
-		}
-
-		if (isset($object['druleids'])) {
-			$options['druleids'] = zbx_toArray($object['druleids']);
-		}
-
-		$dRule = $this->get($options);
-
-		return (bool) $dRule;
-	}
-
 	public function checkInput(array &$dRules) {
 		$dRules = zbx_toArray($dRules);
 
@@ -209,12 +178,14 @@ class CDRule extends CApiService {
 		}
 
 		$proxies = array();
+		$ipRangeValidator = new CIPRangeValidator(array('ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT));
 		foreach ($dRules as $dRule) {
 			if (!isset($dRule['iprange'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
 			}
-			elseif (!validate_ip_range($dRule['iprange'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $dRule['iprange']));
+
+			if (!$ipRangeValidator->validate($dRule['iprange'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $ipRangeValidator->getError());
 			}
 
 			if (isset($dRule['delay']) && $dRule['delay'] < 0) {
@@ -257,7 +228,7 @@ class CDRule extends CApiService {
 			if (isset($dCheck['uniq']) && ($dCheck['uniq'] == 1)) {
 				if (!in_array($dCheck['type'], array(SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.')
+						_('Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.')
 					);
 				}
 

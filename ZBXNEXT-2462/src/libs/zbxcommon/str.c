@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include "threads.h"
 
 static const char	copyright_message[] =
-	"Copyright (C) 2014 Zabbix SIA\n"
+	"Copyright (C) 2015 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 	"This is free software: you are free to change and redistribute it according to the license.\n"
 	"There is NO WARRANTY, to the extent permitted by law.";
@@ -2360,6 +2360,10 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 			return "SNMPv3 agent";
 		case SVC_ICMPPING:
 			return "ICMP ping";
+		case SVC_HTTPS:
+			return "HTTPS";
+		case SVC_TELNET:
+			return "Telnet";
 		default:
 			return "unknown";
 	}
@@ -3303,11 +3307,9 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
  ******************************************************************************/
 void	zbx_trim_str_list(char *list, char delimiter)
 {
-	char	*whitespace = " \t";	/* NB! strchr(3): "terminating null byte is considered part of the string" */
-	char	*out, *in;
-
-	if (NULL == list || '\0' == *list)
-		return;
+	/* NB! strchr(3): "terminating null byte is considered part of the string" */
+	const char	*whitespace = " \t";
+	char		*out, *in;
 
 	out = in = list;
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -143,7 +143,8 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 			'width' => $this->screenitem['width'],
 			'dynamic' => $this->screenitem['dynamic'],
 			'halign' => $this->screenitem['halign'],
-			'valign' => $this->screenitem['valign']
+			'valign' => $this->screenitem['valign'],
+			'url' => ''
 		);
 	}
 

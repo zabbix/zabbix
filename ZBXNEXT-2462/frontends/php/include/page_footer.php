@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,9 +24,6 @@ require_once dirname(__FILE__).'/config.inc.php';
 // if we include footer in some function
 if (!isset($page)) {
 	global $page;
-}
-if (!isset($ZBX_PAGE_POST_JS)) {
-	global $ZBX_PAGE_POST_JS;
 }
 
 if (!defined('PAGE_HEADER_LOADED')) {
@@ -92,6 +89,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$table->show();
 	}
 
+	insertPagePostJs();
 	require_once 'include/views/js/common.init.js.php';
 
 	echo '</body>'."\n".

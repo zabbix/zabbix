@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -175,9 +175,7 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$gotos['events'] = array(
-					'triggerid' => $elem['elementid'],
-					'stime' => date(TIMESTAMP_FORMAT, time() - SEC_PER_WEEK),
-					'period' => SEC_PER_WEEK
+					'triggerid' => $elem['elementid']
 				);
 
 				$gotos['showEvents'] = false;

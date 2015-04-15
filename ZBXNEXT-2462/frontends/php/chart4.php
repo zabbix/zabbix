@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,17 +40,17 @@ if (!hasRequest('triggerid')) {
 	fatal_error(_('No triggers defined.'));
 }
 
-$dbTrigger = API::Trigger()->get(array(
+$dbTriggers = API::Trigger()->get(array(
+	'output' => array('description'),
 	'triggerids' => getRequest('triggerid'),
-	'output' => API_OUTPUT_EXTEND,
 	'expandDescription' => true
 ));
-if (!$dbTrigger) {
+
+if (!$dbTriggers) {
 	access_deny();
 }
-else {
-	$dbTrigger = reset($dbTrigger);
-}
+
+$dbTrigger = reset($dbTriggers);
 
 /*
  * Display

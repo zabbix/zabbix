@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,13 +40,15 @@ class CScreenTriggersOverview extends CScreenBase {
 
 		$options = array(
 			'output' => array(
-				'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
+				'triggerid', 'expression', 'description', 'url', 'value', 'priority', 'lastchange', 'flags'
 			),
 			'selectHosts' => array('hostid', 'name', 'status'),
+			'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
 			'hostids' => $hostIds,
 			'monitored' => true,
 			'skipDependent' => true,
-			'sortfield' => 'description'
+			'sortfield' => 'description',
+			'preservekeys' => true
 		);
 
 		// application filter
@@ -60,6 +62,8 @@ class CScreenTriggersOverview extends CScreenBase {
 		}
 
 		$triggers = API::Trigger()->get($options);
+
+		$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
 
 		return $this->getOutput(getTriggersOverview($hosts, $triggers, $this->pageFile, $this->screenitem['style'],
 			$this->screenid

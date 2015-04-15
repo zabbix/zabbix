@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,6 +47,20 @@ abstract class DbBackend {
 		if ($version['mandatory'] != ZABBIX_DB_VERSION) {
 			$this->setError(_s('The frontend does not match Zabbix database. Current database version (mandatory/optional): %d/%d. Required mandatory version: %d. Contact your system administrator.',
 				$version['mandatory'], $version['optional'], ZABBIX_DB_VERSION));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check the integrity of the table "config".
+	 *
+	 * @return bool
+	 */
+	public function checkConfig() {
+		if (!DBfetch(DBselect('SELECT NULL FROM config c'))) {
+			$this->setError(_('Unable to select configuration.'));
 			return false;
 		}
 
