@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -234,7 +234,7 @@ $newFlexInt = new CSpan(array(
 	SPACE,
 	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
 	SPACE,
-	new CSubmit('add_delay_flex', _('Add'), null, 'button-form')
+	new CButton('add_delay_flex', _('Add'), null, 'button-form')
 ));
 $newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
 

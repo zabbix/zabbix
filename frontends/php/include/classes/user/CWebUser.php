@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,10 +50,6 @@ class CWebUser {
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 				error(_('GUI access disabled.'));
 				throw new Exception();
-			}
-
-			if (empty(self::$data['url'])) {
-				self::$data['url'] = CProfile::get('web.menu.view.last', 'index.php');
 			}
 
 			$result = (bool) self::$data;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -239,61 +239,6 @@ abstract class CGraphGeneral extends CApiService {
 		}
 
 		return $graph['graphid'];
-	}
-
-	/**
-	 * Check if graph or graph prototype exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array $object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('graph.exists method is deprecated.');
-
-		$options = array(
-			'output' => array('graphid'),
-			'filter' => array('flags' => null),
-			'limit' => 1
-		);
-
-		if (isset($object['name'])) {
-			$options['filter']['name'] = $object['name'];
-		}
-
-		if (isset($object['host'])) {
-			$options['filter']['host'] = $object['host'];
-		}
-
-		if (isset($object['hostids'])) {
-			$options['hostids'] = zbx_toArray($object['hostids']);
-		}
-
-		$graph = $this->get($options);
-
-		return (bool) $graph;
-	}
-
-	/**
-	 * Get graphs by name and host IDs.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array  $graphData
-	 * @param string $graphData['hostids']
-	 * @param string $graphData['name']
-	 *
-	 * @return array
-	 */
-	public function getObjects(array $graphData) {
-		$this->deprecated('graph.getobjects method is deprecated.');
-
-		return $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'filter' => $graphData
-		));
 	}
 
 	/**

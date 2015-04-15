@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -392,8 +392,8 @@ var CDoll = Class.create({
 								});
 							});
 
-							sendAjaxData({
-								data: {widgetSort: Object.toJSON(widgetPositions)}
+							sendAjaxData('zabbix.php?action=dashboard.sort', {
+								data: {grid: Object.toJSON(widgetPositions)}
 							});
 						}
 					}

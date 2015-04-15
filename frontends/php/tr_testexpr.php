@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,7 +126,6 @@ else {
 
 // form
 $testForm = new CFormTable(_('Test'), 'tr_testexpr.php');
-$testForm->addHelpIcon();
 $testForm->setTableClass('formlongtable formtable');
 $testForm->addVar('expression', $expression);
 $testForm->addRow(_('Test data'), $dataTable);

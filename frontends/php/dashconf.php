@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,11 +97,11 @@ if (hasRequest('update')) {
 		CProfile::update('web.dashconf.events.extAck', $_REQUEST['extAck'], PROFILE_TYPE_INT);
 	}
 
-	jSredirect('dashboard.php');
+	jSredirect(ZBX_DEFAULT_URL);
 }
 elseif (hasRequest('cancel')) {
 	ob_end_clean();
-	redirect('dashboard.php');
+	redirect(ZBX_DEFAULT_URL);
 }
 
 ob_end_flush();

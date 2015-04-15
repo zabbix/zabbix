@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ $fields = array(
 	'config' =>				array(T_ZBX_INT, O_OPT,	P_SYS,			IN('0,1,2,3'),	null),
 	'hostids' =>			array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,			null),
 	'groupids' =>			array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,			null),
-	'items' =>				array(T_ZBX_STR, O_OPT,	P_SYS,			DB_ID,			null),
+	'items' =>				array(T_ZBX_STR, O_OPT,	P_SYS,			null,			null),
 	'title' =>				array(T_ZBX_STR, O_OPT, null,			null,			null),
 	'xlabel' =>				array(T_ZBX_STR, O_OPT, null,			null,			null),
 	'ylabel' =>				array(T_ZBX_STR, O_OPT, null,			null,			null),

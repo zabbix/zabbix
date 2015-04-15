@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ typedef struct
 zbx_httpstat_t;
 
 extern int	CONFIG_HTTPPOLLER_FORKS;
+extern char	*CONFIG_SOURCE_IP;
 
 #ifdef HAVE_LIBCURL
 
@@ -398,6 +399,15 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
+	}
+
+	if (NULL != CONFIG_SOURCE_IP)
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto clean;
+		}
 	}
 
 	if (0 != httptest->httptest.verify_peer && NULL != CONFIG_SSL_CA_LOCATION)

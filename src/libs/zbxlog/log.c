@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -422,7 +422,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 			0,
 			MSG_ZABBIX_MESSAGE,
 			NULL,
-			sizeof(*strings)-1,
+			sizeof(strings) / sizeof(*strings),
 			0,
 			strings,
 			NULL);

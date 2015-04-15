@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 $hintTable->addRow(array(new CCol(SPACE), _('OK or no trigger')));
 
-$help = new CHelp();
+$help = new CIcon(null, 'iconhelp');
 $help->setHint($hintTable);
 
 // header right
@@ -85,7 +85,7 @@ $filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset'), 'chkbxRang
 $overviewWidget->addFlicker($filterForm, CProfile::get('web.overview.filter.state', 0));
 
 // data table
-if ($this->data['config']['dropdown_first_entry']) {
+if ($data['pageFilter']->groupsSelected) {
 	$dataTable = getItemsDataOverview(array_keys($this->data['pageFilter']->hosts), $this->data['applicationIds'],
 		$this->data['view_style']
 	);
