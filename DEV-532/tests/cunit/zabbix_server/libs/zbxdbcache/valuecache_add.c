@@ -671,6 +671,64 @@ static void	cuvc_suite_add2_test6()
 	ZBX_CU_LEAK_CHECK_END();
 }
 
+
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_by_time(100001, STR, 100, 1005)
+ *    returned:
+ *       {}
+ *    cached:
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *
+ * add_value(100001, STR, 1000.0)
+ *    cached:
+ *       [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *                 1005.2, 1005.5, 1005.7}
+ *
+ * remove(100001)
+ *   cached:
+ *
+ */
+static void	cuvc_suite_add2_test7()
+{
+	zbx_timespec_t			ts = {1000, 000};
+	history_value_t			value = {.str = "1000:000"};
+	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
+	zbx_vc_item_t			*item;
+	zbx_vector_history_record_t	records;
+
+	ZBX_CU_LEAK_CHECK_START();
+
+	zbx_history_record_vector_create(&records);
+
+	CU_ASSERT(SUCCEED == zbx_vc_get_value_range(itemid, ITEM_VALUE_TYPE_STR, &records, 100, 0, 1005));
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 906);
+
+	CU_ASSERT(SUCCEED == zbx_vc_add_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &value));
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1001);
+
+	cuvc_check_cache_str(item, "1001:200", "1001:500", "1001:700",
+			"1002:200", "1002:500", "1002:700", "1003:200", "1003:500", "1003:700",
+			"1004:200", "1004:500", "1004:700", "1005:200", "1005:500", "1005:700", NULL);
+
+	vc_remove_item(item);
+
+	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
+
+	ZBX_CU_LEAK_CHECK_END();
+}
+
 static void	cuvc_suite_add2_cleanup()
 {
 	zbx_vc_item_t	*item;
@@ -1015,6 +1073,8 @@ static void	cuvc_suite_add5_test1()
 
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, VC_MIN_RANGE);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 9);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1003);
+
 
 	zbx_history_record_clear(&record, ITEM_VALUE_TYPE_STR);
 
@@ -1053,6 +1113,8 @@ static void	cuvc_suite_add5_test2()
 	CU_ASSERT(SUCCEED == zbx_vc_add_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &value));
 
 	cuvc_check_cache_str(item, "1005:200", "1005:500", "1005:700", "1065:000", NULL);
+
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1005);
 
 	vc_remove_item(item);
 

@@ -369,6 +369,7 @@ static void	cuvc_suite_get2_test1()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 997);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 6);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1004);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -416,6 +417,7 @@ static void	cuvc_suite_get2_test2()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 999);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 12);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1002);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
@@ -461,6 +463,7 @@ static void	cuvc_suite_get2_test3()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 999);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 12);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1002);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
@@ -506,6 +509,7 @@ static void	cuvc_suite_get2_test4()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 999);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 12);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1002);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
@@ -552,6 +556,7 @@ static void	cuvc_suite_get2_test5()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 1009);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 15);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 992);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
@@ -598,6 +603,7 @@ static void	cuvc_suite_get2_test6()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 1009);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 15);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 992);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 }
@@ -680,6 +686,7 @@ static void	cuvc_suite_get3_test1()
 
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 997);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 6);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1004);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -727,6 +734,7 @@ static void	cuvc_suite_get3_test2()
 
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 997);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 6);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1004);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -774,6 +782,7 @@ static void	cuvc_suite_get3_test3()
 
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 997);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 6);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1004);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -825,6 +834,7 @@ static void	cuvc_suite_get3_test4()
 	ZBX_CU_ASSERT_INT_EQ(item->status, ZBX_ITEM_STATUS_CACHED_ALL);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 15);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1001);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -876,6 +886,7 @@ static void	cuvc_suite_get3_test5()
 	ZBX_CU_ASSERT_INT_EQ(item->status, ZBX_ITEM_STATUS_CACHED_ALL);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 15);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1001);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -965,6 +976,7 @@ static void	cuvc_suite_get4_test1()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 997);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 6);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1004);
 
 	zbx_history_record_clear(&actual, ITEM_VALUE_TYPE_STR);
 
@@ -1016,6 +1028,7 @@ static void	cuvc_suite_get4_test2()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 997);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 6);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1004);
 
 	zbx_history_record_clear(&actual, ITEM_VALUE_TYPE_STR);
 
@@ -1067,6 +1080,7 @@ static void	cuvc_suite_get4_test3()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 997);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 6);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1004);
 
 	zbx_history_record_clear(&actual, ITEM_VALUE_TYPE_STR);
 
@@ -1118,6 +1132,7 @@ static void	cuvc_suite_get4_test4()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 997);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 6);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1004);
 
 	zbx_history_record_clear(&actual, ITEM_VALUE_TYPE_STR);
 
@@ -1169,6 +1184,7 @@ static void	cuvc_suite_get4_test5()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 997);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 6);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1004);
 
 	zbx_history_record_clear(&actual, ITEM_VALUE_TYPE_STR);
 
@@ -1220,6 +1236,7 @@ static void	cuvc_suite_get4_test6()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 997);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 6);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1004);
 
 	zbx_history_record_clear(&actual, ITEM_VALUE_TYPE_STR);
 
@@ -1271,6 +1288,7 @@ static void	cuvc_suite_get4_test7()
 
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 999);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 12);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1002);
 
 	zbx_history_record_clear(&actual, ITEM_VALUE_TYPE_STR);
 
@@ -1322,6 +1340,7 @@ static void	cuvc_suite_get4_test8()
 
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 999);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 12);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1002);
 
 	zbx_history_record_clear(&actual, ITEM_VALUE_TYPE_STR);
 
@@ -1374,6 +1393,7 @@ static void	cuvc_suite_get4_test9()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_NE(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 12);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1002);
 
 	zbx_history_record_clear(&actual, ITEM_VALUE_TYPE_STR);
 
@@ -1423,6 +1443,7 @@ static void	cuvc_suite_get4_test10()
 	ZBX_CU_ASSERT_INT_EQ(item->status, ZBX_ITEM_STATUS_CACHED_ALL);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 15);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1001);
 
 	ZBX_CU_LEAK_CHECK_END();
 }
@@ -1508,6 +1529,7 @@ static void	cuvc_suite_get5_test1()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_NE(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 3);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1005);
 
 	zbx_history_record_clear(&actual, ITEM_VALUE_TYPE_STR);
 
@@ -1558,6 +1580,7 @@ static void	cuvc_suite_get5_test2()
 
 	ZBX_CU_ASSERT_INT_NE(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 6);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1004);
 
 	zbx_history_record_clear(&actual, ITEM_VALUE_TYPE_STR);
 
@@ -1607,6 +1630,7 @@ static void	cuvc_suite_get5_test3()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_NE(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 9);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1003);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -1658,6 +1682,7 @@ static void	cuvc_suite_get5_test4()
 
 	ZBX_CU_ASSERT_INT_NE(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 12);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1002);
 
 	zbx_history_record_clear(&actual, ITEM_VALUE_TYPE_STR);
 
@@ -1708,6 +1733,7 @@ static void	cuvc_suite_get5_test5()
 
 	ZBX_CU_ASSERT_INT_NE(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 15);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1001);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -1759,6 +1785,7 @@ static void	cuvc_suite_get5_test6()
 	ZBX_CU_ASSERT_INT_EQ(item->status, ZBX_ITEM_STATUS_CACHED_ALL);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 15);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1001);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -1810,6 +1837,7 @@ static void	cuvc_suite_get5_test7()
 	ZBX_CU_ASSERT_INT_EQ(item->status, ZBX_ITEM_STATUS_CACHED_ALL);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 15);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1001);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -1891,6 +1919,7 @@ static void	cuvc_suite_get6_test1()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_NE(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 0);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 10000000);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -1938,6 +1967,7 @@ static void	cuvc_suite_get6_test2()
 	ZBX_CU_ASSERT_INT_EQ(item->status, ZBX_ITEM_STATUS_CACHED_ALL);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 0);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 0);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_FLOAT);
 
@@ -1983,6 +2013,7 @@ static void	cuvc_suite_get6_test3()
 	ZBX_CU_ASSERT_INT_EQ(item->status, ZBX_ITEM_STATUS_CACHED_ALL);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 0);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 0);
 
 	ZBX_CU_LEAK_CHECK_END();
 }
@@ -2072,6 +2103,7 @@ static void	cuvc_suite_get7_test1()
 
 	ZBX_CU_ASSERT_INT_NE(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 3);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1005);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -2337,6 +2369,7 @@ static void	cuvc_suite_get7_test6()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_NE(item->active_range, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 1);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1004);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_TEXT);
 
@@ -3230,6 +3263,7 @@ static void	cuvc_suite_get11_test1()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 500);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 0);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1501);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -3281,6 +3315,7 @@ static void	cuvc_suite_get11_test2()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 996);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 3);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1005);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -3329,6 +3364,7 @@ static void	cuvc_suite_get11_test3()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 996);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 3);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1005);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -3378,6 +3414,7 @@ static void	cuvc_suite_get11_test4()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 996);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 3);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1005);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -3426,6 +3463,7 @@ static void	cuvc_suite_get11_test5()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 996);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 3);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1005);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -3475,6 +3513,7 @@ static void	cuvc_suite_get11_test6()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 998);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 9);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1003);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
@@ -3524,6 +3563,7 @@ static void	cuvc_suite_get11_test7()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 999);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 12);
+	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 1002);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 

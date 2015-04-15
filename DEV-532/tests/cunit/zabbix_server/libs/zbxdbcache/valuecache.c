@@ -873,6 +873,8 @@ int	ZBX_CU_MODULE(valuecache)
 			cuvc_suite_add2_test5);
 	ZBX_CU_ADD_TEST(suite, "add value after the beginning of cached data, all data were cached",
 			cuvc_suite_add2_test6);
+	ZBX_CU_ADD_TEST(suite, "add value after the beginning of cached data, check db coverage",
+			cuvc_suite_add2_test7);
 	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_add2_cleanup);
 
 	/* test suite: add3                                                                       */
