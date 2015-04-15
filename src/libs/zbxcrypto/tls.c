@@ -851,7 +851,7 @@ static unsigned int	zbx_ciphersuites(int type, int **suites)
 }
 #endif
 
-#if defined(HAVE_POLARSSL)
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_verify_issuer_subject                                    *
@@ -869,13 +869,19 @@ static unsigned int	zbx_ciphersuites(int type, int **suites)
  *     SUCCEED or FAIL                                                        *
  *                                                                            *
  ******************************************************************************/
+#if defined(HAVE_POLARSSL)
 static int	zbx_tls_verify_issuer_subject(const x509_crt *cert, const char *issuer, const char *subject,
 		char **error)
+#elif defined(HAVE_GNUTLS)
+static int	zbx_tls_verify_issuer_subject(const gnutls_x509_crt_t cert, const char *issuer, const char *subject,
+		char **error)
+#endif
 {
 	int		res, issuer_mismatch = 0, subject_mismatch = 0;
 	size_t		error_alloc = 0, error_offset = 0;
 	char		tls_issuer[HOST_TLS_ISSUER_LEN_MAX], tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
 
+#if defined(HAVE_POLARSSL)
 	if (NULL != issuer && '\0' != *issuer)
 	{
 		if (0 >= (res = x509_dn_gets(tls_issuer, sizeof(tls_issuer), &cert->issuer)))
@@ -898,26 +904,84 @@ static int	zbx_tls_verify_issuer_subject(const x509_crt *cert, const char *issue
 			return FAIL;
 		}
 
-		if (0 != strcmp(tls_subject, subject))	/* TODO RFC 4518 requires more sophisticated issuer matching */
+		if (0 != strcmp(tls_subject, subject))	/* TODO RFC 4518 requires more sophisticated subject matching */
 			subject_mismatch = 1;
 	}
 
-	if (1 == issuer_mismatch || 1 == subject_mismatch)
+#elif defined(HAVE_GNUTLS)
+	if (NULL != issuer && '\0' != *issuer)
 	{
-		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "peer certificate issuer \"%s\", subject \"%s\"",
-				tls_issuer, tls_subject);
+		size_t	tls_issuer_size;
+
+		tls_issuer_size = sizeof(tls_issuer);
+
+		if (0 != (res = gnutls_x509_crt_get_issuer_dn(cert, tls_issuer, &tls_issuer_size)))
+		{
+			if (GNUTLS_E_SHORT_MEMORY_BUFFER == res)
+			{
+				*error = zbx_dsprintf(*error, "too long peer certificate issuer name: %zu bytes",
+						tls_issuer_size);
+			}
+			else
+			{
+				*error = zbx_dsprintf(*error, "gnutls_x509_crt_get_issuer_dn() failed: %d %s", res,
+						gnutls_strerror(res));
+			}
+
+			return FAIL;
+		}
+
+		if (0 != strcmp(tls_issuer, issuer))	/* TODO RFC 4518 requires more sophisticated issuer matching */
+			issuer_mismatch = 1;
 	}
 
-	if (1 == issuer_mismatch)
-		zbx_snprintf_alloc(error, &error_alloc, &error_offset, ", required issuer \"%s\"", issuer);
+	if (NULL != subject && '\0' != *subject)
+	{
+		size_t	tls_subject_size;
 
-	if (1 == subject_mismatch)
-		zbx_snprintf_alloc(error, &error_alloc, &error_offset, ", required subject \"%s\"", subject);
+		tls_subject_size = sizeof(tls_subject);
 
+		if (0 != (res = gnutls_x509_crt_get_dn(cert, tls_subject, &tls_subject_size)))
+		{
+			if (GNUTLS_E_SHORT_MEMORY_BUFFER == res)
+			{
+				*error = zbx_dsprintf(*error, "too long peer certificate subject name: %zu bytes",
+						tls_subject_size);
+			}
+			else
+			{
+				*error = zbx_dsprintf(*error, "gnutls_x509_crt_get_dn() failed: %d %s", res,
+						gnutls_strerror(res));
+			}
+
+			return FAIL;
+		}
+
+		if (0 != strcmp(tls_subject, subject))	/* TODO RFC 4518 requires more sophisticated subject matching */
+			subject_mismatch = 1;
+	}
+#endif
 	if (1 == issuer_mismatch || 1 == subject_mismatch)
+	{
+		if (1 == issuer_mismatch)
+		{
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "issuer: peer: \"%s\", required: \"%s\"",
+					tls_issuer, issuer);
+		}
+
+		if (1 == subject_mismatch)
+		{
+			if (1 == issuer_mismatch)
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, ", ");
+
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "subject: peer: \"%s\", required: "
+					"\"%s\"", tls_subject, subject);
+		}
+
 		return FAIL;
-	else
-		return SUCCEED;
+	}
+
+	return SUCCEED;
 }
 #endif
 
@@ -2624,8 +2688,9 @@ out:
 
 #elif defined(HAVE_GNUTLS)
 
-	const char	*__function_name = "zbx_tls_connect";
-	int		ret = FAIL, res;
+	const char		*__function_name = "zbx_tls_connect";
+	int			ret = FAIL, res;
+	gnutls_x509_crt_t	peer_cert = NULL;
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
@@ -2815,8 +2880,6 @@ out:
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
-		gnutls_x509_crt_t	peer_cert = NULL;
-
 		if ((NULL != tls_arg2 && '\0' != *tls_arg2) || (NULL != tls_arg1 && '\0' != *tls_arg1) ||
 				SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		{
@@ -2846,7 +2909,13 @@ out:
 			goto out1;
 		}
 
-		/* TODO: verify peer certificate Issuer and Subject */
+		/* if required verify peer certificate Issuer and Subject */
+
+		if (SUCCEED != zbx_tls_verify_issuer_subject(peer_cert, tls_arg1, tls_arg2, error))
+		{
+			zbx_tls_close(s);
+			goto out1;
+		}
 
 		if (NULL != peer_cert)
 			gnutls_x509_crt_deinit(peer_cert);
@@ -2883,6 +2952,9 @@ out:	/* an error occured */
 		s->tls_psk_client_creds = NULL;
 	}
 out1:
+	if (NULL != peer_cert)
+		gnutls_x509_crt_deinit(peer_cert);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
