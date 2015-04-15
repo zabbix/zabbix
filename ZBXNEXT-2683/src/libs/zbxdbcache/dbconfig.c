@@ -1615,6 +1615,7 @@ static void	DCsync_hmacros(DB_RESULT result)
 	}
 
 	/* remove deleted hostmacros from buffer */
+
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_iter_reset(&config->hmacros, &iter);
