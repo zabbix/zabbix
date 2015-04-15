@@ -109,10 +109,10 @@ class CTree {
 		$td->setAttribute('style', 'padding-left:'. (2 * $level) .'em;');
 
 		if ($id != 0 && array_key_exists('childnodes', $this->tree[$id])) {
-			$arrow = new CSpan(null, 'arrow-right');
-			$arrow->setAttribute('onclick', $this->treename.'.closeSNodeX("'.$id.'", this);');
-			$arrow->setAttribute('id', 'idi_'.$id);
-			$td->addItem(new CDiv($arrow, 'treeview'));
+			$div = new CDiv(new CSpan(null, 'arrow-right'), 'treeview');
+			$div->setAttribute('onclick', $this->treename.'.closeSNodeX("'.$id.'", this.getElementsByTagName(\'span\')[0]);');
+			$div->setAttribute('id', 'idi_'.$id);
+			$td->addItem($div);
 		}
 
 		$td->addItem($this->tree[$id]['caption']);

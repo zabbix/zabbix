@@ -117,7 +117,7 @@ CTree.prototype = {
 
 	onStartSetStatus: function(id) {
 		if (!empty(this.nodes[id])) {
-			var arrow = document.getElementById('idi_' + id);
+			var arrow = document.getElementById('idi_' + id).getElementsByTagName('span')[0];
 
 			if (!empty(arrow)) {
 				arrow.className = 'arrow-down';
