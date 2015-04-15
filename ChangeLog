@@ -1,8 +1,9 @@
 Changes for 2.5.0
 
 New features:
+A.F....PS. [ZBX-5813] added support for spaces in IP ranges in network discovery and action conditions (asaveljevs)
 .......PS. [ZBXNEXT-866] added IP address in the messages about connections between server and proxy (igors)
-A......... [ZBXNEXT-2724] removed deprecated all "exists" and "getObjects" API methods, "expandData" parameter in various *.get methods and "selectHosts" parameter from application.get method (Ivo)
+A......... [ZBXNEXT-2724] removed all deprecated "exists" and "getObjects" API methods, "expandData" parameter in various *.get methods and "selectHosts" parameter from application.get method (Ivo)
 ..F....... [ZBXNEXT-2357] added MVC framework, some pages already take advantage of the framework (Alexei, Sasha)
 ...GI..PS. [ZBXNEXT-444] improved log file monitoring by saving log file meta information which was previously lost during agent restart (dimir)
 ..F.....S. [ZBXNEXT-1128] added support of {HOST.*} and user macros in trigger URL (igors, Sasha)
@@ -70,9 +71,18 @@ Changes for 2.4.5rc1
 
 New features:
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
-A.F....... [ZBX-1357] updated Brazilian Portuguese translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Italian and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9457] fixed server crash in case ValueCacheSize=0; thanks to MATSUDA Daiki for patch (asaveljevs)
+.......PS. [ZBX-5717] fixed incorrect calculation of icmppingloss[] due to floating-point errors (asaveljevs)
+........S. [ZBX-9436] fixed zabbix_server to not exit in case of database connection loss in the middle of transaction (dimir)
+........S. [ZBX-9355] added host name and names of conflicting templates to the error message when templates fail to link due to a duplicate item, fixed linking of templates containing web scenarious (igors)
+........S. [ZBX-9352] fixed execution of remote commands on the server in case trigger expression contains multiple hosts (asaveljevs)
+........S. [ZBX-9394] fixed SMS sending with Teltonika modems (asaveljevs)
+........S. [ZBX-3507] fixed SMS sending with Huawei GSM modems (asaveljevs)
+.......PS. [ZBX-7446] fixed vmware.hv.status item always returning 0 (gray) status (wiper)
+A......... [ZBX-9346] fixed importing trigger dependencies and maps that contain the triggers expressions with old style operators (Ivo)
 ...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
 A.F....... [ZBX-9365] fixed array_combine() function giving a warning message for PHP versions < 5.4.0 (Ivo)
 ..F....... [ZBX-9395] fixed overview triggers and data page to display results when the option to select first dropdown entry is set to "None" and a group is selected (Ivo)
@@ -666,9 +676,18 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.10rc1
 
 New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese and Japanese translations; thanks to Zabbix translators (Richlv)
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
+.......PS. [ZBX-9457] fixed server crash in case ValueCacheSize=0; thanks to MATSUDA Daiki for patch (asaveljevs)
+.......PS. [ZBX-5717] fixed incorrect calculation of icmppingloss[] due to floating-point errors (asaveljevs)
+........S. [ZBX-9436] fixed zabbix_server to not exit in case of database connection loss in the middle of transaction (dimir)
+........S. [ZBX-9355] added host name and names of conflicting templates to the error message when templates fail to link due to a duplicate item, fixed linking of templates containing web scenarious (igors)
+........S. [ZBX-9352] fixed execution of remote commands on the server in case trigger expression contains multiple hosts (asaveljevs)
+........S. [ZBX-3507] fixed SMS sending with Huawei GSM modems (asaveljevs)
+...G...PS. [ZBX-9251] added missing socket closing to avoid large number of opened sockets (igors)
+.......PS. [ZBX-7446] fixed vmware.hv.status item always returning 0 (gray) status (wiper)
 ...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
 A.F....... [ZBX-9365] fixed array_combine() function giving a warning message for PHP versions < 5.4.0 (Ivo)
 ..F....... [ZBX-9402] fixed trigger list sorting (Ivo)
@@ -1905,6 +1924,11 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-5717] fixed incorrect calculation of icmppingloss[] due to floating-point errors (asaveljevs)
+........S. [ZBX-9436] fixed zabbix_server to not exit in case of database connection loss in the middle of transaction (dimir)
+........S. [ZBX-9352] fixed execution of remote commands on the server in case trigger expression contains multiple hosts (asaveljevs)
+........S. [ZBX-3507] fixed SMS sending with Huawei GSM modems (asaveljevs)
+...G...PS. [ZBX-9251] added missing socket closing to avoid large number of opened sockets (igors)
 ...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
 ..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
 A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
