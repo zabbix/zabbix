@@ -256,8 +256,8 @@ $triggerWidget->addItem($filterForm);
  */
 if ($_REQUEST['fullscreen']) {
 	$triggerInfo = new CTriggersInfo($_REQUEST['groupid'], $_REQUEST['hostid']);
-	$triggerInfo->hideHeader();
 	$triggerInfo->show();
+	echo BR();
 }
 
 $triggerForm = new CForm('get', 'acknow.php');
