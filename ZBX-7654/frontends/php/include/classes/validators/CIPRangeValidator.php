@@ -68,6 +68,8 @@ class CIPRangeValidator extends CIPValidator {
 		$this->maxIPRange = '';
 
 		foreach (explode(',', $ranges) as $range) {
+			$range = trim($range, ' ');
+
 			if (!$this->isValidMask($range) && !$this->isValidRange($range)) {
 				$this->setError(_s('Invalid IP address range "%1$s".', $range));
 
