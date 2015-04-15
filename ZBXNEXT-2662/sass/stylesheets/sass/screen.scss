@@ -91,14 +91,15 @@ strong {
 
 ol {
 	list-style: decimal;
+	list-style-position: inside;
 
 	li {
-		padding: 0 0 7px 0;
+		padding: 0 0 0.7em 0;
 	} 
 }
 
 p {
-	margin: 0 0 1em 0;
+	margin: 0 0 0.7em 0;
 }
 
 /* Main Navigation */
@@ -952,7 +953,7 @@ footer {
 
 	li {
 		display: block;
-		padding: 0 0 7px 0;
+		padding: 0 0 0.7em 0;
 	}
 
 	label {
@@ -1545,7 +1546,7 @@ button[disabled] {
 }
 
 .setup-right-body {
-	height: 355px;
+	max-height: 355px;
 	//border: 1px solid #000;
 	overflow-y: auto;
 
@@ -1556,6 +1557,10 @@ button[disabled] {
 
 	.table-forms-td-right {
 		width: 100%;
+	}
+
+	h4 {
+		margin-top: 25%;
 	}
 }
 
@@ -2164,6 +2169,10 @@ td.disaster-bg {
 	.overlay-close-btn {
 		color: $light-green;
 	}
+
+	ul {
+		border-top-color: $light-green;
+	}
 }
 
 .msg-bad {
@@ -2179,6 +2188,10 @@ td.disaster-bg {
 	.overlay-close-btn {
 		color: $light-red;
 	}
+
+	ul {
+		border-top-color: $light-red;
+	}
 }
 
 .msg-details {
@@ -2193,6 +2206,8 @@ td.disaster-bg {
 
 	ul {
 		margin: 8px 0 0 0;
+		border-top-width: 1px;
+		border-top-style: dashed;
 		font-size: $font-msg-reset-size;
 
 		li {
