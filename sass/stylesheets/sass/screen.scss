@@ -1546,9 +1546,13 @@ button[disabled] {
 }
 
 .setup-right-body {
+	padding-right: 5px;
 	max-height: 355px;
-	//border: 1px solid #000;
 	overflow-y: auto;
+
+	.list-table {
+		@include box-shadow(none);
+	}
 
 	.table-forms-td-left {
 		text-align: left;
@@ -1561,6 +1565,18 @@ button[disabled] {
 
 	h4 {
 		margin: 25% 0 0.4em 0;
+	}
+
+	&::-webkit-scrollbar {
+		width: 5px;
+	}
+
+	&::-webkit-scrollbar-track {
+		background: $light-grey;
+	}
+	
+	&::-webkit-scrollbar-thumb {
+		background: $lighter-blue-grey;
 	}
 }
 
