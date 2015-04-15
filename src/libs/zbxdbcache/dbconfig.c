@@ -887,10 +887,11 @@ static void	config_gmacro_add_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *
 
 	if (NULL == (gmacro_m = zbx_hashset_search(gmacro_index, &gmacro_m_local)))
 	{
-		gmacro_m = zbx_hashset_insert(gmacro_index, &gmacro_m_local, sizeof(ZBX_DC_GMACRO_M));
-
-		zbx_vector_ptr_create_ext(&gmacro_m->gmacros, __config_mem_malloc_func, __config_mem_realloc_func,
+		gmacro_m_local.macro = zbx_strpool_acquire(gmacro->macro);
+		zbx_vector_ptr_create_ext(&gmacro_m_local.gmacros, __config_mem_malloc_func, __config_mem_realloc_func,
 				__config_mem_free_func);
+
+		gmacro_m = zbx_hashset_insert(gmacro_index, &gmacro_m_local, sizeof(ZBX_DC_GMACRO_M));
 	}
 
 	zbx_vector_ptr_append(&gmacro_m->gmacros, gmacro);
@@ -946,10 +947,11 @@ static void	config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *
 
 	if (NULL == (hmacro_hm = zbx_hashset_search(hmacro_index, &hmacro_hm_local)))
 	{
-		hmacro_hm = zbx_hashset_insert(hmacro_index, &hmacro_hm_local, sizeof(ZBX_DC_HMACRO_HM));
-
-		zbx_vector_ptr_create_ext(&hmacro_hm->hmacros, __config_mem_malloc_func, __config_mem_realloc_func,
+		hmacro_hm_local.macro = zbx_strpool_acquire(hmacro->macro);
+		zbx_vector_ptr_create_ext(&hmacro_hm_local.hmacros, __config_mem_malloc_func, __config_mem_realloc_func,
 				__config_mem_free_func);
+
+		hmacro_hm = zbx_hashset_insert(hmacro_index, &hmacro_hm_local, sizeof(ZBX_DC_HMACRO_HM));
 	}
 
 	zbx_vector_ptr_append(&hmacro_hm->hmacros, hmacro);
