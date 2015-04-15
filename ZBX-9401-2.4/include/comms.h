@@ -119,6 +119,11 @@ const char	*zbx_tcp_recv_line(zbx_sock_t *s);
 char    *get_ip_by_socket(zbx_sock_t *s);
 int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty);
 
+int	zbx_udp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout);
+int	zbx_udp_send(zbx_sock_t *s, const char *data, size_t data_len, int timeout);
+int	zbx_udp_recv(zbx_sock_t *s, char **data, size_t *data_len, int timeout);
+void	zbx_udp_close(zbx_sock_t *s);
+
 #define ZBX_DEFAULT_FTP_PORT		21
 #define ZBX_DEFAULT_SSH_PORT		22
 #define ZBX_DEFAULT_TELNET_PORT		23
