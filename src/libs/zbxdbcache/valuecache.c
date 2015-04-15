@@ -162,15 +162,14 @@ typedef struct
 	/* with daily_range and the daily range is reset.             */
 	int		daily_range;
 
-	/* The oldest timestamp that is guaranteed to be covered by   */
-	/* the cached values. It can be larger than the request range.*/
-	/* Initially it is the the lowest boundary of time based      */
-	/* request or the timestamp of the first (earliest) value of  */
-	/* count based request.                                       */
-	/* When the cached values exceeds the request range and the   */
-	/* 'expired' values are dropped this timestamp is set to the  */
-	/* timestamp of the last (oldest) dropped value plus 1.       */
-	int		timestamp_from;
+	/* The timestamp marking the oldest value that is guaranteed  */
+	/* to be cached.                                              */
+	/* The database coverage is based on actual requests made to  */
+	/* database and is used to check if cache has the requested   */
+	/* values for time based requests.                            */
+	/* For all items the database coverage ends with the current  */
+	/* timestamp (now).                                           */
+	int		db_coverage_start;
 
 	/* The number of cache hits for this item.                    */
 	/* Used to evaluate if the item must be dropped from cache    */
@@ -1312,6 +1311,23 @@ static void	vc_item_release(zbx_vc_item_t *item)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: vc_item_update_db_coverage                                       *
+ *                                                                            *
+ * Purpose: updates item database coverage - the timestamp marking the time   *
+ *          from what all values are guaranteed to be cached                  *
+ *                                                                            *
+ * Parameters: item      - [IN] the item                                      *
+ *             timestamp - [IN] the db coverage start timestamp               *
+ *                                                                            *
+ ******************************************************************************/
+static void	vc_item_update_db_coverage(zbx_vc_item_t *item, int timestamp)
+{
+	if (0 == item->db_coverage_start || timestamp < item->db_coverage_start)
+		item->db_coverage_start = timestamp;
+}
+
 /******************************************************************************************************************
  *                                                                                                                *
  * History storage API                                                                                            *
@@ -1795,9 +1811,8 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 				}
 			}
 
-			/* the guaranteed earliest cached timestamp will be the timestamp of */
-			/* last (oldest) removed value + 1                                   */
-			item->timestamp_from = chunk->slots[chunk->last_value].timestamp.sec + 1;
+			/* the database coverage now is the last (oldest) removed value timestamp + 1 */
+			item->db_coverage_start = chunk->slots[chunk->last_value].timestamp.sec + 1;
 
 			vch_item_remove_chunk(item, chunk);
 
@@ -1841,14 +1856,12 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 			/* we can't add it to keep cache consistency. In this case reset the cached all   */
 			/* flag and return success.                                                       */
 			if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
-			{
 				item->status = 0;
 
-				/* if the value has greater timestamp than the guaranteed cached */
-				/* boundary then reset the boundary to the value timestamp + 1   */
-				if (item->timestamp_from < value->timestamp.sec)
-					item->timestamp_from = value->timestamp.sec + 1;
-			}
+			/* if the value is inside database coverage we have to exclude it */
+			/* by setting coverage to value timestamp + 1                     */
+			if (item->db_coverage_start < value->timestamp.sec)
+				item->db_coverage_start = value->timestamp.sec + 1;
 
 			ret = SUCCEED;
 			goto out;
@@ -2015,8 +2028,9 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 	start = timestamp - seconds;
 	update_end = ZBX_VC_TIME();
 
-	/* check if the requested period is in the cached range */
-	if (0 != item->timestamp_from && start >= item->timestamp_from)
+	/* check if the requested period is in the cached range                            */
+	/* (the first interval endpoint is excluded, thats why we have to check start + 1) */
+	if (0 != item->db_coverage_start && start + 1 >= item->db_coverage_start)
 		return SUCCEED;
 
 	/* find if the cache should be updated to cover the required range */
@@ -2052,21 +2066,18 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 		if (SUCCEED == ret)
 		{
 			if (0 < records.values_num)
-			{
 				ret = vch_item_add_values_at_tail(item, records.values, records.values_num);
 
-				if (SUCCEED == ret)
-				{
-					ret = records.values_num;
-
-					if (item->timestamp_from < update_end - update_seconds)
-						item->timestamp_from = update_end - update_seconds + 1;
-
-				}
-			}
 			/* when updating cache with time based request we can always reset status flags */
 			/* flag even if the requested period contains no data                           */
 			item->status = 0;
+
+			if (SUCCEED == ret)
+			{
+				ret = records.values_num;
+				vc_item_update_db_coverage(item, start + 1);
+			}
+
 		}
 		zbx_history_record_vector_destroy(&records, item->value_type);
 	}
@@ -2153,9 +2164,8 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
 			if (SUCCEED == (ret = vch_item_add_values_at_tail(item, records.values, records.values_num)))
 			{
 				ret = records.values_num;
-
-				if (item->timestamp_from < item->tail->slots[item->tail->first_value].timestamp.sec)
-					item->timestamp_from = item->tail->slots[item->tail->first_value].timestamp.sec;
+				vc_item_update_db_coverage(item,
+						item->tail->slots[item->tail->first_value].timestamp.sec);
 			}
 		}
 
@@ -2194,8 +2204,9 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seco
 	start = timestamp - seconds;
 	update_end = ZBX_VC_TIME();
 
-	/* check if the requested period is in the cached range */
-	if (0 != item->active_range && update_end - start <= item->active_range)
+	/* check if the requested period is in the cached range                            */
+	/* (the first interval endpoint is excluded, thats why we have to check start + 1) */
+	if (0 != item->db_coverage_start && start + 1 >= item->db_coverage_start)
 		return SUCCEED;
 
 	/* find if the cache should be updated to cover the required count */
@@ -2250,10 +2261,23 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seco
 
 		vc_cache->db_queries += queries;
 
-		if (SUCCEED == ret && 0 < records.values_num)
+		if (SUCCEED == ret)
 		{
-			if (SUCCEED == (ret = vch_item_add_values_at_tail(item, records.values, records.values_num)))
+			if (0 < records.values_num)
+				ret = vch_item_add_values_at_tail(item, records.values, records.values_num);
+
+			if (SUCCEED == ret)
+			{
 				ret = records.values_num;
+
+				if (count <= records.values_num)
+				{
+					vc_item_update_db_coverage(item,
+							item->tail->slots[item->tail->first_value].timestamp.sec);
+				}
+				else
+					vc_item_update_db_coverage(item, start + 1);
+			}
 		}
 
 		zbx_history_record_vector_destroy(&records, item->value_type);
@@ -2333,9 +2357,7 @@ static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 		if (SUCCEED == ret)
 		{
 			ret = records.values_num;
-
-			if (item->timestamp_from < item->tail->slots[item->tail->first_value].timestamp.sec)
-				item->timestamp_from = item->tail->slots[item->tail->first_value].timestamp.sec;
+			vc_item_update_db_coverage(item, item->tail->slots[item->tail->first_value].timestamp.sec);
 		}
 	}
 	zbx_history_record_vector_destroy(&records, item->value_type);
