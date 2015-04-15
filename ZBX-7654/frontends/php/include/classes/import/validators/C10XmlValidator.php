@@ -128,6 +128,7 @@ class C10XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateHost($host, $subpath);
 		}
 	}
@@ -172,7 +173,6 @@ class C10XmlValidator {
 		}
 
 		// child elements validation
-
 		if (array_key_exists('groups', $host)) {
 			$this->validateGroups($host['groups'], $path.'/groups');
 		}
@@ -248,6 +248,7 @@ class C10XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateItem($item, $subpath);
 		}
 	}
@@ -311,6 +312,7 @@ class C10XmlValidator {
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
 		}
 
+		// child elements validation
 		if (array_key_exists('applications', $item)) {
 			$this->validateApplications($item['applications'], $path.'/applications');
 		}
@@ -341,6 +343,7 @@ class C10XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateTrigger($trigger, $subpath);
 		}
 	}
@@ -434,6 +437,7 @@ class C10XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateGraph($graph, $subpath);
 		}
 	}
@@ -481,6 +485,7 @@ class C10XmlValidator {
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, $error));
 		}
 
+		// child elements validation
 		if (array_key_exists('graph_elements', $graph)) {
 			$this->validateGraphElements($graph['graph_elements'], $path.'/graph_elements');
 		}
@@ -511,6 +516,7 @@ class C10XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateMacro($macro, $subpath);
 		}
 	}
@@ -599,6 +605,7 @@ class C10XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateGraphElement($graph_element, $subpath);
 		}
 	}
@@ -663,6 +670,7 @@ class C10XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateDependency($dependency, $subpath);
 		}
 	}
@@ -685,12 +693,11 @@ class C10XmlValidator {
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s', $path, $errors[0]));
 		}
 
-		$depends = $dependency;
-
 		// unexpected tag validation
-		unset($depends['description']);
+		unset($dependency['description']);
 
-		$this->validateDepends($depends, $path);
+		// child elements validation
+		$this->validateDepends($dependency, $path);
 	}
 
 	/**
@@ -839,6 +846,7 @@ class C10XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateSysmap($sysmap, $subpath);
 		}
 	}
@@ -915,6 +923,7 @@ class C10XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateSelement($selement, $subpath);
 		}
 	}
@@ -1156,6 +1165,7 @@ class C10XmlValidator {
 				throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $subpath, _('an array is expected')));
 			}
 
+			// child elements validation
 			$this->validateImage($image, $subpath);
 		}
 	}
