@@ -78,7 +78,6 @@ typedef struct
 	char		*buf_dyn;
 	zbx_buf_type_t	buf_type;
 	unsigned char	accepted;
-	char		*error;
 	int		timeout;
 }
 zbx_sock_t;
