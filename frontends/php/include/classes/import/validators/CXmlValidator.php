@@ -45,9 +45,7 @@ class CXmlValidator {
 	 * @param array $data	import data
 	 */
 	public function validate($data) {
-		$fields = array(
-			'zabbix_export' =>	'required|array',
-		);
+		$fields = array('zabbix_export' => 'required|array');
 		$validator = new CNewValidator($data, $fields);
 
 		if ($validator->isError()) {
