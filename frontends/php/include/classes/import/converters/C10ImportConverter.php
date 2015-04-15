@@ -839,7 +839,6 @@ class C10ImportConverter extends CConverter {
 				unset($link);
 			}
 
-			$map['label_format'] = SYSMAP_LABEL_ADVANCED_OFF;
 			$map = $this->renameKey($map, 'backgroundid', 'background');
 		}
 		unset($map);
