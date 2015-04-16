@@ -159,9 +159,9 @@ zbx_lld_item_index_t;
 
 typedef struct
 {
-	zbx_uint64_t		application_prototypeid;
-	zbx_uint64_t		itemid;
-	char			*name;
+	zbx_uint64_t	application_prototypeid;
+	zbx_uint64_t	itemid;
+	char		*name;
 }
 zbx_lld_application_prototype_t;
 
@@ -174,9 +174,9 @@ typedef struct
 #define ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME	__UINT64_C(0x0000000000000002)
 #define ZBX_FLAG_LLD_APPLICATION_ADDDISCOVERY	__UINT64_C(0x0000000100000000)
 	zbx_uint64_t		flags;
-	int			items_num;
 	char			*name;
 	const zbx_lld_row_t	*lld_row;
+	int			items_num;
 }
 zbx_lld_application_t;
 
@@ -2298,7 +2298,7 @@ static void	lld_applications_make(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 			}
 			else
 			{
-				/* conflicting application name, reset discovert flags */
+				/* conflicting application name, reset discovery flags */
 				application->flags = ZBX_FLAG_LLD_APPLICATION_UNSET;
 			}
 		}
@@ -2318,7 +2318,7 @@ out:
  * Purpose: validates discovered applications by checking if they have any    *
  *          items linked to them                                              *
  *                                                                            *
- * Parameters: applications       - [IN] the applications                     *
+ * Parameters: applications       - [IN/OUT] the applications                 *
  *             items_applications - [IN/OUT] the item-application links       *
  *                                                                            *
  ******************************************************************************/
@@ -2359,7 +2359,6 @@ static void	lld_applications_validate(zbx_vector_ptr_t *applications, zbx_hashse
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
-
 
 /******************************************************************************
  *                                                                            *
