@@ -238,8 +238,7 @@
 		<div class="setup-right">
 		<h1>Configure DB connection</h1>
 		<div class="setup-right-body">
-		<p>Please create database manually, and set the configuration parameters for connection to this database. Press "Test connection" button when done.</p>
-		<div class="msg-good">Well done!</div>
+		<p>Create database manually and set the configuration parameters for connection to this database.</p>
 		<ul class="table-forms">
 		<li><div class="table-forms-td-left"><label for="DBType">Databese type</label></div><div class="table-forms-td-right"><input type="text" id="DBType" value="localhost"></div></li>
 	    <li><div class="table-forms-td-left"><label for="DBHost">Database host</label></div><div class="table-forms-td-right"><input type="text" id="DBHost" value="localhost"></div></li>
@@ -247,11 +246,48 @@
 	    <li><div class="table-forms-td-left"><label for="DBName">Database name</label></div><div class="table-forms-td-right"><input type="text" id="DBName" value="zabbix"></div></li>
 	    <li><div class="table-forms-td-left"><label for="User">User</label></div><div class="table-forms-td-right"><input type="text" id="User" value="root"></div></li>
 	    <li><div class="table-forms-td-left"><label for="Password">Password</label></div><div class="table-forms-td-right"><input type="password" id="Password"></div></li>
-	    <li><div class="table-forms-td-left"><label for=""></label></div><div class="table-forms-td-right"><button type="button" class="btn-alt">Test connection</button></div></li>
 	    </ul>
 	    </div>
 	    </div>
-	    <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Back</button><button type="button">Next step</button></div>
+	    <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><!--<button type="button" class="setup-btn-float">Test connection</button>--><button type="button" class="btn-alt">Back</button><button type="button">Next step</button></div>
+	    </div>
+	</form>
+	<div class="signin-links">Licensed under <a href="">GPL v2</a></div>
+
+
+
+	<br>
+
+
+
+	<form>
+		<div class="setup-container">
+		<div class="setup-left">
+		<ul>
+		<li class="setup-left-current">Welcome</li>
+		<li class="setup-left-current">Check for pre-requisites</li>
+		<li class="setup-left-current">Configure DB connection</li>
+		<li>Zabbix server details</li>
+		<li>Pre-installation summary</li>
+		<li>Install</li>
+		</ul>
+		</div>
+		<div class="setup-right">
+		<h1>Configure DB connection</h1>
+		<div class="setup-right-body">
+		<p>Create database manually and set the configuration parameters for connection to this database.</p>
+		<div class="msg-good">Well done! Proceed to next step</div>
+		<ul class="table-forms">
+		<li><div class="table-forms-td-left"><label for="DBType">Databese type</label></div><div class="table-forms-td-right"><input type="text" id="DBType" value="localhost"></div></li>
+	    <li><div class="table-forms-td-left"><label for="DBHost">Database host</label></div><div class="table-forms-td-right"><input type="text" id="DBHost" value="localhost"></div></li>
+	    <li><div class="table-forms-td-left"><label for="DBPort">Database port</label></div><div class="table-forms-td-right"><input type="text" id="DBPort" value="0"> <span class="grey">0&ndash;use default port</span></div></li>
+	    <li><div class="table-forms-td-left"><label for="DBName">Database name</label></div><div class="table-forms-td-right"><input type="text" id="DBName" value="zabbix"></div></li>
+	    <li><div class="table-forms-td-left"><label for="User">User</label></div><div class="table-forms-td-right"><input type="text" id="User" value="root"></div></li>
+	    <li><div class="table-forms-td-left"><label for="Password">Password</label></div><div class="table-forms-td-right"><input type="password" id="Password"></div></li>
+	    </ul>
+	    </div>
+	    </div>
+	    <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><!--<button type="button" class="setup-btn-float" disabled>Test connection</button>--><button type="button" class="btn-alt">Back</button><button type="button">Next step</button></div>
 	    </div>
 	</form>
 	<div class="signin-links">Licensed under <a href="">GPL v2</a></div>
@@ -275,12 +311,11 @@
 		<div class="setup-right">
 		<h1>Configure DB connection</h1>
 		<div class="setup-right-body">
-		<p>Please create database manually, and set the configuration parameters for connection to this database. Press "Test connection" button when done.</p>
+		<p>Create database manually and set the configuration parameters for connection to this database.</p>
 		<div class="msg-bad">
 	Oh snap! Check form fields and try submitting again.
 	<div class="msg-details"><a href="" class="link-dotted">Details</a>
 	<ul>
-	<li>Something</li>
 	<li>Something</li>
 	<li>Something</li>
 	<li>Something</li>
@@ -293,11 +328,10 @@
 	    <li><div class="table-forms-td-left"><label for="DBName">Database name</label></div><div class="table-forms-td-right"><input type="text" id="DBName" value="zabbix"></div></li>
 	    <li><div class="table-forms-td-left"><label for="User">User</label></div><div class="table-forms-td-right"><input type="text" id="User" value="root"></div></li>
 	    <li><div class="table-forms-td-left"><label for="Password">Password</label></div><div class="table-forms-td-right"><input type="password" id="Password"></div></li>
-	    <li><div class="table-forms-td-left"><label for=""></label></div><div class="table-forms-td-right"><button type="button" class="btn-alt">Test connection</button></div></li>
 	    </ul>
 	    </div>
 	    </div>
-	    <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Back</button><button type="button" disabled>Next step</button></div>
+	    <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><!--<button type="button" class="setup-btn-float">Test connection</button>--><button type="button" class="btn-alt">Back</button><button type="button">Next step</button></div>
 	    </div>
 	</form>
 	<div class="signin-links">Licensed under <a href="">GPL v2</a></div>
@@ -352,7 +386,7 @@
 		<div class="setup-right">
 		<h1>Pre-installation summary</h1>
 		<div class="setup-right-body">
-		<p>Please check configuration parameters.<!-- If all is correct, press "Next step", or "Back" to change configuration parameters.--></p>
+		<p>Please check configuration parameters.</p>
        <ul class="table-forms">
        <li><div class="table-forms-td-left grey"><label for="HostName">Database type</label></div><div class="table-forms-td-right">MySQL</div></li>
 	   <li><div class="table-forms-td-left grey"><label for="HostName">Database server</label></div><div class="table-forms-td-right">localhost</div></li>
@@ -371,6 +405,43 @@
 	</form>
 	<div class="signin-links">Licensed under <a href="">GPL v2</a></div>
 
+
+	<br>
+
+
+	<form>
+		<div class="setup-container">
+		<div class="setup-left">
+		<ul>
+		<li class="setup-left-current">Welcome</li>
+		<li class="setup-left-current">Check for pre-requisites</li>
+		<li class="setup-left-current">Configure DB connection</li>
+		<li class="setup-left-current">Zabbix server details</li>
+		<li class="setup-left-current">Pre-installation summary</li>
+		<li class="setup-left-current">Install</li>
+		</ul>
+		</div>
+		<div class="setup-right">
+		<h1>Install</h1>
+		<div class="setup-right-body">
+		<div class="msg-bad">Error creating configuration file
+	    <div class="msg-details"><a href="" class="link-dotted">Details</a>
+	    <ul>
+	    <li>/home/user/2.4.1/frontends/php/conf/zabbix.conf.php</li>
+	    <li>Unable to overwrite existing configuration file</li>
+	    </ul></div>
+	    </div>
+	    <p>For manual installation:</p>
+	    <ol>
+	    <li><a href="">Download the configuration file</a></li>
+	    <li>Save it as "/home/user/2.4.1/frontends/php/conf/zabbix.conf.php"</li>
+	    </ol>
+		</div>
+		</div>
+	    <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><!--<button type="button" class="setup-btn-float">Retry installation</button>--><button type="button" class="btn-alt">Back</button><button type="button">Finish</button></div>
+	    </div>
+	</form>
+	<div class="signin-links">Licensed under <a href="">GPL v2</a></div>
 
 
 	<br>
@@ -400,45 +471,6 @@
 	</form>
 	<div class="signin-links">Licensed under <a href="">GPL v2</a></div>
 
-
-	<br>
-
-
-	<form>
-		<div class="setup-container">
-		<div class="setup-left">
-		<ul>
-		<li class="setup-left-current">Welcome</li>
-		<li class="setup-left-current">Check for pre-requisites</li>
-		<li class="setup-left-current">Configure DB connection</li>
-		<li class="setup-left-current">Zabbix server details</li>
-		<li class="setup-left-current">Pre-installation summary</li>
-		<li class="setup-left-current">Install</li>
-		</ul>
-		</div>
-		<div class="setup-right">
-		<h1>Install</h1>
-		<div class="setup-right-body">
-		<div class="msg-bad">Error creating configuration file<br>"/home/user/2.4.1/frontends/php/conf/zabbix.conf.php"
-	    <div class="msg-details"><!--<a href="" class="link-dotted">Details</a>-->
-	    <ul>
-	    <li>Unable to overwrite existing configuration file</li>
-	    </ul></div>
-	    </div>
-	    <p>For manual installation:</p>
-	    <ol>
-	    <li><a href="">Download the configuration file</a></li>
-	    <li>Save it as "/home/user/2.4.1/frontends/php/conf/zabbix.conf.php"</li>
-	    <li>Press "Retry installation" when done</li>
-	    </ol>
-	    <br>
-	    <button type="button" class="btn-alt">Retry installation</button>
-		</div>
-		</div>
-	    <div class="setup-footer"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Back</button><button type="button" disabled>Finish</button></div>
-	    </div>
-	</form>
-	<div class="signin-links">Licensed under <a href="">GPL v2</a></div>
 	</article>
 	<footer>
 	Zabbix 3.0. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" target="_blank">Zabbix SIA</a>

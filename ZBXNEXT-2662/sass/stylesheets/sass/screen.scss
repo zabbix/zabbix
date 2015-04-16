@@ -1598,6 +1598,8 @@ button[disabled] {
 	bottom: 21px;
 	width: 766px;
 	text-align: right;
+	padding-top: 20px;
+	border-top: 1px solid $lightest-blue-grey;
 
 	button {
 		margin: 0 0 0 14px;
@@ -1605,6 +1607,11 @@ button[disabled] {
 		&:first-child {
 			margin: 0;
 			float: left;
+		}
+
+		&.setup-btn-float {
+			float: left;
+			margin: 0 0 0 143px;
 		}
 	}
 }
