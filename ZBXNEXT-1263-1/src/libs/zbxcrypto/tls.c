@@ -1686,9 +1686,9 @@ int	zbx_tls_init_parent(void)
  *          library in a child process                                        *
  *                                                                            *
  ******************************************************************************/
+#if defined(HAVE_POLARSSL)
 void	zbx_tls_init_child(void)
 {
-#if defined(HAVE_POLARSSL)
 	const char	*__function_name = "zbx_tls_init_child";
 	int		res;
 	unsigned int	cipher_count;
@@ -1919,8 +1919,10 @@ void	zbx_tls_init_child(void)
 	zbx_free(pers);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
+}
 #elif defined(HAVE_GNUTLS)
+void	zbx_tls_init_child(void)
+{
 	const char	*__function_name = "zbx_tls_init_child";
 	int		res;
 
@@ -2122,9 +2124,10 @@ void	zbx_tls_init_child(void)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
+}
 #elif defined(HAVE_OPENSSL)
-
+void	zbx_tls_init_child(void)
+{
 	const char	*__function_name = "zbx_tls_init_child";
 	char		*error = NULL;
 	size_t		error_alloc = 0, error_offset = 0;
@@ -2330,8 +2333,8 @@ out:
 	zbx_free(error);
 	zbx_tls_free();
 	exit(EXIT_FAILURE);
-#endif
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -2450,7 +2453,6 @@ void	zbx_tls_free(void)
 #endif
 }
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_connect                                                  *
@@ -2476,9 +2478,9 @@ void	zbx_tls_free(void)
  *     FAIL - an error occurred                                               *
  *                                                                            *
  ******************************************************************************/
+#if defined(HAVE_POLARSSL)
 int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
 {
-#if defined(HAVE_POLARSSL)
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
 
@@ -2548,7 +2550,7 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_cert);
 
 		/* set CA certificate and certificate revocation lists */
-		ssl_set_ca_chain(s->tls_ctx, ca_cert, crl, NULL);	/* TODO set the 4th argument to expected peer Common Name */
+		ssl_set_ca_chain(s->tls_ctx, ca_cert, crl, NULL);
 
 		if (0 != (res = ssl_set_own_cert(s->tls_ctx, my_cert, my_priv_key)))
 		{
@@ -2685,9 +2687,10 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
-
+}
 #elif defined(HAVE_GNUTLS)
-
+int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+{
 	const char		*__function_name = "zbx_tls_connect";
 	int			ret = FAIL, res;
 	gnutls_x509_crt_t	peer_cert = NULL;
@@ -2958,8 +2961,10 @@ out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
-
+}
 #elif defined(HAVE_OPENSSL)
+int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+{
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
@@ -3117,11 +3122,9 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
-#endif
 }
 #endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_accept                                                   *
@@ -3140,9 +3143,9 @@ out:
  *     FAIL - an error occurred                                               *
  *                                                                            *
  ******************************************************************************/
+#if defined(HAVE_POLARSSL)
 int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 {
-#if defined(HAVE_POLARSSL)
 	const char		*__function_name = "zbx_tls_accept";
 	int			ret = FAIL, res;
 	const x509_crt		*peer_cert;
@@ -3331,9 +3334,10 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
-
+}
 #elif defined(HAVE_GNUTLS)
-
+int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
+{
 	const char			*__function_name = "zbx_tls_accept";
 	int				ret = FAIL, res;
 	gnutls_credentials_type_t	creds;
@@ -3601,8 +3605,10 @@ out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
-
+}
 #elif defined(HAVE_OPENSSL)
+int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
+{
 	const char	*__function_name = "zbx_tls_accept", *cipher_name;
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
@@ -3768,7 +3774,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
-#endif
 }
 #endif
 
