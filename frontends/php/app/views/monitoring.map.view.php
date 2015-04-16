@@ -19,7 +19,7 @@
 **/
 
 
-$mapWidget = new CWidget('hat_maps');
+$mapWidget = new CWidget();
 $mapWidget->setTitle(_('Maps'));
 
 if ($data['maps']) {

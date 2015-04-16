@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$triggersWidget = new CWidget(null, 'trigger-list');
+$triggersWidget = new CWidget('trigger-list');
 $triggersWidget->setTitle(_('Triggers'));
 
 // append host summary to widget header

@@ -336,7 +336,7 @@ if ($filter['groupids'] !== null) {
 /*
  * Display
  */
-$latestWidget = new CWidget(null, 'latest-mon');
+$latestWidget = new CWidget('latest-mon');
 $latestWidget->setTitle(_('Latest data'));
 
 

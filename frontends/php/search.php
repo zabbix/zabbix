@@ -60,7 +60,7 @@ $admin = in_array(CWebUser::$data['type'], array(
 ));
 $rows_per_page = CWebUser::$data['rows_per_page'];
 
-$searchWidget = new CWidget('search_wdgt');
+$searchWidget = new CWidget();
 
 $search = getRequest('search', '');
 

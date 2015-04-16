@@ -40,19 +40,7 @@ class CWidget {
 	 */
 	protected $rootClass;
 
-	/**
-	 * The ID of the div, containing the body of the widget.
-	 *
-	 * @var string
-	 */
-	protected $bodyId;
-
-	public function __construct($bodyId = null, $rootClass = null) {
-		if (is_null($bodyId)) {
-			list($usec, $sec) = explode(' ', microtime());
-			$bodyId = 'widget_'.(int)($sec % 10).(int)($usec * 1000);
-		}
-		$this->bodyId = $bodyId;
+	public function __construct($rootClass = null) {
 		$this->css_class = 'header_wide';
 		$this->setRootClass($rootClass);
 	}

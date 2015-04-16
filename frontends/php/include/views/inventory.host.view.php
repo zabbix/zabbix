@@ -19,7 +19,7 @@
 **/
 
 
-$hostInventoryWidget = new CWidget(null, 'inventory-host');
+$hostInventoryWidget = new CWidget('inventory-host');
 $hostInventoryWidget->setTitle(_('Host inventory'));
 
 /*

@@ -19,7 +19,7 @@
 **/
 
 
-$chartsWidget = new CWidget('hat_charts');
+$chartsWidget = new CWidget();
 $chartsWidget->setTitle(_('Graphs'));
 
 $chartForm = new CForm('get');

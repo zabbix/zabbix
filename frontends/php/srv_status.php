@@ -159,7 +159,7 @@ else {
 		$controls->addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 		$r_form->addItem($controls);
 
-		$srv_wdgt = new CWidget('hat_services', 'service-list service-mon');
+		$srv_wdgt = new CWidget('service-list service-mon');
 		$srv_wdgt->setTitle(_('IT services'));
 		$srv_wdgt->setControls($r_form);
 		$srv_wdgt->addItem(BR());

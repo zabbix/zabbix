@@ -21,7 +21,7 @@
 
 $this->addJSfile('js/class.pmaster.js');
 
-$dashboardWidget = new CWidget(null, 'dashboard');
+$dashboardWidget = new CWidget('dashboard');
 $dashboardWidget->setClass('header');
 
 $dashboardWidget->setTitle(_('Dashboard'));

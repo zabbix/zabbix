@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/reports.toptriggers.js.php';
 
-$topTriggers = new CWidget(null, 'top-triggers');
+$topTriggers = new CWidget('top-triggers');
 $topTriggers->setTitle(_('Most busy triggers Top 100'));
 
 $filterForm = new CFilter('web.toptriggers.filter.state');
