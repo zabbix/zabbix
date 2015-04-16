@@ -478,7 +478,7 @@ function getMenuPopupRefresh(options) {
 	jQuery.each(intervals, function(value, label) {
 		items[items.length] = {
 			label: label,
-			css: (value == options.currentRate) ? 'selected' : '',
+			selected: (value == options.currentRate),
 			data: {
 				value: value
 			},
@@ -509,15 +509,14 @@ function getMenuPopupRefresh(options) {
 					});
 				}
 
-				jQuery('a', obj.closest('ul')).each(function() {
-					var a = jQuery(this),
-						li = a.parent();
+				jQuery('a').each(function() {
+					var a = jQuery(this);
 
 					if (a.data('value') == currentRate) {
-						li.addClass('selected');
+						a.addClass('selected');
 					}
 					else {
-						li.removeClass('selected');
+						a.removeClass('selected');
 					}
 				});
 
@@ -1041,6 +1040,10 @@ jQuery(function($) {
 
 		if (typeof options.css !== 'undefined') {
 			item.addClass(options.css);
+		}
+
+		if (typeof options.selected !== 'undefined' && options.selected) {
+			link.addClass('selected');
 		}
 
 		item.append(link);
