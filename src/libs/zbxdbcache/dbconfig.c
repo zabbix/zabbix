@@ -1591,7 +1591,7 @@ static void	DCsync_hmacros(DB_RESULT result)
 		/* see whether we should and can update hmacros_hm index at this point */
 		update_index = 0;
 
-		if (0 == found || hmacro->hostid == hostid || 0 != strcmp(hmacro->macro, macro) ||
+		if (0 == found || hmacro->hostid != hostid || 0 != strcmp(hmacro->macro, macro) ||
 				0 != zbx_strcmp_null(hmacro->context, context))
 		{
 			if (1 == found)
