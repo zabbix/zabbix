@@ -190,14 +190,14 @@ typedef struct
 	/* the number of database queries performed, used only for unit tests */
 	zbx_uint64_t	db_queries;
 
-	/* the low memory mode flag */
+	/* value cache operating mode: 0 - normal, 1 - low memory */
 	int		mode;
-
-	/* timestamp of the last low memory warning message */
-	int		last_warning_time;
 
 	/* time when cache operating mode was changed */
 	int		mode_time;
+
+	/* timestamp of the last low memory warning message */
+	int		last_warning_time;
 
 	/* the minimum number of bytes to be freed when cache runs out of space */
 	size_t		min_free_request;
@@ -768,16 +768,16 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
  ******************************************************************************/
 static void	vc_warn_low_memory()
 {
-	int		now;
+	int	now;
 
 	now = ZBX_VC_TIME();
 
 	if (now - vc_cache->mode_time > ZBX_VC_LOW_MEMORY_RESET_PERIOD)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "value cache has been switched from low memory to normal operation mode");
-
 		vc_cache->mode = ZBX_VC_MODE_NORMAL;
 		vc_cache->mode_time = now;
+
+		zabbix_log(LOG_LEVEL_WARNING, "value cache has been switched from low memory to normal operation mode");
 	}
 	else if (now - vc_cache->last_warning_time > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
 	{
