@@ -1685,6 +1685,45 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 	return $default;
 }
 
+function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
+{
+	$msg_box = new CDiv($title, $good ? 'msg-good' : 'msg-bad', $show_close_box ? 'global-message' : null);
+
+	if ($messages) {
+		$msg_details = new CDiv(null, 'msg-details');
+
+		if ($title !== null) {
+			$link = new CLink(_('Details'), null, 'link-dotted', null, true);
+			$link->setAttribute('onclick', 'javascript: showHide("msg-messages", IE ? "block" : "");');
+			$msg_details->addItem($link);
+		}
+
+		$list = new CList(null);
+		if ($title !== null) {
+			$list->setAttribute('id', 'msg-messages');
+
+			if (!$show_details) {
+				$list->setAttribute('style', 'display: none;');
+			}
+		}
+		foreach ($messages as $message) {
+			$list->addItem($msg['type'].'&nbsp;'.$message['message']);
+		}
+		$msg_details->addItem($list);
+
+		$msg_box->addItem($msg_details);
+	}
+
+	if ($title !== null && $show_close_box) {
+		$close = new CLink('×', null, 'overlay-close-btn', null, true);
+		$close->setAttribute('onclick', 'javascript: showHide("global-message", IE ? "block" : "");');
+		$close->setAttribute('title', _('Close'));
+		$msg_box->addItem($close);
+	}
+
+	return $msg_box;
+}
+
 function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES;
 
@@ -1701,7 +1740,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 	$imageMessages = array();
 
 	if (!$bool && !is_null($errmsg)) {
-		$msg = _('ERROR').': '.$errmsg;
+		$msg = $errmsg;
 	}
 	elseif ($bool && !is_null($okmsg)) {
 		$msg = $okmsg;
@@ -1721,32 +1760,10 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 				break;
 			case PAGE_TYPE_HTML:
 			default:
-				$msgBox = new CDiv(null, $bool ? 'msg-good' : 'msg-bad', 'global-message');
-				$msgBox->addItem($msg);
-				if (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) {
-					$msgDetails = new CDiv(null, 'msg-details');
-					$link = new CLink(_('Details'), null, 'link-dotted', null, true);
-					$link->setAttribute('onclick', 'javascript: showHide("msg_messages", IE ? "block" : "table");');
-					$link->setAttribute('title', _('Maximize').'/'._('Minimize'));
-					$msgDetails->addItem($link);
+				$messages = (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) ? $ZBX_MESSAGES : array();
+				$msg_box = makeMessageBox($bool, $messages, $msg);
 
-					$list = new CList(null);
-					$list->setAttribute('id', 'msg_messages');
-					$list->setAttribute('style', 'display: none;');
-					foreach($ZBX_MESSAGES as $msg) {
-						$list->addItem($msg['type'].'&nbsp;'.$msg['message']);
-					}
-					$msgDetails->addItem($list);
-
-					$msgBox->addItem($msgDetails);
-
-				}
-				$close = new CLink('×', null, 'overlay-close-btn', null, true);
-				$close->setAttribute('onclick', 'javascript: showHide("global-message", IE ? "block" : "table");');
-				$close->setAttribute('title', _('Close'));
-				$msgBox->addItem($close);
-
-				$msgBox->show();
+				$msg_box->show();
 				break;
 		}
 	}

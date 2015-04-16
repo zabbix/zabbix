@@ -1431,14 +1431,16 @@ function getEventActionsStatHints($eventIds) {
 		}
 	}
 
-	foreach ($actions as $eventId => $action) {
-		$actions[$eventId] = new CDiv(null, 'event-action-cont');
-		$actions[$eventId]->addItem(array(
-			new CDiv(isset($action[ALERT_STATUS_SENT]) ? $action[ALERT_STATUS_SENT] : SPACE),
-			new CDiv(isset($action[ALERT_STATUS_NOT_SENT]) ? $action[ALERT_STATUS_NOT_SENT] : SPACE),
-			new CDiv(isset($action[ALERT_STATUS_FAILED]) ? $action[ALERT_STATUS_FAILED] : SPACE)
-		));
+	foreach ($actions as &$action) {
+		$action = array(
+			isset($action[ALERT_STATUS_SENT]) ? $action[ALERT_STATUS_SENT] : '',
+			' ',
+			isset($action[ALERT_STATUS_NOT_SENT]) ? $action[ALERT_STATUS_NOT_SENT] : '',
+			' ',
+			isset($action[ALERT_STATUS_FAILED]) ? $action[ALERT_STATUS_FAILED] : ''
+		);
 	}
+	unset($action);
 
 	return $actions;
 }

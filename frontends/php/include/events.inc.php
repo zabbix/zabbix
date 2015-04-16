@@ -331,6 +331,10 @@ function getEventAckState($event, $url = null, $isLink = true, $params = array()
 		return null;
 	}
 
+	if ($event['acknowledged'] != 0) {
+		$acknowledges_num = is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges'];
+	}
+
 	if ($isLink) {
 		if ($url === null) {
 			$backurl = '';
@@ -354,11 +358,8 @@ function getEventAckState($event, $url = null, $isLink = true, $params = array()
 				if (!empty($ackLinkHints)) {
 					$ackLink->setHint($ackLinkHints, '', false);
 				}
-				$ack = array($ackLink, ' ('.count($event['acknowledges']).')');
 			}
-			else {
-				$ack = array($ackLink, ' ('.$event['acknowledges'].')');
-			}
+			$ack = array($ackLink, CViewHelper::showNum($acknowledges_num));
 		}
 	}
 	else {
@@ -366,7 +367,7 @@ function getEventAckState($event, $url = null, $isLink = true, $params = array()
 			$ack = new CSpan(_('No'), 'on');
 		}
 		else {
-			$ack = array(new CSpan(_('Yes'), 'off'), ' ('.(is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges']).')');
+			$ack = array(new CSpan(_('Yes'), 'off'), CViewHelper::showNum($acknowledges_num));
 		}
 	}
 
