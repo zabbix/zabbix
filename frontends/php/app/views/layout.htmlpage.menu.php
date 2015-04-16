@@ -38,7 +38,7 @@
 	$form->AddItem(array($search, $button));
 	$icons->addItem($form);
 
-	$help = new CLink(SPACE, 'http://www.zabbix.com/documentation/', 'top-nav-help');
+	$help = new CLink(SPACE, 'http://www.zabbix.com/documentation/', 'top-nav-help', null, true);
 	$help->setAttribute('target', '_blank');
 	$help->setAttribute('title', _('Help'));
 	$icons->addItem($help);
