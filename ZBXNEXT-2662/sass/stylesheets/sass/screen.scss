@@ -598,8 +598,8 @@ footer {
 	display: inline-block;
 	position: relative;
 	padding: 0 9px 0 6px;
-	height: 20px;
-	line-height: 20px;
+	height: 18px;
+	line-height: 18px;
 	background: $light-blue-grey;
 	@include border-radius(2px);
 
@@ -650,13 +650,14 @@ footer {
 }
 
 .multiselect {
-	@extend %form-input-height-padding;
 	@extend %form-input-style;
 	@extend .multiselect-button;
 	position: relative;
 	margin-right: 3px;
 	width: 312px;
 	min-height: 22px;
+	line-height: 22px;
+	padding: 0 2px;
 
 	&.active {
 		border-color: $primary-blue;
@@ -674,7 +675,7 @@ footer {
 
 	ul li {
 		display: inline-block;
-		margin: 5px 21px 5px 0;
+		margin: 2px 18px 0 0;
 	}
 }
 
@@ -2324,9 +2325,9 @@ a.form-remove-btn {
 }
 
 .subfilter-disable-btn {
-	width: 20px;
-	height: 20px;
-	line-height: 20px;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
 	display: inline-block;
 	position: absolute;
 	top: 0;
