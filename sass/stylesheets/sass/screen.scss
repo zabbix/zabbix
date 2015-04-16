@@ -656,6 +656,7 @@ footer {
 	position: relative;
 	margin-right: 3px;
 	width: 312px;
+	min-height: 22px;
 
 	&.active {
 		border-color: $primary-blue;
@@ -673,7 +674,7 @@ footer {
 
 	ul li {
 		display: inline-block;
-		margin: 1px 16px 0 0;
+		margin: 5px 21px 5px 0;
 	}
 }
 
@@ -1603,8 +1604,6 @@ button[disabled] {
 	bottom: 21px;
 	width: 766px;
 	text-align: right;
-	padding-top: 20px;
-	border-top: 1px solid $lightest-blue-grey;
 
 	button {
 		margin: 0 0 0 14px;
@@ -2334,6 +2333,7 @@ a.form-remove-btn {
 	right: -16px;
 	color: $white;
 	background: $light-blue-grey;
+	z-index: 11;
 	@extend %close-icon;
 
 	&:hover {
