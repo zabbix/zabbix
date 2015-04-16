@@ -78,7 +78,7 @@ if ($this->data['slideshows']) {
 		$formFilter->addNavigator();
 		$slideshowWidget->addItem($formFilter);
 
-		$slideshowWidget->addItem(new CSpan(_('Loading...'), 'textcolorstyles'));
+		$slideshowWidget->addItem(new CDiv(_('Loading...'), null, WIDGET_SLIDESHOW));
 	}
 	else {
 		$controls->addItem($favouriteIcon);
