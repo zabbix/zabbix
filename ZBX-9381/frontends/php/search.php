@@ -171,12 +171,11 @@ foreach ($hosts as $hnum => $host) {
 				'preservekeys' => true
 			));
 
-			foreach ($host['groups'] as $num => &$group) {
+			foreach ($host['groups'] as $num => $group) {
 				if (!array_key_exists($group['groupid'], $groups)) {
 					unset($host['groups'][$num]);
 				}
 			}
-			unset($group);
 		}
 
 		$group = reset($host['groups']);
