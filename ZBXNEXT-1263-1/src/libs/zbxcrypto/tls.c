@@ -3911,8 +3911,56 @@ int	zbx_tls_get_attr(const zbx_sock_t *s, zbx_tls_conn_attr_t *attr)
 #elif defined(HAVE_GNUTLS)
 	if (ZBX_TCP_SEC_TLS_CERT == s->connection_type)
 	{
-		/* TODO implement getting pointers to issuer and subject and their lengths */
-		return FAIL;
+		gnutls_x509_crt_t	peer_cert = NULL;
+		char			*error = NULL;
+		size_t			issuer_size, subject_size;
+		int			res;
+
+		/* here is some inefficiency - we do not know will it be required to verify peer certificate issuer */
+		/* and subject - but we prepare for it */
+		if (NULL == (peer_cert = zbx_get_peer_cert(s->tls_ctx, &error)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get peer certificate: %s", error);
+			zbx_free(error);
+			return FAIL;
+		}
+
+		issuer_size = sizeof(attr->issuer);
+		subject_size = sizeof(attr->subject);
+
+		if (0 != (res = gnutls_x509_crt_get_issuer_dn(peer_cert, attr->issuer, &issuer_size)))
+		{
+			if (GNUTLS_E_SHORT_MEMORY_BUFFER == res)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "too long peer certificate issuer name: %zu bytes",
+						issuer_size);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "gnutls_x509_crt_get_issuer_dn() failed: %d %s", res,
+						gnutls_strerror(res));
+			}
+
+			return FAIL;
+		}
+
+		if (0 != (res = gnutls_x509_crt_get_dn(peer_cert, attr->subject, &subject_size)))
+		{
+			if (GNUTLS_E_SHORT_MEMORY_BUFFER == res)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "too long peer certificate subject name: %zu bytes",
+						subject_size);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "gnutls_x509_crt_get_dn() failed: %d %s", res,
+						gnutls_strerror(res));
+			}
+
+			return FAIL;
+		}
+
+		gnutls_x509_crt_deinit(peer_cert);
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == s->connection_type)
 	{
