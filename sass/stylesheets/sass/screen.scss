@@ -639,6 +639,10 @@ footer {
 	button {
 		margin: 0 7px;
 	}
+
+	.multiselect {
+		width: 165px;
+	}
 }
 
 .multiselect-wrapper {
@@ -651,6 +655,7 @@ footer {
 	@extend .multiselect-button;
 	position: relative;
 	margin-right: 3px;
+	width: 312px;
 
 	&.active {
 		border-color: $primary-blue;
@@ -1804,6 +1809,10 @@ button[disabled] {
 				background: $light-grey;
 			}
 
+			&.selected {
+				@extend %selected;
+			}
+
 			span {
 				position: absolute;
 				right: 10px;
@@ -1954,12 +1963,7 @@ button[disabled] {
 	width: 200px;
 
 	.selected {
-		background: $blue-grey;
-		color: $white;
-
-		&:hover {
-			@extend .selected;
-		}
+		@extend %selected;
 	}
 
 	table {
@@ -2026,6 +2030,16 @@ button[disabled] {
 	.btn-grey {
 		float: left;
 		margin-top: 0;
+	}
+}
+
+%selected {
+	background: $blue-grey;
+	color: $white;
+
+	&:hover {
+		background: $blue-grey;
+		color: $white;
 	}
 }
 
