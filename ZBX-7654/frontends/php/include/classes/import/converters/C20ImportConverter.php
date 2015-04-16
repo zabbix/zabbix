@@ -44,6 +44,7 @@ class C20ImportConverter extends CConverter {
 		$content = $this->convertTemplates($content);
 		$content = $this->convertTriggers($content);
 		$content = $this->convertScreens($content);
+		$content = $this->convertMaps($content);
 
 		$value['zabbix_export'] = $content;
 
@@ -149,6 +150,13 @@ class C20ImportConverter extends CConverter {
 		}
 
 		foreach ($content['triggers'] as &$trigger) {
+			if ($trigger['dependencies']) {
+				foreach ($trigger['dependencies'] as &$dependency) {
+					$dependency['expression'] = $this->triggerExpressionConverter->convert($dependency['expression']);
+				}
+				unset($dependency);
+			}
+
 			$trigger['expression'] = $this->triggerExpressionConverter->convert($trigger['expression']);
 		}
 		unset($trigger);
@@ -182,6 +190,47 @@ class C20ImportConverter extends CConverter {
 			}
 		}
 		unset($screen);
+
+		return $content;
+	}
+
+	/**
+	 * Convert map elements.
+	 *
+	 * @param array $content
+	 *
+	 * @return array
+	 */
+	protected function convertMaps(array $content) {
+		if (!isset($content['maps']) || !$content['maps']) {
+			return $content;
+		}
+
+		foreach ($content['maps'] as &$map) {
+			if (array_key_exists('selements', $map)) {
+				foreach ($map['selements'] as &$selement) {
+					if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+						$selement['element']['expression'] = $this->triggerExpressionConverter->convert(
+							$selement['element']['expression']
+						);
+					}
+				}
+				unset($selement);
+			}
+
+				foreach ($map['links'] as &$link) {
+					if (array_key_exists('linktriggers', $link)) {
+						foreach ($link['linktriggers'] as &$linktrigger) {
+							$linktrigger['trigger']['expression'] = $this->triggerExpressionConverter->convert(
+								$linktrigger['trigger']['expression']
+							);
+						}
+						unset($linktrigger);
+					}
+				}
+				unset($link);
+		}
+		unset($map);
 
 		return $content;
 	}
