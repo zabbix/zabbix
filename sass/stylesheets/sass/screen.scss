@@ -1810,7 +1810,7 @@ button[disabled] {
 			}
 
 			&.selected {
-				@extend %selected;
+				font-weight: bold;
 			}
 
 			span {
@@ -1963,8 +1963,13 @@ button[disabled] {
 	width: 200px;
 
 	.selected {
-		@extend %selected;
-	}
+		background: $blue-grey;
+		color: $white;
+
+		&:hover {
+			@extend .selected
+			}
+		}
 
 	table {
 		width: 100%;
@@ -2030,16 +2035,6 @@ button[disabled] {
 	.btn-grey {
 		float: left;
 		margin-top: 0;
-	}
-}
-
-%selected {
-	background: $blue-grey;
-	color: $white;
-
-	&:hover {
-		background: $blue-grey;
-		color: $white;
 	}
 }
 
