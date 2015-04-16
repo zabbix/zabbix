@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
-$itemsWidget = new CWidget(null, 'item-list');
+$itemsWidget = new CWidget('item-list');
 $itemsWidget->setTitle(_('Items'));
 
 // create new item button

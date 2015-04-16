@@ -19,7 +19,7 @@
 **/
 
 
-$discoveryWidget = new CWidget('hat_discovery');
+$discoveryWidget = new CWidget();
 $discoveryWidget->setTitle(_('Status of discovery'));
 
 // create header form

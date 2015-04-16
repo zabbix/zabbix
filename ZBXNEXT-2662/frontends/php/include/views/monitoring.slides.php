@@ -19,7 +19,7 @@
 **/
 
 
-$slideshowWidget = new CWidget('hat_slides');
+$slideshowWidget = new CWidget();
 $slideshowWidget->setTitle(_('Slide shows'));
 
 // create header form

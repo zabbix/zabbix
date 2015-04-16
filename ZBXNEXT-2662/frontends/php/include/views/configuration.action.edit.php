@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 
-$actionWidget = new CWidget(null, 'action-edit');
+$actionWidget = new CWidget('action-edit');
 $actionWidget->setTitle(_('Actions'));
 
 // create form

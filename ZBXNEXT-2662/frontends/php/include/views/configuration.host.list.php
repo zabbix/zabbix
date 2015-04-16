@@ -19,7 +19,7 @@
 **/
 
 
-$hostWidget = new CWidget(null, 'host-list');
+$hostWidget = new CWidget('host-list');
 $hostWidget->setTitle(_('Hosts'));
 
 $frmForm = new CForm('get');
