@@ -221,6 +221,14 @@ function get_icon($type, $params = array()) {
 
 			return $icon;
 
+		case 'screenconf':
+
+			$icon = new CRedirectButton(SPACE, null);
+			$icon->addClass(ZBX_STYLE_BTN_CONF);
+			$icon->setTitle(_('Refresh time'));
+
+			return $icon;
+
 		case 'overviewhelp':
 
 			$icon = new CRedirectButton(SPACE, null);

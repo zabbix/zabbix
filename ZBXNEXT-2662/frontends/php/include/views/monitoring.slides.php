@@ -42,7 +42,7 @@ if ($this->data['slideshows']) {
 		))
 		: new CIcon(_('Favourites'), 'iconplus');
 
-	$refreshIcon = new CIcon(_('Menu'), 'iconmenu');
+	$refreshIcon = get_icon('screenconf');
 
 	if ($this->data['screen']) {
 		$refreshIcon->setMenuPopup(CMenuPopupHelper::getRefresh(
@@ -54,10 +54,6 @@ if ($this->data['slideshows']) {
 			)
 		));
 	}
-
-	$controls->addItem($favouriteIcon);
-	$controls->addItem($refreshIcon);
-	$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
 
 	$slideHeaderForm->addVar('fullscreen', $this->data['fullscreen']);
 
@@ -72,6 +68,9 @@ if ($this->data['slideshows']) {
 			$controls->addItem(array(SPACE, _('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()));
 			$controls->addItem(array(SPACE, _('Host'), SPACE, $this->data['pageFilter']->getHostsCB()));
 		}
+		$controls->addItem($favouriteIcon);
+		$controls->addItem($refreshIcon);
+		$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
 		$slideHeaderForm->addItem($controls);
 		$slideshowWidget->setControls($slideHeaderForm);
 
@@ -82,6 +81,9 @@ if ($this->data['slideshows']) {
 		$slideshowWidget->addItem(new CSpan(_('Loading...'), 'textcolorstyles'));
 	}
 	else {
+		$controls->addItem($favouriteIcon);
+		$controls->addItem($refreshIcon);
+		$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
 		$slideHeaderForm->addItem($controls);
 		$slideshowWidget->setControls($slideHeaderForm);
 		$slideshowWidget->addItem(new CTableInfo());
