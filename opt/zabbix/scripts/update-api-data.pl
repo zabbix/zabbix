@@ -9,6 +9,10 @@ use ApiHelper;
 use JSON::XS;
 use Data::Dumper;
 
+use constant JSON_RDDS_SUBSERVICE => 'subService';
+use constant JSON_RDDS_43 => 'RDDS43';
+use constant JSON_RDDS_80 => 'RDDS80';
+
 use constant AUDIT_RESOURCE_INCIDENT => 32;
 parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s');
 
@@ -443,7 +447,7 @@ foreach (@$tlds_ref)
 						{
 							if ($clock < $test_results[$test_result_index]->{'start'})
 							{
-								wrn("no aggregated result of $service test of $nsip (probe:$probe service:$service time:", ts_str($clock), ") found in the database");
+								wrn("no aggregated result of $service test of $nsip (probe:$probe time:", ts_str($clock), ") found in the database");
 								next;
 							}
 
@@ -452,7 +456,7 @@ foreach (@$tlds_ref)
 
 							if ($test_result_index == $test_results_count)
 							{
-								wrn("no aggregated result of $service test of $nsip (probe:$probe service:$service time:", ts_str($clock), ") found in the database");
+								wrn("no aggregated result of $service test of $nsip (probe:$probe time:", ts_str($clock), ") found in the database");
 								next;
 							}
 
@@ -512,21 +516,21 @@ foreach (@$tlds_ref)
 				# run through values from probes (ordered by clock)
 				foreach my $probe (keys(%$values_ref))
 				{
-					my $ports_ref = $values_ref->{$probe};
+					my $subservices_ref = $values_ref->{$probe};
 
 					dbg("probe:$probe");
 
-					foreach my $port (keys(%$ports_ref))
+					foreach my $subservice (keys(%$subservices_ref))
 					{
 						my $test_result_index = 0;
 
-						foreach my $endvalues_ref (@{$ports_ref->{$port}})
+						foreach my $endvalues_ref (@{$subservices_ref->{$subservice}})
 						{
 							my $clock = $endvalues_ref->{'clock'};
 
 							if ($clock < $test_results[$test_result_index]->{'start'})
 							{
-								wrn("no aggregated result of $service$port test (probe:$probe service:$service time:", ts_str($clock), ") found in the database");
+								wrn("no aggregated result of $subservice test (probe:$probe time:", ts_str($clock), ") found in the database");
 								next;
 							}
 
@@ -535,15 +539,15 @@ foreach (@$tlds_ref)
 
 							if ($test_result_index == $test_results_count)
 							{
-								wrn("no aggregated result of $service$port test (probe:$probe service:$service time:", ts_str($clock), ") found in the database");
+								wrn("no aggregated result of $subservice test (probe:$probe time:", ts_str($clock), ") found in the database");
 								next;
 							}
 
 							my $tr_ref = $test_results[$test_result_index];
 
-							$tr_ref->{'ports'}->{$port}->{$probe}->{'status'} = 'No result' unless (exists($tr_ref->{'ports'}->{$port}->{$probe}->{'status'}));
+							$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'} = 'No result' unless (exists($tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'}));
 
-							push(@{$tr_ref->{'ports'}->{$port}->{$probe}->{'details'}}, $endvalues_ref);
+							push(@{$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'details'}}, $endvalues_ref);
 						}
 					}
 				}
@@ -561,11 +565,11 @@ foreach (@$tlds_ref)
 					delete($tr_ref->{'start'});
 					delete($tr_ref->{'end'});
 
-					my $ports_ref = $tr_ref->{'ports'};
+					my $subservices_ref = $tr_ref->{+JSON_RDDS_SUBSERVICE};
 
-					foreach my $port (keys(%$ports_ref))
+					foreach my $subservice (keys(%$subservices_ref))
 					{
-						my $probes_ref = $ports_ref->{$port};
+						my $probes_ref = $subservices_ref->{$subservice};
 
 						foreach my $probe (keys(%$probes_ref))
 						{
@@ -574,9 +578,9 @@ foreach (@$tlds_ref)
 								next if ($status_ref->{'clock'} < $tr_start);
 								last if ($status_ref->{'clock'} > $tr_end);
 
-								my $service_only = ($port eq "43" ? 2 : 3); # 0 - down, 1 - up, 2 - only 43, 3 - only 80
+								my $service_only = ($subservice eq "43" ? 2 : 3); # 0 - down, 1 - up, 2 - only 43, 3 - only 80
 
-								$tr_ref->{'ports'}->{$port}->{$probe}->{'status'} = (($status_ref->{'value'} == 1 or $status_ref->{'value'} == $service_only) ? "Up" : "Down");
+								$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'} = (($status_ref->{'value'} == 1 or $status_ref->{'value'} == $service_only) ? "Up" : "Down");
 							}
 						}
 					}
@@ -612,7 +616,7 @@ foreach (@$tlds_ref)
 					{
 						if ($clock < $test_results[$test_result_index]->{'start'})
 						{
-							wrn("no aggregated result of $service test (probe:$probe service:$service time:", ts_str($clock), ") found in the database");
+							wrn("no aggregated result of $service test (probe:$probe time:", ts_str($clock), ") found in the database");
 							next;
 						}
 
@@ -621,7 +625,7 @@ foreach (@$tlds_ref)
 
 						if ($test_result_index == $test_results_count)
 						{
-							wrn("no aggregated result of $service test (probe:$probe service:$service time:", ts_str($clock), ") found in the database");
+							wrn("no aggregated result of $service test (probe:$probe time:", ts_str($clock), ") found in the database");
 							next;
 						}
 
@@ -884,7 +888,21 @@ sub __get_rdds_test_values
 		my $port = __get_rdds_port($key);
 		my $type = __get_rdds_dbl_type($key);
 
-		$pre_result{$probe}->{$port}->{$clock}->{$type} = ($type eq 'rtt') ? get_detailed_result($cfg_rdds_valuemaps, $value) : int($value);
+		my $subservice;
+		if ($port eq '43')
+		{
+			$subservice = JSON_RDDS_43;
+		}
+		elsif ($port eq '80')
+		{
+			$subservice = JSON_RDDS_80;
+		}
+		else
+		{
+			fail("unknown RDDS port in item (id:$itemid)");
+		}
+
+		$pre_result{$probe}->{$subservice}->{$clock}->{$type} = ($type eq 'rtt') ? get_detailed_result($cfg_rdds_valuemaps, $value) : int($value);
 	}
 
 	my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
@@ -902,24 +920,38 @@ sub __get_rdds_test_values
 		my $port = __get_rdds_port($key);
 		my $type = __get_rdds_str_type($key);
 
-		$pre_result{$probe}->{$port}->{$clock}->{$type} = $value;
+		my $subservice;
+                if ($port eq '43')
+                {
+                        $subservice = JSON_RDDS_43;
+                }
+                elsif ($port eq '80')
+                {
+                        $subservice = JSON_RDDS_80;
+                }
+                else
+                {
+                        fail("unknown RDDS port in item (id:$itemid)");
+                }
+
+		$pre_result{$probe}->{$subservice}->{$clock}->{$type} = $value;
 	}
 
 	foreach my $probe (keys(%pre_result))
 	{
-		foreach my $port (keys(%{$pre_result{$probe}}))
+		foreach my $subservice (keys(%{$pre_result{$probe}}))
 		{
-			foreach my $clock (keys(%{$pre_result{$probe}->{$port}}))
+			foreach my $clock (keys(%{$pre_result{$probe}->{$subservice}}))
 			{
 				my $h;
-				my $clock_ref = $pre_result{$probe}->{$port}->{$clock};
-				foreach my $key (sort(keys(%{$pre_result{$probe}->{$port}->{$clock}})))	# must be sorted by clock
+				my $clock_ref = $pre_result{$probe}->{$subservice}->{$clock};
+				foreach my $key (sort(keys(%{$pre_result{$probe}->{$subservice}->{$clock}})))	# must be sorted by clock
 				{
 					$h->{$key} = $clock_ref->{$key};
 				}
 				$h->{'clock'} = $clock;
 
-				push(@{$result{$probe}->{$port}}, $h);
+				push(@{$result{$probe}->{$subservice}}, $h);
 			}
 		}
 	}
