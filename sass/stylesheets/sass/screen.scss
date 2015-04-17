@@ -597,7 +597,7 @@ footer {
 .subfilter-enabled {
 	display: inline-block;
 	position: relative;
-	padding: 0 9px 0 6px;
+	padding: 0 9px 0 4px;
 	height: 18px;
 	line-height: 18px;
 	background: $light-blue-grey;
@@ -675,7 +675,23 @@ footer {
 
 	ul li {
 		display: inline-block;
-		margin: 2px 18px 0 0;
+		margin: 2px 14px 0 0;
+		white-space: nowrap;
+
+		&.selected {
+
+			.subfilter-enabled {
+				background: darken($light-blue-grey, 5%);
+			}
+
+			.subfilter-disable-btn {
+				background: darken($light-blue-grey, 5%);
+
+				&:active {
+					background: darken($light-blue-grey, 10%);
+				}
+			}
+		}
 	}
 }
 
@@ -2331,7 +2347,7 @@ a.form-remove-btn {
 	display: inline-block;
 	position: absolute;
 	top: 0;
-	right: -16px;
+	right: -12px;
 	color: $white;
 	background: $light-blue-grey;
 	z-index: 11;
@@ -2348,16 +2364,18 @@ a.form-remove-btn {
 }
 
 .color-picker {
-	height: 18px;
+	height: 20px;
 
 	div {
 		display: inline-block;
 		width: 18px;
 		height: 18px;
+		border: 1px solid $white;
 
 		&:hover {
 			cursor: pointer;
-			@include box-shadow(inset 0 0 0 1px $alt-dark-blue)
+			@include box-shadow(inset 0 0 0 1px $white);
+			border-color: $alt-dark-blue;
 		}
 	}
 }
