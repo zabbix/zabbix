@@ -2011,7 +2011,7 @@ out:
  *             seconds   - [IN] the time period to retrieve data for          *
  *             timestamp - [IN] the requested period end timestamp            *
  *                                                                            *
- * Return value:  >=0    - the number ofq values read from database            *
+ * Return value:  >=0    - the number of values read from database            *
  *                FAIL   - an error occurred while trying to cache values     *
  *                                                                            *
  * Comments: This function checks if the requested value range is cached and  *
@@ -2026,7 +2026,6 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 		return SUCCEED;
 
 	start = timestamp - seconds;
-	update_end = ZBX_VC_TIME();
 
 	/* check if the requested period is in the cached range                            */
 	/* (the first interval endpoint is excluded, thats why we have to check start + 1) */
@@ -2039,6 +2038,8 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 		/* we need to get item values before the first cached value, but not including it */
 		update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
 	}
+	else
+		update_end = ZBX_VC_TIME();
 
 	update_seconds = update_end - start;
 
@@ -2196,13 +2197,12 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
  ******************************************************************************/
 static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seconds, int count, int timestamp)
 {
-	int	ret = SUCCEED, cached_records = 0, update_end, start;
+	int	ret = SUCCEED, cached_records = 0, start;
 
 	if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
 		return SUCCEED;
 
 	start = timestamp - seconds;
-	update_end = ZBX_VC_TIME();
 
 	/* check if the requested period is in the cached range                            */
 	/* (the first interval endpoint is excluded, thats why we have to check start + 1) */
@@ -2229,10 +2229,13 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seco
 	{
 		zbx_vector_history_record_t	records;
 		zbx_uint64_t			queries = 0;
+		int				update_end;
 
 		/* get the end timestamp to which (including) the values should be cached */
 		if (NULL != item->head)
 			update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
+		else
+			update_end = ZBX_VC_TIME();
 
 		zbx_vector_history_record_create(&records);
 
