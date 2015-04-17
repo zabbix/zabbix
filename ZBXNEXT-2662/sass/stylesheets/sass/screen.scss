@@ -187,6 +187,7 @@ ul.top-nav-icons {
 		height: 36px;
 		color: $white;
 		font-size: $font-h3-size;
+		text-decoration: none;
 		@include opacity(0.75);
 		@include transition(all .2s ease);
 
@@ -210,6 +211,10 @@ ul.top-nav-icons {
 	.top-nav-signout {
 		background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -91px;
 		width: 44px;
+	}
+
+	.top-nav-zbbshare {
+		background: $secondary-blue url(../img/icon-sprite.png) no-repeat -41px -138px;
 	}
 
 	form {
@@ -698,19 +703,19 @@ footer {
 			display: inline-block;
 			margin: 2px 14px 0 0;
 			white-space: nowrap;
-		}
 
-		&.selected {
+			&.selected {
 
-			.subfilter-enabled {
-				background: darken($light-blue-grey, 5%);
-			}
-
-			.subfilter-disable-btn {
-				background: darken($light-blue-grey, 5%);
-
-				&:active {
+				.subfilter-enabled {
 					background: darken($light-blue-grey, 10%);
+				}
+
+				.subfilter-disable-btn {
+					background: darken($light-blue-grey, 10%);
+
+					&:active {
+						background: darken($light-blue-grey, 15%);
+					}
 				}
 			}
 		}
