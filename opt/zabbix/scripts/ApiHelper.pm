@@ -13,8 +13,6 @@ use constant AH_BASE_DIR => '/opt/zabbix/sla';
 use constant AH_INCIDENT_ACTIVE => 'ACTIVE';
 use constant AH_END_FILE => 'end';
 use constant AH_FALSE_POSITIVE_FILE => 'falsePositive';
-use constant AH_FALSE_POSITIVE => 'YES';
-use constant AH_NOT_FALSE_POSITIVE => 'NO';
 use constant AH_ALARMED_FILE => 'alarmed';
 use constant AH_ALARMED_YES => 'YES';
 use constant AH_ALARMED_NO => 'NO';
@@ -24,7 +22,7 @@ use constant AH_SERVICE_AVAILABILITY_FILE => 'serviceAvailability';
 use constant AH_ROOT_ZONE_DIR => 'zz--root';			# map root zone name (.) to something human readable
 use constant AH_CONTINUE_FILE => 'last_update.txt';		# name of the file containing the timestamp of the last
 								# run with --continue
-use constant AH_AUDIT_FILE => AH_BASE_DIR.'/last_audit.txt';	# name of the file containing the timestamp of the last
+use constant AH_AUDIT_FILE => AH_BASE_DIR . '/last_audit.txt';	# name of the file containing the timestamp of the last
 								# auditlog entry that was checked (false_positive change)
 
 our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED ah_get_error
@@ -42,8 +40,26 @@ sub __make_base_path
 {
 	my $tld = shift;
 	my $service = shift;
+	my $result_path_ptr = shift;	# pointer
+	my $add_path = shift;
 
-	return AH_BASE_DIR . "/$tld/$service";
+	$tld = lc($tld);
+	$service = lc($service);
+
+	my $path = AH_BASE_DIR . "/$tld/$service";
+	$path .= "/$add_path" if ($add_path);
+
+	make_path($path, {error => \my $err});
+
+	if (@$err)
+	{
+		__set_file_error($err);
+		return AH_FAIL;
+	}
+
+	$$result_path_ptr = $path;
+
+	return AH_SUCCESS;
 }
 
 sub __make_inc_path
@@ -52,8 +68,9 @@ sub __make_inc_path
 	my $service = shift;
 	my $start = shift;
 	my $eventid = shift;
+	my $inc_path_ptr = shift;	# pointer
 
-	return __make_base_path($tld, $service) . "/incidents/$start.$eventid";
+	return __make_base_path($tld, $service, $inc_path_ptr, "incidents/$start.$eventid");
 }
 
 sub __set_error
@@ -119,7 +136,7 @@ sub __apply_inc_end
 	my $end = shift;
 	my $lastclock = shift;
 
-	my $end_path = "$inc_path/".AH_END_FILE;
+	my $end_path = "$inc_path/" . AH_END_FILE;
 
 	return __write_file($end_path, AH_INCIDENT_ACTIVE, $lastclock) unless (defined($end));
 
@@ -135,9 +152,20 @@ sub __apply_inc_false_positive
 	my $false_positive = shift;
 	my $clock = shift;
 
-	my $false_positive_path = "$inc_path/".AH_FALSE_POSITIVE_FILE;
+	my $false_positive_path = "$inc_path/" . AH_FALSE_POSITIVE_FILE;
 
-	return __write_file($false_positive_path, $false_positive == 0 ? AH_NOT_FALSE_POSITIVE : AH_FALSE_POSITIVE, $clock);
+	if ($false_positive != 0)
+	{
+		return __write_file($false_positive_path, '', $clock);
+	}
+
+	if ((-e $false_positive_path) and not unlink($false_positive_path))
+	{
+		__set_file_error($!);
+		return AH_FAIL;
+	}
+
+	return AH_SUCCESS;
 }
 
 sub ah_save_alarmed
@@ -147,15 +175,9 @@ sub ah_save_alarmed
 	my $status = shift;
 	my $clock = shift;
 
-	my $base_path = __make_base_path($tld, $service);
+	my $base_path;
 
-	make_path($base_path, {error => \my $err});
-
-	if (@$err)
-	{
-		__set_file_error($err);
-		return AH_FAIL;
-	}
+	return AH_FAIL unless (__make_base_path($tld, $service, \$base_path) == AH_SUCCESS);
 
 	my $alarmed_path = "$base_path/" . AH_ALARMED_FILE;
 
@@ -181,43 +203,26 @@ sub ah_save_service_availability
 	my $downtime = shift;
 	my $clock = shift;
 
-	my $service_availability_path = __make_base_path($tld, $service);
+	my $service_availability_path;
 
-	make_path($service_availability_path, {error => \my $err});
+	return AH_FAIL unless (__make_base_path($tld, $service, \$service_availability_path) == AH_SUCCESS);
 
-	if (@$err)
-	{
-		__set_file_error($err);
-		return AH_FAIL;
-	}
-
-	$service_availability_path .= "/" . AH_SERVICE_AVAILABILITY_FILE;
-
-	return __write_file($service_availability_path, $downtime, $clock);
+	return __write_file("$service_availability_path/" . AH_SERVICE_AVAILABILITY_FILE, $downtime, $clock);
 }
 
 sub ah_save_incident
 {
 	my $tld = shift;
 	my $service = shift;
-	my $eventid = shift; # incident is identified by event ID
+	my $eventid = shift;	# incident is identOAified by event ID
 	my $start = shift;
 	my $end = shift;
 	my $false_positive = shift;
 	my $lastclock = shift;
 
-	$tld = lc($tld);
-	$service = lc($service);
+	my $inc_path;
 
-	my $inc_path = __make_inc_path($tld, $service, $start, $eventid);
-
-	make_path($inc_path, {error => \my $err});
-
-	if (@$err)
-	{
-		__set_file_error($err);
-		return AH_FAIL;
-	}
+	return AH_FAIL unless (__make_inc_path($tld, $service, $start, $eventid, \$inc_path) == AH_SUCCESS);
 
 	return AH_FAIL unless (__apply_inc_end($inc_path, $end, $lastclock) == AH_SUCCESS);
 
@@ -228,23 +233,14 @@ sub ah_save_false_positive
 {
 	my $tld = shift;
 	my $service = shift;
-	my $eventid = shift; # incident is identified by event ID
+	my $eventid = shift;	# incident is identified by event ID
 	my $start = shift;
 	my $false_positive = shift;
 	my $clock = shift;
 
-	$tld = lc($tld);
-        $service = lc($service);
+	my $inc_path;
 
-	my $inc_path = __make_inc_path($tld, $service, $start, $eventid);
-
-	make_path($inc_path, {error => \my $err});
-
-	if (@$err)
-	{
-		__set_file_error($err);
-		return AH_FAIL;
-	}
+	return AH_FAIL unless (__make_inc_path($tld, $service, $start, $eventid, \$inc_path) == AH_SUCCESS);
 
 	return __apply_inc_false_positive($inc_path, $false_positive, $clock);
 }
@@ -253,25 +249,16 @@ sub ah_save_incident_json
 {
 	my $tld = shift;
 	my $service = shift;
-	my $eventid = shift; # incident is identified by event ID
+	my $eventid = shift;	# incident is identified by event ID
 	my $start = shift;
 	my $json = shift;
 	my $clock = shift;
 
-	$tld = lc($tld);
-	$service = lc($service);
+	my $inc_path;
 
-	my $json_path = __make_inc_path($tld, $service, $start, $eventid);
+	return AH_FAIL unless (__make_inc_path($tld, $service, $start, $eventid, \$inc_path) == AH_SUCCESS);
 
-	make_path($json_path, {error => \my $err});
-
-	if (@$err)
-	{
-		__set_file_error($err);
-		return AH_FAIL;
-	}
-
-	$json_path .= "/$clock.$eventid.json";
+	my $json_path = "$inc_path/$clock.$eventid.json";
 
 	return __write_file($json_path, "$json\n", $clock);
 }
@@ -281,7 +268,7 @@ sub ah_get_continue_file
 	my $tld = shift;
 	my $service = shift;
 
-	return AH_BASE_DIR."/$tld/$service/".AH_CONTINUE_FILE;
+	return AH_BASE_DIR . "/$tld/$service/" . AH_CONTINUE_FILE;
 }
 
 sub ah_get_api_tld
