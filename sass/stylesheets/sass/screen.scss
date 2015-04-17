@@ -168,7 +168,7 @@ ul.top-nav-icons {
 		float: left;
 
 		.search-suggest {
-			min-width: 166px;
+			min-width: 168px;
 
 			li {
 				float: none;
@@ -215,16 +215,27 @@ ul.top-nav-icons {
 	}
 
 	input {
-		background: darken($primary-blue, 5%);
-		border: none;
+		//background: darken($primary-blue, 5%);
+		//border: none;
+		background-color: $primary-blue;
+		border: 1px solid $primary-blue;
+		border-bottom-color: $white;
 		width: 169px;
 		height: 24px;
 		line-height: 24px;
-		margin: 6px 13px 0 0;
+		//margin: 6px 13px 0 0;
+		margin: 6px 7px 0 0;
 		color: $white;
 		padding-right: 24px;
-		@include transition(color, background-color .2s ease);
+		@include opacity(0.75);
+		@include transition(color, background-color, border .2s ease);
 		@include placeholder($form-input-top-placeholder);
+
+		&:focus {
+			//background-color: darken($primary-blue, 5%);
+			border-bottom: 1px solid $white;
+			@include opacity(1);
+		}
 
 		&:focus + .btn-search {
 			@include opacity(1);
@@ -673,10 +684,13 @@ footer {
 
 	}
 
-	ul li {
-		display: inline-block;
-		margin: 2px 14px 0 0;
-		white-space: nowrap;
+	.multiselect-list {
+
+		li {
+			display: inline-block;
+			margin: 2px 14px 0 0;
+			white-space: nowrap;
+		}
 
 		&.selected {
 
@@ -1270,11 +1284,12 @@ button {
 
 
 	&.btn-search {
-		background: darken($primary-blue, 5%) url(../img/icon-sprite.png) no-repeat 1px -1px;
+		//background: darken($primary-blue, 5%) url(../img/icon-sprite.png) no-repeat 1px -1px;
+		background: url(../img/icon-sprite.png) no-repeat 1px -1px;
 		position: absolute;
 		border: none;
 		top: 7px;
-		right: 14px;
+		right: 8px;
 		width: 24px;
 		min-height: 22px;
 		padding: 0;
@@ -1425,7 +1440,8 @@ button {
 }
 
 %btn-search-hover-focus {
-	background-color: darken($primary-blue, 5%);
+	//background-color: darken($primary-blue, 5%);
+	background-color: $transparent;
 	@include opacity(1);
 }
 
@@ -1861,6 +1877,7 @@ button[disabled] {
 	border-top: none;
 
 	li {
+		display: block;
 		height: 24px;
 		line-height: 24px;
 		color: $indigo-black;
@@ -2376,6 +2393,11 @@ a.form-remove-btn {
 			cursor: pointer;
 			@include box-shadow(inset 0 0 0 1px $white);
 			border-color: $alt-dark-blue;
+		}
+
+		&:active {
+			cursor: pointer;
+			@include box-shadow(inset 0 0 0 2px $white);
 		}
 	}
 }
