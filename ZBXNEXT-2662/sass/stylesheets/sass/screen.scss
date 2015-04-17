@@ -684,6 +684,12 @@ footer {
 
 	}
 
+	.search-suggest {
+		max-height: 400px;
+		overflow-y: auto;
+		@extend %webkit-scrollbar;
+	}
+
 	.multiselect-list {
 
 		li {
@@ -1606,14 +1612,16 @@ button[disabled] {
 		margin: 25% 0 0.4em 0;
 	}
 
+	@extend %webkit-scrollbar;
+}
+
+%webkit-scrollbar {
 	&::-webkit-scrollbar {
 		width: 5px;
 	}
-
 	&::-webkit-scrollbar-track {
 		background: $light-grey;
 	}
-	
 	&::-webkit-scrollbar-thumb {
 		background: $lighter-blue-grey;
 	}
