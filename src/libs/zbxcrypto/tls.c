@@ -1525,6 +1525,75 @@ static int	zbx_verify_peer_cert(const gnutls_session_t session, char **error)
 }
 #endif
 
+#if defined(HAVE_OPENSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_issuer_subject                                           *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     get certificate issuer and subject as strings                          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     cert         - [IN] certificate                                        *
+ *     issuer       - [OUT] dynamically allocated memory with issuer string   *
+ *     subject      - [OUT] dynamically allocated memory with subject string  *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED or FAIL                                                        *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     In case of success it is a responsibility of caller to deallocate      *
+ *     memory pointed to by '*issuer' and '*subject' using OPENSSL_free().    *
+ *                                                                            *
+ *     Examples often use OpenSSL X509_NAME_oneline() to print certificate    *
+ *     issuer and subject into memory buffers but it is a legacy function     *
+ *     strongly discouraged in new applications. So, we have to use functions *
+ *     writing into BIOs and then turn results into memory buffers.           *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_get_issuer_subject(X509 *cert, char **issuer, char **subject)
+{
+	BIO	*issuer_bio, *subject_bio;
+	int	ret = FAIL, res = 0;
+
+	if (NULL == (issuer_bio = BIO_new(BIO_s_mem())))
+		return FAIL;
+
+	if (NULL == (subject_bio = BIO_new(BIO_s_mem())))
+		goto out;
+
+	/* BIO_set_nbio(..., 1); probably no need to set non-blocking I/O for memory BIO */
+
+	/* XN_FLAG_RFC2253 - RFC 2253 is outdated, it was replaced by RFC 4514 "Lightweight Directory Access Protocol */
+	/* (LDAP): String Representation of Distinguished Names" */
+
+	if (0 >= X509_NAME_print_ex(issuer_bio, X509_get_issuer_name(cert), 0, XN_FLAG_RFC2253))
+		goto out;
+
+	if (0 >= X509_NAME_print_ex(subject_bio, X509_get_subject_name(cert), 0, XN_FLAG_RFC2253))
+		goto out;
+
+	BIO_get_mem_data(issuer_bio, issuer);	/* BIO_get_mem_data() returns amount of data. Ignore it. */
+	BIO_get_mem_data(subject_bio, subject);
+
+	BIO_set_flags(issuer_bio, BIO_FLAGS_MEM_RDONLY);
+	BIO_set_flags(subject_bio, BIO_FLAGS_MEM_RDONLY);
+
+	ret = SUCCEED;
+out:
+	if (1 != BIO_free(issuer_bio))
+		res++;
+
+	if (NULL != subject_bio && 1 != BIO_free(subject_bio))
+		res++;
+
+	if (0 != res)
+		ret = FAIL;
+
+	return ret;
+}
+#endif
+
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
 /******************************************************************************
  *                                                                            *
@@ -2184,12 +2253,15 @@ void	zbx_tls_init_child(void)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded CA certificate(s)", __function_name);
 
 		SSL_CTX_set_verify(ctx_cert, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
-		SSL_CTX_set_verify_depth(ctx_cert, 1);	/* TODO is depth 1 ok ? */
+
+		/* It is possible to limit the length of certificate chain being verified. For example: */
+		/* SSL_CTX_set_verify_depth(ctx_cert, 2); */
+		/* Currently use the default depth 100. */
 
 		if (NULL != ctx_all)
 		{
 			SSL_CTX_set_verify(ctx_all, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
-			SSL_CTX_set_verify_depth(ctx_all, 1);	/* TODO is depth 1 ok ? */
+			/* SSL_CTX_set_verify_depth(ctx_all, 2); */
 		}
 	}
 
@@ -2968,6 +3040,7 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
+	X509		*peer_cert = NULL;
 	char		psk_buf[HOST_TLS_PSK_LEN/2];
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
@@ -3096,9 +3169,32 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
-		/* TODO log peer certificate information for debugging */
+		char	*issuer = NULL, *subject = NULL;
+
+		if ((NULL != tls_arg2 && '\0' != *tls_arg2) || (NULL != tls_arg1 && '\0' != *tls_arg1) ||
+				SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			if (NULL == (peer_cert = SSL_get_peer_certificate(s->tls_ctx)) ||
+					SUCCEED != zbx_get_issuer_subject(peer_cert, &issuer, &subject))
+			{
+				zbx_tls_close(s);
+				goto out1;
+			}
+		}
+
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+			zabbix_log(LOG_LEVEL_DEBUG, "peer certificate issuer:\"%s\" subject:\"%s\"", issuer, subject);
 
 		/* validate peer certificate TODO: Issuer and Subject validation */
+
+		if (NULL != issuer)
+			OPENSSL_free(issuer);
+
+		if (NULL != subject)
+			OPENSSL_free(subject);
+
+		if (NULL != peer_cert)
+			X509_free(peer_cert);
 
 		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
 	}
@@ -3112,12 +3208,16 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 	}
 
 	return SUCCEED;
-out:
+
+out:	/* an error occured */
 	if (NULL != s->tls_ctx)
 	{
 		SSL_free(s->tls_ctx);
 		s->tls_ctx = NULL;
 	}
+out1:
+	if (NULL != peer_cert)
+		X509_free(peer_cert);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
