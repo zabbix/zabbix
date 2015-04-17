@@ -185,6 +185,8 @@ ul.top-nav-icons {
 		display: block;
 		width: 38px;
 		height: 36px;
+		color: $white;
+		font-size: $font-h3-size;
 		@include opacity(0.75);
 		@include transition(all .2s ease);
 
@@ -1649,7 +1651,7 @@ button[disabled] {
 	button {
 		margin: 0 0 0 14px;
 
-		&:first-child {
+		&.cancel {
 			margin: 0;
 			float: left;
 		}
