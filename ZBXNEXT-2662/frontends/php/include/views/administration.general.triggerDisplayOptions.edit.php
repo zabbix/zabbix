@@ -21,7 +21,7 @@
 
 include('include/views/js/administration.general.triggerDisplayOptions.js.php');
 
-$triggerDOFormList = new CFormList('scriptsTab');
+$triggerDOFormList = new CFormList();
 
 $headerDiv = new CDiv(_('Colour'), 'inlineblock trigger_displaying_form_col');
 $headerDiv->addStyle('margin-left: 2px;');

@@ -160,7 +160,7 @@ $hostList->addRow(_('Enabled'), new CCheckBox('status', (HOST_STATUS_MONITORED =
 $divTabs->addTab('hostTab', _('Host'), $hostList);
 
 // groups
-$groupList = new CFormList('grouplist');
+$groupList = new CFormList();
 
 // existing groups
 $groups = array();
@@ -207,7 +207,7 @@ $groupList->addRow(_('Group prototypes'), $groupDiv);
 $divTabs->addTab('groupTab', _('Groups'), $groupList);
 
 // templates
-$tmplList = new CFormList('tmpllist');
+$tmplList = new CFormList();
 
 // create linked template table
 $linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');
@@ -265,7 +265,7 @@ $divTabs->addTab('templateTab', _('Templates'), $tmplList);
 // display inherited parameters only for hosts prototypes on hosts
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	// IPMI
-	$ipmiList = new CFormList('ipmilist');
+	$ipmiList = new CFormList();
 
 	$cmbIPMIAuthtype = new CTextBox('ipmi_authtype', ipmiAuthTypes($parentHost['ipmi_authtype']), ZBX_TEXTBOX_SMALL_SIZE, true);
 	$ipmiList->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype);

@@ -29,7 +29,7 @@ $screenForm = new CForm('post', $action);
 $screenForm->setName('screen_item_form');
 
 // create screen form list
-$screenFormList = new CFormList('screenFormList');
+$screenFormList = new CFormList();
 $screenFormList->addVar('screenid', $_REQUEST['screenid']);
 
 if (isset($_REQUEST['screenitemid'])) {

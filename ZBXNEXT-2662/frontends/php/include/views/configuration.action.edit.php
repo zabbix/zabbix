@@ -39,7 +39,7 @@ else {
 /*
  * Action tab
  */
-$actionFormList = new CFormList('actionlist');
+$actionFormList = new CFormList();
 $nameTextBox = new CTextBox('name', $this->data['action']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
 $actionFormList->addRow(_('Name'), $nameTextBox);
@@ -63,7 +63,7 @@ $actionFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['acti
 /*
  * Condition tab
  */
-$conditionFormList = new CFormList('conditionlist');
+$conditionFormList = new CFormList();
 
 // create condition table
 $conditionTable = new CTable(_('No conditions defined.'), 'formElementTable');

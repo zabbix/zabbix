@@ -21,7 +21,7 @@
 
 include('include/views/js/administration.general.iconmap.js.php');
 
-$iconMapTab = new CFormList('scriptsTab');
+$iconMapTab = new CFormList();
 
 $name = new CTextBox('iconmap[name]', $this->data['iconmap']['name']);
 $name->setAttribute('maxlength', 64);

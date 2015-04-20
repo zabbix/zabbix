@@ -376,7 +376,7 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 // } TEMPLATE WIDGET
 
 // TEMPLATES{
-$tmplList = new CFormList('tmpllist');
+$tmplList = new CFormList();
 
 // create linked template table
 $linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');

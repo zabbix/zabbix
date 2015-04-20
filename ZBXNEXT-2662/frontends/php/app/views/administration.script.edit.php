@@ -30,7 +30,7 @@ $scriptForm->setAttribute('id', 'scriptForm');
 $scriptForm->addVar('form', 1);
 $scriptForm->addVar('scriptid', $data['scriptid']);
 
-$scriptFormList = new CFormList('scriptsTab');
+$scriptFormList = new CFormList();
 
 // name
 $nameTextBox = new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE);

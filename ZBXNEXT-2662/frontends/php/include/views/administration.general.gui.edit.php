@@ -27,7 +27,7 @@ $comboDdFirstEntry = new CComboBox('dropdown_first_entry', $data['dropdown_first
 $comboDdFirstEntry->addItem(ZBX_DROPDOWN_FIRST_NONE, _('None'));
 $comboDdFirstEntry->addItem(ZBX_DROPDOWN_FIRST_ALL, _('All'));
 
-$guiTab = new CFormList('scriptsTab');
+$guiTab = new CFormList();
 $guiTab->addRow(_('Default theme'), array($comboTheme));
 $guiTab->addRow(_('Dropdown first entry'), array(
 	$comboDdFirstEntry,

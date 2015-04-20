@@ -21,7 +21,7 @@
 
 include('include/views/js/administration.general.triggerSeverity.js.php');
 
-$severityTab = new CFormList('scriptsTab');
+$severityTab = new CFormList();
 
 $headerDiv = new CDiv(_('Custom severity'), 'inlineblock');
 $headerDiv->addStyle('width: 16.3em; margin-left: 3px; zoom:1; *display: inline;');
