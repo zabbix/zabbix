@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,9 +34,7 @@ class testPageTriggers extends CWebTest {
 	* @dataProvider data
 	*/
 	public function testPageTriggers_CheckLayout($data) {
-		// Go to the list of triggers
 		$this->zbxTestLogin('triggers.php?hostid='.$data['hostid']);
-		// We are in the list of items
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 		$this->zbxTestTextPresent('Triggers');

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@ class CScreenGraph extends CScreenBase {
 
 		$isDefault = false;
 		if ($graphDims['graphtype'] == GRAPH_TYPE_PIE || $graphDims['graphtype'] == GRAPH_TYPE_EXPLODED) {
-			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || !$this->screenitem['url']) {
+			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || $this->screenitem['url'] === '') {
 				$this->screenitem['url'] = 'chart6.php?graphid='.$resourceId.'&screenid='.$this->screenitem['screenid'];
 				$isDefault = true;
 			}
@@ -146,7 +146,7 @@ class CScreenGraph extends CScreenBase {
 				: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stimeNow'];
 		}
 		else {
-			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || !$this->screenitem['url']) {
+			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || $this->screenitem['url'] === '') {
 				$this->screenitem['url'] = 'chart2.php?graphid='.$resourceId.'&screenid='.$this->screenitem['screenid'];
 				$isDefault = true;
 			}

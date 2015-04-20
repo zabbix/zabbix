@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,63 +94,6 @@ function encodeValues(&$value, $encodeTwice = true) {
 			encodeValues($value->items[$key], false);
 		}
 	}
-}
-
-// add JavaScript for calling after page loading
-function zbx_add_post_js($script) {
-	global $ZBX_PAGE_POST_JS;
-
-	if ($ZBX_PAGE_POST_JS === null) {
-		$ZBX_PAGE_POST_JS = array();
-	}
-
-	if (!in_array($script, $ZBX_PAGE_POST_JS)) {
-		$ZBX_PAGE_POST_JS[] = $script;
-	}
-}
-
-function insert_javascript_for_editable_combobox() {
-	if (defined('EDITABLE_COMBOBOX_SCRIPT_INSERTTED')) {
-		return null;
-	}
-	define('EDITABLE_COMBOBOX_SCRIPT_INSERTTED', 1);
-
-	$js = '
-		function CEditableComboBoxInit(obj) {
-			// store previous value
-			obj.oldValue = obj.value;
-		}
-
-		function CEditableComboBoxOnChange(obj, size, width) {
-			if (-1 != obj.value) {
-				obj.oldValue = obj.value;
-			}
-			else {
-				var newObj = document.createElement("input");
-
-				newObj.type = "text";
-				newObj.name = obj.name;
-				newObj.className = "input text";
-
-				if (size !== null) {
-					newObj.size = size;
-				}
-
-				if (width !== null) {
-					newObj.style.width = width + "px";
-				}
-
-				if (obj.oldValue) {
-					newObj.value = obj.oldValue;
-				}
-
-				obj.parentNode.replaceChild(newObj, obj);
-
-				newObj.focus();
-				newObj.select();
-			}
-		}';
-	insert_js($js);
 }
 
 function insert_show_color_picker_javascript() {
@@ -509,18 +452,23 @@ function get_js($script, $jQueryDocumentReady = false) {
 		: '<script type="text/javascript">'."\n".$script."\n".'</script>';
 }
 
+// add JavaScript for calling after page loading
+function zbx_add_post_js($script) {
+	global $ZBX_PAGE_POST_JS;
+
+	if ($ZBX_PAGE_POST_JS === null) {
+		$ZBX_PAGE_POST_JS = array();
+	}
+
+	if (!in_array($script, $ZBX_PAGE_POST_JS)) {
+		$ZBX_PAGE_POST_JS[] = $script;
+	}
+}
+
 function insertPagePostJs() {
 	global $ZBX_PAGE_POST_JS;
 
 	if ($ZBX_PAGE_POST_JS) {
-		$js = '';
-
-		foreach ($ZBX_PAGE_POST_JS as $script) {
-			$js .= $script."\n";
-		}
-
-		if ($js) {
-			echo get_js($js, true);
-		}
+		echo get_js(implode("\n", $ZBX_PAGE_POST_JS), true);
 	}
 }

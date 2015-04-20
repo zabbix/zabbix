@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -201,7 +201,7 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
  * Function: byte_value_from_proc_file                                        *
  *                                                                            *
  * Purpose: Read amount of memory in bytes from a string in /proc file.       *
- *          For example, reading "VmSize:   176712 kB" from  /proc/1/status   *
+ *          For example, reading "VmSize:   176712 kB" from /proc/1/status    *
  *          will produce a result 176712*1024 = 180953088 bytes               *
  *                                                                            *
  * Parameters:                                                                *
@@ -210,13 +210,13 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
  *     bytes - [OUT] result in bytes                                          *
  *                                                                            *
  * Return value: SUCCEED - successful reading,                                *
- *               NOSUPPORTED - the search string was not found. For example,  *
- *                             /proc/NNN/status files for kernel threads do   *
- *                             not contain "VmSize:" string.                  *
+ *               NOTSUPPORTED - the search string was not found. For example, *
+ *                              /proc/NNN/status files for kernel threads do  *
+ *                              not contain "VmSize:" string.                 *
  *               FAIL - the search string was found but could not be parsed.  *
  *                                                                            *
  ******************************************************************************/
-static int byte_value_from_proc_file(FILE *f, const char *s, zbx_uint64_t *bytes)
+static int	byte_value_from_proc_file(FILE *f, const char *s, zbx_uint64_t *bytes)
 {
 	char	buf[MAX_STRING_LEN], *p, *p_unit;
 	size_t	sz;
@@ -265,7 +265,7 @@ static int byte_value_from_proc_file(FILE *f, const char *s, zbx_uint64_t *bytes
 	return ret;
 }
 
-static int get_total_memory(zbx_uint64_t *total_memory)
+static int	get_total_memory(zbx_uint64_t *total_memory)
 {
 	FILE	*f;
 	int	ret = FAIL;
@@ -303,7 +303,8 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	FILE		*f_cmd = NULL, *f_stat = NULL;
 	zbx_uint64_t	mem_size = 0, byte_value = 0, total_memory;
 	double		pct_size = 0.0, pct_value = 0.0;
-	int		do_task, proccount = 0, invalid_read = 0, mem_type_tried = 0, mem_type_code, res;
+	int		do_task, res, proccount = 0, invalid_user = 0, invalid_read = 0;
+	int		mem_type_tried = 0, mem_type_code;
 	char		*mem_type = NULL;
 	const char	*mem_type_search = NULL;
 
@@ -322,13 +323,14 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			if (0 == errno)
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
-			else
+			if (0 != errno)
+			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
-						zbx_strerror(errno)));
+							zbx_strerror(errno)));
+				return SYSINFO_RET_FAIL;
+			}
 
-			return SYSINFO_RET_FAIL;
+			invalid_user = 1;
 		}
 	}
 	else
@@ -432,6 +434,9 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
+
 	if (ZBX_PMEM == mem_type_code)
 	{
 		if (SUCCEED != get_total_memory(&total_memory))
@@ -509,7 +514,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 					else	/* FAIL */
 					{
 						invalid_read = 1;
-						goto out;
+						goto clean;
 					}
 				}
 				break;
@@ -552,7 +557,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 						else	/* FAIL */
 						{
 							invalid_read = 1;
-							goto out;
+							goto clean;
 						}
 					}
 				}
@@ -573,7 +578,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 					else	/* FAIL */
 					{
 						invalid_read = 1;
-						goto out;
+						goto clean;
 					}
 				}
 				break;
@@ -608,14 +613,14 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				pct_size = pct_value;
 		}
 	}
-out:
+clean:
 	zbx_fclose(f_cmd);
 	zbx_fclose(f_stat);
 	closedir(dir);
 
 	if ((0 == proccount && 0 != mem_type_tried) || 0 != invalid_read)
 	{
-		char	*s = NULL;
+		char	*s;
 
 		s = zbx_strdup(NULL, mem_type_search);
 		zbx_rtrim(s, ":\t");
@@ -623,18 +628,18 @@ out:
 		zbx_free(s);
 		return SYSINFO_RET_FAIL;
 	}
-
+out:
 	if (ZBX_PMEM != mem_type_code)
 	{
 		if (ZBX_DO_AVG == do_task)
-			SET_DBL_RESULT(result, proccount == 0 ? 0 : (double)mem_size / (double)proccount);
+			SET_DBL_RESULT(result, 0 == proccount ? 0 : (double)mem_size / (double)proccount);
 		else
 			SET_UI64_RESULT(result, mem_size);
 	}
 	else
 	{
 		if (ZBX_DO_AVG == do_task)
-			SET_DBL_RESULT(result, proccount == 0 ? 0 : pct_size / (double)proccount);
+			SET_DBL_RESULT(result, 0 == proccount ? 0 : pct_size / (double)proccount);
 		else
 			SET_DBL_RESULT(result, pct_size);
 	}
@@ -664,8 +669,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct dirent	*entries;
 	struct passwd	*usrinfo;
 	FILE		*f_cmd = NULL, *f_stat = NULL;
-	int		zbx_proc_stat;
-	zbx_uint64_t	proccount = 0;
+	int		proccount = 0, invalid_user = 0, zbx_proc_stat;
 
 	if (4 < request->nparam)
 	{
@@ -682,13 +686,14 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (NULL == (usrinfo = getpwnam(param)))
 		{
-			if (0 == errno)
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Specified user does not exist."));
-			else
+			if (0 != errno)
+			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
-						zbx_strerror(errno)));
+							zbx_strerror(errno)));
+				return SYSINFO_RET_FAIL;
+			}
 
-			return SYSINFO_RET_FAIL;
+			invalid_user = 1;
 		}
 	}
 	else
@@ -711,6 +716,9 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	proccomm = get_rparam(request, 3);
+
+	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
+		goto out;
 
 	if (NULL == (dir = opendir("/proc")))
 	{
@@ -753,7 +761,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_fclose(f_cmd);
 	zbx_fclose(f_stat);
 	closedir(dir);
-
+out:
 	SET_UI64_RESULT(result, proccount);
 
 	return SYSINFO_RET_OK;

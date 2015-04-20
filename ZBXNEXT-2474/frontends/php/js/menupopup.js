@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,7 +119,12 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 				clickCallback: function() {
 					var obj = jQuery(this);
 
-					rm4favorites(favouriteObj, item.id);
+					sendAjaxData('zabbix.php?action=dashboard.favourite&operation=delete', {
+						data: {
+							object: favouriteObj,
+							'objectids[]': [item.id]
+						}
+					});
 
 					obj.closest('.menuPopup').fadeOut(100);
 					obj.remove();
@@ -148,7 +153,12 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 				label: t('Remove all'),
 				css: (removeItems.length == 0) ? 'ui-state-disabled' : '',
 				clickCallback: function() {
-					rm4favorites(favouriteObj, 0);
+					sendAjaxData('zabbix.php?action=dashboard.favourite&operation=delete', {
+						data: {
+							object: favouriteObj,
+							'objectids[]': [0]
+						}
+					});
 
 					jQuery(this).closest('.menuPopup').fadeOut(100);
 				}
@@ -289,7 +299,7 @@ function getMenuPopupHost(options) {
  * @param array  options['gotos']['showTriggers']	display "Triggers" link enabled or disabled
  * @param array  options['gotos']['submap']			link to submap page with url parameters ("name" => "value")
  * @param array  options['gotos']['events']			link to events page with url parameters ("name" => "value")
- * @param array  options['gotos']['showEvents']		display "Latest events" link enabled or disabled
+ * @param array  options['gotos']['showEvents']		display "Events" link enabled or disabled
  * @param array  options['urls']					local and global map urls (optional)
  * @param string options['url'][]['label']			url label
  * @param string options['url'][]['url']			url
@@ -388,7 +398,7 @@ function getMenuPopupMap(options) {
 
 		// submap
 		if (typeof options.gotos.submap !== 'undefined') {
-			var url = new Curl('maps.php');
+			var url = new Curl('zabbix.php?action=map.view');
 
 			jQuery.each(options.gotos.submap, function(name, value) {
 				url.setArgument(name, value);
@@ -402,14 +412,14 @@ function getMenuPopupMap(options) {
 
 		// events
 		if (typeof options.gotos.events !== 'undefined') {
-			var url = new Curl('events.php?source=0');
+			var url = new Curl('events.php?filter_set=1&source=0');
 
 			jQuery.each(options.gotos.events, function(name, value) {
 				url.setArgument(name, value);
 			});
 
 			gotos[gotos.length] = {
-				label: t('Latest events'),
+				label: t('Events'),
 				css: options.gotos.showEvents ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
@@ -476,14 +486,28 @@ function getMenuPopupRefresh(options) {
 				var obj = jQuery(this),
 					currentRate = obj.data('value');
 
-				sendAjaxData({
-					data: jQuery.extend({}, params, {
-						widgetName: options.widgetName,
-						widgetRefreshRate: currentRate
-					}),
-					dataType: 'script',
-					success: function(js) { js }
-				});
+
+				// it is a quick solution for slide refresh multiplier, should be replaced with slide.refresh or similar
+				if (options.multiplier) {
+					sendAjaxData('slides.php', {
+						data: jQuery.extend({}, params, {
+							widgetName: options.widgetName,
+							widgetRefreshRate: currentRate
+						}),
+						dataType: 'script',
+						success: function(js) { js }
+					});
+				}
+				else {
+					sendAjaxData('zabbix.php?action=dashboard.widget', {
+						data: jQuery.extend({}, params, {
+							widget: options.widgetName,
+							refreshrate: currentRate
+						}),
+						dataType: 'script',
+						success: function(js) { js }
+					});
+				}
 
 				jQuery('a', obj.closest('ul')).each(function() {
 					var a = jQuery(this),
@@ -570,7 +594,7 @@ function getMenuPopupServiceConfiguration(options) {
  * Get menu popup trigger section data.
  *
  * @param string options['triggerid']				trigger id
- * @param array  options['items']					link to trigger item history page (optional)
+ * @param object options['items']					link to trigger item history page (optional)
  * @param string options['items'][]['name']			item name
  * @param object options['items'][]['params']		item url parameters ("name" => "value")
  * @param object options['acknowledge']				link to acknowledge page (optional)
@@ -587,14 +611,14 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?filter_set=1&triggerid=' + options.triggerid + '&source=0');
+	var url = new Curl('events.php?filter_set=1&source=0&triggerid=' + options.triggerid);
 	if (typeof options.eventTime !== 'undefined') {
 		url.setArgument('nav_time', options.eventTime);
 	}
 
 	items[items.length] = {
 		label: t('Events'),
-		css: options.showEvents ? '' : 'ui-state-disabled',
+		css: (typeof options.showEvents !== 'undefined' && options.showEvents) ? '' : 'ui-state-disabled',
 		url: url.getUrl()
 	};
 
@@ -613,9 +637,8 @@ function getMenuPopupTrigger(options) {
 	}
 
 	// configuration
-	if (typeof options.configuration !== 'undefined' && options.configuration !== null) {
-		var url = new Curl('triggers.php?triggerid=' + options.triggerid + '&hostid=' + options.configuration.hostid
-				+ '&form=update');
+	if (typeof options.configuration !== 'undefined' && options.configuration) {
+		var url = new Curl('triggers.php?form=update&triggerid=' + options.triggerid);
 
 		items[items.length] = {
 			label: t('Configuration'),
@@ -637,7 +660,7 @@ function getMenuPopupTrigger(options) {
 	};
 
 	// items
-	if (typeof options.items !== 'undefined' && options.items.length > 0) {
+	if (typeof options.items !== 'undefined' && objectSize(options.items) > 0) {
 		var items = [];
 
 		jQuery.each(options.items, function(i, item) {

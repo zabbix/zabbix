@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -902,7 +902,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 				continue;
 
 			if (0 == strcmp(group->name, buffer))
-				return group;
+				goto out;
 		}
 
 		/* otherwise create a new group */
@@ -942,7 +942,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 
 		group->flags |= ZBX_FLAG_LLD_GROUP_DISCOVERED;
 	}
-
+out:
 	zbx_free(buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, group);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-function setHostGroupInternal($groupids, $internal = ZBX_NOT_INTERNAL_GROUP) {
-	zbx_value2array($groupids);
-
-	return DBexecute('UPDATE groups SET internal='.zbx_dbstr($internal).' WHERE '.dbConditionInt('groupid', $groupids));
-}
 
 /**
  * Get ipmi auth type label by it's number.

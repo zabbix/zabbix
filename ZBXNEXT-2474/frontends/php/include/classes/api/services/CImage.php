@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -156,47 +156,6 @@ class CImage extends CApiService {
 			$result = zbx_cleanHashes($result);
 		}
 		return $result;
-	}
-
-	/**
-	 * Get images.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array  $image
-	 * @param string $image['name']
-	 * @param string $image['hostid']
-	 *
-	 * @return array
-	 */
-	public function getObjects(array $imageData) {
-		$this->deprecated('image.getobjects method is deprecated.');
-
-		return $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'filter' => $imageData
-		));
-	}
-
-	/**
-	 * Check if image exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('image.exists method is deprecated.');
-
-		$image = $this->get(array(
-			'output' => array('imageid'),
-			'filter' => zbx_array_mintersect(array(array('imageid', 'name'), 'imagetype'), $object),
-			'limit' => 1
-		));
-
-		return (bool) $image;
 	}
 
 	/**

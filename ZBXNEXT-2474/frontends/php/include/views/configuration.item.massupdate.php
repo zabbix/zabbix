@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -569,7 +569,7 @@ $itemForm->addItem($itemTab);
 // append buttons to form
 $itemForm->addItem(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
-	array(new CButtonCancel(url_param('groupid').url_param('hostid').url_param('config')))
+	array(new CButtonCancel(url_param('groupid').url_param('hostid')))
 ));
 $itemWidget->addItem($itemForm);
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ if ($this->data['config']['blink_period'] > 0) {
 
 $hintTable->addRow(array(new CCol(SPACE), _('No trigger')));
 
-$help = new CHelp();
+$help = new CIcon(null, 'iconhelp');
 $help->setHint($hintTable);
 
 // header right
@@ -104,7 +104,7 @@ $filterForm = $filterFormView->render();
 $overviewWidget->addFlicker($filterForm, CProfile::get('web.overview.filter.state', 0));
 
 // data table
-if ($this->data['config']['dropdown_first_entry']) {
+if ($data['pageFilter']->groupsSelected) {
 	global $page;
 
 	$dataTable = getTriggersOverview($this->data['hosts'], $this->data['triggers'], $page['file'],

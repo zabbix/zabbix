@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -180,16 +180,16 @@ function get_icon($type, $params = array()) {
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = new CIcon(
 					_('Remove from favourites'),
-					'iconminus',
-					'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");'
+					'iconminus'
 				);
+				$icon->addAction('onclick', 'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
 				$icon = new CIcon(
 					_('Add to favourites'),
-					'iconplus',
-					'add2favorites("'.$params['elname'].'", "'.$params['elid'].'");'
+					'iconplus'
 				);
+				$icon->addAction('onclick', 'add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			$icon->setAttribute('id', 'addrm_fav');
 
@@ -199,14 +199,19 @@ function get_icon($type, $params = array()) {
 			$url = new CUrl();
 			$url->setArgument('fullscreen', $params['fullscreen'] ? '0' : '1');
 
-			return new CIcon(
+			$icon = new CIcon(
 				$params['fullscreen'] ? _('Normal view') : _('Fullscreen'),
-				'fullscreen',
-				"document.location = '".$url->getUrl()."';"
+				'fullscreen'
 			);
+			$icon->addAction('onclick', "document.location = '".$url->getUrl()."';");
+
+			return $icon;
 
 		case 'reset':
-			return new CIcon(_('Reset'), 'iconreset', 'timeControl.objectReset();');
+			$icon = new CIcon(_('Reset'), 'iconreset');
+			$icon->addAction('onclick', 'timeControl.objectReset();');
+
+			return $icon;
 	}
 
 	return null;
@@ -342,7 +347,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 
 		$list->addItem(array(bold(_('Host').NAME_DELIMITER), new CLink($name, 'hosts.php?form=update&hostid='.$dbHost['hostid'])));
 		$list->addItem($status);
-		$list->addItem(getAvailabilityTable($dbHost));
+		$list->addItem(getAvailabilityTable($dbHost, time()));
 	}
 
 	if (!empty($dbDiscovery)) {
@@ -540,11 +545,12 @@ function makeFormFooter(CButtonInterface $mainButton = null, array $otherButtons
 /**
  * Returns zbx, snmp, jmx, ipmi availability status icons and the discovered host lifetime indicator.
  *
- * @param type $host
+ * @param array  $host			an array of host data
+ * @param string $currentTime	current Unix timestamp
  *
  * @return CDiv
  */
-function getAvailabilityTable($host) {
+function getAvailabilityTable($host, $currentTime) {
 	$arr = array('zbx', 'snmp', 'jmx', 'ipmi');
 
 	// for consistency in foreach loop
@@ -572,12 +578,22 @@ function getAvailabilityTable($host) {
 	// discovered host lifetime indicator
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete']) {
 		$deleteError = new CDiv(SPACE, 'status_icon status_icon_extra iconwarning');
-		$deleteError->setHint(_s(
-			'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($host['hostDiscovery']['ts_delete']),
-			zbx_date2str(DATE_FORMAT, $host['hostDiscovery']['ts_delete']),
-			zbx_date2str(TIME_FORMAT, $host['hostDiscovery']['ts_delete'])
-		));
+
+		// Check if host should've been deleted in the past.
+		if ($currentTime > $host['hostDiscovery']['ts_delete']) {
+			$deleteError->setHint(_s(
+				'The host is not discovered anymore and will be deleted the next time discovery rule is processed.'
+			));
+		}
+		else {
+			$deleteError->setHint(_s(
+				'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+				zbx_date2age($host['hostDiscovery']['ts_delete']),
+				zbx_date2str(DATE_FORMAT, $host['hostDiscovery']['ts_delete']),
+				zbx_date2str(TIME_FORMAT, $host['hostDiscovery']['ts_delete'])
+			));
+		}
+
 		$ad->addItem($deleteError);
 	}
 

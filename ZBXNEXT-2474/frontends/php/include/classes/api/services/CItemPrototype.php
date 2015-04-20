@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -262,37 +262,6 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Check if item prototype exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array $object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('itemprototype.exists method is deprecated.');
-
-		$options = array(
-			'output' => array('itemid'),
-			'filter' => array('key_' => $object['key_']),
-			'limit' => 1
-		);
-
-		if (isset($object['hostid'])) {
-			$options['hostids'] = $object['hostid'];
-		}
-
-		if (isset($object['host'])) {
-			$options['filter']['host'] = $object['host'];
-		}
-
-		$itemPrototype = $this->get($options);
-
-		return (bool) $itemPrototype;
 	}
 
 	/**

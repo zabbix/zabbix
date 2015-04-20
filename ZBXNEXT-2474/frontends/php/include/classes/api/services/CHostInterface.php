@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -187,27 +187,6 @@ class CHostInterface extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Check if host interface exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('hostinterface.exists method is deprecated.');
-
-		$hostInterface = $this->get(array(
-			'output' => array('interfaceid'),
-			'filter' => zbx_array_mintersect(array('interfaceid', 'hostid', 'ip', 'dns'), $object),
-			'limit' => 1
-		));
-
-		return (bool) $hostInterface;
 	}
 
 	/**
@@ -604,10 +583,18 @@ class CHostInterface extends CApiService {
 	 * @param array $interface
 	 */
 	protected function checkIp(array $interface) {
-		if (!zbx_empty($interface['ip']) && !validate_ip($interface['ip'], $arr)
-				&& !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $interface['ip'])
-				&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $interface['ip'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface IP parameter "%s" provided.', $interface['ip']));
+		if ($interface['ip'] === '') {
+			return;
+		}
+
+		if (preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/', $interface['ip'])
+				|| preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $interface['ip'])) {
+			return;
+		}
+
+		$ipValidator = new CIPValidator();
+		if (!$ipValidator->validate($interface['ip'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $ipValidator->getError());
 		}
 	}
 
