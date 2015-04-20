@@ -1,4 +1,4 @@
-.TH ZABBIX_SENDER 8 "10 November 2011"
+.TH ZABBIX_SENDER 8 "20 April 2015"
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix sender utility.
@@ -25,11 +25,45 @@ Specify item key to send value to.
 .IP "-o, --value \fI<value>\fR"
 Specify value.
 .IP "-i, --input-file \fI<inputfile>\fR"
-Load values from input file. Specify \fB-\fR for standard input. Each line of file contains whitespace delimited: \fB<hostname> <key> <value>\fR. \
-Specify \fB-\fR in \fB<hostname>\fR to use hostname from configuration file or \fB--host\fR argument. All entries are sent in a sequential order top-down.
+
+Load values from input file. Specify \fB-\fR to read values from standard input.
+
+Each line of the input file must contain 3 whitespace delimited entries: \fB<hostname> <key> <value>\fR. Specify \fB-\fR as \fB<hostname>\fR to use hostname from configuration file (specified with \fB--config\fR) or \fB--host\fR argument. All entries are sent in a sequential order top-down.
+
+An example of a line of the input file:
+
+\fB host1 item1 sometext\fR
+
+If an entry contains whitespace it must be double-quoted (escaping a whitespace will not work):
+
+\fB "Zabbix server" item1 "some text"\fR
+
+If an entry contains special characters, they must be escaped with a backslash:
+
+\fB "Zabbix server" item1 "sending \\"some text\\""\fR
+
+A backslash itself must not be escaped:
+
+\fB "Zabbix server" item1 "C:\\Documents\\My Folder"\fR
+\fB "Zabbix server" item1 C:\\Documents\fR
+
+In case the last character is a backslash double-quotes cannot be used:
+
+\fB "Zabbix server" item1 C:\\\fR
+\fB "Zabbix server" item1 "C:\\Documents\\"\fR   <\-\- this will not work!
+
 .IP "-T, --with-timestamps"
-Each line of file contains whitespace delimited: \fB<hostname> <key> <timestamp> <value>\fR. This can be used with \fB--input-file\fR option. Timestamp should be specified in Unix timestamp format. \
-If target item has triggers referencing it, all timestamps must be in an increasing order, otherwise event calculation will not be correct.
+
+This option can be only used with \fB--input-file\fR option.
+
+Each line of the input file must contain 4 whitespace delimited entries: \fB<hostname> <key> <timestamp> <value>\fR. Timestamp should be specified in Unix timestamp format. If target item has triggers referencing it, all timestamps must be in an increasing order, otherwise event calculation will not be correct.
+
+An example of a line of the input file:
+
+\fB host1 item1 1429533600 sometext\fR
+
+For more examples on the input file format please see option \fB--input-file\fR.
+
 .IP "-r, --real-time"
 Send values one by one as soon as they are received. This can be used when reading from standard input.
 .IP "-v, --verbose"
