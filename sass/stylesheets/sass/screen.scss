@@ -703,6 +703,7 @@ footer {
 			display: inline-block;
 			margin: 2px 14px 0 0;
 			white-space: nowrap;
+			@include transition(background .2s ease);
 
 			&.disabled {
 
