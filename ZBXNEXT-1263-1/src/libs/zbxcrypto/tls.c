@@ -1553,8 +1553,9 @@ static int	zbx_verify_peer_cert(const gnutls_session_t session, char **error)
  ******************************************************************************/
 static int	zbx_get_issuer_subject(X509 *cert, char **issuer, char **subject)
 {
-	BIO	*issuer_bio, *subject_bio;
-	int	ret = FAIL, res = 0;
+	BIO		*issuer_bio, *subject_bio;
+	int		ret = FAIL, res = 0;
+	const char	null_byte = '\0';
 
 	if (NULL == (issuer_bio = BIO_new(BIO_s_mem())))
 		return FAIL;
@@ -1573,14 +1574,21 @@ static int	zbx_get_issuer_subject(X509 *cert, char **issuer, char **subject)
 	if (0 >= X509_NAME_print_ex(subject_bio, X509_get_subject_name(cert), 0, XN_FLAG_RFC2253))
 		goto out;
 
+	/* terminate string with '\0' */
+	if (1 != BIO_write(issuer_bio, &null_byte, 1) || 1 != BIO_write(subject_bio, &null_byte, 1))
+		goto out;
+
+	/* get pointer to data inside BIO */
 	BIO_get_mem_data(issuer_bio, issuer);	/* BIO_get_mem_data() returns amount of data. Ignore it. */
 	BIO_get_mem_data(subject_bio, subject);
 
+	/* mark buffer read-only for better performance */
 	BIO_set_flags(issuer_bio, BIO_FLAGS_MEM_RDONLY);
 	BIO_set_flags(subject_bio, BIO_FLAGS_MEM_RDONLY);
 
 	ret = SUCCEED;
 out:
+	/* drop BIO but keep its data buffer */
 	if (1 != BIO_free(issuer_bio))
 		res++;
 
@@ -1594,7 +1602,7 @@ out:
 }
 #endif
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_verify_issuer_subject                                        *
@@ -1603,10 +1611,14 @@ out:
  *     verify peer certificate issuer and subject                             *
  *                                                                            *
  * Parameters:                                                                *
- *     cert    - [IN] certificate to verify                                   *
- *     issuer  - [IN] required issuer (don't care if NULL or empty string)    *
- *     subject - [IN] required subject (don't care if NULL or empty string)   *
- *     error   - [OUT] dynamically allocated memory with error message        *
+ *     cert         - [IN] certificate to verify                              *
+ *     issuer       - [IN] required issuer (don't care if NULL or empty       *
+ *                         string)                                            *
+ *     subject      - [IN] required subject (don't care if NULL or empty      *
+ *                         string)                                            *
+ *     peer_issuer  - [IN] issuer of peer certificate                         *
+ *     peer_subject - [IN] subject of peer certificate                        *
+ *     error        - [OUT] dynamically allocated memory with error message   *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED or FAIL                                                        *
@@ -1618,6 +1630,9 @@ static int	zbx_verify_issuer_subject(const x509_crt *cert, const char *issuer, c
 #elif defined(HAVE_GNUTLS)
 static int	zbx_verify_issuer_subject(const gnutls_x509_crt_t cert, const char *issuer, const char *subject,
 		char **error)
+#elif defined(HAVE_OPENSSL)
+static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_subject, const char *issuer,
+		const char *subject, char **error)
 #endif
 {
 	int		res, issuer_mismatch = 0, subject_mismatch = 0;
@@ -1703,28 +1718,48 @@ static int	zbx_verify_issuer_subject(const gnutls_x509_crt_t cert, const char *i
 		if (0 != strcmp(tls_subject, subject))	/* TODO RFC 4518 requires more sophisticated subject matching */
 			subject_mismatch = 1;
 	}
-#endif
-	if (1 == issuer_mismatch || 1 == subject_mismatch)
+#elif defined(HAVE_OPENSSL)
+	if (NULL != issuer && '\0' != *issuer)
 	{
-		if (1 == issuer_mismatch)
-		{
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "issuer: peer: \"%s\", required: \"%s\"",
-					tls_issuer, issuer);
-		}
-
-		if (1 == subject_mismatch)
-		{
-			if (1 == issuer_mismatch)
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, ", ");
-
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "subject: peer: \"%s\", required: "
-					"\"%s\"", tls_subject, subject);
-		}
-
-		return FAIL;
+		if (0 != strcmp(peer_issuer, issuer))	/* TODO RFC 4518 requires more sophisticated issuer matching */
+			issuer_mismatch = 1;
 	}
 
-	return SUCCEED;
+	if (NULL != subject && '\0' != *subject)
+	{
+		if (0 != strcmp(peer_subject, subject))	/* TODO RFC 4518 requires more sophisticated subject matching */
+			subject_mismatch = 1;
+	}
+#endif
+	if (0 == issuer_mismatch && 0 == subject_mismatch)
+		return SUCCEED;
+
+	if (1 == issuer_mismatch)
+	{
+		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "issuer: peer: \"%s\", required: \"%s\"",
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
+				tls_issuer,
+#elif defined(HAVE_OPENSSL)
+				peer_issuer,
+#endif
+				issuer);
+	}
+
+	if (1 == subject_mismatch)
+	{
+		if (1 == issuer_mismatch)
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, ", ");
+
+		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "subject: peer: \"%s\", required: \"%s\"",
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
+				tls_subject,
+#elif defined(HAVE_OPENSSL)
+				peer_subject,
+#endif
+				subject);
+	}
+
+	return FAIL;
 }
 #endif
 
@@ -3040,7 +3075,6 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
-	X509		*peer_cert = NULL;
 	char		psk_buf[HOST_TLS_PSK_LEN/2];
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
@@ -3169,7 +3203,9 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
+		X509	*peer_cert = NULL;
 		char	*issuer = NULL, *subject = NULL;
+		int	err = 0;
 
 		if ((NULL != tls_arg2 && '\0' != *tls_arg2) || (NULL != tls_arg1 && '\0' != *tls_arg1) ||
 				SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
@@ -3177,15 +3213,18 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 			if (NULL == (peer_cert = SSL_get_peer_certificate(s->tls_ctx)) ||
 					SUCCEED != zbx_get_issuer_subject(peer_cert, &issuer, &subject))
 			{
-				zbx_tls_close(s);
-				goto out1;
+				err = 1;
 			}
 		}
 
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		if (0 == err && SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 			zabbix_log(LOG_LEVEL_DEBUG, "peer certificate issuer:\"%s\" subject:\"%s\"", issuer, subject);
 
-		/* validate peer certificate TODO: Issuer and Subject validation */
+		/* basic verification of peer certificate is done during handshake with OpenSSL built-in procedures */
+
+		/* if required verify peer certificate Issuer and Subject */
+		if (0 == err && SUCCEED != zbx_verify_issuer_subject(issuer, subject, tls_arg1, tls_arg2, error))
+			err = 1;
 
 		if (NULL != issuer)
 			OPENSSL_free(issuer);
@@ -3195,6 +3234,12 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 
 		if (NULL != peer_cert)
 			X509_free(peer_cert);
+
+		if (0 != err)
+		{
+			zbx_tls_close(s);
+			goto out1;
+		}
 
 		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
 	}
@@ -3216,9 +3261,6 @@ out:	/* an error occured */
 		s->tls_ctx = NULL;
 	}
 out1:
-	if (NULL != peer_cert)
-		X509_free(peer_cert);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
