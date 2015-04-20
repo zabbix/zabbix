@@ -122,7 +122,7 @@ class CSetupWizard extends CForm {
 			$back_button->setEnabled(false);
 		}
 
-		$setup_footer = new CDiv(array($cancel_button, $back_button, $next_button), 'setup-footer');
+		$setup_footer = new CDiv(array($back_button, $next_button, $cancel_button), 'setup-footer');
 
 		$setup_container = new CDiv(array($setup_left, $setup_right, $setup_footer), 'setup-container');
 
@@ -338,56 +338,15 @@ class CSetupWizard extends CForm {
 			'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
 			'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME')
 		);
-		$config->save();
 
-		$messages = array();
+		$error = false;
 
-		try {
-			$error = false;
-			$config->load();
-
-			if ($config->config['DB']['TYPE'] != $this->getConfig('DB_TYPE')) {
-				$error = true;
-			}
-			elseif ($config->config['DB']['SERVER'] != $this->getConfig('DB_SERVER')) {
-				$error = true;
-			}
-			elseif ($config->config['DB']['PORT'] != $this->getConfig('DB_PORT')) {
-				$error = true;
-			}
-			elseif ($config->config['DB']['DATABASE'] != $this->getConfig('DB_DATABASE')) {
-				$error = true;
-			}
-			elseif ($config->config['DB']['USER'] != $this->getConfig('DB_USER')) {
-				$error = true;
-			}
-			elseif ($config->config['DB']['PASSWORD'] != $this->getConfig('DB_PASSWORD')) {
-				$error = true;
-			}
-			elseif (($this->getConfig('DB_TYPE') == ZBX_DB_DB2 || $this->getConfig('DB_TYPE') == ZBX_DB_POSTGRESQL)
-					&& $config->config['DB']['SCHEMA'] != $this->getConfig('DB_SCHEMA')) {
-				$error = true;
-			}
-			elseif ($config->config['ZBX_SERVER'] != $this->getConfig('ZBX_SERVER')) {
-				$error = true;
-			}
-			elseif ($config->config['ZBX_SERVER_PORT'] != $this->getConfig('ZBX_SERVER_PORT')) {
-				$error = true;
-			}
-			elseif ($config->config['ZBX_SERVER_NAME'] != $this->getConfig('ZBX_SERVER_NAME')) {
-				$error = true;
-			}
-
-			if ($error) {
-				$messages[] = array(
-					'type' => 'error',
-					'message' => _('Unable to overwrite the existing configuration file.')
-				);
-			}
-		}
-		catch (ConfigFileException $e) {
+		if (!$config->save()) {
 			$error = true;
-			$messages[] = array('type' => 'error', 'message' => _('Unable to create the configuration file.'));
+			$messages[] = array(
+				'type' => 'error',
+				'message' => $config->error
+			);
 		}
 
 		if ($error) {
@@ -417,30 +376,9 @@ class CSetupWizard extends CForm {
 			);
 		}
 
-/*
-		$table = array('Configuration file', BR(), '"'.Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH.'"',
-			BR(), 'created: ', $this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
-			? new CSpan(_('OK'), 'ok')
-			: new CSpan(_('Fail'), 'fail')
-		);*/
-
 		return array(
 			new CTag('h1', 'yes', _('Install')),
 			new CDiv(array($message_box, $message), 'setup-right-body')
-/*			$table, BR(), BR(),
-			$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', _('Retry'), null, 'jqueryinput'), BR(), BR()) : null,
-			!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
-				? array($error_text, BR(), 'Please install it manually, or fix permissions on the conf directory.', BR(), BR(),
-					'Press the "Download configuration file" button, download the configuration file ',
-					'and save it as ', BR(),
-					'"'.Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH.'"', BR(), BR(),
-					new CSubmit('save_config', 'Download configuration file', null, 'jqueryinput'),
-					BR(), BR()
-				)
-				: array(
-					'Congratulations on successful installation of Zabbix frontend.', BR(), BR()
-				),
-			'When done, press the '.($this->DISABLE_NEXT_BUTTON ? '"Retry"' : '"Finish"').' button'*/
 		);
 	}
 
