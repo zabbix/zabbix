@@ -33,7 +33,7 @@ if (!empty($this->data['druleid'])) {
 }
 
 // create form list
-$discoveryFormList = new CFormList('discoveryFormList');
+$discoveryFormList = new CFormList();
 $nameTextBox = new CTextBox('name', $this->data['drule']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
 $discoveryFormList->addRow(_('Name'), $nameTextBox);

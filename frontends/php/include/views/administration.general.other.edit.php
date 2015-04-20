@@ -19,7 +19,7 @@
 **/
 
 
-$otherTab = new CFormList('scriptsTab');
+$otherTab = new CFormList();
 
 $discoveryGroup = new CComboBox('discovery_groupid', $data['discovery_groupid']);
 foreach ($data['discovery_groups'] as $group) {

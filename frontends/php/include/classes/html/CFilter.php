@@ -48,7 +48,7 @@ class CFilter extends CTag {
 	}
 
 	public function addColumn($column) {
-		$this->columns[] = $column;
+		$this->columns[] = new CDiv($column, 'cell');
 	}
 
 	public function setFooter($footer) {
@@ -76,7 +76,6 @@ class CFilter extends CTag {
 	private function getTable() {
 		$row = new CDiv(null, 'row');
 		foreach ($this->columns as $column) {
-			$column->addClass('cell');
 			$row->addItem($column);
 		}
 		$table = new CDiv(null, 'table filter-forms');

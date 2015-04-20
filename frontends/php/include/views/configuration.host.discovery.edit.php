@@ -262,7 +262,7 @@ $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 /*
  * Condition tab
  */
-$conditionFormList = new CFormList('conditionlist');
+$conditionFormList = new CFormList();
 
 // type of calculation
 $formula = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_STANDARD_SIZE);

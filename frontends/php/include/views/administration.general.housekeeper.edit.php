@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/administration.general.housekeeper.edit.js.php';
 
-$houseKeeperTab = new CFormList('scriptsTab');
+$houseKeeperTab = new CFormList();
 
 // events and alerts
 $eventAlertTab = new CTable(null, 'formElementTable');

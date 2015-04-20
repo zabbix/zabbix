@@ -35,7 +35,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 }
 
 // create form list
-$expressionFormList = new CFormList('expressionFormList');
+$expressionFormList = new CFormList();
 
 // append item to form list
 $item = array(

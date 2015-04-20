@@ -717,7 +717,7 @@ if ($data['form'] === 'full_clone') {
 $divTabs->addTab('hostTab', _('Host'), $hostList);
 
 // templates
-$tmplList = new CFormList('tmpllist');
+$tmplList = new CFormList();
 
 // create linked template table
 $linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');
@@ -807,7 +807,7 @@ $divTabs->addTab('templateTab', _('Templates'), $tmplList);
 /*
  * IPMI
  */
-$ipmiList = new CFormList('ipmilist');
+$ipmiList = new CFormList();
 
 // normal hosts
 if (!$isDiscovered) {
