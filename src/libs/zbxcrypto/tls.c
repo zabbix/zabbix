@@ -1635,9 +1635,12 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 		const char *subject, char **error)
 #endif
 {
-	int		res, issuer_mismatch = 0, subject_mismatch = 0;
+	int		issuer_mismatch = 0, subject_mismatch = 0;
 	size_t		error_alloc = 0, error_offset = 0;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
+	int		res;
 	char		tls_issuer[HOST_TLS_ISSUER_LEN_MAX], tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
+#endif
 
 #if defined(HAVE_POLARSSL)
 	if (NULL != issuer && '\0' != *issuer)
@@ -1736,13 +1739,13 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 
 	if (1 == issuer_mismatch)
 	{
-		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "issuer: peer: \"%s\", required: \"%s\"",
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
-				tls_issuer,
+		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "issuer: peer: \"%s\", required: \"%s\"",
+				tls_issuer, issuer);
 #elif defined(HAVE_OPENSSL)
-				peer_issuer,
+		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "issuer: peer: \"%s\", required: \"%s\"",
+				peer_issuer, issuer);
 #endif
-				issuer);
 	}
 
 	if (1 == subject_mismatch)
@@ -1750,13 +1753,13 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 		if (1 == issuer_mismatch)
 			zbx_snprintf_alloc(error, &error_alloc, &error_offset, ", ");
 
-		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "subject: peer: \"%s\", required: \"%s\"",
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
-				tls_subject,
+		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "subject: peer: \"%s\", required: \"%s\"",
+				tls_subject, subject);
 #elif defined(HAVE_OPENSSL)
-				peer_subject,
+		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "subject: peer: \"%s\", required: \"%s\"",
+				peer_subject, subject);
 #endif
-				subject);
 	}
 
 	return FAIL;
@@ -3692,8 +3695,8 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 			goto out1;
 		}
 
-		/* Basic verification of peer certificate has been done. Issuer and Subject have to be verified later, */
-		/* after data have been received and sender type and host name are known. */
+		/* Basic verification of peer certificate has been done. Issuer and Subject have to be verified */
+		/* later, after data have been received and sender type and host name are known. */
 	}
 	else if (GNUTLS_CRD_PSK == creds)
 	{
@@ -3784,12 +3787,11 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 
 			goto out;
 		}
-
-		/* Server or proxy with no certificate configured. PSK is always assumed to be configured on server */
-		/* or proxy because PSK can come from database. */
-
-		if (NULL != ctx_psk)
+		else if (NULL != ctx_psk)
 		{
+			/* Server or proxy with no certificate configured. PSK is always assumed to be configured on */
+			/* server or proxy because PSK can come from database. */
+
 			if (NULL == (s->tls_ctx = SSL_new(ctx_psk)))
 			{
 				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "cannot create context to accept"
@@ -3888,9 +3890,41 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
 
-		/* TODO log some certificate debug info here */
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			/* log peer certificate information for debugging */
 
-		/* validate peer certificate TODO: Issuer and Subject validation */
+			X509	*peer_cert = NULL;
+			char	*issuer = NULL, *subject = NULL;
+			int	err = 0;
+
+			if (NULL != (peer_cert = SSL_get_peer_certificate(s->tls_ctx)) &&
+					SUCCEED == zbx_get_issuer_subject(peer_cert, &issuer, &subject))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "peer certificate issuer:\"%s\" subject:\"%s\"", issuer,
+						subject);
+			}
+			else
+				err = 1;
+
+			if (NULL != issuer)
+				OPENSSL_free(issuer);
+
+			if (NULL != subject)
+				OPENSSL_free(subject);
+
+			if (NULL != peer_cert)
+				X509_free(peer_cert);
+
+			if (0 != err)
+			{
+				zbx_tls_close(s);
+				goto out1;
+			}
+		}
+
+		/* Basic verification of peer certificate has been done. Issuer and Subject have to be verified */
+		/* later, after data have been received and sender type and host name are known. */
 	}
 	else
 	{
@@ -3912,7 +3946,7 @@ out:
 		SSL_free(s->tls_ctx);
 		s->tls_ctx = NULL;
 	}
-
+out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
