@@ -78,7 +78,7 @@ typedef struct
 	zbx_uint64_t	total_size;
 	zbx_uint64_t	free_size;
 
-	/* value cache operating mode: 0 - normal, 1 - low memory */
+	/* value cache operating mode - see ZBX_VC_MODE_* defines */
 	int		mode;
 }
 zbx_vc_stats_t;

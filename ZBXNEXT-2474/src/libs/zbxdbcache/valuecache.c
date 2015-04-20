@@ -190,7 +190,7 @@ typedef struct
 	/* the number of database queries performed, used only for unit tests */
 	zbx_uint64_t	db_queries;
 
-	/* value cache operating mode: 0 - normal, 1 - low memory */
+	/* value cache operating mode - see ZBX_VC_MODE_* defines */
 	int		mode;
 
 	/* time when cache operating mode was changed */
