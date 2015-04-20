@@ -116,13 +116,13 @@ class CSetupWizard extends CForm {
 			$next_button = new CSubmit($this->SHOW_RETRY_BUTTON ? 'retry' : 'finish', _('Finish'));
 		}
 
-		$back_button = new CSubmit('back['.$this->getStep().']', _('Back'), null, 'btn-alt');
+		$back_button = new CSubmit('back['.$this->getStep().']', _('Back'), null, 'btn-alt float-left');
 
 		if ($this->getStep() == 0 || $this->DISABLE_BACK_BUTTON) {
 			$back_button->setEnabled(false);
 		}
 
-		$setup_footer = new CDiv(array($back_button, $next_button, $cancel_button), 'setup-footer');
+		$setup_footer = new CDiv(array(new CDiv(array($next_button, $back_button)), $cancel_button), 'setup-footer');
 
 		$setup_container = new CDiv(array($setup_left, $setup_right, $setup_footer), 'setup-container');
 
