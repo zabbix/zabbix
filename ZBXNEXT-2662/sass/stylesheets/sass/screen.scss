@@ -758,6 +758,11 @@ footer {
 	}
 }
 
+.multiselect-matches {
+	padding: 0.4em 5px; 
+	@extend .multiselect-suggest;
+}
+
 // Timeline
 .multiselect-button {
 	float: left;
