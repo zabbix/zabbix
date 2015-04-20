@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ class testFormLogin extends CWebTest {
 	}
 
 	public function testFormLogin_LoginOK() {
-		$this->zbxTestLogin('dashboard.php');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
@@ -43,7 +43,7 @@ class testFormLogin extends CWebTest {
 	public function testFormLogin_LoginIncorrectPassword() {
 		DBsave_tables('users');
 
-		$this->zbxTestLogin('dashboard.php');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
@@ -67,7 +67,7 @@ class testFormLogin extends CWebTest {
 	public function testFormLogin_BlockAccount() {
 		DBsave_tables('users');
 
-		$this->zbxTestLogin('dashboard.php');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
@@ -98,7 +98,7 @@ class testFormLogin extends CWebTest {
 	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds() {
 		DBsave_tables('users');
 
-		$this->zbxTestLogin('dashboard.php');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
@@ -128,7 +128,7 @@ class testFormLogin extends CWebTest {
 		// account is blocked, waiting 35 sec and trying to login
 		sleep(35);
 
-		$this->zbxTestLogin('dashboard.php');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent(array('Username', 'Password'));

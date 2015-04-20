@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -213,6 +213,16 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 	{
 		zbx_snprintf(error, max_error_len, "Could not set cURL option %d: [%s]", opt, curl_easy_strerror(err));
 		goto clean;
+	}
+
+	if (NULL != CONFIG_SOURCE_IP)
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
+		{
+			zbx_snprintf(error, max_error_len, "Could not set cURL option %d: [%s]",
+					opt, curl_easy_strerror(err));
+			goto clean;
+		}
 	}
 
 	if (CURLE_OK != (err = curl_easy_perform(easy_handle)))

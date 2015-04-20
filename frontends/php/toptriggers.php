@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -190,13 +190,14 @@ while ($row = DBfetch($result)) {
 
 $data['triggers'] = API::Trigger()->get(array(
 	'output' => array('triggerid', 'description', 'expression', 'priority', 'flags', 'url', 'lastchange'),
-	'selectItems' => array('hostid', 'name', 'value_type', 'key_'),
+	'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
 	'selectHosts' => array('hostid', 'status', 'name'),
 	'triggerids' => array_keys($triggersEventCount),
 	'expandDescription' => true,
-	'preservekeys' => true,
-	'nopermissions' => true
+	'preservekeys' => true
 ));
+
+$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrl($data['triggers']);
 
 $hostIds = array();
 
@@ -204,23 +205,6 @@ foreach ($data['triggers'] as $triggerId => $trigger) {
 	$hostId = $trigger['hosts'][0]['hostid'];
 	$hostIds[$hostId] = $hostId;
 
-	$triggerItems = array();
-
-	$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
-
-	foreach ($trigger['items'] as $item) {
-		$triggerItems[] = array(
-			'name' => $item['name_expanded'],
-			'params' => array(
-				'itemid' => $item['itemid'],
-				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-					? HISTORY_GRAPH
-					: HISTORY_VALUES
-			)
-		);
-	}
-
-	$data['triggers'][$triggerId]['items'] = $triggerItems;
 	$data['triggers'][$triggerId]['cnt_event'] = $triggersEventCount[$triggerId];
 }
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -495,27 +495,6 @@ class CAction extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Check if action exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('action.exists method is deprecated.');
-
-		$action = $this->get(array(
-			'output' => array('actionid'),
-			'filter' => zbx_array_mintersect(array(array('actionid', 'name')), $object),
-			'limit' => 1
-		));
-
-		return (bool) $action;
 	}
 
 	/**
@@ -1838,9 +1817,6 @@ class CAction extends CApiService {
 		);
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 

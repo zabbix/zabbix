@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ require_once dirname(__FILE__).'/../page_header.php';
 									<button type="submit" class="button jqueryinput" name="enter" id="enter" value="<?php echo _('Sign in'); ?>"><?php echo _('Sign in'); ?></button>
 									<?php if (CWebUser::$data['userid'] > 0) { ?>
 										<span style="margin-left: 14px;">
-												<a class="highlight underline" href="dashboard.php"><?php echo _('Login as Guest'); ?></a>
+												<a class="highlight underline" href="<?php echo ZBX_DEFAULT_URL; ?>"><?php echo _('Login as Guest'); ?></a>
 											</span>
 									<?php } ?>
 								</li>

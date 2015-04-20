@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -142,7 +142,7 @@ $filterButton->main();
 
 $resetButton = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput shadow');
 
-$divButtons = new CDiv(array($filterButton, SPACE, $resetButton));
+$divButtons = new CDiv(array($filterButton, $resetButton));
 $divButtons->addStyle('padding: 4px 0px;');
 
 $filterTable->addRow(new CCol($divButtons, 'controls', 4));
@@ -170,7 +170,7 @@ foreach ($this->data['triggers'] as $trigger) {
 	$hostName->setMenuPopup(CMenuPopupHelper::getHost($this->data['hosts'][$hostId], $this->data['scripts'][$hostId]));
 
 	$triggerDescription = new CSpan($trigger['description'], 'link_menu');
-	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $trigger['items']));
+	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	$table->addRow(array(
 		$hostName,

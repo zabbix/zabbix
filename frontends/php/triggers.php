@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,25 +92,37 @@ check_fields($fields);
 $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 
-// validate permissions
+// Validate permissions to single trigger.
 $triggerId = getRequest('triggerid');
-if ($triggerId) {
-	$trigger = (bool) API::Trigger()->get(array(
-		'output' => array(),
-		'triggerids' => $triggerId,
+
+if ($triggerId !== null) {
+	$trigger = API::Trigger()->get(array(
+		'output' => array('triggerid'),
+		'triggerids' => array($triggerId),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'editable' => true
 	));
+
 	if (!$trigger) {
 		access_deny();
 	}
 }
 
+// Validate permissions to a group of triggers for mass enable/disable actions.
+$triggerIds = getRequest('g_triggerid', array());
+$triggerIds = zbx_toArray($triggerIds);
+
+if ($triggerIds && !API::Trigger()->isWritable($triggerIds)) {
+	access_deny();
+}
+
+// Validate permissions to group.
 $groupId = getRequest('groupid');
 if ($groupId && !API::HostGroup()->isWritable(array($groupId))) {
 	access_deny();
 }
 
+// Validate permissions to host.
 $hostId = getRequest('hostid');
 if ($hostId && !API::Host()->isWritable(array($hostId))) {
 	access_deny();
@@ -398,6 +410,7 @@ else {
 			'editable' => true,
 			'output' => array('triggerid'),
 			'sortfield' => $sortField,
+			'sortorder' => $sortOrder,
 			'limit' => $config['search_limit'] + 1
 		);
 		if (empty($data['showdisabled'])) {

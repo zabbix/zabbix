@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,6 @@ class CGraphItem extends CApiService {
 			// output
 			'selectGraphs'	=> null,
 			'output'		=> API_OUTPUT_EXTEND,
-			'expandData'	=> null,
 			'countOutput'	=> null,
 			'preservekeys'	=> null,
 			'sortfield'		=> '',
@@ -66,8 +65,6 @@ class CGraphItem extends CApiService {
 			'limit'			=> null
 		);
 		$options = zbx_array_merge($defOptions, $options);
-
-		$this->checkDeprecatedParam($options, 'expandData');
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -145,18 +142,6 @@ class CGraphItem extends CApiService {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		// expandData
-		if ($options['expandData'] !== null) {
-			$sqlParts['select'][] = 'i.key_';
-			$sqlParts['select'][] = 'i.hostid';
-			$sqlParts['select'][] = 'i.flags';
-			$sqlParts['select'][] = 'h.host';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['gii'] = 'gi.itemid=i.itemid';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-		}
 
 		if ($options['selectGraphs'] !== null) {
 			$sqlParts = $this->addQuerySelect('graphid', $sqlParts);

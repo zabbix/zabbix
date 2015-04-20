@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -242,6 +242,26 @@ class CMacrosResolverHelper {
 		return self::$macrosResolver->resolve(array(
 			'config' => 'triggerDescription',
 			'data' => zbx_toHash($triggers, 'triggerid')
+		));
+	}
+
+	/**
+	 * Resolve macros in trigger url.
+	 *
+	 * @static
+	 *
+	 * @param array $triggers
+	 * @param string $triggers[triggerid]['expression']
+	 * @param string $triggers[triggerid]['url']
+	 *
+	 * @return array
+	 */
+	public static function resolveTriggerUrl(array $triggers) {
+		self::init();
+
+		return self::$macrosResolver->resolve(array(
+			'config' => 'triggerUrl',
+			'data' => $triggers
 		));
 	}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -758,7 +758,6 @@ class CImportReferencer {
 
 			$dbTriggers = API::Trigger()->get(array(
 				'output' => array('triggerid', 'expression', 'description'),
-				'expandExpression' => true,
 				'filter' => array(
 					'description' => array_keys($this->triggers),
 					'flags' => array(
@@ -771,8 +770,9 @@ class CImportReferencer {
 			));
 
 			foreach ($dbTriggers as $dbTrigger) {
-				if (isset($this->triggers[$dbTrigger['description']][$dbTrigger['expression']])) {
-					$this->triggersRefs[$dbTrigger['description']][$dbTrigger['expression']] = $dbTrigger['triggerid'];
+				$dbTriggerExpression = explode_exp($dbTrigger['expression']);
+				if (isset($this->triggers[$dbTrigger['description']][$dbTriggerExpression])) {
+					$this->triggersRefs[$dbTrigger['description']][$dbTriggerExpression] = $dbTrigger['triggerid'];
 				}
 			}
 		}

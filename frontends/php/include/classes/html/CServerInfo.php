@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class CServerInfo extends CTable {
 			? new CSpan(_('running'), 'off')
 			: new CSpan(_('not running'), 'on');
 		$serverLink = (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN)
-			? new CLink(_('Zabbix server'), 'report1.php')
+			? new CLink(_('Zabbix server'), 'zabbix.php?action=report.status')
 			: _('Zabbix server');
 
 		$this->addRow(new CCol(_('Zabbix server info'), 'nowrap ui-corner-all ui-widget-header'));

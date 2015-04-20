@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,16 +33,6 @@ extern int		server_num, process_num;
  *                                                                            *
  * Function: send_heartbeat                                                   *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	send_heartbeat(void)
 {
@@ -62,7 +52,8 @@ static int	send_heartbeat(void)
 
 	if (SUCCEED != put_data_to_server(&sock, &j, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "sending heartbeat message to server failed: %s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send heartbeat message to server at \"%s\": %s",
+				get_ip_by_socket(&sock), error);
 		ret = FAIL;
 	}
 
@@ -77,14 +68,6 @@ static int	send_heartbeat(void)
  * Function: main_heart_loop                                                  *
  *                                                                            *
  * Purpose: periodically send heartbeat message to the server                 *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(heart_thread, args)
