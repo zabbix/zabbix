@@ -634,7 +634,6 @@ footer {
 	background: $white;
 
 	.cell {
-		white-space: nowrap;
 		text-align: left;
 		padding: 0 20px;
 		border-right: 1px solid #e9edf2;
@@ -703,7 +702,6 @@ footer {
 			display: inline-block;
 			margin: 2px 14px 0 0;
 			white-space: nowrap;
-			@include transition(background .2s ease);
 
 			&.selected {
 
@@ -2392,7 +2390,6 @@ td.disaster-bg {
 	text-decoration: none;
 	cursor: pointer;
 	@include border-radius(2px);
-	@include transition(background .2s ease);
 
 	&:hover {
 		background: $lighter-grey;
