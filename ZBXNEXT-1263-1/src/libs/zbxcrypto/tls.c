@@ -4153,8 +4153,30 @@ int	zbx_tls_get_attr(const zbx_sock_t *s, zbx_tls_conn_attr_t *attr)
 #elif defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == s->connection_type)
 	{
-		/* TODO implement getting pointers to issuer and subject and their lengths */
-		return FAIL;
+		X509	*peer_cert = NULL;
+		char	*issuer = NULL, *subject = NULL;
+		int	err = 0;
+
+		if (NULL != (peer_cert = SSL_get_peer_certificate(s->tls_ctx)) &&
+				SUCCEED == zbx_get_issuer_subject(peer_cert, &issuer, &subject))
+		{
+			zbx_strlcpy(attr->issuer, issuer, sizeof(attr->issuer));
+			zbx_strlcpy(attr->subject, subject, sizeof(attr->subject));
+		}
+		else
+			err = 1;
+
+		if (NULL != issuer)
+			OPENSSL_free(issuer);
+
+		if (NULL != subject)
+			OPENSSL_free(subject);
+
+		if (NULL != peer_cert)
+			X509_free(peer_cert);
+
+		if (0 != err)
+			return FAIL;
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == s->connection_type)
 	{
