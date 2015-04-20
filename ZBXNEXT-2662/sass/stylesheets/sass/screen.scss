@@ -704,6 +704,15 @@ footer {
 			margin: 2px 14px 0 0;
 			white-space: nowrap;
 
+			&.disabled {
+
+				.subfilter-disable-btn {
+					cursor: default;
+					color: $lighter-blue-grey;
+					background: $light-blue-grey;
+				}
+			}
+
 			&.selected {
 
 				.subfilter-enabled {
