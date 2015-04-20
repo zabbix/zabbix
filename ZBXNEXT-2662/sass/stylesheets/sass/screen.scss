@@ -705,15 +705,6 @@ footer {
 			white-space: nowrap;
 			@include transition(background .2s ease);
 
-			&.disabled {
-
-				.subfilter-disable-btn {
-					cursor: default;
-					color: $lighter-blue-grey;
-					background: $light-blue-grey;
-				}
-			}
-
 			&.selected {
 
 				.subfilter-enabled {
@@ -728,6 +719,15 @@ footer {
 					}
 				}
 			}
+		}
+	}
+
+	.disabled {
+
+		.subfilter-disable-btn {
+			cursor: default;
+			color: $lighter-blue-grey;
+			background: $light-blue-grey;
 		}
 	}
 }
