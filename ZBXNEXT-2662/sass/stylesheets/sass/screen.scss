@@ -1653,17 +1653,16 @@ button[disabled] {
 	width: 766px;
 	text-align: right;
 
+	div {
+		float: right;
+	}
+
 	button {
 		margin: 0 0 0 14px;
 
 		&.float-left {
 			margin: 0;
 			float: left;
-		}
-
-		&.setup-btn-float {
-			float: left;
-			margin: 0 0 0 143px;
 		}
 	}
 }
