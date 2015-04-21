@@ -55,7 +55,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->grid = array(); // vertical & horizontal grids params
 		$this->gridLinesCount = array(); // How many grids to draw
 		$this->gridStep = array(); // grid step
-		$this->gridPixels = 50; // optimal grid size
+		$this->gridPixels = 25; // optimal grid size
 		$this->gridPixelsVert = 40;
 	}
 
@@ -1222,19 +1222,7 @@ class CLineGraphDraw extends CGraphDraw {
 		);
 	}
 
-	private function drawMainPeriod($value, $position) {
-		if (date('H', $value) == 0) {
-			if (date('Hi', $value) == 0) {
-				$format = _('d.m');
-			}
-			else {
-				$format = _('d.m H:i');
-			}
-		}
-		else {
-			$format = _('H:i');
-		}
-
+	private function drawMainPeriod($value, $format, $position) {
 		$str = zbx_date2str($format, $value);
 		$dims = imageTextSize(8, 90, $str);
 
@@ -1301,11 +1289,11 @@ class CLineGraphDraw extends CGraphDraw {
 			array('main' => SEC_PER_HALF_YEAR, 'sub' => SEC_PER_MONTH),		// half year and 30 days
 			array('main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH),			// 1 year and 30 days
 			array('main' => SEC_PER_YEAR, 'sub' => SEC_PER_QUARTER),		// 1 year and 90 days
-			array('main' => SEC_PER_FIVE_YEAR, 'sub' => SEC_PER_YEAR)		// 5 years and 1 year
+			array('main' => SEC_PER_FIVE_YEARS, 'sub' => SEC_PER_YEAR)		// 5 years and 1 year
 		);
 
 		// default values
-		$distance = SEC_PER_FIVE_YEAR;
+		$distance = SEC_PER_FIVE_YEARS;
 		$mainInterval = 0;
 		$subInterval = 0;
 
@@ -1343,7 +1331,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$startI++;
 		}
 
-		while (($this->sizeX - ($offsetX + ($lineCount*$intervalX))) < 12) {
+		while (($this->sizeX - ($offsetX + ($lineCount * $intervalX))) < 12) {
 			$lineCount--;
 		}
 
@@ -1406,34 +1394,42 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$elementSize = imageTextSize(7, 90, 'WWW');
 		for ($i = $this->grid['horizontal']['sub']['start']; $i <= $this->grid['horizontal']['sub']['linecount']; $i++) {
+
 			$newTime = $this->from_time + $i * $subInterval + $subOffset;
+
+			if ($subInterval == SEC_PER_MONTH || $subInterval == SEC_PER_QUARTER) {
+				$newTime = mktime(0, 0, 0, date('m', $newTime), 1, date('Y', $newTime));
+			}
 			$position = $i * $subIntervalX + $this->grid['horizontal']['sub']['offsetx'];
 
 			// dayLightSave
-			if ($subInterval > SEC_PER_HOUR) {
+			if ($subInterval > SEC_PER_HOUR && $subInterval < SEC_PER_HALF_MONTH) {
 				$tz = date('Z', $this->from_time) - date('Z', $newTime);
 				$newTime += $tz;
 			}
 
+			if (date('H', $newTime) == 0) {
+				if (date('d', $newTime) == 1 && date('m', $newTime) == 1 && date('i', $newTime) == 0) {
+					$format = YEAR_FORMAT;
+				}
+				elseif (date('i', $newTime) == 0) {
+					$format = _('m-d');
+				}
+				else {
+					$format = _('d.m H:i');
+				}
+			}
+			else {
+				$format = TIME_FORMAT;
+			}
+
 			// main interval checks
-			if ($subInterval < SEC_PER_HOUR && date('i', $newTime) == 0) {
-				$this->drawMainPeriod($newTime, $position);
-				continue;
-			}
-
-			if ($subInterval >= SEC_PER_HOUR && date('H', $newTime) == '00'
-					&& $subInterval < SEC_PER_DAY) {
-				$this->drawMainPeriod($newTime, $position);
-				continue;
-			}
-
-			if ($subInterval == SEC_PER_DAY && date('N', $newTime) == 7) {
-				$this->drawMainPeriod($newTime, $position);
-				continue;
-			}
-
-			if ($subInterval > SEC_PER_DAY && ($i * $subInterval % $mainInterval + $subOffset) == $mainOffset) {
-				$this->drawMainPeriod($newTime, $position);
+			if (($subInterval > SEC_PER_DAY && ($i * $subInterval % $mainInterval + $subOffset) == $mainOffset)
+					|| ($subInterval < SEC_PER_HOUR && date('i', $newTime) == 0)
+					|| ($subInterval == SEC_PER_DAY && date('N', $newTime) == 7)
+					|| ($subInterval >= SEC_PER_HOUR && date('H', $newTime) == '00' && $subInterval < SEC_PER_DAY)
+					|| $format === YEAR_FORMAT) {
+				$this->drawMainPeriod($newTime, $format, $position);
 				continue;
 			}
 
@@ -1442,16 +1438,6 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 			elseif ($mainIntervalX < (ceil($mainInterval / $subInterval + 1) * $elementSize['width'])) {
 				continue;
-			}
-
-			if ($subInterval == SEC_PER_DAY) {
-				$format = _('D');
-			}
-			elseif ($subInterval > SEC_PER_DAY) {
-				$format = _('d.m');
-			}
-			elseif ($subInterval < SEC_PER_DAY) {
-				$format = _('H:i');
 			}
 
 			$this->drawSubPeriod($newTime, $format, $position);
