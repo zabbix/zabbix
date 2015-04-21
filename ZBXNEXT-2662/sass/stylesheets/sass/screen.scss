@@ -185,6 +185,7 @@ ul.top-nav-icons {
 		display: block;
 		width: 38px;
 		height: 36px;
+		line-height: 36px;
 		color: $white;
 		font-size: $font-h3-size;
 		text-decoration: none;
@@ -214,7 +215,9 @@ ul.top-nav-icons {
 	}
 
 	.top-nav-zbbshare {
-		background: $secondary-blue url(../img/icon-sprite.png) no-repeat -41px -138px;
+		background: $primary-blue url(../img/icon-sprite.png) no-repeat -41px -138px;
+	    width: auto;
+		padding: 0 12px 0 27px;
 	}
 
 	form {
