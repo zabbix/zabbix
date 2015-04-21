@@ -1,4 +1,4 @@
-.TH ZABBIX_SENDER 8 "20 April 2015"
+.TH ZABBIX_SENDER 8 "21 April 2015"
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix sender utility.
@@ -17,7 +17,7 @@ Hostname or IP address of Zabbix server. If a host is monitored by a proxy, prox
 .IP "-p, --port \fI<port>\fR"
 Specify port number of server trapper running on the server. Default is 10051.
 .IP "-s, --host \fI<host>\fR"
-Specify host name as registered in Zabbix frontend. Host IP address and DNS name will not work.
+Specify agent hostname as registered in Zabbix frontend. Host IP address and DNS name will not work.
 .IP "-I, --source-address \fI<IP>\fR"
 Specify source IP address.
 .IP "-k, --key \fI<key>\fR"
@@ -28,29 +28,91 @@ Specify value.
 
 Load values from input file. Specify \fB-\fR to read values from standard input.
 
-Each line of the input file must contain 3 whitespace delimited entries: \fB<hostname> <key> <value>\fR. Specify \fB-\fR as \fB<hostname>\fR to use hostname from configuration file (specified with \fB--config\fR) or \fB--host\fR argument. All entries are sent in a sequential order top-down.
+Each line of the input file must contain 3 whitespace delimited entries: \fB<hostname> <key> <value>\fR. Specify \fB-\fR as \fB<hostname>\fR to use hostname from agent configuration file or from \fB--host\fR argument. All entries are sent in a sequential order top-down.
 
 An example of a line of the input file:
 
-\fB host1 item1 sometext\fR
+\fB "Zabbix server" item1 sometext\fR
 
-If an entry contains whitespace it must be double-quoted (escaping a whitespace will not work):
+Entries must be formatted using the following rules:
 
-\fB "Zabbix server" item1 "some text"\fR
+.RS
+.RS
+.IP \[bu] 2
+Quoted and non-quoted entries are supported.
+.IP \[bu]
+Quoting character is double-quote.
+.IP \[bu]
+Entries with spaces must be quoted.
+.IP \[bu]
+Double-quote and backslash characters inside quoted entry must be escaped with a backslash.
+.IP \[bu]
+Escaping is not supported in non-quoted entries.
+.IP \[bu]
+Linefeed escape sequences (\\n) are supported in quoted strings.
+.IP \[bu]
+Linefeed escape sequences are trimmed from the end of an entry.
+.RE
 
-If an entry contains special characters, they must be escaped with a backslash:
+Use cases:
 
-\fB "Zabbix server" item1 "sending \\"some text\\""\fR
+.RS
+.TS
+allbox;
+c c
+l l.
+entry	result
+sometext	sometext
+"some text"	some text
+"some \\"text\\""	some "text"
+"C:\\\\"	C:\\ 
+C:\\	C:\\ 
+some\\ntext	some\\ntext
+"some\\ttext"	some\\ttext
+"some\\ntext"	T{
+some
+.br
+text
+T}
+.TE
+.RE
 
-A backslash itself must not be escaped:
+Notes:
 
-\fB "Zabbix server" item1 "C:\\Documents\\My Folder"\fR
-\fB "Zabbix server" item1 C:\\Documents\fR
+.RS
+.IP \[bu] 2
+Single backslash characters can be used without escaping under certain conditions in quoted entries but please do not rely on it. Support for that might be removed in the future.
+.IP \[bu]
+Linefeed escape sequences (\\n) are removed from the end of an entry.
+.RE
 
-In case the last character is a backslash double-quotes cannot be used:
+.RS
+.TS
+allbox;
+c c
+l l.
+entry	result
+"C:\\My Documents"	C:\\My Documents
+"C:\\"	Warning: [line 1] 'Key value' required
+"some\\ntext\\n\\n"	T{
+some
+.br
+text
+T}
+"\\n\\nsome\\ntext"	T{
+.br
 
-\fB "Zabbix server" item1 C:\\\fR
-\fB "Zabbix server" item1 "C:\\Documents\\"\fR   <\-\- this will not work!
+.br
+
+some
+.br
+text
+T}
+"\\n\\n"	
+.TE
+.RE
+
+.RE
 
 .IP "-T, --with-timestamps"
 
@@ -60,7 +122,7 @@ Each line of the input file must contain 4 whitespace delimited entries: \fB<hos
 
 An example of a line of the input file:
 
-\fB host1 item1 1429533600 sometext\fR
+\fB "Zabbix server" item1 1429533600 sometext\fR
 
 For more examples on the input file format please see option \fB--input-file\fR.
 
