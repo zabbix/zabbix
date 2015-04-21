@@ -56,6 +56,9 @@
 /* the period of low memory warning messages */
 #define ZBX_VC_LOW_MEMORY_WARNING_PERIOD	(5 * SEC_PER_MIN)
 
+/* time period after which value cache will switch back to normal mode */
+#define ZBX_VC_LOW_MEMORY_RESET_PERIOD		SEC_PER_DAY
+
 /* Redefine the time function so unit tests can simulate time changes. */
 /* It should not be changed during normal processing.                  */
 static time_t (*vc_time)(time_t *) = time;
@@ -194,8 +197,11 @@ typedef struct
 	/* the number of database queries performed, used only for unit tests */
 	zbx_uint64_t	db_queries;
 
-	/* the low memory mode flag */
-	int		low_memory;
+	/* value cache operating mode - see ZBX_VC_MODE_* defines */
+	int		mode;
+
+	/* time when cache operating mode was changed */
+	int		mode_time;
 
 	/* timestamp of the last low memory warning message */
 	int		last_warning_time;
@@ -867,7 +873,14 @@ static void	vc_warn_low_memory()
 
 	now = ZBX_VC_TIME();
 
-	if (now - vc_cache->last_warning_time > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
+	if (now - vc_cache->mode_time > ZBX_VC_LOW_MEMORY_RESET_PERIOD)
+	{
+		vc_cache->mode = ZBX_VC_MODE_NORMAL;
+		vc_cache->mode_time = now;
+
+		zabbix_log(LOG_LEVEL_WARNING, "value cache has been switched from low memory to normal operation mode");
+	}
+	else if (now - vc_cache->last_warning_time > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
 	{
 		vc_cache->last_warning_time = now;
 
@@ -923,7 +936,8 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 		return;
 
 	/* failed to free enough space by removing old items, entering low memory mode */
-	vc_cache->low_memory = 1;
+	vc_cache->mode = ZBX_VC_MODE_LOWMEM;
+	vc_cache->mode_time = ZBX_VC_TIME();
 
 	vc_warn_low_memory();
 
@@ -2881,12 +2895,12 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_histo
 	if (NULL == vc_cache)
 		goto out;
 
-	if (1 == vc_cache->low_memory)
+	if (ZBX_VC_MODE_LOWMEM == vc_cache->mode)
 		vc_warn_low_memory();
 
 	if (NULL == (item = zbx_hashset_search(&vc_cache->items, &itemid)))
 	{
-		if (0 == vc_cache->low_memory)
+		if (ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
 			zbx_vc_item_t   new_item = {itemid, value_type};
 
@@ -3004,12 +3018,12 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 	if (NULL == vc_cache)
 		goto out;
 
-	if (1 == vc_cache->low_memory)
+	if (ZBX_VC_MODE_LOWMEM == vc_cache->mode)
 		vc_warn_low_memory();
 
 	if (NULL == (item = zbx_hashset_search(&vc_cache->items, &itemid)))
 	{
-		if (0 == vc_cache->low_memory)
+		if (ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
 			zbx_vc_item_t   new_item = {itemid, value_type};
 
@@ -3087,7 +3101,7 @@ int	zbx_vc_get_statistics(zbx_vc_stats_t *stats)
 
 	stats->hits = vc_cache->hits;
 	stats->misses = vc_cache->misses;
-	stats->low_memory = vc_cache->low_memory;
+	stats->mode = vc_cache->mode;
 
 	stats->total_size = vc_mem->total_size;
 	stats->free_size = vc_mem->free_size;
