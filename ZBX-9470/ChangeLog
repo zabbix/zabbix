@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+........S. [ZBXNEXT-2474] improved value cache low memory mode handling by switching back to normal mode once per day. The current value cache operational mode now can be checked with zabbix[vcache,cache,mode] interval item (wiper)
 ........S. [ZBXNEXT-2462] improved nodata() function calculation (wiper)
 A.F....PS. [ZBX-5813] added support for spaces in IP ranges in network discovery and action conditions (asaveljevs)
 .......PS. [ZBXNEXT-866] added IP address in the messages about connections between server and proxy (igors)
@@ -66,6 +67,11 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 .D........ [ZBX-5166] replaced '-' with '\-' in man-pages (Andris)
 ...G...PS. [ZBX-8391] added stronger command-line parameter validation, revised help and version messages, revised man-pages for Zabbix server, proxy, agent, sender and get utilities (Andris)
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.5
+
+2.4.5rc1 was released as 2.4.5 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.4.5rc1
@@ -677,7 +683,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.10rc1
 
 New features:
-A.F....... [ZBX-1357] updated Brazilian Portuguese and Japanese translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Polish translations; thanks to Zabbix translators (Richlv)
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
