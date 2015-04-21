@@ -26,11 +26,12 @@
 
 static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 {
-	int	i = 0, wlen = 0, len, ret = SUCCEED;
+	const char	*__function_name = "write_gsm";
+	int		i, wlen, len, ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s'", __function_name, str);
 
 	len = strlen(str);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "write to GSM modem [%s]", str);
 
 	for (wlen = 0; wlen < len; wlen += i)
 	{
@@ -50,10 +51,13 @@ static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 		}
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
-static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char *expect, char *error, int max_error_len)
+static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char *expect, char *error,
+		int max_error_len)
 {
 	const char	*__function_name = "check_modem_result";
 	char		rcv[0xff];
@@ -83,9 +87,9 @@ static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char
 			*sbuf = buffer;
 		}
 	}
-	while (*sbuf < *ebuf && ret == FAIL);
+	while (*sbuf < *ebuf && FAIL == ret);
 
-	if (ret == FAIL && error)
+	if (FAIL == ret && NULL != error)
 		zbx_snprintf(error, max_error_len, "Expected [%s] received [%s]", expect, rcv);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -93,13 +97,15 @@ static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char
 	return ret;
 }
 
+#define MAX_ATTEMPTS	3
+
 static int	read_gsm(int fd, const char *expect, char *error, int max_error_len, int timeout_sec)
 {
 	const char	*__function_name = "read_gsm";
 	static char	buffer[0xff], *ebuf = buffer, *sbuf = buffer;
 	fd_set		fdset;
 	struct timeval  tv;
-	int		i, nbytes, ret = SUCCEED;
+	int		i, nbytes, rc, ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s] [%s] [%s] [%s]", __function_name, expect,
 			ebuf != buffer ? buffer : "NULL", ebuf != buffer ? ebuf : "NULL", ebuf != buffer ? sbuf : "NULL");
@@ -110,43 +116,70 @@ static int	read_gsm(int fd, const char *expect, char *error, int max_error_len, 
 		goto out;
 	}
 
-	tv.tv_sec = timeout_sec;
-	tv.tv_usec = 0;
+	/* make attempts to read until there is a printable character, which would indicate a result of the command */
 
-	/* wait for response from modem */
-	FD_ZERO(&fdset);
-	FD_SET(fd, &fdset);
-	while (1)
+	for (i = 0; i < MAX_ATTEMPTS; i++)
 	{
-		i = select(fd + 1, &fdset, NULL, NULL, &tv);
-		if (-1 == i)
+		tv.tv_sec = timeout_sec / MAX_ATTEMPTS;
+		tv.tv_usec = (timeout_sec % MAX_ATTEMPTS) * 1000000 / MAX_ATTEMPTS;
+
+		/* wait for response from modem */
+
+		FD_ZERO(&fdset);
+		FD_SET(fd, &fdset);
+
+		while (1)
 		{
-			if (EINTR == errno)
-				continue;
+			rc = select(fd + 1, &fdset, NULL, NULL, &tv);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "error select() for GSM modem: %s", zbx_strerror(errno));
-			if (NULL != error)
-				zbx_snprintf(error, max_error_len, "error select() for GSM modem: %s", zbx_strerror(errno));
+			if (-1 == rc)
+			{
+				if (EINTR == errno)
+					continue;
 
-			ret = FAIL;
-			goto out;
+				zabbix_log(LOG_LEVEL_DEBUG, "error select() for GSM modem: %s", zbx_strerror(errno));
+
+				if (NULL != error)
+				{
+					zbx_snprintf(error, max_error_len, "error select() for GSM modem: %s",
+							zbx_strerror(errno));
+				}
+
+				ret = FAIL;
+				goto out;
+			}
+			else if (0 == rc)
+			{
+				/* timeout exceeded */
+
+				zabbix_log(LOG_LEVEL_DEBUG, "error during wait for GSM modem");
+				if (NULL != error)
+					zbx_snprintf(error, max_error_len, "error during wait for GSM modem");
+
+				goto check_result;
+			}
+			else
+				break;
 		}
-		else if (0 == i)
+
+		/* read characters into our string buffer */
+
+		while (0 < (nbytes = read(fd, ebuf, buffer + sizeof(buffer) - 1 - ebuf)))
 		{
-			/* timeout exceeded */
-			zabbix_log(LOG_LEVEL_DEBUG, "error during wait for GSM modem");
-			if (NULL != error)
-				zbx_snprintf(error, max_error_len, "error during wait for GSM modem");
+			ebuf += nbytes;
+			*ebuf = '\0';
 
-			goto check_result;
+			zabbix_log(LOG_LEVEL_DEBUG, "Read attempt #%d from GSM modem [%s]", i, ebuf - nbytes);
+
+			do
+			{
+				if (0 == isspace(ebuf[-nbytes]))
+					goto check_result;
+			}
+			while (0 < --nbytes);
 		}
-		else
-			break;
 	}
 
-	/* read characters into our string buffer */
-	while (0 < (nbytes = read(fd, ebuf, buffer + sizeof(buffer) - 1 - ebuf)))
-		ebuf += nbytes;
 	/* nul terminate the string and see if we got an OK response */
 check_result:
 	*ebuf = '\0';
@@ -197,7 +230,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 		{NULL		, NULL		, 0}
 	};
 
-	zbx_sms_scenario	*step = NULL;
+	zbx_sms_scenario	*step;
 	struct termios		options, old_options;
 	int			f, ret = SUCCEED;
 
@@ -218,11 +251,9 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	memset(&options, 0, sizeof(options));
 
 	options.c_iflag = IGNCR | INLCR | ICRNL;
-
 #ifdef ONOCR
 	options.c_oflag = ONOCR;
-#endif	/* ONOCR */
-
+#endif
 	options.c_cflag = old_options.c_cflag | CRTSCTS | CS8 | CLOCAL | CREAD;
 	options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
 	options.c_cc[VMIN] = 0;
@@ -234,7 +265,21 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	{
 		if (NULL != step->message)
 		{
-			if (FAIL == (ret = write_gsm(f, step->message, error, max_error_len)))
+			if (message == step->message)
+			{
+				char	*tmp;
+
+				tmp = zbx_strdup(NULL, message);
+				zbx_remove_chars(tmp, "\r");
+
+				ret = write_gsm(f, tmp, error, max_error_len);
+
+				zbx_free(tmp);
+			}
+			else
+				ret = write_gsm(f, step->message, error, max_error_len);
+
+			if (FAIL == ret)
 				break;
 		}
 
