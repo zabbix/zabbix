@@ -21,19 +21,26 @@
 
 class CList extends CTag {
 
-	public $emptyList;
+	private $emptyList;
 
 	/**
 	 * Creates a UL list.
 	 *
-	 * @param mixed $value			a single or an array of values to add to the list
+	 * @param array $values			an array of CListItem values to add to the list
 	 * @param string $class			HTML class
 	 * @param string $emptyString	text to display if the list is empty
 	 */
-	public function __construct($value = null, $class = null, $emptyString = null) {
+	public function __construct(array $values = null, $class = null, $emptyString = null) {
 		parent::__construct('ul', 'yes');
-		$this->tag_end = '';
-		$this->addItem($value);
+
+		if ($values !== null) {
+			foreach ($values as $value) {
+				if (!$value instanceof CListItem) {
+					throw new Exception();
+				}
+				$this->addItem($value);
+			}
+		}
 		$this->addClass($class);
 
 		if (is_null($value)) {
@@ -49,10 +56,6 @@ class CList extends CTag {
 		}
 
 		return $value;
-	}
-
-	public function isEmpty() {
-		return $this->emptyList;
 	}
 
 	public function addItem($value, $class = null, $id = null) {

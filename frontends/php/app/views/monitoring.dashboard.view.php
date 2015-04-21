@@ -44,10 +44,10 @@ $icon->setMenuPopup(CMenuPopupHelper::getFavouriteGraphs());
 
 $favouriteGraphs = new CCollapsibleUiWidget(WIDGET_FAVOURITE_GRAPHS, $data['favourite_graphs']);
 $favouriteGraphs->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.state', true);
-$favouriteGraphs->setHeader(_('Favourite graphs'), $icon);
-$favouriteGraphs->setFooter(new CList (
-	new CLink(_('Graphs'), 'charts.php', 'highlight')
-));
+$favouriteGraphs->setHeader(_('Favourite graphs'), array($icon));
+$footer = new CList();
+$footer->addItem(new CLink(_('Graphs'), 'charts.php', 'highlight'));
+$favouriteGraphs->setFooter($footer);
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.col', 0);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.row', 0);
@@ -62,10 +62,10 @@ $icon->setMenuPopup(CMenuPopupHelper::getFavouriteMaps());
 
 $favouriteMaps = new CCollapsibleUiWidget(WIDGET_FAVOURITE_MAPS, $data['favourite_maps']);
 $favouriteMaps->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.state', true);
-$favouriteMaps->setHeader(_('Favourite maps'), $icon);
-$favouriteMaps->setFooter(new CList(
-	new CLink(_('Maps'), 'zabbix.php?action=map.view', 'highlight')
-));
+$favouriteMaps->setHeader(_('Favourite maps'), array($icon));
+$footer = new CList();
+$footer->addItem(new CLink(_('Maps'), 'zabbix.php?action=map.view', 'highlight'));
+$favouriteMaps->setFooter($footer);
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.col', 0);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.row', 2);
@@ -84,7 +84,7 @@ $icon->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
 
 $favouriteScreens = new CCollapsibleUiWidget(WIDGET_FAVOURITE_SCREENS, $data['favourite_screens']);
 $favouriteScreens->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.state', true);
-$favouriteScreens->setHeader(_('Favourite screens'), $icon);
+$favouriteScreens->setHeader(_('Favourite screens'), array($icon));
 $footer = new CList();
 $footer->addItem(new CLink(_('Screens'), 'screens.php', 'highlight'));
 $footer->addItem(new CLink(_('Slide shows'), 'slides.php', 'highlight'));
@@ -105,8 +105,10 @@ if ($data['show_status_widget']) {
 
 	$zabbixStatus = new CCollapsibleUiWidget(WIDGET_ZABBIX_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
 	$zabbixStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.state', true);
-	$zabbixStatus->setHeader(_('Status of Zabbix'), $icon);
-	$zabbixStatus->setFooter(new CList(new CDiv(SPACE, 'textwhite', WIDGET_ZABBIX_STATUS.'_footer')));
+	$zabbixStatus->setHeader(_('Status of Zabbix'), array($icon));
+	$footer = new CList();
+	$footer->addItem(new CDiv(null, 'textwhite', WIDGET_ZABBIX_STATUS.'_footer'));
+	$zabbixStatus->setFooter($footer);
 
 	$col = CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.col', 1);
 	$row = CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.row', 0);
@@ -131,8 +133,10 @@ $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_SYSTEM_STATUS, $rate));
 
 $systemStatus = new CCollapsibleUiWidget(WIDGET_SYSTEM_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
 $systemStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.state', true);
-$systemStatus->setHeader(_('System status'), $icon);
-$systemStatus->setFooter(new CList(new CDiv(SPACE, 'textwhite', WIDGET_SYSTEM_STATUS.'_footer')));
+$systemStatus->setHeader(_('System status'), array($icon));
+$footer = new CList();
+$footer->addItem(new CDiv(SPACE, 'textwhite', WIDGET_SYSTEM_STATUS.'_footer'));
+$systemStatus->setFooter($footer);
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.col', 1);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.row', 1);
@@ -156,8 +160,10 @@ $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_HOST_STATUS, $rate));
 
 $hostStatus = new CCollapsibleUiWidget(WIDGET_HOST_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
 $hostStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.state', true);
-$hostStatus->setHeader(_('Host status'), $icon);
-$hostStatus->setFooter(new CList(new CDiv(SPACE, 'textwhite', WIDGET_HOST_STATUS.'_footer')));
+$hostStatus->setHeader(_('Host status'), array($icon));
+$footer = new CList();
+$footer->addItem(new CDiv(SPACE, 'textwhite', WIDGET_HOST_STATUS.'_footer'));
+$hostStatus->setFooter($footer);
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.col', 1);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.row', 2);
@@ -181,8 +187,10 @@ $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_LAST_ISSUES, $rate));
 
 $lastIssues = new CCollapsibleUiWidget(WIDGET_LAST_ISSUES, new CSpan(_('Loading...'), 'textcolorstyles'));
 $lastIssues->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.state', true);
-$lastIssues->setHeader(_n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT), $icon);
-$lastIssues->setFooter(new CList(new CDiv(SPACE, 'textwhite', WIDGET_LAST_ISSUES.'_footer')));
+$lastIssues->setHeader(_n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT), array($icon));
+$footer = new CList();
+$footer->addItem(new CDiv(SPACE, 'textwhite', WIDGET_LAST_ISSUES.'_footer'));
+$lastIssues->setFooter($footer);
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.col', 1);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.row', 3);
@@ -206,8 +214,10 @@ $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_WEB_OVERVIEW, $rate));
 
 $webMonitoring = new CCollapsibleUiWidget(WIDGET_WEB_OVERVIEW, new CSpan(_('Loading...'), 'textcolorstyles'));
 $webMonitoring->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.state', true);
-$webMonitoring->setHeader(_('Web monitoring'), $icon);
-$webMonitoring->setFooter(new CList(new CDiv(SPACE, 'textwhite', WIDGET_WEB_OVERVIEW.'_footer')));
+$webMonitoring->setHeader(_('Web monitoring'), array($icon));
+$footer = new CList();
+$footer->addItem(new CDiv(SPACE, 'textwhite', WIDGET_WEB_OVERVIEW.'_footer'));
+$webMonitoring->setFooter($footer);
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.col', 1);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.row', 4);
@@ -232,8 +242,10 @@ if ($data['show_discovery_widget']) {
 
 	$discoveryStatus = new CCollapsibleUiWidget(WIDGET_DISCOVERY_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
 	$discoveryStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.state', true);
-	$discoveryStatus->setHeader(_('Discovery status'), $icon);
-	$discoveryStatus->setFooter(new CList(new CDiv(SPACE, 'textwhite', WIDGET_DISCOVERY_STATUS.'_footer')));
+	$discoveryStatus->setHeader(_('Discovery status'), array($icon));
+	$footer = new CList();
+	$footer->addItem(new CDiv(SPACE, 'textwhite', WIDGET_DISCOVERY_STATUS.'_footer'));
+	$discoveryStatus->setFooter($footer);
 
 	$col = CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.col', 1);
 	$row = CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.row', 5);
