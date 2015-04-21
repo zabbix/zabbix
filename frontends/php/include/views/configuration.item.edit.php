@@ -62,9 +62,7 @@ if ($this->data['limited']) {
 	);
 }
 else {
-	$typeComboBox = new CComboBox('type', $this->data['type']);
-	$typeComboBox->addItems($this->data['types']);
-	$itemFormList->addRow(_('Type'), $typeComboBox);
+	$itemFormList->addRow(_('Type'), new CComboBox('type', $this->data['type'], null, $this->data['types']));
 }
 
 // append key to form list
@@ -127,10 +125,11 @@ $itemFormList->addRow(_('Security name'),
 );
 
 // append snmpv3 security level to form list
-$securityLevelComboBox = new CComboBox('snmpv3_securitylevel', $this->data['snmpv3_securitylevel']);
-$securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'noAuthNoPriv');
-$securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'authNoPriv');
-$securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'authPriv');
+$securityLevelComboBox = new CComboBox('snmpv3_securitylevel', $this->data['snmpv3_securitylevel'], null, array(
+	ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
+	ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
+	ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
+));
 $itemFormList->addRow(_('Security level'), $securityLevelComboBox, false, 'row_snmpv3_securitylevel');
 $authProtocolRadioButton = array(
 	new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5, null, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_MD5),
@@ -169,9 +168,10 @@ $itemFormList->addRow(_('IPMI sensor'),
 );
 
 // append authentication method to form list
-$authTypeComboBox = new CComboBox('authtype', $this->data['authtype']);
-$authTypeComboBox->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
-$authTypeComboBox->addItem(ITEM_AUTHTYPE_PUBLICKEY, _('Public key'));
+$authTypeComboBox = new CComboBox('authtype', $this->data['authtype'], null, array(
+	ITEM_AUTHTYPE_PASSWORD => _('Password'),
+	ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+));
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, false, 'row_authtype');
 $itemFormList->addRow(_('User name'),
 	new CTextBox('username', $this->data['username'], ZBX_TEXTBOX_SMALL_SIZE, false, 64), false, 'row_username'
@@ -210,13 +210,13 @@ if ($this->data['limited']) {
 	);
 }
 else {
-	$valueTypeComboBox = new CComboBox('value_type', $this->data['value_type']);
-	$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_UINT64, _('Numeric (unsigned)'));
-	$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_FLOAT, _('Numeric (float)'));
-	$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_STR, _('Character'));
-	$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_LOG, _('Log'));
-	$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_TEXT, _('Text'));
-	$itemFormList->addRow(_('Type of information'), $valueTypeComboBox);
+	$itemFormList->addRow(_('Type of information'), new CComboBox('value_type', $this->data['value_type'], null, array(
+		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+		ITEM_VALUE_TYPE_STR => _('Character'),
+		ITEM_VALUE_TYPE_LOG => _('Log'),
+		ITEM_VALUE_TYPE_TEXT => _('Text')
+	)));
 }
 
 // append data type to form list
@@ -225,8 +225,7 @@ if ($this->data['limited']) {
 	$dataType = new CTextBox('data_type_name', item_data_type2str($this->data['data_type']), ZBX_TEXTBOX_SMALL_SIZE, true);
 }
 else {
-	$dataType = new CComboBox('data_type', $this->data['data_type']);
-	$dataType->addItems(item_data_type2str());
+	$dataType = new CComboBox('data_type', $this->data['data_type'], null,  item_data_type2str());
 }
 $itemFormList->addRow(_('Data type'), $dataType, false, 'row_data_type');
 $itemFormList->addRow(_('Units'),
@@ -366,8 +365,7 @@ if ($this->data['limited']) {
 	$deltaComboBox = new CTextBox('delta_name', $deltaOptions[$this->data['delta']], null, true);
 }
 else {
-	$deltaComboBox= new CComboBox('delta', $this->data['delta']);
-	$deltaComboBox->addItems($deltaOptions);
+	$deltaComboBox= new CComboBox('delta', $this->data['delta'], null, $deltaOptions);
 }
 $itemFormList->addRow(_('Store value'), $deltaComboBox, false, 'row_delta');
 
@@ -425,7 +423,7 @@ if (empty($this->data['parent_discoveryid'])) {
 			$fieldNo,
 			$fieldInfo['title'],
 			$this->data['inventory_link'] == $fieldNo && $enabled ? 'yes' : null,
-			$enabled ? 'yes' : 'no'
+			$enabled
 		);
 	}
 	$itemFormList->addRow(_('Populates host inventory field'), $hostInventoryFieldComboBox, false, 'row_inventory_link');

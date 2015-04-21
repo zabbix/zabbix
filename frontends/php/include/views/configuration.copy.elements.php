@@ -42,11 +42,12 @@ $triggersForm->addVar('action', $this->data['action']);
 $triggersFormList = new CFormList('triggersFormList');
 
 // append copy types to form list
-$copyTypeComboBox = new CComboBox('copy_type', $this->data['copy_type'], 'submit()');
-$copyTypeComboBox->addItem(COPY_TYPE_TO_HOST, _('Hosts'));
-$copyTypeComboBox->addItem(COPY_TYPE_TO_TEMPLATE, _('Templates'));
-$copyTypeComboBox->addItem(COPY_TYPE_TO_HOST_GROUP, _('Host groups'));
-$triggersFormList->addRow(_('Target type'), $copyTypeComboBox);
+
+$triggersFormList->addRow(_('Target type'), new CComboBox('copy_type', $this->data['copy_type'], 'submit()', array(
+	COPY_TYPE_TO_HOST => _('Hosts'),
+	COPY_TYPE_TO_TEMPLATE => _('Templates'),
+	COPY_TYPE_TO_HOST_GROUP => _('Host groups')
+)));
 
 // append groups to form list
 if ($this->data['copy_type'] == COPY_TYPE_TO_HOST || $this->data['copy_type'] == COPY_TYPE_TO_TEMPLATE) {
