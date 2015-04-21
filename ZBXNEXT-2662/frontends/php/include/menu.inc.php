@@ -331,7 +331,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			$show_menu = false;
 		}
 
-		$menu_class = 'horizontal_menu_n';
+		$menu_class = null;
 		$sub_menus[$label] = array();
 
 		foreach ($menu['pages'] as $sub_page) {
