@@ -756,7 +756,8 @@ if (!empty($this->data['new_operation'])) {
 			$newOperationsTable->addRow(array(_('Target list'), $cmdList), 'indent_top');
 
 			// type
-			$typeComboBox = new CComboBox('new_operation[opcommand][type]', $data['new_operation']['opcommand']['type'],
+			$typeComboBox = new CComboBox('new_operation[opcommand][type]',
+				$this->data['new_operation']['opcommand']['type'],
 				'showOpTypeForm()',
 				array(
 					ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
@@ -1030,7 +1031,8 @@ if (!empty($this->data['new_operation'])) {
 			$i++;
 		}
 
-		$calcTypeComboBox = new CComboBox('new_operation[evaltype]', $data['new_operation']['evaltype'], 'submit()',
+		$calcTypeComboBox = new CComboBox('new_operation[evaltype]', $this->data['new_operation']['evaltype'],
+			'submit()',
 			array(
 				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
 				CONDITION_EVAL_TYPE_AND => _('And'),
