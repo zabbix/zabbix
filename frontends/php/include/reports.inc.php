@@ -57,13 +57,13 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 	$reportForm->addRow(_('Y label'), new CTextBox('ylabel', $ylabel, 40));
 	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend', $showlegend, null, 1));
 
-	$scale = new CComboBox('scaletype', $scaletype);
-	$scale->addItem(TIMEPERIOD_TYPE_HOURLY, _('Hourly'));
-	$scale->addItem(TIMEPERIOD_TYPE_DAILY, 	_('Daily'));
-	$scale->addItem(TIMEPERIOD_TYPE_WEEKLY,	_('Weekly'));
-	$scale->addItem(TIMEPERIOD_TYPE_MONTHLY, _('Monthly'));
-	$scale->addItem(TIMEPERIOD_TYPE_YEARLY,	_('Yearly'));
-	$reportForm->addRow(_('Scale'), $scale);
+	$reportForm->addRow(_('Scale'), new CComboBox('scaletype', $scaletype, null, array(
+		TIMEPERIOD_TYPE_HOURLY => _('Hourly'),
+		TIMEPERIOD_TYPE_DAILY => _('Daily'),
+		TIMEPERIOD_TYPE_WEEKLY => _('Weekly'),
+		TIMEPERIOD_TYPE_MONTHLY => _('Monthly'),
+		TIMEPERIOD_TYPE_YEARLY => _('Yearly')
+	)));
 
 	$reporttimetab = new CTable(null, 'calendar');
 
@@ -163,13 +163,11 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 	$reportForm->addRow(_('Y label'), new CTextBox('ylabel', $ylabel, 40));
 
 	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend', $showlegend, null, 1));
-
 	if (count($periods) < 2) {
-		$sortCmb = new CComboBox('sorttype', $sorttype);
-			$sortCmb->addItem(0, _('Name'));
-			$sortCmb->addItem(1, _('Value'));
-
-		$reportForm->addRow(_('Sort by'), $sortCmb);
+		$reportForm->addRow(_('Sort by'), new CComboBox('sorttype', $sorttype, null, array(
+			0 => _('Name'),
+			1 => _('Value')
+		)));
 	}
 	else {
 		$reportForm->addVar('sortorder', 0);
@@ -381,21 +379,21 @@ function valueComparisonFormForMultiplePeriods() {
 
 	$reportForm->addRow(_('Period'), $reporttimetab);
 
-	$scale = new CComboBox('scaletype', $scaletype);
-	$scale->addItem(TIMEPERIOD_TYPE_HOURLY, _('Hourly'));
-	$scale->addItem(TIMEPERIOD_TYPE_DAILY, _('Daily'));
-	$scale->addItem(TIMEPERIOD_TYPE_WEEKLY, _('Weekly'));
-	$scale->addItem(TIMEPERIOD_TYPE_MONTHLY, _('Monthly'));
-	$scale->addItem(TIMEPERIOD_TYPE_YEARLY, _('Yearly'));
-	$reportForm->addRow(_('Scale'), $scale);
+	$reportForm->addRow(_('Scale'), new CComboBox('scaletype', $scaletype, null, array(
+		TIMEPERIOD_TYPE_HOURLY => _('Hourly'),
+		TIMEPERIOD_TYPE_DAILY => _('Daily'),
+		TIMEPERIOD_TYPE_WEEKLY => _('Weekly'),
+		TIMEPERIOD_TYPE_MONTHLY => _('Monthly'),
+		TIMEPERIOD_TYPE_YEARLY => _('Yearly')
+	)));
 
-	$avgcmb = new CComboBox('avgperiod', $avgperiod);
-	$avgcmb->addItem(TIMEPERIOD_TYPE_HOURLY, _('Hourly'));
-	$avgcmb->addItem(TIMEPERIOD_TYPE_DAILY, _('Daily'));
-	$avgcmb->addItem(TIMEPERIOD_TYPE_WEEKLY, _('Weekly'));
-	$avgcmb->addItem(TIMEPERIOD_TYPE_MONTHLY, _('Monthly'));
-	$avgcmb->addItem(TIMEPERIOD_TYPE_YEARLY, _('Yearly'));
-	$reportForm->addRow(_('Average by'), $avgcmb);
+	$reportForm->addRow(_('Average by'), new CComboBox('avgperiod', $avgperiod, null, array(
+		TIMEPERIOD_TYPE_HOURLY => _('Hourly'),
+		TIMEPERIOD_TYPE_DAILY => _('Daily'),
+		TIMEPERIOD_TYPE_WEEKLY => _('Weekly'),
+		TIMEPERIOD_TYPE_MONTHLY => _('Monthly'),
+		TIMEPERIOD_TYPE_YEARLY => _('Yearly')
+	)));
 
 	$itemName = '';
 	if ($itemId) {
@@ -424,18 +422,19 @@ function valueComparisonFormForMultiplePeriods() {
 
 	$reportForm->addRow(_('Item'), array($txtCondVal, $btnSelect));
 
-	$paletteCmb = new CComboBox('palette', $palette);
-	$paletteCmb->addItem(0, _s('Palette #%1$s', 1));
-	$paletteCmb->addItem(1, _s('Palette #%1$s', 2));
-	$paletteCmb->addItem(2, _s('Palette #%1$s', 3));
-	$paletteCmb->addItem(3, _s('Palette #%1$s', 4));
-
-	$paletteTypeCmb = new CComboBox('palettetype', $palettetype);
-	$paletteTypeCmb->addItem(0, _('Middle'));
-	$paletteTypeCmb->addItem(1, _('Darken'));
-	$paletteTypeCmb->addItem(2, _('Brighten'));
-
-	$reportForm->addRow(_('Palette'), array($paletteCmb, $paletteTypeCmb));
+	$reportForm->addRow(_('Palette'), array(
+		new CComboBox('palette', $palette, null, array(
+			0 => _s('Palette #%1$s', 1),
+			1 => _s('Palette #%1$s', 2),
+			2 => _s('Palette #%1$s', 3),
+			3 => _s('Palette #%1$s', 4)
+		)),
+		new CComboBox('palettetype', $palettetype, null, array(
+			0 => _('Middle'),
+			1 => _('Darken'),
+			2 => _('Brighten')
+		))
+	));
 
 	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
 	$reportForm->addItemToBottomRow(new CSubmit('report_reset', _('Reset')));

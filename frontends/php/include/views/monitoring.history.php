@@ -83,13 +83,13 @@ if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 		$actionForm->addVar('mark_color', $_REQUEST['mark_color']);
 	}
 
-	$actionComboBox = new CComboBox('action', $this->data['action'], 'submit()');
+	$actions = array();
 	if (isset($this->data['iv_numeric'][$this->data['value_type']])) {
-		$actionComboBox->addItem(HISTORY_GRAPH, _('Graph'));
+		$actions[HISTORY_GRAPH] = _('Graph');
 	}
-	$actionComboBox->addItem(HISTORY_VALUES, _('Values'));
-	$actionComboBox->addItem(HISTORY_LATEST, _('500 latest values'));
-	$actionForm->addItem($actionComboBox);
+	$actions[HISTORY_VALUES] = _('Values');
+	$actions[HISTORY_LATEST] = _('500 latest values');
+	$actionForm->addItem(new CComboBox('action', $this->data['action'], 'submit()', $actions));
 
 	if ($this->data['action'] != HISTORY_GRAPH) {
 		$actionForm->addItem(array(' ', new CSubmit('plaintext', _('As plain text'))));
@@ -141,21 +141,20 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 
 		$filterTask = getRequest('filter_task', 0);
 
-		$taskComboBox = new CComboBox('filter_task', $filterTask, 'submit()');
-		$taskComboBox->addItem(FILTER_TASK_SHOW, _('Show selected'));
-		$taskComboBox->addItem(FILTER_TASK_HIDE, _('Hide selected'));
-		$taskComboBox->addItem(FILTER_TASK_MARK, _('Mark selected'));
-		$taskComboBox->addItem(FILTER_TASK_INVERT_MARK, _('Mark others'));
-		$tasks = array($taskComboBox);
+		$tasks = array(new CComboBox('filter_task', $filterTask, 'submit()', array(
+			FILTER_TASK_SHOW => _('Show selected'),
+			FILTER_TASK_HIDE => _('Hide selected'),
+			FILTER_TASK_MARK => _('Mark selected'),
+			FILTER_TASK_INVERT_MARK => _('Mark others')
+		)));
 
 		if (str_in_array($filterTask, array(FILTER_TASK_MARK, FILTER_TASK_INVERT_MARK))) {
-			$colorComboBox = new CComboBox('mark_color', getRequest('mark_color', 0));
-			$colorComboBox->addItem(MARK_COLOR_RED, _('as Red'));
-			$colorComboBox->addItem(MARK_COLOR_GREEN, _('as Green'));
-			$colorComboBox->addItem(MARK_COLOR_BLUE, _('as Blue'));
-
 			$tasks[] = ' ';
-			$tasks[] = $colorComboBox;
+			$tasks[] = new CComboBox('mark_color', getRequest('mark_color', 0), null, array(
+				MARK_COLOR_RED => _('as Red'),
+				MARK_COLOR_GREEN => _('as Green'),
+				MARK_COLOR_BLUE => _('as Blue')
+			));
 		}
 
 		$filterForm->addRow(_('Selected'), $tasks);
