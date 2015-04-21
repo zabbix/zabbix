@@ -85,7 +85,6 @@ class CTabView extends CDiv {
 		else {
 			$headersList = new CList(null, ZBX_STYLE_TABS_NAV);
 
-
 			foreach ($this->headers as $id => $header) {
 				$tabLink = new CLink($header, '#'.$id, null, null, false);
 				$tabLink->setAttribute('id', 'tab_'.$id);

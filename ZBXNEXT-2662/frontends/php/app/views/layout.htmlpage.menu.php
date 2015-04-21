@@ -20,8 +20,7 @@
 
 	$page_menu = new CTag('header', 'yes');
 
-	$top_menu_items = new CList(null, 'top-nav');
-	$top_menu_items->addItem($data['menu']['main_menu']);
+	$top_menu_items = new CList($data['menu']['main_menu'], 'top-nav');
 
 	// 1st level menu
 	$top_menu = new CDiv($top_menu_items, 'top-nav-container');

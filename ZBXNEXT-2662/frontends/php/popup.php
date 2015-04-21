@@ -465,7 +465,7 @@ for ($i = 1; $i <= $srcfldCount; $i++) {
  * Only host id
  */
 
-$controls = new CList();
+$controls = array();
 
 if (isset($onlyHostid)) {
 	$only_hosts = API::Host()->get(array(
@@ -480,7 +480,7 @@ if (isset($onlyHostid)) {
 	$cmbHosts->addItem($hostid, $host['name']);
 	$cmbHosts->setEnabled(false);
 	$cmbHosts->setAttribute('title', _('You can not switch hosts for current selection.'));
-	$controls->addItem(array(SPACE, _('Host'), SPACE, $cmbHosts));
+	$controls[] = array(SPACE, _('Host'), SPACE, $cmbHosts);
 }
 else {
 	// show Group dropdown in header for these specified sources
@@ -488,7 +488,7 @@ else {
 		'templates', 'hosts', 'host_templates'
 	);
 	if (str_in_array($srctbl, $showGroupCmbBox) && ($srctbl !== 'item_prototypes' || !$parentDiscoveryId)) {
-		$controls->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB()));
+		$controls[] = array(_('Group'), SPACE, $pageFilter->getGroupsCB());
 	}
 
 	// show Type dropdown in header for help items
@@ -500,13 +500,13 @@ else {
 			$cmbTypes->addItem($type, item_type2str($type));
 		}
 
-		$controls->addItem(array(_('Type'), SPACE, $cmbTypes));
+		$controls[] = array(_('Type'), SPACE, $cmbTypes);
 	}
 
 	// show Host dropdown in header for these specified sources
 	$showHostCmbBox = array('triggers', 'items', 'applications', 'graphs', 'graph_prototypes', 'item_prototypes');
 	if (str_in_array($srctbl, $showHostCmbBox) && ($srctbl !== 'item_prototypes' || !$parentDiscoveryId)) {
-		$controls->addItem(array(SPACE, _('Host'), SPACE, $pageFilter->getHostsCB()));
+		$controls[] = array(SPACE, _('Host'), SPACE, $pageFilter->getHostsCB());
 	}
 }
 
@@ -521,12 +521,16 @@ if (str_in_array($srctbl, array('applications', 'triggers'))) {
 		$epmtyScript .= get_window_opener($dstfrm, $dstfld3, $value3);
 		$epmtyScript .= ' close_window(); return false;';
 
-		$controls->addItem(array(SPACE, new CButton('empty', _('Empty'), $epmtyScript)));
+		$controls[] = array(SPACE, new CButton('empty', _('Empty'), $epmtyScript));
 	}
 }
 
-if (!$controls->isEmpty()) {
-	$frmTitle->addItem($controls);
+if ($controls) {
+	$list = new CList();
+	foreach ($controls as $control) {
+		$list->addItem($control);
+	}
+	$frmTitle->addItem($list);
 }
 $widget->setControls($frmTitle);
 

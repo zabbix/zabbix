@@ -58,10 +58,7 @@ class CTag extends CObject {
 		$this->paired = $paired;
 		$this->tag_start = $this->tag_end = $this->tag_body_start = $this->tag_body_end = '';
 
-		if (is_null($body)) {
-			$this->tag_end = $this->tag_body_start = '';
-		}
-		else {
+		if (!is_null($body)) {
 			$this->addItem($body);
 		}
 		$this->addClass($class);

@@ -106,7 +106,7 @@ function getFavouriteGraphsData() {
 /**
  * Get favourite graphs and simple graph.
  *
- * @return CList
+ * @return CTableInfo
  */
 function getFavouriteGraphs() {
 	$data = getFavouriteGraphsData();
@@ -164,7 +164,7 @@ function getFavouriteMapsData() {
 /**
  * Get favourite maps.
  *
- * @return CList
+ * @return CTableInfo
  */
 function getFavouriteMaps() {
 	$data = getFavouriteMapsData();
@@ -243,7 +243,7 @@ function getFavouriteScreensData() {
 /**
  * Get favourite screens and slide shows.
  *
- * @return CList
+ * @return CTableInfo
  */
 function getFavouriteScreens() {
 	$data = getFavouriteScreensData();

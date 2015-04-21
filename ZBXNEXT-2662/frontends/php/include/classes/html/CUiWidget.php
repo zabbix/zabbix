@@ -80,9 +80,9 @@ class CUiWidget extends CDiv {
 	 * Set widget header.
 	 *
 	 * @param string|array|CTag $caption
-	 * @param string|array|CTag $icons
+	 * @param array             $icons
 	 */
-	public function setHeader($caption = null, $icons = SPACE) {
+	public function setHeader($caption = null, array $icons = null) {
 		zbx_value2array($icons);
 
 		if ($caption === null && $icons !== null) {
@@ -92,7 +92,15 @@ class CUiWidget extends CDiv {
 		$this->header = new CDiv(null, 'dashbrd-widget-head header');
 
 		$this->header->addItem(new CTag('h4', 'yes', $caption));
-		$this->header->addItem(new CList($icons));
+
+		if ($icons !== null) {
+			$list = new CList();
+			foreach ($icons as $icon) {
+				$list->addItem($icon);
+			}
+
+			$this->header->addItem($list);
+		}
 	}
 
 	/**
