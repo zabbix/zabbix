@@ -514,7 +514,7 @@ class CItemPrototype extends CItemGeneral {
 				 * application prototypes.
 				 */
 				$db_item_application_prototypes = DBfetchArray(DBselect(
-					'SELECT DISTINCT ap.application_prototypeid,ap.name,ap.templateid,iap.itemapplicationprototypeid'.
+					'SELECT DISTINCT ap.application_prototypeid,ap.name,ap.templateid,iap.item_application_prototypeid'.
 					' FROM application_prototype ap,item_application_prototype iap'.
 					' WHERE ap.application_prototypeid=iap.application_prototypeid'.
 						' AND ap.itemid='.zbx_dbstr($discovery_ruleid).
@@ -523,11 +523,11 @@ class CItemPrototype extends CItemGeneral {
 
 				// Gather all item application prototype records in $old_records for each item.
 				foreach ($db_item_application_prototypes as $item_application_prototype) {
-					$id = $item_application_prototype['itemapplicationprototypeid'];
+					$id = $item_application_prototype['item_application_prototypeid'];
 					$application_prototypeid = $item_application_prototype['application_prototypeid'];
 
 					$old_records[$id] = array(
-						'itemapplicationprototypeid' => $id,
+						'item_application_prototypeid' => $id,
 						'application_prototypeid' => $application_prototypeid,
 						'itemid' => $item['itemid']
 					);
@@ -802,15 +802,15 @@ class CItemPrototype extends CItemGeneral {
 
 		// Unlink application prototypes and delete those who are no longer linked to any other item prototypes.
 		$db_item_application_prototypes = DBfetchArray(DBselect(
-			'SELECT iap.itemapplicationprototypeid,iap.application_prototypeid'.
+			'SELECT iap.item_application_prototypeid,iap.application_prototypeid'.
 			' FROM item_application_prototype iap'.
 			' WHERE '.dbConditionInt('iap.itemid', $prototypeids)
 		));
 
 		if ($db_item_application_prototypes) {
 			DB::delete('item_application_prototype', array(
-				'itemapplicationprototypeid' => zbx_objectValues($db_item_application_prototypes,
-					'itemapplicationprototypeid'
+				'item_application_prototypeid' => zbx_objectValues($db_item_application_prototypes,
+					'item_application_prototypeid'
 				)
 			));
 
