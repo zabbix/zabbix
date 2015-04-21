@@ -1888,7 +1888,7 @@ button[disabled] {
 .action-menu {
 	position: absolute;
 	z-index: 1000;
-	padding: 5px 15px;
+	padding: 5px 15px 5px 25px;
 	min-width: 166px;
 	color: $blue-grey;
 	background: $white;
@@ -1905,8 +1905,8 @@ button[disabled] {
 			line-height: 24px;
 			color: $indigo-black;
 			text-decoration: none;
-			padding: 0 15px;
-			margin: 0 -15px;
+			padding: 0 15px 0 25px;
+			margin: 0 -15px 0 -25px;
 			position: relative;
 			@include transition(background .2s ease);
 
@@ -1919,7 +1919,15 @@ button[disabled] {
 			}
 
 			&.selected {
-				font-weight: bold;
+				background: url(../img/icon-sprite.png) no-repeat -46px -169px;
+
+				&:hover {
+					background-color: $light-grey;
+				}
+
+				&:active {
+					background: $light-grey;
+				}
 			}
 
 			span {
@@ -1938,13 +1946,17 @@ button[disabled] {
 
 		div {
 			border-top: 1px solid $lightest-blue-grey;
-			margin: 5px -15px;
+			margin: 5px -15px 5px -25px;
 		}
 	}
 
 	h3 {
 		height: 24px;
 		line-height: 24px;
+	}
+
+	.arrow-right {
+		border-left-color: $blue-grey;
 	}
 }
 
