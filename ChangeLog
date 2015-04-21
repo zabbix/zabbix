@@ -71,7 +71,7 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 --------------------------------------------------------------------------------
 Changes for 2.4.5
 
-2.4.5rc1 was released as 2.4.5 without any changes
+A.F....... [ZBX-1357] updated Polish and Slovak translations; thanks to Zabbix translators (Richlv)
 
 --------------------------------------------------------------------------------
 Changes for 2.4.5rc1
