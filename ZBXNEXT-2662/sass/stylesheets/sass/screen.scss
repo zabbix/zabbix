@@ -762,7 +762,9 @@ footer {
 }
 
 .multiselect-matches {
-	padding: 0.4em 5px; 
+	padding: 0.4em 5px;
+	color: $indigo-black;
+	font-weight: bold; 
 	@extend .multiselect-suggest;
 }
 
