@@ -482,7 +482,7 @@ static void	cuvc_suite_misc3_test1()
 	ZBX_CU_ASSERT_INT_EQ(item->status, 0);
 	ZBX_CU_ASSERT_INT_EQ(item->active_range, 1000);
 	ZBX_CU_ASSERT_INT_EQ(item->values_total, 0);
-	ZBX_CU_ASSERT_INT_EQ(item->db_coverage_start, 999001);
+	ZBX_CU_ASSERT_INT_EQ(item->db_cached_from, 999001);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
 
