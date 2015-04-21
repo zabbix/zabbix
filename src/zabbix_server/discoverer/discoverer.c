@@ -564,7 +564,10 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 	result = DBselect("select iprange from drules where druleid=" ZBX_FS_UI64, druleid);
 
 	if (NULL != (row = DBfetch(result)))
+	{
 		iprange = zbx_strdup(iprange, row[0]);
+		zbx_trim_str_list(iprange, ',');
+	}
 	DBfree_result(result);
 
 	if (NULL == iprange)
@@ -688,6 +691,8 @@ static int	process_discovery(int now)
 			drule.iprange = row[1];
 			drule.name = row[2];
 			ZBX_DBROW2UINT64(drule.unique_dcheckid, row[3]);
+
+			zbx_trim_str_list(drule.iprange, ',');
 
 			process_rule(&drule);
 		}
