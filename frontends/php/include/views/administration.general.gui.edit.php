@@ -21,16 +21,13 @@
 
 require_once dirname(__FILE__).'/js/administration.general.gui.php';
 
-$comboTheme = new CComboBox('default_theme', $data['default_theme'], null, Z::getThemes());
-
-$comboDdFirstEntry = new CComboBox('dropdown_first_entry', $data['dropdown_first_entry']);
-$comboDdFirstEntry->addItem(ZBX_DROPDOWN_FIRST_NONE, _('None'));
-$comboDdFirstEntry->addItem(ZBX_DROPDOWN_FIRST_ALL, _('All'));
-
 $guiTab = new CFormList('scriptsTab');
-$guiTab->addRow(_('Default theme'), array($comboTheme));
+$guiTab->addRow(_('Default theme'), new CComboBox('default_theme', $data['default_theme'], null, Z::getThemes()));
 $guiTab->addRow(_('Dropdown first entry'), array(
-	$comboDdFirstEntry,
+	new CComboBox('dropdown_first_entry', $data['dropdown_first_entry'], null, array(
+		ZBX_DROPDOWN_FIRST_NONE => _('None'),
+		ZBX_DROPDOWN_FIRST_ALL => _('All')
+	)),
 	new CCheckBox('dropdown_first_remember', $data['dropdown_first_remember'] == 1, null, 1),
 	_('remember selected')
 ));

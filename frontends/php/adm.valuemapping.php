@@ -123,24 +123,24 @@ catch (Exception $e) {
 /*
  * Display
  */
-$generalComboBox = new CComboBox('configDropDown', 'adm.valuemapping.php', 'redirect(this.options[this.selectedIndex].value);');
-$generalComboBox->addItems(array(
-	'adm.gui.php' => _('GUI'),
-	'adm.housekeeper.php' => _('Housekeeping'),
-	'adm.images.php' => _('Images'),
-	'adm.iconmapping.php' => _('Icon mapping'),
-	'adm.regexps.php' => _('Regular expressions'),
-	'adm.macros.php' => _('Macros'),
-	'adm.valuemapping.php' => _('Value mapping'),
-	'adm.workingtime.php' => _('Working time'),
-	'adm.triggerseverities.php' => _('Trigger severities'),
-	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-	'adm.other.php' => _('Other')
-));
-
 $valueMapForm = new CForm();
 $valueMapForm->cleanItems();
-$valueMapForm->addItem($generalComboBox);
+$valueMapForm->addItem(new CComboBox('configDropDown', 'adm.valuemapping.php',
+	'redirect(this.options[this.selectedIndex].value);',
+	array(
+		'adm.gui.php' => _('GUI'),
+		'adm.housekeeper.php' => _('Housekeeping'),
+		'adm.images.php' => _('Images'),
+		'adm.iconmapping.php' => _('Icon mapping'),
+		'adm.regexps.php' => _('Regular expressions'),
+		'adm.macros.php' => _('Macros'),
+		'adm.valuemapping.php' => _('Value mapping'),
+		'adm.workingtime.php' => _('Working time'),
+		'adm.triggerseverities.php' => _('Trigger severities'),
+		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
+		'adm.other.php' => _('Other')
+	)
+));
 if (!isset($_REQUEST['form'])) {
 	$valueMapForm->addItem(new CSubmit('form', _('Create value map')));
 }
