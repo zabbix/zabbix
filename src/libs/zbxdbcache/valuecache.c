@@ -1327,11 +1327,11 @@ static void	vc_item_release(zbx_vc_item_t *item)
  *                                                                            *
  * Function: vc_item_update_db_cached_from                                    *
  *                                                                            *
- * Purpose: updates item database cached from timestamp                       *
+ * Purpose: updates the timestamp from which the item is being cached         *
  *                                                                            *
  * Parameters: item      - [IN] the item                                      *
- *             timestamp - [IN] the timestamp marking the time stgarting with *
- *                              all item values are guaranteed to be cached   *
+ *             timestamp - [IN] the timestamp from which all item values are  *
+ *                              guaranteed to be cached                       *
  *                                                                            *
  ******************************************************************************/
 static void	vc_item_update_db_cached_from(zbx_vc_item_t *item, int timestamp)
@@ -1823,7 +1823,7 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 				}
 			}
 
-			/* the database cached from timestamp now is the last (oldest) removed value timestamp + 1 */
+			/* set the database cached from timestamp to the last (oldest) removed value timestamp + 1 */
 			item->db_cached_from = chunk->slots[chunk->last_value].timestamp.sec + 1;
 
 			vch_item_remove_chunk(item, chunk);
