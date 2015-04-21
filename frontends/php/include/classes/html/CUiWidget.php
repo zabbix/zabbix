@@ -82,7 +82,7 @@ class CUiWidget extends CDiv {
 	 * @param string|array|CTag $caption
 	 * @param array             $icons
 	 */
-	public function setHeader($caption = null, array $icons = null) {
+	public function setHeader($caption = null, array $icons = array()) {
 		zbx_value2array($icons);
 
 		if ($caption === null && $icons !== null) {
@@ -93,13 +93,8 @@ class CUiWidget extends CDiv {
 
 		$this->header->addItem(new CTag('h4', 'yes', $caption));
 
-		if ($icons !== null) {
-			$list = new CList();
-			foreach ($icons as $icon) {
-				$list->addItem($icon);
-			}
-
-			$this->header->addItem($list);
+		if ($icons) {
+			$this->header->addItem(new CList($icons));
 		}
 	}
 

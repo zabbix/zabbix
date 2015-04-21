@@ -26,7 +26,7 @@ class CList extends CTag {
 	/**
 	 * Creates a UL list.
 	 *
-	 * @param array $values			an array of CListItem values to add to the list
+	 * @param array $values			an array of items to add to the list
 	 * @param string $class			HTML class
 	 * @param string $emptyString	text to display if the list is empty
 	 */
@@ -35,9 +35,6 @@ class CList extends CTag {
 
 		if ($values !== null) {
 			foreach ($values as $value) {
-				if (!$value instanceof CListItem) {
-					throw new Exception();
-				}
 				$this->addItem($value);
 			}
 		}

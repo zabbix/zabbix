@@ -526,11 +526,7 @@ if (str_in_array($srctbl, array('applications', 'triggers'))) {
 }
 
 if ($controls) {
-	$list = new CList();
-	foreach ($controls as $control) {
-		$list->addItem($control);
-	}
-	$frmTitle->addItem($list);
+	$frmTitle->addItem(new CList($controls));
 }
 $widget->setControls($frmTitle);
 
