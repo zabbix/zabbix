@@ -612,19 +612,17 @@ jQuery(function($) {
 		}
 
 		if (!empty(data)) {
-			$('.available', obj)
-				.append($('<ul>', {
-					'class': 'multiselect-suggest'
-				}))
-				.mouseenter(function() {
-					values.isAvailableOpened = true;
-				})
-				.mouseleave(function() {
-					values.isAvailableOpened = false;
-				});
-
 			$.each(data, function(i, item) {
-				addAvailable(item, obj, values, options);
+				if (options.limit != 0 && objectLength(values.available) < options.limit) {
+					if (typeof values.available[item.id] === 'undefined'
+							&& typeof values.selected[item.id] === 'undefined'
+							&& typeof values.ignored[item.id] === 'undefined') {
+						values.available[item.id] = item;
+					}
+				}
+				else {
+					values.isMoreMatchesFound = true;
+				}
 			});
 		}
 
@@ -640,6 +638,23 @@ jQuery(function($) {
 
 			$('.available', obj).append(div);
 		}
+		else {
+			$('.available', obj)
+				.append($('<ul>', {
+					'class': 'multiselect-suggest'
+				}))
+				.mouseenter(function() {
+					values.isAvailableOpened = true;
+				})
+				.mouseleave(function() {
+					values.isAvailableOpened = false;
+				});
+
+			$.each(values.available, function(i, item) {
+				addAvailable(item, obj, values, options);
+			});
+		}
+
 
 		// write more matches found label
 		if (values.isMoreMatchesFound) {
@@ -741,66 +756,55 @@ jQuery(function($) {
 	}
 
 	function addAvailable(item, obj, values, options) {
-		if (options.limit != 0 && $('.available li', obj).length < options.limit) {
-			if (typeof values.available[item.id] === 'undefined'
-					&& typeof values.selected[item.id] === 'undefined'
-					&& typeof values.ignored[item.id] === 'undefined') {
-				values.available[item.id] = item;
+		var li = $('<li>', {
+			'data-id': item.id
+		})
+		.click(function() {
+			select(item.id, obj, values, options);
+		})
+		.hover(function() {
+			$('.available li.suggest-hover', obj).removeClass('suggest-hover');
+			li.addClass('suggest-hover');
+		});
 
-				var li = $('<li>', {
-					'data-id': item.id
-				})
-				.click(function() {
-					select(item.id, obj, values, options);
-				})
-				.hover(function() {
-					$('.available li.suggest-hover', obj).removeClass('suggest-hover');
-					li.addClass('suggest-hover');
-				});
+		if (!empty(item.prefix)) {
+			li.append($('<span>', {
+				'class': 'grey',
+				text: item.prefix
+			}));
+		}
 
-				if (!empty(item.prefix)) {
-					li.append($('<span>', {
-						'class': 'grey',
-						text: item.prefix
-					}));
-				}
+		// highlight matched
+		var text = item.name.toLowerCase(),
+			search = values.search.toLowerCase(),
+			start = 0,
+			end = 0,
+			searchLength = search.length;
 
-				// highlight matched
-				var text = item.name.toLowerCase(),
-					search = values.search.toLowerCase(),
-					start = 0,
-					end = 0,
-					searchLength = search.length;
+		while (text.indexOf(search, end) > -1) {
+			end = text.indexOf(search, end);
 
-				while (text.indexOf(search, end) > -1) {
-					end = text.indexOf(search, end);
-
-					if (end > start) {
-						li.append(
-							item.name.substring(start, end)
-						);
-					}
-
-					li.append($('<b>', {
-						text: item.name.substring(end, end + searchLength)
-					}));
-
-					end += searchLength;
-					start = end;
-				}
-
-				if (end < item.name.length) {
-					li.append(
-						item.name.substring(end, item.name.length)
-					);
-				}
-
-				$('.available ul', obj).append(li);
+			if (end > start) {
+				li.append(
+					item.name.substring(start, end)
+				);
 			}
+
+			li.append($('<b>', {
+				text: item.name.substring(end, end + searchLength)
+			}));
+
+			end += searchLength;
+			start = end;
 		}
-		else {
-			values.isMoreMatchesFound = true;
+
+		if (end < item.name.length) {
+			li.append(
+				item.name.substring(end, item.name.length)
+			);
 		}
+
+		$('.available ul', obj).append(li);
 	}
 
 	function select(id, obj, values, options) {
@@ -817,28 +821,17 @@ jQuery(function($) {
 	}
 
 	function showAvailable(obj, values) {
-		if (objectLength(values.available) == 0) {
-			var div = $('.multiselect-matches', obj);
-				div_paddings = div.outerWidth() - div.width();
+		var available = $('.available', obj),
+			available_paddings = available.outerWidth() - available.width();
 
-			div.css({
-				'width': obj.outerWidth() - div_paddings,
-				'left': -1
-			});
+		available.css({
+			'width': obj.outerWidth() - available_paddings,
+			'left': -1
+		});
 
-			$('.available', obj).fadeIn(0);
-		}
-		else {
-			var available = $('.available', obj),
-				available_paddings = available.outerWidth() - available.width();
+		available.fadeIn(0);
 
-			available.css({
-				'width': obj.outerWidth() - available_paddings,
-				'left': -1
-			});
-
-			available.fadeIn(0);
-
+		if (objectLength(values.available) != 0) {
 			// remove selected item selected state
 			if ($('.selected li.selected', obj).length > 0) {
 				$('.selected li.selected', obj).removeClass('selected');
