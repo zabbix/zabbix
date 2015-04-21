@@ -5863,9 +5863,9 @@ return array(
 		),
 	),
 	'item_application_prototype' => array(
-		'key' => 'itemapplicationprototypeid',
+		'key' => 'item_application_prototypeid',
 		'fields' => array(
-			'itemapplicationprototypeid' => array(
+			'item_application_prototypeid' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
