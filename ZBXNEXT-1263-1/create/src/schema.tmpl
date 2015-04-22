@@ -560,7 +560,7 @@ FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|state		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|status
-INDEX		|2		|value
+INDEX		|2		|value,lastchange
 INDEX		|3		|templateid
 
 TABLE|trigger_depends|triggerdepid|ZBX_DATA
@@ -1288,4 +1288,4 @@ INDEX		|1		|itemid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2050004	|2050004
+ROW		|2050004	|2050006
