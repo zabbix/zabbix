@@ -832,17 +832,20 @@ function getItemFilterForm(&$items) {
 
 		// trends
 		if (zbx_empty($filter_trends)) {
-			if (!isset($item_params['trends'][$item['trends']])) {
+			if (!isset($item_params['trends'][$item['trends']]) && $item['trends'] !== '') {
 				$item_params['trends'][$item['trends']] = array('name' => $item['trends'], 'count' => 0);
 			}
+
 			$show_item = true;
+
 			foreach ($item['subfilters'] as $name => $value) {
-				if ($name == 'subfilter_trends') {
+				if ($name === 'subfilter_trends') {
 					continue;
 				}
 				$show_item &= $value;
 			}
-			if ($show_item) {
+
+			if ($show_item && $item['trends'] !== '') {
 				$item_params['trends'][$item['trends']]['count']++;
 			}
 		}

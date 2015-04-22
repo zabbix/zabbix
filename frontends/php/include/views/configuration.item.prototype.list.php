@@ -98,8 +98,7 @@ foreach ($this->data['items'] as $item) {
 		$item['key_'],
 		$item['delay'],
 		$item['history'],
-		in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT))
-			? '' : $item['trends'],
+		$item['trends'],
 		item_type2str($item['type']),
 		new CCol($applications, 'wraptext'),
 		$status

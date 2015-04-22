@@ -262,7 +262,7 @@ foreach ($this->data['items'] as $item) {
 		CHtml::encode($item['key_']),
 		$item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP ? '' : $item['delay'],
 		$item['history'],
-		in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends'],
+		$item['trends'],
 		item_type2str($item['type']),
 		new CCol(CHtml::encode($item['applications_list']), 'wraptext'),
 		$status,
