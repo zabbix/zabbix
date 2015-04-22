@@ -387,6 +387,13 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
+	foreach ($data['items'] as &$item) {
+		if (!in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))) {
+			$item['trends'] = '';
+		}
+	}
+	unset($item);
+
 	$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 
 	order_result($data['items'], $sortField, $sortOrder);

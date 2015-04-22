@@ -1109,9 +1109,20 @@ else {
 	if (isset($_REQUEST['filter_history']) && !zbx_empty($_REQUEST['filter_history'])) {
 		$options['filter']['history'] = $_REQUEST['filter_history'];
 	}
-	if (isset($_REQUEST['filter_trends']) && !zbx_empty($_REQUEST['filter_trends'])) {
-		$options['filter']['trends'] = $_REQUEST['filter_trends'];
+
+	// If no specific value type is set, set a numeric value type when filtering by trends.
+	if (hasRequest('filter_trends')) {
+		$filter_trends = getRequest('filter_trends');
+
+		if ($filter_trends !== '') {
+			$options['filter']['trends'] = $filter_trends;
+
+			if (getRequest('filter_value_type') == -1) {
+				$options['filter']['value_type'] = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+			}
+		}
 	}
+
 	if (isset($_REQUEST['filter_status']) && !zbx_empty($_REQUEST['filter_status']) && $_REQUEST['filter_status'] != -1) {
 		$options['filter']['status'] = $_REQUEST['filter_status'];
 	}
@@ -1170,6 +1181,11 @@ else {
 				$item['host'] = $host['name'];
 			}
 
+			// Hide trend (zero values) for non-numeric item types.
+			if (!in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))) {
+				$item['trends'] = '';
+			}
+
 			$item['subfilters'] = array(
 				'subfilter_hosts' => empty($_REQUEST['subfilter_hosts'])
 					|| (boolean) array_intersect($_REQUEST['subfilter_hosts'], $item['hostids']),
@@ -1189,8 +1205,8 @@ else {
 					|| (count($item['triggers']) > 0 && uint_in_array(1, $_REQUEST['subfilter_with_triggers'])),
 				'subfilter_history' => empty($_REQUEST['subfilter_history'])
 					|| uint_in_array($item['history'], $_REQUEST['subfilter_history']),
-				'subfilter_trends' => empty($_REQUEST['subfilter_trends'])
-					|| uint_in_array($item['trends'], $_REQUEST['subfilter_trends']),
+				'subfilter_trends' => !getRequest('subfilter_trends')
+					|| ($item['trends'] !== '' && uint_in_array($item['trends'], getRequest('subfilter_trends'))),
 				'subfilter_interval' => empty($_REQUEST['subfilter_interval'])
 					|| uint_in_array($item['delay'], $_REQUEST['subfilter_interval']),
 				'subfilter_apps' => empty($_REQUEST['subfilter_apps'])
