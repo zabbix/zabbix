@@ -1168,7 +1168,10 @@ select {
 	&.select-multiple {
 		width: 300px;
 		height: auto;
-		padding: 5px;
+
+		option {
+			padding: 2px 4px;
+		}
 	}
 
 	&[disabled] {
