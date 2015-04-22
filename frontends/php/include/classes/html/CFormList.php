@@ -33,7 +33,7 @@ class CFormList extends CList {
 	}
 
 	public function addRow($term, $description = null, $hidden = false, $id = null, $class = null) {
-		$label = $term;
+		$input_id = null;
 
 		$input = $description;
 		if (is_array($input)) {
@@ -44,9 +44,11 @@ class CFormList extends CList {
 			$input_class = strtolower(get_class($input));
 
 			if (in_array($input_class, $this->formInputs)) {
-				$label = new CLabel($term, $input->getAttribute('id'));
+				$input_id = $input->getAttribute('id');
 			}
 		}
+
+		$label = new CLabel($term, $input_id);
 
 		$defaultClass = $hidden ? ZBX_STYLE_HIDDEN : null;
 
