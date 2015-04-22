@@ -811,25 +811,19 @@ $ipmiList = new CFormList();
 
 // normal hosts
 if (!$isDiscovered) {
-	$cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmiAuthtype, null, ipmiAuthTypes());
-	$cmbIPMIAuthtype->addClass('openView');
-	$cmbIPMIAuthtype->setAttribute('size', 7);
-	$cmbIPMIAuthtype->addStyle('width: 170px;');
-	$ipmiList->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype);
-
-	$cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmiPrivilege, null, ipmiPrivileges());
-	$cmbIPMIPrivilege->addClass('openView');
-	$cmbIPMIPrivilege->setAttribute('size', 5);
-	$cmbIPMIPrivilege->addStyle('width: 170px;');
-	$ipmiList->addRow(_('Privilege level'), $cmbIPMIPrivilege);
+	$ipmiList->addRow(_('Authentication algorithm'),
+		new CListBox('ipmi_authtype', $ipmiAuthtype, 7, null, ipmiAuthTypes())
+	);
+	$ipmiList->addRow(_('Privilege level'), new CListBox('ipmi_privilege', $ipmiPrivilege, 5, null, ipmiPrivileges()));
 }
 // discovered hosts
 else {
-	$cmbIPMIAuthtype = new CTextBox('ipmi_authtype_name', ipmiAuthTypes($dbHost['ipmi_authtype']), ZBX_TEXTBOX_SMALL_SIZE, true);
-	$ipmiList->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype);
-
-	$cmbIPMIPrivilege = new CTextBox('ipmi_privilege_name', ipmiPrivileges($dbHost['ipmi_privilege']), ZBX_TEXTBOX_SMALL_SIZE, true);
-	$ipmiList->addRow(_('Privilege level'), $cmbIPMIPrivilege);
+	$ipmiList->addRow(_('Authentication algorithm'),
+		new CTextBox('ipmi_authtype_name', ipmiAuthTypes($dbHost['ipmi_authtype']), ZBX_TEXTBOX_SMALL_SIZE, true)
+	);
+	$ipmiList->addRow(_('Privilege level'),
+		new CTextBox('ipmi_privilege_name', ipmiPrivileges($dbHost['ipmi_privilege']), ZBX_TEXTBOX_SMALL_SIZE, true)
+	);
 }
 
 $ipmiList->addRow(_('Username'), new CTextBox('ipmi_username', $ipmiUsername, ZBX_TEXTBOX_SMALL_SIZE, $isDiscovered));

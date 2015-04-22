@@ -23,16 +23,13 @@ class CComboBox extends CTag {
 
 	public $value;
 
-	public function __construct($name = 'combobox', $value = null, $action = null, $items = null) {
+	public function __construct($name = 'combobox', $value = null, $action = null, array $items = array()) {
 		parent::__construct('select', 'yes');
 		$this->attr('id', zbx_formatDomId($name));
 		$this->attr('name', $name);
-		$this->attr('size', 1);
 		$this->value = $value;
 		$this->attr('onchange', $action);
-		if (is_array($items)) {
-			$this->addItems($items);
-		}
+		$this->addItems($items);
 
 		// Prevent Firefox remembering selected option on page refresh.
 		$this->setAttribute('autocomplete', 'off');
@@ -42,7 +39,7 @@ class CComboBox extends CTag {
 		$this->value = $value;
 	}
 
-	public function addItems($items) {
+	public function addItems(array $items) {
 		foreach ($items as $value => $caption) {
 			$selected = (int) (strcmp($value, $this->value) == 0);
 			parent::addItem(new CComboItem($value, $caption, $selected));
