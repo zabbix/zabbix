@@ -41,7 +41,7 @@ Entries must be formatted using the following rules:
 .IP \[bu] 2
 Quoted and non-quoted entries are supported.
 .IP \[bu]
-Quoting character is double-quote.
+Double-quote is the quoting character.
 .IP \[bu]
 Entries with spaces must be quoted.
 .IP \[bu]
