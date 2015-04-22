@@ -771,6 +771,7 @@ footer {
 .available {
 	position: absolute;
 	z-index: 1000;
+	margin-top: 1px;
 	border: 1px solid $lighter-blue-grey;
 	border-top: none;
 	min-width: 165px;
