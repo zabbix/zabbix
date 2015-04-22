@@ -21,7 +21,7 @@ a {
 	&:link {
 		text-decoration: none;
 		color: $link-color;
-		@include transition(color .2s ease);
+		@include transition(color .2s ease-in-out);
 	}
 
 	&:visited {
@@ -190,7 +190,7 @@ ul.top-nav-icons {
 		font-size: $font-h3-size;
 		text-decoration: none;
 		@include opacity(0.75);
-		@include transition(all .2s ease);
+		@include transition(all .2s ease-in-out);
 
 		&:hover {
 			@include opacity(1);
@@ -238,7 +238,7 @@ ul.top-nav-icons {
 		color: $white;
 		padding-right: 24px;
 		@include opacity(0.75);
-		@include transition(color, background, border .2s ease);
+		@include transition(color, background, border .2s ease-in-out);
 		@include placeholder($form-input-top-placeholder);
 
 		&:focus {
@@ -424,7 +424,7 @@ footer {
 	    	position: relative;
 	    	margin: -1em;
 	    	padding: 1em;
-	    	@include transition(background .2s ease);
+	    	@include transition(background .2s ease-in-out);
 
 	    	&:hover {
 	    		text-decoration: none;
@@ -439,7 +439,7 @@ footer {
 	}
 
 	tbody tr {
-		@include transition(background .2s ease);
+		@include transition(background .2s ease-in-out);
 
 		&:hover {
 			background: $alt-blue;
@@ -504,7 +504,7 @@ footer {
 	border: 1px solid $light-blue-grey;
 	text-decoration: none;
 	color: $link-color;
-	@include transition(background .2s ease);
+	@include transition(background .2s ease-in-out);
 
 	&:hover {
 		color: $link-hover-color;
@@ -753,7 +753,7 @@ footer {
 		padding: 0.4em 5px;
 		margin: 0 -5px;
 		cursor: pointer;
-		@include transition(background .2s ease);
+		@include transition(background .2s ease-in-out);
 
 		&.suggest-hover {
 			background: $light-grey;
@@ -1212,7 +1212,7 @@ legend {
 %form-input-style {
 	border: 1px solid $light-blue-grey;
 	@include font-form;
-	@include transition(border-color .2s ease);
+	@include transition(border-color .2s ease-in-out);
 
 	&:focus {
 		border-color: $primary-blue;
@@ -1233,7 +1233,7 @@ button {
 	min-height: 24px;
 	vertical-align: middle;
 	cursor: pointer;
-	@include transition(border-color, background-color .2s ease);
+	@include transition(border-color, background-color .2s ease-in-out);
 
 	&:hover {
 		@extend %button-hover;
@@ -1373,7 +1373,7 @@ button {
 		min-height: 22px;
 		padding: 0;
 		@include opacity(0.75);
-		@include transition(all .2s ease);
+		@include transition(all .2s ease-in-out);
 		
 		&:hover {
 			@extend %btn-search-hover-focus;
@@ -1393,7 +1393,7 @@ button {
     	background: $transparent url(../img/icon-sprite.png) no-repeat 3px -262px;
 		@extend %button-widget-icon-size;
 		@include opacity(0.75);
-		@include transition(all .2s ease);
+		@include transition(all .2s ease-in-out);
 
 		&:hover {
 			@extend %btn-widget-hover-active;
@@ -1911,7 +1911,7 @@ button[disabled] {
 			padding: 0 15px 0 25px;
 			margin: 0 -15px 0 -25px;
 			position: relative;
-			@include transition(background .2s ease);
+			@include transition(background .2s ease-in-out);
 
 			&:hover {
 				background: $light-grey;
@@ -1986,7 +1986,7 @@ button[disabled] {
 		padding: 0.4em 5px;
 		margin: 0 -5px;
 		cursor: pointer;
-		@include transition(background .2s ease);
+		@include transition(background .2s ease-in-out);
 
 		&.suggest-hover {
 			background: $light-grey;
@@ -2120,7 +2120,7 @@ button[disabled] {
 
 			td {
 				padding: 4px;
-				@include transition(background-color .2s ease);
+				@include transition(background-color .2s ease-in-out);
 
 				&:hover {
 					background: $light-grey;
@@ -2481,6 +2481,7 @@ a.form-remove-btn {
 	}
 }
 
+/* Color picker */
 .color-picker {
 	height: 20px;
 
@@ -2501,4 +2502,11 @@ a.form-remove-btn {
 			@include box-shadow(inset 0 0 0 2px $white);
 		}
 	}
+}
+
+.preloader {
+	background: url(../img/preload.gif) 0 0;
+	width: 32px;
+	height: 32px;
+	margin: 0 auto;
 }

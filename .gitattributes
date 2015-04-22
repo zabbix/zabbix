@@ -525,6 +525,7 @@ sass/apple-touch-icon-76x76-precomposed.png -text svneol=unset#image/png
 sass/dashboard.html -text
 sass/favicon.ico -text svneol=unset#image/x-icon
 sass/img/icon-sprite.png -text svneol=unset#image/png
+sass/img/preload.gif -text svneol=unset#image/gif
 sass/overlay-dialog.html -text
 sass/overlay-dialog_with_tables.html -text
 sass/popup.html -text
