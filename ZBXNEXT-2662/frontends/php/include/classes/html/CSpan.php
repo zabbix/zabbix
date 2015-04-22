@@ -26,10 +26,5 @@ class CSpan extends CTag {
 		$this->attr('class', $class);
 		$this->attr('id', $id);
 		$this->addItem($items);
-		$this->tag_body_start = '';
-		$this->tag_start = '';
-		$this->tag_end = '';
-		$this->tag_body_start = '';
-		$this->tag_body_end = '';
 	}
 }
