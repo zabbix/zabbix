@@ -304,13 +304,13 @@ jQuery(function($) {
 				.on('keypress keydown', function(e) {
 					switch (e.which) {
 						case KEY.ENTER:
-							var available_selected = $('.available li.suggest-hover', obj);
-
-							if (available_selected.length > 0) {
-								select(available_selected.data('id'), obj, values, options);
-							}
-
 							if (!empty(input.val())) {
+								var available_selected = $('.available li.suggest-hover', obj);
+
+								if (available_selected.length > 0) {
+									select(available_selected.data('id'), obj, values, options);
+								}
+
 								// stop form submit
 								cancelEvent(e);
 								return false;
