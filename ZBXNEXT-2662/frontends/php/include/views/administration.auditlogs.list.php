@@ -21,35 +21,30 @@
 $auditWidget = new CWidget();
 $auditWidget->setTitle(_('Audit log'));
 
+// header
 // create filter
 $filterForm = new CFilter('web.auditlogs.filter.state');
 
 $filterColumn = new CFormList();
-
-$actionComboBox = new CComboBox('action', $this->data['action']);
-$actionComboBox->addItem(-1, _('All'));
-$actionComboBox->addItem(AUDIT_ACTION_LOGIN, _('Login'));
-$actionComboBox->addItem(AUDIT_ACTION_LOGOUT, _('Logout'));
-$actionComboBox->addItem(AUDIT_ACTION_ADD, _('Add'));
-$actionComboBox->addItem(AUDIT_ACTION_UPDATE, _('Update'));
-$actionComboBox->addItem(AUDIT_ACTION_DELETE, _('Delete'));
-$actionComboBox->addItem(AUDIT_ACTION_ENABLE, _('Enable'));
-$actionComboBox->addItem(AUDIT_ACTION_DISABLE, _('Disable'));
-
-$resourceComboBox = new CComboBox('resourcetype', $this->data['resourcetype']);
-$resourceComboBox->addItems(array(-1 => _('All')) + audit_resource2str());
-
-$filterColumn->addRow(
-		_('User'),
-		array (
-			new CTextBox('alias', $this->data['alias'], 20),
-			new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm=zbx_filter'.
-			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
-		)
-	));
-
-$filterColumn->addRow(_('Action'),  $actionComboBox);
-$filterColumn->addRow(_('Resource'), $resourceComboBox);
+$filterColumn->addRow(_('User'), array(
+	new CTextBox('alias', $this->data['alias'], 20),
+	new CButton('btn1', _('Select'),
+		'return PopUp("popup.php?dstfrm=zbx_filter&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
+	)
+));
+$filterColumn->addRow(_('Action'), new CComboBox('action', $this->data['action'], null, array(
+	-1 => _('All'),
+	AUDIT_ACTION_LOGIN => _('Login'),
+	AUDIT_ACTION_LOGOUT => _('Logout'),
+	AUDIT_ACTION_ADD => _('Add'),
+	AUDIT_ACTION_UPDATE => _('Update'),
+	AUDIT_ACTION_DELETE => _('Delete'),
+	AUDIT_ACTION_ENABLE => _('Enable'),
+	AUDIT_ACTION_DISABLE => _('Disable')
+)));
+$filterColumn->addRow(_('Resource'), new CComboBox('resourcetype', $this->data['resourcetype'], null,
+	array(-1 => _('All')) + audit_resource2str()
+));
 
 $filterForm->addColumn($filterColumn);
 $filterForm->addNavigator();

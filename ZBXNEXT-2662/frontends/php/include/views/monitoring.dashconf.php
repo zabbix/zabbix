@@ -44,9 +44,10 @@ else {
 $dashconfFormList->addRow(_('Dashboard filter'), $filterStatusSpan);
 
 // append host groups to form list
-$hostGroupsComboBox = new CComboBox('grpswitch', $this->data['grpswitch'], 'submit();');
-$hostGroupsComboBox->addItem(0, _('All'));
-$hostGroupsComboBox->addItem(1, _('Selected'));
+$hostGroupsComboBox = new CComboBox('grpswitch', $this->data['grpswitch'], 'submit()', array(
+	0 => _('All'),
+	1 => _('Selected')
+));
 if (!$this->data['isFilterEnable']) {
 	$hostGroupsComboBox->setAttribute('disabled', 'disabled');
 }
@@ -101,8 +102,7 @@ array_pop($severities);
 $dashconfFormList->addRow(_('Triggers with severity'), $severities);
 
 // append problem display to form list
-$extAckComboBox = new CComboBox('extAck', $this->data['extAck']);
-$extAckComboBox->addItems(array(
+$extAckComboBox = new CComboBox('extAck', $this->data['extAck'], null, array(
 	EXTACK_OPTION_ALL => _('All'),
 	EXTACK_OPTION_BOTH => _('Separated'),
 	EXTACK_OPTION_UNACK => _('Unacknowledged only')

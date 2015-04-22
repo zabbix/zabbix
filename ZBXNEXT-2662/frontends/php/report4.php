@@ -90,7 +90,7 @@ else {
 	$controls = new CList();
 
 	$controls->addItem(SPACE._('Media type').SPACE);
-	$cmbMedia = new CComboBox('media_type', $media_type, 'submit();');
+	$cmbMedia = new CComboBox('media_type', $media_type, 'submit()');
 	$cmbMedia->addItem(0, _('all'));
 
 	foreach ($media_types as $media_type_id => $media_type_description) {
@@ -104,12 +104,12 @@ else {
 	$controls->addItem($cmbMedia);
 
 	$controls->addItem(SPACE._('Period').SPACE);
-	$cmbPeriod = new CComboBox('period', $period, 'submit();');
-	$cmbPeriod->addItem('daily', _('Daily'));
-	$cmbPeriod->addItem('weekly', _('Weekly'));
-	$cmbPeriod->addItem('monthly', _('Monthly'));
-	$cmbPeriod->addItem('yearly', _('Yearly'));
-	$controls->addItem($cmbPeriod);
+	$controls->addItem(new CComboBox('period', $period, 'submit()', array(
+		'daily' => _('Daily'),
+		'weekly' => _('Weekly'),
+		'monthly' => _('Monthly'),
+		'yearly' => _('Yearly')
+	)));
 
 	if ($period != 'yearly') {
 		$controls->addItem(SPACE._('Year').SPACE);

@@ -111,13 +111,17 @@ unset($this->data['labelTypes'][MAP_LABEL_TYPE_CUSTOM]);
 $sysmapList->addRow(_('Icon label type'), new CComboBox('label_type', $this->data['sysmap']['label_type'], null, $this->data['labelTypes']));
 
 // append icon label location to form list
-$locationComboBox = new CComboBox('label_location', $this->data['sysmap']['label_location']);
-$locationComboBox->addItems(array(0 => _('Bottom'), 1 => _('Left'), 2 => _('Right'), 3 => _('Top')));
-$sysmapList->addRow(_('Icon label location'), $locationComboBox);
+$sysmapList->addRow(_('Icon label location'), new CComboBox('label_location', $data['sysmap']['label_location'], null,
+	array(
+		0 => _('Bottom'),
+		1 => _('Left'),
+		2 => _('Right'),
+		3 => _('Top')
+	)
+));
 
 // append show unack to form list
-$showUnackComboBox = new CComboBox('show_unack', $this->data['sysmap']['show_unack']);
-$showUnackComboBox->addItems(array(
+$showUnackComboBox = new CComboBox('show_unack', $this->data['sysmap']['show_unack'], null, array(
 	EXTACK_OPTION_ALL => _('All'),
 	EXTACK_OPTION_BOTH => _('Separated'),
 	EXTACK_OPTION_UNACK => _('Unacknowledged only'),
@@ -142,8 +146,7 @@ $i = 0;
 foreach ($this->data['sysmap']['urls'] as $url) {
 	$urlLabel = new CTextBox('urls['.$i.'][name]', $url['name'], 32);
 	$urlLink = new CTextBox('urls['.$i.'][url]', $url['url'], 32);
-	$urlEtype = new CComboBox('urls['.$i.'][elementtype]', $url['elementtype']);
-	$urlEtype->addItems(sysmap_element_types());
+	$urlEtype = new CComboBox('urls['.$i.'][elementtype]', $url['elementtype'], null, sysmap_element_types());
 	$removeButton = new CSpan(_('Remove'), 'link_menu');
 	$removeButton->addAction('onclick', '$("urlEntry_'.$i.'").remove();');
 
@@ -159,9 +162,8 @@ $templateUrlLabel = new CTextBox('urls[#{id}][name]', '', 32);
 $templateUrlLabel->setAttribute('disabled', 'disabled');
 $templateUrlLink = new CTextBox('urls[#{id}][url]', '', 32);
 $templateUrlLink->setAttribute('disabled', 'disabled');
-$templateUrlEtype = new CComboBox('urls[#{id}][elementtype]');
+$templateUrlEtype = new CComboBox('urls[#{id}][elementtype]', null, null, sysmap_element_types());
 $templateUrlEtype->setAttribute('disabled', 'disabled');
-$templateUrlEtype->addItems(sysmap_element_types());
 $templateRemoveButton = new CSpan(_('Remove'), 'link_menu');
 $templateRemoveButton->addAction('onclick', '$("entry_#{id}").remove();');
 $templateUrlRow = new CRow(array($templateUrlLabel, $templateUrlLink, $templateUrlEtype, $templateRemoveButton));

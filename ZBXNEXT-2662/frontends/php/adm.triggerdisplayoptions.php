@@ -81,8 +81,9 @@ $cnf_wdgt->setTitle(_('Trigger displaying options'));
 
 $form = new CForm();
 $form->cleanItems();
+
 $controls = new CList();
-$cmbConf = new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php',
+$controls->addItem(new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php',
 	'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
@@ -97,8 +98,7 @@ $cmbConf = new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php',
 		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 		'adm.other.php' => _('Other')
 	)
-);
-$controls->addItem($cmbConf);
+));
 
 $form->addItem($controls);
 $cnf_wdgt->setControls($form);

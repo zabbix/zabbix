@@ -46,7 +46,7 @@ class CTweenBox {
 		return $this->name;
 	}
 
-	public function addItem($value, $caption, $selected = null, $enabled = 'yes') {
+	public function addItem($value, $caption, $selected = null, $enabled = true) {
 		if (is_null($selected)) {
 			if (is_array($this->value)) {
 				if (isset($this->value[$value])) {

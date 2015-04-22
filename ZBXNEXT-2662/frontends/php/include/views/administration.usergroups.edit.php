@@ -56,11 +56,11 @@ $userGroupFormList->addRow(_('Users'), $usersTweenBox->get(_('In group'), array(
 // append frontend and user status to from list
 $isGranted = isset($data['usrgrpid']) ? granted2update_group($data['usrgrpid']) : true;
 if ($isGranted) {
-	$frontendComboBox = new CComboBox('gui_access', $this->data['gui_access']);
-	$frontendComboBox->addItem(GROUP_GUI_ACCESS_SYSTEM, user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM));
-	$frontendComboBox->addItem(GROUP_GUI_ACCESS_INTERNAL, user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL));
-	$frontendComboBox->addItem(GROUP_GUI_ACCESS_DISABLED, user_auth_type2str(GROUP_GUI_ACCESS_DISABLED));
-	$userGroupFormList->addRow(_('Frontend access'), $frontendComboBox);
+	$userGroupFormList->addRow(_('Frontend access'), new CComboBox('gui_access', $this->data['gui_access'], null, array(
+		GROUP_GUI_ACCESS_SYSTEM => user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM),
+		GROUP_GUI_ACCESS_INTERNAL => user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL),
+		GROUP_GUI_ACCESS_DISABLED => user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)
+	)));
 	$userGroupFormList->addRow(_('Enabled'), new CCheckBox('users_status', $this->data['users_status'] ? (isset($data['usrgrpid']) ? 0 : 1) : 1, null, 1)); // invert user status 0 - enable, 1 - disable
 }
 else {

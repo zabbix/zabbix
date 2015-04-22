@@ -314,10 +314,10 @@ else {
 	}
 
 	if ($allow_discovery) {
-		$cmbSource = new CComboBox('source', $source, 'submit()');
-		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, _('Trigger'));
-		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
-		$controls->addItem(array(_('Source').SPACE, $cmbSource));
+		$controls->addItem(array(_('Source').SPACE, new CComboBox('source', $source, 'submit()', array(
+			EVENT_SOURCE_TRIGGERS => _('Trigger'),
+			EVENT_SOURCE_DISCOVERY => _('Discovery')
+		))));
 	}
 
 	$controls->addItem(new CSubmit('csv_export', _('Export to CSV')));

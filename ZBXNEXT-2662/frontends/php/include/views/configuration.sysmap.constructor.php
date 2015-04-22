@@ -44,8 +44,7 @@ $gridShow->setAttribute('id', 'gridshow');
 $gridAutoAlign = new CSpan(($this->data['sysmap']['grid_align'] == SYSMAP_GRID_ALIGN_ON) ? _('On') : _('Off'), 'whitelink');
 $gridAutoAlign->setAttribute('id', 'gridautoalign');
 
-$gridSize = new CComboBox('gridsize', $this->data['sysmap']['grid_size']);
-$gridSize->addItems(array(
+$gridSize = new CComboBox('gridsize', $this->data['sysmap']['grid_size'], null, array(
 	20 => '20x20',
 	40 => '40x40',
 	50 => '50x50',
