@@ -22,22 +22,24 @@
 $mapWidget = new CWidget();
 $mapWidget->setTitle(_('Maps'));
 
+$headerMapForm = new CForm('get');
+$headerMapForm->cleanItems();
+
+$controls = new CList();
+
 if ($data['maps']) {
 	$mapTable = new CTable(null, 'map map-container');
 	$mapTable->setAttribute('style', 'margin-top: 4px;');
 
-	$mapComboBox = new CComboBox('sysmapid', $data['sysmapid'], 'submit()');
+	$maps = array();
 	foreach ($data['maps'] as $sysmapid => $map) {
-		$mapComboBox->addItem($sysmapid, $map['name']);
+		$maps[$sysmapid] = $map['name'];
 	}
 
-	$headerMapForm = new CForm('get');
-	$headerMapForm->cleanItems();
 	$headerMapForm->addVar('action', 'map.view');
 	$headerMapForm->addVar('fullscreen', $data['fullscreen']);
 
-	$controls = new CList();
-	$controls->addItem(array(_('Map').SPACE, $mapComboBox));
+	$controls->addItem(array(_('Map'), SPACE, new CComboBox('sysmapid', $data['sysmapid'], 'submit()', $maps)));
 	$controls->addItem(array(_('Minimum severity').SPACE, $data['pageFilter']->getSeveritiesMinCB()));
 
 	// get map parent maps

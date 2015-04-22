@@ -53,8 +53,10 @@ $cnf_wdgt->setTitle(_('Working time'));
 
 $form = new CForm();
 $form->cleanItems();
+
 $controls = new CList();
-$cmbConf = new CComboBox('configDropDown', 'adm.workingtime.php', 'redirect(this.options[this.selectedIndex].value);',
+$controls->addItem(new CComboBox('configDropDown', 'adm.workingtime.php',
+	'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
 		'adm.housekeeper.php' => _('Housekeeping'),
@@ -68,8 +70,7 @@ $cmbConf = new CComboBox('configDropDown', 'adm.workingtime.php', 'redirect(this
 		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 		'adm.other.php' => _('Other')
 	)
-);
-$controls->addItem($cmbConf);
+));
 
 $form->addItem($controls);
 $cnf_wdgt->setControls($form);

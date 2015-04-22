@@ -37,12 +37,11 @@ $nameTextBox->attr('autofocus', 'autofocus');
 $mediaTypeFormList->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
-$cmbType = new CComboBox('type', $data['type']);
-$cmbType->addItems(array(
+$cmbType = new CComboBox('type', $data['type'], null, array(
 	MEDIA_TYPE_EMAIL => _('Email'),
 	MEDIA_TYPE_EXEC => _('Script'),
 	MEDIA_TYPE_SMS => _('SMS'),
-	MEDIA_TYPE_JABBER => _('Jabber'),
+	MEDIA_TYPE_JABBER => _('Jabber')
 ));
 $cmbType->addItemsInGroup(_('Commercial'), array(MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')));
 $cmbTypeRow = array($cmbType);
@@ -74,12 +73,10 @@ else {
 $mediaTypeFormList->addRow(_('Jabber identifier'), new CTextBox('jabber_username', $data['jabber_username'], ZBX_TEXTBOX_STANDARD_SIZE));
 $mediaTypeFormList->addRow(_('Username'), new CTextBox('eztext_username', $data['eztext_username'], ZBX_TEXTBOX_STANDARD_SIZE));
 $mediaTypeFormList->addRow(_('Password'), $passwdField);
-$limitCb = new CComboBox('eztext_limit', $data['exec_path']);
-$limitCb->addItems(array(
+$mediaTypeFormList->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['exec_path'], null, array(
 	EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
-	EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)'),
-));
-$mediaTypeFormList->addRow(_('Message text limit'), $limitCb);
+	EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
+)));
 
 $mediaTypeFormList->addRow(_('Enabled'), new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE == $data['status'], null, MEDIA_TYPE_STATUS_ACTIVE));
 

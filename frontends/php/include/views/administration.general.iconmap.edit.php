@@ -46,8 +46,9 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 	$numSpan = new CSpan(($i + 1).':');
 	$numSpan->addClass('rowNum');
 
-	$profileLinksComboBox = new CComboBox('iconmap[mappings]['.$i.'][inventory_link]', $mapping['inventory_link']);
-	$profileLinksComboBox->addItems($this->data['inventoryList']);
+	$profileLinksComboBox = new CComboBox('iconmap[mappings]['.$i.'][inventory_link]', $mapping['inventory_link'], null,
+		$this->data['inventoryList']
+	);
 
 	$expressionTextBox = new CTextBox('iconmap[mappings]['.$i.'][expression]', $mapping['expression']);
 	$expressionTextBox->setAttribute('maxlength', 64);
@@ -56,9 +57,10 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 		$expressionTextBox[] = new CVar('iconmap[mappings]['.$i.'][iconmappingid]', $mapping['iconmappingid']);
 	}
 
-	$iconsComboBox = new CComboBox('iconmap[mappings]['.$i.'][iconid]', $mapping['iconid']);
+	$iconsComboBox = new CComboBox('iconmap[mappings]['.$i.'][iconid]', $mapping['iconid'], null,
+		$this->data['iconList']
+	);
 	$iconsComboBox->addClass('mappingIcon');
-	$iconsComboBox->addItems($this->data['iconList']);
 
 	$iconPreviewImage = new CImg('imgstore.php?iconid='.$mapping['iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
 		'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null, 'pointer preview');
@@ -85,17 +87,19 @@ $firstIconId = key($this->data['iconList']);
 $numSpan = new CSpan('0:');
 $numSpan->addClass('rowNum');
 
-$profileLinksComboBox = new CComboBox('iconmap[mappings][#{iconmappingid}][inventory_link]');
-$profileLinksComboBox->addItems($this->data['inventoryList']);
+$profileLinksComboBox = new CComboBox('iconmap[mappings][#{iconmappingid}][inventory_link]', null, null,
+	$this->data['inventoryList']
+);
 $profileLinksComboBox->setAttribute('disabled', 'disabled');
 
 $expressionTextBox = new CTextBox('iconmap[mappings][#{iconmappingid}][expression]');
 $expressionTextBox->setAttribute('maxlength', 64);
 $expressionTextBox->setAttribute('disabled', 'disabled');
 
-$iconsComboBox = new CComboBox('iconmap[mappings][#{iconmappingid}][iconid]', $firstIconId);
+$iconsComboBox = new CComboBox('iconmap[mappings][#{iconmappingid}][iconid]', $firstIconId, null,
+	$this->data['iconList']
+);
 $iconsComboBox->addClass('mappingIcon');
-$iconsComboBox->addItems($this->data['iconList']);
 $iconsComboBox->setAttribute('disabled', 'disabled');
 
 $iconPreviewImage = new CImg('imgstore.php?iconid='.$firstIconId.'&width='.ZBX_ICON_PREVIEW_WIDTH.
@@ -122,9 +126,10 @@ $iconMapTable->addRow(new CCol(new CButton('addMapping', _('Add'), '', 'link_men
 $numSpan = new CSpan($i++.':');
 $numSpan->addClass('rowNum');
 
-$iconsComboBox = new CComboBox('iconmap[default_iconid]', $this->data['iconmap']['default_iconid']);
+$iconsComboBox = new CComboBox('iconmap[default_iconid]', $this->data['iconmap']['default_iconid'], null,
+	$this->data['iconList']
+);
 $iconsComboBox->addClass('mappingIcon');
-$iconsComboBox->addItems($this->data['iconList']);
 
 $iconPreviewImage = new CImg('imgstore.php?iconid='.$this->data['iconmap']['default_iconid'].
 	'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null, 'pointer preview');

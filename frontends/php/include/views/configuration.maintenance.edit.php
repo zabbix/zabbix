@@ -37,10 +37,12 @@ $maintenanceFormList = new CFormList('maintenanceFormList');
 $nameTextBox = new CTextBox('mname', $this->data['mname'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
 $maintenanceFormList->addRow(_('Name'), $nameTextBox);
-$typeComboBox = new CComboBox('maintenance_type', $this->data['maintenance_type']);
-$typeComboBox->addItem(MAINTENANCE_TYPE_NORMAL, _('With data collection'));
-$typeComboBox->addItem(MAINTENANCE_TYPE_NODATA, _('No data collection'));
-$maintenanceFormList->addRow(_('Maintenance type'), $typeComboBox);
+$maintenanceFormList->addRow(_('Maintenance type'),
+	new CComboBox('maintenance_type', $this->data['maintenance_type'], null, array(
+		MAINTENANCE_TYPE_NORMAL => _('With data collection'),
+		MAINTENANCE_TYPE_NODATA => _('No data collection')
+	))
+);
 
 // active since
 if (isset($_REQUEST['active_since'])) {

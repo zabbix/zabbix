@@ -55,9 +55,7 @@ $graphFormList->addRow(_('Name'), $nameTextBox);
 $graphFormList->addRow(_('Width'), new CNumericBox('width', $this->data['width'], 5));
 $graphFormList->addRow(_('Height'), new CNumericBox('height', $this->data['height'], 5));
 
-$graphTypeComboBox = new CComboBox('graphtype', $this->data['graphtype'], 'submit()');
-$graphTypeComboBox->addItems(graphType());
-$graphFormList->addRow(_('Graph type'), $graphTypeComboBox);
+$graphFormList->addRow(_('Graph type'), new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()));
 
 // append legend to form list
 $graphFormList->addRow(_('Show legend'), new CCheckBox('show_legend', $this->data['show_legend'], null, 1));
@@ -101,13 +99,11 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 	}
 
 	$yaxisMinData = array();
-
-	$yTypeComboBox = new CComboBox('ymin_type', $this->data['ymin_type']);
-	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_CALCULATED, _('Calculated'));
-	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_FIXED, _('Fixed'));
-	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_ITEM_VALUE, _('Item'));
-
-	$yaxisMinData[] = $yTypeComboBox;
+	$yaxisMinData[] = new CComboBox('ymin_type', $this->data['ymin_type'], null, array(
+		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
+		GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
+		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
+	));
 
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMinData[] = new CTextBox('yaxismin', $this->data['yaxismin'], 7);
@@ -160,12 +156,11 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 	$graphFormList->addRow(_('Y axis MIN value'), $yaxisMinData);
 
 	$yaxisMaxData = array();
-	$yTypeComboBox = new CComboBox('ymax_type', $this->data['ymax_type']);
-	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_CALCULATED, _('Calculated'));
-	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_FIXED, _('Fixed'));
-	$yTypeComboBox->addItem(GRAPH_YAXIS_TYPE_ITEM_VALUE, _('Item'));
-
-	$yaxisMaxData[] = $yTypeComboBox;
+	$yaxisMaxData[] = new CComboBox('ymax_type', $this->data['ymax_type'], null, array(
+		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
+		GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
+		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
+	));
 
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMaxData[] = new CTextBox('yaxismax', $this->data['yaxismax'], 7);

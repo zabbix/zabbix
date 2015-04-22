@@ -22,15 +22,14 @@
 $overviewWidget = new CWidget();
 $overviewWidget->setTitle(_('Overview'));
 
-$controls = new CList();
-
-$typeComboBox = new CComboBox('type', $this->data['type'], 'submit()');
-$typeComboBox->addItem(SHOW_TRIGGERS, _('Triggers'));
-$typeComboBox->addItem(SHOW_DATA, _('Data'));
-
 $headerForm = new CForm('get');
+
+$controls = new CList();
 $controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$controls->addItem(array(_('Type').SPACE, $typeComboBox));
+$controls->addItem(array(_('Type').SPACE, new CComboBox('type', $this->data['type'], 'submit()', array(
+	SHOW_TRIGGERS => _('Triggers'),
+	SHOW_DATA => _('Data')
+))));
 
 // hint table
 $hintTable = new CTableInfo();
@@ -40,9 +39,10 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 $hintTable->addRow(array(new CCol(SPACE), _('OK or no trigger')));
 
 // header left
-$styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit()');
-$styleComboBox->addItem(STYLE_TOP, _('Top'));
-$styleComboBox->addItem(STYLE_LEFT, _('Left'));
+$styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit()', array(
+	STYLE_TOP => _('Top'),
+	STYLE_LEFT => _('Left')
+));
 
 $controls->additem(array(_('Hosts location').SPACE, $styleComboBox));
 

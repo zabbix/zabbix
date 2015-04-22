@@ -27,11 +27,12 @@ $slideHeaderForm = new CForm('get');
 $slideHeaderForm->setName('slideHeaderForm');
 
 $controls = new CList();
-
-$configComboBox = new CComboBox('config', 'slides.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-$configComboBox->addItem('screens.php', _('Screens'));
-$configComboBox->addItem('slides.php', _('Slide shows'));
-$controls->addItem($configComboBox);
+$controls->addItem(new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);',
+	array(
+		'screens.php' => _('Screens'),
+		'slides.php' => _('Slide shows')
+	)
+));
 
 if ($this->data['slideshows']) {
 	$favouriteIcon = $this->data['screen']

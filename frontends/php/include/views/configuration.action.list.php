@@ -24,17 +24,18 @@ $actionWidget->setTitle(_('Actions'));
 // create new action button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addVar('eventsource', $this->data['eventsource']);
+$createForm->addVar('eventsource', $data['eventsource']);
 $controls = new CList();
 
 // create widget header
-$sourceComboBox = new CComboBox('eventsource', $this->data['eventsource'], 'submit()');
-$sourceComboBox->addItem(EVENT_SOURCE_TRIGGERS, _('Triggers'));
-$sourceComboBox->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
-$sourceComboBox->addItem(EVENT_SOURCE_AUTO_REGISTRATION, _('Auto registration'));
-$sourceComboBox->addItem(EVENT_SOURCE_INTERNAL, _x('Internal', 'event source'));
-
-$controls->addItem(array(_('Event source'), SPACE, $sourceComboBox));
+$controls->addItem(array(_('Event source'), SPACE, new CComboBox('eventsource', $data['eventsource'], 'submit()',
+	array(
+		EVENT_SOURCE_TRIGGERS => _('Triggers'),
+		EVENT_SOURCE_DISCOVERY => _('Discovery'),
+		EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration'),
+		EVENT_SOURCE_INTERNAL => _x('Internal', 'event source')
+	)
+)));
 $controls->addItem(new CSubmit('form', _('Create action')));
 
 $createForm->addItem($controls);
@@ -72,7 +73,7 @@ if ($this->data['actions']) {
 			$conditions[] = BR();
 		}
 
-		sortOperations($this->data['eventsource'], $action['operations']);
+		sortOperations($data['eventsource'], $action['operations']);
 
 		foreach ($action['operations'] as $oIdx => $operation) {
 			$operations[] = $actionOperationDescriptions[$aIdx][$oIdx];

@@ -77,8 +77,9 @@ $cnf_wdgt->setTitle(_('Configuration of trigger severities'));
 
 $form = new CForm();
 $form->cleanItems();
+
 $controls = new CList();
-$cmbConf = new CComboBox('configDropDown', 'adm.triggerseverities.php',
+$controls->addItem(new CComboBox('configDropDown', 'adm.triggerseverities.php',
 	'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
@@ -93,8 +94,7 @@ $cmbConf = new CComboBox('configDropDown', 'adm.triggerseverities.php',
 		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 		'adm.other.php' => _('Other')
 	)
-);
-$controls->addItem($cmbConf);
+));
 
 $form->addItem($controls);
 $cnf_wdgt->setControls($form);

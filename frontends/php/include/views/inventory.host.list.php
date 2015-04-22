@@ -41,15 +41,15 @@ foreach ($inventoryFields as $inventoryField) {
 		$inventoryField['title']
 	);
 }
-$exactComboBox = new CComboBox('filter_exact', $this->data['filterExact']);
-$exactComboBox->addItem('0', _('like'));
-$exactComboBox->addItem('1', _('exactly'));
 
 $filterColumn->addRow(
 		_('Field'),
 		array(
 			$inventoryFieldsComboBox,
-			$exactComboBox,
+			new CComboBox('filter_exact', $this->data['filterExact'], null, array(
+				0 => _('like'),
+				1 => _('exactly')
+			)),
 			new CTextBox('filter_field_value', $this->data['filterFieldValue'], 20)
 		)
 );
