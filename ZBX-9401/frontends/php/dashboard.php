@@ -276,8 +276,8 @@ $leftColumn[] = $fav_maps;
 
 // refresh tab
 $refresh_tab = array(
-	array('id' => 'hat_syssum', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_syssum', 120)),
-	array('id' => 'hat_stszbx', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_stszbx', 120)),
+	array('id' => 'hat_syssum', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_syssum', 60)),
+	array('id' => 'hat_stszbx', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_stszbx', 60)),
 	array('id' => 'hat_lastiss', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_lastiss', 60)),
 	array('id' => 'hat_webovr', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_webovr', 60)),
 	array('id' => 'hat_hoststat', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_hoststat', 60))

@@ -294,7 +294,8 @@ static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, cons
 
 	if (ZBX_SOCK_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype | SOCK_CLOEXEC, ai->ai_protocol)))
 	{
-		zbx_set_tcp_strerror("cannot create socket [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("cannot create socket [[%s]:%d]: %s",
+				ip, port, strerror_from_system(zbx_sock_last_error()));
 		goto out;
 	}
 
@@ -313,12 +314,14 @@ static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, cons
 		if (0 != getaddrinfo(source_ip, NULL, &hints, &ai_bind))
 		{
 			zbx_set_tcp_strerror("invalid source IP address [%s]", source_ip);
+			zbx_tcp_close(s);
 			goto out;
 		}
 
 		if (ZBX_TCP_ERROR == bind(s->socket, ai_bind->ai_addr, ai_bind->ai_addrlen))
 		{
 			zbx_set_tcp_strerror("bind() failed: %s", strerror_from_system(zbx_sock_last_error()));
+			zbx_tcp_close(s);
 			goto out;
 		}
 	}
@@ -328,7 +331,8 @@ static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, cons
 
 	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen))
 	{
-		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s",
+				ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
 		goto out;
 	}
@@ -393,6 +397,7 @@ static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, cons
 		if (ZBX_TCP_ERROR == bind(s->socket, (struct sockaddr *)&source_addr, sizeof(source_addr)))
 		{
 			zbx_set_tcp_strerror("bind() failed: %s", strerror_from_system(zbx_sock_last_error()));
+			zbx_tcp_close(s);
 			return FAIL;
 		}
 	}
@@ -402,7 +407,8 @@ static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, cons
 
 	if (ZBX_TCP_ERROR == connect(s->socket, (struct sockaddr *)&servaddr_in, sizeof(servaddr_in)))
 	{
-		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s",
+				ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
 		return FAIL;
 	}
