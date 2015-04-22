@@ -25,7 +25,6 @@ class CComboBox extends CTag {
 
 	public function __construct($name = 'combobox', $value = null, $action = null, $items = null) {
 		parent::__construct('select', 'yes');
-		$this->tag_end = '';
 		$this->attr('id', zbx_formatDomId($name));
 		$this->attr('name', $name);
 		$this->attr('size', 1);

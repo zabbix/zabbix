@@ -25,12 +25,6 @@ class CSup extends CTag {
 		parent::__construct('sup', 'yes');
 		$this->addItem($items);
 
-		$this->tag_body_start = '';
-		$this->tag_start = '';
-		$this->tag_end = '';
-		$this->tag_body_start = '';
-		$this->tag_body_end = '';
-
 		return $this;
 	}
 
