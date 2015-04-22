@@ -148,20 +148,18 @@ else {
 
 	$frmGItem->addRow(_('Parameter'), array($txtCondVal, $btnSelect));
 
-	$cmbFnc = new CComboBox('calc_fnc', $calc_fnc);
-	$cmbFnc->addItem(CALC_FNC_MIN, _('min'));
-	$cmbFnc->addItem(CALC_FNC_AVG, _('avg'));
-	$cmbFnc->addItem(CALC_FNC_MAX, _('max'));
-	$cmbFnc->addItem(0, _('Count'));
-
-	$frmGItem->addRow(_('Function'), $cmbFnc);
+	$frmGItem->addRow(_('Function'), new CComboBox('calc_fnc', $calc_fnc, null, array(
+		CALC_FNC_MIN => _('min'),
+		CALC_FNC_AVG => _('avg'),
+		CALC_FNC_MAX => _('max'),
+		0 => _('Count')
+	)));
 
 	if ($config == 1) {
-		$cmbAxis = new CComboBox('axisside', $axisside);
-		$cmbAxis->addItem(GRAPH_YAXIS_SIDE_LEFT, _('Left'));
-		$cmbAxis->addItem(GRAPH_YAXIS_SIDE_RIGHT, _('Right'));
-
-		$frmGItem->addRow(_('Axis side'), $cmbAxis);
+		$frmGItem->addRow(_('Axis side'), new CComboBox('axisside', $axisside, null, array(
+			GRAPH_YAXIS_SIDE_LEFT => _('Left'),
+			GRAPH_YAXIS_SIDE_RIGHT => _('Right')
+		)));
 	}
 
 	if ($config == 1) {

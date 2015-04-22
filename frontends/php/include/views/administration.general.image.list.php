@@ -20,12 +20,12 @@
 
 
 // header
-$imageComboBox = new CComboBox('imagetype', $this->data['imagetype'], 'submit();');
-$imageComboBox->addItem(IMAGE_TYPE_ICON, _('Icon'));
-$imageComboBox->addItem(IMAGE_TYPE_BACKGROUND, _('Background'));
 $imageComboBoxForm = new CForm();
 $imageComboBoxForm->addItem(_('Type').SPACE);
-$imageComboBoxForm->addItem($imageComboBox);
+$imageComboBoxForm->addItem(new CComboBox('imagetype', $this->data['imagetype'], 'submit();', array(
+	IMAGE_TYPE_ICON => _('Icon'),
+	IMAGE_TYPE_BACKGROUND => _('Background')
+)));
 $this->data['widget']->addHeader(_('Images'), $imageComboBoxForm);
 
 // form

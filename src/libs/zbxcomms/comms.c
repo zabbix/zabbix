@@ -234,10 +234,16 @@ static void	zbx_tcp_timeout_set(zbx_sock_t *s, int timeout)
 	timeout *= 1000;
 
 	if (ZBX_TCP_ERROR == setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout)))
-		zbx_set_tcp_strerror("setsockopt() failed: %s", strerror_from_system(zbx_sock_last_error()));
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "setsockopt() failed for SO_RCVTIMEO: %s",
+				strerror_from_system(zbx_sock_last_error()));
+	}
 
 	if (ZBX_TCP_ERROR == setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout)))
-		zbx_set_tcp_strerror("setsockopt() failed: %s", strerror_from_system(zbx_sock_last_error()));
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "setsockopt() failed for SO_SNDTIMEO: %s",
+				strerror_from_system(zbx_sock_last_error()));
+	}
 #else
 	alarm(timeout);
 #endif
@@ -364,9 +370,9 @@ static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, sockle
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_connect                                                  *
+ * Function: zbx_sock_connect                                                 *
  *                                                                            *
- * Purpose: connect to external host                                          *
+ * Purpose: connect the socket of the specified type to external host         *
  *                                                                            *
  * Parameters: s - [OUT] socket descriptor                                    *
  *                                                                            *
@@ -377,8 +383,8 @@ static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, sockle
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_IPV6)
-int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+		int timeout, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
 {
 	int		ret = FAIL;
 	struct addrinfo	*ai = NULL, hints;
@@ -392,7 +398,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 	zbx_snprintf(service, sizeof(service), "%d", port);
 	memset(&hints, 0x00, sizeof(struct addrinfo));
 	hints.ai_family = PF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_socktype = type;
 
 	if (0 != getaddrinfo(ip, service, &hints, &ai))
 	{
@@ -416,7 +422,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		memset(&hints, 0x00, sizeof(struct addrinfo));
 
 		hints.ai_family = PF_UNSPEC;
-		hints.ai_socktype = SOCK_STREAM;
+		hints.ai_socktype = type;
 		hints.ai_flags = AI_NUMERICHOST;
 
 		if (0 != getaddrinfo(source_ip, NULL, &hints, &ai_bind))
@@ -470,8 +476,8 @@ out:
 	return ret;
 }
 #else
-int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+		int timeout, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
 {
 	ZBX_SOCKADDR	servaddr_in;
 	struct hostent	*hp;
@@ -497,7 +503,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 	servaddr_in.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr))->s_addr;
 	servaddr_in.sin_port = htons(port);
 
-	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
+	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET, type | SOCK_CLOEXEC, 0)))
 	{
 		zbx_set_tcp_strerror("cannot create socket [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
@@ -553,6 +559,12 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 	return SUCCEED;
 }
 #endif	/* HAVE_IPV6 */
+
+int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
+		unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+{
+	return zbx_sock_connect(s, SOCK_STREAM, source_ip, ip, port, timeout, tls_connect, tls_arg1, tls_arg2);
+}
 
 static ssize_t	zbx_tls_write(zbx_sock_t *s, const char *buf, size_t len)
 {
@@ -1858,4 +1870,75 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	zbx_set_tcp_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", inet_ntoa(name.sin_addr), ip_list);
 #endif
 	return FAIL;
+}
+
+int	zbx_udp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
+{
+	return zbx_sock_connect(s, SOCK_DGRAM, source_ip, ip, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL);
+}
+
+int	zbx_udp_send(zbx_sock_t *s, const char *data, size_t data_len, int timeout)
+{
+	int	ret = SUCCEED;
+
+	ZBX_TCP_START();
+
+	if (0 != timeout)
+		zbx_tcp_timeout_set(s, timeout);
+
+	if (ZBX_TCP_ERROR == sendto(s->socket, data, data_len, 0, NULL, 0))
+	{
+		zbx_set_tcp_strerror("sendto() failed: %s", strerror_from_system(zbx_sock_last_error()));
+		ret = FAIL;
+	}
+
+	if (0 != timeout)
+		zbx_tcp_timeout_cleanup(s);
+
+	return ret;
+}
+
+int	zbx_udp_recv(zbx_sock_t *s, int timeout)
+{
+	char	buffer[65508];	/* maximum payload for UDP over IPv4 is 65507 bytes */
+	ssize_t	read_bytes;
+
+	ZBX_TCP_START();
+
+	zbx_tcp_free(s);
+
+	if (0 != timeout)
+		zbx_tcp_timeout_set(s, timeout);
+
+	if (ZBX_TCP_ERROR == (read_bytes = recvfrom(s->socket, buffer, sizeof(buffer) - 1, 0, NULL, NULL)))
+		zbx_set_tcp_strerror("recvfrom() failed: %s", strerror_from_system(zbx_sock_last_error()));
+
+	if (0 != timeout)
+		zbx_tcp_timeout_cleanup(s);
+
+	if (ZBX_TCP_ERROR == read_bytes)
+		return FAIL;
+
+	if (sizeof(s->buf_stat) > read_bytes)
+	{
+		s->buf_type = ZBX_BUF_TYPE_STAT;
+		s->buffer = s->buf_stat;
+	}
+	else
+	{
+		s->buf_type = ZBX_BUF_TYPE_DYN;
+		s->buffer = zbx_malloc(s->buffer, read_bytes + 1);
+	}
+
+	buffer[read_bytes] = '\0';
+	memcpy(s->buffer, buffer, read_bytes + 1);
+
+	s->read_bytes = (size_t)read_bytes;
+
+	return SUCCEED;
+}
+
+void	zbx_udp_close(zbx_sock_t *s)
+{
+	zbx_tcp_close(s);
 }

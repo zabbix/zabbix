@@ -40,10 +40,10 @@ $nameTextBox->attr('autofocus', 'autofocus');
 $proxyFormList->addRow(_('Proxy name'), $nameTextBox);
 
 // append status to form list
-$statusBox = new CComboBox('status', $data['status']);
-$statusBox->addItem(HOST_STATUS_PROXY_ACTIVE, _('Active'));
-$statusBox->addItem(HOST_STATUS_PROXY_PASSIVE, _('Passive'));
-$proxyFormList->addRow(_('Proxy mode'), $statusBox);
+$proxyFormList->addRow(_('Proxy mode'), new CComboBox('status', $data['status'], null, array(
+	HOST_STATUS_PROXY_ACTIVE => _('Active'),
+	HOST_STATUS_PROXY_PASSIVE => _('Passive')
+)));
 
 $interfaceTable = new CTable(null, 'formElementTable');
 $interfaceTable->addRow(array(

@@ -328,10 +328,10 @@ else {
 	}
 
 	if ($allow_discovery) {
-		$cmbSource = new CComboBox('source', $source, 'submit()');
-		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, _('Trigger'));
-		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
-		$headerForm->addItem(array(SPACE._('Source').SPACE, $cmbSource));
+		$headerForm->addItem(array(SPACE._('Source').SPACE, new CComboBox('source', $source, 'submit()', array(
+			EVENT_SOURCE_TRIGGERS => _('Trigger'),
+			EVENT_SOURCE_DISCOVERY => _('Discovery')
+		))));
 	}
 
 	$eventsWidget->addHeader(_('Events'), $headerForm);

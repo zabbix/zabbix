@@ -113,39 +113,49 @@ static int	DBpatch_2050004(void)
 
 static int	DBpatch_2050005(void)
 {
-	const ZBX_FIELD field = {"tls_connect", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("hosts", &field);
+	return DBdrop_index("triggers", "triggers_2");
 }
 
 static int	DBpatch_2050006(void)
 {
-	const ZBX_FIELD field = {"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("hosts", &field);
+	return DBcreate_index("triggers", "triggers_2", "value,lastchange", 0);
 }
 
 static int	DBpatch_2050007(void)
 {
-	const ZBX_FIELD field = {"tls_issuer", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"tls_connect", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
 static int	DBpatch_2050008(void)
 {
+	const ZBX_FIELD field = {"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_2050009(void)
+{
+	const ZBX_FIELD field = {"tls_issuer", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_2050010(void)
+{
 	const ZBX_FIELD field = {"tls_subject", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
-static int	DBpatch_2050009(void)
+static int	DBpatch_2050011(void)
 {
 	const ZBX_FIELD field = {"tls_psk_identity", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050010(void)
+static int	DBpatch_2050012(void)
 {
 	const ZBX_FIELD field = {"tls_psk", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -163,11 +173,13 @@ DBPATCH_ADD(2050001, 0, 1)
 DBPATCH_ADD(2050002, 0, 1)
 DBPATCH_ADD(2050003, 0, 1)
 DBPATCH_ADD(2050004, 0, 1)
-DBPATCH_ADD(2050005, 0, 1)
-DBPATCH_ADD(2050006, 0, 1)
+DBPATCH_ADD(2050005, 0, 0)
+DBPATCH_ADD(2050006, 0, 0)
 DBPATCH_ADD(2050007, 0, 1)
 DBPATCH_ADD(2050008, 0, 1)
 DBPATCH_ADD(2050009, 0, 1)
 DBPATCH_ADD(2050010, 0, 1)
+DBPATCH_ADD(2050011, 0, 1)
+DBPATCH_ADD(2050012, 0, 1)
 
 DBPATCH_END()
