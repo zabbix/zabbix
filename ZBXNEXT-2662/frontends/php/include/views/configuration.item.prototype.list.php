@@ -20,13 +20,17 @@
 
 
 $itemsWidget = new CWidget();
+$itemsWidget->setTitle(_('Item prototypes'));
 
 // create new item button
 $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-$createForm->addItem(new CSubmit('form', _('Create item prototype')));
-$itemsWidget->setTitle(_('Item prototypes'));
+
+$controls = new CList();
+$controls->addItem(new CSubmit('form', _('Create item prototype')));
+$createForm->addItem($controls);
+
 $itemsWidget->setControls($createForm);
 
 // header
