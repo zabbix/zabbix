@@ -1,6 +1,7 @@
 Changes for 2.4.6rc1
 
 New features:
+...G...PS. [ZBXNEXT-786] made net.tcp.service[ntp] item work over UDP (asaveljevs)
 
 Bug fixes:
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
@@ -620,6 +621,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.10rc1
 
 New features:
+...G...PS. [ZBXNEXT-786] made net.tcp.service[ntp] item work over UDP (asaveljevs)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Polish translations; thanks to Zabbix translators (Richlv)
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
@@ -1865,6 +1867,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.15rc1
 
 New features:
+...G...PS. [ZBXNEXT-786] made net.tcp.service[ntp] item work over UDP (asaveljevs)
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
