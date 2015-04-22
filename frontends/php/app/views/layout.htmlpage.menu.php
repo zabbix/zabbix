@@ -42,6 +42,10 @@
 	$help->setAttribute('title', _('Help'));
 	$icons->addItem($help);
 
+	$zshare = new CLink('Share', 'https://share.zabbix.com/', 'top-nav-zbbshare');
+	$zshare->setAttribute('title', _('Zabbix Share'));
+	$icons->addItem($zshare);
+
 	$print = new CLink(SPACE, null, 'top-nav-print');
 	$print->setAttribute('title', _('Print'));
 	$icons->addItem($print);
