@@ -1200,7 +1200,8 @@ int	zbx_tcp_accept(zbx_sock_t *s, unsigned int tls_accept)
 void	zbx_tcp_unaccept(zbx_sock_t *s)
 {
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_close(s);
+	if (NULL != s->tls_ctx)
+		zbx_tls_close(s);
 #endif
 	if (!s->accepted) return;
 
