@@ -1083,8 +1083,8 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 	{
 		if (NULL == (key->data = gnutls_malloc(psk_len)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot allocate %zu bytes of memory for PSK with identity "
-					"\"%s\"", psk_len, psk_identity);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot allocate " ZBX_FS_SIZE_T " bytes of memory for PSK with "
+					"identity \"%s\"", (zbx_fs_size_t)psk_len, psk_identity);
 			return -1;	/* fail */
 		}
 
@@ -1683,8 +1683,8 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 		{
 			if (GNUTLS_E_SHORT_MEMORY_BUFFER == res)
 			{
-				*error = zbx_dsprintf(*error, "too long peer certificate issuer name: %zu bytes",
-						tls_issuer_size);
+				*error = zbx_dsprintf(*error, "too long peer certificate issuer name: " ZBX_FS_SIZE_T
+						" bytes", (zbx_fs_size_t)tls_issuer_size);
 			}
 			else
 			{
@@ -1709,8 +1709,8 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 		{
 			if (GNUTLS_E_SHORT_MEMORY_BUFFER == res)
 			{
-				*error = zbx_dsprintf(*error, "too long peer certificate subject name: %zu bytes",
-						tls_subject_size);
+				*error = zbx_dsprintf(*error, "too long peer certificate subject name: " ZBX_FS_SIZE_T
+						" bytes", (zbx_fs_size_t)tls_subject_size);
 			}
 			else
 			{
@@ -1960,8 +1960,8 @@ void	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded %zu-bit %s private key", __function_name,
-				pk_get_size(my_priv_key), pk_get_name(my_priv_key));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded " ZBX_FS_SIZE_T "-bit %s private key",
+				__function_name, (zbx_fs_size_t)pk_get_size(my_priv_key), pk_get_name(my_priv_key));
 	}
 
 	/* 'TLSPskFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
@@ -3043,13 +3043,14 @@ int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char 
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s-%s-%s-%zu-%zu)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s-%s-%s-" ZBX_FS_SIZE_T "-"
+				ZBX_FS_SIZE_T ")", __function_name,
 				gnutls_protocol_get_name(gnutls_protocol_get_version(s->tls_ctx)),
 				gnutls_kx_get_name(gnutls_kx_get(s->tls_ctx)),
 				gnutls_cipher_get_name(gnutls_cipher_get(s->tls_ctx)),
 				gnutls_mac_get_name(gnutls_mac_get(s->tls_ctx)),
-				gnutls_mac_get_key_size(gnutls_mac_get(s->tls_ctx)),
-				gnutls_cipher_get_key_size(gnutls_cipher_get(s->tls_ctx)));
+				(zbx_fs_size_t)gnutls_mac_get_key_size(gnutls_mac_get(s->tls_ctx)),
+				(zbx_fs_size_t)gnutls_cipher_get_key_size(gnutls_cipher_get(s->tls_ctx)));
 	}
 
 	return SUCCEED;
@@ -3725,13 +3726,14 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s-%s-%s-%zu-%zu)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s-%s-%s-" ZBX_FS_SIZE_T "-"
+				ZBX_FS_SIZE_T ")", __function_name,
 				gnutls_protocol_get_name(gnutls_protocol_get_version(s->tls_ctx)),
 				gnutls_kx_get_name(gnutls_kx_get(s->tls_ctx)),
 				gnutls_cipher_get_name(gnutls_cipher_get(s->tls_ctx)),
 				gnutls_mac_get_name(gnutls_mac_get(s->tls_ctx)),
-				gnutls_mac_get_key_size(gnutls_mac_get(s->tls_ctx)),
-				gnutls_cipher_get_key_size(gnutls_cipher_get(s->tls_ctx)));
+				(zbx_fs_size_t)gnutls_mac_get_key_size(gnutls_mac_get(s->tls_ctx)),
+				(zbx_fs_size_t)gnutls_cipher_get_key_size(gnutls_cipher_get(s->tls_ctx)));
 	}
 
 	return SUCCEED;
@@ -4116,8 +4118,8 @@ int	zbx_tls_get_attr(const zbx_sock_t *s, zbx_tls_conn_attr_t *attr)
 		{
 			if (GNUTLS_E_SHORT_MEMORY_BUFFER == res)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "too long peer certificate issuer name: %zu bytes",
-						issuer_size);
+				zabbix_log(LOG_LEVEL_WARNING, "too long peer certificate issuer name: " ZBX_FS_SIZE_T
+						" bytes", (zbx_fs_size_t)issuer_size);
 			}
 			else
 			{
@@ -4132,8 +4134,8 @@ int	zbx_tls_get_attr(const zbx_sock_t *s, zbx_tls_conn_attr_t *attr)
 		{
 			if (GNUTLS_E_SHORT_MEMORY_BUFFER == res)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "too long peer certificate subject name: %zu bytes",
-						subject_size);
+				zabbix_log(LOG_LEVEL_WARNING, "too long peer certificate subject name: " ZBX_FS_SIZE_T
+						" bytes", (zbx_fs_size_t)subject_size);
 			}
 			else
 			{
