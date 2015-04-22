@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-23 23:02+0200\n"
-"PO-Revision-Date: 2015-02-15 09:21+0300\n"
+"PO-Revision-Date: 2015-03-07 10:33+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1423984870.0\n"
+"X-POOTLE-MTIME: 1425717193.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -13856,7 +13856,7 @@ msgstr "Skupina už nie je zisťovaná a bude zmazaná %1$s (na %2$s v %3$s)."
 
 #: include/views/configuration.hostgroups.list.php:135
 msgid "The host group is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "Skupina už nie je zisťovaná a bude zmazaná pri ďalšom zisťovaní."
 
 #: include/html.inc.php:565
 #, c-format
@@ -13865,7 +13865,7 @@ msgstr "Host už nie je zisťovaný a bude zmazaný %1$s (na %2$s v %3$s)."
 
 #: include/html.inc.php:560
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "Host už nie je zisťovaný a bude zmazaný pri ďalšom zisťovaní."
 
 #: include/classes/api/services/CImage.php:433
 #, c-format
@@ -13890,7 +13890,7 @@ msgstr "Položka už nie je zistená a bude zmazaná v %1$s (%2$s na %3$s)."
 
 #: include/views/configuration.item.list.php:133
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "Položka už nie je zisťovaná a bude zmazaná pri ďalšom zisťovaní."
 
 #: queue.php:78
 msgid "The queue is empty."
