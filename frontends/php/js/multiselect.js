@@ -305,10 +305,10 @@ jQuery(function($) {
 					switch (e.which) {
 						case KEY.ENTER:
 							if (!empty(input.val())) {
-								var available_selected = $('.available li.suggest-hover', obj);
+								var selected = $('.available li.suggest-hover', obj);
 
-								if (available_selected.length > 0) {
-									select(available_selected.data('id'), obj, values, options);
+								if (selected.length > 0) {
+									select(selected.data('id'), obj, values, options);
 								}
 
 								// stop form submit
@@ -394,41 +394,29 @@ jQuery(function($) {
 
 						case KEY.ARROW_UP:
 							if ($('.available', obj).is(':visible') && $('.available li', obj).length > 0) {
-								if ($('.available li.suggest-hover', obj).length > 0) {
-									var prev = $('.available li.suggest-hover', obj).removeClass('suggest-hover').prev();
+								var selected = $('.available li.suggest-hover', obj),
+									prev = selected.prev();
 
-									if (prev.length > 0) {
-										prev.addClass('suggest-hover');
-									}
-									else {
-										$('.available li:last-child', obj).addClass('suggest-hover');
-									}
+								if (prev.length > 0) {
+									selected.removeClass('suggest-hover');
+									prev.addClass('suggest-hover');
+								}
 
-									scrollAvailable(obj);
-								}
-								else {
-									$('.available li:last-child', obj).addClass('suggest-hover');
-								}
+								scrollAvailable(obj);
 							}
 							break;
 
 						case KEY.ARROW_DOWN:
 							if ($('.available', obj).is(':visible') && $('.available li', obj).length > 0) {
-								if ($('.available li.suggest-hover', obj).length > 0) {
-									var next = $('.available li.suggest-hover', obj).removeClass('suggest-hover').next();
+								var selected = $('.available li.suggest-hover', obj),
+									next = selected.next();
 
-									if (next.length > 0) {
-										next.addClass('suggest-hover');
-									}
-									else {
-										$('.available li:first-child', obj).addClass('suggest-hover');
-									}
+								if (next.length > 0) {
+									selected.removeClass('suggest-hover');
+									next.addClass('suggest-hover');
+								}
 
-									scrollAvailable(obj);
-								}
-								else {
-									$('.available li:first-child', obj).addClass('suggest-hover');
-								}
+								scrollAvailable(obj);
 							}
 							break;
 
