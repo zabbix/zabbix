@@ -619,7 +619,11 @@ static ssize_t	zbx_tls_write(zbx_sock_t *s, const char *buf, size_t len)
 
 		if (0 > res)
 		{
+#if defined(_WINDOWS)
+			zbx_set_tcp_strerror("gnutls_record_send() failed: %Id %s", res, gnutls_strerror(res));
+#else
 			zbx_set_tcp_strerror("gnutls_record_send() failed: %zd %s", res, gnutls_strerror(res));
+#endif
 
 			/* TODO propagate 'close notify' to caller ? Close socket ? */
 
@@ -1445,8 +1449,11 @@ static ssize_t	zbx_tls_read(zbx_sock_t *s, char *buf, size_t len)
 
 		if (0 > res)
 		{
+#if defined(_WINDOWS)
+			zbx_set_tcp_strerror("gnutls_record_recv() failed: %Id %s", res, gnutls_strerror(res));
+#else
 			zbx_set_tcp_strerror("gnutls_record_recv() failed: %zd %s", res, gnutls_strerror(res));
-
+#endif
 			/* TODO propagate 'close notify' to caller ? Close socket ? */
 
 			return ZBX_TCP_ERROR;
