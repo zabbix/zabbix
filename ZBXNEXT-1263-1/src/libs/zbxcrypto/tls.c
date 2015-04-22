@@ -1568,11 +1568,14 @@ static int	zbx_get_issuer_subject(X509 *cert, char **issuer, char **subject)
 	/* XN_FLAG_RFC2253 - RFC 2253 is outdated, it was replaced by RFC 4514 "Lightweight Directory Access Protocol */
 	/* (LDAP): String Representation of Distinguished Names" */
 
-	if (0 >= X509_NAME_print_ex(issuer_bio, X509_get_issuer_name(cert), 0, XN_FLAG_RFC2253))
+	if (0 >= X509_NAME_print_ex(issuer_bio, X509_get_issuer_name(cert), 0, XN_FLAG_RFC2253 & ~ASN1_STRFLGS_ESC_MSB))
 		goto out;
 
-	if (0 >= X509_NAME_print_ex(subject_bio, X509_get_subject_name(cert), 0, XN_FLAG_RFC2253))
+	if (0 >= X509_NAME_print_ex(subject_bio, X509_get_subject_name(cert), 0,
+			XN_FLAG_RFC2253 & ~ASN1_STRFLGS_ESC_MSB))
+	{
 		goto out;
+	}
 
 	/* terminate string with '\0' */
 	if (1 != BIO_write(issuer_bio, &null_byte, 1) || 1 != BIO_write(subject_bio, &null_byte, 1))
@@ -3864,13 +3867,13 @@ int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
 
 		if (0 == res)
 		{
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS connection has been closed during "
-					"handshake:");
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS connection from %s has been closed "
+					"during handshake:", get_ip_by_socket(s));
 		}
 		else
 		{
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake returned error "
-					"code %d:", error_code);
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake with %s returned error "
+					"code %d:", get_ip_by_socket(s), error_code);
 		}
 
 		zbx_tls_error_msg(error, &error_alloc, &error_offset);
