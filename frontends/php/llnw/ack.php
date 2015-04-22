@@ -28,7 +28,7 @@ elseif ($_POST['method'] == 'add.ack' || $_POST['method'] == 'ack.add') {
    error_log("received triggerid: $triggerid");
 
    $q = "SELECT eventid FROM events ".
-        "WHERE objectid=$triggerid AND value=1 ".
+        "WHERE objectid=$triggerid AND value=1 AND source=0 ".
         "ORDER BY clock DESC LIMIT 1";
 
    $eventid = $db->get_var($q);
