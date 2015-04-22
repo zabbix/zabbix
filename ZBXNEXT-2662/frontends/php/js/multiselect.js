@@ -322,7 +322,7 @@ jQuery(function($) {
 								var selected = $('.selected li.selected', obj);
 
 								if (selected.length > 0) {
-									prev = selected.prev();
+									var prev = selected.prev();
 
 									removeSelected(selected.data('id'), obj, values, options);
 
@@ -832,6 +832,7 @@ jQuery(function($) {
 		});
 
 		available.fadeIn(0);
+		available.scrollTop(0);
 
 		if (objectLength(values.available) != 0) {
 			// remove selected item selected state
@@ -958,18 +959,34 @@ jQuery(function($) {
 	}
 
 	function scrollAvailable(obj) {
-		var hover = $('.available li.suggest-hover', obj);
+		var selected = $('.available li.suggest-hover', obj);
 
-		if (hover.length > 0) {
-			var available = $('.available ul', obj),
-				offset = hover.position().top;
+		if (selected.length > 0) {
 
-			if (offset < 0 || offset > available.height()) {
-				if (offset < 0) {
-					offset = 0;
+			var available = $('.available', obj),
+				available_height = available.height();
+				selected_top = 0,
+				selected_height = selected.outerHeight(true);
+
+			if ($('.multiselect-matches', obj)) {
+				selected_top += $('.multiselect-matches', obj).outerHeight(true);
+			}
+
+			$('.available li', obj).each(function() {
+				var item = $(this);
+				if (item.hasClass('suggest-hover')) {
+					return false;
 				}
+				selected_top += item.outerHeight(true);
+			});
 
-				available.animate({scrollTop: offset}, 300);
+			if (selected_top < available.scrollTop()) {
+				var prev = selected.prev();
+
+				available.scrollTop((prev.length == 0) ? 0 : selected_top);
+			}
+			else if (selected_top + selected_height > available.scrollTop() + available_height) {
+				available.scrollTop(selected_top - available_height + selected_height);
 			}
 		}
 	}
