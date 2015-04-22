@@ -446,7 +446,7 @@ footer {
 		}
 
 		&.row-selected {
-			background: $lighter-yellow;
+			@extend %found-bg;
 		}
 
 		&.nothing-to-show {
@@ -779,6 +779,10 @@ footer {
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
 	@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
+}
+
+.suggest-found {
+	@extend %found-bg;
 }
 
 // Timeline
@@ -2321,6 +2325,10 @@ td.high-bg {
 }
 td.disaster-bg {
 	@extend td.na-bg;
+}
+
+%found-bg {
+	background: $lighter-yellow;
 }
 
 .msg-good {
