@@ -308,7 +308,9 @@ jQuery(function($) {
 
 							if (available_selected.length > 0) {
 								select(available_selected.data('id'), obj, values, options);
+							}
 
+							if (!empty(input.val())) {
 								// stop form submit
 								cancelEvent(e);
 								return false;
@@ -912,9 +914,11 @@ jQuery(function($) {
 				'padding-top': input_padding_top
 			});
 
-			// IE8 hack to fix inline-block container resizing and poke input element value to trigger reflow
-			if (IE8) {
-				$('.multiselect-wrapper').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+			if (IE) {
+				// hack to fix inline-block container resizing and poke input element value to trigger reflow
+				if (IE8) {
+					$('.multiselect-wrapper').addClass('ie8fix-inline').removeClass('ie8fix-inline');
+				}
 				var currentInputVal = input.val();
 				input.val(' ').val(currentInputVal);
 			}
