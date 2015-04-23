@@ -135,7 +135,7 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_start                                                    *
+ * Function: zbx_socket_start                                                 *
  *                                                                            *
  * Purpose: Initialize Windows Sockets APIs                                   *
  *                                                                            *
@@ -146,11 +146,11 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
  ******************************************************************************/
 #if defined(_WINDOWS)
 
-#define ZBX_TCP_START() { if( FAIL == tcp_started ) tcp_started = zbx_tcp_start(); }
+#define ZBX_SOCKET_START()	if (FAIL == socket_started) socket_started = zbx_socket_start()
 
-int	tcp_started = FAIL;	/* winXX threads require tcp_started not to be static */
+int	socket_started = FAIL;	/* winXX threads require socket_started not to be static */
 
-static int	zbx_tcp_start()
+static int	zbx_socket_start()
 {
 	WSADATA	sockInfo;
 	int	ret;
@@ -165,8 +165,8 @@ static int	zbx_tcp_start()
 }
 
 #else
-#	define ZBX_TCP_START() {}
-#endif	/* _WINDOWS */
+#	define ZBX_SOCKET_START()
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -375,7 +375,7 @@ static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, cons
 	struct addrinfo	*ai_bind = NULL;
 	char		service[8], *error = NULL;
 
-	ZBX_TCP_START();
+	ZBX_SOCKET_START();
 
 	zbx_tcp_clean(s);
 
@@ -450,7 +450,7 @@ static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, cons
 	struct hostent	*hp;
 	char		*error = NULL;
 
-	ZBX_TCP_START();
+	ZBX_SOCKET_START();
 
 	zbx_tcp_clean(s);
 
@@ -543,7 +543,7 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char 
 	ssize_t		i, written = 0;
 	int		ret = SUCCEED;
 
-	ZBX_TCP_START();
+	ZBX_SOCKET_START();
 
 	if (0 != timeout)
 		zbx_tcp_timeout_set(s, timeout);
@@ -679,7 +679,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 	char		port[8], *ip, *ips, *delim;
 	int		i, err, on, ret = FAIL;
 
-	ZBX_TCP_START();
+	ZBX_SOCKET_START();
 
 	zbx_tcp_clean(s);
 
@@ -822,7 +822,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 	char		*ip, *ips, *delim;
 	int		i, on, ret = FAIL;
 
-	ZBX_TCP_START();
+	ZBX_SOCKET_START();
 
 	zbx_tcp_clean(s);
 
@@ -1079,7 +1079,7 @@ const char	*zbx_tcp_recv_line(zbx_sock_t *s)
 	if (NULL != (line = zbx_sock_find_line(s)))
 		return line;
 
-	ZBX_TCP_START();
+	ZBX_SOCKET_START();
 
 	/* Find the size of leftover data from the last read line operation and copy */
 	/* the leftover data to the static buffer and reset the dynamic buffer.      */
@@ -1199,7 +1199,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout)
 	size_t		allocated, offset, read_bytes;
 	zbx_uint64_t	expected_len;
 
-	ZBX_TCP_START();
+	ZBX_SOCKET_START();
 
 	if (0 != timeout)
 		zbx_tcp_timeout_set(s, timeout);
@@ -1571,7 +1571,7 @@ int	zbx_udp_send(zbx_sock_t *s, const char *data, size_t data_len, int timeout)
 {
 	int	ret = SUCCEED;
 
-	ZBX_TCP_START();
+	ZBX_SOCKET_START();
 
 	if (0 != timeout)
 		zbx_tcp_timeout_set(s, timeout);
@@ -1593,7 +1593,7 @@ int	zbx_udp_recv(zbx_sock_t *s, int timeout)
 	char	buffer[65508];	/* maximum payload for UDP over IPv4 is 65507 bytes */
 	ssize_t	read_bytes;
 
-	ZBX_TCP_START();
+	ZBX_SOCKET_START();
 
 	zbx_tcp_free(s);
 
