@@ -67,13 +67,13 @@ if (opt('ignore-file'))
 	%ignore_hash = map { $_ => 1 } @lines;
 }
 
-my $cfg_dns_interval;
+my $cfg_dns_delay;
 my $cfg_dns_valuemaps;
 my $cfg_dns_minns;
 my $cfg_dns_key_status;
 my $cfg_dns_key_rtt;
 
-my $cfg_rdds_interval;
+my $cfg_rdds_delay;
 my $cfg_rdds_valuemaps;
 my $cfg_rdds_key_status;
 my $cfg_rdds_key_43_rtt;
@@ -82,7 +82,7 @@ my $cfg_rdds_key_43_upd;
 my $cfg_rdds_key_80_rtt;
 my $cfg_rdds_key_80_ip;
 
-my $cfg_epp_interval;
+my $cfg_epp_delay;
 my $cfg_epp_valuemaps;
 my $cfg_epp_key_status;
 my $cfg_epp_key_ip;
@@ -94,7 +94,7 @@ my %services_hash = map { $_ => 1 } @services;
 
 if (exists($services_hash{'dns'}) or exists($services_hash{'dnssec'}))
 {
-	$cfg_dns_interval = get_macro_dns_udp_delay();
+	$cfg_dns_delay = get_macro_dns_udp_delay();
 	$cfg_dns_minns = get_macro_minns();
 	$cfg_dns_valuemaps = get_valuemaps('dns');
 	$cfg_dns_key_status = 'rsm.dns.udp[{$RSM.TLD}]'; # 0 - down, 1 - up
@@ -102,7 +102,7 @@ if (exists($services_hash{'dns'}) or exists($services_hash{'dnssec'}))
 }
 if (exists($services_hash{'rdds'}))
 {
-	$cfg_rdds_interval = get_macro_rdds_delay();
+	$cfg_rdds_delay = get_macro_rdds_delay();
 	$cfg_rdds_valuemaps = get_valuemaps('rdds');
 	$cfg_rdds_key_status = 'rsm.rdds[{$RSM.TLD}'; # 0 - down, 1 - up, 2 - only 43, 3 - only 80
 	$cfg_rdds_key_43_rtt = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
@@ -113,7 +113,7 @@ if (exists($services_hash{'rdds'}))
 }
 if (exists($services_hash{'epp'}))
 {
-	$cfg_epp_interval = get_macro_epp_delay();
+	$cfg_epp_delay = get_macro_epp_delay();
 	$cfg_epp_valuemaps = get_valuemaps('epp');
 	$cfg_epp_key_status = 'rsm.epp[{$RSM.TLD},'; # 0 - down, 1 - up
 	$cfg_epp_key_ip = 'rsm.epp.ip[{$RSM.TLD}]';
@@ -211,6 +211,20 @@ foreach (@$tlds_ref)
 			}
 		}
 
+		my $service_delay;
+		if ($service eq 'dns' or $service eq 'dnssec')
+		{
+			$service_delay = $cfg_dns_delay;
+		}
+		elsif ($service eq 'rdds')
+		{
+			$service_delay = $cfg_rdds_delay;
+		}
+		elsif ($service eq 'epp')
+		{
+			$service_delay = $cfg_epp_delay;
+		}
+
 		my ($from, $till);
 		if (opt('continue'))
 		{
@@ -232,7 +246,7 @@ foreach (@$tlds_ref)
 					}
 				}
 
-				$till = $from + getopt('period') * 60 - 1;
+				$till = $from + getopt('period') * $service_delay - 1;
 			}
 			else
 			{
@@ -245,7 +259,7 @@ foreach (@$tlds_ref)
 
 			if (opt('period'))
 			{
-				$till = $from + getopt('period') * 60 - 1;
+				$till = $from + getopt('period') * $service_delay - 1;
 			}
 			else
 			{
@@ -256,7 +270,7 @@ foreach (@$tlds_ref)
 		{
 			# only period specified
 			$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
-			$from = $till - getopt('period') * 60 + 1;
+			$from = $till - getopt('period') * $service_delay + 1;
 		}
 
 		if ((defined($from) and $from > $lastclock))
@@ -305,23 +319,20 @@ foreach (@$tlds_ref)
 			}
 		}
 
-		my ($nsips_ref, $dns_items_ref, $rdds_dbl_items_ref, $rdds_str_items_ref, $epp_dbl_items_ref, $epp_str_items_ref, $interval);
+		my ($nsips_ref, $dns_items_ref, $rdds_dbl_items_ref, $rdds_str_items_ref, $epp_dbl_items_ref, $epp_str_items_ref);
 
 		if ($service eq 'dns' or $service eq 'dnssec')
 		{
-			$interval = $cfg_dns_interval;
 			$nsips_ref = get_nsips($tld, $cfg_dns_key_rtt, 1); # templated
 			$dns_items_ref = __get_dns_itemids($nsips_ref, $cfg_dns_key_rtt, $tld, getopt('probe'));
 		}
 		elsif ($service eq 'rdds')
 		{
-			$interval = $cfg_rdds_interval;
 			$rdds_dbl_items_ref = __get_rdds_dbl_itemids($tld, getopt('probe'));
 			$rdds_str_items_ref = __get_rdds_str_itemids($tld, getopt('probe'));
 		}
 		elsif ($service eq 'epp')
 		{
-			$interval = $cfg_epp_interval;
 			$epp_dbl_items_ref = __get_epp_dbl_itemids($tld, getopt('probe'));
 			$epp_str_items_ref = __get_epp_str_itemids($tld, getopt('probe'));
 		}
@@ -375,8 +386,16 @@ foreach (@$tlds_ref)
 				$result->{'status'} = get_result_string($cfg_dns_statusmaps, $value);
 				$result->{'clock'} = $clock;
 
-				# time bounds for results from proxies
-				$result->{'start'} = $clock - $interval + RESULT_TIMESTAMP_SHIFT + 1; # we need to start at 0
+				# We have the test resulting value (Up or Down) at "clock". Now we need to select the
+				# time bounds (start/end) of all data points from all proxies.
+				#
+				#   +........................period (service delay).....................+
+				#   |                                                                   |
+				# start                                 clock                          end
+				#   |.....................................|.............................|
+				#   0 seconds <--zero or more minutes--> 30                            59
+				#
+				$result->{'start'} = $clock - $service_delay + RESULT_TIMESTAMP_SHIFT + 1; # we need to start at 0
 				$result->{'end'} = $clock + RESULT_TIMESTAMP_SHIFT;
 
 				if (opt('dry-run'))
@@ -391,7 +410,7 @@ foreach (@$tlds_ref)
 					}
 					else
 					{
-						wrn("invalid status: $value");
+						wrn("unknown status: $value (expected UP (0) or DOWN (1))");
 					}
 				}
 
