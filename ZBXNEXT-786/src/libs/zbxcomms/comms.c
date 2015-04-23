@@ -170,17 +170,15 @@ static int	zbx_socket_start()
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_clean                                                    *
+ * Function: zbx_socket_clean                                                 *
  *                                                                            *
  * Purpose: initialize socket                                                 *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_tcp_clean(zbx_sock_t *s)
+static void	zbx_socket_clean(zbx_sock_t *s)
 {
-	assert(s);
-
 	memset(s, 0, sizeof(zbx_sock_t));
 
 	s->buf_type = ZBX_BUF_TYPE_STAT;
@@ -197,7 +195,7 @@ static void	zbx_tcp_clean(zbx_sock_t *s)
  ******************************************************************************/
 void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
 {
-	zbx_tcp_clean(s);
+	zbx_socket_clean(s);
 
 	s->socket = o;
 }
@@ -377,7 +375,7 @@ static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, cons
 
 	ZBX_SOCKET_START();
 
-	zbx_tcp_clean(s);
+	zbx_socket_clean(s);
 
 	zbx_snprintf(service, sizeof(service), "%d", port);
 	memset(&hints, 0x00, sizeof(struct addrinfo));
@@ -452,7 +450,7 @@ static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, cons
 
 	ZBX_SOCKET_START();
 
-	zbx_tcp_clean(s);
+	zbx_socket_clean(s);
 
 	if (NULL == (hp = gethostbyname(ip)))
 	{
@@ -679,7 +677,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 
 	ZBX_SOCKET_START();
 
-	zbx_tcp_clean(s);
+	zbx_socket_clean(s);
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
@@ -822,7 +820,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 
 	ZBX_SOCKET_START();
 
-	zbx_tcp_clean(s);
+	zbx_socket_clean(s);
 
 	ip = ips = (NULL == listen_ip ? NULL : strdup(listen_ip));
 
