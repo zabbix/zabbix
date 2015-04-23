@@ -1022,7 +1022,7 @@ void	zbx_tcp_unaccept(zbx_sock_t *s)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_sock_find_line                                               *
+ * Function: zbx_socket_find_line                                             *
  *                                                                            *
  * Purpose: finds the next line in socket data buffer                         *
  *                                                                            *
@@ -1032,7 +1032,7 @@ void	zbx_tcp_unaccept(zbx_sock_t *s)
  *               contains no more lines.                                      *
  *                                                                            *
  ******************************************************************************/
-static const char	*zbx_sock_find_line(zbx_sock_t *s)
+static const char	*zbx_socket_find_line(zbx_sock_t *s)
 {
 	char	*ptr, *line = NULL;
 
@@ -1078,7 +1078,7 @@ const char	*zbx_tcp_recv_line(zbx_sock_t *s)
 	size_t		alloc = 0, offset = 0, line_length, left;
 
 	/* check if the buffer already contains the next line */
-	if (NULL != (line = zbx_sock_find_line(s)))
+	if (NULL != (line = zbx_socket_find_line(s)))
 		return line;
 
 	/* Find the size of leftover data from the last read line operation and copy */
@@ -1119,7 +1119,7 @@ const char	*zbx_tcp_recv_line(zbx_sock_t *s)
 	s->read_bytes += nbytes;
 
 	/* check if the static buffer now contains the next line */
-	if (NULL != (line = zbx_sock_find_line(s)))
+	if (NULL != (line = zbx_socket_find_line(s)))
 		goto out;
 
 	/* copy the static buffer data into dynamic buffer */
@@ -1175,7 +1175,7 @@ const char	*zbx_tcp_recv_line(zbx_sock_t *s)
 	while (NULL == ptr);
 
 	s->next_line = s->buffer;
-	line = zbx_sock_find_line(s);
+	line = zbx_socket_find_line(s);
 out:
 	return line;
 }
