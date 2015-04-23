@@ -186,6 +186,21 @@ static void	zbx_socket_clean(zbx_sock_t *s)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_socket_free                                                  *
+ *                                                                            *
+ * Purpose: free socket's dynamic buffer                                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_socket_free(zbx_sock_t *s)
+{
+	if (ZBX_BUF_TYPE_DYN == s->buf_type)
+		zbx_free(s->buffer);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_tcp_init                                                     *
  *                                                                            *
  * Purpose: initialize structure of zabbix socket with specified socket       *
@@ -398,7 +413,7 @@ static int	zbx_socket_create(zbx_sock_t *s, int type, const char *source_ip, con
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
 	fcntl(s->socket, F_SETFD, FD_CLOEXEC);
 #endif
-	func_socket_close = (SOCK_STREAM ? zbx_tcp_close : zbx_udp_close);
+	func_socket_close = (SOCK_STREAM == type ? zbx_tcp_close : zbx_udp_close);
 
 	if (NULL != source_ip)
 	{
@@ -483,7 +498,7 @@ static int	zbx_socket_create(zbx_sock_t *s, int type, const char *source_ip, con
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
 	fcntl(s->socket, F_SETFD, FD_CLOEXEC);
 #endif
-	func_socket_close = (SOCK_STREAM ? zbx_tcp_close : zbx_udp_close);
+	func_socket_close = (SOCK_STREAM == type ? zbx_tcp_close : zbx_udp_close);
 
 	if (NULL != source_ip)
 	{
@@ -592,7 +607,7 @@ cleanup:
  *                                                                            *
  * Function: zbx_tcp_close                                                    *
  *                                                                            *
- * Purpose: close open socket                                                 *
+ * Purpose: close open TCP socket                                             *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -601,10 +616,9 @@ void	zbx_tcp_close(zbx_sock_t *s)
 {
 	zbx_tcp_unaccept(s);
 
-	zbx_tcp_free(s);
-
 	zbx_socket_timeout_cleanup(s);
 
+	zbx_socket_free(s);
 	zbx_socket_close(s->socket);
 }
 
@@ -716,7 +730,8 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 				continue;
 
 			if (ZBX_SOCKET_ERROR == (s->sockets[s->num_socks] =
-					socket(current_ai->ai_family, current_ai->ai_socktype | SOCK_CLOEXEC, current_ai->ai_protocol)))
+					socket(current_ai->ai_family, current_ai->ai_socktype | SOCK_CLOEXEC,
+					current_ai->ai_protocol)))
 			{
 				zbx_set_socket_strerror("socket() for [[%s]:%s] failed: %s",
 						ip ? ip : "-", port, strerror_from_system(zbx_socket_last_error()));
@@ -733,12 +748,12 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
 			fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC);
 #endif
-
 			/* enable address reuse */
 			/* this is to immediately use the address even if it is in TIME_WAIT state */
 			/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
 			on = 1;
-			if (ZBX_PROTO_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on)))
+			if (ZBX_PROTO_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR,
+					(void *)&on, sizeof(on)))
 			{
 				zbx_set_socket_strerror("setsockopt() with SO_REUSEADDR for [[%s]:%s] failed: %s",
 						ip ? ip : "-", port, strerror_from_system(zbx_socket_last_error()));
@@ -746,13 +761,15 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 
 #if defined(IPPROTO_IPV6) && defined(IPV6_V6ONLY)
 			if (PF_INET6 == current_ai->ai_family &&
-				ZBX_PROTO_ERROR == setsockopt(s->sockets[s->num_socks], IPPROTO_IPV6, IPV6_V6ONLY, (void *)&on, sizeof(on)))
+					ZBX_PROTO_ERROR == setsockopt(s->sockets[s->num_socks], IPPROTO_IPV6,
+					IPV6_V6ONLY, (void *)&on, sizeof(on)))
 			{
 				zbx_set_socket_strerror("setsockopt() with IPV6_V6ONLY for [[%s]:%s] failed: %s",
 						ip ? ip : "-", port, strerror_from_system(zbx_socket_last_error()));
 			}
 #endif
-			if (ZBX_PROTO_ERROR == bind(s->sockets[s->num_socks], current_ai->ai_addr, current_ai->ai_addrlen))
+			if (ZBX_PROTO_ERROR == bind(s->sockets[s->num_socks], current_ai->ai_addr,
+					current_ai->ai_addrlen))
 			{
 				zbx_set_socket_strerror("bind() for [[%s]:%s] failed: %s",
 						ip ? ip : "-", port, strerror_from_system(zbx_socket_last_error()));
@@ -856,12 +873,12 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
 		fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC);
 #endif
-
-		/* Enable address reuse */
-		/* This is to immediately use the address even if it is in TIME_WAIT state */
+		/* enable address reuse */
+		/* this is to immediately use the address even if it is in TIME_WAIT state */
 		/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
 		on = 1;
-		if (ZBX_PROTO_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on)))
+		if (ZBX_PROTO_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR, (void *)&on,
+				sizeof(on)))
 		{
 			zbx_set_socket_strerror("setsockopt() for [[%s]:%hu] failed: %s",
 					ip ? ip : "-", listen_port, strerror_from_system(zbx_socket_last_error()));
@@ -869,9 +886,9 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 
 		memset(&serv_addr, 0, sizeof(serv_addr));
 
-		serv_addr.sin_family		= AF_INET;
-		serv_addr.sin_addr.s_addr	= NULL != ip ? inet_addr(ip) : htonl(INADDR_ANY);
-		serv_addr.sin_port		= htons((unsigned short)listen_port);
+		serv_addr.sin_family = AF_INET;
+		serv_addr.sin_addr.s_addr = (NULL != ip ? inet_addr(ip) : htonl(INADDR_ANY));
+		serv_addr.sin_port = htons((unsigned short)listen_port);
 
 		if (ZBX_PROTO_ERROR == bind(s->sockets[s->num_socks], (struct sockaddr *)&serv_addr, sizeof(serv_addr)))
 		{
@@ -967,15 +984,16 @@ int	zbx_tcp_accept(zbx_sock_t *s)
 	/* Since this socket was returned by select(), we know we have */
 	/* a connection waiting and that this accept() will not block. */
 	nlen = sizeof(serv_addr);
-	if (ZBX_SOCKET_ERROR == (accepted_socket = (ZBX_SOCKET)accept(s->sockets[i], (struct sockaddr *)&serv_addr, &nlen)))
+	if (ZBX_SOCKET_ERROR == (accepted_socket = (ZBX_SOCKET)accept(s->sockets[i], (struct sockaddr *)&serv_addr,
+			&nlen)))
 	{
 		zbx_set_socket_strerror("accept() failed: %s", strerror_from_system(zbx_socket_last_error()));
 		return FAIL;
 	}
 
-	s->socket_orig	= s->socket;		/* remember main socket */
-	s->socket	= accepted_socket;	/* replace socket to accepted */
-	s->accepted	= 1;
+	s->socket_orig = s->socket;	/* remember main socket */
+	s->socket = accepted_socket;	/* replace socket to accepted */
+	s->accepted = 1;
 
 	return SUCCEED;
 }
@@ -997,24 +1015,9 @@ void	zbx_tcp_unaccept(zbx_sock_t *s)
 
 	zbx_socket_close(s->socket);
 
-	s->socket	= s->socket_orig;	/* restore main socket */
-	s->socket_orig	= ZBX_SOCKET_ERROR;
-	s->accepted	= 0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_tcp_free                                                     *
- *                                                                            *
- * Purpose: close open socket                                                 *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_tcp_free(zbx_sock_t *s)
-{
-	if (ZBX_BUF_TYPE_DYN == s->buf_type)
-		zbx_free(s->buffer);
+	s->socket = s->socket_orig;	/* restore main socket */
+	s->socket_orig = ZBX_SOCKET_ERROR;
+	s->accepted = 0;
 }
 
 /******************************************************************************
@@ -1093,7 +1096,7 @@ const char	*zbx_tcp_recv_line(zbx_sock_t *s)
 	s->read_bytes = left;
 	s->next_line = s->buf_stat;
 
-	zbx_tcp_free(s);
+	zbx_socket_free(s);
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 	s->buffer = s->buf_stat;
 
@@ -1199,7 +1202,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout)
 	if (0 != timeout)
 		zbx_socket_timeout_set(s, timeout);
 
-	zbx_tcp_free(s);
+	zbx_socket_free(s);
 
 	total_bytes = 0;
 	read_bytes = 0;
@@ -1586,7 +1589,7 @@ int	zbx_udp_recv(zbx_sock_t *s, int timeout)
 	char	buffer[65508];	/* maximum payload for UDP over IPv4 is 65507 bytes */
 	ssize_t	read_bytes;
 
-	zbx_tcp_free(s);
+	zbx_socket_free(s);
 
 	if (0 != timeout)
 		zbx_socket_timeout_set(s, timeout);
@@ -1621,5 +1624,8 @@ int	zbx_udp_recv(zbx_sock_t *s, int timeout)
 
 void	zbx_udp_close(zbx_sock_t *s)
 {
-	zbx_tcp_close(s);
+	zbx_socket_timeout_cleanup(s);
+
+	zbx_socket_free(s);
+	zbx_socket_close(s->socket);
 }
