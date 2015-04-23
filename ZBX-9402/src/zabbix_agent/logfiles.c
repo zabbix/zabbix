@@ -1732,7 +1732,7 @@ static int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, un
 	zbx_stat_t	buf;
 	zbx_uint64_t	l_size;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
 			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0);
 
 	if (0 != zbx_stat(filename, &buf))
@@ -1790,7 +1790,7 @@ static int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, un
 		ret = FAIL;
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d ret:%s",
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d ret:%s",
 			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0, zbx_result_string(ret));
 
 	return ret;
