@@ -60,7 +60,6 @@ class CHelpItems {
 	protected function getItems() {
 		return array(
 			ITEM_TYPE_ZABBIX => array(
-
 				array(
 					'key' => 'agent.hostname',
 					'description' => _('Agent host name. Returns string')
@@ -586,7 +585,7 @@ class CHelpItems {
 				array(
 					'key' => 'wmi.get[<namespace>,<query>]',
 					'description' => _('Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)')
-				),
+				)
 			),
 			ITEM_TYPE_AGGREGATE => array(
 				array(
