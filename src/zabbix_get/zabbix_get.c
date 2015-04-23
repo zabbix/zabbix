@@ -138,7 +138,7 @@ static void	get_value(const char *source_ip, const char *host, unsigned short po
 	}
 
 	if (FAIL == ret)
-		zbx_error("Get value error: %s", zbx_tcp_strerror());
+		zbx_error("Get value error: %s", zbx_socket_strerror());
 }
 
 /******************************************************************************

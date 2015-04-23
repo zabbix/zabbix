@@ -349,7 +349,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	}
 
 	if (FAIL == tcp_ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s", zbx_socket_strerror());
 
 	zbx_thread_exit(ret);
 }

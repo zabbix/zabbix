@@ -87,7 +87,7 @@ static void	process_listener(zbx_sock_t *s)
 	}
 
 	if (FAIL == ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "Process listener error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "Process listener error: %s", zbx_socket_strerror());
 }
 
 ZBX_THREAD_ENTRY(listener_thread, args)
@@ -128,7 +128,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		if (SUCCEED == ret || EINTR == zbx_socket_last_error())
 			continue;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "failed to accept an incoming connection: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to accept an incoming connection: %s", zbx_socket_strerror());
 
 		if (local_request_failed++ > 1000)
 		{

@@ -102,7 +102,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 	else
 	{
 		zbx_snprintf(buffer, sizeof(buffer), "Get value from agent failed: %s",
-				zbx_tcp_strerror());
+				zbx_socket_strerror());
 		SET_MSG_RESULT(result, strdup(buffer));
 		ret = NETWORK_ERROR;
 	}

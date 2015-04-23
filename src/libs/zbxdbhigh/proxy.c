@@ -2228,7 +2228,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			if (FAIL == security_check)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot process trapper item \"%s\": %s",
-						items[i].key_orig, zbx_tcp_strerror());
+						items[i].key_orig, zbx_socket_strerror());
 				continue;
 			}
 		}
