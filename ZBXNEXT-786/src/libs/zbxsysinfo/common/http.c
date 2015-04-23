@@ -58,7 +58,7 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 
 	if (FAIL == ret)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "HTTP get error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "HTTP get error: %s", zbx_socket_strerror());
 		return SYSINFO_RET_FAIL;
 	}
 

@@ -126,7 +126,7 @@ static void	send_proxyhistory(zbx_sock_t *sock)
 
 	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
 	{
-		error = zbx_strdup(error, zbx_tcp_strerror());
+		error = zbx_strdup(error, zbx_socket_strerror());
 		goto out;
 	}
 
@@ -687,7 +687,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		else if (EINTR != zbx_socket_last_error())
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s",
-					zbx_tcp_strerror());
+					zbx_socket_strerror());
 		}
 	}
 }

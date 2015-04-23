@@ -223,7 +223,7 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 
 	if (FAIL == err)
 	{
-		strscpy(error, zbx_tcp_strerror());
+		strscpy(error, zbx_socket_strerror());
 		err = GATEWAY_ERROR;
 	}
 exit:

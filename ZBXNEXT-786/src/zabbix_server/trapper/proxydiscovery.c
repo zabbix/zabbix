@@ -87,7 +87,7 @@ void	send_discovery_data(zbx_sock_t *sock)
 
 	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
 	{
-		error = zbx_strdup(error, zbx_tcp_strerror());
+		error = zbx_strdup(error, zbx_socket_strerror());
 		goto out;
 	}
 

@@ -39,12 +39,12 @@ int	connect_to_server(zbx_sock_t *sock, int timeout, int retry_interval)
 		if (0 == retry_interval)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s]:%d [%s]",
-					CONFIG_SERVER, CONFIG_SERVER_PORT, zbx_tcp_strerror());
+					CONFIG_SERVER, CONFIG_SERVER_PORT, zbx_socket_strerror());
 		}
 		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s]:%d [%s]. Will retry every %d second(s)",
-					CONFIG_SERVER, CONFIG_SERVER_PORT, zbx_tcp_strerror(), retry_interval);
+					CONFIG_SERVER, CONFIG_SERVER_PORT, zbx_socket_strerror(), retry_interval);
 			lastlogtime = (int)time(NULL);
 			while (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout)))
 			{
@@ -93,13 +93,13 @@ int	get_data_from_server(zbx_sock_t *sock, const char *request, char **error)
 
 	if (SUCCEED != zbx_tcp_send(sock, j.buffer))
 	{
-		*error = zbx_strdup(*error, zbx_tcp_strerror());
+		*error = zbx_strdup(*error, zbx_socket_strerror());
 		goto exit;
 	}
 
 	if (SUCCEED != zbx_tcp_recv(sock))
 	{
-		*error = zbx_strdup(*error, zbx_tcp_strerror());
+		*error = zbx_strdup(*error, zbx_socket_strerror());
 		goto exit;
 	}
 
@@ -134,7 +134,7 @@ int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j, char **error)
 
 	if (SUCCEED != zbx_tcp_send(sock, j->buffer))
 	{
-		*error = zbx_strdup(*error, zbx_tcp_strerror());
+		*error = zbx_strdup(*error, zbx_socket_strerror());
 		goto out;
 	}
 

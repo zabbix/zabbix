@@ -37,7 +37,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_strerror                                                 *
+ * Function: zbx_socket_strerror                                              *
  *                                                                            *
  * Purpose: return string describing tcp error                                *
  *                                                                            *
@@ -51,7 +51,7 @@
 
 static char	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR];
 
-const char	*zbx_tcp_strerror(void)
+const char	*zbx_socket_strerror(void)
 {
 	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR - 1] = '\0';	/* force terminate string */
 	return (&zbx_tcp_strerror_message[0]);

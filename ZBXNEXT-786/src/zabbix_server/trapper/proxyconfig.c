@@ -72,7 +72,7 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != zbx_tcp_send(sock, j.buffer))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy \"%s\" at \"%s\": %s",
-				host, get_ip_by_socket(sock), zbx_tcp_strerror());
+				host, get_ip_by_socket(sock), zbx_socket_strerror());
 	}
 
 	alarm(0);

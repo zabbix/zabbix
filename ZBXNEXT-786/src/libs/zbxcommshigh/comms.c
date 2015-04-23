@@ -64,7 +64,7 @@ int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int pr
 
 	if (FAIL == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), protocol, timeout)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error sending result back: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "Error sending result back: %s", zbx_socket_strerror());
 		ret = NETWORK_ERROR;
 	}
 
@@ -117,7 +117,7 @@ int	zbx_recv_response(zbx_sock_t *sock, int timeout, char **error)
 	{
 		/* since we have successfully sent data earlier, we assume the other */
 		/* side is just too busy processing our data if there is no response */
-		*error = zbx_strdup(*error, zbx_tcp_strerror());
+		*error = zbx_strdup(*error, zbx_socket_strerror());
 		goto out;
 	}
 
