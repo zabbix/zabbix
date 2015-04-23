@@ -23,11 +23,12 @@ $auditWidget = new CWidget();
 
 // header
 $configForm = new CForm('get');
-$configComboBox = new CComboBox('config', 'auditacts.php');
-$configComboBox->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
-$configComboBox->addItem('auditlogs.php', _('Audit log'));
-$configComboBox->addItem('auditacts.php', _('Action log'));
-$configForm->addItem($configComboBox);
+$configForm->addItem(new CComboBox('config', 'auditacts.php', 'redirect(this.options[this.selectedIndex].value);',
+	array(
+		'auditlogs.php' => _('Audit log'),
+		'auditacts.php' => _('Action log')
+	)
+));
 $auditWidget->addPageHeader(_('ACTION LOG'), $configForm);
 $auditWidget->addHeader(_('Action log'));
 $auditWidget->addHeaderRowNumber();
