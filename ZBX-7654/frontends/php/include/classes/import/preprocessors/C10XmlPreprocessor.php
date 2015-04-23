@@ -22,15 +22,10 @@
 /**
  * Zabbix 1.8 preprocessor.
  */
-class C10XmlPreprocessor {
+class C10XmlPreprocessor extends CXmlPreprocessorGeneral {
 
-	/**
-	 * @param array $data
-	 *
-	 * @return array
-	 */
-	public function transform(array $data) {
-		$pathes = array(
+	public function __construct() {
+		parent::__construct(array(
 			array('^zabbix_export$', '^(hosts|dependencies|sysmaps|screens|images)$'),
 			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^(groups|triggers|items|templates|graphs|macros)$'),
 			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^items$', '^item[0-9]*', '^applications$'),
@@ -38,39 +33,6 @@ class C10XmlPreprocessor {
 			array('^zabbix_export$', '^sysmaps$', '^sysmap[0-9]*', '^selements$'),
 			array('^zabbix_export$', '^sysmaps$', '^sysmap[0-9]*', '^links$'),
 			array('^zabbix_export$', '^screens$', '^screen[0-9]*', '^screenitems$')
-		);
-
-		foreach ($pathes as $path) {
-			$this->transformEmpStrToArr($path, $data);
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Transforms empty strings to the array for a specified path.
-	 *
-	 * @param array $path
-	 * @param array $data
-	 */
-	protected function transformEmpStrToArr(array $path, array &$data) {
-		if (count($path) > 1) {
-			$curr_tag = array_shift($path);
-			foreach ($data as $key => &$value) {
-				if (is_array($value) && preg_match('/'.$curr_tag.'/', $key)) {
-					$this->transformEmpStrToArr($path, $value);
-				}
-			}
-			unset($value);
-		}
-		else {
-			$last_tag = array_pop($path);
-			foreach ($data as $key => &$value) {
-				if ($value === '' && preg_match('/'.$last_tag.'/', $key)) {
-					$value = array();
-				}
-			}
-			unset($value);
-		}
+		));
 	}
 }
