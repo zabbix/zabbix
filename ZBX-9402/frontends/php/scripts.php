@@ -270,11 +270,14 @@ else {
 		'displayNodes' => is_array(get_current_nodeid())
 	);
 
+	$config = select_config();
+
 	// list of scripts
 	$data['scripts'] = API::Script()->get(array(
 		'output' => array('scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type', 'execute_on'),
 		'editable' => true,
-		'selectGroups' => API_OUTPUT_EXTEND
+		'selectGroups' => API_OUTPUT_EXTEND,
+		'limit' => $config['search_limit'] + 1
 	));
 
 	// find script host group name and user group name. set to '' if all host/user groups used.
