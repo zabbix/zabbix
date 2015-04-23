@@ -79,7 +79,7 @@ if (hasRequest('update')) {
  */
 $form = new CForm();
 $form->cleanItems();
-$cmbConf = new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php',
+$form->addItem(new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php',
 	'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
@@ -94,8 +94,7 @@ $cmbConf = new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php',
 		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 		'adm.other.php' => _('Other')
 	)
-);
-$form->addItem($cmbConf);
+));
 
 $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
