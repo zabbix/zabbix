@@ -371,6 +371,7 @@ static int	zbx_socket_create(zbx_sock_t *s, int type, const char *source_ip, con
 	struct addrinfo	*ai = NULL, hints;
 	struct addrinfo	*ai_bind = NULL;
 	char		service[8], *error = NULL;
+	void		(*func_socket_close)(zbx_sock_t *s);
 
 	ZBX_SOCKET_START();
 
@@ -397,6 +398,7 @@ static int	zbx_socket_create(zbx_sock_t *s, int type, const char *source_ip, con
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
 	fcntl(s->socket, F_SETFD, FD_CLOEXEC);
 #endif
+	func_socket_close = (SOCK_STREAM ? zbx_tcp_close : zbx_udp_close);
 
 	if (NULL != source_ip)
 	{
@@ -409,21 +411,21 @@ static int	zbx_socket_create(zbx_sock_t *s, int type, const char *source_ip, con
 		if (0 != getaddrinfo(source_ip, NULL, &hints, &ai_bind))
 		{
 			zbx_set_socket_strerror("invalid source IP address [%s]", source_ip);
-			zbx_tcp_close(s);
+			func_socket_close(s);
 			goto out;
 		}
 
 		if (ZBX_PROTO_ERROR == bind(s->socket, ai_bind->ai_addr, ai_bind->ai_addrlen))
 		{
 			zbx_set_socket_strerror("bind() failed: %s", strerror_from_system(zbx_socket_last_error()));
-			zbx_tcp_close(s);
+			func_socket_close(s);
 			goto out;
 		}
 	}
 
 	if (SUCCEED != zbx_socket_connect(s, ai->ai_addr, ai->ai_addrlen, timeout, &error))
 	{
-		zbx_tcp_close(s);
+		func_socket_close(s);
 		zbx_set_socket_strerror("cannot connect to [[%s]:%d]: %s", ip, port, error);
 		zbx_free(error);
 		goto out;
@@ -446,6 +448,7 @@ static int	zbx_socket_create(zbx_sock_t *s, int type, const char *source_ip, con
 	ZBX_SOCKADDR	servaddr_in;
 	struct hostent	*hp;
 	char		*error = NULL;
+	void		(*func_socket_close)(zbx_sock_t *s);
 
 	ZBX_SOCKET_START();
 
@@ -480,6 +483,7 @@ static int	zbx_socket_create(zbx_sock_t *s, int type, const char *source_ip, con
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
 	fcntl(s->socket, F_SETFD, FD_CLOEXEC);
 #endif
+	func_socket_close = (SOCK_STREAM ? zbx_tcp_close : zbx_udp_close);
 
 	if (NULL != source_ip)
 	{
@@ -494,14 +498,14 @@ static int	zbx_socket_create(zbx_sock_t *s, int type, const char *source_ip, con
 		if (ZBX_PROTO_ERROR == bind(s->socket, (struct sockaddr *)&source_addr, sizeof(source_addr)))
 		{
 			zbx_set_socket_strerror("bind() failed: %s", strerror_from_system(zbx_socket_last_error()));
-			zbx_tcp_close(s);
+			func_socket_close(s);
 			return FAIL;
 		}
 	}
 
 	if (SUCCEED != zbx_socket_connect(s, (struct sockaddr *)&servaddr_in, sizeof(servaddr_in), timeout, &error))
 	{
-		zbx_tcp_close(s);
+		func_socket_close(s);
 		zbx_set_socket_strerror("cannot connect to [[%s]:%d]: %s", ip, port, error);
 		zbx_free(error);
 		return FAIL;
