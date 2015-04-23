@@ -204,7 +204,7 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_timeout_set                                              *
+ * Function: zbx_socket_timeout_set                                           *
  *                                                                            *
  * Purpose: set timeout for socket operations                                 *
  *                                                                            *
@@ -214,7 +214,7 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_tcp_timeout_set(zbx_sock_t *s, int timeout)
+static void	zbx_socket_timeout_set(zbx_sock_t *s, int timeout)
 {
 	s->timeout = timeout;
 #if defined(_WINDOWS)
@@ -238,7 +238,7 @@ static void	zbx_tcp_timeout_set(zbx_sock_t *s, int timeout)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_timeout_cleanup                                          *
+ * Function: zbx_socket_timeout_cleanup                                       *
  *                                                                            *
  * Purpose: clean up timeout for socket operations                            *
  *                                                                            *
@@ -247,7 +247,7 @@ static void	zbx_tcp_timeout_set(zbx_sock_t *s, int timeout)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_tcp_timeout_cleanup(zbx_sock_t *s)
+static void	zbx_socket_timeout_cleanup(zbx_sock_t *s)
 {
 #if !defined(_WINDOWS)
 	if (0 != s->timeout)
@@ -290,7 +290,7 @@ static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, sockle
 #endif
 
 	if (0 != timeout)
-		zbx_tcp_timeout_set(s, timeout);
+		zbx_socket_timeout_set(s, timeout);
 
 #if defined(_WINDOWS)
 	if (0 != ioctlsocket(s->socket, FIONBIO, &mode))
@@ -544,7 +544,7 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char 
 	int		ret = SUCCEED;
 
 	if (0 != timeout)
-		zbx_tcp_timeout_set(s, timeout);
+		zbx_socket_timeout_set(s, timeout);
 
 	if (0 != (flags & ZBX_TCP_PROTOCOL))
 	{
@@ -582,7 +582,7 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char 
 	}
 cleanup:
 	if (0 != timeout)
-		zbx_tcp_timeout_cleanup(s);
+		zbx_socket_timeout_cleanup(s);
 
 	return ret;
 }
@@ -602,7 +602,7 @@ void	zbx_tcp_close(zbx_sock_t *s)
 
 	zbx_tcp_free(s);
 
-	zbx_tcp_timeout_cleanup(s);
+	zbx_socket_timeout_cleanup(s);
 
 	zbx_socket_close(s->socket);
 }
@@ -1196,7 +1196,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout)
 	zbx_uint64_t	expected_len;
 
 	if (0 != timeout)
-		zbx_tcp_timeout_set(s, timeout);
+		zbx_socket_timeout_set(s, timeout);
 
 	zbx_tcp_free(s);
 
@@ -1341,7 +1341,7 @@ out:
 	}
 cleanup:
 	if (0 != timeout)
-		zbx_tcp_timeout_cleanup(s);
+		zbx_socket_timeout_cleanup(s);
 
 	if (FAIL != total_bytes)
 	{
@@ -1566,7 +1566,7 @@ int	zbx_udp_send(zbx_sock_t *s, const char *data, size_t data_len, int timeout)
 	int	ret = SUCCEED;
 
 	if (0 != timeout)
-		zbx_tcp_timeout_set(s, timeout);
+		zbx_socket_timeout_set(s, timeout);
 
 	if (ZBX_PROTO_ERROR == sendto(s->socket, data, data_len, 0, NULL, 0))
 	{
@@ -1575,7 +1575,7 @@ int	zbx_udp_send(zbx_sock_t *s, const char *data, size_t data_len, int timeout)
 	}
 
 	if (0 != timeout)
-		zbx_tcp_timeout_cleanup(s);
+		zbx_socket_timeout_cleanup(s);
 
 	return ret;
 }
@@ -1588,13 +1588,13 @@ int	zbx_udp_recv(zbx_sock_t *s, int timeout)
 	zbx_tcp_free(s);
 
 	if (0 != timeout)
-		zbx_tcp_timeout_set(s, timeout);
+		zbx_socket_timeout_set(s, timeout);
 
 	if (ZBX_PROTO_ERROR == (read_bytes = recvfrom(s->socket, buffer, sizeof(buffer) - 1, 0, NULL, NULL)))
 		zbx_set_socket_strerror("recvfrom() failed: %s", strerror_from_system(zbx_socket_last_error()));
 
 	if (0 != timeout)
-		zbx_tcp_timeout_cleanup(s);
+		zbx_socket_timeout_cleanup(s);
 
 	if (ZBX_PROTO_ERROR == read_bytes)
 		return FAIL;
