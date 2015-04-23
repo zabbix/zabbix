@@ -780,7 +780,8 @@ jQuery(function($) {
 				);
 			}
 
-			li.append($('<b>', {
+			li.append($('<span>', {
+				'class': 'suggest-found',
 				text: item.name.substring(end, end + searchLength)
 			}));
 

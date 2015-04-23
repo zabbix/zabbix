@@ -423,8 +423,9 @@ newSugTab: function(needle){
 		li.setAttribute('id', 'line_'+count);
 		li.setAttribute('needle', list[key]);
 
-		var bold = document.createElement('b');
+		var bold = document.createElement('span');
 		bold.appendChild(document.createTextNode(list[key].substr(0, needle.length)));
+		bold.setAttribute('class', 'suggest-found');
 		li.appendChild(bold);
 		li.appendChild(document.createTextNode(list[key].substr(needle.length)));
 
