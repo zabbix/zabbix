@@ -390,7 +390,7 @@ static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, cons
 		goto out;
 	}
 
-	if (ZBX_SOCK_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype | SOCK_CLOEXEC, ai->ai_protocol)))
+	if (ZBX_SOCKET_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype | SOCK_CLOEXEC, ai->ai_protocol)))
 	{
 		zbx_set_tcp_strerror("cannot create socket [[%s]:%d]: %s",
 				ip, port, strerror_from_system(zbx_sock_last_error()));
@@ -470,7 +470,7 @@ static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, cons
 	servaddr_in.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr))->s_addr;
 	servaddr_in.sin_port = htons(port);
 
-	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET, type | SOCK_CLOEXEC, 0)))
+	if (ZBX_SOCKET_ERROR == (s->socket = socket(AF_INET, type | SOCK_CLOEXEC, 0)))
 	{
 		zbx_set_tcp_strerror("cannot create socket [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
@@ -536,7 +536,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char flags, int timeout)
 {
 	zbx_uint64_t	len64_le;
-	ssize_t		i = 0, written = 0;
+	ssize_t		i, written = 0;
 	int		ret = SUCCEED;
 
 	ZBX_TCP_START();
@@ -709,7 +709,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 			if (PF_INET != current_ai->ai_family && PF_INET6 != current_ai->ai_family)
 				continue;
 
-			if (ZBX_SOCK_ERROR == (s->sockets[s->num_socks] =
+			if (ZBX_SOCKET_ERROR == (s->sockets[s->num_socks] =
 					socket(current_ai->ai_family, current_ai->ai_socktype | SOCK_CLOEXEC, current_ai->ai_protocol)))
 			{
 				zbx_set_tcp_strerror("socket() for [[%s]:%s] failed: %s",
@@ -840,7 +840,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 			goto out;
 		}
 
-		if (ZBX_SOCK_ERROR == (s->sockets[s->num_socks] = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
+		if (ZBX_SOCKET_ERROR == (s->sockets[s->num_socks] = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
 		{
 			zbx_set_tcp_strerror("socket() for [[%s]:%hu] failed: %s",
 					ip ? ip : "-", listen_port, strerror_from_system(zbx_sock_last_error()));
@@ -961,7 +961,7 @@ int	zbx_tcp_accept(zbx_sock_t *s)
 	/* Since this socket was returned by select(), we know we have */
 	/* a connection waiting and that this accept() will not block. */
 	nlen = sizeof(serv_addr);
-	if (ZBX_SOCK_ERROR == (accepted_socket = (ZBX_SOCKET)accept(s->sockets[i], (struct sockaddr *)&serv_addr, &nlen)))
+	if (ZBX_SOCKET_ERROR == (accepted_socket = (ZBX_SOCKET)accept(s->sockets[i], (struct sockaddr *)&serv_addr, &nlen)))
 	{
 		zbx_set_tcp_strerror("accept() failed: %s", strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
@@ -992,7 +992,7 @@ void	zbx_tcp_unaccept(zbx_sock_t *s)
 	zbx_sock_close(s->socket);
 
 	s->socket	= s->socket_orig;	/* restore main socket */
-	s->socket_orig	= ZBX_SOCK_ERROR;
+	s->socket_orig	= ZBX_SOCKET_ERROR;
 	s->accepted	= 0;
 }
 
