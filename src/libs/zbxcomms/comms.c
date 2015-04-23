@@ -286,7 +286,6 @@ static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, sockle
 	int		res;
 	struct timeval	tv, *ptv;
 #endif
-
 	if (0 != timeout)
 		zbx_socket_timeout_set(s, timeout);
 
@@ -352,7 +351,7 @@ static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, sockle
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_sock_connect                                                 *
+ * Function: zbx_socket_create                                                *
  *                                                                            *
  * Purpose: connect the socket of the specified type to external host         *
  *                                                                            *
@@ -365,7 +364,7 @@ static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, sockle
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_IPV6)
-static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+static int	zbx_socket_create(zbx_sock_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
 		int timeout)
 {
 	int		ret = FAIL;
@@ -441,7 +440,7 @@ out:
 	return ret;
 }
 #else
-static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+static int	zbx_socket_create(zbx_sock_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
 		int timeout)
 {
 	ZBX_SOCKADDR	servaddr_in;
@@ -514,7 +513,7 @@ static int	zbx_sock_connect(zbx_sock_t *s, int type, const char *source_ip, cons
 
 int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
 {
-	return zbx_sock_connect(s, SOCK_STREAM, source_ip, ip, port, timeout);
+	return zbx_socket_create(s, SOCK_STREAM, source_ip, ip, port, timeout);
 }
 
 /******************************************************************************
@@ -1556,7 +1555,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 
 int	zbx_udp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
 {
-	return zbx_sock_connect(s, SOCK_DGRAM, source_ip, ip, port, timeout);
+	return zbx_socket_create(s, SOCK_DGRAM, source_ip, ip, port, timeout);
 }
 
 int	zbx_udp_send(zbx_sock_t *s, const char *data, size_t data_len, int timeout)
