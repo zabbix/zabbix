@@ -33,8 +33,10 @@ else {
 	$table->setAttribute('id', 'tbl_macros');
 	$actions_col = $data['readonly'] ? null : '';
 	if ($data['show_inherited_macros']) {
+		$link = new CLink('configure', 'adm.macros.php');
+		$link->setAttribute('target', '_blank');
 		$table->addRow(array(_('Macro'), '', _('Effective value'), $actions_col, '', _('Template value'), '',
-			_('Global value')
+			array(_('Global value'), ' (', $link, ')')
 		));
 	}
 	else {
@@ -94,15 +96,13 @@ else {
 
 		if ($data['show_inherited_macros']) {
 			if (array_key_exists('template', $macro)) {
+				$link = new CLink(CHtml::encode($macro['template']['name']),
+					'templates.php?form=update&templateid='.$macro['template']['templateid'],
+					'unknown'
+				);
+				$link->setAttribute('target', '_blank');
 				$row[] = '&lArr;';
-				$row[] = new CDiv(array(
-					new CLink(
-						CHtml::encode($macro['template']['name']),
-						'templates.php?form=update&templateid='.$macro['template']['templateid'],
-						'unknown'
-					),
-					NAME_DELIMITER.'"'.$macro['template']['value'].'"'
-				), 'macro-value');
+				$row[] = new CDiv(array($link, NAME_DELIMITER, '"'.$macro['template']['value'].'"'), 'macro-value');
 			}
 			else {
 				array_push($row, '', new CDiv(null, 'macro-value'));
