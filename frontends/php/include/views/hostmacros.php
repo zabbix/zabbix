@@ -33,10 +33,16 @@ else {
 	$table->setAttribute('id', 'tbl_macros');
 	$actions_col = $data['readonly'] ? null : '';
 	if ($data['show_inherited_macros']) {
-		$link = new CLink(_('configure'), 'adm.macros.php');
-		$link->setAttribute('target', '_blank');
+		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+			$link = new CLink(_('configure'), 'adm.macros.php');
+			$link->setAttribute('target', '_blank');
+			$link = array(' (', $link, ')');
+		}
+		else {
+			$link = null;
+		}
 		$table->addRow(array(_('Macro'), '', _('Effective value'), $actions_col, '', _('Template value'), '',
-			array(_('Global value'), ' (', $link, ')')
+			array(_('Global value'), $link)
 		));
 	}
 	else {
