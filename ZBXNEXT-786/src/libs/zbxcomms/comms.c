@@ -47,13 +47,13 @@
  *                                                                            *
  ******************************************************************************/
 
-#define ZBX_SOCKET_STRERROR_LEN_MAX	256
+#define ZBX_SOCKET_STRERROR_LEN	256
 
-static char	zbx_socket_strerror_message[ZBX_SOCKET_STRERROR_LEN_MAX];
+static char	zbx_socket_strerror_message[ZBX_SOCKET_STRERROR_LEN];
 
 const char	*zbx_socket_strerror(void)
 {
-	zbx_socket_strerror_message[ZBX_SOCKET_STRERROR_LEN_MAX - 1] = '\0';	/* force terminate string */
+	zbx_socket_strerror_message[ZBX_SOCKET_STRERROR_LEN - 1] = '\0';	/* force terminate string */
 	return zbx_socket_strerror_message;
 }
 
@@ -1067,7 +1067,7 @@ static const char	*zbx_sock_find_line(zbx_sock_t *s)
  ******************************************************************************/
 const char	*zbx_tcp_recv_line(zbx_sock_t *s)
 {
-#define	ZBX_TCP_MAX_LINE_LENTH	(64 * ZBX_KIBIBYTE)
+#define	ZBX_TCP_LINE_LEN	(64 * ZBX_KIBIBYTE)
 
 	char		buffer[ZBX_STAT_BUF_LEN], *ptr = NULL;
 	const char	*line;
@@ -1125,8 +1125,8 @@ const char	*zbx_tcp_recv_line(zbx_sock_t *s)
 	zbx_strncpy_alloc(&s->buffer, &alloc, &offset, s->buf_stat, s->read_bytes);
 	line_length = s->read_bytes;
 
-	/* Read data into dynamic buffer until newline has been found.       */
-	/* Lines larger than ZBX_TCP_MAX_LINE_LENTH bytes will be truncated. */
+	/* Read data into dynamic buffer until newline has been found. */
+	/* Lines larger than ZBX_TCP_LINE_LEN bytes will be truncated. */
 	do
 	{
 		if (ZBX_PROTO_ERROR == (nbytes = ZBX_TCP_READ(s->socket, buffer, ZBX_STAT_BUF_LEN - 1)))
@@ -1144,14 +1144,14 @@ const char	*zbx_tcp_recv_line(zbx_sock_t *s)
 		buffer[nbytes] = '\0';
 		ptr = strchr(buffer, '\n');
 
-		if (s->read_bytes + nbytes < ZBX_TCP_MAX_LINE_LENTH && s->read_bytes == line_length)
+		if (s->read_bytes + nbytes < ZBX_TCP_LINE_LEN && s->read_bytes == line_length)
 		{
 			zbx_strncpy_alloc(&s->buffer, &alloc, &offset, buffer, nbytes);
 			s->read_bytes += nbytes;
 		}
 		else
 		{
-			if (0 != (left = MIN(ZBX_TCP_MAX_LINE_LENTH - s->read_bytes, ptr - buffer)))
+			if (0 != (left = MIN(ZBX_TCP_LINE_LEN - s->read_bytes, ptr - buffer)))
 			{
 				/* fill the string to the defined limit */
 				zbx_strncpy_alloc(&s->buffer, &alloc, &offset, buffer, left);
