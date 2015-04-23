@@ -121,6 +121,15 @@ static int	DBpatch_2050006(void)
 	return DBcreate_index("triggers", "triggers_2", "value,lastchange", 0);
 }
 
+static int	DBpatch_2050007(void)
+{
+	/* 1 - ITEM_VALUE_TYPE_STR, 2 - ITEM_VALUE_TYPE_LOG, 4 - ITEM_VALUE_TYPE_TEXT */
+	if (ZBX_DB_OK <= DBexecute("update items set trends=0 where value_type in (1,2,4)"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -134,5 +143,6 @@ DBPATCH_ADD(2050003, 0, 1)
 DBPATCH_ADD(2050004, 0, 1)
 DBPATCH_ADD(2050005, 0, 0)
 DBPATCH_ADD(2050006, 0, 0)
+DBPATCH_ADD(2050007, 0, 1)
 
 DBPATCH_END()
