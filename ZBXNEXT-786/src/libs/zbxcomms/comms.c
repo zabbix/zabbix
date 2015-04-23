@@ -599,7 +599,7 @@ void	zbx_tcp_close(zbx_sock_t *s)
 
 	zbx_tcp_timeout_cleanup(s);
 
-	zbx_sock_close(s->socket);
+	zbx_socket_close(s->socket);
 }
 
 /******************************************************************************
@@ -750,7 +750,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 			{
 				zbx_set_tcp_strerror("bind() for [[%s]:%s] failed: %s",
 						ip ? ip : "-", port, strerror_from_system(zbx_sock_last_error()));
-				zbx_sock_close(s->sockets[s->num_socks]);
+				zbx_socket_close(s->sockets[s->num_socks]);
 #ifdef _WINDOWS
 				if (WSAEADDRINUSE == zbx_sock_last_error())
 #else
@@ -765,7 +765,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 			{
 				zbx_set_tcp_strerror("listen() for [[%s]:%s] failed: %s",
 						ip ? ip : "-", port, strerror_from_system(zbx_sock_last_error()));
-				zbx_sock_close(s->sockets[s->num_socks]);
+				zbx_socket_close(s->sockets[s->num_socks]);
 				goto out;
 			}
 
@@ -803,7 +803,7 @@ out:
 	if (SUCCEED != ret)
 	{
 		for (i = 0; i < s->num_socks; i++)
-			zbx_sock_close(s->sockets[i]);
+			zbx_socket_close(s->sockets[i]);
 	}
 
 	return ret;
@@ -871,7 +871,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 		{
 			zbx_set_tcp_strerror("bind() for [[%s]:%hu] failed: %s",
 					ip ? ip : "-", listen_port, strerror_from_system(zbx_sock_last_error()));
-			zbx_sock_close(s->sockets[s->num_socks]);
+			zbx_socket_close(s->sockets[s->num_socks]);
 			goto out;
 		}
 
@@ -879,7 +879,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 		{
 			zbx_set_tcp_strerror("listen() for [[%s]:%hu] failed: %s",
 					ip ? ip : "-", listen_port, strerror_from_system(zbx_sock_last_error()));
-			zbx_sock_close(s->sockets[s->num_socks]);
+			zbx_socket_close(s->sockets[s->num_socks]);
 			goto out;
 		}
 
@@ -906,7 +906,7 @@ out:
 	if (SUCCEED != ret)
 	{
 		for (i = 0; i < s->num_socks; i++)
-			zbx_sock_close(s->sockets[i]);
+			zbx_socket_close(s->sockets[i]);
 	}
 
 	return ret;
@@ -989,7 +989,7 @@ void	zbx_tcp_unaccept(zbx_sock_t *s)
 
 	shutdown(s->socket, 2);
 
-	zbx_sock_close(s->socket);
+	zbx_socket_close(s->socket);
 
 	s->socket	= s->socket_orig;	/* restore main socket */
 	s->socket_orig	= ZBX_SOCKET_ERROR;
