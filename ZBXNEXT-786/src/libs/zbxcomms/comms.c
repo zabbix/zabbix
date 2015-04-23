@@ -177,9 +177,9 @@ static int	zbx_socket_start()
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_socket_clean(zbx_sock_t *s)
+static void	zbx_socket_clean(zbx_socket_t *s)
 {
-	memset(s, 0, sizeof(zbx_sock_t));
+	memset(s, 0, sizeof(zbx_socket_t));
 
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 }
@@ -193,7 +193,7 @@ static void	zbx_socket_clean(zbx_sock_t *s)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_socket_free(zbx_sock_t *s)
+static void	zbx_socket_free(zbx_socket_t *s)
 {
 	if (ZBX_BUF_TYPE_DYN == s->buf_type)
 		zbx_free(s->buffer);
@@ -208,7 +208,7 @@ static void	zbx_socket_free(zbx_sock_t *s)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
+void	zbx_tcp_init(zbx_socket_t *s, ZBX_SOCKET o)
 {
 	zbx_socket_clean(s);
 
@@ -227,7 +227,7 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_socket_timeout_set(zbx_sock_t *s, int timeout)
+static void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout)
 {
 	s->timeout = timeout;
 #if defined(_WINDOWS)
@@ -260,7 +260,7 @@ static void	zbx_socket_timeout_set(zbx_sock_t *s, int timeout)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_socket_timeout_cleanup(zbx_sock_t *s)
+static void	zbx_socket_timeout_cleanup(zbx_socket_t *s)
 {
 #if !defined(_WINDOWS)
 	if (0 != s->timeout)
@@ -292,7 +292,7 @@ static void	zbx_socket_timeout_cleanup(zbx_sock_t *s)
  *           and if successful change socket back to blocking mode.           *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, socklen_t addrlen, int timeout,
+static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, socklen_t addrlen, int timeout,
 		char **error)
 {
 #if defined(_WINDOWS)
@@ -379,14 +379,14 @@ static int	zbx_socket_connect(zbx_sock_t *s, const struct sockaddr *addr, sockle
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_IPV6)
-static int	zbx_socket_create(zbx_sock_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
 		int timeout)
 {
 	int		ret = FAIL;
 	struct addrinfo	*ai = NULL, hints;
 	struct addrinfo	*ai_bind = NULL;
 	char		service[8], *error = NULL;
-	void		(*func_socket_close)(zbx_sock_t *s);
+	void		(*func_socket_close)(zbx_socket_t *s);
 
 	ZBX_SOCKET_START();
 
@@ -457,13 +457,13 @@ out:
 	return ret;
 }
 #else
-static int	zbx_socket_create(zbx_sock_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
 		int timeout)
 {
 	ZBX_SOCKADDR	servaddr_in;
 	struct hostent	*hp;
 	char		*error = NULL;
-	void		(*func_socket_close)(zbx_sock_t *s);
+	void		(*func_socket_close)(zbx_socket_t *s);
 
 	ZBX_SOCKET_START();
 
@@ -530,7 +530,7 @@ static int	zbx_socket_create(zbx_sock_t *s, int type, const char *source_ip, con
 }
 #endif	/* HAVE_IPV6 */
 
-int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
+int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
 {
 	return zbx_socket_create(s, SOCK_STREAM, source_ip, ip, port, timeout);
 }
@@ -553,7 +553,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 #define ZBX_TCP_HEADER		ZBX_TCP_HEADER_DATA ZBX_TCP_HEADER_VERSION
 #define ZBX_TCP_HEADER_LEN	5
 
-int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char flags, int timeout)
+int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned char flags, int timeout)
 {
 	zbx_uint64_t	len64_le;
 	ssize_t		i, written = 0;
@@ -612,7 +612,7 @@ cleanup:
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tcp_close(zbx_sock_t *s)
+void	zbx_tcp_close(zbx_socket_t *s)
 {
 	zbx_tcp_unaccept(s);
 
@@ -686,7 +686,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_IPV6)
-int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_port)
+int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port)
 {
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 	char		port[8], *ip, *ips, *delim;
@@ -832,7 +832,7 @@ out:
 	return ret;
 }
 #else
-int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_port)
+int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port)
 {
 	ZBX_SOCKADDR	serv_addr;
 	char		*ip, *ips, *delim;
@@ -948,7 +948,7 @@ out:
  * Author: Eugene Grigorjev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_accept(zbx_sock_t *s)
+int	zbx_tcp_accept(zbx_socket_t *s)
 {
 	ZBX_SOCKADDR	serv_addr;
 	fd_set		sock_set;
@@ -1007,7 +1007,7 @@ int	zbx_tcp_accept(zbx_sock_t *s)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tcp_unaccept(zbx_sock_t *s)
+void	zbx_tcp_unaccept(zbx_socket_t *s)
 {
 	if (!s->accepted) return;
 
@@ -1032,7 +1032,7 @@ void	zbx_tcp_unaccept(zbx_sock_t *s)
  *               contains no more lines.                                      *
  *                                                                            *
  ******************************************************************************/
-static const char	*zbx_socket_find_line(zbx_sock_t *s)
+static const char	*zbx_socket_find_line(zbx_socket_t *s)
 {
 	char	*ptr, *line = NULL;
 
@@ -1068,9 +1068,9 @@ static const char	*zbx_socket_find_line(zbx_sock_t *s)
  * Comments: Lines larger than 64KB are truncated.                            *
  *                                                                            *
  ******************************************************************************/
-const char	*zbx_tcp_recv_line(zbx_sock_t *s)
+const char	*zbx_tcp_recv_line(zbx_socket_t *s)
 {
-#define	ZBX_TCP_LINE_LEN	(64 * ZBX_KIBIBYTE)
+#define ZBX_TCP_LINE_LEN	(64 * ZBX_KIBIBYTE)
 
 	char		buffer[ZBX_STAT_BUF_LEN], *ptr = NULL;
 	const char	*line;
@@ -1192,7 +1192,7 @@ out:
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout)
+ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 {
 #define ZBX_BUF_LEN	(ZBX_STAT_BUF_LEN * 8)
 	ssize_t		nbytes, left, total_bytes;
@@ -1356,7 +1356,7 @@ cleanup:
 	return total_bytes;
 }
 
-char	*get_ip_by_socket(zbx_sock_t *s)
+char	*get_ip_by_socket(zbx_socket_t *s)
 {
 	ZBX_SOCKADDR			sa;
 	ZBX_SOCKLEN_T			sz = sizeof(sa);
@@ -1477,7 +1477,7 @@ static int	zbx_ip_cmp(const struct addrinfo *current_ai, ZBX_SOCKADDR name)
  *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty)
+int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_empty)
 {
 #if defined(HAVE_IPV6)
 	struct addrinfo	hints, *ai = NULL, *current_ai;
@@ -1560,12 +1560,12 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	return FAIL;
 }
 
-int	zbx_udp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
+int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
 {
 	return zbx_socket_create(s, SOCK_DGRAM, source_ip, ip, port, timeout);
 }
 
-int	zbx_udp_send(zbx_sock_t *s, const char *data, size_t data_len, int timeout)
+int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout)
 {
 	int	ret = SUCCEED;
 
@@ -1584,7 +1584,7 @@ int	zbx_udp_send(zbx_sock_t *s, const char *data, size_t data_len, int timeout)
 	return ret;
 }
 
-int	zbx_udp_recv(zbx_sock_t *s, int timeout)
+int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 {
 	char	buffer[65508];	/* maximum payload for UDP over IPv4 is 65507 bytes */
 	ssize_t	read_bytes;
@@ -1622,7 +1622,7 @@ int	zbx_udp_recv(zbx_sock_t *s, int timeout)
 	return SUCCEED;
 }
 
-void	zbx_udp_close(zbx_sock_t *s)
+void	zbx_udp_close(zbx_socket_t *s)
 {
 	zbx_socket_timeout_cleanup(s);
 

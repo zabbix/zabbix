@@ -2152,7 +2152,7 @@ void	calc_timestamp(const char *line, int *timestamp, const char *format)
  *             processed    - [OUT] number of processed elements              *
  *                                                                            *
  ******************************************************************************/
-void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
+void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid,
 		AGENT_VALUE *values, size_t values_num, int *processed)
 {
 	const char	*__function_name = "process_mass_data";
@@ -2343,7 +2343,7 @@ static void	clean_agent_values(AGENT_VALUE *values, size_t values_num)
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
+int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp,
 		const zbx_uint64_t proxy_hostid, char *info, int max_info_size)
 {
 #define VALUES_MAX	256

@@ -697,7 +697,7 @@ int	main(int argc, char **argv)
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	zbx_sock_t	listen_sock;
+	zbx_socket_t	listen_sock;
 	int		i, db_type;
 
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)

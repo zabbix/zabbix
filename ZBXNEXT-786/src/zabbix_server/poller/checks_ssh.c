@@ -78,7 +78,7 @@ static int	waitsocket(int socket_fd, LIBSSH2_SESSION *session)
 static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 {
 	const char	*__function_name = "ssh_run";
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 	LIBSSH2_SESSION	*session;
 	LIBSSH2_CHANNEL	*channel;
 	int		auth_pw = 0, rc, ret = NOTSUPPORTED,

@@ -27,7 +27,7 @@
 #include "comms.h"
 #include "servercomms.h"
 
-int	connect_to_server(zbx_sock_t *sock, int timeout, int retry_interval)
+int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 {
 	int	res, lastlogtime, now;
 
@@ -63,7 +63,7 @@ int	connect_to_server(zbx_sock_t *sock, int timeout, int retry_interval)
 	return res;
 }
 
-void	disconnect_server(zbx_sock_t *sock)
+void	disconnect_server(zbx_socket_t *sock)
 {
 	zbx_tcp_close(sock);
 }
@@ -78,7 +78,7 @@ void	disconnect_server(zbx_sock_t *sock)
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	get_data_from_server(zbx_sock_t *sock, const char *request, char **error)
+int	get_data_from_server(zbx_socket_t *sock, const char *request, char **error)
 {
 	const char	*__function_name = "get_data_from_server";
 
@@ -124,7 +124,7 @@ exit:
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j, char **error)
+int	put_data_to_server(zbx_socket_t *sock, struct zbx_json *j, char **error)
 {
 	const char	*__function_name = "put_data_to_server";
 

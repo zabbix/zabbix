@@ -33,7 +33,7 @@
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	recv_areg_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
+void	recv_areg_data(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "recv_areg_data";
 
@@ -66,7 +66,7 @@ out:
  * Purpose: send auto-registration data from proxy to a server                *
  *                                                                            *
  ******************************************************************************/
-void	send_areg_data(zbx_sock_t *sock)
+void	send_areg_data(zbx_socket_t *sock)
 {
 	const char	*__function_name = "send_areg_data";
 

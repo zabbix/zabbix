@@ -487,7 +487,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	const char	*__function_name = "refresh_active_checks";
 
 	ZBX_THREAD_LOCAL static int	last_ret = SUCCEED;
-	zbx_sock_t			s;
+	zbx_socket_t			s;
 	int				ret;
 	struct zbx_json			json;
 
@@ -661,7 +661,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	const char			*__function_name = "send_buffer";
 	struct zbx_json 		json;
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
-	zbx_sock_t			s;
+	zbx_socket_t			s;
 	int				ret = SUCCEED, i, now;
 	zbx_timespec_t			ts;
 	const char			*err_send_step = "";

@@ -46,7 +46,7 @@
 int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_agent";
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 	char		buffer[MAX_STRING_LEN];
 	int		ret = SUCCEED;
 	ssize_t		received_len;

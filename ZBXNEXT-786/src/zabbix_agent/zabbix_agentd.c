@@ -785,7 +785,7 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	zbx_sock_t	listen_sock;
+	zbx_socket_t	listen_sock;
 	int		i, j = 0;
 #ifdef _WINDOWS
 	DWORD		res;
