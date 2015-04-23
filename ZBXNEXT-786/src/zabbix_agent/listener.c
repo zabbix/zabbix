@@ -125,7 +125,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			zbx_tcp_unaccept(&s);
 		}
 
-		if (SUCCEED == ret || EINTR == zbx_sock_last_error())
+		if (SUCCEED == ret || EINTR == zbx_socket_last_error())
 			continue;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "failed to accept an incoming connection: %s", zbx_tcp_strerror());

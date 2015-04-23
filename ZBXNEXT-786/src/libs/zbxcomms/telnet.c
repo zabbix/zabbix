@@ -49,7 +49,7 @@ static int	telnet_waitsocket(ZBX_SOCKET socket_fd, int mode)
 	if (ZBX_PROTO_ERROR == rc)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __function_name, rc,
-				zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+				zbx_socket_last_error(), strerror_from_system(zbx_socket_last_error()));
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
@@ -67,7 +67,7 @@ static ssize_t	telnet_socket_read(ZBX_SOCKET socket_fd, void *buf, size_t count)
 
 	while (ZBX_PROTO_ERROR == (rc = ZBX_TCP_READ(socket_fd, buf, count)))
 	{
-		error = zbx_sock_last_error();	/* zabbix_log() resets the error code */
+		error = zbx_socket_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]",
 				__function_name, rc, error, strerror_from_system(error));
 #ifdef _WINDOWS
@@ -107,7 +107,7 @@ static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t
 
 	while (ZBX_PROTO_ERROR == (rc = ZBX_TCP_WRITE(socket_fd, buf, count)))
 	{
-		error = zbx_sock_last_error();	/* zabbix_log() resets the error code */
+		error = zbx_socket_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]",
 				__function_name, rc, error, strerror_from_system(error));
 #ifdef _WINDOWS
@@ -452,7 +452,7 @@ int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *resu
 	if (ZBX_PROTO_ERROR == rc)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s",
-				strerror_from_system(zbx_sock_last_error())));
+				strerror_from_system(zbx_socket_last_error())));
 		goto fail;
 	}
 
