@@ -157,7 +157,7 @@ static int	zbx_socket_start()
 
 	if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
 	{
-		zbx_set_socket_strerror("WSAStartup() failed: %s", strerror_from_system(ret));
+		zabbix_log(LOG_LEVEL_WARNING, "WSAStartup() failed: %s", strerror_from_system(ret));
 		return FAIL;
 	}
 
@@ -542,8 +542,6 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char 
 	zbx_uint64_t	len64_le;
 	ssize_t		i, written = 0;
 	int		ret = SUCCEED;
-
-	ZBX_SOCKET_START();
 
 	if (0 != timeout)
 		zbx_tcp_timeout_set(s, timeout);
@@ -1079,8 +1077,6 @@ const char	*zbx_tcp_recv_line(zbx_sock_t *s)
 	if (NULL != (line = zbx_sock_find_line(s)))
 		return line;
 
-	ZBX_SOCKET_START();
-
 	/* Find the size of leftover data from the last read line operation and copy */
 	/* the leftover data to the static buffer and reset the dynamic buffer.      */
 	/* Because we are reading data in ZBX_STAT_BUF_LEN chunks the leftover       */
@@ -1198,8 +1194,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout)
 	ssize_t		nbytes, left, total_bytes;
 	size_t		allocated, offset, read_bytes;
 	zbx_uint64_t	expected_len;
-
-	ZBX_SOCKET_START();
 
 	if (0 != timeout)
 		zbx_tcp_timeout_set(s, timeout);
@@ -1571,8 +1565,6 @@ int	zbx_udp_send(zbx_sock_t *s, const char *data, size_t data_len, int timeout)
 {
 	int	ret = SUCCEED;
 
-	ZBX_SOCKET_START();
-
 	if (0 != timeout)
 		zbx_tcp_timeout_set(s, timeout);
 
@@ -1592,8 +1584,6 @@ int	zbx_udp_recv(zbx_sock_t *s, int timeout)
 {
 	char	buffer[65508];	/* maximum payload for UDP over IPv4 is 65507 bytes */
 	ssize_t	read_bytes;
-
-	ZBX_SOCKET_START();
 
 	zbx_tcp_free(s);
 
