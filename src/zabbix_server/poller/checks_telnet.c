@@ -31,7 +31,7 @@
 static int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 {
 	const char	*__function_name = "telnet_run";
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 	int		ret = NOTSUPPORTED, flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);

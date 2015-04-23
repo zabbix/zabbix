@@ -41,7 +41,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int protocol, int timeout)
+int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, int protocol, int timeout)
 {
 	const char	*__function_name = "zbx_send_response";
 
@@ -103,7 +103,7 @@ int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int pr
  *                "error" memory !                                            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_recv_response(zbx_sock_t *sock, int timeout, char **error)
+int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error)
 {
 	const char		*__function_name = "zbx_recv_response";
 

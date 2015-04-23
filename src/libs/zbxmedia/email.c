@@ -103,7 +103,7 @@ static void	str_base64_encode_rfc2047(const char *src, char **p_base64)
  * Comments: reads until '\n'                                                 *
  *                                                                            *
  ******************************************************************************/
-static int	smtp_readln(zbx_sock_t *s, const char **buf)
+static int	smtp_readln(zbx_socket_t *s, const char **buf)
 {
 	while (NULL != (*buf = zbx_tcp_recv_line(s)) &&
 			4 <= strlen(*buf) &&
@@ -251,7 +251,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 {
 	const char	*__function_name = "send_email";
 
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 	int		err, ret = FAIL;
 	char		cmd[MAX_STRING_LEN], *cmdp = NULL;
 	char		*tmp = NULL, *base64 = NULL, *base64_lf;

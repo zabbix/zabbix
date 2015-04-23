@@ -318,7 +318,7 @@ static int	check_response(char *response)
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
 	ZBX_THREAD_SENDVAL_ARGS	*sentdval_args;
-	zbx_sock_t		sock;
+	zbx_socket_t		sock;
 	int			tcp_ret, ret = FAIL;
 
 	assert(args);

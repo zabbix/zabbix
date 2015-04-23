@@ -143,8 +143,8 @@ int	main(int argc, char **argv)
 	char		ch;
 	int		task = ZBX_TASK_START;
 	char		*TEST_METRIC = NULL;
-	zbx_sock_t	s_in;
-	zbx_sock_t	s_out;
+	zbx_socket_t	s_in;
+	zbx_socket_t	s_out;
 
 	int		ret, opt_c = 0, opt_p = 0, opt_t = 0;
 	char		**value;

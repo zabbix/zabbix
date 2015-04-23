@@ -32,7 +32,7 @@ const char	*help_message[] = {NULL};
 int	zabbix_sender_send_values(const char *address, unsigned short port, const char *source,
 		const zabbix_sender_value_t *values, int count, char **result)
 {
-	zbx_sock_t	sock;
+	zbx_socket_t	sock;
 	int		ret, i;
 	struct zbx_json	json;
 
