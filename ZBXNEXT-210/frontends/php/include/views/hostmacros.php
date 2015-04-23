@@ -33,7 +33,7 @@ else {
 	$table->setAttribute('id', 'tbl_macros');
 	$actions_col = $data['readonly'] ? null : '';
 	if ($data['show_inherited_macros']) {
-		$link = new CLink('configure', 'adm.macros.php');
+		$link = new CLink(_('configure'), 'adm.macros.php');
 		$link->setAttribute('target', '_blank');
 		$table->addRow(array(_('Macro'), '', _('Effective value'), $actions_col, '', _('Template value'), '',
 			array(_('Global value'), ' (', $link, ')')
