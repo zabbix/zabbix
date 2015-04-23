@@ -2176,6 +2176,26 @@ button[disabled] {
 	}
 }
 
+.notifications {
+	padding: 0;
+	max-width: 250px;
+
+	.dashbrd-widget-head {
+		margin: 0;
+	}
+
+	p {
+		margin: 0.35em 0 0 0;
+	}
+
+	tr {
+		td:first-child {
+			padding: 0;
+			width: 3px;
+		}
+	}
+}
+
 /* Maps, Screens, Graphs */
 .box_on {
 	position: absolute;
