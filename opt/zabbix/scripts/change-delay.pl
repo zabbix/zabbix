@@ -8,7 +8,7 @@ use Getopt::Long;
 
 set_slv_config(get_rsm_config());
 
-parse_opts('type=n', 'delay=n', 'dry-run!');
+parse_opts('type=n', 'delay=n');
 usage() unless (__validate_input() == SUCCESS);
 
 my ($key_part, $macro, $sql);

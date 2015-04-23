@@ -7,7 +7,6 @@ use RSM;
 use RSMSLV;
 use ApiHelper;
 use JSON::XS;
-use Data::Dumper;
 
 use constant JSON_RDDS_SUBSERVICE => 'subService';
 use constant JSON_RDDS_43 => 'RDDS43';
@@ -530,8 +529,6 @@ foreach (@$tlds_ref)
 			{
 				my $values_ref = __get_rdds_test_values($rdds_dbl_items_ref, $rdds_str_items_ref, $values_from, $values_till);
 
-				dbg(Dumper($values_ref)) if (opt('debug'));
-
 				# run through values from probes (ordered by clock)
 				foreach my $probe (keys(%$values_ref))
 				{
@@ -622,8 +619,6 @@ foreach (@$tlds_ref)
 				dbg("EPP results calculation is not implemented yet");
 
 				my $values_ref = __get_epp_test_values($epp_dbl_items_ref, $epp_str_items_ref, $values_from, $values_till);
-
-				dbg(Dumper($values_ref)) if (opt('debug'));
 
 				foreach my $probe (keys(%$values_ref))
 				{
@@ -1609,7 +1604,7 @@ update-api-data.pl - save information about the incidents to a filesystem
 
 =head1 SYNOPSIS
 
-update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--from <timestamp>|--continue] [--period] [--dry-run [--probe name]] [--debug] [--help]
+update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--from <timestamp>|--continue] [--period number] [--dry-run [--probe name]] [--debug] [--help]
 
 =head1 OPTIONS
 
@@ -1631,16 +1626,17 @@ Specify file containing the list of TLDs that should be ignored. TLDs are specif
 
 This option cannot be used together with option --tld.
 
-=item B<--period> minutes
+=item B<--period> number
 
-Specify number of minutes of the period of calculation. The start of the priod can be controlled
-using options --continue (continue from the last time --continue was used) or --from (see below).
+Specify number of test cycles to handle during this run. The first cycle to handle can be specified
+using options --from or --continue (continue from the last time when --continue was used) (see below).
 
 =item B<--from> timestamp
 
-Specify the beginning of the period of calculation as Unix timestamp. The period length can be
-controlled using option --period otherwise the whole period up to the latest data available in the
-database will be processed.
+Specify Unix timestamp within the oldest test cycle to handle in this run. You don't need to specify the
+first second of the test cycle, any timestamp within it will work. Number of test cycles to handle within
+this run can be specified using option --period otherwise all completed test cycles available in the
+database up till now will be handled.
 
 This option cannot be used together with option --continue.
 
