@@ -105,8 +105,6 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 int	zbx_tcp_accept(zbx_sock_t *s);
 void	zbx_tcp_unaccept(zbx_sock_t *s);
 
-void    zbx_tcp_free(zbx_sock_t *s);
-
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
 
 #define	zbx_tcp_recv(s) 		SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0, 0))
