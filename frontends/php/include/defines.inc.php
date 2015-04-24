@@ -789,7 +789,7 @@ define('SPACE',	'&nbsp;');
  */
 define('NAME_DELIMITER', ': ');
 
-define('UNKNOWN_VALUE', '-');
+define('UNKNOWN_VALUE', '');
 
 // suffixes
 define('ZBX_BYTE_SUFFIXES', 'KMGT');
