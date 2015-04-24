@@ -42,7 +42,7 @@
 	$help->setAttribute('title', _('Help'));
 	$icons->addItem($help);
 
-	$zshare = new CLink('Share', 'https://share.zabbix.com/', 'top-nav-zbbshare');
+	$zshare = new CLink('Share', 'https://share.zabbix.com/', 'top-nav-zbbshare', null, true);
 	$zshare->setAttribute('target', '_blank');
 	$zshare->setAttribute('title', _('Zabbix Share'));
 	$icons->addItem($zshare);
