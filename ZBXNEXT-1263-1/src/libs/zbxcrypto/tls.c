@@ -1782,7 +1782,24 @@ int	zbx_tls_init_parent(void)
 	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-	/* TODO fill in implementation */
+
+#if defined(_WINDOWS)
+	/* on MS Windows initialize crypto libraries in parent thread */
+#if defined(HAVE_GNUTLS)
+	if (GNUTLS_E_SUCCESS != gnutls_global_init())
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize GnuTLS library");
+		exit(EXIT_FAILURE);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "GnuTLS library v.%s initialized", gnutls_check_version(NULL));
+#elif defined(HAVE_OPENSSL)
+	SSL_load_error_strings();
+	ERR_load_BIO_strings();
+	SSL_library_init();             /* always returns "1" */
+#endif
+#endif
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -2039,13 +2056,13 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_tls_validate_config();
-
+#if !defined(_WINDOWS)
 	if (GNUTLS_E_SUCCESS != gnutls_global_init())
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize GnuTLS library");
 		exit(EXIT_FAILURE);
 	}
-
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "GnuTLS library v.%s initialized", gnutls_check_version(NULL));
 
 	/* need to allocate certificate credentials store ? */
@@ -2245,11 +2262,11 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_tls_validate_config();
-
+#if !defined(_WINDOWS)
 	SSL_load_error_strings();
 	ERR_load_BIO_strings();
 	SSL_library_init();		/* always returns "1" */
-
+#endif
 	/* TODO PRNG initialization */
 
 	/* set protocol version to TLS 1.2 */
