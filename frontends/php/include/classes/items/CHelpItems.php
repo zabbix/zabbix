@@ -202,7 +202,7 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'system.localtime[<type>]',
-					'description' => _('System time. Returns integer with type as utc; String - with type as local')
+					'description' => _('System time. Returns integer with type as utc; string - with type as local')
 				),
 				array(
 					'key' => 'system.run[command,<mode>]',
@@ -472,7 +472,7 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'system.localtime[<type>]',
-					'description' => _('System time. Returns integer with type as utc; String - with type as local')
+					'description' => _('System time. Returns integer with type as utc; string - with type as local')
 				),
 				array(
 					'key' => 'system.run[command,<mode>]',
