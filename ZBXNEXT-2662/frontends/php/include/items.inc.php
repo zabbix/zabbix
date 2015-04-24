@@ -744,9 +744,9 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 }
 
 function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
-	$css = '';
-	$value = '-';
 	$ack = null;
+	$css = '';
+	$value = UNKNOWN_VALUE;
 
 	if (isset($ithosts[$hostName])) {
 		$item = $ithosts[$hostName];
@@ -759,10 +759,12 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 				: null;
 		}
 
-		$value = ($item['value'] !== null) ? formatHistoryValue($item['value'], $item) : UNKNOWN_VALUE;
+		if ($item['value'] !== null) {
+			$value = formatHistoryValue($item['value'], $item);
+		}
 	}
 
-	if ($value != '-') {
+	if ($value != UNKNOWN_VALUE) {
 		$value = new CSpan($value, 'link');
 	}
 
