@@ -99,7 +99,7 @@ if ($data['show_status_widget']) {
 	$icon->setTitle(_('Action'));
 	$icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_ZABBIX_STATUS, $rate));
 
-	$zabbixStatus = new CCollapsibleUiWidget(WIDGET_ZABBIX_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
+	$zabbixStatus = new CCollapsibleUiWidget(WIDGET_ZABBIX_STATUS, new CDiv(null, 'preloader'));
 	$zabbixStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.state', true);
 	$zabbixStatus->setHeader(_('Status of Zabbix'), array($icon));
 	$zabbixStatus->setFooter(new CList(array(new CDiv(null, 'textwhite', WIDGET_ZABBIX_STATUS.'_footer'))));
@@ -125,7 +125,7 @@ $icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
 $icon->setTitle(_('Action'));
 $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_SYSTEM_STATUS, $rate));
 
-$systemStatus = new CCollapsibleUiWidget(WIDGET_SYSTEM_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
+$systemStatus = new CCollapsibleUiWidget(WIDGET_SYSTEM_STATUS, new CDiv(null, 'preloader'));
 $systemStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.state', true);
 $systemStatus->setHeader(_('System status'), array($icon));
 $systemStatus->setFooter(new CList(array(new CDiv(null, 'textwhite', WIDGET_SYSTEM_STATUS.'_footer'))));
@@ -150,7 +150,7 @@ $icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
 $icon->setTitle(_('Action'));
 $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_HOST_STATUS, $rate));
 
-$hostStatus = new CCollapsibleUiWidget(WIDGET_HOST_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
+$hostStatus = new CCollapsibleUiWidget(WIDGET_HOST_STATUS, new CDiv(null, 'preloader'));
 $hostStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.state', true);
 $hostStatus->setHeader(_('Host status'), array($icon));
 $hostStatus->setFooter(new CList(array(new CDiv(null, 'textwhite', WIDGET_HOST_STATUS.'_footer'))));
@@ -175,7 +175,7 @@ $icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
 $icon->setTitle(_('Action'));
 $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_LAST_ISSUES, $rate));
 
-$lastIssues = new CCollapsibleUiWidget(WIDGET_LAST_ISSUES, new CSpan(_('Loading...'), 'textcolorstyles'));
+$lastIssues = new CCollapsibleUiWidget(WIDGET_LAST_ISSUES, new CDiv(null, 'preloader'));
 $lastIssues->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.state', true);
 $lastIssues->setHeader(_n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT), array($icon));
 $lastIssues->setFooter(new CList(array(new CDiv(null, 'textwhite', WIDGET_LAST_ISSUES.'_footer'))));
@@ -200,7 +200,7 @@ $icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
 $icon->setTitle(_('Action'));
 $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_WEB_OVERVIEW, $rate));
 
-$webMonitoring = new CCollapsibleUiWidget(WIDGET_WEB_OVERVIEW, new CSpan(_('Loading...'), 'textcolorstyles'));
+$webMonitoring = new CCollapsibleUiWidget(WIDGET_WEB_OVERVIEW, new CDiv(null, 'preloader'));
 $webMonitoring->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.state', true);
 $webMonitoring->setHeader(_('Web monitoring'), array($icon));
 $webMonitoring->setFooter(new CList(array(new CDiv(null, 'textwhite', WIDGET_WEB_OVERVIEW.'_footer'))));
@@ -226,7 +226,7 @@ if ($data['show_discovery_widget']) {
 	$icon->setTitle(_('Action'));
 	$icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_DISCOVERY_STATUS, $rate));
 
-	$discoveryStatus = new CCollapsibleUiWidget(WIDGET_DISCOVERY_STATUS, new CSpan(_('Loading...'), 'textcolorstyles'));
+	$discoveryStatus = new CCollapsibleUiWidget(WIDGET_DISCOVERY_STATUS, new CDiv(null, 'preloader'));
 	$discoveryStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.state', true);
 	$discoveryStatus->setHeader(_('Discovery status'), array($icon));
 	$discoveryStatus->setFooter(new CList(array(new CDiv(null, 'textwhite', WIDGET_DISCOVERY_STATUS.'_footer'))));
