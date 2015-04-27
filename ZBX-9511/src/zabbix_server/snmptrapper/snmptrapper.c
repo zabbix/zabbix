@@ -257,7 +257,7 @@ static void	process_trap(const char *addr, char *begin, char *end)
  ******************************************************************************/
 static void	parse_traps(int flag)
 {
-	char	*c, *line, *begin = NULL, *end = NULL, *addr = NULL, *pzbegin, *pzaddr, *pzdate;
+	char	*c, *line, *begin = NULL, *end = NULL, *addr = NULL, *pzbegin, *pzaddr = NULL, *pzdate = NULL;
 
 	c = line = buffer;
 
@@ -284,7 +284,7 @@ static void	parse_traps(int flag)
 
 		/* c now points to the address */
 
-		/* process the previos trap */
+		/* process the previous trap */
 		if (NULL != begin)
 		{
 			*(line - 1) = '\0';

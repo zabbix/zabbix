@@ -494,7 +494,7 @@ static void	process_rule(DB_DRULE *drule)
 			{
 				zbx_snprintf(ip, sizeof(ip), "%x:%x:%x:%x:%x:%x:%x:%x", ipaddress[0], ipaddress[1],
 						ipaddress[2], ipaddress[3], ipaddress[4], ipaddress[5], ipaddress[6],
-						ipaddress[7], ipaddress[8]);
+						ipaddress[7]);
 			}
 			else
 			{
