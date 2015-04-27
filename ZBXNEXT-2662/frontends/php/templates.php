@@ -731,7 +731,7 @@ else {
 
 		$table->addRow(array(
 			new CCheckBox('templates['.$template['templateid'].']', null, null, $template['templateid']),
-			$templatesOutput,
+			new CCol($templatesOutput, 'nowrap'),
 			$applications,
 			$items,
 			$triggers,
