@@ -67,9 +67,7 @@ class CXmlValidator {
 	 */
 	private function validateMainParameters(array $zabbix_export, $path) {
 		$fields = array(
-			'version' =>	'required|string',
-			'date' =>		'string',
-			'time' =>		'string'
+			'version' =>	'required|string'
 		);
 		$validator = new CNewValidator($zabbix_export, $fields);
 
