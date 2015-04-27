@@ -173,9 +173,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'defaultValue' => 0,
 			'popup' => array(
 				'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
-					'&srcfld1=groupid&writeonly=1&multiselect=1',
-				'width' => 450,
-				'height' => 450
+					'&srcfld1=groupid&writeonly=1&multiselect=1'
 			)
 		));
 		break;
@@ -190,9 +188,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'defaultValue' => 0,
 			'popup' => array(
 				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
-					'&dstfld1=new_condition_value_&templated_hosts=1&multiselect=1&writeonly=1',
-				'width' => 450,
-				'height' => 450
+					'&dstfld1=new_condition_value_&templated_hosts=1&multiselect=1&writeonly=1'
 			)
 		));
 		break;
@@ -207,9 +203,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'defaultValue' => 0,
 			'popup' => array(
 				'parameters' => 'srctbl=hosts&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
-					'&srcfld1=hostid&writeonly=1&multiselect=1',
-				'width' => 450,
-				'height' => 450
+					'&srcfld1=hostid&writeonly=1&multiselect=1'
 			)
 		));
 		break;
@@ -224,9 +218,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'defaultValue' => 0,
 			'popup' => array(
 				'parameters' => 'srctbl=triggers&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
-					'&srcfld1=triggerid&writeonly=1&multiselect=1&noempty=1',
-				'width' => 600,
-				'height' => 450
+					'&srcfld1=triggerid&writeonly=1&multiselect=1&noempty=1'
 			)
 		));
 		break;
@@ -290,7 +282,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=proxies&srcfld1=hostid&srcfld2=host'.
 					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=proxy'.
-					'", 450, 450);',
+					'");',
 				'button-form'
 			)
 		);
@@ -878,9 +870,7 @@ if (!empty($this->data['new_operation'])) {
 						'objectOptions' => array('editable' => true),
 						'popup' => array(
 							'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().
-								'&dstfld1=discoveryHostGroup&srcfld1=groupid&writeonly=1&multiselect=1',
-							'width' => 450,
-							'height' => 450
+								'&dstfld1=discoveryHostGroup&srcfld1=groupid&writeonly=1&multiselect=1'
 						)
 					)),
 					null, 2
@@ -932,9 +922,7 @@ if (!empty($this->data['new_operation'])) {
 						'objectOptions' => array('editable' => true),
 						'popup' => array(
 							'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
-								'&dstfld1=discoveryTemplates&templated_hosts=1&multiselect=1&writeonly=1',
-							'width' => 450,
-							'height' => 450
+								'&dstfld1=discoveryTemplates&templated_hosts=1&multiselect=1&writeonly=1'
 						)
 					)),
 					null, 2

@@ -139,7 +139,7 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 			{
 				label: t('Add'),
 				clickCallback: function() {
-					PopUp(addParams, 800, 450);
+					PopUp(addParams);
 
 					jQuery(this).closest('.action-menu').fadeOut(100);
 				}

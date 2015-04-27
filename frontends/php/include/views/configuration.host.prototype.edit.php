@@ -181,9 +181,7 @@ $groupList->addRow(_('Groups'), new CMultiSelect(array(
 	'disabled' => (bool) $hostPrototype['templateid'],
 	'popup' => array(
 		'parameters' => 'srctbl=host_groups&dstfrm='.$frmHost->getName().'&dstfld1=group_links_'.
-			'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1',
-		'width' => 450,
-		'height' => 450
+			'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1'
 	)
 )));
 
@@ -249,9 +247,7 @@ if (!$hostPrototype['templateid']) {
 		'ignored' => $ignoreTemplates,
 		'popup' => array(
 			'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1',
-			'width' => 450,
-			'height' => 450
+				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
 		)
 	))));
 

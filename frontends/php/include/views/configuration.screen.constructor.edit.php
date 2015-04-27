@@ -392,9 +392,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 			'selectedLimit' => 1,
 			'popup' => array(
 				'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-					'&srcfld1=groupid&writeonly=1',
-				'width' => 450,
-				'height' => 450
+					'&srcfld1=groupid&writeonly=1'
 			)
 		)));
 	}
@@ -420,9 +418,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 			'selectedLimit' => 1,
 			'popup' => array(
 				'parameters' => 'srctbl=hosts&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-					'&srcfld1=hostid&writeonly=1',
-				'width' => 450,
-				'height' => 450
+					'&srcfld1=hostid&writeonly=1'
 			)
 		)));
 	}
@@ -492,9 +488,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_
 		'selectedLimit' => 1,
 		'popup' => array(
 			'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-				'&srcfld1=groupid&writeonly=1',
-			'width' => 450,
-			'height' => 450
+				'&srcfld1=groupid&writeonly=1'
 		)
 	)));
 	$screenFormList->addRow(_('Application'), new CTextBox('application', $application, ZBX_TEXTBOX_STANDARD_SIZE, false, 255));
@@ -566,9 +560,7 @@ elseif ($resourceType == SCREEN_RESOURCE_HOSTS_INFO || $resourceType == SCREEN_R
 		'selectedLimit' => 1,
 		'popup' => array(
 			'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-				'&srcfld1=groupid&writeonly=1',
-			'width' => 450,
-			'height' => 450
+				'&srcfld1=groupid&writeonly=1'
 		)
 	)));
 }

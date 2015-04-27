@@ -481,9 +481,7 @@ if ($this->data['displayApplications']) {
 		'data' => $appToReplace,
 		'popup' => array(
 			'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=applications_'.
-				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid'],
-			'width' => 450,
-			'height' => 450
+				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid']
 		)
 	)), null, 'replaceApp');
 
@@ -532,9 +530,7 @@ if ($this->data['displayApplications']) {
 		'addNew' => true,
 		'popup' => array(
 			'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=new_applications_'.
-				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid'],
-			'width' => 450,
-			'height' => 450
+				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid']
 		)
 	)), null, 'newApp');
 
