@@ -227,7 +227,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 										'ymin_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 /* TYPE, REQUIRED ??? */				'ymax_item_1' =>			array('type' => 0),
 										'ymax_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* REQUIRED ??? */						'graph_items' =>			array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'graph_item', 'rules' => array(
+										'graph_items' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => array(
 											'graph_item' =>				array('type' => self::XML_ARRAY, 'rules' => array(
 												'sortorder' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 												'drawtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
@@ -523,7 +523,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 										'ymin_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 /* TYPE, REQUIRED ??? */				'ymax_item_1' =>			array('type' => 0),
 										'ymax_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* REQUIRED ??? */						'graph_items' =>			array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'graph_item', 'rules' => array(
+										'graph_items' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => array(
 											'graph_item' =>				array('type' => self::XML_ARRAY, 'rules' => array(
 												'sortorder' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 												'drawtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
@@ -636,7 +636,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 						'ymin_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 /* TYPE, REQUIRED ??? */'ymax_item_1' =>			array('type' => 0),
 						'ymax_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* REQUIRED ??? */		'graph_items' =>			array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'graph_item', 'rules' => array(
+						'graph_items' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => array(
 							'graph_item' =>				array('type' => self::XML_ARRAY, 'rules' => array(
 								'sortorder' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'drawtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
