@@ -34,7 +34,9 @@ if (!empty($this->data['service'])) {
 // create table
 $servicesChildTable = new CTableInfo();
 $servicesChildTable->setHeader(array(
-	new CCheckBox('all_services', null, "javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');"),
+	new CColHeader(
+		new CCheckBox('all_services', null, "javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');"),
+		'cell-width'),
 	_('Service'),
 	_('Status calculation'),
 	_('Trigger')

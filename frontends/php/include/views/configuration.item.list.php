@@ -57,7 +57,9 @@ $itemTable = new CTableInfo(
 	($this->data['filterSet']) ? null : _('Specify some filter condition to see the items.')
 );
 $itemTable->setHeader(array(
-	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
+	new CColHeader(
+		new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
+		'cell-width'),
 	_('Wizard'),
 	empty($this->data['filter_hostid']) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),

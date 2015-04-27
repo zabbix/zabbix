@@ -44,7 +44,9 @@ $itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 $hostTable = new CTableInfo();
 
 $hostTable->setHeader(array(
-	new CCheckBox('all_hosts', null, "checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');"),
+	new CColHeader(
+		new CCheckBox('all_hosts', null, "checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');"),
+		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Templates'),
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])

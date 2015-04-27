@@ -55,7 +55,9 @@ $applicationForm->setName('applicationForm');
 // create table
 $applicationTable = new CTableInfo();
 $applicationTable->setHeader(array(
-	new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');"),
+	new CColHeader(
+		new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');"),
+		'cell-width'),
 	($this->data['hostid'] > 0) ? null : _('Host'),
 	make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Show')

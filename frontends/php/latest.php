@@ -447,7 +447,7 @@ $lastDataHeader->setAttribute('title', _x('Change', 'noun in latest data'));
 
 $checkAllCheckbox = new CCheckBox('all_items', null, "checkAll('".$form->getName()."', 'all_items', 'itemids');");
 
-$checkAllCheckboxCol = new CColHeader($checkAllCheckbox, 'latest-checkbox');
+$checkAllCheckboxCol = new CColHeader($checkAllCheckbox, 'cell-width');
 
 if ($filter['showDetails']) {
 	$intervalHeader = new CColHeader(new CSpan(_('Interval')), 'latest-interval');
@@ -467,7 +467,7 @@ if ($filter['showDetails']) {
 
 	$table->addClass('latest-details');
 	$table->setHeader(array(
-		new CColHeader(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
+		new CColHeader(new CDiv(null, 'app-list-toggle-all icon-plus-9x9'), 'cell-width'),
 		$checkAllCheckboxCol,
 		$hostHeader,
 		$nameHeader,
@@ -484,7 +484,7 @@ if ($filter['showDetails']) {
 }
 else {
 	$table->setHeader(array(
-		new CColHeader(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
+		new CColHeader(new CDiv(null, 'app-list-toggle-all icon-plus-9x9'), 'cell-width'),
 		$checkAllCheckboxCol,
 		$hostHeader,
 		$nameHeader,

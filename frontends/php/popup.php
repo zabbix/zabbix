@@ -544,7 +544,12 @@ if ($srctbl == 'usrgrp') {
 
 	$table = new CTableInfo();
 	$table->setHeader(array(
-		$multiselect ? new CCheckBox('all_usrgrps', null, "javascript: checkAll('".$form->getName()."', 'all_usrgrps', 'usrgrps');") : null,
+		$multiselect ?
+			new CColHeader(
+				new CCheckBox('all_usrgrps', null, "javascript: checkAll('".$form->getName()."', 'all_usrgrps', 'usrgrps');"),
+				'cell-width')
+			:
+			null,
 		_('Name')
 	));
 
@@ -601,7 +606,12 @@ elseif ($srctbl == 'users') {
 
 	$table = new CTableInfo();
 	$table->setHeader(array(
-		($multiselect ? new CCheckBox('all_users', null, "javascript: checkAll('".$form->getName()."', 'all_users', 'users');") : null),
+		($multiselect ?
+			new CColHeader(
+				new CCheckBox('all_users', null, "javascript: checkAll('".$form->getName()."', 'all_users', 'users');"),
+				'cell-width')
+			:
+			null),
 		_('Alias'),
 		_x('Name', 'user first name'),
 		_('Surname')
@@ -669,8 +679,14 @@ elseif ($srctbl == 'templates') {
 	$form->setAttribute('id', 'templates');
 
 	$table = new CTableInfo();
-	$table->setHeader(array(($multiselect ? new CCheckBox('all_templates', null,
-		"javascript: checkAll('".$form->getName()."', 'all_templates', 'templates');") : null), _('Name')
+	$table->setHeader(array(
+		($multiselect ?
+			new CColHeader(
+				new CCheckBox('all_templates', null, "javascript: checkAll('".$form->getName()."', 'all_templates', 'templates');"),
+				'cell-width')
+			:
+			null),
+		_('Name')
 	));
 
 	$options = array(
@@ -744,8 +760,14 @@ elseif ($srctbl == 'hosts') {
 	$form->setAttribute('id', 'hosts');
 
 	$table = new CTableInfo();
-	$table->setHeader(array(($multiselect ? new CCheckBox('all_hosts', null,
-		"javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');") : null), _('Name')
+	$table->setHeader(array(
+		($multiselect ?
+			new CColHeader(
+				new CCheckBox('all_hosts', null, "javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');"),
+				'cell-width')
+			:
+			null),
+		_('Name')
 	));
 
 	$options = array(
@@ -819,8 +841,14 @@ elseif ($srctbl == 'host_templates') {
 	$form->setAttribute('id', 'hosts');
 
 	$table = new CTableInfo();
-	$table->setHeader(array(($multiselect ? new CCheckBox('all_hosts', null,
-		"javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');") : null), _('Name')
+	$table->setHeader(array(
+		($multiselect ?
+			new CColHeader(
+				new CCheckBox('all_hosts', null, "javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');"),
+				'cell-width')
+			:
+			null),
+		_('Name')
 	));
 
 	$options = array(
@@ -895,8 +923,14 @@ elseif ($srctbl == 'host_groups') {
 	$form->setAttribute('id', 'hostGroups');
 
 	$table = new CTableInfo();
-	$table->setHeader(array(($multiselect ? new CCheckBox('all_hostgroups', null,
-		"javascript: checkAll('".$form->getName()."', 'all_hostgroups', 'hostGroups');") : null), _('Name')
+	$table->setHeader(array(
+		($multiselect ?
+			new CColHeader(
+				new CCheckBox('all_hostgroups', null, "javascript: checkAll('".$form->getName()."', 'all_hostgroups', 'hostGroups');"),
+				'cell-width')
+			:
+			null),
+		_('Name')
 	));
 
 	$options = array(
@@ -987,7 +1021,12 @@ elseif ($srctbl === 'triggers') {
 	$table = new CTableInfo();
 
 	$table->setHeader(array(
-		$multiselect ? new CCheckBox('all_triggers', null, "checkAll('".$form->getName()."', 'all_triggers', 'triggers');") : null,
+		$multiselect ?
+			new CColHeader(
+				new CCheckBox('all_triggers', null, "checkAll('".$form->getName()."', 'all_triggers', 'triggers');"),
+				'cell-width')
+			:
+			null,
 		_('Name'),
 		_('Severity'),
 		_('Status')
@@ -1107,7 +1146,9 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 	$header = array(
 		$pageFilter->hostsAll ? _('Host') : null,
 		$multiselect
-			? new CCheckBox('all_items', null, "javascript: checkAll('".$form->getName()."', 'all_items', 'items');")
+			? new CColHeader(
+				new CCheckBox('all_items', null, "javascript: checkAll('".$form->getName()."', 'all_items', 'items');"),
+				'cell-width')
 			: null,
 		_('Name'),
 		_('Key'),
@@ -1239,8 +1280,14 @@ elseif ($srctbl == 'applications') {
 	$form->setAttribute('id', 'applications');
 
 	$table = new CTableInfo();
-	$table->setHeader(array(($multiselect ? new CCheckBox('all_applications', null,
-		"javascript: checkAll('".$form->getName()."', 'all_applications', 'applications');") : null), _('Name')
+	$table->setHeader(array(
+		($multiselect ?
+			new CColHeader(
+				new CCheckBox('all_applications', null, "javascript: checkAll('".$form->getName()."', 'all_applications', 'applications');"),
+				'cell-width')
+			:
+			null),
+		_('Name')
 	));
 
 	$options = array(
