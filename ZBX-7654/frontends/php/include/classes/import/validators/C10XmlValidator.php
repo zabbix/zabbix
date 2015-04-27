@@ -150,10 +150,10 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 				)),
 				'sysmaps' =>				array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'sysmap', 'rules' => array(
 					'sysmap' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-/* REQUIRED ??? */		'selements' =>				array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'selement', 'rules' => array(
+						'selements' =>				array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'selement', 'rules' => array(
 							'selement' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-/* REQUIRED ??? */				'selementid' =>				array('type' => self::XML_STRING),					// added type validation
-/* REQUIRED ??? */				'elementid' =>				array('type' => self::XML_ARRAY, 'rules' => array(	// added type validation
+								'selementid' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
+								'elementid' =>				array('type' => self::XML_ARRAY, 'rules' => array(
 									'name' =>					array('type' => self::XML_STRING),
 									'host' =>					array('type' => self::XML_STRING),
 									'description' =>			array('type' => self::XML_STRING),
@@ -163,7 +163,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 								'iconid_on' =>				array('type' => self::XML_ARRAY, 'rules' => array(
 									'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 								)),
-								'iconid_off' =>				array('type' => self::XML_ARRAY, 'rules' => array(
+								'iconid_off' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
 									'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 								)),
 								'iconid_unknown' =>			array('type' => self::XML_ARRAY, 'rules' => array(
@@ -172,28 +172,29 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 								'iconid_disabled' =>		array('type' => self::XML_ARRAY, 'rules' => array(
 									'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 								)),
-								'icon_maintenance' =>		array('type' => self::XML_ARRAY, 'rules' => array(
+								'iconid_maintenance' =>		array('type' => self::XML_ARRAY, 'rules' => array(
 									'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 								)),
 								'label' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* REQUIRED ??? */				'label_location' =>			array('type' => self::XML_STRING),
+								'label_location' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'x' =>						array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'y' =>						array('type' => self::XML_STRING | self::XML_REQUIRED),
+								'url' =>					array('type' => self::XML_STRING)
 							))
 						)),
 						'links' =>					array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'link', 'rules' => array(
-							'link' =>					array('type' => self::XML_ARRAY, 'rules' => array(		// added validation of links
+							'link' =>					array('type' => self::XML_ARRAY, 'rules' => array(
 								'selementid1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'selementid2' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'drawtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'color' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'label' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
+								'label' =>					array('type' => self::XML_STRING),
 								'linktriggers' =>			array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'linktrigger', 'rules' => array(
 									'linktrigger' =>			array('type' => self::XML_ARRAY, 'rules' => array(
 										'drawtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 										'color' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'triggerid' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-/* REQUIRED ??? */							'host' =>					array('type' => self::XML_STRING),
+										'triggerid' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
+											'host' =>					array('type' => self::XML_STRING),
 											'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 											'expression' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 										))
