@@ -191,7 +191,7 @@ foreach ($data['hosts'] as $host) {
 
 	$table->addRow(array(
 		new CCheckBox('hosts['.$host['hostid'].']', null, null, $host['hostid']),
-		$description,
+		new CCol($description, 'nowrap'),
 		$applications,
 		$items,
 		$triggers,

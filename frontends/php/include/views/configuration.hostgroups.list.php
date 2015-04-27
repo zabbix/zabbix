@@ -153,7 +153,7 @@ foreach ($this->data['groups'] as $group) {
 
 	$hostGroupTable->addRow(array(
 		new CCheckBox('groups['.$group['groupid'].']', null, null, $group['groupid']),
-		$name,
+		new CCol($name, 'nowrap'),
 		array(
 			array(new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'], ZBX_STYLE_GREY_DOTTED), CViewHelper::showNum($templateCount)),
 			BR(),
