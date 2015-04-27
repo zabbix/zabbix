@@ -610,6 +610,14 @@ footer {
 	}
 }
 
+.cell-width {
+	width: 8px;
+}
+
+.nowrap {
+	white-space: nowrap;
+}
+
 /* Filters */
 .filter-container {
 	text-align: center;
@@ -692,12 +700,7 @@ footer {
 		background: none;
 
 	}
-
-	//.multiselect-suggest {
-	//	max-height: 400px;
-	//	overflow-y: auto;
-	//	@extend %webkit-scrollbar;
-	//}
+}
 
 	.multiselect-list {
 
@@ -731,19 +734,12 @@ footer {
 			background: $light-blue-grey;
 		}
 	}
-}
 
 .multiselect-suggest {
-	//position: absolute;
-	//z-index: 1000;
 	padding: 0 5px;
-	//min-width: 165px;
 	white-space: normal;
 	color: $blue-grey;
 	background: $white;
-	//border: 1px solid $lighter-blue-grey;
-	//border-top: none;
-	//@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
 
 	li {
 		display: block;
