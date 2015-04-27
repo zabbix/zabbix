@@ -166,8 +166,10 @@ class CConfigurationImport {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
 
-			foreach ($template['macros'] as $macro) {
-				$macrosRefs[$template['host']][$macro['macro']] = $macro['macro'];
+			if (array_key_exists('macros', $template)) {
+				foreach ($template['macros'] as $macro) {
+					$macrosRefs[$template['host']][$macro['macro']] = $macro['macro'];
+				}
 			}
 
 			if (!empty($template['templates'])) {
@@ -184,8 +186,10 @@ class CConfigurationImport {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
 
-			foreach ($host['macros'] as $macro) {
-				$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
+			if (array_key_exists('macros', $host)) {
+				foreach ($host['macros'] as $macro) {
+					$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
+				}
 			}
 
 			if (!empty($host['templates'])) {
