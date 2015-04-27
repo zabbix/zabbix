@@ -42,7 +42,9 @@ $discoveryForm->addVar('hostid', $this->data['hostid']);
 $discoveryTable = new CTableInfo();
 
 $discoveryTable->setHeader(array(
-	new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');"),
+	new CColHeader(
+		new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');"),
+		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Items'),
 	_('Triggers'),

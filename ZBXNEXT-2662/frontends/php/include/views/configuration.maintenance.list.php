@@ -37,7 +37,9 @@ $maintenanceForm->setName('maintenanceForm');
 // create table
 $maintenanceTable = new CTableInfo();
 $maintenanceTable->setHeader(array(
-	new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');"),
+	new CColHeader(
+		new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');"),
+		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Type'), 'maintenance_type', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Active since'), 'active_since', $this->data['sort'], $this->data['sortorder']),

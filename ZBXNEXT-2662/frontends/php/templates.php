@@ -584,7 +584,9 @@ else {
 
 	$table = new CTableInfo();
 	$table->setHeader(array(
-		new CCheckBox('all_templates', null, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
+		new CColHeader(
+			new CCheckBox('all_templates', null, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
+			'cell-width'),
 		make_sorting_header(_('Templates'), 'name', $sortField, $sortOrder),
 		_('Applications'),
 		_('Items'),

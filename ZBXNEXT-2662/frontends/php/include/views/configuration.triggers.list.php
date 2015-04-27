@@ -55,7 +55,9 @@ $triggersForm->addVar('hostid', $this->data['hostid']);
 // create table
 $triggersTable = new CTableInfo();
 $triggersTable->setHeader(array(
-	new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
+	new CColHeader(
+		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
+		'cell-width'),
 	make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
 	($this->data['hostid'] == 0) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),

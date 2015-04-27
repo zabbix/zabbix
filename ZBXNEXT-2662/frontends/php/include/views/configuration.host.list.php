@@ -57,7 +57,9 @@ $form->setName('hosts');
 
 $table = new CTableInfo();
 $table->setHeader(array(
-	new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');"),
+	new CColHeader(
+		new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');"),
+		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
 	_('Applications'),
 	_('Items'),

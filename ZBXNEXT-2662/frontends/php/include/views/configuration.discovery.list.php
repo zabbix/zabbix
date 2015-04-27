@@ -36,7 +36,9 @@ $discoveryForm->setName('druleForm');
 // create table
 $discoveryTable = new CTableInfo();
 $discoveryTable->setHeader(array(
-	new CCheckBox('all_drules', null, "checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');"),
+	new CColHeader(
+		new CCheckBox('all_drules', null, "checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');"),
+		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('IP range'),
 	_('Delay'),

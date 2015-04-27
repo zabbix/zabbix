@@ -48,10 +48,12 @@ $hostGroupForm = new CForm();
 $hostGroupForm->setAttribute('id', 'groups');
 
 $hostGroupTable = new CTableInfo();
-$hostGroupTable->setHeader(new CCol(array(
-	new CCheckBox('all_groups', null, 'checkAll(this.checked)'),
+$hostGroupTable->setHeader(array(
+	new CColHeader(
+		new CCheckBox('all_groups', null, 'checkAll(this.checked)'),
+		'cell-width'),
 	_('Name')
-)));
+));
 
 $hostGroups = API::HostGroup()->get(array(
 	'output' => array('groupid', 'name')
