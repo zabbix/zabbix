@@ -1435,6 +1435,66 @@ button {
 		&:active {
 			@extend %btn-widget-hover-active;
 		}
+    }
+
+    &.btn-alarm-on {
+    	border: 0;
+    	background: $transparent url(../img/icon-sprite.png) no-repeat -45px -191px;
+		@extend %button-widget-icon-size;
+		@include opacity(0.75);
+
+		&:hover {
+			@extend %btn-widget-hover-active;
+		}
+
+		&:active {
+			@extend %btn-widget-hover-active;
+		}
+    }
+
+    &.btn-alarm-off {
+    	border: 0;
+    	background: $transparent url(../img/icon-sprite.png) no-repeat -45px -239px;
+		@extend %button-widget-icon-size;
+		@include opacity(0.75);
+
+		&:hover {
+			@extend %btn-widget-hover-active;
+		}
+
+		&:active {
+			@extend %btn-widget-hover-active;
+		}
+    }
+
+    &.btn-sound-on {
+    	border: 0;
+    	background: $transparent url(../img/icon-sprite.png) no-repeat -45px -216px;
+		@extend %button-widget-icon-size;
+		@include opacity(0.75);
+
+		&:hover {
+			@extend %btn-widget-hover-active;
+		}
+
+		&:active {
+			@extend %btn-widget-hover-active;
+		}
+    }
+
+     &.btn-sound-off {
+    	border: 0;
+    	background: $transparent url(../img/icon-sprite.png) no-repeat -45px -264px;
+		@extend %button-widget-icon-size;
+		@include opacity(0.75);
+
+		&:hover {
+			@extend %btn-widget-hover-active;
+		}
+
+		&:active {
+			@extend %btn-widget-hover-active;
+		}
     } 
 
 	&.btn-grey {
@@ -2179,9 +2239,14 @@ button[disabled] {
 .notifications {
 	padding: 0;
 	max-width: 250px;
+	@include opacity(0.9);
 
 	.dashbrd-widget-head {
-		margin: 0;
+		margin: -2px 0 -7px 0;
+	}
+
+	h4 {
+		display: inline-block;
 	}
 
 	p {
@@ -2194,6 +2259,21 @@ button[disabled] {
 			width: 3px;
 		}
 	}
+
+	.dashbrd-widget-head {
+
+		ul {
+			position: relative;
+			display: inline-block;
+			margin-left: 8px;
+
+			li {
+				float: none;
+				display: inline-block;
+			}
+		}
+	}
+
 }
 
 /* Maps, Screens, Graphs */
