@@ -50,7 +50,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 							))
 						)),
-/* REQUIRED ??? */		'groups' =>					array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group', 'rules' => array(
+						'groups' =>					array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group', 'rules' => array(
 							'group' =>					array('type' => self::XML_ARRAY, 'rules' => array(
 								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 							))
@@ -360,7 +360,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 							))
 						)),
-/* REQUIRED ??? */		'groups' =>					array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group', 'rules' => array(
+						'groups' =>					array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group', 'rules' => array(
 							'group' =>					array('type' => self::XML_ARRAY, 'rules' => array(
 								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 							))

@@ -46,7 +46,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 						'ipmi_privilege' =>			array('type' => self::XML_STRING),
 						'ipmi_username' =>			array('type' => self::XML_STRING),
 						'ipmi_password' =>			array('type' => self::XML_STRING),
-						'groups' =>					array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => array(
+						'groups' =>					array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group', 'rules' => array(
 							'group' =>					array('type' => self::XML_STRING)
 						)),
 						'items' =>					array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'item', 'rules' => array(
