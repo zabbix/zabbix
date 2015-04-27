@@ -58,9 +58,7 @@ $replaceGroups = new CDiv(new CMultiSelect(array(
 	'data' => $hostGroupsToReplace,
 	'popup' => array(
 		'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=groups_&srcfld1=groupid'.
-			'&writeonly=1&multiselect=1',
-		'width' => 450,
-		'height' => 450
+			'&writeonly=1&multiselect=1'
 	)
 )), null, 'replaceGroups');
 
@@ -111,9 +109,7 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		'addNew' => true,
 		'popup' => array(
 			'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_&srcfld1=groupid'.
-				'&writeonly=1&multiselect=1',
-			'width' => 450,
-			'height' => 450
+				'&writeonly=1&multiselect=1'
 		)
 	)), null, 'newGroups');
 
@@ -134,9 +130,7 @@ else {
 		'data' => $hostGroupsToAdd,
 		'popup' => array(
 			'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_&srcfld1=groupid'.
-				'&writeonly=1&multiselect=1',
-			'width' => 450,
-			'height' => 450
+				'&writeonly=1&multiselect=1'
 		)
 	));
 
@@ -206,9 +200,7 @@ $templatesDiv = new CDiv(
 			'data' => $data['linkedTemplates'],
 			'popup' => array(
 				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$hostView->getName().
-					'&dstfld1=templates_&templated_hosts=1&multiselect=1',
-				'width' => 450,
-				'height' => 450
+					'&dstfld1=templates_&templated_hosts=1&multiselect=1'
 			)
 		)),
 		$clearDiv,

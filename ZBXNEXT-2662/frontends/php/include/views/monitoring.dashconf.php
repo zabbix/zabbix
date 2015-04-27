@@ -61,9 +61,7 @@ if ($this->data['grpswitch']) {
 		'disabled' => !$this->data['isFilterEnable'],
 		'popup' => array(
 			'parameters' => 'srctbl=host_groups&dstfrm='.$dashconfForm->getName().'&dstfld1=groupids_'.
-				'&srcfld1=groupid&multiselect=1',
-			'width' => 450,
-			'height' => 450
+				'&srcfld1=groupid&multiselect=1'
 		)
 	)));
 	$dashconfFormList->addRow(_('Hide selected groups'), new CMultiSelect(array(
@@ -73,9 +71,7 @@ if ($this->data['grpswitch']) {
 		'disabled' => !$this->data['isFilterEnable'],
 		'popup' => array(
 			'parameters' => 'srctbl=host_groups&dstfrm='.$dashconfForm->getName().'&dstfld1=hidegroupids_'.
-				'&srcfld1=groupid&multiselect=1',
-			'width' => 450,
-			'height' => 450
+				'&srcfld1=groupid&multiselect=1'
 		)
 	)));
 }

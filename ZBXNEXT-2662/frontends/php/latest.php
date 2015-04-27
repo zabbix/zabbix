@@ -353,9 +353,7 @@ $filterColumn1->addRow(
 			'data' => $multiSelectHostGroupData,
 			'popup' => array(
 				'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
-					'&srcfld1=groupid&multiselect=1',
-				'width' => 450,
-				'height' => 450
+					'&srcfld1=groupid&multiselect=1'
 			)
 	))
 );
@@ -368,9 +366,7 @@ $filterColumn1->addRow(
 				'data' => $multiSelectHostData,
 				'popup' => array(
 					'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=hostids_&srcfld1=hostid'.
-						'&real_hosts=1&multiselect=1',
-					'width' => 450,
-					'height' => 450
+						'&real_hosts=1&multiselect=1'
 				)
 			)
 		)

@@ -131,7 +131,7 @@ if (empty($this->data['parent_discoveryid'])) {
 					'&objname=triggers'.
 					'&srcfld1=triggerid'.
 					'&multiselect=1'.
-					'&with_triggers=1", 1000, 700);',
+					'&with_triggers=1");',
 				'link_menu'
 			)
 		),

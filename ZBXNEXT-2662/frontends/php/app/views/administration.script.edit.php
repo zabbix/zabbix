@@ -84,9 +84,7 @@ $scriptFormList->addRow(null, new CMultiSelect(array(
 	'objectName' => 'hostGroup',
 	'data' => $data['hostgroup'],
 	'popup' => array(
-		'parameters' => 'srctbl=host_groups&dstfrm='.$scriptForm->getName().'&dstfld1=groupid&srcfld1=groupid',
-		'width' => 450,
-		'height' => 450
+		'parameters' => 'srctbl=host_groups&dstfrm='.$scriptForm->getName().'&dstfld1=groupid&srcfld1=groupid'
 	)
 )), null, 'hostGroupSelection');
 

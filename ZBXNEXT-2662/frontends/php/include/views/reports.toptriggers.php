@@ -81,9 +81,7 @@ $filterColumn1->addRow(
 			'data' => $this->data['multiSelectHostGroupData'],
 			'popup' => array(
 				'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
-					'&srcfld1=groupid&multiselect=1',
-				'width' => 450,
-				'height' => 450
+					'&srcfld1=groupid&multiselect=1'
 			)
 		)
 	)
@@ -98,9 +96,7 @@ $filterColumn1->addRow(
 			'data' => $this->data['multiSelectHostData'],
 			'popup' => array(
 				'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
-					'&real_hosts=1&multiselect=1',
-				'width' => 450,
-				'height' => 450
+					'&real_hosts=1&multiselect=1'
 			)
 		)
 	)
