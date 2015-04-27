@@ -291,11 +291,11 @@ else {
 
 		order_result($data['mediatypes'], $sortField, $sortOrder);
 
-		$data['paging'] = getPagingLine($data['mediatypes']);
+		$data['paging'] = getPagingLine($data['mediatypes'], $sortOrder);
 	}
 	else {
 		$arr = array();
-		$data['paging'] = getPagingLine($arr);
+		$data['paging'] = getPagingLine($arr, $sortOrder);
 	}
 
 	// render view

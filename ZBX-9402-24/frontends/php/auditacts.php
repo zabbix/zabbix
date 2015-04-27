@@ -137,7 +137,7 @@ if (!$data['alias'] || $data['users']) {
 	$data['alerts'] = array_slice($data['alerts'], 0, $config['search_limit'] + 1);
 
 	// paging
-	$data['paging'] = getPagingLine($data['alerts']);
+	$data['paging'] = getPagingLine($data['alerts'], ZBX_SORT_DOWN);
 
 	// get users
 	if (!$data['alias']) {

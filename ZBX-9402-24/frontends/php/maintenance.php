@@ -528,10 +528,9 @@ else {
 	$data['sortorder'] = $sortOrder;
 
 	$options = array(
-		'output' => array('maintenanceid'),
+		'output' => array('maintenanceid', $sortField),
 		'editable' => true,
 		'sortfield' => $sortField,
-		'sortorder' => $sortOrder,
 		'limit' => $config['search_limit'] + 1
 	);
 
@@ -544,7 +543,9 @@ else {
 
 	$data['maintenances'] = API::Maintenance()->get($options);
 
-	$data['paging'] = getPagingLine($data['maintenances']);
+	order_result($data['maintenances'], $sortField, $sortOrder);
+
+	$data['paging'] = getPagingLine($data['maintenances'], $sortOrder);
 
 	// get list of maintenances
 	$data['maintenances'] = API::Maintenance()->get(array(

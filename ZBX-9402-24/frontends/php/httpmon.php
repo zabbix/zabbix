@@ -99,8 +99,11 @@ $paging = null;
 
 if ($pageFilter->hostsSelected) {
 	$options = array(
-		'output' => array('httptestid'),
+		'output' => array('httptestid', 'name', 'hostid'),
+		'selectHosts' => array('name', 'status'),
+		'selectSteps' => API_OUTPUT_COUNT,
 		'templated' => false,
+		'preservekeys' => true,
 		'filter' => array('status' => HTTPTEST_STATUS_ACTIVE),
 		'limit' => $config['search_limit'] + 1
 	);
@@ -112,22 +115,16 @@ if ($pageFilter->hostsSelected) {
 	}
 	$httpTests = API::HttpTest()->get($options);
 
-	$paging = getPagingLine($httpTests);
-
-	$httpTests = API::HttpTest()->get(array(
-		'httptestids' => zbx_objectValues($httpTests, 'httptestid'),
-		'preservekeys' => true,
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('name', 'status'),
-		'selectSteps' => API_OUTPUT_COUNT,
-	));
-
 	foreach ($httpTests as &$httpTest) {
 		$httpTest['host'] = reset($httpTest['hosts']);
 		$httpTest['hostname'] = $httpTest['host']['name'];
 		unset($httpTest['hosts']);
 	}
 	unset($httpTest);
+
+	order_result($httpTests, $sortField, $sortOrder);
+
+	$paging = getPagingLine($httpTests, $sortOrder);
 
 	$httpTests = resolveHttpTestMacros($httpTests, true, false);
 
@@ -189,7 +186,7 @@ if ($pageFilter->hostsSelected) {
 }
 else {
 	$tmp = array();
-	getPagingLine($tmp);
+	getPagingLine($tmp, $sortOrder);
 }
 
 $httpmon_wdgt->addItem(array($paging, $table, $paging));

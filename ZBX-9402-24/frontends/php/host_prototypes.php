@@ -381,11 +381,9 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	if ($data['hostPrototypes']) {
-		order_result($data['hostPrototypes'], $sortField, $sortOrder);
-	}
+	order_result($data['hostPrototypes'], $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($data['hostPrototypes']);
+	$data['paging'] = getPagingLine($data['hostPrototypes'], $sortOrder);
 
 	// fetch templates linked to the prototypes
 	$templateIds = array();

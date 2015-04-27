@@ -1452,18 +1452,25 @@ function getPageNumber() {
 /**
  * Returns paging line.
  *
- * @param array $items				list of items
+ * @param array  $items				list of items
+ * @param string $sortorder			the order in which items are sorted ASC or DESC
  *
  * @return CTable
  */
-function getPagingLine(&$items) {
+function getPagingLine(&$items, $sortorder) {
 	global $page;
 
 	$config = select_config();
 
 	$searchLimit = '';
 	if ($config['search_limit'] < count($items)) {
-		array_pop($items);
+		if ($sortorder == ZBX_SORT_UP) {
+			array_pop($items);
+		}
+		else {
+			array_shift($items);
+		}
+
 		$searchLimit = '+';
 	}
 

@@ -311,7 +311,7 @@ else {
 	order_result($data['screens'], $sortField, $sortOrder);
 
 	// paging
-	$data['paging'] = getPagingLine($data['screens']);
+	$data['paging'] = getPagingLine($data['screens'], $sortOrder);
 
 	// render view
 	$screenView = new CView('configuration.screen.list', $data);
