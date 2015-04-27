@@ -513,49 +513,56 @@ class C10ImportConverter extends CConverter {
 
 		foreach ($content['dependencies'] as $dependency) {
 			list($sourceHost, $sourceDescription) = explode(':', $dependency['description'], 2);
-			list($targetHost, $targetDescription) = explode(':', $dependency['depends'], 2);
+			unset($dependency['description']);
 
 			// if one of the hosts is missing from the data or doesn't have any triggers, skip this dependency
-			if (!isset($hosts[$sourceHost]) || !isset($hosts[$sourceHost]['triggers'])
-				|| !isset($hosts[$targetHost]) || !isset($hosts[$sourceHost]['triggers'])) {
-
+			if (!isset($hosts[$sourceHost]) || !isset($hosts[$sourceHost]['triggers'])) {
 				continue;
 			}
 
-			// find the target trigger
-			// use the first trigger with the same description
-			$targetTrigger = null;
-			foreach ($hosts[$targetHost]['triggers'] as $trigger) {
-				if ($trigger['description'] === $targetDescription) {
-					$targetTrigger = $trigger;
+			foreach ($dependency as $depends) {
+				list($targetHost, $targetDescription) = explode(':', $depends, 2);
 
-					break;
+				// if one of the hosts is missing from the data or doesn't have any triggers, skip this dependency
+				if (!isset($hosts[$targetHost]) || !isset($hosts[$targetHost]['triggers'])) {
+					continue;
 				}
-			}
 
-			// if the target trigger wasn't found - skip this dependency
-			if (!$targetTrigger) {
-				continue;
-			}
+				// find the target trigger
+				// use the first trigger with the same description
+				$targetTrigger = null;
+				foreach ($hosts[$targetHost]['triggers'] as $trigger) {
+					if ($trigger['description'] === $targetDescription) {
+						$targetTrigger = $trigger;
 
-			// find the source trigger and add the dependencies to all of the copies of the trigger
-			foreach ($hosts[$targetHost]['triggers'] as $trigger) {
-				if ($trigger['description'] === $sourceDescription) {
-					// if the source trigger is not present in the data - skip this dependency
-					if (!isset($descriptionExpressionIndex[$trigger['description']])
-							|| !isset($descriptionExpressionIndex[$trigger['description']][$trigger['expression']])) {
-
-						continue 2;
+						break;
 					}
+				}
 
-					// working with references to triggers in the content here
-					foreach ($descriptionExpressionIndex[$trigger['description']][$trigger['expression']] as &$trigger) {
-						$trigger['dependencies'][] = array(
-							'name' => $targetTrigger['description'],
-							'expression' => $targetTrigger['expression'],
-						);
+				// if the target trigger wasn't found - skip this dependency
+				if (!$targetTrigger) {
+					continue;
+				}
+
+				// find the source trigger and add the dependencies to all of the copies of the trigger
+				foreach ($hosts[$targetHost]['triggers'] as $trigger) {
+					if ($trigger['description'] === $sourceDescription) {
+						// if the source trigger is not present in the data - skip this dependency
+						if (!isset($descriptionExpressionIndex[$trigger['description']])
+								|| !isset($descriptionExpressionIndex[$trigger['description']][$trigger['expression']])) {
+
+							continue 2;
+						}
+
+						// working with references to triggers in the content here
+						foreach ($descriptionExpressionIndex[$trigger['description']][$trigger['expression']] as &$trigger) {
+							$trigger['dependencies'][] = array(
+								'name' => $targetTrigger['description'],
+								'expression' => $targetTrigger['expression'],
+							);
+						}
+						unset($trigger);
 					}
-					unset($trigger);
 				}
 			}
 		}
