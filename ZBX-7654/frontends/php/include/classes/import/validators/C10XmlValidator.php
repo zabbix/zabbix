@@ -120,7 +120,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 								'show_3d' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'percent_left' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'percent_right' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* REQUIRED ??? */				'graph_elements' =>			array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'graph_element', 'rules' => array(
+								'graph_elements' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_element', 'rules' => array(
 									'graph_element' =>			array('type' => self::XML_ARRAY, 'rules' => array(
 										'item' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 										'drawtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
