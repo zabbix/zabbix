@@ -39,13 +39,13 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 						'ip' =>						array('type' => self::XML_STRING | self::XML_REQUIRED),
 						'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 						'status' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'useipmi' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'ipmi_ip' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'ipmi_port' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'ipmi_authtype' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'ipmi_privilege' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'ipmi_username' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'ipmi_password' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
+						'useipmi' =>				array('type' => self::XML_STRING),
+						'ipmi_ip' =>				array('type' => self::XML_STRING),
+						'ipmi_port' =>				array('type' => self::XML_STRING),
+						'ipmi_authtype' =>			array('type' => self::XML_STRING),
+						'ipmi_privilege' =>			array('type' => self::XML_STRING),
+						'ipmi_username' =>			array('type' => self::XML_STRING),
+						'ipmi_password' =>			array('type' => self::XML_STRING),
 						'groups' =>					array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => array(
 							'group' =>					array('type' => self::XML_STRING)
 						)),
@@ -82,7 +82,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 								'snmpv3_securitylevel' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'snmpv3_authpassphrase' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'snmpv3_privpassphrase' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'valuemapid' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
+								'valuemapid' =>				array('type' => self::XML_STRING),
 								'applications' =>			array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => array(
 									'application' =>			array('type' => self::XML_STRING)
 								))
@@ -274,7 +274,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 	 * @throws Exception	if the time is invalid
 	 */
 	protected function validateTime($time, $path) {
-		if (!preg_match('/(2[0-3]|[01][0-9])\.[0-5][0-9]/', $time)) {
+		if (!preg_match('/^(2[0-3]|[01][0-9])\.[0-5][0-9]$/', $time)) {
 			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', 'hh.mm')));
 		}
 	}
