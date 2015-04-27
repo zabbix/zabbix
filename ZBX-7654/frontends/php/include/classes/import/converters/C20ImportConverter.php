@@ -145,12 +145,12 @@ class C20ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertTriggers(array $content) {
-		if (!isset($content['triggers']) || !$content['triggers']) {
+		if (!array_key_exists('triggers', $content)) {
 			return $content;
 		}
 
 		foreach ($content['triggers'] as &$trigger) {
-			if ($trigger['dependencies']) {
+			if (array_key_exists('dependencies', $trigger)) {
 				foreach ($trigger['dependencies'] as &$dependency) {
 					$dependency['expression'] = $this->triggerExpressionConverter->convert($dependency['expression']);
 				}
