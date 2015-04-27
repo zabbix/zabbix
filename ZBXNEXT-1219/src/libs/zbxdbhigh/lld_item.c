@@ -2304,6 +2304,8 @@ static void	lld_applications_make(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 		}
 	}
 	DBfree_result(result);
+
+	zbx_vector_ptr_sort(applications, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 out:
 	zbx_free(sql);
 	zbx_vector_str_destroy(&application_names);
@@ -2327,6 +2329,7 @@ static void	lld_applications_validate(zbx_vector_ptr_t *applications, zbx_hashse
 	const char			*__function_name = "lld_applications_validate";
 	zbx_hashset_iter_t		iter;
 	zbx_lld_item_application_t	*item_application;
+	zbx_lld_application_t		*application;
 	int				i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2342,16 +2345,25 @@ static void	lld_applications_validate(zbx_vector_ptr_t *applications, zbx_hashse
 		if (0 == (item_application->flags & ZBX_FLAG_LLD_ITEM_APPLICATION_DISCOVERED))
 			continue;
 
-		if (NULL == item_application->application_ref.application)
-			continue;
+		if (NULL == (application = item_application->application_ref.application))
+		{
+			if (FAIL == (i = zbx_vector_ptr_bsearch(applications,
+					&item_application->application_ref.applicationid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				continue;
+			}
 
-		item_application->application_ref.application->items_num++;
+			application = (zbx_lld_application_t *)applications->values[i];
+		}
+
+		application->items_num++;
 	}
 
 	/* reset discovery flags for applications with no items */
 	for (i = 0; i < applications->values_num; i++)
 	{
-		zbx_lld_application_t	*application = (zbx_lld_application_t *)applications->values[i];
+		application = (zbx_lld_application_t *)applications->values[i];
 
 		if (0 == application->items_num)
 			application->flags = ZBX_FLAG_LLD_APPLICATION_UNSET;
@@ -2375,7 +2387,7 @@ static void	lld_items_applications_get(zbx_uint64_t lld_ruleid, zbx_hashset_t *i
 	const char			*__function_name = "lld_items_applications_get";
 	DB_RESULT			result;
 	DB_ROW				row;
-	zbx_lld_item_application_t	item_application = {0};
+	zbx_lld_item_application_t	item_application;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2386,6 +2398,9 @@ static void	lld_items_applications_get(zbx_uint64_t lld_ruleid, zbx_hashset_t *i
 				" and id1.itemid=ia.itemid"
 				" and id1.parent_itemid=id2.itemid",
 			lld_ruleid);
+
+	item_application.application_ref.application = NULL;
+	item_application.item_ref.item = NULL;
 
 	while (NULL != (row = DBfetch(result)))
 	{
