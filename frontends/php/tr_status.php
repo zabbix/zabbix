@@ -293,7 +293,7 @@ $triggerTable->setHeader(array(
 	make_sorting_header(_('Last change'), 'lastchange', $sortField, $sortOrder),
 	_('Age'),
 	$showEventColumn ? _('Duration') : null,
-	$config['event_ack_enable'] ? _('Acknowledged') : null,
+	$config['event_ack_enable'] ? _('Ack') : null,
 	_('Host'),
 	make_sorting_header(_('Name'), 'description', $sortField, $sortOrder),
 	_('Description')
@@ -651,23 +651,23 @@ foreach ($triggers as $trigger) {
 			if ($trigger['event_count']) {
 				$ackColumn = new CCol(array(
 					new CLink(
-						_('Acknowledge'),
+						_('No'),
 						'acknow.php?'.
 							'triggers[]='.$trigger['triggerid'].
 							'&backurl='.$page['file'],
-						'on'
-					), ' ('.$trigger['event_count'].')'
+						'red link-dotted'
+					), CViewHelper::showNum($trigger['event_count'])
 				));
 			}
 			else {
 				$ackColumn = new CCol(
 					new CLink(
-						_('Acknowledged'),
+						_('Yes'),
 						'acknow.php?'.
 							'eventid='.$trigger['lastEvent']['eventid'].
 							'&triggerid='.$trigger['lastEvent']['objectid'].
 							'&backurl='.$page['file'],
-						'off'
+						'green link-dotted'
 				));
 			}
 		}
