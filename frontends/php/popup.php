@@ -559,7 +559,7 @@ if ($srctbl == 'usrgrp') {
 	order_result($userGroups, 'name');
 
 	foreach ($userGroups as $userGroup) {
-		$name = new CSpan($userGroup['name'], 'link');
+		$name = new CLink($userGroup['name'], 'javascript:void(0);', null, null, true);
 		$name->attr('id', 'spanid'.$userGroup['usrgrpid']);
 
 		if ($multiselect) {
@@ -618,7 +618,7 @@ elseif ($srctbl == 'users') {
 	order_result($users, 'alias');
 
 	foreach ($users as &$user) {
-		$alias = new CSpan($user['alias'], 'link');
+		$alias = new CLink($user['alias'], 'javascript:void(0);', null, null, true);
 		$alias->attr('id', 'spanid'.$user['userid']);
 
 		if (isset($srcfld2) && $srcfld2 == 'fullname') {
@@ -690,7 +690,7 @@ elseif ($srctbl == 'templates') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($templates as &$template) {
-		$name = new CSpan($template['name'], 'link');
+		$name = new CLink($template['name'], 'javascript:void(0);', null, null, true);
 		$name->attr('id', 'spanid'.$template['templateid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).', '.
@@ -765,7 +765,7 @@ elseif ($srctbl == 'hosts') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($hosts as &$host) {
-		$name = new CSpan($host['name'], 'link');
+		$name = new CLink($host['name'], 'javascript:void(0);', null, null, true);
 		$name->attr('id', 'spanid'.$host['hostid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
@@ -841,7 +841,7 @@ elseif ($srctbl == 'host_templates') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($hosts as &$host) {
-		$name = new CSpan($host['name'], 'link');
+		$name = new CLink($host['name'], 'javascript:void(0);', null, null, true);
 		$name->attr('id', 'spanid'.$host['hostid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
@@ -913,7 +913,7 @@ elseif ($srctbl == 'host_groups') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($hostgroups as &$hostgroup) {
-		$name = new CSpan($hostgroup['name'], 'link');
+		$name = new CLink($hostgroup['name'], 'javascript:void(0);', null, null, true);
 		$name->attr('id', 'spanid'.$hostgroup['groupid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($hostgroup['groupid']).', '.
@@ -1025,7 +1025,7 @@ elseif ($srctbl === 'triggers') {
 		$host = reset($trigger['hosts']);
 		$trigger['hostname'] = $host['name'];
 
-		$description = new CSpan($trigger['description'], 'link');
+		$description = new CLink($trigger['description'], 'javascript:void(0);', null, null, true);
 		$trigger['description'] = $trigger['hostname'].NAME_DELIMITER.$trigger['description'];
 
 		if ($multiselect) {
@@ -1263,7 +1263,7 @@ elseif ($srctbl == 'applications') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($apps as &$app) {
-		$name = new CSpan($app['name'], 'link');
+		$name = new CLink($app['name'], 'javascript:void(0);', null, null, true);
 		$name->attr('id', 'spanid'.$app['applicationid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($app['applicationid']).', '.
