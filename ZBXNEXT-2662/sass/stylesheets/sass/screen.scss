@@ -619,8 +619,42 @@ footer {
 }
 
 /* Filters */
-.filter-container {
+.filter-btn-container {
 	text-align: center;
+}
+
+.filter-container {
+	padding: 10px 0;
+	margin: 0 0 10px 0;
+	background: $white;
+	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	text-align: center;
+
+	.table {
+		border-bottom: 1px solid $lightest-blue-grey;
+	}
+
+	.filter-forms {
+		padding: 0 10px 10px 10px;
+	}
+
+	.list-table {
+		@include box-shadow(none);
+		text-align: left;
+
+		thead {
+
+			th {
+				font-size: $font-form-size;
+				text-transform: none;
+				text-rendering: auto;
+				letter-spacing: normal;
+				color: initial;
+				padding: 8px 5px 5px 5px;
+				border-bottom-width: 1px;
+			}
+		}
+	}
 }
 
 .subfilter-enabled {
@@ -647,7 +681,6 @@ footer {
 	.cell {
 		text-align: left;
 		padding: 0 20px;
-		border-right: 1px solid #e9edf2;
 
 		&:first-child {
 			padding-left: 0;
@@ -665,7 +698,7 @@ footer {
 	}
 
 	button {
-		margin: 0 7px;
+		margin: 15px 7px 0 7px;
 	}
 
 	.multiselect {
@@ -938,12 +971,8 @@ footer {
 /* Forms */
 .table-forms-container {
 	padding: 10px;
-	background: $white;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-
-	//.filter-forms {
-	//	padding: 20px 0 0 0;
-	//}
+	text-align: left;
+	@extend .filter-container;
 }
 
 .form-btns {
@@ -1522,6 +1551,7 @@ button {
 	&.filter-trigger {
 		position: relative;
 		@include border-radius(2px 2px 0 0);
+		padding-right: 21px;
 		min-width: 94px;
 
 		&.filter-active {
