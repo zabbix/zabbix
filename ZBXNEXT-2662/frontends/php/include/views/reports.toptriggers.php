@@ -31,19 +31,8 @@ $filterForm->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter'][
 $filterColumn1 = new CFormList();
 $filterColumn2 = new CFormList();
 
-$periodTable = new CTable();
-
-$periodTable->addRow(array(
-	_('From'),
-	createDateSelector('filter_from', $this->data['filter']['filter_from']))
-);
-
-$periodTable->addRow(array(
-	_('Till'),
-	createDateSelector('filter_till', $this->data['filter']['filter_till']))
-);
-
-$filterColumn2->addRow(_('Period'), $periodTable);
+$filterColumn2->addRow(_('From'), createDateSelector('filter_from', $this->data['filter']['filter_from']));
+$filterColumn2->addRow(_('Till'), createDateSelector('filter_till', $this->data['filter']['filter_till']));
 $filterColumn2->addRow(null,
 	array(
 		new CButton(null, _('Today'), 'javascript: setPeriod('.REPORT_PERIOD_TODAY.');', 'link_menu'),

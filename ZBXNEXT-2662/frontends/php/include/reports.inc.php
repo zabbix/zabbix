@@ -65,17 +65,8 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 		TIMEPERIOD_TYPE_YEARLY => _('Yearly')
 	)));
 
-	$reporttimetab = new CTable(null, 'calendar');
-
-	$timeSinceRow = createDateSelector('report_timesince', $report_timesince, 'report_timetill');
-	array_unshift($timeSinceRow, _('From'));
-	$reporttimetab->addRow($timeSinceRow);
-
-	$timeTillRow = createDateSelector('report_timetill', $report_timetill, 'report_timesince');
-	array_unshift($timeTillRow, _('Till'));
-	$reporttimetab->addRow($timeTillRow);
-
-	$reportForm->addRow(_('Period'), $reporttimetab);
+	$reportForm->addRow(_('From'), createDateSelector('report_timesince', $report_timesince, 'report_timetill'));
+	$reportForm->addRow(_('Till'), createDateSelector('report_timetill', $report_timetill, 'report_timesince'));
 
 	if ($items) {
 		$items = CMacrosResolverHelper::resolveItemNames($items);
@@ -367,17 +358,8 @@ function valueComparisonFormForMultiplePeriods() {
 		array(_('Other hosts | Group').SPACE, $cmbGroups)
 	));
 
-	$reporttimetab = new CTable(null,'calendar');
-
-	$timeSinceRow = createDateSelector('report_timesince', $report_timesince, 'report_timetill');
-	array_unshift($timeSinceRow, _('From'));
-	$reporttimetab->addRow($timeSinceRow);
-
-	$timeTillRow = createDateSelector('report_timetill', $report_timetill, 'report_timesince');
-	array_unshift($timeTillRow, _('Till'));
-	$reporttimetab->addRow($timeTillRow);
-
-	$reportForm->addRow(_('Period'), $reporttimetab);
+	$reportForm->addRow(_('From'), createDateSelector('report_timesince', $report_timesince, 'report_timetill'));
+	$reportForm->addRow(_('Till'), createDateSelector('report_timetill', $report_timetill, 'report_timesince'));
 
 	$reportForm->addRow(_('Scale'), new CComboBox('scaletype', $scaletype, null, array(
 		TIMEPERIOD_TYPE_HOURLY => _('Hourly'),

@@ -366,16 +366,8 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	}
 
 	// filter period
-	$timeSinceRow = createDateSelector('filter_timesince', $_REQUEST['filter_timesince'], 'filter_timetill');
-	array_unshift($timeSinceRow, _('From'));
-	$timeTillRow = createDateSelector('filter_timetill', $_REQUEST['filter_timetill'], 'filter_timesince');
-	array_unshift($timeTillRow, _('Till'));
-
-	$filterPeriodTable = new CTable(null, 'calendar');
-	$filterPeriodTable->addRow($timeSinceRow);
-	$filterPeriodTable->addRow($timeTillRow);
-
-	$filterColumn2->addRow(_('Period'), $filterPeriodTable);
+	$filterColumn2->addRow(_('From'), createDateSelector('filter_timesince', $_REQUEST['filter_timesince'], 'filter_timetill'));
+	$filterColumn2->addRow(_('To'), createDateSelector('filter_timetill', $_REQUEST['filter_timetill'], 'filter_timesince'));
 
 	$filterForm->addColumn($filterColumn1);
 	$filterForm->addColumn($filterColumn2);
