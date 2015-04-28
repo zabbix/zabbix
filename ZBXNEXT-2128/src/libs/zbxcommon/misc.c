@@ -1452,8 +1452,7 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
  *           !!! Don't forget to sync code with PHP !!!                       *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *flex_intervals, time_t now,
-		int lastclock)
+int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *flex_intervals, time_t now)
 {
 	int	nextcheck = 0;
 
@@ -1481,7 +1480,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const 
 					&flex_offset, &errmsg))
 			{
 				flex_intervals = flex;
-				scheduled_check = scheduler_get_nextcheck(interval, (now == lastclock ? now + 1 : now));
+				scheduled_check = scheduler_get_nextcheck(interval, now + 1);
 				scheduler_interval_free(interval);
 			}
 			else
