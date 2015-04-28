@@ -50,7 +50,7 @@ if (!$service) {
 }
 
 $widget = new CWidget();
-$widget->setTitle(_('IT SERVICES AVAILABILITY REPORT').':'.SPACE.$service['name']);
+$widget->setTitle(_('IT services availability report').':'.SPACE.$service['name']);
 
 $controls = new CList();
 
