@@ -628,7 +628,6 @@ footer {
 	margin: 0 0 10px 0;
 	background: $white;
 	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-	text-align: center;
 
 	.table {
 		border-bottom: 1px solid $lightest-blue-grey;
@@ -639,8 +638,8 @@ footer {
 	}
 
 	.list-table {
+		margin-bottom: -10px;
 		@include box-shadow(none);
-		text-align: left;
 
 		thead {
 
