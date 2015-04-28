@@ -118,10 +118,11 @@ $itemFormList->addRow(_('Security name'),
 );
 
 // append snmpv3 security level to form list
-$securityLevelComboBox = new CComboBox('snmpv3_securitylevel', $this->data['snmpv3_securitylevel']);
-$securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'noAuthNoPriv');
-$securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'authNoPriv');
-$securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'authPriv');
+$securityLevelComboBox = new CComboBox('snmpv3_securitylevel', $this->data['snmpv3_securitylevel'], null, array(
+	ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
+	ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
+	ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
+));
 $itemFormList->addRow(_('Security level'), $securityLevelComboBox, false, 'row_snmpv3_securitylevel');
 $authProtocolRadioButton = array(
 	new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5, null, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_MD5),
@@ -160,9 +161,10 @@ $itemFormList->addRow(_('IPMI sensor'),
 );
 
 // append authentication method to form list
-$authTypeComboBox = new CComboBox('authtype', $this->data['authtype']);
-$authTypeComboBox->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
-$authTypeComboBox->addItem(ITEM_AUTHTYPE_PUBLICKEY, _('Public key'));
+$authTypeComboBox = new CComboBox('authtype', $this->data['authtype'], null, array(
+	ITEM_AUTHTYPE_PASSWORD => _('Password'),
+	ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+));
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, false, 'row_authtype');
 $itemFormList->addRow(_('User name'),
 	new CTextBox('username', $this->data['username'], ZBX_TEXTBOX_SMALL_SIZE, false, 64), false, 'row_username'

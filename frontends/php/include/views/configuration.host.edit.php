@@ -438,10 +438,10 @@ if (!$isDiscovered) {
 	$proxyControl = new CComboBox('proxy_hostid', $proxyHostId);
 	$proxyControl->addItem(0, _('(no proxy)'));
 
-	$db_proxies = API::Proxy()->get(array('output' => API_OUTPUT_EXTEND));
-	order_result($db_proxies, 'host');
+	$proxies = API::Proxy()->get(array('output' => array('proxyid', 'host')));
+	order_result($proxies, 'host');
 
-	foreach ($db_proxies as $proxy) {
+	foreach ($proxies as $proxy) {
 		$proxyControl->addItem($proxy['proxyid'], $proxy['host']);
 	}
 }
@@ -811,15 +811,13 @@ $ipmiList = new CFormList('ipmilist');
 
 // normal hosts
 if (!$isDiscovered) {
-	$cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmiAuthtype);
-	$cmbIPMIAuthtype->addItems(ipmiAuthTypes());
+	$cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmiAuthtype, null, ipmiAuthTypes());
 	$cmbIPMIAuthtype->addClass('openView');
 	$cmbIPMIAuthtype->setAttribute('size', 7);
 	$cmbIPMIAuthtype->addStyle('width: 170px;');
 	$ipmiList->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype);
 
-	$cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmiPrivilege);
-	$cmbIPMIPrivilege->addItems(ipmiPrivileges());
+	$cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmiPrivilege, null, ipmiPrivileges());
 	$cmbIPMIPrivilege->addClass('openView');
 	$cmbIPMIPrivilege->setAttribute('size', 5);
 	$cmbIPMIPrivilege->addStyle('width: 170px;');
