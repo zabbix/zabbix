@@ -261,11 +261,16 @@ abstract class CItemGeneral extends CApiService {
 				$item['data_type'] = 0;
 			}
 
-			// set trends to zero for non-numeric item types
-			if ((array_key_exists('value_type', $item)
-					&& !in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)))
-					|| !in_array($fullItem['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))) {
-				$item['trends'] = 0;
+			if (array_key_exists('value_type', $item)) {
+				if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+					if (!array_key_exists('trends', $item)) {
+						$item['trends'] = DAY_IN_YEAR;
+					}
+				}
+				else {
+					// For non-numeric types, which ever value was entered in trends field, is overwritten to zero.
+					$item['trends'] = 0;
+				}
 			}
 
 			// check if the item requires an interface
