@@ -68,7 +68,7 @@ class CXmlValidatorGeneral {
 			if (!array_key_exists('check_unexpected', $rules) || $rules['check_unexpected']) {
 				foreach ($data as $tag => $value) {
 					if (!array_key_exists($tag, $rules['rules'])) {
-						throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path,
+						throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
 							_s('unexpected tag "%1$s"', $tag)
 						));
 					}
@@ -82,7 +82,7 @@ class CXmlValidatorGeneral {
 					$this->validateData($rule, $data[$tag], $subpath);
 				}
 				elseif ($rule['type'] & self::XML_REQUIRED) {
-					throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path,
+					throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
 						_s('the tag "%1$s" is missing', $tag)
 					));
 				}
@@ -97,7 +97,7 @@ class CXmlValidatorGeneral {
 			if (array_key_exists('extra', $rules)) {
 				if (!array_key_exists($rules['extra'], $data)
 						&& ($rules['rules'][$rules['extra']]['type'] & self::XML_REQUIRED)) {
-					throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path,
+					throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
 						_s('the tag "%1$s" is missing', $rules['extra'])
 					));
 				}
@@ -111,7 +111,7 @@ class CXmlValidatorGeneral {
 				}
 
 				if ($tag !== $prefix.($index == 0 ? '' : $index)) {
-					throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path,
+					throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
 						_s('unexpected tag "%1$s"', $tag)
 					));
 				}
@@ -137,7 +137,7 @@ class CXmlValidatorGeneral {
 	 */
 	private function validateString($value, $path) {
 		if (!is_string($value)) {
-			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, _('a character string is expected')));
+			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('a character string is expected')));
 		}
 	}
 
@@ -151,7 +151,7 @@ class CXmlValidatorGeneral {
 	 */
 	private function validateArray($value, $path) {
 		if (!is_array($value)) {
-			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, _('an array is expected')));
+			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('an array is expected')));
 		}
 	}
 }

@@ -262,7 +262,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 	 */
 	protected function validateDate($date, $path) {
 		if (!preg_match('/^(0[1-9]|[1-2][0-9]|3[01])\.(0[1-9]|1[0-2])\.[0-9]{2}$/', $date)) {
-			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('DD.MM.YY', 'XML date format'))));
+			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('DD.MM.YY', 'XML date format'))));
 		}
 	}
 
@@ -276,7 +276,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 	 */
 	protected function validateTime($time, $path) {
 		if (!preg_match('/^(2[0-3]|[01][0-9])\.[0-5][0-9]$/', $time)) {
-			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('hh.mm', 'XML time format'))));
+			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('hh.mm', 'XML time format'))));
 		}
 	}
 }
