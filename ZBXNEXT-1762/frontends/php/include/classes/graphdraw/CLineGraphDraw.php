@@ -1285,10 +1285,9 @@ class CLineGraphDraw extends CGraphDraw {
 			array('main' => SEC_PER_WEEK, 'sub' => SEC_PER_DAY),			// 1 week and 1 day
 			array('main' => SEC_PER_TWO_WEEK, 'sub' => SEC_PER_WEEK),		// 2 weeks and 1 week
 			array('main' => SEC_PER_MONTH, 'sub' => SEC_PER_HALF_MONTH),	// 30 days and 15 days
-			array('main' => SEC_PER_QUARTER, 'sub' => SEC_PER_MONTH),		// 90 days and 30 days
 			array('main' => SEC_PER_HALF_YEAR, 'sub' => SEC_PER_MONTH),		// half year and 30 days
 			array('main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH),			// 1 year and 30 days
-			array('main' => SEC_PER_YEAR, 'sub' => SEC_PER_QUARTER),		// 1 year and 90 days
+			array('main' => SEC_PER_YEAR, 'sub' => SEC_PER_HALF_YEAR),		// 1 year and 90 days
 			array('main' => SEC_PER_FIVE_YEARS, 'sub' => SEC_PER_YEAR)		// 5 years and 1 year
 		);
 
@@ -1387,60 +1386,106 @@ class CLineGraphDraw extends CGraphDraw {
 		$mainInterval = $this->grid['horizontal']['main']['interval'];
 		$mainIntervalX = $this->grid['horizontal']['main']['intervalx'];
 		$mainOffset = $this->grid['horizontal']['main']['offset'];
+		$start = $this->grid['horizontal']['sub']['start'];
 
 		if ($subInterval == $mainInterval) {
 			return;
 		}
 
-		$elementSize = imageTextSize(7, 90, 'WWW');
-		for ($i = $this->grid['horizontal']['sub']['start']; $i <= $this->grid['horizontal']['sub']['linecount']; $i++) {
+		$element_size = imageTextSize(7, 90, 'WWW');
+		$position = 0;
 
-			$newTime = $this->from_time + $i * $subInterval + $subOffset;
+		for ($i = $start; $i <= $this->grid['horizontal']['sub']['linecount']; $i++) {
+			$previous_time = isset($new_time) ? $new_time : $this->stime;
 
-			if ($subInterval == SEC_PER_MONTH || $subInterval == SEC_PER_QUARTER) {
-				$newTime = mktime(0, 0, 0, date('m', $newTime), 1, date('Y', $newTime));
+			if ($subInterval == SEC_PER_YEAR) {
+				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 			}
-			$position = $i * $subIntervalX + $this->grid['horizontal']['sub']['offsetx'];
-
-			// dayLightSave
-			if ($subInterval > SEC_PER_HOUR && $subInterval < SEC_PER_HALF_MONTH) {
-				$tz = date('Z', $this->from_time) - date('Z', $newTime);
-				$newTime += $tz;
-			}
-
-			if (date('H', $newTime) == 0) {
-				if (date('d', $newTime) == 1 && date('m', $newTime) == 1 && date('i', $newTime) == 0) {
-					$format = YEAR_FORMAT;
-				}
-				elseif (date('i', $newTime) == 0) {
-					$format = _('m-d');
+			elseif ($subInterval == SEC_PER_HALF_YEAR) {
+				if ($i == $start) {
+					if (date('m', $this->stime) > 7) {
+						$new_time = mktime(0, 0, 0, date('m', $previous_time), 1, date('Y', $previous_time) + 1);
+					}
+					else {
+						$new_time = mktime(0, 0, 0, 7, 1, date('Y', $previous_time));
+					}
 				}
 				else {
-					$format = _('d.m H:i');
+					if (date('m', $previous_time) == 1) {
+						$new_time = mktime(0, 0, 0, 7, 1, date('Y', $previous_time));
+					}
+					else {
+						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
+					}
 				}
+			}
+			elseif ($subInterval == SEC_PER_MONTH) {
+				$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
+			}
+			elseif ($subInterval == SEC_PER_HALF_MONTH) {
+				if ($i == $start) {
+					if (date('d', $this->stime) > 15) {
+						$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
+					}
+					else {
+						$new_time = mktime(0, 0, 0, date('m', $previous_time), 15, date('Y', $previous_time));
+					}
+				}
+				else {
+					if (date('d', $previous_time) == 1) {
+						$new_time = mktime(0, 0, 0, date('m', $previous_time), 15, date('Y', $previous_time));
+					}
+					else {
+						$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
+					}
+				}
+			}
+			else {
+				$new_time = $this->from_time + $i * $subInterval + $subOffset;
+			}
+
+			$timeInterval = $new_time - $previous_time;
+
+			$timeIntervalX = (($timeInterval) * $this->sizeX) / $this->period;
+
+			$position += $timeIntervalX;
+
+			if ($i == $start && $position < $element_size['width']) {
+				continue;
+			}
+
+			if (date('d', $new_time) == 1 && date('m', $new_time) == 1 && date('H', $new_time) == 0
+					&& date('i', $new_time) == 0) {
+				$format = YEAR_FORMAT;
+			}
+			elseif (date('d', $new_time) == 1 && date('H', $new_time) == 0 && date('i', $new_time) == 0
+					&& ($subInterval == SEC_PER_MONTH || SEC_PER_HALF_YEAR)) {
+				$format = _('M');
+			}
+			elseif (date('H', $new_time) == 0 && date('i', $new_time) == 0) {
+				$format = _('m-d');
 			}
 			else {
 				$format = TIME_FORMAT;
 			}
 
 			// main interval checks
-			if (($subInterval > SEC_PER_DAY && ($i * $subInterval % $mainInterval + $subOffset) == $mainOffset)
-					|| ($subInterval < SEC_PER_HOUR && date('i', $newTime) == 0)
-					|| ($subInterval == SEC_PER_DAY && date('N', $newTime) == 7)
-					|| ($subInterval >= SEC_PER_HOUR && date('H', $newTime) == '00' && $subInterval < SEC_PER_DAY)
-					|| $format === YEAR_FORMAT) {
-				$this->drawMainPeriod($newTime, $format, $position);
+			if (($subInterval < SEC_PER_HOUR && date('i', $new_time) == 0)
+					|| ($subInterval == SEC_PER_DAY && date('N', $new_time) == 7)
+					|| ($subInterval >= SEC_PER_HOUR && date('H', $new_time) == '00' && $subInterval < SEC_PER_DAY)
+					|| ($format === YEAR_FORMAT && $subInterval != SEC_PER_YEAR)) {
+				$this->drawMainPeriod($new_time, $format, $position);
 				continue;
 			}
 
 			if ($mainIntervalX < floor(($mainInterval / $subInterval) * $subIntervalX)) {
 				continue;
 			}
-			elseif ($mainIntervalX < (ceil($mainInterval / $subInterval + 1) * $elementSize['width'])) {
+			elseif ($mainIntervalX < (ceil($mainInterval / $subInterval + 1) * $element_size['width'])) {
 				continue;
 			}
 
-			$this->drawSubPeriod($newTime, $format, $position);
+			$this->drawSubPeriod($new_time, $format, $position);
 		}
 	}
 
