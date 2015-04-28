@@ -655,8 +655,7 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOST 
 
 	if (ITEM_STATE_NOTSUPPORTED == item->state)
 	{
-		nextcheck = calculate_item_nextcheck(seed, item->type, config->config->refresh_unsupported, NULL, now,
-				item->lastclock);
+		nextcheck = calculate_item_nextcheck(seed, item->type, config->config->refresh_unsupported, NULL, now);
 	}
 	else
 	{
@@ -666,7 +665,7 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOST 
 		flexitem = zbx_hashset_search(&config->flexitems, &item->itemid);
 		delay_flex = (NULL != flexitem ? flexitem->delay_flex : NULL);
 
-		nextcheck = calculate_item_nextcheck(seed, item->type, item->delay, delay_flex, now, item->lastclock);
+		nextcheck = calculate_item_nextcheck(seed, item->type, item->delay, delay_flex, now);
 	}
 
 	if (NULL != proxy)
@@ -1978,13 +1977,13 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 				{
 					item->nextcheck = calculate_item_nextcheck(seed, type,
 							config->config->refresh_unsupported, NULL,
-							now - proxy_timediff, item->lastclock);
+							now - proxy_timediff);
 					item->nextcheck += proxy_timediff + (NULL != proxy);
 				}
 				else
 				{
 					item->nextcheck = calculate_item_nextcheck(seed, type, delay, row[16],
-							now - proxy_timediff, item->lastclock);
+							now - proxy_timediff);
 					item->nextcheck += proxy_timediff + (NULL != proxy);
 				}
 			}
