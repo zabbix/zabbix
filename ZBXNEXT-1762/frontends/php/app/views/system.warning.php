@@ -19,7 +19,7 @@
 **/
 
 
-$pageHeader = new CPageHeader(_('Something wrong hapenned'));
+$pageHeader = new CPageHeader(_('Something wrong happened'));
 $pageHeader->addCssInit();
 $pageHeader->display();
 
