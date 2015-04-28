@@ -732,7 +732,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 			$name = new CSpan($host['name'], 'link_menu');
 			$name->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
 
-			$tableRow = array(new CCol($name));
+			$tableRow = array(new CCol($name, 'nowrap'));
 			foreach ($items as $ithosts) {
 				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
 			}
