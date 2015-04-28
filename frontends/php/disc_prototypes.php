@@ -391,6 +391,10 @@ else {
 		if (!in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))) {
 			$item['trends'] = '';
 		}
+
+		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
+			$item['delay'] = '';
+		}
 	}
 	unset($item);
 
