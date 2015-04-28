@@ -224,7 +224,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 						'screenitems' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'screenitem', 'rules' => array(
 							'screenitem' =>				array('type' => self::XML_ARRAY, 'rules' => array(
 								'resourcetype' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* TYPE: mixed */				'resourceid' =>				array('type' => self::XML_REQUIRED),
+								'resourceid' =>				array('type' => self::XML_REQUIRED),
 								'width' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'height' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'x' =>						array('type' => self::XML_STRING | self::XML_REQUIRED),

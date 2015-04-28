@@ -579,7 +579,7 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 								'screen_items' =>			array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => array(
 									'screen_item' =>			array('type' => self::XML_ARRAY, 'rules' => array(
 										'resourcetype' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* TYPE: mixed */						'resource' =>				array('type' => self::XML_REQUIRED),
+										'resource' =>				array('type' => self::XML_REQUIRED),
 										'width' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 										'height' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 										'x' =>						array('type' => self::XML_STRING | self::XML_REQUIRED),
@@ -660,7 +660,7 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 						'screen_items' =>			array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => array(
 							'screen_item' =>			array('type' => self::XML_ARRAY, 'rules' => array(
 								'resourcetype' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* TYPE: mixed */				'resource' =>				array('type' => self::XML_REQUIRED),
+								'resource' =>				array('type' => self::XML_REQUIRED),
 								'width' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'height' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'x' =>						array('type' => self::XML_STRING | self::XML_REQUIRED),
