@@ -30,7 +30,7 @@ define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
 
 define('ZBX_MIN_PERIOD',		3600); // 1 hour
-define('ZBX_MAX_PERIOD',		963072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
+define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
 
@@ -911,7 +911,6 @@ define('SEC_PER_WEEK',			604800);	// 7 * SEC_PER_DAY
 define('SEC_PER_TWO_WEEK',		1209600);	// 14 * SEC_PER_DAY
 define('SEC_PER_HALF_MONTH',	1296000);	// 15 * SEC_PER_DAY
 define('SEC_PER_MONTH',			2592000);	// 30 * SEC_PER_DAY
-define('SEC_PER_QUARTER',		7776000);	// 90 * SEC_PER_DAY
 define('SEC_PER_HALF_YEAR',		15552000);	// 180 * SEC_PER_DAY
 define('SEC_PER_YEAR',			31536000);	// 365 * SEC_PER_DAY
 define('SEC_PER_FIVE_YEARS',	157680000);	// 365 * 5 * SEC_PER_DAY
