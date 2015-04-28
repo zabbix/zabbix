@@ -869,17 +869,20 @@ function getItemFilterForm(&$items) {
 
 		// interval
 		if (zbx_empty($filter_delay) && $filter_type != ITEM_TYPE_TRAPPER) {
-			if (!isset($item_params['interval'][$item['delay']])) {
+			if (!isset($item_params['interval'][$item['delay']]) && $item['delay'] !== '') {
 				$item_params['interval'][$item['delay']] = array('name' => $item['delay'], 'count' => 0);
 			}
+
 			$show_item = true;
+
 			foreach ($item['subfilters'] as $name => $value) {
-				if ($name == 'subfilter_interval') {
+				if ($name === 'subfilter_interval') {
 					continue;
 				}
 				$show_item &= $value;
 			}
-			if ($show_item) {
+
+			if ($show_item && $item['delay'] !== '') {
 				$item_params['interval'][$item['delay']]['count']++;
 			}
 		}

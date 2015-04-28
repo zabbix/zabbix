@@ -260,7 +260,7 @@ foreach ($this->data['items'] as $item) {
 		$description,
 		$triggerInfo,
 		CHtml::encode($item['key_']),
-		$item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP ? '' : $item['delay'],
+		$item['delay'],
 		$item['history'],
 		$item['trends'],
 		item_type2str($item['type']),

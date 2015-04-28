@@ -1103,9 +1103,36 @@ else {
 			&& $_REQUEST['filter_data_type'] != -1) {
 		$options['filter']['data_type'] = $_REQUEST['filter_data_type'];
 	}
-	if (isset($_REQUEST['filter_delay']) && !zbx_empty($_REQUEST['filter_delay'])) {
-		$options['filter']['delay'] = $_REQUEST['filter_delay'];
+
+	/*
+	 * Trapper and SNMP trap items contain zeroes in "delay" field and, if no specific type is set, look in item types
+	 * other than tapper and SNMP trap that allow zeroes. For example, when a flexible interval is used. Since trapper
+	 * and SNMP items contain zeroes, but those zeroes should not be displayed, they cannot be filtered by entering
+	 * either zero or any other number in filter field.
+	 */
+	if (hasRequest('filter_delay')) {
+		$filter_delay = getRequest('filter_delay');
+		$filter_type = getRequest('filter_type');
+
+		if ($filter_delay !== '') {
+			if ($filter_type == -1 && $filter_delay == 0) {
+				$options['filter']['type'] = array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_SIMPLE,
+					ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE,
+					ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
+					ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX
+				);
+
+				$options['filter']['delay'] = $filter_delay;
+			}
+			elseif (($filter_type == ITEM_TYPE_TRAPPER || $filter_type == ITEM_TYPE_SNMPTRAP) && $filter_delay >= 0) {
+				$options['filter']['delay'] = -1;
+			}
+			else {
+				$options['filter']['delay'] = $filter_delay;
+			}
+		}
 	}
+
 	if (isset($_REQUEST['filter_history']) && !zbx_empty($_REQUEST['filter_history'])) {
 		$options['filter']['history'] = $_REQUEST['filter_history'];
 	}
@@ -1186,6 +1213,10 @@ else {
 				$item['trends'] = '';
 			}
 
+			if (in_array($item['type'], array(ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP))) {
+				$item['delay'] = '';
+			}
+
 			$item['subfilters'] = array(
 				'subfilter_hosts' => empty($_REQUEST['subfilter_hosts'])
 					|| (boolean) array_intersect($_REQUEST['subfilter_hosts'], $item['hostids']),
@@ -1207,8 +1238,8 @@ else {
 					|| uint_in_array($item['history'], $_REQUEST['subfilter_history']),
 				'subfilter_trends' => !getRequest('subfilter_trends')
 					|| ($item['trends'] !== '' && uint_in_array($item['trends'], getRequest('subfilter_trends'))),
-				'subfilter_interval' => empty($_REQUEST['subfilter_interval'])
-					|| uint_in_array($item['delay'], $_REQUEST['subfilter_interval']),
+				'subfilter_interval' => !getRequest('subfilter_interval')
+					|| ($item['delay'] !== '' && uint_in_array($item['delay'], getRequest('subfilter_interval'))),
 				'subfilter_apps' => empty($_REQUEST['subfilter_apps'])
 			);
 
