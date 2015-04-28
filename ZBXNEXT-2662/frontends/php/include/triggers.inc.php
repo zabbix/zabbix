@@ -1132,7 +1132,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 			$name = new CSpan($hostName, 'link_menu');
 			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
-			$columns = array($name);
+			$columns = array(new CCol($name, 'nowrap'));
 			foreach ($data as $triggerHosts) {
 				$columns[] = getTriggerOverviewCells(
 					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
