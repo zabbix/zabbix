@@ -36,9 +36,8 @@ class CXmlPreprocessor {
 	 * @param array $data
 	 */
 	public function transform(array $data) {
-		if (array_key_exists('zabbix_export', $data)
-				&& array_key_exists('version', $data['zabbix_export'])
-				&& is_string($data['zabbix_export']['version'])
+		if (array_key_exists('zabbix_export', $data) && is_array($data['zabbix_export'])
+				&& array_key_exists('version', $data['zabbix_export']) && is_string($data['zabbix_export']['version'])
 				&& array_key_exists($data['zabbix_export']['version'], $this->versionPreprocessors)) {
 
 			$data = $this->versionPreprocessors[$data['zabbix_export']['version']]->transform($data);

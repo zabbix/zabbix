@@ -25,8 +25,8 @@
 class C30XmlValidator extends CXmlValidatorGeneral {
 
 	public function __construct() {
-		parent::__construct(array(
-			'type' => self::XML_ARRAY, 'rules' => array(
+		parent::__construct(
+			array('type' => self::XML_ARRAY, 'rules' => array(
 				'version' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 				'date' =>					array('type' => self::XML_STRING, 'ex_validate' => array($this, 'validateDateTime')),
 				'groups' =>					array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => array(
@@ -784,8 +784,8 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 						))
 					))
 				))
-			)
-		));
+			))
+		);
 	}
 
 	/**
@@ -812,7 +812,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 	 */
 	protected function validateDateTime($date, $path) {
 		if (!preg_match('/^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])T(2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]Z$/', $date)) {
-			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', 'YYYY-MM-DDThh:mm:ssZ')));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
 		}
 	}
 }

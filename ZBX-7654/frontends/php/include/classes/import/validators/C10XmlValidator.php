@@ -25,8 +25,8 @@
 class C10XmlValidator extends CXmlValidatorGeneral {
 
 	public function __construct() {
-		parent::__construct(array(
-			'type' => self::XML_ARRAY, 'rules' => array(
+		parent::__construct(
+			array('type' => self::XML_ARRAY, 'rules' => array(
 				'version' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 				'date' =>					array('type' => self::XML_STRING, 'ex_validate' => array($this, 'validateDate')),
 				'time' =>					array('type' => self::XML_STRING, 'ex_validate' => array($this, 'validateTime')),
@@ -248,8 +248,8 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 						'encodedImage' =>			array('type' => self::XML_STRING | self::XML_REQUIRED)
 					))
 				))
-			)
-		));
+			))
+		);
 	}
 
 	/**
@@ -262,7 +262,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 	 */
 	protected function validateDate($date, $path) {
 		if (!preg_match('/^(0[1-9]|[1-2][0-9]|3[01])\.(0[1-9]|1[0-2])\.[0-9]{2}$/', $date)) {
-			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', 'DD.MM.YY')));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('DD.MM.YY', 'XML date format'))));
 		}
 	}
 
@@ -276,7 +276,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 	 */
 	protected function validateTime($time, $path) {
 		if (!preg_match('/^(2[0-3]|[01][0-9])\.[0-5][0-9]$/', $time)) {
-			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', 'hh.mm')));
+			throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('hh.mm', 'XML time format'))));
 		}
 	}
 }
