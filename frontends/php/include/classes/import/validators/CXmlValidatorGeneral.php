@@ -45,20 +45,19 @@ class CXmlValidatorGeneral {
 	 * @param string $path	XML path (for error reporting)
 	 */
 	public function validate(array $data, $path) {
-		$this->validateData($this->rules, $data, $path, true);
+		$this->validateData($this->rules, $data, $path);
 	}
 
 	/**
 	 * Base validation function.
 	 *
-	 * @param array  $rules				validation rules
-	 * @param mixed  $data				import data
-	 * @param string $path				XML path (for error reporting)
-	 * @param bool   $check_unexpected	force validation of unexpected tags (for arrays only)
+	 * @param array  $rules		validation rules
+	 * @param mixed  $data		import data
+	 * @param string $path		XML path (for error reporting)
 	 *
 	 * @throw Exception		if $data does not correspond to validation $rules
 	 */
-	public function validateData(array $rules, $data, $path, $check_unexpected) {
+	public function validateData(array $rules, $data, $path) {
 		if ($rules['type'] & self::XML_STRING) {
 			$this->validateString($data, $path);
 		}
@@ -66,7 +65,7 @@ class CXmlValidatorGeneral {
 			$this->validateArray($data, $path);
 
 			// unexpected tag validation
-			if ($check_unexpected) {
+			if (!array_key_exists('check_unexpected', $rules) || $rules['check_unexpected']) {
 				foreach ($data as $tag => $value) {
 					if (!array_key_exists($tag, $rules['rules'])) {
 						throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path,
@@ -79,7 +78,8 @@ class CXmlValidatorGeneral {
 			// validation of the values type
 			foreach ($rules['rules'] as $tag => $rule) {
 				if (array_key_exists($tag, $data)) {
-					$this->validateData($rule, $data[$tag], $path.'/'.$tag, true);
+					$subpath = ($path === '/' ? $path : $path.'/').$tag;
+					$this->validateData($rule, $data[$tag], $subpath);
 				}
 				elseif ($rule['type'] & self::XML_REQUIRED) {
 					throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path,
@@ -94,9 +94,19 @@ class CXmlValidatorGeneral {
 			$index = 0;
 			$prefix = $rules['prefix'];
 
+			if (array_key_exists('extra', $rules)) {
+				if (!array_key_exists($rules['extra'], $data)
+						&& ($rules['rules'][$rules['extra']]['type'] & self::XML_REQUIRED)) {
+					throw new Exception(_s('Cannot parse XML tag "%1$s": %2$s.', $path,
+						_s('the tag "%1$s" is missing', $rules['extra'])
+					));
+				}
+			}
+
 			foreach ($data as $tag => $value) {
 				if (array_key_exists('extra', $rules) && $rules['extra'] == $tag) {
-					$this->validateData($rules['rules'][$rules['extra']], $value, $path.'/'.$tag, false);
+					$subpath = ($path === '/' ? $path : $path.'/').$tag;
+					$this->validateData($rules['rules'][$rules['extra']], $value, $subpath);
 					continue;
 				}
 
@@ -107,7 +117,8 @@ class CXmlValidatorGeneral {
 				}
 
 				$index++;
-				$this->validateData($rules['rules'][$prefix], $value, $path.'/'.$prefix.'('.$index.')', true);
+				$subpath = ($path === '/' ? $path : $path.'/').$prefix.'('.$index.')';
+				$this->validateData($rules['rules'][$prefix], $value, $subpath);
 			}
 		}
 
