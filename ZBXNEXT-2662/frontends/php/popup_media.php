@@ -109,9 +109,14 @@ $active = getRequest('active', 0);
 $period = getRequest('period', ZBX_DEFAULT_INTERVAL);
 
 
-$frmMedia = new CFormTable(_('New media'));
-$frmMedia->addVar('media', $media);
-$frmMedia->addVar('dstfrm', $_REQUEST['dstfrm']);
+$widget = new CWidget();
+$widget->setTitle(_('New media'));
+
+$form = new CForm();
+$form->addVar('media', $media);
+$form->addVar('dstfrm', $_REQUEST['dstfrm']);
+
+$frmMedia = new CFormList(_('New media'));
 
 $cmbType = new CComboBox('mediatypeid', $mediatypeid);
 
@@ -141,10 +146,18 @@ $cmbStat->addItem(0, _('Enabled'));
 $cmbStat->addItem(1, _('Disabled'));
 $frmMedia->addRow(_('Status'), $cmbStat);
 
-$frmMedia->addItemToBottomRow(array(
+$mediaTab = new CTabView();
+$mediaTab->addTab('mediaTab', _('Media'), $frmMedia);
+
+$mediaTab->setFooter(makeFormFooter(
 	new CSubmit('add', ($media > -1) ? _('Update') : _('Add')),
-	new CButtonCancel(null, 'close_window();')
+	array(
+		new CButtonCancel(null, 'close_window();')
+	)
 ));
-$frmMedia->Show();
+
+$form->addItem($mediaTab);
+$widget->addItem($form);
+$widget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
