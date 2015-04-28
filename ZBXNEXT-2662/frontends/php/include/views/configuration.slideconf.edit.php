@@ -45,11 +45,11 @@ $slideTable = new CTableInfo();
 $slideTable->setAttribute('style', 'min-width: 312px;');
 $slideTable->setAttribute('id', 'slideTable');
 $slideTable->setHeader(array(
-	new CCol(SPACE, null, null, '15'),
-	new CCol(SPACE, null, null, '15'),
+	new CColHeader(SPACE, null, null, '15'),
+	new CColHeader(SPACE, null, null, '15'),
 	_('Screen'),
-	new CCol(_('Delay'), null, null, '70'),
-	new CCol(_('Action'), null, null, '50')
+	new CColHeader(_('Delay'), null, null, '70'),
+	new CColHeader(_('Action'), null, null, '50')
 ));
 
 $i = 1;
@@ -70,7 +70,7 @@ foreach ($this->data['slides'] as $key => $slides) {
 
 	$row = new CRow(
 		array(
-			new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
+			new CCol(new CDiv(null, 'drag-icon'), 'td-drag-icon'),
 			new CSpan($i++.':', 'rowNum', 'current_slide_'.$key),
 			$name,
 			$delay,
