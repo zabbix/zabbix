@@ -1459,10 +1459,10 @@ class CLineGraphDraw extends CGraphDraw {
 				$format = YEAR_FORMAT;
 			}
 			elseif (date('d', $new_time) == 1 && date('H', $new_time) == 0 && date('i', $new_time) == 0
-					&& ($subInterval == SEC_PER_MONTH || SEC_PER_HALF_YEAR)) {
+					&& ($subInterval == SEC_PER_MONTH || $subInterval == SEC_PER_HALF_YEAR)) {
 				$format = _('M');
 			}
-			elseif (date('H', $new_time) == 0 && date('i', $new_time) == 0) {
+			elseif ((date('H', $new_time) == 0 && date('i', $new_time) == 0) || $subInterval > SEC_PER_TWELVE_HOUR) {
 				$format = _('m-d');
 			}
 			else {
