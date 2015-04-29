@@ -46,6 +46,12 @@ class C20XmlPreprocessor extends CXmlPreprocessorGeneral {
 			array('^zabbix_export$', '^templates$', '^template[0-9]*', '^items$', '^item[0-9]*',
 				'^(applications|valuemap)$'
 			),
+			array('^zabbix_export$', '^templates$', '^template[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
+				'^(item_prototypes|trigger_prototypes|graph_prototypes|host_prototypes)$'
+			),
+			array('^zabbix_export$', '^templates$', '^template[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
+				'^item_prototypes', '^item_prototype[0-9]*', '^(applications|valuemap)$'
+			),
 			array('^zabbix_export$', '^screens$', '^screen[0-9]*', '^screen_items$'),
 			array('^zabbix_export$', '^maps$', '^map[0-9]*', '^(background|urls|iconmap|selements|links)$'),
 			array('^zabbix_export$', '^maps$', '^map[0-9]*', '^selements$', '^selement[0-9]*',
