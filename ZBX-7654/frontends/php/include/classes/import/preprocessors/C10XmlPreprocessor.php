@@ -25,15 +25,15 @@
 class C10XmlPreprocessor extends CXmlPreprocessorGeneral {
 
 	public function __construct() {
-		parent::__construct(array(
-			array('^zabbix_export$', '^(hosts|dependencies|sysmaps|screens|images)$'),
-			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^(groups|triggers|items|templates|graphs|macros)$'),
-			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^items$', '^item[0-9]*', '^applications$'),
-			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^graphs$', '^graph[0-9]*', '^graph_elements$'),
-			array('^zabbix_export$', '^sysmaps$', '^sysmap[0-9]*', '^selements$'),
-			array('^zabbix_export$', '^sysmaps$', '^sysmap[0-9]*', '^links$'),
-			array('^zabbix_export$', '^sysmaps$', '^sysmap[0-9]*', '^links$', '^link[0-9]*', '^linktriggers$'),
-			array('^zabbix_export$', '^screens$', '^screen[0-9]*', '^screenitems$')
-		));
+		parent::__construct([
+			['^zabbix_export$', '^(hosts|dependencies|sysmaps|screens|images)$'],
+			['^zabbix_export$', '^hosts$', '^host[0-9]*', '^(groups|triggers|items|templates|graphs|macros)$'],
+			['^zabbix_export$', '^hosts$', '^host[0-9]*', '^items$', '^item[0-9]*', '^applications$'],
+			['^zabbix_export$', '^hosts$', '^host[0-9]*', '^graphs$', '^graph[0-9]*', '^graph_elements$'],
+			['^zabbix_export$', '^sysmaps$', '^sysmap[0-9]*', '^selements$'],
+			['^zabbix_export$', '^sysmaps$', '^sysmap[0-9]*', '^links$'],
+			['^zabbix_export$', '^sysmaps$', '^sysmap[0-9]*', '^links$', '^link[0-9]*', '^linktriggers$'],
+			['^zabbix_export$', '^screens$', '^screen[0-9]*', '^screenitems$']
+		]);
 	}
 }
