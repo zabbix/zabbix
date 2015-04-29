@@ -26,766 +26,766 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 
 	public function __construct() {
 		parent::__construct(
-			array('type' => self::XML_ARRAY, 'rules' => array(
-				'version' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-				'date' =>					array('type' => self::XML_STRING, 'ex_validate' => array($this, 'validateDateTime')),
-				'groups' =>					array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => array(
-					'group' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-						'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-					))
-				)),
-				'hosts' =>					array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'host', 'rules' => array(
-					'host' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-						'host' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'description' =>			array('type' => self::XML_STRING),
-						'proxy' =>					array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-							'name' =>					array('type' => self::XML_STRING)
-						)),
-						'status' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'ipmi_authtype' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'ipmi_privilege' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'ipmi_username' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'ipmi_password' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'templates' =>				array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => array(
-							'template' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-							))
-						)),
-						'groups' =>					array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group', 'rules' => array(
-							'group' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-							))
-						)),
-						'interfaces' =>				array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => array(
-							'interface' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-								'default' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'useip' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'ip' =>						array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'dns' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'bulk' =>					array('type' => self::XML_STRING),
-								'interface_ref' =>			array('type' => self::XML_STRING | self::XML_REQUIRED)
-							))
-						)),
-						'applications' =>			array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => array(
-							'application' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-							))
-						)),
-						'items' =>					array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'item', 'rules' => array(
-							'item' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmp_community' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'multiplier' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmp_oid' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'key' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'delay' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'history' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'trends' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'status' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'value_type' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'allowed_hosts' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'units' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'delta' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_contextname' =>		array('type' => self::XML_STRING),
-								'snmpv3_securityname' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_securitylevel' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_authprotocol' =>	array('type' => self::XML_STRING),
-								'snmpv3_authpassphrase' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_privprotocol' =>	array('type' => self::XML_STRING),
-								'snmpv3_privpassphrase' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'formula' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'delay_flex' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'params' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'ipmi_sensor' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'data_type' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'authtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'username' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'password' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'publickey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'privatekey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'inventory_link' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'applications' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => array(
-									'application' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-									))
-								)),
-								'valuemap' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-									'name' =>					array('type' => self::XML_STRING)
-								)),
-								'logtimefmt' =>				array('type' => self::XML_STRING),
-								'interface_ref' =>			array('type' => self::XML_STRING)
-							))
-						)),
-						'discovery_rules' =>		array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => array(
-							'discovery_rule' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmp_community' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmp_oid' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'key' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'delay' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'status' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'allowed_hosts' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_contextname' =>		array('type' => self::XML_STRING),
-								'snmpv3_securityname' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_securitylevel' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_authprotocol' =>	array('type' => self::XML_STRING),
-								'snmpv3_authpassphrase' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_privprotocol' =>	array('type' => self::XML_STRING),
-								'snmpv3_privpassphrase' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'delay_flex' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'params' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'ipmi_sensor' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'authtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'username' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'password' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'publickey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'privatekey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* TYPE (2.0 string) */			'filter' =>					array('type' => self::XML_REQUIRED),
-								'lifetime' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'interface_ref' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'item_prototypes' =>		array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'item_prototype', 'rules' => array(
-									'item_prototype' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'snmp_community' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'multiplier' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'snmp_oid' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'key' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'delay' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'history' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'trends' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'status' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'value_type' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'allowed_hosts' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'units' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'delta' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'snmpv3_contextname' =>		array('type' => self::XML_STRING),
-										'snmpv3_securityname' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'snmpv3_securitylevel' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'snmpv3_authprotocol' =>	array('type' => self::XML_STRING),
-										'snmpv3_authpassphrase' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'snmpv3_privprotocol' =>	array('type' => self::XML_STRING),
-										'snmpv3_privpassphrase' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'formula' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'delay_flex' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'params' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'ipmi_sensor' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'data_type' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'authtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'username' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'password' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'publickey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'privatekey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'inventory_link' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'applications' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => array(
-											'application' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-												'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-											))
-										)),
-										'valuemap' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-											'name' =>					array('type' => self::XML_STRING)
-										)),
-										'logtimefmt' =>				array('type' => self::XML_STRING),
-										'interface_ref' =>			array('type' => self::XML_STRING)
-									))
-								)),
-								'trigger_prototypes' =>		array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'trigger_prototype', 'rules' => array(
-									'trigger_prototype' =>		array('type' => self::XML_ARRAY, 'rules' => array(
-										'expression' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'url' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'status' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'priority' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-									))
-								)),
-								'graph_prototypes' =>		array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_prototype', 'rules' => array(
-									'graph_prototype' =>		array('type' => self::XML_ARRAY, 'rules' => array(
-										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'width' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'height' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'yaxismin' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'yaxismax' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'show_work_period' =>		array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'show_triggers' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'show_legend' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'show_3d' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'percent_left' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'percent_right' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'ymin_item_1' =>			array('type' => self::XML_REQUIRED),
-										'ymin_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'ymax_item_1' =>			array('type' => self::XML_REQUIRED),
-										'ymax_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'graph_items' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => array(
-											'graph_item' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-												'sortorder' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-												'drawtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-												'color' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-												'yaxisside' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-												'calc_fnc' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-												'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-												'item' =>					array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-													'host' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-													'key' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-												))
-											))
-										))
-									))
-								)),
-								'host_prototypes' =>		array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => array(
-									'host_prototype' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-										'host' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'status' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'group_links' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group_link', 'rules' => array(
-/* INDEXED_ARRAY ??? */						'group_link' =>				array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => array(
-												'group' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-													'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-												))
-											))
-										)),
-										'group_prototypes' =>		array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group_prototype', 'rules' => array(
-											'group_prototype' =>		array('type' => self::XML_ARRAY, 'rules' => array(
-												'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-											))
-										)),
-										'templates' =>				array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'template', 'rules' => array(
-											'template' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-												'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-											))
-										))
-									))
-								))
-							))
-						)),
-						'macros' =>					array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => array(
-							'macro' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-								'macro' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'value' =>				array('type' => self::XML_STRING | self::XML_REQUIRED)
-							))
-						)),
-						'inventory' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-							'inventory_mode' =>			array('type' => self::XML_STRING),
-							'type' =>					array('type' => self::XML_STRING),
-							'type_full' =>				array('type' => self::XML_STRING),
-							'name' =>					array('type' => self::XML_STRING),
-							'alias' =>					array('type' => self::XML_STRING),
-							'os' =>						array('type' => self::XML_STRING),
-							'os_full' =>				array('type' => self::XML_STRING),
-							'os_short' =>				array('type' => self::XML_STRING),
-							'serialno_a' =>				array('type' => self::XML_STRING),
-							'serialno_b' =>				array('type' => self::XML_STRING),
-							'tag' =>					array('type' => self::XML_STRING),
-							'asset_tag' =>				array('type' => self::XML_STRING),
-							'macaddress_a' =>			array('type' => self::XML_STRING),
-							'macaddress_b' =>			array('type' => self::XML_STRING),
-							'hardware' =>				array('type' => self::XML_STRING),
-							'hardware_full' =>			array('type' => self::XML_STRING),
-							'software' =>				array('type' => self::XML_STRING),
-							'software_full' =>			array('type' => self::XML_STRING),
-							'software_app_a' =>			array('type' => self::XML_STRING),
-							'software_app_b' =>			array('type' => self::XML_STRING),
-							'software_app_c' =>			array('type' => self::XML_STRING),
-							'software_app_d' =>			array('type' => self::XML_STRING),
-							'software_app_e' =>			array('type' => self::XML_STRING),
-							'contact' =>				array('type' => self::XML_STRING),
-							'location' =>				array('type' => self::XML_STRING),
-							'location_lat' =>			array('type' => self::XML_STRING),
-							'location_lon' =>			array('type' => self::XML_STRING),
-							'notes' =>					array('type' => self::XML_STRING),
-							'chassis' =>				array('type' => self::XML_STRING),
-							'model' =>					array('type' => self::XML_STRING),
-							'hw_arch' =>				array('type' => self::XML_STRING),
-							'vendor' =>					array('type' => self::XML_STRING),
-							'contract_number' =>		array('type' => self::XML_STRING),
-							'installer_name' =>			array('type' => self::XML_STRING),
-							'deployment_status' =>		array('type' => self::XML_STRING),
-							'url_a' =>					array('type' => self::XML_STRING),
-							'url_b' =>					array('type' => self::XML_STRING),
-							'url_c' =>					array('type' => self::XML_STRING),
-							'host_networks' =>			array('type' => self::XML_STRING),
-							'host_netmask' =>			array('type' => self::XML_STRING),
-							'host_router' =>			array('type' => self::XML_STRING),
-							'oob_ip' =>					array('type' => self::XML_STRING),
-							'oob_netmask' =>			array('type' => self::XML_STRING),
-							'oob_router' =>				array('type' => self::XML_STRING),
-							'date_hw_purchase' =>		array('type' => self::XML_STRING),
-							'date_hw_install' =>		array('type' => self::XML_STRING),
-							'date_hw_expiry' =>			array('type' => self::XML_STRING),
-							'date_hw_decomm' =>			array('type' => self::XML_STRING),
-							'site_address_a' =>			array('type' => self::XML_STRING),
-							'site_address_b' =>			array('type' => self::XML_STRING),
-							'site_address_c' =>			array('type' => self::XML_STRING),
-							'site_city' =>				array('type' => self::XML_STRING),
-							'site_state' =>				array('type' => self::XML_STRING),
-							'site_country' =>			array('type' => self::XML_STRING),
-							'site_zip' =>				array('type' => self::XML_STRING),
-							'site_rack' =>				array('type' => self::XML_STRING),
-							'site_notes' =>				array('type' => self::XML_STRING),
-							'poc_1_name' =>				array('type' => self::XML_STRING),
-							'poc_1_email' =>			array('type' => self::XML_STRING),
-							'poc_1_phone_a' =>			array('type' => self::XML_STRING),
-							'poc_1_phone_b' =>			array('type' => self::XML_STRING),
-							'poc_1_cell' =>				array('type' => self::XML_STRING),
-							'poc_1_screen' =>			array('type' => self::XML_STRING),
-							'poc_1_notes' =>			array('type' => self::XML_STRING),
-							'poc_2_name' =>				array('type' => self::XML_STRING),
-							'poc_2_email' =>			array('type' => self::XML_STRING),
-							'poc_2_phone_a' =>			array('type' => self::XML_STRING),
-							'poc_2_phone_b' =>			array('type' => self::XML_STRING),
-							'poc_2_cell' =>				array('type' => self::XML_STRING),
-							'poc_2_screen' =>			array('type' => self::XML_STRING),
-							'poc_2_notes' =>			array('type' => self::XML_STRING)
-						))
-					))
-				)),
-				'templates' =>				array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => array(
-					'template' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-						'template' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'description' =>			array('type' => self::XML_STRING),
-						'templates' =>				array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => array(
-							'template' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-							))
-						)),
-						'groups' =>					array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group', 'rules' => array(
-							'group' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-							))
-						)),
-						'applications' =>			array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => array(
-							'application' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-							))
-						)),
-						'items' =>					array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'item', 'rules' => array(
-							'item' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmp_community' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'multiplier' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmp_oid' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'key' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'delay' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'history' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'trends' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'status' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'value_type' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'allowed_hosts' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'units' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'delta' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_contextname' =>		array('type' => self::XML_STRING),
-								'snmpv3_securityname' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_securitylevel' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_authprotocol' =>	array('type' => self::XML_STRING),
-								'snmpv3_authpassphrase' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_privprotocol' =>	array('type' => self::XML_STRING),
-								'snmpv3_privpassphrase' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'formula' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'delay_flex' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'params' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'ipmi_sensor' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'data_type' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'authtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'username' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'password' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'publickey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'privatekey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'inventory_link' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'applications' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => array(
-									'application' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-									))
-								)),
-								'valuemap' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-									'name' =>					array('type' => self::XML_STRING)
-								)),
-								'logtimefmt' =>				array('type' => self::XML_STRING)
-							))
-						)),
-						'discovery_rules' =>		array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => array(
-							'discovery_rule' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmp_community' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmp_oid' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'key' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'delay' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'status' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'allowed_hosts' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_contextname' =>		array('type' => self::XML_STRING),
-								'snmpv3_securityname' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_securitylevel' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_authprotocol' =>	array('type' => self::XML_STRING),
-								'snmpv3_authpassphrase' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'snmpv3_privprotocol' =>	array('type' => self::XML_STRING),
-								'snmpv3_privpassphrase' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'delay_flex' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'params' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'ipmi_sensor' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'authtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'username' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'password' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'publickey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'privatekey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* TYPE (2.0 string) */			'filter' =>					array('type' => self::XML_REQUIRED),
-								'lifetime' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'item_prototypes' =>		array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'item_prototype', 'rules' => array(
-									'item_prototype' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'snmp_community' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'multiplier' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'snmp_oid' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'key' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'delay' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'history' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'trends' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'status' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'value_type' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'allowed_hosts' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'units' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'delta' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'snmpv3_contextname' =>		array('type' => self::XML_STRING),
-										'snmpv3_securityname' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'snmpv3_securitylevel' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'snmpv3_authprotocol' =>	array('type' => self::XML_STRING),
-										'snmpv3_authpassphrase' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'snmpv3_privprotocol' =>	array('type' => self::XML_STRING),
-										'snmpv3_privpassphrase' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'formula' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'delay_flex' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'params' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'ipmi_sensor' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'data_type' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'authtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'username' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'password' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'publickey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'privatekey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'inventory_link' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'applications' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => array(
-											'application' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-												'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-											))
-										)),
-										'valuemap' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-											'name' =>					array('type' => self::XML_STRING)
-										)),
-										'logtimefmt' =>				array('type' => self::XML_STRING)
-									))
-								)),
-								'trigger_prototypes' =>		array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'trigger_prototype', 'rules' => array(
-									'trigger_prototype' =>		array('type' => self::XML_ARRAY, 'rules' => array(
-										'expression' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'url' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'status' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'priority' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-									))
-								)),
-								'graph_prototypes' =>		array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_prototype', 'rules' => array(
-									'graph_prototype' =>		array('type' => self::XML_ARRAY, 'rules' => array(
-										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'width' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'height' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'yaxismin' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'yaxismax' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'show_work_period' =>		array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'show_triggers' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'show_legend' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'show_3d' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'percent_left' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'percent_right' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'ymin_item_1' =>			array('type' => self::XML_REQUIRED),
-										'ymin_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'ymax_item_1' =>			array('type' => self::XML_REQUIRED),
-										'ymax_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'graph_items' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => array(
-											'graph_item' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-												'sortorder' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-												'drawtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-												'color' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-												'yaxisside' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-												'calc_fnc' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-												'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-												'item' =>					array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-													'host' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-													'key' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-												))
-											))
-										))
-									))
-								)),
-								'host_prototypes' =>		array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => array(
-									'host_prototype' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-										'host' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'status' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'group_links' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group_link', 'rules' => array(
-/* INDEXED_ARRAY ??? */						'group_link' =>				array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => array(
-												'group' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-													'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-												))
-											))
-										)),
-										'group_prototypes' =>		array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group_prototype', 'rules' => array(
-											'group_prototype' =>		array('type' => self::XML_ARRAY, 'rules' => array(
-												'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-											))
-										)),
-										'templates' =>				array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => array(
-											'template' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-												'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-											))
-										))
-									))
-								))
-							))
-						)),
-						'macros' =>					array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => array(
-							'macro' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-								'macro' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'value' =>				array('type' => self::XML_STRING | self::XML_REQUIRED)
-							))
-						)),
-						'screens' =>				array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => array(
-							'screen' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'hsize' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'vsize' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'screen_items' =>			array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => array(
-									'screen_item' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-										'resourcetype' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'resource' =>				array('type' => self::XML_REQUIRED),
-										'width' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'height' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'x' =>						array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'y' =>						array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'colspan' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'rowspan' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'elements' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'valign' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'halign' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'style' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'dynamic' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'sort_triggers' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'url' =>					array('type' => self::XML_STRING),
-										'application' =>			array('type' => self::XML_STRING),
-										'max_columns' =>			array('type' => self::XML_STRING)
-									))
-								))
-							))
-						))
-					))
-				)),
-				'triggers' =>				array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => array(
-					'trigger' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-						'expression' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'url' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'status' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'priority' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'dependencies' =>			array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => array(
-							'dependency' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'expression' =>				array('type' => self::XML_STRING | self::XML_REQUIRED)
-							))
-						))
-					))
-				)),
-				'graphs' =>					array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'graph', 'rules' => array(
-					'graph' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-						'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'width' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'height' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'yaxismin' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'yaxismax' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'show_work_period' =>		array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'show_triggers' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'show_legend' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'show_3d' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'percent_left' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'percent_right' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'ymin_item_1' =>			array('type' => self::XML_REQUIRED),
-						'ymin_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'ymax_item_1' =>			array('type' => self::XML_REQUIRED),
-						'ymax_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'graph_items' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => array(
-							'graph_item' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-								'sortorder' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'drawtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'color' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'yaxisside' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'calc_fnc' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'item' =>					array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-									'host' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-									'key' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-								))
-							))
-						))
-					))
-				)),
-				'screens' =>				array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => array(
-					'screen' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-						'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'hsize' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'vsize' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'screen_items' =>			array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => array(
-							'screen_item' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-								'resourcetype' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'resource' =>				array('type' => self::XML_REQUIRED),
-								'width' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'height' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'x' =>						array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'y' =>						array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'colspan' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'rowspan' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'elements' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'valign' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'halign' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'style' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'dynamic' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'sort_triggers' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'url' =>					array('type' => self::XML_STRING),
-								'application' =>			array('type' => self::XML_STRING),
-								'max_columns' =>			array('type' => self::XML_STRING)
-							))
-						))
-					))
-				)),
-				'images' =>					array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'image', 'rules' => array(
-					'image' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-						'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'imagetype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'encodedImage' =>			array('type' => self::XML_STRING | self::XML_REQUIRED)
-					))
-				)),
-				'maps' =>					array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'map', 'rules' => array(
-					'map' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-						'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'width' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'height' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'label_type' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'label_location' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'highlight' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'expandproblem' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'markelements' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'show_unack' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'severity_min' =>			array('type' => self::XML_STRING),
-						'grid_size' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'grid_show' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'grid_align' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'label_format' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'label_type_host' =>		array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'label_type_hostgroup' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'label_type_trigger' =>		array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'label_type_map' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'label_type_image' =>		array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'label_string_host' =>		array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'label_string_hostgroup' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'label_string_trigger' =>	array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'label_string_map' =>		array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'label_string_image' =>		array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'expand_macros' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-						'background' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-							'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-						)),
-						'iconmap' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-							'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-						)),
-						'urls' =>					array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'url', 'rules' => array(
-							'url' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-								'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'url' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'elementtype' =>			array('type' => self::XML_STRING | self::XML_REQUIRED)
-							))
-						)),
-						'selements' =>				array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'selement', 'rules' => array(
-							'selement' =>				array('type' => self::XML_ARRAY, 'rules' => array(
-								'elementtype' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'label' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'label_location' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'x' =>						array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'y' =>						array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'elementsubtype' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'areatype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'width' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'height' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'viewtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'use_iconmap' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'selementid' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* TYPE ??? */					'element' =>				array('type' => self::XML_REQUIRED),
-								'icon_off' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-									'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-								)),
-								'icon_on' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-									'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-								)),
-								'icon_disabled' =>			array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-									'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-								)),
-								'icon_maintenance' =>		array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-									'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-								)),
-								'application' =>			array('type' => self::XML_STRING),
-								'urls' =>					array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'url', 'rules' => array(
-									'url' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'url' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
-									))
-								))
-							))
-						)),
-						'links' =>					array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'link', 'rules' => array(
-							'link' =>					array('type' => self::XML_ARRAY, 'rules' => array(
-								'drawtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'color' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'label' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'selementid1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'selementid2' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-								'linktriggers' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'linktrigger', 'rules' => array(
-									'linktrigger' =>			array('type' => self::XML_ARRAY, 'rules' => array(
-										'drawtype' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'color' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-										'trigger' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-											'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-											'expression' =>				array('type' => self::XML_STRING | self::XML_REQUIRED)
-										))
-									))
-								))
-							))
-						))
-					))
-				))
-			))
+			['type' => self::XML_ARRAY, 'rules' => [
+				'version' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+				'date' =>					['type' => self::XML_STRING, 'ex_validate' => [$this, 'validateDateTime']],
+				'groups' =>					['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => [
+					'group' =>					['type' => self::XML_ARRAY, 'rules' => [
+						'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+					]]
+				]],
+				'hosts' =>					['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'host', 'rules' => [
+					'host' =>					['type' => self::XML_ARRAY, 'rules' => [
+						'host' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'description' =>			['type' => self::XML_STRING],
+						'proxy' =>					['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+							'name' =>					['type' => self::XML_STRING]
+						]],
+						'status' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'ipmi_authtype' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'ipmi_privilege' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'ipmi_username' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'ipmi_password' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'templates' =>				['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+							'template' =>				['type' => self::XML_ARRAY, 'rules' => [
+								'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+							]]
+						]],
+						'groups' =>					['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group', 'rules' => [
+							'group' =>					['type' => self::XML_ARRAY, 'rules' => [
+								'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+							]]
+						]],
+						'interfaces' =>				['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => [
+							'interface' =>				['type' => self::XML_ARRAY, 'rules' => [
+								'default' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'useip' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'ip' =>						['type' => self::XML_STRING | self::XML_REQUIRED],
+								'dns' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'port' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'bulk' =>					['type' => self::XML_STRING],
+								'interface_ref' =>			['type' => self::XML_STRING | self::XML_REQUIRED]
+							]]
+						]],
+						'applications' =>			['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+							'application' =>			['type' => self::XML_ARRAY, 'rules' => [
+								'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+							]]
+						]],
+						'items' =>					['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'item', 'rules' => [
+							'item' =>					['type' => self::XML_ARRAY, 'rules' => [
+								'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmp_community' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'multiplier' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmp_oid' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'key' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'delay' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'history' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'trends' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'status' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'value_type' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'allowed_hosts' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'units' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'delta' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_contextname' =>		['type' => self::XML_STRING],
+								'snmpv3_securityname' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_securitylevel' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_authprotocol' =>	['type' => self::XML_STRING],
+								'snmpv3_authpassphrase' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_privprotocol' =>	['type' => self::XML_STRING],
+								'snmpv3_privpassphrase' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'formula' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'delay_flex' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'params' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'ipmi_sensor' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'data_type' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'authtype' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'username' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'password' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'publickey' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'privatekey' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'port' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'description' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'inventory_link' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'applications' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => [
+									'application' =>			['type' => self::XML_ARRAY, 'rules' => [
+										'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+									]]
+								]],
+								'valuemap' =>				['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+									'name' =>					['type' => self::XML_STRING]
+								]],
+								'logtimefmt' =>				['type' => self::XML_STRING],
+								'interface_ref' =>			['type' => self::XML_STRING]
+							]]
+						]],
+						'discovery_rules' =>		['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
+							'discovery_rule' =>			['type' => self::XML_ARRAY, 'rules' => [
+								'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmp_community' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmp_oid' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'key' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'delay' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'status' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'allowed_hosts' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_contextname' =>		['type' => self::XML_STRING],
+								'snmpv3_securityname' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_securitylevel' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_authprotocol' =>	['type' => self::XML_STRING],
+								'snmpv3_authpassphrase' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_privprotocol' =>	['type' => self::XML_STRING],
+								'snmpv3_privpassphrase' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'delay_flex' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'params' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'ipmi_sensor' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'authtype' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'username' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'password' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'publickey' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'privatekey' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'port' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+/* TYPE (2.0 string] */			'filter' =>					['type' => self::XML_REQUIRED],
+								'lifetime' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'description' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'interface_ref' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'item_prototypes' =>		['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'item_prototype', 'rules' => [
+									'item_prototype' =>			['type' => self::XML_ARRAY, 'rules' => [
+										'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'snmp_community' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'multiplier' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'snmp_oid' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'key' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'delay' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'history' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'trends' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'status' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'value_type' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'allowed_hosts' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'units' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'delta' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'snmpv3_contextname' =>		['type' => self::XML_STRING],
+										'snmpv3_securityname' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+										'snmpv3_securitylevel' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+										'snmpv3_authprotocol' =>	['type' => self::XML_STRING],
+										'snmpv3_authpassphrase' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+										'snmpv3_privprotocol' =>	['type' => self::XML_STRING],
+										'snmpv3_privpassphrase' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+										'formula' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'delay_flex' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'params' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'ipmi_sensor' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'data_type' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'authtype' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'username' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'password' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'publickey' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'privatekey' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'port' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'description' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'inventory_link' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'applications' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => [
+											'application' =>			['type' => self::XML_ARRAY, 'rules' => [
+												'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+											]]
+										]],
+										'valuemap' =>				['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+											'name' =>					['type' => self::XML_STRING]
+										]],
+										'logtimefmt' =>				['type' => self::XML_STRING],
+										'interface_ref' =>			['type' => self::XML_STRING]
+									]]
+								]],
+								'trigger_prototypes' =>		['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'trigger_prototype', 'rules' => [
+									'trigger_prototype' =>		['type' => self::XML_ARRAY, 'rules' => [
+										'expression' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'url' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'status' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'priority' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'description' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+									]]
+								]],
+								'graph_prototypes' =>		['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_prototype', 'rules' => [
+									'graph_prototype' =>		['type' => self::XML_ARRAY, 'rules' => [
+										'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'width' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'height' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'yaxismin' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'yaxismax' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'show_work_period' =>		['type' => self::XML_STRING | self::XML_REQUIRED],
+										'show_triggers' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'show_legend' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'show_3d' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'percent_left' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'percent_right' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'ymin_item_1' =>			['type' => self::XML_REQUIRED],
+										'ymin_type_1' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'ymax_item_1' =>			['type' => self::XML_REQUIRED],
+										'ymax_type_1' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'graph_items' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
+											'graph_item' =>				['type' => self::XML_ARRAY, 'rules' => [
+												'sortorder' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+												'drawtype' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+												'color' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+												'yaxisside' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+												'calc_fnc' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+												'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+												'item' =>					['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+													'host' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+													'key' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+												]]
+											]]
+										]]
+									]]
+								]],
+								'host_prototypes' =>		['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
+									'host_prototype' =>			['type' => self::XML_ARRAY, 'rules' => [
+										'host' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'status' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'group_links' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group_link', 'rules' => [
+/* INDEXED_ARRAY ??? */						'group_link' =>				['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => [
+												'group' =>					['type' => self::XML_ARRAY, 'rules' => [
+													'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+												]]
+											]]
+										]],
+										'group_prototypes' =>		['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group_prototype', 'rules' => [
+											'group_prototype' =>		['type' => self::XML_ARRAY, 'rules' => [
+												'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+											]]
+										]],
+										'templates' =>				['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'template', 'rules' => [
+											'template' =>				['type' => self::XML_ARRAY, 'rules' => [
+												'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+											]]
+										]]
+									]]
+								]]
+							]]
+						]],
+						'macros' =>					['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
+							'macro' =>				['type' => self::XML_ARRAY, 'rules' => [
+								'macro' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'value' =>				['type' => self::XML_STRING | self::XML_REQUIRED]
+							]]
+						]],
+						'inventory' =>				['type' => self::XML_ARRAY, 'rules' => [
+							'inventory_mode' =>			['type' => self::XML_STRING],
+							'type' =>					['type' => self::XML_STRING],
+							'type_full' =>				['type' => self::XML_STRING],
+							'name' =>					['type' => self::XML_STRING],
+							'alias' =>					['type' => self::XML_STRING],
+							'os' =>						['type' => self::XML_STRING],
+							'os_full' =>				['type' => self::XML_STRING],
+							'os_short' =>				['type' => self::XML_STRING],
+							'serialno_a' =>				['type' => self::XML_STRING],
+							'serialno_b' =>				['type' => self::XML_STRING],
+							'tag' =>					['type' => self::XML_STRING],
+							'asset_tag' =>				['type' => self::XML_STRING],
+							'macaddress_a' =>			['type' => self::XML_STRING],
+							'macaddress_b' =>			['type' => self::XML_STRING],
+							'hardware' =>				['type' => self::XML_STRING],
+							'hardware_full' =>			['type' => self::XML_STRING],
+							'software' =>				['type' => self::XML_STRING],
+							'software_full' =>			['type' => self::XML_STRING],
+							'software_app_a' =>			['type' => self::XML_STRING],
+							'software_app_b' =>			['type' => self::XML_STRING],
+							'software_app_c' =>			['type' => self::XML_STRING],
+							'software_app_d' =>			['type' => self::XML_STRING],
+							'software_app_e' =>			['type' => self::XML_STRING],
+							'contact' =>				['type' => self::XML_STRING],
+							'location' =>				['type' => self::XML_STRING],
+							'location_lat' =>			['type' => self::XML_STRING],
+							'location_lon' =>			['type' => self::XML_STRING],
+							'notes' =>					['type' => self::XML_STRING],
+							'chassis' =>				['type' => self::XML_STRING],
+							'model' =>					['type' => self::XML_STRING],
+							'hw_arch' =>				['type' => self::XML_STRING],
+							'vendor' =>					['type' => self::XML_STRING],
+							'contract_number' =>		['type' => self::XML_STRING],
+							'installer_name' =>			['type' => self::XML_STRING],
+							'deployment_status' =>		['type' => self::XML_STRING],
+							'url_a' =>					['type' => self::XML_STRING],
+							'url_b' =>					['type' => self::XML_STRING],
+							'url_c' =>					['type' => self::XML_STRING],
+							'host_networks' =>			['type' => self::XML_STRING],
+							'host_netmask' =>			['type' => self::XML_STRING],
+							'host_router' =>			['type' => self::XML_STRING],
+							'oob_ip' =>					['type' => self::XML_STRING],
+							'oob_netmask' =>			['type' => self::XML_STRING],
+							'oob_router' =>				['type' => self::XML_STRING],
+							'date_hw_purchase' =>		['type' => self::XML_STRING],
+							'date_hw_install' =>		['type' => self::XML_STRING],
+							'date_hw_expiry' =>			['type' => self::XML_STRING],
+							'date_hw_decomm' =>			['type' => self::XML_STRING],
+							'site_address_a' =>			['type' => self::XML_STRING],
+							'site_address_b' =>			['type' => self::XML_STRING],
+							'site_address_c' =>			['type' => self::XML_STRING],
+							'site_city' =>				['type' => self::XML_STRING],
+							'site_state' =>				['type' => self::XML_STRING],
+							'site_country' =>			['type' => self::XML_STRING],
+							'site_zip' =>				['type' => self::XML_STRING],
+							'site_rack' =>				['type' => self::XML_STRING],
+							'site_notes' =>				['type' => self::XML_STRING],
+							'poc_1_name' =>				['type' => self::XML_STRING],
+							'poc_1_email' =>			['type' => self::XML_STRING],
+							'poc_1_phone_a' =>			['type' => self::XML_STRING],
+							'poc_1_phone_b' =>			['type' => self::XML_STRING],
+							'poc_1_cell' =>				['type' => self::XML_STRING],
+							'poc_1_screen' =>			['type' => self::XML_STRING],
+							'poc_1_notes' =>			['type' => self::XML_STRING],
+							'poc_2_name' =>				['type' => self::XML_STRING],
+							'poc_2_email' =>			['type' => self::XML_STRING],
+							'poc_2_phone_a' =>			['type' => self::XML_STRING],
+							'poc_2_phone_b' =>			['type' => self::XML_STRING],
+							'poc_2_cell' =>				['type' => self::XML_STRING],
+							'poc_2_screen' =>			['type' => self::XML_STRING],
+							'poc_2_notes' =>			['type' => self::XML_STRING]
+						]]
+					]]
+				]],
+				'templates' =>				['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+					'template' =>				['type' => self::XML_ARRAY, 'rules' => [
+						'template' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+						'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'description' =>			['type' => self::XML_STRING],
+						'templates' =>				['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+							'template' =>				['type' => self::XML_ARRAY, 'rules' => [
+								'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+							]]
+						]],
+						'groups' =>					['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group', 'rules' => [
+							'group' =>					['type' => self::XML_ARRAY, 'rules' => [
+								'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+							]]
+						]],
+						'applications' =>			['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+							'application' =>			['type' => self::XML_ARRAY, 'rules' => [
+								'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+							]]
+						]],
+						'items' =>					['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'item', 'rules' => [
+							'item' =>					['type' => self::XML_ARRAY, 'rules' => [
+								'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmp_community' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'multiplier' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmp_oid' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'key' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'delay' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'history' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'trends' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'status' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'value_type' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'allowed_hosts' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'units' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'delta' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_contextname' =>		['type' => self::XML_STRING],
+								'snmpv3_securityname' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_securitylevel' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_authprotocol' =>	['type' => self::XML_STRING],
+								'snmpv3_authpassphrase' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_privprotocol' =>	['type' => self::XML_STRING],
+								'snmpv3_privpassphrase' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'formula' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'delay_flex' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'params' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'ipmi_sensor' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'data_type' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'authtype' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'username' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'password' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'publickey' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'privatekey' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'port' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'description' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'inventory_link' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'applications' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => [
+									'application' =>			['type' => self::XML_ARRAY, 'rules' => [
+										'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+									]]
+								]],
+								'valuemap' =>				['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+									'name' =>					['type' => self::XML_STRING]
+								]],
+								'logtimefmt' =>				['type' => self::XML_STRING]
+							]]
+						]],
+						'discovery_rules' =>		['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
+							'discovery_rule' =>			['type' => self::XML_ARRAY, 'rules' => [
+								'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmp_community' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmp_oid' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'key' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'delay' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'status' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'allowed_hosts' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_contextname' =>		['type' => self::XML_STRING],
+								'snmpv3_securityname' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_securitylevel' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_authprotocol' =>	['type' => self::XML_STRING],
+								'snmpv3_authpassphrase' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'snmpv3_privprotocol' =>	['type' => self::XML_STRING],
+								'snmpv3_privpassphrase' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+								'delay_flex' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'params' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'ipmi_sensor' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'authtype' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'username' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'password' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'publickey' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'privatekey' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'port' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+/* TYPE (2.0 string] */			'filter' =>					['type' => self::XML_REQUIRED],
+								'lifetime' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'description' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'item_prototypes' =>		['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'item_prototype', 'rules' => [
+									'item_prototype' =>			['type' => self::XML_ARRAY, 'rules' => [
+										'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'snmp_community' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'multiplier' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'snmp_oid' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'key' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'delay' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'history' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'trends' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'status' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'value_type' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'allowed_hosts' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'units' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'delta' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'snmpv3_contextname' =>		['type' => self::XML_STRING],
+										'snmpv3_securityname' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+										'snmpv3_securitylevel' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+										'snmpv3_authprotocol' =>	['type' => self::XML_STRING],
+										'snmpv3_authpassphrase' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+										'snmpv3_privprotocol' =>	['type' => self::XML_STRING],
+										'snmpv3_privpassphrase' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+										'formula' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'delay_flex' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'params' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'ipmi_sensor' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'data_type' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'authtype' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'username' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'password' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'publickey' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'privatekey' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'port' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'description' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'inventory_link' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'applications' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => [
+											'application' =>			['type' => self::XML_ARRAY, 'rules' => [
+												'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+											]]
+										]],
+										'valuemap' =>				['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+											'name' =>					['type' => self::XML_STRING]
+										]],
+										'logtimefmt' =>				['type' => self::XML_STRING]
+									]]
+								]],
+								'trigger_prototypes' =>		['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'trigger_prototype', 'rules' => [
+									'trigger_prototype' =>		['type' => self::XML_ARRAY, 'rules' => [
+										'expression' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'url' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'status' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'priority' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'description' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+									]]
+								]],
+								'graph_prototypes' =>		['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_prototype', 'rules' => [
+									'graph_prototype' =>		['type' => self::XML_ARRAY, 'rules' => [
+										'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'width' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'height' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'yaxismin' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'yaxismax' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'show_work_period' =>		['type' => self::XML_STRING | self::XML_REQUIRED],
+										'show_triggers' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'show_legend' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'show_3d' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'percent_left' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'percent_right' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'ymin_item_1' =>			['type' => self::XML_REQUIRED],
+										'ymin_type_1' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'ymax_item_1' =>			['type' => self::XML_REQUIRED],
+										'ymax_type_1' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'graph_items' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
+											'graph_item' =>				['type' => self::XML_ARRAY, 'rules' => [
+												'sortorder' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+												'drawtype' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+												'color' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+												'yaxisside' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+												'calc_fnc' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+												'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+												'item' =>					['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+													'host' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+													'key' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+												]]
+											]]
+										]]
+									]]
+								]],
+								'host_prototypes' =>		['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
+									'host_prototype' =>			['type' => self::XML_ARRAY, 'rules' => [
+										'host' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'status' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'group_links' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group_link', 'rules' => [
+/* INDEXED_ARRAY ??? */						'group_link' =>				['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => [
+												'group' =>					['type' => self::XML_ARRAY, 'rules' => [
+													'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+												]]
+											]]
+										]],
+										'group_prototypes' =>		['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group_prototype', 'rules' => [
+											'group_prototype' =>		['type' => self::XML_ARRAY, 'rules' => [
+												'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+											]]
+										]],
+										'templates' =>				['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+											'template' =>				['type' => self::XML_ARRAY, 'rules' => [
+												'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+											]]
+										]]
+									]]
+								]]
+							]]
+						]],
+						'macros' =>					['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
+							'macro' =>				['type' => self::XML_ARRAY, 'rules' => [
+								'macro' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'value' =>				['type' => self::XML_STRING | self::XML_REQUIRED]
+							]]
+						]],
+						'screens' =>				['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
+							'screen' =>					['type' => self::XML_ARRAY, 'rules' => [
+								'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'hsize' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'vsize' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'screen_items' =>			['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => [
+									'screen_item' =>			['type' => self::XML_ARRAY, 'rules' => [
+										'resourcetype' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'resource' =>				['type' => self::XML_REQUIRED],
+										'width' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'height' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'x' =>						['type' => self::XML_STRING | self::XML_REQUIRED],
+										'y' =>						['type' => self::XML_STRING | self::XML_REQUIRED],
+										'colspan' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'rowspan' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'elements' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'valign' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'halign' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'style' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'dynamic' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'sort_triggers' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+										'url' =>					['type' => self::XML_STRING],
+										'application' =>			['type' => self::XML_STRING],
+										'max_columns' =>			['type' => self::XML_STRING]
+									]]
+								]]
+							]]
+						]]
+					]]
+				]],
+				'triggers' =>				['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
+					'trigger' =>				['type' => self::XML_ARRAY, 'rules' => [
+						'expression' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+						'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'url' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'status' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'priority' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+						'description' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'dependencies' =>			['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+							'dependency' =>				['type' => self::XML_ARRAY, 'rules' => [
+								'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'expression' =>				['type' => self::XML_STRING | self::XML_REQUIRED]
+							]]
+						]]
+					]]
+				]],
+				'graphs' =>					['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'graph', 'rules' => [
+					'graph' =>					['type' => self::XML_ARRAY, 'rules' => [
+						'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'width' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'height' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'yaxismin' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+						'yaxismax' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+						'show_work_period' =>		['type' => self::XML_STRING | self::XML_REQUIRED],
+						'show_triggers' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'show_legend' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'show_3d' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+						'percent_left' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'percent_right' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'ymin_item_1' =>			['type' => self::XML_REQUIRED],
+						'ymin_type_1' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'ymax_item_1' =>			['type' => self::XML_REQUIRED],
+						'ymax_type_1' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'graph_items' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
+							'graph_item' =>				['type' => self::XML_ARRAY, 'rules' => [
+								'sortorder' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'drawtype' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'color' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'yaxisside' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'calc_fnc' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'type' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'item' =>					['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+									'host' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+									'key' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+								]]
+							]]
+						]]
+					]]
+				]],
+				'screens' =>				['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
+					'screen' =>					['type' => self::XML_ARRAY, 'rules' => [
+						'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'hsize' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'vsize' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'screen_items' =>			['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => [
+							'screen_item' =>			['type' => self::XML_ARRAY, 'rules' => [
+								'resourcetype' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'resource' =>				['type' => self::XML_REQUIRED],
+								'width' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'height' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'x' =>						['type' => self::XML_STRING | self::XML_REQUIRED],
+								'y' =>						['type' => self::XML_STRING | self::XML_REQUIRED],
+								'colspan' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'rowspan' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'elements' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'valign' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'halign' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'style' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'dynamic' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'sort_triggers' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'url' =>					['type' => self::XML_STRING],
+								'application' =>			['type' => self::XML_STRING],
+								'max_columns' =>			['type' => self::XML_STRING]
+							]]
+						]]
+					]]
+				]],
+				'images' =>					['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'image', 'rules' => [
+					'image' =>					['type' => self::XML_ARRAY, 'rules' => [
+						'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'imagetype' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+						'encodedImage' =>			['type' => self::XML_STRING | self::XML_REQUIRED]
+					]]
+				]],
+				'maps' =>					['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'map', 'rules' => [
+					'map' =>					['type' => self::XML_ARRAY, 'rules' => [
+						'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'width' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'height' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+						'label_type' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+						'label_location' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'highlight' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+						'expandproblem' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'markelements' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'show_unack' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+						'severity_min' =>			['type' => self::XML_STRING],
+						'grid_size' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+						'grid_show' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+						'grid_align' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+						'label_format' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'label_type_host' =>		['type' => self::XML_STRING | self::XML_REQUIRED],
+						'label_type_hostgroup' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+						'label_type_trigger' =>		['type' => self::XML_STRING | self::XML_REQUIRED],
+						'label_type_map' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'label_type_image' =>		['type' => self::XML_STRING | self::XML_REQUIRED],
+						'label_string_host' =>		['type' => self::XML_STRING | self::XML_REQUIRED],
+						'label_string_hostgroup' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+						'label_string_trigger' =>	['type' => self::XML_STRING | self::XML_REQUIRED],
+						'label_string_map' =>		['type' => self::XML_STRING | self::XML_REQUIRED],
+						'label_string_image' =>		['type' => self::XML_STRING | self::XML_REQUIRED],
+						'expand_macros' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+						'background' =>				['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+							'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+						]],
+						'iconmap' =>				['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+							'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+						]],
+						'urls' =>					['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'url', 'rules' => [
+							'url' =>					['type' => self::XML_ARRAY, 'rules' => [
+								'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'url' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'elementtype' =>			['type' => self::XML_STRING | self::XML_REQUIRED]
+							]]
+						]],
+						'selements' =>				['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'selement', 'rules' => [
+							'selement' =>				['type' => self::XML_ARRAY, 'rules' => [
+								'elementtype' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'label' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'label_location' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'x' =>						['type' => self::XML_STRING | self::XML_REQUIRED],
+								'y' =>						['type' => self::XML_STRING | self::XML_REQUIRED],
+								'elementsubtype' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'areatype' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'width' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'height' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'viewtype' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'use_iconmap' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'selementid' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+/* TYPE ??? */					'element' =>				['type' => self::XML_REQUIRED],
+								'icon_off' =>				['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+									'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+								]],
+								'icon_on' =>				['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+									'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+								]],
+								'icon_disabled' =>			['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+									'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+								]],
+								'icon_maintenance' =>		['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+									'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+								]],
+								'application' =>			['type' => self::XML_STRING],
+								'urls' =>					['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'url', 'rules' => [
+									'url' =>					['type' => self::XML_ARRAY, 'rules' => [
+										'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'url' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
+									]]
+								]]
+							]]
+						]],
+						'links' =>					['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'link', 'rules' => [
+							'link' =>					['type' => self::XML_ARRAY, 'rules' => [
+								'drawtype' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+								'color' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'label' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+								'selementid1' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'selementid2' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+								'linktriggers' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'linktrigger', 'rules' => [
+									'linktrigger' =>			['type' => self::XML_ARRAY, 'rules' => [
+										'drawtype' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
+										'color' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
+										'trigger' =>				['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
+											'description' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
+											'expression' =>				['type' => self::XML_STRING | self::XML_REQUIRED]
+										]]
+									]]
+								]]
+							]]
+						]]
+					]]
+				]]
+			]]
 		);
 	}
 
