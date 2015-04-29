@@ -62,8 +62,8 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 								'default' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'type' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'useip' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* REQUIRED ??? */				'ip' =>						array('type' => self::XML_STRING),
-/* REQUIRED ??? */				'dns' =>					array('type' => self::XML_STRING),
+								'ip' =>						array('type' => self::XML_STRING | self::XML_REQUIRED),
+								'dns' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'bulk' =>					array('type' => self::XML_STRING),
 								'interface_ref' =>			array('type' => self::XML_STRING | self::XML_REQUIRED)
