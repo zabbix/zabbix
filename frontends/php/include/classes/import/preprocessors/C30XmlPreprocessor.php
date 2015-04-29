@@ -25,40 +25,40 @@
 class C30XmlPreprocessor extends CXmlPreprocessorGeneral {
 
 	public function __construct() {
-		parent::__construct(array(
-			array('^zabbix_export$', '^(groups|hosts|templates|triggers|graphs|screens|images|maps)$'),
-			array('^zabbix_export$', '^hosts$', '^host[0-9]*',
+		parent::__construct([
+			['^zabbix_export$', '^(groups|hosts|templates|triggers|graphs|screens|images|maps)$'],
+			['^zabbix_export$', '^hosts$', '^host[0-9]*',
 				'^(proxy|templates|groups|interfaces|applications|items|discovery_rules|macros|inventory)$'
-			),
-			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^items$', '^item[0-9]*', '^(applications|valuemap)$'),
-			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
+			],
+			['^zabbix_export$', '^hosts$', '^host[0-9]*', '^items$', '^item[0-9]*', '^(applications|valuemap)$'],
+			['^zabbix_export$', '^hosts$', '^host[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
 				'^(item_prototypes|trigger_prototypes|graph_prototypes|host_prototypes)$'
-			),
-			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
+			],
+			['^zabbix_export$', '^hosts$', '^host[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
 				'^host_prototypes$', '^host_prototype[0-9]*', '^(group_prototypes|templates)$'
-			),
-			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
+			],
+			['^zabbix_export$', '^hosts$', '^host[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
 				'^item_prototypes', '^item_prototype[0-9]*', '^(applications|valuemap)$'
-			),
-			array('^zabbix_export$', '^templates$', '^template[0-9]*',
+			],
+			['^zabbix_export$', '^templates$', '^template[0-9]*',
 				'^(templates|groups|applications|items|discovery_rules|macros|screens)$'
-			),
-			array('^zabbix_export$', '^templates$', '^template[0-9]*', '^items$', '^item[0-9]*',
+			],
+			['^zabbix_export$', '^templates$', '^template[0-9]*', '^items$', '^item[0-9]*',
 				'^(applications|valuemap)$'
-			),
-			array('^zabbix_export$', '^templates$', '^template[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
+			],
+			['^zabbix_export$', '^templates$', '^template[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
 				'^(item_prototypes|trigger_prototypes|graph_prototypes|host_prototypes)$'
-			),
-			array('^zabbix_export$', '^templates$', '^template[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
+			],
+			['^zabbix_export$', '^templates$', '^template[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
 				'^item_prototypes', '^item_prototype[0-9]*', '^(applications|valuemap)$'
-			),
-			array('^zabbix_export$', '^screens$', '^screen[0-9]*', '^screen_items$'),
-			array('^zabbix_export$', '^maps$', '^map[0-9]*', '^(background|urls|iconmap|selements|links)$'),
-			array('^zabbix_export$', '^maps$', '^map[0-9]*', '^selements$', '^selement[0-9]*',
+			],
+			['^zabbix_export$', '^screens$', '^screen[0-9]*', '^screen_items$'],
+			['^zabbix_export$', '^maps$', '^map[0-9]*', '^(background|urls|iconmap|selements|links)$'],
+			['^zabbix_export$', '^maps$', '^map[0-9]*', '^selements$', '^selement[0-9]*',
 				'^(icon_off|icon_on|icon_disabled|icon_maintenance|urls)$'
-			),
-			array('^zabbix_export$', '^maps$', '^map[0-9]*', '^links$', '^link[0-9]*', '^linktriggers$'),
-			array('^zabbix_export$', '^triggers$', '^trigger[0-9]*', '^dependencies$')
-		));
+			],
+			['^zabbix_export$', '^maps$', '^map[0-9]*', '^links$', '^link[0-9]*', '^linktriggers$'],
+			['^zabbix_export$', '^triggers$', '^trigger[0-9]*', '^dependencies$']
+		]);
 	}
 }
