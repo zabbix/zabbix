@@ -108,7 +108,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 								'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'inventory_link' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* REQUIRED ??? */				'applications' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => array(
+								'applications' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => array(
 									'application' =>			array('type' => self::XML_ARRAY, 'rules' => array(
 										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 									))
@@ -186,7 +186,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 										'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 										'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 										'inventory_link' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* REQUIRED ??? */						'applications' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => array(
+										'applications' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => array(
 											'application' =>			array('type' => self::XML_ARRAY, 'rules' => array(
 												'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 											))
@@ -406,7 +406,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 								'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'inventory_link' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* REQUIRED */					'applications' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => array(
+								'applications' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => array(
 									'application' =>			array('type' => self::XML_ARRAY, 'rules' => array(
 										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 									))
@@ -414,8 +414,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 								'valuemap' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
 									'name' =>					array('type' => self::XML_STRING)
 								)),
-								'logtimefmt' =>				array('type' => self::XML_STRING),
-/* REMOVE ??? */				'interface_ref' =>			array('type' => self::XML_STRING)
+								'logtimefmt' =>				array('type' => self::XML_STRING)
 							))
 						)),
 						'discovery_rules' =>		array('type' => self::XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => array(
@@ -483,7 +482,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 										'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 										'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 										'inventory_link' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* REQUIRED ??? */						'applications' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => array(
+										'applications' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'application', 'rules' => array(
 											'application' =>			array('type' => self::XML_ARRAY, 'rules' => array(
 												'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 											))
