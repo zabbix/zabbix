@@ -53,7 +53,7 @@ static char	zbx_socket_strerror_message[ZBX_SOCKET_STRERROR_LEN];
 
 const char	*zbx_socket_strerror(void)
 {
-	zbx_socket_strerror_message[ZBX_SOCKET_STRERROR_LEN - 1] = '\0';	/* force terminate string */
+	zbx_socket_strerror_message[ZBX_SOCKET_STRERROR_LEN - 1] = '\0';	/* force null termination */
 	return zbx_socket_strerror_message;
 }
 
@@ -556,7 +556,7 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned char flags, int timeout)
 {
 	zbx_uint64_t	len64_le;
-	ssize_t		i, written = 0;
+	ssize_t		written = 0;
 	int		ret = SUCCEED;
 
 	if (0 != timeout)
@@ -587,6 +587,8 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 
 	while (written < (ssize_t)len)
 	{
+		int	i;
+
 		if (ZBX_PROTO_ERROR == (i = ZBX_TCP_WRITE(s->socket, data + written, (int)(len - written))))
 		{
 			zbx_set_socket_strerror("ZBX_TCP_WRITE() failed: %s",
