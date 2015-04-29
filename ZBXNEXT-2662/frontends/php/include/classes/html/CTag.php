@@ -138,7 +138,7 @@ class CTag extends CObject {
 			$this->attributes['class'] .= ' '.$cssClass;
 		}
 
-		return $this->attributes['class'];
+		return $this;
 	}
 
 	/**
@@ -176,6 +176,8 @@ class CTag extends CObject {
 		else {
 			$this->removeAttribute($name);
 		}
+
+		return $this;
 	}
 
 	/**
