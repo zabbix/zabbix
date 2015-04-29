@@ -5903,6 +5903,18 @@ return array(
 				'ref_table' => 'application_prototype',
 				'ref_field' => 'application_prototypeid',
 			),
+			'lastcheck' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
+			'ts_delete' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
 		),
 	),
 	'dbversion' => array(
