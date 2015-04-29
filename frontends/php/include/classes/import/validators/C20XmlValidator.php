@@ -251,8 +251,8 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 										'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
 										'status' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
 										'group_links' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group_link', 'rules' => [
-/* INDEXED_ARRAY ??? */						'group_link' =>				['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => [
-												'group' =>					['type' => self::XML_ARRAY, 'rules' => [
+											'group_link' =>				['type' => self::XML_ARRAY, 'rules' => [
+												'group' =>					['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
 													'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
 												]]
 											]]
@@ -546,8 +546,8 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 										'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
 										'status' =>					['type' => self::XML_STRING | self::XML_REQUIRED],
 										'group_links' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'group_link', 'rules' => [
-/* INDEXED_ARRAY ??? */						'group_link' =>				['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => [
-												'group' =>					['type' => self::XML_ARRAY, 'rules' => [
+											'group_link' =>				['type' => self::XML_ARRAY, 'rules' => [
+												'group' =>					['type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => [
 													'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
 												]]
 											]]
