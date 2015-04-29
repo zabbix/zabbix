@@ -789,21 +789,6 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 	}
 
 	/**
-	 * Base validation function.
-	 *
-	 * @param array  $zabbix_export	import data
-	 * @param string $path			XML path
-	 */
-	public function validate(array $zabbix_export, $path) {
-		if (array_key_exists('images', $zabbix_export)) {
-			$this->validateImages($zabbix_export['images'], $path.'/images');
-		}
-		if (array_key_exists('maps', $zabbix_export)) {
-			$this->validateMaps($zabbix_export['maps'], $path.'/maps');
-		}
-	}
-
-	/**
 	 * Validate date and time format.
 	 *
 	 * @param string $date	export date and time
