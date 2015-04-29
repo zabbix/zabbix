@@ -245,7 +245,7 @@ foreach (@$tlds_ref)
 					}
 				}
 
-				$till = $from + getopt('period') * $service_delay - 1;
+				$till = $from + getopt('period') * 60 - 1;
 			}
 			else
 			{
@@ -258,7 +258,7 @@ foreach (@$tlds_ref)
 
 			if (opt('period'))
 			{
-				$till = $from + getopt('period') * $service_delay - 1;
+				$till = $from + getopt('period') * 60 - 1;
 			}
 			else
 			{
@@ -269,7 +269,7 @@ foreach (@$tlds_ref)
 		{
 			# only period specified
 			$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
-			$from = $till - getopt('period') * $service_delay + 1;
+			$from = $till - getopt('period') * 60 + 1;
 		}
 
 		if ((defined($from) and $from > $lastclock))
@@ -1604,7 +1604,7 @@ update-api-data.pl - save information about the incidents to a filesystem
 
 =head1 SYNOPSIS
 
-update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--from <timestamp>|--continue] [--period number] [--dry-run [--probe name]] [--debug] [--help]
+update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--from <timestamp>|--continue] [--period minutes] [--dry-run [--probe name]] [--debug] [--help]
 
 =head1 OPTIONS
 
@@ -1626,9 +1626,9 @@ Specify file containing the list of TLDs that should be ignored. TLDs are specif
 
 This option cannot be used together with option --tld.
 
-=item B<--period> number
+=item B<--period> minutes
 
-Specify number of test cycles to handle during this run. The first cycle to handle can be specified
+Specify number minutes of the period to handle during this run. The first cycle to handle can be specified
 using options --from or --continue (continue from the last time when --continue was used) (see below).
 
 =item B<--from> timestamp
