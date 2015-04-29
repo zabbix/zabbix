@@ -465,7 +465,7 @@ foreach (@$tlds_ref)
 						{
 							if ($clock < $test_results[$test_result_index]->{'start'})
 							{
-								wrn("no aggregated result of $service test of $nsip (probe:$probe time:", ts_str($clock), ") found in the database");
+								fail("no aggregated result of $service test of $nsip (probe:$probe time:", ts_str($clock), ") found in the database");
 								next;
 							}
 
@@ -474,7 +474,7 @@ foreach (@$tlds_ref)
 
 							if ($test_result_index == $test_results_count)
 							{
-								wrn("no aggregated result of $service test of $nsip (probe:$probe time:", ts_str($clock), ") found in the database");
+								fail("no aggregated result of $service test of $nsip (probe:$probe time:", ts_str($clock), ") found in the database");
 								next;
 							}
 
@@ -546,7 +546,7 @@ foreach (@$tlds_ref)
 
 							if ($clock < $test_results[$test_result_index]->{'start'})
 							{
-								wrn("no aggregated result of $subservice test (probe:$probe time:", ts_str($clock), ") found in the database");
+								fail("no aggregated result of $subservice test (probe:$probe time:", ts_str($clock), ") found in the database");
 								next;
 							}
 
@@ -555,7 +555,7 @@ foreach (@$tlds_ref)
 
 							if ($test_result_index == $test_results_count)
 							{
-								wrn("no aggregated result of $subservice test (probe:$probe time:", ts_str($clock), ") found in the database");
+								fail("no aggregated result of $subservice test (probe:$probe time:", ts_str($clock), ") found in the database");
 								next;
 							}
 
@@ -630,7 +630,7 @@ foreach (@$tlds_ref)
 					{
 						if ($clock < $test_results[$test_result_index]->{'start'})
 						{
-							wrn("no aggregated result of $service test (probe:$probe time:", ts_str($clock), ") found in the database");
+							fail("no aggregated result of $service test (probe:$probe time:", ts_str($clock), ") found in the database");
 							next;
 						}
 
@@ -639,7 +639,7 @@ foreach (@$tlds_ref)
 
 						if ($test_result_index == $test_results_count)
 						{
-							wrn("no aggregated result of $service test (probe:$probe time:", ts_str($clock), ") found in the database");
+							fail("no aggregated result of $service test (probe:$probe time:", ts_str($clock), ") found in the database");
 							next;
 						}
 
@@ -955,11 +955,11 @@ sub __get_rdds_test_values
 	{
 		foreach my $subservice (keys(%{$pre_result{$probe}}))
 		{
-			foreach my $clock (keys(%{$pre_result{$probe}->{$subservice}}))
+			foreach my $clock (sort(keys(%{$pre_result{$probe}->{$subservice}})))	# must be sorted by clock
 			{
 				my $h;
 				my $clock_ref = $pre_result{$probe}->{$subservice}->{$clock};
-				foreach my $key (sort(keys(%{$pre_result{$probe}->{$subservice}->{$clock}})))	# must be sorted by clock
+				foreach my $key (keys(%{$pre_result{$probe}->{$subservice}->{$clock}}))
 				{
 					$h->{$key} = $clock_ref->{$key};
 				}
