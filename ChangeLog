@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Polish translat
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
+.......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
 .......PS. [ZBX-9457] fixed server crash in case ValueCacheSize=0; thanks to MATSUDA Daiki for patch (asaveljevs)
 .......PS. [ZBX-5717] fixed incorrect calculation of icmppingloss[] due to floating-point errors (asaveljevs)
@@ -1252,6 +1253,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
 .......PS. [ZBX-5717] fixed incorrect calculation of icmppingloss[] due to floating-point errors (asaveljevs)
 ........S. [ZBX-9436] fixed zabbix_server to not exit in case of database connection loss in the middle of transaction (dimir)
