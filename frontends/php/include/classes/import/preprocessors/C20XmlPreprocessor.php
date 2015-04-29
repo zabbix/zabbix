@@ -28,7 +28,7 @@ class C20XmlPreprocessor extends CXmlPreprocessorGeneral {
 		parent::__construct(array(
 			array('^zabbix_export$', '^(groups|hosts|templates|triggers|graphs|screens|images|maps)$'),
 			array('^zabbix_export$', '^hosts$', '^host[0-9]*',
-				'^(templates|groups|interfaces|applications|items|discovery_rules|macros|inventory)$'
+				'^(proxy|templates|groups|interfaces|applications|items|discovery_rules|macros|inventory)$'
 			),
 			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^items$', '^item[0-9]*', '^(applications|valuemap)$'),
 			array('^zabbix_export$', '^hosts$', '^host[0-9]*', '^discovery_rules$', '^discovery_rule[0-9]*',
