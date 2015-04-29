@@ -24,60 +24,44 @@ include('include/views/js/configuration.sysmaps.js.php');
 $sysmapWidget = (new CWidget())->setTitle(_('Network maps'));
 
 // create menu
-$addIcon = new CIcon(_('Add element'), 'iconplus');
-$addIcon->setAttribute('id', 'selementAdd');
-$removeIcon = new CIcon(_('Remove element'), 'iconminus');
-$removeIcon->setAttribute('id', 'selementRemove');
+$menu = (new CList(null, 'object-group'))->
+	addItem(array(
+		_('Icon').':'.SPACE,
+		(new CLink(_('Add'), 'javascript:void(0);', 'link-dotted', null, true))->setAttribute('id', 'selementAdd'),
+		SPACE.'/'.SPACE,
+		(new CLink(_('Remove'), 'javascript:void(0);', 'link-dotted', null, true))->setAttribute('id', 'selementRemove')
+	))->
+	addItem(array(
+		_('Link').':'.SPACE,
+		(new CLink(_('Add'), 'javascript:void(0);', 'link-dotted', null, true))->setAttribute('id', 'linkAdd'),
+		SPACE.'/'.SPACE,
+		(new CLink(_('Remove'), 'javascript:void(0);', 'link-dotted', null, true))->setAttribute('id', 'linkRemove')
+	))->
+	addItem(array(
+		_('Expand macros').':'.SPACE,
+		(new CLink(($this->data['sysmap']['expand_macros'] == SYSMAP_EXPAND_MACROS_ON) ? _('On') : _('Off'),
+			'javascript:void(0);', 'link-dotted', null, true))->setAttribute('id', 'expand_macros')
+	))->
+	addItem(array(
+		_('Grid').':'.SPACE,
+		(new CLink(($this->data['sysmap']['grid_show'] == SYSMAP_GRID_SHOW_ON) ? _('Shown') : _('Hidden'),
+			'javascript:void(0);', 'link-dotted', null, true))->setAttribute('id', 'gridshow'),
+		SPACE.'/'.SPACE,
+		(new CLink(($this->data['sysmap']['grid_align'] == SYSMAP_GRID_ALIGN_ON) ? _('On') : _('Off'),
+			'javascript:void(0);', 'link-dotted', null, true))->setAttribute('id', 'gridautoalign')
+	))->
+	addItem(new CComboBox('gridsize', $this->data['sysmap']['grid_size'], null, array(
+		20 => '20x20',
+		40 => '40x40',
+		50 => '50x50',
+		75 => '75x75',
+		100 => '100x100'
+	)))->
+	addItem((new CSubmit('gridalignall', _('Align icons')))->addClass('btn-alt')->setAttribute('id', 'gridalignall'))->
+	addItem((new CSubmit('update', _('Update')))->setAttribute('id', 'sysmap_update'));
 
-$addLinkIcon = new CIcon(_('Add link'), 'iconplus');
-$addLinkIcon->setAttribute('id', 'linkAdd');
-$removeLinkIcon = new CIcon(_('Remove link'), 'iconminus');
-$removeLinkIcon->setAttribute('id', 'linkRemove');
-
-$expandMacros = new CSpan(($this->data['sysmap']['expand_macros'] == SYSMAP_EXPAND_MACROS_ON) ? _('On') : _('Off'), 'whitelink');
-$expandMacros->setAttribute('id', 'expand_macros');
-
-$gridShow = new CSpan(($this->data['sysmap']['grid_show'] == SYSMAP_GRID_SHOW_ON) ? _('Shown') : _('Hidden'), 'whitelink');
-$gridShow->setAttribute('id', 'gridshow');
-
-$gridAutoAlign = new CSpan(($this->data['sysmap']['grid_align'] == SYSMAP_GRID_ALIGN_ON) ? _('On') : _('Off'), 'whitelink');
-$gridAutoAlign->setAttribute('id', 'gridautoalign');
-
-$gridSize = new CComboBox('gridsize', $this->data['sysmap']['grid_size'], null, array(
-	20 => '20x20',
-	40 => '40x40',
-	50 => '50x50',
-	75 => '75x75',
-	100 => '100x100'
-));
-
-$gridAlignAll = new CSubmit('gridalignall', _('Align icons'));
-$gridAlignAll->setAttribute('id', 'gridalignall');
-
-$gridForm = new CDiv(array($gridSize, $gridAlignAll));
-$gridForm->setAttribute('id', 'gridalignblock');
-
-$saveButton = new CSubmit('update', _('Update'));
-$saveButton->setAttribute('id', 'sysmap_update');
-
-$menuTable = new CTable(null, 'textwhite');
-$menuTable->addRow(array(
-	_s('Map "%s"', $this->data['sysmap']['name']),
-	SPACE.SPACE,
-	_('Icon'), SPACE, $addIcon, SPACE, $removeIcon,
-	SPACE.SPACE,
-	_('Link'), SPACE, $addLinkIcon, SPACE, $removeLinkIcon,
-	SPACE.SPACE,
-	_('Expand macros').' [ ', $expandMacros, ' ]',
-	SPACE.SPACE,
-	_('Grid').SPACE.'[', $gridShow, '|', $gridAutoAlign, ']',
-	SPACE,
-	$gridForm,
-	SPACE.'|'.SPACE,
-	$saveButton
-));
-
-$sysmapWidget->setTitle($menuTable);
+$sysmapWidget->addItem($menu);
+//$sysmapWidget->setTitle($menuTable);
 
 // create map
 $backgroundImage = new CImg('images/general/tree/zero.gif', 'Sysmap');
