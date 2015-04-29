@@ -234,12 +234,14 @@ class CTemplateImporter extends CImporter {
 			$template['templateid'] = $templateId;
 
 			// if we update template, existing macros should have hostmacroid
-			foreach ($template['macros'] as &$macro) {
-				if ($hostMacroId = $this->referencer->resolveMacro($templateId, $macro['macro'])) {
-					$macro['hostmacroid'] = $hostMacroId;
+			if (array_key_exists('macros', $template)) {
+				foreach ($template['macros'] as &$macro) {
+					if ($hostMacroId = $this->referencer->resolveMacro($templateId, $macro['macro'])) {
+						$macro['hostmacroid'] = $hostMacroId;
+					}
 				}
+				unset($macro);
 			}
-			unset($macro);
 		}
 
 		foreach ($template['groups'] as $gnum => $group) {
