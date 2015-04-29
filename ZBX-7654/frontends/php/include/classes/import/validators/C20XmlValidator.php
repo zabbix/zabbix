@@ -146,7 +146,7 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 								'publickey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'privatekey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* TYPE ??? */					'filter' =>					array('type' => self::XML_REQUIRED),
+/* TYPE (2.0 string) */			'filter' =>					array('type' => self::XML_REQUIRED),
 								'lifetime' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'interface_ref' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
@@ -223,9 +223,9 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 										'show_3d' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 										'percent_left' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 										'percent_right' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* TYPE, REQUIRED ??? */				'ymin_item_1' =>			array('type' => 0),
+										'ymin_item_1' =>			array('type' => self::XML_REQUIRED),
 										'ymin_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* TYPE, REQUIRED ??? */				'ymax_item_1' =>			array('type' => 0),
+										'ymax_item_1' =>			array('type' => self::XML_REQUIRED),
 										'ymax_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 										'graph_items' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => array(
 											'graph_item' =>				array('type' => self::XML_ARRAY, 'rules' => array(
@@ -443,7 +443,7 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 								'publickey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'privatekey' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'port' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* TYPE ??? */					'filter' =>					array('type' => self::XML_REQUIRED),
+/* TYPE (2.0 string) */			'filter' =>					array('type' => self::XML_REQUIRED),
 								'lifetime' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'description' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 								'item_prototypes' =>		array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'item_prototype', 'rules' => array(
@@ -518,9 +518,9 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 										'show_3d' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 										'percent_left' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 										'percent_right' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* TYPE, REQUIRED ??? */				'ymin_item_1' =>			array('type' => 0),
+										'ymin_item_1' =>			array('type' => self::XML_REQUIRED),
 										'ymin_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* TYPE, REQUIRED ??? */				'ymax_item_1' =>			array('type' => 0),
+										'ymax_item_1' =>			array('type' => self::XML_REQUIRED),
 										'ymax_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 										'graph_items' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => array(
 											'graph_item' =>				array('type' => self::XML_ARRAY, 'rules' => array(
@@ -631,9 +631,9 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 						'show_3d' =>				array('type' => self::XML_STRING | self::XML_REQUIRED),
 						'percent_left' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 						'percent_right' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* TYPE, REQUIRED ??? */'ymin_item_1' =>			array('type' => 0),
+						'ymin_item_1' =>			array('type' => self::XML_REQUIRED),
 						'ymin_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
-/* TYPE, REQUIRED ??? */'ymax_item_1' =>			array('type' => 0),
+						'ymax_item_1' =>			array('type' => self::XML_REQUIRED),
 						'ymax_type_1' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 						'graph_items' =>			array('type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => array(
 							'graph_item' =>				array('type' => self::XML_ARRAY, 'rules' => array(
