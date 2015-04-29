@@ -587,7 +587,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 
 	while (written < (ssize_t)len)
 	{
-		int	i;
+		ssize_t	i;
 
 		if (ZBX_PROTO_ERROR == (i = ZBX_TCP_WRITE(s->socket, data + written, (int)(len - written))))
 		{
