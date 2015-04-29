@@ -98,13 +98,18 @@ zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_HEXADECIMAL,
 			})
 			.trigger('change');
 
-		// numeric value types cannot contain trend values as zeroes
-		jQuery('#value_type').change(function() {
-			var value = jQuery(this).val(),
+		// When ever non-numeric type is changed back to numeric type, set the default value in "treds" field.
+		jQuery('#value_type').on('focus', function () {
+			old_value = jQuery(this).val();
+		}).change(function() {
+			var new_value = jQuery(this).val(),
 				trends = jQuery('#trends');
 
-			if ((value == <?php echo ITEM_VALUE_TYPE_FLOAT; ?> || value == <?php echo ITEM_VALUE_TYPE_UINT64; ?>)
-					&& trends.val() == 0) {
+			if ((old_value == <?php echo ITEM_VALUE_TYPE_STR; ?> || old_value == <?php echo ITEM_VALUE_TYPE_LOG; ?>
+					|| old_value == <?php echo ITEM_VALUE_TYPE_TEXT; ?>)
+					&& ((new_value == <?php echo ITEM_VALUE_TYPE_FLOAT; ?>
+					|| new_value == <?php echo ITEM_VALUE_TYPE_UINT64; ?>)
+					&& trends.val() == 0)) {
 				trends.val(<?php echo DAY_IN_YEAR; ?>);
 			}
 		});
