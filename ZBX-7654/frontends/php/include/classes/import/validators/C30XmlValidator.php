@@ -39,7 +39,9 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 						'host' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 						'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 						'description' =>			array('type' => self::XML_STRING),
-						'proxy' =>					array('type' => self::XML_STRING),
+						'proxy' =>					array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
+							'name' =>					array('type' => self::XML_STRING)
+						)),
 						'status' =>					array('type' => self::XML_STRING | self::XML_REQUIRED),
 						'ipmi_authtype' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
 						'ipmi_privilege' =>			array('type' => self::XML_STRING | self::XML_REQUIRED),
