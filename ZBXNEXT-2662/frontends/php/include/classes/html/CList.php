@@ -67,5 +67,8 @@ class CList extends CTag {
 		else {
 			parent::addItem($this->prepareItem($value, $class, $id));
 		}
+
+		return $this;
 	}
+
 }

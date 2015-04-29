@@ -26,9 +26,8 @@ $parentHost = $data['parent_host'];
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 require_once dirname(__FILE__).'/js/configuration.host.prototype.edit.js.php';
 
-$widget = new CWidget('hostprototype-edit');
-$widget->setTitle(_('Host prototypes'));
-$widget->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $discoveryRule['itemid']));
+$widget = (new CWidget('hostprototype-edit'))->setTitle(_('Host prototypes'))->
+	addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $discoveryRule['itemid']));
 
 $divTabs = new CTabView();
 if (!isset($_REQUEST['form_refresh'])) {

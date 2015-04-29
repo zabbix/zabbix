@@ -19,12 +19,8 @@
 **/
 
 
-$screenWidget = new CWidget();
-$screenWidget->setTitle(_('Screens'));
-
-$formFilter = new CFilter('web.screens.filter.state');
-$formFilter->addNavigator();
-$screenWidget->addItem($formFilter);
+$screenWidget = (new CWidget())->setTitle(_('Screens'))->
+	addItem((new CFilter('web.screens.filter.state'))->addNavigator());
 
 // header form
 $headerForm = new CForm();
@@ -39,9 +35,7 @@ $controls->addItem(new CComboBox('config', 'screens.php', 'redirect(this.options
 
 if (empty($this->data['screens'])) {
 	$headerForm->addItem($controls);
-	$screenWidget->setControls($headerForm);
-	$screenWidget->addItem(BR());
-	$screenWidget->addItem(new CTableInfo());
+	$screenWidget->setControls($headerForm)->addItem(BR())->addItem(new CTableInfo());
 
 	$screenBuilder = new CScreenBuilder();
 	CScreenBuilder::insertScreenStandardJs(array(

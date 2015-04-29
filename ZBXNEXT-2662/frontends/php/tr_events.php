@@ -91,12 +91,11 @@ $event = reset($events);
  */
 $config = select_config();
 
-$eventWidget = new CWidget();
-$eventWidget->setClass('header');
-$eventWidget->addHeader(
-	array(_('EVENTS').': "'.CMacrosResolverHelper::resolveTriggerName($trigger).'"'),
-	get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen')))
-);
+$eventWidget = (new CWidget())->
+	addHeader(
+		array(_('EVENTS').': "'.CMacrosResolverHelper::resolveTriggerName($trigger).'"'),
+		get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen')))
+	);
 
 // trigger details
 $triggerDetailsWidget = new CUiWidget('hat_triggerdetails', make_trigger_details($trigger));
@@ -145,7 +144,6 @@ $eventTab->addRow(
 	'top'
 );
 
-$eventWidget->addItem($eventTab);
-$eventWidget->show();
+$eventWidget->addItem($eventTab)->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

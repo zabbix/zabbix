@@ -158,8 +158,7 @@ $triggerData = isset($_REQUEST['triggerid'])
 	))
 	: null;
 
-$reportWidget = new CWidget();
-$reportWidget->setTitle(_('Availability report'));
+$reportWidget = (new CWidget())->setTitle(_('Availability report'));
 
 if ($triggerData) {
 	$triggerData = reset($triggerData);
@@ -168,10 +167,11 @@ if ($triggerData) {
 	$triggerData['hostid'] = $host['hostid'];
 	$triggerData['hostname'] = $host['name'];
 
-	$controls = new CList();
-	$controls->addItem(new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']));
-	$controls->addItem($triggerData['description']);
-	$reportWidget->setControls($controls);
+	$reportWidget->setControls(
+		(new CList())->
+			addItem(new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']))->
+			addItem($triggerData['description'])
+	);
 
 	$table = new CTableInfo();
 	$table->addRow(new CImg('chart4.php?triggerid='.$_REQUEST['triggerid']));

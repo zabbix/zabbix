@@ -18,23 +18,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$triggersWidget = new CWidget('trigger-list');
-// create widget header
-$triggersWidget->setTitle(array(_('Trigger prototypes of').SPACE,
-	new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')
-));
-
-// append host summary to widget header
-$triggersWidget->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
+$triggersWidget = (new CWidget())->
+	setTitle(
+		array(_('Trigger prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery'))
+	)->
+	addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 // create new application button
-$createForm = new CForm('get');
-$createForm->cleanItems();
+$createForm = (new CForm('get'))->cleanItems();
 $createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
-$controls = new CList();
-$controls->addItem(new CSubmit('form', _('Create trigger prototype')));
-$createForm->addItem($controls);
+$createForm->addItem((new CList())->addItem(new CSubmit('form', _('Create trigger prototype'))));
 
 $triggersWidget->setControls($createForm);
 

@@ -18,8 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$usersWidget = new CWidget();
-$usersWidget->setTitle(_('Users'));
+$usersWidget = (new CWidget())->setTitle(_('Users'));
 
 // append page header to widget
 $createForm = new CForm('get');

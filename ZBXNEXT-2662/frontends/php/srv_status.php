@@ -146,7 +146,6 @@ else {
 	if ($tree) {
 		// creates form for choosing a preset interval
 		$r_form = new CForm('get');
-		$controls = new CList();
 		$r_form->setAttribute('class', 'nowrap');
 		$r_form->setAttribute('name', 'period_choice');
 		$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
@@ -155,16 +154,18 @@ else {
 		foreach ($periods as $key => $val) {
 			$period_combo->addItem($key, $val);
 		}
-		$controls->addItem(array(_('Period').SPACE, $period_combo));
-		$controls->addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
-		$r_form->addItem($controls);
+		// controls
+		$r_form->addItem((new CList())->
+			addItem(array(_('Period').SPACE, $period_combo))->
+			addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])))
+		);
 
-		$srv_wdgt = new CWidget('service-list service-mon');
-		$srv_wdgt->setTitle(_('IT services'));
-		$srv_wdgt->setControls($r_form);
-		$srv_wdgt->addItem(BR());
-		$srv_wdgt->addItem($tree->getHTML());
-		$srv_wdgt->show();
+		$srv_wdgt = (new CWidget('service-list service-mon'))->
+			setTitle(_('IT services'))->
+			setControls($r_form)->
+			addItem(BR())->
+			addItem($tree->getHTML())->
+			show();
 	}
 	else {
 		error(_('Cannot format Tree. Check logic structure in service links.'));

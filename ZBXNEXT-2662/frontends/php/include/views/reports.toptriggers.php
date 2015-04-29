@@ -21,8 +21,7 @@
 
 require_once dirname(__FILE__).'/js/reports.toptriggers.js.php';
 
-$topTriggers = new CWidget('top-triggers');
-$topTriggers->setTitle(_('Most busy triggers Top 100'));
+$topTriggers = (new CWidget())->setTitle(_('Most busy triggers Top 100'));
 
 $filterForm = new CFilter('web.toptriggers.filter.state');
 $filterForm->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']));

@@ -21,14 +21,11 @@
 
 $this->addJSfile('js/class.pmaster.js');
 
-$dashboardWidget = new CWidget('dashboard');
-$dashboardWidget->setClass('header');
-
-$dashboardWidget->setTitle(_('Dashboard'));
-$dashboardWidget->setControls(new CList(array(
-	get_icon('dashconf'),
-	get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen')))
-)));
+$dashboardWidget = (new CWidget('dashboard'))->setTitle(_('Dashboard'))->
+	setControls(new CList(array(
+		get_icon('dashconf'),
+		get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen')))
+	)));
 
 /*
  * Dashboard grid

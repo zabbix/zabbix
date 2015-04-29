@@ -22,8 +22,7 @@
 $this->addJSfile('js/multiselect.js');
 $this->includeJSfile('app/views/administration.script.edit.js.php');
 
-$scriptsWidget = new CWidget();
-$scriptsWidget->setTitle(_('Scripts'));
+$scriptsWidget = (new CWidget())->setTitle(_('Scripts'));
 
 $scriptForm = new CForm();
 $scriptForm->setAttribute('id', 'scriptForm');
@@ -141,6 +140,4 @@ else {
 }
 
 $scriptForm->addItem($scriptView);
-$scriptsWidget->addItem($scriptForm);
-
-$scriptsWidget->show();
+$scriptsWidget->addItem($scriptForm)->show();

@@ -18,11 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$httpWidget = new CWidget();
-$httpWidget->setTitle(_('Web monitoring'));
+$httpWidget = (new CWidget())->setTitle(_('Web monitoring'));
 
-$createForm = new CForm('get');
-$createForm->cleanItems();
+$createForm = (new CForm('get'))->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
 
 $controls = new CList();

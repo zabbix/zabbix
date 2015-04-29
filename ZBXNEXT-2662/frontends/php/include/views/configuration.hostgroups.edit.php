@@ -19,8 +19,7 @@
 **/
 
 
-$hostGroupWidget = new CWidget();
-$hostGroupWidget->setTitle(_('Host groups'));
+$hostGroupWidget = (new CWidget())->setTitle(_('Host groups'));
 
 // create form
 $hostGroupForm = new CForm();

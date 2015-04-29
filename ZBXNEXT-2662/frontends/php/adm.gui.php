@@ -104,9 +104,7 @@ $controls->addItem(new CComboBox('configDropDown', 'adm.gui.php', 'redirect(this
 
 $form->addItem($controls);
 
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->setTitle(_('GUI'));
-$cnf_wdgt->setControls($form);
+$cnf_wdgt = (new CWidget())->setTitle(_('GUI'))->setControls($form);
 
 $config = select_config();
 
@@ -138,7 +136,6 @@ else {
 }
 
 $guiForm = new CView('administration.general.gui.edit', $data);
-$cnf_wdgt->addItem($guiForm->render());
-$cnf_wdgt->show();
+$cnf_wdgt->addItem($guiForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

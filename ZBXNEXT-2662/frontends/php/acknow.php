@@ -191,8 +191,7 @@ ob_end_flush();
  * Display
  */
 
-$widget = new CWidget();
-$widget->setTitle(_('Alarm acknowledges').SPACE.($bulk ? 'Bulk acknowledge ' : $eventTriggerName));
+$widget = (new CWidget())->setTitle(_('Alarm acknowledges').SPACE.($bulk ? 'Bulk acknowledge ' : $eventTriggerName));
 
 echo BR();
 

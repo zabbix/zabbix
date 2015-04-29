@@ -21,8 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.host.massupdate.js.php';
 
-$hostWidget = new CWidget();
-$hostWidget->setTitle(_('Hosts'));
+$hostWidget = (new CWidget())->setTitle(_('Hosts'));
 
 // create form
 $hostView = new CForm();

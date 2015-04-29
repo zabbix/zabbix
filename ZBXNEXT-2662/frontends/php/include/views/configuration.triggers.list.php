@@ -18,8 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$triggersWidget = new CWidget('trigger-list');
-$triggersWidget->setTitle(_('Triggers'));
+$triggersWidget = (new CWidget('trigger-list'))->setTitle(_('Triggers'));
 
 // append host summary to widget header
 if ($this->data['hostid']) {
@@ -27,8 +26,7 @@ if ($this->data['hostid']) {
 }
 
 // create new application button
-$createForm = new CForm('get');
-$createForm->cleanItems();
+$createForm = (new CForm('get'))->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
 
 $controls = new CList();

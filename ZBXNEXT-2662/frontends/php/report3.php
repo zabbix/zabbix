@@ -49,8 +49,7 @@ if (!$service) {
 	access_deny();
 }
 
-$widget = new CWidget();
-$widget->setTitle(_('IT services availability report').':'.SPACE.$service['name']);
+$widget = (new CWidget())->setTitle(_('IT services availability report').':'.SPACE.$service['name']);
 
 $controls = new CList();
 

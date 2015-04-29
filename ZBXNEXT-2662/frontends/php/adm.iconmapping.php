@@ -103,8 +103,7 @@ elseif (isset($_REQUEST['clone'])) {
 /*
  * Display
  */
-$iconMapWidget = new CWidget();
-$iconMapWidget->setTitle(_('Icon mapping'));
+$iconMapWidget = (new CWidget())->setTitle(_('Icon mapping'));
 
 $iconMapForm = new CForm();
 $iconMapForm->cleanItems();
@@ -188,7 +187,6 @@ else {
 	$iconMapView = new CView('administration.general.iconmap.list', $data);
 }
 
-$iconMapWidget->addItem($iconMapView->render());
-$iconMapWidget->show();
+$iconMapWidget->addItem($iconMapView->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

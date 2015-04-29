@@ -19,8 +19,7 @@
 **/
 
 
-$maintenanceWidget = new CWidget();
-$maintenanceWidget->setTitle(_('Maintenance periods'));
+$maintenanceWidget = (new CWidget())->setTitle(_('Maintenance periods'));
 
 // create form
 $maintenanceForm = new CForm();

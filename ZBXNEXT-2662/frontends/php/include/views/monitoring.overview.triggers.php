@@ -20,8 +20,7 @@
 
 zbx_add_post_js('jqBlink.blink();');
 
-$overviewWidget = new CWidget();
-$overviewWidget->setTitle(_('Overview'));
+$overviewWidget = (new CWidget())->setTitle(_('Overview'));
 
 $typeComboBox = new CComboBox('type', $this->data['type'], 'submit()', array(
 	SHOW_TRIGGERS => _('Triggers'),

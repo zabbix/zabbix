@@ -18,16 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$sysmapWidget = new CWidget();
-$sysmapWidget->setTitle(_('Maps'));
+$sysmapWidget = (new CWidget())->setTitle(_('Maps'));
 
 // create header buttons
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$controls = new CList();
-$controls->addItem(new CSubmit('form', _('Create map')));
-$controls->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=map")'));
-$createForm->addItem($controls);
+$createForm = (new CForm('get'))->cleanItems();
+$createForm->addItem((new CList())->
+	addItem(new CSubmit('form', _('Create map')))->
+	addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=map")'))
+);
 
 $sysmapWidget->setControls($createForm);
 

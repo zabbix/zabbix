@@ -21,8 +21,7 @@
 
 require_once dirname(__FILE__).'/js/monitoring.triggerComment.js.php';
 
-$commentWidget = new CWidget();
-$commentWidget->setTitle(_('Comments'));
+$commentWidget = (new CWidget())->setTitle(_('Comments'));
 
 // create form
 $commentForm = new CForm();

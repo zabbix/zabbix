@@ -23,8 +23,7 @@ if ($data['uncheck']) {
 	uncheckTableRows();
 }
 
-$scriptsWidget = new CWidget();
-$scriptsWidget->setTitle(_('Scripts'));
+$scriptsWidget = (new CWidget())->setTitle(_('Scripts'));
 
 $createForm = new CForm('get');
 $controls = new CList();
@@ -97,6 +96,4 @@ $scriptsForm->addItem(array(
 ));
 
 // append form to widget
-$scriptsWidget->addItem($scriptsForm);
-
-$scriptsWidget->show();
+$scriptsWidget->addItem($scriptsForm)->show();

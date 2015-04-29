@@ -18,8 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$actionWidget = new CWidget();
-$actionWidget->setTitle(_('Actions'));
+$actionWidget = (new CWidget())->setTitle(_('Actions'));
 
 // create new action button
 $createForm = new CForm('get');

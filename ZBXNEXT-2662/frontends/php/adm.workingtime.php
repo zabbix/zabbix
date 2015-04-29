@@ -48,11 +48,9 @@ if (hasRequest('update')) {
 /*
  * Display
  */
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->setTitle(_('Working time'));
+$cnf_wdgt = (new CWidget())->setTitle(_('Working time'));
 
-$form = new CForm();
-$form->cleanItems();
+$form = (new CForm())->cleanItems();
 
 $controls = new CList();
 $controls->addItem(new CComboBox('configDropDown', 'adm.workingtime.php',

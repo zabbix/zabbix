@@ -109,8 +109,7 @@ $active = getRequest('active', 0);
 $period = getRequest('period', ZBX_DEFAULT_INTERVAL);
 
 
-$widget = new CWidget();
-$widget->setTitle(_('New media'));
+$widget = (new CWidget())->setTitle(_('New media'));
 
 $form = new CForm();
 $form->addVar('media', $media);

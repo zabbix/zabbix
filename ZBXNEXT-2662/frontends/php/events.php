@@ -272,8 +272,7 @@ else {
 		}
 	}
 
-	$eventsWidget = new CWidget();
-	$eventsWidget->setTitle(_('Events'));
+	$eventsWidget = (new CWidget())->setTitle(_('Events'));
 
 	$csvDisabled = true;
 

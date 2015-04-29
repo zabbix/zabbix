@@ -122,8 +122,7 @@ catch (Exception $e) {
 /*
  * Display
  */
-$valueMapWidget = new CWidget();
-$valueMapWidget->setTitle(_('Value mapping'));
+$valueMapWidget = (new CWidget())->setTitle(_('Value mapping'));
 
 $valueMapForm = new CForm();
 $valueMapForm->cleanItems();
@@ -222,7 +221,6 @@ else {
 	$valueMapForm = new CView('administration.general.valuemapping.list', $data);
 }
 
-$valueMapWidget->addItem($valueMapForm->render());
-$valueMapWidget->show();
+$valueMapWidget->addItem($valueMapForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

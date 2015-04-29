@@ -62,11 +62,9 @@ if (hasRequest('update')) {
 /*
  * Display
  */
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->setTitle(_('Other configuration parameters'));
+$cnf_wdgt = (new CWidget())->setTitle(_('Other configuration parameters'));
 
-$form = new CForm();
-$form->cleanItems();
+$form = (new CForm())->cleanItems();
 
 $controls = new CList();
 $controls->addItem(new CComboBox('configDropDown', 'adm.other.php', 'redirect(this.options[this.selectedIndex].value);',
@@ -119,7 +117,6 @@ $data['alert_usrgrps'] = DBfetchArray(DBselect('SELECT u.usrgrpid,u.name FROM us
 order_result($data['alert_usrgrps'], 'name');
 
 $otherForm = new CView('administration.general.other.edit', $data);
-$cnf_wdgt->addItem($otherForm->render());
-$cnf_wdgt->show();
+$cnf_wdgt->addItem($otherForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

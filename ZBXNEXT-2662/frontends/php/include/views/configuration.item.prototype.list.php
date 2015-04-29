@@ -19,8 +19,7 @@
 **/
 
 
-$itemsWidget = new CWidget();
-$itemsWidget->setTitle(_('Item prototypes'));
+$itemsWidget = (new CWidget())->setTitle(_('Item prototypes'));
 
 // create new item button
 $createForm = new CForm('get');

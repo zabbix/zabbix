@@ -60,8 +60,6 @@ $admin = in_array(CWebUser::$data['type'], array(
 ));
 $rows_per_page = CWebUser::$data['rows_per_page'];
 
-$searchWidget = new CWidget();
-
 $search = getRequest('search', '');
 
 // Header
@@ -69,7 +67,7 @@ if (zbx_empty($search)) {
 	$search = _('Search pattern is empty');
 }
 
-$searchWidget->setTitle(_('Search').':'.SPACE.$search);
+$searchWidget = (new CWidget())->setTitle(_('Search').':'.SPACE.$search);
 
 // FIND Hosts
 $params = array(

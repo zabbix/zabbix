@@ -76,8 +76,7 @@ if (hasRequest('update')) {
 /*
  * Display
  */
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->setTitle(_('Trigger displaying options'));
+$cnf_wdgt = (new CWidget())->setTitle(_('Trigger displaying options'));
 
 $form = new CForm();
 $form->cleanItems();
@@ -136,7 +135,6 @@ else {
 }
 
 $triggerDisplayingForm = new CView('administration.general.triggerDisplayOptions.edit', $data);
-$cnf_wdgt->addItem($triggerDisplayingForm->render());
-$cnf_wdgt->show();
+$cnf_wdgt->addItem($triggerDisplayingForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

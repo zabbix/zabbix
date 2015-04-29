@@ -21,8 +21,7 @@
 
 include('include/views/js/configuration.sysmaps.js.php');
 
-$sysmapWidget = new CWidget();
-$sysmapWidget->setTitle(_('Network maps'));
+$sysmapWidget = (new CWidget())->setTitle(_('Network maps'));
 
 // create menu
 $addIcon = new CIcon(_('Add element'), 'iconplus');

@@ -25,9 +25,8 @@ $widgetClass = 'host-edit';
 if (isset($data['dbHost']) && $data['dbHost']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	$widgetClass .= ' host-edit-discovered';
 }
-$hostWidget = new CWidget($widgetClass);
-$hostWidget->setTitle(_('Hosts'));
-$hostWidget->addItem(get_header_host_table('', $data['hostId']));
+$hostWidget = (new CWidget($widgetClass))->setTitle(_('Hosts'))->
+	addItem(get_header_host_table('', $data['hostId']));
 
 if ($data['hostId']) {
 	$dbHost = $data['dbHost'];

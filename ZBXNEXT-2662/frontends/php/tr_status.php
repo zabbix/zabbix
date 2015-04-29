@@ -211,8 +211,7 @@ CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR
 /*
  * Display
  */
-$triggerWidget = new CWidget();
-$triggerWidget->setTitle(_('Status of triggers'));
+$triggerWidget = (new CWidget())->setTitle(_('Status of triggers'));
 
 $rightForm = new CForm('get');
 $rightForm->addVar('fullscreen', $_REQUEST['fullscreen']);
@@ -796,8 +795,7 @@ if ($config['event_ack_enable']) {
 }
 
 $triggerForm->addItem(array($triggerTable, $paging, $footer));
-$triggerWidget->addItem($triggerForm);
-$triggerWidget->show();
+$triggerWidget->addItem($triggerForm)->show();
 
 zbx_add_post_js('jqBlink.blink();');
 zbx_add_post_js('var switcher = new CSwitcher(\''.$switcherName.'\');');
