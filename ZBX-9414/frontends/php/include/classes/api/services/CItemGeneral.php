@@ -268,7 +268,7 @@ abstract class CItemGeneral extends CApiService {
 					}
 				}
 				else {
-					// For non-numeric types, which ever value was entered in trends field, is overwritten to zero.
+					// For non-numeric types, whichever value was entered in trends field, is overwritten to zero.
 					$item['trends'] = 0;
 				}
 			}

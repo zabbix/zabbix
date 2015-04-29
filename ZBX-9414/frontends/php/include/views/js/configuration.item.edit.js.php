@@ -98,7 +98,7 @@ zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_HEXADECIMAL,
 			})
 			.trigger('change');
 
-		// When ever non-numeric type is changed back to numeric type, set the default value in "treds" field.
+		// Whenever non-numeric type is changed back to numeric type, set the default value in "trends" field.
 		jQuery('#value_type').on('focus', function () {
 			old_value = jQuery(this).val();
 		}).change(function() {
