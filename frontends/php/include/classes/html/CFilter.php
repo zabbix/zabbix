@@ -30,7 +30,7 @@ class CFilter extends CTag {
 
 	public function __construct($filterid) {
 		parent::__construct('div', 'yes');
-		$this->attr('class', 'table-forms-container');
+		$this->attr('class', 'filter-container');
 		$this->attr('id', 'filter-space');
 		$this->filterid = $filterid;
 		$this->columns = array();
@@ -64,7 +64,7 @@ class CFilter extends CTag {
 	}
 
 	private function getHeader() {
-		$switch = new CDiv(null, 'filter-container');
+		$switch = new CDiv(null, 'filter-btn-container');
 		$button = new CSimpleButton(array(_('Filter'), new CSpan(null, 'arrow-up', 'filter-arrow')), 'filter-trigger filter-active');
 		$button->setAttribute('id', 'filter-mode');
 		$button->addAction('onclick', 'javascript: jQuery("#filter-space").toggle(); jQuery("#filter-mode").toggleClass("filter-active"); jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");');
