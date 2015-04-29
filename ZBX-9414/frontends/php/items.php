@@ -1209,11 +1209,12 @@ else {
 			}
 
 			// Hide trend (zero values) for non-numeric item types.
-			if (!in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))) {
+			if ($item['value_type'] == ITEM_VALUE_TYPE_STR || $item['value_type'] == ITEM_VALUE_TYPE_LOG
+					|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
 				$item['trends'] = '';
 			}
 
-			if (in_array($item['type'], array(ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP))) {
+			if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
 				$item['delay'] = '';
 			}
 
