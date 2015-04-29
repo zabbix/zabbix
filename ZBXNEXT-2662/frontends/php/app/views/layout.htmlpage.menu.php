@@ -37,19 +37,15 @@
 	$form->AddItem(array($search, $button));
 	$icons->addItem($form);
 
-	$help = new CLink(SPACE, 'http://www.zabbix.com/documentation/', 'top-nav-help', null, true);
-	$help->setAttribute('target', '_blank');
-	$help->setAttribute('title', _('Help'));
-	$icons->addItem($help);
-
 	$zshare = new CLink('Share', 'https://share.zabbix.com/', 'top-nav-zbbshare', null, true);
 	$zshare->setAttribute('target', '_blank');
 	$zshare->setAttribute('title', _('Zabbix Share'));
 	$icons->addItem($zshare);
 
-	$print = new CLink(SPACE, null, 'top-nav-print');
-	$print->setAttribute('title', _('Print'));
-	$icons->addItem($print);
+	$help = new CLink(SPACE, 'http://www.zabbix.com/documentation/', 'top-nav-help', null, true);
+	$help->setAttribute('target', '_blank');
+	$help->setAttribute('title', _('Help'));
+	$icons->addItem($help);
 
 	$profile = new CLink(SPACE, 'profile.php', 'top-nav-profile');
 	$profile->setAttribute('title', _('Profile'));
