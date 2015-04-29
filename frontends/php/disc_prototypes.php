@@ -388,7 +388,8 @@ else {
 	));
 
 	foreach ($data['items'] as &$item) {
-		if (!in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))) {
+		if ($item['value_type'] == ITEM_VALUE_TYPE_STR || $item['value_type'] == ITEM_VALUE_TYPE_LOG
+				|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
 			$item['trends'] = '';
 		}
 
