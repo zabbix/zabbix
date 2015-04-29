@@ -113,8 +113,8 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 									))
 								)),
-/* REQUIRED ??? */				'valuemap' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-									'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
+								'valuemap' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
+									'name' =>					array('type' => self::XML_STRING)
 								)),
 								'logtimefmt' =>				array('type' => self::XML_STRING),
 								'interface_ref' =>			array('type' => self::XML_STRING)
@@ -191,8 +191,8 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 												'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 											))
 										)),
-/* REQUIRED ??? */						'valuemap' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-											'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
+										'valuemap' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
+											'name' =>					array('type' => self::XML_STRING)
 										)),
 										'logtimefmt' =>				array('type' => self::XML_STRING),
 										'interface_ref' =>			array('type' => self::XML_STRING)
@@ -411,8 +411,8 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 										'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 									))
 								)),
-/* REQUIRED */					'valuemap' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-									'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
+								'valuemap' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
+									'name' =>					array('type' => self::XML_STRING)
 								)),
 								'logtimefmt' =>				array('type' => self::XML_STRING),
 /* REMOVE ??? */				'interface_ref' =>			array('type' => self::XML_STRING)
@@ -488,8 +488,8 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 												'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
 											))
 										)),
-/* REQUIRED ??? */						'valuemap' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
-											'name' =>					array('type' => self::XML_STRING | self::XML_REQUIRED)
+										'valuemap' =>				array('type' => self::XML_ARRAY | self::XML_REQUIRED, 'rules' => array(
+											'name' =>					array('type' => self::XML_STRING)
 										)),
 										'logtimefmt' =>				array('type' => self::XML_STRING)
 									))
