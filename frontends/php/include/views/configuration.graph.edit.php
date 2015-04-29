@@ -22,12 +22,12 @@
 $graphWidget = new CWidget();
 
 if (!empty($this->data['parent_discoveryid'])) {
-	$graphWidget->setTitle(_('Graph prototypes'));
-	$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
+	$graphWidget->setTitle(_('Graph prototypes'))->
+		addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 else {
-	$graphWidget->setTitle(_('Graphs'));
-	$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid']));
+	$graphWidget->setTitle(_('Graphs'))->
+		addItem(get_header_host_table('graphs', $this->data['hostid']));
 }
 
 // create form

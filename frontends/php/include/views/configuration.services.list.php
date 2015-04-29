@@ -19,8 +19,7 @@
 **/
 
 
-$serviceWidget = new CWidget('service-list');
-$serviceWidget->setTitle(_('IT services'));
+$serviceWidget = (new CWidget('service-list'))->setTitle(_('IT services'));
 
 // create form
 $serviceForm = new CForm();

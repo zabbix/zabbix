@@ -20,12 +20,10 @@
 
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
-$itemsWidget = new CWidget('item-list');
-$itemsWidget->setTitle(_('Items'));
+$itemsWidget = (new CWidget('item-list'))->setTitle(_('Items'));
 
 // create new item button
-$createForm = new CForm('get');
-$createForm->cleanItems();
+$createForm = (new CForm('get'))->cleanItems();
 $controls = new CList();
 
 if (empty($this->data['hostid'])) {

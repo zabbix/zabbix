@@ -92,7 +92,6 @@ $importTab->setFooter(makeFormFooter(
 $importForm->addItem($importTab);
 
 // widget
-$importWidget = new CWidget();
-$importWidget->addItem($importForm);
+$importWidget = (new CWidget())->addItem($importForm);
 
 return $importWidget;

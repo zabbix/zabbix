@@ -19,13 +19,11 @@
 **/
 
 
-$itemWidget = new CWidget();
+$itemWidget = (new CWidget())->setTitle(_('Items'));
 
 if (!empty($this->data['hostid'])) {
 	$itemWidget->addItem(get_header_host_table('items', $this->data['hostid']));
 }
-
-$itemWidget->setTitle(_('Items'));
 
 // create form
 $itemForm = new CForm();

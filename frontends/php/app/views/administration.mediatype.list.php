@@ -23,7 +23,7 @@ if ($data['uncheck']) {
 	uncheckTableRows();
 }
 
-$mediaTypeWidget = new CWidget();
+$mediaTypeWidget = (new CWidget())->setTitle(_('Media types'));
 
 // create new media type button
 $createForm = new CForm('get');
@@ -31,7 +31,6 @@ $createForm = new CForm('get');
 $controls = new CList();
 $controls->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'));
 $createForm->addItem($controls);
-$mediaTypeWidget->setTitle(_('Media types'));
 $mediaTypeWidget->setControls($createForm);
 
 // create form
@@ -132,6 +131,4 @@ $mediaTypeForm->addItem(array(
 ));
 
 // append form to widget
-$mediaTypeWidget->addItem($mediaTypeForm);
-
-$mediaTypeWidget->show();
+$mediaTypeWidget->addItem($mediaTypeForm)->show();

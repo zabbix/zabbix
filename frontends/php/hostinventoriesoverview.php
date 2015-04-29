@@ -67,8 +67,7 @@ $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['groupby'] = getRequest('groupby', '');
 $groupFieldTitle = '';
 
-$hostinvent_wdgt = new CWidget();
-$hostinvent_wdgt->setTitle(_('Host inventory overview'));
+$hostinvent_wdgt = (new CWidget())->setTitle(_('Host inventory overview'));
 
 // getting inventory fields to make a drop down
 $inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title

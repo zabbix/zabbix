@@ -19,8 +19,7 @@
 **/
 
 
-$chartsWidget = new CWidget();
-$chartsWidget->setTitle(_('Graphs'));
+$chartsWidget = (new CWidget())->setTitle(_('Graphs'));
 
 $chartForm = new CForm('get');
 $chartForm->addVar('fullscreen', $this->data['fullscreen']);

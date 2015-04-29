@@ -140,9 +140,7 @@ $controls->addItem(new CComboBox('configDropDown', 'adm.housekeeper.php',
 
 $form->addItem($controls);
 
-$cnf_wdgt = new CWidget('hk');
-$cnf_wdgt->setTitle(_('Housekeeping'));
-$cnf_wdgt->setControls($form);
+$cnf_wdgt = new CWidget()->setTitle(_('Housekeeping'))->setControls($form);
 
 $config = select_config();
 
@@ -190,7 +188,6 @@ else {
 }
 
 $houseKeeperForm = new CView('administration.general.housekeeper.edit', $data);
-$cnf_wdgt->addItem($houseKeeperForm->render());
-$cnf_wdgt->show();
+$cnf_wdgt->addItem($houseKeeperForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -150,11 +150,9 @@ if (hasRequest('update')) {
 /*
  * Display
  */
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->setTitle(_('Macros'));
+$cnf_wdgt = (new CWidget())->setTitle(_('Macros'));
 
-$form = new CForm();
-$form->cleanItems();
+$form = (new CForm())->cleanItems();
 
 $controls = new CList();
 $controls->addItem(new CComboBox('configDropDown', 'adm.macros.php', 'redirect(this.options[this.selectedIndex].value);',
@@ -202,8 +200,6 @@ if ($result) {
 	$data['macros'] = order_macros($data['macros'], 'macro');
 }
 $macrosForm = new CView('administration.general.macros.edit', $data);
-$cnf_wdgt->addItem($macrosForm->render());
-
-$cnf_wdgt->show();
+$cnf_wdgt->addItem($macrosForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

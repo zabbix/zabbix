@@ -18,16 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$applicationWidget = new CWidget();
-$applicationWidget->setTitle(_('Applications'));
+$applicationWidget = (new CWidget())->setTitle(_('Applications'));
 
-$createForm = new CForm('get');
-$createForm->cleanItems();
+$createForm = (new CForm('get'))->cleanItems();
 
-$controls = new CList();
-
-$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$controls->addItem(array(_('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
+$controls = (new CList())->
+	addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()))->
+	addItem(array(_('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 // append host summary to widget header
 if (empty($this->data['hostid'])) {

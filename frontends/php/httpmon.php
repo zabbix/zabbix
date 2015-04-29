@@ -81,9 +81,7 @@ $controls->addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fulls
 
 $r_form->addItem($controls);
 
-$httpmon_wdgt = new CWidget();
-$httpmon_wdgt->setTitle(_('WEB monitoring'));
-$httpmon_wdgt->setControls($r_form);
+$httpmon_wdgt = (new CWidget())->setTitle(_('WEB monitoring'))->setControls($r_form);
 
 // TABLE
 $table = new CTableInfo();
@@ -194,8 +192,7 @@ else {
 	getPagingLine($tmp);
 }
 
-$httpmon_wdgt->addItem(array($table, $paging));
-$httpmon_wdgt->show();
+$httpmon_wdgt->addItem(array($table, $paging))->show();
 
 
 require_once dirname(__FILE__).'/include/page_footer.php';

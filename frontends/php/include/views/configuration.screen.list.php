@@ -18,12 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$screenWidget = new CWidget();
-$screenWidget->setTitle(_('Screens'));
+$screenWidget = (new CWidget())->setTitle(_('Screens'));
 
 // create new screen button
-$createForm = new CForm('get');
-$createForm->cleanItems();
+$createForm = (new CForm('get'))->cleanItems();
 $controls = new CList();
 $controls->addItem(new CSubmit('form', _('Create screen')));
 if (!empty($this->data['templateid'])) {

@@ -19,8 +19,7 @@
 **/
 
 
-$discoveryWidget = new CWidget();
-$discoveryWidget->setTitle(_('Status of discovery'));
+$discoveryWidget = (new CWidget())->setTitle(_('Status of discovery'));
 
 // create header form
 $controls = new CList();
@@ -182,5 +181,4 @@ foreach ($data['drules'] as $drule) {
 	}
 }
 
-$discoveryWidget->addItem($discoveryTable);
-$discoveryWidget->show();
+$discoveryWidget->addItem($discoveryTable)->show();

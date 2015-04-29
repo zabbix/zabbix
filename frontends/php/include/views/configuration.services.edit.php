@@ -25,9 +25,7 @@ global $ZBX_MESSAGES;
 
 $service = $this->data['service'];
 
-$servicesWidget = new CWidget();
-$servicesWidget->setRootClass('services-edit');
-$servicesWidget->setTitle(_('Configuration of IT services'));
+$servicesWidget = (new CWidget())->setTitle(_('Configuration of IT services'));
 
 // create form
 $servicesForm = new CForm();

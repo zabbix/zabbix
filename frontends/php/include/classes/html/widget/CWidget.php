@@ -49,28 +49,36 @@ class CWidget {
 		if (is_string($class)) {
 			$this->css_class = $class;
 		}
+		return $this;
 	}
 
 	public function setTitle($title) {
 		$this->title = $title;
+		return $this;
 	}
 
 	public function setControls($controls) {
 		zbx_value2array($controls);
 
 		$this->controls = $controls;
+
+		return $this;
 	}
 
 	public function addHeader($left = SPACE, $right = SPACE) {
 		zbx_value2array($right);
 
 		$this->headers[] = array('left' => $left, 'right' => $right);
+
+		return $this;
 	}
 
 	public function addItem($items = null) {
 		if (!is_null($items)) {
 			$this->body[] = $items;
 		}
+
+		return $this;
 	}
 
 	public function get() {

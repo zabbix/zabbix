@@ -21,8 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.sysmap.edit.js.php';
 
-$sysmapWidget = new CWidget();
-$sysmapWidget->setTitle(_('Network maps'));
+$sysmapWidget = (new CWidget())->setTitle(_('Network maps'));
 
 // create sysmap form
 $sysmapForm = new CForm();

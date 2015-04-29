@@ -30,8 +30,7 @@ $regExpTable->setHeader(array(
 	_('Expressions')
 ));
 
-$regExpWidget = new CWidget();
-$regExpWidget->setTitle(_('Regular expressions'));
+$regExpWidget = (new CWidget())->setTitle(_('Regular expressions'));
 
 $controls = new CList();
 $controls->addItem(new CComboBox('configDropDown', 'adm.regexps.php',

@@ -19,7 +19,7 @@
 **/
 
 
-$itemsWidget = new CWidget();
+$itemsWidget = (new CWidget())->setTitle(_('Host prototypes'));
 
 $discoveryRule = $this->data['discovery_rule'];
 
@@ -28,7 +28,6 @@ $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 $createForm->addItem(new CSubmit('form', _('Create host prototype')));
-$itemsWidget->setTitle(_('Host prototypes'));
 $itemsWidget->setControls($createForm);
 
 // header

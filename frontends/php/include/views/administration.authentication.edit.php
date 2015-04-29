@@ -19,8 +19,7 @@
 **/
 
 
-$authenticationWidget = new CWidget();
-$authenticationWidget->setTitle(_('Authentication'));
+$authenticationWidget = (new CWidget())->setTitle(_('Authentication'));
 
 // create form
 $authenticationForm = new CForm();

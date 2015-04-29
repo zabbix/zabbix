@@ -83,6 +83,8 @@ class CComboBox extends CTag {
 
 			parent::addItem($citem);
 		}
+
+		return $this;
 	}
 
 	/**

@@ -415,8 +415,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), array('templa
 /*
  * Display
  */
-$templateWidget = new CWidget();
-$templateWidget->setTitle(_('Templates'));
+$templateWidget = (new CWidget())->setTitle(_('Templates'));
 
 $pageFilter = new CPageFilter(array(
 	'config' => array(

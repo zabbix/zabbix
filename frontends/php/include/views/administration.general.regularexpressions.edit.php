@@ -21,8 +21,7 @@
 
 require_once dirname(__FILE__).'/js/adm.regexprs.edit.js.php';
 
-$regExpWidget = new CWidget();
-$regExpWidget->setTitle(_('Regular expressions'));
+$regExpWidget = (new CWidget())->setTitle(_('Regular expressions'));
 
 $headerForm = new CForm();
 $headerForm->cleanItems();

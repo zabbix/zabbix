@@ -22,8 +22,7 @@
 $graphWidget = new CWidget();
 
 // create new graph button
-$createForm = new CForm('get');
-$createForm->cleanItems();
+$createForm = (new CForm('get'))->cleanItems();
 
 $controls = new CList();
 

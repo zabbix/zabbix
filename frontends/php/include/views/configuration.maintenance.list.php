@@ -18,12 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$maintenanceWidget = new CWidget();
-$maintenanceWidget->setTitle(_('Maintenance periods'));
+$maintenanceWidget = (new CWidget())->setTitle(_('Maintenance periods'));
 
 // create new maintenance button
-$createForm = new CForm('get');
-$createForm->cleanItems();
+$createForm = (new CForm('get'))->cleanItems();
 $controls = new CList();
 $controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
 $controls->addItem(new CSubmit('form', _('Create maintenance period')));

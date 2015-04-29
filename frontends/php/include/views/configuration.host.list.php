@@ -19,19 +19,16 @@
 **/
 
 
-$hostWidget = new CWidget('host-list');
-$hostWidget->setTitle(_('Hosts'));
+$hostWidget = (new CWidget('host-list'))->setTitle(_('Hosts'));
 
-$frmForm = new CForm('get');
-$frmForm->cleanItems();
+$frmForm = (new CForm('get'))->cleanItems();
 
-$controls = new CList();
+$frmForm->addItem((new CList())->
+	addItem(array(_('Group').SPACE, $data['pageFilter']->getGroupsCB()))->
+	addItem(new CSubmit('form', _('Create host')))->
+	addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")'))
+);
 
-$controls->addItem(array(_('Group').SPACE, $data['pageFilter']->getGroupsCB()));
-$controls->addItem(new CSubmit('form', _('Create host')));
-$controls->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")'));
-
-$frmForm->addItem($controls);
 $hostWidget->setControls($frmForm);
 
 // Filter

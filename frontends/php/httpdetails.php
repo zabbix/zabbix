@@ -109,11 +109,11 @@ $itemHistory = Manager::History()->getLast($items);
 /*
  * Display
  */
-$httpdetailsWidget = new CWidget();
-$httpdetailsWidget->setTitle(
-	_('DETAILS OF WEB SCENARIO').':'.SPACE.
-	CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])
-);
+$httpdetailsWidget = (new CWidget())->
+	setTitle(
+		_('DETAILS OF WEB SCENARIO').':'.SPACE.
+		CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])
+	);
 $controls = new CList();
 $controls->addItem(get_icon('reset', array('id' => getRequest('httptestid'))));
 $controls->addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
@@ -242,8 +242,7 @@ $httpdetailsTable->addRow(array(
 	new CSpan($status['msg'], $status['style'].' bold')
 ));
 
-$httpdetailsWidget->addItem($httpdetailsTable);
-$httpdetailsWidget->show();
+$httpdetailsWidget->addItem($httpdetailsTable)->show();
 
 echo BR();
 
@@ -351,7 +350,6 @@ CScreenBuilder::insertScreenScrollJs(array('timeline' => $graphInScreen->timelin
 CScreenBuilder::insertScreenRefreshTimeJs();
 CScreenBuilder::insertProcessObjectsJs();
 
-$graphsWidget->addItem($graphTable);
-$graphsWidget->show();
+$graphsWidget->addItem($graphTable)->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

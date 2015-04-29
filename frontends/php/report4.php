@@ -62,14 +62,12 @@ while ($media_type_data = DBfetch($db_media_types)) {
 	$media_types[$media_type_data['mediatypeid']] = $media_type_data['description'];
 }
 
-$widget = new CWidget();
-$widget->setTitle(_('Notifications'));
+$widget = (new CWidget())->setTitle(_('Notifications'));
 
 // if no media types were defined, we have nothing to show
 if (zbx_empty($media_types)) {
 	$table = new CTableInfo();
-	$widget->addItem($table);
-	$widget->show();
+	$widget->addItem($table)->show();
 }
 else {
 	$table = new CTableInfo();
@@ -252,9 +250,7 @@ else {
 		$table->addRow($row);
 	}
 
-	$widget->addItem($table);
-
-	$widget->show();
+	$widget->addItem($table)->show();
 
 	if ($media_type == 0) {
 		echo BR();

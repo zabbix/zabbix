@@ -72,8 +72,7 @@ if (hasRequest('update')) {
 /*
  * Display
  */
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->setTitle(_('Configuration of trigger severities'));
+$cnf_wdgt = (new CWidget())->setTitle(_('Configuration of trigger severities'));
 
 $form = new CForm();
 $form->cleanItems();
@@ -135,7 +134,6 @@ else {
 }
 
 $triggerSeverityForm = new CView('administration.general.triggerSeverity.edit', $data);
-$cnf_wdgt->addItem($triggerSeverityForm->render());
-$cnf_wdgt->show();
+$cnf_wdgt->addItem($triggerSeverityForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -19,9 +19,7 @@
 **/
 
 
-$dashconfWidget = new CWidget();
-$dashconfWidget->setClass('header');
-$dashconfWidget->setTitle(_('Dashboard'));
+$dashconfWidget = (new CWidget())->setTitle(_('Dashboard'));
 
 // create form
 $dashconfForm = new CForm();

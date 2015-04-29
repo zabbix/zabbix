@@ -19,8 +19,7 @@
 **/
 
 
-$overviewWidget = new CWidget();
-$overviewWidget->setTitle(_('Overview'));
+$overviewWidget = (new CWidget())->setTitle(_('Overview'));
 
 $headerForm = new CForm('get');
 

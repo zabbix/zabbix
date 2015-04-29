@@ -21,8 +21,7 @@
 
 $this->includeJSfile('app/views/administration.mediatype.edit.js.php');
 
-$mediaTypeWidget = new CWidget();
-$mediaTypeWidget->setTitle(_('Media types'));
+$mediaTypeWidget = (new CWidget())->setTitle(_('Media types'));
 
 // create form
 $mediaTypeForm = new CForm();
@@ -122,6 +121,4 @@ else {
 $mediaTypeForm->addItem($mediaTypeTab);
 
 // append form to widget
-$mediaTypeWidget->addItem($mediaTypeForm);
-
-$mediaTypeWidget->show();
+$mediaTypeWidget->addItem($mediaTypeForm)->show();

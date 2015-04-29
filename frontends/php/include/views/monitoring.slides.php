@@ -19,8 +19,7 @@
 **/
 
 
-$slideshowWidget = new CWidget();
-$slideshowWidget->setTitle(_('Slide shows'));
+$slideshowWidget = (new CWidget())->setTitle(_('Slide shows'));
 
 // create header form
 $slideHeaderForm = new CForm('get');

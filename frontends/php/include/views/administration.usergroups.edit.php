@@ -19,8 +19,7 @@
 **/
 
 
-$userGroupWidget = new CWidget();
-$userGroupWidget->setTitle(_('User groups'));
+$userGroupWidget = (new CWidget())->setTitle(_('User groups'));
 
 // create form
 $userGroupForm = new CForm();

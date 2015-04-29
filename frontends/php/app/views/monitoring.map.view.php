@@ -19,8 +19,7 @@
 **/
 
 
-$mapWidget = new CWidget();
-$mapWidget->setTitle(_('Maps'));
+$mapWidget = (new CWidget())->setTitle(_('Maps'));
 
 $headerMapForm = new CForm('get');
 $headerMapForm->cleanItems();
@@ -78,8 +77,4 @@ else {
 $controls->addItem(get_icon('fullscreen', array('fullscreen' => $data['fullscreen'])));
 
 $headerMapForm->addItem($controls);
-$mapWidget->setControls($headerMapForm);
-
-$mapWidget->addItem($mapTable);
-
-$mapWidget->show();
+$mapWidget->setControls($headerMapForm)->addItem($mapTable)->show();

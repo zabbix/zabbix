@@ -18,8 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$auditWidget = new CWidget();
-$auditWidget->setTitle(_('Action log'));
+$auditWidget = (new CWidget())->setTitle(_('Action log'));
 
 // create filter
 $filterForm = new CFilter('web.auditacts.filter.state');

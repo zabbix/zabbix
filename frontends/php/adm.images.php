@@ -156,9 +156,7 @@ if (!isset($_REQUEST['form'])) {
 }
 $form->addItem($controls);
 
-$imageWidget = new CWidget();
-$imageWidget->setTitle(_('Images'));
-$imageWidget->setControls($form);
+$imageWidget = (new CWidget())->setTitle(_('Images'))->setControls($form);
 
 $data = array(
 	'form' => getRequest('form'),
@@ -191,7 +189,6 @@ else {
 	$imageForm = new CView('administration.general.image.list', $data);
 }
 
-$imageWidget->addItem($imageForm->render());
-$imageWidget->show();
+$imageWidget->addItem($imageForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

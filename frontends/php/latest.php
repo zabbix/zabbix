@@ -336,9 +336,7 @@ if ($filter['groupids'] !== null) {
 /*
  * Display
  */
-$latestWidget = new CWidget('latest-mon');
-$latestWidget->setTitle(_('Latest data'));
-
+$latestWidget = (new CWidget())->setTitle(_('Latest data'));
 
 // Filter
 $filterForm = new CFilter('web.latest.filter.state');
@@ -403,7 +401,6 @@ $filterForm->addColumn($filterColumn2);
 $latestWidget->addItem($filterForm);
 // End of Filter
 
-$latestWidget->setTitle(_('Latest data'));
 $controls = new CList();
 $controls->addItem(get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))));
 $latestWidget->setControls($controls);
@@ -872,7 +869,6 @@ $form->addItem(array(
 	))
 ));
 
-$latestWidget->addItem($form);
-$latestWidget->show();
+$latestWidget->addItem($form)->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
