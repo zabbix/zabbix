@@ -60,20 +60,19 @@ $menu = (new CList(null, 'object-group'))->
 	addItem((new CSubmit('gridalignall', _('Align icons')))->addClass('btn-alt')->setAttribute('id', 'gridalignall'))->
 	addItem((new CSubmit('update', _('Update')))->setAttribute('id', 'sysmap_update'));
 
-$sysmapWidget->addItem($menu);
-//$sysmapWidget->setTitle($menuTable);
-
 // create map
 $backgroundImage = new CImg('images/general/tree/zero.gif', 'Sysmap');
 $backgroundImage->setAttribute('id', 'sysmap_img', $this->data['sysmap']['width'], $this->data['sysmap']['height']);
 
 $backgroundImageTable = new CTable();
 $backgroundImageTable->addRow($backgroundImage);
-$sysmapWidget->addItem($backgroundImageTable);
 
-$container = new CDiv();
-$container->setAttribute('id', 'sysmap_cnt');
-$sysmapWidget->addItem($container);
+$container = (new CDiv())->setAttribute('id', 'sysmap_cnt');
+
+$sysmapWidget->addItem($menu)->
+	addItem((new CDiv(null, 'table-forms-container'))->
+		addItem($backgroundImageTable)->
+		addItem($container));
 
 // create elements
 zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.CJs::encodeJson(array(
