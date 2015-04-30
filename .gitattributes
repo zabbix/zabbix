@@ -198,7 +198,6 @@ frontends/php/images/gradients/sla_red.png -text
 frontends/php/images/gradients/sla_red15.png -text
 frontends/php/images/gradients/table_head2_bb.gif -text
 frontends/php/images/gradients/table_head_bb.gif -text
-frontends/php/include/classes/import/preprocessors/CXmlPreprocessorGeneral.php -text
 frontends/php/include/classes/mvc/CController.php -text
 frontends/php/include/classes/mvc/CControllerResponse.php -text
 frontends/php/include/classes/mvc/CControllerResponseData.php -text

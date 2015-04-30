@@ -43,9 +43,14 @@ class CXmlValidatorGeneral {
 	 *
 	 * @param array  $data	import data
 	 * @param string $path	XML path (for error reporting)
+	 *
+	 * @return array		Validator does some manipulation for the incoming data. For example, converts empty tags to
+	 *						an array, if desired. Converted array is returned.
 	 */
 	public function validate(array $data, $path) {
 		$this->validateData($this->rules, $data, $path);
+
+		return $data;
 	}
 
 	/**
@@ -55,13 +60,17 @@ class CXmlValidatorGeneral {
 	 * @param mixed  $data		import data
 	 * @param string $path		XML path (for error reporting)
 	 *
-	 * @throw Exception		if $data does not correspond to validation $rules
+	 * @throw Exception			if $data does not correspond to validation $rules
 	 */
-	public function validateData(array $rules, $data, $path) {
+	public function validateData(array $rules, &$data, $path) {
 		if ($rules['type'] & self::XML_STRING) {
 			$this->validateString($data, $path);
 		}
 		elseif ($rules['type'] & self::XML_ARRAY) {
+			if ($data === '') {
+				$data = [];
+			}
+
 			$this->validateArray($data, $path);
 
 			// unexpected tag validation
@@ -89,6 +98,10 @@ class CXmlValidatorGeneral {
 			}
 		}
 		elseif ($rules['type'] & self::XML_INDEXED_ARRAY) {
+			if ($data === '') {
+				$data = [];
+			}
+
 			$this->validateArray($data, $path);
 
 			$index = 0;
@@ -103,10 +116,10 @@ class CXmlValidatorGeneral {
 				}
 			}
 
-			foreach ($data as $tag => $value) {
+			foreach ($data as $tag => &$value) {
 				if (array_key_exists('extra', $rules) && $rules['extra'] == $tag) {
 					$subpath = ($path === '/' ? $path : $path.'/').$tag;
-					$this->validateData($rules['rules'][$rules['extra']], $value, $subpath);
+					$this->validateData($rules['rules'][$tag], $value, $subpath);
 					continue;
 				}
 
@@ -120,6 +133,7 @@ class CXmlValidatorGeneral {
 				$subpath = ($path === '/' ? $path : $path.'/').$prefix.'('.$index.')';
 				$this->validateData($rules['rules'][$prefix], $value, $subpath);
 			}
+			unset($value);
 		}
 
 		if (array_key_exists('ex_validate', $rules)) {
