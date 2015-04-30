@@ -569,7 +569,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 												'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
 											]]
 										]],
-										'templates' =>				['type' => self::XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+										'templates' =>				['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'template', 'rules' => [
 											'template' =>				['type' => self::XML_ARRAY, 'rules' => [
 												'name' =>					['type' => self::XML_STRING | self::XML_REQUIRED]
 											]]
