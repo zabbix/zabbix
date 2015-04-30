@@ -890,6 +890,12 @@ define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 // so this flag is not needed here.
 define('LIBXML_IMPORT_FLAGS', LIBXML_NONET);
 
+// XML validation
+define(XML_STRING,			0x01);
+define(XML_ARRAY,			0x02);
+define(XML_INDEXED_ARRAY,	0x04);
+define(XML_REQUIRED,		0x08);
+
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
 define('ZBX_API_ERROR_PARAMETERS',	100);
