@@ -156,7 +156,7 @@ class C20XmlValidator {
 							'publickey' =>				['type' => XML_STRING | XML_REQUIRED],
 							'privatekey' =>				['type' => XML_STRING | XML_REQUIRED],
 							'port' =>					['type' => XML_STRING | XML_REQUIRED],
-/* TYPE  string] */			'filter' =>					['type' => XML_REQUIRED],
+							'filter' =>					['type' => XML_REQUIRED, 'ex_validate' => array($this, 'validateFilter')],
 							'lifetime' =>				['type' => XML_STRING | XML_REQUIRED],
 							'description' =>			['type' => XML_STRING | XML_REQUIRED],
 							'interface_ref' =>			['type' => XML_STRING | XML_REQUIRED],
@@ -459,7 +459,7 @@ class C20XmlValidator {
 							'publickey' =>				['type' => XML_STRING | XML_REQUIRED],
 							'privatekey' =>				['type' => XML_STRING | XML_REQUIRED],
 							'port' =>					['type' => XML_STRING | XML_REQUIRED],
-/* TYPE  string] */			'filter' =>					['type' => XML_REQUIRED],
+							'filter' =>					['type' => XML_REQUIRED, 'ex_validate' => array($this, 'validateFilter')],
 							'lifetime' =>				['type' => XML_STRING | XML_REQUIRED],
 							'description' =>			['type' => XML_STRING | XML_REQUIRED],
 							'item_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'item_prototype', 'rules' => [
@@ -820,6 +820,7 @@ class C20XmlValidator {
 	 * Validate date and time format.
 	 *
 	 * @param string $date	export date and time
+	 * @param string $path	XML path (for error reporting)
 	 *
 	 * @throws Exception	if the date or time is invalid
 	 */
@@ -827,6 +828,37 @@ class C20XmlValidator {
 		if (!preg_match('/^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])T(2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]Z$/', $date)) {
 			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
 		}
+
+		return $date;
+	}
+
+	/**
+	 * Validate the "discovery_rule/filter" tag.
+	 *
+	 * @param string $data	import data
+	 * @param string $path	XML path (for error reporting)
+	 *
+	 * @throws Exception	if the date or time is invalid
+	 */
+	public function validateFilter($data, $path) {
+		if (is_array($data)) {
+			$rules = ['type' => XML_ARRAY, 'rules' => [
+				'evaltype' =>	['type' => XML_STRING | XML_REQUIRED],
+				'formula' =>	['type' => XML_STRING | XML_REQUIRED],
+				'conditions' =>	['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
+					'condition' =>	['type' => XML_ARRAY, 'rules' => [
+						'macro' =>		['type' => XML_STRING | XML_REQUIRED],
+						'value' =>		['type' => XML_STRING | XML_REQUIRED],
+						'operator' =>	['type' => XML_STRING | XML_REQUIRED],
+						'formulaid' =>	['type' => XML_STRING | XML_REQUIRED]
+					]]
+				]]
+			]];
+
+			$data = (new CXmlValidatorGeneral($rules))->validate($data, $path);
+		}
+
+		return $data;
 	}
 
 	/**
