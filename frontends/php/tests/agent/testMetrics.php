@@ -333,6 +333,8 @@ class testMetrics extends CZabbixTest {
 // TODO
 			array('net.tcp.service[ssh,127.0.0.1,22]',		TYPE_UINT,	'/1/',				1,	1),
 			array('net.tcp.service.perf[ssh,127.0.0.1,22]',	TYPE_FLOAT,	'',					0.001,	10),
+			array('net.udp.service[ntp,127.0.0.1,123]',		TYPE_UINT,	'/1/',				1,	1),
+			array('net.udp.service.perf[ntp,127.0.0.1,123]',TYPE_FLOAT,	'',					0.001,	10),
 			array('proc.num[inetd,,,]',						TYPE_ANY,	'/0/',				0,	0),
 			array('proc.mem[inetd,,]',						TYPE_ANY,	'/0/'		,		0,	0),
 			array('system.hw.chassis[]',					TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
