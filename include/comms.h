@@ -29,19 +29,19 @@ typedef long	ssize_t;
 
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
-#	define zbx_sock_close(s)	if (ZBX_SOCK_ERROR != (s)) closesocket(s)
-#	define zbx_sock_last_error()	WSAGetLastError()
+#	define zbx_socket_close(s)	if (ZBX_SOCKET_ERROR != (s)) closesocket(s)
+#	define zbx_socket_last_error()	WSAGetLastError()
 
-#	define ZBX_TCP_ERROR		SOCKET_ERROR
-#	define ZBX_SOCK_ERROR		INVALID_SOCKET
+#	define ZBX_PROTO_ERROR		SOCKET_ERROR
+#	define ZBX_SOCKET_ERROR		INVALID_SOCKET
 #else
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)write((s), (b), (bl)))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)read((s), (b), (bl)))
-#	define zbx_sock_close(s)	if (ZBX_SOCK_ERROR != (s)) close(s)
-#	define zbx_sock_last_error()	errno
+#	define zbx_socket_close(s)	if (ZBX_SOCKET_ERROR != (s)) close(s)
+#	define zbx_socket_last_error()	errno
 
-#	define ZBX_TCP_ERROR		-1
-#	define ZBX_SOCK_ERROR		-1
+#	define ZBX_PROTO_ERROR		-1
+#	define ZBX_SOCKET_ERROR		-1
 #endif
 
 #if defined(SOCKET) || defined(_WINDOWS)
@@ -71,20 +71,19 @@ typedef struct
 	char		buf_stat[ZBX_STAT_BUF_LEN];
 	char		*buffer;
 	unsigned char	accepted;
-	char		*error;
 	char		*next_line;
 	int		timeout;
 }
-zbx_sock_t;
+zbx_socket_t;
 
-const char	*zbx_tcp_strerror(void);
+const char	*zbx_socket_strerror(void);
 
 #if !defined(_WINDOWS)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 #endif
 
-void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o);
-int     zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout);
+void	zbx_tcp_init(zbx_socket_t *s, ZBX_SOCKET o);
+int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout);
 
 #define ZBX_TCP_PROTOCOL	0x01
 
@@ -93,31 +92,34 @@ int     zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, un
 #define zbx_tcp_send_bytes_to(s, d, len, timeout)	zbx_tcp_send_ext((s), (d), len, ZBX_TCP_PROTOCOL, timeout)
 #define zbx_tcp_send_raw(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, 0)
 
-int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, size_t len, unsigned char flags, int timeout);
+int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned char flags, int timeout);
 
-void    zbx_tcp_close(zbx_sock_t *s);
+void	zbx_tcp_close(zbx_socket_t *s);
 
 #if defined(HAVE_IPV6)
 int	get_address_family(const char *addr, int *family, char *error, int max_error_len);
 #endif
 
-int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_port);
+int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port);
 
-int	zbx_tcp_accept(zbx_sock_t *s);
-void	zbx_tcp_unaccept(zbx_sock_t *s);
-
-void    zbx_tcp_free(zbx_sock_t *s);
+int	zbx_tcp_accept(zbx_socket_t *s);
+void	zbx_tcp_unaccept(zbx_socket_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
 
 #define	zbx_tcp_recv(s) 		SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0, 0))
 #define	zbx_tcp_recv_to(s, timeout) 	SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0, timeout))
 
-ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, unsigned char flags, int timeout);
-const char	*zbx_tcp_recv_line(zbx_sock_t *s);
+ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout);
+const char	*zbx_tcp_recv_line(zbx_socket_t *s);
 
-char    *get_ip_by_socket(zbx_sock_t *s);
-int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty);
+char	*get_ip_by_socket(zbx_socket_t *s);
+int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_empty);
+
+int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout);
+int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout);
+int	zbx_udp_recv(zbx_socket_t *s, int timeout);
+void	zbx_udp_close(zbx_socket_t *s);
 
 #define ZBX_DEFAULT_FTP_PORT		21
 #define ZBX_DEFAULT_SSH_PORT		22
@@ -138,7 +140,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #define ZBX_DEFAULT_AGENT_PORT_STR	"10050"
 #define ZBX_DEFAULT_SERVER_PORT_STR	"10051"
 
-int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int protocol, int timeout);
+int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, int protocol, int timeout);
 
 #define zbx_send_response(sock, result, info, timeout) \
 		zbx_send_response_ext(sock, result, info, ZBX_TCP_PROTOCOL, timeout)
@@ -146,7 +148,7 @@ int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int pr
 #define zbx_send_response_raw(sock, result, info, timeout) \
 		zbx_send_response_ext(sock, result, info, 0, timeout)
 
-int	zbx_recv_response(zbx_sock_t *sock, int timeout, char **error);
+int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error);
 
 #if defined(HAVE_IPV6)
 #define zbx_getnameinfo(sa, host, hostlen, serv, servlen, flags)						\

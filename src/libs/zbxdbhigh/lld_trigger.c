@@ -492,7 +492,7 @@ static char	*lld_expression_expand(const char *expression, zbx_vector_ptr_t *fun
 static void	lld_function_make(zbx_lld_function_t *function_proto, zbx_vector_ptr_t *functions, zbx_uint64_t itemid)
 {
 	int			i;
-	zbx_lld_function_t	*function;
+	zbx_lld_function_t	*function = NULL;
 
 	for (i = 0; i < functions->values_num; i++)
 	{

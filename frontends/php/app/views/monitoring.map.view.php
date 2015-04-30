@@ -25,15 +25,15 @@ if ($data['maps']) {
 	$mapTable = new CTable(null, 'map map-container');
 	$mapTable->setAttribute('style', 'margin-top: 4px;');
 
-	$mapComboBox = new CComboBox('sysmapid', $data['sysmapid'], 'submit()');
+	$maps = array();
 	foreach ($data['maps'] as $sysmapid => $map) {
-		$mapComboBox->addItem($sysmapid, $map['name']);
+		$maps[$sysmapid] = $map['name'];
 	}
 
 	$headerMapForm = new CForm('get');
 	$headerMapForm->addVar('action', 'map.view');
 	$headerMapForm->addVar('fullscreen', $data['fullscreen']);
-	$headerMapForm->addItem(array(_('Maps'), SPACE, $mapComboBox));
+	$headerMapForm->addItem(array(_('Maps'), SPACE, new CComboBox('sysmapid', $data['sysmapid'], 'submit()', $maps)));
 
 	$headerSeverityMinForm = new CForm('get');
 	$headerSeverityMinForm->addVar('action', 'map.view');

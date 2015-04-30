@@ -23,9 +23,10 @@ zbx_add_post_js('jqBlink.blink();');
 
 $overviewWidget = new CWidget();
 
-$typeComboBox = new CComboBox('type', $this->data['type'], 'submit()');
-$typeComboBox->addItem(SHOW_TRIGGERS, _('Triggers'));
-$typeComboBox->addItem(SHOW_DATA, _('Data'));
+$typeComboBox = new CComboBox('type', $this->data['type'], 'submit()', array(
+	SHOW_TRIGGERS => _('Triggers'),
+	SHOW_DATA => _('Data')
+));
 
 $headerForm = new CForm('get');
 $headerForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()));
@@ -69,9 +70,10 @@ $overviewWidget->addPageHeader(_('OVERVIEW'), array(
 ));
 
 // header left
-$styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit()');
-$styleComboBox->addItem(STYLE_TOP, _('Top'));
-$styleComboBox->addItem(STYLE_LEFT, _('Left'));
+$styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit()', array(
+	STYLE_TOP => _('Top'),
+	STYLE_LEFT => _('Left')
+));
 
 $hostLocationForm = new CForm('get');
 $hostLocationForm->addVar('groupid', $this->data['groupid']);
