@@ -1,18 +1,16 @@
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
+	<div class="dashbrd-widget-head">
+		<h4 id="formDragHandler">Map element</h4>
+	</div>
 	<form id="selementForm" name="selementForm">
 		<input type="hidden" id="elementid" name="elementid">
-		<table id="elementFormTable" class="formtable">
-			<thead>
-			<tr class="header">
-				<td id="formDragHandler" colspan="2" class="form_row_first move"><?php echo _('Edit map element'); ?></td>
-			</tr>
-			</thead>
+		<table id="elementFormTable" class="table-forms">
 			<tbody>
 			<tr>
-				<td>
+				<td class="table-forms-td-left">
 					<label for="elementType"><?php echo _('Type'); ?></label>
 				</td>
-				<td>
+				<td class="table-forms-td-right">
 					<select size="1" class="input select" name="elementtype" id="elementType">
 						<option value="<?php echo SYSMAP_ELEMENT_TYPE_HOST; ?>"><?php echo _('Host'); ?></option>
 						<option value="<?php echo SYSMAP_ELEMENT_TYPE_MAP; ?>"><?php echo _('Map'); ?></option>
@@ -23,8 +21,8 @@
 				</td>
 			</tr>
 			<tr id="subtypeRow">
-				<td><?php echo _('Show'); ?></td>
-				<td>
+				<td class="table-forms-td-left"><?php echo _('Show'); ?></td>
+				<td class="table-forms-td-right">
 					<div class="groupingContent">
 						<input id="subtypeHostGroup" type="radio" class="input radio" name="elementsubtype" value="0" checked="checked">
 						<label for="subtypeHostGroup"><?php echo _('Host group'); ?></label>
@@ -35,8 +33,8 @@
 				</td>
 			</tr>
 			<tr id="areaTypeRow">
-				<td><?php echo _('Area type'); ?></td>
-				<td>
+				<td class="table-forms-td-left"><?php echo _('Area type'); ?></td>
+				<td class="table-forms-td-right">
 					<div class="groupingContent">
 						<input id="areaTypeAuto" type="radio" class="input radio" name="areatype" value="0" checked="checked">
 						<label for="areaTypeAuto"><?php echo _('Fit to map'); ?></label>
@@ -47,8 +45,8 @@
 				</td>
 			</tr>
 			<tr id="areaSizeRow">
-				<td><?php echo _('Area size'); ?></td>
-				<td>
+				<td class="table-forms-td-left"><?php echo _('Area size'); ?></td>
+				<td class="table-forms-td-right">
 					<label for="areaSizeWidth"><?php echo _('Width'); ?></label>
 					<input id="areaSizeWidth" type="text" class="input text" name="width" value="200" size="5">
 					<label for="areaSizeHeight"><?php echo _('Height'); ?></label>
@@ -56,28 +54,28 @@
 				</td>
 			</tr>
 			<tr id="areaPlacingRow">
-				<td>
+				<td class="table-forms-td-left">
 					<label for="areaPlacing"><?php echo _('Placing algorithm'); ?></label>
 				</td>
-				<td>
+				<td class="table-forms-td-right">
 					<select id="areaPlacing" class="input select">
 						<option value="<?php echo SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID; ?>"><?php echo _('Grid'); ?></option>
 					</select>
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td class="table-forms-td-left">
 					<label for="elementLabel"><?php echo _('Label'); ?></label>
 				</td>
-				<td>
+				<td class="table-forms-td-right">
 					<textarea id="elementLabel" cols="56" rows="4" name="label" class="input textarea_standard"></textarea>
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td class="table-forms-td-left">
 					<label for="label_location"><?php echo _('Label location'); ?></label>
 				</td>
-				<td>
+				<td class="table-forms-td-right">
 					<select id="label_location" class="input select" name="label_location">
 						<option value="<?php echo MAP_LABEL_LOC_DEFAULT; ?>"><?php echo _('Default'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
@@ -88,72 +86,70 @@
 				</td>
 			</tr>
 			<tr id="hostGroupSelectRow">
-				<td><?php echo _('Host group'); ?></td>
-				<td>
+				<td class="table-forms-td-left"><?php echo _('Host group'); ?></td>
+				<td class="table-forms-td-right">
 					<div id="elementNameHostGroup" class="multiselect" style="width: 312px;"></div>
 				</td>
 			</tr>
 			<tr id="hostSelectRow">
-				<td><?php echo _('Host'); ?></td>
-				<td>
+				<td class="table-forms-td-left"><?php echo _('Host'); ?></td>
+				<td class="table-forms-td-right">
 					<div id="elementNameHost" class="multiselect" style="width: 312px;"></div>
 				</td>
 			</tr>
 			<tr id="triggerSelectRow">
-				<td><?php echo _('Trigger'); ?></td>
-				<td>
+				<td class="table-forms-td-left"><?php echo _('Trigger'); ?></td>
+				<td class="table-forms-td-right">
 					<input readonly="readonly" size="50" id="elementNameTrigger" name="elementName" class="input">
 					<input type="hidden" id="elementExpressionTrigger" name="elementExpressionTrigger">
 					<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1&real_hosts=1&noempty=1')"><?php echo _('Select'); ?></span>
 				</td>
 			</tr>
 			<tr id="mapSelectRow">
-				<td><?php echo _('Map'); ?></td>
-				<td>
-					<input readonly="readonly" size="50" id="elementNameMap" name="elementName" class="input">
+				<td class="table-forms-td-left"><?php echo _('Map'); ?></td>
+				<td class="table-forms-td-right">
+					<input readonly="readonly" size="32" id="elementNameMap" name="elementName" class="input">
 					<span class="link" onclick='PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&writeonly=1&excludeids[]=#{sysmapid}")'><?php echo _('Select'); ?></span>
 				</td>
 			</tr>
 			<tr id="application-select-row">
-				<td><?php echo _('Application'); ?></td>
-				<td>
-					<input size="50" id="application" name="application" class="input text"><button id="application-select" type="button" class="button link_menu"><?php echo _('Select'); ?></button>
+				<td class="table-forms-td-left"><?php echo _('Application'); ?></td>
+				<td class="table-forms-td-right">
+					<input id="application" name="application" class="input text" size="32" type="text"><button id="application-select" type="button" class="button link_menu"><?php echo _('Select'); ?></button>
 				</td>
 			</tr>
 
 			<tr>
-				<td colspan="2">
+				<td class="table-forms-td-right" colspan="2">
 					<fieldset>
 						<legend><?php echo _('Icons'); ?></legend>
 						<table>
 							<tbody>
 							<tr id="useIconMapRow">
 								<td colspan="2">
-									<label for="use_iconmap" id=use_iconmapLabel><?php echo _('Automatic icon selection'); ?></label>
-									<input type="checkbox" name="use_iconmap" id="use_iconmap" class="checkbox" value="1">
+									<label for="use_iconmap" id=use_iconmapLabel>
+										<input type="checkbox" name="use_iconmap" id="use_iconmap" class="checkbox" value="1">
+										<?php echo _('Automatic icon selection'); ?>
+									</label>
 								</td>
 							</tr>
 							<tr>
 								<td>
 									<label for="iconid_off"><?php echo _('Default'); ?></label>
-									<br />
 									<select class="input select" name="iconid_off" id="iconid_off"></select>
 								</td>
 								<td id="iconProblemRow">
 									<label for="iconid_on"><?php echo _('Problem'); ?></label>
-									<br />
 									<select class="input select" name="iconid_on" id="iconid_on"></select>
 								</td>
 							</tr>
 							<tr>
 								<td id="iconMainetnanceRow">
 									<label for="iconid_maintenance"><?php echo _('Maintenance'); ?></label>
-									<br />
 									<select class="input select" name="iconid_maintenance" id="iconid_maintenance"></select>
 								</td>
 								<td id="iconDisabledRow">
 									<label for="iconid_disabled"><?php echo _('Disabled'); ?></label>
-									<br />
 									<select class="input select" name="iconid_disabled" id="iconid_disabled"></select>
 								</td>
 							</tr>
@@ -164,31 +160,31 @@
 			</tr>
 
 			<tr>
-				<td><?php echo _('Coordinates'); ?></td>
-				<td>
-					<label for="x"><?php echo _('X'); ?></label>:
-					<input id="x" maxlength="5" value="0" size="5" name="x" class="input">
-					<label for="y"><?php echo _('Y'); ?></label>:
-					<input maxlength="5" value="0" size="5" id="y" name="y" class="input">
+				<td class="table-forms-td-left"><?php echo _('Coordinates'); ?></td>
+				<td class="table-forms-td-right">
+					<input id="x" type="number" maxlength="5" value="0" size="5" name="x" class="input">
+					<label for="x"><?php echo _('X'); ?></label>
+					<input type="number" maxlength="5" value="0" size="5" id="y" name="y" class="input">
+					<label for="y"><?php echo _('Y'); ?></label>
 				</td>
 			</tr>
 
 			<tr>
-				<td colspan="2">
+				<td class="table-forms-td-right" colspan="2">
 					<fieldset>
 						<legend><?php echo _('URLs'); ?></legend>
 						<table>
 							<thead>
 							<tr>
-								<td><?php echo _('Name'); ?></td>
-								<td><?php echo _('URL'); ?></td>
+								<td><label><?php echo _('Name'); ?></label></td>
+								<td><label><?php echo _('URL'); ?></label></td>
 								<td></td>
 							</tr>
 							</thead>
 							<tbody id="urlContainer"></tbody>
 							<tfoot>
 							<tr>
-								<td colspan="3">
+								<td colspan=3>
 									<button type="button" id="newSelementUrl" class="button link_menu"><?php echo _('Add'); ?></button>
 								</td>
 							</tr>
@@ -197,6 +193,8 @@
 					</fieldset>
 				</td>
 			</tr>
+			</tbody>
+			<tfoot>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
 					<button id="elementApply" class="button element-edit-control jqueryinput" type="button"><?php echo _('Apply') ?></button>
@@ -204,7 +202,7 @@
 					<button id="elementClose" class="button jqueryinput" type="button"><?php echo _('Close') ?></button>
 				</td>
 			</tr>
-			</tbody>
+			</tfoot>
 		</table>
 	</form>
 </script>
@@ -471,8 +469,8 @@
 <script type="text/x-jquery-tmpl" id="selementFormUrls">
 	<tr id="urlrow_#{selementurlid}" class="even_row">
 		<td><input class="input" name="url_#{selementurlid}_name" type="text" size="16" value="#{name}"></td>
-		<td><input class="input" name="url_#{selementurlid}_url" type="text" size="32" value="#{url}"></td>
 		<td>
+			<input class="input" name="url_#{selementurlid}_url" type="text" size="32" value="#{url}">
 			<button type="button" class="button link_menu" onclick="jQuery('#urlrow_#{selementurlid}').remove();"><?php echo _('Remove'); ?></button>
 		</td>
 	</tr>
