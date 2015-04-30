@@ -264,32 +264,34 @@ class C10XmlValidator {
 	/**
 	 * Validate date format.
 	 *
-	 * @param string $date	export date
-	 * @param string $path	XML path
+	 * @param string $data			import data
+	 * @param array  $parent_data	data's parent array
+	 * @param string $path			XML path
 	 *
-	 * @throws Exception	if the date is invalid
+	 * @throws Exception			if the date is invalid
 	 */
-	public function validateDate($date, $path) {
-		if (!preg_match('/^(0[1-9]|[1-2][0-9]|3[01])\.(0[1-9]|1[0-2])\.[0-9]{2}$/', $date)) {
+	public function validateDate($data, array $parent_data = null, $path) {
+		if (!preg_match('/^(0[1-9]|[1-2][0-9]|3[01])\.(0[1-9]|1[0-2])\.[0-9]{2}$/', $data)) {
 			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('DD.MM.YY', 'XML date format'))));
 		}
 
-		return $date;
+		return $data;
 	}
 
 	/**
 	 * Validate time format.
 	 *
-	 * @param string $time	export time
-	 * @param string $path	XML path
+	 * @param string $data			import data
+	 * @param array  $parent_data	data's parent array
+	 * @param string $path			XML path
 	 *
-	 * @throws Exception	if the time is invalid
+	 * @throws Exception			if the time is invalid
 	 */
-	public function validateTime($time, $path) {
-		if (!preg_match('/^(2[0-3]|[01][0-9])\.[0-5][0-9]$/', $time)) {
+	public function validateTime($data, array $parent_data = null, $path) {
+		if (!preg_match('/^(2[0-3]|[01][0-9])\.[0-5][0-9]$/', $data)) {
 			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('hh.mm', 'XML time format'))));
 		}
 
-		return $time;
+		return $data;
 	}
 }

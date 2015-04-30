@@ -43,7 +43,7 @@ class CXmlValidatorGeneral {
 	 *						an array, if desired. Converted array is returned.
 	 */
 	public function validate(array $data, $path) {
-		$this->validateData($this->rules, $data, $path);
+		$this->validateData($this->rules, $data, null, $path);
 
 		return $data;
 	}
@@ -51,13 +51,14 @@ class CXmlValidatorGeneral {
 	/**
 	 * Base validation function.
 	 *
-	 * @param array  $rules		validation rules
-	 * @param mixed  $data		import data
-	 * @param string $path		XML path (for error reporting)
+	 * @param array  $rules			validation rules
+	 * @param mixed  $data			import data
+	 * @param array  $parent_data	data's parent array (used for "ex_validate" callback functions)
+	 * @param string $path			XML path (for error reporting)
 	 *
-	 * @throw Exception			if $data does not correspond to validation $rules
+	 * @throw Exception				if $data does not correspond to validation $rules
 	 */
-	public function validateData(array $rules, &$data, $path) {
+	public function validateData(array $rules, &$data, array $parent_data = null, $path) {
 		if (array_key_exists('preprocessor', $rules)) {
 			$data = call_user_func($rules['preprocessor'], $data);
 		}
@@ -87,7 +88,7 @@ class CXmlValidatorGeneral {
 			foreach ($rules['rules'] as $tag => $rule) {
 				if (array_key_exists($tag, $data)) {
 					$subpath = ($path === '/' ? $path : $path.'/').$tag;
-					$this->validateData($rule, $data[$tag], $subpath);
+					$this->validateData($rule, $data[$tag], $data, $subpath);
 				}
 				elseif ($rule['type'] & XML_REQUIRED) {
 					throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
@@ -118,7 +119,7 @@ class CXmlValidatorGeneral {
 			foreach ($data as $tag => &$value) {
 				if (array_key_exists('extra', $rules) && $rules['extra'] == $tag) {
 					$subpath = ($path === '/' ? $path : $path.'/').$tag;
-					$this->validateData($rules['rules'][$tag], $value, $subpath);
+					$this->validateData($rules['rules'][$tag], $value, $data, $subpath);
 					continue;
 				}
 
@@ -130,13 +131,13 @@ class CXmlValidatorGeneral {
 
 				$index++;
 				$subpath = ($path === '/' ? $path : $path.'/').$prefix.'('.$index.')';
-				$this->validateData($rules['rules'][$prefix], $value, $subpath);
+				$this->validateData($rules['rules'][$prefix], $value, $data, $subpath);
 			}
 			unset($value);
 		}
 
 		if (array_key_exists('ex_validate', $rules)) {
-			$data = call_user_func($rules['ex_validate'], $data, $path);
+			$data = call_user_func($rules['ex_validate'], $data, $parent_data, $path);
 		}
 	}
 

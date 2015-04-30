@@ -841,17 +841,18 @@ class C30XmlValidator {
 	/**
 	 * Validate date and time format.
 	 *
-	 * @param string $date	export date and time
-	 * @param string $path	XML path (for error reporting)
+	 * @param string $data			import data
+	 * @param array  $parent_data	data's parent array
+	 * @param string $path			XML path (for error reporting)
 	 *
-	 * @throws Exception	if the date or time is invalid
+	 * @throws Exception			if the date or time is invalid
 	 */
-	public function validateDateTime($date, $path) {
-		if (!preg_match('/^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])T(2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]Z$/', $date)) {
+	public function validateDateTime($data, array $parent_data = null, $path) {
+		if (!preg_match('/^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])T(2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]Z$/', $data)) {
 			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
 		}
 
-		return $date;
+		return $data;
 	}
 
 	/**
