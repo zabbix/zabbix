@@ -48,15 +48,13 @@ class CXmlValidator {
 	 *						an array, if desired. Converted array is returned.
 	 */
 	public function validate(array $data) {
-		$validator = new CXmlValidatorGeneral(
-			array('type' => CXmlValidatorGeneral::XML_ARRAY, 'rules' => array(
-				'zabbix_export' => array('type' => CXmlValidatorGeneral::XML_ARRAY | CXmlValidatorGeneral::XML_REQUIRED, 'check_unexpected' => false, 'rules' => array(
-					'version' => array('type' => CXmlValidatorGeneral::XML_STRING | CXmlValidatorGeneral::XML_REQUIRED)
-				))
-			))
-		);
+		$rules = ['type' => XML_ARRAY, 'rules' => [
+			'zabbix_export' => ['type' => XML_ARRAY | XML_REQUIRED, 'check_unexpected' => false, 'rules' => [
+				'version' => ['type' => XML_STRING | XML_REQUIRED]
+			]]
+		]];
 
-		$data = $validator->validate($data, '/');
+		$data = (new CXmlValidatorGeneral($rules))->validate($data, '/');
 		$version = $data['zabbix_export']['version'];
 
 		if (!array_key_exists($version, $this->versionValidators)) {

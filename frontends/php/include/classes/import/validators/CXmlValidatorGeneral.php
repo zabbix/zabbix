@@ -24,11 +24,6 @@
  */
 class CXmlValidatorGeneral {
 
-	const XML_STRING = 0x01;
-	const XML_ARRAY = 0x02;
-	const XML_INDEXED_ARRAY = 0x04;
-	const XML_REQUIRED = 0x08;
-
 	/**
 	 * @var array
 	 */
@@ -67,10 +62,10 @@ class CXmlValidatorGeneral {
 			$data = call_user_func($rules['preprocessor'], $data);
 		}
 
-		if ($rules['type'] & self::XML_STRING) {
+		if ($rules['type'] & XML_STRING) {
 			$this->validateString($data, $path);
 		}
-		elseif ($rules['type'] & self::XML_ARRAY) {
+		elseif ($rules['type'] & XML_ARRAY) {
 			if ($data === '') {
 				$data = [];
 			}
@@ -94,14 +89,14 @@ class CXmlValidatorGeneral {
 					$subpath = ($path === '/' ? $path : $path.'/').$tag;
 					$this->validateData($rule, $data[$tag], $subpath);
 				}
-				elseif ($rule['type'] & self::XML_REQUIRED) {
+				elseif ($rule['type'] & XML_REQUIRED) {
 					throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
 						_s('the tag "%1$s" is missing', $tag)
 					));
 				}
 			}
 		}
-		elseif ($rules['type'] & self::XML_INDEXED_ARRAY) {
+		elseif ($rules['type'] & XML_INDEXED_ARRAY) {
 			if ($data === '') {
 				$data = [];
 			}
@@ -113,7 +108,7 @@ class CXmlValidatorGeneral {
 
 			if (array_key_exists('extra', $rules)) {
 				if (!array_key_exists($rules['extra'], $data)
-						&& ($rules['rules'][$rules['extra']]['type'] & self::XML_REQUIRED)) {
+						&& ($rules['rules'][$rules['extra']]['type'] & XML_REQUIRED)) {
 					throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
 						_s('the tag "%1$s" is missing', $rules['extra'])
 					));
