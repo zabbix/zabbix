@@ -109,6 +109,8 @@ class CTag extends CObject {
 		}
 
 		parent::addItem($value);
+
+		return $this;
 	}
 
 	public function setName($value) {

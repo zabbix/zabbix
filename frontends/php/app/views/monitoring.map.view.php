@@ -77,4 +77,6 @@ else {
 $controls->addItem(get_icon('fullscreen', array('fullscreen' => $data['fullscreen'])));
 
 $headerMapForm->addItem($controls);
-$mapWidget->setControls($headerMapForm)->addItem($mapTable)->show();
+$mapWidget->setControls($headerMapForm)->
+	addItem((new CDiv(null, 'table-forms-container'))->addItem($mapTable))->
+	show();
