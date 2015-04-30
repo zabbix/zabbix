@@ -63,6 +63,10 @@ class CXmlValidatorGeneral {
 	 * @throw Exception			if $data does not correspond to validation $rules
 	 */
 	public function validateData(array $rules, &$data, $path) {
+		if (array_key_exists('preprocessor', $rules)) {
+			$data = call_user_func($rules['preprocessor'], $data);
+		}
+
 		if ($rules['type'] & self::XML_STRING) {
 			$this->validateString($data, $path);
 		}
