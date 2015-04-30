@@ -54,12 +54,15 @@ $form = new CForm();
 $form->setMethod('get');
 $form->addVar('serviceid', $_REQUEST['serviceid']);
 
-$cmbPeriod = new CComboBox('period', $period, 'submit();');
-$cmbPeriod->addItem('daily', _('Daily'));
-$cmbPeriod->addItem('weekly', _('Weekly'));
-$cmbPeriod->addItem('monthly', _('Monthly'));
-$cmbPeriod->addItem('yearly', _('Yearly'));
-$form->addItem(array(SPACE._('Period').SPACE, $cmbPeriod));
+$form->addItem(array(
+	SPACE._('Period').SPACE,
+	new CComboBox('period', $period, 'submit()', array(
+		'daily' => _('Daily'),
+		'weekly' => _('Weekly'),
+		'monthly' => _('Monthly'),
+		'yearly' => _('Yearly')
+	))
+));
 
 if ($period != 'yearly') {
 	$cmbYear = new CComboBox('year', $year, 'submit();');
