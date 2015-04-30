@@ -310,11 +310,22 @@ class CXmlImport18 {
 		$explodedKey = explode(',', $oldKey);
 
 		if (in_array($explodedKey[0], self::$oldKeys)) {
-			$newKey = 'net.tcp.service['.$explodedKey[0].',,'.$explodedKey[1].']';
+			if ($explodedKey[0] === 'ntp') {
+				$newKey = 'net.udp.service['.$explodedKey[0].',,'.$explodedKey[1].']';
+			}
+			else {
+				$newKey = 'net.tcp.service['.$explodedKey[0].',,'.$explodedKey[1].']';
+			}
 		}
 		elseif (in_array($explodedKey[0], self::$oldKeysPref)) {
 			$keyWithoutPerf = explode('_', $explodedKey[0]);
-			$newKey = 'net.tcp.service.perf['.$keyWithoutPerf[0].',,'.$explodedKey[1].']';
+
+			if ($keyWithoutPerf[0] === 'ntp') {
+				$newKey = 'net.udp.service.perf['.$keyWithoutPerf[0].',,'.$explodedKey[1].']';
+			}
+			else {
+				$newKey = 'net.tcp.service.perf['.$keyWithoutPerf[0].',,'.$explodedKey[1].']';
+			}
 		}
 
 		return $newKey;
