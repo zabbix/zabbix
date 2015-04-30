@@ -21,28 +21,22 @@ a {
 	&:link {
 		text-decoration: none;
 		color: $link-color;
-		//border-bottom: 1px solid rgba(48,113,171,0.25);
 		@include transition(color .2s ease-in-out);
 	}
 
 	&:visited {
 		text-decoration: none;
 		color: $link-visited-color;
-		border-bottom: 1px solid rgba(48,113,171,0.25);
 	}
 
 	&:hover {
 		text-decoration: underline;
-		//text-decoration: none;
 		color: $link-hover-color;
-		border-bottom: 1px solid rgba(48,113,171,0.25);
 	}
 
 	&:active {
 		text-decoration: underline;
-		//text-decoration: none;
 		color: $link-active-color;
-		border-bottom: 1px solid rgba(48,113,171,0.25);
 	}
 }
 
@@ -50,12 +44,35 @@ a {
 	border-bottom: 1px dotted;
 	cursor: pointer;
 
+	&:visited {
+		text-decoration: none;
+	}
+
 	&:hover {
 		text-decoration: none;
 	}
 
 	&:active {
 		text-decoration: none;
+	}
+}
+
+.link-solid {
+
+	&:link {
+		text-decoration: underline;
+	}
+
+	&:visited {
+		text-decoration: underline;
+	}
+
+	&:hover {
+		text-decoration: underline;
+	}
+
+	&:active {
+		text-decoration: underline;
 	}
 }
 
