@@ -225,9 +225,15 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 										'show_3d' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
 										'percent_left' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
 										'percent_right' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
-										'ymin_item_1' =>			['type' => self::XML_REQUIRED],
+										'ymin_item_1' =>			['type' => self::XML_ARRAY | self::XML_REQUIRED, 'preprocessor' => array($this, 'transform_zero2array'), 'rules' => [
+											'host' =>					['type' => self::XML_STRING],
+											'key' =>					['type' => self::XML_STRING],
+										]],
 										'ymin_type_1' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
-										'ymax_item_1' =>			['type' => self::XML_REQUIRED],
+										'ymax_item_1' =>			['type' => self::XML_ARRAY | self::XML_REQUIRED, 'preprocessor' => array($this, 'transform_zero2array'), 'rules' => [
+											'host' =>					['type' => self::XML_STRING],
+											'key' =>					['type' => self::XML_STRING],
+										]],
 										'ymax_type_1' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
 										'graph_items' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
 											'graph_item' =>				['type' => self::XML_ARRAY, 'rules' => [
@@ -520,9 +526,15 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 										'show_3d' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
 										'percent_left' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
 										'percent_right' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
-										'ymin_item_1' =>			['type' => self::XML_REQUIRED],
+										'ymin_item_1' =>			['type' => self::XML_ARRAY | self::XML_REQUIRED, 'preprocessor' => array($this, 'transform_zero2array'), 'rules' => [
+											'host' =>					['type' => self::XML_STRING],
+											'key' =>					['type' => self::XML_STRING],
+										]],
 										'ymin_type_1' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
-										'ymax_item_1' =>			['type' => self::XML_REQUIRED],
+										'ymax_item_1' =>			['type' => self::XML_ARRAY | self::XML_REQUIRED, 'preprocessor' => array($this, 'transform_zero2array'), 'rules' => [
+											'host' =>					['type' => self::XML_STRING],
+											'key' =>					['type' => self::XML_STRING],
+										]],
 										'ymax_type_1' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
 										'graph_items' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
 											'graph_item' =>				['type' => self::XML_ARRAY, 'rules' => [
@@ -633,9 +645,15 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 						'show_3d' =>				['type' => self::XML_STRING | self::XML_REQUIRED],
 						'percent_left' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
 						'percent_right' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
-						'ymin_item_1' =>			['type' => self::XML_REQUIRED],
+						'ymin_item_1' =>			['type' => self::XML_ARRAY | self::XML_REQUIRED, 'preprocessor' => array($this, 'transform_zero2array'), 'rules' => [
+							'host' =>					['type' => self::XML_STRING],
+							'key' =>					['type' => self::XML_STRING],
+						]],
 						'ymin_type_1' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
-						'ymax_item_1' =>			['type' => self::XML_REQUIRED],
+						'ymax_item_1' =>			['type' => self::XML_ARRAY | self::XML_REQUIRED, 'preprocessor' => array($this, 'transform_zero2array'), 'rules' => [
+							'host' =>					['type' => self::XML_STRING],
+							'key' =>					['type' => self::XML_STRING],
+						]],
 						'ymax_type_1' =>			['type' => self::XML_STRING | self::XML_REQUIRED],
 						'graph_items' =>			['type' => self::XML_INDEXED_ARRAY | self::XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
 							'graph_item' =>				['type' => self::XML_ARRAY, 'rules' => [
@@ -800,5 +818,16 @@ class C20XmlValidator extends CXmlValidatorGeneral {
 		if (!preg_match('/^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])T(2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]Z$/', $date)) {
 			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
 		}
+	}
+
+	/**
+	 * Transforms tags containing zero into an empty array
+	 *
+	 * @param mixed $value
+	 *
+	 * @return mixed		converted value
+	 */
+	protected function transform_zero2array($value) {
+		return ($value === '0') ? [] : $value;
 	}
 }
