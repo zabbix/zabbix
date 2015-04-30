@@ -136,7 +136,7 @@ class CXmlValidatorGeneral {
 		}
 
 		if (array_key_exists('ex_validate', $rules)) {
-			call_user_func($rules['ex_validate'], $data, $path);
+			$data = call_user_func($rules['ex_validate'], $data, $path);
 		}
 	}
 
