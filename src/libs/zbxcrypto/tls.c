@@ -30,6 +30,7 @@
 #	include <polarssl/ssl.h>
 #	include <polarssl/error.h>
 #	include <polarssl/debug.h>
+#	include <polarssl/oid.h>
 #elif defined(HAVE_GNUTLS)
 #	include <gnutls/gnutls.h>
 #	include <gnutls/x509.h>
@@ -1374,6 +1375,238 @@ static void	zbx_log_ciphersuites(const char *title, const SSL *ctx)
 }
 #endif
 
+#if defined(HAVE_POLARSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_print_rdn_value                                              *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     Print an RDN (relative distinguished name) value into buffer           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     value - [IN] pointer to RDN value                                      *
+ *     len   - [IN] number of bytes in the RDN value                          *
+ *     buf   - [OUT] output buffer                                            *
+ *     size  - [IN] output buffer size                                        *
+ *     error - [OUT] dynamically allocated memory with error message.         *
+ *                   Initially '*error' must be NULL.                         *
+ *                                                                            *
+ * Return value:                                                              *
+ *     Number of bytes written into 'buf'                                     *
+ *     '*error' is not NULL if an error occured                               *
+ *                                                                            *
+ ******************************************************************************/
+static size_t	zbx_print_rdn_value(const unsigned char *value, size_t len, unsigned char *buf, size_t size,
+		char **error)
+{
+	const unsigned char	*p_in;
+	unsigned char		*p_out, *p_out_end;
+
+	p_in = value;
+	p_out = buf;
+	p_out_end = buf + size;
+
+	while (value + len > p_in)
+	{
+		if (0 == (*p_in & 0x80))			/* ASCII */
+		{
+			if (0x1f < *p_in && *p_in < 0x7f)	/* printable character */
+			{
+				if (p_out_end - 1 > p_out)
+				{
+					/* According to RFC 4514:                                                   */
+					/*    - escape characters '"' (U+0022), '+' U+002B, ',' U+002C, ';' U+003B, */
+					/*      '<' U+003C, '>' U+003E, '\' U+005C  anywhere in string.             */
+					/*    - escape characters space (' ' U+0020) or number sign ('#' U+0023) at */
+					/*      the beginning of string.                                            */
+					/*    - escape character space (' ' U+0020) at the end of string.           */
+					/*    - escape null (U+0000) character anywhere. <--- we do not allow null. */
+
+					if ((0x20 == (*p_in & 0x70) && ('"' == *p_in || '+' == *p_in || ',' == *p_in))
+							|| (0x30 == (*p_in & 0x70) && (';' == *p_in || '<' == *p_in ||
+							'>' == *p_in)) || '\\' == *p_in ||
+							(' ' == *p_in && (value == p_in || (value + len - 1) == p_in)))
+					{
+						*p_out++ = '\\';
+					}
+				}
+				else
+					goto small_buf;
+
+				if (p_out_end - 1 > p_out)
+					*p_out++ = *p_in++;
+				else
+					goto small_buf;
+			}
+			else if (0 == *p_in)
+			{
+				*error = zbx_strdup(*error, "null byte in certificate, could be an attack");
+				break;
+			}
+			else
+			{
+				*error = zbx_strdup(*error, "non-printable character in certificate");
+				break;
+			}
+		}
+		else if (0xc0 == (*p_in & 0xe0))	/* 11000010-11011111 starts a 2-byte sequence */
+		{
+			if (p_out_end - 2 > p_out)
+			{
+				*p_out++ = *p_in++;
+				*p_out++ = *p_in++;
+			}
+			else
+				goto small_buf;
+		}
+		else if (0xe0 == (*p_in & 0xf0))	/* 11100000-11101111 starts a 3-byte sequence */
+		{
+			if (p_out_end - 3 > p_out)
+			{
+				*p_out++ = *p_in++;
+				*p_out++ = *p_in++;
+				*p_out++ = *p_in++;
+			}
+			else
+				goto small_buf;
+		}
+		else if (0xf0 == (*p_in & 0xf8))	/* 11110000-11110100 starts a 4-byte sequence */
+		{
+			if (p_out_end - 4 > p_out)
+			{
+				*p_out++ = *p_in++;
+				*p_out++ = *p_in++;
+				*p_out++ = *p_in++;
+				*p_out++ = *p_in++;
+			}
+			else
+				goto small_buf;
+		}
+		else				/* not a valid UTF-8 character */
+		{
+			*error = zbx_strdup(*error, "invalid UTF-8 character");
+			break;
+		}
+	}
+
+	*p_out = '\0';
+
+	return (size_t)(p_out - buf);
+small_buf:
+	*p_out = '\0';
+	*error = zbx_strdup(*error, "output buffer too small");
+
+	return (size_t)(p_out - buf);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_x509_dn_gets                                                 *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     Print distinguished name (i.e. issuer, subject) into buffer. Intended  *
+ *     to use as an alternative to PolarSSL x509_dn_gets() to meet            *
+ *     application needs.                                                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     dn    - [IN] pointer to distinguished name                             *
+ *     buf   - [OUT] output buffer                                            *
+ *     size  - [IN] output buffer size                                        *
+ *     error - [OUT] dynamically allocated memory with error message          *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     This function is derived from PolarSSL x509_dn_gets() and heavily      *
+ *     modified to print RDNs in reverse order, to print UTF-8 characters and *
+ *     non-printable characters in a different way than original              *
+ *     x509_dn_gets() does and to return error messages.                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_x509_dn_gets(const x509_name *dn, char *buf, size_t size, char **error)
+{
+	const x509_name	*node, *stop_node = NULL;
+	const char	*short_name = NULL;
+	char		*p, *p_end;
+
+	/* We need to traverse a linked list of RDNs and print them out in reverse order. The number of RDNs in DN */
+	/* is expected to be small (typically 4-5, sometimes up to 8). For such a small list we simply traverse it */
+	/* multiple times for getting elements in reverse order. */
+
+	p = buf;
+	p_end = buf + size;
+
+	while (1)
+	{
+		node = dn;
+
+		while (stop_node != node->next)
+			node = node->next;
+
+		if (NULL != node->oid.p)
+		{
+			if (buf != p)				/* not the first RDN */
+			{
+				if (p_end - 1 == p)
+					goto small_buf;
+
+				p += zbx_strlcpy(p, ",", (size_t)(p_end - p));	/* separator between RDNs */
+			}
+
+			/* write attribute name */
+
+			if (0 == oid_get_attr_short_name(&node->oid, &short_name))
+			{
+				if (p_end - 1 == p)
+					goto small_buf;
+
+				p += zbx_strlcpy(p, short_name, (size_t)(p_end - p));
+			}
+			else	/* unknown OID name, write in numerical form */
+			{
+				int	res;
+
+				if (p_end - 1 == p)
+					goto small_buf;
+
+				if (0 < (res = oid_get_numeric_string(p, (size_t)(p_end - p), &node->oid)))
+					p += (size_t)res;
+				else
+					goto small_buf;
+			}
+
+			if (p_end - 1 == p)
+				goto small_buf;
+
+			p += zbx_strlcpy(p, "=", (size_t)(p_end - p));
+
+			/* write attribute value */
+
+			if (p_end - 1 == p)
+				goto small_buf;
+
+			p += zbx_print_rdn_value(node->val.p, node->val.len, (unsigned char *)p, (size_t)(p_end - p),
+					error);
+
+			if (NULL != *error)
+				break;
+		}
+
+		if (dn->next != stop_node)
+			stop_node = node;
+		else
+			break;
+	}
+
+	if (NULL == *error)
+		return SUCCEED;
+	else
+		return FAIL;
+small_buf:
+	*error = zbx_strdup(*error, "output buffer too small");
+
+	return FAIL;
+}
+#endif
+
 #if defined(HAVE_GNUTLS)
 /******************************************************************************
  *                                                                            *
@@ -1640,20 +1873,18 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 {
 	int		issuer_mismatch = 0, subject_mismatch = 0;
 	size_t		error_alloc = 0, error_offset = 0;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
+#if defined(HAVE_GNUTLS)
 	int		res;
+#endif
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
 	char		tls_issuer[HOST_TLS_ISSUER_LEN_MAX], tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
 #endif
 
 #if defined(HAVE_POLARSSL)
 	if (NULL != issuer && '\0' != *issuer)
 	{
-		if (0 >= (res = x509_dn_gets(tls_issuer, sizeof(tls_issuer), &cert->issuer)))
-		{
-			*error = zbx_dsprintf(*error, "cannot get issuer distinguished name, x509_dn_gets() returned "
-					"%d", res);
+		if (SUCCEED != zbx_x509_dn_gets(&cert->issuer, tls_issuer, sizeof(tls_issuer), error))
 			return FAIL;
-		}
 
 		if (0 != strcmp(tls_issuer, issuer))	/* TODO RFC 4518 requires more sophisticated issuer matching */
 			issuer_mismatch = 1;
@@ -1661,12 +1892,8 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 
 	if (NULL != subject && '\0' != *subject)
 	{
-		if (0 >= (res = x509_dn_gets(tls_subject, sizeof(tls_subject), &cert->subject)))
-		{
-			*error = zbx_dsprintf(*error, "cannot get subject distinguished name, x509_dn_gets() returned "
-					"%d", res);
+		if (SUCCEED != zbx_x509_dn_gets(&cert->subject, tls_subject, sizeof(tls_subject), error))
 			return FAIL;
-		}
 
 		if (0 != strcmp(tls_subject, subject))	/* TODO RFC 4518 requires more sophisticated subject matching */
 			subject_mismatch = 1;
@@ -4084,7 +4311,7 @@ int	zbx_tls_get_attr(const zbx_sock_t *s, zbx_tls_conn_attr_t *attr)
 	if (ZBX_TCP_SEC_TLS_CERT == s->connection_type)
 	{
 		const x509_crt	*peer_cert;
-		int		res;
+		char		*error = NULL;
 
 		if (NULL == (peer_cert = ssl_get_peer_cert(s->tls_ctx)))
 		{
@@ -4092,17 +4319,17 @@ int	zbx_tls_get_attr(const zbx_sock_t *s, zbx_tls_conn_attr_t *attr)
 			return FAIL;
 		}
 
-		if (0 >= (res = x509_dn_gets(attr->issuer, sizeof(attr->issuer), &peer_cert->issuer)))
+		if (SUCCEED != zbx_x509_dn_gets(&peer_cert->issuer, attr->issuer, sizeof(attr->issuer), &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get issuer distinguished name, x509_dn_gets() returned "
-					"%d", res);
+			zabbix_log(LOG_LEVEL_WARNING, "error while getting issuer name: \"%s\"", error);
+			zbx_free(error);
 			return FAIL;
 		}
 
-		if (0 >= (res = x509_dn_gets(attr->subject, sizeof(attr->subject), &peer_cert->subject)))
+		if (SUCCEED != zbx_x509_dn_gets(&peer_cert->subject, attr->subject, sizeof(attr->subject), &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get subject distinguished name, x509_dn_gets() returned "
-					"%d", res);
+			zabbix_log(LOG_LEVEL_WARNING, "error while getting subject name: \"%s\"", error);
+			zbx_free(error);
 			return FAIL;
 		}
 	}
