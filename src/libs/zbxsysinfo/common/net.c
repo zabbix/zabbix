@@ -34,7 +34,7 @@
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)
 {
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 	const char	*buf;
 	int		net, val = ZBX_TCP_EXPECT_OK;
 
@@ -74,7 +74,7 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 	zbx_tcp_close(&s);
 out:
 	if (SUCCEED != net)
-		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect network error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect network error: %s", zbx_socket_strerror());
 
 	return SYSINFO_RET_OK;
 }
