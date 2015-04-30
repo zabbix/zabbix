@@ -33,9 +33,9 @@ class CXmlValidator {
 
 	public function __construct() {
 		$this->versionValidators = array(
-			'1.0' => new C10XmlValidator(),
-			'2.0' => new C20XmlValidator(),
-			'3.0' => new C30XmlValidator()
+			'1.0' => 'C10XmlValidator',
+			'2.0' => 'C20XmlValidator',
+			'3.0' => 'C30XmlValidator'
 		);
 	}
 
@@ -43,8 +43,11 @@ class CXmlValidator {
 	 * Base validation function.
 	 *
 	 * @param array $data	import data
+	 *
+	 * @return array		Validator does some manipulation for the incoming data. For example, converts empty tags to
+	 *						an array, if desired. Converted array is returned.
 	 */
-	public function validate($data) {
+	public function validate(array $data) {
 		$validator = new CXmlValidatorGeneral(
 			array('type' => CXmlValidatorGeneral::XML_ARRAY, 'rules' => array(
 				'zabbix_export' => array('type' => CXmlValidatorGeneral::XML_ARRAY | CXmlValidatorGeneral::XML_REQUIRED, 'check_unexpected' => false, 'rules' => array(
@@ -53,14 +56,18 @@ class CXmlValidator {
 			))
 		);
 
-		$validator->validate($data, '/');
+		$data = $validator->validate($data, '/');
+		$version = $data['zabbix_export']['version'];
 
-		if (!array_key_exists($data['zabbix_export']['version'], $this->versionValidators)) {
+		if (!array_key_exists($version, $this->versionValidators)) {
 			throw new Exception(
 				_s('Invalid XML tag "%1$s": %2$s.', '/zabbix_export/version', _('unsupported version number'))
 			);
 		}
 
-		$this->versionValidators[$data['zabbix_export']['version']]->validate($data['zabbix_export'], '/zabbix_export');
+		$data['zabbix_export'] = (new $this->versionValidators[$version]())->
+			validate($data['zabbix_export'], '/zabbix_export');
+
+		return $data;
 	}
 }
