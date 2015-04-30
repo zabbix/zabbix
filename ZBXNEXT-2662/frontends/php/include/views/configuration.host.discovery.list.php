@@ -130,7 +130,7 @@ foreach ($data['discoveries'] as $discovery) {
 		),
 		$hostPrototypeLink,
 		$discovery['key_'],
-		$discovery['delay'],
+		convertUnitsS($discovery['delay']),
 		item_type2str($discovery['type']),
 		$status,
 		$info

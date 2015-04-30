@@ -54,7 +54,7 @@ foreach ($data['drules'] as $drule) {
 		new CCheckBox('g_druleid['.$drule['druleid'].']', null, null, $drule['druleid']),
 		$drule['description'],
 		$drule['iprange'],
-		$drule['delay'],
+		convertUnitsS($drule['delay']),
 		!empty($drule['checks']) ? implode(', ', $drule['checks']) : '',
 		$status
 	));

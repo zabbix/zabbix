@@ -47,7 +47,7 @@ foreach ($this->data['slides'] as $slide) {
 	$slidesTable->addRow(array(
 		new CCheckBox('shows['.$slide['slideshowid'].']', null, null, $slide['slideshowid']),
 		new CLink($slide['name'], '?form=update&slideshowid='.$slide['slideshowid'], 'action'),
-		$slide['delay'],
+		convertUnitsS($slide['delay']),
 		$slide['cnt']
 	));
 }
