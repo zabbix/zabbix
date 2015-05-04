@@ -56,7 +56,7 @@ static void	process_configuration_sync(size_t *data_size)
 {
 	const char	*__function_name = "process_configuration_sync";
 
-	zbx_sock_t	sock;
+	zbx_socket_t	sock;
 	struct		zbx_json_parse jp;
 	char		value[16], *error = NULL;
 
