@@ -129,6 +129,14 @@ class CHelpItems {
 					'description' => _('Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state')
 				),
 				array(
+					'key' => 'net.udp.service[service,<ip>,<port>]',
+					'description' => _('Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running')
+				),
+				array(
+					'key' => 'net.udp.service.perf[service,<ip>,<port>]',
+					'description' => _('Checks performance of service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
+				),
+				array(
 					'key' => 'perf_counter[counter,<interval>]',
 					'description' => _('Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)')
 				),
@@ -397,6 +405,14 @@ class CHelpItems {
 				array(
 					'key' => 'net.udp.listen[port]',
 					'description' => _('Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state')
+				),
+				array(
+					'key' => 'net.udp.service[service,<ip>,<port>]',
+					'description' => _('Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running')
+				),
+				array(
+					'key' => 'net.udp.service.perf[service,<ip>,<port>]',
+					'description' => _('Checks performance of service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
 				),
 				array(
 					'key' => 'perf_counter[counter,<interval>]',
