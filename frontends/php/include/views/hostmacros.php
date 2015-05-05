@@ -26,7 +26,7 @@ if (!$data['readonly']) {
 $macros_form_list = new CFormList('macrosFormList');
 
 if ($data['readonly'] && !$data['macros']) {
-	$macros_form_list->addRow(_('No macros found.'));
+	$table = _('No macros found.');
 }
 else {
 	$table = new CTable(null, 'formElementTable');
@@ -137,16 +137,16 @@ else {
 
 		$table->addRow($buttons_row);
 	}
-
-	$show_inherited_macros_filter = array(
-		new CRadioButton('show_inherited_macros', '0', null, 'hide_inherited_macros', !$data['show_inherited_macros'], 'submit()'),
-		new CLabel(_('Host macros'), 'hide_inherited_macros'),
-		new CRadioButton('show_inherited_macros', '1', null, 'show_inherited_macros', $data['show_inherited_macros'], 'submit()'),
-		new CLabel(_('Inherited and host macros'), 'show_inherited_macros')
-	);
-
-	$macros_form_list->addRow(null, new CDiv($show_inherited_macros_filter, 'jqueryinputset radioset'));
-	$macros_form_list->addRow(null, $table);
 }
+
+$show_inherited_macros_filter = array(
+	new CRadioButton('show_inherited_macros', '0', null, 'hide_inherited_macros', !$data['show_inherited_macros'], 'submit()'),
+	new CLabel(_('Host macros'), 'hide_inherited_macros'),
+	new CRadioButton('show_inherited_macros', '1', null, 'show_inherited_macros', $data['show_inherited_macros'], 'submit()'),
+	new CLabel(_('Inherited and host macros'), 'show_inherited_macros')
+);
+
+$macros_form_list->addRow(null, new CDiv($show_inherited_macros_filter, 'jqueryinputset radioset'));
+$macros_form_list->addRow(null, $table);
 
 return $macros_form_list;
