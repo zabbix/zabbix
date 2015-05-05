@@ -57,22 +57,22 @@ a {
 	}
 }
 
-.link-solid {
+.link-alt {
 
 	&:link {
-		text-decoration: underline;
+		color: $link-alt-color;
 	}
 
 	&:visited {
-		text-decoration: underline;
+		color: $link-alt-visited-color;
 	}
 
 	&:hover {
-		text-decoration: underline;
+		color: $link-alt-hover-color;
 	}
 
 	&:active {
-		text-decoration: underline;
+		color: $link-alt-active-color;
 	}
 }
 
