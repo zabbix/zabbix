@@ -244,16 +244,12 @@ class C30XmlValidator {
 									'show_3d' =>				['type' => XML_STRING | XML_REQUIRED],
 									'percent_left' =>			['type' => XML_STRING | XML_REQUIRED],
 									'percent_right' =>			['type' => XML_STRING | XML_REQUIRED],
-									'ymin_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'rules' => [
-										'host' =>					['type' => XML_STRING],
-										'key' =>					['type' => XML_STRING],
-									]],
+									// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
 									'ymin_type_1' =>			['type' => XML_STRING | XML_REQUIRED],
-									'ymax_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'rules' => [
-										'host' =>					['type' => XML_STRING],
-										'key' =>					['type' => XML_STRING],
-									]],
+									'ymin_item_1' =>			['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem']],
+									// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
 									'ymax_type_1' =>			['type' => XML_STRING | XML_REQUIRED],
+									'ymax_item_1' =>			['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem']],
 									'graph_items' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
 										'graph_item' =>				['type' => XML_ARRAY, 'rules' => [
 											'sortorder' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -556,16 +552,12 @@ class C30XmlValidator {
 									'show_3d' =>				['type' => XML_STRING | XML_REQUIRED],
 									'percent_left' =>			['type' => XML_STRING | XML_REQUIRED],
 									'percent_right' =>			['type' => XML_STRING | XML_REQUIRED],
-									'ymin_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'rules' => [
-										'host' =>					['type' => XML_STRING],
-										'key' =>					['type' => XML_STRING],
-									]],
+									// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
 									'ymin_type_1' =>			['type' => XML_STRING | XML_REQUIRED],
-									'ymax_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'rules' => [
-										'host' =>					['type' => XML_STRING],
-										'key' =>					['type' => XML_STRING],
-									]],
+									'ymin_item_1' =>			['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem']],
+									// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
 									'ymax_type_1' =>			['type' => XML_STRING | XML_REQUIRED],
+									'ymax_item_1' =>			['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem']],
 									'graph_items' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
 										'graph_item' =>				['type' => XML_ARRAY, 'rules' => [
 											'sortorder' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -621,8 +613,9 @@ class C30XmlValidator {
 							'vsize' =>					['type' => XML_STRING | XML_REQUIRED],
 							'screen_items' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => [
 								'screen_item' =>			['type' => XML_ARRAY, 'rules' => [
+									// The tag 'resourcetype' should be validated before the 'resource' because it is used in 'ex_required' and 'ex_validate' methods.
 									'resourcetype' =>			['type' => XML_STRING | XML_REQUIRED],
-									'resource' =>				['type' => XML_REQUIRED],
+									'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateScreenItemResource']],
 									'width' =>					['type' => XML_STRING | XML_REQUIRED],
 									'height' =>					['type' => XML_STRING | XML_REQUIRED],
 									'x' =>						['type' => XML_STRING | XML_REQUIRED],
@@ -675,16 +668,12 @@ class C30XmlValidator {
 					'show_3d' =>				['type' => XML_STRING | XML_REQUIRED],
 					'percent_left' =>			['type' => XML_STRING | XML_REQUIRED],
 					'percent_right' =>			['type' => XML_STRING | XML_REQUIRED],
-					'ymin_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'rules' => [
-						'host' =>					['type' => XML_STRING],
-						'key' =>					['type' => XML_STRING],
-					]],
+					// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
 					'ymin_type_1' =>			['type' => XML_STRING | XML_REQUIRED],
-					'ymax_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'rules' => [
-						'host' =>					['type' => XML_STRING],
-						'key' =>					['type' => XML_STRING],
-					]],
+					'ymin_item_1' =>			['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem']],
+					// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
 					'ymax_type_1' =>			['type' => XML_STRING | XML_REQUIRED],
+					'ymax_item_1' =>			['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem']],
 					'graph_items' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
 						'graph_item' =>				['type' => XML_ARRAY, 'rules' => [
 							'sortorder' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -708,8 +697,9 @@ class C30XmlValidator {
 					'vsize' =>					['type' => XML_STRING | XML_REQUIRED],
 					'screen_items' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => [
 						'screen_item' =>			['type' => XML_ARRAY, 'rules' => [
+							// The tag 'resourcetype' should be validated before the 'resource' because it is used in 'ex_required' and 'ex_validate' methods.
 							'resourcetype' =>			['type' => XML_STRING | XML_REQUIRED],
-							'resource' =>				['type' => XML_REQUIRED],
+							'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateScreenItemResource']],
 							'width' =>					['type' => XML_STRING | XML_REQUIRED],
 							'height' =>					['type' => XML_STRING | XML_REQUIRED],
 							'x' =>						['type' => XML_STRING | XML_REQUIRED],
@@ -919,6 +909,112 @@ class C30XmlValidator {
 			}
 
 			$data = (new CXmlValidatorGeneral($rules))->validate($data, $path);
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Validate "screen_item/resource" tag.
+	 *
+	 * @param string $data			import data
+	 * @param array  $parent_data	data's parent array
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception			if the map element is invalid
+	 */
+	public function validateScreenItemResource($data, array $parent_data = null, $path) {
+		if (zbx_is_int($parent_data['resourcetype'])) {
+			switch ($parent_data['resourcetype']) {
+				case SCREEN_RESOURCE_GRAPH:
+					$rules = ['type' => XML_ARRAY, 'rules' => [
+						'name' =>			['type' => XML_STRING | XML_REQUIRED],
+						'host' =>			['type' => XML_STRING | XML_REQUIRED]
+					]];
+					break;
+
+				case SCREEN_RESOURCE_SIMPLE_GRAPH:
+				case SCREEN_RESOURCE_PLAIN_TEXT:
+					$rules = ['type' => XML_ARRAY, 'rules' => [
+						'key' =>			['type' => XML_STRING | XML_REQUIRED],
+						'host' =>			['type' => XML_STRING | XML_REQUIRED]
+					]];
+					break;
+
+				case SCREEN_RESOURCE_MAP:
+				case SCREEN_RESOURCE_SCREEN:
+				case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+				case SCREEN_RESOURCE_DATA_OVERVIEW:
+					$rules = ['type' => XML_ARRAY, 'rules' => [
+						'name' =>			['type' => XML_STRING | XML_REQUIRED]
+					]];
+					break;
+
+				case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+					$rules = ['type' => XML_ARRAY, 'rules' => [
+						'name' =>			['type' => XML_STRING]
+					]];
+					break;
+
+				case SCREEN_RESOURCE_HOST_TRIGGERS:
+					$rules = ['type' => XML_ARRAY, 'rules' => [
+						'host' =>			['type' => XML_STRING]
+					]];
+					break;
+
+				default:
+					return $data;
+			}
+
+			$data = (new CXmlValidatorGeneral($rules))->validate($data, $path);
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Validate "ymin_item_1" tag.
+	 *
+	 * @param string $data			import data
+	 * @param array  $parent_data	data's parent array
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception			if the element is invalid
+	 */
+	public function validateYMinItem($data, array $parent_data = null, $path) {
+		if (zbx_is_int($parent_data['ymin_type_1'])) {
+			if ($parent_data['ymin_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				$rules = ['type' => XML_ARRAY, 'rules' => [
+					'host' =>	['type' => XML_STRING | XML_REQUIRED],
+					'key' =>	['type' => XML_STRING | XML_REQUIRED]
+				]];
+
+				$data = (new CXmlValidatorGeneral($rules))->validate($data, $path);
+			}
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Validate "ymax_item_1" tag.
+	 *
+	 * @param string $data			import data
+	 * @param array  $parent_data	data's parent array
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception			if the element is invalid
+	 */
+	public function validateYMaxItem($data, array $parent_data = null, $path) {
+		if (zbx_is_int($parent_data['ymax_type_1'])) {
+			if ($parent_data['ymax_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				$rules = ['type' => XML_ARRAY, 'rules' => [
+					'host' =>	['type' => XML_STRING | XML_REQUIRED],
+					'key' =>	['type' => XML_STRING | XML_REQUIRED]
+				]];
+
+				$data = (new CXmlValidatorGeneral($rules))->validate($data, $path);
+			}
 		}
 
 		return $data;

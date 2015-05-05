@@ -36,13 +36,13 @@ class CXmlValidatorGeneral {
 	/**
 	 * Base validation function.
 	 *
-	 * @param array  $data	import data
+	 * @param mixed  $data	import data
 	 * @param string $path	XML path (for error reporting)
 	 *
 	 * @return array		Validator does some manipulation for the incoming data. For example, converts empty tags to
 	 *						an array, if desired. Converted array is returned.
 	 */
-	public function validate(array $data, $path) {
+	public function validate($data, $path) {
 		$this->validateData($this->rules, $data, null, $path);
 
 		return $data;
