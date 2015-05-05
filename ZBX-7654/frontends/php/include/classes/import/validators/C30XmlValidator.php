@@ -46,7 +46,7 @@ class C30XmlValidator {
 				'host' =>					['type' => XML_ARRAY, 'rules' => [
 					'host' =>					['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'description' =>			['type' => XML_STRING],
+					'description' =>			['type' => XML_STRING | XML_REQUIRED],
 					'proxy' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 						'name' =>					['type' => XML_STRING]
 					]],
@@ -73,7 +73,7 @@ class C30XmlValidator {
 							'ip' =>						['type' => XML_STRING | XML_REQUIRED],
 							'dns' =>					['type' => XML_STRING | XML_REQUIRED],
 							'port' =>					['type' => XML_STRING | XML_REQUIRED],
-							'bulk' =>					['type' => XML_STRING],
+							'bulk' =>					['type' => XML_STRING | XML_REQUIRED],
 							'interface_ref' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
@@ -98,12 +98,12 @@ class C30XmlValidator {
 							'allowed_hosts' =>			['type' => XML_STRING | XML_REQUIRED],
 							'units' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delta' =>					['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_contextname' =>		['type' => XML_STRING],
+							'snmpv3_contextname' =>		['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_securityname' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_securitylevel' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_authprotocol' =>	['type' => XML_STRING],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_privprotocol' =>	['type' => XML_STRING],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 							'formula' =>				['type' => XML_STRING | XML_REQUIRED],
 							'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -126,7 +126,7 @@ class C30XmlValidator {
 							'valuemap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 								'name' =>					['type' => XML_STRING]
 							]],
-							'logtimefmt' =>				['type' => XML_STRING],
+							'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED],
 							'interface_ref' =>			['type' => XML_STRING]
 						]]
 					]],
@@ -140,12 +140,12 @@ class C30XmlValidator {
 							'delay' =>					['type' => XML_STRING | XML_REQUIRED],
 							'status' =>					['type' => XML_STRING | XML_REQUIRED],
 							'allowed_hosts' =>			['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_contextname' =>		['type' => XML_STRING],
+							'snmpv3_contextname' =>		['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_securityname' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_securitylevel' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_authprotocol' =>	['type' => XML_STRING],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_privprotocol' =>	['type' => XML_STRING],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 							'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
 							'params' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -187,12 +187,12 @@ class C30XmlValidator {
 									'allowed_hosts' =>			['type' => XML_STRING | XML_REQUIRED],
 									'units' =>					['type' => XML_STRING | XML_REQUIRED],
 									'delta' =>					['type' => XML_STRING | XML_REQUIRED],
-									'snmpv3_contextname' =>		['type' => XML_STRING],
+									'snmpv3_contextname' =>		['type' => XML_STRING | XML_REQUIRED],
 									'snmpv3_securityname' =>	['type' => XML_STRING | XML_REQUIRED],
 									'snmpv3_securitylevel' =>	['type' => XML_STRING | XML_REQUIRED],
-									'snmpv3_authprotocol' =>	['type' => XML_STRING],
+									'snmpv3_authprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 									'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-									'snmpv3_privprotocol' =>	['type' => XML_STRING],
+									'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 									'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 									'formula' =>				['type' => XML_STRING | XML_REQUIRED],
 									'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -215,7 +215,7 @@ class C30XmlValidator {
 									'valuemap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 										'name' =>					['type' => XML_STRING]
 									]],
-									'logtimefmt' =>				['type' => XML_STRING],
+									'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED],
 									'interface_ref' =>			['type' => XML_STRING]
 								]]
 							]],
@@ -377,7 +377,7 @@ class C30XmlValidator {
 				'template' =>				['type' => XML_ARRAY, 'rules' => [
 					'template' =>				['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'description' =>			['type' => XML_STRING],
+					'description' =>			['type' => XML_STRING | XML_REQUIRED],
 					'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 						'template' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -409,12 +409,12 @@ class C30XmlValidator {
 							'allowed_hosts' =>			['type' => XML_STRING | XML_REQUIRED],
 							'units' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delta' =>					['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_contextname' =>		['type' => XML_STRING],
+							'snmpv3_contextname' =>		['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_securityname' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_securitylevel' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_authprotocol' =>	['type' => XML_STRING],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_privprotocol' =>	['type' => XML_STRING],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 							'formula' =>				['type' => XML_STRING | XML_REQUIRED],
 							'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -437,7 +437,7 @@ class C30XmlValidator {
 							'valuemap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 								'name' =>					['type' => XML_STRING]
 							]],
-							'logtimefmt' =>				['type' => XML_STRING]
+							'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'discovery_rules' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
@@ -450,12 +450,12 @@ class C30XmlValidator {
 							'delay' =>					['type' => XML_STRING | XML_REQUIRED],
 							'status' =>					['type' => XML_STRING | XML_REQUIRED],
 							'allowed_hosts' =>			['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_contextname' =>		['type' => XML_STRING],
+							'snmpv3_contextname' =>		['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_securityname' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_securitylevel' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_authprotocol' =>	['type' => XML_STRING],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-							'snmpv3_privprotocol' =>	['type' => XML_STRING],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 							'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
 							'params' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -496,12 +496,12 @@ class C30XmlValidator {
 									'allowed_hosts' =>			['type' => XML_STRING | XML_REQUIRED],
 									'units' =>					['type' => XML_STRING | XML_REQUIRED],
 									'delta' =>					['type' => XML_STRING | XML_REQUIRED],
-									'snmpv3_contextname' =>		['type' => XML_STRING],
+									'snmpv3_contextname' =>		['type' => XML_STRING | XML_REQUIRED],
 									'snmpv3_securityname' =>	['type' => XML_STRING | XML_REQUIRED],
 									'snmpv3_securitylevel' =>	['type' => XML_STRING | XML_REQUIRED],
-									'snmpv3_authprotocol' =>	['type' => XML_STRING],
+									'snmpv3_authprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 									'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
-									'snmpv3_privprotocol' =>	['type' => XML_STRING],
+									'snmpv3_privprotocol' =>	['type' => XML_STRING | XML_REQUIRED],
 									'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 									'formula' =>				['type' => XML_STRING | XML_REQUIRED],
 									'delay_flex' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -524,7 +524,7 @@ class C30XmlValidator {
 									'valuemap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 										'name' =>					['type' => XML_STRING]
 									]],
-									'logtimefmt' =>				['type' => XML_STRING]
+									'logtimefmt' =>				['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]],
 							'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'trigger_prototype', 'rules' => [
@@ -628,9 +628,9 @@ class C30XmlValidator {
 									'style' =>					['type' => XML_STRING | XML_REQUIRED],
 									'dynamic' =>				['type' => XML_STRING | XML_REQUIRED],
 									'sort_triggers' =>			['type' => XML_STRING | XML_REQUIRED],
-									'url' =>					['type' => XML_STRING],
-									'application' =>			['type' => XML_STRING],
-									'max_columns' =>			['type' => XML_STRING]
+									'url' =>					['type' => XML_STRING | XML_REQUIRED],
+									'application' =>			['type' => XML_STRING | XML_REQUIRED],
+									'max_columns' =>			['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]]
 						]]
@@ -712,9 +712,9 @@ class C30XmlValidator {
 							'style' =>					['type' => XML_STRING | XML_REQUIRED],
 							'dynamic' =>				['type' => XML_STRING | XML_REQUIRED],
 							'sort_triggers' =>			['type' => XML_STRING | XML_REQUIRED],
-							'url' =>					['type' => XML_STRING],
-							'application' =>			['type' => XML_STRING],
-							'max_columns' =>			['type' => XML_STRING]
+							'url' =>					['type' => XML_STRING | XML_REQUIRED],
+							'application' =>			['type' => XML_STRING | XML_REQUIRED],
+							'max_columns' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]]
 				]]
@@ -737,7 +737,7 @@ class C30XmlValidator {
 					'expandproblem' =>			['type' => XML_STRING | XML_REQUIRED],
 					'markelements' =>			['type' => XML_STRING | XML_REQUIRED],
 					'show_unack' =>				['type' => XML_STRING | XML_REQUIRED],
-					'severity_min' =>			['type' => XML_STRING],
+					'severity_min' =>			['type' => XML_STRING | XML_REQUIRED],
 					'grid_size' =>				['type' => XML_STRING | XML_REQUIRED],
 					'grid_show' =>				['type' => XML_STRING | XML_REQUIRED],
 					'grid_align' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -794,7 +794,7 @@ class C30XmlValidator {
 							'icon_maintenance' =>		['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 								'name' =>					['type' => XML_STRING]
 							]],
-							'application' =>			['type' => XML_STRING],
+							'application' =>			['type' => XML_STRING | XML_REQUIRED],
 							'urls' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'url', 'rules' => [
 								'url' =>					['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
