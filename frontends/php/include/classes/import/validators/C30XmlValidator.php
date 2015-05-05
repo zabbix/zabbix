@@ -244,12 +244,12 @@ class C30XmlValidator {
 									'show_3d' =>				['type' => XML_STRING | XML_REQUIRED],
 									'percent_left' =>			['type' => XML_STRING | XML_REQUIRED],
 									'percent_right' =>			['type' => XML_STRING | XML_REQUIRED],
-									'ymin_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => array($this, 'transformZero2Array'), 'rules' => [
+									'ymin_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'rules' => [
 										'host' =>					['type' => XML_STRING],
 										'key' =>					['type' => XML_STRING],
 									]],
 									'ymin_type_1' =>			['type' => XML_STRING | XML_REQUIRED],
-									'ymax_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => array($this, 'transformZero2Array'), 'rules' => [
+									'ymax_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'rules' => [
 										'host' =>					['type' => XML_STRING],
 										'key' =>					['type' => XML_STRING],
 									]],
@@ -556,12 +556,12 @@ class C30XmlValidator {
 									'show_3d' =>				['type' => XML_STRING | XML_REQUIRED],
 									'percent_left' =>			['type' => XML_STRING | XML_REQUIRED],
 									'percent_right' =>			['type' => XML_STRING | XML_REQUIRED],
-									'ymin_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => array($this, 'transformZero2Array'), 'rules' => [
+									'ymin_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'rules' => [
 										'host' =>					['type' => XML_STRING],
 										'key' =>					['type' => XML_STRING],
 									]],
 									'ymin_type_1' =>			['type' => XML_STRING | XML_REQUIRED],
-									'ymax_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => array($this, 'transformZero2Array'), 'rules' => [
+									'ymax_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'rules' => [
 										'host' =>					['type' => XML_STRING],
 										'key' =>					['type' => XML_STRING],
 									]],
@@ -675,12 +675,12 @@ class C30XmlValidator {
 					'show_3d' =>				['type' => XML_STRING | XML_REQUIRED],
 					'percent_left' =>			['type' => XML_STRING | XML_REQUIRED],
 					'percent_right' =>			['type' => XML_STRING | XML_REQUIRED],
-					'ymin_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => array($this, 'transformZero2Array'), 'rules' => [
+					'ymin_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'rules' => [
 						'host' =>					['type' => XML_STRING],
 						'key' =>					['type' => XML_STRING],
 					]],
 					'ymin_type_1' =>			['type' => XML_STRING | XML_REQUIRED],
-					'ymax_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => array($this, 'transformZero2Array'), 'rules' => [
+					'ymax_item_1' =>			['type' => XML_ARRAY | XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'rules' => [
 						'host' =>					['type' => XML_STRING],
 						'key' =>					['type' => XML_STRING],
 					]],
