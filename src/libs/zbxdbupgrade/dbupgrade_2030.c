@@ -1206,8 +1206,11 @@ static int	DBpatch_2030114(void)
 
 static int	DBpatch_2030115(void)
 {
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.hostinventories.php.sort ' and value_str='hostid'"))
+	if (ZBX_DB_OK > DBexecute(
+			"delete from profiles where idx='web.hostinventories.php.sort' and value_str='hostid'"))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }

@@ -50,7 +50,7 @@ extern size_t		(*find_psk_in_cache)(const unsigned char *, unsigned char *, size
  * Purpose: processes the received values from active agents and senders      *
  *                                                                            *
  ******************************************************************************/
-static void	recv_agenthistory(zbx_sock_t *sock, struct zbx_json_parse *jp)
+static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "recv_agenthistory";
 	char		info[128];
@@ -72,7 +72,7 @@ static void	recv_agenthistory(zbx_sock_t *sock, struct zbx_json_parse *jp)
  * Purpose: processes the received values from active proxies                 *
  *                                                                            *
  ******************************************************************************/
-static void	recv_proxyhistory(zbx_sock_t *sock, struct zbx_json_parse *jp)
+static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "recv_proxyhistory";
 	zbx_uint64_t	proxy_hostid;
@@ -106,7 +106,7 @@ out:
  * Purpose: send history data to a Zabbix server                              *
  *                                                                            *
  ******************************************************************************/
-static void	send_proxyhistory(zbx_sock_t *sock)
+static void	send_proxyhistory(zbx_socket_t *sock)
 {
 	const char	*__function_name = "send_proxyhistory";
 
@@ -135,7 +135,7 @@ static void	send_proxyhistory(zbx_sock_t *sock)
 
 	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
 	{
-		error = zbx_strdup(error, zbx_tcp_strerror());
+		error = zbx_strdup(error, zbx_socket_strerror());
 		goto out;
 	}
 
@@ -171,7 +171,7 @@ out1:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	recv_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)
+static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "recv_proxy_heartbeat";
 
@@ -339,7 +339,7 @@ static int	zbx_session_validate(const char *sessionid, int access_level)
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
+static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "recv_getqueue";
 	int			ret = FAIL, request_type = -1, now, i;
@@ -469,7 +469,7 @@ out:
 	return ret;
 }
 
-static void	active_passive_misconfig(zbx_sock_t *sock)
+static void	active_passive_misconfig(zbx_socket_t *sock)
 {
 	char   *msg = NULL;
 
@@ -481,7 +481,7 @@ static void	active_passive_misconfig(zbx_sock_t *sock)
 	zbx_free(msg);
 }
 
-static int	process_trap(zbx_sock_t	*sock, char *s)
+static int	process_trap(zbx_socket_t *sock, char *s)
 {
 	int	ret = SUCCEED;
 
@@ -647,7 +647,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 	return ret;
 }
 
-static void	process_trapper_child(zbx_sock_t *sock)
+static void	process_trapper_child(zbx_socket_t *sock)
 {
 	if (SUCCEED != zbx_tcp_recv_to(sock, CONFIG_TRAPPER_TIMEOUT))
 		return;
@@ -658,7 +658,7 @@ static void	process_trapper_child(zbx_sock_t *sock)
 ZBX_THREAD_ENTRY(trapper_thread, args)
 {
 	double		sec = 0.0;
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -667,7 +667,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
+	memcpy(&s, (zbx_socket_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_socket_t));
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
@@ -700,10 +700,10 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 			zbx_tcp_unaccept(&s);
 		}
-		else if (EINTR != zbx_sock_last_error())
+		else if (EINTR != zbx_socket_last_error())
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s",
-					zbx_tcp_strerror());
+					zbx_socket_strerror());
 		}
 	}
 }

@@ -35,7 +35,7 @@
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
+void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "send_proxyconfig";
 	zbx_uint64_t	proxy_hostid;
@@ -73,7 +73,7 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != zbx_tcp_send(sock, j.buffer))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy \"%s\" at \"%s\": %s",
-				host, get_ip_by_socket(sock), zbx_tcp_strerror());
+				host, get_ip_by_socket(sock), zbx_socket_strerror());
 	}
 
 	alarm(0);
@@ -94,7 +94,7 @@ out:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	recv_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
+void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "recv_proxyconfig";
 	struct zbx_json_parse	jp_data;

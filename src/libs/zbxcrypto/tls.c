@@ -2836,7 +2836,7 @@ void	zbx_tls_free(void)
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_POLARSSL)
-int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
 {
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
@@ -3046,7 +3046,7 @@ out:
 	return ret;
 }
 #elif defined(HAVE_GNUTLS)
-int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
 {
 	const char		*__function_name = "zbx_tls_connect";
 	int			ret = FAIL, res;
@@ -3321,7 +3321,7 @@ out1:
 	return ret;
 }
 #elif defined(HAVE_OPENSSL)
-int	zbx_tls_connect(zbx_sock_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
 {
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
@@ -3537,7 +3537,7 @@ out1:
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_POLARSSL)
-int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
+int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 {
 	const char		*__function_name = "zbx_tls_accept";
 	int			ret = FAIL, res;
@@ -3729,7 +3729,7 @@ out:
 	return ret;
 }
 #elif defined(HAVE_GNUTLS)
-int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
+int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 {
 	const char			*__function_name = "zbx_tls_accept";
 	int				ret = FAIL, res;
@@ -4001,7 +4001,7 @@ out1:
 	return ret;
 }
 #elif defined(HAVE_OPENSSL)
-int	zbx_tls_accept(zbx_sock_t *s, char **error, unsigned int tls_accept)
+int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 {
 	const char	*__function_name = "zbx_tls_accept", *cipher_name;
 	int		ret = FAIL, res;
@@ -4209,7 +4209,7 @@ out1:
  * Purpose: close a TLS connection before closing a TCP socket                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tls_close(zbx_sock_t *s)
+void	zbx_tls_close(zbx_socket_t *s)
 {
 #if defined(HAVE_POLARSSL)
 	if (NULL != s->tls_ctx)
@@ -4303,7 +4303,7 @@ const char	*zbx_tls_connection_type_name(unsigned int type)
  *     (GnuTLS makes it asymmetric)                                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tls_get_attr(const zbx_sock_t *s, zbx_tls_conn_attr_t *attr)
+int	zbx_tls_get_attr(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 {
 	attr->connection_type = s->connection_type;
 
