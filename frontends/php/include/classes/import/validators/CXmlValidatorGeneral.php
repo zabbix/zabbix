@@ -90,7 +90,8 @@ class CXmlValidatorGeneral {
 					$subpath = ($path === '/' ? $path : $path.'/').$tag;
 					$this->validateData($rule, $data[$tag], $data, $subpath);
 				}
-				elseif ($rule['type'] & XML_REQUIRED) {
+				elseif (($rule['type'] & XML_REQUIRED) || (array_key_exists('ex_required', $rule)
+						&& call_user_func($rule['ex_required'], $data))) {
 					throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
 						_s('the tag "%1$s" is missing', $tag)
 					));

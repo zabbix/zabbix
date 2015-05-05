@@ -41,7 +41,7 @@ class C10XmlValidator {
 			'hosts' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'host', 'rules' => [
 				'host' =>					['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'proxy_hostid' =>			['type' => XML_STRING | XML_REQUIRED],
+					'proxy_hostid' =>			['type' => XML_STRING],
 					'useip' =>					['type' => XML_STRING | XML_REQUIRED],
 					'dns' =>					['type' => XML_STRING | XML_REQUIRED],
 					'ip' =>						['type' => XML_STRING | XML_REQUIRED],
@@ -161,13 +161,9 @@ class C10XmlValidator {
 					'selements' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'selement', 'rules' => [
 						'selement' =>				['type' => XML_ARRAY, 'rules' => [
 							'selementid' =>				['type' => XML_STRING | XML_REQUIRED],
-							'elementid' =>				['type' => XML_ARRAY, 'rules' => [
-								'name' =>					['type' => XML_STRING],
-								'host' =>					['type' => XML_STRING],
-								'description' =>			['type' => XML_STRING],
-								'expression' =>				['type' => XML_STRING]
-							]],
+							// The tag 'elementtype' should be validated before the 'elementid' because it is used in 'ex_required' and 'ex_validate' methods.
 							'elementtype' =>			['type' => XML_STRING | XML_REQUIRED],
+							'elementid' =>				['type' => 0, 'ex_required' => [$this, 'requiredMapElement'], 'ex_validate' => [$this, 'validateMapElement']],
 							'iconid_on' =>				['type' => XML_ARRAY, 'rules' => [
 								'name' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
@@ -294,4 +290,74 @@ class C10XmlValidator {
 
 		return $data;
 	}
+
+	/**
+	 * Checking the map element for requirement.
+	 *
+	 * @param array  $parent_data	data's parent array
+	 *
+	 * @throws Exception			if the check is failed
+	 */
+	public function requiredMapElement(array $parent_data = null) {
+		if (zbx_is_int($parent_data['elementtype'])) {
+			switch ($parent_data['elementtype']) {
+				case SYSMAP_ELEMENT_TYPE_HOST:
+				case SYSMAP_ELEMENT_TYPE_MAP:
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Validate map element.
+	 *
+	 * @param string $data			import data
+	 * @param array  $parent_data	data's parent array
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception			if the map element is invalid
+	 */
+	public function validateMapElement($data, array $parent_data = null, $path) {
+		if (zbx_is_int($parent_data['elementtype'])) {
+			switch ($parent_data['elementtype']) {
+				case SYSMAP_ELEMENT_TYPE_HOST:
+					$rules = ['type' => XML_ARRAY, 'rules' => [
+						'host' =>			['type' => XML_STRING | XML_REQUIRED]
+					]];
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_MAP:
+					$rules = ['type' => XML_ARRAY, 'rules' => [
+						'name' =>			['type' => XML_STRING | XML_REQUIRED]
+					]];
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+					$rules = ['type' => XML_ARRAY, 'rules' => [
+						'host' =>			['type' => XML_STRING],
+						'description' =>	['type' => XML_STRING | XML_REQUIRED],
+						'expression' =>		['type' => XML_STRING | XML_REQUIRED]
+					]];
+					break;
+
+				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					$rules = ['type' => XML_ARRAY, 'rules' => [
+						'name' =>			['type' => XML_STRING | XML_REQUIRED]
+					]];
+					break;
+
+				default:
+					return $data;
+			}
+
+			$data = (new CXmlValidatorGeneral($rules))->validate($data, $path);
+		}
+
+		return $data;
+	}
+
 }
