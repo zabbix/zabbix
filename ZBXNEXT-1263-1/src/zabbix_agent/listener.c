@@ -39,7 +39,7 @@ extern int		server_num, process_num;
 
 #include "../libs/zbxcrypto/tls.h"
 
-static void	process_listener(zbx_sock_t *s)
+static void	process_listener(zbx_socket_t *s)
 {
 	AGENT_RESULT	result;
 	char		**value = NULL;
@@ -89,13 +89,13 @@ static void	process_listener(zbx_sock_t *s)
 	}
 
 	if (FAIL == ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "Process listener error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "Process listener error: %s", zbx_socket_strerror());
 }
 
 ZBX_THREAD_ENTRY(listener_thread, args)
 {
 	int		ret, local_request_failed = 0;
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -107,7 +107,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	memcpy(&s, (zbx_sock_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_sock_t));
+	memcpy(&s, (zbx_socket_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_socket_t));
 
 	zbx_free(args);
 
@@ -130,10 +130,10 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			zbx_tcp_unaccept(&s);
 		}
 
-		if (SUCCEED == ret || EINTR == zbx_sock_last_error())
+		if (SUCCEED == ret || EINTR == zbx_socket_last_error())
 			continue;
 
-		zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s", zbx_socket_strerror());
 
 		if (local_request_failed++ > 1000)
 		{

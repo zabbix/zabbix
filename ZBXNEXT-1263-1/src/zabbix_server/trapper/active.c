@@ -45,7 +45,7 @@ extern unsigned char	program_type;
  * Comments: NB! adds host to the database if it does not exist               *
  *                                                                            *
  ******************************************************************************/
-static int	get_hostid_by_host(const zbx_sock_t *sock, const char *host, const char *ip, unsigned short port,
+static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
 		const char *host_metadata, zbx_uint64_t *hostid, char *error)
 {
 	const char	*__function_name = "get_hostid_by_host";
@@ -218,7 +218,7 @@ static void	get_list_of_active_checks(zbx_uint64_t hostid, zbx_vector_uint64_t *
  *           format of the list: key:delay:last_log_size                      *
  *                                                                            *
  ******************************************************************************/
-int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
+int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 {
 	const char		*__function_name = "send_list_of_active_checks";
 
@@ -306,7 +306,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 
 	alarm(CONFIG_TIMEOUT);
 	if (SUCCEED != zbx_tcp_send_raw(sock, buffer))
-		zbx_strlcpy(error, zbx_tcp_strerror(), MAX_STRING_LEN);
+		zbx_strlcpy(error, zbx_socket_strerror(), MAX_STRING_LEN);
 	else
 		ret = SUCCEED;
 	alarm(0);
@@ -410,7 +410,7 @@ out:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
+int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "send_list_of_active_checks_json";
 
@@ -568,7 +568,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	alarm(CONFIG_TIMEOUT);
 	if (SUCCEED != zbx_tcp_send(sock, json.buffer))
-		strscpy(error, zbx_tcp_strerror());
+		strscpy(error, zbx_socket_strerror());
 	else
 		ret = SUCCEED;
 	alarm(0);

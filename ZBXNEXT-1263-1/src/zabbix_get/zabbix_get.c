@@ -172,7 +172,7 @@ static void	get_signal_handler(int sig)
  ******************************************************************************/
 static int	get_value(const char *source_ip, const char *host, unsigned short port, const char *key)
 {
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 	int		ret;
 	ssize_t		bytes_received = -1;
 	char		request[1024];
@@ -213,12 +213,12 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 		if (SUCCEED != ret && 0 != bytes_received)
 		{
-			zbx_error("Get value error: %s", zbx_tcp_strerror());
+			zbx_error("Get value error: %s", zbx_socket_strerror());
 			zbx_error("Check access restrictions in Zabbix agent configuration");
 		}
 	}
 	else
-		zbx_error("Get value error: %s", zbx_tcp_strerror());
+		zbx_error("Get value error: %s", zbx_socket_strerror());
 
 	return ret;
 }

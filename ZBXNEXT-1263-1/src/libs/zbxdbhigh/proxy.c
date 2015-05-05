@@ -107,7 +107,7 @@ static zbx_history_table_t areg = {
  *               configured in passive mode or access denied                  *
  *                                                                            *
  ******************************************************************************/
-int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, const zbx_sock_t *sock,
+int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, const zbx_socket_t *sock,
 		char **error)
 {
 	zbx_uint64_t		hostid_tmp;
@@ -163,7 +163,7 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
  *     FAIL    - access is denied                                             *
  *                                                                            *
  ******************************************************************************/
-int	check_access_passive_proxy(zbx_sock_t *sock, int send_response, const char *req)
+int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req)
 {
 	if (0 == (configured_tls_accept_modes & sock->connection_type))
 	{
@@ -2181,7 +2181,7 @@ void	calc_timestamp(const char *line, int *timestamp, const char *format)
  *             processed    - [OUT] number of processed elements              *
  *                                                                            *
  ******************************************************************************/
-void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
+void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid,
 		AGENT_VALUE *values, size_t values_num, int *processed)
 {
 	const char		*__function_name = "process_mass_data";
@@ -2259,7 +2259,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			if (FAIL == security_check)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot process trapper item \"%s\": %s",
-						items[i].key_orig, zbx_tcp_strerror());
+						items[i].key_orig, zbx_socket_strerror());
 				continue;
 			}
 		}
@@ -2458,7 +2458,7 @@ static void	clean_agent_values(AGENT_VALUE *values, size_t values_num)
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
+int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp,
 		const zbx_uint64_t proxy_hostid, char *info, int max_info_size)
 {
 #define VALUES_MAX	256
@@ -2720,9 +2720,8 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 					drule.druleid);
 
 			if (NULL != (row = DBfetch(result)))
-			{
 				ZBX_STR2UINT64(drule.unique_dcheckid, row[0]);
-			}
+
 			DBfree_result(result);
 
 			last_druleid = drule.druleid;
@@ -2740,12 +2739,37 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 				zbx_date2str(itemtime), zbx_time2str(itemtime), ip, dns, port, dcheck.key_, value);
 
 		DBbegin();
-		if (-1 == dcheck.type)
-			discovery_update_host(&dhost, ip, status, itemtime);
-		else
-			discovery_update_service(&drule, &dcheck, &dhost, ip, dns, port, status, value, itemtime);
-		DBcommit();
 
+		if (-1 == dcheck.type)
+		{
+			if (SUCCEED != discovery_verify_drule(drule.druleid))
+			{
+				DBrollback();
+
+				zabbix_log(LOG_LEVEL_DEBUG, "druleid:" ZBX_FS_UI64 " does not exist", drule.druleid);
+
+				goto next;
+			}
+
+			discovery_update_host(&dhost, ip, status, itemtime);
+		}
+		else
+		{
+			if (SUCCEED != discovery_verify_dcheck(drule.druleid, dcheck.dcheckid))
+			{
+				DBrollback();
+
+				zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " either does not exist or does not"
+						" belong to druleid:" ZBX_FS_UI64, dcheck.dcheckid, drule.druleid);
+
+				goto next;
+			}
+
+			discovery_update_service(&drule, &dcheck, &dhost, ip, dns, port, status, value, itemtime);
+		}
+
+		DBcommit();
+next:
 		continue;
 json_parse_error:
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
