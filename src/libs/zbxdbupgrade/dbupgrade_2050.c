@@ -121,6 +121,86 @@ static int	DBpatch_2050006(void)
 	return DBcreate_index("triggers", "triggers_2", "value,lastchange", 0);
 }
 
+static int	DBpatch_2050007(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*key = NULL, *key_esc, *param;
+	int		ret = SUCCEED;
+	AGENT_REQUEST	request;
+
+	result = DBselect("select itemid,key_ from items where key_ like 'net.tcp.service%%[%%ntp%%'");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		init_request(&request);
+
+		if (SUCCEED != parse_item_key(row[1], &request))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot parse item key \"%s\"", row[1]);
+			continue;
+		}
+
+		key = zbx_strdup(key, row[1]);
+
+		param = get_rparam(&request, 0);
+
+		if (0 == strcmp("service.ntp", param))
+		{
+			/* replace "service.ntp" with "ntp" */
+
+			char	*p;
+
+			p = strstr(key, "service.ntp");
+
+			do
+			{
+				*p = *(p + 8);
+			}
+			while ('\0' != *(p++));
+		}
+
+		free_request(&request);
+
+		/* replace "net.tcp.service" with "net.udp.service" */
+
+		key[4] = 'u';
+		key[5] = 'd';
+		key[6] = 'p';
+
+		key_esc = DBdyn_escape_string(key);
+
+		if (ZBX_DB_OK > DBexecute("update items set key_='%s' where itemid=%s", key_esc, row[0]))
+			ret = FAIL;
+
+		zbx_free(key_esc);
+	}
+	DBfree_result(result);
+
+	zbx_free(key);
+
+	if (SUCCEED == ret)
+	{
+		result = DBselect(
+				"select hostid,key_"
+				" from items"
+				" where key_ like 'net.udp.service%%[%%ntp%%'"
+				" group by hostid,key_"
+				" having count(*)>1");
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Duplicate item key \"%s\" found on host ID \"%s\" after conversion."
+					" Remove the unnecessary original key manually and restart the process.",
+					row[1], row[0]);
+			ret = FAIL;
+		}
+		DBfree_result(result);
+	}
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -134,5 +214,6 @@ DBPATCH_ADD(2050003, 0, 1)
 DBPATCH_ADD(2050004, 0, 1)
 DBPATCH_ADD(2050005, 0, 0)
 DBPATCH_ADD(2050006, 0, 0)
+DBPATCH_ADD(2050007, 0, 1)
 
 DBPATCH_END()
