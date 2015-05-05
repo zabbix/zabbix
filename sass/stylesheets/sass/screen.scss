@@ -657,7 +657,7 @@ footer {
 	}
 
 	.filter-forms {
-		padding: 0 10px 10px 10px;
+		padding: 0 10px 0px 10px;
 	}
 
 	.list-table {
@@ -702,7 +702,7 @@ footer {
 
 	.cell {
 		text-align: left;
-		padding: 0 20px;
+		padding: 0 20px 5px 20px;
 
 		&:first-child {
 			padding-left: 0;
@@ -720,7 +720,7 @@ footer {
 	}
 
 	button {
-		margin: 15px 7px 0 7px;
+		margin: 10px 7px 0 7px;
 	}
 
 	.multiselect {
