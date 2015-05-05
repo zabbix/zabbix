@@ -190,25 +190,6 @@ static int	DBpatch_2050007(void)
 
 	zbx_free(key);
 
-	if (SUCCEED == ret)
-	{
-		result = DBselect(
-				"select hostid,key_"
-				" from items"
-				" where key_ like 'net.udp.service%%[%%ntp%%'"
-				" group by hostid,key_"
-				" having count(*)>1");
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Duplicate item key \"%s\" found on host ID \"%s\" after conversion."
-					" Remove the unnecessary original key manually and restart the process.",
-					row[1], row[0]);
-			ret = FAIL;
-		}
-		DBfree_result(result);
-	}
-
 	return ret;
 }
 
