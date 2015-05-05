@@ -416,7 +416,7 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	}
 	else	/* net.udp.service */
 	{
-		if (0 == strcmp(service, "ntp") || 0 == strcmp(service, "service.ntp" /* deprecated */))
+		if (0 == strcmp(service, "ntp"))
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_NTP_PORT;
