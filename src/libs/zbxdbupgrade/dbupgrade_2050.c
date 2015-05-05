@@ -129,7 +129,12 @@ static int	DBpatch_2050007(void)
 	int		ret = SUCCEED;
 	AGENT_REQUEST	request;
 
-	result = DBselect("select itemid,key_ from items where key_ like 'net.tcp.service%%[%%ntp%%'");
+	/* type - ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE */
+	result = DBselect(
+			"select itemid,key_"
+			" from items"
+			" where type in (0,3,7)"
+				" and key_ like 'net.tcp.service%%[%%ntp%%'");
 
 	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
@@ -141,9 +146,15 @@ static int	DBpatch_2050007(void)
 			continue;
 		}
 
-		key = zbx_strdup(key, row[1]);
-
 		param = get_rparam(&request, 0);
+
+		if (0 != strcmp("service.ntp", param) && 0 != strcmp("ntp", param))
+		{
+			free_request(&request);
+			continue;
+		}
+
+		key = zbx_strdup(key, row[1]);
 
 		if (0 == strcmp("service.ntp", param))
 		{
