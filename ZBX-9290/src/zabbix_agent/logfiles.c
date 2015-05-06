@@ -32,6 +32,7 @@
 #define ZBX_SAME_FILE_ERROR	-1
 #define ZBX_SAME_FILE_NO	0
 #define ZBX_SAME_FILE_YES	1
+#define ZBX_SAME_FILE_RETRY	2
 
 /******************************************************************************
  *                                                                            *
@@ -461,7 +462,8 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
  ******************************************************************************/
 static int	is_same_file(const struct st_logfile *old, const struct st_logfile *new, int use_ino)
 {
-	int	ret = ZBX_SAME_FILE_NO;
+	int		ret = ZBX_SAME_FILE_NO, retry = 0;
+	static int	temp = 0;
 
 	if (1 == use_ino || 2 == use_ino)
 	{
@@ -493,7 +495,15 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 
 	if (old->size == new->size && old->mtime < new->mtime)
 	{
-		/* File's mtime cannot increase without changing size unless manipulated. */
+		if (0 == temp)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "File's mtime cannot increase without changing size unless"
+					" manipulated. Retry reading \"%s\" status on the next check", new->filename);
+			retry = 1;
+		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "\"%s\" is considered to be a new file", new->filename);
+
 		goto out;
 	}
 
@@ -555,6 +565,22 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 
 	ret = ZBX_SAME_FILE_YES;
 out:
+	if (1 == retry)
+	{
+		ret = ZBX_SAME_FILE_RETRY;
+		temp = 1;
+	}
+	else
+	{
+		if (0 == retry && 1 == temp)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "\"%s\" is an old file. Its size has been updated",
+					new->filename);
+		}
+
+		temp = 0;
+	}
+
 	return ret;
 }
 
@@ -597,7 +623,7 @@ static int	setup_old2new(char *old2new, const struct st_logfile *old, int num_ol
 				p[j] = '0';
 			else if (ZBX_SAME_FILE_YES == rc)
 				p[j] = '1';
-			else if (ZBX_SAME_FILE_ERROR == rc)
+			else if (ZBX_SAME_FILE_ERROR == rc || ZBX_SAME_FILE_RETRY == rc)
 				return FAIL;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "setup_old2new: is_same_file(%s, %s) = %c",
