@@ -113,6 +113,13 @@ if ($exportData) {
 // remove inherited macros data (actions: 'add', 'update' and 'form')
 if (hasRequest('macros')) {
 	$_REQUEST['macros'] = cleanInheritedMacros($_REQUEST['macros']);
+
+	// remove empty new macro lines
+	foreach ($_REQUEST['macros'] as $idx => $macro) {
+		if (!array_key_exists('hostmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === '') {
+			unset($_REQUEST['macros'][$idx]);
+		}
+	}
 }
 
 /*
@@ -166,13 +173,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		// macros
 		$macros = getRequest('macros', array());
-
-		// remove empty new macro lines
-		foreach ($macros as $idx => $macro) {
-			if (!array_key_exists('hostmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === '') {
-				unset($macros[$key]);
-			}
-		}
 
 		foreach ($macros as &$macro) {
 			// transform macros to uppercase {$aaa} => {$AAA}
