@@ -594,7 +594,7 @@ foreach (@$tlds_ref)
 								next if ($status_ref->{'clock'} < $tr_start);
 								last if ($status_ref->{'clock'} > $tr_end);
 
-								my $service_only = ($subservice eq "43" ? 2 : 3); # 0 - down, 1 - up, 2 - only 43, 3 - only 80
+								my $service_only = ($subservice eq JSON_RDDS_43 ? 2 : 3); # 0 - down, 1 - up, 2 - only 43, 3 - only 80
 
 								$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'} = (($status_ref->{'value'} == 1 or $status_ref->{'value'} == $service_only) ? "Up" : "Down");
 							}
