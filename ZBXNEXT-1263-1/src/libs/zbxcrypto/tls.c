@@ -89,7 +89,6 @@ ZBX_THREAD_LOCAL static char			*err_msg		= NULL;
 ZBX_THREAD_LOCAL static int			*ciphersuites_cert	= NULL;
 ZBX_THREAD_LOCAL static int			*ciphersuites_psk	= NULL;
 ZBX_THREAD_LOCAL static int			*ciphersuites_all	= NULL;
-ZBX_THREAD_LOCAL static char			work_buf[SSL_MAX_CONTENT_LEN + 1];
 #elif defined(HAVE_GNUTLS)
 ZBX_THREAD_LOCAL static gnutls_certificate_credentials_t	my_cert_creds		= NULL;
 ZBX_THREAD_LOCAL static gnutls_psk_client_credentials_t		my_psk_client_creds	= NULL;
@@ -1679,18 +1678,40 @@ static gnutls_x509_crt_t	zbx_get_peer_cert(const gnutls_session_t session, char 
 }
 #endif
 
-#if defined(HAVE_GNUTLS)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_log_peer_cert                                                *
  *                                                                            *
  * Purpose: write peer certificate information into Zabbix log for debugging  *
  *                                                                            *
+ * Parameters:                                                                *
+ *     function_name - [IN] caller function name                              *
+ *     cert          - [IN] peer certificate                                  *
+ *     error         - [OUT] dynamically allocated memory with error message  *
+ *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - no errors                                                    *
  *     FAIL - an error occurred                                               *
  *                                                                            *
  ******************************************************************************/
+#if defined(HAVE_POLARSSL)
+static int	zbx_log_peer_cert(const char *function_name, const x509_crt *cert, char **error)
+{
+	char	issuer[HOST_TLS_ISSUER_LEN_MAX], subject[HOST_TLS_SUBJECT_LEN_MAX], serial[128];
+
+	if (SUCCEED == zbx_x509_dn_gets(&cert->issuer, issuer, sizeof(issuer), error) &&
+			SUCCEED == zbx_x509_dn_gets(&cert->subject, subject, sizeof(subject), error) &&
+			0 < x509_serial_gets(serial, sizeof(serial), &cert->serial))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): peer certificate: issuer:\"%s\" subject:\"%s\" serial:\"%s\"",
+				function_name, issuer, subject, serial);
+
+		return SUCCEED;
+	}
+	else
+		return FAIL;
+}
+#elif defined(HAVE_GNUTLS)
 static int	zbx_log_peer_cert(const gnutls_x509_crt_t cert, char **error)
 {
 	const char		*__function_name = "zbx_log_peer_cert";
@@ -2078,23 +2099,8 @@ void	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		{
-			/* x509_crt_info() uses a fixed buffer and there is no way to know how large this buffer */
-			/* should be to accumulate all info. */
-			if (-1 != x509_crt_info(work_buf, sizeof(work_buf), "", ca_cert))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded CA certificate(s) from file "
-						"(output may be truncated):\n%s", __function_name, work_buf);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot print CA certificate(s) info",
-						__function_name);
-				zbx_tls_free();
-				exit(EXIT_FAILURE);
-			}
-		}
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded CA certificate(s) from file \"%s\"", __function_name,
+				CONFIG_TLS_CA_FILE);
 	}
 
 	/* 'TLSCrlFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
@@ -2123,22 +2129,8 @@ void	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		{
-			/* x509_crl_info() uses a fixed buffer and there is no way to know how large this buffer */
-			/* should be to accumulate all info. */
-			if (-1 != x509_crl_info(work_buf, sizeof(work_buf), "", crl))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded CRL from file (output may be "
-						"truncated):\n%s", __function_name, work_buf);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot print CRL info", __function_name);
-				zbx_tls_free();
-				exit(EXIT_FAILURE);
-			}
-		}
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded CRL certificate(s) from file \"%s\"", __function_name,
+				CONFIG_TLS_CRL_FILE);
 	}
 
 	/* 'TLSCertFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
@@ -2167,22 +2159,8 @@ void	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		{
-			/* x509_crt_info() uses a fixed buffer and there is no way to know how large this buffer */
-			/* should be to accumulate all info. */
-			if (-1 != x509_crt_info(work_buf, sizeof(work_buf), "", my_cert))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded certificate (output may be "
-						"truncated):\n%s", __function_name, work_buf);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot print certificate info", __function_name);
-				zbx_tls_free();
-				exit(EXIT_FAILURE);
-			}
-		}
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded certificate from file \"%s\"", __function_name,
+				CONFIG_TLS_CERT_FILE);
 	}
 
 	/* 'TLSKeyFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
@@ -2204,7 +2182,7 @@ void	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded " ZBX_FS_SIZE_T "-bit %s private key",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded " ZBX_FS_SIZE_T "-bit %s private key",
 				__function_name, (zbx_fs_size_t)pk_get_size(my_priv_key), pk_get_name(my_priv_key));
 	}
 
@@ -2213,7 +2191,7 @@ void	zbx_tls_init_child(void)
 	if (NULL != CONFIG_TLS_PSK_FILE)
 	{
 		zbx_read_psk_file();
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded pre-shared key", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded pre-shared key", __function_name);
 	}
 
 	/* 'TLSPskIdentity' parameter (in zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). Configure */
@@ -2223,7 +2201,7 @@ void	zbx_tls_init_child(void)
 		my_psk_identity = CONFIG_TLS_PSK_IDENTITY;
 		my_psk_identity_len = strlen(my_psk_identity);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded pre-shared key\'s identity", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded pre-shared key\'s identity", __function_name);
 	}
 
 	/* Certificate always comes from configuration file. Set up ciphersuites. */
@@ -3003,14 +2981,11 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 		{
 			/* log peer certificate information for debugging */
 
-			if (-1 == x509_crt_info(work_buf, sizeof(work_buf), "", peer_cert))
+			if (SUCCEED != zbx_log_peer_cert(__function_name, peer_cert, error))
 			{
-				*error = zbx_strdup(*error, "cannot get peer certificate info");
 				zbx_tls_close(s);
 				goto out;
 			}
-
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): peer certificate:\n%s", __function_name, work_buf);
 		}
 
 		/* Basic validation of peer certificate was done during handshake. If required validate peer */
@@ -3704,23 +3679,29 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		{
 			/* log peer certificate information for debugging */
 
-			if (NULL == (peer_cert = ssl_get_peer_cert(s->tls_ctx)) || -1 == x509_crt_info(work_buf,
-					sizeof(work_buf), "", peer_cert))
+			if (NULL == (peer_cert = ssl_get_peer_cert(s->tls_ctx)))
 			{
-				*error = zbx_strdup(*error, "cannot get peer certificate info");
+				*error = zbx_strdup(*error, "no peer certificate");
 				zbx_tls_close(s);
 				goto out;
 			}
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): peer certificate:\n%s", __function_name, work_buf);
+			if (SUCCEED != zbx_log_peer_cert(__function_name, peer_cert, error))
+			{
+				zbx_tls_close(s);
+				goto out;
+			}
 		}
 
 		/* Basic verification of peer certificate was done during handshake. Issuer and Subject have to be */
 		/* verified later, after data have been received and sender type and host name are known. */
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s)", __function_name,
-			ssl_get_version(s->tls_ctx), ssl_get_ciphersuite(s->tls_ctx));
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s)", __function_name,
+				ssl_get_version(s->tls_ctx), ssl_get_ciphersuite(s->tls_ctx));
+	}
 
 	return SUCCEED;
 out:
