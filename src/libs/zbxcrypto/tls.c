@@ -2342,7 +2342,7 @@ void	zbx_tls_init_child(void)
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded certificate and private key",
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded certificate and private key",
 					__function_name);
 		}
 	}
@@ -2405,7 +2405,7 @@ void	zbx_tls_init_child(void)
 			gnutls_psk_set_server_credentials_function(my_psk_server_creds, zbx_psk_cb);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded pre-shared key and identity", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded pre-shared key and identity", __function_name);
 	}
 
 	/* Certificate always comes from configuration file. Set up ciphersuites. */
@@ -2513,7 +2513,7 @@ void	zbx_tls_init_child(void)
 			goto out;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded CA certificate(s)", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded CA certificate(s)", __function_name);
 
 		SSL_CTX_set_verify(ctx_cert, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
 
@@ -2548,7 +2548,7 @@ void	zbx_tls_init_child(void)
 			goto out;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded certificate", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded certificate", __function_name);
 	}
 
 	/* 'TLSKeyFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
@@ -2564,7 +2564,7 @@ void	zbx_tls_init_child(void)
 			goto out;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded private key", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded private key", __function_name);
 
 		if (1 != SSL_CTX_check_private_key(ctx_cert))
 		{
@@ -2573,7 +2573,7 @@ void	zbx_tls_init_child(void)
 			goto out;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded private key", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded private key", __function_name);
 	}
 
 	/* 'TLSPskIdentity' and 'TLSPskFile' parameters used in zabbix_proxy.conf, zabbix_agentd.conf, */
@@ -2585,7 +2585,7 @@ void	zbx_tls_init_child(void)
 		my_psk_identity_len = strlen(my_psk_identity);
 
 		zbx_read_psk_file();
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): successfully loaded pre-shared key", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded pre-shared key", __function_name);
 	}
 
 	/* set up ciphersuites */
