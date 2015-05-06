@@ -538,7 +538,7 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 
 			if (-1 == (f = zbx_open(new->filename, O_RDONLY)))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot open \"%s\"': %s", new->filename,
+				zabbix_log(LOG_LEVEL_WARNING, "cannot open \"%s\": %s", new->filename,
 						zbx_strerror(errno));
 				ret = ZBX_SAME_FILE_ERROR;
 				goto out;
@@ -554,7 +554,7 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 
 			if (0 != close(f))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", new->filename,
+				zabbix_log(LOG_LEVEL_WARNING, "cannot close file \"%s\": %s", new->filename,
 						zbx_strerror(errno));
 				ret = ZBX_SAME_FILE_ERROR;
 			}
