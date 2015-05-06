@@ -685,57 +685,6 @@ function sendAjaxData(url, options) {
 }
 
 /**
- * Finds all elements with a 'placeholder' attribute and emulates the placeholder in IE.
- */
-function createPlaceholders() {
-	if (IE) {
-		jQuery('[placeholder]').each(function() {
-			var placeholder = jQuery(this);
-
-			if (!placeholder.data('has-placeholder-handlers')) {
-				placeholder
-					.data('has-placeholder-handlers', true)
-					.focus(function() {
-						var obj = jQuery(this);
-
-						if (!obj.attr('placeholder')) {
-							return;
-						}
-
-						if (obj.val() == obj.attr('placeholder')) {
-							obj.val('');
-							obj.removeClass('placeholder');
-						}
-					})
-					.blur(function() {
-						var obj = jQuery(this);
-
-						if (!obj.attr('placeholder')) {
-							return;
-						}
-
-						if (obj.val() == '' ||  obj.val() == obj.attr('placeholder')) {
-							obj.val(obj.attr('placeholder'));
-							obj.addClass('placeholder');
-						}
-					})
-					.blur();
-			}
-
-			jQuery('form').submit(function() {
-				jQuery('.placeholder').each(function() {
-					var obj = jQuery(this);
-
-					if (obj.val() == obj.attr('placeholder')) {
-						obj.val('');
-					}
-				});
-			});
-		});
-	}
-}
-
-/**
  * Converts number to letter representation.
  * From A to Z, then from AA to ZZ etc.
  * Example: 0 => A, 25 => Z, 26 => AA, 27 => AB, 52 => BA, ...
@@ -914,8 +863,6 @@ function getConditionFormula(conditions, evalType) {
 		var template = new Template($(options.template).html());
 		beforeRow.before(template.evaluate(data));
 		table.data('dynamicRows').counter++;
-
-		createPlaceholders();
 
 		table.trigger('tableupdate.dynamicRows', options);
 	}
