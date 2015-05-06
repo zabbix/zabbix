@@ -964,7 +964,7 @@ function cleanInheritedMacros($macros) {
 			unset($macros[$idx]);
 		}
 		else {
-			unset($macros[$idx]['type'], $macros[$idx]['template'], $macros[$idx]['global']);
+			unset($macros[$idx]['type'], $macros[$idx]['inherited']);
 		}
 	}
 
