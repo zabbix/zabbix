@@ -5903,6 +5903,12 @@ return array(
 				'ref_table' => 'application_prototype',
 				'ref_field' => 'application_prototypeid',
 			),
+			'name' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
 			'lastcheck' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
