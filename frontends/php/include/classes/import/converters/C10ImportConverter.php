@@ -259,9 +259,11 @@ class C10ImportConverter extends CConverter {
 				$ipmiInterface = array(
 					'type' => INTERFACE_TYPE_IPMI,
 					'useip' => INTERFACE_USE_IP,
-					'ip' => ((isset($host['ipmi_ip']) && $host['ipmi_ip'] !== '') ? $host['ipmi_ip'] : $host['ip']),
+					'ip' => (array_key_exists('ipmi_ip', $host) && $host['ipmi_ip'] !== '')
+						? $host['ipmi_ip'] : $host['ip'],
 					'dns' => '',
-					'port' => $host['ipmi_port'],
+					'port' => (array_key_exists('ipmi_port', $host) && $host['ipmi_port'] !== '')
+						? $host['ipmi_port'] : '623',
 					'default' => INTERFACE_PRIMARY,
 					'interface_ref' => 'if'.$i
 				);
