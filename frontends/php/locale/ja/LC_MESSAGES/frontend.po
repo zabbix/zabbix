@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-07 21:26+0300\n"
-"PO-Revision-Date: 2015-02-04 03:04+0300\n"
+"POT-Creation-Date: 2015-05-07 21:43+0300\n"
+"PO-Revision-Date: 2015-04-08 06:11+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1423011879.0\n"
+"X-POOTLE-MTIME: 1428466260.0\n"
 
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:357
@@ -5516,7 +5516,7 @@ msgstr "第1週"
 #: include/func.inc.php:1517
 msgctxt "page navigation"
 msgid "First"
-msgstr "第1週"
+msgstr "最初"
 
 #: include/views/js/configuration.sysmaps.js.php:42
 msgid "Fit to map"
@@ -8483,12 +8483,12 @@ msgstr "言語"
 
 #: include/forms.inc.php:1715 include/maintenances.inc.php:115
 msgid "Last"
-msgstr "最新"
+msgstr "最終週"
 
 #: include/func.inc.php:1557
 msgctxt "page navigation"
 msgid "Last"
-msgstr "最新"
+msgstr "最後"
 
 #: app/views/monitoring.dashboard.view.php:175
 #, c-format
@@ -10003,7 +10003,7 @@ msgstr "グラフはありません。"
 #: include/classes/api/services/CHost.php:533
 #, c-format
 msgid "No groups for host \"%1$s\"."
-msgstr ""
+msgstr "ホスト\"%1$s\"にグループが設定されていません。"
 
 #: include/classes/api/services/CHost.php:934
 msgid "No groups for hosts."
@@ -15128,7 +15128,7 @@ msgstr "VMwareハイパーバイザーネットワーク出力統計、<url> - V
 
 #: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
+msgstr "VMwareハイパーバイザーのパフォーマンスカウンター、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名、<path> - パフォーマンスカウンターのパス、<instance> - パフォーマンスカウンターのインスタンス"
 
 #: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -15224,7 +15224,7 @@ msgstr "VMware仮想マシンネットワークインターフェース出力統
 
 #: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
+msgstr "VMware仮想マシンのパフォーマンスカウンター、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<path> - パフォーマンスカウンターのパス、<instance> - パフォーマンスカウンターのインスタンス"
 
 #: include/classes/items/CHelpItems.php:771
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -15236,7 +15236,7 @@ msgstr "VMware仮想マシンプライベートメモリサイズ、<url> - VMwa
 
 #: include/classes/items/CHelpItems.php:715
 msgid "VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "VMware仮想マシンのプロセッサ有効時間率(%)、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
 #: include/classes/items/CHelpItems.php:719
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -15663,7 +15663,7 @@ msgstr "要素の設定が正しくありません。"
 #: include/classes/api/services/CHost.php:511
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
-msgstr ""
+msgstr "ホスト\"%1$s\"のフィールドが正しくありません。"
 
 #: include/classes/api/services/CImage.php:457
 #, c-format

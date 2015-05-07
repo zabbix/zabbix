@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-07 21:26+0300\n"
-"PO-Revision-Date: 2015-02-11 19:18+0300\n"
+"POT-Creation-Date: 2015-05-07 21:43+0300\n"
+"PO-Revision-Date: 2015-03-26 11:38+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1423675124.0\n"
+"X-POOTLE-MTIME: 1427362729.0\n"
 
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:357
@@ -15292,7 +15292,7 @@ msgstr "Statystyki wyjścia sieci hipernadzorcy VMware, <url> - URL usługi VMwa
 
 #: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
+msgstr "Licznik wydajności hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware, <path> - ścieżka licznika wydajności, <instance> - instancja licznika wydajności"
 
 #: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -15388,7 +15388,7 @@ msgstr "Statystyki wyjścia interfejsu sieciowego maszyny wirtualnej VMware, <ur
 
 #: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
+msgstr "Licznik wydajności maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <path> - ścieżka licznika wydajności, <instance> - instancja licznika wydajności"
 
 #: include/classes/items/CHelpItems.php:771
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -15400,7 +15400,7 @@ msgstr "Rozmiar pamięci prywatnej maszyny wirtualnej VMware, <url> - URL usług
 
 #: include/classes/items/CHelpItems.php:715
 msgid "VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "% czasu gotowości procesora maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
 #: include/classes/items/CHelpItems.php:719
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
