@@ -83,10 +83,10 @@ if (hasRequest('update')) {
 		}
 	}
 
+	$result = true;
+
 	if ($macrosToUpdate || $dbMacros || $macros) {
 		DBstart();
-
-		$result = true;
 
 		// update
 		if ($macrosToUpdate) {
@@ -104,17 +104,12 @@ if (hasRequest('update')) {
 		}
 
 		$result = DBend($result);
-		show_messages($result, _('Macros updated'), _('Cannot update macros'));
+	}
 
-		if ($result) {
-			// reload macros after updating to properly display them in the form
-			$_REQUEST['macros'] = API::UserMacro()->get(array(
-				'output' => array('globalmacroid', 'macro', 'value'),
-				'globalmacro' => true,
-				'preservekeys' => true
-			));
-			$_REQUEST['macros'] = order_macros($_REQUEST['macros'], 'macro');
-		}
+	show_messages($result, _('Macros updated'), _('Cannot update macros'));
+
+	if ($result) {
+		unset($_REQUEST['form_refresh']);
 	}
 }
 
