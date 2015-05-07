@@ -140,9 +140,13 @@ else {
 }
 
 $show_inherited_macros_filter = array(
-	new CRadioButton('show_inherited_macros', '0', null, 'hide_inherited_macros', !$data['show_inherited_macros'], 'submit()'),
+	new CRadioButton('show_inherited_macros', '0', null, 'hide_inherited_macros', !$data['show_inherited_macros'],
+		'submit()'
+	),
 	new CLabel(_('Host macros'), 'hide_inherited_macros'),
-	new CRadioButton('show_inherited_macros', '1', null, 'show_inherited_macros', $data['show_inherited_macros'], 'submit()'),
+	new CRadioButton('show_inherited_macros', '1', null, 'show_inherited_macros', $data['show_inherited_macros'],
+		'submit()'
+	),
 	new CLabel(_('Inherited and host macros'), 'show_inherited_macros')
 );
 
