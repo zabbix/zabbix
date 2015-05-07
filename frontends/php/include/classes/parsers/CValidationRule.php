@@ -19,7 +19,6 @@
 **/
 
 class CValidationRule {
-
 	const STATE_BEGIN = 0;
 	const STATE_END = 1;
 
@@ -56,9 +55,7 @@ class CValidationRule {
 							$is_empty = false;
 							$rule = array();
 
-							if (!$this->parseString($buffer, $pos, $rule)				// string
-									&& !$this->parseRequiredIf($buffer, $pos, $rule)	// required_if
-									&& !$this->parseRequired($buffer, $pos, $rule)		// required
+							if (!$this->parseRequired($buffer, $pos, $rule)				// required
 									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
 									&& !$this->parseJson($buffer, $pos, $rule)			// json
 									&& !$this->parseIn($buffer, $pos, $rule)			// in
@@ -66,8 +63,7 @@ class CValidationRule {
 									&& !$this->parseFatal($buffer, $pos, $rule)			// fatal
 									&& !$this->parseDB($buffer, $pos, $rule)			// db
 									&& !$this->parseArrayId($buffer, $pos, $rule)		// array_id
-									&& !$this->parseArrayDB($buffer, $pos, $rule)		// array_db
-									&& !$this->parseArray($buffer, $pos, $rule)) {		// array
+									&& !$this->parseArrayDB($buffer, $pos, $rule)) {	// array_db
 
 								// incorrect validation rule
 								break 3;
@@ -111,75 +107,120 @@ class CValidationRule {
 	}
 
 	/**
-	 * array
+	 * Returns the error message if validation rule is invalid.
 	 *
-	 * 'array' => true
+	 * @return string
 	 */
-	private function parseArray($buffer, &$pos, &$rule) {
-		if (0 != strncmp(substr($buffer, $pos), 'array', 5)) {
+	public function getError() {
+		return $this->error;
+	}
+
+	/**
+	 * fatal
+	 *
+	 * 'fatal' => true
+	 */
+	private function parseFatal($buffer, &$pos, &$rule) {
+		if (0 != strncmp(substr($buffer, $pos), 'fatal', 5)) {
 			return false;
 		}
 
 		$pos += 5;
-		$rule['array'] = true;
+		$rule['fatal'] = true;
 
 		return true;
 	}
 
 	/**
-	 * array_db <table>.<field>
+	 * required
 	 *
-	 * 'array_db' => array(
-	 *     'table' => '<table>',
-	 *     'field' => '<field>'
-	 * )
+	 * 'required' => true
 	 */
-	private function parseArrayDB($buffer, &$pos, &$rules) {
-		$i = $pos;
-
-		if (0 != strncmp(substr($buffer, $i), 'array_db ', 9)) {
+	private function parseRequired($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'required', 8)) {
 			return false;
 		}
 
-		$i += 9;
+		$pos += 8;
+		$rules['required'] = true;
+
+		return true;
+	}
+
+	/**
+	 * not_empty
+	 *
+	 * 'not_empty' => true
+	 */
+	private function parseNotEmpty($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'not_empty', 9)) {
+			return false;
+		}
+
+		$pos += 9;
+		$rules['not_empty'] = true;
+
+		return true;
+	}
+
+	/**
+	 * json
+	 *
+	 * 'json' => true
+	 */
+	private function parseJson($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'json', 4)) {
+			return false;
+		}
+
+		$pos += 4;
+		$rules['json'] = true;
+
+		return true;
+	}
+
+	/**
+	 * in <value1>[,...,<valueN>]
+	 *
+	 * 'in' => array('<value1>', ..., '<valueN>')
+	 */
+	private function parseIn($buffer, &$pos, &$rules) {
+		$i = $pos;
+
+		if (0 != strncmp(substr($buffer, $i), 'in ', 3)) {
+			return false;
+		}
+
+		$i += 3;
 
 		while (isset($buffer[$i]) && $buffer[$i] == ' ') {
 			$i++;
 		}
 
-		$table = '';
+		$values = array();
 
-		if (!$this->parseField($buffer, $i, $table) || !isset($buffer[$i]) || $buffer[$i++] != '.') {
-			return false;
-		}
-
-		$field = '';
-
-		if (!$this->parseField($buffer, $i, $field)) {
+		if (!$this->parseValues($buffer, $i, $values)) {
 			return false;
 		}
 
 		$pos = $i;
-		$rules['array_db'] = array(
-			'table' => $table,
-			'field' => $field
-		);
+		$rules['in'] = $values;
 
 		return true;
 	}
 
 	/**
-	 * array_id
+	 * id
 	 *
-	 * 'array_id' => true
+	 * 'id' => true
 	 */
-	private function parseArrayId($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'array_id', 8)) {
+	private function parseId($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'id', 2)) {
 			return false;
 		}
 
-		$pos += 8;
-		$rules['array_id'] = true;
+		$pos += 2;
+		$rules['id'] = true;
 
 		return true;
 	}
@@ -227,183 +268,59 @@ class CValidationRule {
 	}
 
 	/**
-	 * fatal
+	 * array_id
 	 *
-	 * 'fatal' => true
+	 * 'array_id' => true
 	 */
-	private function parseFatal($buffer, &$pos, &$rule) {
-		if (0 != strncmp(substr($buffer, $pos), 'fatal', 5)) {
+	private function parseArrayId($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'array_id', 8)) {
 			return false;
 		}
 
-		$pos += 5;
-		$rule['fatal'] = true;
+		$pos += 8;
+		$rules['array_id'] = true;
 
 		return true;
 	}
 
 	/**
-	 * id
+	 * array_db <table>.<field>
 	 *
-	 * 'id' => true
+	 * 'array_db' => array(
+	 *     'table' => '<table>',
+	 *     'field' => '<field>'
+	 * )
 	 */
-	private function parseId($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'id', 2)) {
-			return false;
-		}
-
-		$pos += 2;
-		$rules['id'] = true;
-
-		return true;
-	}
-
-	/**
-	 * in <value1>[,...,<valueN>]
-	 *
-	 * 'in' => array('<value1>', ..., '<valueN>')
-	 */
-	private function parseIn($buffer, &$pos, &$rules) {
+	private function parseArrayDB($buffer, &$pos, &$rules) {
 		$i = $pos;
 
-		if (0 != strncmp(substr($buffer, $i), 'in ', 3)) {
+		if (0 != strncmp(substr($buffer, $i), 'array_db ', 9)) {
 			return false;
 		}
 
-		$i += 3;
+		$i += 9;
 
 		while (isset($buffer[$i]) && $buffer[$i] == ' ') {
 			$i++;
 		}
 
-		$values = array();
+		$table = '';
 
-		if (!$this->parseValues($buffer, $i, $values)) {
+		if (!$this->parseField($buffer, $i, $table) || !isset($buffer[$i]) || $buffer[$i++] != '.') {
+			return false;
+		}
+
+		$field = '';
+
+		if (!$this->parseField($buffer, $i, $field)) {
 			return false;
 		}
 
 		$pos = $i;
-		$rules['in'] = $values;
-
-		return true;
-	}
-
-	/**
-	 * json
-	 *
-	 * 'json' => true
-	 */
-	private function parseJson($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'json', 4)) {
-			return false;
-		}
-
-		$pos += 4;
-		$rules['json'] = true;
-
-		return true;
-	}
-
-	/**
-	 * not_empty
-	 *
-	 * 'not_empty' => true
-	 */
-	private function parseNotEmpty($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'not_empty', 9)) {
-			return false;
-		}
-
-		$pos += 9;
-		$rules['not_empty'] = true;
-
-		return true;
-	}
-
-	/**
-	 * required
-	 *
-	 * 'required' => true
-	 */
-	private function parseRequired($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'required', 8)) {
-			return false;
-		}
-
-		$pos += 8;
-		$rules['required'] = true;
-
-		return true;
-	}
-
-	/**
-	 * required_if <field1>[=<value1>[,...,<valueN>]]][ ... [<fieldN>[=<value1>[,...,<valueN>]]]]
-	 *
-	 * 'required_if' => array(
-	 *     'field1' => true / array('<value1>'[, ..., '<valueN>'])
-	 *     'field2' => true / array('<value1>'[, ..., '<valueN>'])
-	 * )
-	 */
-	private function parseRequiredIf($buffer, &$pos, &$rules) {
-		$i = $pos;
-		$rule = array();
-
-		if (0 != strncmp(substr($buffer, $i), 'required_if ', 12)) {
-			return false;
-		}
-
-		$i += 12;
-
-		do {
-			while (isset($buffer[$i]) && $buffer[$i] == ' ') {
-				$i++;
-			}
-
-			if (!isset($buffer[$i]) || $buffer[$i] == '|') {
-				break;
-			}
-
-			$field = '';
-
-			if (!$this->parseField($buffer, $i, $field)) {
-				return false;
-			}
-
-			if (isset($buffer[$i]) && $buffer[$i] == '=') {
-				$i++;
-				$rule[$field] = array();
-
-				if (!$this->parseValues($buffer, $i, $rule[$field])) {
-					return false;
-				}
-			}
-			else {
-				$rule[$field] = true;
-			}
-		} while (isset($buffer[$i]) && $buffer[$i] == ' ');
-
-		if (!$rule) {
-			return false;
-		}
-
-		$pos = $i;
-		$rules['required_if'] = $rule;
-
-		return true;
-	}
-
-	/**
-	 * string
-	 *
-	 * 'string' => true
-	 */
-	private function parseString($buffer, &$pos, &$rule) {
-		if (0 != strncmp(substr($buffer, $pos), 'string', 6)) {
-			return false;
-		}
-
-		$pos += 6;
-		$rule['string'] = true;
+		$rules['array_db'] = array(
+			'table' => $table,
+			'field' => $field
+		);
 
 		return true;
 	}
@@ -468,14 +385,4 @@ class CValidationRule {
 
 		return true;
 	}
-
-	/**
-	 * Returns the error message if validation rule is invalid.
-	 *
-	 * @return string
-	 */
-	public function getError() {
-		return $this->error;
-	}
-
 }
