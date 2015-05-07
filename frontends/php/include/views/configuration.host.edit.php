@@ -796,6 +796,7 @@ if (!$isDiscovered) {
 else {
 	$linkedTemplateTable->setHeader(array(_('Name')));
 	foreach ($linkedTemplates as $template) {
+		$tmplList->addVar('templates[]', $template['templateid']);
 		$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
 		$templateLink->setTarget('_blank');
 
