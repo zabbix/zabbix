@@ -454,6 +454,7 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
  * Return value: ZBX_SAME_FILE_NO - it is not the same file,                  *
  *               ZBX_SAME_FILE_YES - it could be the same file,               *
  *               ZBX_SAME_FILE_ERROR - error.                                 *
+ *               ZBX_SAME_FILE_RETRY - retry on the next check                *
  *                                                                            *
  * Comments: In some cases we can say that it IS NOT the same file.           *
  *           We can never say that it IS the same file and it has not been    *
@@ -502,7 +503,10 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 			retry = 1;
 		}
 		else
+		{
 			zabbix_log(LOG_LEVEL_WARNING, "\"%s\" is considered to be a new file", new->filename);
+			temp = 0;
+		}
 
 		goto out;
 	}
