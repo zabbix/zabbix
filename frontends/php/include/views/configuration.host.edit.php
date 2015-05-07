@@ -55,7 +55,7 @@ $cloneOrFullClone = ($data['form'] === 'clone' || $data['form'] === 'full_clone'
 
 $cloningDiscoveredHost = (
 	$cloneOrFullClone
-	&& getRequest('form_refresh') == 1
+	&& hasRequest('form_refresh')
 	&& $dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED
 );
 
@@ -844,7 +844,7 @@ $divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
 /*
  * Macros
  */
-if (!$macros) {
+if (!$macros && !$isDiscovered) {
 	$macros[] = array(
 		'macro' => '',
 		'value' => ''
