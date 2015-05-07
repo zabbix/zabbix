@@ -450,10 +450,11 @@ $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 
 // macros
 if (!$macros) {
-	$macros[] = array(
-		'macro' => '',
-		'value' => ''
-	);
+	$macro = ['macro' => '', 'value' => ''];
+	if ($data['show_inherited_macros']) {
+		$macro['type'] = 0x02/* HOSTMACRO */;
+	}
+	$macros[] = $macro;
 }
 
 $macrosView = new CView('hostmacros', array(

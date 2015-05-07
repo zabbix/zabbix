@@ -2,16 +2,19 @@
 	<tr class="form_row">
 		<td>
 			<input class="input text macro" type="text" id="macros_#{rowNum}_macro" name="macros[#{rowNum}][macro]" size="30" maxlength="64" placeholder="{$MACRO}">
+<?php	if ($data['show_inherited_macros']) {
+			echo '<input id="macros_#{rowNum}_type" type="hidden" value="2" name="macros[#{rowNum}][type]">';
+		}?>
 		</td>
 		<td>&rArr;</td>
 		<td>
 			<input class="input text" type="text" id="macros_#{rowNum}_value" name="macros[#{rowNum}][value]" size="40" maxlength="255" placeholder="value">
 		</td>
 		<td>
-			<button class="button link_menu element-table-remove" type="button" id="macros_#{rowNum}_remove" name="macros[#{rowNum}][remove]"><?php echo _('Remove');?></button>
+			<button class="button link_menu element-table-remove" type="button" id="macros_#{rowNum}_remove" name="macros[#{rowNum}][remove]"><?=_('Remove');?></button>
 		</td>
 <?php	if ($data['show_inherited_macros']) {
-			echo '<td></td><td></td><td></td><td></td>';
+			echo '<td></td><td><div class="macro-value"></div></td><td></td><td><div class="macro-value"></div></td>';
 		}?>
 	</tr>
 </script>
@@ -31,7 +34,7 @@
 					.attr('readonly', 'readonly')
 					.val($('#macros_' + macroNum + '_inherited_value').val());
 				$('#macros_' + macroNum + '_change')
-					.text(<?php echo CJs::encodeJson(_('Change')); ?>);
+					.text(<?=CJs::encodeJson(_('Change'));?>);
 			}
 			else {
 				$('#macros_' + macroNum + '_type')
@@ -40,7 +43,7 @@
 					.removeAttr('readonly')
 					.focus();
 				$('#macros_' + macroNum + '_change')
-					.text(<?php echo CJs::encodeJson(_('Remove')); ?>);
+					.text(<?=CJs::encodeJson(_('Remove'));?>);
 			}
 		});
 	});
