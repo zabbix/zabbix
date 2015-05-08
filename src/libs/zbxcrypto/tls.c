@@ -1374,7 +1374,7 @@ static void	zbx_log_ciphersuites(const char *title, const SSL *ctx)
 }
 #endif
 
-#if defined(HAVE_POLARSSL)
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_print_rdn_value                                              *
@@ -1497,7 +1497,9 @@ small_buf:
 
 	return (size_t)(p_out - buf);
 }
+#endif
 
+#if defined(HAVE_POLARSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_x509_dn_gets                                                 *
@@ -1513,11 +1515,15 @@ small_buf:
  *     size  - [IN] output buffer size                                        *
  *     error - [OUT] dynamically allocated memory with error message          *
  *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - no errors, FAIL - an error occurred                          *
+ *                                                                            *
  * Comments:                                                                  *
  *     This function is derived from PolarSSL x509_dn_gets() and heavily      *
  *     modified to print RDNs in reverse order, to print UTF-8 characters and *
  *     non-printable characters in a different way than original              *
  *     x509_dn_gets() does and to return error messages.                      *
+ *     Multi-valued RDNs are not supported currently.                         *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_x509_dn_gets(const x509_name *dn, char *buf, size_t size, char **error)
@@ -1526,9 +1532,9 @@ static int	zbx_x509_dn_gets(const x509_name *dn, char *buf, size_t size, char **
 	const char	*short_name = NULL;
 	char		*p, *p_end;
 
-	/* We need to traverse a linked list of RDNs and print them out in reverse order. The number of RDNs in DN */
-	/* is expected to be small (typically 4-5, sometimes up to 8). For such a small list we simply traverse it */
-	/* multiple times for getting elements in reverse order. */
+	/* We need to traverse a linked list of RDNs and print them out in reverse order (recommended by RFC 4514).   */
+	/* The number of RDNs in DN is expected to be small (typically 4-5, sometimes up to 8). For such a small list */
+	/* we simply traverse it multiple times for getting elements in reverse order. */
 
 	p = buf;
 	p_end = buf + size;
@@ -1603,6 +1609,155 @@ small_buf:
 	*error = zbx_strdup(*error, "output buffer too small");
 
 	return FAIL;
+}
+#elif defined(HAVE_GNUTLS)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_x509_dn_gets                                                 *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     Print distinguished name (i.e. issuer, subject) into buffer. Intended  *
+ *     to use as an alternative to GnuTLS gnutls_x509_crt_get_issuer_dn() and *
+ *     gnutls_x509_crt_get_dn() to meet application needs.                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     dn    - [IN] pointer to distinguished name                             *
+ *     buf   - [OUT] output buffer                                            *
+ *     size  - [IN] output buffer size                                        *
+ *     error - [OUT] dynamically allocated memory with error message          *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - no errors, FAIL - an error occurred                          *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     Multi-valued RDNs are not supported currently (only the first value is *
+ *     printed).                                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_x509_dn_gets(const gnutls_x509_dn_t dn, char *buf, size_t size, char **error)
+{
+#define ZBX_AVA_BUF_SIZE	20	/* hopefully no more than 20 RDNs */
+
+	int			res, i = 0, i_max, ava_dyn_size;
+	char			*p, *p_end;
+	gnutls_x509_ava_st	*ava, *ava_dyn = NULL;
+	char			oid_str[128];		/* size equal to MAX_OID_SIZE, internally defined in GnuTLS */
+	gnutls_x509_ava_st	ava_stat[ZBX_AVA_BUF_SIZE];
+
+	/* Find index of the last RDN in distinguished name. Remember pointers to RDNs to minimize calling of */
+	/* gnutls_x509_dn_get_rdn_ava() as it seems a bit expensive. */
+
+	while (1)
+	{
+		if (ZBX_AVA_BUF_SIZE > i)	/* most common case: small number of RDNs, fits in fixed buffer */
+		{
+			ava = &ava_stat[i];
+		}
+		else if (NULL == ava_dyn)	/* fixed buffer full, copy data to dynamic buffer */
+		{
+			ava_dyn_size = 2 * ZBX_AVA_BUF_SIZE;
+			ava_dyn = zbx_malloc(NULL, (size_t)ava_dyn_size * sizeof(gnutls_x509_ava_st));
+
+			memcpy(ava_dyn, ava_stat, ZBX_AVA_BUF_SIZE * sizeof(gnutls_x509_ava_st));
+			ava = ava_dyn + ZBX_AVA_BUF_SIZE;
+		}
+		else if (ava_dyn_size > i)	/* fits in dynamic buffer */
+		{
+			ava = ava_dyn + i;
+		}
+		else				/* expand dynamic buffer */
+		{
+			ava_dyn_size += ZBX_AVA_BUF_SIZE;
+			ava_dyn = zbx_realloc(ava_dyn, (size_t)ava_dyn_size * sizeof(gnutls_x509_ava_st));
+			ava = ava_dyn + i;
+		}
+
+		if (0 == (res = gnutls_x509_dn_get_rdn_ava(dn, i, 0, ava)))	/* RDN with index 'i' exists */
+		{
+			i++;
+		}
+		else if (GNUTLS_E_ASN1_ELEMENT_NOT_FOUND == res)
+		{
+			i_max = i;
+			break;
+		}
+		else
+		{
+			*error = zbx_dsprintf(*error, "zbx_x509_dn_gets(): gnutls_x509_dn_get_rdn_ava() failed: %d %s",
+					res, gnutls_strerror(res));
+			zbx_free(ava_dyn);
+			return FAIL;
+		}
+	}
+
+	/* "print" RDNs in reverse order (recommended by RFC 4514) */
+
+	if (NULL == ava_dyn)
+		ava = &ava_stat[0];
+	else
+		ava = ava_dyn;
+
+	p = buf;
+	p_end = buf + size;
+
+	for (i = i_max - 1, ava += i; i >= 0; i--, ava--)
+	{
+		if (sizeof(oid_str) <= ava->oid.size)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			zbx_free(ava_dyn);
+			return FAIL;
+		}
+
+		memcpy(oid_str, ava->oid.data, ava->oid.size);
+		oid_str[ava->oid.size] = '\0';
+
+		if (buf != p)			/* not the first RDN being printed */
+		{
+			if (p_end - 1 == p)
+				goto small_buf;
+
+			p += zbx_strlcpy(p, ",", (size_t)(p_end - p));	/* separator between RDNs */
+		}
+
+		/* write attribute name */
+
+		if (p_end - 1 == p)
+			goto small_buf;
+
+		p += zbx_strlcpy(p, gnutls_x509_dn_oid_name(oid_str, GNUTLS_X509_DN_OID_RETURN_OID),
+				(size_t)(p_end - p));
+
+		if (p_end - 1 == p)
+			goto small_buf;
+
+		p += zbx_strlcpy(p, "=", (size_t)(p_end - p));
+
+		/* write attribute value */
+
+		if (p_end - 1 == p)
+			goto small_buf;
+
+		p += zbx_print_rdn_value(ava->value.data, ava->value.size, (unsigned char *)p, (size_t)(p_end - p),
+				error);
+
+		if (NULL != *error)
+			break;
+	}
+
+	zbx_free(ava_dyn);
+
+	if (NULL == *error)
+		return SUCCEED;
+	else
+		return FAIL;
+small_buf:
+	zbx_free(ava_dyn);
+	*error = zbx_strdup(*error, "output buffer too small");
+
+	return FAIL;
+
+#undef ZBX_AVA_BUF_SIZE
 }
 #endif
 
@@ -1892,13 +2047,14 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 		const char *subject, char **error)
 #endif
 {
-	int		issuer_mismatch = 0, subject_mismatch = 0;
-	size_t		error_alloc = 0, error_offset = 0;
+	int			issuer_mismatch = 0, subject_mismatch = 0;
+	size_t			error_alloc = 0, error_offset = 0;
 #if defined(HAVE_GNUTLS)
-	int		res;
+	gnutls_x509_dn_t	dn;
+	int			res;
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS)
-	char		tls_issuer[HOST_TLS_ISSUER_LEN_MAX], tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
+	char			tls_issuer[HOST_TLS_ISSUER_LEN_MAX], tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
 #endif
 
 #if defined(HAVE_POLARSSL)
@@ -1923,25 +2079,15 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 #elif defined(HAVE_GNUTLS)
 	if (NULL != issuer && '\0' != *issuer)
 	{
-		size_t	tls_issuer_size;
-
-		tls_issuer_size = sizeof(tls_issuer);
-
-		if (0 != (res = gnutls_x509_crt_get_issuer_dn(cert, tls_issuer, &tls_issuer_size)))
+		if (0 != (res = gnutls_x509_crt_get_issuer(cert, &dn)))
 		{
-			if (GNUTLS_E_SHORT_MEMORY_BUFFER == res)
-			{
-				*error = zbx_dsprintf(*error, "too long peer certificate issuer name: " ZBX_FS_SIZE_T
-						" bytes", (zbx_fs_size_t)tls_issuer_size);
-			}
-			else
-			{
-				*error = zbx_dsprintf(*error, "gnutls_x509_crt_get_issuer_dn() failed: %d %s", res,
-						gnutls_strerror(res));
-			}
-
+			*error = zbx_dsprintf(*error, "gnutls_x509_crt_get_issuer() failed: %d %s", res,
+					gnutls_strerror(res));
 			return FAIL;
 		}
+
+		if (SUCCEED != zbx_x509_dn_gets(dn, tls_issuer, sizeof(tls_issuer), error))
+			return FAIL;
 
 		if (0 != strcmp(tls_issuer, issuer))	/* TODO RFC 4518 requires more sophisticated issuer matching */
 			issuer_mismatch = 1;
@@ -1949,25 +2095,15 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 
 	if (NULL != subject && '\0' != *subject)
 	{
-		size_t	tls_subject_size;
-
-		tls_subject_size = sizeof(tls_subject);
-
-		if (0 != (res = gnutls_x509_crt_get_dn(cert, tls_subject, &tls_subject_size)))
+		if (0 != (res = gnutls_x509_crt_get_subject(cert, &dn)))
 		{
-			if (GNUTLS_E_SHORT_MEMORY_BUFFER == res)
-			{
-				*error = zbx_dsprintf(*error, "too long peer certificate subject name: " ZBX_FS_SIZE_T
-						" bytes", (zbx_fs_size_t)tls_subject_size);
-			}
-			else
-			{
-				*error = zbx_dsprintf(*error, "gnutls_x509_crt_get_dn() failed: %d %s", res,
-						gnutls_strerror(res));
-			}
-
+			*error = zbx_dsprintf(*error, "gnutls_x509_crt_get_subject() failed: %d %s", res,
+					gnutls_strerror(res));
 			return FAIL;
 		}
+
+		if (SUCCEED != zbx_x509_dn_gets(dn, tls_subject, sizeof(tls_subject), error))
+			return FAIL;
 
 		if (0 != strcmp(tls_subject, subject))	/* TODO RFC 4518 requires more sophisticated subject matching */
 			subject_mismatch = 1;
@@ -4322,9 +4458,9 @@ int	zbx_tls_get_attr(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 #elif defined(HAVE_GNUTLS)
 	if (ZBX_TCP_SEC_TLS_CERT == s->connection_type)
 	{
-		gnutls_x509_crt_t	peer_cert = NULL;
+		gnutls_x509_crt_t	peer_cert;
+		gnutls_x509_dn_t	dn;
 		char			*error = NULL;
-		size_t			issuer_size, subject_size;
 		int			res;
 
 		/* here is some inefficiency - we do not know will it be required to verify peer certificate issuer */
@@ -4336,38 +4472,31 @@ int	zbx_tls_get_attr(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 			return FAIL;
 		}
 
-		issuer_size = sizeof(attr->issuer);
-		subject_size = sizeof(attr->subject);
-
-		if (0 != (res = gnutls_x509_crt_get_issuer_dn(peer_cert, attr->issuer, &issuer_size)))
+		if (0 != (res = gnutls_x509_crt_get_issuer(peer_cert, &dn)))
 		{
-			if (GNUTLS_E_SHORT_MEMORY_BUFFER == res)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "too long peer certificate issuer name: " ZBX_FS_SIZE_T
-						" bytes", (zbx_fs_size_t)issuer_size);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "gnutls_x509_crt_get_issuer_dn() failed: %d %s", res,
-						gnutls_strerror(res));
-			}
-
+			zabbix_log(LOG_LEVEL_WARNING, "gnutls_x509_crt_get_issuer() failed: %d %s", res,
+					gnutls_strerror(res));
 			return FAIL;
 		}
 
-		if (0 != (res = gnutls_x509_crt_get_dn(peer_cert, attr->subject, &subject_size)))
+		if (SUCCEED != zbx_x509_dn_gets(dn, attr->issuer, sizeof(attr->issuer), &error))
 		{
-			if (GNUTLS_E_SHORT_MEMORY_BUFFER == res)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "too long peer certificate subject name: " ZBX_FS_SIZE_T
-						" bytes", (zbx_fs_size_t)subject_size);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "gnutls_x509_crt_get_dn() failed: %d %s", res,
-						gnutls_strerror(res));
-			}
+			zabbix_log(LOG_LEVEL_WARNING, "zbx_x509_dn_gets() failed: %s", error);
+			zbx_free(error);
+			return FAIL;
+		}
 
+		if (0 != (res = gnutls_x509_crt_get_subject(peer_cert, &dn)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "gnutls_x509_crt_get_subject() failed: %d %s", res,
+					gnutls_strerror(res));
+			return FAIL;
+		}
+
+		if (SUCCEED != zbx_x509_dn_gets(dn, attr->subject, sizeof(attr->subject), &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "zbx_x509_dn_gets() failed: %s", error);
+			zbx_free(error);
 			return FAIL;
 		}
 
