@@ -918,19 +918,12 @@ class C10ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function wrapChildren(array $array, $key, $wrapperKey) {
-		if (!isset($array[$key]) || !$array[$key]) {
-			return $array;
+		if (array_key_exists($key, $array)) {
+			foreach ($array[$key] as &$content) {
+				$content = [$wrapperKey => $content];
+			}
 		}
-
-		$result = array();
-
-		foreach ($array[$key] as $content) {
-			$result[] = array(
-				$wrapperKey => $content
-			);
-		}
-
-		$array[$key] = $result;
+		unset($content);
 
 		return $array;
 	}
