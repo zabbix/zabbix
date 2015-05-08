@@ -266,7 +266,7 @@ class C30XmlValidator {
 									]]
 								]]
 							]],
-							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
+							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'host_prototype', 'rules' => [
 								'host_prototype' =>			['type' => XML_ARRAY, 'rules' => [
 									'host' =>					['type' => XML_STRING | XML_REQUIRED],
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -574,7 +574,7 @@ class C30XmlValidator {
 									]]
 								]]
 							]],
-							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
+							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'host_prototype', 'rules' => [
 								'host_prototype' =>			['type' => XML_ARRAY, 'rules' => [
 									'host' =>					['type' => XML_STRING | XML_REQUIRED],
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
