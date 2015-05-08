@@ -21,7 +21,7 @@ a {
 	&:link {
 		text-decoration: none;
 		color: $link-color;
-		@include transition(color .2s ease-in-out);
+		@include transition(color .2s ease-out);
 	}
 
 	&:visited {
@@ -30,49 +30,70 @@ a {
 	}
 
 	&:hover {
-		text-decoration: underline;
+		//text-decoration: underline;
+		border-bottom: 1px solid rgba(2,117,184,0.5);
 		color: $link-hover-color;
 	}
 
 	&:active {
-		text-decoration: underline;
+		//text-decoration: underline;
+		border-bottom: 1px solid;
 		color: $link-active-color;
 	}
 }
 
-.link-dotted {
+.link-action {
 	border-bottom: 1px dotted;
 	cursor: pointer;
 
+	&:link {
+		@extend %link-action-style;
+	}
+
 	&:visited {
-		text-decoration: none;
+		@extend %link-action-style;
 	}
 
 	&:hover {
-		text-decoration: none;
+		@extend %link-action-style;
 	}
 
 	&:active {
-		text-decoration: none;
+		@extend %link-action-style;
 	}
+}
+
+%link-action-style {
+	border-bottom: 1px dotted;
+	text-decoration: none;
 }
 
 .link-alt {
 
 	&:link {
-		color: $link-alt-color;
+		text-decoration: none;
+		border-bottom: 1px solid rgba(118,141,153,0.3);
+		cursor: pointer;
 	}
 
 	&:visited {
-		color: $link-alt-visited-color;
+		text-decoration: none;
+		border-bottom: 1px solid rgba(118,141,153,0.3);
+		cursor: pointer;
 	}
 
 	&:hover {
-		color: $link-alt-hover-color;
+		text-decoration: none;
+		border-bottom: 1px solid rgba(2,117,184,0.5);
+		cursor: pointer;
+		color: $link-hover-color;
 	}
 
 	&:active {
-		color: $link-alt-active-color;
+		text-decoration: none;
+		border-bottom: 1px solid rgba(2,117,184,0.5);
+		cursor: pointer;
+		color: $link-active-color;
 	}
 }
 
@@ -127,7 +148,30 @@ p {
 
 /* Main Navigation */
 nav {
-background: $secondary-blue;
+	background: $secondary-blue;
+
+	a {
+
+		&:link {
+			@extend %no-border;
+		}
+
+		&:visited {
+			@extend %no-border;
+		}
+
+		&:hover {
+			@extend %no-border;
+		}
+
+		&:active {
+			@extend %no-border;
+		}
+	}
+}
+
+%no-border {
+	border: none;
 }
 
 .top-nav-container {
@@ -213,7 +257,7 @@ ul.top-nav-icons {
 		font-size: $font-h3-size;
 		text-decoration: none;
 		@include opacity(0.75);
-		@include transition(all .2s ease-in-out);
+		@include transition(all .2s ease-out);
 
 		&:hover {
 			@include opacity(1);
@@ -261,7 +305,7 @@ ul.top-nav-icons {
 		color: $white;
 		padding-right: 24px;
 		@include opacity(0.75);
-		@include transition(color, background, border .2s ease-in-out);
+		@include transition(color, background, border .2s ease-out);
 		@include placeholder($form-input-top-placeholder);
 
 		&:focus {
@@ -447,7 +491,8 @@ footer {
 	    	position: relative;
 	    	margin: -1em;
 	    	padding: 1em;
-	    	@include transition(background .2s ease-in-out);
+	    	border: none;
+	    	@include transition(background .2s ease-out);
 
 	    	&:hover {
 	    		text-decoration: none;
@@ -462,7 +507,7 @@ footer {
 	}
 
 	tbody tr {
-		@include transition(background .2s ease-in-out);
+		@include transition(background .2s ease-out);
 
 		&:hover {
 			background: $alt-blue;
@@ -527,7 +572,7 @@ footer {
 	border: 1px solid $light-blue-grey;
 	text-decoration: none;
 	color: $link-color;
-	@include transition(background .2s ease-in-out);
+	@include transition(background .2s ease-out);
 
 	&:hover {
 		color: $link-hover-color;
@@ -804,7 +849,7 @@ footer {
 		padding: 0.4em 5px;
 		margin: 0 -5px;
 		cursor: pointer;
-		@include transition(background .2s ease-in-out);
+		@include transition(background .2s ease-out);
 
 		&.suggest-hover {
 			background: $light-grey;
@@ -1262,7 +1307,7 @@ legend {
 %form-input-style {
 	border: 1px solid $light-blue-grey;
 	@include font-form;
-	@include transition(border-color .2s ease-in-out);
+	@include transition(border-color .2s ease-out);
 
 	&:focus {
 		border-color: $primary-blue;
@@ -1283,7 +1328,7 @@ button {
 	min-height: 24px;
 	vertical-align: middle;
 	cursor: pointer;
-	@include transition(border-color, background-color .2s ease-in-out);
+	@include transition(border-color, background-color .2s ease-out);
 
 	&:hover {
 		@extend %button-hover;
@@ -1423,7 +1468,7 @@ button {
 		min-height: 22px;
 		padding: 0;
 		@include opacity(0.75);
-		@include transition(all .2s ease-in-out);
+		@include transition(all .2s ease-out);
 		
 		&:hover {
 			@extend %btn-search-hover-focus;
@@ -1443,7 +1488,7 @@ button {
     	background: $transparent url(../img/icon-sprite.png) no-repeat 3px -262px;
 		@extend %button-widget-icon-size;
 		@include opacity(0.75);
-		@include transition(all .2s ease-in-out);
+		@include transition(all .2s ease-out);
 
 		&:hover {
 			@extend %btn-widget-hover-active;
@@ -1675,7 +1720,7 @@ button[disabled] {
 	line-height: 36px;
 	margin: -10px -10px 10px -10px;
 	border-bottom: 1px solid $lightest-blue-grey;
-	@include box-shadow(inset 0 -1px 1px 0 rgba(118,141,153,0.05));
+	//@include box-shadow(inset 0 -1px 1px 0 rgba(118,141,153,0.05));
 
 	li {
 		display: inline-block;
@@ -2023,7 +2068,7 @@ button[disabled] {
 			padding: 0 15px 0 25px;
 			margin: 0 -15px 0 -25px;
 			position: relative;
-			@include transition(background .2s ease-in-out);
+			@include transition(background .2s ease-out);
 
 			&:hover {
 				background: $light-grey;
@@ -2098,7 +2143,7 @@ button[disabled] {
 		padding: 0.4em 5px;
 		margin: 0 -5px;
 		cursor: pointer;
-		@include transition(background .2s ease-in-out);
+		@include transition(background .2s ease-out);
 
 		&.suggest-hover {
 			background: $light-grey;
@@ -2232,7 +2277,7 @@ button[disabled] {
 
 			td {
 				padding: 4px;
-				@include transition(background-color .2s ease-in-out);
+				@include transition(background-color .2s ease-out);
 
 				&:hover {
 					background: $light-grey;
@@ -2485,7 +2530,7 @@ td.disaster-bg {
 	background: $lighter-green;
 	@extend %msg;
 
-	.link-dotted {
+	.link-action {
 		@extend .green;
 	}
 
@@ -2504,7 +2549,7 @@ td.disaster-bg {
 	background: $lighter-red;
 	@extend %msg;
 
-	.link-dotted {
+	.link-action {
 		@extend .red;
 	}
 
@@ -2521,7 +2566,7 @@ td.disaster-bg {
 	font-size: $font-form-size;
 	text-align: left;
 
-	.link-dotted {
+	.link-action {
 		position: absolute;
 		top: 7px;
 		left: 12px
