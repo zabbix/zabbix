@@ -364,14 +364,14 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		switch ($dbHost['status']) {
 			case HOST_STATUS_MONITORED:
 				if ($dbHost['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-					$status = new CSpan(_('In maintenance'), 'orange');
+					$status = new CSpan(_('In maintenance'), ZBX_STYLE_ORANGE);
 				}
 				else {
-					$status = new CSpan(_('Enabled'), 'green');
+					$status = new CSpan(_('Enabled'), ZBX_STYLE_GREEN);
 				}
 				break;
 			case HOST_STATUS_NOT_MONITORED:
-				$status = new CSpan(_('Disabled'), 'red');
+				$status = new CSpan(_('Disabled'), ZBX_STYLE_RED);
 				break;
 			default:
 				$status = _('Unknown');
@@ -623,7 +623,7 @@ function getAvailabilityTable($host, $currentTime) {
 				break;
 			case HOST_AVAILABLE_FALSE:
 				$ai = new CSpan($val, 'status-red');
-				$ai->setHint($host[$val.'_error'], 'on');
+				$ai->setHint($host[$val.'_error'], ZBX_STYLE_RED);
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
 				$ai = new CSpan($val, 'status-grey');

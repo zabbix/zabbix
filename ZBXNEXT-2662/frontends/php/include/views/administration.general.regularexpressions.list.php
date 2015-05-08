@@ -71,12 +71,12 @@ foreach($data['db_exps'] as $exp) {
 		$expressions[$exp['regexpid']] = new CTable();
 	}
 
-	$expressions[$exp['regexpid']]->addRow(array(
-		new CCol($values[$exp['regexpid']], 'top'),
-		new CCol(' &raquo; ', 'top'),
-		new CCol($exp['expression'], 'pre-wrap  break-lines'),
-		new CCol(' ['.expression_type2str($exp['expression_type']).']', 'top')
-	));
+	$expressions[$exp['regexpid']]->addRow([
+		new CCol($values[$exp['regexpid']]),
+		new CCol(' &raquo; '),
+		new CCol($exp['expression']),
+		new CCol(' ['.expression_type2str($exp['expression_type']).']')
+	]);
 }
 foreach($data['regexps'] as $regexpid => $regexp) {
 	$regExpTable->addRow(array(

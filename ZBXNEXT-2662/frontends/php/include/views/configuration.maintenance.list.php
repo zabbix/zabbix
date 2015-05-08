@@ -51,13 +51,13 @@ foreach ($this->data['maintenances'] as $maintenance) {
 
 	switch ($maintenance['status']) {
 		case MAINTENANCE_STATUS_EXPIRED:
-			$maintenanceStatus = new CSpan(_x('Expired', 'maintenance status'), 'red');
+			$maintenanceStatus = new CSpan(_x('Expired', 'maintenance status'), ZBX_STYLE_RED);
 			break;
 		case MAINTENANCE_STATUS_APPROACH:
-			$maintenanceStatus = new CSpan(_x('Approaching', 'maintenance status'), 'blue');
+			$maintenanceStatus = new CSpan(_x('Approaching', 'maintenance status'), ZBX_STYLE_ORANGE);
 			break;
 		case MAINTENANCE_STATUS_ACTIVE:
-			$maintenanceStatus = new CSpan(_x('Active', 'maintenance status'), 'green');
+			$maintenanceStatus = new CSpan(_x('Active', 'maintenance status'), ZBX_STYLE_GREEN);
 			break;
 	}
 

@@ -58,16 +58,16 @@ function httptest_status2str($status = null) {
 }
 
 function httptest_status2style($status) {
-	$statuses = array(
-		HTTPTEST_STATUS_ACTIVE => 'green',
-		HTTPTEST_STATUS_DISABLED => 'red',
-	);
+	$statuses = [
+		HTTPTEST_STATUS_ACTIVE => ZBX_STYLE_GREEN,
+		HTTPTEST_STATUS_DISABLED => ZBX_STYLE_RED
+	];
 
 	if (isset($statuses[$status])) {
 		return $statuses[$status];
 	}
 	else {
-		return 'unknown';
+		return ZBX_STYLE_UNKNOWN;
 	}
 }
 

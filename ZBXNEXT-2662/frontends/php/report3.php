@@ -196,7 +196,7 @@ foreach ($sla['sla'] as $intervalSla) {
 			$intervalSla['okTime'] / SEC_PER_DAY,
 			($intervalSla['okTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
 			($intervalSla['okTime'] % SEC_PER_HOUR) / SEC_PER_MIN
-		), 'off'
+		), ZBX_STYLE_GREEN
 	);
 
 	$problems = new CSpan(
@@ -204,7 +204,7 @@ foreach ($sla['sla'] as $intervalSla) {
 			$intervalSla['problemTime'] / SEC_PER_DAY,
 			($intervalSla['problemTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
 			($intervalSla['problemTime'] % SEC_PER_HOUR) /SEC_PER_MIN
-		), 'on'
+		), ZBX_STYLE_RED
 	);
 
 	$downtime = sprintf('%dd %dh %dm',
@@ -213,16 +213,16 @@ foreach ($sla['sla'] as $intervalSla) {
 		($intervalSla['downtimeTime'] % SEC_PER_HOUR) / SEC_PER_MIN
 	);
 
-	$percentage = new CSpan(sprintf('%2.4f', $intervalSla['sla']), ($intervalSla['sla'] >= $service['goodsla'] ? 'off' : 'on'));
+	$percentage = new CSpan(sprintf('%2.4f', $intervalSla['sla']), ($intervalSla['sla'] >= $service['goodsla'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED));
 
 	$table->addRow(array(
 		format_time($intervalSla['from']),
 		format_time2($intervalSla['to']),
 		$ok,
 		$problems,
-		$downtime,
-		($service['showsla']) ? $percentage : '-',
-		($service['showsla']) ? new CSpan($service['goodsla']) : '-'
+		new CSpan($downtime, ZBX_STYLE_GREY),
+		($service['showsla']) ? $percentage : '',
+		($service['showsla']) ? new CSpan($service['goodsla']) : ''
 	));
 }
 $widget->addItem($table);

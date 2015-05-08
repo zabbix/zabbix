@@ -59,18 +59,18 @@ foreach ($this->data['alerts'] as $alert) {
 
 	if ($alert['status'] == ALERT_STATUS_SENT) {
 		$status = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
-			? new CSpan(_('Sent'), 'green')
-			: new CSpan(_('Executed'), 'green');
+			? new CSpan(_('Sent'), ZBX_STYLE_GREEN)
+			: new CSpan(_('Executed'), ZBX_STYLE_GREEN);
 	}
 	elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
 		$status = new CSpan(array(
 			_('In progress').':',
 			BR(),
 			_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries']),
-		), 'orange');
+		), ZBX_STYLE_ORANGE);
 	}
 	else {
-		$status = new CSpan(_('Not sent'), 'red');
+		$status = new CSpan(_('Not sent'), ZBX_STYLE_RED);
 	}
 
 	$message = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
@@ -95,7 +95,7 @@ foreach ($this->data['alerts'] as $alert) {
 	}
 	else {
 		$info = new CDiv(SPACE, 'status_icon iconerror');
-		$info->setHint($alert['error'], 'on');
+		$info->setHint($alert['error'], ZBX_STYLE_RED);
 	}
 
 	$recipient = (isset($alert['userid']) && $alert['userid'])
@@ -103,13 +103,13 @@ foreach ($this->data['alerts'] as $alert) {
 		: $alert['sendto'];
 
 	$auditTable->addRow(array(
-		new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']), 'top'),
-		new CCol($this->data['actions'][$alert['actionid']]['name'], 'top'),
-		new CCol(($mediatype) ? $mediatype['description'] : '-', 'top'),
-		new CCol($recipient, 'top'),
-		new CCol($message, 'wraptext top'),
-		new CCol($status, 'top'),
-		new CCol($info, 'top')
+		new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock'])),
+		new CCol($this->data['actions'][$alert['actionid']]['name']),
+		new CCol(($mediatype) ? $mediatype['description'] : '-'),
+		new CCol($recipient),
+		new CCol($message),
+		new CCol($status),
+		new CCol($info)
 	));
 }
 

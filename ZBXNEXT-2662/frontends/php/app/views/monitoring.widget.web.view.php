@@ -91,7 +91,7 @@ foreach ($groups as $group) {
 			new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok'], ZBX_STYLE_GREEN),
 			new CSpan(
 				empty($data[$group['groupid']]['failed']) ? 0 : $data[$group['groupid']]['failed'],
-				empty($data[$group['groupid']]['failed']) ? 'off' : ZBX_STYLE_RED
+				empty($data[$group['groupid']]['failed']) ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
 			),
 			new CSpan(empty($data[$group['groupid']]['unknown']) ? 0 : $data[$group['groupid']]['unknown'], ZBX_STYLE_GREY)
 		));

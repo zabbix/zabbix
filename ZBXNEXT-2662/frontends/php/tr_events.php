@@ -131,18 +131,10 @@ $eventHistoryWidget->open = (bool) CProfile::get('web.tr_events.hats.hat_eventli
 $eventHistoryWidget->setHeader(_('Event list [previous 20]'));
 
 $eventTab = new CTable();
-$eventTab->addRow(
-	array(
-		new CDiv(array($triggerDetailsWidget, $eventDetailsWidget), 'column'),
-		new CDiv(
-			array(
-				$eventAcknowledgesWidget, $actionMessagesWidget, $actionCommandWidget, $eventHistoryWidget
-			),
-			'column'
-		)
-	),
-	'top'
-);
+$eventTab->addRow([
+	new CDiv(array($triggerDetailsWidget, $eventDetailsWidget), 'column'),
+	new CDiv([$eventAcknowledgesWidget, $actionMessagesWidget, $actionCommandWidget, $eventHistoryWidget])
+]);
 
 $eventWidget->addItem($eventTab)->show();
 

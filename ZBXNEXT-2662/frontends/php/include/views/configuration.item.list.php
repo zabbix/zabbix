@@ -116,7 +116,7 @@ foreach ($this->data['items'] as $item) {
 
 		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($item['error'], 'on');
+			$info->setHint($item['error'], ZBX_STYLE_RED);
 
 			$infoIcons[] = $info;
 		}
