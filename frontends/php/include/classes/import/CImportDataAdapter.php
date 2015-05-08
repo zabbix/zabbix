@@ -115,9 +115,14 @@ class CImportDataAdapter {
 					}
 				}
 
-				if (array_key_exists('inventory', $host) && array_key_exists('inventory_mode', $host['inventory'])) {
-					$host['inventory_mode'] = $host['inventory']['inventory_mode'];
-					unset($host['inventory']['inventory_mode']);
+				if (array_key_exists('inventory', $host)) {
+					if (array_key_exists('inventory_mode', $host['inventory'])) {
+						$host['inventory_mode'] = $host['inventory']['inventory_mode'];
+						unset($host['inventory']['inventory_mode']);
+					}
+					else {
+						$host['inventory_mode'] = HOST_INVENTORY_DISABLED;
+					}
 				}
 
 				$hosts[] = CArrayHelper::getByKeys($host, [
