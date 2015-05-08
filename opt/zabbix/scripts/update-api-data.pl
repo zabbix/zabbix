@@ -7,12 +7,17 @@ use RSM;
 use RSMSLV;
 use ApiHelper;
 use JSON::XS;
+use Data::Dumper;
 
 use constant JSON_RDDS_SUBSERVICE => 'subService';
 use constant JSON_RDDS_43 => 'RDDS43';
 use constant JSON_RDDS_80 => 'RDDS80';
 
+use constant PROBE_OFFLINE_STR => 'Offline';
+use constant PROBE_NORESULT_STR => 'No result';
+
 use constant AUDIT_RESOURCE_INCIDENT => 32;
+
 parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s');
 
 # do not write any logs
@@ -37,7 +42,7 @@ my $opt_from = getopt('from');
 if (defined($opt_from))
 {
 	$opt_from = truncate_from($opt_from);	# use the whole minute
-	dbg("option \"from\" truncated to the beginnin of a minute: $opt_from") if ($opt_from != getopt('from'));
+	dbg("option \"from\" truncated to the start of a minute: $opt_from") if ($opt_from != getopt('from'));
 }
 
 my @services;
@@ -133,21 +138,169 @@ else
 	$tlds_ref = get_tlds();
 }
 
+my $servicedata;	# hash with various data of TLD service
+
+my $probe_avail_limit = get_macro_probe_avail_limit();
+
+my $probes_from;
+my $probes_till;
+
 foreach (@$tlds_ref)
 {
+	# NB! This is needed in order to set the value globally.
+	$tld = $_;
+
+	if (__tld_ignored($tld) == SUCCESS)
+	{
+		dbg("tld \"$tld\" found in IGNORE list");
+		next;
+	}
+
+	my $ah_tld = ah_get_api_tld($tld);
+
+	foreach my $service (@services)
+	{
+		$servicedata->{$tld}->{$service}->{'enabled'} = tld_service_enabled($tld, $service);
+
+		next unless ($servicedata->{$tld}->{$service}->{'enabled'} == SUCCESS);
+
+		my $lastclock = get_lastclock($tld, "rsm.slv.$service.rollweek");
+
+		if ($lastclock == 0)
+		{
+			$servicedata->{$tld}->{$service}->{'error'} = "no data in the database yet";
+			next;
+		}
+
+		dbg("lastclock:$lastclock");
+
+		my ($from, $till, $continue_file);
+
+		if (opt('continue'))
+		{
+			$continue_file = ah_get_continue_file($ah_tld, $service);
+			my $handle;
+
+			if (! -e $continue_file)
+			{
+				$from = truncate_from(__get_min_clock($tld, $service));
+			}
+			else
+			{
+				fail("cannot open continue file $continue_file\": $!") unless (open($handle, '<', $continue_file));
+
+				chomp(my @lines = <$handle>);
+
+				close($handle);
+
+				$from = $lines[0];
+			}
+
+			if ($from == 0)
+			{
+				$servicedata->{$tld}->{$service}->{'error'} = "no data in the database yet";
+				next;
+			}
+
+			if (opt('period'))
+			{
+				$till = $from + getopt('period') * 60 - 1;
+			}
+			else
+			{
+				$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
+
+			}
+		}
+		elsif (opt('from'))
+		{
+			$from = $opt_from;
+
+			if (opt('period'))
+			{
+				$till = $from + getopt('period') * 60 - 1;
+			}
+			else
+			{
+				$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
+			}
+		}
+		elsif (opt('period'))
+		{
+			# only period specified
+			$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
+			$from = $till - getopt('period') * 60 + 1;
+		}
+
+		if ((defined($from) and $from > $lastclock))
+		{
+			$servicedata->{$tld}->{$service}->{'error'} = "given time period (" . __selected_period($from, $till) . ")".
+				" is in the future from the latest data available (" . ts_str($lastclock) . ")";
+			next;
+		}
+
+		if ($from and ((!$probes_from) or ($from < $probes_from)))
+		{
+			$probes_from = $from;
+		}
+
+		if ($till and ((!$probes_till) or ($till > $probes_till)))
+		{
+			$probes_till = $till;
+		}
+
+		$servicedata->{$tld}->{$service}->{'from'} = $from;
+		$servicedata->{$tld}->{$service}->{'till'} = $till;
+		$servicedata->{$tld}->{$service}->{'lastclock'} = $lastclock;
+		$servicedata->{$tld}->{$service}->{'continue_file'} = $continue_file;
+	}
+}
+
+if (!$probes_from)
+{
+	$probes_from = __get_oldest_clock();
+}
+else
+{
+	# make sure to cover all possible delays
+	$probes_from -= 3600;
+}
+
+if (!$probes_till)
+{
+	$probes_till = $now;
+}
+
+my $all_probes_ref = get_probes();
+
+if (opt('probe'))
+{
+	my $temp = $all_probes_ref;
+
+	undef($all_probes_ref);
+
+	$all_probes_ref->{getopt('probe')} = $temp->{getopt('probe')};
+}
+
+my $probe_times_ref = get_probe_times($probes_from, $probes_till, $probe_avail_limit, $all_probes_ref);
+
+foreach (keys(%$servicedata))
+{
+	# NB! This is needed in order to set the value globally.
 	$tld = $_;
 
 	my $ah_tld = ah_get_api_tld($tld);
 
-	if (__tld_ignored($tld) == SUCCESS)
-	{
-		dbg("tld \"$tld\" ignored");
-		next;
-	}
-
 	foreach my $service (@services)
 	{
-		if (tld_service_enabled($tld, $service) != SUCCESS)
+		my $from = $servicedata->{$tld}->{$service}->{'from'};
+		my $till = $servicedata->{$tld}->{$service}->{'till'};
+		my $lastclock = $servicedata->{$tld}->{$service}->{'lastclock'};
+		my $continue_file = $servicedata->{$tld}->{$service}->{'continue_file'};
+		my $tldserv_enabled = $servicedata->{$tld}->{$service}->{'enabled'};
+		my $tldserv_error = $servicedata->{$tld}->{$service}->{'error'};
+
+		if ($tldserv_enabled != SUCCESS)
 		{
 			if (opt('dry-run'))
 			{
@@ -161,6 +314,12 @@ foreach (@$tlds_ref)
 				}
 			}
 
+			next;
+		}
+
+		if (defined($tldserv_error))
+		{
+			__prnt(uc($service), " SKIP: $tldserv_error");
 			next;
 		}
 
@@ -189,26 +348,6 @@ foreach (@$tlds_ref)
 		# we need down time in minutes, not percent, that's why we can't use "rsm.slv.$service.rollweek" value
 		my ($rollweek_from, $rollweek_till) = get_rollweek_bounds();
 		my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
-		my $lastclock = get_lastclock($tld, "rsm.slv.$service.rollweek");
-
-		my ($continue_clock, $continue_file);
-
-		if (opt('continue'))
-		{
-			$continue_file = ah_get_continue_file($ah_tld, $service);
-			my $handle;
-
-			if (-e $continue_file)
-			{
-				fail("cannot open continue file $continue_file\": $!") unless (open($handle, '<', $continue_file));
-
-				chomp(my @lines = <$handle>);
-
-				close($handle);
-
-				$continue_clock = $lines[0];
-			}
-		}
 
 		my $service_delay;
 		if ($service eq 'dns' or $service eq 'dnssec')
@@ -222,60 +361,6 @@ foreach (@$tlds_ref)
 		elsif ($service eq 'epp')
 		{
 			$service_delay = $cfg_epp_delay;
-		}
-
-		my ($from, $till);
-		if (opt('continue'))
-		{
-			if (defined($continue_clock))
-			{
-				$from = $continue_clock;
-			}
-
-			if (opt('period'))
-			{
-				if (not defined($from))
-				{
-					$from = truncate_from(__get_min_clock($tld, $service));
-
-					if ($from == 0)
-					{
-						wrn("skip $service: no data in the database yet");
-						next;
-					}
-				}
-
-				$till = $from + getopt('period') * 60 - 1;
-			}
-			else
-			{
-				$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
-			}
-		}
-		elsif (opt('from'))
-		{
-			$from = $opt_from;
-
-			if (opt('period'))
-			{
-				$till = $from + getopt('period') * 60 - 1;
-			}
-			else
-			{
-				$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
-			}
-		}
-		elsif (opt('period'))
-		{
-			# only period specified
-			$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
-			$from = $till - getopt('period') * 60 + 1;
-		}
-
-		if ((defined($from) and $from > $lastclock))
-		{
-			wrn(uc($service), ": given time period (", __selected_period($from, $till), ") is in the future from the latest data available (", ts_str($lastclock), ")");
-			next;
 		}
 
 		__prnt("period: ", __selected_period($from, $till), " (", uc($service), ")") if (opt('dry-run') or opt('debug'));
@@ -388,11 +473,11 @@ foreach (@$tlds_ref)
 				# We have the test resulting value (Up or Down) at "clock". Now we need to select the
 				# time bounds (start/end) of all data points from all proxies.
 				#
-				#   +........................period (service delay).....................+
-				#   |                                                                   |
-				# start                                 clock                          end
-				#   |.....................................|.............................|
-				#   0 seconds <--zero or more minutes--> 30                            59
+				#   +........................period (service delay)...........................+
+				#   |                                                                         |
+				# start                                 clock                                end
+				#   |.....................................|...................................|
+				#   0 seconds <--zero or more minutes--> 30                                  59
 				#
 				$result->{'start'} = $clock - $service_delay + RESULT_TIMESTAMP_SHIFT + 1; # we need to start at 0
 				$result->{'end'} = $clock + RESULT_TIMESTAMP_SHIFT;
@@ -427,7 +512,7 @@ foreach (@$tlds_ref)
 			if (opt('dry-run'))
 			{
 				__prnt(uc($service), " incident id:$eventid start:", ts_str($event_start), " end:" . ($event_end ? ts_str($event_end) : "ACTIVE") . " fp:$false_positive");
-				__prnt(uc($service), " listing successful:$status_up failed:$status_down");
+				__prnt(uc($service), " tests successful:$status_up failed:$status_down");
 			}
 			else
 			{
@@ -479,11 +564,40 @@ foreach (@$tlds_ref)
 							}
 
 							my $tr_ref = $test_results[$test_result_index];
+							$tr_ref->{'probes'}->{$probe}->{'status'} = undef;	# the status is set later
 
-							$tr_ref->{'probes'}->{$probe}->{'status'} = 'No result' unless (exists($tr_ref->{'probes'}->{$probe}->{'status'}));
-
-							push(@{$tr_ref->{'probes'}->{$probe}->{'details'}->{$ns}}, {'clock' => $clock, 'rtt' => $endvalues_ref->{$clock}, 'ip' => $ip});
+							if (__probe_offline_at($probe, $clock) != 0)
+							{
+								$tr_ref->{'probes'}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
+							}
+							else
+							{
+								push(@{$tr_ref->{'probes'}->{$probe}->{'details'}->{$ns}}, {'clock' => $clock, 'rtt' => $endvalues_ref->{$clock}, 'ip' => $ip});
+							}
 						}
+					}
+				}
+
+				# add probes that are missing results
+				foreach my $probe (keys(%$all_probes_ref))
+				{
+					foreach my $tr_ref (@test_results)
+					{
+						my $found = 0;
+
+						my $probes_ref = $tr_ref->{'probes'};
+						foreach my $tr_ref_probe (keys(%$probes_ref))
+						{
+							if ($tr_ref_probe eq $probe)
+							{
+								dbg("\"$tr_ref_probe\" found!");
+
+								$found = 1;
+								last;
+							}
+						}
+
+						$probes_ref->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
 					}
 				}
 
@@ -508,7 +622,10 @@ foreach (@$tlds_ref)
 							next if ($status_ref->{'clock'} < $tr_start);
 							last if ($status_ref->{'clock'} > $tr_end);
 
-							$tr_ref->{'probes'}->{$probe}->{'status'} = ($status_ref->{'value'} >= $cfg_dns_minns ? "Up" : "Down");
+							if (not defined($probes_ref->{$probe}->{'status'}))
+							{
+								$probes_ref->{$probe}->{'status'} = ($status_ref->{'value'} >= $cfg_dns_minns ? "Up" : "Down");
+							}
 						}
 					}
 
@@ -560,10 +677,43 @@ foreach (@$tlds_ref)
 							}
 
 							my $tr_ref = $test_results[$test_result_index];
+							$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'} = undef;	# the status is set later
 
-							$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'} = 'No result' unless (exists($tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'}));
+							if (__probe_offline_at($probe, $clock) != 0)
+							{
+								$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
+							}
+							else
+							{
+								push(@{$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'details'}}, $endvalues_ref);
+							}
+						}
+					}
+				}
 
-							push(@{$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'details'}}, $endvalues_ref);
+				# add probes that are missing results
+				foreach my $probe (keys(%$all_probes_ref))
+				{
+					foreach my $tr_ref (@test_results)
+					{
+						my $subservices_ref = $tr_ref->{+JSON_RDDS_SUBSERVICE};
+
+						foreach my $subservice (keys(%$subservices_ref))
+						{
+							my $probes_ref = $subservices_ref->{$subservice};
+
+							my $found = 0;
+
+							foreach my $tr_ref_probe (keys(%$probes_ref))
+							{
+								if ($tr_ref_probe eq $probe)
+								{
+									$found = 1;
+									last;
+								}
+							}
+
+							$probes_ref->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
 						}
 					}
 				}
@@ -594,9 +744,12 @@ foreach (@$tlds_ref)
 								next if ($status_ref->{'clock'} < $tr_start);
 								last if ($status_ref->{'clock'} > $tr_end);
 
-								my $service_only = ($subservice eq JSON_RDDS_43 ? 2 : 3); # 0 - down, 1 - up, 2 - only 43, 3 - only 80
+								if (not defined($probes_ref->{$probe}->{'status'}))
+								{
+									my $service_only = ($subservice eq JSON_RDDS_43 ? 2 : 3); # 0 - down, 1 - up, 2 - only 43, 3 - only 80
 
-								$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'} = (($status_ref->{'value'} == 1 or $status_ref->{'value'} == $service_only) ? "Up" : "Down");
+									$probes_ref->{$probe}->{'status'} = (($status_ref->{'value'} == 1 or $status_ref->{'value'} == $service_only) ? "Up" : "Down");
+								}
 							}
 						}
 					}
@@ -644,10 +797,39 @@ foreach (@$tlds_ref)
 						}
 
 						my $tr_ref = $test_results[$test_result_index];
+						$tr_ref->{'probes'}->{$probe}->{'status'} = undef;	# the status is set later
 
-						$tr_ref->{'probes'}->{$probe}->{'status'} = 'No result' unless (exists($tr_ref->{'probes'}->{$probe}->{'status'}));
+						if (__probe_offline_at($probe, $clock) != 0)
+						{
+							$tr_ref->{'probes'}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
+						}
+						else
+						{
+							$tr_ref->{'probes'}->{$probe}->{'details'}->{$clock} = $endvalues_ref->{$clock};
+						}
+					}
+				}
 
-						$tr_ref->{'probes'}->{$probe}->{'details'}->{$clock} = $endvalues_ref->{$clock};
+				# add probes that are missing results
+				foreach my $probe (keys(%$all_probes_ref))
+				{
+					foreach my $tr_ref (@test_results)
+					{
+						my $found = 0;
+
+						my $probes_ref = $tr_ref->{'probes'};
+						foreach my $tr_ref_probe (keys(%$probes_ref))
+						{
+							if ($tr_ref_probe eq $probe)
+							{
+								dbg("\"$tr_ref_probe\" found!");
+
+								$found = 1;
+								last;
+							}
+						}
+
+						$probes_ref->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
 					}
 				}
 
@@ -665,30 +847,33 @@ foreach (@$tlds_ref)
                                         delete($tr_ref->{'end'});
 
                                         my $probes_ref = $tr_ref->{'probes'};
+
 					foreach my $probe (keys(%$probes_ref))
 					{
 						foreach my $status_ref (@{$statuses_ref->{$probe}})
-                                                {
-                                                        next if ($status_ref->{'clock'} < $tr_start);
-                                                        last if ($status_ref->{'clock'} > $tr_end);
+						{
+							next if ($status_ref->{'clock'} < $tr_start);
+							last if ($status_ref->{'clock'} > $tr_end);
 
-                                                        $tr_ref->{'probes'}->{$probe}->{'status'} = ($status_ref->{'value'} == 1 ? "Up" : "Down");
-                                                }
+							if (not defined($probes_ref->{$probe}->{'status'}))
+							{
+								$probes_ref->{$probe}->{'status'} = ($status_ref->{'value'} == 1 ? "Up" : "Down");
+							}
+						}
 					}
 
 					if (opt('dry-run'))
-                                        {
-                                                __prnt_json($tr_ref);
-                                        }
-                                        else
-                                        {
-                                                if (ah_save_incident_json($ah_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
-                                                {
-                                                        fail("cannot save incident: ", ah_get_error());
-                                                }
-                                        }
+					{
+						__prnt_json($tr_ref);
+					}
+					else
+					{
+						if (ah_save_incident_json($ah_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
+						{
+							fail("cannot save incident: ", ah_get_error());
+						}
+					}
 				}
-
 			}
 			else
 			{
@@ -1563,6 +1748,15 @@ sub __get_min_clock
 	my $tld = shift;
 	my $service = shift;
 
+	# first get the minimum clock from the item that is collected once a day, this way "min(clock)" won't take too much time
+	my $rows_ref = db_select("select itemid from items where key_='rsm.configvalue[RSM.SLV.DNS.TCP.RTT]'");
+
+	my $config_itemid = $rows_ref->[0]->[0];
+
+	$rows_ref = db_select("select min(clock) from history_uint where itemid=$config_itemid");
+
+	my $clock_limit = $rows_ref->[0]->[0];
+
 	my $key_condition;
 	if ($service eq 'dns' or $service eq 'dnssec')
 	{
@@ -1577,7 +1771,7 @@ sub __get_min_clock
 		$key_condition = "key_='$cfg_epp_key_status'";
 	}
 
-	my $rows_ref = db_select("select hostid from hosts where host like '$tld %'");
+	$rows_ref = db_select("select hostid from hosts where host like '$tld %'");
 
 	return 0 if (scalar(@$rows_ref) == 0);
 
@@ -1589,11 +1783,41 @@ sub __get_min_clock
 
 	my $itemids_str = __sql_arr_to_str($rows_ref);
 
-	$rows_ref = db_select("select min(clock) from history_uint where itemid in ($itemids_str)");
+	$rows_ref = db_select("select min(clock) from history_uint where itemid in ($itemids_str) and clock<$clock_limit");
 
 	return 0 if (scalar(@$rows_ref) == 0);
 
 	return $rows_ref->[0]->[0];
+}
+
+sub __get_oldest_clock
+{
+	# 01.01.2014 00:00:00
+	return 1388534400;
+}
+
+sub __probe_offline_at
+{
+	my $probe = shift;
+	my $clock = shift;
+
+	# if a probe was down for the whole period it won't be in a hash
+	return 1 unless exists($probe_times_ref->{$probe});	# offline
+
+	my $times_ref = $probe_times_ref->{$probe};
+
+	my $clocks_count = scalar(@$times_ref);
+
+	my $clock_index = 0;
+	while ($clock_index < $clocks_count)
+	{
+		my $from = $times_ref->[$clock_index++];
+		my $till = $times_ref->[$clock_index++];
+
+		return 0 if (($from < $clock) and ($clock < $till));	# online
+	}
+
+	return 1;	# offline
 }
 
 __END__

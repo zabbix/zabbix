@@ -1065,10 +1065,16 @@ sub get_online_probes
 	return \@result;
 }
 
+# Get online times of probe nodes.
+#
+# Returns hash of probe names as keys and array with online times as values:
+#
 # {
 #   'probe name1' => [ from1, till1, from2, till2 ... ]
 #   ...
 # }
+#
+# NB! If a probe was down for the whole specified period it won't be in a hash.
 sub get_probe_times
 {
 	my $from = shift;
@@ -1085,27 +1091,27 @@ sub get_probe_times
 	# check probe lastaccess time
 	foreach my $probe (keys(%$probes_ref))
 	{
-		my $hostid = $probes_ref->{$probe};
-
 		my $times_ref = __get_reachable_times($probe, $probe_avail_limit, $from, $till);
+
+		my $hostid = $probes_ref->{$probe};
 
 		if (scalar(@$times_ref) != 0)
 		{
-			dbg("$probe reachable times: ", join(',', @$times_ref));
+			dbg("$probe reachable times: ", join(',', @$times_ref)) if (opt('debug'));
 
 			$times_ref = __get_probestatus_times($probe, $hostid, $times_ref, PROBE_KEY_MANUAL);
 		}
 
 		if (scalar(@$times_ref) != 0)
 		{
-			dbg("$probe manual probestatus times: ", join(',', @$times_ref));
+			dbg("$probe manual probestatus times: ", join(',', @$times_ref)) if (opt('debug'));
 
 			$times_ref = __get_probestatus_times($probe, $hostid, $times_ref, PROBE_KEY_AUTOMATIC);
 		}
 
 		if (scalar(@$times_ref) != 0)
 		{
-			dbg("$probe automatic probestatus times: ", join(',', @$times_ref));
+			dbg("$probe automatic probestatus times: ", join(',', @$times_ref)) if (opt('debug'));
 
 			$result{$probe} = $times_ref;
 		}
@@ -2626,18 +2632,16 @@ sub __get_reachable_times
 	my $till = shift;
 
 	my $host = "$probe - mon";
+	my $itemid = get_itemid_by_host($host, PROBE_LASTACCESS_ITEM);
 
 	my ($rows_ref, @times, $last_status);
 
 	$rows_ref = db_select(
-		"select hi.clock,hi.value".
-		" from items i,history_uint hi,hosts h".
-		" where i.itemid=hi.itemid".
-			" and i.hostid=h.hostid".
-	    		" and i.key_='".PROBE_LASTACCESS_ITEM."'".
-	    		" and hi.clock between ".($from-3600)." and ".($from-1).
-	    		" and h.host='$host'".
-		" order by hi.clock desc".
+		"select clock,value".
+		" from history_uint".
+		" where itemid=$itemid".
+			" and clock between ".($from-3600)." and ".($from-1).
+		" order by itemid desc,clock desc".
 		" limit 1");
 
 	$last_status = UP;
@@ -2654,15 +2658,12 @@ sub __get_reachable_times
 	push(@times, $from) if ($last_status == UP);
 
 	$rows_ref = db_select(
-		"select hi.clock,hi.value".
-		" from items i,history_uint hi,hosts h".
-		" where i.itemid=hi.itemid".
-			" and i.hostid=h.hostid".
-	    		" and i.key_='".PROBE_LASTACCESS_ITEM."'".
-	    		" and hi.clock between $from and $till".
-	    		" and h.host='$host'".
-	    		" and hi.value!=0".
-		" order by hi.clock");
+		"select clock,value".
+		" from history_uint".
+		" where itemid=$itemid".
+	    		" and clock between $from and $till".
+	    		" and value!=0".
+		" order by itemid,clock");
 
 	foreach my $row_ref (@$rows_ref)
 	{

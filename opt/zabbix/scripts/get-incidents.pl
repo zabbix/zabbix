@@ -9,7 +9,7 @@ use RSMSLV;
 parse_opts("tld=s", "from=n", "till=n");
 
 # do not write any logs
-setopt('test');
+setopt('nolog');
 
 if (opt('debug'))
 {
