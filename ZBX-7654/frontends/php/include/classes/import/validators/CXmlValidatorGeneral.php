@@ -135,6 +135,23 @@ class CXmlValidatorGeneral {
 				$this->validateData($rules['rules'][$prefix], $value, $data, $subpath);
 			}
 			unset($value);
+
+			// indexing the array numerically
+
+			$extra = null;
+
+			if (array_key_exists('extra', $rules)) {
+				if (array_key_exists($rules['extra'], $data)) {
+					$extra = $data[$rules['extra']];
+					unset($data[$rules['extra']]);
+				}
+			}
+
+			$data = array_values($data);
+
+			if ($extra !== null) {
+				$data[$rules['extra']] = $extra;
+			}
 		}
 
 		if (array_key_exists('ex_validate', $rules)) {

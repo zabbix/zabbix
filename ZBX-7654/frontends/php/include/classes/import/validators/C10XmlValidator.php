@@ -91,7 +91,7 @@ class C10XmlValidator {
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING | XML_REQUIRED],
 							'valuemapid' =>				['type' => XML_STRING],
-							'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+							'applications' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'application', 'rules' => [
 								'application' =>			['type' => XML_STRING]
 							]]
 						]]
