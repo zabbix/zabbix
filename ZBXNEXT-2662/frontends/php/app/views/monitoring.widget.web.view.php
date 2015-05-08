@@ -88,12 +88,12 @@ foreach ($groups as $group) {
 	if (!empty($data[$group['groupid']])) {
 		$table->addRow(array(
 			new CLink($group['name'], 'httpmon.php?groupid='.$group['groupid'].'&hostid=0'),
-			new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok'], 'off'),
+			new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok'], ZBX_STYLE_GREEN),
 			new CSpan(
 				empty($data[$group['groupid']]['failed']) ? 0 : $data[$group['groupid']]['failed'],
-				empty($data[$group['groupid']]['failed']) ? 'off' : 'on'
+				empty($data[$group['groupid']]['failed']) ? 'off' : ZBX_STYLE_RED
 			),
-			new CSpan(empty($data[$group['groupid']]['unknown']) ? 0 : $data[$group['groupid']]['unknown'], 'unknown')
+			new CSpan(empty($data[$group['groupid']]['unknown']) ? 0 : $data[$group['groupid']]['unknown'], ZBX_STYLE_GREY)
 		));
 	}
 }
