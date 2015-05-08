@@ -86,7 +86,7 @@ class CImportDataAdapter {
 
 		if (array_key_exists('templates', $this->data)) {
 			foreach ($this->data['templates'] as $template) {
-				$template = $this->renameData($template, ['template' => 'host']);
+				$template = CArrayHelper::renameKeys($template, ['template' => 'host']);
 
 				$templates[] = CArrayHelper::getByKeys($template, [
 					'groups', 'macros', 'templates', 'host', 'status', 'name', 'description'
@@ -107,11 +107,11 @@ class CImportDataAdapter {
 
 		if (array_key_exists('hosts', $this->data)) {
 			foreach ($this->data['hosts'] as $host) {
-				$host = $this->renameData($host, ['proxyid' => 'proxy_hostid']);
+				$host = CArrayHelper::renameKeys($host, ['proxyid' => 'proxy_hostid']);
 
 				if (array_key_exists('interfaces', $host)) {
 					foreach ($host['interfaces'] as $inum => $interface) {
-						$host['interfaces'][$inum] = $this->renameData($interface, ['default' => 'main']);
+						$host['interfaces'][$inum] = CArrayHelper::renameKeys($interface, ['default' => 'main']);
 					}
 				}
 
@@ -274,7 +274,7 @@ class CImportDataAdapter {
 
 		if (array_key_exists('images', $this->data)) {
 			foreach ($this->data['images'] as $image) {
-				$images[] = $this->renameData($image, ['encodedImage' => 'image']);
+				$images[] = CArrayHelper::renameKeys($image, ['encodedImage' => 'image']);
 			}
 		}
 
@@ -300,7 +300,7 @@ class CImportDataAdapter {
 
 		if (array_key_exists('screens', $this->data)) {
 			foreach ($this->data['screens'] as $screen) {
-				$screens[] = $this->renameData($screen, ['screen_items' => 'screenitems']);
+				$screens[] = CArrayHelper::renameKeys($screen, ['screen_items' => 'screenitems']);
 			}
 		}
 
@@ -320,7 +320,7 @@ class CImportDataAdapter {
 				if (array_key_exists('screens', $template)) {
 					foreach ($template['screens'] as $screen) {
 						$screens[$template['template']][$screen['name']] =
-							$this->renameData($screen, ['screen_items' => 'screenitems']);
+							CArrayHelper::renameKeys($screen, ['screen_items' => 'screenitems']);
 					}
 				}
 			}
@@ -365,7 +365,7 @@ class CImportDataAdapter {
 	 * @return array
 	 */
 	protected function renameItemFields(array $item) {
-		return $this->renameData($item, ['key' => 'key_', 'allowed_hosts' => 'trapper_hosts']);
+		return CArrayHelper::renameKeys($item, ['key' => 'key_', 'allowed_hosts' => 'trapper_hosts']);
 	}
 
 	/**
@@ -376,9 +376,9 @@ class CImportDataAdapter {
 	 * @return array
 	 */
 	protected function renameTriggerFields(array $trigger) {
-		$trigger = $this->renameData($trigger, ['description' => 'comments']);
+		$trigger = CArrayHelper::renameKeys($trigger, ['description' => 'comments']);
 
-		return $this->renameData($trigger, ['name' => 'description', 'severity' => 'priority']);
+		return CArrayHelper::renameKeys($trigger, ['name' => 'description', 'severity' => 'priority']);
 	}
 
 	/**
@@ -389,30 +389,11 @@ class CImportDataAdapter {
 	 * @return array
 	 */
 	protected function renameGraphFields(array $graph) {
-		return $this->renameData($graph, [
+		return CArrayHelper::renameKeys($graph, [
 			'type' => 'graphtype',
 			'ymin_type_1' => 'ymin_type',
 			'ymax_type_1' => 'ymax_type',
 			'graph_items' => 'gitems'
 		]);
-	}
-
-	/**
-	 * Renames array elements keys according to given map.
-	 *
-	 * @param array $data
-	 * @param array $fieldMap
-	 *
-	 * @return array
-	 */
-	protected function renameData(array $data, array $fieldMap) {
-		foreach ($data as $key => $value) {
-			if (array_key_exists($key, $fieldMap)) {
-				$data[$fieldMap[$key]] = $value;
-				unset($data[$key]);
-			}
-		}
-
-		return $data;
 	}
 }

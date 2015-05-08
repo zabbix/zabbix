@@ -64,9 +64,9 @@ class CArrayHelper {
 	 * @return array
 	 */
 	public static function getByKeys(array $array, array $keys) {
-		$result = array();
+		$result = [];
 		foreach ($keys as $key) {
-			if (isset($array[$key])) {
+			if (array_key_exists($key, $array)) {
 				$result[$key] = $array[$key];
 			}
 		}
@@ -74,6 +74,24 @@ class CArrayHelper {
 		return $result;
 	}
 
+	/**
+	 * Renames array elements keys according to given map.
+	 *
+	 * @param array $array
+	 * @param array $fieldMap
+	 *
+	 * @return array
+	 */
+	public static function renameKeys(array $array, array $fieldMap) {
+		foreach ($fieldMap as $old_key => $new_key) {
+			if (array_key_exists($old_key, $array)) {
+				$array[$new_key] = $array[$old_key];
+				unset($array[$old_key]);
+			}
+		}
+
+		return $array;
+	}
 	/**
 	 * Sort array by multiple fields.
 	 *
