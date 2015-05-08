@@ -100,6 +100,7 @@ sass/forms_with_tables.html
 sass/stylesheets/*.css
 sass/stylesheets/*.map
 sass/stylesheets/sass/screen2.scss
+sass/stylesheets/themes
 src/Makefile
 src/Makefile.in
 src/libs/Makefile

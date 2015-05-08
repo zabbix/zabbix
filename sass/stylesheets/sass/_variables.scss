@@ -17,49 +17,48 @@ $light-green: #a5d6a7;
 $lighter-green: #c5e3c6;
 $alt-green: #59db8f;
 
-$primary-blue: #0275b8;
-$secondary-blue: #013e61;
+$primary-blue: #0275b8 !default; // Primary top nav color
+$secondary-blue: #013e61 !default; // Secondary top subnav color
 
 $alt-dark-blue: #7499ff;
-$alt-blue: #e8f4fa;
+$alt-blue: #e8f4fa!default;
 
-$blue-grey: #768d99;
-$light-blue-grey: #acbbc2;
-$lighter-blue-grey: #ccd5d9;
-$lightest-blue-grey: #ebeef0;
-$alt-blue-grey: #97aab3;
+$blue-grey: #768d99 !default;
+$light-blue-grey: #acbbc2 !default;
+$lighter-blue-grey: #ccd5d9 !default;
+$lightest-blue-grey: #ebeef0 !default; //Background color and table border color
+$alt-blue-grey: #97aab3 !default;
 
-//$grey: #737373;
-$light-grey: #ebebeb;
-$lighter-grey: #f2f2f2;
+$light-grey: #ebebeb !default;
+$lighter-grey: #f2f2f2 !default;
 
-$indigo-black: #1f2c33;
-$white: #fff;
+$indigo-black: #1f2c33 !default;
+$white: #fff !default;
 $transparent: transparent;
 
 // LINK COLORS
-$link-color: #0275b8; // Primary Blue
-$link-hover-color: #0275b8;
-$link-active-color: #0275b8;
-$link-visited-color: #0275b8;
+$link-color: #0275b8 !default; // Primary Blue
+$link-hover-color: #0275b8 !default;
+$link-active-color: #0275b8 !default;
+$link-visited-color: #0275b8 !default;
 
-$link-alt-color: #4e9ecd; // Light Primary Blue
-$link-alt-hover-color: #4e9ecd;
-$link-alt-active-color: #4e9ecd;
-$link-alt-visited-color: #4e9ecd;
+$link-alt-color: #4e9ecd !default; // Light Primary Blue
+$link-alt-hover-color: #4e9ecd !default;
+$link-alt-active-color: #4e9ecd !default;
+$link-alt-visited-color: #4e9ecd !default;
 
-$link-topnav-color: #bfdced; // Nav Blue
-$link-topnav-hover-color: #fff;
-$link-topnav-active-color: #fff;
-$link-topnav-visited-color: #bfdced;
+$link-topnav-color: #bfdced !default; // Nav Blue
+$link-topnav-hover-color: #fff !default;
+$link-topnav-active-color: #fff !default;
+$link-topnav-visited-color: #bfdced !default;
 
-$link-topsubnav-color: #bfced7; // SubNav Blue
-$link-topsubnav-hover-color: #fff;
-$link-topsubnav-active-color: #fff;
-$link-topsubnav-visited-color: #bfced7;
+$link-topsubnav-color: #bfced7 !default; // SubNav Blue
+$link-topsubnav-hover-color: #fff !default;
+$link-topsubnav-active-color: #fff !default;
+$link-topsubnav-visited-color: #bfced7 !default;
 
-$form-input-top-placeholder: #c5d8e5;
-$form-input-top-focus-placeholder: #a9a9a9;
+$form-input-top-placeholder: #c5d8e5 !default;
+$form-input-top-focus-placeholder: #a9a9a9 !default;
 
 // TYPOGRAPHY
 $font-stack: Arial, Tahoma, Verdana, sans-serif;
