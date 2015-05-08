@@ -344,7 +344,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$condition = null;
 }
 
-$conditionTable = new CTable(null, 'newActionConditionTable');
+$conditionTable = new CTable();
 $conditionTable->addRow(array($conditionTypeComboBox, $conditionOperatorsComboBox, $condition));
 $conditionTable->addRow(array(new CSubmit('add_condition', _('Add'), null, 'link_menu'), SPACE, SPACE));
 
