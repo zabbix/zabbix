@@ -643,13 +643,13 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 
 					if ($html) {
 						if ($functionData['status'] == ITEM_STATUS_DISABLED) {
-							$style = 'disabled';
+							$style = ZBX_STYLE_RED;
 						}
 						elseif ($functionData['status'] == ITEM_STATUS_ACTIVE) {
-							$style = 'enabled';
+							$style = ZBX_STYLE_GREEN;
 						}
 						else {
-							$style = 'unknown';
+							$style = ZBX_STYLE_GREY;
 						}
 
 						if ($functionData['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $functionData['type'] == ITEM_TYPE_HTTPTEST) {
@@ -660,14 +660,14 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 								$functionData['host'].':'.$functionData['key_'],
 								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].'&parent_discoveryid='.
 									$trigger['discoveryRuleid'],
-								$style
+								ZBX_STYLE_DOTTED.' '.$style
 							);
 						}
 						else {
 							$link = new CLink(
 								$functionData['host'].':'.$functionData['key_'],
 								'items.php?form=update&itemid='.$functionData['itemid'],
-								$style
+								ZBX_STYLE_DOTTED.' '.$style
 							);
 						}
 
@@ -1456,7 +1456,7 @@ function make_trigger_details($trigger) {
 	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
 	foreach ($hosts as $host) {
-		$hostName = new CSpan($host['name'], 'link_menu');
+		$hostName = new CSpan($host['name'], ZBX_STYLE_DOTTED);
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 		$hostNames[] = $hostName;
 		$hostNames[] = ', ';
@@ -1466,21 +1466,21 @@ function make_trigger_details($trigger) {
 	$table = new CTableInfo();
 	$table->addRow(array(
 		new CCol(_n('Host', 'Hosts', count($hosts))),
-		new CCol($hostNames, 'wraptext')
+		new CCol($hostNames)
 	));
 	$table->addRow(array(
 		new CCol(_('Trigger')),
-		new CCol(CMacrosResolverHelper::resolveTriggerName($trigger), 'wraptext')
+		new CCol(CMacrosResolverHelper::resolveTriggerName($trigger))
 	));
 	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'], $config)));
 	$table->addRow(array(
 		new CCol(_('Expression')),
-		new CCol(explode_exp($trigger['expression'], true, true), 'trigger-expression')
+		new CCol(explode_exp($trigger['expression'], true, true))
 	));
 	$table->addRow(array(_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 		? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')));
 	$table->addRow(array(_('Disabled'), ((TRIGGER_STATUS_ENABLED == $trigger['status'])
-		? new CCol(_('No'), 'off') : new CCol(_('Yes'), 'on'))));
+		? new CCol(_('No'), ZBX_STYLE_GREEN) : new CCol(_('Yes'), ZBX_STYLE_RED))));
 
 	return $table;
 }
