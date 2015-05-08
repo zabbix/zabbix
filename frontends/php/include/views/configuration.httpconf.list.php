@@ -71,7 +71,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 	$name = array();
 	if (isset($this->data['parentTemplates'][$httpTestId])) {
 		$template = $this->data['parentTemplates'][$httpTestId];
-		$name[] = new CLink($template['name'], '?groupid=0&hostid='.$template['id'], 'unknown');
+		$name[] = new CLink($template['name'], '?groupid=0&hostid='.$template['id'], ZBX_STYLE_GREY);
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTestId.'&hostid='.$httpTest['hostid']);
@@ -93,7 +93,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 				: _s('Unknown step failed: %1$s', $lastData['error']);
 
 			$infoIcon = new CDiv(SPACE, 'status_icon iconerror');
-			$infoIcon->setHint($errorMessage, 'on');
+			$infoIcon->setHint($errorMessage, ZBX_STYLE_RED);
 		}
 		else {
 			$infoIcon = '';

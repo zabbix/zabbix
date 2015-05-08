@@ -76,7 +76,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 	if ($trigger['templateid'] > 0) {
 		if (!isset($this->data['realHosts'][$triggerid])) {
-			$description[] = new CSpan(_('Host'), 'unknown');
+			$description[] = new CSpan(_('Host'), ZBX_STYLE_GREY);
 			$description[] = NAME_DELIMITER;
 		}
 		else {
@@ -147,7 +147,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	if ($this->data['showInfoColumn']) {
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['error']) {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($trigger['error'], 'on');
+			$info->setHint($trigger['error'], ZBX_STYLE_RED);
 		}
 		else {
 			$info = '';

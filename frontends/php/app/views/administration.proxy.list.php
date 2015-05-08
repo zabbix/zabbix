@@ -64,13 +64,13 @@ foreach ($data['proxies'] as $proxy) {
 
 		switch ($host['status']) {
 			case HOST_STATUS_MONITORED:
-				$style = 'off';
+				$style = null;
 				break;
 			case HOST_STATUS_TEMPLATE:
-				$style = 'unknown';
+				$style = ZBX_STYLE_GREY;
 				break;
 			default:
-				$style = 'on';
+				$style = ZBX_STYLE_RED;
 		}
 
 		if ($hosts) {

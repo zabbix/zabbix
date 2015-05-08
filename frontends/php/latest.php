@@ -558,7 +558,7 @@ foreach ($items as $key => $item){
 		$checkbox->setEnabled(false);
 	}
 
-	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : '';
+	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : '';
 
 	if ($filter['showDetails']) {
 		// item key
@@ -569,7 +569,7 @@ foreach ($items as $key => $item){
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
 			$info = new CDiv(null, 'status_icon iconerror');
-			$info->setHint($item['error'], 'on');
+			$info->setHint($item['error'], ZBX_STYLE_RED);
 		}
 		else {
 			$info = '';
@@ -745,7 +745,7 @@ foreach ($items as $item) {
 		$checkbox->setEnabled(false);
 	}
 
-	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : '';
+	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : '';
 
 	$host = $hosts[$item['hostid']];
 	if ($filter['showDetails']) {
@@ -757,7 +757,7 @@ foreach ($items as $item) {
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
 			$info = new CDiv(null, 'status_icon iconerror');
-			$info->setHint($item['error'], 'on');
+			$info->setHint($item['error'], ZBX_STYLE_RED);
 		}
 		else {
 			$info = '';

@@ -142,7 +142,7 @@ class CScreenActions extends CScreenBase {
 
 		foreach ($alerts as $alert) {
 			if ($alert['status'] == ALERT_STATUS_SENT) {
-				$status = new CSpan(_('Sent'), 'green');
+				$status = new CSpan(_('Sent'), ZBX_STYLE_GREEN);
 			}
 			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
 				$status = new CSpan(array(
@@ -152,7 +152,7 @@ class CScreenActions extends CScreenBase {
 				), 'orange');
 			}
 			else {
-				$status = new CSpan(_('Not sent'), 'red');
+				$status = new CSpan(_('Not sent'), ZBX_STYLE_RED);
 			}
 
 			$recipient = $alert['userid']
@@ -175,18 +175,18 @@ class CScreenActions extends CScreenBase {
 			}
 			else {
 				$info = new CDiv(SPACE, 'status_icon iconerror');
-				$info->setHint($alert['error'], 'on');
+				$info->setHint($alert['error'], ZBX_STYLE_RED);
 			}
 
-			$actionTable->addRow(array(
-				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']), 'top'),
-				new CCol($actions[$alert['actionid']]['name'], 'top'),
-				new CCol(($alert['mediatypeid'] == 0) ? '-' : $alert['description'], 'top'),
-				new CCol($recipient, 'top'),
-				new CCol($message, 'top pre'),
-				new CCol($status, 'top'),
-				new CCol($info, 'wraptext top')
-			));
+			$actionTable->addRow([
+				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock'])),
+				new CCol($actions[$alert['actionid']]['name']),
+				new CCol(($alert['mediatypeid'] == 0) ? '-' : $alert['description']),
+				new CCol($recipient),
+				new CCol($message),
+				new CCol($status),
+				new CCol($info)
+			]);
 		}
 
 		return $this->getOutput($actionTable);

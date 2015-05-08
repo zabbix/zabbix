@@ -159,7 +159,7 @@ function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAck
 		}
 	}
 	else {
-		$object->addClass('unknown');
+		$object->addClass(ZBX_STYLE_GREY);
 	}
 }
 
@@ -202,16 +202,16 @@ function discovery_value($val = null) {
 function discovery_value_style($val) {
 	switch ($val) {
 		case DOBJECT_STATUS_UP:
-			$style = 'off';
+			$style = ZBX_STYLE_GREEN;
 			break;
 		case DOBJECT_STATUS_DOWN:
-			$style = 'on';
+			$style = ZBX_STYLE_RED;
 			break;
 		case DOBJECT_STATUS_DISCOVER:
-			$style = 'off';
+			$style = ZBX_STYLE_GREEN;
 			break;
 		case DOBJECT_STATUS_LOST:
-			$style = 'unknown';
+			$style = ZBX_STYLE_GREY;
 			break;
 		default:
 			$style = '';
@@ -781,7 +781,7 @@ function triggerExpression($trigger, $html = false) {
 				if ($html) {
 					$style = ($function_data['status'] == ITEM_STATUS_DISABLED) ? 'red' : 'grey';
 					if ($function_data['status'] == ITEM_STATUS_ACTIVE) {
-						$style = 'green';
+						$style = ZBX_STYLE_GREEN;
 					}
 
 					if ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST) {
@@ -815,7 +815,7 @@ function triggerExpression($trigger, $html = false) {
 			}
 			else {
 				if ($html) {
-					array_push($exp, new CSpan('*ERROR*', 'on'));
+					array_push($exp, new CSpan('*ERROR*', ZBX_STYLE_RED));
 				}
 				else {
 					$exp .= '*ERROR*';

@@ -76,8 +76,8 @@ foreach ($this->data['users'] as $user) {
 
 	// blocked
 	$blocked = ($user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS)
-		? new CLink(_('Blocked'), 'users.php?action=user.massunblock&group_userid[]='.$userId, 'on')
-		: new CSpan(_('Ok'), 'green');
+		? new CLink(_('Blocked'), 'users.php?action=user.massunblock&group_userid[]='.$userId, ZBX_STYLE_RED)
+		: new CSpan(_('Ok'), ZBX_STYLE_GREEN);
 
 	// user groups
 	order_result($user['usrgrps'], 'name');
@@ -116,12 +116,12 @@ foreach ($this->data['users'] as $user) {
 	}
 
 	// gui access style
-	$guiAccessStyle = 'green';
+	$guiAccessStyle = ZBX_STYLE_GREEN;
 	if ($user['gui_access'] == GROUP_GUI_ACCESS_INTERNAL) {
-		$guiAccessStyle = 'orange';
+		$guiAccessStyle = ZBX_STYLE_ORANGE;
 	}
 	if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-		$guiAccessStyle = 'disabled';
+		$guiAccessStyle = ZBX_STYLE_GREY;
 	}
 
 	// append user to table
@@ -135,8 +135,8 @@ foreach ($this->data['users'] as $user) {
 		$online,
 		$blocked,
 		new CSpan(user_auth_type2str($user['gui_access']), $guiAccessStyle),
-		($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) ? new CSpan(_('Enabled'), 'orange') : new CSpan(_('Disabled'), 'green'),
-		($user['users_status'] == 1) ? new CSpan(_('Disabled'), 'red') : new CSpan(_('Enabled'), 'green')
+		($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) ? new CSpan(_('Enabled'), ZBX_STYLE_ORANGE) : new CSpan(_('Disabled'), ZBX_STYLE_GREEN),
+		($user['users_status'] == 1) ? new CSpan(_('Disabled'), ZBX_STYLE_RED) : new CSpan(_('Enabled'), ZBX_STYLE_GREEN)
 	));
 }
 

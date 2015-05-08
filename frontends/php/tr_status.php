@@ -671,7 +671,7 @@ foreach ($triggers as $trigger) {
 			}
 		}
 		else {
-			$ackColumn = new CCol(_('No events'), 'unknown');
+			$ackColumn = new CCol(_('No events'), ZBX_STYLE_GREY);
 		}
 	}
 	else {
@@ -700,7 +700,7 @@ foreach ($triggers as $trigger) {
 	$unknown = SPACE;
 	if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 		$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-		$unknown->setHint($trigger['error'], 'on');
+		$unknown->setHint($trigger['error'], ZBX_STYLE_RED);
 	}
 
 	// comments

@@ -483,25 +483,25 @@ function make_status_of_zbx() {
 
 	$table->addRow(array(
 		_('Zabbix server is running'),
-		new CSpan($status['zabbix_server'], ($status['zabbix_server'] == _('Yes') ? 'green' : 'red')),
+		new CSpan($status['zabbix_server'], ($status['zabbix_server'] == _('Yes') ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)),
 		isset($ZBX_SERVER, $ZBX_SERVER_PORT) ? $ZBX_SERVER.':'.$ZBX_SERVER_PORT : _('Zabbix server IP or port is not set!')
 	));
 	$title = new CSpan(_('Number of hosts (enabled/disabled/templates)'));
 	$title->setAttribute('title', 'asdad');
 	$table->addRow(array(_('Number of hosts (enabled/disabled/templates)'), $status['hosts_count'],
 		array(
-			new CSpan($status['hosts_count_monitored'], 'green'), ' / ',
-			new CSpan($status['hosts_count_not_monitored'], 'red'), ' / ',
-			new CSpan($status['hosts_count_template'], 'unknown')
+			new CSpan($status['hosts_count_monitored'], ZBX_STYLE_GREEN), ' / ',
+			new CSpan($status['hosts_count_not_monitored'], ZBX_STYLE_RED), ' / ',
+			new CSpan($status['hosts_count_template'], ZBX_STYLE_GREY)
 		)
 	));
 	$title = new CSpan(_('Number of items (enabled/disabled/not supported)'));
 	$title->setAttribute('title', _('Only items assigned to enabled hosts are counted'));
 	$table->addRow(array($title, $status['items_count'],
 		array(
-			new CSpan($status['items_count_monitored'], 'green'), ' / ',
-			new CSpan($status['items_count_disabled'], 'red'), ' / ',
-			new CSpan($status['items_count_not_supported'], 'unknown')
+			new CSpan($status['items_count_monitored'], ZBX_STYLE_GREEN), ' / ',
+			new CSpan($status['items_count_disabled'], ZBX_STYLE_RED), ' / ',
+			new CSpan($status['items_count_not_supported'], ZBX_STYLE_UNKNOWN)
 		)
 	));
 	$title = new CSpan(_('Number of triggers (enabled/disabled [problem/ok])'));
@@ -510,11 +510,11 @@ function make_status_of_zbx() {
 		array(
 			$status['triggers_count_enabled'], ' / ',
 			$status['triggers_count_disabled'], ' [',
-			new CSpan($status['triggers_count_on'], 'red'), ' / ',
-			new CSpan($status['triggers_count_off'], 'green'), ']'
+			new CSpan($status['triggers_count_on'], ZBX_STYLE_RED), ' / ',
+			new CSpan($status['triggers_count_off'], ZBX_STYLE_GREEN), ']'
 		)
 	));
-	$table->addRow(array(_('Number of users (online)'), $status['users_count'], new CSpan($status['users_online'], 'green')));
+	$table->addRow(array(_('Number of users (online)'), $status['users_count'], new CSpan($status['users_online'], ZBX_STYLE_GREEN)));
 	$table->addRow(array(_('Required server performance, new values per second'), $status['qps_total'], ' - '));
 
 	// check requirements
@@ -725,7 +725,7 @@ function make_latest_issues(array $filter = array()) {
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-			$unknown->setHint($trigger['error'], 'on');
+			$unknown->setHint($trigger['error'], ZBX_STYLE_RED);
 		}
 
 		// trigger has events
@@ -750,7 +750,7 @@ function make_latest_issues(array $filter = array()) {
 			)));
 
 			// ack
-			$ack = new CSpan(_('No events'), 'unknown');
+			$ack = new CSpan(_('No events'), ZBX_STYLE_GREY);
 		}
 
 		// description
@@ -835,7 +835,7 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-			$unknown->setHint($trigger['error'], 'on');
+			$unknown->setHint($trigger['error'], ZBX_STYLE_RED);
 		}
 
 		// ack

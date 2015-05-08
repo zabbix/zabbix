@@ -369,7 +369,7 @@
 						expression: expr.data.expression,
 						type: expr.type2str(),
 						result: result,
-						resultClass: exprResult ? 'green' : 'red'
+						resultClass: exprResult ? <?php echo ZBX_STYLE_GREEN; ?> : <?php echo ZBX_STYLE_RED; ?>
 					};
 
 					$('#testResultTable').append(this.testTableRowTpl.evaluate(tplData));
@@ -377,13 +377,13 @@
 
 				if (hasErrors) {
 					tplData = {
-						resultClass: 'red',
+						resultClass: <?php echo ZBX_STYLE_RED; ?>,
 						result: <?php echo CJs::encodeJson(_('UNKNOWN')); ?>
 					};
 				}
 				else {
 					tplData = {
-						resultClass: response.data.final ? 'green' : 'red',
+						resultClass: response.data.final ? <?php echo ZBX_STYLE_GREEN; ?> : <?php echo ZBX_STYLE_RED; ?>,
 						result: response.data.final ? <?php echo CJs::encodeJson(_('TRUE')); ?> : <?php echo CJs::encodeJson(_('FALSE')); ?>
 					};
 				}
