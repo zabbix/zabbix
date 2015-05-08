@@ -339,41 +339,30 @@ class C10ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertHostProfiles(array $host) {
-		$hasProfileData = (isset($host['host_profile']) && $host['host_profile']
-			|| isset($host['host_profiles_ext']) && $host['host_profiles_ext']
-		);
-
-		// if the host contains inventory data, set inventory to mode to manual, otherwise disable it
-		$host['inventory'] = array(
-			'inventory_mode' => ($hasProfileData) ? HOST_INVENTORY_MANUAL : HOST_INVENTORY_DISABLED
-		);
-
-		if (!$hasProfileData) {
-			return $host;
-		}
+		$host['inventory'] = ['inventory_mode' => HOST_INVENTORY_DISABLED];
 
 		// rename and merge profile fields
-		if (isset($host['host_profile']) && $host['host_profile']) {
+		if (array_key_exists('host_profile', $host)) {
 			foreach ($host['host_profile'] as $key => $value) {
-				$newKey = $this->getNewProfileName($key);
-				$host['inventory'][($newKey !== null) ? $newKey : $key] = $value;
+				$host['inventory'][$this->getNewProfileName($key)] = $value;
 			}
+			$host['inventory']['inventory_mode'] = HOST_INVENTORY_MANUAL;
 		}
 
-		if (isset($host['host_profiles_ext']) && $host['host_profiles_ext']) {
+		if (array_key_exists('host_profiles_ext', $host)) {
 			foreach ($host['host_profiles_ext'] as $key => $value) {
-				$newKey = $this->getNewProfileName($key);
-				$key = ($newKey !== null) ? $newKey : $key;
+				$key = $this->getNewProfileName($key);
 
 				// if renaming results in a duplicate inventory field, concatenate them
 				// this is the case with "notes" and "device_notes"
-				if (isset($host['inventory'][$newKey])) {
-					$host['inventory'][$newKey] .= "\r\n\r\n".$value;
+				if (array_key_exists($key, $host['inventory']) && $host['inventory'][$key] !== '') {
+					$host['inventory'][$key] .= "\r\n\r\n".$value;
 				}
 				else {
 					$host['inventory'][$key] = $value;
 				}
 			}
+			$host['inventory']['inventory_mode'] = HOST_INVENTORY_MANUAL;
 		}
 
 		return $host;
@@ -382,12 +371,12 @@ class C10ImportConverter extends CConverter {
 	/**
 	 * Map an old profile key name to the new inventory key name.
 	 *
-	 * @param string $oldName
+	 * @param string $key
 	 *
-	 * @return string|null
+	 * @return string
 	 */
-	protected function getNewProfileName($oldName) {
-		$map = array(
+	protected function getNewProfileName($key) {
+		$map = [
 			'devicetype' => 'type',
 			'serialno' => 'serialno_a',
 			'macaddress' => 'macaddress_a',
@@ -430,9 +419,9 @@ class C10ImportConverter extends CConverter {
 			'poc_2_phone_1' => 'poc_2_phone_a',
 			'poc_2_phone_2' => 'poc_2_phone_b',
 			'device_notes' => 'notes',
-		);
+		];
 
-		return (isset($map[$oldName])) ? $map[$oldName] : null;
+		return array_key_exists($key, $map) ? $map[$key] : $key;
 	}
 
 	/**
