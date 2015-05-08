@@ -140,7 +140,7 @@ class C10ImportConverter extends CConverter {
 		}
 
 		foreach ($content['hosts'] as &$host) {
-			$host = $this->renameKey($host, 'name', 'host');
+			$host = CArrayHelper::renameKeys($host, ['name' => 'host']);
 			$host = $this->convertHostInterfaces($host);
 			$host = $this->convertHostProfiles($host);
 			$host = $this->convertHostApplications($host);
@@ -187,7 +187,7 @@ class C10ImportConverter extends CConverter {
 		}
 
 		foreach ($content['templates'] as &$template) {
-			$template = $this->renameKey($template, 'name', 'template');
+			$template = CArrayHelper::renameKeys($template, ['name' => 'template']);
 			$template = $this->convertHostApplications($template);
 			$template = $this->convertHostItems($template);
 			$template = $this->convertHostTriggers($template, $template['template']);
@@ -461,8 +461,7 @@ class C10ImportConverter extends CConverter {
 		}
 
 		foreach ($host['triggers'] as &$trigger) {
-			$trigger = $this->renameKey($trigger, 'description', 'name');
-			$trigger = $this->renameKey($trigger, 'comments', 'description');
+			$trigger = CArrayHelper::renameKeys($trigger, ['description' => 'name', 'comments' => 'description']);
 			$trigger = $this->convertTriggerExpression($trigger, $hostName);
 		}
 		unset($trigger);
@@ -651,7 +650,7 @@ class C10ImportConverter extends CConverter {
 		}
 
 		foreach ($host['items'] as &$item) {
-			$item = $this->renameKey($item, 'description', 'name');
+			$item = CArrayHelper::renameKeys($item, ['description' => 'name']);
 
 			// convert simple check keys
 			$item['key'] = $this->itemKeyConverter->convert($item['key']);
@@ -679,10 +678,12 @@ class C10ImportConverter extends CConverter {
 		}
 
 		foreach ($host['graphs'] as &$graph) {
-			$graph = $this->renameKey($graph, 'graphtype', 'type');
-			$graph = $this->renameKey($graph, 'graph_elements', 'graph_items');
-			$graph = $this->renameKey($graph, 'ymin_item_key', 'ymin_item_1');
-			$graph = $this->renameKey($graph, 'ymax_item_key', 'ymax_item_1');
+			$graph = CArrayHelper::renameKeys($graph, [
+				'graphtype' => 'type',
+				'graph_elements' => 'graph_items',
+				'ymin_item_key' => 'ymin_item_1',
+				'ymax_item_key' => 'ymax_item_1'
+			]);
 			$graph = $this->convertGraphItemReference($graph, 'ymin_item_1');
 			$graph = $this->convertGraphItemReference($graph, 'ymax_item_1');
 
@@ -784,7 +785,7 @@ class C10ImportConverter extends CConverter {
 		}
 
 		foreach ($host['macros'] as &$macro) {
-			$macro = $this->renameKey($macro, 'name', 'macro');
+			$macro = CArrayHelper::renameKeys($macro, ['name' => 'macro']);
 		}
 		unset($macro);
 
@@ -803,15 +804,17 @@ class C10ImportConverter extends CConverter {
 			return $content;
 		}
 
-		$content = $this->renameKey($content, 'sysmaps', 'maps');
+		$content = CArrayHelper::renameKeys($content, ['sysmaps' => 'maps']);
 		foreach ($content['maps'] as &$map) {
 			if (isset($map['selements']) && $map['selements']) {
 				foreach ($map['selements'] as &$selement) {
-					$selement = $this->renameKey($selement, 'elementid', 'element');
-					$selement = $this->renameKey($selement, 'iconid_off', 'icon_off');
-					$selement = $this->renameKey($selement, 'iconid_on', 'icon_on');
-					$selement = $this->renameKey($selement, 'iconid_disabled', 'icon_disabled');
-					$selement = $this->renameKey($selement, 'iconid_maintenance', 'icon_maintenance');
+					$selement = CArrayHelper::renameKeys($selement, [
+						'elementid' => 'element',
+						'iconid_off' => 'icon_off',
+						'iconid_on' => 'icon_on',
+						'iconid_disabled' => 'icon_disabled',
+						'iconid_maintenance' => 'icon_maintenance'
+					]);
 
 					if (isset($selement['elementtype']) && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
 						unset($selement['element']['host']);
@@ -827,7 +830,7 @@ class C10ImportConverter extends CConverter {
 				foreach ($map['links'] as &$link) {
 					if (isset($link['linktriggers']) && $link['linktriggers']) {
 						foreach ($link['linktriggers'] as &$linkTrigger) {
-							$linkTrigger = $this->renameKey($linkTrigger, 'triggerid', 'trigger');
+							$linkTrigger = CArrayHelper::renameKeys($linkTrigger, ['triggerid' => 'trigger']);
 
 							unset($linkTrigger['trigger']['host']);
 						}
@@ -837,7 +840,7 @@ class C10ImportConverter extends CConverter {
 				unset($link);
 			}
 
-			$map = $this->renameKey($map, 'backgroundid', 'background');
+			$map = CArrayHelper::renameKeys($map, ['backgroundid' => 'background']);
 		}
 		unset($map);
 
@@ -857,14 +860,14 @@ class C10ImportConverter extends CConverter {
 		}
 
 		foreach ($content['screens'] as &$screen) {
-			$screen = $this->renameKey($screen, 'screenitems', 'screen_items');
+			$screen = CArrayHelper::renameKeys($screen, ['screenitems' => 'screen_items']);
 
 			if (isset($screen['screen_items']) && $screen['screen_items']) {
 				foreach ($screen['screen_items'] as &$screenItem) {
-					$screenItem = $this->renameKey($screenItem, 'resourceid', 'resource');
+					$screenItem = CArrayHelper::renameKeys($screenItem, ['resourceid' => 'resource']);
 
 					if (isset($screenItem['resource']) && $screenItem['resource'] !== '0') {
-						$screenItem['resource'] = $this->renameKey($screenItem['resource'], 'key_', 'key');
+						$screenItem['resource'] = CArrayHelper::renameKeys($screenItem['resource'], ['key_' => 'key']);
 					}
 				}
 				unset($screenItem);
@@ -931,25 +934,4 @@ class C10ImportConverter extends CConverter {
 
 		return $array;
 	}
-
-	/**
-	 * Renames the $source key in $array to $target.
-	 *
-	 * @param array $array
-	 * @param string $source
-	 * @param string $target
-	 *
-	 * @return array
-	 */
-	protected function renameKey(array $array, $source, $target) {
-		if (!isset($array[$source])) {
-			return $array;
-		}
-
-		$array[$target] = $array[$source];
-		unset($array[$source]);
-
-		return $array;
-	}
-
 }
