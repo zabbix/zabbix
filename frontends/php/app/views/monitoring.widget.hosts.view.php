@@ -230,7 +230,7 @@ foreach ($groups as $group) {
 
 			for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 				$header[] = ($data['filter']['severity'] === null || isset($data['filter']['severity'][$severity]))
-					? getSeverityName($severity, $data['config'])
+					? new CColHeader(getSeverityName($severity, $data['config']), 'nowrap')
 					: null;
 			}
 
@@ -255,9 +255,9 @@ foreach ($groups as $group) {
 				$host_data = $lastUnack_host_list[$hostid];
 
 				$r = new CRow();
-				$r->addItem(new CLink($host_data['host'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].
-					'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
-				));
+				$r->addItem(new CCol(new CLink($host_data['host'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].
+					'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM), 'nowrap')
+				);
 
 				foreach ($lastUnack_host_list[$host['hostid']]['severities'] as $severity => $trigger_count) {
 					if (!is_null($data['filter']['severity']) && !isset($data['filter']['severity'][$severity])) {
