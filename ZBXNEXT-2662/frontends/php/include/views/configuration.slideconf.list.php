@@ -40,7 +40,7 @@ $slidesTable->setHeader(array(
 		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Count of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'])
+	make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'])
 ));
 
 foreach ($this->data['slides'] as $slide) {
