@@ -34,17 +34,6 @@ if ($data['hostId']) {
 
 	$originalTemplates = $dbHost['parentTemplates'];
 	$originalTemplates = zbx_toHash($originalTemplates, 'templateid');
-
-	// get items that populate host inventory fields
-	$hostItemsToInventory = API::Item()->get(array(
-		'output' => array('inventory_link', 'itemid', 'hostid', 'name', 'key_'),
-		'filter' => array('hostid' => $dbHost['hostid']),
-		'preserveKeys' => true,
-		'nopermissions' => true
-	));
-	$hostItemsToInventory = zbx_toHash($hostItemsToInventory, 'inventory_link');
-
-	$hostItemsToInventory = CMacrosResolverHelper::resolveItemNames($hostItemsToInventory);
 }
 else {
 	$dbHost = array();
@@ -911,29 +900,30 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	}
 
 	// link to populating item at the right side (if any)
-	if (isset($hostItemsToInventory[$inventoryNo])) {
-		$itemName = $hostItemsToInventory[$inventoryNo]['name_expanded'];
+	if (array_key_exists($inventoryNo, $data['inventory_items'])) {
+		$name = $data['inventory_items'][$inventoryNo]['name_expanded'];
 
-		$populatingLink = new CLink($itemName, 'items.php?form=update&itemid='.$hostItemsToInventory[$inventoryNo]['itemid']);
-		$populatingLink->setAttribute('title', _s('This field is automatically populated by item "%s".', $itemName));
-		$populatingItemCell = array(' &larr; ', $populatingLink);
+		$link = new CLink($name, 'items.php?form=update&itemid='.$data['inventory_items'][$inventoryNo]['itemid']);
+		$link->setAttribute('title', _s('This field is automatically populated by item "%s".', $name));
 
-		$input->addClass('linked_to_item'); // this will be used for disabling fields via jquery
+		$inventory_item = new CSpan(array(' &larr; ', $link), 'populating_item');
+		if ($inventoryMode != HOST_INVENTORY_AUTOMATIC) {
+			// those links are visible only in automatic mode
+			$inventory_item->addStyle('display: none');
+		}
+
+		// this will be used for disabling fields via jquery
+		$input->addClass('linked_to_item');
 		if ($inventoryMode == HOST_INVENTORY_AUTOMATIC) {
 			$input->setAttribute('disabled', 'disabled');
 		}
 	}
 	else {
-		$populatingItemCell = '';
+		$inventory_item = null;
 	}
 	$input->addStyle('float: left;');
 
-	$populatingItem = new CSpan($populatingItemCell, 'populating_item');
-	if ($inventoryMode != HOST_INVENTORY_AUTOMATIC) { // those links are visible only in automatic mode
-		$populatingItem->addStyle('display: none');
-	}
-
-	$inventoryFormList->addRow($inventoryInfo['title'], array($input, $populatingItem));
+	$inventoryFormList->addRow($inventoryInfo['title'], array($input, $inventory_item));
 }
 
 // clearing the float
