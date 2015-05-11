@@ -246,8 +246,8 @@ out:
 	return ret;
 }
 
-int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *mailto,
-		const char *mailsubject, const char *mailbody, char *error, size_t max_error_len)
+int	send_email(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo, const char *smtp_email,
+		const char *mailto, const char *mailsubject, const char *mailbody, char *error, size_t max_error_len)
 {
 	const char	*__function_name = "send_email";
 
@@ -275,7 +275,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	/* connect to and receive an initial greeting from SMTP server */
 
-	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, smtp_server, ZBX_DEFAULT_SMTP_PORT, 0))
+	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, smtp_server, smtp_port, 0))
 	{
 		zbx_snprintf(error, max_error_len, "cannot connect to SMTP server \"%s\": %s",
 				smtp_server, zbx_socket_strerror());
