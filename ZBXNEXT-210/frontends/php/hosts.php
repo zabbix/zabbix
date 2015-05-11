@@ -789,6 +789,21 @@ elseif (hasRequest('form')) {
 		$data['dbHost'] = $dbHost;
 	}
 
+	if ($data['hostId']) {
+		// get items that populate host inventory fields
+		$data['inventory_items'] = API::Item()->get(array(
+			'output' => ['inventory_link', 'itemid', 'hostid', 'name', 'key_'],
+			'hostids' => [$dbHost['hostid']],
+			'filter' => ['inventory_link' => array_keys(getHostInventories())]
+		));
+		$data['inventory_items'] = zbx_toHash($data['inventory_items'], 'inventory_link');
+
+		$data['inventory_items'] = CMacrosResolverHelper::resolveItemNames($data['inventory_items']);
+	}
+	else {
+		$data['inventory_items'] = [];
+	}
+
 	// get user allowed host groups and sort them by name
 	$data['groupsAllowed'] = API::HostGroup()->get(array(
 		'output' => array('groupid', 'name'),
