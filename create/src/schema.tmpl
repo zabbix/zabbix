@@ -38,7 +38,7 @@ FIELD		|proxy_hostid	|t_id		|	|NULL		|0			|1|hosts	|hostid		|RESTRICT
 FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|disable_until	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|error		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
@@ -56,12 +56,12 @@ FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|maintenance_from|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ipmi_errors_from|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|snmp_errors_from|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|ipmi_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|snmp_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|ipmi_error	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
+FIELD		|snmp_error	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|jmx_disable_until|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|jmx_available	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|jmx_errors_from|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|jmx_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|jmx_error	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|templateid	|t_id		|	|NULL		|0			|3|hosts	|hostid
@@ -1282,4 +1282,4 @@ INDEX		|1		|itemid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2050004	|2050006
+ROW		|2050010	|2050010
