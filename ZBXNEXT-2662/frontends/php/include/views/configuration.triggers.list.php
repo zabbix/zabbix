@@ -128,7 +128,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				$triggerDependencies[] = new CLink(
 					array($hostNames, NAME_DELIMITER, CHtml::encode($depTrigger['description'])),
 					'triggers.php?form=update&hostid='.$host['hostid'].'&triggerid='.$depTrigger['triggerid'],
-					triggerIndicatorStyle($depTrigger['status'])
+					ZBX_STYLE_LINK_ALT.' '.triggerIndicatorStyle($depTrigger['status'])
 				);
 			}
 			else {
@@ -167,7 +167,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			).
 			'&hostid='.$this->data['hostid'].
 			'&g_triggerid='.$triggerid,
-		triggerIndicatorStyle($trigger['status'], $trigger['state'])
+		ZBX_STYLE_LINK_ACTION.' '.triggerIndicatorStyle($trigger['status'], $trigger['state'])
 	);
 
 	// hosts

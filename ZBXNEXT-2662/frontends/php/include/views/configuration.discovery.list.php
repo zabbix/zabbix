@@ -47,7 +47,7 @@ foreach ($data['drules'] as $drule) {
 	$status = new CCol(new CLink(
 		discovery_status2str($drule['status']),
 		'?g_druleid[]='.$drule['druleid'].'&action='.($drule['status'] == DRULE_STATUS_ACTIVE ? 'drule.massdisable' : 'drule.massenable'),
-		discovery_status2style($drule['status'])
+		ZBX_STYLE_LINK_ACTION.' '.discovery_status2style($drule['status'])
 	));
 
 	$discoveryTable->addRow(array(
