@@ -35,6 +35,7 @@ foreach (@$tlds_ref)
 	$tld = $_; # set global variable here
 
 	my $lastclock = get_lastclock($tld, $cfg_key_out);
+	fail("configuration error: item \"$cfg_key_out\" not found at host \"$tld\"") if ($lastclock == E_FAIL);
 	next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
 	push(@tlds, $tld);

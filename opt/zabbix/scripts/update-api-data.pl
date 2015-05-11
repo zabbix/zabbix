@@ -164,7 +164,15 @@ foreach (@$tlds_ref)
 
 		next unless ($servicedata->{$tld}->{$service}->{'enabled'} == SUCCESS);
 
-		my $lastclock = get_lastclock($tld, "rsm.slv.$service.rollweek");
+		my $lastclock_key = "rsm.slv.$service.rollweek";
+
+		my $lastclock = get_lastclock($tld, $lastclock_key);
+
+		if ($lastclock == E_FAIL)
+		{
+			$servicedata->{$tld}->{$service}->{'error'} = "configuration error: item $lastclock_key not found";
+			next;
+		}
 
 		if ($lastclock == 0)
 		{
@@ -319,7 +327,15 @@ foreach (keys(%$servicedata))
 
 		if (defined($tldserv_error))
 		{
-			__prnt(uc($service), " SKIP: $tldserv_error");
+			if (opt('dry-run'))
+			{
+				__prnt("SKIP ", uc($service), ": $tldserv_error");
+			}
+			else
+			{
+				wrn("SKIP ", uc($service), ": $tldserv_error");
+			}
+
 			next;
 		}
 

@@ -361,6 +361,10 @@ sub get_itemids
 	return \%result;
 }
 
+# returns:
+# E_FAIL - if item was not found
+#      0 - if lastclock is NULL
+#      * - lastclock
 sub get_lastclock
 {
 	my $host = shift;
@@ -390,9 +394,9 @@ sub get_lastclock
 
 	my $rows_ref = db_select($sql);
 
-	fail("lastclock check failed: cannot find item ($key) at host ($host)") if (scalar(@$rows_ref) < 1);
+	return E_FAIL if (scalar(@$rows_ref) == 0);
 
-	return $rows_ref->[0]->[0] ? $rows_ref->[0]->[0] : 0;
+	return (defined($rows_ref->[0]->[0]) && $rows_ref->[0]->[0] > 0) ? $rows_ref->[0]->[0] : 0;
 }
 
 sub get_tlds

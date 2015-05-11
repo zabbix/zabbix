@@ -34,6 +34,7 @@ foreach (@$tlds_ref)
 	$tld = $_;
 
 	my $lastclock = get_lastclock($tld, $cfg_key_out);
+	fail("configuration error: item \"$cfg_key_out\" not found at host \"$tld\"") if ($lastclock == E_FAIL);
 	next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
 
 	my $items_ref = get_tld_items($tld, $cfg_key_in);
