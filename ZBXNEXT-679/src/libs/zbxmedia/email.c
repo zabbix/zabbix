@@ -146,7 +146,7 @@ static int	smtp_readln(zbx_socket_t *s, const char **buf)
  *                                                                              *
  ********************************************************************************/
 static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error_len, char **display_name,
-				char **angle_addr)
+		char **angle_addr)
 {
 	const char	*p, *pstart, *angle_addr_start = NULL, *domain_start = NULL, *utf8_end = NULL;
 	const char	*base64_like_start = NULL, *base64_like_end = NULL;
@@ -273,25 +273,33 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 
 	*error = '\0';
 
+	/* validate addresses before connecting to the server */
+
+	if (SUCCEED != smtp_parse_mailbox(smtp_email, error, max_error_len, &from_display_name, &from_angle_addr))
+		goto clean;
+
+	if (SUCCEED != smtp_parse_mailbox(mailto, error, max_error_len, &to_display_name, &to_angle_addr))
+		goto clean;
+
 	/* connect to and receive an initial greeting from SMTP server */
 
 	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, smtp_server, smtp_port, 0))
 	{
 		zbx_snprintf(error, max_error_len, "cannot connect to SMTP server \"%s\": %s",
 				smtp_server, zbx_socket_strerror());
-		goto close;
+		goto clean;
 	}
 
 	if (FAIL == smtp_readln(&s, &response))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving initial string from SMTP server: %s",
 				zbx_strerror(errno));
-		goto out;
+		goto close;
 	}
 	if (0 != strncmp(response, OK_220, strlen(OK_220)))
 	{
 		zbx_snprintf(error, max_error_len, "no welcome message 220* from SMTP server \"%s\"", response);
-		goto out;
+		goto close;
 	}
 
 	/* send HELO */
@@ -303,66 +311,60 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 		{
 			zbx_snprintf(error, max_error_len, "error sending HELO to mailserver: %s",
 					zbx_strerror(errno));
-			goto out;
+			goto close;
 		}
 		if (FAIL == smtp_readln(&s, &response))
 		{
 			zbx_snprintf(error, max_error_len, "error receiving answer on HELO request: %s",
 					zbx_strerror(errno));
-			goto out;
+			goto close;
 		}
 		if (0 != strncmp(response, OK_250, strlen(OK_250)))
 		{
 			zbx_snprintf(error, max_error_len, "wrong answer on HELO \"%s\"", response);
-			goto out;
+			goto close;
 		}
 	}
 
 	/* send MAIL FROM */
-
-	if (SUCCEED != smtp_parse_mailbox(smtp_email, error, max_error_len, &from_display_name, &from_angle_addr))
-		goto out;
 
 	zbx_snprintf(cmd, sizeof(cmd), "MAIL FROM:%s\r\n", from_angle_addr);
 
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
 		zbx_snprintf(error, max_error_len, "error sending MAIL FROM to mailserver: %s", zbx_strerror(errno));
-		goto out;
+		goto close;
 	}
 	if (FAIL == smtp_readln(&s, &response))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving answer on MAIL FROM request: %s", zbx_strerror(errno));
-		goto out;
+		goto close;
 	}
 	if (0 != strncmp(response, OK_250, strlen(OK_250)))
 	{
 		zbx_snprintf(error, max_error_len, "wrong answer on MAIL FROM \"%s\"", response);
-		goto out;
+		goto close;
 	}
 
 	/* send RCPT TO */
-
-	if (SUCCEED != smtp_parse_mailbox(mailto, error, max_error_len, &to_display_name, &to_angle_addr))
-		goto out;
 
 	zbx_snprintf(cmd, sizeof(cmd), "RCPT TO:%s\r\n", to_angle_addr);
 
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
 		zbx_snprintf(error, max_error_len, "error sending RCPT TO to mailserver: %s", zbx_strerror(errno));
-		goto out;
+		goto close;
 	}
 	if (FAIL == smtp_readln(&s, &response))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving answer on RCPT TO request: %s", zbx_strerror(errno));
-		goto out;
+		goto close;
 	}
 	/* May return 251 as well: User not local; will forward to <forward-path>. See RFC825. */
 	if (0 != strncmp(response, OK_250, strlen(OK_250)) && 0 != strncmp(response, OK_251, strlen(OK_251)))
 	{
 		zbx_snprintf(error, max_error_len, "wrong answer on RCPT TO \"%s\"", response);
-		goto out;
+		goto close;
 	}
 
 	/* send DATA */
@@ -371,17 +373,17 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
 		zbx_snprintf(error, max_error_len, "error sending DATA to mailserver: %s", zbx_strerror(errno));
-		goto out;
+		goto close;
 	}
 	if (FAIL == smtp_readln(&s, &response))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving answer on DATA request: %s", zbx_strerror(errno));
-		goto out;
+		goto close;
 	}
 	if (0 != strncmp(response, OK_354, strlen(OK_354)))
 	{
 		zbx_snprintf(error, max_error_len, "wrong answer on DATA \"%s\"", response);
-		goto out;
+		goto close;
 	}
 
 	/* prepare subject */
@@ -450,7 +452,7 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	{
 		zbx_snprintf(error, max_error_len, "error sending headers and mail body to mailserver: %s",
 				zbx_strerror(errno));
-		goto out;
+		goto close;
 	}
 
 	/* send . */
@@ -459,17 +461,17 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
 		zbx_snprintf(error, max_error_len, "error sending . to mailserver: %s", zbx_strerror(errno));
-		goto out;
+		goto close;
 	}
 	if (FAIL == smtp_readln(&s, &response))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving answer on . request: %s", zbx_strerror(errno));
-		goto out;
+		goto close;
 	}
 	if (0 != strncmp(response, OK_250, strlen(OK_250)))
 	{
 		zbx_snprintf(error, max_error_len, "wrong answer on end of data \"%s\"", response);
-		goto out;
+		goto close;
 	}
 
 	/* send QUIT */
@@ -478,17 +480,18 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
 		zbx_snprintf(error, max_error_len, "error sending QUIT to mailserver: %s", zbx_strerror(errno));
-		goto out;
+		goto close;
 	}
 
 	ret = SUCCEED;
-out:
+close:
+	zbx_tcp_close(&s);
+clean:
 	zbx_free(from_display_name);
 	zbx_free(to_display_name);
 	zbx_free(from_angle_addr);
 	zbx_free(to_angle_addr);
-	zbx_tcp_close(&s);
-close:
+
 	if ('\0' != *error)
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 
