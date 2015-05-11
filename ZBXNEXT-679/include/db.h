@@ -306,14 +306,19 @@ typedef struct
 {
 	zbx_uint64_t		mediatypeid;
 	zbx_media_type_t	type;
-	char	*description;
-	char	*smtp_server;
-	char	*smtp_helo;
-	char	*smtp_email;
-	char	*exec_path;
-	char	*gsm_modem;
-	char	*username;
-	char	*passwd;
+	char			*description;
+	char			*smtp_server;
+	char			*smtp_helo;
+	char			*smtp_email;
+	char			*exec_path;
+	char			*gsm_modem;
+	char			*username;
+	char			*passwd;
+	unsigned short		smtp_port;
+	unsigned char		smtp_security;
+	unsigned char		smtp_verify_peer;
+	unsigned char		smtp_verify_host;
+	unsigned char		smtp_authentication;
 }
 DB_MEDIATYPE;
 

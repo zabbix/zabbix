@@ -62,8 +62,9 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	if (MEDIA_TYPE_EMAIL == mediatype->type)
 	{
 		alarm(ALARM_ACTION_TIMEOUT);
-		res = send_email(mediatype->smtp_server, mediatype->smtp_helo, mediatype->smtp_email,
-				alert->sendto, alert->subject, alert->message, error, max_error_len);
+		res = send_email(mediatype->smtp_server, mediatype->smtp_port, mediatype->smtp_helo,
+				mediatype->smtp_email, alert->sendto, alert->subject, alert->message,
+				error, max_error_len);
 		alarm(0);
 	}
 #ifdef HAVE_JABBER
@@ -172,8 +173,9 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 		result = DBselect(
 				"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid,"
-				"mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,"
-				"mt.gsm_modem,mt.username,mt.passwd,a.retries"
+					"mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,"
+					"mt.gsm_modem,mt.username,mt.passwd,mt.smtp_port,mt.smtp_security,"
+					"mt.smtp_verify_peer,mt.smtp_verify_host,mt.smtp_authentication,a.retries"
 				" from alerts a,media_type mt"
 				" where a.mediatypeid=mt.mediatypeid"
 					" and a.status=%d"
@@ -201,8 +203,13 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 			mediatype.gsm_modem = row[13];
 			mediatype.username = row[14];
 			mediatype.passwd = row[15];
+			mediatype.smtp_port = (unsigned short)atoi(row[16]);
+			ZBX_STR2UCHAR(mediatype.smtp_security, row[17]);
+			ZBX_STR2UCHAR(mediatype.smtp_verify_peer, row[18]);
+			ZBX_STR2UCHAR(mediatype.smtp_verify_host, row[19]);
+			ZBX_STR2UCHAR(mediatype.smtp_authentication, row[20]);
 
-			alert.retries = atoi(row[16]);
+			alert.retries = atoi(row[21]);
 
 			*error = '\0';
 			res = execute_action(&alert, &mediatype, error, sizeof(error));
