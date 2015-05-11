@@ -533,7 +533,6 @@ sass/screens-edit.html -text
 sass/setup.html -text
 sass/signin.html -text
 sass/touch-icon-192x192.png -text svneol=unset#image/png
-sass/wide-table.html -text
 src/libs/zbxsysinfo/win32/wmi.cpp -text
 src/zabbix_java/lib/README svneol=native#text/plain
 src/zabbix_java/lib/android-json-4.3_r3.1.jar -text

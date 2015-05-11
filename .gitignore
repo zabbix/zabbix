@@ -101,6 +101,7 @@ sass/stylesheets/*.css
 sass/stylesheets/*.map
 sass/stylesheets/sass/screen2.scss
 sass/stylesheets/themes
+sass/wide-table.html
 src/Makefile
 src/Makefile.in
 src/libs/Makefile
