@@ -240,13 +240,6 @@ foreach (@$tlds_ref)
 			$from = $till - getopt('period') * 60 + 1;
 		}
 
-		if ((defined($from) and $from > $lastclock))
-		{
-			$servicedata->{$tld}->{$service}->{'error'} = "given time period (" . __selected_period($from, $till) . ")".
-				" is in the future from the latest data available (" . ts_str($lastclock) . ")";
-			next;
-		}
-
 		if ($from and ((!$probes_from) or ($from < $probes_from)))
 		{
 			$probes_from = $from;
@@ -255,6 +248,15 @@ foreach (@$tlds_ref)
 		if ($till and ((!$probes_till) or ($till > $probes_till)))
 		{
 			$probes_till = $till;
+		}
+
+		# NB! This check must be done after setting $probes_from and $probes_till, otherwise
+		# calculation of probe status information may be done for the period up till now.
+		if ((defined($from) and $from > $lastclock))
+		{
+			$servicedata->{$tld}->{$service}->{'error'} = "given time period (" . __selected_period($from, $till) . ")".
+				" is in the future from the latest data available (" . ts_str($lastclock) . ")";
+			next;
 		}
 
 		$servicedata->{$tld}->{$service}->{'from'} = $from;

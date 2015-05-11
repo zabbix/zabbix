@@ -2742,7 +2742,7 @@ sub __get_probestatus_times
 		my $from = $times_ref->[$idx++];
 		my $till = $times_ref->[$idx++];
 
-		$rows_ref = db_select("select clock,value from history_uint where itemid=$itemid and clock between $from and $till order by clock");
+		$rows_ref = db_select("select clock,value from history_uint where itemid=$itemid and clock between $from and $till order by itemid,clock");
 
 		push(@times, $from) if ($last_status == UP);
 
