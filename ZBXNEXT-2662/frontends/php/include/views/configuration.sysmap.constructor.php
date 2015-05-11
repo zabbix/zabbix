@@ -27,28 +27,28 @@ $sysmapWidget = (new CWidget())->setTitle(_('Network maps'));
 $menu = (new CList(null, 'object-group'))->
 	addItem(array(
 		_('Icon').':'.SPACE,
-		(new CLink(_('Add'), 'javascript:void(0);', 'link-dotted', null, true))->setAttribute('id', 'selementAdd'),
+		(new CLink(_('Add'), 'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setAttribute('id', 'selementAdd'),
 		SPACE.'/'.SPACE,
-		(new CLink(_('Remove'), 'javascript:void(0);', 'link-dotted', null, true))->setAttribute('id', 'selementRemove')
+		(new CLink(_('Remove'), 'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setAttribute('id', 'selementRemove')
 	))->
 	addItem(array(
 		_('Link').':'.SPACE,
-		(new CLink(_('Add'), 'javascript:void(0);', 'link-dotted', null, true))->setAttribute('id', 'linkAdd'),
+		(new CLink(_('Add'), 'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setAttribute('id', 'linkAdd'),
 		SPACE.'/'.SPACE,
-		(new CLink(_('Remove'), 'javascript:void(0);', 'link-dotted', null, true))->setAttribute('id', 'linkRemove')
+		(new CLink(_('Remove'), 'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setAttribute('id', 'linkRemove')
 	))->
 	addItem(array(
 		_('Expand macros').':'.SPACE,
 		(new CLink(($this->data['sysmap']['expand_macros'] == SYSMAP_EXPAND_MACROS_ON) ? _('On') : _('Off'),
-			'javascript:void(0);', 'link-dotted', null, true))->setAttribute('id', 'expand_macros')
+			'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setAttribute('id', 'expand_macros')
 	))->
 	addItem(array(
 		_('Grid').':'.SPACE,
 		(new CLink(($this->data['sysmap']['grid_show'] == SYSMAP_GRID_SHOW_ON) ? _('Shown') : _('Hidden'),
-			'javascript:void(0);', 'link-dotted', null, true))->setAttribute('id', 'gridshow'),
+			'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setAttribute('id', 'gridshow'),
 		SPACE.'/'.SPACE,
 		(new CLink(($this->data['sysmap']['grid_align'] == SYSMAP_GRID_ALIGN_ON) ? _('On') : _('Off'),
-			'javascript:void(0);', 'link-dotted', null, true))->setAttribute('id', 'gridautoalign')
+			'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setAttribute('id', 'gridautoalign')
 	))->
 	addItem(new CComboBox('gridsize', $this->data['sysmap']['grid_size'], null, array(
 		20 => '20x20',

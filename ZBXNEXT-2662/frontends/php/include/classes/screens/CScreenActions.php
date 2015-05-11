@@ -149,7 +149,7 @@ class CScreenActions extends CScreenBase {
 					_('In progress').':',
 					BR(),
 					_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries']),
-				), 'orange');
+				), ZBX_STYLE_ORANGE);
 			}
 			else {
 				$status = new CSpan(_('Not sent'), ZBX_STYLE_RED);

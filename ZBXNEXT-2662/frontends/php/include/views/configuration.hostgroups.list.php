@@ -76,7 +76,7 @@ foreach ($this->data['groups'] as $group) {
 			$hostsOutput[] = ', ';
 		}
 
-		$hostsOutput[] = new CLink($template['name'], $url, ZBX_STYLE_GREY_DOTTED);
+		$hostsOutput[] = new CLink($template['name'], $url, ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
 	}
 
 	if ($group['hosts'] && $i < $this->data['config']['max_in_table']) {
@@ -99,7 +99,7 @@ foreach ($this->data['groups'] as $group) {
 
 			switch ($host['status']) {
 				case HOST_STATUS_NOT_MONITORED:
-					$style = ZBX_STYLE_RED_DOTTED;
+					$style = ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED;
 					$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
 					break;
 
@@ -122,7 +122,7 @@ foreach ($this->data['groups'] as $group) {
 	// name
 	$name = array();
 	if ($group['discoveryRule']) {
-		$name[] = new CLink($group['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$group['discoveryRule']['itemid'], 'orange');
+		$name[] = new CLink($group['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$group['discoveryRule']['itemid'], ZBX_STYLE_ORANGE);
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$group['groupid']);
@@ -154,7 +154,8 @@ foreach ($this->data['groups'] as $group) {
 		new CCheckBox('groups['.$group['groupid'].']', null, null, $group['groupid']),
 		new CCol($name, 'nowrap'),
 		array(
-			array(new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'], ZBX_STYLE_GREY_DOTTED), CViewHelper::showNum($templateCount)),
+			array(new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY),
+				CViewHelper::showNum($templateCount)),
 			BR(),
 			array(new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), CViewHelper::showNum($hostCount))
 		),

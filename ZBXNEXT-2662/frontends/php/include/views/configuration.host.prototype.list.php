@@ -56,7 +56,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	$name = array();
 	if ($hostPrototype['templateid']) {
 		$sourceTemplate = $hostPrototype['sourceTemplate'];
-		$name[] = new CLink($sourceTemplate['name'], '?parent_discoveryid='.$hostPrototype['sourceDiscoveryRuleId'], ZBX_STYLE_GREY_DOTTED);
+		$name[] = new CLink($sourceTemplate['name'], '?parent_discoveryid='.$hostPrototype['sourceDiscoveryRuleId'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($hostPrototype['name'], '?form=update&parent_discoveryid='.$discoveryRule['itemid'].'&hostid='.$hostPrototype['hostid']);
@@ -72,7 +72,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		foreach ($hostPrototype['templates'] as $template) {
 
 			$caption = array();
-			$caption[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'], ZBX_STYLE_GREY_DOTTED);
+			$caption[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
 
 			$linkedTemplates = $this->data['linkedTemplates'][$template['templateid']]['parentTemplates'];
 			if ($linkedTemplates) {
@@ -80,7 +80,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 				$caption[] = ' (';
 				foreach ($linkedTemplates as $tpl) {
-					$caption[] = new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid'], ZBX_STYLE_GREY_DOTTED);
+					$caption[] = new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
 					$caption[] = ', ';
 				}
 				array_pop($caption);
@@ -105,7 +105,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				? 'hostprototype.massenable'
 				: 'hostprototype.massdisable'
 			),
-		itemIndicatorStyle($hostPrototype['status'])
+		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($hostPrototype['status'])
 	);
 
 	$hostTable->addRow(array(

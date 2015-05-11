@@ -81,7 +81,7 @@ foreach ($this->data['items'] as $item) {
 		$description[] = new CLink(
 			CHtml::encode($item['template_host']['name']),
 			'?hostid='.$item['template_host']['hostid'].'&filter_set=1',
-			'grey'
+			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY
 		);
 		$description[] = NAME_DELIMITER;
 	}
@@ -90,7 +90,7 @@ foreach ($this->data['items'] as $item) {
 		$description[] = new CLink(
 			CHtml::encode($item['discoveryRule']['name']),
 			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'],
-			ZBX_STYLE_ORANGE_DOTTED
+			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_ORANGE
 		);
 		$description[] = NAME_DELIMITER.$item['name_expanded'];
 	}
@@ -107,7 +107,7 @@ foreach ($this->data['items'] as $item) {
 		'?group_itemid='.$item['itemid'].
 			'&hostid='.$item['hostid'].
 			'&action='.($item['status'] == ITEM_STATUS_DISABLED ? 'item.massenable' : 'item.massdisable'),
-		itemIndicatorStyle($item['status'], $item['state'])
+		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($item['status'], $item['state'])
 	));
 
 	// info
@@ -165,7 +165,7 @@ foreach ($this->data['items'] as $item) {
 		$triggerDescription = array();
 		if ($trigger['templateid'] > 0) {
 			if (!isset($this->data['triggerRealHosts'][$trigger['triggerid']])) {
-				$triggerDescription[] = new CSpan('HOST', 'grey');
+				$triggerDescription[] = new CSpan('HOST', ZBX_STYLE_GREY);
 				$triggerDescription[] = ':';
 			}
 			else {
@@ -173,7 +173,7 @@ foreach ($this->data['items'] as $item) {
 				$triggerDescription[] = new CLink(
 					CHtml::encode($realHost['name']),
 					'triggers.php?hostid='.$realHost['hostid'],
-					'grey'
+					ZBX_STYLE_GREY
 				);
 				$triggerDescription[] = ':';
 			}
@@ -213,7 +213,7 @@ foreach ($this->data['items'] as $item) {
 	unset($trigger);
 
 	if (!empty($item['triggers'])) {
-		$triggerInfo = new CSpan(_('Triggers'), 'link_menu');
+		$triggerInfo = new CSpan(_('Triggers'), ZBX_STYLE_LINK_ACTION.' link_menu');
 		$triggerInfo->setHint($triggerHintTable);
 		$triggerInfo = array($triggerInfo);
 		$triggerInfo[] = CViewHelper::showNum(count($item['triggers']));

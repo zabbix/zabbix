@@ -1693,7 +1693,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		$msg_details = new CDiv(null, 'msg-details');
 
 		if ($title !== null) {
-			$link = new CLink(_('Details'), null, 'link-dotted', null, true);
+			$link = new CLink(_('Details'), null, ZBX_STYLE_LINK_DOTTED, null, true);
 			$link->setAttribute('onclick', 'javascript: showHide("msg-messages", IE ? "block" : "");');
 			$msg_details->addItem($link);
 		}

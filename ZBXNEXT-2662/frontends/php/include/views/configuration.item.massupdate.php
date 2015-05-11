@@ -70,7 +70,7 @@ if ($this->data['displayInterfaces']) {
 		$interfacesComboBox->addItem($interfaceGroup);
 	}
 
-	$span = new CSpan(_('No interface found'), 'red');
+	$span = new CSpan(_('No interface found'), ZBX_STYLE_RED);
 	$span->setAttribute('id', 'interface_not_defined');
 	$span->setAttribute('style', 'display: none;');
 
@@ -363,7 +363,7 @@ $newFlexInt = new CDiv(
 	'row-new-delay-flex-fields'
 );
 
-$maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), 'red');
+$maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), ZBX_STYLE_RED);
 $maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');
 $maxFlexMsg->setAttribute('style', 'display: none;');
 

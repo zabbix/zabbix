@@ -782,7 +782,7 @@ else {
 					);
 				}
 				else {
-					$triggerDescription = new CSpan($description, 'pointer link_menu');
+					$triggerDescription = new CSpan($description, ZBX_STYLE_LINK_ACTION.' link_menu');
 					$triggerDescription->setMenuPopup(
 						CMenuPopupHelper::getTrigger($trigger, null, $event['clock'])
 					);
@@ -804,7 +804,7 @@ else {
 					$hostName = null;
 
 					if (getRequest('hostid', 0) == 0) {
-						$hostName = new CSpan($host['name'], 'link_menu');
+						$hostName = new CSpan($host['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
 						$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 					}
 

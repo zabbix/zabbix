@@ -129,11 +129,11 @@ foreach ($this->data['triggers'] as $trigger) {
 	$hostId = $trigger['hosts'][0]['hostid'];
 
 	$hostName = new CSpan($trigger['hosts'][0]['name'],
-		'link_menu menu-host'.(($this->data['hosts'][$hostId]['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
+		ZBX_STYLE_LINK_ACTION.' link_menu'.(($this->data['hosts'][$hostId]['status'] == HOST_STATUS_NOT_MONITORED) ? ' '.ZBX_STYLE_RED : '')
 	);
 	$hostName->setMenuPopup(CMenuPopupHelper::getHost($this->data['hosts'][$hostId], $this->data['scripts'][$hostId]));
 
-	$triggerDescription = new CSpan($trigger['description'], 'link_menu');
+	$triggerDescription = new CSpan($trigger['description'], ZBX_STYLE_LINK_ACTION.' link_menu');
 	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	$table->addRow(array(

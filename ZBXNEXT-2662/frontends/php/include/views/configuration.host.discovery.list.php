@@ -78,7 +78,7 @@ foreach ($data['discoveries'] as $discovery) {
 				? 'discoveryrule.massenable'
 				: 'discoveryrule.massdisable'
 			),
-		itemIndicatorStyle($discovery['status'], $discovery['state'])
+		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($discovery['status'], $discovery['state'])
 	);
 
 	// info

@@ -564,7 +564,7 @@ foreach ($items as $key => $item){
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			? new CSpan($item['key_expanded'], ZBX_STYLE_GREEN)
-			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], ZBX_STYLE_GREEN_DOTTED);
+			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN);
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
@@ -652,7 +652,7 @@ foreach ($applications as $appid => $dbApp) {
 
 	if (!$singleHostSelected) {
 		$hostName = new CSpan($host['name'],
-			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
+			ZBX_STYLE_LINK_ACTION.' link_menu'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' '.ZBX_STYLE_RED : '')
 		);
 
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
@@ -752,7 +752,7 @@ foreach ($items as $item) {
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			? new CSpan($item['key_expanded'], 'enabled')
-			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], ZBX_STYLE_GREEN_DOTTED);
+			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN);
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
@@ -830,7 +830,7 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	if (!$singleHostSelected) {
 		$hostName = new CSpan($host['name'],
-			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
+			ZBX_STYLE_LINK_ACTION.' link_menu'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' '.ZBX_STYLE_RED : '')
 		);
 
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
