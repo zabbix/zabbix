@@ -42,16 +42,16 @@ $sysmapTable->setHeader(array(
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder']),
-	_('Edit')
+	_('Map')
 ));
 
 foreach ($this->data['maps'] as $map) {
 	$sysmapTable->addRow(array(
 		new CCheckBox('maps['.$map['sysmapid'].']', null, null, $map['sysmapid']),
-		new CLink($map['name'], 'sysmap.php?sysmapid='.$map['sysmapid']),
+		new CLink($map['name'], 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form'),
 		$map['width'],
 		$map['height'],
-		new CLink(_('Edit'), 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form')
+		new CLink(_('Edit'), 'sysmap.php?sysmapid='.$map['sysmapid']),
 	));
 }
 

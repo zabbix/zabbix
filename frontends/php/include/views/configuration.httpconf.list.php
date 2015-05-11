@@ -121,7 +121,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 					? 'httptest.massenable'
 					: 'httptest.massdisable'
 				),
-			httptest_status2style($httpTest['status'])
+			ZBX_STYLE_LINK_ACTION.' '.httptest_status2style($httpTest['status'])
 		),
 		$infoIcon
 	));

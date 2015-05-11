@@ -67,7 +67,7 @@ function httptest_status2style($status) {
 		return $statuses[$status];
 	}
 	else {
-		return ZBX_STYLE_UNKNOWN;
+		return ZBX_STYLE_GREY;
 	}
 }
 

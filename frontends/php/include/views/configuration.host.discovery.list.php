@@ -63,7 +63,7 @@ foreach ($data['discoveries'] as $discovery) {
 	if ($discovery['templateid']) {
 		$dbTemplate = get_realhost_by_itemid($discovery['templateid']);
 
-		$description[] = new CLink($dbTemplate['name'], '?hostid='.$dbTemplate['hostid'], ZBX_STYLE_GREY);
+		$description[] = new CLink($dbTemplate['name'], '?hostid='.$dbTemplate['hostid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}
 

@@ -54,9 +54,9 @@ $screenTable->setHeader(array(
 foreach ($this->data['screens'] as $screen) {
 	$screenTable->addRow(array(
 		new CCheckBox('screens['.$screen['screenid'].']', null, null, $screen['screenid']),
-		new CLink($screen['name'], 'screenedit.php?screenid='.$screen['screenid'].url_param('templateid')),
+		new CLink($screen['name'], '?form=update&screenid='.$screen['screenid'].url_param('templateid')),
 		$screen['hsize'].' x '.$screen['vsize'],
-		new CLink(_('Edit'), '?form=update&screenid='.$screen['screenid'].url_param('templateid'))
+		new CLink(_('Edit'), 'screenedit.php?screenid='.$screen['screenid'].url_param('templateid'))
 	));
 }
 

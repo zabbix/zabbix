@@ -2322,14 +2322,14 @@ function triggerIndicator($status, $state = null) {
 function triggerIndicatorStyle($status, $state = null) {
 	if ($status == TRIGGER_STATUS_ENABLED) {
 		return ($state == TRIGGER_STATE_UNKNOWN) ?
-			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY :
-			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN;
+			ZBX_STYLE_GREY :
+			ZBX_STYLE_GREEN;
 	}
 	elseif ($status == TRIGGER_STATUS_DISABLED) {
-		return ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED;
+		return ZBX_STYLE_RED;
 	}
 
-	return ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY;
+	return ZBX_STYLE_GREY;
 }
 
 /**
