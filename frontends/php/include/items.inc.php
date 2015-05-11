@@ -223,13 +223,15 @@ function itemIndicator($status, $state = null) {
  */
 function itemIndicatorStyle($status, $state = null) {
 	if ($status == ITEM_STATUS_ACTIVE) {
-		return ($state == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY_DOTTED : ZBX_STYLE_GREEN_DOTTED;
+		return ($state == ITEM_STATE_NOTSUPPORTED) ?
+			ZBX_STYLE_GREY :
+			ZBX_STYLE_GREEN;
 	}
 	elseif ($status == ITEM_STATUS_DISABLED) {
-		return ZBX_STYLE_RED_DOTTED;
+		return ZBX_STYLE_RED;
 	}
 
-	return ZBX_STYLE_GREY_DOTTED;
+	return ZBX_STYLE_GREY;
 }
 
 /**
@@ -729,7 +731,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 		foreach ($hostNames as $hostId => $hostName) {
 			$host = $hosts[$hostId];
 
-			$name = new CSpan($host['name'], 'link_menu');
+			$name = new CSpan($host['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
 			$name->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
 
 			$tableRow = array(new CCol($name, 'nowrap'));

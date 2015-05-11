@@ -660,14 +660,14 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 								$functionData['host'].':'.$functionData['key_'],
 								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].'&parent_discoveryid='.
 									$trigger['discoveryRuleid'],
-								ZBX_STYLE_DOTTED.' '.$style
+								ZBX_STYLE_LINK_ALT.' '.$style
 							);
 						}
 						else {
 							$link = new CLink(
 								$functionData['host'].':'.$functionData['key_'],
 								'items.php?form=update&itemid='.$functionData['itemid'],
-								ZBX_STYLE_DOTTED.' '.$style
+								ZBX_STYLE_LINK_ALT.' '.$style
 							);
 						}
 
@@ -779,7 +779,7 @@ function triggerExpression($trigger, $html = false) {
 				$function_data += $trigger['hosts'][$function_data['hostid']];
 
 				if ($html) {
-					$style = ($function_data['status'] == ITEM_STATUS_DISABLED) ? 'red' : 'grey';
+					$style = ($function_data['status'] == ITEM_STATUS_DISABLED) ? ZBX_STYLE_RED : ZBX_STYLE_GREY;
 					if ($function_data['status'] == ITEM_STATUS_ACTIVE) {
 						$style = ZBX_STYLE_GREEN;
 					}
@@ -1129,7 +1129,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		foreach ($hostNames as $hostId => $hostName) {
-			$name = new CSpan($hostName, 'link_menu');
+			$name = new CSpan($hostName, ZBX_STYLE_LINK_ACTION.' link_menu');
 			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = array(new CCol($name, 'nowrap'));
@@ -1456,7 +1456,7 @@ function make_trigger_details($trigger) {
 	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
 	foreach ($hosts as $host) {
-		$hostName = new CSpan($host['name'], ZBX_STYLE_DOTTED);
+		$hostName = new CSpan($host['name'], ZBX_STYLE_LINK_ACTION);
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 		$hostNames[] = $hostName;
 		$hostNames[] = ', ';
@@ -2321,13 +2321,15 @@ function triggerIndicator($status, $state = null) {
  */
 function triggerIndicatorStyle($status, $state = null) {
 	if ($status == TRIGGER_STATUS_ENABLED) {
-		return ($state == TRIGGER_STATE_UNKNOWN) ? ZBX_STYLE_GREY_DOTTED : ZBX_STYLE_GREEN_DOTTED;
+		return ($state == TRIGGER_STATE_UNKNOWN) ?
+			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY :
+			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN;
 	}
 	elseif ($status == TRIGGER_STATUS_DISABLED) {
-		return ZBX_STYLE_RED_DOTTED;
+		return ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED;
 	}
 
-	return ZBX_STYLE_GREY_DOTTED;
+	return ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY;
 }
 
 /**

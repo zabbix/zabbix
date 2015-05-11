@@ -272,20 +272,21 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 
 		// is activated
 		if (str_in_array($id, $subfilter)) {
-			$link = new CLink(array($element['name'], new CSup(SPACE.$element['count'])), null, ZBX_STYLE_GREEN_DOTTED);
+			$link = new CLink($element['name'], null, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN);
 			$link->onClick(CHtml::encode(
 				'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 				'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
 			));
 			$output[] = $link;
+			$output[] = new CSup(SPACE.$element['count']);
 		}
 
 		// isn't activated
 		else {
 			// subfilter has 0 items
 			if ($element['count'] == 0) {
-				$link = new CLink(array($element['name'], new CSup(SPACE.$element['count'])), null,  ZBX_STYLE_GREY);
-				$output[] = $link;
+				$output[] = new CLink($element['name'], null,  ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREY);
+				$output[] = new CSup(SPACE.$element['count']);
 			}
 			else {
 				// this level has no active subfilters
@@ -293,7 +294,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 					? new CSup(SPACE.'+'.$element['count'])
 					: new CSup(SPACE.$element['count']);
 
-				$link = new CLink($element['name'], null, ZBX_STYLE_DOTTED);
+				$link = new CLink($element['name'], null, ZBX_STYLE_LINK_ACTION);
 				$link->onClick(CHtml::encode(
 					'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 					'create_var("zbx_filter", '.

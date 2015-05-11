@@ -102,17 +102,17 @@ foreach ($this->data['users'] as $user) {
 			$userGroup['name'],
 			'usergrps.php?form=update&usrgrpid='.$userGroup['usrgrpid'],
 			($userGroup['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $userGroup['users_status'] == GROUP_STATUS_DISABLED)
-				? ZBX_STYLE_RED . ' ' . ZBX_STYLE_DOTTED : ZBX_STYLE_GREEN . ' ' . ZBX_STYLE_DOTTED
+				? ZBX_STYLE_LINK_ACTION . ' ' . ZBX_STYLE_RED : ZBX_STYLE_LINK_ACTION . ' ' . ZBX_STYLE_GREEN
 		);
 	}
 
 	// user type style
-	$userTypeStyle = 'enabled';
+	$userTypeStyle = ZBX_STYLE_GREEN;
 	if ($user['type'] == USER_TYPE_ZABBIX_ADMIN) {
-		$userTypeStyle = 'orange';
+		$userTypeStyle = ZBX_STYLE_ORANGE;
 	}
 	if ($user['type'] == USER_TYPE_SUPER_ADMIN) {
-		$userTypeStyle = 'disabled';
+		$userTypeStyle = ZBX_STYLE_RED;
 	}
 
 	// gui access style

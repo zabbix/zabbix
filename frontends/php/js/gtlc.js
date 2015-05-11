@@ -1140,7 +1140,7 @@ var CScrollBar = Class.create({
 			caption = caption.split(' ', 2)[0];
 
 			this.dom.linklist[links] = document.createElement('a');
-			this.dom.linklist[links].className = 'link-dotted';
+			this.dom.linklist[links].className = 'link-alt';
 			this.dom.linklist[links].setAttribute('zoom', zooms[key]);
 			this.dom.linklist[links].appendChild(document.createTextNode(caption));
 			this.dom.links.appendChild(this.dom.linklist[links]);
@@ -1150,7 +1150,7 @@ var CScrollBar = Class.create({
 		}
 
 		this.dom.linklist[links] = document.createElement('a');
-		this.dom.linklist[links].className = 'link-dotted';
+		this.dom.linklist[links].className = 'link-alt';
 		this.dom.linklist[links].setAttribute('zoom', this.maxperiod);
 		this.dom.linklist[links].appendChild(document.createTextNode(locale['S_ALL_S']));
 		this.dom.links.appendChild(this.dom.linklist[links]);
@@ -1188,7 +1188,7 @@ var CScrollBar = Class.create({
 			caption = caption.split(' ', 2)[0];
 
 			this.dom.nav_linklist[links] = document.createElement('a');
-			this.dom.nav_linklist[links].className = 'link-dotted';
+			this.dom.nav_linklist[links].className = 'link-alt';
 			this.dom.nav_linklist[links].setAttribute('nav', moves[i]);
 			this.dom.nav_linklist[links].appendChild(document.createTextNode(caption));
 			this.dom.nav_links.appendChild(this.dom.nav_linklist[links]);
@@ -1211,7 +1211,7 @@ var CScrollBar = Class.create({
 			caption = caption.split(' ', 2)[0];
 
 			this.dom.nav_linklist[links] = document.createElement('a');
-			this.dom.nav_linklist[links].className = 'link-dotted';
+			this.dom.nav_linklist[links].className = 'link-alt';
 			this.dom.nav_linklist[links].setAttribute('nav', moves[i]);
 			this.dom.nav_linklist[links].appendChild(document.createTextNode(caption));
 			this.dom.nav_links.appendChild(this.dom.nav_linklist[links]);
@@ -1234,17 +1234,17 @@ var CScrollBar = Class.create({
 				var linkzoom = this.dom.linklist[i].getAttribute('zoom');
 
 				if (linkzoom == period) {
-					this.dom.linklist[i].className = 'link-dotted selected';
+					this.dom.linklist[i].className = 'link-alt selected';
 				}
 				else {
-					this.dom.linklist[i].className = 'link-dotted';
+					this.dom.linklist[i].className = 'link-alt';
 				}
 			}
 		}
 
 		i = this.dom.linklist.length - 1;
 		if (period == (timeControl.timeline.endtime() - timeControl.timeline.starttime())) {
-			this.dom.linklist[i].className = 'link-dotted selected';
+			this.dom.linklist[i].className = 'link-alt selected';
 		}
 	},
 
@@ -1291,7 +1291,7 @@ var CScrollBar = Class.create({
 		// left
 		this.dom.info_left = document.createElement('a');
 		this.dom.timeline.appendChild(this.dom.info_left);
-		this.dom.info_left.className = 'info_left link-dotted';
+		this.dom.info_left.className = 'info_left link-alt';
 		this.dom.info_left.appendChild(document.createTextNode('01.01.1970 00:00:00'));
 		this.dom.info_left.setAttribute('data-timestamp', 1);
 
@@ -1303,7 +1303,7 @@ var CScrollBar = Class.create({
 		// right
 		this.dom.info_right = document.createElement('a');
 		this.dom.timeline.appendChild(this.dom.info_right);
-		this.dom.info_right.className = 'info_right link-dotted';
+		this.dom.info_right.className = 'info_right link-alt';
 		this.dom.info_right.appendChild(document.createTextNode('01.01.1970 00:00:00'));
 		this.dom.info_right.setAttribute('data-timestamp', 1);
 
@@ -1377,7 +1377,7 @@ var CScrollBar = Class.create({
 
 		this.dom.period_state = document.createElement('a');
 		this.dom.period.appendChild(this.dom.period_state);
-		this.dom.period_state.className = 'period_state link-dotted';
+		this.dom.period_state.className = 'period_state link-alt';
 		this.dom.period_state.appendChild(document.createTextNode(this.fixedperiod == 1 ? locale['S_FIXED_SMALL'] : locale['S_DYNAMIC_SMALL']));
 		addListener(this.dom.period_state, 'click', this.switchPeriodState.bindAsEventListener(this));
 

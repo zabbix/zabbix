@@ -524,7 +524,7 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 }
 
 foreach ($triggers as $trigger) {
-	$description = new CSpan($trigger['description'], 'link_menu');
+	$description = new CSpan($trigger['description'], ZBX_STYLE_LINK_ACTION.' link_menu');
 	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	if ($showDetails) {
@@ -586,7 +586,7 @@ foreach ($triggers as $trigger) {
 			}
 		}
 
-		$hostName = new CSpan($triggerHost['name'], 'link_menu');
+		$hostName = new CSpan($triggerHost['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
 
 		// add maintenance icon with hint if host is in maintenance
@@ -654,7 +654,7 @@ foreach ($triggers as $trigger) {
 						'acknow.php?'.
 							'triggers[]='.$trigger['triggerid'].
 							'&backurl='.$page['file'],
-						'red link-dotted'
+						ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED
 					), CViewHelper::showNum($trigger['event_count'])
 				));
 			}
@@ -666,7 +666,7 @@ foreach ($triggers as $trigger) {
 							'eventid='.$trigger['lastEvent']['eventid'].
 							'&triggerid='.$trigger['lastEvent']['objectid'].
 							'&backurl='.$page['file'],
-						'green link-dotted'
+						ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN
 				));
 			}
 		}

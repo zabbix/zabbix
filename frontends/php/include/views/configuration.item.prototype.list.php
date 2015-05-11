@@ -81,7 +81,7 @@ foreach ($this->data['items'] as $item) {
 				? 'itemprototype.massenable'
 				: 'itemprototype.massdisable'
 			),
-		itemIndicatorStyle($item['status'])
+		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($item['status'])
 	);
 
 	if (!empty($item['applications'])) {

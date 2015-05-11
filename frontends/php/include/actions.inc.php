@@ -1372,7 +1372,7 @@ function getEventActionsStatus($eventIds) {
 
 		// display
 		if ($notSendCount > 0) {
-			$status = new CSpan(_('In progress'), 'orange');
+			$status = new CSpan(_('In progress'), ZBX_STYLE_ORANGE);
 		}
 		elseif ($mixed == ALERT_STATUS_SENT) {
 			$status = new CSpan(_('Ok'), ZBX_STYLE_GREEN);

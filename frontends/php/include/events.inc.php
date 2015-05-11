@@ -349,10 +349,10 @@ function getEventAckState($event, $url = null, $isLink = true, $params = array()
 		}
 
 		if ($event['acknowledged'] == 0) {
-			$ack = new CLink(_('No'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, ZBX_STYLE_RED_DOTTED);
+			$ack = new CLink(_('No'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED);
 		}
 		else {
-			$ackLink = new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, ZBX_STYLE_GREEN_DOTTED);
+			$ackLink = new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN);
 			if (is_array($event['acknowledges'])) {
 				$ackLinkHints = makeAckTab($event);
 				if (!empty($ackLinkHints)) {
