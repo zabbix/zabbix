@@ -102,7 +102,7 @@ static void	sync_config(void)
 	result = DBselect_once(
 			"select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,"
 				"mt.exec_path,mt.gsm_modem,mt.username,mt.passwd,mt.smtp_port,mt.smtp_security,"
-				"mt.smtp_verify_peer,mt.smtp_verify_host,mt.authentication,m.sendto"
+				"mt.smtp_verify_peer,mt.smtp_verify_host,mt.smtp_authentication,m.sendto"
 			" from media m,users_groups u,config c,media_type mt"
 			" where m.userid=u.userid"
 				" and u.usrgrpid=c.alert_usrgrpid"
