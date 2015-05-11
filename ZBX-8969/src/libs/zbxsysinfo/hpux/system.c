@@ -26,9 +26,13 @@
 
 int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	struct utsname	name;
+#ifdef __GNUC__
+	struct utsname_hpux_v1	name;
+#else
+	struct utsname		name;
+#endif
 
-	if (-1 == uname(&name))
+	if (-1 == uname((struct utsname *)&name))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
