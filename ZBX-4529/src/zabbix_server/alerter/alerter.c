@@ -96,11 +96,11 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 
 		if (0 == access(cmd, X_OK))
 		{
-			send_to = zbx_dyn_escape_string(alert->sendto, "\"\\");
-			subject = zbx_dyn_escape_string(alert->subject, "\"\\");
-			message = zbx_dyn_escape_string(alert->message, "\"\\");
+			send_to = zbx_dyn_escape_shell_single_quote(alert->sendto);
+			subject = zbx_dyn_escape_shell_single_quote(alert->subject);
+			message = zbx_dyn_escape_shell_single_quote(alert->message);
 
-			zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " \"%s\" \"%s\" \"%s\"",
+			zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " '%s' '%s' '%s'",
 					send_to, subject, message);
 
 			zbx_free(send_to);
