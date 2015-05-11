@@ -122,7 +122,7 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'net.tcp.service.perf[service,<ip>,<port>]',
-					'description' => _('Checks performance of service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service')
+					'description' => _('Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service')
 				),
 				array(
 					'key' => 'net.udp.listen[port]',
@@ -134,7 +134,7 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'net.udp.service.perf[service,<ip>,<port>]',
-					'description' => _('Checks performance of service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
+					'description' => _('Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
 				),
 				array(
 					'key' => 'perf_counter[counter,<interval>]',
@@ -400,7 +400,7 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'net.tcp.service.perf[service,<ip>,<port>]',
-					'description' => _('Checks performance of service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service')
+					'description' => _('Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service')
 				),
 				array(
 					'key' => 'net.udp.listen[port]',
@@ -412,7 +412,7 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'net.udp.service.perf[service,<ip>,<port>]',
-					'description' => _('Checks performance of service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
+					'description' => _('Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
 				),
 				array(
 					'key' => 'perf_counter[counter,<interval>]',
@@ -624,11 +624,19 @@ class CHelpItems {
 				),
 				array(
 					'key' => 'net.tcp.service[service,<ip>,<port>]',
-					'description' => _('Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used.')
+					'description' => _('Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running')
 				),
 				array(
 					'key' => 'net.tcp.service.perf[service,<ip>,<port>]',
-					'description' => _('Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used.')
+					'description' => _('Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service')
+				),
+				array(
+					'key' => 'net.udp.service[service,<ip>,<port>]',
+					'description' => _('Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running')
+				),
+				array(
+					'key' => 'net.udp.service.perf[service,<ip>,<port>]',
+					'description' => _('Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
 				),
 				array(
 					'key' => 'vmware.cluster.status[<url>,<name>]',
