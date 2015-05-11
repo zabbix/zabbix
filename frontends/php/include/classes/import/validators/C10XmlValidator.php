@@ -253,7 +253,7 @@ class C10XmlValidator {
 								'name' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
 							'label' =>					['type' => XML_STRING | XML_REQUIRED],
-							'label_location' =>			['type' => XML_STRING | XML_REQUIRED],
+							'label_location' =>			['type' => XML_STRING],
 							'x' =>						['type' => XML_STRING | XML_REQUIRED],
 							'y' =>						['type' => XML_STRING | XML_REQUIRED],
 							'url' =>					['type' => XML_STRING]
