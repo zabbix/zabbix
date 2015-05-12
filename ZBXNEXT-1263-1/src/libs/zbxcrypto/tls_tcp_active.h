@@ -38,5 +38,6 @@ int		zbx_tls_get_attr(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
 int		DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr, zbx_uint64_t *hostid,
 		char **error);
 size_t		DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, size_t psk_buf_len);
+int		zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error);
 
 #endif	/* ZABBIX_TLS_TCP_ACTIVE_H */

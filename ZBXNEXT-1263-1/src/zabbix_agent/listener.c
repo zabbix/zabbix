@@ -38,6 +38,7 @@ extern int		server_num, process_num;
 #endif
 
 #include "../libs/zbxcrypto/tls.h"
+#include "../libs/zbxcrypto/tls_tcp_active.h"
 
 static void	process_listener(zbx_socket_t *s)
 {
@@ -94,6 +95,9 @@ static void	process_listener(zbx_socket_t *s)
 
 ZBX_THREAD_ENTRY(listener_thread, args)
 {
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	char		*msg = NULL;
+#endif
 	int		ret, local_request_failed = 0;
 	zbx_socket_t	s;
 
@@ -125,7 +129,15 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			zbx_setproctitle("listener #%d [processing request]", process_num);
 
 			if (SUCCEED == (ret = zbx_tcp_check_security(&s, CONFIG_HOSTS_ALLOWED, 0)))
-				process_listener(&s);
+			{
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				if (ZBX_TCP_SEC_TLS_CERT != s.connection_type ||
+						SUCCEED == (ret = zbx_check_server_issuer_subject(&s, &msg)))
+#endif
+				{
+					process_listener(&s);
+				}
+			}
 
 			zbx_tcp_unaccept(&s);
 		}
@@ -133,7 +145,18 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		if (SUCCEED == ret || EINTR == zbx_socket_last_error())
 			continue;
 
-		zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s", zbx_socket_strerror());
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		if (NULL != msg)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "failed to accept an incoming connection: %s", msg);
+			zbx_free(msg);
+		}
+		else
+#endif
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "failed to accept an incoming connection: %s",
+					zbx_socket_strerror());
+		}
 
 		if (local_request_failed++ > 1000)
 		{
