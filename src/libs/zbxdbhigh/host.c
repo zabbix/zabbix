@@ -2393,7 +2393,7 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 	DB_ROW			row;
 	char			*sql = NULL;
 	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
-	zbx_application_t	*application;
+	zbx_application_t	*application = NULL;
 	zbx_vector_ptr_t	applications;
 	int			i, j, new_applications = 0, new_application_templates = 0;
 

@@ -75,7 +75,7 @@ return array(
 			'error' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
+				'length' => 2048,
 				'default' => '',
 			),
 			'available' => array(
@@ -184,13 +184,13 @@ return array(
 			'ipmi_error' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
+				'length' => 2048,
 				'default' => '',
 			),
 			'snmp_error' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
+				'length' => 2048,
 				'default' => '',
 			),
 			'jmx_disable_until' => array(
@@ -214,7 +214,7 @@ return array(
 			'jmx_error' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
+				'length' => 2048,
 				'default' => '',
 			),
 			'name' => array(
