@@ -146,7 +146,7 @@ p {
 
 /* Main Navigation */
 nav {
-	background: $secondary-blue;
+	background: darken($primary-blue, 17%);
 
 	a {
 
@@ -203,7 +203,7 @@ nav {
 				line-height: 0;
 				border-left: 7px solid transparent;
 				border-right: 7px solid transparent;
-				border-bottom: 7px solid $secondary-blue;
+				border-bottom: 7px solid darken($primary-blue, 17%);
 			}
 
 			a, a:hover {
@@ -320,11 +320,11 @@ ul.top-nav-icons {
 .top-subnav-container {
 	height: 36px;
 	line-height: 36px;
-	background: $secondary-blue;
+	background: darken($primary-blue, 17%);
 }
 
 .top-subnav {
-	background: $secondary-blue;
+	background: darken($primary-blue, 17%);
 
 	li {
 		display: block;
@@ -348,7 +348,7 @@ ul.top-nav-icons {
 
 	&.selected {
 		@include border-radius(2px);
-		background: lighten($secondary-blue, 10%);
+		background: darken($primary-blue, 7%);
 		color: $link-main-subnav-active-color;
 	}
 }
@@ -1654,8 +1654,8 @@ button {
 }
 
 %button-active {
-	background-color: $secondary-blue;
-	border-color: $secondary-blue;
+	background-color: darken($primary-blue, 17%);
+	border-color: darken($primary-blue, 17%);
 	color: $white;
 }
 

@@ -30,23 +30,26 @@ $body-bg-color: #ebeef0 !default; //NEW page bg color
 $font-color: #1f2c33 !default; //NEW
 $font-alt-color: #768d99 !default; //NEW
 $main-nav-bg-color: #0275b8 !default; //NEW
-$main-subnav-bg-color: #013e61 !default; //NEW
+//$main-subnav-bg-color: #013e61 !default; //NEW
 
 // UI COLORS
 $ui-bg-color: #fff !default; //NEW ui element's bg color: widgets, containers for forms, tables, filters, action menus
-$ui-hover-color: #e8f4fa !default; //NEW light blue hover for table rows, alt buttons, etc.
+$ui-bg-hover-color: #e8f4fa !default; //NEW light blue hover for table rows, alt buttons, etc.
 $ui-border-color: #e8f4fa !default; //NEW
-$action-hover-color: #ebebeb !default; //NEW action menu item, calendar item hover colors
+$action-bg-hover-color: #ebebeb !default; //NEW action menu item, calendar item hover colors
+$action-border-color: #ccd5d9 !default; //NEW action menu item, calendar, all overlay border color
 $table-border-color: #ebeef0 !default; // NEW row separator color in tables
 
 
 // FORM COLORS
-$form-border-color: #fff !default; //NEW
+$form-border-color: #acbbc2 !default; //NEW
 $form-bg-color: #fff !default; //NEW
 $form-disabled-bg-color: #ebebeb !default; //NEW
 
 // BUTTON COLORS
-
+$main-btn-bg-color: #0275b8 !default;
+$alt-btn-bg-color: transparent !default;
+$form-btn-bg-color: transparent !default;
 
 
 
@@ -54,7 +57,7 @@ $form-disabled-bg-color: #ebebeb !default; //NEW
 
 
 $primary-blue: #0275b8 !default; // USED Primary top nav color
-$secondary-blue: #013e61 !default; // USED Secondary top subnav color
+//$secondary-blue: #013e61 !default; // USED Secondary top subnav color
 
 
 $alt-blue: #e8f4fa!default; // USED
