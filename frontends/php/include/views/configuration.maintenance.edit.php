@@ -19,8 +19,7 @@
 **/
 
 
-$maintenanceWidget = new CWidget();
-$maintenanceWidget->addPageHeader(_('CONFIGURATION OF MAINTENANCE PERIODS'));
+$maintenanceWidget = (new CWidget())->setTitle(_('Maintenance periods'));
 
 // create form
 $maintenanceForm = new CForm();
@@ -37,10 +36,12 @@ $maintenanceFormList = new CFormList('maintenanceFormList');
 $nameTextBox = new CTextBox('mname', $this->data['mname'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
 $maintenanceFormList->addRow(_('Name'), $nameTextBox);
-$typeComboBox = new CComboBox('maintenance_type', $this->data['maintenance_type']);
-$typeComboBox->addItem(MAINTENANCE_TYPE_NORMAL, _('With data collection'));
-$typeComboBox->addItem(MAINTENANCE_TYPE_NODATA, _('No data collection'));
-$maintenanceFormList->addRow(_('Maintenance type'), $typeComboBox);
+$maintenanceFormList->addRow(_('Maintenance type'),
+	new CComboBox('maintenance_type', $this->data['maintenance_type'], null, array(
+		MAINTENANCE_TYPE_NORMAL => _('With data collection'),
+		MAINTENANCE_TYPE_NODATA => _('No data collection')
+	))
+);
 
 // active since
 if (isset($_REQUEST['active_since'])) {
@@ -105,14 +106,14 @@ $maintenancePeriodTable->setHeader(array(
 
 foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 	$maintenancePeriodTable->addRow(array(
-		new CCol(timeperiod_type2str($timeperiod['timeperiod_type']), 'nowrap'),
+		new CCol(timeperiod_type2str($timeperiod['timeperiod_type']), ZBX_STYLE_NOWRAP),
 		new CCol(shedule2str($timeperiod), 'wraptext'),
-		new CCol(zbx_date2age(0, $timeperiod['period']), 'nowrap'),
+		new CCol(zbx_date2age(0, $timeperiod['period']), ZBX_STYLE_NOWRAP),
 		new CCol(array(
 			new CSubmit('edit_timeperiodid['.$id.']', _('Edit'), null, 'link_menu'),
 			SPACE.SPACE,
 			new CSubmit('del_timeperiodid['.$id.']', _('Remove'), null, 'link_menu')
-		), 'nowrap')
+		), ZBX_STYLE_NOWRAP)
 	));
 	if (isset($timeperiod['timeperiodid'])) {
 		$maintenanceForm->addVar('timeperiods['.$id.'][timeperiodid]', $timeperiod['timeperiodid']);
@@ -185,11 +186,10 @@ if (!$this->data['form_refresh']) {
 $maintenanceTab->addTab('maintenanceTab', _('Maintenance'), $maintenanceFormList);
 $maintenanceTab->addTab('periodsTab', _('Periods'), $maintenancePeriodFormList);
 $maintenanceTab->addTab('hostTab', _('Hosts & Groups'), $hostsAndGroupsFormList);
-$maintenanceForm->addItem($maintenanceTab);
 
 // append buttons to form
 if (isset($this->data['maintenanceid'])) {
-	$maintenanceForm->addItem(makeFormFooter(
+	$maintenanceTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -199,12 +199,13 @@ if (isset($this->data['maintenanceid'])) {
 	));
 }
 else {
-	$maintenanceForm->addItem(makeFormFooter(
+	$maintenanceTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
 
+$maintenanceForm->addItem($maintenanceTab);
 $maintenanceWidget->addItem($maintenanceForm);
 
 return $maintenanceWidget;

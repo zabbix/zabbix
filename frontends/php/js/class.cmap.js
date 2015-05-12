@@ -202,7 +202,10 @@ ZABBIX.apps.map = (function($) {
 			}
 
 			// create container for forms
-			this.formContainer = $('<div></div>', {id: 'map-window'})
+			this.formContainer = $('<div></div>', {
+					id: 'map-window',
+					class: 'overlay-dialogue',
+					style: 'display:none; position:absolute; top: 50px; left: 500px'})
 				.appendTo('body')
 				.draggable({
 					containment: [0, 0, 3200, 3200]
@@ -556,8 +559,7 @@ ZABBIX.apps.map = (function($) {
 
 					PopUp('popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'
 						+ '&with_applications=1&dstfrm=selementForm'
-						+ ((data.length > 0 && $('#elementType').val() == '4') ? '&hostid='+ data[0].id : ''),
-						450, 450
+						+ ((data.length > 0 && $('#elementType').val() == '4') ? '&hostid='+ data[0].id : '')
 					);
 				});
 
@@ -854,7 +856,7 @@ ZABBIX.apps.map = (function($) {
 			this.sysmap.data.selements[this.id] = this.data;
 
 			// create dom
-			this.domNode = $('<div></div>')
+			this.domNode = $('<div></div>', {style: 'position:absolute'})
 				.appendTo(this.sysmap.container)
 				.addClass('pointer sysmap_element')
 				.attr('data-id', this.id);
@@ -1275,8 +1277,6 @@ ZABBIX.apps.map = (function($) {
 				popup: {
 					parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
 						'&srcfld1=hostid&writeonly=1',
-					width: 450,
-					height: 450,
 					buttonClass: 'button link_menu'
 				}
 			});
@@ -1293,8 +1293,6 @@ ZABBIX.apps.map = (function($) {
 				popup: {
 					parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
 						'&srcfld1=groupid&writeonly=1',
-					width: 450,
-					height: 450,
 					buttonClass: 'button link_menu'
 				}
 			});

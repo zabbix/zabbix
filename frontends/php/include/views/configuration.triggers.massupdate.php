@@ -28,7 +28,7 @@ if (!empty($data['hostid'])) {
 	$triggersWidget->addItem(get_header_host_table('triggers', $data['hostid']));
 }
 
-$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'));
+$triggersWidget->setTitle(_('Triggers'));
 
 // create form
 $triggersForm = new CForm();
@@ -98,7 +98,7 @@ $dependenciesDiv = new CDiv(
 		new CButton('btn1', _('Add'),
 			'return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
 				'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
-				'&with_triggers=1&noempty=1", 1000, 700);',
+				'&with_triggers=1&noempty=1");',
 			'link_menu'
 		)
 	),
@@ -115,17 +115,17 @@ $triggersFormList->addRow(
 	$dependenciesDiv
 );
 
-// append tabs to form
 $triggersTab = new CTabView();
 $triggersTab->addTab('triggersTab', _('Mass update'), $triggersFormList);
-$triggersForm->addItem($triggersTab);
 
 // append buttons to form
-$triggersForm->addItem(makeFormFooter(
+$triggersTab->setFooter(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
 	array(new CButtonCancel(url_param('hostid')))
 ));
 
+// append tabs to form
+$triggersForm->addItem($triggersTab);
 $triggersWidget->addItem($triggersForm);
 
 return $triggersWidget;

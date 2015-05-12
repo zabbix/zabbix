@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 $page['file'] = 'conf.import.php';
 $page['title'] = _('Configuration import');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['hist_arg'] = array();
 
 ob_start();
 

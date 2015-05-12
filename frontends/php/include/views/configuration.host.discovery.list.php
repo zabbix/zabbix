@@ -18,19 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$discoveryWidget = new CWidget();
+$discoveryWidget = (new CWidget())->setTitle(_('Discovery rules'));
 
 // create new discovery rule button
 $createForm = new CForm('get');
 $createForm->cleanItems();
+$controls = new CList();
 $createForm->addVar('hostid', $this->data['hostid']);
-$createForm->addItem(new CSubmit('form', _('Create discovery rule')));
-$discoveryWidget->addPageHeader(_('CONFIGURATION OF DISCOVERY RULES'), $createForm);
+$controls->addItem(new CSubmit('form', _('Create discovery rule')));
+$createForm->addItem($controls);
+$discoveryWidget->setControls($createForm);
 
 // header
-$discoveryWidget->addHeader(_('Discovery rules'));
-$discoveryWidget->addHeaderRowNumber();
 $discoveryWidget->addItem(get_header_host_table('discoveries', $this->data['hostid']));
 
 // create form
@@ -39,10 +38,12 @@ $discoveryForm->setName('discovery');
 $discoveryForm->addVar('hostid', $this->data['hostid']);
 
 // create table
-$discoveryTable = new CTableInfo(_('No discovery rules found.'));
+$discoveryTable = new CTableInfo();
 
 $discoveryTable->setHeader(array(
-	new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');"),
+	new CColHeader(
+		new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');"),
+		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Items'),
 	_('Triggers'),
@@ -62,7 +63,7 @@ foreach ($data['discoveries'] as $discovery) {
 	if ($discovery['templateid']) {
 		$dbTemplate = get_realhost_by_itemid($discovery['templateid']);
 
-		$description[] = new CLink($dbTemplate['name'], '?hostid='.$dbTemplate['hostid'], 'unknown');
+		$description[] = new CLink($dbTemplate['name'], '?hostid='.$dbTemplate['hostid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}
 
@@ -77,14 +78,14 @@ foreach ($data['discoveries'] as $discovery) {
 				? 'discoveryrule.massenable'
 				: 'discoveryrule.massdisable'
 			),
-		itemIndicatorStyle($discovery['status'], $discovery['state'])
+		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($discovery['status'], $discovery['state'])
 	);
 
 	// info
 	if ($data['showInfoColumn']) {
 		if ($discovery['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($discovery['error'])) {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($discovery['error'], 'on');
+			$info->setHint($discovery['error'], ZBX_STYLE_RED);
 		}
 		else {
 			$info = '';
@@ -99,7 +100,7 @@ foreach ($data['discoveries'] as $discovery) {
 	if ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$hostPrototypeLink = array(
 			new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$discovery['itemid']),
-			' ('.$discovery['hostPrototypes'].')'
+			CViewHelper::showNum($discovery['hostPrototypes'])
 		);
 	}
 
@@ -111,25 +112,25 @@ foreach ($data['discoveries'] as $discovery) {
 				_('Item prototypes'),
 				'disc_prototypes.php?parent_discoveryid='.$discovery['itemid']
 			),
-			' ('.$discovery['items'].')'
+			CViewHelper::showNum($discovery['items'])
 		),
 		array(
 			new CLink(
 				_('Trigger prototypes'),
 				'trigger_prototypes.php?parent_discoveryid='.$discovery['itemid']
 			),
-			' ('.$discovery['triggers'].')'
+			CViewHelper::showNum($discovery['triggers'])
 		),
 		array(
 			new CLink(
 				_('Graph prototypes'),
 				'graphs.php?parent_discoveryid='.$discovery['itemid']
 			),
-			' ('.$discovery['graphs'].')'
+			CViewHelper::showNum($discovery['graphs'])
 		),
 		$hostPrototypeLink,
 		$discovery['key_'],
-		$discovery['delay'],
+		convertUnitsS($discovery['delay']),
 		item_type2str($discovery['type']),
 		$status,
 		$info
@@ -140,10 +141,9 @@ zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
 $discoveryForm->addItem(array(
-	$this->data['paging'],
 	$discoveryTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'g_hostdruleid',
+	new CActionButtonList('action', 'g_hostdruleid',
 		array(
 			'discoveryrule.massenable' => array('name' => _('Enable'),
 				'confirm' =>_('Enable selected discovery rules?')
@@ -156,7 +156,7 @@ $discoveryForm->addItem(array(
 			)
 		),
 		$this->data['hostid']
-	))
+	)
 ));
 
 // append form to widget

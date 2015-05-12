@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Notification report');
 $page['file'] = 'report4.php';
-$page['hist_arg'] = array('media_type','period','year');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -63,11 +62,12 @@ while ($media_type_data = DBfetch($db_media_types)) {
 	$media_types[$media_type_data['mediatypeid']] = $media_type_data['description'];
 }
 
+$widget = (new CWidget())->setTitle(_('Notifications'));
+
 // if no media types were defined, we have nothing to show
 if (zbx_empty($media_types)) {
-	show_table_header(_('Notifications'));
-	$table = new CTableInfo(_('No notifications found.'));
-	$table->show();
+	$table = new CTableInfo();
+	$widget->addItem($table)->show();
 }
 else {
 	$table = new CTableInfo();
@@ -85,8 +85,10 @@ else {
 	$form = new CForm();
 	$form->setMethod('get');
 
-	$form->addItem(SPACE._('Media type').SPACE);
-	$cmbMedia = new CComboBox('media_type', $media_type, 'submit();');
+	$controls = new CList();
+
+	$controls->addItem(SPACE._('Media type').SPACE);
+	$cmbMedia = new CComboBox('media_type', $media_type, 'submit()');
 	$cmbMedia->addItem(0, _('all'));
 
 	foreach ($media_types as $media_type_id => $media_type_description) {
@@ -97,31 +99,32 @@ else {
 			unset($media_types[$media_type_id]);
 		}
 	}
-	$form->addItem($cmbMedia);
+	$controls->addItem($cmbMedia);
 
-	$form->addItem(SPACE._('Period').SPACE);
-	$cmbPeriod = new CComboBox('period', $period, 'submit();');
-	$cmbPeriod->addItem('daily', _('Daily'));
-	$cmbPeriod->addItem('weekly', _('Weekly'));
-	$cmbPeriod->addItem('monthly', _('Monthly'));
-	$cmbPeriod->addItem('yearly', _('Yearly'));
-	$form->addItem($cmbPeriod);
+	$controls->addItem(SPACE._('Period').SPACE);
+	$controls->addItem(new CComboBox('period', $period, 'submit()', array(
+		'daily' => _('Daily'),
+		'weekly' => _('Weekly'),
+		'monthly' => _('Monthly'),
+		'yearly' => _('Yearly')
+	)));
 
 	if ($period != 'yearly') {
-		$form->addItem(SPACE._('Year').SPACE);
+		$controls->addItem(SPACE._('Year').SPACE);
 		$cmbYear = new CComboBox('year', $year, 'submit();');
 		for ($y = $minYear; $y <= date('Y'); $y++) {
 			$cmbYear->addItem($y, $y);
 		}
-		$form->addItem($cmbYear);
+		$controls->addItem($cmbYear);
 	}
 
-	show_table_header(_('Notifications'), $form);
+	$form->addItem($controls);
+	$widget->setControls($form);
 
 	$header = array();
 	$db_users = DBselect('SELECT u.* FROM users u ORDER BY u.alias,u.userid');
 	while ($user_data = DBfetch($db_users)) {
-		$header[] = new CCol($user_data['alias'], 'vertical_rotation');
+		$header[] = new CColHeader($user_data['alias'], 'vertical_rotation');
 		$users[$user_data['userid']] = $user_data['alias'];
 	}
 
@@ -131,7 +134,7 @@ else {
 			$minTime = mktime(0, 0, 0, 1, 1, $minYear);
 
 			$dateFormat = _x('Y', DATE_FORMAT_CONTEXT);
-			array_unshift($header, new CCol(_('Year'), 'center'));
+			array_unshift($header, _('Year'));
 
 			for ($i = $minYear; $i <= date('Y'); $i++) {
 				$intervals[mktime(0, 0, 0, 1, 1, $i)] = mktime(0, 0, 0, 1, 1, $i + 1);
@@ -143,7 +146,7 @@ else {
 			$minTime = mktime(0, 0, 0, 1, 1, $year);
 
 			$dateFormat = _x('F', DATE_FORMAT_CONTEXT);
-			array_unshift($header, new CCol(_('Month'),'center'));
+			array_unshift($header, _('Month'));
 
 			$max = ($year == $currentYear) ? date('n') : 12;
 			for ($i = 1; $i <= $max; $i++) {
@@ -156,7 +159,7 @@ else {
 			$minTime = mktime(0, 0, 0, 1, 1, $year);
 
 			$dateFormat = DATE_FORMAT;
-			array_unshift($header, new CCol(_('Day'),'center'));
+			array_unshift($header, _('Day'));
 
 			$max = ($year == $currentYear) ? date('z') : DAY_IN_YEAR;
 			for ($i = 1; $i <= $max; $i++) {
@@ -172,7 +175,7 @@ else {
 			$minTime = $time - $wd * SEC_PER_DAY;
 
 			$dateFormat = DATE_TIME_FORMAT;
-			array_unshift($header, new CCol(_('From'), 'center'), new CCol(_('Till'), 'center'));
+			array_unshift($header, _('From'), _('Till'));
 
 			$max = ($year == $currentYear) ? date('W') - 1 : 52;
 			for ($i = 0; $i <= $max; $i++) {
@@ -246,7 +249,8 @@ else {
 
 		$table->addRow($row);
 	}
-	$table->show();
+
+	$widget->addItem($table)->show();
 
 	if ($media_type == 0) {
 		echo BR();

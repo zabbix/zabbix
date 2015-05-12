@@ -18,12 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of icon mapping');
 $page['file'] = 'adm.iconmapping.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -105,30 +103,35 @@ elseif (isset($_REQUEST['clone'])) {
 /*
  * Display
  */
-$generalComboBox = new CComboBox('configDropDown', 'adm.iconmapping.php', 'redirect(this.options[this.selectedIndex].value);');
-$generalComboBox->addItems(array(
-	'adm.gui.php' => _('GUI'),
-	'adm.housekeeper.php' => _('Housekeeping'),
-	'adm.images.php' => _('Images'),
-	'adm.iconmapping.php' => _('Icon mapping'),
-	'adm.regexps.php' => _('Regular expressions'),
-	'adm.macros.php' => _('Macros'),
-	'adm.valuemapping.php' => _('Value mapping'),
-	'adm.workingtime.php' => _('Working time'),
-	'adm.triggerseverities.php' => _('Trigger severities'),
-	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-	'adm.other.php' => _('Other')
-));
+$iconMapWidget = (new CWidget())->setTitle(_('Icon mapping'));
+
 $iconMapForm = new CForm();
 $iconMapForm->cleanItems();
-$iconMapForm->addItem($generalComboBox);
+
+$controls = new CList();
+$controls->addItem(new CComboBox('configDropDown', 'adm.iconmapping.php',
+	'redirect(this.options[this.selectedIndex].value);',
+	array(
+		'adm.gui.php' => _('GUI'),
+		'adm.housekeeper.php' => _('Housekeeping'),
+		'adm.images.php' => _('Images'),
+		'adm.iconmapping.php' => _('Icon mapping'),
+		'adm.regexps.php' => _('Regular expressions'),
+		'adm.macros.php' => _('Macros'),
+		'adm.valuemapping.php' => _('Value mapping'),
+		'adm.workingtime.php' => _('Working time'),
+		'adm.triggerseverities.php' => _('Trigger severities'),
+		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
+		'adm.other.php' => _('Other')
+	)
+));
 
 if (!isset($_REQUEST['form'])) {
-	$iconMapForm->addItem(new CSubmit('form', _('Create icon map')));
+	$controls->addItem(new CSubmit('form', _('Create icon map')));
 }
 
-$iconMapWidget = new CWidget();
-$iconMapWidget->addPageHeader(_('CONFIGURATION OF ICON MAPPING'), $iconMapForm);
+$iconMapForm->addItem($controls);
+$iconMapWidget->setControls($iconMapForm);
 
 $data = array(
 	'form_refresh' => getRequest('form_refresh', 0),
@@ -173,8 +176,6 @@ if (isset($_REQUEST['form'])) {
 	$iconMapView = new CView('administration.general.iconmap.edit', $data);
 }
 else {
-	$iconMapWidget->addHeader(_('Icon mapping'));
-
 	$data['iconmaps'] = API::IconMap()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
@@ -186,7 +187,6 @@ else {
 	$iconMapView = new CView('administration.general.iconmap.list', $data);
 }
 
-$iconMapWidget->addItem($iconMapView->render());
-$iconMapWidget->show();
+$iconMapWidget->addItem($iconMapView->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

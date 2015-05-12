@@ -28,7 +28,7 @@ if (!empty($this->data['hostid'])) {
 	$triggersWidget->addItem(get_header_host_table('triggers', $this->data['hostid']));
 }
 
-$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'));
+$triggersWidget->setTitle(_('Triggers'));
 
 // create form
 $triggersForm = new CForm();
@@ -70,8 +70,8 @@ $addExpressionButton = new CButton(
 	'insert',
 	($this->data['input_method'] == IM_TREE) ? _('Edit') : _('Add'),
 	'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
-		'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression'.
-		'&srcfld1=expression&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()), 800, 265);',
+		'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression&srcfld1=expression'.
+		'&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()));',
 	'button-form top'
 );
 if ($this->data['limited']) {
@@ -298,7 +298,7 @@ $dependenciesFormList->addRow(
 			$dependenciesTable,
 			new CButton('bnt1', _('Add'),
 				'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
-					'&with_triggers=1&noempty=1", 1000, 700);',
+					'&with_triggers=1&noempty=1");',
 				'link_menu'
 			)
 		),
@@ -306,9 +306,6 @@ $dependenciesFormList->addRow(
 	)
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
-
-// append tabs to form
-$triggersForm->addItem($triggersTab);
 
 // append buttons to form
 if (!empty($this->data['triggerid'])) {
@@ -319,7 +316,7 @@ if (!empty($this->data['triggerid'])) {
 		$deleteButton->setAttribute('disabled', 'disabled');
 	}
 
-	$triggersForm->addItem(makeFormFooter(
+	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -329,11 +326,14 @@ if (!empty($this->data['triggerid'])) {
 	));
 }
 else {
-	$triggersForm->addItem(makeFormFooter(
+	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('hostid')))
 	));
 }
+
+// append tabs to form
+$triggersForm->addItem($triggersTab);
 
 $triggersWidget->addItem($triggersForm);
 

@@ -27,6 +27,26 @@ class CScreenTriggersInfo extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		return $this->getOutput(new CTriggersInfo($this->screenitem['resourceid'], null, $this->screenitem['style']));
+
+			$groupid = $this->screenitem['resourceid'];
+			$style = $this->screenitem['style'];
+
+			$table = new CTriggersInfo($groupid, null, $style);
+
+			if ($groupid != 0) {
+				$group = get_hostgroup_by_groupid($groupid);
+				$header_str = _('Group').SPACE.'&quot;'.$group['name'].'&quot;';
+			}
+			else {
+				$header_str = _('All groups');
+			}
+
+			$header = new CColHeader($header_str);
+			if ($style == STYLE_HORIZONTAL) {
+				$header->setColSpan(8);
+			}
+			$table->setHeader(array($header));
+
+			return $this->getOutput($table);
 	}
 }

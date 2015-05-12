@@ -19,15 +19,13 @@
 **/
 
 
-$itemWidget = new CWidget();
+$itemWidget = (new CWidget())->setTitle($this->data['page_header']);
 
 if (!empty($this->data['hostid'])) {
 	$itemWidget->addItem(get_header_host_table('discoveries', $this->data['hostid'],
 		isset($this->data['parent_discoveryid']) ? $this->data['parent_discoveryid'] : null
 	));
 }
-
-$itemWidget->addPageHeader($this->data['page_header']);
 
 // create form
 $itemForm = new CForm();
@@ -93,7 +91,7 @@ if (!empty($this->data['interfaces'])) {
 		$interfacesComboBox->addItem($interfaceGroup);
 	}
 
-	$span = new CSpan(_('No interface found'), 'red');
+	$span = new CSpan(_('No interface found'), ZBX_STYLE_RED);
 	$span->setAttribute('id', 'interface_not_defined');
 	$span->setAttribute('style', 'display: none;');
 
@@ -118,10 +116,11 @@ $itemFormList->addRow(_('Security name'),
 );
 
 // append snmpv3 security level to form list
-$securityLevelComboBox = new CComboBox('snmpv3_securitylevel', $this->data['snmpv3_securitylevel']);
-$securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'noAuthNoPriv');
-$securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'authNoPriv');
-$securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'authPriv');
+$securityLevelComboBox = new CComboBox('snmpv3_securitylevel', $this->data['snmpv3_securitylevel'], null, array(
+	ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
+	ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
+	ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
+));
 $itemFormList->addRow(_('Security level'), $securityLevelComboBox, false, 'row_snmpv3_securitylevel');
 $authProtocolRadioButton = array(
 	new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5, null, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_MD5),
@@ -160,9 +159,10 @@ $itemFormList->addRow(_('IPMI sensor'),
 );
 
 // append authentication method to form list
-$authTypeComboBox = new CComboBox('authtype', $this->data['authtype']);
-$authTypeComboBox->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
-$authTypeComboBox->addItem(ITEM_AUTHTYPE_PUBLICKEY, _('Public key'));
+$authTypeComboBox = new CComboBox('authtype', $this->data['authtype'], null, array(
+	ITEM_AUTHTYPE_PASSWORD => _('Password'),
+	ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+));
 $itemFormList->addRow(_('Authentication method'), $authTypeComboBox, false, 'row_authtype');
 $itemFormList->addRow(_('User name'),
 	new CTextBox('username', $this->data['username'], ZBX_TEXTBOX_SMALL_SIZE, false, 64), false, 'row_username'
@@ -238,7 +238,7 @@ $newFlexInt = new CSpan(array(
 ));
 $newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
 
-$maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), 'red');
+$maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), ZBX_STYLE_RED);
 $maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');
 $maxFlexMsg->setAttribute('style', 'display: none;');
 
@@ -262,7 +262,7 @@ $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 /*
  * Condition tab
  */
-$conditionFormList = new CFormList('conditionlist');
+$conditionFormList = new CFormList();
 
 // type of calculation
 $formula = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
@@ -343,7 +343,6 @@ if (!hasRequest('form_refresh')) {
 }
 $itemTab->addTab('itemTab', $this->data['caption'], $itemFormList);
 $itemTab->addTab('macroTab', _('Filters'), $conditionFormList);
-$itemForm->addItem($itemTab);
 
 // append buttons to form
 if (!empty($this->data['itemid'])) {
@@ -358,14 +357,16 @@ if (!empty($this->data['itemid'])) {
 
 	$buttons[] = new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'));
 
-	$itemForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$itemTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
-	$itemForm->addItem(makeFormFooter(
+	$itemTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')))
 	));
 }
+
+$itemForm->addItem($itemTab);
 $itemWidget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.edit.js.php';

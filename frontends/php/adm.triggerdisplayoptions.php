@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of trigger displaying options');
 $page['file'] = 'adm.triggerdisplayoptions.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -77,9 +76,13 @@ if (hasRequest('update')) {
 /*
  * Display
  */
+$cnf_wdgt = (new CWidget())->setTitle(_('Trigger displaying options'));
+
 $form = new CForm();
 $form->cleanItems();
-$cmbConf = new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php',
+
+$controls = new CList();
+$controls->addItem(new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php',
 	'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
@@ -94,11 +97,10 @@ $cmbConf = new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php',
 		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 		'adm.other.php' => _('Other')
 	)
-);
-$form->addItem($cmbConf);
+));
 
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
+$form->addItem($controls);
+$cnf_wdgt->setControls($form);
 
 $config = select_config();
 
@@ -133,7 +135,6 @@ else {
 }
 
 $triggerDisplayingForm = new CView('administration.general.triggerDisplayOptions.edit', $data);
-$cnf_wdgt->addItem($triggerDisplayingForm->render());
-$cnf_wdgt->show();
+$cnf_wdgt->addItem($triggerDisplayingForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

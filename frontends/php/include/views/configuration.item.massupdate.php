@@ -19,13 +19,11 @@
 **/
 
 
-$itemWidget = new CWidget();
+$itemWidget = (new CWidget())->setTitle(_('Items'));
 
 if (!empty($this->data['hostid'])) {
 	$itemWidget->addItem(get_header_host_table('items', $this->data['hostid']));
 }
-
-$itemWidget->addPageHeader(_('CONFIGURATION OF ITEMS'));
 
 // create form
 $itemForm = new CForm();
@@ -38,15 +36,13 @@ $itemForm->addVar('action', $this->data['action']);
 $itemFormList = new CFormList('itemFormList');
 
 // append type to form list
-$typeComboBox = new CComboBox('type', $this->data['type']);
-$typeComboBox->addItems($this->data['itemTypes']);
 $itemFormList->addRow(
 	array(
 		_('Type'),
 		SPACE,
 		new CVisibilityBox('visible[type]', isset($this->data['visible']['type']), 'type', _('Original'))
 	),
-	$typeComboBox
+	new CComboBox('type', $this->data['type'], null, $this->data['itemTypes'])
 );
 
 // append hosts to form list
@@ -74,7 +70,7 @@ if ($this->data['displayInterfaces']) {
 		$interfacesComboBox->addItem($interfaceGroup);
 	}
 
-	$span = new CSpan(_('No interface found'), 'red');
+	$span = new CSpan(_('No interface found'), ZBX_STYLE_RED);
 	$span->setAttribute('id', 'interface_not_defined');
 	$span->setAttribute('style', 'display: none;');
 
@@ -120,17 +116,17 @@ $itemFormList->addRow(
 );
 
 // append snmpv3 securitylevel to form list
-$securityLevelComboBox = new CComboBox('snmpv3_securitylevel', $this->data['snmpv3_securitylevel']);
-$securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'noAuthNoPriv');
-$securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'authNoPriv');
-$securityLevelComboBox->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'authPriv');
 $itemFormList->addRow(
 	array(
 		_('Security level'),
 		SPACE,
 		new CVisibilityBox('visible[securitylevel]', isset($this->data['visible']['securitylevel']), 'snmpv3_securitylevel', _('Original'))
 	),
-	$securityLevelComboBox
+	new CComboBox('snmpv3_securitylevel', $this->data['snmpv3_securitylevel'], null, array(
+		ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
+		ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
+		ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
+	))
 );
 
 // append snmpv3 authprotocol to form list
@@ -204,31 +200,29 @@ $itemFormList->addRow(
 );
 
 // append value type to form list
-$valueTypeComboBox = new CComboBox('value_type', $this->data['value_type']);
-$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_UINT64, _('Numeric (unsigned)'));
-$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_FLOAT, _('Numeric (float)'));
-$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_STR, _('Character'));
-$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_LOG, _('Log'));
-$valueTypeComboBox->addItem(ITEM_VALUE_TYPE_TEXT, _('Text'));
 $itemFormList->addRow(
 	array(
 		_('Type of information'),
 		SPACE,
 		new CVisibilityBox('visible[value_type]', isset($this->data['visible']['value_type']), 'value_type', _('Original'))
 	),
-	$valueTypeComboBox
+	new CComboBox('value_type', $this->data['value_type'], null, array(
+		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+		ITEM_VALUE_TYPE_STR => _('Character'),
+		ITEM_VALUE_TYPE_LOG => _('Log'),
+		ITEM_VALUE_TYPE_TEXT => _('Text')
+	))
 );
 
 // append data type to form list
-$dataTypeComboBox = new CComboBox('data_type', $this->data['data_type']);
-$dataTypeComboBox->addItems(item_data_type2str());
 $itemFormList->addRow(
 	array(
 		_('Data type'),
 		SPACE,
 		new CVisibilityBox('visible[data_type]', isset($this->data['visible']['data_type']), 'data_type', _('Original'))
 	),
-	$dataTypeComboBox
+	new CComboBox('data_type', $this->data['data_type'], null, item_data_type2str())
 );
 
 // append units to form list
@@ -242,16 +236,16 @@ $itemFormList->addRow(
 );
 
 // append authtype to form list
-$authTypeComboBox = new CComboBox('authtype', $this->data['authtype']);
-$authTypeComboBox->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
-$authTypeComboBox->addItem(ITEM_AUTHTYPE_PUBLICKEY, _('Public key'));
 $itemFormList->addRow(
 	array(
 		_('Authentication method'),
 		SPACE,
 		new CVisibilityBox('visible[authtype]', isset($this->data['visible']['authtype']), 'authtype', _('Original'))
 	),
-	$authTypeComboBox
+	new CComboBox('authtype', $this->data['authtype'], null, array(
+		ITEM_AUTHTYPE_PASSWORD => _('Password'),
+		ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+	))
 );
 
 // append username to form list
@@ -369,7 +363,7 @@ $newFlexInt = new CDiv(
 	'row-new-delay-flex-fields'
 );
 
-$maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), 'red');
+$maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), ZBX_STYLE_RED);
 $maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');
 $maxFlexMsg->setAttribute('style', 'display: none;');
 
@@ -420,17 +414,17 @@ $itemFormList->addRow(
 );
 
 // append delta to form list
-$deltaComboBox = new CComboBox('delta', $this->data['delta']);
-$deltaComboBox->addItem(0, _('As is'));
-$deltaComboBox->addItem(1, _('Delta (speed per second)'));
-$deltaComboBox->addItem(2, _('Delta (simple change)'));
 $itemFormList->addRow(
 	array(
 		_('Store value'),
 		SPACE,
 		new CVisibilityBox('visible[delta]', isset($this->data['visible']['delta']), 'delta', _('Original'))
 	),
-	$deltaComboBox
+	new CComboBox('delta', $this->data['delta'], null, array(
+		0 => _('As is'),
+		1 => _('Delta (speed per second)'),
+		2 => _('Delta (simple change)')
+	))
 );
 
 // append valuemap to form list
@@ -485,9 +479,7 @@ if ($this->data['displayApplications']) {
 		'data' => $appToReplace,
 		'popup' => array(
 			'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=applications_'.
-				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid'],
-			'width' => 450,
-			'height' => 450
+				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid']
 		)
 	)), null, 'replaceApp');
 
@@ -536,9 +528,7 @@ if ($this->data['displayApplications']) {
 		'addNew' => true,
 		'popup' => array(
 			'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=new_applications_'.
-				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid'],
-			'width' => 450,
-			'height' => 450
+				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid']
 		)
 	)), null, 'newApp');
 
@@ -564,13 +554,14 @@ $itemFormList->addRow(
 // append tabs to form
 $itemTab = new CTabView();
 $itemTab->addTab('itemTab', _('Mass update'), $itemFormList);
-$itemForm->addItem($itemTab);
 
 // append buttons to form
-$itemForm->addItem(makeFormFooter(
+$itemTab->setFooter(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
 	array(new CButtonCancel(url_param('groupid').url_param('hostid')))
 ));
+
+$itemForm->addItem($itemTab);
 $itemWidget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';

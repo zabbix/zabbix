@@ -25,9 +25,7 @@ global $ZBX_MESSAGES;
 
 $service = $this->data['service'];
 
-$servicesWidget = new CWidget();
-$servicesWidget->setRootClass('services-edit');
-$servicesWidget->addPageHeader(_('CONFIGURATION OF IT SERVICES'));
+$servicesWidget = (new CWidget())->setTitle(_('Configuration of IT services'));
 
 // create form
 $servicesForm = new CForm();
@@ -57,9 +55,9 @@ $servicesFormList->addRow(_('Parent service'), array(
 ));
 
 // append algorithm to form list
-$algorithmComboBox = new CComboBox('algorithm', $this->data['algorithm']);
-$algorithmComboBox->addItems(serviceAlgorythm());
-$servicesFormList->addRow(_('Status calculation algorithm'), $algorithmComboBox);
+$servicesFormList->addRow(_('Status calculation algorithm'),
+	new CComboBox('algorithm', $this->data['algorithm'], null, serviceAlgorythm())
+);
 
 // append SLA to form list
 $showslaCheckbox = new CCheckBox('showsla', ($this->data['showsla'] == 0) ? 'no' : 'yes', null, 1);
@@ -260,10 +258,13 @@ else {
 	$servicesForm->addVar('new_service_time[note]', '');
 }
 
-$timeTypeComboBox = new CComboBox('new_service_time[type]', $this->data['new_service_time']['type'], 'javascript: document.forms[0].action += \'?form=1\'; submit();');
-$timeTypeComboBox->addItem(SERVICE_TIME_TYPE_UPTIME, _('Uptime'));
-$timeTypeComboBox->addItem(SERVICE_TIME_TYPE_DOWNTIME, _('Downtime'));
-$timeTypeComboBox->addItem(SERVICE_TIME_TYPE_ONETIME_DOWNTIME, _('One-time downtime'));
+$timeTypeComboBox = new CComboBox('new_service_time[type]', $this->data['new_service_time']['type'], 'submit()',
+	array(
+		SERVICE_TIME_TYPE_UPTIME => _('Uptime'),
+		SERVICE_TIME_TYPE_DOWNTIME => _('Downtime'),
+		SERVICE_TIME_TYPE_ONETIME_DOWNTIME => _('One-time downtime')
+	)
+);
 $servicesTimeFormList->addRow(
 	_('New service time'),
 	new CDiv(array(
@@ -284,7 +285,6 @@ if (!$this->data['form_refresh']) {
 $servicesTab->addTab('servicesTab', _('Service'), $servicesFormList);
 $servicesTab->addTab('servicesDependenciesTab', _('Dependencies'), $servicesDependenciesFormList);
 $servicesTab->addTab('servicesTimeTab', _('Time'), $servicesTimeFormList);
-$servicesForm->addItem($servicesTab);
 
 // append buttons to form
 if ($service['serviceid']) {
@@ -296,17 +296,19 @@ if ($service['serviceid']) {
 		));
 	}
 
-	$servicesForm->addItem(makeFormFooter(
+	$servicesTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update'), 'javascript: document.forms[0].action += \'?saction=1\';'),
 		$buttons
 	));
 }
 else {
-	$servicesForm->addItem(makeFormFooter(
+	$servicesTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add'), 'javascript: document.forms[0].action += \'?saction=1\';'),
 		array(new CButtonCancel())
 	));
 }
+
+$servicesForm->addItem($servicesTab);
 
 // append form to widget
 $servicesWidget->addItem($servicesForm);
