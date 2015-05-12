@@ -18,25 +18,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$screenWidget = new CWidget();
+$screenWidget = (new CWidget())->setTitle(_('Screens'));
 
 // create new screen button
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$createForm->addItem(new CSubmit('form', _('Create screen')));
+$createForm = (new CForm('get'))->cleanItems();
+$controls = new CList();
+$controls->addItem(new CSubmit('form', _('Create screen')));
 if (!empty($this->data['templateid'])) {
 	$createForm->addVar('templateid', $this->data['templateid']);
 	$screenWidget->addItem(get_header_host_table('screens', $this->data['templateid']));
 }
 else {
-	$createForm->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=screen")'));
+	$controls->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=screen")'));
 }
-$screenWidget->addPageHeader(_('CONFIGURATION OF SCREENS'), $createForm);
-
-// header
-$screenWidget->addHeader(_('Screens'));
-$screenWidget->addHeaderRowNumber();
+$createForm->addItem($controls);
+$screenWidget->setControls($createForm);
 
 // create form
 $screenForm = new CForm();
@@ -45,9 +41,11 @@ $screenForm->setName('screenForm');
 $screenForm->addVar('templateid', $this->data['templateid']);
 
 // create table
-$screenTable = new CTableInfo(_('No screens found.'));
+$screenTable = new CTableInfo();
 $screenTable->setHeader(array(
-	new CCheckBox('all_screens', null, "checkAll('".$screenForm->getName()."', 'all_screens', 'screens');"),
+	new CColHeader(
+		new CCheckBox('all_screens', null, "checkAll('".$screenForm->getName()."', 'all_screens', 'screens');"),
+		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Dimension (cols x rows)'),
 	_('Screen')
@@ -56,9 +54,9 @@ $screenTable->setHeader(array(
 foreach ($this->data['screens'] as $screen) {
 	$screenTable->addRow(array(
 		new CCheckBox('screens['.$screen['screenid'].']', null, null, $screen['screenid']),
-		new CLink($screen['name'], 'screenedit.php?screenid='.$screen['screenid'].url_param('templateid')),
+		new CLink($screen['name'], '?form=update&screenid='.$screen['screenid'].url_param('templateid')),
 		$screen['hsize'].' x '.$screen['vsize'],
-		new CLink(_('Edit'), '?form=update&screenid='.$screen['screenid'].url_param('templateid'))
+		new CLink(_('Edit'), 'screenedit.php?screenid='.$screen['screenid'].url_param('templateid'))
 	));
 }
 
@@ -71,10 +69,9 @@ $buttonsArray['screen.massdelete'] = array('name' => _('Delete'), 'confirm' => _
 
 // append table to form
 $screenForm->addItem(array(
-	$this->data['paging'],
 	$screenTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'screens', $buttonsArray))
+	new CActionButtonList('action', 'screens', $buttonsArray)
 ));
 
 // append form to widget

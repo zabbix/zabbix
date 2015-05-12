@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 
 $page['title'] = _('Dashboard configuration');
 $page['file'] = 'dashconf.php';
-$page['hist_arg'] = array();
 $page['scripts'] = array('multiselect.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

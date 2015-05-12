@@ -18,56 +18,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$auditWidget = new CWidget();
-
-// header
-$configForm = new CForm('get');
-$configForm->addItem(new CComboBox('config', 'auditacts.php', 'redirect(this.options[this.selectedIndex].value);',
-	array(
-		'auditlogs.php' => _('Audit log'),
-		'auditacts.php' => _('Action log')
-	)
-));
-$auditWidget->addPageHeader(_('ACTION LOG'), $configForm);
-$auditWidget->addHeader(_('Action log'));
-$auditWidget->addHeaderRowNumber();
+$auditWidget = (new CWidget())->setTitle(_('Action log'));
 
 // create filter
-$filterForm = new CForm('get');
-$filterForm->setAttribute('name', 'zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
-$filterTable = new CTable('', 'filter filter-center');
-$filterTable->addRow(array(array(
-	bold(_('Recipient')),
-	' ',
-	new CTextBox('alias', $this->data['alias'], 20),
-	new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm='.$filterForm->getName().
-		'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");',
-		'button-form'
+$filterForm = new CFilter('web.auditacts.filter.state');
+
+$filterColumn = new CFormList();
+$filterColumn->addRow(
+	_('Recipient'),
+	array (
+		new CTextBox('alias', $this->data['alias'], 20),
+		new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm=zbx_filter'.
+			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
+		)
 	)
-)));
+);
 
-$filterButton = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput shadow');
-$filterButton->main();
-
-$resetButton = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput shadow');
-
-$buttonsDiv = new CDiv(array($filterButton, $resetButton));
-$buttonsDiv->setAttribute('style', 'padding: 4px 0px;');
-
-$filterTable->addRow(new CCol($buttonsDiv, 'controls'));
-$filterForm->addItem($filterTable);
-
-$auditWidget->addFlicker($filterForm, CProfile::get('web.auditacts.filter.state', 1));
-$auditWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.auditacts.filter.state', 1));
+$filterForm->addColumn($filterColumn);
+$filterForm->addNavigator();
+$auditWidget->addItem($filterForm);
 
 // create form
 $auditForm = new CForm('get');
 $auditForm->setName('auditForm');
 
 // create table
-$auditTable = new CTableInfo(_('No action log entries found.'));
+$auditTable = new CTableInfo();
 $auditTable->setHeader(array(
 	_('Time'),
 	_('Action'),
@@ -83,18 +59,18 @@ foreach ($this->data['alerts'] as $alert) {
 
 	if ($alert['status'] == ALERT_STATUS_SENT) {
 		$status = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
-			? new CSpan(_('Sent'), 'green')
-			: new CSpan(_('Executed'), 'green');
+			? new CSpan(_('Sent'), ZBX_STYLE_GREEN)
+			: new CSpan(_('Executed'), ZBX_STYLE_GREEN);
 	}
 	elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
 		$status = new CSpan(array(
 			_('In progress').':',
 			BR(),
 			_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries']),
-		), 'orange');
+		), ZBX_STYLE_ORANGE);
 	}
 	else {
-		$status = new CSpan(_('Not sent'), 'red');
+		$status = new CSpan(_('Not sent'), ZBX_STYLE_RED);
 	}
 
 	$message = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
@@ -119,7 +95,7 @@ foreach ($this->data['alerts'] as $alert) {
 	}
 	else {
 		$info = new CDiv(SPACE, 'status_icon iconerror');
-		$info->setHint($alert['error'], 'on');
+		$info->setHint($alert['error'], ZBX_STYLE_RED);
 	}
 
 	$recipient = (isset($alert['userid']) && $alert['userid'])
@@ -127,18 +103,18 @@ foreach ($this->data['alerts'] as $alert) {
 		: $alert['sendto'];
 
 	$auditTable->addRow(array(
-		new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']), 'top'),
-		new CCol($this->data['actions'][$alert['actionid']]['name'], 'top'),
-		new CCol(($mediatype) ? $mediatype['description'] : '-', 'top'),
-		new CCol($recipient, 'top'),
-		new CCol($message, 'wraptext top'),
-		new CCol($status, 'top'),
-		new CCol($info, 'top')
+		new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock'])),
+		new CCol($this->data['actions'][$alert['actionid']]['name']),
+		new CCol(($mediatype) ? $mediatype['description'] : '-'),
+		new CCol($recipient),
+		new CCol($message),
+		new CCol($status),
+		new CCol($info)
 	));
 }
 
 // append table to form
-$auditForm->addItem(array($this->data['paging'], $auditTable, $this->data['paging']));
+$auditForm->addItem(array($auditTable, $this->data['paging']));
 
 // append navigation bar js
 $objData = array(

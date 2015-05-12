@@ -59,3 +59,9 @@ dbschema: dbschema_ibm_db2 dbschema_mysql dbschema_oracle dbschema_postgresql db
 
 gettext:
 	frontends/php/locale/make_mo.sh
+
+css:
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/screen.scss frontends/php/styles/zabbix.css
+	cp frontends/php/styles/zabbix.css sass/stylesheets/screen.css
+	cp sass/img/icon-sprite.png frontends/php/img/
+	cp sass/img/preload.gif frontends/php/img/

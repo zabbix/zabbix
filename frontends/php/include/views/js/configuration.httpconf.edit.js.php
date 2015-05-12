@@ -165,7 +165,7 @@
 					stepNames += '&steps_names[]=' + $(stepName).val();
 				});
 
-				return PopUp('popup_httpstep.php?dstfrm=httpForm' + stepNames, 600, 542);
+				return PopUp('popup_httpstep.php?dstfrm=httpForm' + stepNames);
 			});
 		<?php endif ?>
 
@@ -192,7 +192,7 @@
 					+ '<?php echo url_param($step['headers'], false, 'headers'); ?>'
 					+ '<?php echo url_param($step['retrieve_mode'], false, 'retrieve_mode'); ?>'
 					+ '<?php echo url_param($step['follow_redirects'], false, 'follow_redirects'); ?>'
-					+ stepNames, 600, 542);
+					+ stepNames);
 			});
 		<?php endforeach ?>
 

@@ -21,7 +21,7 @@
 
 include('include/views/js/administration.general.triggerDisplayOptions.js.php');
 
-$triggerDOFormList = new CFormList('scriptsTab');
+$triggerDOFormList = new CFormList();
 
 $headerDiv = new CDiv(_('Colour'), 'inlineblock trigger_displaying_form_col');
 $headerDiv->addStyle('margin-left: 2px;');
@@ -95,10 +95,12 @@ $severityView->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFo
 
 $severityForm = new CForm();
 $severityForm->setName('triggerDisplayOptions');
-$severityForm->addItem($severityView);
-$severityForm->addItem(makeFormFooter(
+
+$severityView->setFooter(makeFormFooter(
 	new CSubmit('update', _('Update')),
 	array(new CButton('resetDefaults', _('Reset defaults')))
 ));
+
+$severityForm->addItem($severityView);
 
 return $severityForm;

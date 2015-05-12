@@ -19,7 +19,7 @@
 **/
 
 
-$valueMappingTable = new CTableInfo(_('No value maps found.'));
+$valueMappingTable = new CTableInfo();
 $valueMappingTable->setHeader(array(
 	_('Name'),
 	_('Value map')

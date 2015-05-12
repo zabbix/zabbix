@@ -18,28 +18,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$auditWidget = new CWidget();
+$auditWidget = (new CWidget())->setTitle(_('Audit log'));
 
 // header
-$configForm = new CForm('get');
-$configForm->addItem(new CComboBox('config', 'auditlogs.php', 'redirect(this.options[this.selectedIndex].value);',
-	array(
-		'auditlogs.php' => _('Audit log'),
-		'auditacts.php' => _('Action log')
+// create filter
+$filterForm = new CFilter('web.auditlogs.filter.state');
+
+$filterColumn = new CFormList();
+$filterColumn->addRow(_('User'), array(
+	new CTextBox('alias', $this->data['alias'], 20),
+	new CButton('btn1', _('Select'),
+		'return PopUp("popup.php?dstfrm=zbx_filter&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
 	)
 ));
-$auditWidget->addPageHeader(_('AUDIT LOG'), $configForm);
-$auditWidget->addHeader(_('Audit log'));
-$auditWidget->addHeaderRowNumber();
-
-// create filter
-$filterForm = new CForm('get');
-$filterForm->setAttribute('name', 'zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
-$filterTable = new CTable('', 'filter filter-center');
-
-$actionComboBox = new CComboBox('action', $this->data['action'], null, array(
+$filterColumn->addRow(_('Action'), new CComboBox('action', $this->data['action'], null, array(
 	-1 => _('All'),
 	AUDIT_ACTION_LOGIN => _('Login'),
 	AUDIT_ACTION_LOGOUT => _('Logout'),
@@ -48,45 +40,21 @@ $actionComboBox = new CComboBox('action', $this->data['action'], null, array(
 	AUDIT_ACTION_DELETE => _('Delete'),
 	AUDIT_ACTION_ENABLE => _('Enable'),
 	AUDIT_ACTION_DISABLE => _('Disable')
-));
-
-$resourceComboBox = new CComboBox('resourcetype', $this->data['resourcetype'], null,
+)));
+$filterColumn->addRow(_('Resource'), new CComboBox('resourcetype', $this->data['resourcetype'], null,
 	array(-1 => _('All')) + audit_resource2str()
-);
-
-$filterTable->addRow(array(
-	array(
-		bold(_('User')),
-		' ',
-		new CTextBox('alias', $this->data['alias'], 20),
-		new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm='.$filterForm->getName().
-			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");',
-			'button-form'
-		)
-	),
-	array(bold(_('Action')), ' ', $actionComboBox),
-	array(bold(_('Resource')), ' ', $resourceComboBox)
 ));
-$filterButton = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput shadow');
-$filterButton->main();
 
-$resetButton = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput shadow');
-
-$buttonsDiv = new CDiv(array($filterButton, $resetButton));
-$buttonsDiv->setAttribute('style', 'padding: 4px 0;');
-
-$filterTable->addRow(new CCol($buttonsDiv, 'controls', 3));
-$filterForm->addItem($filterTable);
-
-$auditWidget->addFlicker($filterForm, CProfile::get('web.auditlogs.filter.state', 1));
-$auditWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.auditlogs.filter.state', 1));
+$filterForm->addColumn($filterColumn);
+$filterForm->addNavigator();
+$auditWidget->addItem($filterForm);
 
 // create form
 $auditForm = new CForm('get');
 $auditForm->setName('auditForm');
 
 // create table
-$auditTable = new CTableInfo(_('No audit log entries found.'));
+$auditTable = new CTableInfo();
 $auditTable->setHeader(array(
 	_('Time'),
 	_('User'),
@@ -121,7 +89,7 @@ foreach ($this->data['actions'] as $action) {
 }
 
 // append table to form
-$auditForm->addItem(array($this->data['paging'], $auditTable, $this->data['paging']));
+$auditForm->addItem(array($auditTable, $this->data['paging']));
 
 // append navigation bar js
 $objData = array(
