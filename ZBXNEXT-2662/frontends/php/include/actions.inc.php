@@ -1424,7 +1424,7 @@ function getEventActionsStatHints($eventIds) {
 				$style = ZBX_STYLE_RED;
 			}
 
-			$hint = new CSpan($alert['cnt'], $style);
+			$hint = new CSpan($alert['cnt'], ZBX_STYLE_LINK_ACTION.' '.$style);
 			$hint->setHint(get_actions_hint_by_eventid($alert['eventid'], $alert['status']));
 
 			$actions[$alert['eventid']][$alert['status']] = $hint;

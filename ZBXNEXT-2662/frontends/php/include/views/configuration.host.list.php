@@ -189,7 +189,7 @@ foreach ($data['hosts'] as $host) {
 
 	$table->addRow(array(
 		new CCheckBox('hosts['.$host['hostid'].']', null, null, $host['hostid']),
-		new CCol($description, 'nowrap'),
+		new CCol($description, ZBX_STYLE_NOWRAP),
 		$applications,
 		$items,
 		$triggers,

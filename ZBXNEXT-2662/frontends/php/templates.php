@@ -730,7 +730,7 @@ else {
 
 		$table->addRow(array(
 			new CCheckBox('templates['.$template['templateid'].']', null, null, $template['templateid']),
-			new CCol($templatesOutput, 'nowrap'),
+			new CCol($templatesOutput, ZBX_STYLE_NOWRAP),
 			$applications,
 			$items,
 			$triggers,

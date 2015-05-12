@@ -1132,7 +1132,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 			$name = new CSpan($hostName, ZBX_STYLE_LINK_ACTION.' link_menu');
 			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
-			$columns = array(new CCol($name, 'nowrap'));
+			$columns = array(new CCol($name, ZBX_STYLE_NOWRAP));
 			foreach ($data as $triggerHosts) {
 				$columns[] = getTriggerOverviewCells(
 					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
