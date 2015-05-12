@@ -40,7 +40,7 @@ extern int		server_num, process_num;
 static void	host_availability_sender(struct zbx_json *j)
 {
 	const char	*__function_name = "host_availability_sender";
-	zbx_sock_t	sock;
+	zbx_socket_t	sock;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -77,7 +77,7 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
 {
 	const char	*__function_name = "history_sender";
 
-	zbx_sock_t	sock;
+	zbx_socket_t	sock;
 	zbx_uint64_t	lastid;
 	zbx_timespec_t	ts;
 	int		ret = SUCCEED;

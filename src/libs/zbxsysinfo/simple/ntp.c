@@ -143,7 +143,7 @@ out:
 
 int	check_ntp(char *host, unsigned short port, int timeout, int *value_int)
 {
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 	int		ret;
 	char		request[NTP_PACKET_SIZE];
 	ntp_data	data;
@@ -169,7 +169,7 @@ int	check_ntp(char *host, unsigned short port, int timeout, int *value_int)
 	}
 
 	if (FAIL == ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "NTP check error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "NTP check error: %s", zbx_socket_strerror());
 
 	return SYSINFO_RET_OK;
 }

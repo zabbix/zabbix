@@ -25,7 +25,7 @@
 
 extern int	CONFIG_TIMEOUT;
 
-void	recv_areg_data(zbx_sock_t *sock, struct zbx_json_parse *jp);
-void	send_areg_data(zbx_sock_t *sock);
+void	recv_areg_data(zbx_socket_t *sock, struct zbx_json_parse *jp);
+void	send_areg_data(zbx_socket_t *sock);
 
 #endif

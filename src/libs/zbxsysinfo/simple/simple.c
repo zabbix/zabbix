@@ -132,7 +132,7 @@ static int	find_ssh_ident_string(const char *recv_buf, int *remote_major, int *r
 static int	check_ssh(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	int		ret;
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 	char		send_buf[MAX_STRING_LEN];
 	int		remote_major, remote_minor;
 
@@ -158,7 +158,7 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 	}
 
 	if (FAIL == ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "SSH check error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "SSH check error: %s", zbx_socket_strerror());
 
 	return SYSINFO_RET_OK;
 }
@@ -219,13 +219,12 @@ clean:
 static int	check_telnet(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	const char	*__function_name = "check_telnet";
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 #ifdef _WINDOWS
 	u_long		argp = 1;
 #else
 	int		flags;
 #endif
-
 	*value_int = 0;
 
 	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout))
@@ -246,7 +245,7 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 		zbx_tcp_close(&s);
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "%s error: %s", __function_name, zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "%s error: %s", __function_name, zbx_socket_strerror());
 
 	return SYSINFO_RET_OK;
 }
