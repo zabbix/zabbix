@@ -252,6 +252,10 @@ class C20ImportConverter extends CConverter {
 				$rule['status'] = ITEM_STATUS_ACTIVE;
 			}
 
+			if (!array_key_exists('host_prototypes', $rule)) {
+				$rule['host_prototypes'] = [];
+			}
+
 			$rule = $this->convertDiscoveryRuleFilter($rule);
 			$rule = $this->convertTriggerPrototypes($rule);
 		}
