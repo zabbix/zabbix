@@ -622,7 +622,7 @@ class CConfigurationImport {
 					$item['applications'] = $applicationsIds;
 				}
 
-				if (isset($item['interface_ref']) && $item['interface_ref']) {
+				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
 					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
 				}
 
@@ -701,7 +701,7 @@ class CConfigurationImport {
 			foreach ($discoveryRules as $item) {
 				$item['hostid'] = $hostId;
 
-				if (isset($item['interface_ref'])) {
+				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
 					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
 				}
 
@@ -780,7 +780,7 @@ class CConfigurationImport {
 
 					$prototype['applications'] = $applicationsIds;
 
-					if (isset($prototype['interface_ref'])) {
+					if (array_key_exists('interface_ref', $prototype) && $prototype['interface_ref']) {
 						$prototype['interfaceid'] = $this->referencer->interfacesCache[$hostId][$prototype['interface_ref']];
 					}
 
@@ -870,7 +870,7 @@ class CConfigurationImport {
 					}
 				}
 
-				if (isset($item['interface_ref'])) {
+				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
 					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
 				}
 				unset($item['item_prototypes']);
