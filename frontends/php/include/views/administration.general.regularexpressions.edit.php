@@ -67,8 +67,8 @@ $exprTable = new CTable(null, 'formElementTable formWideTable');
 $exprTable->attr('id', 'exprTable');
 $exprTable->setHeader(array(
 	_('Expression'),
-	new CCol(_('Expression type'), 'nowrap'),
-	new CCol(_('Case sensitive'), 'nowrap'),
+	new CCol(_('Expression type'), ZBX_STYLE_NOWRAP),
+	new CCol(_('Case sensitive'), ZBX_STYLE_NOWRAP),
 	SPACE
 ));
 $exprTable->setFooter(new CButton('add', _('Add'), null, 'link_menu exprAdd'));

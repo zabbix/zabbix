@@ -203,9 +203,9 @@ if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TY
 
 		$mediaTableInfo->addRow(array(
 			new CCheckBox('user_medias_to_del['.$id.']', null, null, $id),
-			new CSpan($media['description'], 'nowrap'),
-			new CSpan($media['sendto'], 'nowrap'),
-			new CSpan($media['period'], 'nowrap'),
+			new CSpan($media['description'], ZBX_STYLE_NOWRAP),
+			new CSpan($media['sendto'], ZBX_STYLE_NOWRAP),
+			new CSpan($media['period'], ZBX_STYLE_NOWRAP),
 			$mediaSeverity,
 			$status,
 			new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'");', 'link_menu'))

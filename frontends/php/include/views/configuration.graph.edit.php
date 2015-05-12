@@ -227,9 +227,9 @@ $itemsTable->setHeader(array(
 	($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED)
 		? new CCol(_('Type'), null, null, 80) : null,
 	new CCol(_('Function'), null, null, 80),
-	($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? new CCol(_('Draw style'), 'nowrap', null, 80) : null,
+	($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? new CCol(_('Draw style'), ZBX_STYLE_NOWRAP, null, 80) : null,
 	($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED)
-		? new CCol(_('Y axis side'), 'nowrap', null, 80) : null,
+		? new CCol(_('Y axis side'), ZBX_STYLE_NOWRAP, null, 80) : null,
 	new CCol(_('Colour'), null, null, 100),
 	new CCol(_('Action'), null, null, 50)
 ));

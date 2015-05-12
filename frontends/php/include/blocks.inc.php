@@ -421,13 +421,13 @@ function make_system_status($filter) {
 
 			$allTriggersNum = $data['count'];
 			if ($allTriggersNum) {
-				$allTriggersNum = new CSpan($allTriggersNum, 'pointer');
+				$allTriggersNum = new CSpan($allTriggersNum, ZBX_STYLE_LINK_ACTION);
 				$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams, $actions, $config));
 			}
 
 			$unackTriggersNum = $data['count_unack'];
 			if ($unackTriggersNum) {
-				$unackTriggersNum = new CSpan($unackTriggersNum, 'pointer red bold');
+				$unackTriggersNum = new CSpan($unackTriggersNum, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
 				$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams, $actions, $config));
 			}
 
@@ -719,7 +719,7 @@ function make_latest_issues(array $filter = array()) {
 			$hostName->addClass('left-to-icon-maintenance-abs');
 		}
 
-		$hostDiv = new CDiv(array($hostName, $maintenanceIcon), 'maintenance-abs-cont');
+		$hostDiv = new CDiv(array($hostName, $maintenanceIcon), ZBX_STYLE_NOWRAP.' '.'maintenance-abs-cont');
 
 		// unknown triggers
 		$unknown = SPACE;

@@ -146,7 +146,6 @@ else {
 	if ($tree) {
 		// creates form for choosing a preset interval
 		$r_form = new CForm('get');
-		$r_form->setAttribute('class', 'nowrap');
 		$r_form->setAttribute('name', 'period_choice');
 		$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 

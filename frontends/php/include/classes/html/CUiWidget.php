@@ -115,7 +115,7 @@ class CUiWidget extends CDiv {
 		$table->addStyle('width: 100%;');
 		$table->addRow(array($leftColumn, $rightColumn));
 
-		$this->header = new CDiv($table, 'nowrap ui-corner-all ui-widget-header header');
+		$this->header = new CDiv($table, ZBX_STYLE_NOWRAP.' ui-corner-all ui-widget-header header');
 	}
 
 	/**

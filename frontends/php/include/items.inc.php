@@ -734,7 +734,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 			$name = new CSpan($host['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
 			$name->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
 
-			$tableRow = array(new CCol($name, 'nowrap'));
+			$tableRow = array(new CCol($name, ZBX_STYLE_NOWRAP));
 			foreach ($items as $ithosts) {
 				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
 			}
