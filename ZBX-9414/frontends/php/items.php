@@ -1124,7 +1124,7 @@ else {
 
 				$options['filter']['delay'] = $filter_delay;
 			}
-			elseif (($filter_type == ITEM_TYPE_TRAPPER || $filter_type == ITEM_TYPE_SNMPTRAP) && $filter_delay >= 0) {
+			elseif ($filter_type == ITEM_TYPE_TRAPPER || $filter_type == ITEM_TYPE_SNMPTRAP) {
 				$options['filter']['delay'] = -1;
 			}
 			else {
