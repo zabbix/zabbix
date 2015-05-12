@@ -25,9 +25,12 @@
 
 int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	struct utsname	name;
-
-	if (-1 == uname(&name))
+#if defined(HAVE_SYS_UTSNAME_HPUX_V1) && defined(GCC_VERSION) && 4003 > GCC_VERSION	/* version 4.3.0 */
+	struct utsname_hpux_v1	name;
+#else
+	struct utsname		name;
+#endif
+	if (-1 == uname((struct utsname *)&name))
 		return SYSINFO_RET_FAIL;
 
 	SET_STR_RESULT(result, zbx_strdup(NULL, name.machine));

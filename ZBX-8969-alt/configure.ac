@@ -976,6 +976,21 @@ if test "x$ARCH" = "xhpux"; then
 	AC_MSG_RESULT(yes),
 	CFLAGS="$saved_CFLAGS"
 	AC_MSG_RESULT(no))
+
+	AC_MSG_CHECKING(for struct utsname_hpux_v1 in sys/utsname.h)
+	AC_TRY_COMPILE(
+[
+#ifdef HAVE_SYS_UTSNAME_H
+#	include <sys/utsname.h>
+#endif
+],
+[
+struct utsname_hpux_v1	name;
+uname((struct utsname *)&name);
+],
+	AC_DEFINE(HAVE_SYS_UTSNAME_HPUX_V1, 1, [Define to 1 if struct 'utsname_hpux_v1' exists.])
+	AC_MSG_RESULT(yes),
+	AC_MSG_RESULT(no))
 fi
 
 AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to OS name for code managing])
