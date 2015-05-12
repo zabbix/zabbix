@@ -1,0 +1,73 @@
+//$red: #e33734;
+//$light-red: #ed9898;
+//$lighter-red: #fccacf;
+//$alt-red: #e45959;
+
+//$orange: #f24f1d;
+//$alt-dark-orange: #e97659;
+//$alt-orange: #ffa059;
+
+//$yellow: #fad634;
+//$light-yellow: #fcf39d;
+//$lighter-yellow: #fcf7c2;
+//$alt-yellow: #ffc859;
+
+//$green: #429e47;
+//$light-green: #a5d6a7;
+//$lighter-green: #c5e3c6;
+//$alt-green: #59db8f;
+
+$primary-blue: #2b2b2b; // Primary top nav color
+$secondary-blue: #222; // Secondary top subnav color
+
+//$alt-dark-blue: #7499ff;
+$alt-blue: #242424;//#e8f4fa;
+
+$blue-grey: #768d99;
+$light-blue-grey: #acbbc2;
+$lighter-blue-grey: #ccd5d9;
+$lightest-blue-grey: #0d1114;//#ebeef0; //Background color and table border color
+$alt-blue-grey: #97aab3;
+
+$light-grey: #ebebeb;
+$lighter-grey: #f2f2f2;
+
+$indigo-black: #d1dade;//#1f2c33;
+$white: #303030;//#fff;
+$transparent: transparent;
+
+// LINK COLORS
+$link-color: #0275b8; // Primary Blue
+$link-hover-color: #0275b8;
+$link-active-color: #0275b8;
+$link-visited-color: #0275b8;
+
+$link-topnav-color: #bfdced; // Nav Blue
+$link-topnav-hover-color: #fff;
+$link-topnav-active-color: #fff;
+$link-topnav-visited-color: #bfdced;
+
+$link-topsubnav-color: #bfced7; // SubNav Blue
+$link-topsubnav-hover-color: #fff;
+$link-topsubnav-active-color: #fff;
+$link-topsubnav-visited-color: #bfced7;
+
+
+// Important! @import string should always be last
+@import 'screen.scss';
+
+.dashbrd-widget {
+	@include box-shadow(none);
+}
+
+.list-table {
+	@extend .dashbrd-widget;
+}
+
+.action-menu {
+	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.3));
+}
+
+.overlay-dialogue {
+	@extend .action-menu;
+}

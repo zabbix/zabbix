@@ -1,3 +1,4 @@
+// NOTIFICATION & ALERT COLORS
 $red: #e33734;
 $light-red: #ed9898;
 $lighter-red: #fccacf;
@@ -17,24 +18,72 @@ $light-green: #a5d6a7;
 $lighter-green: #c5e3c6;
 $alt-green: #59db8f;
 
-$primary-blue: #0275b8 !default; // Primary top nav color
-$secondary-blue: #013e61 !default; // Secondary top subnav color
-
 $alt-dark-blue: #7499ff;
-$alt-blue: #e8f4fa!default;
+$alt-blue-grey: #97aab3;
+
+$white: #fff !default;
+$transparent: transparent;
+
+
+// MAIN COLORS
+$body-bg-color: #ebeef0 !default; //NEW page bg color
+$font-color: #1f2c33 !default; //NEW
+$font-alt-color: #768d99 !default; //NEW
+$main-nav-bg-color: #0275b8 !default; //NEW
+$main-subnav-bg-color: #013e61 !default; //NEW
+
+// UI COLORS
+$ui-bg-color: #fff !default; //NEW ui element's bg color: widgets, containers for forms, tables, filters, action menus
+$ui-hover-color: #e8f4fa !default; //NEW light blue hover for table rows, alt buttons, etc.
+$ui-border-color: #e8f4fa !default; //NEW
+$action-hover-color: #ebebeb !default; //NEW action menu item, calendar item hover colors
+$table-border-color: #ebeef0 !default; // NEW row separator color in tables
+
+
+// FORM COLORS
+$form-border-color: #fff !default; //NEW
+$form-bg-color: #fff !default; //NEW
+$form-disabled-bg-color: #ebebeb !default; //NEW
+
+// BUTTON COLORS
+
+
+
+
+
+
+
+$primary-blue: #0275b8 !default; // USED Primary top nav color
+$secondary-blue: #013e61 !default; // USED Secondary top subnav color
+
+
+$alt-blue: #e8f4fa!default; // USED
 
 $blue-grey: #768d99 !default;
 $light-blue-grey: #acbbc2 !default;
 $lighter-blue-grey: #ccd5d9 !default;
 $lightest-blue-grey: #ebeef0 !default; //Background color and table border color
-$alt-blue-grey: #97aab3 !default;
 
-$light-grey: #ebebeb !default;
-$lighter-grey: #f2f2f2 !default;
 
-$indigo-black: #1f2c33 !default;
-$white: #fff !default;
-$transparent: transparent;
+
+$light-grey: #ebebeb !default; // USED
+//$lighter-grey: #f2f2f2 !default;
+
+$indigo-black: #1f2c33 !default; // USED
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // LINK COLORS
 $link-color: #0275b8 !default; // Primary Blue
@@ -42,23 +91,21 @@ $link-hover-color: #0275b8 !default;
 $link-active-color: #0275b8 !default;
 $link-visited-color: #0275b8 !default;
 
-$link-alt-color: #4e9ecd !default; // Light Primary Blue
-$link-alt-hover-color: #4e9ecd !default;
-$link-alt-active-color: #4e9ecd !default;
-$link-alt-visited-color: #4e9ecd !default;
+//$link-alt-color: #4e9ecd !default; // Light Primary Blue
+//$link-alt-hover-color: #4e9ecd !default;
+//$link-alt-active-color: #4e9ecd !default;
+//$link-alt-visited-color: #4e9ecd !default;
 
-$link-topnav-color: #bfdced !default; // Nav Blue
-$link-topnav-hover-color: #fff !default;
-$link-topnav-active-color: #fff !default;
-$link-topnav-visited-color: #bfdced !default;
+$link-main-nav-color: #bfdced !default; // Nav Blue
+$link-main-nav-hover-color: #fff !default;
+$link-main-nav-active-color: #fff !default;
+$link-main-nav-visited-color: #bfdced !default;
 
-$link-topsubnav-color: #bfced7 !default; // SubNav Blue
-$link-topsubnav-hover-color: #fff !default;
-$link-topsubnav-active-color: #fff !default;
-$link-topsubnav-visited-color: #bfced7 !default;
+$link-main-subnav-color: #bfced7 !default; // SubNav Blue
+$link-main-subnav-hover-color: #fff !default;
+$link-main-subnav-active-color: #fff !default;
+$link-main-subnav-visited-color: #bfced7 !default;
 
-$form-input-top-placeholder: #c5d8e5 !default;
-$form-input-top-focus-placeholder: #a9a9a9 !default;
 
 // TYPOGRAPHY
 $font-stack: Arial, Tahoma, Verdana, sans-serif;
@@ -89,9 +136,7 @@ $font-msg-reset-size: 0.850em; // Default 1em/12px
 $font-transform: uppercase;
 
 
-// MIXINS
-
-// Fonts
+// FONT MIXINS
 @mixin font-body {
 	font: $font-body-size $font-stack;
 	line-height: $body-line-height;
@@ -129,7 +174,8 @@ $font-transform: uppercase;
 	line-height: $setup-title-line-height;
 }
 
-//CSS3
+
+//CSS3 MIXINS
 @mixin box-shadow($shadow...) {
 	-webkit-box-shadow: $shadow;
     -moz-box-shadow: $shadow;
@@ -158,20 +204,6 @@ $font-transform: uppercase;
 	opacity: $opacity;
 	$opacity-ie: $opacity * 100;
 	filter: alpha(opacity=$opacity-ie);
-}
-
-@mixin placeholder($placehldr-color) {
-	&::-webkit-input-placeholder {
-		color: $placehldr-color;
-	}
-
-	&::-moz-placeholder {
-		color: $placehldr-color;
-	}
-
-	&:-ms-input-placeholder {
-		color: $placehldr-color;
-	}
 }
 
 @mixin transform($transforms) {
