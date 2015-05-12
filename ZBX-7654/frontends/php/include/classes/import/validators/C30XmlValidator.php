@@ -170,7 +170,7 @@ class C30XmlValidator {
 							]],
 							'lifetime' =>				['type' => XML_STRING | XML_REQUIRED],
 							'description' =>			['type' => XML_STRING | XML_REQUIRED],
-							'interface_ref' =>			['type' => XML_STRING | XML_REQUIRED],
+							'interface_ref' =>			['type' => XML_STRING],
 							'item_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'item_prototype', 'rules' => [
 								'item_prototype' =>			['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
