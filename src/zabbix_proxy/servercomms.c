@@ -28,6 +28,9 @@
 #include "servercomms.h"
 
 extern unsigned int	configured_tls_connect_mode;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+extern char		*CONFIG_TLS_SERVER_CERT_ISSUER, *CONFIG_TLS_SERVER_CERT_SUBJECT;
+#endif
 
 int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 {
@@ -37,15 +40,13 @@ int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 			CONFIG_SERVER, CONFIG_SERVER_PORT, timeout);
 
 	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout,
-			configured_tls_connect_mode, NULL, NULL)))	/* The connect mode can specify TLS with PSK */
-									/* but here we do not know PSK details. */
-									/* Therefore we put NULL in the last 2 */
-									/* arguments. zbx_tls_connect() will find */
-									/* out PSK in this case. If the connect mode */
-									/* specifies TLS with certificate then also */
-									/* NULLs are ok, as the active proxy does not */
-									/* verify server certificate issuer and */
-									/* subject. */
+			configured_tls_connect_mode,
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			CONFIG_TLS_SERVER_CERT_ISSUER, CONFIG_TLS_SERVER_CERT_SUBJECT)))
+			/* in case of TLS with PSK zbx_tls_connect() will find PSK */
+#else
+			NULL, NULL)))
+#endif
 	{
 		if (0 == retry_interval)
 		{
@@ -54,11 +55,17 @@ int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s]:%d [%s]. Will retry every %d second(s)",
-					CONFIG_SERVER, CONFIG_SERVER_PORT, zbx_socket_strerror(), retry_interval);
+			zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s]:%d [%s]. Will retry every "
+					"%d second(s)", CONFIG_SERVER, CONFIG_SERVER_PORT, zbx_socket_strerror(),
+					retry_interval);
 			lastlogtime = (int)time(NULL);
 			while (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT,
-					timeout, configured_tls_connect_mode, NULL, NULL)))
+					timeout, configured_tls_connect_mode,
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+					CONFIG_TLS_SERVER_CERT_ISSUER, CONFIG_TLS_SERVER_CERT_SUBJECT)))
+#else
+					NULL, NULL)))
+#endif
 			{
 				now = (int)time(NULL);
 				if (60 <= now - lastlogtime)

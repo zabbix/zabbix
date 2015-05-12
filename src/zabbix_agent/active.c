@@ -561,14 +561,13 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, CONFIG_LISTEN_PORT);
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT,
-			configured_tls_connect_mode, NULL, NULL)))	/* The connect mode can specify TLS with PSK */
-									/* but here we do not know PSK details. */
-									/* Therefore we put NULL in the last 2 */
-									/* arguments. zbx_tls_connect() will find */
-									/* out PSK in this case. If the connect mode */
-									/* specifies TLS with certificate then also */
-									/* NULLs are ok, as the agent does not verify */
-									/* peer certificate issuer and subject. */
+			configured_tls_connect_mode,
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			CONFIG_TLS_SERVER_CERT_ISSUER, CONFIG_TLS_SERVER_CERT_SUBJECT)))
+			/* in case of TLS with PSK zbx_tls_connect() will find PSK */
+#else
+			NULL, NULL)))
+#endif
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
 
@@ -731,14 +730,13 @@ static int	send_buffer(const char *host, unsigned short port)
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, ts.ns);
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MIN(buffer.count * CONFIG_TIMEOUT, 60),
-			configured_tls_connect_mode, NULL, NULL)))	/* The connect mode can specify TLS with PSK */
-									/* but here we do not know PSK details. */
-									/* Therefore we put NULL in the last 2 */
-									/* arguments. zbx_tls_connect() will find */
-									/* out PSK in this case. If the connect mode */
-									/* specifies TLS with certificate then also */
-									/* NULLs are ok, as the agent does not verify */
-									/* peer certificate issuer and subject. */
+			configured_tls_connect_mode,
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			CONFIG_TLS_SERVER_CERT_ISSUER, CONFIG_TLS_SERVER_CERT_SUBJECT)))
+			/* in case of TLS with PSK zbx_tls_connect() will find PSK */
+#else
+			NULL, NULL)))
+#endif
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]", json.buffer);
 

@@ -165,10 +165,10 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
  ******************************************************************************/
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req)
 {
+	char	*msg = NULL;
+
 	if (0 == (configured_tls_accept_modes & sock->connection_type))
 	{
-		char	*msg;
-
 		msg = zbx_dsprintf(NULL, "%s from server over connection of type \"%s\" is not allowed", req,
 				zbx_tls_connection_type_name(sock->connection_type));
 
@@ -181,8 +181,18 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 		return FAIL;
 	}
 
-	/* TODO add certificate issuer and subject checking if required */
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type && SUCCEED != zbx_check_server_issuer_subject(sock, &msg))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server is not allowed: %s", req, msg);
 
+		if (ZBX_SEND_RESPONSE == send_response)
+			zbx_send_response(sock, FAIL, "certificate issuer or subject mismatch", CONFIG_TIMEOUT);
+
+		zbx_free(msg);
+		return FAIL;
+	}
+#endif
 	return SUCCEED;
 }
 

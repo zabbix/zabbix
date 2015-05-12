@@ -62,6 +62,8 @@ extern char				*CONFIG_TLS_CONNECT;
 extern char				*CONFIG_TLS_ACCEPT;
 extern char				*CONFIG_TLS_CA_FILE;
 extern char				*CONFIG_TLS_CRL_FILE;
+extern char				*CONFIG_TLS_SERVER_CERT_ISSUER;
+extern char				*CONFIG_TLS_SERVER_CERT_SUBJECT;
 extern char				*CONFIG_TLS_CERT_FILE;
 extern char				*CONFIG_TLS_KEY_FILE;
 extern char				*CONFIG_TLS_PSK_FILE;
@@ -473,6 +475,8 @@ static void	zbx_tls_validate_config(void)
 	{
 		zbx_parameter_not_empty(CONFIG_TLS_CA_FILE, "TLSCaFile");
 		zbx_parameter_not_empty(CONFIG_TLS_CRL_FILE, "TLSCrlFile");
+		zbx_parameter_not_empty(CONFIG_TLS_SERVER_CERT_ISSUER, "TLSServerCertIssuer");
+		zbx_parameter_not_empty(CONFIG_TLS_SERVER_CERT_SUBJECT, "TLSServerCertSubject");
 		zbx_parameter_not_empty(CONFIG_TLS_CERT_FILE, "TLSCertFile");
 		zbx_parameter_not_empty(CONFIG_TLS_KEY_FILE, "TLSKeyFile");
 	}
@@ -551,6 +555,30 @@ static void	zbx_tls_validate_config(void)
 		else
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCrlFile\" is defined but "
+					"\"TLSCertFile\" and \"TLSKeyFile\" are not defined");
+		}
+		goto out;
+	}
+
+	/* Server certificate issuer is optional but must be defined only together with a certificate */
+
+	if (NULL == CONFIG_TLS_CERT_FILE && NULL != CONFIG_TLS_SERVER_CERT_ISSUER)
+	{
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_AGENT)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSServerCertIssuer\" is defined but "
+					"\"TLSCertFile\" and \"TLSKeyFile\" are not defined");
+		}
+		goto out;
+	}
+
+	/* Server certificate subject is optional but must be defined only together with a certificate */
+
+	if (NULL == CONFIG_TLS_CERT_FILE && NULL != CONFIG_TLS_SERVER_CERT_SUBJECT)
+	{
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_AGENT)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSServerCertSubject\" is defined but "
 					"\"TLSCertFile\" and \"TLSKeyFile\" are not defined");
 		}
 		goto out;
@@ -2150,6 +2178,54 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 	}
 
 	return FAIL;
+}
+#endif
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_check_server_issuer_subject                                  *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     check server certificate issuer and subject (for passive proxies and   *
+ *     agent passive checks)                                                  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     sock  - [IN] certificate to verify                                     *
+ *     error - [OUT] dynamically allocated memory with error message          *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED or FAIL                                                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
+{
+	zbx_tls_conn_attr_t	attr;
+
+	if (SUCCEED != zbx_tls_get_attr(sock, &attr))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+
+		*error = zbx_dsprintf(*error, "cannot get connection attributes for connection from %s",
+				get_ip_by_socket(sock));
+		return FAIL;
+	}
+
+	/* TODO RFC 4518 requires more sophisticated issuer matching */
+	if (NULL != CONFIG_TLS_SERVER_CERT_ISSUER && 0 != strcmp(CONFIG_TLS_SERVER_CERT_ISSUER, attr.issuer))
+	{
+		*error = zbx_dsprintf(*error, "certificate issuer does not match for %s", get_ip_by_socket(sock));
+		return FAIL;
+	}
+
+	/* TODO RFC 4518 requires more sophisticated subject matching */
+	if (NULL != CONFIG_TLS_SERVER_CERT_SUBJECT && 0 != strcmp(CONFIG_TLS_SERVER_CERT_SUBJECT, attr.subject))
+	{
+		*error = zbx_dsprintf(*error, "certificate subject does not match for %s", get_ip_by_socket(sock));
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 #endif
 
