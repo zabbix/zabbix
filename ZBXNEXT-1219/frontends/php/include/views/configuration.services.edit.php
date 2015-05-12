@@ -57,9 +57,9 @@ $servicesFormList->addRow(_('Parent service'), array(
 ));
 
 // append algorithm to form list
-$algorithmComboBox = new CComboBox('algorithm', $this->data['algorithm']);
-$algorithmComboBox->addItems(serviceAlgorythm());
-$servicesFormList->addRow(_('Status calculation algorithm'), $algorithmComboBox);
+$servicesFormList->addRow(_('Status calculation algorithm'),
+	new CComboBox('algorithm', $this->data['algorithm'], null, serviceAlgorythm())
+);
 
 // append SLA to form list
 $showslaCheckbox = new CCheckBox('showsla', ($this->data['showsla'] == 0) ? 'no' : 'yes', null, 1);
@@ -260,10 +260,13 @@ else {
 	$servicesForm->addVar('new_service_time[note]', '');
 }
 
-$timeTypeComboBox = new CComboBox('new_service_time[type]', $this->data['new_service_time']['type'], 'javascript: document.forms[0].action += \'?form=1\'; submit();');
-$timeTypeComboBox->addItem(SERVICE_TIME_TYPE_UPTIME, _('Uptime'));
-$timeTypeComboBox->addItem(SERVICE_TIME_TYPE_DOWNTIME, _('Downtime'));
-$timeTypeComboBox->addItem(SERVICE_TIME_TYPE_ONETIME_DOWNTIME, _('One-time downtime'));
+$timeTypeComboBox = new CComboBox('new_service_time[type]', $this->data['new_service_time']['type'], 'submit()',
+	array(
+		SERVICE_TIME_TYPE_UPTIME => _('Uptime'),
+		SERVICE_TIME_TYPE_DOWNTIME => _('Downtime'),
+		SERVICE_TIME_TYPE_ONETIME_DOWNTIME => _('One-time downtime')
+	)
+);
 $servicesTimeFormList->addRow(
 	_('New service time'),
 	new CDiv(array(

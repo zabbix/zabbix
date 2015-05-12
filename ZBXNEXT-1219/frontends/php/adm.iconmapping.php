@@ -105,23 +105,24 @@ elseif (isset($_REQUEST['clone'])) {
 /*
  * Display
  */
-$generalComboBox = new CComboBox('configDropDown', 'adm.iconmapping.php', 'redirect(this.options[this.selectedIndex].value);');
-$generalComboBox->addItems(array(
-	'adm.gui.php' => _('GUI'),
-	'adm.housekeeper.php' => _('Housekeeping'),
-	'adm.images.php' => _('Images'),
-	'adm.iconmapping.php' => _('Icon mapping'),
-	'adm.regexps.php' => _('Regular expressions'),
-	'adm.macros.php' => _('Macros'),
-	'adm.valuemapping.php' => _('Value mapping'),
-	'adm.workingtime.php' => _('Working time'),
-	'adm.triggerseverities.php' => _('Trigger severities'),
-	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-	'adm.other.php' => _('Other')
-));
 $iconMapForm = new CForm();
 $iconMapForm->cleanItems();
-$iconMapForm->addItem($generalComboBox);
+$iconMapForm->addItem(new CComboBox('configDropDown', 'adm.iconmapping.php',
+	'redirect(this.options[this.selectedIndex].value);',
+	array(
+		'adm.gui.php' => _('GUI'),
+		'adm.housekeeper.php' => _('Housekeeping'),
+		'adm.images.php' => _('Images'),
+		'adm.iconmapping.php' => _('Icon mapping'),
+		'adm.regexps.php' => _('Regular expressions'),
+		'adm.macros.php' => _('Macros'),
+		'adm.valuemapping.php' => _('Value mapping'),
+		'adm.workingtime.php' => _('Working time'),
+		'adm.triggerseverities.php' => _('Trigger severities'),
+		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
+		'adm.other.php' => _('Other')
+	)
+));
 
 if (!isset($_REQUEST['form'])) {
 	$iconMapForm->addItem(new CSubmit('form', _('Create icon map')));
