@@ -246,6 +246,77 @@ out:
 	return ret;
 }
 
+char	*smtp_prepare_payload(const char *from_display_name, const char *from_angle_addr, const char *to_display_name,
+		const char *to_angle_addr, const char *mailsubject, const char *mailbody)
+{
+	char		*tmp = NULL, *base64 = NULL, *base64_lf;
+	char		*localsubject = NULL, *localbody = NULL;
+	char		str_time[MAX_STRING_LEN];
+	struct tm	*local_time;
+	time_t		email_time;
+
+	/* prepare subject */
+
+	tmp = string_replace(mailsubject, "\r\n", " ");
+	localsubject = string_replace(tmp, "\n", " ");
+	zbx_free(tmp);
+
+	if (FAIL == is_ascii_string(localsubject))
+	{
+		/* split subject into multiple RFC 2047 "encoded-words" */
+		str_base64_encode_rfc2047(localsubject, &base64);
+		zbx_free(localsubject);
+
+		localsubject = base64;
+		base64 = NULL;
+	}
+
+	/* prepare body */
+
+	tmp = string_replace(mailbody, "\r\n", "\n");
+	localbody = string_replace(tmp, "\n", "\r\n");
+	zbx_free(tmp);
+
+	str_base64_encode_dyn(localbody, &base64, strlen(localbody));
+
+	/* wrap base64 encoded data with linefeeds */
+	base64_lf = str_linefeed(base64, ZBX_EMAIL_B64_MAXLINE, "\r\n");
+	zbx_free(base64);
+	base64 = base64_lf;
+
+	zbx_free(localbody);
+	localbody = base64;
+	base64 = NULL;
+
+	/* prepare date */
+
+	time(&email_time);
+	local_time = localtime(&email_time);
+	strftime(str_time, MAX_STRING_LEN, "%a, %d %b %Y %H:%M:%S %z", local_time);
+
+	/* e-mails are sent in 'SMTP/MIME e-mail' format because UTF-8 is used both in mailsubject and mailbody */
+	/* =?charset?encoding?encoded text?= format must be used for subject field */
+
+	tmp = zbx_dsprintf(tmp,
+			"From: %s%s\r\n"
+			"To: %s%s\r\n"
+			"Date: %s\r\n"
+			"Subject: %s\r\n"
+			"MIME-Version: 1.0\r\n"
+			"Content-Type: text/plain; charset=\"UTF-8\"\r\n"
+			"Content-Transfer-Encoding: base64\r\n"
+			"\r\n"
+			"%s",
+			NULL != from_display_name ? from_display_name : "", from_angle_addr,
+			NULL != to_display_name ? to_display_name: "", to_angle_addr,
+			str_time, localsubject, localbody);
+
+	zbx_free(localsubject);
+	zbx_free(localbody);
+
+	return tmp;
+}
+
 int	send_email(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo, const char *smtp_email,
 		const char *mailto, const char *mailsubject, const char *mailbody, char *error, size_t max_error_len)
 {
@@ -254,14 +325,8 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	zbx_socket_t	s;
 	int		err, ret = FAIL;
 	char		cmd[MAX_STRING_LEN], *cmdp = NULL;
-	char		*tmp = NULL, *base64 = NULL, *base64_lf;
-	char		*localsubject = NULL, *localbody = NULL;
 	char		*from_display_name = NULL, *from_angle_addr = NULL;
 	char		*to_display_name = NULL, *to_angle_addr = NULL;
-
-	char		str_time[MAX_STRING_LEN];
-	struct tm	*local_time = NULL;
-	time_t		email_time;
 
 	const char	*OK_220 = "220";
 	const char	*OK_250 = "250";
@@ -386,67 +451,10 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 		goto close;
 	}
 
-	/* prepare subject */
-
-	tmp = string_replace(mailsubject, "\r\n", " ");
-	localsubject = string_replace(tmp, "\n", " ");
-	zbx_free(tmp);
-
-	if (FAIL == is_ascii_string(localsubject))
-	{
-		/* split subject into multiple RFC 2047 "encoded-words" */
-		str_base64_encode_rfc2047(localsubject, &base64);
-		zbx_free(localsubject);
-
-		localsubject = base64;
-		base64 = NULL;
-	}
-
-	/* prepare body */
-
-	tmp = string_replace(mailbody, "\r\n", "\n");
-	localbody = string_replace(tmp, "\n", "\r\n");
-	zbx_free(tmp);
-
-	str_base64_encode_dyn(localbody, &base64, strlen(localbody));
-
-	/* wrap base64 encoded data with linefeeds */
-	base64_lf = str_linefeed(base64, ZBX_EMAIL_B64_MAXLINE, "\r\n");
-	zbx_free(base64);
-	base64 = base64_lf;
-
-	zbx_free(localbody);
-	localbody = base64;
-	base64 = NULL;
-
-	/* prepare date */
-
-	time(&email_time);
-	local_time = localtime(&email_time);
-	strftime(str_time, MAX_STRING_LEN, "%a, %d %b %Y %H:%M:%S %z", local_time);
-
-	/* e-mails are sent in 'SMTP/MIME e-mail' format because UTF-8 is used both in mailsubject and mailbody */
-	/* =?charset?encoding?encoded text?= format must be used for subject field */
-
-	cmdp = zbx_dsprintf(cmdp,
-			"From: %s%s\r\n"
-			"To: %s%s\r\n"
-			"Date: %s\r\n"
-			"Subject: %s\r\n"
-			"MIME-Version: 1.0\r\n"
-			"Content-Type: text/plain; charset=\"UTF-8\"\r\n"
-			"Content-Transfer-Encoding: base64\r\n"
-			"\r\n"
-			"%s",
-			NULL != from_display_name ? from_display_name : "", from_angle_addr,
-			NULL != to_display_name ? to_display_name: "", to_angle_addr,
-			str_time, localsubject, localbody);
-
+	cmdp = smtp_prepare_payload(from_display_name, from_angle_addr, to_display_name, to_angle_addr, mailsubject,
+			mailbody);
 	err = write(s.socket, cmdp, strlen(cmdp));
-
 	zbx_free(cmdp);
-	zbx_free(localsubject);
-	zbx_free(localbody);
 
 	if (-1 == err)
 	{
