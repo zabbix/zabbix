@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of macros');
 $page['file'] = 'adm.macros.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -151,9 +150,12 @@ if (hasRequest('update')) {
 /*
  * Display
  */
-$form = new CForm();
-$form->cleanItems();
-$form->addItem(new CComboBox('configDropDown', 'adm.macros.php', 'redirect(this.options[this.selectedIndex].value);',
+$cnf_wdgt = (new CWidget())->setTitle(_('Macros'));
+
+$form = (new CForm())->cleanItems();
+
+$controls = new CList();
+$controls->addItem(new CComboBox('configDropDown', 'adm.macros.php', 'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
 		'adm.housekeeper.php' => _('Housekeeping'),
@@ -169,8 +171,9 @@ $form->addItem(new CComboBox('configDropDown', 'adm.macros.php', 'redirect(this.
 	)
 ));
 
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF MACROS'), $form);
+$form->addItem($controls);
+
+$cnf_wdgt->setControls($form);
 
 $data = array();
 $data['form_refresh'] = getRequest('form_refresh', 0);
@@ -197,8 +200,6 @@ if ($result) {
 	$data['macros'] = order_macros($data['macros'], 'macro');
 }
 $macrosForm = new CView('administration.general.macros.edit', $data);
-$cnf_wdgt->addItem($macrosForm->render());
-
-$cnf_wdgt->show();
+$cnf_wdgt->addItem($macrosForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

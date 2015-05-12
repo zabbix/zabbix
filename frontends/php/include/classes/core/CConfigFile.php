@@ -133,8 +133,15 @@ class CConfigFile {
 			$this->check();
 
 			if (!file_put_contents($this->configFile, $this->getString())) {
-				self::exception('Cannot write config file.');
+				if (file_exists($this->configFile)) {
+					self::exception(_('Unable to overwrite the existing configuration file.'));
+				}
+				else {
+					self::exception(_('Unable to create the configuration file.'));
+				}
 			}
+
+			return true;
 		}
 		catch (Exception $e) {
 			$this->error = $e->getMessage();
