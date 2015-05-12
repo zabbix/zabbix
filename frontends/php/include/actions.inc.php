@@ -1117,7 +1117,7 @@ function getActionMessages(array $alerts) {
 		'preservekeys' => true
 	));
 
-	$table = new CTableInfo(_('No actions found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(
 		_('Time'),
 		_('Type'),
@@ -1149,16 +1149,16 @@ function getActionMessages(array $alerts) {
 		}
 
 		if ($alert['status'] == ALERT_STATUS_SENT) {
-			$status = new CSpan(_('sent'), 'green');
-			$retries = new CSpan(SPACE, 'green');
+			$status = new CSpan(_('sent'), ZBX_STYLE_GREEN);
+			$retries = new CSpan(SPACE, ZBX_STYLE_GREEN);
 		}
 		elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-			$status = new CSpan(_('In progress'), 'orange');
-			$retries = new CSpan(ALERT_MAX_RETRIES - $alert['retries'], 'orange');
+			$status = new CSpan(_('In progress'), ZBX_STYLE_ORANGE);
+			$retries = new CSpan(ALERT_MAX_RETRIES - $alert['retries'], ZBX_STYLE_ORANGE);
 		}
 		else {
-			$status = new CSpan(_('not sent'), 'red');
-			$retries = new CSpan(0, 'red');
+			$status = new CSpan(_('not sent'), ZBX_STYLE_RED);
+			$retries = new CSpan(0, ZBX_STYLE_RED);
 		}
 
 		$recipient = $alert['userid']
@@ -1181,18 +1181,18 @@ function getActionMessages(array $alerts) {
 		}
 		else {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($alert['error'], 'on');
+			$info->setHint($alert['error'], ZBX_STYLE_RED);
 		}
 
-		$table->addRow(array(
-			new CCol($time, 'top'),
-			new CCol((isset($mediaType['description']) ? $mediaType['description'] : ''), 'top'),
-			new CCol($status, 'top'),
-			new CCol($retries, 'top'),
-			new CCol($recipient, 'top'),
-			new CCol($message, 'wraptext top'),
-			new CCol($info, 'wraptext top')
-		));
+		$table->addRow([
+			new CCol($time),
+			new CCol((isset($mediaType['description']) ? $mediaType['description'] : '')),
+			new CCol($status),
+			new CCol($retries),
+			new CCol($recipient),
+			new CCol($message),
+			new CCol($info)
+		]);
 	}
 
 	return $table;
@@ -1213,7 +1213,7 @@ function getActionMessages(array $alerts) {
  * @return CTableInfo
  */
 function getActionCommands(array $alerts) {
-	$table = new CTableInfo(_('No actions found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(
 		_('Time'),
 		_('Status'),
@@ -1241,34 +1241,33 @@ function getActionCommands(array $alerts) {
 
 		switch ($alert['status']) {
 			case ALERT_STATUS_SENT:
-				$status = new CSpan(_('executed'), 'green');
+				$status = new CSpan(_('executed'), ZBX_STYLE_GREEN);
 				break;
 
 			case ALERT_STATUS_NOT_SENT:
-				$status = new CSpan(_('In progress'), 'orange');
+				$status = new CSpan(_('In progress'), ZBX_STYLE_ORANGE);
 				break;
 
 			default:
-				$status = new CSpan(_('not sent'), 'red');
+				$status = new CSpan(_('not sent'), ZBX_STYLE_RED);
 				break;
 		}
 
-		$error = $alert['error'] ? new CSpan($alert['error'], 'on') : new CSpan(SPACE, 'off');
+		$error = $alert['error'] ? new CSpan($alert['error'], ZBX_STYLE_RED) : new CSpan(SPACE, ZBX_STYLE_GREEN);
 
-		$table->addRow(array(
-			new CCol($time, 'top'),
-			new CCol($status, 'top'),
-			new CCol(array(bold(_('Command').NAME_DELIMITER), BR(), zbx_nl2br($alert['message'])), 'wraptext top'),
-			new CCol($error, 'wraptext top')
-		));
+		$table->addRow([
+			new CCol($time),
+			new CCol($status),
+			new CCol(array(bold(_('Command').NAME_DELIMITER), BR(), zbx_nl2br($alert['message']))),
+			new CCol($error)
+		]);
 	}
 
 	return $table;
 }
 
 function get_actions_hint_by_eventid($eventid, $status = null) {
-	$tab_hint = new CTableInfo(_('No actions found.'));
-	$tab_hint->setAttribute('style', 'width: 300px;');
+	$tab_hint = new CTableInfo();
 	$tab_hint->setHeader(array(
 		_('User'),
 		_('Details'),
@@ -1288,13 +1287,13 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 
 	while ($row = DBfetch($result)) {
 		if ($row['status'] == ALERT_STATUS_SENT) {
-			$status = new CSpan(_('Sent'), 'green');
+			$status = new CSpan(_('Sent'), ZBX_STYLE_GREEN);
 		}
 		elseif ($row['status'] == ALERT_STATUS_NOT_SENT) {
-			$status = new CSpan(_('In progress'), 'orange');
+			$status = new CSpan(_('In progress'), ZBX_STYLE_ORANGE);
 		}
 		else {
-			$status = new CSpan(_('not sent'), 'red');
+			$status = new CSpan(_('not sent'), ZBX_STYLE_RED);
 		}
 
 		switch ($row['alerttype']) {
@@ -1373,19 +1372,19 @@ function getEventActionsStatus($eventIds) {
 
 		// display
 		if ($notSendCount > 0) {
-			$status = new CSpan(_('In progress'), 'orange');
+			$status = new CSpan(_('In progress'), ZBX_STYLE_ORANGE);
 		}
 		elseif ($mixed == ALERT_STATUS_SENT) {
-			$status = new CSpan(_('Ok'), 'green');
+			$status = new CSpan(_('Ok'), ZBX_STYLE_GREEN);
 		}
 		elseif ($mixed == ALERT_STATUS_FAILED) {
-			$status = new CSpan(_('Failed'), 'red');
+			$status = new CSpan(_('Failed'), ZBX_STYLE_RED);
 		}
 		else {
-			$columnLeft = new CCol(($sendCount > 0) ? new CSpan($sendCount, 'green') : SPACE);
+			$columnLeft = new CCol(($sendCount > 0) ? new CSpan($sendCount, ZBX_STYLE_GREEN) : SPACE);
 			$columnLeft->setAttribute('width', '10');
 
-			$columnRight = new CCol(($failedCount > 0) ? new CSpan($failedCount, 'red') : SPACE);
+			$columnRight = new CCol(($failedCount > 0) ? new CSpan($failedCount, ZBX_STYLE_RED) : SPACE);
 			$columnRight->setAttribute('width', '10');
 
 			$status = new CRow(array($columnLeft, $columnRight));
@@ -1416,30 +1415,32 @@ function getEventActionsStatHints($eventIds) {
 	while ($alert = DBfetch($alerts)) {
 		if ($alert['cnt'] > 0) {
 			if ($alert['status'] == ALERT_STATUS_SENT) {
-				$color = 'green';
+				$style = ZBX_STYLE_GREEN;
 			}
 			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-				$color = 'orange';
+				$style = ZBX_STYLE_ORANGE;
 			}
 			else {
-				$color = 'red';
+				$style = ZBX_STYLE_RED;
 			}
 
-			$hint = new CSpan($alert['cnt'], $color);
+			$hint = new CSpan($alert['cnt'], ZBX_STYLE_LINK_ACTION.' '.$style);
 			$hint->setHint(get_actions_hint_by_eventid($alert['eventid'], $alert['status']));
 
 			$actions[$alert['eventid']][$alert['status']] = $hint;
 		}
 	}
 
-	foreach ($actions as $eventId => $action) {
-		$actions[$eventId] = new CDiv(null, 'event-action-cont');
-		$actions[$eventId]->addItem(array(
-			new CDiv(isset($action[ALERT_STATUS_SENT]) ? $action[ALERT_STATUS_SENT] : SPACE),
-			new CDiv(isset($action[ALERT_STATUS_NOT_SENT]) ? $action[ALERT_STATUS_NOT_SENT] : SPACE),
-			new CDiv(isset($action[ALERT_STATUS_FAILED]) ? $action[ALERT_STATUS_FAILED] : SPACE)
-		));
+	foreach ($actions as &$action) {
+		$action = array(
+			isset($action[ALERT_STATUS_SENT]) ? $action[ALERT_STATUS_SENT] : '',
+			' ',
+			isset($action[ALERT_STATUS_NOT_SENT]) ? $action[ALERT_STATUS_NOT_SENT] : '',
+			' ',
+			isset($action[ALERT_STATUS_FAILED]) ? $action[ALERT_STATUS_FAILED] : ''
+		);
 	}
+	unset($action);
 
 	return $actions;
 }

@@ -76,5 +76,5 @@ if ($data['fullscreen'] == 0) {
 
 	$table = new CTable(null, 'maxwidth page_header');
 	$table->addRow($top_page_row);
-	$table->show();
+//	$table->show();
 }

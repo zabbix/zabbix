@@ -21,7 +21,7 @@
 
 include('include/views/js/administration.general.triggerSeverity.js.php');
 
-$severityTab = new CFormList('scriptsTab');
+$severityTab = new CFormList();
 
 $headerDiv = new CDiv(_('Custom severity'), 'inlineblock');
 $headerDiv->addStyle('width: 16.3em; margin-left: 3px; zoom:1; *display: inline;');
@@ -71,10 +71,10 @@ $severityView->addTab('severities', _('Trigger severities'), $severityTab);
 
 $severityForm = new CForm();
 $severityForm->setName('triggerSeverity');
-$severityForm->addItem($severityView);
-$severityForm->addItem(makeFormFooter(
+$severityView->setFooter(makeFormFooter(
 	new CSubmit('update', _('Update')),
 	array(new CButton('resetDefaults', _('Reset defaults')))
 ));
+$severityForm->addItem($severityView);
 
 return $severityForm;
