@@ -21,8 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
-$discoveryWidget = new CWidget();
-$discoveryWidget->addPageHeader(_('CONFIGURATION OF DISCOVERY RULES'));
+$discoveryWidget = (new CWidget())->setTitle(_('Discovery rules'));
 
 // create form
 $discoveryForm = new CForm();
@@ -33,7 +32,7 @@ if (!empty($this->data['druleid'])) {
 }
 
 // create form list
-$discoveryFormList = new CFormList('discoveryFormList');
+$discoveryFormList = new CFormList();
 $nameTextBox = new CTextBox('name', $this->data['drule']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
 $discoveryFormList->addRow(_('Name'), $nameTextBox);
@@ -78,12 +77,11 @@ $discoveryFormList->addRow(_('Enabled'), new CCheckBox('status', $status, null, 
 // append tabs to form
 $discoveryTabs = new CTabView();
 $discoveryTabs->addTab('druleTab', _('Discovery rule'), $discoveryFormList);
-$discoveryForm->addItem($discoveryTabs);
 
 // append buttons to form
 if (isset($this->data['druleid']))
 {
-	$discoveryForm->addItem(makeFormFooter(
+	$discoveryTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -93,12 +91,13 @@ if (isset($this->data['druleid']))
 	));
 }
 else {
-	$discoveryForm->addItem(makeFormFooter(
+	$discoveryTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
 
+$discoveryForm->addItem($discoveryTabs);
 $discoveryWidget->addItem($discoveryForm);
 
 return $discoveryWidget;

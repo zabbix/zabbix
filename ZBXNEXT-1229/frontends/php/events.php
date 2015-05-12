@@ -40,7 +40,6 @@ else {
 
 	$page['title'] = _('Latest events');
 	$page['file'] = 'events.php';
-	$page['hist_arg'] = array('groupid', 'hostid');
 	$page['scripts'] = array('class.calendar.js', 'gtlc.js');
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -273,7 +272,7 @@ else {
 		}
 	}
 
-	$eventsWidget = new CWidget();
+	$eventsWidget = (new CWidget())->setTitle(_('Events'));
 
 	$csvDisabled = true;
 
@@ -286,6 +285,7 @@ else {
 	$frmForm->addVar('period', $period, 'period_csv');
 	$frmForm->addVar('page', getPageNumber(), 'page_csv');
 
+
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		if ($triggerId) {
 			$frmForm->addVar('triggerid', $triggerId, 'triggerid_csv');
@@ -295,55 +295,39 @@ else {
 			$frmForm->addVar('hostid', getRequest('hostid'), 'hostid_csv');
 		}
 	}
-	$frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
 
-	$eventsWidget->addPageHeader(
-		_('HISTORY OF EVENTS').SPACE.'['.zbx_date2str(DATE_TIME_FORMAT_SECONDS).']',
-		array(
-			$frmForm,
-			SPACE,
-			get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen')))
-		)
-	);
+	$frmForm->addVar('fullscreen', getRequest('fullscreen'));
+	$frmForm->addVar('stime', $stime);
+	$frmForm->addVar('period', $period);
 
-	$headerForm = new CForm('get');
-	$headerForm->addVar('fullscreen', getRequest('fullscreen'));
-	$headerForm->addVar('stime', $stime);
-	$headerForm->addVar('period', $period);
+	$controls = new CList();
 
 	// add host and group filters to the form
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		if (getRequest('triggerid') != 0) {
-			$headerForm->addVar('triggerid', getRequest('triggerid'), 'triggerid_filter');
+			$frmForm->addVar('triggerid', getRequest('triggerid'), 'triggerid_filter');
 		}
 
-		$headerForm->addItem(array(
-			_('Group').SPACE,
-			$pageFilter->getGroupsCB()
-		));
-		$headerForm->addItem(array(
-			SPACE._('Host').SPACE,
-			$pageFilter->getHostsCB()
-		));
+		$controls->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+		$controls->addItem(array(_('Host').SPACE, $pageFilter->getHostsCB()));
 	}
 
 	if ($allow_discovery) {
-		$cmbSource = new CComboBox('source', $source, 'submit()');
-		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, _('Trigger'));
-		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
-		$headerForm->addItem(array(SPACE._('Source').SPACE, $cmbSource));
+		$controls->addItem(array(_('Source').SPACE, new CComboBox('source', $source, 'submit()', array(
+			EVENT_SOURCE_TRIGGERS => _('Trigger'),
+			EVENT_SOURCE_DISCOVERY => _('Discovery')
+		))));
 	}
 
-	$eventsWidget->addHeader(_('Events'), $headerForm);
-	$eventsWidget->addHeaderRowNumber();
+	$controls->addItem(new CSubmit('csv_export', _('Export to CSV')));
+	$controls->addItem(get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))));
 
-	$filterForm = null;
+	$frmForm->addItem($controls);
+	$eventsWidget->setControls($frmForm);
+
+	$filterForm = new CFilter('web.events.filter.state');
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
-		$filterForm = new CFormTable(null, null, 'get');
-		$filterForm->setTableClass('formtable old-filter');
-		$filterForm->setAttribute('name', 'zbx_filter');
-		$filterForm->setAttribute('id', 'zbx_filter');
 		$filterForm->addVar('triggerid', $triggerId);
 		$filterForm->addVar('stime', $stime);
 		$filterForm->addVar('period', $period);
@@ -370,13 +354,15 @@ else {
 			$trigger = '';
 		}
 
-		$filterForm->addRow(new CRow(array(
-			new CCol(_('Trigger'), 'form_row_l'),
-			new CCol(array(
+		$filterColumn = new CFormList();
+
+		$filterColumn->addRow(
+			_('Trigger'),
+			array(
 				new CTextBox('trigger', $trigger, 96, true),
 				new CButton('btn1', _('Select'),
 					'return PopUp("popup.php?'.
-						'dstfrm='.$filterForm->getName().
+						'dstfrm=zbx_filter'.
 						'&dstfld1=triggerid'.
 						'&dstfld2=trigger'.
 						'&srctbl=triggers'.
@@ -386,23 +372,19 @@ else {
 						'&monitored_hosts=1'.
 						'&with_monitored_triggers=1'.
 						($pageFilter->hostid ? '&only_hostid='.$pageFilter->hostid : '').
-						'");',
-					'button-form'
+						'");'
 				)
-			), 'form_row_r')
-		)));
+			)
+		);
 
-		$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
-		$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
+		$filterForm->addColumn($filterColumn);
 	}
 
-	$eventsWidget->addFlicker($filterForm, CProfile::get('web.events.filter.state', 0));
+	$filterForm->addNavigator();
 
-	$scroll = new CDiv();
-	$scroll->setAttribute('id', 'scrollbar_cntr');
-	$eventsWidget->addFlicker($scroll, CProfile::get('web.events.filter.state', 0));
+	$eventsWidget->addItem($filterForm);
 
-	$table = new CTableInfo(_('No events found.'));
+	$table = new CTableInfo();
 }
 
 // trigger events
@@ -800,7 +782,7 @@ else {
 					);
 				}
 				else {
-					$triggerDescription = new CSpan($description, 'pointer link_menu');
+					$triggerDescription = new CSpan($description, ZBX_STYLE_LINK_ACTION.' link_menu');
 					$triggerDescription->setMenuPopup(
 						CMenuPopupHelper::getTrigger($trigger, null, $event['clock'])
 					);
@@ -822,7 +804,7 @@ else {
 					$hostName = null;
 
 					if (getRequest('hostid', 0) == 0) {
-						$hostName = new CSpan($host['name'], 'link_menu');
+						$hostName = new CSpan($host['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
 						$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 					}
 
@@ -851,7 +833,7 @@ else {
 	}
 
 	if (!$csvExport) {
-		$table = array($paging, $table, $paging);
+		$table = array($table, $paging);
 	}
 }
 

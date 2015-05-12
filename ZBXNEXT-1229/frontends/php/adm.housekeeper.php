@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of housekeeping');
 $page['file'] = 'adm.housekeeper.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -120,7 +119,10 @@ if (hasRequest('update')) {
 
 $form = new CForm();
 $form->cleanItems();
-$cmbConf = new CComboBox('configDropDown', 'adm.housekeeper.php', 'redirect(this.options[this.selectedIndex].value);',
+
+$controls = new CList();
+$controls->addItem(new CComboBox('configDropDown', 'adm.housekeeper.php',
+	'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
 		'adm.housekeeper.php' => _('Housekeeping'),
@@ -134,11 +136,11 @@ $cmbConf = new CComboBox('configDropDown', 'adm.housekeeper.php', 'redirect(this
 		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 		'adm.other.php' => _('Other')
 	)
-);
-$form->addItem($cmbConf);
+));
 
-$cnf_wdgt = new CWidget(null, 'hk');
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF HOUSEKEEPING'), $form);
+$form->addItem($controls);
+
+$cnf_wdgt = new CWidget()->setTitle(_('Housekeeping'))->setControls($form);
 
 $config = select_config();
 
@@ -186,7 +188,6 @@ else {
 }
 
 $houseKeeperForm = new CView('administration.general.housekeeper.edit', $data);
-$cnf_wdgt->addItem($houseKeeperForm->render());
-$cnf_wdgt->show();
+$cnf_wdgt->addItem($houseKeeperForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

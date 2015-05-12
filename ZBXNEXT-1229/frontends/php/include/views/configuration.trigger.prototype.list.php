@@ -18,25 +18,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$triggersWidget = new CWidget(null, 'trigger-list');
-
-// append host summary to widget header
-$triggersWidget->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
+$triggersWidget = (new CWidget())->
+	setTitle(
+		array(_('Trigger prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery'))
+	)->
+	addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 // create new application button
-$createForm = new CForm('get');
-$createForm->cleanItems();
-
-$createForm->addItem(new CSubmit('form', _('Create trigger prototype')));
+$createForm = (new CForm('get'))->cleanItems();
 $createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGER PROTOTYPES'), $createForm);
 
-// create widget header
+$createForm->addItem((new CList())->addItem(new CSubmit('form', _('Create trigger prototype'))));
 
-$triggersWidget->addHeader(array(_('Trigger prototypes of').SPACE,
-	new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')
-));
+$triggersWidget->setControls($createForm);
+
+/*
 $triggersWidget->addHeaderRowNumber(array(
 	'[ ',
 	new CLink(
@@ -47,6 +43,7 @@ $triggersWidget->addHeaderRowNumber(array(
 	),
 	' ]'
 ));
+*/
 
 // create form
 $triggersForm = new CForm();
@@ -54,9 +51,11 @@ $triggersForm->setName('triggersForm');
 $triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
-$triggersTable = new CTableInfo(_('No trigger prototypes found.'));
+$triggersTable = new CTableInfo();
 $triggersTable->setHeader(array(
-	new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
+	new CColHeader(
+		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
+		'cell-width'),
 	make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
 	_('Expression'),
@@ -76,7 +75,7 @@ foreach ($this->data['triggers'] as $trigger) {
 
 	if ($trigger['templateid'] > 0) {
 		if (!isset($this->data['realHosts'][$triggerid])) {
-			$description[] = new CSpan(_('Template'), 'unknown');
+			$description[] = new CSpan(_('Template'), ZBX_STYLE_GREY);
 			$description[] = NAME_DELIMITER;
 		}
 		else {
@@ -89,7 +88,7 @@ foreach ($this->data['triggers'] as $trigger) {
 			$description[] = new CLink(
 				CHtml::encode($real_host['name']),
 				'trigger_prototypes.php?parent_discoveryid='.$tpl_disc_ruleid,
-				'unknown'
+				ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY
 			);
 
 			$description[] = NAME_DELIMITER;
@@ -148,7 +147,7 @@ foreach ($this->data['triggers'] as $trigger) {
 			).
 			'&g_triggerid='.$triggerid.
 			'&parent_discoveryid='.$this->data['parent_discoveryid'],
-		triggerIndicatorStyle($trigger['status'])
+		ZBX_STYLE_LINK_ACTION.' '.triggerIndicatorStyle($trigger['status'])
 	);
 
 	// checkbox
@@ -167,10 +166,9 @@ zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
 
 // append table to form
 $triggersForm->addItem(array(
-	$this->data['paging'],
 	$triggersTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'g_triggerid',
+	new CActionButtonList('action', 'g_triggerid',
 		array(
 			'triggerprototype.massenable' => array('name' => _('Enable'),
 				'confirm' => _('Enable selected trigger prototypes?')
@@ -184,7 +182,7 @@ $triggersForm->addItem(array(
 			),
 		),
 		$this->data['parent_discoveryid']
-	))
+	)
 ));
 
 // append form to widget

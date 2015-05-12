@@ -34,7 +34,8 @@ $saveButton = new CSubmit('update', _('Update'));
 $saveButton->attr('data-removed-count', 0);
 $saveButton->main();
 
+$macrosTab->setFooter(makeFormFooter(null, array($saveButton)));
+
 $macrosForm->addItem($macrosTab);
-$macrosForm->addItem(makeFormFooter(null, array($saveButton)));
 
 return $macrosForm;

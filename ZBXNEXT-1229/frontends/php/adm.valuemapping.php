@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of value mapping');
 $page['file'] = 'adm.valuemapping.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -123,30 +122,35 @@ catch (Exception $e) {
 /*
  * Display
  */
-$generalComboBox = new CComboBox('configDropDown', 'adm.valuemapping.php', 'redirect(this.options[this.selectedIndex].value);');
-$generalComboBox->addItems(array(
-	'adm.gui.php' => _('GUI'),
-	'adm.housekeeper.php' => _('Housekeeping'),
-	'adm.images.php' => _('Images'),
-	'adm.iconmapping.php' => _('Icon mapping'),
-	'adm.regexps.php' => _('Regular expressions'),
-	'adm.macros.php' => _('Macros'),
-	'adm.valuemapping.php' => _('Value mapping'),
-	'adm.workingtime.php' => _('Working time'),
-	'adm.triggerseverities.php' => _('Trigger severities'),
-	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-	'adm.other.php' => _('Other')
-));
+$valueMapWidget = (new CWidget())->setTitle(_('Value mapping'));
 
 $valueMapForm = new CForm();
 $valueMapForm->cleanItems();
-$valueMapForm->addItem($generalComboBox);
+
+$controls = new CList();
+$controls->addItem(new CComboBox('configDropDown', 'adm.valuemapping.php',
+	'redirect(this.options[this.selectedIndex].value);',
+	array(
+		'adm.gui.php' => _('GUI'),
+		'adm.housekeeper.php' => _('Housekeeping'),
+		'adm.images.php' => _('Images'),
+		'adm.iconmapping.php' => _('Icon mapping'),
+		'adm.regexps.php' => _('Regular expressions'),
+		'adm.macros.php' => _('Macros'),
+		'adm.valuemapping.php' => _('Value mapping'),
+		'adm.workingtime.php' => _('Working time'),
+		'adm.triggerseverities.php' => _('Trigger severities'),
+		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
+		'adm.other.php' => _('Other')
+	)
+));
+
 if (!isset($_REQUEST['form'])) {
-	$valueMapForm->addItem(new CSubmit('form', _('Create value map')));
+	$controls->addItem(new CSubmit('form', _('Create value map')));
 }
 
-$valueMapWidget = new CWidget();
-$valueMapWidget->addPageHeader(_('CONFIGURATION OF VALUE MAPPING'), $valueMapForm);
+$valueMapForm->addItem($controls);
+$valueMapWidget->setControls($valueMapForm);
 
 if (isset($_REQUEST['form'])) {
 	$data = array(
@@ -197,9 +201,6 @@ else {
 		'valuemaps' => array()
 	);
 
-	$valueMapWidget->addHeader(_('Value mapping'));
-	$valueMapWidget->addItem(BR());
-
 	$dbValueMaps = DBselect('SELECT v.valuemapid,v.name FROM valuemaps v');
 
 	while ($dbValueMap = DBfetch($dbValueMaps)) {
@@ -220,7 +221,6 @@ else {
 	$valueMapForm = new CView('administration.general.valuemapping.list', $data);
 }
 
-$valueMapWidget->addItem($valueMapForm->render());
-$valueMapWidget->show();
+$valueMapWidget->addItem($valueMapForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

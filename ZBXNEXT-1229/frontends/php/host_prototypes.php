@@ -28,9 +28,6 @@ $page['title'] = _('Configuration of host prototypes');
 $page['file'] = 'host_prototypes.php';
 $page['scripts'] = array('effects.js', 'class.cviewswitcher.js', 'multiselect.js');
 
-//???
-$page['hist_arg'] = array('parent_discoveryid');
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION

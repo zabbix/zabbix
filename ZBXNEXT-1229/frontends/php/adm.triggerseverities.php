@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of trigger severities');
 $page['file'] = 'adm.triggerseverities.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -73,9 +72,13 @@ if (hasRequest('update')) {
 /*
  * Display
  */
+$cnf_wdgt = (new CWidget())->setTitle(_('Configuration of trigger severities'));
+
 $form = new CForm();
 $form->cleanItems();
-$cmbConf = new CComboBox('configDropDown', 'adm.triggerseverities.php',
+
+$controls = new CList();
+$controls->addItem(new CComboBox('configDropDown', 'adm.triggerseverities.php',
 	'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
@@ -90,11 +93,10 @@ $cmbConf = new CComboBox('configDropDown', 'adm.triggerseverities.php',
 		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 		'adm.other.php' => _('Other')
 	)
-);
-$form->addItem($cmbConf);
+));
 
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF TRIGGER SEVERITIES'), $form);
+$form->addItem($controls);
+$cnf_wdgt->setControls($form);
 
 $config = select_config();
 
@@ -132,7 +134,6 @@ else {
 }
 
 $triggerSeverityForm = new CView('administration.general.triggerSeverity.edit', $data);
-$cnf_wdgt->addItem($triggerSeverityForm->render());
-$cnf_wdgt->show();
+$cnf_wdgt->addItem($triggerSeverityForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

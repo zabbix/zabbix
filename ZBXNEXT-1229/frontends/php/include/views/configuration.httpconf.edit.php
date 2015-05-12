@@ -19,8 +19,7 @@
 **/
 
 
-$httpWidget = new CWidget();
-$httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'));
+$httpWidget = (new CWidget())->setTitle(_('Web monitoring'));
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
@@ -113,9 +112,9 @@ $httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status
 $httpAuthenticationFormList = new CFormList('httpAuthenticationFormList');
 
 // Authentication type
-$authenticationComboBox = new CComboBox('authentication', $this->data['authentication']);
-$authenticationComboBox->addItems(httptest_authentications());
-$httpAuthenticationFormList->addRow(_('HTTP authentication'), $authenticationComboBox);
+$httpAuthenticationFormList->addRow(_('HTTP authentication'),
+	new CComboBox('authentication', $this->data['authentication'], null, httptest_authentications())
+);
 
 $httpAuthenticationUserTB = new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64);
 $httpAuthenticationPasswordTB = new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64);
@@ -170,7 +169,7 @@ $stepsTable->setHeader(array(
 	new CCol(_('Timeout'), null, null, '50'),
 	new CCol(_('URL'), null, null, '200'),
 	new CCol(_('Required'), null, null, '50'),
-	new CCol(_('Status codes'), 'nowrap', null, '90'),
+	new CCol(_('Status codes'), ZBX_STYLE_NOWRAP, null, '90'),
 	new CCol('', null, null, '50')
 ));
 
@@ -251,8 +250,6 @@ $httpTab->addTab('scenarioTab', _('Scenario'), $httpFormList);
 $httpTab->addTab('stepTab', _('Steps'), $httpStepFormList);
 $httpTab->addTab('authenticationTab', _('Authentication'), $httpAuthenticationFormList);
 
-$httpForm->addItem($httpTab);
-
 // append buttons to form
 if (!empty($this->data['httptestid'])) {
 	$buttons = array(new CSubmit('clone', _('Clone')));
@@ -276,14 +273,16 @@ if (!empty($this->data['httptestid'])) {
 
 	$buttons[] = new CButtonCancel();
 
-	$httpForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$httpTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
-	$httpForm->addItem(makeFormFooter(
+	$httpTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
+
+$httpForm->addItem($httpTab);
 $httpWidget->addItem($httpForm);
 
 $this->data['agentVisibility'] = array();

@@ -28,7 +28,7 @@ if (!empty($this->data['hostid'])) {
 	$triggersWidget->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 
-$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGER PROTOTYPES'));
+$triggersWidget->setTitle(_('Trigger prototypes'));
 
 // create form
 $triggersForm = new CForm();
@@ -71,7 +71,8 @@ $addExpressionButton = new CButton(
 	($this->data['input_method'] == IM_TREE) ? _('Edit') : _('Add'),
 	'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 		'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression'.url_param('parent_discoveryid').
-		'&srcfld1=expression&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()), 800, 265);',
+		'&srcfld1=expression'.
+		'&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()));',
 	'button-form top'
 );
 if ($this->data['limited']) {
@@ -296,7 +297,7 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 
 $addButton = new CButton('add_dep_trigger', _('Add'),
 	'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
-		'&with_triggers=1&normal_only=1&noempty=1", 1000, 700);',
+		'&with_triggers=1&normal_only=1&noempty=1");',
 	'link_menu'
 );
 $addPrototypeButton = new CButton('add_dep_trigger_prototype', _('Add prototype'),
@@ -312,9 +313,6 @@ $dependenciesFormList->addRow(_('Dependencies'),
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
 
-// append tabs to form
-$triggersForm->addItem($triggersTab);
-
 // append buttons to form
 if (!empty($this->data['triggerid'])) {
 	$deleteButton = new CButtonDelete(_('Delete trigger prototype?'),
@@ -325,7 +323,7 @@ if (!empty($this->data['triggerid'])) {
 		$deleteButton->setAttribute('disabled', 'disabled');
 	}
 
-	$triggersForm->addItem(makeFormFooter(
+	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -335,11 +333,14 @@ if (!empty($this->data['triggerid'])) {
 	));
 }
 else {
-	$triggersForm->addItem(makeFormFooter(
+	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('parent_discoveryid')))
 	));
 }
+
+// append tabs to form
+$triggersForm->addItem($triggersTab);
 
 $triggersWidget->addItem($triggersForm);
 

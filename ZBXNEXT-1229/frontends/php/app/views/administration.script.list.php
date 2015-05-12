@@ -23,22 +23,24 @@ if ($data['uncheck']) {
 	uncheckTableRows();
 }
 
-$scriptsWidget = new CWidget();
+$scriptsWidget = (new CWidget())->setTitle(_('Scripts'));
 
 $createForm = new CForm('get');
-$createForm->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit'));
+$controls = new CList();
+$controls->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit'));
 
-$scriptsWidget->addPageHeader(_('CONFIGURATION OF SCRIPTS'), $createForm);
-$scriptsWidget->addHeader(_('Scripts'));
-$scriptsWidget->addHeaderRowNumber();
+$createForm->addItem($controls);
+$scriptsWidget->setControls($createForm);
 
 $scriptsForm = new CForm();
 $scriptsForm->setName('scriptsForm');
 $scriptsForm->setAttribute('id', 'scripts');
 
-$scriptsTable = new CTableInfo(_('No scripts found.'));
+$scriptsTable = new CTableInfo();
 $scriptsTable->setHeader(array(
-	new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');"),
+	new CColHeader(
+		new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');"),
+		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
 	_('Type'),
 	_('Execute on'),
@@ -86,15 +88,12 @@ foreach ($data['scripts'] as $script) {
 
 // append table to form
 $scriptsForm->addItem(array(
-	$data['paging'],
 	$scriptsTable,
 	$data['paging'],
-	get_table_header(new CActionButtonList('action', 'scriptids', array(
+	new CActionButtonList('action', 'scriptids', array(
 		'script.delete' => array('name' => _('Delete'), 'confirm' => _('Delete selected scripts?'))
-	)))
+	))
 ));
 
 // append form to widget
-$scriptsWidget->addItem($scriptsForm);
-
-$scriptsWidget->show();
+$scriptsWidget->addItem($scriptsForm)->show();

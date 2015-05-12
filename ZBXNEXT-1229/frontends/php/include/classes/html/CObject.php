@@ -52,6 +52,7 @@ class CObject {
 
 	public function cleanItems() {
 		$this->items = array();
+		return $this;
 	}
 
 	public function itemsCount() {

@@ -21,8 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.host.massupdate.js.php';
 
-$hostWidget = new CWidget();
-$hostWidget->addPageHeader(_('CONFIGURATION OF HOSTS'));
+$hostWidget = (new CWidget())->setTitle(_('Hosts'));
 
 // create form
 $hostView = new CForm();
@@ -58,9 +57,7 @@ $replaceGroups = new CDiv(new CMultiSelect(array(
 	'data' => $hostGroupsToReplace,
 	'popup' => array(
 		'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=groups_&srcfld1=groupid'.
-			'&writeonly=1&multiselect=1',
-		'width' => 450,
-		'height' => 450
+			'&writeonly=1&multiselect=1'
 	)
 )), null, 'replaceGroups');
 
@@ -111,9 +108,7 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		'addNew' => true,
 		'popup' => array(
 			'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_&srcfld1=groupid'.
-				'&writeonly=1&multiselect=1',
-			'width' => 450,
-			'height' => 450
+				'&writeonly=1&multiselect=1'
 		)
 	)), null, 'newGroups');
 
@@ -134,9 +129,7 @@ else {
 		'data' => $hostGroupsToAdd,
 		'popup' => array(
 			'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_&srcfld1=groupid'.
-				'&writeonly=1&multiselect=1',
-			'width' => 450,
-			'height' => 450
+				'&writeonly=1&multiselect=1'
 		)
 	));
 
@@ -176,16 +169,16 @@ $hostFormList->addRow(
 );
 
 // append status to form list
-$statusComboBox = new CComboBox('status', $data['status']);
-$statusComboBox->addItem(HOST_STATUS_MONITORED, _('Enabled'));
-$statusComboBox->addItem(HOST_STATUS_NOT_MONITORED, _('Disabled'));
 $hostFormList->addRow(
 	array(
 		_('Status'),
 		SPACE,
 		new CVisibilityBox('visible[status]', isset($data['visible']['status']), 'status', _('Original'))
 	),
-	$statusComboBox
+	new CComboBox('status', $data['status'], null, array(
+		HOST_STATUS_MONITORED => _('Enabled'),
+		HOST_STATUS_NOT_MONITORED => _('Disabled')
+	))
 );
 
 $templatesFormList = new CFormList('templatesFormList');
@@ -206,9 +199,7 @@ $templatesDiv = new CDiv(
 			'data' => $data['linkedTemplates'],
 			'popup' => array(
 				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$hostView->getName().
-					'&dstfld1=templates_&templated_hosts=1&multiselect=1',
-				'width' => 450,
-				'height' => 450
+					'&dstfld1=templates_&templated_hosts=1&multiselect=1'
 			)
 		)),
 		$clearDiv,
@@ -238,26 +229,22 @@ $templatesFormList->addRow(
 $ipmiFormList = new CFormList('ipmiFormList');
 
 // append ipmi to form list
-$ipmiAuthtypeComboBox = new CComboBox('ipmi_authtype', $data['ipmi_authtype']);
-$ipmiAuthtypeComboBox->addItems(ipmiAuthTypes());
 $ipmiFormList->addRow(
 	array(
 		_('IPMI authentication algorithm'),
 		SPACE,
 		new CVisibilityBox('visible[ipmi_authtype]', isset($data['visible']['ipmi_authtype']), 'ipmi_authtype', _('Original'))
 	),
-	$ipmiAuthtypeComboBox
+	new CComboBox('ipmi_authtype', $data['ipmi_authtype'], null, ipmiAuthTypes())
 );
 
-$ipmiPrivilegeComboBox = new CComboBox('ipmi_privilege', $data['ipmi_privilege']);
-$ipmiPrivilegeComboBox->addItems(ipmiPrivileges());
 $ipmiFormList->addRow(
 	array(
 		_('IPMI privilege level'),
 		SPACE,
 		new CVisibilityBox('visible[ipmi_privilege]', isset($data['visible']['ipmi_privilege']), 'ipmi_privilege', _('Original'))
 	),
-	$ipmiPrivilegeComboBox
+	new CComboBox('ipmi_privilege', $data['ipmi_privilege'], null, ipmiPrivileges())
 );
 
 $ipmiFormList->addRow(
@@ -281,17 +268,17 @@ $ipmiFormList->addRow(
 $inventoryFormList = new CFormList('inventoryFormList');
 
 // append inventories to form list
-$inventoryModesComboBox = new CComboBox('inventory_mode', $data['inventory_mode']);
-$inventoryModesComboBox->addItem(HOST_INVENTORY_DISABLED, _('Disabled'));
-$inventoryModesComboBox->addItem(HOST_INVENTORY_MANUAL, _('Manual'));
-$inventoryModesComboBox->addItem(HOST_INVENTORY_AUTOMATIC, _('Automatic'));
 $inventoryFormList->addRow(
 	array(
 		_('Inventory mode'),
 		SPACE,
 		new CVisibilityBox('visible[inventory_mode]', isset($data['visible']['inventory_mode']), 'inventory_mode', _('Original'))
 	),
-	$inventoryModesComboBox
+	new CComboBox('inventory_mode', $data['inventory_mode'], null, array(
+		HOST_INVENTORY_DISABLED => _('Disabled'),
+		HOST_INVENTORY_MANUAL => _('Manual'),
+		HOST_INVENTORY_AUTOMATIC => _('Automatic')
+	))
 );
 
 $hostInventoryTable = DB::getSchema('host_inventory');
@@ -337,13 +324,14 @@ $hostTab->addTab('hostTab', _('Host'), $hostFormList);
 $hostTab->addTab('templatesTab', _('Templates'), $templatesFormList);
 $hostTab->addTab('ipmiTab', _('IPMI'), $ipmiFormList);
 $hostTab->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
-$hostView->addItem($hostTab);
 
 // append buttons to form
-$hostView->addItem(makeFormFooter(
+$hostTab->setFooter(makeFormFooter(
 	new CSubmit('masssave', _('Update')),
 	array(new CButtonCancel(url_param('groupid')))
 ));
+
+$hostView->addItem($hostTab);
 
 $hostWidget->addItem($hostView);
 

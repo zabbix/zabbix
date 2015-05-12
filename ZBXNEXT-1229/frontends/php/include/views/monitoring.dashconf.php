@@ -19,9 +19,7 @@
 **/
 
 
-$dashconfWidget = new CWidget();
-$dashconfWidget->setClass('header');
-$dashconfWidget->addPageHeader(_('DASHBOARD CONFIGURATION'));
+$dashconfWidget = (new CWidget())->setTitle(_('Dashboard'));
 
 // create form
 $dashconfForm = new CForm();
@@ -34,19 +32,20 @@ $dashconfFormList = new CFormList('dashconfFormList');
 
 // append filter status to form list
 if ($this->data['isFilterEnable']) {
-	$filterStatusSpan = new CSpan(_('Enabled'), 'green underline pointer');
+	$filterStatusSpan = new CSpan(_('Enabled'), ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN);
 	$filterStatusSpan->setAttribute('onclick', "create_var('".$dashconfForm->getName()."', 'filterEnable', 0, true);");
 }
 else {
-	$filterStatusSpan = new CSpan(_('Disabled'), 'red underline pointer');
+	$filterStatusSpan = new CSpan(_('Disabled'), ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
 	$filterStatusSpan->setAttribute('onclick', "$('dashform').enable(); create_var('".$dashconfForm->getName()."', 'filterEnable', 1, true);");
 }
 $dashconfFormList->addRow(_('Dashboard filter'), $filterStatusSpan);
 
 // append host groups to form list
-$hostGroupsComboBox = new CComboBox('grpswitch', $this->data['grpswitch'], 'submit();');
-$hostGroupsComboBox->addItem(0, _('All'));
-$hostGroupsComboBox->addItem(1, _('Selected'));
+$hostGroupsComboBox = new CComboBox('grpswitch', $this->data['grpswitch'], 'submit()', array(
+	0 => _('All'),
+	1 => _('Selected')
+));
 if (!$this->data['isFilterEnable']) {
 	$hostGroupsComboBox->setAttribute('disabled', 'disabled');
 }
@@ -60,9 +59,7 @@ if ($this->data['grpswitch']) {
 		'disabled' => !$this->data['isFilterEnable'],
 		'popup' => array(
 			'parameters' => 'srctbl=host_groups&dstfrm='.$dashconfForm->getName().'&dstfld1=groupids_'.
-				'&srcfld1=groupid&multiselect=1',
-			'width' => 450,
-			'height' => 450
+				'&srcfld1=groupid&multiselect=1'
 		)
 	)));
 	$dashconfFormList->addRow(_('Hide selected groups'), new CMultiSelect(array(
@@ -72,9 +69,7 @@ if ($this->data['grpswitch']) {
 		'disabled' => !$this->data['isFilterEnable'],
 		'popup' => array(
 			'parameters' => 'srctbl=host_groups&dstfrm='.$dashconfForm->getName().'&dstfld1=hidegroupids_'.
-				'&srcfld1=groupid&multiselect=1',
-			'width' => 450,
-			'height' => 450
+				'&srcfld1=groupid&multiselect=1'
 		)
 	)));
 }
@@ -101,8 +96,7 @@ array_pop($severities);
 $dashconfFormList->addRow(_('Triggers with severity'), $severities);
 
 // append problem display to form list
-$extAckComboBox = new CComboBox('extAck', $this->data['extAck']);
-$extAckComboBox->addItems(array(
+$extAckComboBox = new CComboBox('extAck', $this->data['extAck'], null, array(
 	EXTACK_OPTION_ALL => _('All'),
 	EXTACK_OPTION_BOTH => _('Separated'),
 	EXTACK_OPTION_UNACK => _('Unacknowledged only')
@@ -117,12 +111,12 @@ $dashconfFormList->addRow(_('Problem display'), $extAckComboBox);
 $dashconfTab = new CTabView();
 $dashconfTab->addTab('dashconfTab', _('Filter'), $dashconfFormList);
 
-$dashconfForm->addItem($dashconfTab);
-$dashconfForm->addItem(makeFormFooter(
+$dashconfTab->setFooter(makeFormFooter(
 	new CSubmit('update', _('Update')),
 	array(new CButtonCancel())
 ));
 
+$dashconfForm->addItem($dashconfTab);
 $dashconfWidget->addItem($dashconfForm);
 
 return $dashconfWidget;

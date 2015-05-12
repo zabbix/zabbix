@@ -21,8 +21,7 @@
 
 $this->includeJSfile('app/views/administration.mediatype.edit.js.php');
 
-$mediaTypeWidget = new CWidget();
-$mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'));
+$mediaTypeWidget = (new CWidget())->setTitle(_('Media types'));
 
 // create form
 $mediaTypeForm = new CForm();
@@ -37,12 +36,11 @@ $nameTextBox->attr('autofocus', 'autofocus');
 $mediaTypeFormList->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
-$cmbType = new CComboBox('type', $data['type']);
-$cmbType->addItems(array(
+$cmbType = new CComboBox('type', $data['type'], null, array(
 	MEDIA_TYPE_EMAIL => _('Email'),
 	MEDIA_TYPE_EXEC => _('Script'),
 	MEDIA_TYPE_SMS => _('SMS'),
-	MEDIA_TYPE_JABBER => _('Jabber'),
+	MEDIA_TYPE_JABBER => _('Jabber')
 ));
 $cmbType->addItemsInGroup(_('Commercial'), array(MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')));
 $cmbTypeRow = array($cmbType);
@@ -74,21 +72,16 @@ else {
 $mediaTypeFormList->addRow(_('Jabber identifier'), new CTextBox('jabber_username', $data['jabber_username'], ZBX_TEXTBOX_STANDARD_SIZE));
 $mediaTypeFormList->addRow(_('Username'), new CTextBox('eztext_username', $data['eztext_username'], ZBX_TEXTBOX_STANDARD_SIZE));
 $mediaTypeFormList->addRow(_('Password'), $passwdField);
-$limitCb = new CComboBox('eztext_limit', $data['exec_path']);
-$limitCb->addItems(array(
+$mediaTypeFormList->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['exec_path'], null, array(
 	EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
-	EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)'),
-));
-$mediaTypeFormList->addRow(_('Message text limit'), $limitCb);
+	EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
+)));
 
 $mediaTypeFormList->addRow(_('Enabled'), new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE == $data['status'], null, MEDIA_TYPE_STATUS_ACTIVE));
 
 // append form list to tab
 $mediaTypeTab = new CTabView();
 $mediaTypeTab->addTab('mediaTypeTab', _('Media type'), $mediaTypeFormList);
-
-// append tab to form
-$mediaTypeForm->addItem($mediaTypeTab);
 
 // append buttons to form
 $cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.list');
@@ -98,7 +91,7 @@ if ($data['mediatypeid'] == 0) {
 	$addButton = new CSubmitButton(_('Add'), 'action', 'mediatype.create');
 	$addButton->setAttribute('id', 'add');
 
-	$mediaTypeForm->addItem(makeFormFooter(
+	$mediaTypeTab->setFooter(makeFormFooter(
 		$addButton,
 		array($cancelButton)
 	));
@@ -114,7 +107,7 @@ else {
 	);
 	$deleteButton->setAttribute('id', 'delete');
 
-	$mediaTypeForm->addItem(makeFormFooter(
+	$mediaTypeTab->setFooter(makeFormFooter(
 		$updateButton,
 		array(
 			$cloneButton,
@@ -124,7 +117,8 @@ else {
 	));
 }
 
-// append form to widget
-$mediaTypeWidget->addItem($mediaTypeForm);
+// append tab to form
+$mediaTypeForm->addItem($mediaTypeTab);
 
-$mediaTypeWidget->show();
+// append form to widget
+$mediaTypeWidget->addItem($mediaTypeForm)->show();

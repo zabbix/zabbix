@@ -57,25 +57,16 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 	$reportForm->addRow(_('Y label'), new CTextBox('ylabel', $ylabel, 40));
 	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend', $showlegend, null, 1));
 
-	$scale = new CComboBox('scaletype', $scaletype);
-	$scale->addItem(TIMEPERIOD_TYPE_HOURLY, _('Hourly'));
-	$scale->addItem(TIMEPERIOD_TYPE_DAILY, 	_('Daily'));
-	$scale->addItem(TIMEPERIOD_TYPE_WEEKLY,	_('Weekly'));
-	$scale->addItem(TIMEPERIOD_TYPE_MONTHLY, _('Monthly'));
-	$scale->addItem(TIMEPERIOD_TYPE_YEARLY,	_('Yearly'));
-	$reportForm->addRow(_('Scale'), $scale);
+	$reportForm->addRow(_('Scale'), new CComboBox('scaletype', $scaletype, null, array(
+		TIMEPERIOD_TYPE_HOURLY => _('Hourly'),
+		TIMEPERIOD_TYPE_DAILY => _('Daily'),
+		TIMEPERIOD_TYPE_WEEKLY => _('Weekly'),
+		TIMEPERIOD_TYPE_MONTHLY => _('Monthly'),
+		TIMEPERIOD_TYPE_YEARLY => _('Yearly')
+	)));
 
-	$reporttimetab = new CTable(null, 'calendar');
-
-	$timeSinceRow = createDateSelector('report_timesince', $report_timesince, 'report_timetill');
-	array_unshift($timeSinceRow, _('From'));
-	$reporttimetab->addRow($timeSinceRow);
-
-	$timeTillRow = createDateSelector('report_timetill', $report_timetill, 'report_timesince');
-	array_unshift($timeTillRow, _('Till'));
-	$reporttimetab->addRow($timeTillRow);
-
-	$reportForm->addRow(_('Period'), $reporttimetab);
+	$reportForm->addRow(_('From'), createDateSelector('report_timesince', $report_timesince, 'report_timetill'));
+	$reportForm->addRow(_('Till'), createDateSelector('report_timetill', $report_timetill, 'report_timesince'));
 
 	if ($items) {
 		$items = CMacrosResolverHelper::resolveItemNames($items);
@@ -87,7 +78,7 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 			$caption = new CSpan($item['caption'], 'link');
 			$caption->onClick('return PopUp("popup_bitem.php?config='.BR_DISTRIBUTION_MULTIPLE_PERIODS.
 				'&list_name=items&dstfrm='.$reportForm->GetName().url_param($item, false).
-				url_param($id, false, 'gid').'", 550, 400, "graph_item_form");'
+				url_param($id, false, 'gid').'", 0, 0, "graph_item_form");'
 			);
 
 			$description = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
@@ -117,7 +108,7 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 	$reportForm->addRow(_('Items'), array(
 		$items_table,
 		new CButton('add_item', _('Add'), 'return PopUp("popup_bitem.php?config='.BR_DISTRIBUTION_MULTIPLE_PERIODS.
-			'&dstfrm='.$reportForm->getName().'", 800, 400, "graph_item_form");'
+			'&dstfrm='.$reportForm->getName().'", 0, 0, "graph_item_form");'
 		),
 		$delete_button
 	));
@@ -163,13 +154,11 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 	$reportForm->addRow(_('Y label'), new CTextBox('ylabel', $ylabel, 40));
 
 	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend', $showlegend, null, 1));
-
 	if (count($periods) < 2) {
-		$sortCmb = new CComboBox('sorttype', $sorttype);
-			$sortCmb->addItem(0, _('Name'));
-			$sortCmb->addItem(1, _('Value'));
-
-		$reportForm->addRow(_('Sort by'), $sortCmb);
+		$reportForm->addRow(_('Sort by'), new CComboBox('sorttype', $sorttype, null, array(
+			0 => _('Name'),
+			1 => _('Value')
+		)));
 	}
 	else {
 		$reportForm->addVar('sortorder', 0);
@@ -185,7 +174,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 				$period['report_timesince'].'&report_timetill='.$period['report_timetill'].'&color='.$period['color'];
 
 			$caption = new CSpan($period['caption'], 'link');
-			$caption->addAction('onclick', "return PopUp('".$edit_link."',840,340,'period_form');");
+			$caption->addAction('onclick', "return PopUp('".$edit_link."', 0, 0, 'period_form');");
 
 			$periods_table->addRow(array(
 				new CCheckBox('group_pid['.$pid.']'),
@@ -208,7 +197,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 	$reportForm->addRow(_('Period'), array(
 		$periods_table,
 		new CButton('add_period', _('Add'), 'return PopUp("popup_period.php?config='.BR_DISTRIBUTION_MULTIPLE_ITEMS.
-			'&dstfrm='.$reportForm->getName().'", 840, 340, "period_form");'
+			'&dstfrm='.$reportForm->getName().'", 0, 0, "period_form");'
 		),
 		$delete_button
 	));
@@ -221,7 +210,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 		foreach ($items as $id => &$item) {
 			$caption = new CSpan($item['caption'], 'link');
 			$caption->onClick('return PopUp("popup_bitem.php?config='.BR_DISTRIBUTION_MULTIPLE_ITEMS.'&list_name=items'.
-				'&dstfrm='.$reportForm->GetName().url_param($item, false).url_param($id, false, 'gid').'", 550, 400, "'.
+				'&dstfrm='.$reportForm->GetName().url_param($item, false).url_param($id, false, 'gid').'", 0, 0, "'.
 				'graph_item_form");'
 			);
 
@@ -250,7 +239,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 	$reportForm->addRow(_('Items'), array(
 		$items_table,
 		new CButton('add_item',_('Add'), "return PopUp('popup_bitem.php?config=".BR_DISTRIBUTION_MULTIPLE_ITEMS.
-			"&dstfrm=".$reportForm->getName()."', 550, 400, 'graph_item_form');"
+			"&dstfrm=".$reportForm->getName()."', 0, 0, 'graph_item_form');"
 		),
 		$delete_button
 	));
@@ -369,33 +358,24 @@ function valueComparisonFormForMultiplePeriods() {
 		array(_('Other hosts | Group').SPACE, $cmbGroups)
 	));
 
-	$reporttimetab = new CTable(null,'calendar');
+	$reportForm->addRow(_('From'), createDateSelector('report_timesince', $report_timesince, 'report_timetill'));
+	$reportForm->addRow(_('Till'), createDateSelector('report_timetill', $report_timetill, 'report_timesince'));
 
-	$timeSinceRow = createDateSelector('report_timesince', $report_timesince, 'report_timetill');
-	array_unshift($timeSinceRow, _('From'));
-	$reporttimetab->addRow($timeSinceRow);
+	$reportForm->addRow(_('Scale'), new CComboBox('scaletype', $scaletype, null, array(
+		TIMEPERIOD_TYPE_HOURLY => _('Hourly'),
+		TIMEPERIOD_TYPE_DAILY => _('Daily'),
+		TIMEPERIOD_TYPE_WEEKLY => _('Weekly'),
+		TIMEPERIOD_TYPE_MONTHLY => _('Monthly'),
+		TIMEPERIOD_TYPE_YEARLY => _('Yearly')
+	)));
 
-	$timeTillRow = createDateSelector('report_timetill', $report_timetill, 'report_timesince');
-	array_unshift($timeTillRow, _('Till'));
-	$reporttimetab->addRow($timeTillRow);
-
-	$reportForm->addRow(_('Period'), $reporttimetab);
-
-	$scale = new CComboBox('scaletype', $scaletype);
-	$scale->addItem(TIMEPERIOD_TYPE_HOURLY, _('Hourly'));
-	$scale->addItem(TIMEPERIOD_TYPE_DAILY, _('Daily'));
-	$scale->addItem(TIMEPERIOD_TYPE_WEEKLY, _('Weekly'));
-	$scale->addItem(TIMEPERIOD_TYPE_MONTHLY, _('Monthly'));
-	$scale->addItem(TIMEPERIOD_TYPE_YEARLY, _('Yearly'));
-	$reportForm->addRow(_('Scale'), $scale);
-
-	$avgcmb = new CComboBox('avgperiod', $avgperiod);
-	$avgcmb->addItem(TIMEPERIOD_TYPE_HOURLY, _('Hourly'));
-	$avgcmb->addItem(TIMEPERIOD_TYPE_DAILY, _('Daily'));
-	$avgcmb->addItem(TIMEPERIOD_TYPE_WEEKLY, _('Weekly'));
-	$avgcmb->addItem(TIMEPERIOD_TYPE_MONTHLY, _('Monthly'));
-	$avgcmb->addItem(TIMEPERIOD_TYPE_YEARLY, _('Yearly'));
-	$reportForm->addRow(_('Average by'), $avgcmb);
+	$reportForm->addRow(_('Average by'), new CComboBox('avgperiod', $avgperiod, null, array(
+		TIMEPERIOD_TYPE_HOURLY => _('Hourly'),
+		TIMEPERIOD_TYPE_DAILY => _('Daily'),
+		TIMEPERIOD_TYPE_WEEKLY => _('Weekly'),
+		TIMEPERIOD_TYPE_MONTHLY => _('Monthly'),
+		TIMEPERIOD_TYPE_YEARLY => _('Yearly')
+	)));
 
 	$itemName = '';
 	if ($itemId) {
@@ -424,18 +404,19 @@ function valueComparisonFormForMultiplePeriods() {
 
 	$reportForm->addRow(_('Item'), array($txtCondVal, $btnSelect));
 
-	$paletteCmb = new CComboBox('palette', $palette);
-	$paletteCmb->addItem(0, _s('Palette #%1$s', 1));
-	$paletteCmb->addItem(1, _s('Palette #%1$s', 2));
-	$paletteCmb->addItem(2, _s('Palette #%1$s', 3));
-	$paletteCmb->addItem(3, _s('Palette #%1$s', 4));
-
-	$paletteTypeCmb = new CComboBox('palettetype', $palettetype);
-	$paletteTypeCmb->addItem(0, _('Middle'));
-	$paletteTypeCmb->addItem(1, _('Darken'));
-	$paletteTypeCmb->addItem(2, _('Brighten'));
-
-	$reportForm->addRow(_('Palette'), array($paletteCmb, $paletteTypeCmb));
+	$reportForm->addRow(_('Palette'), array(
+		new CComboBox('palette', $palette, null, array(
+			0 => _s('Palette #%1$s', 1),
+			1 => _s('Palette #%1$s', 2),
+			2 => _s('Palette #%1$s', 3),
+			3 => _s('Palette #%1$s', 4)
+		)),
+		new CComboBox('palettetype', $palettetype, null, array(
+			0 => _('Middle'),
+			1 => _('Darken'),
+			2 => _('Brighten')
+		))
+	));
 
 	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
 	$reportForm->addItemToBottomRow(new CSubmit('report_reset', _('Reset')));
