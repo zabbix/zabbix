@@ -21,8 +21,7 @@
 
 $this->includeJSfile('app/views/administration.proxy.edit.js.php');
 
-$proxyWidget = new CWidget();
-$proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'));
+$proxyWidget = (new CWidget())->setTitle(_('Proxies'));
 
 // create form
 $proxyForm = new CForm();
@@ -126,7 +125,6 @@ $encryptionFormList->addRow(_('PSK'), $encryptionInPSK);
 $proxyTab = new CTabView();
 $proxyTab->addTab('proxyTab', _('Proxy'), $proxyFormList);
 $proxyTab->addTab('encryptionTab', _('Encryption'), $encryptionFormList);
-$proxyForm->addItem($proxyTab);
 
 // append buttons to form
 $cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list');
@@ -136,7 +134,7 @@ if ($data['proxyid'] == 0) {
 	$addButton = new CSubmitButton(_('Add'), 'action', 'proxy.create');
 	$addButton->setAttribute('id', 'add');
 
-	$proxyForm->addItem(makeFormFooter(
+	$proxyTab->setFooter(makeFormFooter(
 		$addButton,
 		array($cancelButton)
 	));
@@ -152,7 +150,7 @@ else {
 	);
 	$deleteButton->setAttribute('id', 'delete');
 
-	$proxyForm->addItem(makeFormFooter(
+	$proxyTab->setFooter(makeFormFooter(
 		$updateButton,
 		array(
 			$cloneButton,
@@ -162,7 +160,5 @@ else {
 	));
 }
 
-// append form to widget
-$proxyWidget->addItem($proxyForm);
-
-$proxyWidget->show();
+$proxyForm->addItem($proxyTab);
+$proxyWidget->addItem($proxyForm)->show();

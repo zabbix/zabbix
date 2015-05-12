@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Host inventory overview');
 $page['file'] = 'hostinventoriesoverview.php';
-$page['hist_arg'] = array('groupid', 'hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -68,8 +67,7 @@ $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['groupby'] = getRequest('groupby', '');
 $groupFieldTitle = '';
 
-$hostinvent_wdgt = new CWidget();
-$hostinvent_wdgt->addPageHeader(_('HOST INVENTORY OVERVIEW'));
+$hostinvent_wdgt = (new CWidget())->setTitle(_('Host inventory overview'));
 
 // getting inventory fields to make a drop down
 $inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
@@ -87,12 +85,13 @@ foreach($inventoryFields as $inventoryField){
 }
 
 $r_form = new CForm('get');
-$r_form->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB(), SPACE));
-$r_form->addItem(array(_('Grouping by'), SPACE, $inventoryFieldsComboBox));
-$hostinvent_wdgt->addHeader(_('Hosts'), $r_form);
-$hostinvent_wdgt->addItem(BR());
+$controls = new CList();
+$controls->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+$controls->addItem(array(_('Grouping by').SPACE, $inventoryFieldsComboBox));
+$r_form->addItem($controls);
+$hostinvent_wdgt->setControls($r_form);
 
-$table = new CTableInfo(_('No hosts found.'));
+$table = new CTableInfo();
 $table->setHeader(
 	array(
 		make_sorting_header($groupFieldTitle === '' ? _('Field') : $groupFieldTitle, 'inventory_field',

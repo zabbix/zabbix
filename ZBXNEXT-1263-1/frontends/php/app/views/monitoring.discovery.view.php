@@ -19,22 +19,23 @@
 **/
 
 
-$discoveryWidget = new CWidget('hat_discovery');
+$discoveryWidget = (new CWidget())->setTitle(_('Status of discovery'));
 
 // create header form
+$controls = new CList();
+$controls->addItem(array(_('Discovery rule'), SPACE, $data['pageFilter']->getDiscoveryCB()));
+$controls->addItem(get_icon('fullscreen', array('fullscreen' => $data['fullscreen'])));
+
 $discoveryHeaderForm = new CForm('get');
 $discoveryHeaderForm->setName('slideHeaderForm');
 $discoveryHeaderForm->addVar('action', 'discovery.view');
 $discoveryHeaderForm->addVar('fullscreen', $data['fullscreen']);
-$discoveryWidget->addPageHeader(_('STATUS OF DISCOVERY'), get_icon('fullscreen', array('fullscreen' => $data['fullscreen'])));
+$discoveryHeaderForm->addItem($controls);
 
-$discoveryRulesComboBox = $data['pageFilter']->getDiscoveryCB();
-
-$discoveryHeaderForm->addItem(array(_('Discovery rule').SPACE, $discoveryRulesComboBox));
-$discoveryWidget->addHeader(_('Discovery rules'), $discoveryHeaderForm);
+$discoveryWidget->setControls($discoveryHeaderForm);
 
 // create table
-$discoveryTable = new CTableInfo(_('No discovered devices found.'));
+$discoveryTable = new CTableInfo();
 $discoveryTable->makeVerticalRotation();
 
 $discoveredDeviceCol = make_sorting_header(_('Discovered device'), 'ip', $data['sort'], $data['sortorder']);
@@ -42,12 +43,12 @@ $discoveredDeviceCol->addClass('left');
 
 $header = array(
 	$discoveredDeviceCol,
-	new CCol(_('Monitored host'), 'left'),
-	new CCol(array(_('Uptime').'/', _('Downtime')), 'left')
+	new CColHeader(_('Monitored host'), 'left'),
+	new CColHeader(array(_('Uptime').'/', _('Downtime')), 'left')
 );
 
 foreach ($data['services'] as $name => $foo) {
-	$header[] = new CCol($name, 'vertical_rotation');
+	$header[] = new CColHeader($name, 'vertical_rotation');
 }
 $discoveryTable->setHeader($header, 'vertical_header');
 
@@ -180,5 +181,4 @@ foreach ($data['drules'] as $drule) {
 	}
 }
 
-$discoveryWidget->addItem($discoveryTable);
-$discoveryWidget->show();
+$discoveryWidget->addItem($discoveryTable)->show();

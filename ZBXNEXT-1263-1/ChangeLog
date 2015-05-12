@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+..F.I..PS. [ZBXNEXT-2800] increased error field lengths in "hosts" table from 128 to 2048 (asaveljevs)
 ....I..... [ZBXNEXT-2495] improved performance of maps; changed triggers_2 index (Sasha)
 ........S. [ZBXNEXT-2474] improved value cache low memory mode handling by switching back to normal mode once per day. The current value cache operational mode now can be checked with zabbix[vcache,cache,mode] interval item (wiper)
 ........S. [ZBXNEXT-2462] improved nodata() function calculation (wiper)
@@ -31,6 +32,7 @@ A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent, updated outdated
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+..F....... [ZBXNEXT-2791] synchronised item key helper descriptions and return values from the Zabbix manual (Richlv)
 ........S. [ZBX-9470] fixed bug when sometimes value cache would try to cache already cached time based request (wiper)
 ...G...... [ZBX-9317] changed proc.mem[] and proc.num[] to return 0 if the specified user does not exist (asaveljevs)
 ...G...... [ZBX-8513] changed vm.memory.size[available] key on AIX to return the sum of free and cached memory (wiper)

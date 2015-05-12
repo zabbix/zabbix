@@ -21,32 +21,19 @@
 
 require_once dirname(__FILE__).'/js/reports.toptriggers.js.php';
 
-$topTriggers = new CWidget(null, 'top-triggers');
-$topTriggers->addHeader(_('Report'));
+$topTriggers = (new CWidget())->setTitle(_('Most busy triggers Top 100'));
 
-$filterForm = new CForm('get');
-$filterForm->setAttribute('name', 'zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
+$filterForm = new CFilter('web.toptriggers.filter.state');
 $filterForm->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']));
 $filterForm->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_till']));
 
-$filterTable = new CTable(null, 'filter');
+$filterColumn1 = new CFormList();
+$filterColumn2 = new CFormList();
 
-$periodTable = new CTable(null, 'period-table');
-
-$periodTable->addRow(array(
-	new CCol(bold(_('From')), 'label'),
-	new CCol(array(createDateSelector('filter_from', $this->data['filter']['filter_from'])))
-));
-
-$periodTable->addRow(array(
-	new CCol(bold(_('Till')), 'label'),
-	new CCol(array(createDateSelector('filter_till', $this->data['filter']['filter_till'])))
-));
-
-$periodTable->addRow(array(
-	new CCol(null, 'label'),
-	new CCol(array(
+$filterColumn2->addRow(_('From'), createDateSelector('filter_from', $this->data['filter']['filter_from']));
+$filterColumn2->addRow(_('Till'), createDateSelector('filter_till', $this->data['filter']['filter_till']));
+$filterColumn2->addRow(null,
+	array(
 		new CButton(null, _('Today'), 'javascript: setPeriod('.REPORT_PERIOD_TODAY.');', 'link_menu'),
 		new CButton(null, _('Yesterday'), 'javascript: setPeriod('.REPORT_PERIOD_YESTERDAY.');',
 			'link_menu period-link'
@@ -70,48 +57,38 @@ $periodTable->addRow(array(
 		new CButton(null, _('Last year'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');',
 			'link_menu period-link'
 		)
-	), 'quick-input')
-));
+	)
+);
 
-$periods = new CCol($periodTable, 'top');
-$periods->setRowSpan(3);
-
-$filterTable->addRow(array(
-	new CCol(bold(_('Host groups')), 'label'),
-	new CCol(new CMultiSelect(
+$filterColumn1->addRow(
+	'Host groups',
+	new CMultiSelect(
 		array(
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
 			'data' => $this->data['multiSelectHostGroupData'],
 			'popup' => array(
 				'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
-					'&srcfld1=groupid&multiselect=1',
-				'width' => 450,
-				'height' => 450
+					'&srcfld1=groupid&multiselect=1'
 			)
-		)),
-		'inputcol'
-	),
-	$periods
-));
+		)
+	)
+);
 
-$filterTable->addRow(array(
-	new CCol(bold(_('Hosts')), 'label'),
-	new CCol(new CMultiSelect(
+$filterColumn1->addRow(
+	'Hosts',
+	new CMultiSelect(
 		array(
 			'name' => 'hostids[]',
 			'objectName' => 'hosts',
 			'data' => $this->data['multiSelectHostData'],
 			'popup' => array(
 				'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
-					'&real_hosts=1&multiselect=1',
-				'width' => 450,
-				'height' => 450
+					'&real_hosts=1&multiselect=1'
 			)
-		)),
-		'inputcol'
+		)
 	)
-));
+);
 
 // severities
 $severitiesTable = new CTable(null, 'severities-table');
@@ -132,28 +109,15 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 $severitiesTable->addRow($severitiesCol1);
 $severitiesTable->addRow($severitiesCol2);
 
-$filterTable->addRow(array(
-	new CCol(bold(_('Severity')), 'label top'),
-	new CCol($severitiesTable)
-));
+$filterColumn1->addRow(_('Severity'), $severitiesTable);
 
-$filterButton = new CSubmit('filter_set', _('Filter'), null, 'jqueryinput shadow');
-$filterButton->main();
+$filterForm->addColumn($filterColumn1);
+$filterForm->addColumn($filterColumn2);
 
-$resetButton = new CSubmit('filter_rst', _('Reset'), null, 'jqueryinput shadow');
-
-$divButtons = new CDiv(array($filterButton, $resetButton));
-$divButtons->addStyle('padding: 4px 0px;');
-
-$filterTable->addRow(new CCol($divButtons, 'controls', 4));
-
-$filterForm->addItem($filterTable);
-
-$topTriggers->addFlicker($filterForm, CProfile::get('web.toptriggers.filter.state', 0));
-$topTriggers->addPageHeader(_('MOST BUSY TRIGGERS TOP 100'));
+$topTriggers->addItem($filterForm);
 
 // table
-$table = new CTableInfo(_('No triggers found.'));
+$table = new CTableInfo();
 $table->setHeader(array(
 	_('Host'),
 	_('Trigger'),
@@ -165,11 +129,11 @@ foreach ($this->data['triggers'] as $trigger) {
 	$hostId = $trigger['hosts'][0]['hostid'];
 
 	$hostName = new CSpan($trigger['hosts'][0]['name'],
-		'link_menu menu-host'.(($this->data['hosts'][$hostId]['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
+		ZBX_STYLE_LINK_ACTION.' link_menu'.(($this->data['hosts'][$hostId]['status'] == HOST_STATUS_NOT_MONITORED) ? ' '.ZBX_STYLE_RED : '')
 	);
 	$hostName->setMenuPopup(CMenuPopupHelper::getHost($this->data['hosts'][$hostId], $this->data['scripts'][$hostId]));
 
-	$triggerDescription = new CSpan($trigger['description'], 'link_menu');
+	$triggerDescription = new CSpan($trigger['description'], ZBX_STYLE_LINK_ACTION.' link_menu');
 	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	$table->addRow(array(

@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of web monitoring');
 $page['file'] = 'httpconf.php';
 $page['scripts'] = array('class.cviewswitcher.js');
-$page['hist_arg'] = array('groupid', 'hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -47,7 +46,7 @@ $fields = array(
 	'retries'         => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({add}) || isset({update})', _('Retries')),
 	'status'          => array(T_ZBX_STR, O_OPT, null,  null,                    null),
 	'agent'           => array(T_ZBX_STR, O_OPT, null, null,                     'isset({add}) || isset({update})'),
-	'agent_other'     => array(T_ZBX_STR, O_OPT, P_NO_TRIM, null,
+	'agent_other'     => array(T_ZBX_STR, O_OPT, null, null,
 		'(isset({add}) || isset({update})) && {agent} == '.ZBX_AGENT_OTHER
 	),
 	'variables'       => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})'),
