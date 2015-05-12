@@ -666,7 +666,6 @@
 			jQuery('#update').button('option', 'label', <?php echo CJs::encodeJson(_('Add')); ?>)
 				.attr({id: 'add', name: 'add'});
 			jQuery('#druleid, #delete, #clone').remove();
-			jQuery('#cancel').addClass('ui-corner-left');
 			jQuery('#form').val('clone');
 			jQuery('#name').focus();
 		});

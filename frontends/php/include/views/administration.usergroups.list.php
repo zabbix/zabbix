@@ -18,30 +18,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$userGroupsWidget = new CWidget();
+$userGroupsWidget = (new CWidget())->setTitle(_('User groups'));
 
 // append page header to widget
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$configurationComboBox = new CComboBox('config', 'usergrps.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-$configurationComboBox->addItem('usergrps.php', _('User groups'));
-$configurationComboBox->addItem('users.php', _('Users'));
-$createForm->addItem(array($configurationComboBox, new CSubmit('form', _('Create user group'))));
-$userGroupsWidget->addPageHeader(_('CONFIGURATION OF USER GROUPS'), $createForm);
-
-// append header to widget
-$userGroupsWidget->addHeader(_('User groups'));
-$userGroupsWidget->addHeaderRowNumber();
+$controls = new CList();
+$controls->addItem(new CSubmit('form', _('Create user group')));
+$createForm->addItem($controls);
+$userGroupsWidget->setControls($createForm);
 
 // create form
 $userGroupsForm = new CForm();
 $userGroupsForm->setName('userGroupsForm');
 
 // create user group table
-$userGroupTable = new CTableInfo(_('No user groups found.'));
+$userGroupTable = new CTableInfo();
 $userGroupTable->setHeader(array(
-	new CCheckBox('all_groups', null, "checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');"),
+	new CColHeader(
+		new CCheckBox('all_groups', null, "checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');"),
+		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	'#',
 	_('Members'),
@@ -54,17 +50,17 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 	$userGroupId = $usrgrp['usrgrpid'];
 
 	$debugMode = ($usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
-		? new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisabledebug&usrgrpid='.$userGroupId, 'orange')
-		: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenabledebug&usrgrpid='.$userGroupId, 'enabled');
+		? new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisabledebug&usrgrpid='.$userGroupId, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_ORANGE)
+		: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenabledebug&usrgrpid='.$userGroupId, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN);
 
 	// gui access
 	$guiAccess = user_auth_type2str($usrgrp['gui_access']);
-	$guiAccessStyle = 'enabled';
+	$guiAccessStyle = ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN;
 	if ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_INTERNAL) {
-		$guiAccessStyle = 'orange';
+		$guiAccessStyle = ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_ORANGE;
 	}
 	if ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-		$guiAccessStyle = 'disabled';
+		$guiAccessStyle = ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED;
 	}
 
 	if (granted2update_group($userGroupId)) {
@@ -79,12 +75,12 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 		);
 
 		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
-			? new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisable&usrgrpid='.$userGroupId, 'enabled')
-			: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenable&usrgrpid='.$userGroupId, 'disabled');
+			? new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisable&usrgrpid='.$userGroupId, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN)
+			: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenable&usrgrpid='.$userGroupId, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
 	}
 	else {
 		$guiAccess = new CSpan($guiAccess, $guiAccessStyle);
-		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED) ? new CSpan(_('Enabled'), 'enabled') : new CSpan(_('Disabled'), 'disabled');
+		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED) ? new CSpan(_('Enabled'), ZBX_STYLE_GREEN) : new CSpan(_('Disabled'), ZBX_STYLE_RED);
 	}
 
 	if (isset($usrgrp['users'])) {
@@ -110,7 +106,7 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 			$users[] = new CLink(getUserFullname($user),
 				'users.php?form=update&userid='.$user['userid'],
 				($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $user['users_status'] == GROUP_STATUS_DISABLED)
-					? 'disabled' : 'enabled'
+					? ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED : ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN
 			);
 		}
 	}
@@ -118,7 +114,7 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 	$userGroupTable->addRow(array(
 		new CCheckBox('group_groupid['.$userGroupId.']', null, null, $userGroupId),
 		new CLink($usrgrp['name'], 'usergrps.php?form=update&usrgrpid='.$userGroupId),
-		array(new CLink(_('Users'), 'users.php?filter_usrgrpid='.$userGroupId), ' (', count($usrgrp['users']), ')'),
+		array(new CLink(_('Users'), 'users.php?filter_usrgrpid='.$userGroupId), CViewHelper::showNum(count($usrgrp['users']))),
 		new CCol($users, 'wraptext'),
 		$guiAccess,
 		$debugMode,
@@ -128,10 +124,9 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 
 // append table to form
 $userGroupsForm->addItem(array(
-	$this->data['paging'],
 	$userGroupTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'group_groupid', array(
+	new CActionButtonList('action', 'group_groupid', array(
 		'usergroup.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected groups?')),
 		'usergroup.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected groups?')),
 		'usergroup.massenabledebug' => array('name' => _('Enable debug mode'),
@@ -141,7 +136,7 @@ $userGroupsForm->addItem(array(
 			'confirm' => _('Disable debug mode in selected groups?')
 		),
 		'usergroup.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected groups?'))
-	)))
+	))
 ));
 
 // append form to widget

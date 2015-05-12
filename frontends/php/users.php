@@ -28,7 +28,6 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 
 $page['title'] = _('Configuration of users');
 $page['file'] = 'users.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

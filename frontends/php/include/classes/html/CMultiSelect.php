@@ -52,19 +52,26 @@ class CMultiSelect extends CTag {
 				'type here to search' => _('type here to search'),
 				'new' => _('new'),
 				'Select' => _('Select')
-			),
-			'data' => empty($options['data']) ? array() : zbx_cleanHashes($options['data']),
-			'ignored' => isset($options['ignored']) ? $options['ignored'] : null,
-			'defaultValue' => isset($options['defaultValue']) ? $options['defaultValue'] : null,
-			'disabled' => isset($options['disabled']) ? $options['disabled'] : false,
-			'selectedLimit' => isset($options['selectedLimit']) ? $options['selectedLimit'] : null,
-			'addNew' => isset($options['addNew']) ? $options['addNew'] : false,
-			'popup' => array(
-				'parameters' => isset($options['popup']['parameters']) ? $options['popup']['parameters'] : null,
-				'width' => isset($options['popup']['width']) ? $options['popup']['width'] : null,
-				'height' => isset($options['popup']['height']) ? $options['popup']['height'] : null
 			)
 		);
+
+		if (array_key_exists('data', $options)) {
+			$params['data'] = zbx_cleanHashes($options['data']);
+		}
+
+		foreach (array('ignored', 'defaultValue', 'disabled', 'selectedLimit', 'addNew') as $option) {
+			if (array_key_exists($option, $options)) {
+				$params[$option] = $options[$option];
+			}
+		}
+
+		if (array_key_exists('popup', $options)) {
+			foreach (array('parameters', 'width', 'height') as $option) {
+				if (array_key_exists($option, $options['popup'])) {
+					$params['popup'][$option] = $options['popup'][$option];
+				}
+			}
+		}
 
 		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).');');
 	}

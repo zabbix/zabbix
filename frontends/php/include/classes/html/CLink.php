@@ -26,10 +26,6 @@ class CLink extends CTag {
 	public function __construct($item = null, $url = null, $class = null, $action = null, $nosid = null) {
 		parent::__construct('a', 'yes');
 
-		$this->tag_start = '';
-		$this->tag_end = '';
-		$this->tag_body_start = '';
-		$this->tag_body_end = '';
 		$this->nosid = $nosid;
 
 		if (!is_null($class)) {

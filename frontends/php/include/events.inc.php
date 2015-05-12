@@ -188,7 +188,7 @@ function make_event_details($event, $trigger) {
 function make_small_eventlist($startEvent) {
 	$config = select_config();
 
-	$table = new CTableInfo(_('No events found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(
 		_('Time'),
 		_('Status'),
@@ -265,7 +265,6 @@ function make_popup_eventlist($triggerId, $eventId) {
 	$config = select_config();
 
 	$table = new CTableInfo();
-	$table->setAttribute('style', 'width: 400px;');
 
 	// if acknowledges are turned on, we show 'ack' column
 	if ($config['event_ack_enable']) {
@@ -332,6 +331,10 @@ function getEventAckState($event, $url = null, $isLink = true, $params = array()
 		return null;
 	}
 
+	if ($event['acknowledged'] != 0) {
+		$acknowledges_num = is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges'];
+	}
+
 	if ($isLink) {
 		if ($url === null) {
 			$backurl = '';
@@ -346,28 +349,25 @@ function getEventAckState($event, $url = null, $isLink = true, $params = array()
 		}
 
 		if ($event['acknowledged'] == 0) {
-			$ack = new CLink(_('No'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, 'disabled');
+			$ack = new CLink(_('No'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED);
 		}
 		else {
-			$ackLink = new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, 'enabled');
+			$ackLink = new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN);
 			if (is_array($event['acknowledges'])) {
 				$ackLinkHints = makeAckTab($event);
 				if (!empty($ackLinkHints)) {
 					$ackLink->setHint($ackLinkHints, '', false);
 				}
-				$ack = array($ackLink, ' ('.count($event['acknowledges']).')');
 			}
-			else {
-				$ack = array($ackLink, ' ('.$event['acknowledges'].')');
-			}
+			$ack = array($ackLink, CViewHelper::showNum($acknowledges_num));
 		}
 	}
 	else {
 		if ($event['acknowledged'] == 0) {
-			$ack = new CSpan(_('No'), 'on');
+			$ack = new CSpan(_('No'), ZBX_STYLE_RED);
 		}
 		else {
-			$ack = array(new CSpan(_('Yes'), 'off'), ' ('.(is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges']).')');
+			$ack = array(new CSpan(_('Yes'), ZBX_STYLE_GREEN), CViewHelper::showNum($acknowledges_num));
 		}
 	}
 

@@ -21,16 +21,16 @@
 
 function getSeverityStyle($severity, $type = true) {
 	$styles = array(
-		TRIGGER_SEVERITY_DISASTER => 'disaster',
-		TRIGGER_SEVERITY_HIGH => 'high',
-		TRIGGER_SEVERITY_AVERAGE => 'average',
-		TRIGGER_SEVERITY_WARNING => 'warning',
-		TRIGGER_SEVERITY_INFORMATION => 'information',
-		TRIGGER_SEVERITY_NOT_CLASSIFIED => 'not_classified'
+		TRIGGER_SEVERITY_DISASTER => ZBX_STYLE_DISASTER_BG,
+		TRIGGER_SEVERITY_HIGH => ZBX_STYLE_HIGH_BG,
+		TRIGGER_SEVERITY_AVERAGE => ZBX_STYLE_AVERAGE_BG,
+		TRIGGER_SEVERITY_WARNING => ZBX_STYLE_WARNING_BG,
+		TRIGGER_SEVERITY_INFORMATION => ZBX_STYLE_INFO_BG,
+		TRIGGER_SEVERITY_NOT_CLASSIFIED => ZBX_STYLE_NA_BG
 	);
 
 	if (!$type) {
-		return 'normal';
+		return ZBX_STYLE_NORMAL_BG;
 	}
 	elseif (isset($styles[$severity])) {
 		return $styles[$severity];
@@ -159,7 +159,7 @@ function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAck
 		}
 	}
 	else {
-		$object->addClass('unknown');
+		$object->addClass(ZBX_STYLE_GREY);
 	}
 }
 
@@ -202,16 +202,16 @@ function discovery_value($val = null) {
 function discovery_value_style($val) {
 	switch ($val) {
 		case DOBJECT_STATUS_UP:
-			$style = 'off';
+			$style = ZBX_STYLE_GREEN;
 			break;
 		case DOBJECT_STATUS_DOWN:
-			$style = 'on';
+			$style = ZBX_STYLE_RED;
 			break;
 		case DOBJECT_STATUS_DISCOVER:
-			$style = 'off';
+			$style = ZBX_STYLE_GREEN;
 			break;
 		case DOBJECT_STATUS_LOST:
-			$style = 'unknown';
+			$style = ZBX_STYLE_GREY;
 			break;
 		default:
 			$style = '';
@@ -643,13 +643,13 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 
 					if ($html) {
 						if ($functionData['status'] == ITEM_STATUS_DISABLED) {
-							$style = 'disabled';
+							$style = ZBX_STYLE_RED;
 						}
 						elseif ($functionData['status'] == ITEM_STATUS_ACTIVE) {
-							$style = 'enabled';
+							$style = ZBX_STYLE_GREEN;
 						}
 						else {
-							$style = 'unknown';
+							$style = ZBX_STYLE_GREY;
 						}
 
 						if ($functionData['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $functionData['type'] == ITEM_TYPE_HTTPTEST) {
@@ -660,14 +660,14 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 								$functionData['host'].':'.$functionData['key_'],
 								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].'&parent_discoveryid='.
 									$trigger['discoveryRuleid'],
-								$style
+								ZBX_STYLE_LINK_ALT.' '.$style
 							);
 						}
 						else {
 							$link = new CLink(
 								$functionData['host'].':'.$functionData['key_'],
 								'items.php?form=update&itemid='.$functionData['itemid'],
-								$style
+								ZBX_STYLE_LINK_ALT.' '.$style
 							);
 						}
 
@@ -779,9 +779,9 @@ function triggerExpression($trigger, $html = false) {
 				$function_data += $trigger['hosts'][$function_data['hostid']];
 
 				if ($html) {
-					$style = ($function_data['status'] == ITEM_STATUS_DISABLED) ? 'disabled' : 'unknown';
+					$style = ($function_data['status'] == ITEM_STATUS_DISABLED) ? ZBX_STYLE_RED : ZBX_STYLE_GREY;
 					if ($function_data['status'] == ITEM_STATUS_ACTIVE) {
-						$style = 'enabled';
+						$style = ZBX_STYLE_GREEN;
 					}
 
 					if ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST) {
@@ -815,7 +815,7 @@ function triggerExpression($trigger, $html = false) {
 			}
 			else {
 				if ($html) {
-					array_push($exp, new CSpan('*ERROR*', 'on'));
+					array_push($exp, new CSpan('*ERROR*', ZBX_STYLE_RED));
 				}
 				else {
 					$exp .= '*ERROR*';
@@ -1081,7 +1081,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		}
 	}
 
-	$triggerTable = new CTableInfo(_('No triggers found.'));
+	$triggerTable = new CTableInfo();
 
 	if (empty($hostNames)) {
 		return $triggerTable;
@@ -1093,12 +1093,11 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 	if ($viewMode == STYLE_TOP) {
 		// header
-		$header = array(new CCol(_('Triggers'), 'center'));
+		$header = array(_('Triggers'));
 
 		foreach ($hostNames as $hostName) {
-			$header[] = new CCol($hostName, 'vertical_rotation');
+			$header[] = new CColHeader($hostName, 'vertical_rotation');
 		}
-
 		$triggerTable->setHeader($header, 'vertical_header');
 
 		// data
@@ -1118,10 +1117,10 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 	}
 	else {
 		// header
-		$header = array(new CCol(_('Host'), 'center'));
+		$header = array(_('Host'));
 
 		foreach ($data as $description => $triggerHosts) {
-			$header[] = new CCol($description, 'vertical_rotation');
+			$header[] = new CColHeader($description, 'vertical_rotation');
 		}
 
 		$triggerTable->setHeader($header, 'vertical_header');
@@ -1130,10 +1129,10 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		foreach ($hostNames as $hostId => $hostName) {
-			$name = new CSpan($hostName, 'link_menu');
+			$name = new CSpan($hostName, ZBX_STYLE_LINK_ACTION.' link_menu');
 			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
-			$columns = array($name);
+			$columns = array(new CCol($name, ZBX_STYLE_NOWRAP));
 			foreach ($data as $triggerHosts) {
 				$columns[] = getTriggerOverviewCells(
 					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
@@ -1457,7 +1456,7 @@ function make_trigger_details($trigger) {
 	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
 	foreach ($hosts as $host) {
-		$hostName = new CSpan($host['name'], 'link_menu');
+		$hostName = new CSpan($host['name'], ZBX_STYLE_LINK_ACTION);
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 		$hostNames[] = $hostName;
 		$hostNames[] = ', ';
@@ -1467,21 +1466,21 @@ function make_trigger_details($trigger) {
 	$table = new CTableInfo();
 	$table->addRow(array(
 		new CCol(_n('Host', 'Hosts', count($hosts))),
-		new CCol($hostNames, 'wraptext')
+		new CCol($hostNames)
 	));
 	$table->addRow(array(
 		new CCol(_('Trigger')),
-		new CCol(CMacrosResolverHelper::resolveTriggerName($trigger), 'wraptext')
+		new CCol(CMacrosResolverHelper::resolveTriggerName($trigger))
 	));
 	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'], $config)));
 	$table->addRow(array(
 		new CCol(_('Expression')),
-		new CCol(explode_exp($trigger['expression'], true, true), 'trigger-expression')
+		new CCol(explode_exp($trigger['expression'], true, true))
 	));
 	$table->addRow(array(_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 		? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')));
 	$table->addRow(array(_('Disabled'), ((TRIGGER_STATUS_ENABLED == $trigger['status'])
-		? new CCol(_('No'), 'off') : new CCol(_('Yes'), 'on'))));
+		? new CCol(_('No'), ZBX_STYLE_GREEN) : new CCol(_('Yes'), ZBX_STYLE_RED))));
 
 	return $table;
 }
@@ -2322,13 +2321,15 @@ function triggerIndicator($status, $state = null) {
  */
 function triggerIndicatorStyle($status, $state = null) {
 	if ($status == TRIGGER_STATUS_ENABLED) {
-		return ($state == TRIGGER_STATE_UNKNOWN) ? 'unknown' : 'enabled';
+		return ($state == TRIGGER_STATE_UNKNOWN) ?
+			ZBX_STYLE_GREY :
+			ZBX_STYLE_GREEN;
 	}
 	elseif ($status == TRIGGER_STATUS_DISABLED) {
-		return 'disabled';
+		return ZBX_STYLE_RED;
 	}
 
-	return 'unknown';
+	return ZBX_STYLE_GREY;
 }
 
 /**

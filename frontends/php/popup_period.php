@@ -123,17 +123,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			new CTextBox('caption', $caption, 42)
 		);
 
-		$reporttimetab = new CTable(null, 'calendar');
-
-		$timeSinceRow = createDateSelector('report_timesince', $report_timesince, 'report_timetill');
-		array_unshift($timeSinceRow, _('From'));
-		$reporttimetab->addRow($timeSinceRow);
-
-		$timeTillRow = createDateSelector('report_timetill', $report_timetill, 'report_timesince');
-		array_unshift($timeTillRow, _('Till'));
-		$reporttimetab->addRow($timeTillRow);
-
-		$frmPd->addRow(_('Period'), $reporttimetab);
+		$frmPd->addRow(_('From'), createDateSelector('report_timesince', $report_timesince, 'report_timetill'));
+		$frmPd->addRow(_('Till'), createDateSelector('report_timetill', $report_timetill, 'report_timesince'));
 
 		if($config != 1)
 			$frmPd->addRow(_('Colour'), new CColor('color',$color));
