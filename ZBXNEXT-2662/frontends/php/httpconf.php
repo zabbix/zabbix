@@ -46,7 +46,7 @@ $fields = array(
 	'retries'         => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({add}) || isset({update})', _('Retries')),
 	'status'          => array(T_ZBX_STR, O_OPT, null,  null,                    null),
 	'agent'           => array(T_ZBX_STR, O_OPT, null, null,                     'isset({add}) || isset({update})'),
-	'agent_other'     => array(T_ZBX_STR, O_OPT, P_NO_TRIM, null,
+	'agent_other'     => array(T_ZBX_STR, O_OPT, null, null,
 		'(isset({add}) || isset({update})) && {agent} == '.ZBX_AGENT_OTHER
 	),
 	'variables'       => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({add}) || isset({update})'),
