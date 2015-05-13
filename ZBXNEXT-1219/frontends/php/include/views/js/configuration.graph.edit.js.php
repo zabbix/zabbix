@@ -179,7 +179,7 @@
 						+ '&srcfld3=flags&dstfld3=items_' + i + '_flags'
 					: '&srctbl=items')
 				+ '<?php echo !empty($this->data['normal_only']) ? '&normal_only=1' : ''; ?>'
-				+ '&srcfld1=itemid&srcfld2=name" + getOnlyHostParam(), 800, 600)';
+				+ '&srcfld1=itemid&srcfld2=name" + getOnlyHostParam())';
 			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
 		}
 	}

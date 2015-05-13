@@ -29,7 +29,6 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 
 $page['title'] = _('Event details');
 $page['file'] = 'tr_events.php';
-$page['hist_arg'] = array('triggerid', 'eventid');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -92,12 +91,11 @@ $event = reset($events);
  */
 $config = select_config();
 
-$eventWidget = new CWidget();
-$eventWidget->setClass('header');
-$eventWidget->addHeader(
-	array(_('EVENTS').': "'.CMacrosResolverHelper::resolveTriggerName($trigger).'"'),
-	get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen')))
-);
+$eventWidget = (new CWidget())->
+	setTitle(_('Event for trigger').': "'.CMacrosResolverHelper::resolveTriggerName($trigger).'"')->
+	setControls((new CList())->
+		addItem(get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))))
+	);
 
 // trigger details
 $triggerDetailsWidget = new CUiWidget('hat_triggerdetails', make_trigger_details($trigger));
@@ -133,20 +131,11 @@ $eventHistoryWidget->open = (bool) CProfile::get('web.tr_events.hats.hat_eventli
 $eventHistoryWidget->setHeader(_('Event list [previous 20]'));
 
 $eventTab = new CTable();
-$eventTab->addRow(
-	array(
-		new CDiv(array($triggerDetailsWidget, $eventDetailsWidget), 'column'),
-		new CDiv(
-			array(
-				$eventAcknowledgesWidget, $actionMessagesWidget, $actionCommandWidget, $eventHistoryWidget
-			),
-			'column'
-		)
-	),
-	'top'
-);
+$eventTab->addRow([
+	new CDiv(array($triggerDetailsWidget, $eventDetailsWidget), 'column'),
+	new CDiv([$eventAcknowledgesWidget, $actionMessagesWidget, $actionCommandWidget, $eventHistoryWidget])
+]);
 
-$eventWidget->addItem($eventTab);
-$eventWidget->show();
+$eventWidget->addItem($eventTab)->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

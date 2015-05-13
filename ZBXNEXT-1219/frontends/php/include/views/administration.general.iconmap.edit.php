@@ -21,7 +21,7 @@
 
 include('include/views/js/administration.general.iconmap.js.php');
 
-$iconMapTab = new CFormList('scriptsTab');
+$iconMapTab = new CFormList();
 
 $name = new CTextBox('iconmap[name]', $this->data['iconmap']['name']);
 $name->setAttribute('maxlength', 64);
@@ -141,11 +141,10 @@ $iconMapTable->addRow(array(new CCol(_('Default'), null, 4), $iconsComboBox, $ic
 $iconMapTab->addRow(_('Mappings'), new CDiv($iconMapTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 $iconMapView = new CTabView();
 $iconMapView->addTab('iconmap', _('Icon map'), $iconMapTab);
-$iconMapForm->addItem($iconMapView);
 
 // footer
 if (isset($this->data['iconmapid'])) {
-	$iconMapForm->addItem(makeFormFooter(
+	$iconMapView->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -155,10 +154,12 @@ if (isset($this->data['iconmapid'])) {
 	));
 }
 else {
-	$iconMapForm->addItem(makeFormFooter(
+	$iconMapView->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
+
+$iconMapForm->addItem($iconMapView);
 
 return $iconMapForm;

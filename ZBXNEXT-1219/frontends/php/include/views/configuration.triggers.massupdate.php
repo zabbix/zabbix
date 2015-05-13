@@ -36,10 +36,10 @@ if (!empty($this->data['hostid'])) {
 }
 
 if (!empty($this->data['parent_discoveryid'])) {
-	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGER PROTOTYPES'));
+	$triggersWidget->setTitle(_('Trigger prototypes'));
 }
 else {
-	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'));
+	$triggersWidget->setTitle(_('Triggers'));
 }
 
 // create form
@@ -131,7 +131,7 @@ if (empty($this->data['parent_discoveryid'])) {
 					'&objname=triggers'.
 					'&srcfld1=triggerid'.
 					'&multiselect=1'.
-					'&with_triggers=1", 1000, 700);',
+					'&with_triggers=1");',
 				'link_menu'
 			)
 		),
@@ -157,14 +157,14 @@ if (empty($this->data['parent_discoveryid'])) {
 // append tabs to form
 $triggersTab = new CTabView();
 $triggersTab->addTab('triggersTab', _('Mass update'), $triggersFormList);
-$triggersForm->addItem($triggersTab);
 
 // append buttons to form
-$triggersForm->addItem(makeFormFooter(
+$triggersTab->setFooter(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
 	array(new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid'))))
 ));
 
+$triggersForm->addItem($triggersTab);
 $triggersWidget->addItem($triggersForm);
 
 return $triggersWidget;
