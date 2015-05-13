@@ -574,9 +574,9 @@ footer {
 %paging-btn {
 	display: inline-block;
 	margin-left: -1px;
-	padding: 0 14px;
-	min-height: 22px;
-	line-height: 22px;
+	padding: 3px 14px;
+	//min-height: 22px;
+	//line-height: 22px;
 	border: 1px solid $light-blue-grey;
 	text-decoration: none;
 	color: $link-color;
@@ -1177,10 +1177,30 @@ footer {
 	}
 
 	label {
-		padding: 0 0 0 15px;
+		padding: 0 0 0 16px;
 		display: inline-block;
-		text-indent: -15px;
+		text-indent: -13px;
 		max-width: 600px;
+
+		input[type="checkbox"] {
+			left: -3px;
+			margin: 0;
+		}
+
+		input[type="radio"] {
+			left: -3px;
+			margin: 0;
+		}
+	}
+}
+
+label {
+	input[type="checkbox"] {
+		margin-right: 3px;
+	}
+
+	input[type="radio"] {
+		margin-right: 3px;
 	}
 }
 
