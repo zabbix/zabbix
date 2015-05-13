@@ -29,9 +29,9 @@ static int	check_procstate(struct procentry64 *procentry, int zbx_proc_stat)
 	switch (zbx_proc_stat)
 	{
 		case ZBX_PROC_STAT_RUN:
-			return SRUN == procentry->pi_state ? SUCCEED : FAIL;
+			return SACTIVE == procentry->pi_state && 0 != procentry->pi_cpu ? SUCCEED : FAIL;
 		case ZBX_PROC_STAT_SLEEP:
-			return SSLEEP == procentry->pi_state ? SUCCEED : FAIL;
+			return SACTIVE == procentry->pi_state && 0 == procentry->pi_cpu ? SUCCEED : FAIL;
 		case ZBX_PROC_STAT_ZOMB:
 			return SZOMB == procentry->pi_state ? SUCCEED : FAIL;
 	}
