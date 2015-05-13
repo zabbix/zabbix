@@ -772,7 +772,7 @@ function isTemplate($hostId) {
  *
  * @return array
  */
-function getInheritedMacros($hostids) {
+function getInheritedMacros(array $hostids) {
 	$all_macros = array();
 	$global_macros = array();
 
@@ -905,7 +905,7 @@ function getInheritedMacros($hostids) {
  *   array(
  *       '{$MACRO}' => array(
  *           'macro' => '{$MACRO}',
- *           'type' => 0x03,						<- 0x01 - inherited macro, 0x02 -> host macro, 0x03 - both macros
+ *           'type' => 0x03,						<- MACRO_TYPE_INHERITED, MACRO_TYPE_HOSTMACRO or MACRO_TYPE_BOTH
  *           'value' => 'effective value',
  *           'hostmacroid' => 7532,                 <- optional
  *           'template' => array(                   <- optional
@@ -919,13 +919,14 @@ function getInheritedMacros($hostids) {
  *       )
  *   )
  *
- * @param array $host_macros
+ * @param array $host_macros		the list of host macros
+ * @param array $inherited_macros	the list of inherited macros (the output of the getInheritedMacros() function)
  *
  * @return array
  */
-function mergeInheritedMacros($host_macros, $inherited_macros) {
+function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 	foreach ($inherited_macros as &$inherited_macro) {
-		$inherited_macro['type'] = 0x01/* INHERITED */;
+		$inherited_macro['type'] = MACRO_TYPE_INHERITED;
 		$inherited_macro['value'] = array_key_exists('template', $inherited_macro)
 			? $inherited_macro['template']['value']
 			: $inherited_macro['global']['value'];
@@ -940,7 +941,7 @@ function mergeInheritedMacros($host_macros, $inherited_macros) {
 		else {
 			$host_macro['type'] = 0x00;
 		}
-		$host_macro['type'] |= 0x02/* HOSTMACRO */;
+		$host_macro['type'] |= MACRO_TYPE_HOSTMACRO;
 	}
 	unset($host_macro);
 
@@ -958,9 +959,9 @@ function mergeInheritedMacros($host_macros, $inherited_macros) {
  *
  * @return array
  */
-function cleanInheritedMacros($macros) {
+function cleanInheritedMacros(array $macros) {
 	foreach ($macros as $idx => $macro) {
-		if (array_key_exists('type', $macro) && !($macro['type'] & 0x02/* HOSTMACRO */)) {
+		if (array_key_exists('type', $macro) && !($macro['type'] & MACRO_TYPE_HOSTMACRO)) {
 			unset($macros[$idx]);
 		}
 		else {

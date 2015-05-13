@@ -61,19 +61,14 @@ foreach ($data['macros'] as $i => $macro) {
 		$button_cell[] = new CVar('macros['.$i.'][globalmacroid]', $macro['globalmacroid']);
 	}
 
-	$row = array($macro_input, '&rArr;', $value_input, $button_cell);
-	$table->addRow($row, 'form_row');
+	$table->addRow([$macro_input, '&rArr;', $value_input, $button_cell], 'form_row');
 }
 
 // buttons
 $buttons_column = new CCol(new CButton('macro_add', _('Add'), null, 'link_menu element-table-add'));
 $buttons_column->setAttribute('colspan', 5);
 
-$buttons_row = new CRow();
-$buttons_row->setAttribute('id', 'row_new_macro');
-$buttons_row->addItem($buttons_column);
-
-$table->addRow($buttons_row);
+$table->addRow(new CRow($buttons_column, null, 'row_new_macro'));
 
 // form list
 $macros_form_list = new CFormList('macrosFormList');

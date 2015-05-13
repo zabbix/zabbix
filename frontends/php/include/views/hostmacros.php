@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 if (!$data['readonly']) {
 	require_once dirname(__FILE__).'/js/hostmacros.js.php';
 }
@@ -53,7 +54,7 @@ else {
 	foreach ($data['macros'] as $i => $macro) {
 		$macro_input = new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, false, 64);
 		$macro_input->setReadOnly(
-			$data['readonly'] || ($data['show_inherited_macros'] && ($macro['type'] & 0x01/* INHERITED */))
+			$data['readonly'] || ($data['show_inherited_macros'] && ($macro['type'] & MACRO_TYPE_INHERITED))
 		);
 		$macro_input->addClass('macro');
 		$macro_input->setAttribute('placeholder', '{$MACRO}');
@@ -64,7 +65,7 @@ else {
 				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
 			}
 
-			if ($data['show_inherited_macros'] && ($macro['type'] & 0x01/* INHERITED */)) {
+			if ($data['show_inherited_macros'] && ($macro['type'] & MACRO_TYPE_INHERITED)) {
 				$macro_cell[] = new CVar('macros['.$i.'][inherited][value]',
 					array_key_exists('template', $macro) ? $macro['template']['value'] : $macro['global']['value']
 				);
@@ -77,7 +78,7 @@ else {
 
 		$value_input = new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255);
 		$value_input->setReadOnly(
-			$data['readonly'] || ($data['show_inherited_macros'] && !($macro['type'] & 0x02/* HOSTMACRO */))
+			$data['readonly'] || ($data['show_inherited_macros'] && !($macro['type'] & MACRO_TYPE_HOSTMACRO))
 		);
 		$value_input->setAttribute('placeholder', _('value'));
 
@@ -85,10 +86,10 @@ else {
 
 		if (!$data['readonly']) {
 			if ($data['show_inherited_macros']) {
-				if (($macro['type'] & 0x03) == 0x03/* INHERITED | HOSTMACRO */) {
+				if (($macro['type'] & MACRO_TYPE_BOTH) == MACRO_TYPE_BOTH) {
 					$row[] = new CButton('macros['.$i.'][change]', _('Remove'), null, 'link_menu element-table-change');
 				}
-				elseif ($macro['type'] & 0x01/* INHERITED */) {
+				elseif ($macro['type'] & MACRO_TYPE_INHERITED) {
 					$row[] = new CButton('macros['.$i.'][change]', _('Change'), null, 'link_menu element-table-change');
 				}
 				else {
@@ -131,21 +132,17 @@ else {
 		$buttons_column = new CCol(new CButton('macro_add', _('Add'), null, 'link_menu element-table-add'));
 		$buttons_column->setAttribute('colspan', 5);
 
-		$buttons_row = new CRow();
-		$buttons_row->setAttribute('id', 'row_new_macro');
-		$buttons_row->addItem($buttons_column);
-
-		$table->addRow($buttons_row);
+		$table->addRow(new CRow($buttons_column, null, 'row_new_macro'));
 	}
 }
 
 $show_inherited_macros_filter = array(
 	new CRadioButton('show_inherited_macros', '0', null, 'hide_inherited_macros', !$data['show_inherited_macros'],
-		'submit()'
+		'this.form.submit()'
 	),
 	new CLabel(_('Host macros'), 'hide_inherited_macros'),
 	new CRadioButton('show_inherited_macros', '1', null, 'show_inherited_macros', $data['show_inherited_macros'],
-		'submit()'
+		'this.form.submit()'
 	),
 	new CLabel(_('Inherited and host macros'), 'show_inherited_macros')
 );

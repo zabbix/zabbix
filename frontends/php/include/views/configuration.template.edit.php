@@ -452,7 +452,7 @@ $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 if (!$macros) {
 	$macro = ['macro' => '', 'value' => ''];
 	if ($data['show_inherited_macros']) {
-		$macro['type'] = 0x02/* HOSTMACRO */;
+		$macro['type'] = MACRO_TYPE_HOSTMACRO;
 	}
 	$macros[] = $macro;
 }

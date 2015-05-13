@@ -5,20 +5,18 @@
 		</td>
 		<td>&rArr;</td>
 		<td>
-			<input class="input text" type="text" id="macros_#{rowNum}_value" name="macros[#{rowNum}][value]" size="40" maxlength="255" placeholder="value">
+			<input class="input text" type="text" id="macros_#{rowNum}_value" name="macros[#{rowNum}][value]" size="40" maxlength="255" placeholder="<?= _('value') ?>">
 		</td>
 		<td>
-			<button class="button link_menu element-table-remove" type="button" id="macros_#{rowNum}_remove" name="macros[#{rowNum}][remove]"><?php echo _('Remove');?></button>
+			<button class="button link_menu element-table-remove" type="button" id="macros_#{rowNum}_remove" name="macros[#{rowNum}][remove]"><?= _('Remove') ?></button>
 		</td>
 	</tr>
 </script>
 <script type="text/javascript">
 	jQuery(function($) {
 		$('#tbl_macros').on('click', 'button.element-table-remove', function() {
-			var e = $(this);
-
 			// check if the macro has an hidden ID element, if it does - increment the deleted macro counter
-			var macroNum = e.attr('id').split('_')[1];
+			var macroNum = $(this).attr('id').split('_')[1];
 			if ($('#macros_' + macroNum + '_globalmacroid').length) {
 				var count = $('#update').data('removedCount') + 1;
 				$('#update').data('removedCount', count);
@@ -29,7 +27,7 @@
 			var removedCount = $(this).data('removedCount');
 
 			if (removedCount) {
-				return confirm(<?php echo CJs::encodeJson(_('Are you sure you want to delete')); ?> + ' ' + removedCount + ' ' + <?php echo CJs::encodeJson(_('macro(s)')); ?>+'?');
+				return confirm(<?= CJs::encodeJson(_('Are you sure you want to delete')) ?> + ' ' + removedCount + ' ' + <?= CJs::encodeJson(_('macro(s)')) ?> + '?');
 			}
 		});
 
