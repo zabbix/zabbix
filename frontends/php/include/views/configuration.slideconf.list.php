@@ -18,47 +18,47 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$slideWidget = new CWidget();
+$slideWidget = (new CWidget())->setTitle(_('Slide shows'));
 
 // create new hostgroup button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addItem(new CSubmit('form', _('Create slide show')));
-$slideWidget->addPageHeader(_('CONFIGURATION OF SLIDE SHOWS'), $createForm);
-$slideWidget->addHeader(_('Slide shows'));
-$slideWidget->addHeaderRowNumber();
+$controls = new CList();
+$controls->addItem(new CSubmit('form', _('Create slide show')));
+$createForm->addItem($controls);
+$slideWidget->setControls($createForm);
 
 // create form
 $slideForm = new CForm();
 $slideForm->setName('slideForm');
 
 // create table
-$slidesTable = new CTableInfo(_('No slide shows found.'));
+$slidesTable = new CTableInfo();
 $slidesTable->setHeader(array(
-	new CCheckBox('all_shows', null, "checkAll('".$slideForm->getName()."', 'all_shows', 'shows');"),
+	new CColHeader(
+		new CCheckBox('all_shows', null, "checkAll('".$slideForm->getName()."', 'all_shows', 'shows');"),
+		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Count of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'])
+	make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'])
 ));
 
 foreach ($this->data['slides'] as $slide) {
 	$slidesTable->addRow(array(
 		new CCheckBox('shows['.$slide['slideshowid'].']', null, null, $slide['slideshowid']),
 		new CLink($slide['name'], '?form=update&slideshowid='.$slide['slideshowid'], 'action'),
-		$slide['delay'],
+		convertUnitsS($slide['delay']),
 		$slide['cnt']
 	));
 }
 
 // append table to form
 $slideForm->addItem(array(
-	$this->data['paging'],
 	$slidesTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'shows', array(
+	new CActionButtonList('action', 'shows', array(
 		'slideshow.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected slide shows?'))
-	)))
+	))
 ));
 
 // append form to widget

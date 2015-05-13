@@ -19,7 +19,7 @@
 **/
 
 
-$table = new CTableInfo(_('No host groups found.'));
+$table = new CTableInfo();
 $table->setHeader(array(
 	_('Host group'),
 	_('Without problems'),
@@ -230,7 +230,7 @@ foreach ($groups as $group) {
 
 			for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 				$header[] = ($data['filter']['severity'] === null || isset($data['filter']['severity'][$severity]))
-					? getSeverityName($severity, $data['config'])
+					? new CColHeader(getSeverityName($severity, $data['config']), ZBX_STYLE_NOWAP)
 					: null;
 			}
 
@@ -255,9 +255,9 @@ foreach ($groups as $group) {
 				$host_data = $lastUnack_host_list[$hostid];
 
 				$r = new CRow();
-				$r->addItem(new CLink($host_data['host'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].
-					'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
-				));
+				$r->addItem(new CCol(new CLink($host_data['host'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].
+					'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM), ZBX_STYLE_NOWRAP)
+				);
 
 				foreach ($lastUnack_host_list[$host['hostid']]['severities'] as $severity => $trigger_count) {
 					if (!is_null($data['filter']['severity']) && !isset($data['filter']['severity'][$severity])) {
@@ -267,7 +267,7 @@ foreach ($groups as $group) {
 				}
 				$table_inf->addRow($r);
 			}
-			$lastUnack_count = new CSpan($hosts_data[$group['groupid']]['lastUnack'], 'pointer red bold');
+			$lastUnack_count = new CSpan($hosts_data[$group['groupid']]['lastUnack'], ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
 			$lastUnack_count->setHint($table_inf);
 		}
 		else {
@@ -278,7 +278,6 @@ foreach ($groups as $group) {
 	// if hostgroup contains problematic hosts, hint should be built
 	if ($hosts_data[$group['groupid']]['problematic']) {
 		$table_inf = new CTableInfo();
-		$table_inf->setAttribute('style', 'width: 400px;');
 
 		// set trigger severities as table header starting from highest severity
 		$header = array();
@@ -321,7 +320,7 @@ foreach ($groups as $group) {
 			}
 			$table_inf->addRow($r);
 		}
-		$problematic_count = new CSpan($hosts_data[$group['groupid']]['problematic'], 'pointer');
+		$problematic_count = new CSpan($hosts_data[$group['groupid']]['problematic'], ZBX_STYLE_LINK_ACTION);
 		$problematic_count->setHint($table_inf);
 	}
 	else {

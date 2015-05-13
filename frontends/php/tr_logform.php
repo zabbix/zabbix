@@ -244,7 +244,7 @@ if (hasRequest('sform')) {
 	$ctb->setAttribute('disabled', 'disabled');
 
 	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item".
-		"&srctbl=items&srcfld1=itemid&srcfld2=name',800,450);";
+		"&srctbl=items&srcfld1=itemid&srcfld2=name');";
 	$cbtn = new CSubmit('select_item', _('Select'), $script);
 
 	$frmTRLog->addRow(_('Item'), array($ctb, $cbtn));
@@ -268,11 +268,11 @@ if (hasRequest('sform')) {
 		array($ctb, BR(), $cbIregexp, 'iregexp', SPACE, $cbAdd, SPACE, $cbOr, SPACE, $exp_select, SPACE, $cb)
 	);
 
-	$keyTable = new CTableInfo(null);
+	$keyTable = new CTableInfo();
 	$keyTable->setAttribute('id', 'key_list');
 	$keyTable->setHeader(array(_('Keyword'), _('Type'), _('Action')));
 
-	$table = new CTableInfo(null);
+	$table = new CTableInfo();
 	$table->setAttribute('id', 'exp_list');
 	$table->setHeader(array(_('Expression'), _('Type'), _('Position'), _('Action')));
 

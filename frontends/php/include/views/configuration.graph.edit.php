@@ -22,12 +22,12 @@
 $graphWidget = new CWidget();
 
 if (!empty($this->data['parent_discoveryid'])) {
-	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPH PROTOTYPES'));
-	$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
+	$graphWidget->setTitle(_('Graph prototypes'))->
+		addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 else {
-	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPHS'));
-	$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid']));
+	$graphWidget->setTitle(_('Graphs'))->
+		addItem(get_header_host_table('graphs', $this->data['hostid']));
 }
 
 // create form
@@ -227,9 +227,9 @@ $itemsTable->setHeader(array(
 	($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED)
 		? new CCol(_('Type'), null, null, 80) : null,
 	new CCol(_('Function'), null, null, 80),
-	($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? new CCol(_('Draw style'), 'nowrap', null, 80) : null,
+	($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? new CCol(_('Draw style'), ZBX_STYLE_NOWRAP, null, 80) : null,
 	($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED)
-		? new CCol(_('Y axis side'), 'nowrap', null, 80) : null,
+		? new CCol(_('Y axis side'), ZBX_STYLE_NOWRAP, null, 80) : null,
 	new CCol(_('Colour'), null, null, 100),
 	new CCol(_('Action'), null, null, 50)
 ));
@@ -237,7 +237,7 @@ $itemsTable->setHeader(array(
 $addButton = new CButton('add_item', _('Add'),
 	'return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
 		($this->data['normal_only'] ? '&normal_only=1' : '').
-		'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam(), 800, 600);',
+		'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam());',
 	'link_menu'
 );
 
@@ -248,7 +248,7 @@ if ($this->data['parent_discoveryid']) {
 			url_param($this->data['graphtype'], false, 'graphtype').
 			url_param('parent_discoveryid').
 			($this->data['normal_only'] ? '&normal_only=1' : '').
-			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1", 800, 600);',
+			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");',
 		'link_menu'
 	);
 }
@@ -297,7 +297,6 @@ $chartImage->preload();
 $graphPreviewTable = new CTable(null, 'center maxwidth');
 $graphPreviewTable->addRow(new CDiv($chartImage, null, 'previewChar'));
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
-$graphForm->addItem($graphTab);
 
 // append buttons to form
 if (!empty($this->data['graphid'])) {
@@ -312,7 +311,7 @@ if (!empty($this->data['graphid'])) {
 		$deleteButton->setEnabled(false);
 	}
 
-	$graphForm->addItem(makeFormFooter(
+	$graphTab->setFooter(makeFormFooter(
 		$updateButton,
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -322,7 +321,7 @@ if (!empty($this->data['graphid'])) {
 	));
 }
 else {
-	$graphForm->addItem(makeFormFooter(
+	$graphTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('parent_discoveryid')))
 	));
@@ -331,6 +330,8 @@ else {
 // insert js (depended from some variables inside the file)
 insert_show_color_picker_javascript();
 require_once dirname(__FILE__).'/js/configuration.graph.edit.js.php';
+
+$graphForm->addItem($graphTab);
 
 // append form to widget
 $graphWidget->addItem($graphForm);
