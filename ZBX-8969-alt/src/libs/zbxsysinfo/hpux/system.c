@@ -25,7 +25,7 @@
 
 int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-#if defined(HAVE_SYS_UTSNAME_HPUX_V1) && defined(GCC_VERSION) && 4003 > GCC_VERSION	/* version 4.3.0 */
+#if defined(HAVE_SYS_UTSNAME_HPUX_V1) && defined(__GNUC__) && 403 > __GNUC__ * 100 + __GNUC_MINOR__ /* version 4.3.0 */
 	struct utsname_hpux_v1	name;
 #else
 	struct utsname		name;
