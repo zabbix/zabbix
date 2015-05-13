@@ -1182,7 +1182,8 @@ function getItemFormData(array $item = array(), array $options = array()) {
 	$data['db_applications'] = DBfetchArray(DBselect(
 		'SELECT DISTINCT a.applicationid,a.name'.
 		' FROM applications a'.
-		' WHERE a.hostid='.zbx_dbstr($data['hostid'])
+		' WHERE a.hostid='.zbx_dbstr($data['hostid']).
+			($data['parent_discoveryid'] ? ' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL : '')
 	));
 	order_result($data['db_applications'], 'name');
 
