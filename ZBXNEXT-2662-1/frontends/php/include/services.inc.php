@@ -114,7 +114,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 		$serviceNode = array(
 			'id' => $service['serviceid'],
 			'caption' => $caption,
-			'description' => $service['trigger'] ? $service['trigger']['description'] : '-',
+			'description' => $service['trigger'] ? $service['trigger']['description'] : '',
 			'parentid' => $parentService ? $parentService['serviceid'] : 0,
 			'algorithm' => serviceAlgorythm($service['algorithm'])
 		);
@@ -213,7 +213,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 		}
 
 		// reason
-		$problemList = '-';
+		$problemList = '';
 		if ($serviceSla['problems']) {
 			$problemList = new CList(null, 'service-problems');
 			foreach ($serviceSla['problems'] as $problemTrigger) {
@@ -276,7 +276,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			'sla' => $sla,
 			'sla2' => $sla2,
 			'parentid' => ($parentService) ? $parentService['serviceid'] : 0,
-			'status' => ($serviceSla['status'] !== null) ? $serviceSla['status'] : '-'
+			'status' => ($serviceSla['status'] !== null) ? $serviceSla['status'] : ''
 		);
 	}
 

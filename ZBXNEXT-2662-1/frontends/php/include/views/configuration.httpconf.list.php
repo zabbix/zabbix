@@ -112,7 +112,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		$httpTest['retries'],
 		httptest_authentications($httpTest['authentication']),
 		($httpTest['http_proxy'] !== '') ? _('Yes') : _('No'),
-		($httpTest['applicationid'] != 0) ? $httpTest['application_name'] : '-',
+		($httpTest['applicationid'] != 0) ? $httpTest['application_name'] : '',
 		new CLink(
 			httptest_status2str($httpTest['status']),
 			'?group_httptestid[]='.$httpTest['httptestid'].

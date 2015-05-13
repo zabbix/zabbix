@@ -728,7 +728,7 @@ else {
 			$linkedToOutput[] = new CLink($linkedToHost['name'], $url, $style);
 		}
 
-		$table->addRow(array(
+		$table->addRow([
 			new CCheckBox('templates['.$template['templateid'].']', null, null, $template['templateid']),
 			new CCol($templatesOutput, ZBX_STYLE_NOWRAP),
 			$applications,
@@ -738,9 +738,9 @@ else {
 			$screens,
 			$discoveries,
 			$httpTests,
-			$linkedTemplatesOutput ? new CCol($linkedTemplatesOutput, 'wraptext') : '-',
-			$linkedToOutput ? new CCol($linkedToOutput, 'wraptext') : '-'
-		));
+			$linkedTemplatesOutput ? $linkedTemplatesOutput : '',
+			$linkedToOutput ? $linkedToOutput : ''
+		]);
 	}
 
 	$footer = new CActionButtonList('action', 'templates', array(

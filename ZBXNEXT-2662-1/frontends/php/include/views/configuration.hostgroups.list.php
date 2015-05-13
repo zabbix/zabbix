@@ -159,7 +159,7 @@ foreach ($this->data['groups'] as $group) {
 			BR(),
 			array(new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), CViewHelper::showNum($hostCount))
 		),
-		new CCol(empty($hostsOutput) ? '-' : $hostsOutput, 'wraptext'),
+		empty($hostsOutput) ? '' : $hostsOutput,
 		$info
 	));
 }

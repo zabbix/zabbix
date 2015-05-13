@@ -93,13 +93,13 @@ if ($this->data['actions']) {
 			);
 		}
 
-		$actionTable->addRow(array(
+		$actionTable->addRow([
 			new CCheckBox('g_actionid['.$action['actionid'].']', null, null, $action['actionid']),
 			new CLink($action['name'], 'actionconf.php?form=update&actionid='.$action['actionid']),
 			$conditions,
-			new CCol($operations, 'wraptext'),
+			$operations,
 			$status
-		));
+		]);
 	}
 }
 
