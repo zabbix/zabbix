@@ -294,25 +294,17 @@ ul.top-nav-icons {
 	}
 
 	input {
-		//background: darken($primary-blue, 5%);
-		//border: none;
-		background-color: $primary-blue;
-		border: none;
-		border-bottom: 1px solid $white;
-		//width: 169px;
-		width: 174px;
-		//height: 24px;
-		//line-height: 24px;
-		//margin: 6px 13px 0 0;
+		background-color: darken($primary-blue, 5%);
+		border: 1px solid darken($primary-blue, 6%);
+		width: 167px;
 		margin: 6px 7px 0 0;
 		color: $white;
-		padding: 4px 24px 4px 0;
-		@include opacity(0.75);
-		@include transition(color, background-color, border .2s ease-out);
+		padding: 4px 24px 4px 5px;
+		@include opacity(1);
+		@include transition(border-color .2s ease-out);
 
 		&:focus {
-			//background: darken($primary-blue, 5%);
-			border-bottom: 1px solid $white;
+			border-color: darken($primary-blue, 10%);
 			@include opacity(1);
 		}
 
@@ -1475,7 +1467,6 @@ button {
 
 
 	&.btn-search {
-		//background: darken($primary-blue, 5%) url(../img/icon-sprite.png) no-repeat 1px -1px;
 		background: url(../img/icon-sprite.png) no-repeat 1px -1px;
 		position: absolute;
 		border: none;
