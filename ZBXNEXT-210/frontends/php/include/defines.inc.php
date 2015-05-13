@@ -984,6 +984,11 @@ define('MAP_DEFAULT_ICON', 'Server_(96)');
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');
 
+// configuration -> hosts (macro inheritance)
+define('MACRO_TYPE_INHERITED',	0x01);
+define('MACRO_TYPE_HOSTMACRO',	0x02);
+define('MACRO_TYPE_BOTH',		0x03);	// MACRO_TYPE_INHERITED | MACRO_TYPE_HOSTMACRO
+
 // if magic quotes on, then get rid of them
 if (get_magic_quotes_gpc()) {
 	function zbx_stripslashes($value) {

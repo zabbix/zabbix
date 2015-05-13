@@ -837,7 +837,7 @@ $divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
 if (!$macros && !$isDiscovered) {
 	$macro = ['macro' => '', 'value' => ''];
 	if ($data['show_inherited_macros']) {
-		$macro['type'] = 0x02/* HOSTMACRO */;
+		$macro['type'] = MACRO_TYPE_HOSTMACRO;
 	}
 	$macros[] = $macro;
 }

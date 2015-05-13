@@ -809,7 +809,9 @@ class CUserMacro extends CApiService {
 			));
 			foreach ($globalMacroIds as $globalMacroId) {
 				if (!isset($globalMacros[$globalMacroId])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro with globalmacroid "%1$s" does not exist.', $globalMacroId));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Macro with globalmacroid "%1$s" does not exist.', $globalMacroId)
+					);
 				}
 			}
 		}

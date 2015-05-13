@@ -50,9 +50,7 @@ if (hasRequest('update')) {
 
 	// remove empty new macro lines
 	foreach ($macros as $idx => $macro) {
-		if (!array_key_exists('globalmacroid', $macro)
-				&& $macro['macro'] === '' && $macro['value'] === '') {
-
+		if (!array_key_exists('globalmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === '') {
 			unset($macros[$idx]);
 		}
 	}
@@ -66,9 +64,7 @@ if (hasRequest('update')) {
 	// update
 	$macrosToUpdate = array();
 	foreach ($macros as $idx => $macro) {
-		if (array_key_exists('globalmacroid', $macro)
-				&& array_key_exists($macro['globalmacroid'], $dbMacros)) {
-
+		if (array_key_exists('globalmacroid', $macro) && array_key_exists($macro['globalmacroid'], $dbMacros)) {
 			$dbMacro = $dbMacros[$macro['globalmacroid']];
 
 			// remove item from new macros array
@@ -130,10 +126,7 @@ else {
 }
 
 if (!$data['macros']) {
-	$data['macros'][] = array(
-		'macro' => '',
-		'value' => ''
-	);
+	$data['macros'][] = ['macro' => '', 'value' => ''];
 }
 
 $view = new CView('administration.general.macros.edit', $data);

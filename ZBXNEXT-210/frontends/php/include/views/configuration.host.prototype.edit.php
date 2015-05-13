@@ -280,7 +280,9 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	// macros
 	$macros = $parentHost['macros'];
 	if ($data['show_inherited_macros']) {
-		$macros = mergeInheritedMacros($macros, getInheritedMacros(zbx_objectValues($hostPrototype['templates'], 'templateid')));
+		$macros = mergeInheritedMacros($macros,
+			getInheritedMacros(zbx_objectValues($hostPrototype['templates'], 'templateid'))
+		);
 	}
 	$macros = array_values(order_macros($macros, 'macro'));
 
