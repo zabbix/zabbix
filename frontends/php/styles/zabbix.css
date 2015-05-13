@@ -130,7 +130,7 @@ p {
 
 /* Main Navigation */
 nav {
-  background: #013e61; }
+  background: #013e62; }
 
 nav a:link, nav a:visited, nav a:hover, nav a:active, .ui-tabs-nav li a {
   border: none; }
@@ -162,7 +162,7 @@ nav a:link, nav a:visited, nav a:hover, nav a:active, .ui-tabs-nav li a {
         line-height: 0;
         border-left: 7px solid transparent;
         border-right: 7px solid transparent;
-        border-bottom: 7px solid #013e61; }
+        border-bottom: 7px solid #013e62; }
       .top-nav li.selected a, .top-nav .calendar li.selected:hover a, .calendar .top-nav li.selected:hover a, .top-nav li.selected a:hover {
         color: #fff; }
   .top-nav a {
@@ -232,12 +232,6 @@ ul.top-nav-icons {
     -webkit-transition: color, background, border 0.2s ease-out;
     -moz-transition: color, background, border 0.2s ease-out;
     transition: color, background, border 0.2s ease-out; }
-    ul.top-nav-icons input::-webkit-input-placeholder {
-      color: #c5d8e5; }
-    ul.top-nav-icons input::-moz-placeholder {
-      color: #c5d8e5; }
-    ul.top-nav-icons input:-ms-input-placeholder {
-      color: #c5d8e5; }
     ul.top-nav-icons input:focus {
       border-bottom: 1px solid #fff;
       opacity: 1;
@@ -245,20 +239,14 @@ ul.top-nav-icons {
     ul.top-nav-icons input:focus + .btn-search {
       opacity: 1;
       filter: alpha(opacity=100); }
-      ul.top-nav-icons input:focus + .btn-search::-webkit-input-placeholder {
-        color: #a9a9a9; }
-      ul.top-nav-icons input:focus + .btn-search::-moz-placeholder {
-        color: #a9a9a9; }
-      ul.top-nav-icons input:focus + .btn-search:-ms-input-placeholder {
-        color: #a9a9a9; }
 
 .top-subnav-container {
   height: 36px;
   line-height: 36px;
-  background: #013e61; }
+  background: #013e62; }
 
 .top-subnav {
-  background: #013e61; }
+  background: #013e62; }
   .top-subnav li {
     display: block;
     float: left;
@@ -276,7 +264,7 @@ ul.top-nav-icons {
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
     border-radius: 2px;
-    background: #025e93;
+    background: #025f95;
     color: #fff; }
 
 .arrow-up {
@@ -674,7 +662,7 @@ footer {
 .sublevel {
   height: 22px;
   border: 1px solid #ebebeb;
-  background: #f2f2f2;
+  background: #ebebeb;
   margin: 5px 0;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
@@ -846,9 +834,9 @@ footer {
   max-width: 600px; }
 
 input[disabled] {
-  background: #f2f2f2; }
+  background: #ebebeb; }
 input[readonly] {
-  background: #f2f2f2;
+  background: #ebebeb;
   color: #1f2c33 !important;
   cursor: text !important; }
 
@@ -858,9 +846,9 @@ textarea {
   padding: 5px 0 0 5px;
   overflow: auto; }
   textarea[disabled] {
-    background: #f2f2f2; }
+    background: #ebebeb; }
   textarea[readonly] {
-    background: #f2f2f2;
+    background: #ebebeb;
     color: #1f2c33 !important;
     cursor: text !important; }
 
@@ -872,9 +860,9 @@ select {
     width: 300px;
     height: auto; }
   select[disabled] {
-    background: #f2f2f2; }
+    background: #ebebeb; }
   select[readonly] {
-    background: #f2f2f2;
+    background: #ebebeb;
     color: #1f2c33 !important;
     cursor: text !important; }
 
@@ -1048,8 +1036,8 @@ button:hover, button.btn-alt:hover, button.btn-conf:hover, button.btn-max:hover,
   color: #fff; }
 
 button:active, button.btn-alt:active, button.btn-conf:active, button.btn-max:active, button.btn-min:active, button.btn-add-fav:active, button.btn-remove-fav:active, button.btn-action:active, button.btn-info:active, button.btn-reset:active {
-  background-color: #013e61;
-  border-color: #013e61;
+  background-color: #013e62;
+  border-color: #013e62;
   color: #fff; }
 
 button.btn-conf, button.btn-max, button.btn-min, button.btn-add-fav, button.btn-remove-fav, button.btn-action, button.btn-info, button.btn-reset, .help-icon, .drag-icon {
@@ -1687,10 +1675,10 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   -moz-border-radius: 2px;
   border-radius: 2px; }
   .overlay-close-btn:hover, .form-remove-btn:hover, .subfilter-disable-btn:hover {
-    background: #f2f2f2;
+    background: #ebebeb;
     text-decoration: none; }
   .overlay-close-btn:active, .form-remove-btn:active, .subfilter-disable-btn:active {
-    background: #e5e5e5;
+    background: #dedede;
     text-decoration: none; }
 
 .overlay-close-btn, a.overlay-close-btn {

@@ -111,15 +111,15 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 		}
 	}
 
-	$userGroupTable->addRow(array(
+	$userGroupTable->addRow([
 		new CCheckBox('group_groupid['.$userGroupId.']', null, null, $userGroupId),
 		new CLink($usrgrp['name'], 'usergrps.php?form=update&usrgrpid='.$userGroupId),
 		array(new CLink(_('Users'), 'users.php?filter_usrgrpid='.$userGroupId), CViewHelper::showNum(count($usrgrp['users']))),
-		new CCol($users, 'wraptext'),
+		$users,
 		$guiAccess,
 		$debugMode,
 		$usersStatus
-	));
+	]);
 }
 
 // append table to form

@@ -107,7 +107,7 @@ $maintenancePeriodTable->setHeader(array(
 foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 	$maintenancePeriodTable->addRow(array(
 		new CCol(timeperiod_type2str($timeperiod['timeperiod_type']), ZBX_STYLE_NOWRAP),
-		new CCol(shedule2str($timeperiod), 'wraptext'),
+		shedule2str($timeperiod),
 		new CCol(zbx_date2age(0, $timeperiod['period']), ZBX_STYLE_NOWRAP),
 		new CCol(array(
 			new CSubmit('edit_timeperiodid['.$id.']', _('Edit'), null, 'link_menu'),

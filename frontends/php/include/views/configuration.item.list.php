@@ -251,7 +251,7 @@ foreach ($this->data['items'] as $item) {
 	$checkBox = new CCheckBox('group_itemid['.$item['itemid'].']', null, null, $item['itemid']);
 	$checkBox->setEnabled(empty($item['discoveryRule']));
 
-	$itemTable->addRow(array(
+	$itemTable->addRow([
 		$checkBox,
 		$menuIcon,
 		empty($this->data['filter_hostid']) ? $item['host'] : null,
@@ -262,10 +262,10 @@ foreach ($this->data['items'] as $item) {
 		convertUnitsS(24*3600*$item['history']),
 		in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : convertUnitsS(24*3600*$item['trends']),
 		item_type2str($item['type']),
-		new CCol(CHtml::encode($item['applications_list']), 'wraptext'),
+		CHtml::encode($item['applications_list']),
 		$status,
 		$infoIcons
-	));
+	]);
 }
 
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
