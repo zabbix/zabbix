@@ -185,7 +185,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	char			*ip, zone[MAX_STRING_LEN], buffer[MAX_STRING_LEN], *zone_str, *param;
 	struct in_addr		inaddr;
 #ifndef _WINDOWS
-	int			saved_nscount, saved_retrans, saved_retry;
+	int			saved_nscount = 0, saved_retrans, saved_retry;
 	struct sockaddr_in	saved_ns;
 #endif
 	typedef struct
