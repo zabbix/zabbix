@@ -266,9 +266,9 @@ foreach (@$tlds_ref)
 	}
 }
 
-if (!$probes_from)
+if (!defined($probes_from))
 {
-	$probes_from = __get_oldest_clock();
+	$probes_from = 0;
 }
 else
 {
@@ -1805,13 +1805,7 @@ sub __get_min_clock
 
 	return 0 if (scalar(@$rows_ref) == 0);
 
-	return $rows_ref->[0]->[0];
-}
-
-sub __get_oldest_clock
-{
-	# 01.01.2014 00:00:00
-	return 1388534400;
+	return $rows_ref->[0]->[0] ? $rows_ref->[0]->[0] : 0;
 }
 
 sub __probe_offline_at
