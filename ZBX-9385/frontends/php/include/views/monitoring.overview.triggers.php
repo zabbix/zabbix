@@ -105,7 +105,7 @@ $filterForm = $filterFormView->render();
 $overviewWidget->addFlicker($filterForm, CProfile::get('web.overview.filter.state', 0));
 
 // data table
-if ($config['dropdown_first_entry']) {
+if ($data['pageFilter']->groupsSelected) {
 	global $page;
 
 	$dataTable = getTriggersOverview($this->data['hosts'], $this->data['triggers'], $page['file'],
