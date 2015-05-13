@@ -50,7 +50,8 @@ $hostGroupTable->setHeader(array(
 		new CCheckBox('all_groups', null, "checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');"),
 		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	' # ',
+	_('Hosts'),
+	_('Templates'),
 	_('Members'),
 	_('Info')
 ));
@@ -150,18 +151,15 @@ foreach ($this->data['groups'] as $group) {
 		$info = '';
 	}
 
-	$hostGroupTable->addRow(array(
+	$hostGroupTable->addRow([
 		new CCheckBox('groups['.$group['groupid'].']', null, null, $group['groupid']),
 		new CCol($name, ZBX_STYLE_NOWRAP),
-		array(
-			array(new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY),
-				CViewHelper::showNum($templateCount)),
-			BR(),
-			array(new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), CViewHelper::showNum($hostCount))
-		),
+		[new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), CViewHelper::showNum($hostCount)],
+		[new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY),
+				CViewHelper::showNum($templateCount)],
 		empty($hostsOutput) ? '' : $hostsOutput,
 		$info
-	));
+	]);
 }
 
 // append table to form
