@@ -142,6 +142,13 @@ my $servicedata;	# hash with various data of TLD service
 
 my $probe_avail_limit = get_macro_probe_avail_limit();
 
+# Get the minimum clock from the item that is collected once a day, this way
+# "min(clock)" won't take too much time (see function __get_min_clock() for details)
+my $rows_ref = db_select("select itemid from items where key_='rsm.configvalue[RSM.SLV.DNS.TCP.RTT]'");
+my $config_itemid = $rows_ref->[0]->[0];
+$rows_ref = db_select("select min(clock) from history_uint where itemid=$config_itemid");
+my $config_minclock = $rows_ref->[0]->[0];
+
 my $probes_from;
 my $probes_till;
 
@@ -191,7 +198,7 @@ foreach (@$tlds_ref)
 
 			if (! -e $continue_file)
 			{
-				$from = truncate_from(__get_min_clock($tld, $service));
+				$from = truncate_from(__get_min_clock($tld, $service, $config_minclock));
 			}
 			else
 			{
@@ -1765,15 +1772,7 @@ sub __get_min_clock
 {
 	my $tld = shift;
 	my $service = shift;
-
-	# first get the minimum clock from the item that is collected once a day, this way "min(clock)" won't take too much time
-	my $rows_ref = db_select("select itemid from items where key_='rsm.configvalue[RSM.SLV.DNS.TCP.RTT]'");
-
-	my $config_itemid = $rows_ref->[0]->[0];
-
-	$rows_ref = db_select("select min(clock) from history_uint where itemid=$config_itemid");
-
-	my $clock_limit = $rows_ref->[0]->[0];
+	my $minclock = shift;
 
 	my $key_condition;
 	if ($service eq 'dns' or $service eq 'dnssec')
@@ -1789,7 +1788,7 @@ sub __get_min_clock
 		$key_condition = "key_='$cfg_epp_key_status'";
 	}
 
-	$rows_ref = db_select("select hostid from hosts where host like '$tld %'");
+	my $rows_ref = db_select("select hostid from hosts where host like '$tld %'");
 
 	return 0 if (scalar(@$rows_ref) == 0);
 
@@ -1801,7 +1800,7 @@ sub __get_min_clock
 
 	my $itemids_str = __sql_arr_to_str($rows_ref);
 
-	$rows_ref = db_select("select min(clock) from history_uint where itemid in ($itemids_str) and clock<$clock_limit");
+	$rows_ref = db_select("select min(clock) from history_uint where itemid in ($itemids_str) and clock<$minclock");
 
 	return 0 if (scalar(@$rows_ref) == 0);
 
