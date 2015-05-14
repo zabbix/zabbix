@@ -546,10 +546,10 @@ class C10ImportConverter extends CConverter {
 
 						// working with references to triggers in the content here
 						foreach ($descriptionExpressionIndex[$trigger['description']][$trigger['expression']] as &$trigger) {
-							$trigger['dependencies'][] = array(
+							$trigger['dependencies'][] = [
 								'name' => $targetTrigger['description'],
-								'expression' => $targetTrigger['expression'],
-							);
+								'expression' => $this->triggerConverter->convert($targetTrigger['expression'])
+							];
 						}
 						unset($trigger);
 					}
