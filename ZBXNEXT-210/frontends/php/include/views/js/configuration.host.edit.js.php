@@ -305,8 +305,9 @@
 
 			disable: function() {
 				jQuery('.interface-drag-control, .interface-control').html('');
-				jQuery('.interfaceRow').find('input').removeAttr('id');
-				jQuery('.interfaceRow').find('input').removeAttr('name');
+				jQuery('.interfaceRow').find('input')
+					.removeAttr('id')
+					.removeAttr('name');
 				jQuery('.interfaceRow').find('input[type="text"]').attr('readonly', true);
 				jQuery('.interfaceRow').find('input[type="radio"], input[type="checkbox"]').attr('disabled', true);
 				jQuery('.interface-connect-to').find('input').button('disable');
