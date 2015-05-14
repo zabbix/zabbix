@@ -269,8 +269,6 @@ else {
 	}
 	$ifTab->addRow($row);
 	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');
-
-//	$hostList->addVar('interfaces', $data['interfaces']);
 }
 
 $hostList->addRow(_('Description'), new CTextArea('description', $data['description']));
@@ -698,7 +696,7 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	$field_name = $inventoryInfo['db_field'];
 
 	if (!array_key_exists($field_name, $data['host_inventory'])) {
-		$data['host_inventory'][$field_name] = '';	/* ??? */
+		$data['host_inventory'][$field_name] = '';
 	}
 
 	if ($hostInventoryTable['fields'][$field_name]['type'] == DB::FIELD_TYPE_TEXT) {
