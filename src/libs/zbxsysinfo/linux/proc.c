@@ -221,7 +221,7 @@ int	byte_value_from_proc_file(FILE *f, const char *label, const char *guard, zbx
 {
 	char	buf[MAX_STRING_LEN], *p_value, *p_unit;
 	size_t	label_len, guard_len;
-	long	pos;
+	long	pos = 0;
 	int	ret = NOTSUPPORTED;
 
 	label_len = strlen(label);
