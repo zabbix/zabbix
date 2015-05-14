@@ -793,23 +793,24 @@ footer {
 	width: 312px;
 	min-height: 22px;
 	line-height: 22px;
-	padding: 0 2px;
+	padding: 0;
 
 	&.active {
 		border-color: $primary-blue;
 	}
 
 	input[type="text"] {
-		position: absolute;
-		z-index: 10;
-		top: 0;
-		left: 0;
 		border: none;
 		background: none;
+		box-sizing: border-box;
+		width: 100%;
+		padding-top: 2px;
 
 	}
 
 	.multiselect-list {
+		padding-left: 2px;
+		padding-bottom: 2px;
 
 		li {
 			display: inline-block;
@@ -857,6 +858,8 @@ footer {
 		padding: 0.4em 5px;
 		margin: 0 -5px;
 		cursor: pointer;
+		overflow: hidden;
+		text-overflow: ellipsis;
 		@include transition(background-color .2s ease-out);
 
 		&.suggest-hover {
@@ -2718,7 +2721,6 @@ a.form-remove-btn {
 	right: -12px;
 	color: $white;
 	background-color: $light-blue-grey;
-	z-index: 11;
 	@extend %close-icon;
 
 	&:hover {
