@@ -2459,21 +2459,21 @@ a.grey {
 }
 
 .status-green {
-	@extend .green;
+	color: darken($green, 15%);
 	border: 1px solid $light-green;
 	background-color: $lighter-green;
 	@extend %status;
 }
 
 .status-red {
-	@extend .red;
+	color: darken($red, 15%);
 	border: 1px solid $light-red;
 	background-color: $lighter-red;
 	@extend %status;
 }
 
 .status-grey {
-	@extend .grey;
+	color: darken($blue-grey, 15%);
 	border: 1px solid $light-blue-grey;
 	background-color: $lighter-blue-grey;
 	@extend %status;
@@ -2553,13 +2553,13 @@ td.disaster-bg {
 }
 
 .msg-good {
-	@extend .green;
+	color: darken($green, 15%);
 	border: 1px solid $light-green;
 	background-color: $lighter-green;
 	@extend %msg;
 
 	.link-action {
-		@extend .green;
+		color: darken($green, 15%);
 	}
 
 	.overlay-close-btn {
@@ -2572,19 +2572,19 @@ td.disaster-bg {
 
 	button {
 		background-color: $white;
-		@extend .green;
+		color: darken($green, 15%);
 		border-color: $light-green;
 	}
 }
 
 .msg-bad {
-	@extend .red;
+	color: darken($red, 15%);
 	border: 1px solid $light-red;
 	background-color: $lighter-red;
 	@extend %msg;
 
 	.link-action {
-		@extend .red;
+		color: darken($red, 15%);
 	}
 
 	.overlay-close-btn {
@@ -2597,7 +2597,7 @@ td.disaster-bg {
 
 	button {
 		background-color: $white;
-		@extend .red;
+		color: darken($red, 15%);
 		border-color: $light-red;
 	}
 }
