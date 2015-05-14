@@ -767,8 +767,7 @@ footer {
 		}
 
 		button {
-			margin-left: 0;
-			margin-right: 0;
+			margin: 0;
 		}
 	}
 
@@ -1621,7 +1620,6 @@ button {
     } 
 
 	&.btn-grey {
-		margin-top: -2px;
 		background-color: $transparent;
 		color: $link-color;
 		border-color: $light-blue-grey;
