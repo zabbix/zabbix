@@ -2459,28 +2459,26 @@ a.grey {
 }
 
 .status-green {
-	color: darken($green, 15%);
-	border: 1px solid $light-green;
-	background-color: $lighter-green;
+    border: 1px solid darken(desaturate($alt-green, 10%), 18%);
+	background-color: darken(desaturate($alt-green, 10%), 16%);
 	@extend %status;
 }
 
 .status-red {
-	color: darken($red, 15%);
-	border: 1px solid $light-red;
-	background-color: $lighter-red;
+	border: 1px solid darken(desaturate($alt-red, 10%), 7%);
+	background-color: darken(desaturate($alt-red, 10%), 5%);
 	@extend %status;
 }
 
 .status-grey {
-	color: darken($blue-grey, 15%);
-	border: 1px solid $light-blue-grey;
-	background-color: $lighter-blue-grey;
+	border: 1px solid darken(desaturate($alt-blue-grey, 10%), 10%);
+	background-color: darken(desaturate($alt-blue-grey, 10%), 8%);
 	@extend %status;
 }
 
 %status {
-	padding: 2px 4px;
+	padding: 1px 3px;
+	color: $white;
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	text-align: center;
@@ -2553,13 +2551,13 @@ td.disaster-bg {
 }
 
 .msg-good {
-	color: darken($green, 15%);
+	color: darken(desaturate($green, 10%), 20%);
 	border: 1px solid $light-green;
 	background-color: $lighter-green;
 	@extend %msg;
 
 	.link-action {
-		color: darken($green, 15%);
+		color: darken(desaturate($green, 10%), 20%);
 	}
 
 	.overlay-close-btn {
@@ -2572,19 +2570,19 @@ td.disaster-bg {
 
 	button {
 		background-color: $white;
-		color: darken($green, 15%);
+		color: darken(desaturate($green, 10%), 20%);
 		border-color: $light-green;
 	}
 }
 
 .msg-bad {
-	color: darken($red, 15%);
+	color: darken(desaturate($red, 10%), 20%);
 	border: 1px solid $light-red;
 	background-color: $lighter-red;
 	@extend %msg;
 
 	.link-action {
-		color: darken($red, 15%);
+		color: darken(desaturate($red, 10%), 20%);
 	}
 
 	.overlay-close-btn {
@@ -2597,7 +2595,7 @@ td.disaster-bg {
 
 	button {
 		background-color: $white;
-		color: darken($red, 15%);
+		color: darken(desaturate($red, 10%), 20%);
 		border-color: $light-red;
 	}
 }
