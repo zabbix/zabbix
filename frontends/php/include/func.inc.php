@@ -1698,7 +1698,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 			$msg_details->addItem($link);
 		}
 
-		$list = new CList(null);
+		$list = new CList();
 		if ($title !== null) {
 			$list->setAttribute('id', 'msg-messages');
 

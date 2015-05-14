@@ -327,7 +327,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	/*
 	 * Back
 	 */
-	$list = new CList(null, 'object-group');
+	$list = new CList([], 'object-group');
 	if ($dbHost['status'] == HOST_STATUS_TEMPLATE) {
 		$list->addItem(array(new CLink(_('All templates'), '&gt;', 'templates.php?templateid='.$dbHost['hostid'].url_param('groupid'))));
 
@@ -580,7 +580,7 @@ function makeFormFooter(CButtonInterface $mainButton = null, array $otherButtons
 		$button->addClass('btn-alt');
 	}
 
-	$buttons = new CList(null, 'table-forms');
+	$buttons = new CList([], 'table-forms');
 
 	if ($mainButton !== null) {
 		$buttons->addItem(array(

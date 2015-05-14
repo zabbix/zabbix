@@ -27,7 +27,7 @@
 	$top_menu = new CDiv($top_menu_items, 'top-nav-container');
 	$top_menu->setAttribute('id', 'mmenu');
 
-	$icons = new CList(null, 'top-nav-icons');
+	$icons = new CList([], 'top-nav-icons');
 
 	$form = new CForm('get', 'search.php');
 	$search = new CTextBox('search', '', 20, false, 255);
@@ -64,7 +64,7 @@
 	$menu_divs = array();
 	$menu_selected = false;
 	foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
-		$sub_menu_row = new CList(null, 'top-subnav');
+		$sub_menu_row = new CList([], 'top-subnav');
 		foreach ($sub_menu as $id => $sub_page) {
 			if (empty($sub_page['menu_text'])) {
 				$sub_page['menu_text'] = SPACE;

@@ -215,7 +215,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 		// reason
 		$problemList = '';
 		if ($serviceSla['problems']) {
-			$problemList = new CList(null, 'service-problems');
+			$problemList = new CList([], 'service-problems');
 			foreach ($serviceSla['problems'] as $problemTrigger) {
 				$problemList->addItem(new CLink($problemTrigger['description'],
 					'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
