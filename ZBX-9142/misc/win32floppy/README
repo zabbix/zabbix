@@ -1,0 +1,63 @@
+/* 
+** Zabbix
+** Copyright (C) 2000-2015 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+SYNOPSIS
+	install.bat "host name" "server IP" [ "install dir" ] [ "config dir" ]
+
+	uninstall.bat [ "install dir" ]
+
+DESCRIPTION
+	install.bat - installation script, which copies executable file to 
+	"install dir", creates configuration file in "config dir" with 
+	default parameters, installs Zabbix Agent as a service and starts the service.
+
+	uninstall.bat - uninstallation script, which stops Zabbix Agent service
+	and removes the service from the system. uninstall.bat DOESN'T remove files, you
+	must manualy remove them.
+
+	NOTE: For installation script, file 'ZabbixW32.exe' must be accessible from current '.' directory.
+	For example: You may copy 'install.bat','uninstall.bat' and 'ZabbixW32.exe'
+	into one directory and start intallation.
+
+OPTIONS
+	"host name"
+		Zabbix Agent unique hostname which will be used for active checks.
+
+	"server IP"
+		Zabbix Server IP address
+
+	"install dir"
+		installation directory for binary files. 
+		Default value is %PROGRAMFILES%/zabbix
+
+	"config dir"
+		directory for configuration file.
+		Default value is "install dir"
+
+USAGE
+	install.bat localhost 127.0.0.1 c:/zabbix
+	uninstall.bat c:/zabbix
+
+	install.bat "My Host Name" 192.168.5.1 d:/programs/zabbix_bin d:/programs/zabbix_conf 
+	uninstall.bat d:/programs/zabbix_bin
+
+AUTHOR
+	Eugene Grigorjev, Nov 2005
+	eugene.grigorjev@zabbix.com
+	http://www.zabbix.com
