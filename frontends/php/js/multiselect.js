@@ -231,6 +231,18 @@ jQuery(function($) {
 				'class': 'multiselect-wrapper'
 			}));
 
+			// selected
+			var selected_div = $('<div>', {
+				'class': 'selected'
+			});
+			var selected_ul = $('<ul>', {
+				'class': 'multiselect-list'
+			});
+			if (options.disabled) {
+				selected_ul.addClass('disabled');
+			}
+			obj.append(selected_div.append(selected_ul));
+
 			// search input
 			if (!options.disabled) {
 				var input = $('<input>', {
@@ -439,21 +451,6 @@ jQuery(function($) {
 				obj.append(input);
 			}
 
-			// selected
-			var selected_div = $('<div>', {
-				'class': 'selected'
-			});
-			var sdelected_ul = $('<ul>', {
-				'class': 'multiselect-list',
-				css: {
-					width: values.width
-				}
-			});
-			if (options.disabled) {
-				sdelected_ul.addClass('disabled');
-			}
-			obj.append(selected_div.append(sdelected_ul));
-
 			// available
 			if (!options.disabled) {
 				var available = $('<div>', {
@@ -480,9 +477,6 @@ jQuery(function($) {
 			else {
 				loadSelected(options.data, obj, values, options);
 			}
-
-			// resize
-			resize(obj, values, options);
 
 			cleanLastSearch(obj);
 
@@ -706,9 +700,6 @@ jQuery(function($) {
 
 			removePlaceholder(obj);
 
-			// resize
-			resize(obj, values, options);
-
 			// set readonly
 			if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
 				setReadonly(obj);
@@ -722,9 +713,6 @@ jQuery(function($) {
 		$('input[value="' + id + '"]', obj).remove();
 
 		delete values.selected[id];
-
-		// resize
-		resize(obj, values, options);
 
 		// remove readonly
 		if ($('.selected li', obj).length == 0) {
@@ -865,56 +853,6 @@ jQuery(function($) {
 		}
 	}
 
-	function resize(obj, values, options) {
-		if (!options.selectedLimit || $('.selected li', obj).length < options.selectedLimit) {
-			resizeSelected(obj, values, options);
-		}
-	}
-
-	function resizeSelected(obj, values, options) {
-		if (options.disabled) {
-			if ($('.selected li', obj).length) {
-				var item = $('.selected li', obj),
-					item_margins = item.outerHeight(true) - item.height();
-
-				$('.selected ul', obj).css({
-					'padding-bottom': item_margins
-				});
-			}
-		}
-		else {
-			var input_padding_top = 0,
-				input = $('input[type="text"]', obj),
-				obj_paddings = obj.innerWidth() - obj.width(),
-				input_paddings = input.innerWidth() - input.width();
-
-			if ($('.selected li', obj).length > 0) {
-				var lastItem = $('.selected li:last-child', obj),
-					position = lastItem.position();
-
-				input_padding_top = position.top + lastItem.outerHeight(true);
-			}
-
-			$('.selected ul', obj).css({
-				'padding-bottom': input.height()
-			});
-
-			input.css({
-				'width': obj.width() + obj_paddings - input_paddings,
-				'padding-top': input_padding_top
-			});
-
-			if (IE) {
-				// hack to fix inline-block container resizing and poke input element value to trigger reflow
-				if (IE8) {
-					$('.multiselect-wrapper').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-				}
-				var currentInputVal = input.val();
-				input.val(' ').val(currentInputVal);
-			}
-		}
-	}
-
 	function resizeSelectedText(item, text, obj, options) {
 		var text_paddings = text.innerWidth() - text.width(),
 			item_margins = item.outerWidth(true) - item.width(),
@@ -1002,7 +940,6 @@ jQuery(function($) {
 	function removePlaceholder(obj) {
 		$('input[type="text"]', obj)
 			.removeAttr('placeholder')
-//			.removeClass('placeholder')
 			.val('');
 	}
 
