@@ -817,6 +817,10 @@ class C10ImportConverter extends CConverter {
 					]);
 
 					if (isset($selement['elementtype']) && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+						$selement['element']['expression'] = $this->triggerConverter->convert(
+							$selement['element']['expression']
+						);
+
 						unset($selement['element']['host']);
 					}
 
@@ -831,6 +835,9 @@ class C10ImportConverter extends CConverter {
 					if (isset($link['linktriggers']) && $link['linktriggers']) {
 						foreach ($link['linktriggers'] as &$linkTrigger) {
 							$linkTrigger = CArrayHelper::renameKeys($linkTrigger, ['triggerid' => 'trigger']);
+							$linkTrigger['trigger']['expression'] = $this->triggerConverter->convert(
+								$linkTrigger['trigger']['expression']
+							);
 
 							unset($linkTrigger['trigger']['host']);
 						}
