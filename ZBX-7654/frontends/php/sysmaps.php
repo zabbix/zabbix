@@ -34,7 +34,6 @@ else {
 	$page['title'] = _('Configuration of network maps');
 	$page['file'] = 'sysmaps.php';
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['hist_arg'] = array();
 
 	$isExportData = false;
 }

@@ -24,11 +24,6 @@ class CIFrame extends CTag {
 	public function __construct($src = null, $width = '100%', $height = '100%', $scrolling = 'no', $id = 'iframe') {
 		parent::__construct('iframe', 'yes');
 
-		$this->tag_start = '';
-		$this->tag_end = '';
-		$this->tag_body_start = '';
-		$this->tag_body_end = '';
-
 		$this->setSrc($src);
 		$this->setWidth($width);
 		$this->setHeight($height);

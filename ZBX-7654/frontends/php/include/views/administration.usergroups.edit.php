@@ -19,8 +19,7 @@
 **/
 
 
-$userGroupWidget = new CWidget();
-$userGroupWidget->addPageHeader(_('CONFIGURATION OF USER GROUPS'));
+$userGroupWidget = (new CWidget())->setTitle(_('User groups'));
 
 // create form
 $userGroupForm = new CForm();
@@ -105,7 +104,7 @@ $permissionsTable->addRow(array(
 	array(
 		new CButton('add_read_write', _('Add'),
 			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_READ_WRITE."', 450, 450);",
+				'&permission='.PERM_READ_WRITE."');",
 			'button-form'
 		),
 		new CSubmit('del_read_write', _('Delete selected'), null, 'button-form')
@@ -113,7 +112,7 @@ $permissionsTable->addRow(array(
 	array(
 		new CButton('add_read_only', _('Add'),
 			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_READ."', 450, 450);",
+				'&permission='.PERM_READ."');",
 			'button-form'
 		),
 		new CSubmit('del_read_only', _('Delete selected'), null, 'button-form')
@@ -121,7 +120,7 @@ $permissionsTable->addRow(array(
 	array(
 		new CButton('add_deny', _('Add'),
 			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_DENY."', 450, 450);",
+				'&permission='.PERM_DENY."');",
 			'button-form'
 		),
 		new CSubmit('del_deny', _('Delete selected'), null, 'button-form')
@@ -139,12 +138,9 @@ if (!$this->data['form_refresh']) {
 $userGroupTab->addTab('userGroupTab', _('User group'), $userGroupFormList);
 $userGroupTab->addTab('permissionsTab', _('Permissions'), $permissionsFormList);
 
-// append tab to form
-$userGroupForm->addItem($userGroupTab);
-
 // append buttons to form
 if (isset($this->data['usrgrpid'])) {
-	$userGroupForm->addItem(makeFormFooter(
+	$userGroupTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('usrgrpid')),
@@ -153,12 +149,14 @@ if (isset($this->data['usrgrpid'])) {
 	));
 }
 else {
-	$userGroupForm->addItem(makeFormFooter(
+	$userGroupTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
 
+// append tab to form
+$userGroupForm->addItem($userGroupTab);
 // append form to widget
 $userGroupWidget->addItem($userGroupForm);
 
