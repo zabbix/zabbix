@@ -173,9 +173,7 @@ $fields = array(
 	'new_application_prototype' =>	array(T_ZBX_STR, O_OPT, null,	null,
 		'isset({parent_discoveryid}) && (isset({add}) || isset({update}))'
 	),
-	'application_prototypes' =>		array(T_ZBX_STR, O_OPT, null,	DB_ID,
-		'isset({parent_discoveryid}) && (isset({add}) || isset({update}))'
-	),
+	'application_prototypes' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'history' =>					array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),
 		'isset({add}) || isset({update})',
 		_('History storage period')
