@@ -975,7 +975,7 @@ elseif (hasRequest('form')) {
 	if (!$data['macros'] && $data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		$macro = ['macro' => '', 'value' => ''];
 		if ($data['show_inherited_macros']) {
-			$macro['type'] = 0x02/* HOSTMACRO */;
+			$macro['type'] = MACRO_TYPE_HOSTMACRO;
 		}
 		$data['macros'][] = $macro;
 	}
