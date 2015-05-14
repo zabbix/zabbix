@@ -1224,16 +1224,17 @@ class CConfigurationImport {
 	 * @return null
 	 */
 	protected function addDependencies() {
+		$triggerDependencies = [];
 		foreach ($this->formattedData['triggers'] as $trigger) {
-			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
-
 			$deps = [];
-			$triggerDependencies = [];
 
 			if (isset($trigger['dependencies'])) {
+				$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+
 				foreach ($trigger['dependencies'] as $dependency) {
 					$depTriggerId = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
-					if ($depTriggerId) {
+
+					if (!$depTriggerId) {
 						throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.',
 							$trigger['description'],
 							$dependency['name']
