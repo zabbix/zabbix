@@ -740,19 +740,22 @@ sub db_select
 {
 	my $query = shift;
 
-	dbg("[$query]");
-
 	my $sth = $dbh->prepare($query)
 		or fail("cannot prepare [$query]: ", $dbh->errstr);
+
+	dbg("[$query]");
 
 	$sth->execute()
 		or fail("cannot execute [$query]: ", $sth->errstr);
 
 	my $rows_ref = $sth->fetchall_arrayref();
 
-	my $rows = scalar(@$rows_ref);
+	if (opt('debug'))
+	{
+		my $rows = scalar(@$rows_ref);
 
-	dbg("$rows row", ($rows != 1 ? "s" : ""));
+		dbg("$rows row", ($rows != 1 ? "s" : ""));
+	}
 
 	return $rows_ref;
 }
@@ -2505,7 +2508,7 @@ my $log_open = 0;
 
 sub __func
 {
-	my $depth = 4;
+	my $depth = 3;
 
 	my $func = (caller($depth))[3];
 

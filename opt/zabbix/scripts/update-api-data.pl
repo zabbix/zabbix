@@ -149,6 +149,8 @@ my $config_itemid = $rows_ref->[0]->[0];
 $rows_ref = db_select("select min(clock) from history_uint where itemid=$config_itemid");
 my $config_minclock = $rows_ref->[0]->[0];
 
+dbg("config_minclock:$config_minclock");
+
 my $probes_from;
 my $probes_till;
 
@@ -167,9 +169,22 @@ foreach (@$tlds_ref)
 
 	foreach my $service (@services)
 	{
-		$servicedata->{$tld}->{$service}->{'enabled'} = tld_service_enabled($tld, $service);
+		if (tld_service_enabled($tld, $service) != SUCCESS)
+		{
+			if (opt('dry-run'))
+			{
+				__prnt(uc($service), " DISABLED");
+			}
+			else
+			{
+				if (ah_save_alarmed($ah_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
+				{
+					fail("cannot save alarmed: ", ah_get_error());
+				}
+			}
 
-		next unless ($servicedata->{$tld}->{$service}->{'enabled'} == SUCCESS);
+			next;
+		}
 
 		my $lastclock_key = "rsm.slv.$service.rollweek";
 
@@ -177,13 +192,13 @@ foreach (@$tlds_ref)
 
 		if ($lastclock == E_FAIL)
 		{
-			$servicedata->{$tld}->{$service}->{'error'} = "configuration error: item $lastclock_key not found";
+			wrn(uc($service), ": configuration error, item $lastclock_key not found");
 			next;
 		}
 
 		if ($lastclock == 0)
 		{
-			$servicedata->{$tld}->{$service}->{'error'} = "no data in the database yet";
+			wrn(uc($service), ": no rolling week data in the database yet");
 			next;
 		}
 
@@ -213,7 +228,7 @@ foreach (@$tlds_ref)
 
 			if ($from == 0)
 			{
-				$servicedata->{$tld}->{$service}->{'error'} = "no data in the database yet";
+				wrn(uc($service), ": no data from probes in the database yet");
 				next;
 			}
 
@@ -261,8 +276,7 @@ foreach (@$tlds_ref)
 		# calculation of probe status information may be done for the period up till now.
 		if ((defined($from) and $from > $lastclock))
 		{
-			$servicedata->{$tld}->{$service}->{'error'} = "given time period (" . __selected_period($from, $till) . ")".
-				" is in the future from the latest data available (" . ts_str($lastclock) . ")";
+			wrn(uc($service), ": time period (" . __selected_period($from, $till) . ")". " is in the future from the latest data available (" . ts_str($lastclock) . ")");
 			next;
 		}
 
@@ -273,20 +287,8 @@ foreach (@$tlds_ref)
 	}
 }
 
-if (!defined($probes_from))
-{
-	$probes_from = 0;
-}
-else
-{
-	# make sure to cover all possible delays
-	$probes_from -= 3600;
-}
-
-if (!$probes_till)
-{
-	$probes_till = $now;
-}
+fail("cannot calculate beginning of the period") unless(defined($probes_from));
+fail("cannot calculate end of the period") unless(defined($probes_till));
 
 my $all_probes_ref = get_probes();
 
@@ -314,39 +316,6 @@ foreach (keys(%$servicedata))
 		my $till = $servicedata->{$tld}->{$service}->{'till'};
 		my $lastclock = $servicedata->{$tld}->{$service}->{'lastclock'};
 		my $continue_file = $servicedata->{$tld}->{$service}->{'continue_file'};
-		my $tldserv_enabled = $servicedata->{$tld}->{$service}->{'enabled'};
-		my $tldserv_error = $servicedata->{$tld}->{$service}->{'error'};
-
-		if ($tldserv_enabled != SUCCESS)
-		{
-			if (opt('dry-run'))
-			{
-				__prnt(uc($service), " DISABLED");
-			}
-			else
-			{
-				if (ah_save_alarmed($ah_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
-				{
-					fail("cannot save alarmed: ", ah_get_error());
-				}
-			}
-
-			next;
-		}
-
-		if (defined($tldserv_error))
-		{
-			if (opt('dry-run'))
-			{
-				__prnt("SKIP ", uc($service), ": $tldserv_error");
-			}
-			else
-			{
-				wrn("SKIP ", uc($service), ": $tldserv_error");
-			}
-
-			next;
-		}
 
 		my $hostid = get_hostid($tld);
 		my $key = "rsm.slv.$service.avail";
@@ -1800,11 +1769,19 @@ sub __get_min_clock
 
 	my $itemids_str = __sql_arr_to_str($rows_ref);
 
-	$rows_ref = db_select("select min(clock) from history_uint where itemid in ($itemids_str) and clock<$minclock");
+	my $ret = 0;
 
-	return 0 if (scalar(@$rows_ref) == 0);
+	while ($ret == 0 && $minclock < $now)
+	{
+		$rows_ref = db_select("select min(clock) from history_uint where itemid in ($itemids_str) and clock<$minclock");
 
-	return $rows_ref->[0]->[0] ? $rows_ref->[0]->[0] : 0;
+		$ret = $rows_ref->[0]->[0] if ($rows_ref->[0]->[0]);
+
+		# move half of a day forward
+		$minclock += 43200;
+	}
+
+	return $ret;
 }
 
 sub __probe_offline_at
@@ -1878,12 +1855,14 @@ This option cannot be used together with option --continue.
 =item B<--continue>
 
 Continue calculation from the timestamp of the last run with --continue. In case of first run with
---continue all available data will be calculated. The continue token is saved per each TLD-service
-pair separately.
+--continue the oldest available data will be used as starting point. You may specify the end point
+of the period with --period option (see above). If you don't specify the end point the timestamp
+of the newest available data in the database will be used.
 
-Note, that continue token will not be updated if this option was specified together with --dry-run.
+The continue token is saved per each TLD-service pair separately.
 
-This option cannot be used together with option --period.
+Note, that continue token is not be updated if this option was specified together with --dry-run
+or when you use --from option.
 
 =item B<--probe> name
 
