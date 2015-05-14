@@ -2566,6 +2566,12 @@ td.disaster-bg {
 	ul {
 		border-top-color: $light-green;
 	}
+
+	button {
+		background-color: $white;
+		@extend .green;
+		border-color: $light-green;
+	}
 }
 
 .msg-bad {
@@ -2584,6 +2590,12 @@ td.disaster-bg {
 
 	ul {
 		border-top-color: $light-red;
+	}
+
+	button {
+		background-color: $white;
+		@extend .red;
+		border-color: $light-red;
 	}
 }
 
@@ -2608,6 +2620,11 @@ td.disaster-bg {
 		}
 	}
 
+}
+
+.msg-buttons {
+	text-align: right;
+	margin: 10px 0 0 0;
 }
 
 %msg {
@@ -2635,6 +2652,13 @@ td.disaster-bg {
 	color: $indigo-black;
 	border-top: 1px solid $yellow;
 	@include box-shadow(-1px 0 2px 0 rgba(118,141,153,0.15));
+}
+
+.msg-global {
+	text-align: left;
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 25%;
 }
 
 /* Close/Remove icon */
