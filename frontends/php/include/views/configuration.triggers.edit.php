@@ -34,10 +34,10 @@ if (!empty($this->data['hostid'])) {
 }
 
 if (!empty($this->data['parent_discoveryid'])) {
-	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGER PROTOTYPES'));
+	$triggersWidget->setTitle(_('Trigger prototypes'));
 }
 else {
-	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'));
+	$triggersWidget->setTitle(_('Triggers'));
 }
 
 // create form
@@ -81,7 +81,7 @@ $addExpressionButton = new CButton(
 	($this->data['input_method'] == IM_TREE) ? _('Edit') : _('Add'),
 	'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 		'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression'.url_param('parent_discoveryid').
-		'&srcfld1=expression&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()), 800, 265);',
+		'&srcfld1=expression&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()));',
 	'button-form top'
 );
 if ($this->data['limited']) {
@@ -321,7 +321,7 @@ if (empty($this->data['parent_discoveryid'])) {
 						'&srcfld1=triggerid'.
 						'&reference=deptrigger'.
 						'&multiselect=1'.
-						'&with_triggers=1", 1000, 700);',
+						'&with_triggers=1");',
 					'link_menu'
 				)
 			),
@@ -330,9 +330,6 @@ if (empty($this->data['parent_discoveryid'])) {
 	);
 	$triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
 }
-
-// append tabs to form
-$triggersForm->addItem($triggersTab);
 
 // append buttons to form
 if (!empty($this->data['triggerid'])) {
@@ -344,7 +341,7 @@ if (!empty($this->data['triggerid'])) {
 		$deleteButton->setAttribute('disabled', 'disabled');
 	}
 
-	$triggersForm->addItem(makeFormFooter(
+	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -354,11 +351,14 @@ if (!empty($this->data['triggerid'])) {
 	));
 }
 else {
-	$triggersForm->addItem(makeFormFooter(
+	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid'))))
 	));
 }
+
+// append tabs to form
+$triggersForm->addItem($triggersTab);
 
 $triggersWidget->addItem($triggersForm);
 

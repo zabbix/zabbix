@@ -90,7 +90,7 @@ class CTable extends CTag {
 		return $item;
 	}
 
-	public function setHeader($value = null, $class = 'header') {
+	public function setHeader($value = null, $class = null) {
 		if (is_null($class)) {
 			$class = $this->headerClass;
 		}
@@ -100,9 +100,11 @@ class CTable extends CTag {
 			}
 		}
 		else {
-			$value = new CRow($value, $class);
+			$value = new CRowHeader($value, $class);
 		}
 		$this->colnum = $value->itemsCount();
+
+		$value = new CTag('thead', 'yes', $value);
 		$this->header = $value->toString();
 	}
 
@@ -137,8 +139,8 @@ class CTable extends CTag {
 
 	public function endToString() {
 		$ret = '';
-		if ($this->rownum == 0 && isset($this->message)) {
-			$ret = $this->prepareRow(new CCol($this->message, 'message'));
+		if ($this->rownum == 0 && $this->message !== null) {
+			$ret = $this->prepareRow(new CCol($this->message), 'nothing-to-show');
 			$ret = $ret->toString();
 		}
 		$ret .= $this->footer;

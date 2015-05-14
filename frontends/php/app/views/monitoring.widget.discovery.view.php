@@ -41,20 +41,18 @@ foreach ($drules as &$drule) {
 }
 unset($drule);
 
-$header = array(
-	new CCol(_('Discovery rule')),
-	new CCol(_x('Up', 'discovery results in dashboard')),
-	new CCol(_x('Down', 'discovery results in dashboard'))
-);
-
 $table = new CTableInfo();
-$table->setHeader($header, 'header');
+$table->setHeader(array(
+	_('Discovery rule'),
+	_x('Up', 'discovery results in dashboard'),
+	_x('Down', 'discovery results in dashboard')
+));
 
 foreach ($drules as $drule) {
 	$table->addRow(array(
 		new CLink($drule['name'], 'zabbix.php?action=discovery.view&druleid='.$drule['druleid']),
-		new CSpan($drule['up'], 'green'),
-		new CSpan($drule['down'], ($drule['down'] != 0) ? 'red' : 'green')
+		new CSpan($drule['up'], ZBX_STYLE_GREEN),
+		new CSpan($drule['down'], ($drule['down'] != 0) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
 	));
 }
 

@@ -60,9 +60,9 @@ $availableJScripts = array(
 	'multiselect.js' => '',
 	'chkbxrange.js' => '',
 	// vendors
-	'prototype.js' => '',
-	'jquery.js' => 'jquery/',
-	'jquery-ui.js' => 'jquery/',
+	'prototype.js' => 'vendors/',
+	'jquery.js' => 'vendors/',
+	'jquery-ui.js' => 'vendors/',
 	'activity-indicator.js' => 'vendors/',
 	// classes
 	'class.bbcode.js' => '',
