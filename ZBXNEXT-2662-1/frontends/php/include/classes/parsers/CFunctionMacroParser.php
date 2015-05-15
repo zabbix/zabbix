@@ -37,6 +37,36 @@ class CFunctionMacroParser extends CParser {
 	protected $source;
 
 	/**
+	 * An options array
+	 *
+	 * Supported options:
+	 *   '18_simple_checks' => true		with support for old-style simple checks like "ftp,{$PORT}"
+	 *
+	 * @var array
+	 */
+	public $options = array('18_simple_checks' => false);
+
+	/**
+	 * Parser for user macros.
+	 *
+	 * @var CMacroParser
+	 */
+	protected $userMacroParser;
+
+	/**
+	 * @param array $options
+	 */
+	public function __construct($options = array()) {
+		if (array_key_exists('18_simple_checks', $options)) {
+			$this->options['18_simple_checks'] = $options['18_simple_checks'];
+		}
+
+		if ($this->options['18_simple_checks'] === true) {
+			$this->userMacroParser = new CMacroParser('$');
+		}
+	}
+
+	/**
 	 * @param string    $source
 	 * @param int       $startPos
 	 *
@@ -132,6 +162,25 @@ class CFunctionMacroParser extends CParser {
 		if (isset($this->source[$this->pos]) && $this->source[$this->pos] == '(') {
 			while ($this->pos > $startPos && $this->source[$this->pos] != '.') {
 				$this->pos--;
+			}
+		}
+		// for instance, tcp,22
+		elseif ($this->options['18_simple_checks'] === true
+				&& isset($this->source[$this->pos]) && $this->source[$this->pos] == ',') {
+			$this->pos++;
+
+			// user macro
+			$result = $this->userMacroParser->parse($this->source, $this->pos);
+
+			if ($result !== false) {
+				$this->pos += $result->length;
+			}
+			// numeric parameter or empty parameter
+			else {
+				while (isset($this->source[$this->pos])
+						&& $this->source[$this->pos] > '0' && $this->source[$this->pos] < '9') {
+					$this->pos++;
+				}
 			}
 		}
 		// for instance, net.tcp.port[,80]
