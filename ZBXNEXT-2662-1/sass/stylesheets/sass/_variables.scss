@@ -137,15 +137,6 @@ $font-msg-reset-size: 0.850em; // Default 1em/12px
 
 $font-transform: uppercase;
 
-// IMAGE MAPS
-$browsers: (
-	chrome: url(../img/browser-sprite.png) no-repeat 0 0,
-	ff: url(../img/browser-sprite.png) no-repeat -66px 0px,
-	ie: url(../img/browser-sprite.png) no-repeat 0 -66px,
-	opera: url(../img/browser-sprite.png) no-repeat -66px -66px,
-	safari: url(../img/browser-sprite.png) no-repeat 0 -132px
-
-);
 
 // FONT MIXINS
 @mixin font-body {
