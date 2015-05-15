@@ -249,6 +249,7 @@ jQuery(function($) {
 					'class': 'input',
 					type: 'text'
 				})
+				.attr('placeholder', options.labels['type here to search'])
 				.on('keyup change', function(e) {
 					if (e.which == KEY.ESCAPE) {
 						cleanSearchInput(obj);
@@ -472,7 +473,6 @@ jQuery(function($) {
 			// preload data
 			if (empty(options.data)) {
 				setDefaultValue(obj, options);
-				setPlaceholder(obj, options);
 			}
 			else {
 				loadSelected(options.data, obj, values, options);
@@ -693,8 +693,6 @@ jQuery(function($) {
 
 			text.append(close_btn);
 
-			removePlaceholder(obj);
-
 			// set readonly
 			if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
 				setReadonly(obj);
@@ -712,7 +710,6 @@ jQuery(function($) {
 		// remove readonly
 		if ($('.selected li', obj).length == 0) {
 			setDefaultValue(obj, options);
-			setPlaceholder(obj, options);
 		}
 
 		// clean
@@ -830,18 +827,11 @@ jQuery(function($) {
 	}
 
 	function cleanLastSearch(obj) {
-		var input = $('input[type="text"]', obj);
-
-		input.data('lastSearch', '');
-		input.val('');
+		$('input[type="text"]', obj).data('lastSearch', '').val('');
 	}
 
 	function cleanSearchInput(obj) {
-		var input = $('input[type="text"]', obj);
-
-		if (!(IE && input.val() == input.attr('placeholder'))) {
-			input.val('');
-		}
+		$('input[type="text"]', obj).val('');
 	}
 
 	function resizeSelectedText(item, text, obj, options) {
@@ -910,7 +900,6 @@ jQuery(function($) {
 	}
 
 	function setReadonly(obj) {
-		cleanSearchInput(obj);
 		$('input[type="text"]', obj).css({'display': 'none'});
 		$(obj).removeClass('active');
 
@@ -920,18 +909,6 @@ jQuery(function($) {
 		$('.selected ul', obj).css({
 			'padding-bottom': item_margins
 		});
-	}
-
-	function setPlaceholder(obj, options) {
-		$('input[type="text"]', obj).attr('placeholder', options.labels['type here to search']);
-
-		createPlaceholders();
-	}
-
-	function removePlaceholder(obj) {
-		$('input[type="text"]', obj)
-			.removeAttr('placeholder')
-			.val('');
 	}
 
 	function getLimit(values, options) {
