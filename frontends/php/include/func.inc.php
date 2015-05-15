@@ -1616,48 +1616,40 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 
 		// if the user is logged in - render the access denied message
 		if (CWebUser::isLoggedIn()) {
-			$header = _('Access denied.');
-			$message = array(
-				_('Your are logged in as'),
-				' ',
-				bold(CWebUser::$data['alias']),
-				'. ',
-				_('You have no permissions to access this page.'),
-				BR(),
-				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
-			);
+			$data = [
+				'header' => _('Access denied'),
+				'messages' => [
+					_s('Your are logged in as "%1$s".', CWebUser::$data['alias']).' '._('You have no permissions to access this page.'),
+					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
+				],
+				'buttons' => []
+			];
 
-			$buttons = array();
 			// display the login button only for guest users
 			if (CWebUser::isGuest()) {
-				$buttons[] = new CButton('login', _('Login'),
+				$data['buttons'][] = new CButton('login', _('Login'),
 					'javascript: document.location = "index.php?request='.$url.'";', 'button'
 				);
 			}
-			$buttons[] = new CButton('back', _('Go to dashboard'),
+			$data['buttons'][] = new CButton('back', _('Go to dashboard'),
 				'javascript: document.location = "zabbix.php?action=dashboard.view"', 'button'
 			);
 		}
 		// if the user is not logged in - offer to login
 		else {
-			$header = _('You are not logged in.');
-			$message = array(
-				_('You must login to view this page.'),
-				BR(),
-				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
-			);
-			$buttons = array(
-				new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'button')
-			);
+			$data = [
+				'header' => _('You are not logged in'),
+				'messages' => [
+					_('You must login to view this page.'),
+					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
+				],
+				'buttons' => [
+					new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'button')
+				]
+			];
 		}
 
-		$warning = new CWarning($header, $message);
-		$warning->setButtons($buttons);
-
-		$warningView = new CView('general.warning', array(
-			'warning' => $warning
-		));
-		$warningView->render();
+		(new CView('general.warning', $data))->render();
 		exit;
 	}
 }
