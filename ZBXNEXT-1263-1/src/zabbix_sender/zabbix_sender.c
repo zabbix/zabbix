@@ -37,10 +37,10 @@ const char	*usage_message[] = {
 	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-s host] -k key -o value",
 	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-s host] [-T] [-r] -i input-file",
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"[-v] -z server [-p port] [-I IP-address] -s host --tls-connect=cert --tls-ca-file=ca_file [--tls-crl-file=crl_file] --tls-cert-file=cert_file --tls-key-file=key_file -k key -o value",
-	"[-v] -z server [-p port] [-I IP-address] [-s host] --tls-connect=cert --tls-ca-file=ca_file [--tls-crl-file=crl_file] --tls-cert-file=cert_file --tls-key-file=key_file [-T] [-r] -i input-file",
-	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-s host] --tls-connect=cert --tls-ca-file=ca_file [--tls-crl-file=crl_file] --tls-cert-file=cert_file --tls-key-file=key_file -k key -o value",
-	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-s host] --tls-connect=cert --tls-ca-file=ca_file [--tls-crl-file=crl_file] --tls-cert-file=cert_file --tls-key-file=key_file [-T] [-r] -i input-file",
+	"[-v] -z server [-p port] [-I IP-address] -s host --tls-connect=cert --tls-ca-file=ca_file [--tls-crl-file=crl_file] [--tls-cert-issuer=certificate_issuer] [--tls-cert-subject=certificate_subject] --tls-cert-file=cert_file --tls-key-file=key_file -k key -o value",
+	"[-v] -z server [-p port] [-I IP-address] [-s host] --tls-connect=cert --tls-ca-file=ca_file [--tls-crl-file=crl_file] [--tls-cert-issuer=certificate_issuer] [--tls-cert-subject=certificate_subject] --tls-cert-file=cert_file --tls-key-file=key_file [-T] [-r] -i input-file",
+	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-s host] --tls-connect=cert --tls-ca-file=ca_file [--tls-crl-file=crl_file] [--tls-cert-issuer=certificate_issuer] [--tls-cert-subject=certificate_subject] --tls-cert-file=cert_file --tls-key-file=key_file -k key -o value",
+	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-s host] --tls-connect=cert --tls-ca-file=ca_file [--tls-crl-file=crl_file] [--tls-cert-issuer=certificate_issuer] [--tls-cert-subject=certificate_subject] --tls-cert-file=cert_file --tls-key-file=key_file [-T] [-r] -i input-file",
 	"[-v] -z server [-p port] [-I IP-address] -s host --tls-connect=psk --tls-psk-identity=psk_identity --tls-psk-file=psk_file -k key -o value",
 	"[-v] -z server [-p port] [-I IP-address] [-s host] --tls-connect=psk --tls-psk-identity=psk_identity --tls-psk-file=psk_file [-T] [-r] -i input-file",
 	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-s host] --tls-connect=psk --tls-psk-identity=psk_identity --tls-psk-file=psk_file -k key -o value",
@@ -103,6 +103,10 @@ const char	*help_message[] = {
 	"",
 	"  --tls-crl-file                       Full pathname of a file containing revoked certificates",
 	"",
+	"  --tls-cert-issuer                    Allowed server certificate issuer",
+	"",
+	"  --tls-cert-subject                   Allowed server certificate subject",
+	"",
 	"  --tls-cert-file                      Full pathname of a file containing the certificate or certificate chain",
 	"",
 	"  --tls-key-file                       Full pathname of a file containing the private key",
@@ -122,7 +126,10 @@ const char	*help_message[] = {
 	"        --tls-psk-identity=\"PSK ID Zabbix agentd\" --tls-psk-file=/home/zabbix/zabbix_agentd.psk",
 	"",
 	"    zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43 --tls-connect=cert \\",
-	"        --tls-ca-file=/home/zabbix/zabbix_ca_file --tls-cert-file=/home/zabbix/zabbix_agentd.crt \\",
+	"        --tls-ca-file=/home/zabbix/zabbix_ca_file \\",
+	"        --tls-cert-issuer=\"CN=Signing CA,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
+	"        --tls-cert-subject=\"CN=Zabbix proxy,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
+	"        --tls-cert-file=/home/zabbix/zabbix_agentd.crt \\",
 	"        --tls-key-file=/home/zabbix/zabbix_agentd.key",
 #endif
 	NULL	/* end of text */
@@ -136,8 +143,8 @@ char	*CONFIG_TLS_CONNECT		= NULL;
 char	*CONFIG_TLS_ACCEPT		= NULL; /* not used in zabbix_sender, just for linking with tls.c */
 char	*CONFIG_TLS_CA_FILE		= NULL;
 char	*CONFIG_TLS_CRL_FILE		= NULL;
-char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;	/* not used in zabbix_sender, just for linking with tls.c */
-char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;	/* not used in zabbix_sender, just for linking with tls.c */
+char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
+char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
 char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
@@ -163,11 +170,13 @@ static struct zbx_option	longopts[] =
 	{"version",		0,	NULL,	'V'},
 	{"tls-connect",		1,	NULL,	'1'},
 	{"tls-ca-file",		1,	NULL,	'2'},
-	{"tls-crl-file",	1,	NULL,	'4'},
-	{"tls-cert-file",	1,	NULL,	'5'},
-	{"tls-key-file",	1,	NULL,	'6'},
-	{"tls-psk-identity",	1,	NULL,	'7'},
-	{"tls-psk-file",	1,	NULL,	'8'},
+	{"tls-crl-file",	1,	NULL,	'3'},
+	{"tls-cert-issuer",	1,	NULL,	'4'},
+	{"tls-cert-subject",	1,	NULL,	'5'},
+	{"tls-cert-file",	1,	NULL,	'6'},
+	{"tls-key-file",	1,	NULL,	'7'},
+	{"tls-psk-identity",	1,	NULL,	'8'},
+	{"tls-psk-file",	1,	NULL,	'9'},
 	{NULL}
 };
 
@@ -408,13 +417,13 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	signal(SIGQUIT, send_signal_handler);
 	signal(SIGALRM, send_signal_handler);
 #endif
-
-	/* The connect mode can specify TLS with PSK but here we do not know PSK details. Therefore we put NULL in */
-	/* the last 2 arguments. zbx_tls_connect() will find out PSK in this case. If the connect mode specifies */
-	/* TLS with certificate then also NULLs are ok, as the sender does not verify server certificate issuer and */
-	/* subject. */
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port,
-			GET_SENDER_TIMEOUT, configured_tls_connect_mode, NULL, NULL)))
+			GET_SENDER_TIMEOUT, configured_tls_connect_mode,
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			CONFIG_TLS_SERVER_CERT_ISSUER, CONFIG_TLS_SERVER_CERT_SUBJECT)))
+#else
+			NULL, NULL)))
+#endif
 	{
 		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sentdval_args->json.buffer)))
 		{
@@ -435,9 +444,25 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	zbx_thread_exit(ret);
 }
 
+static void	zbx_fill_from_config_file(char **dst, char *src)
+{
+	/* helper function, only for TYPE_STRING configuration parameters */
+
+	if (NULL != src)
+	{
+		if (NULL == *dst)
+			*dst = zbx_strdup(*dst, src);
+
+		zbx_free(src);
+	}
+}
+
 static void    zbx_load_config(const char *config_file)
 {
-	char	*cfg_source_ip = NULL, *cfg_active_hosts = NULL, *cfg_hostname = NULL, *r = NULL;
+	char	*cfg_source_ip = NULL, *cfg_active_hosts = NULL, *cfg_hostname = NULL, *r = NULL,
+		*cfg_tls_connect = NULL, *cfg_tls_ca_file = NULL, *cfg_tls_crl_file = NULL,
+		*cfg_tls_server_cert_issuer = NULL, *cfg_tls_server_cert_subject = NULL, *cfg_tls_cert_file = NULL,
+		*cfg_tls_key_file = NULL, *cfg_tls_psk_file = NULL, *cfg_tls_psk_identity = NULL;
 
 	struct cfg_line	cfg[] =
 	{
@@ -449,19 +474,23 @@ static void    zbx_load_config(const char *config_file)
 			PARM_OPT,	0,			0},
 		{"Hostname",			&cfg_hostname,				TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSConnect",			&CONFIG_TLS_CONNECT,			TYPE_STRING,
+		{"TLSConnect",			&cfg_tls_connect,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCaFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
+		{"TLSCaFile",			&cfg_tls_ca_file,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCrlFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
+		{"TLSCrlFile",			&cfg_tls_crl_file,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCertFile",			&CONFIG_TLS_CERT_FILE,			TYPE_STRING,
+		{"TLSServerCertIssuer",		&cfg_tls_server_cert_issuer,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
+		{"TLSServerCertSubject",	&cfg_tls_server_cert_subject,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPskFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
+		{"TLSCertFile",			&cfg_tls_cert_file,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPskIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
+		{"TLSKeyFile",			&cfg_tls_key_file,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPskFile",			&cfg_tls_psk_file,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPskIdentity",		&cfg_tls_psk_identity,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{NULL}
 	};
@@ -472,14 +501,7 @@ static void    zbx_load_config(const char *config_file)
 	/* do not complain about unknown parameters in agent configuration file */
 	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT);
 
-	if (NULL != cfg_source_ip)
-	{
-		if (NULL == CONFIG_SOURCE_IP)
-		{
-			CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, cfg_source_ip);
-		}
-		zbx_free(cfg_source_ip);
-	}
+	zbx_fill_from_config_file(&CONFIG_SOURCE_IP, cfg_source_ip);
 
 	if (NULL == ZABBIX_SERVER)
 	{
@@ -504,14 +526,16 @@ static void    zbx_load_config(const char *config_file)
 	}
 	zbx_free(cfg_active_hosts);
 
-	if (NULL != cfg_hostname)
-	{
-		if (NULL == ZABBIX_HOSTNAME)
-		{
-			ZABBIX_HOSTNAME = zbx_strdup(ZABBIX_HOSTNAME, cfg_hostname);
-		}
-		zbx_free(cfg_hostname);
-	}
+	zbx_fill_from_config_file(&ZABBIX_HOSTNAME, cfg_hostname);
+	zbx_fill_from_config_file(&CONFIG_TLS_CONNECT, cfg_tls_connect);
+	zbx_fill_from_config_file(&CONFIG_TLS_CA_FILE, cfg_tls_ca_file);
+	zbx_fill_from_config_file(&CONFIG_TLS_CRL_FILE, cfg_tls_crl_file);
+	zbx_fill_from_config_file(&CONFIG_TLS_SERVER_CERT_ISSUER, cfg_tls_server_cert_issuer);
+	zbx_fill_from_config_file(&CONFIG_TLS_SERVER_CERT_SUBJECT, cfg_tls_server_cert_subject);
+	zbx_fill_from_config_file(&CONFIG_TLS_CERT_FILE, cfg_tls_cert_file);
+	zbx_fill_from_config_file(&CONFIG_TLS_KEY_FILE, cfg_tls_key_file);
+	zbx_fill_from_config_file(&CONFIG_TLS_PSK_FILE, cfg_tls_psk_file);
+	zbx_fill_from_config_file(&CONFIG_TLS_PSK_IDENTITY, cfg_tls_psk_identity);
 }
 
 static void	parse_commandline(int argc, char **argv)
@@ -595,29 +619,37 @@ static void	parse_commandline(int argc, char **argv)
 			case '2':
 				CONFIG_TLS_CA_FILE = zbx_strdup(CONFIG_TLS_CA_FILE, zbx_optarg);
 				break;
-			case '4':
+			case '3':
 				CONFIG_TLS_CRL_FILE = zbx_strdup(CONFIG_TLS_CRL_FILE, zbx_optarg);
 				break;
+			case '4':
+				CONFIG_TLS_SERVER_CERT_ISSUER = zbx_strdup(CONFIG_TLS_SERVER_CERT_ISSUER, zbx_optarg);
+				break;
 			case '5':
-				CONFIG_TLS_CERT_FILE = zbx_strdup(CONFIG_TLS_CERT_FILE, zbx_optarg);
+				CONFIG_TLS_SERVER_CERT_SUBJECT = zbx_strdup(CONFIG_TLS_SERVER_CERT_SUBJECT, zbx_optarg);
 				break;
 			case '6':
-				CONFIG_TLS_KEY_FILE = zbx_strdup(CONFIG_TLS_KEY_FILE, zbx_optarg);
+				CONFIG_TLS_CERT_FILE = zbx_strdup(CONFIG_TLS_CERT_FILE, zbx_optarg);
 				break;
 			case '7':
-				CONFIG_TLS_PSK_IDENTITY = zbx_strdup(CONFIG_TLS_PSK_IDENTITY, zbx_optarg);
+				CONFIG_TLS_KEY_FILE = zbx_strdup(CONFIG_TLS_KEY_FILE, zbx_optarg);
 				break;
 			case '8':
+				CONFIG_TLS_PSK_IDENTITY = zbx_strdup(CONFIG_TLS_PSK_IDENTITY, zbx_optarg);
+				break;
+			case '9':
 				CONFIG_TLS_PSK_FILE = zbx_strdup(CONFIG_TLS_PSK_FILE, zbx_optarg);
 				break;
 #else
 			case '1':
 			case '2':
+			case '3':
 			case '4':
 			case '5':
 			case '6':
 			case '7':
 			case '8':
+			case '9':
 				zbx_error("TLS parameters cannot be used: Zabbix sender was compiled without TLS "
 						"support.");
 				exit(EXIT_FAILURE);
@@ -899,9 +931,13 @@ int	main(int argc, char **argv)
 	sentdval_args.port = ZABBIX_SERVER_PORT;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(_WINDOWS)
+	zbx_tls_init_parent();
+#endif
 	zbx_tls_init_child();
 #else
 	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
+			NULL != CONFIG_TLS_SERVER_CERT_ISSUER || NULL != CONFIG_TLS_SERVER_CERT_SUBJECT ||
 			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
 			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
 	{
