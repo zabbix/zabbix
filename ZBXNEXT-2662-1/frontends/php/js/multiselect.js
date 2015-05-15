@@ -507,11 +507,6 @@ jQuery(function($) {
 
 				obj.parent().append($('<div class="multiselect-button"></div>').append(popupButton));
 			}
-
-			// IE browsers use default width
-			if (IE) {
-				options.defaultWidth = $('input[type="text"]', obj).width();
-			}
 		});
 	};
 
@@ -720,16 +715,12 @@ jQuery(function($) {
 			setPlaceholder(obj, options);
 		}
 
-		if (options.selectedLimit == 0 || $('.selected li', obj).length < options.selectedLimit) {
-			$('input[type="text"]', obj).prop('disabled', false);
-		}
-
 		// clean
 		cleanAvailable(obj, values);
 		cleanLastSearch(obj);
 
-		if (!$('input[type="text"]', obj).prop('disabled')) {
-			$('input[type="text"]', obj).focus();
+		if (options.selectedLimit == 0 || $('.selected li', obj).length < options.selectedLimit) {
+			$('input[type="text"]', obj).css({'display': ''}).focus();
 		}
 	}
 
@@ -793,7 +784,7 @@ jQuery(function($) {
 			cleanAvailable(obj, values);
 			cleanLastSearch(obj);
 
-			if (!$('input[type="text"]', obj).prop('disabled')) {
+			if (options.selectedLimit == 0 || $('.selected li', obj).length < options.selectedLimit) {
 				$('input[type="text"]', obj).focus();
 			}
 		}
@@ -920,7 +911,7 @@ jQuery(function($) {
 
 	function setReadonly(obj) {
 		cleanSearchInput(obj);
-		$('input[type="text"]', obj).prop('disabled', true);
+		$('input[type="text"]', obj).css({'display': 'none'});
 		$(obj).removeClass('active');
 
 		var item = $('.selected li', obj),
