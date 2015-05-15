@@ -233,11 +233,13 @@ elseif ((hasRequest('clone') || hasRequest('full_clone')) && hasRequest('hostid'
 		]));
 	}
 
-	$interfaceid = 1;
-	$interfaces = getRequest('interfaces', []);
-	foreach ($interfaces as &$interface) {
-		$interface['interfaceid'] = (string) $interfaceid++;
-		unset($interface['locked'], $interface['items']);
+	if (hasRequest('interfaces')) {
+		$interfaceid = 1;
+		foreach ($_REQUEST['interfaces'] as &$interface) {
+			$interface['interfaceid'] = (string) $interfaceid++;
+			unset($interface['locked'], $interface['items']);
+		}
+		unset($interface);
 	}
 
 	if (hasRequest('full_clone')) {
