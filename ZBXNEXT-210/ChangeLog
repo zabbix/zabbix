@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+..F....... [ZBXNEXT-210] added displaying of the available user macros on host and template level (Sasha)
 A.F....... [ZBX-7654] implemented XML import versioning and fixed various XML validation issues (Pavels, Oleg, Sasha)
 ..F.I..PS. [ZBXNEXT-2800] increased error field lengths in "hosts" table from 128 to 2048 (asaveljevs)
 ....I..... [ZBXNEXT-2495] improved performance of maps; changed triggers_2 index (Sasha)
