@@ -25,14 +25,9 @@
 class CConfigurationImport {
 
 	/**
-	 * @var CImportReader
+	 * @var CImportDataAdapter
 	 */
-	protected $reader;
-
-	/**
-	 * @var CImportFormatter
-	 */
-	protected $formatter;
+	protected $adapter;
 
 	/**
 	 * @var CImportReferencer
@@ -55,17 +50,12 @@ class CConfigurationImport {
 	protected $options;
 
 	/**
-	 * @var string with import data in one of supported formats
-	 */
-	protected $source;
-
-	/**
 	 * @var array with data read from source string
 	 */
 	protected $data;
 
 	/**
-	 * @var array with formatted data received from formatter
+	 * @var array  cached data from the adapter
 	 */
 	protected $formattedData = array();
 
@@ -74,13 +64,12 @@ class CConfigurationImport {
 	 * Source string must be suitable for reader class,
 	 * i.e. if string contains json then reader should be able to read json.
 	 *
-	 * @param string					$source						configuration data in specified format
 	 * @param array						$options					import options "createMissing", "updateExisting" and "deleteMissing"
 	 * @param CImportReferencer			$referencer					class containing all importable objects
 	 * @param CImportedObjectContainer	$importedObjectContainer	class containing processed host and template IDs
 	 * @param CTriggerExpression		$triggerExpression			class to parse trigger expression
 	 */
-	public function __construct($source, array $options = array(), CImportReferencer $referencer,
+	public function __construct(array $options = array(), CImportReferencer $referencer,
 			CImportedObjectContainer $importedObjectContainer, CTriggerExpression $triggerExpression) {
 		$this->options = array(
 			'groups' => array('createMissing' => false),
@@ -99,92 +88,45 @@ class CConfigurationImport {
 		);
 
 		$this->options = array_merge($this->options, $options);
-		$this->source = $source;
 		$this->referencer = $referencer;
 		$this->importedObjectContainer = $importedObjectContainer;
 		$this->triggerExpression = $triggerExpression;
 	}
 
 	/**
-	 * Set reader that is used to read data from source string that is passed to constructor.
-	 *
-	 * @param CImportReader $reader
-	 */
-	public function setReader(CImportReader $reader) {
-		$this->reader = $reader;
-	}
-
-	/**
 	 * Import configuration data.
 	 *
-	 * @todo   for 1.8 version import old class CXmlImport18 is used
-	 *
-	 * @throws Exception
-	 * @throws UnexpectedValueException
+	 * @param CImportDataAdapter $adapter   an object to provide access to the imported data
 	 *
 	 * @return bool
 	 */
-	public function import() {
-		if (empty($this->reader)) {
-			throw new UnexpectedValueException('Reader is not set.');
-		}
+	public function import(CImportDataAdapter $adapter) {
+		$this->adapter = $adapter;
 
-		$this->data = $this->reader->read($this->source);
+		// parse all import for references to resolve them all together with less sql count
+		$this->gatherReferences();
 
-		$version = $this->getImportVersion();
+		$this->processGroups();
+		$this->processTemplates();
+		$this->processHosts();
 
-		// if import version is 1.8 we use old class that support it.
-		// old import class process hosts, maps and screens separately.
-		if ($version == '1.8') {
-			CXmlImport18::import($this->source);
+		// delete missing objects from processed hosts and templates
+		$this->deleteMissingDiscoveryRules();
+		$this->deleteMissingTriggers();
+		$this->deleteMissingGraphs();
+		$this->deleteMissingItems();
+		$this->deleteMissingApplications();
 
-			if ($this->options['maps']['updateExisting'] || $this->options['maps']['createMissing']) {
-				CXmlImport18::parseMap($this->options);
-			}
-
-			if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
-				CXmlImport18::parseScreen($this->options);
-			}
-
-			if ($this->options['hosts']['updateExisting']
-					|| $this->options['hosts']['createMissing']
-					|| $this->options['templates']['updateExisting']
-					|| $this->options['templates']['createMissing']) {
-				CXmlImport18::parseMain($this->options);
-			}
-		}
-		else {
-			$this->formatter = $this->getFormatter($version);
-
-			// pass data to formatter
-			// export has root key "zabbix_export" which is not passed
-			$this->formatter->setData($this->data['zabbix_export']);
-
-			// parse all import for references to resolve them all together with less sql count
-			$this->gatherReferences();
-
-			$this->processGroups();
-			$this->processTemplates();
-			$this->processHosts();
-
-			// delete missing objects from processed hosts and templates
-			$this->deleteMissingDiscoveryRules();
-			$this->deleteMissingTriggers();
-			$this->deleteMissingGraphs();
-			$this->deleteMissingItems();
-			$this->deleteMissingApplications();
-
-			// import objects
-			$this->processApplications();
-			$this->processItems();
-			$this->processDiscoveryRules();
-			$this->processTriggers();
-			$this->processGraphs();
-			$this->processImages();
-			$this->processMaps();
-			$this->processTemplateScreens();
-			$this->processScreens();
-		}
+		// import objects
+		$this->processApplications();
+		$this->processItems();
+		$this->processDiscoveryRules();
+		$this->processTriggers();
+		$this->processGraphs();
+		$this->processImages();
+		$this->processMaps();
+		$this->processTemplateScreens();
+		$this->processScreens();
 
 		return true;
 	}
@@ -224,8 +166,10 @@ class CConfigurationImport {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
 
-			foreach ($template['macros'] as $macro) {
-				$macrosRefs[$template['host']][$macro['macro']] = $macro['macro'];
+			if (array_key_exists('macros', $template)) {
+				foreach ($template['macros'] as $macro) {
+					$macrosRefs[$template['host']][$macro['macro']] = $macro['macro'];
+				}
 			}
 
 			if (!empty($template['templates'])) {
@@ -242,8 +186,10 @@ class CConfigurationImport {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
 
-			foreach ($host['macros'] as $macro) {
-				$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
+			if (array_key_exists('macros', $host)) {
+				foreach ($host['macros'] as $macro) {
+					$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
+				}
 			}
 
 			if (!empty($host['templates'])) {
@@ -374,8 +320,10 @@ class CConfigurationImport {
 				$itemsRefs[$expression['host']][$expression['item']] = $expression['item'];
 			}
 
-			foreach ($trigger['dependencies'] as $dependency) {
-				$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
+			if (isset($trigger['dependencies'])) {
+				foreach ($trigger['dependencies'] as $dependency) {
+					$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
+				}
 			}
 		}
 
@@ -674,7 +622,7 @@ class CConfigurationImport {
 					$item['applications'] = $applicationsIds;
 				}
 
-				if (isset($item['interface_ref']) && $item['interface_ref']) {
+				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
 					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
 				}
 
@@ -753,7 +701,7 @@ class CConfigurationImport {
 			foreach ($discoveryRules as $item) {
 				$item['hostid'] = $hostId;
 
-				if (isset($item['interface_ref'])) {
+				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
 					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
 				}
 
@@ -832,7 +780,7 @@ class CConfigurationImport {
 
 					$prototype['applications'] = $applicationsIds;
 
-					if (isset($prototype['interface_ref'])) {
+					if (array_key_exists('interface_ref', $prototype) && $prototype['interface_ref']) {
 						$prototype['interfaceid'] = $this->referencer->interfacesCache[$hostId][$prototype['interface_ref']];
 					}
 
@@ -922,7 +870,7 @@ class CConfigurationImport {
 					}
 				}
 
-				if (isset($item['interface_ref'])) {
+				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
 					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
 				}
 				unset($item['item_prototypes']);
@@ -1216,7 +1164,6 @@ class CConfigurationImport {
 
 		$triggersToCreate = array();
 		$triggersToUpdate = array();
-		$triggersToCreateDependencies = array();
 
 		foreach ($allTriggers as $trigger) {
 			// search for existing items in trigger expressions
@@ -1236,32 +1183,16 @@ class CConfigurationImport {
 			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
 
 			if ($triggerId) {
-				$deps = array();
-
-				foreach ($trigger['dependencies'] as $dependency) {
-					$depTriggerId = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
-					if (!$depTriggerId) {
-						throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.',
-							$trigger['description'],
-							$dependency['name']
-						));
-					}
-
-					$deps[] = array('triggerid' => $depTriggerId);
-				}
-
-				$trigger['dependencies'] = $deps;
 				$trigger['triggerid'] = $triggerId;
+				unset($trigger['dependencies']);
 				$triggersToUpdate[] = $trigger;
 			}
 			else {
-				$triggersToCreateDependencies[] = $trigger['dependencies'];
 				unset($trigger['dependencies']);
 				$triggersToCreate[] = $trigger;
 			}
 		}
 
-		$triggerDependencies = array();
 		$newTriggers = array();
 
 		if ($this->options['triggers']['createMissing'] && $triggersToCreate) {
@@ -1275,17 +1206,39 @@ class CConfigurationImport {
 			}
 		}
 
-		// if we have new triggers with dependencies and they were created, create their dependencies
-		if ($triggersToCreateDependencies && isset($newTriggerIds)) {
-			foreach ($newTriggerIds['triggerids'] as $tnum => $triggerId) {
-				$deps = array();
+		if ($this->options['triggers']['updateExisting'] && $triggersToUpdate) {
+			API::Trigger()->update($triggersToUpdate);
+		}
 
-				foreach ($triggersToCreateDependencies[$tnum] as $dependency) {
+		// refresh triggers because template triggers can be inherited to host and used in maps
+		$this->referencer->refreshTriggers();
+
+		$this->addDependencies();
+	}
+
+	/**
+	 * Update trigger dependencies
+	 *
+	 * @throws Exception
+	 *
+	 * @return null
+	 */
+	protected function addDependencies() {
+		$triggerDependencies = [];
+		foreach ($this->formattedData['triggers'] as $trigger) {
+			$deps = [];
+
+			if (isset($trigger['dependencies'])) {
+				$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+
+				foreach ($trigger['dependencies'] as $dependency) {
 					$depTriggerId = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
 
 					if (!$depTriggerId) {
-						$trigger = $newTriggers[$triggerId];
-						throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.', $trigger['description'], $dependency['name']));
+						throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.',
+							$trigger['description'],
+							$dependency['name']
+						));
 					}
 
 					$deps[] = array('triggerid' => $depTriggerId);
@@ -1300,16 +1253,9 @@ class CConfigurationImport {
 			}
 		}
 
-		if ($this->options['triggers']['updateExisting'] && $triggersToUpdate) {
-			API::Trigger()->update($triggersToUpdate);
-		}
-
 		if ($triggerDependencies) {
 			API::Trigger()->update($triggerDependencies);
 		}
-
-		// refresh triggers because template triggers can be inherited to host and used in maps
-		$this->referencer->refreshTriggers();
 	}
 
 	/**
@@ -1827,46 +1773,13 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Method for creating an import formatter for the specified import version.
-	 *
-	 * @throws InvalidArgumentException
-	 *
-	 * @param string $version
-	 *
-	 * @return CImportFormatter
-	 */
-	protected function getFormatter($version) {
-		switch ($version) {
-			case '2.0':
-				$converter = new C24TriggerConverter(new CFunctionMacroParser(), new CMacroParser('#'));
-
-				return new C20ImportFormatter($converter);
-			default:
-				throw new InvalidArgumentException('Unknown import version.');
-		}
-	}
-
-	/**
-	 * Get configuration import version.
-	 *
-	 * @return string
-	 */
-	protected function getImportVersion() {
-		if (isset($this->data['zabbix_export']['version'])) {
-			return $this->data['zabbix_export']['version'];
-		}
-
-		return '1.8';
-	}
-
-	/**
 	 * Get formatted groups.
 	 *
 	 * @return array
 	 */
 	protected function getFormattedGroups() {
 		if (!isset($this->formattedData['groups'])) {
-			$this->formattedData['groups'] = $this->formatter->getGroups();
+			$this->formattedData['groups'] = $this->adapter->getGroups();
 		}
 
 		return $this->formattedData['groups'];
@@ -1879,7 +1792,7 @@ class CConfigurationImport {
 	 */
 	public function getFormattedTemplates() {
 		if (!isset($this->formattedData['templates'])) {
-			$this->formattedData['templates'] = $this->formatter->getTemplates();
+			$this->formattedData['templates'] = $this->adapter->getTemplates();
 		}
 
 		return $this->formattedData['templates'];
@@ -1892,7 +1805,7 @@ class CConfigurationImport {
 	 */
 	public function getFormattedHosts() {
 		if (!isset($this->formattedData['hosts'])) {
-			$this->formattedData['hosts'] = $this->formatter->getHosts();
+			$this->formattedData['hosts'] = $this->adapter->getHosts();
 		}
 
 		return $this->formattedData['hosts'];
@@ -1905,7 +1818,7 @@ class CConfigurationImport {
 	 */
 	protected function getFormattedApplications() {
 		if (!isset($this->formattedData['applications'])) {
-			$this->formattedData['applications'] = $this->formatter->getApplications();
+			$this->formattedData['applications'] = $this->adapter->getApplications();
 		}
 
 		return $this->formattedData['applications'];
@@ -1918,7 +1831,7 @@ class CConfigurationImport {
 	 */
 	protected function getFormattedItems() {
 		if (!isset($this->formattedData['items'])) {
-			$this->formattedData['items'] = $this->formatter->getItems();
+			$this->formattedData['items'] = $this->adapter->getItems();
 		}
 
 		return $this->formattedData['items'];
@@ -1931,7 +1844,7 @@ class CConfigurationImport {
 	 */
 	protected function getFormattedDiscoveryRules() {
 		if (!isset($this->formattedData['discoveryRules'])) {
-			$this->formattedData['discoveryRules'] = $this->formatter->getDiscoveryRules();
+			$this->formattedData['discoveryRules'] = $this->adapter->getDiscoveryRules();
 
 			foreach ($this->formattedData['discoveryRules'] as &$discoveryRules) {
 				foreach ($discoveryRules as &$discoveryRule) {
@@ -1955,7 +1868,7 @@ class CConfigurationImport {
 	 */
 	protected function getFormattedTriggers() {
 		if (!isset($this->formattedData['triggers'])) {
-			$this->formattedData['triggers'] = $this->formatter->getTriggers();
+			$this->formattedData['triggers'] = $this->adapter->getTriggers();
 
 			foreach ($this->formattedData['triggers'] as &$trigger) {
 				$trigger['parsedExpressions'] = $this->parseTriggerExpression($trigger['expression']);
@@ -2000,7 +1913,7 @@ class CConfigurationImport {
 	 */
 	protected function getFormattedGraphs() {
 		if (!isset($this->formattedData['graphs'])) {
-			$this->formattedData['graphs'] = $this->formatter->getGraphs();
+			$this->formattedData['graphs'] = $this->adapter->getGraphs();
 		}
 
 		return $this->formattedData['graphs'];
@@ -2013,7 +1926,7 @@ class CConfigurationImport {
 	 */
 	protected function getFormattedImages() {
 		if (!isset($this->formattedData['images'])) {
-			$this->formattedData['images'] = $this->formatter->getImages();
+			$this->formattedData['images'] = $this->adapter->getImages();
 		}
 
 		return $this->formattedData['images'];
@@ -2026,7 +1939,7 @@ class CConfigurationImport {
 	 */
 	protected function getFormattedMaps() {
 		if (!isset($this->formattedData['maps'])) {
-			$this->formattedData['maps'] = $this->formatter->getMaps();
+			$this->formattedData['maps'] = $this->adapter->getMaps();
 		}
 
 		return $this->formattedData['maps'];
@@ -2039,7 +1952,7 @@ class CConfigurationImport {
 	 */
 	protected function getFormattedScreens() {
 		if (!isset($this->formattedData['screens'])) {
-			$this->formattedData['screens'] = $this->formatter->getScreens();
+			$this->formattedData['screens'] = $this->adapter->getScreens();
 		}
 
 		return $this->formattedData['screens'];
@@ -2052,7 +1965,7 @@ class CConfigurationImport {
 	 */
 	protected function getFormattedTemplateScreens() {
 		if (!isset($this->formattedData['templateScreens'])) {
-				$this->formattedData['templateScreens'] = $this->formatter->getTemplateScreens();
+				$this->formattedData['templateScreens'] = $this->adapter->getTemplateScreens();
 		}
 
 		return $this->formattedData['templateScreens'];
