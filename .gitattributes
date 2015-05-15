@@ -249,6 +249,13 @@ frontends/php/locale/zh_TW/LC_MESSAGES/frontend.po -text
 frontends/php/robots.txt svneol=native#text/plain
 frontends/php/styles/zabbix.css svneol=native#text/css
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/unit/include/classes/import/formatters/hostAndTemplate.xml svneol=native#text/xml
+frontends/php/tests/unit/include/classes/import/formatters/map.xml svneol=native#text/xml
+frontends/php/tests/unit/include/classes/import/formatters/screen.xml svneol=native#text/xml
+frontends/php/tests/unit/include/classes/import/xml/host18.xml svneol=native#text/xml
+frontends/php/tests/unit/include/classes/import/xml/hostAndTemplate.xml svneol=native#text/xml
+frontends/php/tests/unit/include/classes/import/xml/map.xml svneol=native#text/xml
+frontends/php/tests/unit/include/classes/import/xml/screen.xml svneol=native#text/xml
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text

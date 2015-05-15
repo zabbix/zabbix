@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+A.F....... [ZBX-7654] implemented XML import versioning and fixed various XML validation issues (Pavels, Oleg, Sasha)
 ..F.I..PS. [ZBXNEXT-2800] increased error field lengths in "hosts" table from 128 to 2048 (asaveljevs)
 ....I..... [ZBXNEXT-2495] improved performance of maps; changed triggers_2 index (Sasha)
 ........S. [ZBXNEXT-2474] improved value cache low memory mode handling by switching back to normal mode once per day. The current value cache operational mode now can be checked with zabbix[vcache,cache,mode] interval item (wiper)
