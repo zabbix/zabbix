@@ -14,6 +14,7 @@ use File::Pid;
 use POSIX qw(floor);
 use Sys::Syslog;
 use Data::Dumper;
+use Time::HiRes qw(time);
 
 use constant SUCCESS => 0;
 use constant E_FAIL => -1;
@@ -745,10 +746,34 @@ sub db_select
 
 	dbg("[$query]");
 
+	my ($start, $exe, $fetch, $total);
+	if (opt('warnslow'))
+	{
+		$start = time();
+	}
+
 	$sth->execute()
 		or fail("cannot execute [$query]: ", $sth->errstr);
 
+	if (opt('warnslow'))
+	{
+		$exe = time();
+	}
+
 	my $rows_ref = $sth->fetchall_arrayref();
+
+	if (opt('warnslow'))
+	{
+		my $now = time();
+		$total = $now - $start;
+
+		if ($total > getopt('warnslow'))
+		{
+			$fetch = $now - $exe;
+			$exe = $exe - $start;
+			wrn("slow query: [$query] took ", sprintf("%.3f seconds (execute:%.3f fetch:%.3f)", $total, $exe, $fetch));
+		}
+	}
 
 	if (opt('debug'))
 	{
@@ -2427,7 +2452,7 @@ sub trim
 
 sub parse_opts
 {
-	GetOptions(\%OPTS, 'help!', 'dry-run!', 'nolog!', 'debug!', @_) or pod2usage(2);
+	GetOptions(\%OPTS, 'help!', 'dry-run!', 'warnslow=f', 'nolog!', 'debug!', @_) or pod2usage(2);
 	pod2usage(1) if (opt('help'));
 }
 

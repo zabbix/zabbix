@@ -1816,7 +1816,7 @@ update-api-data.pl - save information about the incidents to a filesystem
 
 =head1 SYNOPSIS
 
-update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--from <timestamp>|--continue] [--period minutes] [--dry-run [--probe name]] [--debug] [--help]
+update-api-data.pl [--service <dns|dnssec|rdds|epp>] [--tld <tld>|--ignore-file <file>] [--from <timestamp>|--continue] [--period minutes] [--dry-run [--probe name]] [--warnslow <seconds>] [--debug] [--help]
 
 =head1 OPTIONS
 
@@ -1873,6 +1873,11 @@ This option can only be used for debugging purposes and must be used together wi
 =item B<--dry-run>
 
 Print data to the screen, do not write anything to the filesystem.
+
+=item B<--warnslow> seconds
+
+Issue a warning in case an SQL query takes more than specified number of seconds. A floating-point number
+is supported as seconds (i. e. 0.5, 1, 1.5 are valid).
 
 =item B<--debug>
 
