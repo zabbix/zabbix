@@ -32,7 +32,7 @@ const char	syslog_app_name[] = "zabbix_get";
 const char	*usage_message[] = {
 	"-s host-name-or-IP [-p port-number] [-I IP-address] -k item-key",
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"-s host-name-or-IP [-p port-number] [-I IP-address] --tls-connect=cert --tls-ca-file=ca_file [--tls-crl-file=crl_file] --tls-cert-file=cert_file --tls-key-file=key_file -k item-key",
+	"-s host-name-or-IP [-p port-number] [-I IP-address] --tls-connect=cert --tls-ca-file=ca_file [--tls-crl-file=crl_file] [--tls-cert-issuer=certificate_issuer] [--tls-cert-subject=certificate_subject] --tls-cert-file=cert_file --tls-key-file=key_file -k item-key",
 	"-s host-name-or-IP [-p port-number] [-I IP-address] --tls-connect=psk --tls-psk-identity=psk_identity --tls-psk-file=psk_file -k item-key",
 #endif
 	"-h",
@@ -67,6 +67,10 @@ const char	*help_message[] = {
 	"",
 	"  --tls-crl-file                     Full pathname of a file containing revoked certificates",
 	"",
+	"  --tls-cert-issuer                  Allowed server certificate issuer",
+	"",
+	"  --tls-cert-subject                 Allowed server certificate subject",
+	"",
 	"  --tls-cert-file                    Full pathname of a file containing the certificate or certificate chain",
 	"",
 	"  --tls-key-file                     Full pathname of a file containing the private key",
@@ -86,7 +90,10 @@ const char	*help_message[] = {
 	"        --tls-psk-identity=\"PSK ID Zabbix agentd\" --tls-psk-file=/home/zabbix/zabbix_agentd.psk ",
 	"",
 	"    zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\" --tls-connect=cert \\",
-	"        --tls-ca-file=/home/zabbix/zabbix_ca_file --tls-cert-file=/home/zabbix/zabbix_get.crt \\",
+	"        --tls-ca-file=/home/zabbix/zabbix_ca_file \\",
+	"        --tls-cert-issuer=\"CN=Signing CA,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
+	"        --tls-cert-subject=\"CN=server1,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
+	"        --tls-cert-file=/home/zabbix/zabbix_get.crt \\",
 	"        --tls-key-file=/home/zabbix/zabbix_get.key",
 #endif
 	NULL	/* end of text */
@@ -100,8 +107,8 @@ char	*CONFIG_TLS_CONNECT		= NULL;
 char	*CONFIG_TLS_ACCEPT		= NULL;	/* not used in zabbix_get, just for linking with tls.c */
 char	*CONFIG_TLS_CA_FILE		= NULL;
 char	*CONFIG_TLS_CRL_FILE		= NULL;
-char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;	/* not used in zabbix_get, just for linking with tls.c */
-char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;	/* not used in zabbix_get, just for linking with tls.c */
+char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
+char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
 char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
@@ -120,11 +127,13 @@ struct zbx_option	longopts[] =
 	{"version",		0,	NULL,	'V'},
 	{"tls-connect",		1,	NULL,	'1'},
 	{"tls-ca-file",		1,	NULL,	'2'},
-	{"tls-crl-file",	1,	NULL,	'4'},
-	{"tls-cert-file",	1,	NULL,	'5'},
-	{"tls-key-file",	1,	NULL,	'6'},
-	{"tls-psk-identity",	1,	NULL,	'7'},
-	{"tls-psk-file",	1,	NULL,	'8'},
+	{"tls-crl-file",	1,	NULL,	'3'},
+	{"tls-cert-issuer",	1,	NULL,	'4'},
+	{"tls-cert-subject",	1,	NULL,	'5'},
+	{"tls-cert-file",	1,	NULL,	'6'},
+	{"tls-key-file",	1,	NULL,	'7'},
+	{"tls-psk-identity",	1,	NULL,	'8'},
+	{"tls-psk-file",	1,	NULL,	'9'},
 	{NULL}
 };
 
@@ -179,12 +188,13 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	ssize_t		bytes_received = -1;
 	char		request[1024];
 
-	/* The connect mode can specify TLS with PSK but here we do not know PSK details. Therefore we put NULL in */
-	/* the last 2 arguments. zbx_tls_connect() will find out PSK in this case. If the connect mode specifies TLS */
-	/* with certificate then also NULLs are ok, as the sender does not verify server certificate issuer and */
-	/* subject. */
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT,
-			configured_tls_connect_mode, NULL, NULL)))
+			configured_tls_connect_mode,
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			CONFIG_TLS_SERVER_CERT_ISSUER, CONFIG_TLS_SERVER_CERT_SUBJECT)))
+#else
+			NULL, NULL)))
+#endif
 	{
 		zbx_snprintf(request, sizeof(request), "%s\n", key);
 
@@ -288,29 +298,37 @@ int	main(int argc, char **argv)
 			case '2':
 				CONFIG_TLS_CA_FILE = zbx_strdup(CONFIG_TLS_CA_FILE, zbx_optarg);
 				break;
-			case '4':
+			case '3':
 				CONFIG_TLS_CRL_FILE = zbx_strdup(CONFIG_TLS_CRL_FILE, zbx_optarg);
 				break;
+			case '4':
+				CONFIG_TLS_SERVER_CERT_ISSUER = zbx_strdup(CONFIG_TLS_SERVER_CERT_ISSUER, zbx_optarg);
+				break;
 			case '5':
-				CONFIG_TLS_CERT_FILE = zbx_strdup(CONFIG_TLS_CERT_FILE, zbx_optarg);
+				CONFIG_TLS_SERVER_CERT_SUBJECT = zbx_strdup(CONFIG_TLS_SERVER_CERT_SUBJECT, zbx_optarg);
 				break;
 			case '6':
-				CONFIG_TLS_KEY_FILE = zbx_strdup(CONFIG_TLS_KEY_FILE, zbx_optarg);
+				CONFIG_TLS_CERT_FILE = zbx_strdup(CONFIG_TLS_CERT_FILE, zbx_optarg);
 				break;
 			case '7':
-				CONFIG_TLS_PSK_IDENTITY = zbx_strdup(CONFIG_TLS_PSK_IDENTITY, zbx_optarg);
+				CONFIG_TLS_KEY_FILE = zbx_strdup(CONFIG_TLS_KEY_FILE, zbx_optarg);
 				break;
 			case '8':
+				CONFIG_TLS_PSK_IDENTITY = zbx_strdup(CONFIG_TLS_PSK_IDENTITY, zbx_optarg);
+				break;
+			case '9':
 				CONFIG_TLS_PSK_FILE = zbx_strdup(CONFIG_TLS_PSK_FILE, zbx_optarg);
 				break;
 #else
 			case '1':
 			case '2':
+			case '3':
 			case '4':
 			case '5':
 			case '6':
 			case '7':
 			case '8':
+			case '9':
 				zbx_error("TLS parameters cannot be used: 'zabbix_get' was compiled without TLS "
 						"support.");
 				exit(EXIT_FAILURE);
@@ -363,9 +381,13 @@ int	main(int argc, char **argv)
 	}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(_WINDOWS)
+	zbx_tls_init_parent();
+#endif
 	zbx_tls_init_child();
 #else
 	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
+			NULL != CONFIG_TLS_SERVER_CERT_ISSUER || NULL != CONFIG_TLS_SERVER_CERT_SUBJECT ||
 			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
 			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
 	{
