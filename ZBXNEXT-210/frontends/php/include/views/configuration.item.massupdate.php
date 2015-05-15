@@ -19,13 +19,11 @@
 **/
 
 
-$itemWidget = new CWidget();
+$itemWidget = (new CWidget())->setTitle(_('Items'));
 
 if (!empty($this->data['hostid'])) {
 	$itemWidget->addItem(get_header_host_table('items', $this->data['hostid']));
 }
-
-$itemWidget->addPageHeader(_('CONFIGURATION OF ITEMS'));
 
 // create form
 $itemForm = new CForm();
@@ -72,7 +70,7 @@ if ($this->data['displayInterfaces']) {
 		$interfacesComboBox->addItem($interfaceGroup);
 	}
 
-	$span = new CSpan(_('No interface found'), 'red');
+	$span = new CSpan(_('No interface found'), ZBX_STYLE_RED);
 	$span->setAttribute('id', 'interface_not_defined');
 	$span->setAttribute('style', 'display: none;');
 
@@ -365,7 +363,7 @@ $newFlexInt = new CDiv(
 	'row-new-delay-flex-fields'
 );
 
-$maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), 'red');
+$maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), ZBX_STYLE_RED);
 $maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');
 $maxFlexMsg->setAttribute('style', 'display: none;');
 
@@ -481,9 +479,7 @@ if ($this->data['displayApplications']) {
 		'data' => $appToReplace,
 		'popup' => array(
 			'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=applications_'.
-				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid'],
-			'width' => 450,
-			'height' => 450
+				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid']
 		)
 	)), null, 'replaceApp');
 
@@ -532,9 +528,7 @@ if ($this->data['displayApplications']) {
 		'addNew' => true,
 		'popup' => array(
 			'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=new_applications_'.
-				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid'],
-			'width' => 450,
-			'height' => 450
+				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid']
 		)
 	)), null, 'newApp');
 
@@ -560,13 +554,14 @@ $itemFormList->addRow(
 // append tabs to form
 $itemTab = new CTabView();
 $itemTab->addTab('itemTab', _('Mass update'), $itemFormList);
-$itemForm->addItem($itemTab);
 
 // append buttons to form
-$itemForm->addItem(makeFormFooter(
+$itemTab->setFooter(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
 	array(new CButtonCancel(url_param('groupid').url_param('hostid')))
 ));
+
+$itemForm->addItem($itemTab);
 $itemWidget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';

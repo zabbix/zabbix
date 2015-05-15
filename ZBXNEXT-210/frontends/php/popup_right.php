@@ -47,11 +47,13 @@ show_table_header(permission2str($permission));
 $hostGroupForm = new CForm();
 $hostGroupForm->setAttribute('id', 'groups');
 
-$hostGroupTable = new CTableInfo(_('No host groups found.'));
-$hostGroupTable->setHeader(new CCol(array(
-	new CCheckBox('all_groups', null, 'checkAll(this.checked)'),
+$hostGroupTable = new CTableInfo();
+$hostGroupTable->setHeader(array(
+	new CColHeader(
+		new CCheckBox('all_groups', null, 'checkAll(this.checked)'),
+		'cell-width'),
 	_('Name')
-)));
+));
 
 $hostGroups = API::HostGroup()->get(array(
 	'output' => array('groupid', 'name')

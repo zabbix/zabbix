@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="screenRowTPL">
 <tr class="sortable" id="slides_#{rowId}">
-	<td>
-		<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+	<td class='td-drag-icon'>
+		<div class="drag-icon"></div>
 		<input id="slides_#{rowId}_screenid" name="slides[#{rowId}][screenid]" type="hidden" value="#{screenid}" />
 		<input id="slides_#{rowId}_slideid" name="slides[#{rowId}][slideid]" type="hidden" value="" />
 	</td>
@@ -132,7 +132,7 @@
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			cursor: 'move',
-			handle: 'span.ui-icon-arrowthick-2-n-s',
+			handle: 'div.drag-icon',
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,

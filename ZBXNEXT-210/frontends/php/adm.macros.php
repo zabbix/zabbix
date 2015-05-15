@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of macros');
 $page['file'] = 'adm.macros.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -129,8 +128,6 @@ if (!$data['macros']) {
 	$data['macros'][] = ['macro' => '', 'value' => ''];
 }
 
-$view = new CView('administration.general.macros.edit', $data);
-$view->render();
-$view->show();
+(new CView('administration.general.macros.edit', $data))->render()->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

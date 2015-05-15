@@ -21,9 +21,12 @@
 
 require_once dirname(__FILE__).'/js/administration.general.macros.edit.js.php';
 
-$header_form = new CForm();
-$header_form->cleanItems();
-$header_form->addItem(new CComboBox('configDropDown', 'adm.macros.php',
+$widget = (new CWidget())->setTitle(_('Macros'));
+
+$header_form = (new CForm())->cleanItems();
+
+$controls = new CList();
+$controls->addItem(new CComboBox('configDropDown', 'adm.macros.php',
 	'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
@@ -40,8 +43,9 @@ $header_form->addItem(new CComboBox('configDropDown', 'adm.macros.php',
 	)
 ));
 
-$widget = new CWidget();
-$widget->addPageHeader(_('CONFIGURATION OF MACROS'), $header_form);
+$header_form->addItem($controls);
+
+$widget->setControls($header_form);
 
 $table = new CTable(null, 'formElementTable');
 $table->setAttribute('id', 'tbl_macros');
@@ -81,10 +85,11 @@ $saveButton = new CSubmit('update', _('Update'));
 $saveButton->attr('data-removed-count', 0);
 $saveButton->main();
 
+$tab_view->setFooter(makeFormFooter(null, [$saveButton]));
+
 $form = new CForm();
 $form->setName('macrosForm');
 $form->addItem($tab_view);
-$form->addItem(makeFormFooter(null, array($saveButton)));
 
 $widget->addItem($form);
 

@@ -257,12 +257,12 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 
 			$slaBar = array(
 				$bar,
-				new CSpan(sprintf('%.4f', $slaBad), 'sla-value '.(($service['goodsla'] > $slaGood) ? 'red' : 'green'))
+				new CSpan(sprintf('%.4f', $slaBad), 'sla-value '.(($service['goodsla'] > $slaGood) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN))
 			);
 
 			$sla = new CDiv($slaBar, 'invisible');
 			$sla2 = array(
-				new CSpan(sprintf('%.4f', $slaGood), 'sla-value '.(($service['goodsla'] > $slaGood) ? 'red' : 'green')),
+				new CSpan(sprintf('%.4f', $slaGood), 'sla-value '.(($service['goodsla'] > $slaGood) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)),
 				'/',
 				new CSpan(sprintf('%.4f', $service['goodsla']), 'sla-value')
 			);

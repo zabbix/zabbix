@@ -37,7 +37,6 @@ else {
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	$page['title'] = _('Configuration of templates');
 	$page['file'] = 'templates.php';
-	$page['hist_arg'] = array('groupid');
 	$page['scripts'] = array('multiselect.js');
 }
 
@@ -421,7 +420,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), array('templa
 /*
  * Display
  */
-$templateWidget = new CWidget();
+$templateWidget = (new CWidget())->setTitle(_('Templates'));
 
 $pageFilter = new CPageFilter(array(
 	'config' => array(
@@ -436,7 +435,6 @@ $pageFilter = new CPageFilter(array(
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
 if (hasRequest('form')) {
-	$templateWidget->addPageHeader(_('CONFIGURATION OF TEMPLATES'));
 
 	if ($templateId = getRequest('templateid', 0)) {
 		$templateWidget->addItem(get_header_host_table('', $templateId));
@@ -576,28 +574,24 @@ else {
 
 	$config = select_config();
 
-	$frmForm = new CForm();
+	$frmForm = new CForm('get');
 	$frmForm->cleanItems();
-	$frmForm->addItem(new CDiv(array(
-		new CSubmit('form', _('Create template')),
-		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=template")')
-	)));
-	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid'], 'filter_groupid_id'));
+	$controls = new CList();
+	$controls->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+	$controls->addItem(new CSubmit('form', _('Create template')));
+	$controls->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=template")'));
+	$frmForm->addItem($controls);
 
-	$templateWidget->addPageHeader(_('CONFIGURATION OF TEMPLATES'), $frmForm);
-
-	$frmGroup = new CForm('get');
-	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
-
-	$templateWidget->addHeader(_('Templates'), $frmGroup);
-	$templateWidget->addHeaderRowNumber();
+	$templateWidget->setControls($frmForm);
 
 	$form = new CForm();
 	$form->setName('templates');
 
-	$table = new CTableInfo(_('No templates found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(
-		new CCheckBox('all_templates', null, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
+		new CColHeader(
+			new CCheckBox('all_templates', null, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
+			'cell-width'),
 		make_sorting_header(_('Templates'), 'name', $sortField, $sortOrder),
 		_('Applications'),
 		_('Items'),
@@ -658,19 +652,19 @@ else {
 		$templatesOutput[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid'));
 
 		$applications = array(new CLink(_('Applications'), 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
-			' ('.$template['applications'].')');
+			CViewHelper::showNum($template['applications']));
 		$items = array(new CLink(_('Items'), 'items.php?filter_set=1&groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
-			' ('.$template['items'].')');
+			CViewHelper::showNum($template['items']));
 		$triggers = array(new CLink(_('Triggers'), 'triggers.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
-			' ('.$template['triggers'].')');
+			CViewHelper::showNum($template['triggers']));
 		$graphs = array(new CLink(_('Graphs'), 'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
-			' ('.$template['graphs'].')');
+			CViewHelper::showNum($template['graphs']));
 		$screens = array(new CLink(_('Screens'), 'screenconf.php?templateid='.$template['templateid']),
-			' ('.$template['screens'].')');
+			CViewHelper::showNum($template['screens']));
 		$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$template['templateid']),
-			' ('.$template['discoveries'].')');
+			CViewHelper::showNum($template['discoveries']));
 		$httpTests = array(new CLink(_('Web'), 'httpconf.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
-			' ('.$template['httpTests'].')');
+			CViewHelper::showNum($template['httpTests']));
 
 		order_result($template['parentTemplates'], 'name');
 
@@ -693,7 +687,7 @@ else {
 				$linkedTemplatesOutput[] = ', ';
 			}
 
-			$linkedTemplatesOutput[] = new CLink($linkedTemplate['name'], $url, 'unknown');
+			$linkedTemplatesOutput[] = new CLink($linkedTemplate['name'], $url, ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
 		}
 
 		$i = 0;
@@ -719,12 +713,12 @@ else {
 
 			switch ($linkedToHost['status']) {
 				case HOST_STATUS_NOT_MONITORED:
-					$style = 'on';
+					$style = ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED;
 					$url = 'hosts.php?form=update&hostid='.$linkedToHost['objectid'].'&groupid='.$_REQUEST['groupid'];
 					break;
 
 				case HOST_STATUS_TEMPLATE:
-					$style = 'unknown';
+					$style = ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY;
 					$url = 'templates.php?form=update&templateid='.$linkedToHost['objectid'];
 					break;
 
@@ -742,7 +736,7 @@ else {
 
 		$table->addRow(array(
 			new CCheckBox('templates['.$template['templateid'].']', null, null, $template['templateid']),
-			$templatesOutput,
+			new CCol($templatesOutput, ZBX_STYLE_NOWRAP),
 			$applications,
 			$items,
 			$triggers,
@@ -755,15 +749,15 @@ else {
 		));
 	}
 
-	$footer = get_table_header(new CActionButtonList('action', 'templates', array(
+	$footer = new CActionButtonList('action', 'templates', array(
 		'template.export' => array('name' => _('Export')),
 		'template.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected templates?')),
 		'template.massdeleteclear' => array('name' => _('Delete and clear'),
 			'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)')
 		)
-	)));
+	));
 
-	$form->addItem(array($paging, $table, $paging, $footer));
+	$form->addItem(array($table, $paging, $footer));
 	$templateWidget->addItem($form);
 }
 

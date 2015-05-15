@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/administration.general.gui.php';
 
-$guiTab = new CFormList('scriptsTab');
+$guiTab = new CFormList();
 $guiTab->addRow(_('Default theme'), new CComboBox('default_theme', $data['default_theme'], null, Z::getThemes()));
 $guiTab->addRow(_('Dropdown first entry'), array(
 	new CComboBox('dropdown_first_entry', $data['dropdown_first_entry'], null, array(
@@ -57,7 +57,9 @@ $guiView->addTab('gui', _('GUI'), $guiTab);
 
 $guiForm = new CForm();
 $guiForm->setName('guiForm');
+
+$guiView->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
+
 $guiForm->addItem($guiView);
-$guiForm->addItem(makeFormFooter(new CSubmit('update', _('Update'))));
 
 return $guiForm;

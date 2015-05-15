@@ -19,7 +19,7 @@
 **/
 
 
-$iconMapTable = new CTableInfo(_('No icon maps found.'));
+$iconMapTable = new CTableInfo();
 $iconMapTable->setHeader(array(
 	_('Name'),
 	_('Icon map')

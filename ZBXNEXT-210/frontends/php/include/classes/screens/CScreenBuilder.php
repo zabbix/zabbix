@@ -312,7 +312,7 @@ class CScreenBuilder {
 	 */
 	public function show() {
 		if (empty($this->screen)) {
-			return new CTableInfo(_('No screens found.'));
+			return new CTableInfo();
 		}
 
 		$skipedFields = array();
@@ -338,7 +338,7 @@ class CScreenBuilder {
 		// create screen table
 		$screenTable = new CTable();
 		$screenTable->setAttribute('class',
-			in_array($this->mode, array(SCREEN_MODE_PREVIEW, SCREEN_MODE_SLIDESHOW)) ? 'screen_view' : 'screen_edit'
+			in_array($this->mode, array(SCREEN_MODE_PREVIEW, SCREEN_MODE_SLIDESHOW)) ? 'screen-table' : 'screen-table dashed-border'
 		);
 		$screenTable->setAttribute('id', self::makeScreenTableId($this->screen['screenid']));
 
@@ -347,7 +347,7 @@ class CScreenBuilder {
 			$newColumns = array(new CCol(new CImg('images/general/zero.png', 'zero', 1, 1)));
 
 			for ($i = 0, $size = $this->screen['hsize'] + 1; $i < $size; $i++) {
-				$icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
+				$icon = new CDiv('+', 'treeview-plus');
 				$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_col='.$i.'";');
 
 				array_push($newColumns, new CCol($icon));
@@ -362,7 +362,7 @@ class CScreenBuilder {
 
 			// action left cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
-				$icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
+				$icon = new CDiv('+', 'treeview-plus');
 				$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_row='.$r.'";');
 
 				array_push($newColumns, new CCol($icon));
@@ -511,7 +511,7 @@ class CScreenBuilder {
 
 			// action right cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
-				$icon = new CImg('images/general/minus.png', null, null, null, 'pointer');
+				$icon = new CDiv('−', 'treeview-plus');
 				if ($emptyScreenRow) {
 					$removeRowLink = 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r.'";';
 				}
@@ -529,12 +529,12 @@ class CScreenBuilder {
 
 		// action bottom row
 		if ($this->mode == SCREEN_MODE_EDIT) {
-			$icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
+			$icon = new CDiv('+', 'treeview-plus');
 			$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&add_row='.$this->screen['vsize'].'";');
 			$newColumns = array(new CCol($icon));
 
 			for ($i = 0; $i < $this->screen['hsize']; $i++) {
-				$icon = new CImg('images/general/minus.png', null, null, null, 'pointer');
+				$icon = new CDiv('−', 'treeview-plus');
 				if (isset($emptyScreenColumns[$i])) {
 					$removeColumnLink = 'javascript:'.
 						' if (confirm('.CJs::encodeJson(_('This screen-column is not empty. Delete it?')).')) {'.
@@ -553,7 +553,7 @@ class CScreenBuilder {
 			$screenTable->addRow($newColumns);
 		}
 
-		return $screenTable;
+		return new CDiv($screenTable, 'table-forms-container');
 	}
 
 	/**

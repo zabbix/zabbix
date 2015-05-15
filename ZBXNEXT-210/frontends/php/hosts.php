@@ -32,7 +32,6 @@ else {
 	$page['title'] = _('Configuration of hosts');
 	$page['file'] = 'hosts.php';
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['hist_arg'] = array('groupid');
 	$page['scripts'] = array('multiselect.js');
 
 	$exportData = false;

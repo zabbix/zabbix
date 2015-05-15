@@ -142,6 +142,21 @@ $ZBX_MENU = array(
 				'sub_pages' => array('popup_period.php', 'popup_bitem.php', 'chart_bar.php')
 			),
 			array(
+				'url' => 'auditlogs.php',
+				'label' => _('Audit'),
+				'user_type' => USER_TYPE_ZABBIX_ADMIN
+			),
+			array(
+				'url' => 'auditacts.php',
+				'label' => _('Action log'),
+				'user_type' => USER_TYPE_ZABBIX_ADMIN
+			),
+			array(
+				'url' => 'report4.php',
+				'label' => _('Notifications'),
+				'user_type' => USER_TYPE_ZABBIX_ADMIN
+			),
+			array(
 				'url' => 'popup.php'
 			),
 			array(
@@ -249,8 +264,11 @@ $ZBX_MENU = array(
 			),
 			array(
 				'url' => 'usergrps.php',
-				'label' => _('Users'),
-				'sub_pages' => array('users.php', 'popup_usrgrp.php')
+				'label' => _('User groups')
+			),
+			array(
+				'url' => 'users.php',
+				'label' => _('Users')
 			),
 			array(
 				'url' => 'zabbix.php',
@@ -265,21 +283,8 @@ $ZBX_MENU = array(
 				'label' => _('Scripts')
 			),
 			array(
-				'url' => 'auditlogs.php',
-				'label' => _('Audit'),
-				'sub_pages' => array('auditacts.php')
-			),
-			array(
 				'url' => 'queue.php',
 				'label' => _('Queue')
-			),
-			array(
-				'url' => 'report4.php',
-				'label' => _('Notifications')
-			),
-			array(
-				'url' => 'setup.php',
-				'label' => _('Installation')
 			)
 		)
 	),
@@ -326,7 +331,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			$show_menu = false;
 		}
 
-		$menu_class = 'horizontal_menu_n';
+		$menu_class = null;
 		$sub_menus[$label] = array();
 
 		foreach ($menu['pages'] as $sub_page) {
@@ -363,7 +368,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				// permission check
 				$deny &= (CWebUser::$data['type'] < $menu['user_type'] || CWebUser::$data['type'] < $sub_page['user_type']);
 
-				$menu_class = 'active';
+				$menu_class = 'selected';
 				$page_exists = true;
 				$page['menu'] = $label;
 				$row['selected'] = true;
@@ -393,11 +398,11 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 		else {
 			$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'].'?action='.$sub_menus[$label][$menu['default_page_id']]['menu_action'];
 		}
-		$mmenu_entry = new CCol($menu['label'], $menu_class);
+		$mmenu_entry = new CListItem(new CLink($menu['label'], $menu_url), $menu_class);
 		$mmenu_entry->setAttribute('id', $label);
-		$mmenu_entry->addAction('onclick', 'javascript: redirect(\''.$menu_url.'\');');
-		$mmenu_entry->addAction('onmouseover', 'javascript: MMenu.mouseOver(\''.$label.'\');');
-		$mmenu_entry->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
+// click to navigate to other sections, uncomment for old-style navigation
+//		$mmenu_entry->addAction('onmouseover', 'javascript: MMenu.mouseOver(\''.$label.'\');');
+//		$mmenu_entry->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
 		array_push($main_menu, $mmenu_entry);
 	}
 
