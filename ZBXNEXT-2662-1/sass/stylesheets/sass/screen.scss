@@ -575,8 +575,6 @@ footer {
 	display: inline-block;
 	margin-left: -1px;
 	padding: 3px 14px;
-	//min-height: 22px;
-	//line-height: 22px;
 	border: 1px solid $light-blue-grey;
 	text-decoration: none;
 	color: $link-color;
@@ -2474,12 +2472,21 @@ a.grey {
 	@extend %status;
 }
 
+.status-yellow {
+	border: 1px solid darken(desaturate($alt-yellow, 10%), 12%);
+	background-color: darken(desaturate($alt-yellow, 10%), 10%);
+	@extend %status;
+}
+
 %status {
 	padding: 1px 3px;
 	color: $white;
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	text-align: center;
+	min-width: 1em;
+	display: inline-block;
+	cursor: default;
 	@include border-radius(2px); 
 }
 
@@ -2624,6 +2631,10 @@ td.disaster-bg {
 .msg-buttons {
 	text-align: right;
 	margin: 10px 0 0 0;
+
+	button {
+		margin: 0 0 0 10px;
+	}
 }
 
 %msg {
@@ -2757,4 +2768,13 @@ a.form-remove-btn {
 	width: 32px;
 	height: 32px;
 	margin: 0 auto;
+}
+
+/* Browser icons */
+@each $browser, $bgimage in $browsers {
+    .browser-icon-#{$browser} {
+        background: $bgimage;
+        width: 25px;
+        height: 25px;
+    }
 }

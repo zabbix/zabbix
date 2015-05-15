@@ -2,28 +2,27 @@
 $red: #e33734;
 $light-red: #ed9898;
 $lighter-red: #fccacf;
-$alt-red: #e45959;
 
 $orange: #f24f1d;
 $alt-dark-orange: #e97659;
-$alt-orange: #ffa059;
 
 $yellow: #fad634;
 $light-yellow: #fcf39d;
 $lighter-yellow: #fcf7c2;
-$alt-yellow: #ffc859;
 
 $green: #429e47;
 $light-green: #a5d6a7;
 $lighter-green: #c5e3c6;
-$alt-green: #59db8f;
 
+$alt-red: #e45959;
+$alt-orange: #ffa059;
+$alt-yellow: #ffc859;
+$alt-green: #59db8f;
 $alt-dark-blue: #7499ff;
 $alt-blue-grey: #97aab3;
 
 $white: #fff !default;
 $transparent: transparent;
-
 
 // MAIN COLORS
 $body-bg-color: #ebeef0 !default; //NEW page bg color
@@ -138,6 +137,15 @@ $font-msg-reset-size: 0.850em; // Default 1em/12px
 
 $font-transform: uppercase;
 
+// IMAGE MAPS
+$browsers: (
+	chrome: url(../img/browser-sprite.png) no-repeat -46px -169px,
+	ff: url(../img/browser-sprite.png) no-repeat -46px -169px,
+	ie: url(../img/browser-sprite.png) no-repeat -46px -169px,
+	opera: url(../img/browser-sprite.png) no-repeat -46px -169px,
+	safari: url(../img/browser-sprite.png) no-repeat -46px -169px
+
+);
 
 // FONT MIXINS
 @mixin font-body {
