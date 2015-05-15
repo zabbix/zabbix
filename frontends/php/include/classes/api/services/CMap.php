@@ -356,7 +356,7 @@ class CMap extends CMapElement {
 			// labels
 			$mapLabels = array('label_type' => array('typeName' => _('icon')));
 
-			if ($dbMap['label_format'] == SYSMAP_LABEL_ADVANCED_ON) {
+			if (isset($dbMap['label_format']) && $dbMap['label_format'] == SYSMAP_LABEL_ADVANCED_ON) {
 				$mapLabels['label_type_hostgroup'] = array('string' => 'label_string_hostgroup', 'typeName' => _('host group'));
 				$mapLabels['label_type_host'] = array('string' => 'label_string_host', 'typeName' => _('host'));
 				$mapLabels['label_type_trigger'] = array('string' => 'label_string_trigger', 'typeName' => _('trigger'));

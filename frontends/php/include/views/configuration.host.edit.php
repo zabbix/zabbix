@@ -25,9 +25,8 @@ $widgetClass = 'host-edit';
 if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	$widgetClass .= ' host-edit-discovered';
 }
-$hostWidget = new CWidget(null, $widgetClass);
-$hostWidget->addPageHeader(_('CONFIGURATION OF HOSTS'));
-$hostWidget->addItem(get_header_host_table('', $data['hostid']));
+$hostWidget = (new CWidget($widgetClass))->setTitle(_('Hosts'))->
+	addItem(get_header_host_table('', $data['hostid']));
 
 $divTabs = new CTabView();
 if (!hasRequest('form_refresh')) {
@@ -98,18 +97,17 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		$tmp_label .= ' '._('(Only super admins can create groups)');
 		$newgroupTB->setReadonly(true);
 	}
-	$hostList->addRow(null, array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, 'new');
+	$hostList->addRow(new CLabel($tmp_label, 'newgroup'), $newgroupTB, null, null, ZBX_STYLE_TABLE_FORMS_TR_NEW);
 }
 else {
 	// groups for discovered hosts
-	$groupBox = new CComboBox();
-	$groupBox->addClass('openView');
+	$groupBox = new CListBox(null, null, 10);
 	$groupBox->setEnabled(false);
-	$groupBox->setAttribute('size', 10);
-	$groupBox->addStyle('width: 170px;');
 	foreach ($data['groupsAll'] as $group) {
 		if (in_array($group['groupid'], $data['groups'])) {
-			$groupBox->addItem($group['groupid'], $group['name'], null, array_key_exists($group['groupid'], $data['groupsAllowed']));
+			$groupBox->addItem($group['groupid'], $group['name'], null,
+				array_key_exists($group['groupid'], $data['groupsAllowed'])
+			);
 		}
 	}
 	$hostList->addRow(_('Groups'), $groupBox);
@@ -541,7 +539,7 @@ if ($data['clone_hostid'] != 0) {
 $divTabs->addTab('hostTab', _('Host'), $hostList);
 
 // templates
-$tmplList = new CFormList('tmpllist');
+$tmplList = new CFormList();
 
 // create linked template table
 $linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');
@@ -588,9 +586,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		'ignored' => $ignoredTemplates,
 		'popup' => array(
 			'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1',
-			'width' => 450,
-			'height' => 450
+				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
 		)
 	))));
 
@@ -621,18 +617,11 @@ $divTabs->addTab('templateTab', _('Templates'), $tmplList);
 /*
  * IPMI
  */
-$ipmiList = new CFormList('ipmilist');
+$ipmiList = new CFormList();
 
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	$cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $data['ipmi_authtype'], null, ipmiAuthTypes());
-	$cmbIPMIAuthtype->addClass('openView');
-	$cmbIPMIAuthtype->setAttribute('size', 7);
-	$cmbIPMIAuthtype->addStyle('width: 170px;');
-
-	$cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $data['ipmi_privilege'], null, ipmiPrivileges());
-	$cmbIPMIPrivilege->addClass('openView');
-	$cmbIPMIPrivilege->setAttribute('size', 5);
-	$cmbIPMIPrivilege->addStyle('width: 170px;');
+	$cmbIPMIAuthtype = new CListBox('ipmi_authtype', $data['ipmi_authtype'], 7, null, ipmiAuthTypes());
+	$cmbIPMIPrivilege = new CListBox('ipmi_privilege', $data['ipmi_privilege'], 5, null, ipmiPrivileges());
 }
 else {
 	$cmbIPMIAuthtype = [
@@ -747,14 +736,13 @@ $clearFixDiv->addStyle('clear: both;');
 $inventoryFormList->addRow('', $clearFixDiv);
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
-$frmHost->addItem($divTabs);
 
 /*
  * footer
  */
 // Do not display the clone and delete buttons for clone forms and new host forms.
 if ($data['hostid'] != 0) {
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -765,11 +753,13 @@ if ($data['hostid'] != 0) {
 	));
 }
 else {
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('groupid')))
 	));
 }
+
+$frmHost->addItem($divTabs);
 
 $hostWidget->addItem($frmHost);
 

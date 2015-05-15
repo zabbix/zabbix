@@ -21,14 +21,10 @@
 
 class CListBox extends CComboBox {
 
-	public function __construct($name = 'listbox', $value = null, $size = 5, $action = null) {
-		parent::__construct($name, null, $action);
+	public function __construct($name = 'listbox', $value = null, $size = 5, $action = null, array $items = array()) {
+		parent::__construct($name, $value, $action, $items);
 		$this->attr('multiple', 'multiple');
+		$this->attr('class', ZBX_STYLE_SELECT_MULTIPLE);
 		$this->attr('size', $size);
-		$this->setValue($value);
-	}
-
-	public function setSize($value) {
-		$this->attr('size', $value);
 	}
 }

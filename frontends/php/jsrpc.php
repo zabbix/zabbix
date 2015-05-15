@@ -33,7 +33,6 @@ else {
 
 $page['title'] = 'RPC';
 $page['file'] = 'jsrpc.php';
-$page['hist_arg'] = array();
 $page['type'] = detect_page_type($requestType);
 
 require_once dirname(__FILE__).'/include/page_header.php';

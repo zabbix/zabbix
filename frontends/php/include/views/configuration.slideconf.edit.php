@@ -21,8 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.slideconf.edit.js.php';
 
-$slideWidget = new CWidget();
-$slideWidget->addPageHeader(_('CONFIGURATION OF SLIDE SHOWS'));
+$slideWidget = (new CWidget())->setTitle(_('Slide shows'));
 
 // create form
 $slideForm = new CForm();
@@ -41,15 +40,15 @@ $slideFormList->addRow(_('Name'), $nameTextBox);
 $slideFormList->addRow(_('Default delay (in seconds)'), new CNumericBox('delay', $this->data['delay'], 5, false, false, false));
 
 // append slide table
-$slideTable = new CTableInfo(null, 'formElementTable');
+$slideTable = new CTableInfo();
 $slideTable->setAttribute('style', 'min-width: 312px;');
 $slideTable->setAttribute('id', 'slideTable');
 $slideTable->setHeader(array(
-	new CCol(SPACE, null, null, '15'),
-	new CCol(SPACE, null, null, '15'),
+	new CColHeader(SPACE, null, null, '15'),
+	new CColHeader(SPACE, null, null, '15'),
 	_('Screen'),
-	new CCol(_('Delay'), null, null, '70'),
-	new CCol(_('Action'), null, null, '50')
+	new CColHeader(_('Delay'), null, null, '70'),
+	new CColHeader(_('Action'), null, null, '50')
 ));
 
 $i = 1;
@@ -70,7 +69,7 @@ foreach ($this->data['slides'] as $key => $slides) {
 
 	$row = new CRow(
 		array(
-			new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
+			new CCol(new CDiv(null, 'drag-icon'), 'td-drag-icon'),
 			new CSpan($i++.':', 'rowNum', 'current_slide_'.$key),
 			$name,
 			$delay,
@@ -86,7 +85,7 @@ $addButtonColumn = new CCol(
 	empty($this->data['work_slide'])
 		? new CButton('add', _('Add'),
 			'return PopUp("popup.php?srctbl=screens&srcfld1=screenid&dstfrm='.$slideForm->getName().
-				'&multiselect=1&writeonly=1", 450, 450)',
+				'&multiselect=1&writeonly=1")',
 			'link_menu')
 		: null,
 	null,
@@ -100,11 +99,10 @@ $slideFormList->addRow(_('Slides'), new CDiv($slideTable, 'objectgroup inlineblo
 // append tabs to form
 $slideTab = new CTabView();
 $slideTab->addTab('slideTab', _('Slide'), $slideFormList);
-$slideForm->addItem($slideTab);
 
 // append buttons to form
 if (isset($this->data['slideshowid'])) {
-	$slideForm->addItem(makeFormFooter(
+	$slideTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -114,12 +112,13 @@ if (isset($this->data['slideshowid'])) {
 	));
 }
 else {
-	$slideForm->addItem(makeFormFooter(
+	$slideTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
 
+$slideForm->addItem($slideTab);
 $slideWidget->addItem($slideForm);
 
 return $slideWidget;

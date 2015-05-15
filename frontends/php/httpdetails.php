@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Details of web scenario');
 $page['file'] = 'httpdetails.php';
-$page['hist_arg'] = array('httptestid');
 $page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -110,19 +109,15 @@ $itemHistory = Manager::History()->getLast($items);
 /*
  * Display
  */
-$httpdetailsWidget = new CWidget();
-$httpdetailsWidget->addPageHeader(
-	array(
-		_('DETAILS OF WEB SCENARIO'),
-		SPACE,
-		bold(CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])),
-		isset($httpTestData['lastcheck']) ? ' ['.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $httpTestData['lastcheck']).']' : null
-	),
-	array(
-		get_icon('reset', array('id' => getRequest('httptestid'))),
-		get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
-	)
-);
+$httpdetailsWidget = (new CWidget())->
+	setTitle(
+		_('DETAILS OF WEB SCENARIO').':'.SPACE.
+		CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])
+	);
+$controls = new CList();
+$controls->addItem(get_icon('reset', array('id' => getRequest('httptestid'))));
+$controls->addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
+$httpdetailsWidget->setControls($controls);
 
 // append table to widget
 $httpdetailsTable = new CTableInfo();
@@ -148,23 +143,23 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 	$httpStepItemsByType = $httpStepItems[$httpstep_data['httpstepid']];
 
 	$status['msg'] = _('OK');
-	$status['style'] = 'enabled';
+	$status['style'] = ZBX_STYLE_GREEN;
 	$status['afterError'] = false;
 
 	if (!isset($httpTestData['lastfailedstep'])) {
 		$status['msg'] = _('Never executed');
-		$status['style'] = 'unknown';
+		$status['style'] = ZBX_STYLE_GREY;
 	}
 	elseif ($httpTestData['lastfailedstep'] != 0) {
 		if ($httpTestData['lastfailedstep'] == $httpstep_data['no']) {
 			$status['msg'] = ($httpTestData['error'] === null)
 				? _('Unknown error')
 				: _s('Error: %1$s', $httpTestData['error']);
-			$status['style'] = 'disabled';
+			$status['style'] = ZBX_STYLE_RED;
 		}
 		elseif ($httpTestData['lastfailedstep'] < $httpstep_data['no']) {
 			$status['msg'] = _('Unknown');
-			$status['style'] = 'unknown';
+			$status['style'] = ZBX_STYLE_GREY;
 			$status['afterError'] = true;
 		}
 	}
@@ -226,17 +221,17 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 
 if (!isset($httpTestData['lastfailedstep'])) {
 	$status['msg'] = _('Never executed');
-	$status['style'] = 'unknown';
+	$status['style'] = ZBX_STYLE_GREY;
 }
 elseif ($httpTestData['lastfailedstep'] != 0) {
 	$status['msg'] = ($httpTestData['error'] === null)
 		? _('Unknown error')
 		: _s('Error: %1$s', $httpTestData['error']);
-	$status['style'] = 'disabled';
+	$status['style'] = ZBX_STYLE_RED;
 }
 else {
 	$status['msg'] = _('OK');
-	$status['style'] = 'enabled';
+	$status['style'] = ZBX_STYLE_GREEN;
 }
 
 $httpdetailsTable->addRow(array(
@@ -247,15 +242,16 @@ $httpdetailsTable->addRow(array(
 	new CSpan($status['msg'], $status['style'].' bold')
 ));
 
-$httpdetailsWidget->addItem($httpdetailsTable);
-$httpdetailsWidget->show();
+$httpdetailsWidget->addItem($httpdetailsTable)->show();
 
 echo BR();
 
 // create graphs widget
 $graphsWidget = new CWidget();
-$graphsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.httpdetails.filter.state', 0));
-$graphsWidget->addItem(SPACE);
+
+$filterForm = new CFilter('web.httpdetails.filter.state');
+$filterForm->addNavigator();
+$graphsWidget->addItem($filterForm);
 
 $graphTable = new CTableInfo();
 $graphTable->setAttribute('id', 'graph');
@@ -354,7 +350,6 @@ CScreenBuilder::insertScreenScrollJs(array('timeline' => $graphInScreen->timelin
 CScreenBuilder::insertScreenRefreshTimeJs();
 CScreenBuilder::insertProcessObjectsJs();
 
-$graphsWidget->addItem($graphTable);
-$graphsWidget->show();
+$graphsWidget->addItem($graphTable)->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -26,9 +26,8 @@ $parentHost = $data['parent_host'];
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 require_once dirname(__FILE__).'/js/configuration.host.prototype.edit.js.php';
 
-$widget = new CWidget(null, 'hostprototype-edit');
-$widget->addPageHeader(_('CONFIGURATION OF HOST PROTOTYPES'));
-$widget->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $discoveryRule['itemid']));
+$widget = (new CWidget('hostprototype-edit'))->setTitle(_('Host prototypes'))->
+	addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $discoveryRule['itemid']));
 
 $divTabs = new CTabView();
 if (!isset($_REQUEST['form_refresh'])) {
@@ -160,7 +159,7 @@ $hostList->addRow(_('Enabled'), new CCheckBox('status', (HOST_STATUS_MONITORED =
 $divTabs->addTab('hostTab', _('Host'), $hostList);
 
 // groups
-$groupList = new CFormList('grouplist');
+$groupList = new CFormList();
 
 // existing groups
 $groups = array();
@@ -181,9 +180,7 @@ $groupList->addRow(_('Groups'), new CMultiSelect(array(
 	'disabled' => (bool) $hostPrototype['templateid'],
 	'popup' => array(
 		'parameters' => 'srctbl=host_groups&dstfrm='.$frmHost->getName().'&dstfld1=group_links_'.
-			'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1',
-		'width' => 450,
-		'height' => 450
+			'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1'
 	)
 )));
 
@@ -207,7 +204,7 @@ $groupList->addRow(_('Group prototypes'), $groupDiv);
 $divTabs->addTab('groupTab', _('Groups'), $groupList);
 
 // templates
-$tmplList = new CFormList('tmpllist');
+$tmplList = new CFormList();
 
 // create linked template table
 $linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');
@@ -249,9 +246,7 @@ if (!$hostPrototype['templateid']) {
 		'ignored' => $ignoreTemplates,
 		'popup' => array(
 			'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1',
-			'width' => 450,
-			'height' => 450
+				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
 		)
 	))));
 
@@ -265,7 +260,7 @@ $divTabs->addTab('templateTab', _('Templates'), $tmplList);
 // display inherited parameters only for hosts prototypes on hosts
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	// IPMI
-	$ipmiList = new CFormList('ipmilist');
+	$ipmiList = new CFormList();
 
 	$cmbIPMIAuthtype = new CTextBox('ipmi_authtype', ipmiAuthTypes($parentHost['ipmi_authtype']), ZBX_TEXTBOX_SMALL_SIZE, true);
 	$ipmiList->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype);
@@ -330,8 +325,6 @@ $inventoryFormList->addRow('', $clearFixDiv);
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
 
-$frmHost->addItem($divTabs);
-
 /*
  * footer
  */
@@ -342,7 +335,7 @@ if (isset($hostPrototype['hostid'])) {
 	);
 	$btnDelete->setEnabled($hostPrototype['templateid'] == 0);
 
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array (
 			new CSubmit('clone', _('Clone')),
@@ -352,12 +345,13 @@ if (isset($hostPrototype['hostid'])) {
 	));
 }
 else {
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('parent_discoveryid')))
 	));
 }
 
+$frmHost->addItem($divTabs);
 $widget->addItem($frmHost);
 
 return $widget;

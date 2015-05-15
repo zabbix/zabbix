@@ -127,7 +127,7 @@ var MMenu = {
 	showSubMenu: function(show_label) {
 		var menu_div = $('sub_' + show_label);
 		if (!is_null(menu_div)) {
-			$(show_label).className = 'active';
+			$(show_label).className = 'selected';
 			menu_div.show();
 			for (var key in this.menus) {
 				if (key == show_label) {
@@ -365,7 +365,7 @@ var jqBlink = {
 var hintBox = {
 
 	createBox: function(e, target, hintText, className, isStatic) {
-		var box = jQuery('<div></div>').addClass('hintbox');
+		var box = jQuery('<div></div>').addClass('overlay-dialogue');
 
 		if (typeof hintText === 'string') {
 			hintText = hintText.replace(/\n/g, '<br />');
@@ -379,12 +379,8 @@ var hintBox = {
 		}
 
 		if (isStatic) {
-			var close_link = jQuery('<div>' + locale['S_CLOSE'] + '</div>')
-				.addClass('link')
-				.css({
-					'text-align': 'right',
-					'border-bottom': '1px #333 solid'
-				}).click(function() {
+			var close_link = jQuery('<span class="overlay-close-btn">×</a>')
+				.click(function() {
 					hintBox.hideHint(e, target, true);
 				});
 			box.prepend(close_link);
@@ -645,16 +641,16 @@ function changeFlickerState(id, titleWhenVisible, titleWhenHidden) {
 
 function changeWidgetState(obj, widgetId) {
 	var widgetObj = jQuery('#' + widgetId + '_widget'),
-		css = switchElementClass(obj, 'arrowup', 'arrowdown'),
+		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'),
 		state = 0;
 
-	if (css === 'arrowdown') {
+	if (css === 'btn-widget-expand') {
 		jQuery('.body', widgetObj).slideUp(50);
-		jQuery('.footer', widgetObj).slideUp(50);
+		jQuery('.dashbrd-widget-foot', widgetObj).slideUp(50);
 	}
 	else {
 		jQuery('.body', widgetObj).slideDown(50);
-		jQuery('.footer', widgetObj).slideDown(50);
+		jQuery('.dashbrd-widget-foot', widgetObj).slideDown(50);
 
 		state = 1;
 	}

@@ -46,11 +46,10 @@ if (isset($this->data['imageid'])) {
 // append tab
 $imageTab = new CTabView();
 $imageTab->addTab('imageTab', ($this->data['imagetype'] == IMAGE_TYPE_ICON) ? _('Icon') : _('Background'), $imageFormList);
-$imageForm->addItem($imageTab);
 
 // append buttons
 if (isset($this->data['imageid'])) {
-	$imageForm->addItem(makeFormFooter(
+	$imageTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')),
@@ -59,10 +58,12 @@ if (isset($this->data['imageid'])) {
 	));
 }
 else {
-	$imageForm->addItem(makeFormFooter(
+	$imageTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
+
+$imageForm->addItem($imageTab);
 
 return $imageForm;
