@@ -450,6 +450,7 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
  *          use_ino - [IN] 0 - do not use inodes in comparison,               *
  *                         1 - use up to 64-bit inodes in comparison,         *
  *                         2 - use 128-bit inodes in comparison.              *
+ *          retry   - [IN/OUT] flag for repeated check of mtime and size      *
  *                                                                            *
  * Return value: ZBX_SAME_FILE_NO - it is not the same file,                  *
  *               ZBX_SAME_FILE_YES - it could be the same file,               *
@@ -461,10 +462,9 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
  *           truncated and replaced with a similar one.                       *
  *                                                                            *
  ******************************************************************************/
-static int	is_same_file(const struct st_logfile *old, const struct st_logfile *new, int use_ino)
+static int	is_same_file(const struct st_logfile *old, const struct st_logfile *new, int use_ino, int *retry)
 {
-	int		ret = ZBX_SAME_FILE_NO, retry = 0;
-	static int	temp = 0;
+	int	ret = ZBX_SAME_FILE_NO;
 
 	if (1 == use_ino || 2 == use_ino)
 	{
@@ -496,16 +496,17 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 
 	if (old->size == new->size && old->mtime < new->mtime)
 	{
-		if (0 == temp)
+		if (0 == *retry)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "File's mtime cannot increase without changing size unless"
 					" manipulated. Retry reading \"%s\" status on the next check", new->filename);
-			retry = 1;
+			*retry = 1;
+			ret = ZBX_SAME_FILE_RETRY;
 		}
 		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "\"%s\" is considered to be a new file", new->filename);
-			temp = 0;
+			*retry = 0;
 		}
 
 		goto out;
@@ -569,22 +570,6 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 
 	ret = ZBX_SAME_FILE_YES;
 out:
-	if (1 == retry)
-	{
-		ret = ZBX_SAME_FILE_RETRY;
-		temp = 1;
-	}
-	else
-	{
-		if (0 == retry && 1 == temp)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "\"%s\" is an old file. Its size has been updated",
-					new->filename);
-		}
-
-		temp = 0;
-	}
-
 	return ret;
 }
 
@@ -611,7 +596,7 @@ out:
  *       old2new[i][j] = '1' - the i-th old file COULD BE the j-th new file   *
  *                                                                            *
  ******************************************************************************/
-static int	setup_old2new(char *old2new, const struct st_logfile *old, int num_old,
+static int	setup_old2new(char *old2new, struct st_logfile *old, int num_old,
 		const struct st_logfile *new, int num_new, int use_ino)
 {
 	int	i, j, rc;
@@ -621,7 +606,7 @@ static int	setup_old2new(char *old2new, const struct st_logfile *old, int num_ol
 	{
 		for (j = 0; j < num_new; j++)
 		{
-			rc = is_same_file(old + i, new + j, use_ino);
+			rc = is_same_file(old + i, new + j, use_ino, &old[i].retry);
 
 			if (ZBX_SAME_FILE_NO == rc)
 				p[j] = '0';
@@ -634,6 +619,13 @@ static int	setup_old2new(char *old2new, const struct st_logfile *old, int num_ol
 					old[i].filename, new[j].filename, p[j]);
 		}
 		p += (size_t)num_new;
+
+		if (1 == old[i].retry)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Size of \"%s\" has been updated. Consider it to be an old file",
+					new->filename);
+			old[i].retry = 0;
+		}
 	}
 	return SUCCEED;
 }
@@ -1082,6 +1074,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 #endif
 	(*logfiles)[i].size = (zbx_uint64_t)st->st_size;
 	(*logfiles)[i].processed_size = 0;
+	(*logfiles)[i].retry = 0;
 
 	++(*logfiles_num);
 out:
