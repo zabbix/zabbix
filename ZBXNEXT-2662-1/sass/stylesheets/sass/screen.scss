@@ -2473,13 +2473,13 @@ a.grey {
 }
 
 .status-yellow {
-	border: 1px solid darken(desaturate($alt-yellow, 10%), 12%);
-	background-color: darken(desaturate($alt-yellow, 10%), 10%);
+	border: 1px solid darken(desaturate($alt-yellow, 10%), 18%);
+	background-color: darken(desaturate($alt-yellow, 10%), 16%);
 	@extend %status;
 }
 
 %status {
-	padding: 1px 3px;
+	padding: 0 3px;
 	color: $white;
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
@@ -2668,6 +2668,7 @@ td.disaster-bg {
 	text-align: left;
 	margin-left: auto;
 	margin-right: auto;
+	margin-top: 5%;
 	max-width: 25%;
 }
 
@@ -2770,11 +2771,44 @@ a.form-remove-btn {
 	margin: 0 auto;
 }
 
+.browser-warning-container {
+	margin-top: 5%;
+	margin-left: auto;
+	margin-right: auto;
+	width: 766px;
+	text-align: center;
+	padding: 28px 28px 10px 28px;
+	@extend .table-forms-container;
+
+	h2 {
+		text-align: left;
+	}
+
+	p {
+		margin: 0.7em 0;
+		text-align: left;
+	}
+
+	li {
+		display: inline-block;
+		margin: 25px 20px;
+	}
+}
+
+.browser-warning-footer {
+	border-top: 1px solid $lightest-blue-grey;
+	margin: 25px 0 0 0;
+	padding: 10px 0 0 0;
+	text-align: center;
+}
+
 /* Browser icons */
 @each $browser, $bgimage in $browsers {
     .browser-icon-#{$browser} {
         background: $bgimage;
-        width: 25px;
-        height: 25px;
+        width: 66px;
+        height: 66px;
+        margin: 0 auto;
+        margin-bottom: 5px;
     }
 }
