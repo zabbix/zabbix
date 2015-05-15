@@ -317,16 +317,14 @@ char	*smtp_prepare_payload(const char *from_display_name, const char *from_angle
 	return tmp;
 }
 
-int	send_email(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo, const char *smtp_email,
-		const char *mailto, const char *mailsubject, const char *mailbody, char *error, size_t max_error_len)
+static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
+		const char *from_display_name, const char *from_angle_addr, const char *to_display_name,
+		const char *to_angle_addr, const char *mailsubject, const char *mailbody, char *error,
+		size_t max_error_len)
 {
-	const char	*__function_name = "send_email";
-
 	zbx_socket_t	s;
 	int		err, ret = FAIL;
 	char		cmd[MAX_STRING_LEN], *cmdp = NULL;
-	char		*from_display_name = NULL, *from_angle_addr = NULL;
-	char		*to_display_name = NULL, *to_angle_addr = NULL;
 
 	const char	*OK_220 = "220";
 	const char	*OK_250 = "250";
@@ -334,25 +332,13 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	const char	*OK_354 = "354";
 	const char	*response;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() smtp_server:'%s'", __function_name, smtp_server);
-
-	*error = '\0';
-
-	/* validate addresses before connecting to the server */
-
-	if (SUCCEED != smtp_parse_mailbox(smtp_email, error, max_error_len, &from_display_name, &from_angle_addr))
-		goto clean;
-
-	if (SUCCEED != smtp_parse_mailbox(mailto, error, max_error_len, &to_display_name, &to_angle_addr))
-		goto clean;
-
 	/* connect to and receive an initial greeting from SMTP server */
 
 	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, smtp_server, smtp_port, 0))
 	{
 		zbx_snprintf(error, max_error_len, "cannot connect to SMTP server \"%s\": %s",
 				smtp_server, zbx_socket_strerror());
-		goto clean;
+		goto out;
 	}
 
 	if (FAIL == smtp_readln(&s, &response))
@@ -361,6 +347,7 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 				zbx_strerror(errno));
 		goto close;
 	}
+
 	if (0 != strncmp(response, OK_220, strlen(OK_220)))
 	{
 		zbx_snprintf(error, max_error_len, "no welcome message 220* from SMTP server \"%s\"", response);
@@ -372,18 +359,21 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	if (0 != strlen(smtp_helo))
 	{
 		zbx_snprintf(cmd, sizeof(cmd), "HELO %s\r\n", smtp_helo);
+
 		if (-1 == write(s.socket, cmd, strlen(cmd)))
 		{
 			zbx_snprintf(error, max_error_len, "error sending HELO to mailserver: %s",
 					zbx_strerror(errno));
 			goto close;
 		}
+
 		if (FAIL == smtp_readln(&s, &response))
 		{
 			zbx_snprintf(error, max_error_len, "error receiving answer on HELO request: %s",
 					zbx_strerror(errno));
 			goto close;
 		}
+
 		if (0 != strncmp(response, OK_250, strlen(OK_250)))
 		{
 			zbx_snprintf(error, max_error_len, "wrong answer on HELO \"%s\"", response);
@@ -400,11 +390,13 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 		zbx_snprintf(error, max_error_len, "error sending MAIL FROM to mailserver: %s", zbx_strerror(errno));
 		goto close;
 	}
+
 	if (FAIL == smtp_readln(&s, &response))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving answer on MAIL FROM request: %s", zbx_strerror(errno));
 		goto close;
 	}
+
 	if (0 != strncmp(response, OK_250, strlen(OK_250)))
 	{
 		zbx_snprintf(error, max_error_len, "wrong answer on MAIL FROM \"%s\"", response);
@@ -420,11 +412,13 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 		zbx_snprintf(error, max_error_len, "error sending RCPT TO to mailserver: %s", zbx_strerror(errno));
 		goto close;
 	}
+
 	if (FAIL == smtp_readln(&s, &response))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving answer on RCPT TO request: %s", zbx_strerror(errno));
 		goto close;
 	}
+
 	/* May return 251 as well: User not local; will forward to <forward-path>. See RFC825. */
 	if (0 != strncmp(response, OK_250, strlen(OK_250)) && 0 != strncmp(response, OK_251, strlen(OK_251)))
 	{
@@ -435,16 +429,19 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	/* send DATA */
 
 	zbx_snprintf(cmd, sizeof(cmd), "DATA\r\n");
+
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
 		zbx_snprintf(error, max_error_len, "error sending DATA to mailserver: %s", zbx_strerror(errno));
 		goto close;
 	}
+
 	if (FAIL == smtp_readln(&s, &response))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving answer on DATA request: %s", zbx_strerror(errno));
 		goto close;
 	}
+
 	if (0 != strncmp(response, OK_354, strlen(OK_354)))
 	{
 		zbx_snprintf(error, max_error_len, "wrong answer on DATA \"%s\"", response);
@@ -466,16 +463,19 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	/* send . */
 
 	zbx_snprintf(cmd, sizeof(cmd), "\r\n.\r\n");
+
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
 		zbx_snprintf(error, max_error_len, "error sending . to mailserver: %s", zbx_strerror(errno));
 		goto close;
 	}
+
 	if (FAIL == smtp_readln(&s, &response))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving answer on . request: %s", zbx_strerror(errno));
 		goto close;
 	}
+
 	if (0 != strncmp(response, OK_250, strlen(OK_250)))
 	{
 		zbx_snprintf(error, max_error_len, "wrong answer on end of data \"%s\"", response);
@@ -485,6 +485,7 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	/* send QUIT */
 
 	zbx_snprintf(cmd, sizeof(cmd), "QUIT\r\n");
+
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
 		zbx_snprintf(error, max_error_len, "error sending QUIT to mailserver: %s", zbx_strerror(errno));
@@ -494,6 +495,57 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	ret = SUCCEED;
 close:
 	zbx_tcp_close(&s);
+out:
+	return ret;
+}
+
+static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
+		const char *from_display_name, const char *from_angle_addr, const char *to_display_name,
+		const char *to_angle_addr, const char *mailsubject, const char *mailbody,
+		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
+		unsigned char smtp_authentication, const char *username, const char *password,
+		char *error, size_t max_error_len)
+{
+	return FAIL;
+}
+
+int	send_email(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
+		const char *smtp_email, const char *mailto, const char *mailsubject, const char *mailbody,
+		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
+		unsigned char smtp_authentication, const char *username, const char *password,
+		char *error, size_t max_error_len)
+{
+	const char	*__function_name = "send_email";
+
+	int		ret = FAIL;
+	char		*from_display_name = NULL, *from_angle_addr = NULL;
+	char		*to_display_name = NULL, *to_angle_addr = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() smtp_server:'%s'", __function_name, smtp_server);
+
+	*error = '\0';
+
+	/* validate addresses before connecting to the server */
+
+	if (SUCCEED != smtp_parse_mailbox(smtp_email, error, max_error_len, &from_display_name, &from_angle_addr))
+		goto clean;
+
+	if (SUCCEED != smtp_parse_mailbox(mailto, error, max_error_len, &to_display_name, &to_angle_addr))
+		goto clean;
+
+	/* choose appropriate method for sending the email */
+
+	if (SMTP_SECURITY_NONE == smtp_security && SMTP_AUTHENTICATION_NONE == smtp_authentication)
+	{
+		ret = send_email_plain(smtp_server, smtp_port, smtp_helo, from_display_name, from_angle_addr,
+				to_display_name, to_angle_addr, mailsubject, mailbody, error, max_error_len);
+	}
+	else
+	{
+		ret = send_email_curl(smtp_server, smtp_port, smtp_helo, from_display_name, from_angle_addr,
+				to_display_name, to_angle_addr, mailsubject, mailbody, smtp_security, smtp_verify_peer,
+				smtp_verify_host, smtp_authentication, username, password, error, max_error_len);
+	}
 clean:
 	zbx_free(from_display_name);
 	zbx_free(to_display_name);
