@@ -118,7 +118,7 @@ class CHostImporter extends CImporter {
 								&& $dbInterface['port'] == $interface['port']
 								&& $dbInterface['type'] == $interface['type']
 								&& $dbInterface['main'] == $interface['main']
-								&& $dbInterface['bulk'] == $interface['bulk']) {
+								&& (!isset($interface['bulk']) || $dbInterface['bulk'] == $interface['bulk'])) {
 							$refName = $interface['interface_ref'];
 							$this->referencer->interfacesCache[$hostId][$refName] = $dbInterface['interfaceid'];
 						}
@@ -171,12 +171,15 @@ class CHostImporter extends CImporter {
 
 		if ($hostId = $this->referencer->resolveHost($host['host'])) {
 			$host['hostid'] = $hostId;
-			foreach ($host['macros'] as &$macro) {
-				if ($hostMacroId = $this->referencer->resolveMacro($hostId, $macro['macro'])) {
-					$macro['hostmacroid'] = $hostMacroId;
+
+			if (array_key_exists('macros', $host)) {
+				foreach ($host['macros'] as &$macro) {
+					if ($hostMacroId = $this->referencer->resolveMacro($hostId, $macro['macro'])) {
+						$macro['hostmacroid'] = $hostMacroId;
+					}
 				}
+				unset($macro);
 			}
-			unset($macro);
 		}
 
 
@@ -255,7 +258,8 @@ class CHostImporter extends CImporter {
 							&& $dbHostInterface['useip'] == $xmlHostInterface['useip']
 							&& $dbHostInterface['port'] == $xmlHostInterface['port']
 							&& $dbHostInterface['type'] == $xmlHostInterface['type']
-							&& $dbHostInterface['bulk'] == $xmlHostInterface['bulk']) {
+							&& (!isset($xmlHostInterface['bulk'])
+								|| $dbHostInterface['bulk'] == $xmlHostInterface['bulk'])) {
 						$xmlHostInterface['interfaceid'] = $dbHostInterfaceId;
 						$reusedInterfaceIds[$dbHostInterfaceId] = true;
 						break;

@@ -749,3 +749,225 @@ function isTemplate($hostId) {
 
 	return ($dbHost && $dbHost['status'] == HOST_STATUS_TEMPLATE);
 }
+
+/**
+ * Get list of inherited macros by host ids.
+ *
+ * Returns an array like:
+ *   array(
+ *       '{$MACRO}' => array(
+ *           'macro' => '{$MACRO}',
+ *           'template' => array(                   <- optional
+ *               'value' => 'template-level value'
+ *               'templateid' => 10001,
+ *               'name' => 'Template OS Linux'
+ *           ),
+ *           'global' => array(                     <- optional
+ *               'value' => 'global-level value'
+ *           )
+ *       )
+ *   )
+ *
+ * @param array $hostids
+ *
+ * @return array
+ */
+function getInheritedMacros(array $hostids) {
+	$all_macros = array();
+	$global_macros = array();
+
+	$db_global_macros = API::UserMacro()->get(array(
+		'output' => array('macro', 'value'),
+		'globalmacro' => true
+	));
+
+	foreach ($db_global_macros as $db_global_macro) {
+		$all_macros[$db_global_macro['macro']] = true;
+		$global_macros[$db_global_macro['macro']] = $db_global_macro['value'];
+	}
+
+	// hostid => array('name' => name, 'macros' => array(macro => value), 'templateids' => array(templateid))
+	$hosts = array();
+
+	$templateids = $hostids;
+
+	do {
+		$db_templates = API::Template()->get(array(
+			'output' => array('name'),
+			'selectParentTemplates' => array('templateid'),
+			'selectMacros' => array('macro', 'value'),
+			'templateids' => $templateids,
+			'preservekeys' => true
+		));
+
+		$templateids = array();
+
+		foreach ($db_templates as $hostid => $db_template) {
+			$hosts[$hostid] = array(
+				'templateid' => $hostid,
+				'name' => $db_template['name'],
+				'templateids' => zbx_objectValues($db_template['parentTemplates'], 'templateid'),
+				'macros' => array()
+			);
+
+			foreach ($db_template['macros'] as $dbMacro) {
+				$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
+				$all_macros[$dbMacro['macro']] = true;
+			}
+		}
+
+		foreach ($db_templates as $db_template) {
+			// only unprocessed templates will be populated
+			foreach ($db_template['parentTemplates'] as $template) {
+				if (!array_key_exists($template['templateid'], $hosts)) {
+					$templateids[$template['templateid']] = $template['templateid'];
+				}
+			}
+		}
+	} while ($templateids);
+
+	$all_macros = array_keys($all_macros);
+	$all_templates = array();
+	$inherited_macros = array();
+
+	// resolving
+	foreach ($all_macros as $macro) {
+		$inherited_macro = array('macro' => $macro);
+
+		if (array_key_exists($macro, $global_macros)) {
+			$inherited_macro['global'] = array(
+				'value' => $global_macros[$macro]
+			);
+		}
+
+		$templateids = $hostids;
+
+		do {
+			natsort($templateids);
+
+			foreach ($templateids as $templateid) {
+				if (array_key_exists($templateid, $hosts) && array_key_exists($macro, $hosts[$templateid]['macros'])) {
+					$inherited_macro['template'] = array(
+						'value' => $hosts[$templateid]['macros'][$macro],
+						'templateid' => $hosts[$templateid]['templateid'],
+						'name' => $hosts[$templateid]['name'],
+						'rights' => PERM_READ
+					);
+
+					if (!array_key_exists($hosts[$templateid]['templateid'], $all_templates)) {
+						$all_templates[$hosts[$templateid]['templateid']] = array();
+					}
+					$all_templates[$hosts[$templateid]['templateid']][] = &$inherited_macro['template'];
+
+					break 2;
+				}
+			}
+
+			$parent_templateids = array();
+
+			foreach ($templateids as $templateid) {
+				if (array_key_exists($templateid, $hosts)) {
+					foreach ($hosts[$templateid]['templateids'] as $templateid) {
+						$parent_templateids[$templateid] = $templateid;
+					}
+				}
+			}
+
+			$templateids = $parent_templateids;
+		} while ($templateids);
+
+		$inherited_macros[$macro] = $inherited_macro;
+	}
+
+	// checking permissions
+	if ($all_templates) {
+		$db_templates = API::Template()->get(array(
+			'output' => array('templateid'),
+			'templateids' => array_keys($all_templates),
+			'editable' => true
+		));
+
+		foreach ($db_templates as $db_template) {
+			foreach ($all_templates[$db_template['templateid']] as &$template) {
+				$template['rights'] = PERM_READ_WRITE;
+			}
+			unset($template);
+		}
+	}
+
+	return $inherited_macros;
+}
+
+/**
+ * Merge list of inherited and host-level macros.
+ *
+ * Returns an array like:
+ *   array(
+ *       '{$MACRO}' => array(
+ *           'macro' => '{$MACRO}',
+ *           'type' => 0x03,						<- MACRO_TYPE_INHERITED, MACRO_TYPE_HOSTMACRO or MACRO_TYPE_BOTH
+ *           'value' => 'effective value',
+ *           'hostmacroid' => 7532,                 <- optional
+ *           'template' => array(                   <- optional
+ *               'value' => 'template-level value'
+ *               'templateid' => 10001,
+ *               'name' => 'Template OS Linux'
+ *           ),
+ *           'global' => array(                     <- optional
+ *               'value' => 'global-level value'
+ *           )
+ *       )
+ *   )
+ *
+ * @param array $host_macros		the list of host macros
+ * @param array $inherited_macros	the list of inherited macros (the output of the getInheritedMacros() function)
+ *
+ * @return array
+ */
+function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
+	foreach ($inherited_macros as &$inherited_macro) {
+		$inherited_macro['type'] = MACRO_TYPE_INHERITED;
+		$inherited_macro['value'] = array_key_exists('template', $inherited_macro)
+			? $inherited_macro['template']['value']
+			: $inherited_macro['global']['value'];
+	}
+	unset($inherited_macro);
+
+	foreach ($host_macros as &$host_macro) {
+		if (array_key_exists($host_macro['macro'], $inherited_macros)) {
+			$host_macro = array_merge($inherited_macros[$host_macro['macro']], $host_macro);
+			unset($inherited_macros[$host_macro['macro']]);
+		}
+		else {
+			$host_macro['type'] = 0x00;
+		}
+		$host_macro['type'] |= MACRO_TYPE_HOSTMACRO;
+	}
+	unset($host_macro);
+
+	foreach ($inherited_macros as $inherited_macro) {
+		$host_macros[] = $inherited_macro;
+	}
+
+	return $host_macros;
+}
+
+/**
+ * Remove inherited macros data.
+ *
+ * @param array $macros
+ *
+ * @return array
+ */
+function cleanInheritedMacros(array $macros) {
+	foreach ($macros as $idx => $macro) {
+		if (array_key_exists('type', $macro) && !($macro['type'] & MACRO_TYPE_HOSTMACRO)) {
+			unset($macros[$idx]);
+		}
+		else {
+			unset($macros[$idx]['type'], $macros[$idx]['inherited']);
+		}
+	}
+
+	return $macros;
+}

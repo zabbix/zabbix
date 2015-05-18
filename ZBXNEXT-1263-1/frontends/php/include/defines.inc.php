@@ -21,6 +21,7 @@
 
 define('ZABBIX_VERSION',		'2.5.0');
 define('ZABBIX_API_VERSION',	'2.5.0');
+define('ZABBIX_EXPORT_VERSION',	'3.0');
 define('ZABBIX_DB_VERSION',		2050016);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
@@ -871,6 +872,8 @@ define('ZBX_SOCKET_BYTES_LIMIT',    1048576);   // socket response size limit, 1
 // value is also used in servercheck.js file
 define('SERVER_CHECK_INTERVAL', 10);
 
+define('DATE_TIME_FORMAT_SECONDS_XML', 'Y-m-d\TH:i:s\Z');
+
 // XML export|import tags
 define('XML_TAG_MACRO',				'macro');
 define('XML_TAG_HOST',				'host');
@@ -890,6 +893,12 @@ define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 // pass the LIBXML_NONET flag. Please keep in mind that LIBXML_NOENT actually EXPANDS entities, opposite to it's name -
 // so this flag is not needed here.
 define('LIBXML_IMPORT_FLAGS', LIBXML_NONET);
+
+// XML validation
+define('XML_STRING',		0x01);
+define('XML_ARRAY',			0x02);
+define('XML_INDEXED_ARRAY',	0x04);
+define('XML_REQUIRED',		0x08);
 
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
@@ -1022,6 +1031,11 @@ define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');
+
+// configuration -> hosts (macro inheritance)
+define('MACRO_TYPE_INHERITED',	0x01);
+define('MACRO_TYPE_HOSTMACRO',	0x02);
+define('MACRO_TYPE_BOTH',		0x03);	// MACRO_TYPE_INHERITED | MACRO_TYPE_HOSTMACRO
 
 // if magic quotes on, then get rid of them
 if (get_magic_quotes_gpc()) {

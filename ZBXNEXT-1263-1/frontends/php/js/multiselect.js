@@ -995,8 +995,6 @@ jQuery(function($) {
 
 	function setPlaceholder(obj, options) {
 		$('input[type="text"]', obj).attr('placeholder', options.labels['type here to search']);
-
-		createPlaceholders();
 	}
 
 	function removePlaceholder(obj) {
