@@ -26,9 +26,7 @@ $triggersWidget = new CWidget();
 // append host summary to widget header
 $triggersWidget->addItem(get_header_host_table('triggers', $data['hostid'], $data['parent_discoveryid']));
 
-if (!empty($data['parent_discoveryid'])) {
-	$triggersWidget->setTitle(_('Trigger prototypes'));
-}
+$triggersWidget->setTitle(_('Trigger prototypes'));
 
 $triggersForm = new CForm();
 $triggersForm->setName('triggersForm');
