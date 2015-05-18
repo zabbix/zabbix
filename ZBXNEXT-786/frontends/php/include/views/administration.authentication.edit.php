@@ -19,8 +19,7 @@
 **/
 
 
-$authenticationWidget = new CWidget();
-$authenticationWidget->addPageHeader(_('CONFIGURATION OF AUTHENTICATION'));
+$authenticationWidget = (new CWidget())->setTitle(_('Authentication'));
 
 // create form
 $authenticationForm = new CForm();
@@ -118,9 +117,6 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 $authenticationTab = new CTabView();
 $authenticationTab->addTab('authenticationTab', $this->data['title'], $authenticationFormList);
 
-// append tab to form
-$authenticationForm->addItem($authenticationTab);
-
 // create save button
 $saveButton = new CSubmit('update', _('Update'));
 if ($this->data['is_authentication_type_changed']) {
@@ -135,11 +131,14 @@ elseif ($this->data['config']['authentication_type'] != ZBX_AUTH_LDAP) {
 
 // append buttons to form
 if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
-	$authenticationForm->addItem(makeFormFooter($saveButton, array(new CSubmit('test', _('Test')))));
+	$authenticationTab->setFooter(makeFormFooter($saveButton, array(new CSubmit('test', _('Test')))));
 }
 else {
-	$authenticationForm->addItem(makeFormFooter($saveButton));
+	$authenticationTab->setFooter(makeFormFooter($saveButton));
 }
+
+// append tab to form
+$authenticationForm->addItem($authenticationTab);
 
 // append form to widget
 $authenticationWidget->addItem($authenticationForm);

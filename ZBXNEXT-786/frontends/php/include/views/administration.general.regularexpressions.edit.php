@@ -21,11 +21,13 @@
 
 require_once dirname(__FILE__).'/js/adm.regexprs.edit.js.php';
 
-$regExpWidget = new CWidget();
+$regExpWidget = (new CWidget())->setTitle(_('Regular expressions'));
 
 $headerForm = new CForm();
 $headerForm->cleanItems();
-$headerForm->addItem(new CComboBox('configDropDown', 'adm.regexps.php',
+
+$controls = new CList();
+$controls->addItem(new CComboBox('configDropDown', 'adm.regexps.php',
 	'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
@@ -42,7 +44,9 @@ $headerForm->addItem(new CComboBox('configDropDown', 'adm.regexps.php',
 	)
 ));
 
-$regExpWidget->addPageHeader(_('CONFIGURATION OF REGULAR EXPRESSIONS'), $headerForm);
+$headerForm->addItem($controls);
+
+$regExpWidget->setControls($headerForm);
 
 $form = new CForm();
 $form->attr('id', 'zabbixRegExpForm');
@@ -63,8 +67,8 @@ $exprTable = new CTable(null, 'formElementTable formWideTable');
 $exprTable->attr('id', 'exprTable');
 $exprTable->setHeader(array(
 	_('Expression'),
-	new CCol(_('Expression type'), 'nowrap'),
-	new CCol(_('Case sensitive'), 'nowrap'),
+	new CCol(_('Expression type'), ZBX_STYLE_NOWRAP),
+	new CCol(_('Case sensitive'), ZBX_STYLE_NOWRAP),
 	SPACE
 ));
 $exprTable->setFooter(new CButton('add', _('Add'), null, 'link_menu exprAdd'));
@@ -91,7 +95,7 @@ $preloaderDiv = new CDiv(null, 'preloader', 'testPreloader');
 $preloaderDiv->addStyle('display: none');
 $testTab->addRow(SPACE, array(new CButton('testExpression', _('Test expressions')), $preloaderDiv));
 
-$tabExp = new CTableInfo(null);
+$tabExp = new CTableInfo();
 $tabExp->attr('id', 'testResultTable');
 $tabExp->setHeader(array(_('Expression'), _('Expression type'), _('Result')));
 $testTab->addRow(_('Result'), $tabExp);
@@ -102,11 +106,10 @@ if (!$data['form_refresh']) {
 }
 $regExpView->addTab('expr', _('Expressions'), $exprTab);
 $regExpView->addTab('test', _('Test'), $testTab);
-$form->addItem($regExpView);
 
 // footer
 if (isset($data['regexpid'])) {
-	$form->addItem(makeFormFooter(
+	$regExpView->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CButton('clone', _('Clone')),
@@ -119,13 +122,13 @@ if (isset($data['regexpid'])) {
 	));
 }
 else {
-	$form->addItem(makeFormFooter(
+	$regExpView->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
 
-// append form to widget
+$form->addItem($regExpView);
 $regExpWidget->addItem($form);
 
 return $regExpWidget;

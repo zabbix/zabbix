@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of GUI');
 $page['file'] = 'adm.gui.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -85,7 +84,9 @@ if (hasRequest('update')) {
  */
 $form = new CForm();
 $form->cleanItems();
-$form->addItem(new CComboBox('configDropDown', 'adm.gui.php', 'redirect(this.options[this.selectedIndex].value);',
+
+$controls = new CList();
+$controls->addItem(new CComboBox('configDropDown', 'adm.gui.php', 'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
 		'adm.housekeeper.php' => _('Housekeeping'),
@@ -101,8 +102,9 @@ $form->addItem(new CComboBox('configDropDown', 'adm.gui.php', 'redirect(this.opt
 	)
 ));
 
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF GUI'), $form);
+$form->addItem($controls);
+
+$cnf_wdgt = (new CWidget())->setTitle(_('GUI'))->setControls($form);
 
 $config = select_config();
 
@@ -134,7 +136,6 @@ else {
 }
 
 $guiForm = new CView('administration.general.gui.edit', $data);
-$cnf_wdgt->addItem($guiForm->render());
-$cnf_wdgt->show();
+$cnf_wdgt->addItem($guiForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

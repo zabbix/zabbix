@@ -19,7 +19,7 @@
 **/
 
 
-$otherTab = new CFormList('scriptsTab');
+$otherTab = new CFormList();
 
 $discoveryGroup = new CComboBox('discovery_groupid', $data['discovery_groupid']);
 foreach ($data['discovery_groups'] as $group) {
@@ -46,7 +46,7 @@ $otherView->addTab('other', _('Other parameters'), $otherTab);
 
 $otherForm = new CForm();
 $otherForm->setName('otherForm');
+$otherView->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
 $otherForm->addItem($otherView);
-$otherForm->addItem(makeFormFooter(new CSubmit('update', _('Update'))));
 
 return $otherForm;

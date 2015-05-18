@@ -56,12 +56,8 @@ class CTag extends CObject {
 
 		$this->tagname = $tagname;
 		$this->paired = $paired;
-		$this->tag_start = $this->tag_end = $this->tag_body_start = $this->tag_body_end = '';
 
-		if (is_null($body)) {
-			$this->tag_end = $this->tag_body_start = '';
-		}
-		else {
+		if (!is_null($body)) {
 			$this->addItem($body);
 		}
 		$this->addClass($class);
@@ -69,7 +65,7 @@ class CTag extends CObject {
 
 	// do not put new line symbol (\n) before or after html tags, it adds spaces in unwanted places
 	public function startToString() {
-		$res = $this->tag_start.'<'.$this->tagname;
+		$res = '<'.$this->tagname;
 		foreach ($this->attributes as $key => $value) {
 			if ($value === null) {
 				continue;
@@ -86,12 +82,11 @@ class CTag extends CObject {
 	}
 
 	public function bodyToString() {
-		return $this->tag_body_start.parent::toString(false);
+		return parent::toString(false);
 	}
 
 	public function endToString() {
-		$res = ($this->paired === 'yes') ? $this->tag_body_end.'</'.$this->tagname.'>' : '';
-		$res .= $this->tag_end;
+		$res = ($this->paired === 'yes') ? '</'.$this->tagname.'>' : '';
 
 		return $res;
 	}
@@ -114,6 +109,8 @@ class CTag extends CObject {
 		}
 
 		parent::addItem($value);
+
+		return $this;
 	}
 
 	public function setName($value) {
@@ -143,7 +140,7 @@ class CTag extends CObject {
 			$this->attributes['class'] .= ' '.$cssClass;
 		}
 
-		return $this->attributes['class'];
+		return $this;
 	}
 
 	/**
@@ -181,6 +178,8 @@ class CTag extends CObject {
 		else {
 			$this->removeAttribute($name);
 		}
+
+		return $this;
 	}
 
 	/**
