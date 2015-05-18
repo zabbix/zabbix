@@ -145,10 +145,6 @@
 #	include <sys/dkstat.h>
 #endif
 
-#ifdef HAVE_SYS_SCHED_H
-#	include <sys/sched.h>
-#endif
-
 #ifdef HAVE_DEVSTAT_H
 #	include <devstat.h>
 #endif

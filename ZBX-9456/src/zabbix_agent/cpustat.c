@@ -26,6 +26,10 @@
 #include "mutexs.h"
 #include "log.h"
 
+#if defined(__OpenBSD__) && defined(HAVE_SYS_SCHED_H) && !defined(HAVE_SYS_DKSTAT_H)
+#	include <sys/sched.h>
+#endif
+
 #if !defined(_WINDOWS)
 #	define LOCK_CPUSTATS	zbx_mutex_lock(&cpustats_lock)
 #	define UNLOCK_CPUSTATS	zbx_mutex_unlock(&cpustats_lock)
