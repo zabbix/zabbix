@@ -1090,7 +1090,7 @@ class CConfigurationImport {
 				$dep_triggerid = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
 
 				if (!$dep_triggerid) {
-					throw new Exception(_s('Trigger prorotype "%1$s" depends on trigger "%2$s", which does not exist.',
+					throw new Exception(_s('Trigger prototype "%1$s" depends on trigger "%2$s", which does not exist.',
 						$trigger['description'],
 						$dependency['name']
 					));
