@@ -54,8 +54,12 @@ $autoloader = new CAutoloader(array(
 	__DIR__.'/../../include/classes/api/managers',
 	__DIR__.'/../../include/classes/html',
 	__DIR__.'/../../include/classes/html/interfaces',
+	__DIR__.'/../../include/classes/import',
+	__DIR__.'/../../include/classes/import/readers',
+	__DIR__.'/../../include/classes/import/converters',
 	__DIR__.'/include/classes/html',
 	__DIR__.'/include/classes/validators',
 	__DIR__.'/include/classes/parsers',
+	__DIR__.'/include/classes/import/converters',
 ));
 $autoloader->register();
