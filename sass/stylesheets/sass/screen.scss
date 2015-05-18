@@ -11,12 +11,13 @@ html {
 }
 
 body {
-	//@include font-body;
 	font-family: $font-stack;
 	font-size: $font-body-size;
 	line-height: $body-line-height;
-	color: $indigo-black;
-	background-color: $lightest-blue-grey;
+	//color: $indigo-black;
+	//background-color: $lightest-blue-grey;
+	color: $font-color;
+	background-color: $body-bg-color;
 	margin-bottom: 90px;
 	min-width: 950px;
 }
@@ -101,7 +102,6 @@ a {
 }
 
 h1 {
-	//@include font-h1;
 	font-size: $font-h1-size;
 	line-height: $h1-line-height;
 	border-bottom: 1px solid $lighter-blue-grey;
@@ -109,13 +109,11 @@ h1 {
 }
 
 h2 {
-	//@include font-h2;
 	font-size: $font-h2-size;
 	line-height: $h2-line-height;
 }
 
 h3 {
-	//@include font-h3;
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	color: $blue-grey;
@@ -124,7 +122,6 @@ h3 {
 }
 
 h4 {
-	//@include font-h4;
 	font-size: $font-h4-size;
 	line-height: $h4-line-height;
 
@@ -162,7 +159,8 @@ p {
 
 /* Main Navigation */
 nav {
-	background-color: darken($primary-blue, 17%);
+	//background-color: darken($primary-blue, 17%);
+	background-color: darken($main-color, 17%);
 
 	a {
 
@@ -196,12 +194,14 @@ nav {
 	height: 36px;
 	line-height: 35px;
 	position: relative;
-	background-color: $primary-blue;
+	//background-color: $primary-blue;
+	background-color: $main-color;
 }
 
 .top-nav {
 	font-size: $font-top-nav-size;
-	background-color: $primary-blue;
+	//background-color: $primary-blue;
+	background-color: $main-color;
 
 	li {
 		display: block;
@@ -223,7 +223,8 @@ nav {
 				line-height: 0;
 				border-left: 7px solid transparent;
 				border-right: 7px solid transparent;
-				border-bottom: 7px solid darken($primary-blue, 17%);
+				//border-bottom: 7px solid darken($primary-blue, 17%);
+				border-bottom: 7px solid darken($main-color, 17%);
 			}
 
 			a, a:hover {
@@ -283,24 +284,29 @@ ul.top-nav-icons {
     }
 
 	.top-nav-help {
-		background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -18px;
+		//background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -18px;
+		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -18px;
 	}
 
 	.top-nav-print {
-		background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -42px;
+		//background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -42px;
+		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -42px;
 	}
 
 	.top-nav-profile {
-		background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -66px;
+		//background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -66px;
+		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -66px;
 	}
 
 	.top-nav-signout {
-		background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -91px;
+		//background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -91px;
+		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -91px;
 		width: 44px;
 	}
 
 	.top-nav-zbbshare {
-		background: $primary-blue url(../img/icon-sprite.png) no-repeat -41px -138px;
+		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -41px -138px;
+		background: $main-color url(../img/icon-sprite.png) no-repeat -41px -138px;
 	    width: auto;
 		padding: 0 12px 0 27px;
 	}
@@ -310,8 +316,10 @@ ul.top-nav-icons {
 	}
 
 	input {
-		background-color: darken($primary-blue, 5%);
-		border: 1px solid darken($primary-blue, 6%);
+		//background-color: darken($primary-blue, 5%);
+		//border: 1px solid darken($primary-blue, 6%);
+		background-color: darken($main-color, 5%);
+		border: 1px solid darken($main-color, 6%);
 		width: 167px;
 		margin: 6px 7px 0 0;
 		color: $white;
@@ -320,7 +328,8 @@ ul.top-nav-icons {
 		@include transition(border-color .2s ease-out);
 
 		&:focus {
-			border-color: darken($primary-blue, 10%);
+			//border-color: darken($primary-blue, 10%);
+			border-color: darken($main-color, 10%);
 			@include opacity(1);
 		}
 
@@ -333,11 +342,13 @@ ul.top-nav-icons {
 .top-subnav-container {
 	height: 36px;
 	line-height: 36px;
-	background-color: darken($primary-blue, 17%);
+	//background-color: darken($primary-blue, 17%);
+	background-color: darken($main-color, 17%);
 }
 
 .top-subnav {
-	background-color: darken($primary-blue, 17%);
+	//background-color: darken($primary-blue, 17%);
+	background-color: darken($main-color, 17%);
 
 	li {
 		display: block;
@@ -361,7 +372,8 @@ ul.top-nav-icons {
 
 	&.selected {
 		@include border-radius(2px);
-		background-color: darken($primary-blue, 7%);
+		//background-color: darken($primary-blue, 7%);
+		background-color: darken($main-color, 7%);
 		color: $link-main-subnav-active-color;
 	}
 }
@@ -1354,10 +1366,13 @@ button::-moz-focus-inner {
 
 button {
 	@include border-radius(2px);
-	background-color: $primary-blue;
-	color: $white;
+	//background-color: $primary-blue;
+	//color: $white;
+	color: $btn-color;
+	background-color: $btn-bg-color;
 	font-family: $font-stack;
-	border: 1px solid $primary-blue;
+	//border: 1px solid $primary-blue;
+	border: 1px solid $btn-bg-color;
 	padding: 0 11px;
 	min-height: 24px;
 	vertical-align: middle;
@@ -1374,8 +1389,10 @@ button {
 
 	&.btn-alt {
 		@extend button;
-		background-color: $transparent;
-		color: $primary-blue;
+		//background-color: $transparent;
+		//color: $primary-blue;
+		color: $btn-alt-color;
+		background-color: $btn-alt-bg-color;
 
 		&:hover {
 			@extend %button-hover;
@@ -1387,7 +1404,8 @@ button {
 	}
 
 	&.btn-conf {
-		background: $primary-blue url(../img/icon-sprite.png) no-repeat -1px -145px;
+		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -1px -145px;
+		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -145px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -1400,7 +1418,8 @@ button {
 	}
 
 	&.btn-max {
-		background: $primary-blue url(../img/icon-sprite.png) no-repeat -1px -169px;
+		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -1px -169px;
+		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -169px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -1413,7 +1432,8 @@ button {
 	}
 
 	&.btn-min {
-		background: $primary-blue url(../img/icon-sprite.png) no-repeat -1px -193px;
+		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -1px -193px;
+		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -193px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -1426,7 +1446,8 @@ button {
 	}
 
 	&.btn-add-fav {
-		background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -1px;
+		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -1px;
+		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -1px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -1439,7 +1460,8 @@ button {
 	}
 
 	&.btn-remove-fav {
-		background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -25px;
+		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -25px;
+		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -25px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -1452,7 +1474,8 @@ button {
 	}
 
 	&.btn-action {
-		background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -49px;
+		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -49px;
+		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -49px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -1465,7 +1488,8 @@ button {
 	}
 
 	&.btn-info {
-		background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -73px;
+		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -73px;
+		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -73px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -1478,7 +1502,8 @@ button {
 	}
 
 	&.btn-reset {
-		background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -97px;
+		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -97px;
+		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -97px;
 		@extend %button-icon-size;
 		
 		&:hover {
@@ -1623,27 +1648,37 @@ button {
     } 
 
 	&.btn-grey {
-		background-color: $transparent;
-		color: $link-color;
-		border-color: $light-blue-grey;
+		//background-color: $transparent;
+		//color: $link-color;
+		color: $btn-form-color;
+		background-color: $btn-form-bg-color;
+		border-color: $btn-form-border-color;
+		//border-color: $light-blue-grey;
 
 		&:hover {
 			background-color: $alt-blue;
-			color: $link-color;
-			border-color: $light-blue-grey;
+			//color: $link-color;
+			color: $btn-form-hover-color;
+			border-color: $btn-form-border-color;
+			//border-color: $light-blue-grey;
 		}
 
 		&:active {
 			background-color: darken($alt-blue, 5%);
-			color: $link-color;
+			//color: $link-color;
+			color: $btn-form-color;
 		}
 
 		.arrow-left {
-			border-right-color: $link-color;
+			//border-right-color: $link-color;
+			border-right-color: $btn-form-color;
+
 		}
 
 		.arrow-right {
-			border-left-color: $link-color;
+			//border-left-color: $link-color;
+			border-left-color: $btn-form-color;
+
 		}
 	}
 
@@ -1677,15 +1712,21 @@ button {
 }
 
 %button-hover {
-	background-color: darken($primary-blue, 5%);
-	border-color: darken($primary-blue, 5%);
-	color: $white;
+	//background-color: darken($primary-blue, 5%);
+	//border-color: darken($primary-blue, 5%);
+	color: $btn-hover-color;
+	background-color: darken($btn-bg-color, 5%);
+	border-color: darken($btn-bg-color, 5%);
+	//color: $white;
 }
 
 %button-active {
-	background-color: darken($primary-blue, 17%);
-	border-color: darken($primary-blue, 17%);
-	color: $white;
+	//background-color: darken($primary-blue, 17%);
+	//border-color: darken($primary-blue, 17%);
+	color: $btn-active-color;
+	background-color: darken($btn-bg-color, 17%);
+	border-color: darken($btn-bg-color, 17%);
+	//color: $white;
 }
 
 %button-icon-size {
@@ -1701,8 +1742,10 @@ button {
 }
 
 %disabled {
-	color: $light-blue-grey;
-	border-color: $lighter-blue-grey;
+	//color: $light-blue-grey;
+	//border-color: $lighter-blue-grey;
+	color: $btn-disabled-color;
+	border-color: $btn-disabled-border-color;
 	cursor: default;
 }
 
@@ -1718,16 +1761,19 @@ button {
 
 button[disabled] {
 	@extend %disabled;
-	background-color: $transparent;
+	//background-color: $transparent;
+	background-color: $btn-disabled-bg-color;
 
 	&:hover {
 		@extend %disabled;
-		background-color: $transparent;
+		//background-color: $transparent;
+		background-color: $btn-disabled-bg-color;
 	}
 
 	&:active {
 		@extend %disabled;
-		background-color: $transparent;
+		//background-color: $transparent;
+		background-color: $btn-disabled-bg-color;
 	}
 }
 
@@ -1774,7 +1820,8 @@ button[disabled] {
 				color: $indigo-black;
 				text-decoration: none;
 				cursor: default;
-				border-top: 3px solid $primary-blue;
+				//border-top: 3px solid $primary-blue;
+				border-top: 3px solid $main-color;
 				border-bottom: 3px solid $white;
 			}
 		}
@@ -1838,7 +1885,8 @@ button[disabled] {
 			padding: 4px 0 4px 28px;
 
 			&.setup-left-current {
-				border-left: 3px solid $primary-blue;
+				//border-left: 3px solid $primary-blue;
+				border-left: 3px solid $main-color;
 				color: $blue-grey;
 				padding-left: 25px;
 			}

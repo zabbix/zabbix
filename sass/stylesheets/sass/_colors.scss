@@ -24,14 +24,16 @@ $alt-blue-grey: #97aab3;
 $white: #fff !default;
 $transparent: transparent;
 
-// MAIN COLORS
-$body-bg-color: #ebeef0 !default; //NEW page bg color
+
+// MAIN
+$main-color: #0275b8 !default; //NEW Used across main nav bg and main button bg
 $font-color: #1f2c33 !default; //NEW
 $font-alt-color: #768d99 !default; //NEW
-$main-color: #0275b8 !default; //NEW Used across main nav bg and main button bg
+$body-bg-color: #ebeef0 !default; //NEW page bg color
 //$main-subnav-bg-color: #013e61 !default; //NEW
 
-// UI COLORS
+
+// UI
 $ui-bg-color: #fff !default; //NEW ui element's bg color: widgets, containers for forms, tables, filters, action menus
 $ui-bg-hover-color: #e8f4fa !default; //NEW light blue hover for table rows, alt buttons, etc.
 $ui-border-color: #e8f4fa !default; //NEW
@@ -40,15 +42,55 @@ $action-border-color: #ccd5d9 !default; //NEW action menu item, calendar, all ov
 $table-border-color: #ebeef0 !default; // NEW row separator color in tables
 
 
-// FORM COLORS
-$form-border-color: #acbbc2 !default; //NEW
+// FORMS
+$form-color: #1f2c33 !default;
 $form-bg-color: #fff !default; //NEW
+$form-border-color: #acbbc2 !default; //NEW
+
 $form-disabled-bg-color: #ebebeb !default; //NEW
 
-// BUTTON COLORS
-$main-btn-bg-color: #0275b8 !default;
-$alt-btn-bg-color: transparent !default;
-$form-btn-bg-color: transparent !default;
+
+// BUTTONS
+$btn-color: #fff !default;
+$btn-hover-color: #fff !default;
+$btn-active-color: #fff !default;
+$btn-bg-color: #0275b8 !default;
+
+$btn-alt-color: #0275b8 !default;
+$btn-alt-hover-color: #0275b8 !default;
+$btn-alt-active-color: #0275b8 !default;
+$btn-alt-bg-color: transparent !default;
+$btn-alt-border-color: $btn-bg-color !default;
+
+$btn-form-color: #0275b8 !default;
+$btn-form-hover-color: #0275b8 !default;
+$btn-form-active-color: #0275b8 !default;
+$btn-form-bg-color: transparent !default;
+$btn-form-border-color: $form-border-color !default;
+
+$btn-disabled-color: #acbbc2 !default;
+$btn-disabled-hover-color: #acbbc2 !default;
+$btn-disabled-active-color: #acbbc2 !default;
+$btn-disabled-bg-color: transparent !default;
+$btn-disabled-border-color: #ccd5d9 !default;
+
+
+// LINKS
+$link-color: #0275b8 !default; // Primary Blue
+$link-hover-color: #0275b8 !default;
+$link-active-color: #0275b8 !default;
+$link-visited-color: #0275b8 !default;
+
+$link-main-nav-color: #bfdced !default; // Nav Blue
+$link-main-nav-hover-color: #fff !default;
+$link-main-nav-active-color: #fff !default;
+$link-main-nav-visited-color: #bfdced !default;
+
+$link-main-subnav-color: #bfced7 !default; // SubNav Blue
+$link-main-subnav-hover-color: #fff !default;
+$link-main-subnav-active-color: #fff !default;
+$link-main-subnav-visited-color: #bfced7 !default;
+
 
 
 
@@ -72,34 +114,3 @@ $light-grey: #ebebeb !default; // USED
 //$lighter-grey: #f2f2f2 !default;
 
 $indigo-black: #1f2c33 !default; // USED
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// LINK COLORS
-$link-color: #0275b8 !default; // Primary Blue
-$link-hover-color: #0275b8 !default;
-$link-active-color: #0275b8 !default;
-$link-visited-color: #0275b8 !default;
-
-$link-main-nav-color: #bfdced !default; // Nav Blue
-$link-main-nav-hover-color: #fff !default;
-$link-main-nav-active-color: #fff !default;
-$link-main-nav-visited-color: #bfdced !default;
-
-$link-main-subnav-color: #bfced7 !default; // SubNav Blue
-$link-main-subnav-hover-color: #fff !default;
-$link-main-subnav-active-color: #fff !default;
-$link-main-subnav-visited-color: #bfced7 !default;
-
