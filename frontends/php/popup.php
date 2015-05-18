@@ -1015,8 +1015,6 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 	$form->setName('triggerform');
 	$form->setAttribute('id', 'triggers');
 
-	$triggerPrototypesPopup = ($srctbl === 'trigger_prototypes');
-
 	$table = new CTableInfo();
 
 	$table->setHeader(array(
@@ -1038,7 +1036,7 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 		'expandDescription' => true
 	);
 
-	if ($triggerPrototypesPopup) {
+	if ($srctbl === 'trigger_prototypes') {
 		if ($parentDiscoveryId) {
 			$options['discoveryids'] = array($parentDiscoveryId);
 		}

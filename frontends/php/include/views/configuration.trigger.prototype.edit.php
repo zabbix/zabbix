@@ -302,7 +302,7 @@ $addButton = new CButton('add_dep_trigger', _('Add'),
 );
 $addPrototypeButton = new CButton('add_dep_trigger_prototype', _('Add prototype'),
 	'return PopUp("popup.php?srctbl=trigger_prototypes&srcfld1=triggerid&reference=deptrigger'.
-		url_param('parent_discoveryid').'&multiselect=1", 1000, 700);',
+		url_param('parent_discoveryid').'&multiselect=1");',
 	'link_menu'
 );
 $dependenciesFormList->addRow(_('Dependencies'),
