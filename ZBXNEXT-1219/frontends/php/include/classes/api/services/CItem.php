@@ -556,13 +556,13 @@ class CItem extends CItemGeneral {
 
 		$itemIds = array_keys(array_flip($itemIds));
 
-		$delItems = $this->get(array(
-			'output' => array('name', 'templateid', 'flags'),
-			'selectHosts' => array('name'),
+		$delItems = $this->get([
+			'output' => ['itemid', 'name', 'templateid', 'flags'],
+			'selectHosts' => ['name'],
 			'itemids' => $itemIds,
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
 		// TODO: remove $nopermissions hack
 		if (!$nopermissions) {
@@ -645,29 +645,44 @@ class CItem extends CItemGeneral {
 		));
 
 		/*
-		 * Find discovered applications for items or created items. Delete items and re-check if discovered applications
-		 * are no longer linked to other items.
+		 * Collect only discovered items to that will be deleted. Deleting a normal item, linkage between
+		 * discovered applications is not checked and those applications are left alone.
 		 */
-		$discovered_applications = API::Application()->get(array(
-			'output' => array('applicationid'),
-			'itemids' => $itemIds,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
-			'preservekeys' => true
-		));
+		$discovered_items_to_delete = [];
+		$discovered_applications = [];
+
+		foreach ($delItems as $delItem) {
+			if ($delItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				$discovered_items_to_delete[$delItem['itemid']] = true;
+			}
+		}
+
+		if ($discovered_items_to_delete) {
+			/*
+			 * Find discovered applications for created items. Chain-delete discovered items (for example deleting
+			 * an item prototype) and re-check if discovered applications are no longer linked to other items.
+			 * In case applications are still linked to normal items, leave them be.
+			 */
+			$discovered_applications = API::Application()->get([
+				'output' => [],
+				'itemids' => array_keys($discovered_items_to_delete),
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+				'preservekeys' => true
+			]);
+		}
 
 		DB::delete('items', array('itemid' => $itemIds));
 
-		if ($discovered_applications) {
-			$applicationids = array_keys($discovered_applications);
+		if ($discovered_items_to_delete && $discovered_applications) {
+			// Check if discovered applications are no longer linked to other items.
+			$discovered_applications = API::Application()->get([
+				'output' => ['applicationid'],
+				'selectItems' => ['itemid'],
+				'applicationids' => array_keys($discovered_applications),
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
+			]);
 
-			$discovered_applications = API::Application()->get(array(
-				'output' => array('applicationid'),
-				'selectItems' => array('itemid'),
-				'applicationids' => $applicationids,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED)
-			));
-
-			$applications_to_delete = array();
+			$applications_to_delete = [];
 
 			foreach ($discovered_applications as $discovered_application) {
 				if (!$discovered_application['items']) {
