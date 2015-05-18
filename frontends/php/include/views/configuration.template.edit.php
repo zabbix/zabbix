@@ -55,9 +55,14 @@ if ($data['templateId'] != 0 && !hasRequest('form_refresh')) {
 		$visiblename = '';
 	}
 
-	$macros = order_macros($this->data['dbTemplate']['macros'], 'macro');
+	$macros = $this->data['dbTemplate']['macros'];
 	$templateIds = $this->data['original_templates'];
 }
+
+if ($data['show_inherited_macros']) {
+	$macros = mergeInheritedMacros($macros, getInheritedMacros($templateIds));
+}
+$macros = array_values(order_macros($macros, 'macro'));
 
 $clear_templates = array_intersect($clear_templates, array_keys($this->data['original_templates']));
 $clear_templates = array_diff($clear_templates, array_keys($templateIds));
@@ -376,7 +381,7 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 // } TEMPLATE WIDGET
 
 // TEMPLATES{
-$tmplList = new CFormList('tmpllist');
+$tmplList = new CFormList();
 
 // create linked template table
 $linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');
@@ -426,9 +431,7 @@ $newTemplateTable->addRow(array(new CMultiSelect(array(
 	'ignored' => $ignoredTemplates,
 	'popup' => array(
 		'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-			'&dstfld1=add_templates_&templated_hosts=1&multiselect=1',
-		'width' => 450,
-		'height' => 450
+			'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
 	)
 ))));
 
@@ -444,19 +447,25 @@ $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 // } TEMPLATES
 
 // macros
-if (empty($macros)) {
-	$macros = array(array('macro' => '', 'value' => ''));
+if (!$macros) {
+	$macro = ['macro' => '', 'value' => ''];
+	if ($data['show_inherited_macros']) {
+		$macro['type'] = MACRO_TYPE_HOSTMACRO;
+	}
+	$macros[] = $macro;
 }
-$macrosView = new CView('common.macros', array(
-	'macros' => $macros
+
+$macrosView = new CView('hostmacros', array(
+	'macros' => $macros,
+	'show_inherited_macros' => $data['show_inherited_macros'],
+	'readonly' => false
 ));
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 
-$frmHost->addItem($divTabs);
 
 // Footer
 if ($data['templateId'] != 0 && $data['form'] !== 'full_clone') {
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -473,10 +482,12 @@ if ($data['templateId'] != 0 && $data['form'] !== 'full_clone') {
 	));
 }
 else {
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('groupid')))
 	));
 }
+
+$frmHost->addItem($divTabs);
 
 return $frmHost;

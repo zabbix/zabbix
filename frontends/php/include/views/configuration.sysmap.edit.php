@@ -21,8 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.sysmap.edit.js.php';
 
-$sysmapWidget = new CWidget();
-$sysmapWidget->addPageHeader(_('CONFIGURATION OF NETWORK MAPS'));
+$sysmapWidget = (new CWidget())->setTitle(_('Network maps'));
 
 // create sysmap form
 $sysmapForm = new CForm();
@@ -34,7 +33,7 @@ if (isset($this->data['sysmap']['sysmapid'])) {
 }
 
 // create sysmap form list
-$sysmapList = new CFormList('sysmaplist');
+$sysmapList = new CFormList();
 
 $nameTextBox = new CTextBox('name', $this->data['sysmap']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
@@ -147,7 +146,7 @@ foreach ($this->data['sysmap']['urls'] as $url) {
 	$urlLabel = new CTextBox('urls['.$i.'][name]', $url['name'], 32);
 	$urlLink = new CTextBox('urls['.$i.'][url]', $url['url'], 32);
 	$urlEtype = new CComboBox('urls['.$i.'][elementtype]', $url['elementtype'], null, sysmap_element_types());
-	$removeButton = new CSpan(_('Remove'), 'link_menu');
+	$removeButton = new CSpan(_('Remove'), ZBX_STYLE_LINK_ACTION.' link_menu');
 	$removeButton->addAction('onclick', '$("urlEntry_'.$i.'").remove();');
 
 	$urlRow = new CRow(array($urlLabel, $urlLink, $urlEtype, $removeButton));
@@ -164,7 +163,7 @@ $templateUrlLink = new CTextBox('urls[#{id}][url]', '', 32);
 $templateUrlLink->setAttribute('disabled', 'disabled');
 $templateUrlEtype = new CComboBox('urls[#{id}][elementtype]', null, null, sysmap_element_types());
 $templateUrlEtype->setAttribute('disabled', 'disabled');
-$templateRemoveButton = new CSpan(_('Remove'), 'link_menu');
+$templateRemoveButton = new CSpan(_('Remove'), ZBX_STYLE_LINK_ACTION.' link_menu');
 $templateRemoveButton->addAction('onclick', '$("entry_#{id}").remove();');
 $templateUrlRow = new CRow(array($templateUrlLabel, $templateUrlLink, $templateUrlEtype, $templateRemoveButton));
 $templateUrlRow->addStyle('display: none');
@@ -172,7 +171,7 @@ $templateUrlRow->setAttribute('id', 'urlEntryTpl');
 $urlTable->addRow($templateUrlRow);
 
 // append "add" button to url table
-$addButton = new CSpan(_('Add'), 'link_menu');
+$addButton = new CSpan(_('Add'), ZBX_STYLE_LINK_ACTION.' link_menu');
 $addButton->addAction('onclick', 'cloneRow("urlEntryTpl", '.$i.')');
 $addButtonColumn = new CCol($addButton);
 $addButtonColumn->setColSpan(4);
@@ -184,11 +183,10 @@ $sysmapList->addRow(_('URLs'), new CDiv($urlTable, 'objectgroup inlineblock bord
 // append sysmap to form
 $sysmapTab = new CTabView();
 $sysmapTab->addTab('sysmapTab', _('Map'), $sysmapList);
-$sysmapForm->addItem($sysmapTab);
 
 // append buttons to form
 if (hasRequest('sysmapid') && getRequest('sysmapid') > 0) {
-	$sysmapForm->addItem(makeFormFooter(
+	$sysmapTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array (
 			new	CButton('clone', _('Clone')),
@@ -198,12 +196,13 @@ if (hasRequest('sysmapid') && getRequest('sysmapid') > 0) {
 	));
 }
 else {
-	$sysmapForm->addItem(makeFormFooter(
+	$sysmapTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
 
+$sysmapForm->addItem($sysmapTab);
 
 // append form to widget
 $sysmapWidget->addItem($sysmapForm);

@@ -52,11 +52,10 @@ else {
 // append tab
 $valueMappingTab = new CTabView();
 $valueMappingTab->addTab('valuemapping', _('Value mapping'), $valueMappingFormList);
-$valueMappingForm->addItem($valueMappingTab);
 
 // append buttons
 if (!empty($this->data['valuemapid'])) {
-	$valueMappingForm->addItem(makeFormFooter(
+	$valueMappingTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CButtonDelete($this->data['confirmMessage'], url_param('valuemapid')),
@@ -65,10 +64,12 @@ if (!empty($this->data['valuemapid'])) {
 	));
 }
 else {
-	$valueMappingForm->addItem(makeFormFooter(
+	$valueMappingTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
+
+$valueMappingForm->addItem($valueMappingTab);
 
 return $valueMappingForm;

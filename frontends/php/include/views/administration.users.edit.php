@@ -22,12 +22,10 @@
 include('include/views/js/administration.users.edit.js.php');
 
 if ($this->data['is_profile']) {
-	$userWidget = new CWidget(null, 'profile');
-	$userWidget->addPageHeader(_('USER PROFILE').NAME_DELIMITER.$this->data['name'].' '.$this->data['surname']);
+	$userWidget = (new CWidget('profile'))->setTitle(_('User profile').NAME_DELIMITER.$this->data['name'].' '.$this->data['surname']);
 }
 else {
-	$userWidget = new CWidget();
-	$userWidget->addPageHeader(_('CONFIGURATION OF USERS'));
+	$userWidget = (new CWidget())->setTitle(_('Users'));
 }
 
 // create form
@@ -66,7 +64,7 @@ if (!$this->data['is_profile']) {
 		array(
 			$lstGroups,
 			new CButton('add_group', _('Add'),
-				'return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups", 450, 450);', 'button-form top'),
+				'return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups");', 'button-form top'),
 			BR(),
 			(count($this->data['user_groups']) > 0)
 				? new CSubmit('del_user_group', _('Delete selected'), null, 'button-form')
@@ -174,7 +172,7 @@ if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TY
 	$userMediaFormList = new CFormList('userMediaFormList');
 	$userForm->addVar('user_medias', $this->data['user_medias']);
 
-	$mediaTableInfo = new CTableInfo(_('No media found.'));
+	$mediaTableInfo = new CTableInfo();
 
 	foreach ($this->data['user_medias'] as $id => $media) {
 		if (!isset($media['active']) || !$media['active']) {
@@ -205,17 +203,17 @@ if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TY
 
 		$mediaTableInfo->addRow(array(
 			new CCheckBox('user_medias_to_del['.$id.']', null, null, $id),
-			new CSpan($media['description'], 'nowrap'),
-			new CSpan($media['sendto'], 'nowrap'),
-			new CSpan($media['period'], 'nowrap'),
+			new CSpan($media['description'], ZBX_STYLE_NOWRAP),
+			new CSpan($media['sendto'], ZBX_STYLE_NOWRAP),
+			new CSpan($media['period'], ZBX_STYLE_NOWRAP),
 			$mediaSeverity,
 			$status,
-			new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'", 550, 400);', 'link_menu'))
+			new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'");', 'link_menu'))
 		);
 	}
 
 	$userMediaFormList->addRow(_('Media'), array($mediaTableInfo,
-		new CButton('add_media', _('Add'), 'return PopUp("popup_media.php?dstfrm='.$userForm->getName().'", 550, 400);', 'link_menu'),
+		new CButton('add_media', _('Add'), 'return PopUp("popup_media.php?dstfrm='.$userForm->getName().'");', 'link_menu'),
 		SPACE,
 		SPACE,
 		(count($this->data['user_medias']) > 0) ? new CSubmit('del_user_media', _('Delete selected'), null, 'link_menu') : null
@@ -332,9 +330,6 @@ if (isset($userMessagingFormList)) {
 	$userTab->addTab('messagingTab', _('Messaging'), $userMessagingFormList);
 }
 
-// append tab to form
-$userForm->addItem($userTab);
-
 // append buttons to form
 if ($data['userid'] != 0) {
 	$buttons = array(
@@ -350,14 +345,17 @@ if ($data['userid'] != 0) {
 		array_unshift($buttons, $deleteButton);
 	}
 
-	$userForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$userTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
-	$userForm->addItem(makeFormFooter(
+	$userTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel())
 	));
 }
+
+// append tab to form
+$userForm->addItem($userTab);
 
 // append form to widget
 $userWidget->addItem($userForm);

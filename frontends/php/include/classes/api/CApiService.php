@@ -664,16 +664,18 @@ class CApiService {
 	 * @return array
 	 */
 	protected function extendObjects($tableName, array $objects, array $fields) {
-		$dbObjects = API::getApiService()->select($tableName, array(
-			'output' => $fields,
-			$this->pkOption($tableName) => zbx_objectValues($objects, $this->pk($tableName)),
-			'preservekeys' => true
-		));
+		if ($objects) {
+			$dbObjects = API::getApiService()->select($tableName, array(
+				'output' => $fields,
+				$this->pkOption($tableName) => zbx_objectValues($objects, $this->pk($tableName)),
+				'preservekeys' => true
+			));
 
-		foreach ($objects as &$object) {
-			$pk = $object[$this->pk($tableName)];
-			if (isset($dbObjects[$pk])) {
-				check_db_fields($dbObjects[$pk], $object);
+			foreach ($objects as &$object) {
+				$pk = $object[$this->pk($tableName)];
+				if (isset($dbObjects[$pk])) {
+					check_db_fields($dbObjects[$pk], $object);
+				}
 			}
 		}
 

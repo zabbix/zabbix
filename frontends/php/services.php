@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 $page['title'] = _('Configuration of IT services');
 $page['file'] = 'services.php';
 $page['scripts'] = array('class.calendar.js');
-$page['hist_arg'] = array();
 
 if (isset($_REQUEST['pservices']) || isset($_REQUEST['cservices'])) {
 	define('ZBX_PAGE_NO_MENU', 1);

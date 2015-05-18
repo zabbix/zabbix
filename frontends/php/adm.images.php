@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/include/images.inc.php';
 
 $page['title'] = _('Configuration of images');
 $page['file'] = 'adm.images.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -130,7 +129,9 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['imageid'])) {
  */
 $form = new CForm();
 $form->cleanItems();
-$form->addItem(new CComboBox('configDropDown', 'adm.images.php',
+
+$controls = new CList();
+$controls->addItem(new CComboBox('configDropDown', 'adm.images.php',
 	'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
@@ -151,11 +152,11 @@ if (!isset($_REQUEST['form'])) {
 	$imageType = getRequest('imagetype', IMAGE_TYPE_ICON);
 
 	$form->addVar('imagetype', $imageType);
-	$form->addItem(new CSubmit('form',  ($imageType == IMAGE_TYPE_ICON) ? _('Create icon') : _('Create background')));
+	$controls->addItem(new CSubmit('form',  ($imageType == IMAGE_TYPE_ICON) ? _('Create icon') : _('Create background')));
 }
+$form->addItem($controls);
 
-$imageWidget = new CWidget();
-$imageWidget->addPageHeader(_('CONFIGURATION OF IMAGES'), $form);
+$imageWidget = (new CWidget())->setTitle(_('Images'))->setControls($form);
 
 $data = array(
 	'form' => getRequest('form'),
@@ -188,7 +189,6 @@ else {
 	$imageForm = new CView('administration.general.image.list', $data);
 }
 
-$imageWidget->addItem($imageForm->render());
-$imageWidget->show();
+$imageWidget->addItem($imageForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

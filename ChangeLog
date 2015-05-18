@@ -1,6 +1,9 @@
 Changes for 2.5.0
 
 New features:
+..F....... [ZBXNEXT-210] added displaying of the available user macros on host and template level (Sasha)
+A.F....... [ZBX-7654] implemented XML import versioning and fixed various XML validation issues (Pavels, Oleg, Sasha)
+..F.I..PS. [ZBXNEXT-2800] increased error field lengths in "hosts" table from 128 to 2048 (asaveljevs)
 ....I..... [ZBXNEXT-2495] improved performance of maps; changed triggers_2 index (Sasha)
 ........S. [ZBXNEXT-2474] improved value cache low memory mode handling by switching back to normal mode once per day. The current value cache operational mode now can be checked with zabbix[vcache,cache,mode] interval item (wiper)
 ........S. [ZBXNEXT-2462] improved nodata() function calculation (wiper)
@@ -79,6 +82,7 @@ A.F....... [ZBX-1357] updated Dutch translation; thanks to Zabbix translators (R
 ...G...PS. [ZBXNEXT-786] made net.tcp.service[ntp] item work over UDP (asaveljevs)
 
 Bug fixes:
+...G...... [ZBX-9385] fixed proc.num[,,run] and proc.num[,,sleep] always returning 0 on AIX hosts (asaveljevs)
 ...G...PS. [ZBX-9511] fixed compiler warnings in discoverer, SNMP trapper, LLD, and DNS item code (asaveljevs)
 .......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)

@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/discovery.inc.php';
 
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'discoveryconf.php';
-$page['hist_arg'] = array();
 $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';

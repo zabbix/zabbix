@@ -29,10 +29,6 @@ class CImg extends CTag {
 		}
 
 		parent::__construct('img', 'no');
-		$this->tag_start = '';
-		$this->tag_end = '';
-		$this->tag_body_start = '';
-		$this->tag_body_end = '';
 		$this->setAttribute('border', 0);
 		$this->setName($name);
 		$this->setAltText($name);
