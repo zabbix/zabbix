@@ -1,5 +1,7 @@
 @import '_reset.scss';
-@import '_variables.scss';
+@import '_colors.scss';
+@import '_fonts.scss';
+@import '_mixins.scss';
 
 /* ----------- Zabbix Styles ----------- */
 
@@ -9,7 +11,10 @@ html {
 }
 
 body {
-	@include font-body;
+	//@include font-body;
+	font-family: $font-stack;
+	font-size: $font-body-size;
+	line-height: $body-line-height;
 	color: $indigo-black;
 	background-color: $lightest-blue-grey;
 	margin-bottom: 90px;
@@ -35,7 +40,7 @@ a {
 	}
 
 	&:active {
-		border-bottom: 1px solid;
+		border-bottom: 1px solid rgba(2,117,184,0.5);
 		color: $link-active-color;
 	}
 }
@@ -96,21 +101,32 @@ a {
 }
 
 h1 {
-	@include font-h1;
+	//@include font-h1;
+	font-size: $font-h1-size;
+	line-height: $h1-line-height;
 	border-bottom: 1px solid $lighter-blue-grey;
 	padding: 0 0 5px 0;
 }
 
 h2 {
-	@include font-h2;
+	//@include font-h2;
+	font-size: $font-h2-size;
+	line-height: $h2-line-height;
 }
 
 h3 {
-	@include font-h3;
+	//@include font-h3;
+	font-size: $font-h3-size;
+	text-transform: $font-transform;
+	color: $blue-grey;
+	letter-spacing: 0.0688em;
+	text-rendering: optimizeLegibility;
 }
 
 h4 {
-	@include font-h4;
+	//@include font-h4;
+	font-size: $font-h4-size;
+	line-height: $h4-line-height;
 
 	span {
 		font-size: $font-body-size;
@@ -1145,12 +1161,6 @@ footer {
 				display: block;
 			}
 		}
-
-		//label {
-		//	display: block;
-		//	height: 24px;
-		//	line-height: 24px;
-		//}
 	}
 }
 
@@ -1258,8 +1268,6 @@ input {
 }
 
 textarea {
-	//height: 12px;
-	//line-height: 12px;
 	width: 300px;
 	height: 50px;
 	padding: 5px 0 0 5px;
@@ -1280,8 +1288,6 @@ textarea {
 }
 
 select {
-	//height: 24px;
-	//line-height: 24px;
 	padding: 3px 3px 3px 0;
 	background-color: $white;
 	@extend %form-input-style;
@@ -1328,14 +1334,13 @@ legend {
 }
 
 %form-input-height-padding {
-	//height: 22px;
-	//line-height: 22px;
 	padding: 4px 5px;
 }
 
 %form-input-style {
 	border: 1px solid $light-blue-grey;
-	@include font-form;
+	font-family: $font-stack;
+	font-size: $font-form-size;
 	@include transition(border-color .2s ease-out);
 
 	&:focus {
@@ -1888,7 +1893,8 @@ button[disabled] {
 	height: 350px;
 	display: table-cell;
 	vertical-align: middle;
-	@include font-setup-title;
+	font-size: $font-setup-title;
+	line-height: $setup-title-line-height;
 
 	span {
 		display: block;
