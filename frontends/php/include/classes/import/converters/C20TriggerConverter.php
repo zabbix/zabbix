@@ -22,7 +22,7 @@
 /**
  * Trigger expression converter from 2.2 to 2.4.
  */
-class C24TriggerConverter {
+class C20TriggerConverter extends CConverter {
 
 	/**
 	 * A parser for function macros.
@@ -42,9 +42,9 @@ class C24TriggerConverter {
 	 * @param CFunctionMacroParser  $functionMacroParser
 	 * @param CMacroParser          $lldMacroParser
 	 */
-	public function __construct(CFunctionMacroParser $functionMacroParser, CMacroParser $lldMacroParser) {
-		$this->functionMacroParser = $functionMacroParser;
-		$this->lldMacroParser = $lldMacroParser;
+	public function __construct() {
+		$this->functionMacroParser = new CFunctionMacroParser();
+		$this->lldMacroParser = new CMacroParser('#');
 	}
 
 	/**

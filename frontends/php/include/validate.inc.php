@@ -23,23 +23,6 @@ function unset_request($key) {
 	unset($_GET[$key], $_POST[$key], $_REQUEST[$key]);
 }
 
-function is_int_range($value) {
-	if (!empty($value)) {
-		foreach (explode(',', $value) as $int_range) {
-			$int_range = explode('-', $int_range);
-			if (count($int_range) > 2) {
-				return false;
-			}
-			foreach ($int_range as $int_val) {
-				if (!is_numeric($int_val)) {
-					return false;
-				}
-			}
-		}
-	}
-	return true;
-}
-
 function BETWEEN($min, $max, $var = null) {
 	return '({'.$var.'}>='.$min.'&&{'.$var.'}<='.$max.')&&';
 }
