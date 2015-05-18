@@ -644,26 +644,12 @@ class CItemPrototype extends CItemGeneral {
 			}
 		}
 
+		// Find discovered applications that have been discovered from only one rule and delete them.
 		DB::replace('item_application_prototype', $old_records, $new_records);
 
 		// Find and delete application prototypes from database that are no longer linked to any item prototypes.
 		if ($application_prototypes_to_remove) {
-			$db_application_prototypes = DBfetchArray(DBselect(
-				'SELECT ap.application_prototypeid'.
-				' FROM application_prototype ap'.
-				' WHERE NOT EXISTS ('.
-					'SELECT NULL'.
-					' FROM item_application_prototype iap'.
-					' WHERE ap.application_prototypeid=iap.application_prototypeid'.
-				')'.
-				' AND '.dbConditionInt('ap.application_prototypeid', array_keys($application_prototypes_to_remove))
-			));
-
-			if ($db_application_prototypes) {
-				DB::delete('application_prototype', array(
-					'application_prototypeid' => zbx_objectValues($db_application_prototypes, 'application_prototypeid')
-				));
-			}
+			$this->deleteApplicationPrototypes(array_keys($application_prototypes_to_remove));
 		}
 
 // TODO: REMOVE info
@@ -814,24 +800,11 @@ class CItemPrototype extends CItemGeneral {
 				)
 			));
 
-			$db_application_prototypes = DBfetchArray(DBselect(
-				'SELECT ap.application_prototypeid'.
-				' FROM application_prototype ap'.
-				' WHERE NOT EXISTS ('.
-					'SELECT NULL'.
-					' FROM item_application_prototype iap'.
-					' WHERE ap.application_prototypeid=iap.application_prototypeid'.
-				')'.
-				' AND '.dbConditionInt('ap.application_prototypeid',
-					zbx_objectValues($db_item_application_prototypes, 'application_prototypeid')
-				)
-			));
+			$application_prototypeids = zbx_objectValues($db_item_application_prototypes, 'application_prototypeid');
 
-			if ($db_application_prototypes) {
-				DB::delete('application_prototype', array(
-					'application_prototypeid' => zbx_objectValues($db_application_prototypes, 'application_prototypeid')
-				));
-			}
+			$this->deleteApplicationPrototypes(zbx_objectValues($db_item_application_prototypes,
+				'application_prototypeid'
+			));
 		}
 
 // ITEM PROTOTYPES
@@ -845,6 +818,61 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		return array('prototypeids' => $prototypeids);
+	}
+
+	/*
+	 * Finds and deletes application prototypes by given IDs. Looks for discovered applications that were created from
+	 * prototypes and deletes them if they are not discovered by other rules.
+	 *
+	 * @param array $application_prototypeids
+	 */
+	protected function deleteApplicationPrototypes(array $application_prototypeids) {
+		$db_application_prototypes = DBfetchArray(DBselect(
+			'SELECT ap.application_prototypeid'.
+			' FROM application_prototype ap'.
+			' WHERE NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM item_application_prototype iap'.
+				' WHERE ap.application_prototypeid=iap.application_prototypeid'.
+			')'.
+			' AND '.dbConditionInt('ap.application_prototypeid', $application_prototypeids)
+		));
+
+		if ($db_application_prototypes) {
+			// Find discovered applications for deletable application prototypes.
+			$discovered_applications = DBfetchArray(DBselect(
+				'SELECT DISTINCT ad.applicationid'.
+				' FROM application_discovery ad'.
+				' WHERE '.dbConditionInt('ad.application_prototypeid', $application_prototypeids)
+			));
+
+			DB::delete('application_prototype', [
+				'application_prototypeid' => zbx_objectValues($db_application_prototypes, 'application_prototypeid')
+			]);
+
+			/*
+			 * Deleting an application prototype will automatically delete the link in 'item_application_prototype',
+			 * but it will not delete the actual discovered application. When the link is gone,
+			 * delete the discoveted application. Link between a regular item does not matter any more.
+			 */
+			if ($discovered_applications) {
+				$discovered_applicationids = zbx_objectValues($discovered_applications, 'applicationid');
+
+				$discovered_applications_to_delete = DBfetchArray(DBselect(
+					'SELECT DISTINCT ad.applicationid'.
+					' FROM application_discovery ad'.
+					' WHERE '.dbConditionInt('ad.applicationid', $discovered_applicationids)
+				));
+
+				$applications_to_delete = array_diff($discovered_applicationids,
+					zbx_objectValues($discovered_applications_to_delete, 'applicationid')
+				);
+
+				if ($applications_to_delete) {
+					API::Application()->delete($applications_to_delete, true);
+				}
+			}
+		}
 	}
 
 	public function syncTemplates($data) {

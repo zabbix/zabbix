@@ -78,7 +78,7 @@ foreach ($this->data['applications'] as $application) {
 	elseif ($application['discoveryRule']) {
 		$name = array(new CLink(CHtml::encode($application['discoveryRule']['name']),
 			'disc_prototypes.php?parent_discoveryid='.$application['discoveryRule']['itemid'],
-			'parent-discovery'
+			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_ORANGE
 		));
 		$name[] = NAME_DELIMITER.$application['name'];
 	}
