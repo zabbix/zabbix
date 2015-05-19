@@ -104,7 +104,8 @@ a {
 h1 {
 	font-size: $font-h1-size;
 	line-height: $h1-line-height;
-	border-bottom: 1px solid $lighter-blue-grey;
+	//border-bottom: 1px solid $lighter-blue-grey;
+	border-bottom: 1px solid darken($body-bg-color, 10%);
 	padding: 0 0 5px 0;
 }
 
@@ -532,12 +533,14 @@ footer {
 
 	    	&:hover {
 	    		text-decoration: none;
-	    		background-color: $alt-blue;
+	    		//background-color: $alt-blue;
+	    		background-color: $ui-hover-color
 	    	}
 
 	    	&:active {
 	    		text-decoration: none;
-	    		background-color: darken($alt-blue, 5%);
+	    		//background-color: darken($alt-blue, 5%);
+	    		background-color: darken($ui-hover-color, 5%);
 	    	}	    
 	    }
 	}
@@ -546,7 +549,8 @@ footer {
 		@include transition(background-color .2s ease-out);
 
 		&:hover {
-			background-color: $alt-blue;
+			//background-color: $alt-blue;
+			background-color: $ui-hover-color;
 		}
 
 		&.row-selected {
@@ -610,12 +614,14 @@ footer {
 
 	&:hover {
 		color: $link-hover-color;
-		background-color: $alt-blue;
+		//background-color: $alt-blue;
+		background-color: $ui-hover-color;
 	}
 
 	&:active {
 		color: $link-active-color;
-		background-color: darken($alt-blue, 5%);
+		//background-color: darken($alt-blue, 5%);
+		background-color: darken($ui-hover-color, 5%);
 	}
 
 	&:first-child {
@@ -655,11 +661,13 @@ footer {
 	@include border-radius(2px);
 
 	&:hover {
-		background-color: $alt-blue;
+		//background-color: $alt-blue;
+		background-color: $ui-hover-color;
 	}
 
 	&:active {
-		background-color: darken($alt-blue, 5%);
+		//background-color: darken($alt-blue, 5%);
+		background-color: darken($ui-hover-color, 5%);
 	}
 }
 
@@ -903,7 +911,7 @@ footer {
 	position: absolute;
 	z-index: 1000;
 	margin-top: 1px;
-	border: 1px solid $lighter-blue-grey;
+	border: 1px solid $action-border-color;
 	border-top: none;
 	min-width: 165px;
 	max-height: 400px;
@@ -1008,11 +1016,13 @@ footer {
 	@include border-radius(2px);
 
 	&:hover {
-		background-color: $alt-blue;
+		//background-color: $alt-blue;
+		background-color: $ui-hover-color;
 	}
 
 	&:active {
-		background-color: darken($alt-blue, 5%);
+		//background-color: darken($alt-blue, 5%);
+		background-color: darken($ui-hover-color, 5%);
 	}
 
 	.center {
@@ -1322,7 +1332,8 @@ select {
 }
 
 fieldset {
-	border: 1px solid $lighter-blue-grey;
+	//border: 1px solid $lighter-blue-grey;
+	border: 1px solid lighten($form-border-color, 10%);
 	padding: 0 10px 10px 15px;
 }
 
@@ -1655,17 +1666,19 @@ button {
 		//border-color: $light-blue-grey;
 
 		&:hover {
-			background-color: $alt-blue;
+			//background-color: $alt-blue;
 			//color: $link-color;
 			color: $btn-form-hover-color;
+			background-color: $ui-hover-color;
 			border-color: $btn-form-border-color;
 			//border-color: $light-blue-grey;
 		}
 
 		&:active {
-			background-color: darken($alt-blue, 5%);
+			//background-color: darken($alt-blue, 5%);
 			//color: $link-color;
 			color: $btn-form-font-color;
+			background-color: darken($ui-hover-color, 5%);
 		}
 
 		.arrow-left {
@@ -2129,7 +2142,7 @@ button[disabled] {
 	padding: 5px 15px 5px 25px;
 	min-width: 166px;
 	background-color: $ui-bg-color;
-	border: 1px solid $lighter-blue-grey;
+	border: 1px solid $action-border-color;
 	@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
 
 	li {
@@ -2154,22 +2167,22 @@ button[disabled] {
 		@include transition(background-color .2s ease-out);
 
 		&:hover {
-			background-color: $light-grey;
+			background-color: $action-hover-color;
 		}
 
 		&:active {
-			background-color: $light-grey;
+			background-color: $action-hover-color;
 		}
 
 		&.selected {
 			background: url(../img/icon-sprite.png) no-repeat -46px -169px;
 
 			&:hover {
-				background-color: $light-grey;
+				background-color: $action-hover-color;
 			}
 
 			&:active {
-				background-color: $light-grey;
+				background-color: $action-hover-color;
 			}
 		}
 
@@ -2204,7 +2217,7 @@ button[disabled] {
 	min-width: 16px;
 	color: $font-alt-color;
 	background-color: $form-bg-color;
-	border: 1px solid $lighter-blue-grey;
+	border: 1px solid $action-border-color;
 	border-top: none;
 	@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
 
@@ -2219,7 +2232,7 @@ button[disabled] {
 		@include transition(background-color .2s ease-out);
 
 		&.suggest-hover {
-			background-color: $light-grey;
+			background-color: $action-hover-color;
 		}
 	}
 }
@@ -2229,7 +2242,7 @@ button[disabled] {
 	z-index: 1000;
 	padding: 15px;
 	background-color: $ui-bg-color;
-	border: 1px solid $lighter-blue-grey;
+	border: 1px solid $action-border-color;
 	@include box-shadow(0 5px 20px 0 rgba(118,141,153,0.3));
 
 	.list-table {
@@ -2328,7 +2341,7 @@ button[disabled] {
 	width: 200px;
 
 	.selected {
-		background-color: $blue-grey;
+		background-color: $light-blue-grey;
 		color: $white;
 
 		&:hover {
@@ -2353,7 +2366,7 @@ button[disabled] {
 				@include transition(background-color .2s ease-out);
 
 				&:hover {
-					background-color: $light-grey;
+					background-color: $action-hover-color;
 					cursor: pointer;
 				}
 			}
@@ -2737,12 +2750,12 @@ td.disaster-bg {
 	@include border-radius(2px);
 
 	&:hover {
-		background-color: $light-grey;
+		background-color: $action-hover-color;
 		text-decoration: none;
 	}
 
 	&:active {
-		background-color: darken($light-grey, 5%);
+		background-color: darken($action-hover-color, 5%);
 		text-decoration: none;
 	}
 }
