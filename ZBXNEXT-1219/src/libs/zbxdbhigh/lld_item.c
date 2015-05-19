@@ -168,7 +168,8 @@ zbx_lld_application_prototype_t;
 typedef struct
 {
 	zbx_uint64_t		applicationid;
-	zbx_uint64_t		parentid;
+	zbx_uint64_t		application_prototypeid;
+	zbx_uint64_t		application_discoveryid;
 	int			lastcheck;
 	int			ts_delete;
 #define ZBX_FLAG_LLD_APPLICATION_UNSET			__UINT64_C(0x0000000000000000)
@@ -221,21 +222,6 @@ typedef struct
 	zbx_uint64_t			flags;
 }
 zbx_lld_item_application_t;
-
-typedef struct
-{
-	zbx_uint64_t	applicationid;
-	zbx_uint64_t	application_prototypeid;
-
-#define ZBX_FLAG_LLD_APPLICATION_DISCOVERY_UNSET		__UINT64_C(0x0000000000000000)
-#define ZBX_FLAG_LLD_APPLICATION_DISCOVERY_DELETE		__UINT64_C(0x0000000000000001)
-#define ZBX_FLAG_LLD_APPLICATION_DISCOVERY_UPDATE_TS		__UINT64_C(0x0000000000000002)
-#define ZBX_FLAG_LLD_APPLICATION_DISCOVERY_RESET_TS		__UINT64_C(0x0000000000000004)
-	zbx_uint64_t	flags;
-
-	int		lastcheck;
-}
-zbx_lld_application_discovery_t;
 
 /* application index by prototypeid and lld row */
 typedef struct
@@ -1492,9 +1478,9 @@ static void	lld_applications_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 	int				i, new_applications = 0, new_discoveries = 0, index;
 	zbx_lld_application_t		*application;
 	zbx_lld_application_prototype_t	*application_prototype;
-	zbx_uint64_t			applicationid;
+	zbx_uint64_t			applicationid, application_discoveryid;
 	zbx_db_insert_t			db_insert, db_insert_discovery;
-	zbx_vector_uint64_t		del_applicationids;
+	zbx_vector_uint64_t		del_applicationids, del_discoveryids;
 	char				*sql_a = NULL, *sql_ad = NULL, *name;
 	size_t				sql_a_alloc = 0, sql_a_offset = 0, sql_ad_alloc = 0, sql_ad_offset = 0;
 
@@ -1504,6 +1490,7 @@ static void	lld_applications_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 		goto out;
 
 	zbx_vector_uint64_create(&del_applicationids);
+	zbx_vector_uint64_create(&del_discoveryids);
 
 	/* Count new applications and application discoveries.                      */
 	/* Note that an application might have been discovered by another lld rule. */
@@ -1540,8 +1527,9 @@ static void	lld_applications_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 
 	if (0 != new_discoveries)
 	{
-		zbx_db_insert_prepare(&db_insert_discovery, "application_discovery", "applicationid",
-				"application_prototypeid", "name", NULL);
+		application_discoveryid = DBget_maxid_num("application_discovery", new_discoveries);
+		zbx_db_insert_prepare(&db_insert_discovery, "application_discovery", "application_discoveryid",
+				"applicationid", "application_prototypeid", "name", NULL);
 	}
 
 	for (i = 0; i < applications->values_num; i++)
@@ -1553,19 +1541,15 @@ static void	lld_applications_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 
 		if (0 != (application->flags & ZBX_FLAG_LLD_APPLICATION_REMOVE_DISCOVERY))
 		{
-			zbx_snprintf_alloc(&sql_ad, &sql_ad_alloc, &sql_ad_offset,
-					"delete from application_discovery"
-					" where applicationid=" ZBX_FS_UI64
-						" and application_prototypeid=" ZBX_FS_UI64 ";\n",
-					application->applicationid, application->parentid);
+			zbx_vector_uint64_append(&del_discoveryids, application->application_discoveryid);
 			continue;
 		}
 
 		if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_DISCOVERED))
 			continue;
 
-		if (FAIL == (index = zbx_vector_ptr_search(application_prototypes, &application->parentid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		if (FAIL == (index = zbx_vector_ptr_search(application_prototypes,
+				&application->application_prototypeid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -1592,9 +1576,8 @@ static void	lld_applications_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 			name = DBdyn_escape_string(application_prototype->name);
 			zbx_snprintf_alloc(&sql_ad, &sql_ad_alloc, &sql_ad_offset,
 					"update application_discovery set name='%s'"
-					" where applicationid=" ZBX_FS_UI64
-						" and application_prototypeid=" ZBX_FS_UI64 ";\n",
-					name, application->applicationid, application->parentid);
+					" where application_discoveryid=" ZBX_FS_UI64 ";\n",
+					name, application->application_discoveryid);
 			zbx_free(name);
 			continue;
 		}
@@ -1602,7 +1585,9 @@ static void	lld_applications_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 		if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_ADD_DISCOVERY))
 			continue;
 
-		zbx_db_insert_add_values(&db_insert_discovery, application->applicationid, application->parentid,
+		application->application_discoveryid = application_discoveryid++;
+		zbx_db_insert_add_values(&db_insert_discovery, application->application_discoveryid,
+				application->applicationid, application->application_prototypeid,
 				application_prototype->name);
 	}
 
@@ -1611,6 +1596,14 @@ static void	lld_applications_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "delete from applications where");
 		DBadd_condition_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "applicationid", del_applicationids.values,
 				del_applicationids.values_num);
+		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, ";\n");
+	}
+
+	if (0 != del_discoveryids.values_num)
+	{
+		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "delete from application_discovery where");
+		DBadd_condition_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, "application_discoveryid",
+				del_discoveryids.values, del_discoveryids.values_num);
 		zbx_strcpy_alloc(&sql_a, &sql_a_alloc, &sql_a_offset, ";\n");
 	}
 
@@ -1638,6 +1631,7 @@ static void	lld_applications_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 		zbx_db_insert_clean(&db_insert_discovery);
 	}
 
+	zbx_vector_uint64_destroy(&del_discoveryids);
 	zbx_vector_uint64_destroy(&del_applicationids);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1869,8 +1863,7 @@ static void	lld_remove_lost_items(const zbx_vector_ptr_t *items, unsigned short 
 				"update item_discovery"
 				" set ts_delete=%d"
 				" where itemid=" ZBX_FS_UI64 ";\n",
-				(int)discovery_itemts.values[i].second + lifetime_sec,
-				discovery_itemts.values[i].first);
+				(int)discovery_itemts.values[i].second, discovery_itemts.values[i].first);
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
@@ -1922,38 +1915,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_application_discovery_add                                    *
- *                                                                            *
- * Purpose: application discovery to application discovery update vector      *
- *                                                                            *
- * Parameters: discoveries             - [OUT] the application discovery      *
- *                                             update vector                  *
- *             applicationid           - [IN] the application id              *
- *             application_prototypeid - [IN] the appplication prototype id   *
- *             lastcheck               - [IN] the last successfull check      *
- *                                            timestamp                       *
- *             flags                   - [IN] the update flags, see           *
- *                                       ZBX_FLAG_LLD_APPLICATION_DISCOVERY_  *
- *                                       defines                              *
- *                                                                            *
- ******************************************************************************/
-static void	lld_application_discovery_add(zbx_vector_ptr_t *discoveries, zbx_uint64_t applicationid,
-		zbx_uint64_t application_prototypeid, int lastcheck, zbx_uint64_t flags)
-{
-	zbx_lld_application_discovery_t	*discovery;
-
-	discovery = (zbx_lld_application_discovery_t *)zbx_malloc(NULL, sizeof(zbx_lld_application_discovery_t));
-
-	discovery->applicationid = applicationid;
-	discovery->application_prototypeid = application_prototypeid;
-	discovery->lastcheck = lastcheck;
-	discovery->flags = flags;
-
-	zbx_vector_ptr_append(discoveries, discovery);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: lld_remove_lost_applications                                     *
  *                                                                            *
  * Purpose: updates application_discovery lastcheck and ts_delete fields,     *
@@ -1968,11 +1929,10 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 	DB_ROW				row;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_vector_uint64_t		del_applicationids;
-	zbx_vector_ptr_t		discoveries;
+	zbx_vector_uint64_t		del_applicationids, del_discoveryids, ts_discoveryids, lc_discoveryids;
+	zbx_vector_uint64_pair_t	discovery_applicationts;
 	int				i, lifetime_sec, index;
 	const zbx_lld_application_t	*application;
-	zbx_lld_application_discovery_t	*discovery;
 	zbx_uint64_t			applicationid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1983,7 +1943,10 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 	lifetime_sec = lifetime * SEC_PER_DAY;
 
 	zbx_vector_uint64_create(&del_applicationids);
-	zbx_vector_ptr_create(&discoveries);
+	zbx_vector_uint64_create(&del_discoveryids);
+	zbx_vector_uint64_create(&ts_discoveryids);
+	zbx_vector_uint64_create(&lc_discoveryids);
+	zbx_vector_uint64_pair_create(&discovery_applicationts);
 
 	/* prepare application discovery update vector */
 	for (i = 0; i < applications->values_num; i++)
@@ -1998,22 +1961,22 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 			if (application->lastcheck < lastcheck - lifetime_sec)
 			{
 				zbx_vector_uint64_append(&del_applicationids, application->applicationid);
-
-				lld_application_discovery_add(&discoveries, application->applicationid,
-						application->parentid, 0, ZBX_FLAG_LLD_APPLICATION_DISCOVERY_DELETE);
-
+				zbx_vector_uint64_append(&del_discoveryids, application->application_discoveryid);
 			}
 			else if (application->ts_delete != application->lastcheck + lifetime_sec)
 			{
-				lld_application_discovery_add(&discoveries, application->applicationid,
-						application->parentid, application->lastcheck,
-						ZBX_FLAG_LLD_APPLICATION_DISCOVERY_UPDATE_TS);
+				zbx_uint64_pair_t	applicationts;
+
+				applicationts.first = application->application_discoveryid;
+				applicationts.second = application->lastcheck + lifetime_sec;
+				zbx_vector_uint64_pair_append(&discovery_applicationts, applicationts);
 			}
 		}
 		else
 		{
-			lld_application_discovery_add(&discoveries, application->applicationid,
-					application->parentid, lastcheck, ZBX_FLAG_LLD_APPLICATION_DISCOVERY_RESET_TS);
+			zbx_vector_uint64_append(&lc_discoveryids, application->application_discoveryid);
+			if (0 != application->ts_delete)
+				zbx_vector_uint64_append(&ts_discoveryids, application->application_discoveryid);
 		}
 	}
 
@@ -2050,8 +2013,12 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 		DBfree_result(result);
 	}
 
-	if (0 == discoveries.values_num && 0 == del_applicationids.values_num)
+	if (0 == discovery_applicationts.values_num && 0 == del_applicationids.values_num &&
+			0 == del_discoveryids.values_num && 0 == ts_discoveryids.values_num &&
+			0 == lc_discoveryids.values_num )
+	{
 		goto clean;
+	}
 
 	/* remove lost applications and update application discovery table */
 
@@ -2059,40 +2026,43 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	for (i = 0; i < discoveries.values_num; i++)
+	for (i = 0; i < discovery_applicationts.values_num; i++)
 	{
-		discovery = (zbx_lld_application_discovery_t *)discoveries.values[i];
+		zbx_uint64_pair_t	*applicationts = &(discovery_applicationts.values[i]);
 
-		switch (discovery->flags)
-		{
-			case ZBX_FLAG_LLD_APPLICATION_DISCOVERY_DELETE:
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"delete from application_discovery"
-						" where applicationid=" ZBX_FS_UI64
-						" and application_prototypeid=" ZBX_FS_UI64 ";\n",
-						discovery->applicationid, discovery->application_prototypeid);
-				break;
-			case ZBX_FLAG_LLD_APPLICATION_DISCOVERY_UPDATE_TS:
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"update application_discovery"
-						" set ts_delete=%d"
-						" where applicationid=" ZBX_FS_UI64
-						" and application_prototypeid=" ZBX_FS_UI64 ";\n",
-						discovery->lastcheck + lifetime_sec, discovery->applicationid,
-						discovery->application_prototypeid);
-				break;
-			case ZBX_FLAG_LLD_APPLICATION_DISCOVERY_RESET_TS:
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"update application_discovery"
-						" set ts_delete=0,lastcheck=%d"
-						" where applicationid=" ZBX_FS_UI64
-						" and application_prototypeid=" ZBX_FS_UI64 ";\n",
-						discovery->lastcheck, discovery->applicationid,
-						discovery->application_prototypeid);
-				break;
-		}
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update application_discovery"
+				" set ts_delete=%d"
+				" where application_discoveryid=" ZBX_FS_UI64 ";\n",
+				(int)applicationts->second, applicationts->first);
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	if (0 != del_discoveryids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from application_discovery where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_discoveryid",
+				del_discoveryids.values, del_discoveryids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
+
+	if (0 != ts_discoveryids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update application_discovery"
+				" set ts_delete=0 where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_discoveryid",
+				ts_discoveryids.values, ts_discoveryids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
+
+	if (0 != lc_discoveryids.values_num)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update application_discovery"
+				" set lastcheck=%d where", lastcheck);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_discoveryid",
+				lc_discoveryids.values, lc_discoveryids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
 	if (0 != del_applicationids.values_num)
@@ -2111,8 +2081,10 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 clean:
 	zbx_free(sql);
 
-	zbx_vector_ptr_clear_ext(&discoveries, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&discoveries);
+	zbx_vector_uint64_pair_destroy(&discovery_applicationts);
+	zbx_vector_uint64_destroy(&lc_discoveryids);
+	zbx_vector_uint64_destroy(&ts_discoveryids);
+	zbx_vector_uint64_destroy(&del_discoveryids);
 	zbx_vector_uint64_destroy(&del_applicationids);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -2336,7 +2308,8 @@ static void	lld_applications_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *appl
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select a.applicationid,a.name,ap.application_prototypeid,ad.lastcheck,ad.ts_delete,ad.name"
+			"select a.applicationid,a.name,ap.application_prototypeid,ad.lastcheck,ad.ts_delete,ad.name,"
+				"ad.application_discoveryid"
 			" from applications a,application_discovery ad,application_prototype ap"
 			" where ap.itemid=" ZBX_FS_UI64
 				" and ad.application_prototypeid=ap.application_prototypeid"
@@ -2348,7 +2321,8 @@ static void	lld_applications_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *appl
 		application = (zbx_lld_application_t *)zbx_malloc(NULL, sizeof(zbx_lld_application_t));
 
 		ZBX_STR2UINT64(application->applicationid, row[0]);
-		ZBX_STR2UINT64(application->parentid, row[2]);
+		ZBX_STR2UINT64(application->application_prototypeid, row[2]);
+		ZBX_STR2UINT64(application->application_discoveryid, row[6]);
 		application->name = zbx_strdup(NULL, row[1]);
 		application->lastcheck = atoi(row[3]);
 		application->ts_delete = atoi(row[4]);
@@ -2393,7 +2367,8 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 	{
 		application = (zbx_lld_application_t *)zbx_malloc(NULL, sizeof(zbx_lld_application_t));
 		application->applicationid = 0;
-		application->parentid = application_prototype->application_prototypeid;
+		application->application_prototypeid = application_prototype->application_prototypeid;
+		application->application_discoveryid = 0;
 
 		application->name = zbx_strdup(NULL, application_prototype->name);
 		substitute_discovery_macros(&application->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -2477,7 +2452,7 @@ static void	lld_applications_make(const zbx_vector_ptr_t *application_prototypes
 
 			if (0 == strcmp(application->name, buffer))
 			{
-				application_index_local.application_prototypeid = application->parentid;
+				application_index_local.application_prototypeid = application->application_prototypeid;
 				application_index_local.lld_row = lld_row;
 				application_index_local.application = application;
 				zbx_hashset_insert(applications_index, &application_index_local,
@@ -2570,7 +2545,7 @@ static void	lld_applications_validate(zbx_uint64_t hostid, zbx_uint64_t lld_rule
 				application->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 
 				/* fail if application has different prototype */
-				if (application->parentid != application_compare->parentid)
+				if (application->application_prototypeid != application_compare->application_prototypeid)
 				{
 					*error = zbx_strdcatf(*error, "Cannot %s application:"
 							" application with the same name \"%s\" already exists.\n",
@@ -2582,7 +2557,7 @@ static void	lld_applications_validate(zbx_uint64_t hostid, zbx_uint64_t lld_rule
 
 				/* update application index to use the matching application */
 
-				application_index_local.application_prototypeid = application->parentid;
+				application_index_local.application_prototypeid = application->application_prototypeid;
 				application_index_local.lld_row = application->lld_row;
 
 				if (NULL == (application_index = zbx_hashset_search(applications_index,
@@ -2681,6 +2656,7 @@ static void	lld_applications_validate(zbx_uint64_t hostid, zbx_uint64_t lld_rule
 				/* update application flags so that instead of renaming it a new */
 				/* discovery record is created                                    */
 
+				application->application_discoveryid = 0;
 				application->flags &= ~ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME;
 				application->flags |= ZBX_FLAG_LLD_APPLICATION_ADD_DISCOVERY;
 			}
@@ -2735,13 +2711,15 @@ static void	lld_applications_validate(zbx_uint64_t hostid, zbx_uint64_t lld_rule
 			new_application = (zbx_lld_application_t *)zbx_malloc(NULL, sizeof(zbx_lld_application_t));
 			memset(new_application, 0, sizeof(zbx_lld_application_t));
 			new_application->applicationid = application->applicationid;
-			new_application->parentid = application->parentid;
+			new_application->application_prototypeid = application->application_prototypeid;
+			new_application->application_discoveryid = application->application_discoveryid;
 			new_application->flags = ZBX_FLAG_LLD_APPLICATION_REMOVE_DISCOVERY;
 			zbx_vector_ptr_append(applications, new_application);
 
-			/* reset application id and flags so a new application is created */
-			/* instead of renaming the shared one                             */
+			/* reset applicationid, application_discoveryid and flags             */
+			/* so a new application is created instead of renaming the shared one */
 			application->applicationid = 0;
+			application->application_discoveryid = 0;
 			application->flags = ZBX_FLAG_LLD_APPLICATION_ADD_DISCOVERY |
 					ZBX_FLAG_LLD_APPLICATION_DISCOVERED;
 		}
