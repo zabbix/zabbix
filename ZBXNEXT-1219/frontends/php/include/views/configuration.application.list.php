@@ -57,39 +57,71 @@ $applicationTable->setHeader(array(
 		'cell-width'),
 	($this->data['hostid'] > 0) ? null : _('Host'),
 	make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Show')
+	_('Show'),
+	$data['showInfoColumn'] ? _('Info') : null
 ));
 
+$current_time = time();
+
 foreach ($this->data['applications'] as $application) {
+	$info_icons = [];
+
 	// inherited app, display the template list
 	if ($application['templateids'] && !empty($application['sourceTemplates'])) {
-		$name = array();
+		$name = [];
 
-		CArrayHelper::sort($application['sourceTemplates'], array('name'));
+		CArrayHelper::sort($application['sourceTemplates'], ['name']);
 
 		foreach ($application['sourceTemplates'] as $template) {
-			$name[] = new CLink($template['name'], 'applications.php?hostid='.$template['hostid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
+			$name[] = new CLink($template['name'], 'applications.php?hostid='.$template['hostid'],
+				ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY
+			);
 			$name[] = ', ';
 		}
 		array_pop($name);
 		$name[] = NAME_DELIMITER;
 		$name[] = $application['name'];
+
+		$info_icons[] = '';
 	}
-	elseif ($application['discoveryRule']) {
-		$name = array(new CLink(CHtml::encode($application['discoveryRule']['name']),
+	elseif ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $application['discoveryRule']) {
+		$name = [new CLink(CHtml::encode($application['discoveryRule']['name']),
 			'disc_prototypes.php?parent_discoveryid='.$application['discoveryRule']['itemid'],
 			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_ORANGE
-		));
+		)];
 		$name[] = NAME_DELIMITER.$application['name'];
+
+		if ($application['applicationDiscovery']['ts_delete']) {
+			$icon_warning = new CDiv(SPACE, 'status_icon iconwarning');
+
+			// Check if application should've been deleted in the past.
+			if ($current_time > $application['applicationDiscovery']['ts_delete']) {
+				$icon_warning->setHint(_s(
+					'The application is not discovered anymore and will be deleted the next time discovery rule is processed.'
+				));
+			}
+			else {
+				$icon_warning->setHint(_s(
+					'The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+					zbx_date2age($application['applicationDiscovery']['ts_delete']),
+					zbx_date2str(DATE_FORMAT, $application['applicationDiscovery']['ts_delete']),
+					zbx_date2str(TIME_FORMAT, $application['applicationDiscovery']['ts_delete'])
+				));
+			}
+
+			$info_icons[] = $icon_warning;
+		}
+		else {
+			$info_icons[] = '';
+		}
 	}
 	else {
-		$name = new CLink(
-			$application['name'],
-			'applications.php?'.
-				'form=update'.
-				'&applicationid='.$application['applicationid'].
+		$name = new CLink($application['name'],
+			'applications.php?form=update&applicationid='.$application['applicationid'].
 				'&hostid='.$application['hostid']
 		);
+
+		$info_icons[] = '';
 	}
 
 	$checkBox = new CCheckBox('applications['.$application['applicationid'].']', null, null,
@@ -97,11 +129,11 @@ foreach ($this->data['applications'] as $application) {
 	);
 	$checkBox->setEnabled(!$application['discoveryRule']);
 
-	$applicationTable->addRow(array(
+	$applicationTable->addRow([
 		$checkBox,
 		($this->data['hostid'] > 0) ? null : $application['host']['name'],
 		$name,
-		array(
+		[
 			new CLink(
 				_('Items'),
 				'items.php?'.
@@ -110,8 +142,9 @@ foreach ($this->data['applications'] as $application) {
 					'&filter_application='.urlencode($application['name'])
 			),
 			CViewHelper::showNum(count($application['items']))
-		)
-	));
+		],
+		$data['showInfoColumn'] ? $info_icons : null
+	]);
 }
 
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
