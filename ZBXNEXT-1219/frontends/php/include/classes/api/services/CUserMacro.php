@@ -272,39 +272,18 @@ class CUserMacro extends CApiService {
 
 		$this->validateCreateGlobal($globalMacros);
 
-		$globalmacroids = DB::insert('globalmacro', $globalMacros);
+		$globalMacroIds = DB::insert('globalmacro', $globalMacros);
 
-		return array('globalmacroids' => $globalmacroids);
-	}
-
-	/**
-	 * Validates the input parameters for the updateGlobal() method.
-	 *
-	 * @param array $globalMacros
-	 *
-	 * @throws APIException if the input is invalid
-	 */
-	protected function validateUpdateGlobal(array $globalMacros) {
-		$this->checkGlobalMacrosPermissions(_('Only Super Admins can update global macros.'));
-
+		$globalMacroId = reset($globalMacroIds);
 		foreach ($globalMacros as $globalMacro) {
-			if (!isset($globalMacro['globalmacroid']) || zbx_empty($globalMacro['globalmacroid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
-			}
+			$value = array_key_exists('value', $globalMacro) ? $globalMacro['value'] : '';
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO,
+				$globalMacroId, $globalMacro['macro'].' &rArr; '.$value, null, null, null
+			);
+			$globalMacroId = next($globalMacroIds);
 		}
 
-		$globalMacros = $this->extendObjects('globalmacro', $globalMacros, array('macro'));
-
-		foreach ($globalMacros as $globalMacro) {
-			$this->checkMacro($globalMacro);
-			$this->checkValue($globalMacro);
-			$this->checkUnsupportedFields('globalmacro', $globalMacro,
-				_s('Wrong fields for macro "%1$s".', $globalMacro['macro']));
-		}
-
-		$this->checkDuplicateMacros($globalMacros);
-		$this->checkIfGlobalMacrosExist(zbx_objectValues($globalMacros, 'globalmacroid'));
-		$this->checkIfGlobalMacrosDontRepeat($globalMacros);
+		return array('globalmacroids' => $globalMacroIds);
 	}
 
 	/**
@@ -317,22 +296,55 @@ class CUserMacro extends CApiService {
 	public function updateGlobal(array $globalMacros) {
 		$globalMacros = zbx_toArray($globalMacros);
 
-		$this->validateUpdateGlobal($globalMacros);
+		// validate macros
+		$this->checkGlobalMacrosPermissions(_('Only Super Admins can update global macros.'));
+
+		foreach ($globalMacros as $globalMacro) {
+			if (!isset($globalMacro['globalmacroid']) || zbx_empty($globalMacro['globalmacroid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+			}
+		}
+
+		$exGlobalMacros = $this->extendObjects('globalmacro', $globalMacros, ['macro', 'value']);
+
+		foreach ($exGlobalMacros as $exGlobalMacro) {
+			$this->checkMacro($exGlobalMacro);
+			$this->checkValue($exGlobalMacro);
+			$this->checkUnsupportedFields('globalmacro', $exGlobalMacro,
+				_s('Wrong fields for macro "%1$s".', $exGlobalMacro['macro']));
+		}
+
+		$this->checkDuplicateMacros($exGlobalMacros);
+		$this->checkIfGlobalMacrosExist(zbx_objectValues($globalMacros, 'globalmacroid'));
+		$this->checkIfGlobalMacrosDontRepeat($exGlobalMacros);
 
 		// update macros
-		$data = array();
-		foreach ($globalMacros as $gmacro) {
-			$globalMacroId = $gmacro['globalmacroid'];
-			unset($gmacro['globalmacroid']);
+		$data = [];
+		foreach ($globalMacros as $globalMacro) {
+			$values = [];
+			foreach (['macro', 'value'] as $field) {
+				if (array_key_exists($field, $globalMacro)) {
+					$values[$field] = $globalMacro[$field];
+				}
+			}
 
-			$data[] = array(
-				'values'=> $gmacro,
-				'where'=> array('globalmacroid' => $globalMacroId)
-			);
+			if ($values) {
+				$data[] = [
+					'values'=> $values,
+					'where'=> ['globalmacroid' => $globalMacro['globalmacroid']]
+				];
+			}
 		}
 		DB::update('globalmacro', $data);
 
-		return array('globalmacroids' => zbx_objectValues($globalMacros, 'globalmacroid'));
+		foreach ($exGlobalMacros as $exGlobalMacro) {
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO,
+				$exGlobalMacro['globalmacroid'], $exGlobalMacro['macro'].' &rArr; '.$exGlobalMacro['value'], null, null,
+				null
+			);
+		}
+
+		return ['globalmacroids' => zbx_objectValues($globalMacros, 'globalmacroid')];
 	}
 
 	/**
@@ -363,8 +375,19 @@ class CUserMacro extends CApiService {
 
 		$this->validateDeleteGlobal($globalMacroIds);
 
+		$globalMacros = API::getApiService()->select('globalmacro', array(
+			'output' => array('globalmacroid', 'macro', 'value'),
+			'globalmacroids' => $globalMacroIds
+		));
+
 		// delete macros
 		DB::delete('globalmacro', array('globalmacroid' => $globalMacroIds));
+
+		foreach ($globalMacros as $globalMacro) {
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO,
+				$globalMacro['globalmacroid'], $globalMacro['macro'].' &rArr; '.$globalMacro['value'], null, null, null
+			);
+		}
 
 		return array('globalmacroids' => $globalMacroIds);
 	}
@@ -778,14 +801,18 @@ class CUserMacro extends CApiService {
 	 * @throws APIException if any of the global macros is not present in $globalMacros
 	 */
 	protected function checkIfGlobalMacrosExist(array $globalMacroIds) {
-		$globalMacros = API::getApiService()->select('globalmacro', array(
-			'output' => array('globalmacroid'),
-			'globalmacroids' => $globalMacroIds
-		));
-		$globalMacros = zbx_toHash($globalMacros, 'globalmacroid');
-		foreach ($globalMacroIds as $globalMacroId) {
-			if (!isset($globalMacros[$globalMacroId])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro with globalmacroid "%1$s" does not exist.', $globalMacroId));
+		if ($globalMacroIds) {
+			$globalMacros = API::getApiService()->select('globalmacro', array(
+				'output' => array('globalmacroid'),
+				'globalmacroids' => $globalMacroIds,
+				'preservekeys' => true
+			));
+			foreach ($globalMacroIds as $globalMacroId) {
+				if (!isset($globalMacros[$globalMacroId])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Macro with globalmacroid "%1$s" does not exist.', $globalMacroId)
+					);
+				}
 			}
 		}
 	}
