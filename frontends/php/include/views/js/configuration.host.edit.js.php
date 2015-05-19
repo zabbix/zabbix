@@ -1,15 +1,14 @@
 <script type="text/x-jquery-tmpl" id="hostInterfaceRow">
 <tr class="interfaceRow" id="hostInterfaceRow_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}">
-	<td class="interface-drag-control">
+	<td class="interface-drag-control"></td>
+	<td class="interface-ip">
 		<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}" />
 		<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}" />
 		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}" />
-	</td>
-	<td class="interface-ip">
 		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" maxlength="64" value="#{iface.ip}" />
 		<div class="interface-bulk">
 			<input class="input checkbox pointer" type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{*attrs.checked_bulk} />
-			<label for="interfaces[#{iface.interfaceid}][bulk]"><?php echo _('Use bulk requests'); ?></label>
+			<label for="interfaces[#{iface.interfaceid}][bulk]"><?= _('Use bulk requests') ?></label>
 		</div>
 	</td>
 	<td class="interface-dns">
@@ -19,7 +18,7 @@
 		<div class="jqueryinputset radioset">
 			<input class="interface-useip" type="radio" id="radio_ip_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="1" #{*attrs.checked_ip} />
 			<input class="interface-useip" type="radio" id="radio_dns_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="0" #{*attrs.checked_dns} />
-			<label for="radio_ip_#{iface.interfaceid}"><?php echo _('IP'); ?></label><label for="radio_dns_#{iface.interfaceid}"><?php echo _('DNS'); ?></label>
+			<label for="radio_ip_#{iface.interfaceid}"><?= _('IP') ?></label><label for="radio_dns_#{iface.interfaceid}"><?= _('DNS') ?></label>
 		</div>
 	</td>
 	<td class="interface-port">
@@ -30,7 +29,7 @@
 		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"></label>
 	</td>
 	<td class="interface-control">
-		<button type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" class="button link_menu remove" #{*attrs.disabled}><?php echo _('Remove'); ?></button>
+		<button type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" class="button link_menu remove" #{*attrs.disabled}><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -58,7 +57,7 @@
 			domRow = jQuery('#hostInterfaceRow_' + hostInterface.interfaceid);
 			jQuery('.jqueryinputset', domRow).buttonset();
 
-			if (hostInterface.type != <?php echo INTERFACE_TYPE_SNMP; ?>) {
+			if (hostInterface.type != <?= INTERFACE_TYPE_SNMP ?>) {
 				jQuery('.interface-bulk', domRow).remove();
 			}
 
@@ -140,7 +139,7 @@
 			domElement.children().first().append('<span class="ui-icon ui-icon-arrowthick-2-n-s state-disabled"></span>');
 			jQuery('.ui-icon', domElement).hover(
 				function (event) {
-					jQuery('<div>' + <?php echo CJs::encodeJson(_('Interface is used by items that require this type of the interface.')); ?> + '</div>')
+					jQuery('<div>' + <?= CJs::encodeJson(_('Interface is used by items that require this type of the interface.')) ?> + '</div>')
 						.css({position: 'absolute', opacity: 1, padding: '2px'})
 						.addClass('ui-state-highlight')
 						.appendTo(event.target.parentNode);
@@ -174,7 +173,7 @@
 				attrs.checked_main = 'checked="checked"';
 			}
 
-			if (hostInterface.type == <?php echo INTERFACE_TYPE_SNMP; ?>) {
+			if (hostInterface.type == <?= INTERFACE_TYPE_SNMP ?>) {
 				if (hostInterface.bulk == 1) {
 					attrs.checked_bulk = 'checked="checked"';
 				}
@@ -217,7 +216,7 @@
 				ip: '127.0.0.1'
 			};
 
-			if (newInterface.type == <?php echo INTERFACE_TYPE_SNMP; ?>) {
+			if (newInterface.type == <?= INTERFACE_TYPE_SNMP ?>) {
 				newInterface.bulk = 1;
 			}
 
@@ -306,7 +305,10 @@
 
 			disable: function() {
 				jQuery('.interface-drag-control, .interface-control').html('');
-				jQuery('.interfaceRow').find('input').attr('readonly', true);
+				jQuery('.interfaceRow').find('input')
+					.removeAttr('id')
+					.removeAttr('name');
+				jQuery('.interfaceRow').find('input[type="text"]').attr('readonly', true);
 				jQuery('.interfaceRow').find('input[type="radio"], input[type="checkbox"]').attr('disabled', true);
 				jQuery('.interface-connect-to').find('input').button('disable');
 			}
@@ -343,7 +345,7 @@
 
 				ui.helper.remove();
 
-				if (getHostInterfaceNumericType(hostInterfaceTypeName) == <?php echo INTERFACE_TYPE_SNMP; ?>) {
+				if (getHostInterfaceNumericType(hostInterfaceTypeName) == <?= INTERFACE_TYPE_SNMP ?>) {
 					if (jQuery('.interface-bulk', jQuery('#hostInterfaceRow_' + hostInterfaceId)).length == 0) {
 						var bulkDiv = jQuery('<div>', {
 							'class': 'interface-bulk'
@@ -362,7 +364,7 @@
 						// append label
 						bulkDiv.append(jQuery('<label>', {
 							'for': 'interfaces[' + hostInterfaceId + '][bulk]',
-							text: '<?php echo _('Use bulk requests'); ?>'
+							text: '<?= _('Use bulk requests') ?>'
 						}));
 
 						jQuery('.interface-ip', jQuery('#hostInterfaceRow_' + hostInterfaceId)).append(bulkDiv);
@@ -406,15 +408,15 @@
 			var inventoryFields = jQuery('#inventorylist :input:gt(2)');
 
 			switch (jQuery(this).val()) {
-				case '<?php echo HOST_INVENTORY_DISABLED; ?>':
+				case '<?= HOST_INVENTORY_DISABLED ?>':
 					inventoryFields.prop('disabled', true);
 					jQuery('.populating_item').hide();
 					break;
-				case '<?php echo HOST_INVENTORY_MANUAL; ?>':
+				case '<?= HOST_INVENTORY_MANUAL ?>':
 					inventoryFields.prop('disabled', false);
 					jQuery('.populating_item').hide();
 					break;
-				case '<?php echo HOST_INVENTORY_AUTOMATIC; ?>':
+				case '<?= HOST_INVENTORY_AUTOMATIC ?>':
 					inventoryFields.prop('disabled', false);
 					inventoryFields.filter('.linked_to_item').prop('disabled', true);
 					jQuery('.populating_item').show();
@@ -435,16 +437,16 @@
 
 		switch (typeName) {
 			case 'agent':
-				typeNum = '<?php echo INTERFACE_TYPE_AGENT; ?>';
+				typeNum = '<?= INTERFACE_TYPE_AGENT ?>';
 				break;
 			case 'snmp':
-				typeNum = '<?php echo INTERFACE_TYPE_SNMP; ?>';
+				typeNum = '<?= INTERFACE_TYPE_SNMP ?>';
 				break;
 			case 'jmx':
-				typeNum = '<?php echo INTERFACE_TYPE_JMX; ?>';
+				typeNum = '<?= INTERFACE_TYPE_JMX ?>';
 				break;
 			case 'ipmi':
-				typeNum = '<?php echo INTERFACE_TYPE_IPMI; ?>';
+				typeNum = '<?= INTERFACE_TYPE_IPMI ?>';
 				break;
 			default:
 				throw new Error('Unknown host interface type name.');
