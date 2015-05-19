@@ -1013,11 +1013,10 @@ else {
 	$hosts = array();
 	if ($pageFilter->groupsSelected) {
 		$hosts = API::Host()->get(array(
-			'output' => array('hostid', 'name', 'status'),
+			'output' => array('hostid', $sortField),
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
 			'sortfield' => $sortField,
-			'sortorder' => $sortOrder,
 			'limit' => $config['search_limit'] + 1,
 			'search' => array(
 				'name' => ($filter['host'] === '') ? null : $filter['host'],
@@ -1031,7 +1030,7 @@ else {
 	}
 	order_result($hosts, $sortField, $sortOrder);
 
-	$pagingLine = getPagingLine($hosts);
+	$pagingLine = getPagingLine($hosts, $sortOrder);
 
 	$hosts = API::Host()->get(array(
 		'hostids' => zbx_objectValues($hosts, 'hostid'),

@@ -304,7 +304,6 @@ $options = array(
 	'monitored' => true,
 	'skipDependent' => true,
 	'sortfield' => $sortField,
-	'sortorder' => $sortOrder,
 	'limit' => $config['search_limit'] + 1
 );
 
@@ -372,7 +371,7 @@ if (!$showMaintenance) {
 $triggers = API::Trigger()->get($options);
 
 order_result($triggers, $sortField, $sortOrder);
-$paging = getPagingLine($triggers);
+$paging = getPagingLine($triggers, $sortOrder);
 
 
 $triggers = API::Trigger()->get(array(
