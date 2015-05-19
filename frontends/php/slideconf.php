@@ -205,6 +205,9 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	$config = select_config();
+	$limit = $config['search_limit'] + 1;
+
 	$data = array(
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
@@ -214,7 +217,8 @@ else {
 			'SELECT s.slideshowid,s.name,s.delay,COUNT(sl.slideshowid) AS cnt'.
 			' FROM slideshows s'.
 				' LEFT JOIN slides sl ON sl.slideshowid=s.slideshowid'.
-			' GROUP BY s.slideshowid,s.name,s.delay'
+			' GROUP BY s.slideshowid,s.name,s.delay'.
+			' ORDER BY '.(($sortField === 'cnt') ? 'cnt' : 's.'.$sortField)
 	));
 
 	foreach ($data['slides'] as $key => $slide) {
@@ -225,7 +229,16 @@ else {
 
 	order_result($data['slides'], $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($data['slides']);
+	if ($sortOrder == ZBX_SORT_UP) {
+		$data['slides'] = array_slice($data['slides'], 0, $limit);
+	}
+	else {
+		$data['slides'] = array_slice($data['slides'], -$limit, $limit);
+	}
+
+	order_result($data['slides'], $sortField, $sortOrder);
+
+	$data['paging'] = getPagingLine($data['slides'], $sortOrder);
 
 	// render view
 	$slideshowView = new CView('configuration.slideconf.list', $data);

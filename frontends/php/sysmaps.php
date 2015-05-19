@@ -306,13 +306,12 @@ else {
 		'editable' => true,
 		'output' => array('sysmapid', 'name', 'width', 'height'),
 		'sortfield' => $sortField,
-		'sortorder' => $sortOrder,
 		'limit' => $config['search_limit'] + 1
 	));
 	order_result($data['maps'], $sortField, $sortOrder);
 
 	// paging
-	$data['paging'] = getPagingLine($data['maps']);
+	$data['paging'] = getPagingLine($data['maps'], $sortOrder);
 
 	// render view
 	$mapView = new CView('configuration.sysmap.list', $data);

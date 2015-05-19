@@ -597,7 +597,7 @@ else {
 	if ($data['pageFilter']->hostsSelected) {
 		$options = array(
 			'editable' => true,
-			'output' => array('httptestid'),
+			'output' => array('httptestid', $sortField),
 			'limit' => $config['search_limit'] + 1
 		);
 		if (empty($data['showDisabled'])) {
@@ -611,10 +611,6 @@ else {
 		}
 		$httpTests = API::HttpTest()->get($options);
 
-		order_result($httpTests, $sortField, $sortOrder);
-
-		$data['paging'] = getPagingLine($httpTests);
-
 		$dbHttpTests = DBselect(
 			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname,ht.retries,'.
 				'ht.authentication,ht.http_proxy,a.applicationid,a.name AS application_name'.
@@ -627,6 +623,10 @@ else {
 		while ($dbHttpTest = DBfetch($dbHttpTests)) {
 			$httpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
 		}
+
+		order_result($httpTests, $sortField, $sortOrder);
+
+		$data['paging'] = getPagingLine($httpTests, $sortOrder);
 
 		if($data['showInfoColumn']) {
 			$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($httpTests));

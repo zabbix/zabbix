@@ -397,11 +397,17 @@ else {
 	if ($data['pageFilter']->hostsSelected) {
 		$options = array(
 			'editable' => true,
-			'output' => array('triggerid'),
 			'sortfield' => $sortField,
-			'sortorder' => $sortOrder,
 			'limit' => $config['search_limit'] + 1
 		);
+
+		if ($sortField === 'status') {
+			$options['output'] = array('triggerid', 'status', 'state');
+		}
+		else {
+			$options['output'] = array('triggerid', $sortField);
+		}
+
 		if (empty($data['showdisabled'])) {
 			$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 		}
@@ -416,8 +422,16 @@ else {
 
 	$_REQUEST['hostid'] = getRequest('hostid', $data['pageFilter']->hostid);
 
+	// sort for paging
+	if ($sortField === 'status') {
+		orderTriggersByStatus($data['triggers'], $sortOrder);
+	}
+	else {
+		order_result($data['triggers'], $sortField, $sortOrder);
+	}
+
 	// paging
-	$data['paging'] = getPagingLine($data['triggers']);
+	$data['paging'] = getPagingLine($data['triggers'], $sortOrder);
 
 	$data['triggers'] = API::Trigger()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
@@ -429,6 +443,7 @@ else {
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND
 	));
 
+	// sort for displaying full results
 	if ($sortField === 'status') {
 		orderTriggersByStatus($data['triggers'], $sortOrder);
 	}
