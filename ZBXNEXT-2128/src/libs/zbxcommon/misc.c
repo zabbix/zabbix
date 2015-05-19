@@ -1251,15 +1251,15 @@ static int	scheduler_get_filter_nextcheck(const zbx_scheduler_interval_t *interv
 	/* handle unspecified (default) filter */
 	if (NULL == filter)
 	{
-		/* Empty filter matches all valid values if the filter level is less than */
-		/* interval filter level. For example if interval filter level is minutes */
-		/* then hour filter matches all hours.                                    */
+		/* Empty filter matches all valid values if the filter level is less than        */
+		/* interval filter level. For example if interval filter level is minutes - m30, */
+		/* then hour filter matches all hours.                                           */
 		if (interval->filter_level > level)
 			return SUCCEED;
 
-		/* If the filter level is greater than interval filter level, then filter */
-		/* matches only 0 value. For example if interval filter level is minutes  */
-		/* then filter matches only 0 seconds.                                    */
+		/* If the filter level is greater than interval filter level, then filter       */
+		/* matches only 0 value. For example if interval filter level is minutes - m30, */
+		/* then seconds filter matches the 0th second.                                  */
 		return 0 == *value ? SUCCEED : FAIL;
 	}
 
@@ -1352,7 +1352,6 @@ static void	scheduler_apply_minute_filter(zbx_scheduler_interval_t *interval, st
 	{
 		tm->tm_hour++;
 		tm->tm_min = 0;
-		tm->tm_sec = 0;
 
 		/* hours have been changed, we have to reapply hour filter */
 		scheduler_apply_hour_filter(interval, tm);
@@ -1438,7 +1437,7 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
  *             flex_intervals - [IN] descriptions of flexible intervals       *
  *                                   in the form [dd/d1-d2,hh:mm-hh:mm;]      *
  *             now       - [IN] current timestamp                             *
- *             lastclcok - [IN] timestamp of the last check                   *
+ *             lastclock - [IN] timestamp of the last check                   *
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
