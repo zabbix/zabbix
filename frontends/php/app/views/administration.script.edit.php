@@ -22,15 +22,14 @@
 $this->addJSfile('js/multiselect.js');
 $this->includeJSfile('app/views/administration.script.edit.js.php');
 
-$scriptsWidget = new CWidget();
-$scriptsWidget->addPageHeader(_('CONFIGURATION OF SCRIPTS'));
+$scriptsWidget = (new CWidget())->setTitle(_('Scripts'));
 
 $scriptForm = new CForm();
 $scriptForm->setAttribute('id', 'scriptForm');
 $scriptForm->addVar('form', 1);
 $scriptForm->addVar('scriptid', $data['scriptid']);
 
-$scriptFormList = new CFormList('scriptsTab');
+$scriptFormList = new CFormList();
 
 // name
 $nameTextBox = new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
@@ -84,9 +83,7 @@ $scriptFormList->addRow(null, new CMultiSelect(array(
 	'objectName' => 'hostGroup',
 	'data' => $data['hostgroup'],
 	'popup' => array(
-		'parameters' => 'srctbl=host_groups&dstfrm='.$scriptForm->getName().'&dstfld1=groupid&srcfld1=groupid',
-		'width' => 450,
-		'height' => 450
+		'parameters' => 'srctbl=host_groups&dstfrm='.$scriptForm->getName().'&dstfld1=groupid&srcfld1=groupid'
 	)
 )), null, 'hostGroupSelection');
 
@@ -107,7 +104,6 @@ $scriptFormList->addRow($confirmationLabel, array(
 
 $scriptView = new CTabView();
 $scriptView->addTab('scripts', _('Script'), $scriptFormList);
-$scriptForm->addItem($scriptView);
 
 // footer
 $cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=script.list');
@@ -117,7 +113,7 @@ if ($data['scriptid'] == 0) {
 	$addButton = new CSubmitButton(_('Add'), 'action', 'script.create');
 	$addButton->setAttribute('id', 'add');
 
-	$scriptForm->addItem(makeFormFooter(
+	$scriptView->setFooter(makeFormFooter(
 		$addButton,
 		array($cancelButton)
 	));
@@ -133,7 +129,7 @@ else {
 	);
 	$deleteButton->setAttribute('id', 'delete');
 
-	$scriptForm->addItem(makeFormFooter(
+	$scriptView->setFooter(makeFormFooter(
 		$updateButton,
 		array(
 			$cloneButton,
@@ -143,6 +139,5 @@ else {
 	));
 }
 
-$scriptsWidget->addItem($scriptForm);
-
-$scriptsWidget->show();
+$scriptForm->addItem($scriptView);
+$scriptsWidget->addItem($scriptForm)->show();

@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
 $page['scripts'] = array('class.cviewswitcher.js', 'multiselect.js', 'items.js');
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -1213,10 +1212,18 @@ else {
 					|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
 				$item['trends'] = '';
 			}
+			else {
+				$item['trends'] = convertUnitsS(24*3600*$item['trends']);
+			}
 
 			if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
 				$item['delay'] = '';
 			}
+			else {
+				$item['delay'] = convertUnitsS($item['delay']);
+			}
+
+			$item['history'] = convertUnitsS(24*3600*$item['history']);
 
 			$item['subfilters'] = array(
 				'subfilter_hosts' => empty($_REQUEST['subfilter_hosts'])
@@ -1314,7 +1321,7 @@ else {
 		order_result($data['items'], $sortField, $sortOrder);
 	}
 
-	$data['paging'] = getPagingLine($data['items']);
+	$data['paging'] = getPagingLine($data['items'], $sortOrder);
 
 	$itemTriggerIds = array();
 	foreach ($data['items'] as $item) {

@@ -369,25 +369,25 @@ var CDoll = Class.create({
 	},
 
 	updateSortable: function() {
-		var columnObj = jQuery('.column');
+		var columnObj = jQuery('.cell');
 
 		if (columnObj.length > 0) {
 			columnObj
 				.sortable({
-					connectWith: '.column',
-					handle: 'div.header',
+					connectWith: '.cell',
+					handle: 'div.dashbrd-widget-head',
 					forcePlaceholderSize: true,
-					placeholder: 'widget ui-corner-all ui-sortable-placeholder',
+					placeholder: 'dashbrd-widget',
 					opacity: '0.8',
 					update: function(e, ui) {
 						// prevent duplicate save requests when moving a widget from one column to another
 						if (!ui.sender) {
 							var widgetPositions = {};
 
-							jQuery('.column').each(function(colNum, column) {
+							jQuery('.cell').each(function(colNum, column) {
 								widgetPositions[colNum] = {};
 
-								jQuery('.widget', column).each(function(rowNum, widget) {
+								jQuery('.dashbrd-widget', column).each(function(rowNum, widget) {
 									widgetPositions[colNum][rowNum] = widget.id;
 								});
 							});

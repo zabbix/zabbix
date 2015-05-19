@@ -61,7 +61,7 @@ class CControllerFavouriteCreate extends CController {
 		if ($result) {
 			$data['main_block'] = '$("addrm_fav").title = "'._('Remove from favourites').'";'."\n".
 				'$("addrm_fav").onclick = function() { rm4favorites("'.$object.'", "'.$objectid.'"); }'."\n".
-				'switchElementClass("addrm_fav", "iconminus", "iconplus");';
+				'switchElementClass("addrm_fav", "btn-add-fav", "btn-remove-fav");';
 		}
 		else {
 			$data['main_block'] = '';

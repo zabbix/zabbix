@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = _('Queue');
 $page['file'] = 'queue.php';
-$page['hist_arg'] = array('config');
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
@@ -65,17 +64,19 @@ if ($zabbixServer->getError()) {
 
 // create filter form
 $form = new CForm('get');
-$cmbMode = new CComboBox('config', $config, 'submit();');
-$cmbMode->addItem(QUEUE_OVERVIEW, _('Overview'));
-$cmbMode->addItem(QUEUE_OVERVIEW_BY_PROXY, _('Overview by proxy'));
-$cmbMode->addItem(QUEUE_DETAILS, _('Details'));
-$form->addItem($cmbMode);
+$cmbMode = (new CComboBox('config', $config, 'submit();'))->
+	addItem(QUEUE_OVERVIEW, _('Overview'))->
+	addItem(QUEUE_OVERVIEW_BY_PROXY, _('Overview by proxy'))->
+	addItem(QUEUE_DETAILS, _('Details'));
+// controls
+$form->addItem((new CList())->
+	addItem($cmbMode)
+);
 
 // display table
-$queueWidget = new CWidget();
-$queueWidget->addPageHeader(_('QUEUE OF ITEMS TO BE UPDATED'), $form);
+$queueWidget = (new CWidget())->setTitle(_('Queue of items to be updated'))->setControls($form);
 
-$table = new CTableInfo(_('The queue is empty.'));
+$table = new CTableInfo();
 
 $severityConfig = select_config();
 
@@ -275,8 +276,7 @@ elseif ($config == QUEUE_DETAILS) {
 	}
 }
 
-$queueWidget->addItem($table);
-$queueWidget->show();
+$queueWidget->addItem($table)->show();
 
 // display the table footer
 if ($config == QUEUE_OVERVIEW_BY_PROXY) {

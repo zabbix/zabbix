@@ -123,6 +123,34 @@ static int	DBpatch_2050006(void)
 
 static int	DBpatch_2050007(void)
 {
+	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hosts", &field);
+}
+
+static int	DBpatch_2050008(void)
+{
+	const ZBX_FIELD	field = {"ipmi_error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hosts", &field);
+}
+
+static int	DBpatch_2050009(void)
+{
+	const ZBX_FIELD	field = {"snmp_error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hosts", &field);
+}
+
+static int	DBpatch_2050010(void)
+{
+	const ZBX_FIELD	field = {"jmx_error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hosts", &field);
+}
+
+static int	DBpatch_2050011(void)
+{
 	/* 1 - ITEM_VALUE_TYPE_STR, 2 - ITEM_VALUE_TYPE_LOG, 4 - ITEM_VALUE_TYPE_TEXT */
 	if (ZBX_DB_OK <= DBexecute("update items set trends=0 where value_type in (1,2,4)"))
 		return SUCCEED;
@@ -144,5 +172,9 @@ DBPATCH_ADD(2050004, 0, 1)
 DBPATCH_ADD(2050005, 0, 0)
 DBPATCH_ADD(2050006, 0, 0)
 DBPATCH_ADD(2050007, 0, 1)
+DBPATCH_ADD(2050008, 0, 1)
+DBPATCH_ADD(2050009, 0, 1)
+DBPATCH_ADD(2050010, 0, 1)
+DBPATCH_ADD(2050011, 0, 1)
 
 DBPATCH_END()

@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Status of Web monitoring');
 $page['file'] = 'httpmon.php';
-$page['hist_arg'] = array('groupid', 'hostid');
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
@@ -74,19 +73,18 @@ $_REQUEST['hostid'] = $pageFilter->hostid;
 
 $r_form = new CForm('get');
 $r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
-$r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB()));
-$r_form->addItem(array(SPACE._('Host').SPACE,$pageFilter->getHostsCB()));
 
-$httpmon_wdgt = new CWidget();
-$httpmon_wdgt->addPageHeader(
-	_('STATUS OF WEB MONITORING'),
-	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
-);
-$httpmon_wdgt->addHeader(_('Web scenarios'), $r_form);
-$httpmon_wdgt->addHeaderRowNumber();
+$controls = new CList();
+$controls->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+$controls->addItem(array(_('Host').SPACE, $pageFilter->getHostsCB()));
+$controls->addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
+
+$r_form->addItem($controls);
+
+$httpmon_wdgt = (new CWidget())->setTitle(_('WEB monitoring'))->setControls($r_form);
 
 // TABLE
-$table = new CTableInfo(_('No web scenarios found.'));
+$table = new CTableInfo();
 $table->SetHeader(array(
 	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname', $sortField, $sortOrder) : null,
 	make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
@@ -101,8 +99,11 @@ if ($pageFilter->hostsSelected) {
 	$config = select_config();
 
 	$options = array(
-		'output' => array('httptestid'),
+		'output' => array('httptestid', 'name', 'hostid'),
+		'selectHosts' => array('name', 'status'),
+		'selectSteps' => API_OUTPUT_COUNT,
 		'templated' => false,
+		'preservekeys' => true,
 		'filter' => array('status' => HTTPTEST_STATUS_ACTIVE),
 		'limit' => $config['search_limit'] + 1
 	);
@@ -114,22 +115,16 @@ if ($pageFilter->hostsSelected) {
 	}
 	$httpTests = API::HttpTest()->get($options);
 
-	$paging = getPagingLine($httpTests);
-
-	$httpTests = API::HttpTest()->get(array(
-		'httptestids' => zbx_objectValues($httpTests, 'httptestid'),
-		'preservekeys' => true,
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('name', 'status'),
-		'selectSteps' => API_OUTPUT_COUNT,
-	));
-
 	foreach ($httpTests as &$httpTest) {
 		$httpTest['host'] = reset($httpTest['hosts']);
 		$httpTest['hostname'] = $httpTest['host']['name'];
 		unset($httpTest['hosts']);
 	}
 	unset($httpTest);
+
+	order_result($httpTests, $sortField, $sortOrder);
+
+	$paging = getPagingLine($httpTests, $sortOrder);
 
 	$httpTests = resolveHttpTestMacros($httpTests, true, false);
 
@@ -163,18 +158,18 @@ if ($pageFilter->hostsSelected) {
 					$status['msg'] = _s('Unknown step failed: %1$s', $error);
 				}
 
-				$status['style'] = 'disabled';
+				$status['style'] = ZBX_STYLE_RED;
 			}
 			else {
 				$status['msg'] = _('OK');
-				$status['style'] = 'enabled';
+				$status['style'] = ZBX_STYLE_GREEN;
 			}
 		}
 		// no history data exists
 		else {
 			$lastcheck = _('Never');
 			$status['msg'] = _('Unknown');
-			$status['style'] = 'unknown';
+			$status['style'] = ZBX_STYLE_GREY;
 		}
 
 		$cpsan = new CSpan($httpTest['hostname'],
@@ -191,11 +186,10 @@ if ($pageFilter->hostsSelected) {
 }
 else {
 	$tmp = array();
-	getPagingLine($tmp);
+	getPagingLine($tmp, $sortOrder);
 }
 
-$httpmon_wdgt->addItem(array($paging, $table, $paging));
-$httpmon_wdgt->show();
+$httpmon_wdgt->addItem(array($table, $paging))->show();
 
 
 require_once dirname(__FILE__).'/include/page_footer.php';

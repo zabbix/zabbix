@@ -19,18 +19,21 @@
 **/
 
 
-$itemsWidget = new CWidget();
+$itemsWidget = (new CWidget())->setTitle(_('Item prototypes'));
 
 // create new item button
 $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-$createForm->addItem(new CSubmit('form', _('Create item prototype')));
-$itemsWidget->addPageHeader(_('CONFIGURATION OF ITEM PROTOTYPES'), $createForm);
+
+$controls = new CList();
+$controls->addItem(new CSubmit('form', _('Create item prototype')));
+$createForm->addItem($controls);
+
+$itemsWidget->setControls($createForm);
 
 // header
 $itemsWidget->addHeader(array(_('Item prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')));
-$itemsWidget->addHeaderRowNumber();
 $itemsWidget->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 // create form
@@ -40,10 +43,12 @@ $itemForm->addVar('hostid', $this->data['hostid']);
 $itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
-$itemTable = new CTableInfo(_('No item prototypes found.'));
+$itemTable = new CTableInfo();
 
 $itemTable->setHeader(array(
-	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
+	new CColHeader(
+		new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
+		'cell-width'),
 	make_sorting_header(_('Name'),'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
@@ -60,7 +65,7 @@ foreach ($this->data['items'] as $item) {
 		$template_host = get_realhost_by_itemid($item['templateid']);
 		$templateDiscoveryRuleId = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $template_host['hostid']);
 
-		$description[] = new CLink($template_host['name'], '?parent_discoveryid='.$templateDiscoveryRuleId, 'unknown');
+		$description[] = new CLink($template_host['name'], '?parent_discoveryid='.$templateDiscoveryRuleId, ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}
 	$description[] = new CLink(
@@ -76,7 +81,7 @@ foreach ($this->data['items'] as $item) {
 				? 'itemprototype.massenable'
 				: 'itemprototype.massdisable'
 			),
-		itemIndicatorStyle($item['status'])
+		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($item['status'])
 	);
 
 	if (!empty($item['applications'])) {
@@ -109,10 +114,9 @@ zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
 
 // append table to form
 $itemForm->addItem(array(
-	$this->data['paging'],
 	$itemTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'group_itemid',
+	new CActionButtonList('action', 'group_itemid',
 		array(
 			'itemprototype.massenable' => array('name' => _('Enable'),
 				'confirm' => _('Enable selected item prototypes?')
@@ -125,7 +129,7 @@ $itemForm->addItem(array(
 			)
 		),
 		$this->data['parent_discoveryid']
-	))
+	)
 ));
 
 // append form to widget

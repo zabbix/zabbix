@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/users.inc.php';
 
 $page['title'] = _('Action log');
 $page['file'] = 'auditacts.php';
-$page['hist_arg'] = array();
 $page['scripts'] = array('class.calendar.js', 'gtlc.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -139,7 +138,7 @@ if (!$data['alias'] || $data['users']) {
 	$data['alerts'] = array_slice($data['alerts'], 0, $config['search_limit'] + 1);
 
 	// paging
-	$data['paging'] = getPagingLine($data['alerts']);
+	$data['paging'] = getPagingLine($data['alerts'], ZBX_SORT_DOWN);
 
 	// get users
 	if (!$data['alias']) {

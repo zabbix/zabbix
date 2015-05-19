@@ -38,7 +38,7 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextNotPresent('Displaying 0');
 		// Header
-		$this->zbxTestTextPresent(array('Name', 'Delay', 'Count of slides'));
+		$this->zbxTestTextPresent(array('Name', 'Delay', 'Number of slides'));
 		// Data
 		$this->zbxTestTextPresent(array($slideshow['name']));
 		$this->zbxTestDropdownHasOptions('action', array('Delete selected'));
