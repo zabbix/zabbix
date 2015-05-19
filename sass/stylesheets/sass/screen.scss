@@ -382,28 +382,28 @@ ul.top-nav-icons {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-bottom: 4px solid $indigo-black;
+	border-bottom: 4px solid $font-color;
 }
 
 .arrow-down {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-top: 4px solid $indigo-black;
+	border-top: 4px solid $font-color;
 }
 
 .arrow-left {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
-	border-right: 4px solid $indigo-black;
+	border-right: 4px solid $font-color;
 }
 
 .arrow-right {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
-	border-left: 4px solid $indigo-black;
+	border-left: 4px solid $font-color;
 }
 
 %arrow {
@@ -454,7 +454,7 @@ article {
 	}
 
 	.arrow-right {
-		border-left-color: $indigo-black;
+		border-left-color: $font-color;
 	}
 }
 
@@ -768,7 +768,7 @@ footer {
 	@include border-radius(2px);
 
 	a {
-		color: $indigo-black;
+		color: $font-color;
 		text-decoration: none;
 		cursor: default;
 	}
@@ -877,7 +877,7 @@ footer {
 		display: block;
 		height: inherit;
 		line-height: normal;
-		color: $indigo-black;
+		color: $font-color;
 		padding: 0.4em 5px;
 		margin: 0 -5px;
 		cursor: pointer;
@@ -886,14 +886,15 @@ footer {
 		@include transition(background-color .2s ease-out);
 
 		&.suggest-hover {
-			background-color: $light-grey;
+			//background-color: $light-grey;
+			background-color: $action-hover-color;
 		}
 	}
 }
 
 .multiselect-matches {
 	padding: 0.4em 5px;
-	color: $indigo-black;
+	color: $font-color;
 	font-weight: bold; 
 	@extend .multiselect-suggest;
 }
@@ -1088,7 +1089,7 @@ footer {
 	//margin: 0 auto;
 	display: table;
 	width: 100%;
-	color: $indigo-black;
+	color: $font-color;
 
 	li {
 		display: table-row;
@@ -1366,7 +1367,7 @@ button {
 	@include border-radius(2px);
 	//background-color: $primary-blue;
 	//color: $white;
-	color: $btn-color;
+	color: $btn-font-color;
 	background-color: $btn-bg-color;
 	font-family: $font-stack;
 	//border: 1px solid $primary-blue;
@@ -1389,7 +1390,7 @@ button {
 		@extend button;
 		//background-color: $transparent;
 		//color: $primary-blue;
-		color: $btn-alt-color;
+		color: $btn-alt-font-color;
 		background-color: $btn-alt-bg-color;
 
 		&:hover {
@@ -1648,7 +1649,7 @@ button {
 	&.btn-grey {
 		//background-color: $transparent;
 		//color: $link-color;
-		color: $btn-form-color;
+		color: $btn-form-font-color;
 		background-color: $btn-form-bg-color;
 		border-color: $btn-form-border-color;
 		//border-color: $light-blue-grey;
@@ -1664,18 +1665,18 @@ button {
 		&:active {
 			background-color: darken($alt-blue, 5%);
 			//color: $link-color;
-			color: $btn-form-color;
+			color: $btn-form-font-color;
 		}
 
 		.arrow-left {
 			//border-right-color: $link-color;
-			border-right-color: $btn-form-color;
+			border-right-color: $btn-form-font-color;
 
 		}
 
 		.arrow-right {
 			//border-left-color: $link-color;
-			border-left-color: $btn-form-color;
+			border-left-color: $btn-form-font-color;
 
 		}
 	}
@@ -1742,7 +1743,7 @@ button {
 %disabled {
 	//color: $light-blue-grey;
 	//border-color: $lighter-blue-grey;
-	color: $btn-disabled-color;
+	color: $btn-disabled-font-color;
 	border-color: $btn-disabled-border-color;
 	cursor: default;
 }
@@ -1815,7 +1816,7 @@ button[disabled] {
 				padding: 8px 13px 11px 13px;
 				font-weight: bold;
 				background-color: $ui-bg-color;
-				color: $indigo-black;
+				color: $font-color;
 				text-decoration: none;
 				cursor: default;
 				//border-top: 3px solid $primary-blue;
