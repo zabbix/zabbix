@@ -100,12 +100,11 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 			subject = zbx_dyn_escape_shell_single_quote(alert->subject);
 			message = zbx_dyn_escape_shell_single_quote(alert->message);
 
-			zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " '%s' '%s' '%s'",
-					send_to, subject, message);
+			zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " '%s' '%s' '%s'", send_to, subject, message);
 
-			zbx_free(send_to);
-			zbx_free(subject);
 			zbx_free(message);
+			zbx_free(subject);
+			zbx_free(send_to);
 
 			if (SUCCEED == (res = zbx_execute(cmd, &output, error, max_error_len, ALARM_ACTION_TIMEOUT)))
 			{
