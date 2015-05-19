@@ -318,22 +318,22 @@ foreach (keys(%$servicedata))
 		my $continue_file = $servicedata->{$tld}->{$service}->{'continue_file'};
 
 		my $hostid = get_hostid($tld);
-		my $key = "rsm.slv.$service.avail";
-		my $avail_itemid = get_itemid_by_hostid($hostid, $key);
+		my $avail_key = "rsm.slv.$service.avail";
+		my $avail_itemid = get_itemid_by_hostid($hostid, $avail_key);
 
 		if ($avail_itemid < 0)
 		{
 			if ($avail_itemid == E_ID_NONEXIST)
 			{
-				wrn("configuration error: service $service enabled but item \"$key\" not found");
+				wrn("configuration error: service $service enabled but item \"$avail_key\" not found");
 			}
 			elsif ($avail_itemid == E_ID_MULTIPLE)
 			{
-				wrn("configuration error: multiple items with key \"$key\" found");
+				wrn("configuration error: multiple items with key \"$avail_key\" found");
 			}
 			else
 			{
-				wrn("cannot get ID of $service item ($key): unknown error");
+				wrn("cannot get ID of $service item ($avail_key): unknown error");
 			}
 
 			next;
@@ -544,7 +544,7 @@ foreach (keys(%$servicedata))
 						{
 							if ($clock < $test_results[$test_result_index]->{'start'})
 							{
-								fail("no aggregated result of $service test of $nsip (probe:$probe time:", ts_str($clock), ") found in the database");
+								__no_status_result($service, $avail_key, $probe, $clock, $nsip);
 								next;
 							}
 
@@ -553,7 +553,7 @@ foreach (keys(%$servicedata))
 
 							if ($test_result_index == $test_results_count)
 							{
-								fail("no aggregated result of $service test of $nsip (probe:$probe time:", ts_str($clock), ") found in the database");
+								__no_status_result($service, $avail_key, $probe, $clock, $nsip);
 								next;
 							}
 
@@ -657,7 +657,7 @@ foreach (keys(%$servicedata))
 
 							if ($clock < $test_results[$test_result_index]->{'start'})
 							{
-								fail("no aggregated result of $subservice test (probe:$probe time:", ts_str($clock), ") found in the database");
+								__no_status_result($subservice, $avail_key, $probe, $clock);
 								next;
 							}
 
@@ -666,7 +666,7 @@ foreach (keys(%$servicedata))
 
 							if ($test_result_index == $test_results_count)
 							{
-								fail("no aggregated result of $subservice test (probe:$probe time:", ts_str($clock), ") found in the database");
+								__no_status_result($subservice, $avail_key, $probe, $clock);
 								next;
 							}
 
@@ -777,7 +777,7 @@ foreach (keys(%$servicedata))
 					{
 						if ($clock < $test_results[$test_result_index]->{'start'})
 						{
-							fail("no aggregated result of $service test (probe:$probe time:", ts_str($clock), ") found in the database");
+							__no_status_result($service, $avail_key, $probe, $clock);
 							next;
 						}
 
@@ -786,7 +786,7 @@ foreach (keys(%$servicedata))
 
 						if ($test_result_index == $test_results_count)
 						{
-							fail("no aggregated result of $service test (probe:$probe time:", ts_str($clock), ") found in the database");
+							__no_status_result($service, $avail_key, $probe, $clock);
 							next;
 						}
 
@@ -1806,6 +1806,22 @@ sub __probe_offline_at
 	}
 
 	return 1;	# offline
+}
+
+sub __no_status_result
+{
+	my $service = shift;
+	my $avail_key = shift;
+	my $probe = shift;
+	my $clock = shift;
+	my $details = shift;
+
+	fail("Service availability result is missing for ", uc($service), " test ", ($details ? "($details) " : ''),
+		"performed at ", ts_str($clock), " ($clock) on probe $probe. This means the test period was not" .
+		" handled by SLV availability cron job ($avail_key). This may happen e. g. if cron was not running" .
+		" at some point. In order to fix this problem please run".
+		"\n  $avail_key.pl --from $clock".
+		"\nmanually to add missing service availability result.");
 }
 
 __END__

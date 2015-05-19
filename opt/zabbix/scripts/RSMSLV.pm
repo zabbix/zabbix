@@ -77,21 +77,20 @@ our @EXPORT = qw($result $dbh $tld
 		process_slv_monthly get_results get_item_values check_lastclock sql_time_condition get_incidents
 		get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
 		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
-		get_tld_by_trigger truncate_from
-		dbg info wrn fail slv_exit exit_if_running trim parse_opts opt getopt setopt optkeys ts_str write_file
-		usage);
+		get_tld_by_trigger truncate_from alerts_enabled
+		dbg info wrn fail slv_exit exit_if_running trim parse_opts parse_avail_opts opt getopt setopt optkeys
+		ts_str write_file usage);
 
 # configuration, set in set_slv_config()
 my $config = undef;
-
-# whether additional alerts through Redis are enabled, disable in config passed with set_slv_config()
-my $alerts_enabled = 1;
 
 # this will be used for making sure only one copy of script runs (see function exit_if_running())
 my $pidfile;
 use constant PID_DIR => '/tmp';
 
-my @_sender_values; # used to send values to Zabbix server
+my @_sender_values;	# used to send values to Zabbix server
+
+my $POD2USAGE_FILE;	# usage message file
 
 sub get_macro_minns
 {
@@ -788,16 +787,15 @@ sub db_select
 sub set_slv_config
 {
 	$config = shift;
-
-	$alerts_enabled = undef if ($config and $config->{'redis'} and $config->{'redis'}->{'enabled'} and $config->{'redis'}->{'enabled'} eq "0");
 }
 
-# Get bounds of the previous rdds test period shifted AVAIL_SHIFT_BACK seconds back.
+# Get time bounds of the last test guaranteed to have all probe results.
 sub get_interval_bounds
 {
 	my $interval = shift;
+	my $clock = shift;
 
-	my $t = time();
+	my $t = ($clock ? $clock : time());
 	my $till = int($t / 60) * 60 - AVAIL_SHIFT_BACK;
 	my $from = $till - $interval;
 
@@ -806,7 +804,7 @@ sub get_interval_bounds
 	return ($from, $till, $till - RESULT_TIMESTAMP_SHIFT);
 }
 
-# Get bounds of the previous week shifted ROLLWEEK_SHIFT_BACK seconds back.
+# Get time bounds of the rolling week, shift back to guarantee all probe results.
 sub get_rollweek_bounds
 {
 	my $t = time();
@@ -1507,7 +1505,7 @@ sub process_slv_avail
 	if ($probes_count < $cfg_minonline)
 	{
 		push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes online, $probes_count while $cfg_minonline required)");
-		add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld (not enough probes online, $probes_count while $cfg_minonline required)") if ($alerts_enabled);
+		add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld (not enough probes online, $probes_count while $cfg_minonline required)") if (alerts_enabled() == SUCCESS);
 		return;
 	}
 
@@ -1531,7 +1529,7 @@ sub process_slv_avail
 	if ($probes_with_results < $cfg_minonline)
 	{
 		push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes with reults, $probes_with_results while $cfg_minonline required)");
-		add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld (not enough probes with reults, $probes_with_results while $cfg_minonline required)") if ($alerts_enabled);
+		add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld (not enough probes with reults, $probes_with_results while $cfg_minonline required)") if (alerts_enabled() == SUCCESS);
 		return;
 	}
 
@@ -1624,12 +1622,12 @@ sub process_slv_ns_avail
 		if ($online_probes_count < $cfg_minonline)
 		{
 			push_value($tld, $out_key, $value_ts, UP, "Up (not enough probes online, $online_probes_count while $cfg_minonline required)");
-			add_alert(ts_str($value_ts) . "#system#zabbix#$out_key#PROBLEM#$tld (not enough probes online, $online_probes_count while $cfg_minonline required)") if ($alerts_enabled);
+			add_alert(ts_str($value_ts) . "#system#zabbix#$out_key#PROBLEM#$tld (not enough probes online, $online_probes_count while $cfg_minonline required)") if (alerts_enabled() == SUCCESS);
 		}
 		elsif ($probes_with_results < $cfg_minonline)
 		{
 			push_value($tld, $out_key, $value_ts, UP, "Up (not enough probes with reults, $probes_with_results while $cfg_minonline required)");
-			add_alert(ts_str($value_ts) . "#system#zabbix#$out_key#PROBLEM#$tld (not enough probes with reults, $probes_with_results while $cfg_minonline required)") if ($alerts_enabled);
+			add_alert(ts_str($value_ts) . "#system#zabbix#$out_key#PROBLEM#$tld (not enough probes with reults, $probes_with_results while $cfg_minonline required)") if (alerts_enabled() == SUCCESS);
 		}
 		else
 		{
@@ -2376,6 +2374,14 @@ sub truncate_from
 	return $ts - ($ts % 60);
 }
 
+# whether additional alerts through Redis are enabled, disable in config passed with set_slv_config()
+sub alerts_enabled
+{
+	return SUCCESS if ($config && $config->{'redis'} && $config->{'redis'}->{'enabled'} && ($config->{'redis'}->{'enabled'} ne "0"));
+
+	return E_FAIL;
+}
+
 sub slv_exit
 {
 	my $rv = shift;
@@ -2452,8 +2458,24 @@ sub trim
 
 sub parse_opts
 {
-	GetOptions(\%OPTS, 'help!', 'dry-run!', 'warnslow=f', 'nolog!', 'debug!', @_) or pod2usage(2);
-	pod2usage(1) if (opt('help'));
+	if (!GetOptions(\%OPTS, 'help!', 'dry-run!', 'warnslow=f', 'nolog!', 'debug!', @_))
+	{
+		pod2usage(-verbose => 0, -input => $POD2USAGE_FILE);
+	}
+
+	if (opt('help'))
+	{
+		pod2usage(-verbose => 1, -input => $POD2USAGE_FILE);
+	}
+
+	setopt('nolog') if (opt('dry-run') || opt('debug'));
+}
+
+sub parse_avail_opts
+{
+	$POD2USAGE_FILE = '/opt/zabbix/scripts/slv/rsm.slv.usage';
+
+	parse_opts('from=n', 'period=n');
 }
 
 sub opt
