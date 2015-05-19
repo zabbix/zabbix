@@ -5887,8 +5887,13 @@ return array(
 		),
 	),
 	'application_discovery' => array(
-		'key' => 'applicationid,application_prototypeid',
+		'key' => 'application_discoveryid',
 		'fields' => array(
+			'application_discoveryid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			),
 			'applicationid' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
