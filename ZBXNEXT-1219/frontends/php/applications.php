@@ -355,7 +355,7 @@ else {
 
 		/*
 		 * Calculate the 'ts_delete' which will display the of warning icon and hint telling when application will be
-		 * deleted. Also we* need only 'ts_delete' for view, so get rid of the multidimensional array inside
+		 * deleted. Also we need only 'ts_delete' for view, so get rid of the multidimensional array inside
 		 * 'applicationDiscovery' property.
 		 */
 		foreach ($data['applications'] as &$application) {
