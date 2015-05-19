@@ -61,7 +61,7 @@ class CControllerFavouriteDelete extends CController {
 		if ($result) {
 			$data['main_block'] = '$("addrm_fav").title = "'._('Add to favourites').'";'."\n".
 				'$("addrm_fav").onclick = function() { add2favorites("'.$object.'", "'.$objectid.'"); }'."\n".
-				'switchElementClass("addrm_fav", "iconminus", "iconplus");';
+				'switchElementClass("addrm_fav", "btn-remove-fav", "btn-add-fav");';
 		}
 		else {
 			$data['main_block'] = '';

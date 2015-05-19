@@ -21,8 +21,7 @@
 
 $this->includeJSfile('app/views/administration.mediatype.edit.js.php');
 
-$mediaTypeWidget = new CWidget();
-$mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'));
+$mediaTypeWidget = (new CWidget())->setTitle(_('Media types'));
 
 // create form
 $mediaTypeForm = new CForm();
@@ -84,9 +83,6 @@ $mediaTypeFormList->addRow(_('Enabled'), new CCheckBox('status', MEDIA_TYPE_STAT
 $mediaTypeTab = new CTabView();
 $mediaTypeTab->addTab('mediaTypeTab', _('Media type'), $mediaTypeFormList);
 
-// append tab to form
-$mediaTypeForm->addItem($mediaTypeTab);
-
 // append buttons to form
 $cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.list');
 $cancelButton->setAttribute('id', 'cancel');
@@ -95,7 +91,7 @@ if ($data['mediatypeid'] == 0) {
 	$addButton = new CSubmitButton(_('Add'), 'action', 'mediatype.create');
 	$addButton->setAttribute('id', 'add');
 
-	$mediaTypeForm->addItem(makeFormFooter(
+	$mediaTypeTab->setFooter(makeFormFooter(
 		$addButton,
 		array($cancelButton)
 	));
@@ -111,7 +107,7 @@ else {
 	);
 	$deleteButton->setAttribute('id', 'delete');
 
-	$mediaTypeForm->addItem(makeFormFooter(
+	$mediaTypeTab->setFooter(makeFormFooter(
 		$updateButton,
 		array(
 			$cloneButton,
@@ -121,7 +117,8 @@ else {
 	));
 }
 
-// append form to widget
-$mediaTypeWidget->addItem($mediaTypeForm);
+// append tab to form
+$mediaTypeForm->addItem($mediaTypeTab);
 
-$mediaTypeWidget->show();
+// append form to widget
+$mediaTypeWidget->addItem($mediaTypeForm)->show();

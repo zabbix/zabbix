@@ -62,513 +62,545 @@ class CHelpItems {
 			ITEM_TYPE_ZABBIX => array(
 				array(
 					'key' => 'agent.hostname',
-					'description' => _('Agent host name defined in the configuration file. String value.')
+					'description' => _('Agent host name. Returns string')
 				),
 				array(
 					'key' => 'agent.ping',
-					'description' => _('Check the agent usability. Always return 1. Can be used as a TCP ping.')
+					'description' => _('Agent availability check. Returns nothing - unavailable; 1 - available')
 				),
 				array(
 					'key' => 'agent.version',
-					'description' => _('Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1')
+					'description' => _('Version of Zabbix agent. Returns string')
 				),
 				array(
 					'key' => 'kernel.maxfiles',
-					'description' => _('Maximum number of opened files supported by OS.')
+					'description' => _('Maximum number of opened files supported by OS. Returns integer')
 				),
 				array(
 					'key' => 'kernel.maxproc',
-					'description' => _('Maximum number of processes supported by OS.')
+					'description' => _('Maximum number of processes supported by OS. Returns integer')
 				),
 				array(
 					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
-					'description' => _('Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up.')
+					'description' => _('Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up')
 				),
 				array(
 					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
-					'description' => _('Performs a DNS query. On success returns a character string with the required type of information.')
+					'description' => _('Performs a DNS query. Returns character string with the required type of information')
 				),
 				array(
 					'key' => 'net.if.collisions[if]',
-					'description' => _('Out-of-window collision. Collisions count.')
+					'description' => _('Number of out-of-window collisions. Returns integer')
 				),
 				array(
 					'key' => 'net.if.in[if,<mode>]',
-					'description' => _('Network interface input statistic. Integer value. If mode is missing bytes is used.')
+					'description' => _('Incoming traffic statistics on network interface. Returns integer')
 				),
 				array(
 					'key' => 'net.if.list',
-					'description' => _('List of network interfaces. Text value.')
+					'description' => _('Network interface list (includes interface type, status, IPv4 address, description). Returns text')
 				),
 				array(
 					'key' => 'net.if.out[if,<mode>]',
-					'description' => _('Network interface output statistic. Integer value. If mode is missing bytes is used.')
+					'description' => _('Outgoing traffic statistics on network interface. Returns integer')
 				),
 				array(
 					'key' => 'net.if.total[if,<mode>]',
-					'description' => _('Sum of network interface incoming and outgoing statistics. Integer value. Mode - one of bytes (default), packets, errors or dropped')
+					'description' => _('Sum of incoming and outgoing traffic statistics on network interface. Returns integer')
 				),
 				array(
 					'key' => 'net.tcp.listen[port]',
-					'description' => _('Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state.')
+					'description' => _('Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state')
 				),
 				array(
 					'key' => 'net.tcp.port[<ip>,port]',
-					'description' => _('Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]')
+					'description' => _('Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect')
 				),
 				array(
 					'key' => 'net.tcp.service[service,<ip>,<port>]',
-					'description' => _('Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
+					'description' => _('Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running')
 				),
 				array(
 					'key' => 'net.tcp.service.perf[service,<ip>,<port>]',
-					'description' => _('Check performance of service "service". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used.')
+					'description' => _('Checks performance of service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service')
 				),
 				array(
 					'key' => 'net.udp.listen[port]',
-					'description' => _('Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state.')
+					'description' => _('Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state')
+				),
+				array(
+					'key' => 'net.udp.service[service,<ip>,<port>]',
+					'description' => _('Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running')
+				),
+				array(
+					'key' => 'net.udp.service.perf[service,<ip>,<port>]',
+					'description' => _('Checks performance of service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
 				),
 				array(
 					'key' => 'perf_counter[counter,<interval>]',
-					'description' => _('Value of any performance counter, where "counter" parameter is the counter path and "interval" parameter is a number of last seconds, for which the agent returns an average value.')
+					'description' => _('Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)')
 				),
 				array(
 					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
-					'description' => _('Memory used by a process. <name> process name (default: "all processes"). <user> user name (default: "all users"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). <memtype> type of process memory (supported on some platforms, see documentation). Example: proc.mem[,root].')
+					'description' => _('Memory used by process in bytes. Returns integer')
 				),
 				array(
 					'key' => 'proc.num[<name>,<user>,<state>,<cmdline>]',
-					'description' => _('Number of processes. <name> and <user> same as in proc.mem item. <state> all (default), run, sleep, zomb. <cmdline> filter by command line (supports regex). Example: proc.num[apache2,www-data]. On Windows, only <name> and <user> are supported.')
+					'description' => _('The number of processes. Returns integer')
 				),
 				array(
 					'key' => 'proc_info[<process>,<attribute>,<type>]',
-					'description' => _('Different information about specific process(es)')
+					'description' => _('Different information about specific process(es). Returns float')
+				),
+				array(
+					'key' => 'sensor[device,sensor,<mode>]',
+					'description' => _('Hardware sensor reading. Returns float')
 				),
 				array(
 					'key' => 'service_state[service]',
-					'description' => _('State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service')
+					'description' => _('State of a service. Returns 0 - running; 1 - paused; 2 - start pending; 3 - pause pending; 4 - continue pending; 5 - stop pending; 6 - stopped; 7 - unknown; 255 - no such service')
+				),
+				array(
+					'key' => 'services[<type>,<state>,<exclude>]',
+					'description' => _('Listing of services. Returns 0 - if empty; text - list of services separated by a newline')
 				),
 				array(
 					'key' => 'system.boottime',
-					'description' => _('Timestamp of system boot.')
+					'description' => _('System boot time. Returns integer (Unix timestamp)')
 				),
 				array(
 					'key' => 'system.cpu.intr',
-					'description' => _('Device interrupts.')
+					'description' => _('Device interrupts. Returns integer')
 				),
 				array(
 					'key' => 'system.cpu.load[<cpu>,<mode>]',
-					'description' => _('CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage.')
+					'description' => _('CPU load. Returns float')
 				),
 				array(
 					'key' => 'system.cpu.num[<type>]',
-					'description' => _('Number of available processors.')
+					'description' => _('Number of CPUs. Returns integer')
 				),
 				array(
 					'key' => 'system.cpu.switches',
-					'description' => _('Context switches.')
+					'description' => _('Count of context switches. Returns integer')
 				),
 				array(
 					'key' => 'system.cpu.util[<cpu>,<type>,<mode>]',
-					'description' => _('CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used.')
+					'description' => _('CPU utilisation in percent. Returns float')
 				),
 				array(
 					'key' => 'system.hostname[<type>]',
-					'description' => _('Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com')
+					'description' => _('System host name. Returns string')
 				),
 				array(
 					'key' => 'system.hw.chassis[<info>]',
-					'description' => _('Chassis info - returns full info by default')
+					'description' => _('Chassis information. Returns string')
 				),
 				array(
 					'key' => 'system.hw.cpu[<cpu>,<info>]',
-					'description' => _('CPU info - lists full info for all CPUs by default')
+					'description' => _('CPU information. Returns string or integer')
 				),
 				array(
 					'key' => 'system.hw.devices[<type>]',
-					'description' => _('Device list - lists PCI devices by default')
+					'description' => _('Listing of PCI or USB devices. Returns text')
 				),
 				array(
 					'key' => 'system.hw.macaddr[<interface>,<format>]',
-					'description' => _('MAC address - lists all MAC addresses with interface names by default')
+					'description' => _('Listing of MAC addresses. Returns string')
 				),
 				array(
 					'key' => 'system.localtime[<type>]',
-					'description' => _('System local time. Time in seconds.')
+					'description' => _('System time. Returns integer with type as utc; string - with type as local')
 				),
 				array(
 					'key' => 'system.run[command,<mode>]',
-					'description' => _('Run specified command on the host.')
+					'description' => _('Run specified command on the host. Returns text result of the command')
 				),
 				array(
 					'key' => 'system.stat[resource,<type>]',
-					'description' => _('Virtual memory statistics.')
+					'description' => _('System statistics. Returns integer or float')
 				),
 				array(
 					'key' => 'system.sw.arch',
-					'description' => _('Software architecture')
+					'description' => _('Software architecture information. Returns string')
 				),
 				array(
 					'key' => 'system.sw.os[<info>]',
-					'description' => _('Current OS - returns full info by default')
+					'description' => _('Operating system information. Returns string')
 				),
 				array(
 					'key' => 'system.sw.packages[<package>,<manager>,<format>]',
-					'description' => _('Software package list - lists all packages for all supported package managers by default')
+					'description' => _('Listing of installed packages. Returns text')
 				),
 				array(
 					'key' => 'system.swap.in[<device>,<type>]',
-					'description' => _('Swap in. If type is count - swapins is returned. If type is pages - pages swapped in is returned. If swap is missing all is used.')
+					'description' => _('Swap in (from device into memory) statistics. Returns integer')
 				),
 				array(
 					'key' => 'system.swap.out[<device>,<type>]',
-					'description' => _('Swap out. If type is count - swapouts is returned. If type is pages - pages swapped in is returned. If swap is missing all is used.')
+					'description' => _('Swap out (from memory onto device) statistics. Returns integer')
 				),
 				array(
 					'key' => 'system.swap.size[<device>,<type>]',
-					'description' => _('Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used.')
+					'description' => _('Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				),
 				array(
 					'key' => 'system.uname',
-					'description' => _('Returns detailed host information. String value')
+					'description' => _('Detailed host information. Returns string')
 				),
 				array(
 					'key' => 'system.uptime',
-					'description' => _('System uptime in seconds.')
+					'description' => _('System uptime in seconds. Returns integer')
 				),
 				array(
 					'key' => 'system.users.num',
-					'description' => _('Number of users connected. Command who is used on agent side.')
+					'description' => _('Number of users logged in. Returns integer')
 				),
 				array(
 					'key' => 'vfs.dev.read[<device>,<type>,<mode>]',
-					'description' => _('Device read statistics.')
+					'description' => _('Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps')
 				),
 				array(
 					'key' => 'vfs.dev.write[<device>,<type>,<mode>]',
-					'description' => _('Device write statistics.')
+					'description' => _('Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps')
 				),
 				array(
 					'key' => 'vfs.file.cksum[file]',
-					'description' => _('Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum. Example: vfs.file.cksum[/etc/passwd]')
+					'description' => _('File checksum, calculated by the UNIX cksum algorithm. Returns integer')
 				),
 				array(
 					'key' => 'vfs.file.contents[file,<encoding>]',
-					'description' => _('Get contents of a given file.')
+					'description' => _('Retrieving contents of a file. Returns text')
 				),
 				array(
 					'key' => 'vfs.file.exists[file]',
-					'description' => _('Check if file exists. 0 - file does not exist, 1 - file exists')
+					'description' => _('Checks if file exists. Returns 0 - not found; 1 - regular file or a link (symbolic or hard) to regular file exists')
 				),
 				array(
 					'key' => 'vfs.file.md5sum[file]',
-					'description' => _('Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]')
+					'description' => _('MD5 checksum of file. Returns character string (MD5 hash of the file)')
 				),
 				array(
 					'key' => 'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
-					'description' => _('Find string in a file. Matched string')
+					'description' => _('Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter')
 				),
 				array(
 					'key' => 'vfs.file.regmatch[file,regexp,<encoding>,<start line>,<end line>]',
-					'description' => _('Find string in a file. 0 - expression not found, 1 - found')
+					'description' => _('Find string in a file. Returns 0 - match not found; 1 - found')
 				),
 				array(
 					'key' => 'vfs.file.size[file]',
-					'description' => _('Size of a given file. Size in bytes. File must have read permissions for user zabbix. Example: vfs.file.size[/var/log/syslog]')
+					'description' => _('File size (in bytes). Returns integer')
 				),
 				array(
 					'key' => 'vfs.file.time[file,<mode>]',
-					'description' => _('File time information. Number of seconds.The mode is optional. If mode is missing modify is used.')
+					'description' => _('File time information. Returns integer (Unix timestamp)')
 				),
 				array(
 					'key' => 'vfs.fs.inode[fs,<mode>]',
-					'description' => _('Number of inodes for a given volume. If mode is missing total is used.')
+					'description' => _('Number or percentage of inodes. Returns integer for number; float for percentage')
 				),
 				array(
 					'key' => 'vfs.fs.size[fs,<mode>]',
-					'description' => _('Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free].')
+					'description' => _('Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				),
 				array(
 					'key' => 'vm.memory.size[<mode>]',
-					'description' => _('Amount of memory size in bytes. If mode is missing total is used.')
+					'description' => _('Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				),
 				array(
 					'key' => 'web.page.get[host,<path>,<port>]',
-					'description' => _('Get content of web page. Default path is /')
+					'description' => _('Get content of web page. Returns web page source as text')
 				),
 				array(
 					'key' => 'web.page.perf[host,<path>,<port>]',
-					'description' => _('Get timing of loading full web page. Default path is /')
+					'description' => _('Loading time of full web page (in seconds). Returns float')
 				),
 				array(
 					'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>,<output>]',
-					'description' => _('Get first occurrence of regexp in web page. Default path is /')
+					'description' => _('Find string on a web page. Returns the matched string, or as specified by the optional output parameter')
 				),
 				array(
 					'key' => 'wmi.get[<namespace>,<query>]',
-					'description' => _('Execute WMI query and return the first selected object.')
+					'description' => _('Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)')
 				)
 			),
 			ITEM_TYPE_ZABBIX_ACTIVE => array(
 				array(
 					'key' => 'agent.hostname',
-					'description' => _('Agent host name defined in the configuration file. String value.')
+					'description' => _('Agent host name. Returns string')
 				),
 				array(
 					'key' => 'agent.ping',
-					'description' => _('Check the agent usability. Always return 1. Can be used as a TCP ping.')
+					'description' => _('Agent availability check. Returns nothing - unavailable; 1 - available')
 				),
 				array(
 					'key' => 'agent.version',
-					'description' => _('Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1')
+					'description' => _('Version of Zabbix agent. Returns string')
 				),
 				array(
 					'key' => 'eventlog[name,<regexp>,<severity>,<source>,<eventid>,<maxlines>,<mode>]',
-					'description' => _('Monitoring of Windows event logs. pattern, severity, eventid - regular expressions')
+					'description' => _('Event log monitoring. Returns log')
 				),
 				array(
 					'key' => 'kernel.maxfiles',
-					'description' => _('Maximum number of opened files supported by OS.')
+					'description' => _('Maximum number of opened files supported by OS. Returns integer')
 				),
 				array(
 					'key' => 'kernel.maxproc',
-					'description' => _('Maximum number of processes supported by OS.')
+					'description' => _('Maximum number of processes supported by OS. Returns integer')
 				),
 				array(
 					'key' => 'log[file,<regexp>,<encoding>,<maxlines>,<mode>,<output>]',
-					'description' => _('Monitoring of log file. pattern - regular expression')
+					'description' => _('Log file monitoring. Returns log')
 				),
 				array(
 					'key' => 'logrt[file_regexp,<regexp>,<encoding>,<maxlines>,<mode>,<output>]',
-					'description' => _('Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression')
+					'description' => _('Log file monitoring with log rotation support. Returns log')
 				),
 				array(
 					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
-					'description' => _('Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up.')
+					'description' => _('Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up')
 				),
 				array(
 					'key' => 'net.dns.record[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
-					'description' => _('Performs a DNS query. On success returns a character string with the required type of information.')
+					'description' => _('Performs a DNS query. Returns character string with the required type of information')
 				),
 				array(
 					'key' => 'net.if.collisions[if]',
-					'description' => _('Out-of-window collision. Collisions count.')
+					'description' => _('Number of out-of-window collisions. Returns integer')
 				),
 				array(
 					'key' => 'net.if.in[if,<mode>]',
-					'description' => _('Network interface input statistic. Integer value. If mode is missing bytes is used.')
+					'description' => _('Incoming traffic statistics on network interface. Returns integer')
 				),
 				array(
 					'key' => 'net.if.list',
-					'description' => _('List of network interfaces. Text value.')
+					'description' => _('Network interface list (includes interface type, status, IPv4 address, description). Returns text')
 				),
 				array(
 					'key' => 'net.if.out[if,<mode>]',
-					'description' => _('Network interface output statistic. Integer value. If mode is missing bytes is used.')
+					'description' => _('Outgoing traffic statistics on network interface. Returns integer')
 				),
 				array(
 					'key' => 'net.if.total[if,<mode>]',
-					'description' => _('Sum of network interface incoming and outgoing statistics. Integer value. Mode - one of bytes (default), packets, errors or dropped')
+					'description' => _('Sum of incoming and outgoing traffic statistics on network interface. Returns integer')
 				),
 				array(
 					'key' => 'net.tcp.listen[port]',
-					'description' => _('Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state.')
+					'description' => _('Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state')
 				),
 				array(
 					'key' => 'net.tcp.port[<ip>,port]',
-					'description' => _('Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If IP is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]')
+					'description' => _('Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect')
 				),
 				array(
 					'key' => 'net.tcp.service[service,<ip>,<port>]',
-					'description' => _('Check if service is available. 0 - service is down, 1 - service is running. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
+					'description' => _('Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running')
 				),
 				array(
 					'key' => 'net.tcp.service.perf[service,<ip>,<port>]',
-					'description' => _('Check performance of service "service". 0 - service is down, sec - number of seconds spent on connection to the service. If IP is missing 127.0.0.1 is used. If port number is missing, default service port is used.')
+					'description' => _('Checks performance of service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service')
 				),
 				array(
 					'key' => 'net.udp.listen[port]',
-					'description' => _('Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state.')
+					'description' => _('Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state')
+				),
+				array(
+					'key' => 'net.udp.service[service,<ip>,<port>]',
+					'description' => _('Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running')
+				),
+				array(
+					'key' => 'net.udp.service.perf[service,<ip>,<port>]',
+					'description' => _('Checks performance of service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
 				),
 				array(
 					'key' => 'perf_counter[counter,<interval>]',
-					'description' => _('Value of any performance counter, where "counter" parameter is the counter path and "interval" parameter is a number of last seconds, for which the agent returns an average value.')
+					'description' => _('Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)')
 				),
 				array(
 					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
-					'description' => _('Memory used by a process. <name> process name (default: "all processes"). <user> user name (default: "all users"). <mode> possible values: avg, max, min, sum (default). <cmdline> filter by command line (supports regex). <memtype> type of process memory (supported on some platforms, see documentation). Example: proc.mem[,root].')
+					'description' => _('Memory used by process in bytes. Returns integer')
 				),
 				array(
 					'key' => 'proc.num[<name>,<user>,<state>,<cmdline>]',
-					'description' => _('Number of processes. <name> and <user> same as in proc.mem item. <state> all (default), run, sleep, zomb. <cmdline> filter by command line (supports regex). Example: proc.num[apache2,www-data]. On Windows, only <name> and <user> are supported.')
+					'description' => _('The number of processes. Returns integer')
 				),
 				array(
 					'key' => 'proc_info[<process>,<attribute>,<type>]',
-					'description' => _('Different information about specific process(es)')
+					'description' => _('Different information about specific process(es). Returns float')
+				),
+				array(
+					'key' => 'sensor[device,sensor,<mode>]',
+					'description' => _('Hardware sensor reading. Returns float')
 				),
 				array(
 					'key' => 'service_state[service]',
-					'description' => _('State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service')
+					'description' => _('State of a service. Returns 0 - running; 1 - paused; 2 - start pending; 3 - pause pending; 4 - continue pending; 5 - stop pending; 6 - stopped; 7 - unknown; 255 - no such service')
+				),
+				array(
+					'key' => 'services[<type>,<state>,<exclude>]',
+					'description' => _('Listing of services. Returns 0 - if empty; text - list of services separated by a newline')
 				),
 				array(
 					'key' => 'system.boottime',
-					'description' => _('Timestamp of system boot.')
+					'description' => _('System boot time. Returns integer (Unix timestamp)')
 				),
 				array(
 					'key' => 'system.cpu.intr',
-					'description' => _('Device interrupts.')
+					'description' => _('Device interrupts. Returns integer')
 				),
 				array(
 					'key' => 'system.cpu.load[<cpu>,<mode>]',
-					'description' => _('CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage.')
+					'description' => _('CPU load. Returns float')
 				),
 				array(
 					'key' => 'system.cpu.num[<type>]',
-					'description' => _('Number of available processors.')
+					'description' => _('Number of CPUs. Returns integer')
 				),
 				array(
 					'key' => 'system.cpu.switches',
-					'description' => _('Context switches.')
+					'description' => _('Count of context switches. Returns integer')
 				),
 				array(
 					'key' => 'system.cpu.util[<cpu>,<type>,<mode>]',
-					'description' => _('CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used. If type is missing user is used. If mode is missing avg1 is used.')
+					'description' => _('CPU utilisation in percent. Returns float')
 				),
 				array(
 					'key' => 'system.hostname[<type>]',
-					'description' => _('Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com')
+					'description' => _('System host name. Returns string')
 				),
 				array(
 					'key' => 'system.hw.chassis[<info>]',
-					'description' => _('Chassis info - returns full info by default')
+					'description' => _('Chassis information. Returns string')
 				),
 				array(
 					'key' => 'system.hw.cpu[<cpu>,<info>]',
-					'description' => _('CPU info - lists full info for all CPUs by default')
+					'description' => _('CPU information. Returns string or integer')
 				),
 				array(
 					'key' => 'system.hw.devices[<type>]',
-					'description' => _('Device list - lists PCI devices by default')
+					'description' => _('Listing of PCI or USB devices. Returns text')
 				),
 				array(
 					'key' => 'system.hw.macaddr[<interface>,<format>]',
-					'description' => _('MAC address - lists all MAC addresses with interface names by default')
+					'description' => _('Listing of MAC addresses. Returns string')
 				),
 				array(
 					'key' => 'system.localtime[<type>]',
-					'description' => _('System local time. Time in seconds.')
+					'description' => _('System time. Returns integer with type as utc; string - with type as local')
 				),
 				array(
 					'key' => 'system.run[command,<mode>]',
-					'description' => _('Run specified command on the host.')
+					'description' => _('Run specified command on the host. Returns text result of the command')
 				),
 				array(
 					'key' => 'system.stat[resource,<type>]',
-					'description' => _('Virtual memory statistics.')
+					'description' => _('System statistics. Returns integer or float')
 				),
 				array(
 					'key' => 'system.sw.arch',
-					'description' => _('Software architecture')
+					'description' => _('Software architecture information. Returns string')
 				),
 				array(
 					'key' => 'system.sw.os[<info>]',
-					'description' => _('Current OS - returns full info by default')
+					'description' => _('Operating system information. Returns string')
 				),
 				array(
 					'key' => 'system.sw.packages[<package>,<manager>,<format>]',
-					'description' => _('Software package list - lists all packages for all supported package managers by default')
+					'description' => _('Listing of installed packages. Returns text')
 				),
 				array(
 					'key' => 'system.swap.in[<device>,<type>]',
-					'description' => _('Swap in. If type is count - swapins is returned. If type is pages - pages swapped in is returned. If swap is missing all is used.')
+					'description' => _('Swap in (from device into memory) statistics. Returns integer')
 				),
 				array(
 					'key' => 'system.swap.out[<device>,<type>]',
-					'description' => _('Swap out. If type is count - swapouts is returned. If type is pages - pages swapped in is returned. If swap is missing all is used.')
+					'description' => _('Swap out (from memory onto device) statistics. Returns integer')
 				),
 				array(
 					'key' => 'system.swap.size[<device>,<type>]',
-					'description' => _('Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used.')
+					'description' => _('Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				),
 				array(
 					'key' => 'system.uname',
-					'description' => _('Returns detailed host information. String value')
+					'description' => _('Detailed host information. Returns string')
 				),
 				array(
 					'key' => 'system.uptime',
-					'description' => _('System uptime in seconds.')
+					'description' => _('System uptime in seconds. Returns integer')
 				),
 				array(
 					'key' => 'system.users.num',
-					'description' => _('Number of users connected. Command who is used on agent side.')
+					'description' => _('Number of users logged in. Returns integer')
 				),
 				array(
 					'key' => 'vfs.dev.read[<device>,<type>,<mode>]',
-					'description' => _('Device read statistics.')
+					'description' => _('Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps')
 				),
 				array(
 					'key' => 'vfs.dev.write[<device>,<type>,<mode>]',
-					'description' => _('Device write statistics.')
+					'description' => _('Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps')
 				),
 				array(
 					'key' => 'vfs.file.cksum[file]',
-					'description' => _('Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum. Example: vfs.file.cksum[/etc/passwd]')
+					'description' => _('File checksum, calculated by the UNIX cksum algorithm. Returns integer')
 				),
 				array(
 					'key' => 'vfs.file.contents[file,<encoding>]',
-					'description' => _('Get contents of a given file.')
+					'description' => _('Retrieving contents of a file. Returns text')
 				),
 				array(
 					'key' => 'vfs.file.exists[file]',
-					'description' => _('Check if file exists. 0 - file does not exist, 1 - file exists')
+					'description' => _('Checks if file exists. Returns 0 - not found; 1 - regular file or a link (symbolic or hard) to regular file exists')
 				),
 				array(
 					'key' => 'vfs.file.md5sum[file]',
-					'description' => _('Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]')
+					'description' => _('MD5 checksum of file. Returns character string (MD5 hash of the file)')
 				),
 				array(
 					'key' => 'vfs.file.regexp[file,regexp,<encoding>,<start line>,<end line>,<output>]',
-					'description' => _('Find string in a file. Matched string')
+					'description' => _('Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter')
 				),
 				array(
 					'key' => 'vfs.file.regmatch[file,regexp,<encoding>,<start line>,<end line>]',
-					'description' => _('Find string in a file. 0 - expression not found, 1 - found')
+					'description' => _('Find string in a file. Returns 0 - match not found; 1 - found')
 				),
 				array(
 					'key' => 'vfs.file.size[file]',
-					'description' => _('Size of a given file. Size in bytes. File must have read permissions for user zabbix. Example: vfs.file.size[/var/log/syslog]')
+					'description' => _('File size (in bytes). Returns integer')
 				),
 				array(
 					'key' => 'vfs.file.time[file,<mode>]',
-					'description' => _('File time information. Number of seconds.The mode is optional. If mode is missing modify is used.')
+					'description' => _('File time information. Returns integer (Unix timestamp)')
 				),
 				array(
 					'key' => 'vfs.fs.inode[fs,<mode>]',
-					'description' => _('Number of inodes for a given volume. If mode is missing total is used.')
+					'description' => _('Number or percentage of inodes. Returns integer for number; float for percentage')
 				),
 				array(
 					'key' => 'vfs.fs.size[fs,<mode>]',
-					'description' => _('Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free].')
+					'description' => _('Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				),
 				array(
 					'key' => 'vm.memory.size[<mode>]',
-					'description' => _('Amount of memory size in bytes. If mode is missing total is used.')
+					'description' => _('Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage')
 				),
 				array(
 					'key' => 'web.page.get[host,<path>,<port>]',
-					'description' => _('Get content of web page. Default path is /')
+					'description' => _('Get content of web page. Returns web page source as text')
 				),
 				array(
 					'key' => 'web.page.perf[host,<path>,<port>]',
-					'description' => _('Get timing of loading full web page. Default path is /')
+					'description' => _('Loading time of full web page (in seconds). Returns float')
 				),
 				array(
 					'key' => 'web.page.regexp[host,<path>,<port>,<regexp>,<length>,<output>]',
-					'description' => _('Get first occurrence of regexp in web page. Default path is /')
+					'description' => _('Find string on a web page. Returns the matched string, or as specified by the optional output parameter')
 				),
 				array(
 					'key' => 'wmi.get[<namespace>,<query>]',
-					'description' => _('Execute WMI query and return the first selected object.')
+					'description' => _('Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)')
 				)
 			),
 			ITEM_TYPE_AGGREGATE => array(

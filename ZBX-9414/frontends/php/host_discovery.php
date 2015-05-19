@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
 $page['scripts'] = array('class.cviewswitcher.js', 'items.js');
-$page['hist_arg'] = array('hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -413,7 +412,7 @@ else {
 	}
 
 	// paging
-	$data['paging'] = getPagingLine($data['discoveries']);
+	$data['paging'] = getPagingLine($data['discoveries'], $sortOrder);
 
 	// render view
 	$discoveryView = new CView('configuration.host.discovery.list', $data);

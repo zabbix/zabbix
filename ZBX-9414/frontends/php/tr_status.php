@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['file'] = 'tr_status.php';
 $page['title'] = _('Status of triggers');
-$page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.cswitcher.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -212,19 +211,19 @@ CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR
 /*
  * Display
  */
-$triggerWidget = new CWidget();
+$triggerWidget = (new CWidget())->setTitle(_('Status of triggers'));
 
 $rightForm = new CForm('get');
-$rightForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
-$rightForm->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB()));
 $rightForm->addVar('fullscreen', $_REQUEST['fullscreen']);
 
-$triggerWidget->addPageHeader(
-	_('STATUS OF TRIGGERS').SPACE.'['.zbx_date2str(DATE_TIME_FORMAT_SECONDS).']',
-	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
-);
-$triggerWidget->addHeader(_('Triggers'), $rightForm);
-$triggerWidget->addHeaderRowNumber();
+$controls = new CList();
+$controls->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+$controls->addItem(array(_('Host').SPACE, $pageFilter->getHostsCB()));
+$controls->addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
+
+$rightForm->addItem($controls);
+
+$triggerWidget->setControls($rightForm);
 
 // filter
 $filterFormView = new CView('common.filter.trigger', array(
@@ -247,17 +246,17 @@ $filterFormView = new CView('common.filter.trigger', array(
 	),
 	'config' => $config
 ));
-$filterForm = $filterFormView->render();
 
-$triggerWidget->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 0));
+$filterForm = $filterFormView->render();
+$triggerWidget->addItem($filterForm);
 
 /*
  * Form
  */
 if ($_REQUEST['fullscreen']) {
 	$triggerInfo = new CTriggersInfo($_REQUEST['groupid'], $_REQUEST['hostid']);
-	$triggerInfo->hideHeader();
 	$triggerInfo->show();
+	echo BR();
 }
 
 $triggerForm = new CForm('get', 'acknow.php');
@@ -283,7 +282,7 @@ else {
 	$showHideAllDiv = null;
 }
 
-$triggerTable = new CTableInfo(_('No triggers found.'));
+$triggerTable = new CTableInfo();
 $triggerTable->setHeader(array(
 	$showHideAllDiv,
 	$config['event_ack_enable'] ? $headerCheckBox : null,
@@ -293,7 +292,7 @@ $triggerTable->setHeader(array(
 	make_sorting_header(_('Last change'), 'lastchange', $sortField, $sortOrder),
 	_('Age'),
 	$showEventColumn ? _('Duration') : null,
-	$config['event_ack_enable'] ? _('Acknowledged') : null,
+	$config['event_ack_enable'] ? _('Ack') : null,
 	_('Host'),
 	make_sorting_header(_('Name'), 'description', $sortField, $sortOrder),
 	_('Description')
@@ -305,7 +304,6 @@ $options = array(
 	'monitored' => true,
 	'skipDependent' => true,
 	'sortfield' => $sortField,
-	'sortorder' => $sortOrder,
 	'limit' => $config['search_limit'] + 1
 );
 
@@ -373,7 +371,7 @@ if (!$showMaintenance) {
 $triggers = API::Trigger()->get($options);
 
 order_result($triggers, $sortField, $sortOrder);
-$paging = getPagingLine($triggers);
+$paging = getPagingLine($triggers, $sortOrder);
 
 
 $triggers = API::Trigger()->get(array(
@@ -525,7 +523,7 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 }
 
 foreach ($triggers as $trigger) {
-	$description = new CSpan($trigger['description'], 'link_menu');
+	$description = new CSpan($trigger['description'], ZBX_STYLE_LINK_ACTION.' link_menu');
 	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	if ($showDetails) {
@@ -587,7 +585,7 @@ foreach ($triggers as $trigger) {
 			}
 		}
 
-		$hostName = new CSpan($triggerHost['name'], 'link_menu');
+		$hostName = new CSpan($triggerHost['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
 
 		// add maintenance icon with hint if host is in maintenance
@@ -651,28 +649,28 @@ foreach ($triggers as $trigger) {
 			if ($trigger['event_count']) {
 				$ackColumn = new CCol(array(
 					new CLink(
-						_('Acknowledge'),
+						_('No'),
 						'acknow.php?'.
 							'triggers[]='.$trigger['triggerid'].
 							'&backurl='.$page['file'],
-						'on'
-					), ' ('.$trigger['event_count'].')'
+						ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED
+					), CViewHelper::showNum($trigger['event_count'])
 				));
 			}
 			else {
 				$ackColumn = new CCol(
 					new CLink(
-						_('Acknowledged'),
+						_('Yes'),
 						'acknow.php?'.
 							'eventid='.$trigger['lastEvent']['eventid'].
 							'&triggerid='.$trigger['lastEvent']['objectid'].
 							'&backurl='.$page['file'],
-						'off'
+						ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN
 				));
 			}
 		}
 		else {
-			$ackColumn = new CCol(_('No events'), 'unknown');
+			$ackColumn = new CCol(_('No events'), ZBX_STYLE_GREY);
 		}
 	}
 	else {
@@ -701,7 +699,7 @@ foreach ($triggers as $trigger) {
 	$unknown = SPACE;
 	if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 		$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-		$unknown->setHint($trigger['error'], 'on');
+		$unknown->setHint($trigger['error'], ZBX_STYLE_RED);
 	}
 
 	// comments
@@ -790,14 +788,13 @@ foreach ($triggers as $trigger) {
  */
 $footer = null;
 if ($config['event_ack_enable']) {
-	$footer = get_table_header(new CActionButtonList('action', $showEventColumn ? 'events' : 'triggers', array(
+	$footer = new CActionButtonList('action', $showEventColumn ? 'events' : 'triggers', array(
 		'trigger.bulkacknowledge' => array('name' => _('Bulk acknowledge'))
-	)));
+	));
 }
 
-$triggerForm->addItem(array($paging, $triggerTable, $paging, $footer));
-$triggerWidget->addItem($triggerForm);
-$triggerWidget->show();
+$triggerForm->addItem(array($triggerTable, $paging, $footer));
+$triggerWidget->addItem($triggerForm)->show();
 
 zbx_add_post_js('jqBlink.blink();');
 zbx_add_post_js('var switcher = new CSwitcher(\''.$switcherName.'\');');

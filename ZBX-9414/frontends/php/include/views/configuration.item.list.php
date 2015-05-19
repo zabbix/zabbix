@@ -18,34 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
-$itemsWidget = new CWidget(null, 'item-list');
+$itemsWidget = (new CWidget('item-list'))->setTitle(_('Items'));
 
 // create new item button
-$createForm = new CForm('get');
-$createForm->cleanItems();
+$createForm = (new CForm('get'))->cleanItems();
+$controls = new CList();
 
 if (empty($this->data['hostid'])) {
 	$createButton = new CSubmit('form', _('Create item (select host first)'));
 	$createButton->setEnabled(false);
-	$createForm->addItem($createButton);
+	$controls->addItem($createButton);
 }
 else {
 	$createForm->addVar('hostid', $this->data['hostid']);
-	$createForm->addItem(new CSubmit('form', _('Create item')));
+	$controls->addItem(new CSubmit('form', _('Create item')));
 }
-$itemsWidget->addPageHeader(_('CONFIGURATION OF ITEMS'), $createForm);
-
-// header
-$itemsWidget->addHeader(_('Items'));
-$itemsWidget->addHeaderRowNumber();
+$createForm->addItem($controls);
+$itemsWidget->setControls($createForm);
 
 if (!empty($this->data['hostid'])) {
 	$itemsWidget->addItem(get_header_host_table('items', $this->data['hostid']));
 }
-$itemsWidget->addFlicker($this->data['flicker'], CProfile::get('web.items.filter.state', 0));
+$itemsWidget->addItem($this->data['flicker']);
 
 // create form
 $itemForm = new CForm();
@@ -56,10 +52,12 @@ if (!empty($this->data['hostid'])) {
 
 // create table
 $itemTable = new CTableInfo(
-	($this->data['filterSet']) ? _('No items found.') : _('Specify some filter condition to see the items.')
+	($this->data['filterSet']) ? null : _('Specify some filter condition to see the items.')
 );
 $itemTable->setHeader(array(
-	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
+	new CColHeader(
+		new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
+		'cell-width'),
 	_('Wizard'),
 	empty($this->data['filter_hostid']) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
@@ -83,7 +81,7 @@ foreach ($this->data['items'] as $item) {
 		$description[] = new CLink(
 			CHtml::encode($item['template_host']['name']),
 			'?hostid='.$item['template_host']['hostid'].'&filter_set=1',
-			'unknown'
+			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY
 		);
 		$description[] = NAME_DELIMITER;
 	}
@@ -92,7 +90,7 @@ foreach ($this->data['items'] as $item) {
 		$description[] = new CLink(
 			CHtml::encode($item['discoveryRule']['name']),
 			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'],
-			'parent-discovery'
+			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_ORANGE
 		);
 		$description[] = NAME_DELIMITER.$item['name_expanded'];
 	}
@@ -109,7 +107,7 @@ foreach ($this->data['items'] as $item) {
 		'?group_itemid='.$item['itemid'].
 			'&hostid='.$item['hostid'].
 			'&action='.($item['status'] == ITEM_STATUS_DISABLED ? 'item.massenable' : 'item.massdisable'),
-		itemIndicatorStyle($item['status'], $item['state'])
+		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($item['status'], $item['state'])
 	));
 
 	// info
@@ -118,7 +116,7 @@ foreach ($this->data['items'] as $item) {
 
 		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($item['error'], 'on');
+			$info->setHint($item['error'], ZBX_STYLE_RED);
 
 			$infoIcons[] = $info;
 		}
@@ -167,7 +165,7 @@ foreach ($this->data['items'] as $item) {
 		$triggerDescription = array();
 		if ($trigger['templateid'] > 0) {
 			if (!isset($this->data['triggerRealHosts'][$trigger['triggerid']])) {
-				$triggerDescription[] = new CSpan('HOST', 'unknown');
+				$triggerDescription[] = new CSpan('HOST', ZBX_STYLE_GREY);
 				$triggerDescription[] = ':';
 			}
 			else {
@@ -175,7 +173,7 @@ foreach ($this->data['items'] as $item) {
 				$triggerDescription[] = new CLink(
 					CHtml::encode($realHost['name']),
 					'triggers.php?hostid='.$realHost['hostid'],
-					'unknown'
+					ZBX_STYLE_GREY
 				);
 				$triggerDescription[] = ':';
 			}
@@ -215,10 +213,10 @@ foreach ($this->data['items'] as $item) {
 	unset($trigger);
 
 	if (!empty($item['triggers'])) {
-		$triggerInfo = new CSpan(_('Triggers'), 'link_menu');
+		$triggerInfo = new CSpan(_('Triggers'), ZBX_STYLE_LINK_ACTION.' link_menu');
 		$triggerInfo->setHint($triggerHintTable);
 		$triggerInfo = array($triggerInfo);
-		$triggerInfo[] = ' ('.count($item['triggers']).')';
+		$triggerInfo[] = CViewHelper::showNum(count($item['triggers']));
 
 		$triggerHintTable = array();
 	}
@@ -274,10 +272,9 @@ zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
 $itemForm->addItem(array(
-	$this->data['paging'],
 	$itemTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'group_itemid',
+	new CActionButtonList('action', 'group_itemid',
 		array(
 			'item.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected items?')),
 			'item.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected items?')),
@@ -289,7 +286,7 @@ $itemForm->addItem(array(
 			'item.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected items?'))
 		),
 		$this->data['hostid']
-	))
+	)
 ));
 
 // append form to widget

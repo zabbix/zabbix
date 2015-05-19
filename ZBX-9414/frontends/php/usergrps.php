@@ -28,7 +28,6 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 
 $page['title'] = _('Configuration of user groups');
 $page['file'] = 'usergrps.php';
-$page['hist_arg'] = array('config');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -498,7 +497,7 @@ else {
 
 	// sorting & paging
 	order_result($data['usergroups'], $sortField, $sortOrder);
-	$data['paging'] = getPagingLine($data['usergroups']);
+	$data['paging'] = getPagingLine($data['usergroups'], $sortOrder);
 
 	// render view
 	$userGroupsView = new CView('administration.usergroups.list', $data);

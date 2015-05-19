@@ -21,8 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 
-$actionWidget = new CWidget(null, 'action-edit');
-$actionWidget->addPageHeader(_('CONFIGURATION OF ACTIONS'));
+$actionWidget = (new CWidget())->setTitle(_('Actions'));
 
 // create form
 $actionForm = new CForm();
@@ -39,7 +38,7 @@ else {
 /*
  * Action tab
  */
-$actionFormList = new CFormList('actionlist');
+$actionFormList = new CFormList();
 $nameTextBox = new CTextBox('name', $this->data['action']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
 $actionFormList->addRow(_('Name'), $nameTextBox);
@@ -63,7 +62,7 @@ $actionFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['acti
 /*
  * Condition tab
  */
-$conditionFormList = new CFormList('conditionlist');
+$conditionFormList = new CFormList();
 
 // create condition table
 $conditionTable = new CTable(_('No conditions defined.'), 'formElementTable');
@@ -173,9 +172,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'defaultValue' => 0,
 			'popup' => array(
 				'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
-					'&srcfld1=groupid&writeonly=1&multiselect=1',
-				'width' => 450,
-				'height' => 450
+					'&srcfld1=groupid&writeonly=1&multiselect=1'
 			)
 		));
 		break;
@@ -190,9 +187,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'defaultValue' => 0,
 			'popup' => array(
 				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
-					'&dstfld1=new_condition_value_&templated_hosts=1&multiselect=1&writeonly=1',
-				'width' => 450,
-				'height' => 450
+					'&dstfld1=new_condition_value_&templated_hosts=1&multiselect=1&writeonly=1'
 			)
 		));
 		break;
@@ -207,9 +202,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'defaultValue' => 0,
 			'popup' => array(
 				'parameters' => 'srctbl=hosts&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
-					'&srcfld1=hostid&writeonly=1&multiselect=1',
-				'width' => 450,
-				'height' => 450
+					'&srcfld1=hostid&writeonly=1&multiselect=1'
 			)
 		));
 		break;
@@ -224,9 +217,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'defaultValue' => 0,
 			'popup' => array(
 				'parameters' => 'srctbl=triggers&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
-					'&srcfld1=triggerid&writeonly=1&multiselect=1&noempty=1',
-				'width' => 600,
-				'height' => 450
+					'&srcfld1=triggerid&writeonly=1&multiselect=1&noempty=1'
 			)
 		));
 		break;
@@ -265,7 +256,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			new CTextBox('drule', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=drules&srcfld1=druleid&srcfld2=name'.
-					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=drule", 450, 450);',
+					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=drule");',
 				'button-form'
 			)
 		);
@@ -277,7 +268,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			new CTextBox('dcheck', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=dchecks&srcfld1=dcheckid&srcfld2=name'.
-					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=dcheck&writeonly=1", 450, 450);',
+					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=dcheck&writeonly=1");',
 				'button-form'
 			)
 		);
@@ -290,7 +281,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			new CButton('btn1', _('Select'),
 				'return PopUp("popup.php?srctbl=proxies&srcfld1=hostid&srcfld2=host'.
 					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=proxy'.
-					'", 450, 450);',
+					'");',
 				'button-form'
 			)
 		);
@@ -353,7 +344,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$condition = null;
 }
 
-$conditionTable = new CTable(null, 'newActionConditionTable');
+$conditionTable = new CTable();
 $conditionTable->addRow(array($conditionTypeComboBox, $conditionOperatorsComboBox, $condition));
 $conditionTable->addRow(array(new CSubmit('add_condition', _('Add'), null, 'link_menu'), SPACE, SPACE));
 
@@ -585,7 +576,7 @@ if (!empty($this->data['new_operation'])) {
 			$usrgrpList->attr('style', 'min-width: 310px;');
 			$usrgrpList->setAttribute('id', 'opmsgUsrgrpList');
 
-			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1", 450, 450)', 'link_menu');
+			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")', 'link_menu');
 			$addUsrgrpBtn->attr('id', 'addusrgrpbtn');
 			$usrgrpList->addRow(new CRow(new CCol($addUsrgrpBtn, null, 2), null, 'opmsgUsrgrpListFooter'));
 
@@ -594,7 +585,7 @@ if (!empty($this->data['new_operation'])) {
 			$userList->attr('style', 'min-width: 310px;');
 			$userList->setAttribute('id', 'opmsgUserList');
 
-			$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1", 450, 450)', 'link_menu');
+			$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")', 'link_menu');
 			$addUserBtn->attr('id', 'adduserbtn');
 			$userList->addRow(new CRow(new CCol($addUserBtn, null, 2), null, 'opmsgUserListFooter'));
 
@@ -878,9 +869,7 @@ if (!empty($this->data['new_operation'])) {
 						'objectOptions' => array('editable' => true),
 						'popup' => array(
 							'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().
-								'&dstfld1=discoveryHostGroup&srcfld1=groupid&writeonly=1&multiselect=1',
-							'width' => 450,
-							'height' => 450
+								'&dstfld1=discoveryHostGroup&srcfld1=groupid&writeonly=1&multiselect=1'
 						)
 					)),
 					null, 2
@@ -932,9 +921,7 @@ if (!empty($this->data['new_operation'])) {
 						'objectOptions' => array('editable' => true),
 						'popup' => array(
 							'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
-								'&dstfld1=discoveryTemplates&templated_hosts=1&multiselect=1&writeonly=1',
-							'width' => 450,
-							'height' => 450
+								'&dstfld1=discoveryTemplates&templated_hosts=1&multiselect=1&writeonly=1'
 						)
 					)),
 					null, 2
@@ -1124,12 +1111,11 @@ if (!hasRequest('form_refresh')) {
 $actionTabs->addTab('actionTab', _('Action'), $actionFormList);
 $actionTabs->addTab('conditionTab', _('Conditions'), $conditionFormList);
 $actionTabs->addTab('operationTab', _('Operations'), $operationFormList);
-$actionForm->addItem($actionTabs);
 
 // append buttons to form
 $others = array();
 if (!empty($this->data['actionid'])) {
-	$actionForm->addItem(makeFormFooter(
+	$actionTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		array(
 			new CButton('clone', _('Clone')),
@@ -1142,12 +1128,13 @@ if (!empty($this->data['actionid'])) {
 	));
 }
 else {
-	$actionForm->addItem(makeFormFooter(
+	$actionTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		array(new CButtonCancel(url_param('actiontype')))
 	));
 }
 
+$actionForm->addItem($actionTabs);
 
 // append form to widget
 $actionWidget->addItem($actionForm);

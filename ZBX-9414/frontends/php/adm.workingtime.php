@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of working time');
 $page['file'] = 'adm.workingtime.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -49,9 +48,12 @@ if (hasRequest('update')) {
 /*
  * Display
  */
-$form = new CForm();
-$form->cleanItems();
-$form->addItem(new CComboBox('configDropDown', 'adm.workingtime.php',
+$cnf_wdgt = (new CWidget())->setTitle(_('Working time'));
+
+$form = (new CForm())->cleanItems();
+
+$controls = new CList();
+$controls->addItem(new CComboBox('configDropDown', 'adm.workingtime.php',
 	'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
@@ -68,8 +70,8 @@ $form->addItem(new CComboBox('configDropDown', 'adm.workingtime.php',
 	)
 ));
 
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF WORKING TIME'), $form);
+$form->addItem($controls);
+$cnf_wdgt->setControls($form);
 
 $config = select_config();
 

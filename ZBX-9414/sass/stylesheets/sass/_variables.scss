@@ -1,0 +1,189 @@
+$red: #e33734;
+$light-red: #ed9898;
+$lighter-red: #fccacf;
+$alt-red: #e45959;
+
+$orange: #f24f1d;
+$alt-dark-orange: #e97659;
+$alt-orange: #ffa059;
+
+$yellow: #fad634;
+$light-yellow: #fcf39d;
+$lighter-yellow: #fcf7c2;
+$alt-yellow: #ffc859;
+
+$green: #429e47;
+$light-green: #a5d6a7;
+$lighter-green: #c5e3c6;
+$alt-green: #59db8f;
+
+$primary-blue: #0275b8 !default; // Primary top nav color
+$secondary-blue: #013e61 !default; // Secondary top subnav color
+
+$alt-dark-blue: #7499ff;
+$alt-blue: #e8f4fa!default;
+
+$blue-grey: #768d99 !default;
+$light-blue-grey: #acbbc2 !default;
+$lighter-blue-grey: #ccd5d9 !default;
+$lightest-blue-grey: #ebeef0 !default; //Background color and table border color
+$alt-blue-grey: #97aab3 !default;
+
+$light-grey: #ebebeb !default;
+$lighter-grey: #f2f2f2 !default;
+
+$indigo-black: #1f2c33 !default;
+$white: #fff !default;
+$transparent: transparent;
+
+// LINK COLORS
+$link-color: #0275b8 !default; // Primary Blue
+$link-hover-color: #0275b8 !default;
+$link-active-color: #0275b8 !default;
+$link-visited-color: #0275b8 !default;
+
+$link-alt-color: #4e9ecd !default; // Light Primary Blue
+$link-alt-hover-color: #4e9ecd !default;
+$link-alt-active-color: #4e9ecd !default;
+$link-alt-visited-color: #4e9ecd !default;
+
+$link-topnav-color: #bfdced !default; // Nav Blue
+$link-topnav-hover-color: #fff !default;
+$link-topnav-active-color: #fff !default;
+$link-topnav-visited-color: #bfdced !default;
+
+$link-topsubnav-color: #bfced7 !default; // SubNav Blue
+$link-topsubnav-hover-color: #fff !default;
+$link-topsubnav-active-color: #fff !default;
+$link-topsubnav-visited-color: #bfced7 !default;
+
+$form-input-top-placeholder: #c5d8e5 !default;
+$form-input-top-focus-placeholder: #a9a9a9 !default;
+
+// TYPOGRAPHY
+$font-stack: Arial, Tahoma, Verdana, sans-serif;
+
+$font-body-size: 75%; // Default 1em/12px
+$body-line-height: 1.4em;
+
+$font-h1-size: 1.750em; // 21px
+$h1-line-height: 1.2em;
+
+$font-h2-size: 1.5em; // 18px
+$h2-line-height: 1.2em;
+
+$font-h3-size: 0.917em; // 11px
+
+$font-h4-size: 1.333em; //16px
+$h4-line-height: 1.2em;
+
+$font-top-nav-size: 1.167em; // 14px
+
+$font-setup-title: 7em; // 84px
+$setup-title-line-height: 0.75em;
+$font-setup-sup-title: 0.250em; // 21px
+
+$font-form-size: 1em; // Default 1em/12px 
+$font-msg-reset-size: 0.850em; // Default 1em/12px
+
+$font-transform: uppercase;
+
+
+// MIXINS
+
+// Fonts
+@mixin font-body {
+	font: $font-body-size $font-stack;
+	line-height: $body-line-height;
+}
+
+@mixin font-h1 {
+	font-size: $font-h1-size;
+	line-height: $h1-line-height;
+}
+
+@mixin font-h2 {
+	font-size: $font-h2-size;
+	line-height: $h2-line-height;
+}
+
+@mixin font-h3 {
+	font-size: $font-h3-size;
+	text-transform: $font-transform;
+	color: $blue-grey;
+	letter-spacing: 0.0688em;
+	text-rendering: optimizeLegibility;
+}
+
+@mixin font-h4 {
+	font-size: $font-h4-size;
+	line-height: $h4-line-height;
+}
+
+@mixin font-form {
+	font: $font-form-size $font-stack;
+}
+
+@mixin font-setup-title {
+	font-size: $font-setup-title;
+	line-height: $setup-title-line-height;
+}
+
+//CSS3
+@mixin box-shadow($shadow...) {
+	-webkit-box-shadow: $shadow;
+    -moz-box-shadow: $shadow;
+    box-shadow: $shadow;
+}
+
+@mixin border-radius($radius) {
+	-webkit-border-radius: $radius;
+	-moz-border-radius: $radius;
+	border-radius: $radius;
+}
+
+@mixin transition($arguments...) {
+	-webkit-transition: $arguments;
+	-moz-transition: $arguments;
+	transition: $arguments;
+}
+
+@mixin box-sizing($box-model) {
+	-webkit-box-sizing: $box-model;
+	-moz-box-sizing: $box-model;
+	box-sizing: $box-model;
+}
+
+@mixin opacity($opacity) {
+	opacity: $opacity;
+	$opacity-ie: $opacity * 100;
+	filter: alpha(opacity=$opacity-ie);
+}
+
+@mixin placeholder($placehldr-color) {
+	&::-webkit-input-placeholder {
+		color: $placehldr-color;
+	}
+
+	&::-moz-placeholder {
+		color: $placehldr-color;
+	}
+
+	&:-ms-input-placeholder {
+		color: $placehldr-color;
+	}
+}
+
+@mixin transform($transforms) {
+	-webkit-transform: $transforms;
+	-moz-transform: $transforms;
+	-ms-transform: $transforms;
+	transform: $transforms;
+}
+
+@mixin rotate($rotate: 0) {
+	-webkit-transform: rotate($rotate +deg);
+	-moz-transform: rotate($rotate +deg);
+	-ms-transform: rotate($rotate +deg);
+	transform: rotate($rotate +deg);
+}

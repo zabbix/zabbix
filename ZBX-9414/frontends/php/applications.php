@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of applications');
 $page['file'] = 'applications.php';
-$page['hist_arg'] = array('groupid', 'hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -356,7 +355,7 @@ else {
 	}
 
 	// get paging
-	$data['paging'] = getPagingLine($data['applications']);
+	$data['paging'] = getPagingLine($data['applications'], $sortOrder);
 
 	// render view
 	$applicationView = new CView('configuration.application.list', $data);
