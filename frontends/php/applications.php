@@ -284,49 +284,51 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-	$pageFilter = new CPageFilter(array(
-		'groups' => array('editable' => true, 'with_hosts_and_templates' => true),
-		'hosts' => array('editable' => true, 'templated_hosts' => true),
+	$pageFilter = new CPageFilter([
+		'groups' => ['editable' => true, 'with_hosts_and_templates' => true],
+		'hosts' => ['editable' => true, 'templated_hosts' => true],
 		'hostid' => getRequest('hostid'),
 		'groupid' => getRequest('groupid')
-	));
+	]);
 
-	$data = array(
+	$data = [
 		'pageFilter' => $pageFilter,
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'hostid' => $pageFilter->hostid,
-		'groupid' => $pageFilter->groupid
-	);
+		'groupid' => $pageFilter->groupid,
+		'showInfoColumn' => false
+	];
 
 	if ($pageFilter->hostsSelected) {
 		$config = select_config();
 
 		// get application ids
-		$applications = API::Application()->get(array(
+		$applications = API::Application()->get([
+			'output' => ['applicationid'],
 			'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null,
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
-			'output' => array('applicationid'),
 			'editable' => true,
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1
-		));
+		]);
 		$applicationIds = zbx_objectValues($applications, 'applicationid');
 
 		// get applications
-		$data['applications'] = API::Application()->get(array(
+		$data['applications'] = API::Application()->get([
+			'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
+			'selectItems' => ['itemid'],
+			'selectHost' => ['hostid', 'name'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectApplicationDiscovery' => ['ts_delete'],
 			'applicationids' => $applicationIds,
-			'output' => API_OUTPUT_EXTEND,
-			'selectItems' => array('itemid'),
-			'selectHost' => array('hostid', 'name'),
-			'selectDiscoveryRule' => array('itemid', 'name')
-		));
+		]);
 
 		order_result($data['applications'], $sortField, $sortOrder);
 
 		// fetch template application source parents
 		$applicationSourceParentIds = getApplicationSourceParentIds($applicationIds);
-		$parentAppIds = array();
+		$parentAppIds = [];
 
 		foreach ($applicationSourceParentIds as $applicationParentIds) {
 			foreach ($applicationParentIds as $parentId) {
@@ -350,9 +352,54 @@ else {
 				}
 			}
 		}
+
+		/*
+		 * Calculate the 'ts_delete' which will display the of warning icon and hint telling when application will be
+		 * deleted. Also we* need only 'ts_delete' for view, so get rid of the multidimensional array inside
+		 * 'applicationDiscovery' property.
+		 */
+		foreach ($data['applications'] as &$application) {
+			if ($application['applicationDiscovery']) {
+				if (count($application['applicationDiscovery']) > 1) {
+					if (min($application['applicationDiscovery']) == 0) {
+						// One rule stops discovering application, but other rule continues to discover it.
+						unset($application['applicationDiscovery']);
+						$application['applicationDiscovery']['ts_delete'] = 0;
+					}
+					else {
+						// Both rules stop discovering application. Find maximum clock.
+						$max = max($application['applicationDiscovery']);
+						unset($application['applicationDiscovery']);
+						$application['applicationDiscovery'] = $max;
+					}
+				}
+				else {
+					// Application is discovered by one rule.
+					$ts_delete = $application['applicationDiscovery'][0]['ts_delete'];
+					unset($application['applicationDiscovery']);
+					$application['applicationDiscovery']['ts_delete'] = $ts_delete;
+				}
+			}
+		}
+
+		// Info column is show when all hosts are selected or current host is not a template.
+		if ($pageFilter->hostid > 0) {
+			$host = API::Host()->get([
+				'output' => ['status'],
+				'hostids' => [$pageFilter->hostid]
+			]);
+			reset($host);
+
+			if ($host && $host['status'] != HOST_STATUS_TEMPLATE) {
+				$data['showInfoColumn'] = true;
+			}
+		}
+		else {
+			$data['showInfoColumn'] = true;
+		}
 	}
 	else {
-		$data['applications'] = array();
+		$data['applications'] = [];
 	}
 
 	// get paging

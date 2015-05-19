@@ -638,6 +638,27 @@ class CApplication extends CApiService {
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
+		// adding application discovery
+		if ($options['selectApplicationDiscovery'] !== null) {
+			$applicationDiscoveries = API::getApiService()->select('application_discovery', [
+				'output' => $this->outputExtend($options['selectApplicationDiscovery'],
+					['application_discoveryid', 'applicationid']
+				),
+				'filter' => ['applicationid' => array_keys($result)],
+				'preservekeys' => true
+			]);
+
+			$relationMap = $this->createRelationMap($applicationDiscoveries, 'applicationid',
+				'application_discoveryid'
+			);
+
+			$applicationDiscoveries = $this->unsetExtraFields($applicationDiscoveries,
+				['applicationid', 'application_discoveryid'], $options['selectApplicationDiscovery']
+			);
+
+			$result = $relationMap->mapMany($result, $applicationDiscoveries, 'applicationDiscovery');
+		}
+
 		return $result;
 	}
 }
