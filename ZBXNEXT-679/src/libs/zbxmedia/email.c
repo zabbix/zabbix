@@ -246,8 +246,8 @@ out:
 	return ret;
 }
 
-char	*smtp_prepare_payload(const char *from_display_name, const char *from_angle_addr, const char *to_display_name,
-		const char *to_angle_addr, const char *mailsubject, const char *mailbody)
+static char	*smtp_prepare_payload(const char *from_display_name, const char *from_angle_addr,
+		const char *to_display_name, const char *to_angle_addr, const char *mailsubject, const char *mailbody)
 {
 	char		*tmp = NULL, *base64 = NULL, *base64_lf;
 	char		*localsubject = NULL, *localbody = NULL;
@@ -317,6 +317,28 @@ char	*smtp_prepare_payload(const char *from_display_name, const char *from_angle
 	return tmp;
 }
 
+typedef struct
+{
+	char	*payload;
+	size_t	payload_len;
+	size_t	provided_len;
+}
+smtp_payload_status_t;
+
+static size_t	smtp_provide_payload(void *buffer, size_t size, size_t nmemb, void *instream)
+{
+	size_t			current_len;
+	smtp_payload_status_t	*payload_status = (smtp_payload_status_t *)instream;
+
+	current_len = MIN(size * nmemb, payload_status->payload_len - payload_status->provided_len);
+
+	memcpy(buffer, payload_status->payload + payload_status->provided_len, current_len);
+
+	payload_status->provided_len += current_len;
+
+	return current_len;
+}
+
 static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
 		const char *from_display_name, const char *from_angle_addr, const char *to_display_name,
 		const char *to_angle_addr, const char *mailsubject, const char *mailbody, char *error,
@@ -356,7 +378,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 
 	/* send HELO */
 
-	if (0 != strlen(smtp_helo))
+	if ('\0' != *smtp_helo)
 	{
 		zbx_snprintf(cmd, sizeof(cmd), "HELO %s\r\n", smtp_helo);
 
@@ -506,7 +528,115 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		unsigned char smtp_authentication, const char *username, const char *password,
 		char *error, size_t max_error_len)
 {
+#if defined(HAVE_LIBCURL) && 0x072200 <= LIBCURL_VERSION_NUM	/* version 7.34.0, required for CURLOPT_LOGIN_OPTIONS */
+	int			err, ret = FAIL;
+	CURL            	*easyhandle;
+	char			url[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE];
+	size_t			url_offset= 0;
+	struct curl_slist	*recipients = NULL;
+	smtp_payload_status_t	payload_status = {};
+
+	if (NULL == (easyhandle = curl_easy_init()))
+	{
+		zbx_strlcpy(error, "cannot initialize cURL library", max_error_len);
+		goto out;
+	}
+
+	if (SMTP_SECURITY_SSL == smtp_security)
+		url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "smtps://");
+	else
+		url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "smtp://");
+
+	url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "%s:%hu", smtp_server, smtp_port);
+
+	if ('\0' != *smtp_helo)
+		url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", smtp_helo);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)))
+		goto error;
+
+	if (SMTP_SECURITY_NONE != smtp_security)
+	{
+		extern char	*CONFIG_SSL_CA_LOCATION;
+
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER,
+						0 == smtp_verify_peer ? 0L : 1L)) ||
+				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST,
+						0 == smtp_verify_host ? 0L : 2L)))
+		{
+			goto error;
+		}
+
+		if (0 != smtp_verify_peer && NULL != CONFIG_SSL_CA_LOCATION)
+		{
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, CONFIG_SSL_CA_LOCATION)))
+				goto error;
+		}
+
+		if (SMTP_SECURITY_STARTTLS == smtp_security)
+		{
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL)))
+				goto error;
+		}
+	}
+
+	if (SMTP_AUTHENTICATION_NORMAL_PASSWORD == smtp_authentication)
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERNAME, username)) ||
+				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PASSWORD, password)) ||
+				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_LOGIN_OPTIONS, "AUTH=PLAIN")))
+		{
+			goto error;
+		}
+	}
+
+	recipients = curl_slist_append(recipients, to_angle_addr);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAIL_FROM, from_angle_addr)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAIL_RCPT, recipients)))
+	{
+		goto error;
+	}
+
+	payload_status.payload = smtp_prepare_payload(from_display_name, from_angle_addr, to_display_name,
+			to_angle_addr, mailsubject, mailbody);
+	payload_status.payload_len = strlen(payload_status.payload);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_UPLOAD, 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_READFUNCTION, smtp_provide_payload)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_READDATA, &payload_status)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
+	{
+		goto error;
+	}
+
+	if (NULL != CONFIG_SOURCE_IP)
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
+			goto error;
+	}
+
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+	{
+		zbx_snprintf(error, max_error_len, "%s: %s", curl_easy_strerror(err), errbuf);
+		goto clean;
+	}
+
+	ret = SUCCEED;
+	goto clean;
+error:
+	zbx_strlcpy(error, curl_easy_strerror(err), max_error_len);
+clean:
+	zbx_free(payload_status.payload);
+
+	curl_slist_free_all(recipients);
+	curl_easy_cleanup(easyhandle);
+out:
+	return ret;
+#else
+	zbx_strlcpy(error, "Support for SMTP authentication was not compiled in", max_error_len);
 	return FAIL;
+#endif
 }
 
 int	send_email(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
