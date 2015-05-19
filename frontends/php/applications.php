@@ -361,16 +361,17 @@ else {
 		foreach ($data['applications'] as &$application) {
 			if ($application['applicationDiscovery']) {
 				if (count($application['applicationDiscovery']) > 1) {
-					if (min($application['applicationDiscovery']) == 0) {
+					$ts_delete = zbx_objectValues($application['applicationDiscovery'], 'ts_delete');
+
+					if (min($ts_delete) == 0) {
 						// One rule stops discovering application, but other rule continues to discover it.
 						unset($application['applicationDiscovery']);
 						$application['applicationDiscovery']['ts_delete'] = 0;
 					}
 					else {
 						// Both rules stop discovering application. Find maximum clock.
-						$max = max($application['applicationDiscovery']);
 						unset($application['applicationDiscovery']);
-						$application['applicationDiscovery'] = $max;
+						$application['applicationDiscovery'] = max($ts_delete);
 					}
 				}
 				else {
