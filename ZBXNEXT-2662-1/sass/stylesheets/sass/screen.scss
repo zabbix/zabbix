@@ -116,7 +116,7 @@ h2 {
 h3 {
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
-	color: $blue-grey;
+	color: $font-alt-color;
 	letter-spacing: 0.0688em;
 	text-rendering: optimizeLegibility;
 }
@@ -127,13 +127,13 @@ h4 {
 
 	span {
 		font-size: $font-body-size;
-		color: $blue-grey;
+		color: $font-alt-color;
 	}
 }
 
 sup {
 	font-size: $font-h3-size;
-	color: $blue-grey;
+	color: $font-alt-color;
 }
 
 b {
@@ -465,7 +465,7 @@ footer {
     width: 100%;
     height: 60px;
 	text-align: center;
-	color: $blue-grey;
+	color: $font-alt-color;
 
 	a {
 
@@ -491,7 +491,7 @@ footer {
 /* Tables */
 .list-table {
 	width: 100%;
-    background-color: $white;
+    background-color: $ui-bg-color;
     @include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
 	
 	thead th {
@@ -503,23 +503,23 @@ footer {
 		overflow: hidden;
 	    padding: 8px 5px 7px 5px;
 	    vertical-align: bottom;
-	    border-bottom: 2px solid $lightest-blue-grey;
+	    border-bottom: 2px solid $table-border-color;
 	    text-align: left;
-	    color: $blue-grey;
+	    color: $font-alt-color;
 	    //white-space: nowrap;
 
 	    .arrow-up {
 	    	position: absolute;
 	    	top: 45%;
 	    	margin: 0 0 0 4px;
-	    	border-bottom-color: $blue-grey;
+	    	border-bottom-color: $font-alt-color;
 	    }
 
 	    .arrow-down {
 	    	position: absolute;
 	    	top: 45%;
 	    	margin: 0 0 0 4px;
-	    	border-top-color: $blue-grey;
+	    	border-top-color: $font-alt-color;
 	    }
 
 	    a {
@@ -565,7 +565,7 @@ footer {
 	td {
 		padding: 8px 5px 8px 5px;
 		vertical-align: middle;
-		border-bottom: 1px solid $lightest-blue-grey;
+		border-bottom: 1px solid $table-border-color;
 	}
 
 	.vertical_rotation_inner {
@@ -576,9 +576,9 @@ footer {
 
 .table-paging {
 	text-align: center;
-	background-color: $white;
+	background-color: $ui-bg-color;
 	padding: 7px 5px;
-	border-top: 1px solid $lightest-blue-grey;
+	border-top: 1px solid $table-border-color;
 	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
 
 	a {
@@ -643,7 +643,7 @@ footer {
 
 .treeview-plus {
 	display: inline-block;
-	background-color: $white;
+	background-color: $ui-bg-color;
 	border: 1px solid $light-blue-grey;
 	cursor: pointer;
 	width: 10px;
@@ -671,12 +671,12 @@ footer {
 	text-align: center;
 
 	.arrow-right {
-		border-left-color: $blue-grey;
+		border-left-color: $font-alt-color;
 	}
 
 	.arrow-down {
 		margin-bottom: 2px;
-		border-top-color: $blue-grey;
+		border-top-color: $font-alt-color;
 	}
 
 	&:hover .arrow-right {
@@ -728,11 +728,11 @@ footer {
 .filter-container {
 	padding: 10px 0;
 	margin: 0 0 10px 0;
-	background-color: $white;
+	background-color: $ui-bg-color;
 	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
 
 	.table {
-		border-bottom: 1px solid $lightest-blue-grey;
+		border-bottom: 1px solid $table-border-color;
 	}
 
 	.filter-forms {
@@ -777,7 +777,7 @@ footer {
 .filter-forms {
 	margin: 0 auto;
 	text-align: center;
-	background-color: $white;
+	background-color: $ui-bg-color;
 
 	.cell {
 		text-align: left;
@@ -817,11 +817,9 @@ footer {
 	margin-right: 3px;
 	width: 312px;
 	min-height: 22px;
-	line-height: 22px;
-	padding: 0;
 
 	&.active {
-		border-color: $primary-blue;
+		border-color: $form-border-focus-color;
 	}
 
 	input[type="text"] {
@@ -829,7 +827,6 @@ footer {
 		background: none;
 		box-sizing: border-box;
 		width: 100%;
-		padding-top: 2px;
 
 	}
 
@@ -872,8 +869,8 @@ footer {
 .multiselect-suggest {
 	padding: 0 5px;
 	white-space: normal;
-	color: $blue-grey;
-	background-color: $white;
+	color: $font-alt-color;
+	background-color: $ui-bg-color;
 
 	li {
 		display: block;
@@ -954,7 +951,7 @@ footer {
 	}
 
 	.btn-grey {
-		background-color: $white;
+		background-color: $ui-bg-color;
 		margin-top: -1px;
 	}
 }
@@ -1004,7 +1001,7 @@ footer {
 .icon {
 	position: relative;
 	height: 22px;
-	background-color: $white;
+	background-color: $ui-bg-color;
 	cursor: move;
 	@include border-radius(2px);
 
@@ -1183,7 +1180,7 @@ footer {
 .table-forms-separator {
 	display: inline-block;
 	padding: 0 0 5px 0;
-	border-bottom: 2px solid $lightest-blue-grey;
+	border-bottom: 2px solid $table-border-color;
 }
 
 .margin-top {
@@ -1267,13 +1264,13 @@ input {
 	}
 
 	&[disabled] {
-		background-color: $light-grey;
+		background-color: $form-disabled-bg-color;
 		@extend %disabled;
 	}
 
 	&[readonly] {
-		background-color: $light-grey;
-		color: $indigo-black!important;
+		background-color: $form-disabled-bg-color;
+		color: $font-color!important;
 		cursor: text!important;
 		@extend %disabled;
 	}  
@@ -1287,13 +1284,13 @@ textarea {
 	@extend %form-input-style;
 
 	&[disabled] {
-		background-color: $light-grey;
+		background-color: $form-disabled-bg-color;
 		@extend %disabled;
 	}
 
 	&[readonly] {
-		background-color: $light-grey;
-		color: $indigo-black!important;
+		background-color: $form-disabled-bg-color;
+		color: $font-color!important;
 		cursor: text!important;
 		@extend %disabled;
 	}   
@@ -1301,7 +1298,7 @@ textarea {
 
 select {
 	padding: 3px 3px 3px 0;
-	background-color: $white;
+	background-color: $form-bg-color;
 	@extend %form-input-style;
 
 	&.select-multiple {
@@ -1310,13 +1307,13 @@ select {
 	}
 
 	&[disabled] {
-		background-color: $light-grey;
+		background-color: $form-disabled-bg-color;
 		@extend %disabled;
 	}
 
 	&[readonly] {
-		background-color: $light-grey;
-		color: $indigo-black!important;
+		background-color: $form-disabled-bg-color;
+		color: $font-color!important;
 		cursor: text!important;
 		@extend %disabled;
 	}   
@@ -1350,13 +1347,13 @@ legend {
 }
 
 %form-input-style {
-	border: 1px solid $light-blue-grey;
+	border: 1px solid $form-border-color;
 	font-family: $font-stack;
 	font-size: $font-form-size;
 	@include transition(border-color .2s ease-out);
 
 	&:focus {
-		border-color: $primary-blue;
+		border-color: $form-border-focus-color;
 	}
 }
 
@@ -1689,7 +1686,7 @@ button {
 		min-width: 94px;
 
 		&.filter-active {
-			background-color: $white;
+			background-color: $ui-bg-color;
 			border: none;
 			color: $link-color;
 			@include box-shadow(0 -1px 1px 0 rgba(118,141,153,0.08));
@@ -1779,7 +1776,7 @@ button[disabled] {
 
 .action-buttons {
 	margin: 15px 0 0 0;
-	color: $blue-grey;
+	color: $font-alt-color;
 
 	button {
 		margin: 0 14px 10px 0;
@@ -1796,7 +1793,7 @@ button[disabled] {
 	height: 36px;
 	line-height: 36px;
 	margin: -10px -10px 10px -10px;
-	border-bottom: 1px solid $lightest-blue-grey;
+	border-bottom: 1px solid $table-border-color;
 
 	li {
 		display: inline-block;
@@ -1811,12 +1808,12 @@ button[disabled] {
 		}
 
 		&.ui-tabs-active {
-			border-left: 1px solid $lightest-blue-grey;
-			border-right: 1px solid $lightest-blue-grey;
+			border-left: 1px solid $table-border-color;
+			border-right: 1px solid $table-border-color;
 			a {
 				padding: 8px 13px 11px 13px;
 				font-weight: bold;
-				background-color: $white;
+				background-color: $ui-bg-color;
 				color: $indigo-black;
 				text-decoration: none;
 				cursor: default;
@@ -1857,7 +1854,7 @@ button[disabled] {
 /* Sign in, Installation */
 
 .setup-container  {
-	background-color: $white;
+	background-color: $ui-bg-color;
 	width: 766px;
 	height: 440px;
 	margin: 0 auto;
@@ -1887,7 +1884,7 @@ button[disabled] {
 			&.setup-left-current {
 				//border-left: 3px solid $primary-blue;
 				border-left: 3px solid $main-color;
-				color: $blue-grey;
+				color: $font-alt-color;
 				padding-left: 25px;
 			}
 		}
@@ -1937,7 +1934,7 @@ button[disabled] {
 }
 
 .setup-title {
-	color: #768d99;
+	color: $font-alt-color;
 	height: 350px;
 	display: table-cell;
 	vertical-align: middle;
@@ -1971,7 +1968,7 @@ button[disabled] {
 }
 
 .signin-container {
-	background-color: $white;
+	background-color: $ui-bg-color;
 	width: 322px;
 	margin: 0 auto;
 	padding: 20px 28px 0 28px;
@@ -2028,7 +2025,7 @@ button[disabled] {
 .signin-links {
 	width: 100%;
 	text-align: center;
-	color: $blue-grey;
+	color: $font-alt-color;
 	margin: 22px 0 0 0;
 }
 
@@ -2056,7 +2053,7 @@ button[disabled] {
 .dashbrd-widget {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
-	background-color: $white;
+	background-color: $ui-bg-color;
 	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
 
 	.list-table {
@@ -2073,7 +2070,7 @@ button[disabled] {
 		tbody tr {
 
 			&:last-child td {
-				border-bottom: 1px solid $lightest-blue-grey;
+				border-bottom: 1px solid $table-border-color;
 			}
 		}
 	}
@@ -2081,11 +2078,11 @@ button[disabled] {
 
 %nothing-to-show {
 	text-align: center;
-	color: $blue-grey;
+	color: $font-alt-color;
 	@include transition(0s);
 
 	td:hover {
-		background-color: $white;
+		background-color: $ui-bg-color;
 	}
 }
 
@@ -2114,7 +2111,7 @@ button[disabled] {
 
 .dashbrd-widget-foot {
 	text-align: right;
-	color: $blue-grey;
+	color: $font-alt-color;
 	margin: 0 10px;
 
 	li {
@@ -2129,7 +2126,7 @@ button[disabled] {
 	z-index: 1000;
 	padding: 5px 15px 5px 25px;
 	min-width: 166px;
-	background-color: $white;
+	background-color: $ui-bg-color;
 	border: 1px solid $lighter-blue-grey;
 	@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
 
@@ -2138,7 +2135,7 @@ button[disabled] {
 		white-space: nowrap;
 
 		div {
-			border-top: 1px solid $lightest-blue-grey;
+			border-top: 1px solid $table-border-color;
 			margin: 5px -15px 5px -25px;
 		}
 	}
@@ -2182,7 +2179,7 @@ button[disabled] {
 			line-height: auto;
 			padding: 0;
 			margin: 0;
-			border-left-color: $blue-grey;
+			border-left-color: $font-alt-color;
 		}
 	}
 
@@ -2203,8 +2200,8 @@ button[disabled] {
 	z-index: 1000;
 	padding: 0 5px;
 	min-width: 16px;
-	color: $blue-grey;
-	background-color: $white;
+	color: $font-alt-color;
+	background-color: $form-bg-color;
 	border: 1px solid $lighter-blue-grey;
 	border-top: none;
 	@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
@@ -2213,7 +2210,7 @@ button[disabled] {
 		display: block;
 		height: inherit;
 		line-height: normal;
-		color: $indigo-black;
+		color: $font-color;
 		padding: 0.4em 5px;
 		margin: 0 -5px;
 		cursor: pointer;
@@ -2229,7 +2226,7 @@ button[disabled] {
 	position: absolute;
 	z-index: 1000;
 	padding: 15px;
-	background-color: $white;
+	background-color: $ui-bg-color;
 	border: 1px solid $lighter-blue-grey;
 	@include box-shadow(0 5px 20px 0 rgba(118,141,153,0.3));
 
@@ -2343,7 +2340,7 @@ button[disabled] {
 
 		thead {
 			text-transform: $font-transform;
-			color: $blue-grey;
+			color: $font-alt-color;
 		}
 
 		tbody {
@@ -2497,7 +2494,7 @@ a.orange {
 }
 
 .grey {
-	color: $blue-grey;
+	color: $font-alt-color;
 }
 
 a.grey {
@@ -2709,7 +2706,7 @@ td.disaster-bg {
 	padding: 7px 5px;
 	text-align: center;
 	background-color: $light-yellow;
-	color: $indigo-black;
+	color: $font-color;
 	border-top: 1px solid $yellow;
 	@include box-shadow(-1px 0 2px 0 rgba(118,141,153,0.15));
 }
@@ -2799,17 +2796,17 @@ a.form-remove-btn {
 		display: inline-block;
 		width: 18px;
 		height: 18px;
-		border: 1px solid $white;
+		border: 1px solid $ui-bg-color;
 
 		&:hover {
 			cursor: pointer;
-			@include box-shadow(inset 0 0 0 1px $white);
+			@include box-shadow(inset 0 0 0 1px $ui-bg-color);
 			border-color: $alt-dark-blue;
 		}
 
 		&:active {
 			cursor: pointer;
-			@include box-shadow(inset 0 0 0 2px $white);
+			@include box-shadow(inset 0 0 0 2px $ui-bg-color);
 		}
 	}
 }
@@ -2870,7 +2867,7 @@ $browsers: (
 }
 
 .browser-warning-footer {
-	border-top: 1px solid $lightest-blue-grey;
+	border-top: 1px solid $table-border-color;
 	margin: 25px 0 0 0;
 	padding: 10px 0 0 0;
 	text-align: center;

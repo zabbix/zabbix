@@ -43,9 +43,10 @@ $table-border-color: #ebeef0 !default; // NEW row separator color in tables
 
 
 // FORMS
-$form-color: #1f2c33 !default;
+$form-color: #1f2c33 !default; // NEW
 $form-bg-color: #fff !default; //NEW
 $form-border-color: #acbbc2 !default; //NEW
+$form-border-focus-color: #0275b8 !default; //NEW
 
 $form-disabled-bg-color: #ebebeb !default; //NEW
 
@@ -97,7 +98,7 @@ $link-main-subnav-visited-color: #bfced7 !default;
 
 
 
-$primary-blue: #0275b8 !default; // USED Primary top nav color
+//$primary-blue: #0275b8 !default; // USED Primary top nav color
 //$secondary-blue: #013e61 !default; // USED Secondary top subnav color
 
 
@@ -106,7 +107,7 @@ $alt-blue: #e8f4fa!default; // USED
 $blue-grey: #768d99 !default;
 $light-blue-grey: #acbbc2 !default;
 $lighter-blue-grey: #ccd5d9 !default;
-$lightest-blue-grey: #ebeef0 !default; //Background color and table border color
+//$lightest-blue-grey: #ebeef0 !default; //Background color and table border color
 
 
 
