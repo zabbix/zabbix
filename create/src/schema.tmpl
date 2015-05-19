@@ -1295,15 +1295,17 @@ FIELD		|itemid				|t_id	|	|NOT NULL	|0	|2|items
 UNIQUE		|1				|application_prototypeid,itemid
 INDEX		|2				|itemid
 
-TABLE|application_discovery|applicationid,application_prototypeid|ZBX_DATA
+TABLE|application_discovery|application_discoveryid|ZBX_DATA
+FIELD		|application_discoveryid	|t_id		|	|NOT NULL	|0
 FIELD		|applicationid			|t_id		|	|NOT NULL	|0	|1|applications
-FIELD		|application_prototypeid	|t_id		|	|NOT NULL	|0	|2|application_prototype	|application_prototypeid
+FIELD		|application_prototypeid	|t_id		|	|NOT NULL	|0	|2|application_prototype
 FIELD		|name				|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck			|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete			|t_time		|'0'	|NOT NULL	|ZBX_NODATA
-INDEX		|1				|application_prototypeid
+INDEX		|1				|applicationid
+INDEX		|2				|application_prototypeid
 
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2050025	|2050025
+ROW		|2050026	|2050026
