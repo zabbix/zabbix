@@ -214,9 +214,20 @@ else{
 				}
 			}
 
-			order_result($data['hosts'], getPageSortField('name'), getPageSortOrder());
+			$sortfield = getPageSortField('name');
+			$sortorder = getPageSortOrder();
+			$limit = $data['config']['search_limit'] + 1;
 
-			$data['hosts'] = array_slice($data['hosts'], 0, $data['config']['search_limit'] + 1);
+			order_result($data['hosts'], $sortfield, $sortorder);
+
+			if ($sortorder == ZBX_SORT_UP) {
+				$data['hosts'] = array_slice($data['hosts'], 0, $limit);
+			}
+			else {
+				$data['hosts'] = array_slice($data['hosts'], -$limit, $limit);
+			}
+
+			order_result($data['hosts'], $sortfield, $sortorder);
 		}
 
 	}

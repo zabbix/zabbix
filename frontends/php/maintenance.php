@@ -516,10 +516,9 @@ else {
 
 	// get only maintenance IDs for paging
 	$options = array(
-		'output' => array('maintenanceid'),
+		'output' => array('maintenanceid', $sortfield),
 		'editable' => true,
 		'sortfield' => $sortfield,
-		'sortorder' => $sortorder,
 		'limit' => $config['search_limit'] + 1
 	);
 
@@ -531,6 +530,9 @@ else {
 	}
 
 	$data['maintenances'] = API::Maintenance()->get($options);
+
+	order_result($data['maintenances'], $sortfield, $sortorder);
+
 	$data['paging'] = getPagingLine($data['maintenances'], array('maintenanceid'));
 
 	// get list of maintenances
