@@ -1816,7 +1816,7 @@ sub __no_status_result
 	my $clock = shift;
 	my $details = shift;
 
-	fail("Service availability result is missing for ", uc($service), " test ", ($details ? "($details) " : ''),
+	wrn("Service availability result is missing for ", uc($service), " test ", ($details ? "($details) " : ''),
 		"performed at ", ts_str($clock), " ($clock) on probe $probe. This means the test period was not" .
 		" handled by SLV availability cron job ($avail_key). This may happen e. g. if cron was not running" .
 		" at some point. In order to fix this problem please run".
