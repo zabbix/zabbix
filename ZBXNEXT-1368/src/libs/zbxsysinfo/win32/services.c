@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "log.h"
+#include "zbxjson.h"
 
 int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -290,6 +291,131 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 		buf = zbx_strdup(buf, "0");
 
 	SET_STR_RESULT(result, buf);
+
+	return SYSINFO_RET_OK;
+}
+
+int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
+	QUERY_SERVICE_CONFIG		*qsc = NULL;
+	SC_HANDLE			h_mgr, h_srv;
+	DWORD				sz = 0, szn, i, services, resume_handle = 0;
+	int				ret;
+	char				*utf8;
+	struct zbx_json			j;
+
+	if (0 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (h_mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+
+	while (0 != (ret = EnumServicesStatusEx(h_mgr, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL,
+			(LPBYTE)ssp, sz, &szn, &services, &resume_handle, NULL)) || ERROR_MORE_DATA == GetLastError())
+	{
+		for (i = 0; i < services; i++)
+		{
+			if (NULL == (h_srv = OpenService(h_mgr, ssp[i].lpServiceName, SERVICE_QUERY_STATUS |
+				SERVICE_QUERY_CONFIG)))
+			{
+				continue;
+			}
+
+			zbx_json_addobject(&j, NULL);
+
+			utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
+			zbx_json_addstring(&j, "{#SERVICE.NAME}", utf8, ZBX_JSON_TYPE_STRING);
+			zbx_free(utf8);
+
+			utf8 = zbx_unicode_to_utf8(ssp[i].lpDisplayName);
+			zbx_json_addstring(&j, "{#SERVICE.DESCRIPTION}", utf8, ZBX_JSON_TYPE_STRING);
+			zbx_free(utf8);
+
+			if((SERVICE_FILE_SYSTEM_DRIVER | SERVICE_KERNEL_DRIVER) &
+				ssp[i].ServiceStatusProcess.dwServiceType)
+			{
+				utf8 = "driver";
+			}
+			else if((SERVICE_WIN32_OWN_PROCESS | SERVICE_WIN32_SHARE_PROCESS) &
+				ssp[i].ServiceStatusProcess.dwServiceType)
+			{
+				utf8 = "service";
+			}
+			else
+				utf8 = "unknown";
+
+			zbx_json_addstring(&j, "{#SERVICE.TYPE}", utf8, ZBX_JSON_TYPE_STRING);
+			zbx_free(utf8);
+
+			zbx_json_adduint64(&j, "{#SERVICE.STATUS}", ssp[i].ServiceStatusProcess.dwCurrentState);
+
+			QueryServiceConfig(h_srv, qsc, 0, &sz);
+			if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
+			{
+				qsc = (QUERY_SERVICE_CONFIG *)zbx_malloc((void *)qsc, sz);
+
+				if (0 != QueryServiceConfig(h_srv, qsc, sz, &sz))
+				{
+					utf8 = zbx_unicode_to_utf8(qsc->lpBinaryPathName);
+					zbx_json_addstring(&j, "{#SERVICE.PATH}", utf8, ZBX_JSON_TYPE_STRING);
+					zbx_free(utf8);
+
+					utf8 = zbx_unicode_to_utf8(qsc->lpServiceStartName);
+					zbx_json_addstring(&j, "{#SERVICE.USER}", utf8, ZBX_JSON_TYPE_STRING);
+					zbx_free(utf8);
+
+					if(SERVICE_DEMAND_START == qsc->dwStartType)
+					{
+						utf8 = "manual";
+					}
+					else if(SERVICE_DISABLED == qsc->dwStartType)
+					{
+						utf8 = "disabled";
+					}
+					else if(SERVICE_AUTO_START == qsc->dwStartType ||
+						SERVICE_BOOT_START == qsc->dwStartType ||
+						SERVICE_SYSTEM_START == qsc->dwStartType)
+					{
+						utf8 = "automatic";
+					}
+					else
+						utf8 = "unknown";
+
+					zbx_json_addstring(&j, "{#SERVICE.STARTUP_TYPE}", utf8, ZBX_JSON_TYPE_STRING);
+				}
+
+				zbx_free(qsc);
+			}
+
+			zbx_json_close(&j);
+
+			CloseServiceHandle(h_srv);
+		}
+
+		if (0 == szn)
+			break;
+
+		if (NULL == ssp)
+		{
+			sz = szn;
+			ssp = (ENUM_SERVICE_STATUS_PROCESS *)zbx_malloc((void *)ssp, sz);
+		}
+	}
+
+	zbx_free(ssp);
+
+	CloseServiceHandle(h_mgr);
+
+	zbx_json_close(&j);
+	SET_STR_RESULT(result, strdup(j.buffer));
+	zbx_json_free(&j);
 
 	return SYSINFO_RET_OK;
 }
