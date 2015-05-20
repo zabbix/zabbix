@@ -22,29 +22,20 @@
 class CTriggersInfo extends CTable {
 
 	public $style;
-	public $show_header;
 	private $groupid;
 	private $hostid;
 
 	public function __construct($groupid = null, $hostid = null, $style = STYLE_HORIZONTAL) {
 		$this->style = null;
 
-		parent::__construct(null, 'triggers_info');
+		parent::__construct(null, 'list-table');
 		$this->setOrientation($style);
-		$this->show_header = true;
 		$this->groupid = is_null($groupid) ? 0 : $groupid;
 		$this->hostid = is_null($hostid) ? 0 : $hostid;
 	}
 
 	public function setOrientation($value) {
-		if ($value != STYLE_HORIZONTAL && $value != STYLE_VERTICAL) {
-			return $this->error('Incorrect value for SetOrientation ['.$value.']');
-		}
 		$this->style = $value;
-	}
-
-	public function hideHeader() {
-		$this->show_header = false;
 	}
 
 	public function bodyToString() {
@@ -92,24 +83,6 @@ class CTriggersInfo extends CTable {
 				case TRIGGER_VALUE_FALSE:
 					$triggersOkState += $row['cnt'];
 			}
-		}
-
-		if ($this->show_header) {
-			$header_str = _('Triggers info').SPACE;
-
-			if ($this->groupid != 0) {
-				$group = get_hostgroup_by_groupid($this->groupid);
-				$header_str .= _('Group').SPACE.'&quot;'.$group['name'].'&quot;';
-			}
-			else {
-				$header_str .= _('All groups');
-			}
-
-			$header = new CCol($header_str, 'header');
-			if ($this->style == STYLE_HORIZONTAL) {
-				$header->setColspan(8);
-			}
-			$this->addRow($header);
 		}
 
 		$severityCells = array(getSeverityCell(null, $config, $triggersOkState.SPACE._('Ok'), true));

@@ -48,7 +48,6 @@ $fields = array(
 	'zbx_server' =>			array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'zbx_server_name' =>	array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'zbx_server_port' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Port')),
-	'message' =>			array(T_ZBX_STR, O_OPT, null,	null,				null),
 	// actions
 	'save_config' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
 	'retry' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
@@ -56,8 +55,6 @@ $fields = array(
 	'finish' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
 	'next' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
 	'back' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
-	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,				null)
 );
 
 // config
@@ -93,36 +90,45 @@ elseif (hasRequest('cancel') || hasRequest('finish')) {
 $ZBX_SETUP_WIZARD = new CSetupWizard($ZBX_CONFIG);
 
 // page title
-$pageTitle = '';
-if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
-	$pageTitle = $ZBX_SERVER_NAME.NAME_DELIMITER;
-}
-$pageTitle .= _('Installation');
-
-$pageHeader = new CPageHeader($pageTitle);
+$pageHeader = new CPageHeader(_('Installation'));
 $pageHeader->addCssInit();
-$pageHeader->addCssFile('styles/themes/originalblue/main.css');
-$pageHeader->addJsFile('js/jquery/jquery.js');
-$pageHeader->addJsFile('js/jquery/jquery-ui.js');
-$pageHeader->addJsFile('js/functions.js');
+//$pageHeader->addJsFile('js/jquery/jquery.js');
+//$pageHeader->addJsFile('js/functions.js');
+$pageHeader->addJsFile('js/browsers.js');
 
 // if init fails due to missing configuration, set user as guest with default en_GB language
 if (!CWebUser::$data) {
 	CWebUser::setDefault();
 }
 
-$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&amp;files[]=common.js&amp;files[]=main.js';
+$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'];
 $pageHeader->addJsFile($path);
 
 $pageHeader->display();
-?>
-<body class="originalblue">
 
-<?php $ZBX_SETUP_WIZARD->show(); ?>
-<script>
-	jQuery(function($) {
-		$('.jqueryinput').button();
-	});
-</script>
-</body>
+/*
+ * Dispalying
+ */
+$header = new CTag('header', 'yes', new CDiv(new CDiv(null, 'signin-logo')));
+$header->attr('role', 'banner');
+
+$link = new CLink('GPL v2', 'http://www.zabbix.com/license.php', null, null, true);
+$link->setAttribute('target', '_blank');
+$sub_footer = new CDiv(array('Licensed under ', $link), 'signin-links');
+
+$link = new CLink('Zabbix SIA', 'http://www.zabbix.com/', null, null, true);
+$link->setAttribute('target', '_blank');
+$footer = new CTag('footer', 'yes', array(
+	'Zabbix '.ZABBIX_VERSION.'. &copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
+	$link
+));
+
+$body = new CTag('body', 'yes', array(
+	$header,
+	new CTag('article', 'yes', array($ZBX_SETUP_WIZARD, $sub_footer)),
+	$footer
+));
+
+$body->show();
+?>
 </html>

@@ -384,10 +384,10 @@ function openWinCentered(url, name, width, height, params) {
 
 function PopUp(url, width, height, form_name) {
 	if (!width) {
-		width = 720;
+		width = 1024;
 	}
 	if (!height) {
-		height = 480;
+		height = 768;
 	}
 	if (!form_name) {
 		form_name = 'zbx_popup';

@@ -223,13 +223,15 @@ function itemIndicator($status, $state = null) {
  */
 function itemIndicatorStyle($status, $state = null) {
 	if ($status == ITEM_STATUS_ACTIVE) {
-		return ($state == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : 'enabled';
+		return ($state == ITEM_STATE_NOTSUPPORTED) ?
+			ZBX_STYLE_GREY :
+			ZBX_STYLE_GREEN;
 	}
 	elseif ($status == ITEM_STATUS_DISABLED) {
-		return 'disabled';
+		return ZBX_STYLE_RED;
 	}
 
-	return 'unknown';
+	return ZBX_STYLE_GREY;
 }
 
 /**
@@ -487,24 +489,6 @@ function disable_item($itemids) {
 	return update_item_status($itemids, ITEM_STATUS_DISABLED);
 }
 
-function get_item_by_key($key, $host = '') {
-	$item = false;
-	$sql_from = '';
-	$sql_where = '';
-	if (!empty($host)) {
-		$sql_from = ',hosts h ';
-		$sql_where = ' AND h.host='.zbx_dbstr($host).' AND i.hostid=h.hostid ';
-	}
-	$sql = 'SELECT DISTINCT i.*'.
-			' FROM items i '.$sql_from.
-			' WHERE i.key_='.zbx_dbstr($key).
-				$sql_where;
-	if ($item = DBfetch(DBselect($sql))) {
-		$item = $item;
-	}
-	return $item;
-}
-
 function get_item_by_itemid($itemid) {
 	$db_items = DBfetch(DBselect('SELECT i.* FROM items i WHERE i.itemid='.zbx_dbstr($itemid)));
 	if ($db_items) {
@@ -694,7 +678,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 		}
 	}
 
-	$table = new CTableInfo(_('No items found.'));
+	$table = new CTableInfo();
 	if (empty($hostNames)) {
 		return $table;
 	}
@@ -703,9 +687,9 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 	order_result($hostNames);
 
 	if ($viewMode == STYLE_TOP) {
-		$header = array(new CCol(_('Items'), 'center'));
+		$header = array(_('Items'));
 		foreach ($hostNames as $hostName) {
-			$header[] = new CCol($hostName, 'vertical_rotation');
+			$header[] = new CColHeader($hostName, 'vertical_rotation');
 		}
 		$table->setHeader($header, 'vertical_header');
 
@@ -720,19 +704,19 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 	else {
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
-		$header = array(new CCol(_('Hosts'), 'center'));
+		$header = array(_('Hosts'));
 		foreach ($items as $descr => $ithosts) {
-			$header[] = new CCol($descr, 'vertical_rotation');
+			$header[] = new CColHeader($descr, 'vertical_rotation');
 		}
 		$table->setHeader($header, 'vertical_header');
 
 		foreach ($hostNames as $hostId => $hostName) {
 			$host = $hosts[$hostId];
 
-			$name = new CSpan($host['name'], 'link_menu');
+			$name = new CSpan($host['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
 			$name->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
 
-			$tableRow = array(new CCol($name));
+			$tableRow = array(new CCol($name, ZBX_STYLE_NOWRAP));
 			foreach ($items as $ithosts) {
 				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
 			}
@@ -744,9 +728,9 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 }
 
 function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
-	$css = '';
-	$value = '-';
 	$ack = null;
+	$css = '';
+	$value = UNKNOWN_VALUE;
 
 	if (isset($ithosts[$hostName])) {
 		$item = $ithosts[$hostName];
@@ -759,10 +743,12 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 				: null;
 		}
 
-		$value = ($item['value'] !== null) ? formatHistoryValue($item['value'], $item) : UNKNOWN_VALUE;
+		if ($item['value'] !== null) {
+			$value = formatHistoryValue($item['value'], $item);
+		}
 	}
 
-	if ($value != '-') {
+	if ($value != UNKNOWN_VALUE) {
 		$value = new CSpan($value, 'link');
 	}
 
