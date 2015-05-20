@@ -20,9 +20,16 @@
 
 
 /**
- * Converter for converting import data from 1.8 to 2.0.
+ * Converter for converting import data from 2.x to 3.0.
  */
 class C20ImportConverter extends CConverter {
+
+	/**
+	 * Item key convertation.
+	 *
+	 * @var C20ItemKeyConverter
+	 */
+	protected $itemKeyConverter;
 
 	/**
 	 * Converter used for converting trigger expressions from 2.2 to 2.4 format.
@@ -32,6 +39,7 @@ class C20ImportConverter extends CConverter {
 	protected $triggerExpressionConverter;
 
 	public function __construct() {
+		$this->itemKeyConverter = new C20ItemKeyConverter();
 		$this->triggerExpressionConverter = new C20TriggerConverter();
 	}
 
@@ -109,6 +117,8 @@ class C20ImportConverter extends CConverter {
 			if (isset($item['status']) && $item['status'] == ITEM_STATUS_NOTSUPPORTED) {
 				$item['status'] = ITEM_STATUS_ACTIVE;
 			}
+
+			$item['key'] = $this->itemKeyConverter->convert($item['key']);
 		}
 		unset($item);
 
