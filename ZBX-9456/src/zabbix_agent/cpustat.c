@@ -26,7 +26,8 @@
 #include "mutexs.h"
 #include "log.h"
 
-#if defined(__OpenBSD__) && defined(HAVE_SYS_SCHED_H) && !defined(HAVE_SYS_DKSTAT_H)
+/* <sys/dkstat.h> removed in OpenBSD 5.7, only <sys/sched.h> with the same CP_* definitions remained */
+#if defined(OpenBSD) && defined(HAVE_SYS_SCHED_H) && !defined(HAVE_SYS_DKSTAT_H)
 #	include <sys/sched.h>
 #endif
 

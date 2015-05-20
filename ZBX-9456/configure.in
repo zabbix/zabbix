@@ -650,9 +650,9 @@ AC_TRY_COMPILE(
 [
 #include <sys/param.h>
 #include <sys/sysctl.h>
-#ifdef HAVE_SYS_DKSTAT_H
+#if defined(HAVE_SYS_DKSTAT_H)
 #	include <sys/dkstat.h>
-#elif HAVE_SYS_SCHED_H
+#elif defined(HAVE_SYS_SCHED_H)
 #	include <sys/sched.h>
 #endif
 ],
