@@ -45,6 +45,8 @@ class C20TriggerConverter extends CConverter {
 	public function __construct() {
 		$this->functionMacroParser = new CFunctionMacroParser();
 		$this->lldMacroParser = new CMacroParser('#');
+		$this->itemKeyConverter = new C20ItemKeyConverter();
+		$this->triggerExpressionParser = new CTriggerExpression();
 	}
 
 	/**
@@ -62,11 +64,19 @@ class C20TriggerConverter extends CConverter {
 				&& strpos($expression, '&') === false
 				&& strpos($expression, '|') === false) {
 
+			$this->triggerExpressionParser->parse($expression);
+
+			$expression = '{'.
+				$this->triggerExpressionParser->expressions[0]['host'].':'.
+				$this->itemKeyConverter->convert($this->triggerExpressionParser->expressions[0]['item']).'.'.
+				$this->triggerExpressionParser->expressions[0]['function'].
+			'}';
+
 			return $expression;
 		}
 
 		// find all the operators that need to be replaced
-		$foundOperators = array();
+		$found_operators = [];
 		$pos = 0;
 		while (isset($expression[$pos])) {
 			switch ($expression[$pos]) {
@@ -80,15 +90,25 @@ class C20TriggerConverter extends CConverter {
 					}
 
 					if ($result) {
-						$pos += $result->length - 1;
-					}
+						$new_expression = '{'.
+							$result->expression['host'].':'.
+							$this->itemKeyConverter->convert($result->expression['item']).'.'.
+							$result->expression['function'].
+						'}';
 
+						$new_expression_lng = mb_strlen($new_expression);
+						$old_expression_lng = mb_strlen($result->expression['expression']);
+
+						$expression = substr_replace($expression, $new_expression, $pos, $old_expression_lng);
+
+						$pos += $new_expression_lng;
+					}
 					// otherwise just continue as is, other macros don't contain any of these characters
 					break;
 				case '&':
 				case '|':
 				case '#':
-					$foundOperators[$pos] = $expression[$pos];
+					$found_operators[$pos] = $expression[$pos];
 
 					break;
 			}
@@ -97,7 +117,7 @@ class C20TriggerConverter extends CConverter {
 		}
 
 		// replace the operators
-		foreach (array_reverse($foundOperators, true) as $pos => $operator) {
+		foreach (array_reverse($found_operators, true) as $pos => $operator) {
 			switch ($operator) {
 				case '&':
 					$expression = $this->replaceLogicalOperator($expression, 'and', $pos);
