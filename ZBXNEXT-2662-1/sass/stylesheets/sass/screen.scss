@@ -607,7 +607,8 @@ footer {
 	display: inline-block;
 	margin-left: -1px;
 	padding: 3px 14px;
-	border: 1px solid $light-blue-grey;
+	//border: 1px solid $light-blue-grey;
+	border: 1px solid $form-border-color;
 	text-decoration: none;
 	color: $link-color;
 	@include transition(background-color .2s ease-out);
@@ -634,15 +635,19 @@ footer {
 
 	&.paging-selected {
 		color: $white;
-		border-color: $light-blue-grey;
-		background-color: $light-blue-grey;
+		//border-color: $light-blue-grey;
+		border-color: $form-border-color;
+		//background-color: $light-blue-grey;
+		background-color: $ui-bg-selected-color;
 
 		&:hover {
-			background-color: darken($light-blue-grey, 5%);
+			//background-color: darken($light-blue-grey, 5%);
+			background-color: darken($ui-bg-selected-color, 5%);
 		}
 
 		&:active {
-			background-color: darken($light-blue-grey, 10%);
+			//background-color: darken($light-blue-grey, 10%);
+			background-color: darken($ui-bg-selected-color, 10%);
 		}
 	}
 }
@@ -650,7 +655,8 @@ footer {
 .treeview-plus {
 	display: inline-block;
 	background-color: $ui-bg-color;
-	border: 1px solid $light-blue-grey;
+	//border: 1px solid $light-blue-grey;
+	border: 1px solid $form-border-color;
 	cursor: pointer;
 	width: 10px;
 	height: 10px;
@@ -772,7 +778,8 @@ footer {
 	padding: 0 9px 0 4px;
 	height: 18px;
 	line-height: 18px;
-	background-color: $light-blue-grey;
+	//background-color: $light-blue-grey;
+	background-color: $ui-bg-selected-color;
 	@include border-radius(2px);
 
 	a {
@@ -851,14 +858,19 @@ footer {
 			&.selected {
 
 				.subfilter-enabled {
-					background-color: darken($light-blue-grey, 10%);
+					//background-color: darken($light-blue-grey, 10%);
+					background-color: darken($ui-bg-selected-color, 10%);
 				}
 
 				.subfilter-disable-btn {
-					background-color: darken($light-blue-grey, 10%);
+					//background-color: darken($light-blue-grey, 10%);
+					background-color: darken($ui-bg-selected-color, 10%);
+					@include opacity(1);
 
 					&:active {
-						background-color: darken($light-blue-grey, 15%);
+						//background-color: darken($light-blue-grey, 15%);
+						background-color: darken($ui-bg-selected-color, 15%);
+						@include opacity(1);
 					}
 				}
 			}
@@ -866,11 +878,14 @@ footer {
 	}
 
 	.disabled {
+		@include opacity(0.5);
 
 		.subfilter-disable-btn {
 			cursor: default;
-			color: $lighter-blue-grey;
-			background-color: $light-blue-grey;
+			//color: $lighter-blue-grey;
+			color: lighten($ui-bg-selected-color, 10%);
+			//background-color: $light-blue-grey;
+			background-color: $ui-bg-selected-color;
 		}
 	}
 }
@@ -942,8 +957,10 @@ footer {
 
 .sublevel {
 	height: 22px;
-	border: 1px solid $light-grey;
-	background-color: $light-grey;
+	//border: 1px solid $light-grey;
+	//background-color: $light-grey;
+	border: 1px solid $form-disabled-bg-color;
+	background-color: $form-disabled-bg-color;
 	margin: 5px 0;
 	@include border-radius(2px);
 	
@@ -992,11 +1009,13 @@ footer {
 	margin: 5px 0;
 
 	.arrow-left {
-		border-right-color: $light-blue-grey;
+		//border-right-color: $light-blue-grey;
+		border-right-color: $font-alt-color;
 	}
 
 	.arrow-right {
-		border-left-color: $light-blue-grey;
+		//border-left-color: $light-blue-grey;
+		border-left-color: $font-alt-color;
 	}
 }
 
@@ -1004,7 +1023,8 @@ footer {
 	position: absolute;
 	z-index: 1;
 	height: 22px;
-	border: 1px solid $light-blue-grey;
+	//border: 1px solid $light-blue-grey;
+	border: 1px solid $form-border-color;
 	@include border-radius(2px);
 }
 
@@ -1038,7 +1058,8 @@ footer {
 	top: 0;
 	height: 22px;
 	line-height: 22px;
-	border: 1px solid $light-blue-grey;
+	//border: 1px solid $light-blue-grey;
+	border: 1px solid $form-border-color;
 	@include border-radius(2px);
 }
 
@@ -1527,7 +1548,7 @@ button {
 
 
 	&.btn-search {
-		background: url(../img/icon-sprite.png) no-repeat 1px -1px;
+		background: darken($main-color, 5%) url(../img/icon-sprite.png) no-repeat 1px -1px;
 		position: absolute;
 		border: none;
 		top: 7px;
@@ -1536,7 +1557,7 @@ button {
 		min-height: 22px;
 		padding: 0;
 		@include opacity(0.75);
-		@include transition(all .2s ease-out);
+		@include transition(opacity .2s ease-out);
 		
 		&:hover {
 			@extend %btn-search-hover-focus;
@@ -1553,10 +1574,10 @@ button {
 
     &.btn-widget-action {
     	border: 0;
-    	background: $transparent url(../img/icon-sprite.png) no-repeat 3px -262px;
+    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat 3px -262px;
 		@extend %button-widget-icon-size;
-		@include opacity(0.75);
-		@include transition(all .2s ease-out);
+		@include opacity(0.5);
+		@include transition(opacity .2s ease-out);
 
 		&:hover {
 			@extend %btn-widget-hover-active;
@@ -1569,9 +1590,10 @@ button {
 
     &.btn-widget-collapse {
     	border: 0;
-    	background: $transparent url(../img/icon-sprite.png) no-repeat 2px -214px;
+    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat 2px -214px;
 		@extend %button-widget-icon-size;
-		@include opacity(0.75);
+		@include opacity(0.5);
+		@include transition(opacity .2s ease-out);
 
 		&:hover {
 			@extend %btn-widget-hover-active;
@@ -1584,9 +1606,10 @@ button {
 
     &.btn-widget-expand {
     	border: 0;
-    	background: $transparent url(../img/icon-sprite.png) no-repeat 2px -238px;
+    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat 2px -238px;
 		@extend %button-widget-icon-size;
-		@include opacity(0.75);
+		@include opacity(0.5);
+		@include transition(opacity .2s ease-out);
 
 		&:hover {
 			@extend %btn-widget-hover-active;
@@ -1599,9 +1622,10 @@ button {
 
     &.btn-alarm-on {
     	border: 0;
-    	background: $transparent url(../img/icon-sprite.png) no-repeat -45px -191px;
+    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat -45px -191px;
 		@extend %button-widget-icon-size;
-		@include opacity(0.75);
+		@include opacity(0.5);
+		@include transition(opacity .2s ease-out);
 
 		&:hover {
 			@extend %btn-widget-hover-active;
@@ -1614,9 +1638,10 @@ button {
 
     &.btn-alarm-off {
     	border: 0;
-    	background: $transparent url(../img/icon-sprite.png) no-repeat -45px -239px;
+    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat -45px -239px;
 		@extend %button-widget-icon-size;
-		@include opacity(0.75);
+		@include opacity(0.5);
+		@include transition(opacity .2s ease-out);
 
 		&:hover {
 			@extend %btn-widget-hover-active;
@@ -1629,9 +1654,10 @@ button {
 
     &.btn-sound-on {
     	border: 0;
-    	background: $transparent url(../img/icon-sprite.png) no-repeat -45px -216px;
+    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat -45px -216px;
 		@extend %button-widget-icon-size;
-		@include opacity(0.75);
+		@include opacity(0.5);
+		@include transition(opacity .2s ease-out);
 
 		&:hover {
 			@extend %btn-widget-hover-active;
@@ -1644,9 +1670,10 @@ button {
 
      &.btn-sound-off {
     	border: 0;
-    	background: $transparent url(../img/icon-sprite.png) no-repeat -45px -264px;
+    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat -45px -264px;
 		@extend %button-widget-icon-size;
-		@include opacity(0.75);
+		@include opacity(0.5);
+		@include transition(opacity .2s ease-out);
 
 		&:hover {
 			@extend %btn-widget-hover-active;
@@ -1762,12 +1789,14 @@ button {
 }
 
 %btn-search-hover-focus {
-	background-color: $transparent;
+	//background-color: $transparent;
+	background-color: darken($main-color, 5%);
 	@include opacity(1);
 }
 
 %btn-widget-hover-active {
-	background-color: $transparent;
+	//background-color: $transparent;
+	background-color: $ui-bg-color;
 	@include opacity(1);
 }
 
@@ -1816,6 +1845,11 @@ button[disabled] {
 		a {
 			@extend %no-border;
 			padding: 11px 13px;
+			@include transition(background-color .2s ease-out);
+
+			&:hover {
+				background-color: $ui-hover-color;
+			}
 		} 
 
 		&.ui-tabs-active:first-child {
@@ -1834,7 +1868,8 @@ button[disabled] {
 				cursor: default;
 				//border-top: 3px solid $primary-blue;
 				border-top: 3px solid $main-color;
-				border-bottom: 3px solid $white;
+				//border-bottom: 3px solid $white;
+				border-bottom: 3px solid $ui-bg-color;
 			}
 		}
 	}
@@ -1847,23 +1882,26 @@ button[disabled] {
 
 .help-icon {
 	background: url(../img/icon-sprite.png) no-repeat 0 -312px;
-	@extend %button-icon-size;
 	display: block;
 	position: absolute;
 	top: 0;
 	right: -26px;
+	@extend %button-icon-size;
+	@include opacity(0.75);
+	@include transition(opacity .2s ease-out);
 
 	&:hover {
-		background: url(../img/icon-sprite.png) no-repeat 0 -336px;
 		cursor: pointer;
+		//background: url(../img/icon-sprite.png) no-repeat 0 -336px;
+		@include opacity(1);
 	}
 }
 
 .drag-icon {
-	@extend %button-icon-size;
 	margin-left: -9px;
 	cursor: move;
 	background: url(../img/icon-sprite.png) no-repeat 0 -288px;
+	@extend %button-icon-size;
 }
 
 /* Sign in, Installation */
@@ -1938,13 +1976,13 @@ button[disabled] {
 
 %webkit-scrollbar {
 	&::-webkit-scrollbar {
-		width: 5px;
+		width: 6px;
 	}
 	&::-webkit-scrollbar-track {
-		background-color: $light-grey;
+		background-color: $form-disabled-bg-color;
 	}
 	&::-webkit-scrollbar-thumb {
-		background-color: $lighter-blue-grey;
+		background-color: $form-border-color;
 	}
 }
 
@@ -2341,7 +2379,8 @@ button[disabled] {
 	width: 200px;
 
 	.selected {
-		background-color: $light-blue-grey;
+		//background-color: $light-blue-grey;
+		background-color: $ui-bg-selected-color;
 		color: $white;
 
 		&:hover {
@@ -2475,7 +2514,8 @@ button[disabled] {
 .dashed-border {
 
 	td {
-		border: 1px dashed $lighter-blue-grey;
+		//border: 1px dashed $lighter-blue-grey;
+		border: 1px dashed $form-border-color;
 
 		td {
 			border: none;
@@ -2628,7 +2668,7 @@ td.disaster-bg {
 	}
 
 	.overlay-close-btn {
-		color: $light-green;
+		color: $green;
 	}
 
 	ul {
@@ -2653,7 +2693,7 @@ td.disaster-bg {
 	}
 
 	.overlay-close-btn {
-		color: $light-red;
+		color: $red;
 	}
 
 	ul {
@@ -2742,20 +2782,26 @@ td.disaster-bg {
 	height: 18px;
 	line-height: 18px;
 	text-align: center;
-	color: $light-blue-grey;
+	//color: $light-blue-grey;
+	color: $font-alt-color;
 	font-size: $font-h2-size;
 	font-weight: bold;
 	text-decoration: none;
 	cursor: pointer;
-	@include border-radius(2px);
+	@include opacity(0.5);
+	@include transition(opacity .2s ease-out);
 
 	&:hover {
-		background-color: $action-hover-color;
+		//background-color: $action-hover-color;
+		//color: darken($light-blue-grey, 10%);
+		@include opacity(1);
 		text-decoration: none;
 	}
 
 	&:active {
-		background-color: darken($action-hover-color, 5%);
+		//background-color: darken($action-hover-color, 5%);
+		//color: darken($light-blue-grey, 10%);
+		@include opacity(1);
 		text-decoration: none;
 	}
 }
@@ -2790,16 +2836,21 @@ a.form-remove-btn {
 	top: 0;
 	right: -12px;
 	color: $white;
-	background-color: $light-blue-grey;
+	//background-color: $light-blue-grey;
+	background-color: $ui-bg-selected-color;
 	@extend %close-icon;
+	@include border-radius(2px);
+	@include opacity(1);
 
 	&:hover {
-		background-color: darken($light-blue-grey, 5%);
+		//background-color: darken($light-blue-grey, 5%);
+		background-color: darken($ui-bg-selected-color, 5%);
 	}
 
 	&:active {
 
-		background-color: darken($light-blue-grey, 10%);
+		//background-color: darken($light-blue-grey, 10%);
+		background-color: darken($ui-bg-selected-color, 10%);
 	}
 }
 

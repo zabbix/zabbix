@@ -35,10 +35,13 @@ $body-bg-color: #ebeef0 !default; //NEW page bg color
 
 // UI
 $ui-bg-color: #fff !default; //NEW ui element's bg color: widgets, containers for forms, tables, filters, action menus
+$ui-bg-selected-color: #acbbc2 !default;
 $ui-hover-color: #e8f4fa !default; //NEW light blue hover for table rows, alt buttons, etc.
 $ui-border-color: #e8f4fa !default; //NEW
+
 $action-hover-color: #ebebeb !default; //NEW action menu item, calendar item hover colors
 $action-border-color: #ccd5d9 !default; //NEW action menu item, calendar, all overlay border color
+
 $table-border-color: #ebeef0 !default; // NEW row separator color in tables
 
 
@@ -105,13 +108,13 @@ $link-main-subnav-visited-color: #bfced7 !default;
 //$alt-blue: #e8f4fa!default; // USED
 
 //$blue-grey: #768d99 !default;
-$light-blue-grey: #acbbc2 !default;
-$lighter-blue-grey: #ccd5d9 !default;
+//$light-blue-grey: #acbbc2 !default;
+//$lighter-blue-grey: #ccd5d9 !default;
 //$lightest-blue-grey: #ebeef0 !default; //Background color and table border color
 
 
 
-$light-grey: #ebebeb !default; // USED In scrollbar and timeline bar
+//$light-grey: #ebebeb !default; // USED In scrollbar and timeline bar
 //$lighter-grey: #f2f2f2 !default;
 
 //$indigo-black: #1f2c33 !default; // USED
