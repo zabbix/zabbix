@@ -33,23 +33,20 @@ class C20ItemKeyConverter extends CConverter {
 	 */
 	public function convert($value) {
 		$item_key = new CItemKey($value);
-		$key_parameters = [];
 
-		if (($item_key->getKeyId() === 'net.tcp.service' || $item_key->getKeyId() === 'net.tcp.service.perf')
-				&& $item_key->getParameters() && trim($item_key->getParameters()[0]) === 'ntp') {
-			if ($item_key->getKeyId() === 'net.tcp.service') {
-				$new_key_id = 'net.udp.service';
-			}
-			else {
-				$new_key_id = 'net.udp.service.perf';
-			}
-			foreach ($item_key->getParameters() as $key_parameter) {
-				$key_parameters[] = $key_parameter;
-			}
-			$value = $new_key_id.'['.implode(',', $key_parameters).']';
+		if (!$item_key->isValid()) {
+			return $value;
 		}
 
-		return $value;
+		if ($item_key->getKeyId() !== 'net.tcp.service' && $item_key->getKeyId() !== 'net.tcp.service.perf') {
+			return $value;
+		}
+
+		if (!$item_key->getParameters() || $item_key->getParameters()[0] != 'ntp') {
+			return $value;
+		}
+
+		return substr_replace($value, 'udp', 4, 3);
 	}
 
 }
