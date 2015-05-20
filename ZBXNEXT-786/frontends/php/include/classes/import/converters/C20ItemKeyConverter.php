@@ -34,8 +34,9 @@ class C20ItemKeyConverter extends CConverter {
 	public function convert($value) {
 		$item_key = new CItemKey($value);
 		$key_parameters = [];
+
 		if (($item_key->getKeyId() === 'net.tcp.service' || $item_key->getKeyId() === 'net.tcp.service.perf')
-				&& trim($item_key->getParameters()[0]) === 'ntp') {
+				&& $item_key->getParameters() && trim($item_key->getParameters()[0]) === 'ntp') {
 			if ($item_key->getKeyId() === 'net.tcp.service') {
 				$new_key_id = 'net.udp.service';
 			}
