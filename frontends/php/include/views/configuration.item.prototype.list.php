@@ -101,9 +101,9 @@ foreach ($this->data['items'] as $item) {
 		new CCheckBox('group_itemid['.$item['itemid'].']', null, null, $item['itemid']),
 		$description,
 		$item['key_'],
-		$item['delay'],
-		$item['history'],
-		$item['trends'],
+		($item['delay'] !== '') ? convertUnitsS($item['delay']) : '',
+		convertUnitsS(SEC_PER_DAY * $item['history']),
+		($item['trends'] !== '') ? convertUnitsS(SEC_PER_DAY * $item['trends']) : '',
 		item_type2str($item['type']),
 		new CCol($applications, 'wraptext'),
 		$status
