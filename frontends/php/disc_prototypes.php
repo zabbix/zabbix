@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of item prototypes');
 $page['file'] = 'disc_prototypes.php';
 $page['scripts'] = array('effects.js', 'class.cviewswitcher.js', 'items.js');
-$page['hist_arg'] = array('parent_discoveryid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -391,7 +390,7 @@ else {
 
 	order_result($data['items'], $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($data['items']);
+	$data['paging'] = getPagingLine($data['items'], $sortOrder);
 
 	// render view
 	$itemView = new CView('configuration.item.prototype.list', $data);

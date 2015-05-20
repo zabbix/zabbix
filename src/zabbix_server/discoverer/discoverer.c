@@ -362,6 +362,15 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 
 			DBbegin();
 
+			if (SUCCEED != discovery_verify_dcheck(drule->druleid, dcheck->dcheckid))
+			{
+				DBrollback();
+
+				zabbix_log(LOG_LEVEL_DEBUG, "discovery check was deleted during processing, stopping");
+
+				goto out;
+			}
+
 			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 				discovery_update_service(drule, dcheck, dhost, ip, dns, port, status, value, now);
 			else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
@@ -378,7 +387,7 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 		else
 			break;
 	}
-
+out:
 	zbx_free(value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -494,7 +503,7 @@ static void	process_rule(DB_DRULE *drule)
 			{
 				zbx_snprintf(ip, sizeof(ip), "%x:%x:%x:%x:%x:%x:%x:%x", ipaddress[0], ipaddress[1],
 						ipaddress[2], ipaddress[3], ipaddress[4], ipaddress[5], ipaddress[6],
-						ipaddress[7], ipaddress[8]);
+						ipaddress[7]);
 			}
 			else
 			{
@@ -521,6 +530,16 @@ static void	process_rule(DB_DRULE *drule)
 
 			DBbegin();
 
+			if (SUCCEED != discovery_verify_drule(drule->druleid))
+			{
+				DBrollback();
+
+				zabbix_log(LOG_LEVEL_DEBUG, "discovery rule '%s' was deleted during processing,"
+						" stopping", drule->name);
+
+				goto out;
+			}
+
 			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 				discovery_update_host(&dhost, ip, host_status, now);
 			else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
@@ -538,7 +557,7 @@ next:
 		else
 			break;
 	}
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 

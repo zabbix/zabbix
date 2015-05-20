@@ -28,9 +28,6 @@ $page['title'] = _('Configuration of host prototypes');
 $page['file'] = 'host_prototypes.php';
 $page['scripts'] = array('effects.js', 'class.cviewswitcher.js', 'multiselect.js');
 
-//???
-$page['hist_arg'] = array('parent_discoveryid');
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -48,6 +45,7 @@ $fields = array(
 	'group_prototypes' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
 	'unlink' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'group_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'show_inherited_macros' =>	array(T_ZBX_INT, O_OPT, null, IN(array(0,1)), null),
 	// actions
 	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"hostprototype.massdelete","hostprototype.massdisable",'.
@@ -276,7 +274,8 @@ if (isset($_REQUEST['form'])) {
 			),
 			'groupPrototypes' => getRequest('group_prototypes', array())
 		),
-		'groups' => array()
+		'groups' => array(),
+		'show_inherited_macros' => getRequest('show_inherited_macros', 0)
 	);
 
 	// add already linked and new templates
@@ -290,7 +289,7 @@ if (isset($_REQUEST['form'])) {
 		'output' => API_OUTPUT_EXTEND,
 		'selectGroups' => array('groupid', 'name'),
 		'selectInterfaces' => API_OUTPUT_EXTEND,
-		'selectMacros' => API_OUTPUT_EXTEND,
+		'selectMacros' => array('macro', 'value'),
 		'hostids' => $discoveryRule['hostid'],
 		'templated_hosts' => true
 	));
@@ -383,11 +382,9 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	if ($data['hostPrototypes']) {
-		order_result($data['hostPrototypes'], $sortField, $sortOrder);
-	}
+	order_result($data['hostPrototypes'], $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($data['hostPrototypes']);
+	$data['paging'] = getPagingLine($data['hostPrototypes'], $sortOrder);
 
 	// fetch templates linked to the prototypes
 	$templateIds = array();

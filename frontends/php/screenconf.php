@@ -37,7 +37,6 @@ else {
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	$page['title'] = _('Configuration of screens');
 	$page['file'] = 'screenconf.php';
-	$page['hist_arg'] = array('templateid');
 }
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -313,7 +312,7 @@ else {
 	order_result($data['screens'], $sortField, $sortOrder);
 
 	// paging
-	$data['paging'] = getPagingLine($data['screens']);
+	$data['paging'] = getPagingLine($data['screens'], $sortOrder);
 
 	// render view
 	$screenView = new CView('configuration.screen.list', $data);

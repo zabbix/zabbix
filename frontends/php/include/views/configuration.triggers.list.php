@@ -18,8 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$triggersWidget = new CWidget(null, 'trigger-list');
+$triggersWidget = (new CWidget('trigger-list'))->setTitle(_('Triggers'));
 
 // append host summary to widget header
 if ($this->data['hostid']) {
@@ -27,37 +26,24 @@ if ($this->data['hostid']) {
 }
 
 // create new application button
-$createForm = new CForm('get');
-$createForm->cleanItems();
+$createForm = (new CForm('get'))->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
+
+$controls = new CList();
+$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+$controls->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 if (!$this->data['hostid']) {
 	$createButton = new CSubmit('form', _('Create trigger (select host first)'));
 	$createButton->setEnabled(false);
-	$createForm->addItem($createButton);
+	$controls->addItem($createButton);
 }
 else {
-	$createForm->addItem(new CSubmit('form', _('Create trigger')));
+	$controls->addItem(new CSubmit('form', _('Create trigger')));
 }
 
-$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'), $createForm);
-
-// create widget header
-$filterForm = new CForm('get');
-$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
-
-$triggersWidget->addHeader(_('Triggers'), $filterForm);
-$triggersWidget->addHeaderRowNumber(array(
-	'[ ',
-	new CLink(
-		$this->data['showdisabled'] ? _('Hide disabled triggers') : _('Show disabled triggers'),
-		'triggers.php?'.
-			'hostid='.$this->data['hostid'].
-			'&showdisabled='.($this->data['showdisabled'] ? 0 : 1)
-	),
-	' ]'
-));
+$createForm->addItem($controls);
+$triggersWidget->setControls($createForm);
 
 // create form
 $triggersForm = new CForm();
@@ -65,9 +51,11 @@ $triggersForm->setName('triggersForm');
 $triggersForm->addVar('hostid', $this->data['hostid']);
 
 // create table
-$triggersTable = new CTableInfo(_('No triggers found.'));
+$triggersTable = new CTableInfo();
 $triggersTable->setHeader(array(
-	new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
+	new CColHeader(
+		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
+		'cell-width'),
 	make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
 	($this->data['hostid'] == 0) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
@@ -88,7 +76,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 	if ($trigger['templateid'] > 0) {
 		if (!isset($this->data['realHosts'][$triggerid])) {
-			$description[] = new CSpan(_('Host'), 'unknown');
+			$description[] = new CSpan(_('Host'), ZBX_STYLE_GREY);
 			$description[] = NAME_DELIMITER;
 		}
 		else {
@@ -98,7 +86,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			$description[] = new CLink(
 				CHtml::encode($real_host['name']),
 				'triggers.php?hostid='.$real_host['hostid'],
-				'unknown'
+				ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY
 			);
 
 			$description[] = NAME_DELIMITER;
@@ -109,7 +97,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$description[] = new CLink(
 			CHtml::encode($trigger['discoveryRule']['name']),
 			'trigger_prototypes.php?parent_discoveryid='.$trigger['discoveryRule']['itemid'],
-			'parent-discovery'
+			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_ORANGE
 		);
 		$description[] = NAME_DELIMITER.$trigger['description'];
 	}
@@ -140,7 +128,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				$triggerDependencies[] = new CLink(
 					array($hostNames, NAME_DELIMITER, CHtml::encode($depTrigger['description'])),
 					'triggers.php?form=update&hostid='.$host['hostid'].'&triggerid='.$depTrigger['triggerid'],
-					triggerIndicatorStyle($depTrigger['status'])
+					ZBX_STYLE_LINK_ALT.' '.triggerIndicatorStyle($depTrigger['status'])
 				);
 			}
 			else {
@@ -159,7 +147,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	if ($this->data['showInfoColumn']) {
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['error']) {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($trigger['error'], 'on');
+			$info->setHint($trigger['error'], ZBX_STYLE_RED);
 		}
 		else {
 			$info = '';
@@ -179,7 +167,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			).
 			'&hostid='.$this->data['hostid'].
 			'&g_triggerid='.$triggerid,
-		triggerIndicatorStyle($trigger['status'], $trigger['state'])
+		ZBX_STYLE_LINK_ACTION.' '.triggerIndicatorStyle($trigger['status'], $trigger['state'])
 	);
 
 	// hosts
@@ -212,10 +200,9 @@ zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
 $triggersForm->addItem(array(
-	$this->data['paging'],
 	$triggersTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'g_triggerid',
+	new CActionButtonList('action', 'g_triggerid',
 		array(
 			'trigger.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected triggers?')),
 			'trigger.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected triggers?')),
@@ -224,7 +211,7 @@ $triggersForm->addItem(array(
 			'trigger.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected triggers?'))
 		),
 		$this->data['hostid']
-	))
+	)
 ));
 
 // append form to widget

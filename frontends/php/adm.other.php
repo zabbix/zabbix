@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Other configuration parameters');
 $page['file'] = 'adm.other.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -63,9 +62,12 @@ if (hasRequest('update')) {
 /*
  * Display
  */
-$form = new CForm();
-$form->cleanItems();
-$form->addItem(new CComboBox('configDropDown', 'adm.other.php', 'redirect(this.options[this.selectedIndex].value);',
+$cnf_wdgt = (new CWidget())->setTitle(_('Other configuration parameters'));
+
+$form = (new CForm())->cleanItems();
+
+$controls = new CList();
+$controls->addItem(new CComboBox('configDropDown', 'adm.other.php', 'redirect(this.options[this.selectedIndex].value);',
 	array(
 		'adm.gui.php' => _('GUI'),
 		'adm.housekeeper.php' => _('Housekeeping'),
@@ -81,8 +83,9 @@ $form->addItem(new CComboBox('configDropDown', 'adm.other.php', 'redirect(this.o
 	)
 ));
 
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('OTHER CONFIGURATION PARAMETERS'), $form);
+$form->addItem($controls);
+
+$cnf_wdgt->setControls($form);
 
 $config = select_config();
 
@@ -114,7 +117,6 @@ $data['alert_usrgrps'] = DBfetchArray(DBselect('SELECT u.usrgrpid,u.name FROM us
 order_result($data['alert_usrgrps'], 'name');
 
 $otherForm = new CView('administration.general.other.edit', $data);
-$cnf_wdgt->addItem($otherForm->render());
-$cnf_wdgt->show();
+$cnf_wdgt->addItem($otherForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

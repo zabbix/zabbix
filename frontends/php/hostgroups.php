@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 
 $page['title'] = _('Configuration of host groups');
 $page['file'] = 'hostgroups.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -410,14 +409,14 @@ else {
 	);
 
 	$groups = API::HostGroup()->get(array(
-		'output' => array('groupid'),
+		'output' => array('groupid', $sortField),
 		'editable' => true,
 		'sortfield' => $sortField,
-		'sortorder' => $sortOrder,
 		'limit' => $config['search_limit'] + 1
 	));
+	order_result($groups, $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($groups);
+	$data['paging'] = getPagingLine($groups, $sortOrder);
 	$groupIds = zbx_objectValues($groups, 'groupid');
 
 	// get hosts and templates count

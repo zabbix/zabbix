@@ -23,24 +23,25 @@ if ($data['uncheck']) {
 	uncheckTableRows();
 }
 
-$proxyWidget = new CWidget();
+$proxyWidget = (new CWidget())->setTitle(_('Proxies'));
 
 // create new proxy button
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$createForm->addItem(new CRedirectButton(_('Create proxy'), 'zabbix.php?action=proxy.edit'));
-$proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'), $createForm);
-$proxyWidget->addHeader(_('Proxies'));
-$proxyWidget->addHeaderRowNumber();
+$createForm = (new CForm('get'))->cleanItems();
+$createForm->addItem((new CList())->
+	addItem(new CRedirectButton(_('Create proxy'), 'zabbix.php?action=proxy.edit'))
+);
+$proxyWidget->setControls($createForm);
 
 // create form
 $proxyForm = new CForm('get');
 $proxyForm->setName('proxyForm');
 
 // create table
-$proxyTable = new CTableInfo(_('No proxies found.'));
+$proxyTable = new CTableInfo();
 $proxyTable->setHeader(array(
-	new CCheckBox('all_hosts', null, "checkAll('".$proxyForm->getName()."', 'all_hosts', 'proxyids');"),
+	new CColHeader(
+		new CCheckBox('all_hosts', null, "checkAll('".$proxyForm->getName()."', 'all_hosts', 'proxyids');"),
+		'cell-width'),
 	make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder']),
 	_('Mode'),
 	_('Last seen (age)'),
@@ -63,13 +64,13 @@ foreach ($data['proxies'] as $proxy) {
 
 		switch ($host['status']) {
 			case HOST_STATUS_MONITORED:
-				$style = 'off';
+				$style = null;
 				break;
 			case HOST_STATUS_TEMPLATE:
-				$style = 'unknown';
+				$style = ZBX_STYLE_GREY;
 				break;
 			default:
-				$style = 'on';
+				$style = ZBX_STYLE_RED;
 		}
 
 		if ($hosts) {
@@ -93,10 +94,9 @@ foreach ($data['proxies'] as $proxy) {
 
 // append table to form
 $proxyForm->addItem(array(
-	$data['paging'],
 	$proxyTable,
 	$data['paging'],
-	get_table_header(new CActionButtonList('action', 'proxyids', array(
+	new CActionButtonList('action', 'proxyids', array(
 		'proxy.hostenable' => array('name' => _('Enable hosts'),
 			'confirm' => _('Enable hosts monitored by selected proxies?')
 		),
@@ -104,10 +104,8 @@ $proxyForm->addItem(array(
 			'confirm' => _('Disable hosts monitored by selected proxies?')
 		),
 		'proxy.delete' => array('name' => _('Delete'), 'confirm' => _('Delete selected proxies?'))
-	)))
+	))
 ));
 
 // append form to widget
-$proxyWidget->addItem($proxyForm);
-
-$proxyWidget->show();
+$proxyWidget->addItem($proxyForm)->show();

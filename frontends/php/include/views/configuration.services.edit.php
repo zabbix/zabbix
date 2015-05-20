@@ -25,9 +25,7 @@ global $ZBX_MESSAGES;
 
 $service = $this->data['service'];
 
-$servicesWidget = new CWidget();
-$servicesWidget->setRootClass('services-edit');
-$servicesWidget->addPageHeader(_('CONFIGURATION OF IT SERVICES'));
+$servicesWidget = (new CWidget())->setTitle(_('Configuration of IT services'));
 
 // create form
 $servicesForm = new CForm();
@@ -287,7 +285,6 @@ if (!$this->data['form_refresh']) {
 $servicesTab->addTab('servicesTab', _('Service'), $servicesFormList);
 $servicesTab->addTab('servicesDependenciesTab', _('Dependencies'), $servicesDependenciesFormList);
 $servicesTab->addTab('servicesTimeTab', _('Time'), $servicesTimeFormList);
-$servicesForm->addItem($servicesTab);
 
 // append buttons to form
 if ($service['serviceid']) {
@@ -299,17 +296,19 @@ if ($service['serviceid']) {
 		));
 	}
 
-	$servicesForm->addItem(makeFormFooter(
+	$servicesTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update'), 'javascript: document.forms[0].action += \'?saction=1\';'),
 		$buttons
 	));
 }
 else {
-	$servicesForm->addItem(makeFormFooter(
+	$servicesTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add'), 'javascript: document.forms[0].action += \'?saction=1\';'),
 		array(new CButtonCancel())
 	));
 }
+
+$servicesForm->addItem($servicesTab);
 
 // append form to widget
 $servicesWidget->addItem($servicesForm);
