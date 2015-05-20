@@ -103,6 +103,7 @@ ZBX_THREAD_LOCAL static const SSL_METHOD	*method			= NULL;
 ZBX_THREAD_LOCAL static SSL_CTX			*ctx_cert		= NULL;
 ZBX_THREAD_LOCAL static SSL_CTX			*ctx_psk		= NULL;
 ZBX_THREAD_LOCAL static SSL_CTX			*ctx_all		= NULL;
+ZBX_THREAD_LOCAL static X509_CRL		*my_crl			= NULL;
 /* variables for passing required PSK-identity and PSK info to client callback function */
 ZBX_THREAD_LOCAL static char			*psk_identity_for_cb	= NULL;
 ZBX_THREAD_LOCAL static size_t			psk_identity_len_for_cb	= 0;
@@ -2744,7 +2745,51 @@ void	zbx_tls_init_child(void)
 	/* Load CRL (certificate revocation list) file. */
 	if (NULL != CONFIG_TLS_CRL_FILE)
 	{
-		/* TODO implement CRL functionality */
+		FILE	*f;
+		X509_VERIFY_PARAM	*param;
+
+		if (NULL == (f = fopen(CONFIG_TLS_CRL_FILE, "r")))
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot open file \"%s\": %s",
+					CONFIG_TLS_CRL_FILE, zbx_strerror(errno));
+			goto out;
+		}
+
+		if (NULL == PEM_read_X509_CRL(f, &my_crl, NULL, NULL))
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot load CRL(s) from file \"%s\":",
+					CONFIG_TLS_CRL_FILE);
+			goto out;
+		}
+
+		if (0 != fclose(f))
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot close file \"%s\": %s",
+					CONFIG_TLS_CRL_FILE, zbx_strerror(errno));
+			goto out;
+		}
+
+		if ((NULL != ctx_cert && 1 != X509_STORE_add_crl(SSL_CTX_get_cert_store(ctx_cert), my_crl)) ||
+				(NULL != ctx_all && 1 != X509_STORE_add_crl(SSL_CTX_get_cert_store(ctx_all), my_crl)))
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot add CRL(s) from file \"%s\":",
+					CONFIG_TLS_CRL_FILE);
+			goto out;
+		}
+
+		param = X509_VERIFY_PARAM_new();
+		X509_VERIFY_PARAM_set_flags(param, X509_V_FLAG_CRL_CHECK_ALL);
+
+		if ((NULL != ctx_cert && 1 != SSL_CTX_set1_param(ctx_cert, param)) ||
+				(NULL != ctx_all && 1 != SSL_CTX_set1_param(ctx_all, param)))
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set CRL verification flag:");
+			goto out;
+		}
+
+		X509_VERIFY_PARAM_free(param);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded CRL file", __function_name);
 	}
 
 	/* 'TLSCertFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
@@ -2987,6 +3032,9 @@ void	zbx_tls_free(void)
 
 	if (NULL != ctx_all)
 		SSL_CTX_free(ctx_all);
+
+	if (NULL != my_crl)
+		X509_CRL_free(my_crl);
 
 	if (NULL != my_psk)
 	{
