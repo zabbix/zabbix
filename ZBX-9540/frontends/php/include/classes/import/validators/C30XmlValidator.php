@@ -929,6 +929,7 @@ class C30XmlValidator {
 		if (zbx_is_int($parent_data['resourcetype'])) {
 			switch ($parent_data['resourcetype']) {
 				case SCREEN_RESOURCE_GRAPH:
+				case SCREEN_RESOURCE_LLD_GRAPH:
 					$rules = ['type' => XML_ARRAY, 'rules' => [
 						'name' =>			['type' => XML_STRING | XML_REQUIRED],
 						'host' =>			['type' => XML_STRING | XML_REQUIRED]
@@ -942,6 +943,7 @@ class C30XmlValidator {
 					// break; is not missing here
 
 				case SCREEN_RESOURCE_SIMPLE_GRAPH:
+				case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 				case SCREEN_RESOURCE_PLAIN_TEXT:
 					$rules = ['type' => XML_ARRAY, 'rules' => [
 						'key' =>			['type' => XML_STRING | XML_REQUIRED],
