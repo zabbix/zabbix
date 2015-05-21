@@ -56,7 +56,7 @@ $httpTable->setHeader(array(
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Number of steps'),
 	_('Update interval'),
-	_('Retries'),
+	_('Attempts'),
 	_('Authentication'),
 	_('HTTP proxy'),
 	_('Application'),
