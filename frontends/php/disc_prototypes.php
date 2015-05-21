@@ -391,18 +391,10 @@ else {
 				|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
 			$item['trends'] = '';
 		}
-		else {
-			$item['trends'] = convertUnitsS(24*3600*$item['trends']);
-		}
 
 		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
 			$item['delay'] = '';
 		}
-		else {
-			$item['delay'] = convertUnitsS($item['delay']);
-		}
-
-		$item['history'] = convertUnitsS(24*3600*$item['history']);
 	}
 	unset($item);
 
