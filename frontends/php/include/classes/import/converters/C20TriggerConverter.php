@@ -74,11 +74,6 @@ class C20TriggerConverter extends CConverter {
 					// skip function macros
 					$result = $this->functionMacroParser->parse($expression, $pos);
 
-					// if it's not a function macro, try to parse it as an LLD macro
-					if (!$result) {
-						$result = $this->lldMacroParser->parse($expression, $pos);
-					}
-
 					if ($result) {
 						$new_expression = '{'.
 							$result->expression['host'].':'.
@@ -93,13 +88,21 @@ class C20TriggerConverter extends CConverter {
 
 						$pos += $new_expression_lng;
 					}
+					else {
+						// if it's not a function macro, try to parse it as an LLD macro
+						$result = $this->lldMacroParser->parse($expression, $pos);
+
+						if ($result) {
+							$pos += $result->length - 1;
+						}
+					}
 					// otherwise just continue as is, other macros don't contain any of these characters
 					break;
+
 				case '&':
 				case '|':
 				case '#':
 					$found_operators[$pos] = $expression[$pos];
-
 					break;
 			}
 
