@@ -52,6 +52,9 @@ class C20ImportConverter extends CConverter {
 		if (array_key_exists('templates', $data['zabbix_export'])) {
 			$data['zabbix_export']['templates'] = $this->convertTemplates($data['zabbix_export']['templates']);
 		}
+		if (array_key_exists('graphs', $data['zabbix_export'])) {
+			$data['zabbix_export']['graphs'] = $this->convertGraphs($data['zabbix_export']['graphs']);
+		}
 		if (array_key_exists('triggers', $data['zabbix_export'])) {
 			$data['zabbix_export']['triggers'] = $this->convertTriggers($data['zabbix_export']['triggers']);
 		}
@@ -253,6 +256,7 @@ class C20ImportConverter extends CConverter {
 
 			$discovery_rule['filter'] = $this->convertDiscoveryRuleFilter($discovery_rule['filter']);
 			$discovery_rule['item_prototypes'] = $this->convertItemPrototypes($discovery_rule['item_prototypes']);
+			$discovery_rule['graph_prototypes'] = $this->convertGraphs($discovery_rule['graph_prototypes']);
 			$discovery_rule['trigger_prototypes'] =
 				$this->convertTriggerPrototypes($discovery_rule['trigger_prototypes']);
 		}
@@ -275,6 +279,38 @@ class C20ImportConverter extends CConverter {
 		unset($item_prototype);
 
 		return $item_prototypes;
+	}
+
+	/**
+	 * Convert graph elements.
+	 *
+	 * @param array $graphs
+	 *
+	 * @return array
+	 */
+	protected function convertGraphs(array $graphs) {
+		foreach ($graphs as &$graph) {
+			$graph['graph_items'] = $this->convertGraphItems($graph['graph_items']);
+		}
+		unset($graph);
+
+		return $graphs;
+	}
+
+	/**
+	 * Convert graph items elements.
+	 *
+	 * @param array $graph_items
+	 *
+	 * @return array
+	 */
+	protected function convertGraphItems(array $graph_items) {
+		foreach ($graph_items as &$graph_item) {
+			$graph_item['item']['key'] = $this->itemKeyConverter->convert($graph_item['item']['key']);
+		}
+		unset($graph_item);
+
+		return $graph_items;
 	}
 
 	/**
