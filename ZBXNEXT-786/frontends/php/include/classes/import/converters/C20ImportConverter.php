@@ -98,6 +98,9 @@ class C20ImportConverter extends CConverter {
 	 */
 	protected function convertTemplates(array $templates) {
 		foreach ($templates as &$template) {
+			if (array_key_exists('items', $template)) {
+				$template['items'] = $this->convertItems($template['items']);
+			}
 			if (array_key_exists('discovery_rules', $template)) {
 				$template['discovery_rules'] = $this->convertDiscoveryRules($template['discovery_rules']);
 			}
