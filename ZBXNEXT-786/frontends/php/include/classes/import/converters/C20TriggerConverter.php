@@ -39,6 +39,13 @@ class C20TriggerConverter extends CConverter {
 	protected $lldMacroParser;
 
 	/**
+	 * An item key converter.
+	 *
+	 * @var C20ItemKeyConverter
+	 */
+	protected $itemKeyConverter;
+
+	/**
 	 * @param CFunctionMacroParser  $functionMacroParser
 	 * @param CMacroParser          $lldMacroParser
 	 */
@@ -46,7 +53,6 @@ class C20TriggerConverter extends CConverter {
 		$this->functionMacroParser = new CFunctionMacroParser();
 		$this->lldMacroParser = new CMacroParser('#');
 		$this->itemKeyConverter = new C20ItemKeyConverter();
-		$this->triggerExpressionParser = new CTriggerExpression();
 	}
 
 	/**
@@ -59,22 +65,6 @@ class C20TriggerConverter extends CConverter {
 	 * @return string
 	 */
 	public function convert($expression) {
-		// don't try to parse the expression if there's nothing to replace
-		if (strpos($expression, '#') === false
-				&& strpos($expression, '&') === false
-				&& strpos($expression, '|') === false) {
-
-			$this->triggerExpressionParser->parse($expression);
-
-			$expression = '{'.
-				$this->triggerExpressionParser->expressions[0]['host'].':'.
-				$this->itemKeyConverter->convert($this->triggerExpressionParser->expressions[0]['item']).'.'.
-				$this->triggerExpressionParser->expressions[0]['function'].
-			'}';
-
-			return $expression;
-		}
-
 		// find all the operators that need to be replaced
 		$found_operators = [];
 		$pos = 0;
