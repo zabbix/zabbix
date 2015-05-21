@@ -404,7 +404,7 @@ else {
 	}
 
 	// paging
-	$data['paging'] = getPagingLine($data['discoveries']);
+	$data['paging'] = getPagingLine($data['discoveries'], $sortOrder);
 
 	// render view
 	$discoveryView = new CView('configuration.host.discovery.list', $data);
