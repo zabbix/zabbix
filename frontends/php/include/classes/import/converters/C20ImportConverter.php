@@ -249,8 +249,10 @@ class C20ImportConverter extends CConverter {
 			}
 
 			$discovery_rule['filter'] = $this->convertDiscoveryRuleFilter($discovery_rule['filter']);
-			$discovery_rule['trigger_prototypes'] =
-				$this->convertTriggerPrototypes($discovery_rule['trigger_prototypes']);
+			if (array_key_exists('trigger_prototypes', $discovery_rule)) {
+				$discovery_rule['trigger_prototypes'] =
+					$this->convertTriggerPrototypes($discovery_rule['trigger_prototypes']);
+			}
 		}
 		unset($discovery_rule);
 
