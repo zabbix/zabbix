@@ -252,14 +252,29 @@ class C20ImportConverter extends CConverter {
 			}
 
 			$discovery_rule['filter'] = $this->convertDiscoveryRuleFilter($discovery_rule['filter']);
-			if (array_key_exists('trigger_prototypes', $discovery_rule)) {
-				$discovery_rule['trigger_prototypes'] =
-					$this->convertTriggerPrototypes($discovery_rule['trigger_prototypes']);
-			}
+			$discovery_rule['item_prototypes'] = $this->convertItemPrototypes($discovery_rule['item_prototypes']);
+			$discovery_rule['trigger_prototypes'] =
+				$this->convertTriggerPrototypes($discovery_rule['trigger_prototypes']);
 		}
 		unset($discovery_rule);
 
 		return $discovery_rules;
+	}
+
+	/**
+	 * Convert item prototype elements.
+	 *
+	 * @param array $item_prototypes
+	 *
+	 * @return array
+	 */
+	protected function convertItemPrototypes(array $item_prototypes) {
+		foreach ($item_prototypes as &$item_prototype) {
+			$item_prototype['key'] = $this->itemKeyConverter->convert($item_prototype['key']);
+		}
+		unset($item_prototype);
+
+		return $item_prototypes;
 	}
 
 	/**
@@ -270,10 +285,11 @@ class C20ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertTriggerPrototypes(array $trigger_prototypes) {
-		foreach ($trigger_prototypes as &$trigger) {
-			$trigger['expression'] = $this->triggerExpressionConverter->convert($trigger['expression']);
+		foreach ($trigger_prototypes as &$trigger_prototype) {
+			$trigger_prototype['expression'] =
+				$this->triggerExpressionConverter->convert($trigger_prototype['expression']);
 		}
-		unset($trigger);
+		unset($trigger_prototype);
 
 		return $trigger_prototypes;
 	}
