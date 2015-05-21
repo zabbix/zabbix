@@ -114,7 +114,7 @@ class C20ImportConverter extends CConverter {
 		}
 
 		foreach ($host['items'] as &$item) {
-			if (isset($item['status']) && $item['status'] == ITEM_STATUS_NOTSUPPORTED) {
+			if ($item['status'] == ITEM_STATUS_NOTSUPPORTED) {
 				$item['status'] = ITEM_STATUS_ACTIVE;
 			}
 

@@ -42,7 +42,7 @@ class C20ItemKeyConverter extends CConverter {
 			return $value;
 		}
 
-		if (!$item_key->getParameters() || $item_key->getParameters()[0] != 'ntp') {
+		if (!$item_key->getParameters() || $item_key->getParameters()[0] !== 'ntp') {
 			return $value;
 		}
 
