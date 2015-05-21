@@ -102,8 +102,8 @@ $table-border-color: #3d3d3d;//#ebeef0; // NEW row separator color in tables
 
 // FORMS
 $form-font-color: #d1dade;//#1f2c33; // NEW
-$form-bg-color: #303030;//#fff; //NEW
-$form-border-color: #acbbc2; //NEW
+$form-bg-color: #242424;//#fff; //NEW
+$form-border-color: #3d3d3d;//#acbbc2; //NEW
 $form-border-focus-color: #0275b8; //NEW
 
 $form-disabled-bg-color: #ebebeb; //NEW
@@ -167,8 +167,16 @@ $link-main-subnav-visited-color: #bfced7;
 	@extend %no-shadow;
 }
 
+.table-forms-container {
+	@extend %no-shadow;
+}
+
 %no-shadow {
 	@include box-shadow(none);
+}
+
+.search-suggest {
+	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.4));
 }
 
 .action-menu {

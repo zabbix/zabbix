@@ -1385,6 +1385,7 @@ legend {
 	font-family: $font-stack;
 	font-size: $font-form-size;
 	color: $font-color;
+	background-color: $form-bg-color;
 	@include transition(border-color .2s ease-out);
 
 	&:focus {
@@ -1858,19 +1859,20 @@ button[disabled] {
 		}
 
 		&.ui-tabs-active {
-			border-left: 1px solid $table-border-color;
-			border-right: 1px solid $table-border-color;
+			//border-left: 1px solid $table-border-color;
+			//border-right: 1px solid $table-border-color;
 			a {
-				padding: 8px 13px 11px 13px;
+				//padding: 8px 13px 11px 13px;
+				padding: 8px 13px 9px 13px;
 				font-weight: bold;
 				background-color: $ui-bg-color;
 				color: $font-color;
 				text-decoration: none;
 				cursor: default;
 				//border-top: 3px solid $primary-blue;
-				border-top: 3px solid $main-color;
+				//border-top: 3px solid $main-color;
 				//border-bottom: 3px solid $white;
-				border-bottom: 3px solid $ui-bg-color;
+				border-bottom: 3px solid $main-color;
 			}
 		}
 	}
@@ -2255,7 +2257,7 @@ button[disabled] {
 	padding: 0 5px;
 	min-width: 16px;
 	color: $font-alt-color;
-	background-color: $form-bg-color;
+	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-top: none;
 	@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
