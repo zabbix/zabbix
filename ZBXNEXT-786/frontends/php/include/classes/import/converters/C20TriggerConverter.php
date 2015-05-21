@@ -81,12 +81,9 @@ class C20TriggerConverter extends CConverter {
 							$result->expression['function'].
 						'}';
 
-						$new_expression_lng = mb_strlen($new_expression);
-						$old_expression_lng = mb_strlen($result->expression['expression']);
+						$expression = substr_replace($expression, $new_expression, $pos, $result->length);
 
-						$expression = substr_replace($expression, $new_expression, $pos, $old_expression_lng);
-
-						$pos += $new_expression_lng;
+						$pos += strlen($new_expression) - 1;
 					}
 					else {
 						// if it's not a function macro, try to parse it as an LLD macro
