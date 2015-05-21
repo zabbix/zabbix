@@ -162,7 +162,7 @@ if (!empty($data['actions'])) {
 }
 
 // get paging
-$data['paging'] = getPagingLine($data['actions']);
+$data['paging'] = getPagingLine($data['actions'], ZBX_SORT_DOWN);
 
 // get timeline
 unset($sqlWhere['from'], $sqlWhere['till']);

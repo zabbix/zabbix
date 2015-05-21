@@ -1265,7 +1265,7 @@ else {
 		order_result($data['items'], $sortField, $sortOrder);
 	}
 
-	$data['paging'] = getPagingLine($data['items']);
+	$data['paging'] = getPagingLine($data['items'], $sortOrder);
 
 	$itemTriggerIds = array();
 	foreach ($data['items'] as $item) {
