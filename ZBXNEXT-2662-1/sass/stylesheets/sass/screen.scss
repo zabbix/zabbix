@@ -753,7 +753,7 @@ footer {
 		padding: 0 10px 0px 10px;
 	}
 
-	.list-table {
+	.list-table {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 		margin-bottom: -10px;
 		@include box-shadow(none);
 
@@ -1384,6 +1384,7 @@ legend {
 	border: 1px solid $form-border-color;
 	font-family: $font-stack;
 	font-size: $font-form-size;
+	color: $font-color;
 	@include transition(border-color .2s ease-out);
 
 	&:focus {
@@ -2458,7 +2459,6 @@ button[disabled] {
 .notifications {
 	padding: 0;
 	max-width: 250px;
-	@include opacity(0.9);
 
 	.dashbrd-widget-head {
 		margin: -2px 0 -7px 0;
