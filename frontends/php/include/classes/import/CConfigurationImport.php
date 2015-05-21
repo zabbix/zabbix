@@ -780,6 +780,10 @@ class CConfigurationImport {
 
 					$prototype['applications'] = $applicationsIds;
 
+					if (array_key_exists('application_prototypes', $prototype)) {
+						$prototype['applicationPrototypes'] = $prototype['application_prototypes'];
+					}
+
 					if (array_key_exists('interface_ref', $prototype) && $prototype['interface_ref']) {
 						$prototype['interfaceid'] = $this->referencer->interfacesCache[$hostId][$prototype['interface_ref']];
 					}
@@ -1446,13 +1450,14 @@ class CConfigurationImport {
 			}
 		}
 
-		$dbApplicationIds = API::Application()->get(array(
-			'output' => array('applicationid'),
+		$dbApplicationIds = API::Application()->get([
+			'output' => ['applicationid'],
 			'hostids' => $processedHostIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
-			'inherited' => false
-		));
+			'inherited' => false,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		]);
 
 		$applicationsToDelete = array_diff_key($dbApplicationIds, $applicationIdsXML);
 		if ($applicationsToDelete) {
