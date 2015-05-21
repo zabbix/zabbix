@@ -69,11 +69,11 @@ our @EXPORT = qw($result $dbh $tld
 		get_macro_rdds_delay get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items get_hostid
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid_by_key get_itemid_by_host
-		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids get_lastclock get_tlds get_probes get_nsips
-		get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_select set_slv_config
-		get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds minutes_last_month
-		get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
-		get_ns_from_key is_service_error process_slv_ns_monthly process_slv_avail process_slv_ns_avail
+		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids_by_host_and_keypart get_lastclock get_tlds
+		get_probes get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_select
+		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
+		minutes_last_month get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
+		get_nsip_from_key is_service_error process_slv_ns_monthly process_slv_avail process_slv_ns_avail
 		process_slv_monthly get_results get_item_values check_lastclock sql_time_condition get_incidents
 		get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
 		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
@@ -332,7 +332,7 @@ sub __get_itemid_by_sql
         return $rows_ref->[0]->[0];
 }
 
-sub get_itemids
+sub get_itemids_by_host_and_keypart
 {
 	my $host = shift;
 	my $key_part = shift;
@@ -353,9 +353,9 @@ sub get_itemids
 		my $itemid = $row_ref->[0];
 		my $key = $row_ref->[1];
 
-		my $ns = get_ns_from_key($key);
+		my $nsip = get_nsip_from_key($key);
 
-		$result{$ns} = $itemid;
+		$result{$nsip} = $itemid;
 	}
 
 	return \%result;
@@ -505,7 +505,7 @@ sub get_nsips
 	my @nss;
 	foreach my $row_ref (@$rows_ref)
 	{
-		push(@nss, get_ns_from_key($row_ref->[0]));
+		push(@nss, get_nsip_from_key($row_ref->[0]));
 	}
 
 	fail("cannot find items ($key*) at host ($host)") if (scalar(@nss) == 0);
@@ -593,7 +593,7 @@ sub get_nsip_items
 	my %result;
 	foreach my $row_ref (@$rows_ref)
 	{
-		$result{$row_ref->[0]}{$row_ref->[1]} = get_ns_from_key($row_ref->[2]);
+		$result{$row_ref->[0]}{$row_ref->[1]} = get_nsip_from_key($row_ref->[2]);
 	}
 
 	fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
@@ -1303,19 +1303,19 @@ sub send_values
 #
 # rsm.dns.udp.rtt[{$RSM.TLD},i.ns.se.,194.146.106.22] -> "i.ns.se.,194.146.106.22"
 # rsm.slv.dns.avail[i.ns.se.,194.146.106.22] -> "i.ns.se.,194.146.106.22"
-sub get_ns_from_key
+sub get_nsip_from_key
 {
-	my $result = shift;
+	my $key = shift;
 
-	$result =~ s/^[^\[]+\[([^\]]+)]$/$1/;
+	$key =~ s/^[^\[]+\[([^\]]+)]$/$1/;
 
 	my $got_params = 0;
-	my $pos = length($result);
+	my $pos = length($key);
 
 	while ($pos > 0 and $got_params < 2)
 	{
 		$pos--;
-		my $char = substr($result, $pos, 1);
+		my $char = substr($key, $pos, 1);
 		$got_params++ if ($char eq ',')
 	}
 
@@ -1323,7 +1323,7 @@ sub get_ns_from_key
 
 	return "" unless ($got_params == 2);
 
-	return substr($result, $pos);
+	return substr($key, $pos);
 }
 
 sub is_service_error
@@ -1350,7 +1350,7 @@ sub process_slv_ns_monthly
 	# first we need to get the list of name servers
 	my $nsips_ref = get_nsips($tld, $cfg_key_out);
 
-	dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($nsips_ref));
+	dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($nsips_ref)) if (opt('debug'));
 
 	# %successful_values is a hash of name server as key and its number of successful results as a value. Name server is
 	# represented by a string consisting of name and IP separated by comma. Each successful result means the IP was UP at
@@ -1438,7 +1438,7 @@ sub process_slv_monthly
 
 	my $all_items_ref = get_all_items($cfg_key_in);
 
-	dbg("using filter '$cfg_key_in' found next items:\n", Dumper($all_items_ref));
+	dbg("using filter '$cfg_key_in' found next items:\n", Dumper($all_items_ref)) if (opt('debug'));
 
 	my $cur_from = $from;
 	my ($interval, $cur_till);
@@ -1574,7 +1574,7 @@ sub process_slv_ns_avail
 
 	my $nsips_ref = get_nsips($tld, $cfg_key_out);
 
-	dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($nsips_ref));
+	dbg("using filter '$cfg_key_out' found next name servers:\n", Dumper($nsips_ref)) if (opt('debug'));
 
 	my $online_probes_ref = get_online_probes($from, $till, $probe_avail_limit, undef);
 
@@ -1594,17 +1594,17 @@ sub process_slv_ns_avail
 	# use binds for faster execution of the same SQL query
 	my $sth = get_downtime_prepare();
 
-	foreach my $ns (keys(%$values_ref))
+	foreach my $nsip (keys(%$values_ref))
 	{
-		my $itemid = $values_ref->{$ns}->{'itemid'};
-		my $item_values_ref = $values_ref->{$ns}->{'values'};
+		my $itemid = $values_ref->{$nsip}->{'itemid'};
+		my $item_values_ref = $values_ref->{$nsip}->{'values'};
 
-		my $out_key = $cfg_key_out . $ns . ']';
+		my $out_key = $cfg_key_out . $nsip . ']';
 
 		# get current month downtime
 		my $downtime = get_downtime_execute($sth, $itemid, $curmon_from, $curmon_till, 1); # ignore incidents
 
-		push_value($tld, "rsm.slv.dns.ns.downtime[$ns]", $value_ts, $downtime,
+		push_value($tld, "rsm.slv.dns.ns.downtime[$nsip]", $value_ts, $downtime,
 			"$downtime minutes of downtime from ", ts_str($curmon_from), " ($curmon_from) till ",
 			ts_str($curmon_till), " ($curmon_till)");
 
@@ -1637,9 +1637,9 @@ sub process_slv_ns_avail
 			push_value($tld, $out_key, $value_ts, $test_result, avail_result_msg($test_result, $probes_with_positive, $probes_with_results, $perc, $value_ts));
 		}
 
-		push_value($tld, "rsm.slv.dns.ns.results[$ns]", $value_ts, $probes_with_results, "probes with results");
-		push_value($tld, "rsm.slv.dns.ns.positive[$ns]", $value_ts, $probes_with_positive, "probes with positive results");
-		push_value($tld, "rsm.slv.dns.ns.sla[$ns]", $value_ts, $positive_sla, "positive results according to SLA");
+		push_value($tld, "rsm.slv.dns.ns.results[$nsip]", $value_ts, $probes_with_results, "probes with results");
+		push_value($tld, "rsm.slv.dns.ns.positive[$nsip]", $value_ts, $probes_with_positive, "probes with positive results");
+		push_value($tld, "rsm.slv.dns.ns.sla[$nsip]", $value_ts, $positive_sla, "positive results according to SLA");
 	}
 }
 
@@ -2160,7 +2160,7 @@ sub get_itemids_by_hostids
 	{
 		unless ($all_items->{$hostid})
 		{
-			dbg("\nhostid $hostid from:\n", Dumper($hostids_ref), "was not found in:\n", Dumper($all_items));
+			dbg("\nhostid $hostid from:\n", Dumper($hostids_ref), "was not found in:\n", Dumper($all_items)) if (opt('debug'));
 			fail("internal error: no hostid $hostid in input items");
 		}
 

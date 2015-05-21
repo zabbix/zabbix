@@ -44,7 +44,7 @@ foreach (@$tlds_ref)
 		my $itemid = $item->[0];
 		my $key = $item->[1];
 
-		my $key_out = $cfg_key_out . get_ns_from_key($key). "]";
+		my $key_out = $cfg_key_out . get_nsip_from_key($key). "]";
 		my $up_count = get_up_count($itemid);
 
 		my $perc = sprintf("%.3f", $up_count * 100 / $total_values);

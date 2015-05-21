@@ -71,7 +71,7 @@ foreach (@$tlds_ref)
 
 	if ("[" eq substr($key, -1))
 	{
-		my $itemids_ref = get_itemids($tld, $key);
+		my $itemids_ref = get_itemids_by_host_and_keypart($tld, $key);
 		foreach my $ns (keys(%$itemids_ref))
 		{
 			my $itemid = $itemids_ref->{$ns};

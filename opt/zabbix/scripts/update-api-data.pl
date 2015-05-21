@@ -1287,7 +1287,7 @@ sub __get_dns_itemids
 		# remove TLD from host name to get just the Probe name
 		my $_probe = ($probe ? $probe : substr($host, $tld_length));
 
-		$result{$_probe}->{$itemid} = get_ns_from_key($key);
+		$result{$_probe}->{$itemid} = get_nsip_from_key($key);
 	}
 
 	fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
@@ -1632,19 +1632,23 @@ sub __update_false_positives
 	my $last_audit = ah_get_last_audit();
 	my $maxclock = 0;
 
-	# '%Incident [%]% - ignore old "details" format (dropped in December 2014)
 	my $rows_ref = db_select(
-		"select substring(details,1,locate(':',details)-1) as eventid,max(clock)".
+		"select details,max(clock)".
 		" from auditlog".
 		" where resourcetype=".AUDIT_RESOURCE_INCIDENT.
 			" and clock>$last_audit".
-			" and details not like '%Incident [%]%'".
 		" group by eventid");
 
 	foreach my $row_ref (@$rows_ref)
 	{
-		my $eventid = $row_ref->[0];
+		my $details = $row_ref->[0];
 		my $clock = $row_ref->[1];
+
+		# ignore old "details" format (dropped in December 2014)
+		next if ($details =~ '.*Incident \[.*\]');
+
+		my $eventid = $details;
+		$eventid =~ s/^([0-9]+): .*/$1/;
 
 		$maxclock = $clock if ($clock > $maxclock);
 
