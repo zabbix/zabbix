@@ -22,282 +22,282 @@
 class C20ImportConverterTest extends CImportConverterTest {
 
 	public function testConvertHosts() {
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(),
-				array(
-					'interfaces' => array(
-						array(
+		$source = $this->createSource([
+			'hosts' => [
+				[],
+				[
+					'interfaces' => [
+						[
 							'type' => INTERFACE_TYPE_AGENT,
-						),
-						array(
+						],
+						[
 							'type' => INTERFACE_TYPE_SNMP,
-						)
-					)
-				),
-			)
-		));
+						]
+					]
+				]
+			]
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'hosts' => array(
-				array(),
-				array(
-					'interfaces' => array(
-						array(
+		$expectedResult = $this->createExpectedResult([
+			'hosts' => [
+				[],
+				[
+					'interfaces' => [
+						[
 							'type' => INTERFACE_TYPE_AGENT,
 							'bulk' => SNMP_BULK_ENABLED
-						),
-						array(
+						],
+						[
 							'type' => INTERFACE_TYPE_SNMP,
 							'bulk' => SNMP_BULK_ENABLED
-						)
-					)
-				),
-			)
-		));
+						]
+					]
+				]
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 	}
 
 	public function testConvertItems() {
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(),
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[],
+				[
 					'items' => ''
-				),
-				array(
-					'items' => array(
-						array(),
-						array(
+				],
+				[
+					'items' => [
+						[],
+						[
 							'status' => ITEM_STATUS_NOTSUPPORTED
-						)
-					)
-				)
-			)
-		));
+						]
+					]
+				]
+			]
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'hosts' => array(
-				array(),
-				array(
+		$expectedResult = $this->createExpectedResult([
+			'hosts' => [
+				[],
+				[
 					'items' => ''
-				),
-				array(
-					'items' => array(
-						array(),
-						array(
+				],
+				[
+					'items' => [
+						[],
+						[
 							'status' => ITEM_STATUS_ACTIVE
-						)
-					)
-				)
-			)
-		));
+						]
+					]
+				]
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 	}
 
 	public function testConvertTriggers() {
 		$this->assertConvert(
-			$this->createExpectedResult(array()),
-			$this->createSource(array())
+			$this->createExpectedResult([]),
+			$this->createSource([])
 		);
 		$this->assertConvert(
-			$this->createExpectedResult(array('triggers' => '')),
-			$this->createSource(array('triggers' => ''))
+			$this->createExpectedResult(['triggers' => '']),
+			$this->createSource(['triggers' => ''])
 		);
 
-		$source = $this->createSource(array(
-			'triggers' => array(
-				array(
+		$source = $this->createSource([
+			'triggers' => [
+				[
 					'expression' => '{host:item.last(0)}#0|{host:item.last(0)}#1'
-				)
-			)
-		));
+				]
+			]
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'triggers' => array(
-				array(
+		$expectedResult = $this->createExpectedResult([
+			'triggers' => [
+				[
 					'expression' => '{host:item.last(0)}<>0 or {host:item.last(0)}<>1'
-				)
-			)
-		));
+				]
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 	}
 
 	public function testConvertDiscoveryRules() {
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(),
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[],
+				[
 					'discovery_rules' => ''
-				),
-				array(
-					'discovery_rules' => array(
-						array(),
-						array(
+				],
+				[
+					'discovery_rules' => [
+						[],
+						[
 							'status' => ITEM_STATUS_NOTSUPPORTED,
-							'filter' => array()
-						),
-						array(
+							'filter' => []
+						],
+						[
 							'filter' => ''
-						),
-						array(
+						],
+						[
 							'filter' => ':'
-						),
-						array(
+						],
+						[
 							'filter' => '{#MACRO}:regex'
-						),
-					)
-				)
-			),
-			'templates' => array(
-				array(
-					'discovery_rules' => array(
-						array(),
-						array(
-							'filter' => array()
-						),
-						array(
+						],
+					]
+				]
+			],
+			'templates' => [
+				[
+					'discovery_rules' => [
+						[],
+						[
+							'filter' => []
+						],
+						[
 							'filter' => ''
-						),
-						array(
+						],
+						[
 							'filter' => ':'
-						),
-						array(
+						],
+						[
 							'filter' => '{#MACRO}:regex'
-						),
-					)
-				)
-			)
-		));
+						],
+					]
+				]
+			]
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'hosts' => array(
-				array(),
-				array(
+		$expectedResult = $this->createExpectedResult([
+			'hosts' => [
+				[],
+				[
 					'discovery_rules' => ''
-				),
-				array(
-					'discovery_rules' => array(
-						array(),
-						array(
+				],
+				[
+					'discovery_rules' => [
+						[],
+						[
 							'status' => ITEM_STATUS_ACTIVE,
-							'filter' => array()
-						),
-						array(
+							'filter' => []
+						],
+						[
 							'filter' => ''
-						),
-						array(),
-						array(
-							'filter' => array(
+						],
+						[],
+						[
+							'filter' => [
 								'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 								'formula' => '',
-								'conditions' => array(
-									array(
+								'conditions' => [
+									[
 										'macro' => '{#MACRO}',
 										'value' => 'regex',
 										'operator' => CONDITION_OPERATOR_REGEXP,
-									)
-								)
-							)
-						)
-					)
-				)
-			),
-			'templates' => array(
-				array(
-					'discovery_rules' => array(
-						array(),
-						array(
-							'filter' => array()
-						),
-						array(
+									]
+								]
+							]
+						]
+					]
+				]
+			],
+			'templates' => [
+				[
+					'discovery_rules' => [
+						[],
+						[
+							'filter' => []
+						],
+						[
 							'filter' => ''
-						),
-						array(),
-						array(
-							'filter' => array(
+						],
+						[],
+						[
+							'filter' => [
 								'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 								'formula' => '',
-								'conditions' => array(
-									array(
+								'conditions' => [
+									[
 										'macro' => '{#MACRO}',
 										'value' => 'regex',
 										'operator' => CONDITION_OPERATOR_REGEXP,
-									)
-								)
-							)
-						)
-					)
-				)
-			)
-		));
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 	}
 
 	public function testConvertTriggerPrototypes() {
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(
-					'discovery_rules' => array(
-						array(),
-						array(
+		$source = $this->createSource([
+			'hosts' => [
+				[
+					'discovery_rules' => [
+						[],
+						[
 							'trigger_prototypes' => ''
-						),
-						array(
-							'trigger_prototypes' => array(
-								array(
+						],
+						[
+							'trigger_prototypes' => [
+								[
 									'expression' => '{host:item.last(0)}#0|{host:item.last(0)}#1'
-								)
-							)
-						)
-					)
-				)
-			)
-		));
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'hosts' => array(
-				array(
-					'discovery_rules' => array(
-						array(),
-						array(
+		$expectedResult = $this->createExpectedResult([
+			'hosts' => [
+				[
+					'discovery_rules' => [
+						[],
+						[
 							'trigger_prototypes' => ''
-						),
-						array(
-							'trigger_prototypes' => array(
-								array(
+						],
+						[
+							'trigger_prototypes' => [
+								[
 									'expression' => '{host:item.last(0)}<>0 or {host:item.last(0)}<>1'
-								)
-							)
-						)
-					)
-				)
-			)
-		));
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 	}
 
-	protected function createSource(array $data = array()) {
-		return array(
-			'zabbix_export' => array_merge(array(
+	protected function createSource(array $data = []) {
+		return [
+			'zabbix_export' => array_merge([
 				'version' => '2.0',
 				'date' => '2014-11-19T12:19:00Z'
-			), $data)
-		);
+			], $data)
+		];
 	}
 
-	protected function createExpectedResult(array $data = array()) {
-		return array(
-			'zabbix_export' => array_merge(array(
+	protected function createExpectedResult(array $data = []) {
+		return [
+			'zabbix_export' => array_merge([
 				'version' => '3.0',
 				'date' => '2014-11-19T12:19:00Z'
-			), $data)
-		);
+			], $data)
+		];
 	}
 
 	protected function assertConvert(array $expectedResult, array $source) {
