@@ -75,7 +75,7 @@ $httpFormList->addRow(_('New application'),
 $httpFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5));
 
 // number of retries
-$httpFormList->addRow(_('Retries'), new CNumericBox('retries', $this->data['retries'], 2));
+$httpFormList->addRow(_('Attempts'), new CNumericBox('retries', $this->data['retries'], 2));
 
 $agentComboBox = new CComboBox('agent', $this->data['agent']);
 

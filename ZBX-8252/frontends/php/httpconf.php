@@ -43,7 +43,9 @@ $fields = array(
 	'httptestid'      => array(T_ZBX_INT, O_NO,  P_SYS, DB_ID,                   'isset({form}) && {form} == "update"'),
 	'name'            => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({add}) || isset({update})', _('Name')),
 	'delay'           => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})', _('Update interval (in sec)')),
-	'retries'         => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({add}) || isset({update})', _('Retries')),
+	'retries'         => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({add}) || isset({update})',
+		_('Attempts')
+	),
 	'status'          => array(T_ZBX_STR, O_OPT, null,  null,                    null),
 	'agent'           => array(T_ZBX_STR, O_OPT, null, null,                     'isset({add}) || isset({update})'),
 	'agent_other'     => array(T_ZBX_STR, O_OPT, null, null,
