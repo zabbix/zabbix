@@ -91,18 +91,18 @@ $body-bg-color: #0d1114;//#ebeef0; //NEW page bg color
 // UI
 $ui-bg-color: #303030;//#fff; //NEW ui element's bg color: widgets, containers for forms, tables, filters, action menus
 $ui-bg-selected-color: #acbbc2;
-$ui-hover-color: #e8f4fa; //NEW light blue hover for table rows, alt buttons, etc.
-$ui-border-color: #e8f4fa; //NEW
+$ui-hover-color: #242424;//#e8f4fa; //NEW light blue hover for table rows, alt buttons, etc.
+//$ui-border-color: #e8f4fa; //NEW
 
-$action-hover-color: #ebebeb; //NEW action menu item, calendar item hover colors
-$action-border-color: #ccd5d9; //NEW action menu item, calendar, all overlay border color
+$action-hover-color: #242424;//#ebebeb; //NEW action menu item, calendar item hover colors
+$action-border-color: #3d3d3d;//#ccd5d9; //NEW action menu item, calendar, all overlay border color
 
 $table-border-color: #3d3d3d;//#ebeef0; // NEW row separator color in tables
 
 
 // FORMS
-$form-font-color: #1f2c33; // NEW
-$form-bg-color: #fff; //NEW
+$form-font-color: #d1dade;//#1f2c33; // NEW
+$form-bg-color: #303030;//#fff; //NEW
 $form-border-color: #acbbc2; //NEW
 $form-border-focus-color: #0275b8; //NEW
 
@@ -156,15 +156,23 @@ $link-main-subnav-visited-color: #bfced7;
 @import 'screen.scss';
 
 .dashbrd-widget {
-	@include box-shadow(none);
+	@extend %no-shadow;
 }
 
 .list-table {
-	@extend .dashbrd-widget;
+	@extend %no-shadow;
+}
+
+.table-paging {
+	@extend %no-shadow;
+}
+
+%no-shadow {
+	@include box-shadow(none);
 }
 
 .action-menu {
-	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.3));
+	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.4));
 }
 
 .overlay-dialogue {
