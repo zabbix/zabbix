@@ -207,11 +207,12 @@ class C20ImportConverterTest extends CImportConverterTest {
 								],
 								[
 									'status' => ITEM_STATUS_DISABLED,
-									'filter' => '',
+									'filter' => [],
 									'host_prototypes' => []
 								],
 								[
 									'status' => ITEM_STATUS_ACTIVE,
+									'filter' => [],
 									'host_prototypes' => []
 								],
 								[
