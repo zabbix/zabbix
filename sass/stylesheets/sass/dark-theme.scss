@@ -17,40 +17,139 @@
 //$lighter-green: #c5e3c6;
 //$alt-green: #59db8f;
 
-$primary-blue: #2b2b2b; // Primary top nav color
-$secondary-blue: #222; // Secondary top subnav color
+//$primary-blue: #2b2b2b; // Primary top nav color
+//$secondary-blue: #222; // Secondary top subnav color
 
 //$alt-dark-blue: #7499ff;
-$alt-blue: #242424;//#e8f4fa;
+//$alt-blue: #242424;//#e8f4fa;
 
-$blue-grey: #768d99;
-$light-blue-grey: #acbbc2;
-$lighter-blue-grey: #ccd5d9;
-$lightest-blue-grey: #0d1114;//#ebeef0; //Background color and table border color
-$alt-blue-grey: #97aab3;
+//$blue-grey: #768d99;
+//$light-blue-grey: #acbbc2;
+//$lighter-blue-grey: #ccd5d9;
+//$lightest-blue-grey: #0d1114;//#ebeef0; //Background color and table border color
+//$alt-blue-grey: #97aab3;
 
-$light-grey: #ebebeb;
-$lighter-grey: #f2f2f2;
+//$light-grey: #ebebeb;
+//$lighter-grey: #f2f2f2;
 
-$indigo-black: #d1dade;//#1f2c33;
-$white: #303030;//#fff;
-$transparent: transparent;
+//$indigo-black: #d1dade;//#1f2c33;
+//$white: #303030;//#fff;
+//$transparent: transparent;
 
 // LINK COLORS
+//$link-color: #0275b8; // Primary Blue
+//$link-hover-color: #0275b8;
+//$link-active-color: #0275b8;
+//$link-visited-color: #0275b8;
+
+//$link-topnav-color: #bfdced; // Nav Blue
+//$link-topnav-hover-color: #fff;
+//$link-topnav-active-color: #fff;
+//$link-topnav-visited-color: #bfdced;
+
+//$link-topsubnav-color: #bfced7; // SubNav Blue
+//$link-topsubnav-hover-color: #fff;
+//$link-topsubnav-active-color: #fff;
+//$link-topsubnav-visited-color: #bfced7;
+
+
+
+// NOTIFICATION & ALERT COLORS
+$red: #e33734;
+$light-red: #ed9898;
+$lighter-red: #fccacf;
+
+$orange: #f24f1d;
+$alt-dark-orange: #e97659;
+
+$yellow: #fad634;
+$light-yellow: #fcf39d;
+$lighter-yellow: #fcf7c2;
+
+$green: #429e47;
+$light-green: #a5d6a7;
+$lighter-green: #c5e3c6;
+
+$alt-red: #e45959;
+$alt-orange: #ffa059;
+$alt-yellow: #ffc859;
+$alt-green: #59db8f;
+$alt-dark-blue: #7499ff;
+$alt-blue-grey: #97aab3;
+
+$white: #fff;
+$transparent: transparent;
+
+
+// MAIN
+$main-color: #0275b8; //NEW Used across main nav bg and main button bg
+$font-color: #d1dade;//#1f2c33; //NEW
+$font-alt-color: #768d99; //NEW
+$body-bg-color: #0d1114;//#ebeef0; //NEW page bg color
+
+
+// UI
+$ui-bg-color: #303030;//#fff; //NEW ui element's bg color: widgets, containers for forms, tables, filters, action menus
+$ui-bg-selected-color: #acbbc2;
+$ui-hover-color: #e8f4fa; //NEW light blue hover for table rows, alt buttons, etc.
+$ui-border-color: #e8f4fa; //NEW
+
+$action-hover-color: #ebebeb; //NEW action menu item, calendar item hover colors
+$action-border-color: #ccd5d9; //NEW action menu item, calendar, all overlay border color
+
+$table-border-color: #ebeef0; // NEW row separator color in tables
+
+
+// FORMS
+$form-font-color: #1f2c33; // NEW
+$form-bg-color: #fff; //NEW
+$form-border-color: #acbbc2; //NEW
+$form-border-focus-color: #0275b8; //NEW
+
+$form-disabled-bg-color: #ebebeb; //NEW
+
+
+// BUTTONS
+$btn-font-color: #fff;
+$btn-hover-color: #fff;
+$btn-active-color: #fff;
+$btn-bg-color: #0275b8;
+
+$btn-alt-font-color: #0275b8;
+$btn-alt-hover-color: #0275b8;
+$btn-alt-active-color: #0275b8;
+$btn-alt-bg-color: transparent;
+$btn-alt-border-color: $btn-bg-color;
+
+$btn-form-font-color: #0275b8;
+$btn-form-hover-color: #0275b8;
+$btn-form-active-color: #0275b8;
+$btn-form-bg-color: transparent;
+$btn-form-border-color: $form-border-color;
+
+$btn-disabled-font-color: #acbbc2;
+$btn-disabled-hover-color: #acbbc2;
+$btn-disabled-active-color: #acbbc2;
+$btn-disabled-bg-color: transparent;
+$btn-disabled-border-color: #ccd5d9;
+
+
+// LINKS
 $link-color: #0275b8; // Primary Blue
 $link-hover-color: #0275b8;
 $link-active-color: #0275b8;
 $link-visited-color: #0275b8;
 
-$link-topnav-color: #bfdced; // Nav Blue
-$link-topnav-hover-color: #fff;
-$link-topnav-active-color: #fff;
-$link-topnav-visited-color: #bfdced;
+$link-main-nav-color: #bfdced; // Nav Blue
+$link-main-nav-hover-color: #fff;
+$link-main-nav-active-color: #fff;
+$link-main-nav-visited-color: #bfdced;
 
-$link-topsubnav-color: #bfced7; // SubNav Blue
-$link-topsubnav-hover-color: #fff;
-$link-topsubnav-active-color: #fff;
-$link-topsubnav-visited-color: #bfced7;
+$link-main-subnav-color: #bfced7; // SubNav Blue
+$link-main-subnav-hover-color: #fff;
+$link-main-subnav-active-color: #fff;
+$link-main-subnav-visited-color: #bfced7;
+
 
 
 // Important! @import string should always be last
