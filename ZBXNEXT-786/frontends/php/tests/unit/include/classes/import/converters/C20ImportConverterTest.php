@@ -57,6 +57,22 @@ class C20ImportConverterTest extends CImportConverterTest {
 											'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
 										]
 									],
+									'graph_prototypes' => [
+										[
+											'graph_items' => [
+												[
+													'item' => [
+														'key' => 'net.if.in[{#IFNAME}]'
+													]
+												],
+												[
+													'item' => [
+														'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+													]
+												]
+											]
+										]
+									],
 									'trigger_prototypes' => [
 										[
 											'expression' => '{host:item.last(0)}#0|{host:item.last(0)}#1'
@@ -67,18 +83,21 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'status' => ITEM_STATUS_DISABLED,
 									'filter' => '',
 									'item_prototypes' => [],
+									'graph_prototypes' => [],
 									'trigger_prototypes' => []
 								],
 								[
 									'status' => ITEM_STATUS_NOTSUPPORTED,
 									'filter' => ':',
 									'item_prototypes' => [],
+									'graph_prototypes' => [],
 									'trigger_prototypes' => []
 								],
 								[
 									'status' => ITEM_STATUS_ACTIVE,
 									'filter' => '{#MACRO}:regex',
 									'item_prototypes' => [],
+									'graph_prototypes' => [],
 									'trigger_prototypes' => []
 								],
 							]
@@ -114,6 +133,22 @@ class C20ImportConverterTest extends CImportConverterTest {
 											'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
 										]
 									],
+									'graph_prototypes' => [
+										[
+											'graph_items' => [
+												[
+													'item' => [
+														'key' => 'net.if.in[{#IFNAME}]'
+													]
+												],
+												[
+													'item' => [
+														'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+													]
+												]
+											]
+										]
+									],
 									'trigger_prototypes' => [
 										[
 											'expression' => '{host:item.last(0)}<>0 or {host:item.last(0)}<>1'
@@ -125,6 +160,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'status' => ITEM_STATUS_DISABLED,
 									'filter' => [],
 									'item_prototypes' => [],
+									'graph_prototypes' => [],
 									'trigger_prototypes' => [],
 									'host_prototypes' => []
 								],
@@ -132,6 +168,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'status' => ITEM_STATUS_ACTIVE,
 									'filter' => [],
 									'item_prototypes' => [],
+									'graph_prototypes' => [],
 									'trigger_prototypes' => [],
 									'host_prototypes' => []
 								],
@@ -149,8 +186,47 @@ class C20ImportConverterTest extends CImportConverterTest {
 										]
 									],
 									'item_prototypes' => [],
+									'graph_prototypes' => [],
 									'trigger_prototypes' => [],
 									'host_prototypes' => []
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'graphs' => [
+						[
+							'graph_items' => [
+								[
+									'item' => [
+										'key' => 'net.if.in[{#IFNAME}]'
+									]
+								],
+								[
+									'item' => [
+										'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+									]
+								]
+							]
+						]
+					]
+				],
+				[
+					'graphs' => [
+						[
+							'graph_items' => [
+								[
+									'item' => [
+										'key' => 'net.if.in[{#IFNAME}]'
+									]
+								],
+								[
+									'item' => [
+										'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+									]
 								]
 							]
 						]
@@ -197,6 +273,22 @@ class C20ImportConverterTest extends CImportConverterTest {
 											'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
 										]
 									],
+									'graph_prototypes' => [
+										[
+											'graph_items' => [
+												[
+													'item' => [
+														'key' => 'net.if.in[{#IFNAME}]'
+													]
+												],
+												[
+													'item' => [
+														'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+													]
+												]
+											]
+										]
+									],
 									'trigger_prototypes' => [
 										[
 											'expression' => '{host:item.last(0)}#0|{host:item.last(0)}#1'
@@ -207,18 +299,21 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'status' => ITEM_STATUS_DISABLED,
 									'filter' => '',
 									'item_prototypes' => [],
+									'graph_prototypes' => [],
 									'trigger_prototypes' => []
 								],
 								[
 									'status' => ITEM_STATUS_NOTSUPPORTED,
 									'filter' => ':',
 									'item_prototypes' => [],
+									'graph_prototypes' => [],
 									'trigger_prototypes' => []
 								],
 								[
 									'status' => ITEM_STATUS_ACTIVE,
 									'filter' => '{#MACRO}:regex',
 									'item_prototypes' => [],
+									'graph_prototypes' => [],
 									'trigger_prototypes' => []
 								],
 							]
@@ -248,6 +343,22 @@ class C20ImportConverterTest extends CImportConverterTest {
 											'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
 										]
 									],
+									'graph_prototypes' => [
+										[
+											'graph_items' => [
+												[
+													'item' => [
+														'key' => 'net.if.in[{#IFNAME}]'
+													]
+												],
+												[
+													'item' => [
+														'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+													]
+												]
+											]
+										]
+									],
 									'trigger_prototypes' => [
 										[
 											'expression' => '{host:item.last(0)}<>0 or {host:item.last(0)}<>1'
@@ -259,6 +370,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'status' => ITEM_STATUS_DISABLED,
 									'filter' => [],
 									'item_prototypes' => [],
+									'graph_prototypes' => [],
 									'trigger_prototypes' => [],
 									'host_prototypes' => []
 								],
@@ -266,6 +378,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'status' => ITEM_STATUS_ACTIVE,
 									'filter' => [],
 									'item_prototypes' => [],
+									'graph_prototypes' => [],
 									'trigger_prototypes' => [],
 									'host_prototypes' => []
 								],
@@ -283,6 +396,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 										]
 									],
 									'item_prototypes' => [],
+									'graph_prototypes' => [],
 									'trigger_prototypes' => [],
 									'host_prototypes' => []
 								]
