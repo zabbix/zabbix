@@ -63,33 +63,34 @@ class CApplication extends CApiService {
 		);
 
 		$defOptions = array(
-			'groupids'					=> null,
-			'templateids'				=> null,
-			'hostids'					=> null,
-			'itemids'					=> null,
-			'applicationids'			=> null,
-			'templated'					=> null,
-			'editable'					=> null,
-			'inherited' 				=> null,
-			'nopermissions'				=> null,
+			'groupids'						=> null,
+			'templateids'					=> null,
+			'hostids'						=> null,
+			'itemids'						=> null,
+			'applicationids'				=> null,
+			'templated'						=> null,
+			'editable'						=> null,
+			'inherited'						=> null,
+			'nopermissions'					=> null,
 			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
-			'searchWildcardsEnabled'	=> null,
+			'filter'						=> null,
+			'search'						=> null,
+			'searchByAny'					=> null,
+			'startSearch'					=> null,
+			'excludeSearch'					=> null,
+			'searchWildcardsEnabled'		=> null,
 			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'selectHost'				=> null,
-			'selectItems'				=> null,
-			'selectDiscoveryRule'		=> null,
-			'countOutput'				=> null,
-			'groupCount'				=> null,
-			'preservekeys'				=> null,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null
+			'output'						=> API_OUTPUT_EXTEND,
+			'selectHost'					=> null,
+			'selectItems'					=> null,
+			'selectDiscoveryRule'			=> null,
+			'selectApplicationDiscovery'	=> null,
+			'countOutput'					=> null,
+			'groupCount'					=> null,
+			'preservekeys'					=> null,
+			'sortfield'						=> '',
+			'sortorder'						=> '',
+			'limit'							=> null
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
@@ -248,23 +249,23 @@ class CApplication extends CApiService {
 
 		// permissions
 		if ($update || $delete) {
-			$itemDbFields = array('applicationid' => null);
-			$dbApplications = $this->get(array(
-				'output' => API_OUTPUT_EXTEND,
+			$itemDbFields = ['applicationid' => null];
+			$dbApplications = $this->get([
+				'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
 				'applicationids' => zbx_objectValues($applications, 'applicationid'),
-				'editable' => 1,
-				'preservekeys' => 1
-			));
+				'editable' => true,
+				'preservekeys' => true
+			]);
 		}
 		else {
-			$itemDbFields = array('name' => null, 'hostid' => null);
-			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid', 'host', 'status'),
+			$itemDbFields = ['name' => null, 'hostid' => null];
+			$dbHosts = API::Host()->get([
+				'output' => ['hostid', 'host', 'status'],
 				'hostids' => zbx_objectValues($applications, 'hostid'),
-				'templated_hosts' => 1,
-				'editable' => 1,
-				'preservekeys' => 1
-			));
+				'templated_hosts' => true,
+				'editable' => true,
+				'preservekeys' => true
+			]);
 		}
 
 		if ($update){
@@ -303,10 +304,16 @@ class CApplication extends CApiService {
 				);
 			}
 
-			// check on operating with templated applications
+			// Check on operating with templated and discovered applications.
 			if ($delete || $update) {
 				if ($dbApplications[$application['applicationid']]['templateids']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update templated applications.'));
+				}
+
+				if ($dbApplications[$application['applicationid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update discovered application "%1$s".',
+						$dbApplications[$application['applicationid']]['name']
+					));
 				}
 			}
 
@@ -387,14 +394,13 @@ class CApplication extends CApiService {
 	 */
 	public function delete(array $applicationids, $nopermissions = false) {
 		// TODO: remove $nopermissions hack
-		$options = array(
+		$delApplications = $this->get([
+			'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
+			'selectHost' => ['name', 'hostid'],
 			'applicationids' => $applicationids,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
-			'selectHost' => array('name', 'hostid')
-		);
-		$delApplications = $this->get($options);
+			'preservekeys' => true
+		]);
 
 		if (!$nopermissions) {
 			foreach ($applicationids as $applicationid) {
@@ -403,6 +409,12 @@ class CApplication extends CApiService {
 				}
 				if ($delApplications[$applicationid]['templateids']) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated application.'));
+				}
+
+				if ($delApplications[$applicationid]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot delete discovered application "%1$s".',
+						$delApplications[$applicationid]['name']
+					));
 				}
 			}
 		}

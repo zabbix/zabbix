@@ -677,17 +677,24 @@ class CImportReferencer {
 	 */
 	protected function selectApplications() {
 		if (!empty($this->applications)) {
-			$this->applicationsRefs = array();
-			$sqlWhere = array();
+			$this->applicationsRefs = [];
+			$sqlWhere = [];
+
 			foreach ($this->applications as $host => $applications) {
 				$hostId = $this->resolveHostOrTemplate($host);
 				if ($hostId) {
-					$sqlWhere[] = '(hostid='.zbx_dbstr($hostId).' AND '.dbConditionString('name', $applications).')';
+					$sqlWhere[] = '(a.hostid='.zbx_dbstr($hostId).' AND '.
+						dbConditionString('a.name', $applications).')';
 				}
 			}
 
 			if ($sqlWhere) {
-				$dbApplications = DBselect('SELECT applicationid,hostid,name FROM applications WHERE '.implode(' OR ', $sqlWhere));
+				$dbApplications = DBselect(
+					'SELECT a.applicationid,a.hostid,a.name'.
+					' FROM applications a'.
+					' WHERE '.implode(' OR ', $sqlWhere).
+						' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL
+				);
 				while ($dbApplication = DBfetch($dbApplications)) {
 					$this->applicationsRefs[$dbApplication['hostid']][$dbApplication['name']] = $dbApplication['applicationid'];
 				}
