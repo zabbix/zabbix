@@ -43,77 +43,79 @@ class C20ImportConverter extends CConverter {
 		$this->triggerExpressionConverter = new C20TriggerConverter();
 	}
 
-	public function convert($value) {
-		$content = $value['zabbix_export'];
+	public function convert($data) {
+		$data['zabbix_export']['version'] = '3.0';
 
-		$content['version'] = '3.0';
+		if (array_key_exists('hosts', $data['zabbix_export'])) {
+			$data['zabbix_export']['hosts'] = $this->convertHosts($data['zabbix_export']['hosts']);
+		}
+		if (array_key_exists('templates', $data['zabbix_export'])) {
+			$data['zabbix_export']['templates'] = $this->convertTemplates($data['zabbix_export']['templates']);
+		}
+		if (array_key_exists('triggers', $data['zabbix_export'])) {
+			$data['zabbix_export']['triggers'] = $this->convertTriggers($data['zabbix_export']['triggers']);
+		}
+		if (array_key_exists('screens', $data['zabbix_export'])) {
+			$data['zabbix_export']['screens'] = $this->convertScreens($data['zabbix_export']['screens']);
+		}
+		if (array_key_exists('maps', $data['zabbix_export'])) {
+			$data['zabbix_export']['maps'] = $this->convertMaps($data['zabbix_export']['maps']);
+		}
 
-		$content = $this->convertHosts($content);
-		$content = $this->convertTemplates($content);
-		$content = $this->convertTriggers($content);
-		$content = $this->convertScreens($content);
-		$content = $this->convertMaps($content);
-
-		$value['zabbix_export'] = $content;
-
-		return $value;
+		return $data;
 	}
 
 	/**
 	 * Convert host elements.
 	 *
-	 * @param array $content
+	 * @param array $hosts
 	 *
 	 * @return array
 	 */
-	protected function convertHosts(array $content) {
-		if (!isset($content['hosts']) || !$content['hosts']) {
-			return $content;
-		}
-
-		foreach ($content['hosts'] as &$host) {
-			$host = $this->convertHostInterfaces($host);
-			$host = $this->convertItems($host);
-			$host = $this->convertDiscoveryRules($host);
+	protected function convertHosts(array $hosts) {
+		foreach ($hosts as &$host) {
+			if (array_key_exists('interfaces', $host)) {
+				$host['interfaces'] = $this->convertHostInterfaces($host['interfaces']);
+			}
+			if (array_key_exists('items', $host)) {
+				$host['items'] = $this->convertItems($host['items']);
+			}
+			if (array_key_exists('discovery_rules', $host)) {
+				$host['discovery_rules'] = $this->convertDiscoveryRules($host['discovery_rules']);
+			}
 		}
 		unset($host);
 
-		return $content;
+		return $hosts;
 	}
 
 	/**
 	 * Convert template elements.
 	 *
-	 * @param array $content
+	 * @param array $templates
 	 *
 	 * @return array
 	 */
-	protected function convertTemplates(array $content) {
-		if (!isset($content['templates']) || !$content['templates']) {
-			return $content;
-		}
-
-		foreach ($content['templates'] as &$template) {
-			$template = $this->convertDiscoveryRules($template);
+	protected function convertTemplates(array $templates) {
+		foreach ($templates as &$template) {
+			if (array_key_exists('discovery_rules', $template)) {
+				$template['discovery_rules'] = $this->convertDiscoveryRules($template['discovery_rules']);
+			}
 		}
 		unset($template);
 
-		return $content;
+		return $templates;
 	}
 
 	/**
 	 * Convert item elements.
 	 *
-	 * @param array $host
+	 * @param array $items
 	 *
 	 * @return array
 	 */
-	protected function convertItems(array $host) {
-		if (!isset($host['items']) || !$host['items']) {
-			return $host;
-		}
-
-		foreach ($host['items'] as &$item) {
+	protected function convertItems(array $items) {
+		foreach ($items as &$item) {
 			if ($item['status'] == ITEM_STATUS_NOTSUPPORTED) {
 				$item['status'] = ITEM_STATUS_ACTIVE;
 			}
@@ -122,44 +124,36 @@ class C20ImportConverter extends CConverter {
 		}
 		unset($item);
 
-		return $host;
+		return $items;
 	}
 
 	/**
 	 * Convert interface elements.
 	 *
-	 * @param array $host
+	 * @param array $interfaces
 	 *
 	 * @return array
 	 */
-	protected function convertHostInterfaces(array $host) {
-		if (!isset($host['interfaces'])) {
-			return $host;
-		}
-
-		foreach ($host['interfaces'] as &$interface) {
-			if (!isset($interface['bulk']) && $interface['type'] == INTERFACE_TYPE_SNMP) {
+	protected function convertHostInterfaces(array $interfaces) {
+		foreach ($interfaces as &$interface) {
+			if (!array_key_exists('bulk', $interface) && $interface['type'] == INTERFACE_TYPE_SNMP) {
 				$interface['bulk'] = SNMP_BULK_ENABLED;
 			}
 		}
 		unset($interface);
 
-		return $host;
+		return $interfaces;
 	}
 
 	/**
 	 * Convert trigger elements.
 	 *
-	 * @param array $content
+	 * @param array $triggers
 	 *
 	 * @return array
 	 */
-	protected function convertTriggers(array $content) {
-		if (!array_key_exists('triggers', $content)) {
-			return $content;
-		}
-
-		foreach ($content['triggers'] as &$trigger) {
+	protected function convertTriggers(array $triggers) {
+		foreach ($triggers as &$trigger) {
 			if (array_key_exists('dependencies', $trigger)) {
 				foreach ($trigger['dependencies'] as &$dependency) {
 					$dependency['expression'] = $this->triggerExpressionConverter->convert($dependency['expression']);
@@ -171,23 +165,19 @@ class C20ImportConverter extends CConverter {
 		}
 		unset($trigger);
 
-		return $content;
+		return $triggers;
 	}
 
 	/**
 	 * Convert screen elements.
 	 *
-	 * @param array $content
+	 * @param array $screens
 	 *
 	 * @return array
 	 */
-	protected function convertScreens(array $content) {
-		if (!isset($content['screens']) || !$content['screens']) {
-			return $content;
-		}
-
-		foreach ($content['screens'] as &$screen) {
-			if (isset($screen['screen_items']) && $screen['screen_items']) {
+	protected function convertScreens(array $screens) {
+		foreach ($screens as &$screen) {
+			if (array_key_exists('screen_items', $screen)) {
 				foreach ($screen['screen_items'] as &$screenItem) {
 					if ($screenItem['rowspan'] == 0) {
 						$screenItem['rowspan'] = 1;
@@ -201,22 +191,18 @@ class C20ImportConverter extends CConverter {
 		}
 		unset($screen);
 
-		return $content;
+		return $screens;
 	}
 
 	/**
 	 * Convert map elements.
 	 *
-	 * @param array $content
+	 * @param array $maps
 	 *
 	 * @return array
 	 */
-	protected function convertMaps(array $content) {
-		if (!isset($content['maps']) || !$content['maps']) {
-			return $content;
-		}
-
-		foreach ($content['maps'] as &$map) {
+	protected function convertMaps(array $maps) {
+		foreach ($maps as &$map) {
 			if (array_key_exists('selements', $map)) {
 				foreach ($map['selements'] as &$selement) {
 					if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
@@ -242,90 +228,79 @@ class C20ImportConverter extends CConverter {
 		}
 		unset($map);
 
-		return $content;
+		return $maps;
 	}
 
 	/**
 	 * Convert discovery rule elements.
 	 *
-	 * @param array $host
+	 * @param array $discovery_rules
 	 *
 	 * @return array
 	 */
-	protected function convertDiscoveryRules(array $host) {
-		if (!isset($host['discovery_rules']) || !$host['discovery_rules']) {
-			return $host;
-		}
-
-		foreach ($host['discovery_rules'] as &$rule) {
-			if (isset($rule['status']) && $rule['status'] == ITEM_STATUS_NOTSUPPORTED) {
-				$rule['status'] = ITEM_STATUS_ACTIVE;
+	protected function convertDiscoveryRules(array $discovery_rules) {
+		foreach ($discovery_rules as &$discovery_rule) {
+			if ($discovery_rule['status'] == ITEM_STATUS_NOTSUPPORTED) {
+				$discovery_rule['status'] = ITEM_STATUS_ACTIVE;
 			}
 
-			if (!array_key_exists('host_prototypes', $rule)) {
-				$rule['host_prototypes'] = [];
+			if (!array_key_exists('st_prototypes', $discovery_rule)) {
+				$discovery_rule['host_prototypes'] = [];
 			}
 
-			$rule = $this->convertDiscoveryRuleFilter($rule);
-			$rule = $this->convertTriggerPrototypes($rule);
+			$discovery_rule['filter'] = $this->convertDiscoveryRuleFilter($discovery_rule['filter']);
+			$discovery_rule['trigger_prototypes'] =
+				$this->convertTriggerPrototypes($discovery_rule['trigger_prototypes']);
 		}
-		unset($rule);
+		unset($discovery_rule);
 
-		return $host;
+		return $discovery_rules;
 	}
 
 	/**
 	 * Convert trigger prototype elements.
 	 *
-	 * @param array $rule
+	 * @param array $trigger_prototypes
 	 *
 	 * @return array
 	 */
-	protected function convertTriggerPrototypes(array $rule) {
-		if (!isset($rule['trigger_prototypes']) || !$rule['trigger_prototypes']) {
-			return $rule;
-		}
-
-		foreach ($rule['trigger_prototypes'] as &$trigger) {
+	protected function convertTriggerPrototypes(array $trigger_prototypes) {
+		foreach ($trigger_prototypes as &$trigger) {
 			$trigger['expression'] = $this->triggerExpressionConverter->convert($trigger['expression']);
 		}
 		unset($trigger);
 
-		return $rule;
+		return $trigger_prototypes;
 	}
 
 	/**
 	 * Convert filters from the 2.0 and 2.2 string representations to a 2.4 array.
 	 *
-	 * @param array $rule
+	 * @param mixed $filter
 	 * @return array
 	 */
-	protected function convertDiscoveryRuleFilter(array $rule) {
-		if (!isset($rule['filter'])) {
-			return $rule;
-		}
-		// empty filters were exported as ":"
-		elseif ($rule['filter'] === ':') {
-			unset($rule['filter']);
-
-			return $rule;
-		}
+	protected function convertDiscoveryRuleFilter($filter) {
 		// string filters were exported as "{#MACRO}:regex"
-		elseif ($rule['filter'] && !is_array($rule['filter'])) {
-			list ($filterMacro, $filterValue) = explode(':', $rule['filter']);
-			$rule['filter'] = array(
+		if (is_string($filter)) {
+			// empty filters
+			if ($filter === '' || $filter === ':') {
+				return [];
+			}
+
+			list ($macro, $value) = explode(':', $filter);
+			$filter = [
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 				'formula' => '',
-				'conditions' => array(
-					array(
-						'macro' => $filterMacro,
-						'value' => $filterValue,
+				'conditions' => [
+					[
+						'macro' => $macro,
+						'value' => $value,
 						'operator' => CONDITION_OPERATOR_REGEXP
-					)
-				)
-			);
+					]
+				]
+			];
 		}
 
-		return $rule;
+		return $filter;
 	}
 }

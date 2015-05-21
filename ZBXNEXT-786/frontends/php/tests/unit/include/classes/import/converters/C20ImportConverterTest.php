@@ -101,11 +101,12 @@ class C20ImportConverterTest extends CImportConverterTest {
 								],
 								[
 									'status' => ITEM_STATUS_DISABLED,
-									'filter' => '',
+									'filter' => [],
 									'host_prototypes' => []
 								],
 								[
 									'status' => ITEM_STATUS_ACTIVE,
+									'filter' => [],
 									'host_prototypes' => []
 								],
 								[
@@ -227,6 +228,48 @@ class C20ImportConverterTest extends CImportConverterTest {
 										]
 									],
 									'host_prototypes' => []
+								]
+							]
+						]
+					]
+				],
+				[
+					'screens' => [
+						[],
+						[
+							'screen_items' => [
+								[
+									'rowspan' => 0,
+									'colspan' => 0
+								],
+								[
+									'rowspan' => 1,
+									'colspan' => 2
+								],
+								[
+									'rowspan' => 3,
+									'colspan' => 4
+								]
+							]
+						]
+					]
+				],
+				[
+					'screens' => [
+						[],
+						[
+							'screen_items' => [
+								[
+									'rowspan' => 1,
+									'colspan' => 1
+								],
+								[
+									'rowspan' => 1,
+									'colspan' => 2
+								],
+								[
+									'rowspan' => 3,
+									'colspan' => 4
 								]
 							]
 						]
