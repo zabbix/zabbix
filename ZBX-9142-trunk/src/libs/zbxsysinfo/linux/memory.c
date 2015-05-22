@@ -81,7 +81,7 @@ static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 
 	if (FAIL == (res = byte_value_from_proc_file(f, "Cached:", NULL, &value)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain the value of Cached"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain the value of Cached from /proc/meminfo."));
 		goto close;
 	}
 
@@ -148,7 +148,7 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 
 	if (FAIL == (res = byte_value_from_proc_file(f, "MemAvailable:", "Cached:", &value)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain the value of MemAvailable"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain the value of MemAvailable from /proc/meminfo."));
 		goto close;
 	}
 
@@ -161,7 +161,7 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 
 	if (FAIL == (res = byte_value_from_proc_file(f, "Cached:", NULL, &value)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain the value of Cached"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain the value of Cached from /proc/meminfo."));
 		goto close;
 	}
 
