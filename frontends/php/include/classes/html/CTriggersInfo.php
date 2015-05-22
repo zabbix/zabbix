@@ -21,21 +21,19 @@
 
 class CTriggersInfo extends CTable {
 
-	public $style = null;
+	private $style = STYLE_HORIZONTAL;
 	private $groupid;
-	private $hostid;
 
-	public function __construct($groupid, $hostid, $style) {
+	public function __construct($groupid) {
 		parent::__construct(null, 'list-table');
 
-		$this->setOrientation($style);
-
-		$this->groupid = ($groupid === null) ? 0 : $groupid;
-		$this->hostid = ($hostid === null) ? 0 : $hostid;
+		$this->groupid = $groupid;
 	}
 
 	public function setOrientation($value) {
 		$this->style = $value;
+
+		return $this;
 	}
 
 	public function bodyToString() {
@@ -55,10 +53,7 @@ class CTriggersInfo extends CTable {
 			'skipDependent' => true
 		];
 
-		if ($this->hostid > 0) {
-			$options['hostids'] = $this->hostid;
-		}
-		elseif ($this->groupid > 0) {
+		if ($this->groupid != 0) {
 			$options['groupids'] = $this->groupid;
 		}
 		$triggers = API::Trigger()->get($options);
