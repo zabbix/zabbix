@@ -19,11 +19,14 @@
 **/
 
 
-$itemsWidget = (new CWidget())->setTitle(_('Item prototypes'));
+$itemsWidget = new CWidget();
+$itemsWidget->setTitle([
+	_('Item prototypes of').SPACE,
+	new CSpan($this->data['discovery_rule']['name'], ZBX_STYLE_GREEN)
+]);
 
 // create new item button
-$createForm = new CForm('get');
-$createForm->cleanItems();
+$createForm = (new CForm('get'))->cleanItems();
 $createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 $controls = new CList();
@@ -33,7 +36,6 @@ $createForm->addItem($controls);
 $itemsWidget->setControls($createForm);
 
 // header
-$itemsWidget->addHeader(array(_('Item prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')));
 $itemsWidget->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 // create form
@@ -90,11 +92,11 @@ foreach ($this->data['items'] as $item) {
 		$applications = zbx_objectValues($item['applications'], 'name');
 		$applications = implode(', ', $applications);
 		if (empty($applications)) {
-			$applications = '-';
+			$applications = '';
 		}
 	}
 	else {
-		$applications = '-';
+		$applications = '';
 	}
 
 	$itemTable->addRow(array(
@@ -105,7 +107,7 @@ foreach ($this->data['items'] as $item) {
 		convertUnitsS(SEC_PER_DAY * $item['history']),
 		($item['trends'] !== '') ? convertUnitsS(SEC_PER_DAY * $item['trends']) : '',
 		item_type2str($item['type']),
-		new CCol($applications, 'wraptext'),
+		$applications,
 		$status
 	));
 }
