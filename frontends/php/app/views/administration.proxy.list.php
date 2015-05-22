@@ -80,16 +80,16 @@ foreach ($data['proxies'] as $proxy) {
 		$hosts[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'], $style);
 	}
 
-	$proxyTable->addRow(array(
+	$proxyTable->addRow([
 		new CCheckBox('proxyids['.$proxy['proxyid'].']', null, null, $proxy['proxyid']),
 		new CLink($proxy['host'], 'zabbix.php?action=proxy.edit&proxyid='.$proxy['proxyid']),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
-		$proxy['lastaccess'] == 0 ? '-' : zbx_date2age($proxy['lastaccess']),
+		$proxy['lastaccess'] == 0 ? new CSpan(_('Never'), ZBX_STYLE_RED) : zbx_date2age($proxy['lastaccess']),
 		count($proxy['hosts']),
 		array_key_exists('item_count', $proxy) ? $proxy['item_count'] : 0,
-		array_key_exists('perf', $proxy) ? $proxy['perf'] : '-',
-		new CCol($hosts ? $hosts : '-', 'wraptext')
-	));
+		array_key_exists('perf', $proxy) ? $proxy['perf'] : '',
+		$hosts ? $hosts : ''
+	]);
 }
 
 // append table to form

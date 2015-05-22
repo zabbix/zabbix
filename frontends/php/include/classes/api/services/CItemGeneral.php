@@ -261,6 +261,12 @@ abstract class CItemGeneral extends CApiService {
 				$item['data_type'] = 0;
 			}
 
+			// For non-numeric types, whichever value was entered in trends field, is overwritten to zero.
+			if ($fullItem['value_type'] == ITEM_VALUE_TYPE_STR || $fullItem['value_type'] == ITEM_VALUE_TYPE_LOG
+					|| $fullItem['value_type'] == ITEM_VALUE_TYPE_TEXT) {
+				$item['trends'] = 0;
+			}
+
 			// check if the item requires an interface
 			$itemInterfaceType = itemTypeInterface($fullItem['type']);
 			if ($itemInterfaceType !== false && $host['status'] != HOST_STATUS_TEMPLATE) {

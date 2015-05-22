@@ -702,7 +702,7 @@ foreach ($triggers as $trigger) {
 	}
 	else {
 		$comments = zbx_empty($trigger['comments'])
-			? new CSpan('-')
+			? new CSpan('')
 			: new CLink(_('Show'), 'tr_comments.php?triggerid='.$trigger['triggerid']);
 	}
 
@@ -714,7 +714,7 @@ foreach ($triggers as $trigger) {
 		$statusSpan,
 		$unknown,
 		$lastChange,
-		empty($trigger['lastchange']) ? '-' : zbx_date2age($trigger['lastchange']),
+		empty($trigger['lastchange']) ? '' : zbx_date2age($trigger['lastchange']),
 		$showEventColumn ? SPACE : null,
 		$ackColumn,
 		$hostColumn,
