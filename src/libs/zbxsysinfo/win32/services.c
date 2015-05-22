@@ -432,7 +432,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	SERVICE_STATUS			status;
 	SC_HANDLE			h_mgr, h_srv;
 	DWORD				sz = 0;
-	int				param_type;
+	int				param_type, i;
 	char				*name, *param;
 	wchar_t				*wname, service_name[MAX_STRING_LEN];
 	DWORD				max_len_name = MAX_STRING_LEN;
@@ -492,10 +492,21 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (ZBX_SRV_PARAM_STATE == param_type)
 		{
-			if (0 == QueryServiceStatus(h_srv, &status))
-				SET_UI64_RESULT(result, 7);
+			if (0 != QueryServiceStatus(h_srv, &status))
+			{
+				static DWORD states[7] = {SERVICE_RUNNING, SERVICE_PAUSED, SERVICE_START_PENDING,
+						SERVICE_PAUSE_PENDING,SERVICE_CONTINUE_PENDING, SERVICE_STOP_PENDING,
+						SERVICE_STOPPED};
+
+				for (i = 0; i < 7 && status.dwCurrentState != states[i]; i++)
+					;
+
+				SET_UI64_RESULT(result, i);
+			}
 			else
-				SET_UI64_RESULT(result, status.dwCurrentState);
+			{
+				SET_UI64_RESULT(result, 7);
+			}
 		}
 		else
 		{
