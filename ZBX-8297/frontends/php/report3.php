@@ -218,9 +218,9 @@ foreach ($sla['sla'] as $intervalSla) {
 	$table->addRow(array(
 		format_time($intervalSla['from']),
 		format_time2($intervalSla['to']),
-		$ok,
-		$problems,
-		new CSpan($downtime, ZBX_STYLE_GREY),
+		$intervalSla['okTime'] == 0 ? '' : $ok,
+		$intervalSla['problemTime'] == 0 ? '' : $problems,
+		$intervalSla['downtimeTime'] ==0 ? '' : new CSpan($downtime, ZBX_STYLE_GREY),
 		($service['showsla']) ? $percentage : '',
 		($service['showsla']) ? new CSpan($service['goodsla']) : ''
 	));

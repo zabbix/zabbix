@@ -167,7 +167,7 @@ if ($pageFilter->hostsSelected) {
 		}
 		// no history data exists
 		else {
-			$lastcheck = _('Never');
+			$lastcheck = new CSpan(_('Never'), ZBX_STYLE_RED);
 			$status['msg'] = _('Unknown');
 			$status['style'] = ZBX_STYLE_GREY;
 		}

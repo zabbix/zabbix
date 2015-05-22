@@ -139,7 +139,7 @@ foreach ($data['hosts'] as $host) {
 	$status = new CLink($statusCaption, $statusUrl, ZBX_STYLE_LINK_ACTION.' '.$statusClass, $statusScript);
 
 	if (empty($host['parentTemplates'])) {
-		$hostTemplates = '-';
+		$hostTemplates = '';
 	}
 	else {
 		order_result($host['parentTemplates'], 'name');
@@ -187,7 +187,7 @@ foreach ($data['hosts'] as $host) {
 		}
 	}
 
-	$table->addRow(array(
+	$table->addRow([
 		new CCheckBox('hosts['.$host['hostid'].']', null, null, $host['hostid']),
 		new CCol($description, ZBX_STYLE_NOWRAP),
 		$applications,
@@ -197,10 +197,10 @@ foreach ($data['hosts'] as $host) {
 		$discoveries,
 		$httpTests,
 		$hostInterface,
-		new CCol($hostTemplates, 'wraptext'),
+		$hostTemplates,
 		$status,
 		getAvailabilityTable($host, $currentTime)
-	));
+	]);
 }
 
 $form->addItem(array(

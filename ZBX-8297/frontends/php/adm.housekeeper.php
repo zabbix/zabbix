@@ -140,7 +140,7 @@ $controls->addItem(new CComboBox('configDropDown', 'adm.housekeeper.php',
 
 $form->addItem($controls);
 
-$cnf_wdgt = new CWidget()->setTitle(_('Housekeeping'))->setControls($form);
+$cnf_wdgt = (new CWidget())->setTitle(_('Housekeeping'))->setControls($form);
 
 $config = select_config();
 

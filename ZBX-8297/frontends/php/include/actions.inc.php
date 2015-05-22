@@ -1298,7 +1298,7 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 
 		switch ($row['alerttype']) {
 			case ALERT_TYPE_MESSAGE:
-				$message = empty($row['description']) ? '-' : $row['description'];
+				$message = empty($row['description']) ? '' : $row['description'];
 				break;
 			case ALERT_TYPE_COMMAND:
 				$message = array(bold(_('Command').NAME_DELIMITER));
@@ -1308,7 +1308,7 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 				}
 				break;
 			default:
-				$message = '-';
+				$message = '';
 		}
 
 		if (!$row['alias']) {

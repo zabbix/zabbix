@@ -34,6 +34,7 @@ A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent, updated outdated
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+A.F.I..... [ZBX-9414] fixed sorting, displaying and filtering by trends and interval in items, item prototypes and discovery rules (Ivo)
 ..F....... [ZBXNEXT-2791] synchronised item key helper descriptions and return values from the Zabbix manual (Richlv)
 ........S. [ZBX-9470] fixed bug when sometimes value cache would try to cache already cached time based request (wiper)
 ...G...... [ZBX-9317] changed proc.mem[] and proc.num[] to return 0 if the specified user does not exist (asaveljevs)
