@@ -609,7 +609,7 @@ else {
 
 	if ($pageFilter->groupsSelected) {
 		$templates = API::Template()->get(array(
-			'output' => array('templateid', 'name'),
+			'output' => array('templateid', $sortField),
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
 			'sortfield' => $sortField,
@@ -619,7 +619,7 @@ else {
 
 	// sorting && paging
 	order_result($templates, $sortField, $sortOrder);
-	$paging = getPagingLine($templates);
+	$paging = getPagingLine($templates, $sortOrder);
 
 	$templates = API::Template()->get(array(
 		'templateids' => zbx_objectValues($templates, 'templateid'),
