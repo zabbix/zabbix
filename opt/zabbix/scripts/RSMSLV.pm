@@ -1361,10 +1361,10 @@ sub process_slv_ns_monthly
 	# ...
 	my %total_values;
 	my %successful_values;
-	foreach my $ns (@$nsips_ref)
+	foreach my $nsip (@$nsips_ref)
 	{
-		$total_values{$ns} = 0;
-		$successful_values{$ns} = 0;
+		$total_values{$nsip} = 0;
+		$successful_values{$nsip} = 0;
 	}
 
 	my $probes_ref = get_probes();
@@ -1391,32 +1391,32 @@ sub process_slv_ns_monthly
 
 		my $values_ref = get_nsip_values($itemids_ref, [$cur_from, $cur_till], $nsip_items_ref);
 
-		foreach my $ns (keys(%$values_ref))
+		foreach my $nsip (keys(%$values_ref))
 		{
-			my $item_values_ref = $values_ref->{$ns}->{'values'};
+			my $item_values_ref = $values_ref->{$nsip}->{'values'};
 
 			foreach (@$item_values_ref)
 			{
-				$total_values{$ns}++;
-				$successful_values{$ns}++ if ($check_value_ref->($_) == SUCCESS);
+				$total_values{$nsip}++;
+				$successful_values{$nsip}++ if ($check_value_ref->($_) == SUCCESS);
 			}
 		}
 
 		$cur_from += $interval;
 	}
 
-	foreach my $ns (keys(%total_values))
+	foreach my $nsip (keys(%total_values))
 	{
-		if ($total_values{$ns} == 0)
+		if ($total_values{$nsip} == 0)
 		{
-			info("$ns: no values found in the database for a given period");
+			info("$nsip: no values found in the database for a given period");
 			next;
 		}
 
-		my $perc = sprintf("%.3f", $successful_values{$ns} * 100 / $total_values{$ns});
-		my $key_out = $cfg_key_out . $ns . ']';
+		my $perc = sprintf("%.3f", $successful_values{$nsip} * 100 / $total_values{$nsip});
+		my $key_out = $cfg_key_out . $nsip . ']';
 
-		push_value($tld, $key_out, $value_ts, $perc, "$ns: $perc% successful values (", $successful_values{$ns}, "/", $total_values{$ns});
+		push_value($tld, $key_out, $value_ts, $perc, "$nsip: $perc% successful values (", $successful_values{$nsip}, "/", $total_values{$nsip});
 	}
 }
 

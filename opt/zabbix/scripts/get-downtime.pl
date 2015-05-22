@@ -72,12 +72,12 @@ foreach (@$tlds_ref)
 	if ("[" eq substr($key, -1))
 	{
 		my $itemids_ref = get_itemids_by_host_and_keypart($tld, $key);
-		foreach my $ns (keys(%$itemids_ref))
+		foreach my $nsip (keys(%$itemids_ref))
 		{
-			my $itemid = $itemids_ref->{$ns};
+			my $itemid = $itemids_ref->{$nsip};
 			my $downtime = get_downtime($itemid, $from, $till, 1); # no incidents check
 
-			info("$ns: $downtime minutes of downtime from ", ts_str($from), " ($from) till ", ts_str($till), " ($till)");
+			info("$nsip: $downtime minutes of downtime from ", ts_str($from), " ($from) till ", ts_str($till), " ($till)");
 		}
 	}
 	else
