@@ -4502,9 +4502,20 @@ void	zbx_tls_close(zbx_socket_t *s)
 
 	if (NULL != s->tls_ctx)
 	{
-		if (1 != (res = SSL_shutdown(s->tls_ctx)))
+		/* In the best case SSL_shutdown() returns 1 (bidirectional shutdown successfully completed). */
+		/* 0 (shutdown is not yet finished) is also sufficient for us as unidirectional shutdown is allowed */
+		/* < 0 (fatal error) must be logged. */
+		if (0 > (res = SSL_shutdown(s->tls_ctx)))
 		{
-			/* TODO add error processing */
+			int	error_code;
+			char	*error = NULL;
+			size_t	error_alloc = 0, error_offset = 0;
+
+			error_code = SSL_get_error(s->tls_ctx, res);
+			zbx_tls_error_msg(&error, &error_alloc, &error_offset);
+			zabbix_log(LOG_LEVEL_WARNING, "TLS shutdown with %s returned error code %d: %s",
+					get_ip_by_socket(s), error_code, info_buf);
+			zbx_free(error);
 		}
 
 		SSL_free(s->tls_ctx);
