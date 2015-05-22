@@ -1186,12 +1186,19 @@ footer {
 
 		td {
 			padding: 5px 5px 5px 0;
-			vertical-align: top;
+			//vertical-align: top;
 			position: relative;
 
-			 &.td-drag-icon {
-			 	padding: 5px 0px;
-			 }
+			&.td-drag-icon {
+				padding: 0 11px 0 0;
+				vertical-align: middle;
+			}
+
+			.drag-icon {
+				position: absolute;
+				top: 5px;
+				margin-right: 5px;
+			}
 
 			 &.center {
 			 	text-align: center;
