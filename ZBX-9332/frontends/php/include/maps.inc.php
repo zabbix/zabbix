@@ -1231,10 +1231,10 @@ function getSelementsInfo($sysmap, array $options = array()) {
 						if ($i['priority'] < $trigger['priority']) {
 							$i['priority'] = $trigger['priority'];
 						}
-					}
 
-					if ($trigger['lastEvent'] && !$trigger['lastEvent']['acknowledged']) {
-						$i['problem_unack']++;
+						if ($trigger['lastEvent'] && !$trigger['lastEvent']['acknowledged']) {
+							$i['problem_unack']++;
+						}
 					}
 
 					$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < $config['blink_period']);
