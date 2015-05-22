@@ -387,7 +387,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 					else
 						utf8 = "unknown";
 
-					zbx_json_addstring(&j, "{#SERVICE.STARTUP_TYPE}", utf8, ZBX_JSON_TYPE_STRING);
+					zbx_json_addstring(&j, "{#SERVICE.STARTUP}", utf8, ZBX_JSON_TYPE_STRING);
 					zbx_free(utf8);
 				}
 
@@ -424,7 +424,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_SRV_PARAM_DESCRIPTION	0x02
 #define ZBX_SRV_PARAM_PATH		0x03
 #define ZBX_SRV_PARAM_USER		0x04
-#define ZBX_SRV_PARAM_STARTUP_TYPE	0x05
+#define ZBX_SRV_PARAM_STARTUP		0x05
 
 int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -460,8 +460,8 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 		param_type = ZBX_SRV_PARAM_PATH;
 	else if (0 == strcmp(param, "user"))
 		param_type = ZBX_SRV_PARAM_USER;
-	else if (0 == strcmp(param, "startup_type"))
-		param_type = ZBX_SRV_PARAM_STARTUP_TYPE;
+	else if (0 == strcmp(param, "startup"))
+		param_type = ZBX_SRV_PARAM_STARTUP;
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -544,7 +544,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 				case ZBX_SRV_PARAM_USER:
 					SET_STR_RESULT(result, zbx_unicode_to_utf8(qsc->lpServiceStartName));
 					break;
-				case ZBX_SRV_PARAM_STARTUP_TYPE:
+				case ZBX_SRV_PARAM_STARTUP:
 					SET_UI64_RESULT(result, qsc->dwStartType);
 					break;
 			}
