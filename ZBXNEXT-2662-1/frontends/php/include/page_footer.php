@@ -62,7 +62,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	if (!defined('ZBX_PAGE_NO_MENU')) {
 		echo '<div class="footer">'."\n";
 		echo '<a href="http://www.zabbix.com" target="_blank" class="logo"></a>'."\n";
-		echo 'Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" target="_blank">Zabbix SIA</a>'."\n";
+		echo 'Zabbix '.ZABBIX_VERSION.'. &copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', <a href="http://www.zabbix.com" target="_blank">Zabbix SIA</a>'."\n";
 		echo '</div>'."\n";
 	}
 	insertPagePostJs();

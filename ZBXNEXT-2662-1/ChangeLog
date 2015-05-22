@@ -34,6 +34,7 @@ A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent, updated outdated
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+A.F.I..... [ZBX-9414] fixed sorting, displaying and filtering by trends and interval in items, item prototypes and discovery rules (Ivo)
 ..F....... [ZBXNEXT-2791] synchronised item key helper descriptions and return values from the Zabbix manual (Richlv)
 ........S. [ZBX-9470] fixed bug when sometimes value cache would try to cache already cached time based request (wiper)
 ...G...... [ZBX-9317] changed proc.mem[] and proc.num[] to return 0 if the specified user does not exist (asaveljevs)
@@ -82,7 +83,8 @@ A.F....... [ZBX-1357] updated Dutch translation; thanks to Zabbix translators (R
 ...G...PS. [ZBXNEXT-786] made net.tcp.service[ntp] item work over UDP (asaveljevs)
 
 Bug fixes:
-........S. [ZBX-4529] fixed argument escaping for script media types in alerter (wiper)
+..F....... [ZBX-9402] fixed sorting of elements in pages and fixed several requests returning more results than record count set in configuration (Ivo)
+........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
 ...G...... [ZBX-9385] fixed proc.num[,,run] and proc.num[,,sleep] always returning 0 on AIX hosts (asaveljevs)
 ...G...PS. [ZBX-9511] fixed compiler warnings in discoverer, SNMP trapper, LLD, and DNS item code (asaveljevs)
 .......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
@@ -708,7 +710,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Polish translat
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
-........S. [ZBX-4529] fixed argument escaping for script media types in alerter (wiper)
+........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
 .......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
 .......PS. [ZBX-9457] fixed server crash in case ValueCacheSize=0; thanks to MATSUDA Daiki for patch (asaveljevs)
@@ -721,7 +723,7 @@ Bug fixes:
 .......PS. [ZBX-7446] fixed vmware.hv.status item always returning 0 (gray) status (wiper)
 ...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
 A.F....... [ZBX-9365] fixed array_combine() function giving a warning message for PHP versions < 5.4.0 (Ivo)
-..F....... [ZBX-9402] fixed trigger list sorting (Ivo)
+..F....... [ZBX-9402] fixed sorting of elements in pages and fixed several requests returning more results than record count set in configuration (Ivo)
 ..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
 ..F....... [ZBX-9102] fixed "System status" dashboard widget performing poorly (Ivo)
 A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
@@ -1956,7 +1958,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-........S. [ZBX-4529] fixed argument escaping for script media types in alerter (wiper)
+........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
 .......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
 .......PS. [ZBX-5717] fixed incorrect calculation of icmppingloss[] due to floating-point errors (asaveljevs)

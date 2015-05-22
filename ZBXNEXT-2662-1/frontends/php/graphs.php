@@ -646,7 +646,7 @@ else {
 
 	order_result($data['graphs'], $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($data['graphs']);
+	$data['paging'] = getPagingLine($data['graphs'], $sortOrder);
 
 	// get graphs after paging
 	$options = array(
