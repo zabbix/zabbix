@@ -532,8 +532,11 @@ sass/apple-touch-icon-120x120-precomposed.png -text svneol=unset#image/png
 sass/apple-touch-icon-152x152-precomposed.png -text svneol=unset#image/png
 sass/apple-touch-icon-180x180-precomposed.png -text svneol=unset#image/png
 sass/apple-touch-icon-76x76-precomposed.png -text svneol=unset#image/png
+sass/browserwarning.html -text
 sass/dashboard.html -text
+sass/errors.html -text
 sass/favicon.ico -text svneol=unset#image/x-icon
+sass/img/browser-sprite.png -text svneol=unset#image/png
 sass/img/icon-sprite.png -text svneol=unset#image/png
 sass/img/preload.gif -text svneol=unset#image/gif
 sass/overlay-dialog.html -text
@@ -542,6 +545,10 @@ sass/popup.html -text
 sass/screens-edit.html -text
 sass/setup.html -text
 sass/signin.html -text
+sass/stylesheets/sass/_colors.scss -text
+sass/stylesheets/sass/_fonts.scss -text
+sass/stylesheets/sass/_mixins.scss -text
+sass/stylesheets/sass/dark-theme.scss -text
 sass/touch-icon-192x192.png -text svneol=unset#image/png
 src/libs/zbxsysinfo/win32/wmi.cpp -text
 src/zabbix_java/lib/README svneol=native#text/plain
