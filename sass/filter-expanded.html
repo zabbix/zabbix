@@ -15,16 +15,16 @@
 	</head>
 <body>
 	<header role="banner">
-		<nav role="navigation">
+		<div class="nav" role="navigation">
 			<div class="top-nav-container">
 			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><li><a href="" class="top-nav-print" title="Print"></a></li><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
 			</div>
 			<div class="top-subnav-container">
 			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
 			</div>
-		</nav>
+		</div>
 	</header>
-	<article>
+	<div class="article">
 	<div class="header-title">
 	<h1>Dashboard</h1>
 	<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
@@ -41,12 +41,13 @@
 	<ul class="table-forms">
 	<li><div class="table-forms-td-left"><label for="Groups">Host group</label></div><div class="table-forms-td-right">
 	<div class="multiselect-wrapper">
-	<div class="multiselect"><input type="text" style="" value="">
+	<div class="multiselect">
       <div class="selected">
         <ul class="multiselect-list disabled">
           <li data-id=""><span class="subfilter-enabled">Discovered hosts<span class="subfilter-disable-btn">&times;</span></span></li><li data-id=""><span class="subfilter-enabled">Linux servers<span class="subfilter-disable-btn">&times;</span></span></li>
         </ul>
       </div>
+      <input type="text" style="" value="" placeholder="Search">
     </div>
     <div class="multiselect-button"><button type="button" class="btn-grey">Select</button></div>
     </div>
@@ -54,19 +55,20 @@
 	</li>
 	<li><div class="table-forms-td-left"><label for="Groups">Host group</label></div><div class="table-forms-td-right">
 	<div class="multiselect-wrapper">
-	<div class="multiselect"><input type="text" style="" value="">
+	<div class="multiselect">
       <div class="selected">
         <ul class="multiselect-list">
           <li data-id="" class="selected"><span class="subfilter-enabled">Discovered hosts<span class="subfilter-disable-btn">&times;</span></span></li><li data-id=""><span class="subfilter-enabled">Linux servers<span class="subfilter-disable-btn">&times;</span></span></li>
         </ul>
       </div>
+      <input type="text" style="" value="" placeholder="Search">
     </div>
     <div class="multiselect-button"><button type="button" class="btn-grey">Select</button></div>
     </div>
     </div>
 	</li>
 	<li><div class="table-forms-td-left"><label for="Groups">Host</label></div><div class="table-forms-td-right">
-	<div class="multiselect"><input type="text" id="Groups" placeholder="Search">
+	<div class="multiselect">
 	<div class="available" style="top: 23px">
 	<div class="multiselect-matches">More matches found</div>
 	<ul class="multiselect-suggest"><li class="suggest-hover"><span class="grey"><span class="suggest-found">Za</span>bbix servers</span></li><li><span class="grey"><span class="suggest-found">Za</span>bbix servers</span>df dsfsdf sfsdf sdfsdfsdf</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="grey"><span class="suggest-found">Za</span>bbix servers</span></li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li>Zabbix server</li><li>Zabbix server</li></ul>
@@ -186,6 +188,7 @@
 				<th>Templates</th>
 				<th><a href="">Status</a></th>
 				<th>Availability</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -203,6 +206,7 @@
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
 				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><span class="status-yellow"><b>!</b></span></td>
 			</tr>
 			<tr class="row-selected">
 			    <td>root</td>
@@ -218,6 +222,7 @@
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
 				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><span class="status-yellow"><b>!</b></span></td>
 			</tr>
 			<tr>
 			    <td><div class="treeview"><span class="arrow-right"></span></div><a href="">Public Cloud Service</a></td>
@@ -233,6 +238,7 @@
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
 				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><span class="status-yellow"><b>!</b></span></td>
 			</tr>
 			<tr>
 			    <td><div class="treeview"><span class="arrow-down"></span></div><a href="">Business System</a></td>
@@ -248,6 +254,7 @@
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
 				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><span class="status-yellow"><b>!</b></span></td>
 			</tr>
 			<tr>
 			    <td style="padding-left: 2em;"><div class="treeview"><span class="arrow-right"></span></div><a href="">CRM</a>-<a href="">CRM is unavailable by ICMP</a></td>
@@ -263,6 +270,7 @@
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
 				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><span class="status-yellow"><b>!</b></span></td>
 			</tr>
 			<tr>
 			    <td style="padding-left: 2em;"><div class="treeview"><span class="arrow-down"></span></div><a href="">CRM</a>-<a href="">CRM is unavailable by ICMP</a></td>
@@ -278,6 +286,7 @@
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
 				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><span class="status-yellow"><b>!</b></span></td>
 			</tr>
 			<tr>
 			    <td style="padding-left: 4em;"><a href="">ERP 2</a>-<a href="">ERP 2 is unavailable by ICMP</a></td>
@@ -293,6 +302,7 @@
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
 				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><span class="status-yellow"><b>!</b></span></td>
 			</tr>
 			<tr>
 			    <td></td>
@@ -308,6 +318,7 @@
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
 				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><span class="status-yellow"><b>!</b></span></td>
 			</tr>
 			<tr>
 			    <td></td>
@@ -323,6 +334,7 @@
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
 				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><span class="status-yellow"><b>!</b></span></td>
 			</tr>
 			<tr class="row-selected">
 			    <td></td>
@@ -338,6 +350,7 @@
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
 				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><span class="status-yellow"><b>!</b></span></td>
 			</tr>
 			<tr>
 			    <td></td>
@@ -353,6 +366,7 @@
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
 				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><span class="status-yellow"><b>!</b></span></td>
 			</tr>
 			<tr>
 			    <td></td>
@@ -368,6 +382,7 @@
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
 				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><span class="status-yellow"><b>!</b></span></td>
 			</tr>
 			<tr class="nothing-to-show">
 			    <td colspan="13">We couldn't find any results</td>
@@ -384,10 +399,10 @@
 	</form><!--
 	<div class="msg-good">Well done! You successfully added new parameters. <span class="msg-close-btn" title="Close">&times;</span></div>
 	<div class="msg-bad">Oh snap! Check form fields and try submitting again. <span class="msg-close-btn" title="Close">&times;</span></div>-->
-	</article>
-	<footer>
+	</div>
+	<div class="footer">
 	<a href="http://www.zabbix.com" target="_blank" class="logo"></a>
 	Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
-	</footer>
+	</div>
 </body>
 </html>

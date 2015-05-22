@@ -79,11 +79,11 @@ foreach($data['db_exps'] as $exp) {
 	]);
 }
 foreach($data['regexps'] as $regexpid => $regexp) {
-	$regExpTable->addRow(array(
+	$regExpTable->addRow([
 		new CCheckBox('regexpids['.$regexp['regexpid'].']', null, null, $regexp['regexpid']),
 		new CLink($regexp['name'], 'adm.regexps.php?form=update'.'&regexpid='.$regexp['regexpid']),
-		isset($expressions[$regexpid]) ? $expressions[$regexpid] : '-'
-	));
+		isset($expressions[$regexpid]) ? $expressions[$regexpid] : ''
+	]);
 }
 
 // append table to form

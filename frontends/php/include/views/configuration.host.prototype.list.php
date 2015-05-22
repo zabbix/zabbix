@@ -63,7 +63,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 	// template list
 	if (empty($hostPrototype['templates'])) {
-		$hostTemplates = '-';
+		$hostTemplates = '';
 	}
 	else {
 		$hostTemplates = array();
@@ -111,7 +111,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	$hostTable->addRow(array(
 		new CCheckBox('group_hostid['.$hostPrototype['hostid'].']', null, null, $hostPrototype['hostid']),
 		$name,
-		new CCol($hostTemplates, 'wraptext'),
+		$hostTemplates,
 		$status
 	));
 }

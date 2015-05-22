@@ -181,7 +181,7 @@ class CScreenActions extends CScreenBase {
 			$actionTable->addRow([
 				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock'])),
 				new CCol($actions[$alert['actionid']]['name']),
-				new CCol(($alert['mediatypeid'] == 0) ? '-' : $alert['description']),
+				new CCol(($alert['mediatypeid'] == 0) ? '' : $alert['description']),
 				new CCol($recipient),
 				new CCol($message),
 				new CCol($status),
