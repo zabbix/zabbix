@@ -42,7 +42,9 @@ class CScreenTriggersInfo extends CScreenBase {
 		}
 
 		return $this->getOutput(
-			(new CTriggersInfo($this->screenitem['resourceid'], null, $this->screenitem['style']))->setHeader([$header])
+			(new CTriggersInfo($this->screenitem['resourceid']))->
+				setOrientation($this->screenitem['style'])->
+				setHeader([$header])
 		);
 	}
 }
