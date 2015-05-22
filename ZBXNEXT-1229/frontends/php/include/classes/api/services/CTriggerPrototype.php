@@ -860,6 +860,10 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$insert = array();
 
 		foreach ($triggerPrototypes as $triggerPrototype) {
+			if (!array_key_exists('dependencies', $triggerPrototype)) {
+				continue;
+			}
+
 			foreach ($triggerPrototype['dependencies'] as $dependency) {
 				$insert[] = array(
 					'triggerid_down' => $triggerPrototype['triggerid'],
@@ -917,6 +921,10 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$depTriggerIds = array();
 
 		foreach ($triggerPrototypes as $triggerPrototype) {
+			if (!array_key_exists('dependencies', $triggerPrototype)) {
+				continue;
+			}
+
 			foreach ($triggerPrototype['dependencies'] as $dependency) {
 				$depTriggerIds[$dependency['triggerid']] = $dependency['triggerid'];
 			}
@@ -944,6 +952,10 @@ class CTriggerPrototype extends CTriggerGeneral {
 			));
 
 			foreach ($triggerPrototypes as $triggerPrototype) {
+				if (!array_key_exists('dependencies', $triggerPrototype)) {
+					continue;
+				}
+
 				$dRuleId = $dRules[$triggerPrototype['triggerid']]['discoveryRule']['itemid'];
 
 				// Check if current trigger prototype rules match dependent trigger prototype rules.
@@ -993,6 +1005,10 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$triggerPrototypes = zbx_toHash($triggerPrototypes, 'triggerid');
 
 		foreach ($triggerPrototypes as $triggerPrototype) {
+			if (!array_key_exists('dependencies', $triggerPrototype)) {
+				continue;
+			}
+
 			$depTriggerIds = zbx_objectValues($triggerPrototype['dependencies'], 'triggerid');
 
 			$triggerTemplates = API::Template()->get(array(
@@ -1124,6 +1140,10 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$depTriggerIds = array();
 
 		foreach ($triggerPrototypes as $triggerPrototype) {
+			if (!array_key_exists('dependencies', $triggerPrototype)) {
+				continue;
+			}
+
 			foreach ($triggerPrototype['dependencies'] as $dependency) {
 				$depTriggerIds[$dependency['triggerid']] = $dependency['triggerid'];
 			}
@@ -1174,6 +1194,10 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$duplicateTriggerId = null;
 
 		foreach ($triggerPrototypes as $triggerPrototype) {
+			if (!array_key_exists('dependencies', $triggerPrototype)) {
+				continue;
+			}
+
 			foreach ($triggerPrototype['dependencies'] as $dependency) {
 				$depTriggerIds[$dependency['triggerid']] = $dependency['triggerid'];
 
