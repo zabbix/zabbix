@@ -334,7 +334,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_free(utf8);
 
 			utf8 = zbx_unicode_to_utf8(ssp[i].lpDisplayName);
-			zbx_json_addstring(&j, "{#SERVICE.DESCRIPTION}", utf8, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "{#SERVICE.DISPLAYNAME}", utf8, ZBX_JSON_TYPE_STRING);
 			zbx_free(utf8);
 
 			if((SERVICE_FILE_SYSTEM_DRIVER | SERVICE_KERNEL_DRIVER) &
@@ -421,7 +421,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 }
 
 #define ZBX_SRV_PARAM_STATE		0x01
-#define ZBX_SRV_PARAM_DESCRIPTION	0x02
+#define ZBX_SRV_PARAM_DISPLAYNAME	0x02
 #define ZBX_SRV_PARAM_PATH		0x03
 #define ZBX_SRV_PARAM_USER		0x04
 #define ZBX_SRV_PARAM_STARTUP		0x05
@@ -454,8 +454,8 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == param || '\0' == *param || 0 == strcmp(param, "state"))	/* default second parameter */
 		param_type = ZBX_SRV_PARAM_STATE;
-	else if (0 == strcmp(param, "description"))
-		param_type = ZBX_SRV_PARAM_DESCRIPTION;
+	else if (0 == strcmp(param, "displayname"))
+		param_type = ZBX_SRV_PARAM_DISPLAYNAME;
 	else if (0 == strcmp(param, "path"))
 		param_type = ZBX_SRV_PARAM_PATH;
 	else if (0 == strcmp(param, "user"))
@@ -535,7 +535,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			switch (param_type)
 			{
-				case ZBX_SRV_PARAM_DESCRIPTION:
+				case ZBX_SRV_PARAM_DISPLAYNAME:
 					SET_STR_RESULT(result, zbx_unicode_to_utf8(qsc->lpDisplayName));
 					break;
 				case ZBX_SRV_PARAM_PATH:
