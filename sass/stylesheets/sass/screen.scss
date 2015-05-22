@@ -600,6 +600,7 @@ footer {
 
 .radio-switch {
 	cursor: pointer;
+	background-color: $form-bg-color;
 	@extend %paging-btn;
 }
 
@@ -1215,13 +1216,18 @@ footer {
 
 .table-forms-separator {
 	display: inline-block;
-	padding: 0 0 5px 0;
-	border-bottom: 2px solid $table-border-color;
+	padding: 0 0 5px 5px;
+	margin: 0 0 0 -5px;
+	border-bottom: 1px dashed $form-border-color;
+}
+
+.drag-drop-area {
+	@extend %found-bg;
 }
 
 .margin-top {
 	display: block;
-	margin: 4px 0 0 0;
+	margin: 0px 0 0 0;
 }
 
 .form-new-group {
@@ -1308,12 +1314,10 @@ input {
 	}
 
 	&[disabled] {
-		background-color: $form-disabled-bg-color;
 		@extend %disabled;
 	}
 
 	&[readonly] {
-		background-color: $form-disabled-bg-color;
 		color: $font-color!important;
 		cursor: text!important;
 		@extend %disabled;
@@ -1328,12 +1332,10 @@ textarea {
 	@extend %form-input-style;
 
 	&[disabled] {
-		background-color: $form-disabled-bg-color;
 		@extend %disabled;
 	}
 
 	&[readonly] {
-		background-color: $form-disabled-bg-color;
 		color: $font-color!important;
 		cursor: text!important;
 		@extend %disabled;
@@ -1351,12 +1353,10 @@ select {
 	}
 
 	&[disabled] {
-		background-color: $form-disabled-bg-color;
 		@extend %disabled;
 	}
 
 	&[readonly] {
-		background-color: $form-disabled-bg-color;
 		color: $font-color!important;
 		cursor: text!important;
 		@extend %disabled;
@@ -1797,6 +1797,7 @@ button {
 	//color: $light-blue-grey;
 	//border-color: $lighter-blue-grey;
 	color: $btn-disabled-font-color;
+	background-color: $form-disabled-bg-color;
 	border-color: $btn-disabled-border-color;
 	cursor: default;
 }
