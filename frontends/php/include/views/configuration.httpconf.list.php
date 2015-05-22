@@ -71,7 +71,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 	$name = array();
 	if (isset($this->data['parentTemplates'][$httpTestId])) {
 		$template = $this->data['parentTemplates'][$httpTestId];
-		$name[] = new CLink($template['name'], '?groupid=0&hostid='.$template['id'], ZBX_STYLE_GREY);
+		$name[] = new CLink($template['name'], '?groupid=0&hostid='.$template['id'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTestId.'&hostid='.$httpTest['hostid']);
@@ -112,7 +112,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		$httpTest['retries'],
 		httptest_authentications($httpTest['authentication']),
 		($httpTest['http_proxy'] !== '') ? _('Yes') : _('No'),
-		($httpTest['applicationid'] != 0) ? $httpTest['application_name'] : '-',
+		($httpTest['applicationid'] != 0) ? $httpTest['application_name'] : '',
 		new CLink(
 			httptest_status2str($httpTest['status']),
 			'?group_httptestid[]='.$httpTest['httptestid'].

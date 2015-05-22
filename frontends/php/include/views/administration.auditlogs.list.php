@@ -76,7 +76,7 @@ foreach ($this->data['actions'] as $action) {
 		$details = $action['details'];
 	}
 
-	$auditTable->addRow(array(
+	$auditTable->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 		$action['alias'],
 		$action['ip'],
@@ -84,8 +84,8 @@ foreach ($this->data['actions'] as $action) {
 		$action['action'],
 		$action['resourceid'],
 		$action['resourcename'],
-		new CCol($details, 'wraptext')
-	));
+		$details
+	]);
 }
 
 // append table to form

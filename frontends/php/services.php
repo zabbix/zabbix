@@ -294,7 +294,7 @@ if (isset($_REQUEST['pservices'])) {
 	foreach ($parentServices as $key => $parentService) {
 		$parentServices[$key]['trigger'] = !empty($parentService['trigger'])
 			? $triggers[$parentService['trigger']['triggerid']]['description']
-			: '-';
+			: '';
 	}
 
 	$data['db_pservices'] = $parentServices;
@@ -335,7 +335,7 @@ elseif (isset($_REQUEST['cservices'])) {
 	foreach ($childServices as $key => $childService) {
 		$childServices[$key]['trigger'] = !empty($childService['trigger'])
 			? $triggers[$childService['trigger']['triggerid']]['description']
-			: '-';
+			: '';
 	}
 
 	$data['db_cservices'] = $childServices;
@@ -397,7 +397,7 @@ elseif (isset($_REQUEST['form'])) {
 					'triggerid' => $childService['triggerid'],
 					'trigger' => !empty($childService['triggerid'])
 							? $triggers[$childService['trigger']['triggerid']]['description']
-							: '-',
+							: '',
 					'serviceid' => $dependency['servicedownid'],
 					'soft' => $dependency['soft'],
 				);

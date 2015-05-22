@@ -102,15 +102,15 @@ foreach ($this->data['alerts'] as $alert) {
 		? array(bold(getUserFullname($this->data['users'][$alert['userid']])), BR(), $alert['sendto'])
 		: $alert['sendto'];
 
-	$auditTable->addRow(array(
-		new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock'])),
-		new CCol($this->data['actions'][$alert['actionid']]['name']),
-		new CCol(($mediatype) ? $mediatype['description'] : '-'),
-		new CCol($recipient),
-		new CCol($message),
-		new CCol($status),
-		new CCol($info)
-	));
+	$auditTable->addRow([
+		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
+		$this->data['actions'][$alert['actionid']]['name'],
+		($mediatype) ? $mediatype['description'] : '',
+		$recipient,
+		$message,
+		$status,
+		$info
+	]);
 }
 
 // append table to form

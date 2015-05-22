@@ -92,7 +92,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 		array_pop($actionLinks);
 	}
 	else {
-		$actionLinks = '-';
+		$actionLinks = '';
 	}
 	$actionColumn = new CCol($actionLinks);
 	$actionColumn->setAttribute('style', 'white-space: normal;');

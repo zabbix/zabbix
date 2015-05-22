@@ -169,17 +169,22 @@ function make_event_details($event, $trigger) {
 	$config = select_config();
 	$table = new CTableInfo();
 
-	$table->addRow(array(
-		new CCol(_('Event')),
-		new CCol(CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event)), 'wraptext')
-	));
-	$table->addRow(array(_('Time'), zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock'])));
+	$table->addRow([
+		_('Event'),
+		CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event))
+	]);
+	$table->addRow([
+		_('Time'),
+		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock'])
+	]);
 
 	if ($config['event_ack_enable']) {
 		// to make resulting link not have hint with acknowledges
 		$event['acknowledges'] = count($event['acknowledges']);
-		$ack = getEventAckState($event, $page['file']);
-		$table->addRow(array(_('Acknowledged'), $ack));
+		$table->addRow([
+			_('Acknowledged'),
+			getEventAckState($event, $page['file'])
+		]);
 	}
 
 	return $table;
