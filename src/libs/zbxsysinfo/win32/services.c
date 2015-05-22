@@ -301,7 +301,6 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	QUERY_SERVICE_CONFIG		*qsc = NULL;
 	SC_HANDLE			h_mgr, h_srv;
 	DWORD				sz = 0, szn, i, services, resume_handle = 0;
-	int				ret;
 	char				*utf8;
 	struct zbx_json			j;
 
@@ -317,8 +316,8 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
-	while (0 != (ret = EnumServicesStatusEx(h_mgr, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL,
-			(LPBYTE)ssp, sz, &szn, &services, &resume_handle, NULL)) || ERROR_MORE_DATA == GetLastError())
+	while (0 != EnumServicesStatusEx(h_mgr, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL,
+			(LPBYTE)ssp, sz, &szn, &services, &resume_handle, NULL) || ERROR_MORE_DATA == GetLastError())
 	{
 		for (i = 0; i < services; i++)
 		{
@@ -354,7 +353,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addstring(&j, "{#SERVICE.TYPE}", utf8, ZBX_JSON_TYPE_STRING);
 			zbx_free(utf8);
 
-			zbx_json_adduint64(&j, "{#SERVICE.STATUS}", ssp[i].ServiceStatusProcess.dwCurrentState);
+			zbx_json_adduint64(&j, "{#SERVICE.STATE}", ssp[i].ServiceStatusProcess.dwCurrentState);
 
 			QueryServiceConfig(h_srv, qsc, 0, &sz);
 			if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
@@ -389,6 +388,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 						utf8 = "unknown";
 
 					zbx_json_addstring(&j, "{#SERVICE.STARTUP_TYPE}", utf8, ZBX_JSON_TYPE_STRING);
+					zbx_free(utf8);
 				}
 
 				zbx_free(qsc);
