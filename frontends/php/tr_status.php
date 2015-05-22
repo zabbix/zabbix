@@ -253,12 +253,6 @@ $triggerWidget->addItem($filterForm);
 /*
  * Form
  */
-if ($_REQUEST['fullscreen']) {
-	$triggerInfo = new CTriggersInfo($_REQUEST['groupid'], $_REQUEST['hostid']);
-	$triggerInfo->show();
-	echo BR();
-}
-
 $triggerForm = new CForm('get', 'acknow.php');
 $triggerForm->setName('tr_status');
 $triggerForm->addVar('backurl', $page['file']);
