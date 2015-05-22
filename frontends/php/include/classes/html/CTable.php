@@ -106,6 +106,8 @@ class CTable extends CTag {
 
 		$value = new CTag('thead', 'yes', $value);
 		$this->header = $value->toString();
+
+		return $this;
 	}
 
 	public function setFooter($value = null, $class = 'footer') {
