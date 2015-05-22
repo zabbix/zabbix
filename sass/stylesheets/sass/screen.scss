@@ -1148,10 +1148,6 @@ footer {
 		@extend tfoot;
 	}
 
-	.table-forms-tr-new {
-		background-color: $lighter-green;
-	}
-
 	.table-forms-td-left {
 		display: table-cell;
 		padding: 5px 0;
@@ -1226,6 +1222,14 @@ footer {
 .margin-top {
 	display: block;
 	margin: 4px 0 0 0;
+}
+
+.form-new-group {
+	diplay: inline-block;
+	border: 5px solid $lighter-green;
+	padding: 4px 0;
+	margin-left: -5px;
+	@include border-radius(2px);
 }
 
 .list-check-radio {
