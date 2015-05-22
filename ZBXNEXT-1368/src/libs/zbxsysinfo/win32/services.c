@@ -428,14 +428,14 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	QUERY_SERVICE_CONFIG		*qsc = NULL;
-	SERVICE_STATUS			status;
-	SC_HANDLE			h_mgr, h_srv;
-	DWORD				sz = 0;
-	int				param_type, i;
-	char				*name, *param;
-	wchar_t				*wname, service_name[MAX_STRING_LEN];
-	DWORD				max_len_name = MAX_STRING_LEN;
+	QUERY_SERVICE_CONFIG	*qsc = NULL;
+	SERVICE_STATUS		status;
+	SC_HANDLE		h_mgr, h_srv;
+	DWORD			sz = 0;
+	int			param_type, i;
+	char			*name, *param;
+	wchar_t			*wname, service_name[MAX_STRING_LEN];
+	DWORD			max_len_name = MAX_STRING_LEN;
 
 	if (2 < request->nparam)
 	{
