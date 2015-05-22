@@ -59,6 +59,14 @@ class C20ImportConverterTest extends CImportConverterTest {
 									],
 									'graph_prototypes' => [
 										[
+											'ymin_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymin_item_1' => [
+												'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+											],
+											'ymax_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymax_item_1' => [
+												'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+											],
 											'graph_items' => [
 												[
 													'item' => [
@@ -135,6 +143,14 @@ class C20ImportConverterTest extends CImportConverterTest {
 									],
 									'graph_prototypes' => [
 										[
+											'ymin_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymin_item_1' => [
+												'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+											],
+											'ymax_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymax_item_1' => [
+												'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+											],
 											'graph_items' => [
 												[
 													'item' => [
@@ -199,15 +215,23 @@ class C20ImportConverterTest extends CImportConverterTest {
 				[
 					'graphs' => [
 						[
+							'ymin_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+							'ymin_item_1' => [
+								'key' => 'net.tcp.service[ntp, localhost, 123]'
+							],
+							'ymax_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+							'ymax_item_1' => [
+								'key' => 'net.tcp.service[ntp, localhost, 123]'
+							],
 							'graph_items' => [
 								[
 									'item' => [
-										'key' => 'net.if.in[{#IFNAME}]'
+										'key' => 'net.if.in[eth0]'
 									]
 								],
 								[
 									'item' => [
-										'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+										'key' => 'net.tcp.service[ntp, localhost, 123]'
 									]
 								]
 							]
@@ -217,15 +241,23 @@ class C20ImportConverterTest extends CImportConverterTest {
 				[
 					'graphs' => [
 						[
+							'ymin_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+							'ymin_item_1' => [
+								'key' => 'net.udp.service[ntp, localhost, 123]'
+							],
+							'ymax_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+							'ymax_item_1' => [
+								'key' => 'net.udp.service[ntp, localhost, 123]'
+							],
 							'graph_items' => [
 								[
 									'item' => [
-										'key' => 'net.if.in[{#IFNAME}]'
+										'key' => 'net.if.in[eth0]'
 									]
 								],
 								[
 									'item' => [
-										'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+										'key' => 'net.udp.service[ntp, localhost, 123]'
 									]
 								]
 							]
@@ -261,6 +293,39 @@ class C20ImportConverterTest extends CImportConverterTest {
 							]
 						],
 						[
+							'screens' => [
+								[],
+								[
+									'screen_items' => [
+										[
+											'rowspan' => 0,
+											'colspan' => 0,
+											'resourcetype' => SCREEN_RESOURCE_SIMPLE_GRAPH,
+											'resource' => [
+												'key' => 'net.tcp.service[ntp]'
+											]
+										],
+										[
+											'rowspan' => 1,
+											'colspan' => 2,
+											'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+											'resource' => [
+												'key' => 'net.tcp.service[ntp]'
+											]
+										],
+										[
+											'rowspan' => 3,
+											'colspan' => 4,
+											'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+											'resource' => [
+												'key' => 'net.tcp.service[tcp,,5432]'
+											]
+										]
+									]
+								]
+							]
+						],
+						[
 							'discovery_rules' => [
 								[
 									'status' => ITEM_STATUS_ACTIVE,
@@ -275,6 +340,14 @@ class C20ImportConverterTest extends CImportConverterTest {
 									],
 									'graph_prototypes' => [
 										[
+											'ymin_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymin_item_1' => [
+												'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+											],
+											'ymax_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymax_item_1' => [
+												'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+											],
 											'graph_items' => [
 												[
 													'item' => [
@@ -331,6 +404,39 @@ class C20ImportConverterTest extends CImportConverterTest {
 							]
 						],
 						[
+							'screens' => [
+								[],
+								[
+									'screen_items' => [
+										[
+											'rowspan' => 1,
+											'colspan' => 1,
+											'resourcetype' => SCREEN_RESOURCE_SIMPLE_GRAPH,
+											'resource' => [
+												'key' => 'net.udp.service[ntp]'
+											]
+										],
+										[
+											'rowspan' => 1,
+											'colspan' => 2,
+											'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+											'resource' => [
+												'key' => 'net.udp.service[ntp]'
+											]
+										],
+										[
+											'rowspan' => 3,
+											'colspan' => 4,
+											'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+											'resource' => [
+												'key' => 'net.tcp.service[tcp,,5432]'
+											]
+										]
+									]
+								]
+							]
+						],
+						[
 							'discovery_rules' => [
 								[
 									'status' => ITEM_STATUS_ACTIVE,
@@ -345,6 +451,14 @@ class C20ImportConverterTest extends CImportConverterTest {
 									],
 									'graph_prototypes' => [
 										[
+											'ymin_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymin_item_1' => [
+												'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+											],
+											'ymax_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymax_item_1' => [
+												'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+											],
 											'graph_items' => [
 												[
 													'item' => [
@@ -403,7 +517,9 @@ class C20ImportConverterTest extends CImportConverterTest {
 							]
 						]
 					]
-				],
+				]
+			],
+			[
 				[
 					'screens' => [
 						[],
@@ -411,15 +527,27 @@ class C20ImportConverterTest extends CImportConverterTest {
 							'screen_items' => [
 								[
 									'rowspan' => 0,
-									'colspan' => 0
+									'colspan' => 0,
+									'resourcetype' => SCREEN_RESOURCE_SIMPLE_GRAPH,
+									'resource' => [
+										'key' => 'net.tcp.service[ntp]'
+									]
 								],
 								[
 									'rowspan' => 1,
-									'colspan' => 2
+									'colspan' => 2,
+									'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+									'resource' => [
+										'key' => 'net.tcp.service[ntp]'
+									]
 								],
 								[
 									'rowspan' => 3,
-									'colspan' => 4
+									'colspan' => 4,
+									'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+									'resource' => [
+										'key' => 'net.tcp.service[tcp,,5432]'
+									]
 								]
 							]
 						]
@@ -432,15 +560,27 @@ class C20ImportConverterTest extends CImportConverterTest {
 							'screen_items' => [
 								[
 									'rowspan' => 1,
-									'colspan' => 1
+									'colspan' => 1,
+									'resourcetype' => SCREEN_RESOURCE_SIMPLE_GRAPH,
+									'resource' => [
+										'key' => 'net.udp.service[ntp]'
+									]
 								],
 								[
 									'rowspan' => 1,
-									'colspan' => 2
+									'colspan' => 2,
+									'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+									'resource' => [
+										'key' => 'net.udp.service[ntp]'
+									]
 								],
 								[
 									'rowspan' => 3,
-									'colspan' => 4
+									'colspan' => 4,
+									'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+									'resource' => [
+										'key' => 'net.tcp.service[tcp,,5432]'
+									]
 								]
 							]
 						]
