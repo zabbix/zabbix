@@ -107,6 +107,9 @@ class C20ImportConverter extends CConverter {
 			if (array_key_exists('discovery_rules', $template)) {
 				$template['discovery_rules'] = $this->convertDiscoveryRules($template['discovery_rules']);
 			}
+			if (array_key_exists('screens', $template)) {
+				$template['screens'] = $this->convertScreens($template['screens']);
+			}
 		}
 		unset($template);
 
@@ -175,7 +178,7 @@ class C20ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Convert screen elements.
+	 * Convert screens.
 	 *
 	 * @param array $screens
 	 *
@@ -184,20 +187,43 @@ class C20ImportConverter extends CConverter {
 	protected function convertScreens(array $screens) {
 		foreach ($screens as &$screen) {
 			if (array_key_exists('screen_items', $screen)) {
-				foreach ($screen['screen_items'] as &$screenItem) {
-					if ($screenItem['rowspan'] == 0) {
-						$screenItem['rowspan'] = 1;
-					}
-					if ($screenItem['colspan'] == 0) {
-						$screenItem['colspan'] = 1;
-					}
-				}
-				unset($screenItem);
+				$screen['screen_items'] = $this->convertScreenItems($screen['screen_items']);
 			}
 		}
 		unset($screen);
 
 		return $screens;
+	}
+
+	/**
+	 * Convert screen items.
+	 *
+	 * @param array $screen_items
+	 *
+	 * @return array
+	 */
+	protected function convertScreenItems(array $screen_items) {
+		foreach ($screen_items as &$screen_item) {
+			if ($screen_item['rowspan'] == 0) {
+				$screen_item['rowspan'] = 1;
+			}
+			if ($screen_item['colspan'] == 0) {
+				$screen_item['colspan'] = 1;
+			}
+
+			if (zbx_is_int($screen_item['resourcetype'])) {
+				switch ($screen_item['resourcetype']) {
+					case SCREEN_RESOURCE_SIMPLE_GRAPH:
+					case SCREEN_RESOURCE_PLAIN_TEXT:
+						$screen_item['resource']['key'] =
+							$this->itemKeyConverter->convert($screen_item['resource']['key']);
+						break;
+				}
+			}
+		}
+		unset($screen_item);
+
+		return $screen_items;
 	}
 
 	/**
@@ -291,6 +317,18 @@ class C20ImportConverter extends CConverter {
 	protected function convertGraphs(array $graphs) {
 		foreach ($graphs as &$graph) {
 			$graph['graph_items'] = $this->convertGraphItems($graph['graph_items']);
+
+			if (zbx_is_int($graph['ymin_type_1'])) {
+				if ($graph['ymin_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+					$graph['ymin_item_1']['key'] = $this->itemKeyConverter->convert($graph['ymin_item_1']['key']);
+				}
+			}
+
+			if (zbx_is_int($graph['ymax_type_1'])) {
+				if ($graph['ymax_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+					$graph['ymax_item_1']['key'] = $this->itemKeyConverter->convert($graph['ymax_item_1']['key']);
+				}
+			}
 		}
 		unset($graph);
 
