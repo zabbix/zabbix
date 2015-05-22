@@ -1009,6 +1009,23 @@ class CTriggerPrototype extends CTriggerGeneral {
 				continue;
 			}
 
+			$triggerid_down = $triggerPrototype['triggerid'];
+			$triggerids_up = zbx_objectValues($triggerPrototype['dependencies'], 'triggerid');
+
+			foreach ($triggerids_up as $triggerid_up) {
+				if (bccomp($triggerid_down, $triggerid_up) == 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('Cannot create dependency on trigger prototype itself.')
+					);
+				}
+			}
+		}
+
+		foreach ($triggerPrototypes as $triggerPrototype) {
+			if (!array_key_exists('dependencies', $triggerPrototype)) {
+				continue;
+			}
+
 			$depTriggerIds = zbx_objectValues($triggerPrototype['dependencies'], 'triggerid');
 
 			$triggerTemplates = API::Template()->get(array(
@@ -1030,11 +1047,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 				if ($triggerDepTemplates) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add dependency from a host to a template.'));
 				}
-			}
-
-			// the trigger can't depend on itself
-			if (in_array($triggerPrototype['triggerid'], $depTriggerIds)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create dependency on trigger prototype itself.'));
 			}
 
 			// check circular dependency
