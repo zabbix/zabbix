@@ -621,9 +621,6 @@ static ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len)
 			polarssl_strerror(res, err, sizeof(err));
 			zbx_set_socket_strerror("ssl_write() failed: %s", err);
 
-			/* TODO propagate 'close notify' to caller ? Close socket ? */
-			/* if (POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY == res) */
-
 			return ZBX_PROTO_ERROR;
 		}
 		else
@@ -644,9 +641,6 @@ static ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len)
 #else
 			zbx_set_socket_strerror("gnutls_record_send() failed: %zd %s", res, gnutls_strerror(res));
 #endif
-
-			/* TODO propagate 'close notify' to caller ? Close socket ? */
-
 			return ZBX_PROTO_ERROR;
 		}
 		else
@@ -1435,9 +1429,6 @@ static ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len)
 			polarssl_strerror(res, err, sizeof(err));
 			zbx_set_socket_strerror("ssl_read() failed: %s", err);
 
-			/* TODO propagate 'close notify' to caller ? Close socket ? */
-			/* if (POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY == res) */
-
 			return ZBX_PROTO_ERROR;
 		}
 		else
@@ -1458,8 +1449,6 @@ static ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len)
 #else
 			zbx_set_socket_strerror("gnutls_record_recv() failed: %zd %s", res, gnutls_strerror(res));
 #endif
-			/* TODO propagate 'close notify' to caller ? Close socket ? */
-
 			return ZBX_PROTO_ERROR;
 		}
 		else
