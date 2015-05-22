@@ -171,8 +171,16 @@ $link-main-subnav-visited-color: #bfced7;
 	@extend %no-shadow;
 }
 
+.filter-container {
+	@include box-shadow(none);	
+}
+
 %no-shadow {
 	@include box-shadow(none);
+}
+
+.available {
+	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.4));
 }
 
 .search-suggest {
@@ -184,5 +192,5 @@ $link-main-subnav-visited-color: #bfced7;
 }
 
 .overlay-dialogue {
-	@extend .action-menu;
+	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.4));
 }
