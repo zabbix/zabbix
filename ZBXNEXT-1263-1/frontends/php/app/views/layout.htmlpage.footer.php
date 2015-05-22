@@ -21,13 +21,14 @@
 
 show_messages();
 
-echo '</article>'."\n";
+// end of article div
+echo '</div>'."\n";
 
 if ($data['fullscreen'] == 0) {
-	echo '<footer>'."\n";
+	echo '<div class="footer">'."\n";
 	echo '<a href="http://www.zabbix.com" target="_blank" class="logo"></a>'."\n";
 	echo 'Zabbix '.ZABBIX_VERSION.'. &copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', <a href="http://www.zabbix.com" target="_blank">Zabbix SIA</a>'."\n";
-	echo '</footer>'."\n";
+	echo '</div>'."\n";
 }
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
