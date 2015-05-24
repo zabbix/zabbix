@@ -32,14 +32,14 @@ if (!empty($this->data['service'])) {
 
 // create table
 $servicesChildTable = new CTableInfo();
-$servicesChildTable->setHeader(array(
+$servicesChildTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_services', null, "javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');"),
 		'cell-width'),
 	_('Service'),
 	_('Status calculation'),
 	_('Trigger')
-));
+]);
 
 $prefix = null;
 foreach ($this->data['db_cservices'] as $service) {
@@ -52,11 +52,11 @@ foreach ($this->data['db_cservices'] as $service) {
 	$cb = new CCheckBox('services['.$service['serviceid'].']', null, null, $service['serviceid']);
 	$cb->addClass('service-select');
 
-	$servicesChildTable->addRow(array(
+	$servicesChildTable->addRow([
 		$cb,
-		array($prefix, $description),
+		[$prefix, $description],
 		serviceAlgorythm($service['algorithm']),
-		$service['trigger'])
+		$service['trigger']]
 	);
 }
 $servicesChildTable->setFooter(new CCol(new CButton('select', _('Select')), 'right'));

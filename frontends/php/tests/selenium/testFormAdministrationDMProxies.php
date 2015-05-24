@@ -90,97 +90,97 @@ class testFormAdministrationDMProxies extends CWebTest {
 	// Returns all possible proxy data
 	public static function dataCreate() {
 		// Ok/bad, name, mode, hosts, ip, dns, connect_to, port, error
-		return array(
-			array(PROXY_GOOD, 'New active proxy 1', HOST_STATUS_PROXY_ACTIVE,
-				array('ЗАББИКС Сервер'), 0, 0, 0, 0, ''
-			),
-			array(PROXY_GOOD, 'New active proxy 2', HOST_STATUS_PROXY_ACTIVE,
-				array(), 0, 0, 0, 0, ''
-			),
-			array(PROXY_GOOD, 'New passive proxy 1', HOST_STATUS_PROXY_PASSIVE,
-				array(), '192.168.1.1', 'proxy123.zabbix.com', 0, 11051, ''
-			),
-			array(PROXY_GOOD, 'New passive proxy with IP macro', HOST_STATUS_PROXY_PASSIVE,
-				array(), '{$PROXY_IP}', 'proxy123.zabbix.com', 0, 11051, ''
-			),
-			array(PROXY_GOOD, 'New passive proxy with port macro', HOST_STATUS_PROXY_PASSIVE,
-				array(), '192.168.1.1', 'proxy123.zabbix.com', 0, '{$PROXY_PORT}', ''
-			),
-			array(
+		return [
+			[PROXY_GOOD, 'New active proxy 1', HOST_STATUS_PROXY_ACTIVE,
+				['ЗАББИКС Сервер'], 0, 0, 0, 0, ''
+			],
+			[PROXY_GOOD, 'New active proxy 2', HOST_STATUS_PROXY_ACTIVE,
+				[], 0, 0, 0, 0, ''
+			],
+			[PROXY_GOOD, 'New passive proxy 1', HOST_STATUS_PROXY_PASSIVE,
+				[], '192.168.1.1', 'proxy123.zabbix.com', 0, 11051, ''
+			],
+			[PROXY_GOOD, 'New passive proxy with IP macro', HOST_STATUS_PROXY_PASSIVE,
+				[], '{$PROXY_IP}', 'proxy123.zabbix.com', 0, 11051, ''
+			],
+			[PROXY_GOOD, 'New passive proxy with port macro', HOST_STATUS_PROXY_PASSIVE,
+				[], '192.168.1.1', 'proxy123.zabbix.com', 0, '{$PROXY_PORT}', ''
+			],
+			[
 				PROXY_BAD,
 				'New passive proxy 2',
 				HOST_STATUS_PROXY_PASSIVE,
-				array(),
+				[],
 				'wrong ip',
 				'proxy123.zabbix.com',
 				11051,
 				0,
-				array('Cannot add proxy', 'Incorrect interface IP parameter "wrong ip" provided.')
-			),
-			array(
+				['Cannot add proxy', 'Incorrect interface IP parameter "wrong ip" provided.']
+			],
+			[
 				PROXY_BAD,
 				'%^&',
 				HOST_STATUS_PROXY_PASSIVE,
-				array(),
+				[],
 				'wrong ip',
 				'proxy123.zabbix.com',
 				11051,
 				0,
-				array('Cannot add proxy', 'Incorrect characters used for proxy name "%^&".')
-			),
-			array(
+				['Cannot add proxy', 'Incorrect characters used for proxy name "%^&".']
+			],
+			[
 				PROXY_BAD,
 				'Прокси',
 				HOST_STATUS_PROXY_PASSIVE,
-				array(),
+				[],
 				'wrong ip',
 				'proxy123.zabbix.com',
 				11051,
 				0,
-				array('Cannot add proxy', 'Incorrect characters used for proxy name "Прокси".')
-			),
-			array(
+				['Cannot add proxy', 'Incorrect characters used for proxy name "Прокси".']
+			],
+			[
 				PROXY_BAD,
 				'New passive proxy 3',
 				HOST_STATUS_PROXY_PASSIVE,
-				array(),
+				[],
 				'192.168.1.1',
 				'proxy123.zabbix.com',
 				0,
 				'port',
-				array('Cannot add proxy', 'Incorrect interface port "port" provided')
-			),
-			array(PROXY_BAD,
+				['Cannot add proxy', 'Incorrect interface port "port" provided']
+			],
+			[PROXY_BAD,
 				'New active proxy 1',
 				HOST_STATUS_PROXY_ACTIVE,
-				array(),
+				[],
 				0,
 				0,
 				0,
 				0,
-				array('Cannot add proxy', 'Proxy "New active proxy 1" already exists.')
-			),
-			array(PROXY_BAD,
+				['Cannot add proxy', 'Proxy "New active proxy 1" already exists.']
+			],
+			[PROXY_BAD,
 				'New passive proxy with wrong port macro',
 				HOST_STATUS_PROXY_PASSIVE,
-				array(),
+				[],
 				'192.168.1.1',
 				'proxy123.zabbix.com',
 				0,
 				'$PROXY_PORT',
-				array('Cannot add proxy', 'Incorrect interface port "$PROXY_PORT" provided')
-			),
-			array(PROXY_BAD,
+				['Cannot add proxy', 'Incorrect interface port "$PROXY_PORT" provided']
+			],
+			[PROXY_BAD,
 				'New passive proxy with wrong IP macro',
 				HOST_STATUS_PROXY_PASSIVE,
-				array(),
+				[],
 				'$PROXY_IP',
 				'proxy123.zabbix.com',
 				0,
 				11051,
-				array('Cannot add proxy', 'Incorrect interface IP parameter "$PROXY_IP" provided.')
-			)
-		);
+				['Cannot add proxy', 'Incorrect interface IP parameter "$PROXY_IP" provided.']
+			]
+		];
 	}
 
 	/**
@@ -237,7 +237,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 				$this->zbxTestCheckTitle('Configuration of proxies');
 				$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 				$this->zbxTestTextPresent('PROXIES');
-				$this->zbxTestTextPresent(array('Mode', 'Name', 'Last seen (age)', 'Host count', 'Required performance (vps)', 'Hosts'));
+				$this->zbxTestTextPresent(['Mode', 'Name', 'Last seen (age)', 'Host count', 'Required performance (vps)', 'Hosts']);
 				$this->zbxTestTextPresent($name);
 
 				switch ($mode) {
@@ -270,11 +270,11 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 	public static function dataUpdateProxyName() {
 		// Name, newname
-		return array(
-			array('New active proxy 1', 'New active proxy 1 updated'),
-			array('New active proxy 2', 'New active proxy 2 updated'),
-			array('New passive proxy 1', 'New passive proxy 1 updated')
-		);
+		return [
+			['New active proxy 1', 'New active proxy 1 updated'],
+			['New active proxy 2', 'New active proxy 2 updated'],
+			['New passive proxy 1', 'New passive proxy 1 updated']
+		];
 	}
 
 	/**
@@ -316,11 +316,11 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 	public static function dataClone() {
 		// Name, newname
-		return array(
-			array('Active proxy 1', 'Active proxy 1 cloned'),
-			array('Active proxy 2', 'Active proxy 2 cloned'),
-			array('Passive proxy 1', 'Passive proxy 1 cloned')
-		);
+		return [
+			['Active proxy 1', 'Active proxy 1 cloned'],
+			['Active proxy 2', 'Active proxy 2 cloned'],
+			['Passive proxy 1', 'Passive proxy 1 cloned']
+		];
 	}
 
 
@@ -362,10 +362,10 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 	public static function dataDelete() {
 		// Name, newname
-		return array(
-			array('Active proxy 2'),
-			array('Passive proxy 2')
-		);
+		return [
+			['Active proxy 2'],
+			['Passive proxy 2']
+		];
 	}
 
 	/**

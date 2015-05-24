@@ -22,9 +22,9 @@ include dirname(__FILE__).'/js/conf.import.js.php';
 
 $rulesTable = (new CTable())->
 	addClass('formElementTable')->
-	setHeader(array(SPACE, _('Update existing'), _('Create new'), _('Delete missing')), 'bold');
+	setHeader([SPACE, _('Update existing'), _('Create new'), _('Delete missing')], 'bold');
 
-$titles = array(
+$titles = [
 	'groups' => _('Groups'),
 	'hosts' => _('Hosts'),
 	'templates' => _('Templates'),
@@ -38,7 +38,7 @@ $titles = array(
 	'screens' => _('Screens'),
 	'maps' => _('Maps'),
 	'images' => _('Images')
-);
+];
 $rules = $this->get('rules');
 foreach ($titles as $key => $title) {
 	$cbExist = null;
@@ -66,12 +66,12 @@ foreach ($titles as $key => $title) {
 		$cbDeleted->setAttribute('class', 'input checkbox pointer deleteMissing');
 	}
 
-	$rulesTable->addRow(array(
+	$rulesTable->addRow([
 		$title,
 		new CCol($cbExist, 'center'),
 		new CCol($cbMissed, 'center'),
 		new CCol($cbDeleted, 'center')
-	));
+	]);
 }
 
 // form list
@@ -87,7 +87,7 @@ $importTab->addTab('importTab', _('Import'), $importFormList);
 $importForm = new CForm('post', null, 'multipart/form-data');
 $importTab->setFooter(makeFormFooter(
 	new CSubmit('import', _('Import')),
-	array(new CButtonCancel())
+	[new CButtonCancel()]
 ));
 
 $importForm->addItem($importTab);

@@ -105,7 +105,7 @@ class CScreenBuilder {
 	 * @param boolean	$options['updateProfile']
 	 * @param array		$options['screen']
 	 */
-	public function __construct(array $options = array()) {
+	public function __construct(array $options = []) {
 		$this->isFlickerfree = isset($options['isFlickerfree']) ? $options['isFlickerfree'] : true;
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_SLIDESHOW;
 		$this->timestamp = !empty($options['timestamp']) ? $options['timestamp'] : time();
@@ -125,12 +125,12 @@ class CScreenBuilder {
 			$this->screen = $options['screen'];
 		}
 		elseif (!empty($options['screenid'])) {
-			$this->screen = API::Screen()->get(array(
+			$this->screen = API::Screen()->get([
 				'screenids' => $options['screenid'],
 				'output' => API_OUTPUT_EXTEND,
 				'selectScreenItems' => API_OUTPUT_EXTEND,
 				'editable' => ($this->mode == SCREEN_MODE_EDIT)
-			));
+			]);
 
 			if (!empty($this->screen)) {
 				$this->screen = reset($this->screen);
@@ -145,13 +145,13 @@ class CScreenBuilder {
 		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : null;
 		$this->updateProfile = isset($options['updateProfile']) ? $options['updateProfile'] : true;
 
-		$this->timeline = CScreenBase::calculateTime(array(
+		$this->timeline = CScreenBase::calculateTime([
 			'profileIdx' => $this->profileIdx,
 			'profileIdx2' => $this->profileIdx2,
 			'updateProfile' => $this->updateProfile,
 			'period' => !empty($options['period']) ? $options['period'] : null,
 			'stime' => !empty($options['stime']) ? $options['stime'] : null
-		));
+		]);
 	}
 
 	/**
@@ -168,21 +168,21 @@ class CScreenBuilder {
 	 *
 	 * @return CScreenBase
 	 */
-	public static function getScreen(array $options = array()) {
+	public static function getScreen(array $options = []) {
 		// get resourcetype from screenitem
 		if (empty($options['screenitem']) && !empty($options['screenitemid'])) {
 			if (!empty($options['hostid'])) {
-				$options['screenitem'] = API::TemplateScreenItem()->get(array(
+				$options['screenitem'] = API::TemplateScreenItem()->get([
 					'screenitemids' => $options['screenitemid'],
 					'hostids' => $options['hostid'],
 					'output' => API_OUTPUT_EXTEND
-				));
+				]);
 			}
 			else {
-				$options['screenitem'] = API::ScreenItem()->get(array(
+				$options['screenitem'] = API::ScreenItem()->get([
 					'screenitemids' => $options['screenitemid'],
 					'output' => API_OUTPUT_EXTEND
-				));
+				]);
 			}
 			$options['screenitem'] = reset($options['screenitem']);
 		}
@@ -252,13 +252,13 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_HISTORY:
 				// TODO: pass the items from the outside instead of retrieving them by ids
 				if (isset($options['itemids'])) {
-					$items = API::Item()->get(array(
+					$items = API::Item()->get([
 						'itemids' => $options['itemids'],
 						'webitems' => true,
-						'selectHosts' => array('name'),
-						'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'),
+						'selectHosts' => ['name'],
+						'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
 						'preservekeys' => true
-					));
+					]);
 
 					$items = CMacrosResolverHelper::resolveItemNames($items);
 
@@ -296,10 +296,10 @@ class CScreenBuilder {
 			$options['isTemplatedScreen'] = (bool) $options['screen']['templateid'];
 		}
 		elseif (isset($options['screenid'])) {
-			$options['isTemplatedScreen'] = (bool) API::TemplateScreen()->get(array(
-				'screenids' => array($options['screenid']),
-				'output' => array()
-			));
+			$options['isTemplatedScreen'] = (bool) API::TemplateScreen()->get([
+				'screenids' => [$options['screenid']],
+				'output' => []
+			]);
 		}
 
 		return $options;
@@ -315,9 +315,9 @@ class CScreenBuilder {
 			return new CTableInfo();
 		}
 
-		$skipedFields = array();
-		$screenitems = array();
-		$emptyScreenColumns = array();
+		$skipedFields = [];
+		$screenitems = [];
+		$emptyScreenColumns = [];
 
 		// calculate table columns and rows
 		foreach ($this->screen['screenitems'] as $screenitem) {
@@ -327,7 +327,7 @@ class CScreenBuilder {
 				for ($j = 0; $j < $screenitem['colspan'] || $j == 0; $j++) {
 					if ($i != 0 || $j != 0) {
 						if (!isset($skipedFields[$screenitem['y'] + $i])) {
-							$skipedFields[$screenitem['y'] + $i] = array();
+							$skipedFields[$screenitem['y'] + $i] = [];
 						}
 						$skipedFields[$screenitem['y'] + $i][$screenitem['x'] + $j] = 1;
 					}
@@ -338,13 +338,13 @@ class CScreenBuilder {
 		// create screen table
 		$screenTable = new CTable();
 		$screenTable->setAttribute('class',
-			in_array($this->mode, array(SCREEN_MODE_PREVIEW, SCREEN_MODE_SLIDESHOW)) ? 'screen-table' : 'screen-table dashed-border'
+			in_array($this->mode, [SCREEN_MODE_PREVIEW, SCREEN_MODE_SLIDESHOW]) ? 'screen-table' : 'screen-table dashed-border'
 		);
 		$screenTable->setAttribute('id', self::makeScreenTableId($this->screen['screenid']));
 
 		// action top row
 		if ($this->mode == SCREEN_MODE_EDIT) {
-			$newColumns = array(new CCol(new CImg('images/general/zero.png', 'zero', 1, 1)));
+			$newColumns = [new CCol(new CImg('images/general/zero.png', 'zero', 1, 1))];
 
 			for ($i = 0, $size = $this->screen['hsize'] + 1; $i < $size; $i++) {
 				$icon = new CDiv('+', 'treeview-plus');
@@ -357,7 +357,7 @@ class CScreenBuilder {
 		}
 
 		for ($r = 0; $r < $this->screen['vsize']; $r++) {
-			$newColumns = array();
+			$newColumns = [];
 			$emptyScreenRow = true;
 
 			// action left cell
@@ -375,7 +375,7 @@ class CScreenBuilder {
 
 				// screen item
 				$isEditForm = false;
-				$screenitem = array();
+				$screenitem = [];
 
 				foreach ($screenitems as $tmprow) {
 					if ($tmprow['x'] == $c && $tmprow['y'] == $r) {
@@ -385,7 +385,7 @@ class CScreenBuilder {
 				}
 
 				if (empty($screenitem)) {
-					$screenitem = array(
+					$screenitem = [
 						'screenitemid' => 0,
 						'resourcetype' => 0,
 						'resourceid' => 0,
@@ -400,7 +400,7 @@ class CScreenBuilder {
 						'url' => '',
 						'dynamic' => 0,
 						'sort_triggers' => SCREEN_SORT_TRIGGERS_DATE_DESC
-					);
+					];
 				}
 
 				if (!empty($screenitem['screenitemid'])) {
@@ -424,13 +424,13 @@ class CScreenBuilder {
 						&& (isset($_REQUEST['form']) && $_REQUEST['form'] == 'update')
 						&& ((isset($_REQUEST['x']) && $_REQUEST['x'] == $c && isset($_REQUEST['y']) && $_REQUEST['y'] == $r)
 								|| (isset($_REQUEST['screenitemid']) && bccomp($_REQUEST['screenitemid'], $screenitem['screenitemid']) == 0))) {
-					$screenView = new CView('configuration.screen.constructor.edit', array('screen' => $this->screen));
+					$screenView = new CView('configuration.screen.constructor.edit', ['screen' => $this->screen]);
 					$item = $screenView->render();
 					$isEditForm = true;
 				}
 				// screen cell
 				elseif (!empty($screenitem['screenitemid']) && isset($screenitem['resourcetype'])) {
-					$screenBase = CScreenBuilder::getScreen(array(
+					$screenBase = CScreenBuilder::getScreen([
 						'screen' => $this->screen,
 						'screenid' => $this->screen['screenid'],
 						'isFlickerfree' => $this->isFlickerfree,
@@ -444,7 +444,7 @@ class CScreenBuilder {
 						'timeline' => $this->timeline,
 						'resourcetype' => $screenitem['resourcetype'],
 						'screenitem' => $screenitem
-					));
+					]);
 
 					if (!empty($screenBase)) {
 						if ($this->mode == SCREEN_MODE_EDIT && !empty($screenitem['screenitemid'])) {
@@ -462,7 +462,7 @@ class CScreenBuilder {
 				}
 				// change/empty cell
 				else {
-					$item = array(SPACE);
+					$item = [SPACE];
 					if ($this->mode == SCREEN_MODE_EDIT) {
 						array_push($item, BR(), new CLink(_('Change'), $action, 'empty_change_link'));
 					}
@@ -531,7 +531,7 @@ class CScreenBuilder {
 		if ($this->mode == SCREEN_MODE_EDIT) {
 			$icon = new CDiv('+', 'treeview-plus');
 			$icon->onClick('javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&add_row='.$this->screen['vsize'].'";');
-			$newColumns = array(new CCol($icon));
+			$newColumns = [new CCol($icon)];
 
 			for ($i = 0; $i < $this->screen['hsize']; $i++) {
 				$icon = new CDiv('−', 'treeview-plus');
@@ -565,17 +565,17 @@ class CScreenBuilder {
 	 * @param array $options['timeline']
 	 * @param string $options['profileIdx']
 	 */
-	public static function insertScreenScrollJs(array $options = array()) {
+	public static function insertScreenScrollJs(array $options = []) {
 		$options['timeline'] = empty($options['timeline']) ? '' : $options['timeline'];
 		$options['profileIdx'] = empty($options['profileIdx']) ? '' : $options['profileIdx'];
 
-		$timeControlData = array(
+		$timeControlData = [
 			'id' => 'scrollbar',
 			'loadScroll' => 1,
 			'mainObject' => 1,
 			'periodFixed' => CProfile::get($options['profileIdx'].'.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-		);
+		];
 
 		zbx_add_post_js('timeControl.addObject("scrollbar", '.zbx_jsvalue($options['timeline']).', '.zbx_jsvalue($timeControlData).');');
 	}
@@ -627,7 +627,7 @@ class CScreenBuilder {
 	 *
 	 * @static
 	 */
-	public static function insertScreenStandardJs(array $options = array()) {
+	public static function insertScreenStandardJs(array $options = []) {
 		CScreenBuilder::insertScreenScrollJs($options);
 		CScreenBuilder::insertScreenRefreshTimeJs();
 		CScreenBuilder::insertProcessObjectsJs();

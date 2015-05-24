@@ -51,16 +51,16 @@ $imageTab->addTab('imageTab', ($this->data['imagetype'] == IMAGE_TYPE_ICON) ? _(
 if (isset($this->data['imageid'])) {
 	$imageTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')),
 			new CButtonCancel()
-		)
+		]
 	));
 }
 else {
 	$imageTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 

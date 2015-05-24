@@ -26,7 +26,7 @@
  *
  * @return object $reportForm
  */
-function valueDistributionFormForMultiplePeriods($items = array()) {
+function valueDistributionFormForMultiplePeriods($items = []) {
 	$config = getRequest('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
 	$scaletype = getRequest('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 
@@ -57,13 +57,13 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 	$reportForm->addRow(_('Y label'), new CTextBox('ylabel', $ylabel, 40));
 	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend', $showlegend, null, 1));
 
-	$reportForm->addRow(_('Scale'), new CComboBox('scaletype', $scaletype, null, array(
+	$reportForm->addRow(_('Scale'), new CComboBox('scaletype', $scaletype, null, [
 		TIMEPERIOD_TYPE_HOURLY => _('Hourly'),
 		TIMEPERIOD_TYPE_DAILY => _('Daily'),
 		TIMEPERIOD_TYPE_WEEKLY => _('Weekly'),
 		TIMEPERIOD_TYPE_MONTHLY => _('Monthly'),
 		TIMEPERIOD_TYPE_YEARLY => _('Yearly')
-	)));
+	]));
 
 	$reportForm->addRow(_('From'), createDateSelector('report_timesince', $report_timesince, 'report_timetill'));
 	$reportForm->addRow(_('Till'), createDateSelector('report_timetill', $report_timetill, 'report_timesince'));
@@ -83,14 +83,14 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 
 			$description = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
 
-			$items_table->addRow(array(
+			$items_table->addRow([
 				new CCheckBox('group_gid['.$id.']', isset($group_gid[$id])),
 				$caption,
 				$description,
 				graph_item_calc_fnc2str($item['calc_fnc'], 0),
 				($item['axisside'] == GRAPH_YAXIS_SIDE_LEFT) ? _('Left') : _('Right'),
 				$color,
-			));
+			]);
 
 			// once used, unset unnecessary fields so they don't pass to URL
 			unset($item['value_type'], $item['host'], $item['name'], $item['name_expanded']);
@@ -105,13 +105,13 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
 		$items_table = $delete_button = null;
 	}
 
-	$reportForm->addRow(_('Items'), array(
+	$reportForm->addRow(_('Items'), [
 		$items_table,
 		new CButton('add_item', _('Add'), 'return PopUp("popup_bitem.php?config='.BR_DISTRIBUTION_MULTIPLE_PERIODS.
 			'&dstfrm='.$reportForm->getName().'", 0, 0, "graph_item_form");'
 		),
 		$delete_button
-	));
+	]);
 	unset($items_table, $delete_button);
 
 	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
@@ -128,7 +128,7 @@ function valueDistributionFormForMultiplePeriods($items = array()) {
  *
  * @return object $reportForm
  */
-function valueDistributionFormForMultipleItems($items = array(), $periods = array()){
+function valueDistributionFormForMultipleItems($items = [], $periods = []){
 	$config = getRequest('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
 
 	$title = getRequest('title', _('Report 2'));
@@ -155,10 +155,10 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 
 	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend', $showlegend, null, 1));
 	if (count($periods) < 2) {
-		$reportForm->addRow(_('Sort by'), new CComboBox('sorttype', $sorttype, null, array(
+		$reportForm->addRow(_('Sort by'), new CComboBox('sorttype', $sorttype, null, [
 			0 => _('Name'),
 			1 => _('Value')
-		)));
+		]));
 	}
 	else {
 		$reportForm->addVar('sortorder', 0);
@@ -176,13 +176,13 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 			$caption = new CSpan($period['caption'], 'link');
 			$caption->onClick("return PopUp('".$edit_link."', 0, 0, 'period_form');");
 
-			$periods_table->addRow(array(
+			$periods_table->addRow([
 				new CCheckBox('group_pid['.$pid.']'),
 				$caption,
 				zbx_date2str(DATE_TIME_FORMAT, $period['report_timesince']),
 				zbx_date2str(DATE_TIME_FORMAT, $period['report_timetill']),
 				$color
-			));
+			]);
 		}
 
 		$reportForm->addVar('periods', $periods);
@@ -194,13 +194,13 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 		$periods_table = $delete_button = null;
 	}
 
-	$reportForm->addRow(_('Period'), array(
+	$reportForm->addRow(_('Period'), [
 		$periods_table,
 		new CButton('add_period', _('Add'), 'return PopUp("popup_period.php?config='.BR_DISTRIBUTION_MULTIPLE_ITEMS.
 			'&dstfrm='.$reportForm->getName().'", 0, 0, "period_form");'
 		),
 		$delete_button
-	));
+	]);
 	unset($periods_table, $delete_button);
 
 	if ($items) {
@@ -216,12 +216,12 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 
 			$description = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
 
-			$items_table->addRow(array(
+			$items_table->addRow([
 				new CCheckBox('group_gid['.$id.']', isset($group_gid[$id])),
 				$caption,
 				$description,
 				graph_item_calc_fnc2str($item['calc_fnc'], 0)
-			));
+			]);
 
 			// once used, unset unnecessary fields so they don't pass to URL. "color" goes in "periods" parameter.
 			unset($item['value_type'], $item['host'], $item['name'], $item['name_expanded'], $item['color']);
@@ -236,13 +236,13 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 		$items_table = $delete_button = null;
 	}
 
-	$reportForm->addRow(_('Items'), array(
+	$reportForm->addRow(_('Items'), [
 		$items_table,
 		new CButton('add_item',_('Add'), "return PopUp('popup_bitem.php?config=".BR_DISTRIBUTION_MULTIPLE_ITEMS.
 			"&dstfrm=".$reportForm->getName()."', 0, 0, 'graph_item_form');"
 		),
 		$delete_button
-	));
+	]);
 	unset($items_table, $delete_button);
 
 	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
@@ -271,7 +271,7 @@ function valueComparisonFormForMultiplePeriods() {
 
 	$itemId = getRequest('itemid', 0);
 
-	$hostids = getRequest('hostids', array());
+	$hostids = getRequest('hostids', []);
 	$hostids = zbx_toHash($hostids);
 	$showlegend = getRequest('showlegend', 0);
 
@@ -298,13 +298,13 @@ function valueComparisonFormForMultiplePeriods() {
 	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend', $showlegend, null, 1));
 	$reportForm->addVar('sortorder', 0);
 
-	$groupids = getRequest('groupids', array());
+	$groupids = getRequest('groupids', []);
 	$group_tb = new CTweenBox($reportForm, 'groupids', $groupids, 10);
 
-	$db_groups = API::HostGroup()->get(array(
+	$db_groups = API::HostGroup()->get([
 		'real_hosts' => true,
-		'output' => array('groupid', 'name')
-	));
+		'output' => ['groupid', 'name']
+	]);
 	order_result($db_groups, 'name');
 	foreach ($db_groups as $group) {
 		$groupids[$group['groupid']] = $group['groupid'];
@@ -320,15 +320,15 @@ function valueComparisonFormForMultiplePeriods() {
 		$cmbGroups->addItem($group['groupid'], $group['name']);
 	}
 
-	$td_groups = new CCol(array(_('Group'), SPACE, $cmbGroups));
+	$td_groups = new CCol([_('Group'), SPACE, $cmbGroups]);
 	$td_groups->setAttribute('style', 'text-align: right;');
 
 	$host_tb = new CTweenBox($reportForm, 'hostids', $hostids, 10);
 
-	$options = array(
+	$options = [
 		'real_hosts' => true,
-		'output' => array('hostid', 'name')
-	);
+		'output' => ['hostid', 'name']
+	];
 	if ($groupid > 0) {
 		$options['groupids'] = $groupid;
 	}
@@ -340,11 +340,11 @@ function valueComparisonFormForMultiplePeriods() {
 		$host_tb->addItem($host['hostid'],$host['name']);
 	}
 
-	$options = array(
+	$options = [
 		'real_hosts' => true,
-		'output' => array('hostid', 'name'),
+		'output' => ['hostid', 'name'],
 		'hostids' => $hostids,
-	);
+	];
 	$db_hosts2 = API::Host()->get($options);
 	order_result($db_hosts2, 'name');
 	foreach ($db_hosts2 as $hnum => $host) {
@@ -355,31 +355,31 @@ function valueComparisonFormForMultiplePeriods() {
 
 	$reportForm->addRow(_('Hosts'),
 		$host_tb->Get(_('Selected hosts'),
-		array(_('Other hosts | Group').SPACE, $cmbGroups)
+		[_('Other hosts | Group').SPACE, $cmbGroups]
 	));
 
 	$reportForm->addRow(_('From'), createDateSelector('report_timesince', $report_timesince, 'report_timetill'));
 	$reportForm->addRow(_('Till'), createDateSelector('report_timetill', $report_timetill, 'report_timesince'));
 
-	$reportForm->addRow(_('Scale'), new CComboBox('scaletype', $scaletype, null, array(
+	$reportForm->addRow(_('Scale'), new CComboBox('scaletype', $scaletype, null, [
 		TIMEPERIOD_TYPE_HOURLY => _('Hourly'),
 		TIMEPERIOD_TYPE_DAILY => _('Daily'),
 		TIMEPERIOD_TYPE_WEEKLY => _('Weekly'),
 		TIMEPERIOD_TYPE_MONTHLY => _('Monthly'),
 		TIMEPERIOD_TYPE_YEARLY => _('Yearly')
-	)));
+	]));
 
-	$reportForm->addRow(_('Average by'), new CComboBox('avgperiod', $avgperiod, null, array(
+	$reportForm->addRow(_('Average by'), new CComboBox('avgperiod', $avgperiod, null, [
 		TIMEPERIOD_TYPE_HOURLY => _('Hourly'),
 		TIMEPERIOD_TYPE_DAILY => _('Daily'),
 		TIMEPERIOD_TYPE_WEEKLY => _('Weekly'),
 		TIMEPERIOD_TYPE_MONTHLY => _('Monthly'),
 		TIMEPERIOD_TYPE_YEARLY => _('Yearly')
-	)));
+	]));
 
 	$itemName = '';
 	if ($itemId) {
-		$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($itemId)));
+		$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($itemId)]);
 		$item = reset($items);
 
 		$itemName = $item['name_expanded'];
@@ -402,21 +402,21 @@ function valueComparisonFormForMultiplePeriods() {
 		'button-form'
 	);
 
-	$reportForm->addRow(_('Item'), array($txtCondVal, $btnSelect));
+	$reportForm->addRow(_('Item'), [$txtCondVal, $btnSelect]);
 
-	$reportForm->addRow(_('Palette'), array(
-		new CComboBox('palette', $palette, null, array(
+	$reportForm->addRow(_('Palette'), [
+		new CComboBox('palette', $palette, null, [
 			0 => _s('Palette #%1$s', 1),
 			1 => _s('Palette #%1$s', 2),
 			2 => _s('Palette #%1$s', 3),
 			3 => _s('Palette #%1$s', 4)
-		)),
-		new CComboBox('palettetype', $palettetype, null, array(
+		]),
+		new CComboBox('palettetype', $palettetype, null, [
 			0 => _('Middle'),
 			1 => _('Darken'),
 			2 => _('Brighten')
-		))
-	));
+		])
+	]);
 
 	$reportForm->addItemToBottomRow(new CSubmit('report_show', _('Show')));
 	$reportForm->addItemToBottomRow(new CSubmit('report_reset', _('Reset')));
@@ -433,14 +433,14 @@ function valueComparisonFormForMultiplePeriods() {
  *
  * @return mixed	valid items array on success or false on failure
  */
-function validateBarReportItems($items = array()) {
+function validateBarReportItems($items = []) {
 	$config = getRequest('config', BR_DISTRIBUTION_MULTIPLE_PERIODS);
 
 	if (!isset($items) || !$items) {
 		return false;
 	}
 
-	$fields = array('itemid', 'calc_fnc');
+	$fields = ['itemid', 'calc_fnc'];
 	if ($config == BR_DISTRIBUTION_MULTIPLE_PERIODS) {
 		array_push($fields, 'color');
 	}
@@ -456,17 +456,17 @@ function validateBarReportItems($items = array()) {
 		$itemIds[$item['itemid']] = $item['itemid'];
 	}
 
-	$validItems = API::Item()->get(array(
-		'output' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
-		'selectHosts' => array('name'),
+	$validItems = API::Item()->get([
+		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+		'selectHosts' => ['name'],
 		'webitems' => true,
 		'itemids' => $itemIds,
 		'preservekeys' => true
-	));
+	]);
 
 	$items = zbx_toHash($items, 'itemid');
 
-	$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+	$allowedValueTypes = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
 
 	foreach ($validItems as &$item) {
 		if (!in_array($item['value_type'], $allowedValueTypes)) {
@@ -493,12 +493,12 @@ function validateBarReportItems($items = array()) {
 	unset($item);
 
 	// check axis value. 0 = count
-	$calcFncValidator = new CLimitedSetValidator(array(
-		'values' => array(0, CALC_FNC_MIN, CALC_FNC_AVG, CALC_FNC_MAX)
-	));
-	$axisValidator = new CLimitedSetValidator(array(
-		'values' => array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT)
-	));
+	$calcFncValidator = new CLimitedSetValidator([
+		'values' => [0, CALC_FNC_MIN, CALC_FNC_AVG, CALC_FNC_MAX]
+	]);
+	$axisValidator = new CLimitedSetValidator([
+		'values' => [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT]
+	]);
 
 	if ($config == BR_DISTRIBUTION_MULTIPLE_PERIODS) {
 		$colorValidator = new CColorValidator();
@@ -535,11 +535,11 @@ function validateBarReportItems($items = array()) {
  *
  * @return mixed	valid periods array on success or false on failure
  */
-function validateBarReportPeriods($periods = array()) {
+function validateBarReportPeriods($periods = []) {
 	if (!isset($periods) || !$periods) {
 		return false;
 	}
-	$fields = array('report_timesince', 'report_timetill', 'color');
+	$fields = ['report_timesince', 'report_timetill', 'color'];
 	$colorValidator = new CColorValidator();
 
 	foreach ($periods as &$period) {

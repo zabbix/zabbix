@@ -27,14 +27,14 @@ $createForm->addVar('eventsource', $data['eventsource']);
 $controls = new CList();
 
 // create widget header
-$controls->addItem(array(_('Event source'), SPACE, new CComboBox('eventsource', $data['eventsource'], 'submit()',
-	array(
+$controls->addItem([_('Event source'), SPACE, new CComboBox('eventsource', $data['eventsource'], 'submit()',
+	[
 		EVENT_SOURCE_TRIGGERS => _('Triggers'),
 		EVENT_SOURCE_DISCOVERY => _('Discovery'),
 		EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration'),
 		EVENT_SOURCE_INTERNAL => _x('Internal', 'event source')
-	)
-)));
+	]
+)]);
 $controls->addItem(new CSubmit('form', _('Create action')));
 
 $createForm->addItem($controls);
@@ -47,7 +47,7 @@ $actionForm->setName('actionForm');
 
 // create table
 $actionTable = new CTableInfo();
-$actionTable->setHeader(array(
+$actionTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_items', null, "checkAll('".$actionForm->getName()."', 'all_items', 'g_actionid');"),
 		'cell-width'),
@@ -55,15 +55,15 @@ $actionTable->setHeader(array(
 	_('Conditions'),
 	_('Operations'),
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
-));
+]);
 
 if ($this->data['actions']) {
 	$actionConditionStringValues = actionConditionValueToString($this->data['actions'], $this->data['config']);
 	$actionOperationDescriptions = getActionOperationDescriptions($this->data['actions']);
 
 	foreach ($this->data['actions'] as $aIdx => $action) {
-		$conditions = array();
-		$operations = array();
+		$conditions = [];
+		$operations = [];
 
 		order_result($action['filter']['conditions'], 'conditiontype', ZBX_SORT_DOWN);
 
@@ -104,15 +104,15 @@ if ($this->data['actions']) {
 }
 
 // append table to form
-$actionForm->addItem(array(
+$actionForm->addItem([
 	$actionTable,
 	$this->data['paging'],
-	new CActionButtonList('action', 'g_actionid', array(
-		'action.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected actions?')),
-		'action.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected actions?')),
-		'action.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected actions?'))
-	))
-));
+	new CActionButtonList('action', 'g_actionid', [
+		'action.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected actions?')],
+		'action.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected actions?')],
+		'action.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected actions?')]
+	])
+]);
 
 // append form to widget
 $actionWidget->addItem($actionForm);

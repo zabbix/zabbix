@@ -57,7 +57,7 @@ $httpFormList->addRow(_('Name'), $nameTextBox);
 
 // Application
 if ($this->data['application_list']) {
-	$applications = zbx_array_merge(array(''), $this->data['application_list']);
+	$applications = zbx_array_merge([''], $this->data['application_list']);
 	$httpFormList->addRow(_('Application'),
 		new CComboBox('applicationid', $this->data['applicationid'], null, $applications)
 	);
@@ -162,7 +162,7 @@ $stepsTable = (new CTable())->
 	setAttribute('style', 'min-width: 500px;')->
 	setAttribute('id', 'httpStepTable');
 
-$stepsTable->setHeader(array(
+$stepsTable->setHeader([
 	new CCol(SPACE, null, null, '15'),
 	new CCol(SPACE, null, null, '15'),
 	new CCol(_('Name'), null, null, '150'),
@@ -171,7 +171,7 @@ $stepsTable->setHeader(array(
 	new CCol(_('Required'), null, null, '50'),
 	new CCol(_('Status codes'), ZBX_STYLE_NOWRAP, null, '90'),
 	new CCol('', null, null, '50')
-));
+]);
 
 $i = 1;
 foreach ($this->data['steps'] as $stepid => $step) {
@@ -219,7 +219,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$dragHandler = new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move');
 	}
 
-	$row = new CRow(array(
+	$row = new CRow([
 		$dragHandler,
 		$numSpan,
 		$name,
@@ -228,7 +228,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		htmlspecialchars($step['required']),
 		$step['status_codes'],
 		$removeButton
-	), 'sortable', 'steps_'.$stepid);
+	], 'sortable', 'steps_'.$stepid);
 
 	$stepsTable->addRow($row);
 }
@@ -250,7 +250,7 @@ $httpTab->addTab('authenticationTab', _('Authentication'), $httpAuthenticationFo
 
 // append buttons to form
 if (!empty($this->data['httptestid'])) {
-	$buttons = array(new CSubmit('clone', _('Clone')));
+	$buttons = [new CSubmit('clone', _('Clone'))];
 
 	if ($this->data['templated'] == 0) {
 		$buttons[] = new CButtonDelete(
@@ -276,14 +276,14 @@ if (!empty($this->data['httptestid'])) {
 else {
 	$httpTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 
 $httpForm->addItem($httpTab);
 $httpWidget->addItem($httpForm);
 
-$this->data['agentVisibility'] = array();
+$this->data['agentVisibility'] = [];
 zbx_subarray_push($this->data['agentVisibility'], ZBX_AGENT_OTHER, 'agent_other');
 zbx_subarray_push($this->data['agentVisibility'], ZBX_AGENT_OTHER, 'row_agent_other');
 

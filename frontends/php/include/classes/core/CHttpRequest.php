@@ -27,7 +27,7 @@ class CHttpRequest {
 	/**
 	 * additional HTTP headers not prefixed with HTTP_ in $_SERVER superglobal
 	 */
-	public $add_headers = array('CONTENT_TYPE', 'CONTENT_LENGTH');
+	public $add_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH'];
 
 	/**
 	 * Retrieve HTTP Body
@@ -58,10 +58,10 @@ class CHttpRequest {
 		$this->protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : false;
 		$this->request_method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : false;
 
-		$this->headers = array();
+		$this->headers = [];
 		foreach ($_SERVER as $i => $val) {
 			if (strpos($i, 'HTTP_') === 0 || in_array($i, $this->add_headers)) {
-				$name = str_replace(array('HTTP_', '_'), array('', '-'), $i);
+				$name = str_replace(['HTTP_', '_'], ['', '-'], $i);
 				$this->headers[$name] = $val;
 			}
 		}

@@ -22,22 +22,22 @@ zbx_add_post_js('jqBlink.blink();');
 
 $overviewWidget = (new CWidget())->setTitle(_('Overview'));
 
-$typeComboBox = new CComboBox('type', $this->data['type'], 'submit()', array(
+$typeComboBox = new CComboBox('type', $this->data['type'], 'submit()', [
 	SHOW_TRIGGERS => _('Triggers'),
 	SHOW_DATA => _('Data')
-));
+]);
 
 $headerForm = new CForm('get');
 $controls = new CList();
 
-$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$controls->addItem(array(_('Type').SPACE, $typeComboBox));
+$controls->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]);
+$controls->addItem([_('Type').SPACE, $typeComboBox]);
 
 // hint table
 $hintTable = new CTableInfo();
-$hintTable->addRow(array(new CCol(SPACE, 'normal'), _('OK')));
+$hintTable->addRow([new CCol(SPACE, 'normal'), _('OK')]);
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$hintTable->addRow(array(getSeverityCell($severity, $this->data['config']), _('PROBLEM')));
+	$hintTable->addRow([getSeverityCell($severity, $this->data['config']), _('PROBLEM')]);
 }
 
 // blinking preview in help popup (only if blinking is enabled)
@@ -55,23 +55,23 @@ if ($this->data['config']['blink_period'] > 0) {
 	// double div necassary for FireFox
 	$col = new CCol(new CDiv(new CDiv($col), 'overview-mon-severities-container'));
 
-	$hintTable->addRow(array($col, _s('Age less than %s', convertUnitsS($this->data['config']['blink_period']))));
+	$hintTable->addRow([$col, _s('Age less than %s', convertUnitsS($this->data['config']['blink_period']))]);
 }
 
-$hintTable->addRow(array(new CCol(SPACE), _('No trigger')));
+$hintTable->addRow([new CCol(SPACE), _('No trigger')]);
 
 // header left
-$styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit()', array(
+$styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit()', [
 	STYLE_TOP => _('Top'),
 	STYLE_LEFT => _('Left')
-));
+]);
 
-$controls->additem(array(_('Hosts location').SPACE, $styleComboBox));
+$controls->additem([_('Hosts location').SPACE, $styleComboBox]);
 
 // header right
 $help = get_icon('overviewhelp');
 $help->setHint($hintTable);
-$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
+$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 $controls->addItem($help);
 
 $headerForm->addItem($controls);
@@ -79,9 +79,9 @@ $overviewWidget->setControls($headerForm);
 
 // filter
 $filter = $this->data['filter'];
-$filterFormView = new CView('common.filter.trigger', array(
+$filterFormView = new CView('common.filter.trigger', [
 	'overview' => true,
-	'filter' => array(
+	'filter' => [
 		'showTriggers' => $filter['showTriggers'],
 		'ackStatus' => $filter['ackStatus'],
 		'showSeverity' => $filter['showSeverity'],
@@ -94,9 +94,9 @@ $filterFormView = new CView('common.filter.trigger', array(
 		'hostId' => $this->data['hostid'],
 		'groupId' => $this->data['groupid'],
 		'fullScreen' => $this->data['fullscreen']
-	),
+	],
 	'config' => $this->data['config']
-));
+]);
 $filterForm = $filterFormView->render();
 
 $overviewWidget->addItem($filterForm);

@@ -22,8 +22,8 @@
 class CTabView extends CDiv {
 
 	protected $id = 'tabs';
-	protected $tabs = array();
-	protected $headers = array();
+	protected $tabs = [];
+	protected $headers = [];
 	protected $footer = null;
 	protected $selectedTab = null;
 
@@ -32,9 +32,9 @@ class CTabView extends CDiv {
 	 *
 	 * @var array
 	 */
-	protected $disabledTabs = array();
+	protected $disabledTabs = [];
 
-	public function __construct($data = array()) {
+	public function __construct($data = []) {
 		if (isset($data['id'])) {
 			$this->id = $data['id'];
 		}

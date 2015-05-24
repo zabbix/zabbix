@@ -39,7 +39,7 @@ class CTextArea extends CTag {
 	 * @param int		$options['maxlength']
 	 * @param boolean	$options['readonly']
 	 */
-	public function __construct($name = 'textarea', $value = '', $options = array()) {
+	public function __construct($name = 'textarea', $value = '', $options = []) {
 		parent::__construct('textarea', 'yes');
 		$this->setAttribute('class', 'input');
 		$this->setAttribute('id', zbx_formatDomId($name));

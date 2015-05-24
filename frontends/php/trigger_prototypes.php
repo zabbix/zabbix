@@ -30,58 +30,58 @@ $page['file'] = 'trigger_prototypes.php';
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'parent_discoveryid' => array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
-	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'),
-	'type' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'description' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')),
-	'expression' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Expression')),
-	'priority' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'),
-	'comments' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
-	'url' =>				array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
-	'status' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'input_method' =>		array(T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_input_method})'),
-	'expr_temp' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'),
-	'expr_target_single' =>	array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'),
-	'dependencies' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'new_dependence' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({add_dependence})'),
-	'rem_dependence' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'g_triggerid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'showdisabled' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+$fields = [
+	'parent_discoveryid' => [T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
+	'triggerid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'],
+	'type' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'description' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
+	'expression' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Expression')],
+	'priority' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'],
+	'comments' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'url' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'status' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'input_method' =>		[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_input_method})'],
+	'expr_temp' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'],
+	'expr_target_single' =>	[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'],
+	'dependencies' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'new_dependence' =>		[T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({add_dependence})'],
+	'rem_dependence' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'g_triggerid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'showdisabled' =>		[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	// actions
-	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"triggerprototype.massdelete","triggerprototype.massdisable",'.
 									'"triggerprototype.massenable","triggerprototype.massupdate",'.
 									'"triggerprototype.massupdateform"'
 								),
 								null
-							),
-	'visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'toggle_input_method' =>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'add_expression' => 	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'and_expression' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'or_expression' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'replace_expression' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'remove_expression' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'test_expression' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'add_dependence' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'del_dependence' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'group_enable' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'group_disable' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'group_delete' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'copy' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'update' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'massupdate' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+							],
+	'visible' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'toggle_input_method' =>[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_expression' => 	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'and_expression' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'or_expression' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'replace_expression' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'remove_expression' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'test_expression' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_dependence' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'del_dependence' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'group_enable' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'group_disable' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'group_delete' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'copy' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'clone' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'massupdate' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
-);
+	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null],
+	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+];
 $_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 
 check_fields($fields);
@@ -90,18 +90,18 @@ $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIG
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 
 // validate permissions
-$discoveryRule = API::DiscoveryRule()->get(array(
-	'output' => array('name', 'itemid', 'hostid'),
+$discoveryRule = API::DiscoveryRule()->get([
+	'output' => ['name', 'itemid', 'hostid'],
 	'itemids' => getRequest('parent_discoveryid'),
 	'editable' => true
-));
+]);
 $discoveryRule = reset($discoveryRule);
 
 if (!$discoveryRule) {
 	access_deny();
 }
 
-$triggerPrototypeIds = getRequest('g_triggerid', array());
+$triggerPrototypeIds = getRequest('g_triggerid', []);
 if (!is_array($triggerPrototypeIds)) {
 	$triggerPrototypeIds = zbx_toArray($triggerPrototypeIds);
 }
@@ -112,12 +112,12 @@ if ($triggerPrototypeId !== null) {
 }
 
 if ($triggerPrototypeIds) {
-	$triggerPrototypes = API::TriggerPrototype()->get(array(
-		'output' => array('triggerid'),
+	$triggerPrototypes = API::TriggerPrototype()->get([
+		'output' => ['triggerid'],
 		'triggerids' => $triggerPrototypeIds,
 		'editable' => true,
 		'preservekeys' => true
-	));
+	]);
 
 	if ($triggerPrototypes) {
 		foreach ($triggerPrototypeIds as $triggerPrototypeId) {
@@ -160,7 +160,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$trigger = array(
+	$trigger = [
 		'expression' => getRequest('expression'),
 		'description' => getRequest('description'),
 		'type' => getRequest('type'),
@@ -169,7 +169,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'comments' => getRequest('comments'),
 		'url' => getRequest('url'),
 		'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
-	);
+	];
 
 	if (hasRequest('update')) {
 		$trigger['triggerid'] = getRequest('triggerid');
@@ -189,7 +189,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 }
 elseif (hasRequest('delete') && hasRequest('triggerid')) {
-	$result = API::TriggerPrototype()->delete(array(getRequest('triggerid')));
+	$result = API::TriggerPrototype()->delete([getRequest('triggerid')]);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
@@ -206,10 +206,10 @@ elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massup
 		$priority = getRequest('priority');
 
 		foreach ($triggerIds as $triggerId) {
-			$result = API::TriggerPrototype()->update(array(
+			$result = API::TriggerPrototype()->update([
 				'triggerid' => $triggerId,
 				'priority' => $priority
-			));
+			]);
 			if (!$result) {
 				break;
 			}
@@ -225,24 +225,24 @@ elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massup
 	}
 	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
 }
-elseif (getRequest('action') && str_in_array(getRequest('action'), array('triggerprototype.massenable', 'triggerprototype.massdisable')) && hasRequest('g_triggerid')) {
+elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprototype.massenable', 'triggerprototype.massdisable']) && hasRequest('g_triggerid')) {
 	$enable = (getRequest('action') == 'triggerprototype.massenable');
 	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
-	$update = array();
+	$update = [];
 
 	// get requested triggers with permission check
-	$dbTriggerPrototypes = API::TriggerPrototype()->get(array(
-		'output' => array('triggerid', 'status'),
+	$dbTriggerPrototypes = API::TriggerPrototype()->get([
+		'output' => ['triggerid', 'status'],
 		'triggerids' => getRequest('g_triggerid'),
 		'editable' => true
-	));
+	]);
 
 	if ($dbTriggerPrototypes) {
 		foreach ($dbTriggerPrototypes as $dbTriggerPrototype) {
-			$update[] = array(
+			$update[] = [
 				'triggerid' => $dbTriggerPrototype['triggerid'],
 				'status' => $status
-			);
+			];
 		}
 
 		$result = API::TriggerPrototype()->update($update);
@@ -302,26 +302,26 @@ else {
 
 	$config = select_config();
 
-	$data = array(
+	$data = [
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'discovery_rule' => $discoveryRule,
 		'hostid' => $discoveryRule['hostid'],
 		'showdisabled' => getRequest('showdisabled', 1),
-		'triggers' => array(),
+		'triggers' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'config' => $config
-	);
+	];
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	// get triggers
-	$options = array(
+	$options = [
 		'editable' => true,
-		'output' => array('triggerid', $sortField),
+		'output' => ['triggerid', $sortField],
 		'discoveryids' => $data['parent_discoveryid'],
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
-	);
+	];
 	if (empty($data['showdisabled'])) {
 		$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 	}
@@ -332,13 +332,13 @@ else {
 	// paging
 	$data['paging'] = getPagingLine($data['triggers'], $sortOrder);
 
-	$data['triggers'] = API::TriggerPrototype()->get(array(
+	$data['triggers'] = API::TriggerPrototype()->get([
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
+		'selectItems' => ['itemid', 'hostid', 'key_', 'type', 'flags', 'status'],
 		'selectFunctions' => API_OUTPUT_EXTEND
-	));
+	]);
 	order_result($data['triggers'], $sortField, $sortOrder);
 
 	// get real hosts

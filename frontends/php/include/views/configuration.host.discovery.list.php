@@ -40,7 +40,7 @@ $discoveryForm->addVar('hostid', $this->data['hostid']);
 // create table
 $discoveryTable = new CTableInfo();
 
-$discoveryTable->setHeader(array(
+$discoveryTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');"),
 		'cell-width'),
@@ -54,11 +54,11 @@ $discoveryTable->setHeader(array(
 	make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
 	$data['showInfoColumn'] ? _('Info') : null
-));
+]);
 
 foreach ($data['discoveries'] as $discovery) {
 	// description
-	$description = array();
+	$description = [];
 
 	if ($discovery['templateid']) {
 		$dbTemplate = get_realhost_by_itemid($discovery['templateid']);
@@ -98,66 +98,66 @@ foreach ($data['discoveries'] as $discovery) {
 	// host prototype link
 	$hostPrototypeLink = null;
 	if ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$hostPrototypeLink = array(
+		$hostPrototypeLink = [
 			new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$discovery['itemid']),
 			CViewHelper::showNum($discovery['hostPrototypes'])
-		);
+		];
 	}
 
-	$discoveryTable->addRow(array(
+	$discoveryTable->addRow([
 		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', null, null, $discovery['itemid']),
 		$description,
-		array(
+		[
 			new CLink(
 				_('Item prototypes'),
 				'disc_prototypes.php?parent_discoveryid='.$discovery['itemid']
 			),
 			CViewHelper::showNum($discovery['items'])
-		),
-		array(
+		],
+		[
 			new CLink(
 				_('Trigger prototypes'),
 				'trigger_prototypes.php?parent_discoveryid='.$discovery['itemid']
 			),
 			CViewHelper::showNum($discovery['triggers'])
-		),
-		array(
+		],
+		[
 			new CLink(
 				_('Graph prototypes'),
 				'graphs.php?parent_discoveryid='.$discovery['itemid']
 			),
 			CViewHelper::showNum($discovery['graphs'])
-		),
+		],
 		$hostPrototypeLink,
 		$discovery['key_'],
 		convertUnitsS($discovery['delay']),
 		item_type2str($discovery['type']),
 		$status,
 		$info
-	));
+	]);
 }
 
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
-$discoveryForm->addItem(array(
+$discoveryForm->addItem([
 	$discoveryTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'g_hostdruleid',
-		array(
-			'discoveryrule.massenable' => array('name' => _('Enable'),
+		[
+			'discoveryrule.massenable' => ['name' => _('Enable'),
 				'confirm' =>_('Enable selected discovery rules?')
-			),
-			'discoveryrule.massdisable' => array('name' => _('Disable'),
+			],
+			'discoveryrule.massdisable' => ['name' => _('Disable'),
 				'confirm' =>_('Disable selected discovery rules?')
-			),
-			'discoveryrule.massdelete' => array('name' => _('Delete'),
+			],
+			'discoveryrule.massdelete' => ['name' => _('Delete'),
 				'confirm' =>_('Delete selected discovery rules?')
-			)
-		),
+			]
+		],
 		$this->data['hostid']
 	)
-));
+]);
 
 // append form to widget
 $discoveryWidget->addItem($discoveryForm);

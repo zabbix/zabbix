@@ -39,7 +39,7 @@ $mediaTypeForm->setName('mediaTypesForm');
 
 // create table
 $mediaTypeTable = new CTableInfo();
-$mediaTypeTable->setHeader(array(
+$mediaTypeTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_media_types', null,
 			"checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"
@@ -50,7 +50,7 @@ $mediaTypeTable->setHeader(array(
 	_('Status'),
 	_('Used in actions'),
 	_('Details')
-));
+]);
 
 foreach ($data['mediatypes'] as $mediaType) {
 	switch ($mediaType['typeid']) {
@@ -83,7 +83,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 	}
 
 	// action list
-	$actionLinks = array();
+	$actionLinks = [];
 	if (!empty($mediaType['listOfActions'])) {
 		foreach ($mediaType['listOfActions'] as $action) {
 			$actionLinks[] = new CLink($action['name'], 'actionconf.php?form=update&actionid='.$action['actionid']);
@@ -109,26 +109,26 @@ foreach ($data['mediatypes'] as $mediaType) {
 		: new CLink(_('Disabled'), $statusLink, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
 
 	// append row
-	$mediaTypeTable->addRow(array(
+	$mediaTypeTable->addRow([
 		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', null, null, $mediaType['mediatypeid']),
 		new CLink($mediaType['description'], '?action=mediatype.edit&mediatypeid='.$mediaType['mediatypeid']),
 		media_type2str($mediaType['typeid']),
 		$status,
 		$actionColumn,
 		$details
-	));
+	]);
 }
 
 // append table to form
-$mediaTypeForm->addItem(array(
+$mediaTypeForm->addItem([
 	$mediaTypeTable,
 	$data['paging'],
-	new CActionButtonList('action', 'mediatypeids', array(
-		'mediatype.enable' => array('name' => _('Enable'), 'confirm' => _('Enable selected media types?')),
-		'mediatype.disable' => array('name' => _('Disable'), 'confirm' => _('Disable selected media types?')),
-		'mediatype.delete' => array('name' => _('Delete'), 'confirm' => _('Delete selected media types?'))
-	))
-));
+	new CActionButtonList('action', 'mediatypeids', [
+		'mediatype.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected media types?')],
+		'mediatype.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected media types?')],
+		'mediatype.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected media types?')]
+	])
+]);
 
 // append form to widget
 $mediaTypeWidget->addItem($mediaTypeForm)->show();

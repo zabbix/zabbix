@@ -45,7 +45,7 @@ $hostGroupForm->setName('hostgroupForm');
 
 // create table
 $hostGroupTable = new CTableInfo();
-$hostGroupTable->setHeader(array(
+$hostGroupTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_groups', null, "checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');"),
 		'cell-width'),
@@ -54,12 +54,12 @@ $hostGroupTable->setHeader(array(
 	_('Templates'),
 	_('Members'),
 	_('Info')
-));
+]);
 
 $currentTime = time();
 
 foreach ($this->data['groups'] as $group) {
-	$hostsOutput = array();
+	$hostsOutput = [];
 	$i = 0;
 
 	foreach ($group['templates'] as $template) {
@@ -121,7 +121,7 @@ foreach ($this->data['groups'] as $group) {
 	$templateCount = $this->data['groupCounts'][$group['groupid']]['templates'];
 
 	// name
-	$name = array();
+	$name = [];
 	if ($group['discoveryRule']) {
 		$name[] = new CLink($group['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$group['discoveryRule']['itemid'], ZBX_STYLE_ORANGE);
 		$name[] = NAME_DELIMITER;
@@ -163,17 +163,17 @@ foreach ($this->data['groups'] as $group) {
 }
 
 // append table to form
-$hostGroupForm->addItem(array(
+$hostGroupForm->addItem([
 	$hostGroupTable,
 	$this->data['paging'],
-	new CActionButtonList('action', 'groups', array(
-		'hostgroup.massenable' => array('name' => _('Enable hosts'), 'confirm' => _('Enable selected hosts?')),
-		'hostgroup.massdisable' => array('name' => _('Disable hosts'),
+	new CActionButtonList('action', 'groups', [
+		'hostgroup.massenable' => ['name' => _('Enable hosts'), 'confirm' => _('Enable selected hosts?')],
+		'hostgroup.massdisable' => ['name' => _('Disable hosts'),
 			'confirm' => _('Disable hosts in the selected host groups?')
-		),
-		'hostgroup.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected host groups?'))
-	))
-));
+		],
+		'hostgroup.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected host groups?')]
+	])
+]);
 
 // append form to widget
 $hostGroupWidget->addItem($hostGroupForm);

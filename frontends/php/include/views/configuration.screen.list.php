@@ -42,37 +42,37 @@ $screenForm->addVar('templateid', $this->data['templateid']);
 
 // create table
 $screenTable = new CTableInfo();
-$screenTable->setHeader(array(
+$screenTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_screens', null, "checkAll('".$screenForm->getName()."', 'all_screens', 'screens');"),
 		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Dimension (cols x rows)'),
 	_('Screen')
-));
+]);
 
 foreach ($this->data['screens'] as $screen) {
-	$screenTable->addRow(array(
+	$screenTable->addRow([
 		new CCheckBox('screens['.$screen['screenid'].']', null, null, $screen['screenid']),
 		new CLink($screen['name'], '?form=update&screenid='.$screen['screenid'].url_param('templateid')),
 		$screen['hsize'].' x '.$screen['vsize'],
 		new CLink(_('Edit'), 'screenedit.php?screenid='.$screen['screenid'].url_param('templateid'))
-	));
+	]);
 }
 
 // buttons
-$buttonsArray = array();
+$buttonsArray = [];
 if (!$this->data['templateid']) {
-	$buttonsArray['screen.export'] = array('name' => _('Export'));
+	$buttonsArray['screen.export'] = ['name' => _('Export')];
 }
-$buttonsArray['screen.massdelete'] = array('name' => _('Delete'), 'confirm' => _('Delete selected screens?'));
+$buttonsArray['screen.massdelete'] = ['name' => _('Delete'), 'confirm' => _('Delete selected screens?')];
 
 // append table to form
-$screenForm->addItem(array(
+$screenForm->addItem([
 	$screenTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'screens', $buttonsArray)
-));
+]);
 
 // append form to widget
 $screenWidget->addItem($screenForm);

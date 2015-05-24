@@ -34,20 +34,20 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $bulk = (getRequest('action', '') == 'trigger.bulkacknowledge');
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'eventid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'triggers' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'triggerid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'screenid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'events' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'message' =>		array(T_ZBX_STR, O_OPT, null,	$bulk ? null : NOT_EMPTY, 'isset({save}) || isset({saveandreturn})'),
-	'backurl' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+$fields = [
+	'eventid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'triggers' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'triggerid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'screenid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'events' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'message' =>		[T_ZBX_STR, O_OPT, null,	$bulk ? null : NOT_EMPTY, 'isset({save}) || isset({saveandreturn})'],
+	'backurl' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
-	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"trigger.bulkacknowledge"'),	null),
-	'saveandreturn' =>	array(T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null)
-);
+	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"trigger.bulkacknowledge"'),	null],
+	'saveandreturn' =>	[T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null],
+	'save' =>			[T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null],
+	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null]
+];
 check_fields($fields);
 
 $_REQUEST['backurl'] = getRequest('backurl', 'tr_status.php');
@@ -58,7 +58,7 @@ $_REQUEST['backurl'] = getRequest('backurl', 'tr_status.php');
 if (isset($_REQUEST['cancel'])) {
 	ob_end_clean();
 
-	if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
+	if (in_array($_REQUEST['backurl'], ['tr_events.php', 'events.php'])) {
 		redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid'].
 			'&source='.EVENT_SOURCE_TRIGGERS
 		);
@@ -82,21 +82,21 @@ if (!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQU
 	require_once dirname(__FILE__).'/include/page_footer.php';
 }
 elseif (getRequest('eventid')) {
-	$event = API::Event()->get(array(
+	$event = API::Event()->get([
 		'eventids' => getRequest('eventid'),
-		'output' => array('eventid'),
+		'output' => ['eventid'],
 		'limit' => 1
-	));
+	]);
 	if (!$event) {
 		access_deny();
 	}
 }
 elseif (getRequest('triggers')) {
-	$trigger = API::Trigger()->get(array(
+	$trigger = API::Trigger()->get([
 		'triggerids' => getRequest('triggers'),
-		'output' => array('triggerid'),
+		'output' => ['triggerid'],
 		'limit' => 1
-	));
+	]);
 	if (!$trigger) {
 		access_deny();
 	}
@@ -112,11 +112,11 @@ $eventTriggerName = null;
 $bulk = !isset($_REQUEST['eventid']);
 
 if (!$bulk) {
-	$events = API::Event()->get(array(
+	$events = API::Event()->get([
 		'eventids' => $_REQUEST['eventid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectRelatedObject' => API_OUTPUT_EXTEND
-	));
+	]);
 
 	if ($events) {
 		$event = reset($events);
@@ -137,21 +137,21 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 		$_REQUEST['events'] = zbx_toObject($_REQUEST['events'], 'eventid');
 	}
 	elseif (isset($_REQUEST['triggers'])) {
-		$_REQUEST['events'] = API::Event()->get(array(
+		$_REQUEST['events'] = API::Event()->get([
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'objectids' => $_REQUEST['triggers'],
-			'output' => array('eventid'),
+			'output' => ['eventid'],
 			'acknowledged' => EVENT_NOT_ACKNOWLEDGED
-		));
+		]);
 	}
 
 	DBstart();
 
-	$result = API::Event()->acknowledge(array(
+	$result = API::Event()->acknowledge([
 		'eventids' => zbx_objectValues($_REQUEST['events'], 'eventid'),
 		'message' => $_REQUEST['message']
-	));
+	]);
 
 	if ($result) {
 		$eventAcknowledged = true;
@@ -168,7 +168,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 	if (isset($_REQUEST['saveandreturn'])) {
 		ob_end_clean();
 
-		if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
+		if (in_array($_REQUEST['backurl'], ['tr_events.php', 'events.php'])) {
 			redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid'].
 				'&source='.EVENT_SOURCE_TRIGGERS
 			);
@@ -210,14 +210,14 @@ else {
 
 	if ($acknowledges) {
 		$acknowledgesTable = new CTableInfo();
-		$acknowledgesTable->setHeader(array(_('Time'), _('User'), _('Message')));
+		$acknowledgesTable->setHeader([_('Time'), _('User'), _('Message')]);
 
 		while ($acknowledge = DBfetch($acknowledges)) {
-			$acknowledgesTable->addRow(array(
+			$acknowledgesTable->addRow([
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock']),
 				getUserFullname($acknowledge),
 				zbx_nl2br($acknowledge['message'])
-			));
+			]);
 		}
 	}
 
@@ -262,11 +262,11 @@ elseif (hasRequest('events')) {
 
 $formList = new CFormList();
 
-$message = new CTextArea('message', '', array(
+$message = new CTextArea('message', '', [
 	'rows' => ZBX_TEXTAREA_STANDARD_ROWS,
 	'width' => ZBX_TEXTAREA_BIG_WIDTH,
 	'maxlength' => 255
-));
+]);
 $message->setAttribute('autofocus', 'autofocus');
 
 $formList->addRow(_('Message'), $message);
@@ -281,18 +281,18 @@ if ($acknowledgesTable !== null) {
 if (!$bulk) {
 	$ackTab->setFooter(makeFormFooter(
 		new CSubmit('saveandreturn', $saveAndReturnLabel),
-		array(
+		[
 			new CSubmit('save', $saveLabel),
-			new CButtonCancel(url_params(array('backurl', 'eventid', 'triggerid', 'screenid')))
-		)
+			new CButtonCancel(url_params(['backurl', 'eventid', 'triggerid', 'screenid']))
+		]
 	));
 }
 else {
 	$ackTab->setFooter(makeFormFooter(
 		new CSubmit('saveandreturn', $saveAndReturnLabel),
-		array(
-			new CButtonCancel(url_params(array('backurl', 'eventid', 'triggerid', 'screenid')))
-		)
+		[
+			new CButtonCancel(url_params(['backurl', 'eventid', 'triggerid', 'screenid']))
+		]
 	));
 }
 

@@ -30,7 +30,7 @@ $userGroupComboBox->addItem(0, _('All'));
 foreach ($this->data['userGroups'] as $userGroup) {
 	$userGroupComboBox->addItem($userGroup['usrgrpid'], $userGroup['name']);
 }
-$controls->addItem(array(_('User group').SPACE, $userGroupComboBox));
+$controls->addItem([_('User group').SPACE, $userGroupComboBox]);
 $controls->addItem(new CSubmit('form', _('Create user')));
 
 $createForm->addItem($controls);
@@ -42,7 +42,7 @@ $usersForm->setName('userForm');
 
 // create users table
 $usersTable = new CTableInfo();
-$usersTable->setHeader(array(
+$usersTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');"),
 		'cell-width'),
@@ -56,7 +56,7 @@ $usersTable->setHeader(array(
 	_('Frontend access'),
 	_('Debug mode'),
 	_('Status')
-));
+]);
 
 foreach ($this->data['users'] as $user) {
 	$userId = $user['userid'];
@@ -82,7 +82,7 @@ foreach ($this->data['users'] as $user) {
 	// user groups
 	order_result($user['usrgrps'], 'name');
 
-	$usersGroups = array();
+	$usersGroups = [];
 	$i = 0;
 
 	foreach ($user['usrgrps'] as $userGroup) {
@@ -125,7 +125,7 @@ foreach ($this->data['users'] as $user) {
 	}
 
 	// append user to table
-	$usersTable->addRow(array(
+	$usersTable->addRow([
 		new CCheckBox('group_userid['.$userId.']', null, null, $userId),
 		new CLink($user['alias'], 'users.php?form=update&userid='.$userId),
 		$user['name'],
@@ -137,18 +137,18 @@ foreach ($this->data['users'] as $user) {
 		new CSpan(user_auth_type2str($user['gui_access']), $guiAccessStyle),
 		($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) ? new CSpan(_('Enabled'), ZBX_STYLE_ORANGE) : new CSpan(_('Disabled'), ZBX_STYLE_GREEN),
 		($user['users_status'] == 1) ? new CSpan(_('Disabled'), ZBX_STYLE_RED) : new CSpan(_('Enabled'), ZBX_STYLE_GREEN)
-	));
+	]);
 }
 
 // append table to form
-$usersForm->addItem(array(
+$usersForm->addItem([
 	$usersTable,
 	$this->data['paging'],
-	new CActionButtonList('action', 'group_userid', array(
-		'user.massunblock' => array('name' => _('Unblock'), 'confirm' => _('Unblock selected users?')),
-		'user.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected users?'))
-	))
-));
+	new CActionButtonList('action', 'group_userid', [
+		'user.massunblock' => ['name' => _('Unblock'), 'confirm' => _('Unblock selected users?')],
+		'user.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected users?')]
+	])
+]);
 
 // append form to widget
 $usersWidget->addItem($usersForm);

@@ -25,7 +25,7 @@ if ($data['fullscreen'] == 0) {
 	$support = new CLink(_('Get support'), 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 	$support->setTarget('_blank');
 
-	$page_header_r_col = array($help, '|', $support, '|');
+	$page_header_r_col = [$help, '|', $support, '|'];
 
 	$page_header_r_col[] = new CLink(_('Print'), '', 'small_font print-link', null, 'nosid');
 	$page_header_r_col[] = '|';

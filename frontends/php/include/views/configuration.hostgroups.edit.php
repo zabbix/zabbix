@@ -59,7 +59,7 @@ foreach ($this->data['r_hosts'] as $host) {
 		$hostsComboBox->addItem($host['hostid'], $host['name'], true, false);
 	}
 }
-$hostGroupFormList->addRow(_('Hosts'), $hostsComboBox->get(_('Hosts in'), array(_('Other hosts | Group').SPACE, $groupsComboBox)));
+$hostGroupFormList->addRow(_('Hosts'), $hostsComboBox->get(_('Hosts in'), [_('Other hosts | Group').SPACE, $groupsComboBox]));
 
 // append tabs to form
 $hostGroupTab = new CTabView();
@@ -69,7 +69,7 @@ $hostGroupTab->addTab('hostgroupTab', _('Host group'), $hostGroupFormList);
 if ($this->data['groupid'] == 0) {
 	$hostGroupTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 else {
@@ -80,11 +80,11 @@ else {
 
 	$hostGroupTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
 			new CButtonCancel()
-		)
+		]
 	));
 }
 

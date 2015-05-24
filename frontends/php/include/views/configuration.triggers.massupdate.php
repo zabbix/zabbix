@@ -58,14 +58,14 @@ foreach ($this->data['g_triggerid'] as $triggerid) {
 $triggersFormList = new CFormList('triggersFormList');
 
 // append severity to form list
-$severityDiv = new CSeverity(array(
+$severityDiv = new CSeverity([
 	'id' => 'priority_div',
 	'name' => 'priority',
 	'value' => $this->data['priority']
-));
+]);
 
 $triggersFormList->addRow(
-	array(
+	[
 		_('Severity'),
 		SPACE,
 		new CVisibilityBox(
@@ -74,7 +74,7 @@ $triggersFormList->addRow(
 			'priority_div',
 			_('Original')
 		),
-	),
+	],
 	$severityDiv
 );
 
@@ -92,7 +92,7 @@ if (empty($this->data['parent_discoveryid'])) {
 	foreach ($this->data['dependencies'] as $dependency) {
 		$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
-		$hostNames = array();
+		$hostNames = [];
 		foreach ($dependency['hosts'] as $host) {
 			$hostNames[] = CHtml::encode($host['name']);
 			$hostNames[] = ', ';
@@ -101,26 +101,26 @@ if (empty($this->data['parent_discoveryid'])) {
 
 		if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 			$description = new CLink(
-				array($hostNames, NAME_DELIMITER, CHtml::encode($dependency['description'])),
+				[$hostNames, NAME_DELIMITER, CHtml::encode($dependency['description'])],
 				'triggers.php?form=update&hostid='.$dependency['hostid'].'&triggerid='.$dependency['triggerid']
 			);
 			$description->setAttribute('target', '_blank');
 		}
 		else {
-			$description = array($hostNames, NAME_DELIMITER, $dependency['description']);
+			$description = [$hostNames, NAME_DELIMITER, $dependency['description']];
 		}
 
-		$row = new CRow(array($description, new CButton('remove', _('Remove'),
+		$row = new CRow([$description, new CButton('remove', _('Remove'),
 			'javascript: removeDependency(\''.$dependency['triggerid'].'\');',
 			'link_menu'
-		)));
+		)]);
 
 		$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
 		$dependenciesTable->addRow($row);
 	}
 
 	$dependenciesDiv = new CDiv(
-		array(
+		[
 			$dependenciesTable,
 			new CButton('btn1', _('Add'),
 				'return PopUp("popup.php?'.
@@ -135,13 +135,13 @@ if (empty($this->data['parent_discoveryid'])) {
 					'&with_triggers=1");',
 				'link_menu'
 			)
-		),
+		],
 		'objectgroup inlineblock border_dotted ui-corner-all'
 	);
 	$dependenciesDiv->setAttribute('id', 'dependencies_div');
 
 	$triggersFormList->addRow(
-		array(
+		[
 			_('Replace dependencies'),
 			SPACE,
 			new CVisibilityBox(
@@ -150,7 +150,7 @@ if (empty($this->data['parent_discoveryid'])) {
 				'dependencies_div',
 				_('Original')
 			)
-		),
+		],
 		$dependenciesDiv
 	);
 }
@@ -162,7 +162,7 @@ $triggersTab->addTab('triggersTab', _('Mass update'), $triggersFormList);
 // append buttons to form
 $triggersTab->setFooter(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
-	array(new CButtonCancel(url_params(array('groupid', 'hostid', 'parent_discoveryid'))))
+	[new CButtonCancel(url_params(['groupid', 'hostid', 'parent_discoveryid']))]
 ));
 
 $triggersForm->addItem($triggersTab);

@@ -29,10 +29,10 @@ define('ZBX_PAGE_NO_MENU', 1);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR					TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'dstfrm' =>		array(T_ZBX_STR, O_MAND,P_SYS, NOT_EMPTY,	null),
-	'permission' =>	array(T_ZBX_INT, O_MAND,P_SYS, IN(PERM_DENY.','.PERM_READ.','.PERM_READ_WRITE), null)
-);
+$fields = [
+	'dstfrm' =>		[T_ZBX_STR, O_MAND,P_SYS, NOT_EMPTY,	null],
+	'permission' =>	[T_ZBX_INT, O_MAND,P_SYS, IN(PERM_DENY.','.PERM_READ.','.PERM_READ_WRITE), null]
+];
 check_fields($fields);
 
 $dstfrm = getRequest('dstfrm', 0);
@@ -48,16 +48,16 @@ $hostGroupForm = new CForm();
 $hostGroupForm->setAttribute('id', 'groups');
 
 $hostGroupTable = new CTableInfo();
-$hostGroupTable->setHeader(array(
+$hostGroupTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_groups', null, 'checkAll(this.checked)'),
 		'cell-width'),
 	_('Name')
-));
+]);
 
-$hostGroups = API::HostGroup()->get(array(
-	'output' => array('groupid', 'name')
-));
+$hostGroups = API::HostGroup()->get([
+	'output' => ['groupid', 'name']
+]);
 
 order_result($hostGroups, 'name');
 
@@ -67,7 +67,7 @@ foreach ($hostGroups as $hostGroup) {
 	$hostGroupCheckBox->setAttribute('data-name', $hostGroup['name']);
 	$hostGroupCheckBox->setAttribute('data-permission', $permission);
 
-	$hostGroupTable->addRow(new CCol(array($hostGroupCheckBox, $hostGroup['name'])));
+	$hostGroupTable->addRow(new CCol([$hostGroupCheckBox, $hostGroup['name']]));
 }
 
 $hostGroupTable->setFooter(new CCol(new CButton('select', _('Select'), 'addGroups("'.$dstfrm.'")'), 'right'));

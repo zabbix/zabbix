@@ -47,7 +47,7 @@ $itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 // create table
 $itemTable = new CTableInfo();
 
-$itemTable->setHeader(array(
+$itemTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
 		'cell-width'),
@@ -59,10 +59,10 @@ $itemTable->setHeader(array(
 	make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
 	_('Applications'),
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
-));
+]);
 
 foreach ($this->data['items'] as $item) {
-	$description = array();
+	$description = [];
 	if (!empty($item['templateid'])) {
 		$template_host = get_realhost_by_itemid($item['templateid']);
 		$templateDiscoveryRuleId = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $template_host['hostid']);
@@ -99,7 +99,7 @@ foreach ($this->data['items'] as $item) {
 		$applications = '';
 	}
 
-	$itemTable->addRow(array(
+	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', null, null, $item['itemid']),
 		$description,
 		$item['key_'],
@@ -109,30 +109,30 @@ foreach ($this->data['items'] as $item) {
 		item_type2str($item['type']),
 		$applications,
 		$status
-	));
+	]);
 }
 
 zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
 
 // append table to form
-$itemForm->addItem(array(
+$itemForm->addItem([
 	$itemTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'group_itemid',
-		array(
-			'itemprototype.massenable' => array('name' => _('Enable'),
+		[
+			'itemprototype.massenable' => ['name' => _('Enable'),
 				'confirm' => _('Enable selected item prototypes?')
-			),
-			'itemprototype.massdisable' => array('name' => _('Disable'),
+			],
+			'itemprototype.massdisable' => ['name' => _('Disable'),
 				'confirm' => _('Disable selected item prototypes?')
-			),
-			'itemprototype.massdelete' => array('name' => _('Delete'),
+			],
+			'itemprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected item prototypes?')
-			)
-		),
+			]
+		],
 		$this->data['parent_discoveryid']
 	)
-));
+]);
 
 // append form to widget
 $itemsWidget->addItem($itemForm);

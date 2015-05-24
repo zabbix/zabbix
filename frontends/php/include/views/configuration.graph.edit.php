@@ -79,7 +79,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$percentLeftCheckbox->setChecked(0);
 		}
 
-		$graphFormList->addRow(_('Percentile line (left)'), array($percentLeftCheckbox, SPACE, $percentLeftTextBox));
+		$graphFormList->addRow(_('Percentile line (left)'), [$percentLeftCheckbox, SPACE, $percentLeftTextBox]);
 
 		// percent right
 		$percentRightTextBox = new CTextBox('percent_right', $this->data['percent_right'], 6, false, 7);
@@ -95,15 +95,15 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 
-		$graphFormList->addRow(_('Percentile line (right)'), array($percentRightCheckbox, SPACE, $percentRightTextBox));
+		$graphFormList->addRow(_('Percentile line (right)'), [$percentRightCheckbox, SPACE, $percentRightTextBox]);
 	}
 
-	$yaxisMinData = array();
-	$yaxisMinData[] = new CComboBox('ymin_type', $this->data['ymin_type'], null, array(
+	$yaxisMinData = [];
+	$yaxisMinData[] = new CComboBox('ymin_type', $this->data['ymin_type'], null, [
 		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
 		GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
 		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
-	));
+	]);
 
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMinData[] = new CTextBox('yaxismin', $this->data['yaxismin'], 7);
@@ -115,7 +115,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		if (!empty($this->data['ymin_itemid'])) {
 			$min_host = get_host_by_itemid($this->data['ymin_itemid']);
 
-			$minItems = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($this->data['ymin_itemid'])));
+			$minItems = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($this->data['ymin_itemid'])]);
 			$minItem = reset($minItems);
 
 			$ymin_name = $min_host['name'].NAME_DELIMITER.$minItem['name_expanded'];
@@ -155,12 +155,12 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 	$graphFormList->addRow(_('Y axis MIN value'), $yaxisMinData);
 
-	$yaxisMaxData = array();
-	$yaxisMaxData[] = new CComboBox('ymax_type', $this->data['ymax_type'], null, array(
+	$yaxisMaxData = [];
+	$yaxisMaxData[] = new CComboBox('ymax_type', $this->data['ymax_type'], null, [
 		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
 		GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
 		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
-	));
+	]);
 
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMaxData[] = new CTextBox('yaxismax', $this->data['yaxismax'], 7);
@@ -172,7 +172,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		if (!empty($this->data['ymax_itemid'])) {
 			$max_host = get_host_by_itemid($this->data['ymax_itemid']);
 
-			$maxItems = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($this->data['ymax_itemid'])));
+			$maxItems = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($this->data['ymax_itemid'])]);
 			$maxItem = reset($maxItems);
 
 			$ymax_name = $max_host['name'].NAME_DELIMITER.$maxItem['name_expanded'];
@@ -221,7 +221,7 @@ $itemsTable = (new CTable())->
 	addClass('formElementTable');
 $itemsTable->setAttribute('style', 'min-width: 700px;');
 $itemsTable->setAttribute('id', 'itemsTable');
-$itemsTable->setHeader(array(
+$itemsTable->setHeader([
 	new CCol(SPACE, null, null, 15),
 	new CCol(SPACE, null, null, 15),
 	new CCol(_('Name'), null, null, ($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? 280 : 360),
@@ -233,7 +233,7 @@ $itemsTable->setHeader(array(
 		? new CCol(_('Y axis side'), ZBX_STYLE_NOWRAP, null, 80) : null,
 	new CCol(_('Colour'), null, null, 100),
 	new CCol(_('Action'), null, null, 50)
-));
+]);
 
 $addButton = new CButton('add_item', _('Add'),
 	'return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
@@ -254,7 +254,7 @@ if ($this->data['parent_discoveryid']) {
 	);
 }
 $itemsTable->addRow(new CRow(
-	new CCol(array($addButton, SPACE, SPACE, SPACE, $addPrototypeButton), null, 8),
+	new CCol([$addButton, SPACE, SPACE, SPACE, $addPrototypeButton], null, 8),
 	null,
 	'itemButtonsRow'
 ));
@@ -306,7 +306,7 @@ if (!empty($this->data['graphid'])) {
 	$updateButton = new CSubmit('update', _('Update'));
 	$deleteButton = new CButtonDelete(
 		$this->data['parent_discoveryid'] ? _('Delete graph prototype?') : _('Delete graph?'),
-		url_params(array('graphid', 'parent_discoveryid', 'hostid'))
+		url_params(['graphid', 'parent_discoveryid', 'hostid'])
 	);
 
 	if (!empty($this->data['templateid'])) {
@@ -316,17 +316,17 @@ if (!empty($this->data['graphid'])) {
 
 	$graphTab->setFooter(makeFormFooter(
 		$updateButton,
-		array(
+		[
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
 			new CButtonCancel(url_param('parent_discoveryid'))
-		)
+		]
 	));
 }
 else {
 	$graphTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('parent_discoveryid')))
+		[new CButtonCancel(url_param('parent_discoveryid'))]
 	));
 }
 

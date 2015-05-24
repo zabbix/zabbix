@@ -38,7 +38,7 @@ $proxyForm->setName('proxyForm');
 
 // create table
 $proxyTable = new CTableInfo();
-$proxyTable->setHeader(array(
+$proxyTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_hosts', null, "checkAll('".$proxyForm->getName()."', 'all_hosts', 'proxyids');"),
 		'cell-width'),
@@ -49,10 +49,10 @@ $proxyTable->setHeader(array(
 	_('Item count'),
 	_('Required performance (vps)'),
 	_('Hosts')
-));
+]);
 
 foreach ($data['proxies'] as $proxy) {
-	$hosts = array();
+	$hosts = [];
 	$i = 0;
 
 	foreach ($proxy['hosts'] as $host) {
@@ -93,19 +93,19 @@ foreach ($data['proxies'] as $proxy) {
 }
 
 // append table to form
-$proxyForm->addItem(array(
+$proxyForm->addItem([
 	$proxyTable,
 	$data['paging'],
-	new CActionButtonList('action', 'proxyids', array(
-		'proxy.hostenable' => array('name' => _('Enable hosts'),
+	new CActionButtonList('action', 'proxyids', [
+		'proxy.hostenable' => ['name' => _('Enable hosts'),
 			'confirm' => _('Enable hosts monitored by selected proxies?')
-		),
-		'proxy.hostdisable' => array('name' => _('Disable hosts'),
+		],
+		'proxy.hostdisable' => ['name' => _('Disable hosts'),
 			'confirm' => _('Disable hosts monitored by selected proxies?')
-		),
-		'proxy.delete' => array('name' => _('Delete'), 'confirm' => _('Delete selected proxies?'))
-	))
-));
+		],
+		'proxy.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected proxies?')]
+	])
+]);
 
 // append form to widget
 $proxyWidget->addItem($proxyForm)->show();

@@ -22,10 +22,10 @@
 class CNewValidator {
 
 	private $rules;
-	private $input = array();
-	private $output = array();
-	private $errors = array();
-	private $errorsFatal = array();
+	private $input = [];
+	private $output = [];
+	private $errors = [];
+	private $errorsFatal = [];
 
 	/**
 	 * Parser for validation rules.

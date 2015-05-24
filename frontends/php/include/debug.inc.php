@@ -26,7 +26,7 @@ function sdb($return = false) {
 	foreach ($backtrace as $n => $bt) {
 		$result .= '  --['.$n.']-- '.$bt['file'].' : '.$bt['line'].'<br/>';
 		$result .= "&nbsp;&nbsp;<b>".(isset($bt['class']) ? $bt['class'].$bt['type'].$bt['function'] : $bt['function']).'</b>';
-		$args = array();
+		$args = [];
 		foreach ($bt['args'] as $arg) {
 			$args[] = is_array($arg) ? print_r($arg, true) : $arg;
 		}
@@ -100,7 +100,7 @@ function sdFile($data, $persist = false, $fileName = 'debug.txt') {
 function sdff($msg, $fileName = '/tmp/zabbix.log') {
 	$fileStreem = @fopen($fileName, 'a');
 	if (is_array($msg)) {
-		$toImplode = array();
+		$toImplode = [];
 		foreach ($msg as $key => $value) {
 			$toImplode[] = var_export($key, true).'=>'.var_export($value, true);
 		}
@@ -149,7 +149,7 @@ function ilb($limit = 100) {
 }
 
 function timer($timer = null) {
-	static $timers = array();
+	static $timers = [];
 
 	if ($timer === null) {
 		$timer = '_general_';

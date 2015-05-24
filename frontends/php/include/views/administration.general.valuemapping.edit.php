@@ -38,7 +38,7 @@ $valueMappingFormList->addRow(_('Name'), $nameTextBox);
 $mappingsTable = (new CTable(SPACE))->
 	addClass('formElementTable')->
 	setAttribute('id', 'mappingsTable')->
-	addRow(array(_('Value'), SPACE, _('Mapped to'), SPACE))->
+	addRow([_('Value'), SPACE, _('Mapped to'), SPACE])->
 	addRow(new CCol(new CButton('addMapping', _('Add'), '', 'link_menu'), null, 4));
 $valueMappingFormList->addRow(_('Mappings'), new CDiv($mappingsTable, 'border_dotted inlineblock objectgroup'));
 
@@ -58,16 +58,16 @@ $valueMappingTab->addTab('valuemapping', _('Value mapping'), $valueMappingFormLi
 if (!empty($this->data['valuemapid'])) {
 	$valueMappingTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CButtonDelete($this->data['confirmMessage'], url_param('valuemapid')),
 			new CButtonCancel()
-		)
+		]
 	));
 }
 else {
 	$valueMappingTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 

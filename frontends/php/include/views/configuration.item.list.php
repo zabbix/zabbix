@@ -54,7 +54,7 @@ if (!empty($this->data['hostid'])) {
 $itemTable = new CTableInfo(
 	($this->data['filterSet']) ? null : _('Specify some filter condition to see the items.')
 );
-$itemTable->setHeader(array(
+$itemTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
 		'cell-width'),
@@ -70,13 +70,13 @@ $itemTable->setHeader(array(
 	_('Applications'),
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
 	$data['showInfoColumn'] ? _('Info') : null
-));
+]);
 
 $currentTime = time();
 
 foreach ($this->data['items'] as $item) {
 	// description
-	$description = array();
+	$description = [];
 	if (!empty($item['template_host'])) {
 		$description[] = new CLink(
 			CHtml::encode($item['template_host']['name']),
@@ -112,7 +112,7 @@ foreach ($this->data['items'] as $item) {
 
 	// info
 	if ($data['showInfoColumn']) {
-		$infoIcons = array();
+		$infoIcons = [];
 
 		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
 			$info = new CDiv(SPACE, 'status_icon iconerror');
@@ -153,16 +153,16 @@ foreach ($this->data['items'] as $item) {
 
 	// triggers info
 	$triggerHintTable = new CTableInfo();
-	$triggerHintTable->setHeader(array(
+	$triggerHintTable->setHeader([
 		_('Severity'),
 		_('Name'),
 		_('Expression'),
 		_('Status')
-	));
+	]);
 
 	foreach ($item['triggers'] as $num => &$trigger) {
 		$trigger = $this->data['itemTriggers'][$trigger['triggerid']];
-		$triggerDescription = array();
+		$triggerDescription = [];
 		if ($trigger['templateid'] > 0) {
 			if (!isset($this->data['triggerRealHosts'][$trigger['triggerid']])) {
 				$triggerDescription[] = new CSpan('HOST', ZBX_STYLE_GREY);
@@ -198,7 +198,7 @@ foreach ($this->data['items'] as $item) {
 		$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
 		$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
 
-		$triggerHintTable->addRow(array(
+		$triggerHintTable->addRow([
 			getSeverityCell($trigger['priority'], $this->data['config']),
 			$triggerDescription,
 			triggerExpression($trigger, true),
@@ -206,7 +206,7 @@ foreach ($this->data['items'] as $item) {
 				triggerIndicator($trigger['status'], $trigger['state']),
 				triggerIndicatorStyle($trigger['status'], $trigger['state'])
 			),
-		));
+		]);
 
 		$item['triggers'][$num] = $trigger;
 	}
@@ -215,30 +215,30 @@ foreach ($this->data['items'] as $item) {
 	if (!empty($item['triggers'])) {
 		$triggerInfo = new CSpan(_('Triggers'), ZBX_STYLE_LINK_ACTION.' link_menu');
 		$triggerInfo->setHint($triggerHintTable);
-		$triggerInfo = array($triggerInfo);
+		$triggerInfo = [$triggerInfo];
 		$triggerInfo[] = CViewHelper::showNum(count($item['triggers']));
 
-		$triggerHintTable = array();
+		$triggerHintTable = [];
 	}
 	else {
 		$triggerInfo = SPACE;
 	}
 
 	// if item type is 'Log' we must show log menu
-	if (in_array($item['value_type'], array(ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT))) {
-		$triggers = array();
+	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
+		$triggers = [];
 
 		foreach ($item['triggers'] as $trigger) {
 			foreach ($trigger['functions'] as $function) {
-				if (!str_in_array($function['function'], array('regexp', 'iregexp'))) {
+				if (!str_in_array($function['function'], ['regexp', 'iregexp'])) {
 					continue 2;
 				}
 			}
 
-			$triggers[] = array(
+			$triggers[] = [
 				'id' => $trigger['triggerid'],
 				'name' => $trigger['description']
-			);
+			];
 		}
 
 		$menuIcon = new CIcon(_('Menu'), 'iconmenu_b');
@@ -271,23 +271,23 @@ foreach ($this->data['items'] as $item) {
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
-$itemForm->addItem(array(
+$itemForm->addItem([
 	$itemTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'group_itemid',
-		array(
-			'item.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected items?')),
-			'item.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected items?')),
-			'item.massclearhistory' => array('name' => _('Clear history'),
+		[
+			'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?')],
+			'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?')],
+			'item.massclearhistory' => ['name' => _('Clear history'),
 				'confirm' => _('Delete history of selected items?')
-			),
-			'item.masscopyto' => array('name' => _('Copy')),
-			'item.massupdateform' => array('name' => _('Mass update')),
-			'item.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected items?'))
-		),
+			],
+			'item.masscopyto' => ['name' => _('Copy')],
+			'item.massupdateform' => ['name' => _('Mass update')],
+			'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?')]
+		],
 		$this->data['hostid']
 	)
-));
+]);
 
 // append form to widget
 $itemsWidget->addItem($itemForm);

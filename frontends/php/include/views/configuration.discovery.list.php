@@ -31,7 +31,7 @@ $discoveryForm->setName('druleForm');
 
 // create table
 $discoveryTable = new CTableInfo();
-$discoveryTable->setHeader(array(
+$discoveryTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_drules', null, "checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');"),
 		'cell-width'),
@@ -40,7 +40,7 @@ $discoveryTable->setHeader(array(
 	_('Delay'),
 	_('Checks'),
 	_('Status')
-));
+]);
 foreach ($data['drules'] as $drule) {
 	array_push($drule['description'], new CLink($drule['name'], '?form=update&druleid='.$drule['druleid']));
 
@@ -50,26 +50,26 @@ foreach ($data['drules'] as $drule) {
 		ZBX_STYLE_LINK_ACTION.' '.discovery_status2style($drule['status'])
 	));
 
-	$discoveryTable->addRow(array(
+	$discoveryTable->addRow([
 		new CCheckBox('g_druleid['.$drule['druleid'].']', null, null, $drule['druleid']),
 		$drule['description'],
 		$drule['iprange'],
 		convertUnitsS($drule['delay']),
 		!empty($drule['checks']) ? implode(', ', $drule['checks']) : '',
 		$status
-	));
+	]);
 }
 
 // append table to form
-$discoveryForm->addItem(array(
+$discoveryForm->addItem([
 	$discoveryTable,
 	$this->data['paging'],
-	new CActionButtonList('action', 'g_druleid', array(
-		'drule.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected discovery rules?')),
-		'drule.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected discovery rules?')),
-		'drule.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected discovery rules?'))
-	))
-));
+	new CActionButtonList('action', 'g_druleid', [
+		'drule.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected discovery rules?')],
+		'drule.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected discovery rules?')],
+		'drule.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected discovery rules?')]
+	])
+]);
 
 // append form to widget
 $discoveryWidget->addItem($discoveryForm);

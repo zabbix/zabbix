@@ -45,17 +45,17 @@ $applicationTab->addTab('applicationTab', _('Application'), $applicationFormList
 if (!empty($this->data['applicationid'])) {
 	$applicationTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CSubmit('clone', _('Clone')),
-			new CButtonDelete(_('Delete application?'), url_params(array('hostid', 'form', 'applicationid'))),
+			new CButtonDelete(_('Delete application?'), url_params(['hostid', 'form', 'applicationid'])),
 			new CButtonCancel(url_param('hostid'))
-		)
+		]
 	));
 }
 else {
 	$applicationTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('hostid')))
+		[new CButtonCancel(url_param('hostid'))]
 	));
 }
 

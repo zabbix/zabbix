@@ -47,8 +47,8 @@ class CTag extends CObject {
 
 	public function __construct($tagname = null, $paired = 'no', $body = null, $class = null) {
 		parent::__construct();
-		$this->attributes = array();
-		$this->dataAttributes = array();
+		$this->attributes = [];
+		$this->dataAttributes = [];
 
 		if (!is_string($tagname)) {
 			return $this->error('Incorrect tagname for CTag "'.$tagname.'".');
@@ -72,7 +72,7 @@ class CTag extends CObject {
 			}
 
 			// a special encoding strategy should be used for the "value", "name" and "id" attributes
-			$strategy = in_array($key, array('value', 'name', 'id'), true) ? $this->attrEncStrategy : $this->encStrategy;
+			$strategy = in_array($key, ['value', 'name', 'id'], true) ? $this->attrEncStrategy : $this->encStrategy;
 			$value = $this->encode($value, $strategy);
 			$res .= ' '.$key.'="'.$value.'"';
 		}
@@ -245,7 +245,7 @@ class CTag extends CObject {
 	 */
 	protected function encode($value, $strategy = self::ENC_NOAMP) {
 		if ($strategy == self::ENC_NOAMP) {
-			$value = str_replace(array('<', '>', '"'), array('&lt;', '&gt;', '&quot;'), $value);
+			$value = str_replace(['<', '>', '"'], ['&lt;', '&gt;', '&quot;'], $value);
 		}
 		else {
 			$value = CHtml::encode($value);

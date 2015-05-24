@@ -26,7 +26,7 @@ class CMultiSelect extends CTag {
 	 *
 	 * @see jQuery.multiSelect()
 	 */
-	public function __construct(array $options = array()) {
+	public function __construct(array $options = []) {
 		parent::__construct('div', 'yes');
 		$this->addClass('multiselect');
 		$this->setAttribute('id', zbx_formatDomId($options['name']));
@@ -43,30 +43,30 @@ class CMultiSelect extends CTag {
 			}
 		}
 
-		$params = array(
+		$params = [
 			'url' => $url->getUrl(),
 			'name' => $options['name'],
-			'labels' => array(
+			'labels' => [
 				'No matches found' => _('No matches found'),
 				'More matches found...' => _('More matches found...'),
 				'type here to search' => _('type here to search'),
 				'new' => _('new'),
 				'Select' => _('Select')
-			)
-		);
+			]
+		];
 
 		if (array_key_exists('data', $options)) {
 			$params['data'] = zbx_cleanHashes($options['data']);
 		}
 
-		foreach (array('ignored', 'defaultValue', 'disabled', 'selectedLimit', 'addNew') as $option) {
+		foreach (['ignored', 'defaultValue', 'disabled', 'selectedLimit', 'addNew'] as $option) {
 			if (array_key_exists($option, $options)) {
 				$params[$option] = $options[$option];
 			}
 		}
 
 		if (array_key_exists('popup', $options)) {
-			foreach (array('parameters', 'width', 'height') as $option) {
+			foreach (['parameters', 'width', 'height'] as $option) {
 				if (array_key_exists($option, $options['popup'])) {
 					$params['popup'][$option] = $options['popup'][$option];
 				}

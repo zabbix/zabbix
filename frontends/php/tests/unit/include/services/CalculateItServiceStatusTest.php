@@ -22,166 +22,166 @@
 class CalculateItServiceStatusTest extends PHPUnit_Framework_TestCase {
 
 	public function provider() {
-		return array(
+		return [
 			// single service without an algorithm
-			array(
-				array(
-					0 => array('algorithm' => SERVICE_ALGORITHM_NONE, 'triggerid' => 0),
-				),
-				array(),
-				array(),
-				array(
+			[
+				[
+					0 => ['algorithm' => SERVICE_ALGORITHM_NONE, 'triggerid' => 0],
+				],
+				[],
+				[],
+				[
 					0 => SERVICE_STATUS_OK
-				)
-			),
+				]
+			],
 
 			// service with SLA calculation but no trigger
-			array(
-				array(
-					0 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0)
-				),
-				array(),
-				array(),
-				array(
+			[
+				[
+					0 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0]
+				],
+				[],
+				[],
+				[
 					0 => SERVICE_STATUS_OK
-				)
-			),
+				]
+			],
 
 			// max ok
-			array(
-				array(
-					0 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0),
-					1 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1),
-					2 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 2),
-				),
-				array(
-					0 => array(1, 2)
-				),
-				array(
+			[
+				[
+					0 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0],
+					1 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1],
+					2 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 2],
+				],
+				[
+					0 => [1, 2]
+				],
+				[
 					1 => $this->createTrigger(TRIGGER_VALUE_FALSE),
 					2 => $this->createTrigger(TRIGGER_VALUE_FALSE),
-				),
-				array(
+				],
+				[
 					0 => SERVICE_STATUS_OK,
 					1 => SERVICE_STATUS_OK,
 					2 => SERVICE_STATUS_OK
-				)
-			),
+				]
+			],
 
 			// min ok
-			array(
-				array(
-					0 => array('algorithm' => SERVICE_ALGORITHM_MIN, 'triggerid' => 0),
-					1 => array('algorithm' => SERVICE_ALGORITHM_MIN, 'triggerid' => 1),
-					2 => array('algorithm' => SERVICE_ALGORITHM_MIN, 'triggerid' => 2),
-				),
-				array(
-					0 => array(1, 2)
-				),
-				array(
+			[
+				[
+					0 => ['algorithm' => SERVICE_ALGORITHM_MIN, 'triggerid' => 0],
+					1 => ['algorithm' => SERVICE_ALGORITHM_MIN, 'triggerid' => 1],
+					2 => ['algorithm' => SERVICE_ALGORITHM_MIN, 'triggerid' => 2],
+				],
+				[
+					0 => [1, 2]
+				],
+				[
 					1 => $this->createTrigger(TRIGGER_VALUE_FALSE),
 					2 => $this->createTrigger(TRIGGER_VALUE_FALSE),
-				),
-				array(
+				],
+				[
 					0 => SERVICE_STATUS_OK,
 					1 => SERVICE_STATUS_OK,
 					2 => SERVICE_STATUS_OK
-				)
-			),
+				]
+			],
 
 			// max problem
-			array(
-				array(
-					0 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0),
-					1 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1),
-					2 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 2),
-					3 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 3),
-				),
-				array(
-					0 => array(1, 2, 3)
-				),
-				array(
+			[
+				[
+					0 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0],
+					1 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1],
+					2 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 2],
+					3 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 3],
+				],
+				[
+					0 => [1, 2, 3]
+				],
+				[
 					1 => $this->createTrigger(TRIGGER_VALUE_TRUE),
 					2 => $this->createTrigger(TRIGGER_VALUE_TRUE, TRIGGER_SEVERITY_DISASTER),
 					3 => $this->createTrigger(TRIGGER_VALUE_FALSE),
-				),
-				array(
+				],
+				[
 					0 => TRIGGER_SEVERITY_DISASTER,
 					1 => TRIGGER_SEVERITY_AVERAGE,
 					2 => TRIGGER_SEVERITY_DISASTER,
 					3 => SERVICE_STATUS_OK
-				)
-			),
+				]
+			],
 
 			// min problem
-			array(
-				array(
-					0 => array('algorithm' => SERVICE_ALGORITHM_MIN, 'triggerid' => 0),
-					1 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1),
-					2 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 2),
-					3 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 3),
-				),
-				array(
-					0 => array(1, 2, 3)
-				),
-				array(
+			[
+				[
+					0 => ['algorithm' => SERVICE_ALGORITHM_MIN, 'triggerid' => 0],
+					1 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1],
+					2 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 2],
+					3 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 3],
+				],
+				[
+					0 => [1, 2, 3]
+				],
+				[
 					1 => $this->createTrigger(TRIGGER_VALUE_TRUE),
 					2 => $this->createTrigger(TRIGGER_VALUE_TRUE, TRIGGER_SEVERITY_DISASTER),
 					3 => $this->createTrigger(TRIGGER_VALUE_TRUE),
-				),
-				array(
+				],
+				[
 					0 => TRIGGER_SEVERITY_DISASTER,
 					1 => TRIGGER_SEVERITY_AVERAGE,
 					2 => TRIGGER_SEVERITY_DISASTER,
 					3 => TRIGGER_SEVERITY_AVERAGE
-				)
-			),
+				]
+			],
 
 			// graph services with soft links
-			array(
-				array(
-					0 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0),
-					1 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0),
-					2 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0),
-					3 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1),
-				),
-				array(
-					0 => array(1, 2),
-					1 => array(3),
-					2 => array(3),
-				),
-				array(
+			[
+				[
+					0 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0],
+					1 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0],
+					2 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0],
+					3 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1],
+				],
+				[
+					0 => [1, 2],
+					1 => [3],
+					2 => [3],
+				],
+				[
 					1 => $this->createTrigger(TRIGGER_VALUE_TRUE),
-				),
-				array(
+				],
+				[
 					0 => TRIGGER_SEVERITY_AVERAGE,
 					1 => TRIGGER_SEVERITY_AVERAGE,
 					2 => TRIGGER_SEVERITY_AVERAGE,
 					3 => TRIGGER_SEVERITY_AVERAGE,
-				)
-			),
+				]
+			],
 
 			// a service branch with a disabled service in the middle
-			array(
-				array(
-					0 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0),
-					1 => array('algorithm' => SERVICE_ALGORITHM_NONE, 'triggerid' => 0),
-					2 => array('algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1),
-				),
-				array(
-					0 => array(1),
-					1 => array(2)
-				),
-				array(
+			[
+				[
+					0 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 0],
+					1 => ['algorithm' => SERVICE_ALGORITHM_NONE, 'triggerid' => 0],
+					2 => ['algorithm' => SERVICE_ALGORITHM_MAX, 'triggerid' => 1],
+				],
+				[
+					0 => [1],
+					1 => [2]
+				],
+				[
 					1 => $this->createTrigger(TRIGGER_VALUE_TRUE),
-				),
-				array(
+				],
+				[
 					0 => SERVICE_STATUS_OK,
 					1 => SERVICE_STATUS_OK,
 					2 => TRIGGER_SEVERITY_AVERAGE,
-				)
-			),
-		);
+				]
+			],
+		];
 	}
 
 	/**
@@ -201,11 +201,11 @@ class CalculateItServiceStatusTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function createTrigger($value, $severity = TRIGGER_SEVERITY_AVERAGE) {
-		return array(
+		return [
 			'status' => TRIGGER_STATUS_ENABLED,
 			'value' => $value,
 			'priority' => $severity
-		);
+		];
 	}
 
 }
