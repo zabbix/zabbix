@@ -76,9 +76,10 @@ class CTweenBox {
 			$caption_r = _('Other');
 		}
 
-		$grp_tab = new CTable(null, 'tweenBoxTable');
-		$grp_tab->attr('name', $this->name);
-		$grp_tab->attr('id', zbx_formatDomId($this->name));
+		$grp_tab = (new CTable())->
+			addClass('tweenBoxTable');
+		$grp_tab->setAttribute('name', $this->name);
+		$grp_tab->setAttribute('id', zbx_formatDomId($this->name));
 		$grp_tab->setCellSpacing(0);
 		$grp_tab->setCellPadding(0);
 

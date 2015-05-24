@@ -43,13 +43,11 @@ $servicesChildTable->setHeader(array(
 
 $prefix = null;
 foreach ($this->data['db_cservices'] as $service) {
-	$description = new CLink($service['name'], '#', 'service-name');
-	$description->setAttributes(array(
-		'id' => 'service-name-'.$service['serviceid'],
-		'data-name' => $service['name'],
-		'data-serviceid' => $service['serviceid'],
-		'data-trigger' => $service['trigger']
-	));
+	$description = (new CLink($service['name'], '#', 'service-name'))->
+		setAttribute('id', 'service-name-'.$service['serviceid'])->
+		setAttribute('data-name', $service['name'])->
+		setAttribute('data-serviceid', $service['serviceid'])->
+		setAttribute('data-trigger', $service['trigger']);
 
 	$cb = new CCheckBox('services['.$service['serviceid'].']', null, null, $service['serviceid']);
 	$cb->addClass('service-select');

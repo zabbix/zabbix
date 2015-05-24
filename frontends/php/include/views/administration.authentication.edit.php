@@ -120,7 +120,7 @@ $authenticationTab->addTab('authenticationTab', $this->data['title'], $authentic
 // create save button
 $saveButton = new CSubmit('update', _('Update'));
 if ($this->data['is_authentication_type_changed']) {
-	$saveButton->addAction('onclick', 'javascript: if (confirm('.
+	$saveButton->onClick('javascript: if (confirm('.
 		CJs::encodeJson(_('Switching authentication method will reset all except this session! Continue?')).')) {'.
 		'jQuery("#authenticationForm").submit(); return true; } else { return false; }'
 	);

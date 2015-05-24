@@ -59,9 +59,10 @@ if (isset($_REQUEST['serviceid']) && isset($_REQUEST['showgraph'])) {
 	$service = reset($service);
 
 	if ($service) {
-		$table = new CTable(null, 'chart');
-		$table->addRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')));
-		$table->show();
+		$table = (new CTable())->
+			addClass('chart')->
+			addRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')))->
+			show();
 	}
 	else {
 		access_deny();

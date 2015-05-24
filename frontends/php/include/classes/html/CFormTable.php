@@ -57,8 +57,8 @@ class CFormTable extends CForm {
 		if (!is_string($value)) {
 			return $this->error('Incorrect value for setName "'.$value.'".');
 		}
-		$this->attr('name', $value);
-		$this->attr('id', zbx_formatDomId($value));
+		$this->setAttribute('name', $value);
+		$this->setAttribute('id', zbx_formatDomId($value));
 		return true;
 	}
 
@@ -101,8 +101,8 @@ class CFormTable extends CForm {
 			);
 		}
 
-		if (!is_null($id)) {
-			$item1->attr('id', zbx_formatDomId($id));
+		if ($id !== null) {
+			$item1->setAttribute('id', zbx_formatDomId($id));
 		}
 		array_push($this->center_items, $item1);
 
@@ -136,7 +136,8 @@ class CFormTable extends CForm {
 
 	public function bodyToString() {
 		$res = parent::bodyToString();
-		$tbl = new CTable(null, $this->tableclass);
+		$tbl = new CTable();
+		$tbl->addClass($this->tableclass);
 		$tbl->setCellSpacing(0);
 		$tbl->setCellPadding(1);
 		$tbl->setAlign($this->align);

@@ -41,7 +41,7 @@ if (isset($this->data['service'])) {
 // create form list
 $servicesFormList = new CFormList('servicesFormList');
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $servicesFormList->addRow(_('Name'), $nameTextBox);
 
 // append parent link to form list
@@ -88,10 +88,11 @@ $servicesFormList->addRow(_('Sort order (0->999)'), new CTextBox('sortorder', $t
 /*
  * Dependencies tab
  */
-$servicesChildTable = new CTable(_('No dependencies defined.'), 'formElementTable');
-$servicesChildTable->setAttribute('style', 'min-width:500px;');
-$servicesChildTable->setAttribute('id', 'service_children');
-$servicesChildTable->setHeader(array(_('Services'), _('Soft'), _('Trigger'), _('Action')));
+$servicesChildTable = (new CTable(_('No dependencies defined.')))->
+	addClass('formElementTable')->
+	setAttribute('style', 'min-width:500px;')->
+	setAttribute('id', 'service_children')->
+	setHeader(array(_('Services'), _('Soft'), _('Trigger'), _('Action')));
 foreach ($this->data['children'] as $child) {
 	$childrenLink = new CLink($child['name'], 'services.php?form=1&serviceid='.$child['serviceid']);
 	$childrenLink->setAttribute('target', '_blank');
@@ -128,9 +129,10 @@ $servicesDependenciesFormList->addRow(
  * Service times tab
  */
 $servicesTimeFormList = new CFormList('servicesTimeFormList');
-$servicesTimeTable = new CTable(_('No times defined. Work 24x7.'), 'formElementTable');
-$servicesTimeTable->setAttribute('style', 'min-width: 500px;');
-$servicesTimeTable->setHeader(array(_('Type'), _('Interval'), _('Note'), _('Action')));
+$servicesTimeTable = (new CTable(_('No times defined. Work 24x7.')))->
+	addClass('formElementTable')->
+	setAttribute('style', 'min-width: 500px;')->
+	setHeader(array(_('Type'), _('Interval'), _('Note'), _('Action')));
 
 $i = 0;
 foreach ($this->data['times'] as $serviceTime) {
@@ -173,7 +175,8 @@ $servicesTimeFormList->addRow(
 );
 
 // create service time table
-$serviceTimeTable = new CTable(null, 'formElementTable');
+$serviceTimeTable = (new CTable())->
+	addClass('formElementTable');
 if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
 	// downtime since
 	if (isset($_REQUEST['new_service_time']['from'])) {

@@ -251,7 +251,9 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 			}
 		}
 
-		$table = new CTable(_('No accessible resources'), 'right_table calculated');
+		$table = (new CTable(_('No accessible resources')))->
+			addClass('right_table')->
+			addClass('calculated');
 		if (!$isHeaderDisplayed) {
 			$table->setHeader(array(_('Read-write'), _('Read only'), _('Deny')), 'header');
 			$isHeaderDisplayed = true;
@@ -1494,7 +1496,8 @@ function getTriggerFormData($exprAction) {
 }
 
 function get_timeperiod_form() {
-	$tblPeriod = new CTable(null, 'formElementTable');
+	$tblPeriod = (new CTable())->
+		addClass('formElementTable');
 
 	// init new_timeperiod variable
 	$new_timeperiod = getRequest('new_timeperiod', array());

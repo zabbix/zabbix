@@ -34,7 +34,7 @@ $commentFormList = new CFormList('commentFormList');
 $commentTextArea = new CTextArea('comments', CMacrosResolverHelper::resolveTriggerDescription($this->data['trigger']), array(
 	'rows' => 25, 'width' => ZBX_TEXTAREA_BIG_WIDTH, 'readonly' => $this->data['isCommentExist']
 ));
-$commentTextArea->attr('autofocus', 'autofocus');
+$commentTextArea->setAttribute('autofocus', 'autofocus');
 $commentFormList->addRow(_('Description'), $commentTextArea);
 
 // append tabs to form

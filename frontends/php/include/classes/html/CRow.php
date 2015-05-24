@@ -24,8 +24,10 @@ class CRow extends CTag {
 	public function __construct($item = null, $class = null, $id = null) {
 		parent::__construct('tr', 'yes');
 		$this->addItem($item);
-		$this->attr('class', $class);
-		$this->attr('id', $id);
+		$this->addClass($class);
+		if ($id !== null) {
+			$this->setAttribute('id', $id);
+		}
 	}
 
 	public function addItem($item) {

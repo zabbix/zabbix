@@ -25,7 +25,7 @@ $iconMapTab = new CFormList();
 
 $name = new CTextBox('iconmap[name]', $this->data['iconmap']['name']);
 $name->setAttribute('maxlength', 64);
-$name->attr('autofocus', 'autofocus');
+$name->setAttribute('autofocus', 'autofocus');
 $iconMapTab->addRow(_('Name'), $name);
 
 $iconMapTable = new CTable();

@@ -22,7 +22,8 @@
 class CServerInfo extends CTable {
 
 	public function __construct() {
-		parent::__construct(null, 'server_info');
+		parent::__construct();
+		$this->addClass('server_info');
 	}
 
 	public function bodyToString() {

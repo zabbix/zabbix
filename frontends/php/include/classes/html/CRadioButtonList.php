@@ -46,7 +46,7 @@ class CRadioButtonList extends CDiv {
 
 		$radio = new CInput('radio', $this->name, $value, null, $id);
 		if (strcmp($value, $this->value) == 0 || !is_null($checked) || $checked) {
-			$radio->attr('checked', 'checked');
+			$radio->setAttribute('checked', 'checked');
 		}
 
 		$label = new CLabel($name, $id);

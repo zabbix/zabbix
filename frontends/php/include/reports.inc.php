@@ -174,7 +174,7 @@ function valueDistributionFormForMultipleItems($items = array(), $periods = arra
 				$period['report_timesince'].'&report_timetill='.$period['report_timetill'].'&color='.$period['color'];
 
 			$caption = new CSpan($period['caption'], 'link');
-			$caption->addAction('onclick', "return PopUp('".$edit_link."', 0, 0, 'period_form');");
+			$caption->onClick("return PopUp('".$edit_link."', 0, 0, 'period_form');");
 
 			$periods_table->addRow(array(
 				new CCheckBox('group_pid['.$pid.']'),

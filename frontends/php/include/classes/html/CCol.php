@@ -24,30 +24,32 @@ class CCol extends CTag {
 	public function __construct($item = null, $class = null, $colspan = null, $width = null) {
 		parent::__construct('td', 'yes');
 		$this->addItem($item);
-		$this->attr('class', $class);
-		if (!empty($colspan)) {
-			$this->attr('colspan', $colspan);
+		if ($class !== null) {
+			$this->addClass($class);
 		}
-		if (!empty($width)) {
-			$this->attr('width', $width);
+		if ($colspan !== null) {
+			$this->setAttribute('colspan', $colspan);
+		}
+		if ($width !== null) {
+			$this->setAttribute('width', $width);
 		}
 	}
 
 	public function setAlign($value) {
-		$this->attr('align', strval($value));
+		$this->setAttribute('align', strval($value));
 	}
 
 	public function setRowSpan($value) {
-		$this->attr('rowspan', strval($value));
+		$this->setAttribute('rowspan', strval($value));
 	}
 
 	public function setColSpan($value) {
-		$this->attr('colspan', strval($value));
+		$this->setAttribute('colspan', strval($value));
 	}
 
 	public function setWidth($value) {
 		if (is_string($value)) {
-			$this->attr('width', $value);
+			$this->setAttribute('width', $value);
 		}
 	}
 }

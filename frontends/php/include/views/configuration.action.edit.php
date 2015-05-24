@@ -40,7 +40,7 @@ else {
  */
 $actionFormList = new CFormList();
 $nameTextBox = new CTextBox('name', $this->data['action']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $actionFormList->addRow(_('Name'), $nameTextBox);
 
 $actionFormList->addRow(_('Default subject'), new CTextBox('def_shortdata', $this->data['action']['def_shortdata'], ZBX_TEXTBOX_STANDARD_SIZE));
@@ -65,10 +65,11 @@ $actionFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['acti
 $conditionFormList = new CFormList();
 
 // create condition table
-$conditionTable = new CTable(_('No conditions defined.'), 'formElementTable');
-$conditionTable->attr('id', 'conditionTable');
-$conditionTable->attr('style', 'min-width: 350px;');
-$conditionTable->setHeader(array(_('Label'), _('Name'), _('Action')));
+$conditionTable = (new CTable(_('No conditions defined.')))->
+	addClass('formElementTable')->
+	setAttrubute('id', 'conditionTable')->
+	setAttribute('style', 'min-width: 350px;')->
+	setHeader(array(_('Label'), _('Name'), _('Action')));
 
 $i = 0;
 
@@ -115,8 +116,8 @@ if ($this->data['action']['filter']['conditions']) {
 }
 
 $formula = new CTextBox('formula', $this->data['action']['filter']['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
-$formula->attr('id', 'formula');
-$formula->attr('placeholder', 'A or (B and C) &hellip;');
+$formula->setAttribute('id', 'formula');
+$formula->setAttribute('placeholder', 'A or (B and C) &hellip;');
 if ($this->data['action']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
 	$formula->addClass('hidden');
 }
@@ -363,8 +364,9 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsou
 }
 
 // create operation table
-$operationsTable = new CTable(_('No operations defined.'), 'formElementTable');
-$operationsTable->attr('style', 'min-width: 600px;');
+$operationsTable = (new CTable(_('No operations defined.')))->
+	addCLass('formElementTable')->
+	setAttribute('style', 'min-width: 600px;');
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationsTable->setHeader(array(_('Steps'), _('Details'), _('Start in'), _('Duration (sec)'), _('Action')));
 	$delay = count_operations_delay($this->data['action']['operations'], $this->data['action']['esc_period']);
@@ -477,7 +479,8 @@ $operationFormList->addRow(_('Action operations'), new CDiv(array($operationsTab
 
 // create new operation table
 if (!empty($this->data['new_operation'])) {
-	$newOperationsTable = new CTable(null, 'formElementTable');
+	$newOperationsTable = (new CTable())->
+		addClass('formElementTable');
 	$newOperationsTable->addItem(new CVar('new_operation[actionid]', $this->data['actionid']));
 
 	if (isset($this->data['new_operation']['id'])) {
@@ -489,14 +492,13 @@ if (!empty($this->data['new_operation'])) {
 
 	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 		$stepFrom = new CNumericBox('new_operation[esc_step_from]', $this->data['new_operation']['esc_step_from'], 5);
-		$stepFrom->attr('size', 6);
-		$stepFrom->addAction(
-			'onchange',
+		$stepFrom->setAttribute('size', 6);
+		$stepFrom->onChange(
 			'javascript:'.$stepFrom->getAttribute('onchange').' if (this.value == 0) this.value = 1;'
 		);
 
 		$stepTo = new CNumericBox('new_operation[esc_step_to]', $this->data['new_operation']['esc_step_to'], 5);
-		$stepTo->attr('size', 6);
+		$stepTo->setAttribute('size', 6);
 
 		$stepTable = new CTable();
 		$stepTable->addRow(array(_('From'), $stepFrom), 'indent_both');
@@ -571,22 +573,27 @@ if (!empty($this->data['new_operation'])) {
 				$this->data['new_operation']['opmessage']['default_msg'] = 0;
 			}
 
-			$usrgrpList = new CTable(null, 'formElementTable');
-			$usrgrpList->setHeader(array(_('User group'), _('Action')));
-			$usrgrpList->attr('style', 'min-width: 310px;');
-			$usrgrpList->setAttribute('id', 'opmsgUsrgrpList');
+			$usrgrpList = (new CTable())->
+				addClass('formElementTable')->
+				setHeader([
+					_('User group'),
+					_('Action')
+				])->
+				setAttribute('style', 'min-width: 310px;')->
+				setAttribute('id', 'opmsgUsrgrpList');
 
 			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")', 'link_menu');
-			$addUsrgrpBtn->attr('id', 'addusrgrpbtn');
+			$addUsrgrpBtn->setAttribute('id', 'addusrgrpbtn');
 			$usrgrpList->addRow(new CRow(new CCol($addUsrgrpBtn, null, 2), null, 'opmsgUsrgrpListFooter'));
 
-			$userList = new CTable(null, 'formElementTable');
-			$userList->setHeader(array(_('User'), _('Action')));
-			$userList->attr('style', 'min-width: 310px;');
-			$userList->setAttribute('id', 'opmsgUserList');
+			$userList = (new CTable())->
+				addClass('formElementTable')->
+				setHeader(array(_('User'), _('Action')))->
+				setAttribute('style', 'min-width: 310px;')->
+				setAttribute('id', 'opmsgUserList');
 
 			$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")', 'link_menu');
-			$addUserBtn->attr('id', 'adduserbtn');
+			$addUserBtn->setAttribute('id', 'adduserbtn');
 			$userList->addRow(new CRow(new CCol($addUserBtn, null, 2), null, 'opmsgUserListFooter'));
 
 			// add participations
@@ -695,9 +702,10 @@ if (!empty($this->data['new_operation'])) {
 				}
 			}
 
-			$cmdList = new CTable(null, 'formElementTable');
-			$cmdList->attr('style', 'min-width: 310px;');
-			$cmdList->setHeader(array(_('Target'), _('Action')));
+			$cmdList = (new CTable())->
+				addClass('formElementTable')->
+				setAttribute('style', 'min-width: 310px;')->
+				setHeader(array(_('Target'), _('Action')));
 
 			$addCmdBtn = new CButton('add', _('New'), 'javascript: showOpCmdForm(0, "new");', 'link_menu');
 			$cmdList->addRow(new CRow(new CCol($addCmdBtn, null, 3), null, 'opCmdListFooter'));
@@ -822,7 +830,7 @@ if (!empty($this->data['new_operation'])) {
 
 			// set custom id because otherwise they are set based on name (sick!) and produce duplicate ids
 			$passphraseCB = new CTextBox('new_operation[opcommand][password]', $this->data['new_operation']['opcommand']['password'], ZBX_TEXTBOX_SMALL_SIZE);
-			$passphraseCB->attr('id', 'new_operation_opcommand_passphrase');
+			$passphraseCB->setAttribute('id', 'new_operation_opcommand_passphrase');
 			$newOperationsTable->addRow(array(_('Key passphrase'), $passphraseCB), 'class_authentication_passphrase hidden');
 
 			// ssh && telnet
@@ -839,7 +847,7 @@ if (!empty($this->data['new_operation'])) {
 			$newOperationsTable->addRow(array(_('Commands'), $commandTextArea), 'class_opcommand_command hidden indent_both');
 
 			$commandIpmiTextBox = new CTextBox('new_operation[opcommand][command]', $this->data['new_operation']['opcommand']['command'], ZBX_TEXTBOX_STANDARD_SIZE);
-			$commandIpmiTextBox->attr('id', 'opcommand_command_ipmi');
+			$commandIpmiTextBox->setAttribute('id', 'opcommand_command_ipmi');
 			$newOperationsTable->addRow(array(_('Commands'), $commandIpmiTextBox), 'class_opcommand_command_ipmi hidden indent_both');
 			break;
 
@@ -970,10 +978,11 @@ if (!empty($this->data['new_operation'])) {
 		$allowed_opconditions = get_opconditions_by_eventsource($this->data['eventsource']);
 		$grouped_opconditions = array();
 
-		$operationConditionsTable = new CTable(_('No conditions defined.'), 'formElementTable');
-		$operationConditionsTable->attr('id', 'operationConditionTable');
-		$operationConditionsTable->attr('style', 'min-width: 310px;');
-		$operationConditionsTable->setHeader(array(_('Label'), _('Name'), _('Action')));
+		$operationConditionsTable = (new CTable(_('No conditions defined.')))->
+			addClass('formElementTable')->
+			setAttribute('id', 'operationConditionTable')->
+			setAttribute('style', 'min-width: 310px;')->
+			setHeader(array(_('Label'), _('Name'), _('Action')));
 
 		$i = 0;
 
@@ -1026,7 +1035,7 @@ if (!empty($this->data['new_operation'])) {
 				CONDITION_EVAL_TYPE_OR => _('Or')
 			)
 		);
-		$calcTypeComboBox->attr('id', 'operationEvaltype');
+		$calcTypeComboBox->setAttribute('id', 'operationEvaltype');
 
 		$newOperationsTable->addRow(array(
 				_('Type of calculation'),
@@ -1043,7 +1052,8 @@ if (!empty($this->data['new_operation'])) {
 
 	// append new operation condition to form list
 	if (isset($_REQUEST['new_opcondition'])) {
-		$newOperationConditionTable = new CTable(null, 'formElementTable');
+		$newOperationConditionTable = (new CTable())->
+			addClass('formElementTable');
 
 		$allowedOpConditions = get_opconditions_by_eventsource($this->data['eventsource']);
 

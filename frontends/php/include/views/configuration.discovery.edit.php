@@ -34,7 +34,7 @@ if (!empty($this->data['druleid'])) {
 // create form list
 $discoveryFormList = new CFormList();
 $nameTextBox = new CTextBox('name', $this->data['drule']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $discoveryFormList->addRow(_('Name'), $nameTextBox);
 
 // append proxy to form list
@@ -48,7 +48,8 @@ $discoveryFormList->addRow(_('IP range'), new CTextBox('iprange', $this->data['d
 $discoveryFormList->addRow(_('Delay (in sec)'), new CNumericBox('delay', $this->data['drule']['delay'], 8));
 
 // append checks to form list
-$checkTable = new CTable(null, 'formElementTable');
+$checkTable = (new CTable())
+	->addClass('formElementTable');
 $checkTable->addRow(new CRow(
 	new CCol(
 		new CButton('newCheck', _('New'), null, 'link_menu'),

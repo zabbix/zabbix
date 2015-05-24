@@ -125,7 +125,9 @@ class CWidget {
 		}
 
 		// header table
-		$table = new CTable(null, $this->css_class.' maxwidth');
+		$table = (new CTable())->
+			addClass($this->css_class)->
+			addClass('maxwidth');
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 		$table->addRow($this->createHeaderRow($header['left'], $columnRights), 'first');

@@ -44,7 +44,7 @@ $userFormList = new CFormList('userFormList');
 
 if (!$data['is_profile']) {
 	$nameTextBox = new CTextBox('alias', $this->data['alias'], ZBX_TEXTBOX_STANDARD_SIZE);
-	$nameTextBox->attr('autofocus', 'autofocus');
+	$nameTextBox->setAttribute('autofocus', 'autofocus');
 	$userFormList->addRow(_('Alias'), $nameTextBox);
 	$userFormList->addRow(_x('Name', 'user first name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
 	$userFormList->addRow(_('Surname'), new CTextBox('surname', $this->data['surname'], ZBX_TEXTBOX_STANDARD_SIZE));
@@ -131,7 +131,7 @@ setlocale(LC_MONETARY, zbx_locale_variants(CWebUser::$data['lang']));
 $languageError = '';
 if (!function_exists('bindtextdomain')) {
 	$languageError = 'Translations are unavailable because the PHP gettext module is missing.';
-	$languageComboBox->attr('disabled', 'disabled');
+	$languageComboBox->setAttribute('disabled', 'disabled');
 }
 elseif (!$allLocalesAvailable) {
 	$languageError = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
@@ -254,8 +254,9 @@ if ($this->data['is_profile']) {
 		new CButton('stop', _('Stop'), 'javascript: AudioControl.stop();', 'button-form')
 	);
 
-	$triggersTable = new CTable('', 'invisible');
-	$triggersTable->addRow($resolved);
+	$triggersTable = (new CTable(''))->
+		addClass('invisible')->
+		addRow($resolved);
 
 	$msgVisibility = array('1' => array(
 		'messages[timeout]',

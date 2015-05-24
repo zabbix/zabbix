@@ -47,8 +47,10 @@ if ($this->data['config']['blink_period'] > 0) {
 	for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
 		$row->addItem(new CCol(SPACE, getSeverityStyle($i)));
 	}
-	$col = new CTable('', 'blink overview-mon-severities');
-	$col->addRow($row);
+	$col = (new CTable(''))->
+		addClass('blink')->
+		addClass('overview-mon-severities')->
+		addRow($row);
 
 	// double div necassary for FireFox
 	$col = new CCol(new CDiv(new CDiv($col), 'overview-mon-severities-container'));

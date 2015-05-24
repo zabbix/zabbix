@@ -36,7 +36,7 @@ if (isset($this->data['sysmap']['sysmapid'])) {
 $sysmapList = new CFormList();
 
 $nameTextBox = new CTextBox('name', $this->data['sysmap']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $sysmapList->addRow(_('Name'), $nameTextBox);
 $sysmapList->addRow(_('Width'), new CNumericBox('width', $this->data['sysmap']['width'], 5));
 $sysmapList->addRow(_('Height'), new CNumericBox('height', $this->data['sysmap']['height'], 5));
@@ -135,9 +135,10 @@ $sysmapList->addRow(_('Problem display'), $showUnackComboBox);
 $sysmapList->addRow(_('Minimum trigger severity'), new CSeverity(array('name' => 'severity_min', 'value' => $this->data['sysmap']['severity_min'])));
 
 // create url table
-$urlTable = new CTable(_('No URLs defined.'), 'formElementTable');
-$urlTable->setAttribute('style', 'min-width: 500px;');
-$urlTable->setHeader(array(_('Name'), _('URL'), _('Element'), SPACE));
+$urlTable = (new CTable(_('No URLs defined.')))->
+	addClass('formElementTable')->
+	setAttribute('style', 'min-width: 500px;')->
+	setHeader(array(_('Name'), _('URL'), _('Element'), SPACE));
 if (empty($this->data['sysmap']['urls'])) {
 	$this->data['sysmap']['urls'][] = array('name' => '', 'url' => '', 'elementtype' => 0);
 }
@@ -147,7 +148,7 @@ foreach ($this->data['sysmap']['urls'] as $url) {
 	$urlLink = new CTextBox('urls['.$i.'][url]', $url['url'], 32);
 	$urlEtype = new CComboBox('urls['.$i.'][elementtype]', $url['elementtype'], null, sysmap_element_types());
 	$removeButton = new CSpan(_('Remove'), ZBX_STYLE_LINK_ACTION.' link_menu');
-	$removeButton->addAction('onclick', '$("urlEntry_'.$i.'").remove();');
+	$removeButton->onClick('$("urlEntry_'.$i.'").remove();');
 
 	$urlRow = new CRow(array($urlLabel, $urlLink, $urlEtype, $removeButton));
 	$urlRow->setAttribute('id', 'urlEntry_'.$i);
@@ -164,7 +165,7 @@ $templateUrlLink->setAttribute('disabled', 'disabled');
 $templateUrlEtype = new CComboBox('urls[#{id}][elementtype]', null, null, sysmap_element_types());
 $templateUrlEtype->setAttribute('disabled', 'disabled');
 $templateRemoveButton = new CSpan(_('Remove'), ZBX_STYLE_LINK_ACTION.' link_menu');
-$templateRemoveButton->addAction('onclick', '$("entry_#{id}").remove();');
+$templateRemoveButton->onClick('$("entry_#{id}").remove();');
 $templateUrlRow = new CRow(array($templateUrlLabel, $templateUrlLink, $templateUrlEtype, $templateRemoveButton));
 $templateUrlRow->addStyle('display: none');
 $templateUrlRow->setAttribute('id', 'urlEntryTpl');
@@ -172,7 +173,7 @@ $urlTable->addRow($templateUrlRow);
 
 // append "add" button to url table
 $addButton = new CSpan(_('Add'), ZBX_STYLE_LINK_ACTION.' link_menu');
-$addButton->addAction('onclick', 'cloneRow("urlEntryTpl", '.$i.')');
+$addButton->onClick('cloneRow("urlEntryTpl", '.$i.')');
 $addButtonColumn = new CCol($addButton);
 $addButtonColumn->setColSpan(4);
 $urlTable->addRow($addButtonColumn);
