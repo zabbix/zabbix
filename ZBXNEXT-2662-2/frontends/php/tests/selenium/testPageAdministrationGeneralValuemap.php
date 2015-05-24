@@ -34,7 +34,7 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestTextPresent('CONFIGURATION OF VALUE MAPPING');
 		$this->zbxTestTextPresent('Value mapping');
-		$this->zbxTestTextPresent(array('Name', 'Value map'));
+		$this->zbxTestTextPresent(['Name', 'Value map']);
 		$this->assertElementPresent('form');
 		// checking that all valuemaps are present in the report
 		$this->zbxTestTextPresent($valuemap['name']);

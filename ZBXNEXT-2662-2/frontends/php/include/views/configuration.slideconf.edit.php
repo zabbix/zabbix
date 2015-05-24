@@ -43,13 +43,13 @@ $slideFormList->addRow(_('Default delay (in seconds)'), new CNumericBox('delay',
 $slideTable = new CTableInfo();
 $slideTable->setAttribute('style', 'min-width: 312px;');
 $slideTable->setAttribute('id', 'slideTable');
-$slideTable->setHeader(array(
+$slideTable->setHeader([
 	new CColHeader(SPACE, null, null, '15'),
 	new CColHeader(SPACE, null, null, '15'),
 	_('Screen'),
 	new CColHeader(_('Delay'), null, null, '70'),
 	new CColHeader(_('Action'), null, null, '50')
-));
+]);
 
 $i = 1;
 foreach ($this->data['slides'] as $key => $slides) {
@@ -68,13 +68,13 @@ foreach ($this->data['slides'] as $key => $slides) {
 	$removeButton->setAttribute('remove_slide', $key);
 
 	$row = new CRow(
-		array(
+		[
 			new CCol(new CDiv(null, 'drag-icon'), 'td-drag-icon'),
 			new CSpan($i++.':', 'rowNum', 'current_slide_'.$key),
 			$name,
 			$delay,
 			$removeButton
-		),
+		],
 		'sortable',
 		'slides_'.$key
 	);
@@ -104,17 +104,17 @@ $slideTab->addTab('slideTab', _('Slide'), $slideFormList);
 if (isset($this->data['slideshowid'])) {
 	$slideTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CSubmit('clone', _('Clone')),
-			new CButtonDelete(_('Delete slide show?'), url_params(array('form', 'slideshowid'))),
+			new CButtonDelete(_('Delete slide show?'), url_params(['form', 'slideshowid'])),
 			new CButtonCancel()
-		)
+		]
 	));
 }
 else {
 	$slideTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 

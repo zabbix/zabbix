@@ -27,7 +27,7 @@ class testPageStatusOfZabbix extends CWebTest {
 		$this->zbxTestTextPresent('STATUS OF ZABBIX');
 
 		// header
-		$this->zbxTestTextPresent(array('Parameter', 'Value', 'Details'));
+		$this->zbxTestTextPresent(['Parameter', 'Value', 'Details']);
 
 		// data
 		$this->zbxTestTextPresent('Zabbix server is running');

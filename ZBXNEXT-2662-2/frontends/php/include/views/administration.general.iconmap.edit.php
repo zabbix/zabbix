@@ -38,7 +38,7 @@ if (isset($this->data['iconmapid'])) {
 }
 
 // header
-$iconMapTable->addRow(array(SPACE, SPACE, _('Inventory field'), _('Expression'), _('Icon'), SPACE, SPACE), 'header');
+$iconMapTable->addRow([SPACE, SPACE, _('Inventory field'), _('Expression'), _('Icon'), SPACE, SPACE], 'header');
 
 order_result($this->data['iconmap']['mappings'], 'sortorder');
 $i = 0;
@@ -52,7 +52,7 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 
 	$expressionTextBox = new CTextBox('iconmap[mappings]['.$i.'][expression]', $mapping['expression']);
 	$expressionTextBox->setAttribute('maxlength', 64);
-	$expressionTextBox = array($expressionTextBox);
+	$expressionTextBox = [$expressionTextBox];
 	if (isset($mapping['iconmappingid'])) {
 		$expressionTextBox[] = new CVar('iconmap[mappings]['.$i.'][iconmappingid]', $mapping['iconmappingid']);
 	}
@@ -66,7 +66,7 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 		'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null, 'pointer preview');
 	$iconPreviewImage->setAttribute('data-image-full', 'imgstore.php?iconid='.$mapping['iconid']);
 
-	$row = new CRow(array(
+	$row = new CRow([
 		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
 		$numSpan,
 		$profileLinksComboBox,
@@ -74,7 +74,7 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 		$iconsComboBox,
 		$iconPreviewImage,
 		new CButton('remove', _('Remove'), '', 'link_menu removeMapping'),
-	), 'sortable');
+	], 'sortable');
 	$row->setAttribute('id', 'iconmapidRow_'.$i);
 	$iconMapTable->addRow($row);
 
@@ -107,7 +107,7 @@ $iconPreviewImage = new CImg('imgstore.php?iconid='.$firstIconId.'&width='.ZBX_I
 $iconPreviewImage->setAttribute('data-image-full', 'imgstore.php?iconid='.$firstIconId);
 
 // row template
-$hiddenRowTemplate = new CRow(array(
+$hiddenRowTemplate = new CRow([
 	new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
 	$numSpan,
 	$profileLinksComboBox,
@@ -115,7 +115,7 @@ $hiddenRowTemplate = new CRow(array(
 	$iconsComboBox,
 	$iconPreviewImage,
 	new CButton('remove', _('Remove'), '', 'link_menu removeMapping'),
-), 'hidden');
+], 'hidden');
 $hiddenRowTemplate->setAttribute('id', 'rowTpl');
 $iconMapTable->addRow($hiddenRowTemplate);
 
@@ -135,7 +135,7 @@ $iconPreviewImage = new CImg('imgstore.php?iconid='.$this->data['iconmap']['defa
 	'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null, 'pointer preview');
 $iconPreviewImage->setAttribute('data-image-full', 'imgstore.php?iconid='.$this->data['iconmap']['default_iconid']);
 
-$iconMapTable->addRow(array(new CCol(_('Default'), null, 4), $iconsComboBox, $iconPreviewImage));
+$iconMapTable->addRow([new CCol(_('Default'), null, 4), $iconsComboBox, $iconPreviewImage]);
 // </default icon row>
 
 $iconMapTab->addRow(_('Mappings'), new CDiv($iconMapTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
@@ -146,17 +146,17 @@ $iconMapView->addTab('iconmap', _('Icon map'), $iconMapTab);
 if (isset($this->data['iconmapid'])) {
 	$iconMapView->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete icon map?'), url_param('form').url_param('iconmapid')),
 			new CButtonCancel()
-		)
+		]
 	));
 }
 else {
 	$iconMapView->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 

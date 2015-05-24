@@ -28,16 +28,16 @@ $page['file'] = 'adm.images.php';
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'imageid' =>	array(T_ZBX_INT, O_NO,	P_SYS,		DB_ID,		'isset({form}) && {form} == "update"'),
-	'name' =>		array(T_ZBX_STR, O_NO,	null,		NOT_EMPTY,	'isset({add}) || isset({update})'),
-	'imagetype' =>	array(T_ZBX_INT, O_OPT, null,		IN('1,2'),	'isset({add}) || isset({update})'),
+$fields = [
+	'imageid' =>	[T_ZBX_INT, O_NO,	P_SYS,		DB_ID,		'isset({form}) && {form} == "update"'],
+	'name' =>		[T_ZBX_STR, O_NO,	null,		NOT_EMPTY,	'isset({add}) || isset({update})'],
+	'imagetype' =>	[T_ZBX_INT, O_OPT, null,		IN('1,2'),	'isset({add}) || isset({update})'],
 	// actions
-	'add' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
-	'update' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
-	'delete' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
-	'form' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null)
-);
+	'add' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
+	'update' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
+	'delete' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
+	'form' =>		[T_ZBX_STR, O_OPT, P_SYS,		null,		null]
+];
 check_fields($fields);
 
 /*
@@ -77,20 +77,20 @@ if (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if (hasRequest('update')) {
-			$result = API::Image()->update(array(
+			$result = API::Image()->update([
 				'imageid' => getRequest('imageid'),
 				'name' => getRequest('name'),
 				'image' => $image
-			));
+			]);
 
 			$audit_action = 'Image ['.getRequest('name').'] updated';
 		}
 		else {
-			$result = API::Image()->create(array(
+			$result = API::Image()->create([
 				'name' => $_REQUEST['name'],
 				'imagetype' => $_REQUEST['imagetype'],
 				'image' => $image
-			));
+			]);
 
 			$audit_action = 'Image ['.$_REQUEST['name'].'] added';
 		}
@@ -113,7 +113,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['imageid'])) {
 	DBstart();
 
 	$image = get_image_by_imageid($_REQUEST['imageid']);
-	$result = API::Image()->delete(array(getRequest('imageid')));
+	$result = API::Image()->delete([getRequest('imageid')]);
 
 	if ($result) {
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, 'Image ['.$image['name'].'] deleted');
@@ -133,7 +133,7 @@ $form->cleanItems();
 $controls = new CList();
 $controls->addItem(new CComboBox('configDropDown', 'adm.images.php',
 	'redirect(this.options[this.selectedIndex].value);',
-	array(
+	[
 		'adm.gui.php' => _('GUI'),
 		'adm.housekeeper.php' => _('Housekeeping'),
 		'adm.images.php' => _('Images'),
@@ -145,7 +145,7 @@ $controls->addItem(new CComboBox('configDropDown', 'adm.images.php',
 		'adm.triggerseverities.php' => _('Trigger severities'),
 		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 		'adm.other.php' => _('Other')
-	)
+	]
 ));
 
 if (!isset($_REQUEST['form'])) {
@@ -158,10 +158,10 @@ $form->addItem($controls);
 
 $imageWidget = (new CWidget())->setTitle(_('Images'))->setControls($form);
 
-$data = array(
+$data = [
 	'form' => getRequest('form'),
 	'widget' => &$imageWidget
-);
+];
 
 if (!empty($data['form'])) {
 	if (isset($_REQUEST['imageid'])) {
@@ -180,10 +180,10 @@ if (!empty($data['form'])) {
 else {
 	$data['imagetype'] = getRequest('imagetype', IMAGE_TYPE_ICON);
 
-	$data['images'] = API::Image()->get(array(
-		'filter' => array('imagetype' => $data['imagetype']),
-		'output' => array('imageid', 'imagetype', 'name')
-	));
+	$data['images'] = API::Image()->get([
+		'filter' => ['imagetype' => $data['imagetype']],
+		'output' => ['imageid', 'imagetype', 'name']
+	]);
 	order_result($data['images'], 'name');
 
 	$imageForm = new CView('administration.general.image.list', $data);

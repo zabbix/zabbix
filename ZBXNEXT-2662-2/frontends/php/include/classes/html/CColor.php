@@ -33,7 +33,7 @@ class CColor extends CObject {
 
 		$lbl = new CColorCell('lbl_'.$name, $value, 'javascript: show_color_picker("'.$name.'")');
 
-		$this->addItem(array($txt, $lbl));
+		$this->addItem([$txt, $lbl]);
 
 		insert_show_color_picker_javascript();
 	}

@@ -23,7 +23,7 @@ $maintenanceWidget = (new CWidget())->setTitle(_('Maintenance periods'));
 // create new maintenance button
 $createForm = (new CForm('get'))->cleanItems();
 $controls = new CList();
-$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+$controls->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]);
 $controls->addItem(new CSubmit('form', _('Create maintenance period')));
 $createForm->addItem($controls);
 $maintenanceWidget->setControls($createForm);
@@ -34,7 +34,7 @@ $maintenanceForm->setName('maintenanceForm');
 
 // create table
 $maintenanceTable = new CTableInfo();
-$maintenanceTable->setHeader(array(
+$maintenanceTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');"),
 		'cell-width'),
@@ -44,7 +44,7 @@ $maintenanceTable->setHeader(array(
 	make_sorting_header(_('Active till'), 'active_till', $this->data['sort'], $this->data['sortorder']),
 	_('State'),
 	_('Description')
-));
+]);
 
 foreach ($this->data['maintenances'] as $maintenance) {
 	$maintenanceid = $maintenance['maintenanceid'];
@@ -61,7 +61,7 @@ foreach ($this->data['maintenances'] as $maintenance) {
 			break;
 	}
 
-	$maintenanceTable->addRow(array(
+	$maintenanceTable->addRow([
 		new CCheckBox('maintenanceids['.$maintenanceid.']', null, null, $maintenanceid),
 		new CLink($maintenance['name'], 'maintenance.php?form=update&maintenanceid='.$maintenanceid),
 		$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
@@ -69,17 +69,17 @@ foreach ($this->data['maintenances'] as $maintenance) {
 		zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_till']),
 		$maintenanceStatus,
 		$maintenance['description']
-	));
+	]);
 }
 
 // append table to form
-$maintenanceForm->addItem(array(
+$maintenanceForm->addItem([
 	$maintenanceTable,
 	$this->data['paging'],
-	new CActionButtonList('action', 'maintenanceids', array(
-		'maintenance.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected maintenance periods?'))
-	))
-));
+	new CActionButtonList('action', 'maintenanceids', [
+		'maintenance.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maintenance periods?')]
+	])
+]);
 
 // append form to widget
 $maintenanceWidget->addItem($maintenanceForm);

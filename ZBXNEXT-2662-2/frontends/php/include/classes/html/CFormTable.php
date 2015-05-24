@@ -24,9 +24,9 @@ class CFormTable extends CForm {
 	private $align;
 	private $title;
 	private $tableclass = 'formtable';
-	protected $top_items = array();
-	protected $center_items = array();
-	protected $bottom_items = array();
+	protected $top_items = [];
+	protected $center_items = [];
+	protected $bottom_items = [];
 
 	public function __construct($title = null, $action = null, $method = null, $enctype = null, $form_variable = null) {
 		$method = is_null($method) ? 'post' : $method;
@@ -93,10 +93,10 @@ class CFormTable extends CForm {
 			}
 
 			$item1 = new CRow(
-				array(
+				[
 					new CCol($item1, 'form_row_l'),
 					new CCol($item2, 'form_row_r')
-				),
+				],
 				$class
 			);
 		}

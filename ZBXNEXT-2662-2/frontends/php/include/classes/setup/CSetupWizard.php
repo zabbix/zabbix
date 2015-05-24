@@ -30,32 +30,32 @@ class CSetupWizard extends CForm {
 
 		$this->frontendSetup = new CFrontendSetup();
 
-		$this->stage = array(
-			0 => array(
+		$this->stage = [
+			0 => [
 				'title' => _('Welcome'),
 				'fnc' => 'stage0'
-			),
-			1 => array(
+			],
+			1 => [
 				'title' => _('Check of pre-requisites'),
 				'fnc' => 'stage1'
-			),
-			2 => array(
+			],
+			2 => [
 				'title' => _('Configure DB connection'),
 				'fnc' => 'stage2'
-			),
-			3 => array(
+			],
+			3 => [
 				'title' => _('Zabbix server details'),
 				'fnc' => 'stage3'
-			),
-			4 => array(
+			],
+			4 => [
 				'title' => _('Pre-Installation summary'),
 				'fnc' => 'stage4'
-			),
-			5 => array(
+			],
+			5 => [
 				'title' => _('Install'),
 				'fnc' => 'stage5'
-			)
-		);
+			]
+		];
 
 		$this->eventHandler();
 
@@ -122,9 +122,9 @@ class CSetupWizard extends CForm {
 			$back_button->setEnabled(false);
 		}
 
-		$setup_footer = new CDiv(array(new CDiv(array($next_button, $back_button)), $cancel_button), 'setup-footer');
+		$setup_footer = new CDiv([new CDiv([$next_button, $back_button]), $cancel_button], 'setup-footer');
 
-		$setup_container = new CDiv(array($setup_left, $setup_right, $setup_footer), 'setup-container');
+		$setup_container = new CDiv([$setup_left, $setup_right, $setup_footer], 'setup-container');
 
 		return parent::bodyToString($destroy).$setup_container->ToString();
 	}
@@ -145,7 +145,7 @@ class CSetupWizard extends CForm {
 	}
 
 	function stage0() {
-		$setup_title = new CDiv(array(new CSpan(_('Welcome to')), 'Zabbix 3.0'), 'setup-title');
+		$setup_title = new CDiv([new CSpan(_('Welcome to')), 'Zabbix 3.0'], 'setup-title');
 
 		return new CDiv($setup_title, 'setup-right-body');
 	}
@@ -155,7 +155,7 @@ class CSetupWizard extends CForm {
 			addClass(ZBX_STYLE_LIST_TABLE)->
 			setHeader(['', _('Current value'), _('Required'), '']);
 
-		$messages = array();
+		$messages = [];
 		$finalResult = CFrontendSetup::CHECK_OK;
 
 		foreach ($this->frontendSetup->checkRequirements() as $req) {
@@ -170,16 +170,16 @@ class CSetupWizard extends CForm {
 			else {
 				$class = ZBX_STYLE_RED;
 				$result = new CSpan(_('Fail'));
-				$messages[] = array('type' => 'error', 'message' => $req['error']);
+				$messages[] = ['type' => 'error', 'message' => $req['error']];
 			}
 
 			$table->addRow(
-				array(
+				[
 					$req['name'],
 					$req['current'],
 					($req['required'] !== null) ? $req['required'] : '',
 					new CCol($result, $class)
-				)
+				]
 			);
 
 			if ($req['result'] > $finalResult) {
@@ -195,10 +195,10 @@ class CSetupWizard extends CForm {
 			$message_box = null;
 		}
 
-		return array(
+		return [
 			new CTag('h1', 'yes', _('Check of pre-requisites')),
-			new CDiv(array($message_box, $table), 'setup-right-body')
-		);
+			new CDiv([$message_box, $table], 'setup-right-body')
+		];
 	}
 
 	function stage2() {
@@ -224,7 +224,7 @@ class CSetupWizard extends CForm {
 				$port = new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 20, false, false, false);
 				$port->removeAttribute('style');
 				$table->addRow(_('Database port'),
-					array($port, ' ', new CSpan(_('0 - use default port'), ZBX_STYLE_GREY))
+					[$port, ' ', new CSpan(_('0 - use default port'), ZBX_STYLE_GREY)]
 				);
 
 				$table->addRow(_('Database name'), new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix')));
@@ -247,14 +247,14 @@ class CSetupWizard extends CForm {
 			$message_box = null;
 		}
 
-		return array(
+		return [
 			new CTag('h1', 'yes', _('Configure DB connection')),
-			new CDiv(array(
+			new CDiv([
 				new CTag('p', 'yes', _s('Please create database manually, and set the configuration parameters for connection to this database. Press "%1$s" button when done.', _('Next step'))),
 				$message_box,
 				$table
-			), 'setup-right-body')
-		);
+			], 'setup-right-body')
+		];
 	}
 
 	function stage3() {
@@ -270,13 +270,13 @@ class CSetupWizard extends CForm {
 
 		$table->addRow('Name', new CTextBox('zbx_server_name', $this->getConfig('ZBX_SERVER_NAME', '')));
 
-		return array(
+		return [
 			new CTag('h1', 'yes', _('Zabbix server details')),
-			new CDiv(array(
+			new CDiv([
 				new CTag('p', 'yes', _('Please enter host name or host IP address and port number of Zabbix server, as well as the name of the installation (optional).')),
 				$table
-			), 'setup-right-body')
-		);
+			], 'setup-right-body')
+		];
 	}
 
 	function stage4() {
@@ -311,13 +311,13 @@ class CSetupWizard extends CForm {
 		$table->addRow(new CSpan(_('Zabbix server port'), ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER_PORT'));
 		$table->addRow(new CSpan(_('Zabbix server name'), ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER_NAME'));
 
-		return array(
+		return [
 			new CTag('h1', 'yes', _('Pre-Installation summary')),
-			new CDiv(array(
+			new CDiv([
 				new CTag('p', 'yes', _s('Please check configuration parameters. If all is correct, press "%1$s" button, or "%2$s" button to change configuration parameters.', _('Next step'), _('Back'))),
 				$table
-			), 'setup-right-body')
-		);
+			], 'setup-right-body')
+		];
 	}
 
 	function stage5() {
@@ -325,8 +325,8 @@ class CSetupWizard extends CForm {
 
 		$config_file_name = Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH;
 		$config = new CConfigFile($config_file_name);
-		$config->config = array(
-			'DB' => array(
+		$config->config = [
+			'DB' => [
 				'TYPE' => $this->getConfig('DB_TYPE'),
 				'SERVER' => $this->getConfig('DB_SERVER'),
 				'PORT' => $this->getConfig('DB_PORT'),
@@ -334,20 +334,20 @@ class CSetupWizard extends CForm {
 				'USER' => $this->getConfig('DB_USER'),
 				'PASSWORD' => $this->getConfig('DB_PASSWORD'),
 				'SCHEMA' => $this->getConfig('DB_SCHEMA')
-			),
+			],
 			'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
 			'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
 			'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME')
-		);
+		];
 
 		$error = false;
 
 		if (!$config->save()) {
 			$error = true;
-			$messages[] = array(
+			$messages[] = [
 				'type' => 'error',
 				'message' => $config->error
-			);
+			];
 		}
 
 		if ($error) {
@@ -356,31 +356,31 @@ class CSetupWizard extends CForm {
 			$this->setConfig('ZBX_CONFIG_FILE_CORRECT', false);
 
 			$message_box = makeMessageBox(false, $messages, _('Cannot create the configuration file.'), false, true);
-			$message = array(
+			$message = [
 				new CTag('p', 'yes', _('Alternatively, you can install it manually:')),
-				new CTag('ol', 'yes', array(
+				new CTag('ol', 'yes', [
 					new CTag('li', 'yes', new CLink(_('Download the configuration file'), 'setup.php?save_config=1')),
 					new CTag('li', 'yes', _s('Save it as "%1$s"', $config_file_name))
-				)),
-			);
+				]),
+			];
 		}
 		else {
 			$this->DISABLE_CANCEL_BUTTON = true;
 			$this->DISABLE_BACK_BUTTON = true;
 
 			$message_box = null;
-			$message = array(
+			$message = [
 				new CTag('h4', 'yes', _('Congratulations on successful installation of Zabbix frontend.'),
 					ZBX_STYLE_GREEN
 				),
 				new CTag('p', 'yes', _s('Configuration file "%1$s" created.', $config_file_name))
-			);
+			];
 		}
 
-		return array(
+		return [
 			new CTag('h1', 'yes', _('Install')),
-			new CDiv(array($message_box, $message), 'setup-right-body')
-		);
+			new CDiv([$message_box, $message], 'setup-right-body')
+		];
 	}
 
 	function checkConnection() {
@@ -494,8 +494,8 @@ class CSetupWizard extends CForm {
 				header('Content-Type: application/x-httpd-php');
 				header('Content-Disposition: attachment; filename="'.basename(CConfigFile::CONFIG_FILE_PATH).'"');
 				$config = new CConfigFile(Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH);
-				$config->config = array(
-					'DB' => array(
+				$config->config = [
+					'DB' => [
 						'TYPE' => $this->getConfig('DB_TYPE'),
 						'SERVER' => $this->getConfig('DB_SERVER'),
 						'PORT' => $this->getConfig('DB_PORT'),
@@ -503,11 +503,11 @@ class CSetupWizard extends CForm {
 						'USER' => $this->getConfig('DB_USER'),
 						'PASSWORD' => $this->getConfig('DB_PASSWORD'),
 						'SCHEMA' => $this->getConfig('DB_SCHEMA')
-					),
+					],
 					'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
 					'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
 					'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME')
-				);
+				];
 				die($config->getString());
 			}
 		}

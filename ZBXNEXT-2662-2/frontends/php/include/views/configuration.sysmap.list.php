@@ -35,7 +35,7 @@ $sysmapForm->setName('frm_maps');
 
 // create table
 $sysmapTable = new CTableInfo();
-$sysmapTable->setHeader(array(
+$sysmapTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_maps', null, "checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');"),
 		'cell-width'),
@@ -43,27 +43,27 @@ $sysmapTable->setHeader(array(
 	make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder']),
 	_('Map')
-));
+]);
 
 foreach ($this->data['maps'] as $map) {
-	$sysmapTable->addRow(array(
+	$sysmapTable->addRow([
 		new CCheckBox('maps['.$map['sysmapid'].']', null, null, $map['sysmapid']),
 		new CLink($map['name'], 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form'),
 		$map['width'],
 		$map['height'],
 		new CLink(_('Edit'), 'sysmap.php?sysmapid='.$map['sysmapid']),
-	));
+	]);
 }
 
 // append table to form
-$sysmapForm->addItem(array(
+$sysmapForm->addItem([
 	$sysmapTable,
 	$this->data['paging'],
-	new CActionButtonList('action', 'maps', array(
-		'map.export' => array('name' => _('Export')),
-		'map.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected maps?'))
-	))
-));
+	new CActionButtonList('action', 'maps', [
+		'map.export' => ['name' => _('Export')],
+		'map.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maps?')]
+	])
+]);
 
 // append form to widget
 $sysmapWidget->addItem($sysmapForm);

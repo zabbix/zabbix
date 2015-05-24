@@ -40,9 +40,9 @@ class CServerInfo extends CTable {
 		$this->addRow(new CCol(_('Zabbix server info'), ZBX_STYLE_NOWRAP.' ui-corner-all ui-widget-header'));
 		$this->addRow(_('Updated').NAME_DELIMITER.zbx_date2str(DATE_TIME_FORMAT_SECONDS, time()));
 		$this->addRow(_('Users (online)').NAME_DELIMITER.$status['users_count'].'('.$status['users_online'].')');
-		$this->addRow(new CCol(array(_('Logged in as').SPACE, new CLink(CWebUser::$data['alias'], 'profile.php'))));
-		$this->addRow(new CCol(array($serverLink, SPACE._('is').SPACE, $server)), 'status');
-		$this->addRow(new CCol(array(
+		$this->addRow(new CCol([_('Logged in as').SPACE, new CLink(CWebUser::$data['alias'], 'profile.php')]));
+		$this->addRow(new CCol([$serverLink, SPACE._('is').SPACE, $server]), 'status');
+		$this->addRow(new CCol([
 			_('Hosts (m/n/t)').NAME_DELIMITER.$status['hosts_count'].'(',
 			new CSpan($status['hosts_count_monitored'], ZBX_STYLE_GREEN),
 			'/',
@@ -50,8 +50,8 @@ class CServerInfo extends CTable {
 			'/',
 			new CSpan($status['hosts_count_template'], ZBX_STYLE_GREY),
 			')'
-		)));
-		$this->addRow(new CCol(array(
+		]));
+		$this->addRow(new CCol([
 			_('Items (m/d/n)').NAME_DELIMITER.$status['items_count'].'(',
 			new CSpan($status['items_count_monitored'], ZBX_STYLE_GREEN),
 			'/',
@@ -59,15 +59,15 @@ class CServerInfo extends CTable {
 			'/',
 			new CSpan($status['items_count_not_supported'], ZBX_STYLE_GREY),
 			')'
-		)));
-		$this->addRow(new CCol(array(
+		]));
+		$this->addRow(new CCol([
 			_('Triggers (e/d)[p/o]').NAME_DELIMITER.$status['triggers_count'].
 			'('.$status['triggers_count_enabled'].'/'.$status['triggers_count_disabled'].')[',
 			new CSpan($status['triggers_count_on'], ZBX_STYLE_GREEN),
 			'/',
 			new CSpan($status['triggers_count_off'], ZBX_STYLE_RED),
 			']'
-		)));
+		]));
 
 		return parent::bodyToString();
 	}

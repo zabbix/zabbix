@@ -34,7 +34,7 @@ $userGroupsForm->setName('userGroupsForm');
 
 // create user group table
 $userGroupTable = new CTableInfo();
-$userGroupTable->setHeader(array(
+$userGroupTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_groups', null, "checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');"),
 		'cell-width'),
@@ -44,7 +44,7 @@ $userGroupTable->setHeader(array(
 	_('Frontend access'),
 	_('Debug mode'),
 	_('Status')
-));
+]);
 
 foreach ($this->data['usergroups'] as $usrgrp) {
 	$userGroupId = $usrgrp['usrgrpid'];
@@ -87,7 +87,7 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 		$userGroupUsers = $usrgrp['users'];
 		order_result($userGroupUsers, 'alias');
 
-		$users = array();
+		$users = [];
 		$i = 0;
 
 		foreach ($userGroupUsers as $user) {
@@ -114,7 +114,7 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 	$userGroupTable->addRow([
 		new CCheckBox('group_groupid['.$userGroupId.']', null, null, $userGroupId),
 		new CLink($usrgrp['name'], 'usergrps.php?form=update&usrgrpid='.$userGroupId),
-		array(new CLink(_('Users'), 'users.php?filter_usrgrpid='.$userGroupId), CViewHelper::showNum(count($usrgrp['users']))),
+		[new CLink(_('Users'), 'users.php?filter_usrgrpid='.$userGroupId), CViewHelper::showNum(count($usrgrp['users']))],
 		$users,
 		$guiAccess,
 		$debugMode,
@@ -123,21 +123,21 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 }
 
 // append table to form
-$userGroupsForm->addItem(array(
+$userGroupsForm->addItem([
 	$userGroupTable,
 	$this->data['paging'],
-	new CActionButtonList('action', 'group_groupid', array(
-		'usergroup.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected groups?')),
-		'usergroup.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected groups?')),
-		'usergroup.massenabledebug' => array('name' => _('Enable debug mode'),
+	new CActionButtonList('action', 'group_groupid', [
+		'usergroup.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected groups?')],
+		'usergroup.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected groups?')],
+		'usergroup.massenabledebug' => ['name' => _('Enable debug mode'),
 			'confirm' => _('Enable debug mode in selected groups?')
-		),
-		'usergroup.massdisabledebug' => array('name' => _('Disable debug mode'),
+		],
+		'usergroup.massdisabledebug' => ['name' => _('Disable debug mode'),
 			'confirm' => _('Disable debug mode in selected groups?')
-		),
-		'usergroup.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected groups?'))
-	))
-));
+		],
+		'usergroup.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected groups?')]
+	])
+]);
 
 // append form to widget
 $userGroupsWidget->addItem($userGroupsForm);

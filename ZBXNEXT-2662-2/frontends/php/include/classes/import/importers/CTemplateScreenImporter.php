@@ -34,8 +34,8 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 			return;
 		}
 
-		$screensToCreate = array();
-		$screensToUpdate = array();
+		$screensToCreate = [];
+		$screensToUpdate = [];
 
 		foreach ($allScreens as $template => $screens) {
 			$templateId = $this->referencer->resolveTemplate($template);
@@ -90,7 +90,7 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 			return;
 		}
 
-		$templateScreenIdsXML = array();
+		$templateScreenIdsXML = [];
 
 		if ($allScreens) {
 			foreach ($allScreens as $template => $screens) {
@@ -108,12 +108,12 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 			}
 		}
 
-		$dbTemplateScreenIds = API::TemplateScreen()->get(array(
-			'output' => array('screenid'),
+		$dbTemplateScreenIds = API::TemplateScreen()->get([
+			'output' => ['screenid'],
 			'hostids' => $templateIdsXML,
 			'nopermissions' => true,
 			'preservekeys' => true
-		));
+		]);
 
 		$templateScreensToDelete = array_diff_key($dbTemplateScreenIds, $templateScreenIdsXML);
 

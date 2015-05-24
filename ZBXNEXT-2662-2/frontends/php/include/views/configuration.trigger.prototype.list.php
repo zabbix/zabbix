@@ -20,7 +20,7 @@
 
 $triggersWidget = (new CWidget())->
 	setTitle(
-		array(_('Trigger prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery'))
+		[_('Trigger prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')]
 	)->
 	addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
@@ -52,7 +52,7 @@ $triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
 $triggersTable = new CTableInfo();
-$triggersTable->setHeader(array(
+$triggersTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
 		'cell-width'),
@@ -60,14 +60,14 @@ $triggersTable->setHeader(array(
 	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
 	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
-));
+]);
 
 foreach ($this->data['triggers'] as $trigger) {
 	$triggerid = $trigger['triggerid'];
 	$trigger['discoveryRuleid'] = $this->data['parent_discoveryid'];
 
 	// description
-	$description = array();
+	$description = [];
 
 	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 	$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
@@ -119,37 +119,37 @@ foreach ($this->data['triggers'] as $trigger) {
 	// checkbox
 	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', null, null, $triggerid);
 
-	$triggersTable->addRow(array(
+	$triggersTable->addRow([
 		$checkBox,
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$description,
 		new CCol(triggerExpression($trigger, true), 'trigger-expression'),
 		$status
-	));
+	]);
 }
 
 zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
 
 // append table to form
-$triggersForm->addItem(array(
+$triggersForm->addItem([
 	$triggersTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
-		array(
-			'triggerprototype.massenable' => array('name' => _('Enable'),
+		[
+			'triggerprototype.massenable' => ['name' => _('Enable'),
 				'confirm' => _('Enable selected trigger prototypes?')
-			),
-			'triggerprototype.massdisable' => array('name' => _('Disable'),
+			],
+			'triggerprototype.massdisable' => ['name' => _('Disable'),
 				'confirm' => _('Disable selected trigger prototypes?')
-			),
-			'triggerprototype.massupdateform' => array('name' => _('Mass update')),
-			'triggerprototype.massdelete' => array('name' => _('Delete'),
+			],
+			'triggerprototype.massupdateform' => ['name' => _('Mass update')],
+			'triggerprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected trigger prototypes?')
-			),
-		),
+			],
+		],
 		$this->data['parent_discoveryid']
 	)
-));
+]);
 
 // append form to widget
 $triggersWidget->addItem($triggersForm);

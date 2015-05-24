@@ -41,12 +41,12 @@ class CMacrosResolverGeneral {
 	 *
 	 * @var array
 	 */
-	protected $interfacePriorities = array(
+	protected $interfacePriorities = [
 		INTERFACE_TYPE_AGENT => 4,
 		INTERFACE_TYPE_SNMP => 3,
 		INTERFACE_TYPE_JMX => 2,
 		INTERFACE_TYPE_IPMI => 1
-	);
+	];
 
 	/**
 	 * Work config name.
@@ -65,7 +65,7 @@ class CMacrosResolverGeneral {
 	 * @return array
 	 */
 	protected function getTriggerReference($expression, $text) {
-		$result = array();
+		$result = [];
 
 		// search for reference macros $1, $2, $3, ...
 		preg_match_all('/\$([1-9])/', $text, $refNumbers);
@@ -96,7 +96,7 @@ class CMacrosResolverGeneral {
 	 * @return array
 	 */
 	protected function findMacros($pattern, array $texts) {
-		$result = array();
+		$result = [];
 
 		foreach ($texts as $text) {
 			preg_match_all('/'.$pattern.'/', $text, $matches);
@@ -116,7 +116,7 @@ class CMacrosResolverGeneral {
 	 * @return array	where key is found macro and value is array with related function position
 	 */
 	protected function findFunctionMacros($pattern, $text) {
-		$result = array();
+		$result = [];
 
 		preg_match_all('/'.$pattern.'/', $text, $matches);
 
@@ -139,7 +139,7 @@ class CMacrosResolverGeneral {
 	protected function findFunctions($expression) {
 		preg_match_all('/\{([0-9]+)\}/', $expression, $matches);
 
-		$functions = array();
+		$functions = [];
 
 		foreach ($matches[1] as $i => $functionid) {
 			$functions[$i + 1] = $functionid;
@@ -241,7 +241,7 @@ class CMacrosResolverGeneral {
 			);
 
 			// macro should be resolved to interface with highest priority ($priorities)
-			$interfaces = array();
+			$interfaces = [];
 
 			while ($dbInterface = DBfetch($dbInterfaces)) {
 				if (isset($interfaces[$dbInterface['functionid']])
@@ -394,7 +394,7 @@ class CMacrosResolverGeneral {
 		/*
 		 * User macros
 		 */
-		$hostIds = array();
+		$hostIds = [];
 
 		foreach ($data as $element) {
 			foreach ($element['hostids'] as $hostId) {
@@ -407,21 +407,21 @@ class CMacrosResolverGeneral {
 		}
 
 		// hostid => array(templateid)
-		$hostTemplates = array();
+		$hostTemplates = [];
 
 		// hostid => array(macro => value)
-		$hostMacros = array();
+		$hostMacros = [];
 
 		do {
-			$dbHosts = API::Host()->get(array(
+			$dbHosts = API::Host()->get([
 				'hostids' => $hostIds,
 				'templated_hosts' => true,
-				'output' => array('hostid'),
-				'selectParentTemplates' => array('templateid'),
-				'selectMacros' => array('macro', 'value')
-			));
+				'output' => ['hostid'],
+				'selectParentTemplates' => ['templateid'],
+				'selectMacros' => ['macro', 'value']
+			]);
 
-			$hostIds = array();
+			$hostIds = [];
 
 			if ($dbHosts) {
 				foreach ($dbHosts as $dbHost) {
@@ -429,7 +429,7 @@ class CMacrosResolverGeneral {
 
 					foreach ($dbHost['macros'] as $dbMacro) {
 						if (!isset($hostMacros[$dbHost['hostid']])) {
-							$hostMacros[$dbHost['hostid']] = array();
+							$hostMacros[$dbHost['hostid']] = [];
 						}
 
 						$hostMacros[$dbHost['hostid']][$dbMacro['macro']] = $dbMacro['value'];
@@ -450,7 +450,7 @@ class CMacrosResolverGeneral {
 		$allMacrosResolved = true;
 
 		foreach ($data as &$element) {
-			$hostIds = array();
+			$hostIds = [];
 
 			foreach ($element['hostids'] as $hostId) {
 				$hostIds[$hostId] = $hostId;
@@ -477,10 +477,10 @@ class CMacrosResolverGeneral {
 		/*
 		 * Global macros
 		 */
-		$dbGlobalMacros = API::UserMacro()->get(array(
-			'output' => array('macro', 'value'),
+		$dbGlobalMacros = API::UserMacro()->get([
+			'output' => ['macro', 'value'],
 			'globalmacro' => true
-		));
+		]);
 
 		if ($dbGlobalMacros) {
 			$dbGlobalMacros = zbx_toHash($dbGlobalMacros, 'macro');
@@ -545,7 +545,7 @@ class CMacrosResolverGeneral {
 			return null;
 		}
 
-		$templateIds = array();
+		$templateIds = [];
 
 		foreach ($hostIds as $hostId) {
 			if (isset($hostTemplates[$hostId])) {

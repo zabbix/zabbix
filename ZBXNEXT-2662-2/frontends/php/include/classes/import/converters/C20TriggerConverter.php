@@ -66,7 +66,7 @@ class C20TriggerConverter extends CConverter {
 		}
 
 		// find all the operators that need to be replaced
-		$foundOperators = array();
+		$foundOperators = [];
 		$pos = 0;
 		while (isset($expression[$pos])) {
 			switch ($expression[$pos]) {

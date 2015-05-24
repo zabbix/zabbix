@@ -57,7 +57,7 @@ foreach ($this->data['iconMaps'] as $iconMap) {
 }
 $iconMappingsLink = new CLink(_('show icon mappings'), 'adm.iconmapping.php');
 $iconMappingsLink->setAttribute('target', '_blank');
-$sysmapList->addRow(_('Automatic icon mapping'), array($iconMappingComboBox, SPACE, $iconMappingsLink));
+$sysmapList->addRow(_('Automatic icon mapping'), [$iconMappingComboBox, SPACE, $iconMappingsLink]);
 
 // append multiple checkboxes to form list
 $sysmapList->addRow(_('Icon highlight'), new CCheckBox('highlight', $this->data['sysmap']['highlight'], null, 1));
@@ -71,7 +71,7 @@ $customLabelHostgroupTextArea = new CTextArea('label_string_hostgroup', $this->d
 if ($this->data['sysmap']['label_type_hostgroup'] != MAP_LABEL_TYPE_CUSTOM) {
 	$customLabelHostgroupTextArea->addClass('hidden');
 }
-$sysmapList->addRow(_('Host group label type'), array($labelTypeHostgroupComboBox, BR(), $customLabelHostgroupTextArea));
+$sysmapList->addRow(_('Host group label type'), [$labelTypeHostgroupComboBox, BR(), $customLabelHostgroupTextArea]);
 
 // append host to form list
 $labelTypeHostComboBox = new CComboBox('label_type_host', $this->data['sysmap']['label_type_host'], null, $this->data['labelTypes']);
@@ -79,7 +79,7 @@ $customLabelHostTextArea = new CTextArea('label_string_host', $this->data['sysma
 if ($this->data['sysmap']['label_type_host'] != MAP_LABEL_TYPE_CUSTOM) {
 	$customLabelHostTextArea->addClass('hidden');
 }
-$sysmapList->addRow(_('Host label type'), array($labelTypeHostComboBox, BR(), $customLabelHostTextArea));
+$sysmapList->addRow(_('Host label type'), [$labelTypeHostComboBox, BR(), $customLabelHostTextArea]);
 
 // append trigger to form list
 $labelTypeTriggerComboBox = new CComboBox('label_type_trigger', $this->data['sysmap']['label_type_trigger'], null, $this->data['labelTypesLimited']);
@@ -87,7 +87,7 @@ $customLabelTriggerTextArea = new CTextArea('label_string_trigger', $this->data[
 if ($this->data['sysmap']['label_type_trigger'] != MAP_LABEL_TYPE_CUSTOM) {
 	$customLabelTriggerTextArea->addClass('hidden');
 }
-$sysmapList->addRow(_('Trigger label type'), array($labelTypeTriggerComboBox, BR(), $customLabelTriggerTextArea));
+$sysmapList->addRow(_('Trigger label type'), [$labelTypeTriggerComboBox, BR(), $customLabelTriggerTextArea]);
 
 // append map to form list
 $labelTypeMapComboBox = new CComboBox('label_type_map', $this->data['sysmap']['label_type_map'], null, $this->data['labelTypesLimited']);
@@ -95,7 +95,7 @@ $customLabelMapTextArea = new CTextArea('label_string_map', $this->data['sysmap'
 if ($this->data['sysmap']['label_type_map'] != MAP_LABEL_TYPE_CUSTOM) {
 	$customLabelMapTextArea->addClass('hidden');
 }
-$sysmapList->addRow(_('Map label type'), array($labelTypeMapComboBox, BR(), $customLabelMapTextArea));
+$sysmapList->addRow(_('Map label type'), [$labelTypeMapComboBox, BR(), $customLabelMapTextArea]);
 
 // append image to form list
 $labelTypeImageComboBox = new CComboBox('label_type_image', $this->data['sysmap']['label_type_image'], null, $this->data['labelTypesImage']);
@@ -103,7 +103,7 @@ $customLabelImageTextArea = new CTextArea('label_string_image', $this->data['sys
 if ($this->data['sysmap']['label_type_image'] != MAP_LABEL_TYPE_CUSTOM) {
 	$customLabelImageTextArea->addClass('hidden');
 }
-$sysmapList->addRow(_('Image label type'), array($labelTypeImageComboBox, BR(), $customLabelImageTextArea));
+$sysmapList->addRow(_('Image label type'), [$labelTypeImageComboBox, BR(), $customLabelImageTextArea]);
 
 // append icon label to form list
 unset($this->data['labelTypes'][MAP_LABEL_TYPE_CUSTOM]);
@@ -111,20 +111,20 @@ $sysmapList->addRow(_('Icon label type'), new CComboBox('label_type', $this->dat
 
 // append icon label location to form list
 $sysmapList->addRow(_('Icon label location'), new CComboBox('label_location', $data['sysmap']['label_location'], null,
-	array(
+	[
 		0 => _('Bottom'),
 		1 => _('Left'),
 		2 => _('Right'),
 		3 => _('Top')
-	)
+	]
 ));
 
 // append show unack to form list
-$showUnackComboBox = new CComboBox('show_unack', $this->data['sysmap']['show_unack'], null, array(
+$showUnackComboBox = new CComboBox('show_unack', $this->data['sysmap']['show_unack'], null, [
 	EXTACK_OPTION_ALL => _('All'),
 	EXTACK_OPTION_BOTH => _('Separated'),
 	EXTACK_OPTION_UNACK => _('Unacknowledged only'),
-));
+]);
 $showUnackComboBox->setEnabled($this->data['config']['event_ack_enable']);
 if (!$this->data['config']['event_ack_enable']) {
 	$showUnackComboBox->setAttribute('title', _('Acknowledging disabled'));
@@ -132,15 +132,15 @@ if (!$this->data['config']['event_ack_enable']) {
 $sysmapList->addRow(_('Problem display'), $showUnackComboBox);
 
 // append severity min to form list
-$sysmapList->addRow(_('Minimum trigger severity'), new CSeverity(array('name' => 'severity_min', 'value' => $this->data['sysmap']['severity_min'])));
+$sysmapList->addRow(_('Minimum trigger severity'), new CSeverity(['name' => 'severity_min', 'value' => $this->data['sysmap']['severity_min']]));
 
 // create url table
 $urlTable = (new CTable(_('No URLs defined.')))->
 	addClass('formElementTable')->
 	setAttribute('style', 'min-width: 500px;')->
-	setHeader(array(_('Name'), _('URL'), _('Element'), SPACE));
+	setHeader([_('Name'), _('URL'), _('Element'), SPACE]);
 if (empty($this->data['sysmap']['urls'])) {
-	$this->data['sysmap']['urls'][] = array('name' => '', 'url' => '', 'elementtype' => 0);
+	$this->data['sysmap']['urls'][] = ['name' => '', 'url' => '', 'elementtype' => 0];
 }
 $i = 0;
 foreach ($this->data['sysmap']['urls'] as $url) {
@@ -150,7 +150,7 @@ foreach ($this->data['sysmap']['urls'] as $url) {
 	$removeButton = new CSpan(_('Remove'), ZBX_STYLE_LINK_ACTION.' link_menu');
 	$removeButton->onClick('$("urlEntry_'.$i.'").remove();');
 
-	$urlRow = new CRow(array($urlLabel, $urlLink, $urlEtype, $removeButton));
+	$urlRow = new CRow([$urlLabel, $urlLink, $urlEtype, $removeButton]);
 	$urlRow->setAttribute('id', 'urlEntry_'.$i);
 
 	$urlTable->addRow($urlRow);
@@ -166,7 +166,7 @@ $templateUrlEtype = new CComboBox('urls[#{id}][elementtype]', null, null, sysmap
 $templateUrlEtype->setAttribute('disabled', 'disabled');
 $templateRemoveButton = new CSpan(_('Remove'), ZBX_STYLE_LINK_ACTION.' link_menu');
 $templateRemoveButton->onClick('$("entry_#{id}").remove();');
-$templateUrlRow = new CRow(array($templateUrlLabel, $templateUrlLink, $templateUrlEtype, $templateRemoveButton));
+$templateUrlRow = new CRow([$templateUrlLabel, $templateUrlLink, $templateUrlEtype, $templateRemoveButton]);
 $templateUrlRow->addStyle('display: none');
 $templateUrlRow->setAttribute('id', 'urlEntryTpl');
 $urlTable->addRow($templateUrlRow);
@@ -189,17 +189,17 @@ $sysmapTab->addTab('sysmapTab', _('Map'), $sysmapList);
 if (hasRequest('sysmapid') && getRequest('sysmapid') > 0) {
 	$sysmapTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array (
+		[
 			new	CButton('clone', _('Clone')),
 			new CButtonDelete(_('Delete network map?'), url_param('form').url_param('sysmapid')),
 			new CButtonCancel()
-		)
+		]
 	));
 }
 else {
 	$sysmapTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 

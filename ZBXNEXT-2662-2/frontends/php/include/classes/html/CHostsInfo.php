@@ -45,10 +45,10 @@ class CHostsInfo extends CTable {
 		$total = 0;
 
 		// fetch accessible host ids
-		$hosts = API::Host()->get(array(
-			'output' => array('hostid'),
+		$hosts = API::Host()->get([
+			'output' => ['hostid'],
 			'preservekeys' => true
-		));
+		]);
 		$hostIds = array_keys($hosts);
 
 		if ($this->groupid != 0) {
@@ -122,7 +122,7 @@ class CHostsInfo extends CTable {
 		$total = new CCol($total.'  '._('Total'), 'total');
 
 		if ($this->style == STYLE_HORIZONTAL) {
-			$this->addRow(array($avail, $notav, $uncn, $total));
+			$this->addRow([$avail, $notav, $uncn, $total]);
 		}
 		else {
 			$this->addRow($avail);

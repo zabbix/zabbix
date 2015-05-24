@@ -77,7 +77,7 @@ function zbx_imagealine($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_N
 
 	// Get foreground line color
 	$lc = imagecolorsforindex($image, $color);
-	$lc = array($lc['red'], $lc['green'], $lc['blue']);
+	$lc = [$lc['red'], $lc['green'], $lc['blue']];
 
 	$dx = $x2 - $x1;
 	$dy = $y2 - $y1;
@@ -93,22 +93,22 @@ function zbx_imagealine($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_N
 
 			if (LINE_TYPE_BOLD == $style) {
 				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint - 1));
-				$bc = array($bc['red'], $bc['green'], $bc['blue']);
+				$bc = [$bc['red'], $bc['green'], $bc['blue']];
 				imagesetpixel($image, $x, $yint - 1, zbx_colormix($image, $lc, $bc, $yfrac));
 
 				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint + 1));
-				$bc = array($bc['red'], $bc['green'], $bc['blue']);
+				$bc = [$bc['red'], $bc['green'], $bc['blue']];
 				imagesetpixel($image, $x, $yint + 1, zbx_colormix($image, $lc, $bc, 1 - $yfrac));
 
 				imagesetpixel($image, $x, $yint, $color);
 			}
 			else {
 				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint));
-				$bc = array($bc['red'], $bc['green'], $bc['blue']);
+				$bc = [$bc['red'], $bc['green'], $bc['blue']];
 				imagesetpixel($image, $x, $yint, zbx_colormix($image, $lc, $bc, $yfrac));
 
 				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint + 1));
-				$bc = array($bc['red'], $bc['green'], $bc['blue']);
+				$bc = [$bc['red'], $bc['green'], $bc['blue']];
 				imagesetpixel($image, $x, $yint + 1, zbx_colormix($image, $lc, $bc, 1 - $yfrac));
 			}
 		}
@@ -125,22 +125,22 @@ function zbx_imagealine($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_N
 
 			if (LINE_TYPE_BOLD == $style) {
 				$bc = imagecolorsforindex($image, imagecolorat($image, $xint - 1, $y));
-				$bc = array($bc['red'], $bc['green'], $bc['blue']);
+				$bc = [$bc['red'], $bc['green'], $bc['blue']];
 				imagesetpixel($image, $xint - 1, $y, zbx_colormix($image, $lc, $bc, $xfrac));
 
 				$bc = imagecolorsforindex($image, imagecolorat($image, $xint + 1, $y));
-				$bc = array($bc['red'], $bc['green'], $bc['blue']);
+				$bc = [$bc['red'], $bc['green'], $bc['blue']];
 				imagesetpixel($image, $xint + 1, $y, zbx_colormix($image, $lc, $bc, 1 - $xfrac));
 
 				imagesetpixel($image, $xint, $y, $color);
 			}
 			else {
 				$bc = imagecolorsforindex($image, imagecolorat($image, $xint, $y));
-				$bc = array($bc['red'], $bc['green'], $bc['blue']);
+				$bc = [$bc['red'], $bc['green'], $bc['blue']];
 				imagesetpixel($image, $xint, $y, zbx_colormix($image, $lc, $bc, $xfrac));
 
 				$bc = imagecolorsforindex($image, imagecolorat($image, $xint + 1, $y));
-				$bc = array($bc['red'], $bc['green'], $bc['blue']);
+				$bc = [$bc['red'], $bc['green'], $bc['blue']];
 				imagesetpixel($image, $xint + 1, $y, zbx_colormix($image, $lc, $bc, 1 - $xfrac));
 			}
 		}

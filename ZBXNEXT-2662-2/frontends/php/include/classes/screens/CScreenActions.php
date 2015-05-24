@@ -111,55 +111,55 @@ class CScreenActions extends CScreenBase {
 		order_result($alerts, $sortfield, $sortorder);
 
 		if ($alerts) {
-			$dbUsers = API::User()->get(array(
-				'output' => array('userid', 'alias', 'name', 'surname'),
+			$dbUsers = API::User()->get([
+				'output' => ['userid', 'alias', 'name', 'surname'],
 				'userids' => zbx_objectValues($alerts, 'userid'),
 				'preservekeys' => true
-			));
+			]);
 		}
 
 		// indicator of sort field
-		$sortfieldSpan = new CSpan(array($sorttitle, SPACE));
+		$sortfieldSpan = new CSpan([$sorttitle, SPACE]);
 		$sortorderSpan = new CSpan(SPACE, ($sortorder === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
 
 		// create alert table
 		$actionTable = new CTableInfo();
-		$actionTable->setHeader(array(
-			($sortfield === 'clock') ? array($sortfieldSpan, $sortorderSpan) : _('Time'),
+		$actionTable->setHeader([
+			($sortfield === 'clock') ? [$sortfieldSpan, $sortorderSpan] : _('Time'),
 			_('Action'),
-			($sortfield === 'description') ? array($sortfieldSpan, $sortorderSpan) : _('Type'),
-			($sortfield === 'sendto') ? array($sortfieldSpan, $sortorderSpan) : _('Recipient(s)'),
+			($sortfield === 'description') ? [$sortfieldSpan, $sortorderSpan] : _('Type'),
+			($sortfield === 'sendto') ? [$sortfieldSpan, $sortorderSpan] : _('Recipient(s)'),
 			_('Message'),
-			($sortfield === 'status') ? array($sortfieldSpan, $sortorderSpan) : _('Status'),
+			($sortfield === 'status') ? [$sortfieldSpan, $sortorderSpan] : _('Status'),
 			_('Info')
-		));
+		]);
 
-		$actions = API::Action()->get(array(
-			'output' => array('actionid', 'name'),
+		$actions = API::Action()->get([
+			'output' => ['actionid', 'name'],
 			'actionids' => array_unique(zbx_objectValues($alerts, 'actionid')),
 			'preservekeys' => true
-		));
+		]);
 
 		foreach ($alerts as $alert) {
 			if ($alert['status'] == ALERT_STATUS_SENT) {
 				$status = new CSpan(_('Sent'), ZBX_STYLE_GREEN);
 			}
 			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-				$status = new CSpan(array(
+				$status = new CSpan([
 					_('In progress').':',
 					BR(),
 					_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries']),
-				), ZBX_STYLE_ORANGE);
+				], ZBX_STYLE_ORANGE);
 			}
 			else {
 				$status = new CSpan(_('Not sent'), ZBX_STYLE_RED);
 			}
 
 			$recipient = $alert['userid']
-				? array(bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto'])
+				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
 				: $alert['sendto'];
 
-			$message = array(
+			$message = [
 				bold(_('Subject').':'),
 				br(),
 				$alert['subject'],
@@ -168,7 +168,7 @@ class CScreenActions extends CScreenBase {
 				bold(_('Message').':'),
 				br(),
 				$alert['message']
-			);
+			];
 
 			if (zbx_empty($alert['error'])) {
 				$info = '';

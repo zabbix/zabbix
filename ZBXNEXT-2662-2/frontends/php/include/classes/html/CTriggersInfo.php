@@ -45,16 +45,16 @@ class CTriggersInfo extends CTable {
 		$config = select_config();
 
 		// array of triggers (not classified, information, warning, average, high, disaster) in problem state
-		$triggersProblemState = array();
+		$triggersProblemState = [];
 
 		// number of triggers in OK state
 		$triggersOkState = 0;
 
-		$options = array(
+		$options = [
 			'monitored' => true,
 			'skipDependent' => true,
-			'output' => array('triggerid')
-		);
+			'output' => ['triggerid']
+		];
 
 		if ($this->hostid > 0) {
 			$options['hostids'] = $this->hostid;
@@ -86,7 +86,7 @@ class CTriggersInfo extends CTable {
 			}
 		}
 
-		$severityCells = array(getSeverityCell(null, $config, $triggersOkState.SPACE._('Ok'), true));
+		$severityCells = [getSeverityCell(null, $config, $triggersOkState.SPACE._('Ok'), true)];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severityCount = isset($triggersProblemState[$severity]) ? $triggersProblemState[$severity] : 0;

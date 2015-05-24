@@ -23,8 +23,8 @@ $applicationWidget = (new CWidget())->setTitle(_('Applications'));
 $createForm = (new CForm('get'))->cleanItems();
 
 $controls = (new CList())->
-	addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()))->
-	addItem(array(_('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
+	addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()])->
+	addItem([_('Host').SPACE, $this->data['pageFilter']->getHostsCB()]);
 
 // append host summary to widget header
 if (empty($this->data['hostid'])) {
@@ -51,21 +51,21 @@ $applicationForm->setName('applicationForm');
 
 // create table
 $applicationTable = new CTableInfo();
-$applicationTable->setHeader(array(
+$applicationTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');"),
 		'cell-width'),
 	($this->data['hostid'] > 0) ? null : _('Host'),
 	make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Show')
-));
+]);
 
 foreach ($this->data['applications'] as $application) {
 	// inherited app, display the template list
 	if ($application['templateids'] && !empty($application['sourceTemplates'])) {
-		$name = array();
+		$name = [];
 
-		CArrayHelper::sort($application['sourceTemplates'], array('name'));
+		CArrayHelper::sort($application['sourceTemplates'], ['name']);
 
 		foreach ($application['sourceTemplates'] as $template) {
 			$name[] = new CLink($template['name'], 'applications.php?hostid='.$template['hostid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
@@ -85,11 +85,11 @@ foreach ($this->data['applications'] as $application) {
 		);
 	}
 
-	$applicationTable->addRow(array(
+	$applicationTable->addRow([
 		new CCheckBox('applications['.$application['applicationid'].']', null, null, $application['applicationid']),
 		($this->data['hostid'] > 0) ? null : $application['host']['name'],
 		$name,
-		array(
+		[
 			new CLink(
 				_('Items'),
 				'items.php?'.
@@ -98,27 +98,27 @@ foreach ($this->data['applications'] as $application) {
 					'&filter_application='.urlencode($application['name'])
 			),
 			CViewHelper::showNum(count($application['items']))
-		)
-	));
+		]
+	]);
 }
 
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
-$applicationForm->addItem(array(
+$applicationForm->addItem([
 	$applicationTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'applications',
-		array(
-			'application.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected applications?')),
-			'application.massdisable' => array('name' => _('Disable'),
+		[
+			'application.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected applications?')],
+			'application.massdisable' => ['name' => _('Disable'),
 				'confirm' => _('Disable selected applications?')
-			),
-			'application.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected applications?'))
-		),
+			],
+			'application.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected applications?')]
+		],
 		$this->data['hostid']
 	)
-));
+]);
 
 // append form to widget
 $applicationWidget->addItem($applicationForm);

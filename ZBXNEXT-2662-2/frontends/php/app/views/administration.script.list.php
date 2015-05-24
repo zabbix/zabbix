@@ -37,7 +37,7 @@ $scriptsForm->setName('scriptsForm');
 $scriptsForm->setAttribute('id', 'scripts');
 
 $scriptsTable = new CTableInfo();
-$scriptsTable->setHeader(array(
+$scriptsTable->setHeader([
 	new CColHeader(
 		new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');"),
 		'cell-width'),
@@ -48,7 +48,7 @@ $scriptsTable->setHeader(array(
 	_('User group'),
 	_('Host group'),
 	_('Host access')
-));
+]);
 
 foreach ($data['scripts'] as $script) {
 	switch ($script['type']) {
@@ -74,7 +74,7 @@ foreach ($data['scripts'] as $script) {
 		$scriptExecuteOn = '';
 	}
 
-	$scriptsTable->addRow(array(
+	$scriptsTable->addRow([
 		new CCheckBox('scriptids['.$script['scriptid'].']', 'no', null, $script['scriptid']),
 		new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid']),
 		$scriptType,
@@ -83,17 +83,17 @@ foreach ($data['scripts'] as $script) {
 		$script['userGroupName'] === null ?  _('All') : $script['userGroupName'],
 		$script['hostGroupName'] === null ?  _('All') : $script['hostGroupName'],
 		($script['host_access'] == PERM_READ_WRITE) ? _('Write') : _('Read')
-	));
+	]);
 }
 
 // append table to form
-$scriptsForm->addItem(array(
+$scriptsForm->addItem([
 	$scriptsTable,
 	$data['paging'],
-	new CActionButtonList('action', 'scriptids', array(
-		'script.delete' => array('name' => _('Delete'), 'confirm' => _('Delete selected scripts?'))
-	))
-));
+	new CActionButtonList('action', 'scriptids', [
+		'script.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected scripts?')]
+	])
+]);
 
 // append form to widget
 $scriptsWidget->addItem($scriptsForm)->show();

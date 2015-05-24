@@ -42,7 +42,7 @@ $frmHost->addVar('parent_discoveryid', $discoveryRule['itemid']);
 $hostList = new CFormList('hostlist');
 
 if ($hostPrototype['templateid'] && $data['parents']) {
-	$parents = array();
+	$parents = [];
 	foreach (array_reverse($data['parents']) as $parent) {
 		$parents[] = new CLink(
 			$parent['parentHost']['name'],
@@ -71,7 +71,7 @@ $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 // display inherited parameters only for hosts prototypes on hosts
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
-	$existingInterfaceTypes = array();
+	$existingInterfaceTypes = [];
 
 	foreach ($parentHost['interfaces'] as $interface) {
 		$existingInterfaceTypes[$interface['type']] = true;
@@ -87,7 +87,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		setAttribute('data-type', 'agent');
 
 	// header
-	$ifTab->addRow(array(
+	$ifTab->addRow([
 		new CCol(SPACE, 'interface-drag-control'),
 		new CCol(_('IP address'), 'interface-ip'),
 		new CCol(_('DNS name'), 'interface-dns'),
@@ -95,7 +95,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		new CCol(_('Port'), 'interface-port'),
 		new CCol(_('Default'), 'interface-default'),
 		new CCol(SPACE, 'interface-control')
-	));
+	]);
 
 	$row = new CRow(null, null, 'agentInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_AGENT])) {
@@ -166,27 +166,27 @@ $divTabs->addTab('hostTab', _('Host'), $hostList);
 $groupList = new CFormList();
 
 // existing groups
-$groups = array();
+$groups = [];
 foreach ($data['groups'] as $group) {
-	$groups[] = array(
+	$groups[] = [
 		'id' => $group['groupid'],
 		'name' => $group['name']
-	);
+	];
 }
-$groupList->addRow(_('Groups'), new CMultiSelect(array(
+$groupList->addRow(_('Groups'), new CMultiSelect([
 	'name' => 'group_links[]',
 	'objectName' => 'hostGroup',
-	'objectOptions' => array(
+	'objectOptions' => [
 		'editable' => true,
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-	),
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+	],
 	'data' => $groups,
 	'disabled' => (bool) $hostPrototype['templateid'],
-	'popup' => array(
+	'popup' => [
 		'parameters' => 'srctbl=host_groups&dstfrm='.$frmHost->getName().'&dstfld1=group_links_'.
 			'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1'
-	)
-)));
+	]
+]));
 
 // new group prototypes
 $customGroupTable = (new CTable(SPACE))->
@@ -216,19 +216,19 @@ $linkedTemplateTable = (new CTable(_('No templates linked.')))->
 	addClass('formElementTable');
 $linkedTemplateTable->setAttribute('id', 'linkedTemplateTable');
 $linkedTemplateTable->setAttribute('style', 'min-width: 400px;');
-$linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
+$linkedTemplateTable->setHeader([_('Name'), _('Action')]);
 
-$ignoreTemplates = array();
+$ignoreTemplates = [];
 if ($hostPrototype['templates']) {
 	foreach ($hostPrototype['templates'] as $template) {
 		$tmplList->addVar('templates['.$template['templateid'].']', $template['templateid']);
 		$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
 		$templateLink->setTarget('_blank');
 
-		$linkedTemplateTable->addRow(array(
+		$linkedTemplateTable->addRow([
 			$templateLink,
 			!$hostPrototype['templateid'] ? new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu') : '',
-		));
+		]);
 
 		$ignoreTemplates[$template['templateid']] = $template['name'];
 	}
@@ -247,17 +247,17 @@ if (!$hostPrototype['templateid']) {
 	$newTemplateTable->setAttribute('id', 'newTemplateTable');
 	$newTemplateTable->setAttribute('style', 'min-width: 400px;');
 
-	$newTemplateTable->addRow(array(new CMultiSelect(array(
+	$newTemplateTable->addRow([new CMultiSelect([
 		'name' => 'add_templates[]',
 		'objectName' => 'templates',
 		'ignored' => $ignoreTemplates,
-		'popup' => array(
+		'popup' => [
 			'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
 				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
-		)
-	))));
+		]
+	])]);
 
-	$newTemplateTable->addRow(array(new CSubmit('add_template', _('Add'), null, 'link_menu')));
+	$newTemplateTable->addRow([new CSubmit('add_template', _('Add'), null, 'link_menu')]);
 
 	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 }
@@ -288,11 +288,11 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	}
 	$macros = array_values(order_macros($macros, 'macro'));
 
-	$macrosView = new CView('hostmacros', array(
+	$macrosView = new CView('hostmacros', [
 		'macros' => $macros,
 		'show_inherited_macros' => $data['show_inherited_macros'],
 		'readonly' => true
-	));
+	]);
 	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 }
 
@@ -315,14 +315,14 @@ $inventoryAutomaticBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOM
 );
 $inventoryAutomaticBtn->setEnabled(!$hostPrototype['templateid']);
 
-$inventoryTypeRadioButton = array(
+$inventoryTypeRadioButton = [
 	$inventoryDisabledBtn,
 	new CLabel(_('Disabled'), 'host_inventory_radio_'.HOST_INVENTORY_DISABLED),
 	$inventoryManualBtn,
 	new CLabel(_('Manual'), 'host_inventory_radio_'.HOST_INVENTORY_MANUAL),
 	$inventoryAutomaticBtn,
 	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
-);
+];
 $inventoryFormList->addRow(new CDiv($inventoryTypeRadioButton, 'jqueryinputset radioset'));
 
 // clearing the float
@@ -344,17 +344,17 @@ if (isset($hostPrototype['hostid'])) {
 
 	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array (
+		[
 			new CSubmit('clone', _('Clone')),
 			$btnDelete,
 			new CButtonCancel(url_param('parent_discoveryid'))
-		)
+		]
 	));
 }
 else {
 	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('parent_discoveryid')))
+		[new CButtonCancel(url_param('parent_discoveryid'))]
 	));
 }
 

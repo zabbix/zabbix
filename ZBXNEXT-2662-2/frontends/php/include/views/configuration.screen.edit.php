@@ -50,17 +50,17 @@ if (isset($this->data['screenid']))
 {
 	$screenTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete screen?'), url_param('form').url_param('screenid').url_param('templateid')),
 			new CButtonCancel(url_param('templateid'))
-		)
+		]
 	));
 }
 else {
 	$screenTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('templateid')))
+		[new CButtonCancel(url_param('templateid'))]
 	));
 }
 

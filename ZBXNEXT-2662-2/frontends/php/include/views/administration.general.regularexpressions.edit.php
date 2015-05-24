@@ -29,7 +29,7 @@ $headerForm->cleanItems();
 $controls = new CList();
 $controls->addItem(new CComboBox('configDropDown', 'adm.regexps.php',
 	'redirect(this.options[this.selectedIndex].value);',
-	array(
+	[
 		'adm.gui.php' => _('GUI'),
 		'adm.housekeeper.php' => _('Housekeeping'),
 		'adm.images.php' => _('Images'),
@@ -41,7 +41,7 @@ $controls->addItem(new CComboBox('configDropDown', 'adm.regexps.php',
 		'adm.triggerseverities.php' => _('Trigger severities'),
 		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 		'adm.other.php' => _('Other')
-	)
+	]
 ));
 
 $headerForm->addItem($controls);
@@ -67,28 +67,28 @@ $exprTable = (new CTable())->
 	addClass('formElementTable')->
 	addClass('formWideTable');
 $exprTable->setAttribute('id', 'exprTable');
-$exprTable->setHeader(array(
+$exprTable->setHeader([
 	_('Expression'),
 	new CCol(_('Expression type'), ZBX_STYLE_NOWRAP),
 	new CCol(_('Case sensitive'), ZBX_STYLE_NOWRAP),
 	SPACE
-));
+]);
 $exprTable->setFooter(new CButton('add', _('Add'), null, 'link_menu exprAdd'));
 $exprTab->addRow(_('Expressions'), new CDiv($exprTable, 'inlineblock border_dotted objectgroup'));
 
 $exprForm = (new CTable())->
 	addClass('formElementTable')->
-	addRow(array(_('Expression'), new CTextBox('expressionNew', null, ZBX_TEXTBOX_STANDARD_SIZE)))->
-	addRow(array(_('Expression type'), new CComboBox('typeNew', null, null, expression_type2str())))->
-	addRow(array(_('Delimiter'), new CComboBox('delimiterNew', null, null, expressionDelimiters())), null, 'delimiterNewRow')->
-	addRow(array(_('Case sensitive'), new CCheckBox('case_sensitiveNew')));
+	addRow([_('Expression'), new CTextBox('expressionNew', null, ZBX_TEXTBOX_STANDARD_SIZE)])->
+	addRow([_('Expression type'), new CComboBox('typeNew', null, null, expression_type2str())])->
+	addRow([_('Delimiter'), new CComboBox('delimiterNew', null, null, expressionDelimiters())], null, 'delimiterNewRow')->
+	addRow([_('Case sensitive'), new CCheckBox('case_sensitiveNew')]);
 
-$exprFormFooter = array(
+$exprFormFooter = [
 	new CButton('saveExpression', _('Add'), null, 'link_menu'),
 	SPACE,
 	new CButton('cancelExpression', _('Cancel'), null, 'link_menu')
-);
-$exprTab->addRow(null, new CDiv(array($exprForm, $exprFormFooter), 'objectgroup inlineblock border_dotted'), true, 'exprForm');
+];
+$exprTab->addRow(null, new CDiv([$exprForm, $exprFormFooter], 'objectgroup inlineblock border_dotted'), true, 'exprForm');
 
 /*
  * Test tab
@@ -97,11 +97,11 @@ $testTab = new CFormList('testTab');
 $testTab->addRow(_('Test string'), new CTextArea('test_string', $data['test_string']));
 $preloaderDiv = new CDiv(null, 'preloader', 'testPreloader');
 $preloaderDiv->addStyle('display: none');
-$testTab->addRow(SPACE, array(new CButton('testExpression', _('Test expressions')), $preloaderDiv));
+$testTab->addRow(SPACE, [new CButton('testExpression', _('Test expressions')), $preloaderDiv]);
 
 $tabExp = new CTableInfo();
 $tabExp->setAttribute('id', 'testResultTable');
-$tabExp->setHeader(array(_('Expression'), _('Expression type'), _('Result')));
+$tabExp->setHeader([_('Expression'), _('Expression type'), _('Result')]);
 $testTab->addRow(_('Result'), $tabExp);
 
 $regExpView = new CTabView();
@@ -115,20 +115,20 @@ $regExpView->addTab('test', _('Test'), $testTab);
 if (isset($data['regexpid'])) {
 	$regExpView->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CButton('clone', _('Clone')),
 			new CButtonDelete(
 				_('Delete regular expression?'),
 				url_param('regexpid').url_param('regexp.massdelete', false, 'action')
 			),
 			new CButtonCancel()
-		)
+		]
 	));
 }
 else {
 	$regExpView->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 

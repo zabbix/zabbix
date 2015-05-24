@@ -29,7 +29,7 @@ $authenticationForm->setName('authenticationForm');
 $authenticationFormList = new CFormList('authenticationList');
 
 // append config radio buttons to form list
-$configTypeRadioButton = array(
+$configTypeRadioButton = [
 	new CRadioButton('config', ZBX_AUTH_INTERNAL, null, 'config_'.ZBX_AUTH_INTERNAL,
 		($this->data['config']['authentication_type'] == ZBX_AUTH_INTERNAL),
 		'submit()'
@@ -45,7 +45,7 @@ $configTypeRadioButton = array(
 		'submit()'
 	),
 	new CLabel(_('HTTP'), 'config_'.ZBX_AUTH_HTTP)
-);
+];
 $authenticationFormList->addRow(_('Default authentication'),
 	new CDiv($configTypeRadioButton, 'jqueryinputset radioset')
 );
@@ -131,7 +131,7 @@ elseif ($this->data['config']['authentication_type'] != ZBX_AUTH_LDAP) {
 
 // append buttons to form
 if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
-	$authenticationTab->setFooter(makeFormFooter($saveButton, array(new CSubmit('test', _('Test')))));
+	$authenticationTab->setFooter(makeFormFooter($saveButton, [new CSubmit('test', _('Test'))]));
 }
 else {
 	$authenticationTab->setFooter(makeFormFooter($saveButton));

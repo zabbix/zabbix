@@ -51,7 +51,7 @@ class CRadioButtonList extends CDiv {
 
 		$label = new CLabel($name, $id);
 
-		$outerDiv = new CDiv(array($radio, $label));
+		$outerDiv = new CDiv([$radio, $label]);
 		if ($this->orientation == self::ORIENTATION_HORIZONTAL) {
 			$outerDiv->addClass('inlineblock');
 		}

@@ -29,35 +29,35 @@ $page['type'] = PAGE_TYPE_IMAGE;
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'config' =>				array(T_ZBX_INT, O_OPT,	P_SYS,			IN('0,1,2,3'),	null),
-	'hostids' =>			array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,			null),
-	'groupids' =>			array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,			null),
-	'items' =>				array(T_ZBX_STR, O_OPT,	P_SYS,			null,			null),
-	'title' =>				array(T_ZBX_STR, O_OPT, null,			null,			null),
-	'xlabel' =>				array(T_ZBX_STR, O_OPT, null,			null,			null),
-	'ylabel' =>				array(T_ZBX_STR, O_OPT, null,			null,			null),
-	'showlegend' =>			array(T_ZBX_STR, O_OPT, null,			null,			null),
-	'sorttype' =>			array(T_ZBX_INT, O_OPT,	null,			null,			null),
-	'scaletype' =>			array(T_ZBX_INT, O_OPT,	null,			null,			null),
-	'avgperiod' =>			array(T_ZBX_INT, O_OPT,	null,			null,			null),
-	'periods' =>			array(T_ZBX_STR, O_OPT,	null,			null,			null),
-	'report_timesince' =>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,			null),
-	'report_timetill' =>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,			null),
-	'palette'=>				array(T_ZBX_INT, O_OPT,	null,			null,			null),
-	'palettetype'=>			array(T_ZBX_INT, O_OPT,	null,			null,			null),
-);
+$fields = [
+	'config' =>				[T_ZBX_INT, O_OPT,	P_SYS,			IN('0,1,2,3'),	null],
+	'hostids' =>			[T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,			null],
+	'groupids' =>			[T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,			null],
+	'items' =>				[T_ZBX_STR, O_OPT,	P_SYS,			null,			null],
+	'title' =>				[T_ZBX_STR, O_OPT, null,			null,			null],
+	'xlabel' =>				[T_ZBX_STR, O_OPT, null,			null,			null],
+	'ylabel' =>				[T_ZBX_STR, O_OPT, null,			null,			null],
+	'showlegend' =>			[T_ZBX_STR, O_OPT, null,			null,			null],
+	'sorttype' =>			[T_ZBX_INT, O_OPT,	null,			null,			null],
+	'scaletype' =>			[T_ZBX_INT, O_OPT,	null,			null,			null],
+	'avgperiod' =>			[T_ZBX_INT, O_OPT,	null,			null,			null],
+	'periods' =>			[T_ZBX_STR, O_OPT,	null,			null,			null],
+	'report_timesince' =>	[T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,			null],
+	'report_timetill' =>	[T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,			null],
+	'palette'=>				[T_ZBX_INT, O_OPT,	null,			null,			null],
+	'palettetype'=>			[T_ZBX_INT, O_OPT,	null,			null,			null],
+];
 
 check_fields($fields);
 
 // validate permissions
-$items = getRequest('items', array());
+$items = getRequest('items', []);
 $itemIds = zbx_objectValues($_REQUEST['items'], 'itemid');
-$itemsCount = API::Item()->get(array(
+$itemsCount = API::Item()->get([
 	'itemids' => $itemIds,
 	'webitems' => true,
 	'countOutput' => true
-));
+]);
 if (count($itemIds) != $itemsCount) {
 	access_deny();
 }
@@ -155,9 +155,9 @@ if ($config == 1) {
 	$graph = new CBarGraphDraw(GRAPH_TYPE_COLUMN);
 	$graph->setHeader($title);
 
-	$graph_data['colors'] = array();
-	$graph_data['legend'] = array();
-	$db_values = array();
+	$graph_data['colors'] = [];
+	$graph_data['legend'] = [];
+	$db_values = [];
 
 	foreach ($items as $item) {
 		$itemid = $item['itemid'];
@@ -165,7 +165,7 @@ if ($config == 1) {
 
 		$graph_data['legend'][] = $item['caption'];
 
-		$sql_arr = array();
+		$sql_arr = [];
 		array_push($sql_arr,
 			'SELECT itemid,'.$calc_field.' as i,'.
 				' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
@@ -276,7 +276,7 @@ if ($config == 1) {
 		if (!isset($graph_data['captions'])) {
 			$date_caption = ($scaletype == TIMEPERIOD_TYPE_HOURLY) ? DATE_TIME_FORMAT : DATE_FORMAT;
 
-			$graph_data['captions'] = array();
+			$graph_data['captions'] = [];
 			foreach ($item_data['clock'] as $id => $clock) {
 				$graph_data['captions'][$id] = zbx_date2str($date_caption, $clock);
 			}
@@ -284,23 +284,23 @@ if ($config == 1) {
 	}
 }
 elseif ($config == 2) {
-	$periods = getRequest('periods', array());
+	$periods = getRequest('periods', []);
 
 	$graph = new CBarGraphDraw(GRAPH_TYPE_COLUMN);
 	$graph->setHeader('REPORT 1');
 
-	$graph_data = array();
+	$graph_data = [];
 
-	$graph_data['colors'] = array();
-	$graph_data['captions'] = array();
-	$graph_data['values'] = array();
-	$graph_data['legend'] = array();
+	$graph_data['colors'] = [];
+	$graph_data['captions'] = [];
+	$graph_data['values'] = [];
+	$graph_data['legend'] = [];
 
 	foreach ($periods as $pid => $period) {
 		$graph_data['colors'][] = $period['color'];
 		$graph_data['legend'][] = $period['caption'];
 
-		$db_values[$pid] = array();
+		$db_values[$pid] = [];
 		foreach ($items as $item) {
 			$itemid = $item['itemid'];
 			$item_data = &$db_values[$pid][$itemid];
@@ -383,8 +383,8 @@ elseif ($config == 2) {
 	}
 }
 elseif ($config == 3) {
-	$hostids = getRequest('hostids', array());
-	$groupids = getRequest('groupids', array());
+	$hostids = getRequest('hostids', []);
+	$groupids = getRequest('groupids', []);
 
 	// validate permissions
 	if (!API::Host()->isReadable($hostids) || !API::HostGroup()->isReadable($groupids)) {
@@ -405,7 +405,7 @@ elseif ($config == 3) {
 		$sql = 'SELECT DISTINCT hg.hostid'.
 			' FROM hosts_groups hg,hosts h'.
 			' WHERE h.hostid=hg.hostid'.
-				' AND '.dbConditionInt('h.status', array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)).
+				' AND '.dbConditionInt('h.status', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]).
 				' AND '.dbConditionInt('hg.groupid', $groupids);
 		$res = DBselect($sql);
 		while ($db_host = DBfetch($res)) {
@@ -413,7 +413,7 @@ elseif ($config == 3) {
 		}
 	}
 
-	$itemids = array();
+	$itemids = [];
 	foreach ($items as $item){
 		if ($item['itemid'] > 0) {
 			$itemids = get_same_item_for_host($item['itemid'], $hostids);
@@ -424,12 +424,12 @@ elseif ($config == 3) {
 	$graph = new CBarGraphDraw(GRAPH_TYPE_COLUMN);
 	$graph->setHeader('REPORT 3');
 
-	$graph_data = array();
+	$graph_data = [];
 
-	$graph_data['colors'] = array();
-	$graph_data['captions'] = array();
-	$graph_data['values'] = array();
-	$graph_data['legend'] = array();
+	$graph_data['colors'] = [];
+	$graph_data['captions'] = [];
+	$graph_data['values'] = [];
+	$graph_data['legend'] = [];
 
 
 	$timesince = getRequest('report_timesince', time() - SEC_PER_DAY);
@@ -525,11 +525,11 @@ elseif ($config == 3) {
 
 	$hosts = get_host_by_itemid($itemids);
 
-	$db_values = array();
+	$db_values = [];
 	foreach ($itemids as $itemid) {
 		$count = 0;
 		if (!isset($db_values[$count])) {
-			$db_values[$count] = array();
+			$db_values[$count] = [];
 		}
 		$graph_data['captions'][$itemid] = $hosts[$itemid]['host'];
 
@@ -571,7 +571,7 @@ elseif ($config == 3) {
 
 			$item_data = null;
 
-			$sql_arr = array();
+			$sql_arr = [];
 
 			array_push($sql_arr,
 				'SELECT itemid,'.$calc_field.' as i,sum(num) as count,avg(value_avg) as avg '.
@@ -632,7 +632,7 @@ elseif ($config == 3) {
 }
 
 if (!isset($graph_data['captions'])) {
-	$graph_data['captions'] = array();
+	$graph_data['captions'] = [];
 }
 if (!isset($graph_data['legend'])) {
 	$graph_data['legend'] = '';

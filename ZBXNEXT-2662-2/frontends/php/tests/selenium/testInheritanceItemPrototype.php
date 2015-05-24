@@ -65,25 +65,25 @@ class testInheritanceItemPrototype extends CWebTest {
 
 	// Returns create data
 	public static function create() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'testInheritanceItemPrototype6',
 					'key' => 'item-prototype-test6'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'testInheritanceItemPrototype5',
 					'key' => 'item-prototype-test5',
-					'errors' => array(
+					'errors' => [
 						'Item prototype "item-prototype-test5" already exists on "Template inheritance test host", inherited from another template'
-					)
-				)
-			)
-		);
+					]
+				]
+			]
+		];
 	}
 
 	/**

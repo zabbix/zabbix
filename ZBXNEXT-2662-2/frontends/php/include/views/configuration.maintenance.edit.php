@@ -37,10 +37,10 @@ $nameTextBox = new CTextBox('mname', $this->data['mname'], ZBX_TEXTBOX_STANDARD_
 $nameTextBox->setAttribute('autofocus', 'autofocus');
 $maintenanceFormList->addRow(_('Name'), $nameTextBox);
 $maintenanceFormList->addRow(_('Maintenance type'),
-	new CComboBox('maintenance_type', $this->data['maintenance_type'], null, array(
+	new CComboBox('maintenance_type', $this->data['maintenance_type'], null, [
 		MAINTENANCE_TYPE_NORMAL => _('With data collection'),
 		MAINTENANCE_TYPE_NODATA => _('No data collection')
-	))
+	])
 );
 
 // active since
@@ -50,13 +50,13 @@ if (isset($_REQUEST['active_since'])) {
 	$fromDay = getRequest('active_since_day');
 	$fromHours = getRequest('active_since_hour');
 	$fromMinutes = getRequest('active_since_minute');
-	$fromDate = array(
+	$fromDate = [
 		'y' => $fromYear,
 		'm' => $fromMonth,
 		'd' => $fromDay,
 		'h' => $fromHours,
 		'i' => $fromMinutes
-	);
+	];
 	$activeSince = $fromYear.$fromMonth.$fromDay.$fromHours.$fromMinutes;
 }
 else {
@@ -72,13 +72,13 @@ if (isset($_REQUEST['active_till'])) {
 	$toDay = getRequest('active_till_day');
 	$toHours = getRequest('active_till_hour');
 	$toMinutes = getRequest('active_till_minute');
-	$toDate = array(
+	$toDate = [
 		'y' => $toYear,
 		'm' => $toMonth,
 		'd' => $toDay,
 		'h' => $toHours,
 		'i' => $toMinutes,
-	);
+	];
 	$activeTill = $toYear.$toMonth.$toDay.$toHours.$toMinutes;
 }
 else {
@@ -106,16 +106,16 @@ $maintenancePeriodTable = (new CTable(_('No maintenance periods defined.')))->
 	]);
 
 foreach ($this->data['timeperiods'] as $id => $timeperiod) {
-	$maintenancePeriodTable->addRow(array(
+	$maintenancePeriodTable->addRow([
 		new CCol(timeperiod_type2str($timeperiod['timeperiod_type']), ZBX_STYLE_NOWRAP),
 		shedule2str($timeperiod),
 		new CCol(zbx_date2age(0, $timeperiod['period']), ZBX_STYLE_NOWRAP),
-		new CCol(array(
+		new CCol([
 			new CSubmit('edit_timeperiodid['.$id.']', _('Edit'), null, 'link_menu'),
 			SPACE.SPACE,
 			new CSubmit('del_timeperiodid['.$id.']', _('Remove'), null, 'link_menu')
-		), ZBX_STYLE_NOWRAP)
-	));
+		], ZBX_STYLE_NOWRAP)
+	]);
 	if (isset($timeperiod['timeperiodid'])) {
 		$maintenanceForm->addVar('timeperiods['.$id.'][timeperiodid]', $timeperiod['timeperiodid']);
 	}
@@ -143,14 +143,14 @@ if (isset($_REQUEST['new_timeperiod'])) {
 		$saveLabel = _('Add');
 	}
 
-	$footer = array(
+	$footer = [
 		new CSubmit('add_timeperiod', $saveLabel, null, 'link_menu'),
 		SPACE.SPACE,
 		new CSubmit('cancel_new_timeperiod', _('Cancel'), null, 'link_menu')
-	);
+	];
 
 	$maintenancePeriodFormList->addRow(_('Maintenance period'),
-		new CDiv(array(get_timeperiod_form(), $footer), 'objectgroup inlineblock border_dotted')
+		new CDiv([get_timeperiod_form(), $footer], 'objectgroup inlineblock border_dotted')
 	);
 }
 
@@ -168,7 +168,7 @@ foreach ($this->data['all_groups'] as $group) {
 }
 $hostTable = (new CTable())->
 	addClass('formElementTable')->
-	addRow($hostTweenBox->get(_('In maintenance'), array(_('Other hosts | Group').SPACE, $groupsComboBox)));
+	addRow($hostTweenBox->get(_('In maintenance'), [_('Other hosts | Group').SPACE, $groupsComboBox]));
 $hostsAndGroupsFormList->addRow(_('Hosts in maintenance'), $hostTable);
 
 $groupTable = (new CTable())->
@@ -194,17 +194,17 @@ $maintenanceTab->addTab('hostTab', _('Hosts & Groups'), $hostsAndGroupsFormList)
 if (isset($this->data['maintenanceid'])) {
 	$maintenanceTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete maintenance period?'), url_param('form').url_param('maintenanceid')),
 			new CButtonCancel()
-		)
+		]
 	));
 }
 else {
 	$maintenanceTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 

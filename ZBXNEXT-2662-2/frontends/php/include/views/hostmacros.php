@@ -38,17 +38,17 @@ else {
 		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			$link = new CLink(_('configure'), 'adm.macros.php');
 			$link->setAttribute('target', '_blank');
-			$link = array(' (', $link, ')');
+			$link = [' (', $link, ')'];
 		}
 		else {
 			$link = null;
 		}
-		$table->addRow(array(_('Macro'), '', _('Effective value'), $actions_col, '', _('Template value'), '',
-			array(_('Global value'), $link)
-		));
+		$table->addRow([_('Macro'), '', _('Effective value'), $actions_col, '', _('Template value'), '',
+			[_('Global value'), $link]
+		]);
 	}
 	else {
-		$table->addRow(array(_('Macro'), '', _('Value'), $actions_col));
+		$table->addRow([_('Macro'), '', _('Value'), $actions_col]);
 	}
 
 	// fields
@@ -60,7 +60,7 @@ else {
 		$macro_input->addClass('macro');
 		$macro_input->setAttribute('placeholder', '{$MACRO}');
 
-		$macro_cell = array($macro_input);
+		$macro_cell = [$macro_input];
 		if (!$data['readonly']) {
 			if (array_key_exists('hostmacroid', $macro)) {
 				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
@@ -83,7 +83,7 @@ else {
 		);
 		$value_input->setAttribute('placeholder', _('value'));
 
-		$row = array($macro_cell, '&rArr;', $value_input);
+		$row = [$macro_cell, '&rArr;', $value_input];
 
 		if (!$data['readonly']) {
 			if ($data['show_inherited_macros']) {
@@ -110,7 +110,7 @@ else {
 				);
 				$link->setAttribute('target', '_blank');
 				$row[] = '&lArr;';
-				$row[] = new CDiv(array($link, NAME_DELIMITER, '"'.$macro['template']['value'].'"'), 'macro-value');
+				$row[] = new CDiv([$link, NAME_DELIMITER, '"'.$macro['template']['value'].'"'], 'macro-value');
 			}
 			else {
 				array_push($row, '', new CDiv(null, 'macro-value'));
@@ -137,7 +137,7 @@ else {
 	}
 }
 
-$show_inherited_macros_filter = array(
+$show_inherited_macros_filter = [
 	new CRadioButton('show_inherited_macros', '0', null, 'hide_inherited_macros', !$data['show_inherited_macros'],
 		'this.form.submit()'
 	),
@@ -146,7 +146,7 @@ $show_inherited_macros_filter = array(
 		'this.form.submit()'
 	),
 	new CLabel(_('Inherited and host macros'), 'show_inherited_macros')
-);
+];
 
 $macros_form_list->addRow(null, new CDiv($show_inherited_macros_filter, 'jqueryinputset radioset'));
 $macros_form_list->addRow(null, $table);

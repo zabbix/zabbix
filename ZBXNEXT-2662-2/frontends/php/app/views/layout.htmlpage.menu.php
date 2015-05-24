@@ -35,7 +35,7 @@
 	$search->addClass('search');
 
 	$button = new CSubmitButton(SPACE, null, null, 'btn-search');
-	$form->AddItem(array($search, $button));
+	$form->AddItem([$search, $button]);
 	$icons->addItem($form);
 
 	$zshare = new CLink('Share', 'https://share.zabbix.com/', 'top-nav-zbbshare', null, true);
@@ -64,7 +64,7 @@
 		addClass('sub_menu')->
 		addClass('maxwidth')->
 		addClass('ui-widget-header');
-	$menu_divs = array();
+	$menu_divs = [];
 	$menu_selected = false;
 	foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
 		$sub_menu_row = new CList([], 'top-subnav');

@@ -22,7 +22,7 @@
 class CFilter extends CTag {
 
 	private $filterid;
-	private $columns = array();
+	private $columns = [];
 	private $form;
 	private $footer = null;
 	private $navigator = false;
@@ -33,7 +33,7 @@ class CFilter extends CTag {
 		$this->setAttribute('class', 'filter-container');
 		$this->setAttribute('id', 'filter-space');
 		$this->filterid = $filterid;
-		$this->columns = array();
+		$this->columns = [];
 
 		$this->form = new CForm('get');
 		$this->form->setAttribute('name', $this->name);
@@ -65,7 +65,7 @@ class CFilter extends CTag {
 
 	private function getHeader() {
 		$switch = new CDiv(null, 'filter-btn-container');
-		$button = new CSimpleButton(array(_('Filter'), new CSpan(null, 'arrow-up', 'filter-arrow')), 'filter-trigger filter-active');
+		$button = new CSimpleButton([_('Filter'), new CSpan(null, 'arrow-up', 'filter-arrow')], 'filter-trigger filter-active');
 		$button->setAttribute('id', 'filter-mode');
 		$button->onClick('javascript: jQuery("#filter-space").toggle(); jQuery("#filter-mode").toggleClass("filter-active"); jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");');
 		$switch->addItem($button);

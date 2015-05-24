@@ -303,17 +303,17 @@ class C20ImportConverter extends CConverter {
 		// string filters were exported as "{#MACRO}:regex"
 		elseif ($rule['filter'] && !is_array($rule['filter'])) {
 			list ($filterMacro, $filterValue) = explode(':', $rule['filter']);
-			$rule['filter'] = array(
+			$rule['filter'] = [
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 				'formula' => '',
-				'conditions' => array(
-					array(
+				'conditions' => [
+					[
 						'macro' => $filterMacro,
 						'value' => $filterValue,
 						'operator' => CONDITION_OPERATOR_REGEXP
-					)
-				)
-			);
+					]
+				]
+			];
 		}
 
 		return $rule;

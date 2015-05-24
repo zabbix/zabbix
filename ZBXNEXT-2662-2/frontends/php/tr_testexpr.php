@@ -29,12 +29,12 @@ define('ZBX_PAGE_NO_MENU', 1);
 define('COMBO_PATTERN', 'str_in_array({},array(');
 define('COMBO_PATTERN_LENGTH', strlen(COMBO_PATTERN));
 
-$definedErrorPhrases = array(
+$definedErrorPhrases = [
 	EXPRESSION_HOST_UNKNOWN => _('Unknown host, no such host present in system'),
 	EXPRESSION_HOST_ITEM_UNKNOWN => _('Unknown host item, no such item in selected host'),
 	EXPRESSION_NOT_A_MACRO_ERROR => _('Given expression is not a macro'),
 	EXPRESSION_FUNCTION_UNKNOWN => _('Incorrect function is used')
-);
+];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -48,24 +48,24 @@ list($outline, $eHTMLTree) = analyzeExpression($expression);
 $dataTable = (new CTable())->
 	addClass('tableinfo')->
 	setAttribute('id', 'data_list')->
-	setHeader(array(_('Expression Variable Elements'), _('Result type'), _('Value')));
+	setHeader([_('Expression Variable Elements'), _('Result type'), _('Value')]);
 
-$datas = array();
-$fields = array();
-$rplcts = array();
+$datas = [];
+$fields = [];
+$rplcts = [];
 $allowedTesting = true;
 
 $expressionData = new CTriggerExpression();
 $result = $expressionData->parse($expression);
 if ($result) {
-	$macrosData = array();
+	$macrosData = [];
 
-	$supportedTokenTypes = array(
+	$supportedTokenTypes = [
 		CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO => 1,
 		CTriggerExpressionParserResult::TOKEN_TYPE_MACRO => 1,
 		CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO => 1,
 		CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO => 1
-	);
+	];
 	foreach ($result->getTokens() as $token) {
 		if (!isset($supportedTokenTypes[$token['type']]) || isset($macrosData[$token['value']])) {
 			continue;
@@ -97,21 +97,21 @@ if ($result) {
 				$control = new CTextBox($fname, $macrosData[$token['value']], 30);
 			}
 
-			$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})',
+			$fields[$fname] = [$info['type'], O_OPT, null, $validation, 'isset({test_expression})',
 				$token['value']
-			);
+			];
 		}
 
 		$resultType = (is_array($info) || !isset($definedErrorPhrases[$info]))
 			? $info['value_type']
 			: new CCol($definedErrorPhrases[$info], 'disaster');
 
-		$dataTable->addRow(new CRow(array($token['value'], $resultType, $control)));
+		$dataTable->addRow(new CRow([$token['value'], $resultType, $control]));
 	}
 }
 
 // checks
-$fields['test_expression'] = array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null);
+$fields['test_expression'] = [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null];
 if (!check_fields($fields)) {
 	$test = false;
 }
@@ -136,7 +136,7 @@ $resultTable = (new CTable())->
 	setAttribute('id', 'result_list');
 $resultTable->setOddRowClass('even_row');
 $resultTable->setEvenRowClass('even_row');
-$resultTable->setHeader(array(_('Expression'), _('Result')));
+$resultTable->setHeader([_('Expression'), _('Result')]);
 
 ksort($rplcts, SORT_NUMERIC);
 
@@ -158,7 +158,7 @@ foreach ($eHTMLTree as $e) {
 	$col = new CCol($result);
 	$col->setAttribute('style', $style);
 
-	$resultTable->addRow(new CRow(array($e['list'], $col)));
+	$resultTable->addRow(new CRow([$e['list'], $col]));
 }
 
 $result = '-';
@@ -178,7 +178,7 @@ if ($allowedTesting && $test) {
 $col = new CCol($result);
 $col->setAttribute('style', $style);
 
-$resultTable->setFooter(array($outline, $col), $resultTable->headerClass);
+$resultTable->setFooter([$outline, $col], $resultTable->headerClass);
 
 $testForm->addRow(_('Result'), $resultTable);
 
