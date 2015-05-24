@@ -30,8 +30,9 @@ if ($data['readonly'] && !$data['macros']) {
 	$table = _('No macros found.');
 }
 else {
-	$table = new CTable(null, 'formElementTable');
-	$table->setAttribute('id', 'tbl_macros');
+	$table = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('id', 'tbl_macros');
 	$actions_col = $data['readonly'] ? null : '';
 	if ($data['show_inherited_macros']) {
 		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {

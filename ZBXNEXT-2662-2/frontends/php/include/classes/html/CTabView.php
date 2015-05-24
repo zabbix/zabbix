@@ -45,8 +45,8 @@ class CTabView extends CDiv {
 			$this->setDisabled($data['disabled']);
 		}
 		parent::__construct();
-		$this->attr('id', zbx_formatDomId($this->id));
-		$this->attr('class', ZBX_STYLE_TABLE_FORMS_CONTAINER);
+		$this->setAttribute('id', zbx_formatDomId($this->id));
+		$this->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER);
 	}
 
 	public function setSelected($selected) {
@@ -67,7 +67,7 @@ class CTabView extends CDiv {
 	public function addTab($id, $header, $body) {
 		$this->headers[$id] = $header;
 		$this->tabs[$id] = new CDiv($body);
-		$this->tabs[$id]->attr('id', zbx_formatDomId($id));
+		$this->tabs[$id]->setAttribute('id', zbx_formatDomId($id));
 	}
 
 	public function setFooter($footer) {

@@ -51,7 +51,7 @@ if (!empty($this->data['templates'])) {
 // Name
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['templated'], 64);
 if (!$this->data['templated']) {
-	$nameTextBox->attr('autofocus', 'autofocus');
+	$nameTextBox->setAttribute('autofocus', 'autofocus');
 }
 $httpFormList->addRow(_('Name'), $nameTextBox);
 
@@ -157,11 +157,11 @@ $httpAuthenticationFormList->addRow(
  * Step tab
  */
 $httpStepFormList = new CFormList('httpFormList');
-$stepsTable = new CTable(null, 'formElementTable');
-$stepsTable->setAttributes(array(
-	'style' => 'min-width: 500px;',
-	'id' => 'httpStepTable'
-));
+$stepsTable = (new CTable())->
+	addClass('formElementTable')->
+	setAttribute('style', 'min-width: 500px;')->
+	setAttribute('id', 'httpStepTable');
+
 $stepsTable->setHeader(array(
 	new CCol(SPACE, null, null, '15'),
 	new CCol(SPACE, null, null, '15'),
@@ -191,15 +191,13 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$step['required'] = '';
 	}
 
-	$numSpan = new CSpan($i++.':');
-	$numSpan->addClass('rowNum');
-	$numSpan->setAttribute('id', 'current_step_'.$stepid);
+	$numSpan = (new CSpan($i++.':'))->
+		addClass('rowNum')->
+		setAttribute('id', 'current_step_'.$stepid);
 
-	$name = new CSpan($step['name'], 'link');
-	$name->setAttributes(array(
-		'id' => 'name_'.$stepid,
-		'name_step' => $stepid
-	));
+	$name = (new CSpan($step['name'], 'link'))->
+		setAttribute('id', 'name_'.$stepid)->
+		setAttribute('name_step', $stepid);
 
 	if (mb_strlen($step['url']) > 70) {
 		$start = mb_substr($step['url'], 0, 35);

@@ -33,7 +33,9 @@ class CTable extends CTag {
 
 	public function __construct($message = null, $class = null) {
 		parent::__construct('table', 'yes');
-		$this->attr('class', $class);
+		if ($class !== null) {
+			$this->addClass($class);
+		}
 		$this->rownum = 0;
 		$this->oddRowClass = null;
 		$this->evenRowClass = null;
@@ -77,7 +79,9 @@ class CTable extends CTag {
 		}
 
 		if (is_object($item) && strtolower(get_class($item)) === 'crow') {
-			$item->attr('class', $class);
+			if ($class !== null) {
+				$item->addClass($class);
+			}
 		}
 		else {
 			$item = new CRow($item, $class, $id);
@@ -85,7 +89,9 @@ class CTable extends CTag {
 
 		if (!isset($item->attributes['class']) || is_array($item->attributes['class'])) {
 			$class = ($this->rownum % 2) ? $this->oddRowClass : $this->evenRowClass;
-			$item->attr('class', $class);
+			if ($class !== null) {
+				$item->addClass($class);
+			}
 		}
 		return $item;
 	}
@@ -106,6 +112,8 @@ class CTable extends CTag {
 
 		$value = new CTag('thead', 'yes', $value);
 		$this->header = $value->toString();
+
+		return $this;
 	}
 
 	public function setFooter($value = null, $class = 'footer') {
@@ -119,7 +127,8 @@ class CTable extends CTag {
 	public function addRow($item, $class = null, $id = null) {
 		$item = $this->addItem($this->prepareRow($item, $class, $id));
 		++$this->rownum;
-		return $item;
+
+		return $this;
 	}
 
 	public function showRow($item, $class = null, $id = null) {

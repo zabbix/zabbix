@@ -189,8 +189,8 @@ class CProfiler {
 		}
 
 		$debug = new CDiv(null, 'textcolorstyles');
-		$debug->attr('name', 'zbx_debug_info');
-		$debug->attr('style', 'display: none; overflow: auto; width: 95%; border: 1px #777777 solid; margin: 4px; padding: 4px;');
+		$debug->setAttribute('name', 'zbx_debug_info');
+		$debug->setAttribute('style', 'display: none; overflow: auto; width: 95%; border: 1px #777777 solid; margin: 4px; padding: 4px;');
 		$debug->addItem(array(BR(), new CJsScript($debug_str), BR()));
 		$debug->show();
 	}

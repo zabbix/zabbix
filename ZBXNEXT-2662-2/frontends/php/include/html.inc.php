@@ -161,7 +161,11 @@ function get_table_header($columnLeft, $columnRights = SPACE) {
 		$rights = array_reverse($rights);
 	}
 
-	$table = new CTable(null, 'ui-widget-header ui-corner-all header maxwidth');
+	$table = (new CTable())->
+		addClass('ui-widget-header')->
+		addClass('ui-corner-all')->
+		addClass('header')->
+		addClass('maxwidth');
 	$table->setCellSpacing(0);
 	$table->setCellPadding(1);
 	$table->addRow(array(new CCol($columnLeft, 'header_l left'), new CCol($rights, 'header_r right')));
@@ -181,13 +185,13 @@ function get_icon($type, $params = array()) {
 				$icon = new CRedirectButton(SPACE, null);
 				$icon->addClass(ZBX_STYLE_BTN_REMOVE_FAV);
 				$icon->setTitle(_('Remove from favourites'));
-				$icon->addAction('onclick', 'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
+				$icon->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
 				$icon = new CRedirectButton(SPACE, null);
 				$icon->addClass(ZBX_STYLE_BTN_ADD_FAV);
 				$icon->setTitle(_('Add to favourites'));
-				$icon->addAction('onclick', 'add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
+				$icon->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			$icon->setAttribute('id', 'addrm_fav');
 
@@ -240,7 +244,7 @@ function get_icon($type, $params = array()) {
 			$icon = new CRedirectButton(SPACE, null);
 			$icon->addClass(ZBX_STYLE_BTN_RESET);
 			$icon->setTitle(_('Reset'));
-			$icon->addAction('onclick', 'timeControl.objectReset();');
+			$icon->onClick('timeControl.objectReset();');
 
 			return $icon;
 	}
@@ -696,27 +700,27 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 	}
 
 	$day = new CTextBox($name.'_day', $d, 2, false, 2);
-	$day->attr('style', 'text-align: right;');
-	$day->attr('placeholder', _('dd'));
-	$day->addAction('onchange', 'validateDatePartBox(this, 1, 31, 2);');
+	$day->setAttribute('style', 'text-align: right;');
+	$day->setAttribute('placeholder', _('dd'));
+	$day->onChange('validateDatePartBox(this, 1, 31, 2);');
 
 	$month = new CTextBox($name.'_month', $m, 2, false, 2);
-	$month->attr('style', 'text-align: right;');
-	$month->attr('placeholder', _('mm'));
-	$month->addAction('onchange', 'validateDatePartBox(this, 1, 12, 2);');
+	$month->setAttribute('style', 'text-align: right;');
+	$month->setAttribute('placeholder', _('mm'));
+	$month->onChange('validateDatePartBox(this, 1, 12, 2);');
 
 	$year = new CNumericBox($name.'_year', $y, 4);
-	$year->attr('placeholder', _('yyyy'));
+	$year->setAttribute('placeholder', _('yyyy'));
 
 	$hour = new CTextBox($name.'_hour', $h, 2, false, 2);
-	$hour->attr('style', 'text-align: right;');
-	$hour->attr('placeholder', _('hh'));
-	$hour->addAction('onchange', 'validateDatePartBox(this, 0, 23, 2);');
+	$hour->setAttribute('style', 'text-align: right;');
+	$hour->setAttribute('placeholder', _('hh'));
+	$hour->onChange('validateDatePartBox(this, 0, 23, 2);');
 
 	$minute = new CTextBox($name.'_minute', $i, 2, false, 2);
-	$minute->attr('style', 'text-align: right;');
-	$minute->attr('placeholder', _('mm'));
-	$minute->addAction('onchange', 'validateDatePartBox(this, 0, 59, 2);');
+	$minute->setAttribute('style', 'text-align: right;');
+	$minute->setAttribute('placeholder', _('mm'));
+	$minute->onChange('validateDatePartBox(this, 0, 59, 2);');
 
 	$fields = array($year, '-', $month, '-', $day, ' ', $hour, ':', $minute, $calendarIcon);
 

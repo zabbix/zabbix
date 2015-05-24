@@ -118,8 +118,8 @@ class CScreenHostgroupTriggers extends CScreenBase {
 			}
 
 			if ($this->mode == SCREEN_MODE_EDIT) {
-				$groupComboBox->attr('disabled', 'disabled');
-				$hostComboBox->attr('disabled', 'disabled');
+				$groupComboBox->setAttribute('disabled', 'disabled');
+				$hostComboBox->setAttribute('disabled', 'disabled');
 			}
 
 			$item->addItem(array(_('Group').SPACE, $groupComboBox));

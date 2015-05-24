@@ -47,9 +47,14 @@ $header_form->addItem($controls);
 
 $widget->setControls($header_form);
 
-$table = new CTable(null, 'formElementTable');
-$table->setAttribute('id', 'tbl_macros');
-$table->addRow(array(_('Macro'), '', _('Value'), ''));
+$table = (new CTable())->
+	addClass('formElementTable')->
+	setAttribute('id', 'tbl_macros')->
+	addRow([
+		_('Macro'), '',
+		_('Value'),
+		''
+	]);
 
 // fields
 foreach ($data['macros'] as $i => $macro) {
@@ -82,7 +87,7 @@ $tab_view = new CTabView();
 $tab_view->addTab('macros', _('Macros'), $macros_form_list);
 
 $saveButton = new CSubmit('update', _('Update'));
-$saveButton->attr('data-removed-count', 0);
+$saveButton->setAttribute('data-removed-count', 0);
 $saveButton->main();
 
 $tab_view->setFooter(makeFormFooter(null, [$saveButton]));

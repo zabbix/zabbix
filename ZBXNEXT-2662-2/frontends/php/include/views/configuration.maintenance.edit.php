@@ -34,7 +34,7 @@ if (isset($this->data['maintenanceid'])) {
  */
 $maintenanceFormList = new CFormList('maintenanceFormList');
 $nameTextBox = new CTextBox('mname', $this->data['mname'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $maintenanceFormList->addRow(_('Name'), $nameTextBox);
 $maintenanceFormList->addRow(_('Maintenance type'),
 	new CComboBox('maintenance_type', $this->data['maintenance_type'], null, array(
@@ -96,13 +96,14 @@ $maintenanceFormList->addRow(_('Description'), new CTextArea('description', $thi
  * Maintenance period tab
  */
 $maintenancePeriodFormList = new CFormList('maintenancePeriodFormList');
-$maintenancePeriodTable = new CTable(_('No maintenance periods defined.'), 'formElementTable');
-$maintenancePeriodTable->setHeader(array(
-	_('Period type'),
-	_('Schedule'),
-	_('Period'),
-	_('Action')
-));
+$maintenancePeriodTable = (new CTable(_('No maintenance periods defined.')))->
+	addClass('formElementTable')->
+	setHeader([
+		_('Period type'),
+		_('Schedule'),
+		_('Period'),
+		_('Action')
+	]);
 
 foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 	$maintenancePeriodTable->addRow(array(
@@ -165,11 +166,13 @@ $groupsComboBox = new CComboBox('twb_groupid', $this->data['twb_groupid'], 'subm
 foreach ($this->data['all_groups'] as $group) {
 	$groupsComboBox->addItem($group['groupid'], $group['name']);
 }
-$hostTable = new CTable(null, 'formElementTable');
-$hostTable->addRow($hostTweenBox->get(_('In maintenance'), array(_('Other hosts | Group').SPACE, $groupsComboBox)));
+$hostTable = (new CTable())->
+	addClass('formElementTable')->
+	addRow($hostTweenBox->get(_('In maintenance'), array(_('Other hosts | Group').SPACE, $groupsComboBox)));
 $hostsAndGroupsFormList->addRow(_('Hosts in maintenance'), $hostTable);
 
-$groupTable = new CTable(null, 'formElementTable');
+$groupTable = (new CTable())->
+	addClass('formElementTable');
 $groupTweenBox = new CTweenBox($maintenanceForm, 'groupids', $this->data['groupids'], 10);
 foreach ($this->data['all_groups'] as $group) {
 	$groupTweenBox->addItem($group['groupid'], $group['name']);

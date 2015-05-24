@@ -74,7 +74,7 @@ $templateList = new CFormList('hostlist');
 
 // FORM ITEM : Template name text box [  ]
 $template_nameTB = new CTextBox('template_name', $host, 54, false, 128);
-$template_nameTB->attr('autofocus', 'autofocus');
+$template_nameTB->setAttribute('autofocus', 'autofocus');
 $templateList->addRow(_('Template name'), $template_nameTB);
 
 $visiblenameTB = new CTextBox('visiblename', $visiblename, 54, false, 128);
@@ -384,8 +384,9 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 $tmplList = new CFormList();
 
 // create linked template table
-$linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');
-$linkedTemplateTable->attr('id', 'linkedTemplateTable');
+$linkedTemplateTable = (new CTable(_('No templates linked.')))->
+	addClass('formElementTable');
+$linkedTemplateTable->setAttribute('id', 'linkedTemplateTable');
 $linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 
 $ignoredTemplates = array();
@@ -421,9 +422,10 @@ foreach ($data['linkedTemplates'] as $template) {
 $tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
 
 // create new linked template table
-$newTemplateTable = new CTable(null, 'formElementTable');
-$newTemplateTable->attr('id', 'newTemplateTable');
-$newTemplateTable->attr('style', 'min-width: 400px;');
+$newTemplateTable = (new CTable())->
+	addClass('formElementTable');
+$newTemplateTable->setAttribute('id', 'newTemplateTable');
+$newTemplateTable->setAttribute('style', 'min-width: 400px;');
 
 $newTemplateTable->addRow(array(new CMultiSelect(array(
 	'name' => 'add_templates[]',

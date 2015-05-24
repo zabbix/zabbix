@@ -28,7 +28,8 @@ class CTriggersInfo extends CTable {
 	public function __construct($groupid = null, $hostid = null, $style = STYLE_HORIZONTAL) {
 		$this->style = null;
 
-		parent::__construct(null, 'list-table');
+		parent::__construct();
+		$this->addClass(ZBX_STYLE_LIST_TABLE);
 		$this->setOrientation($style);
 		$this->groupid = is_null($groupid) ? 0 : $groupid;
 		$this->hostid = is_null($hostid) ? 0 : $hostid;

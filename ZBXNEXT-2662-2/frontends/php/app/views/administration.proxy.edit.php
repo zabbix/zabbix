@@ -34,7 +34,7 @@ if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 // create form list
 $proxyFormList = new CFormList('proxyFormList');
 $nameTextBox = new CTextBox('host', $data['host'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $proxyFormList->addRow(_('Proxy name'), $nameTextBox);
 
 // append status to form list

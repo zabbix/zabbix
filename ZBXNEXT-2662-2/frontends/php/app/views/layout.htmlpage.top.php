@@ -67,14 +67,15 @@ if ($data['fullscreen'] == 0) {
 	$logo = new CLink(new CDiv(null, 'zabbix_logo'), 'http://www.zabbix.com/', 'image', null, 'nosid');
 	$logo->setTarget('_blank');
 
-	$top_page_row = array(
+	$top_page_row = [
 		new CCol($logo, 'page_header_l'),
 		new CCol($page_header_r_col, 'maxwidth page_header_r')
-	);
+	];
 
 	unset($logo, $page_header_r_col, $help, $support, $debug);
 
-	$table = new CTable(null, 'maxwidth page_header');
-	$table->addRow($top_page_row);
-//	$table->show();
+	$table = (new CTable())->
+		addClass('maxwidth')->
+		addClass('page_header')->
+		addRow($top_page_row);
 }

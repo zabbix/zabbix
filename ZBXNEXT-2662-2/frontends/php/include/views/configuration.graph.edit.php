@@ -50,7 +50,7 @@ if (!empty($this->data['templates'])) {
 	$graphFormList->addRow(_('Parent graphs'), $this->data['templates']);
 }
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $graphFormList->addRow(_('Name'), $nameTextBox);
 $graphFormList->addRow(_('Width'), new CNumericBox('width', $this->data['width'], 5));
 $graphFormList->addRow(_('Height'), new CNumericBox('height', $this->data['height'], 5));
@@ -71,11 +71,11 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$percentLeftCheckbox = new CCheckBox('visible[percent_left]', 1, 'javascript: showHideVisible("percent_left");', 1);
 
 		if(isset($this->data['visible']) && isset($this->data['visible']['percent_left'])) {
-			$percentLeftTextBox->attr('style', '');
+			$percentLeftTextBox->setAttribute('style', '');
 			$percentLeftCheckbox->setChecked(1);
 		}
 		elseif ($this->data['percent_left'] == 0) {
-			$percentLeftTextBox->attr('style', 'visibility: hidden;');
+			$percentLeftTextBox->setAttribute('style', 'visibility: hidden;');
 			$percentLeftCheckbox->setChecked(0);
 		}
 
@@ -86,11 +86,11 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$percentRightCheckbox = new CCheckBox('visible[percent_right]', 1, 'javascript: showHideVisible("percent_right");', 1);
 
 		if(isset($this->data['visible']) && isset($this->data['visible']['percent_right'])) {
-			$percentRightTextBox->attr('style', '');
+			$percentRightTextBox->setAttribute('style', '');
 			$percentRightCheckbox->setChecked(1);
 		}
 		elseif ($this->data['percent_right'] == 0) {
-			$percentRightTextBox->attr('style', 'visibility: hidden;');
+			$percentRightTextBox->setAttribute('style', 'visibility: hidden;');
 			$percentRightCheckbox->setChecked(0);
 		}
 
@@ -217,9 +217,10 @@ else {
 }
 
 // append items to form list
-$itemsTable = new CTable(null, 'formElementTable');
-$itemsTable->attr('style', 'min-width: 700px;');
-$itemsTable->attr('id', 'itemsTable');
+$itemsTable = (new CTable())->
+	addClass('formElementTable');
+$itemsTable->setAttribute('style', 'min-width: 700px;');
+$itemsTable->setAttribute('id', 'itemsTable');
 $itemsTable->setHeader(array(
 	new CCol(SPACE, null, null, 15),
 	new CCol(SPACE, null, null, 15),
@@ -294,7 +295,9 @@ $graphTab->addTab(
 $chartImage = new CImg('chart3.php?period=3600');
 $chartImage->preload();
 
-$graphPreviewTable = new CTable(null, 'center maxwidth');
+$graphPreviewTable = (new CTable())->
+	addClass('center')->
+	addClass('maxwidth');
 $graphPreviewTable->addRow(new CDiv($chartImage, null, 'previewChar'));
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 

@@ -49,7 +49,7 @@ if (!empty($this->data['templates'])) {
 }
 
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $itemFormList->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
@@ -259,10 +259,11 @@ $itemFormList->addRow(_('Use custom multiplier'), $multiplier, false, 'row_multi
 $itemFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5), false, 'row_delay');
 
 // append delay flex to form list
-$delayFlexTable = new CTable(_('No flexible intervals defined.'), 'formElementTable');
-$delayFlexTable->setAttribute('style', 'min-width: 310px;');
-$delayFlexTable->setAttribute('id', 'delayFlexTable');
-$delayFlexTable->setHeader(array(_('Interval'), _('Period'), _('Action')));
+$delayFlexTable = (new CTable(_('No flexible intervals defined.')))->
+	addClass('formElementTable')->
+	setAttribute('style', 'min-width: 310px;')->
+	setAttribute('id', 'delayFlexTable')->
+	setHeader(array(_('Interval'), _('Period'), _('Action')));
 $i = 0;
 $this->data['maxReached'] = false;
 foreach ($this->data['delay_flex'] as $delayFlex) {

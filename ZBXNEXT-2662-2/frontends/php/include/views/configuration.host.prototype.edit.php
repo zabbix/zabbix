@@ -81,9 +81,10 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	zbx_add_post_js('hostInterfacesManager.disable();');
 
 	// table for agent interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'agentInterfaces');
-	$ifTab->setAttribute('data-type', 'agent');
+	$ifTab = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('id', 'agentInterfaces')->
+		setAttribute('data-type', 'agent');
 
 	// header
 	$ifTab->addRow(array(
@@ -106,9 +107,10 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-first');
 
 	// table for SNMP interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'SNMPInterfaces');
-	$ifTab->setAttribute('data-type', 'snmp');
+	$ifTab = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('id', 'SNMPInterfaces')->
+		setAttribute('data-type', 'snmp');
 
 	$row = new CRow(null, null, 'SNMPInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
@@ -119,9 +121,10 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
 
 	// table for JMX interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'JMXInterfaces');
-	$ifTab->setAttribute('data-type', 'jmx');
+	$ifTab = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('id', 'JMXInterfaces')->
+		setAttribute('data-type', 'jmx');
 
 	$row = new CRow(null, null, 'JMXInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
@@ -132,9 +135,10 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
 
 	// table for IPMI interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'IPMIInterfaces');
-	$ifTab->setAttribute('data-type', 'ipmi');
+	$ifTab = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('id', 'IPMIInterfaces')->
+		setAttribute('data-type', 'ipmi');
 
 	$row = new CRow(null, null, 'IPMIInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
@@ -185,8 +189,9 @@ $groupList->addRow(_('Groups'), new CMultiSelect(array(
 )));
 
 // new group prototypes
-$customGroupTable = new CTable(SPACE, 'formElementTable');
-$customGroupTable->setAttribute('id', 'tbl_group_prototypes');
+$customGroupTable = (new CTable(SPACE))->
+		addClass('formElementTable')->
+		setAttribute('id', 'tbl_group_prototypes');
 
 // buttons
 $addButton = new CButton('group_prototype_add', _('Add'), null, 'link_menu');
@@ -207,9 +212,10 @@ $divTabs->addTab('groupTab', _('Groups'), $groupList);
 $tmplList = new CFormList();
 
 // create linked template table
-$linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');
-$linkedTemplateTable->attr('id', 'linkedTemplateTable');
-$linkedTemplateTable->attr('style', 'min-width: 400px;');
+$linkedTemplateTable = (new CTable(_('No templates linked.')))->
+	addClass('formElementTable');
+$linkedTemplateTable->setAttribute('id', 'linkedTemplateTable');
+$linkedTemplateTable->setAttribute('style', 'min-width: 400px;');
 $linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 
 $ignoreTemplates = array();
@@ -236,9 +242,10 @@ elseif ($hostPrototype['templateid']) {
 
 // create new linked template table
 if (!$hostPrototype['templateid']) {
-	$newTemplateTable = new CTable(null, 'formElementTable');
-	$newTemplateTable->attr('id', 'newTemplateTable');
-	$newTemplateTable->attr('style', 'min-width: 400px;');
+	$newTemplateTable = (new CTable())->
+		addClass('formElementTable');
+	$newTemplateTable->setAttribute('id', 'newTemplateTable');
+	$newTemplateTable->setAttribute('style', 'min-width: 400px;');
 
 	$newTemplateTable->addRow(array(new CMultiSelect(array(
 		'name' => 'add_templates[]',

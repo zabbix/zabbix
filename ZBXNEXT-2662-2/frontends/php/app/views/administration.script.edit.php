@@ -33,8 +33,8 @@ $scriptFormList = new CFormList();
 
 // name
 $nameTextBox = new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->attr('autofocus', 'autofocus');
-$nameTextBox->attr('placeholder', _('<Sub-menu/Sub-menu.../>Script'));
+$nameTextBox->setAttribute('autofocus', 'autofocus');
+$nameTextBox->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'));
 $scriptFormList->addRow(_('Name'), $nameTextBox);
 
 // type

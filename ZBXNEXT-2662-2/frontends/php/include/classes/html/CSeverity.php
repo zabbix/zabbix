@@ -28,7 +28,7 @@ class CSeverity extends CTag {
 	 */
 	public function __construct(array $options = array()) {
 		parent::__construct('div', 'yes');
-		$this->attr('id', isset($options['id']) ? $options['id'] : zbx_formatDomId($options['name']));
+		$this->setAttribute('id', isset($options['id']) ? $options['id'] : zbx_formatDomId($options['name']));
 		$this->addClass('jqueryinputset radioset control-severity');
 
 		if (!isset($options['value'])) {
@@ -54,15 +54,15 @@ class CSeverity extends CTag {
 			$label = new CLabel(getSeverityName($severity, $config), $options['name'].'_'.$severity,
 				$options['name'].'_label_'.$severity
 			);
-			$label->attr('data-severity', $severity);
-			$label->attr('data-severity-style', $css);
+			$label->setAttribute('data-severity', $severity);
+			$label->setAttribute('data-severity-style', $css);
 
 			if ($options['value'] == $severity) {
-				$label->attr('aria-pressed', 'true');
+				$label->setAttribute('aria-pressed', 'true');
 				$label->addClass($css);
 			}
 			else {
-				$label->attr('aria-pressed', 'false');
+				$label->setAttribute('aria-pressed', 'false');
 			}
 
 			$items[] = $label;

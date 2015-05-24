@@ -30,7 +30,7 @@ $imageForm->addVar('imagetype', $this->data['imagetype']);
 // append form list
 $imageFormList = new CFormList('imageFormList');
 $nameTextBox = new CTextBox('name', $this->data['imagename'], 64, false, 64);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $imageFormList->addRow(_('Name'), $nameTextBox);
 $imageFormList->addRow(_('Upload'), new CFile('image'));
 

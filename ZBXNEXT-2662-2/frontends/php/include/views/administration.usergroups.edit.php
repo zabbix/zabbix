@@ -35,7 +35,7 @@ if (isset($this->data['usrgrpid'])) {
 */
 $userGroupFormList = new CFormList('userGroupFormList');
 $nameTextBox = new CTextBox('gname', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $userGroupFormList->addRow(_('Group name'), $nameTextBox);
 
 // append groups to form list
@@ -76,8 +76,9 @@ $userGroupFormList->addRow(_('Debug mode'), new CCheckBox('debug_mode', $this->d
 $permissionsFormList = new CFormList('permissionsFormList');
 
 // append permissions table to form list
-$permissionsTable = new CTable(null, 'right_table');
-$permissionsTable->setHeader(array(_('Read-write'), _('Read only'), _('Deny')), 'header');
+$permissionsTable = (new CTable())->
+	addClass('right_table')->
+	setHeader(array(_('Read-write'), _('Read only'), _('Deny')), 'header');
 
 $lstWrite = new CListBox('right_to_del[read_write][]', null, 20);
 $lstRead = new CListBox('right_to_del[read_only][]', null, 20);

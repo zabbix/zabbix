@@ -49,7 +49,7 @@ $headerForm->addItem($controls);
 $regExpWidget->setControls($headerForm);
 
 $form = new CForm();
-$form->attr('id', 'zabbixRegExpForm');
+$form->setAttribute('id', 'zabbixRegExpForm');
 $form->addVar('form', 1);
 $form->addVar('regexpid', $data['regexpid']);
 
@@ -60,11 +60,13 @@ zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($dat
  */
 $exprTab = new CFormList('exprTab');
 $nameTextBox = new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $exprTab->addRow(_('Name'), $nameTextBox);
 
-$exprTable = new CTable(null, 'formElementTable formWideTable');
-$exprTable->attr('id', 'exprTable');
+$exprTable = (new CTable())->
+	addClass('formElementTable')->
+	addClass('formWideTable');
+$exprTable->setAttribute('id', 'exprTable');
 $exprTable->setHeader(array(
 	_('Expression'),
 	new CCol(_('Expression type'), ZBX_STYLE_NOWRAP),
@@ -74,11 +76,13 @@ $exprTable->setHeader(array(
 $exprTable->setFooter(new CButton('add', _('Add'), null, 'link_menu exprAdd'));
 $exprTab->addRow(_('Expressions'), new CDiv($exprTable, 'inlineblock border_dotted objectgroup'));
 
-$exprForm = new CTable(null, 'formElementTable');
-$exprForm->addRow(array(_('Expression'), new CTextBox('expressionNew', null, ZBX_TEXTBOX_STANDARD_SIZE)));
-$exprForm->addRow(array(_('Expression type'), new CComboBox('typeNew', null, null, expression_type2str())));
-$exprForm->addRow(array(_('Delimiter'), new CComboBox('delimiterNew', null, null, expressionDelimiters())), null, 'delimiterNewRow');
-$exprForm->addRow(array(_('Case sensitive'), new CCheckBox('case_sensitiveNew')));
+$exprForm = (new CTable())->
+	addClass('formElementTable')->
+	addRow(array(_('Expression'), new CTextBox('expressionNew', null, ZBX_TEXTBOX_STANDARD_SIZE)))->
+	addRow(array(_('Expression type'), new CComboBox('typeNew', null, null, expression_type2str())))->
+	addRow(array(_('Delimiter'), new CComboBox('delimiterNew', null, null, expressionDelimiters())), null, 'delimiterNewRow')->
+	addRow(array(_('Case sensitive'), new CCheckBox('case_sensitiveNew')));
+
 $exprFormFooter = array(
 	new CButton('saveExpression', _('Add'), null, 'link_menu'),
 	SPACE,
@@ -96,7 +100,7 @@ $preloaderDiv->addStyle('display: none');
 $testTab->addRow(SPACE, array(new CButton('testExpression', _('Test expressions')), $preloaderDiv));
 
 $tabExp = new CTableInfo();
-$tabExp->attr('id', 'testResultTable');
+$tabExp->setAttribute('id', 'testResultTable');
 $tabExp->setHeader(array(_('Expression'), _('Expression type'), _('Result')));
 $testTab->addRow(_('Result'), $tabExp);
 

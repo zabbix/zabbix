@@ -106,7 +106,7 @@ $pageHeader->display();
  * Dispalying
  */
 $header = new CTag('header', 'yes', new CDiv(new CDiv(null, 'signin-logo')));
-$header->attr('role', 'banner');
+$header->setAttribute('role', 'banner');
 
 $link = new CLink('GPL v2', 'http://www.zabbix.com/license.php', null, null, true);
 $link->setAttribute('target', '_blank');

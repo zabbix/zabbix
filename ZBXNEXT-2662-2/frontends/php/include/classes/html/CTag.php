@@ -114,51 +114,24 @@ class CTag extends CObject {
 	}
 
 	public function setName($value) {
-		if (is_null($value)) {
-			return $value;
-		}
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for SetName "'.$value.'".');
-		}
-
-		return $this->setAttribute('name', $value);
-	}
-
-	public function getName() {
-		if (isset($this->attributes['name'])) {
-			return $this->attributes['name'];
-		}
-
-		return null;
-	}
-
-	public function addClass($cssClass) {
-		if (!isset($this->attributes['class']) || zbx_empty($this->attributes['class'])) {
-			$this->attributes['class'] = $cssClass;
-		}
-		else {
-			$this->attributes['class'] .= ' '.$cssClass;
-		}
+		$this->setAttribute('name', $value);
 
 		return $this;
 	}
 
-	/**
-	 * HTML class check for existing, return thue if exist
-	 *
-	 * @param string $cssClass
-	 *
-	 * @return bool
-	 */
-	public function hasClass($cssClass) {
-		$chkClass = explode(' ', $this->getAttribute('class'));
-		return in_array($cssClass, $chkClass);
+	public function getName() {
+		return $this->getAttribute('name');
 	}
 
-	public function attr($name, $value) {
-		if (!is_null($value)) {
-			$this->setAttribute($name, $value);
+	public function addClass($class) {
+		if (!isset($this->attributes['class']) || zbx_empty($this->attributes['class'])) {
+			$this->attributes['class'] = $class;
 		}
+		else {
+			$this->attributes['class'] .= ' '.$class;
+		}
+
+		return $this;
 	}
 
 	public function getAttribute($name) {
@@ -166,65 +139,47 @@ class CTag extends CObject {
 	}
 
 	public function setAttribute($name, $value) {
-		if (!is_null($value)) {
-			if (is_object($value)) {
-				$value = unpack_object($value);
-			}
-			elseif (is_array($value)) {
-				$value = CHtml::serialize($value);
-			}
-			$this->attributes[$name] = $value;
+		if (is_object($value)) {
+			$value = unpack_object($value);
 		}
-		else {
-			$this->removeAttribute($name);
+		elseif (is_array($value)) {
+			$value = CHtml::serialize($value);
 		}
+		$this->attributes[$name] = $value;
 
 		return $this;
-	}
-
-	/**
-	 * Sets multiple HTML attributes.
-	 *
-	 * @param array $attributes		defined as array(attributeName1 => value1, attributeName2 => value2, ...)
-	 */
-	public function setAttributes(array $attributes) {
-		foreach ($attributes as $name => $value) {
-			$this->setAttribute($name, $value);
-		}
 	}
 
 	public function removeAttribute($name) {
 		unset($this->attributes[$name]);
 	}
 
-	public function addAction($name, $value) {
+	private function addAction($name, $value) {
 		$this->attributes[$name] = $value;
 	}
 
 	/**
 	 * Adds a hint box to the elemt.
 	 *
-	 * @param string|array|CTag     $text       hint content
-	 * @param string                $spanClass  wrap the content in a span element and assign a this class to the span
-	 * @param bool                  $byClick    if set to true, it will be possible to "freeze" the hint box via a mouse
+	 * @param string|array|CTag     $text          hint content
+	 * @param string                $spanClass     wrap the content in a span element and assign a this class to the span
+	 * @param bool                  $freezeOnCLick if set to true, it will be possible to "freeze" the hint box via a mouse
 	 *                                          click
 	 *
 	 * @return bool
 	 */
-	public function setHint($text, $spanClass = '', $byClick = true) {
+	public function setHint($text, $spanClass = '', $freezeOnClick = true) {
 		if (empty($text)) {
-			return false;
+			return;
 		}
 
 		encodeValues($text);
 		$text = unpack_object($text);
 
-		$this->addAction('onmouseover', 'hintBox.HintWraper(event, this, '.zbx_jsvalue($text).', "'.$spanClass.'");');
-		if ($byClick) {
-			$this->addAction('onclick', 'hintBox.showStaticHint(event, this, '.zbx_jsvalue($text).', "'.$spanClass.'");');
+		$this->onMouseover('hintBox.HintWraper(event, this, '.zbx_jsvalue($text).', "'.$spanClass.'");');
+		if ($freezeOnClick) {
+			$this->onClick('hintBox.showStaticHint(event, this, '.zbx_jsvalue($text).', "'.$spanClass.'");');
 		}
-
-		return true;
 	}
 
 	/**
@@ -233,11 +188,23 @@ class CTag extends CObject {
 	 * @param array $data
 	 */
 	public function setMenuPopup(array $data) {
-		$this->attr('data-menu-popup', $data);
+		$this->setAttribute('data-menu-popup', $data);
 	}
 
-	public function onClick($handleCode) {
-		$this->addAction('onclick', $handleCode);
+	public function onChange($script) {
+		$this->addAction('onchange', $script);
+	}
+
+	public function onClick($script) {
+		$this->addAction('onclick', $script);
+	}
+
+	public function onMouseover($script) {
+		$this->addAction('onmouseover', $script);
+	}
+
+	public function onMouseout($script) {
+		$this->addAction('onmouseout', $script);
 	}
 
 	public function addStyle($value) {
@@ -264,7 +231,7 @@ class CTag extends CObject {
 		return $form;
 	}
 
-	public function setTitle($value = 'title') {
+	public function setTitle($value) {
 		$this->setAttribute('title', $value);
 	}
 

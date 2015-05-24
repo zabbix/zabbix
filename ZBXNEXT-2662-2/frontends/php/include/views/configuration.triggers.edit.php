@@ -59,7 +59,7 @@ if (!empty($this->data['templates'])) {
 	$triggersFormList->addRow(_('Parent triggers'), $this->data['templates']);
 }
 $nameTextBox = new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $triggersFormList->addRow(_('Name'), $nameTextBox);
 
 // append expression to form list
@@ -143,9 +143,10 @@ $triggersFormList->addRow(_('Expression'), $expressionRow);
 
 // append expression table to form list
 if ($this->data['input_method'] == IM_TREE) {
-	$expressionTable = new CTable(null, 'formElementTable');
-	$expressionTable->setAttribute('style', 'min-width: 500px;');
-	$expressionTable->setAttribute('id', 'exp_list');
+	$expressionTable = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('style', 'min-width: 500px;')->
+		setAttribute('id', 'exp_list');
 	$expressionTable->setOddRowClass('even_row');
 	$expressionTable->setEvenRowClass('even_row');
 	$expressionTable->setHeader(array(
@@ -276,10 +277,11 @@ $triggersTab->addTab(
  */
 if (empty($this->data['parent_discoveryid'])) {
 	$dependenciesFormList = new CFormList('dependenciesFormList');
-	$dependenciesTable = new CTable(_('No dependencies defined.'), 'formElementTable');
-	$dependenciesTable->setAttribute('style', 'min-width: 500px;');
-	$dependenciesTable->setAttribute('id', 'dependenciesTable');
-	$dependenciesTable->setHeader(array(_('Name'), _('Action')));
+	$dependenciesTable = (new CTable(_('No dependencies defined.')))
+		->addClass('formElementTable')->
+		setAttribute('style', 'min-width: 500px;')->
+		setAttribute('id', 'dependenciesTable')->
+		setHeader(array(_('Name'), _('Action')));
 
 	foreach ($this->data['db_dependencies'] as $dependency) {
 		$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);

@@ -27,7 +27,8 @@ class CHostsInfo extends CTable {
 		$this->groupid = $groupid;
 		$this->style = null;
 
-		parent::__construct(null, 'hosts_info');
+		parent::__construct();
+		$this->addClass('hosts_info');
 		$this->setOrientation($style);
 	}
 

@@ -564,7 +564,7 @@ if ($srctbl == 'usrgrp') {
 
 	foreach ($userGroups as $userGroup) {
 		$name = new CLink($userGroup['name'], 'javascript:void(0);', null, null, true);
-		$name->attr('id', 'spanid'.$userGroup['usrgrpid']);
+		$name->setAttribute('id', 'spanid'.$userGroup['usrgrpid']);
 
 		if ($multiselect) {
 			$js_action = "javascript: addValue(".zbx_jsvalue($reference).', '.zbx_jsvalue($userGroup['usrgrpid']).');';
@@ -627,7 +627,7 @@ elseif ($srctbl == 'users') {
 
 	foreach ($users as &$user) {
 		$alias = new CLink($user['alias'], 'javascript:void(0);', null, null, true);
-		$alias->attr('id', 'spanid'.$user['userid']);
+		$alias->setAttribute('id', 'spanid'.$user['userid']);
 
 		if (isset($srcfld2) && $srcfld2 == 'fullname') {
 			$user[$srcfld2] = getUserFullname($user);
@@ -704,7 +704,7 @@ elseif ($srctbl == 'templates') {
 
 	foreach ($templates as &$template) {
 		$name = new CLink($template['name'], 'javascript:void(0);', null, null, true);
-		$name->attr('id', 'spanid'.$template['templateid']);
+		$name->setAttribute('id', 'spanid'.$template['templateid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).', '.
 			$parentId.');';
@@ -784,7 +784,7 @@ elseif ($srctbl == 'hosts') {
 
 	foreach ($hosts as &$host) {
 		$name = new CLink($host['name'], 'javascript:void(0);', null, null, true);
-		$name->attr('id', 'spanid'.$host['hostid']);
+		$name->setAttribute('id', 'spanid'.$host['hostid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
 			$parentId.');';
@@ -865,7 +865,7 @@ elseif ($srctbl == 'host_templates') {
 
 	foreach ($hosts as &$host) {
 		$name = new CLink($host['name'], 'javascript:void(0);', null, null, true);
-		$name->attr('id', 'spanid'.$host['hostid']);
+		$name->setAttribute('id', 'spanid'.$host['hostid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
 			$parentId.');';
@@ -942,7 +942,7 @@ elseif ($srctbl == 'host_groups') {
 
 	foreach ($hostgroups as &$hostgroup) {
 		$name = new CLink($hostgroup['name'], 'javascript:void(0);', null, null, true);
-		$name->attr('id', 'spanid'.$hostgroup['groupid']);
+		$name->setAttribute('id', 'spanid'.$hostgroup['groupid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($hostgroup['groupid']).', '.
 			$parentId.');';
@@ -1301,7 +1301,7 @@ elseif ($srctbl == 'applications') {
 
 	foreach ($apps as &$app) {
 		$name = new CLink($app['name'], 'javascript:void(0);', null, null, true);
-		$name->attr('id', 'spanid'.$app['applicationid']);
+		$name->setAttribute('id', 'spanid'.$app['applicationid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($app['applicationid']).', '.
 			$parentId.');';
@@ -1742,7 +1742,7 @@ elseif ($srctbl == 'proxies') {
 elseif ($srctbl == 'scripts') {
 	$form = new CForm();
 	$form->setName('scriptform');
-	$form->attr('id', 'scripts');
+	$form->setAttribute('id', 'scripts');
 
 	$table = new CTableInfo();
 

@@ -35,7 +35,7 @@ $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SI
 	($this->data['groupid'] && $this->data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
 	64
 );
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $hostGroupFormList->addRow(_('Group name'), $nameTextBox);
 
 // append groups and hosts to form list
@@ -75,7 +75,7 @@ if ($this->data['groupid'] == 0) {
 else {
 	$deleteButton = new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid'));
 	if (!isset($this->data['deletableHostGroups'][$this->data['groupid']])) {
-		$deleteButton->attr('disabled', 'disabled');
+		$deleteButton->setAttribute('disabled', 'disabled');
 	}
 
 	$hostGroupTab->setFooter(makeFormFooter(

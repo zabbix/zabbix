@@ -21,7 +21,7 @@
 
 $workingTimeTab = new CFormList();
 $wtTextBox = new CTextBox('work_period', $data['work_period'], ZBX_TEXTBOX_STANDARD_SIZE);
-$wtTextBox->attr('autofocus', 'autofocus');
+$wtTextBox->setAttribute('autofocus', 'autofocus');
 $workingTimeTab->addRow(_('Working time'), $wtTextBox);
 
 $workingTimeView = new CTabView();

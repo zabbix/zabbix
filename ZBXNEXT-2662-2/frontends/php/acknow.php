@@ -267,7 +267,7 @@ $message = new CTextArea('message', '', array(
 	'width' => ZBX_TEXTAREA_BIG_WIDTH,
 	'maxlength' => 255
 ));
-$message->attr('autofocus', 'autofocus');
+$message->setAttribute('autofocus', 'autofocus');
 
 $formList->addRow(_('Message'), $message);
 

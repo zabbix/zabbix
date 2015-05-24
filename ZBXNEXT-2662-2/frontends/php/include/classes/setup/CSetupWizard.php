@@ -151,8 +151,9 @@ class CSetupWizard extends CForm {
 	}
 
 	function stage1() {
-		$table = new CTable(null, 'list-table');
-		$table->setHeader(array('', _('Current value'), _('Required'), ''));
+		$table = (new CTable())->
+			addClass(ZBX_STYLE_LIST_TABLE)->
+			setHeader(['', _('Current value'), _('Required'), '']);
 
 		$messages = array();
 		$finalResult = CFrontendSetup::CHECK_OK;

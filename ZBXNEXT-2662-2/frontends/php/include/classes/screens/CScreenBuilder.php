@@ -348,7 +348,7 @@ class CScreenBuilder {
 
 			for ($i = 0, $size = $this->screen['hsize'] + 1; $i < $size; $i++) {
 				$icon = new CDiv('+', 'treeview-plus');
-				$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_col='.$i.'";');
+				$icon->onClick('javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_col='.$i.'";');
 
 				array_push($newColumns, new CCol($icon));
 			}
@@ -363,7 +363,7 @@ class CScreenBuilder {
 			// action left cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
 				$icon = new CDiv('+', 'treeview-plus');
-				$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_row='.$r.'";');
+				$icon->onClick('javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_row='.$r.'";');
 
 				array_push($newColumns, new CCol($icon));
 			}
@@ -521,7 +521,7 @@ class CScreenBuilder {
 							' location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r.'";'.
 						' }';
 				}
-				$icon->addAction('onclick', $removeRowLink);
+				$icon->onClick($removeRowLink);
 				array_push($newColumns, new CCol($icon));
 			}
 			$screenTable->addRow(new CRow($newColumns));
@@ -530,7 +530,7 @@ class CScreenBuilder {
 		// action bottom row
 		if ($this->mode == SCREEN_MODE_EDIT) {
 			$icon = new CDiv('+', 'treeview-plus');
-			$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&add_row='.$this->screen['vsize'].'";');
+			$icon->onClick('javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&add_row='.$this->screen['vsize'].'";');
 			$newColumns = array(new CCol($icon));
 
 			for ($i = 0; $i < $this->screen['hsize']; $i++) {
@@ -544,7 +544,7 @@ class CScreenBuilder {
 				else {
 					$removeColumnLink = 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&rmv_col='.$i.'";';
 				}
-				$icon->addAction('onclick', $removeColumnLink);
+				$icon->onClick($removeColumnLink);
 
 				array_push($newColumns, new CCol($icon));
 			}

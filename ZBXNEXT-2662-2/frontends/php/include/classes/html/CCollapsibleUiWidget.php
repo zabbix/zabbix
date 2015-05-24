@@ -51,7 +51,7 @@ class CCollapsibleUiWidget extends CUiWidget {
 			$icon->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND);
 			$icon->setTitle(_('Open'));
 		}
-		$icon->addAction('onclick', 'changeWidgetState(this, "'.$this->id.'");');
+		$icon->onClick('changeWidgetState(this, "'.$this->id.'");');
 		$icon->setAttribute('id', $this->id.'_icon');
 		$icons[] = $icon;
 
