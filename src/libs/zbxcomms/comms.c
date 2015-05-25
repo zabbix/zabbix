@@ -648,15 +648,15 @@ static ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len)
 #elif defined(HAVE_OPENSSL)
 		int	res;
 
-		/* TODO: should we process SSL_ERROR_WANT_READ or set SSL_MODE_AUTO_RETRY ? */
-		/* (see "man SSL_write") */
-
 		if (0 < (res = SSL_write(s->tls_ctx, buf, (int)len)))
 		{
 			return (ssize_t)res;	/* success */
 		}
 		else
 		{
+			/* SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE should not be returned here because we set */
+			/* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
+
 			int	error_code;
 
 			error_code = SSL_get_error(s->tls_ctx, res);
@@ -1456,15 +1456,15 @@ static ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len)
 #elif defined(HAVE_OPENSSL)
 		int	res;
 
-		/* TODO: should we process SSL_ERROR_WANT_READ or set SSL_MODE_AUTO_RETRY ? */
-		/* (see "man SSL_read") */
-
 		if (0 < (res = SSL_read(s->tls_ctx, buf, len)))
 		{
 			return (ssize_t)res;	/* success */
 		}
 		else
 		{
+			/* SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE should not be returned here because we set */
+			/* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
+
 			int	error_code;
 
 			error_code = SSL_get_error(s->tls_ctx, res);

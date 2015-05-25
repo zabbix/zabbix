@@ -2735,10 +2735,7 @@ void	zbx_tls_init_child(void)
 		/* Currently use the default depth 100. */
 
 		if (NULL != ctx_all)
-		{
 			SSL_CTX_set_verify(ctx_all, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
-			/* SSL_CTX_set_verify_depth(ctx_all, 2); */
-		}
 	}
 
 	/* 'TLSCrlFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
@@ -2912,6 +2909,17 @@ void	zbx_tls_init_child(void)
 			SSL_CTX_set_psk_server_callback(ctx_all, zbx_psk_server_cb);
 		}
 	}
+
+	/* we're using blocking sockets, deal with renegotiations automatically */
+
+	if (NULL != ctx_cert)
+		SSL_CTX_set_mode(ctx_cert, SSL_MODE_AUTO_RETRY);
+
+	if (NULL != ctx_psk)
+		SSL_CTX_set_mode(ctx_psk, SSL_MODE_AUTO_RETRY);
+
+	if (NULL != ctx_all)
+		SSL_CTX_set_mode(ctx_all, SSL_MODE_AUTO_RETRY);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -3831,7 +3839,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 
 		/* set CA certificate and certificate revocation lists */
 		if (NULL != ca_cert)
-			ssl_set_ca_chain(s->tls_ctx, ca_cert, crl, NULL);	/* TODO set the 4th argument to expected peer Common Name ? */
+			ssl_set_ca_chain(s->tls_ctx, ca_cert, crl, NULL);
 
 		if (NULL != my_cert && 0 != (res = ssl_set_own_cert(s->tls_ctx, my_cert, my_priv_key)))
 		{
