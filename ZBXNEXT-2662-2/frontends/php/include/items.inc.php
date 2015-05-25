@@ -689,7 +689,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 	if ($viewMode == STYLE_TOP) {
 		$header = [_('Items')];
 		foreach ($hostNames as $hostName) {
-			$header[] = new CColHeader($hostName, 'vertical_rotation');
+			$header[] = (new CColHeader($hostName))->addClass('vertical_rotation');
 		}
 		$table->setHeader($header, 'vertical_header');
 
@@ -706,7 +706,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 
 		$header = [_('Hosts')];
 		foreach ($items as $descr => $ithosts) {
-			$header[] = new CColHeader($descr, 'vertical_rotation');
+			$header[] = (new CColHeader($descr))->addClass('vertical_rotation');
 		}
 		$table->setHeader($header, 'vertical_header');
 
@@ -716,7 +716,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 			$name = new CSpan($host['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
 			$name->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
 
-			$tableRow = [new CCol($name, ZBX_STYLE_NOWRAP)];
+			$tableRow = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($items as $ithosts) {
 				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
 			}
@@ -752,7 +752,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 		$value = new CSpan($value, 'link');
 	}
 
-	$column = new CCol([$value, $ack], $css);
+	$column = (new CCol([$value, $ack]))->addClass($css);
 
 	if (isset($ithosts[$hostName])) {
 		$column->setMenuPopup(CMenuPopupHelper::getHistory($item));

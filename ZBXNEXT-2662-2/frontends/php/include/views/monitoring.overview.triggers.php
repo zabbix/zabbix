@@ -35,7 +35,7 @@ $controls->addItem([_('Type').SPACE, $typeComboBox]);
 
 // hint table
 $hintTable = new CTableInfo();
-$hintTable->addRow([new CCol(SPACE, 'normal'), _('OK')]);
+$hintTable->addRow([(new CCol(SPACE))->addClass('normal'), _('OK')]);
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$hintTable->addRow([getSeverityCell($severity, $this->data['config']), _('PROBLEM')]);
 }
@@ -43,9 +43,9 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 // blinking preview in help popup (only if blinking is enabled)
 if ($this->data['config']['blink_period'] > 0) {
 	$row = new CRow(null);
-	$row->addItem(new CCol(SPACE, 'normal'));
+	$row->addItem((new CCol(SPACE))->addClass('normal'));
 	for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
-		$row->addItem(new CCol(SPACE, getSeverityStyle($i)));
+		$row->addItem((new CCol(SPACE))->addClass(getSeverityStyle($i)));
 	}
 	$col = (new CTable(''))->
 		addClass('blink')->

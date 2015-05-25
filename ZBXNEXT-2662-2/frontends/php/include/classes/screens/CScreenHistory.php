@@ -214,12 +214,12 @@ class CScreenHistory extends CScreenBase {
 								$row[] = ($data['source'] === '') ? '-' : $data['source'];
 								$row[] = ($data['severity'] == 0)
 								? '-'
-								: new CCol(get_item_logtype_description($data['severity']), get_item_logtype_style($data['severity']));
+								: (new CCol(get_item_logtype_description($data['severity'])))->addClass(get_item_logtype_style($data['severity']));
 								$row[] = ($data['logeventid'] == 0) ? '-' : $data['logeventid'];
 							}
 						}
 
-						$row[] = new CCol($data['value'], 'pre');
+						$row[] = (new CCol($data['value']))->addClass('pre');
 
 						$newRow = new CRow($row);
 						if (!is_null($color)) {

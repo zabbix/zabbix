@@ -104,7 +104,7 @@ if ($result) {
 
 		$resultType = (is_array($info) || !isset($definedErrorPhrases[$info]))
 			? $info['value_type']
-			: new CCol($definedErrorPhrases[$info], 'disaster');
+			: (new CCol($definedErrorPhrases[$info]))->addClass('disaster');
 
 		$dataTable->addRow(new CRow([$token['value'], $resultType, $control]));
 	}
@@ -155,8 +155,8 @@ foreach ($eHTMLTree as $e) {
 		}
 	}
 
-	$col = new CCol($result);
-	$col->setAttribute('style', $style);
+	$col = (new CCol($result))->
+		setAttribute('style', $style);
 
 	$resultTable->addRow(new CRow([$e['list'], $col]));
 }

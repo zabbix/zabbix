@@ -178,7 +178,7 @@ class CSetupWizard extends CForm {
 					$req['name'],
 					$req['current'],
 					($req['required'] !== null) ? $req['required'] : '',
-					new CCol($result, $class)
+					(new CCol($result))->addClass($class)
 				]
 			);
 
@@ -266,7 +266,10 @@ class CSetupWizard extends CForm {
 			false
 		);
 		$port->removeAttribute('style');
-		$table->addRow(new CCol('Port', 'header'), $port);
+		$table->addRow(
+			(new CCol('Port'))->addClass('header'),
+			$port
+		);
 
 		$table->addRow('Name', new CTextBox('zbx_server_name', $this->getConfig('ZBX_SERVER_NAME', '')));
 

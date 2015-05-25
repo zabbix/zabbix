@@ -589,9 +589,9 @@ else {
 
 	$table = new CTableInfo();
 	$table->setHeader([
-		new CColHeader(
-			new CCheckBox('all_templates', null, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
-			'cell-width'),
+		(new CColHeader(
+			new CCheckBox('all_templates', null, "checkAll('".$form->getName()."', 'all_templates', 'templates');")))->
+			addClass('cell-width'),
 		make_sorting_header(_('Templates'), 'name', $sortField, $sortOrder),
 		_('Applications'),
 		_('Items'),
@@ -736,7 +736,7 @@ else {
 
 		$table->addRow([
 			new CCheckBox('templates['.$template['templateid'].']', null, null, $template['templateid']),
-			new CCol($templatesOutput, ZBX_STYLE_NOWRAP),
+			(new CCol($templatesOutput))->addClass(ZBX_STYLE_NOWRAP),
 			$applications,
 			$items,
 			$triggers,

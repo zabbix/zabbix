@@ -172,10 +172,9 @@ $templateUrlRow->setAttribute('id', 'urlEntryTpl');
 $urlTable->addRow($templateUrlRow);
 
 // append "add" button to url table
-$addButton = new CSpan(_('Add'), ZBX_STYLE_LINK_ACTION.' link_menu');
-$addButton->onClick('cloneRow("urlEntryTpl", '.$i.')');
-$addButtonColumn = new CCol($addButton);
-$addButtonColumn->setColSpan(4);
+$addButton = (new CSpan(_('Add'), ZBX_STYLE_LINK_ACTION.' link_menu'))->
+	onClick('cloneRow("urlEntryTpl", '.$i.')');
+$addButtonColumn = (new CCol($addButton))->setColSpan(4);
 $urlTable->addRow($addButtonColumn);
 
 // append url table to form list

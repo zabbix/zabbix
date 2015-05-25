@@ -125,7 +125,7 @@ foreach ($inventoryFilters as $field) {
 	$i++;
 }
 $inventoryFilterTable->addRow(
-	new CCol(new CButton('inventory_add', _('Add'), null, 'link_menu element-table-add'), null, 3)
+	(new CCol(new CButton('inventory_add', _('Add'), null, 'link_menu element-table-add')))->setColSpan(3)
 );
 $column->addRow(_('Filter by host inventory'), $inventoryFilterTable);
 

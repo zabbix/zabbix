@@ -109,17 +109,22 @@ class CHostsInfo extends CTable {
 			$header_str .= _('All groups');
 		}
 
-		$header = new CCol($header_str, 'header');
+		$header = (new CCol($header_str))->
+			addClass('header');
 		if ($this->style == STYLE_HORIZONTAL) {
 			$header->setColspan(4);
 		}
 
 		$this->addRow($header);
 
-		$avail = new CCol($avail.'  '._('Available'), 'avail');
-		$notav = new CCol($notav.'  '._('Not available'), 'notav');
-		$uncn = new CCol($uncn.'  '._('Unknown'), 'uncn');
-		$total = new CCol($total.'  '._('Total'), 'total');
+		$avail = (new CCol($avail.'  '._('Available')))->
+			addClass('avail');
+		$notav = (new CCol($notav.'  '._('Not available')))->
+			addClass('notav');
+		$uncn = (new CCol($uncn.'  '._('Unknown')))->
+			addClass('uncn');
+		$total = (new CCol($total.'  '._('Total')))->
+			addClass('total');
 
 		if ($this->style == STYLE_HORIZONTAL) {
 			$this->addRow([$avail, $notav, $uncn, $total]);

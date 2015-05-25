@@ -670,7 +670,7 @@ foreach ($triggers as $trigger) {
 			}
 		}
 		else {
-			$ackColumn = new CCol(_('No events'), ZBX_STYLE_GREY);
+			$ackColumn = (new CCol(_('No events')))->addClass(ZBX_STYLE_GREY);
 		}
 	}
 	else {

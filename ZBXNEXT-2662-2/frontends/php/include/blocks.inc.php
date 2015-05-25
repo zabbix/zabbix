@@ -760,7 +760,7 @@ function make_latest_issues(array $filter = []) {
 		else {
 			$description = new CSpan($description, 'pointer');
 		}
-		$description = new CCol($description, getSeverityStyle($trigger['priority']));
+		$description = (new CCol($description))->addClass(getSeverityStyle($trigger['priority']));
 		if ($trigger['lastEvent']) {
 			$description->setHint(
 				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']), '', false

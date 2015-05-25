@@ -67,7 +67,7 @@ $conditionFormList = new CFormList();
 // create condition table
 $conditionTable = (new CTable(_('No conditions defined.')))->
 	addClass('formElementTable')->
-	setAttrubute('id', 'conditionTable')->
+	setAttribute('id', 'conditionTable')->
 	setAttribute('style', 'min-width: 350px;')->
 	setHeader([_('Label'), _('Name'), _('Action')]);
 
@@ -584,7 +584,7 @@ if (!empty($this->data['new_operation'])) {
 
 			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")', 'link_menu');
 			$addUsrgrpBtn->setAttribute('id', 'addusrgrpbtn');
-			$usrgrpList->addRow(new CRow(new CCol($addUsrgrpBtn, null, 2), null, 'opmsgUsrgrpListFooter'));
+			$usrgrpList->addRow(new CRow((new CCol($addUsrgrpBtn))->setColSpan(2), null, 'opmsgUsrgrpListFooter'));
 
 			$userList = (new CTable())->
 				addClass('formElementTable')->
@@ -594,7 +594,7 @@ if (!empty($this->data['new_operation'])) {
 
 			$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")', 'link_menu');
 			$addUserBtn->setAttribute('id', 'adduserbtn');
-			$userList->addRow(new CRow(new CCol($addUserBtn, null, 2), null, 'opmsgUserListFooter'));
+			$userList->addRow(new CRow((new CCol($addUserBtn))->setColSpan(2), null, 'opmsgUserListFooter'));
 
 			// add participations
 			$usrgrpids = isset($this->data['new_operation']['opmessage_grp'])
@@ -708,7 +708,7 @@ if (!empty($this->data['new_operation'])) {
 				setHeader([_('Target'), _('Action')]);
 
 			$addCmdBtn = new CButton('add', _('New'), 'javascript: showOpCmdForm(0, "new");', 'link_menu');
-			$cmdList->addRow(new CRow(new CCol($addCmdBtn, null, 3), null, 'opCmdListFooter'));
+			$cmdList->addRow(new CRow((new CCol($addCmdBtn))->setColSpan(3), null, 'opCmdListFooter'));
 
 			// add participations
 			if (!isset($this->data['new_operation']['opcommand_grp'])) {
@@ -870,7 +870,7 @@ if (!empty($this->data['new_operation'])) {
 			$groupList = new CTable();
 			$groupList->setAttribute('id', 'opGroupList');
 			$groupList->addRow(new CRow(
-				new CCol(
+				(new CCol(
 					new CMultiSelect([
 						'name' => 'discoveryHostGroup',
 						'objectName' => 'hostGroup',
@@ -879,15 +879,15 @@ if (!empty($this->data['new_operation'])) {
 							'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().
 								'&dstfld1=discoveryHostGroup&srcfld1=groupid&writeonly=1&multiselect=1'
 						]
-					]),
-					null, 2
-				),
+					])))->
+					setColSpan(2),
 				null,
 				'opGroupListFooter'
 			));
-			$groupList->addRow(new CCol(
-				new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu'), null, 2
-			));
+			$groupList->addRow(
+				(new CCol(new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu')))->
+					setColSpan(2)
+			);
 
 			// load host groups
 			$groupIds = isset($this->data['new_operation']['opgroup'])
@@ -922,7 +922,7 @@ if (!empty($this->data['new_operation'])) {
 			$templateList = new CTable();
 			$templateList->setAttribute('id', 'opTemplateList');
 			$templateList->addRow(new CRow(
-				new CCol(
+				(new CCol(
 					new CMultiSelect([
 						'name' => 'discoveryTemplates',
 						'objectName' => 'templates',
@@ -931,15 +931,15 @@ if (!empty($this->data['new_operation'])) {
 							'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
 								'&dstfld1=discoveryTemplates&templated_hosts=1&multiselect=1&writeonly=1'
 						]
-					]),
-					null, 2
-				),
+					])))->
+					setColSpan(2),
 				null,
 				'opTemplateListFooter'
 			));
-			$templateList->addRow(new CCol(
-				new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu'), null, 2
-			));
+			$templateList->addRow(
+				(new CCol(new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu')))->
+					setColSpan(2)
+			);
 
 			// load templates
 			$templateIds = isset($this->data['new_operation']['optemplate'])
@@ -1005,9 +1005,10 @@ if (!empty($this->data['new_operation'])) {
 			}
 
 			$label = num2letter($i);
-			$labelCol = new CCol($label, 'label');
-			$labelCol->setAttribute('data-conditiontype', $opcondition['conditiontype']);
-			$labelCol->setAttribute('data-formulaid', $label);
+			$labelCol = (new CCol($label))->
+				addClass('label')->
+				setAttribute('data-conditiontype', $opcondition['conditiontype'])->
+				setAttribute('data-formulaid', $label);
 			$operationConditionsTable->addRow(
 				[
 					$labelCol,

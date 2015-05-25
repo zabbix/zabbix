@@ -68,9 +68,9 @@ foreach ($titles as $key => $title) {
 
 	$rulesTable->addRow([
 		$title,
-		new CCol($cbExist, 'center'),
-		new CCol($cbMissed, 'center'),
-		new CCol($cbDeleted, 'center')
+		(new CCol($cbExist))->addClass('center'),
+		(new CCol($cbMissed))->addClass('center'),
+		(new CCol($cbDeleted))->addClass('center')
 	]);
 }
 

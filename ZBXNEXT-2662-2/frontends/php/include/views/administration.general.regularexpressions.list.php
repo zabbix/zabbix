@@ -23,9 +23,9 @@ $form->setName('regularExpressionsForm');
 
 $regExpTable = new CTableInfo();
 $regExpTable->setHeader([
-	new CColHeader(
-		new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');"),
-		'cell-width'),
+	(new CColHeader(
+		new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');")))->
+		addClass('cell-width'),
 	_('Name'),
 	_('Expressions')
 ]);

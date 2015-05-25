@@ -69,8 +69,8 @@ $exprTable = (new CTable())->
 $exprTable->setAttribute('id', 'exprTable');
 $exprTable->setHeader([
 	_('Expression'),
-	new CCol(_('Expression type'), ZBX_STYLE_NOWRAP),
-	new CCol(_('Case sensitive'), ZBX_STYLE_NOWRAP),
+	(new CCol(_('Expression type')))->addClass(ZBX_STYLE_NOWRAP),
+	(new CCol(_('Case sensitive')))->addClass(ZBX_STYLE_NOWRAP),
 	SPACE
 ]);
 $exprTable->setFooter(new CButton('add', _('Add'), null, 'link_menu exprAdd'));

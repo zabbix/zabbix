@@ -53,9 +53,9 @@ $triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 // create table
 $triggersTable = new CTableInfo();
 $triggersTable->setHeader([
-	new CColHeader(
-		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
-		'cell-width'),
+	(new CColHeader(
+		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")))->
+		addClass('cell-width'),
 	make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
 	_('Expression'),
@@ -123,7 +123,7 @@ foreach ($this->data['triggers'] as $trigger) {
 		$checkBox,
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$description,
-		new CCol(triggerExpression($trigger, true), 'trigger-expression'),
+		(new CCol(triggerExpression($trigger, true)))->addClass('trigger-expression'),
 		$status
 	]);
 }

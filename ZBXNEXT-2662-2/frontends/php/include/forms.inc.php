@@ -247,7 +247,7 @@ function getPermissionsFormList($rights = [], $user_type = USER_TYPE_ZABBIX_USER
 				$sLabel = $item;
 			}
 			else {
-				$row->addItem(new CCol($item, $class));
+				$row->addItem((new CCol($item))->addClass($class));
 			}
 		}
 
@@ -1698,8 +1698,8 @@ function get_timeperiod_form() {
 			$cmbCount->addItem(4, _('Fourth'));
 			$cmbCount->addItem(5, _('Last'));
 
-			$td = new CCol($cmbCount);
-			$td->setColSpan(2);
+			$td = (new CCol($cmbCount))->
+				setColSpan(2);
 
 			$tabDays = new CTable();
 			$tabDays->addRow($td);

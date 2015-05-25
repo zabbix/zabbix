@@ -49,9 +49,9 @@ $hostGroupForm->setAttribute('id', 'groups');
 
 $hostGroupTable = new CTableInfo();
 $hostGroupTable->setHeader([
-	new CColHeader(
-		new CCheckBox('all_groups', null, 'checkAll(this.checked)'),
-		'cell-width'),
+	(new CColHeader(
+		new CCheckBox('all_groups', null, 'checkAll(this.checked)')))->
+		addClass('cell-width'),
 	_('Name')
 ]);
 
@@ -70,7 +70,7 @@ foreach ($hostGroups as $hostGroup) {
 	$hostGroupTable->addRow(new CCol([$hostGroupCheckBox, $hostGroup['name']]));
 }
 
-$hostGroupTable->setFooter(new CCol(new CButton('select', _('Select'), 'addGroups("'.$dstfrm.'")'), 'right'));
+$hostGroupTable->setFooter((new CCol(new CButton('select', _('Select'), 'addGroups("'.$dstfrm.'")')))->addClass('right'));
 
 $hostGroupForm->addItem($hostGroupTable);
 $hostGroupForm->show();

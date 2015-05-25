@@ -68,8 +68,8 @@ if ($data['fullscreen'] == 0) {
 	$logo->setTarget('_blank');
 
 	$top_page_row = [
-		new CCol($logo, 'page_header_l'),
-		new CCol($page_header_r_col, 'maxwidth page_header_r')
+		(new CCol($logo))->addClass('page_header_l'),
+		(new CCol($page_header_r_col))->addClass('maxwidth')->addClass('page_header_r')
 	];
 
 	unset($logo, $page_header_r_col, $help, $support, $debug);

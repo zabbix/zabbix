@@ -163,14 +163,14 @@ $stepsTable = (new CTable())->
 	setAttribute('id', 'httpStepTable');
 
 $stepsTable->setHeader([
-	new CCol(SPACE, null, null, '15'),
-	new CCol(SPACE, null, null, '15'),
-	new CCol(_('Name'), null, null, '150'),
-	new CCol(_('Timeout'), null, null, '50'),
-	new CCol(_('URL'), null, null, '200'),
-	new CCol(_('Required'), null, null, '50'),
-	new CCol(_('Status codes'), ZBX_STYLE_NOWRAP, null, '90'),
-	new CCol('', null, null, '50')
+	(new CCol(SPACE))->setWidth('15'),
+	(new CCol(SPACE))->setWidth('15'),
+	(new CCol(_('Name')))->setWidth('150'),
+	(new CCol(_('Timeout')))->setWidth('50'),
+	(new CCol(_('URL')))->setWidth('200'),
+	(new CCol(_('Required')))->setWidth('50'),
+	(new CCol(_('Status codes')))->setClass(ZBX_STYLE_NOWRAP)->setWidth('90'),
+	(new CCol(''))->setWidth('50')
 ]);
 
 $i = 1;
@@ -234,7 +234,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 }
 
 if (!$this->data['templated']) {
-	$stepsTable->addRow(new CCol(new CButton('add_step', _('Add'), null, 'link_menu'), null, 8));
+	$stepsTable->addRow((new CCol(new CButton('add_step', _('Add'), null, 'link_menu')))->setColSpan(8));
 }
 
 $httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineblock border_dotted ui-corner-all'));

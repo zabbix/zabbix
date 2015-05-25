@@ -114,7 +114,7 @@ function getSeverityCell($severity, $config, $text = null, $forceNormal = false)
 		$text = CHtml::encode(getSeverityName($severity, $config));
 	}
 
-	return new CCol($text, getSeverityStyle($severity, !$forceNormal));
+	return (new CCol($text))->addClass(getSeverityStyle($severity, !$forceNormal));
 }
 
 /**
@@ -1082,7 +1082,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		$header = [_('Triggers')];
 
 		foreach ($hostNames as $hostName) {
-			$header[] = new CColHeader($hostName, 'vertical_rotation');
+			$header[] = (new CColHeader($hostName))->addClass('vertical_rotation');
 		}
 		$triggerTable->setHeader($header, 'vertical_header');
 
@@ -1106,7 +1106,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		$header = [_('Host')];
 
 		foreach ($data as $description => $triggerHosts) {
-			$header[] = new CColHeader($description, 'vertical_rotation');
+			$header[] = (new CColHeader($description))->addClass('vertical_rotation');
 		}
 
 		$triggerTable->setHeader($header, 'vertical_header');
@@ -1118,7 +1118,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 			$name = new CSpan($hostName, ZBX_STYLE_LINK_ACTION.' link_menu');
 			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
-			$columns = [new CCol($name, ZBX_STYLE_NOWRAP)];
+			$columns = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($data as $triggerHosts) {
 				$columns[] = getTriggerOverviewCells(
 					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
@@ -1233,8 +1233,8 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 	}
 
 	$column = ((is_array($desc) && count($desc) > 0) || $ack)
-		? new CCol([$desc, $ack], $css.' hosts')
-		: new CCol(SPACE, $css.' hosts');
+		? (new CCol([$desc, $ack]))->addClass($css)->addClass('hosts')
+		: (new CCol(SPACE))->addClass($css)->addClass('hosts');
 
 	$column->setAttribute('style', $style);
 
@@ -1466,7 +1466,7 @@ function make_trigger_details($trigger) {
 	$table->addRow([_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 		? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')]);
 	$table->addRow([_('Disabled'), ((TRIGGER_STATUS_ENABLED == $trigger['status'])
-		? new CCol(_('No'), ZBX_STYLE_GREEN) : new CCol(_('Yes'), ZBX_STYLE_RED))]);
+		? (new CCol(_('No')))->addCLass(ZBX_STYLE_GREEN) : (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED))]);
 
 	return $table;
 }

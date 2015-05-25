@@ -43,12 +43,12 @@ $discoveredDeviceCol->addClass('left');
 
 $header = [
 	$discoveredDeviceCol,
-	new CColHeader(_('Monitored host'), 'left'),
-	new CColHeader([_('Uptime').'/', _('Downtime')], 'left')
+	(new CColHeader(_('Monitored host')))->addClass('left'),
+	(new CColHeader([_('Uptime').'/', _('Downtime')]))->addClass('left')
 ];
 
 foreach ($data['services'] as $name => $foo) {
-	$header[] = new CColHeader($name, 'vertical_rotation');
+	$header[] = (new CColHeader($name))->addClass('vertical_rotation');
 }
 $discoveryTable->setHeader($header, 'vertical_header');
 
@@ -168,10 +168,10 @@ foreach ($data['drules'] as $drule) {
 				elseif ($class == 'inactive') {
 					$hintTable->setHeader(_('Downtime'));
 				}
-				$timeColumn = new CCol(zbx_date2age($h_data['services'][$name]['time']), $class);
+				$timeColumn = (new CCol(zbx_date2age($h_data['services'][$name]['time'])))->addClass($class);
 				$hintTable->addRow($timeColumn);
 			}
-			$column = new CCol($hint, $class);
+			$column = (new CCol($hint))->addClass($class);
 			if (!is_null($hintTable)) {
 				$column->setHint($hintTable);
 			}
