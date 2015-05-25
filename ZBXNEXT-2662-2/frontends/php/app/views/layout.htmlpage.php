@@ -67,7 +67,7 @@ function local_generateHeader($data) {
 		echo $pageMenu->getOutput();
 	}
 
-	echo '<div class="article">';
+	echo '<div class="'.ZBX_STYLE_ARTICLE.'">';
 
 	// should be replaced with addPostJS() at some point
 	zbx_add_post_js('initMessages({});');

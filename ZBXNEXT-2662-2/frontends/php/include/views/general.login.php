@@ -32,7 +32,7 @@ require_once dirname(__FILE__).'/../page_header.php';
 <header role="banner">
 		<div><div class="signin-logo"></div></div>
 </header>
-<div class="article">
+<div class="<?= ZBX_STYLE_ARTICLE ?>">
 <div class="signin-container">
 	<h1>Sign in</h1>
 	<form action="index.php" method="post">
@@ -56,7 +56,7 @@ require_once dirname(__FILE__).'/../page_header.php';
 <div class="signin-links"><a target="_blank" href="http://www.zabbix.com/documentation/"><?php echo _('Help'); ?></a>&nbsp;&nbsp;•&nbsp;&nbsp;<a target="_lbank" href="http://www.zabbix.com/support.php"><?php echo _('Support'); ?></a></div>
 </div>
 
-<div class="footer">
+<div class="<?= ZBX_STYLE_FOOTER ?>">
 <?php echo _s('Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA', ZABBIX_VERSION, ZABBIX_COPYRIGHT_FROM, ZABBIX_COPYRIGHT_TO); ?>
 </div>
 

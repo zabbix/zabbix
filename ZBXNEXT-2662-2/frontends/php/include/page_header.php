@@ -200,7 +200,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
-	echo '<div class="article">';
+	echo '<div class="'.ZBX_STYLE_ARTICLE.'">';
 }
 
 // unset multiple variables
