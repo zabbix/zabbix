@@ -988,7 +988,7 @@ footer {
 .icon {
 	position: relative;
 	height: 22px;
-	background-color: $ui-bg-color;
+	background-color: $btn-form-bg-color;
 	cursor: move;
 	@include border-radius(2px);
 
