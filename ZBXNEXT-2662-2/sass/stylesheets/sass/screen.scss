@@ -14,8 +14,6 @@ body {
 	font-family: $font-stack;
 	font-size: $font-body-size;
 	line-height: $body-line-height;
-	//color: $indigo-black;
-	//background-color: $lightest-blue-grey;
 	color: $font-color;
 	background-color: $body-bg-color;
 	margin-bottom: 90px;
@@ -104,7 +102,6 @@ a {
 h1 {
 	font-size: $font-h1-size;
 	line-height: $h1-line-height;
-	//border-bottom: 1px solid $lighter-blue-grey;
 	border-bottom: 1px solid darken($body-bg-color, 10%);
 	padding: 0 0 5px 0;
 }
@@ -160,7 +157,6 @@ p {
 
 /* Main Navigation */
 nav {
-	//background-color: darken($primary-blue, 17%);
 	background-color: darken($main-color, 17%);
 
 	a {
@@ -195,13 +191,11 @@ nav {
 	height: 36px;
 	line-height: 35px;
 	position: relative;
-	//background-color: $primary-blue;
 	background-color: $main-color;
 }
 
 .top-nav {
 	font-size: $font-top-nav-size;
-	//background-color: $primary-blue;
 	background-color: $main-color;
 
 	li {
@@ -224,7 +218,6 @@ nav {
 				line-height: 0;
 				border-left: 7px solid transparent;
 				border-right: 7px solid transparent;
-				//border-bottom: 7px solid darken($primary-blue, 17%);
 				border-bottom: 7px solid darken($main-color, 17%);
 			}
 
@@ -285,28 +278,23 @@ ul.top-nav-icons {
     }
 
 	.top-nav-help {
-		//background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -18px;
 		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -18px;
 	}
 
 	.top-nav-print {
-		//background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -42px;
 		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -42px;
 	}
 
 	.top-nav-profile {
-		//background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -66px;
 		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -66px;
 	}
 
 	.top-nav-signout {
-		//background: $primary-blue url(../img/icon-sprite.png) no-repeat 7px -91px;
 		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -91px;
 		width: 44px;
 	}
 
 	.top-nav-zbbshare {
-		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -41px -138px;
 		background: $main-color url(../img/icon-sprite.png) no-repeat -41px -138px;
 	    width: auto;
 		padding: 0 12px 0 27px;
@@ -317,8 +305,6 @@ ul.top-nav-icons {
 	}
 
 	input {
-		//background-color: darken($primary-blue, 5%);
-		//border: 1px solid darken($primary-blue, 6%);
 		background-color: darken($main-color, 5%);
 		border: 1px solid darken($main-color, 6%);
 		width: 167px;
@@ -329,7 +315,6 @@ ul.top-nav-icons {
 		@include transition(border-color .2s ease-out);
 
 		&:focus {
-			//border-color: darken($primary-blue, 10%);
 			border-color: darken($main-color, 10%);
 			@include opacity(1);
 		}
@@ -343,12 +328,10 @@ ul.top-nav-icons {
 .top-subnav-container {
 	height: 36px;
 	line-height: 36px;
-	//background-color: darken($primary-blue, 17%);
 	background-color: darken($main-color, 17%);
 }
 
 .top-subnav {
-	//background-color: darken($primary-blue, 17%);
 	background-color: darken($main-color, 17%);
 
 	li {
@@ -373,7 +356,6 @@ ul.top-nav-icons {
 
 	&.selected {
 		@include border-radius(2px);
-		//background-color: darken($primary-blue, 7%);
 		background-color: darken($main-color, 7%);
 		color: $link-main-subnav-active-color;
 	}
@@ -507,7 +489,6 @@ footer {
 	    border-bottom: 2px solid $table-border-color;
 	    text-align: left;
 	    color: $font-alt-color;
-	    //white-space: nowrap;
 
 	    .arrow-up {
 	    	position: absolute;
@@ -533,13 +514,11 @@ footer {
 
 	    	&:hover {
 	    		text-decoration: none;
-	    		//background-color: $alt-blue;
 	    		background-color: $ui-hover-color
 	    	}
 
 	    	&:active {
 	    		text-decoration: none;
-	    		//background-color: darken($alt-blue, 5%);
 	    		background-color: darken($ui-hover-color, 5%);
 	    	}	    
 	    }
@@ -549,7 +528,6 @@ footer {
 		@include transition(background-color .2s ease-out);
 
 		&:hover {
-			//background-color: $alt-blue;
 			background-color: $ui-hover-color;
 		}
 
@@ -608,7 +586,6 @@ footer {
 	display: inline-block;
 	margin-left: -1px;
 	padding: 3px 14px;
-	//border: 1px solid $light-blue-grey;
 	border: 1px solid $form-border-color;
 	text-decoration: none;
 	color: $link-color;
@@ -616,13 +593,11 @@ footer {
 
 	&:hover {
 		color: $link-hover-color;
-		//background-color: $alt-blue;
 		background-color: $ui-hover-color;
 	}
 
 	&:active {
 		color: $link-active-color;
-		//background-color: darken($alt-blue, 5%);
 		background-color: darken($ui-hover-color, 5%);
 	}
 
@@ -636,18 +611,14 @@ footer {
 
 	&.paging-selected {
 		color: $white;
-		//border-color: $light-blue-grey;
 		border-color: $form-border-color;
-		//background-color: $light-blue-grey;
 		background-color: $ui-bg-selected-color;
 
 		&:hover {
-			//background-color: darken($light-blue-grey, 5%);
 			background-color: darken($ui-bg-selected-color, 5%);
 		}
 
 		&:active {
-			//background-color: darken($light-blue-grey, 10%);
 			background-color: darken($ui-bg-selected-color, 10%);
 		}
 	}
@@ -656,7 +627,6 @@ footer {
 .treeview-plus {
 	display: inline-block;
 	background-color: $ui-bg-color;
-	//border: 1px solid $light-blue-grey;
 	border: 1px solid $form-border-color;
 	cursor: pointer;
 	width: 10px;
@@ -668,12 +638,10 @@ footer {
 	@include border-radius(2px);
 
 	&:hover {
-		//background-color: $alt-blue;
 		background-color: $ui-hover-color;
 	}
 
 	&:active {
-		//background-color: darken($alt-blue, 5%);
 		background-color: darken($ui-hover-color, 5%);
 	}
 }
@@ -779,7 +747,6 @@ footer {
 	padding: 0 9px 0 4px;
 	height: 18px;
 	line-height: 18px;
-	//background-color: $light-blue-grey;
 	background-color: $ui-bg-selected-color;
 	@include border-radius(2px);
 
@@ -859,17 +826,14 @@ footer {
 			&.selected {
 
 				.subfilter-enabled {
-					//background-color: darken($light-blue-grey, 10%);
 					background-color: darken($ui-bg-selected-color, 10%);
 				}
 
 				.subfilter-disable-btn {
-					//background-color: darken($light-blue-grey, 10%);
 					background-color: darken($ui-bg-selected-color, 10%);
 					@include opacity(1);
 
 					&:active {
-						//background-color: darken($light-blue-grey, 15%);
 						background-color: darken($ui-bg-selected-color, 15%);
 						@include opacity(1);
 					}
@@ -883,9 +847,7 @@ footer {
 
 		.subfilter-disable-btn {
 			cursor: default;
-			//color: $lighter-blue-grey;
 			color: lighten($ui-bg-selected-color, 10%);
-			//background-color: $light-blue-grey;
 			background-color: $ui-bg-selected-color;
 		}
 	}
@@ -910,7 +872,6 @@ footer {
 		@include transition(background-color .2s ease-out);
 
 		&.suggest-hover {
-			//background-color: $light-grey;
 			background-color: $action-hover-color;
 		}
 	}
@@ -958,8 +919,6 @@ footer {
 
 .sublevel {
 	height: 22px;
-	//border: 1px solid $light-grey;
-	//background-color: $light-grey;
 	border: 1px solid $form-disabled-bg-color;
 	background-color: $form-disabled-bg-color;
 	margin: 5px 0;
@@ -1010,12 +969,10 @@ footer {
 	margin: 5px 0;
 
 	.arrow-left {
-		//border-right-color: $light-blue-grey;
 		border-right-color: $font-alt-color;
 	}
 
 	.arrow-right {
-		//border-left-color: $light-blue-grey;
 		border-left-color: $font-alt-color;
 	}
 }
@@ -1024,7 +981,6 @@ footer {
 	position: absolute;
 	z-index: 1;
 	height: 22px;
-	//border: 1px solid $light-blue-grey;
 	border: 1px solid $form-border-color;
 	@include border-radius(2px);
 }
@@ -1037,12 +993,10 @@ footer {
 	@include border-radius(2px);
 
 	&:hover {
-		//background-color: $alt-blue;
 		background-color: $ui-hover-color;
 	}
 
 	&:active {
-		//background-color: darken($alt-blue, 5%);
 		background-color: darken($ui-hover-color, 5%);
 	}
 
@@ -1059,7 +1013,6 @@ footer {
 	top: 0;
 	height: 22px;
 	line-height: 22px;
-	//border: 1px solid $light-blue-grey;
 	border: 1px solid $form-border-color;
 	@include border-radius(2px);
 }
@@ -1110,7 +1063,6 @@ footer {
 }
 
 .form-btns {
-	//text-align: center;
 
 	button {
 		margin: 10px 6px 5px 6px;
@@ -1118,7 +1070,6 @@ footer {
 }
 
 .table-forms {
-	//margin: 0 auto;
 	display: table;
 	width: 100%;
 	color: $font-color;
@@ -1183,7 +1134,6 @@ footer {
 
 		td {
 			padding: 5px 5px 5px 0;
-			//vertical-align: top;
 			position: relative;
 
 			&.td-drag-icon {
@@ -1314,13 +1264,13 @@ input {
 	}
 
 	&[disabled] {
-		@extend %disabled;
+		@extend %form-disabled;
 	}
 
 	&[readonly] {
 		color: $font-color!important;
 		cursor: text!important;
-		@extend %disabled;
+		@extend %form-disabled;
 	}  
 }
 
@@ -1332,13 +1282,13 @@ textarea {
 	@extend %form-input-style;
 
 	&[disabled] {
-		@extend %disabled;
+		@extend %form-disabled;
 	}
 
 	&[readonly] {
 		color: $font-color!important;
 		cursor: text!important;
-		@extend %disabled;
+		@extend %form-disabled;
 	}   
 }
 
@@ -1353,18 +1303,17 @@ select {
 	}
 
 	&[disabled] {
-		@extend %disabled;
+		@extend %form-disabled;
 	}
 
 	&[readonly] {
 		color: $font-color!important;
 		cursor: text!important;
-		@extend %disabled;
+		@extend %form-disabled;
 	}   
 }
 
 fieldset {
-	//border: 1px solid $lighter-blue-grey;
 	border: 1px solid lighten($form-border-color, 10%);
 	padding: 0 10px 10px 15px;
 }
@@ -1410,12 +1359,9 @@ button::-moz-focus-inner {
 
 button {
 	@include border-radius(2px);
-	//background-color: $primary-blue;
-	//color: $white;
 	color: $btn-font-color;
 	background-color: $btn-bg-color;
 	font-family: $font-stack;
-	//border: 1px solid $primary-blue;
 	border: 1px solid $btn-bg-color;
 	padding: 0 11px;
 	min-height: 24px;
@@ -1433,8 +1379,6 @@ button {
 
 	&.btn-alt {
 		@extend button;
-		//background-color: $transparent;
-		//color: $primary-blue;
 		color: $btn-alt-font-color;
 		background-color: $btn-alt-bg-color;
 
@@ -1448,7 +1392,6 @@ button {
 	}
 
 	&.btn-conf {
-		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -1px -145px;
 		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -145px;
 		@extend %button-icon-size;
 		
@@ -1462,7 +1405,6 @@ button {
 	}
 
 	&.btn-max {
-		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -1px -169px;
 		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -169px;
 		@extend %button-icon-size;
 		
@@ -1476,7 +1418,6 @@ button {
 	}
 
 	&.btn-min {
-		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -1px -193px;
 		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -193px;
 		@extend %button-icon-size;
 		
@@ -1490,7 +1431,6 @@ button {
 	}
 
 	&.btn-add-fav {
-		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -1px;
 		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -1px;
 		@extend %button-icon-size;
 		
@@ -1504,7 +1444,6 @@ button {
 	}
 
 	&.btn-remove-fav {
-		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -25px;
 		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -25px;
 		@extend %button-icon-size;
 		
@@ -1518,7 +1457,6 @@ button {
 	}
 
 	&.btn-action {
-		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -49px;
 		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -49px;
 		@extend %button-icon-size;
 		
@@ -1532,7 +1470,6 @@ button {
 	}
 
 	&.btn-info {
-		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -73px;
 		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -73px;
 		@extend %button-icon-size;
 		
@@ -1546,7 +1483,6 @@ button {
 	}
 
 	&.btn-reset {
-		//background: $primary-blue url(../img/icon-sprite.png) no-repeat -49px -97px;
 		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -97px;
 		@extend %button-icon-size;
 		
@@ -1698,37 +1634,27 @@ button {
     } 
 
 	&.btn-grey {
-		//background-color: $transparent;
-		//color: $link-color;
 		color: $btn-form-font-color;
 		background-color: $btn-form-bg-color;
 		border-color: $btn-form-border-color;
-		//border-color: $light-blue-grey;
 
 		&:hover {
-			//background-color: $alt-blue;
-			//color: $link-color;
 			color: $btn-form-hover-color;
 			background-color: $ui-hover-color;
 			border-color: $btn-form-border-color;
-			//border-color: $light-blue-grey;
 		}
 
 		&:active {
-			//background-color: darken($alt-blue, 5%);
-			//color: $link-color;
 			color: $btn-form-font-color;
 			background-color: darken($ui-hover-color, 5%);
 		}
 
 		.arrow-left {
-			//border-right-color: $link-color;
 			border-right-color: $btn-form-font-color;
 
 		}
 
 		.arrow-right {
-			//border-left-color: $link-color;
 			border-left-color: $btn-form-font-color;
 
 		}
@@ -1764,21 +1690,15 @@ button {
 }
 
 %button-hover {
-	//background-color: darken($primary-blue, 5%);
-	//border-color: darken($primary-blue, 5%);
 	color: $btn-hover-color;
 	background-color: darken($btn-bg-color, 5%);
 	border-color: darken($btn-bg-color, 5%);
-	//color: $white;
 }
 
 %button-active {
-	//background-color: darken($primary-blue, 17%);
-	//border-color: darken($primary-blue, 17%);
 	color: $btn-active-color;
 	background-color: darken($btn-bg-color, 17%);
 	border-color: darken($btn-bg-color, 17%);
-	//color: $white;
 }
 
 %button-icon-size {
@@ -1793,42 +1713,38 @@ button {
 	padding: 0;
 }
 
-%disabled {
-	//color: $light-blue-grey;
-	//border-color: $lighter-blue-grey;
+%btn-disabled {
 	color: $btn-disabled-font-color;
-	background-color: $form-disabled-bg-color;
+	background-color: $btn-disabled-bg-color;
 	border-color: $btn-disabled-border-color;
 	cursor: default;
 }
 
+%form-disabled {
+	color: $form-disabled-font-color;
+	background-color: $form-disabled-bg-color;
+	border-color: $form-disabled-border-color;
+}
+
 %btn-search-hover-focus {
-	//background-color: $transparent;
 	background-color: darken($main-color, 5%);
 	@include opacity(1);
 }
 
 %btn-widget-hover-active {
-	//background-color: $transparent;
 	background-color: $ui-bg-color;
 	@include opacity(1);
 }
 
 button[disabled] {
-	@extend %disabled;
-	//background-color: $transparent;
-	background-color: $btn-disabled-bg-color;
+	@extend %btn-disabled;
 
 	&:hover {
-		@extend %disabled;
-		//background-color: $transparent;
-		background-color: $btn-disabled-bg-color;
+		@extend %btn-disabled;
 	}
 
 	&:active {
-		@extend %disabled;
-		//background-color: $transparent;
-		background-color: $btn-disabled-bg-color;
+		@extend %btn-disabled;
 	}
 }
 
@@ -1907,7 +1823,6 @@ button[disabled] {
 
 	&:hover {
 		cursor: pointer;
-		//background: url(../img/icon-sprite.png) no-repeat 0 -336px;
 		@include opacity(1);
 	}
 }
@@ -1950,7 +1865,6 @@ button[disabled] {
 			padding: 4px 0 4px 28px;
 
 			&.setup-left-current {
-				//border-left: 3px solid $primary-blue;
 				border-left: 3px solid $main-color;
 				color: $font-alt-color;
 				padding-left: 25px;
@@ -2394,7 +2308,6 @@ button[disabled] {
 	width: 200px;
 
 	.selected {
-		//background-color: $light-blue-grey;
 		background-color: $ui-bg-selected-color;
 		color: $white;
 
@@ -2528,7 +2441,6 @@ button[disabled] {
 .dashed-border {
 
 	td {
-		//border: 1px dashed $lighter-blue-grey;
 		border: 1px dashed $form-border-color;
 
 		td {
@@ -2796,7 +2708,6 @@ td.disaster-bg {
 	height: 18px;
 	line-height: 18px;
 	text-align: center;
-	//color: $light-blue-grey;
 	color: $font-alt-color;
 	font-size: $font-h2-size;
 	font-weight: bold;
@@ -2806,15 +2717,11 @@ td.disaster-bg {
 	@include transition(opacity .2s ease-out);
 
 	&:hover {
-		//background-color: $action-hover-color;
-		//color: darken($light-blue-grey, 10%);
 		@include opacity(1);
 		text-decoration: none;
 	}
 
 	&:active {
-		//background-color: darken($action-hover-color, 5%);
-		//color: darken($light-blue-grey, 10%);
 		@include opacity(1);
 		text-decoration: none;
 	}
@@ -2850,20 +2757,16 @@ a.form-remove-btn {
 	top: 0;
 	right: -12px;
 	color: $white;
-	//background-color: $light-blue-grey;
 	background-color: $ui-bg-selected-color;
 	@extend %close-icon;
 	@include border-radius(2px);
 	@include opacity(1);
 
 	&:hover {
-		//background-color: darken($light-blue-grey, 5%);
 		background-color: darken($ui-bg-selected-color, 5%);
 	}
 
 	&:active {
-
-		//background-color: darken($light-blue-grey, 10%);
 		background-color: darken($ui-bg-selected-color, 10%);
 	}
 }
