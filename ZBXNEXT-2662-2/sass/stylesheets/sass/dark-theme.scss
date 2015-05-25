@@ -3,14 +3,14 @@ $transparent: transparent;
 
 
 // MAIN
-$main-color: #0275b8;
+$main-color: #5c5c5c;//#0275b8;
 $font-color: #d1dade;//#1f2c33;
-$font-alt-color: #768d99;
+$font-alt-color: #7d7d7d;//#768d99;
 $body-bg-color: #0d1114;//#ebeef0;
 
 
 // UI
-$ui-bg-color: #303030;//#fff;
+$ui-bg-color: #303030;//#2e2f30;//#fff;
 $ui-bg-selected-color: #acbbc2;
 $ui-hover-color: #242424;//#e8f4fa;
 
@@ -22,9 +22,9 @@ $table-border-color: #3d3d3d;//#ebeef0;
 
 // FORMS
 $form-font-color: #d1dade;//#1f2c33;
-$form-bg-color: #242424;//#fff;
-$form-border-color: #3d3d3d;//#acbbc2;
-$form-border-focus-color: #0275b8; //NEW
+$form-bg-color: #242424;//#303030;#242424;//#fff;
+$form-border-color: #3d3d3d;//#636363;//#4a4a4a;//#3d3d3d;//#acbbc2;
+$form-border-focus-color: #4a4a4a;//#7d7d7d;//#0275b8; //NEW
 
 $form-disabled-font-color: #525252;//#d1dade;//#1f2c33;
 $form-disabled-bg-color: transparent; //#ebebeb; //NEW
@@ -36,7 +36,7 @@ $form-disabled-border-color: #3d3d3d; //NEW
 $btn-font-color: #fff;
 $btn-hover-color: #fff;
 $btn-active-color: #fff;
-$btn-bg-color: #0275b8;
+$btn-bg-color: #5c5c5c;//#0275b8;
 
 $btn-alt-font-color: #0275b8;
 $btn-alt-hover-color: #0275b8;
@@ -44,11 +44,11 @@ $btn-alt-active-color: #0275b8;
 $btn-alt-bg-color: transparent;
 $btn-alt-border-color: $btn-bg-color;
 
-$btn-form-font-color: #0275b8;
+$btn-form-font-color: #d1dade;//#2782b8;//#0275b8;
 $btn-form-hover-color: #0275b8;
 $btn-form-active-color: #0275b8;
-$btn-form-bg-color: transparent;
-$btn-form-border-color: $form-border-color;
+$btn-form-bg-color: #242424;//transparent;
+$btn-form-border-color: #3d3d3d;//$form-border-color;
 
 $btn-disabled-font-color: #acbbc2;
 $btn-disabled-hover-color: #acbbc2;
