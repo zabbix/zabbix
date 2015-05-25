@@ -31,7 +31,7 @@
 	<div class="article">
 		<div class="browser-warning-container">
 			<div class="browserwarningForm">
-				<h2 class="red">You are using an outdated browser.</h2>
+				<h2 class="<?= ZBX_STYLE_RED ?>">You are using an outdated browser.</h2>
 				<p>Zabbix frontend is built on advanced, modern technologies and does not support old browsers. It is highly recommended that you choose and install a modern browser. It is free of charge and only takes a couple of minutes.</p>
 				<p>New browsers usually come with support for new technologies, increasing web page speed, better privacy settings and so on. They also resolve security and functional issues.</p>
 				<ul>
@@ -65,7 +65,7 @@
 	<div class="footer">
 		<a class="logo" target="_blank" href="http://www.zabbix.com"></a>
 		<?= 'Zabbix '.ZABBIX_VERSION.' &copy; '.ZABBIX_COPYRIGHT_FROM.'-'.ZABBIX_COPYRIGHT_TO.', ' ?>
-		<a class="grey link-alt" target="_blank" href="http://www.zabbix.com">Zabbix SIA</a>
+		<a class="<?= ZBX_STYLE_GREY ?> link-alt" target="_blank" href="http://www.zabbix.com">Zabbix SIA</a>
 	</div>
 </body>
 </html>
