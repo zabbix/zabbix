@@ -168,7 +168,14 @@ function get_table_header($columnLeft, $columnRights = SPACE) {
 		addClass('maxwidth');
 	$table->setCellSpacing(0);
 	$table->setCellPadding(1);
-	$table->addRow([new CCol($columnLeft, 'header_l left'), new CCol($rights, 'header_r right')]);
+	$table->addRow([
+		(new CCol($columnLeft))->
+			addClass('header_l')->
+			addClass('left'),
+		(new CCol($rights))->
+			addClass('header_r')->
+			addClass('right')
+	]);
 
 	return $table;
 }

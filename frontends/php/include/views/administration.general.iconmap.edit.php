@@ -120,7 +120,7 @@ $hiddenRowTemplate->setAttribute('id', 'rowTpl');
 $iconMapTable->addRow($hiddenRowTemplate);
 
 // add row button
-$iconMapTable->addRow(new CCol(new CButton('addMapping', _('Add'), '', 'link_menu'), null, 7));
+$iconMapTable->addRow((new CCol(new CButton('addMapping', _('Add'), '', 'link_menu')))->setColSpan(7));
 
 // <default icon row>
 $numSpan = new CSpan($i++.':');
@@ -135,7 +135,7 @@ $iconPreviewImage = new CImg('imgstore.php?iconid='.$this->data['iconmap']['defa
 	'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null, 'pointer preview');
 $iconPreviewImage->setAttribute('data-image-full', 'imgstore.php?iconid='.$this->data['iconmap']['default_iconid']);
 
-$iconMapTable->addRow([new CCol(_('Default'), null, 4), $iconsComboBox, $iconPreviewImage]);
+$iconMapTable->addRow([(new CCol(_('Default')))->setColSpan(4), $iconsComboBox, $iconPreviewImage]);
 // </default icon row>
 
 $iconMapTab->addRow(_('Mappings'), new CDiv($iconMapTable, 'objectgroup inlineblock border_dotted ui-corner-all'));

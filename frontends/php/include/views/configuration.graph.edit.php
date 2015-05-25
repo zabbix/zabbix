@@ -222,17 +222,17 @@ $itemsTable = (new CTable())->
 $itemsTable->setAttribute('style', 'min-width: 700px;');
 $itemsTable->setAttribute('id', 'itemsTable');
 $itemsTable->setHeader([
-	new CCol(SPACE, null, null, 15),
-	new CCol(SPACE, null, null, 15),
-	new CCol(_('Name'), null, null, ($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? 280 : 360),
+	(new CCol(SPACE))->setWidth(15),
+	(new CCol(SPACE))->setWidth(15),
+	(new CCol(_('Name')))->setWidth(($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? 280 : 360),
 	($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED)
-		? new CCol(_('Type'), null, null, 80) : null,
-	new CCol(_('Function'), null, null, 80),
-	($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? new CCol(_('Draw style'), ZBX_STYLE_NOWRAP, null, 80) : null,
+		? (new CCol(_('Type')))->setWidth(80) : null,
+	(new CCol(_('Function')))->setWidth(80),
+	($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? (new CCol(_('Draw style')))->addClass(ZBX_STYLE_NOWRAP)->setWidth(80) : null,
 	($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED)
-		? new CCol(_('Y axis side'), ZBX_STYLE_NOWRAP, null, 80) : null,
-	new CCol(_('Colour'), null, null, 100),
-	new CCol(_('Action'), null, null, 50)
+		? (new CCol(_('Y axis side')))->addClass(ZBX_STYLE_NOWRAP)->setWidth(80) : null,
+	(new CCol(_('Colour')))->setWidth(100),
+	(new CCol(_('Action')))->setWidth(50)
 ]);
 
 $addButton = new CButton('add_item', _('Add'),
@@ -254,7 +254,7 @@ if ($this->data['parent_discoveryid']) {
 	);
 }
 $itemsTable->addRow(new CRow(
-	new CCol([$addButton, SPACE, SPACE, SPACE, $addPrototypeButton], null, 8),
+	(new CCol([$addButton, SPACE, SPACE, SPACE, $addPrototypeButton]))->setColSpan(8),
 	null,
 	'itemButtonsRow'
 ));

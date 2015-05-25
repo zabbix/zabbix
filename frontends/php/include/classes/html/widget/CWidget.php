@@ -146,8 +146,15 @@ class CWidget {
 	}
 
 	private function createHeaderRow($col1, $col2 = SPACE) {
-		$td_r = new CCol($col2, 'header_r right');
-		$row = [new CCol($col1, 'header_l left'), $td_r];
+		$td_r = (new CCol($col2))->
+			addClass('header_r')->
+			addClass('right');
+		$row = [
+			(new CCol($col1))->
+				addClass('header_l')->
+				addClass('left'),
+			$td_r
+		];
 		return $row;
 	}
 

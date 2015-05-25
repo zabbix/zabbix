@@ -152,6 +152,8 @@ class CTag extends CObject {
 
 	public function removeAttribute($name) {
 		unset($this->attributes[$name]);
+
+		return $this;
 	}
 
 	private function addAction($name, $value) {
@@ -180,6 +182,8 @@ class CTag extends CObject {
 		if ($freezeOnClick) {
 			$this->onClick('hintBox.showStaticHint(event, this, '.zbx_jsvalue($text).', "'.$spanClass.'");');
 		}
+
+		return $this;
 	}
 
 	/**
@@ -189,22 +193,32 @@ class CTag extends CObject {
 	 */
 	public function setMenuPopup(array $data) {
 		$this->setAttribute('data-menu-popup', $data);
+
+		return $this;
 	}
 
 	public function onChange($script) {
 		$this->addAction('onchange', $script);
+
+		return $this;
 	}
 
 	public function onClick($script) {
 		$this->addAction('onclick', $script);
+
+		return $this;
 	}
 
 	public function onMouseover($script) {
 		$this->addAction('onmouseover', $script);
+
+		return $this;
 	}
 
 	public function onMouseout($script) {
 		$this->addAction('onmouseout', $script);
+
+		return $this;
 	}
 
 	public function addStyle($value) {
@@ -217,6 +231,8 @@ class CTag extends CObject {
 		else {
 			unset($this->attributes['style']);
 		}
+
+		return $this;
 	}
 
 	public function error($value) {

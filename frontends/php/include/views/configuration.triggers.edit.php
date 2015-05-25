@@ -192,7 +192,7 @@ if ($this->data['input_method'] == IM_TREE) {
 					}
 					$errorImg->setHint($errorTexts, 'left');
 				}
-				$errorColumn = new CCol($errorImg, 'center');
+				$errorColumn = (new CCol($errorImg))->addClass('center');
 			}
 			else {
 				$errorColumn = null;

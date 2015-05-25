@@ -96,7 +96,10 @@ class CScreenPlainText extends CScreenBase {
 
 			$class = $this->screenitem['style'] ? null : 'pre';
 
-			$table->addRow([zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history['clock']), new CCol($value, $class)]);
+			$table->addRow([
+				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history['clock']),
+				(new CCol($value))->addClass($class)
+			]);
 		}
 
 		return $this->getOutput($table);

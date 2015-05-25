@@ -592,7 +592,7 @@ else {
 					$event_data['object_data']['ip'],
 					zbx_empty($event_data['object_data']['dns']) ? SPACE : $event_data['object_data']['dns'],
 					$event_data['description'],
-					new CCol(discovery_value($event_data['value']), discovery_value_style($event_data['value']))
+					(new CCol(discovery_value($event_data['value'])))->addClass(discovery_value_style($event_data['value']))
 				]);
 			}
 		}

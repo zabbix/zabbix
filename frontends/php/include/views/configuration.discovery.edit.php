@@ -51,11 +51,8 @@ $discoveryFormList->addRow(_('Delay (in sec)'), new CNumericBox('delay', $this->
 $checkTable = (new CTable())
 	->addClass('formElementTable');
 $checkTable->addRow(new CRow(
-	new CCol(
-		new CButton('newCheck', _('New'), null, 'link_menu'),
-		null,
-		2
-	),
+	(new CCol(new CButton('newCheck', _('New'), null, 'link_menu')))->
+		setColSpan(2),
 	null,
 	'dcheckListFooter'
 ));

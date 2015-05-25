@@ -97,9 +97,9 @@ foreach ($this->data['group_rights'] as $id => $rights) {
 }
 
 $permissionsTable->addRow([
-	new CCol($lstWrite, 'read_write'),
-	new CCol($lstRead, 'read_only'),
-	new CCol($lstDeny, 'deny')
+	(new CCol($lstWrite))->addClass('read_write'),
+	(new CCol($lstRead))->addClass('read_only'),
+	(new CCol($lstDeny))->addClass('deny')
 ]);
 $permissionsTable->addRow([
 	[

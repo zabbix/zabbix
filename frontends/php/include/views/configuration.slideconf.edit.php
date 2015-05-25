@@ -44,11 +44,11 @@ $slideTable = new CTableInfo();
 $slideTable->setAttribute('style', 'min-width: 312px;');
 $slideTable->setAttribute('id', 'slideTable');
 $slideTable->setHeader([
-	new CColHeader(SPACE, null, null, '15'),
-	new CColHeader(SPACE, null, null, '15'),
+	(new CColHeader(SPACE))->setWidth('15'),
+	(new CColHeader(SPACE))->setWidth('15'),
 	_('Screen'),
-	new CColHeader(_('Delay'), null, null, '70'),
-	new CColHeader(_('Action'), null, null, '50')
+	(new CColHeader(_('Delay')))->setWidth('70'),
+	(new CColHeader(_('Action')))->setWidth('50')
 ]);
 
 $i = 1;
@@ -69,7 +69,7 @@ foreach ($this->data['slides'] as $key => $slides) {
 
 	$row = new CRow(
 		[
-			new CCol(new CDiv(null, 'drag-icon'), 'td-drag-icon'),
+			(new CCol(new CDiv(null, 'drag-icon')))->addClass('td-drag-icon'),
 			new CSpan($i++.':', 'rowNum', 'current_slide_'.$key),
 			$name,
 			$delay,
@@ -81,16 +81,15 @@ foreach ($this->data['slides'] as $key => $slides) {
 	$slideTable->addRow($row);
 }
 
-$addButtonColumn = new CCol(
+$addButtonColumn = (new CCol(
 	empty($this->data['work_slide'])
 		? new CButton('add', _('Add'),
 			'return PopUp("popup.php?srctbl=screens&srcfld1=screenid&dstfrm='.$slideForm->getName().
 				'&multiselect=1&writeonly=1")',
 			'link_menu')
-		: null,
-	null,
-	5
-);
+		: null))->
+	setColSpan(5);
+
 $addButtonColumn->setAttribute('style', 'vertical-align: middle;');
 $slideTable->addRow(new CRow($addButtonColumn, null, 'screenListFooter'));
 

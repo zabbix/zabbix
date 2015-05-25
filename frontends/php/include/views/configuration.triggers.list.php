@@ -53,9 +53,9 @@ $triggersForm->addVar('hostid', $this->data['hostid']);
 // create table
 $triggersTable = new CTableInfo();
 $triggersTable->setHeader([
-	new CColHeader(
-		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
-		'cell-width'),
+	(new CColHeader(
+		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")))->
+		addClass('cell-width'),
 	make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
 	($this->data['hostid'] == 0) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
@@ -190,7 +190,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$hosts,
 		$description,
-		new CCol(triggerExpression($trigger, true), 'trigger-expression'),
+		(new CCol(triggerExpression($trigger, true)))->addClass('trigger-expression'),
 		$status,
 		$info
 	]);

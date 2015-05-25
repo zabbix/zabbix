@@ -1381,11 +1381,11 @@ function getEventActionsStatus($eventIds) {
 			$status = new CSpan(_('Failed'), ZBX_STYLE_RED);
 		}
 		else {
-			$columnLeft = new CCol(($sendCount > 0) ? new CSpan($sendCount, ZBX_STYLE_GREEN) : SPACE);
-			$columnLeft->setAttribute('width', '10');
+			$columnLeft = (new CCol(($sendCount > 0) ? new CSpan($sendCount, ZBX_STYLE_GREEN) : SPACE))->
+				setAttribute('width', '10');
 
-			$columnRight = new CCol(($failedCount > 0) ? new CSpan($failedCount, ZBX_STYLE_RED) : SPACE);
-			$columnRight->setAttribute('width', '10');
+			$columnRight = (new CCol(($failedCount > 0) ? new CSpan($failedCount, ZBX_STYLE_RED) : SPACE))->
+				setAttribute('width', '10');
 
 			$status = new CRow([$columnLeft, $columnRight]);
 		}

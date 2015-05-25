@@ -39,7 +39,7 @@ $mappingsTable = (new CTable(SPACE))->
 	addClass('formElementTable')->
 	setAttribute('id', 'mappingsTable')->
 	addRow([_('Value'), SPACE, _('Mapped to'), SPACE])->
-	addRow(new CCol(new CButton('addMapping', _('Add'), '', 'link_menu'), null, 4));
+	addRow((new CCol(new CButton('addMapping', _('Add'), '', 'link_menu')))->setColSpan(4));
 $valueMappingFormList->addRow(_('Mappings'), new CDiv($mappingsTable, 'border_dotted inlineblock objectgroup'));
 
 // add mappings to form by js

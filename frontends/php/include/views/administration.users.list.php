@@ -43,9 +43,9 @@ $usersForm->setName('userForm');
 // create users table
 $usersTable = new CTableInfo();
 $usersTable->setHeader([
-	new CColHeader(
-		new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');"),
-		'cell-width'),
+	(new CColHeader(
+		new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');")))->
+			addClass('cell-width'),
 	make_sorting_header(_('Alias'), 'alias', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_x('Name', 'user first name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Surname'), 'surname', $this->data['sort'], $this->data['sortorder']),
@@ -67,11 +67,11 @@ foreach ($this->data['users'] as $user) {
 		$onlineTime = ($user['autologout'] == 0 || ZBX_USER_ONLINE_TIME < $user['autologout']) ? ZBX_USER_ONLINE_TIME : $user['autologout'];
 
 		$online = (($session['lastaccess'] + $onlineTime) >= time())
-			? new CCol(_('Yes').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')', ZBX_STYLE_GREEN)
-			: new CCol(_('No').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')', ZBX_STYLE_RED);
+			? (new CCol(_('Yes').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))->addClass(ZBX_STYLE_GREEN)
+			: (new CCol(_('No').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))->addClass(ZBX_STYLE_RED);
 	}
 	else {
-		$online = new CCol(_('No'), ZBX_STYLE_RED);
+		$online = (new CCol(_('No')))->addClass(ZBX_STYLE_RED);
 	}
 
 	// blocked
