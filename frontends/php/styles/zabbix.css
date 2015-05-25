@@ -412,7 +412,8 @@ footer, .footer {
     border-left-color: #0275b8; }
 
 .radio-switch {
-  cursor: pointer; }
+  cursor: pointer;
+  background-color: #fff; }
 
 .table-paging a, .radio-switch {
   display: inline-block;
@@ -778,8 +779,6 @@ footer, .footer {
     padding-top: 5px; }
   .table-forms tfoot button, .table-forms .tfoot-buttons button {
     margin: 0 14px 0 0; }
-  .table-forms .table-forms-tr-new {
-    background-color: #c5e3c6; }
   .table-forms .table-forms-td-left {
     display: table-cell;
     padding: 5px 0;
@@ -822,12 +821,22 @@ footer, .footer {
 
 .table-forms-separator {
   display: inline-block;
-  padding: 0 0 5px 0;
-  border-bottom: 2px solid #ebeef0; }
+  padding: 0 0 5px 5px;
+  margin: 0 0 0 -5px;
+  border-bottom: 1px dashed #acbbc2; }
 
 .margin-top {
   display: block;
-  margin: 4px 0 0 0; }
+  margin: 0px 0 0 0; }
+
+.form-new-group {
+  diplay: inline-block;
+  border: 5px solid #c5e3c6;
+  padding: 4px 0;
+  margin-left: -5px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px; }
 
 .list-check-radio li {
   display: block;
@@ -849,10 +858,7 @@ label input[type="checkbox"] {
 label input[type="radio"] {
   margin-right: 3px; }
 
-input[disabled] {
-  background-color: #ebebeb; }
 input[readonly] {
-  background-color: #ebebeb;
   color: #1f2c33 !important;
   cursor: text !important; }
 
@@ -861,10 +867,7 @@ textarea {
   height: 50px;
   padding: 5px 0 0 5px;
   overflow: auto; }
-  textarea[disabled] {
-    background-color: #ebebeb; }
   textarea[readonly] {
-    background-color: #ebebeb;
     color: #1f2c33 !important;
     cursor: text !important; }
 
@@ -874,10 +877,7 @@ select {
   select.select-multiple {
     width: 300px;
     height: auto; }
-  select[disabled] {
-    background-color: #ebebeb; }
   select[readonly] {
-    background-color: #ebebeb;
     color: #1f2c33 !important;
     cursor: text !important; }
 
@@ -1085,6 +1085,7 @@ button.btn-widget-action, button.btn-widget-collapse, button.btn-widget-expand, 
 
 input[disabled], input[readonly], textarea[disabled], textarea[readonly], select[disabled], select[readonly], button[disabled], button[disabled]:hover, button[disabled]:active {
   color: #acbbc2;
+  background-color: #ebebeb;
   border-color: #ccd5d9;
   cursor: default; }
 
@@ -1643,7 +1644,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
 .disaster-bg {
   background-color: #e45959; }
 
-.list-table tbody tr.row-selected, .suggest-found {
+.list-table tbody tr.row-selected, .suggest-found, .drag-drop-area {
   background-color: #fcf7c2; }
 
 .msg-good {
