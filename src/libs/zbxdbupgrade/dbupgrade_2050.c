@@ -149,6 +149,15 @@ static int	DBpatch_2050010(void)
 	return DBmodify_field_type("hosts", &field);
 }
 
+static int	DBpatch_2050011(void)
+{
+	/* 1 - ITEM_VALUE_TYPE_STR, 2 - ITEM_VALUE_TYPE_LOG, 4 - ITEM_VALUE_TYPE_TEXT */
+	if (ZBX_DB_OK <= DBexecute("update items set trends=0 where value_type in (1,2,4)"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -166,5 +175,6 @@ DBPATCH_ADD(2050007, 0, 1)
 DBPATCH_ADD(2050008, 0, 1)
 DBPATCH_ADD(2050009, 0, 1)
 DBPATCH_ADD(2050010, 0, 1)
+DBPATCH_ADD(2050011, 0, 1)
 
 DBPATCH_END()

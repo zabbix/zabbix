@@ -27,12 +27,8 @@ try {
 	Z::getInstance()->run(ZBase::EXEC_MODE_SETUP);
 }
 catch (Exception $e) {
-	$warningView = new CView('general.warning', array(
-		'message' => array(
-			'header' => 'Configuration file error', 'text' => $e->getMessage()
-		)
-	));
-	$warningView->render();
+	(new CView('general.warning', ['header' => 'Configuration file error', 'messages' => [$e->getMessage()]]))->
+		render();
 	exit;
 }
 
@@ -118,14 +114,15 @@ $sub_footer = new CDiv(array('Licensed under ', $link), 'signin-links');
 
 $link = new CLink('Zabbix SIA', 'http://www.zabbix.com/', null, null, true);
 $link->setAttribute('target', '_blank');
-$footer = new CTag('footer', 'yes', array(
+$footer = new CDiv([
 	'Zabbix '.ZABBIX_VERSION.'. &copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
-	$link
-));
+	$link],
+	'footer'
+);
 
 $body = new CTag('body', 'yes', array(
 	$header,
-	new CTag('article', 'yes', array($ZBX_SETUP_WIZARD, $sub_footer)),
+	new CDiv(array($ZBX_SETUP_WIZARD, $sub_footer), 'article'),
 	$footer
 ));
 
