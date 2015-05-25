@@ -449,7 +449,6 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
  *          use_ino - [IN] 0 - do not use inodes in comparison,               *
  *                         1 - use up to 64-bit inodes in comparison,         *
  *                         2 - use 128-bit inodes in comparison.              *
- *          retry   - [IN/OUT] flag for repeated check of mtime and size      *
  *                                                                            *
  * Return value: ZBX_SAME_FILE_NO - it is not the same file,                  *
  *               ZBX_SAME_FILE_YES - it could be the same file,               *
