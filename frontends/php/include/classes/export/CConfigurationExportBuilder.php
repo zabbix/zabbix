@@ -450,26 +450,21 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatTriggers(array $triggers) {
-		$result = array();
+		$result = [];
 
-		order_result($triggers, 'description');
+		CArrayHelper::sort($triggers, ['description', 'expression']);
 
 		foreach ($triggers as $trigger) {
-			$tr = array(
+			$result[] = [
 				'expression' => $trigger['expression'],
 				'name' => $trigger['description'],
 				'url' => $trigger['url'],
 				'status' => $trigger['status'],
 				'priority' => $trigger['priority'],
 				'description' => $trigger['comments'],
-				'type' => $trigger['type']
-			);
-
-			if (isset($trigger['dependencies'])) {
-				$tr['dependencies'] = $this->formatDependencies($trigger['dependencies']);
-			}
-
-			$result[] = $tr;
+				'type' => $trigger['type'],
+				'dependencies' => $this->formatDependencies($trigger['dependencies'])
+			];
 		}
 
 		return $result;
@@ -662,13 +657,15 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatDependencies(array $dependencies) {
-		$result = array();
+		$result = [];
+
+		CArrayHelper::sort($dependencies, ['description', 'expression']);
 
 		foreach ($dependencies as $dependency) {
-			$result[] = array(
+			$result[] = [
 				'name' => $dependency['description'],
 				'expression' => $dependency['expression']
-			);
+			];
 		}
 
 		return $result;
