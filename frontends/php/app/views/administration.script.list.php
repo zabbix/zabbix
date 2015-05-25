@@ -38,9 +38,9 @@ $scriptsForm->setAttribute('id', 'scripts');
 
 $scriptsTable = new CTableInfo();
 $scriptsTable->setHeader([
-	new CColHeader(
-		new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');"),
-		'cell-width'),
+	(new CColHeader(
+		new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');")))->
+		addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
 	_('Type'),
 	_('Execute on'),

@@ -35,9 +35,9 @@ $userGroupsForm->setName('userGroupsForm');
 // create user group table
 $userGroupTable = new CTableInfo();
 $userGroupTable->setHeader([
-	new CColHeader(
-		new CCheckBox('all_groups', null, "checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');"),
-		'cell-width'),
+	(new CColHeader(
+		new CCheckBox('all_groups', null, "checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');")))->
+		addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	'#',
 	_('Members'),

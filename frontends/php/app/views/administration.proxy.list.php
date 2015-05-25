@@ -39,9 +39,9 @@ $proxyForm->setName('proxyForm');
 // create table
 $proxyTable = new CTableInfo();
 $proxyTable->setHeader([
-	new CColHeader(
-		new CCheckBox('all_hosts', null, "checkAll('".$proxyForm->getName()."', 'all_hosts', 'proxyids');"),
-		'cell-width'),
+	(new CColHeader(
+		new CCheckBox('all_hosts', null, "checkAll('".$proxyForm->getName()."', 'all_hosts', 'proxyids');")))->
+		addClass('cell-width'),
 	make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder']),
 	_('Mode'),
 	_('Last seen (age)'),

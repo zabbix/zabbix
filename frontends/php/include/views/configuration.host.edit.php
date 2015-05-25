@@ -132,12 +132,12 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$dnsLabel = (new CCol(_('DNS name')))->addClass('interface-dns');
 	$connectToLabel = (new CCol(_('Connect to')))->addClass('interface-connect-to');
 	$portLabel = (new CCol(_('Port')))->addClass('interface-port');
-	$defaultLabel = (new CCol(_('Default')))->addClass('interface-default')->setColSpan('2');
+	$defaultLabel = (new CCol(_('Default')))->addClass('interface-default')->setColSpan(2);
 	$ifTab->addRow([$iconLabel, $ipLabel, $dnsLabel, $connectToLabel, $portLabel, $defaultLabel]);
 
 	$helpTextWhenDragInterfaceAgent = new CSpan(_('Drag here to change the type of the interface to "agent" type.'));
 	$helpTextWhenDragInterfaceAgent->addClass('dragHelpText');
-	$buttonCol = (new CCol(new CButton('addAgentInterface', _('Add'), null, 'link_menu')))->addClass('interface-add-control')->setColSpan('7');
+	$buttonCol = (new CCol(new CButton('addAgentInterface', _('Add'), null, 'link_menu')))->addClass('interface-add-control')->setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceAgent);
 
 	$buttonRow = new CRow([$buttonCol]);
@@ -174,7 +174,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$helpTextWhenDragInterfaceJMX->addClass('dragHelpText');
 	$buttonCol = (new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu')))->
 		addClass('interface-add-control')->
-		setColSpan('7');
+		setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceJMX);
 
 	$buttonRow = new CRow([$buttonCol]);
@@ -192,7 +192,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$helpTextWhenDragInterfaceIPMI->addClass('dragHelpText');
 	$buttonCol = (new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu')))->
 		addClass('interface-add-control')->
-		setColSpan('7');
+		setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceIPMI);
 
 	$buttonRow = new CRow([$buttonCol]);
@@ -247,7 +247,7 @@ else {
 	$row = new CRow(null, null, 'SNMPInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
 		$row->addItem((new CCol())->addClass('interface-drag-control'));
-		$row->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan('5'));
+		$row->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(5));
 	}
 	$ifTab->addRow($row);
 	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
@@ -261,7 +261,7 @@ else {
 	$row = new CRow(null, null, 'JMXInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
 		$row->addItem((new CCol())->addClass('interface-drag-control'));
-		$row->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan('5'));
+		$row->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(5));
 	}
 	$ifTab->addRow($row);
 	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
@@ -275,7 +275,7 @@ else {
 	$row = new CRow(null, null, 'IPMIInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
 		$row->addItem((new CCol())->addClass('interface-drag-control'));
-		$row->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan('5'));
+		$row->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(5));
 	}
 	$ifTab->addRow($row);
 	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');

@@ -44,11 +44,11 @@ $slideTable = new CTableInfo();
 $slideTable->setAttribute('style', 'min-width: 312px;');
 $slideTable->setAttribute('id', 'slideTable');
 $slideTable->setHeader([
-	(new CColHeader(SPACE))->setWidth('15'),
-	(new CColHeader(SPACE))->setWidth('15'),
+	(new CColHeader(SPACE))->setWidth(15),
+	(new CColHeader(SPACE))->setWidth(15),
 	_('Screen'),
-	(new CColHeader(_('Delay')))->setWidth('70'),
-	(new CColHeader(_('Action')))->setWidth('50')
+	(new CColHeader(_('Delay')))->setWidth(70),
+	(new CColHeader(_('Action')))->setWidth(50)
 ]);
 
 $i = 1;

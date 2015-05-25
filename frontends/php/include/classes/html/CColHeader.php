@@ -21,35 +21,20 @@
 
 class CColHeader extends CTag {
 
-	public function __construct($item = null, $class = null, $colspan = null, $width = null) {
+	public function __construct($item = null) {
 		parent::__construct('th', 'yes');
 		$this->addItem($item);
-		if ($class !== null) {
-			$this->setAttribute('class', $class);
-		}
-		if ($colspan !== null) {
-			$this->setAttribute('colspan', $colspan);
-		}
-		if ($width !== null) {
-			$this->setAttribute('width', $width);
-		}
 	}
 
 	public function setAlign($value) {
-		$this->setAttribute('align', strval($value));
-	}
-
-	public function setRowSpan($value) {
-		$this->setAttribute('rowspan', strval($value));
+		$this->setAttribute('align', $value);
 	}
 
 	public function setColSpan($value) {
-		$this->setAttribute('colspan', strval($value));
+		$this->setAttribute('colspan', $value);
 	}
 
 	public function setWidth($value) {
-		if (is_string($value)) {
-			$this->setAttribute('width', $value);
-		}
+		$this->setAttribute('width', $value);
 	}
 }

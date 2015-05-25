@@ -52,9 +52,9 @@ $applicationForm->setName('applicationForm');
 // create table
 $applicationTable = new CTableInfo();
 $applicationTable->setHeader([
-	new CColHeader(
-		new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');"),
-		'cell-width'),
+	(new CColHeader(
+		new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');")))->
+		addClass('cell-width'),
 	($this->data['hostid'] > 0) ? null : _('Host'),
 	make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Show')
