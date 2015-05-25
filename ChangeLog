@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Polish translat
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
+...G...... [ZBX-9456] fixed sustem.cpu.util item to work correctly on OpenBSD 5.7 (igors)
 ........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
 .......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
@@ -1254,6 +1255,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9456] fixed sustem.cpu.util item to work correctly on OpenBSD 5.7 (igors)
 ........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
 .......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
