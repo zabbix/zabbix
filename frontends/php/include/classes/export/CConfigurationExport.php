@@ -572,8 +572,9 @@ class CConfigurationExport {
 		// gather trigger prototypes
 		$triggers = API::TriggerPrototype()->get(array(
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
-			'output' => API_OUTPUT_EXTEND,
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
+			'selectDependencies' => ['description', 'expression'],
 			'selectItems' => array('flags', 'type'),
 			'inherited' => false,
 			'preservekeys' => true
@@ -587,6 +588,12 @@ class CConfigurationExport {
 			}
 
 			$trigger['expression'] = explode_exp($trigger['expression']);
+
+			foreach ($trigger['dependencies'] as &$dependency) {
+				$dependency['expression'] = explode_exp($dependency['expression']);
+			}
+			unset($dependency);
+
 			$items[$trigger['discoveryRule']['itemid']]['triggerPrototypes'][] = $trigger;
 		}
 
@@ -750,9 +757,9 @@ class CConfigurationExport {
 
 		$triggers = API::Trigger()->get(array(
 			'hostids' => $hostIds,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
-			'selectDependencies' => API_OUTPUT_EXTEND,
+			'selectDependencies' => ['description', 'expression'],
 			'selectItems' => array('flags', 'type'),
 			'inherited' => false,
 			'preservekeys' => true

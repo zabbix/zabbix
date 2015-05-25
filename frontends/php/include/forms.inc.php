@@ -1302,24 +1302,34 @@ function getTriggerMassupdateFormData() {
 		'hostid' => getRequest('hostid', 0)
 	);
 
-	// get dependencies
-	$data['dependencies'] = API::Trigger()->get(array(
-		'triggerids' => $data['dependencies'],
-		'output' => array('triggerid', 'flags', 'description'),
-		'preservekeys' => true,
-		'selectHosts' => array('hostid', 'name')
-	));
-	foreach ($data['dependencies'] as &$dependency) {
-		if (count($dependency['hosts']) > 1) {
-			order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
-		}
+	if ($data['dependencies']) {
+		$dependencyTriggers = API::Trigger()->get(array(
+			'output' => array('triggerid', 'description', 'flags'),
+			'selectHosts' => array('hostid', 'name'),
+			'triggerids' => $data['dependencies'],
+			'preservekeys' => true
+		));
 
-		$dependency['hosts'] = array_values($dependency['hosts']);
-		$dependency['hostid'] = $dependency['hosts'][0]['hostid'];
+		if ($data['parent_discoveryid']) {
+			$dependencyTriggerPrototypes = API::TriggerPrototype()->get(array(
+				'output' => array('triggerid', 'description', 'flags'),
+				'selectHosts' => array('hostid', 'name'),
+				'triggerids' => $data['dependencies'],
+				'preservekeys' => true
+			));
+			$data['dependencies'] = $dependencyTriggers + $dependencyTriggerPrototypes;
+		}
+		else {
+			$data['dependencies'] = $dependencyTriggers;
+		}
+	}
+
+	foreach ($data['dependencies'] as &$dependency) {
+		order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
 	}
 	unset($dependency);
 
-	order_result($data['dependencies'], 'description');
+	order_result($data['dependencies'], 'description', ZBX_SORT_UP);
 
 	return $data;
 }
@@ -1471,25 +1481,36 @@ function getTriggerFormData($exprAction) {
 		$data['expression_field_readonly'] = $data['limited'];
 	}
 
-	if (empty($data['parent_discoveryid'])) {
-		$data['db_dependencies'] = API::Trigger()->get(array(
+	if ($data['dependencies']) {
+		$dependencyTriggers = API::Trigger()->get(array(
+			'output' => array('triggerid', 'description', 'flags'),
+			'selectHosts' => array('hostid', 'name'),
 			'triggerids' => $data['dependencies'],
-			'output' => array('triggerid', 'flags', 'description'),
-			'preservekeys' => true,
-			'selectHosts' => array('hostid', 'name')
+			'preservekeys' => true
 		));
-		foreach ($data['db_dependencies'] as &$dependency) {
-			if (count($dependency['hosts']) > 1) {
-				order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
-			}
 
-			$dependency['hosts'] = array_values($dependency['hosts']);
-			$dependency['hostid'] = $dependency['hosts'][0]['hostid'];
+		if ($data['parent_discoveryid']) {
+			$dependencyTriggerPrototypes = API::TriggerPrototype()->get(array(
+				'output' => array('triggerid', 'description', 'flags'),
+				'selectHosts' => array('hostid', 'name'),
+				'triggerids' => $data['dependencies'],
+				'preservekeys' => true
+			));
+
+			$data['db_dependencies'] = $dependencyTriggers + $dependencyTriggerPrototypes;
 		}
-		unset($dependency);
-
-		order_result($data['db_dependencies'], 'description');
+		else {
+			$data['db_dependencies'] = $dependencyTriggers;
+		}
 	}
+
+	foreach ($data['db_dependencies'] as &$dependency) {
+		order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
+	}
+	unset($dependency);
+
+	order_result($data['db_dependencies'], 'description');
+
 	return $data;
 }
 

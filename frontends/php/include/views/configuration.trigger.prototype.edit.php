@@ -25,21 +25,21 @@ $triggersWidget = new CWidget();
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
-	$triggersWidget->addItem(get_header_host_table('triggers', $this->data['hostid']));
+	$triggersWidget->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 
-$triggersWidget->setTitle(_('Triggers'));
+$triggersWidget->setTitle(_('Trigger prototypes'));
 
 // create form
 $triggersForm = new CForm();
 $triggersForm->setName('triggersForm');
 $triggersForm->addVar('form', $this->data['form']);
-$triggersForm->addVar('hostid', $this->data['hostid']);
+$triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 $triggersForm->addVar('input_method', $this->data['input_method']);
 $triggersForm->addVar('toggle_input_method', '');
 $triggersForm->addVar('remove_expression', '');
 
-if ($data['triggerid'] !== null) {
+if ($this->data['triggerid'] !== null) {
 	$triggersForm->addVar('triggerid', $this->data['triggerid']);
 }
 
@@ -70,7 +70,8 @@ $addExpressionButton = new CButton(
 	'insert',
 	($this->data['input_method'] == IM_TREE) ? _('Edit') : _('Add'),
 	'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
-		'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression&srcfld1=expression'.
+		'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression'.url_param('parent_discoveryid').
+		'&srcfld1=expression'.
 		'&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()));',
 	'button-form top'
 );
@@ -254,7 +255,7 @@ $triggersTab = new CTabView();
 if (!$this->data['form_refresh']) {
 	$triggersTab->setSelected(0);
 }
-$triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
+$triggersTab->addTab('triggersTab',	_('Trigger prototype'), $triggersFormList);
 
 /*
  * Dependencies tab
@@ -272,14 +273,17 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 		implode(', ', zbx_objectValues($dependency['hosts'], 'name')).NAME_DELIMITER.$dependency['description']
 	);
 
-	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		$description = new CLink($depTriggerDescription,
+			'trigger_prototypes.php?form=update'.url_param('parent_discoveryid').'&triggerid='.$dependency['triggerid']
+		);
+		$description->setAttribute('target', '_blank');
+	}
+	elseif ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$description = new CLink($depTriggerDescription,
 			'triggers.php?form=update&triggerid='.$dependency['triggerid']
 		);
 		$description->setAttribute('target', '_blank');
-	}
-	else {
-		$description = $depTriggerDescription;
 	}
 
 	$row = new CRow(array($description, new CButton('remove', _('Remove'),
@@ -291,17 +295,19 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 	$dependenciesTable->addRow($row);
 }
 
-$dependenciesFormList->addRow(
-	_('Dependencies'),
+$addButton = new CButton('add_dep_trigger', _('Add'),
+	'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
+		'&with_triggers=1&normal_only=1&noempty=1");',
+	'link_menu'
+);
+$addPrototypeButton = new CButton('add_dep_trigger_prototype', _('Add prototype'),
+	'return PopUp("popup.php?srctbl=trigger_prototypes&srcfld1=triggerid&reference=deptrigger'.
+		url_param('parent_discoveryid').'&multiselect=1");',
+	'link_menu'
+);
+$dependenciesFormList->addRow(_('Dependencies'),
 	new CDiv(
-		array(
-			$dependenciesTable,
-			new CButton('bnt1', _('Add'),
-				'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
-					'&with_triggers=1&noempty=1");',
-				'link_menu'
-			)
-		),
+		array($dependenciesTable, $addButton, SPACE, SPACE, SPACE, $addPrototypeButton),
 		'objectgroup inlineblock border_dotted ui-corner-all'
 	)
 );
@@ -309,9 +315,10 @@ $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList
 
 // append buttons to form
 if (!empty($this->data['triggerid'])) {
-	$deleteButton = new CButtonDelete(_('Delete trigger?'),
-		url_params(array('form', 'hostid', 'triggerid'))
+	$deleteButton = new CButtonDelete(_('Delete trigger prototype?'),
+		url_params(array('form', 'triggerid', 'parent_discoveryid'))
 	);
+
 	if ($this->data['limited']) {
 		$deleteButton->setAttribute('disabled', 'disabled');
 	}
@@ -321,14 +328,14 @@ if (!empty($this->data['triggerid'])) {
 		array(
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
-			new CButtonCancel(url_param('hostid'))
+			new CButtonCancel(url_param('parent_discoveryid'))
 		)
 	));
 }
 else {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('hostid')))
+		array(new CButtonCancel(url_param('parent_discoveryid')))
 	));
 }
 
