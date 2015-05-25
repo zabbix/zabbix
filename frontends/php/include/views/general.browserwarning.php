@@ -28,41 +28,39 @@
 	<link rel="stylesheet" type="text/css" href="styles/zabbix.css" />
 </head>
 <body>
-	<div class="article">
+	<div class="<?= ZBX_STYLE_ARTICLE ?>">
 		<div class="browser-warning-container">
-			<div class="browserwarningForm">
-				<h2 class="<?= ZBX_STYLE_RED ?>">You are using an outdated browser.</h2>
-				<p>Zabbix frontend is built on advanced, modern technologies and does not support old browsers. It is highly recommended that you choose and install a modern browser. It is free of charge and only takes a couple of minutes.</p>
-				<p>New browsers usually come with support for new technologies, increasing web page speed, better privacy settings and so on. They also resolve security and functional issues.</p>
-				<ul>
-					<li>
-						<a target="_blank" href="http://www.google.com/chrome"><div class="browser-logo-chrome"></div></a>
-						<a target="_blank" href="http://www.google.com/chrome">Google Chrome</a>
-					</li>
-					<li>
-						<a target="_blank" href="http://www.mozilla.org/firefox"><div class="browser-logo-ff"></div></a>
-						<a target="_blank" href="http://www.mozilla.org/firefox">Mozilla Firefox</a>
-					</li>
-					<li>
-						<a target="_blank" href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie"><div class="browser-logo-ie"></div></a>
-						<a target="_blank" href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie">Internet Explorer</a>
-					</li>
-					<li>
-						<a target="_blank" href="http://www.opera.com/download"><div class="browser-logo-opera"></div></a>
-						<a target="_blank" href="http://www.opera.com/download">Opera browser</a>
-					</li>
-					<li>
-						<a target="_blank" href="http://www.apple.com/safari/download"><div class="browser-logo-safari"></div></a>
-						<a target="_blank" href="http://www.apple.com/safari/download">Apple Safari</a>
-					</li>
-				</ul>
-				<div class="browser-warning-footer">
-					<a href="index.php" onClick="javascript: document.cookie='browserwarning_ignore=yes';">Continue despite this warning</a>
-				</div>
+			<h2 class="<?= ZBX_STYLE_RED ?>">You are using an outdated browser.</h2>
+			<p>Zabbix frontend is built on advanced, modern technologies and does not support old browsers. It is highly recommended that you choose and install a modern browser. It is free of charge and only takes a couple of minutes.</p>
+			<p>New browsers usually come with support for new technologies, increasing web page speed, better privacy settings and so on. They also resolve security and functional issues.</p>
+			<ul>
+				<li>
+					<a target="_blank" href="http://www.google.com/chrome"><div class="browser-logo-chrome"></div></a>
+					<a target="_blank" href="http://www.google.com/chrome">Google Chrome</a>
+				</li>
+				<li>
+					<a target="_blank" href="http://www.mozilla.org/firefox"><div class="browser-logo-ff"></div></a>
+					<a target="_blank" href="http://www.mozilla.org/firefox">Mozilla Firefox</a>
+				</li>
+				<li>
+					<a target="_blank" href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie"><div class="browser-logo-ie"></div></a>
+					<a target="_blank" href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie">Internet Explorer</a>
+				</li>
+				<li>
+					<a target="_blank" href="http://www.opera.com/download"><div class="browser-logo-opera"></div></a>
+					<a target="_blank" href="http://www.opera.com/download">Opera browser</a>
+				</li>
+				<li>
+					<a target="_blank" href="http://www.apple.com/safari/download"><div class="browser-logo-safari"></div></a>
+					<a target="_blank" href="http://www.apple.com/safari/download">Apple Safari</a>
+				</li>
+			</ul>
+			<div class="browser-warning-footer">
+				<a href="index.php" onClick="javascript: document.cookie='browserwarning_ignore=yes';">Continue despite this warning</a>
 			</div>
 		</div>
 	</div>
-	<div class="footer">
+	<div class="<?= ZBX_STYLE_FOOTER ?>">
 		<a class="logo" target="_blank" href="http://www.zabbix.com"></a>
 		<?= 'Zabbix '.ZABBIX_VERSION.' &copy; '.ZABBIX_COPYRIGHT_FROM.'-'.ZABBIX_COPYRIGHT_TO.', ' ?>
 		<a class="<?= ZBX_STYLE_GREY ?> link-alt" target="_blank" href="http://www.zabbix.com">Zabbix SIA</a>

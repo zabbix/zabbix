@@ -991,6 +991,8 @@ define('HISTORY_LATEST', 'showlatest');
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // CSS styles
+define('ZBX_STYLE_ARTICLE', 'article');
+define('ZBX_STYLE_FOOTER', 'footer');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
 define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav');
 define('ZBX_STYLE_BTN_CONF', 'btn-conf');
