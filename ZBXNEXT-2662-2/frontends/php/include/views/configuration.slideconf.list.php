@@ -35,9 +35,9 @@ $slideForm->setName('slideForm');
 // create table
 $slidesTable = new CTableInfo();
 $slidesTable->setHeader([
-	new CColHeader(
-		new CCheckBox('all_shows', null, "checkAll('".$slideForm->getName()."', 'all_shows', 'shows');"),
-		'cell-width'),
+	(new CColHeader(
+		new CCheckBox('all_shows', null, "checkAll('".$slideForm->getName()."', 'all_shows', 'shows');")))->
+		addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'])

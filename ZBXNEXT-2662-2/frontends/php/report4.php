@@ -124,7 +124,7 @@ else {
 	$header = [];
 	$db_users = DBselect('SELECT u.* FROM users u ORDER BY u.alias,u.userid');
 	while ($user_data = DBfetch($db_users)) {
-		$header[] = new CColHeader($user_data['alias'], 'vertical_rotation');
+		$header[] = (new CColHeader($user_data['alias']))->addClass('vertical_rotation');
 		$users[$user_data['userid']] = $user_data['alias'];
 	}
 

@@ -36,9 +36,9 @@ $sysmapForm->setName('frm_maps');
 // create table
 $sysmapTable = new CTableInfo();
 $sysmapTable->setHeader([
-	new CColHeader(
-		new CCheckBox('all_maps', null, "checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');"),
-		'cell-width'),
+	(new CColHeader(
+		new CCheckBox('all_maps', null, "checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');")))->
+		addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder']),
