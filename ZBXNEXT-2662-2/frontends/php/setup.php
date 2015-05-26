@@ -112,18 +112,10 @@ $link = new CLink('GPL v2', 'http://www.zabbix.com/license.php', null, null, tru
 $link->setAttribute('target', '_blank');
 $sub_footer = new CDiv(['Licensed under ', $link], 'signin-links');
 
-$link = new CLink('Zabbix SIA', 'http://www.zabbix.com/', null, null, true);
-$link->setAttribute('target', '_blank');
-$footer = new CDiv([
-	'Zabbix '.ZABBIX_VERSION.'. &copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
-	$link],
-	ZBX_STYLE_FOOTER
-);
-
 $body = new CTag('body', 'yes', [
 	$header,
 	new CDiv([$ZBX_SETUP_WIZARD, $sub_footer], ZBX_STYLE_ARTICLE),
-	$footer
+	makePageFooter(false)
 ]);
 
 $body->show();

@@ -60,10 +60,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	// end of article div
 	echo '</div>'."\n";
 	if (!defined('ZBX_PAGE_NO_MENU')) {
-		echo '<div class="'.ZBX_STYLE_FOOTER.'">'."\n";
-		echo '<a href="http://www.zabbix.com" target="_blank" class="logo"></a>'."\n";
-		echo 'Zabbix '.ZABBIX_VERSION.'. &copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', <a href="http://www.zabbix.com" target="_blank">Zabbix SIA</a>'."\n";
-		echo '</div>'."\n";
+		makePageFooter()->show();
 	}
 	insertPagePostJs();
 	require_once 'include/views/js/common.init.js.php';

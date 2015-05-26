@@ -36,28 +36,26 @@ require_once dirname(__FILE__).'/../page_header.php';
 <div class="signin-container">
 	<h1>Sign in</h1>
 	<form action="index.php" method="post">
-	<input type="hidden" name="request" class="input hidden" value="<?php echo $request; ?>" />
+	<input type="hidden" name="request" class="input hidden" value="<?= $request; ?>" />
 		<ul>
 			<li>
-				<label for="name"><?php echo _('Username'); ?></label><input id="name" name="name" autofocus="" type="text">
-<?php if (!empty($message)) { ?>
-				<div class="red"><?php echo $message ?></div>
-<?php } ?>
+				<label for="name"><?= _('Username'); ?></label><input id="name" name="name" autofocus="" type="text">
+<?php if (!empty($message)): ?>
+				<div class="red"><?= $message ?></div>
+<?php endif ?>
 			</li>
-			<li><label for="password"><?php echo _('Password'); ?></label><input id="password" name="password" type="password"></li>
-			<li><label for="autologin"><input name="autologin" value="1" id="autologin" <?php echo (getRequest('autologin', 1) == 1) ? 'checked="checked"' : ''; ?> type="checkbox"><?php echo _('Remember me for 30 days'); ?></label></li>
-			<li><button name="enter" type="submit" value="<?php echo _('Sign in'); ?>"><?php echo _('Sign in'); ?></button></li>
-<?php if (CWebUser::$data['userid'] > 0) { ?>
-			<li class="sign-in-txt">or <a href="<?php echo ZBX_DEFAULT_URL; ?>">sign in as guest</a></li>
-<?php } ?>
+			<li><label for="password"><?= _('Password'); ?></label><input id="password" name="password" type="password"></li>
+			<li><label for="autologin"><input name="autologin" value="1" id="autologin" <?= (getRequest('autologin', 1) == 1) ? 'checked="checked"' : ''; ?> type="checkbox"><?= _('Remember me for 30 days'); ?></label></li>
+			<li><button name="enter" type="submit" value="<?= _('Sign in'); ?>"><?= _('Sign in'); ?></button></li>
+<?php if (CWebUser::$data['userid'] > 0): ?>
+			<li class="sign-in-txt">or <a href="<?= ZBX_DEFAULT_URL; ?>">sign in as guest</a></li>
+<?php endif ?>
 		</ul>
 	</form>
 </div>
-<div class="signin-links"><a target="_blank" href="http://www.zabbix.com/documentation/"><?php echo _('Help'); ?></a>&nbsp;&nbsp;•&nbsp;&nbsp;<a target="_lbank" href="http://www.zabbix.com/support.php"><?php echo _('Support'); ?></a></div>
+<div class="signin-links"><a target="_blank" href="http://www.zabbix.com/documentation/"><?= _('Help'); ?></a>&nbsp;&nbsp;•&nbsp;&nbsp;<a target="_lbank" href="http://www.zabbix.com/support.php"><?= _('Support'); ?></a></div>
 </div>
 
-<div class="<?= ZBX_STYLE_FOOTER ?>">
-<?php echo _s('Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA', ZABBIX_VERSION, ZABBIX_COPYRIGHT_FROM, ZABBIX_COPYRIGHT_TO); ?>
-</div>
+<?= makePageFooter(false, false)->toString() ?>
 
 </body>
