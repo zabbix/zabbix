@@ -616,6 +616,12 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 			goto error;
 	}
 
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_VERBOSE, 1L)))
+			goto error;
+	}
+
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
 		zbx_snprintf(error, max_error_len, "%s: %s", curl_easy_strerror(err), errbuf);
@@ -651,7 +657,8 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	char		*from_display_name = NULL, *from_angle_addr = NULL;
 	char		*to_display_name = NULL, *to_angle_addr = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() smtp_server:'%s'", __function_name, smtp_server);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() smtp_server:'%s' smtp_port:%hu smtp_security:%d smtp_authentication:%d",
+			__function_name, smtp_server, smtp_port, (int)smtp_security, (int)smtp_authentication);
 
 	*error = '\0';
 
