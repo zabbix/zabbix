@@ -2165,10 +2165,12 @@ button[disabled] {
 		}
 	}
 
-	.grey {
+	.action-menu-item-disabled {
 		display: block;
 		height: 24px;
 		line-height: 24px;
+		color: $font-alt-color;
+		cursor: default;
 	}
 
 	h3 {
