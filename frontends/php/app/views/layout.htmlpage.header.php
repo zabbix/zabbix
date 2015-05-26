@@ -47,7 +47,7 @@ CSS;
 	}
 }
 $css = CHtml::encode($css);
-$pageHeader->addCssFile('styles/themes/'.$css.'/main.css');
+//$pageHeader->addCssFile('styles/themes/'.$css.'/main.css');
 
 $pageHeader->addJsFile('js/browsers.js');
 $pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');
@@ -68,4 +68,4 @@ foreach ($data['javascript']['files'] as $path) {
 $pageHeader->display();
 
 echo "<body class=\"$css\">";
-echo "<div id=\"message-global-wrap\"><div id=\"message-global\"></div></div>";
+echo "<div class=\"msg-bad-global\" id=\"msg-bad-global\"></div>";

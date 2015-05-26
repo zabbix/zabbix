@@ -21,7 +21,7 @@
 
 include('include/views/js/configuration.httpconf.popup.js.php');
 
-$httpPopupWidget = new CWidget(null, 'httptest-popup');
+$httpPopupWidget = new CWidget('httptest-popup');
 
 $result = false;
 if (hasRequest('add') || hasRequest('update')) {
@@ -82,7 +82,7 @@ else {
 	$httpPopupForm->addVar('old_name', getRequest('old_name'));
 	$httpPopupForm->addVar('steps_names', getRequest('steps_names'));
 
-	$httpPopupFormList = new CFormList('httpPopupFormList');
+	$httpPopupFormList = new CFormList();
 	$httpPopupFormList->addRow(_('Name'), new CTextBox('name', getRequest('name', ''), ZBX_TEXTBOX_STANDARD_SIZE, (bool) getRequest('templated'), 64));
 	$httpPopupFormList->addRow(_('URL'), new CTextBox('url', getRequest('url', ''), ZBX_TEXTBOX_STANDARD_SIZE, false, null));
 	$httpPopupFormList->addRow(_('Post'), new CTextArea('posts', getRequest('posts', '')));
@@ -101,22 +101,22 @@ else {
 	// append tabs to form
 	$httpPopupTab = new CTabView();
 	$httpPopupTab->addTab('scenarioStepTab', _('Step of web scenario'), $httpPopupFormList);
-	$httpPopupForm->addItem($httpPopupTab);
 
 	// append buttons to form
 	if (hasRequest('stepid')) {
-		$httpPopupForm->addItem(makeFormFooter(
+		$httpPopupTab->setFooter(makeFormFooter(
 			new CSubmit('update', _('Update')),
 			array(new CButtonCancel(null, 'close_window();'))
 		));
 	}
 	else {
-		$httpPopupForm->addItem(makeFormFooter(
+		$httpPopupTab->setFooter(makeFormFooter(
 			new CSubmit('add', _('Add')),
 			array(new CButtonCancel(null, 'close_window();'))
 		));
 	}
 
+	$httpPopupForm->addItem($httpPopupTab);
 	$httpPopupWidget->addItem($httpPopupForm);
 }
 

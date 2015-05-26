@@ -19,11 +19,14 @@
 **/
 
 
-$hostGroupWidget = new CWidget();
+$hostGroupWidget = (new CWidget())->setTitle(_('Host groups'));
 
 // create new hostgroup button
 $createForm = new CForm('get');
 $createForm->cleanItems();
+
+$controls = new CList();
+
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$tmpItem = new CSubmit('form', _('Create host group'));
 }
@@ -31,24 +34,24 @@ else {
 	$tmpItem = new CSubmit('form', _('Create host group').SPACE._('(Only super admins can create groups)'));
 	$tmpItem->setEnabled(false);
 }
-$createForm->addItem($tmpItem);
+$controls->addItem($tmpItem);
+$createForm->addItem($controls);
 
-$hostGroupWidget->addPageHeader(_('CONFIGURATION OF HOST GROUPS'), $createForm);
-
-// header
-$hostGroupWidget->addHeader(_('Host groups'));
-$hostGroupWidget->addHeaderRowNumber();
+$hostGroupWidget->setControls($createForm);
 
 // create form
 $hostGroupForm = new CForm();
 $hostGroupForm->setName('hostgroupForm');
 
 // create table
-$hostGroupTable = new CTableInfo(_('No host groups found.'));
+$hostGroupTable = new CTableInfo();
 $hostGroupTable->setHeader(array(
-	new CCheckBox('all_groups', null, "checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');"),
+	new CColHeader(
+		new CCheckBox('all_groups', null, "checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');"),
+		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	' # ',
+	_('Hosts'),
+	_('Templates'),
 	_('Members'),
 	_('Info')
 ));
@@ -74,7 +77,7 @@ foreach ($this->data['groups'] as $group) {
 			$hostsOutput[] = ', ';
 		}
 
-		$hostsOutput[] = new CLink($template['name'], $url, 'unknown');
+		$hostsOutput[] = new CLink($template['name'], $url, ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
 	}
 
 	if ($group['hosts'] && $i < $this->data['config']['max_in_table']) {
@@ -97,7 +100,7 @@ foreach ($this->data['groups'] as $group) {
 
 			switch ($host['status']) {
 				case HOST_STATUS_NOT_MONITORED:
-					$style = 'on';
+					$style = ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED;
 					$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
 					break;
 
@@ -120,7 +123,7 @@ foreach ($this->data['groups'] as $group) {
 	// name
 	$name = array();
 	if ($group['discoveryRule']) {
-		$name[] = new CLink($group['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$group['discoveryRule']['itemid'], 'parent-discovery');
+		$name[] = new CLink($group['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$group['discoveryRule']['itemid'], ZBX_STYLE_ORANGE);
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$group['groupid']);
@@ -148,31 +151,28 @@ foreach ($this->data['groups'] as $group) {
 		$info = '';
 	}
 
-	$hostGroupTable->addRow(array(
+	$hostGroupTable->addRow([
 		new CCheckBox('groups['.$group['groupid'].']', null, null, $group['groupid']),
-		$name,
-		array(
-			array(new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'], 'unknown'), ' ('.$templateCount.')'),
-			BR(),
-			array(new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), ' ('.$hostCount.')')
-		),
-		new CCol(empty($hostsOutput) ? '-' : $hostsOutput, 'wraptext'),
+		new CCol($name, ZBX_STYLE_NOWRAP),
+		[new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), CViewHelper::showNum($hostCount)],
+		[new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY),
+				CViewHelper::showNum($templateCount)],
+		empty($hostsOutput) ? '' : $hostsOutput,
 		$info
-	));
+	]);
 }
 
 // append table to form
 $hostGroupForm->addItem(array(
-	$this->data['paging'],
 	$hostGroupTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'groups', array(
+	new CActionButtonList('action', 'groups', array(
 		'hostgroup.massenable' => array('name' => _('Enable hosts'), 'confirm' => _('Enable selected hosts?')),
 		'hostgroup.massdisable' => array('name' => _('Disable hosts'),
 			'confirm' => _('Disable hosts in the selected host groups?')
 		),
 		'hostgroup.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected host groups?'))
-	)))
+	))
 ));
 
 // append form to widget

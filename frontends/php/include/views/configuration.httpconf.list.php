@@ -18,46 +18,38 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+$httpWidget = (new CWidget())->setTitle(_('Web monitoring'));
 
-$httpWidget = new CWidget();
-
-$createForm = new CForm('get');
-$createForm->cleanItems();
+$createForm = (new CForm('get'))->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
+
+$controls = new CList();
+$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+$controls->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 if (empty($this->data['hostid'])) {
 	$createButton = new CSubmit('form', _('Create web scenario (select host first)'));
 	$createButton->setEnabled(false);
-	$createForm->addItem($createButton);
+	$controls->addItem($createButton);
 }
 else {
-	$createForm->addItem(new CSubmit('form', _('Create web scenario')));
-
+	$controls->addItem(new CSubmit('form', _('Create web scenario')));
 	$httpWidget->addItem(get_header_host_table('web', $this->data['hostid']));
 }
 
-$httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'), $createForm);
-
-// header
-$filterForm = new CForm('get');
-$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
-
-$httpWidget->addHeader(_('Web scenarios'), $filterForm);
-$httpWidget->addHeaderRowNumber(array(
-	'[ ',
-	new CLink($this->data['showDisabled'] ? _('Hide disabled web scenarios') : _('Show disabled web scenarios'),
-	'?showdisabled='.($this->data['showDisabled'] ? 0 : 1), null), ' ]'
-));
+$createForm->addItem($controls);
+$httpWidget->setControls($createForm);
 
 // create form
 $httpForm = new CForm();
 $httpForm->setName('scenarios');
 $httpForm->addVar('hostid', $this->data['hostid']);
 
-$httpTable = new CTableInfo(_('No web scenarios found.'));
+$httpTable = new CTableInfo();
 $httpTable->setHeader(array(
-	new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
+	new CColHeader(
+		new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
+		'cell-width'),
 	($this->data['hostid'] == 0)
 		? make_sorting_header(_('Host'), 'hostname', $this->data['sort'], $this->data['sortorder'])
 		: null,
@@ -79,7 +71,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 	$name = array();
 	if (isset($this->data['parentTemplates'][$httpTestId])) {
 		$template = $this->data['parentTemplates'][$httpTestId];
-		$name[] = new CLink($template['name'], '?groupid=0&hostid='.$template['id'], 'unknown');
+		$name[] = new CLink($template['name'], '?groupid=0&hostid='.$template['id'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTestId.'&hostid='.$httpTest['hostid']);
@@ -101,7 +93,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 				: _s('Unknown step failed: %1$s', $lastData['error']);
 
 			$infoIcon = new CDiv(SPACE, 'status_icon iconerror');
-			$infoIcon->setHint($errorMessage, 'on');
+			$infoIcon->setHint($errorMessage, ZBX_STYLE_RED);
 		}
 		else {
 			$infoIcon = '';
@@ -116,11 +108,11 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		($this->data['hostid'] > 0) ? null : $httpTest['hostname'],
 		$name,
 		$httpTest['stepscnt'],
-		$httpTest['delay'],
+		convertUnitsS($httpTest['delay']),
 		$httpTest['retries'],
 		httptest_authentications($httpTest['authentication']),
 		($httpTest['http_proxy'] !== '') ? _('Yes') : _('No'),
-		($httpTest['applicationid'] != 0) ? $httpTest['application_name'] : '-',
+		($httpTest['applicationid'] != 0) ? $httpTest['application_name'] : '',
 		new CLink(
 			httptest_status2str($httpTest['status']),
 			'?group_httptestid[]='.$httpTest['httptestid'].
@@ -129,7 +121,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 					? 'httptest.massenable'
 					: 'httptest.massdisable'
 				),
-			httptest_status2style($httpTest['status'])
+			ZBX_STYLE_LINK_ACTION.' '.httptest_status2style($httpTest['status'])
 		),
 		$infoIcon
 	));
@@ -139,10 +131,9 @@ zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
 $httpForm->addItem(array(
-	$this->data['paging'],
 	$httpTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'group_httptestid',
+	new CActionButtonList('action', 'group_httptestid',
 		array(
 			'httptest.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')),
 			'httptest.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')),
@@ -152,7 +143,7 @@ $httpForm->addItem(array(
 			'httptest.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?'))
 		),
 		$this->data['hostid']
-	))
+	)
 ));
 
 // append form to widget

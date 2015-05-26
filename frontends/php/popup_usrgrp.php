@@ -83,7 +83,7 @@ if(form){
 
 	$form->setName('groups');
 
-	$table = new CTableInfo(_('No user groups found.'));
+	$table = new CTableInfo();
 	$table->setHeader(array(
 		new CCheckBox("all_groups",NULL,"checkAll('".$form->getName()."','all_groups','new_groups');"),
 		_('Name')

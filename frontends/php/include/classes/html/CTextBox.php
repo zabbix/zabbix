@@ -27,7 +27,6 @@ class CTextBox extends CInput {
 		parent::__construct('text', $name, $value);
 		$this->setReadonly($readonly);
 		$this->caption = null;
-		$this->tag_body_start = '';
 		$this->setAttribute('size', $size);
 		$this->setAttribute('maxlength', $maxlength);
 

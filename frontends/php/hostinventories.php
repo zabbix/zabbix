@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Host inventory');
 $page['file'] = 'hostinventories.php';
-$page['hist_arg'] = array('groupid', 'hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -244,13 +243,22 @@ else {
 				unset($host);
 			}
 
+			$limit = $data['config']['search_limit'] + 1;
+
 			order_result($data['hosts'], $sortField, $sortOrder);
 
-			$data['hosts'] = array_slice($data['hosts'], 0, $data['config']['search_limit'] + 1);
+			if ($sortOrder == ZBX_SORT_UP) {
+				$data['hosts'] = array_slice($data['hosts'], 0, $limit);
+			}
+			else {
+				$data['hosts'] = array_slice($data['hosts'], -$limit, $limit);
+			}
+
+			order_result($data['hosts'], $sortField, $sortOrder);
 		}
 	}
 
-	$data['paging'] = getPagingLine($data['hosts']);
+	$data['paging'] = getPagingLine($data['hosts'], $sortOrder);
 
 	$hostinventoriesView = new CView('inventory.host.list', $data);
 	$hostinventoriesView->render();

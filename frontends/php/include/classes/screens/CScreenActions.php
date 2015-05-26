@@ -123,7 +123,7 @@ class CScreenActions extends CScreenBase {
 		$sortorderSpan = new CSpan(SPACE, ($sortorder === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
 
 		// create alert table
-		$actionTable = new CTableInfo(_('No action log entries found.'));
+		$actionTable = new CTableInfo();
 		$actionTable->setHeader(array(
 			($sortfield === 'clock') ? array($sortfieldSpan, $sortorderSpan) : _('Time'),
 			_('Action'),
@@ -142,17 +142,17 @@ class CScreenActions extends CScreenBase {
 
 		foreach ($alerts as $alert) {
 			if ($alert['status'] == ALERT_STATUS_SENT) {
-				$status = new CSpan(_('Sent'), 'green');
+				$status = new CSpan(_('Sent'), ZBX_STYLE_GREEN);
 			}
 			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
 				$status = new CSpan(array(
 					_('In progress').':',
 					BR(),
 					_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries']),
-				), 'orange');
+				), ZBX_STYLE_ORANGE);
 			}
 			else {
-				$status = new CSpan(_('Not sent'), 'red');
+				$status = new CSpan(_('Not sent'), ZBX_STYLE_RED);
 			}
 
 			$recipient = $alert['userid']
@@ -175,18 +175,18 @@ class CScreenActions extends CScreenBase {
 			}
 			else {
 				$info = new CDiv(SPACE, 'status_icon iconerror');
-				$info->setHint($alert['error'], 'on');
+				$info->setHint($alert['error'], ZBX_STYLE_RED);
 			}
 
-			$actionTable->addRow(array(
-				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']), 'top'),
-				new CCol($actions[$alert['actionid']]['name'], 'top'),
-				new CCol(($alert['mediatypeid'] == 0) ? '-' : $alert['description'], 'top'),
-				new CCol($recipient, 'top'),
-				new CCol($message, 'top pre'),
-				new CCol($status, 'top'),
-				new CCol($info, 'wraptext top')
-			));
+			$actionTable->addRow([
+				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock'])),
+				new CCol($actions[$alert['actionid']]['name']),
+				new CCol(($alert['mediatypeid'] == 0) ? '' : $alert['description']),
+				new CCol($recipient),
+				new CCol($message),
+				new CCol($status),
+				new CCol($info)
+			]);
 		}
 
 		return $this->getOutput($actionTable);

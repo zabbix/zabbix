@@ -23,25 +23,28 @@ if ($data['uncheck']) {
 	uncheckTableRows();
 }
 
-$mediaTypeWidget = new CWidget();
+$mediaTypeWidget = (new CWidget())->setTitle(_('Media types'));
 
 // create new media type button
 $createForm = new CForm('get');
-$createForm->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'));
-$mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'), $createForm);
-$mediaTypeWidget->addHeader(_('Media types'));
-$mediaTypeWidget->addHeaderRowNumber();
+
+$controls = new CList();
+$controls->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'));
+$createForm->addItem($controls);
+$mediaTypeWidget->setControls($createForm);
 
 // create form
 $mediaTypeForm = new CForm();
 $mediaTypeForm->setName('mediaTypesForm');
 
 // create table
-$mediaTypeTable = new CTableInfo(_('No media types found.'));
+$mediaTypeTable = new CTableInfo();
 $mediaTypeTable->setHeader(array(
-	new CCheckBox('all_media_types', null,
-		"checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"
-	),
+	new CColHeader(
+		new CCheckBox('all_media_types', null,
+			"checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"
+		),
+		'cell-width'),
 	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder']),
 	make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder']),
 	_('Status'),
@@ -89,7 +92,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 		array_pop($actionLinks);
 	}
 	else {
-		$actionLinks = '-';
+		$actionLinks = '';
 	}
 	$actionColumn = new CCol($actionLinks);
 	$actionColumn->setAttribute('style', 'white-space: normal;');
@@ -102,8 +105,8 @@ foreach ($data['mediatypes'] as $mediaType) {
 		'&mediatypeids[]='.$mediaType['mediatypeid'];
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
-		? new CLink(_('Enabled'), $statusLink, 'enabled')
-		: new CLink(_('Disabled'), $statusLink, 'disabled');
+		? new CLink(_('Enabled'), $statusLink, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN)
+		: new CLink(_('Disabled'), $statusLink, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
 
 	// append row
 	$mediaTypeTable->addRow(array(
@@ -118,17 +121,14 @@ foreach ($data['mediatypes'] as $mediaType) {
 
 // append table to form
 $mediaTypeForm->addItem(array(
-	$data['paging'],
 	$mediaTypeTable,
 	$data['paging'],
-	get_table_header(new CActionButtonList('action', 'mediatypeids', array(
+	new CActionButtonList('action', 'mediatypeids', array(
 		'mediatype.enable' => array('name' => _('Enable'), 'confirm' => _('Enable selected media types?')),
 		'mediatype.disable' => array('name' => _('Disable'), 'confirm' => _('Disable selected media types?')),
 		'mediatype.delete' => array('name' => _('Delete'), 'confirm' => _('Delete selected media types?'))
-	)))
+	))
 ));
 
 // append form to widget
-$mediaTypeWidget->addItem($mediaTypeForm);
-
-$mediaTypeWidget->show();
+$mediaTypeWidget->addItem($mediaTypeForm)->show();

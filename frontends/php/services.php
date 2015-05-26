@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 $page['title'] = _('Configuration of IT services');
 $page['file'] = 'services.php';
 $page['scripts'] = array('class.calendar.js');
-$page['hist_arg'] = array();
 
 if (isset($_REQUEST['pservices']) || isset($_REQUEST['cservices'])) {
 	define('ZBX_PAGE_NO_MENU', 1);
@@ -295,7 +294,7 @@ if (isset($_REQUEST['pservices'])) {
 	foreach ($parentServices as $key => $parentService) {
 		$parentServices[$key]['trigger'] = !empty($parentService['trigger'])
 			? $triggers[$parentService['trigger']['triggerid']]['description']
-			: '-';
+			: '';
 	}
 
 	$data['db_pservices'] = $parentServices;
@@ -336,7 +335,7 @@ elseif (isset($_REQUEST['cservices'])) {
 	foreach ($childServices as $key => $childService) {
 		$childServices[$key]['trigger'] = !empty($childService['trigger'])
 			? $triggers[$childService['trigger']['triggerid']]['description']
-			: '-';
+			: '';
 	}
 
 	$data['db_cservices'] = $childServices;
@@ -398,7 +397,7 @@ elseif (isset($_REQUEST['form'])) {
 					'triggerid' => $childService['triggerid'],
 					'trigger' => !empty($childService['triggerid'])
 							? $triggers[$childService['trigger']['triggerid']]['description']
-							: '-',
+							: '',
 					'serviceid' => $dependency['servicedownid'],
 					'soft' => $dependency['soft'],
 				);

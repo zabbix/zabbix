@@ -73,7 +73,7 @@ class CControllerProxyList extends CController {
 		));
 		// sorting & paging
 		order_result($data['proxies'], $sortField, $sortOrder);
-		$data['paging'] = getPagingLine($data['proxies']);
+		$data['paging'] = getPagingLine($data['proxies'], $sortOrder);
 
 		foreach ($data['proxies'] as &$proxy) {
 			order_result($proxy['hosts'], 'name');

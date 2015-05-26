@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/users.inc.php';
 
 $page['title'] = _('Audit log');
 $page['file'] = 'auditlogs.php';
-$page['hist_arg'] = array();
 $page['scripts'] = array('class.calendar.js', 'gtlc.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -163,7 +162,7 @@ if (!empty($data['actions'])) {
 }
 
 // get paging
-$data['paging'] = getPagingLine($data['actions']);
+$data['paging'] = getPagingLine($data['actions'], ZBX_SORT_DOWN);
 
 // get timeline
 unset($sqlWhere['from'], $sqlWhere['till']);

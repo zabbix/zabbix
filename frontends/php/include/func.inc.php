@@ -1390,29 +1390,18 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 	$link->setArgument('sortorder', $sortorder);
 
 	zbx_value2array($obj);
-	$cont = new CSpan();
 
-	foreach ($obj as $el) {
-		if (is_object($el) || $el === SPACE) {
-			$cont->addItem($el);
-		}
-		else {
-			$cont->addItem(new CSpan($el, 'underline'));
-		}
-	}
-	$cont->addItem(SPACE);
-
-	$img = null;
+	$arrow = null;
 	if ($tabfield == $sortField) {
 		if ($sortorder == ZBX_SORT_UP) {
-			$img = new CSpan(SPACE, 'icon_sortdown');
+			$arrow = new CSpan(null, 'arrow-down');
 		}
 		else {
-			$img = new CSpan(SPACE, 'icon_sortup');
+			$arrow = new CSpan(null, 'arrow-up');
 		}
 	}
-	$col = new CCol(array($cont, $img), 'nowrap hover_grey');
-	$col->setAttribute('onclick', 'javascript: redirect("'.$link->getUrl().'");');
+
+	$col = new CColHeader(array(new CLink(array($obj, $arrow), $link->getUrl())));
 
 	return $col;
 }
@@ -1449,24 +1438,35 @@ function getPageNumber() {
 /**
  * Returns paging line.
  *
- * @param array $items				list of items
+ * @param array  $items				list of items
+ * @param string $sortorder			the order in which items are sorted ASC or DESC
  *
  * @return CTable
  */
-function getPagingLine(&$items) {
+function getPagingLine(&$items, $sortorder) {
 	global $page;
 
 	$config = select_config();
 
 	$searchLimit = '';
 	if ($config['search_limit'] < count($items)) {
-		array_pop($items);
+		if ($sortorder == ZBX_SORT_UP) {
+			array_pop($items);
+		}
+		else {
+			array_shift($items);
+		}
+
 		$searchLimit = '+';
 	}
 
 	$rowsPerPage = CWebUser::$data['rows_per_page'];
 	$itemsCount = count($items);
 	$pagesCount = ($itemsCount > 0) ? ceil($itemsCount / $rowsPerPage) : 1;
+
+	if ($pagesCount == 1) {
+		return null;
+	}
 
 	$currentPage = getPageNumber();
 	if ($currentPage < 1) {
@@ -1505,87 +1505,35 @@ function getPagingLine(&$items) {
 
 	$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
 
-	$pageLine = array();
+	$tags = array();
 
-	$table = null;
-
-	if ($pagesCount > 1) {
-		$url = CUrlFactory::getContextUrl();
-
-		if ($startPage > 1) {
-			$url->setArgument('page', 1);
-			$pageLine[] = new CLink('<< '._x('First', 'page navigation'), $url->getUrl(), null, null, true);
-			$pageLine[] = '&nbsp;&nbsp;';
-		}
-
-		if ($currentPage > 1) {
-			$url->setArgument('page', $currentPage - 1);
-			$pageLine[] = new CLink('< '._x('Previous', 'page navigation'), $url->getUrl(), null, null, true);
-			$pageLine[] = ' | ';
-		}
-
-		for ($p = $startPage; $p <= $pagesCount; $p++) {
-			if ($p > $endPage) {
-				break;
-			}
-
-			if ($p == $currentPage) {
-				$pagespan = new CSpan($p, 'bold textcolorstyles');
-			}
-			else {
-				$url->setArgument('page', $p);
-				$pagespan = new CLink($p, $url->getUrl(), null, null, true);
-			}
-
-			$pageLine[] = $pagespan;
-			$pageLine[] = ' | ';
-		}
-
-		array_pop($pageLine);
-
-		if ($currentPage < $pagesCount) {
-			$pageLine[] = ' | ';
-
-			$url->setArgument('page', $currentPage + 1);
-			$pageLine[] = new CLink(_x('Next', 'page navigation').' >', $url->getUrl(), null, null, true);
-		}
-
-		if ($p < $pagesCount) {
-			$pageLine[] = '&nbsp;&nbsp;';
-
-			$url->setArgument('page', $pagesCount);
-			$pageLine[] = new CLink(_x('Last', 'page navigation').' >>', $url->getUrl(), null, null, true);
-		}
-
-		$table = new CTable(null, 'paging');
-		$table->addRow(new CCol($pageLine));
+	$url = CUrlFactory::getContextUrl();
+	if ($startPage > 1) {
+		$url->setArgument('page', 1);
+		$tags[] = new CLink(_('First'), $url->getUrl(), null, null, true);
 	}
 
-	$viewFromPage = ($currentPage - 1) * $rowsPerPage + 1;
-
-	$viewTillPage = $currentPage * $rowsPerPage;
-	if ($viewTillPage > $itemsCount) {
-		$viewTillPage = $itemsCount;
+	if ($currentPage > 1) {
+		$url->setArgument('page', $currentPage - 1);
+		$tags[] = new CLink(new CSpan(null, 'arrow-left'), $url->getUrl(), null, null, true);
 	}
 
-	$pageView = array();
-	$pageView[] = _('Displaying').SPACE;
-	if ($itemsCount > 0) {
-		$pageView[] = new CSpan($viewFromPage, 'info');
-		$pageView[] = SPACE._('to').SPACE;
+	for ($p = $startPage; $p <= $endPage; $p++) {
+		$url->setArgument('page', $p);
+		$tags[] = new CLink($p, $url->getUrl(), $p == $currentPage ? 'paging-selected' : null, null, true);
 	}
 
-	$pageView[] = new CSpan($viewTillPage, 'info');
-	$pageView[] = SPACE._('of').SPACE;
-	$pageView[] = new CSpan($itemsCount, 'info');
-	$pageView[] = $searchLimit;
-	$pageView[] = SPACE._('found');
+	if ($currentPage < $pagesCount) {
+		$url->setArgument('page', $currentPage + 1);
+		$tags[] = new CLink(new CSpan(null, 'arrow-right'), $url->getUrl(), null, null, true);
+	}
 
-	$pageView = new CSpan($pageView);
+	if ($p < $pagesCount) {
+		$url->setArgument('page', $pagesCount);
+		$tags[] = new CLink(_('Last'), $url->getUrl(), null, null, true);
+	}
 
-	zbx_add_post_js('insertInElement("numrows", '.zbx_jsvalue($pageView->toString()).', "div");');
-
-	return $table;
+	return new CDiv($tags, 'table-paging');
 }
 
 /************* MATH *************/
@@ -1675,48 +1623,40 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 
 		// if the user is logged in - render the access denied message
 		if (CWebUser::isLoggedIn()) {
-			$header = _('Access denied.');
-			$message = array(
-				_('Your are logged in as'),
-				' ',
-				bold(CWebUser::$data['alias']),
-				'. ',
-				_('You have no permissions to access this page.'),
-				BR(),
-				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
-			);
+			$data = [
+				'header' => _('Access denied'),
+				'messages' => [
+					_s('Your are logged in as "%1$s".', CWebUser::$data['alias']).' '._('You have no permissions to access this page.'),
+					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
+				],
+				'buttons' => []
+			];
 
-			$buttons = array();
 			// display the login button only for guest users
 			if (CWebUser::isGuest()) {
-				$buttons[] = new CButton('login', _('Login'),
+				$data['buttons'][] = new CButton('login', _('Login'),
 					'javascript: document.location = "index.php?request='.$url.'";', 'button'
 				);
 			}
-			$buttons[] = new CButton('back', _('Go to dashboard'),
+			$data['buttons'][] = new CButton('back', _('Go to dashboard'),
 				'javascript: document.location = "zabbix.php?action=dashboard.view"', 'button'
 			);
 		}
 		// if the user is not logged in - offer to login
 		else {
-			$header = _('You are not logged in.');
-			$message = array(
-				_('You must login to view this page.'),
-				BR(),
-				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
-			);
-			$buttons = array(
-				new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'button')
-			);
+			$data = [
+				'header' => _('You are not logged in'),
+				'messages' => [
+					_('You must login to view this page.'),
+					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
+				],
+				'buttons' => [
+					new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'button')
+				]
+			];
 		}
 
-		$warning = new CWarning($header, $message);
-		$warning->setButtons($buttons);
-
-		$warningView = new CView('general.warning', array(
-			'warning' => $warning
-		));
-		$warningView->render();
+		(new CView('general.warning', $data))->render();
 		exit;
 	}
 }
@@ -1744,6 +1684,45 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 	return $default;
 }
 
+function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
+{
+	$msg_box = new CDiv($title, $good ? 'msg-good' : 'msg-bad', $show_close_box ? 'global-message' : null);
+
+	if ($messages) {
+		$msg_details = new CDiv(null, 'msg-details');
+
+		if ($title !== null) {
+			$link = new CLink(_('Details'), null, ZBX_STYLE_LINK_DOTTED, null, true);
+			$link->setAttribute('onclick', 'javascript: showHide("msg-messages", IE ? "block" : "");');
+			$msg_details->addItem($link);
+		}
+
+		$list = new CList();
+		if ($title !== null) {
+			$list->setAttribute('id', 'msg-messages');
+
+			if (!$show_details) {
+				$list->setAttribute('style', 'display: none;');
+			}
+		}
+		foreach ($messages as $message) {
+			$list->addItem($msg['type'].'&nbsp;'.$message['message']);
+		}
+		$msg_details->addItem($list);
+
+		$msg_box->addItem($msg_details);
+	}
+
+	if ($title !== null && $show_close_box) {
+		$close = new CLink('×', null, 'overlay-close-btn', null, true);
+		$close->setAttribute('onclick', 'javascript: showHide("global-message", IE ? "block" : "");');
+		$close->setAttribute('title', _('Close'));
+		$msg_box->addItem($close);
+	}
+
+	return $msg_box;
+}
+
 function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES;
 
@@ -1760,7 +1739,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 	$imageMessages = array();
 
 	if (!$bool && !is_null($errmsg)) {
-		$msg = _('ERROR').': '.$errmsg;
+		$msg = $errmsg;
 	}
 	elseif ($bool && !is_null($okmsg)) {
 		$msg = $okmsg;
@@ -1780,24 +1759,10 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 				break;
 			case PAGE_TYPE_HTML:
 			default:
-				$msg_tab = new CTable($msg, ($bool ? 'msgok' : 'msgerr'));
-				$msg_tab->setCellPadding(0);
-				$msg_tab->setCellSpacing(0);
+				$messages = (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) ? $ZBX_MESSAGES : array();
+				$msg_box = makeMessageBox($bool, $messages, $msg);
 
-				$row = array();
-
-				$msg_col = new CCol(bold($msg), 'msg_main msg');
-				$msg_col->setAttribute('id', 'page_msg');
-				$row[] = $msg_col;
-
-				if (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) {
-					$msg_details = new CDiv(_('Details'), 'blacklink');
-					$msg_details->setAttribute('onclick', 'javascript: showHide("msg_messages", IE ? "block" : "table");');
-					$msg_details->setAttribute('title', _('Maximize').'/'._('Minimize'));
-					array_unshift($row, new CCol($msg_details, 'clr'));
-				}
-				$msg_tab->addRow($row);
-				$msg_tab->show();
+				$msg_box->show();
 				break;
 		}
 	}
@@ -1824,29 +1789,6 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 			foreach ($ZBX_MESSAGES as $msg) {
 				echo '['.$msg['type'].'] '.$msg['message']."\n";
 			}
-		}
-		else {
-			$lst_error = new CList(null,'messages');
-			foreach ($ZBX_MESSAGES as $msg) {
-				$lst_error->addItem($msg['message'], $msg['type']);
-				$bool = ($bool && 'error' !== strtolower($msg['type']));
-			}
-			$msg_show = 6;
-			$msg_count = count($ZBX_MESSAGES);
-			if ($msg_count > $msg_show) {
-				$msg_count = $msg_show * 16;
-				$lst_error->setAttribute('style', 'height: '.$msg_count.'px;');
-			}
-			$tab = new CTable(null, ($bool ? 'msgok' : 'msgerr'));
-			$tab->setCellPadding(0);
-			$tab->setCellSpacing(0);
-			$tab->setAttribute('id', 'msg_messages');
-			$tab->setAttribute('style', 'width: 100%;');
-			if (isset($msg_tab) && $bool) {
-				$tab->setAttribute('style', 'display: none;');
-			}
-			$tab->addRow(new CCol($lst_error, 'msg'));
-			$tab->show();
 		}
 		$ZBX_MESSAGES = null;
 	}

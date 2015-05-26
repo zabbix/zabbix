@@ -18,78 +18,99 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+	$page_menu = (new CTag('header', 'yes'))->setAttribute('role', 'banner');
+	$page_menu_div = (new CDiv(null, 'nav'))->setAttribute('role', 'navigation');
 
-$menu_table = new CTable(null, 'menu pointer');
-$menu_table->addRow($data['menu']['main_menu']);
+	$top_menu_items = new CList($data['menu']['main_menu'], 'top-nav');
 
-$serverName = (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '')
-	? new CCol($ZBX_SERVER_NAME, 'right textcolorstyles server-name')
-	: null;
+	// 1st level menu
+	$top_menu = new CDiv($top_menu_items, 'top-nav-container');
+	$top_menu->setAttribute('id', 'mmenu');
 
-// 1st level menu
-$table = new CTable(null, 'maxwidth');
-$table->addRow(array($menu_table, $serverName));
+	$icons = new CList([], 'top-nav-icons');
 
-$page_menu = new CDiv(null, 'textwhite');
-$page_menu->setAttribute('id', 'mmenu');
-$page_menu->addItem($table);
+	$form = new CForm('get', 'search.php');
+	$search = new CTextBox('search', '', 20, false, 255);
+	$search->setAttribute('autocomplete', 'off');
+	$search->addClass('search');
 
-// 2nd level menu
-$sub_menu_table = new CTable(null, 'sub_menu maxwidth ui-widget-header');
-$menu_divs = array();
-$menu_selected = false;
-foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
-	$sub_menu_row = array();
-	foreach ($sub_menu as $id => $sub_page) {
-		if (empty($sub_page['menu_text'])) {
-			$sub_page['menu_text'] = SPACE;
+	$button = new CSubmitButton(SPACE, null, null, 'btn-search');
+	$form->AddItem(array($search, $button));
+	$icons->addItem($form);
+
+	$zshare = new CLink('Share', 'https://share.zabbix.com/', 'top-nav-zbbshare', null, true);
+	$zshare->setAttribute('target', '_blank');
+	$zshare->setAttribute('title', _('Zabbix Share'));
+	$icons->addItem($zshare);
+
+	$help = new CLink(SPACE, 'http://www.zabbix.com/documentation/', 'top-nav-help', null, true);
+	$help->setAttribute('target', '_blank');
+	$help->setAttribute('title', _('Help'));
+	$icons->addItem($help);
+
+	$profile = new CLink(SPACE, 'profile.php', 'top-nav-profile');
+	$profile->setAttribute('title', _('Profile'));
+	$icons->addItem($profile);
+
+	$signout = new CLink(SPACE, 'index.php?reconnect=1', 'top-nav-signout');
+	$signout->setAttribute('title', _('Sign out'));
+	$icons->addItem($signout);
+	$top_menu->addItem($icons);
+
+	$page_menu_div->addItem($top_menu);
+
+	// 2nd level menu
+	$sub_menu_table = new CTable(null, 'sub_menu maxwidth ui-widget-header');
+	$menu_divs = array();
+	$menu_selected = false;
+	foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
+		$sub_menu_row = new CList([], 'top-subnav');
+		foreach ($sub_menu as $id => $sub_page) {
+			if (empty($sub_page['menu_text'])) {
+				$sub_page['menu_text'] = SPACE;
+			}
+
+			$url = new CUrl($sub_page['menu_url']);
+			if ($sub_page['menu_action'] !== null) {
+				$url->setArgument('action', $sub_page['menu_action']);
+			}
+			else {
+				$url->setArgument('ddreset', 1);
+			}
+			$url->removeArgument('sid');
+
+			if ($sub_page['selected']) {
+				$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl(), 'selected', null, false);
+			}
+			else {
+				$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl(), null, null, false);
+			}
+			$sub_menu_row->addItem($sub_menu_item);
 		}
 
-		$url = new CUrl($sub_page['menu_url']);
-		if ($sub_page['menu_action'] !== null) {
-			$url->setArgument('action', $sub_page['menu_action']);
+		$sub_menu_div = new CDiv($sub_menu_row, 'top-subnav-container');
+		$sub_menu_div->setAttribute('id', 'sub_'.$label);
+		$sub_menu_div->addAction('onmouseover', 'javascript: MMenu.submenu_mouseOver();');
+		$sub_menu_div->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
+
+		if ($data['menu']['selected'] == $label) {
+			$menu_selected = true;
+			$sub_menu_div->setAttribute('style', 'display: block;');
+			insert_js('MMenu.def_label = '.zbx_jsvalue($label));
 		}
 		else {
-			$url->setArgument('ddreset', 1);
+			$sub_menu_div->setAttribute('style', 'display: none;');
 		}
-		$url->removeArgument('sid');
-
-		$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl(), $sub_page['class'].' nowrap', null, false);
-		if ($sub_page['selected']) {
-			$sub_menu_item = new CSpan($sub_menu_item, 'active nowrap');
-		}
-		$sub_menu_row[] = $sub_menu_item;
-		$sub_menu_row[] = new CSpan(SPACE.' | '.SPACE, 'divider');
+		$menu_divs[] = $sub_menu_div;
 	}
-	array_pop($sub_menu_row);
 
-	$sub_menu_div = new CDiv($sub_menu_row);
-	$sub_menu_div->setAttribute('id', 'sub_'.$label);
-	$sub_menu_div->addAction('onmouseover', 'javascript: MMenu.submenu_mouseOver();');
+	$sub_menu_div = new CDiv(SPACE);
+	$sub_menu_div->setAttribute('id', 'sub_empty');
+	$sub_menu_div->setAttribute('style', 'display: '.($menu_selected ? 'none;' : 'block;'));
 
-	$sub_menu_div->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
-
-	if ($data['menu']['selected'] == $label) {
-		$menu_selected = true;
-		$sub_menu_div->setAttribute('style', 'display: block;');
-		insert_js('MMenu.def_label = '.zbx_jsvalue($label));
-	}
-	else {
-		$sub_menu_div->setAttribute('style', 'display: none;');
-	}
 	$menu_divs[] = $sub_menu_div;
-}
 
-$sub_menu_div = new CDiv(SPACE);
-$sub_menu_div->setAttribute('id', 'sub_empty');
-$sub_menu_div->setAttribute('style', 'display: '.($menu_selected ? 'none;' : 'block;'));
-
-$menu_divs[] = $sub_menu_div;
-$search_div = null;
-
-$searchForm = new CView('general.search');
-$search_div = $searchForm->render();
-
-$sub_menu_table->addRow(array($menu_divs, $search_div));
-$page_menu->addItem($sub_menu_table);
-$page_menu->show();
+	$page_menu_div->addItem($menu_divs);
+	$page_menu_div->addItem($sub_menu_table);
+	$page_menu->addItem($page_menu_div);
+	$page_menu->show();

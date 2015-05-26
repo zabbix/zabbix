@@ -21,16 +21,17 @@
 
 class CConfigurationExportBuilder {
 
-	const EXPORT_VERSION = '2.0';
-
 	/**
 	 * @var array
 	 */
 	protected $data = array();
 
+	/**
+	 * @param $version  current export version
+	 */
 	public function __construct() {
-		$this->data['version'] = self::EXPORT_VERSION;
-		$this->data['date'] = date('Y-m-d\TH:i:s\Z', time() - date('Z'));
+		$this->data['version'] = ZABBIX_EXPORT_VERSION;
+		$this->data['date'] = date(DATE_TIME_FORMAT_SECONDS_XML, time() - date('Z'));
 	}
 
 	/**
@@ -449,26 +450,21 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatTriggers(array $triggers) {
-		$result = array();
+		$result = [];
 
-		order_result($triggers, 'description');
+		CArrayHelper::sort($triggers, ['description', 'expression']);
 
 		foreach ($triggers as $trigger) {
-			$tr = array(
+			$result[] = [
 				'expression' => $trigger['expression'],
 				'name' => $trigger['description'],
 				'url' => $trigger['url'],
 				'status' => $trigger['status'],
 				'priority' => $trigger['priority'],
 				'description' => $trigger['comments'],
-				'type' => $trigger['type']
-			);
-
-			if (isset($trigger['dependencies'])) {
-				$tr['dependencies'] = $this->formatDependencies($trigger['dependencies']);
-			}
-
-			$result[] = $tr;
+				'type' => $trigger['type'],
+				'dependencies' => $this->formatDependencies($trigger['dependencies'])
+			];
 		}
 
 		return $result;
@@ -661,13 +657,15 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatDependencies(array $dependencies) {
-		$result = array();
+		$result = [];
+
+		CArrayHelper::sort($dependencies, ['description', 'expression']);
 
 		foreach ($dependencies as $dependency) {
-			$result[] = array(
+			$result[] = [
 				'name' => $dependency['description'],
 				'expression' => $dependency['expression']
-			);
+			];
 		}
 
 		return $result;

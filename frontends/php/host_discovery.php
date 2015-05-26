@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
 $page['scripts'] = array('class.cviewswitcher.js', 'items.js');
-$page['hist_arg'] = array('hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -395,6 +394,14 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
+	// hide zeroes for trapper and SNMP trap items
+	foreach ($data['discoveries'] as &$discovery) {
+		if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP) {
+			$discovery['delay'] = '';
+		}
+	}
+	unset($discovery);
+
 	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 
 	if ($sortField === 'status') {
@@ -405,7 +412,7 @@ else {
 	}
 
 	// paging
-	$data['paging'] = getPagingLine($data['discoveries']);
+	$data['paging'] = getPagingLine($data['discoveries'], $sortOrder);
 
 	// render view
 	$discoveryView = new CView('configuration.host.discovery.list', $data);

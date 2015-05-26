@@ -45,16 +45,16 @@ function get_last_event_by_triggerid($triggerId) {
  * @return CTableInfo
  */
 function makeAckTab($event) {
-	$acknowledgeTable = new CTableInfo(_('No acknowledges found.'));
+	$acknowledgeTable = new CTableInfo();
 	$acknowledgeTable->setHeader(array(_('Time'), _('User'), _('Comments')));
 
 	if (!empty($event['acknowledges']) && is_array($event['acknowledges'])) {
 		foreach ($event['acknowledges'] as $acknowledge) {
-			$acknowledgeTable->addRow(array(
+			$acknowledgeTable->addRow([
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock']),
 				getUserFullname($acknowledge),
-				new CCol(zbx_nl2br($acknowledge['message']), 'wraptext')
-			));
+				zbx_nl2br($acknowledge['message'])
+			]);
 		}
 	}
 

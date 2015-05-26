@@ -21,8 +21,7 @@
 
 include('include/views/js/configuration.services.edit.js.php');
 
-$servicesParentWidget = new CWidget();
-$servicesParentWidget->addPageHeader(_('IT service parent'));
+$servicesParentWidget = (new CWidget())->setTitle(_('IT service parent'));
 
 // create form
 $servicesParentForm = new CForm();
@@ -45,7 +44,11 @@ $description = new CLink(_('root'), '#', null, 'javascript:
 	self.close();
 	return false;'
 );
-$servicesParentTable->addRow(array(array($prefix, $description), _('Note'), '-'));
+$servicesParentTable->addRow([
+		[$prefix, $description],
+		_('Note'),
+		'-'
+]);
 
 // others
 foreach ($this->data['db_pservices'] as $db_service) {

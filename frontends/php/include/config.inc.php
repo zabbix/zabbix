@@ -33,12 +33,7 @@ try {
 	Z::getInstance()->run();
 }
 catch (DBException $e) {
-	$warningView = new CView('general.warning', array(
-		'message' => array(
-			'header' => 'Database error', 'text' => $e->getMessage()
-		)
-	));
-	$warningView->render();
+	(new CView('general.warning', ['header' => 'Database error', 'messages' => [$e->getMessage()]]))->render();
 	exit;
 }
 catch (ConfigFileException $e) {
@@ -48,18 +43,13 @@ catch (ConfigFileException $e) {
 			exit;
 
 		case CConfigFile::CONFIG_ERROR:
-			$warningView = new CView('general.warning', array(
-				'message' => array(
-					'header' => 'Configuration file error', 'text' => $e->getMessage()
-				)
-			));
-			$warningView->render();
+			(new CView('general.warning', ['header' => 'Configuration file error', 'messages' => [$e->getMessage()]]))->
+				render();
 			exit;
 	}
 }
 catch (Exception $e) {
-	$warningView = new CView('general.warning', array('message' => $e->getMessage()));
-	$warningView->render();
+	(new CView('general.warning', ['header' => $e->getMessage(), 'messages' => []]))->render();
 	exit;
 }
 
@@ -70,7 +60,6 @@ global $ZBX_SERVER, $ZBX_SERVER_PORT, $page;
 $page = array(
 	'title' => null,
 	'file' => null,
-	'hist_arg' => null,
 	'scripts' => null,
 	'type' => null,
 	'menu' => null

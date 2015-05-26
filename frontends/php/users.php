@@ -28,7 +28,6 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 
 $page['title'] = _('Configuration of users');
 $page['file'] = 'users.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -409,7 +408,7 @@ else {
 
 	// sorting & paging
 	order_result($data['users'], $sortField, $sortOrder);
-	$data['paging'] = getPagingLine($data['users']);
+	$data['paging'] = getPagingLine($data['users'], $sortOrder);
 
 	// set default lastaccess time to 0
 	foreach ($data['users'] as $user) {

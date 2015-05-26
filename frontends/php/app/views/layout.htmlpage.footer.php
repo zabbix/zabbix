@@ -21,23 +21,14 @@
 
 show_messages();
 
+// end of article div
+echo '</div>'."\n";
+
 if ($data['fullscreen'] == 0) {
-	$table = new CTable(null, 'textwhite bold maxwidth ui-widget-header ui-corner-all page_footer');
-
-	$conString = _s('Connected as \'%1$s\'', $data['user']['alias']);
-
-	$table->addRow(array(
-		new CCol(new CLink(
-			_s('Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA',
-			ZABBIX_VERSION, ZABBIX_COPYRIGHT_FROM, ZABBIX_COPYRIGHT_TO),
-			ZABBIX_HOMEPAGE, 'highlight', null, true), 'center'),
-			new CCol(array(
-				new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-				new CSpan($conString, 'footer_sign')
-			), 'right')
-		));
-
-	$table->show();
+	echo '<div class="footer">'."\n";
+	echo '<a href="http://www.zabbix.com" target="_blank" class="logo"></a>'."\n";
+	echo 'Zabbix '.ZABBIX_VERSION.'. &copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', <a href="http://www.zabbix.com" target="_blank">Zabbix SIA</a>'."\n";
+	echo '</div>'."\n";
 }
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
