@@ -62,8 +62,7 @@
 	</div>
 	<div class="<?= ZBX_STYLE_FOOTER ?>">
 		<a class="logo" target="_blank" href="http://www.zabbix.com"></a>
-		<?= 'Zabbix '.ZABBIX_VERSION.' &copy; '.ZABBIX_COPYRIGHT_FROM.'-'.ZABBIX_COPYRIGHT_TO.', ' ?>
-		<a class="<?= ZBX_STYLE_GREY ?> link-alt" target="_blank" href="http://www.zabbix.com">Zabbix SIA</a>
+		&copy; 2001&ndash;2015, <a target="_blank" href="http://www.zabbix.com/">Zabbix SIA</a>
 	</div>
 </body>
 </html>
