@@ -3,28 +3,28 @@ $transparent: transparent;
 
 
 // MAIN
-$main-color: #5c5c5c;//#0275b8;
-$font-color: #d1dade;//#1f2c33;
-$font-alt-color: #7d7d7d;//#768d99;
-$body-bg-color: #0d1114;//#ebeef0;
+$main-color: #768d99;//#2d3135;//#5c5c5c;//#0275b8;
+$font-color: #e6e8f3;//#d1dade;//#1f2c33;
+$font-alt-color: #768d99;//#7d7d7d;
+$body-bg-color: #000;//#0d1114;//#ebeef0;
 
 
 // UI
-$ui-bg-color: #303030;//#2e2f30;//#fff;
+$ui-bg-color: #2d3135;//#303030;//#2e2f30;//#fff;
 $ui-bg-selected-color: #acbbc2;
-$ui-hover-color: #242424;//#e8f4fa;
+$ui-hover-color: #383c40;//#383d42;//#242424;//#e8f4fa;
 
-$action-hover-color: #242424;//#ebebeb;
-$action-border-color: #3d3d3d;//#ccd5d9;
+$action-hover-color: #383c40;//#383d42;//#242424;//#ebebeb;
+$action-border-color: #383c40;//#383d42;//#3d3d3d;//#ccd5d9;
 
-$table-border-color: #3d3d3d;//#ebeef0;
+$table-border-color: #383c40;//#383d42;//#3d3d3d;//#ebeef0;
 
 
 // FORMS
-$form-font-color: #d1dade;//#1f2c33;
-$form-bg-color: #242424;//#303030;#242424;//#fff;
-$form-border-color: #3d3d3d;//#636363;//#4a4a4a;//#3d3d3d;//#acbbc2;
-$form-border-focus-color: #4a4a4a;//#7d7d7d;//#0275b8; //NEW
+$form-font-color: #e6e8f3;//#d1dade;//#1f2c33;
+$form-bg-color: #383d42;//#242424;//#303030;#242424;//#fff;
+$form-border-color: #44474c;//#3d3d3d;//#636363;//#4a4a4a;//#3d3d3d;//#acbbc2;
+$form-border-focus-color: #5b5e64;//#4f5358;//#4a4a4a;//#7d7d7d;//#0275b8; //NEW
 
 $form-disabled-font-color: #525252;//#d1dade;//#1f2c33;
 $form-disabled-bg-color: transparent; //#ebebeb; //NEW
@@ -33,14 +33,14 @@ $form-disabled-border-color: #3d3d3d; //NEW
 
 
 // BUTTONS
-$btn-font-color: #fff;
-$btn-hover-color: #fff;
-$btn-active-color: #fff;
-$btn-bg-color: #5c5c5c;//#0275b8;
+$btn-font-color: #e6e8f3;//#fff;
+$btn-hover-color: #e6e8f3;//#fff;
+$btn-active-color: #e6e8f3;//#fff;
+$btn-bg-color: #6c818c;//#44474c;//#5c5c5c;//#0275b8;
 
-$btn-alt-font-color: #0275b8;
-$btn-alt-hover-color: #0275b8;
-$btn-alt-active-color: #0275b8;
+$btn-alt-font-color: #768d99;//#0275b8;
+$btn-alt-hover-color: #768d99;//#0275b8;
+$btn-alt-active-color: #768d99;//#0275b8;
 $btn-alt-bg-color: transparent;
 $btn-alt-border-color: $btn-bg-color;
 
@@ -63,10 +63,10 @@ $link-hover-color: #2782b8; //#0275b8;
 $link-active-color: #2782b8; //#0275b8;
 $link-visited-color: #2782b8; //#0275b8;
 
-$link-main-nav-color: #bfdced;
-$link-main-nav-hover-color: #fff;
-$link-main-nav-active-color: #fff;
-$link-main-nav-visited-color: #bfdced;
+$link-main-nav-color: #b9bbc4;//#bfdced;
+$link-main-nav-hover-color: #e6e8f3;//#fff;
+$link-main-nav-active-color: #e6e8f3;//#fff;
+$link-main-nav-visited-color: #e6e8f3;//#bfdced;
 
 $link-main-subnav-color: #bfced7;
 $link-main-subnav-hover-color: #fff;
