@@ -584,7 +584,9 @@ if (!empty($this->data['new_operation'])) {
 
 			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")', 'link_menu');
 			$addUsrgrpBtn->setAttribute('id', 'addusrgrpbtn');
-			$usrgrpList->addRow(new CRow((new CCol($addUsrgrpBtn))->setColSpan(2), null, 'opmsgUsrgrpListFooter'));
+			$usrgrpList->addRow((new CRow(
+				(new CCol($addUsrgrpBtn))->setColSpan(2)))->setId('opmsgUsrgrpListFooter')
+			);
 
 			$userList = (new CTable())->
 				addClass('formElementTable')->
@@ -594,7 +596,8 @@ if (!empty($this->data['new_operation'])) {
 
 			$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")', 'link_menu');
 			$addUserBtn->setAttribute('id', 'adduserbtn');
-			$userList->addRow(new CRow((new CCol($addUserBtn))->setColSpan(2), null, 'opmsgUserListFooter'));
+			$userList->addRow((new CRow(
+				(new CCol($addUserBtn))->setColSpan(2)))->setId('opmsgUserListFooter'));
 
 			// add participations
 			$usrgrpids = isset($this->data['new_operation']['opmessage_grp'])
@@ -708,7 +711,9 @@ if (!empty($this->data['new_operation'])) {
 				setHeader([_('Target'), _('Action')]);
 
 			$addCmdBtn = new CButton('add', _('New'), 'javascript: showOpCmdForm(0, "new");', 'link_menu');
-			$cmdList->addRow(new CRow((new CCol($addCmdBtn))->setColSpan(3), null, 'opCmdListFooter'));
+			$cmdList->addRow((new CRow(
+				(new CCol($addCmdBtn))->setColSpan(3)))->setId('opCmdListFooter')
+			);
 
 			// add participations
 			if (!isset($this->data['new_operation']['opcommand_grp'])) {
@@ -869,7 +874,7 @@ if (!empty($this->data['new_operation'])) {
 
 			$groupList = new CTable();
 			$groupList->setAttribute('id', 'opGroupList');
-			$groupList->addRow(new CRow(
+			$groupList->addRow((new CRow(
 				(new CCol(
 					new CMultiSelect([
 						'name' => 'discoveryHostGroup',
@@ -880,10 +885,8 @@ if (!empty($this->data['new_operation'])) {
 								'&dstfld1=discoveryHostGroup&srcfld1=groupid&writeonly=1&multiselect=1'
 						]
 					])))->
-					setColSpan(2),
-				null,
-				'opGroupListFooter'
-			));
+					setColSpan(2)))->setId('opGroupListFooter')
+			);
 			$groupList->addRow(
 				(new CCol(new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu')))->
 					setColSpan(2)
@@ -921,7 +924,7 @@ if (!empty($this->data['new_operation'])) {
 
 			$templateList = new CTable();
 			$templateList->setAttribute('id', 'opTemplateList');
-			$templateList->addRow(new CRow(
+			$templateList->addRow((new CRow(
 				(new CCol(
 					new CMultiSelect([
 						'name' => 'discoveryTemplates',
@@ -932,10 +935,8 @@ if (!empty($this->data['new_operation'])) {
 								'&dstfld1=discoveryTemplates&templated_hosts=1&multiselect=1&writeonly=1'
 						]
 					])))->
-					setColSpan(2),
-				null,
-				'opTemplateListFooter'
-			));
+					setColSpan(2)))->setId('opTemplateListFooter')
+			);
 			$templateList->addRow(
 				(new CCol(new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu')))->
 					setColSpan(2)

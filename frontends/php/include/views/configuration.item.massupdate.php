@@ -323,12 +323,11 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 	$itemForm->addVar('delay_flex['.$i.'][delay]', $delayFlex['delay']);
 	$itemForm->addVar('delay_flex['.$i.'][period]', $delayFlex['period']);
 
-	$row = new CRow([
+	$row = (new CRow([
 		$delayFlex['delay'],
 		$delayFlex['period'],
 		new CButton('remove', _('Remove'), 'javascript: removeDelayFlex('.$i.');', 'link_menu')
-	]);
-	$row->setAttribute('id', 'delayFlex_'.$i);
+	]))->setId('delayFlex_'.$i);
 	$delayFlexTable->addRow($row);
 
 	// limit count of intervals, 7 intervals by 30 symbols = 210 characters, db storage field is 256

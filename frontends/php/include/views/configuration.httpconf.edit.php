@@ -169,7 +169,7 @@ $stepsTable->setHeader([
 	(new CCol(_('Timeout')))->setWidth('50'),
 	(new CCol(_('URL')))->setWidth('200'),
 	(new CCol(_('Required')))->setWidth('50'),
-	(new CCol(_('Status codes')))->setClass(ZBX_STYLE_NOWRAP)->setWidth('90'),
+	(new CCol(_('Status codes')))->addClass(ZBX_STYLE_NOWRAP)->setWidth('90'),
 	(new CCol(''))->setWidth('50')
 ]);
 
@@ -219,7 +219,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$dragHandler = new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move');
 	}
 
-	$row = new CRow([
+	$row = (new CRow([
 		$dragHandler,
 		$numSpan,
 		$name,
@@ -227,8 +227,9 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$url,
 		htmlspecialchars($step['required']),
 		$step['status_codes'],
-		$removeButton
-	], 'sortable', 'steps_'.$stepid);
+		$removeButton]))->
+			addClass('sortable')->
+			setId('steps_'.$stepid);
 
 	$stepsTable->addRow($row);
 }

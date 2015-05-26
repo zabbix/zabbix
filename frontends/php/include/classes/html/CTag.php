@@ -251,6 +251,10 @@ class CTag extends CObject {
 		$this->setAttribute('title', $value);
 	}
 
+	public function setId($id) {
+		$this->setAttribute('id', $id);
+	}
+
 	/**
 	 * Sanitizes a string according to the given strategy before outputting it to the browser.
 	 *

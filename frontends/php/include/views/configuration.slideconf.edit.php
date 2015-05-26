@@ -67,17 +67,16 @@ foreach ($this->data['slides'] as $key => $slides) {
 	$removeButton = new CButton('remove_'.$key, _('Remove'), 'javascript: removeSlide(this);', 'link_menu');
 	$removeButton->setAttribute('remove_slide', $key);
 
-	$row = new CRow(
+	$row = (new CRow(
 		[
 			(new CCol(new CDiv(null, 'drag-icon')))->addClass('td-drag-icon'),
 			new CSpan($i++.':', 'rowNum', 'current_slide_'.$key),
 			$name,
 			$delay,
 			$removeButton
-		],
-		'sortable',
-		'slides_'.$key
-	);
+		]))->
+		addClass('sortable')->
+		setId('slides_'.$key);
 	$slideTable->addRow($row);
 }
 
@@ -91,7 +90,7 @@ $addButtonColumn = (new CCol(
 	setColSpan(5);
 
 $addButtonColumn->setAttribute('style', 'vertical-align: middle;');
-$slideTable->addRow(new CRow($addButtonColumn, null, 'screenListFooter'));
+$slideTable->addRow((new CRow($addButtonColumn))->setId('screenListFooter'));
 
 $slideFormList->addRow(_('Slides'), new CDiv($slideTable, 'objectgroup inlineblock border_dotted'));
 

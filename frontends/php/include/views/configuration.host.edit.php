@@ -140,8 +140,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$buttonCol = (new CCol(new CButton('addAgentInterface', _('Add'), null, 'link_menu')))->addClass('interface-add-control')->setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceAgent);
 
-	$buttonRow = new CRow([$buttonCol]);
-	$buttonRow->setAttribute('id', 'agentInterfacesFooter');
+	$buttonRow = (new CRow([$buttonCol]))->setId('agentInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 
@@ -158,8 +157,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$buttonCol = (new CCol(new CButton('addSNMPInterface', _('Add'), null, 'link_menu')))->addClass('interface-add-control')->setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceSNMP);
 
-	$buttonRow = new CRow([$buttonCol]);
-	$buttonRow->setAttribute('id', 'SNMPInterfacesFooter');
+	$buttonRow = (new CRow([$buttonCol]))->setId('SNMPInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 
@@ -177,8 +175,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceJMX);
 
-	$buttonRow = new CRow([$buttonCol]);
-	$buttonRow->setAttribute('id', 'JMXInterfacesFooter');
+	$buttonRow = (new CRow([$buttonCol]))->setId('JMXInterfacesFooter');
 	$ifTab->addRow($buttonRow);
 
 	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
@@ -195,8 +192,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceIPMI);
 
-	$buttonRow = new CRow([$buttonCol]);
-	$buttonRow->setAttribute('id', 'IPMIInterfacesFooter');
+	$buttonRow = (new CRow([$buttonCol]))->setId('IPMIInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
@@ -229,7 +225,7 @@ else {
 		(new CCol())->addClass('interface-control')
 	]);
 
-	$row = new CRow(null, null, 'agentInterfacesFooter');
+	$row = (new CRow())->setId('agentInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_AGENT])) {
 		$row->addItem((new CCol())->addClass('interface-drag-control'));
 		$row->addItem((new CCol(_('No agent interfaces found.')))->setColSpan(5));
@@ -244,7 +240,7 @@ else {
 		setAttribute('id', 'SNMPInterfaces')->
 		setAttribute('data-type', 'snmp');
 
-	$row = new CRow(null, null, 'SNMPInterfacesFooter');
+	$row = (new CRow())->setId('SNMPInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
 		$row->addItem((new CCol())->addClass('interface-drag-control'));
 		$row->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(5));
@@ -258,7 +254,7 @@ else {
 		setAttribute('id', 'JMXInterfaces')->
 		setAttribute('data-type', 'jmx');
 
-	$row = new CRow(null, null, 'JMXInterfacesFooter');
+	$row = (new CRow())->setId('JMXInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
 		$row->addItem((new CCol())->addClass('interface-drag-control'));
 		$row->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(5));
@@ -272,7 +268,7 @@ else {
 		setAttribute('id', 'IPMIInterfaces')->
 		setAttribute('data-type', 'ipmi');
 
-	$row = new CRow(null, null, 'IPMIInterfacesFooter');
+	$row = (new CRow())->setId('IPMIInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
 		$row->addItem((new CCol())->addClass('interface-drag-control'));
 		$row->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(5));
