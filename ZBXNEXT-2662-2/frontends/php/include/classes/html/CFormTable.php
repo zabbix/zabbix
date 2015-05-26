@@ -94,13 +94,11 @@ class CFormTable extends CForm {
 				$item2 = SPACE;
 			}
 
-			$item1 = new CRow(
+			$item1 = (new CRow(
 				[
 					(new CCol($item1))->addClass('form_row_l'),
 					(new CCol($item2))->addClass('form_row_r')
-				],
-				$class
-			);
+				]))->addClass($class);
 		}
 
 		if ($id !== null) {

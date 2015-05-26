@@ -75,7 +75,13 @@ class CTable extends CTag {
 			if (isset($this->header) && !isset($item->attributes['colspan'])) {
 				$item->attributes['colspan'] = $this->colnum;
 			}
-			$item = new CRow($item, $class, $id);
+			$item = new CRow($item);
+			if ($class !== null) {
+				$item->addClass($class);
+			}
+			if ($id !== null) {
+				$item->setId($id);
+			}
 		}
 
 		if (is_object($item) && strtolower(get_class($item)) === 'crow') {
@@ -84,7 +90,13 @@ class CTable extends CTag {
 			}
 		}
 		else {
-			$item = new CRow($item, $class, $id);
+			$item = new CRow($item);
+			if ($class !== null) {
+				$item->addClass($class);
+			}
+			if ($id !== null) {
+				$item->setId($id);
+			}
 		}
 
 		if (!isset($item->attributes['class']) || is_array($item->attributes['class'])) {
