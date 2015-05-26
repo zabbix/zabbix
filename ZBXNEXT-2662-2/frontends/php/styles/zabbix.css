@@ -1395,10 +1395,12 @@ button.btn-widget-action:hover, button.btn-widget-action:active, button.btn-widg
       padding: 0;
       margin: 0;
       border-left-color: #768d99; }
-  .action-menu .grey {
+  .action-menu .action-menu-item-disabled {
     display: block;
     height: 24px;
-    line-height: 24px; }
+    line-height: 24px;
+    color: #768d99;
+    cursor: default; }
   .action-menu h3 {
     height: 24px;
     line-height: 24px; }

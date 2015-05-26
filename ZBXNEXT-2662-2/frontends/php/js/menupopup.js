@@ -1082,7 +1082,7 @@ jQuery(function($) {
 		}
 
 		if (typeof options.disabled !== 'undefined' && options.disabled) {
-			span.addClass('grey');
+			span.addClass('action-menu-item-disabled');
 		}
 		else {
 			span.addClass('action-menu-item');
