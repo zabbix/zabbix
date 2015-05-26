@@ -2910,16 +2910,32 @@ void	zbx_tls_init_child(void)
 		}
 	}
 
-	/* we're using blocking sockets, deal with renegotiations automatically */
 
 	if (NULL != ctx_cert)
+	{
+		/* we're using blocking sockets, deal with renegotiations automatically */
 		SSL_CTX_set_mode(ctx_cert, SSL_MODE_AUTO_RETRY);
 
+		/* use server ciphersuite preference */
+		SSL_CTX_set_options(ctx_cert, SSL_OP_CIPHER_SERVER_PREFERENCE);
+
+		/* do not connect to unpatched servers */
+		SSL_CTX_clear_options(ctx_cert, SSL_OP_LEGACY_SERVER_CONNECT);
+	}
+
 	if (NULL != ctx_psk)
+	{
 		SSL_CTX_set_mode(ctx_psk, SSL_MODE_AUTO_RETRY);
+		SSL_CTX_set_options(ctx_psk, SSL_OP_CIPHER_SERVER_PREFERENCE);
+		SSL_CTX_clear_options(ctx_psk, SSL_OP_LEGACY_SERVER_CONNECT);
+	}
 
 	if (NULL != ctx_all)
+	{
 		SSL_CTX_set_mode(ctx_all, SSL_MODE_AUTO_RETRY);
+		SSL_CTX_set_options(ctx_all, SSL_OP_CIPHER_SERVER_PREFERENCE);
+		SSL_CTX_clear_options(ctx_all, SSL_OP_LEGACY_SERVER_CONNECT);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
