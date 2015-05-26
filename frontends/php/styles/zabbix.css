@@ -1692,14 +1692,13 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   .msg-details .link-action {
     position: absolute;
     top: 7px;
-    left: 12px; }
+    left: 15px;
+    margin-bottom: 20px; }
   .msg-details ul {
-    margin: 8px 0 0 0;
     border-top-width: 1px;
-    border-top-style: dashed;
     font-size: 0.85em; }
     .msg-details ul li {
-      margin: 0.5em 0 0 0; }
+      margin: 0.4em 0 0.4em 0; }
 
 .msg-buttons {
   text-align: right;
@@ -1709,7 +1708,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
 
 .msg-good, .msg-bad {
   font-size: 1.167em;
-  padding: 7px 12px;
+  padding: 7px 15px;
   margin: 0 0 12px 0;
   text-align: center;
   position: relative;

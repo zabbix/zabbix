@@ -188,8 +188,7 @@ class CSetupWizard extends CForm {
 		}
 
 		if ($finalResult == CFrontendSetup::CHECK_FATAL) {
-			$message_title = _s('Please correct all issues and press "%1$s" button.', _('Next step'));
-			$message_box = makeMessageBox(false, $messages, $message_title, false, true);
+			$message_box = makeMessageBox(false, $messages, null, false, true);
 		}
 		else {
 			$message_box = null;
