@@ -27,66 +27,68 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getFavouriteGraphs() {
-		$graphs = $simpeGraphs = [];
+		$graphs = [];
+		$simple_graphs = [];
 
 		$favourites = CFavorite::get('web.favorite.graphids');
 
 		if ($favourites) {
-			$graphIds = $itemIds = $dbGraphs = $dbItems = [];
+			$graphids = [];
+			$itemids = [];
+			$db_graphs = [];
+			$db_items = [];
 
 			foreach ($favourites as $favourite) {
 				if ($favourite['source'] === 'itemid') {
-					$itemIds[$favourite['value']] = $favourite['value'];
+					$itemids[$favourite['value']] = true;
 				}
 				else {
-					$graphIds[$favourite['value']] = $favourite['value'];
+					$graphids[$favourite['value']] = true;
 				}
 			}
 
-			if ($graphIds) {
-				$dbGraphs = API::Graph()->get([
+			if ($graphids) {
+				$db_graphs = API::Graph()->get([
 					'output' => ['graphid', 'name'],
 					'selectHosts' => ['hostid', 'name'],
 					'expandName' => true,
-					'graphids' => $graphIds,
+					'graphids' => array_keys($graphids),
 					'preservekeys' => true
 				]);
 			}
 
-			if ($itemIds) {
-				$dbItems = API::Item()->get([
+			if ($itemids) {
+				$db_items = API::Item()->get([
 					'output' => ['itemid', 'hostid', 'name', 'key_'],
 					'selectHosts' => ['hostid', 'name'],
-					'itemids' => $itemIds,
+					'itemids' => array_keys($itemids),
 					'webitems' => true,
 					'preservekeys' => true
 				]);
 
-				$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
+				$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
 			}
 
 			foreach ($favourites as $favourite) {
-				$sourceId = $favourite['value'];
+				$sourceid = $favourite['value'];
 
 				if ($favourite['source'] === 'itemid') {
-					if (isset($dbItems[$sourceId])) {
-						$dbItem = $dbItems[$sourceId];
-						$dbHost = reset($dbItem['hosts']);
+					if (array_key_exists($sourceid, $db_items)) {
+						$db_item = $db_items[$sourceid];
 
-						$simpeGraphs[] = [
-							'id' => $sourceId,
-							'label' => $dbHost['name'].NAME_DELIMITER.$dbItem['name_expanded']
+						$simple_graphs[] = [
+							'id' => $sourceid,
+							'label' => $db_item['hosts'][0]['name'].NAME_DELIMITER.$db_item['name_expanded']
 						];
 					}
 				}
 				else {
-					if (isset($dbGraphs[$sourceId])) {
-						$dbGraph = $dbGraphs[$sourceId];
-						$dbHost = reset($dbGraph['hosts']);
+					if (array_key_exists($sourceid, $db_graphs)) {
+						$db_graph = $db_graphs[$sourceid];
 
 						$graphs[] = [
-							'id' => $sourceId,
-							'label' => $dbHost['name'].NAME_DELIMITER.$dbGraph['name']
+							'id' => $sourceid,
+							'label' => $db_graph['hosts'][0]['name'].NAME_DELIMITER.$db_graph['name']
 						];
 					}
 				}
@@ -96,7 +98,7 @@ class CMenuPopupHelper {
 		return [
 			'type' => 'favouriteGraphs',
 			'graphs' => $graphs,
-			'simpleGraphs' => $simpeGraphs
+			'simpleGraphs' => $simple_graphs
 		];
 	}
 
@@ -111,21 +113,21 @@ class CMenuPopupHelper {
 		$favourites = CFavorite::get('web.favorite.sysmapids');
 
 		if ($favourites) {
-			$mapIds = [];
+			$mapids = [];
 
 			foreach ($favourites as $favourite) {
-				$mapIds[$favourite['value']] = $favourite['value'];
+				$mapids[$favourite['value']] = true;
 			}
 
-			$dbMaps = API::Map()->get([
+			$db_maps = API::Map()->get([
 				'output' => ['sysmapid', 'name'],
-				'sysmapids' => $mapIds
+				'sysmapids' => array_keys($mapids)
 			]);
 
-			foreach ($dbMaps as $dbMap) {
+			foreach ($db_maps as $db_map) {
 				$maps[] = [
-					'id' => $dbMap['sysmapid'],
-					'label' => $dbMap['name']
+					'id' => $db_map['sysmapid'],
+					'label' => $db_map['name']
 				];
 			}
 		}
