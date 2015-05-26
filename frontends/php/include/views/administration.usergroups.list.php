@@ -111,9 +111,11 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 		}
 	}
 
+	$name = new CLink($usrgrp['name'], 'usergrps.php?form=update&usrgrpid='.$userGroupId);
+
 	$userGroupTable->addRow([
 		new CCheckBox('group_groupid['.$userGroupId.']', null, null, $userGroupId),
-		new CLink($usrgrp['name'], 'usergrps.php?form=update&usrgrpid='.$userGroupId),
+		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[new CLink(_('Users'), 'users.php?filter_usrgrpid='.$userGroupId), CViewHelper::showNum(count($usrgrp['users']))],
 		$users,
 		$guiAccess,

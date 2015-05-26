@@ -108,10 +108,12 @@ foreach ($data['mediatypes'] as $mediaType) {
 		? new CLink(_('Enabled'), $statusLink, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN)
 		: new CLink(_('Disabled'), $statusLink, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
 
+	$name = new CLink($mediaType['description'], '?action=mediatype.edit&mediatypeid='.$mediaType['mediatypeid']);
+
 	// append row
 	$mediaTypeTable->addRow([
 		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', null, null, $mediaType['mediatypeid']),
-		new CLink($mediaType['description'], '?action=mediatype.edit&mediatypeid='.$mediaType['mediatypeid']),
+		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		media_type2str($mediaType['typeid']),
 		$status,
 		$actionColumn,

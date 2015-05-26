@@ -74,9 +74,11 @@ foreach ($data['scripts'] as $script) {
 		$scriptExecuteOn = '';
 	}
 
+	$name = new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid']);
+
 	$scriptsTable->addRow([
 		new CCheckBox('scriptids['.$script['scriptid'].']', 'no', null, $script['scriptid']),
-		new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid']),
+		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		$scriptType,
 		$scriptExecuteOn,
 		zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
