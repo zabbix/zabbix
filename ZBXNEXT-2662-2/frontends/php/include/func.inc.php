@@ -1692,7 +1692,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		$msg_details = new CDiv(null, 'msg-details');
 
 		if ($title !== null) {
-			$link = new CLink(_('Details'), null, ZBX_STYLE_LINK_DOTTED, null, true);
+			$link = new CLink(_('Details'), null, ZBX_STYLE_LINK_ACTION, null, true);
 			$link->setAttribute('onclick', 'javascript: showHide("msg-messages", IE ? "block" : "");');
 			$msg_details->addItem($link);
 		}
@@ -1706,7 +1706,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 			}
 		}
 		foreach ($messages as $message) {
-			$list->addItem($msg['type'].'&nbsp;'.$message['message']);
+			$list->addItem(/*$msg['type'].'&nbsp;'.*/$message['message']);
 		}
 		$msg_details->addItem($list);
 
