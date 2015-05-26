@@ -21,7 +21,8 @@
 
 define('ZABBIX_VERSION',		'2.5.0');
 define('ZABBIX_API_VERSION',	'2.5.0');
-define('ZABBIX_DB_VERSION',		2050011);
+define('ZABBIX_EXPORT_VERSION',	'3.0');
+define('ZABBIX_DB_VERSION',		2050016);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2015');
@@ -789,7 +790,7 @@ define('SPACE',	'&nbsp;');
  */
 define('NAME_DELIMITER', ': ');
 
-define('UNKNOWN_VALUE', '-');
+define('UNKNOWN_VALUE', '');
 
 // suffixes
 define('ZBX_BYTE_SUFFIXES', 'KMGT');
@@ -867,6 +868,8 @@ define('ZBX_SOCKET_BYTES_LIMIT',    1048576);   // socket response size limit, 1
 // value is also used in servercheck.js file
 define('SERVER_CHECK_INTERVAL', 10);
 
+define('DATE_TIME_FORMAT_SECONDS_XML', 'Y-m-d\TH:i:s\Z');
+
 // XML export|import tags
 define('XML_TAG_MACRO',				'macro');
 define('XML_TAG_HOST',				'host');
@@ -886,6 +889,12 @@ define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 // pass the LIBXML_NONET flag. Please keep in mind that LIBXML_NOENT actually EXPANDS entities, opposite to it's name -
 // so this flag is not needed here.
 define('LIBXML_IMPORT_FLAGS', LIBXML_NONET);
+
+// XML validation
+define('XML_STRING',		0x01);
+define('XML_ARRAY',			0x02);
+define('XML_INDEXED_ARRAY',	0x04);
+define('XML_REQUIRED',		0x08);
 
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
@@ -981,8 +990,48 @@ define('HISTORY_LATEST', 'showlatest');
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
+// CSS styles
+define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
+define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav');
+define('ZBX_STYLE_BTN_CONF', 'btn-conf');
+define('ZBX_STYLE_BTN_GREY', 'btn-grey');
+define('ZBX_STYLE_BTN_INFO', 'btn-info');
+define('ZBX_STYLE_BTN_MAX', 'btn-max');
+define('ZBX_STYLE_BTN_MIN', 'btn-min');
+define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
+define('ZBX_STYLE_BTN_RESET', 'btn-reset');
+define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
+define('ZBX_STYLE_GREEN', 'green');
+define('ZBX_STYLE_GREY', 'grey');
+define('ZBX_STYLE_HIDDEN', 'hidden');
+define('ZBX_STYLE_HIGH_BG', 'high-bg');
+define('ZBX_STYLE_INFO_BG', 'info-bg');
+define('ZBX_STYLE_LINK_ACTION', 'link-action');
+define('ZBX_STYLE_LINK_ALT', 'link-alt');
+define('ZBX_STYLE_NA_BG', 'na-bg');
+define('ZBX_STYLE_NORMAL_BG', 'normal-bg');
+define('ZBX_STYLE_NOWRAP', 'nowrap');
+define('ZBX_STYLE_ORANGE', 'orange');
+define('ZBX_STYLE_RED', 'red');
+define('ZBX_STYLE_SELECT_MULTIPLE', 'select-multiple');
+define('ZBX_STYLE_TABLE_FORMS', 'table-forms');
+define('ZBX_STYLE_TABLE_FORMS_CONTAINER', 'table-forms-container');
+define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
+define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
+define('ZBX_STYLE_TABLE_FORMS_TR_NEW', 'table-forms-tr-new');
+define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
+define('ZBX_STYLE_WARNING_BG', 'warning-bg');
+define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action');
+define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
+define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
+
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');
+
+// configuration -> hosts (macro inheritance)
+define('MACRO_TYPE_INHERITED',	0x01);
+define('MACRO_TYPE_HOSTMACRO',	0x02);
+define('MACRO_TYPE_BOTH',		0x03);	// MACRO_TYPE_INHERITED | MACRO_TYPE_HOSTMACRO
 
 // if magic quotes on, then get rid of them
 if (get_magic_quotes_gpc()) {

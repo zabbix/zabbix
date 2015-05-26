@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/discovery.inc.php';
 
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'discoveryconf.php';
-$page['hist_arg'] = array();
 $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -286,6 +285,8 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	$config = select_config();
+
 	$data = array(
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
@@ -295,7 +296,9 @@ else {
 	$data['drules'] = API::DRule()->get(array(
 		'output' => array('proxy_hostid', 'name', 'status', 'iprange', 'delay'),
 		'selectDChecks' => array('type'),
-		'editable' => true
+		'editable' => true,
+		'sortfield' => $sortField,
+		'limit' => $config['search_limit'] + 1
 	));
 
 	if ($data['drules']) {
@@ -325,7 +328,7 @@ else {
 	}
 
 	// get paging
-	$data['paging'] = getPagingLine($data['drules']);
+	$data['paging'] = getPagingLine($data['drules'], $sortOrder);
 
 	// render view
 	$discoveryView = new CView('configuration.discovery.list', $data);

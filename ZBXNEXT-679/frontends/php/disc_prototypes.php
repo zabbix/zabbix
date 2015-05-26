@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of item prototypes');
 $page['file'] = 'disc_prototypes.php';
 $page['scripts'] = array('effects.js', 'class.cviewswitcher.js', 'items.js');
-$page['hist_arg'] = array('parent_discoveryid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -387,11 +386,23 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
+	foreach ($data['items'] as &$item) {
+		if ($item['value_type'] == ITEM_VALUE_TYPE_STR || $item['value_type'] == ITEM_VALUE_TYPE_LOG
+				|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
+			$item['trends'] = '';
+		}
+
+		if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP) {
+			$item['delay'] = '';
+		}
+	}
+	unset($item);
+
 	$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 
 	order_result($data['items'], $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($data['items']);
+	$data['paging'] = getPagingLine($data['items'], $sortOrder);
 
 	// render view
 	$itemView = new CView('configuration.item.prototype.list', $data);

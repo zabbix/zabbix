@@ -301,7 +301,7 @@ class CMapImporter extends CImporter {
 	 */
 	protected function resolveMapElementReferences(array $maps) {
 		foreach ($maps as &$map) {
-			if ($map['iconmap']) {
+			if (isset($map['iconmap']) && $map['iconmap']) {
 				$map['iconmapid'] = $this->referencer->resolveIconMap($map['iconmap']['name']);
 
 				if (!$map['iconmapid']) {
@@ -311,7 +311,7 @@ class CMapImporter extends CImporter {
 				}
 			}
 
-			if ($map['background']) {
+			if (isset($map['background']) && $map['background']) {
 				$image = getImageByIdent($map['background']);
 
 				if (!$image) {

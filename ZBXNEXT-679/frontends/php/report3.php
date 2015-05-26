@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/include/services.inc.php';
 
 $page['title'] = _('IT services availability report');
 $page['file'] = 'report3.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -50,11 +49,15 @@ if (!$service) {
 	access_deny();
 }
 
+$widget = (new CWidget())->setTitle(_('IT services availability report').':'.SPACE.$service['name']);
+
+$controls = new CList();
+
 $form = new CForm();
 $form->setMethod('get');
 $form->addVar('serviceid', $_REQUEST['serviceid']);
 
-$form->addItem(array(
+$controls->addItem(array(
 	SPACE._('Period').SPACE,
 	new CComboBox('period', $period, 'submit()', array(
 		'daily' => _('Daily'),
@@ -70,16 +73,11 @@ if ($period != 'yearly') {
 	for ($y = (date('Y') - YEAR_LEFT_SHIFT); $y <= date('Y'); $y++) {
 		$cmbYear->addItem($y, $y);
 	}
-	$form->addItem(array(SPACE._('Year').SPACE, $cmbYear));
+	$controls->addItem(array(SPACE._('Year').SPACE, $cmbYear));
 }
 
-show_table_header(array(
-	_('IT SERVICES AVAILABILITY REPORT'),
-	SPACE.'"',
-	new CLink($service['name'], 'srv_status.php?showgraph=1&serviceid='.$service['serviceid']),
-	'"'
-	), $form
-);
+$form->addItem($controls);
+$widget->setControls($form);
 
 $table = new CTableInfo();
 
@@ -89,7 +87,7 @@ switch ($period) {
 	case 'yearly':
 		$from = date('Y') - YEAR_LEFT_SHIFT;
 		$to = date('Y');
-		array_unshift($header, new CCol(_('Year'), 'center'));
+		array_unshift($header, _('Year'));
 
 		function get_time($y) {
 			return mktime(0, 0, 0, 1, 1, $y);
@@ -106,7 +104,7 @@ switch ($period) {
 	case 'monthly':
 		$from = 1;
 		$to = 12;
-		array_unshift($header, new CCol(_('Month'), 'center'));
+		array_unshift($header, _('Month'));
 
 		function get_time($m) {
 			global $year;
@@ -124,7 +122,7 @@ switch ($period) {
 	case 'daily':
 		$from = 1;
 		$to = DAY_IN_YEAR;
-		array_unshift($header, new CCol(_('Day'), 'center'));
+		array_unshift($header, _('Day'));
 
 		function get_time($d) {
 			global $year;
@@ -143,7 +141,7 @@ switch ($period) {
 	default:
 		$from = 0;
 		$to = 52;
-		array_unshift($header, new CCol(_('From'), 'center'), new CCol(_('Till'), 'center'));
+		array_unshift($header, _('From'), _('Till'));
 
 		function get_time($w) {
 			static $beg;
@@ -198,7 +196,7 @@ foreach ($sla['sla'] as $intervalSla) {
 			$intervalSla['okTime'] / SEC_PER_DAY,
 			($intervalSla['okTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
 			($intervalSla['okTime'] % SEC_PER_HOUR) / SEC_PER_MIN
-		), 'off'
+		), ZBX_STYLE_GREEN
 	);
 
 	$problems = new CSpan(
@@ -206,7 +204,7 @@ foreach ($sla['sla'] as $intervalSla) {
 			$intervalSla['problemTime'] / SEC_PER_DAY,
 			($intervalSla['problemTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
 			($intervalSla['problemTime'] % SEC_PER_HOUR) /SEC_PER_MIN
-		), 'on'
+		), ZBX_STYLE_RED
 	);
 
 	$downtime = sprintf('%dd %dh %dm',
@@ -215,18 +213,19 @@ foreach ($sla['sla'] as $intervalSla) {
 		($intervalSla['downtimeTime'] % SEC_PER_HOUR) / SEC_PER_MIN
 	);
 
-	$percentage = new CSpan(sprintf('%2.4f', $intervalSla['sla']), ($intervalSla['sla'] >= $service['goodsla'] ? 'off' : 'on'));
+	$percentage = new CSpan(sprintf('%2.4f', $intervalSla['sla']), ($intervalSla['sla'] >= $service['goodsla'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED));
 
 	$table->addRow(array(
 		format_time($intervalSla['from']),
 		format_time2($intervalSla['to']),
-		$ok,
-		$problems,
-		$downtime,
-		($service['showsla']) ? $percentage : '-',
-		($service['showsla']) ? new CSpan($service['goodsla']) : '-'
+		$intervalSla['okTime'] == 0 ? '' : $ok,
+		$intervalSla['problemTime'] == 0 ? '' : $problems,
+		$intervalSla['downtimeTime'] ==0 ? '' : new CSpan($downtime, ZBX_STYLE_GREY),
+		($service['showsla']) ? $percentage : '',
+		($service['showsla']) ? new CSpan($service['goodsla']) : ''
 	));
 }
-$table->show();
+$widget->addItem($table);
+$widget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -37,7 +37,6 @@ jQuery(function($) {
 		 */
 		check: function(nocache) {
 			var params = nocache ? {nocache: true} : {};
-
 			new RPC.Call({
 				'method': 'zabbix.status',
 				'params': params,
@@ -56,15 +55,15 @@ jQuery(function($) {
 
 		showWarning: function(message) {
 			if (!this.warning) {
-				$('#message-global').text(message);
-				$('#message-global-wrap').fadeIn(100);
+				$('#msg-bad-global').text(message);
+				$('#msg-bad-global').fadeIn(100);
 				this.warning = true;
 			}
 		},
 
 		hideWarning: function() {
 			if (this.warning) {
-				$('#message-global-wrap').fadeOut(100);
+				$('#msg-bad-global').fadeOut(100);
 				this.warning = false;
 			}
 		}
@@ -84,7 +83,7 @@ jQuery(function($) {
 
 
 	// event that hide warning message when mouse hover it
-	$('#message-global-wrap').on('mouseenter', function() {
+	$('#msg-bad-global').on('mouseenter', function() {
 		var obj = $(this),
 			offset = obj.offset(),
 			x1 = Math.floor(offset.left),

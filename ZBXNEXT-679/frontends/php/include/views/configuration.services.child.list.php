@@ -21,8 +21,7 @@
 
 include(dirname(__FILE__).'/js/configuration.services.child.list.js.php');
 
-$servicesChildWidget = new CWidget();
-$servicesChildWidget->addPageHeader(_('IT service dependencies'));
+$servicesChildWidget = (new CWidget())->setTitle(_('IT service dependencies'));
 
 // create form
 $servicesChildForm = new CForm();
@@ -32,9 +31,11 @@ if (!empty($this->data['service'])) {
 }
 
 // create table
-$servicesChildTable = new CTableInfo(_('No IT services found.'));
+$servicesChildTable = new CTableInfo();
 $servicesChildTable->setHeader(array(
-	new CCheckBox('all_services', null, "javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');"),
+	new CColHeader(
+		new CCheckBox('all_services', null, "javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');"),
+		'cell-width'),
 	_('Service'),
 	_('Status calculation'),
 	_('Trigger')

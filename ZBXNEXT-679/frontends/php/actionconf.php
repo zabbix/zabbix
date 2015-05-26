@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/include/triggers.inc.php';
 $page['title'] = _('Configuration of actions');
 $page['file'] = 'actionconf.php';
 $page['scripts'] = array('multiselect.js');
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -541,7 +540,7 @@ else {
 
 	// sorting && paging
 	order_result($data['actions'], $sortField, $sortOrder);
-	$data['paging'] = getPagingLine($data['actions']);
+	$data['paging'] = getPagingLine($data['actions'], $sortOrder);
 
 	// render view
 	$actionView = new CView('configuration.action.list', $data);

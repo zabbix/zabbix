@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/services.inc.php';
 
 $page['title'] = _('IT services');
 $page['file'] = 'srv_status.php';
-$page['hist_arg'] = array();
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
@@ -146,9 +145,7 @@ else {
 
 	if ($tree) {
 		// creates form for choosing a preset interval
-		$r_form = new CForm();
-		$r_form->setAttribute('class', 'nowrap');
-		$r_form->setMethod('get');
+		$r_form = new CForm('get');
 		$r_form->setAttribute('name', 'period_choice');
 		$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
@@ -156,14 +153,18 @@ else {
 		foreach ($periods as $key => $val) {
 			$period_combo->addItem($key, $val);
 		}
-		$r_form->addItem(array(_('Period').SPACE, $period_combo));
+		// controls
+		$r_form->addItem((new CList())->
+			addItem(array(_('Period').SPACE, $period_combo))->
+			addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])))
+		);
 
-		$srv_wdgt = new CWidget('hat_services', 'service-list service-mon');
-		$srv_wdgt->addPageHeader(_('IT SERVICES'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
-		$srv_wdgt->addHeader(_('IT services'), $r_form);
-		$srv_wdgt->addItem(BR());
-		$srv_wdgt->addItem($tree->getHTML());
-		$srv_wdgt->show();
+		$srv_wdgt = (new CWidget('service-list service-mon'))->
+			setTitle(_('IT services'))->
+			setControls($r_form)->
+			addItem(BR())->
+			addItem($tree->getHTML())->
+			show();
 	}
 	else {
 		error(_('Cannot format Tree. Check logic structure in service links.'));

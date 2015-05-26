@@ -142,28 +142,6 @@ function granted2update_group($userGroupIds) {
 }
 
 /**
- * Check if user can be appended to group.
- *
- * @param string $userId
- * @param string $userGroupId
- *
- * @return bool
- */
-function granted2move_user($userId, $userGroupId) {
-	$group = API::UserGroup()->get(array(
-		'usrgrpids' => $userGroupId,
-		'output' => API_OUTPUT_EXTEND
-	));
-	$group = reset($group);
-
-	if ($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $group['users_status'] == GROUP_STATUS_DISABLED) {
-		return (bccomp(CWebUser::$data['userid'], $userId) != 0);
-	}
-
-	return true;
-}
-
-/**
  * Change group status.
  *
  * @param array $userGroupIds

@@ -19,15 +19,14 @@
 **/
 
 
-$hostInventoryWidget = new CWidget(null, 'inventory-host');
-$hostInventoryWidget->addPageHeader(_('HOST INVENTORY'), SPACE);
+$hostInventoryWidget = (new CWidget('inventory-host'))->setTitle(_('Host inventory'));
 
 /*
  * Overview tab
  */
 $overviewFormList = new CFormList();
 
-$hostSpan = new CSpan($this->data['host']['host'], 'link_menu menu-host');
+$hostSpan = new CSpan($this->data['host']['host'], ZBX_STYLE_LINK_ACTION.' link_menu');
 $hostSpan->setMenuPopup(CMenuPopupHelper::getHost(
 	$this->data['host'],
 	$this->data['hostScripts'][$this->data['host']['hostid']],
@@ -286,8 +285,9 @@ $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 
 // append tabs and form
 $hostInventoriesForm = new CForm();
+$hostInventoriesTab->setFooter(makeFormFooter(null, array(new CButtonCancel(url_param('groupid')))));
+
 $hostInventoriesForm->addItem($hostInventoriesTab);
-$hostInventoriesForm->addItem(makeFormFooter(null, array(new CButtonCancel(url_param('groupid')))));
 $hostInventoryWidget->addItem($hostInventoriesForm);
 
 return $hostInventoryWidget;

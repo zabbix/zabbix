@@ -71,7 +71,7 @@ class CActionButtonList extends CObject {
 
 			$this->buttons[$actionValue]->removeAttribute('id');
 			$this->buttons[$actionValue]->setAttribute('value', $actionValue);
-			$this->buttons[$actionValue]->addClass('footerButton');
+			$this->buttons[$actionValue]->addClass('btn-alt footerButton');
 
 			if (array_key_exists('confirm', $buttonData)) {
 				$this->buttons[$actionValue]->setAttribute('confirm', $buttonData['confirm']);
@@ -87,7 +87,7 @@ class CActionButtonList extends CObject {
 	 */
 	public function getSelectedCountElement() {
 		if (!$this->selectedCountElement) {
-			$this->selectedCountElement = new CSpan('0 '._('selected'), null, 'selectedCount');
+			$this->selectedCountElement = new CSpan(SPACE.'0 '._('selected').SPACE, null, 'selectedCount');
 		}
 
 		return $this->selectedCountElement;
@@ -104,11 +104,17 @@ class CActionButtonList extends CObject {
 		zbx_add_post_js('chkbxRange.pageGoName = '.CJs::encodeJson($this->checkboxesName).';');
 		zbx_add_post_js('chkbxRange.prefix = '.CJs::encodeJson($this->cookieNamePrefix).';');
 
-		$this->items[] = $this->getSelectedCountElement()->toString($destroy);
+		$items = array();
 
 		foreach ($this->buttons as $button) {
-			$this->items[] = $button->toString($destroy);
+			$items[] = $button;
 		}
+
+		$this->items[] = new CDiv(array(
+			$this->getSelectedCountElement(),
+			$items),
+			'action-buttons'
+		);
 
 		return parent::toString($destroy);
 	}

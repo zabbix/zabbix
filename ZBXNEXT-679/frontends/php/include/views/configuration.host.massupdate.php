@@ -21,8 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.host.massupdate.js.php';
 
-$hostWidget = new CWidget();
-$hostWidget->addPageHeader(_('CONFIGURATION OF HOSTS'));
+$hostWidget = (new CWidget())->setTitle(_('Hosts'));
 
 // create form
 $hostView = new CForm();
@@ -58,9 +57,7 @@ $replaceGroups = new CDiv(new CMultiSelect(array(
 	'data' => $hostGroupsToReplace,
 	'popup' => array(
 		'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=groups_&srcfld1=groupid'.
-			'&writeonly=1&multiselect=1',
-		'width' => 450,
-		'height' => 450
+			'&writeonly=1&multiselect=1'
 	)
 )), null, 'replaceGroups');
 
@@ -111,9 +108,7 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		'addNew' => true,
 		'popup' => array(
 			'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_&srcfld1=groupid'.
-				'&writeonly=1&multiselect=1',
-			'width' => 450,
-			'height' => 450
+				'&writeonly=1&multiselect=1'
 		)
 	)), null, 'newGroups');
 
@@ -134,9 +129,7 @@ else {
 		'data' => $hostGroupsToAdd,
 		'popup' => array(
 			'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_&srcfld1=groupid'.
-				'&writeonly=1&multiselect=1',
-			'width' => 450,
-			'height' => 450
+				'&writeonly=1&multiselect=1'
 		)
 	));
 
@@ -206,9 +199,7 @@ $templatesDiv = new CDiv(
 			'data' => $data['linkedTemplates'],
 			'popup' => array(
 				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$hostView->getName().
-					'&dstfld1=templates_&templated_hosts=1&multiselect=1',
-				'width' => 450,
-				'height' => 450
+					'&dstfld1=templates_&templated_hosts=1&multiselect=1'
 			)
 		)),
 		$clearDiv,
@@ -333,13 +324,14 @@ $hostTab->addTab('hostTab', _('Host'), $hostFormList);
 $hostTab->addTab('templatesTab', _('Templates'), $templatesFormList);
 $hostTab->addTab('ipmiTab', _('IPMI'), $ipmiFormList);
 $hostTab->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
-$hostView->addItem($hostTab);
 
 // append buttons to form
-$hostView->addItem(makeFormFooter(
+$hostTab->setFooter(makeFormFooter(
 	new CSubmit('masssave', _('Update')),
 	array(new CButtonCancel(url_param('groupid')))
 ));
+
+$hostView->addItem($hostTab);
 
 $hostWidget->addItem($hostView);
 

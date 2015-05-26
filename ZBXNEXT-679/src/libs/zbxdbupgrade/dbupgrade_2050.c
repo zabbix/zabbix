@@ -123,33 +123,70 @@ static int	DBpatch_2050006(void)
 
 static int	DBpatch_2050007(void)
 {
+	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hosts", &field);
+}
+
+static int	DBpatch_2050008(void)
+{
+	const ZBX_FIELD	field = {"ipmi_error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hosts", &field);
+}
+
+static int	DBpatch_2050009(void)
+{
+	const ZBX_FIELD	field = {"snmp_error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hosts", &field);
+}
+
+static int	DBpatch_2050010(void)
+{
+	const ZBX_FIELD	field = {"jmx_error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hosts", &field);
+}
+
+static int	DBpatch_2050011(void)
+{
+	/* 1 - ITEM_VALUE_TYPE_STR, 2 - ITEM_VALUE_TYPE_LOG, 4 - ITEM_VALUE_TYPE_TEXT */
+	if (ZBX_DB_OK <= DBexecute("update items set trends=0 where value_type in (1,2,4)"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_2050012(void)
+{
 	const ZBX_FIELD	field = {"smtp_port", "25", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
-static int	DBpatch_2050008(void)
+static int	DBpatch_2050013(void)
 {
 	const ZBX_FIELD	field = {"smtp_security", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
-static int	DBpatch_2050009(void)
+static int	DBpatch_2050014(void)
 {
 	const ZBX_FIELD	field = {"smtp_verify_peer", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
-static int	DBpatch_2050010(void)
+static int	DBpatch_2050015(void)
 {
 	const ZBX_FIELD	field = {"smtp_verify_host", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
-static int	DBpatch_2050011(void)
+static int	DBpatch_2050016(void)
 {
 	const ZBX_FIELD	field = {"smtp_authentication", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -174,5 +211,10 @@ DBPATCH_ADD(2050008, 0, 1)
 DBPATCH_ADD(2050009, 0, 1)
 DBPATCH_ADD(2050010, 0, 1)
 DBPATCH_ADD(2050011, 0, 1)
+DBPATCH_ADD(2050012, 0, 1)
+DBPATCH_ADD(2050013, 0, 1)
+DBPATCH_ADD(2050014, 0, 1)
+DBPATCH_ADD(2050015, 0, 1)
+DBPATCH_ADD(2050016, 0, 1)
 
 DBPATCH_END()

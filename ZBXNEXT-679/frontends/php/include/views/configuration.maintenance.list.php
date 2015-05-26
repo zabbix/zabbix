@@ -18,29 +18,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$maintenanceWidget = new CWidget();
+$maintenanceWidget = (new CWidget())->setTitle(_('Maintenance periods'));
 
 // create new maintenance button
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$createForm->addItem(new CSubmit('form', _('Create maintenance period')));
-$maintenanceWidget->addPageHeader(_('CONFIGURATION OF MAINTENANCE PERIODS'), $createForm);
-
-// header
-$filterForm = new CForm('get');
-$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$maintenanceWidget->addHeader(_('Maintenance periods'), $filterForm);
-$maintenanceWidget->addHeaderRowNumber();
+$createForm = (new CForm('get'))->cleanItems();
+$controls = new CList();
+$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+$controls->addItem(new CSubmit('form', _('Create maintenance period')));
+$createForm->addItem($controls);
+$maintenanceWidget->setControls($createForm);
 
 // create form
 $maintenanceForm = new CForm();
 $maintenanceForm->setName('maintenanceForm');
 
 // create table
-$maintenanceTable = new CTableInfo(_('No maintenance periods found.'));
+$maintenanceTable = new CTableInfo();
 $maintenanceTable->setHeader(array(
-	new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');"),
+	new CColHeader(
+		new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');"),
+		'cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Type'), 'maintenance_type', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Active since'), 'active_since', $this->data['sort'], $this->data['sortorder']),
@@ -54,13 +51,13 @@ foreach ($this->data['maintenances'] as $maintenance) {
 
 	switch ($maintenance['status']) {
 		case MAINTENANCE_STATUS_EXPIRED:
-			$maintenanceStatus = new CSpan(_x('Expired', 'maintenance status'), 'red');
+			$maintenanceStatus = new CSpan(_x('Expired', 'maintenance status'), ZBX_STYLE_RED);
 			break;
 		case MAINTENANCE_STATUS_APPROACH:
-			$maintenanceStatus = new CSpan(_x('Approaching', 'maintenance status'), 'blue');
+			$maintenanceStatus = new CSpan(_x('Approaching', 'maintenance status'), ZBX_STYLE_ORANGE);
 			break;
 		case MAINTENANCE_STATUS_ACTIVE:
-			$maintenanceStatus = new CSpan(_x('Active', 'maintenance status'), 'green');
+			$maintenanceStatus = new CSpan(_x('Active', 'maintenance status'), ZBX_STYLE_GREEN);
 			break;
 	}
 
@@ -77,12 +74,11 @@ foreach ($this->data['maintenances'] as $maintenance) {
 
 // append table to form
 $maintenanceForm->addItem(array(
-	$this->data['paging'],
 	$maintenanceTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'maintenanceids', array(
+	new CActionButtonList('action', 'maintenanceids', array(
 		'maintenance.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected maintenance periods?'))
-	)))
+	))
 ));
 
 // append form to widget

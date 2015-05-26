@@ -114,7 +114,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 		$serviceNode = array(
 			'id' => $service['serviceid'],
 			'caption' => $caption,
-			'description' => $service['trigger'] ? $service['trigger']['description'] : '-',
+			'description' => $service['trigger'] ? $service['trigger']['description'] : '',
 			'parentid' => $parentService ? $parentService['serviceid'] : 0,
 			'algorithm' => serviceAlgorythm($service['algorithm'])
 		);
@@ -213,9 +213,9 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 		}
 
 		// reason
-		$problemList = '-';
+		$problemList = '';
 		if ($serviceSla['problems']) {
-			$problemList = new CList(null, 'service-problems');
+			$problemList = new CList([], 'service-problems');
 			foreach ($serviceSla['problems'] as $problemTrigger) {
 				$problemList->addItem(new CLink($problemTrigger['description'],
 					'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
@@ -257,12 +257,12 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 
 			$slaBar = array(
 				$bar,
-				new CSpan(sprintf('%.4f', $slaBad), 'sla-value '.(($service['goodsla'] > $slaGood) ? 'red' : 'green'))
+				new CSpan(sprintf('%.4f', $slaBad), 'sla-value '.(($service['goodsla'] > $slaGood) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN))
 			);
 
 			$sla = new CDiv($slaBar, 'invisible');
 			$sla2 = array(
-				new CSpan(sprintf('%.4f', $slaGood), 'sla-value '.(($service['goodsla'] > $slaGood) ? 'red' : 'green')),
+				new CSpan(sprintf('%.4f', $slaGood), 'sla-value '.(($service['goodsla'] > $slaGood) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)),
 				'/',
 				new CSpan(sprintf('%.4f', $service['goodsla']), 'sla-value')
 			);
@@ -276,7 +276,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			'sla' => $sla,
 			'sla2' => $sla2,
 			'parentid' => ($parentService) ? $parentService['serviceid'] : 0,
-			'status' => ($serviceSla['status'] !== null) ? $serviceSla['status'] : '-'
+			'status' => ($serviceSla['status'] !== null) ? $serviceSla['status'] : ''
 		);
 	}
 

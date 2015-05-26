@@ -38,7 +38,7 @@ class CScreenPlainText extends CScreenBase {
 		}
 
 		if ($this->screenitem['resourceid'] == 0) {
-			$table = new CTableInfo(_('No values found.'));
+			$table = new CTableInfo();
 			$table->setHeader(array(_('Timestamp'), _('Item')));
 
 			return $this->getOutput($table);
@@ -60,7 +60,7 @@ class CScreenPlainText extends CScreenBase {
 
 		$host = get_host_by_itemid($this->screenitem['resourceid']);
 
-		$table = new CTableInfo(_('No values found.'));
+		$table = new CTableInfo();
 		$table->setHeader(array(_('Timestamp'), $host['name'].NAME_DELIMITER.$item['name_expanded']));
 
 		$stime = zbxDateToTime($this->timeline['stime']);

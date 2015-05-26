@@ -84,14 +84,14 @@ $importTab->addTab('importTab', _('Import'), $importFormList);
 
 // form
 $importForm = new CForm('post', null, 'multipart/form-data');
-$importForm->addItem($importTab);
-$importForm->addItem(makeFormFooter(
+$importTab->setFooter(makeFormFooter(
 	new CSubmit('import', _('Import')),
 	array(new CButtonCancel())
 ));
 
+$importForm->addItem($importTab);
+
 // widget
-$importWidget = new CWidget();
-$importWidget->addItem($importForm);
+$importWidget = (new CWidget())->addItem($importForm);
 
 return $importWidget;
