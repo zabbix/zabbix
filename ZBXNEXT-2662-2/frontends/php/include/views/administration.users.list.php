@@ -124,10 +124,12 @@ foreach ($this->data['users'] as $user) {
 		$guiAccessStyle = ZBX_STYLE_GREY;
 	}
 
+	$alias = new CLink($user['alias'], 'users.php?form=update&userid='.$userId);
+
 	// append user to table
 	$usersTable->addRow([
 		new CCheckBox('group_userid['.$userId.']', null, null, $userId),
-		new CLink($user['alias'], 'users.php?form=update&userid='.$userId),
+		(new CCol($alias))->addClass(ZBX_STYLE_NOWRAP),
 		$user['name'],
 		$user['surname'],
 		user_type2str($user['type']),
