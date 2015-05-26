@@ -72,7 +72,7 @@ $icon->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
 $icon = new CRedirectButton(SPACE, null);
 $icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
 $icon->setTitle(_('Action'));
-$icon->setAttribute('id', 'favouriteMaps');
+$icon->setAttribute('id', 'favouriteScreens');
 $icon->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
 
 $favouriteScreens = new CCollapsibleUiWidget(WIDGET_FAVOURITE_SCREENS, $data['favourite_screens']);
