@@ -61,13 +61,11 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 
 	if (MEDIA_TYPE_EMAIL == mediatype->type)
 	{
-		alarm(ALARM_ACTION_TIMEOUT);
 		res = send_email(mediatype->smtp_server, mediatype->smtp_port, mediatype->smtp_helo,
 				mediatype->smtp_email, alert->sendto, alert->subject, alert->message,
 				mediatype->smtp_security, mediatype->smtp_verify_peer, mediatype->smtp_verify_host,
 				mediatype->smtp_authentication, mediatype->username, mediatype->passwd,
-				error, max_error_len);
-		alarm(0);
+				ALARM_ACTION_TIMEOUT, error, max_error_len);
 	}
 #ifdef HAVE_JABBER
 	else if (MEDIA_TYPE_JABBER == mediatype->type)

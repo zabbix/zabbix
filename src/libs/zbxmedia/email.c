@@ -341,8 +341,8 @@ static size_t	smtp_provide_payload(void *buffer, size_t size, size_t nmemb, void
 
 static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
 		const char *from_display_name, const char *from_angle_addr, const char *to_display_name,
-		const char *to_angle_addr, const char *mailsubject, const char *mailbody, char *error,
-		size_t max_error_len)
+		const char *to_angle_addr, const char *mailsubject, const char *mailbody, int timeout,
+		char *error, size_t max_error_len)
 {
 	zbx_socket_t	s;
 	int		err, ret = FAIL;
@@ -353,6 +353,8 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 	const char	*OK_251 = "251";
 	const char	*OK_354 = "354";
 	const char	*response;
+
+	alarm(timeout);
 
 	/* connect to and receive an initial greeting from SMTP server */
 
@@ -518,6 +520,8 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 close:
 	zbx_tcp_close(&s);
 out:
+	alarm(0);
+
 	return ret;
 }
 
@@ -525,7 +529,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		const char *from_display_name, const char *from_angle_addr, const char *to_display_name,
 		const char *to_angle_addr, const char *mailsubject, const char *mailbody,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
-		unsigned char smtp_authentication, const char *username, const char *password,
+		unsigned char smtp_authentication, const char *username, const char *password, int timeout,
 		char *error, size_t max_error_len)
 {
 #if defined(HAVE_LIBCURL) && 0x072200 <= LIBCURL_VERSION_NUM	/* version 7.34.0, required for CURLOPT_LOGIN_OPTIONS */
@@ -605,6 +609,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_UPLOAD, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_READFUNCTION, smtp_provide_payload)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_READDATA, &payload_status)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, (long)timeout)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
 	{
 		goto error;
@@ -648,7 +653,7 @@ out:
 int	send_email(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
 		const char *smtp_email, const char *mailto, const char *mailsubject, const char *mailbody,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
-		unsigned char smtp_authentication, const char *username, const char *password,
+		unsigned char smtp_authentication, const char *username, const char *password, int timeout,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "send_email";
@@ -675,13 +680,14 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	if (SMTP_SECURITY_NONE == smtp_security && SMTP_AUTHENTICATION_NONE == smtp_authentication)
 	{
 		ret = send_email_plain(smtp_server, smtp_port, smtp_helo, from_display_name, from_angle_addr,
-				to_display_name, to_angle_addr, mailsubject, mailbody, error, max_error_len);
+				to_display_name, to_angle_addr, mailsubject, mailbody, timeout, error, max_error_len);
 	}
 	else
 	{
 		ret = send_email_curl(smtp_server, smtp_port, smtp_helo, from_display_name, from_angle_addr,
 				to_display_name, to_angle_addr, mailsubject, mailbody, smtp_security, smtp_verify_peer,
-				smtp_verify_host, smtp_authentication, username, password, error, max_error_len);
+				smtp_verify_host, smtp_authentication, username, password, timeout, error,
+				max_error_len);
 	}
 clean:
 	zbx_free(from_display_name);
