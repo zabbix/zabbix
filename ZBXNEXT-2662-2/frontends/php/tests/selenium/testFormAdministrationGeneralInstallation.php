@@ -27,7 +27,7 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		'2. Check of pre-requisites',
 		'3. Configure DB connection',
 		'4. Zabbix server details',
-		'5. Pre-Installation summary',
+		'5. Pre-installation summary',
 		'6. Install'
 	];
 

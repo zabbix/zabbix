@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 
-$page['title'] = _('Most busy triggers top 100');
+$page['title'] = _('100 busiest triggers');
 $page['file'] = 'toptriggers.php';
 $page['scripts'] = ['multiselect.js', 'class.calendar.js'];
 

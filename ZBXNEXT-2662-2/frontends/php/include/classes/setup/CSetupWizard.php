@@ -48,7 +48,7 @@ class CSetupWizard extends CForm {
 				'fnc' => 'stage3'
 			],
 			4 => [
-				'title' => _('Pre-Installation summary'),
+				'title' => _('Pre-installation summary'),
 				'fnc' => 'stage4'
 			],
 			5 => [
@@ -276,7 +276,7 @@ class CSetupWizard extends CForm {
 		return [
 			new CTag('h1', 'yes', _('Zabbix server details')),
 			new CDiv([
-				new CTag('p', 'yes', _('Please enter host name or host IP address and port number of Zabbix server, as well as the name of the installation (optional).')),
+				new CTag('p', 'yes', _('Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional).')),
 				$table
 			], 'setup-right-body')
 		];
@@ -315,7 +315,7 @@ class CSetupWizard extends CForm {
 		$table->addRow(new CSpan(_('Zabbix server name'), ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER_NAME'));
 
 		return [
-			new CTag('h1', 'yes', _('Pre-Installation summary')),
+			new CTag('h1', 'yes', _('Pre-installation summary')),
 			new CDiv([
 				new CTag('p', 'yes', _s('Please check configuration parameters. If all is correct, press "%1$s" button, or "%2$s" button to change configuration parameters.', _('Next step'), _('Back'))),
 				$table
@@ -373,7 +373,7 @@ class CSetupWizard extends CForm {
 
 			$message_box = null;
 			$message = [
-				new CTag('h4', 'yes', _('Congratulations on successful installation of Zabbix frontend.'),
+				new CTag('h4', 'yes', _('Congratulations! You have successfully installed Zabbix frontend.'),
 					ZBX_STYLE_GREEN
 				),
 				new CTag('p', 'yes', _s('Configuration file "%1$s" created.', $config_file_name))
