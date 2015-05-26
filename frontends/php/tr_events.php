@@ -92,7 +92,7 @@ $event = reset($events);
 $config = select_config();
 
 $eventWidget = (new CWidget())->
-	setTitle(_('Event for trigger').': "'.CMacrosResolverHelper::resolveTriggerName($trigger).'"')->
+	setTitle(_s('Event of trigger: "%1$s"', CMacrosResolverHelper::resolveTriggerName($trigger)))->
 	setControls((new CList())->
 		addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
 	);

@@ -81,7 +81,7 @@ $controls->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen
 
 $r_form->addItem($controls);
 
-$httpmon_wdgt = (new CWidget())->setTitle(_('WEB monitoring'))->setControls($r_form);
+$httpmon_wdgt = (new CWidget())->setTitle(_('Web monitoring'))->setControls($r_form);
 
 // TABLE
 $table = new CTableInfo();

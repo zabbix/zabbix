@@ -1626,7 +1626,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			$data = [
 				'header' => _('Access denied'),
 				'messages' => [
-					_s('Your are logged in as "%1$s".', CWebUser::$data['alias']).' '._('You have no permissions to access this page.'),
+					_s('You are logged in as "%1$s".', CWebUser::$data['alias']).' '._('You have no permissions to access this page.'),
 					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 				],
 				'buttons' => []
