@@ -379,7 +379,9 @@ var hintBox = {
 		}
 
 		if (isStatic) {
-			var close_link = jQuery('<span class="overlay-close-btn">×</a>')
+			var close_link = jQuery('<span>', {
+					'class': 'overlay-close-btn'}
+				)
 				.click(function() {
 					hintBox.hideHint(e, target, true);
 				});
