@@ -2789,14 +2789,6 @@ a.overlay-close-btn {
 	@extend .overlay-close-btn; 
 }
 
-.form-remove-btn {
-	@extend %close-icon;
-}
-
-a.form-remove-btn {
-	@extend .form-remove-btn;
-}
-
 .subfilter-disable-btn {
 	width: 18px;
 	height: 18px;
