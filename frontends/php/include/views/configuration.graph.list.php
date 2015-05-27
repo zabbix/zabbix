@@ -42,8 +42,8 @@ else {
 
 	$createForm->addVar('hostid', $this->data['hostid']);
 
-	$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-	$controls->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
+	$controls->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]);
+	$controls->addItem([SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()]);
 
 	if (!empty($this->data['hostid'])) {
 		$controls->addItem(new CSubmit('form', _('Create graph')));
@@ -72,23 +72,23 @@ if (!empty($this->data['parent_discoveryid'])) {
 
 // create table
 $graphTable = new CTableInfo();
-$graphTable->setHeader(array(
-	new CColHeader(
-		new CCheckBox('all_graphs', null, "checkAll('".$graphForm->getName()."', 'all_graphs', 'group_graphid');"),
-		'cell-width'),
+$graphTable->setHeader([
+	(new CColHeader(
+		new CCheckBox('all_graphs', null, "checkAll('".$graphForm->getName()."', 'all_graphs', 'group_graphid');")))->
+		addClass('cell-width'),
 	!empty($this->data['hostid']) ? null : _('Hosts'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Width'),
 	_('Height'),
 	make_sorting_header(_('Graph type'), 'graphtype', $this->data['sort'], $this->data['sortorder'])
-));
+]);
 
 foreach ($this->data['graphs'] as $graph) {
 	$graphid = $graph['graphid'];
 
 	$hostList = null;
 	if (empty($this->data['hostid'])) {
-		$hostList = array();
+		$hostList = [];
 		foreach ($graph['hosts'] as $host) {
 			$hostList[$host['name']] = $host['name'];
 		}
@@ -100,7 +100,7 @@ foreach ($this->data['graphs'] as $graph) {
 	}
 
 	$isCheckboxEnabled = true;
-	$name = array();
+	$name = [];
 	if (!empty($graph['templateid'])) {
 		$realHosts = get_realhosts_by_graphid($graph['templateid']);
 		$realHosts = DBfetch($realHosts);
@@ -142,14 +142,14 @@ foreach ($this->data['graphs'] as $graph) {
 	$checkBox = new CCheckBox('group_graphid['.$graphid.']', null, null, $graphid);
 	$checkBox->setEnabled($isCheckboxEnabled);
 
-	$graphTable->addRow(array(
+	$graphTable->addRow([
 		$checkBox,
 		$hostList,
 		$name,
 		$graph['width'],
 		$graph['height'],
 		$graph['graphtype']
-	));
+	]);
 }
 
 if ($this->data['parent_discoveryid']) {
@@ -160,23 +160,23 @@ else {
 }
 
 // buttons
-$buttonsArray = array();
+$buttonsArray = [];
 if (!$this->data['parent_discoveryid']) {
-	$buttonsArray['graph.masscopyto'] = array('name' => _('Copy'));
+	$buttonsArray['graph.masscopyto'] = ['name' => _('Copy')];
 }
-$buttonsArray['graph.massdelete'] = array('name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
+$buttonsArray['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
 	? _('Delete selected graph prototypes?')
 	: _('Delete selected graphs?')
-);
+];
 
 // append table to form
-$graphForm->addItem(array(
+$graphForm->addItem([
 	$graphTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'group_graphid', $buttonsArray,
 		$this->data['parent_discoveryid'] ? $this->data['parent_discoveryid'] : $this->data['hostid']
 	)
-));
+]);
 
 // append form to widget
 $graphWidget->addItem($graphForm);

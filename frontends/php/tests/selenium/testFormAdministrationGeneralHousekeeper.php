@@ -27,7 +27,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertElementPresent('configDropDown');
 
 		$this->zbxTestCheckTitle('Configuration of housekeeping');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPING', 'Housekeeping'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF HOUSEKEEPING', 'Housekeeping']);
 
 		// events and alerts
 
@@ -183,9 +183,9 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 	}
 
 	public static function update() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'expected' => TEST_GOOD,
 					'hk_events_mode' => true,
 					'hk_events_trigger' => 101,
@@ -204,10 +204,10 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends_mode' => true,
 					'hk_trends_global' => true,
 					'hk_trends' => 110
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'hk_events_mode' => false,
 					'hk_services_mode' => false,
@@ -215,10 +215,10 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_sessions_mode' => false,
 					'hk_history_mode' => false,
 					'hk_trends_mode' => false
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'hk_events_mode' => true,
 					'hk_services_mode' => true,
@@ -228,10 +228,10 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_history_global' => false,
 					'hk_trends_mode' => true,
 					'hk_trends_global' => false
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'hk_events_mode' => true,
 					'hk_events_trigger' => 0,
@@ -250,7 +250,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends_mode' => true,
 					'hk_trends_global' => true,
 					'hk_trends' => -1,
-					'errors' => array(
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value "0" for "Trigger event and alert data storage period" field: must be between 1 and 99999.',
 						'Incorrect value "0" for "Internal event and alert data storage period" field: must be between 1 and 99999.',
@@ -261,11 +261,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 						'Incorrect value "0" for "User session data storage period" field: must be between 1 and 99999.',
 						'Incorrect value "-1" for "History data storage period" field: must be between 0 and 99999.',
 						'Incorrect value "-1" for "Trend data storage period" field: must be between 0 and 99999.'
-					)
-				)
-			),
-			array(
-				array(
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'resetDefaults' => true,
 					'hk_events_mode' => true,
@@ -283,9 +283,9 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_history_global' => false,
 					'hk_trends_mode' => true,
 					'hk_trends_global' => false
-				)
-			)
-		);
+				]
+			]
+		];
 	}
 
 	/**

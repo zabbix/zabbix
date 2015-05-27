@@ -42,10 +42,10 @@ class testPageInventory extends CWebTest {
 		$this->zbxTestTextPresent('HOST INVENTORY');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextPresent(
-			array('Host', 'Group', 'Name', 'Type', 'OS', 'Serial number A', 'Tag', 'MAC address A')
+			['Host', 'Group', 'Name', 'Type', 'OS', 'Serial number A', 'Tag', 'MAC address A']
 		);
 
-		$this->zbxTestTextPresent(array(
+		$this->zbxTestTextPresent([
 			$data['hostname'],
 			$data['name'],
 			$data['type'],
@@ -53,7 +53,7 @@ class testPageInventory extends CWebTest {
 			$data['serialno_a'],
 			$data['tag'],
 			$data['macaddress_a'],
-		));
+		]);
 	}
 
 	/**

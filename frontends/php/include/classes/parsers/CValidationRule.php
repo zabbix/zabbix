@@ -41,7 +41,7 @@ class CValidationRule {
 
 		$pos = 0;
 		$state = self::STATE_BEGIN;
-		$rules = array();
+		$rules = [];
 		$is_empty = true;
 
 		while (isset($buffer[$pos])) {
@@ -53,7 +53,7 @@ class CValidationRule {
 							break;
 						default:
 							$is_empty = false;
-							$rule = array();
+							$rule = [];
 
 							if (!$this->parseRequired($buffer, $pos, $rule)				// required
 									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
@@ -197,7 +197,7 @@ class CValidationRule {
 			$i++;
 		}
 
-		$values = array();
+		$values = [];
 
 		if (!$this->parseValues($buffer, $i, $values)) {
 			return false;
@@ -259,10 +259,10 @@ class CValidationRule {
 		}
 
 		$pos = $i;
-		$rules['db'] = array(
+		$rules['db'] = [
 			'table' => $table,
 			'field' => $field
-		);
+		];
 
 		return true;
 	}
@@ -317,10 +317,10 @@ class CValidationRule {
 		}
 
 		$pos = $i;
-		$rules['array_db'] = array(
+		$rules['array_db'] = [
 			'table' => $table,
 			'field' => $field
-		);
+		];
 
 		return true;
 	}
@@ -329,7 +329,7 @@ class CValidationRule {
 	 * <field>
 	 */
 	private function parseField($buffer, &$pos, &$field) {
-		$matches = array();
+		$matches = [];
 		if (1 != preg_match('/^[A-Za-z0-9_]+/', substr($buffer, $pos), $matches))
 			return false;
 

@@ -492,7 +492,7 @@ jQuery(function($) {
 
 				var popupButton = $('<button>', {
 					type: 'button',
-					'class': options.popup.buttonClass ? options.popup.buttonClass : 'btn-alt',
+					'class': options.popup.buttonClass ? options.popup.buttonClass : 'btn-grey',
 					text: options.labels['Select']
 				});
 
