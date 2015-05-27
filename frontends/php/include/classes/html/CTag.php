@@ -253,6 +253,8 @@ class CTag extends CObject {
 
 	public function setId($id) {
 		$this->setAttribute('id', $id);
+
+		return $this;
 	}
 
 	/**
