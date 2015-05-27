@@ -137,11 +137,6 @@ $ZBX_MENU = [
 				'label' => _('Triggers top 100')
 			],
 			[
-				'url' => 'report6.php',
-				'label' => _('Bar reports'),
-				'sub_pages' => ['popup_period.php', 'popup_bitem.php', 'chart_bar.php']
-			],
-			[
 				'url' => 'auditlogs.php',
 				'label' => _('Audit'),
 				'user_type' => USER_TYPE_ZABBIX_ADMIN

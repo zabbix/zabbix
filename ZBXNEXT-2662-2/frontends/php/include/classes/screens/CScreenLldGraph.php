@@ -165,13 +165,6 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 				$url = 'chart7.php';
 				break;
 
-			case GRAPH_TYPE_BAR:
-			case GRAPH_TYPE_COLUMN:
-			case GRAPH_TYPE_BAR_STACKED:
-			case GRAPH_TYPE_COLUMN_STACKED:
-				$url = 'chart_bar.php';
-				break;
-
 			default:
 				show_error_message(_('Graph prototype not found.'));
 				exit;
