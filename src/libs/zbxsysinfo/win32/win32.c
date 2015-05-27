@@ -53,10 +53,10 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
 
+	{"service.discovery",	CF_HAVEPARAMS,	SERVICE_DISCOVERY,	NULL},
+	{"service.info",	CF_HAVEPARAMS,	SERVICE_INFO,		ZABBIX_SERVICE_NAME},
 	{"service_state",	CF_HAVEPARAMS,	SERVICE_STATE,		ZABBIX_SERVICE_NAME},
 	{"services",		CF_HAVEPARAMS,	SERVICES,		NULL},
-	{"service.info",	CF_HAVEPARAMS,	SERVICE_INFO,		ZABBIX_SERVICE_NAME},
-	{"service.discovery",	CF_HAVEPARAMS,	SERVICE_DISCOVERY,	NULL},
 	{"perf_counter",	CF_HAVEPARAMS,	PERF_COUNTER,		"\\System\\Processes"},
 	{"proc_info",		CF_HAVEPARAMS,	PROC_INFO,		"svchost.exe"},
 
