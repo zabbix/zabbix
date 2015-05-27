@@ -611,13 +611,13 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * Add triggers
+	 * Add triggers.
 	 *
 	 * Trigger params: expression, description, type, priority, status, comments, url, templateid
 	 *
 	 * @param array $triggers
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function create(array $triggers) {
 		$triggers = zbx_toArray($triggers);
@@ -656,7 +656,7 @@ class CTrigger extends CTriggerGeneral {
 	 *
 	 * @param array $triggers
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function update(array $triggers) {
 		$triggers = zbx_toArray($triggers);
@@ -934,7 +934,7 @@ class CTrigger extends CTriggerGeneral {
 	 *
 	 * @param array $triggers   an array of triggers with the 'triggerid' field defined
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function deleteDependencies(array $triggers) {
 		$triggers = zbx_toArray($triggers);
@@ -1034,7 +1034,9 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * @param $triggers
+	 * Updates trigger records in database.
+	 *
+	 * @param array $triggers
 	 */
 	protected function updateReal(array $triggers) {
 		$triggers = zbx_toArray($triggers);

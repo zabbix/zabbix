@@ -386,7 +386,7 @@ class CMacrosResolverGeneral {
 	/**
 	 * Get macros with values.
 	 *
-	 * @param array $data			Macros to resolve (array(hostids => array(hostid), macros => array(macro => null)))
+	 * @param array $data			Macros to resolve ([hostids => [hostid], macros => [macro => null]])
 	 *
 	 * @return array
 	 */
@@ -406,10 +406,10 @@ class CMacrosResolverGeneral {
 			return $data;
 		}
 
-		// hostid => array(templateid)
+		// hostid => [templateid]
 		$hostTemplates = [];
 
-		// hostid => array(macro => value)
+		// hostid => [macro => value]
 		$hostMacros = [];
 
 		do {
@@ -529,8 +529,8 @@ class CMacrosResolverGeneral {
 	 *
 	 * @param array  $hostIds		The sorted list of hosts where macros will be looked for (hostid => hostid)
 	 * @param string $macro			Macro to resolve
-	 * @param array  $hostTemplates	The list of linked templates (hostid => array(templateid))
-	 * @param array  $hostMacros	The list of macros on hosts (hostid => array(macro => value))
+	 * @param array  $hostTemplates	The list of linked templates (hostid => [templateid])
+	 * @param array  $hostMacros	The list of macros on hosts (hostid => [macro => value])
 	 *
 	 * @return array
 	 */
