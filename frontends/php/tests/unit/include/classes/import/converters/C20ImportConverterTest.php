@@ -174,7 +174,11 @@ class C20ImportConverterTest extends CImportConverterTest {
 								],
 								[
 									'status' => ITEM_STATUS_DISABLED,
-									'filter' => [],
+									'filter' => [
+										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+										'formula' => '',
+										'conditions' => []
+									],
 									'item_prototypes' => [],
 									'graph_prototypes' => [],
 									'trigger_prototypes' => [],
@@ -182,7 +186,11 @@ class C20ImportConverterTest extends CImportConverterTest {
 								],
 								[
 									'status' => ITEM_STATUS_ACTIVE,
-									'filter' => [],
+									'filter' => [
+										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+										'formula' => '',
+										'conditions' => []
+									],
 									'item_prototypes' => [],
 									'graph_prototypes' => [],
 									'trigger_prototypes' => [],
@@ -482,7 +490,11 @@ class C20ImportConverterTest extends CImportConverterTest {
 								],
 								[
 									'status' => ITEM_STATUS_DISABLED,
-									'filter' => [],
+									'filter' => [
+										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+										'formula' => '',
+										'conditions' => []
+									],
 									'item_prototypes' => [],
 									'graph_prototypes' => [],
 									'trigger_prototypes' => [],
@@ -490,7 +502,11 @@ class C20ImportConverterTest extends CImportConverterTest {
 								],
 								[
 									'status' => ITEM_STATUS_ACTIVE,
-									'filter' => [],
+									'filter' => [
+										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+										'formula' => '',
+										'conditions' => []
+									],
 									'item_prototypes' => [],
 									'graph_prototypes' => [],
 									'trigger_prototypes' => [],

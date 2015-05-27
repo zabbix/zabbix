@@ -45,7 +45,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestLogin('adm.other.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
-		$this->zbxTestTextPresent(array('OTHER CONFIGURATION PARAMETERS', 'Other parameters'));
+		$this->zbxTestTextPresent(['OTHER CONFIGURATION PARAMETERS', 'Other parameters']);
 		$this->assertAttribute("//input[@id='refresh_unsupported']/@value", $allValues['refresh_unsupported']);
 
 		// checkbox "snmptrap_logging"
@@ -70,7 +70,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestLogin('adm.other.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
-		$this->zbxTestTextPresent(array('OTHER CONFIGURATION PARAMETERS', 'Other parameters'));
+		$this->zbxTestTextPresent(['OTHER CONFIGURATION PARAMETERS', 'Other parameters']);
 
 		$sql = 'SELECT groupid FROM groups';
 		$hgroups = DBfetchArray(DBselect($sql));
@@ -85,7 +85,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestLogin('adm.other.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
-		$this->zbxTestTextPresent(array('OTHER CONFIGURATION PARAMETERS', 'Other parameters'));
+		$this->zbxTestTextPresent(['OTHER CONFIGURATION PARAMETERS', 'Other parameters']);
 
 		$sql = 'SELECT usrgrpid FROM usrgrp';
 		$usrgrp = DBfetchArray(DBselect($sql));
@@ -144,7 +144,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestTextPresent('Other parameters');
 		$this->input_type('refresh_unsupported', '65536');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value "65536" for "Refresh unsupported items (in sec)" field: must be between 0 and 65535.'));
+		$this->zbxTestTextPresent(['ERROR: Page received incorrect data', 'Incorrect value "65536" for "Refresh unsupported items (in sec)" field: must be between 0 and 65535.']);
 	}
 
 }

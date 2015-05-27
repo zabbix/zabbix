@@ -38,7 +38,7 @@ class CButton extends CTag implements CButtonInterface {
 			$this->setAttribute('name', $name);
 		}
 
-		$this->addAction('onclick', $action);
+		$this->onClick($action);
 
 		$this->buttonClass = $buttonClass;
 	}
@@ -60,7 +60,7 @@ class CButton extends CTag implements CButtonInterface {
 			$this->removeAttribute('disabled');
 		}
 		else {
-			$this->attr('disabled', 'disabled');
+			$this->setAttribute('disabled', 'disabled');
 		}
 	}
 

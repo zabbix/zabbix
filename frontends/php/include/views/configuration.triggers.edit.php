@@ -49,18 +49,18 @@ if (!empty($this->data['templates'])) {
 	$triggersFormList->addRow(_('Parent triggers'), $this->data['templates']);
 }
 $nameTextBox = new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $triggersFormList->addRow(_('Name'), $nameTextBox);
 
 // append expression to form list
 $expressionTextBox = new CTextArea(
 	$this->data['expression_field_name'],
 	$this->data['expression_field_value'],
-	array(
+	[
 		'rows' => ZBX_TEXTAREA_STANDARD_ROWS,
 		'width' => ZBX_TEXTAREA_STANDARD_WIDTH,
 		'readonly' => $this->data['expression_field_readonly']
-	)
+	]
 );
 if ($this->data['expression_field_readonly']) {
 	$triggersForm->addVar('expression', $this->data['expression']);
@@ -77,7 +77,7 @@ $addExpressionButton = new CButton(
 if ($this->data['limited']) {
 	$addExpressionButton->setAttribute('disabled', 'disabled');
 }
-$expressionRow = array($expressionTextBox, $addExpressionButton);
+$expressionRow = [$expressionTextBox, $addExpressionButton];
 
 if ($this->data['input_method'] == IM_TREE) {
 	// insert macro button
@@ -127,23 +127,24 @@ elseif ($this->data['input_method'] != IM_FORCED) {
 		'document.getElementById("input_method").value='.(($this->data['input_method'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
 		'document.forms["'.$triggersForm->getName().'"].submit();'
 	);
-	$expressionRow[] = array(BR(), $inputMethodToggle);
+	$expressionRow[] = [BR(), $inputMethodToggle];
 }
 $triggersFormList->addRow(_('Expression'), $expressionRow);
 
 // append expression table to form list
 if ($this->data['input_method'] == IM_TREE) {
-	$expressionTable = new CTable(null, 'formElementTable');
-	$expressionTable->setAttribute('style', 'min-width: 500px;');
-	$expressionTable->setAttribute('id', 'exp_list');
+	$expressionTable = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('style', 'min-width: 500px;')->
+		setAttribute('id', 'exp_list');
 	$expressionTable->setOddRowClass('even_row');
 	$expressionTable->setEvenRowClass('even_row');
-	$expressionTable->setHeader(array(
+	$expressionTable->setHeader([
 		$this->data['limited'] ? null : _('Target'),
 		_('Expression'),
 		_('Error'),
 		$this->data['limited'] ? null : _('Action')
-	));
+	]);
 
 	$allowedTesting = true;
 	if (!empty($this->data['eHTMLTree'])) {
@@ -169,7 +170,7 @@ if ($this->data['input_method'] == IM_TREE) {
 			else {
 				$allowedTesting = false;
 				$errorImg = new CImg('images/general/error2.png', 'expression_errors');
-				$errorTexts = array();
+				$errorTexts = [];
 
 				if (is_array($e['expression']['levelErrors'])) {
 					foreach ($e['expression']['levelErrors'] as $expVal => $errTxt) {
@@ -183,7 +184,7 @@ if ($this->data['input_method'] == IM_TREE) {
 				$errorImg->setHint($errorTexts, 'left');
 			}
 
-			$errorColumn = new CCol($errorImg, 'center');
+			$errorColumn = (new CCol($errorImg))->addClass('center');
 
 			// templated trigger
 			if ($this->data['limited']) {
@@ -197,7 +198,7 @@ if ($this->data['input_method'] == IM_TREE) {
 				}
 			}
 
-			$row = new CRow(array($triggerCheckbox, $e['list'], $errorColumn, isset($deleteUrl) ? $deleteUrl : null));
+			$row = new CRow([$triggerCheckbox, $e['list'], $errorColumn, isset($deleteUrl) ? $deleteUrl : null]);
 			$expressionTable->addRow($row);
 		}
 	}
@@ -218,13 +219,13 @@ if ($this->data['input_method'] == IM_TREE) {
 		$testButton->setAttribute('disabled', 'disabled');
 	}
 
-	$wrapOutline = new CSpan(array($this->data['outline']));
-	$triggersFormList->addRow(SPACE, array(
+	$wrapOutline = new CSpan([$this->data['outline']]);
+	$triggersFormList->addRow(SPACE, [
 		$wrapOutline,
 		BR(),
 		BR(),
-		new CDiv(array($expressionTable, $testButton), 'objectgroup inlineblock border_dotted ui-corner-all')
-	));
+		new CDiv([$expressionTable, $testButton], 'objectgroup inlineblock border_dotted ui-corner-all')
+	]);
 
 	$inputMethodToggle = new CSpan(_('Close expression constructor'), 'link');
 	$inputMethodToggle->setAttribute('onclick', 'javascript: '.
@@ -232,13 +233,13 @@ if ($this->data['input_method'] == IM_TREE) {
 		'document.getElementById("input_method").value='.IM_ESTABLISHED.';'.
 		'document.forms["'.$triggersForm->getName().'"].submit();'
 	);
-	$triggersFormList->addRow(SPACE, array($inputMethodToggle, BR()));
+	$triggersFormList->addRow(SPACE, [$inputMethodToggle, BR()]);
 }
 
 $triggersFormList->addRow(_('Multiple PROBLEM events generation'), new CCheckBox('type', (($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED) ? 'yes' : 'no'), null, 1));
 $triggersFormList->addRow(_('Description'), new CTextArea('comments', $this->data['comments']));
 $triggersFormList->addRow(_('URL'), new CTextBox('url', $this->data['url'], ZBX_TEXTBOX_STANDARD_SIZE));
-$triggersFormList->addRow(_('Severity'), new CSeverity(array('name' => 'priority', 'value' => $this->data['priority'])));
+$triggersFormList->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => $this->data['priority']]));
 
 // append status to form list
 if (empty($this->data['triggerid']) && empty($this->data['form_refresh'])) {
@@ -260,10 +261,11 @@ $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
  * Dependencies tab
  */
 $dependenciesFormList = new CFormList('dependenciesFormList');
-$dependenciesTable = new CTable(_('No dependencies defined.'), 'formElementTable');
-$dependenciesTable->setAttribute('style', 'min-width: 500px;');
-$dependenciesTable->setAttribute('id', 'dependenciesTable');
-$dependenciesTable->setHeader(array(_('Name'), _('Action')));
+$dependenciesTable = (new CTable(_('No dependencies defined.')))->
+	addClass('formElementTable')->
+	setAttribute('style', 'min-width: 500px;')->
+	setAttribute('id', 'dependenciesTable')->
+	setHeader([_('Name'), _('Action')]);
 
 foreach ($this->data['db_dependencies'] as $dependency) {
 	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
@@ -282,10 +284,10 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 		$description = $depTriggerDescription;
 	}
 
-	$row = new CRow(array($description, new CButton('remove', _('Remove'),
+	$row = new CRow([$description, new CButton('remove', _('Remove'),
 		'javascript: removeDependency("'.$dependency['triggerid'].'");',
 		'link_menu'
-	)));
+	)]);
 
 	$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
 	$dependenciesTable->addRow($row);
@@ -294,14 +296,14 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 $dependenciesFormList->addRow(
 	_('Dependencies'),
 	new CDiv(
-		array(
+		[
 			$dependenciesTable,
 			new CButton('bnt1', _('Add'),
 				'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
 					'&with_triggers=1&noempty=1");',
 				'link_menu'
 			)
-		),
+		],
 		'objectgroup inlineblock border_dotted ui-corner-all'
 	)
 );
@@ -309,26 +311,23 @@ $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList
 
 // append buttons to form
 if (!empty($this->data['triggerid'])) {
-	$deleteButton = new CButtonDelete(_('Delete trigger?'),
-		url_params(array('form', 'hostid', 'triggerid'))
-	);
+	$deleteButton = new CButtonDelete(_('Delete trigger?'), url_params(['form', 'hostid', 'triggerid']));
 	if ($this->data['limited']) {
 		$deleteButton->setAttribute('disabled', 'disabled');
 	}
 
 	$triggersTab->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
-		array(
+		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
 			new CButtonCancel(url_param('hostid'))
-		)
+		]
 	));
 }
 else {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('hostid')))
+		[new CButtonCancel(url_param('hostid'))]
 	));
 }
 

@@ -34,18 +34,18 @@ class CXmlImportReaderTest extends PHPUnit_Framework_TestCase {
 		$reader = new CXmlImportReader();
 		$data = $reader->read($xml);
 
-		$this->assertEquals($data, array(
-			'hosts' => array(
-				'host' => array(
+		$this->assertEquals($data, [
+			'hosts' => [
+				'host' => [
 					'host' => 'Zabbix server',
 					'status' => '0',
-				),
-				'host1' => array(
+				],
+				'host1' => [
 					'host' => 'Linux server',
 					'status' => '0',
-				),
-			)
-		));
+				],
+			]
+		]);
 	}
 
 }

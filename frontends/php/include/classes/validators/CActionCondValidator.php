@@ -31,31 +31,31 @@ class CActionCondValidator extends CValidator {
 	public function validate($condition) {
 		// build validators
 		$timePeriodValidator = new CTimePeriodValidator();
-		$discoveryCheckTypeValidator = new CLimitedSetValidator(array(
+		$discoveryCheckTypeValidator = new CLimitedSetValidator([
 			'values' => array_keys(discovery_check_type2str())
-		));
-		$discoveryObjectStatusValidator = new CLimitedSetValidator(array(
+		]);
+		$discoveryObjectStatusValidator = new CLimitedSetValidator([
 			'values' => array_keys(discovery_object_status2str())
-		));
-		$triggerSeverityValidator = new CLimitedSetValidator(array(
-			'values' => array(
+		]);
+		$triggerSeverityValidator = new CLimitedSetValidator([
+			'values' => [
 				TRIGGER_SEVERITY_NOT_CLASSIFIED,
 				TRIGGER_SEVERITY_INFORMATION,
 				TRIGGER_SEVERITY_WARNING,
 				TRIGGER_SEVERITY_AVERAGE,
 				TRIGGER_SEVERITY_HIGH,
 				TRIGGER_SEVERITY_DISASTER
-			)
-		));
-		$discoveryObjectValidator = new CLimitedSetValidator(array(
+			]
+		]);
+		$discoveryObjectValidator = new CLimitedSetValidator([
 			'values' => array_keys(discovery_object2str())
-		));
-		$triggerValueValidator = new CLimitedSetValidator(array(
+		]);
+		$triggerValueValidator = new CLimitedSetValidator([
 			'values' => array_keys(trigger_value2str())
-		));
-		$eventTypeValidator = new CLimitedSetValidator(array(
+		]);
+		$eventTypeValidator = new CLimitedSetValidator([
 			'values' => array_keys(eventType())
-		));
+		]);
 
 		$conditionValue = $condition['value'];
 		// validate condition values depending on condition type

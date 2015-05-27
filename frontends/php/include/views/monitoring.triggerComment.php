@@ -31,10 +31,10 @@ $commentForm->addVar('triggerid', $this->data['triggerid']);
 // create form list
 $commentFormList = new CFormList('commentFormList');
 
-$commentTextArea = new CTextArea('comments', CMacrosResolverHelper::resolveTriggerDescription($this->data['trigger']), array(
+$commentTextArea = new CTextArea('comments', CMacrosResolverHelper::resolveTriggerDescription($this->data['trigger']), [
 	'rows' => 25, 'width' => ZBX_TEXTAREA_BIG_WIDTH, 'readonly' => $this->data['isCommentExist']
-));
-$commentTextArea->attr('autofocus', 'autofocus');
+]);
+$commentTextArea->setAttribute('autofocus', 'autofocus');
 $commentFormList->addRow(_('Description'), $commentTextArea);
 
 // append tabs to form
@@ -45,9 +45,9 @@ $commentTab->addTab('commentTab', _s('Description for "%s".', $this->data['trigg
 $updateButton = new CSubmit('update', _('Update'));
 $updateButton->setEnabled(!$this->data['isCommentExist']);
 
-$buttons = array(
+$buttons = [
 	new CButtonCancel('&triggerid='.$this->data['triggerid'])
-);
+];
 
 if ($this->data['isCommentExist']) {
 	$editButton = new CButton('edit', _('Edit'));

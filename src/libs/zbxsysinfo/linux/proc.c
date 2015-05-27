@@ -206,7 +206,8 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
  *                                                                            *
  * Parameters:                                                                *
  *     f     - [IN] file to read from                                         *
- *     s     - [IN] beginning part of string to search for, e.g. "VmSize:\t"  *
+ *     label - [IN] label to look for, e.g. "VmData:\t"                       *
+ *     guard - [IN] label before which to stop, e.g. "VmStk:\t" (optional)    *
  *     bytes - [OUT] result in bytes                                          *
  *                                                                            *
  * Return value: SUCCEED - successful reading,                                *
@@ -216,21 +217,39 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
  *               FAIL - the search string was found but could not be parsed.  *
  *                                                                            *
  ******************************************************************************/
-static int	byte_value_from_proc_file(FILE *f, const char *s, zbx_uint64_t *bytes)
+int	byte_value_from_proc_file(FILE *f, const char *label, const char *guard, zbx_uint64_t *bytes)
 {
-	char	buf[MAX_STRING_LEN], *p, *p_unit;
-	size_t	sz;
+	char	buf[MAX_STRING_LEN], *p_value, *p_unit;
+	size_t	label_len, guard_len;
+	long	pos = 0;
 	int	ret = NOTSUPPORTED;
 
-	sz = strlen(s);
-	p = buf + sz;
+	label_len = strlen(label);
+	p_value = buf + label_len;
+
+	if (NULL != guard)
+	{
+		guard_len = strlen(guard);
+		pos = ftell(f);
+	}
 
 	while (NULL != fgets(buf, (int)sizeof(buf), f))
 	{
-		if (0 != strncmp(buf, s, sz))
+		if (NULL != guard)
+		{
+			if (0 == strncmp(buf, guard, guard_len))
+			{
+				fseek(f, pos, SEEK_SET);
+				break;
+			}
+
+			pos = ftell(f);
+		}
+
+		if (0 != strncmp(buf, label, label_len))
 			continue;
 
-		if (NULL == (p_unit = strrchr(p, ' ')))
+		if (NULL == (p_unit = strrchr(p_value, ' ')))
 		{
 			ret = FAIL;
 			break;
@@ -238,10 +257,10 @@ static int	byte_value_from_proc_file(FILE *f, const char *s, zbx_uint64_t *bytes
 
 		*p_unit++ = '\0';
 
-		while (' ' == *p)
-			p++;
+		while (' ' == *p_value)
+			p_value++;
 
-		if (FAIL == is_uint64(p, bytes))
+		if (FAIL == is_uint64(p_value, bytes))
 		{
 			ret = FAIL;
 			break;
@@ -272,7 +291,7 @@ static int	get_total_memory(zbx_uint64_t *total_memory)
 
 	if (NULL != (f = fopen("/proc/meminfo", "r")))
 	{
-		ret = byte_value_from_proc_file(f, "MemTotal:", total_memory);
+		ret = byte_value_from_proc_file(f, "MemTotal:", NULL, total_memory);
 		zbx_fclose(f);
 	}
 
@@ -505,17 +524,15 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			case ZBX_VMSTK:
 			case ZBX_VMEXE:
 			case ZBX_VMPTE:
-				if (SUCCEED != (res = byte_value_from_proc_file(f_stat, mem_type_search, &byte_value)))
+				res = byte_value_from_proc_file(f_stat, mem_type_search, NULL, &byte_value);
+
+				if (NOTSUPPORTED == res)
+					continue;
+
+				if (FAIL == res)
 				{
-					if (NOTSUPPORTED == res)
-					{
-						continue;
-					}
-					else	/* FAIL */
-					{
-						invalid_read = 1;
-						goto clean;
-					}
+					invalid_read = 1;
+					goto clean;
 				}
 				break;
 			case ZBX_SIZE:
@@ -527,19 +544,19 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 					mem_type_search = "VmData:\t";
 
-					if (SUCCEED == (res = byte_value_from_proc_file(f_stat, mem_type_search,
+					if (SUCCEED == (res = byte_value_from_proc_file(f_stat, mem_type_search, NULL,
 							&byte_value)))
 					{
 						mem_type_search = "VmStk:\t";
 
 						if (SUCCEED == (res = byte_value_from_proc_file(f_stat, mem_type_search,
-								&m)))
+								NULL, &m)))
 						{
 							byte_value += m;
 							mem_type_search = "VmExe:\t";
 
 							if (SUCCEED == (res = byte_value_from_proc_file(f_stat,
-									mem_type_search, &m)))
+									mem_type_search, NULL, &m)))
 							{
 								byte_value += m;
 							}
@@ -563,23 +580,21 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				}
 				break;
 			case ZBX_PMEM:
-				{
-					mem_type_search = "VmRSS:\t";
-					res = byte_value_from_proc_file(f_stat, mem_type_search, &byte_value);
+				mem_type_search = "VmRSS:\t";
+				res = byte_value_from_proc_file(f_stat, mem_type_search, NULL, &byte_value);
 
-					if (SUCCEED == res)
-					{
-						pct_value = ((double)byte_value / (double)total_memory) * 100.0;
-					}
-					else if (NOTSUPPORTED == res)
-					{
-						continue;
-					}
-					else	/* FAIL */
-					{
-						invalid_read = 1;
-						goto clean;
-					}
+				if (SUCCEED == res)
+				{
+					pct_value = ((double)byte_value / (double)total_memory) * 100.0;
+				}
+				else if (NOTSUPPORTED == res)
+				{
+					continue;
+				}
+				else	/* FAIL */
+				{
+					invalid_read = 1;
+					goto clean;
 				}
 				break;
 		}

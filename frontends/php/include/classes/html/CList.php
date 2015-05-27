@@ -54,7 +54,7 @@ class CList extends CTag {
 	public function addItem($value, $class = null, $id = null) {
 		if (!is_null($value) && $this->emptyList) {
 			$this->emptyList = false;
-			$this->items = array();
+			$this->items = [];
 		}
 
 		if ($value instanceof CListItem) {

@@ -28,21 +28,21 @@ class CEvent extends CApiService {
 
 	protected $tableName = 'events';
 	protected $tableAlias = 'e';
-	protected $sortColumns = array('eventid', 'objectid', 'clock');
+	protected $sortColumns = ['eventid', 'objectid', 'clock'];
 
 	/**
 	 * Array of supported objects where keys are object IDs and values are translated object names.
 	 *
 	 * @var array
 	 */
-	protected $objects = array();
+	protected $objects = [];
 
 	/**
 	 * Array of supported sources where keys are source IDs and values are translated source names.
 	 *
 	 * @var array
 	 */
-	protected $sources = array();
+	protected $sources = [];
 
 	public function __construct() {
 		parent::__construct();
@@ -69,21 +69,21 @@ class CEvent extends CApiService {
 	 *
 	 * @return array|int item data as array or false if error
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sqlParts = array(
-			'select'	=> array($this->fieldId('eventid')),
-			'from'		=> array('events' => 'events e'),
-			'where'		=> array(),
-			'order'		=> array(),
-			'group'		=> array(),
+		$sqlParts = [
+			'select'	=> [$this->fieldId('eventid')],
+			'from'		=> ['events' => 'events e'],
+			'where'		=> [],
+			'order'		=> [],
+			'group'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'objectids'					=> null,
@@ -118,7 +118,7 @@ class CEvent extends CApiService {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		$this->validateGet($options);
@@ -129,11 +129,11 @@ class CEvent extends CApiService {
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
 				// specific triggers
 				if ($options['objectids'] !== null) {
-					$triggers = API::Trigger()->get(array(
-						'output' => array('triggerid'),
+					$triggers = API::Trigger()->get([
+						'output' => ['triggerid'],
 						'triggerids' => $options['objectids'],
 						'editable' => $options['editable']
-					));
+					]);
 					$options['objectids'] = zbx_objectValues($triggers, 'triggerid');
 				}
 				// all triggers
@@ -159,19 +159,19 @@ class CEvent extends CApiService {
 				// specific items or LLD rules
 				if ($options['objectids'] !== null) {
 					if ($options['object'] == EVENT_OBJECT_ITEM) {
-						$items = API::Item()->get(array(
-							'output' => array('itemid'),
+						$items = API::Item()->get([
+							'output' => ['itemid'],
 							'itemids' => $options['objectids'],
 							'editable' => $options['editable']
-						));
+						]);
 						$options['objectids'] = zbx_objectValues($items, 'itemid');
 					}
 					elseif ($options['object'] == EVENT_OBJECT_LLDRULE) {
-						$items = API::DiscoveryRule()->get(array(
-							'output' => array('itemid'),
+						$items = API::DiscoveryRule()->get([
+							'output' => ['itemid'],
 							'itemids' => $options['objectids'],
 							'editable' => $options['editable']
-						));
+						]);
 						$options['objectids'] = zbx_objectValues($items, 'itemid');
 					}
 				}
@@ -202,7 +202,7 @@ class CEvent extends CApiService {
 
 		// objectids
 		if ($options['objectids'] !== null
-				&& in_array($options['object'], array(EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE))) {
+				&& in_array($options['object'], [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE])) {
 
 			zbx_value2array($options['objectids']);
 			$sqlParts['where'][] = dbConditionInt('e.objectid', $options['objectids']);
@@ -335,7 +335,7 @@ class CEvent extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('object', 'objectid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['object', 'objectid'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -356,22 +356,22 @@ class CEvent extends CApiService {
 	 * @return void
 	 */
 	protected function validateGet(array $options) {
-		$sourceValidator = new CLimitedSetValidator(array(
+		$sourceValidator = new CLimitedSetValidator([
 			'values' => array_keys(eventSource())
-		));
+		]);
 		if (!$sourceValidator->validate($options['source'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect source value.'));
 		}
 
-		$objectValidator = new CLimitedSetValidator(array(
+		$objectValidator = new CLimitedSetValidator([
 			'values' => array_keys(eventObject())
-		));
+		]);
 		if (!$objectValidator->validate($options['object'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect object value.'));
 		}
 
 		$sourceObjectValidator = new CEventSourceObjectValidator();
-		if (!$sourceObjectValidator->validate(array('source' => $options['source'], 'object' => $options['object']))) {
+		if (!$sourceObjectValidator->validate(['source' => $options['source'], 'object' => $options['object']])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $sourceObjectValidator->getError());
 		}
 	}
@@ -399,20 +399,20 @@ class CEvent extends CApiService {
 		}
 
 		$time = time();
-		$dataInsert = array();
+		$dataInsert = [];
 
 		foreach ($eventIds as $eventId) {
-			$dataInsert[] = array(
+			$dataInsert[] = [
 				'userid' => self::$userData['userid'],
 				'eventid' => $eventId,
 				'clock' => $time,
 				'message'=> $data['message']
-			);
+			];
 		}
 
 		DB::insert('acknowledges', $dataInsert);
 
-		return array('eventids' => array_values($eventIds));
+		return ['eventids' => array_values($eventIds)];
 	}
 
 	/**
@@ -478,12 +478,12 @@ class CEvent extends CApiService {
 				$relationMap->addRelation($relation['eventid'], $relation['hostid']);
 			}
 
-			$hosts = API::Host()->get(array(
+			$hosts = API::Host()->get([
 				'output' => $options['selectHosts'],
 				'hostids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
@@ -514,19 +514,19 @@ class CEvent extends CApiService {
 					break;
 			}
 
-			$objects = $api->get(array(
+			$objects = $api->get([
 				'output' => $options['selectRelatedObject'],
 				$api->pkOption() => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapOne($result, $objects, 'relatedObject');
 		}
 
 		// adding alerts
 		if ($options['select_alerts'] !== null && $options['select_alerts'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'eventid', 'alertid', 'alerts');
-			$alerts = API::Alert()->get(array(
+			$alerts = API::Alert()->get([
 				'output' => $options['select_alerts'],
 				'selectMediatypes' => API_OUTPUT_EXTEND,
 				'alertids' => $relationMap->getRelatedIds(),
@@ -534,7 +534,7 @@ class CEvent extends CApiService {
 				'preservekeys' => true,
 				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN
-			));
+			]);
 			$result = $relationMap->mapMany($result, $alerts, 'alerts');
 		}
 
@@ -542,17 +542,17 @@ class CEvent extends CApiService {
 		if ($options['select_acknowledges'] !== null) {
 			if ($options['select_acknowledges'] != API_OUTPUT_COUNT) {
 				// create the base query
-				$sqlParts = API::getApiService()->createSelectQueryParts('acknowledges', 'a', array(
+				$sqlParts = API::getApiService()->createSelectQueryParts('acknowledges', 'a', [
 					'output' => $this->outputExtend($options['select_acknowledges'],
-						array('acknowledgeid', 'eventid', 'clock')
+						['acknowledgeid', 'eventid', 'clock']
 					),
-					'filter' => array('eventid' => $eventIds)
-				));
+					'filter' => ['eventid' => $eventIds]
+				]);
 				$sqlParts['order'][] = 'a.clock DESC';
 
 				// if the user data is requested via extended output or specified fields, join the users table
-				$userFields = array('alias', 'name', 'surname');
-				$requestUserData = array();
+				$userFields = ['alias', 'name', 'surname'];
+				$requestUserData = [];
 				foreach ($userFields as $userField) {
 					if ($this->outputIsRequested($userField, $options['select_acknowledges'])) {
 						$requestUserData[] = $userField;
@@ -568,7 +568,7 @@ class CEvent extends CApiService {
 
 				$acknowledges = DBFetchArrayAssoc(DBselect($this->createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
 				$relationMap = $this->createRelationMap($acknowledges, 'eventid', 'acknowledgeid');
-				$acknowledges = $this->unsetExtraFields($acknowledges, array('eventid', 'acknowledgeid', 'clock'),
+				$acknowledges = $this->unsetExtraFields($acknowledges, ['eventid', 'acknowledgeid', 'clock'],
 					$options['select_acknowledges']
 				);
 				$result = $relationMap->mapMany($result, $acknowledges, 'acknowledges');
@@ -605,30 +605,30 @@ class CEvent extends CApiService {
 	 * @return void
 	 */
 	protected function checkCanBeAcknowledged(array $eventIds) {
-		$allowedEvents = $this->get(array(
+		$allowedEvents = $this->get([
 			'eventids' => $eventIds,
-			'output' => array('eventid'),
+			'output' => ['eventid'],
 			'preservekeys' => true
-		));
+		]);
 		foreach ($eventIds as $eventId) {
 			if (!isset($allowedEvents[$eventId])) {
 				// check if an event actually exists but maybe belongs to a different source or object
-				$event = API::getApiService()->select($this->tableName(), array(
-					'output' => array('eventid', 'source', 'object'),
+				$event = API::getApiService()->select($this->tableName(), [
+					'output' => ['eventid', 'source', 'object'],
 					'eventids' => $eventId,
 					'limit' => 1
-				));
+				]);
 				$event = reset($event);
 
 				// if the event exists, check if we have permissions to access it
 				if ($event) {
-					$event = $this->get(array(
-						'output' => array('eventid'),
+					$event = $this->get([
+						'output' => ['eventid'],
 						'eventids' => $event['eventid'],
 						'source' => $event['source'],
 						'object' => $event['object'],
 						'limit' => 1
-					));
+					]);
 				}
 
 				// the event exists, is accessible but belongs to a different object or source

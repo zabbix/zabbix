@@ -26,18 +26,18 @@ require_once dirname(__FILE__).'/../../include/classes/export/writers/CXmlExport
 class class_cxmlexportwriter extends PHPUnit_Framework_TestCase {
 
 	public static function provider() {
-		return array(
-			array(
-				array(
-					'root' => array(
+		return [
+			[
+				[
+					'root' => [
 						'string' => 'string',
 						'null' => null,
 						'empty' => '',
-						'array' => array(
+						'array' => [
 							'string' => 'string'
-						)
-					)
-				),
+						]
+					]
+				],
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
 				"<root>\n".
 				"    <string>string</string>\n".
@@ -47,8 +47,8 @@ class class_cxmlexportwriter extends PHPUnit_Framework_TestCase {
 				"        <string>string</string>\n".
 				"    </array>\n".
 				"</root>\n"
-			)
-		);
+			]
+		];
 	}
 
 	/**
