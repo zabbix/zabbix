@@ -24,7 +24,7 @@ global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT;
 $pageHeader = new CPageHeader($data['page']['title']);
 $pageHeader->addCssInit();
 
-$scripts = array();
+$scripts = [];
 
 $css = ZBX_DEFAULT_THEME;
 if (!empty($DB['DB'])) {

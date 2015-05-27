@@ -37,7 +37,7 @@ class CServicesSlaCalculator {
 		 * - ut_s	- count of uptime starts
 		 * - ut_e	- count of uptime ends
 		 */
-		$data = array();
+		$data = [];
 		foreach ($serviceAlarms as $alarm) {
 			if ($alarm['clock'] >= $periodStart && $alarm['clock'] <= $periodEnd) {
 				$data[$alarm['clock']]['alarm'] = $alarm['value'];
@@ -81,7 +81,7 @@ class CServicesSlaCalculator {
 		}
 
 		if (!isset($data[$periodEnd])) {
-			$data[$periodEnd] = array();
+			$data[$periodEnd] = [];
 		}
 
 		// sort by time stamp
@@ -90,10 +90,10 @@ class CServicesSlaCalculator {
 		// calculate times
 		$dtCnt = 0;
 		$utCnt = 0;
-		$slaTime = array(
-			'dt' => array('problemTime' => 0, 'okTime' => 0),
-			'ut' => array('problemTime' => 0, 'okTime' => 0)
-		);
+		$slaTime = [
+			'dt' => ['problemTime' => 0, 'okTime' => 0],
+			'ut' => ['problemTime' => 0, 'okTime' => 0]
+		];
 		$prevTime = $periodStart;
 
 		if (isset($data[$periodStart]['ut_s'])) {

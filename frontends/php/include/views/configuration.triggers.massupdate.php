@@ -44,27 +44,25 @@ foreach ($data['g_triggerid'] as $triggerid) {
 $triggersFormList = new CFormList('triggersFormList');
 
 // append severity to form list
-$severityDiv = new CSeverity(array(
+$severityDiv = new CSeverity([
 	'id' => 'priority_div',
 	'name' => 'priority',
 	'value' => $data['priority']
-));
+]);
 
 $triggersFormList->addRow(
-	array(_('Severity'), SPACE,
+	[_('Severity'), SPACE,
 		new CVisibilityBox('visible[priority]', isset($data['visible']['priority']), 'priority_div', _('Original')),
-	),
+	],
 	$severityDiv
 );
 
 // append dependencies to form list
-$dependenciesTable = new CTable(_('No dependencies defined.'), 'formElementTable');
-$dependenciesTable->setAttribute('style', 'min-width: 500px;');
-$dependenciesTable->setAttribute('id', 'dependenciesTable');
-$dependenciesTable->setHeader(array(
-	_('Name'),
-	_('Action')
-));
+$dependenciesTable = (new CTable(_('No dependencies defined.')))->
+	addClass('formElementTable')->
+	setAttribute('style', 'min-width: 500px;')->
+	setAttribute('id', 'dependenciesTable')->
+	setHeader([_('Name'), _('Action')]);
 
 foreach ($data['dependencies'] as $dependency) {
 	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
@@ -83,17 +81,17 @@ foreach ($data['dependencies'] as $dependency) {
 		$description = $depTriggerDescription;
 	}
 
-	$row = new CRow(array($description, new CButton('remove', _('Remove'),
+	$row = new CRow([$description, new CButton('remove', _('Remove'),
 		'javascript: removeDependency(\''.$dependency['triggerid'].'\');',
 		'link_menu'
-	)));
+	)]);
 
 	$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
 	$dependenciesTable->addRow($row);
 }
 
 $dependenciesDiv = new CDiv(
-	array(
+	[
 		$dependenciesTable,
 		new CButton('btn1', _('Add'),
 			'return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
@@ -101,17 +99,17 @@ $dependenciesDiv = new CDiv(
 				'&with_triggers=1&noempty=1");',
 			'link_menu'
 		)
-	),
+	],
 	'objectgroup inlineblock border_dotted ui-corner-all'
 );
 $dependenciesDiv->setAttribute('id', 'dependencies_div');
 
 $triggersFormList->addRow(
-	array(_('Replace dependencies'), SPACE,
+	[_('Replace dependencies'), SPACE,
 		new CVisibilityBox('visible[dependencies]', isset($data['visible']['dependencies']), 'dependencies_div',
 			_('Original')
 		)
-	),
+	],
 	$dependenciesDiv
 );
 
@@ -121,7 +119,7 @@ $triggersTab->addTab('triggersTab', _('Mass update'), $triggersFormList);
 // append buttons to form
 $triggersTab->setFooter(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
-	array(new CButtonCancel(url_param('hostid')))
+	[new CButtonCancel(url_param('hostid'))]
 ));
 
 // append tabs to form

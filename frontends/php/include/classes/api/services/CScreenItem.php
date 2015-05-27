@@ -34,7 +34,7 @@ class CScreenItem extends CApiService {
 	 *
 	 * @var array
 	 */
-	protected static $resourceTypes = array(
+	protected static $resourceTypes = [
 		SCREEN_RESOURCE_GRAPH,
 		SCREEN_RESOURCE_SIMPLE_GRAPH,
 		SCREEN_RESOURCE_MAP,
@@ -54,17 +54,17 @@ class CScreenItem extends CApiService {
 		SCREEN_RESOURCE_HOST_TRIGGERS,
 		SCREEN_RESOURCE_LLD_GRAPH,
 		SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
-	);
+	];
 
-	protected $sortColumns = array(
+	protected $sortColumns = [
 		'screenitemid',
 		'screenid'
-	);
+	];
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->getOptions = zbx_array_merge($this->getOptions, array(
+		$this->getOptions = zbx_array_merge($this->getOptions, [
 			'screenitemids'	=> null,
 			'screenids'		=> null,
 			'editable'		=> null,
@@ -72,7 +72,7 @@ class CScreenItem extends CApiService {
 			'sortorder'		=> '',
 			'preservekeys'	=> null,
 			'countOutput'	=> null
-		));
+		]);
 	}
 
 	/**
@@ -86,7 +86,7 @@ class CScreenItem extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function get(array $options = array()) {
+	public function get(array $options = []) {
 		$options = zbx_array_merge($this->getOptions, $options);
 
 		// build and execute query
@@ -94,7 +94,7 @@ class CScreenItem extends CApiService {
 		$res = DBselect($sql, $options['limit']);
 
 		// fetch results
-		$result = array();
+		$result = [];
 		while ($row = DBfetch($res)) {
 			// count query, return a single result
 			if ($options['countOutput'] !== null) {
@@ -128,7 +128,7 @@ class CScreenItem extends CApiService {
 
 		$screenItemIds = DB::insert($this->tableName(), $screenItems);
 
-		return array('screenitemids' => $screenItemIds);
+		return ['screenitemids' => $screenItemIds];
 	}
 
 	/**
@@ -139,10 +139,10 @@ class CScreenItem extends CApiService {
 	 * @param array $screenItems
 	 */
 	protected function validateCreate(array $screenItems) {
-		$screenItemDBfields = array(
+		$screenItemDBfields = [
 			'screenid' => null,
 			'resourcetype' => null
-		);
+		];
 
 		foreach ($screenItems as &$screenItem) {
 			if (!check_db_fields($screenItemDBfields, $screenItem)) {
@@ -155,32 +155,32 @@ class CScreenItem extends CApiService {
 
 		$screenIds = array_keys(array_flip(zbx_objectValues($screenItems, 'screenid')));
 
-		$dbScreens = API::Screen()->get(array(
-			'output' => array('screenid', 'hsize', 'vsize', 'name'),
+		$dbScreens = API::Screen()->get([
+			'output' => ['screenid', 'hsize', 'vsize', 'name'],
 			'screenids' => $screenIds,
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
 		if (count($dbScreens) < count($screenIds)) {
-			$dbTemplateScreens = API::TemplateScreen()->get(array(
-				'output' => array('screenid', 'hsize', 'vsize', 'name'),
+			$dbTemplateScreens = API::TemplateScreen()->get([
+				'output' => ['screenid', 'hsize', 'vsize', 'name'],
 				'screenids' => $screenIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			if ($dbTemplateScreens) {
 				$dbScreens = zbx_array_merge($dbScreens, $dbTemplateScreens);
 			}
 		}
 
-		$dbScreenItems = $this->get(array(
-			'output' => array('screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan'),
+		$dbScreenItems = $this->get([
+			'output' => ['screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan'],
 			'screenids' => $screenIds,
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
 		$this->checkInput($screenItems, $dbScreenItems);
 		$this->checkDuplicateResourceInCell($screenItems, $dbScreenItems, $dbScreens);
@@ -206,8 +206,8 @@ class CScreenItem extends CApiService {
 
 		$screenItems = zbx_toHash($screenItems, 'screenitemid');
 
-		$update = array();
-		$screenItemIds = array();
+		$update = [];
+		$screenItemIds = [];
 
 		foreach ($screenItems as $screenItem) {
 			$screenItemId = $screenItem['screenitemid'];
@@ -234,17 +234,17 @@ class CScreenItem extends CApiService {
 				}
 			}
 
-			$update[] = array(
+			$update[] = [
 				'values' => $screenItem,
-				'where' => array('screenitemid' => $screenItemId)
-			);
+				'where' => ['screenitemid' => $screenItemId]
+			];
 
 			$screenItemIds[] = $screenItemId;
 		}
 
 		DB::update($this->tableName(), $update);
 
-		return array('screenitemids' => $screenItemIds);
+		return ['screenitemids' => $screenItemIds];
 	}
 
 	/**
@@ -255,9 +255,9 @@ class CScreenItem extends CApiService {
 	 * @param array $screenItems
 	 */
 	protected function validateUpdate(array $screenItems) {
-		$screenItemDBfields = array(
+		$screenItemDBfields = [
 			'screenitemid' => null
-		);
+		];
 
 		foreach ($screenItems as $screenItem) {
 			if (!check_db_fields($screenItemDBfields, $screenItem)) {
@@ -268,34 +268,34 @@ class CScreenItem extends CApiService {
 		$screenItems = zbx_toHash($screenItems, 'screenitemid');
 		$screenItemIds = array_keys($screenItems);
 
-		$dbScreens = API::Screen()->get(array(
-			'output' => array('screenid', 'hsize', 'vsize', 'name'),
+		$dbScreens = API::Screen()->get([
+			'output' => ['screenid', 'hsize', 'vsize', 'name'],
 			'screenitemids' => $screenItemIds,
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
-		$dbTemplateScreens = API::TemplateScreen()->get(array(
-			'output' => array('screenid', 'hsize', 'vsize', 'name'),
+		$dbTemplateScreens = API::TemplateScreen()->get([
+			'output' => ['screenid', 'hsize', 'vsize', 'name'],
 			'screenitemids' => $screenItemIds,
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
 		if ($dbTemplateScreens) {
 			$dbScreens = zbx_array_merge($dbScreens, $dbTemplateScreens);
 		}
 
-		$dbScreenItems = $this->get(array(
-			'output' => array('screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan', 'resourcetype', 'resourceid',
-				'style'),
+		$dbScreenItems = $this->get([
+			'output' => ['screenitemid', 'screenid', 'x', 'y', 'rowspan', 'colspan', 'resourcetype', 'resourceid',
+				'style'],
 			'screenitemids' => $screenItemIds,
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
 		$screenItems = $this->extendObjects($this->tableName(), $screenItems,
-			array('screenid', 'x', 'y', 'rowspan', 'colspan', 'style')
+			['screenid', 'x', 'y', 'rowspan', 'colspan', 'style']
 		);
 
 		$this->checkInput($screenItems, $dbScreenItems);
@@ -317,11 +317,11 @@ class CScreenItem extends CApiService {
 	 * @return array
 	 */
 	public function updateByPosition(array $screenItems) {
-		$screenItemDBfields = array(
+		$screenItemDBfields = [
 			'screenid' => null,
 			'x' => null,
 			'y' => null
-		);
+		];
 
 		foreach ($screenItems as $screenItem) {
 			if (!check_db_fields($screenItemDBfields, $screenItem)) {
@@ -329,14 +329,14 @@ class CScreenItem extends CApiService {
 			}
 		}
 
-		$dbScreenItems = $this->get(array(
-			'output' => array('screenitemid', 'screenid', 'x', 'y'),
+		$dbScreenItems = $this->get([
+			'output' => ['screenitemid', 'screenid', 'x', 'y'],
 			'screenids' => zbx_objectValues($screenItems, 'screenid'),
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
-		$create = $update = $affectedIds = array();
+		$create = $update = $affectedIds = [];
 
 		foreach ($screenItems as $screenItem) {
 			foreach ($dbScreenItems as $dbScreenItem) {
@@ -364,7 +364,7 @@ class CScreenItem extends CApiService {
 			$affectedIds = array_merge($affectedIds, $screenItems['screenitemids']);
 		}
 
-		return array('screenitemids' => $affectedIds);
+		return ['screenitemids' => $affectedIds];
 	}
 
 	/**
@@ -376,11 +376,11 @@ class CScreenItem extends CApiService {
 	 */
 	public function delete(array $screenItemIds) {
 		// check permissions
-		$dbScreenItems = $this->get(array(
-			'output' => array('screenitemid'),
+		$dbScreenItems = $this->get([
+			'output' => ['screenitemid'],
 			'screenitemids' => $screenItemIds,
 			'preservekeys' => true
-		));
+		]);
 
 		foreach ($screenItemIds as $screenItemId) {
 			if (!isset($dbScreenItems[$screenItemId])) {
@@ -389,11 +389,11 @@ class CScreenItem extends CApiService {
 		}
 
 		// delete screen items
-		DB::delete($this->tableName(), array(
+		DB::delete($this->tableName(), [
 			'screenitemid' => $screenItemIds
-		));
+		]);
 
-		return array('screenitemids' => $screenItemIds);
+		return ['screenitemids' => $screenItemIds];
 	}
 
 	/**
@@ -413,10 +413,10 @@ class CScreenItem extends CApiService {
 
 		$screenItemIds = array_unique($screenItemIds);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'screenitemids' => $screenItemIds,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($screenItemIds) == $count);
 	}
@@ -438,11 +438,11 @@ class CScreenItem extends CApiService {
 
 		$screenItemIds = array_unique($screenItemIds);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'screenitemids' => $screenItemIds,
 			'editable' => true,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($screenItemIds) == $count);
 	}
@@ -459,25 +459,25 @@ class CScreenItem extends CApiService {
 	 * @param array $screenItems
 	 * @param array $dbScreenItems
 	 */
-	protected function checkInput(array $screenItems, array $dbScreenItems = array()) {
-		$hostGroupsIds = array();
-		$hostIds = array();
-		$graphIds = array();
-		$itemIds = array();
-		$mapIds = array();
-		$screenIds = array();
-		$itemPrototypeIds = array();
-		$graphPrototypeIds = array();
+	protected function checkInput(array $screenItems, array $dbScreenItems = []) {
+		$hostGroupsIds = [];
+		$hostIds = [];
+		$graphIds = [];
+		$itemIds = [];
+		$mapIds = [];
+		$screenIds = [];
+		$itemPrototypeIds = [];
+		$graphPrototypeIds = [];
 
-		$screenItems = $this->extendFromObjects($screenItems, $dbScreenItems, array('resourcetype'));
+		$screenItems = $this->extendFromObjects($screenItems, $dbScreenItems, ['resourcetype']);
 
-		$validStyles = array(
-			SCREEN_RESOURCE_CLOCK => array(TIME_TYPE_LOCAL, TIME_TYPE_SERVER, TIME_TYPE_HOST),
-			SCREEN_RESOURCE_DATA_OVERVIEW => array(STYLE_TOP, STYLE_LEFT),
-			SCREEN_RESOURCE_TRIGGERS_OVERVIEW => array(STYLE_TOP, STYLE_LEFT),
-			SCREEN_RESOURCE_HOSTS_INFO => array(STYLE_VERTICAL, STYLE_HORIZONTAL),
-			SCREEN_RESOURCE_TRIGGERS_INFO => array(STYLE_VERTICAL, STYLE_HORIZONTAL)
-		);
+		$validStyles = [
+			SCREEN_RESOURCE_CLOCK => [TIME_TYPE_LOCAL, TIME_TYPE_SERVER, TIME_TYPE_HOST],
+			SCREEN_RESOURCE_DATA_OVERVIEW => [STYLE_TOP, STYLE_LEFT],
+			SCREEN_RESOURCE_TRIGGERS_OVERVIEW => [STYLE_TOP, STYLE_LEFT],
+			SCREEN_RESOURCE_HOSTS_INFO => [STYLE_VERTICAL, STYLE_HORIZONTAL],
+			SCREEN_RESOURCE_TRIGGERS_INFO => [STYLE_VERTICAL, STYLE_HORIZONTAL]
+		];
 
 		foreach ($screenItems as $screenItem) {
 			// check permissions
@@ -500,7 +500,7 @@ class CScreenItem extends CApiService {
 				case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
 				case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 				case SCREEN_RESOURCE_DATA_OVERVIEW:
-					$overviewResources = array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW);
+					$overviewResources = [SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW];
 					if (in_array($screenItem['resourcetype'], $overviewResources)) {
 						if (!$screenItem['resourceid']) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _(
@@ -627,7 +627,7 @@ class CScreenItem extends CApiService {
 			// is set and valid for create method, and is valid for update method, if set
 			$dbScreenItem = isset($screenItem['screenitemid']) ? $dbScreenItems[$screenItem['screenitemid']] : null;
 
-			$lldResources = array(SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH);
+			$lldResources = [SCREEN_RESOURCE_LLD_GRAPH, SCREEN_RESOURCE_LLD_SIMPLE_GRAPH];
 			if (in_array($screenItem['resourcetype'], $lldResources)) {
 				$set = isset($screenItem['max_columns']);
 				$valid = ($set && $this->isValidMaxColumns($screenItem['max_columns']));
@@ -646,12 +646,12 @@ class CScreenItem extends CApiService {
 
 		// check host groups
 		if ($hostGroupsIds) {
-			$dbHostGroups = API::HostGroup()->get(array(
-				'output' => array('groupid'),
+			$dbHostGroups = API::HostGroup()->get([
+				'output' => ['groupid'],
 				'groupids' => $hostGroupsIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			foreach ($hostGroupsIds as $hostGroupsId) {
 				if (!isset($dbHostGroups[$hostGroupsId])) {
@@ -664,12 +664,12 @@ class CScreenItem extends CApiService {
 
 		// check hosts
 		if ($hostIds) {
-			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid'),
+			$dbHosts = API::Host()->get([
+				'output' => ['hostid'],
 				'hostids' => $hostIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			foreach ($hostIds as $hostId) {
 				if (!isset($dbHosts[$hostId])) {
@@ -682,12 +682,12 @@ class CScreenItem extends CApiService {
 
 		// check graphs
 		if ($graphIds) {
-			$dbGraphs = API::Graph()->get(array(
-				'output' => array('graphid'),
+			$dbGraphs = API::Graph()->get([
+				'output' => ['graphid'],
 				'graphids' => $graphIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			foreach ($graphIds as $graphId) {
 				if (!isset($dbGraphs[$graphId])) {
@@ -700,12 +700,12 @@ class CScreenItem extends CApiService {
 
 		// check graph prototypes
 		if ($graphPrototypeIds) {
-			$dbGraphPrototypes = API::GraphPrototype()->get(array(
-				'output' => array('graphid'),
+			$dbGraphPrototypes = API::GraphPrototype()->get([
+				'output' => ['graphid'],
 				'graphids' => $graphPrototypeIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			foreach ($graphPrototypeIds as $graphPrototypeId) {
 				if (!isset($dbGraphPrototypes[$graphPrototypeId])) {
@@ -718,13 +718,13 @@ class CScreenItem extends CApiService {
 
 		// check items
 		if ($itemIds) {
-			$dbItems = API::Item()->get(array(
-				'output' => array('itemid'),
+			$dbItems = API::Item()->get([
+				'output' => ['itemid'],
 				'itemids' => $itemIds,
 				'editable' => true,
 				'preservekeys' => true,
 				'webitems' => true
-			));
+			]);
 
 			foreach ($itemIds as $itemId) {
 				if (!isset($dbItems[$itemId])) {
@@ -737,12 +737,12 @@ class CScreenItem extends CApiService {
 
 		// check item prototypes
 		if ($itemPrototypeIds) {
-			$dbItemPrototypes = API::ItemPrototype()->get(array(
-				'output' => array('itemid'),
+			$dbItemPrototypes = API::ItemPrototype()->get([
+				'output' => ['itemid'],
 				'itemids' => $itemPrototypeIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			foreach ($itemPrototypeIds as $itemPrototypeId) {
 				if (!isset($dbItemPrototypes[$itemPrototypeId])) {
@@ -755,12 +755,12 @@ class CScreenItem extends CApiService {
 
 		// check maps
 		if ($mapIds) {
-			$dbMaps = API::Map()->get(array(
-				'output' => array('sysmapid'),
+			$dbMaps = API::Map()->get([
+				'output' => ['sysmapid'],
 				'sysmapids' => $mapIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			foreach ($mapIds as $mapId) {
 				if (!isset($dbMaps[$mapId])) {
@@ -773,20 +773,20 @@ class CScreenItem extends CApiService {
 
 		// check screens
 		if ($screenIds) {
-			$dbScreens = API::Screen()->get(array(
-				'output' => array('screenid'),
+			$dbScreens = API::Screen()->get([
+				'output' => ['screenid'],
 				'screenids' => $screenIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			if (count($dbScreens) < count($screenIds)) {
-				$dbTemplateScreens = API::TemplateScreen()->get(array(
-					'output' => array('screenid'),
+				$dbTemplateScreens = API::TemplateScreen()->get([
+					'output' => ['screenid'],
 					'screenids' => $screenIds,
 					'editable' => true,
 					'preservekeys' => true
-				));
+				]);
 
 				if ($dbTemplateScreens) {
 					$dbScreens = zbx_array_merge($dbScreens, $dbTemplateScreens);

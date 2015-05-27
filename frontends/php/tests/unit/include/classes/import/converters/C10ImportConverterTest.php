@@ -23,335 +23,335 @@ class C10ImportConverterTest extends CImportConverterTest {
 
 	public function testTemplateSeparation() {
 		$this->assertConvert(
-			$this->createExpectedResult(array()),
+			$this->createExpectedResult([]),
 			$this->createSource()
 		);
 		$this->assertConvert(
-			$this->createExpectedResult(array('hosts' => '')),
-			$this->createSource(array('hosts' => ''))
+			$this->createExpectedResult(['hosts' => '']),
+			$this->createSource(['hosts' => ''])
 		);
 
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[
 					'name' => 'Template 1',
-				),
-				array(
+				],
+				[
 					'name' => 'Template 2',
 					'status' => HOST_STATUS_TEMPLATE
-				),
-				array(
+				],
+				[
 					'name' => 'Host 1',
 					'status' => HOST_STATUS_NOT_MONITORED
-				),
-				array(
+				],
+				[
 					'name' => 'Host 2',
 					'status' => HOST_STATUS_MONITORED
-				),
-			),
-		));
+				],
+			],
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'hosts' => array(
-				array(
+		$expectedResult = $this->createExpectedResult([
+			'hosts' => [
+				[
 					'host' => 'Host 1',
 					'status' => HOST_STATUS_NOT_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					)
-				),
-				array(
+					]
+				],
+				[
 					'host' => 'Host 2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					)
-				),
-			),
-			'templates' => array(
-				array(
+					]
+				],
+			],
+			'templates' => [
+				[
 					'template' => 'Template 1',
-				),
-				array(
+				],
+				[
 					'template' => 'Template 2'
-				),
-			)
-		));
+				],
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 	}
 
 	public function testConvertGroups() {
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED
-				),
-				array(
+				],
+				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'groups' => array(
+					'groups' => [
 						'Zabbix server',
 						'Linux server',
-					),
-				),
-				array(
+					],
+				],
+				[
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'groups' => array(
+					'groups' => [
 						'Zabbix server',
 						'My group',
-					),
-				),
-				array(
+					],
+				],
+				[
 					'name' => 'template',
 					'status' => HOST_STATUS_TEMPLATE,
-					'groups' => array(
+					'groups' => [
 						'Templates',
-					),
-				),
-			),
-		));
+					],
+				],
+			],
+		]);
 
-		$result = $this->createExpectedResult(array(
-			'groups' => array(
-				array(
+		$result = $this->createExpectedResult([
+			'groups' => [
+				[
 					'name' => 'Zabbix server'
-				),
-				array(
+				],
+				[
 					'name' => 'Linux server'
-				),
-				array(
+				],
+				[
 					'name' => 'My group'
-				),
-				array(
+				],
+				[
 					'name' => 'Templates'
-				),
-			),
-			'hosts' => array(
-				array(
+				],
+			],
+			'hosts' => [
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					)
-				),
-				array(
+					]
+				],
+				[
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-					'groups' => array(
-						array(
+					],
+					'groups' => [
+						[
 							'name' => 'Zabbix server'
-						),
-						array(
+						],
+						[
 							'name' => 'Linux server'
-						),
-					),
-				),
-				array(
+						],
+					],
+				],
+				[
 					'host' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-					'groups' => array(
-						array(
+					],
+					'groups' => [
+						[
 							'name' => 'Zabbix server'
-						),
-						array(
+						],
+						[
 							'name' => 'My group'
-						),
-					),
-				),
-			),
-			'templates' => array(
-				array(
+						],
+					],
+				],
+			],
+			'templates' => [
+				[
 					'template' => 'template',
-					'groups' => array(
-						array(
+					'groups' => [
+						[
 							'name' => 'Templates'
-						)
-					)
-				)
-			)
-		));
+						]
+					]
+				]
+			]
+		]);
 
 		$this->assertConvert($result, $source);
 	}
 
 	public function testConvertHosts() {
 		$this->assertConvert(
-			$this->createExpectedResult(array()),
+			$this->createExpectedResult([]),
 			$this->createSource()
 		);
 		$this->assertConvert(
-			$this->createExpectedResult(array('hosts' => '')),
-			$this->createSource(array('hosts' => ''))
+			$this->createExpectedResult(['hosts' => '']),
+			$this->createSource(['hosts' => ''])
 		);
 
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-				),
-				array(
+				],
+				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-				),
-			)
-		));
-		$result = $this->createExpectedResult(array(
-			'hosts' => array(
-				array(
+				],
+			]
+		]);
+		$result = $this->createExpectedResult([
+			'hosts' => [
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					)
-				),
-				array(
+					]
+				],
+				[
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					)
-				),
-			)
-		));
+					]
+				],
+			]
+		]);
 		$this->assertConvert($result, $source);
 	}
 
 	public function testConvertHostInterfaces() {
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-				),
+				],
 				// host with an agent interface
-				array(
+				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'useip' => 1,
 					'ip' => '127.0.0.1',
 					'dns' => 'http://zabbix.com',
 					'port' => '123',
-					'items' => array(
-						array(
+					'items' => [
+						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_ZABBIX,
-						),
-						array(
+						],
+						[
 							'key' => 'item2',
 							'type' => ITEM_TYPE_SIMPLE,
-						)
-					)
-				),
+						]
+					]
+				],
 				// missing interface data
-				array(
+				[
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
 					'useip' => 1,
 					'ip' => '127.0.0.1',
-				),
+				],
 				// host with an IPMI interface
-				array(
+				[
 					'name' => 'host4',
 					'status' => HOST_STATUS_MONITORED,
 					'ip' => '127.0.0.1',
 					'ipmi_ip' => '127.0.0.2',
 					'ipmi_port' => '123',
-					'items' => array(
+					'items' => [
 						// an IPMI item to test
-						array(
+						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_IPMI,
-						)
-					)
-				),
+						]
+					]
+				],
 				// host with an IPMI interface, fallback to "ip"
-				array(
+				[
 					'name' => 'host5',
 					'status' => HOST_STATUS_MONITORED,
 					'ip' => '127.0.0.1',
 					'ipmi_port' => '123',
-					'items' => array(
+					'items' => [
 						// an IPMI item to test
-						array(
+						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_IPMI,
-						)
-					)
-				),
+						]
+					]
+				],
 				// host with SNMP interfaces
-				array(
+				[
 					'name' => 'host6',
 					'status' => HOST_STATUS_MONITORED,
 					'useip' => 1,
 					'ip' => '127.0.0.1',
 					'dns' => 'http://zabbix.com',
-					'items' => array(
-						array(
+					'items' => [
+						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_SNMPV1,
 							'snmp_port' => '1'
-						),
-						array(
+						],
+						[
 							'key' => 'item2',
 							'type' => ITEM_TYPE_SNMPV2C,
 							'snmp_port' => '2'
-						),
-						array(
+						],
+						[
 							'key' => 'item3',
 							'type' => ITEM_TYPE_SNMPV3,
 							'snmp_port' => '3'
-						),
-						array(
+						],
+						[
 							'key' => 'item4',
 							'type' => ITEM_TYPE_SNMPV1,
 							'snmp_port' => '1'
-						),
-						array(
+						],
+						[
 							'key' => 'item5',
 							'type' => ITEM_TYPE_SNMPV3,
-						),
-					)
-				),
+						],
+					]
+				],
 				// missing item type
-				array(
+				[
 					'name' => 'host7',
 					'status' => HOST_STATUS_MONITORED,
-					'items' => array(
-						array(
+					'items' => [
+						[
 							'key' => 'item1',
-						)
-					)
-				)
-			)
-		));
-		$expectedResult = $this->createExpectedResult(array(
-			'hosts' => array(
-				array(
+						]
+					]
+				]
+			]
+		]);
+		$expectedResult = $this->createExpectedResult([
+			'hosts' => [
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					)
-				),
+					]
+				],
 				// host with an agent interface
-				array(
+				[
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-					'interfaces' => array(
-						array(
+					],
+					'interfaces' => [
+						[
 							'type' => INTERFACE_TYPE_AGENT,
 							'useip' => 1,
 							'ip' => '127.0.0.1',
@@ -359,38 +359,38 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'port' => '123',
 							'default' => INTERFACE_PRIMARY,
 							'interface_ref' => 'if0'
-						)
-					),
-					'items' => array(
-						array(
+						]
+					],
+					'items' => [
+						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_ZABBIX,
 							'interface_ref' => 'if0'
-						),
-						array(
+						],
+						[
 							'key' => 'item2',
 							'type' => ITEM_TYPE_SIMPLE,
 							'interface_ref' => 'if0'
-						)
-					)
-				),
+						]
+					]
+				],
 				// missing interface data
-				array(
+				[
 					'host' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
+					],
+				],
 				// host with an IPMI interface
-				array(
+				[
 					'host' => 'host4',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-					'interfaces' => array(
-						array(
+					],
+					'interfaces' => [
+						[
 							'type' => INTERFACE_TYPE_IPMI,
 							'useip' => 1,
 							'ip' => '127.0.0.2',
@@ -398,25 +398,25 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'port' => '123',
 							'default' => INTERFACE_PRIMARY,
 							'interface_ref' => 'if0'
-						),
-					),
-					'items' => array(
-						array(
+						],
+					],
+					'items' => [
+						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_IPMI,
 							'interface_ref' => 'if0'
-						)
-					)
-				),
+						]
+					]
+				],
 				// host with an IPMI interface, fallback to "ip"
-				array(
+				[
 					'host' => 'host5',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-					'interfaces' => array(
-						array(
+					],
+					'interfaces' => [
+						[
 							'type' => INTERFACE_TYPE_IPMI,
 							'useip' => 1,
 							'ip' => '127.0.0.1',
@@ -424,25 +424,25 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'port' => '123',
 							'default' => INTERFACE_PRIMARY,
 							'interface_ref' => 'if0'
-						),
-					),
-					'items' => array(
-						array(
+						],
+					],
+					'items' => [
+						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_IPMI,
 							'interface_ref' => 'if0'
-						)
-					)
-				),
+						]
+					]
+				],
 				// host with SNMP interfaces
-				array(
+				[
 					'host' => 'host6',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-					'interfaces' => array(
-						array(
+					],
+					'interfaces' => [
+						[
 							'type' => INTERFACE_TYPE_SNMP,
 							'useip' => 1,
 							'ip' => '127.0.0.1',
@@ -450,8 +450,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'port' => '1',
 							'default' => INTERFACE_PRIMARY,
 							'interface_ref' => 'if0'
-						),
-						array(
+						],
+						[
 							'type' => INTERFACE_TYPE_SNMP,
 							'useip' => 1,
 							'ip' => '127.0.0.1',
@@ -459,8 +459,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'port' => '2',
 							'default' => INTERFACE_SECONDARY,
 							'interface_ref' => 'if1'
-						),
-						array(
+						],
+						[
 							'type' => INTERFACE_TYPE_SNMP,
 							'useip' => 1,
 							'ip' => '127.0.0.1',
@@ -468,75 +468,75 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'port' => '3',
 							'default' => INTERFACE_SECONDARY,
 							'interface_ref' => 'if2'
-						),
-					),
-					'items' => array(
-						array(
+						],
+					],
+					'items' => [
+						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_SNMPV1,
 							'snmp_port' => '1',
 							'interface_ref' => 'if0'
-						),
-						array(
+						],
+						[
 							'key' => 'item2',
 							'type' => ITEM_TYPE_SNMPV2C,
 							'snmp_port' => '2',
 							'interface_ref' => 'if1'
-						),
-						array(
+						],
+						[
 							'key' => 'item3',
 							'type' => ITEM_TYPE_SNMPV3,
 							'snmp_port' => '3',
 							'interface_ref' => 'if2'
-						),
-						array(
+						],
+						[
 							'key' => 'item4',
 							'type' => ITEM_TYPE_SNMPV1,
 							'snmp_port' => '1',
 							'interface_ref' => 'if0'
-						),
-						array(
+						],
+						[
 							'key' => 'item5',
 							'type' => ITEM_TYPE_SNMPV3,
-						),
-					)
-				),
+						],
+					]
+				],
 				// missing item type
-				array(
+				[
 					'host' => 'host7',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-					'items' => array(
-						array(
+					],
+					'items' => [
+						[
 							'key' => 'item1',
-						)
-					)
-				)
-			)
-		));
+						]
+					]
+				]
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 	}
 
 	public function testConvertHostProfiles() {
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-				),
-				array(
+				],
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'host_profile' => '',
 					'host_profiles_ext' => '',
-				),
-				array(
+				],
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'host_profile' => array(
+					'host_profile' => [
 						'devicetype' => 'device type',
 						'name' => 'name',
 						'os' => 'os',
@@ -548,8 +548,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 						'contact' => 'contact',
 						'location' => 'location',
 						'notes' => 'notes',
-					),
-					'host_profiles_ext' => array(
+					],
+					'host_profiles_ext' => [
 						'device_alias' => 'device alias',
 						'device_type' => 'device type',
 						'device_chassis' => 'device chassis',
@@ -608,31 +608,31 @@ class C10ImportConverterTest extends CImportConverterTest {
 						'poc_2_cell' => 'poc 2 cell',
 						'poc_2_screen' => 'poc 2 screen',
 						'poc_2_notes' => 'poc 2 notes',
-					)
-				)
-			)
-		));
+					]
+				]
+			]
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'hosts' => array(
-				array(
+		$expectedResult = $this->createExpectedResult([
+			'hosts' => [
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					)
-				),
-				array(
+					]
+				],
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					)
-				),
-				array(
+					]
+				],
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_MANUAL,
 						'type' => 'device type',
 						'name' => 'name',
@@ -702,1039 +702,1039 @@ class C10ImportConverterTest extends CImportConverterTest {
 						'poc_2_cell' => 'poc 2 cell',
 						'poc_2_screen' => 'poc 2 screen',
 						'poc_2_notes' => 'poc 2 notes',
-					)
-				)
-			)
-		));
+					]
+				]
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 	}
 
 	public function testConvertItems() {
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-				),
-				array(
+				],
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'items' => ''
-				),
-				array(
+				],
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'items' => array(
-						array(
+					'items' => [
+						[
 							'key' => 'item',
-						),
-						array(
+						],
+						[
 							'key' => 'item',
 							'applications' => ''
-						),
-						array(
+						],
+						[
 							'description' => 'My item',
 							'key' => 'ftp,1',
-							'applications' => array(
+							'applications' => [
 								'Application 1',
 								'Application 2',
-							)
-						)
-					)
-				),
-				array(
+							]
+						]
+					]
+				],
+				[
 					'name' => 'template',
 					'status' => HOST_STATUS_TEMPLATE,
-					'items' => array(
-						array(
+					'items' => [
+						[
 							'key' => 'item',
-						),
-						array(
+						],
+						[
 							'description' => 'My item',
 							'key' => 'ftp,1',
-							'applications' => array(
+							'applications' => [
 								'Application 1',
 								'Application 2',
-							)
-						)
-					)
-				)
-			),
-		));
+							]
+						]
+					]
+				]
+			],
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'hosts' => array(
-				array(
+		$expectedResult = $this->createExpectedResult([
+			'hosts' => [
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-				array(
+					],
+				],
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
+					],
 					'items' => ''
-				),
-				array(
+				],
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-					'items' => array(
-						array(
+					],
+					'items' => [
+						[
 							'key' => 'item',
-						),
-						array(
+						],
+						[
 							'key' => 'item',
 							'applications' => ''
-						),
-						array(
+						],
+						[
 							'name' => 'My item',
 							'key' => 'net.tcp.service[ftp,,1]',
-							'applications' => array(
-								array(
+							'applications' => [
+								[
 									'name' => 'Application 1'
-								),
-								array(
+								],
+								[
 									'name' => 'Application 2'
-								),
-							)
-						)
-					)
-				)
-			),
-			'templates' => array(
-				array(
+								],
+							]
+						]
+					]
+				]
+			],
+			'templates' => [
+				[
 					'template' => 'template',
-					'items' => array(
-						array(
+					'items' => [
+						[
 							'key' => 'item',
-						),
-						array(
+						],
+						[
 							'name' => 'My item',
 							'key' => 'net.tcp.service[ftp,,1]',
-							'applications' => array(
-								array(
+							'applications' => [
+								[
 									'name' => 'Application 1'
-								),
-								array(
+								],
+								[
 									'name' => 'Application 2'
-								),
-							)
-						)
-					)
-				)
-			)
-		));
+								],
+							]
+						]
+					]
+				]
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 	}
 
 	public function testConvertTriggers() {
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-				),
-				array(
+				],
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'triggers' => ''
-				),
-				array(
+				],
+				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'triggers' => array(
-						array(
+					'triggers' => [
+						[
 							'description' => 'My trigger',
 							'comments' => 'Trigger from two hosts',
 							'expression' => '{host:item.last(0)}>0&{host2:item.last(0)}'
-						),
-						array(
+						],
+						[
 							'description' => 'Simple check trigger',
 							'expression' => '{host:ftp,1.last(0)}'
-						),
-						array(
+						],
+						[
 							'description' => 'Macro trigger',
 							'expression' => '{{HOSTNAME}:item.last(0)}>0&{{HOST.HOST}:item.last(0)}>0'
-						),
-					)
-				),
-				array(
+						],
+					]
+				],
+				[
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'triggers' => array(
-						array(
+					'triggers' => [
+						[
 							'description' => 'My trigger',
 							'comments' => 'Trigger from two hosts',
 							'expression' => '{host:item.last(0)}>0&{host2:item.last(0)}'
-						)
-					)
-				),
-				array(
+						]
+					]
+				],
+				[
 					'name' => 'template',
 					'status' => HOST_STATUS_TEMPLATE,
-					'triggers' => array(
-						array(
+					'triggers' => [
+						[
 							'description' => 'My trigger 2',
 							'expression' => '{template:item.last(0)}>0'
-						)
-					)
-				)
-			),
-		));
+						]
+					]
+				]
+			],
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'triggers' => array(
-				array(
+		$expectedResult = $this->createExpectedResult([
+			'triggers' => [
+				[
 					'name' => 'My trigger',
 					'description' => 'Trigger from two hosts',
 					'expression' => '{host:item.last(0)}>0&{host2:item.last(0)}'
-				),
-				array(
+				],
+				[
 					'name' => 'Simple check trigger',
 					'expression' => '{host:net.tcp.service[ftp,,1].last(0)}'
-				),
-				array(
+				],
+				[
 					'name' => 'Macro trigger',
 					'expression' => '{host2:item.last(0)}>0&{host2:item.last(0)}>0'
-				),
-				array(
+				],
+				[
 					'name' => 'My trigger 2',
 					'expression' => '{template:item.last(0)}>0'
-				),
-			),
-			'hosts' => array(
-				array(
+				],
+			],
+			'hosts' => [
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-				array(
+					],
+				],
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-				array(
+					],
+				],
+				[
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-				array(
+					],
+				],
+				[
 					'host' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				)
-			),
-			'templates' => array(
-				array(
+					],
+				]
+			],
+			'templates' => [
+				[
 					'template' => 'template',
-				)
-			)
-		));
+				]
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 	}
 
 	public function testConvertTriggerDependencies() {
 		$this->assertConvert(
-			$this->createExpectedResult(array()),
-			$this->createSource(array())
+			$this->createExpectedResult([]),
+			$this->createSource([])
 		);
 
 		// dependencies as an empty string
-		$source = $this->createSource(array(
+		$source = $this->createSource([
 			'dependencies' => ''
-		));
-		$expectedResult = $this->createExpectedResult(array());
+		]);
+		$expectedResult = $this->createExpectedResult([]);
 		$this->assertConvert($expectedResult, $source);
 
 		// missing hosts
-		$source = $this->createSource(array(
-			'dependencies' => array()
-		));
-		$expectedResult = $this->createExpectedResult(array());
+		$source = $this->createSource([
+			'dependencies' => []
+		]);
+		$expectedResult = $this->createExpectedResult([]);
 		$this->assertConvert($expectedResult, $source);
 
 		// hosts have no triggers
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-				),
-				array(
+				],
+				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-				)
-			),
-			'dependencies' => array(
-				array(
+				]
+			],
+			'dependencies' => [
+				[
 					'description' => 'host1:trigger',
 					'depends' => 'host2:trigger',
-				)
-			)
-		));
-		$expectedResult = $this->createExpectedResult(array(
-			'hosts' => array(
-				array(
+				]
+			]
+		]);
+		$expectedResult = $this->createExpectedResult([
+			'hosts' => [
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-				array(
+					],
+				],
+				[
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-			)
-		));
+					],
+				],
+			]
+		]);
 		$this->assertConvert($expectedResult, $source);
 
 		// the used triggers are missing
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'triggers' => array(),
-				),
-				array(
+					'triggers' => [],
+				],
+				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'triggers' => array(
-						array(
+					'triggers' => [
+						[
 							'description' => 'trigger',
 							'expression' => '{host2:item.last()}>0'
-						)
-					),
-				),
-				array(
+						]
+					],
+				],
+				[
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'triggers' => array(
-						array(
+					'triggers' => [
+						[
 							'description' => 'trigger2',
 							'expression' => '{host3:item.last()}>0'
-						)
-					),
-				)
-			),
-			'dependencies' => array(
-				array(
+						]
+					],
+				]
+			],
+			'dependencies' => [
+				[
 					'description' => 'host1:trigger',
 					'depends' => 'host1:trigger2',
-				),
+				],
 				// target trigger missing
-				array(
+				[
 					'description' => 'host2:trigger',
 					'depends' => 'host2:trigger2',
-				),
+				],
 				// source trigger missing
-				array(
+				[
 					'description' => 'host3:trigger',
 					'depends' => 'host3:trigger2',
-				)
-			)
-		));
-		$expectedResult = $this->createExpectedResult(array(
-			'triggers' => array(
-				array(
+				]
+			]
+		]);
+		$expectedResult = $this->createExpectedResult([
+			'triggers' => [
+				[
 					'name' => 'trigger',
 					'expression' => '{host2:item.last()}>0'
-				),
-				array(
+				],
+				[
 					'name' => 'trigger2',
 					'expression' => '{host3:item.last()}>0'
-				),
-			),
-			'hosts' => array(
-				array(
+				],
+			],
+			'hosts' => [
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-				array(
+					],
+				],
+				[
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-				array(
+					],
+				],
+				[
 					'host' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-			)
-		));
+					],
+				],
+			]
+		]);
 		$this->assertConvert($expectedResult, $source);
 
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'triggers' => array(
-						array(
+					'triggers' => [
+						[
 							'description' => 'common-trigger',
 							'expression' => '{host1:item.last(0)}>0&{host2:item.last(0)}'
-						),
-					)
-				),
+						],
+					]
+				],
 				// check the case when hosts are in a different order than in the expression
-				array(
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'triggers' => array(
-						array(
+					'triggers' => [
+						[
 							'description' => 'common-trigger',
 							'expression' => '{host1:item.last(0)}>0&{host2:item.last(0)}'
-						),
-						array(
+						],
+						[
 							'description' => 'dep-trigger',
 							'expression' => '{host1:item.last(0)}'
-						),
-					)
-				),
-				array(
+						],
+					]
+				],
+				[
 					'name' => 'template1',
 					'status' => HOST_STATUS_TEMPLATE,
-					'triggers' => array(
-						array(
+					'triggers' => [
+						[
 							'description' => 'common-trigger',
 							'expression' => '{template1:item.last(0)}>0&{template2:item.last(0)}'
-						),
-					)
-				),
-				array(
+						],
+					]
+				],
+				[
 					'name' => 'template2',
 					'status' => HOST_STATUS_TEMPLATE,
-					'triggers' => array(
-						array(
+					'triggers' => [
+						[
 							'description' => 'common-trigger',
 							'expression' => '{template1:item.last(0)}>0&{template2:item.last(0)}'
-						),
-						array(
+						],
+						[
 							'description' => 'dep-trigger',
 							'expression' => '{template1:item.last(0)}'
-						),
-					)
-				),
-			),
-			'dependencies' => array(
-				array(
+						],
+					]
+				],
+			],
+			'dependencies' => [
+				[
 					'description' => 'host1:common-trigger',
 					'depends' => 'host1:dep-trigger'
-				),
-				array(
+				],
+				[
 					'description' => 'template1:common-trigger',
 					'depends' => 'template2:dep-trigger'
-				),
-			)
-		));
+				],
+			]
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'triggers' => array(
-				array(
+		$expectedResult = $this->createExpectedResult([
+			'triggers' => [
+				[
 					'name' => 'common-trigger',
 					'expression' => '{host1:item.last(0)}>0&{host2:item.last(0)}',
-					'dependencies' => array(
-						array(
+					'dependencies' => [
+						[
 							'name' => 'dep-trigger',
 							'expression' => '{host1:item.last(0)}'
-						)
-					)
-				),
-				array(
+						]
+					]
+				],
+				[
 					'name' => 'dep-trigger',
 					'expression' => '{host1:item.last(0)}'
-				),
-				array(
+				],
+				[
 					'name' => 'common-trigger',
 					'expression' => '{template1:item.last(0)}>0&{template2:item.last(0)}',
-					'dependencies' => array(
-						array(
+					'dependencies' => [
+						[
 							'name' => 'dep-trigger',
 							'expression' => '{template1:item.last(0)}'
-						)
-					)
-				),
-				array(
+						]
+					]
+				],
+				[
 					'name' => 'dep-trigger',
 					'expression' => '{template1:item.last(0)}'
-				),
-			),
-			'hosts' => array(
-				array(
+				],
+			],
+			'hosts' => [
+				[
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-				array(
+					],
+				],
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-			),
-			'templates' => array(
-				array(
+					],
+				],
+			],
+			'templates' => [
+				[
 					'template' => 'template1'
-				),
-				array(
+				],
+				[
 					'template' => 'template2'
-				),
-			),
-		));
+				],
+			],
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 	}
 
 	public function testConvertHostTemplates() {
 		$this->assertConvert(
-			$this->createExpectedResult(array()),
+			$this->createExpectedResult([]),
 			$this->createSource()
 		);
 		$this->assertConvert(
-			$this->createExpectedResult(array('hosts' => '')),
-			$this->createSource(array('hosts' => ''))
+			$this->createExpectedResult(['hosts' => '']),
+			$this->createSource(['hosts' => ''])
 		);
 
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-				),
-				array(
+				],
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'templates' => ''
-				),
-				array(
+				],
+				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'templates' => array(
+					'templates' => [
 						'template1',
 						'template2',
-					)
-				),
-				array(
+					]
+				],
+				[
 					'name' => 'template',
 					'status' => HOST_STATUS_TEMPLATE,
-					'templates' => array(
+					'templates' => [
 						'template1',
 						'template2',
-					)
-				)
-			),
-		));
+					]
+				]
+			],
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'hosts' => array(
-				array(
+		$expectedResult = $this->createExpectedResult([
+			'hosts' => [
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-				array(
+					],
+				],
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
+					],
 					'templates' => ''
-				),
-				array(
+				],
+				[
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-					'templates' => array(
-						array(
+					],
+					'templates' => [
+						[
 							'name' => 'template1'
-						),
-						array(
+						],
+						[
 							'name' => 'template2'
-						),
-					)
-				)
-			),
-			'templates' => array(
-				array(
+						],
+					]
+				]
+			],
+			'templates' => [
+				[
 					'template' => 'template',
-					'templates' => array(
-						array(
+					'templates' => [
+						[
 							'name' => 'template1'
-						),
-						array(
+						],
+						[
 							'name' => 'template2'
-						),
-					)
-				)
-			)
-		));
+						],
+					]
+				]
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 	}
 
 	public function testConvertGraphs() {
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-				),
-				array(
+				],
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'graphs' => ''
-				),
-				array(
+				],
+				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'graphs' => array(
-						array(
+					'graphs' => [
+						[
 							'name' => 'graph1',
 							'graphtype' => GRAPH_TYPE_BAR,
 							'ymin_item_key' => '',
 							'ymax_item_key' => '',
-							'graph_elements' => array(
-								array(
+							'graph_elements' => [
+								[
 									'item' => 'host2:item'
-								),
-							)
-						),
-						array(
+								],
+							]
+						],
+						[
 							'name' => 'graph2',
 							'graphtype' => GRAPH_TYPE_BAR,
 							'ymin_item_key' => 'host2:itemmin',
 							'ymax_item_key' => 'host2:itemmax',
-							'graph_elements' => array(
-								array(
+							'graph_elements' => [
+								[
 									'periods_cnt' => 5,
 									'item' => 'host2:item'
-								),
-							)
-						),
-						array(
+								],
+							]
+						],
+						[
 							'name' => 'graph3',
 							'ymin_item_key' => 'host2:ftp,1',
 							'ymax_item_key' => 'host2:ftp,2',
-							'graph_elements' => array(
-								array(
+							'graph_elements' => [
+								[
 									'item' => 'host2:ftp,3'
-								),
-								array(
+								],
+								[
 									'item' => '{HOSTNAME}:ftp,3'
-								),
-								array(
+								],
+								[
 									'item' => '{HOST.HOST}:ftp,3'
-								),
-							)
-						),
-						array(
+								],
+							]
+						],
+						[
 							'name' => 'two-host graph',
-							'graph_elements' => array(
-								array(
+							'graph_elements' => [
+								[
 									'item' => 'host2:item'
-								),
-								array(
+								],
+								[
 									'item' => 'host3:item'
-								),
-							)
-						),
-					)
-				),
-				array(
+								],
+							]
+						],
+					]
+				],
+				[
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'graphs' => array(
-						array(
+					'graphs' => [
+						[
 							'name' => 'two-host graph',
-							'graph_elements' => array(
-								array(
+							'graph_elements' => [
+								[
 									'item' => 'host2:item'
-								),
-								array(
+								],
+								[
 									'item' => 'host3:item'
-								),
-							)
-						)
-					)
-				),
-				array(
+								],
+							]
+						]
+					]
+				],
+				[
 					'name' => 'template',
 					'status' => HOST_STATUS_TEMPLATE,
-					'graphs' => array(
-						array(
+					'graphs' => [
+						[
 							// same name as for the host graph but a different item
 							'name' => 'graph2',
-							'graph_elements' => array(
-								array(
+							'graph_elements' => [
+								[
 									'item' => 'template:item'
-								),
-							)
-						)
-					)
-				)
-			),
-		));
+								],
+							]
+						]
+					]
+				]
+			],
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'graphs' => array(
-				array(
+		$expectedResult = $this->createExpectedResult([
+			'graphs' => [
+				[
 					'name' => 'graph1',
 					'type' => GRAPH_TYPE_BAR,
 					'ymin_item_1' => '',
 					'ymax_item_1' => '',
-					'graph_items' => array(
-						array(
-							'item' => array(
+					'graph_items' => [
+						[
+							'item' => [
 								'host' => 'host2',
 								'key' => 'item'
-							)
-						),
-					)
-				),
-				array(
+							]
+						],
+					]
+				],
+				[
 					'name' => 'graph2',
 					'type' => GRAPH_TYPE_BAR,
-					'ymin_item_1' => array(
+					'ymin_item_1' => [
 						'host' => 'host2',
 						'key' => 'itemmin'
-					),
-					'ymax_item_1' => array(
+					],
+					'ymax_item_1' => [
 						'host' => 'host2',
 						'key' => 'itemmax'
-					),
-					'graph_items' => array(
-						array(
-							'item' => array(
+					],
+					'graph_items' => [
+						[
+							'item' => [
 								'host' => 'host2',
 								'key' => 'item'
-							)
-						),
-					)
-				),
-				array(
+							]
+						],
+					]
+				],
+				[
 					'name' => 'graph3',
-					'ymin_item_1' => array(
+					'ymin_item_1' => [
 						'host' => 'host2',
 						'key' => 'net.tcp.service[ftp,,1]'
-					),
-					'ymax_item_1' => array(
+					],
+					'ymax_item_1' => [
 						'host' => 'host2',
 						'key' => 'net.tcp.service[ftp,,2]'
-					),
-					'graph_items' => array(
-						array(
-							'item' => array(
+					],
+					'graph_items' => [
+						[
+							'item' => [
 								'host' => 'host2',
 								'key' => 'net.tcp.service[ftp,,3]'
-							),
-						),
-						array(
-							'item' => array(
+							],
+						],
+						[
+							'item' => [
 								'host' => 'host2',
 								'key' => 'net.tcp.service[ftp,,3]'
-							),
-						),
-						array(
-							'item' => array(
+							],
+						],
+						[
+							'item' => [
 								'host' => 'host2',
 								'key' => 'net.tcp.service[ftp,,3]'
-							),
-						),
-					)
-				),
-				array(
+							],
+						],
+					]
+				],
+				[
 					'name' => 'two-host graph',
-					'graph_items' => array(
-						array(
-							'item' => array(
+					'graph_items' => [
+						[
+							'item' => [
 								'host' => 'host2',
 								'key' => 'item'
-							),
-						),
-						array(
-							'item' => array(
+							],
+						],
+						[
+							'item' => [
 								'host' => 'host3',
 								'key' => 'item'
-							),
-						)
-					)
-				),
-				array(
+							],
+						]
+					]
+				],
+				[
 					'name' => 'graph2',
-					'graph_items' => array(
-						array(
-							'item' => array(
+					'graph_items' => [
+						[
+							'item' => [
 								'host' => 'template',
 								'key' => 'item'
-							),
-						),
-					)
-				)
-			),
-			'hosts' => array(
-				array(
+							],
+						],
+					]
+				]
+			],
+			'hosts' => [
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-				array(
+					],
+				],
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-				array(
+					],
+				],
+				[
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-				array(
+					],
+				],
+				[
 					'host' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-			),
-			'templates' => array(
-				array(
+					],
+				],
+			],
+			'templates' => [
+				[
 					'template' => 'template',
-				)
-			)
-		));
+				]
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 	}
 
 	public function testConvertMacros() {
-		$source = $this->createSource(array(
-			'hosts' => array(
-				array(
+		$source = $this->createSource([
+			'hosts' => [
+				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-				),
-				array(
+				],
+				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'macros' => ''
-				),
-				array(
+				],
+				[
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'macros' => array(
-						array(
+					'macros' => [
+						[
 							'name' => '{$MACRO}',
 							'value' => 'value',
-						)
-					)
-				),
-				array(
+						]
+					]
+				],
+				[
 					'name' => 'template',
 					'status' => HOST_STATUS_TEMPLATE,
-					'macros' => array(
-						array(
+					'macros' => [
+						[
 							'name' => '{$MACRO}',
 							'value' => 'value',
-						)
-					)
-				),
-			),
-		));
+						]
+					]
+				],
+			],
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'hosts' => array(
-				array(
+		$expectedResult = $this->createExpectedResult([
+			'hosts' => [
+				[
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-				),
-				array(
+					],
+				],
+				[
 					'host' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
+					],
 					'macros' => ''
-				),
-				array(
+				],
+				[
 					'host' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'inventory' => array(
+					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
-					),
-					'macros' => array(
-						array(
+					],
+					'macros' => [
+						[
 							'macro' => '{$MACRO}',
 							'value' => 'value',
-						)
-					)
-				)
-			),
-			'templates' => array(
-				array(
+						]
+					]
+				]
+			],
+			'templates' => [
+				[
 					'template' => 'template',
-					'macros' => array(
-						array(
+					'macros' => [
+						[
 							'macro' => '{$MACRO}',
 							'value' => 'value',
-						)
-					)
-				)
-			)
-		));
+						]
+					]
+				]
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 	}
 
 	public function testConvertSysmaps() {
 		$this->assertConvert(
-			$this->createExpectedResult(array()),
+			$this->createExpectedResult([]),
 			$this->createSource()
 		);
 		$this->assertConvert(
-			$this->createExpectedResult(array('sysmaps' => '')),
-			$this->createSource(array('sysmaps' => ''))
+			$this->createExpectedResult(['sysmaps' => '']),
+			$this->createSource(['sysmaps' => ''])
 		);
 
-		$source = $this->createSource(array(
-			'sysmaps' => array(
-				array(),
-				array(
+		$source = $this->createSource([
+			'sysmaps' => [
+				[],
+				[
 					'selements' => '',
 					'links' => '',
-				),
-				array(
-					'selements' => array(
-						array(
+				],
+				[
+					'selements' => [
+						[
 							'selementid' => 1,
 							'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
-							'elementid' => array(
+							'elementid' => [
 								'host' => 'host',
-							),
-							'iconid_off' => array(),
-							'iconid_on' => array(),
-							'iconid_disabled' => array(),
-							'iconid_maintenance' => array(),
-							'iconid_unknown' => array(),
-						),
-						array(
+							],
+							'iconid_off' => [],
+							'iconid_on' => [],
+							'iconid_disabled' => [],
+							'iconid_maintenance' => [],
+							'iconid_unknown' => [],
+						],
+						[
 							'selementid' => 2,
 							'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
-							'elementid' => array(
+							'elementid' => [
 								'host' => 'host',
 								'description' => 'trigger'
-							)
-						)
-					),
-					'links' => array(
-						array(),
-						array(
+							]
+						]
+					],
+					'links' => [
+						[],
+						[
 							'linktriggers' => ''
-						),
-						array(
-							'linktriggers' => array(
-								array(
-									'triggerid' => array(
+						],
+						[
+							'linktriggers' => [
+								[
+									'triggerid' => [
 										'host' => 'host',
 										'description' => 'trigger'
-									)
-								)
-							)
-						)
-					)
-				)
-			)
-		));
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'maps' => array(
-				array(),
-				array(
+		$expectedResult = $this->createExpectedResult([
+			'maps' => [
+				[],
+				[
 					'selements' => '',
 					'links' => '',
-				),
-				array(
-					'selements' => array(
-						array(
+				],
+				[
+					'selements' => [
+						[
 							'selementid' => 1,
 							'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
-							'element' => array(
+							'element' => [
 								'host' => 'host'
-							),
-							'icon_off' => array(),
-							'icon_on' => array(),
-							'icon_disabled' => array(),
-							'icon_maintenance' => array(),
-						),
-						array(
+							],
+							'icon_off' => [],
+							'icon_on' => [],
+							'icon_disabled' => [],
+							'icon_maintenance' => [],
+						],
+						[
 							'selementid' => 2,
 							'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
-							'element' => array(
+							'element' => [
 								'description' => 'trigger'
-							)
-						)
-					),
-					'links' => array(
-						array(),
-						array(
+							]
+						]
+					],
+					'links' => [
+						[],
+						[
 							'linktriggers' => ''
-						),
-						array(
-							'linktriggers' => array(
-								array(
-									'trigger' => array(
+						],
+						[
+							'linktriggers' => [
+								[
+									'trigger' => [
 										'description' => 'trigger'
-									)
-								)
-							)
-						)
-					)
-				)
-			)
-		));
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 
@@ -1742,78 +1742,78 @@ class C10ImportConverterTest extends CImportConverterTest {
 
 	public function testConvertScreens() {
 		$this->assertConvert(
-			$this->createExpectedResult(array()),
+			$this->createExpectedResult([]),
 			$this->createSource()
 		);
 		$this->assertConvert(
-			$this->createExpectedResult(array('screens' => '')),
-			$this->createSource(array('screens' => ''))
+			$this->createExpectedResult(['screens' => '']),
+			$this->createSource(['screens' => ''])
 		);
 
-		$source = $this->createSource(array(
-			'screens' => array(
-				array(),
-				array(
+		$source = $this->createSource([
+			'screens' => [
+				[],
+				[
 					'screenitems' => ''
-				),
-				array(
-					'screenitems' => array(
+				],
+				[
+					'screenitems' => [
 						// resource is exported as "0" if it's not used
-						array(
+						[
 							'resourceid' => '0'
-						),
-						array(
-							'resourceid' => array(
+						],
+						[
+							'resourceid' => [
 								'key_' => 'itemkey',
-							),
-						)
-					)
-				)
-			)
-		));
+							],
+						]
+					]
+				]
+			]
+		]);
 
-		$expectedResult = $this->createExpectedResult(array(
-			'screens' => array(
-				array(),
-				array(
+		$expectedResult = $this->createExpectedResult([
+			'screens' => [
+				[],
+				[
 					'screen_items' => ''
-				),
-				array(
-					'screen_items' => array(
-						array(
+				],
+				[
+					'screen_items' => [
+						[
 							'resource' => '0'
-						),
-						array(
-							'resource' => array(
+						],
+						[
+							'resource' => [
 								'key' => 'itemkey',
-							),
-						)
-					)
-				)
-			)
-		));
+							],
+						]
+					]
+				]
+			]
+		]);
 
 		$this->assertConvert($expectedResult, $source);
 
 	}
 
-	protected function createSource(array $data = array()) {
-		return array(
-			'zabbix_export' => array_merge(array(
+	protected function createSource(array $data = []) {
+		return [
+			'zabbix_export' => array_merge([
 				'version' => '1.0',
 				'date' => '19.11.14',
 				'time' => '12.19'
-			), $data)
-		);
+			], $data)
+		];
 	}
 
-	protected function createExpectedResult(array $data = array()) {
-		return array(
-			'zabbix_export' => array_merge(array(
+	protected function createExpectedResult(array $data = []) {
+		return [
+			'zabbix_export' => array_merge([
 				'version' => '2.0',
 				'date' => '2014-11-19T12:19:00Z'
-			), $data)
-		);
+			], $data)
+		];
 	}
 
 	protected function createConverter() {

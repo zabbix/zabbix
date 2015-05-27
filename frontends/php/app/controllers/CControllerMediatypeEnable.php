@@ -22,9 +22,9 @@
 class CControllerMediatypeEnable extends CController {
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'mediatypeids' =>	'required|array_db media_type.mediatypeid'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -40,23 +40,23 @@ class CControllerMediatypeEnable extends CController {
 			return false;
 		}
 
-		$mediatypes = API::Mediatype()->get(array(
+		$mediatypes = API::Mediatype()->get([
 			'mediatypeids' => $this->getInput('mediatypeids'),
 			'countOutput' => true,
 			'editable' => true
-		));
+		]);
 
 		return ($mediatypes == count($this->getInput('mediatypeids')));
 	}
 
 	protected function doAction() {
-		$mediatypes = array();
+		$mediatypes = [];
 
 		foreach ($this->getInput('mediatypeids') as $mediatypeid) {
-			$mediatypes[] = array(
+			$mediatypes[] = [
 				'mediatypeid' => $mediatypeid,
 				'status' => MEDIA_TYPE_STATUS_ACTIVE
-			);
+			];
 		}
 		$result = API::Mediatype()->update($mediatypes);
 

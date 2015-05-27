@@ -21,11 +21,11 @@
 
 class CTableInfo extends CTable {
 
-	public function __construct($message = null, $class = 'list-table') {
+	public function __construct($message = null) {
 		if ($message === null) {
 			$message = _('No data found');
 		}
-		parent::__construct($message, $class);
+		parent::__construct($message, ZBX_STYLE_LIST_TABLE);
 		$this->addMakeVerticalRotationJs = false;
 	}
 

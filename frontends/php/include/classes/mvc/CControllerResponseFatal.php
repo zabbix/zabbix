@@ -21,7 +21,7 @@
 
 class CControllerResponseFatal extends CControllerResponse {
 
-	private $messages = array();
+	private $messages = [];
 
 	public function getLocation() {
 		return $this->location;

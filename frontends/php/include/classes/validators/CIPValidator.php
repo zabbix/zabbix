@@ -87,7 +87,7 @@ class CIPValidator extends CValidator {
 			return false;
 		}
 
-		$patterns = array(
+		$patterns = [
 			'([a-f0-9]{1,4}:){7}[a-f0-9]{1,4}',
 			':(:[a-f0-9]{1,4}){1,7}',
 			'[a-f0-9]{1,4}::([a-f0-9]{1,4}:){0,5}[a-f0-9]{1,4}',
@@ -98,7 +98,7 @@ class CIPValidator extends CValidator {
 			'([a-f0-9]{1,4}:){6}:[a-f0-9]{1,4}',
 			'([a-f0-9]{1,4}:){1,7}:',
 			'::'
-		);
+		];
 
 		$pattern = '/^('.implode(')$|^(', $patterns).')$/i';
 

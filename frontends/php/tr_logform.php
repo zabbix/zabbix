@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = _('Trigger form');
 $page['file'] = 'tr_logform.php';
-$page['scripts'] = array('tr_logform.js');
+$page['scripts'] = ['tr_logform.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_NO_MENU', 1);
@@ -34,43 +34,43 @@ define('ZBX_PAGE_NO_MENU', 1);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'description' =>	array(T_ZBX_STR, O_OPT,  null,			NOT_EMPTY,			'isset({add}) || isset({update})'),
-	'itemid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,			DB_ID,				'isset({add}) || isset({update})'),
-	'sform' =>			array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
-	'sitems' =>			array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
-	'triggerid' =>		array(T_ZBX_INT, O_OPT,  P_SYS,			DB_ID,				null),
-	'type' =>			array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
-	'priority' =>		array(T_ZBX_INT, O_OPT,  null,			IN('0,1,2,3,4,5'),	'isset({add}) || isset({update})'),
-	'expressions' =>	array(T_ZBX_STR, O_OPT,	 null,			NOT_EMPTY,			'isset({add}) || isset({update})'),
-	'expr_type' =>		array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
-	'comments' =>		array(T_ZBX_STR, O_OPT,  null,			null,				null),
-	'url' =>			array(T_ZBX_STR, O_OPT,  null,			null,				null),
-	'status' =>			array(T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	 null,			null,				null),
+$fields = [
+	'description' =>	[T_ZBX_STR, O_OPT,  null,			NOT_EMPTY,			'isset({add}) || isset({update})'],
+	'itemid' =>			[T_ZBX_INT, O_OPT,	 P_SYS,			DB_ID,				'isset({add}) || isset({update})'],
+	'sform' =>			[T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null],
+	'sitems' =>			[T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null],
+	'triggerid' =>		[T_ZBX_INT, O_OPT,  P_SYS,			DB_ID,				null],
+	'type' =>			[T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null],
+	'priority' =>		[T_ZBX_INT, O_OPT,  null,			IN('0,1,2,3,4,5'),	'isset({add}) || isset({update})'],
+	'expressions' =>	[T_ZBX_STR, O_OPT,	 null,			NOT_EMPTY,			'isset({add}) || isset({update})'],
+	'expr_type' =>		[T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null],
+	'comments' =>		[T_ZBX_STR, O_OPT,  null,			null,				null],
+	'url' =>			[T_ZBX_STR, O_OPT,  null,			null,				null],
+	'status' =>			[T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT,	 null,			null,				null],
 	// actions
-	'add' =>			array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,				null),
-	'update' =>			array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,				null),
-	'keys' => 			array(T_ZBX_STR, O_OPT,  null,			null,				null),
-);
+	'add' =>			[T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,				null],
+	'update' =>			[T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,				null],
+	'keys' => 			[T_ZBX_STR, O_OPT,  null,			null,				null],
+];
 check_fields($fields);
 
 /*
  * Permissions
  */
-if (getRequest('itemid') && !API::Item()->isWritable(array($_REQUEST['itemid']))
-		|| getRequest('triggerid') && !API::Trigger()->isWritable(array($_REQUEST['triggerid']))) {
+if (getRequest('itemid') && !API::Item()->isWritable([$_REQUEST['itemid']])
+		|| getRequest('triggerid') && !API::Trigger()->isWritable([$_REQUEST['triggerid']])) {
 	access_deny();
 }
 
 $itemid = getRequest('itemid', 0);
 
-$item = API::Item()->get(array(
-	'output' => array('key_'),
-	'selectHosts' => array('host'),
+$item = API::Item()->get([
+	'output' => ['key_'],
+	'selectHosts' => ['host'],
 	'itemids' => $itemid,
 	'limit' => 1
-));
+]);
 $item = reset($item);
 $host = reset($item['hosts']);
 
@@ -96,10 +96,10 @@ if (hasRequest('add') || hasRequest('update')) {
 			$triggerId = getRequest('triggerid');
 			$description = getRequest('description', '');
 
-			$triggersData = API::Trigger()->get(array(
-				'triggerids' => array($triggerId),
+			$triggersData = API::Trigger()->get([
+				'triggerids' => [$triggerId],
 				'output' => API_OUTPUT_EXTEND
-			));
+			]);
 			$triggerData = reset($triggersData);
 
 			if ($triggerData['templateid']) {
@@ -107,7 +107,7 @@ if (hasRequest('add') || hasRequest('update')) {
 				$expression = explode_exp($triggerData['expression']);
 			}
 
-			$trigger = array();
+			$trigger = [];
 			$trigger['triggerid'] = $triggerId;
 			$trigger['expression'] = $expression;
 			$trigger['description'] = $description;
@@ -124,7 +124,7 @@ if (hasRequest('add') || hasRequest('update')) {
 			show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 		}
 		else {
-			$trigger = array();
+			$trigger = [];
 			$trigger['expression'] = $expression;
 			$trigger['description'] = getRequest('description');
 			$trigger['type'] = $type;
@@ -135,10 +135,10 @@ if (hasRequest('add') || hasRequest('update')) {
 
 			$result = (bool) API::Trigger()->create($trigger);
 			if ($result) {
-				$dbTriggers = API::Trigger()->get(array(
+				$dbTriggers = API::Trigger()->get([
 					'triggerids' => $result['triggerids'],
-					'output' => array('triggerid')
-				));
+					'output' => ['triggerid']
+				]);
 
 				$dbTrigger = reset($dbTriggers);
 				$triggerId = $dbTrigger['triggerid'];
@@ -208,7 +208,7 @@ if (hasRequest('sform')) {
 	}
 	else {
 		$description = getRequest('description', '');
-		$expressions = getRequest('expressions', array());
+		$expressions = getRequest('expressions', []);
 		$type = getRequest('type', 0);
 		$priority = getRequest('priority', 0);
 		$comments = getRequest('comments', '');
@@ -216,7 +216,7 @@ if (hasRequest('sform')) {
 		$status = getRequest('status', 0);
 	}
 
-	$keys = getRequest('keys', array());
+	$keys = getRequest('keys', []);
 
 	$frmTRLog->addRow(_('Description'), new CTextBox('description', $description, 80));
 
@@ -247,7 +247,7 @@ if (hasRequest('sform')) {
 		"&srctbl=items&srcfld1=itemid&srcfld2=name');";
 	$cbtn = new CSubmit('select_item', _('Select'), $script);
 
-	$frmTRLog->addRow(_('Item'), array($ctb, $cbtn));
+	$frmTRLog->addRow(_('Item'), [$ctb, $cbtn]);
 	$frmTRLog->addVar('itemid', $itemid);
 
 
@@ -265,16 +265,16 @@ if (hasRequest('sform')) {
 	$cbIregexp = new CCheckBox('iregexp', 'no', null, 1);
 
 	$frmTRLog->addRow(_('Expression'),
-		array($ctb, BR(), $cbIregexp, 'iregexp', SPACE, $cbAdd, SPACE, $cbOr, SPACE, $exp_select, SPACE, $cb)
+		[$ctb, BR(), $cbIregexp, 'iregexp', SPACE, $cbAdd, SPACE, $cbOr, SPACE, $exp_select, SPACE, $cb]
 	);
 
 	$keyTable = new CTableInfo();
 	$keyTable->setAttribute('id', 'key_list');
-	$keyTable->setHeader(array(_('Keyword'), _('Type'), _('Action')));
+	$keyTable->setHeader([_('Keyword'), _('Type'), _('Action')]);
 
 	$table = new CTableInfo();
 	$table->setAttribute('id', 'exp_list');
-	$table->setHeader(array(_('Expression'), _('Type'), _('Position'), _('Action')));
+	$table->setHeader([_('Expression'), _('Type'), _('Position'), _('Action')]);
 
 	$maxId = 0;
 	foreach ($expressions as $id => $expr) {
@@ -294,12 +294,12 @@ if (hasRequest('sform')) {
 			' return false;'
 		);
 
-		$row = new CRow(array(
+		$row = new CRow([
 			htmlspecialchars($expr['value']),
 			($expr['type'] == CTextTriggerConstructor::EXPRESSION_TYPE_MATCH) ? _('Include') : _('Exclude'),
-			array($imgup, ' ', $imgdn),
+			[$imgup, ' ', $imgdn],
 			$del_url
-		));
+		]);
 		$row->setAttribute('id', 'logtr'.$id);
 		$table->addRow($row);
 
@@ -318,7 +318,7 @@ if (hasRequest('sform')) {
 			' if (confirm('.CJs::encodeJson(_('Delete keyword?')).')) remove_keyword("keytr'.$id.'");'.
 			' return false;'
 		);
-		$row = new CRow(array(htmlspecialchars($val['value']), $val['type'], $del_url));
+		$row = new CRow([htmlspecialchars($val['value']), $val['type'], $del_url]);
 		$row->setAttribute('id', 'keytr'.$id);
 		$keyTable->addRow($row);
 
@@ -337,7 +337,7 @@ if (hasRequest('sform')) {
 
 	$config = select_config();
 
-	$severityNames = array();
+	$severityNames = [];
 	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 		$severityNames[] = getSeverityName($severity, $config);
 	}

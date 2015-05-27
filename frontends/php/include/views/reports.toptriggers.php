@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/reports.toptriggers.js.php';
 
-$topTriggers = (new CWidget())->setTitle(_('Most busy triggers Top 100'));
+$topTriggers = (new CWidget())->setTitle(_('100 busiest triggers'));
 
 $filterForm = new CFilter('web.toptriggers.filter.state');
 $filterForm->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']));
@@ -33,7 +33,7 @@ $filterColumn2 = new CFormList();
 $filterColumn2->addRow(_('From'), createDateSelector('filter_from', $this->data['filter']['filter_from']));
 $filterColumn2->addRow(_('Till'), createDateSelector('filter_till', $this->data['filter']['filter_till']));
 $filterColumn2->addRow(null,
-	array(
+	[
 		new CButton(null, _('Today'), 'javascript: setPeriod('.REPORT_PERIOD_TODAY.');', 'link_menu'),
 		new CButton(null, _('Yesterday'), 'javascript: setPeriod('.REPORT_PERIOD_YESTERDAY.');',
 			'link_menu period-link'
@@ -57,41 +57,42 @@ $filterColumn2->addRow(null,
 		new CButton(null, _('Last year'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');',
 			'link_menu period-link'
 		)
-	)
+	]
 );
 
 $filterColumn1->addRow(
 	'Host groups',
 	new CMultiSelect(
-		array(
+		[
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
 			'data' => $this->data['multiSelectHostGroupData'],
-			'popup' => array(
+			'popup' => [
 				'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
 					'&srcfld1=groupid&multiselect=1'
-			)
-		)
+			]
+		]
 	)
 );
 
 $filterColumn1->addRow(
 	'Hosts',
 	new CMultiSelect(
-		array(
+		[
 			'name' => 'hostids[]',
 			'objectName' => 'hosts',
 			'data' => $this->data['multiSelectHostData'],
-			'popup' => array(
+			'popup' => [
 				'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
 					'&real_hosts=1&multiselect=1'
-			)
-		)
+			]
+		]
 	)
 );
 
 // severities
-$severitiesTable = new CTable(null, 'severities-table');
+$severitiesTable = (new CTable())->
+	addClass('severities-table');
 
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$serverityCheckBox = new CCheckBox('severities['.$severity.']',
@@ -99,10 +100,10 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 	);
 
 	if ($severity % 2) {
-		$severitiesCol2[] = new CCol(array($serverityCheckBox, getSeverityName($severity, $this->data['config'])));
+		$severitiesCol2[] = new CCol([$serverityCheckBox, getSeverityName($severity, $this->data['config'])]);
 	}
 	else {
-		$severitiesCol1[] = new CCol(array($serverityCheckBox, getSeverityName($severity, $this->data['config'])));
+		$severitiesCol1[] = new CCol([$serverityCheckBox, getSeverityName($severity, $this->data['config'])]);
 	}
 }
 
@@ -118,12 +119,12 @@ $topTriggers->addItem($filterForm);
 
 // table
 $table = new CTableInfo();
-$table->setHeader(array(
+$table->setHeader([
 	_('Host'),
 	_('Trigger'),
 	_('Severity'),
 	_('Number of status changes')
-));
+]);
 
 foreach ($this->data['triggers'] as $trigger) {
 	$hostId = $trigger['hosts'][0]['hostid'];
@@ -136,12 +137,12 @@ foreach ($this->data['triggers'] as $trigger) {
 	$triggerDescription = new CSpan($trigger['description'], ZBX_STYLE_LINK_ACTION.' link_menu');
 	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
-	$table->addRow(array(
+	$table->addRow([
 		$hostName,
 		$triggerDescription,
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$trigger['cnt_event']
-	));
+	]);
 }
 
 $topTriggers->addItem($table);

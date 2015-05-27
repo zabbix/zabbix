@@ -45,7 +45,7 @@ class CScreenTriggersInfo extends CScreenBase {
 			if ($style == STYLE_HORIZONTAL) {
 				$header->setColSpan(8);
 			}
-			$table->setHeader(array($header));
+			$table->setHeader([$header]);
 
 			return $this->getOutput($table);
 	}

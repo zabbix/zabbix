@@ -28,7 +28,7 @@ class CProxy extends CApiService {
 
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';
-	protected $sortColumns = array('hostid', 'host', 'status');
+	protected $sortColumns = ['hostid', 'host', 'status'];
 
 	/**
 	 * Get proxy data.
@@ -44,20 +44,20 @@ class CProxy extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 
 		$userType = self::$userData['type'];
 
-		$sqlParts = array(
-			'select'	=> array('hostid' => 'h.hostid'),
-			'from'		=> array('hosts' => 'hosts h'),
-			'where'		=> array('h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['hostid' => 'h.hostid'],
+			'from'		=> ['hosts' => 'hosts h'],
+			'where'		=> ['h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'proxyids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -77,14 +77,14 @@ class CProxy extends CApiService {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 			if ($permission == PERM_READ_WRITE) {
-				return array();
+				return [];
 			}
 		}
 
@@ -115,7 +115,7 @@ class CProxy extends CApiService {
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT h.hostid) AS rowscount');
+			$sqlParts['select'] = ['COUNT(DISTINCT h.hostid) AS rowscount'];
 		}
 
 		// limit
@@ -144,7 +144,7 @@ class CProxy extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('hostid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -178,17 +178,17 @@ class CProxy extends CApiService {
 
 		// permissions
 		if ($update) {
-			$proxyDBfields = array('proxyid' => null);
+			$proxyDBfields = ['proxyid' => null];
 
-			$dbProxies = $this->get(array(
-				'output' => array('proxyid', 'hostid', 'host', 'status'),
+			$dbProxies = $this->get([
+				'output' => ['proxyid', 'hostid', 'host', 'status'],
 				'proxyids' => $proxyIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 		}
 		else {
-			$proxyDBfields = array('host' => null);
+			$proxyDBfields = ['host' => null];
 		}
 
 		foreach ($proxies as &$proxy) {
@@ -230,10 +230,10 @@ class CProxy extends CApiService {
 						_s('Incorrect characters used for proxy name "%1$s".', $proxy['host']));
 				}
 
-				$proxiesExists = $this->get(array(
-					'output' => array('proxyid'),
-					'filter' => array('host' => $proxy['host'])
-				));
+				$proxiesExists = $this->get([
+					'output' => ['proxyid'],
+					'filter' => ['host' => $proxy['host']]
+				]);
 				foreach ($proxiesExists as $proxyExists) {
 					if ($create || bccomp($proxyExists['proxyid'], $proxy['proxyid']) != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy "%s" already exists.', $proxy['host']));
@@ -263,12 +263,12 @@ class CProxy extends CApiService {
 			if (!empty($proxy['hosts'])) {
 				$hostIds = zbx_objectValues($proxy['hosts'], 'hostid');
 
-				$hosts = API::Host()->get(array(
+				$hosts = API::Host()->get([
 					'hostids' => $hostIds,
 					'editable' => true,
-					'output' => array('hostid', 'proxy_hostid', 'name'),
+					'output' => ['hostid', 'proxy_hostid', 'name'],
 					'preservekeys' => true
-				));
+				]);
 
 				if (empty($hosts)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -279,15 +279,15 @@ class CProxy extends CApiService {
 		unset($proxy);
 
 		// check if any of the affected hosts are discovered
-		$hostIds = array();
+		$hostIds = [];
 		foreach ($proxies as $proxy) {
 			if (isset($proxy['hosts'])) {
 				$hostIds = array_merge($hostIds, zbx_objectValues($proxy['hosts'], 'hostid'));
 			}
 		}
-		$this->checkValidator($hostIds, new CHostNormalValidator(array(
+		$this->checkValidator($hostIds, new CHostNormalValidator([
 			'message' => _('Cannot update proxy for discovered host "%1$s".')
-		)));
+		]));
 	}
 
 	/**
@@ -306,13 +306,13 @@ class CProxy extends CApiService {
 
 		$proxyIds = DB::insert('hosts', $proxies);
 
-		$hostUpdate = array();
+		$hostUpdate = [];
 		foreach ($proxies as $key => $proxy) {
 			if (!empty($proxy['hosts'])) {
-				$hostUpdate[] = array(
-					'values' => array('proxy_hostid' => $proxyIds[$key]),
-					'where' => array('hostid' => zbx_objectValues($proxy['hosts'], 'hostid'))
-				);
+				$hostUpdate[] = [
+					'values' => ['proxy_hostid' => $proxyIds[$key]],
+					'where' => ['hostid' => zbx_objectValues($proxy['hosts'], 'hostid')]
+				];
 			}
 
 			// create interface
@@ -327,7 +327,7 @@ class CProxy extends CApiService {
 
 		DB::update('hosts', $hostUpdate);
 
-		return array('proxyids' => $proxyIds);
+		return ['proxyids' => $proxyIds];
 	}
 
 	/**
@@ -344,38 +344,38 @@ class CProxy extends CApiService {
 
 		$this->checkInput($proxies, __FUNCTION__);
 
-		$proxyIds = $proxyUpdate = $hostUpdate = array();
+		$proxyIds = $proxyUpdate = $hostUpdate = [];
 
 		foreach ($proxies as $proxy) {
 			$proxyIds[] = $proxy['proxyid'];
 
-			$proxyUpdate[] = array(
+			$proxyUpdate[] = [
 				'values' => $proxy,
-				'where' => array('hostid' => $proxy['proxyid'])
-			);
+				'where' => ['hostid' => $proxy['proxyid']]
+			];
 
 			if (isset($proxy['hosts'])) {
 				// unset proxy for all hosts except for discovered hosts
-				$hostUpdate[] = array(
-					'values' => array('proxy_hostid' => 0),
-					'where' => array(
+				$hostUpdate[] = [
+					'values' => ['proxy_hostid' => 0],
+					'where' => [
 						'proxy_hostid' => $proxy['proxyid'],
 						'flags' => ZBX_FLAG_DISCOVERY_NORMAL
-					)
-				);
+					]
+				];
 
-				$hostUpdate[] = array(
-					'values' => array('proxy_hostid' => $proxy['proxyid']),
-					'where' => array('hostid' => zbx_objectValues($proxy['hosts'], 'hostid'))
-				);
+				$hostUpdate[] = [
+					'values' => ['proxy_hostid' => $proxy['proxyid']],
+					'where' => ['hostid' => zbx_objectValues($proxy['hosts'], 'hostid')]
+				];
 			}
 
 			// if this is an active proxy - delete it's interface;
 			if (isset($proxy['status']) && $proxy['status'] == HOST_STATUS_PROXY_ACTIVE) {
-				$interfaces = API::HostInterface()->get(array(
+				$interfaces = API::HostInterface()->get([
 					'hostids' => $proxy['hostid'],
-					'output' => array('interfaceid')
-				));
+					'output' => ['interfaceid']
+				]);
 				$interfaceIds = zbx_objectValues($interfaces, 'interfaceid');
 
 				if ($interfaceIds) {
@@ -400,7 +400,7 @@ class CProxy extends CApiService {
 		DB::update('hosts', $proxyUpdate);
 		DB::update('hosts', $hostUpdate);
 
-		return array('proxyids' => $proxyIds);
+		return ['proxyids' => $proxyIds];
 	}
 
 	/**
@@ -420,7 +420,7 @@ class CProxy extends CApiService {
 		);
 		$dbProxies = DBfetchArrayAssoc($dbProxies, 'hostid');
 
-		$actionIds = array();
+		$actionIds = [];
 
 		// get conditions
 		$dbActions = DBselect(
@@ -434,23 +434,23 @@ class CProxy extends CApiService {
 		}
 
 		if ($actionIds) {
-			DB::update('actions', array(
-				'values' => array('status' => ACTION_STATUS_DISABLED),
-				'where' => array('actionid' => $actionIds)
-			));
+			DB::update('actions', [
+				'values' => ['status' => ACTION_STATUS_DISABLED],
+				'where' => ['actionid' => $actionIds]
+			]);
 		}
 
 		// delete action conditions
-		DB::delete('conditions', array(
+		DB::delete('conditions', [
 			'conditiontype' => CONDITION_TYPE_PROXY,
 			'value' => $proxyIds
-		));
+		]);
 
 		// delete interface
-		DB::delete('interface', array('hostid' => $proxyIds));
+		DB::delete('interface', ['hostid' => $proxyIds]);
 
 		// delete host
-		DB::delete('hosts', array('hostid' => $proxyIds));
+		DB::delete('hosts', ['hostid' => $proxyIds]);
 
 		// TODO: remove info from API
 		foreach ($dbProxies as $proxy) {
@@ -458,7 +458,7 @@ class CProxy extends CApiService {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_PROXY, '['.$proxy['host'].'] ['.$proxy['hostid'].']');
 		}
 
-		return array('proxyids' => $proxyIds);
+		return ['proxyids' => $proxyIds];
 	}
 
 	/**
@@ -493,10 +493,10 @@ class CProxy extends CApiService {
 
 		$proxyIds = array_unique($proxyIds);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'proxyids' => $proxyIds,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($proxyIds) == $count);
 	}
@@ -515,11 +515,11 @@ class CProxy extends CApiService {
 
 		$proxyIds = array_unique($proxyIds);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'proxyids' => $proxyIds,
 			'editable' => true,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($proxyIds) == $count);
 	}
@@ -594,28 +594,28 @@ class CProxy extends CApiService {
 
 		// selectHosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
-			$hosts = API::Host()->get(array(
-				'output' => $this->outputExtend($options['selectHosts'], array('hostid', 'proxy_hostid')),
+			$hosts = API::Host()->get([
+				'output' => $this->outputExtend($options['selectHosts'], ['hostid', 'proxy_hostid']),
 				'proxyids' => $proxyIds,
 				'preservekeys' => true
-			));
+			]);
 
 			$relationMap = $this->createRelationMap($hosts, 'proxy_hostid', 'hostid');
-			$hosts = $this->unsetExtraFields($hosts, array('proxy_hostid', 'hostid'), $options['selectHosts']);
+			$hosts = $this->unsetExtraFields($hosts, ['proxy_hostid', 'hostid'], $options['selectHosts']);
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
 		// adding host interface
 		if ($options['selectInterface'] !== null && $options['selectInterface'] != API_OUTPUT_COUNT) {
-			$interfaces = API::HostInterface()->get(array(
-				'output' => $this->outputExtend($options['selectInterface'], array('interfaceid', 'hostid')),
+			$interfaces = API::HostInterface()->get([
+				'output' => $this->outputExtend($options['selectInterface'], ['interfaceid', 'hostid']),
 				'hostids' => $proxyIds,
 				'nopermissions' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			$relationMap = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
-			$interfaces = $this->unsetExtraFields($interfaces, array('hostid', 'interfaceid'), $options['selectInterface']);
+			$interfaces = $this->unsetExtraFields($interfaces, ['hostid', 'interfaceid'], $options['selectInterface']);
 			$result = $relationMap->mapOne($result, $interfaces, 'interface');
 
 			foreach ($result as $key => $proxy) {
