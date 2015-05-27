@@ -143,7 +143,7 @@ foreach ($data['drules'] as $drule) {
 		$dns = $h_data['dns'] == '' ? '' : ' ('.$h_data['dns'].')';
 		$row = array(
 			$h_data['type'] == 'primary' ? new CSpan($ip.$dns, $h_data['class']) : new CSpan(SPACE.SPACE.$ip.$dns),
-			new CSpan(empty($h_data['host']) ? '-' : $h_data['host']),
+			new CSpan(empty($h_data['host']) ? '' : $h_data['host']),
 			new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave')
 				? ''
 				: convert_units(array('value' => time() - $h_data['time'], 'units' => 'uptime'))), $h_data['class'])

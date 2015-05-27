@@ -108,7 +108,7 @@ foreach ($this->data['children'] as $child) {
 			null,
 			1
 		),
-		!empty($child['trigger']) ? $child['trigger'] : '-',
+		!empty($child['trigger']) ? $child['trigger'] : '',
 		new CButton('remove', _('Remove'), 'javascript: removeDependentChild(\''.$child['serviceid'].'\');', 'link_menu')
 	));
 	$row->setAttribute('id', 'children_'.$child['serviceid']);

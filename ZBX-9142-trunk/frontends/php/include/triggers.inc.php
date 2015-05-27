@@ -297,20 +297,6 @@ function get_triggers_by_hostid($hostid) {
 	);
 }
 
-function get_trigger_by_description($desc) {
-	list($host_name, $trigger_description) = explode(':', $desc, 2);
-
-	$sql = 'SELECT t.*'.
-			' FROM triggers t,items i,functions f,hosts h'.
-			' WHERE h.host='.zbx_dbstr($host_name).
-				' AND i.hostid=h.hostid'.
-				' AND f.itemid=i.itemid'.
-				' AND t.triggerid=f.triggerid'.
-				' AND t.description='.zbx_dbstr($trigger_description).
-			' ORDER BY t.triggerid DESC';
-	return DBfetch(DBselect($sql, 1));
-}
-
 // unescape Raw URL
 function utf8RawUrlDecode($source) {
 	$decodedStr = '';
@@ -1208,7 +1194,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		// trigger dependency DOWN
 		$dependencyTable = new CTableInfo();
 		$dependencyTable->setAttribute('style', 'width: 200px;');
-		$dependencyTable->addRow(bold(_('Depends on').NAME_DELIMITER));
+		$dependencyTable->addRow(bold(_('Depends on').':'));
 
 		$isDependencyFound = false;
 		$dbDependencies = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_down='.zbx_dbstr($triggerId));
@@ -1228,7 +1214,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		// trigger dependency UP
 		$dependencyTable = new CTableInfo();
 		$dependencyTable->setAttribute('style', 'width: 200px;');
-		$dependencyTable->addRow(bold(_('Dependent').NAME_DELIMITER));
+		$dependencyTable->addRow(bold(_('Dependent').':'));
 
 		$isDependencyFound = false;
 		$dbDependencies = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_up='.zbx_dbstr($triggerId));

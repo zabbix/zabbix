@@ -57,11 +57,8 @@ $fields = array(
 	'twb_groupid'		=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
 	'newgroup'			=> array(T_ZBX_STR, O_OPT, null,		null,	null),
 	'description'		=> array(T_ZBX_STR, O_OPT, null,		null,	null),
-	'macros_rem'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'macros'			=> array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
-	'macro_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
-	'value_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
-	'macro_add'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'show_inherited_macros' => array(T_ZBX_INT, O_OPT, null,	IN(array(0,1)), null),
 	// actions
 	'action'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"template.export","template.massdelete","template.massdeleteclear"'),
@@ -110,6 +107,18 @@ if ($exportData) {
 	}
 
 	exit;
+}
+
+// remove inherited macros data (actions: 'add', 'update' and 'form')
+if (hasRequest('macros')) {
+	$_REQUEST['macros'] = cleanInheritedMacros($_REQUEST['macros']);
+
+	// remove empty new macro lines
+	foreach ($_REQUEST['macros'] as $idx => $macro) {
+		if (!array_key_exists('hostmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === '') {
+			unset($_REQUEST['macros'][$idx]);
+		}
+	}
 }
 
 /*
@@ -164,15 +173,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		// macros
 		$macros = getRequest('macros', array());
 
-		foreach ($macros as $key => $macro) {
-			if (zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
-				unset($macros[$key]);
-			}
-			else {
-				// transform macros to uppercase {$aaa} => {$AAA}
-				$macros[$key]['macro'] = mb_strtoupper($macro['macro']);
-			}
+		foreach ($macros as &$macro) {
+			// transform macros to uppercase {$aaa} => {$AAA}
+			$macro['macro'] = mb_strtoupper($macro['macro']);
 		}
+		unset($macro);
 
 		// groups
 		$groups = getRequest('groups', array());
@@ -438,7 +443,8 @@ if (hasRequest('form')) {
 	$data = array(
 		'form' => getRequest('form'),
 		'groupId' => getRequest('groupid', 0),
-		'groupIds' => getRequest('groups', array())
+		'groupIds' => getRequest('groups', array()),
+		'show_inherited_macros' => getRequest('show_inherited_macros', 0)
 	);
 
 	if ($templateId) {
@@ -603,7 +609,7 @@ else {
 
 	if ($pageFilter->groupsSelected) {
 		$templates = API::Template()->get(array(
-			'output' => array('templateid', 'name'),
+			'output' => array('templateid', $sortField),
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
 			'sortfield' => $sortField,
@@ -613,7 +619,7 @@ else {
 
 	// sorting && paging
 	order_result($templates, $sortField, $sortOrder);
-	$paging = getPagingLine($templates);
+	$paging = getPagingLine($templates, $sortOrder);
 
 	$templates = API::Template()->get(array(
 		'templateids' => zbx_objectValues($templates, 'templateid'),
@@ -728,7 +734,7 @@ else {
 			$linkedToOutput[] = new CLink($linkedToHost['name'], $url, $style);
 		}
 
-		$table->addRow(array(
+		$table->addRow([
 			new CCheckBox('templates['.$template['templateid'].']', null, null, $template['templateid']),
 			new CCol($templatesOutput, ZBX_STYLE_NOWRAP),
 			$applications,
@@ -738,9 +744,9 @@ else {
 			$screens,
 			$discoveries,
 			$httpTests,
-			$linkedTemplatesOutput ? new CCol($linkedTemplatesOutput, 'wraptext') : '-',
-			$linkedToOutput ? new CCol($linkedToOutput, 'wraptext') : '-'
-		));
+			$linkedTemplatesOutput ? $linkedTemplatesOutput : '',
+			$linkedToOutput ? $linkedToOutput : ''
+		]);
 	}
 
 	$footer = new CActionButtonList('action', 'templates', array(
