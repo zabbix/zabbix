@@ -377,23 +377,23 @@ class C20ImportConverter extends CConverter {
 	protected function convertDiscoveryRuleFilter($filter) {
 		// string filters were exported as "{#MACRO}:regex"
 		if (is_string($filter)) {
-			// empty filters
-			if ($filter === '' || $filter === ':') {
-				return [];
-			}
-
-			list ($macro, $value) = explode(':', $filter);
-			$filter = [
+			$new_filter = [
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 				'formula' => '',
-				'conditions' => [
-					[
-						'macro' => $macro,
-						'value' => $value,
-						'operator' => CONDITION_OPERATOR_REGEXP
-					]
-				]
+				'conditions' => []
 			];
+
+			if (strpos($filter, ':') !== false && $filter !== ':') {
+				list ($macro, $value) = explode(':', $filter);
+
+				$new_filter['conditions'][] = [
+					'macro' => $macro,
+					'value' => $value,
+					'operator' => CONDITION_OPERATOR_REGEXP
+				];
+			}
+
+			return $new_filter;
 		}
 
 		return $filter;
