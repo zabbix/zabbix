@@ -22,6 +22,269 @@
 #include "log.h"
 #include "zbxjson.h"
 
+int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
+	QUERY_SERVICE_CONFIG		*qsc = NULL;
+	SC_HANDLE			h_mgr, h_srv;
+	DWORD				sz = 0, szn, i, services, resume_handle = 0;
+	char				*utf8;
+	struct zbx_json			j;
+
+	if (0 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (h_mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+
+	while (0 != EnumServicesStatusEx(h_mgr, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL,
+			(LPBYTE)ssp, sz, &szn, &services, &resume_handle, NULL) || ERROR_MORE_DATA == GetLastError())
+	{
+		for (i = 0; i < services; i++)
+		{
+			if (NULL == (h_srv = OpenService(h_mgr, ssp[i].lpServiceName, SERVICE_QUERY_STATUS |
+				SERVICE_QUERY_CONFIG)))
+			{
+				continue;
+			}
+
+			zbx_json_addobject(&j, NULL);
+
+			utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
+			zbx_json_addstring(&j, "{#SERVICE.NAME}", utf8, ZBX_JSON_TYPE_STRING);
+			zbx_free(utf8);
+
+			utf8 = zbx_unicode_to_utf8(ssp[i].lpDisplayName);
+			zbx_json_addstring(&j, "{#SERVICE.DISPLAYNAME}", utf8, ZBX_JSON_TYPE_STRING);
+			zbx_free(utf8);
+
+			if((SERVICE_FILE_SYSTEM_DRIVER | SERVICE_KERNEL_DRIVER) &
+				ssp[i].ServiceStatusProcess.dwServiceType)
+			{
+				utf8 = "driver";
+			}
+			else if((SERVICE_WIN32_OWN_PROCESS | SERVICE_WIN32_SHARE_PROCESS) &
+				ssp[i].ServiceStatusProcess.dwServiceType)
+			{
+				utf8 = "service";
+			}
+			else
+				utf8 = "unknown";
+
+			zbx_json_addstring(&j, "{#SERVICE.TYPE}", utf8, ZBX_JSON_TYPE_STRING);
+			zbx_free(utf8);
+
+			zbx_json_adduint64(&j, "{#SERVICE.STATE}", ssp[i].ServiceStatusProcess.dwCurrentState);
+
+			QueryServiceConfig(h_srv, qsc, 0, &sz);
+			if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
+			{
+				qsc = (QUERY_SERVICE_CONFIG *)zbx_malloc((void *)qsc, sz);
+
+				if (0 != QueryServiceConfig(h_srv, qsc, sz, &sz))
+				{
+					utf8 = zbx_unicode_to_utf8(qsc->lpBinaryPathName);
+					zbx_json_addstring(&j, "{#SERVICE.PATH}", utf8, ZBX_JSON_TYPE_STRING);
+					zbx_free(utf8);
+
+					utf8 = zbx_unicode_to_utf8(qsc->lpServiceStartName);
+					zbx_json_addstring(&j, "{#SERVICE.USER}", utf8, ZBX_JSON_TYPE_STRING);
+					zbx_free(utf8);
+
+					if(SERVICE_DEMAND_START == qsc->dwStartType)
+					{
+						utf8 = "manual";
+					}
+					else if(SERVICE_DISABLED == qsc->dwStartType)
+					{
+						utf8 = "disabled";
+					}
+					else if(SERVICE_AUTO_START == qsc->dwStartType ||
+						SERVICE_BOOT_START == qsc->dwStartType ||
+						SERVICE_SYSTEM_START == qsc->dwStartType)
+					{
+						utf8 = "automatic";
+					}
+					else
+						utf8 = "unknown";
+
+					zbx_json_addstring(&j, "{#SERVICE.STARTUP}", utf8, ZBX_JSON_TYPE_STRING);
+					zbx_free(utf8);
+				}
+
+				zbx_free(qsc);
+			}
+
+			zbx_json_close(&j);
+
+			CloseServiceHandle(h_srv);
+		}
+
+		if (0 == szn)
+			break;
+
+		if (NULL == ssp)
+		{
+			sz = szn;
+			ssp = (ENUM_SERVICE_STATUS_PROCESS *)zbx_malloc((void *)ssp, sz);
+		}
+	}
+
+	zbx_free(ssp);
+
+	CloseServiceHandle(h_mgr);
+
+	zbx_json_close(&j);
+	SET_STR_RESULT(result, strdup(j.buffer));
+	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
+}
+
+#define ZBX_SRV_PARAM_STATE		0x01
+#define ZBX_SRV_PARAM_DISPLAYNAME	0x02
+#define ZBX_SRV_PARAM_PATH		0x03
+#define ZBX_SRV_PARAM_USER		0x04
+#define ZBX_SRV_PARAM_STARTUP		0x05
+
+int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	QUERY_SERVICE_CONFIG	*qsc = NULL;
+	SERVICE_STATUS		status;
+	SC_HANDLE		h_mgr, h_srv;
+	DWORD			sz = 0;
+	int			param_type, i;
+	char			*name, *param;
+	wchar_t			*wname, service_name[MAX_STRING_LEN];
+	DWORD			max_len_name = MAX_STRING_LEN;
+
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	name = get_rparam(request, 0);
+	param = get_rparam(request, 1);
+
+	if (NULL == name || '\0' == *name)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "state"))	/* default second parameter */
+		param_type = ZBX_SRV_PARAM_STATE;
+	else if (0 == strcmp(param, "displayname"))
+		param_type = ZBX_SRV_PARAM_DISPLAYNAME;
+	else if (0 == strcmp(param, "path"))
+		param_type = ZBX_SRV_PARAM_PATH;
+	else if (0 == strcmp(param, "user"))
+		param_type = ZBX_SRV_PARAM_USER;
+	else if (0 == strcmp(param, "startup"))
+		param_type = ZBX_SRV_PARAM_STARTUP;
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (h_mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	wname = zbx_utf8_to_unicode(name);
+	h_srv = OpenService(h_mgr, wname, SERVICE_QUERY_STATUS | SERVICE_QUERY_CONFIG);
+
+	if (NULL == h_srv && 0 != GetServiceKeyName(h_mgr, wname, service_name, &max_len_name))
+		h_srv = OpenService(h_mgr, service_name, SERVICE_QUERY_STATUS | SERVICE_QUERY_CONFIG);
+
+	zbx_free(wname);
+
+	if (NULL == h_srv)
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "service \"%s\" could not be found", name));
+		CloseServiceHandle(h_mgr);
+		return SYSINFO_RET_FAIL;
+	}
+	else
+	{
+		if (ZBX_SRV_PARAM_STATE == param_type)
+		{
+			if (0 != QueryServiceStatus(h_srv, &status))
+			{
+				static DWORD states[7] = {SERVICE_RUNNING, SERVICE_PAUSED, SERVICE_START_PENDING,
+						SERVICE_PAUSE_PENDING,SERVICE_CONTINUE_PENDING, SERVICE_STOP_PENDING,
+						SERVICE_STOPPED};
+
+				for (i = 0; i < 7 && status.dwCurrentState != states[i]; i++)
+					;
+
+				SET_UI64_RESULT(result, i);
+			}
+			else
+			{
+				SET_UI64_RESULT(result, 7);
+			}
+		}
+		else
+		{
+			QueryServiceConfig(h_srv, qsc, 0, &sz);
+
+			if (ERROR_INSUFFICIENT_BUFFER != GetLastError())
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain service config: %s",
+						strerror_from_system(GetLastError())));
+				CloseServiceHandle(h_srv);
+				CloseServiceHandle(h_mgr);
+				return SYSINFO_RET_FAIL;
+			}
+
+			qsc = (QUERY_SERVICE_CONFIG *)zbx_malloc((void *)qsc, sz);
+
+			if (0 == QueryServiceConfig(h_srv, qsc, sz, &sz))
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain service config: %s",
+						strerror_from_system(GetLastError())));
+				zbx_free(qsc);
+				CloseServiceHandle(h_srv);
+				CloseServiceHandle(h_mgr);
+				return SYSINFO_RET_FAIL;
+			}
+
+			switch (param_type)
+			{
+				case ZBX_SRV_PARAM_DISPLAYNAME:
+					SET_STR_RESULT(result, zbx_unicode_to_utf8(qsc->lpDisplayName));
+					break;
+				case ZBX_SRV_PARAM_PATH:
+					SET_STR_RESULT(result, zbx_unicode_to_utf8(qsc->lpBinaryPathName));
+					break;
+				case ZBX_SRV_PARAM_USER:
+					SET_STR_RESULT(result, zbx_unicode_to_utf8(qsc->lpServiceStartName));
+					break;
+				case ZBX_SRV_PARAM_STARTUP:
+					SET_UI64_RESULT(result, qsc->dwStartType);
+					break;
+			}
+			zbx_free(qsc);
+		}
+	}
+
+	CloseServiceHandle(h_srv);
+	CloseServiceHandle(h_mgr);
+
+	return SYSINFO_RET_OK;
+}
+
 int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SC_HANDLE	mgr, service;
@@ -291,269 +554,6 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 		buf = zbx_strdup(buf, "0");
 
 	SET_STR_RESULT(result, buf);
-
-	return SYSINFO_RET_OK;
-}
-
-int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
-	QUERY_SERVICE_CONFIG		*qsc = NULL;
-	SC_HANDLE			h_mgr, h_srv;
-	DWORD				sz = 0, szn, i, services, resume_handle = 0;
-	char				*utf8;
-	struct zbx_json			j;
-
-	if (0 < request->nparam)
-		return SYSINFO_RET_FAIL;
-
-	if (NULL == (h_mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
-
-	while (0 != EnumServicesStatusEx(h_mgr, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL,
-			(LPBYTE)ssp, sz, &szn, &services, &resume_handle, NULL) || ERROR_MORE_DATA == GetLastError())
-	{
-		for (i = 0; i < services; i++)
-		{
-			if (NULL == (h_srv = OpenService(h_mgr, ssp[i].lpServiceName, SERVICE_QUERY_STATUS |
-				SERVICE_QUERY_CONFIG)))
-			{
-				continue;
-			}
-
-			zbx_json_addobject(&j, NULL);
-
-			utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
-			zbx_json_addstring(&j, "{#SERVICE.NAME}", utf8, ZBX_JSON_TYPE_STRING);
-			zbx_free(utf8);
-
-			utf8 = zbx_unicode_to_utf8(ssp[i].lpDisplayName);
-			zbx_json_addstring(&j, "{#SERVICE.DISPLAYNAME}", utf8, ZBX_JSON_TYPE_STRING);
-			zbx_free(utf8);
-
-			if((SERVICE_FILE_SYSTEM_DRIVER | SERVICE_KERNEL_DRIVER) &
-				ssp[i].ServiceStatusProcess.dwServiceType)
-			{
-				utf8 = "driver";
-			}
-			else if((SERVICE_WIN32_OWN_PROCESS | SERVICE_WIN32_SHARE_PROCESS) &
-				ssp[i].ServiceStatusProcess.dwServiceType)
-			{
-				utf8 = "service";
-			}
-			else
-				utf8 = "unknown";
-
-			zbx_json_addstring(&j, "{#SERVICE.TYPE}", utf8, ZBX_JSON_TYPE_STRING);
-			zbx_free(utf8);
-
-			zbx_json_adduint64(&j, "{#SERVICE.STATE}", ssp[i].ServiceStatusProcess.dwCurrentState);
-
-			QueryServiceConfig(h_srv, qsc, 0, &sz);
-			if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
-			{
-				qsc = (QUERY_SERVICE_CONFIG *)zbx_malloc((void *)qsc, sz);
-
-				if (0 != QueryServiceConfig(h_srv, qsc, sz, &sz))
-				{
-					utf8 = zbx_unicode_to_utf8(qsc->lpBinaryPathName);
-					zbx_json_addstring(&j, "{#SERVICE.PATH}", utf8, ZBX_JSON_TYPE_STRING);
-					zbx_free(utf8);
-
-					utf8 = zbx_unicode_to_utf8(qsc->lpServiceStartName);
-					zbx_json_addstring(&j, "{#SERVICE.USER}", utf8, ZBX_JSON_TYPE_STRING);
-					zbx_free(utf8);
-
-					if(SERVICE_DEMAND_START == qsc->dwStartType)
-					{
-						utf8 = "manual";
-					}
-					else if(SERVICE_DISABLED == qsc->dwStartType)
-					{
-						utf8 = "disabled";
-					}
-					else if(SERVICE_AUTO_START == qsc->dwStartType ||
-						SERVICE_BOOT_START == qsc->dwStartType ||
-						SERVICE_SYSTEM_START == qsc->dwStartType)
-					{
-						utf8 = "automatic";
-					}
-					else
-						utf8 = "unknown";
-
-					zbx_json_addstring(&j, "{#SERVICE.STARTUP}", utf8, ZBX_JSON_TYPE_STRING);
-					zbx_free(utf8);
-				}
-
-				zbx_free(qsc);
-			}
-
-			zbx_json_close(&j);
-
-			CloseServiceHandle(h_srv);
-		}
-
-		if (0 == szn)
-			break;
-
-		if (NULL == ssp)
-		{
-			sz = szn;
-			ssp = (ENUM_SERVICE_STATUS_PROCESS *)zbx_malloc((void *)ssp, sz);
-		}
-	}
-
-	zbx_free(ssp);
-
-	CloseServiceHandle(h_mgr);
-
-	zbx_json_close(&j);
-	SET_STR_RESULT(result, strdup(j.buffer));
-	zbx_json_free(&j);
-
-	return SYSINFO_RET_OK;
-}
-
-#define ZBX_SRV_PARAM_STATE		0x01
-#define ZBX_SRV_PARAM_DISPLAYNAME	0x02
-#define ZBX_SRV_PARAM_PATH		0x03
-#define ZBX_SRV_PARAM_USER		0x04
-#define ZBX_SRV_PARAM_STARTUP		0x05
-
-int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	QUERY_SERVICE_CONFIG	*qsc = NULL;
-	SERVICE_STATUS		status;
-	SC_HANDLE		h_mgr, h_srv;
-	DWORD			sz = 0;
-	int			param_type, i;
-	char			*name, *param;
-	wchar_t			*wname, service_name[MAX_STRING_LEN];
-	DWORD			max_len_name = MAX_STRING_LEN;
-
-	if (2 < request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	name = get_rparam(request, 0);
-	param = get_rparam(request, 1);
-
-	if (NULL == name || '\0' == *name)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (NULL == param || '\0' == *param || 0 == strcmp(param, "state"))	/* default second parameter */
-		param_type = ZBX_SRV_PARAM_STATE;
-	else if (0 == strcmp(param, "displayname"))
-		param_type = ZBX_SRV_PARAM_DISPLAYNAME;
-	else if (0 == strcmp(param, "path"))
-		param_type = ZBX_SRV_PARAM_PATH;
-	else if (0 == strcmp(param, "user"))
-		param_type = ZBX_SRV_PARAM_USER;
-	else if (0 == strcmp(param, "startup"))
-		param_type = ZBX_SRV_PARAM_STARTUP;
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (NULL == (h_mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	wname = zbx_utf8_to_unicode(name);
-	h_srv = OpenService(h_mgr, wname, SERVICE_QUERY_STATUS | SERVICE_QUERY_CONFIG);
-
-	if (NULL == h_srv && 0 != GetServiceKeyName(h_mgr, wname, service_name, &max_len_name))
-		h_srv = OpenService(h_mgr, service_name, SERVICE_QUERY_STATUS | SERVICE_QUERY_CONFIG);
-
-	zbx_free(wname);
-
-	if (NULL == h_srv)
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "service \"%s\" could not be found", name));
-		CloseServiceHandle(h_mgr);
-		return SYSINFO_RET_FAIL;
-	}
-	else
-	{
-		if (ZBX_SRV_PARAM_STATE == param_type)
-		{
-			if (0 != QueryServiceStatus(h_srv, &status))
-			{
-				static DWORD states[7] = {SERVICE_RUNNING, SERVICE_PAUSED, SERVICE_START_PENDING,
-						SERVICE_PAUSE_PENDING,SERVICE_CONTINUE_PENDING, SERVICE_STOP_PENDING,
-						SERVICE_STOPPED};
-
-				for (i = 0; i < 7 && status.dwCurrentState != states[i]; i++)
-					;
-
-				SET_UI64_RESULT(result, i);
-			}
-			else
-			{
-				SET_UI64_RESULT(result, 7);
-			}
-		}
-		else
-		{
-			QueryServiceConfig(h_srv, qsc, 0, &sz);
-
-			if (ERROR_INSUFFICIENT_BUFFER != GetLastError())
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain service config: %s",
-						strerror_from_system(GetLastError())));
-				CloseServiceHandle(h_srv);
-				CloseServiceHandle(h_mgr);
-				return SYSINFO_RET_FAIL;
-			}
-
-			qsc = (QUERY_SERVICE_CONFIG *)zbx_malloc((void *)qsc, sz);
-
-			if (0 == QueryServiceConfig(h_srv, qsc, sz, &sz))
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain service config: %s",
-						strerror_from_system(GetLastError())));
-				zbx_free(qsc);
-				CloseServiceHandle(h_srv);
-				CloseServiceHandle(h_mgr);
-				return SYSINFO_RET_FAIL;
-			}
-
-			switch (param_type)
-			{
-				case ZBX_SRV_PARAM_DISPLAYNAME:
-					SET_STR_RESULT(result, zbx_unicode_to_utf8(qsc->lpDisplayName));
-					break;
-				case ZBX_SRV_PARAM_PATH:
-					SET_STR_RESULT(result, zbx_unicode_to_utf8(qsc->lpBinaryPathName));
-					break;
-				case ZBX_SRV_PARAM_USER:
-					SET_STR_RESULT(result, zbx_unicode_to_utf8(qsc->lpServiceStartName));
-					break;
-				case ZBX_SRV_PARAM_STARTUP:
-					SET_UI64_RESULT(result, qsc->dwStartType);
-					break;
-			}
-			zbx_free(qsc);
-		}
-	}
-
-	CloseServiceHandle(h_srv);
-	CloseServiceHandle(h_mgr);
 
 	return SYSINFO_RET_OK;
 }
