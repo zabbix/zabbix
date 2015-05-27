@@ -21,184 +21,251 @@
 
 class C20ImportConverterTest extends CImportConverterTest {
 
-	public function testConvertHosts() {
-		$source = $this->createSource([
-			'hosts' => [
+	public function testConvertProvider() {
+		return [
+			[
 				[],
+				[]
+			],
+			[
 				[
-					'interfaces' => [
-						[
-							'type' => INTERFACE_TYPE_AGENT,
-						],
-						[
-							'type' => INTERFACE_TYPE_SNMP,
-						]
-					]
-				],
-			]
-		]);
-
-		$expectedResult = $this->createExpectedResult([
-			'hosts' => [
-				[],
-				[
-					'interfaces' => [
-						[
-							'type' => INTERFACE_TYPE_AGENT,
-							'bulk' => SNMP_BULK_ENABLED
-						],
-						[
-							'type' => INTERFACE_TYPE_SNMP,
-							'bulk' => SNMP_BULK_ENABLED
-						]
-					]
-				],
-			]
-		]);
-
-		$this->assertConvert($expectedResult, $source);
-	}
-
-	public function testConvertItems() {
-		$source = $this->createSource([
-			'hosts' => [
-				[],
-				[
-					'items' => ''
-				],
-				[
-					'items' => [
+					'hosts' => [
 						[],
 						[
-							'status' => ITEM_STATUS_NOTSUPPORTED
+							'interfaces' => [
+								['type' => INTERFACE_TYPE_AGENT],
+								['type' => INTERFACE_TYPE_SNMP]
+							]
+						],
+						[
+							'items' => [
+								['key' => 'agent.ping', 'status' => ITEM_STATUS_ACTIVE],
+								['key' => 'net.tcp.service[ntp]', 'status' => ITEM_STATUS_DISABLED],
+								['key' => 'net.tcp.service[tcp,,5432]', 'status' => ITEM_STATUS_NOTSUPPORTED]
+							]
+						],
+						[
+							'discovery_rules' => [
+								[
+									'status' => ITEM_STATUS_ACTIVE,
+									'filter' => [],
+									'item_prototypes' => [
+										[
+											'key' => 'net.if.in[{#IFNAME}]'
+										],
+										[
+											'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+										]
+									],
+									'graph_prototypes' => [
+										[
+											'ymin_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymin_item_1' => [
+												'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+											],
+											'ymax_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymax_item_1' => [
+												'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+											],
+											'graph_items' => [
+												[
+													'item' => [
+														'key' => 'net.if.in[{#IFNAME}]'
+													]
+												],
+												[
+													'item' => [
+														'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+													]
+												]
+											]
+										]
+									],
+									'trigger_prototypes' => [
+										[
+											'expression' => '{host:item.last(0)}#0|{host:item.last(0)}#1'
+										]
+									]
+								],
+								[
+									'status' => ITEM_STATUS_DISABLED,
+									'filter' => '',
+									'item_prototypes' => [],
+									'graph_prototypes' => [],
+									'trigger_prototypes' => []
+								],
+								[
+									'status' => ITEM_STATUS_NOTSUPPORTED,
+									'filter' => ':',
+									'item_prototypes' => [],
+									'graph_prototypes' => [],
+									'trigger_prototypes' => []
+								],
+								[
+									'status' => ITEM_STATUS_ACTIVE,
+									'filter' => '{#MACRO}:regex',
+									'item_prototypes' => [],
+									'graph_prototypes' => [],
+									'trigger_prototypes' => []
+								],
+							]
 						]
 					]
-				]
-			]
-		]);
-
-		$expectedResult = $this->createExpectedResult([
-			'hosts' => [
-				[],
-				[
-					'items' => ''
 				],
 				[
-					'items' => [
+					'hosts' => [
 						[],
 						[
-							'status' => ITEM_STATUS_ACTIVE
+							'interfaces' => [
+								['type' => INTERFACE_TYPE_AGENT],
+								['type' => INTERFACE_TYPE_SNMP, 'bulk' => SNMP_BULK_ENABLED]
+							]
+						],
+						[
+							'items' => [
+								['key' => 'agent.ping', 'status' => ITEM_STATUS_ACTIVE],
+								['key' => 'net.udp.service[ntp]', 'status' => ITEM_STATUS_DISABLED],
+								['key' => 'net.tcp.service[tcp,,5432]', 'status' => ITEM_STATUS_ACTIVE]
+							]
+						],
+						[
+							'discovery_rules' => [
+								[
+									'status' => ITEM_STATUS_ACTIVE,
+									'filter' => [],
+									'item_prototypes' => [
+										[
+											'key' => 'net.if.in[{#IFNAME}]'
+										],
+										[
+											'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+										]
+									],
+									'graph_prototypes' => [
+										[
+											'ymin_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymin_item_1' => [
+												'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+											],
+											'ymax_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymax_item_1' => [
+												'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+											],
+											'graph_items' => [
+												[
+													'item' => [
+														'key' => 'net.if.in[{#IFNAME}]'
+													]
+												],
+												[
+													'item' => [
+														'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+													]
+												]
+											]
+										]
+									],
+									'trigger_prototypes' => [
+										[
+											'expression' => '{host:item.last(0)}<>0 or {host:item.last(0)}<>1'
+										]
+									],
+									'host_prototypes' => []
+								],
+								[
+									'status' => ITEM_STATUS_DISABLED,
+									'filter' => [
+										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+										'formula' => '',
+										'conditions' => []
+									],
+									'item_prototypes' => [],
+									'graph_prototypes' => [],
+									'trigger_prototypes' => [],
+									'host_prototypes' => []
+								],
+								[
+									'status' => ITEM_STATUS_ACTIVE,
+									'filter' => [
+										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+										'formula' => '',
+										'conditions' => []
+									],
+									'item_prototypes' => [],
+									'graph_prototypes' => [],
+									'trigger_prototypes' => [],
+									'host_prototypes' => []
+								],
+								[
+									'status' => ITEM_STATUS_ACTIVE,
+									'filter' => [
+										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+										'formula' => '',
+										'conditions' => [
+											[
+												'macro' => '{#MACRO}',
+												'value' => 'regex',
+												'operator' => CONDITION_OPERATOR_REGEXP,
+											]
+										]
+									],
+									'item_prototypes' => [],
+									'graph_prototypes' => [],
+									'trigger_prototypes' => [],
+									'host_prototypes' => []
+								]
+							]
 						]
-					]
-				]
-			]
-		]);
-
-		$this->assertConvert($expectedResult, $source);
-	}
-
-	public function testConvertTriggers() {
-		$this->assertConvert(
-			$this->createExpectedResult([]),
-			$this->createSource([])
-		);
-		$this->assertConvert(
-			$this->createExpectedResult(['triggers' => '']),
-			$this->createSource(['triggers' => ''])
-		);
-
-		$source = $this->createSource([
-			'triggers' => [
-				[
-					'expression' => '{host:item.last(0)}#0|{host:item.last(0)}#1'
-				]
-			]
-		]);
-
-		$expectedResult = $this->createExpectedResult([
-			'triggers' => [
-				[
-					'expression' => '{host:item.last(0)}<>0 or {host:item.last(0)}<>1'
-				]
-			]
-		]);
-
-		$this->assertConvert($expectedResult, $source);
-	}
-
-	public function testConvertDiscoveryRules() {
-		$source = $this->createSource([
-			'hosts' => [
-				[],
-				[
-					'discovery_rules' => ''
-				],
-				[
-					'discovery_rules' => [
-						[],
-						[
-							'status' => ITEM_STATUS_NOTSUPPORTED,
-							'filter' => []
-						],
-						[
-							'filter' => ''
-						],
-						[
-							'filter' => ':'
-						],
-						[
-							'filter' => '{#MACRO}:regex'
-						],
 					]
 				]
 			],
-			'templates' => [
+			[
 				[
-					'discovery_rules' => [
-						[],
+					'graphs' => [
 						[
-							'filter' => []
-						],
-						[
-							'filter' => ''
-						],
-						[
-							'filter' => ':'
-						],
-						[
-							'filter' => '{#MACRO}:regex'
-						],
+							'ymin_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+							'ymin_item_1' => [
+								'key' => 'net.tcp.service[ntp, localhost, 123]'
+							],
+							'ymax_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+							'ymax_item_1' => [
+								'key' => 'net.tcp.service[ntp, localhost, 123]'
+							],
+							'graph_items' => [
+								[
+									'item' => [
+										'key' => 'net.if.in[eth0]'
+									]
+								],
+								[
+									'item' => [
+										'key' => 'net.tcp.service[ntp, localhost, 123]'
+									]
+								]
+							]
+						]
 					]
-				]
-			]
-		]);
-
-		$expectedResult = $this->createExpectedResult([
-			'hosts' => [
-				[],
-				[
-					'discovery_rules' => ''
 				],
 				[
-					'discovery_rules' => [
-						[],
+					'graphs' => [
 						[
-							'status' => ITEM_STATUS_ACTIVE,
-							'filter' => []
-						],
-						[
-							'filter' => ''
-						],
-						[],
-						[
-							'filter' => [
-								'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-								'formula' => '',
-								'conditions' => [
-									[
-										'macro' => '{#MACRO}',
-										'value' => 'regex',
-										'operator' => CONDITION_OPERATOR_REGEXP,
+							'ymin_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+							'ymin_item_1' => [
+								'key' => 'net.udp.service[ntp, localhost, 123]'
+							],
+							'ymax_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+							'ymax_item_1' => [
+								'key' => 'net.udp.service[ntp, localhost, 123]'
+							],
+							'graph_items' => [
+								[
+									'item' => [
+										'key' => 'net.if.in[eth0]'
+									]
+								],
+								[
+									'item' => [
+										'key' => 'net.udp.service[ntp, localhost, 123]'
 									]
 								]
 							]
@@ -206,26 +273,329 @@ class C20ImportConverterTest extends CImportConverterTest {
 					]
 				]
 			],
-			'templates' => [
+			[
 				[
-					'discovery_rules' => [
+					'triggers' => [
+						[
+							'expression' => '{host:item.last(0)}#0|{host:item.last(0)}#1'
+						]
+					]
+				],
+				[
+					'triggers' => [
+						[
+							'expression' => '{host:item.last(0)}<>0 or {host:item.last(0)}<>1'
+						]
+					]
+				]
+			],
+			[
+				[
+					'templates' => [
 						[],
 						[
-							'filter' => []
+							'items' => [
+								['key' => 'agent.ping', 'status' => ITEM_STATUS_ACTIVE],
+								['key' => 'net.tcp.service[ntp]', 'status' => ITEM_STATUS_DISABLED],
+								['key' => 'net.tcp.service[tcp,,5432]', 'status' => ITEM_STATUS_NOTSUPPORTED]
+							]
 						],
 						[
-							'filter' => ''
+							'screens' => [
+								[],
+								[
+									'screen_items' => [
+										[
+											'rowspan' => 0,
+											'colspan' => 0,
+											'resourcetype' => SCREEN_RESOURCE_SIMPLE_GRAPH,
+											'resource' => [
+												'key' => 'net.tcp.service[ntp]'
+											]
+										],
+										[
+											'rowspan' => 1,
+											'colspan' => 2,
+											'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+											'resource' => [
+												'key' => 'net.tcp.service[ntp]'
+											]
+										],
+										[
+											'rowspan' => 3,
+											'colspan' => 4,
+											'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+											'resource' => [
+												'key' => 'net.tcp.service[tcp,,5432]'
+											]
+										]
+									]
+								]
+							]
 						],
+						[
+							'discovery_rules' => [
+								[
+									'status' => ITEM_STATUS_ACTIVE,
+									'filter' => [],
+									'item_prototypes' => [
+										[
+											'key' => 'net.if.in[{#IFNAME}]'
+										],
+										[
+											'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+										]
+									],
+									'graph_prototypes' => [
+										[
+											'ymin_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymin_item_1' => [
+												'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+											],
+											'ymax_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymax_item_1' => [
+												'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+											],
+											'graph_items' => [
+												[
+													'item' => [
+														'key' => 'net.if.in[{#IFNAME}]'
+													]
+												],
+												[
+													'item' => [
+														'key' => 'net.tcp.service[ntp, {#HOST}, {#PORT}]'
+													]
+												]
+											]
+										]
+									],
+									'trigger_prototypes' => [
+										[
+											'expression' => '{host:item.last(0)}#0|{host:item.last(0)}#1'
+										]
+									]
+								],
+								[
+									'status' => ITEM_STATUS_DISABLED,
+									'filter' => '',
+									'item_prototypes' => [],
+									'graph_prototypes' => [],
+									'trigger_prototypes' => []
+								],
+								[
+									'status' => ITEM_STATUS_NOTSUPPORTED,
+									'filter' => ':',
+									'item_prototypes' => [],
+									'graph_prototypes' => [],
+									'trigger_prototypes' => []
+								],
+								[
+									'status' => ITEM_STATUS_ACTIVE,
+									'filter' => '{#MACRO}:regex',
+									'item_prototypes' => [],
+									'graph_prototypes' => [],
+									'trigger_prototypes' => []
+								],
+							]
+						]
+					]
+				],
+				[
+					'templates' => [
 						[],
 						[
-							'filter' => [
-								'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-								'formula' => '',
-								'conditions' => [
-									[
-										'macro' => '{#MACRO}',
-										'value' => 'regex',
-										'operator' => CONDITION_OPERATOR_REGEXP,
+							'items' => [
+								['key' => 'agent.ping', 'status' => ITEM_STATUS_ACTIVE],
+								['key' => 'net.udp.service[ntp]', 'status' => ITEM_STATUS_DISABLED],
+								['key' => 'net.tcp.service[tcp,,5432]', 'status' => ITEM_STATUS_ACTIVE]
+							]
+						],
+						[
+							'screens' => [
+								[],
+								[
+									'screen_items' => [
+										[
+											'rowspan' => 1,
+											'colspan' => 1,
+											'resourcetype' => SCREEN_RESOURCE_SIMPLE_GRAPH,
+											'resource' => [
+												'key' => 'net.udp.service[ntp]'
+											]
+										],
+										[
+											'rowspan' => 1,
+											'colspan' => 2,
+											'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+											'resource' => [
+												'key' => 'net.udp.service[ntp]'
+											]
+										],
+										[
+											'rowspan' => 3,
+											'colspan' => 4,
+											'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+											'resource' => [
+												'key' => 'net.tcp.service[tcp,,5432]'
+											]
+										]
+									]
+								]
+							]
+						],
+						[
+							'discovery_rules' => [
+								[
+									'status' => ITEM_STATUS_ACTIVE,
+									'filter' => [],
+									'item_prototypes' => [
+										[
+											'key' => 'net.if.in[{#IFNAME}]'
+										],
+										[
+											'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+										]
+									],
+									'graph_prototypes' => [
+										[
+											'ymin_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymin_item_1' => [
+												'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+											],
+											'ymax_type_1' => GRAPH_YAXIS_TYPE_ITEM_VALUE,
+											'ymax_item_1' => [
+												'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+											],
+											'graph_items' => [
+												[
+													'item' => [
+														'key' => 'net.if.in[{#IFNAME}]'
+													]
+												],
+												[
+													'item' => [
+														'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+													]
+												]
+											]
+										]
+									],
+									'trigger_prototypes' => [
+										[
+											'expression' => '{host:item.last(0)}<>0 or {host:item.last(0)}<>1'
+										]
+									],
+									'host_prototypes' => []
+								],
+								[
+									'status' => ITEM_STATUS_DISABLED,
+									'filter' => [
+										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+										'formula' => '',
+										'conditions' => []
+									],
+									'item_prototypes' => [],
+									'graph_prototypes' => [],
+									'trigger_prototypes' => [],
+									'host_prototypes' => []
+								],
+								[
+									'status' => ITEM_STATUS_ACTIVE,
+									'filter' => [
+										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+										'formula' => '',
+										'conditions' => []
+									],
+									'item_prototypes' => [],
+									'graph_prototypes' => [],
+									'trigger_prototypes' => [],
+									'host_prototypes' => []
+								],
+								[
+									'status' => ITEM_STATUS_ACTIVE,
+									'filter' => [
+										'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+										'formula' => '',
+										'conditions' => [
+											[
+												'macro' => '{#MACRO}',
+												'value' => 'regex',
+												'operator' => CONDITION_OPERATOR_REGEXP,
+											]
+										]
+									],
+									'item_prototypes' => [],
+									'graph_prototypes' => [],
+									'trigger_prototypes' => [],
+									'host_prototypes' => []
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'screens' => [
+						[],
+						[
+							'screen_items' => [
+								[
+									'rowspan' => 0,
+									'colspan' => 0,
+									'resourcetype' => SCREEN_RESOURCE_SIMPLE_GRAPH,
+									'resource' => [
+										'key' => 'net.tcp.service[ntp]'
+									]
+								],
+								[
+									'rowspan' => 1,
+									'colspan' => 2,
+									'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+									'resource' => [
+										'key' => 'net.tcp.service[ntp]'
+									]
+								],
+								[
+									'rowspan' => 3,
+									'colspan' => 4,
+									'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+									'resource' => [
+										'key' => 'net.tcp.service[tcp,,5432]'
+									]
+								]
+							]
+						]
+					]
+				],
+				[
+					'screens' => [
+						[],
+						[
+							'screen_items' => [
+								[
+									'rowspan' => 1,
+									'colspan' => 1,
+									'resourcetype' => SCREEN_RESOURCE_SIMPLE_GRAPH,
+									'resource' => [
+										'key' => 'net.udp.service[ntp]'
+									]
+								],
+								[
+									'rowspan' => 1,
+									'colspan' => 2,
+									'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+									'resource' => [
+										'key' => 'net.udp.service[ntp]'
+									]
+								],
+								[
+									'rowspan' => 3,
+									'colspan' => 4,
+									'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
+									'resource' => [
+										'key' => 'net.tcp.service[tcp,,5432]'
 									]
 								]
 							]
@@ -233,53 +603,17 @@ class C20ImportConverterTest extends CImportConverterTest {
 					]
 				]
 			]
-		]);
-
-		$this->assertConvert($expectedResult, $source);
+		];
 	}
 
-	public function testConvertTriggerPrototypes() {
-		$source = $this->createSource([
-			'hosts' => [
-				[
-					'discovery_rules' => [
-						[],
-						[
-							'trigger_prototypes' => ''
-						],
-						[
-							'trigger_prototypes' => [
-								[
-									'expression' => '{host:item.last(0)}#0|{host:item.last(0)}#1'
-								]
-							]
-						]
-					]
-				]
-			]
-		]);
-
-		$expectedResult = $this->createExpectedResult([
-			'hosts' => [
-				[
-					'discovery_rules' => [
-						[],
-						[
-							'trigger_prototypes' => ''
-						],
-						[
-							'trigger_prototypes' => [
-								[
-									'expression' => '{host:item.last(0)}<>0 or {host:item.last(0)}<>1'
-								]
-							]
-						]
-					]
-				]
-			]
-		]);
-
-		$this->assertConvert($expectedResult, $source);
+	/**
+	 * @dataProvider testConvertProvider
+	 *
+	 * @param $data
+	 * @param $expected
+	 */
+	public function testConvert(array $data, array $expected) {
+		$this->assertConvert($this->createExpectedResult($expected), $this->createSource($data));
 	}
 
 	protected function createSource(array $data = []) {
@@ -300,9 +634,9 @@ class C20ImportConverterTest extends CImportConverterTest {
 		];
 	}
 
-	protected function assertConvert(array $expectedResult, array $source) {
+	protected function assertConvert(array $expected, array $source) {
 		$result = $this->createConverter()->convert($source);
-		$this->assertEquals($expectedResult, $result);
+		$this->assertEquals($expected, $result);
 	}
 
 
