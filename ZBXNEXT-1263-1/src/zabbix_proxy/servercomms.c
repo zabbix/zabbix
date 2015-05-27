@@ -29,24 +29,35 @@
 
 extern unsigned int	configured_tls_connect_mode;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-extern char		*CONFIG_TLS_SERVER_CERT_ISSUER, *CONFIG_TLS_SERVER_CERT_SUBJECT;
+extern char		*CONFIG_TLS_SERVER_CERT_ISSUER, *CONFIG_TLS_SERVER_CERT_SUBJECT, *CONFIG_TLS_PSK_IDENTITY;
 #endif
 
 int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 {
 	int	res, lastlogtime, now;
+	char	*tls_arg1, *tls_arg2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_server() [%s]:%d [timeout:%d]",
 			CONFIG_SERVER, CONFIG_SERVER_PORT, timeout);
 
+	if (ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode)
+	{
+		tls_arg1 = NULL;
+		tls_arg2 = NULL;
+	}
+	else if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
+	{
+		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
+		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
+	}
+	else	/* ZBX_TCP_SEC_TLS_PSK */
+	{
+		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
+		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
+	}
+
 	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout,
-			configured_tls_connect_mode,
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			CONFIG_TLS_SERVER_CERT_ISSUER, CONFIG_TLS_SERVER_CERT_SUBJECT)))
-			/* in case of TLS with PSK zbx_tls_connect() will find PSK */
-#else
-			NULL, NULL)))
-#endif
+			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
 		if (0 == retry_interval)
 		{
@@ -60,12 +71,7 @@ int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 					retry_interval);
 			lastlogtime = (int)time(NULL);
 			while (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT,
-					timeout, configured_tls_connect_mode,
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-					CONFIG_TLS_SERVER_CERT_ISSUER, CONFIG_TLS_SERVER_CERT_SUBJECT)))
-#else
-					NULL, NULL)))
-#endif
+					timeout, configured_tls_connect_mode, tls_arg1, tls_arg2)))
 			{
 				now = (int)time(NULL);
 				if (60 <= now - lastlogtime)
