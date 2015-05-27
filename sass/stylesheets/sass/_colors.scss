@@ -50,7 +50,9 @@ $form-bg-color: #fff !default; //NEW
 $form-border-color: #acbbc2 !default; //NEW
 $form-border-focus-color: #0275b8 !default; //NEW
 
+$form-disabled-font-color: #acbbc2 !default;
 $form-disabled-bg-color: #ebebeb !default; //NEW
+$form-disabled-border-color: #ccd5d9 !default;
 
 
 // BUTTONS
@@ -79,41 +81,17 @@ $btn-disabled-border-color: #ccd5d9 !default;
 
 
 // LINKS
-$link-color: #0275b8 !default; // Primary Blue
+$link-color: #0275b8 !default;
 $link-hover-color: #0275b8 !default;
 $link-active-color: #0275b8 !default;
 $link-visited-color: #0275b8 !default;
 
-$link-main-nav-color: #bfdced !default; // Nav Blue
+$link-main-nav-color: #bfdced !default;
 $link-main-nav-hover-color: #fff !default;
 $link-main-nav-active-color: #fff !default;
 $link-main-nav-visited-color: #bfdced !default;
 
-$link-main-subnav-color: #bfced7 !default; // SubNav Blue
+$link-main-subnav-color: #bfced7 !default;
 $link-main-subnav-hover-color: #fff !default;
 $link-main-subnav-active-color: #fff !default;
 $link-main-subnav-visited-color: #bfced7 !default;
-
-
-
-
-
-
-
-//$primary-blue: #0275b8 !default; // USED Primary top nav color
-//$secondary-blue: #013e61 !default; // USED Secondary top subnav color
-
-
-//$alt-blue: #e8f4fa!default; // USED
-
-//$blue-grey: #768d99 !default;
-//$light-blue-grey: #acbbc2 !default;
-//$lighter-blue-grey: #ccd5d9 !default;
-//$lightest-blue-grey: #ebeef0 !default; //Background color and table border color
-
-
-
-//$light-grey: #ebebeb !default; // USED In scrollbar and timeline bar
-//$lighter-grey: #f2f2f2 !default;
-
-//$indigo-black: #1f2c33 !default; // USED

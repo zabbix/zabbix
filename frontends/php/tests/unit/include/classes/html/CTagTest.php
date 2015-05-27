@@ -30,7 +30,7 @@ abstract class CTagTest extends PHPUnit_Framework_TestCase {
 	 * @param string $expectedHtml
 	 */
 	public function testConstruct(array $params, $expectedHtml) {
-		$tag = call_user_func_array(array($this, 'createTag'), $params);
+		$tag = call_user_func_array([$this, 'createTag'], $params);
 		$this->assertEquals($expectedHtml, (string) $tag);
 	}
 

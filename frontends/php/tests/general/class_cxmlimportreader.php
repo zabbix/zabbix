@@ -25,8 +25,8 @@ require_once dirname(__FILE__).'/../../include/classes/import/readers/CXmlImport
 class class_cxmlimportreader extends PHPUnit_Framework_TestCase {
 
 	public static function provider() {
-		return array(
-			array(
+		return [
+			[
 				<<< XML
 <root>
 	<tag>tag</tag>
@@ -38,18 +38,18 @@ class class_cxmlimportreader extends PHPUnit_Framework_TestCase {
 </root>
 XML
 				,
-				array(
-					'root' => array(
+				[
+					'root' => [
 						'tag' => 'tag',
 						'empty_tag' => '',
 						'empty' => '',
-						'array' => array(
+						'array' => [
 							'tag' => 'tag'
-						)
-					)
-				),
-			),
-		);
+						]
+					]
+				],
+			],
+		];
 	}
 
 	/**

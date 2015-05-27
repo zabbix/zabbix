@@ -44,7 +44,7 @@ class CFunctionMacroParser extends CParser {
 	 *
 	 * @var array
 	 */
-	public $options = array('18_simple_checks' => false);
+	public $options = ['18_simple_checks' => false];
 
 	/**
 	 * Parser for user macros.
@@ -56,7 +56,7 @@ class CFunctionMacroParser extends CParser {
 	/**
 	 * @param array $options
 	 */
-	public function __construct($options = array()) {
+	public function __construct($options = []) {
 		if (array_key_exists('18_simple_checks', $options)) {
 			$this->options['18_simple_checks'] = $options['18_simple_checks'];
 		}
@@ -110,7 +110,7 @@ class CFunctionMacroParser extends CParser {
 		$result->pos = $startPos;
 		$result->length = $expressionLength;
 
-		$result->expression = array(
+		$result->expression = [
 			'expression' => $expression,
 			'pos' => $startPos,
 			'host' => $host,
@@ -119,7 +119,7 @@ class CFunctionMacroParser extends CParser {
 			'functionName' => $functionName,
 			'functionParam' => substr($function, strpos($function, '(') + 1, -1),
 			'functionParamList' => $functionParamList
-		);
+		];
 
 		return $result;
 	}
@@ -305,7 +305,7 @@ class CFunctionMacroParser extends CParser {
 
 		$state = self::STATE_NEW;
 		$num = 0;
-		$functionParamList = array();
+		$functionParamList = [];
 		$functionParamList[$num] = '';
 
 		while (isset($this->source[$this->pos])) {
@@ -385,7 +385,7 @@ class CFunctionMacroParser extends CParser {
 
 		$function = substr($this->source, $startPos, $this->pos - $startPos);
 
-		return array($function, $functionParamList);
+		return [$function, $functionParamList];
 	}
 
 	/**

@@ -28,7 +28,8 @@ class CTriggersInfo extends CTable {
 	public function __construct($groupid = null, $hostid = null, $style = STYLE_HORIZONTAL) {
 		$this->style = null;
 
-		parent::__construct(null, 'list-table');
+		parent::__construct();
+		$this->addClass(ZBX_STYLE_LIST_TABLE);
 		$this->setOrientation($style);
 		$this->groupid = is_null($groupid) ? 0 : $groupid;
 		$this->hostid = is_null($hostid) ? 0 : $hostid;
@@ -44,16 +45,16 @@ class CTriggersInfo extends CTable {
 		$config = select_config();
 
 		// array of triggers (not classified, information, warning, average, high, disaster) in problem state
-		$triggersProblemState = array();
+		$triggersProblemState = [];
 
 		// number of triggers in OK state
 		$triggersOkState = 0;
 
-		$options = array(
+		$options = [
 			'monitored' => true,
 			'skipDependent' => true,
-			'output' => array('triggerid')
-		);
+			'output' => ['triggerid']
+		];
 
 		if ($this->hostid > 0) {
 			$options['hostids'] = $this->hostid;
@@ -85,7 +86,7 @@ class CTriggersInfo extends CTable {
 			}
 		}
 
-		$severityCells = array(getSeverityCell(null, $config, $triggersOkState.SPACE._('Ok'), true));
+		$severityCells = [getSeverityCell(null, $config, $triggersOkState.SPACE._('Ok'), true)];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severityCount = isset($triggersProblemState[$severity]) ? $triggersProblemState[$severity] : 0;

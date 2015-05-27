@@ -26,7 +26,7 @@ class CScreenMap extends CScreenBase {
 	 *
 	 * @var array
 	 */
-	private $data = array();
+	private $data = [];
 
 	/**
 	 * Process screen.
@@ -39,7 +39,7 @@ class CScreenMap extends CScreenBase {
 		$image->setAttribute('id', 'map_'.$this->screenitem['screenitemid']);
 
 		if ($this->mode == SCREEN_MODE_PREVIEW) {
-			$sysmap = API::Map()->get(array(
+			$sysmap = API::Map()->get([
 				'sysmapids' => $this->screenitem['resourceid'],
 				'output' => API_OUTPUT_EXTEND,
 				'selectSelements' => API_OUTPUT_EXTEND,
@@ -47,21 +47,21 @@ class CScreenMap extends CScreenBase {
 				'expandUrls' => true,
 				'nopermissions' => true,
 				'preservekeys' => true
-			));
+			]);
 			$sysmap = reset($sysmap);
 
 			$image->setSrc($image->getAttribute('src').'&severity_min='.$sysmap['severity_min']);
 
-			$actionMap = getActionMapBySysmap($sysmap, array('severity_min' => $sysmap['severity_min']));
+			$actionMap = getActionMapBySysmap($sysmap, ['severity_min' => $sysmap['severity_min']]);
 			$image->setMap($actionMap->getName());
 
-			$output = array($actionMap, $image);
+			$output = [$actionMap, $image];
 		}
 		elseif ($this->mode == SCREEN_MODE_EDIT) {
-			$output = array($image, BR(), new CLink(_('Change'), $this->action));
+			$output = [$image, BR(), new CLink(_('Change'), $this->action)];
 		}
 		else {
-			$output = array($image);
+			$output = [$image];
 		}
 
 		$this->insertFlickerfreeJs();

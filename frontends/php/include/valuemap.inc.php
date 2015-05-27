@@ -40,7 +40,7 @@ function addValueMap(array $valueMap, array $mappings) {
 		throw new Exception(_s('Value map "%1$s" already exists.', $valueMap['name']));
 	}
 
-	$valueMapIds = DB::insert('valuemaps', array($valueMap));
+	$valueMapIds = DB::insert('valuemaps', [$valueMap]);
 	$valueMapId = reset($valueMapIds);
 
 	return addValueMapMappings($valueMapId, $mappings);
@@ -82,10 +82,10 @@ function updateValueMap(array $valueMap, array $mappings) {
 
 	$result = rewriteValueMapMappings($valueMapId, $mappings);
 
-	$result &= DB::update('valuemaps', array(
+	$result &= DB::update('valuemaps', [
 		'values' => $valueMap,
-		'where' => array('valuemapid' => $valueMapId)
-	));
+		'where' => ['valuemapid' => $valueMapId]
+	]);
 
 	return (bool) $result;
 }
@@ -98,11 +98,11 @@ function updateValueMap(array $valueMap, array $mappings) {
  * @return bool
  */
 function deleteValueMap($valueMapId) {
-	$result = DB::update('items', array(
-		'values' => array('valuemapid' => 0),
-		'where' => array('valuemapid' => $valueMapId)
-	));
-	$result &= DB::delete('valuemaps', array('valuemapid' => $valueMapId));
+	$result = DB::update('items', [
+		'values' => ['valuemapid' => 0],
+		'where' => ['valuemapid' => $valueMapId]
+	]);
+	$result &= DB::delete('valuemaps', ['valuemapid' => $valueMapId]);
 
 	return (bool) $result;
 }
@@ -168,8 +168,8 @@ function rewriteValueMapMappings($valueMapId, array $mappings) {
 	$result = true;
 	$dbValueMaps = getValueMapMappings($valueMapId);
 
-	$mappingsToAdd = array();
-	$mappingsToUpdate = array();
+	$mappingsToAdd = [];
+	$mappingsToUpdate = [];
 	foreach ($mappings as $mapping) {
 		if (!isset($mapping['mappingid'])) {
 			$mappingsToAdd[] = $mapping;
@@ -226,10 +226,10 @@ function updateValueMapMappings(array $mappings) {
 		$mappingid = $mapping['mappingid'];
 		unset($mapping['mappingid']);
 
-		$result &= DB::update('mappings', array(
+		$result &= DB::update('mappings', [
 			'values' => $mapping,
-			'where' => array('mappingid' => $mappingid)
-		));
+			'where' => ['mappingid' => $mappingid]
+		]);
 	}
 	unset($mapping);
 
@@ -244,7 +244,7 @@ function updateValueMapMappings(array $mappings) {
  * @return bool
  */
 function deleteValueMapMappings(array $mappingIds) {
-	return (bool) DB::delete('mappings', array('mappingid' => $mappingIds));
+	return (bool) DB::delete('mappings', ['mappingid' => $mappingIds]);
 }
 
 /**
@@ -255,7 +255,7 @@ function deleteValueMapMappings(array $mappingIds) {
  * @return array
  */
 function getValueMapMappings($valueMapId) {
-	$mappings = array();
+	$mappings = [];
 
 	$dbMappings = DBselect(
 		'SELECT m.mappingid,m.value,m.newvalue'.
@@ -279,7 +279,7 @@ function getValueMapMappings($valueMapId) {
  * @return string|bool
  */
 function getMappedValue($value, $valueMapId) {
-	static $valueMaps = array();
+	static $valueMaps = [];
 
 	if ($valueMapId < 1) {
 		return false;
