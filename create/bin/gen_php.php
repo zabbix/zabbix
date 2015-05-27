@@ -94,22 +94,22 @@ function parse_schema($path) {
 
 	$str = "<?php\n";
 
-	$str .= 'return array('."\n";
+	$str .= 'return ['."\n";
 	foreach ($schema as $table => $data) {
-		$str .= "\t'$table' => array(\n";
+		$str .= "\t'$table' => [\n";
 		$str .= "\t\t'key' => '{$data['key']}',\n";
-		$str .= "\t\t'fields' => array(\n";
+		$str .= "\t\t'fields' => [\n";
 		foreach ($data['fields'] as $field => $fieldata) {
-			$str .= "\t\t\t'$field' => array(\n";
+			$str .= "\t\t\t'$field' => [\n";
 			foreach ($fieldata as $name => $val) {
 				$str .= "\t\t\t\t'$name' => $val,\n";
 			}
-			$str .= "\t\t\t),\n";
+			$str .= "\t\t\t],\n";
 		}
-		$str .= "\t\t),\n";
-		$str .= "\t),\n";
+		$str .= "\t\t],\n";
+		$str .= "\t],\n";
 	}
-	$str .= ");\n";
+	$str .= "];\n";
 
 	$str .= "?>\n";
 
