@@ -93,10 +93,11 @@ $column->addRow(_('Filter by name'), new CTextBox('txt_select', $filter['txtSele
 // application
 $column->addRow(_('Filter by application'), [
 	new CTextBox('application', $filter['application'], 40),
+
 	new CButton('application_name', _('Select'),
 		'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1'.
 		'&dstfrm=zbx_filter");',
-		'button-form'
+		ZBX_STYLE_BTN_GREY
 	)
 ]);
 
@@ -119,13 +120,13 @@ foreach ($inventoryFilters as $field) {
 	$inventoryFilterTable->addRow([
 		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventoryFields),
 		new CTextBox('inventory['.$i.'][value]', $field['value'], 20),
-		new CButton('inventory['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')
+		new CButton('inventory['.$i.'][remove]', _('Remove'), null, 'element-table-remove')
 	], 'form_row');
 
 	$i++;
 }
 $inventoryFilterTable->addRow(
-	(new CCol(new CButton('inventory_add', _('Add'), null, 'link_menu element-table-add')))->setColSpan(3)
+	(new CCol(new CButton('inventory_add', _('Add'), null, 'element-table-add')))->setColSpan(2)
 );
 $column->addRow(_('Filter by host inventory'), $inventoryFilterTable);
 
