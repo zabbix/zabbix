@@ -63,7 +63,6 @@ class testGeneric extends CWebTest {
 			['toptriggers.php?severities[3]=3&filter_set=Filter',	'100 busiest triggers'],
 			['toptriggers.php?severities[4]=4&filter_set=Filter',	'100 busiest triggers'],
 			['toptriggers.php?severities[5]=5&filter_set=Filter',	'100 busiest triggers'],
-			['report6.php',										'Bar reports'],
 
 			// configuration
 			['hostgroups.php',					'Configuration of host groups'],

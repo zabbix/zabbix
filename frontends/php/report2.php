@@ -21,7 +21,6 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
-require_once dirname(__FILE__).'/include/reports.inc.php';
 
 $page['title'] = _('Availability report');
 $page['file'] = 'report2.php';
