@@ -46,16 +46,16 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->zbxTestTextPresent('Scripts');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextPresent(
-				array('Name', 'Type', 'Execute on', 'Commands', 'User group', 'Host group', 'Host access')
+				['Name', 'Type', 'Execute on', 'Commands', 'User group', 'Host group', 'Host access']
 		);
 
 		$dbResult = DBselect('SELECT name,command FROM scripts');
 
 		while ($dbRow = DBfetch($dbResult)) {
-			$this->zbxTestTextPresent(array($dbRow['name'], $dbRow['command']));
+			$this->zbxTestTextPresent([$dbRow['name'], $dbRow['command']]);
 		}
 
-		$this->zbxTestDropdownHasOptions('action', array('Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', ['Delete selected']);
 		$this->assertElementValue('goButton', 'Go (0)');
 	}
 

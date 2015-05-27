@@ -26,14 +26,14 @@ class CSetParser extends CParser {
 	 *
 	 * @var array
 	 */
-	protected $needles = array();
+	protected $needles = [];
 
 	/**
 	 * Array of chars that are used in the given strings with chars as keys.
 	 *
 	 * @var array
 	 */
-	protected $chars = array();
+	protected $chars = [];
 
 	/**
 	 * Array of strings to search for.

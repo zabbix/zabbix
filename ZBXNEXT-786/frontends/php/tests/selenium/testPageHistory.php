@@ -40,15 +40,15 @@ class testPageHistory extends CWebTest {
 		switch ($item['value_type']) {
 			case ITEM_VALUE_TYPE_LOG:
 				if (substr($item['key_'], 0, 9) === 'eventlog[') {
-					$table_titles = array('Timestamp', 'Local time', 'Source', 'Severity', 'Event ID', 'Value');
+					$table_titles = ['Timestamp', 'Local time', 'Source', 'Severity', 'Event ID', 'Value'];
 				}
 				else {
-					$table_titles = array('Timestamp', 'Local time', 'Value');
+					$table_titles = ['Timestamp', 'Local time', 'Value'];
 				}
 				break;
 
 			default:
-				$table_titles = array('Timestamp', 'Value');
+				$table_titles = ['Timestamp', 'Value'];
 		}
 		$this->zbxTestTextPresent($table_titles);
 

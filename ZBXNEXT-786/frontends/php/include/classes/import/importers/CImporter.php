@@ -34,7 +34,7 @@ abstract class CImporter {
 	/**
 	 * @var array
 	 */
-	protected $options = array();
+	protected $options = [];
 
 	/**
 	 * @param array						$options					import options "createMissing", "updateExisting" and "deleteMissing"

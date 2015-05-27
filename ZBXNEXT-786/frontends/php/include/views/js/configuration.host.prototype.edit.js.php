@@ -38,10 +38,10 @@
 			addGroupPrototypeRow({'name': '', 'group_prototypeid': ''});
 		<?php endif ?>
 		<?php foreach ($hostPrototype['groupPrototypes'] as $i => $groupPrototype): ?>
-			addGroupPrototypeRow(<?php echo CJs::encodeJson(array(
+			addGroupPrototypeRow(<?php echo CJs::encodeJson([
 				'name' => $groupPrototype['name'],
 				'group_prototypeid' => isset($groupPrototype['group_prototypeid']) ? $groupPrototype['group_prototypeid'] : null
-			)) ?>);
+			]) ?>);
 		<?php endforeach ?>
 
 		<?php if ($hostPrototype['templateid']): ?>

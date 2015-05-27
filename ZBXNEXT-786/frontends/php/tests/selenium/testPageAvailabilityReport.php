@@ -27,7 +27,7 @@ class testPageAvailabilityReport extends CWebTest {
 		$this->zbxTestTextPresent('AVAILABILITY REPORT');
 		$this->zbxTestTextPresent('Mode');
 		$this->zbxTestTextPresent('Filter');
-		$this->zbxTestTextPresent(array('Host', 'Name', 'Problems', 'Ok', 'Graph'));
+		$this->zbxTestTextPresent(['Host', 'Name', 'Problems', 'Ok', 'Graph']);
 	}
 
 // Check that no real host or template names displayed
@@ -43,7 +43,7 @@ class testPageAvailabilityReport extends CWebTest {
 		$this->zbxTestTextPresent('AVAILABILITY REPORT');
 		$this->zbxTestTextPresent('Mode');
 		$this->zbxTestTextPresent('Filter');
-		$this->zbxTestTextPresent(array('Host', 'Name', 'Problems', 'Ok', 'Graph'));
+		$this->zbxTestTextPresent(['Host', 'Name', 'Problems', 'Ok', 'Graph']);
 	}
 
 // Check that no real host or template names displayed

@@ -36,12 +36,12 @@ class CHostGroupNormalValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($hostGroupIds) {
-		$hostGroups = API::HostGroup()->get(array(
-			'output' => array('name'),
+		$hostGroups = API::HostGroup()->get([
+			'output' => ['name'],
 			'groupids' => $hostGroupIds,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
 			'limit' => 1
-		));
+		]);
 
 		if ($hostGroups) {
 			$hostGroup = reset($hostGroups);
