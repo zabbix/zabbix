@@ -120,8 +120,8 @@ class CConfigurationImport {
 		// import objects
 		$this->processApplications();
 		$this->processItems();
-		$this->processDiscoveryRules();
 		$this->processTriggers();
+		$this->processDiscoveryRules();
 		$this->processGraphs();
 		$this->processImages();
 		$this->processMaps();
@@ -928,6 +928,8 @@ class CConfigurationImport {
 		$triggersToUpdate = [];
 		$graphsToCreate = [];
 		$graphsToUpdate = [];
+		// the list of triggers to process dependencies
+		$triggers = [];
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
@@ -958,6 +960,9 @@ class CConfigurationImport {
 					}
 
 					$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+
+					$triggers[] = $trigger;
+					unset($trigger['dependencies']);
 
 					if ($triggerId) {
 						$trigger['triggerid'] = $triggerId;
@@ -1042,7 +1047,12 @@ class CConfigurationImport {
 		}
 
 		if ($triggersToCreate) {
-			API::TriggerPrototype()->create($triggersToCreate);
+			$result = API::TriggerPrototype()->create($triggersToCreate);
+
+			foreach ($result['triggerids'] as $tnum => $triggerid) {
+				$trigger = $triggersToCreate[$tnum];
+				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'], $triggerid);
+			}
 		}
 		if ($triggersToUpdate) {
 			API::TriggerPrototype()->update($triggersToUpdate);
@@ -1053,6 +1063,50 @@ class CConfigurationImport {
 		}
 		if ($graphsToUpdate) {
 			API::GraphPrototype()->update($graphsToUpdate);
+		}
+
+		$this->processTriggerPrototypeDependencies($triggers);
+	}
+
+	/**
+	 * Update trigger dependencies
+	 *
+	 * @param array $triggers
+	 *
+	 * @throws Exception
+	 */
+	protected function processTriggerPrototypeDependencies(array $triggers) {
+		$dependencies = [];
+
+		foreach ($triggers as $trigger) {
+			if (!array_key_exists('dependencies', $trigger)) {
+				continue;
+			}
+
+			$deps = [];
+			$triggerid = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+
+			foreach ($trigger['dependencies'] as $dependency) {
+				$dep_triggerid = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+
+				if (!$dep_triggerid) {
+					throw new Exception(_s('Trigger prototype "%1$s" depends on trigger "%2$s", which does not exist.',
+						$trigger['description'],
+						$dependency['name']
+					));
+				}
+
+				$deps[] = ['triggerid' => $dep_triggerid];
+			}
+
+			$dependencies[] = [
+				'triggerid' => $triggerid,
+				'dependencies' => $deps
+			];
+		}
+
+		if ($dependencies) {
+			API::TriggerPrototype()->update($dependencies);
 		}
 	}
 
@@ -1164,6 +1218,8 @@ class CConfigurationImport {
 
 		$triggersToCreate = [];
 		$triggersToUpdate = [];
+		// the list of triggers to process dependencies
+		$triggers = [];
 
 		foreach ($allTriggers as $trigger) {
 			// search for existing items in trigger expressions
@@ -1183,78 +1239,82 @@ class CConfigurationImport {
 			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
 
 			if ($triggerId) {
-				$trigger['triggerid'] = $triggerId;
-				unset($trigger['dependencies']);
-				$triggersToUpdate[] = $trigger;
+				if ($this->options['triggers']['updateExisting']) {
+					$triggers[] = $trigger;
+
+					$trigger['triggerid'] = $triggerId;
+					unset($trigger['dependencies']);
+					$triggersToUpdate[] = $trigger;
+				}
 			}
 			else {
-				unset($trigger['dependencies']);
-				$triggersToCreate[] = $trigger;
+				if ($this->options['triggers']['createMissing']) {
+					$triggers[] = $trigger;
+
+					unset($trigger['dependencies']);
+					$triggersToCreate[] = $trigger;
+				}
 			}
 		}
 
-		$newTriggers = [];
+		if ($triggersToCreate) {
+			$result = API::Trigger()->create($triggersToCreate);
 
-		if ($this->options['triggers']['createMissing'] && $triggersToCreate) {
-			$newTriggerIds = API::Trigger()->create($triggersToCreate);
-
-			foreach ($newTriggerIds['triggerids'] as $tnum => $triggerId) {
+			foreach ($result['triggerids'] as $tnum => $triggerid) {
 				$trigger = $triggersToCreate[$tnum];
-				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'], $triggerId);
-
-				$newTriggers[$triggerId] = $trigger;
+				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'], $triggerid);
 			}
 		}
 
-		if ($this->options['triggers']['updateExisting'] && $triggersToUpdate) {
+		if ($triggersToUpdate) {
 			API::Trigger()->update($triggersToUpdate);
 		}
 
 		// refresh triggers because template triggers can be inherited to host and used in maps
 		$this->referencer->refreshTriggers();
 
-		$this->addDependencies();
+		$this->processTriggerDependencies($triggers);
 	}
 
 	/**
 	 * Update trigger dependencies
 	 *
-	 * @throws Exception
+	 * @param array $triggers
 	 *
-	 * @return null
+	 * @throws Exception
 	 */
-	protected function addDependencies() {
-		$triggerDependencies = [];
-		foreach ($this->formattedData['triggers'] as $trigger) {
-			$deps = [];
+	protected function processTriggerDependencies(array $triggers) {
+		$dependencies = [];
 
-			if (isset($trigger['dependencies'])) {
-				$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
-
-				foreach ($trigger['dependencies'] as $dependency) {
-					$depTriggerId = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
-
-					if (!$depTriggerId) {
-						throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.',
-							$trigger['description'],
-							$dependency['name']
-						));
-					}
-
-					$deps[] = ['triggerid' => $depTriggerId];
-				}
-
-				if ($deps) {
-					$triggerDependencies[] = [
-						'triggerid' => $triggerId,
-						'dependencies' => $deps
-					];
-				}
+		foreach ($triggers as $trigger) {
+			if (!array_key_exists('dependencies', $trigger)) {
+				continue;
 			}
+
+			$deps = [];
+			$triggerid = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+
+			foreach ($trigger['dependencies'] as $dependency) {
+				$dep_triggerid = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+
+				if (!$dep_triggerid) {
+					throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.',
+						$trigger['description'],
+						$dependency['name']
+					));
+				}
+
+				$deps[] = ['triggerid' => $dep_triggerid];
+			}
+
+			$dependencies[] = [
+				'triggerid' => $triggerid,
+				'dependencies' => $deps
+			];
 		}
 
-		if ($triggerDependencies) {
-			API::Trigger()->update($triggerDependencies);
+		if ($dependencies) {
+			API::Trigger()->update($dependencies);
 		}
 	}
 

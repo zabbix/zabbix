@@ -24,23 +24,19 @@ require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 $triggersWidget = new CWidget();
 
 // append host summary to widget header
-if (!empty($data['hostid'])) {
-	$triggersWidget->addItem(get_header_host_table('triggers', $data['hostid']));
-}
+$triggersWidget->addItem(get_header_host_table('triggers', $data['hostid'], $data['parent_discoveryid']));
 
-$triggersWidget->setTitle(_('Triggers'));
+$triggersWidget->setTitle(_('Trigger prototypes'));
 
-// create form
 $triggersForm = new CForm();
 $triggersForm->setName('triggersForm');
-$triggersForm->addVar('hostid', $data['hostid']);
 $triggersForm->addVar('action', $data['action']);
+$triggersForm->addVar('parent_discoveryid', $data['parent_discoveryid']);
 
 foreach ($data['g_triggerid'] as $triggerid) {
 	$triggersForm->addVar('g_triggerid['.$triggerid.']', $triggerid);
 }
 
-// create form list
 $triggersFormList = new CFormList('triggersFormList');
 
 // append severity to form list
@@ -71,14 +67,17 @@ foreach ($data['dependencies'] as $dependency) {
 		implode(', ', zbx_objectValues($dependency['hosts'], 'name')).NAME_DELIMITER.$dependency['description']
 	);
 
-	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		$description = new CLink($depTriggerDescription,
+			'trigger_prototypes.php?form=update'.url_param('parent_discoveryid').'&triggerid='.$dependency['triggerid']
+		);
+		$description->setAttribute('target', '_blank');
+	}
+	elseif ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$description = new CLink($depTriggerDescription,
 			'triggers.php?form=update&triggerid='.$dependency['triggerid']
 		);
 		$description->setAttribute('target', '_blank');
-	}
-	else {
-		$description = $depTriggerDescription;
 	}
 
 	$row = new CRow([$description, new CButton('remove', _('Remove'),
@@ -90,16 +89,19 @@ foreach ($data['dependencies'] as $dependency) {
 	$dependenciesTable->addRow($row);
 }
 
+$addButton = new CButton('add_dep_trigger', _('Add'), 'return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency'.
+		'&reference=deptrigger&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid'.
+		'&multiselect=1&with_triggers=1&normal_only=1&noempty=1");',
+	'link_menu'
+);
+$addPrototypeButton = new CButton('add_dep_trigger_prototype', _('Add prototype'), 'return PopUp("popup.php?'.
+		'dstfrm=massupdate&dstact=add_dependency&reference=deptrigger&dstfld1=new_dependency&srctbl=trigger_prototypes'.
+		'&objname=triggers&srcfld1=triggerid'.url_param('parent_discoveryid').'&multiselect=1");',
+	'link_menu'
+);
+
 $dependenciesDiv = new CDiv(
-	[
-		$dependenciesTable,
-		new CButton('btn1', _('Add'),
-			'return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
-				'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
-				'&with_triggers=1&noempty=1");',
-			'link_menu'
-		)
-	],
+	[$dependenciesTable, $addButton, SPACE, SPACE, SPACE, $addPrototypeButton],
 	'objectgroup inlineblock border_dotted ui-corner-all'
 );
 $dependenciesDiv->setAttribute('id', 'dependencies_div');
@@ -119,7 +121,7 @@ $triggersTab->addTab('triggersTab', _('Mass update'), $triggersFormList);
 // append buttons to form
 $triggersTab->setFooter(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
-	[new CButtonCancel(url_param('hostid'))]
+	[new CButtonCancel(url_param('parent_discoveryid'))]
 ));
 
 // append tabs to form

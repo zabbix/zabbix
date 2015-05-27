@@ -44,8 +44,7 @@ $fields = [
 	'expr_temp' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'],
 	'expr_target_single' =>	[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'],
 	'dependencies' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'new_dependence' =>		[T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({add_dependence})'],
-	'rem_dependence' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'new_dependency' =>		[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
 	'g_triggerid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'showdisabled' =>		[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	// actions
@@ -64,8 +63,7 @@ $fields = [
 	'replace_expression' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'remove_expression' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'test_expression' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_dependence' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'del_dependence' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_dependency' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'group_enable' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'group_disable' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'group_delete' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -163,21 +161,63 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$trigger = [
 		'expression' => getRequest('expression'),
 		'description' => getRequest('description'),
-		'type' => getRequest('type'),
-		'priority' => getRequest('priority'),
-		'status' => getRequest('status'),
-		'comments' => getRequest('comments'),
 		'url' => getRequest('url'),
-		'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
+		'status' => getRequest('status'),
+		'priority' => getRequest('priority'),
+		'comments' => getRequest('comments'),
+		'type' => getRequest('type'),
+		'dependencies' => zbx_toObject(getRequest('dependencies', []), 'triggerid')
 	];
 
 	if (hasRequest('update')) {
-		$trigger['triggerid'] = getRequest('triggerid');
-		$result = API::TriggerPrototype()->update($trigger);
+		// Update only changed fields.
+
+		$oldTriggerPrototype = API::TriggerPrototype()->get([
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
+			'selectDependencies' => ['triggerid'],
+			'triggerids' => getRequest('triggerid')
+		]);
+		if (!$oldTriggerPrototype) {
+			access_deny();
+		}
+
+		$oldTriggerPrototype = reset($oldTriggerPrototype);
+		$oldTriggerPrototype['dependencies'] = zbx_toHash(
+			zbx_objectValues($oldTriggerPrototype['dependencies'], 'triggerid')
+		);
+		$oldTriggerPrototype['expression'] = explode_exp($oldTriggerPrototype['expression']);
+
+		$newDependencies = $trigger['dependencies'];
+		$oldDependencies = $oldTriggerPrototype['dependencies'];
+
+		unset($trigger['dependencies'], $oldTriggerPrototype['dependencies']);
+
+		$triggerToUpdate = array_diff_assoc($trigger, $oldTriggerPrototype);
+		$triggerToUpdate['triggerid'] = getRequest('triggerid');
+
+		// dependencies
+		$updateDepencencies = false;
+		if (count($newDependencies) != count($oldDependencies)) {
+			$updateDepencencies = true;
+		}
+		else {
+			foreach ($newDependencies as $dependency) {
+				if (!isset($oldDependencies[$dependency['triggerid']])) {
+					$updateDepencencies = true;
+				}
+			}
+		}
+		if ($updateDepencencies) {
+			$triggerToUpdate['dependencies'] = $newDependencies;
+		}
+
+		$result = API::TriggerPrototype()->update($triggerToUpdate);
 
 		show_messages($result, _('Trigger prototype updated'), _('Cannot update trigger prototype'));
 	}
 	else {
+		$trigger['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+
 		$result = API::TriggerPrototype()->create($trigger);
 
 		show_messages($result, _('Trigger prototype added'), _('Cannot add trigger prototype'));
@@ -197,26 +237,38 @@ elseif (hasRequest('delete') && hasRequest('triggerid')) {
 	}
 	show_messages($result, _('Trigger prototype deleted'), _('Cannot delete trigger prototype'));
 }
-elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massupdate' && hasRequest('massupdate') && hasRequest('g_triggerid')) {
-	$triggerIds = getRequest('g_triggerid');
-	$visible = getRequest('visible');
-
-	$result = false;
-	if (isset($visible['priority'])) {
-		$priority = getRequest('priority');
-
-		foreach ($triggerIds as $triggerId) {
-			$result = API::TriggerPrototype()->update([
-				'triggerid' => $triggerId,
-				'priority' => $priority
-			]);
-			if (!$result) {
-				break;
-			}
+elseif (hasRequest('add_dependency') && hasRequest('new_dependency')) {
+	if (!hasRequest('dependencies')) {
+		$_REQUEST['dependencies'] = [];
+	}
+	foreach (getRequest('new_dependency') as $triggerId) {
+		if (!uint_in_array($triggerId, getRequest('dependencies'))) {
+			$_REQUEST['dependencies'][] = $triggerId;
 		}
 	}
-	else {
-		$result = true;
+}
+elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massupdate'
+		&& hasRequest('massupdate') && hasRequest('g_triggerid')) {
+	$result = true;
+	$visible = getRequest('visible', []);
+
+	if ($visible) {
+		$triggersToUpdate = [];
+
+		foreach (getRequest('g_triggerid') as $triggerId) {
+			$trigger = ['triggerid' => $triggerId];
+
+			if (isset($visible['priority'])) {
+				$trigger['priority'] = getRequest('priority');
+			}
+			if (isset($visible['dependencies'])) {
+				$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
+			}
+
+			$triggersToUpdate[] = $trigger;
+		}
+
+		$result = (bool) API::TriggerPrototype()->update($triggersToUpdate);
 	}
 
 	if ($result) {
@@ -278,10 +330,12 @@ elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massde
 /*
  * Display
  */
-if (hasRequest('action') && getRequest('action') == 'triggerprototype.massupdateform' && hasRequest('g_triggerid')) {
+if (hasRequest('action') && getRequest('action') === 'triggerprototype.massupdateform' && hasRequest('g_triggerid')) {
 	$data = getTriggerMassupdateFormData();
 	$data['action'] = 'triggerprototype.massupdate';
-	$triggersView = new CView('configuration.triggers.massupdate', $data);
+	$data['hostid'] = $discoveryRule['hostid'];
+
+	$triggersView = new CView('configuration.trigger.prototype.massupdate', $data);
 	$triggersView->render();
 	$triggersView->show();
 }
@@ -289,7 +343,7 @@ elseif (isset($_REQUEST['form'])) {
 	$data = getTriggerFormData($exprAction);
 	$data['hostid'] = $discoveryRule['hostid'];
 
-	$triggersView = new CView('configuration.triggers.edit', $data);
+	$triggersView = new CView('configuration.trigger.prototype.edit', $data);
 	$triggersView->render();
 	$triggersView->show();
 }
@@ -310,8 +364,10 @@ else {
 		'triggers' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'config' => $config
+		'config' => $config,
+		'dependencyTriggers' => []
 	];
+
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	// get triggers
@@ -333,13 +389,57 @@ else {
 	$data['paging'] = getPagingLine($data['triggers'], $sortOrder);
 
 	$data['triggers'] = API::TriggerPrototype()->get([
-		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => API_OUTPUT_EXTEND,
-		'selectItems' => ['itemid', 'hostid', 'key_', 'type', 'flags', 'status'],
-		'selectFunctions' => API_OUTPUT_EXTEND
+		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'templateid'],
+		'selectHosts' => ['hostid', 'host'],
+		'selectItems' => ['itemid', 'type', 'hostid', 'key_', 'status', 'flags'],
+		'selectFunctions' => ['functionid', 'itemid', 'function', 'parameter'],
+		'selectDependencies' => ['triggerid', 'description'],
+		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
 	]);
 	order_result($data['triggers'], $sortField, $sortOrder);
+
+	$depTriggerIds = [];
+	foreach ($data['triggers'] as $trigger) {
+		foreach ($trigger['dependencies'] as $depTrigger) {
+			$depTriggerIds[$depTrigger['triggerid']] = true;
+		}
+	}
+
+	if ($depTriggerIds) {
+		$dependencyTriggers = [];
+		$dependencyTriggerPrototypes = [];
+
+		$depTriggerIds = array_keys($depTriggerIds);
+
+		$dependencyTriggers = API::Trigger()->get([
+			'output' => ['triggerid', 'description', 'status', 'flags'],
+			'selectHosts' => ['hostid', 'name'],
+			'triggerids' => $depTriggerIds,
+			'filter' => [
+				'flags' => [ZBX_FLAG_DISCOVERY_NORMAL]
+			],
+			'preservekeys' => true
+		]);
+
+		$dependencyTriggerPrototypes = API::TriggerPrototype()->get([
+			'output' => ['triggerid', 'description', 'status', 'flags'],
+			'selectHosts' => ['hostid', 'name'],
+			'triggerids' => $depTriggerIds,
+			'preservekeys' => true
+		]);
+
+		$data['dependencyTriggers'] = $dependencyTriggers + $dependencyTriggerPrototypes;
+
+		foreach ($data['triggers'] as &$trigger) {
+			order_result($trigger['dependencies'], 'description', ZBX_SORT_UP);
+		}
+		unset($trigger);
+
+		foreach ($data['dependencyTriggers'] as &$dependencyTrigger) {
+			order_result($dependencyTrigger['hosts'], 'name', ZBX_SORT_UP);
+		}
+		unset($dependencyTrigger);
+	}
 
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
