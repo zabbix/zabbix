@@ -394,6 +394,14 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
+	// hide zeroes for trapper and SNMP trap items
+	foreach ($data['discoveries'] as &$discovery) {
+		if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP) {
+			$discovery['delay'] = '';
+		}
+	}
+	unset($discovery);
+
 	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 
 	if ($sortField === 'status') {

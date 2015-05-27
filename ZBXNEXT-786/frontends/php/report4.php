@@ -244,7 +244,12 @@ else {
 		}
 
 		foreach ($summary as $s) {
-			array_push($row, array($s['total'], ($media_type == 0) ? SPACE.'('.implode('/', $s['medias']).')' : ''));
+			if ($s['total'] == 0) {
+				array_push($row, '');
+			}
+			else {
+				array_push($row, array($s['total'], ($media_type == 0) ? SPACE.'('.implode('/', $s['medias']).')' : ''));
+			}
 		}
 
 		$table->addRow($row);

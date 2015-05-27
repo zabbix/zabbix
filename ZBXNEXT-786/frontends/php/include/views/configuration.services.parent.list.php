@@ -44,7 +44,11 @@ $description = new CLink(_('root'), '#', null, 'javascript:
 	self.close();
 	return false;'
 );
-$servicesParentTable->addRow(array(array($prefix, $description), _('Note'), '-'));
+$servicesParentTable->addRow([
+		[$prefix, $description],
+		_('Note'),
+		'-'
+]);
 
 // others
 foreach ($this->data['db_pservices'] as $db_service) {

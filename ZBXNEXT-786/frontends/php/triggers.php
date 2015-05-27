@@ -156,20 +156,23 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$trigger = array(
 		'expression' => getRequest('expression'),
 		'description' => getRequest('description'),
-		'priority' => getRequest('priority'),
-		'status' => getRequest('status'),
-		'type' => getRequest('type'),
-		'comments' => getRequest('comments'),
 		'url' => getRequest('url'),
+		'status' => getRequest('status'),
+		'priority' => getRequest('priority'),
+		'comments' => getRequest('comments'),
+		'type' => getRequest('type'),
 		'dependencies' => zbx_toObject(getRequest('dependencies', array()), 'triggerid')
 	);
 
 	if (hasRequest('update')) {
 		// update only changed fields
+
 		$oldTrigger = API::Trigger()->get(array(
-			'triggerids' => getRequest('triggerid'),
-			'output' => API_OUTPUT_EXTEND,
-			'selectDependencies' => array('triggerid')
+			'output' => array(
+				'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'
+			),
+			'selectDependencies' => array('triggerid'),
+			'triggerids' => getRequest('triggerid')
 		));
 		if (!$oldTrigger) {
 			access_deny();
@@ -177,11 +180,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$oldTrigger = reset($oldTrigger);
 		$oldTrigger['dependencies'] = zbx_toHash(zbx_objectValues($oldTrigger['dependencies'], 'triggerid'));
+		$oldTrigger['expression'] = explode_exp($oldTrigger['expression']);
 
 		$newDependencies = $trigger['dependencies'];
 		$oldDependencies = $oldTrigger['dependencies'];
-		unset($trigger['dependencies']);
-		unset($oldTrigger['dependencies']);
+
+		unset($trigger['dependencies'], $oldTrigger['dependencies']);
 
 		$triggerToUpdate = array_diff_assoc($trigger, $oldTrigger);
 		$triggerToUpdate['triggerid'] = getRequest('triggerid');
@@ -201,11 +205,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if ($updateDepencencies) {
 			$triggerToUpdate['dependencies'] = $newDependencies;
 		}
+
 		$result = API::Trigger()->update($triggerToUpdate);
+
 		show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 	}
 	else {
 		$result = API::Trigger()->create($trigger);
+
 		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 	}
 
@@ -236,28 +243,29 @@ elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])
 		}
 	}
 }
-elseif (hasRequest('action') && getRequest('action') == 'trigger.massupdate' && hasRequest('massupdate') && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
+		&& hasRequest('massupdate') && hasRequest('g_triggerid')) {
+	$result = true;
 	$visible = getRequest('visible', array());
 
-	// update triggers
-	$triggersToUpdate = array();
-	foreach (getRequest('g_triggerid') as $triggerid) {
-		$trigger = array('triggerid' => $triggerid);
+	if ($visible) {
+		$triggersToUpdate = array();
 
-		if (isset($visible['priority'])) {
-			$trigger['priority'] = getRequest('priority');
-		}
-		if (isset($visible['dependencies'])) {
-			$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', array()), 'triggerid');
+		foreach (getRequest('g_triggerid') as $triggerid) {
+			$trigger = array('triggerid' => $triggerid);
+
+			if (isset($visible['priority'])) {
+				$trigger['priority'] = getRequest('priority');
+			}
+			if (isset($visible['dependencies'])) {
+				$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', array()), 'triggerid');
+			}
+
+			$triggersToUpdate[] = $trigger;
 		}
 
-		$triggersToUpdate[] = $trigger;
+		$result = (bool) API::Trigger()->update($triggersToUpdate);
 	}
-
-	DBstart();
-
-	$result = API::Trigger()->update($triggersToUpdate);
-	$result = DBend($result);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['g_triggerid']);
@@ -384,7 +392,6 @@ else {
 
 	$data = array(
 		'showdisabled' => getRequest('showdisabled', 1),
-		'parent_discoveryid' => null,
 		'triggers' => array(),
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
@@ -444,13 +451,15 @@ else {
 	$data['paging'] = getPagingLine($data['triggers'], $sortOrder);
 
 	$data['triggers'] = API::Trigger()->get(array(
-		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => API_OUTPUT_EXTEND,
+		'output' => array(
+			'triggerid', 'expression', 'description', 'status', 'priority', 'error', 'templateid', 'state'
+		),
+		'selectHosts' => array('hostid', 'host'),
 		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
-		'selectFunctions' => API_OUTPUT_EXTEND,
+		'selectFunctions' => array('functionid', 'itemid', 'function', 'parameter'),
 		'selectDependencies' => array('triggerid', 'description'),
-		'selectDiscoveryRule' => API_OUTPUT_EXTEND
+		'selectDiscoveryRule' => array('itemid', 'name'),
+		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
 	));
 
 	// sort for displaying full results
@@ -461,37 +470,31 @@ else {
 		order_result($data['triggers'], $sortField, $sortOrder);
 	}
 
-	$dependencyIds = array();
+	$depTriggerIds = array();
 	foreach ($data['triggers'] as $trigger) {
 		foreach ($trigger['dependencies'] as $depTrigger) {
-			$dependencyIds[$depTrigger['triggerid']] = $depTrigger['triggerid'];
+			$depTriggerIds[$depTrigger['triggerid']] = true;
 		}
 	}
 
 	$dependencyTriggers = array();
-	if ($dependencyIds) {
+	if ($depTriggerIds) {
 		$dependencyTriggers = API::Trigger()->get(array(
-			'triggerids' => $dependencyIds,
-			'output' => array('triggerid', 'flags', 'description', 'status'),
+			'output' => array('triggerid', 'description', 'status', 'flags'),
 			'selectHosts' => array('hostid', 'name'),
+			'triggerids' => array_keys($depTriggerIds),
 			'preservekeys' => true
 		));
 
-		// sort dependencies
 		foreach ($data['triggers'] as &$trigger) {
-			if (count($trigger['dependencies']) > 1) {
-				order_result($trigger['dependencies'], 'description', ZBX_SORT_UP);
-			}
+			order_result($trigger['dependencies'], 'description', ZBX_SORT_UP);
 		}
 		unset($trigger);
 
-		// sort dependency trigger hosts
-		foreach ($dependencyTriggers as &$trigger) {
-			if (count($dependencyTriggers[$trigger['triggerid']]['hosts']) > 1) {
-				order_result($dependencyTriggers[$trigger['triggerid']]['hosts'], 'name', ZBX_SORT_UP);
-			}
+		foreach ($dependencyTriggers as &$dependencyTrigger) {
+			order_result($dependencyTrigger['hosts'], 'name', ZBX_SORT_UP);
 		}
-		unset($trigger);
+		unset($dependencyTrigger);
 	}
 
 	$data['dependencyTriggers'] = $dependencyTriggers;
