@@ -35,7 +35,7 @@
 	$search->addClass('search');
 
 	$button = new CSubmitButton(SPACE, null, null, 'btn-search');
-	$form->AddItem(array($search, $button));
+	$form->AddItem([$search, $button]);
 	$icons->addItem($form);
 
 	$zshare = new CLink('Share', 'https://share.zabbix.com/', 'top-nav-zbbshare', null, true);
@@ -60,8 +60,11 @@
 	$page_menu_div->addItem($top_menu);
 
 	// 2nd level menu
-	$sub_menu_table = new CTable(null, 'sub_menu maxwidth ui-widget-header');
-	$menu_divs = array();
+	$sub_menu_table = (new CTable())->
+		addClass('sub_menu')->
+		addClass('maxwidth')->
+		addClass('ui-widget-header');
+	$menu_divs = [];
 	$menu_selected = false;
 	foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
 		$sub_menu_row = new CList([], 'top-subnav');
@@ -90,8 +93,8 @@
 
 		$sub_menu_div = new CDiv($sub_menu_row, 'top-subnav-container');
 		$sub_menu_div->setAttribute('id', 'sub_'.$label);
-		$sub_menu_div->addAction('onmouseover', 'javascript: MMenu.submenu_mouseOver();');
-		$sub_menu_div->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
+		$sub_menu_div->onMouseover('javascript: MMenu.submenu_mouseOver();');
+		$sub_menu_div->onMouseout('javascript: MMenu.mouseOut();');
 
 		if ($data['menu']['selected'] == $label) {
 			$menu_selected = true;

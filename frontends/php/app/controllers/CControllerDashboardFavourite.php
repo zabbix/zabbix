@@ -28,16 +28,16 @@ class CControllerDashboardFavourite extends CController {
 	}
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'object' =>		'fatal|required|in graphid,itemid,screenid,slideshowid,sysmapid',
 			'objectids' =>	'fatal|required|array_id',
 			'operation' =>	'fatal|required|in create,delete'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(array('main_block' => '')));
+			$this->setResponse(new CControllerResponseData(['main_block' => '']));
 		}
 
 		return $ret;
@@ -52,7 +52,7 @@ class CControllerDashboardFavourite extends CController {
 		$operation = $this->getInput('operation');
 		$objectids = $this->getInput('objectids');
 
-		$data = array();
+		$data = [];
 		$result = true;
 
 		DBstart();

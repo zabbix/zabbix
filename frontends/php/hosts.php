@@ -32,7 +32,7 @@ else {
 	$page['title'] = _('Configuration of hosts');
 	$page['file'] = 'hosts.php';
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['scripts'] = array('multiselect.js');
+	$page['scripts'] = ['multiselect.js'];
 
 	$exportData = false;
 }
@@ -40,91 +40,91 @@ else {
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'groups' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'new_groups' =>		array(T_ZBX_STR, O_OPT, P_SYS,			null,		null),
-	'hostids' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'applications' =>	array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null),
-	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "update"'),
-	'clone_hostid' =>	array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "full_clone"'),
-	'host' =>			array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})', _('Host name')),
-	'visiblename' =>	array(T_ZBX_STR, O_OPT, null,			null,		'isset({add}) || isset({update})'),
-	'description' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'proxy_hostid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		    DB_ID,		null),
-	'status' =>			array(T_ZBX_INT, O_OPT, null,			IN(array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)), null),
-	'newgroup' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'interfaces' =>		array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})', _('Agent or SNMP or JMX or IPMI interface')),
-	'mainInterfaces' =>	array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
-	'templates' =>		array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
-	'add_template' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'add_templates' => array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
-	'templates_rem' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'clear_templates' => array(T_ZBX_INT, O_OPT, null,			DB_ID,		null),
-	'ipmi_authtype' =>	array(T_ZBX_INT, O_OPT, null,			BETWEEN(-1, 6), null),
-	'ipmi_privilege' =>	array(T_ZBX_INT, O_OPT, null,			BETWEEN(0, 5), null),
-	'ipmi_username' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'ipmi_password' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'tls_accept' =>		array(T_ZBX_INT, O_OPT, null,			BETWEEN(0, 7), null),
-	'tls_connect' =>	array(T_ZBX_INT, O_OPT, null,			BETWEEN(0, 4), null),
-	'tls_issuer' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
-	'tls_psk' =>		array(T_ZBX_STR, O_OPT, null,			HEX(),		null),
-	'tls_psk_identity' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
-	'tls_subject' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
-	'flags' =>			array(T_ZBX_INT, O_OPT, null,
+$fields = [
+	'hosts' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
+	'groups' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
+	'new_groups' =>		[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
+	'hostids' =>		[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
+	'groupids' =>		[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
+	'applications' =>	[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
+	'groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
+	'hostid' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "update"'],
+	'clone_hostid' =>	[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "full_clone"'],
+	'host' =>			[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})', _('Host name')],
+	'visiblename' =>	[T_ZBX_STR, O_OPT, null,			null,		'isset({add}) || isset({update})'],
+	'description' =>	[T_ZBX_STR, O_OPT, null,			null,		null],
+	'proxy_hostid' =>	[T_ZBX_INT, O_OPT, P_SYS,		    DB_ID,		null],
+	'status' =>			[T_ZBX_INT, O_OPT, null,			IN([HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]), null),
+	'newgroup' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
+	'interfaces' =>		[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})', _('Agent or SNMP or JMX or IPMI interface')],
+	'mainInterfaces' =>	[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'templates' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'add_template' =>	[T_ZBX_STR, O_OPT, null,			null,		null],
+	'add_templates' => [T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'templates_rem' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
+	'clear_templates' => [T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'ipmi_authtype' =>	[T_ZBX_INT, O_OPT, null,			BETWEEN(-1, 6), null],
+	'ipmi_privilege' =>	[T_ZBX_INT, O_OPT, null,			BETWEEN(0, 5), null],
+	'ipmi_username' =>	[T_ZBX_STR, O_OPT, null,			null,		null],
+	'ipmi_password' =>	[T_ZBX_STR, O_OPT, null,			null,		null],
+	'tls_accept' =>		[T_ZBX_INT, O_OPT, null,			BETWEEN(0, 7), null],
+	'tls_connect' =>	[T_ZBX_INT, O_OPT, null,			BETWEEN(0, 4), null],
+	'tls_issuer' =>		[T_ZBX_STR, O_OPT, null,		null,		null],
+	'tls_psk' =>		[T_ZBX_STR, O_OPT, null,			HEX(),		null],
+	'tls_psk_identity' =>	[T_ZBX_STR, O_OPT, null,		null,		null],
+	'tls_subject' =>	[T_ZBX_STR, O_OPT, null,		null,		null],
+	'flags' =>			[T_ZBX_INT, O_OPT, null,
 		IN([ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]), null),
-	'mass_replace_tpls' => array(T_ZBX_STR, O_OPT, null,		null,		null),
-	'mass_clear_tpls' => array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'inventory_mode' => array(T_ZBX_INT, O_OPT, null,
-		IN(HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC), null),
-	'host_inventory' =>	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	null,		null),
-	'macros' =>			array(T_ZBX_STR, O_OPT, P_SYS,			null,		null),
-	'visible' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
-	'show_inherited_macros' => array(T_ZBX_INT, O_OPT, null, IN(array(0,1)), null),
+	'mass_replace_tpls' => [T_ZBX_STR, O_OPT, null,		null,		null],
+	'mass_clear_tpls' => [T_ZBX_STR, O_OPT, null,			null,		null],
+	'inventory_mode' => [T_ZBX_INT, O_OPT, null,
+		IN(HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC), null],
+	'host_inventory' =>	[T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	null,		null],
+	'macros' =>			[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
+	'visible' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
+	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	// actions
-	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 							IN('"host.export","host.massdelete","host.massdisable","host.massenable","host.massupdate"'.
 								',"host.massupdateform"'
 							),
 							null
-						),
-	'add_to_group' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,		null),
-	'delete_from_group' => array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,		null),
-	'unlink' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'unlink_and_clear' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'masssave' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'full_clone' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
-	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,		null,			null),
+						],
+	'add_to_group' =>	[T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,		null],
+	'delete_from_group' => [T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,		null],
+	'unlink' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
+	'unlink_and_clear' => [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
+	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
+	'update' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
+	'masssave' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
+	'clone' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
+	'full_clone' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
+	'delete' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
+	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
+	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,		null,			null],
 	// filter
-	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
-	'filter_rst' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
-	'filter_host' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
-	'filter_ip' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
-	'filter_dns' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
-	'filter_port' =>	array(T_ZBX_STR, O_OPT, null,		null,			null),
+	'filter_set' =>		[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
+	'filter_rst' =>		[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
+	'filter_host' =>	[T_ZBX_STR, O_OPT, null,		null,			null],
+	'filter_ip' =>		[T_ZBX_STR, O_OPT, null,		null,			null],
+	'filter_dns' =>		[T_ZBX_STR, O_OPT, null,		null,			null],
+	'filter_port' =>	[T_ZBX_STR, O_OPT, null,		null,			null],
 	// ajax
-	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,		null,			null),
+	'filterState' =>	[T_ZBX_INT, O_OPT, P_ACT,		null,			null],
 	// sort and sortorder
-	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null),
-	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
-);
+	'sort' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null],
+	'sortorder' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+];
 check_fields($fields);
 
 /*
  * Permissions
  */
-if (getRequest('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isWritable([$_REQUEST['groupid']])) {
 	access_deny();
 }
-if (getRequest('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
+if (getRequest('hostid') && !API::Host()->isWritable([$_REQUEST['hostid']])) {
 	access_deny();
 }
 
@@ -139,13 +139,13 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit;
 }
 
-$hostIds = getRequest('hosts', array());
+$hostIds = getRequest('hosts', []);
 
 /*
  * Export
  */
 if ($exportData) {
-	$export = new CConfigurationExport(array('hosts' => $hostIds));
+	$export = new CConfigurationExport(['hosts' => $hostIds]);
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
@@ -197,13 +197,13 @@ foreach ($macros as $idx => $macro) {
  * Actions
  */
 if (isset($_REQUEST['add_template']) && isset($_REQUEST['add_templates'])) {
-	$_REQUEST['templates'] = getRequest('templates', array());
+	$_REQUEST['templates'] = getRequest('templates', []);
 	$_REQUEST['templates'] = array_merge($_REQUEST['templates'], $_REQUEST['add_templates']);
 }
 if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
-	$_REQUEST['clear_templates'] = getRequest('clear_templates', array());
+	$_REQUEST['clear_templates'] = getRequest('clear_templates', []);
 
-	$unlinkTemplates = array();
+	$unlinkTemplates = [];
 
 	if (isset($_REQUEST['unlink'])) {
 		// templates_rem for old style removal in massupdate form
@@ -254,27 +254,27 @@ elseif ((hasRequest('clone') || hasRequest('full_clone')) && hasRequest('hostid'
 	unset($_REQUEST['hostid'], $_REQUEST['flags']);
 }
 elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && hasRequest('masssave')) {
-	$hostIds = getRequest('hosts', array());
-	$visible = getRequest('visible', array());
+	$hostIds = getRequest('hosts', []);
+	$visible = getRequest('visible', []);
 	$_REQUEST['proxy_hostid'] = getRequest('proxy_hostid', 0);
-	$_REQUEST['templates'] = getRequest('templates', array());
+	$_REQUEST['templates'] = getRequest('templates', []);
 
 	try {
 		DBstart();
 
 		// filter only normal hosts, ignore discovered
-		$hosts = API::Host()->get(array(
-			'output' => array('hostid'),
+		$hosts = API::Host()->get([
+			'output' => ['hostid'],
 			'hostids' => $hostIds,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-		));
-		$hosts = array('hosts' => $hosts);
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		]);
+		$hosts = ['hosts' => $hosts];
 
-		$properties = array(
+		$properties = [
 			'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'description'
-		);
+		];
 
-		$newValues = array();
+		$newValues = [];
 		foreach ($properties as $property) {
 			if (isset($visible[$property])) {
 				$newValues[$property] = $_REQUEST[$property];
@@ -288,21 +288,21 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		if (isset($visible['inventory_mode'])) {
 			$newValues['inventory_mode'] = getRequest('inventory_mode', HOST_INVENTORY_DISABLED);
 			$newValues['inventory'] = ($newValues['inventory_mode'] == HOST_INVENTORY_DISABLED)
-				? array() : getRequest('host_inventory', array());
+				? [] : getRequest('host_inventory', []);
 		}
 
-		$templateIds = array();
+		$templateIds = [];
 		if (isset($visible['templates'])) {
 			$templateIds = $_REQUEST['templates'];
 		}
 
 		// add new or existing host groups
-		$newHostGroupIds = array();
+		$newHostGroupIds = [];
 		if (isset($visible['new_groups']) && !empty($_REQUEST['new_groups'])) {
 			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 				foreach ($_REQUEST['new_groups'] as $newGroup) {
 					if (is_array($newGroup) && isset($newGroup['new'])) {
-						$newGroups[] = array('name' => $newGroup['new']);
+						$newGroups[] = ['name' => $newGroup['new']];
 					}
 					else {
 						$newHostGroupIds[] = $newGroup;
@@ -335,30 +335,30 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 			}
 
 			if (isset($replaceHostGroupsIds)) {
-				$hosts['groups'] = API::HostGroup()->get(array(
+				$hosts['groups'] = API::HostGroup()->get([
 					'groupids' => $replaceHostGroupsIds,
 					'editable' => true,
-					'output' => array('groupid')
-				));
+					'output' => ['groupid']
+				]);
 			}
 			else {
-				$hosts['groups'] = array();
+				$hosts['groups'] = [];
 			}
 		}
 		elseif ($newHostGroupIds) {
-			$newHostGroups = API::HostGroup()->get(array(
+			$newHostGroups = API::HostGroup()->get([
 				'groupids' => $newHostGroupIds,
 				'editable' => true,
-				'output' => array('groupid')
-			));
+				'output' => ['groupid']
+			]);
 		}
 
 		if (isset($_REQUEST['mass_replace_tpls'])) {
 			if (isset($_REQUEST['mass_clear_tpls'])) {
-				$hostTemplates = API::Template()->get(array(
-					'output' => array('templateid'),
+				$hostTemplates = API::Template()->get([
+					'output' => ['templateid'],
 					'hostids' => $hostIds
-				));
+				]);
 
 				$hostTemplateIds = zbx_objectValues($hostTemplates, 'templateid');
 				$templatesToDelete = array_diff($hostTemplateIds, $templateIds);
@@ -374,7 +374,7 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 			throw new Exception();
 		}
 
-		$add = array();
+		$add = [];
 		if ($templateIds && isset($visible['templates'])) {
 			$add['templates'] = $templateIds;
 		}
@@ -418,11 +418,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$msgOk = _('Host updated');
 			$msgFail = _('Cannot update host');
 
-			$dbHost = API::Host()->get(array(
+			$dbHost = API::Host()->get([
 				'output' => API_OUTPUT_EXTEND,
 				'hostids' => $hostId,
 				'editable' => true
-			));
+			]);
 			$dbHost = reset($dbHost);
 		}
 		else {
@@ -434,25 +434,25 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		// host data
 		if (!$create && $dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$host = array(
+			$host = [
 				'hostid' => $hostId,
 				'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 				'description' => getRequest('description', ''),
 				'inventory' => (getRequest('inventory_mode') == HOST_INVENTORY_DISABLED)
-					? array()
-					: getRequest('host_inventory', array())
-			);
+					? []
+					: getRequest('host_inventory', [])
+			];
 		}
 		else {
 			// templates
-			$templates = array();
+			$templates = [];
 
-			foreach (getRequest('templates', array()) as $templateId) {
-				$templates[] = array('templateid' => $templateId);
+			foreach (getRequest('templates', []) as $templateId) {
+				$templates[] = ['templateid' => $templateId];
 			}
 
 			// interfaces
-			$interfaces = getRequest('interfaces', array());
+			$interfaces = getRequest('interfaces', []);
 
 			foreach ($interfaces as $key => $interface) {
 				if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {
@@ -489,11 +489,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			unset($macro);
 
 			// new group
-			$groups = getRequest('groups', array());
+			$groups = getRequest('groups', []);
 			$newGroup = getRequest('newgroup');
 
 			if (!zbx_empty($newGroup)) {
-				$newGroup = API::HostGroup()->create(array('name' => $newGroup));
+				$newGroup = API::HostGroup()->create(['name' => $newGroup]);
 
 				if (!$newGroup) {
 					throw new Exception();
@@ -505,7 +505,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$groups = zbx_toObject($groups, 'groupid');
 
 			// host data
-			$host = array(
+			$host = [
 				'host' => getRequest('host'),
 				'name' => getRequest('visiblename'),
 				'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
@@ -527,12 +527,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'macros' => $macros,
 				'inventory_mode' => getRequest('inventory_mode'),
 				'inventory' => (getRequest('inventory_mode') == HOST_INVENTORY_DISABLED)
-					? array()
-					: getRequest('host_inventory', array())
-			);
+					? []
+					: getRequest('host_inventory', [])
+			];
 
 			if (!$create) {
-				$host['templates_clear'] = zbx_toObject(getRequest('clear_templates', array()), 'templateid');
+				$host['templates_clear'] = zbx_toObject(getRequest('clear_templates', []), 'templateid');
 			}
 		}
 
@@ -555,11 +555,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				throw new Exception();
 			}
 
-			$dbHostNew = API::Host()->get(array(
+			$dbHostNew = API::Host()->get([
 				'output' => API_OUTPUT_EXTEND,
 				'hostids' => $hostId,
 				'editable' => true
-			));
+			]);
 			$dbHostNew = reset($dbHostNew);
 
 			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $dbHostNew['hostid'], $dbHostNew['host'], 'hosts',
@@ -586,11 +586,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			// copy triggers
-			$dbTriggers = API::Trigger()->get(array(
-				'output' => array('triggerid'),
+			$dbTriggers = API::Trigger()->get([
+				'output' => ['triggerid'],
 				'hostids' => $srcHostId,
 				'inherited' => false
-			));
+			]);
 
 			if ($dbTriggers) {
 				if (!copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'), $hostId, $srcHostId)) {
@@ -599,17 +599,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			// copy discovery rules
-			$dbDiscoveryRules = API::DiscoveryRule()->get(array(
-				'output' => array('itemid'),
+			$dbDiscoveryRules = API::DiscoveryRule()->get([
+				'output' => ['itemid'],
 				'hostids' => $srcHostId,
 				'inherited' => false
-			));
+			]);
 
 			if ($dbDiscoveryRules) {
-				$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
+				$copyDiscoveryRules = API::DiscoveryRule()->copy([
 					'discoveryids' => zbx_objectValues($dbDiscoveryRules, 'itemid'),
-					'hostids' => array($hostId)
-				));
+					'hostids' => [$hostId]
+				]);
 
 				if (!$copyDiscoveryRules) {
 					throw new Exception();
@@ -617,14 +617,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			// copy graphs
-			$dbGraphs = API::Graph()->get(array(
+			$dbGraphs = API::Graph()->get([
 				'output' => API_OUTPUT_EXTEND,
-				'selectHosts' => array('hostid'),
-				'selectItems' => array('type'),
+				'selectHosts' => ['hostid'],
+				'selectItems' => ['type'],
 				'hostids' => $srcHostId,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 				'inherited' => false
-			));
+			]);
 
 			foreach ($dbGraphs as $dbGraph) {
 				if (count($dbGraph['hosts']) > 1) {
@@ -658,7 +658,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 elseif (hasRequest('delete') && hasRequest('hostid')) {
 	DBstart();
 
-	$result = API::Host()->delete(array(getRequest('hostid')));
+	$result = API::Host()->delete([getRequest('hostid')]);
 	$result = DBend($result);
 
 	if ($result) {
@@ -680,16 +680,16 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massdelete' && has
 	}
 	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 }
-elseif (hasRequest('action') && str_in_array(getRequest('action'), array('host.massenable', 'host.massdisable')) && hasRequest('hosts')) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), ['host.massenable', 'host.massdisable']) && hasRequest('hosts')) {
 	$enable =(getRequest('action') == 'host.massenable');
 	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 
-	$actHosts = API::Host()->get(array(
+	$actHosts = API::Host()->get([
 		'hostids' => getRequest('hosts'),
 		'editable' => true,
 		'templated_hosts' => true,
-		'output' => array('hostid')
-	));
+		'output' => ['hostid']
+	]);
 	$actHosts = zbx_objectValues($actHosts, 'hostid');
 
 	if ($actHosts) {
@@ -718,24 +718,24 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), array('host.m
 /*
  * Display
  */
-$pageFilter = new CPageFilter(array(
-	'groups' => array(
+$pageFilter = new CPageFilter([
+	'groups' => [
 		'real_hosts' => true,
 		'editable' => true
-	),
+	],
 	'groupid' => getRequest('groupid')
-));
+]);
 
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = getRequest('hostid', 0);
 
 if (hasRequest('action') && getRequest('action') === 'host.massupdateform' && hasRequest('hosts')) {
-	$data = array(
+	$data = [
 		'hosts' => getRequest('hosts'),
-		'visible' => getRequest('visible', array()),
+		'visible' => getRequest('visible', []),
 		'mass_replace_tpls' => getRequest('mass_replace_tpls'),
 		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
-		'groups' => getRequest('groups', array()),
+		'groups' => getRequest('groups', []),
 		'newgroup' => getRequest('newgroup', ''),
 		'status' => getRequest('status', HOST_STATUS_MONITORED),
 		'description' => getRequest('description'),
@@ -745,19 +745,19 @@ if (hasRequest('action') && getRequest('action') === 'host.massupdateform' && ha
 		'ipmi_username' => getRequest('ipmi_username', ''),
 		'ipmi_password' => getRequest('ipmi_password', ''),
 		'inventory_mode' => getRequest('inventory_mode', HOST_INVENTORY_DISABLED),
-		'host_inventory' => getRequest('host_inventory', array()),
-		'templates' => getRequest('templates', array()),
+		'host_inventory' => getRequest('host_inventory', []),
+		'templates' => getRequest('templates', []),
 		'inventories' => zbx_toHash(getHostInventories(), 'db_field')
-	);
+	];
 
 	// sort templates
 	natsort($data['templates']);
 
 	// get groups
-	$data['all_groups'] = API::HostGroup()->get(array(
+	$data['all_groups'] = API::HostGroup()->get([
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true
-	));
+	]);
 	order_result($data['all_groups'], 'name');
 
 	// get proxies
@@ -771,16 +771,16 @@ if (hasRequest('action') && getRequest('action') === 'host.massupdateform' && ha
 	// get templates data
 	$data['linkedTemplates'] = null;
 	if (!empty($data['templates'])) {
-		$getLinkedTemplates = API::Template()->get(array(
+		$getLinkedTemplates = API::Template()->get([
 			'templateids' => $data['templates'],
-			'output' => array('templateid', 'name')
-		));
+			'output' => ['templateid', 'name']
+		]);
 
 		foreach ($getLinkedTemplates as $getLinkedTemplate) {
-			$data['linkedTemplates'][] = array(
+			$data['linkedTemplates'][] = [
 				'id' => $getLinkedTemplate['templateid'],
 				'name' => $getLinkedTemplate['name']
-			);
+			];
 		}
 	}
 
@@ -1039,32 +1039,32 @@ else {
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 	// get Hosts
-	$hosts = array();
+	$hosts = [];
 	if ($pageFilter->groupsSelected) {
-		$hosts = API::Host()->get(array(
-			'output' => array('hostid', $sortField),
+		$hosts = API::Host()->get([
+			'output' => ['hostid', $sortField],
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1,
-			'search' => array(
+			'search' => [
 				'name' => ($filter['host'] === '') ? null : $filter['host'],
 				'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
 				'dns' => ($filter['dns'] === '') ? null : $filter['dns']
-			),
-			'filter' => array(
+			],
+			'filter' => [
 				'port' => ($filter['port'] === '') ? null : $filter['port']
-			)
-		));
+			]
+		]);
 	}
 	order_result($hosts, $sortField, $sortOrder);
 
 	$pagingLine = getPagingLine($hosts, $sortOrder);
 
-	$hosts = API::Host()->get(array(
+	$hosts = API::Host()->get([
 		'hostids' => zbx_objectValues($hosts, 'hostid'),
 		'output' => API_OUTPUT_EXTEND,
-		'selectParentTemplates' => array('hostid', 'name'),
+		'selectParentTemplates' => ['hostid', 'name'],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectDiscoveries' => API_OUTPUT_COUNT,
@@ -1072,42 +1072,42 @@ else {
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
-		'selectDiscoveryRule' => array('itemid', 'name'),
-		'selectHostDiscovery' => array('ts_delete')
-	));
+		'selectDiscoveryRule' => ['itemid', 'name'],
+		'selectHostDiscovery' => ['ts_delete']
+	]);
 	order_result($hosts, $sortField, $sortOrder);
 
 	// selecting linked templates to templates linked to hosts
-	$templateIds = array();
+	$templateIds = [];
 	foreach ($hosts as $host) {
 		$templateIds = array_merge($templateIds, zbx_objectValues($host['parentTemplates'], 'templateid'));
 	}
 	$templateIds = array_unique($templateIds);
 
-	$templates = API::Template()->get(array(
-		'output' => array('templateid', 'name'),
+	$templates = API::Template()->get([
+		'output' => ['templateid', 'name'],
 		'templateids' => $templateIds,
-		'selectParentTemplates' => array('hostid', 'name'),
+		'selectParentTemplates' => ['hostid', 'name'],
 		'preservekeys' => true
-	));
+	]);
 
 	// get proxy host IDs that that are not 0
-	$proxyHostIds = array();
+	$proxyHostIds = [];
 	foreach ($hosts as $host) {
 		if ($host['proxy_hostid']) {
 			$proxyHostIds[$host['proxy_hostid']] = $host['proxy_hostid'];
 		}
 	}
-	$proxies = array();
+	$proxies = [];
 	if ($proxyHostIds) {
-		$proxies = API::Proxy()->get(array(
+		$proxies = API::Proxy()->get([
 			'proxyids' => $proxyHostIds,
-			'output' => array('host'),
+			'output' => ['host'],
 			'preservekeys' => true
-		));
+		]);
 	}
 
-	$data = array(
+	$data = [
 		'pageFilter' => $pageFilter,
 		'hosts' => $hosts,
 		'paging' => $pagingLine,
@@ -1118,7 +1118,7 @@ else {
 		'config' => $config,
 		'templates' => $templates,
 		'proxies' => $proxies
-	);
+	];
 
 	$hostView = new CView('configuration.host.list', $data);
 }

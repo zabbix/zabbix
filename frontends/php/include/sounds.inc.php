@@ -20,7 +20,7 @@
 
 
 function getSounds() {
-	$fileList = array();
+	$fileList = [];
 	$dir = scandir('./audio');
 	foreach ($dir as $file) {
 		if (!preg_match('/^([\w\d_]+)\.(wav|ogg)$/i', $file)) {
@@ -33,16 +33,16 @@ function getSounds() {
 }
 
 function getMessageSettings() {
-	$defSeverities = array(
+	$defSeverities = [
 		TRIGGER_SEVERITY_NOT_CLASSIFIED => 1,
 		TRIGGER_SEVERITY_INFORMATION => 1,
 		TRIGGER_SEVERITY_WARNING => 1,
 		TRIGGER_SEVERITY_AVERAGE => 1,
 		TRIGGER_SEVERITY_HIGH => 1,
 		TRIGGER_SEVERITY_DISASTER => 1
-	);
+	];
 
-	$messages = array(
+	$messages = [
 		'enabled' => 0,
 		'timeout' => 60,
 		'last.clock' => 0,
@@ -57,13 +57,13 @@ function getMessageSettings() {
 		'sounds.'.TRIGGER_SEVERITY_AVERAGE => 'alarm_average.wav',
 		'sounds.'.TRIGGER_SEVERITY_HIGH => 'alarm_high.wav',
 		'sounds.'.TRIGGER_SEVERITY_DISASTER => 'alarm_disaster.wav'
-	);
+	];
 
 	$dbProfiles = DBselect(
 		'SELECT p.idx,p.source,p.value_str'.
 		' FROM profiles p'.
 		' WHERE p.userid='.CWebUser::$data['userid'].
-			' AND '.dbConditionString('p.idx', array('web.messages'))
+			' AND '.dbConditionString('p.idx', ['web.messages'])
 	);
 	while ($profile = DBfetch($dbProfiles)) {
 		$messages[$profile['source']] = $profile['value_str'];
@@ -90,33 +90,33 @@ function updateMessageSettings($messages) {
 		'SELECT p.profileid,p.idx,p.source,p.value_str'.
 		' FROM profiles p'.
 		' WHERE p.userid='.CWebUser::$data['userid'].
-			' AND '.dbConditionString('p.idx', array('web.messages'))
+			' AND '.dbConditionString('p.idx', ['web.messages'])
 	);
 	while ($profile = DBfetch($dbProfiles)) {
 		$profile['value'] = $profile['value_str'];
 		$dbMessages[$profile['source']] = $profile;
 	}
 
-	$inserts = array();
-	$updates = array();
+	$inserts = [];
+	$updates = [];
 
 	foreach ($messages as $key => $value) {
-		$values = array(
+		$values = [
 			'userid' => CWebUser::$data['userid'],
 			'idx' => 'web.messages',
 			'source' => $key,
 			'value_str' =>  $value,
 			'type' => PROFILE_TYPE_STR
-		);
+		];
 
 		if (!isset($dbMessages[$key])) {
 			$inserts[] = $values;
 		}
 		elseif ($dbMessages[$key]['value'] != $value) {
-			$updates[] = array(
+			$updates[] = [
 				'values' => $values,
-				'where' => array('profileid' => $dbMessages[$key]['profileid'])
-			);
+				'where' => ['profileid' => $dbMessages[$key]['profileid']]
+			];
 		}
 	}
 

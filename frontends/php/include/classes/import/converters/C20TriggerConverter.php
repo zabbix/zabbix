@@ -39,12 +39,20 @@ class C20TriggerConverter extends CConverter {
 	protected $lldMacroParser;
 
 	/**
+	 * An item key converter.
+	 *
+	 * @var C20ItemKeyConverter
+	 */
+	protected $itemKeyConverter;
+
+	/**
 	 * @param CFunctionMacroParser  $functionMacroParser
 	 * @param CMacroParser          $lldMacroParser
 	 */
 	public function __construct() {
 		$this->functionMacroParser = new CFunctionMacroParser();
 		$this->lldMacroParser = new CMacroParser('#');
+		$this->itemKeyConverter = new C20ItemKeyConverter();
 	}
 
 	/**
@@ -57,16 +65,8 @@ class C20TriggerConverter extends CConverter {
 	 * @return string
 	 */
 	public function convert($expression) {
-		// don't try to parse the expression if there's nothing to replace
-		if (strpos($expression, '#') === false
-				&& strpos($expression, '&') === false
-				&& strpos($expression, '|') === false) {
-
-			return $expression;
-		}
-
 		// find all the operators that need to be replaced
-		$foundOperators = array();
+		$found_operators = [];
 		$pos = 0;
 		while (isset($expression[$pos])) {
 			switch ($expression[$pos]) {
@@ -74,22 +74,32 @@ class C20TriggerConverter extends CConverter {
 					// skip function macros
 					$result = $this->functionMacroParser->parse($expression, $pos);
 
-					// if it's not a function macro, try to parse it as an LLD macro
-					if (!$result) {
-						$result = $this->lldMacroParser->parse($expression, $pos);
-					}
-
 					if ($result) {
-						$pos += $result->length - 1;
-					}
+						$new_expression = '{'.
+							$result->expression['host'].':'.
+							$this->itemKeyConverter->convert($result->expression['item']).'.'.
+							$result->expression['function'].
+						'}';
 
+						$expression = substr_replace($expression, $new_expression, $pos, $result->length);
+
+						$pos += strlen($new_expression) - 1;
+					}
+					else {
+						// if it's not a function macro, try to parse it as an LLD macro
+						$result = $this->lldMacroParser->parse($expression, $pos);
+
+						if ($result) {
+							$pos += $result->length - 1;
+						}
+					}
 					// otherwise just continue as is, other macros don't contain any of these characters
 					break;
+
 				case '&':
 				case '|':
 				case '#':
-					$foundOperators[$pos] = $expression[$pos];
-
+					$found_operators[$pos] = $expression[$pos];
 					break;
 			}
 
@@ -97,7 +107,7 @@ class C20TriggerConverter extends CConverter {
 		}
 
 		// replace the operators
-		foreach (array_reverse($foundOperators, true) as $pos => $operator) {
+		foreach (array_reverse($found_operators, true) as $pos => $operator) {
 			switch ($operator) {
 				case '&':
 					$expression = $this->replaceLogicalOperator($expression, 'and', $pos);

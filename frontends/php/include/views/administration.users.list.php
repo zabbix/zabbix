@@ -30,7 +30,7 @@ $userGroupComboBox->addItem(0, _('All'));
 foreach ($this->data['userGroups'] as $userGroup) {
 	$userGroupComboBox->addItem($userGroup['usrgrpid'], $userGroup['name']);
 }
-$controls->addItem(array(_('User group').SPACE, $userGroupComboBox));
+$controls->addItem([_('User group').SPACE, $userGroupComboBox]);
 $controls->addItem(new CSubmit('form', _('Create user')));
 
 $createForm->addItem($controls);
@@ -42,10 +42,10 @@ $usersForm->setName('userForm');
 
 // create users table
 $usersTable = new CTableInfo();
-$usersTable->setHeader(array(
-	new CColHeader(
-		new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');"),
-		'cell-width'),
+$usersTable->setHeader([
+	(new CColHeader(
+		new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');")))->
+			addClass('cell-width'),
 	make_sorting_header(_('Alias'), 'alias', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_x('Name', 'user first name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Surname'), 'surname', $this->data['sort'], $this->data['sortorder']),
@@ -56,7 +56,7 @@ $usersTable->setHeader(array(
 	_('Frontend access'),
 	_('Debug mode'),
 	_('Status')
-));
+]);
 
 foreach ($this->data['users'] as $user) {
 	$userId = $user['userid'];
@@ -67,11 +67,11 @@ foreach ($this->data['users'] as $user) {
 		$onlineTime = ($user['autologout'] == 0 || ZBX_USER_ONLINE_TIME < $user['autologout']) ? ZBX_USER_ONLINE_TIME : $user['autologout'];
 
 		$online = (($session['lastaccess'] + $onlineTime) >= time())
-			? new CCol(_('Yes').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')', ZBX_STYLE_GREEN)
-			: new CCol(_('No').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')', ZBX_STYLE_RED);
+			? (new CCol(_('Yes').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))->addClass(ZBX_STYLE_GREEN)
+			: (new CCol(_('No').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))->addClass(ZBX_STYLE_RED);
 	}
 	else {
-		$online = new CCol(_('No'), ZBX_STYLE_RED);
+		$online = (new CCol(_('No')))->addClass(ZBX_STYLE_RED);
 	}
 
 	// blocked
@@ -82,7 +82,7 @@ foreach ($this->data['users'] as $user) {
 	// user groups
 	order_result($user['usrgrps'], 'name');
 
-	$usersGroups = array();
+	$usersGroups = [];
 	$i = 0;
 
 	foreach ($user['usrgrps'] as $userGroup) {
@@ -124,10 +124,12 @@ foreach ($this->data['users'] as $user) {
 		$guiAccessStyle = ZBX_STYLE_GREY;
 	}
 
+	$alias = new CLink($user['alias'], 'users.php?form=update&userid='.$userId);
+
 	// append user to table
-	$usersTable->addRow(array(
+	$usersTable->addRow([
 		new CCheckBox('group_userid['.$userId.']', null, null, $userId),
-		new CLink($user['alias'], 'users.php?form=update&userid='.$userId),
+		(new CCol($alias))->addClass(ZBX_STYLE_NOWRAP),
 		$user['name'],
 		$user['surname'],
 		user_type2str($user['type']),
@@ -137,18 +139,18 @@ foreach ($this->data['users'] as $user) {
 		new CSpan(user_auth_type2str($user['gui_access']), $guiAccessStyle),
 		($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) ? new CSpan(_('Enabled'), ZBX_STYLE_ORANGE) : new CSpan(_('Disabled'), ZBX_STYLE_GREEN),
 		($user['users_status'] == 1) ? new CSpan(_('Disabled'), ZBX_STYLE_RED) : new CSpan(_('Enabled'), ZBX_STYLE_GREEN)
-	));
+	]);
 }
 
 // append table to form
-$usersForm->addItem(array(
+$usersForm->addItem([
 	$usersTable,
 	$this->data['paging'],
-	new CActionButtonList('action', 'group_userid', array(
-		'user.massunblock' => array('name' => _('Unblock'), 'confirm' => _('Unblock selected users?')),
-		'user.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected users?'))
-	))
-));
+	new CActionButtonList('action', 'group_userid', [
+		'user.massunblock' => ['name' => _('Unblock'), 'confirm' => _('Unblock selected users?')],
+		'user.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected users?')]
+	])
+]);
 
 // append form to widget
 $usersWidget->addItem($usersForm);

@@ -22,34 +22,34 @@
 class CRedirectButtonTest extends CTagTest {
 
 	public function constructProvider() {
-		return array(
-			array(
-				array('caption'),
+		return [
+			[
+				['caption'],
 				'<button class="button button-plain shadow ui-corner-all" type="button">caption</button>'
-			),
-			array(
-				array('caption', 'http://google.com'),
+			],
+			[
+				['caption', 'http://google.com'],
 				'<button class="button button-plain shadow ui-corner-all" type="button" data-url="http://google.com">caption</button>'
-			),
-			array(
-				array('caption', 'http://google.com', 'Are you sure?'),
+			],
+			[
+				['caption', 'http://google.com', 'Are you sure?'],
 				'<button class="button button-plain shadow ui-corner-all" type="button" data-url="http://google.com" data-confirmation="Are you sure?">caption</button>'
-			),
-			array(
-				array('caption', 'http://google.com', null, 'my-class'),
+			],
+			[
+				['caption', 'http://google.com', null, 'my-class'],
 				'<button class="button my-class" type="button" data-url="http://google.com">caption</button>'
-			),
+			],
 			// caption encoding
-			array(
-				array('</button>'),
+			[
+				['</button>'],
 				'<button class="button button-plain shadow ui-corner-all" type="button">&lt;/button&gt;</button>'
-			),
+			],
 			// parameter encoding
-			array(
-				array('caption', 'url"&"'),
+			[
+				['caption', 'url"&"'],
 				'<button class="button button-plain shadow ui-corner-all" type="button" data-url="url&quot;&&quot;">caption</button>'
-			),
-		);
+			],
+		];
 	}
 
 	/**

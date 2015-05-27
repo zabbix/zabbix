@@ -26,7 +26,7 @@ class CControllerProxyEdit extends CController {
 	}
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'proxyid' =>		'db       hosts.hostid',
 			'host' =>			'db       hosts.host',
 			'status' =>			'db       hosts.status         |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
@@ -43,7 +43,7 @@ class CControllerProxyEdit extends CController {
 			'tls_psk' =>		'db       hosts.tls_psk',
 			'tls_psk_identity'=>'db       hosts.tls_psk_identity',
 			'tls_subject' => 	'db       hosts.tls_subject'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -60,11 +60,11 @@ class CControllerProxyEdit extends CController {
 		}
 
 		if ($this->hasInput('proxyid')) {
-			return (bool) API::Proxy()->get(array(
-				'output' => array(),
+			return (bool) API::Proxy()->get([
+				'output' => [],
 				'proxyids' => $this->getInput('proxyid'),
 				'editable' => true
-			));
+			]);
 		}
 
 		return true;
@@ -72,7 +72,7 @@ class CControllerProxyEdit extends CController {
 
 	protected function doAction() {
 		// default values
-		$data = array(
+		$data = [
 			'sid' => $this->getUserSID(),
 			'proxyid' => 0,
 			'host' => '',
@@ -81,7 +81,7 @@ class CControllerProxyEdit extends CController {
 			'ip' => '127.0.0.1',
 			'useip' => '1',
 			'port' => '10051',
-			'proxy_hostids' => array(),
+			'proxy_hostids' => [],
 			'description' => '',
 			'tls_accept' => 0,
 			'tls_connect' => 0,
@@ -89,18 +89,18 @@ class CControllerProxyEdit extends CController {
 			'tls_psk' => '',
 			'tls_psk_identity' => '',
 			'tls_subject' => ''
-		);
+		];
 
 		// get values from the dabatase
 		if ($this->hasInput('proxyid')) {
 			$data['proxyid'] = $this->getInput('proxyid');
 
-			$proxies = API::Proxy()->get(array(
-				'output' => array('host', 'status', 'description', 'tls_accept', 'tls_connect', 'tls_issuer', 'tls_psk', 'tls_psk_identity', 'tls_subject'),
-				'selectHosts' => array('hostid'),
-				'selectInterface' => array('interfaceid', 'dns', 'ip', 'useip', 'port'),
+			$proxies = API::Proxy()->get([
+				'output' => ['host', 'status', 'description', 'tls_accept', 'tls_connect', 'tls_issuer', 'tls_psk', 'tls_psk_identity', 'tls_subject'],
+				'selectHosts' => ['hostid'],
+				'selectInterface' => ['interfaceid', 'dns', 'ip', 'useip', 'port'],
 				'proxyids' => $data['proxyid']
-			));
+			]);
 			$proxy = $proxies[0];
 
 			$data['host'] = $proxy['host'];

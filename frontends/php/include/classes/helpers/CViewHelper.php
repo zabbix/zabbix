@@ -38,6 +38,6 @@ class CViewHelper {
 			return null;
 		}
 
-		return array(SPACE, new CSup($num));
+		return [SPACE, new CSup($num)];
 	}
 }

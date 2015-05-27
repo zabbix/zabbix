@@ -22,7 +22,7 @@
 class CControllerProxyCreate extends CController {
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'host' =>			'db       hosts.host',
 			'status' =>			'db       hosts.status     |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
 			'dns' =>			'db       interface.dns',
@@ -37,7 +37,7 @@ class CControllerProxyCreate extends CController {
 			'tls_psk' =>		'db       hosts.tls_psk',
 			'tls_psk_identity'=>'db       hosts.tls_psk_identity',
 			'tls_subject' => 	'db       hosts.tls_subject'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -63,28 +63,28 @@ class CControllerProxyCreate extends CController {
 	}
 
 	protected function doAction() {
-		$proxy = array();
+		$proxy = [];
 
-		$this->getInputs($proxy, array('host', 'description', 'status', 'tls_accept', 'tls_connect',
-			'tls_issuer', 'tls_psk', 'tls_psk_identity', 'tls_subject'));
+		$this->getInputs($proxy, ['host', 'description', 'status', 'tls_accept', 'tls_connect',
+			'tls_issuer', 'tls_psk', 'tls_psk_identity', 'tls_subject']);
 
 		if ($this->getInput('status', HOST_STATUS_PROXY_ACTIVE) == HOST_STATUS_PROXY_PASSIVE) {
-			$proxy['interface'] = array();
-			$this->getInputs($proxy['interface'], array('dns', 'ip', 'useip', 'port'));
+			$proxy['interface'] = [];
+			$this->getInputs($proxy['interface'], ['dns', 'ip', 'useip', 'port']);
 		}
 
 		DBstart();
 
 		if ($this->hasInput('proxy_hostids')) {
 			// skip discovered hosts
-			$proxy['hosts'] = API::Host()->get(array(
-				'output' => array('hostid'),
+			$proxy['hosts'] = API::Host()->get([
+				'output' => ['hostid'],
 				'hostids' => $this->getInput('proxy_hostids'),
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-			));
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+			]);
 		}
 
-		$result = API::Proxy()->create(array($proxy));
+		$result = API::Proxy()->create([$proxy]);
 
 		if ($result) {
 			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_PROXY,

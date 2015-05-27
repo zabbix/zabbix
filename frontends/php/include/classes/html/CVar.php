@@ -26,14 +26,14 @@ class CVar {
 	public $element_id;
 
 	public function __construct($name, $value = null, $id = null) {
-		$this->var_container = array();
+		$this->var_container = [];
 		$this->var_name = $name;
 		$this->element_id = $id;
 		$this->setValue($value);
 	}
 
 	public function setValue($value) {
-		$this->var_container = array();
+		$this->var_container = [];
 		if (is_null($value)) {
 			return;
 		}

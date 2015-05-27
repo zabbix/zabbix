@@ -51,7 +51,7 @@ class CGlobalRegexp {
 	 *
 	 * @var array
 	 */
-	private static $_cachedExpressions = array();
+	private static $_cachedExpressions = [];
 
 	/**
 	 * Checks if expression is valid.
@@ -95,7 +95,7 @@ class CGlobalRegexp {
 			$regExp = substr($regExp, 1);
 
 			if (!isset(self::$_cachedExpressions[$regExp])) {
-				self::$_cachedExpressions[$regExp] = array();
+				self::$_cachedExpressions[$regExp] = [];
 
 				$dbRegExps = DBselect(
 					'SELECT e.regexpid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive'.
@@ -220,7 +220,7 @@ class CGlobalRegexp {
 			$patterns = explode($expression['exp_delimiter'], $expression['expression']);
 		}
 		else {
-			$patterns = array($expression['expression']);
+			$patterns = [$expression['expression']];
 		}
 
 		$expectedResult = ($expression['expression_type'] != EXPRESSION_TYPE_NOT_INCLUDED);

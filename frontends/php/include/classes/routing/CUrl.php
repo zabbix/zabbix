@@ -24,7 +24,7 @@ class CUrl {
 	private $url;
 	protected $reference;
 	protected $query;
-	protected $arguments = array();
+	protected $arguments = [];
 
 	/**
 	 * WARNING: the class doesn't support parsing query strings with multi-dimentional arrays.

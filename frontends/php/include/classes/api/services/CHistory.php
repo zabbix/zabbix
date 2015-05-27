@@ -28,7 +28,7 @@ class CHistory extends CApiService {
 
 	protected $tableName = 'history';
 	protected $tableAlias = 'h';
-	protected $sortColumns = array('itemid', 'clock');
+	protected $sortColumns = ['itemid', 'clock'];
 
 	public function __construct() {
 		// considering the quirky nature of the history API,
@@ -47,19 +47,19 @@ class CHistory extends CApiService {
 	 *
 	 * @return array|int item data as array or false if error
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 
-		$sqlParts = array(
-			'select'	=> array('history' => 'h.itemid'),
-			'from'		=> array(),
-			'where'		=> array(),
-			'group'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['history' => 'h.itemid'],
+			'from'		=> [],
+			'where'		=> [],
+			'group'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'history'					=> ITEM_VALUE_TYPE_UINT64,
 			'hostids'					=> null,
 			'itemids'					=> null,
@@ -82,7 +82,7 @@ class CHistory extends CApiService {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		if (!$tableName = CHistoryManager::getTableName($options['history'])) {
@@ -94,13 +94,13 @@ class CHistory extends CApiService {
 		if (USER_TYPE_SUPER_ADMIN == self::$userData['type'] || $options['nopermissions']) {
 		}
 		else {
-			$items = API::Item()->get(array(
+			$items = API::Item()->get([
 				'itemids' => ($options['itemids'] === null) ? null : $options['itemids'],
-				'output' => array('itemid'),
+				'output' => ['itemid'],
 				'editable' => $options['editable'],
 				'preservekeys' => true,
 				'webitems' => true
-			));
+			]);
 			$options['itemids'] = array_keys($items);
 		}
 
@@ -148,7 +148,7 @@ class CHistory extends CApiService {
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT h.hostid) as rowscount');
+			$sqlParts['select'] = ['count(DISTINCT h.hostid) as rowscount'];
 
 			// groupCount
 			if (!is_null($options['groupCount'])) {
