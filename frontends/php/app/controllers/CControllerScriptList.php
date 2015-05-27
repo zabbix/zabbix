@@ -52,6 +52,8 @@ class CControllerScriptList extends CController {
 		CProfile::update('web.scripts.php.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.scripts.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+		$config = select_config();
+
 		$data = array(
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sortField,
@@ -63,12 +65,13 @@ class CControllerScriptList extends CController {
 			'output' => array('scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type',
 				'execute_on'
 			),
-			'editable' => true
+			'editable' => true,
+			'limit' => $config['search_limit'] + 1
 		));
 
 		// sorting & paging
 		order_result($data['scripts'], $sortField, $sortOrder);
-		$data['paging'] = getPagingLine($data['scripts']);
+		$data['paging'] = getPagingLine($data['scripts'], $sortOrder);
 
 		// find script host group name and user group name. set to '' if all host/user groups used.
 

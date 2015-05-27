@@ -103,7 +103,7 @@ class CControllerMediatypeList extends CController {
 			order_result($data['mediatypes'], $sortField, $sortOrder);
 		}
 
-		$data['paging'] = getPagingLine($data['mediatypes']);
+		$data['paging'] = getPagingLine($data['mediatypes'], $sortOrder);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));

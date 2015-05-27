@@ -501,7 +501,7 @@ function make_status_of_zbx() {
 		array(
 			new CSpan($status['items_count_monitored'], ZBX_STYLE_GREEN), ' / ',
 			new CSpan($status['items_count_disabled'], ZBX_STYLE_RED), ' / ',
-			new CSpan($status['items_count_not_supported'], ZBX_STYLE_UNKNOWN)
+			new CSpan($status['items_count_not_supported'], ZBX_STYLE_GREY)
 		)
 	));
 	$title = new CSpan(_('Number of triggers (enabled/disabled [problem/ok])'));
@@ -515,7 +515,7 @@ function make_status_of_zbx() {
 		)
 	));
 	$table->addRow(array(_('Number of users (online)'), $status['users_count'], new CSpan($status['users_online'], ZBX_STYLE_GREEN)));
-	$table->addRow(array(_('Required server performance, new values per second'), $status['qps_total'], ' - '));
+	$table->addRow(array(_('Required server performance, new values per second'), $status['qps_total'], ''));
 
 	// check requirements
 	if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
@@ -851,7 +851,7 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 		// action
 		$action = (isset($trigger['event']['eventid']) && isset($actions[$trigger['event']['eventid']]))
 			? $actions[$trigger['event']['eventid']]
-			: _('-');
+			: '';
 
 		$popupTable->addRow(array(
 			$trigger['hosts'][0]['name'],
