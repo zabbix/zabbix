@@ -31,9 +31,6 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char				*utf8;
 	struct zbx_json			j;
 
-	if (0 < request->nparam)
-		return SYSINFO_RET_FAIL;
-
 	if (NULL == (h_mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
