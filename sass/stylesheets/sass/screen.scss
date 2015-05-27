@@ -1391,6 +1391,41 @@ button {
 		}
 	}
 
+	&.btn-add {
+		background-color: $transparent;
+		border: none;
+		color: $link-color;
+		font-size: inherit;
+		border-bottom: 1px dotted $link-color;
+		padding: 0;
+		min-height: inherit;
+		@include border-radius(0);
+
+		&:hover {
+			@extend .btn-add;
+		}
+
+		&:active {
+			@extend .btn-add;
+		}  
+	}
+
+	&.btn-remove {
+		background-color: $transparent;
+		border: none;
+		padding: 0;
+		min-height: inherit;
+		@extend %close-icon;
+
+		&:hover {
+			@extend .btn-remove;
+		}
+
+		&:active {
+			@extend .btn-remove;
+		}  
+	}
+
 	&.btn-conf {
 		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -145px;
 		@extend %button-icon-size;
@@ -2725,6 +2760,10 @@ td.disaster-bg {
 	cursor: pointer;
 	@include opacity(0.5);
 	@include transition(opacity .2s ease-out);
+
+	&:before {
+		content:"\00d7";
+	}
 
 	&:hover {
 		@include opacity(1);
