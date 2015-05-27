@@ -398,8 +398,9 @@ static int	check_response(char *response)
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
 	ZBX_THREAD_SENDVAL_ARGS	*sentdval_args;
-	zbx_socket_t		sock;
 	int			tcp_ret, ret = FAIL;
+	char			*tls_arg1, *tls_arg2;
+	zbx_socket_t		sock;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -417,13 +418,24 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	signal(SIGQUIT, send_signal_handler);
 	signal(SIGALRM, send_signal_handler);
 #endif
+	if (ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode)
+	{
+		tls_arg1 = NULL;
+		tls_arg2 = NULL;
+	}
+	else if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
+	{
+		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
+		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
+	}
+	else	/* ZBX_TCP_SEC_TLS_PSK */
+	{
+		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
+		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
+	}
+
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port,
-			GET_SENDER_TIMEOUT, configured_tls_connect_mode,
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			CONFIG_TLS_SERVER_CERT_ISSUER, CONFIG_TLS_SERVER_CERT_SUBJECT)))
-#else
-			NULL, NULL)))
-#endif
+			GET_SENDER_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
 		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sentdval_args->json.buffer)))
 		{

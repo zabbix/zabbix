@@ -1282,9 +1282,18 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
  * Function: zbx_read_psk_file                                                *
  *                                                                            *
  * Purpose:                                                                   *
- *    Read a pre-shared key from a configured file and convert it from        *
- *    textual representation (ASCII hex digit string) to a binary             *
- *    representation (byte string)                                            *
+ *     Read a pre-shared key from a configured file and convert it from       *
+ *     textual representation (ASCII hex digit string) to a binary            *
+ *     representation (byte string)                                           *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     Maximum length of PSK hex-digit string is defined by HOST_TLS_PSK_LEN. *
+ *     Currently it is 512 characters, which encodes a 2048-bit PSK and is    *
+ *     supported by GnuTLS and OpenSSL libraries (compiled with default       *
+ *     parameters). PolarSSL supports up to 256-bit PSK (compiled with        *
+ *     default parameters). If the key is longer an error message             *
+ *     "ssl_set_psk(): SSL - Bad input parameters to function" will be logged *
+ *     at runtime.                                                            *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_read_psk_file(void)
@@ -1343,13 +1352,7 @@ static void	zbx_read_psk_file(void)
 		goto out;
 	}
 
-#if defined(HAVE_POLARSSL)
-	/* Currently PolarSSL supports up to 32 bytes long PSKs, but with other libraries we can support up */
-	/* to 256 bytes. Check both limits for safer code. */
-	if (POLARSSL_PSK_MAX_LEN * 2 < len || HOST_TLS_PSK_LEN < len)
-#elif defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (HOST_TLS_PSK_LEN < len)
-#endif
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "PSK in file \"%s\" is too large", CONFIG_TLS_PSK_FILE);
 		goto out;
@@ -3183,7 +3186,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	{
 		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_psk);
 
-		if (NULL == tls_arg1)	/* 'tls_psk_identity' is not set */
+		if (NULL == tls_arg2)	/* PSK is not set from DB */
 		{
 			/* set up the PSK from a configuration file (in agentd, agent (always) and a case in active */
 			/* proxy when it connects to server) */
@@ -3372,7 +3375,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 			goto out;
 		}
 
-		if (NULL == tls_arg1)	/* 'tls_psk_identity' is not set */
+		if (NULL == tls_arg2)	/* PSK is not set from DB */
 		{
 			/* set up the PSK from a configuration file (in agentd, agent (always) and a case in active */
 			/* proxy when it connects to server) */
@@ -3624,7 +3627,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 			goto out;
 		}
 
-		if (NULL == tls_arg1)	/* 'tls_psk_identity' is not set from DB */
+		if (NULL == tls_arg2)	/* PSK is not set from DB */
 		{
 			/* Set up PSK global variables from a configuration file (always in agentd, agent and a */
 			/* case when active proxy connects to server). Here we set it only in case of active proxy */

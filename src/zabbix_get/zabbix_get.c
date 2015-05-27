@@ -186,15 +186,27 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	zbx_socket_t	s;
 	int		ret;
 	ssize_t		bytes_received = -1;
+	char		*tls_arg1, *tls_arg2;
 	char		request[1024];
 
+	if (ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode)
+	{
+		tls_arg1 = NULL;
+		tls_arg2 = NULL;
+	}
+	else if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
+	{
+		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
+		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
+	}
+	else	/* ZBX_TCP_SEC_TLS_PSK */
+	{
+		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
+		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
+	}
+
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT,
-			configured_tls_connect_mode,
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			CONFIG_TLS_SERVER_CERT_ISSUER, CONFIG_TLS_SERVER_CERT_SUBJECT)))
-#else
-			NULL, NULL)))
-#endif
+			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
 		zbx_snprintf(request, sizeof(request), "%s\n", key);
 
