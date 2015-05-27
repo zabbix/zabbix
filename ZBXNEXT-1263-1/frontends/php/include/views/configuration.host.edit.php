@@ -123,81 +123,85 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		: 'hostInterfacesManager.addNew("agent");');
 
 	// table for agent interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'agentInterfaces');
-	$ifTab->setAttribute('data-type', 'agent');
+	$ifTab = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('id', 'agentInterfaces')->
+		setAttribute('data-type', 'agent');
 
 	// headers with sizes
-	$iconLabel = new CCol(' ', 'interface-drag-control');
-	$ipLabel = new CCol(_('IP address'), 'interface-ip');
-	$dnsLabel = new CCol(_('DNS name'), 'interface-dns');
-	$connectToLabel = new CCol(_('Connect to'), 'interface-connect-to');
-	$portLabel = new CCol(_('Port'), 'interface-port');
-	$defaultLabel = new CCol(_('Default'), 'interface-default', 2);
-	$ifTab->addRow(array($iconLabel, $ipLabel, $dnsLabel, $connectToLabel, $portLabel, $defaultLabel));
+	$iconLabel = (new CCol(' '))->addClass('interface-drag-control');
+	$ipLabel = (new CCol(_('IP address')))->addClass('interface-ip');
+	$dnsLabel = (new CCol(_('DNS name')))->addClass('interface-dns');
+	$connectToLabel = (new CCol(_('Connect to')))->addClass('interface-connect-to');
+	$portLabel = (new CCol(_('Port')))->addClass('interface-port');
+	$defaultLabel = (new CCol(_('Default')))->addClass('interface-default')->setColSpan(2);
+	$ifTab->addRow([$iconLabel, $ipLabel, $dnsLabel, $connectToLabel, $portLabel, $defaultLabel]);
 
 	$helpTextWhenDragInterfaceAgent = new CSpan(_('Drag here to change the type of the interface to "agent" type.'));
 	$helpTextWhenDragInterfaceAgent->addClass('dragHelpText');
-	$buttonCol = new CCol(new CButton('addAgentInterface', _('Add'), null, 'link_menu'), 'interface-add-control', 7);
+	$buttonCol = (new CCol(new CButton('addAgentInterface', _('Add'), null, 'link_menu')))->addClass('interface-add-control')->setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceAgent);
 
-	$buttonRow = new CRow(array($buttonCol));
-	$buttonRow->setAttribute('id', 'agentInterfacesFooter');
+	$buttonRow = (new CRow([$buttonCol]))->setId('agentInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 
 	$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row interface-row-first');
 
 	// table for SNMP interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'SNMPInterfaces');
-	$ifTab->setAttribute('data-type', 'snmp');
+	$ifTab = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('id', 'SNMPInterfaces')->
+		setAttribute('data-type', 'snmp');
 
 	$helpTextWhenDragInterfaceSNMP = new CSpan(_('Drag here to change the type of the interface to "SNMP" type.'));
 	$helpTextWhenDragInterfaceSNMP->addClass('dragHelpText');
-	$buttonCol = new CCol(new CButton('addSNMPInterface', _('Add'), null, 'link_menu'), 'interface-add-control', 7);
+	$buttonCol = (new CCol(new CButton('addSNMPInterface', _('Add'), null, 'link_menu')))->addClass('interface-add-control')->setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceSNMP);
 
-	$buttonRow = new CRow(array($buttonCol));
-	$buttonRow->setAttribute('id', 'SNMPInterfacesFooter');
+	$buttonRow = (new CRow([$buttonCol]))->setId('SNMPInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 
 	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted inlineblock objectgroup interface-group'), false, null, 'interface-row');
 
 	// table for JMX interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'JMXInterfaces');
-	$ifTab->setAttribute('data-type', 'jmx');
+	$ifTab = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('id', 'JMXInterfaces')->
+		setAttribute('data-type', 'jmx');
 	$helpTextWhenDragInterfaceJMX = new CSpan(_('Drag here to change the type of the interface to "JMX" type.'));
 	$helpTextWhenDragInterfaceJMX->addClass('dragHelpText');
-	$buttonCol = new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu'), 'interface-add-control', 7);
+	$buttonCol = (new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu')))->
+		addClass('interface-add-control')->
+		setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceJMX);
 
-	$buttonRow = new CRow(array($buttonCol));
-	$buttonRow->setAttribute('id', 'JMXInterfacesFooter');
+	$buttonRow = (new CRow([$buttonCol]))->setId('JMXInterfacesFooter');
 	$ifTab->addRow($buttonRow);
 
 	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
 
 	// table for IPMI interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'IPMIInterfaces');
-	$ifTab->setAttribute('data-type', 'ipmi');
+	$ifTab = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('id', 'IPMIInterfaces')->
+		setAttribute('data-type', 'ipmi');
 	$helpTextWhenDragInterfaceIPMI = new CSpan(_('Drag here to change the type of the interface to "IPMI" type.'));
 	$helpTextWhenDragInterfaceIPMI->addClass('dragHelpText');
-	$buttonCol = new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu'), 'interface-add-control', 7);
+	$buttonCol = (new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu')))->
+		addClass('interface-add-control')->
+		setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceIPMI);
 
-	$buttonRow = new CRow(array($buttonCol));
-	$buttonRow->setAttribute('id', 'IPMIInterfacesFooter');
+	$buttonRow = (new CRow([$buttonCol]))->setId('IPMIInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
 	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
 }
 // interfaces for discovered hosts
 else {
-	$existingInterfaceTypes = array();
+	$existingInterfaceTypes = [];
 	foreach ($data['interfaces'] as $interface) {
 		$existingInterfaceTypes[$interface['type']] = true;
 	}
@@ -207,65 +211,69 @@ else {
 	$hostList->addVar('interfaces', $data['interfaces']);
 
 	// table for agent interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'agentInterfaces');
-	$ifTab->setAttribute('data-type', 'agent');
+	$ifTab = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('id', 'agentInterfaces')->
+		setAttribute('data-type', 'agent');
 
 	// header
-	$ifTab->addRow(array(
-		new CCol(null, 'interface-drag-control'),
-		new CCol(_('IP address'), 'interface-ip'),
-		new CCol(_('DNS name'), 'interface-dns'),
-		new CCol(_('Connect to'), 'interface-connect-to'),
-		new CCol(_('Port'), 'interface-port'),
-		new CCol(_('Default'), 'interface-default'),
-		new CCol(null, 'interface-control')
-	));
+	$ifTab->addRow([
+		(new CCol())->addClass('interface-drag-control'),
+		(new CCol(_('IP address')))->addClass('interface-ip'),
+		(new CCol(_('DNS name')))->addClass('interface-dns'),
+		(new CCol(_('Connect to')))->addClass('interface-connect-to'),
+		(new CCol(_('Port')))->addClass('interface-port'),
+		(new CCol(_('Default')))->addClass('interface-default'),
+		(new CCol())->addClass('interface-control')
+	]);
 
-	$row = new CRow(null, null, 'agentInterfacesFooter');
+	$row = (new CRow())->setId('agentInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_AGENT])) {
-		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No agent interfaces found.'), null, 5));
+		$row->addItem((new CCol())->addClass('interface-drag-control'));
+		$row->addItem((new CCol(_('No agent interfaces found.')))->setColSpan(5));
 	}
 	$ifTab->addRow($row);
 
 	$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-first');
 
 	// table for SNMP interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'SNMPInterfaces');
-	$ifTab->setAttribute('data-type', 'snmp');
+	$ifTab = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('id', 'SNMPInterfaces')->
+		setAttribute('data-type', 'snmp');
 
-	$row = new CRow(null, null, 'SNMPInterfacesFooter');
+	$row = (new CRow())->setId('SNMPInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
-		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No SNMP interfaces found.'), null, 5));
+		$row->addItem((new CCol())->addClass('interface-drag-control'));
+		$row->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(5));
 	}
 	$ifTab->addRow($row);
 	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
 
 	// table for JMX interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'JMXInterfaces');
-	$ifTab->setAttribute('data-type', 'jmx');
+	$ifTab = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('id', 'JMXInterfaces')->
+		setAttribute('data-type', 'jmx');
 
-	$row = new CRow(null, null, 'JMXInterfacesFooter');
+	$row = (new CRow())->setId('JMXInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
-		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No JMX interfaces found.'), null, 5));
+		$row->addItem((new CCol())->addClass('interface-drag-control'));
+		$row->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(5));
 	}
 	$ifTab->addRow($row);
 	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
 
 	// table for IPMI interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'IPMIInterfaces');
-	$ifTab->setAttribute('data-type', 'ipmi');
+	$ifTab = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('id', 'IPMIInterfaces')->
+		setAttribute('data-type', 'ipmi');
 
-	$row = new CRow(null, null, 'IPMIInterfacesFooter');
+	$row = (new CRow())->setId('IPMIInterfacesFooter');
 	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
-		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No IPMI interfaces found.'), null, 5));
+		$row->addItem((new CCol())->addClass('interface-drag-control'));
+		$row->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(5));
 	}
 	$ifTab->addRow($row);
 	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');
@@ -290,15 +298,15 @@ $hostList->addRow(_('Enabled'),
 
 if ($data['clone_hostid'] != 0) {
 	// host applications
-	$hostApps = API::Application()->get(array(
-		'output' => array('name'),
-		'hostids' => array($data['clone_hostid']),
+	$hostApps = API::Application()->get([
+		'output' => ['name'],
+		'hostids' => [$data['clone_hostid']],
 		'inherited' => false,
 		'preservekeys' => true
-	));
+	]);
 
 	if ($hostApps) {
-		$applicationsList = array();
+		$applicationsList = [];
 		foreach ($hostApps as $hostAppId => $hostApp) {
 			$applicationsList[$hostAppId] = $hostApp['name'];
 		}
@@ -311,17 +319,17 @@ if ($data['clone_hostid'] != 0) {
 	}
 
 	// host items
-	$hostItems = API::Item()->get(array(
-		'output' => array('itemid', 'hostid', 'key_', 'name'),
-		'hostids' => array($data['clone_hostid']),
+	$hostItems = API::Item()->get([
+		'output' => ['itemid', 'hostid', 'key_', 'name'],
+		'hostids' => [$data['clone_hostid']],
 		'inherited' => false,
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-	));
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+	]);
 
 	if ($hostItems) {
 		$hostItems = CMacrosResolverHelper::resolveItemNames($hostItems);
 
-		$itemsList = array();
+		$itemsList = [];
 		foreach ($hostItems as $hostItem) {
 			$itemsList[$hostItem['itemid']] = $hostItem['name_expanded'];
 		}
@@ -334,16 +342,16 @@ if ($data['clone_hostid'] != 0) {
 	}
 
 	// host triggers
-	$hostTriggers = API::Trigger()->get(array(
-		'output' => array('triggerid', 'description'),
-		'selectItems' => array('type'),
-		'hostids' => array($data['clone_hostid']),
+	$hostTriggers = API::Trigger()->get([
+		'output' => ['triggerid', 'description'],
+		'selectItems' => ['type'],
+		'hostids' => [$data['clone_hostid']],
 		'inherited' => false,
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL))
-	));
+		'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]]
+	]);
 
 	if ($hostTriggers) {
-		$triggersList = array();
+		$triggersList = [];
 
 		foreach ($hostTriggers as $hostTrigger) {
 			if (httpItemExists($hostTrigger['items'])) {
@@ -363,17 +371,17 @@ if ($data['clone_hostid'] != 0) {
 	}
 
 	// host graphs
-	$hostGraphs = API::Graph()->get(array(
-		'output' => array('graphid', 'name'),
-		'selectHosts' => array('hostid'),
-		'selectItems' => array('type'),
-		'hostids' => array($data['clone_hostid']),
+	$hostGraphs = API::Graph()->get([
+		'output' => ['graphid', 'name'],
+		'selectHosts' => ['hostid'],
+		'selectItems' => ['type'],
+		'hostids' => [$data['clone_hostid']],
 		'inherited' => false,
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL))
-	));
+		'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]]
+	]);
 
 	if ($hostGraphs) {
-		$graphsList = array();
+		$graphsList = [];
 		foreach ($hostGraphs as $hostGraph) {
 			if (count($hostGraph['hosts']) > 1) {
 				continue;
@@ -395,18 +403,18 @@ if ($data['clone_hostid'] != 0) {
 	}
 
 	// discovery rules
-	$hostDiscoveryRuleIds = array();
+	$hostDiscoveryRuleIds = [];
 
-	$hostDiscoveryRules = API::DiscoveryRule()->get(array(
-		'output' => array('itemid', 'hostid', 'key_', 'name'),
-		'hostids' => array($data['clone_hostid']),
+	$hostDiscoveryRules = API::DiscoveryRule()->get([
+		'output' => ['itemid', 'hostid', 'key_', 'name'],
+		'hostids' => [$data['clone_hostid']],
 		'inherited' => false
-	));
+	]);
 
 	if ($hostDiscoveryRules) {
 		$hostDiscoveryRules = CMacrosResolverHelper::resolveItemNames($hostDiscoveryRules);
 
-		$discoveryRuleList = array();
+		$discoveryRuleList = [];
 		foreach ($hostDiscoveryRules as $discoveryRule) {
 			$discoveryRuleList[$discoveryRule['itemid']] = $discoveryRule['name_expanded'];
 		}
@@ -420,17 +428,17 @@ if ($data['clone_hostid'] != 0) {
 	}
 
 	// item prototypes
-	$hostItemPrototypes = API::ItemPrototype()->get(array(
-		'output' => array('itemid', 'hostid', 'key_', 'name'),
-		'hostids' => array($data['clone_hostid']),
+	$hostItemPrototypes = API::ItemPrototype()->get([
+		'output' => ['itemid', 'hostid', 'key_', 'name'],
+		'hostids' => [$data['clone_hostid']],
 		'discoveryids' => $hostDiscoveryRuleIds,
 		'inherited' => false
-	));
+	]);
 
 	if ($hostItemPrototypes) {
 		$hostItemPrototypes = CMacrosResolverHelper::resolveItemNames($hostItemPrototypes);
 
-		$prototypeList = array();
+		$prototypeList = [];
 		foreach ($hostItemPrototypes as $itemPrototype) {
 			$prototypeList[$itemPrototype['itemid']] = $itemPrototype['name_expanded'];
 		}
@@ -443,16 +451,16 @@ if ($data['clone_hostid'] != 0) {
 	}
 
 	// Trigger prototypes
-	$hostTriggerPrototypes = API::TriggerPrototype()->get(array(
-		'output' => array('triggerid', 'description'),
-		'selectItems' => array('type'),
-		'hostids' => array($data['clone_hostid']),
+	$hostTriggerPrototypes = API::TriggerPrototype()->get([
+		'output' => ['triggerid', 'description'],
+		'selectItems' => ['type'],
+		'hostids' => [$data['clone_hostid']],
 		'discoveryids' => $hostDiscoveryRuleIds,
 		'inherited' => false
-	));
+	]);
 
 	if ($hostTriggerPrototypes) {
-		$prototypeList = array();
+		$prototypeList = [];
 		foreach ($hostTriggerPrototypes as $triggerPrototype) {
 			// skip trigger prototypes with web items
 			if (httpItemExists($triggerPrototype['items'])) {
@@ -472,16 +480,16 @@ if ($data['clone_hostid'] != 0) {
 	}
 
 	// Graph prototypes
-	$hostGraphPrototypes = API::GraphPrototype()->get(array(
-		'output' => array('graphid', 'name'),
-		'selectHosts' => array('hostid'),
-		'hostids' => array($data['clone_hostid']),
+	$hostGraphPrototypes = API::GraphPrototype()->get([
+		'output' => ['graphid', 'name'],
+		'selectHosts' => ['hostid'],
+		'hostids' => [$data['clone_hostid']],
 		'discoveryids' => $hostDiscoveryRuleIds,
 		'inherited' => false
-	));
+	]);
 
 	if ($hostGraphPrototypes) {
-		$prototypeList = array();
+		$prototypeList = [];
 		foreach ($hostGraphPrototypes as $graphPrototype) {
 			if (count($graphPrototype['hosts']) == 1) {
 				$prototypeList[$graphPrototype['graphid']] = $graphPrototype['name'];
@@ -496,14 +504,14 @@ if ($data['clone_hostid'] != 0) {
 	}
 
 	// host prototypes
-	$hostPrototypes = API::HostPrototype()->get(array(
-		'output' => array('hostid', 'name'),
+	$hostPrototypes = API::HostPrototype()->get([
+		'output' => ['hostid', 'name'],
 		'discoveryids' => $hostDiscoveryRuleIds,
 		'inherited' => false
-	));
+	]);
 
 	if ($hostPrototypes) {
-		$prototypeList = array();
+		$prototypeList = [];
 		foreach ($hostPrototypes as $hostPrototype) {
 			$prototypeList[$hostPrototype['hostid']] = $hostPrototype['name'];
 		}
@@ -516,14 +524,14 @@ if ($data['clone_hostid'] != 0) {
 	}
 
 	// web scenarios
-	$httpTests = API::HttpTest()->get(array(
-		'output' => array('httptestid', 'name'),
-		'hostids' => array($data['clone_hostid']),
+	$httpTests = API::HttpTest()->get([
+		'output' => ['httptestid', 'name'],
+		'hostids' => [$data['clone_hostid']],
 		'inherited' => false
-	));
+	]);
 
 	if ($httpTests) {
-		$httpTestList = array();
+		$httpTestList = [];
 
 		foreach ($httpTests as $httpTest) {
 			$httpTestList[$httpTest['httptestid']] = $httpTest['name'];
@@ -544,13 +552,14 @@ $divTabs->addTab('hostTab', _('Host'), $hostList);
 $tmplList = new CFormList();
 
 // create linked template table
-$linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');
-$linkedTemplateTable->attr('id', 'linkedTemplateTable');
+$linkedTemplateTable = (new CTable(_('No templates linked.')))->
+	addClass('formElementTable')->
+	setAttribute('id', 'linkedTemplateTable');
 
 // templates for normal hosts
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	$linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
-	$ignoredTemplates = array();
+	$linkedTemplateTable->setHeader([_('Name'), _('Action')]);
+	$ignoredTemplates = [];
 
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
@@ -579,20 +588,21 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	);
 
 	// create new linked template table
-	$newTemplateTable = new CTable(null, 'formElementTable');
-	$newTemplateTable->attr('id', 'newTemplateTable');
+	$newTemplateTable = (new CTable())->
+		addClass('formElementTable')->
+		setAttribute('id', 'newTemplateTable');
 
-	$newTemplateTable->addRow(array(new CMultiSelect(array(
+	$newTemplateTable->addRow([new CMultiSelect([
 		'name' => 'add_templates[]',
 		'objectName' => 'templates',
 		'ignored' => $ignoredTemplates,
-		'popup' => array(
+		'popup' => [
 			'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
 				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
-		)
-	))));
+		]
+	])]);
 
-	$newTemplateTable->addRow(array(new CSubmit('add_template', _('Add'), null, 'link_menu')));
+	$newTemplateTable->addRow([new CSubmit('add_template', _('Add'), null, 'link_menu')]);
 
 	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable,
 		'template-link-block objectgroup inlineblock border_dotted ui-corner-all')
@@ -600,7 +610,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 }
 // templates for discovered hosts
 else {
-	$linkedTemplateTable->setHeader(array(_('Name')));
+	$linkedTemplateTable->setHeader([_('Name')]);
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
 		$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
@@ -645,11 +655,11 @@ $divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
 /*
  * Macros
  */
-$macrosView = new CView('hostmacros', array(
+$macrosView = new CView('hostmacros', [
 	'macros' => $data['macros'],
 	'show_inherited_macros' => $data['show_inherited_macros'],
 	'readonly' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-));
+]);
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 
 $inventoryFormList = new CFormList('inventorylist');
@@ -712,7 +722,7 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 		$link = new CLink($name, 'items.php?form=update&itemid='.$data['inventory_items'][$inventoryNo]['itemid']);
 		$link->setAttribute('title', _s('This field is automatically populated by item "%s".', $name));
 
-		$inventory_item = new CSpan(array(' &larr; ', $link), 'populating_item');
+		$inventory_item = new CSpan([' &larr; ', $link], 'populating_item');
 		if ($data['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {
 			// those links are visible only in automatic mode
 			$inventory_item->addStyle('display: none');
@@ -729,7 +739,7 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	}
 	$input->addStyle('float: left;');
 
-	$inventoryFormList->addRow($inventoryInfo['title'], array($input, $inventory_item));
+	$inventoryFormList->addRow($inventoryInfo['title'], [$input, $inventory_item]);
 }
 
 // clearing the float
@@ -768,18 +778,18 @@ $divTabs->addTab('encryptionTab', _('Encryption'), $encryptionFormList);
 if ($data['hostid'] != 0) {
 	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CSubmit('clone', _('Clone')),
 			new CSubmit('full_clone', _('Full clone')),
 			new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid').url_param('groupid')),
 			new CButtonCancel(url_param('groupid'))
-		)
+		]
 	));
 }
 else {
 	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('groupid')))
+		[new CButtonCancel(url_param('groupid'))]
 	));
 }
 

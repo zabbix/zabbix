@@ -28,26 +28,26 @@ class CLdapAuthValidatorTest extends CValidatorTest {
 	}
 
 	public function validParamProvider() {
-		return array(
-			array(array(
-				'conf' => array()
-			))
-		);
+		return [
+			[[
+				'conf' => []
+			]]
+		];
 	}
 
 	public function validValuesProvider() {
-		return array(array());
+		return [[]];
 	}
 
 	public function invalidValuesProvider() {
-		return array(array());
+		return [[]];
 	}
 
 	public function invalidValuesWithObjectsProvider() {
-		return array(array());
+		return [[]];
 	}
 
-	protected function createValidator(array $params = array()) {
+	protected function createValidator(array $params = []) {
 		return new CLdapAuthValidator($params);
 	}
 }

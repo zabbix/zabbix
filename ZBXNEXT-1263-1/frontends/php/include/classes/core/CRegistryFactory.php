@@ -30,19 +30,19 @@ class CRegistryFactory {
 	 *
 	 * @var array
 	 */
-	protected $objects = array();
+	protected $objects = [];
 
 	/**
 	 * An array of created object instances.
 	 *
 	 * @var array
 	 */
-	protected $instances = array();
+	protected $instances = [];
 
 	/**
 	 * @param array $objects	array of defined objects
 	 */
-	public function __construct(array $objects = array()) {
+	public function __construct(array $objects = []) {
 		$this->objects = $objects;
 	}
 

@@ -22,7 +22,7 @@
 class CFilter extends CTag {
 
 	private $filterid;
-	private $columns = array();
+	private $columns = [];
 	private $form;
 	private $footer = null;
 	private $navigator = false;
@@ -30,10 +30,10 @@ class CFilter extends CTag {
 
 	public function __construct($filterid) {
 		parent::__construct('div', 'yes');
-		$this->attr('class', 'filter-container');
-		$this->attr('id', 'filter-space');
+		$this->setAttribute('class', 'filter-container');
+		$this->setAttribute('id', 'filter-space');
 		$this->filterid = $filterid;
-		$this->columns = array();
+		$this->columns = [];
 
 		$this->form = new CForm('get');
 		$this->form->setAttribute('name', $this->name);
@@ -65,9 +65,9 @@ class CFilter extends CTag {
 
 	private function getHeader() {
 		$switch = new CDiv(null, 'filter-btn-container');
-		$button = new CSimpleButton(array(_('Filter'), new CSpan(null, 'arrow-up', 'filter-arrow')), 'filter-trigger filter-active');
+		$button = new CSimpleButton([_('Filter'), new CSpan(null, 'arrow-up', 'filter-arrow')], 'filter-trigger filter-active');
 		$button->setAttribute('id', 'filter-mode');
-		$button->addAction('onclick', 'javascript: jQuery("#filter-space").toggle(); jQuery("#filter-mode").toggleClass("filter-active"); jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");');
+		$button->onClick('javascript: jQuery("#filter-space").toggle(); jQuery("#filter-mode").toggleClass("filter-active"); jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");');
 		$switch->addItem($button);
 
 		return $switch;
@@ -98,10 +98,10 @@ class CFilter extends CTag {
 		$url->setArgument('filter_rst', 1);
 		$resetButton = new CRedirectButton(_('Reset'), $url->getUrl());
 		$resetButton->addClass('btn-alt');
-		$resetButton->addAction('onclick', 'javascript: chkbxRange.clearSelectedOnFilterChange();');
+		$resetButton->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
 
 		$filterButton = new CSubmit('filter_set', _('Filter'));
-		$filterButton->addAction('onclick', 'javascript: chkbxRange.clearSelectedOnFilterChange();');
+		$filterButton->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
 
 		$buttons->addItem($filterButton);
 		$buttons->addItem($resetButton);

@@ -31,7 +31,7 @@ class testPagePopup extends CWebTest {
 		$this->zbxTestOpen($this->urlPopupProxies);
 		$this->zbxTestCheckTitle('Proxies');
 		$this->zbxTestTextPresent('Proxies');
-		$this->zbxTestTextPresent(array('Name'));
+		$this->zbxTestTextPresent(['Name']);
 
 		$result = DBselect(
 			'SELECT host'.
@@ -48,7 +48,7 @@ class testPagePopup extends CWebTest {
 		$this->zbxTestOpen($this->urlPopupApplications);
 		$this->zbxTestCheckTitle('Applications');
 		$this->zbxTestTextPresent('Applications');
-		$this->zbxTestTextPresent(array('Group', 'Host'));
+		$this->zbxTestTextPresent(['Group', 'Host']);
 		$this->zbxTestTextPresent('Name');
 		$this->assertElementPresent('groupid');
 		$this->assertElementPresent('hostid');
@@ -56,7 +56,7 @@ class testPagePopup extends CWebTest {
 		$this->assertSomethingSelected('hostid');
 
 		$ddGroups = $this->zbxGetDropDownElements('groupid');
-		$dbGroups = array();
+		$dbGroups = [];
 
 		// checking order of dropdown entries
 

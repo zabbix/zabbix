@@ -30,9 +30,9 @@ class CIPValidatorTest extends CValidatorTest {
 	 * @return array
 	 */
 	public function validParamProvider() {
-		return array(
-			array(array())
-		);
+		return [
+			[[]]
+		];
 	}
 
 	/**
@@ -41,15 +41,15 @@ class CIPValidatorTest extends CValidatorTest {
 	 * @return array
 	 */
 	public function validValuesProvider() {
-		return array(
-			array(array(), '0.0.0.0'),
-			array(array(), '255.255.255.255'),
-			array(array(), '192.168.1.0'),
-			array(array(), '2002:0:0:0:0:0:0:0'),
-			array(array(), '2002:0:0:0:0:0:ffff:ffff'),
-			array(array(), 'fe80:0:0:0:0:0:c0a8:100'),
-			array(array(), 'fe80::c0a8:100')
-		);
+		return [
+			[[], '0.0.0.0'],
+			[[], '255.255.255.255'],
+			[[], '192.168.1.0'],
+			[[], '2002:0:0:0:0:0:0:0'],
+			[[], '2002:0:0:0:0:0:ffff:ffff'],
+			[[], 'fe80:0:0:0:0:0:c0a8:100'],
+			[[], 'fe80::c0a8:100']
+		];
 	}
 
 	/**
@@ -58,44 +58,44 @@ class CIPValidatorTest extends CValidatorTest {
 	 * @return array
 	 */
 	public function invalidValuesProvider() {
-		return array(
-			array(array(),
+		return [
+			[[],
 				null,
 				'Invalid IP address "null": must be a string.'
-			),
-			array(array(),
-				array(),
+			],
+			[[],
+				[],
 				'Invalid IP address "array": must be a string.'
-			),
-			array(array(),
+			],
+			[[],
 				'',
 				'IP address cannot be empty.'
-			),
-			array(array(),
+			],
+			[[],
 				'{$A}',
 				'Invalid IP address "{$A}".'
-			),
-			array(array(),
+			],
+			[[],
 				'321.654.987.456',
 				'Invalid IP address "321.654.987.456".'
-			),
-			array(array(),
+			],
+			[[],
 				'0:0:0:0:0:0:1438e:3dcc8',
 				'Invalid IP address "0:0:0:0:0:0:1438e:3dcc8".'
-			),
-			array(array(),
+			],
+			[[],
 				'0::::::7f00:',
 				'Invalid IP address "0::::::7f00:".'
-			),
-			array(array(),
+			],
+			[[],
 				'192.168.0.0/16',
 				'Invalid IP address "192.168.0.0/16".'
-			),
-			array(array(),
+			],
+			[[],
 				'192.168.0.0-255',
 				'Invalid IP address "192.168.0.0-255".'
-			)
-		);
+			]
+		];
 	}
 
 	/**
@@ -104,11 +104,11 @@ class CIPValidatorTest extends CValidatorTest {
 	 * @return array
 	 */
 	public function invalidValuesWithObjectsProvider() {
-		return array(array(
-			array(),
+		return [[
+			[],
 			null,
 			'Invalid IP address "null": must be a string.'
-		));
+		]];
 	}
 
 	/**
@@ -118,7 +118,7 @@ class CIPValidatorTest extends CValidatorTest {
 	 *
 	 * @return CValidator
 	 */
-	protected function createValidator(array $params = array()) {
+	protected function createValidator(array $params = []) {
 		return new CIPValidator($params);
 	}
 }

@@ -25,10 +25,10 @@ class CLabel extends CTag {
 		parent::__construct('label', 'yes', $label);
 
 		if ($id !== null) {
-			$this->attr('id', zbx_formatDomId($id));
+			$this->setAttribute('id', zbx_formatDomId($id));
 		}
 		if ($for !== null) {
-			$this->attr('for', zbx_formatDomId($for));
+			$this->setAttribute('for', zbx_formatDomId($for));
 		}
 	}
 }

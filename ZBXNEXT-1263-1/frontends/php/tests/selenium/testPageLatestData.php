@@ -28,7 +28,7 @@ class testPageLatestData extends CWebTest {
 		$this->zbxTestTextPresent('Items');
 //		$this->zbxTestTextPresent(array('Host groups', 'Hosts', 'Application', 'Name', 'Show items without data', 'Show details'));
 //		$this->zbxTestTextPresent('Filter');
-		$this->zbxTestTextPresent(array('Host', 'Name', 'Last check', 'Last value', 'Change'));
+		$this->zbxTestTextPresent(['Host', 'Name', 'Last check', 'Last value', 'Change']);
 	}
 
 // Check that no real host or template names displayed

@@ -65,570 +65,570 @@ class testFormItemPrototype extends CWebTest {
 
 	// Returns layout data
 	public static function layout() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'key' => 'item-prototype-form1'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Boolean'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Hexadecimal'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Octal'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (float)'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Character'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Log'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Text'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix agent (active)'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Simple check'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv1 agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv1 agent',
 					'value_type' => 'Numeric (float)'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv2 agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv3 agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Boolean'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Hexadecimal'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Octal'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (float)'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Character'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Log'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Text'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'authNoPriv'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'authPriv'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SNMP trap'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix internal'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix internal',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Boolean'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix trapper'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Zabbix aggregate'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'External check'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Database monitor'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'IPMI agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SSH agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SSH agent',
 					'authtype' => 'Public key'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SSH agent',
 					'authtype' => 'Password'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SSH agent',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Boolean'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'SSH agent',
 					'authtype' => 'Password',
 					'value_type' => 'Character'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'TELNET agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'JMX agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'type' => 'Calculated'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'key' => 'item-prototype-test1'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Template inheritance test host',
 					'key' => 'item-prototype-test1'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Boolean'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Hexadecimal'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Octal'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (float)'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Character'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Log'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Text'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix agent (active)'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Simple check'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv1 agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv1 agent',
 					'value_type' => 'Numeric (float)'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv2 agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv3 agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Boolean'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Hexadecimal'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Octal'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (float)'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Character'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Log'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Text'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'authNoPriv'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'authPriv'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SNMP trap'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix internal'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix internal',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Boolean'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix trapper'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Zabbix aggregate'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'External check'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Database monitor'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'IPMI agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SSH agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SSH agent',
 					'authtype' => 'Public key'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SSH agent',
 					'authtype' => 'Password'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SSH agent',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Boolean'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'SSH agent',
 					'authtype' => 'Password',
 					'value_type' => 'Character'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'TELNET agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'JMX agent'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Inheritance test template',
 					'type' => 'Calculated'
-				)
-			)
-		);
+				]
+			]
+		];
 	}
 
 	/**
@@ -712,7 +712,7 @@ class testFormItemPrototype extends CWebTest {
 		$this->zbxTestTextPresent('Type');
 		if (!isset($templateid)) {
 			$this->assertVisible('type');
-			$this->zbxTestDropdownHasOptions('type', array(
+			$this->zbxTestDropdownHasOptions('type', [
 				'Zabbix agent',
 				'Zabbix agent (active)',
 				'Simple check',
@@ -730,7 +730,7 @@ class testFormItemPrototype extends CWebTest {
 				'TELNET agent',
 				'JMX agent',
 				'Calculated'
-			));
+			]);
 			if (isset($data['type'])) {
 				$this->zbxTestDropdownSelect('type', $data['type']);
 			}
@@ -814,7 +814,7 @@ class testFormItemPrototype extends CWebTest {
 					}
 					break;
 				default:
-					$this->zbxTestTextNotPresent(array('Host interface', 'No interface found'));
+					$this->zbxTestTextNotPresent(['Host interface', 'No interface found']);
 					$this->assertNotVisible('interfaceid');
 					break;
 			}
@@ -899,7 +899,7 @@ class testFormItemPrototype extends CWebTest {
 		if ($type == 'SSH agent') {
 			$this->zbxTestTextPresent('Authentication method');
 			$this->assertVisible('authtype');
-			$this->zbxTestDropdownHasOptions('authtype', array('Password', 'Public key'));
+			$this->zbxTestDropdownHasOptions('authtype', ['Password', 'Public key']);
 		}
 		else {
 			$this->zbxTestTextNotPresent('Authentication method');
@@ -924,7 +924,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->assertAttribute("//input[@id='password']/@size", 25);
 		}
 		else {
-			$this->zbxTestTextNotPresent(array('User name', 'Password', 'Key passphrase'));
+			$this->zbxTestTextNotPresent(['User name', 'Password', 'Key passphrase']);
 			$this->assertNotVisible('username');
 			$this->assertNotVisible('password');
 		}
@@ -992,7 +992,7 @@ class testFormItemPrototype extends CWebTest {
 
 			$this->zbxTestTextPresent('Security level');
 			$this->assertVisible('snmpv3_securitylevel');
-			$this->zbxTestDropdownHasOptions('snmpv3_securitylevel', array('noAuthNoPriv', 'authNoPriv', 'authPriv'));
+			$this->zbxTestDropdownHasOptions('snmpv3_securitylevel', ['noAuthNoPriv', 'authNoPriv', 'authPriv']);
 		}
 		else {
 			$this->zbxTestTextNotPresent('Security name');
@@ -1076,13 +1076,13 @@ class testFormItemPrototype extends CWebTest {
 		if (!isset($templateid)) {
 			$this->zbxTestTextPresent('Type of information');
 			$this->assertVisible('value_type');
-			$this->zbxTestDropdownHasOptions('value_type', array(
+			$this->zbxTestDropdownHasOptions('value_type', [
 				'Numeric (unsigned)',
 				'Numeric (float)',
 				'Character',
 				'Log',
 				'Text'
-			));
+			]);
 
 			if ($type == 'Zabbix aggregate' || $type == 'Calculated') {
 				$this->assertAttribute("//*[@id='value_type']/option[text()='Character']/@disabled", 'disabled');
@@ -1105,7 +1105,7 @@ class testFormItemPrototype extends CWebTest {
 		if ($value_type == 'Numeric (unsigned)' && !isset($templateid)) {
 			$this->zbxTestTextPresent('Data type');
 			$this->assertVisible('data_type');
-			$this->zbxTestDropdownHasOptions('data_type', array('Boolean', 'Octal', 'Decimal', 'Hexadecimal'));
+			$this->zbxTestDropdownHasOptions('data_type', ['Boolean', 'Octal', 'Decimal', 'Hexadecimal']);
 			$this->assertAttribute("//*[@id='data_type']/option[text()='Decimal']/@selected", 'selected');
 			$this->isEditable("//*[@id='data_type']/option[text()='Decimal']");
 
@@ -1186,7 +1186,7 @@ class testFormItemPrototype extends CWebTest {
 			case 'TELNET agent':
 			case 'JMX agent':
 			case 'Calculated':
-				$this->zbxTestTextPresent(array('Flexible intervals', 'Interval', 'Period', 'No flexible intervals defined.'));
+				$this->zbxTestTextPresent(['Flexible intervals', 'Interval', 'Period', 'No flexible intervals defined.']);
 				$this->assertVisible('delayFlexTable');
 
 				$this->zbxTestTextPresent('New flexible interval', 'Interval (in sec)', 'Period');
@@ -1202,7 +1202,7 @@ class testFormItemPrototype extends CWebTest {
 				$this->assertVisible('add_delay_flex');
 				break;
 			default:
-				$this->zbxTestTextNotPresent(array('Flexible intervals', 'Interval', 'Period', 'No flexible intervals defined.'));
+				$this->zbxTestTextNotPresent(['Flexible intervals', 'Interval', 'Period', 'No flexible intervals defined.']);
 				$this->assertNotVisible('delayFlexTable');
 
 				$this->zbxTestTextNotPresent('New flexible interval', 'Interval (in sec)', 'Period');
@@ -1238,7 +1238,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->zbxTestTextPresent('Store value');
 			if (!isset($templateid)) {
 				$this->assertVisible('delta');
-				$this->zbxTestDropdownHasOptions('delta', array('As is', 'Delta (speed per second)', 'Delta (simple change)'));
+				$this->zbxTestDropdownHasOptions('delta', ['As is', 'Delta (speed per second)', 'Delta (simple change)']);
 				$this->assertAttribute("//*[@id='delta']/option[text()='As is']/@selected", 'selected');
 			}
 			else {
@@ -1253,12 +1253,12 @@ class testFormItemPrototype extends CWebTest {
 		}
 
 		if ($value_type == 'Numeric (float)' || $value_type == 'Numeric (unsigned)' || $value_type == 'Character') {
-			$this->zbxTestTextPresent(array('Show value', 'show value mappings'));
+			$this->zbxTestTextPresent(['Show value', 'show value mappings']);
 			if (!isset($templateid)) {
 				$this->assertVisible('valuemapid');
 				$this->assertAttribute("//*[@id='valuemapid']/option[text()='As is']/@selected", 'selected');
 
-				$options = array('As is');
+				$options = ['As is'];
 				$result = DBselect('SELECT name FROM valuemaps');
 				while ($row = DBfetch($result)) {
 					$options[] = $row['name'];
@@ -1273,7 +1273,7 @@ class testFormItemPrototype extends CWebTest {
 			}
 		}
 		else {
-			$this->zbxTestTextNotPresent(array('Show value', 'show value mappings'));
+			$this->zbxTestTextNotPresent(['Show value', 'show value mappings']);
 			$this->assertNotVisible('valuemapid');
 		}
 
@@ -1355,878 +1355,878 @@ class testFormItemPrototype extends CWebTest {
 		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid=33800');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
-		$this->zbxTestTextPresent(array(
+		$this->zbxTestTextPresent([
 			'Item prototype updated', $data['name'],
 			'CONFIGURATION OF ITEM PROTOTYPES',
 			'Item prototypes of '.$this->discoveryRule
-		));
+		]);
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
 
 	// Returns create data
 	public static function create() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Checksum of $1',
 					'key' => 'vfs.file.cksum[/sbin/shutdown]',
 					'dbName' => 'Checksum of /sbin/shutdown',
 					'dbCheck' => true,
 					'formCheck' =>true
-				)
-			),
+				]
+			],
 			// Duplicate item
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Checksum of $1',
 					'key' => 'vfs.file.cksum[/sbin/shutdown]',
-					'errors' => array(
+					'errors' => [
 						'ERROR: Cannot add item',
 						'Item with key "vfs.file.cksum[/sbin/shutdown]" already exists on'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Item name is missing
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'key' =>'item-name-missing',
-					'errors' => array(
+					'errors' => [
 						'Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Item key is missing
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item name',
-					'errors' => array(
+					'errors' => [
 						'Page received incorrect data',
 						'Incorrect value for field "Key": cannot be empty.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Empty formula
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => ' ',
 					'formulaValue' => '',
-					'errors' => array(
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Value "" of "Custom multiplier" has incorrect decimal format.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Incorrect formula
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => ' value ',
 					'formulaValue' => 'value',
-					'errors' => array(
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Value "value" of "Custom multiplier" has incorrect decimal format.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Incorrect formula
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => '321abc',
 					'formulaValue' => '321abc',
-					'errors' => array(
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Value "321abc" of "Custom multiplier" has incorrect decimal format.'
-					)
-				)
-			),
-			array(
-				array(
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item formula1',
 					'key' => 'item-formula-test',
 					'formula' => '5',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
+				]
+			],
 			// Empty timedelay
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item delay',
 					'key' => 'item-delay-test',
 					'delay' => 0,
-					'errors' => array(
+					'errors' => [
 						'ERROR: Cannot add item',
 						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Incorrect timedelay
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item delay',
 					'key' => 'item-delay-test',
 					'delay' => '-30',
-					'errors' => array(
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value "-30" for "Update interval (in sec)" field: must be between 0 and 86400.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Incorrect timedelay
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item delay',
 					'key' => 'item-delay-test',
 					'delay' => 86401,
-					'errors' => array(
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value "86401" for "Update interval (in sec)" field: must be between 0 and 86400.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Empty time flex period
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
-					'flexPeriod' => array(
-						array('flexDelay' => '', 'flexTime' => '', 'instantCheck' => true)
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexDelay' => '', 'flexTime' => '', 'instantCheck' => true]
+					],
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "New flexible interval": cannot be empty.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Incorrect flex period
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
-					'flexPeriod' => array(
-						array('flexTime' => '1-11,00:00-24:00', 'instantCheck' => true)
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexTime' => '1-11,00:00-24:00', 'instantCheck' => true]
+					],
+					'errors' => [
 						'ERROR: Invalid time period',
 						'Incorrect time period "1-11,00:00-24:00".'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Incorrect flex period
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,00:00-25:00', 'instantCheck' => true)
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexTime' => '1-7,00:00-25:00', 'instantCheck' => true]
+					],
+					'errors' => [
 						'ERROR: Invalid time period',
 						'Incorrect time period "1-7,00:00-25:00".'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Incorrect flex period
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,24:00-00:00', 'instantCheck' => true)
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexTime' => '1-7,24:00-00:00', 'instantCheck' => true]
+					],
+					'errors' => [
 						'ERROR: Invalid time period',
 						'Incorrect time period "1-7,24:00-00:00" start time must be less than end time.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Incorrect flex period
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
-					'flexPeriod' => array(
-						array('flexTime' => '1,00:00-24:00;2,00:00-24:00', 'instantCheck' => true)
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexTime' => '1,00:00-24:00;2,00:00-24:00', 'instantCheck' => true]
+					],
+					'errors' => [
 						'ERROR: Invalid time period',
 						'Incorrect time period "1,00:00-24:00;2,00:00-24:00".'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Multiple flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-test',
-					'flexPeriod' => array(
-						array('flexTime' => '1,00:00-24:00'),
-						array('flexTime' => '2,00:00-24:00'),
-						array('flexTime' => '1,00:00-24:00'),
-						array('flexTime' => '2,00:00-24:00')
-					)
-				)
-			),
+					'flexPeriod' => [
+						['flexTime' => '1,00:00-24:00'],
+						['flexTime' => '2,00:00-24:00'],
+						['flexTime' => '1,00:00-24:00'],
+						['flexTime' => '2,00:00-24:00']
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00')
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexDelay' => 0, 'flexTime' => '1,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '2,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '3,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '4,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '5,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '6,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '7,00:00-24:00']
+					],
+					'errors' => [
 						'ERROR: Cannot add item',
 						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex1',
 					'key' => 'item-flex-delay1',
-					'flexPeriod' => array(
-						array('flexTime' => '1,00:00-24:00'),
-						array('flexTime' => '2,00:00-24:00'),
-						array('flexTime' => '3,00:00-24:00'),
-						array('flexTime' => '4,00:00-24:00'),
-						array('flexTime' => '5,00:00-24:00'),
-						array('flexTime' => '6,00:00-24:00'),
-						array('flexTime' => '7,00:00-24:00')
-					)
-				)
-			),
+					'flexPeriod' => [
+						['flexTime' => '1,00:00-24:00'],
+						['flexTime' => '2,00:00-24:00'],
+						['flexTime' => '3,00:00-24:00'],
+						['flexTime' => '4,00:00-24:00'],
+						['flexTime' => '5,00:00-24:00'],
+						['flexTime' => '6,00:00-24:00'],
+						['flexTime' => '7,00:00-24:00']
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
 					'delay' => 0,
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00')
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexDelay' => 0, 'flexTime' => '1,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '2,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '3,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '4,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '5,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '6,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '7,00:00-24:00']
+					],
+					'errors' => [
 						'ERROR: Cannot add item',
 						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex2',
 					'key' => 'item-flex-delay2',
 					'delay' => 0,
-					'flexPeriod' => array(
-						array('flexTime' => '1-5,00:00-24:00'),
-						array('flexTime' => '6-7,00:00-24:00')
-					),
+					'flexPeriod' => [
+						['flexTime' => '1-5,00:00-24:00'],
+						['flexTime' => '6-7,00:00-24:00']
+					],
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00')
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00']
+					],
+					'errors' => [
 						'ERROR: Cannot add item',
 						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay3',
-					'flexPeriod' => array(
-						array('flexTime' => '1-5,00:00-24:00'),
-						array('flexTime' => '6-7,00:00-24:00')
-					)
-				)
-			),
+					'flexPeriod' => [
+						['flexTime' => '1-5,00:00-24:00'],
+						['flexTime' => '6-7,00:00-24:00']
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay4',
 					'delay' => 0,
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,00:00-24:00')
-					)
-				)
-			),
+					'flexPeriod' => [
+						['flexTime' => '1-7,00:00-24:00']
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00')
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00']
+					],
+					'errors' => [
 						'ERROR: Cannot add item',
 						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay5',
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,00:00-24:00')
-					)
-				)
-			),
+					'flexPeriod' => [
+						['flexTime' => '1-7,00:00-24:00']
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00'),
-						array('flexTime' => '1-5,00:00-24:00'),
-						array('flexTime' => '6-7,00:00-24:00')
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00'],
+						['flexTime' => '1-5,00:00-24:00'],
+						['flexTime' => '6-7,00:00-24:00']
+					],
+					'errors' => [
 						'ERROR: Cannot add item',
 						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
-					'flexPeriod' => array(
-						array('flexTime' => '1-5,00:00-24:00'),
-						array('flexTime' => '6-7,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00')
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexTime' => '1-5,00:00-24:00'],
+						['flexTime' => '6-7,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00']
+					],
+					'errors' => [
 						'ERROR: Cannot add item',
 						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00')
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00']
+					],
+					'errors' => [
 						'ERROR: Cannot add item',
 						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00')
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00']
+					],
+					'errors' => [
 						'ERROR: Cannot add item',
 						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay6',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00', 'remove' => true),
-						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00', 'remove' => true),
-						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00', 'remove' => true),
-						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00', 'remove' => true),
-						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00', 'remove' => true),
-						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00', 'remove' => true),
-						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00', 'remove' => true),
-						array('flexTime' => '1,00:00-24:00'),
-						array('flexTime' => '2,00:00-24:00'),
-						array('flexTime' => '3,00:00-24:00'),
-						array('flexTime' => '4,00:00-24:00'),
-						array('flexTime' => '5,00:00-24:00'),
-						array('flexTime' => '6,00:00-24:00'),
-						array('flexTime' => '7,00:00-24:00')
-					)
-				)
-			),
+					'flexPeriod' => [
+						['flexDelay' => 0, 'flexTime' => '1,00:00-24:00', 'remove' => true],
+						['flexDelay' => 0, 'flexTime' => '2,00:00-24:00', 'remove' => true],
+						['flexDelay' => 0, 'flexTime' => '3,00:00-24:00', 'remove' => true],
+						['flexDelay' => 0, 'flexTime' => '4,00:00-24:00', 'remove' => true],
+						['flexDelay' => 0, 'flexTime' => '5,00:00-24:00', 'remove' => true],
+						['flexDelay' => 0, 'flexTime' => '6,00:00-24:00', 'remove' => true],
+						['flexDelay' => 0, 'flexTime' => '7,00:00-24:00', 'remove' => true],
+						['flexTime' => '1,00:00-24:00'],
+						['flexTime' => '2,00:00-24:00'],
+						['flexTime' => '3,00:00-24:00'],
+						['flexTime' => '4,00:00-24:00'],
+						['flexTime' => '5,00:00-24:00'],
+						['flexTime' => '6,00:00-24:00'],
+						['flexTime' => '7,00:00-24:00']
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
 					'key' => 'item-flex-delay7',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00', 'remove' => true),
-						array('flexTime' => '1-7,00:00-24:00')
-					)
-				)
-			),
+					'flexPeriod' => [
+						['flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00', 'remove' => true],
+						['flexTime' => '1-7,00:00-24:00']
+					]
+				]
+			],
 			// Delay combined with flex periods
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex Check',
 					'key' => 'item-flex-delay8',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00', 'remove' => true),
-						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00', 'remove' => true),
-						array('flexTime' => '1-5,00:00-24:00'),
-						array('flexTime' => '6-7,00:00-24:00')
-					),
+					'flexPeriod' => [
+						['flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00', 'remove' => true],
+						['flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00', 'remove' => true],
+						['flexTime' => '1-5,00:00-24:00'],
+						['flexTime' => '6-7,00:00-24:00']
+					],
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
+				]
+			],
 			// Maximum flexfields allowed reached- error
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex-maximum entries',
 					'key' => 'item-flex-maximum',
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true)
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true]
+					],
+					'errors' => [
 						'Maximum number of flexible intervals added'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Maximum flexfields allowed reached- error
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex-maximum entries',
 					'key' => 'item-flex-maximum',
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true)
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true]
+					],
+					'errors' => [
 						'Maximum number of flexible intervals added'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Maximum flexfields allowed reached- save OK
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex-maximum save OK',
 					'key' => 'item-flex-maximum-save',
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00', 'maximumItems' => true)
-					),
+					'flexPeriod' => [
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00', 'maximumItems' => true]
+					],
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
+				]
+			],
 			// Maximum flexfields allowed reached- remove one item
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex-maximum with remove',
 					'key' => 'item-flex-maximum-remove',
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true, 'remove' => true),
-						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true)
-					),
-					'errors' => array(
+					'flexPeriod' => [
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00'],
+						['flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true, 'remove' => true],
+						['flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true]
+					],
+					'errors' => [
 						'Maximum number of flexible intervals added'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Flexfields with negative number in flexdelay
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex-negative flexdelay',
 					'key' => 'item-flex-negative-flexdelay',
-					'flexPeriod' => array(
-						array('flexDelay' => '-50', 'flexTime' => '1-7,00:00-24:00')
-					)
-				)
-			),
+					'flexPeriod' => [
+						['flexDelay' => '-50', 'flexTime' => '1-7,00:00-24:00']
+					]
+				]
+			],
 			// Flexfields with symbols in flexdelay
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex-symbols in flexdelay',
 					'key' => 'item-flex-symbols-flexdelay',
-					'flexPeriod' => array(
-						array('flexDelay' => '50abc', 'flexTime' => '1-7,00:00-24:00')
-					)
-				)
-			),
+					'flexPeriod' => [
+						['flexDelay' => '50abc', 'flexTime' => '1-7,00:00-24:00']
+					]
+				]
+			],
 			// History
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item history',
 					'key' => 'item-history-empty',
 					'history' => ''
-				)
-			),
+				]
+			],
 			// History
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item history',
 					'key' => 'item-history-test',
 					'history' => 65536,
-					'errors' => array(
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value "65536" for "History storage period" field: must be between 0 and 65535.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// History
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item history',
 					'key' => 'item-history-test',
 					'history' => '-1',
-					'errors' => array(
+					'errors' => [
 							'ERROR: Page received incorrect data',
 							'Incorrect value "-1" for "History storage period" field: must be between 0 and 65535.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// History
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item history',
 					'key' => 'item-history-test',
 					'history' => 'days'
-				)
-			),
+				]
+			],
 			// Trends
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-empty',
 					'trends' => '',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
+				]
+			],
 			// Trends
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-test',
 					'trends' => '-1',
-					'errors' => array(
+					'errors' => [
 							'ERROR: Page received incorrect data',
 							'Incorrect value "-1" for "Trend storage period" field: must be between 0 and 65535.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Trends
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Item trends',
 					'key' => 'item-trends-test',
 					'trends' => 65536,
-					'errors' => array(
+					'errors' => [
 							'ERROR: Page received incorrect data',
 							'Incorrect value "65536" for "Trend storage period" field: must be between 0 and 65535.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Trends
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item trends Check',
 					'key' => 'item-trends-test',
 					'trends' => 'trends',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?',
 					'key' => 'item-symbols-test',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'itemSimple',
 					'key' => 'key-template-simple',
 					'formCheck' => true,
 					'dbCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'itemName',
 					'key' => 'key-template-item',
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'itemTrigger',
 					'key' => 'key-template-trigger',
 					'formCheck' => true,
 					'dbCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'itemRemove',
 					'key' => 'key-template-remove',
 					'formCheck' => true,
 					'dbCheck' => true,
-					'remove' => true)
-			),
-			array(
-				array(
+					'remove' => true]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'itemInheritance',
 					'key' => 'test-item-reuse',
-					'errors' => array(
+					'errors' => [
 						'ERROR: Cannot add item',
 						'Item with key "test-item-reuse" already exists on "Simple form test host".'
-					)
-				)
-			),
+					]
+				]
+			],
 			// List of all item types
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'Zabbix agent',
 					'name' => 'Zabbix agent',
 					'key' => 'item-zabbix-agent',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'Zabbix agent (active)',
 					'name' => 'Zabbix agent (active)',
 					'key' => 'item-zabbix-agent-active',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'Simple check',
 					'name' => 'Simple check',
 					'key' => 'item-simple-check',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'item-snmpv1-agent',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'SNMPv2 agent',
 					'name' => 'SNMPv2 agent',
 					'key' => 'item-snmpv2-agent',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
 					'key' => 'item-snmpv3-agent',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'SNMP trap',
 					'name' => 'SNMP trap',
 					'key' => 'snmptrap.fallback',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'Zabbix internal',
 					'name' => 'Zabbix internal',
 					'key' => 'item-zabbix-internal',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'Zabbix trapper',
 					'name' => 'Zabbix trapper',
 					'key' => 'item-zabbix-trapper',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'Zabbix aggregate',
 					'name' => 'Zabbix aggregate',
 					'key' => 'grpmax[Zabbix servers group,some-item-key,last,0]',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'Zabbix aggregate',
 					'name' => 'Zabbix aggregate',
 					'key' => 'item-zabbix-aggregate',
-					'errors' => array(
+					'errors' => [
 						'ERROR: Cannot add item',
 						'Key "item-zabbix-aggregate" does not match'
-					)
-				)
-			),
-			array(
-				array(
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'External check',
 					'name' => 'External check',
 					'key' => 'item-external-check',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
@@ -2234,10 +2234,10 @@ class testFormItemPrototype extends CWebTest {
 					'dbCheck' => true,
 					'params_ap' => 'SELECT * FROM items',
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent',
@@ -2245,10 +2245,10 @@ class testFormItemPrototype extends CWebTest {
 					'ipmi_sensor' => 'ipmi_sensor',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent with spaces',
@@ -2257,10 +2257,10 @@ class testFormItemPrototype extends CWebTest {
 					'ipmiSpaces' => true,
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent',
@@ -2269,10 +2269,10 @@ class testFormItemPrototype extends CWebTest {
 					'params_es' => 'executed script',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent',
@@ -2281,48 +2281,48 @@ class testFormItemPrototype extends CWebTest {
 					'params_es' => 'executed script',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent error',
 					'key' => 'item-ipmi-agent-error',
-					'errors' => array(
+					'errors' => [
 							'ERROR: Page received incorrect data',
 							'Incorrect value for field "IPMI sensor": cannot be empty.'
-					)
-				)
-			),
-			array(
-				array(
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent error',
 					'key' => 'item-ssh-agent-error',
-					'errors' => array(
+					'errors' => [
 							'ERROR: Page received incorrect data',
 							'Incorrect value for field "User name": cannot be empty.',
 							'Incorrect value for field "Executed script": cannot be empty.'
-					)
-				)
-			),
-			array(
-				array(
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent error',
 					'key' => 'item-telnet-agent-error',
-					'errors' => array(
+					'errors' => [
 							'ERROR: Page received incorrect data',
 							'Incorrect value for field "User name": cannot be empty.',
 							'Incorrect value for field "Executed script": cannot be empty.'
-					)
-				)
-			),
-			array(
-				array(
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
@@ -2330,10 +2330,10 @@ class testFormItemPrototype extends CWebTest {
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'Calculated',
 					'name' => 'Calculated',
@@ -2342,88 +2342,88 @@ class testFormItemPrototype extends CWebTest {
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'Calculated',
 					'name' => 'Calculated',
 					'key' => 'item-calculated',
-					'errors' => array(
+					'errors' => [
 							'ERROR: Page received incorrect data',
 							'Incorrect value for field "Formula": cannot be empty.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Empty SQL query
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
-					'errors' => array(
+					'errors' => [
 							'ERROR: Page received incorrect data',
 							'Incorrect value for field "SQL query": cannot be empty.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Default
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
 					'params_ap' => 'SELECT * FROM items',
-					'errors' => array(
+					'errors' => [
 							'ERROR: Cannot add item',
 							'Check the key, please. Default example was passed.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Default
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent',
 					'username' => 'zabbix',
 					'params_es' => 'script to be executed',
-					'errors' => array(
+					'errors' => [
 							'ERROR: Cannot add item',
 							'Check the key, please. Default example was passed.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Default
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent',
 					'username' => 'zabbix',
 					'params_es' => 'script to be executed',
-					'errors' => array(
+					'errors' => [
 							'ERROR: Cannot add item',
 							'Check the key, please. Default example was passed.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Default
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
 					'username' => 'zabbix',
 					'params_es' => 'script to be executed',
-					'errors' => array(
+					'errors' => [
 							'ERROR: Cannot add item',
 							'Check the key, please. Default example was passed.'
-					)
-				)
-			)
-		);
+					]
+				]
+			]
+		];
 	}
 
 	/**
@@ -2565,16 +2565,16 @@ class testFormItemPrototype extends CWebTest {
 				case TEST_GOOD:
 					$this->zbxTestTextPresent('Item prototype added');
 					$this->zbxTestCheckTitle('Configuration of item prototypes');
-					$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of ".$this->discoveryRule));
+					$this->zbxTestTextPresent(['CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of ".$this->discoveryRule]);
 					break;
 
 				case TEST_BAD:
 					$this->zbxTestCheckTitle('Configuration of item prototypes');
-					$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', 'Item prototype'));
+					$this->zbxTestTextPresent(['CONFIGURATION OF ITEM PROTOTYPES', 'Item prototype']);
 					foreach ($data['errors'] as $msg) {
 						$this->zbxTestTextPresent($msg);
 					}
-					$this->zbxTestTextPresent(array('Name', 'Type', 'Key'));
+					$this->zbxTestTextPresent(['Name', 'Type', 'Key']);
 					if (isset($data['formula'])) {
 						$formulaValue = $this->getValue('formula');
 						$this->assertEquals($data['formulaValue'], $formulaValue);

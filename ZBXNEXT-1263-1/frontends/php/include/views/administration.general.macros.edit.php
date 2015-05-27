@@ -28,7 +28,7 @@ $header_form = (new CForm())->cleanItems();
 $controls = new CList();
 $controls->addItem(new CComboBox('configDropDown', 'adm.macros.php',
 	'redirect(this.options[this.selectedIndex].value);',
-	array(
+	[
 		'adm.gui.php' => _('GUI'),
 		'adm.housekeeper.php' => _('Housekeeping'),
 		'adm.images.php' => _('Images'),
@@ -40,16 +40,21 @@ $controls->addItem(new CComboBox('configDropDown', 'adm.macros.php',
 		'adm.triggerseverities.php' => _('Trigger severities'),
 		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 		'adm.other.php' => _('Other')
-	)
+	]
 ));
 
 $header_form->addItem($controls);
 
 $widget->setControls($header_form);
 
-$table = new CTable(null, 'formElementTable');
-$table->setAttribute('id', 'tbl_macros');
-$table->addRow(array(_('Macro'), '', _('Value'), ''));
+$table = (new CTable())->
+	addClass('formElementTable')->
+	setAttribute('id', 'tbl_macros')->
+	addRow([
+		_('Macro'), '',
+		_('Value'),
+		''
+	]);
 
 // fields
 foreach ($data['macros'] as $i => $macro) {
@@ -60,7 +65,7 @@ foreach ($data['macros'] as $i => $macro) {
 	$value_input = new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255);
 	$value_input->setAttribute('placeholder', _('value'));
 
-	$button_cell = array(new CButton('macros['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove'));
+	$button_cell = [new CButton('macros['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')];
 	if (array_key_exists('globalmacroid', $macro)) {
 		$button_cell[] = new CVar('macros['.$i.'][globalmacroid]', $macro['globalmacroid']);
 	}
@@ -82,7 +87,7 @@ $tab_view = new CTabView();
 $tab_view->addTab('macros', _('Macros'), $macros_form_list);
 
 $saveButton = new CSubmit('update', _('Update'));
-$saveButton->attr('data-removed-count', 0);
+$saveButton->setAttribute('data-removed-count', 0);
 $saveButton->main();
 
 $tab_view->setFooter(makeFormFooter(null, [$saveButton]));

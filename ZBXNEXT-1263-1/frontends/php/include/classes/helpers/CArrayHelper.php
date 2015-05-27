@@ -41,7 +41,7 @@ class CArrayHelper {
 	 * @return array
 	 */
 	public static function getByKeysStrict(array $array, array $keys) {
-		$result = array();
+		$result = [];
 		foreach ($keys as $key) {
 			if (!isset($array[$key])) {
 				throw new InvalidArgumentException(sprintf('Array does not have element with key "%1$s".', $key));
@@ -103,11 +103,11 @@ class CArrayHelper {
 	public static function sort(array &$array, array $fields) {
 		foreach ($fields as $fid => $field) {
 			if (!is_array($field)) {
-				$fields[$fid] = array('field' => $field, 'order' => ZBX_SORT_UP);
+				$fields[$fid] = ['field' => $field, 'order' => ZBX_SORT_UP];
 			}
 		}
 		self::$fields = $fields;
-		uasort($array, array('self', 'compare'));
+		uasort($array, ['self', 'compare']);
 	}
 
 	/**
@@ -154,7 +154,7 @@ class CArrayHelper {
 	 *
 	 * @return array
 	 */
-	public static function unsetEqualValues(array $a1, array $a2, array $skipKeys = array()) {
+	public static function unsetEqualValues(array $a1, array $a2, array $skipKeys = []) {
 		// ignore given fields
 		foreach ($skipKeys as $key) {
 			unset($a2[$key]);
@@ -198,7 +198,7 @@ class CArrayHelper {
 	 * @return null|array           the first duplicate found or null if there are no duplicates
 	 */
 	public static function findDuplicate(array $arrays, $uniqueField, $uniqueField2 = null) {
-		$uniqueValues = array();
+		$uniqueValues = [];
 
 		foreach ($arrays as $array) {
 			$value = $array[$uniqueField];

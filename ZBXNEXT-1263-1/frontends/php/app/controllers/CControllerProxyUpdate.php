@@ -22,7 +22,7 @@
 class CControllerProxyUpdate extends CController {
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'proxyid' =>		'fatal|required|db       hosts.hostid',
 			'host' =>			'               db       hosts.host',
 			'status' =>			'               db       hosts.status     |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
@@ -39,7 +39,7 @@ class CControllerProxyUpdate extends CController {
 			'tls_psk' =>		'               db       hosts.tls_psk',
 			'tls_psk_identity'=>'               db       hosts.tls_psk_identity',
 			'tls_subject' => 	'               db       hosts.tls_subject'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -65,36 +65,36 @@ class CControllerProxyUpdate extends CController {
 			return false;
 		}
 
-		return (bool) API::Proxy()->get(array(
-			'output' => array(),
+		return (bool) API::Proxy()->get([
+			'output' => [],
 			'proxyids' => $this->getInput('proxyid'),
 			'editable' => true
-		));
+		]);
 	}
 
 	protected function doAction() {
-		$proxy = array();
+		$proxy = [];
 
-		$this->getInputs($proxy, array('proxyid', 'host', 'description', 'status', 'tls_accept', 'tls_connect',
-			'tls_issuer', 'tls_psk', 'tls_psk_identity', 'tls_subject'));
+		$this->getInputs($proxy, ['proxyid', 'host', 'description', 'status', 'tls_accept', 'tls_connect',
+			'tls_issuer', 'tls_psk', 'tls_psk_identity', 'tls_subject']);
 
 		if ($this->getInput('status', HOST_STATUS_PROXY_ACTIVE) == HOST_STATUS_PROXY_PASSIVE) {
-			$proxy['interface'] = array();
-			$this->getInputs($proxy['interface'], array('interfaceid', 'dns', 'ip', 'useip', 'port'));
+			$proxy['interface'] = [];
+			$this->getInputs($proxy['interface'], ['interfaceid', 'dns', 'ip', 'useip', 'port']);
 		}
 
 		DBstart();
 
 		if ($this->hasInput('proxy_hostids')) {
 			// skip discovered hosts
-			$proxy['hosts'] = API::Host()->get(array(
-				'output' => array('hostid'),
+			$proxy['hosts'] = API::Host()->get([
+				'output' => ['hostid'],
 				'hostids' => $this->getInput('proxy_hostids'),
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-			));
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+			]);
 		}
 		else {
-			$proxy['hosts'] = array();
+			$proxy['hosts'] = [];
 		}
 
 		$result = API::Proxy()->update($proxy);

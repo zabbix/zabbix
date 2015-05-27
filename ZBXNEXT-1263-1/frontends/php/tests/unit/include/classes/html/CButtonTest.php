@@ -22,42 +22,42 @@
 class CButtonTest extends CTagTest {
 
 	public function constructProvider() {
-		return array(
-			array(
-				array(),
+		return [
+			[
+				[],
 				'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button"></button>'
-			),
-			array(
-				array('my-button'),
+			],
+			[
+				['my-button'],
 				'<button class="button button-plain shadow ui-corner-all" type="button" id="my-button" name="my-button"></button>'
-			),
-			array(
-				array('button[value]'),
+			],
+			[
+				['button[value]'],
 				'<button class="button button-plain shadow ui-corner-all" type="button" id="button_value" name="button[value]"></button>'
-			),
-			array(
-				array('button', 'caption'),
+			],
+			[
+				['button', 'caption'],
 				'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button">caption</button>'
-			),
-			array(
-				array('button', 'caption', 'callback()'),
+			],
+			[
+				['button', 'caption', 'callback()'],
 				'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button" onclick="callback()">caption</button>'
-			),
-			array(
-				array('button', 'caption', null, 'my-class'),
+			],
+			[
+				['button', 'caption', null, 'my-class'],
 				'<button class="button my-class" type="button" id="button" name="button">caption</button>'
-			),
+			],
 			// value encoding
-			array(
-				array('button', '</button>'),
+			[
+				['button', '</button>'],
 				'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button">&lt;/button&gt;</button>'
-			),
+			],
 			// parameter encoding
-			array(
-				array('button"&"'),
+			[
+				['button"&"'],
 				'<button class="button button-plain shadow ui-corner-all" type="button" id="button&quot;&amp;&quot;" name="button&quot;&amp;&quot;"></button>'
-			),
-		);
+			],
+		];
 	}
 
 	public function testSetEnabled() {

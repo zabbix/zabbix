@@ -48,38 +48,38 @@ function init_mbstrings() {
  * @return array    an array of locales with locale codes as keys and arrays as values
  */
 function getLocales() {
-	return array(
-		'en_GB' => array('name' => _('English (en_GB)'),	'display' => true),
-		'en_US' => array('name' => _('English (en_US)'),	'display' => true),
-		'bg_BG' => array('name' => _('Bulgarian (bg_BG)'),	'display' => false),
-		'zh_CN' => array('name' => _('Chinese (zh_CN)'),	'display' => false),
-		'zh_TW' => array('name' => _('Chinese (zh_TW)'),	'display' => false),
-		'cs_CZ' => array('name' => _('Czech (cs_CZ)'),		'display' => false),
-		'nl_NL' => array('name' => _('Dutch (nl_NL)'),		'display' => false),
-		'fi_FI' => array('name' => _('Finnish (fi_FI)'),	'display' => false),
-		'fr_FR' => array('name' => _('French (fr_FR)'),		'display' => false),
-		'de_DE' => array('name' => _('German (de_DE)'),		'display' => false),
-		'el_GR' => array('name' => _('Greek (el_GR)'),		'display' => false),
-		'hu_HU' => array('name' => _('Hungarian (hu_HU)'),	'display' => false),
-		'id_ID' => array('name' => _('Indonesian (id_ID)'),	'display' => false),
-		'it_IT' => array('name' => _('Italian (it_IT)'),	'display' => true),
-		'ko_KR' => array('name' => _('Korean (ko_KR)'),		'display' => false),
-		'ja_JP' => array('name' => _('Japanese (ja_JP)'),	'display' => true),
-		'lv_LV' => array('name' => _('Latvian (lv_LV)'),	'display' => false),
-		'lt_LT' => array('name' => _('Lithuanian (lt_LT)'),	'display' => false),
-		'fa_IR' => array('name' => _('Persian (fa_IR)'),	'display' => false),
-		'pl_PL' => array('name' => _('Polish (pl_PL)'),		'display' => true),
-		'pt_BR' => array('name' => _('Portuguese (pt_BR)'),	'display' => true),
-		'pt_PT' => array('name' => _('Portuguese (pt_PT)'),	'display' => false),
-		'ro_RO' => array('name' => _('Romanian (ro_RO)'),	'display' => false),
-		'ru_RU' => array('name' => _('Russian (ru_RU)'),	'display' => true),
-		'sk_SK' => array('name' => _('Slovak (sk_SK)'),		'display' => true),
-		'es_ES' => array('name' => _('Spanish (es_ES)'),	'display' => false),
-		'sv_SE' => array('name' => _('Swedish (sv_SE)'),	'display' => false),
-		'tr_TR' => array('name' => _('Turkish (tr_TR)'),	'display' => false),
-		'uk_UA' => array('name' => _('Ukrainian (uk_UA)'),	'display' => false),
-		'vi_VN' => array('name' => _('Vietnamese (vi_VN)'),	'display' => false)
-	);
+	return [
+		'en_GB' => ['name' => _('English (en_GB)'),	'display' => true],
+		'en_US' => ['name' => _('English (en_US)'),	'display' => true],
+		'bg_BG' => ['name' => _('Bulgarian (bg_BG)'),	'display' => false],
+		'zh_CN' => ['name' => _('Chinese (zh_CN)'),	'display' => false],
+		'zh_TW' => ['name' => _('Chinese (zh_TW)'),	'display' => false],
+		'cs_CZ' => ['name' => _('Czech (cs_CZ)'),		'display' => false],
+		'nl_NL' => ['name' => _('Dutch (nl_NL)'),		'display' => false],
+		'fi_FI' => ['name' => _('Finnish (fi_FI)'),	'display' => false],
+		'fr_FR' => ['name' => _('French (fr_FR)'),		'display' => false],
+		'de_DE' => ['name' => _('German (de_DE)'),		'display' => false],
+		'el_GR' => ['name' => _('Greek (el_GR)'),		'display' => false],
+		'hu_HU' => ['name' => _('Hungarian (hu_HU)'),	'display' => false],
+		'id_ID' => ['name' => _('Indonesian (id_ID)'),	'display' => false],
+		'it_IT' => ['name' => _('Italian (it_IT)'),	'display' => true],
+		'ko_KR' => ['name' => _('Korean (ko_KR)'),		'display' => false],
+		'ja_JP' => ['name' => _('Japanese (ja_JP)'),	'display' => true],
+		'lv_LV' => ['name' => _('Latvian (lv_LV)'),	'display' => false],
+		'lt_LT' => ['name' => _('Lithuanian (lt_LT)'),	'display' => false],
+		'fa_IR' => ['name' => _('Persian (fa_IR)'),	'display' => false],
+		'pl_PL' => ['name' => _('Polish (pl_PL)'),		'display' => true],
+		'pt_BR' => ['name' => _('Portuguese (pt_BR)'),	'display' => true],
+		'pt_PT' => ['name' => _('Portuguese (pt_PT)'),	'display' => false],
+		'ro_RO' => ['name' => _('Romanian (ro_RO)'),	'display' => false],
+		'ru_RU' => ['name' => _('Russian (ru_RU)'),	'display' => true],
+		'sk_SK' => ['name' => _('Slovak (sk_SK)'),		'display' => true],
+		'es_ES' => ['name' => _('Spanish (es_ES)'),	'display' => false],
+		'sv_SE' => ['name' => _('Swedish (sv_SE)'),	'display' => false],
+		'tr_TR' => ['name' => _('Turkish (tr_TR)'),	'display' => false],
+		'uk_UA' => ['name' => _('Ukrainian (uk_UA)'),	'display' => false],
+		'vi_VN' => ['name' => _('Vietnamese (vi_VN)'),	'display' => false]
+	];
 }
 
 /**
@@ -98,7 +98,7 @@ function zbx_locale_variants($language) {
 }
 
 function zbx_locale_variants_unix($language) {
-	$postfixes = array(
+	$postfixes = [
 		'',
 		'.utf8',
 		'.UTF-8',
@@ -133,8 +133,8 @@ function zbx_locale_variants_unix($language) {
 		'.gbk',
 		'.koi8r',
 		'.tcvn'
-	);
-	$result = array();
+	];
+	$result = [];
 	foreach ($postfixes as $postfix) {
 		$result[] = $language.$postfix;
 	}
@@ -146,37 +146,37 @@ function zbx_locale_variants_win($language) {
 	// for a list of supported languages see:
 	// http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
 	// http://docs.moodle.org/dev/Table_of_locales#Table
-	$winLanguageName = array(
-		'en_gb' => array('English_United Kingdom.1252', 'english-uk'),
-		'en_us' => array('English_United States.1252', 'english-usa'),
-		'bg_bg' => array('Bulgarian_Bulgaria.1251'),
-		'zh_cn' => array('Chinese (Simplified)_People\'s Republic of China.936', 'chinese'),
-		'zh_tw' => array('Chinese_Taiwan.950', 'chinese'),
-		'cs_cz' => array('Czech_Czech Republic.1250', 'czech'),
-		'nl_nl' => array('Dutch_Netherlands.1252', 'dutch'),
-		'fi_fi' => array('Finnish_Finland.1252', 'finnish'),
-		'fr_fr' => array('French_France.1252', 'french'),
-		'de_de' => array('German_Germany.1252', 'german'),
-		'el_gr' => array('Greek_Greece.1253', 'greek'),
-		'hu_hu' => array('Hungarian_Hungary.1250', 'hungarian'),
-		'id_id' => array('Indonesian_indonesia.1252', 'indonesian'),
-		'it_it' => array('Italian_Italy.1252', 'italian'),
-		'ko_kr' => array('Korean_Korea.949', 'korean'),
-		'ja_jp' => array('Japanese_Japan.932', 'japanese'),
-		'lv_lv' => array('Latvian_Latvia.1257', 'latvian'),
-		'lt_lt' => array('Lithuanian_Lithuania.1257', 'lithuanian'),
-		'fa_ir' => array('Farsi_Iran.1256', 'farsi'),
-		'pl_pl' => array('Polish_Poland.1250', 'polish'),
-		'pt_br' => array('Portuguese_Brazil.1252', 'portuguese-brazil'),
-		'pt_pt' => array('Portuguese_Portugal.1252', 'portuguese'),
-		'ro_ro' => array('Romanian_Romania.1250', 'romanian'),
-		'ru_ru' => array('Russian_Russia.1251', 'russian'),
-		'sk_sk' => array('Slovak_Slovakia.1250', 'slovak'),
-		'es_es' => array('Spanish_Spain.1252', 'spanish'),
-		'sv_se' => array('Swedish_Sweden.1252', 'swedish'),
-		'tr_tr' => array('Turkish_Turkey.1254', 'turkish'),
-		'uk_ua' => array('Ukrainian_Ukraine.1251', 'ukrainian'),
-		'vi_vn' => array('Vietnamese_Viet Nam.1258', 'vietnamese')
-	);
+	$winLanguageName = [
+		'en_gb' => ['English_United Kingdom.1252', 'english-uk'],
+		'en_us' => ['English_United States.1252', 'english-usa'],
+		'bg_bg' => ['Bulgarian_Bulgaria.1251'],
+		'zh_cn' => ['Chinese (Simplified)_People\'s Republic of China.936', 'chinese'],
+		'zh_tw' => ['Chinese_Taiwan.950', 'chinese'],
+		'cs_cz' => ['Czech_Czech Republic.1250', 'czech'],
+		'nl_nl' => ['Dutch_Netherlands.1252', 'dutch'],
+		'fi_fi' => ['Finnish_Finland.1252', 'finnish'],
+		'fr_fr' => ['French_France.1252', 'french'],
+		'de_de' => ['German_Germany.1252', 'german'],
+		'el_gr' => ['Greek_Greece.1253', 'greek'],
+		'hu_hu' => ['Hungarian_Hungary.1250', 'hungarian'],
+		'id_id' => ['Indonesian_indonesia.1252', 'indonesian'],
+		'it_it' => ['Italian_Italy.1252', 'italian'],
+		'ko_kr' => ['Korean_Korea.949', 'korean'],
+		'ja_jp' => ['Japanese_Japan.932', 'japanese'],
+		'lv_lv' => ['Latvian_Latvia.1257', 'latvian'],
+		'lt_lt' => ['Lithuanian_Lithuania.1257', 'lithuanian'],
+		'fa_ir' => ['Farsi_Iran.1256', 'farsi'],
+		'pl_pl' => ['Polish_Poland.1250', 'polish'],
+		'pt_br' => ['Portuguese_Brazil.1252', 'portuguese-brazil'],
+		'pt_pt' => ['Portuguese_Portugal.1252', 'portuguese'],
+		'ro_ro' => ['Romanian_Romania.1250', 'romanian'],
+		'ru_ru' => ['Russian_Russia.1251', 'russian'],
+		'sk_sk' => ['Slovak_Slovakia.1250', 'slovak'],
+		'es_es' => ['Spanish_Spain.1252', 'spanish'],
+		'sv_se' => ['Swedish_Sweden.1252', 'swedish'],
+		'tr_tr' => ['Turkish_Turkey.1254', 'turkish'],
+		'uk_ua' => ['Ukrainian_Ukraine.1251', 'ukrainian'],
+		'vi_vn' => ['Vietnamese_Viet Nam.1258', 'vietnamese']
+	];
 	return $winLanguageName[strtolower($language)];
 }
