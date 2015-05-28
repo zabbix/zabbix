@@ -26,7 +26,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
 	QUERY_SERVICE_CONFIG		*qsc = NULL;
-	SC_HANDLE			h_mgr, h_srv;
+	SC_HANDLE			h_mgr;
 	DWORD				sz = 0, szn, i, services, resume_handle = 0;
 	char				*utf8;
 	struct zbx_json			j;
@@ -45,6 +45,8 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		for (i = 0; i < services; i++)
 		{
+			SC_HANDLE	h_srv;
+
 			if (NULL == (h_srv = OpenService(h_mgr, ssp[i].lpServiceName,
 					SERVICE_QUERY_STATUS | SERVICE_QUERY_CONFIG)))
 			{
@@ -75,7 +77,6 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 				utf8 = "unknown";
 
 			zbx_json_addstring(&j, "{#SERVICE.TYPE}", utf8, ZBX_JSON_TYPE_STRING);
-			zbx_free(utf8);
 
 			zbx_json_adduint64(&j, "{#SERVICE.STATE}", ssp[i].ServiceStatusProcess.dwCurrentState);
 
@@ -113,7 +114,6 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 						utf8 = "unknown";
 
 					zbx_json_addstring(&j, "{#SERVICE.STARTUP}", utf8, ZBX_JSON_TYPE_STRING);
-					zbx_free(utf8);
 				}
 
 				zbx_free(qsc);
@@ -211,7 +211,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == h_srv)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "service \"%s\" could not be found", name));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot find the specified service."));
 		CloseServiceHandle(h_mgr);
 		return SYSINFO_RET_FAIL;
 	}
@@ -237,7 +237,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (ERROR_INSUFFICIENT_BUFFER != GetLastError())
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain service config: %s",
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain service configuration: %s",
 					strerror_from_system(GetLastError())));
 			CloseServiceHandle(h_srv);
 			CloseServiceHandle(h_mgr);
@@ -248,7 +248,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (0 == QueryServiceConfig(h_srv, qsc, sz, &sz))
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain service config: %s",
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain service configuration: %s",
 					strerror_from_system(GetLastError())));
 			zbx_free(qsc);
 			CloseServiceHandle(h_srv);
@@ -509,8 +509,7 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	while (0 != EnumServicesStatusEx(h_mgr, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL,
-			(unsigned char *)ssp, sz, &szn, &services, &resume_handle, NULL) ||
-			ERROR_MORE_DATA == GetLastError())
+			(LPBYTE)ssp, sz, &szn, &services, &resume_handle, NULL) || ERROR_MORE_DATA == GetLastError())
 	{
 		for (i = 0; i < services; i++)
 		{
