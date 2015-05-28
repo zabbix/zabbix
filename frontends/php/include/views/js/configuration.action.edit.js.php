@@ -78,7 +78,7 @@
 
 <script type="text/x-jquery-tmpl" id="opcmdEditFormTPL">
 <div id="opcmdEditForm">
-	<table class="objectgroup border_dotted ui-corner-all inlineblock" style="min-width: 310px;">
+	<table class="objectgroup border_dotted inlineblock" style="min-width: 310px;">
 		<tbody>
 		<tr>
 			<td><?php echo _('Target'); ?></td>
@@ -111,7 +111,7 @@
 <tr id="operationTypeScriptElements" class="hidden">
 	<td><?php echo CHtml::encode(_('Execute on')); ?></td>
 	<td>
-		<div class="objectgroup inlineblock border_dotted ui-corner-all" id="uniqList">
+		<div class="objectgroup inlineblock border_dotted" id="uniqList">
 			<div>
 				<input type="radio" id="execute_on_agent" name="execute_on" value="0" class="input radio">
 				<label for="execute_on_agent"><?php echo CHtml::encode(_('Zabbix agent')); ?></label>

@@ -24,7 +24,7 @@
 </script>
 <script type="text/x-jquery-tmpl" id="newDCheckTPL">
 	<div id="new_check_form">
-		<div class="objectgroup inlineblock border_dotted ui-corner-all">
+		<div class="objectgroup inlineblock border_dotted">
 			<table class="formElementTable">
 				<tbody>
 				<tr>

@@ -30,7 +30,7 @@ class CRedirectButton extends CSimpleButton {
 	 * @param string $confirmation	confirmation message text
 	 * @param string $class
 	 */
-	public function __construct($caption, $url, $confirmation = null, $class = 'button-plain shadow ui-corner-all') {
+	public function __construct($caption, $url, $confirmation = null, $class = null) {
 		parent::__construct($caption, $class);
 
 		$this->setUrl($url, $confirmation);

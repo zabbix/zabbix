@@ -70,7 +70,6 @@ class CUiWidget extends CDiv {
 		$this->id = $id;
 		$this->body = $body ? [$body] : [];
 
-//		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget ui-tabs');
 		parent::__construct(null, 'dashbrd-widget');
 
 		$this->setAttribute('id', $this->id.'_widget');
@@ -115,7 +114,7 @@ class CUiWidget extends CDiv {
 		$table->addStyle('width: 100%;');
 		$table->addRow([$leftColumn, $rightColumn]);
 
-		$this->header = new CDiv($table, ZBX_STYLE_NOWRAP.' ui-corner-all ui-widget-header header');
+		$this->header = new CDiv($table, ZBX_STYLE_NOWRAP.' ui-widget-header header');
 	}
 
 	/**

@@ -343,7 +343,7 @@ $itemFormList->addRow(
 		SPACE,
 		new CVisibilityBox('visible[delay_flex]', isset($this->data['visible']['delay_flex']), ['delayFlexDiv', 'row-new-delay-flex-fields'], _('Original'))
 	],
-	new CDiv($delayFlexTable, 'objectgroup inlineblock border_dotted ui-corner-all', 'delayFlexDiv')
+	new CDiv($delayFlexTable, 'objectgroup inlineblock border_dotted', 'delayFlexDiv')
 );
 
 // append new delay to form list

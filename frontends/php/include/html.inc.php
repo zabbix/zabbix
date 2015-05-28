@@ -163,7 +163,6 @@ function get_table_header($columnLeft, $columnRights = SPACE) {
 
 	$table = (new CTable())->
 		addClass('ui-widget-header')->
-		addClass('ui-corner-all')->
 		addClass('header')->
 		addClass('maxwidth');
 	$table->setCellSpacing(0);

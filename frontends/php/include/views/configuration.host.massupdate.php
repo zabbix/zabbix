@@ -214,7 +214,7 @@ $templatesDiv = new CDiv(
 			_('Clear when unlinking')
 		], 'floatleft')
 	],
-	'objectgroup inlineblock border_dotted ui-corner-all'
+	'objectgroup inlineblock border_dotted'
 );
 $templatesDiv->setAttribute('id', 'templateDiv');
 

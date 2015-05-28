@@ -35,9 +35,6 @@ class CInput extends CTag {
 		$this->setAttribute('name', $name);
 		$this->setAttribute('value', $value);
 		$class = !is_null($class) ? $class : $type;
-		if ($class == 'button' || $class == 'submit') {
-			$class .= ' shadow ui-corner-all';
-		}
 		$this->addClass('input '.$class);
 		return $this;
 	}
