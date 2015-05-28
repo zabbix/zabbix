@@ -254,9 +254,9 @@ if ($this->data['is_profile']) {
 		new CButton('stop', _('Stop'), 'javascript: AudioControl.stop();', 'button-form')
 	];
 
-	$triggersTable = (new CTable(''))->
-		addClass('invisible')->
-		addRow($resolved);
+	$triggersTable = (new CTable(''))
+		->addClass('invisible')
+		->addRow($resolved);
 
 	$msgVisibility = ['1' => [
 		'messages[timeout]',

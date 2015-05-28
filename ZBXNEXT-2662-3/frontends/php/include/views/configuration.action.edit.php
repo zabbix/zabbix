@@ -65,11 +65,11 @@ $actionFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['acti
 $conditionFormList = new CFormList();
 
 // create condition table
-$conditionTable = (new CTable(_('No conditions defined.')))->
-	addClass('formElementTable')->
-	setAttribute('id', 'conditionTable')->
-	setAttribute('style', 'min-width: 350px;')->
-	setHeader([_('Label'), _('Name'), _('Action')]);
+$conditionTable = (new CTable(_('No conditions defined.')))
+	->addClass('formElementTable')
+	->setAttribute('id', 'conditionTable')
+	->setAttribute('style', 'min-width: 350px;')
+	->setHeader([_('Label'), _('Name'), _('Action')]);
 
 $i = 0;
 
@@ -364,9 +364,9 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsou
 }
 
 // create operation table
-$operationsTable = (new CTable(_('No operations defined.')))->
-	addCLass('formElementTable')->
-	setAttribute('style', 'min-width: 600px;');
+$operationsTable = (new CTable(_('No operations defined.')))
+	->addCLass('formElementTable')
+	->setAttribute('style', 'min-width: 600px;');
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationsTable->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration (sec)'), _('Action')]);
 	$delay = count_operations_delay($this->data['action']['operations'], $this->data['action']['esc_period']);
@@ -479,8 +479,7 @@ $operationFormList->addRow(_('Action operations'), new CDiv([$operationsTable, $
 
 // create new operation table
 if (!empty($this->data['new_operation'])) {
-	$newOperationsTable = (new CTable())->
-		addClass('formElementTable');
+	$newOperationsTable = (new CTable())->addClass('formElementTable');
 	$newOperationsTable->addItem(new CVar('new_operation[actionid]', $this->data['actionid']));
 
 	if (isset($this->data['new_operation']['id'])) {
@@ -573,14 +572,11 @@ if (!empty($this->data['new_operation'])) {
 				$this->data['new_operation']['opmessage']['default_msg'] = 0;
 			}
 
-			$usrgrpList = (new CTable())->
-				addClass('formElementTable')->
-				setHeader([
-					_('User group'),
-					_('Action')
-				])->
-				setAttribute('style', 'min-width: 310px;')->
-				setAttribute('id', 'opmsgUsrgrpList');
+			$usrgrpList = (new CTable())
+				->addClass('formElementTable')
+				->setAttribute('style', 'min-width: 310px;')
+				->setAttribute('id', 'opmsgUsrgrpList')
+				->setHeader([_('User group'), _('Action')]);
 
 			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")', 'link_menu');
 			$addUsrgrpBtn->setAttribute('id', 'addusrgrpbtn');
@@ -588,11 +584,11 @@ if (!empty($this->data['new_operation'])) {
 				(new CCol($addUsrgrpBtn))->setColSpan(2)))->setId('opmsgUsrgrpListFooter')
 			);
 
-			$userList = (new CTable())->
-				addClass('formElementTable')->
-				setHeader([_('User'), _('Action')])->
-				setAttribute('style', 'min-width: 310px;')->
-				setAttribute('id', 'opmsgUserList');
+			$userList = (new CTable())
+				->addClass('formElementTable')
+				->setHeader([_('User'), _('Action')])
+				->setAttribute('style', 'min-width: 310px;')
+				->setAttribute('id', 'opmsgUserList');
 
 			$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")', 'link_menu');
 			$addUserBtn->setAttribute('id', 'adduserbtn');
@@ -705,10 +701,10 @@ if (!empty($this->data['new_operation'])) {
 				}
 			}
 
-			$cmdList = (new CTable())->
-				addClass('formElementTable')->
-				setAttribute('style', 'min-width: 310px;')->
-				setHeader([_('Target'), _('Action')]);
+			$cmdList = (new CTable())
+				->addClass('formElementTable')
+				->setAttribute('style', 'min-width: 310px;')
+				->setHeader([_('Target'), _('Action')]);
 
 			$addCmdBtn = new CButton('add', _('New'), 'javascript: showOpCmdForm(0, "new");', 'link_menu');
 			$cmdList->addRow((new CRow(
@@ -884,12 +880,11 @@ if (!empty($this->data['new_operation'])) {
 							'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().
 								'&dstfld1=discoveryHostGroup&srcfld1=groupid&writeonly=1&multiselect=1'
 						]
-					])))->
-					setColSpan(2)))->setId('opGroupListFooter')
-			);
+					]))
+				)->setColSpan(2))
+			)->setId('opGroupListFooter'));
 			$groupList->addRow(
-				(new CCol(new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu')))->
-					setColSpan(2)
+				(new CCol(new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu')))->setColSpan(2)
 			);
 
 			// load host groups
@@ -934,12 +929,12 @@ if (!empty($this->data['new_operation'])) {
 							'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
 								'&dstfld1=discoveryTemplates&templated_hosts=1&multiselect=1&writeonly=1'
 						]
-					])))->
-					setColSpan(2)))->setId('opTemplateListFooter')
-			);
+					]))
+				)->setColSpan(2))
+			)->setId('opTemplateListFooter'));
+
 			$templateList->addRow(
-				(new CCol(new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu')))->
-					setColSpan(2)
+				(new CCol(new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu')))->setColSpan(2)
 			);
 
 			// load templates
@@ -979,11 +974,11 @@ if (!empty($this->data['new_operation'])) {
 		$allowed_opconditions = get_opconditions_by_eventsource($this->data['eventsource']);
 		$grouped_opconditions = [];
 
-		$operationConditionsTable = (new CTable(_('No conditions defined.')))->
-			addClass('formElementTable')->
-			setAttribute('id', 'operationConditionTable')->
-			setAttribute('style', 'min-width: 310px;')->
-			setHeader([_('Label'), _('Name'), _('Action')]);
+		$operationConditionsTable = (new CTable(_('No conditions defined.')))
+			->addClass('formElementTable')
+			->setAttribute('id', 'operationConditionTable')
+			->setAttribute('style', 'min-width: 310px;')
+			->setHeader([_('Label'), _('Name'), _('Action')]);
 
 		$i = 0;
 
@@ -1006,10 +1001,10 @@ if (!empty($this->data['new_operation'])) {
 			}
 
 			$label = num2letter($i);
-			$labelCol = (new CCol($label))->
-				addClass('label')->
-				setAttribute('data-conditiontype', $opcondition['conditiontype'])->
-				setAttribute('data-formulaid', $label);
+			$labelCol = (new CCol($label))
+				->addClass('label')
+				->setAttribute('data-conditiontype', $opcondition['conditiontype'])
+				->setAttribute('data-formulaid', $label);
 			$operationConditionsTable->addRow(
 				[
 					$labelCol,
@@ -1054,8 +1049,7 @@ if (!empty($this->data['new_operation'])) {
 
 	// append new operation condition to form list
 	if (isset($_REQUEST['new_opcondition'])) {
-		$newOperationConditionTable = (new CTable())->
-			addClass('formElementTable');
+		$newOperationConditionTable = (new CTable())->addClass('formElementTable');
 
 		$allowedOpConditions = get_opconditions_by_eventsource($this->data['eventsource']);
 

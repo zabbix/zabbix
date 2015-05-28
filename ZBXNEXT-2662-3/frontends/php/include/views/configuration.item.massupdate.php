@@ -309,11 +309,11 @@ $itemFormList->addRow(
 );
 
 // append delay flex to form list
-$delayFlexTable = (new CTable(_('No flexible intervals defined.')))->
-	addClass('formElementTable')->
-	setAttribute('style', 'min-width: 310px;')->
-	setAttribute('id', 'delayFlexTable')->
-	setHeader([_('Interval'), _('Period'), _('Action')]);
+$delayFlexTable = (new CTable(_('No flexible intervals defined.')))
+	->addClass('formElementTable')
+	->setAttribute('style', 'min-width: 310px;')
+	->setAttribute('id', 'delayFlexTable')
+	->setHeader([_('Interval'), _('Period'), _('Action')]);
 $i = 0;
 $this->data['maxReached'] = false;
 foreach ($this->data['delay_flex'] as $delayFlex) {

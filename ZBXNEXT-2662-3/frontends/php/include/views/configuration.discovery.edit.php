@@ -49,10 +49,9 @@ $discoveryFormList->addRow(_('Delay (in sec)'), new CNumericBox('delay', $this->
 
 // append checks to form list
 $checkTable = (new CTable())->addClass('formElementTable');
-$checkTable->addRow((new CRow(
-	(new CCol(new CButton('newCheck', _('New'), null, 'link_menu')))->
-		setColSpan(2)))->setId('dcheckListFooter')
-);
+$checkTable->addRow((
+	new CRow((new CCol(new CButton('newCheck', _('New'), null, 'link_menu')))->setColSpan(2))
+)->setId('dcheckListFooter'));
 $discoveryFormList->addRow(_('Checks'),
 	new CDiv($checkTable, 'objectgroup inlineblock border_dotted', 'dcheckList'));
 

@@ -37,16 +37,14 @@ class CServerInfo extends CTable {
 			? new CLink(_('Zabbix server'), 'zabbix.php?action=report.status')
 			: _('Zabbix server');
 
-		$this->addRow((new CCol(_('Zabbix server info')))->
-			addClass(ZBX_STYLE_NOWRAP)->
-			addClass('ui-widget-header')
+		$this->addRow((new CCol(_('Zabbix server info')))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->addClass('ui-widget-header')
 		);
 		$this->addRow(_('Updated').NAME_DELIMITER.zbx_date2str(DATE_TIME_FORMAT_SECONDS, time()));
 		$this->addRow(_('Users (online)').NAME_DELIMITER.$status['users_count'].'('.$status['users_online'].')');
 		$this->addRow(new CCol([_('Logged in as').SPACE, new CLink(CWebUser::$data['alias'], 'profile.php')]));
-		$this->addRow((new CCol([$serverLink, SPACE._('is').SPACE, $server]))->
-			addClass('status')
-		);
+		$this->addRow((new CCol([$serverLink, SPACE._('is').SPACE, $server]))->addClass('status'));
 		$this->addRow(new CCol([
 			_('Hosts (m/n/t)').NAME_DELIMITER.$status['hosts_count'].'(',
 			new CSpan($status['hosts_count_monitored'], ZBX_STYLE_GREEN),

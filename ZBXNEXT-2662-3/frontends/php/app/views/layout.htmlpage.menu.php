@@ -60,10 +60,10 @@
 	$page_menu_div->addItem($top_menu);
 
 	// 2nd level menu
-	$sub_menu_table = (new CTable())->
-		addClass('sub_menu')->
-		addClass('maxwidth')->
-		addClass('ui-widget-header');
+	$sub_menu_table = (new CTable())
+		->addClass('sub_menu')
+		->addClass('maxwidth')
+		->addClass('ui-widget-header');
 	$menu_divs = [];
 	$menu_selected = false;
 	foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {

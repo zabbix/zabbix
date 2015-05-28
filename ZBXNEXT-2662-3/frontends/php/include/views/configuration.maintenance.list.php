@@ -22,9 +22,9 @@ $maintenanceWidget = (new CWidget())->setTitle(_('Maintenance periods'));
 
 // create new maintenance button
 $createForm = (new CForm('get'))->cleanItems();
-$controls = new CList();
-$controls->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]);
-$controls->addItem(new CSubmit('form', _('Create maintenance period')));
+$controls = (new CList())
+	->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()])
+	->addItem(new CSubmit('form', _('Create maintenance period')));
 $createForm->addItem($controls);
 $maintenanceWidget->setControls($createForm);
 
@@ -36,8 +36,8 @@ $maintenanceForm->setName('maintenanceForm');
 $maintenanceTable = new CTableInfo();
 $maintenanceTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');")))->
-		addClass('cell-width'),
+		new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');")
+	))->addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Type'), 'maintenance_type', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Active since'), 'active_since', $this->data['sort'], $this->data['sortorder']),

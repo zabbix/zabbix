@@ -45,10 +45,10 @@ define('NO_LINK_IN_TESTING', true);
 list($outline, $eHTMLTree) = analyzeExpression($expression);
 
 // test data (create table, create check fields)
-$dataTable = (new CTable())->
-	addClass('tableinfo')->
-	setAttribute('id', 'data_list')->
-	setHeader([_('Expression Variable Elements'), _('Result type'), _('Value')]);
+$dataTable = (new CTable())
+	->addClass('tableinfo')
+	->setAttribute('id', 'data_list')
+	->setHeader([_('Expression Variable Elements'), _('Result type'), _('Value')]);
 
 $datas = [];
 $fields = [];
@@ -131,9 +131,9 @@ $testForm->setTableClass('formlongtable formtable');
 $testForm->addVar('expression', $expression);
 $testForm->addRow(_('Test data'), $dataTable);
 
-$resultTable = (new CTable())->
-	addClass('tableinfo')->
-	setAttribute('id', 'result_list');
+$resultTable = (new CTable())
+	->addClass('tableinfo')
+	->setAttribute('id', 'result_list');
 $resultTable->setOddRowClass('even_row');
 $resultTable->setEvenRowClass('even_row');
 $resultTable->setHeader([_('Expression'), _('Result')]);
@@ -155,8 +155,7 @@ foreach ($eHTMLTree as $e) {
 		}
 	}
 
-	$col = (new CCol($result))->
-		setAttribute('style', $style);
+	$col = (new CCol($result))->setAttribute('style', $style);
 
 	$resultTable->addRow(new CRow([$e['list'], $col]));
 }

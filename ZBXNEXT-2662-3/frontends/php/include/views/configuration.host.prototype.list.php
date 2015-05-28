@@ -44,8 +44,8 @@ $hostTable = new CTableInfo();
 
 $hostTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_hosts', null, "checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');")))->
-		addClass('cell-width'),
+		new CCheckBox('all_hosts', null, "checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');")
+	))->addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Templates'),
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])

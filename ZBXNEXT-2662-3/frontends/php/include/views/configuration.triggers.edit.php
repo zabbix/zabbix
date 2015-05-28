@@ -133,10 +133,10 @@ $triggersFormList->addRow(_('Expression'), $expressionRow);
 
 // append expression table to form list
 if ($this->data['input_method'] == IM_TREE) {
-	$expressionTable = (new CTable())->
-		addClass('formElementTable')->
-		setAttribute('style', 'min-width: 500px;')->
-		setAttribute('id', 'exp_list');
+	$expressionTable = (new CTable())
+		->addClass('formElementTable')
+		->setAttribute('style', 'min-width: 500px;')
+		->setAttribute('id', 'exp_list');
 	$expressionTable->setOddRowClass('even_row');
 	$expressionTable->setEvenRowClass('even_row');
 	$expressionTable->setHeader([
@@ -261,11 +261,11 @@ $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
  * Dependencies tab
  */
 $dependenciesFormList = new CFormList('dependenciesFormList');
-$dependenciesTable = (new CTable(_('No dependencies defined.')))->
-	addClass('formElementTable')->
-	setAttribute('style', 'min-width: 500px;')->
-	setAttribute('id', 'dependenciesTable')->
-	setHeader([_('Name'), _('Action')]);
+$dependenciesTable = (new CTable(_('No dependencies defined.')))
+	->addClass('formElementTable')
+	->setAttribute('style', 'min-width: 500px;')
+	->setAttribute('id', 'dependenciesTable')
+	->setHeader([_('Name'), _('Action')]);
 
 foreach ($this->data['db_dependencies'] as $dependency) {
 	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);

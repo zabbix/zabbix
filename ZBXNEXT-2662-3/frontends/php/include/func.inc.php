@@ -1714,10 +1714,10 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	}
 
 	if ($title !== null && $show_close_box) {
-		$msg_box->addItem((new CSpan())->
-			addClass('overlay-close-btn')->
-			setAttribute('onclick', 'javascript: showHide("global-message", IE ? "block" : "");')->
-			setAttribute('title', _('Close')));
+		$msg_box->addItem((new CSpan())
+			->addClass('overlay-close-btn')
+			->setAttribute('onclick', 'javascript: showHide("global-message", IE ? "block" : "");')
+			->setAttribute('title', _('Close')));
 	}
 
 	return $msg_box;

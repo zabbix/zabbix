@@ -90,15 +90,14 @@ $column->addRow(_('Age less than'), [$statusChangeCheckBox, $statusChangeDays, S
 // name
 $column->addRow(_('Filter by name'), new CTextBox('txt_select', $filter['txtSelect'], 40));
 
+$application_name_url =
+	'popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1&dstfrm=zbx_filter';
+
 // application
 $column->addRow(_('Filter by application'), [
 	new CTextBox('application', $filter['application'], 40),
-
-	new CButton('application_name', _('Select'),
-		'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1'.
-		'&dstfrm=zbx_filter");',
-		ZBX_STYLE_BTN_GREY
-	)
+	(new CButton('application_name', _('Select'), 'return PopUp("'.$application_name_url.'");'))
+		->addClass(ZBX_STYLE_BTN_GREY)
 ]);
 
 // inventory filter
@@ -120,13 +119,19 @@ foreach ($inventoryFilters as $field) {
 	$inventoryFilterTable->addRow([
 		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventoryFields),
 		new CTextBox('inventory['.$i.'][value]', $field['value'], 20),
-		new CButton('inventory['.$i.'][remove]', _('Remove'), null, 'element-table-remove')
+		(new CButton('inventory['.$i.'][remove]'))
+			->addClass(ZBX_STYLE_BTN_REMOVE)
+			->addClass('element-table-remove')
 	], 'form_row');
 
 	$i++;
 }
 $inventoryFilterTable->addRow(
-	(new CCol(new CButton('inventory_add', _('Add'), null, 'element-table-add')))->setColSpan(2)
+	(new CCol(
+		(new CButton('inventory_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_ADD)
+			->addClass('element-table-add')
+	))->setColSpan(2)
 );
 $column->addRow(_('Filter by host inventory'), $inventoryFilterTable);
 

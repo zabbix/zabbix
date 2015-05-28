@@ -64,14 +64,12 @@ if ($zabbixServer->getError()) {
 
 // create filter form
 $form = new CForm('get');
-$cmbMode = (new CComboBox('config', $config, 'submit();'))->
-	addItem(QUEUE_OVERVIEW, _('Overview'))->
-	addItem(QUEUE_OVERVIEW_BY_PROXY, _('Overview by proxy'))->
-	addItem(QUEUE_DETAILS, _('Details'));
+$cmbMode = (new CComboBox('config', $config, 'submit();'))
+	->addItem(QUEUE_OVERVIEW, _('Overview'))
+	->addItem(QUEUE_OVERVIEW_BY_PROXY, _('Overview by proxy'))
+	->addItem(QUEUE_DETAILS, _('Details'));
 // controls
-$form->addItem((new CList())->
-	addItem($cmbMode)
-);
+$form->addItem((new CList())->addItem($cmbMode));
 
 // display table
 $queueWidget = (new CWidget())->setTitle(_('Queue of items to be updated'))->setControls($form);

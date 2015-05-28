@@ -192,11 +192,11 @@ $itemFormList->addRow(_('SQL query'),
 $itemFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5), false, 'row_delay');
 
 // append delay flex to form list
-$delayFlexTable = (new CTable(_('No flexible intervals defined.')))->
-	addClass('formElementTable')->
-	setAttribute('style', 'min-width: 310px;')->
-	setAttribute('id', 'delayFlexTable')->
-	setHeader([_('Interval'), _('Period'), _('Action')]);
+$delayFlexTable = (new CTable(_('No flexible intervals defined.')))
+	->addClass('formElementTable')
+	->setAttribute('style', 'min-width: 310px;')
+	->setAttribute('id', 'delayFlexTable')
+	->setHeader([_('Interval'), _('Period'), _('Action')]);
 $i = 0;
 $this->data['maxReached'] = false;
 foreach ($this->data['delay_flex'] as $delayFlex) {
@@ -286,10 +286,10 @@ $conditionFormList->addRow(_('Type of calculation'),
 );
 
 // macros
-$conditionTable = (new CTable(''))->
-	addClass('formElementTable')->
-	setAttribute('id', 'conditions')->
-	addRow([_('Label'), _('Macro'), SPACE, _('Regular expression'), SPACE]);
+$conditionTable = (new CTable(''))
+	->addClass('formElementTable')
+	->setAttribute('id', 'conditions')
+	->addRow([_('Label'), _('Macro'), SPACE, _('Regular expression'), SPACE]);
 
 $conditions = $this->data['conditions'];
 if (!$conditions) {
@@ -318,14 +318,21 @@ foreach ($conditions as $i => $condition) {
 	$value->setAttribute('placeholder', _('regular expression'));
 
 	// delete button
-	$deleteButtonCell = [new CButton('conditions_'.$i.'_remove', _('Remove'), null, 'link_menu element-table-remove')];
+	$deleteButtonCell = [
+		(new CButton('conditions_'.$i.'_remove'))
+			->addClass(ZBX_STYLE_BTN_REMOVE)
+			->addClass('element-table-remove')
+	];
 
 	$row = [$formulaId, $macro, new CSpan(_('matches')), $value, $deleteButtonCell];
 	$conditionTable->addRow($row, 'form_row');
 }
 
-$addButton = new CButton('macro_add', _('Add'), null, 'link_menu element-table-add');
-$buttonColumn = new CCol($addButton);
+$buttonColumn = new CCol(
+	(new CButton('macro_add', _('Add')))
+		->addClass(ZBX_STYLE_BTN_ADD)
+		->addClass('element-table-add')
+);
 $buttonColumn->setAttribute('colspan', 5);
 
 $buttonRow = new CRow();

@@ -548,12 +548,11 @@ if ($srctbl == 'usrgrp') {
 
 	$table = new CTableInfo();
 	$table->setHeader([
-		$multiselect ?
-			(new CColHeader(
-				new CCheckBox('all_usrgrps', null, "javascript: checkAll('".$form->getName()."', 'all_usrgrps', 'usrgrps');")))->
-				addClass('cell-width')
-			:
-			null,
+		$multiselect
+			? (new CColHeader(
+				new CCheckBox('all_usrgrps', null, "javascript: checkAll('".$form->getName()."', 'all_usrgrps', 'usrgrps');"))
+			)->addClass('cell-width')
+			: null,
 		_('Name')
 	]);
 
@@ -609,12 +608,11 @@ elseif ($srctbl == 'users') {
 
 	$table = new CTableInfo();
 	$table->setHeader([
-		($multiselect ?
-			(new CColHeader(
-				new CCheckBox('all_users', null, "javascript: checkAll('".$form->getName()."', 'all_users', 'users');")))->
-				addClass('cell-width')
-			:
-			null),
+		$multiselect
+			? (new CColHeader(
+				new CCheckBox('all_users', null, "javascript: checkAll('".$form->getName()."', 'all_users', 'users');"))
+			)->addClass('cell-width')
+			: null,
 		_('Alias'),
 		_x('Name', 'user first name'),
 		_('Surname')
@@ -682,12 +680,11 @@ elseif ($srctbl == 'templates') {
 
 	$table = new CTableInfo();
 	$table->setHeader([
-		($multiselect ?
-			(new CColHeader(
-				new CCheckBox('all_templates', null, "javascript: checkAll('".$form->getName()."', 'all_templates', 'templates');")))->
-				addClass('cell-width')
-			:
-			null),
+		$multiselect
+			? (new CColHeader(
+				new CCheckBox('all_templates', null, "javascript: checkAll('".$form->getName()."', 'all_templates', 'templates');"))
+			)->addClass('cell-width')
+			: null,
 		_('Name')
 	]);
 
@@ -762,12 +759,11 @@ elseif ($srctbl == 'hosts') {
 
 	$table = new CTableInfo();
 	$table->setHeader([
-		($multiselect ?
-			(new CColHeader(
-				new CCheckBox('all_hosts', null, "javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');")))->
-				addClass('cell-width')
-			:
-			null),
+		$multiselect
+			? (new CColHeader(
+				new CCheckBox('all_hosts', null, "javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');"))
+			)->addClass('cell-width')
+			: null,
 		_('Name')
 	]);
 
@@ -842,12 +838,11 @@ elseif ($srctbl == 'host_templates') {
 
 	$table = new CTableInfo();
 	$table->setHeader([
-		($multiselect ?
-			(new CColHeader(
-				new CCheckBox('all_hosts', null, "javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');")))->
-				addClass('cell-width')
-			:
-			null),
+		$multiselect
+			? (new CColHeader(
+				new CCheckBox('all_hosts', null, "javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');"))
+			)->addClass('cell-width')
+			: null,
 		_('Name')
 	]);
 
@@ -923,12 +918,11 @@ elseif ($srctbl == 'host_groups') {
 
 	$table = new CTableInfo();
 	$table->setHeader([
-		($multiselect ?
-			(new CColHeader(
-				new CCheckBox('all_hostgroups', null, "javascript: checkAll('".$form->getName()."', 'all_hostgroups', 'hostGroups');")))->
-				addClass('cell-width')
-			:
-			null),
+		$multiselect
+			? (new CColHeader(
+				new CCheckBox('all_hostgroups', null, "javascript: checkAll('".$form->getName()."', 'all_hostgroups', 'hostGroups');"))
+			)->addClass('cell-width')
+			: null,
 		_('Name')
 	]);
 
@@ -1020,8 +1014,8 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 	$table->setHeader([
 		$multiselect
 			? (new CColHeader(
-				new CCheckBox('all_triggers', null, "checkAll('".$form->getName()."', 'all_triggers', 'triggers');")))->
-				addClass('cell-width')
+				new CCheckBox('all_triggers', null, "checkAll('".$form->getName()."', 'all_triggers', 'triggers');"))
+			)->addClass('cell-width')
 			: null,
 		_('Name'),
 		_('Severity'),
@@ -1173,8 +1167,8 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 		$pageFilter->hostsAll ? _('Host') : null,
 		$multiselect
 			? (new CColHeader(
-				new CCheckBox('all_items', null, "javascript: checkAll('".$form->getName()."', 'all_items', 'items');")))->
-				addClass('cell-width')
+				new CCheckBox('all_items', null, "javascript: checkAll('".$form->getName()."', 'all_items', 'items');"))
+			)->addClass('cell-width')
 			: null,
 		_('Name'),
 		_('Key'),
@@ -1306,12 +1300,11 @@ elseif ($srctbl == 'applications') {
 
 	$table = new CTableInfo();
 	$table->setHeader([
-		($multiselect ?
-			(new CColHeader(
-				new CCheckBox('all_applications', null, "javascript: checkAll('".$form->getName()."', 'all_applications', 'applications');")))->
-				addClass('cell-width')
-			:
-			null),
+		$multiselect
+			? (new CColHeader(
+				new CCheckBox('all_applications', null, "javascript: checkAll('".$form->getName()."', 'all_applications', 'applications');"))
+			)->addClass('cell-width')
+			: null,
 		_('Name')
 	]);
 

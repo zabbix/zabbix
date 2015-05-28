@@ -27,10 +27,10 @@ $headerMapForm->cleanItems();
 $controls = new CList();
 
 if ($data['maps']) {
-	$mapTable = (new CTable())->
-		addClass('map')->
-		addClass('container')->
-		setAttribute('style', 'margin-top: 4px;');
+	$mapTable = (new CTable())
+		->addClass('map')
+		->addClass('container')
+		->setAttribute('style', 'margin-top: 4px;');
 
 	$maps = [];
 	foreach ($data['maps'] as $sysmapid => $map) {
@@ -72,15 +72,16 @@ if ($data['maps']) {
 	]));
 }
 else {
-	$mapTable = (new CTable(_('No maps found.')))->
-		addClass('map')->
-		addClass('map-container')->
-		setAttribute('style', 'margin-top: 4px;');
+	$mapTable = (new CTable(_('No maps found.')))
+		->addClass('map')
+		->addClass('map-container')
+		->setAttribute('style', 'margin-top: 4px;');
 }
 
 $controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
 
 $headerMapForm->addItem($controls);
-$mapWidget->setControls($headerMapForm)->
-	addItem((new CDiv(null, 'table-forms-container'))->addItem($mapTable))->
-	show();
+$mapWidget->setControls($headerMapForm)
+	->addItem((new CDiv(null, 'table-forms-container'))
+	->addItem($mapTable))
+	->show();

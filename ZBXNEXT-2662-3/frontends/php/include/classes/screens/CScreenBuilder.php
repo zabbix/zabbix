@@ -499,10 +499,10 @@ class CScreenBuilder {
 				}
 
 				// colspan/rowspan
-				$newColumn = (new CCol($item))->
-					addClass($halign)->
-					addClass($valign)->
-					addClass('screenitem');
+				$newColumn = (new CCol($item))
+					->addClass($halign)
+					->addClass($valign)
+					->addClass('screenitem');
 				if (!empty($screenitem['colspan'])) {
 					$newColumn->setColSpan($screenitem['colspan']);
 				}

@@ -104,11 +104,8 @@ class CUiWidget extends CDiv {
 	 * @param string|array|CTag $rightColumn
 	 */
 	public function setDoubleHeader($leftColumn, $rightColumn) {
-		$leftColumn = (new CCol($leftColumn))->
-			addStyle('text-align: left; border: 0;');
-
-		$rightColumn = (new CCol($rightColumn))->
-			addStyle('text-align: right; border: 0;');
+		$leftColumn = (new CCol($leftColumn))->addStyle('text-align: left; border: 0;');
+		$rightColumn = (new CCol($rightColumn))->addStyle('text-align: right; border: 0;');
 
 		$table = new CTable();
 		$table->addStyle('width: 100%;');

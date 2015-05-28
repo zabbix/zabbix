@@ -96,14 +96,9 @@ $maintenanceFormList->addRow(_('Description'), new CTextArea('description', $thi
  * Maintenance period tab
  */
 $maintenancePeriodFormList = new CFormList('maintenancePeriodFormList');
-$maintenancePeriodTable = (new CTable(_('No maintenance periods defined.')))->
-	addClass('formElementTable')->
-	setHeader([
-		_('Period type'),
-		_('Schedule'),
-		_('Period'),
-		_('Action')
-	]);
+$maintenancePeriodTable = (new CTable(_('No maintenance periods defined.')))
+	->addClass('formElementTable')
+	->setHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')]);
 
 foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 	$maintenancePeriodTable->addRow([
@@ -114,8 +109,7 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 			new CSubmit('edit_timeperiodid['.$id.']', _('Edit'), null, 'link_menu'),
 			SPACE.SPACE,
 			new CSubmit('del_timeperiodid['.$id.']', _('Remove'), null, 'link_menu')
-		]))->
-			addClass(ZBX_STYLE_NOWRAP)
+		]))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 	if (isset($timeperiod['timeperiodid'])) {
 		$maintenanceForm->addVar('timeperiods['.$id.'][timeperiodid]', $timeperiod['timeperiodid']);
@@ -167,13 +161,12 @@ $groupsComboBox = new CComboBox('twb_groupid', $this->data['twb_groupid'], 'subm
 foreach ($this->data['all_groups'] as $group) {
 	$groupsComboBox->addItem($group['groupid'], $group['name']);
 }
-$hostTable = (new CTable())->
-	addClass('formElementTable')->
-	addRow($hostTweenBox->get(_('In maintenance'), [_('Other hosts | Group').SPACE, $groupsComboBox]));
+$hostTable = (new CTable())
+	->addClass('formElementTable')
+	->addRow($hostTweenBox->get(_('In maintenance'), [_('Other hosts | Group').SPACE, $groupsComboBox]));
 $hostsAndGroupsFormList->addRow(_('Hosts in maintenance'), $hostTable);
 
-$groupTable = (new CTable())->
-	addClass('formElementTable');
+$groupTable = (new CTable())->addClass('formElementTable');
 $groupTweenBox = new CTweenBox($maintenanceForm, 'groupids', $this->data['groupids'], 10);
 foreach ($this->data['all_groups'] as $group) {
 	$groupTweenBox->addItem($group['groupid'], $group['name']);

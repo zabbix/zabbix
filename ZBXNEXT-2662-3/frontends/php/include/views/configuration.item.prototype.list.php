@@ -49,8 +49,8 @@ $itemTable = new CTableInfo();
 
 $itemTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")))->
-		addClass('cell-width'),
+		new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
+	))->addClass('cell-width'),
 	make_sorting_header(_('Name'),'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),

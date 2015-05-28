@@ -27,9 +27,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 				size="40" maxlength="255" placeholder="<?php echo _('regular expression') ?>">
 		</td>
 		<td>
-			<button class="button link_menu element-table-remove" type="button" id="conditions_#{rowNum}_remove" name="conditions_#{rowNum}_remove">
-				<?php echo _('Remove'); ?>
-			</button>
+			<button class="<?= ZBX_STYLE_BTN_REMOVE ?> element-table-remove" type="button" id="conditions_#{rowNum}_remove" name="conditions_#{rowNum}_remove"></button>
 		</td>
 	</tr>
 </script>

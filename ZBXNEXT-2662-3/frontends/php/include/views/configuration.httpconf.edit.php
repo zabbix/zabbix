@@ -157,10 +157,10 @@ $httpAuthenticationFormList->addRow(
  * Step tab
  */
 $httpStepFormList = new CFormList('httpFormList');
-$stepsTable = (new CTable())->
-	addClass('formElementTable')->
-	setAttribute('style', 'min-width: 500px;')->
-	setAttribute('id', 'httpStepTable');
+$stepsTable = (new CTable())
+	->addClass('formElementTable')
+	->setAttribute('style', 'min-width: 500px;')
+	->setAttribute('id', 'httpStepTable');
 
 $stepsTable->setHeader([
 	(new CCol(SPACE))->setWidth('15'),
@@ -191,13 +191,13 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$step['required'] = '';
 	}
 
-	$numSpan = (new CSpan($i++.':'))->
-		addClass('rowNum')->
-		setAttribute('id', 'current_step_'.$stepid);
+	$numSpan = (new CSpan($i++.':'))
+		->addClass('rowNum')
+		->setAttribute('id', 'current_step_'.$stepid);
 
-	$name = (new CSpan($step['name'], 'link'))->
-		setAttribute('id', 'name_'.$stepid)->
-		setAttribute('name_step', $stepid);
+	$name = (new CSpan($step['name'], 'link'))
+		->setAttribute('id', 'name_'.$stepid)
+		->setAttribute('name_step', $stepid);
 
 	if (mb_strlen($step['url']) > 70) {
 		$start = mb_substr($step['url'], 0, 35);
@@ -227,9 +227,9 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$url,
 		htmlspecialchars($step['required']),
 		$step['status_codes'],
-		$removeButton]))->
-			addClass('sortable')->
-			setId('steps_'.$stepid);
+		$removeButton]))
+			->addClass('sortable')
+			->setId('steps_'.$stepid);
 
 	$stepsTable->addRow($row);
 }

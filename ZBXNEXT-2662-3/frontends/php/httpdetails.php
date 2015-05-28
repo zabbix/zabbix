@@ -109,8 +109,8 @@ $itemHistory = Manager::History()->getLast($items);
 /*
  * Display
  */
-$httpdetailsWidget = (new CWidget())->
-	setTitle(
+$httpdetailsWidget = (new CWidget())
+	->setTitle(
 		_('DETAILS OF WEB SCENARIO').':'.SPACE.
 		CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])
 	);

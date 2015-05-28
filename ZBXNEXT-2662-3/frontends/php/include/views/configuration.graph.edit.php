@@ -22,12 +22,12 @@
 $graphWidget = new CWidget();
 
 if (!empty($this->data['parent_discoveryid'])) {
-	$graphWidget->setTitle(_('Graph prototypes'))->
-		addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
+	$graphWidget->setTitle(_('Graph prototypes'))
+		->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 else {
-	$graphWidget->setTitle(_('Graphs'))->
-		addItem(get_header_host_table('graphs', $this->data['hostid']));
+	$graphWidget->setTitle(_('Graphs'))
+		->addItem(get_header_host_table('graphs', $this->data['hostid']));
 }
 
 // create form
@@ -217,8 +217,7 @@ else {
 }
 
 // append items to form list
-$itemsTable = (new CTable())->
-	addClass('formElementTable');
+$itemsTable = (new CTable())->addClass('formElementTable');
 $itemsTable->setAttribute('style', 'min-width: 700px;');
 $itemsTable->setAttribute('id', 'itemsTable');
 $itemsTable->setHeader([
@@ -295,9 +294,9 @@ $graphTab->addTab(
 $chartImage = new CImg('chart3.php?period=3600');
 $chartImage->preload();
 
-$graphPreviewTable = (new CTable())->
-	addClass('center')->
-	addClass('maxwidth');
+$graphPreviewTable = (new CTable())
+	->addClass('center')
+	->addClass('maxwidth');
 $graphPreviewTable->addRow(new CDiv($chartImage, null, 'previewChar'));
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 

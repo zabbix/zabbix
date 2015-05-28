@@ -91,11 +91,9 @@ $event = reset($events);
  */
 $config = select_config();
 
-$eventWidget = (new CWidget())->
-	setTitle(_s('Event of trigger: "%1$s"', CMacrosResolverHelper::resolveTriggerName($trigger)))->
-	setControls((new CList())->
-		addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
-	);
+$eventWidget = (new CWidget())
+	->setTitle(_s('Event of trigger: "%1$s"', CMacrosResolverHelper::resolveTriggerName($trigger)))
+	->setControls((new CList())->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')])));
 
 // trigger details
 $triggerDetailsWidget = new CUiWidget('hat_triggerdetails', make_trigger_details($trigger));

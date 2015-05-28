@@ -43,8 +43,8 @@ $mediaTypeTable->setHeader([
 	(new CColHeader(
 		new CCheckBox('all_media_types', null,
 			"checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"
-		)))->
-		addClass('cell-width'),
+		)
+	))->addClass('cell-width'),
 	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder']),
 	make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder']),
 	_('Status'),
