@@ -971,7 +971,19 @@ if test "x$ARCH" = "xhpux"; then
 	saved_CFLAGS="$CFLAGS"
 	CFLAGS="-D_HPUX_API_LEVEL=20040821"
 	AC_TRY_RUN(
-	[int main(void) {return 0;}],
+[
+#ifdef HAVE_SYS_UTSNAME_H
+#	include <sys/utsname.h>
+#endif
+
+int main(void)
+{
+	/* uname() fails with EFAULT on HP-UX systems that were only partially upgraded to this API level */
+
+	struct utsname	name;
+	return uname(&name));
+}
+],
 	CFLAGS="-D_HPUX_API_LEVEL=20040821 $saved_CFLAGS"
 	AC_MSG_RESULT(yes),
 	CFLAGS="$saved_CFLAGS"
