@@ -71,7 +71,7 @@ if ($this->data['displayInterfaces']) {
 	}
 
 	$span = new CSpan(_('No interface found'), ZBX_STYLE_RED);
-	$span->setAttribute('id', 'interface_not_defined');
+	$span->setId('interface_not_defined');
 	$span->setAttribute('style', 'display: none;');
 
 	$interfaceVisBox = new CVisibilityBox('visible[interface]', isset($this->data['visible']['interface']), 'interfaceDiv', _('Original'));
@@ -309,10 +309,11 @@ $itemFormList->addRow(
 );
 
 // append delay flex to form list
-$delayFlexTable = (new CTable(_('No flexible intervals defined.')))
+$delayFlexTable = (new CTable())
+	->setNoDataMessage(_('No flexible intervals defined.'))
 	->addClass('formElementTable')
 	->setAttribute('style', 'min-width: 310px;')
-	->setAttribute('id', 'delayFlexTable')
+	->setId('delayFlexTable')
 	->setHeader([_('Interval'), _('Period'), _('Action')]);
 $i = 0;
 $this->data['maxReached'] = false;
@@ -364,7 +365,7 @@ $newFlexInt = new CDiv(
 );
 
 $maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), ZBX_STYLE_RED);
-$maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');
+$maxFlexMsg->setId('row-new-delay-flex-max-reached');
 $maxFlexMsg->setAttribute('style', 'display: none;');
 
 $itemFormList->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], false, 'row_new_delay_flex', 'new');

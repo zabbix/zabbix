@@ -25,7 +25,7 @@ $proxyWidget = (new CWidget())->setTitle(_('Proxies'));
 
 // create form
 $proxyForm = new CForm();
-$proxyForm->setAttribute('id', 'proxyForm');
+$proxyForm->setId('proxyForm');
 $proxyForm->addVar('proxyid', $data['proxyid']);
 if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
@@ -43,13 +43,14 @@ $proxyFormList->addRow(_('Proxy mode'), new CComboBox('status', $data['status'],
 	HOST_STATUS_PROXY_PASSIVE => _('Passive')
 ]));
 
-$interfaceTable = new CTable(null, 'formElementTable');
-$interfaceTable->addRow([
-	_('IP address'),
-	_('DNS name'),
-	_('Connect to'),
-	_('Port')
-]);
+$interfaceTable = (new CTable())
+	->addClass('formElementTable')
+	->addRow([
+		_('IP address'),
+		_('DNS name'),
+		_('Connect to'),
+		_('Port')
+	]);
 
 $connectByComboBox = new CRadioButtonList('useip', $data['useip']);
 $connectByComboBox->addValue(_('IP'), 1);
@@ -91,11 +92,11 @@ $proxyTab->addTab('proxyTab', _('Proxy'), $proxyFormList);
 
 // append buttons to form
 $cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list');
-$cancelButton->setAttribute('id', 'cancel');
+$cancelButton->setId('cancel');
 
 if ($data['proxyid'] == 0) {
 	$addButton = new CSubmitButton(_('Add'), 'action', 'proxy.create');
-	$addButton->setAttribute('id', 'add');
+	$addButton->setId('add');
 
 	$proxyTab->setFooter(makeFormFooter(
 		$addButton,
@@ -104,14 +105,14 @@ if ($data['proxyid'] == 0) {
 }
 else {
 	$updateButton = new CSubmitButton(_('Update'), 'action', 'proxy.update');
-	$updateButton->setAttribute('id', 'update');
+	$updateButton->setId('update');
 	$cloneButton = new CSimpleButton(_('Clone'));
-	$cloneButton->setAttribute('id', 'clone');
+	$cloneButton->setId('clone');
 	$deleteButton = new CRedirectButton(_('Delete'),
 		'zabbix.php?action=proxy.delete&sid='.$data['sid'].'&proxyids[]='.$data['proxyid'],
 		_('Delete proxy?')
 	);
-	$deleteButton->setAttribute('id', 'delete');
+	$deleteButton->setId('delete');
 
 	$proxyTab->setFooter(makeFormFooter(
 		$updateButton,

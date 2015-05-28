@@ -187,7 +187,7 @@ $templatesFormList = new CFormList('templatesFormList');
 $templatesTable = (new CTable())
 	->addClass('formElementTable')
 	->setAttribute('style', 'min-width: 500px;')
-	->setAttribute('id', 'template_table');
+	->setId('template_table');
 
 $clearDiv = new CDiv();
 $clearDiv->addStyle('clear: both;');
@@ -216,7 +216,7 @@ $templatesDiv = new CDiv(
 	],
 	'objectgroup inlineblock border_dotted'
 );
-$templatesDiv->setAttribute('id', 'templateDiv');
+$templatesDiv->setId('templateDiv');
 
 $templatesFormList->addRow(
 	[

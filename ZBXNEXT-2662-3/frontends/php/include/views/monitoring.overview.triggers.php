@@ -47,7 +47,8 @@ if ($this->data['config']['blink_period'] > 0) {
 	for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
 		$row->addItem((new CCol(SPACE))->addClass(getSeverityStyle($i)));
 	}
-	$col = (new CTable(''))
+	$col = (new CTable())
+		->setNoDataMessage('')
 		->addClass('blink')
 		->addClass('overview-mon-severities')
 		->addRow($row);

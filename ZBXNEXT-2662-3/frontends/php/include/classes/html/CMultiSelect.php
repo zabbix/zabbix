@@ -29,7 +29,7 @@ class CMultiSelect extends CTag {
 	public function __construct(array $options = []) {
 		parent::__construct('div', 'yes');
 		$this->addClass('multiselect');
-		$this->setAttribute('id', zbx_formatDomId($options['name']));
+		$this->setId(zbx_formatDomId($options['name']));
 
 		// url
 		$url = new CUrl('jsrpc.php');

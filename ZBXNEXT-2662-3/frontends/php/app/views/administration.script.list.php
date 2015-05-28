@@ -34,7 +34,7 @@ $scriptsWidget->setControls($createForm);
 
 $scriptsForm = new CForm();
 $scriptsForm->setName('scriptsForm');
-$scriptsForm->setAttribute('id', 'scripts');
+$scriptsForm->setId('scripts');
 
 $scriptsTable = new CTableInfo();
 $scriptsTable->setHeader([

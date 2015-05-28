@@ -160,18 +160,17 @@ $httpStepFormList = new CFormList('httpFormList');
 $stepsTable = (new CTable())
 	->addClass('formElementTable')
 	->setAttribute('style', 'min-width: 500px;')
-	->setAttribute('id', 'httpStepTable');
-
-$stepsTable->setHeader([
-	(new CCol(SPACE))->setWidth('15'),
-	(new CCol(SPACE))->setWidth('15'),
-	(new CCol(_('Name')))->setWidth('150'),
-	(new CCol(_('Timeout')))->setWidth('50'),
-	(new CCol(_('URL')))->setWidth('200'),
-	(new CCol(_('Required')))->setWidth('50'),
-	(new CCol(_('Status codes')))->addClass(ZBX_STYLE_NOWRAP)->setWidth('90'),
-	(new CCol(''))->setWidth('50')
-]);
+	->setId('httpStepTable')
+	->setHeader([
+		(new CCol(SPACE))->setWidth('15'),
+		(new CCol(SPACE))->setWidth('15'),
+		(new CCol(_('Name')))->setWidth('150'),
+		(new CCol(_('Timeout')))->setWidth('50'),
+		(new CCol(_('URL')))->setWidth('200'),
+		(new CCol(_('Required')))->setWidth('50'),
+		(new CCol(_('Status codes')))->addClass(ZBX_STYLE_NOWRAP)->setWidth('90'),
+		(new CCol(''))->setWidth('50')
+	]);
 
 $i = 1;
 foreach ($this->data['steps'] as $stepid => $step) {
@@ -193,10 +192,10 @@ foreach ($this->data['steps'] as $stepid => $step) {
 
 	$numSpan = (new CSpan($i++.':'))
 		->addClass('rowNum')
-		->setAttribute('id', 'current_step_'.$stepid);
+		->setId('current_step_'.$stepid);
 
 	$name = (new CSpan($step['name'], 'link'))
-		->setAttribute('id', 'name_'.$stepid)
+		->setId('name_'.$stepid)
 		->setAttribute('name_step', $stepid);
 
 	if (mb_strlen($step['url']) > 70) {

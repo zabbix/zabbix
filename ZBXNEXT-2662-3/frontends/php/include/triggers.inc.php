@@ -1561,8 +1561,8 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 					$expressionId = 'expr_'.$element['id'];
 
 					$url = new CSpan($element['expression'], 'link');
-					$url->setAttribute('id', $expressionId);
-					$url->setAttribute('onclick', 'javascript: copy_expression("'.$expressionId.'");');
+					$url->setId($expressionId);
+					$url->onClick('javascript: copy_expression("'.$expressionId.'");');
 				}
 				$expr = expressionLevelDraw($next, $level);
 				$expr[] = SPACE;

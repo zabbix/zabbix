@@ -28,7 +28,7 @@ class CFormList extends CList {
 		parent::__construct([], 'table-forms');
 
 		if ($id) {
-			$this->setAttribute('id', zbx_formatDomId($id));
+			$this->setId(zbx_formatDomId($id));
 		}
 	}
 

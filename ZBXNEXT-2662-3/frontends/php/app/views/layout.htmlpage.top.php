@@ -41,7 +41,7 @@ if ($data['fullscreen'] == 0) {
 			" if (this.state == 'none') { this.state = 'block'; }".
 			" else { this.state = 'none'; }".
 			" showHideByName('zbx_debug_info', this.state);";
-		$debug->setAttribute('onclick', 'javascript: '.$d_script);
+		$debug->onClick('javascript: '.$d_script);
 
 		$page_header_r_col[] = $debug;
 		$page_header_r_col[] = '|';

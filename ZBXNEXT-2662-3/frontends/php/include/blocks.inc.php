@@ -111,7 +111,7 @@ function getFavouriteGraphsData() {
 function getFavouriteGraphs() {
 	$data = getFavouriteGraphsData();
 
-	$favourites = new CTableInfo(_('No graphs added.'));
+	$favourites = (new CTableInfo())->setNoDataMessage(_('No graphs added.'));
 
 	if ($data['graphs']) {
 		foreach ($data['graphs'] as $graph) {
@@ -169,7 +169,7 @@ function getFavouriteMapsData() {
 function getFavouriteMaps() {
 	$data = getFavouriteMapsData();
 
-	$favourites = new CTableInfo(_('No maps added.'));
+	$favourites = (new CTableInfo())->setNoDataMessage(_('No maps added.'));
 
 	if ($data) {
 		foreach ($data as $map) {
@@ -248,7 +248,7 @@ function getFavouriteScreensData() {
 function getFavouriteScreens() {
 	$data = getFavouriteScreensData();
 
-	$favourites = new CTableInfo(_('No screens added.'));
+	$favourites = (new CTableInfo())->setNoDataMessage(_('No screens added.'));
 
 	if ($data['screens']) {
 		foreach ($data['screens'] as $screen) {

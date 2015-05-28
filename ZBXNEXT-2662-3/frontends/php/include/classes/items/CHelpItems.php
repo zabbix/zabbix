@@ -633,12 +633,12 @@ class CHelpItems {
 				[
 					'key' => 'net.udp.service[service,<ip>,<port>]',
 					'description' => _('Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running')
-				),
-				array(
+				],
+				[
 					'key' => 'net.udp.service.perf[service,<ip>,<port>]',
 					'description' => _('Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
-				),
-				array(
+				],
+				[
 					'key' => 'vmware.cluster.status[<url>,<name>]',
 					'description' => _('VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name')
 				],

@@ -53,7 +53,7 @@ foreach ($titles as $key => $title) {
 				continue;
 			}
 
-			$cbExist->setAttribute('onclick', 'if (this.checked) return confirm(\''._('Images for all maps will be updated!').'\')');
+			$cbExist->onClick('if (this.checked) return confirm(\''._('Images for all maps will be updated!').'\')');
 		}
 	}
 
@@ -63,7 +63,7 @@ foreach ($titles as $key => $title) {
 
 	if (isset($rules[$key]['deleteMissing'])) {
 		$cbDeleted = new CCheckBox('rules['.$key.'][deleteMissing]', $rules[$key]['deleteMissing'], null, 1);
-		$cbDeleted->setAttribute('class', 'input checkbox pointer deleteMissing');
+		$cbDeleted->addClass('input checkbox pointer deleteMissing');
 	}
 
 	$rulesTable->addRow([

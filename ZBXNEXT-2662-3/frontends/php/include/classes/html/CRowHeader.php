@@ -25,10 +25,10 @@ class CRowHeader extends CTag {
 		parent::__construct('tr', 'yes');
 		$this->addItem($item);
 		if ($class !== null) {
-			$this->setAttribute('class', $class);
+			$this->addClass($class);
 		}
 		if ($id !== null) {
-			$this->setAttribute('id', $id);
+			$this->setId($id);
 		}
 	}
 

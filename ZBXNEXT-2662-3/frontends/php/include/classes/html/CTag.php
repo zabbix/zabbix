@@ -257,6 +257,10 @@ class CTag extends CObject {
 		return $this;
 	}
 
+	public function getId() {
+		return $this->getAttribute('id');
+	}
+
 	/**
 	 * Sanitizes a string according to the given strategy before outputting it to the browser.
 	 *

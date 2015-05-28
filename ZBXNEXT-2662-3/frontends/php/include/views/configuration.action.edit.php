@@ -67,7 +67,7 @@ $conditionFormList = new CFormList();
 // create condition table
 $conditionTable = (new CTable(_('No conditions defined.')))
 	->addClass('formElementTable')
-	->setAttribute('id', 'conditionTable')
+	->setId('conditionTable')
 	->setAttribute('style', 'min-width: 350px;')
 	->setHeader([_('Label'), _('Name'), _('Action')]);
 
@@ -116,7 +116,7 @@ if ($this->data['action']['filter']['conditions']) {
 }
 
 $formula = new CTextBox('formula', $this->data['action']['filter']['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
-$formula->setAttribute('id', 'formula');
+$formula->setId('formula');
 $formula->setAttribute('placeholder', 'A or (B and C) &hellip;');
 if ($this->data['action']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
 	$formula->addClass('hidden');
@@ -364,8 +364,9 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsou
 }
 
 // create operation table
-$operationsTable = (new CTable(_('No operations defined.')))
-	->addCLass('formElementTable')
+$operationsTable = (new CTable())
+	->setNoDataMessage(_('No operations defined.'))
+	->addClass('formElementTable')
 	->setAttribute('style', 'min-width: 600px;');
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationsTable->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration (sec)'), _('Action')]);
@@ -575,11 +576,11 @@ if (!empty($this->data['new_operation'])) {
 			$usrgrpList = (new CTable())
 				->addClass('formElementTable')
 				->setAttribute('style', 'min-width: 310px;')
-				->setAttribute('id', 'opmsgUsrgrpList')
+				->setId('opmsgUsrgrpList')
 				->setHeader([_('User group'), _('Action')]);
 
 			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")', 'link_menu');
-			$addUsrgrpBtn->setAttribute('id', 'addusrgrpbtn');
+			$addUsrgrpBtn->setId('addusrgrpbtn');
 			$usrgrpList->addRow((new CRow(
 				(new CCol($addUsrgrpBtn))->setColSpan(2)))->setId('opmsgUsrgrpListFooter')
 			);
@@ -588,10 +589,10 @@ if (!empty($this->data['new_operation'])) {
 				->addClass('formElementTable')
 				->setHeader([_('User'), _('Action')])
 				->setAttribute('style', 'min-width: 310px;')
-				->setAttribute('id', 'opmsgUserList');
+				->setId('opmsgUserList');
 
 			$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")', 'link_menu');
-			$addUserBtn->setAttribute('id', 'adduserbtn');
+			$addUserBtn->setId('adduserbtn');
 			$userList->addRow((new CRow(
 				(new CCol($addUserBtn))->setColSpan(2)))->setId('opmsgUserListFooter'));
 
@@ -752,7 +753,7 @@ if (!empty($this->data['new_operation'])) {
 
 			// target list
 			$cmdList = new CDiv($cmdList, 'objectgroup border_dotted inlineblock');
-			$cmdList->setAttribute('id', 'opCmdList');
+			$cmdList->setId('opCmdList');
 			$newOperationsTable->addRow([_('Target list'), $cmdList], 'indent_top');
 
 			// type
@@ -831,7 +832,7 @@ if (!empty($this->data['new_operation'])) {
 
 			// set custom id because otherwise they are set based on name (sick!) and produce duplicate ids
 			$passphraseCB = new CTextBox('new_operation[opcommand][password]', $this->data['new_operation']['opcommand']['password'], ZBX_TEXTBOX_SMALL_SIZE);
-			$passphraseCB->setAttribute('id', 'new_operation_opcommand_passphrase');
+			$passphraseCB->setId('new_operation_opcommand_passphrase');
 			$newOperationsTable->addRow([_('Key passphrase'), $passphraseCB], 'class_authentication_passphrase hidden');
 
 			// ssh && telnet
@@ -848,7 +849,7 @@ if (!empty($this->data['new_operation'])) {
 			$newOperationsTable->addRow([_('Commands'), $commandTextArea], 'class_opcommand_command hidden indent_both');
 
 			$commandIpmiTextBox = new CTextBox('new_operation[opcommand][command]', $this->data['new_operation']['opcommand']['command'], ZBX_TEXTBOX_STANDARD_SIZE);
-			$commandIpmiTextBox->setAttribute('id', 'opcommand_command_ipmi');
+			$commandIpmiTextBox->setId('opcommand_command_ipmi');
 			$newOperationsTable->addRow([_('Commands'), $commandIpmiTextBox], 'class_opcommand_command_ipmi hidden indent_both');
 			break;
 
@@ -869,7 +870,7 @@ if (!empty($this->data['new_operation'])) {
 			}
 
 			$groupList = new CTable();
-			$groupList->setAttribute('id', 'opGroupList');
+			$groupList->setId('opGroupList');
 			$groupList->addRow((new CRow(
 				(new CCol(
 					new CMultiSelect([
@@ -918,7 +919,7 @@ if (!empty($this->data['new_operation'])) {
 			}
 
 			$templateList = new CTable();
-			$templateList->setAttribute('id', 'opTemplateList');
+			$templateList->setId('opTemplateList');
 			$templateList->addRow((new CRow(
 				(new CCol(
 					new CMultiSelect([
@@ -974,9 +975,10 @@ if (!empty($this->data['new_operation'])) {
 		$allowed_opconditions = get_opconditions_by_eventsource($this->data['eventsource']);
 		$grouped_opconditions = [];
 
-		$operationConditionsTable = (new CTable(_('No conditions defined.')))
+		$operationConditionsTable = (new CTable())
+			->setNoDataMessage(_('No conditions defined.'))
 			->addClass('formElementTable')
-			->setAttribute('id', 'operationConditionTable')
+			->setId('operationConditionTable')
 			->setAttribute('style', 'min-width: 310px;')
 			->setHeader([_('Label'), _('Name'), _('Action')]);
 
@@ -1032,7 +1034,7 @@ if (!empty($this->data['new_operation'])) {
 				CONDITION_EVAL_TYPE_OR => _('Or')
 			]
 		);
-		$calcTypeComboBox->setAttribute('id', 'operationEvaltype');
+		$calcTypeComboBox->setId('operationEvaltype');
 
 		$newOperationsTable->addRow([
 				_('Type of calculation'),

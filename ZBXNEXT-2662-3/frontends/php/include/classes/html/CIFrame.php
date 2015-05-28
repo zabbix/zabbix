@@ -28,7 +28,7 @@ class CIFrame extends CTag {
 		$this->setWidth($width);
 		$this->setHeight($height);
 		$this->setScrolling($scrolling);
-		$this->setAttribute('id', $id);
+		$this->setId($id);
 	}
 
 	public function setSrc($value = null) {

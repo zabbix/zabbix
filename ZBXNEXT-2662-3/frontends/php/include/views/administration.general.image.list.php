@@ -33,7 +33,8 @@ $imageForm = new CForm();
 $imageForm->setName('imageForm');
 $imageForm->addItem(BR());
 
-$imageTable = (new CTable(_('No images found.')))
+$imageTable = (new CTable())
+	->setNoDataMessage(_('No images found.'))
 	->addClass('header_wide')
 	->addClass('padding_standard');
 

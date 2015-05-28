@@ -92,7 +92,7 @@ if (!empty($this->data['interfaces'])) {
 	}
 
 	$span = new CSpan(_('No interface found'), ZBX_STYLE_RED);
-	$span->setAttribute('id', 'interface_not_defined');
+	$span->setId('interface_not_defined');
 	$span->setAttribute('style', 'display: none;');
 
 	$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], false, 'interface_row');
@@ -192,10 +192,11 @@ $itemFormList->addRow(_('SQL query'),
 $itemFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5), false, 'row_delay');
 
 // append delay flex to form list
-$delayFlexTable = (new CTable(_('No flexible intervals defined.')))
+$delayFlexTable = (new CTable())
+	->setNoDataMessage(_('No flexible intervals defined.'))
 	->addClass('formElementTable')
 	->setAttribute('style', 'min-width: 310px;')
-	->setAttribute('id', 'delayFlexTable')
+	->setId('delayFlexTable')
 	->setHeader([_('Interval'), _('Period'), _('Action')]);
 $i = 0;
 $this->data['maxReached'] = false;
@@ -236,10 +237,10 @@ $newFlexInt = new CSpan([
 	SPACE,
 	new CButton('add_delay_flex', _('Add'), null, 'button-form')
 ]);
-$newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
+$newFlexInt->setId('row-new-delay-flex-fields');
 
 $maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), ZBX_STYLE_RED);
-$maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');
+$maxFlexMsg->setId('row-new-delay-flex-max-reached');
 $maxFlexMsg->setAttribute('style', 'display: none;');
 
 $itemFormList->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], false, 'row_new_delay_flex', 'new');
@@ -266,7 +267,7 @@ $conditionFormList = new CFormList();
 
 // type of calculation
 $formula = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
-$formula->setAttribute('id', 'formula');
+$formula->setId('formula');
 $formula->setAttribute('placeholder', 'A or (B and C) &hellip;');
 if ($this->data['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
 	$formula->addClass('hidden');
@@ -286,9 +287,10 @@ $conditionFormList->addRow(_('Type of calculation'),
 );
 
 // macros
-$conditionTable = (new CTable(''))
+$conditionTable = (new CTable())
+	->setNoDataMessage('')
 	->addClass('formElementTable')
-	->setAttribute('id', 'conditions')
+	->setId('conditions')
 	->addRow([_('Label'), _('Macro'), SPACE, _('Regular expression'), SPACE]);
 
 $conditions = $this->data['conditions'];
@@ -335,9 +337,9 @@ $buttonColumn = new CCol(
 );
 $buttonColumn->setAttribute('colspan', 5);
 
-$buttonRow = new CRow();
-$buttonRow->setAttribute('id', 'row_new_macro');
-$buttonRow->addItem($buttonColumn);
+$buttonRow = (new CRow())
+	->setId('row_new_macro')
+	->addItem($buttonColumn);
 
 $conditionTable->addRow($buttonRow);
 

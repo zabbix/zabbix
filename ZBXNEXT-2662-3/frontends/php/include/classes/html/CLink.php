@@ -29,7 +29,7 @@ class CLink extends CTag {
 		$this->nosid = $nosid;
 
 		if (!is_null($class)) {
-			$this->setAttribute('class', $class);
+			$this->addClass($class);
 		}
 		if (!is_null($item)) {
 			$this->addItem($item);
@@ -38,7 +38,7 @@ class CLink extends CTag {
 			$this->setUrl($url);
 		}
 		if (!is_null($action)) {
-			$this->setAttribute('onclick', $action);
+			$this->onClick($action);
 		}
 	}
 

@@ -253,8 +253,7 @@ $filterForm = new CFilter('web.httpdetails.filter.state');
 $filterForm->addNavigator();
 $graphsWidget->addItem($filterForm);
 
-$graphTable = new CTableInfo();
-$graphTable->setAttribute('id', 'graph');
+$graphTable = (new CTableInfo())->setId('graph');
 
 // dims
 $graphDims = getGraphDims();

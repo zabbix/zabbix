@@ -45,7 +45,7 @@ show_table_header(permission2str($permission));
 
 // host groups
 $hostGroupForm = new CForm();
-$hostGroupForm->setAttribute('id', 'groups');
+$hostGroupForm->setId('groups');
 
 $hostGroupTable = new CTableInfo();
 $hostGroupTable->setHeader([

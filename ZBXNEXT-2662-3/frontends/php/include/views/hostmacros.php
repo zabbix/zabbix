@@ -32,7 +32,7 @@ if ($data['readonly'] && !$data['macros']) {
 else {
 	$table = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('id', 'tbl_macros');
+		->setAttribute('tbl_macros');
 
 	$actions_col = $data['readonly'] ? null : '';
 	if ($data['show_inherited_macros']) {

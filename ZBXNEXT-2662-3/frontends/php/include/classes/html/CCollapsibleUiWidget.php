@@ -52,7 +52,7 @@ class CCollapsibleUiWidget extends CUiWidget {
 			$icon->setTitle(_('Open'));
 		}
 		$icon->onClick('changeWidgetState(this, "'.$this->id.'");');
-		$icon->setAttribute('id', $this->id.'_icon');
+		$icon->setId($this->id.'_icon');
 		$icons[] = $icon;
 
 		parent::setHeader($caption, $icons);
@@ -63,7 +63,7 @@ class CCollapsibleUiWidget extends CUiWidget {
 	 */
 	public function build() {
 		$body = new CDiv($this->body, 'body');
-		$body->setAttribute('id', $this->id);
+		$body->setId($this->id);
 
 		if (!$this->open) {
 			$body->setAttribute('style', 'display: none;');

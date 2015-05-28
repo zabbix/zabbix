@@ -49,7 +49,7 @@ $widget->setControls($header_form);
 
 $table = (new CTable())
 	->addClass('formElementTable')
-	->setAttribute('id', 'tbl_macros')
+	->setId('tbl_macros')
 	->addRow([_('Macro'), '', _('Value'), '']);
 
 // fields

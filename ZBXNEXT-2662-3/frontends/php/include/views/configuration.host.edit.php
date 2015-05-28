@@ -124,7 +124,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	// table for agent interfaces with footer
 	$ifTab = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('id', 'agentInterfaces')
+		->setId('agentInterfaces')
 		->setAttribute('data-type', 'agent');
 
 	// headers with sizes
@@ -150,7 +150,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	// table for SNMP interfaces with footer
 	$ifTab = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('id', 'SNMPInterfaces')
+		->setId('SNMPInterfaces')
 		->setAttribute('data-type', 'snmp');
 
 	$helpTextWhenDragInterfaceSNMP = new CSpan(_('Drag here to change the type of the interface to "SNMP" type.'));
@@ -167,7 +167,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	// table for JMX interfaces with footer
 	$ifTab = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('id', 'JMXInterfaces')
+		->setId('JMXInterfaces')
 		->setAttribute('data-type', 'jmx');
 	$helpTextWhenDragInterfaceJMX = new CSpan(_('Drag here to change the type of the interface to "JMX" type.'));
 	$helpTextWhenDragInterfaceJMX->addClass('dragHelpText');
@@ -184,7 +184,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	// table for IPMI interfaces with footer
 	$ifTab = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('id', 'IPMIInterfaces')
+		->setId('IPMIInterfaces')
 		->setAttribute('data-type', 'ipmi');
 	$helpTextWhenDragInterfaceIPMI = new CSpan(_('Drag here to change the type of the interface to "IPMI" type.'));
 	$helpTextWhenDragInterfaceIPMI->addClass('dragHelpText');
@@ -212,7 +212,7 @@ else {
 	// table for agent interfaces with footer
 	$ifTab = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('id', 'agentInterfaces')
+		->setId('agentInterfaces')
 		->setAttribute('data-type', 'agent');
 
 	// header
@@ -238,7 +238,7 @@ else {
 	// table for SNMP interfaces with footer
 	$ifTab = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('id', 'SNMPInterfaces')
+		->setId('SNMPInterfaces')
 		->setAttribute('data-type', 'snmp');
 
 	$row = (new CRow())->setId('SNMPInterfacesFooter');
@@ -252,7 +252,7 @@ else {
 	// table for JMX interfaces with footer
 	$ifTab = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('id', 'JMXInterfaces')
+		->setId('JMXInterfaces')
 		->setAttribute('data-type', 'jmx');
 
 	$row = (new CRow())->setId('JMXInterfacesFooter');
@@ -266,7 +266,7 @@ else {
 	// table for IPMI interfaces with footer
 	$ifTab = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('id', 'IPMIInterfaces')
+		->setId('IPMIInterfaces')
 		->setAttribute('data-type', 'ipmi');
 
 	$row = (new CRow())->setId('IPMIInterfacesFooter');
@@ -551,9 +551,10 @@ $divTabs->addTab('hostTab', _('Host'), $hostList);
 $tmplList = new CFormList();
 
 // create linked template table
-$linkedTemplateTable = (new CTable(_('No templates linked.')))
+$linkedTemplateTable = (new CTable())
+	->setNoDataMessage(_('No templates linked.'))
 	->addClass('formElementTable')
-	->setAttribute('id', 'linkedTemplateTable');
+	->setId('linkedTemplateTable');
 
 // templates for normal hosts
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
@@ -589,7 +590,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	// create new linked template table
 	$newTemplateTable = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('id', 'newTemplateTable');
+		->setId('newTemplateTable');
 
 	$newTemplateTable->addRow([new CMultiSelect([
 		'name' => 'add_templates[]',

@@ -156,7 +156,7 @@ function insert_show_color_picker_javascript() {
 	}
 
 	$cancel = new CSpan(_('Cancel'), 'link');
-	$cancel->setAttribute('onclick', 'javascript: hide_color_picker();');
+	$cancel->onClick('javascript: hide_color_picker();');
 
 	$tmp = [$table, $cancel];
 	$script = '

@@ -31,11 +31,8 @@ class CTable extends CTag {
 	protected $rownum;
 	protected $message;
 
-	public function __construct($message = null, $class = null) {
+	public function __construct() {
 		parent::__construct('table', 'yes');
-		if ($class !== null) {
-			$this->addClass($class);
-		}
 		$this->rownum = 0;
 		$this->oddRowClass = null;
 		$this->evenRowClass = null;
@@ -44,27 +41,42 @@ class CTable extends CTag {
 		$this->footer = '';
 		$this->footerClass = null;
 		$this->colnum = 1;
-		$this->message = $message;
 	}
 
 	public function setOddRowClass($value = null) {
 		$this->oddRowClass = $value;
+
+		return $this;
 	}
 
 	public function setEvenRowClass($value = null) {
 		$this->evenRowClass = $value;
+
+		return $this;
 	}
 
 	public function setAlign($value) {
-		return $this->attributes['align'] = $value;
+		$this->attributes['align'] = $value;
+
+		return $this;
 	}
 
 	public function setCellPadding($value) {
-		return $this->attributes['cellpadding'] = strval($value);
+		$this->attributes['cellpadding'] = strval($value);
+
+		return $this;
 	}
 
 	public function setCellSpacing($value) {
-		return $this->attributes['cellspacing'] = strval($value);
+		$this->attributes['cellspacing'] = strval($value);
+
+		return $this;
+	}
+
+	public function setNoDataMessage($message) {
+		$this->message = $message;
+
+		return $this;
 	}
 
 	public function prepareRow($item, $class = null, $id = null) {
@@ -114,7 +126,7 @@ class CTable extends CTag {
 		}
 		if (is_object($value) && strtolower(get_class($value)) === 'crow') {
 			if (!is_null($class)) {
-				$value->setAttribute('class', $class);
+				$value->addClass($class);
 			}
 		}
 		else {

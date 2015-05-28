@@ -188,7 +188,7 @@ class CScreenGraph extends CScreenBase {
 				$item = new CLink(null, 'charts.php?graphid='.$resourceId.'&period='.$this->timeline['period'].
 						'&stime='.$this->timeline['stimeNow']);
 			}
-			$item->setAttribute('id', $containerId);
+			$item->setId($containerId);
 
 			return $this->getOutput($item);
 		}

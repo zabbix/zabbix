@@ -51,9 +51,8 @@ if (!empty($this->data['hostid'])) {
 }
 
 // create table
-$itemTable = new CTableInfo(
-	($this->data['filterSet']) ? null : _('Specify some filter condition to see the items.')
-);
+$itemTable = (new CTableInfo())
+	->setNoDataMessage(($this->data['filterSet']) ? null : _('Specify some filter condition to see the items.'));
 $itemTable->setHeader([
 	(new CColHeader(
 		new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")

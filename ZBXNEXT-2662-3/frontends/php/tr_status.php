@@ -276,7 +276,7 @@ $headerCheckBox = ($showEventColumn)
 
 if ($showEvents != EVENTS_OPTION_NOEVENT) {
 	$showHideAllDiv = new CDiv(SPACE, 'filterclosed');
-	$showHideAllDiv->setAttribute('id', $switcherName);
+	$showHideAllDiv->setId($switcherName);
 }
 else {
 	$showHideAllDiv = null;

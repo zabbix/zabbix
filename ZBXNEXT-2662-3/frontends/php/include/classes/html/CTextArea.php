@@ -41,8 +41,8 @@ class CTextArea extends CTag {
 	 */
 	public function __construct($name = 'textarea', $value = '', $options = []) {
 		parent::__construct('textarea', 'yes');
-		$this->setAttribute('class', 'input');
-		$this->setAttribute('id', zbx_formatDomId($name));
+		$this->addClass('input');
+		$this->setId(zbx_formatDomId($name));
 		$this->setAttribute('name', $name);
 		$this->setAttribute('rows', !empty($options['rows']) ? $options['rows'] : ZBX_TEXTAREA_STANDARD_ROWS);
 		if (isset($options['readonly'])) {

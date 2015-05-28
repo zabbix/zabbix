@@ -27,28 +27,28 @@ $sysmapWidget = (new CWidget())->setTitle(_('Network maps'));
 $menu = (new CList([], 'object-group'))
 	->addItem([
 		_('Icon').':'.SPACE,
-		(new CLink(_('Add'), 'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setAttribute('id', 'selementAdd'),
+		(new CLink(_('Add'), 'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setId('selementAdd'),
 		SPACE.'/'.SPACE,
-		(new CLink(_('Remove'), 'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setAttribute('id', 'selementRemove')
+		(new CLink(_('Remove'), 'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setId('selementRemove')
 	])
 	->addItem([
 		_('Link').':'.SPACE,
-		(new CLink(_('Add'), 'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setAttribute('id', 'linkAdd'),
+		(new CLink(_('Add'), 'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setId('linkAdd'),
 		SPACE.'/'.SPACE,
-		(new CLink(_('Remove'), 'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setAttribute('id', 'linkRemove')
+		(new CLink(_('Remove'), 'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setId('linkRemove')
 	])
 	->addItem([
 		_('Expand macros').':'.SPACE,
 		(new CLink(($this->data['sysmap']['expand_macros'] == SYSMAP_EXPAND_MACROS_ON) ? _('On') : _('Off'),
-			'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setAttribute('id', 'expand_macros')
+			'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setId('expand_macros')
 	])
 	->addItem([
 		_('Grid').':'.SPACE,
 		(new CLink(($this->data['sysmap']['grid_show'] == SYSMAP_GRID_SHOW_ON) ? _('Shown') : _('Hidden'),
-			'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setAttribute('id', 'gridshow'),
+			'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setId('gridshow'),
 		SPACE.'/'.SPACE,
 		(new CLink(($this->data['sysmap']['grid_align'] == SYSMAP_GRID_ALIGN_ON) ? _('On') : _('Off'),
-			'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setAttribute('id', 'gridautoalign')
+			'javascript:void(0);', ZBX_STYLE_LINK_DOTTED, null, true))->setId('gridautoalign')
 	])
 	->addItem(new CComboBox('gridsize', $this->data['sysmap']['grid_size'], null, [
 		20 => '20x20',
@@ -57,17 +57,17 @@ $menu = (new CList([], 'object-group'))
 		75 => '75x75',
 		100 => '100x100'
 	]))
-	->addItem((new CSubmit('gridalignall', _('Align icons')))->addClass('btn-alt')->setAttribute('id', 'gridalignall'))
-	->addItem((new CSubmit('update', _('Update')))->setAttribute('id', 'sysmap_update'));
+	->addItem((new CSubmit('gridalignall', _('Align icons')))->addClass('btn-alt')->setId('gridalignall'))
+	->addItem((new CSubmit('update', _('Update')))->setId('sysmap_update'));
 
 // create map
 $backgroundImage = new CImg('images/general/tree/zero.gif', 'Sysmap');
-$backgroundImage->setAttribute('id', 'sysmap_img', $this->data['sysmap']['width'], $this->data['sysmap']['height']);
+$backgroundImage->setId('sysmap_img', $this->data['sysmap']['width'], $this->data['sysmap']['height']);
 
 $backgroundImageTable = new CTable();
 $backgroundImageTable->addRow($backgroundImage);
 
-$container = (new CDiv())->setAttribute('id', 'sysmap_cnt');
+$container = (new CDiv())->setId('sysmap_cnt');
 
 $sysmapWidget->addItem($menu)
 	->addItem((new CDiv(null, 'table-forms-container'))

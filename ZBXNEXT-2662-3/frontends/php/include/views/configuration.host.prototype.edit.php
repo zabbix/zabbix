@@ -84,7 +84,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	// table for agent interfaces with footer
 	$ifTab = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('id', 'agentInterfaces')
+		->setId('agentInterfaces')
 		->setAttribute('data-type', 'agent');
 
 	// header
@@ -110,7 +110,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	// table for SNMP interfaces with footer
 	$ifTab = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('id', 'SNMPInterfaces')
+		->setId('SNMPInterfaces')
 		->setAttribute('data-type', 'snmp');
 
 	$row = (new CRow())->setId('SNMPInterfacesFooter');
@@ -124,7 +124,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	// table for JMX interfaces with footer
 	$ifTab = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('id', 'JMXInterfaces')
+		->setId('JMXInterfaces')
 		->setAttribute('data-type', 'jmx');
 
 	$row = (new CRow())->setId('JMXInterfacesFooter');
@@ -138,7 +138,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	// table for IPMI interfaces with footer
 	$ifTab = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('id', 'IPMIInterfaces')
+		->setId('IPMIInterfaces')
 		->setAttribute('data-type', 'ipmi');
 
 	$row = (new CRow())->setId('IPMIInterfacesFooter');
@@ -190,18 +190,19 @@ $groupList->addRow(_('Groups'), new CMultiSelect([
 ]));
 
 // new group prototypes
-$customGroupTable = (new CTable(SPACE))
+$customGroupTable = (new CTable())
+	->setNoDataMessage(SPACE)
 	->addClass('formElementTable')
-	->setAttribute('id', 'tbl_group_prototypes');
+	->setId('tbl_group_prototypes');
 
 // buttons
 $addButton = new CButton('group_prototype_add', _('Add'), null, 'link_menu');
 $buttonColumn = new CCol($addButton);
 $buttonColumn->setAttribute('colspan', 5);
 
-$buttonRow = new CRow();
-$buttonRow->setAttribute('id', 'row_new_group_prototype');
-$buttonRow->addItem($buttonColumn);
+$buttonRow = (new CRow())
+	->setId('row_new_group_prototype')
+	->addItem($buttonColumn);
 
 $customGroupTable->addRow($buttonRow);
 $groupDiv = new CDiv($customGroupTable, 'objectgroup border_dotted group-prototypes');
@@ -213,10 +214,12 @@ $divTabs->addTab('groupTab', _('Groups'), $groupList);
 $tmplList = new CFormList();
 
 // create linked template table
-$linkedTemplateTable = (new CTable(_('No templates linked.')))->addClass('formElementTable');
-$linkedTemplateTable->setAttribute('id', 'linkedTemplateTable');
-$linkedTemplateTable->setAttribute('style', 'min-width: 400px;');
-$linkedTemplateTable->setHeader([_('Name'), _('Action')]);
+$linkedTemplateTable = (new CTable())
+	->setNoDataMessage(_('No templates linked.'))
+	->addClass('formElementTable')
+	->setId('linkedTemplateTable')
+	->setAttribute('style', 'min-width: 400px;')
+	->setHeader([_('Name'), _('Action')]);
 
 $ignoreTemplates = [];
 if ($hostPrototype['templates']) {
@@ -242,9 +245,10 @@ elseif ($hostPrototype['templateid']) {
 
 // create new linked template table
 if (!$hostPrototype['templateid']) {
-	$newTemplateTable = (new CTable())->addClass('formElementTable');
-	$newTemplateTable->setAttribute('id', 'newTemplateTable');
-	$newTemplateTable->setAttribute('style', 'min-width: 400px;');
+	$newTemplateTable = (new CTable())
+		->addClass('formElementTable')
+		->setId('newTemplateTable')
+		->setAttribute('style', 'min-width: 400px;');
 
 	$newTemplateTable->addRow([new CMultiSelect([
 		'name' => 'add_templates[]',

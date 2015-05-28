@@ -26,7 +26,7 @@ class CButton extends CTag implements CButtonInterface {
 		$this->setAttribute('type', 'button');
 
 		if ($name !== null) {
-			$this->setAttribute('id', zbx_formatDomId($name));
+			$this->setId(zbx_formatDomId($name));
 			$this->setAttribute('name', $name);
 		}
 

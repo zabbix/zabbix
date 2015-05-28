@@ -240,7 +240,7 @@ if (hasRequest('sform')) {
 	}
 
 	$ctb = new CTextBox('item', $itemName, 80);
-	$ctb->setAttribute('id', 'item');
+	$ctb->setId('item');
 	$ctb->setAttribute('disabled', 'disabled');
 
 	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item".
@@ -252,12 +252,12 @@ if (hasRequest('sform')) {
 
 
 	$exp_select = new CComboBox('expr_type');
-	$exp_select->setAttribute('id', 'expr_type');
+	$exp_select->setId('expr_type');
 	$exp_select->addItem(CTextTriggerConstructor::EXPRESSION_TYPE_MATCH, _('Include'));
 	$exp_select->addItem(CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH, _('Exclude'));
 
 	$ctb = new CTextBox('expression', '', 80);
-	$ctb->setAttribute('id', 'logexpr');
+	$ctb->setId('logexpr');
 
 	$cb = new CButton('add_exp', _('Add'), 'javascript: add_logexpr();');
 	$cbAdd = new CButton('add_key_and', _('AND'), 'javascript: add_keyword_and();');
@@ -268,28 +268,28 @@ if (hasRequest('sform')) {
 		[$ctb, BR(), $cbIregexp, 'iregexp', SPACE, $cbAdd, SPACE, $cbOr, SPACE, $exp_select, SPACE, $cb]
 	);
 
-	$keyTable = new CTableInfo();
-	$keyTable->setAttribute('id', 'key_list');
-	$keyTable->setHeader([_('Keyword'), _('Type'), _('Action')]);
+	$keyTable = (new CTableInfo())
+		->setId('key_list')
+		->setHeader([_('Keyword'), _('Type'), _('Action')]);
 
-	$table = new CTableInfo();
-	$table->setAttribute('id', 'exp_list');
-	$table->setHeader([_('Expression'), _('Type'), _('Position'), _('Action')]);
+	$table = (new CTableInfo())
+		->setId('exp_list')
+		->setHeader([_('Expression'), _('Type'), _('Position'), _('Action')]);
 
 	$maxId = 0;
 	foreach ($expressions as $id => $expr) {
 		$imgup = new CImg('images/general/arrow_up.png', 'up', 12, 14);
-		$imgup->setAttribute('onclick', 'javascript: element_up("logtr'.$id.'");');
-		$imgup->setAttribute('onmouseover', 'javascript: this.style.cursor = "pointer";');
+		$imgup->onClick('javascript: element_up("logtr'.$id.'");');
+		$imgup->onMouseover('javascript: this.style.cursor = "pointer";');
 		$imgup->addClass('updown');
 
 		$imgdn = new CImg('images/general/arrow_down.png', 'down', 12, 14);
-		$imgdn->setAttribute('onclick', 'javascript: element_down("logtr'.$id.'");');
-		$imgdn->setAttribute('onmouseover', 'javascript: this.style.cursor = "pointer";');
+		$imgdn->onClick('javascript: element_down("logtr'.$id.'");');
+		$imgdn->onMouseover('javascript: this.style.cursor = "pointer";');
 		$imgdn->addClass('updown');
 
 		$del_url = new CSpan(_('Delete'), 'link');
-		$del_url->setAttribute('onclick', 'javascript:'.
+		$del_url->onClick('javascript:'.
 			' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) remove_expression("logtr'.$id.'");'.
 			' return false;'
 		);
@@ -300,7 +300,7 @@ if (hasRequest('sform')) {
 			[$imgup, ' ', $imgdn],
 			$del_url
 		]);
-		$row->setAttribute('id', 'logtr'.$id);
+		$row->setId('logtr'.$id);
 		$table->addRow($row);
 
 		$frmTRLog->addVar('expressions['.$id.'][value]', $expr['value']);
@@ -319,7 +319,7 @@ if (hasRequest('sform')) {
 			' return false;'
 		);
 		$row = new CRow([htmlspecialchars($val['value']), $val['type'], $del_url]);
-		$row->setAttribute('id', 'keytr'.$id);
+		$row->setId('keytr'.$id);
 		$keyTable->addRow($row);
 
 		$frmTRLog->addVar('keys['.$id.'][value]', $val['value']);

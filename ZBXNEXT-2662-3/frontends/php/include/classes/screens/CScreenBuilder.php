@@ -337,10 +337,10 @@ class CScreenBuilder {
 
 		// create screen table
 		$screenTable = new CTable();
-		$screenTable->setAttribute('class',
+		$screenTable->addClass(
 			in_array($this->mode, [SCREEN_MODE_PREVIEW, SCREEN_MODE_SLIDESHOW]) ? 'screen-table' : 'screen-table dashed-border'
 		);
-		$screenTable->setAttribute('id', self::makeScreenTableId($this->screen['screenid']));
+		$screenTable->setId(self::makeScreenTableId($this->screen['screenid']));
 
 		// action top row
 		if ($this->mode == SCREEN_MODE_EDIT) {
@@ -493,7 +493,7 @@ class CScreenBuilder {
 
 				if ($this->mode == SCREEN_MODE_EDIT && !$isEditForm) {
 					$item = new CDiv($item, 'draggable');
-					$item->setAttribute('id', 'position_'.$r.'_'.$c);
+					$item->setId('position_'.$r.'_'.$c);
 					$item->setAttribute('data-xcoord', $c);
 					$item->setAttribute('data-ycoord', $r);
 				}

@@ -25,6 +25,6 @@ class CListItem extends CTag {
 		parent::__construct('li', 'yes');
 		$this->addItem($value);
 		$this->addClass($class);
-		$this->setAttribute('id', $id);
+		$this->setId($id);
 	}
 }

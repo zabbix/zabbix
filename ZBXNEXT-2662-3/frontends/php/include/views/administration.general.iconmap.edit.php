@@ -28,8 +28,7 @@ $name->setAttribute('maxlength', 64);
 $name->setAttribute('autofocus', 'autofocus');
 $iconMapTab->addRow(_('Name'), $name);
 
-$iconMapTable = new CTable();
-$iconMapTable->setAttribute('id', 'iconMapTable');
+$iconMapTable = (new CTable())->setId('iconMapTable');
 
 $iconMapForm = new CForm();
 $iconMapForm->addVar('form', 1);
