@@ -4144,7 +4144,8 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		{
 			continue;
 		}
-		else if (GNUTLS_E_WARNING_ALERT_RECEIVED == res || GNUTLS_E_FATAL_ALERT_RECEIVED == res)
+		else if (GNUTLS_E_WARNING_ALERT_RECEIVED == res || GNUTLS_E_FATAL_ALERT_RECEIVED == res ||
+				GNUTLS_E_GOT_APPLICATION_DATA == res)
 		{
 			const char	*msg;
 			int		alert;
@@ -4161,6 +4162,13 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 						"%s", __function_name, alert, msg);
 				continue;
 			}
+			else if (GNUTLS_E_GOT_APPLICATION_DATA == res)
+					/* if rehandshake request deal with it as with error */
+			{
+				*error = zbx_dsprintf(*error, "%s(): gnutls_handshake() returned "
+						"GNUTLS_E_GOT_APPLICATION_DATA", __function_name);
+				goto out;
+			}
 			else	/* GNUTLS_E_FATAL_ALERT_RECEIVED */
 			{
 				*error = zbx_dsprintf(*error, "%s(): gnutls_handshake() failed with fatal alert: %d %s",
@@ -4168,7 +4176,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 				goto out;
 			}
 		}
-		else	/* TODO should we process GNUTLS_E_GOT_APPLICATION_DATA ? */
+		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): gnutls_handshake() returned: %d %s",
 					__function_name, res, gnutls_strerror(res));
