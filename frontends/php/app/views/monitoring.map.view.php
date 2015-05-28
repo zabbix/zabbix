@@ -72,7 +72,8 @@ if ($data['maps']) {
 	]));
 }
 else {
-	$mapTable = (new CTable(_('No maps found.')))
+	$mapTable = (new CTable())
+		->setNoDataMessage(_('No maps found.'))
 		->addClass('map')
 		->addClass('map-container')
 		->setAttribute('style', 'margin-top: 4px;');

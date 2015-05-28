@@ -135,7 +135,8 @@ $sysmapList->addRow(_('Problem display'), $showUnackComboBox);
 $sysmapList->addRow(_('Minimum trigger severity'), new CSeverity(['name' => 'severity_min', 'value' => $this->data['sysmap']['severity_min']]));
 
 // create url table
-$urlTable = (new CTable(_('No URLs defined.')))
+$urlTable = (new CTable())
+	->setNoDataMessage(_('No URLs defined.'))
 	->addClass('formElementTable')
 	->setAttribute('style', 'min-width: 500px;')
 	->setHeader([_('Name'), _('URL'), _('Element'), SPACE]);
@@ -151,7 +152,7 @@ foreach ($this->data['sysmap']['urls'] as $url) {
 	$removeButton->onClick('$("urlEntry_'.$i.'").remove();');
 
 	$urlRow = new CRow([$urlLabel, $urlLink, $urlEtype, $removeButton]);
-	$urlRow->setAttribute('id', 'urlEntry_'.$i);
+	$urlRow->setId('urlEntry_'.$i);
 
 	$urlTable->addRow($urlRow);
 	$i++;
@@ -168,7 +169,7 @@ $templateRemoveButton = new CSpan(_('Remove'), ZBX_STYLE_LINK_ACTION.' link_menu
 $templateRemoveButton->onClick('$("entry_#{id}").remove();');
 $templateUrlRow = new CRow([$templateUrlLabel, $templateUrlLink, $templateUrlEtype, $templateRemoveButton]);
 $templateUrlRow->addStyle('display: none');
-$templateUrlRow->setAttribute('id', 'urlEntryTpl');
+$templateUrlRow->setId('urlEntryTpl');
 $urlTable->addRow($templateUrlRow);
 
 // append "add" button to url table

@@ -93,7 +93,7 @@ class CImg extends CTag {
 		$id = $this->getAttribute('id');
 		if (empty($id)) {
 			$id = 'img'.uniqid();
-			$this->setAttribute('id', $id);
+			$this->setId($id);
 		}
 
 		insert_js(
@@ -106,7 +106,7 @@ class CImg extends CTag {
 		);
 
 		$this->addClass('preloader');
-		$this->setAttribute('id', $id.'preloader');
+		$this->setId($id.'preloader');
 		$this->setAttribute('src', 'styles/themes/'.getUserTheme(CWebUser::$data).'/images/preloader.gif');
 	}
 }

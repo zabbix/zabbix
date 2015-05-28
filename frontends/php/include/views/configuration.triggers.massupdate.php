@@ -58,10 +58,11 @@ $triggersFormList->addRow(
 );
 
 // append dependencies to form list
-$dependenciesTable = (new CTable(_('No dependencies defined.')))
+$dependenciesTable = (new CTable())
+	->setNoDataMessage(_('No dependencies defined.'))
 	->addClass('formElementTable')
 	->setAttribute('style', 'min-width: 500px;')
-	->setAttribute('id', 'dependenciesTable')
+	->setId('dependenciesTable')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($data['dependencies'] as $dependency) {
@@ -86,7 +87,7 @@ foreach ($data['dependencies'] as $dependency) {
 		'link_menu'
 	)]);
 
-	$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
+	$row->setId('dependency_'.$dependency['triggerid']);
 	$dependenciesTable->addRow($row);
 }
 
@@ -102,7 +103,7 @@ $dependenciesDiv = new CDiv(
 	],
 	'objectgroup inlineblock border_dotted'
 );
-$dependenciesDiv->setAttribute('id', 'dependencies_div');
+$dependenciesDiv->setId('dependencies_div');
 
 $triggersFormList->addRow(
 	[_('Replace dependencies'), SPACE,

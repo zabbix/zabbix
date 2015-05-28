@@ -59,7 +59,7 @@ class CFormTable extends CForm {
 			return $this->error('Incorrect value for setName "'.$value.'".');
 		}
 		$this->setAttribute('name', $value);
-		$this->setAttribute('id', zbx_formatDomId($value));
+		$this->setId(zbx_formatDomId($value));
 		return true;
 	}
 
@@ -102,7 +102,7 @@ class CFormTable extends CForm {
 		}
 
 		if ($id !== null) {
-			$item1->setAttribute('id', zbx_formatDomId($id));
+			$item1->setId(zbx_formatDomId($id));
 		}
 		array_push($this->center_items, $item1);
 

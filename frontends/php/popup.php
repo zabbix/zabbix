@@ -544,7 +544,7 @@ insert_js_function('addValue');
 if ($srctbl == 'usrgrp') {
 	$form = new CForm();
 	$form->setName('usrgrpform');
-	$form->setAttribute('id', 'usrgrps');
+	$form->setId('usrgrps');
 
 	$table = new CTableInfo();
 	$table->setHeader([
@@ -568,7 +568,7 @@ if ($srctbl == 'usrgrp') {
 
 	foreach ($userGroups as $userGroup) {
 		$name = new CLink($userGroup['name'], 'javascript:void(0);', null, null, true);
-		$name->setAttribute('id', 'spanid'.$userGroup['usrgrpid']);
+		$name->setId('spanid'.$userGroup['usrgrpid']);
 
 		if ($multiselect) {
 			$js_action = "javascript: addValue(".zbx_jsvalue($reference).', '.zbx_jsvalue($userGroup['usrgrpid']).');';
@@ -580,7 +580,7 @@ if ($srctbl == 'usrgrp') {
 			];
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		$name->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
+		$name->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 		$table->addRow([
 			$multiselect ? new CCheckBox('usrgrps['.$userGroup['usrgrpid'].']', null, null, $userGroup['usrgrpid']) : null,
@@ -604,7 +604,7 @@ if ($srctbl == 'usrgrp') {
 elseif ($srctbl == 'users') {
 	$form = new CForm();
 	$form->setName('userform');
-	$form->setAttribute('id', 'users');
+	$form->setId('users');
 
 	$table = new CTableInfo();
 	$table->setHeader([
@@ -630,7 +630,7 @@ elseif ($srctbl == 'users') {
 
 	foreach ($users as &$user) {
 		$alias = new CLink($user['alias'], 'javascript:void(0);', null, null, true);
-		$alias->setAttribute('id', 'spanid'.$user['userid']);
+		$alias->setId('spanid'.$user['userid']);
 
 		if (isset($srcfld2) && $srcfld2 == 'fullname') {
 			$user[$srcfld2] = getUserFullname($user);
@@ -648,7 +648,7 @@ elseif ($srctbl == 'users') {
 			}
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		$alias->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
+		$alias->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 		$table->addRow([
 			$multiselect ? new CCheckBox('users['.zbx_jsValue($user[$srcfld1]).']', null, null, $user['userid']) : null,
@@ -676,7 +676,7 @@ elseif ($srctbl == 'users') {
 elseif ($srctbl == 'templates') {
 	$form = new CForm();
 	$form->setName('templateform');
-	$form->setAttribute('id', 'templates');
+	$form->setId('templates');
 
 	$table = new CTableInfo();
 	$table->setHeader([
@@ -706,7 +706,7 @@ elseif ($srctbl == 'templates') {
 
 	foreach ($templates as &$template) {
 		$name = new CLink($template['name'], 'javascript:void(0);', null, null, true);
-		$name->setAttribute('id', 'spanid'.$template['templateid']);
+		$name->setId('spanid'.$template['templateid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).', '.
 			$parentId.');';
@@ -724,7 +724,7 @@ elseif ($srctbl == 'templates') {
 			$name->removeAttribute('class');
 		}
 		else {
-			$name->setAttribute('onclick', $jsAction.' jQuery(this).removeAttr("onclick");');
+			$name->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
 
 			$data[$template['templateid']] = [
 				'id' => $template['templateid'],
@@ -755,7 +755,7 @@ elseif ($srctbl == 'templates') {
 elseif ($srctbl == 'hosts') {
 	$form = new CForm();
 	$form->setName('hostform');
-	$form->setAttribute('id', 'hosts');
+	$form->setId('hosts');
 
 	$table = new CTableInfo();
 	$table->setHeader([
@@ -785,7 +785,7 @@ elseif ($srctbl == 'hosts') {
 
 	foreach ($hosts as &$host) {
 		$name = new CLink($host['name'], 'javascript:void(0);', null, null, true);
-		$name->setAttribute('id', 'spanid'.$host['hostid']);
+		$name->setId('spanid'.$host['hostid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
 			$parentId.');';
@@ -803,7 +803,7 @@ elseif ($srctbl == 'hosts') {
 			$name->removeAttribute('class');
 		}
 		else {
-			$name->setAttribute('onclick', $jsAction.' jQuery(this).removeAttr("onclick");');
+			$name->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
 
 			$data[$host['hostid']] = [
 				'id' => $host['hostid'],
@@ -834,7 +834,7 @@ elseif ($srctbl == 'hosts') {
 elseif ($srctbl == 'host_templates') {
 	$form = new CForm();
 	$form->setName('hosttemplateform');
-	$form->setAttribute('id', 'hosts');
+	$form->setId('hosts');
 
 	$table = new CTableInfo();
 	$table->setHeader([
@@ -865,7 +865,7 @@ elseif ($srctbl == 'host_templates') {
 
 	foreach ($hosts as &$host) {
 		$name = new CLink($host['name'], 'javascript:void(0);', null, null, true);
-		$name->setAttribute('id', 'spanid'.$host['hostid']);
+		$name->setId('spanid'.$host['hostid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
 			$parentId.');';
@@ -883,7 +883,7 @@ elseif ($srctbl == 'host_templates') {
 			$name->removeAttribute('class');
 		}
 		else {
-			$name->setAttribute('onclick', $jsAction.' jQuery(this).removeAttr("onclick");');
+			$name->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
 
 			$data[$host['hostid']] = [
 				'id' => $host['hostid'],
@@ -914,7 +914,7 @@ elseif ($srctbl == 'host_templates') {
 elseif ($srctbl == 'host_groups') {
 	$form = new CForm();
 	$form->setName('hostGroupsform');
-	$form->setAttribute('id', 'hostGroups');
+	$form->setId('hostGroups');
 
 	$table = new CTableInfo();
 	$table->setHeader([
@@ -941,7 +941,7 @@ elseif ($srctbl == 'host_groups') {
 
 	foreach ($hostgroups as &$hostgroup) {
 		$name = new CLink($hostgroup['name'], 'javascript:void(0);', null, null, true);
-		$name->setAttribute('id', 'spanid'.$hostgroup['groupid']);
+		$name->setId('spanid'.$hostgroup['groupid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($hostgroup['groupid']).', '.
 			$parentId.');';
@@ -958,7 +958,7 @@ elseif ($srctbl == 'host_groups') {
 			$name->removeAttribute('class');
 		}
 		else {
-			$name->setAttribute('onclick', $jsAction.' jQuery(this).removeAttr("onclick");');
+			$name->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
 
 			$data[$hostgroup['groupid']] = [
 				'id' => $hostgroup['groupid'],
@@ -994,7 +994,7 @@ elseif ($srctbl === 'help_items') {
 	foreach ($helpItems->getByType($itemType) as $helpItem) {
 		$action = get_window_opener($dstfrm, $dstfld1, $helpItem[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 		$name = new CLink($helpItem['key'], 'javascript:void(0);', null, null, true);
-		$name->setAttribute('onclick', $action.' close_window(); return false;');
+		$name->onClick($action.' close_window(); return false;');
 		$table->addRow([$name, $helpItem['description']]);
 	}
 	$widget->addItem($table)->show();
@@ -1007,7 +1007,7 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 
 	$form = new CForm();
 	$form->setName('triggerform');
-	$form->setAttribute('id', 'triggers');
+	$form->setId('triggers');
 
 	$table = new CTableInfo();
 
@@ -1101,7 +1101,7 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 			}
 			$js_action = 'addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); return false;';
 		}
-		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
+		$description->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 		if (count($trigger['dependencies']) > 0) {
 			$description = [
@@ -1158,7 +1158,7 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 	$form = new CForm();
 	$form->setName('itemform');
-	$form->setAttribute('id', 'items');
+	$form->setId('items');
 
 	$itemPrototypesPopup = ($srctbl === 'item_prototypes');
 
@@ -1248,7 +1248,7 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 				($submitParent ? 'true' : 'false').'); return false;';
 		}
 
-		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
+		$description->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 		$table->addRow([
 			($hostid > 0) ? null : $item['hostname'],
@@ -1296,7 +1296,7 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 elseif ($srctbl == 'applications') {
 	$form = new CForm();
 	$form->setName('applicationform');
-	$form->setAttribute('id', 'applications');
+	$form->setId('applications');
 
 	$table = new CTableInfo();
 	$table->setHeader([
@@ -1329,7 +1329,7 @@ elseif ($srctbl == 'applications') {
 
 	foreach ($apps as &$app) {
 		$name = new CLink($app['name'], 'javascript:void(0);', null, null, true);
-		$name->setAttribute('id', 'spanid'.$app['applicationid']);
+		$name->setId('spanid'.$app['applicationid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($app['applicationid']).', '.
 			$parentId.');';
@@ -1340,7 +1340,7 @@ elseif ($srctbl == 'applications') {
 			);
 		}
 
-		$name->setAttribute('onclick', $jsAction.' jQuery(this).removeAttr("onclick");');
+		$name->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
 
 		$data[$app['applicationid']] = [
 			'id' => $app['applicationid'],
@@ -1370,7 +1370,7 @@ elseif ($srctbl == 'applications') {
 elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
 	$form = new CForm();
 	$form->setName('graphform');
-	$form->setAttribute('id', 'graphs');
+	$form->setId('graphs');
 
 	$graphPrototypesPopup = ($srctbl === 'graph_prototypes');
 
@@ -1436,7 +1436,7 @@ elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).');'.
 				' close_window(); return false;';
 		}
-		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
+		$description->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
 			$description = new CCol([
@@ -1484,7 +1484,7 @@ elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
 elseif ($srctbl == 'sysmaps') {
 	$form = new CForm();
 	$form->setName('sysmapform');
-	$form->setAttribute('id', 'sysmaps');
+	$form->setId('sysmaps');
 
 	$table = new CTableInfo();
 
@@ -1524,7 +1524,7 @@ elseif ($srctbl == 'sysmaps') {
 			$description->removeAttribute('class');
 		}
 		else {
-			$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
+			$description->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 		}
 
 		if ($multiselect) {
@@ -1552,7 +1552,7 @@ elseif ($srctbl == 'slides') {
 
 	$form = new CForm();
 	$form->setName('slideform');
-	$form->setAttribute('id', 'slides');
+	$form->setId('slides');
 
 	$table = new CTableInfo();
 
@@ -1588,7 +1588,7 @@ elseif ($srctbl == 'slides') {
 			];
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		$name->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
+		$name->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
 			$name = new CCol([new CCheckBox('slides['.zbx_jsValue($dbSlideshow[$srcfld1]).']', null, null, $dbSlideshow['slideshowid']), $name]);
@@ -1614,7 +1614,7 @@ elseif ($srctbl == 'screens') {
 
 	$form = new CForm();
 	$form->setName('screenform');
-	$form->setAttribute('id', 'screens');
+	$form->setId('screens');
 
 	$table = new CTableInfo();
 
@@ -1648,7 +1648,7 @@ elseif ($srctbl == 'screens') {
 			];
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		$name->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
+		$name->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
 			$name = new CCol([new CCheckBox('screens['.zbx_jsValue($screen[$srcfld1]).']', null, null, $screen['screenid']), $name]);
@@ -1689,7 +1689,7 @@ elseif ($srctbl == 'screens2') {
 		$name = new CLink($screen['name'], 'javascript:void(0);', null, null, true);
 
 		$action = get_window_opener($dstfrm, $dstfld1, $screen[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $screen[$srcfld2]) : '');
-		$name->setAttribute('onclick', $action.' close_window(); return false;');
+		$name->onClick($action.' close_window(); return false;');
 		$table->addRow($name);
 	}
 	$widget->addItem($table)->show();
@@ -1711,7 +1711,7 @@ elseif ($srctbl === 'drules') {
 	foreach ($dRules as $dRule) {
 		$action = get_window_opener($dstfrm, $dstfld1, $dRule[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $dRule[$srcfld2]) : '');
 		$name = new CLink($dRule['name'], 'javascript:void(0);', null, null, true);
-		$name->setAttribute('onclick', $action.' close_window(); return false;');
+		$name->onClick($action.' close_window(); return false;');
 		$table->addRow($name);
 	}
 	$widget->addItem($table)->show();
@@ -1736,7 +1736,7 @@ elseif ($srctbl === 'dchecks') {
 			$action = get_window_opener($dstfrm, $dstfld1, $dCheck[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $name) : '');
 			$name = new CLink($name, 'javascript:void(0);', null, null, true);
-			$name->setAttribute('onclick', $action.' close_window(); return false;');
+			$name->onClick($action.' close_window(); return false;');
 			$table->addRow($name);
 		}
 	}
@@ -1759,7 +1759,7 @@ elseif ($srctbl == 'proxies') {
 	while ($row = DBfetch($result)) {
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 		$name = new CLink($row['host'], 'javascript:void(0);', null, null, true);
-		$name->setAttribute('onclick', $action.' close_window(); return false;');
+		$name->onClick($action.' close_window(); return false;');
 		$table->addRow($name);
 	}
 	$widget->addItem($table)->show();
@@ -1770,7 +1770,7 @@ elseif ($srctbl == 'proxies') {
 elseif ($srctbl == 'scripts') {
 	$form = new CForm();
 	$form->setName('scriptform');
-	$form->setAttribute('id', 'scripts');
+	$form->setId('scripts');
 
 	$table = new CTableInfo();
 
@@ -1816,7 +1816,7 @@ elseif ($srctbl == 'scripts') {
 			];
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
+		$description->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
 			$description = new CCol([new CCheckBox('scripts['.zbx_jsValue($script[$srcfld1]).']', null, null, $script['scriptid']), $description]);

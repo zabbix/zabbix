@@ -917,7 +917,8 @@ input[type="text"], input[type="password"], input[type="search"], input[type="nu
     border-color: #0275b8; }
 
 button::-moz-focus-inner, button.btn-alt::-moz-focus-inner {
-  padding: 0; }
+  padding: 0;
+  border: 0; }
 
 button, button.btn-alt {
   -webkit-border-radius: 2px;
@@ -934,10 +935,13 @@ button, button.btn-alt {
   -webkit-transition: border-color, background-color 0.2s ease-out;
   -moz-transition: border-color, background-color 0.2s ease-out;
   transition: border-color, background-color 0.2s ease-out; }
+  button:focus {
+    outline: thin dotted;
+    outline-offset: -2px; }
   button.btn-alt {
     color: #0275b8;
     background-color: transparent; }
-  button.btn-add, button.btn-add:hover, button.btn-add:active {
+  button.btn-link, button.btn-link:hover, button.btn-link:active {
     background-color: transparent;
     border: none;
     color: #0275b8;

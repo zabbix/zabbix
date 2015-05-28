@@ -37,7 +37,7 @@ $widgetRefreshParams = [];
 $icon = new CRedirectButton(SPACE, null);
 $icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
 $icon->setTitle(_('Action'));
-$icon->setAttribute('id', 'favouriteGraphs');
+$icon->setId('favouriteGraphs');
 $icon->setMenuPopup(CMenuPopupHelper::getFavouriteGraphs());
 
 $favouriteGraphs = new CCollapsibleUiWidget(WIDGET_FAVOURITE_GRAPHS, $data['favourite_graphs']);
@@ -53,7 +53,7 @@ $dashboardGrid[$col][$row] = $favouriteGraphs;
 $icon = new CRedirectButton(SPACE, null);
 $icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
 $icon->setTitle(_('Action'));
-$icon->setAttribute('id', 'favouriteMaps');
+$icon->setId('favouriteMaps');
 $icon->setMenuPopup(CMenuPopupHelper::getFavouriteMaps());
 
 $favouriteMaps = new CCollapsibleUiWidget(WIDGET_FAVOURITE_MAPS, $data['favourite_maps']);
@@ -67,13 +67,13 @@ $dashboardGrid[$col][$row] = $favouriteMaps;
 
 // favourite screens
 $icon = new CIcon(_('Menu'), 'iconmenu');
-$icon->setAttribute('id', 'favouriteScreens');
+$icon->setId('favouriteScreens');
 $icon->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
 
 $icon = new CRedirectButton(SPACE, null);
 $icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
 $icon->setTitle(_('Action'));
-$icon->setAttribute('id', 'favouriteScreens');
+$icon->setId('favouriteScreens');
 $icon->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
 
 $favouriteScreens = new CCollapsibleUiWidget(WIDGET_FAVOURITE_SCREENS, $data['favourite_screens']);

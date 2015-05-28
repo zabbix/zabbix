@@ -27,10 +27,10 @@ class CInput extends CTag {
 
 		// if id is not passed, it will be the same as element name
 		if ($id === null) {
-			$this->setAttribute('id', zbx_formatDomId($name));
+			$this->setId(zbx_formatDomId($name));
 		}
 		else {
-			$this->setAttribute('id', zbx_formatDomId($id));
+			$this->setId(zbx_formatDomId($id));
 		}
 		$this->setAttribute('name', $name);
 		$this->setAttribute('value', $value);

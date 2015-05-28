@@ -88,10 +88,11 @@ $servicesFormList->addRow(_('Sort order (0->999)'), new CTextBox('sortorder', $t
 /*
  * Dependencies tab
  */
-$servicesChildTable = (new CTable(_('No dependencies defined.')))
+$servicesChildTable = (new CTable())
+	->setNoDataMessage(_('No dependencies defined.'))
 	->addClass('formElementTable')
 	->setAttribute('style', 'min-width:500px;')
-	->setAttribute('id', 'service_children')
+	->setId('service_children')
 	->setHeader([_('Services'), _('Soft'), _('Trigger'), _('Action')]);
 foreach ($this->data['children'] as $child) {
 	$childrenLink = new CLink($child['name'], 'services.php?form=1&serviceid='.$child['serviceid']);
@@ -112,7 +113,7 @@ foreach ($this->data['children'] as $child) {
 		!empty($child['trigger']) ? $child['trigger'] : '',
 		new CButton('remove', _('Remove'), 'javascript: removeDependentChild(\''.$child['serviceid'].'\');', 'link_menu')
 	]);
-	$row->setAttribute('id', 'children_'.$child['serviceid']);
+	$row->setId('children_'.$child['serviceid']);
 	$servicesChildTable->addRow($row);
 }
 $servicesDependenciesFormList = new CFormList('servicesDependensiesFormList');
@@ -129,7 +130,8 @@ $servicesDependenciesFormList->addRow(
  * Service times tab
  */
 $servicesTimeFormList = new CFormList('servicesTimeFormList');
-$servicesTimeTable = (new CTable(_('No times defined. Work 24x7.')))
+$servicesTimeTable = (new CTable())
+	->setNoDataMessage(_('No times defined. Work 24x7.'))
 	->addClass('formElementTable')
 	->setAttribute('style', 'min-width: 500px;')
 	->setHeader([_('Type'), _('Interval'), _('Note'), _('Action')]);
@@ -165,7 +167,7 @@ foreach ($this->data['times'] as $serviceTime) {
 		htmlspecialchars($serviceTime['note']),
 		new CButton('remove', _('Remove'), 'javascript: removeTime(\''.$i.'\');', 'link_menu')
 	]);
-	$row->setAttribute('id', 'times_'.$i);
+	$row->setId('times_'.$i);
 	$servicesTimeTable->addRow($row);
 	$i++;
 }

@@ -122,7 +122,7 @@ if ($this->data['input_method'] == IM_TREE) {
 }
 elseif ($this->data['input_method'] != IM_FORCED) {
 	$inputMethodToggle = new CSpan(_('Expression constructor'), 'link');
-	$inputMethodToggle->setAttribute('onclick', 'javascript: '.
+	$inputMethodToggle->onClick('javascript: '.
 		'document.getElementById("toggle_input_method").value=1;'.
 		'document.getElementById("input_method").value='.(($this->data['input_method'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
 		'document.forms["'.$triggersForm->getName().'"].submit();'
@@ -136,7 +136,7 @@ if ($this->data['input_method'] == IM_TREE) {
 	$expressionTable = (new CTable())
 		->addClass('formElementTable')
 		->setAttribute('style', 'min-width: 500px;')
-		->setAttribute('id', 'exp_list');
+		->setId('exp_list');
 	$expressionTable->setOddRowClass('even_row');
 	$expressionTable->setEvenRowClass('even_row');
 	$expressionTable->setHeader([
@@ -151,7 +151,7 @@ if ($this->data['input_method'] == IM_TREE) {
 		foreach ($this->data['eHTMLTree'] as $i => $e) {
 			if (!$this->data['limited']) {
 				$deleteUrl = new CSpan(_('Delete'), 'link');
-				$deleteUrl->setAttribute('onclick', 'javascript:'.
+				$deleteUrl->onClick('javascript:'.
 					' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
 						' delete_expression("'.$e['id'] .'");'.
 						' document.forms["'.$triggersForm->getName().'"].submit();'.
@@ -193,7 +193,7 @@ if ($this->data['input_method'] == IM_TREE) {
 				for ($i = 0; $i < $listSize; $i++) {
 					if (gettype($e['list'][$i]) == 'object' && get_class($e['list'][$i]) == 'CSpan' && $e['list'][$i]->getAttribute('class') == 'link') {
 						$e['list'][$i]->removeAttribute('class');
-						$e['list'][$i]->setAttribute('onclick', '');
+						$e['list'][$i]->onClick('');
 					}
 				}
 			}
@@ -228,7 +228,7 @@ if ($this->data['input_method'] == IM_TREE) {
 	]);
 
 	$inputMethodToggle = new CSpan(_('Close expression constructor'), 'link');
-	$inputMethodToggle->setAttribute('onclick', 'javascript: '.
+	$inputMethodToggle->onClick('javascript: '.
 		'document.getElementById("toggle_input_method").value=1;'.
 		'document.getElementById("input_method").value='.IM_ESTABLISHED.';'.
 		'document.forms["'.$triggersForm->getName().'"].submit();'
@@ -261,10 +261,11 @@ $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
  * Dependencies tab
  */
 $dependenciesFormList = new CFormList('dependenciesFormList');
-$dependenciesTable = (new CTable(_('No dependencies defined.')))
+$dependenciesTable = (new CTable())
+	->setNoDataMessage(_('No dependencies defined.'))
 	->addClass('formElementTable')
 	->setAttribute('style', 'min-width: 500px;')
-	->setAttribute('id', 'dependenciesTable')
+	->setId('dependenciesTable')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($this->data['db_dependencies'] as $dependency) {
@@ -289,7 +290,7 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 		'link_menu'
 	)]);
 
-	$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
+	$row->setId('dependency_'.$dependency['triggerid']);
 	$dependenciesTable->addRow($row);
 }
 

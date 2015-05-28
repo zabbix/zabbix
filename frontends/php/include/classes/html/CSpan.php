@@ -24,10 +24,10 @@ class CSpan extends CTag {
 	public function __construct($items = null, $class = null, $id = null) {
 		parent::__construct('span', 'yes');
 		if ($class !== null) {
-			$this->setAttribute('class', $class);
+			$this->addClass($class);
 		}
 		if ($id !== null) {
-			$this->setAttribute('id', $id);
+			$this->setId($id);
 		}
 		$this->addItem($items);
 	}

@@ -1390,8 +1390,9 @@ function getEventActionsStatus($eventIds) {
 			$status = new CRow([$columnLeft, $columnRight]);
 		}
 
-		$actions[$eventId] = new CTable(' - ');
-		$actions[$eventId]->addRow($status);
+		$actions[$eventId] = (new CTable())
+			->setNoDataMessage(' - ')
+			->addRow($status);
 	}
 
 	return $actions;

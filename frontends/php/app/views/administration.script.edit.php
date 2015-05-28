@@ -25,7 +25,7 @@ $this->includeJSfile('app/views/administration.script.edit.js.php');
 $scriptsWidget = (new CWidget())->setTitle(_('Scripts'));
 
 $scriptForm = new CForm();
-$scriptForm->setAttribute('id', 'scriptForm');
+$scriptForm->setId('scriptForm');
 $scriptForm->addVar('form', 1);
 $scriptForm->addVar('scriptid', $data['scriptid']);
 
@@ -107,11 +107,11 @@ $scriptView->addTab('scripts', _('Script'), $scriptFormList);
 
 // footer
 $cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=script.list');
-$cancelButton->setAttribute('id', 'cancel');
+$cancelButton->setId('cancel');
 
 if ($data['scriptid'] == 0) {
 	$addButton = new CSubmitButton(_('Add'), 'action', 'script.create');
-	$addButton->setAttribute('id', 'add');
+	$addButton->setId('add');
 
 	$scriptView->setFooter(makeFormFooter(
 		$addButton,
@@ -120,14 +120,14 @@ if ($data['scriptid'] == 0) {
 }
 else {
 	$updateButton = new CSubmitButton(_('Update'), 'action', 'script.update');
-	$updateButton->setAttribute('id', 'update');
+	$updateButton->setId('update');
 	$cloneButton = new CSimpleButton(_('Clone'));
-	$cloneButton->setAttribute('id', 'clone');
+	$cloneButton->setId('clone');
 	$deleteButton = new CRedirectButton(_('Delete'),
 		'zabbix.php?action=script.delete&sid='.$data['sid'].'&scriptids[]='.$data['scriptid'],
 		_('Delete script?')
 	);
-	$deleteButton->setAttribute('id', 'delete');
+	$deleteButton->setId('delete');
 
 	$scriptView->setFooter(makeFormFooter(
 		$updateButton,

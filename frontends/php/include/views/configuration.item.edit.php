@@ -99,7 +99,7 @@ if (!empty($this->data['interfaces'])) {
 	}
 
 	$span = new CSpan(_('No interface found'), ZBX_STYLE_RED);
-	$span->setAttribute('id', 'interface_not_defined');
+	$span->setId('interface_not_defined');
 	$span->setAttribute('style', 'display: none;');
 
 	$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], false, 'interface_row');
@@ -259,10 +259,11 @@ $itemFormList->addRow(_('Use custom multiplier'), $multiplier, false, 'row_multi
 $itemFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5), false, 'row_delay');
 
 // append delay flex to form list
-$delayFlexTable = (new CTable(_('No flexible intervals defined.')))
+$delayFlexTable = (new CTable())
+	->setNoDataMessage(_('No flexible intervals defined.'))
 	->addClass('formElementTable')
 	->setAttribute('style', 'min-width: 310px;')
-	->setAttribute('id', 'delayFlexTable')
+	->setId('delayFlexTable')
 	->setHeader([_('Interval'), _('Period'), _('Action')]);
 $i = 0;
 $this->data['maxReached'] = false;
@@ -278,7 +279,7 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 		$delayFlex['period'],
 		new CButton('remove', _('Remove'), 'javascript: removeDelayFlex('.$i.');', 'link_menu')
 	]);
-	$row->setAttribute('id', 'delayFlex_'.$i);
+	$row->setId('delayFlex_'.$i);
 	$delayFlexTable->addRow($row);
 
 	// limit count of intervals, 7 intervals by 30 symbols = 210 characters, db storage field is 256
@@ -304,10 +305,10 @@ $newFlexInt = new CSpan([
 	SPACE,
 	new CButton('add_delay_flex', _('Add'), null, 'button-form')
 ]);
-$newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
+$newFlexInt->setId('row-new-delay-flex-fields');
 
 $maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), ZBX_STYLE_RED);
-$maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');
+$maxFlexMsg->setId('row-new-delay-flex-max-reached');
 $maxFlexMsg->setAttribute('style', 'display: none;');
 
 $itemFormList->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], false, 'row_new_delay_flex', 'new');

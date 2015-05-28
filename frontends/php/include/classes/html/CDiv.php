@@ -27,7 +27,7 @@ class CDiv extends CTag {
 			$this->addClass($class);
 		}
 		if ($id) {
-			$this->setAttribute('id', zbx_formatDomId($id));
+			$this->setId(zbx_formatDomId($id));
 		}
 		$this->addItem($items);
 

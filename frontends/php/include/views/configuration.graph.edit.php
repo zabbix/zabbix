@@ -217,9 +217,10 @@ else {
 }
 
 // append items to form list
-$itemsTable = (new CTable())->addClass('formElementTable');
-$itemsTable->setAttribute('style', 'min-width: 700px;');
-$itemsTable->setAttribute('id', 'itemsTable');
+$itemsTable = (new CTable())
+	->addClass('formElementTable')
+	->setAttribute('style', 'min-width: 700px;')
+	->setId('itemsTable');
 $itemsTable->setHeader([
 	(new CCol(SPACE))->setWidth(15),
 	(new CCol(SPACE))->setWidth(15),

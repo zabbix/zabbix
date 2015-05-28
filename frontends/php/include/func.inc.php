@@ -1693,13 +1693,13 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 
 		if ($title !== null) {
 			$link = new CLink(_('Details'), null, ZBX_STYLE_LINK_ACTION, null, true);
-			$link->setAttribute('onclick', 'javascript: showHide("msg-messages", IE ? "block" : "");');
+			$link->onClick('javascript: showHide("msg-messages", IE ? "block" : "");');
 			$msg_details->addItem($link);
 		}
 
 		$list = new CList();
 		if ($title !== null) {
-			$list->setAttribute('id', 'msg-messages');
+			$list->setId('msg-messages');
 
 			if (!$show_details) {
 				$list->setAttribute('style', 'display: none;');
@@ -1716,7 +1716,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	if ($title !== null && $show_close_box) {
 		$msg_box->addItem((new CSpan())
 			->addClass('overlay-close-btn')
-			->setAttribute('onclick', 'javascript: showHide("global-message", IE ? "block" : "");')
+			->onClick('javascript: showHide("global-message", IE ? "block" : "");')
 			->setAttribute('title', _('Close')));
 	}
 

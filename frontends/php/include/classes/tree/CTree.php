@@ -82,7 +82,7 @@ class CTree {
 
 		$tr = new CRow();
 		$tr->addItem($td);
-		$tr->setAttribute('id', 'id_'.$id);
+		$tr->setId('id_'.$id);
 		$tr->setAttribute('style', $this->tree[$id]['parentid'] != '0' ? 'display: none;' : '');
 
 		foreach ($this->fields as $value) {
@@ -110,8 +110,8 @@ class CTree {
 
 		if ($id != 0 && array_key_exists('childnodes', $this->tree[$id])) {
 			$div = new CDiv(new CSpan(null, 'arrow-right'), 'treeview');
-			$div->setAttribute('onclick', $this->treename.'.closeSNodeX("'.$id.'", this.getElementsByTagName(\'span\')[0]);');
-			$div->setAttribute('id', 'idi_'.$id);
+			$div->onClick($this->treename.'.closeSNodeX("'.$id.'", this.getElementsByTagName(\'span\')[0]);');
+			$div->setId('idi_'.$id);
 			$td->addItem($div);
 		}
 

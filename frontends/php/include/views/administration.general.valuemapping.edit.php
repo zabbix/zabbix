@@ -35,9 +35,10 @@ $nameTextBox->setAttribute('autofocus', 'autofocus');
 $valueMappingFormList->addRow(_('Name'), $nameTextBox);
 
 // mappings
-$mappingsTable = (new CTable(SPACE))
+$mappingsTable = (new CTable())
+	->setNoDataMessage(SPACE)
 	->addClass('formElementTable')
-	->setAttribute('id', 'mappingsTable')
+	->setId('mappingsTable')
 	->addRow([_('Value'), SPACE, _('Mapped to'), SPACE])
 	->addRow((new CCol(new CButton('addMapping', _('Add'), '', 'link_menu')))->setColSpan(4));
 $valueMappingFormList->addRow(_('Mappings'), new CDiv($mappingsTable, 'border_dotted inlineblock objectgroup'));

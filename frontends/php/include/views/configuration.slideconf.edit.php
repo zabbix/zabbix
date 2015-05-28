@@ -40,16 +40,16 @@ $slideFormList->addRow(_('Name'), $nameTextBox);
 $slideFormList->addRow(_('Default delay (in seconds)'), new CNumericBox('delay', $this->data['delay'], 5, false, false, false));
 
 // append slide table
-$slideTable = new CTableInfo();
-$slideTable->setAttribute('style', 'min-width: 312px;');
-$slideTable->setAttribute('id', 'slideTable');
-$slideTable->setHeader([
-	(new CColHeader(SPACE))->setWidth(15),
-	(new CColHeader(SPACE))->setWidth(15),
-	_('Screen'),
-	(new CColHeader(_('Delay')))->setWidth(70),
-	(new CColHeader(_('Action')))->setWidth(50)
-]);
+$slideTable = (new CTableInfo())
+	->setAttribute('style', 'min-width: 312px;')
+	->setId('slideTable')
+	->setHeader([
+		(new CColHeader(SPACE))->setWidth(15),
+		(new CColHeader(SPACE))->setWidth(15),
+		_('Screen'),
+		(new CColHeader(_('Delay')))->setWidth(70),
+		(new CColHeader(_('Action')))->setWidth(50)
+	]);
 
 $i = 1;
 foreach ($this->data['slides'] as $key => $slides) {

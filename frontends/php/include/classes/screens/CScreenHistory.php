@@ -223,7 +223,7 @@ class CScreenHistory extends CScreenBase {
 
 						$newRow = new CRow($row);
 						if (!is_null($color)) {
-							$newRow->setAttribute('class', $color);
+							$newRow->addClass($color);
 						}
 
 						$historyTable->addRow($newRow);

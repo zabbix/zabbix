@@ -96,7 +96,8 @@ $maintenanceFormList->addRow(_('Description'), new CTextArea('description', $thi
  * Maintenance period tab
  */
 $maintenancePeriodFormList = new CFormList('maintenancePeriodFormList');
-$maintenancePeriodTable = (new CTable(_('No maintenance periods defined.')))
+$maintenancePeriodTable = (new CTable())
+	->setNoDataMessage(_('No maintenance periods defined.'))
 	->addClass('formElementTable')
 	->setHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')]);
 

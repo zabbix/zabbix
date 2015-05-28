@@ -72,7 +72,7 @@ class CUiWidget extends CDiv {
 
 		parent::__construct(null, 'dashbrd-widget');
 
-		$this->setAttribute('id', $this->id.'_widget');
+		$this->setId($this->id.'_widget');
 	}
 
 	/**
@@ -130,7 +130,7 @@ class CUiWidget extends CDiv {
 	 */
 	public function build() {
 		$body = new CDiv($this->body, 'body');
-		$body->setAttribute('id', $this->id);
+		$body->setId($this->id);
 
 		$this->cleanItems();
 

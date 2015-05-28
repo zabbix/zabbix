@@ -199,7 +199,7 @@ function get_icon($type, $params = []) {
 				$icon->setTitle(_('Add to favourites'));
 				$icon->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
-			$icon->setAttribute('id', 'addrm_fav');
+			$icon->setId('addrm_fav');
 
 			return $icon;
 

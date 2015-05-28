@@ -113,7 +113,7 @@ foreach (getHostInventories() as $inventory) {
 }
 
 $inventoryFilterTable = new CTable();
-$inventoryFilterTable->setAttribute('id', 'inventory-filter');
+$inventoryFilterTable->setId('inventory-filter');
 $i = 0;
 foreach ($inventoryFilters as $field) {
 	$inventoryFilterTable->addRow([

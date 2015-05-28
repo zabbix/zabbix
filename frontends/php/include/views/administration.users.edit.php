@@ -254,7 +254,8 @@ if ($this->data['is_profile']) {
 		new CButton('stop', _('Stop'), 'javascript: AudioControl.stop();', 'button-form')
 	];
 
-	$triggersTable = (new CTable(''))
+	$triggersTable = (new CTable())
+		->setNoDataTable('')
 		->addClass('invisible')
 		->addRow($resolved);
 

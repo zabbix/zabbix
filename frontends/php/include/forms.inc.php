@@ -251,7 +251,8 @@ function getPermissionsFormList($rights = [], $user_type = USER_TYPE_ZABBIX_USER
 			}
 		}
 
-		$table = (new CTable(_('No accessible resources')))
+		$table = (new CTable())
+			->setNoDataMessage(_('No accessible resources'))
 			->addClass('right_table')
 			->addClass('calculated');
 		if (!$isHeaderDisplayed) {
@@ -372,7 +373,7 @@ function getItemFilterForm(&$items) {
 	// type select
 	$fTypeVisibility = [];
 	$cmbType = new CComboBox('filter_type', $filter_type);
-	$cmbType->setAttribute('id', 'filter_type');
+	$cmbType->setId('filter_type');
 	$cmbType->addItem(-1, _('all'));
 	foreach (['filter_delay_label', 'filter_delay'] as $vItem) {
 		zbx_subarray_push($fTypeVisibility, -1, $vItem);
@@ -445,13 +446,13 @@ function getItemFilterForm(&$items) {
 
 	// update interval
 	$updateIntervalLabel = new CSpan(_('Update interval (in sec)'));
-	$updateIntervalLabel->setAttribute('id', 'filter_delay_label');
+	$updateIntervalLabel->setId('filter_delay_label');
 
 	$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, false, true);
 
 	// data type
 	$dataTypeLabel = new CSpan(bold(_('Data type').NAME_DELIMITER));
-	$dataTypeLabel->setAttribute('id', 'filter_data_type_label');
+	$dataTypeLabel->setId('filter_data_type_label');
 
 	$dataTypeInput = new CComboBox('filter_data_type', $filter_data_type);
 	$dataTypeInput->addItem(-1, _('all'));
@@ -459,25 +460,25 @@ function getItemFilterForm(&$items) {
 
 	// SNMP community
 	$snmpCommunityLabel = new CSpan([bold(_('SNMP community')), SPACE._('like').NAME_DELIMITER]);
-	$snmpCommunityLabel->setAttribute('id', 'filter_snmp_community_label');
+	$snmpCommunityLabel->setId('filter_snmp_community_label');
 
 	$snmpCommunityField = new CTextBox('filter_snmp_community', $filter_snmp_community, ZBX_TEXTBOX_FILTER_SIZE);
 
 	// SNMPv3 security name
 	$snmpSecurityLabel = new CSpan([bold(_('Security name')), SPACE._('like').NAME_DELIMITER]);
-	$snmpSecurityLabel->setAttribute('id', 'filter_snmpv3_securityname_label');
+	$snmpSecurityLabel->setId('filter_snmpv3_securityname_label');
 
 	$snmpSecurityField = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
 
 	// SNMP OID
 	$snmpOidLabel = new CSpan([bold(_('SNMP OID')), SPACE._('like').NAME_DELIMITER]);
-	$snmpOidLabel->setAttribute('id', 'filter_snmp_oid_label');
+	$snmpOidLabel->setId('filter_snmp_oid_label');
 
 	$snmpOidField = new CTextBox('filter_snmp_oid', $filter_snmp_oid, ZBX_TEXTBOX_FILTER_SIZE);
 
 	// port
 	$portLabel = new CSpan([bold(_('Port')), SPACE._('like').NAME_DELIMITER]);
-	$portLabel->setAttribute('id', 'filter_port_label');
+	$portLabel->setId('filter_port_label');
 
 	$portField = new CNumericBox('filter_port', $filter_port, 5, false, true);
 

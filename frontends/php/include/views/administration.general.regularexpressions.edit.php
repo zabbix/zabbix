@@ -49,7 +49,7 @@ $headerForm->addItem($controls);
 $regExpWidget->setControls($headerForm);
 
 $form = new CForm();
-$form->setAttribute('id', 'zabbixRegExpForm');
+$form->setId('zabbixRegExpForm');
 $form->addVar('form', 1);
 $form->addVar('regexpid', $data['regexpid']);
 
@@ -65,15 +65,15 @@ $exprTab->addRow(_('Name'), $nameTextBox);
 
 $exprTable = (new CTable())
 	->addClass('formElementTable')
-	->addClass('formWideTable');
-$exprTable->setAttribute('id', 'exprTable');
-$exprTable->setHeader([
-	_('Expression'),
-	(new CCol(_('Expression type')))->addClass(ZBX_STYLE_NOWRAP),
-	(new CCol(_('Case sensitive')))->addClass(ZBX_STYLE_NOWRAP),
-	SPACE
-]);
-$exprTable->setFooter(new CButton('add', _('Add'), null, 'link_menu exprAdd'));
+	->addClass('formWideTable')
+	->setId('exprTable')
+	->setHeader([
+		_('Expression'),
+		(new CCol(_('Expression type')))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol(_('Case sensitive')))->addClass(ZBX_STYLE_NOWRAP),
+		SPACE
+	])
+	->setFooter(new CButton('add', _('Add'), null, 'link_menu exprAdd'));
 $exprTab->addRow(_('Expressions'), new CDiv($exprTable, 'inlineblock border_dotted objectgroup'));
 
 $exprForm = (new CTable())
@@ -99,9 +99,9 @@ $preloaderDiv = new CDiv(null, 'preloader', 'testPreloader');
 $preloaderDiv->addStyle('display: none');
 $testTab->addRow(SPACE, [new CButton('testExpression', _('Test expressions')), $preloaderDiv]);
 
-$tabExp = new CTableInfo();
-$tabExp->setAttribute('id', 'testResultTable');
-$tabExp->setHeader([_('Expression'), _('Expression type'), _('Result')]);
+$tabExp = (new CTableInfo())
+	->setId('testResultTable')
+	->setHeader([_('Expression'), _('Expression type'), _('Result')]);
 $testTab->addRow(_('Result'), $tabExp);
 
 $regExpView = new CTabView();

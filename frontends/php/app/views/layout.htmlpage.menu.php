@@ -25,7 +25,7 @@
 
 	// 1st level menu
 	$top_menu = new CDiv($top_menu_items, 'top-nav-container');
-	$top_menu->setAttribute('id', 'mmenu');
+	$top_menu->setId('mmenu');
 
 	$icons = new CList([], 'top-nav-icons');
 
@@ -92,7 +92,7 @@
 		}
 
 		$sub_menu_div = new CDiv($sub_menu_row, 'top-subnav-container');
-		$sub_menu_div->setAttribute('id', 'sub_'.$label);
+		$sub_menu_div->setId('sub_'.$label);
 		$sub_menu_div->onMouseover('javascript: MMenu.submenu_mouseOver();');
 		$sub_menu_div->onMouseout('javascript: MMenu.mouseOut();');
 
@@ -108,7 +108,7 @@
 	}
 
 	$sub_menu_div = new CDiv(SPACE);
-	$sub_menu_div->setAttribute('id', 'sub_empty');
+	$sub_menu_div->setId('sub_empty');
 	$sub_menu_div->setAttribute('style', 'display: '.($menu_selected ? 'none;' : 'block;'));
 
 	$menu_divs[] = $sub_menu_div;

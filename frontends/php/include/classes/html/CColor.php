@@ -27,7 +27,7 @@ class CColor extends CObject {
 		$txt = new CTextBox($name, $value);
 		$txt->addStyle('width: 6em;');
 		$txt->setAttribute('maxlength', 6);
-		$txt->setAttribute('id', zbx_formatDomId($name));
+		$txt->setId(zbx_formatDomId($name));
 		$txt->onChange('set_color_by_name("'.$name.'", this.value)');
 		$txt->addStyle('style', 'margin-top: 0px; margin-bottom: 0px;');
 

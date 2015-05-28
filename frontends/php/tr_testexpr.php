@@ -47,7 +47,7 @@ list($outline, $eHTMLTree) = analyzeExpression($expression);
 // test data (create table, create check fields)
 $dataTable = (new CTable())
 	->addClass('tableinfo')
-	->setAttribute('id', 'data_list')
+	->setId('data_list')
 	->setHeader([_('Expression Variable Elements'), _('Result type'), _('Value')]);
 
 $datas = [];
@@ -133,7 +133,7 @@ $testForm->addRow(_('Test data'), $dataTable);
 
 $resultTable = (new CTable())
 	->addClass('tableinfo')
-	->setAttribute('id', 'result_list');
+	->setId('result_list');
 $resultTable->setOddRowClass('even_row');
 $resultTable->setEvenRowClass('even_row');
 $resultTable->setHeader([_('Expression'), _('Result')]);
