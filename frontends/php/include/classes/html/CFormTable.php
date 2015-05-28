@@ -37,9 +37,9 @@ class CFormTable extends CForm {
 		$form_variable = is_null($form_variable) ? 'form' : $form_variable;
 		$this->addVar($form_variable, getRequest($form_variable, 1));
 
-		$this->bottom_items = (new CCol(SPACE))->
-			addClass('form_row_last')->
-			setColSpan(2);
+		$this->bottom_items = (new CCol(SPACE))
+			->addClass('form_row_last')
+			->setColSpan(2);
 	}
 
 	public function setAction($value) {
@@ -78,9 +78,9 @@ class CFormTable extends CForm {
 		if (is_object($item1) && strtolower(get_class($item1)) === 'crow') {
 		}
 		elseif (is_object($item1) && strtolower(get_class($item1)) === 'ctable') {
-			$td = (new CCol($item1))->
-				addClass('form_row_c')->
-				setColSpan(2);
+			$td = (new CCol($item1))
+				->addClass('form_row_c')
+				->setColSpan(2);
 			$item1 = new CRow($td);
 		}
 		else {
@@ -116,9 +116,9 @@ class CFormTable extends CForm {
 		if (is_null($class)) {
 			$class = 'form_row_c';
 		}
-		$col = (new CCol($value))->
-			addClass($class)->
-			setColSpan(2);
+		$col = (new CCol($value))
+			->addClass($class)
+			->setColSpan(2);
 		array_push($this->center_items, new CRow($col));
 	}
 
@@ -145,9 +145,9 @@ class CFormTable extends CForm {
 
 		// add first row
 		if (!is_null($this->title)) {
-			$col = (new CCol())->
-				addClass('form_row_first')->
-				setColSpan(2);
+			$col = (new CCol())
+				->addClass('form_row_first')
+				->setColSpan(2);
 
 			if (isset($this->title)) {
 				$col->addItem($this->title);

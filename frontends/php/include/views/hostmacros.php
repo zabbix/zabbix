@@ -30,9 +30,10 @@ if ($data['readonly'] && !$data['macros']) {
 	$table = _('No macros found.');
 }
 else {
-	$table = (new CTable())->
-		addClass('formElementTable')->
-		setAttribute('id', 'tbl_macros');
+	$table = (new CTable())
+		->addClass('formElementTable')
+		->setAttribute('id', 'tbl_macros');
+
 	$actions_col = $data['readonly'] ? null : '';
 	if ($data['show_inherited_macros']) {
 		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
@@ -88,17 +89,23 @@ else {
 		if (!$data['readonly']) {
 			if ($data['show_inherited_macros']) {
 				if (($macro['type'] & MACRO_TYPE_BOTH) == MACRO_TYPE_BOTH) {
-					$row[] = new CButton('macros['.$i.'][change]', _('Remove'), null, 'link_menu element-table-change');
+					$row[] = (new CButton('macros['.$i.'][change]'))
+						->addClass(ZBX_STYLE_BTN_REMOVE)
+						->addClass('element-table-change');
 				}
 				elseif ($macro['type'] & MACRO_TYPE_INHERITED) {
 					$row[] = new CButton('macros['.$i.'][change]', _('Change'), null, 'link_menu element-table-change');
 				}
 				else {
-					$row[] = new CButton('macros['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove');
+					$row[] = (new CButton('macros['.$i.'][remove]'))
+						->addClass(ZBX_STYLE_BTN_REMOVE)
+						->addClass('element-table-remove');
 				}
 			}
 			else {
-				$row[] = new CButton('macros['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove');
+				$row[] = (new CButton('macros['.$i.'][remove]'))
+					->addClass(ZBX_STYLE_BTN_REMOVE)
+					->addClass('element-table-remove');
 			}
 		}
 
@@ -130,7 +137,11 @@ else {
 
 	// buttons
 	if (!$data['readonly']) {
-		$buttons_column = new CCol(new CButton('macro_add', _('Add'), null, 'link_menu element-table-add'));
+		$buttons_column = new CCol(
+			(new CButton('macro_add', _('Add')))
+				->addClass(ZBX_STYLE_BTN_ADD)
+				->addClass('element-table-add')
+		);
 		$buttons_column->setAttribute('colspan', 5);
 
 		$table->addRow(new CRow($buttons_column, null, 'row_new_macro'));

@@ -161,19 +161,19 @@ function get_table_header($columnLeft, $columnRights = SPACE) {
 		$rights = array_reverse($rights);
 	}
 
-	$table = (new CTable())->
-		addClass('ui-widget-header')->
-		addClass('header')->
-		addClass('maxwidth');
+	$table = (new CTable())
+		->addClass('ui-widget-header')
+		->addClass('header')
+		->addClass('maxwidth');
 	$table->setCellSpacing(0);
 	$table->setCellPadding(1);
 	$table->addRow([
-		(new CCol($columnLeft))->
-			addClass('header_l')->
-			addClass('left'),
-		(new CCol($rights))->
-			addClass('header_r')->
-			addClass('right')
+		(new CCol($columnLeft))
+			->addClass('header_l')
+			->addClass('left'),
+		(new CCol($rights))
+			->addClass('header_r')
+			->addClass('right')
 	]);
 
 	return $table;

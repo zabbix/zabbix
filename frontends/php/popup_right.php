@@ -49,10 +49,7 @@ $hostGroupForm->setAttribute('id', 'groups');
 
 $hostGroupTable = new CTableInfo();
 $hostGroupTable->setHeader([
-	(new CColHeader(
-		new CCheckBox('all_groups', null, 'checkAll(this.checked)')))->
-		addClass('cell-width'),
-	_('Name')
+	(new CColHeader(new CCheckBox('all_groups', null, 'checkAll(this.checked)')))->addClass('cell-width'), _('Name')
 ]);
 
 $hostGroups = API::HostGroup()->get([

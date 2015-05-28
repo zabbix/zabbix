@@ -73,9 +73,10 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 		$expressionTextBox,
 		$iconsComboBox,
 		$iconPreviewImage,
-		new CButton('remove', _('Remove'), '', 'link_menu removeMapping')]))->
-		addClass('sortable')->
-		setId('iconmapidRow_'.$i);
+		new CButton('remove', _('Remove'), '', 'link_menu removeMapping')
+	]))
+		->addClass('sortable')
+		->setId('iconmapidRow_'.$i);
 	$iconMapTable->addRow($row);
 
 	$i++;
@@ -114,9 +115,10 @@ $hiddenRowTemplate = (new CRow([
 	$expressionTextBox,
 	$iconsComboBox,
 	$iconPreviewImage,
-	new CButton('remove', _('Remove'), '', 'link_menu removeMapping')]))->
-	addClass('hidden')->
-	setId('rowTpl');
+	new CButton('remove', _('Remove'), '', 'link_menu removeMapping')
+]))
+	->addClass('hidden')
+	->setId('rowTpl');
 $iconMapTable->addRow($hiddenRowTemplate);
 
 // add row button

@@ -135,10 +135,10 @@ $sysmapList->addRow(_('Problem display'), $showUnackComboBox);
 $sysmapList->addRow(_('Minimum trigger severity'), new CSeverity(['name' => 'severity_min', 'value' => $this->data['sysmap']['severity_min']]));
 
 // create url table
-$urlTable = (new CTable(_('No URLs defined.')))->
-	addClass('formElementTable')->
-	setAttribute('style', 'min-width: 500px;')->
-	setHeader([_('Name'), _('URL'), _('Element'), SPACE]);
+$urlTable = (new CTable(_('No URLs defined.')))
+	->addClass('formElementTable')
+	->setAttribute('style', 'min-width: 500px;')
+	->setHeader([_('Name'), _('URL'), _('Element'), SPACE]);
 if (empty($this->data['sysmap']['urls'])) {
 	$this->data['sysmap']['urls'][] = ['name' => '', 'url' => '', 'elementtype' => 0];
 }
@@ -172,8 +172,7 @@ $templateUrlRow->setAttribute('id', 'urlEntryTpl');
 $urlTable->addRow($templateUrlRow);
 
 // append "add" button to url table
-$addButton = (new CSpan(_('Add'), ZBX_STYLE_LINK_ACTION.' link_menu'))->
-	onClick('cloneRow("urlEntryTpl", '.$i.')');
+$addButton = (new CSpan(_('Add'), ZBX_STYLE_LINK_ACTION.' link_menu'))->onClick('cloneRow("urlEntryTpl", '.$i.')');
 $addButtonColumn = (new CCol($addButton))->setColSpan(4);
 $urlTable->addRow($addButtonColumn);
 

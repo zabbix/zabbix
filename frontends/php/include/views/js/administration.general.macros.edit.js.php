@@ -8,7 +8,7 @@
 			<input class="input text" type="text" id="macros_#{rowNum}_value" name="macros[#{rowNum}][value]" size="40" maxlength="255" placeholder="<?= _('value') ?>">
 		</td>
 		<td>
-			<button class="button link_menu element-table-remove" type="button" id="macros_#{rowNum}_remove" name="macros[#{rowNum}][remove]"><?= _('Remove') ?></button>
+			<button class="<?= ZBX_STYLE_BTN_REMOVE ?> element-table-remove" type="button" id="macros_#{rowNum}_remove" name="macros[#{rowNum}][remove]"></button>
 		</td>
 	</tr>
 </script>

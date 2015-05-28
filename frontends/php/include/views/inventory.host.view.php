@@ -91,13 +91,13 @@ $interfaceTableHeaderSet = false;
 
 // Agent interface
 if ($agentInterfaceRows) {
-	$agentInterfacesTable = (new CTable())->
-		addClass('formElementTable')->
-		addClass('border_dotted')->
-		addClass('objectgroup')->
-		addClass('element-row-first')->
-		addClass('interfaces')->
-		setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
+	$agentInterfacesTable = (new CTable())
+		->addClass('formElementTable')
+		->addClass('border_dotted')
+		->addClass('objectgroup')
+		->addClass('element-row-first')
+		->addClass('interfaces')
+		->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
 	$interfaceTableHeaderSet = true;
 
 	foreach ($agentInterfaceRows as $interface) {
@@ -109,12 +109,12 @@ if ($agentInterfaceRows) {
 
 // SNMP interface
 if ($snmpInterfaceRows) {
-	$snmpInterfacesTable = (new CTable())->
-		addClass('formElementTable')->
-		addClass('border')->
-		addClass('dotted')->
-		addClass('objectgroup')->
-		addClass('interfaces');
+	$snmpInterfacesTable = (new CTable())
+		->addClass('formElementTable')
+		->addClass('border')
+		->addClass('dotted')
+		->addClass('objectgroup')
+		->addClass('interfaces');
 
 	if ($interfaceTableHeaderSet) {
 		$snmpInterfacesTable->addClass('element-row');
@@ -134,11 +134,11 @@ if ($snmpInterfaceRows) {
 
 // JMX interface
 if ($jmxInterfaceRows) {
-	$jmxInterfacesTable = (new CTable())->
-		addClass('formElementTable')->
-		addClass('border_dotted')->
-		addClass('objectgroup')->
-		addClass('interfaces');
+	$jmxInterfacesTable = (new CTable())
+		->addClass('formElementTable')
+		->addClass('border_dotted')
+		->addClass('objectgroup')
+		->addClass('interfaces');
 
 	if ($interfaceTableHeaderSet) {
 		$jmxInterfacesTable->addClass('element-row');
@@ -157,11 +157,11 @@ if ($jmxInterfaceRows) {
 
 // IPMI interface
 if ($ipmiInterfaceRows) {
-	$ipmiInterfacesTable = (new CTable())->
-		addClass('formElementTable')->
-		addClass('border_dotted')->
-		addClass('objectgroup')->
-		addClass('interfaces');
+	$ipmiInterfacesTable = (new CTable())
+		->addClass('formElementTable')
+		->addClass('border_dotted')
+		->addClass('objectgroup')
+		->addClass('interfaces');
 
 	if ($interfaceTableHeaderSet) {
 		$ipmiInterfacesTable->addClass('element-row');

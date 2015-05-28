@@ -167,9 +167,9 @@ if ($triggerData) {
 	$triggerData['hostname'] = $host['name'];
 
 	$reportWidget->setControls(
-		(new CList())->
-			addItem(new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']))->
-			addItem($triggerData['description'])
+		(new CList())
+			->addItem(new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']))
+			->addItem($triggerData['description'])
 	);
 
 	$table = new CTableInfo();

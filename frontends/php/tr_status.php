@@ -770,10 +770,10 @@ foreach ($triggers as $trigger) {
 				zbx_date2age($event['clock']),
 				zbx_date2age($nextClock, $event['clock']),
 				($config['event_ack_enable']) ? $ack : null,
-				$emptyColumn]))->
-					addClass('odd_row')->
-					setAttribute('data-parentid', $trigger['triggerid'])->
-					addStyle('display: none;');
+				$emptyColumn]))
+					->addClass('odd_row')
+					->setAttribute('data-parentid', $trigger['triggerid'])
+					->addStyle('display: none;');
 			$triggerTable->addRow($row);
 
 			if ($i > $config['event_show_max']) {

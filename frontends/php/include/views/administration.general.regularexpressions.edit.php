@@ -63,9 +63,9 @@ $nameTextBox = new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE, fa
 $nameTextBox->setAttribute('autofocus', 'autofocus');
 $exprTab->addRow(_('Name'), $nameTextBox);
 
-$exprTable = (new CTable())->
-	addClass('formElementTable')->
-	addClass('formWideTable');
+$exprTable = (new CTable())
+	->addClass('formElementTable')
+	->addClass('formWideTable');
 $exprTable->setAttribute('id', 'exprTable');
 $exprTable->setHeader([
 	_('Expression'),
@@ -76,12 +76,12 @@ $exprTable->setHeader([
 $exprTable->setFooter(new CButton('add', _('Add'), null, 'link_menu exprAdd'));
 $exprTab->addRow(_('Expressions'), new CDiv($exprTable, 'inlineblock border_dotted objectgroup'));
 
-$exprForm = (new CTable())->
-	addClass('formElementTable')->
-	addRow([_('Expression'), new CTextBox('expressionNew', null, ZBX_TEXTBOX_STANDARD_SIZE)])->
-	addRow([_('Expression type'), new CComboBox('typeNew', null, null, expression_type2str())])->
-	addRow([_('Delimiter'), new CComboBox('delimiterNew', null, null, expressionDelimiters())], null, 'delimiterNewRow')->
-	addRow([_('Case sensitive'), new CCheckBox('case_sensitiveNew')]);
+$exprForm = (new CTable())
+	->addClass('formElementTable')
+	->addRow([_('Expression'), new CTextBox('expressionNew', null, ZBX_TEXTBOX_STANDARD_SIZE)])
+	->addRow([_('Expression type'), new CComboBox('typeNew', null, null, expression_type2str())])
+	->addRow([_('Delimiter'), new CComboBox('delimiterNew', null, null, expressionDelimiters())], null, 'delimiterNewRow')
+	->addRow([_('Case sensitive'), new CCheckBox('case_sensitiveNew')]);
 
 $exprFormFooter = [
 	new CButton('saveExpression', _('Add'), null, 'link_menu'),

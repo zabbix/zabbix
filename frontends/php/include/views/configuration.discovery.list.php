@@ -21,8 +21,8 @@
 $discoveryWidget = (new CWidget())->setTitle(_('Discovery rules'));
 
 // create new discovery rule button
-$createForm = (new CForm('get'))->cleanItems()->
-	addItem((new CList())->addItem(new CSubmit('form', _('Create discovery rule'))));
+$createForm = (new CForm('get'))->cleanItems()
+	->addItem((new CList())->addItem(new CSubmit('form', _('Create discovery rule'))));
 $discoveryWidget->setControls($createForm);
 
 // create form
@@ -33,8 +33,8 @@ $discoveryForm->setName('druleForm');
 $discoveryTable = new CTableInfo();
 $discoveryTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_drules', null, "checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');")))->
-		addClass('cell-width'),
+		new CCheckBox('all_drules', null, "checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');")
+	))->addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('IP range'),
 	_('Delay'),

@@ -33,9 +33,9 @@ $imageForm = new CForm();
 $imageForm->setName('imageForm');
 $imageForm->addItem(BR());
 
-$imageTable = (new CTable(_('No images found.')))->
-	addClass('header_wide')->
-	addClass('padding_standard');
+$imageTable = (new CTable(_('No images found.')))
+	->addClass('header_wide')
+	->addClass('padding_standard');
 
 $count = 0;
 $imageRow = new CRow();
@@ -46,9 +46,9 @@ foreach ($this->data['images'] as $image) {
 
 	$name = new CLink($image['name'], 'adm.images.php?form=update&imageid='.$image['imageid']);
 
-	$imgColumn = (new CCol())->
-		setAttribute('align', 'center');
-		addItem([$img, BR(), $name], 'center');
+	$imgColumn = (new CCol())
+		->setAttribute('align', 'center')
+		->addItem([$img, BR(), $name], 'center');
 	$imageRow->addItem($imgColumn);
 
 	$count++;

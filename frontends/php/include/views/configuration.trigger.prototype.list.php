@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$triggersWidget = (new CWidget())->
-	setTitle(
+$triggersWidget = (new CWidget())
+	->setTitle(
 		[_('Trigger prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')]
-	)->
-	addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
+	)
+	->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 // create new application button
 $createForm = (new CForm('get'))->cleanItems();
@@ -54,8 +54,8 @@ $triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 $triggersTable = new CTableInfo();
 $triggersTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")))->
-		addClass('cell-width'),
+		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")
+	))->addClass('cell-width'),
 	make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
 	_('Expression'),

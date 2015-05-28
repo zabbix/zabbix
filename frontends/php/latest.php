@@ -432,43 +432,42 @@ $lastCheckHeader = make_sorting_header(_('Last check'), 'lastclock', $sortField,
 $lastCheckHeader->addClass('latest-lastcheck');
 $lastCheckHeader->setAttribute('title', _('Last check'));
 
-$lastValueHeader = (new CColHeader(new CSpan(_('Last value'))))->
-	addClass('latest-lastvalue')->
-	setAttribute('title', _('Last value'));
+$lastValueHeader = (new CColHeader(new CSpan(_('Last value'))))
+	->addClass('latest-lastvalue')
+	->setAttribute('title', _('Last value'));
 
-$lastDataHeader = (new CColHeader(new CSpan(_x('Change', 'noun in latest data'))))->
-	addClass('latest-data')->
-	setAttribute('title', _x('Change', 'noun in latest data'));
+$lastDataHeader = (new CColHeader(new CSpan(_x('Change', 'noun in latest data'))))
+	->addClass('latest-data')
+	->setAttribute('title', _x('Change', 'noun in latest data'));
 
 $checkAllCheckbox = new CCheckBox('all_items', null, "checkAll('".$form->getName()."', 'all_items', 'itemids');");
 
 $checkAllCheckboxCol = (new CColHeader($checkAllCheckbox))->addClass('cell-width');
 
 if ($filter['showDetails']) {
-	$intervalHeader = (new CColHeader(_('Interval')))->
-		addClass('latest-interval')->
-		setAttribute('title', _('Interval'));
+	$intervalHeader = (new CColHeader(_('Interval')))
+		->addClass('latest-interval')
+		->setAttribute('title', _('Interval'));
 
-	$historyHeader = (new CColHeader(_('History')))->
-		addClass('latest-history')->
-		setAttribute('title', _('History'));
+	$historyHeader = (new CColHeader(_('History')))
+		->addClass('latest-history')
+		->setAttribute('title', _('History'));
 
-	$trendsHeader = (new CColHeader(_('Trends')))->
-		addClass('latest-trends')->
-		setAttribute('title', _('Trends'));
+	$trendsHeader = (new CColHeader(_('Trends')))
+		->addClass('latest-trends')
+		->setAttribute('title', _('Trends'));
 
-	$typeHeader = (new CColHeader(_('Type')))->
-		addClass('latest-type')->
-		setAttribute('title', _('Type'));
+	$typeHeader = (new CColHeader(_('Type')))
+		->addClass('latest-type')
+		->setAttribute('title', _('Type'));
 
-	$infoHeader = (new CColHeader(_('Info')))->
-		addClass('latest-info')->
-		setAttribute('title', _('Info'));
+	$infoHeader = (new CColHeader(_('Info')))
+		->addClass('latest-info')
+		->setAttribute('title', _('Info'));
 
 	$table->addClass('latest-details');
 	$table->setHeader([
-		(new CColHeader(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')))->
-			addClass('cell-width'),
+		(new CColHeader(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')))->addClass('cell-width'),
 		$checkAllCheckboxCol,
 		$hostHeader,
 		$nameHeader,
@@ -479,8 +478,7 @@ if ($filter['showDetails']) {
 		$lastCheckHeader,
 		$lastValueHeader,
 		$lastDataHeader,
-		(new CColHeader())->
-			addClass('latest-actions'),
+		(new CColHeader())->addClass('latest-actions'),
 		$infoHeader
 	]);
 }
@@ -494,8 +492,7 @@ else {
 		$lastCheckHeader,
 		$lastValueHeader,
 		$lastDataHeader,
-		(new CColHeader())->
-			addClass('latest-actions')
+		(new CColHeader())->addClass('latest-actions')
 	]);
 }
 
@@ -799,8 +796,7 @@ foreach ($items as $item) {
 			new CCol(new CSpan($lastClock, $stateCss)),
 			new CCol(new CSpan($lastValue, $stateCss)),
 			new CCol(new CSpan($change, $stateCss)),
-			(new CCol($actions))->
-				addClass($stateCss),
+			(new CCol($actions))->addClass($stateCss),
 			$info
 		]);
 	}
@@ -813,8 +809,7 @@ foreach ($items as $item) {
 			new CCol(new CSpan($lastClock, $stateCss)),
 			new CCol(new CSpan($lastValue, $stateCss)),
 			new CCol(new CSpan($change, $stateCss)),
-			(new CCol($actions))->
-				addClass($stateCss)
+			(new CCol($actions))->addClass($stateCss)
 		]);
 	}
 

@@ -20,9 +20,9 @@
 
 include dirname(__FILE__).'/js/conf.import.js.php';
 
-$rulesTable = (new CTable())->
-	addClass('formElementTable')->
-	setHeader([SPACE, _('Update existing'), _('Create new'), _('Delete missing')], 'bold');
+$rulesTable = (new CTable())
+	->addClass('formElementTable')
+	->setHeader([SPACE, _('Update existing'), _('Create new'), _('Delete missing')], 'bold');
 
 $titles = [
 	'groups' => _('Groups'),

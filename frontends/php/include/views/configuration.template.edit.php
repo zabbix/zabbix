@@ -384,8 +384,7 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 $tmplList = new CFormList();
 
 // create linked template table
-$linkedTemplateTable = (new CTable(_('No templates linked.')))->
-	addClass('formElementTable');
+$linkedTemplateTable = (new CTable(_('No templates linked.')))->addClass('formElementTable');
 $linkedTemplateTable->setAttribute('id', 'linkedTemplateTable');
 $linkedTemplateTable->setHeader([_('Name'), _('Action')]);
 
@@ -422,8 +421,7 @@ foreach ($data['linkedTemplates'] as $template) {
 $tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'template-link-block objectgroup inlineblock border_dotted'));
 
 // create new linked template table
-$newTemplateTable = (new CTable())->
-	addClass('formElementTable');
+$newTemplateTable = (new CTable())->addClass('formElementTable');
 $newTemplateTable->setAttribute('id', 'newTemplateTable');
 $newTemplateTable->setAttribute('style', 'min-width: 400px;');
 

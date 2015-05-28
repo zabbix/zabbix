@@ -1757,7 +1757,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   max-width: 25%; }
 
 /* Close/Remove icon */
-button.btn-remove, button.btn-remove:hover, button.btn-remove:active, .overlay-close-btn, a.overlay-close-btn, .form-remove-btn, a.form-remove-btn, .subfilter-disable-btn {
+button.btn-remove, button.btn-remove:hover, button.btn-remove:active, .overlay-close-btn, a.overlay-close-btn, .subfilter-disable-btn {
   display: block;
   width: 18px;
   height: 18px;
@@ -1773,13 +1773,13 @@ button.btn-remove, button.btn-remove:hover, button.btn-remove:active, .overlay-c
   -webkit-transition: opacity 0.2s ease-out;
   -moz-transition: opacity 0.2s ease-out;
   transition: opacity 0.2s ease-out; }
-  button.btn-remove:before, button.btn-remove:hover:before, button.btn-remove:active:before, .overlay-close-btn:before, .form-remove-btn:before, .subfilter-disable-btn:before {
+  button.btn-remove:before, button.btn-remove:hover:before, button.btn-remove:active:before, .overlay-close-btn:before, .subfilter-disable-btn:before {
     content: "\00d7"; }
-  button.btn-remove:hover, .overlay-close-btn:hover, .form-remove-btn:hover, .subfilter-disable-btn:hover {
+  button.btn-remove:hover, .overlay-close-btn:hover, .subfilter-disable-btn:hover {
     opacity: 1;
     filter: alpha(opacity=100);
     text-decoration: none; }
-  button.btn-remove:active, .overlay-close-btn:active, .form-remove-btn:active, .subfilter-disable-btn:active {
+  button.btn-remove:active, .overlay-close-btn:active, .subfilter-disable-btn:active {
     opacity: 1;
     filter: alpha(opacity=100);
     text-decoration: none; }

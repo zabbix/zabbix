@@ -47,14 +47,10 @@ $header_form->addItem($controls);
 
 $widget->setControls($header_form);
 
-$table = (new CTable())->
-	addClass('formElementTable')->
-	setAttribute('id', 'tbl_macros')->
-	addRow([
-		_('Macro'), '',
-		_('Value'),
-		''
-	]);
+$table = (new CTable())
+	->addClass('formElementTable')
+	->setAttribute('id', 'tbl_macros')
+	->addRow([_('Macro'), '', _('Value'), '']);
 
 // fields
 foreach ($data['macros'] as $i => $macro) {
@@ -65,7 +61,11 @@ foreach ($data['macros'] as $i => $macro) {
 	$value_input = new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255);
 	$value_input->setAttribute('placeholder', _('value'));
 
-	$button_cell = [new CButton('macros['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')];
+	$button_cell = [
+		(new CButton('macros['.$i.'][remove]'))
+			->addClass(ZBX_STYLE_BTN_REMOVE)
+			->addClass('element-table-remove')
+	];
 	if (array_key_exists('globalmacroid', $macro)) {
 		$button_cell[] = new CVar('macros['.$i.'][globalmacroid]', $macro['globalmacroid']);
 	}
@@ -74,7 +74,11 @@ foreach ($data['macros'] as $i => $macro) {
 }
 
 // buttons
-$buttons_column = new CCol(new CButton('macro_add', _('Add'), null, 'link_menu element-table-add'));
+$buttons_column = new CCol(
+	(new CButton('macro_add', _('Add')))
+		->addClass(ZBX_STYLE_BTN_ADD)
+		->addClass('element-table-add')
+);
 $buttons_column->setAttribute('colspan', 5);
 
 $table->addRow(new CRow($buttons_column, null, 'row_new_macro'));

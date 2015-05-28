@@ -24,8 +24,7 @@ require_once dirname(__FILE__).'/js/administration.general.housekeeper.edit.js.p
 $houseKeeperTab = new CFormList();
 
 // events and alerts
-$eventAlertTab = (new CTable())->
-	addClass('formElementTable');
+$eventAlertTab = (new CTable())->addClass('formElementTable');
 $eventsMode = new CCheckBox('hk_events_mode', $data['hk_events_mode'] == 1, null, 1);
 $eventAlertTab->addRow([
 	new CLabel(_('Enable internal housekeeping'), 'hk_events_mode'),
@@ -60,8 +59,7 @@ $eventAlertTab->addClass('border_dotted objectgroup element-row element-row-firs
 $houseKeeperTab->addRow(_('Events and alerts'), new CDiv($eventAlertTab));
 
 // IT services
-$itServicesTab = (new CTable())->
-	addClass('formElementTable');
+$itServicesTab = (new CTable())->addClass('formElementTable');
 
 $itServicesTab->addRow([
 	new CLabel(_('Enable internal housekeeping'), 'hk_services_mode'),
@@ -78,8 +76,7 @@ $itServicesTab->addClass('border_dotted objectgroup element-row');
 $houseKeeperTab->addRow(_('IT services'), new CDiv($itServicesTab));
 
 // audit
-$auditTab = (new CTable())->
-	addClass('formElementTable');
+$auditTab = (new CTable())->addClass('formElementTable');
 
 $auditTab->addRow([
 	new CLabel(_('Enable internal housekeeping'), 'hk_audit_mode'),
@@ -96,8 +93,7 @@ $auditTab->addClass('border_dotted objectgroup element-row');
 $houseKeeperTab->addRow(_('Audit'), new CDiv($auditTab));
 
 // user session
-$userSessionTab = (new CTable())->
-	addClass('formElementTable');
+$userSessionTab = (new CTable())->addClass('formElementTable');
 
 $userSessionTab->addRow([
 	new CLabel(_('Enable internal housekeeping'), 'hk_sessions_mode'),
@@ -114,8 +110,7 @@ $userSessionTab->addClass('border_dotted objectgroup element-row');
 $houseKeeperTab->addRow(_('User sessions'), new CDiv($userSessionTab));
 
 // history
-$histortTab = (new CTable())->
-	addClass('formElementTable');
+$histortTab = (new CTable())->addClass('formElementTable');
 
 $histortTab->addRow([
 	new CLabel(_('Enable internal housekeeping'), 'hk_history_mode'),
@@ -134,8 +129,7 @@ $histortTab->addClass('border_dotted objectgroup element-row');
 $houseKeeperTab->addRow(_('History'), new CDiv($histortTab));
 
 // trend
-$trendTab = (new CTable())->
-	addClass('formElementTable');
+$trendTab = (new CTable())->addClass('formElementTable');
 
 $trendTab->addRow([
 	new CLabel(_('Enable internal housekeeping'), 'hk_trends_mode'),

@@ -42,8 +42,8 @@ $discoveryTable = new CTableInfo();
 
 $discoveryTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")))->
-		addClass('cell-width'),
+		new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")
+	))->addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Items'),
 	_('Triggers'),

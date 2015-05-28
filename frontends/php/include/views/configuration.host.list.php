@@ -23,10 +23,10 @@ $hostWidget = (new CWidget('host-list'))->setTitle(_('Hosts'));
 
 $frmForm = (new CForm('get'))->cleanItems();
 
-$frmForm->addItem((new CList())->
-	addItem([_('Group').SPACE, $data['pageFilter']->getGroupsCB()])->
-	addItem(new CSubmit('form', _('Create host')))->
-	addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")'))
+$frmForm->addItem((new CList())
+	->addItem([_('Group').SPACE, $data['pageFilter']->getGroupsCB()])
+	->addItem(new CSubmit('form', _('Create host')))
+	->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")'))
 );
 
 $hostWidget->setControls($frmForm);
@@ -55,8 +55,8 @@ $form->setName('hosts');
 $table = new CTableInfo();
 $table->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');")))->
-		addClass('cell-width'),
+		new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
+	))->addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
 	_('Applications'),
 	_('Items'),

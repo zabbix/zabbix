@@ -58,11 +58,11 @@ $triggersFormList->addRow(
 );
 
 // append dependencies to form list
-$dependenciesTable = (new CTable(_('No dependencies defined.')))->
-	addClass('formElementTable')->
-	setAttribute('style', 'min-width: 500px;')->
-	setAttribute('id', 'dependenciesTable')->
-	setHeader([_('Name'), _('Action')]);
+$dependenciesTable = (new CTable(_('No dependencies defined.')))
+	->addClass('formElementTable')
+	->setAttribute('style', 'min-width: 500px;')
+	->setAttribute('id', 'dependenciesTable')
+	->setHeader([_('Name'), _('Action')]);
 
 foreach ($data['dependencies'] as $dependency) {
 	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);

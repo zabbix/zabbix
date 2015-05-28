@@ -22,9 +22,9 @@ $sysmapWidget = (new CWidget())->setTitle(_('Maps'));
 
 // create header buttons
 $createForm = (new CForm('get'))->cleanItems();
-$createForm->addItem((new CList())->
-	addItem(new CSubmit('form', _('Create map')))->
-	addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=map")'))
+$createForm->addItem((new CList())
+	->addItem(new CSubmit('form', _('Create map')))
+	->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=map")'))
 );
 
 $sysmapWidget->setControls($createForm);
@@ -37,8 +37,8 @@ $sysmapForm->setName('frm_maps');
 $sysmapTable = new CTableInfo();
 $sysmapTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_maps', null, "checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');")))->
-		addClass('cell-width'),
+		new CCheckBox('all_maps', null, "checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');")
+	))->addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder']),

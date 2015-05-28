@@ -22,9 +22,9 @@ $applicationWidget = (new CWidget())->setTitle(_('Applications'));
 
 $createForm = (new CForm('get'))->cleanItems();
 
-$controls = (new CList())->
-	addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()])->
-	addItem([_('Host').SPACE, $this->data['pageFilter']->getHostsCB()]);
+$controls = (new CList())
+	->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()])
+	->addItem([_('Host').SPACE, $this->data['pageFilter']->getHostsCB()]);
 
 // append host summary to widget header
 if (empty($this->data['hostid'])) {
@@ -53,8 +53,8 @@ $applicationForm->setName('applicationForm');
 $applicationTable = new CTableInfo();
 $applicationTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');")))->
-		addClass('cell-width'),
+		new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');")
+	))->addClass('cell-width'),
 	($this->data['hostid'] > 0) ? null : _('Host'),
 	make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Show')

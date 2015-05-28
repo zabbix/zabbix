@@ -184,10 +184,10 @@ $hostFormList->addRow(
 $templatesFormList = new CFormList('templatesFormList');
 
 // append templates table to from list
-$templatesTable = (new CTable())->
-	addClass('formElementTable')->
-	setAttribute('style', 'min-width: 500px;')->
-	setAttribute('id', 'template_table');
+$templatesTable = (new CTable())
+	->addClass('formElementTable')
+	->setAttribute('style', 'min-width: 500px;')
+	->setAttribute('id', 'template_table');
 
 $clearDiv = new CDiv();
 $clearDiv->addStyle('clear: both;');

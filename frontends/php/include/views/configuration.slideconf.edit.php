@@ -74,9 +74,10 @@ foreach ($this->data['slides'] as $key => $slides) {
 			$name,
 			$delay,
 			$removeButton
-		]))->
-		addClass('sortable')->
-		setId('slides_'.$key);
+		]
+	))
+		->addClass('sortable')
+		->setId('slides_'.$key);
 	$slideTable->addRow($row);
 }
 
@@ -86,8 +87,8 @@ $addButtonColumn = (new CCol(
 			'return PopUp("popup.php?srctbl=screens&srcfld1=screenid&dstfrm='.$slideForm->getName().
 				'&multiselect=1&writeonly=1")',
 			'link_menu')
-		: null))->
-	setColSpan(5);
+		: null
+	))->setColSpan(5);
 
 $addButtonColumn->setAttribute('style', 'vertical-align: middle;');
 $slideTable->addRow((new CRow($addButtonColumn))->setId('screenListFooter'));

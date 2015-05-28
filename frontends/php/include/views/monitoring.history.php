@@ -243,9 +243,9 @@ else {
 		$filterForm->addNavigator();
 		$historyWidget->addItem($filterForm);
 
-		$historyTable = (new CTable())->
-			addClass('maxwidth')->
-			addRow($screen->get());
+		$historyTable = (new CTable())
+			->addClass('maxwidth')
+			->addRow($screen->get());
 		$historyWidget->addItem($historyTable);
 
 		CScreenBuilder::insertScreenStandardJs([

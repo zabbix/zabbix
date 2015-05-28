@@ -91,8 +91,7 @@ $filterColumn1->addRow(
 );
 
 // severities
-$severitiesTable = (new CTable())->
-	addClass('severities-table');
+$severitiesTable = (new CTable())->addClass('severities-table');
 
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$serverityCheckBox = new CCheckBox('severities['.$severity.']',

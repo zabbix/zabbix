@@ -125,9 +125,9 @@ class CWidget {
 		}
 
 		// header table
-		$table = (new CTable())->
-			addClass($this->css_class)->
-			addClass('maxwidth');
+		$table = (new CTable())
+			->addClass($this->css_class)
+			->addClass('maxwidth');
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 		$table->addRow($this->createHeaderRow($header['left'], $columnRights), 'first');
@@ -146,13 +146,13 @@ class CWidget {
 	}
 
 	private function createHeaderRow($col1, $col2 = SPACE) {
-		$td_r = (new CCol($col2))->
-			addClass('header_r')->
-			addClass('right');
+		$td_r = (new CCol($col2))
+			->addClass('header_r')
+			->addClass('right');
 		$row = [
-			(new CCol($col1))->
-				addClass('header_l')->
-				addClass('left'),
+			(new CCol($col1))
+				->addClass('header_l')
+				->addClass('left'),
 			$td_r
 		];
 		return $row;

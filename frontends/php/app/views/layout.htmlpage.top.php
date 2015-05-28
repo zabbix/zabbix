@@ -74,8 +74,8 @@ if ($data['fullscreen'] == 0) {
 
 	unset($logo, $page_header_r_col, $help, $support, $debug);
 
-	$table = (new CTable())->
-		addClass('maxwidth')->
-		addClass('page_header')->
-		addRow($top_page_row);
+	$table = (new CTable())
+		->addClass('maxwidth')
+		->addClass('page_header')
+		->addRow($top_page_row);
 }

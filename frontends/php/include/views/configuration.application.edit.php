@@ -19,8 +19,9 @@
 **/
 
 
-$applicationWidget = (new CWidget())->setTitle(_('Applications'))->
-	addItem(get_header_host_table('applications', $this->data['hostid']));
+$applicationWidget = (new CWidget())
+	->setTitle(_('Applications'))
+	->addItem(get_header_host_table('applications', $this->data['hostid']));
 
 // create form
 $applicationForm = new CForm();

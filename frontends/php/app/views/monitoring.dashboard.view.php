@@ -21,8 +21,9 @@
 
 $this->addJSfile('js/class.pmaster.js');
 
-$dashboardWidget = (new CWidget('dashboard'))->setTitle(_('Dashboard'))->
-	setControls(new CList([
+$dashboardWidget = (new CWidget('dashboard'))
+	->setTitle(_('Dashboard'))
+	->setControls(new CList([
 		get_icon('dashconf'),
 		get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')])
 	]));
