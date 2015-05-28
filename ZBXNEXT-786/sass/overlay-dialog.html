@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Zabbix | Hosts</title>
+		<link rel="stylesheet" href="stylesheets/screen.css">
+        <link rel="icon" href="favicon.ico">
+        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+        <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+	</head>
+<body>
+	<header role="banner">
+		<div class="nav" role="navigation">
+			<div class="top-nav-container">
+			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><b>Za</b>bbix server</li><li><b>Za</b>bbix server<li>Zabbix server</li></ul></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-print" title="Print"></a></li><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			</div>
+			<div class="top-subnav-container">
+			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
+			</div>
+		</div>
+	</header>
+	<div class="article">
+	<div class="header-title">
+	<h1>Dashboard</h1>
+	<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
+	</div>
+
+	<div class="overlay-dialogue" style="top: 130px; left: 13px">
+	<div class="dashbrd-widget-head"><h4>Edit map element</h4></div>
+	<ul class="table-forms" style="width: auto">
+		<!--<tfoot>
+		<li>
+		<div class="table-forms-td-left"></div>
+		<div class="table-forms-td-right"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Remove</button><button type="button">Apply</button></div>
+		</li>
+		</tfoot>-->
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Type</label></div>
+		<div class="table-forms-td-right"><select size="1" name="elementtype" id="elementType"><option value="0">Host</option><option value="1">Map</option><option value="2">Trigger</option><option value="3">Host group</option></select></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left">Show</div>
+		<div class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> Host group</label></li><li><label for="IpAddr"><input type="radio" id="IpAddr"> Host group elements</label></li></ul></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left">Area type</div>
+		<div class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> Fit to map</label></li><li><label for="IpAddr"><input type="radio" id="IpAddr"> Custom size</label></li></ul></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="VisibleName">Label</label></div>
+		<div class="table-forms-td-right"><textarea id="VisibleName"></textarea></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Label location</label></div>
+		<div class="table-forms-td-right"><select><option>Bottom</option></select></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Host</label></div>
+		<div class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Application</label></div>
+		<div class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></div>
+		</li>
+		<li>
+		<!--<div class="table-forms-td-left"></div>-->
+		<div class="table-forms-td-right"><fieldset><legend>Icons</legend><table><tbody><tr><td colspan="2"><label for="UseIconmap"><input type="checkbox" id="UseIconmap"> Automatic icon selection</label></td></tr><tr><td><label>Default</label>
+		<select>
+		    <option value="2">Cloud_(24)</option>
+		    <option value="3">Cloud_(48)</option>
+		    <option value="4">Cloud_(64)</option>
+		    <option value="5">Cloud_(96)</option>
+		    <option value="1">Cloud_(128)</option>
+		    <option value="7">Crypto-router_(24)</option>
+            <option value="8">Crypto-router_(48)</option>
+            <option value="9">Crypto-router_(64)</option>
+            <option value="10">Crypto-router_(96)</option>
+            <option value="6">Crypto-router_(128)</option>
+            <option value="12">Crypto-router_symbol_(24)</option>
+            <option value="13">Crypto-router_symbol_(48)</option>
+            <option value="14">Crypto-router_symbol_(64)</option>
+            <option value="15">Crypto-router_symbol_(96)</option>
+            <option value="11">Crypto-router_symbol_(128)</option>
+            <option value="17">Disk_array_2D_(24)</option>
+            <option value="19">Disk_array_2D_(64)</option>
+            <option value="20">Disk_array_2D_(96)</option>
+            <option value="16">Disk_array_2D_(128)</option>
+            <option value="22">Disk_array_3D_(24)</option>
+            <option value="23">Disk_array_3D_(48)</option>
+            <option value="25">Disk_array_3D_(96)</option>
+            <option value="21">Disk_array_3D_(128)</option>
+            <option value="27">Firewall_(24)</option>
+            <option value="28">Firewall_(48)</option>
+            <option value="29">Firewall_(64)</option>
+            <option value="30">Firewall_(96)</option>
+            <option value="26">Firewall_(128)</option>
+            <option value="32">House_(24)</option>
+            <option value="34">House_(64)</option>
+            <option value="35">House_(96)</option>
+            <option value="31">House_(128)</option>
+            <option value="37">Hub_(24)</option>
+            <option value="38">Hub_(48)</option>
+            <option value="39">Hub_(64)</option>
+            <option value="40">Hub_(96)</option>
+            <option value="36">Hub_(128)</option>
+            <option value="42">IP_PBX_(24)</option>
+            <option value="43">IP_PBX_(48)</option>
+            <option value="44">IP_PBX_(64)</option>
+            <option value="45">IP_PBX_(96)</option>
+            <option value="41">IP_PBX_(128)</option>
+            <option value="47">IP_PBX_symbol_(24)</option>
+            <option value="48">IP_PBX_symbol_(48)</option>
+            <option value="49">IP_PBX_symbol_(64)</option>
+            <option value="50">IP_PBX_symbol_(96)</option>
+            <option value="46">IP_PBX_symbol_(128)</option>
+            <option value="52">Modem_(24)</option>
+            <option value="54">Modem_(64)</option>
+            <option value="55">Modem_(96)</option>
+            <option value="51">Modem_(128)</option>
+            <option value="57">Network_(24)</option>
+            <option value="58">Network_(48)</option>
+            <option value="59">Network_(64)</option>
+            <option value="60">Network_(96)</option>
+            <option value="56">Network_(128)</option>
+            <option value="62">Network_adapter_(24)</option>
+            <option value="63">Network_adapter_(48)</option>
+            <option value="64">Network_adapter_(64)</option>
+            <option value="65">Network_adapter_(96)</option>
+            <option value="61">Network_adapter_(128)</option>
+            <option value="67">Notebook_(24)</option>
+            <option value="68">Notebook_(48)</option>
+            <option value="69">Notebook_(64)</option>
+            <option value="70">Notebook_(96)</option>
+            <option value="66">Notebook_(128)</option>
+            <option value="72">PBX_(24)</option>
+            <option value="73">PBX_(48)</option>
+            <option value="74">PBX_(64)</option>
+            <option value="75">PBX_(96)</option>
+            <option value="71">PBX_(128)</option>
+            <option value="77">Phone_(24)</option>
+            <option value="78">Phone_(48)</option>
+            <option value="79">Phone_(64)</option>
+            <option value="80">Phone_(96)</option>
+            <option value="76">Phone_(128)</option>
+            <option value="82">Printer_(24)</option>
+            <option value="83">Printer_(48)</option>
+            <option value="84">Printer_(64)</option>
+            <option value="85">Printer_(96)</option>
+            <option value="81">Printer_(128)</option>
+            <option value="93">Rackmountable_1U_server_2D_(64)</option>
+            <option value="94">Rackmountable_1U_server_2D_(96)</option>
+            <option value="92">Rackmountable_1U_server_2D_(128)</option>
+            <option value="96">Rackmountable_1U_server_3D_(64)</option>
+            <option value="97">Rackmountable_1U_server_3D_(96)</option>
+            <option value="95">Rackmountable_1U_server_3D_(128)</option>
+            <option value="99">Rackmountable_2U_server_2D_(64)</option>
+            <option value="100">Rackmountable_2U_server_2D_(96)</option>
+            <option value="98">Rackmountable_2U_server_2D_(128)</option>
+            <option value="102">Rackmountable_2U_server_3D_(64)</option>
+            <option value="103">Rackmountable_2U_server_3D_(96)</option>
+            <option value="101">Rackmountable_2U_server_3D_(128)</option>
+            <option value="105">Rackmountable_3U_server_2D_(64)</option>
+            <option value="106">Rackmountable_3U_server_2D_(96)</option>
+            <option value="104">Rackmountable_3U_server_2D_(128)</option>
+            <option value="108">Rackmountable_3U_server_3D_(64)</option>
+            <option value="109">Rackmountable_3U_server_3D_(96)</option>
+            <option value="107">Rackmountable_3U_server_3D_(128)</option>
+            <option value="111">Rackmountable_4U_server_2D_(64)</option>
+            <option value="110">Rackmountable_4U_server_2D_(128)</option>
+            <option value="114">Rackmountable_4U_server_3D_(64)</option>
+            <option value="115">Rackmountable_4U_server_3D_(96)</option>
+            <option value="113">Rackmountable_4U_server_3D_(128)</option>
+            <option value="117">Rackmountable_5U_server_2D_(64)</option>
+            <option value="118">Rackmountable_5U_server_2D_(96)</option>
+            <option value="116">Rackmountable_5U_server_2D_(128)</option>
+            <option value="120">Rackmountable_5U_server_3D_(64)</option>
+            <option value="121">Rackmountable_5U_server_3D_(96)</option>
+            <option value="119">Rackmountable_5U_server_3D_(128)</option>
+            <option value="87">Rack_42_(64)</option>
+            <option value="88">Rack_42_(96)</option>
+            <option value="86">Rack_42_(128)</option>
+            <option value="90">Rack_42_with_door_(64)</option>
+            <option value="91">Rack_42_with_door_(96)</option>
+            <option value="89">Rack_42_with_door_(128)</option>
+            <option value="123">Router_(24)</option>
+            <option value="124">Router_(48)</option>
+            <option value="125">Router_(64)</option>
+            <option value="126">Router_(96)</option>
+            <option value="122">Router_(128)</option>
+            <option value="128">Router_symbol_(24)</option>
+            <option value="129">Router_symbol_(48)</option>
+            <option value="130">Router_symbol_(64)</option>
+            <option value="131">Router_symbol_(96)</option>
+            <option value="127">Router_symbol_(128)</option>
+            <option value="133">SAN_(24)</option>
+            <option value="134">SAN_(48)</option>
+            <option value="135">SAN_(64)</option>
+            <option value="136">SAN_(96)</option>
+            <option value="132">SAN_(128)</option>
+            <option value="138">Satellite_(24)</option>
+            <option value="139">Satellite_(48)</option>
+            <option value="140">Satellite_(64)</option>
+            <option value="141">Satellite_(96)</option>
+            <option value="137">Satellite_(128)</option>
+            <option value="143">Satellite_antenna_(24)</option>
+            <option value="144">Satellite_antenna_(48)</option>
+            <option value="145">Satellite_antenna_(64)</option>
+            <option value="146">Satellite_antenna_(96)</option>
+            <option value="142">Satellite_antenna_(128)</option>
+            <option value="148">Server_(24)</option>
+            <option value="149">Server_(48)</option>
+            <option value="150">Server_(64)</option>
+            <option value="151">Server_(96)</option>
+            <option value="147">Server_(128)</option>
+            <option value="153">Switch_(24)</option>
+            <option value="154">Switch_(48)</option>
+            <option value="155">Switch_(64)</option>
+            <option value="156">Switch_(96)</option>
+            <option value="152">Switch_(128)</option>
+            <option value="158">UPS_(24)</option>
+            <option value="159">UPS_(48)</option>
+            <option value="160">UPS_(64)</option>
+            <option value="161">UPS_(96)</option>
+            <option value="157">UPS_(128)</option>
+            <option value="163">UPS_rackmountable_2D_(24)</option>
+            <option value="164">UPS_rackmountable_2D_(48)</option>
+            <option value="165">UPS_rackmountable_2D_(64)</option>
+            <option value="166">UPS_rackmountable_2D_(96)</option>
+            <option value="162">UPS_rackmountable_2D_(128)</option>
+            <option value="168">UPS_rackmountable_3D_(24)</option>
+            <option value="169">UPS_rackmountable_3D_(48)</option>
+            <option value="170">UPS_rackmountable_3D_(64)</option>
+            <option value="171">UPS_rackmountable_3D_(96)</option>
+            <option value="167">UPS_rackmountable_3D_(128)</option>
+            <option value="173">Video_terminal_(24)</option>
+            <option value="174">Video_terminal_(48)</option>
+            <option value="175">Video_terminal_(64)</option>
+            <option value="176">Video_terminal_(96)</option>
+            <option value="172">Video_terminal_(128)</option>
+            <option value="178">Workstation_(24)</option>
+            <option value="179">Workstation_(48)</option>
+            <option value="180">Workstation_(64)</option>
+            <option value="181">Workstation_(96)</option>
+            <option value="177">Workstation_(128)</option>
+            <option value="183">Zabbix_server_2D_(64)</option>
+            <option value="184">Zabbix_server_2D_(96)</option>
+            <option value="182">Zabbix_server_2D_(128)</option>
+            <option value="186">Zabbix_server_3D_(64)</option>
+            <option value="187">Zabbix_server_3D_(96)</option>
+            <option value="185">Zabbix_server_3D_(128)</option>
+		</select></td><td><label>Problem</label>
+		<select>
+			<option value="0">Default</option>
+            <option value="2">Cloud_(24)</option>
+            <option value="3">Cloud_(48)</option>
+            <option value="4">Cloud_(64)</option>
+            <option value="5">Cloud_(96)</option>
+            <option value="1">Cloud_(128)</option>
+            <option value="7">Crypto-router_(24)</option>
+            <option value="8">Crypto-router_(48)</option>
+            <option value="9">Crypto-router_(64)</option>
+            <option value="10">Crypto-router_(96)</option>
+            <option value="12">Crypto-router_symbol_(24)</option>
+            <option value="13">Crypto-router_symbol_(48)</option>
+            <option value="14">Crypto-router_symbol_(64)</option>
+            <option value="15">Crypto-router_symbol_(96)</option>
+            <option value="11">Crypto-router_symbol_(128)</option>
+            <option value="18">Disk_array_2D_(48)</option>
+            <option value="19">Disk_array_2D_(64)</option>
+            <option value="20">Disk_array_2D_(96)</option>
+            <option value="16">Disk_array_2D_(128)</option>
+            <option value="22">Disk_array_3D_(24)</option>
+            <option value="23">Disk_array_3D_(48)</option>
+            <option value="24">Disk_array_3D_(64)</option>
+            <option value="25">Disk_array_3D_(96)</option>
+            <option value="21">Disk_array_3D_(128)</option>
+            <option value="27">Firewall_(24)</option>
+            <option value="28">Firewall_(48)</option>
+            <option value="29">Firewall_(64)</option>
+            <option value="30">Firewall_(96)</option>
+            <option value="26">Firewall_(128)</option>
+            <option value="32">House_(24)</option>
+            <option value="33">House_(48)</option>
+            <option value="34">House_(64)</option>
+            <option value="35">House_(96)</option>
+            <option value="31">House_(128)</option>
+            <option value="37">Hub_(24)</option>
+            <option value="38">Hub_(48)</option>
+            <option value="39">Hub_(64)</option>
+            <option value="40">Hub_(96)</option>
+            <option value="36">Hub_(128)</option>
+            <option value="42">IP_PBX_(24)</option>
+            <option value="43">IP_PBX_(48)</option>
+            <option value="44">IP_PBX_(64)</option>
+            <option value="45">IP_PBX_(96)</option>
+            <option value="41">IP_PBX_(128)</option>
+            <option value="47">IP_PBX_symbol_(24)</option>
+            <option value="48">IP_PBX_symbol_(48)</option>
+            <option value="49">IP_PBX_symbol_(64)</option>
+            <option value="50">IP_PBX_symbol_(96)</option>
+            <option value="46">IP_PBX_symbol_(128)</option>
+            <option value="52">Modem_(24)</option>
+            <option value="53">Modem_(48)</option>
+            <option value="54">Modem_(64)</option>
+            <option value="55">Modem_(96)</option>
+            <option value="51">Modem_(128)</option>
+            <option value="57">Network_(24)</option>
+            <option value="58">Network_(48)</option>
+            <option value="59">Network_(64)</option>
+            <option value="60">Network_(96)</option>
+            <option value="56">Network_(128)</option>
+            <option value="62">Network_adapter_(24)</option>
+            <option value="63">Network_adapter_(48)</option>
+            <option value="64">Network_adapter_(64)</option>
+            <option value="65">Network_adapter_(96)</option>
+            <option value="61">Network_adapter_(128)</option>
+            <option value="67">Notebook_(24)</option>
+            <option value="68">Notebook_(48)</option>
+            <option value="69">Notebook_(64)</option>
+            <option value="70">Notebook_(96)</option>
+            <option value="66">Notebook_(128)</option>
+            <option value="72">PBX_(24)</option>
+            <option value="73">PBX_(48)</option>
+            <option value="74">PBX_(64)</option>
+            <option value="75">PBX_(96)</option>
+            <option value="71">PBX_(128)</option>
+            <option value="77">Phone_(24)</option>
+            <option value="78">Phone_(48)</option>
+            <option value="79">Phone_(64)</option>
+            <option value="80">Phone_(96)</option>
+            <option value="76">Phone_(128)</option>
+            <option value="82">Printer_(24)</option>
+            <option value="83">Printer_(48)</option>
+            <option value="84">Printer_(64)</option>
+            <option value="85">Printer_(96)</option>
+            <option value="81">Printer_(128)</option>
+            <option value="93">Rackmountable_1U_server_2D_(64)</option>
+            <option value="94">Rackmountable_1U_server_2D_(96)</option>
+            <option value="92">Rackmountable_1U_server_2D_(128)</option>
+            <option value="96">Rackmountable_1U_server_3D_(64)</option>
+            <option value="97">Rackmountable_1U_server_3D_(96)</option>
+            <option value="95">Rackmountable_1U_server_3D_(128)</option>
+            <option value="99">Rackmountable_2U_server_2D_(64)</option>
+            <option value="100">Rackmountable_2U_server_2D_(96)</option>
+            <option value="98">Rackmountable_2U_server_2D_(128)</option>
+            <option value="102">Rackmountable_2U_server_3D_(64)</option>
+            <option value="103">Rackmountable_2U_server_3D_(96)</option>
+            <option value="101">Rackmountable_2U_server_3D_(128)</option>
+            <option value="105">Rackmountable_3U_server_2D_(64)</option>
+            <option value="106">Rackmountable_3U_server_2D_(96)</option>
+            <option value="104">Rackmountable_3U_server_2D_(128)</option>
+            <option value="108">Rackmountable_3U_server_3D_(64)</option>
+            <option value="109">Rackmountable_3U_server_3D_(96)</option>
+            <option value="107">Rackmountable_3U_server_3D_(128)</option>
+            <option value="111">Rackmountable_4U_server_2D_(64)</option>
+            <option value="112">Rackmountable_4U_server_2D_(96)</option>
+            <option value="110">Rackmountable_4U_server_2D_(128)</option>
+            <option value="114">Rackmountable_4U_server_3D_(64)</option>
+            <option value="115">Rackmountable_4U_server_3D_(96)</option>
+            <option value="113">Rackmountable_4U_server_3D_(128)</option>
+            <option value="117">Rackmountable_5U_server_2D_(64)</option>
+            <option value="118">Rackmountable_5U_server_2D_(96)</option>
+            <option value="116">Rackmountable_5U_server_2D_(128)</option>
+            <option value="120">Rackmountable_5U_server_3D_(64)</option>
+            <option value="121">Rackmountable_5U_server_3D_(96)</option>
+            <option value="119">Rackmountable_5U_server_3D_(128)</option>
+            <option value="87">Rack_42_(64)</option>
+            <option value="88">Rack_42_(96)</option>
+            <option value="86">Rack_42_(128)</option>
+            <option value="90">Rack_42_with_door_(64)</option>
+            <option value="89">Rack_42_with_door_(128)</option>
+            <option value="123">Router_(24)</option>
+            <option value="124">Router_(48)</option>
+            <option value="125">Router_(64)</option>
+            <option value="126">Router_(96)</option>
+            <option value="122">Router_(128)</option>
+            <option value="128">Router_symbol_(24)</option>
+            <option value="129">Router_symbol_(48)</option>
+            <option value="130">Router_symbol_(64)</option>
+            <option value="131">Router_symbol_(96)</option>
+            <option value="127">Router_symbol_(128)</option>
+            <option value="133">SAN_(24)</option>
+            <option value="134">SAN_(48)</option>
+            <option value="135">SAN_(64)</option>
+            <option value="136">SAN_(96)</option>
+            <option value="132">SAN_(128)</option>
+            <option value="138">Satellite_(24)</option>
+            <option value="139">Satellite_(48)</option>
+            <option value="140">Satellite_(64)</option>
+            <option value="141">Satellite_(96)</option>
+            <option value="137">Satellite_(128)</option>
+            <option value="143">Satellite_antenna_(24)</option>
+            <option value="144">Satellite_antenna_(48)</option>
+            <option value="145">Satellite_antenna_(64)</option>
+            <option value="146">Satellite_antenna_(96)</option>
+            <option value="142">Satellite_antenna_(128)</option>
+            <option value="148">Server_(24)</option>
+            <option value="149">Server_(48)</option>
+            <option value="150">Server_(64)</option>
+            <option value="151">Server_(96)</option>
+            <option value="147">Server_(128)</option>
+            <option value="153">Switch_(24)</option>
+            <option value="154">Switch_(48)</option>
+            <option value="155">Switch_(64)</option>
+            <option value="156">Switch_(96)</option>
+            <option value="152">Switch_(128)</option>
+            <option value="158">UPS_(24)</option>
+            <option value="159">UPS_(48)</option>
+            <option value="160">UPS_(64)</option>
+            <option value="161">UPS_(96)</option>
+            <option value="157">UPS_(128)</option>
+            <option value="163">UPS_rackmountable_2D_(24)</option>
+            <option value="164">UPS_rackmountable_2D_(48)</option>
+            <option value="165">UPS_rackmountable_2D_(64)</option>
+            <option value="166">UPS_rackmountable_2D_(96)</option>
+            <option value="162">UPS_rackmountable_2D_(128)</option>
+            <option value="168">UPS_rackmountable_3D_(24)</option>
+            <option value="169">UPS_rackmountable_3D_(48)</option>
+            <option value="170">UPS_rackmountable_3D_(64)</option>
+            <option value="171">UPS_rackmountable_3D_(96)</option>
+            <option value="167">UPS_rackmountable_3D_(128)</option>
+            <option value="173">Video_terminal_(24)</option>
+            <option value="174">Video_terminal_(48)</option>
+            <option value="175">Video_terminal_(64)</option>
+            <option value="176">Video_terminal_(96)</option>
+            <option value="172">Video_terminal_(128)</option>
+            <option value="178">Workstation_(24)</option>
+            <option value="179">Workstation_(48)</option>
+            <option value="180">Workstation_(64)</option>
+            <option value="181">Workstation_(96)</option>
+            <option value="177">Workstation_(128)</option>
+            <option value="183">Zabbix_server_2D_(64)</option>
+            <option value="184">Zabbix_server_2D_(96)</option>
+            <option value="182">Zabbix_server_2D_(128)</option>
+            <option value="186">Zabbix_server_3D_(64)</option>
+            <option value="187">Zabbix_server_3D_(96)</option>
+            <option value="185">Zabbix_server_3D_(128)</option>
+        </select></td></tr><tr><td><label>Maintenance</label>
+		<select>
+		    <option value="0">Default</option>
+		    <option value="2">Cloud_(24)</option>
+            <option value="3">Cloud_(48)</option>
+            <option value="4">Cloud_(64)</option>
+            <option value="5">Cloud_(96)</option>
+            <option value="1">Cloud_(128)</option>
+            <option value="7">Crypto-router_(24)</option>
+            <option value="8">Crypto-router_(48)</option>
+            <option value="9">Crypto-router_(64)</option>
+            <option value="10">Crypto-router_(96)</option>
+            <option value="6">Crypto-router_(128)</option>
+            <option value="12">Crypto-router_symbol_(24)</option>
+            <option value="13">Crypto-router_symbol_(48)</option>
+            <option value="14">Crypto-router_symbol_(64)</option>
+            <option value="15">Crypto-router_symbol_(96)</option>
+            <option value="11">Crypto-router_symbol_(128)</option>
+            <option value="17">Disk_array_2D_(24)</option>
+            <option value="18">Disk_array_2D_(48)</option>
+            <option value="19">Disk_array_2D_(64)</option>
+            <option value="20">Disk_array_2D_(96)</option>
+            <option value="16">Disk_array_2D_(128)</option>
+            <option value="22">Disk_array_3D_(24)</option>
+            <option value="23">Disk_array_3D_(48)</option>
+            <option value="24">Disk_array_3D_(64)</option>
+            <option value="25">Disk_array_3D_(96)</option>
+            <option value="21">Disk_array_3D_(128)</option>
+            <option value="27">Firewall_(24)</option>
+            <option value="28">Firewall_(48)</option>
+            <option value="29">Firewall_(64)</option>
+            <option value="30">Firewall_(96)</option>
+            <option value="26">Firewall_(128)</option>
+            <option value="32">House_(24)</option>
+            <option value="33">House_(48)</option>
+            <option value="34">House_(64)</option>
+            <option value="35">House_(96)</option>
+            <option value="31">House_(128)</option>
+            <option value="37">Hub_(24)</option>
+            <option value="38">Hub_(48)</option>
+            <option value="39">Hub_(64)</option>
+            <option value="40">Hub_(96)</option>
+            <option value="36">Hub_(128)</option>
+            <option value="42">IP_PBX_(24)</option>
+            <option value="43">IP_PBX_(48)</option>
+            <option value="44">IP_PBX_(64)</option>
+            <option value="45">IP_PBX_(96)</option>
+            <option value="41">IP_PBX_(128)</option>
+            <option value="47">IP_PBX_symbol_(24)</option>
+            <option value="48">IP_PBX_symbol_(48)</option>
+            <option value="49">IP_PBX_symbol_(64)</option>
+            <option value="50">IP_PBX_symbol_(96)</option>
+            <option value="46">IP_PBX_symbol_(128)</option>
+            <option value="52">Modem_(24)</option>
+            <option value="53">Modem_(48)</option>
+            <option value="54">Modem_(64)</option>
+            <option value="55">Modem_(96)</option>
+            <option value="51">Modem_(128)</option>
+            <option value="57">Network_(24)</option>
+            <option value="58">Network_(48)</option>
+            <option value="59">Network_(64)</option>
+            <option value="60">Network_(96)</option>
+            <option value="56">Network_(128)</option>
+            <option value="62">Network_adapter_(24)</option>
+            <option value="63">Network_adapter_(48)</option>
+            <option value="64">Network_adapter_(64)</option>
+            <option value="65">Network_adapter_(96)</option>
+            <option value="61">Network_adapter_(128)</option>
+            <option value="67">Notebook_(24)</option>
+            <option value="68">Notebook_(48)</option>
+            <option value="69">Notebook_(64)</option>
+            <option value="70">Notebook_(96)</option>
+            <option value="66">Notebook_(128)</option>
+            <option value="72">PBX_(24)</option>
+            <option value="73">PBX_(48)</option>
+            <option value="74">PBX_(64)</option>
+            <option value="75">PBX_(96)</option>
+            <option value="71">PBX_(128)</option>
+            <option value="77">Phone_(24)</option>
+            <option value="78">Phone_(48)</option>
+            <option value="79">Phone_(64)</option>
+            <option value="80">Phone_(96)</option>
+            <option value="76">Phone_(128)</option>
+            <option value="82">Printer_(24)</option>
+            <option value="83">Printer_(48)</option>
+            <option value="84">Printer_(64)</option>
+            <option value="85">Printer_(96)</option>
+            <option value="81">Printer_(128)</option>
+            <option value="93">Rackmountable_1U_server_2D_(64)</option>
+            <option value="94">Rackmountable_1U_server_2D_(96)</option>
+            <option value="92">Rackmountable_1U_server_2D_(128)</option>
+            <option value="96">Rackmountable_1U_server_3D_(64)</option>
+            <option value="97">Rackmountable_1U_server_3D_(96)</option>
+            <option value="95">Rackmountable_1U_server_3D_(128)</option>
+            <option value="99">Rackmountable_2U_server_2D_(64)</option>
+            <option value="100">Rackmountable_2U_server_2D_(96)</option>
+            <option value="98">Rackmountable_2U_server_2D_(128)</option>
+            <option value="102">Rackmountable_2U_server_3D_(64)</option>
+            <option value="103">Rackmountable_2U_server_3D_(96)</option>
+            <option value="101">Rackmountable_2U_server_3D_(128)</option>
+            <option value="105">Rackmountable_3U_server_2D_(64)</option>
+            <option value="106">Rackmountable_3U_server_2D_(96)</option>
+            <option value="104">Rackmountable_3U_server_2D_(128)</option>
+            <option value="108">Rackmountable_3U_server_3D_(64)</option>
+            <option value="109">Rackmountable_3U_server_3D_(96)</option>
+            <option value="107">Rackmountable_3U_server_3D_(128)</option>
+            <option value="111">Rackmountable_4U_server_2D_(64)</option>
+            <option value="112">Rackmountable_4U_server_2D_(96)</option>
+            <option value="110">Rackmountable_4U_server_2D_(128)</option>
+            <option value="114">Rackmountable_4U_server_3D_(64)</option>
+            <option value="115">Rackmountable_4U_server_3D_(96)</option>
+            <option value="113">Rackmountable_4U_server_3D_(128)</option>
+            <option value="117">Rackmountable_5U_server_2D_(64)</option>
+            <option value="118">Rackmountable_5U_server_2D_(96)</option>
+            <option value="116">Rackmountable_5U_server_2D_(128)</option>
+            <option value="120">Rackmountable_5U_server_3D_(64)</option>
+            <option value="121">Rackmountable_5U_server_3D_(96)</option>
+            <option value="119">Rackmountable_5U_server_3D_(128)</option>
+            <option value="87">Rack_42_(64)</option>
+            <option value="88">Rack_42_(96)</option>
+            <option value="86">Rack_42_(128)</option>
+            <option value="90">Rack_42_with_door_(64)</option>
+            <option value="91">Rack_42_with_door_(96)</option>
+            <option value="89">Rack_42_with_door_(128)</option>
+            <option value="123">Router_(24)</option>
+            <option value="124">Router_(48)</option>
+            <option value="125">Router_(64)</option>
+            <option value="126">Router_(96)</option>
+            <option value="122">Router_(128)</option>
+            <option value="128">Router_symbol_(24)</option>
+            <option value="129">Router_symbol_(48)</option>
+            <option value="130">Router_symbol_(64)</option>
+            <option value="131">Router_symbol_(96)</option>
+            <option value="127">Router_symbol_(128)</option>
+            <option value="133">SAN_(24)</option>
+            <option value="134">SAN_(48)</option>
+            <option value="135">SAN_(64)</option>
+            <option value="136">SAN_(96)</option>
+            <option value="132">SAN_(128)</option>
+            <option value="138">Satellite_(24)</option>
+            <option value="139">Satellite_(48)</option>
+            <option value="140">Satellite_(64)</option>
+            <option value="141">Satellite_(96)</option>
+            <option value="137">Satellite_(128)</option>
+            <option value="143">Satellite_antenna_(24)</option>
+            <option value="144">Satellite_antenna_(48)</option>
+            <option value="145">Satellite_antenna_(64)</option>
+            <option value="146">Satellite_antenna_(96)</option>
+            <option value="142">Satellite_antenna_(128)</option>
+            <option value="148">Server_(24)</option>
+            <option value="149">Server_(48)</option>
+            <option value="150">Server_(64)</option>
+            <option value="151">Server_(96)</option>
+            <option value="147">Server_(128)</option>
+            <option value="153">Switch_(24)</option>
+            <option value="154">Switch_(48)</option>
+            <option value="155">Switch_(64)</option>
+            <option value="156">Switch_(96)</option>
+            <option value="152">Switch_(128)</option>
+            <option value="158">UPS_(24)</option>
+            <option value="159">UPS_(48)</option>
+            <option value="160">UPS_(64)</option>
+            <option value="161">UPS_(96)</option>
+            <option value="157">UPS_(128)</option>
+            <option value="163">UPS_rackmountable_2D_(24)</option>
+            <option value="164">UPS_rackmountable_2D_(48)</option>
+            <option value="165">UPS_rackmountable_2D_(64)</option>
+            <option value="166">UPS_rackmountable_2D_(96)</option>
+            <option value="162">UPS_rackmountable_2D_(128)</option>
+            <option value="168">UPS_rackmountable_3D_(24)</option>
+            <option value="169">UPS_rackmountable_3D_(48)</option>
+            <option value="170">UPS_rackmountable_3D_(64)</option>
+            <option value="171">UPS_rackmountable_3D_(96)</option>
+            <option value="167">UPS_rackmountable_3D_(128)</option>
+            <option value="173">Video_terminal_(24)</option>
+            <option value="174">Video_terminal_(48)</option>
+            <option value="175">Video_terminal_(64)</option>
+            <option value="176">Video_terminal_(96)</option>
+            <option value="172">Video_terminal_(128)</option>
+            <option value="178">Workstation_(24)</option>
+            <option value="179">Workstation_(48)</option>
+            <option value="180">Workstation_(64)</option>
+            <option value="181">Workstation_(96)</option>
+            <option value="177">Workstation_(128)</option>
+            <option value="183">Zabbix_server_2D_(64)</option>
+            <option value="184">Zabbix_server_2D_(96)</option>
+            <option value="182">Zabbix_server_2D_(128)</option>
+            <option value="186">Zabbix_server_3D_(64)</option>
+            <option value="187">Zabbix_server_3D_(96)</option>
+            <option value="185">Zabbix_server_3D_(128)</option></select></td><td><label>Disabled</label>
+        <select>
+            <option value="0">Default</option>
+            <option value="2">Cloud_(24)</option>
+            <option value="3">Cloud_(48)</option>
+            <option value="4">Cloud_(64)</option>
+            <option value="5">Cloud_(96)</option>
+            <option value="1">Cloud_(128)</option>
+            <option value="7">Crypto-router_(24)</option>
+            <option value="8">Crypto-router_(48)</option>
+            <option value="9">Crypto-router_(64)</option>
+            <option value="10">Crypto-router_(96)</option>
+            <option value="6">Crypto-router_(128)</option>
+            <option value="12">Crypto-router_symbol_(24)</option>
+            <option value="13">Crypto-router_symbol_(48)</option>
+            <option value="14">Crypto-router_symbol_(64)</option>
+            <option value="15">Crypto-router_symbol_(96)</option>
+            <option value="11">Crypto-router_symbol_(128)</option>
+            <option value="17">Disk_array_2D_(24)</option>
+            <option value="18">Disk_array_2D_(48)</option>
+            <option value="19">Disk_array_2D_(64)</option>
+            <option value="20">Disk_array_2D_(96)</option>
+            <option value="16">Disk_array_2D_(128)</option>
+            <option value="22">Disk_array_3D_(24)</option>
+            <option value="23">Disk_array_3D_(48)</option>
+            <option value="24">Disk_array_3D_(64)</option>
+            <option value="25">Disk_array_3D_(96)</option>
+            <option value="21">Disk_array_3D_(128)</option>
+            <option value="27">Firewall_(24)</option>
+            <option value="28">Firewall_(48)</option>
+            <option value="29">Firewall_(64)</option>
+            <option value="30">Firewall_(96)</option>
+            <option value="26">Firewall_(128)</option>
+            <option value="32">House_(24)</option>
+            <option value="33">House_(48)</option>
+            <option value="34">House_(64)</option>
+            <option value="35">House_(96)</option>
+            <option value="31">House_(128)</option>
+            <option value="37">Hub_(24)</option>
+            <option value="38">Hub_(48)</option>
+            <option value="39">Hub_(64)</option>
+            <option value="40">Hub_(96)</option>
+            <option value="36">Hub_(128)</option>
+            <option value="42">IP_PBX_(24)</option>
+            <option value="43">IP_PBX_(48)</option>
+            <option value="44">IP_PBX_(64)</option>
+            <option value="45">IP_PBX_(96)</option>
+            <option value="41">IP_PBX_(128)</option>
+            <option value="47">IP_PBX_symbol_(24)</option>
+            <option value="48">IP_PBX_symbol_(48)</option>
+            <option value="49">IP_PBX_symbol_(64)</option>
+            <option value="50">IP_PBX_symbol_(96)</option>
+            <option value="46">IP_PBX_symbol_(128)</option>
+            <option value="52">Modem_(24)</option>
+            <option value="53">Modem_(48)</option>
+            <option value="54">Modem_(64)</option>
+            <option value="55">Modem_(96)</option>
+            <option value="51">Modem_(128)</option>
+            <option value="57">Network_(24)</option>
+            <option value="58">Network_(48)</option>
+            <option value="59">Network_(64)</option>
+            <option value="60">Network_(96)</option>
+            <option value="56">Network_(128)</option>
+            <option value="62">Network_adapter_(24)</option>
+            <option value="63">Network_adapter_(48)</option>
+            <option value="64">Network_adapter_(64)</option>
+            <option value="65">Network_adapter_(96)</option>
+            <option value="61">Network_adapter_(128)</option>
+            <option value="67">Notebook_(24)</option>
+            <option value="68">Notebook_(48)</option>
+            <option value="69">Notebook_(64)</option>
+            <option value="70">Notebook_(96)</option>
+            <option value="66">Notebook_(128)</option>
+            <option value="72">PBX_(24)</option>
+            <option value="73">PBX_(48)</option>
+            <option value="74">PBX_(64)</option>
+            <option value="75">PBX_(96)</option>
+            <option value="71">PBX_(128)</option>
+            <option value="77">Phone_(24)</option>
+            <option value="78">Phone_(48)</option>
+            <option value="79">Phone_(64)</option>
+            <option value="80">Phone_(96)</option>
+            <option value="76">Phone_(128)</option>
+            <option value="82">Printer_(24)</option>
+            <option value="83">Printer_(48)</option>
+            <option value="84">Printer_(64)</option>
+            <option value="85">Printer_(96)</option>
+            <option value="81">Printer_(128)</option>
+            <option value="93">Rackmountable_1U_server_2D_(64)</option>
+            <option value="94">Rackmountable_1U_server_2D_(96)</option>
+            <option value="92">Rackmountable_1U_server_2D_(128)</option>
+            <option value="96">Rackmountable_1U_server_3D_(64)</option>
+            <option value="97">Rackmountable_1U_server_3D_(96)</option>
+            <option value="95">Rackmountable_1U_server_3D_(128)</option>
+            <option value="99">Rackmountable_2U_server_2D_(64)</option>
+            <option value="100">Rackmountable_2U_server_2D_(96)</option>
+            <option value="98">Rackmountable_2U_server_2D_(128)</option>
+            <option value="102">Rackmountable_2U_server_3D_(64)</option>
+            <option value="103">Rackmountable_2U_server_3D_(96)</option>
+            <option value="101">Rackmountable_2U_server_3D_(128)</option>
+            <option value="105">Rackmountable_3U_server_2D_(64)</option>
+            <option value="106">Rackmountable_3U_server_2D_(96)</option>
+            <option value="104">Rackmountable_3U_server_2D_(128)</option>
+            <option value="108">Rackmountable_3U_server_3D_(64)</option>
+            <option value="109">Rackmountable_3U_server_3D_(96)</option>
+            <option value="107">Rackmountable_3U_server_3D_(128)</option>
+            <option value="111">Rackmountable_4U_server_2D_(64)</option>
+            <option value="112">Rackmountable_4U_server_2D_(96)</option>
+            <option value="110">Rackmountable_4U_server_2D_(128)</option>
+            <option value="114">Rackmountable_4U_server_3D_(64)</option>
+            <option value="115">Rackmountable_4U_server_3D_(96)</option>
+            <option value="113">Rackmountable_4U_server_3D_(128)</option>
+            <option value="117">Rackmountable_5U_server_2D_(64)</option>
+            <option value="118">Rackmountable_5U_server_2D_(96)</option>
+            <option value="116">Rackmountable_5U_server_2D_(128)</option>
+            <option value="120">Rackmountable_5U_server_3D_(64)</option>
+            <option value="121">Rackmountable_5U_server_3D_(96)</option>
+            <option value="119">Rackmountable_5U_server_3D_(128)</option>
+            <option value="87">Rack_42_(64)</option>
+            <option value="88">Rack_42_(96)</option>
+            <option value="86">Rack_42_(128)</option>
+            <option value="90">Rack_42_with_door_(64)</option>
+            <option value="91">Rack_42_with_door_(96)</option>
+            <option value="89">Rack_42_with_door_(128)</option>
+            <option value="123">Router_(24)</option>
+            <option value="124">Router_(48)</option>
+            <option value="125">Router_(64)</option>
+            <option value="126">Router_(96)</option>
+            <option value="122">Router_(128)</option>
+            <option value="128">Router_symbol_(24)</option>
+            <option value="129">Router_symbol_(48)</option>
+            <option value="130">Router_symbol_(64)</option>
+            <option value="131">Router_symbol_(96)</option>
+            <option value="127">Router_symbol_(128)</option>
+            <option value="133">SAN_(24)</option>
+            <option value="134">SAN_(48)</option>
+            <option value="135">SAN_(64)</option>
+            <option value="136">SAN_(96)</option>
+            <option value="132">SAN_(128)</option>
+            <option value="138">Satellite_(24)</option>
+            <option value="139">Satellite_(48)</option>
+            <option value="140">Satellite_(64)</option>
+            <option value="141">Satellite_(96)</option>
+            <option value="137">Satellite_(128)</option>
+            <option value="143">Satellite_antenna_(24)</option>
+            <option value="144">Satellite_antenna_(48)</option>
+            <option value="145">Satellite_antenna_(64)</option>
+            <option value="146">Satellite_antenna_(96)</option>
+            <option value="142">Satellite_antenna_(128)</option>
+            <option value="148">Server_(24)</option>
+            <option value="149">Server_(48)</option>
+            <option value="150">Server_(64)</option>
+            <option value="151">Server_(96)</option>
+            <option value="147">Server_(128)</option>
+            <option value="153">Switch_(24)</option>
+            <option value="154">Switch_(48)</option>
+            <option value="155">Switch_(64)</option>
+            <option value="156">Switch_(96)</option>
+            <option value="152">Switch_(128)</option>
+            <option value="158">UPS_(24)</option>
+            <option value="159">UPS_(48)</option>
+            <option value="160">UPS_(64)</option>
+            <option value="161">UPS_(96)</option>
+            <option value="157">UPS_(128)</option>
+            <option value="163">UPS_rackmountable_2D_(24)</option>
+            <option value="164">UPS_rackmountable_2D_(48)</option>
+            <option value="165">UPS_rackmountable_2D_(64)</option>
+            <option value="166">UPS_rackmountable_2D_(96)</option>
+            <option value="162">UPS_rackmountable_2D_(128)</option>
+            <option value="168">UPS_rackmountable_3D_(24)</option>
+            <option value="169">UPS_rackmountable_3D_(48)</option>
+            <option value="170">UPS_rackmountable_3D_(64)</option>
+            <option value="171">UPS_rackmountable_3D_(96)</option>
+            <option value="167">UPS_rackmountable_3D_(128)</option>
+            <option value="173">Video_terminal_(24)</option>
+            <option value="174">Video_terminal_(48)</option>
+            <option value="175">Video_terminal_(64)</option>
+            <option value="176">Video_terminal_(96)</option>
+            <option value="172">Video_terminal_(128)</option>
+            <option value="178">Workstation_(24)</option>
+            <option value="179">Workstation_(48)</option>
+            <option value="180">Workstation_(64)</option>
+            <option value="181">Workstation_(96)</option>
+            <option value="177">Workstation_(128)</option>
+            <option value="183">Zabbix_server_2D_(64)</option>
+            <option value="184">Zabbix_server_2D_(96)</option>
+            <option value="182">Zabbix_server_2D_(128)</option>
+            <option value="186">Zabbix_server_3D_(64)</option>
+            <option value="187">Zabbix_server_3D_(96)</option>
+            <option value="185">Zabbix_server_3D_(128)</option>
+        </select></td></tr></tbody></table></fieldset></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Coordinates</label></div>
+		<div class="table-forms-td-right"><input type="number" id="HostName"> <label>X</label>&nbsp;&nbsp;<input type="number" id="HostName"> <label>Y</label></div>
+		</li>
+		<li>
+		<!--<div class="table-forms-td-left"></div>-->
+		<div class="table-forms-td-right"><fieldset><legend>URLs</legend><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td><a href="#" class="link-dotted">Add</a></td><td></td></tr></tbody></table></fieldset></div>
+		</li>
+	</ul>
+	</div>
+<!--
+	<div class="overlay-dialogue" style="top: 130px; left: 570px">
+	<div class="dashbrd-widget-head"><h4>Mass update elements (2)</h4></div>
+	<table class="table-forms">
+		<tfoot>
+		<tr>
+		<div class="table-forms-td-left"></td>
+		<div class="table-forms-td-right"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Remove</button><button type="button">Apply</button></td>
+		</tr>
+		</tfoot>
+		<tbody>
+		<tr>
+		<td class="table-forms-td-right" colspan="2">
+		<div style="max-height: 128px; overflow-y: auto;">
+			<table class="list-table">
+			<tbody>
+			<tr>
+				<td>Host</td>
+				<td>Zabbix server</td>
+			</tr>
+			<tr>
+				<td>Image</td>
+				<td>Server_(96)</td>
+			</tr>
+			<tr>
+				<td>Image</td>
+				<td>Server_(96)</td>
+			</tr>
+			<tr>
+				<td>Image</td>
+				<td>Server_(96)</td>
+			</tr>
+			<tr>
+				<td>Image</td>
+				<td>Server_(96)</td>
+			</tr>
+			<tr>
+				<td>Image</td>
+				<td>Server_(96)</td>
+			</tr>
+			<tr>
+				<td>Image</td>
+				<td>Server_(96)</td>
+			</tr>
+			<tr>
+				<td>Image</td>
+				<td>Server_(96)</td>
+			</tr>
+			<tr>
+				<td>Image</td>
+				<td>Server_(96)</td>
+			</tr>
+			<tr>
+				<td>Image</td>
+				<td>Server_(96)</td>
+			</tr>
+			</tbody>
+			</table>
+		</div>
+		</td>
+		</tr>
+		<tr>
+		<div class="table-forms-td-left">Show</td>
+		<div class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> Host group</label></li><li><label for="IpAddr"><input type="radio" id="IpAddr"> Host group elements</label></li></ul></td>
+		</tr>
+		<tr>
+		<div class="table-forms-td-left">Area type</td>
+		<div class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr"> Fit to map</label></li><li><label for="IpAddr"><input type="radio" id="IpAddr"> Custom size</label></li></ul></td>
+		</tr>
+		<tr>
+		<div class="table-forms-td-left"><label for="VisibleName">Label</label></td>
+		<div class="table-forms-td-right"><textarea id="VisibleName"></textarea></td>
+		</tr>
+		<tr>
+		<div class="table-forms-td-left"><label for="HostName">Label location</label></td>
+		<div class="table-forms-td-right"><select><option>Bottom</option></select></td>
+		</tr>
+		<tr>
+		<div class="table-forms-td-left"><label for="HostName">Host</label></td>
+		<div class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></td>
+		</tr>
+		<tr>
+		<div class="table-forms-td-left"><label for="HostName">Application</label></td>
+		<div class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></td>
+		</tr>
+		<tr>
+		<!--<div class="table-forms-td-left"></td>--><!--
+		<td class="table-forms-td-right" colspan="2"><fieldset><legend>Icons</legend><table><tbody><tr><td colspan="2"><label for="UseIconmap"><input type="checkbox" id="UseIconmap"> Automatic icon selection</label></td></tr><tr><td><label>Default</label>
+		<select>
+		    <option value="2">Cloud_(24)</option>
+		    <option value="3">Cloud_(48)</option>
+		    <option value="4">Cloud_(64)</option>
+		    <option value="5">Cloud_(96)</option>
+		    <option value="1">Cloud_(128)</option>
+		    <option value="7">Crypto-router_(24)</option>
+            <option value="8">Crypto-router_(48)</option>
+            <option value="9">Crypto-router_(64)</option>
+            <option value="10">Crypto-router_(96)</option>
+            <option value="6">Crypto-router_(128)</option>
+            <option value="12">Crypto-router_symbol_(24)</option>
+            <option value="13">Crypto-router_symbol_(48)</option>
+            <option value="14">Crypto-router_symbol_(64)</option>
+            <option value="15">Crypto-router_symbol_(96)</option>
+            <option value="11">Crypto-router_symbol_(128)</option>
+            <option value="17">Disk_array_2D_(24)</option>
+            <option value="19">Disk_array_2D_(64)</option>
+            <option value="20">Disk_array_2D_(96)</option>
+            <option value="16">Disk_array_2D_(128)</option>
+            <option value="22">Disk_array_3D_(24)</option>
+            <option value="23">Disk_array_3D_(48)</option>
+            <option value="25">Disk_array_3D_(96)</option>
+            <option value="21">Disk_array_3D_(128)</option>
+            <option value="27">Firewall_(24)</option>
+            <option value="28">Firewall_(48)</option>
+            <option value="29">Firewall_(64)</option>
+            <option value="30">Firewall_(96)</option>
+            <option value="26">Firewall_(128)</option>
+            <option value="32">House_(24)</option>
+            <option value="34">House_(64)</option>
+            <option value="35">House_(96)</option>
+            <option value="31">House_(128)</option>
+            <option value="37">Hub_(24)</option>
+            <option value="38">Hub_(48)</option>
+            <option value="39">Hub_(64)</option>
+            <option value="40">Hub_(96)</option>
+            <option value="36">Hub_(128)</option>
+            <option value="42">IP_PBX_(24)</option>
+            <option value="43">IP_PBX_(48)</option>
+            <option value="44">IP_PBX_(64)</option>
+            <option value="45">IP_PBX_(96)</option>
+            <option value="41">IP_PBX_(128)</option>
+            <option value="47">IP_PBX_symbol_(24)</option>
+            <option value="48">IP_PBX_symbol_(48)</option>
+            <option value="49">IP_PBX_symbol_(64)</option>
+            <option value="50">IP_PBX_symbol_(96)</option>
+            <option value="46">IP_PBX_symbol_(128)</option>
+            <option value="52">Modem_(24)</option>
+            <option value="54">Modem_(64)</option>
+            <option value="55">Modem_(96)</option>
+            <option value="51">Modem_(128)</option>
+            <option value="57">Network_(24)</option>
+            <option value="58">Network_(48)</option>
+            <option value="59">Network_(64)</option>
+            <option value="60">Network_(96)</option>
+            <option value="56">Network_(128)</option>
+            <option value="62">Network_adapter_(24)</option>
+            <option value="63">Network_adapter_(48)</option>
+            <option value="64">Network_adapter_(64)</option>
+            <option value="65">Network_adapter_(96)</option>
+            <option value="61">Network_adapter_(128)</option>
+            <option value="67">Notebook_(24)</option>
+            <option value="68">Notebook_(48)</option>
+            <option value="69">Notebook_(64)</option>
+            <option value="70">Notebook_(96)</option>
+            <option value="66">Notebook_(128)</option>
+            <option value="72">PBX_(24)</option>
+            <option value="73">PBX_(48)</option>
+            <option value="74">PBX_(64)</option>
+            <option value="75">PBX_(96)</option>
+            <option value="71">PBX_(128)</option>
+            <option value="77">Phone_(24)</option>
+            <option value="78">Phone_(48)</option>
+            <option value="79">Phone_(64)</option>
+            <option value="80">Phone_(96)</option>
+            <option value="76">Phone_(128)</option>
+            <option value="82">Printer_(24)</option>
+            <option value="83">Printer_(48)</option>
+            <option value="84">Printer_(64)</option>
+            <option value="85">Printer_(96)</option>
+            <option value="81">Printer_(128)</option>
+            <option value="93">Rackmountable_1U_server_2D_(64)</option>
+            <option value="94">Rackmountable_1U_server_2D_(96)</option>
+            <option value="92">Rackmountable_1U_server_2D_(128)</option>
+            <option value="96">Rackmountable_1U_server_3D_(64)</option>
+            <option value="97">Rackmountable_1U_server_3D_(96)</option>
+            <option value="95">Rackmountable_1U_server_3D_(128)</option>
+            <option value="99">Rackmountable_2U_server_2D_(64)</option>
+            <option value="100">Rackmountable_2U_server_2D_(96)</option>
+            <option value="98">Rackmountable_2U_server_2D_(128)</option>
+            <option value="102">Rackmountable_2U_server_3D_(64)</option>
+            <option value="103">Rackmountable_2U_server_3D_(96)</option>
+            <option value="101">Rackmountable_2U_server_3D_(128)</option>
+            <option value="105">Rackmountable_3U_server_2D_(64)</option>
+            <option value="106">Rackmountable_3U_server_2D_(96)</option>
+            <option value="104">Rackmountable_3U_server_2D_(128)</option>
+            <option value="108">Rackmountable_3U_server_3D_(64)</option>
+            <option value="109">Rackmountable_3U_server_3D_(96)</option>
+            <option value="107">Rackmountable_3U_server_3D_(128)</option>
+            <option value="111">Rackmountable_4U_server_2D_(64)</option>
+            <option value="110">Rackmountable_4U_server_2D_(128)</option>
+            <option value="114">Rackmountable_4U_server_3D_(64)</option>
+            <option value="115">Rackmountable_4U_server_3D_(96)</option>
+            <option value="113">Rackmountable_4U_server_3D_(128)</option>
+            <option value="117">Rackmountable_5U_server_2D_(64)</option>
+            <option value="118">Rackmountable_5U_server_2D_(96)</option>
+            <option value="116">Rackmountable_5U_server_2D_(128)</option>
+            <option value="120">Rackmountable_5U_server_3D_(64)</option>
+            <option value="121">Rackmountable_5U_server_3D_(96)</option>
+            <option value="119">Rackmountable_5U_server_3D_(128)</option>
+            <option value="87">Rack_42_(64)</option>
+            <option value="88">Rack_42_(96)</option>
+            <option value="86">Rack_42_(128)</option>
+            <option value="90">Rack_42_with_door_(64)</option>
+            <option value="91">Rack_42_with_door_(96)</option>
+            <option value="89">Rack_42_with_door_(128)</option>
+            <option value="123">Router_(24)</option>
+            <option value="124">Router_(48)</option>
+            <option value="125">Router_(64)</option>
+            <option value="126">Router_(96)</option>
+            <option value="122">Router_(128)</option>
+            <option value="128">Router_symbol_(24)</option>
+            <option value="129">Router_symbol_(48)</option>
+            <option value="130">Router_symbol_(64)</option>
+            <option value="131">Router_symbol_(96)</option>
+            <option value="127">Router_symbol_(128)</option>
+            <option value="133">SAN_(24)</option>
+            <option value="134">SAN_(48)</option>
+            <option value="135">SAN_(64)</option>
+            <option value="136">SAN_(96)</option>
+            <option value="132">SAN_(128)</option>
+            <option value="138">Satellite_(24)</option>
+            <option value="139">Satellite_(48)</option>
+            <option value="140">Satellite_(64)</option>
+            <option value="141">Satellite_(96)</option>
+            <option value="137">Satellite_(128)</option>
+            <option value="143">Satellite_antenna_(24)</option>
+            <option value="144">Satellite_antenna_(48)</option>
+            <option value="145">Satellite_antenna_(64)</option>
+            <option value="146">Satellite_antenna_(96)</option>
+            <option value="142">Satellite_antenna_(128)</option>
+            <option value="148">Server_(24)</option>
+            <option value="149">Server_(48)</option>
+            <option value="150">Server_(64)</option>
+            <option value="151">Server_(96)</option>
+            <option value="147">Server_(128)</option>
+            <option value="153">Switch_(24)</option>
+            <option value="154">Switch_(48)</option>
+            <option value="155">Switch_(64)</option>
+            <option value="156">Switch_(96)</option>
+            <option value="152">Switch_(128)</option>
+            <option value="158">UPS_(24)</option>
+            <option value="159">UPS_(48)</option>
+            <option value="160">UPS_(64)</option>
+            <option value="161">UPS_(96)</option>
+            <option value="157">UPS_(128)</option>
+            <option value="163">UPS_rackmountable_2D_(24)</option>
+            <option value="164">UPS_rackmountable_2D_(48)</option>
+            <option value="165">UPS_rackmountable_2D_(64)</option>
+            <option value="166">UPS_rackmountable_2D_(96)</option>
+            <option value="162">UPS_rackmountable_2D_(128)</option>
+            <option value="168">UPS_rackmountable_3D_(24)</option>
+            <option value="169">UPS_rackmountable_3D_(48)</option>
+            <option value="170">UPS_rackmountable_3D_(64)</option>
+            <option value="171">UPS_rackmountable_3D_(96)</option>
+            <option value="167">UPS_rackmountable_3D_(128)</option>
+            <option value="173">Video_terminal_(24)</option>
+            <option value="174">Video_terminal_(48)</option>
+            <option value="175">Video_terminal_(64)</option>
+            <option value="176">Video_terminal_(96)</option>
+            <option value="172">Video_terminal_(128)</option>
+            <option value="178">Workstation_(24)</option>
+            <option value="179">Workstation_(48)</option>
+            <option value="180">Workstation_(64)</option>
+            <option value="181">Workstation_(96)</option>
+            <option value="177">Workstation_(128)</option>
+            <option value="183">Zabbix_server_2D_(64)</option>
+            <option value="184">Zabbix_server_2D_(96)</option>
+            <option value="182">Zabbix_server_2D_(128)</option>
+            <option value="186">Zabbix_server_3D_(64)</option>
+            <option value="187">Zabbix_server_3D_(96)</option>
+            <option value="185">Zabbix_server_3D_(128)</option>
+		</select></td><td><label>Problem</label>
+		<select>
+			<option value="0">Default</option>
+            <option value="2">Cloud_(24)</option>
+            <option value="3">Cloud_(48)</option>
+            <option value="4">Cloud_(64)</option>
+            <option value="5">Cloud_(96)</option>
+            <option value="1">Cloud_(128)</option>
+            <option value="7">Crypto-router_(24)</option>
+            <option value="8">Crypto-router_(48)</option>
+            <option value="9">Crypto-router_(64)</option>
+            <option value="10">Crypto-router_(96)</option>
+            <option value="12">Crypto-router_symbol_(24)</option>
+            <option value="13">Crypto-router_symbol_(48)</option>
+            <option value="14">Crypto-router_symbol_(64)</option>
+            <option value="15">Crypto-router_symbol_(96)</option>
+            <option value="11">Crypto-router_symbol_(128)</option>
+            <option value="18">Disk_array_2D_(48)</option>
+            <option value="19">Disk_array_2D_(64)</option>
+            <option value="20">Disk_array_2D_(96)</option>
+            <option value="16">Disk_array_2D_(128)</option>
+            <option value="22">Disk_array_3D_(24)</option>
+            <option value="23">Disk_array_3D_(48)</option>
+            <option value="24">Disk_array_3D_(64)</option>
+            <option value="25">Disk_array_3D_(96)</option>
+            <option value="21">Disk_array_3D_(128)</option>
+            <option value="27">Firewall_(24)</option>
+            <option value="28">Firewall_(48)</option>
+            <option value="29">Firewall_(64)</option>
+            <option value="30">Firewall_(96)</option>
+            <option value="26">Firewall_(128)</option>
+            <option value="32">House_(24)</option>
+            <option value="33">House_(48)</option>
+            <option value="34">House_(64)</option>
+            <option value="35">House_(96)</option>
+            <option value="31">House_(128)</option>
+            <option value="37">Hub_(24)</option>
+            <option value="38">Hub_(48)</option>
+            <option value="39">Hub_(64)</option>
+            <option value="40">Hub_(96)</option>
+            <option value="36">Hub_(128)</option>
+            <option value="42">IP_PBX_(24)</option>
+            <option value="43">IP_PBX_(48)</option>
+            <option value="44">IP_PBX_(64)</option>
+            <option value="45">IP_PBX_(96)</option>
+            <option value="41">IP_PBX_(128)</option>
+            <option value="47">IP_PBX_symbol_(24)</option>
+            <option value="48">IP_PBX_symbol_(48)</option>
+            <option value="49">IP_PBX_symbol_(64)</option>
+            <option value="50">IP_PBX_symbol_(96)</option>
+            <option value="46">IP_PBX_symbol_(128)</option>
+            <option value="52">Modem_(24)</option>
+            <option value="53">Modem_(48)</option>
+            <option value="54">Modem_(64)</option>
+            <option value="55">Modem_(96)</option>
+            <option value="51">Modem_(128)</option>
+            <option value="57">Network_(24)</option>
+            <option value="58">Network_(48)</option>
+            <option value="59">Network_(64)</option>
+            <option value="60">Network_(96)</option>
+            <option value="56">Network_(128)</option>
+            <option value="62">Network_adapter_(24)</option>
+            <option value="63">Network_adapter_(48)</option>
+            <option value="64">Network_adapter_(64)</option>
+            <option value="65">Network_adapter_(96)</option>
+            <option value="61">Network_adapter_(128)</option>
+            <option value="67">Notebook_(24)</option>
+            <option value="68">Notebook_(48)</option>
+            <option value="69">Notebook_(64)</option>
+            <option value="70">Notebook_(96)</option>
+            <option value="66">Notebook_(128)</option>
+            <option value="72">PBX_(24)</option>
+            <option value="73">PBX_(48)</option>
+            <option value="74">PBX_(64)</option>
+            <option value="75">PBX_(96)</option>
+            <option value="71">PBX_(128)</option>
+            <option value="77">Phone_(24)</option>
+            <option value="78">Phone_(48)</option>
+            <option value="79">Phone_(64)</option>
+            <option value="80">Phone_(96)</option>
+            <option value="76">Phone_(128)</option>
+            <option value="82">Printer_(24)</option>
+            <option value="83">Printer_(48)</option>
+            <option value="84">Printer_(64)</option>
+            <option value="85">Printer_(96)</option>
+            <option value="81">Printer_(128)</option>
+            <option value="93">Rackmountable_1U_server_2D_(64)</option>
+            <option value="94">Rackmountable_1U_server_2D_(96)</option>
+            <option value="92">Rackmountable_1U_server_2D_(128)</option>
+            <option value="96">Rackmountable_1U_server_3D_(64)</option>
+            <option value="97">Rackmountable_1U_server_3D_(96)</option>
+            <option value="95">Rackmountable_1U_server_3D_(128)</option>
+            <option value="99">Rackmountable_2U_server_2D_(64)</option>
+            <option value="100">Rackmountable_2U_server_2D_(96)</option>
+            <option value="98">Rackmountable_2U_server_2D_(128)</option>
+            <option value="102">Rackmountable_2U_server_3D_(64)</option>
+            <option value="103">Rackmountable_2U_server_3D_(96)</option>
+            <option value="101">Rackmountable_2U_server_3D_(128)</option>
+            <option value="105">Rackmountable_3U_server_2D_(64)</option>
+            <option value="106">Rackmountable_3U_server_2D_(96)</option>
+            <option value="104">Rackmountable_3U_server_2D_(128)</option>
+            <option value="108">Rackmountable_3U_server_3D_(64)</option>
+            <option value="109">Rackmountable_3U_server_3D_(96)</option>
+            <option value="107">Rackmountable_3U_server_3D_(128)</option>
+            <option value="111">Rackmountable_4U_server_2D_(64)</option>
+            <option value="112">Rackmountable_4U_server_2D_(96)</option>
+            <option value="110">Rackmountable_4U_server_2D_(128)</option>
+            <option value="114">Rackmountable_4U_server_3D_(64)</option>
+            <option value="115">Rackmountable_4U_server_3D_(96)</option>
+            <option value="113">Rackmountable_4U_server_3D_(128)</option>
+            <option value="117">Rackmountable_5U_server_2D_(64)</option>
+            <option value="118">Rackmountable_5U_server_2D_(96)</option>
+            <option value="116">Rackmountable_5U_server_2D_(128)</option>
+            <option value="120">Rackmountable_5U_server_3D_(64)</option>
+            <option value="121">Rackmountable_5U_server_3D_(96)</option>
+            <option value="119">Rackmountable_5U_server_3D_(128)</option>
+            <option value="87">Rack_42_(64)</option>
+            <option value="88">Rack_42_(96)</option>
+            <option value="86">Rack_42_(128)</option>
+            <option value="90">Rack_42_with_door_(64)</option>
+            <option value="89">Rack_42_with_door_(128)</option>
+            <option value="123">Router_(24)</option>
+            <option value="124">Router_(48)</option>
+            <option value="125">Router_(64)</option>
+            <option value="126">Router_(96)</option>
+            <option value="122">Router_(128)</option>
+            <option value="128">Router_symbol_(24)</option>
+            <option value="129">Router_symbol_(48)</option>
+            <option value="130">Router_symbol_(64)</option>
+            <option value="131">Router_symbol_(96)</option>
+            <option value="127">Router_symbol_(128)</option>
+            <option value="133">SAN_(24)</option>
+            <option value="134">SAN_(48)</option>
+            <option value="135">SAN_(64)</option>
+            <option value="136">SAN_(96)</option>
+            <option value="132">SAN_(128)</option>
+            <option value="138">Satellite_(24)</option>
+            <option value="139">Satellite_(48)</option>
+            <option value="140">Satellite_(64)</option>
+            <option value="141">Satellite_(96)</option>
+            <option value="137">Satellite_(128)</option>
+            <option value="143">Satellite_antenna_(24)</option>
+            <option value="144">Satellite_antenna_(48)</option>
+            <option value="145">Satellite_antenna_(64)</option>
+            <option value="146">Satellite_antenna_(96)</option>
+            <option value="142">Satellite_antenna_(128)</option>
+            <option value="148">Server_(24)</option>
+            <option value="149">Server_(48)</option>
+            <option value="150">Server_(64)</option>
+            <option value="151">Server_(96)</option>
+            <option value="147">Server_(128)</option>
+            <option value="153">Switch_(24)</option>
+            <option value="154">Switch_(48)</option>
+            <option value="155">Switch_(64)</option>
+            <option value="156">Switch_(96)</option>
+            <option value="152">Switch_(128)</option>
+            <option value="158">UPS_(24)</option>
+            <option value="159">UPS_(48)</option>
+            <option value="160">UPS_(64)</option>
+            <option value="161">UPS_(96)</option>
+            <option value="157">UPS_(128)</option>
+            <option value="163">UPS_rackmountable_2D_(24)</option>
+            <option value="164">UPS_rackmountable_2D_(48)</option>
+            <option value="165">UPS_rackmountable_2D_(64)</option>
+            <option value="166">UPS_rackmountable_2D_(96)</option>
+            <option value="162">UPS_rackmountable_2D_(128)</option>
+            <option value="168">UPS_rackmountable_3D_(24)</option>
+            <option value="169">UPS_rackmountable_3D_(48)</option>
+            <option value="170">UPS_rackmountable_3D_(64)</option>
+            <option value="171">UPS_rackmountable_3D_(96)</option>
+            <option value="167">UPS_rackmountable_3D_(128)</option>
+            <option value="173">Video_terminal_(24)</option>
+            <option value="174">Video_terminal_(48)</option>
+            <option value="175">Video_terminal_(64)</option>
+            <option value="176">Video_terminal_(96)</option>
+            <option value="172">Video_terminal_(128)</option>
+            <option value="178">Workstation_(24)</option>
+            <option value="179">Workstation_(48)</option>
+            <option value="180">Workstation_(64)</option>
+            <option value="181">Workstation_(96)</option>
+            <option value="177">Workstation_(128)</option>
+            <option value="183">Zabbix_server_2D_(64)</option>
+            <option value="184">Zabbix_server_2D_(96)</option>
+            <option value="182">Zabbix_server_2D_(128)</option>
+            <option value="186">Zabbix_server_3D_(64)</option>
+            <option value="187">Zabbix_server_3D_(96)</option>
+            <option value="185">Zabbix_server_3D_(128)</option>
+        </select></td></tr><tr><td><label>Maintenance</label>
+		<select>
+		    <option value="0">Default</option>
+		    <option value="2">Cloud_(24)</option>
+            <option value="3">Cloud_(48)</option>
+            <option value="4">Cloud_(64)</option>
+            <option value="5">Cloud_(96)</option>
+            <option value="1">Cloud_(128)</option>
+            <option value="7">Crypto-router_(24)</option>
+            <option value="8">Crypto-router_(48)</option>
+            <option value="9">Crypto-router_(64)</option>
+            <option value="10">Crypto-router_(96)</option>
+            <option value="6">Crypto-router_(128)</option>
+            <option value="12">Crypto-router_symbol_(24)</option>
+            <option value="13">Crypto-router_symbol_(48)</option>
+            <option value="14">Crypto-router_symbol_(64)</option>
+            <option value="15">Crypto-router_symbol_(96)</option>
+            <option value="11">Crypto-router_symbol_(128)</option>
+            <option value="17">Disk_array_2D_(24)</option>
+            <option value="18">Disk_array_2D_(48)</option>
+            <option value="19">Disk_array_2D_(64)</option>
+            <option value="20">Disk_array_2D_(96)</option>
+            <option value="16">Disk_array_2D_(128)</option>
+            <option value="22">Disk_array_3D_(24)</option>
+            <option value="23">Disk_array_3D_(48)</option>
+            <option value="24">Disk_array_3D_(64)</option>
+            <option value="25">Disk_array_3D_(96)</option>
+            <option value="21">Disk_array_3D_(128)</option>
+            <option value="27">Firewall_(24)</option>
+            <option value="28">Firewall_(48)</option>
+            <option value="29">Firewall_(64)</option>
+            <option value="30">Firewall_(96)</option>
+            <option value="26">Firewall_(128)</option>
+            <option value="32">House_(24)</option>
+            <option value="33">House_(48)</option>
+            <option value="34">House_(64)</option>
+            <option value="35">House_(96)</option>
+            <option value="31">House_(128)</option>
+            <option value="37">Hub_(24)</option>
+            <option value="38">Hub_(48)</option>
+            <option value="39">Hub_(64)</option>
+            <option value="40">Hub_(96)</option>
+            <option value="36">Hub_(128)</option>
+            <option value="42">IP_PBX_(24)</option>
+            <option value="43">IP_PBX_(48)</option>
+            <option value="44">IP_PBX_(64)</option>
+            <option value="45">IP_PBX_(96)</option>
+            <option value="41">IP_PBX_(128)</option>
+            <option value="47">IP_PBX_symbol_(24)</option>
+            <option value="48">IP_PBX_symbol_(48)</option>
+            <option value="49">IP_PBX_symbol_(64)</option>
+            <option value="50">IP_PBX_symbol_(96)</option>
+            <option value="46">IP_PBX_symbol_(128)</option>
+            <option value="52">Modem_(24)</option>
+            <option value="53">Modem_(48)</option>
+            <option value="54">Modem_(64)</option>
+            <option value="55">Modem_(96)</option>
+            <option value="51">Modem_(128)</option>
+            <option value="57">Network_(24)</option>
+            <option value="58">Network_(48)</option>
+            <option value="59">Network_(64)</option>
+            <option value="60">Network_(96)</option>
+            <option value="56">Network_(128)</option>
+            <option value="62">Network_adapter_(24)</option>
+            <option value="63">Network_adapter_(48)</option>
+            <option value="64">Network_adapter_(64)</option>
+            <option value="65">Network_adapter_(96)</option>
+            <option value="61">Network_adapter_(128)</option>
+            <option value="67">Notebook_(24)</option>
+            <option value="68">Notebook_(48)</option>
+            <option value="69">Notebook_(64)</option>
+            <option value="70">Notebook_(96)</option>
+            <option value="66">Notebook_(128)</option>
+            <option value="72">PBX_(24)</option>
+            <option value="73">PBX_(48)</option>
+            <option value="74">PBX_(64)</option>
+            <option value="75">PBX_(96)</option>
+            <option value="71">PBX_(128)</option>
+            <option value="77">Phone_(24)</option>
+            <option value="78">Phone_(48)</option>
+            <option value="79">Phone_(64)</option>
+            <option value="80">Phone_(96)</option>
+            <option value="76">Phone_(128)</option>
+            <option value="82">Printer_(24)</option>
+            <option value="83">Printer_(48)</option>
+            <option value="84">Printer_(64)</option>
+            <option value="85">Printer_(96)</option>
+            <option value="81">Printer_(128)</option>
+            <option value="93">Rackmountable_1U_server_2D_(64)</option>
+            <option value="94">Rackmountable_1U_server_2D_(96)</option>
+            <option value="92">Rackmountable_1U_server_2D_(128)</option>
+            <option value="96">Rackmountable_1U_server_3D_(64)</option>
+            <option value="97">Rackmountable_1U_server_3D_(96)</option>
+            <option value="95">Rackmountable_1U_server_3D_(128)</option>
+            <option value="99">Rackmountable_2U_server_2D_(64)</option>
+            <option value="100">Rackmountable_2U_server_2D_(96)</option>
+            <option value="98">Rackmountable_2U_server_2D_(128)</option>
+            <option value="102">Rackmountable_2U_server_3D_(64)</option>
+            <option value="103">Rackmountable_2U_server_3D_(96)</option>
+            <option value="101">Rackmountable_2U_server_3D_(128)</option>
+            <option value="105">Rackmountable_3U_server_2D_(64)</option>
+            <option value="106">Rackmountable_3U_server_2D_(96)</option>
+            <option value="104">Rackmountable_3U_server_2D_(128)</option>
+            <option value="108">Rackmountable_3U_server_3D_(64)</option>
+            <option value="109">Rackmountable_3U_server_3D_(96)</option>
+            <option value="107">Rackmountable_3U_server_3D_(128)</option>
+            <option value="111">Rackmountable_4U_server_2D_(64)</option>
+            <option value="112">Rackmountable_4U_server_2D_(96)</option>
+            <option value="110">Rackmountable_4U_server_2D_(128)</option>
+            <option value="114">Rackmountable_4U_server_3D_(64)</option>
+            <option value="115">Rackmountable_4U_server_3D_(96)</option>
+            <option value="113">Rackmountable_4U_server_3D_(128)</option>
+            <option value="117">Rackmountable_5U_server_2D_(64)</option>
+            <option value="118">Rackmountable_5U_server_2D_(96)</option>
+            <option value="116">Rackmountable_5U_server_2D_(128)</option>
+            <option value="120">Rackmountable_5U_server_3D_(64)</option>
+            <option value="121">Rackmountable_5U_server_3D_(96)</option>
+            <option value="119">Rackmountable_5U_server_3D_(128)</option>
+            <option value="87">Rack_42_(64)</option>
+            <option value="88">Rack_42_(96)</option>
+            <option value="86">Rack_42_(128)</option>
+            <option value="90">Rack_42_with_door_(64)</option>
+            <option value="91">Rack_42_with_door_(96)</option>
+            <option value="89">Rack_42_with_door_(128)</option>
+            <option value="123">Router_(24)</option>
+            <option value="124">Router_(48)</option>
+            <option value="125">Router_(64)</option>
+            <option value="126">Router_(96)</option>
+            <option value="122">Router_(128)</option>
+            <option value="128">Router_symbol_(24)</option>
+            <option value="129">Router_symbol_(48)</option>
+            <option value="130">Router_symbol_(64)</option>
+            <option value="131">Router_symbol_(96)</option>
+            <option value="127">Router_symbol_(128)</option>
+            <option value="133">SAN_(24)</option>
+            <option value="134">SAN_(48)</option>
+            <option value="135">SAN_(64)</option>
+            <option value="136">SAN_(96)</option>
+            <option value="132">SAN_(128)</option>
+            <option value="138">Satellite_(24)</option>
+            <option value="139">Satellite_(48)</option>
+            <option value="140">Satellite_(64)</option>
+            <option value="141">Satellite_(96)</option>
+            <option value="137">Satellite_(128)</option>
+            <option value="143">Satellite_antenna_(24)</option>
+            <option value="144">Satellite_antenna_(48)</option>
+            <option value="145">Satellite_antenna_(64)</option>
+            <option value="146">Satellite_antenna_(96)</option>
+            <option value="142">Satellite_antenna_(128)</option>
+            <option value="148">Server_(24)</option>
+            <option value="149">Server_(48)</option>
+            <option value="150">Server_(64)</option>
+            <option value="151">Server_(96)</option>
+            <option value="147">Server_(128)</option>
+            <option value="153">Switch_(24)</option>
+            <option value="154">Switch_(48)</option>
+            <option value="155">Switch_(64)</option>
+            <option value="156">Switch_(96)</option>
+            <option value="152">Switch_(128)</option>
+            <option value="158">UPS_(24)</option>
+            <option value="159">UPS_(48)</option>
+            <option value="160">UPS_(64)</option>
+            <option value="161">UPS_(96)</option>
+            <option value="157">UPS_(128)</option>
+            <option value="163">UPS_rackmountable_2D_(24)</option>
+            <option value="164">UPS_rackmountable_2D_(48)</option>
+            <option value="165">UPS_rackmountable_2D_(64)</option>
+            <option value="166">UPS_rackmountable_2D_(96)</option>
+            <option value="162">UPS_rackmountable_2D_(128)</option>
+            <option value="168">UPS_rackmountable_3D_(24)</option>
+            <option value="169">UPS_rackmountable_3D_(48)</option>
+            <option value="170">UPS_rackmountable_3D_(64)</option>
+            <option value="171">UPS_rackmountable_3D_(96)</option>
+            <option value="167">UPS_rackmountable_3D_(128)</option>
+            <option value="173">Video_terminal_(24)</option>
+            <option value="174">Video_terminal_(48)</option>
+            <option value="175">Video_terminal_(64)</option>
+            <option value="176">Video_terminal_(96)</option>
+            <option value="172">Video_terminal_(128)</option>
+            <option value="178">Workstation_(24)</option>
+            <option value="179">Workstation_(48)</option>
+            <option value="180">Workstation_(64)</option>
+            <option value="181">Workstation_(96)</option>
+            <option value="177">Workstation_(128)</option>
+            <option value="183">Zabbix_server_2D_(64)</option>
+            <option value="184">Zabbix_server_2D_(96)</option>
+            <option value="182">Zabbix_server_2D_(128)</option>
+            <option value="186">Zabbix_server_3D_(64)</option>
+            <option value="187">Zabbix_server_3D_(96)</option>
+            <option value="185">Zabbix_server_3D_(128)</option></select></td><td><label>Disabled</label>
+        <select>
+            <option value="0">Default</option>
+            <option value="2">Cloud_(24)</option>
+            <option value="3">Cloud_(48)</option>
+            <option value="4">Cloud_(64)</option>
+            <option value="5">Cloud_(96)</option>
+            <option value="1">Cloud_(128)</option>
+            <option value="7">Crypto-router_(24)</option>
+            <option value="8">Crypto-router_(48)</option>
+            <option value="9">Crypto-router_(64)</option>
+            <option value="10">Crypto-router_(96)</option>
+            <option value="6">Crypto-router_(128)</option>
+            <option value="12">Crypto-router_symbol_(24)</option>
+            <option value="13">Crypto-router_symbol_(48)</option>
+            <option value="14">Crypto-router_symbol_(64)</option>
+            <option value="15">Crypto-router_symbol_(96)</option>
+            <option value="11">Crypto-router_symbol_(128)</option>
+            <option value="17">Disk_array_2D_(24)</option>
+            <option value="18">Disk_array_2D_(48)</option>
+            <option value="19">Disk_array_2D_(64)</option>
+            <option value="20">Disk_array_2D_(96)</option>
+            <option value="16">Disk_array_2D_(128)</option>
+            <option value="22">Disk_array_3D_(24)</option>
+            <option value="23">Disk_array_3D_(48)</option>
+            <option value="24">Disk_array_3D_(64)</option>
+            <option value="25">Disk_array_3D_(96)</option>
+            <option value="21">Disk_array_3D_(128)</option>
+            <option value="27">Firewall_(24)</option>
+            <option value="28">Firewall_(48)</option>
+            <option value="29">Firewall_(64)</option>
+            <option value="30">Firewall_(96)</option>
+            <option value="26">Firewall_(128)</option>
+            <option value="32">House_(24)</option>
+            <option value="33">House_(48)</option>
+            <option value="34">House_(64)</option>
+            <option value="35">House_(96)</option>
+            <option value="31">House_(128)</option>
+            <option value="37">Hub_(24)</option>
+            <option value="38">Hub_(48)</option>
+            <option value="39">Hub_(64)</option>
+            <option value="40">Hub_(96)</option>
+            <option value="36">Hub_(128)</option>
+            <option value="42">IP_PBX_(24)</option>
+            <option value="43">IP_PBX_(48)</option>
+            <option value="44">IP_PBX_(64)</option>
+            <option value="45">IP_PBX_(96)</option>
+            <option value="41">IP_PBX_(128)</option>
+            <option value="47">IP_PBX_symbol_(24)</option>
+            <option value="48">IP_PBX_symbol_(48)</option>
+            <option value="49">IP_PBX_symbol_(64)</option>
+            <option value="50">IP_PBX_symbol_(96)</option>
+            <option value="46">IP_PBX_symbol_(128)</option>
+            <option value="52">Modem_(24)</option>
+            <option value="53">Modem_(48)</option>
+            <option value="54">Modem_(64)</option>
+            <option value="55">Modem_(96)</option>
+            <option value="51">Modem_(128)</option>
+            <option value="57">Network_(24)</option>
+            <option value="58">Network_(48)</option>
+            <option value="59">Network_(64)</option>
+            <option value="60">Network_(96)</option>
+            <option value="56">Network_(128)</option>
+            <option value="62">Network_adapter_(24)</option>
+            <option value="63">Network_adapter_(48)</option>
+            <option value="64">Network_adapter_(64)</option>
+            <option value="65">Network_adapter_(96)</option>
+            <option value="61">Network_adapter_(128)</option>
+            <option value="67">Notebook_(24)</option>
+            <option value="68">Notebook_(48)</option>
+            <option value="69">Notebook_(64)</option>
+            <option value="70">Notebook_(96)</option>
+            <option value="66">Notebook_(128)</option>
+            <option value="72">PBX_(24)</option>
+            <option value="73">PBX_(48)</option>
+            <option value="74">PBX_(64)</option>
+            <option value="75">PBX_(96)</option>
+            <option value="71">PBX_(128)</option>
+            <option value="77">Phone_(24)</option>
+            <option value="78">Phone_(48)</option>
+            <option value="79">Phone_(64)</option>
+            <option value="80">Phone_(96)</option>
+            <option value="76">Phone_(128)</option>
+            <option value="82">Printer_(24)</option>
+            <option value="83">Printer_(48)</option>
+            <option value="84">Printer_(64)</option>
+            <option value="85">Printer_(96)</option>
+            <option value="81">Printer_(128)</option>
+            <option value="93">Rackmountable_1U_server_2D_(64)</option>
+            <option value="94">Rackmountable_1U_server_2D_(96)</option>
+            <option value="92">Rackmountable_1U_server_2D_(128)</option>
+            <option value="96">Rackmountable_1U_server_3D_(64)</option>
+            <option value="97">Rackmountable_1U_server_3D_(96)</option>
+            <option value="95">Rackmountable_1U_server_3D_(128)</option>
+            <option value="99">Rackmountable_2U_server_2D_(64)</option>
+            <option value="100">Rackmountable_2U_server_2D_(96)</option>
+            <option value="98">Rackmountable_2U_server_2D_(128)</option>
+            <option value="102">Rackmountable_2U_server_3D_(64)</option>
+            <option value="103">Rackmountable_2U_server_3D_(96)</option>
+            <option value="101">Rackmountable_2U_server_3D_(128)</option>
+            <option value="105">Rackmountable_3U_server_2D_(64)</option>
+            <option value="106">Rackmountable_3U_server_2D_(96)</option>
+            <option value="104">Rackmountable_3U_server_2D_(128)</option>
+            <option value="108">Rackmountable_3U_server_3D_(64)</option>
+            <option value="109">Rackmountable_3U_server_3D_(96)</option>
+            <option value="107">Rackmountable_3U_server_3D_(128)</option>
+            <option value="111">Rackmountable_4U_server_2D_(64)</option>
+            <option value="112">Rackmountable_4U_server_2D_(96)</option>
+            <option value="110">Rackmountable_4U_server_2D_(128)</option>
+            <option value="114">Rackmountable_4U_server_3D_(64)</option>
+            <option value="115">Rackmountable_4U_server_3D_(96)</option>
+            <option value="113">Rackmountable_4U_server_3D_(128)</option>
+            <option value="117">Rackmountable_5U_server_2D_(64)</option>
+            <option value="118">Rackmountable_5U_server_2D_(96)</option>
+            <option value="116">Rackmountable_5U_server_2D_(128)</option>
+            <option value="120">Rackmountable_5U_server_3D_(64)</option>
+            <option value="121">Rackmountable_5U_server_3D_(96)</option>
+            <option value="119">Rackmountable_5U_server_3D_(128)</option>
+            <option value="87">Rack_42_(64)</option>
+            <option value="88">Rack_42_(96)</option>
+            <option value="86">Rack_42_(128)</option>
+            <option value="90">Rack_42_with_door_(64)</option>
+            <option value="91">Rack_42_with_door_(96)</option>
+            <option value="89">Rack_42_with_door_(128)</option>
+            <option value="123">Router_(24)</option>
+            <option value="124">Router_(48)</option>
+            <option value="125">Router_(64)</option>
+            <option value="126">Router_(96)</option>
+            <option value="122">Router_(128)</option>
+            <option value="128">Router_symbol_(24)</option>
+            <option value="129">Router_symbol_(48)</option>
+            <option value="130">Router_symbol_(64)</option>
+            <option value="131">Router_symbol_(96)</option>
+            <option value="127">Router_symbol_(128)</option>
+            <option value="133">SAN_(24)</option>
+            <option value="134">SAN_(48)</option>
+            <option value="135">SAN_(64)</option>
+            <option value="136">SAN_(96)</option>
+            <option value="132">SAN_(128)</option>
+            <option value="138">Satellite_(24)</option>
+            <option value="139">Satellite_(48)</option>
+            <option value="140">Satellite_(64)</option>
+            <option value="141">Satellite_(96)</option>
+            <option value="137">Satellite_(128)</option>
+            <option value="143">Satellite_antenna_(24)</option>
+            <option value="144">Satellite_antenna_(48)</option>
+            <option value="145">Satellite_antenna_(64)</option>
+            <option value="146">Satellite_antenna_(96)</option>
+            <option value="142">Satellite_antenna_(128)</option>
+            <option value="148">Server_(24)</option>
+            <option value="149">Server_(48)</option>
+            <option value="150">Server_(64)</option>
+            <option value="151">Server_(96)</option>
+            <option value="147">Server_(128)</option>
+            <option value="153">Switch_(24)</option>
+            <option value="154">Switch_(48)</option>
+            <option value="155">Switch_(64)</option>
+            <option value="156">Switch_(96)</option>
+            <option value="152">Switch_(128)</option>
+            <option value="158">UPS_(24)</option>
+            <option value="159">UPS_(48)</option>
+            <option value="160">UPS_(64)</option>
+            <option value="161">UPS_(96)</option>
+            <option value="157">UPS_(128)</option>
+            <option value="163">UPS_rackmountable_2D_(24)</option>
+            <option value="164">UPS_rackmountable_2D_(48)</option>
+            <option value="165">UPS_rackmountable_2D_(64)</option>
+            <option value="166">UPS_rackmountable_2D_(96)</option>
+            <option value="162">UPS_rackmountable_2D_(128)</option>
+            <option value="168">UPS_rackmountable_3D_(24)</option>
+            <option value="169">UPS_rackmountable_3D_(48)</option>
+            <option value="170">UPS_rackmountable_3D_(64)</option>
+            <option value="171">UPS_rackmountable_3D_(96)</option>
+            <option value="167">UPS_rackmountable_3D_(128)</option>
+            <option value="173">Video_terminal_(24)</option>
+            <option value="174">Video_terminal_(48)</option>
+            <option value="175">Video_terminal_(64)</option>
+            <option value="176">Video_terminal_(96)</option>
+            <option value="172">Video_terminal_(128)</option>
+            <option value="178">Workstation_(24)</option>
+            <option value="179">Workstation_(48)</option>
+            <option value="180">Workstation_(64)</option>
+            <option value="181">Workstation_(96)</option>
+            <option value="177">Workstation_(128)</option>
+            <option value="183">Zabbix_server_2D_(64)</option>
+            <option value="184">Zabbix_server_2D_(96)</option>
+            <option value="182">Zabbix_server_2D_(128)</option>
+            <option value="186">Zabbix_server_3D_(64)</option>
+            <option value="187">Zabbix_server_3D_(96)</option>
+            <option value="185">Zabbix_server_3D_(128)</option>
+        </select></td></tr></tbody></table></fieldset></td>
+		</tr>
+		<tr>
+		<div class="table-forms-td-left"><label for="HostName">Coordinates</label></td>
+		<div class="table-forms-td-right"><input type="number" id="HostName"> <label>X</label>&nbsp;&nbsp;<input type="number" id="HostName"> <label>Y</label></td>
+		</tr>
+		<tr>
+		<!--<div class="table-forms-td-left"></td>--><!--
+		<td class="table-forms-td-right" colspan="2"><fieldset><legend>URLs</legend><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><a href="#" class="form-remove-btn">&times;</a></td></tr><tr><td><a href="#" class="link-dotted">Add</a></td><td></td></tr></tbody></table></fieldset></div>
+		</li>
+	</ul>
+	</div>-->
+
+	</div>
+	<div class="footer">
+	<a href="http://www.zabbix.com" target="_blank" class="logo"></a>
+	Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" target="_blank">Zabbix SIA</a>
+	</div>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Zabbix | Hosts</title>
+		<link rel="stylesheet" href="stylesheets/screen.css">
+		<!--<link rel="stylesheet" href="stylesheets/dark-theme.css">-->
+        <link rel="icon" href="favicon.ico">
+        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+        <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+	</head>
+<body>
+	<header role="banner">
+		<div class="nav" role="navigation">
+			<div class="top-nav-container">
+			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><li><a href="" class="top-nav-print" title="Print"></a></li><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			</div>
+			<div class="top-subnav-container">
+			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
+			</div>
+		</div>
+	</header>
+	<div class="article">
+	<div class="header-title">
+	<h1>Dashboard</h1>
+	<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li><li><button type="button" class="btn-add-fav" title="Add to dashboard"></button></li><li><button type="button" class="btn-remove-fav" title="Remove from dashboard"></button></li><li><button type="button" class="btn-action" title="Action"></button></li><li><button type="button" class="btn-info" title="Info"></button></li><li><button type="button" class="btn-reset" title="Reset"></button></li></ul></form>
+	</div>
+	<div class="table widget-placeholder">
+	<div class="row">
+	<div class="cell">
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head">
+		<h4>Favorite screens</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<tbody>
+			<tr>
+				<td><a href="#">Zabbix server</a></td>
+			</tr>
+			<tr>
+				<td><a href="#">My 2nd megaserver</a></td>
+			</tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li><a href="#">Screens</a></li><li><a href="#">Slide shows</a></li></ul>
+	</div>
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head">
+		<h4>Favorite graphs</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<tbody>
+			<tr class="nothing-to-show">
+				<td>No graphs added</td>
+			</tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li><a href="#">Graphs</a></li></ul>
+	</div>
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head">
+		<h4>Favorite maps</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+	</div>
+	</div>
+	<div class="cell">
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head">
+		<h4>Status of Zabbix</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<thead>
+		<tr>
+			<th>Parameter</th>
+			<th>Value</th>
+			<th>Details</th>
+		</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Zabbix server is running</td><td><span class="green">Yes</span></td><td>Localhost: 10051</td>
+			</tr>
+			<tr>
+				<td>Number of hosts (enabled/disabled/templates)</td><td>25</td><td><span class="green">2</span>/<span class="red">0</span>/<span class="grey">23</span></td>
+			</tr>
+			<tr>
+				<td>Number of items (enabled/disabled/not supported)</td><td>67</td><td><span class="green">62</span>/<span class="red">2</span>/<span class="grey">3</span></td>
+			</tr>
+			<tr>
+				<td>Number of triggers (enabled/disabled/[problem/ok])</td><td>40</td><td>40/0/[<span class="red">0</span>/<span class="green">40</span>]</td>
+			</tr>
+			<tr>
+				<td>Number of users (online)</td><td>2</td><td><span class="green">1</span></td>
+			</tr>
+			<tr>
+				<td>Required server performance, new values per second</td><td>0.86</td><td>&ndash;</td>
+			</tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li>Updated 17:51:21</li></ul>
+	</div>
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head">
+		<h4>Host status</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<thead>
+		<tr>
+			<th>Host group</th>
+			<th>Without problems</th>
+			<th>With problems</th>
+			<th>Total</th>
+		</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Zabbix servers</td><td class="normal-bg"><span class="link-action">2222222</span></td><td class="normal-bg">0</td><td>2</td>
+			</tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li>Updated 09:28:45</li></ul>
+	</div>
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head">
+		<h4>Web monitoring</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<tbody>
+			<tr class="nothing-to-show">
+				<td><!--No web scenarios found--><div class="preloader"></div></td>
+			</tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li>Updated 09:28:45</li></ul>
+	</div>
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head">
+		<h4>Last 20 issues</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<tbody>
+			<tr class="nothing-to-show">
+				<td>No events found</td>
+			</tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li>10 of 10 issues are shown</li><li>Updated 09:28:45</li></ul>
+	</div>
+	</div>
+	<div class="cell">
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head">
+		<h4>System status</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<thead>
+		<tr>
+			<th>Host group</th>
+			<th>Disaster</th>
+			<th>High</th>
+			<th>Average</th>
+			<th>Warning</th>
+			<th>Info</th>
+			<th>Not classified</th>
+		</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><a href="#">Zabbix servers</a></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+			</tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li>Updated 11:17:48</li></ul>
+	</div>
+	</div>
+	</div>
+	</div>
+
+	<ul class="action-menu" style="top: 156px; left: 669px">
+	<li><h3>Favourite screens</h3></li>
+	<li><span class="action-menu-item">Add</span></li>
+	<li><span class="action-menu-item">Remove<span class="arrow-right"></span></span>
+	<ul class="action-menu" style="top: 47px; left: 204px">
+	<li><span class="action-menu-item">Zabbix server</span></li>
+	</ul></li>
+	<li><span class="action-menu-item">Remove all</span></li>
+	<li><div></div></li>
+	<li><h3>Favourite slide shows</h3></li>
+	<li><span class="action-menu-item selected">Add</span></li>
+	<li><span class="action-menu-item-disabled">Remove</span></li>
+	<li><span class="action-menu-item-disabled">Remove all</span></li>
+	</ul>
+
+	<div class="overlay-dialogue" style="top: 520px; left: 700px">
+	<span class="overlay-close-btn">&times;</span>
+		<table class="list-table">
+		<thead>
+		<tr>
+			<th>Host</th>
+			<th>Disaster</th>
+			<th>High</th>
+			<th>Average</th>
+			<th>Warning</th>
+			<th>Information</th>
+			<th>Not classified</th>
+		</tr>
+		</thead>
+		<tbody>
+			<tr><td><a href="#">vSphere 001</a></td><td class="disaster-bg">25</td><td class="high-bg">7</td><td class="average-bg">0</td><td class="warning-bg">2</td><td class="info-bg">0</td><td class="na-bg">0</td></tr>
+			<tr><td><a href="#">vSphere 002</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
+			<tr><td><a href="#">vSphere 003</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
+			<tr><td><a href="#">vSphere 004</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
+			<tr><td><a href="#">vSphere 005</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
+		</tbody>
+		</table>
+	</div>
+<div class="preloader"></div>
+	</div>
+	<div class="footer">
+	<a href="http://www.zabbix.com" target="_blank" class="logo"></a>
+	Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
+	</div>
+	<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
+
+	<div id="" class="overlay-dialogue notifications" style="top: 128px; right: 13px">
+	<span class="overlay-close-btn">&times;</span>
+	<div class="dashbrd-widget-head">
+	<h4>Notifications</h4><ul><li><button type="button" class="btn-alarm-on" title="Alarm on"></button></li><li><button type="button" class="btn-alarm-off" title="Alarm off"></button></li><li><button type="button" class="btn-sound-on" title="Sound on"></button></li><li><button type="button" class="btn-sound-off" title="Sound off"></button></li></ul></div>
+
+	<table class="list-table">
+	<tr>
+	<td class="disaster-bg"></td>
+	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
+	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
+	</tr>
+	<tr>
+	<td class="high-bg"></td>
+	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
+	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
+	</tr>
+	<tr>
+	<td class="average-bg"></td>
+	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
+	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
+	</tr>
+	<tr>
+	<td class="warning-bg"></td>
+	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
+	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
+	</tr>
+	<tr>
+	<td class="normal-bg"></td>
+	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
+	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
+	</tr>
+	<tr>
+	<td class="info-bg"></td>
+	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
+	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
+	</tr>
+	<tr>
+	<td class="na-bg"></td>
+	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
+	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
+	</tr>
+	</table>
+	</div>
+<!--
+<div id="zbx_messages" class="messagecontainer ui-draggable" style="opacity: 0.9; top: 104px;"><div class="header"><h3 class="headertext move">Messages</h3><div class="controls"><ul class="" style="float: right;"><li class="linear"><div title="Snooze" class="iconsnooze menu_icon shadow"></div></li><li class="linear"><div title="Mute/Unmute" class="iconsound menu_icon shadow"></div></li><li class="linear"><div title="Clear" class="iconclose menu_icon shadow"></div></li></ul></div></div><ul class=""><li class="listItem"><div class="message" style="background-color: rgb(170, 255, 170);"><div class="messagebox"><span class="title">Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></span><br><span class="body">Details: <a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></span><br><span class="body">Date: <b><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></b></span></div></div></li></ul></div>
+-->
+</body>
+</html>
