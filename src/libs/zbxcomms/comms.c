@@ -1440,10 +1440,11 @@ static ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len)
 		{
 			res = gnutls_record_recv(s->tls_ctx, buf, len);
 		}
-		while (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res);	/* TODO maybe GNUTLS_E_REHANDSHAKE */
+		while (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res);
 
 		if (0 > res)
 		{
+			/* in case of rehandshake a GNUTLS_E_REHANDSHAKE will be returned, deal with it as with error */
 #if defined(_WINDOWS)
 			zbx_set_socket_strerror("gnutls_record_recv() failed: %Id %s", res, gnutls_strerror(res));
 #else
