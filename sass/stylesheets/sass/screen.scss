@@ -1112,6 +1112,7 @@ footer {
 			display: block;
 			height: 24px;
 			line-height: 24px;
+			//padding: 4px 0;
 		}
 
 		input {
@@ -1346,6 +1347,7 @@ legend {
 	font-size: $font-form-size;
 	color: $font-color;
 	background-color: $form-bg-color;
+	//vertical-align: top;
 	@include transition(border-color .2s ease-out);
 
 	&:focus {
@@ -1355,6 +1357,7 @@ legend {
 
 button::-moz-focus-inner {
 	padding: 0;
+	border: 0;
 }
 
 button {
@@ -1365,12 +1368,18 @@ button {
 	border: 1px solid $btn-bg-color;
 	padding: 0 11px;
 	min-height: 24px;
+	//line-height: 24px;
 	vertical-align: middle;
 	cursor: pointer;
 	@include transition(border-color, background-color .2s ease-out);
 
 	&:hover {
 		@extend %button-hover;
+	}
+
+	&:focus {
+		outline: thin dotted;
+		outline-offset: -2px;
 	}
 
 	&:active {
@@ -1391,7 +1400,7 @@ button {
 		}
 	}
 
-	&.btn-add {
+	&.btn-link {
 		background-color: $transparent;
 		border: none;
 		color: $link-color;
@@ -1402,11 +1411,11 @@ button {
 		@include border-radius(0);
 
 		&:hover {
-			@extend .btn-add;
+			@extend .btn-link;
 		}
 
 		&:active {
-			@extend .btn-add;
+			@extend .btn-link;
 		}  
 	}
 
@@ -1678,6 +1687,10 @@ button {
 			background-color: $ui-hover-color;
 			border-color: $btn-form-border-color;
 		}
+
+		//&:focus {
+		//	border-color: $form-border-focus-color;
+		//}
 
 		&:active {
 			color: $btn-form-font-color;
