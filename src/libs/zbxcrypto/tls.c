@@ -3330,7 +3330,9 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	s->tls_psk_client_creds = NULL;
 	s->tls_psk_server_creds = NULL;
 
-	if (GNUTLS_E_SUCCESS != (res = gnutls_init(&s->tls_ctx, GNUTLS_CLIENT))) /* TODO use GNUTLS_NO_EXTENSIONS ? */
+	if (GNUTLS_E_SUCCESS != (res = gnutls_init(&s->tls_ctx, GNUTLS_CLIENT | GNUTLS_NO_EXTENSIONS)))
+			/* GNUTLS_NO_EXTENSIONS is used because we do not currently support extensions (e.g. session */
+			/* tickets and OCSP) */
 	{
 		*error = zbx_dsprintf(*error, "gnutls_init() failed: %d %s", res, gnutls_strerror(res));
 		goto out;
@@ -4010,7 +4012,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	s->tls_psk_client_creds = NULL;
 	s->tls_psk_server_creds = NULL;
 
-	if (GNUTLS_E_SUCCESS != (res = gnutls_init(&s->tls_ctx, GNUTLS_SERVER))) /* TODO use GNUTLS_NO_EXTENSIONS ? */
+	if (GNUTLS_E_SUCCESS != (res = gnutls_init(&s->tls_ctx, GNUTLS_SERVER)))
 	{
 		*error = zbx_dsprintf(*error, "gnutls_init() failed: %d %s", res, gnutls_strerror(res));
 		goto out;
