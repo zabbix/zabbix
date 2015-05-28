@@ -203,7 +203,7 @@ $buttonRow->setAttribute('id', 'row_new_group_prototype');
 $buttonRow->addItem($buttonColumn);
 
 $customGroupTable->addRow($buttonRow);
-$groupDiv = new CDiv($customGroupTable, 'objectgroup border_dotted ui-corner-all group-prototypes');
+$groupDiv = new CDiv($customGroupTable, 'objectgroup border_dotted group-prototypes');
 $groupList->addRow(_('Group prototypes'), $groupDiv);
 
 $divTabs->addTab('groupTab', _('Groups'), $groupList);
@@ -233,7 +233,7 @@ if ($hostPrototype['templates']) {
 		$ignoreTemplates[$template['templateid']] = $template['name'];
 	}
 
-	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'objectgroup inlineblock border_dotted'));
 }
 // for inherited prototypes with no templates display a text message
 elseif ($hostPrototype['templateid']) {
@@ -259,7 +259,7 @@ if (!$hostPrototype['templateid']) {
 
 	$newTemplateTable->addRow([new CSubmit('add_template', _('Add'), null, 'link_menu')]);
 
-	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted'));
 }
 
 $divTabs->addTab('templateTab', _('Templates'), $tmplList);

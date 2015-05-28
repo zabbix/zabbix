@@ -62,7 +62,7 @@ $interfaceTable->addRow([
 	$connectByComboBox,
 	new CTextBox('port', $data['port'], 18, false, 64)
 ]);
-$proxyFormList->addRow(_('Interface'), new CDiv($interfaceTable, 'objectgroup inlineblock border_dotted ui-corner-all'),
+$proxyFormList->addRow(_('Interface'), new CDiv($interfaceTable, 'objectgroup inlineblock border_dotted'),
 	$data['status'] != HOST_STATUS_PROXY_PASSIVE);
 
 // append hosts to form list

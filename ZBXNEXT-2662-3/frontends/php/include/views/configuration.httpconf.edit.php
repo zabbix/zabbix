@@ -238,7 +238,7 @@ if (!$this->data['templated']) {
 	$stepsTable->addRow((new CCol(new CButton('add_step', _('Add'), null, 'link_menu')))->setColSpan(8));
 }
 
-$httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineblock border_dotted'));
 
 // append tabs to form
 $httpTab = new CTabView();

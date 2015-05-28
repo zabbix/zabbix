@@ -224,7 +224,7 @@ if ($this->data['input_method'] == IM_TREE) {
 		$wrapOutline,
 		BR(),
 		BR(),
-		new CDiv([$expressionTable, $testButton], 'objectgroup inlineblock border_dotted ui-corner-all')
+		new CDiv([$expressionTable, $testButton], 'objectgroup inlineblock border_dotted')
 	]);
 
 	$inputMethodToggle = new CSpan(_('Close expression constructor'), 'link');
@@ -304,7 +304,7 @@ $dependenciesFormList->addRow(
 				'link_menu'
 			)
 		],
-		'objectgroup inlineblock border_dotted ui-corner-all'
+		'objectgroup inlineblock border_dotted'
 	)
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);

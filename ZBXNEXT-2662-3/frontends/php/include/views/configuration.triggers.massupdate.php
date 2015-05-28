@@ -100,7 +100,7 @@ $dependenciesDiv = new CDiv(
 			'link_menu'
 		)
 	],
-	'objectgroup inlineblock border_dotted ui-corner-all'
+	'objectgroup inlineblock border_dotted'
 );
 $dependenciesDiv->setAttribute('id', 'dependencies_div');
 

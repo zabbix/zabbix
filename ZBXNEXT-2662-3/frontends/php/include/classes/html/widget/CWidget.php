@@ -133,7 +133,7 @@ class CWidget {
 		$table->addRow($this->createHeaderRow($header['left'], $columnRights), 'first');
 
 		if ($this->css_class != 'header_wide') {
-			$table->addClass('ui-widget-header ui-corner-all');
+			$table->addClass('ui-widget-header');
 		}
 
 		foreach ($this->headers as $num => $header) {

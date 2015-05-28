@@ -3,7 +3,7 @@
 		<td>
 			<select class="input select" id="inventory_#{rowNum}_field" name="inventory[#{rowNum}][field]">
 				<?php foreach (getHostInventories() as $field): ?>
-					<option value="<?php echo $field['db_field'] ?>"><?php echo $field['title'] ?></option>
+					<option value="<?= $field['db_field'] ?>"><?= $field['title'] ?></option>
 				<?php endforeach ?>
 			</select>
 		</td>
@@ -12,8 +12,8 @@
 				   size="20" maxlength="255">
 		</td>
 		<td>
-			<button type="button" class="button link_menu element-table-remove" id="inventory_#{rowNum}_remove" name="inventory_#{rowNum}_remove">
-				<?php echo _('Remove'); ?>
+			<button type="button" class="element-table-remove" id="inventory_#{rowNum}_remove" name="inventory_#{rowNum}_remove">
+				<?= _('Remove') ?>
 			</button>
 		</td>
 	</tr>

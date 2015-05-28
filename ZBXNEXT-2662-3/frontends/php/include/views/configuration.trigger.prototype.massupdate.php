@@ -102,7 +102,7 @@ $addPrototypeButton = new CButton('add_dep_trigger_prototype', _('Add prototype'
 
 $dependenciesDiv = new CDiv(
 	[$dependenciesTable, $addButton, SPACE, SPACE, SPACE, $addPrototypeButton],
-	'objectgroup inlineblock border_dotted ui-corner-all'
+	'objectgroup inlineblock border_dotted'
 );
 $dependenciesDiv->setAttribute('id', 'dependencies_div');
 

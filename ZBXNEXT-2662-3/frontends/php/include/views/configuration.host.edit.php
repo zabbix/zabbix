@@ -582,7 +582,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	}
 
 	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable,
-		'template-link-block objectgroup inlineblock border_dotted ui-corner-all')
+		'template-link-block objectgroup inlineblock border_dotted')
 	);
 
 	// create new linked template table
@@ -603,7 +603,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$newTemplateTable->addRow([new CSubmit('add_template', _('Add'), null, 'link_menu')]);
 
 	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable,
-		'template-link-block objectgroup inlineblock border_dotted ui-corner-all')
+		'template-link-block objectgroup inlineblock border_dotted')
 	);
 }
 // templates for discovered hosts
@@ -618,7 +618,7 @@ else {
 	}
 
 	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable,
-		'template-link-block objectgroup inlineblock border_dotted ui-corner-all')
+		'template-link-block objectgroup inlineblock border_dotted')
 	);
 }
 

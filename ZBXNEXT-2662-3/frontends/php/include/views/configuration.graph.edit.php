@@ -277,7 +277,7 @@ foreach ($this->data['items'] as $n => $item) {
 	);
 }
 
-$graphFormList->addRow(_('Items'), new CDiv($itemsTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$graphFormList->addRow(_('Items'), new CDiv($itemsTable, 'objectgroup inlineblock border_dotted'));
 
 // append tabs to form
 $graphTab = new CTabView();

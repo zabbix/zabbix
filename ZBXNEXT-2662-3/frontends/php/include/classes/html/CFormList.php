@@ -77,7 +77,7 @@ class CFormList extends CList {
 		$this->addItem(
 			[
 				new CDiv($label ? $label : _('Info'), 'dt right listInfoLabel'),
-				new CDiv($text, 'objectgroup inlineblock border_dotted ui-corner-all listInfoText')
+				new CDiv($text, 'objectgroup inlineblock border_dotted listInfoText')
 			],
 			'formrow listInfo'
 		);

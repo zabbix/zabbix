@@ -39,7 +39,6 @@ class CServerInfo extends CTable {
 
 		$this->addRow((new CCol(_('Zabbix server info')))->
 			addClass(ZBX_STYLE_NOWRAP)->
-			addClass('ui-corner-all')->
 			addClass('ui-widget-header')
 		);
 		$this->addRow(_('Updated').NAME_DELIMITER.zbx_date2str(DATE_TIME_FORMAT_SECONDS, time()));

@@ -122,7 +122,7 @@ $servicesDependenciesFormList->addRow(
 		$servicesChildTable,
 		new CButton('add_child_service', _('Add'), "javascript: openWinCentered('services.php?cservices=1".url_param('serviceid')."', 'ZBX_Services_List', 640, 520, 'scrollbars=1, toolbar=0, menubar=0, resizable=0');", 'link_menu'),
 	],
-	'objectgroup inlineblock border_dotted ui-corner-all')
+	'objectgroup inlineblock border_dotted')
 );
 
 /*
@@ -171,7 +171,7 @@ foreach ($this->data['times'] as $serviceTime) {
 }
 $servicesTimeFormList->addRow(
 	_('Service times'),
-	new CDiv($servicesTimeTable, 'objectgroup inlineblock border_dotted ui-corner-all')
+	new CDiv($servicesTimeTable, 'objectgroup inlineblock border_dotted')
 );
 
 // create service time table
@@ -275,7 +275,7 @@ $servicesTimeFormList->addRow(
 		$serviceTimeTable,
 		new CButton('add_service_time', _('Add'), null, 'link_menu')
 	],
-	'objectgroup inlineblock border_dotted ui-corner-all')
+	'objectgroup inlineblock border_dotted')
 );
 
 /*

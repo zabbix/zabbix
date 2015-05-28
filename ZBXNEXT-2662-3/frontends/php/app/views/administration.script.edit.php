@@ -50,7 +50,7 @@ $typeRadioButton->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT);
 $typeRadioButton->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
 $scriptFormList->addRow(
 	_('Execute on'),
-	new CDiv($typeRadioButton, 'objectgroup inlineblock border_dotted ui-corner-all'),
+	new CDiv($typeRadioButton, 'objectgroup inlineblock border_dotted'),
 	($data['type'] == ZBX_SCRIPT_TYPE_IPMI)
 );
 $scriptFormList->addRow(

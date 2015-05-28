@@ -221,7 +221,7 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 	}
 }
 $itemFormList->addRow(_('Flexible intervals'),
-	new CDiv($delayFlexTable, 'objectgroup inlineblock border_dotted ui-corner-all'), false, 'row_flex_intervals'
+	new CDiv($delayFlexTable, 'objectgroup inlineblock border_dotted'), false, 'row_flex_intervals'
 );
 
 // append new flexible interval to form list
@@ -334,7 +334,7 @@ $buttonRow->addItem($buttonColumn);
 
 $conditionTable->addRow($buttonRow);
 
-$conditionFormList->addRow(_('Filters'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$conditionFormList->addRow(_('Filters'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted'));
 
 
 // append tabs to form

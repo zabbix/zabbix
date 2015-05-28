@@ -24,8 +24,7 @@ $pageHeader->addCssInit();
 $pageHeader->display();
 
 $buttons = [new CButton('back', _('Go to dashboard'),
-	'javascript: document.location = "zabbix.php?action=dashboard.view"',
-	'button'
+	'javascript: document.location = "zabbix.php?action=dashboard.view"'
 )];
 
 echo '<body>';
