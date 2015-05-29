@@ -4209,7 +4209,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr,
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == attr->connection_type)
 	{
-		/* TODO RFC 4518 requires more sophisticated issuer matching */
+		/* simplified match, not compliant with RFC 4517, 4518 */
 		if ('\0' != *dc_host->tls_issuer && 0 != strcmp(dc_host->tls_issuer, attr->issuer))
 		{
 			UNLOCK_CACHE;
@@ -4217,7 +4217,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr,
 			return FAIL;
 		}
 
-		/* TODO RFC 4518 requires more sophisticated subject matching */
+		/* simplified match, not compliant with RFC 4517, 4518 */
 		if ('\0' != *dc_host->tls_subject && 0 != strcmp(dc_host->tls_subject, attr->subject))
 		{
 			UNLOCK_CACHE;
