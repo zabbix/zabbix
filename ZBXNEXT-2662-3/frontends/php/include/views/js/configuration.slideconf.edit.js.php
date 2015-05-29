@@ -11,13 +11,11 @@
 	<td>#{name}</td>
 	<td>
 		<input class="input text" type="text" id="slides_#{rowId}_delay" name="slides[#{rowId}][delay]"
-			placeholder="<?php echo CHtml::encode(_('default')); ?>" value="" size="5" maxlength="5"
+			placeholder="<?= CHtml::encode(_('default')); ?>" value="" size="5" maxlength="5"
 			onchange="validateNumericBox(this, true, false);" style="text-align: right;">
 	</td>
 	<td>
-		<button type="button" class="button link_menu" id="remove_#{rowId}" remove_slide="#{rowId}" onclick="removeSlide(this);">
-			<?php echo _('Remove') ?>
-		</button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="remove_#{rowId}" remove_slide="#{rowId}" onclick="removeSlide(this);"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>

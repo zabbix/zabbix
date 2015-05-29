@@ -66,14 +66,13 @@ if ($this->data['expression_field_readonly']) {
 	$triggersForm->addVar('expression', $this->data['expression']);
 }
 
-$addExpressionButton = new CButton(
+$addExpressionButton = (new CButton(
 	'insert',
 	($this->data['input_method'] == IM_TREE) ? _('Edit') : _('Add'),
 	'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 		'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression&srcfld1=expression'.
-		'&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()));',
-	'button-form top'
-);
+		'&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()));'
+))->addClass(ZBX_STYLE_BTN_GREY);
 if ($this->data['limited']) {
 	$addExpressionButton->setAttribute('disabled', 'disabled');
 }
@@ -81,7 +80,7 @@ $expressionRow = [$expressionTextBox, $addExpressionButton];
 
 if ($this->data['input_method'] == IM_TREE) {
 	// insert macro button
-	$insertMacroButton = new CButton('insert_macro', _('Insert expression'), null, 'button-form top');
+	$insertMacroButton = (new CButton('insert_macro', _('Insert expression')))->addClass(ZBX_STYLE_BTN_GREY);
 	$insertMacroButton->setMenuPopup(CMenuPopupHelper::getTriggerMacro());
 	if ($this->data['limited']) {
 		$insertMacroButton->setAttribute('disabled', 'disabled');
@@ -91,7 +90,7 @@ if ($this->data['input_method'] == IM_TREE) {
 	array_push($expressionRow, BR());
 	if (empty($this->data['outline'])) {
 		// add button
-		$addExpressionButton = new CSubmit('add_expression', _('Add'), null, 'button-form');
+		$addExpressionButton = (new CSubmit('add_expression', _('Add')))->addClass(ZBX_STYLE_BTN_GREY);
 		if ($this->data['limited']) {
 			$addExpressionButton->setAttribute('disabled', 'disabled');
 		}
@@ -99,21 +98,21 @@ if ($this->data['input_method'] == IM_TREE) {
 	}
 	else {
 		// add button
-		$addExpressionButton = new CSubmit('and_expression', _('And'), null, 'button-form');
+		$addExpressionButton = (new CSubmit('and_expression', _('And')))->addClass(ZBX_STYLE_BTN_GREY);
 		if ($this->data['limited']) {
 			$addExpressionButton->setAttribute('disabled', 'disabled');
 		}
 		array_push($expressionRow, $addExpressionButton);
 
 		// or button
-		$orExpressionButton = new CSubmit('or_expression', _('Or'), null, 'button-form');
+		$orExpressionButton = (new CSubmit('or_expression', _('Or')))->addClass(ZBX_STYLE_BTN_GREY);
 		if ($this->data['limited']) {
 			$orExpressionButton->setAttribute('disabled', 'disabled');
 		}
 		array_push($expressionRow, $orExpressionButton);
 
 		// replace button
-		$replaceExpressionButton = new CSubmit('replace_expression', _('Replace'), null, 'button-form');
+		$replaceExpressionButton = (new CSubmit('replace_expression', _('Replace')))->addClass(ZBX_STYLE_BTN_GREY);
 		if ($this->data['limited']) {
 			$replaceExpressionButton->setAttribute('disabled', 'disabled');
 		}
@@ -121,7 +120,7 @@ if ($this->data['input_method'] == IM_TREE) {
 	}
 }
 elseif ($this->data['input_method'] != IM_FORCED) {
-	$inputMethodToggle = new CSpan(_('Expression constructor'), 'link');
+	$inputMethodToggle = (new CButton(null, _('Expression constructor')))->addClass(ZBX_STYLE_BTN_LINK);
 	$inputMethodToggle->onClick('javascript: '.
 		'document.getElementById("toggle_input_method").value=1;'.
 		'document.getElementById("input_method").value='.(($this->data['input_method'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
@@ -207,11 +206,10 @@ if ($this->data['input_method'] == IM_TREE) {
 		$this->data['outline'] = '';
 	}
 
-	$testButton = new CButton('test_expression', _('Test'),
+	$testButton = (new CButton('test_expression', _('Test'),
 		'openWinCentered("tr_testexpr.php?expression=" + encodeURIComponent(this.form.elements["expression"].value),'.
-		'"ExpressionTest", 850, 400, "titlebar=no, resizable=yes, scrollbars=yes"); return false;',
-		'link_menu'
-	);
+		'"ExpressionTest", 850, 400, "titlebar=no, resizable=yes, scrollbars=yes"); return false;'
+	))->addClass(ZBX_STYLE_BTN_LINK);
 	if (!$allowedTesting) {
 		$testButton->setAttribute('disabled', 'disabled');
 	}
@@ -227,7 +225,7 @@ if ($this->data['input_method'] == IM_TREE) {
 		new CDiv([$expressionTable, $testButton], 'objectgroup inlineblock border_dotted')
 	]);
 
-	$inputMethodToggle = new CSpan(_('Close expression constructor'), 'link');
+	$inputMethodToggle = (new CButton(null, _('Close expression constructor')))->addClass(ZBX_STYLE_BTN_LINK);
 	$inputMethodToggle->onClick('javascript: '.
 		'document.getElementById("toggle_input_method").value=1;'.
 		'document.getElementById("input_method").value='.IM_ESTABLISHED.';'.
@@ -285,10 +283,10 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 		$description = $depTriggerDescription;
 	}
 
-	$row = new CRow([$description, new CButton('remove', _('Remove'),
-		'javascript: removeDependency("'.$dependency['triggerid'].'");',
-		'link_menu'
-	)]);
+	$row = new CRow([$description,
+		(new CButton('remove', _('Remove'), 'javascript: removeDependency("'.$dependency['triggerid'].'");'))
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
 
 	$row->setId('dependency_'.$dependency['triggerid']);
 	$dependenciesTable->addRow($row);
@@ -299,11 +297,10 @@ $dependenciesFormList->addRow(
 	new CDiv(
 		[
 			$dependenciesTable,
-			new CButton('bnt1', _('Add'),
+			(new CButton('bnt1', _('Add'),
 				'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
-					'&with_triggers=1&noempty=1");',
-				'link_menu'
-			)
+					'&with_triggers=1&noempty=1");'
+			))->addClass(ZBX_STYLE_BTN_LINK)
 		],
 		'objectgroup inlineblock border_dotted'
 	)

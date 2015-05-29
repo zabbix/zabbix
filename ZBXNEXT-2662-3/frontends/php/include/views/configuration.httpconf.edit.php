@@ -213,8 +213,9 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$dragHandler = SPACE;
 	}
 	else {
-		$removeButton = new CButton('remove_'.$stepid, _('Remove'), 'javascript: removeStep(this);', 'link_menu');
-		$removeButton->setAttribute('remove_step', $stepid);
+		$removeButton = (new CButton('remove_'.$stepid, _('Remove'), 'javascript: removeStep(this);'))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->setAttribute('remove_step', $stepid);
 		$dragHandler = new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move');
 	}
 
@@ -234,7 +235,11 @@ foreach ($this->data['steps'] as $stepid => $step) {
 }
 
 if (!$this->data['templated']) {
-	$stepsTable->addRow((new CCol(new CButton('add_step', _('Add'), null, 'link_menu')))->setColSpan(8));
+	$stepsTable->addRow(
+		(new CCol(
+			(new CButton('add_step', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+		))->setColSpan(8)
+	);
 }
 
 $httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineblock border_dotted'));

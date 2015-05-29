@@ -62,8 +62,8 @@ foreach ($data['macros'] as $i => $macro) {
 	$value_input->setAttribute('placeholder', _('value'));
 
 	$button_cell = [
-		(new CButton('macros['.$i.'][remove]'))
-			->addClass(ZBX_STYLE_BTN_REMOVE)
+		(new CButton('macros['.$i.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
 	];
 	if (array_key_exists('globalmacroid', $macro)) {
@@ -76,7 +76,7 @@ foreach ($data['macros'] as $i => $macro) {
 // buttons
 $buttons_column = new CCol(
 	(new CButton('macro_add', _('Add')))
-		->addClass(ZBX_STYLE_BTN_ADD)
+		->addClass(ZBX_STYLE_BTN_LINK)
 		->addClass('element-table-add')
 );
 $buttons_column->setAttribute('colspan', 5);

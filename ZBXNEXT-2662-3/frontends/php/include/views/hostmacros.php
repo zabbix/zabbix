@@ -32,7 +32,7 @@ if ($data['readonly'] && !$data['macros']) {
 else {
 	$table = (new CTable())
 		->addClass('formElementTable')
-		->setAttribute('tbl_macros');
+		->setId('tbl_macros');
 
 	$actions_col = $data['readonly'] ? null : '';
 	if ($data['show_inherited_macros']) {
@@ -89,22 +89,24 @@ else {
 		if (!$data['readonly']) {
 			if ($data['show_inherited_macros']) {
 				if (($macro['type'] & MACRO_TYPE_BOTH) == MACRO_TYPE_BOTH) {
-					$row[] = (new CButton('macros['.$i.'][change]'))
-						->addClass(ZBX_STYLE_BTN_REMOVE)
+					$row[] = (new CButton('macros['.$i.'][change]', _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('element-table-change');
 				}
 				elseif ($macro['type'] & MACRO_TYPE_INHERITED) {
-					$row[] = new CButton('macros['.$i.'][change]', _('Change'), null, 'link_menu element-table-change');
+					$row[] = (new CButton('macros['.$i.'][change]', _('Change')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-change');
 				}
 				else {
-					$row[] = (new CButton('macros['.$i.'][remove]'))
-						->addClass(ZBX_STYLE_BTN_REMOVE)
+					$row[] = (new CButton('macros['.$i.'][remove]', _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('element-table-remove');
 				}
 			}
 			else {
-				$row[] = (new CButton('macros['.$i.'][remove]'))
-					->addClass(ZBX_STYLE_BTN_REMOVE)
+				$row[] = (new CButton('macros['.$i.'][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove');
 			}
 		}
@@ -139,7 +141,7 @@ else {
 	if (!$data['readonly']) {
 		$buttons_column = new CCol(
 			(new CButton('macro_add', _('Add')))
-				->addClass(ZBX_STYLE_BTN_ADD)
+				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-add')
 		);
 		$buttons_column->setAttribute('colspan', 5);

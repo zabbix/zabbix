@@ -397,10 +397,9 @@ foreach ($data['linkedTemplates'] as $template) {
 	$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
 	$templateLink->setTarget('_blank');
 
-	$unlinkButton = new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu');
-	$unlinkAndClearButton = new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null,
-		'link_menu'
-	);
+	$unlinkButton = (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK);
+	$unlinkAndClearButton = (new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
+		->addClass(ZBX_STYLE_BTN_LINK);
 	$unlinkAndClearButton->addStyle('margin-left: 8px');
 
 	$linkedTemplateTable->addRow(
@@ -440,7 +439,7 @@ $newTemplateTable->addRow([new CMultiSelect([
 
 $newTemplateTable->addRow(
 	[
-		new CSubmit('add_template', _('Add'), null, 'link_menu')
+		(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 	]
 );
 

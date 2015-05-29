@@ -82,10 +82,10 @@ foreach ($data['dependencies'] as $dependency) {
 		$description = $depTriggerDescription;
 	}
 
-	$row = new CRow([$description, new CButton('remove', _('Remove'),
-		'javascript: removeDependency(\''.$dependency['triggerid'].'\');',
-		'link_menu'
-	)]);
+	$row = new CRow([$description,
+		(new CButton('remove', _('Remove'), 'javascript: removeDependency(\''.$dependency['triggerid'].'\');'))
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
 
 	$row->setId('dependency_'.$dependency['triggerid']);
 	$dependenciesTable->addRow($row);
@@ -94,12 +94,11 @@ foreach ($data['dependencies'] as $dependency) {
 $dependenciesDiv = new CDiv(
 	[
 		$dependenciesTable,
-		new CButton('btn1', _('Add'),
+		(new CButton('btn1', _('Add'),
 			'return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
 				'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
-				'&with_triggers=1&noempty=1");',
-			'link_menu'
-		)
+				'&with_triggers=1&noempty=1");'
+		))->addClass(ZBX_STYLE_BTN_LINK)
 	],
 	'objectgroup inlineblock border_dotted'
 );

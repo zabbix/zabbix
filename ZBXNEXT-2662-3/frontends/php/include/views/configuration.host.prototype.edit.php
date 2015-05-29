@@ -196,7 +196,7 @@ $customGroupTable = (new CTable())
 	->setId('tbl_group_prototypes');
 
 // buttons
-$addButton = new CButton('group_prototype_add', _('Add'), null, 'link_menu');
+$addButton = (new CButton('group_prototype_add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK);
 $buttonColumn = new CCol($addButton);
 $buttonColumn->setAttribute('colspan', 5);
 
@@ -230,7 +230,7 @@ if ($hostPrototype['templates']) {
 
 		$linkedTemplateTable->addRow([
 			$templateLink,
-			!$hostPrototype['templateid'] ? new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu') : '',
+			!$hostPrototype['templateid'] ? (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK) : '',
 		]);
 
 		$ignoreTemplates[$template['templateid']] = $template['name'];
@@ -260,7 +260,7 @@ if (!$hostPrototype['templateid']) {
 		]
 	])]);
 
-	$newTemplateTable->addRow([new CSubmit('add_template', _('Add'), null, 'link_menu')]);
+	$newTemplateTable->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
 	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted'));
 }

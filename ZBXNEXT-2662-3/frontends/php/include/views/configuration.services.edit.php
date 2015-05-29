@@ -111,7 +111,8 @@ foreach ($this->data['children'] as $child) {
 			1
 		),
 		!empty($child['trigger']) ? $child['trigger'] : '',
-		new CButton('remove', _('Remove'), 'javascript: removeDependentChild(\''.$child['serviceid'].'\');', 'link_menu')
+		(new CButton('remove', _('Remove'), 'javascript: removeDependentChild(\''.$child['serviceid'].'\');'))
+			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 	$row->setId('children_'.$child['serviceid']);
 	$servicesChildTable->addRow($row);
@@ -121,7 +122,8 @@ $servicesDependenciesFormList->addRow(
 	_('Depends on'),
 	new CDiv([
 		$servicesChildTable,
-		new CButton('add_child_service', _('Add'), "javascript: openWinCentered('services.php?cservices=1".url_param('serviceid')."', 'ZBX_Services_List', 640, 520, 'scrollbars=1, toolbar=0, menubar=0, resizable=0');", 'link_menu'),
+		(new CButton('add_child_service', _('Add'), "javascript: openWinCentered('services.php?cservices=1".url_param('serviceid')."', 'ZBX_Services_List', 640, 520, 'scrollbars=1, toolbar=0, menubar=0, resizable=0');"))
+			->addClass(ZBX_STYLE_BTN_LINK)
 	],
 	'objectgroup inlineblock border_dotted')
 );
@@ -165,7 +167,7 @@ foreach ($this->data['times'] as $serviceTime) {
 		],
 		$from.' - '.$to,
 		htmlspecialchars($serviceTime['note']),
-		new CButton('remove', _('Remove'), 'javascript: removeTime(\''.$i.'\');', 'link_menu')
+		(new CButton('remove', _('Remove'), 'javascript: removeTime(\''.$i.'\');'))->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 	$row->setId('times_'.$i);
 	$servicesTimeTable->addRow($row);
@@ -274,7 +276,7 @@ $servicesTimeFormList->addRow(
 	new CDiv([
 		new CDiv($timeTypeComboBox, 'time-type-combobox'),
 		$serviceTimeTable,
-		new CButton('add_service_time', _('Add'), null, 'link_menu')
+		(new CButton('add_service_time', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 	],
 	'objectgroup inlineblock border_dotted')
 );

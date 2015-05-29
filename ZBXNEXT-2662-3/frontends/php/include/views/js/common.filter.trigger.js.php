@@ -12,7 +12,7 @@
 				   size="20" maxlength="255">
 		</td>
 		<td>
-			<button type="button" class="<?= ZBX_STYLE_BTN_REMOVE ?> element-table-remove" id="inventory_#{rowNum}_remove" name="inventory_#{rowNum}_remove"></button>
+			<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> element-table-remove" id="inventory_#{rowNum}_remove" name="inventory_#{rowNum}_remove"><?= _('Remove') ?></button>
 		</td>
 	</tr>
 </script>

@@ -34,29 +34,23 @@ $filterColumn2->addRow(_('From'), createDateSelector('filter_from', $this->data[
 $filterColumn2->addRow(_('Till'), createDateSelector('filter_till', $this->data['filter']['filter_till']));
 $filterColumn2->addRow(null,
 	[
-		new CButton(null, _('Today'), 'javascript: setPeriod('.REPORT_PERIOD_TODAY.');', 'link_menu'),
-		new CButton(null, _('Yesterday'), 'javascript: setPeriod('.REPORT_PERIOD_YESTERDAY.');',
-			'link_menu period-link'
-		),
-		new CButton(null, _('Current week'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_WEEK.');',
-			'link_menu period-link'
-		),
-		new CButton(null, _('Current month'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_MONTH.');',
-			'link_menu period-link'
-		),
-		new CButton(null, _('Current year'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_YEAR.');',
-			'link_menu period-link'
-		),
+		(new CButton(null, _('Today'), 'javascript: setPeriod('.REPORT_PERIOD_TODAY.');'))
+			->addClass(ZBX_STYLE_BTN_LINK),
+		(new CButton(null, _('Yesterday'), 'javascript: setPeriod('.REPORT_PERIOD_YESTERDAY.');'))
+			->addClass(ZBX_STYLE_BTN_LINK),
+		(new CButton(null, _('Current week'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_WEEK.');'))
+			->addClass(ZBX_STYLE_BTN_LINK),
+		(new CButton(null, _('Current month'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_MONTH.');'))
+			->addClass(ZBX_STYLE_BTN_LINK),
+		(new CButton(null, _('Current year'), 'javascript: setPeriod('.REPORT_PERIOD_CURRENT_YEAR.');'))
+			->addClass(ZBX_STYLE_BTN_LINK),
 		BR(),
-		new CButton(null, _('Last week'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_WEEK.');',
-			'link_menu'
-		),
-		new CButton(null, _('Last month'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_MONTH.');',
-			'link_menu period-link'
-		),
-		new CButton(null, _('Last year'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');',
-			'link_menu period-link'
-		)
+		(new CButton(null, _('Last week'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_WEEK.');'))
+			->addClass(ZBX_STYLE_BTN_LINK),
+		(new CButton(null, _('Last month'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_MONTH.');'))
+			->addClass(ZBX_STYLE_BTN_LINK),
+		(new CButton(null, _('Last year'), 'javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');'))
+			->addClass(ZBX_STYLE_BTN_LINK)
 	]
 );
 
@@ -128,12 +122,14 @@ $table->setHeader([
 foreach ($this->data['triggers'] as $trigger) {
 	$hostId = $trigger['hosts'][0]['hostid'];
 
-	$hostName = new CSpan($trigger['hosts'][0]['name'],
-		ZBX_STYLE_LINK_ACTION.' link_menu'.(($this->data['hosts'][$hostId]['status'] == HOST_STATUS_NOT_MONITORED) ? ' '.ZBX_STYLE_RED : '')
-	);
+	$hostName = (new CSpan($trigger['hosts'][0]['name']))
+		->addClass(ZBX_STYLE_LINK_ACTION);
+	if ($this->data['hosts'][$hostId]['status'] == HOST_STATUS_NOT_MONITORED) {
+		$hostName->addClass(ZBX_STYLE_RED);
+	}
 	$hostName->setMenuPopup(CMenuPopupHelper::getHost($this->data['hosts'][$hostId], $this->data['scripts'][$hostId]));
 
-	$triggerDescription = new CSpan($trigger['description'], ZBX_STYLE_LINK_ACTION.' link_menu');
+	$triggerDescription = (new CSpan($trigger['description']))->addClass(ZBX_STYLE_LINK_ACTION);
 	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	$table->addRow([

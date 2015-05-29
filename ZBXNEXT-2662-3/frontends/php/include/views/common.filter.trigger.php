@@ -119,8 +119,8 @@ foreach ($inventoryFilters as $field) {
 	$inventoryFilterTable->addRow([
 		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventoryFields),
 		new CTextBox('inventory['.$i.'][value]', $field['value'], 20),
-		(new CButton('inventory['.$i.'][remove]'))
-			->addClass(ZBX_STYLE_BTN_REMOVE)
+		(new CButton('inventory['.$i.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
 	], 'form_row');
 
@@ -129,7 +129,7 @@ foreach ($inventoryFilters as $field) {
 $inventoryFilterTable->addRow(
 	(new CCol(
 		(new CButton('inventory_add', _('Add')))
-			->addClass(ZBX_STYLE_BTN_ADD)
+			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-add')
 	))->setColSpan(2)
 );

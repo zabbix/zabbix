@@ -208,15 +208,19 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			new CSpan($media['period'], ZBX_STYLE_NOWRAP),
 			$mediaSeverity,
 			$status,
-			new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'");', 'link_menu')]
-		);
+			(new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'");'))
+				->addClass(ZBX_STYLE_BTN_LINK)
+		]);
 	}
 
 	$userMediaFormList->addRow(_('Media'), [$mediaTableInfo,
-		new CButton('add_media', _('Add'), 'return PopUp("popup_media.php?dstfrm='.$userForm->getName().'");', 'link_menu'),
+		(new CButton('add_media', _('Add'), 'return PopUp("popup_media.php?dstfrm='.$userForm->getName().'");'))
+			->addClass(ZBX_STYLE_BTN_LINK),
 		SPACE,
 		SPACE,
-		(count($this->data['user_medias']) > 0) ? new CSubmit('del_user_media', _('Delete selected'), null, 'link_menu') : null
+		$this->data['user_medias']
+			? (new CSubmit('del_user_media', _('Delete selected')))->addClass(ZBX_STYLE_BTN_LINK)
+			: null
 	]);
 }
 

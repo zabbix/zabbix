@@ -72,7 +72,9 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 		$expressionTextBox,
 		$iconsComboBox,
 		$iconPreviewImage,
-		new CButton('remove', _('Remove'), '', 'link_menu removeMapping')
+		(new CButton('remove', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('removeMapping')
 	]))
 		->addClass('sortable')
 		->setId('iconmapidRow_'.$i);
@@ -114,14 +116,16 @@ $hiddenRowTemplate = (new CRow([
 	$expressionTextBox,
 	$iconsComboBox,
 	$iconPreviewImage,
-	new CButton('remove', _('Remove'), '', 'link_menu removeMapping')
+	(new CButton('remove', _('Remove')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('removeMapping')
 ]))
 	->addClass('hidden')
 	->setId('rowTpl');
 $iconMapTable->addRow($hiddenRowTemplate);
 
 // add row button
-$iconMapTable->addRow((new CCol(new CButton('addMapping', _('Add'), '', 'link_menu')))->setColSpan(7));
+$iconMapTable->addRow((new CCol((new CButton('addMapping', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)))->setColSpan(7));
 
 // <default icon row>
 $numSpan = new CSpan($i++.':');
