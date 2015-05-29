@@ -91,11 +91,11 @@
 		</tr>
 		<tr>
 		<td class="table-forms-td-left"><label for="HostName">Host</label></td>
-		<td class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></td>
+		<td class="table-forms-td-right"><div class="form-input-margin"><input type="text" id="HostName"></div><button type="button" class="btn-grey">Select</button></td>
 		</tr>
 		<tr>
 		<td class="table-forms-td-left"><label for="HostName">Application</label></td>
-		<td class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></td>
+		<td class="table-forms-td-right"><div class="form-input-margin"><input type="text" id="HostName"></div><button type="button" class="btn-grey">Select</button></td>
 		</tr>
 		<tr>
 		<!--<td class="table-forms-td-left"></td>-->
@@ -853,11 +853,11 @@
 		</tr>
 		<tr>
 		<td class="table-forms-td-left"><label for="HostName">Coordinates</label></td>
-		<td class="table-forms-td-right"><input type="number" id="HostName"> <label>X</label>&nbsp;&nbsp;<input type="number" id="HostName"> <label>Y</label></td>
+		<td class="table-forms-td-right"><div class="form-input-margin"><input type="number" id="HostName"><label>X</label></div><div class="form-input-margin"><input type="number" id="HostName"><label>Y</label></div></td>
 		</tr>
 		<tr>
 		<!--<td class="table-forms-td-left"></td>-->
-		<td class="table-forms-td-right" colspan="2"><fieldset><legend>URLs</legend><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-remove"></button></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-remove"></button></td></tr><tr><td><button type="button" class="btn-add">Add</button></td><td></td></tr></tbody></table></fieldset></td>
+		<td class="table-forms-td-right" colspan="2"><fieldset><legend>URLs</legend><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><button type="button" class="btn-link">Add</button></td><td></td></tr></tbody></table></fieldset></td>
 		</tr>
 		</tbody>
 	</table>
@@ -978,31 +978,31 @@
 		</td>
 		</tr>
 		<tr>
-		<td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox"> Label</label></td>
+		<td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Label</label></td>
 		<td class="table-forms-td-right"><textarea id="VisibleName"></textarea></td>
 		</tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox"> Label location</label></td>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Label location</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
 		<tr>
-		<td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox"> Automatic icon selection</label></td>
+		<td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Automatic icon selection</label></td>
 		<td class="table-forms-td-right"><input type="checkbox"></td>
 		</tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox"> Icon (default)</label></td>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (default)</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox"> Icon (problem)</label></td>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (problem)</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox"> Icon (maintenance)</label></td>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (maintenance)</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox"> Icon (disabled)</label></td>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (disabled)</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
 		</tbody>
@@ -1049,7 +1049,7 @@
             </tr>
             <tr>
             <td class="table-forms-td-right" colspan="2">
-            <fieldset><legend>Link indicators</legend><table><tbody><tr><td><label>Triggers</label></td><td><label>Type</label></td><td><label>Color</label></td><td>&nbsp;</td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-remove"></button></td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-remove"></button></td></tr></tbody></table></fieldset>
+            <fieldset><legend>Link indicators</legend><table><tbody><tr><td><label>Triggers</label></td><td><label>Type</label></td><td><label>Color</label></td><td>&nbsp;</td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr></tbody></table></fieldset>
             </td>
             </tr>
             

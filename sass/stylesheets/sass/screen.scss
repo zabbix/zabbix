@@ -430,6 +430,7 @@ article {
 	li {
 		display: inline-block;
 		margin: 0 14px 0 0;
+		vertical-align: middle;
 	}
 
 	.selected {
@@ -791,6 +792,7 @@ footer {
 
 .multiselect-wrapper {
 	position: relative;
+	vertical-align: top;
 }
 
 .multiselect {
@@ -853,6 +855,10 @@ footer {
 	}
 }
 
+.multiselect-button {
+	float: left;
+}
+
 .multiselect-suggest {
 	padding: 0 5px;
 	white-space: normal;
@@ -902,10 +908,6 @@ footer {
 }
 
 // Timeline
-.multiselect-button {
-	float: left;
-}
-
 .scrollbar {
 	position: relative;
 	margin: 0 auto;
@@ -1178,7 +1180,7 @@ footer {
 
 .margin-top {
 	display: block;
-	margin: 0px 0 0 0;
+	margin: 4px 0 0 0;
 }
 
 .form-new-group {
@@ -1324,6 +1326,11 @@ legend {
 	padding: 0 5px 0 5px;
 }
 
+.form-input-margin {
+	display: inline-block;
+	margin: 0 3px 0 0;
+}
+
 %form-check-radio-style {
 	margin: 0;
 	padding: 0;
@@ -1338,7 +1345,11 @@ legend {
 }
 
 %form-input-height-padding {
-	padding: 4px 5px;
+	//padding: 4px 5px;
+	padding: 0 5px;
+	min-height: 22px;
+	line-height: 22px;
+	zoom: 1;
 }
 
 %form-input-style {
@@ -1347,7 +1358,6 @@ legend {
 	font-size: $font-form-size;
 	color: $font-color;
 	background-color: $form-bg-color;
-	//vertical-align: top;
 	@include transition(border-color .2s ease-out);
 
 	&:focus {
@@ -1358,6 +1368,7 @@ legend {
 button::-moz-focus-inner {
 	padding: 0;
 	border: 0;
+	vertical-align: middle;
 }
 
 button {
@@ -1368,8 +1379,6 @@ button {
 	border: 1px solid $btn-bg-color;
 	padding: 0 11px;
 	min-height: 24px;
-	//line-height: 24px;
-	vertical-align: middle;
 	cursor: pointer;
 	@include transition(border-color, background-color .2s ease-out);
 
@@ -1406,7 +1415,7 @@ button {
 		color: $link-color;
 		font-size: inherit;
 		border-bottom: 1px dotted $link-color;
-		padding: 0;
+		padding: 0!important;
 		min-height: inherit;
 		@include border-radius(0);
 
@@ -1419,21 +1428,21 @@ button {
 		}  
 	}
 
-	&.btn-remove {
-		background-color: $transparent;
-		border: none;
-		padding: 0;
-		min-height: inherit;
-		@extend %close-icon;
+	//&.btn-remove {
+	//	background-color: $transparent;
+	//	border: none;
+	//	padding: 0;
+	//	min-height: inherit;
+	//	@extend %close-icon;
 
-		&:hover {
-			@extend .btn-remove;
-		}
+	//	&:hover {
+	//		@extend .btn-remove;
+	//	}
 
-		&:active {
-			@extend .btn-remove;
-		}  
-	}
+	//	&:active {
+	//		@extend .btn-remove;
+	//	}  
+	//}
 
 	&.btn-conf {
 		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -145px;
@@ -1681,6 +1690,7 @@ button {
 		color: $btn-form-font-color;
 		background-color: $btn-form-bg-color;
 		border-color: $btn-form-border-color;
+		vertical-align: top;
 
 		&:hover {
 			color: $btn-form-hover-color;
@@ -2060,7 +2070,9 @@ button[disabled] {
 }
 
 %signin-input {
-	padding: 10px 5px;
+	//padding: 10px 5px;
+	min-height: 38px;
+	line-height: 38px; 
 	width: 100%;
 	@include box-sizing(border-box);
 }
