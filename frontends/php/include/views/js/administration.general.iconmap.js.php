@@ -7,17 +7,17 @@
 		<span class="rowNum">#0:</span>
 	</td>
 	<td>
-		<select id="iconmap_mappings_#{iconmappingid}_inventory_link" name="iconmap[mappings][#{iconmappingid}][inventory_link]" autocomplete="off" disabled="disabled">
+		<select id="iconmap_mappings_#{iconmappingid}_inventory_link" name="iconmap[mappings][#{iconmappingid}][inventory_link]" autocomplete="off">
 			<?php foreach ($this->data['inventoryList'] as $key => $value): ?>
 				<option value="<?= $key ?>"><?= $value ?></option>
 			<?php endforeach ?>
 		</select>
 	</td>
 	<td>
-		<input class="input text" id="iconmap_mappings_#{iconmappingid}_expression" name="iconmap[mappings][#{iconmappingid}][expression]" value="" size="20" maxlength="64" disabled="disabled" type="text" />
+		<input class="input text" id="iconmap_mappings_#{iconmappingid}_expression" name="iconmap[mappings][#{iconmappingid}][expression]" value="" size="20" maxlength="64" type="text" />
 	</td>
 	<td>
-		<select class="mappingIcon" id="iconmap_mappings_#{iconmappingid}_iconid" name="iconmap[mappings][#{iconmappingid}][iconid]" autocomplete="off" disabled="disabled">
+		<select class="mappingIcon" id="iconmap_mappings_#{iconmappingid}_iconid" name="iconmap[mappings][#{iconmappingid}][iconid]" autocomplete="off">
 			<?php foreach ($this->data['iconList'] as $key => $value): ?>
 				<option value="<?= $key ?>"><?= $value ?></option>
 			<?php endforeach ?>
@@ -107,9 +107,7 @@
 
 			mapping.iconmappingid = iconmappingid;
 			$('#iconMapListFooter').before(tpl.evaluate(mapping));
-//			$('<tr id="iconmapidRow_' + iconmappingid + '" class="sortable">' + tpl.evaluate(mapping) + '</tr>').insertBefore('#iconMapListFooter');
 
-			$('#iconmapidRow_' + iconmappingid + ' :input').prop('disabled', false);
 			iconMapTable.sortable('refresh');
 
 			if (iconMapTable.find('tr.sortable').length > 1) {
