@@ -2316,7 +2316,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid,
 
 				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 				{
-					/* TODO RFC 4518 requires more sophisticated issuer matching */
+					/* simplified match, not compliant with RFC 4517, 4518 */
 					if ('\0' != *items[i].host.tls_issuer &&
 							0 != strcmp(items[i].host.tls_issuer, attr.issuer))
 					{
@@ -2327,7 +2327,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid,
 						continue;
 					}
 
-					/* TODO RFC 4518 requires more sophisticated subject matching */
+					/* simplified match, not compliant with RFC 4517, 4518 */
 					if ('\0' != *items[i].host.tls_subject &&
 							0 != strcmp(items[i].host.tls_subject, attr.subject))
 					{

@@ -2095,7 +2095,7 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 		if (SUCCEED != zbx_x509_dn_gets(&cert->issuer, tls_issuer, sizeof(tls_issuer), error))
 			return FAIL;
 
-		if (0 != strcmp(tls_issuer, issuer))	/* TODO RFC 4518 requires more sophisticated issuer matching */
+		if (0 != strcmp(tls_issuer, issuer))	/* simplified match, not compliant with RFC 4517, 4518 */
 			issuer_mismatch = 1;
 	}
 
@@ -2104,7 +2104,7 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 		if (SUCCEED != zbx_x509_dn_gets(&cert->subject, tls_subject, sizeof(tls_subject), error))
 			return FAIL;
 
-		if (0 != strcmp(tls_subject, subject))	/* TODO RFC 4518 requires more sophisticated subject matching */
+		if (0 != strcmp(tls_subject, subject))	/* simplified match, not compliant with RFC 4517, 4518 */
 			subject_mismatch = 1;
 	}
 
@@ -2121,7 +2121,7 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 		if (SUCCEED != zbx_x509_dn_gets(dn, tls_issuer, sizeof(tls_issuer), error))
 			return FAIL;
 
-		if (0 != strcmp(tls_issuer, issuer))	/* TODO RFC 4518 requires more sophisticated issuer matching */
+		if (0 != strcmp(tls_issuer, issuer))	/* simplified match, not compliant with RFC 4517, 4518 */
 			issuer_mismatch = 1;
 	}
 
@@ -2137,19 +2137,19 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 		if (SUCCEED != zbx_x509_dn_gets(dn, tls_subject, sizeof(tls_subject), error))
 			return FAIL;
 
-		if (0 != strcmp(tls_subject, subject))	/* TODO RFC 4518 requires more sophisticated subject matching */
+		if (0 != strcmp(tls_subject, subject))	/* simplified match, not compliant with RFC 4517, 4518 */
 			subject_mismatch = 1;
 	}
 #elif defined(HAVE_OPENSSL)
 	if (NULL != issuer && '\0' != *issuer)
 	{
-		if (0 != strcmp(peer_issuer, issuer))	/* TODO RFC 4518 requires more sophisticated issuer matching */
+		if (0 != strcmp(peer_issuer, issuer))	/* simplified match, not compliant with RFC 4517, 4518 */
 			issuer_mismatch = 1;
 	}
 
 	if (NULL != subject && '\0' != *subject)
 	{
-		if (0 != strcmp(peer_subject, subject))	/* TODO RFC 4518 requires more sophisticated subject matching */
+		if (0 != strcmp(peer_subject, subject))	/* simplified match, not compliant with RFC 4517, 4518 */
 			subject_mismatch = 1;
 	}
 #endif
@@ -2215,14 +2215,14 @@ int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
 		return FAIL;
 	}
 
-	/* TODO RFC 4518 requires more sophisticated issuer matching */
+	/* simplified match, not compliant with RFC 4517, 4518 */
 	if (NULL != CONFIG_TLS_SERVER_CERT_ISSUER && 0 != strcmp(CONFIG_TLS_SERVER_CERT_ISSUER, attr.issuer))
 	{
 		*error = zbx_dsprintf(*error, "certificate issuer does not match for %s", get_ip_by_socket(sock));
 		return FAIL;
 	}
 
-	/* TODO RFC 4518 requires more sophisticated subject matching */
+	/* simplified match, not compliant with RFC 4517, 4518 */
 	if (NULL != CONFIG_TLS_SERVER_CERT_SUBJECT && 0 != strcmp(CONFIG_TLS_SERVER_CERT_SUBJECT, attr.subject))
 	{
 		*error = zbx_dsprintf(*error, "certificate subject does not match for %s", get_ip_by_socket(sock));
@@ -2592,7 +2592,7 @@ void	zbx_tls_init_child(void)
 				exit(EXIT_FAILURE);
 			}
 
-			/* TODO docs say 'my_psk_identity' should be prepared with "SASLprep" profile of "stringprep" */
+			/* Simplified. 'my_psk_identity' should have been prepared as required by RFC 4518. */
 			if (GNUTLS_E_SUCCESS != (res = gnutls_psk_set_client_credentials(my_psk_client_creds,
 					my_psk_identity, &key, GNUTLS_PSK_KEY_RAW)))
 			{
@@ -3417,7 +3417,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 			key.data = psk_buf;
 			key.size = (unsigned int)psk_len;
 
-			/* TODO docs say 'my_psk_identity' should be prepared with "SASLprep" profile of "stringprep" */
+			/* Simplified. 'tls_arg1' (PSK identity) should have been prepared as required by RFC 4518. */
 			if (GNUTLS_E_SUCCESS != (res = gnutls_psk_set_client_credentials(s->tls_psk_client_creds,
 					tls_arg1, &key, GNUTLS_PSK_KEY_RAW)))
 			{

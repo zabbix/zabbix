@@ -116,7 +116,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 
 			if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 			{
-				/* TODO RFC 4518 requires more sophisticated issuer matching */
+				/* simplified match, not compliant with RFC 4517, 4518 */
 				if ('\0' != *row[3] && 0 != strcmp(row[3], attr.issuer))
 				{
 					zbx_snprintf(error, MAX_STRING_LEN, "certificate issuer does not match for "
@@ -124,7 +124,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 					goto done;
 				}
 
-				/* TODO RFC 4518 requires more sophisticated subject matching */
+				/* simplified match, not compliant with RFC 4517, 4518 */
 				if ('\0' != *row[4] && 0 != strcmp(row[4], attr.subject))
 				{
 					zbx_snprintf(error, MAX_STRING_LEN, "certificate subject does not match for "
