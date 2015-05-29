@@ -158,18 +158,19 @@ $httpAuthenticationFormList->addRow(
  */
 $httpStepFormList = new CFormList('httpFormList');
 $stepsTable = (new CTable())
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 500px;')
+	->addClass(ZBX_STYLE_LIST_TABLE)
 	->setId('httpStepTable')
 	->setHeader([
-		(new CCol(SPACE))->setWidth('15'),
-		(new CCol(SPACE))->setWidth('15'),
-		(new CCol(_('Name')))->setWidth('150'),
-		(new CCol(_('Timeout')))->setWidth('50'),
-		(new CCol(_('URL')))->setWidth('200'),
-		(new CCol(_('Required')))->setWidth('50'),
-		(new CCol(_('Status codes')))->addClass(ZBX_STYLE_NOWRAP)->setWidth('90'),
-		(new CCol(''))->setWidth('50')
+		(new CColHeader(''))->setWidth('15'),
+		(new CColHeader(''))->setWidth('15'),
+		(new CColHeader(_('Name')))->setWidth('150'),
+		(new CColHeader(_('Timeout')))->setWidth('50'),
+		(new CColHeader(_('URL')))->setWidth('200'),
+		(new CColHeader(_('Required')))->setWidth('50'),
+		(new CColHeader(_('Status codes')))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->setWidth('90'),
+		(new CColHeader(''))->setWidth('50')
 	]);
 
 $i = 1;
@@ -210,28 +211,31 @@ foreach ($this->data['steps'] as $stepid => $step) {
 
 	if ($this->data['templated']) {
 		$removeButton = SPACE;
-		$dragHandler = SPACE;
+		$dragHandler = '';
 	}
 	else {
 		$removeButton = (new CButton('remove_'.$stepid, _('Remove'), 'javascript: removeStep(this);'))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->setAttribute('remove_step', $stepid);
-		$dragHandler = new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move');
+		$dragHandler = (new CCol(
+			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+		))->addClass(ZBX_STYLE_TD_DRAG_ICON);
 	}
 
-	$row = (new CRow([
-		$dragHandler,
-		$numSpan,
-		$name,
-		$step['timeout'].SPACE._('sec'),
-		$url,
-		htmlspecialchars($step['required']),
-		$step['status_codes'],
-		$removeButton]))
+	$stepsTable->addRow(
+		(new CRow([
+			$dragHandler,
+			$numSpan,
+			$name,
+			$step['timeout'].SPACE._('sec'),
+			$url,
+			htmlspecialchars($step['required']),
+			$step['status_codes'],
+			$removeButton
+		]))
 			->addClass('sortable')
-			->setId('steps_'.$stepid);
-
-	$stepsTable->addRow($row);
+			->setId('steps_'.$stepid)
+	);
 }
 
 if (!$this->data['templated']) {
