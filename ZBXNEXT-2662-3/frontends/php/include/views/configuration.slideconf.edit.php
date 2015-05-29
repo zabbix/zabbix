@@ -41,11 +41,10 @@ $slideFormList->addRow(_('Default delay (in seconds)'), new CNumericBox('delay',
 
 // append slide table
 $slideTable = (new CTableInfo())
-	->setAttribute('style', 'min-width: 312px;')
 	->setId('slideTable')
 	->setHeader([
-		(new CColHeader(SPACE))->setWidth(15),
-		(new CColHeader(SPACE))->setWidth(15),
+		(new CColHeader())->setWidth(15),
+		(new CColHeader())->setWidth(15),
 		_('Screen'),
 		(new CColHeader(_('Delay')))->setWidth(70),
 		(new CColHeader(_('Action')))->setWidth(50)
@@ -68,18 +67,19 @@ foreach ($this->data['slides'] as $key => $slides) {
 		->addClass(ZBX_STYLE_BTN_LINK);
 	$removeButton->setAttribute('remove_slide', $key);
 
-	$row = (new CRow(
-		[
-			(new CCol(new CDiv(null, 'drag-icon')))->addClass('td-drag-icon'),
+	$slideTable->addRow(
+		(new CRow([
+			(new CCol(
+				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			new CSpan($i++.':', 'rowNum', 'current_slide_'.$key),
 			$name,
 			$delay,
 			$removeButton
-		]
-	))
-		->addClass('sortable')
-		->setId('slides_'.$key);
-	$slideTable->addRow($row);
+		]))
+			->addClass('sortable')
+			->setId('slides_'.$key)
+	);
 }
 
 $addButtonColumn = (new CCol(

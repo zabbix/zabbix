@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="screenRowTPL">
 <tr class="sortable" id="slides_#{rowId}">
-	<td class='td-drag-icon'>
-		<div class="drag-icon"></div>
+	<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
+		<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 		<input id="slides_#{rowId}_screenid" name="slides[#{rowId}][screenid]" type="hidden" value="#{screenid}" />
 		<input id="slides_#{rowId}_slideid" name="slides[#{rowId}][slideid]" type="hidden" value="" />
 	</td>
@@ -130,7 +130,7 @@
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			cursor: 'move',
-			handle: 'div.drag-icon',
+			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
