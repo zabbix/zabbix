@@ -277,7 +277,7 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 	$row = new CRow([
 		$delayFlex['delay'],
 		$delayFlex['period'],
-		new CButton('remove', _('Remove'), 'javascript: removeDelayFlex('.$i.');', 'link_menu')
+		(new CButton('remove', _('Remove'), 'javascript: removeDelayFlex('.$i.');'))->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 	$row->setId('delayFlex_'.$i);
 	$delayFlexTable->addRow($row);
@@ -303,7 +303,7 @@ $newFlexInt = new CSpan([
 	SPACE,
 	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
 	SPACE,
-	new CButton('add_delay_flex', _('Add'), null, 'button-form')
+	(new CButton('add_delay_flex', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 ]);
 $newFlexInt->setId('row-new-delay-flex-fields');
 

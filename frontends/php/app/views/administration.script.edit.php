@@ -99,7 +99,7 @@ $confirmationLabel = new CLabel(_('Confirmation text'), 'confirmation');
 $scriptFormList->addRow($confirmationLabel, [
 	new CTextBox('confirmation', $data['confirmation'], ZBX_TEXTBOX_STANDARD_SIZE),
 	SPACE,
-	new CButton('testConfirmation', _('Test confirmation'), null, 'link_menu')
+	(new CButton('testConfirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)
 ]);
 
 $scriptView = new CTabView();

@@ -73,7 +73,11 @@ $exprTable = (new CTable())
 		(new CCol(_('Case sensitive')))->addClass(ZBX_STYLE_NOWRAP),
 		SPACE
 	])
-	->setFooter(new CButton('add', _('Add'), null, 'link_menu exprAdd'));
+	->setFooter(
+		(new CButton('add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('exprAdd')
+	);
 $exprTab->addRow(_('Expressions'), new CDiv($exprTable, 'inlineblock border_dotted objectgroup'));
 
 $exprForm = (new CTable())
@@ -84,9 +88,9 @@ $exprForm = (new CTable())
 	->addRow([_('Case sensitive'), new CCheckBox('case_sensitiveNew')]);
 
 $exprFormFooter = [
-	new CButton('saveExpression', _('Add'), null, 'link_menu'),
+	(new CButton('saveExpression', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
 	SPACE,
-	new CButton('cancelExpression', _('Cancel'), null, 'link_menu')
+	(new CButton('cancelExpression', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
 ];
 $exprTab->addRow(null, new CDiv([$exprForm, $exprFormFooter], 'objectgroup inlineblock border_dotted'), true, 'exprForm');
 

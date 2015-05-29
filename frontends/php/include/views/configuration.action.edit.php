@@ -103,7 +103,8 @@ if ($this->data['action']['filter']['conditions']) {
 					$actionConditionStringValues[0][$cIdx]
 				),
 				[
-					new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');', 'link_menu'),
+					(new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');'))
+						->addClass(ZBX_STYLE_BTN_LINK),
 					new CVar('conditions['.$i.']', $condition)
 				],
 				new CVar('conditions[' . $i . '][formulaid]', $label)
@@ -347,7 +348,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 
 $conditionTable = new CTable();
 $conditionTable->addRow([$conditionTypeComboBox, $conditionOperatorsComboBox, $condition]);
-$conditionTable->addRow([new CSubmit('add_condition', _('Add'), null, 'link_menu'), SPACE, SPACE]);
+$conditionTable->addRow([
+	(new CCol(
+		(new CSubmit('add_condition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+	))->setColSpan(3)
+]);
 
 $conditionFormList->addRow(_('New condition'), new CDiv($conditionTable, 'objectgroup floatleft border_dotted'));
 
@@ -428,12 +433,11 @@ if ($this->data['action']['operations']) {
 				$esc_delay_txt,
 				$esc_period_txt,
 				[
-					new CSubmit('edit_operationid['.$operationid.']', _('Edit'), null, 'link_menu'),
+					(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
 					SPACE, SPACE, SPACE,
 					[
-						new CButton('remove', _('Remove'), 'javascript: removeOperation('.$operationid.');',
-							'link_menu'
-						),
+						(new CButton('remove', _('Remove'), 'javascript: removeOperation('.$operationid.');'))
+							->addClass(ZBX_STYLE_BTN_LINK),
 						new CVar('operations['.$operationid.']', $operation)
 					]
 				]
@@ -443,12 +447,11 @@ if ($this->data['action']['operations']) {
 			$operationRow = [
 				$details,
 				[
-					new CSubmit('edit_operationid['.$operationid.']', _('Edit'), null, 'link_menu'),
+					(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
 					SPACE, SPACE, SPACE,
 					[
-						new CButton('remove', _('Remove'), 'javascript: removeOperation('.$operationid.');',
-							'link_menu'
-						),
+						(new CButton('remove', _('Remove'), 'javascript: removeOperation('.$operationid.');'))
+							->addClass(ZBX_STYLE_BTN_LINK),
 						new CVar('operations['.$operationid.']', $operation)
 					]
 				]
@@ -473,7 +476,7 @@ if ($this->data['action']['operations']) {
 
 $footer = [];
 if (empty($this->data['new_operation'])) {
-	$footer[] = new CSubmit('new_operation', _('New'), null, 'link_menu');
+	$footer[] = (new CSubmit('new_operation', _('New')))->addClass(ZBX_STYLE_BTN_LINK);
 }
 
 $operationFormList->addRow(_('Action operations'), new CDiv([$operationsTable, $footer], 'objectgroup inlineblock border_dotted'));
@@ -579,7 +582,8 @@ if (!empty($this->data['new_operation'])) {
 				->setId('opmsgUsrgrpList')
 				->setHeader([_('User group'), _('Action')]);
 
-			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")', 'link_menu');
+			$addUsrgrpBtn = (new CButton('add', _('Select'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")'))
+				->addClass(ZBX_STYLE_BTN_GREY);
 			$addUsrgrpBtn->setId('addusrgrpbtn');
 			$usrgrpList->addRow((new CRow(
 				(new CCol($addUsrgrpBtn))->setColSpan(2)))->setId('opmsgUsrgrpListFooter')
@@ -591,7 +595,8 @@ if (!empty($this->data['new_operation'])) {
 				->setAttribute('style', 'min-width: 310px;')
 				->setId('opmsgUserList');
 
-			$addUserBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")', 'link_menu');
+			$addUserBtn = (new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")'))
+				->addClass(ZBX_STYLE_BTN_LINK);
 			$addUserBtn->setId('adduserbtn');
 			$userList->addRow((new CRow(
 				(new CCol($addUserBtn))->setColSpan(2)))->setId('opmsgUserListFooter'));
@@ -707,7 +712,8 @@ if (!empty($this->data['new_operation'])) {
 				->setAttribute('style', 'min-width: 310px;')
 				->setHeader([_('Target'), _('Action')]);
 
-			$addCmdBtn = new CButton('add', _('New'), 'javascript: showOpCmdForm(0, "new");', 'link_menu');
+			$addCmdBtn = (new CButton('add', _('New'), 'javascript: showOpCmdForm(0, "new");'))
+				->addClass(ZBX_STYLE_BTN_LINK);
 			$cmdList->addRow((new CRow(
 				(new CCol($addCmdBtn))->setColSpan(3)))->setId('opCmdListFooter')
 			);
@@ -771,7 +777,7 @@ if (!empty($this->data['new_operation'])) {
 
 			$userScriptId = new CVar('new_operation[opcommand][scriptid]', $this->data['new_operation']['opcommand']['scriptid']);
 			$userScriptName = new CTextBox('new_operation[opcommand][script]', $this->data['new_operation']['opcommand']['script'], 32, true);
-			$userScriptSelect = new CButton('select_opcommand_script', _('Select'), null, 'link_menu');
+			$userScriptSelect = (new CButton('select_opcommand_script', _('Select')))->addClass(ZBX_STYLE_BTN_GREY);
 
 			$userScript = new CDiv([$userScriptId, $userScriptName, SPACE, $userScriptSelect], 'class_opcommand_userscript inlineblock hidden');
 
@@ -885,7 +891,9 @@ if (!empty($this->data['new_operation'])) {
 				)->setColSpan(2))
 			)->setId('opGroupListFooter'));
 			$groupList->addRow(
-				(new CCol(new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu')))->setColSpan(2)
+				(new CCol(
+					(new CButton('add', _('Add'), 'return addDiscoveryHostGroup();'))->addClass(ZBX_STYLE_BTN_LINK)
+				))->setColSpan(2)
 			);
 
 			// load host groups
@@ -935,7 +943,9 @@ if (!empty($this->data['new_operation'])) {
 			)->setId('opTemplateListFooter'));
 
 			$templateList->addRow(
-				(new CCol(new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu')))->setColSpan(2)
+				(new CCol(
+					(new CButton('add', _('Add'), 'return addDiscoveryTemplates();'))->addClass(ZBX_STYLE_BTN_LINK)
+				))->setColSpan(2)
 			);
 
 			// load templates
@@ -1014,7 +1024,8 @@ if (!empty($this->data['new_operation'])) {
 						$operationConditionStringValues[$cIdx]
 					),
 					[
-						new CButton('remove', _('Remove'), 'javascript: removeOperationCondition('.$i.');', 'link_menu'),
+						(new CButton('remove', _('Remove'), 'javascript: removeOperationCondition('.$i.');'))
+							->addClass(ZBX_STYLE_BTN_LINK),
 						new CVar('new_operation[opconditions]['.$i.'][conditiontype]', $opcondition['conditiontype']),
 						new CVar('new_operation[opconditions]['.$i.'][operator]', $opcondition['operator']),
 						new CVar('new_operation[opconditions]['.$i.'][value]', $opcondition['value'])
@@ -1044,7 +1055,9 @@ if (!empty($this->data['new_operation'])) {
 		);
 
 		if (!isset($_REQUEST['new_opcondition'])) {
-			$operationConditionsTable->addRow(new CCol(new CSubmit('new_opcondition', _('New'), null, 'link_menu')));
+			$operationConditionsTable->addRow((new CCol(
+				(new CSubmit('new_opcondition', _('New')))->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColspan(3));
 		}
 		$newOperationsTable->addRow([_('Conditions'), new CDiv($operationConditionsTable, 'objectgroup inlineblock border_dotted')], 'indent_top');
 	}
@@ -1095,18 +1108,18 @@ if (!empty($this->data['new_operation'])) {
 		$newOperationConditionTable->addRow($rowCondition);
 
 		$newOperationConditionFooter = [
-			new CSubmit('add_opcondition', _('Add'), null, 'link_menu'),
+			(new CSubmit('add_opcondition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
 			SPACE.SPACE,
-			new CSubmit('cancel_new_opcondition', _('Cancel'), null, 'link_menu')
+			(new CSubmit('cancel_new_opcondition', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
 		];
 
 		$newOperationsTable->addRow([_('Operation condition'), new CDiv([$newOperationConditionTable, $newOperationConditionFooter], 'objectgroup inlineblock border_dotted')]);
 	}
 
 	$footer = [
-		new CSubmit('add_operation', (isset($this->data['new_operation']['id'])) ? _('Update') : _('Add'), null, 'link_menu'),
+		(new CSubmit('add_operation', (isset($this->data['new_operation']['id'])) ? _('Update') : _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
 		SPACE.SPACE,
-		new CSubmit('cancel_new_operation', _('Cancel'), null, 'link_menu')
+		(new CSubmit('cancel_new_operation', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
 	];
 	$operationFormList->addRow(_('Operation details'), new CDiv([$newOperationsTable, $footer], 'objectgroup floatleft border_dotted'));
 }

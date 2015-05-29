@@ -55,12 +55,6 @@ class CTable extends CTag {
 		return $this;
 	}
 
-	public function setAlign($value) {
-		$this->attributes['align'] = $value;
-
-		return $this;
-	}
-
 	public function setCellPadding($value) {
 		$this->attributes['cellpadding'] = strval($value);
 
@@ -146,6 +140,8 @@ class CTable extends CTag {
 		}
 		$this->footer = $this->prepareRow($value, $class);
 		$this->footer = $this->footer->toString();
+
+		return $this;
 	}
 
 	public function addRow($item, $class = null, $id = null) {

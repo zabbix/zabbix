@@ -523,7 +523,7 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 }
 
 foreach ($triggers as $trigger) {
-	$description = new CSpan($trigger['description'], ZBX_STYLE_LINK_ACTION.' link_menu');
+	$description = (new CSpan($trigger['description']))->addClass(ZBX_STYLE_LINK_ACTION);
 	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	if ($showDetails) {
@@ -585,7 +585,7 @@ foreach ($triggers as $trigger) {
 			}
 		}
 
-		$hostName = new CSpan($triggerHost['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
+		$hostName = (new CSpan($triggerHost['name']))->addClass(ZBX_STYLE_BTN_ACTION);
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
 
 		// add maintenance icon with hint if host is in maintenance

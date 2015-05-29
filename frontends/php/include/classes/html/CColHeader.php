@@ -26,15 +26,13 @@ class CColHeader extends CTag {
 		$this->addItem($item);
 	}
 
-	public function setAlign($value) {
-		$this->setAttribute('align', $value);
-	}
-
 	public function setColSpan($value) {
 		$this->setAttribute('colspan', $value);
 	}
 
 	public function setWidth($value) {
 		$this->setAttribute('width', $value);
+
+		return $this;
 	}
 }

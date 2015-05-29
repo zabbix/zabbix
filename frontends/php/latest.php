@@ -662,9 +662,10 @@ foreach ($applications as $appid => $dbApp) {
 	$hostName = null;
 
 	if (!$singleHostSelected) {
-		$hostName = new CSpan($host['name'],
-			ZBX_STYLE_LINK_ACTION.' link_menu'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' '.ZBX_STYLE_RED : '')
-		);
+		$hostName = (new CSpan($host['name']))->addClass(ZBX_STYLE_LINK_ACTION);
+		if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
+			$hostName->addClass(ZBX_STYLE_RED);
+		}
 
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	}
@@ -840,9 +841,10 @@ foreach ($hosts as $hostId => $dbHost) {
 	$hostName = null;
 
 	if (!$singleHostSelected) {
-		$hostName = new CSpan($host['name'],
-			ZBX_STYLE_LINK_ACTION.' link_menu'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' '.ZBX_STYLE_RED : '')
-		);
+		$hostName = (new CSpan($host['name']))->addClass(ZBX_STYLE_LINK_ACTION);
+		if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
+			$hostName->addClass(ZBX_STYLE_RED);
+		}
 
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	}

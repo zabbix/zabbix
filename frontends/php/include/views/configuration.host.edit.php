@@ -138,7 +138,11 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	$helpTextWhenDragInterfaceAgent = new CSpan(_('Drag here to change the type of the interface to "agent" type.'));
 	$helpTextWhenDragInterfaceAgent->addClass('dragHelpText');
-	$buttonCol = (new CCol(new CButton('addAgentInterface', _('Add'), null, 'link_menu')))->addClass('interface-add-control')->setColSpan(7);
+	$buttonCol = (new CCol(
+		(new CButton('addAgentInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+	))
+		->addClass('interface-add-control')
+		->setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceAgent);
 
 	$buttonRow = (new CRow([$buttonCol]))->setId('agentInterfacesFooter');
@@ -155,7 +159,11 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	$helpTextWhenDragInterfaceSNMP = new CSpan(_('Drag here to change the type of the interface to "SNMP" type.'));
 	$helpTextWhenDragInterfaceSNMP->addClass('dragHelpText');
-	$buttonCol = (new CCol(new CButton('addSNMPInterface', _('Add'), null, 'link_menu')))->addClass('interface-add-control')->setColSpan(7);
+	$buttonCol = (new CCol(
+		(new CButton('addSNMPInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+	))
+		->addClass('interface-add-control')
+		->setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceSNMP);
 
 	$buttonRow = (new CRow([$buttonCol]))->setId('SNMPInterfacesFooter');
@@ -171,7 +179,9 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		->setAttribute('data-type', 'jmx');
 	$helpTextWhenDragInterfaceJMX = new CSpan(_('Drag here to change the type of the interface to "JMX" type.'));
 	$helpTextWhenDragInterfaceJMX->addClass('dragHelpText');
-	$buttonCol = (new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu')))
+	$buttonCol = (new CCol(
+		(new CButton('addJMXInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+	))
 		->addClass('interface-add-control')
 		->setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceJMX);
@@ -188,7 +198,9 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		->setAttribute('data-type', 'ipmi');
 	$helpTextWhenDragInterfaceIPMI = new CSpan(_('Drag here to change the type of the interface to "IPMI" type.'));
 	$helpTextWhenDragInterfaceIPMI->addClass('dragHelpText');
-	$buttonCol = (new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu')))
+	$buttonCol = (new CCol(
+		(new CButton('addIPMIInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+	))
 		->addClass('interface-add-control')
 		->setColSpan(7);
 	$buttonCol->addItem($helpTextWhenDragInterfaceIPMI);
@@ -566,12 +578,12 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
 		$templateLink->setTarget('_blank');
 
-		$unlinkButton = new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu');
+		$unlinkButton = (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK);
 		if (array_key_exists($template['templateid'], $data['original_templates'])) {
-			$unlinkAndClearButton = new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'),
-				null, 'link_menu'
-			);
-			$unlinkAndClearButton->addStyle('margin-left: 8px');
+			$unlinkAndClearButton =
+				(new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addStyle('margin-left: 8px');
 		}
 		else {
 			$unlinkAndClearButton = null;
@@ -602,7 +614,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		]
 	])]);
 
-	$newTemplateTable->addRow([new CSubmit('add_template', _('Add'), null, 'link_menu')]);
+	$newTemplateTable->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
 	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable,
 		'template-link-block objectgroup inlineblock border_dotted')

@@ -210,7 +210,7 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 	$row = (new CRow([
 		$delayFlex['delay'],
 		$delayFlex['period'],
-		new CButton('remove', _('Remove'), 'javascript: removeDelayFlex('.$i.');', 'link_menu')
+		(new CButton('remove', _('Remove'), 'javascript: removeDelayFlex('.$i.');'))->addClass(ZBX_STYLE_BTN_LINK)
 	]))->setId('delayFlex_'.$i);
 	$delayFlexTable->addRow($row);
 
@@ -235,7 +235,7 @@ $newFlexInt = new CSpan([
 	SPACE,
 	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
 	SPACE,
-	new CButton('add_delay_flex', _('Add'), null, 'button-form')
+	(new CButton('add_delay_flex', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 ]);
 $newFlexInt->setId('row-new-delay-flex-fields');
 
@@ -321,8 +321,8 @@ foreach ($conditions as $i => $condition) {
 
 	// delete button
 	$deleteButtonCell = [
-		(new CButton('conditions_'.$i.'_remove'))
-			->addClass(ZBX_STYLE_BTN_REMOVE)
+		(new CButton('conditions_'.$i.'_remove', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
 	];
 
@@ -332,7 +332,7 @@ foreach ($conditions as $i => $condition) {
 
 $buttonColumn = new CCol(
 	(new CButton('macro_add', _('Add')))
-		->addClass(ZBX_STYLE_BTN_ADD)
+		->addClass(ZBX_STYLE_BTN_LINK)
 		->addClass('element-table-add')
 );
 $buttonColumn->setAttribute('colspan', 5);

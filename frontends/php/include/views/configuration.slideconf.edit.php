@@ -64,7 +64,8 @@ foreach ($this->data['slides'] as $key => $slides) {
 	$delay = new CNumericBox('slides['.$key.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, false, true, false);
 	$delay->setAttribute('placeholder', _('default'));
 
-	$removeButton = new CButton('remove_'.$key, _('Remove'), 'javascript: removeSlide(this);', 'link_menu');
+	$removeButton = (new CButton('remove_'.$key, _('Remove'), 'javascript: removeSlide(this);'))
+		->addClass(ZBX_STYLE_BTN_LINK);
 	$removeButton->setAttribute('remove_slide', $key);
 
 	$row = (new CRow(
@@ -83,10 +84,10 @@ foreach ($this->data['slides'] as $key => $slides) {
 
 $addButtonColumn = (new CCol(
 	empty($this->data['work_slide'])
-		? new CButton('add', _('Add'),
+		? (new CButton('add', _('Add'),
 			'return PopUp("popup.php?srctbl=screens&srcfld1=screenid&dstfrm='.$slideForm->getName().
-				'&multiselect=1&writeonly=1")',
-			'link_menu')
+				'&multiselect=1&writeonly=1")'
+		))->addClass(ZBX_STYLE_BTN_LINK)
 		: null
 	))->setColSpan(5);
 

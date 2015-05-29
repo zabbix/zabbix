@@ -1115,7 +1115,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		foreach ($hostNames as $hostId => $hostName) {
-			$name = new CSpan($hostName, ZBX_STYLE_LINK_ACTION.' link_menu');
+			$name = (new CSpan($hostName))->addClass(ZBX_STYLE_LINK_ACTION);
 			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];

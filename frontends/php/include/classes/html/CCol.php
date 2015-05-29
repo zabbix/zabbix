@@ -26,10 +26,6 @@ class CCol extends CTag {
 		$this->addItem($item);
 	}
 
-	public function setAlign($value) {
-		$this->setAttribute('align', $value);
-	}
-
 	public function setRowSpan($value) {
 		$this->setAttribute('rowspan', $value);
 
@@ -44,5 +40,7 @@ class CCol extends CTag {
 
 	public function setWidth($value) {
 		$this->setAttribute('width', $value);
+
+		return $this;
 	}
 }

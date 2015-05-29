@@ -9,7 +9,7 @@
 		<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
 		<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
 		<?php if ($this->data['graphtype'] != GRAPH_TYPE_PIE && $this->data['graphtype'] != GRAPH_TYPE_EXPLODED): ?>
-			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?php echo GRAPH_ITEM_SIMPLE; ?>">
+			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
 		<?php endif; ?>
 	</td>
 
@@ -27,8 +27,8 @@
 	<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
 		<td>
 			<select id="items_#{number}_type" name="items[#{number}][type]" class="input select">
-				<option value="<?php echo GRAPH_ITEM_SIMPLE; ?>"><?php echo _('Simple'); ?></option>
-				<option value="<?php echo GRAPH_ITEM_SUM; ?>"><?php echo _('Graph sum'); ?></option>
+				<option value="<?= GRAPH_ITEM_SIMPLE ?>"><?= _('Simple') ?></option>
+				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
 			</select>
 		</td>
 	<?php endif; ?>
@@ -37,17 +37,17 @@
 	<td>
 		<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]" class="input select">
 		<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
-			<option value="<?php echo CALC_FNC_MIN; ?>"><?php echo _('min'); ?></option>
-			<option value="<?php echo CALC_FNC_AVG; ?>"><?php echo _('avg'); ?></option>
-			<option value="<?php echo CALC_FNC_MAX; ?>"><?php echo _('max'); ?></option>
-			<option value="<?php echo CALC_FNC_LST; ?>"><?php echo _('last'); ?></option>
+			<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
+			<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
+			<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
+			<option value="<?= CALC_FNC_LST ?>"><?= _('last') ?></option>
 		<?php else: ?>
 			<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
-				<option value="<?php echo CALC_FNC_ALL; ?>"><?php echo _('all'); ?></option>
+				<option value="<?= CALC_FNC_ALL ?>"><?= _('all') ?></option>
 			<?php endif; ?>
-				<option value="<?php echo CALC_FNC_MIN; ?>"><?php echo _('min'); ?></option>
-				<option value="<?php echo CALC_FNC_AVG; ?>"><?php echo _('avg'); ?></option>
-				<option value="<?php echo CALC_FNC_MAX; ?>"><?php echo _('max'); ?></option>
+				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
+				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
+				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
 		<?php endif; ?>
 		</select>
 	</td>
@@ -57,7 +57,7 @@
 		<td>
 			<select id="items_#{number}_drawtype" name="items[#{number}][drawtype]" class="input select">
 			<?php foreach (graph_item_drawtypes() as $drawtype): ?>
-				<option value="<?php echo $drawtype; ?>"><?php echo graph_item_drawtype2str($drawtype); ?></option>
+				<option value="<?= $drawtype ?>"><?= graph_item_drawtype2str($drawtype) ?></option>
 			<?php endforeach; ?>
 			</select>
 		</td>
@@ -69,27 +69,21 @@
 	<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED): ?>
 		<td>
 			<select id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" class="input select">
-				<option value="<?php echo GRAPH_YAXIS_SIDE_LEFT; ?>"><?php echo _('Left'); ?></option>
-				<option value="<?php echo GRAPH_YAXIS_SIDE_RIGHT; ?>"><?php echo _('Right'); ?></option>
+				<option value="<?= GRAPH_YAXIS_SIDE_LEFT ?>"><?= _('Left') ?></option>
+				<option value="<?= GRAPH_YAXIS_SIDE_RIGHT ?>"><?= _('Right') ?></option>
 			</select>
 		</td>
 	<?php else: ?>
 		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
 	<?php endif; ?>
-
-	<!-- color -->
 	<td>
 		<input type="text" id="items_#{number}_color" name="items[#{number}][color]" class="input text colorpicker"
 			onchange="javascript: set_color_by_name('items_#{number}_color', this.value);" maxlength="6" size="7" value="">
 		<div id="lbl_items_#{number}_color" name="lbl_items[#{number}][color]" title="#" class="pointer colorpickerLabel"
 			onclick="javascript: show_color_picker('items_#{number}_color');">&nbsp;&nbsp;&nbsp;</div>
 	</td>
-
-	<!-- remove button -->
 	<td>
-		<button type="button" class="button link_menu" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);">
-			<?php echo _('Remove') ?>
-		</button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -136,7 +130,7 @@
 				number: number,
 				number_nr: number + 1,
 				gitemid: null,
-				graphid: <?php echo $this->data['graphid']; ?>,
+				graphid: <?= $this->data['graphid'] ?>,
 				itemid: list.values[i].itemid,
 				type: null,
 				calc_fnc: null,
@@ -150,7 +144,7 @@
 
 			var itemTpl = new Template(jQuery('#itemTpl').html());
 			jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
-			jQuery('#items_' + item['number'] + '_calc_fnc').val(<?php echo CALC_FNC_AVG; ?>);
+			jQuery('#items_' + item['number'] + '_calc_fnc').val(<?= CALC_FNC_AVG ?>);
 			jQuery('#items_' + item['number'] + '_color').val(item['color']);
 			jQuery('#lbl_items_' + item['number'] + '_color').attr('title', '#' + item['color']);
 			jQuery('#lbl_items_' + item['number'] + '_color').css('background-color', '#' + item['color']);
@@ -162,7 +156,7 @@
 
 	function getOnlyHostParam() {
 		<?php if ($this->data['is_template']): ?>
-			return '&only_hostid=<?php echo $this->data['hostid']; ?>';
+			return '&only_hostid=<?= $this->data['hostid'] ?>';
 		<?php else: ?>
 			return '&real_hosts=1';
 		<?php endif ?>
@@ -174,11 +168,11 @@
 		for (var i = 0; i < size; i++) {
 			var nameLink = 'PopUp("popup.php?writeonly=1&numeric=1&dstfrm=graphForm'
 				+ '&dstfld1=items_' + i + '_itemid&dstfld2=items_' + i + '_name'
-				+ (jQuery('#items_' + i + '_flags').val() == <?php echo ZBX_FLAG_DISCOVERY_PROTOTYPE; ?>
-					? '&srctbl=item_prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
+				+ (jQuery('#items_' + i + '_flags').val() == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>
+					? '&srctbl=item_prototypes&parent_discoveryid=<?= $this->data['parent_discoveryid'] ?>'
 						+ '&srcfld3=flags&dstfld3=items_' + i + '_flags'
 					: '&srctbl=items')
-				+ '<?php echo !empty($this->data['normal_only']) ? '&normal_only=1' : ''; ?>'
+				+ '<?= !empty($this->data['normal_only']) ? '&normal_only=1' : '' ?>'
 				+ '&srcfld1=itemid&srcfld2=name" + getOnlyHostParam())';
 			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
 		}
@@ -352,7 +346,7 @@
 			});
 
 			$('#previewTab img')
-				.attr('src', 'styles/themes/<?php echo getUserTheme(CWebUser::$data); ?>/images/preloader.gif')
+				.attr('src', 'styles/themes/<?= getUserTheme(CWebUser::$data) ?>/images/preloader.gif')
 				.width(80)
 				.height(12);
 
@@ -383,13 +377,13 @@
 		// Y axis min clean unused fields
 		$('#ymin_type').change(function() {
 			switch ($(this).val()) {
-				case '<?php echo GRAPH_YAXIS_TYPE_CALCULATED; ?>':
+				case '<?= GRAPH_YAXIS_TYPE_CALCULATED ?>':
 					$('#yaxismin').val('');
 					$('#ymin_name').val('');
 					$('#ymin_itemid').val('0');
 					break;
 
-				case '<?php echo GRAPH_YAXIS_TYPE_FIXED; ?>':
+				case '<?= GRAPH_YAXIS_TYPE_FIXED ?>':
 					$('#ymin_name').val('');
 					$('#ymin_itemid').val('0');
 					break;
@@ -404,13 +398,13 @@
 		// Y axis max clean unused fields
 		$('#ymax_type').change(function() {
 			switch ($(this).val()) {
-				case '<?php echo GRAPH_YAXIS_TYPE_CALCULATED; ?>':
+				case '<?= GRAPH_YAXIS_TYPE_CALCULATED ?>':
 					$('#yaxismax').val('');
 					$('#ymax_name').val('');
 					$('#ymax_itemid').val('0');
 					break;
 
-				case '<?php echo GRAPH_YAXIS_TYPE_FIXED; ?>':
+				case '<?= GRAPH_YAXIS_TYPE_FIXED ?>':
 					$('#ymax_name').val('');
 					$('#ymax_itemid').val('0');
 					break;

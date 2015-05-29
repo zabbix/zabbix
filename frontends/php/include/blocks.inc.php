@@ -687,7 +687,7 @@ function make_latest_issues(array $filter = []) {
 	foreach ($triggers as $trigger) {
 		$host = $hosts[$trigger['hostid']];
 
-		$hostName = new CSpan($host['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
+		$hostName = (new CSpan($host['name']))->addClass(ZBX_STYLE_LINK_ACTION);
 		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 
 		// add maintenance icon with hint if host is in maintenance

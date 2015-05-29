@@ -81,25 +81,23 @@ foreach ($data['dependencies'] as $dependency) {
 		$description->setAttribute('target', '_blank');
 	}
 
-	$row = new CRow([$description, new CButton('remove', _('Remove'),
-		'javascript: removeDependency(\''.$dependency['triggerid'].'\');',
-		'link_menu'
-	)]);
+	$row = new CRow([$description,
+		(new CButton('remove', _('Remove'), 'javascript: removeDependency(\''.$dependency['triggerid'].'\');'))
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
 
 	$row->setId('dependency_'.$dependency['triggerid']);
 	$dependenciesTable->addRow($row);
 }
 
-$addButton = new CButton('add_dep_trigger', _('Add'), 'return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency'.
-		'&reference=deptrigger&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid'.
-		'&multiselect=1&with_triggers=1&normal_only=1&noempty=1");',
-	'link_menu'
-);
-$addPrototypeButton = new CButton('add_dep_trigger_prototype', _('Add prototype'), 'return PopUp("popup.php?'.
-		'dstfrm=massupdate&dstact=add_dependency&reference=deptrigger&dstfld1=new_dependency&srctbl=trigger_prototypes'.
-		'&objname=triggers&srcfld1=triggerid'.url_param('parent_discoveryid').'&multiselect=1");',
-	'link_menu'
-);
+$addButton = (new CButton('add_dep_trigger', _('Add'),
+	'return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger&dstfld1=new_dependency'.
+	'&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1&with_triggers=1&normal_only=1&noempty=1");'
+))->addClass(ZBX_STYLE_BTN_LINK);
+$addPrototypeButton = (new CButton('add_dep_trigger_prototype', _('Add prototype'),
+	'return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger&dstfld1=new_dependency'.
+	'&srctbl=trigger_prototypes&objname=triggers&srcfld1=triggerid'.url_param('parent_discoveryid').'&multiselect=1");'
+))->addClass(ZBX_STYLE_BTN_LINK);
 
 $dependenciesDiv = new CDiv(
 	[$dependenciesTable, $addButton, SPACE, SPACE, SPACE, $addPrototypeButton],

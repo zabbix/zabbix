@@ -235,23 +235,21 @@ $itemsTable->setHeader([
 	(new CCol(_('Action')))->setWidth(50)
 ]);
 
-$addButton = new CButton('add_item', _('Add'),
+$addButton = (new CButton('add_item', _('Add'),
 	'return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
 		($this->data['normal_only'] ? '&normal_only=1' : '').
-		'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam());',
-	'link_menu'
-);
+		'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam());'
+))->addClass(ZBX_STYLE_BTN_LINK);
 
 $addPrototypeButton = null;
 if ($this->data['parent_discoveryid']) {
-	$addPrototypeButton = new CButton('add_protoitem', _('Add prototype'),
+	$addPrototypeButton = (new CButton('add_protoitem', _('Add prototype'),
 		'return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
 			url_param($this->data['graphtype'], false, 'graphtype').
 			url_param('parent_discoveryid').
 			($this->data['normal_only'] ? '&normal_only=1' : '').
-			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");',
-		'link_menu'
-	);
+			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");'
+	))->addClass(ZBX_STYLE_BTN_LINK);
 }
 $itemsTable->addRow(new CRow(
 	(new CCol([$addButton, SPACE, SPACE, SPACE, $addPrototypeButton]))->setColSpan(8),
