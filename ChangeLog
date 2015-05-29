@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] updated Dutch translation; thanks to Zabbix translators (R
 ...G...PS. [ZBXNEXT-786] made net.tcp.service[ntp] item work over UDP (asaveljevs)
 
 Bug fixes:
+...G...... [ZBX-9595] added variable initialization for correct operation of system.swap.*[,pages] items (igors)
 ...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
 ...G...... [ZBX-9456] fixed sustem.cpu.util item to work correctly on OpenBSD 5.7 (igors)
 ..F....... [ZBX-9402] fixed sorting of elements in pages and fixed several requests returning more results than record count set in configuration (Ivo)
