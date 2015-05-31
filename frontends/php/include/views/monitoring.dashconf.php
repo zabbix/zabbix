@@ -32,14 +32,18 @@ $dashconfFormList = new CFormList('dashconfFormList');
 
 // append filter status to form list
 if ($this->data['isFilterEnable']) {
-	$filterStatusSpan = new CSpan(_('Enabled'), ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN);
-	$filterStatusSpan->onClick("create_var('".$dashconfForm->getName()."', 'filterEnable', 0, true);");
-	$filterStatusSpan->setAttribute('tabindex', 0);
+	$filterStatusSpan = (new CSpan(_('Enabled')))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(ZBX_STYLE_GREEN)
+		->onClick("create_var('".$dashconfForm->getName()."', 'filterEnable', 0, true);")
+		->setAttribute('tabindex', 0);
 }
 else {
-	$filterStatusSpan = new CSpan(_('Disabled'), ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
-	$filterStatusSpan->onClick("$('dashform').enable(); create_var('".$dashconfForm->getName()."', 'filterEnable', 1, true);");
-	$filterStatusSpan->setAttribute('tabindex', 0);
+	$filterStatusSpan = (new CSpan(_('Disabled')))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(ZBX_STYLE_RED)
+		->onClick("$('dashform').enable(); create_var('".$dashconfForm->getName()."', 'filterEnable', 1, true);")
+		->setAttribute('tabindex', 0);
 }
 $dashconfFormList->addRow(_('Dashboard filter'), $filterStatusSpan);
 

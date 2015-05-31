@@ -120,7 +120,8 @@ class CScreenActions extends CScreenBase {
 
 		// indicator of sort field
 		$sortfieldSpan = new CSpan([$sorttitle, SPACE]);
-		$sortorderSpan = new CSpan(SPACE, ($sortorder === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
+		$sortorderSpan = (new CSpan(SPACE))
+			->addClass(($sortorder === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
 
 		// create alert table
 		$actionTable = new CTableInfo();
@@ -142,17 +143,18 @@ class CScreenActions extends CScreenBase {
 
 		foreach ($alerts as $alert) {
 			if ($alert['status'] == ALERT_STATUS_SENT) {
-				$status = new CSpan(_('Sent'), ZBX_STYLE_GREEN);
+				$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
 			}
 			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-				$status = new CSpan([
+				$status = (new CSpan([
 					_('In progress').':',
 					BR(),
-					_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries']),
-				], ZBX_STYLE_ORANGE);
+					_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries'])])
+				)
+					->addClass(ZBX_STYLE_ORANGE);
 			}
 			else {
-				$status = new CSpan(_('Not sent'), ZBX_STYLE_RED);
+				$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
 			}
 
 			$recipient = $alert['userid']

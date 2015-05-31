@@ -223,7 +223,7 @@ class CSetupWizard extends CForm {
 				$port = new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 20, false, false, false);
 				$port->removeAttribute('style');
 				$table->addRow(_('Database port'),
-					[$port, ' ', new CSpan(_('0 - use default port'), ZBX_STYLE_GREY)]
+					[$port, ' ', (new CSpan(_('0 - use default port')))->addClass(ZBX_STYLE_GREY)]
 				);
 
 				$table->addRow(_('Database name'), new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix')));
@@ -286,32 +286,32 @@ class CSetupWizard extends CForm {
 		$databases = $this->frontendSetup->getSupportedDatabases();
 
 		$table = new CFormList();
-		$table->addRow(new CSpan(_('Database type'), ZBX_STYLE_GREY), $databases[$db_type]);
+		$table->addRow((new CSpan(_('Database type')))->addClass(ZBX_STYLE_GREY), $databases[$db_type]);
 
 		switch ($db_type) {
 			case ZBX_DB_SQLITE3:
-				$table->addRow(new CSpan(_('Database file'), ZBX_STYLE_GREY), $this->getConfig('DB_DATABASE'));
+				$table->addRow((new CSpan(_('Database file')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_DATABASE'));
 				break;
 			default:
 				$db_port = ($this->getConfig('DB_PORT') == 0) ? _('default') : $this->getConfig('DB_PORT');
 				$db_password = preg_replace('/./', '*', $this->getConfig('DB_PASSWORD'));
 
-				$table->addRow(new CSpan(_('Database server'), ZBX_STYLE_GREY), $this->getConfig('DB_SERVER'));
-				$table->addRow(new CSpan(_('Database port'), ZBX_STYLE_GREY), $db_port);
-				$table->addRow(new CSpan(_('Database name'), ZBX_STYLE_GREY), $this->getConfig('DB_DATABASE'));
-				$table->addRow(new CSpan(_('Database user'), ZBX_STYLE_GREY), $this->getConfig('DB_USER'));
-				$table->addRow(new CSpan(_('Database password'), ZBX_STYLE_GREY), $db_password);
+				$table->addRow((new CSpan(_('Database server')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SERVER'));
+				$table->addRow((new CSpan(_('Database port')))->addClass(ZBX_STYLE_GREY), $db_port);
+				$table->addRow((new CSpan(_('Database name')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_DATABASE'));
+				$table->addRow((new CSpan(_('Database user')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_USER'));
+				$table->addRow((new CSpan(_('Database password')))->addClass(ZBX_STYLE_GREY), $db_password);
 				if ($db_type == ZBX_DB_DB2 || $db_type == ZBX_DB_POSTGRESQL) {
-					$table->addRow(new CSpan(_('Database schema'), ZBX_STYLE_GREY), $this->getConfig('DB_SCHEMA'));
+					$table->addRow((new CSpan(_('Database schema')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SCHEMA'));
 				}
 				break;
 		}
 
 		$table->addRow(null, null);
 
-		$table->addRow(new CSpan(_('Zabbix server'), ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER'));
-		$table->addRow(new CSpan(_('Zabbix server port'), ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER_PORT'));
-		$table->addRow(new CSpan(_('Zabbix server name'), ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER_NAME'));
+		$table->addRow((new CSpan(_('Zabbix server')))->addClass(ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER'));
+		$table->addRow((new CSpan(_('Zabbix server port')))->addClass(ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER_PORT'));
+		$table->addRow((new CSpan(_('Zabbix server name')))->addClass(ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER_NAME'));
 
 		return [
 			new CTag('h1', 'yes', _('Pre-installation summary')),

@@ -782,10 +782,11 @@ else {
 					];
 				}
 				else {
-					$triggerDescription = (new CSpan($description))->addClass(ZBX_STYLE_LINK_ACTION);
-					$triggerDescription->setMenuPopup(
-						CMenuPopupHelper::getTrigger($trigger, null, $event['clock'])
-					);
+					$triggerDescription = (new CSpan($description))
+						->addClass(ZBX_STYLE_LINK_ACTION)
+						->setMenuPopup(
+							CMenuPopupHelper::getTrigger($trigger, null, $event['clock'])
+						);
 
 					// acknowledge
 					$ack = getEventAckState($event, $page['file']);
@@ -804,8 +805,9 @@ else {
 					$hostName = null;
 
 					if (getRequest('hostid', 0) == 0) {
-						$hostName = (new CSpan($host['name']))->addClass(ZBX_STYLE_LINK_ACTION);
-						$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
+						$hostName = (new CSpan($host['name']))
+							->addClass(ZBX_STYLE_LINK_ACTION)
+							->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 					}
 
 					$table->addRow([

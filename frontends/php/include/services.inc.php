@@ -129,7 +129,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 		}
 	}
 	else {
-		$serviceNode['caption'] = new CSpan($serviceNode['caption'], 'service-caption-soft');
+		$serviceNode['caption'] = (new CSpan($serviceNode['caption']))->addClass('service-caption-soft');
 
 		$tree[$serviceNode['id'].'.'.$dependency['linkid']] = $serviceNode;
 	}
@@ -266,14 +266,18 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 
 			$slaBar = [
 				$bar,
-				new CSpan(sprintf('%.4f', $slaBad), 'sla-value '.(($service['goodsla'] > $slaGood) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN))
+				(new CSpan(sprintf('%.4f', $slaBad)))
+					->addClass('sla-value')
+					->addClass($service['goodsla'] > $slaGood ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
 			];
 
 			$sla = (new CDiv($slaBar))->addClass('invisible');
 			$sla2 = [
-				new CSpan(sprintf('%.4f', $slaGood), 'sla-value '.(($service['goodsla'] > $slaGood) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)),
+				(new CSpan(sprintf('%.4f', $slaGood)))
+					->addClass('sla-value')
+					->addClass($service['goodsla'] > $slaGood ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
 				'/',
-				new CSpan(sprintf('%.4f', $service['goodsla']), 'sla-value')
+				(new CSpan(sprintf('%.4f', $service['goodsla'])))->addClass('sla-value')
 			];
 		}
 
@@ -300,7 +304,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 	}
 	// soft dependencies
 	else {
-		$serviceNode['caption'] = new CSpan($serviceNode['caption'], 'service-caption-soft');
+		$serviceNode['caption'] = (new CSpan($serviceNode['caption']))->addClass('service-caption-soft');
 
 		$tree[$serviceNode['id'].'.'.$dependency['linkid']] = $serviceNode;
 	}

@@ -136,8 +136,8 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$defaultLabel = (new CCol(_('Default')))->addClass('interface-default')->setColSpan(2);
 	$ifTab->addRow([$iconLabel, $ipLabel, $dnsLabel, $connectToLabel, $portLabel, $defaultLabel]);
 
-	$helpTextWhenDragInterfaceAgent = new CSpan(_('Drag here to change the type of the interface to "agent" type.'));
-	$helpTextWhenDragInterfaceAgent->addClass('dragHelpText');
+	$helpTextWhenDragInterfaceAgent = (new CSpan(_('Drag here to change the type of the interface to "agent" type.')))
+		->addClass('dragHelpText');
 	$buttonCol = (new CCol(
 		(new CButton('addAgentInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 	))
@@ -164,8 +164,8 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		->setId('SNMPInterfaces')
 		->setAttribute('data-type', 'snmp');
 
-	$helpTextWhenDragInterfaceSNMP = new CSpan(_('Drag here to change the type of the interface to "SNMP" type.'));
-	$helpTextWhenDragInterfaceSNMP->addClass('dragHelpText');
+	$helpTextWhenDragInterfaceSNMP = (new CSpan(_('Drag here to change the type of the interface to "SNMP" type.')))
+		->addClass('dragHelpText');
 	$buttonCol = (new CCol(
 		(new CButton('addSNMPInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 	))
@@ -191,8 +191,8 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		->addClass('formElementTable')
 		->setId('JMXInterfaces')
 		->setAttribute('data-type', 'jmx');
-	$helpTextWhenDragInterfaceJMX = new CSpan(_('Drag here to change the type of the interface to "JMX" type.'));
-	$helpTextWhenDragInterfaceJMX->addClass('dragHelpText');
+	$helpTextWhenDragInterfaceJMX = (new CSpan(_('Drag here to change the type of the interface to "JMX" type.')))
+		->addClass('dragHelpText');
 	$buttonCol = (new CCol(
 		(new CButton('addJMXInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 	))
@@ -217,8 +217,8 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		->addClass('formElementTable')
 		->setId('IPMIInterfaces')
 		->setAttribute('data-type', 'ipmi');
-	$helpTextWhenDragInterfaceIPMI = new CSpan(_('Drag here to change the type of the interface to "IPMI" type.'));
-	$helpTextWhenDragInterfaceIPMI->addClass('dragHelpText');
+	$helpTextWhenDragInterfaceIPMI = (new CSpan(_('Drag here to change the type of the interface to "IPMI" type.')))
+		->addClass('dragHelpText');
 	$buttonCol = (new CCol(
 		(new CButton('addIPMIInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 	))
@@ -803,7 +803,7 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 		$link = new CLink($name, 'items.php?form=update&itemid='.$data['inventory_items'][$inventoryNo]['itemid']);
 		$link->setAttribute('title', _s('This field is automatically populated by item "%s".', $name));
 
-		$inventory_item = new CSpan([' &larr; ', $link], 'populating_item');
+		$inventory_item = (new CSpan([' &larr; ', $link]))->addClass('populating_item');
 		if ($data['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {
 			// those links are visible only in automatic mode
 			$inventory_item->addStyle('display: none');

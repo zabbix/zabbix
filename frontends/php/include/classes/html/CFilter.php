@@ -65,7 +65,9 @@ class CFilter extends CTag {
 
 	private function getHeader() {
 		$switch = (new CDiv())->addClass('filter-btn-container');
-		$button = new CSimpleButton([_('Filter'), new CSpan(null, 'arrow-up', 'filter-arrow')], 'filter-trigger filter-active');
+		$button = new CSimpleButton(
+			[_('Filter'), (new CSpan())->addClass('arrow-up')->setId('filter-arrow')],
+			'filter-trigger filter-active');
 		$button->setId('filter-mode');
 		$button->onClick('javascript: jQuery("#filter-space").toggle(); jQuery("#filter-mode").toggleClass("filter-active"); jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");');
 		$switch->addItem($button);

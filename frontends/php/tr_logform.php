@@ -288,11 +288,12 @@ if (hasRequest('sform')) {
 		$imgdn->onMouseover('javascript: this.style.cursor = "pointer";');
 		$imgdn->addClass('updown');
 
-		$del_url = new CSpan(_('Delete'), 'link');
-		$del_url->onClick('javascript:'.
-			' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) remove_expression("logtr'.$id.'");'.
-			' return false;'
-		);
+		$del_url = (new CSpan(_('Delete')))
+			->addClass('link')
+			->onClick('javascript:'.
+				' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) remove_expression("logtr'.$id.'");'.
+				' return false;'
+			);
 
 		$row = new CRow([
 			htmlspecialchars($expr['value']),

@@ -167,20 +167,21 @@ if ($pageFilter->hostsSelected) {
 		}
 		// no history data exists
 		else {
-			$lastcheck = new CSpan(_('Never'), ZBX_STYLE_RED);
+			$lastcheck = (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED);
 			$status['msg'] = _('Unknown');
 			$status['style'] = ZBX_STYLE_GREY;
 		}
 
-		$cpsan = new CSpan($httpTest['hostname'],
-			($httpTest['host']['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : ''
-		);
+		$cpsan = new CSpan($httpTest['hostname']);
+		if ($httpTest['host']['status'] == HOST_STATUS_NOT_MONITORED) {
+			$cpsan->addClass('not-monitored');
+		};
 		$table->addRow(new CRow([
 			($_REQUEST['hostid'] > 0) ? null : $cpsan,
 			new CLink($httpTest['name'], 'httpdetails.php?httptestid='.$httpTest['httptestid']),
 			$httpTest['steps'],
 			$lastcheck,
-			new CSpan($status['msg'], $status['style'])
+			(new CSpan($status['msg']))->addClass($status['style'])
 		]));
 	}
 }

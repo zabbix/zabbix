@@ -202,8 +202,8 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	if (mb_strlen($step['url']) > 70) {
 		$start = mb_substr($step['url'], 0, 35);
 		$end = mb_substr($step['url'], mb_strlen($step['url']) - 25, 25);
-		$url = new CSpan($start.SPACE.'...'.SPACE.$end);
-		$url->setHint($step['url']);
+		$url = (new CSpan($start.SPACE.'...'.SPACE.$end))
+			->setHint($step['url']);
 	}
 	else {
 		$url = $step['url'];

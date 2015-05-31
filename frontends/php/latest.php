@@ -575,7 +575,7 @@ foreach ($items as $key => $item){
 	if ($filter['showDetails']) {
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-			? new CSpan($item['key_expanded'], ZBX_STYLE_GREEN)
+			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
 			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN);
 
 		// info
@@ -601,18 +601,18 @@ foreach ($items as $key => $item){
 			$checkbox,
 			$hostColumn,
 			new CCol((new CDiv([$item['name_expanded'], BR(), $itemKey]))->addClass($stateCss.' item')),
-			new CCol(new CSpan(
+			new CCol((new CSpan(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
-					: $item['delay'],
-				$stateCss
-			)),
-			new CCol(new CSpan($config['hk_history_global'] ? $config['hk_history'] : $item['history'], $stateCss)),
-			new CCol(new CSpan($trendValue, $stateCss)),
-			new CCol(new CSpan(item_type2str($item['type']), $stateCss)),
-			new CCol(new CSpan($lastClock, $stateCss)),
-			new CCol(new CSpan($lastValue, $stateCss)),
-			new CCol(new CSpan($change, $stateCss)),
+					: $item['delay']))
+					->addCLass($stateCss)
+			),
+			new CCol((new CSpan($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($stateCss)),
+			new CCol((new CSpan($trendValue))->addClass($stateCss)),
+			new CCol((new CSpan(item_type2str($item['type'])))->addClass($stateCss)),
+			new CCol((new CSpan($lastClock))->addClass($stateCss)),
+			new CCol((new CSpan($lastValue))->addClass($stateCss)),
+			new CCol((new CSpan($change))->addClass($stateCss)),
 			$actions,
 			$info
 		]);
@@ -622,10 +622,10 @@ foreach ($items as $key => $item){
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
-			new CCol(new CSpan($lastClock, $stateCss)),
-			new CCol(new CSpan($lastValue, $stateCss)),
-			new CCol(new CSpan($change, $stateCss)),
+			new CCol((new CSpan($item['name_expanded']))->addClass($stateCss)->addClass('item')),
+			new CCol((new CSpan($lastClock))->addClass($stateCss)),
+			new CCol((new CSpan($lastValue))->addClass($stateCss)),
+			new CCol((new CSpan($change))->addClass($stateCss)),
 			$actions
 		]);
 	}
@@ -665,12 +665,12 @@ foreach ($applications as $appid => $dbApp) {
 	$hostName = null;
 
 	if (!$singleHostSelected) {
-		$hostName = (new CSpan($host['name']))->addClass(ZBX_STYLE_LINK_ACTION);
+		$hostName = (new CSpan($host['name']))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 		if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
 			$hostName->addClass(ZBX_STYLE_RED);
 		}
-
-		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	}
 
 	// add toggle row
@@ -766,7 +766,7 @@ foreach ($items as $item) {
 	if ($filter['showDetails']) {
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-			? new CSpan($item['key_expanded'], 'enabled')
+			? (new CSpan($item['key_expanded']))->addClass('enabled')
 			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN);
 
 		// info
@@ -792,18 +792,18 @@ foreach ($items as $item) {
 			$checkbox,
 			$hostColumn,
 			new CCol((new CDiv([$item['name_expanded'], BR(), $itemKey]))->addClass($stateCss.' item')),
-			new CCol(new CSpan(
+			new CCol((new CSpan(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
-					: $item['delay'],
-				$stateCss
-			)),
-			new CCol(new CSpan($config['hk_history_global'] ? $config['hk_history'] : $item['history'], $stateCss)),
-			new CCol(new CSpan($trendValue, $stateCss)),
-			new CCol(new CSpan(item_type2str($item['type']), $stateCss)),
-			new CCol(new CSpan($lastClock, $stateCss)),
-			new CCol(new CSpan($lastValue, $stateCss)),
-			new CCol(new CSpan($change, $stateCss)),
+					: $item['delay']))
+					->addClass($stateCss)
+			),
+			new CCol((new CSpan($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($stateCss)),
+			new CCol((new CSpan($trendValue))->addClass($stateCss)),
+			new CCol((new CSpan(item_type2str($item['type'])))->addClass($stateCss)),
+			new CCol((new CSpan($lastClock))->addClass($stateCss)),
+			new CCol((new CSpan($lastValue))->addClass($stateCss)),
+			new CCol((new CSpan($change))->addClass($stateCss)),
 			(new CCol($actions))->addClass($stateCss),
 			$info
 		]);
@@ -813,10 +813,10 @@ foreach ($items as $item) {
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
-			new CCol(new CSpan($lastClock, $stateCss)),
-			new CCol(new CSpan($lastValue, $stateCss)),
-			new CCol(new CSpan($change, $stateCss)),
+			new CCol((new CSpan($item['name_expanded']))->addClass($stateCss)->addClass('item')),
+			new CCol((new CSpan($lastClock))->addClass($stateCss)),
+			new CCol((new CSpan($lastValue))->addClass($stateCss)),
+			new CCol((new CSpan($change))->addClass($stateCss)),
 			(new CCol($actions))->addClass($stateCss)
 		]);
 	}
@@ -846,12 +846,12 @@ foreach ($hosts as $hostId => $dbHost) {
 	$hostName = null;
 
 	if (!$singleHostSelected) {
-		$hostName = (new CSpan($host['name']))->addClass(ZBX_STYLE_LINK_ACTION);
+		$hostName = (new CSpan($host['name']))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 		if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
 			$hostName->addClass(ZBX_STYLE_RED);
 		}
-
-		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	}
 
 	// add toggle row

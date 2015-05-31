@@ -76,7 +76,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 	if ($trigger['templateid'] > 0) {
 		if (!isset($this->data['realHosts'][$triggerid])) {
-			$description[] = new CSpan(_('Host'), ZBX_STYLE_GREY);
+			$description[] = (new CSpan(_('Host')))->addClass(ZBX_STYLE_GREY);
 			$description[] = NAME_DELIMITER;
 		}
 		else {

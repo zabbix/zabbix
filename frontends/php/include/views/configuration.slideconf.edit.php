@@ -72,7 +72,7 @@ foreach ($this->data['slides'] as $key => $slides) {
 			(new CCol(
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			new CSpan($i++.':', 'rowNum', 'current_slide_'.$key),
+			(new CSpan($i++.':'))->addClass('rowNum')->setId('current_slide_'.$key),
 			$name,
 			$delay,
 			$removeButton

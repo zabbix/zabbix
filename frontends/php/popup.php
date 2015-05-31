@@ -1120,10 +1120,8 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 			$multiselect ? new CCheckBox('triggers['.zbx_jsValue($trigger[$srcfld1]).']', null, null, $trigger['triggerid']) : null,
 			$description,
 			getSeverityCell($trigger['priority'], $config),
-			new CSpan(
-				triggerIndicator($trigger['status'], $trigger['state']),
-				triggerIndicatorStyle($trigger['status'], $trigger['state'])
-			)
+			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
+				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		]);
 
 		// made to save memory usage
@@ -1257,10 +1255,8 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 			$item['key_'],
 			item_type2str($item['type']),
 			itemValueTypeString($item['value_type']),
-			new CSpan(
-				itemIndicator($item['status'], $item['state']),
-				itemIndicatorStyle($item['status'], $item['state'])
-			)
+			(new CSpan(itemIndicator($item['status'], $item['state'])))
+				->addClass(itemIndicatorStyle($item['status'], $item['state']))
 		]);
 
 		// made to save memory usage

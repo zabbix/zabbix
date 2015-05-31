@@ -92,9 +92,10 @@ if ($this->data['action']['filter']['conditions']) {
 
 		$label = isset($condition['formulaid']) ? $condition['formulaid'] : num2letter($i);
 
-		$labelSpan = new CSpan($label, 'label');
-		$labelSpan->setAttribute('data-conditiontype', $condition['conditiontype']);
-		$labelSpan->setAttribute('data-formulaid', $label);
+		$labelSpan = (new CSpan($label))
+			->addClass('label')
+			->setAttribute('data-conditiontype', $condition['conditiontype'])
+			->setAttribute('data-formulaid', $label);
 
 		$conditionTable->addRow(
 			[
@@ -137,7 +138,9 @@ $conditionFormList->addRow(
 	_('Type of calculation'),
 	[
 		$calculationTypeComboBox,
-		new CSpan('', ($this->data['action']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) ? 'hidden' : '', 'conditionLabel'),
+		(new CSpan(''))
+			->addClass($this->data['action']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION ? 'hidden' : '')
+			->setId('conditionLabel'),
 		$formula
 	],
 	false,
@@ -412,8 +415,8 @@ if ($this->data['action']['operations']) {
 			$operation['mediatypeid'] = 0;
 		}
 
-		$details = new CSpan($actionOperationDescriptions[0][$operationid]);
-		$details->setHint($actionOperationHints[$operationid]);
+		$details = (new CSpan($actionOperationDescriptions[0][$operationid]))
+			->setHint($actionOperationHints[$operationid]);
 
 		if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS
 				|| $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
@@ -1095,7 +1098,7 @@ if (!empty($this->data['new_operation'])) {
 
 		$newOperationsTable->addRow([
 				_('Type of calculation'),
-				[$calcTypeComboBox, new CSpan('', null, 'operationConditionLabel')]
+				[$calcTypeComboBox, (new CSpan(''))->setId('operationConditionLabel')]
 			],
 			null, 'operationConditionRow'
 		);

@@ -98,9 +98,10 @@ if (!empty($this->data['interfaces'])) {
 		$interfacesComboBox->addItem($interfaceGroup);
 	}
 
-	$span = new CSpan(_('No interface found'), ZBX_STYLE_RED);
-	$span->setId('interface_not_defined');
-	$span->setAttribute('style', 'display: none;');
+	$span = (new CSpan(_('No interface found')))
+		->addClass(ZBX_STYLE_RED)
+		->setId('interface_not_defined')
+		->setAttribute('style', 'display: none;');
 
 	$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], false, 'interface_row');
 	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
@@ -315,9 +316,10 @@ $newFlexInt = new CSpan([
 ]);
 $newFlexInt->setId('row-new-delay-flex-fields');
 
-$maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), ZBX_STYLE_RED);
-$maxFlexMsg->setId('row-new-delay-flex-max-reached');
-$maxFlexMsg->setAttribute('style', 'display: none;');
+$maxFlexMsg = (new CSpan(_('Maximum number of flexible intervals added')))
+	->addClass(ZBX_STYLE_RED)
+	->setId('row-new-delay-flex-max-reached')
+	->setAttribute('style', 'display: none;');
 
 $itemFormList->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], false, 'row_new_delay_flex', 'new');
 

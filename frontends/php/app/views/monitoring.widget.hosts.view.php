@@ -270,8 +270,10 @@ foreach ($groups as $group) {
 				}
 				$table_inf->addRow($r);
 			}
-			$lastUnack_count = new CSpan($hosts_data[$group['groupid']]['lastUnack'], ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
-			$lastUnack_count->setHint($table_inf);
+			$lastUnack_count = (new CSpan($hosts_data[$group['groupid']]['lastUnack']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_RED)
+				->setHint($table_inf);
 		}
 		else {
 			$lastUnack_count = 0;
@@ -323,8 +325,9 @@ foreach ($groups as $group) {
 			}
 			$table_inf->addRow($r);
 		}
-		$problematic_count = new CSpan($hosts_data[$group['groupid']]['problematic'], ZBX_STYLE_LINK_ACTION);
-		$problematic_count->setHint($table_inf);
+		$problematic_count = (new CSpan($hosts_data[$group['groupid']]['problematic']))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setHint($table_inf);
 	}
 	else {
 		$problematic_count = 0;

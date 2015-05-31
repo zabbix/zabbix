@@ -445,40 +445,38 @@ function getItemFilterForm(&$items) {
 	}
 
 	// update interval
-	$updateIntervalLabel = new CSpan(_('Update interval (in sec)'));
-	$updateIntervalLabel->setId('filter_delay_label');
+	$updateIntervalLabel = (new CSpan(_('Update interval (in sec)')))->setId('filter_delay_label');
 
 	$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, false, true);
 
 	// data type
-	$dataTypeLabel = new CSpan(bold(_('Data type').NAME_DELIMITER));
-	$dataTypeLabel->setId('filter_data_type_label');
+	$dataTypeLabel = (new CSpan(bold(_('Data type').NAME_DELIMITER)))->setId('filter_data_type_label');
 
 	$dataTypeInput = new CComboBox('filter_data_type', $filter_data_type);
 	$dataTypeInput->addItem(-1, _('all'));
 	$dataTypeInput->addItems(item_data_type2str());
 
 	// SNMP community
-	$snmpCommunityLabel = new CSpan([bold(_('SNMP community')), SPACE._('like').NAME_DELIMITER]);
-	$snmpCommunityLabel->setId('filter_snmp_community_label');
+	$snmpCommunityLabel = (new CSpan([bold(_('SNMP community')), SPACE._('like').NAME_DELIMITER]))
+		->setId('filter_snmp_community_label');
 
 	$snmpCommunityField = new CTextBox('filter_snmp_community', $filter_snmp_community, ZBX_TEXTBOX_FILTER_SIZE);
 
 	// SNMPv3 security name
-	$snmpSecurityLabel = new CSpan([bold(_('Security name')), SPACE._('like').NAME_DELIMITER]);
-	$snmpSecurityLabel->setId('filter_snmpv3_securityname_label');
+	$snmpSecurityLabel = (new CSpan([bold(_('Security name')), SPACE._('like').NAME_DELIMITER]))
+		->setId('filter_snmpv3_securityname_label');
 
 	$snmpSecurityField = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
 
 	// SNMP OID
-	$snmpOidLabel = new CSpan([bold(_('SNMP OID')), SPACE._('like').NAME_DELIMITER]);
-	$snmpOidLabel->setId('filter_snmp_oid_label');
+	$snmpOidLabel = (new CSpan([bold(_('SNMP OID')), SPACE._('like').NAME_DELIMITER]))
+		->setId('filter_snmp_oid_label');
 
 	$snmpOidField = new CTextBox('filter_snmp_oid', $filter_snmp_oid, ZBX_TEXTBOX_FILTER_SIZE);
 
 	// port
-	$portLabel = new CSpan([bold(_('Port')), SPACE._('like').NAME_DELIMITER]);
-	$portLabel->setId('filter_port_label');
+	$portLabel = (new CSpan([bold(_('Port')), SPACE._('like').NAME_DELIMITER]))
+		->setId('filter_port_label');
 
 	$portField = new CNumericBox('filter_port', $filter_port, 5, false, true);
 

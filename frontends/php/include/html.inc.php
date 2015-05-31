@@ -71,7 +71,7 @@ function make_decoration($haystack, $needle, $class = null) {
 			$result = [$start, bold($found), $end];
 		}
 		else {
-			$result = [$start, new CSpan($found, $class), $end];
+			$result = [$start, (new CSpan($found))->addClass($class), $end];
 		}
 	}
 
@@ -353,7 +353,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		$list->addItem([new CLink(_('All hosts'), 'hosts.php?hostid='.$dbHost['hostid'].url_param('groupid'))]);
 	}
 
-	$list->addItem(new CSpan(null, 'arrow-right'));
+	$list->addItem((new CSpan())->addClass('arrow-right'));
 
 	/*
 	 * Name
@@ -374,14 +374,14 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		switch ($dbHost['status']) {
 			case HOST_STATUS_MONITORED:
 				if ($dbHost['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-					$status = new CSpan(_('In maintenance'), ZBX_STYLE_ORANGE);
+					$status = (new CSpan(_('In maintenance')))->addClass(ZBX_STYLE_ORANGE);
 				}
 				else {
-					$status = new CSpan(_('Enabled'), ZBX_STYLE_GREEN);
+					$status = (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN);
 				}
 				break;
 			case HOST_STATUS_NOT_MONITORED:
-				$status = new CSpan(_('Disabled'), ZBX_STYLE_RED);
+				$status = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
 				break;
 			default:
 				$status = _('Unknown');
@@ -629,14 +629,15 @@ function getAvailabilityTable($host, $currentTime) {
 	foreach ($arr as $val) {
 		switch ($host[$val.'_available']) {
 			case HOST_AVAILABLE_TRUE:
-				$ai = new CSpan($val, 'status-green');
+				$ai = (new CSpan($val))->addClass('status-green');
 				break;
 			case HOST_AVAILABLE_FALSE:
-				$ai = new CSpan($val, 'status-red');
-				$ai->setHint($host[$val.'_error'], ZBX_STYLE_RED);
+				$ai = (new CSpan($val))
+					->addClass('status-red')
+					->setHint($host[$val.'_error'], ZBX_STYLE_RED);
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
-				$ai = new CSpan($val, 'status-grey');
+				$ai = (new CSpan($val))->addClass('status-grey');
 				break;
 		}
 		$ad[] = $ai;
