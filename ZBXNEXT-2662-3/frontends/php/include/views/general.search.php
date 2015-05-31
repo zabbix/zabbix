@@ -29,4 +29,4 @@ $searchForm->addItem($searchBox);
 $searchBtn = new CSubmit('searchbttn', _('Search'), null, 'jqueryinput');
 $searchForm->addItem($searchBtn);
 
-return new CDiv($searchForm, 'zbx_search', 'zbx_search');
+return (new CDiv($searchForm))->addClass('zbx_search')->setId('zbx_search');

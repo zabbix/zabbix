@@ -130,7 +130,7 @@ foreach ($this->data['groups'] as $group) {
 
 	// info, discovered item lifetime indicator
 	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete']) {
-		$info = new CDiv(SPACE, 'status_icon iconwarning');
+		$info = (new CDiv(SPACE))->addClass('status_icon')->addClass('iconwarning');
 
 		// Check if host group should've been deleted in the past.
 		if ($currentTime > $group['groupDiscovery']['ts_delete']) {

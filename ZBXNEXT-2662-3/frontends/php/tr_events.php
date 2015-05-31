@@ -130,7 +130,7 @@ $eventHistoryWidget->setHeader(_('Event list [previous 20]'));
 
 $eventTab = new CTable();
 $eventTab->addRow([
-	new CDiv([$triggerDetailsWidget, $eventDetailsWidget], 'column'),
+	(new CDiv([$triggerDetailsWidget, $eventDetailsWidget]))->addClass('column'),
 	new CDiv([$eventAcknowledgesWidget, $actionMessagesWidget, $actionCommandWidget, $eventHistoryWidget])
 ]);
 

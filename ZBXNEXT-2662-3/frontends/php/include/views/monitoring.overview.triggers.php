@@ -54,7 +54,9 @@ if ($this->data['config']['blink_period'] > 0) {
 		->addRow($row);
 
 	// double div necassary for FireFox
-	$col = new CCol(new CDiv(new CDiv($col), 'overview-mon-severities-container'));
+	$col = new CCol(
+		(new CDiv(new CDiv($col)))->addClass('overview-mon-severities-container')
+	);
 
 	$hintTable->addRow([$col, _s('Age less than %s', convertUnitsS($this->data['config']['blink_period']))]);
 }

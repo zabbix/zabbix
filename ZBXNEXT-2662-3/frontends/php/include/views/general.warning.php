@@ -29,7 +29,9 @@ $buttons = array_key_exists('buttons', $data)
 
 echo '<body>';
 
-(new CDiv(new CWarning($data['header'], $data['messages'], $buttons), ZBX_STYLE_ARTICLE))->show();
+(new CDiv(new CWarning($data['header'], $data['messages'], $buttons)))
+	->addClass(ZBX_STYLE_ARTICLE)
+	->show();
 
 echo get_js("setTimeout('document.location.reload();', 30000);");
 echo '</body>';

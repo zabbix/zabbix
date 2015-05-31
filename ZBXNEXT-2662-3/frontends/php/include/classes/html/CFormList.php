@@ -61,14 +61,14 @@ class CFormList extends CList {
 
 		if ($description === null) {
 			$this->addItem([
-				new CDiv(SPACE, ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-				new CDiv($label, ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
+				(new CDiv(SPACE))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+				(new CDiv($label))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
 				$class, $id);
 		}
 		else {
 			$this->addItem([
-				new CDiv($label, ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-				new CDiv($description, ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
+				(new CDiv($label))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+				(new CDiv($description))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
 				$class, $id);
 		}
 	}
@@ -76,8 +76,8 @@ class CFormList extends CList {
 	public function addInfo($text, $label = null) {
 		$this->addItem(
 			[
-				new CDiv($label ? $label : _('Info'), 'dt right listInfoLabel'),
-				new CDiv($text, 'objectgroup inlineblock border_dotted listInfoText')
+				(new CDiv($label ? $label : _('Info')))->addClass('dt right listInfoLabel'),
+				(new CDiv($text))->addClass('objectgroup inlineblock border_dotted listInfoText')
 			],
 			'formrow listInfo'
 		);

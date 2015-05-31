@@ -143,7 +143,12 @@ $conditionFormList->addRow(
 	false,
 	'conditionRow'
 );
-$conditionFormList->addRow(_('Conditions'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted'));
+$conditionFormList->addRow(_('Conditions'),
+	(new CDiv($conditionTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+);
 
 // append new condition to form list
 $conditionTypeComboBox = new CComboBox('new_condition[conditiontype]', $this->data['new_condition']['conditiontype'], 'submit()');
@@ -354,7 +359,12 @@ $conditionTable->addRow([
 	))->setColSpan(3)
 ]);
 
-$conditionFormList->addRow(_('New condition'), new CDiv($conditionTable, 'objectgroup floatleft border_dotted'));
+$conditionFormList->addRow(_('New condition'),
+	(new CDiv($conditionTable))
+		->addClass('objectgroup')
+		->addClass('floatleft')
+		->addClass('border_dotted')
+);
 
 /*
  * Operation tab
@@ -479,7 +489,12 @@ if (empty($this->data['new_operation'])) {
 	$footer[] = (new CSubmit('new_operation', _('New')))->addClass(ZBX_STYLE_BTN_LINK);
 }
 
-$operationFormList->addRow(_('Action operations'), new CDiv([$operationsTable, $footer], 'objectgroup inlineblock border_dotted'));
+$operationFormList->addRow(_('Action operations'),
+	(new CDiv([$operationsTable, $footer]))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+);
 
 // create new operation table
 if (!empty($this->data['new_operation'])) {
@@ -631,8 +646,18 @@ if (!empty($this->data['new_operation'])) {
 			$jsInsert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users]).');';
 			zbx_add_post_js($jsInsert);
 
-			$newOperationsTable->addRow([_('Send to User groups'), new CDiv($usrgrpList, 'objectgroup inlineblock border_dotted')]);
-			$newOperationsTable->addRow([_('Send to Users'), new CDiv($userList, 'objectgroup inlineblock border_dotted')]);
+			$newOperationsTable->addRow([_('Send to User groups'),
+				(new CDiv($usrgrpList))
+					->addClass('objectgroup')
+					->addClass('inlineblock')
+					->addClass('border_dotted')
+			]);
+			$newOperationsTable->addRow([_('Send to Users'),
+				(new CDiv($userList))
+					->addClass('objectgroup')
+					->addClass('inlineblock')
+					->addClass('border_dotted')
+			]);
 
 			$mediaTypeComboBox = new CComboBox('new_operation[opmessage][mediatypeid]', $this->data['new_operation']['opmessage']['mediatypeid']);
 			$mediaTypeComboBox->addItem(0, '- '._('All').' -');
@@ -758,8 +783,11 @@ if (!empty($this->data['new_operation'])) {
 			zbx_add_post_js($jsInsert);
 
 			// target list
-			$cmdList = new CDiv($cmdList, 'objectgroup border_dotted inlineblock');
-			$cmdList->setId('opCmdList');
+			$cmdList = (new CDiv($cmdList))
+				->addClass('objectgroup')
+				->addClass('inlineblock')
+				->addClass('border_dotted')
+				->setId('opCmdList');
 			$newOperationsTable->addRow([_('Target list'), $cmdList], 'indent_top');
 
 			// type
@@ -779,7 +807,10 @@ if (!empty($this->data['new_operation'])) {
 			$userScriptName = new CTextBox('new_operation[opcommand][script]', $this->data['new_operation']['opcommand']['script'], 32, true);
 			$userScriptSelect = (new CButton('select_opcommand_script', _('Select')))->addClass(ZBX_STYLE_BTN_GREY);
 
-			$userScript = new CDiv([$userScriptId, $userScriptName, SPACE, $userScriptSelect], 'class_opcommand_userscript inlineblock hidden');
+			$userScript = (new CDiv([$userScriptId, $userScriptName, SPACE, $userScriptSelect]))
+				->addClass('class_opcommand_userscript')
+				->addClass('border_dotted')
+				->addClass('hidden');
 
 			$newOperationsTable->addRow([_('Type'), [$typeComboBox, SPACE, $userScript]], 'indent_bottom');
 
@@ -788,7 +819,13 @@ if (!empty($this->data['new_operation'])) {
 			$executeOnRadioButton->makeVertical();
 			$executeOnRadioButton->addValue(SPACE._('Zabbix agent').SPACE, ZBX_SCRIPT_EXECUTE_ON_AGENT);
 			$executeOnRadioButton->addValue(SPACE._('Zabbix server').SPACE, ZBX_SCRIPT_EXECUTE_ON_SERVER);
-			$newOperationsTable->addRow([_('Execute on'), new CDiv($executeOnRadioButton, 'objectgroup border_dotted inlineblock')], 'class_opcommand_execute_on hidden indent_both');
+			$newOperationsTable->addRow([_('Execute on'),
+					(new CDiv($executeOnRadioButton))
+						->addClass('objectgroup')
+						->addClass('border_dotted')
+						->addClass('inlineblock')
+				], 'class_opcommand_execute_on hidden indent_both'
+			);
 
 			// ssh
 			$authTypeComboBox = new CComboBox('new_operation[opcommand][authtype]',
@@ -917,7 +954,12 @@ if (!empty($this->data['new_operation'])) {
 				? _('Add to host groups')
 				: _('Remove from host groups');
 
-			$newOperationsTable->addRow([$caption, new CDiv($groupList, 'objectgroup inlineblock border_dotted')]);
+			$newOperationsTable->addRow([$caption,
+				(new CDiv($groupList))
+						->addClass('objectgroup')
+						->addClass('border_dotted')
+						->addClass('inlineblock')
+			]);
 			break;
 
 		case OPERATION_TYPE_TEMPLATE_ADD:
@@ -969,7 +1011,11 @@ if (!empty($this->data['new_operation'])) {
 				? _('Link with templates')
 				: _('Unlink from templates');
 
-			$newOperationsTable->addRow([$caption, new CDiv($templateList, 'objectgroup border_dotted')]);
+			$newOperationsTable->addRow([$caption,
+				(new CDiv($templateList))
+						->addClass('objectgroup')
+						->addClass('border_dotted')
+			]);
 			break;
 	}
 
@@ -1059,7 +1105,12 @@ if (!empty($this->data['new_operation'])) {
 				(new CSubmit('new_opcondition', _('New')))->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColspan(3));
 		}
-		$newOperationsTable->addRow([_('Conditions'), new CDiv($operationConditionsTable, 'objectgroup inlineblock border_dotted')], 'indent_top');
+		$newOperationsTable->addRow([_('Conditions'),
+			(new CDiv($operationConditionsTable))
+				->addClass('objectgroup')
+				->addClass('inlineblock')
+				->addClass('border_dotted')
+		], 'indent_top');
 	}
 
 	// append new operation condition to form list
@@ -1113,7 +1164,12 @@ if (!empty($this->data['new_operation'])) {
 			(new CSubmit('cancel_new_opcondition', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
 		];
 
-		$newOperationsTable->addRow([_('Operation condition'), new CDiv([$newOperationConditionTable, $newOperationConditionFooter], 'objectgroup inlineblock border_dotted')]);
+		$newOperationsTable->addRow([_('Operation condition'),
+			(new CDiv([$newOperationConditionTable, $newOperationConditionFooter]))
+				->addClass('objectgroup')
+				->addClass('inlineblock')
+				->addClass('border_dotted')
+		]);
 	}
 
 	$footer = [
@@ -1121,7 +1177,12 @@ if (!empty($this->data['new_operation'])) {
 		SPACE.SPACE,
 		(new CSubmit('cancel_new_operation', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
 	];
-	$operationFormList->addRow(_('Operation details'), new CDiv([$newOperationsTable, $footer], 'objectgroup floatleft border_dotted'));
+	$operationFormList->addRow(_('Operation details'),
+		(new CDiv([$newOperationsTable, $footer]))
+			->addClass('objectgroup')
+			->addClass('floatleft')
+			->addClass('border_dotted')
+	);
 }
 
 // append tabs to form

@@ -238,29 +238,38 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 
 			$chart1 = null;
 			if ($widthGreen > 0) {
-				$chart1 = new CDiv(null, 'sla-bar-part sla-green');
-				$chart1->setAttribute('style', 'width: '.$widthGreen.'px;');
+				$chart1 = (new CDiv())
+					->addClass('sla-bar-part')
+					->addClass('sla-green')
+					->setAttribute('style', 'width: '.$widthGreen.'px;');
 			}
 			$chart2 = null;
 			if ($widthRed > 0) {
-				$chart2 = new CDiv(null, 'sla-bar-part sla-red');
-				$chart2->setAttribute('style', 'width: '.$widthRed.'px;');
+				$chart2 = (new CDiv())
+					->addClass('sla-bar-part')
+					->addClass('sla-red')
+					->setAttribute('style', 'width: '.$widthRed.'px;');
 			}
 			$bar = new CLink([
 				$chart1,
 				$chart2,
-				new CDiv('80%', 'sla-bar-legend sla-bar-legend-start'),
-				new CDiv('100%', 'sla-bar-legend sla-bar-legend-end')
+				(new CDiv('80%'))
+					->addClass('sla-bar-legend')
+					->addClass('sla-bar-legend-start'),
+				(new CDiv('100%'))
+					->addClass('sla-bar-legend')
+					->addClass('sla-bar-legend-end')
 			], 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'));
-			$bar = new CDiv($bar, 'sla-bar');
-			$bar->setAttribute('title', _s('Only the last 20%% of the indicator is displayed.'));
+			$bar = (new CDiv($bar))
+				->addClass('sla-bar')
+				->setAttribute('title', _s('Only the last 20%% of the indicator is displayed.'));
 
 			$slaBar = [
 				$bar,
 				new CSpan(sprintf('%.4f', $slaBad), 'sla-value '.(($service['goodsla'] > $slaGood) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN))
 			];
 
-			$sla = new CDiv($slaBar, 'invisible');
+			$sla = (new CDiv($slaBar))->addClass('invisible');
 			$sla2 = [
 				new CSpan(sprintf('%.4f', $slaGood), 'sla-value '.(($service['goodsla'] > $slaGood) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)),
 				'/',

@@ -62,8 +62,9 @@ class CCollapsibleUiWidget extends CUiWidget {
 	 * Display the widget in expanded or collapsed state.
 	 */
 	public function build() {
-		$body = new CDiv($this->body, 'body');
-		$body->setId($this->id);
+		$body = (new CDiv($this->body))
+			->addClass('body')
+			->setId($this->id);
 
 		if (!$this->open) {
 			$body->setAttribute('style', 'display: none;');

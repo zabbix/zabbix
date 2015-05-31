@@ -23,18 +23,19 @@ include('include/views/js/administration.general.triggerDisplayOptions.js.php');
 
 $triggerDOFormList = new CFormList();
 
-$headerDiv = new CDiv(_('Colour'), 'inlineblock trigger_displaying_form_col');
-$headerDiv->addStyle('margin-left: 2px;');
+$headerDiv = (new CDiv(_('Colour')))
+	->addClass('inlineblock')
+	->addClass('trigger_displaying_form_col')
+	->addStyle('margin-left: 2px;');
 $triggerDOFormList->addRow(SPACE, [$headerDiv, _('Blinking')]);
 
 // Unacknowledged problem events
 $triggerDOFormList->addRow(
 	_('Unacknowledged PROBLEM events'),
 	[
-		new CDiv(
-			new CColor('problem_unack_color', $data['problem_unack_color']),
-			'inlineblock trigger_displaying_form_col'
-		),
+		(new CDiv(new CColor('problem_unack_color', $data['problem_unack_color'])))
+			->addClass('inlineblock')
+			->addClass('trigger_displaying_form_col'),
 		new CCheckBox('problem_unack_style', $data['problem_unack_style'] == 1, null, 1)
 	]
 );
@@ -43,10 +44,10 @@ $triggerDOFormList->addRow(
 $triggerDOFormList->addRow(
 	_('Acknowledged PROBLEM events'),
 	[
-		new CDiv(
-			new CColor('problem_ack_color', $data['problem_ack_color']),
-			'inlineblock trigger_displaying_form_col'
-		),
+		(new CDiv(
+			new CColor('problem_ack_color', $data['problem_ack_color'])))
+				->addClass('inlineblock')
+				->addClass('trigger_displaying_form_col'),
 		new CCheckBox('problem_ack_style', $data['problem_ack_style'] == 1, null, 1)
 	]
 );
@@ -55,10 +56,9 @@ $triggerDOFormList->addRow(
 $triggerDOFormList->addRow(
 	_('Unacknowledged OK events'),
 	[
-		new CDiv(
-			new CColor('ok_unack_color', $data['ok_unack_color']),
-			'inlineblock trigger_displaying_form_col'
-		),
+		(new CDiv(new CColor('ok_unack_color', $data['ok_unack_color'])))
+			->addClass('inlineblock')
+			->addClass('trigger_displaying_form_col'),
 		new CCheckBox('ok_unack_style', $data['ok_unack_style'] == 1, null, 1)
 	]
 );
@@ -67,10 +67,9 @@ $triggerDOFormList->addRow(
 $triggerDOFormList->addRow(
 	_('Acknowledged OK events'),
 	[
-		new CDiv(
-			new CColor('ok_ack_color', $data['ok_ack_color']),
-			'inlineblock trigger_displaying_form_col'
-		),
+		(new CDiv(new CColor('ok_ack_color', $data['ok_ack_color'])))
+			->addCLass('inlineblock')
+			->addClass('trigger_displaying_form_col'),
 		new CCheckBox('ok_ack_style', $data['ok_ack_style'] == 1, null, 1)
 	]
 );

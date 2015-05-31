@@ -125,7 +125,10 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 	$maintenanceForm->addVar('timeperiods['.$id.'][period]', $timeperiod['period']);
 }
 
-$periodsDiv = new CDiv($maintenancePeriodTable, 'objectgroup inlineblock border_dotted');
+$periodsDiv = (new CDiv($maintenancePeriodTable))
+	->addClass('objectgroup')
+	->addClass('inlineblock')
+	->addClass('border_dotted');
 if (!isset($_REQUEST['new_timeperiod'])) {
 	$periodsDiv->addItem((new CSubmit('new_timeperiod', _('New')))->addClass(ZBX_STYLE_BTN_LINK));
 }
@@ -146,7 +149,10 @@ if (isset($_REQUEST['new_timeperiod'])) {
 	];
 
 	$maintenancePeriodFormList->addRow(_('Maintenance period'),
-		new CDiv([get_timeperiod_form(), $footer], 'objectgroup inlineblock border_dotted')
+		(new CDiv([get_timeperiod_form(), $footer]))
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('border_dotted')
 	);
 }
 

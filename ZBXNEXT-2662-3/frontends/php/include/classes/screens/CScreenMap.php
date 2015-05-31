@@ -66,9 +66,12 @@ class CScreenMap extends CScreenBase {
 
 		$this->insertFlickerfreeJs();
 
-		$div = new CDiv($output, 'map-container flickerfreescreen', $this->getScreenId());
-		$div->setAttribute('data-timestamp', $this->timestamp);
-		$div->addStyle('position: relative;');
+		$div = (new CDiv($output))
+			->addClass('map-container')
+			->addClass('flickerfreescreen')
+			->setId($this->getScreenId())
+			->setAttribute('data-timestamp', $this->timestamp)
+			->addStyle('position: relative;');
 
 		return $div;
 	}

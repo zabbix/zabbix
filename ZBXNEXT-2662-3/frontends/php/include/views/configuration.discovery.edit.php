@@ -57,13 +57,23 @@ $checkTable->addRow((
 	)
 )->setId('dcheckListFooter'));
 $discoveryFormList->addRow(_('Checks'),
-	new CDiv($checkTable, 'objectgroup inlineblock border_dotted', 'dcheckList'));
+	(new CDiv($checkTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+		->setId('dcheckList')
+);
 
 // append uniqueness criteria to form list
 $uniquenessCriteriaRadio = new CRadioButtonList('uniqueness_criteria', $this->data['drule']['uniqueness_criteria']);
 $uniquenessCriteriaRadio->addValue(SPACE._('IP address'), -1, true, zbx_formatDomId('uniqueness_criteria_ip'));
 $discoveryFormList->addRow(_('Device uniqueness criteria'),
-	new CDiv($uniquenessCriteriaRadio, 'objectgroup inlineblock border_dotted', 'uniqList'));
+	(new CDiv($uniquenessCriteriaRadio))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+		->setId('uniqList')
+);
 
 // append status to form list
 $status = (empty($this->data['druleid']) && empty($this->data['form_refresh']))

@@ -78,7 +78,13 @@ $exprTable = (new CTable())
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('exprAdd')
 	);
-$exprTab->addRow(_('Expressions'), new CDiv($exprTable, 'inlineblock border_dotted objectgroup'));
+$exprTab->addRow(
+	_('Expressions'),
+	(new CDiv($exprTable))
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+		->addClass('objectgroup')
+);
 
 $exprForm = (new CTable())
 	->addClass('formElementTable')
@@ -92,15 +98,25 @@ $exprFormFooter = [
 	SPACE,
 	(new CButton('cancelExpression', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
 ];
-$exprTab->addRow(null, new CDiv([$exprForm, $exprFormFooter], 'objectgroup inlineblock border_dotted'), true, 'exprForm');
+$exprTab->addRow(
+	null,
+	(new CDiv([$exprForm, $exprFormFooter]))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted'),
+	true,
+	'exprForm'
+);
 
 /*
  * Test tab
  */
 $testTab = new CFormList('testTab');
 $testTab->addRow(_('Test string'), new CTextArea('test_string', $data['test_string']));
-$preloaderDiv = new CDiv(null, 'preloader', 'testPreloader');
-$preloaderDiv->addStyle('display: none');
+$preloaderDiv = (new CDiv())
+	->addClass('preloader')
+	->setId('testPreloader')
+	->addStyle('display: none');
 $testTab->addRow(SPACE, [new CButton('testExpression', _('Test expressions')), $preloaderDiv]);
 
 $tabExp = (new CTableInfo())

@@ -64,7 +64,7 @@ if ($data['fullscreen'] == 0) {
 		$page_header_r_col[] = new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, null);
 	}
 
-	$logo = new CLink(new CDiv(null, 'zabbix_logo'), 'http://www.zabbix.com/', 'image', null, 'nosid');
+	$logo = new CLink((new CDiv())->addClass('zabbix_logo'), 'http://www.zabbix.com/', 'image', null, 'nosid');
 	$logo->setTarget('_blank');
 
 	$top_page_row = [

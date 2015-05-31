@@ -91,7 +91,7 @@ foreach ($data['dependencies'] as $dependency) {
 	$dependenciesTable->addRow($row);
 }
 
-$dependenciesDiv = new CDiv(
+$dependenciesDiv = (new CDiv(
 	[
 		$dependenciesTable,
 		(new CButton('btn1', _('Add'),
@@ -99,10 +99,11 @@ $dependenciesDiv = new CDiv(
 				'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
 				'&with_triggers=1&noempty=1");'
 		))->addClass(ZBX_STYLE_BTN_LINK)
-	],
-	'objectgroup inlineblock border_dotted'
-);
-$dependenciesDiv->setId('dependencies_div');
+	]))
+	->addClass('objectgroup')
+	->addClass('inlineblock')
+	->addClass('border_dotted')
+	->setId('dependencies_div');
 
 $triggersFormList->addRow(
 	[_('Replace dependencies'), SPACE,

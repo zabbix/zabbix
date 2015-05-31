@@ -84,8 +84,10 @@ foreach ($data['discoveries'] as $discovery) {
 	// info
 	if ($data['showInfoColumn']) {
 		if ($discovery['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($discovery['error'])) {
-			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($discovery['error'], ZBX_STYLE_RED);
+			$info = (new CDiv(SPACE))
+				->addClass('status_icon')
+				->addClass('iconerror')
+				->setHint($discovery['error'], ZBX_STYLE_RED);
 		}
 		else {
 			$info = '';

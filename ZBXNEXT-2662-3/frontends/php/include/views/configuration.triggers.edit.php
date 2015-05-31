@@ -222,7 +222,10 @@ if ($this->data['input_method'] == IM_TREE) {
 		$wrapOutline,
 		BR(),
 		BR(),
-		new CDiv([$expressionTable, $testButton], 'objectgroup inlineblock border_dotted')
+		(new CDiv([$expressionTable, $testButton]))
+			->addClass('objectgroup')
+			->addCLass('inlineblock')
+			->addClass('border_dotted')
 	]);
 
 	$inputMethodToggle = (new CButton(null, _('Close expression constructor')))->addClass(ZBX_STYLE_BTN_LINK);
@@ -294,16 +297,17 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 
 $dependenciesFormList->addRow(
 	_('Dependencies'),
-	new CDiv(
+	(new CDiv(
 		[
 			$dependenciesTable,
 			(new CButton('bnt1', _('Add'),
 				'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
 					'&with_triggers=1&noempty=1");'
 			))->addClass(ZBX_STYLE_BTN_LINK)
-		],
-		'objectgroup inlineblock border_dotted'
-	)
+		]))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
 

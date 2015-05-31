@@ -19,13 +19,14 @@
 **/
 
 	$page_menu = (new CTag('header', 'yes'))->setAttribute('role', 'banner');
-	$page_menu_div = (new CDiv(null, 'nav'))->setAttribute('role', 'navigation');
+	$page_menu_div = (new CDiv())->addClass('nav')->setAttribute('role', 'navigation');
 
 	$top_menu_items = new CList($data['menu']['main_menu'], 'top-nav');
 
 	// 1st level menu
-	$top_menu = new CDiv($top_menu_items, 'top-nav-container');
-	$top_menu->setId('mmenu');
+	$top_menu = (new CDiv($top_menu_items))
+		->addClass('top-nav-container')
+		->setId('mmenu');
 
 	$icons = new CList([], 'top-nav-icons');
 
@@ -91,10 +92,11 @@
 			$sub_menu_row->addItem($sub_menu_item);
 		}
 
-		$sub_menu_div = new CDiv($sub_menu_row, 'top-subnav-container');
-		$sub_menu_div->setId('sub_'.$label);
-		$sub_menu_div->onMouseover('javascript: MMenu.submenu_mouseOver();');
-		$sub_menu_div->onMouseout('javascript: MMenu.mouseOut();');
+		$sub_menu_div = (new CDiv($sub_menu_row))
+			->addClass('top-subnav-container')
+			->setId('sub_'.$label)
+			->onMouseover('javascript: MMenu.submenu_mouseOver();')
+			->onMouseout('javascript: MMenu.mouseOut();');
 
 		if ($data['menu']['selected'] == $label) {
 			$menu_selected = true;
@@ -107,9 +109,9 @@
 		$menu_divs[] = $sub_menu_div;
 	}
 
-	$sub_menu_div = new CDiv(SPACE);
-	$sub_menu_div->setId('sub_empty');
-	$sub_menu_div->setAttribute('style', 'display: '.($menu_selected ? 'none;' : 'block;'));
+	$sub_menu_div = (new CDiv(SPACE))
+		->setId('sub_empty')
+		->setAttribute('style', 'display: '.($menu_selected ? 'none;' : 'block;'));
 
 	$menu_divs[] = $sub_menu_div;
 

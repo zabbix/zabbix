@@ -106,7 +106,7 @@ class CWidget {
 	private function createTopHeader() {
 		$body = [new CTag('h1', 'yes', $this->title), $this->controls];
 
-		return new CDiv($body, 'header-title');
+		return (new CDiv($body))->addClass('header-title');
 	}
 
 	private function createHeader() {
@@ -116,7 +116,7 @@ class CWidget {
 
 		if (!is_null($header['right'])) {
 			foreach ($header['right'] as $right) {
-				$columnRights[] = new CDiv($right, 'floatright');
+				$columnRights[] = (new CDiv($right))->addClass('floatright');
 			}
 		}
 

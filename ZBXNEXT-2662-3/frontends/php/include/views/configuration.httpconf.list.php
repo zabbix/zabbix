@@ -92,8 +92,10 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 				)
 				: _s('Unknown step failed: %1$s', $lastData['error']);
 
-			$infoIcon = new CDiv(SPACE, 'status_icon iconerror');
-			$infoIcon->setHint($errorMessage, ZBX_STYLE_RED);
+			$infoIcon = (new CDiv(SPACE))
+				->addClass('status_icon')
+				->addClass('iconerror')
+				->setHint($errorMessage, ZBX_STYLE_RED);
 		}
 		else {
 			$infoIcon = '';

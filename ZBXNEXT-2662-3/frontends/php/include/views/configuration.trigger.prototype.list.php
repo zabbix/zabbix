@@ -134,7 +134,7 @@ foreach ($this->data['triggers'] as $trigger) {
 		}
 		array_pop($triggerDependencies);
 
-		$description = array_merge($description, [new CDiv($triggerDependencies, 'dependencies')]);
+		$description = array_merge($description, [(new CDiv($triggerDependencies))->addClass('dependencies')]);
 	}
 
 	// status

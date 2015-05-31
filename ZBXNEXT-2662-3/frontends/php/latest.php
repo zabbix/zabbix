@@ -470,7 +470,8 @@ if ($filter['showDetails']) {
 
 	$table->addClass('latest-details');
 	$table->setHeader([
-		(new CColHeader(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')))->addClass('cell-width'),
+		(new CColHeader((new CDiv())->addClass('app-list-toggle-all icon-plus-9x9')))
+			->addClass('cell-width'),
 		$checkAllCheckboxCol,
 		$hostHeader,
 		$nameHeader,
@@ -487,7 +488,7 @@ if ($filter['showDetails']) {
 }
 else {
 	$table->setHeader([
-		(new CColHeader(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')))
+		(new CColHeader((new CDiv())->addClass('app-list-toggle-all icon-plus-9x9')))
 			->addClass('cell-width'),
 		$checkAllCheckboxCol,
 		$hostHeader,
@@ -579,8 +580,9 @@ foreach ($items as $key => $item){
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$info = new CDiv(null, 'status_icon iconerror');
-			$info->setHint($item['error'], ZBX_STYLE_RED);
+			$info = (new CDiv())
+				->addClass('status_icon iconerror')
+				->setHint($item['error'], ZBX_STYLE_RED);
 		}
 		else {
 			$info = '';
@@ -598,7 +600,7 @@ foreach ($items as $key => $item){
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol(new CDiv([$item['name_expanded'], BR(), $itemKey], $stateCss.' item')),
+			new CCol((new CDiv([$item['name_expanded'], BR(), $itemKey]))->addClass($stateCss.' item')),
 			new CCol(new CSpan(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
@@ -652,12 +654,13 @@ foreach ($applications as $appid => $dbApp) {
 
 	$openState = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
 
-	$toggle = new CDiv(null, 'app-list-toggle icon-plus-9x9');
+	$toggle = (new CDiv())
+		->addClass('app-list-toggle icon-plus-9x9')
+		->setAttribute('data-app-id', $dbApp['applicationid'])
+		->setAttribute('data-open-state', $openState);
 	if ($openState) {
 		$toggle->addClass('icon-minus-9x9');
 	}
-	$toggle->setAttribute('data-app-id', $dbApp['applicationid']);
-	$toggle->setAttribute('data-open-state', $openState);
 
 	$hostName = null;
 
@@ -768,8 +771,9 @@ foreach ($items as $item) {
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$info = new CDiv(null, 'status_icon iconerror');
-			$info->setHint($item['error'], ZBX_STYLE_RED);
+			$info = (new CDiv())
+				->addClass('status_icon iconerror')
+				->setHint($item['error'], ZBX_STYLE_RED);
 		}
 		else {
 			$info = '';
@@ -787,7 +791,7 @@ foreach ($items as $item) {
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol(new CDiv([$item['name_expanded'], BR(), $itemKey], $stateCss.' item')),
+			new CCol((new CDiv([$item['name_expanded'], BR(), $itemKey]))->addClass($stateCss.' item')),
 			new CCol(new CSpan(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
@@ -831,12 +835,13 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	$openState = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
 
-	$toggle = new CDiv(null, 'app-list-toggle icon-plus-9x9');
+	$toggle = (new CDiv())
+		->addClass('app-list-toggle icon-plus-9x9')
+		->setAttribute('data-app-id', '0_'.$host['hostid'])
+		->setAttribute('data-open-state', $openState);
 	if ($openState) {
 		$toggle->addClass('icon-minus-9x9');
 	}
-	$toggle->setAttribute('data-app-id', '0_'.$host['hostid']);
-	$toggle->setAttribute('data-open-state', $openState);
 
 	$hostName = null;
 

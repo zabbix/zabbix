@@ -78,7 +78,7 @@ if ($this->data['displayInterfaces']) {
 	$interfaceVisBox->setAttribute('data-multiple-interface-types', $this->data['multiple_interface_types']);
 	$itemFormList->addRow(
 		[_('Host interface'), SPACE, $interfaceVisBox],
-		new CDiv([$interfacesComboBox, $span], null, 'interfaceDiv'),
+		(new CDiv([$interfacesComboBox, $span]))->setId('interfaceDiv'),
 		false,
 		'interface_row'
 	);
@@ -130,16 +130,16 @@ $itemFormList->addRow(
 );
 
 // append snmpv3 authprotocol to form list
-$authProtocol = new CDiv(
+$authProtocol = (new CDiv(
 	[
 		new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5, null, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_MD5),
 		new CLabel(_('MD5'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5),
 		new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_SHA, null, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_SHA),
 		new CLabel(_('SHA'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
-	],
-	'jqueryinputset radioset',
-	'authprotocol_div'
-);
+]))
+	->addClass('jqueryinputset')
+	->addClass('radioset')
+	->setId('authprotocol_div');
 $itemFormList->addRow(
 	[
 		_('Authentication protocol'),
@@ -160,16 +160,16 @@ $itemFormList->addRow(
 );
 
 // append snmpv3 privprotocol to form list
-$privProtocol = new CDiv(
+$privProtocol = (new CDiv(
 	[
 		new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES, null, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_DES),
 		new CLabel(_('DES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES),
 		new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_AES, null, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_AES),
 		new CLabel(_('AES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
-	],
-	'jqueryinputset radioset',
-	'privprotocol_div'
-);
+]))
+	->addClass('jqueryinputset')
+	->addClass('radioset')
+	->setId('privprotocol_div');
 $itemFormList->addRow(
 	[
 		_('Privacy protocol'),
@@ -344,12 +344,15 @@ $itemFormList->addRow(
 		SPACE,
 		new CVisibilityBox('visible[delay_flex]', isset($this->data['visible']['delay_flex']), ['delayFlexDiv', 'row-new-delay-flex-fields'], _('Original'))
 	],
-	new CDiv($delayFlexTable, 'objectgroup inlineblock border_dotted', 'delayFlexDiv')
+	(new CDiv($delayFlexTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+		->setId('delayFlexDiv')
 );
 
 // append new delay to form list
-$newFlexInt = new CDiv(
-	[
+$newFlexInt = (new CDiv([
 		_('Interval (in sec)'),
 		SPACE,
 		new CNumericBox('new_delay_flex[delay]', 50, 5),
@@ -359,10 +362,8 @@ $newFlexInt = new CDiv(
 		new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 20),
 		SPACE,
 		(new CSubmit('add_delay_flex', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-	],
-	null,
-	'row-new-delay-flex-fields'
-);
+]))
+	->setId('row-new-delay-flex-fields');
 
 $maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), ZBX_STYLE_RED);
 $maxFlexMsg->setId('row-new-delay-flex-max-reached');
@@ -443,7 +444,8 @@ $itemFormList->addRow(
 		SPACE,
 		new CVisibilityBox('visible[valuemapid]', isset($this->data['visible']['valuemapid']), 'valuemap', _('Original'))
 	],
-	new CDiv([$valueMapsComboBox, SPACE, $valueMapLink], null, 'valuemap')
+	(new CDiv([$valueMapsComboBox, SPACE, $valueMapLink]))
+		->setId('valuemap')
 );
 
 // append trapper hosts to form list
@@ -473,7 +475,7 @@ if ($this->data['displayApplications']) {
 		}
 	}
 
-	$replaceApp = new CDiv(new CMultiSelect([
+	$replaceApp = (new CDiv(new CMultiSelect([
 		'name' => 'applications[]',
 		'objectName' => 'applications',
 		'objectOptions' => ['hostid' => $this->data['hostid']],
@@ -482,7 +484,8 @@ if ($this->data['displayApplications']) {
 			'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=applications_'.
 				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid']
 		]
-	]), null, 'replaceApp');
+	])))
+		->setId('replaceApp');
 
 	$itemFormList->addRow(
 		[_('Replace applications'), SPACE, new CVisibilityBox('visible[applications]',
@@ -521,7 +524,7 @@ if ($this->data['displayApplications']) {
 		}
 	}
 
-	$newApp = new CDiv(new CMultiSelect([
+	$newApp = (new CDiv(new CMultiSelect([
 		'name' => 'new_applications[]',
 		'objectName' => 'applications',
 		'objectOptions' => ['hostid' => $this->data['hostid']],
@@ -531,7 +534,8 @@ if ($this->data['displayApplications']) {
 			'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=new_applications_'.
 				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid']
 		]
-	]), null, 'newApp');
+	])))
+		->setId('newApp');
 
 	$itemFormList->addRow(
 		[_('Add new or existing applications'), SPACE, new CVisibilityBox('visible[new_applications]',

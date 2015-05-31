@@ -78,7 +78,10 @@ if ($this->data['slideshows']) {
 		$formFilter->addNavigator();
 		$slideshowWidget->addItem($formFilter);
 
-		$slideshowWidget->addItem(new CDiv(new CDiv(null, 'preloader'), null, WIDGET_SLIDESHOW));
+		$slideshowWidget->addItem(
+			(new CDiv((new CDiv())->addClass('preloader')))
+				->setId(WIDGET_SLIDESHOW)
+		);
 	}
 	else {
 		$controls->addItem($favouriteIcon);

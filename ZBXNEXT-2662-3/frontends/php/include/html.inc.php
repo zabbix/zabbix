@@ -155,7 +155,7 @@ function get_table_header($columnLeft, $columnRights = SPACE) {
 		}
 
 		foreach ($columnRights as $columnRight) {
-			$rights[] = new CDiv($columnRight, 'floatright');
+			$rights[] = (new CDiv($columnRight))->addClass('floatright');
 		}
 
 		$rights = array_reverse($rights);
@@ -594,14 +594,14 @@ function makeFormFooter(CButtonInterface $mainButton = null, array $otherButtons
 
 	if ($mainButton !== null) {
 		$buttons->addItem([
-			new CDiv($mainButton, ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-			new CDiv($otherButtons, ZBX_STYLE_TABLE_FORMS_TD_RIGHT)]
+			(new CDiv($mainButton))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+			(new CDiv($otherButtons))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)]
 		);
 	}
 	else {
 		$buttons->addItem([
-			new CDiv(SPACE, ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-			new CDiv($otherButtons, ZBX_STYLE_TABLE_FORMS_TD_RIGHT)]
+			(new CDiv(SPACE))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+			(new CDiv($otherButtons))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)]
 		);
 	}
 
@@ -754,12 +754,12 @@ function makePageFooter($with_logo = true, $with_version = true)
 		: null;
 	$version = $with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : '';
 
-	return new CDiv([
+	return (new CDiv([
 		$logo,
 		$version.'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
 		(new CLink('Zabbix SIA', 'http://www.zabbix.com/', null, null, true))
 			->addClass(ZBX_STYLE_GREY)
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->setAttribute('target', '_blank')
-	], ZBX_STYLE_FOOTER);
+	]))->addClass(ZBX_STYLE_FOOTER);
 }

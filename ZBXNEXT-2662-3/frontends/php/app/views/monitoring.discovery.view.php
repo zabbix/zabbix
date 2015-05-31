@@ -152,7 +152,7 @@ foreach ($data['drules'] as $drule) {
 		foreach ($data['services'] as $name => $foo) {
 			$class = null;
 			$time = SPACE;
-			$hint = new CDiv(SPACE, $class);
+			$hint = (new CDiv(SPACE))->addClass($class);
 
 			$hintTable = null;
 			if (isset($h_data['services'][$name])) {

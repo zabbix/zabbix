@@ -34,7 +34,7 @@ $hostSpan->setMenuPopup(CMenuPopupHelper::getHost(
 ));
 
 $hostName = ($this->data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
-	? [$hostSpan, SPACE, new CDiv(null, 'icon-maintenance-inline')]
+	? [$hostSpan, SPACE, (new CDiv())->addClass('icon-maintenance-inline')]
 	: $hostSpan;
 
 $overviewFormList->addRow(_('Host name'), $hostName);
@@ -51,37 +51,37 @@ foreach ($this->data['host']['interfaces'] as $interface) {
 	switch ($interface['type']) {
 		case INTERFACE_TYPE_AGENT:
 			$agentInterfaceRows[] = new CRow([
-				new CDiv($interface['ip'], 'ip'.$spanClass),
-				new CDiv($interface['dns'], 'dns'.$spanClass),
-				new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS'), 'useip'.$spanClass),
-				new CDiv($interface['port'], 'port'.$spanClass)
+				(new CDiv($interface['ip']))->addClass('ip'.$spanClass),
+				(new CDiv($interface['dns']))->addClass('dns'.$spanClass),
+				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))->addClass('useip'.$spanClass),
+				(new CDiv($interface['port']))->addClass('port'.$spanClass)
 			]);
 			break;
 
 		case INTERFACE_TYPE_SNMP:
 			$snmpInterfaceRows[] = new CRow([
-				new CDiv($interface['ip'], 'ip'.$spanClass),
-				new CDiv($interface['dns'], 'dns'.$spanClass),
-				new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS'), 'useip'.$spanClass),
-				new CDiv($interface['port'], 'port'.$spanClass)
+				(new CDiv($interface['ip']))->addClass('ip'.$spanClass),
+				(new CDiv($interface['dns']))->addClass('dns'.$spanClass),
+				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))->addClass('useip'.$spanClass),
+				(new CDiv($interface['port']))->addClass('port'.$spanClass)
 			]);
 			break;
 
 		case INTERFACE_TYPE_IPMI:
 			$ipmiInterfaceRows[] = new CRow([
-				new CDiv($interface['ip'], 'ip'.$spanClass),
-				new CDiv($interface['dns'], 'dns'.$spanClass),
-				new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS'), 'useip'.$spanClass),
-				new CDiv($interface['port'], 'port'.$spanClass)
+				(new CDiv($interface['ip']))->addClass('ip'.$spanClass),
+				(new CDiv($interface['dns']))->addClass('dns'.$spanClass),
+				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))->addClass('useip'.$spanClass),
+				(new CDiv($interface['port']))->addClass('port'.$spanClass)
 			]);
 			break;
 
 		case INTERFACE_TYPE_JMX:
 			$jmxInterfaceRows[] = new CRow([
-				new CDiv($interface['ip'], 'ip'.$spanClass),
-				new CDiv($interface['dns'], 'dns'.$spanClass),
-				new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS'), 'useip'.$spanClass),
-				new CDiv($interface['port'], 'port'.$spanClass)
+				(new CDiv($interface['ip']))->addClass('ip'.$spanClass),
+				(new CDiv($interface['dns']))->addClass('dns'.$spanClass),
+				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))->addClass('useip'.$spanClass),
+				(new CDiv($interface['port']))->addClass('port'.$spanClass)
 			]);
 			break;
 	}
@@ -184,28 +184,28 @@ if ($this->data['host']['inventory']) {
 	if ($this->data['host']['inventory']['os']) {
 		$overviewFormList->addRow(
 			$this->data['tableTitles']['os']['title'],
-			[new CDiv(new CSpan(
-				zbx_str2links($this->data['host']['inventory']['os']), 'inventory-text-field'),
-				'inventory-text-field-wrap'
-			)]
+			[(new CDiv(new CSpan(
+				zbx_str2links($this->data['host']['inventory']['os']), 'inventory-text-field')))
+				->addClass('inventory-text-field-wrap')
+			]
 		);
 	}
 	if ($this->data['host']['inventory']['hardware']) {
 		$overviewFormList->addRow(
 			$this->data['tableTitles']['hardware']['title'],
-			[new CDiv(new CSpan(
-				zbx_str2links($this->data['host']['inventory']['hardware']), 'inventory-text-field'),
-				'inventory-text-field-wrap'
-			)]
+			[(new CDiv(new CSpan(
+				zbx_str2links($this->data['host']['inventory']['hardware']), 'inventory-text-field')))
+				->addClass('inventory-text-field-wrap')
+			]
 		);
 	}
 	if ($this->data['host']['inventory']['software']) {
 		$overviewFormList->addRow(
 			$this->data['tableTitles']['software']['title'],
-			[new CDiv(new CSpan(
-				zbx_str2links($this->data['host']['inventory']['software']), 'inventory-text-field'),
-				'inventory-text-field-wrap'
-			)]
+			[(new CDiv(new CSpan(
+				zbx_str2links($this->data['host']['inventory']['software']), 'inventory-text-field')))
+				->addClass('inventory-text-field-wrap')
+			]
 		);
 	}
 }
@@ -213,10 +213,10 @@ if ($this->data['host']['inventory']) {
 // description
 if ($this->data['host']['description'] !== '') {
 	$overviewFormList->addRow(_('Description'),
-		[new CDiv(new CSpan(
-			zbx_str2links($this->data['host']['description']), 'inventory-text-field'),
-			'inventory-text-field-wrap'
-		)]
+		[(new CDiv(new CSpan(
+			zbx_str2links($this->data['host']['description']), 'inventory-text-field')))
+			->addClass('inventory-text-field-wrap')
+		]
 	);
 }
 
@@ -287,7 +287,7 @@ if ($this->data['host']['inventory']) {
 		if (!zbx_empty($value)) {
 			$detailsFormList->addRow(
 				$this->data['tableTitles'][$key]['title'],
-				[new CDiv(new CSpan(zbx_str2links($value), 'inventory-text-field'), 'inventory-text-field-wrap')]
+				[(new CDiv(new CSpan(zbx_str2links($value), 'inventory-text-field')))->addClass('inventory-text-field-wrap')]
 			);
 
 			$inventoryValues = true;

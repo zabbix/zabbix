@@ -47,7 +47,9 @@ $configTypeRadioButton = [
 	new CLabel(_('HTTP'), 'config_'.ZBX_AUTH_HTTP)
 ];
 $authenticationFormList->addRow(_('Default authentication'),
-	new CDiv($configTypeRadioButton, 'jqueryinputset radioset')
+	(new CDiv($configTypeRadioButton))
+		->addClass('jqueryinputset')
+		->addClass('radioset')
 );
 
 // append LDAP fields to form list
