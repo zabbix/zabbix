@@ -149,13 +149,14 @@ if ($this->data['input_method'] == IM_TREE) {
 	if (!empty($this->data['eHTMLTree'])) {
 		foreach ($this->data['eHTMLTree'] as $i => $e) {
 			if (!$this->data['limited']) {
-				$deleteUrl = new CSpan(_('Delete'), 'link');
-				$deleteUrl->onClick('javascript:'.
-					' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
-						' delete_expression("'.$e['id'] .'");'.
-						' document.forms["'.$triggersForm->getName().'"].submit();'.
-					' }'
-				);
+				$deleteUrl = (new CSpan(_('Delete')))
+					->addClass('link')
+					->onClick('javascript:'.
+						' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
+							' delete_expression("'.$e['id'] .'");'.
+							' document.forms["'.$triggersForm->getName().'"].submit();'.
+						' }'
+					);
 				$triggerCheckbox = new CCheckBox('expr_target_single', ($i == 0) ? 'yes' : 'no', 'check_target(this);', $e['id']);
 			}
 			else {

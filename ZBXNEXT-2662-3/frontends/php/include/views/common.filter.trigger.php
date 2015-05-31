@@ -83,8 +83,7 @@ $statusChangeCheckBox = new CCheckBox('status_change', $filter['statusChange'],
 );
 $statusChangeCheckBox->addStyle('vertical-align: middle;');
 
-$daysSpan = new CSpan(_('days'));
-$daysSpan->addStyle('vertical-align: middle;');
+$daysSpan = (new CSpan(_('days')))->addStyle('vertical-align: middle;');
 $column->addRow(_('Age less than'), [$statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan]);
 
 // name

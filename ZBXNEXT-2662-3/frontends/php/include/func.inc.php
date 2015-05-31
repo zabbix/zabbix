@@ -1394,10 +1394,10 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 	$arrow = null;
 	if ($tabfield == $sortField) {
 		if ($sortorder == ZBX_SORT_UP) {
-			$arrow = new CSpan(null, 'arrow-down');
+			$arrow = (new CSpan())->addClass('arrow-down');
 		}
 		else {
-			$arrow = new CSpan(null, 'arrow-up');
+			$arrow = (new CSpan())->addClass('arrow-up');
 		}
 	}
 
@@ -1515,7 +1515,7 @@ function getPagingLine(&$items, $sortorder) {
 
 	if ($currentPage > 1) {
 		$url->setArgument('page', $currentPage - 1);
-		$tags[] = new CLink(new CSpan(null, 'arrow-left'), $url->getUrl(), null, null, true);
+		$tags[] = new CLink((new CSpan())->addClass('arrow-left'), $url->getUrl(), null, null, true);
 	}
 
 	for ($p = $startPage; $p <= $endPage; $p++) {
@@ -1525,7 +1525,7 @@ function getPagingLine(&$items, $sortorder) {
 
 	if ($currentPage < $pagesCount) {
 		$url->setArgument('page', $currentPage + 1);
-		$tags[] = new CLink(new CSpan(null, 'arrow-right'), $url->getUrl(), null, null, true);
+		$tags[] = new CLink((new CSpan())->addClass('arrow-right'), $url->getUrl(), null, null, true);
 	}
 
 	if ($p < $pagesCount) {

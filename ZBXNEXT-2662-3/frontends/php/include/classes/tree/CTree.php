@@ -109,7 +109,7 @@ class CTree {
 		$td->setAttribute('style', 'padding-left:'. (2 * $level) .'em;');
 
 		if ($id != 0 && array_key_exists('childnodes', $this->tree[$id])) {
-			$div = (new CDiv(new CSpan(null, 'arrow-right')))
+			$div = (new CDiv((new CSpan())->addClass('arrow-right')))
 				->addClass('treeview')
 				->onClick($this->treename.'.closeSNodeX("'.$id.'", this.getElementsByTagName(\'span\')[0]);')
 				->setId('idi_'.$id);

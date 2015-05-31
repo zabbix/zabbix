@@ -524,8 +524,9 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 }
 
 foreach ($triggers as $trigger) {
-	$description = (new CSpan($trigger['description']))->addClass(ZBX_STYLE_LINK_ACTION);
-	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
+	$description = (new CSpan($trigger['description']))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	if ($showDetails) {
 		$description = [
@@ -573,7 +574,7 @@ foreach ($triggers as $trigger) {
 	}
 	unset($img, $dependenciesTable, $dependency);
 
-	$triggerDescription = new CSpan($description, 'pointer');
+	$triggerDescription = (new CSpan($description))->addClass('pointer');
 
 	// host js menu
 	$hostList = [];
@@ -586,8 +587,9 @@ foreach ($triggers as $trigger) {
 			}
 		}
 
-		$hostName = (new CSpan($triggerHost['name']))->addClass(ZBX_STYLE_BTN_ACTION);
-		$hostName->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
+		$hostName = (new CSpan($triggerHost['name']))
+			->addClass(ZBX_STYLE_BTN_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
 
 		// add maintenance icon with hint if host is in maintenance
 		if ($triggerHost['maintenance_status']) {

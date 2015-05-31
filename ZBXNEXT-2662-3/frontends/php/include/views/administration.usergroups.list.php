@@ -79,8 +79,10 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 			: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenable&usrgrpid='.$userGroupId, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
 	}
 	else {
-		$guiAccess = new CSpan($guiAccess, $guiAccessStyle);
-		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED) ? new CSpan(_('Enabled'), ZBX_STYLE_GREEN) : new CSpan(_('Disabled'), ZBX_STYLE_RED);
+		$guiAccess = (new CSpan($guiAccess))->addClass($guiAccessStyle);
+		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
+			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
+			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
 	}
 
 	if (isset($usrgrp['users'])) {

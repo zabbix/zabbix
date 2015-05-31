@@ -22,7 +22,7 @@
 $itemsWidget = new CWidget();
 $itemsWidget->setTitle([
 	_('Item prototypes of').SPACE,
-	new CSpan($this->data['discovery_rule']['name'], ZBX_STYLE_GREEN)
+	(new CSpan($this->data['discovery_rule']['name']))->addClass(ZBX_STYLE_GREEN)
 ]);
 
 // create new item button

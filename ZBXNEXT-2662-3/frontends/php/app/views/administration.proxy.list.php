@@ -84,7 +84,9 @@ foreach ($data['proxies'] as $proxy) {
 		new CCheckBox('proxyids['.$proxy['proxyid'].']', null, null, $proxy['proxyid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
-		$proxy['lastaccess'] == 0 ? new CSpan(_('Never'), ZBX_STYLE_RED) : zbx_date2age($proxy['lastaccess']),
+		$proxy['lastaccess'] == 0
+			? (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED)
+			: zbx_date2age($proxy['lastaccess']),
 		count($proxy['hosts']),
 		array_key_exists('item_count', $proxy) ? $proxy['item_count'] : 0,
 		array_key_exists('perf', $proxy) ? $proxy['perf'] : '',

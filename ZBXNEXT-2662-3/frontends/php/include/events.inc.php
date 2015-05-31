@@ -369,10 +369,10 @@ function getEventAckState($event, $url = null, $isLink = true, $params = []) {
 	}
 	else {
 		if ($event['acknowledged'] == 0) {
-			$ack = new CSpan(_('No'), ZBX_STYLE_RED);
+			$ack = (new CSpan(_('No')))->addClass(ZBX_STYLE_RED);
 		}
 		else {
-			$ack = [new CSpan(_('Yes'), ZBX_STYLE_GREEN), CViewHelper::showNum($acknowledges_num)];
+			$ack = [(new CSpan(_('Yes')))->addClass(ZBX_STYLE_GREEN), CViewHelper::showNum($acknowledges_num)];
 		}
 	}
 

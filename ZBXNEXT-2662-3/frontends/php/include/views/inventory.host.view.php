@@ -26,12 +26,13 @@ $hostInventoryWidget = (new CWidget('inventory-host'))->setTitle(_('Host invento
  */
 $overviewFormList = new CFormList();
 
-$hostSpan = (new CSpan($this->data['host']['host']))->addClass(ZBX_STYLE_LINK_ACTION);
-$hostSpan->setMenuPopup(CMenuPopupHelper::getHost(
-	$this->data['host'],
-	$this->data['hostScripts'][$this->data['host']['hostid']],
-	false
-));
+$hostSpan = (new CSpan($this->data['host']['host']))
+	->addClass(ZBX_STYLE_LINK_ACTION)
+	->setMenuPopup(CMenuPopupHelper::getHost(
+		$this->data['host'],
+		$this->data['hostScripts'][$this->data['host']['hostid']],
+		false
+	));
 
 $hostName = ($this->data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
 	? [$hostSpan, SPACE, (new CDiv())->addClass('icon-maintenance-inline')]
@@ -40,7 +41,7 @@ $hostName = ($this->data['host']['maintenance_status'] == HOST_MAINTENANCE_STATU
 $overviewFormList->addRow(_('Host name'), $hostName);
 
 if ($this->data['host']['host'] !== $this->data['host']['name']) {
-	$overviewFormList->addRow(_('Visible name'), new CSpan($this->data['host']['name'], 'text-field'));
+	$overviewFormList->addRow(_('Visible name'), (new CSpan($this->data['host']['name']))->addClass('text-field'));
 }
 
 $agentInterfaceRows = $snmpInterfaceRows = $ipmiInterfaceRows = $jmxInterfaceRows = [];
@@ -184,8 +185,9 @@ if ($this->data['host']['inventory']) {
 	if ($this->data['host']['inventory']['os']) {
 		$overviewFormList->addRow(
 			$this->data['tableTitles']['os']['title'],
-			[(new CDiv(new CSpan(
-				zbx_str2links($this->data['host']['inventory']['os']), 'inventory-text-field')))
+			[(new CDiv(
+				(new CSpan(zbx_str2links($this->data['host']['inventory']['os'])))->addClass('inventory-text-field')
+			))
 				->addClass('inventory-text-field-wrap')
 			]
 		);
@@ -193,8 +195,9 @@ if ($this->data['host']['inventory']) {
 	if ($this->data['host']['inventory']['hardware']) {
 		$overviewFormList->addRow(
 			$this->data['tableTitles']['hardware']['title'],
-			[(new CDiv(new CSpan(
-				zbx_str2links($this->data['host']['inventory']['hardware']), 'inventory-text-field')))
+			[(new CDiv(
+				(new CSpan(zbx_str2links($this->data['host']['inventory']['hardware'])))->addClass('inventory-text-field')
+			))
 				->addClass('inventory-text-field-wrap')
 			]
 		);
@@ -202,8 +205,9 @@ if ($this->data['host']['inventory']) {
 	if ($this->data['host']['inventory']['software']) {
 		$overviewFormList->addRow(
 			$this->data['tableTitles']['software']['title'],
-			[(new CDiv(new CSpan(
-				zbx_str2links($this->data['host']['inventory']['software']), 'inventory-text-field')))
+			[(new CDiv(
+				(new CSpan(zbx_str2links($this->data['host']['inventory']['software'])))->addClass('inventory-text-field')
+			))
 				->addClass('inventory-text-field-wrap')
 			]
 		);
@@ -213,8 +217,9 @@ if ($this->data['host']['inventory']) {
 // description
 if ($this->data['host']['description'] !== '') {
 	$overviewFormList->addRow(_('Description'),
-		[(new CDiv(new CSpan(
-			zbx_str2links($this->data['host']['description']), 'inventory-text-field')))
+		[(new CDiv(
+			(new CSpan(zbx_str2links($this->data['host']['description'])))->addClass('inventory-text-field')
+		))
 			->addClass('inventory-text-field-wrap')
 		]
 	);
@@ -264,12 +269,12 @@ else {
 
 $overviewFormList->addRow(_('Configuration'), [
 	$hostLink,
-	new CSpan([$applicationsLink, SPACE, '('.$this->data['host']['applications'].')'], 'overview-link'),
-	new CSpan([$itemsLink, SPACE, '('.$this->data['host']['items'].')'], 'overview-link'),
-	new CSpan([$triggersLink, SPACE, '('.$this->data['host']['triggers'].')'], 'overview-link'),
-	new CSpan([$graphsLink, SPACE, '('.$this->data['host']['graphs'].')'], 'overview-link'),
-	new CSpan([$discoveryLink, SPACE, '('.$this->data['host']['discoveries'].')'], 'overview-link'),
-	new CSpan([$webLink, SPACE, '('.$this->data['host']['httpTests'].')'], 'overview-link')
+	(new CSpan([$applicationsLink, SPACE, '('.$this->data['host']['applications'].')']))->addClass('overview-link'),
+	(new CSpan([$itemsLink, SPACE, '('.$this->data['host']['items'].')']))->addClass('overview-link'),
+	(new CSpan([$triggersLink, SPACE, '('.$this->data['host']['triggers'].')']))->addClass('overview-link'),
+	(new CSpan([$graphsLink, SPACE, '('.$this->data['host']['graphs'].')']))->addClass('overview-link'),
+	(new CSpan([$discoveryLink, SPACE, '('.$this->data['host']['discoveries'].')']))->addClass('overview-link'),
+	(new CSpan([$webLink, SPACE, '('.$this->data['host']['httpTests'].')']))->addClass('overview-link')
 ]);
 
 $hostInventoriesTab = new CTabView(['remember' => true]);
@@ -287,7 +292,9 @@ if ($this->data['host']['inventory']) {
 		if (!zbx_empty($value)) {
 			$detailsFormList->addRow(
 				$this->data['tableTitles'][$key]['title'],
-				[(new CDiv(new CSpan(zbx_str2links($value), 'inventory-text-field')))->addClass('inventory-text-field-wrap')]
+				[(new CDiv(
+					(new CSpan(zbx_str2links($value)))->addClass('inventory-text-field')
+				))->addClass('inventory-text-field-wrap')]
 			);
 
 			$inventoryValues = true;

@@ -38,7 +38,13 @@ if (empty($this->data['screen']) || empty($this->data['host'])) {
 	]);
 }
 else {
-	$screenWidget->setTitle([$this->data['screen']['name'], SPACE, _('on'), SPACE, new CSpan($this->data['host']['name'], ZBX_STYLE_ORANGE)]);
+	$screenWidget->setTitle([
+		$this->data['screen']['name'],
+		SPACE,
+		_('on'),
+		SPACE,
+		(new CSpan($this->data['host']['name']))->addClass(ZBX_STYLE_ORANGE)
+	]);
 
 	$controls = new CList();
 

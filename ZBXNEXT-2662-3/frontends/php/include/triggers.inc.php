@@ -639,7 +639,7 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 						}
 
 						if ($functionData['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $functionData['type'] == ITEM_TYPE_HTTPTEST) {
-							$link = new CSpan($functionData['host'].':'.$functionData['key_'], $style);
+							$link = (new CSpan($functionData['host'].':'.$functionData['key_']))->addClass($style);
 						}
 						elseif ($functionData['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 							$link = new CLink(
@@ -667,7 +667,7 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 
 			if ($error) {
 				if ($html) {
-					$expressionExpanded[] = new CSpan('*ERROR*', 'on');
+					$expressionExpanded[] = (new CSpan('*ERROR*'))->addClass('on');
 				}
 				else {
 					$expressionExpanded .= '*ERROR*';
@@ -771,7 +771,7 @@ function triggerExpression($trigger, $html = false) {
 					}
 
 					if ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST) {
-						$link = new CSpan($function_data['host'].':'.CHtml::encode($function_data['key_']), $style);
+						$link = (new CSpan($function_data['host'].':'.CHtml::encode($function_data['key_'])))->addClass($style);
 					}
 					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 						$link = new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),

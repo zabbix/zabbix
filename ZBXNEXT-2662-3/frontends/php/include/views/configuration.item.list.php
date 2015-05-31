@@ -166,7 +166,7 @@ foreach ($this->data['items'] as $item) {
 		$triggerDescription = [];
 		if ($trigger['templateid'] > 0) {
 			if (!isset($this->data['triggerRealHosts'][$trigger['triggerid']])) {
-				$triggerDescription[] = new CSpan('HOST', ZBX_STYLE_GREY);
+				$triggerDescription[] = (new CSpan('HOST'))->addClass(ZBX_STYLE_GREY);
 				$triggerDescription[] = ':';
 			}
 			else {
@@ -203,10 +203,8 @@ foreach ($this->data['items'] as $item) {
 			getSeverityCell($trigger['priority'], $this->data['config']),
 			$triggerDescription,
 			triggerExpression($trigger, true),
-			new CSpan(
-				triggerIndicator($trigger['status'], $trigger['state']),
-				triggerIndicatorStyle($trigger['status'], $trigger['state'])
-			),
+			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
+				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		]);
 
 		$item['triggers'][$num] = $trigger;
@@ -214,8 +212,9 @@ foreach ($this->data['items'] as $item) {
 	unset($trigger);
 
 	if (!empty($item['triggers'])) {
-		$triggerInfo = (new CSpan(_('Triggers')))->addClass(ZBX_STYLE_LINK_ACTION);
-		$triggerInfo->setHint($triggerHintTable);
+		$triggerInfo = (new CSpan(_('Triggers')))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setHint($triggerHintTable);
 		$triggerInfo = [$triggerInfo];
 		$triggerInfo[] = CViewHelper::showNum(count($item['triggers']));
 

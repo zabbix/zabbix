@@ -20,7 +20,7 @@
 
 $triggersWidget = (new CWidget())
 	->setTitle(
-		[_('Trigger prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')]
+		[_('Trigger prototypes of').SPACE, (new CSpan($this->data['discovery_rule']['name']))->addClass('parent-discovery')]
 	)
 	->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
@@ -75,7 +75,7 @@ foreach ($this->data['triggers'] as $trigger) {
 
 	if ($trigger['templateid'] > 0) {
 		if (!isset($this->data['realHosts'][$triggerid])) {
-			$description[] = new CSpan(_('Template'), ZBX_STYLE_GREY);
+			$description[] = (new CSpan(_('Template')))->addClass(ZBX_STYLE_GREY);
 			$description[] = NAME_DELIMITER;
 		}
 		else {

@@ -87,7 +87,7 @@ class CActionButtonList extends CObject {
 	 */
 	public function getSelectedCountElement() {
 		if (!$this->selectedCountElement) {
-			$this->selectedCountElement = new CSpan(SPACE.'0 '._('selected').SPACE, null, 'selectedCount');
+			$this->selectedCountElement = (new CSpan(SPACE.'0 '._('selected').SPACE))->setId('selectedCount');
 		}
 
 		return $this->selectedCountElement;

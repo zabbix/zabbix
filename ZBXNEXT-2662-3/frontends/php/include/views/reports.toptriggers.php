@@ -129,8 +129,9 @@ foreach ($this->data['triggers'] as $trigger) {
 	}
 	$hostName->setMenuPopup(CMenuPopupHelper::getHost($this->data['hosts'][$hostId], $this->data['scripts'][$hostId]));
 
-	$triggerDescription = (new CSpan($trigger['description']))->addClass(ZBX_STYLE_LINK_ACTION);
-	$triggerDescription->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
+	$triggerDescription = (new CSpan($trigger['description']))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	$table->addRow([
 		$hostName,

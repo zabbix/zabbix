@@ -52,14 +52,15 @@ $servicesParentTable->addRow([
 
 // others
 foreach ($this->data['db_pservices'] as $db_service) {
-	$description = new CSpan($db_service['name'], 'link');
-	$description->onClick('javascript:
-		jQuery(\'#parent_name\', window.opener.document).val('.zbx_jsvalue($db_service['name']).');
-		jQuery(\'#parentname\', window.opener.document).val('.zbx_jsvalue($db_service['name']).');
-		jQuery(\'#parentid\', window.opener.document).val('.zbx_jsvalue($db_service['serviceid']).');
-		self.close();
-		return false;'
-	);
+	$description = (new CSpan($db_service['name']))
+		->addClass('link')
+		->onClick('javascript:
+			jQuery(\'#parent_name\', window.opener.document).val('.zbx_jsvalue($db_service['name']).');
+			jQuery(\'#parentname\', window.opener.document).val('.zbx_jsvalue($db_service['name']).');
+			jQuery(\'#parentid\', window.opener.document).val('.zbx_jsvalue($db_service['serviceid']).');
+			self.close();
+			return false;'
+		);
 	$servicesParentTable->addRow([[$prefix, $description], serviceAlgorythm($db_service['algorithm']), $db_service['trigger']]);
 }
 $column = new CCol(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));

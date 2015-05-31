@@ -215,7 +215,7 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 		$speed,
 		$respTime,
 		$resp,
-		new CSpan($status['msg'], $status['style'])
+		(new CSpan($status['msg']))->addClass($status['style'])
 	]);
 }
 
@@ -239,7 +239,7 @@ $httpdetailsTable->addRow([
 	SPACE,
 	bold(($totalTime['value']) ? formatHistoryValue($totalTime['value'], $totalTime) : UNKNOWN_VALUE),
 	SPACE,
-	new CSpan($status['msg'], $status['style'].' bold')
+	(new CSpan($status['msg']))->addClass($status['style'])->addClass('bold')
 ]);
 
 $httpdetailsWidget->addItem($httpdetailsTable)->show();

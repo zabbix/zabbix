@@ -155,8 +155,9 @@ function insert_show_color_picker_javascript() {
 		$table->addRow($row);
 	}
 
-	$cancel = new CSpan(_('Cancel'), 'link');
-	$cancel->onClick('javascript: hide_color_picker();');
+	$cancel = (new CSpan(_('Cancel')))
+		->addClass('link')
+		->onClick('javascript: hide_color_picker();');
 
 	$tmp = [$table, $cancel];
 	$script = '

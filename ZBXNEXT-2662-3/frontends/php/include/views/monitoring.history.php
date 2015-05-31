@@ -190,7 +190,7 @@ $screen = CScreenBuilder::getScreen([
 
 // append plaintext to widget
 if ($this->data['plaintext']) {
-	$plaintextSpan = new CSpan(null, 'textblackwhite');
+	$plaintextSpan = (new CSpan())->addClass('textblackwhite');
 
 	foreach ($headerPlaintext as $text) {
 		$plaintextSpan->addItem([new CJsScript($text), BR()]);

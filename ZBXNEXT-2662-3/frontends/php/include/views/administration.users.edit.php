@@ -99,8 +99,8 @@ if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 	}
 }
 else {
-	$userFormList->addRow(_('Password'), new CSpan(
-		_s('Unavailable for users with %1$s.', authentication2str($data['auth_type']))
+	$userFormList->addRow(_('Password'),
+		(new CSpan(_s('Unavailable for users with %1$s.')))->addClass(authentication2str($data['auth_type'])
 	));
 }
 
@@ -139,7 +139,9 @@ elseif (!$allLocalesAvailable) {
 
 $userFormList->addRow(
 	_('Language'),
-	$languageError ? [$languageComboBox, SPACE, new CSpan($languageError, 'red wrap')] : $languageComboBox
+	$languageError
+		? [$languageComboBox, SPACE, (new CSpan($languageError))->addClass('red')->addCLass('wrap')]
+		: $languageComboBox
 );
 
 // append themes to form list
@@ -197,15 +199,18 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 
 			$mediaActive = ($media['severity'] & (1 << $severity));
 
-			$mediaSeverity[$severity] = new CSpan(mb_substr($severityName, 0, 1), $mediaActive ? 'enabled' : null);
-			$mediaSeverity[$severity]->setHint($severityName.($mediaActive ? ' ('._('on').')' : ' ('._('off').')'));
+			$mediaSeverity[$severity] = (new CSpan(mb_substr($severityName, 0, 1)))
+				->setHint($severityName.($mediaActive ? ' ('._('on').')' : ' ('._('off').')'));
+			if ($mediaActive) {
+				$mediaSeverity[$severity]->addClass('enabled');
+			}
 		}
 
 		$mediaTableInfo->addRow([
 			new CCheckBox('user_medias_to_del['.$id.']', null, null, $id),
-			new CSpan($media['description'], ZBX_STYLE_NOWRAP),
-			new CSpan($media['sendto'], ZBX_STYLE_NOWRAP),
-			new CSpan($media['period'], ZBX_STYLE_NOWRAP),
+			(new CSpan($media['description']))->addClass(ZBX_STYLE_NOWRAP),
+			(new CSpan($media['sendto']))->addClass(ZBX_STYLE_NOWRAP),
+			(new CSpan($media['period']))->addClass(ZBX_STYLE_NOWRAP),
 			$mediaSeverity,
 			$status,
 			(new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'");'))

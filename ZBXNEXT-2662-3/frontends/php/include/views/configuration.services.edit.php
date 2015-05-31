@@ -144,17 +144,17 @@ $i = 0;
 foreach ($this->data['times'] as $serviceTime) {
 	switch ($serviceTime['type']) {
 		case SERVICE_TIME_TYPE_UPTIME:
-			$type = new CSpan(_('Uptime'), 'enabled');
+			$type = (new CSpan(_('Uptime')))->addClass('enabled');
 			$from = dowHrMinToStr($serviceTime['ts_from']);
 			$to = dowHrMinToStr($serviceTime['ts_to'], true);
 			break;
 		case SERVICE_TIME_TYPE_DOWNTIME:
-			$type = new CSpan(_('Downtime'), 'disabled');
+			$type = (new CSpan(_('Downtime')))->addClass('disabled');
 			$from = dowHrMinToStr($serviceTime['ts_from']);
 			$to = dowHrMinToStr($serviceTime['ts_to'], true);
 			break;
 		case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
-			$type = new CSpan(_('One-time downtime'), 'disabled');
+			$type = (new CSpan(_('One-time downtime')))->addClass('disabled');
 			$from = zbx_date2str(DATE_TIME_FORMAT, $serviceTime['ts_from']);
 			$to = zbx_date2str(DATE_TIME_FORMAT, $serviceTime['ts_to']);
 			break;
