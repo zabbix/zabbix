@@ -246,7 +246,12 @@ if (!$this->data['templated']) {
 	);
 }
 
-$httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineblock border_dotted'));
+$httpStepFormList->addRow(_('Steps'),
+	(new CDiv($stepsTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+);
 
 // append tabs to form
 $httpTab = new CTabView();

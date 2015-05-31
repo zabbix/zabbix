@@ -120,12 +120,14 @@ foreach ($this->data['children'] as $child) {
 $servicesDependenciesFormList = new CFormList('servicesDependensiesFormList');
 $servicesDependenciesFormList->addRow(
 	_('Depends on'),
-	new CDiv([
+	(new CDiv([
 		$servicesChildTable,
 		(new CButton('add_child_service', _('Add'), "javascript: openWinCentered('services.php?cservices=1".url_param('serviceid')."', 'ZBX_Services_List', 640, 520, 'scrollbars=1, toolbar=0, menubar=0, resizable=0');"))
 			->addClass(ZBX_STYLE_BTN_LINK)
-	],
-	'objectgroup inlineblock border_dotted')
+		]))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
 );
 
 /*
@@ -175,7 +177,10 @@ foreach ($this->data['times'] as $serviceTime) {
 }
 $servicesTimeFormList->addRow(
 	_('Service times'),
-	new CDiv($servicesTimeTable, 'objectgroup inlineblock border_dotted')
+	(new CDiv($servicesTimeTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
 );
 
 // create service time table
@@ -273,12 +278,14 @@ $timeTypeComboBox = new CComboBox('new_service_time[type]', $this->data['new_ser
 );
 $servicesTimeFormList->addRow(
 	_('New service time'),
-	new CDiv([
+	(new CDiv([
 		new CDiv($timeTypeComboBox, 'time-type-combobox'),
 		$serviceTimeTable,
 		(new CButton('add_service_time', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-	],
-	'objectgroup inlineblock border_dotted')
+	]))
+	->addClass('objectgroup')
+	->addClass('inlineblock')
+	->addClass('border_dotted')
 );
 
 /*

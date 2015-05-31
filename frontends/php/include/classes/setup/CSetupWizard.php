@@ -95,9 +95,9 @@ class CSetupWizard extends CForm {
 	}
 
 	function bodyToString($destroy = true) {
-		$setup_left = new CDiv($this->getList(), 'setup-left');
+		$setup_left = (new CDiv($this->getList()))->addClass('setup-left');
 
-		$setup_right = new CDiv($this->getStage(), 'setup-right');
+		$setup_right = (new CDiv($this->getStage()))->addClass('setup-right');
 
 		if (CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			$cancel_button = new CSubmit('cancel', _('Cancel'), null, 'btn-alt float-left');
@@ -122,9 +122,9 @@ class CSetupWizard extends CForm {
 			$back_button->setEnabled(false);
 		}
 
-		$setup_footer = new CDiv([new CDiv([$next_button, $back_button]), $cancel_button], 'setup-footer');
+		$setup_footer = (new CDiv([new CDiv([$next_button, $back_button]), $cancel_button]))->addClass('setup-footer');
 
-		$setup_container = new CDiv([$setup_left, $setup_right, $setup_footer], 'setup-container');
+		$setup_container = (new CDiv([$setup_left, $setup_right, $setup_footer]))->addClass('setup-container');
 
 		return parent::bodyToString($destroy).$setup_container->ToString();
 	}
@@ -145,9 +145,9 @@ class CSetupWizard extends CForm {
 	}
 
 	function stage0() {
-		$setup_title = new CDiv([new CSpan(_('Welcome to')), 'Zabbix 3.0'], 'setup-title');
+		$setup_title = (new CDiv([new CSpan(_('Welcome to')), 'Zabbix 3.0']))->addClass('setup-title');
 
-		return new CDiv($setup_title, 'setup-right-body');
+		return (new CDiv($setup_title))->addClass('setup-right-body');
 	}
 
 	function stage1() {
@@ -196,7 +196,7 @@ class CSetupWizard extends CForm {
 
 		return [
 			new CTag('h1', 'yes', _('Check of pre-requisites')),
-			new CDiv([$message_box, $table], 'setup-right-body')
+			(new CDiv([$message_box, $table]))->addClass('setup-right-body')
 		];
 	}
 
@@ -248,11 +248,11 @@ class CSetupWizard extends CForm {
 
 		return [
 			new CTag('h1', 'yes', _('Configure DB connection')),
-			new CDiv([
+			(new CDiv([
 				new CTag('p', 'yes', _s('Please create database manually, and set the configuration parameters for connection to this database. Press "%1$s" button when done.', _('Next step'))),
 				$message_box,
-				$table
-			], 'setup-right-body')
+				$table]))
+				->addClass('setup-right-body')
 		];
 	}
 
@@ -274,10 +274,10 @@ class CSetupWizard extends CForm {
 
 		return [
 			new CTag('h1', 'yes', _('Zabbix server details')),
-			new CDiv([
+			(new CDiv([
 				new CTag('p', 'yes', _('Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional).')),
-				$table
-			], 'setup-right-body')
+				$table]))
+				->addClass('setup-right-body')
 		];
 	}
 
@@ -315,10 +315,10 @@ class CSetupWizard extends CForm {
 
 		return [
 			new CTag('h1', 'yes', _('Pre-installation summary')),
-			new CDiv([
+			(new CDiv([
 				new CTag('p', 'yes', _s('Please check configuration parameters. If all is correct, press "%1$s" button, or "%2$s" button to change configuration parameters.', _('Next step'), _('Back'))),
-				$table
-			], 'setup-right-body')
+				$table]))
+				->addClass('setup-right-body')
 		];
 	}
 
@@ -381,7 +381,7 @@ class CSetupWizard extends CForm {
 
 		return [
 			new CTag('h1', 'yes', _('Install')),
-			new CDiv([$message_box, $message], 'setup-right-body')
+			(new CDiv([$message_box, $message]))->addClass('setup-right-body')
 		];
 	}
 

@@ -21,14 +21,8 @@
 
 class CDiv extends CTag {
 
-	public function __construct($items = null, $class = null, $id = null) {
+	public function __construct($items = null) {
 		parent::__construct('div', 'yes');
-		if ($class !== null) {
-			$this->addClass($class);
-		}
-		if ($id) {
-			$this->setId(zbx_formatDomId($id));
-		}
 		$this->addItem($items);
 
 		return $this;

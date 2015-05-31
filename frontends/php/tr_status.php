@@ -275,8 +275,9 @@ $headerCheckBox = ($showEventColumn)
 	: new CCheckBox('all_triggers', false, "checkAll('".$triggerForm->GetName()."', 'all_triggers', 'triggers');");
 
 if ($showEvents != EVENTS_OPTION_NOEVENT) {
-	$showHideAllDiv = new CDiv(SPACE, 'filterclosed');
-	$showHideAllDiv->setId($switcherName);
+	$showHideAllDiv = (new CDiv(SPACE))
+		->addClass('filterclosed')
+		->setId($switcherName);
 }
 else {
 	$showHideAllDiv = null;
@@ -530,7 +531,7 @@ foreach ($triggers as $trigger) {
 		$description = [
 			$description,
 			BR(),
-			new CDiv(explode_exp($trigger['expression'], true, true), 'trigger-expression')
+			(new CDiv(explode_exp($trigger['expression'], true, true)))->addClass('trigger-expression')
 		];
 	}
 
@@ -590,7 +591,7 @@ foreach ($triggers as $trigger) {
 
 		// add maintenance icon with hint if host is in maintenance
 		if ($triggerHost['maintenance_status']) {
-			$maintenanceIcon = new CDiv(null, 'icon-maintenance-inline');
+			$maintenanceIcon = (new CDiv())->addClass('icon-maintenance-inline');
 
 			$maintenances = API::Maintenance()->get([
 				'maintenanceids' => $triggerHost['maintenanceid'],
@@ -679,8 +680,9 @@ foreach ($triggers as $trigger) {
 
 	// open or close
 	if ($showEvents != EVENTS_OPTION_NOEVENT && !empty($trigger['events'])) {
-		$openOrCloseDiv = new CDiv(SPACE, 'filterclosed');
-		$openOrCloseDiv->setAttribute('data-switcherid', $trigger['triggerid']);
+		$openOrCloseDiv = (new CDiv(SPACE))
+			->addClass('filterclosed')
+			->setAttribute('data-switcherid', $trigger['triggerid']);
 	}
 	elseif ($showEvents == EVENTS_OPTION_NOEVENT) {
 		$openOrCloseDiv = null;
@@ -698,8 +700,10 @@ foreach ($triggers as $trigger) {
 	// unknown triggers
 	$unknown = SPACE;
 	if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-		$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-		$unknown->setHint($trigger['error'], ZBX_STYLE_RED);
+		$unknown = (new CDiv(SPACE))
+			->addClass('status_icon')
+			->addClass('iconunknown')
+			->setHint($trigger['error'], ZBX_STYLE_RED);
 	}
 
 	// comments

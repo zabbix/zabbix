@@ -134,15 +134,17 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		}
 		array_pop($triggerDependencies);
 
-		$description = array_merge($description, [new CDiv($triggerDependencies, 'dependencies')]);
+		$description = array_merge($description, [(new CDiv($triggerDependencies))->addClass('dependencies')]);
 	}
 
 
 	// info
 	if ($this->data['showInfoColumn']) {
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['error']) {
-			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($trigger['error'], ZBX_STYLE_RED);
+			$info = (new CDiv(SPACE))
+				->addClass('status_icon')
+				->addClass('iconerror')
+				->setHint($trigger['error'], ZBX_STYLE_RED);
 		}
 		else {
 			$info = '';

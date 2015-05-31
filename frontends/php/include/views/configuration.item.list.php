@@ -114,15 +114,17 @@ foreach ($this->data['items'] as $item) {
 		$infoIcons = [];
 
 		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
-			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($item['error'], ZBX_STYLE_RED);
-
-			$infoIcons[] = $info;
+			$infoIcons[] = (new CDiv(SPACE))
+				->addClass('status_icon')
+				->addClass('iconerror')
+				->setHint($item['error'], ZBX_STYLE_RED);
 		}
 
 		// discovered item lifetime indicator
 		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete']) {
-			$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
+			$deleteError = (new CDiv(SPACE))
+				->addClass('status_icon')
+				->addClass('iconwarning');
 
 			// Check if item should've been deleted in the past.
 			if ($currentTime > $item['itemDiscovery']['ts_delete']) {

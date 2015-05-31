@@ -99,11 +99,11 @@ $addPrototypeButton = (new CButton('add_dep_trigger_prototype', _('Add prototype
 	'&srctbl=trigger_prototypes&objname=triggers&srcfld1=triggerid'.url_param('parent_discoveryid').'&multiselect=1");'
 ))->addClass(ZBX_STYLE_BTN_LINK);
 
-$dependenciesDiv = new CDiv(
-	[$dependenciesTable, $addButton, SPACE, SPACE, SPACE, $addPrototypeButton],
-	'objectgroup inlineblock border_dotted'
-);
-$dependenciesDiv->setId('dependencies_div');
+$dependenciesDiv = (new CDiv([$dependenciesTable, $addButton, SPACE, SPACE, SPACE, $addPrototypeButton]))
+	->addClass('objectgroup')
+	->AddClass('inlineblock')
+	->addClass('border_dotted')
+	->setId('dependencies_div');
 
 $triggersFormList->addRow(
 	[_('Replace dependencies'), SPACE,

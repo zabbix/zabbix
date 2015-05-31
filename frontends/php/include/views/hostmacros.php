@@ -119,18 +119,19 @@ else {
 				);
 				$link->setAttribute('target', '_blank');
 				$row[] = '&lArr;';
-				$row[] = new CDiv([$link, NAME_DELIMITER, '"'.$macro['template']['value'].'"'], 'macro-value');
+				$row[] = (new CDiv([$link, NAME_DELIMITER, '"'.$macro['template']['value'].'"']))
+					->addClass('macro-value');
 			}
 			else {
-				array_push($row, '', new CDiv(null, 'macro-value'));
+				array_push($row, '', (new CDiv())->addClass('macro-value'));
 			}
 
 			if (array_key_exists('global', $macro)) {
 				$row[] = '&lArr;';
-				$row[] = new CDiv('"'.$macro['global']['value'].'"', 'macro-value');
+				$row[] = (new CDiv('"'.$macro['global']['value'].'"'))->addClass('macro-value');
 			}
 			else {
-				array_push($row, '', new CDiv(null, 'macro-value'));
+				array_push($row, '', (new CDiv())->addClass('macro-value'));
 			}
 		}
 
@@ -161,7 +162,7 @@ $show_inherited_macros_filter = [
 	new CLabel(_('Inherited and host macros'), 'show_inherited_macros')
 ];
 
-$macros_form_list->addRow(null, new CDiv($show_inherited_macros_filter, 'jqueryinputset radioset'));
+$macros_form_list->addRow(null, (new CDiv($show_inherited_macros_filter))->addClass('jqueryinputset')->addClass('radioset'));
 $macros_form_list->addRow(null, $table);
 
 return $macros_form_list;

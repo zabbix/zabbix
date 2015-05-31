@@ -94,7 +94,11 @@ $addButtonColumn = (new CCol(
 $addButtonColumn->setAttribute('style', 'vertical-align: middle;');
 $slideTable->addRow((new CRow($addButtonColumn))->setId('screenListFooter'));
 
-$slideFormList->addRow(_('Slides'), new CDiv($slideTable, 'objectgroup inlineblock border_dotted'));
+$slideFormList->addRow(_('Slides'), (new CDiv($slideTable))
+	->addClass('objectgroup')
+	->addClass('inlineblock')
+	->addClass('border_dotted')
+);
 
 // append tabs to form
 $slideTab = new CTabView();

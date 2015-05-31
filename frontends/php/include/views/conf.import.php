@@ -77,7 +77,12 @@ foreach ($titles as $key => $title) {
 // form list
 $importFormList = new CFormList('proxyFormList');
 $importFormList->addRow(_('Import file'), new CFile('import_file'));
-$importFormList->addRow(_('Rules'), new CDiv($rulesTable, 'border_dotted objectgroup inlineblock'));
+$importFormList->addRow(_('Rules'),
+	(new CDiv($rulesTable))
+		->addClass('border_dotted')
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+);
 
 // tab
 $importTab = new CTabView();

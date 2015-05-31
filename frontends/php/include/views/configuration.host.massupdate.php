@@ -50,7 +50,7 @@ if (isset($_REQUEST['groups'])) {
 	}
 }
 
-$replaceGroups = new CDiv(new CMultiSelect([
+$replaceGroups = (new CDiv(new CMultiSelect([
 	'name' => 'groups[]',
 	'objectName' => 'hostGroup',
 	'objectOptions' => ['editable' => true],
@@ -59,7 +59,7 @@ $replaceGroups = new CDiv(new CMultiSelect([
 		'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=groups_&srcfld1=groupid'.
 			'&writeonly=1&multiselect=1'
 	]
-]), null, 'replaceGroups');
+])))->setId('replaceGroups');
 
 $hostFormList->addRow(
 	[
@@ -100,7 +100,7 @@ if (isset($_REQUEST['new_groups'])) {
 	}
 }
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$newGroups = new CDiv(new CMultiSelect([
+	$newGroups = (new CDiv(new CMultiSelect([
 		'name' => 'new_groups[]',
 		'objectName' => 'hostGroup',
 		'objectOptions' => ['editable' => true],
@@ -110,7 +110,7 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_&srcfld1=groupid'.
 				'&writeonly=1&multiselect=1'
 		]
-	]), null, 'newGroups');
+	])))->setId('newGroups');
 
 	$hostFormList->addRow(
 		[
@@ -189,10 +189,9 @@ $templatesTable = (new CTable())
 	->setAttribute('style', 'min-width: 500px;')
 	->setId('template_table');
 
-$clearDiv = new CDiv();
-$clearDiv->addStyle('clear: both;');
+$clearDiv = (new CDiv())->addStyle('clear: both;');
 
-$templatesDiv = new CDiv(
+$templatesDiv = (new CDiv(
 	[
 		new CMultiSelect([
 			'name' => 'templates[]',
@@ -204,7 +203,7 @@ $templatesDiv = new CDiv(
 			]
 		]),
 		$clearDiv,
-		new CDiv([
+		(new CDiv([
 			new CCheckBox('mass_replace_tpls', $data['mass_replace_tpls']),
 			SPACE,
 			_('Replace'),
@@ -212,11 +211,13 @@ $templatesDiv = new CDiv(
 			new CCheckBox('mass_clear_tpls', $data['mass_clear_tpls']),
 			SPACE,
 			_('Clear when unlinking')
-		], 'floatleft')
-	],
-	'objectgroup inlineblock border_dotted'
-);
-$templatesDiv->setId('templateDiv');
+		]))->addClass('floatleft')
+	]
+))
+	->addClass('objectgroup')
+	->addClass('inlineblock')
+	->addClass('border_dotted')
+	->setId('templateDiv');
 
 $templatesFormList->addRow(
 	[

@@ -66,10 +66,12 @@ $backgroundImageTable->addRow($backgroundImage);
 
 $container = (new CDiv())->setId('sysmap_cnt');
 
-$sysmapWidget->addItem($menu)
-	->addItem((new CDiv(null, 'table-forms-container'))
-	->addItem($backgroundImageTable)
-	->addItem($container));
+$sysmapWidget->addItem($menu)->addItem(
+	(new CDiv())
+		->addClass('table-forms-container')
+		->addItem($backgroundImageTable)
+		->addItem($container)
+);
 
 // create elements
 zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.CJs::encodeJson([

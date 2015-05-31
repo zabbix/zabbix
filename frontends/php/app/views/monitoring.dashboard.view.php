@@ -97,10 +97,12 @@ if ($data['show_status_widget']) {
 	$icon->setTitle(_('Action'));
 	$icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_ZABBIX_STATUS, $rate));
 
-	$zabbixStatus = new CCollapsibleUiWidget(WIDGET_ZABBIX_STATUS, new CDiv(null, 'preloader'));
+	$zabbixStatus = new CCollapsibleUiWidget(WIDGET_ZABBIX_STATUS, (new CDiv())->addClass('preloader'));
 	$zabbixStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.state', true);
 	$zabbixStatus->setHeader(_('Status of Zabbix'), [$icon]);
-	$zabbixStatus->setFooter(new CList([new CDiv(null, 'textwhite', WIDGET_ZABBIX_STATUS.'_footer')]));
+	$zabbixStatus->setFooter(new CList([
+		(new CDiv())->addClass('textwhite')->setId(WIDGET_ZABBIX_STATUS.'_footer')
+	]));
 
 	$col = CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.col', 1);
 	$row = CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.row', 0);
@@ -123,10 +125,12 @@ $icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
 $icon->setTitle(_('Action'));
 $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_SYSTEM_STATUS, $rate));
 
-$systemStatus = new CCollapsibleUiWidget(WIDGET_SYSTEM_STATUS, new CDiv(null, 'preloader'));
+$systemStatus = new CCollapsibleUiWidget(WIDGET_SYSTEM_STATUS, (new CDiv())->addClass('preloader'));
 $systemStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.state', true);
 $systemStatus->setHeader(_('System status'), [$icon]);
-$systemStatus->setFooter(new CList([new CDiv(null, 'textwhite', WIDGET_SYSTEM_STATUS.'_footer')]));
+$systemStatus->setFooter(new CList([
+	(new CDiv())->addClass('textwhite')->setId(WIDGET_SYSTEM_STATUS.'_footer')
+]));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.col', 1);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.row', 1);
@@ -148,10 +152,12 @@ $icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
 $icon->setTitle(_('Action'));
 $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_HOST_STATUS, $rate));
 
-$hostStatus = new CCollapsibleUiWidget(WIDGET_HOST_STATUS, new CDiv(null, 'preloader'));
+$hostStatus = new CCollapsibleUiWidget(WIDGET_HOST_STATUS, (new CDiv())->addClass('preloader'));
 $hostStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.state', true);
 $hostStatus->setHeader(_('Host status'), [$icon]);
-$hostStatus->setFooter(new CList([new CDiv(null, 'textwhite', WIDGET_HOST_STATUS.'_footer')]));
+$hostStatus->setFooter(new CList([
+	(new CDiv())->addClass('textwhite')->setId(WIDGET_HOST_STATUS.'_footer')
+]));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.col', 1);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.row', 2);
@@ -173,10 +179,12 @@ $icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
 $icon->setTitle(_('Action'));
 $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_LAST_ISSUES, $rate));
 
-$lastIssues = new CCollapsibleUiWidget(WIDGET_LAST_ISSUES, new CDiv(null, 'preloader'));
+$lastIssues = new CCollapsibleUiWidget(WIDGET_LAST_ISSUES, (new CDiv())->addClass('preloader'));
 $lastIssues->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.state', true);
 $lastIssues->setHeader(_n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT), [$icon]);
-$lastIssues->setFooter(new CList([new CDiv(null, 'textwhite', WIDGET_LAST_ISSUES.'_footer')]));
+$lastIssues->setFooter(new CList([
+	(new CDiv())->addClass('textwhite')->setId(WIDGET_LAST_ISSUES.'_footer')
+]));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.col', 1);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.row', 3);
@@ -198,10 +206,12 @@ $icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
 $icon->setTitle(_('Action'));
 $icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_WEB_OVERVIEW, $rate));
 
-$webMonitoring = new CCollapsibleUiWidget(WIDGET_WEB_OVERVIEW, new CDiv(null, 'preloader'));
+$webMonitoring = new CCollapsibleUiWidget(WIDGET_WEB_OVERVIEW, (new CDiv())->addClass('preloader'));
 $webMonitoring->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.state', true);
 $webMonitoring->setHeader(_('Web monitoring'), [$icon]);
-$webMonitoring->setFooter(new CList([new CDiv(null, 'textwhite', WIDGET_WEB_OVERVIEW.'_footer')]));
+$webMonitoring->setFooter(new CList([
+	(new CDiv())->addClass('textwhite')->setId(WIDGET_WEB_OVERVIEW.'_footer')
+]));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.col', 1);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.row', 4);
@@ -224,10 +234,12 @@ if ($data['show_discovery_widget']) {
 	$icon->setTitle(_('Action'));
 	$icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_DISCOVERY_STATUS, $rate));
 
-	$discoveryStatus = new CCollapsibleUiWidget(WIDGET_DISCOVERY_STATUS, new CDiv(null, 'preloader'));
+	$discoveryStatus = new CCollapsibleUiWidget(WIDGET_DISCOVERY_STATUS, (new CDiv())->addClass('preloader'));
 	$discoveryStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.state', true);
 	$discoveryStatus->setHeader(_('Discovery status'), [$icon]);
-	$discoveryStatus->setFooter(new CList([new CDiv(null, 'textwhite', WIDGET_DISCOVERY_STATUS.'_footer')]));
+	$discoveryStatus->setFooter(new CList([
+		(new CDiv())->addClass('textwhite')->setId(WIDGET_DISCOVERY_STATUS.'_footer')
+	]));
 
 	$col = CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.col', 1);
 	$row = CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.row', 5);
@@ -247,15 +259,17 @@ foreach ($dashboardGrid as $key => $val) {
 	ksort($dashboardGrid[$key]);
 }
 
-$dashboardRow = new CDiv(
+$dashboardRow = (new CDiv(
 	[
-		new CDiv($dashboardGrid[0], 'cell'),
-		new CDiv($dashboardGrid[1], 'cell'),
-		new CDiv($dashboardGrid[2], 'cell')
-	],
-	'row'
-);
-$dashboardTable = new CDiv($dashboardRow, 'table widget-placeholder');
+		(new CDiv($dashboardGrid[0]))->addClass('cell'),
+		(new CDiv($dashboardGrid[1]))->addClass('cell'),
+		(new CDiv($dashboardGrid[2]))->addClass('cell')
+	]))
+	->addClass('row');
+
+$dashboardTable = (new CDiv($dashboardRow))
+	->addClass('table')
+	->addClass('widget-placeholder');
 
 $dashboardWidget->addItem($dashboardTable);
 $dashboardWidget->show();

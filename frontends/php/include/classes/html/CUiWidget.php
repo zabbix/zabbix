@@ -70,8 +70,9 @@ class CUiWidget extends CDiv {
 		$this->id = $id;
 		$this->body = $body ? [$body] : [];
 
-		parent::__construct(null, 'dashbrd-widget');
+		parent::__construct();
 
+		$this->addClass('dashbrd-widget');
 		$this->setId($this->id.'_widget');
 	}
 
@@ -88,7 +89,7 @@ class CUiWidget extends CDiv {
 			$caption = SPACE;
 		}
 
-		$this->header = new CDiv(null, 'dashbrd-widget-head header');
+		$this->header = (new CDiv())->addClass('dashbrd-widget-head header');
 
 		$this->header->addItem(new CTag('h4', 'yes', $caption));
 
@@ -111,7 +112,9 @@ class CUiWidget extends CDiv {
 		$table->addStyle('width: 100%;');
 		$table->addRow([$leftColumn, $rightColumn]);
 
-		$this->header = new CDiv($table, ZBX_STYLE_NOWRAP.' ui-widget-header header');
+		$this->header = (new CDiv($table))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->addClass('ui-widget-header header');
 	}
 
 	/**
@@ -129,8 +132,9 @@ class CUiWidget extends CDiv {
 	 * Build widget header, body and footer.
 	 */
 	public function build() {
-		$body = new CDiv($this->body, 'body');
-		$body->setId($this->id);
+		$body = (new CDiv($this->body))
+			->setClass('body')
+			->setId($this->id);
 
 		$this->cleanItems();
 

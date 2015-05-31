@@ -220,7 +220,10 @@ if ($this->data['input_method'] == IM_TREE) {
 		$wrapOutline,
 		BR(),
 		BR(),
-		new CDiv([$expressionTable, $testButton], 'objectgroup inlineblock border_dotted')
+		(new CDiv([$expressionTable, $testButton]))
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('border_dotted')
 	]);
 
 	$inputMethodToggle = (new CButton(null, _('Close expression constructor'), 'javascript: '.
@@ -301,10 +304,10 @@ $addPrototypeButton = (new CButton('add_dep_trigger_prototype', _('Add prototype
 		url_param('parent_discoveryid').'&multiselect=1");'
 ))->addClass(ZBX_STYLE_BTN_LINK);
 $dependenciesFormList->addRow(_('Dependencies'),
-	new CDiv(
-		[$dependenciesTable, $addButton, SPACE, SPACE, SPACE, $addPrototypeButton],
-		'objectgroup inlineblock border_dotted'
-	)
+	(new CDiv([$dependenciesTable, $addButton, SPACE, SPACE, SPACE, $addPrototypeButton]))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
 

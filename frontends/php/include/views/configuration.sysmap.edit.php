@@ -176,7 +176,12 @@ $addButtonColumn = (new CCol($addButton))->setColSpan(4);
 $urlTable->addRow($addButtonColumn);
 
 // append url table to form list
-$sysmapList->addRow(_('URLs'), new CDiv($urlTable, 'objectgroup inlineblock border_dotted'));
+$sysmapList->addRow(_('URLs'),
+	(new CDiv($urlTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+);
 
 // append sysmap to form
 $sysmapTab = new CTabView();

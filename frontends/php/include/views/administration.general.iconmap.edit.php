@@ -106,7 +106,13 @@ $iconPreviewImage->setAttribute('data-image-full', 'imgstore.php?iconid='.$this-
 $iconMapTable->addRow([(new CCol(_('Default')))->setColSpan(4), $iconsComboBox, $iconPreviewImage]);
 // </default icon row>
 
-$iconMapTab->addRow(_('Mappings'), new CDiv($iconMapTable, 'objectgroup inlineblock border_dotted'));
+$iconMapTab->addRow(
+	_('Mappings'),
+	(new CDiv($iconMapTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+);
 $iconMapView = new CTabView();
 $iconMapView->addTab('iconmap', _('Icon map'), $iconMapTab);
 

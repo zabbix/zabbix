@@ -48,7 +48,7 @@ class CFilter extends CTag {
 	}
 
 	public function addColumn($column) {
-		$this->columns[] = new CDiv($column, 'cell');
+		$this->columns[] = (new CDiv($column))->addClass('cell');
 	}
 
 	public function setFooter($footer) {
@@ -64,7 +64,7 @@ class CFilter extends CTag {
 	}
 
 	private function getHeader() {
-		$switch = new CDiv(null, 'filter-btn-container');
+		$switch = (new CDiv())->addClass('filter-btn-container');
 		$button = new CSimpleButton([_('Filter'), new CSpan(null, 'arrow-up', 'filter-arrow')], 'filter-trigger filter-active');
 		$button->setId('filter-mode');
 		$button->onClick('javascript: jQuery("#filter-space").toggle(); jQuery("#filter-mode").toggleClass("filter-active"); jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");');
@@ -74,11 +74,11 @@ class CFilter extends CTag {
 	}
 
 	private function getTable() {
-		$row = new CDiv(null, 'row');
+		$row = (new CDiv())->addClass('row');
 		foreach ($this->columns as $column) {
 			$row->addItem($column);
 		}
-		$table = new CDiv(null, 'table filter-forms');
+		$table = (new CDiv())->addClass('table filter-forms');
 
 		$table->addItem($row);
 
@@ -90,7 +90,7 @@ class CFilter extends CTag {
 			return null;
 		}
 
-		$buttons = new CDiv(null, 'filter-forms');
+		$buttons = (new CDiv())->addClass('filter-forms');
 
 		$url = new cUrl();
 		$url->removeArgument('sid');
@@ -121,7 +121,7 @@ class CFilter extends CTag {
 		$this->form->addItem($this->getButtons());
 
 		if($this->navigator) {
-			$this->form->addItem(new CDiv(null, null, 'scrollbar_cntr'));
+			$this->form->addItem((new CDiv())->setId('scrollbar_cntr'));
 		}
 		if($this->footer !== null) {
 			$this->form->addItem($this->footer);

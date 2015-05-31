@@ -34,7 +34,8 @@ class CRadioButtonList extends CDiv {
 		$this->name = $name;
 		$this->value = $value;
 		$this->orientation = self::ORIENTATION_HORIZONTAL;
-		parent::__construct(null, null, $name);
+		parent::__construct();
+		$this->setId($name);
 	}
 
 	public function addValue($name, $value, $checked = null, $id = null) {

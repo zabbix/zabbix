@@ -660,14 +660,15 @@ function make_latest_issues(array $filter = []) {
 
 	// indicator of sort field
 	if ($showSortIndicator) {
-		$sortDiv = new CDiv(SPACE, ($filter['sortorder'] === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
-		$sortDiv->addStyle('float: left');
-		$hostHeaderDiv = new CDiv([_('Host'), SPACE]);
-		$hostHeaderDiv->addStyle('float: left');
-		$issueHeaderDiv = new CDiv([_('Issue'), SPACE]);
-		$issueHeaderDiv->addStyle('float: left');
-		$lastChangeHeaderDiv = new CDiv([_('Time'), SPACE]);
-		$lastChangeHeaderDiv->addStyle('float: left');
+		$sortDiv = (new CDiv(SPACE))
+			->addClass(($filter['sortorder'] === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor')
+			->addStyle('float: left');
+		$hostHeaderDiv = (new CDiv([_('Host'), SPACE]))
+			->addStyle('float: left');
+		$issueHeaderDiv = (new CDiv([_('Issue'), SPACE]))
+			->addStyle('float: left');
+		$lastChangeHeaderDiv = (new CDiv([_('Time'), SPACE]))
+			->addStyle('float: left');
 	}
 
 	$table = new CTableInfo();
@@ -694,7 +695,7 @@ function make_latest_issues(array $filter = []) {
 		$maintenanceIcon = null;
 
 		if ($host['maintenance_status']) {
-			$maintenanceIcon = new CDiv(null, 'icon-maintenance-abs');
+			$maintenanceIcon = (new CDiv())->addClass('icon-maintenance-abs');
 
 			// get maintenance
 			$maintenances = API::Maintenance()->get([
@@ -719,13 +720,17 @@ function make_latest_issues(array $filter = []) {
 			$hostName->addClass('left-to-icon-maintenance-abs');
 		}
 
-		$hostDiv = new CDiv([$hostName, $maintenanceIcon], ZBX_STYLE_NOWRAP.' '.'maintenance-abs-cont');
+		$hostDiv = (new CDiv([$hostName, $maintenanceIcon]))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->addClass('maintenance-abs-cont');
 
 		// unknown triggers
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-			$unknown->setHint($trigger['error'], ZBX_STYLE_RED);
+			$unknown = (new CDiv(SPACE))
+				->addClass('status_icon')
+				->addClass('iconunknown')
+				->setHint($trigger['error'], ZBX_STYLE_RED);
 		}
 
 		// trigger has events
@@ -797,8 +802,8 @@ function make_latest_issues(array $filter = []) {
 		'jQuery("#'.WIDGET_LAST_ISSUES.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
-	$infoDiv = new CDiv(_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggersTotalCount));
-	$infoDiv->addStyle('text-align: right; padding-right: 3px;');
+	$infoDiv = (new CDiv(_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggersTotalCount)))
+		->addStyle('text-align: right; padding-right: 3px;');
 
 	return new CDiv([$table, $infoDiv, $script]);
 }
@@ -834,8 +839,10 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 		// unknown triggers
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-			$unknown->setHint($trigger['error'], ZBX_STYLE_RED);
+			$unknown = (new CDiv(SPACE))
+				->addClass('status_icon')
+				->addClass('iconunknown')
+				->setHint($trigger['error'], ZBX_STYLE_RED);
 		}
 
 		// ack

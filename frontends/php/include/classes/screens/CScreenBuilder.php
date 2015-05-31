@@ -347,8 +347,9 @@ class CScreenBuilder {
 			$newColumns = [new CCol(new CImg('images/general/zero.png', 'zero', 1, 1))];
 
 			for ($i = 0, $size = $this->screen['hsize'] + 1; $i < $size; $i++) {
-				$icon = new CDiv('+', 'treeview-plus');
-				$icon->onClick('javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_col='.$i.'";');
+				$icon = (new CDiv('+'))
+					->addClass('treeview-plus')
+					->onClick('javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_col='.$i.'";');
 
 				array_push($newColumns, new CCol($icon));
 			}
@@ -362,8 +363,9 @@ class CScreenBuilder {
 
 			// action left cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
-				$icon = new CDiv('+', 'treeview-plus');
-				$icon->onClick('javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_row='.$r.'";');
+				$icon = (new CDiv('+'))
+					->addClass('treeview-plus')
+					->onClick('javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_row='.$r.'";');
 
 				array_push($newColumns, new CCol($icon));
 			}
@@ -492,10 +494,11 @@ class CScreenBuilder {
 				}
 
 				if ($this->mode == SCREEN_MODE_EDIT && !$isEditForm) {
-					$item = new CDiv($item, 'draggable');
-					$item->setId('position_'.$r.'_'.$c);
-					$item->setAttribute('data-xcoord', $c);
-					$item->setAttribute('data-ycoord', $r);
+					$item = (new CDiv($item))
+						->addClass('draggable')
+						->setId('position_'.$r.'_'.$c)
+						->setAttribute('data-xcoord', $c)
+						->setAttribute('data-ycoord', $r);
 				}
 
 				// colspan/rowspan
@@ -514,7 +517,7 @@ class CScreenBuilder {
 
 			// action right cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
-				$icon = new CDiv('−', 'treeview-plus');
+				$icon = (new CDiv('−'))->addClass('treeview-plus');
 				if ($emptyScreenRow) {
 					$removeRowLink = 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r.'";';
 				}
@@ -532,12 +535,13 @@ class CScreenBuilder {
 
 		// action bottom row
 		if ($this->mode == SCREEN_MODE_EDIT) {
-			$icon = new CDiv('+', 'treeview-plus');
-			$icon->onClick('javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&add_row='.$this->screen['vsize'].'";');
+			$icon = (new CDiv('+'))
+				->addClass('treeview-plus')
+				->onClick('javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&add_row='.$this->screen['vsize'].'";');
 			$newColumns = [new CCol($icon)];
 
 			for ($i = 0; $i < $this->screen['hsize']; $i++) {
-				$icon = new CDiv('−', 'treeview-plus');
+				$icon = (new CDiv('−'))->addClass('treeview-plus');
 				if (isset($emptyScreenColumns[$i])) {
 					$removeColumnLink = 'javascript:'.
 						' if (confirm('.CJs::encodeJson(_('This screen-column is not empty. Delete it?')).')) {'.
@@ -556,7 +560,7 @@ class CScreenBuilder {
 			$screenTable->addRow($newColumns);
 		}
 
-		return new CDiv($screenTable, 'table-forms-container');
+		return (new CDiv($screenTable))->addClass('table-forms-container');
 	}
 
 	/**

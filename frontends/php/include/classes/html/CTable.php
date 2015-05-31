@@ -119,12 +119,15 @@ class CTable extends CTag {
 			$class = $this->headerClass;
 		}
 		if (is_object($value) && strtolower(get_class($value)) === 'crow') {
-			if (!is_null($class)) {
+			if ($class !== null) {
 				$value->addClass($class);
 			}
 		}
 		else {
 			$value = new CRowHeader($value, $class);
+			if ($class !== null) {
+				$value->addClass($class);
+			}
 		}
 		$this->colnum = $value->itemsCount();
 

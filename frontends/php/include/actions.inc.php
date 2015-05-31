@@ -1180,8 +1180,10 @@ function getActionMessages(array $alerts) {
 			$info = '';
 		}
 		else {
-			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($alert['error'], ZBX_STYLE_RED);
+			$info = (new CDiv(SPACE))
+				->addClass('status_icon')
+				->addClass('iconerror')
+				->setHint($alert['error'], ZBX_STYLE_RED);
 		}
 
 		$table->addRow([

@@ -275,7 +275,13 @@ foreach ($this->data['items'] as $n => $item) {
 	);
 }
 
-$graphFormList->addRow(_('Items'), new CDiv($itemsTable, 'objectgroup inlineblock border_dotted'));
+$graphFormList->addRow(
+	_('Items'),
+	(new CDiv($itemsTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->AddClass('border_dotted')
+);
 
 // append tabs to form
 $graphTab = new CTabView();
@@ -296,7 +302,7 @@ $chartImage->preload();
 $graphPreviewTable = (new CTable())
 	->addClass('center')
 	->addClass('maxwidth');
-$graphPreviewTable->addRow(new CDiv($chartImage, null, 'previewChar'));
+$graphPreviewTable->addRow((new CDiv($chartImage))->setId('previewChar'));
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 
 // append buttons to form

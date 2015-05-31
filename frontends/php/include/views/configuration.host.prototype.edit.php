@@ -105,7 +105,16 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	}
 	$ifTab->addRow($row);
 
-	$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-first');
+	$hostList->addRow(
+		_('Agent interfaces'),
+		(new CDiv($ifTab))
+			->addClass('border_dotted')
+			->addClass('objectgroup')
+			->addClass('interface-group'),
+		false,
+		null,
+		'interface-row interface-row-first'
+	);
 
 	// table for SNMP interfaces with footer
 	$ifTab = (new CTable())
@@ -119,7 +128,16 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		$row->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(5));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
+	$hostList->addRow(
+		_('SNMP interfaces'),
+		(new CDiv($ifTab))
+			->addClass('border_dotted')
+			->addClass('objectgroup')
+			->addClass('interface-group'),
+		false,
+		null,
+		'interface-row'
+	);
 
 	// table for JMX interfaces with footer
 	$ifTab = (new CTable())
@@ -133,7 +151,16 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		$row->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(5));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
+	$hostList->addRow(
+		_('JMX interfaces'),
+		(new CDiv($ifTab))
+			->addClass('border_dotted')
+			->addClass('objectgroup')
+			->addClass('interface-group'),
+		false,
+		null,
+		'interface-row'
+	);
 
 	// table for IPMI interfaces with footer
 	$ifTab = (new CTable())
@@ -147,7 +174,16 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		$row->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(5));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');
+	$hostList->addRow(
+		_('IPMI interfaces'),
+		(new CDiv($ifTab))
+			->addClass('border_dotted')
+			->addClass('objectgroup')
+			->addClass('interface-group'),
+		false,
+		null,
+		'interface-row interface-row-last'
+	);
 
 	// proxy
 	if ($parentHost['proxy_hostid']) {
@@ -205,7 +241,10 @@ $buttonRow = (new CRow())
 	->addItem($buttonColumn);
 
 $customGroupTable->addRow($buttonRow);
-$groupDiv = new CDiv($customGroupTable, 'objectgroup border_dotted group-prototypes');
+$groupDiv = (new CDiv($customGroupTable))
+	->addClass('objectgroup')
+	->addClass('border_dotted')
+	->addClass('group-prototypes');
 $groupList->addRow(_('Group prototypes'), $groupDiv);
 
 $divTabs->addTab('groupTab', _('Groups'), $groupList);
@@ -236,7 +275,13 @@ if ($hostPrototype['templates']) {
 		$ignoreTemplates[$template['templateid']] = $template['name'];
 	}
 
-	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'objectgroup inlineblock border_dotted'));
+	$tmplList->addRow(
+		_('Linked templates'),
+		(new CDiv($linkedTemplateTable))
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('border_dotted')
+	);
 }
 // for inherited prototypes with no templates display a text message
 elseif ($hostPrototype['templateid']) {
@@ -262,7 +307,13 @@ if (!$hostPrototype['templateid']) {
 
 	$newTemplateTable->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
-	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted'));
+	$tmplList->addRow(
+		_('Link new templates'),
+		(new CDiv($newTemplateTable))
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addCLass('border_dotted')
+	);
 }
 
 $divTabs->addTab('templateTab', _('Templates'), $tmplList);
@@ -326,11 +377,10 @@ $inventoryTypeRadioButton = [
 	$inventoryAutomaticBtn,
 	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
 ];
-$inventoryFormList->addRow(new CDiv($inventoryTypeRadioButton, 'jqueryinputset radioset'));
+$inventoryFormList->addRow((new CDiv($inventoryTypeRadioButton))->addClass('jqueryinputset')->addClass('radioset'));
 
 // clearing the float
-$clearFixDiv = new CDiv();
-$clearFixDiv->addStyle('clear: both;');
+$clearFixDiv = (new CDiv())->addStyle('clear: both;');
 $inventoryFormList->addRow('', $clearFixDiv);
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);

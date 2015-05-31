@@ -43,7 +43,12 @@ $mappingsTable = (new CTable())
 	->addRow((new CCol(
 		(new CButton('addMapping', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 	))->setColSpan(4));
-$valueMappingFormList->addRow(_('Mappings'), new CDiv($mappingsTable, 'border_dotted inlineblock objectgroup'));
+$valueMappingFormList->addRow(_('Mappings'),
+	(new CDiv($mappingsTable))
+		->addClass('border_dotted')
+		->addClass('inlineblock')
+		->addClass('objectgroup')
+);
 
 // add mappings to form by js
 if (empty($this->data['mappings'])) {

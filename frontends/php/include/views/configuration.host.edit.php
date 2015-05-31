@@ -149,7 +149,14 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	$ifTab->addRow($buttonRow);
 
-	$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row interface-row-first');
+	$hostList->addRow(_('Agent interfaces'),
+		(new CDiv($ifTab))
+			->addClass('border_dotted')
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('interface-group'),
+		false, null, 'interface-row interface-row-first'
+	);
 
 	// table for SNMP interfaces with footer
 	$ifTab = (new CTable())
@@ -170,7 +177,14 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	$ifTab->addRow($buttonRow);
 
-	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted inlineblock objectgroup interface-group'), false, null, 'interface-row');
+	$hostList->addRow(_('SNMP interfaces'),
+		(new CDiv($ifTab))
+			->addClass('border_dotted')
+			->addClass('inlineblock')
+			->addClass('objectgroup')
+			->addClass('interface-group'),
+		false, null, 'interface-row'
+	);
 
 	// table for JMX interfaces with footer
 	$ifTab = (new CTable())
@@ -189,7 +203,14 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$buttonRow = (new CRow([$buttonCol]))->setId('JMXInterfacesFooter');
 	$ifTab->addRow($buttonRow);
 
-	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
+	$hostList->addRow(_('JMX interfaces'),
+		(new CDiv($ifTab))
+			->addClass('border_dotted')
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('interface-group'),
+		false, null, 'interface-row'
+	);
 
 	// table for IPMI interfaces with footer
 	$ifTab = (new CTable())
@@ -208,7 +229,14 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$buttonRow = (new CRow([$buttonCol]))->setId('IPMIInterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
-	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
+	$hostList->addRow(_('IPMI interfaces'),
+		(new CDiv($ifTab))
+			->addClass('border_dotted')
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('interface-group'),
+		false, null, 'interface-row'
+	);
 }
 // interfaces for discovered hosts
 else {
@@ -245,7 +273,14 @@ else {
 	}
 	$ifTab->addRow($row);
 
-	$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-first');
+	$hostList->addRow(_('Agent interfaces'),
+		(new CDiv($ifTab))
+			->addClass('border_dotted')
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('interface-group'),
+		false, null, 'interface-row interface-row-first'
+	);
 
 	// table for SNMP interfaces with footer
 	$ifTab = (new CTable())
@@ -259,7 +294,13 @@ else {
 		$row->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(5));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
+	$hostList->addRow(_('SNMP interfaces'),
+		(new CDiv($ifTab))
+			->addClass('border_dotted')
+			->addClass('objectgroup')
+			->addClass('interface-group'),
+		false, null, 'interface-row'
+	);
 
 	// table for JMX interfaces with footer
 	$ifTab = (new CTable())
@@ -273,7 +314,13 @@ else {
 		$row->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(5));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
+	$hostList->addRow(_('JMX interfaces'),
+		(new CDiv($ifTab))
+			->addClass('border_dotted')
+			->addClass('objectgroup')
+			->addClass('interface-group'),
+		false, null, 'interface-row'
+	);
 
 	// table for IPMI interfaces with footer
 	$ifTab = (new CTable())
@@ -287,7 +334,13 @@ else {
 		$row->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(5));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');
+	$hostList->addRow(_('IPMI interfaces'),
+		(new CDiv($ifTab))
+			->addClass('border_dotted')
+			->addClass('objectgroup')
+			->addClass('interface-group'),
+		false, null, 'interface-row interface-row-last'
+	);
 }
 
 $hostList->addRow(_('Description'), new CTextArea('description', $data['description']));
@@ -595,8 +648,12 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		$ignoredTemplates[$template['templateid']] = $template['name'];
 	}
 
-	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable,
-		'template-link-block objectgroup inlineblock border_dotted')
+	$tmplList->addRow(_('Linked templates'),
+		(new CDiv($linkedTemplateTable))
+			->addClass('template-link-block')
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('border_dotted')
 	);
 
 	// create new linked template table
@@ -616,8 +673,12 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	$newTemplateTable->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
-	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable,
-		'template-link-block objectgroup inlineblock border_dotted')
+	$tmplList->addRow(_('Link new templates'),
+		(new CDiv($newTemplateTable))
+			->addClass('template-link-block')
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('border_dotted')
 	);
 }
 // templates for discovered hosts
@@ -631,8 +692,12 @@ else {
 		$linkedTemplateTable->addRow($templateLink, null, 'conditions_'.$template['templateid']);
 	}
 
-	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable,
-		'template-link-block objectgroup inlineblock border_dotted')
+	$tmplList->addRow(_('Linked templates'),
+		(new CDiv($linkedTemplateTable))
+			->addClass('template-link-block')
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('border_dotted')
 	);
 }
 
@@ -697,7 +762,11 @@ $inventoryTypeRadioButton = [
 	$inventoryManualBtn, new CLabel(_('Manual'), 'host_inventory_radio_'.HOST_INVENTORY_MANUAL),
 	$inventoryAutomaticBtn, new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC)
 ];
-$inventoryFormList->addRow(null, new CDiv($inventoryTypeRadioButton, 'jqueryinputset radioset'));
+$inventoryFormList->addRow(null,
+	(new CDiv($inventoryTypeRadioButton))
+		->addClass('jqueryinputset')
+		->addClass('radioset')
+);
 if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	$inventoryFormList->addVar('inventory_mode', $data['inventory_mode']);
 }
@@ -755,8 +824,7 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 }
 
 // clearing the float
-$clearFixDiv = new CDiv();
-$clearFixDiv->addStyle('clear: both;');
+$clearFixDiv = (new CDiv())->addStyle('clear: both;');
 $inventoryFormList->addRow('', $clearFixDiv);
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);

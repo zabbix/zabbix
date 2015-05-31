@@ -1533,7 +1533,7 @@ function getPagingLine(&$items, $sortorder) {
 		$tags[] = new CLink(_('Last'), $url->getUrl(), null, null, true);
 	}
 
-	return new CDiv($tags, 'table-paging');
+	return (new CDiv($tags))->addClass('table-paging');
 }
 
 /************* MATH *************/
@@ -1686,10 +1686,15 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 
 function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
 {
-	$msg_box = new CDiv($title, $good ? 'msg-good' : 'msg-bad', $show_close_box ? 'global-message' : null);
+	$msg_box = (new CDiv($title))
+		->addClass($good ? 'msg-good' : 'msg-bad');
+
+	if ($show_close_box) {
+		$msg_box->setId('global-message');
+	}
 
 	if ($messages) {
-		$msg_details = new CDiv(null, 'msg-details');
+		$msg_details = (new CDiv())->addClass('msg-details');
 
 		if ($title !== null) {
 			$link = new CLink(_('Details'), null, ZBX_STYLE_LINK_ACTION, null, true);

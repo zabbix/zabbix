@@ -129,7 +129,9 @@ $authProtocolRadioButton = [
 	new CLabel(_('SHA'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
 ];
 $itemFormList->addRow(_('Authentication protocol'),
-	new CDiv($authProtocolRadioButton, 'jqueryinputset radioset'),
+	(new CDiv($authProtocolRadioButton))
+		->addClass('jqueryinputset')
+		->addClass('radioset'),
 	false, 'row_snmpv3_authprotocol'
 );
 $itemFormList->addRow(_('Authentication passphrase'),
@@ -143,7 +145,9 @@ $privProtocolRadioButton = [
 	new CLabel(_('AES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
 ];
 $itemFormList->addRow(_('Privacy protocol'),
-	new CDiv($privProtocolRadioButton, 'jqueryinputset radioset'),
+	(new CDiv($privProtocolRadioButton))
+		->addClass('jqueryinputset')
+		->addClass('radioset'),
 	false, 'row_snmpv3_privprotocol'
 );
 $itemFormList->addRow(_('Privacy passphrase'),
@@ -222,7 +226,11 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 	}
 }
 $itemFormList->addRow(_('Flexible intervals'),
-	new CDiv($delayFlexTable, 'objectgroup inlineblock border_dotted'), false, 'row_flex_intervals'
+	(new CDiv($delayFlexTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted'),
+	false, 'row_flex_intervals'
 );
 
 // append new flexible interval to form list
@@ -343,7 +351,12 @@ $buttonRow = (new CRow())
 
 $conditionTable->addRow($buttonRow);
 
-$conditionFormList->addRow(_('Filters'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted'));
+$conditionFormList->addRow(_('Filters'),
+	(new CDiv($conditionTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+);
 
 
 // append tabs to form

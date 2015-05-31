@@ -83,6 +83,6 @@ $controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']])
 
 $headerMapForm->addItem($controls);
 $mapWidget->setControls($headerMapForm)
-	->addItem((new CDiv(null, 'table-forms-container'))
-	->addItem($mapTable))
+	->addItem((new CDiv())->addClass('table-forms-container'))
+	->addItem($mapTable)
 	->show();
