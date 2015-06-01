@@ -53,7 +53,6 @@ typedef struct zbx_scheduler_interval_t
 }
 zbx_scheduler_interval_t;
 
-
 #ifdef _WINDOWS
 
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
@@ -722,7 +721,7 @@ static void	scheduler_interval_free(zbx_scheduler_interval_t *interval)
 static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char *text, int *len, int min, int max,
 		int var_len)
 {
-	int			start = 0, end = 0, period = 1;
+	int			start = 0, end = 0, step = 1;
 	const char		*pstart, *pend;
 	zbx_scheduler_filter_t	*filter_new;
 
@@ -752,7 +751,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
 			}
 			while (0 != isdigit(*pend) && 0 < *len);
 
-			/* empty interval, fail */
+			/* empty or too long value, fail */
 			if (pend == pstart || pend - pstart > var_len)
 				return FAIL;
 
@@ -788,11 +787,11 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
 		}
 		while (0 != isdigit(*pend) && 0 < *len);
 
-		/* empty period, fail */
+		/* empty or too long step, fail */
 		if (pend == pstart || pend - pstart > var_len)
 			return FAIL;
 
-		if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &period, 4, 1, end - start))
+		if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &step, 4, 1, end - start))
 			return FAIL;
 	}
 	else
@@ -816,7 +815,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
 	filter_new = zbx_malloc(NULL, sizeof(zbx_scheduler_filter_t));
 	filter_new->start = start;
 	filter_new->end = end;
-	filter_new->step = period;
+	filter_new->step = step;
 	filter_new->next = *filter;
 	*filter = filter_new;
 
@@ -997,18 +996,16 @@ static int	preprocess_flexible_interval(const char *text, zbx_scheduler_interval
 		size_t	errmsg_alloc = 0, errmsg_offset = 0;
 
 		zbx_free(*errmsg);
-		zbx_strcpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, "Invalid scheduling interval: '");
+		zbx_strcpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, "Invalid scheduling interval: \"");
 		zbx_strncpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, text, ptr - text + 1);
-		zbx_strcpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, "\'.");
+		zbx_strcpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, "\".");
 
 		scheduler_interval_free(new_interval);
 		return FAIL;
 	}
-	else
-	{
-		new_interval->next = *interval;
-		*interval = new_interval;
-	}
+
+	new_interval->next = *interval;
+	*interval = new_interval;
 
 	return SUCCEED;
 }
@@ -1437,7 +1434,6 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
  *             flex_intervals - [IN] descriptions of flexible intervals       *
  *                                   in the form [dd/d1-d2,hh:mm-hh:mm;]      *
  *             now       - [IN] current timestamp                             *
- *             lastclock - [IN] timestamp of the last check                   *
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
@@ -1467,13 +1463,14 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const 
 	{
 		int	current_delay = 0, try = 0;
 		time_t	next_interval, t, tmax, scheduled_check = 0;
-		char	*flex = NULL, *errmsg = NULL;
+		char	*flex = NULL;
 		size_t	flex_alloc = 0, flex_offset = 0;
 
 		/* first try to parse out and calculate scheduled intervals */
 		if (NULL != flex_intervals)
 		{
 			zbx_scheduler_interval_t	*interval = NULL;
+			char				*errmsg = NULL;
 
 			if (SUCCEED == preprocess_flexible_interval(flex_intervals, &interval, &flex, &flex_alloc,
 					&flex_offset, &errmsg))
@@ -1484,7 +1481,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const 
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_ERR, "wrong scheduled interval format: \"%s\"", errmsg);
+				zabbix_log(LOG_LEVEL_ERR, "%s", errmsg);
 				zbx_free(errmsg);
 			}
 		}
