@@ -35,7 +35,7 @@ class CLink extends CTag {
 		}
 	}
 
-	public function setUrl($value) {
+	private function setUrl($value) {
 		if ($this->usesid) {
 			if (is_null($this->sid)) {
 				$this->sid = isset($_COOKIE['zbx_sessionid']) ? substr($_COOKIE['zbx_sessionid'], 16, 16) : null;
@@ -55,6 +55,8 @@ class CLink extends CTag {
 
 	public function removeSID() {
 		$this->usesid  = false;
+
+		return $this;
 	}
 
 	public function getUrl() {
@@ -62,11 +64,8 @@ class CLink extends CTag {
 	}
 
 	public function setTarget($value = null) {
-		if (is_null($value)) {
-			unset($this->attributes['target']);
-		}
-		else {
-			$this->attributes['target'] = $value;
-		}
+		$this->attributes['target'] = $value;
+
+		return $this;
 	}
 }
