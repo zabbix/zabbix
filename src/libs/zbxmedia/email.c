@@ -339,6 +339,23 @@ static size_t	smtp_provide_payload(void *buffer, size_t size, size_t nmemb, void
 	return current_len;
 }
 
+#if defined(HAVE_LIBCURL) && 0x072200 <= LIBCURL_VERSION_NUM	/* version 7.34.0 */
+static int	smtp_debug_function(CURL *easyhandle, curl_infotype type, char *data, size_t size, void *userptr)
+{
+	const char	labels[3] = {'*', '<', '>'};
+
+	if (CURLINFO_TEXT != type && CURLINFO_HEADER_IN != type && CURLINFO_HEADER_OUT != type)
+		goto out;
+
+	while (0 < size && ('\r' == data[size - 1] || '\n' == data[size - 1]))
+		size--;
+
+	zabbix_log(LOG_LEVEL_TRACE, "%c %.*s", labels[type], (int)size, data);
+out:
+	return 0;
+}
+#endif
+
 static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
 		const char *from_display_name, const char *from_angle_addr, const char *to_display_name,
 		const char *to_angle_addr, const char *mailsubject, const char *mailbody, int timeout,
@@ -624,6 +641,9 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_VERBOSE, 1L)))
+			goto error;
+
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_DEBUGFUNCTION, smtp_debug_function)))
 			goto error;
 	}
 
