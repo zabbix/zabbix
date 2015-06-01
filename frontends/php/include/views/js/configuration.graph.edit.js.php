@@ -90,22 +90,22 @@
 <script type="text/javascript">
 	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, flags) {
 		var item = {
-			number: number,
-			number_nr: number + 1,
-			gitemid: gitemid,
-			graphid: graphid,
-			itemid: itemid,
-			type: type,
-			calc_fnc: calc_fnc,
-			drawtype: drawtype,
-			yaxisside: yaxisside,
-			color: color,
-			sortorder: number,
-			flags: flags,
-			name: name
-		};
+				number: number,
+				number_nr: number + 1,
+				gitemid: gitemid,
+				graphid: graphid,
+				itemid: itemid,
+				type: type,
+				calc_fnc: calc_fnc,
+				drawtype: drawtype,
+				yaxisside: yaxisside,
+				color: color,
+				sortorder: number,
+				flags: flags,
+				name: name
+			},
+			itemTpl = new Template(jQuery('#itemTpl').html());
 
-		var itemTpl = new Template(jQuery('#itemTpl').html());
 		jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
 		jQuery('#items_' + number + '_type').val(type);
 		jQuery('#items_' + number + '_calc_fnc').val(calc_fnc);
@@ -127,22 +127,22 @@
 		for (var i = 0; i < list.values.length; i++) {
 			var number = jQuery('#itemsTable tr.sortable').length,
 				item = {
-				number: number,
-				number_nr: number + 1,
-				gitemid: null,
-				graphid: <?= $this->data['graphid'] ?>,
-				itemid: list.values[i].itemid,
-				type: null,
-				calc_fnc: null,
-				drawtype: 0,
-				yaxisside: 0,
-				sortorder: number,
-				flags: (typeof list.values[i].flags === 'undefined') ? 0 : list.values[i].flags,
-				color: getNextColor(1),
-				name: list.values[i].name
-			};
+					number: number,
+					number_nr: number + 1,
+					gitemid: null,
+					graphid: <?= $this->data['graphid'] ?>,
+					itemid: list.values[i].itemid,
+					type: null,
+					calc_fnc: null,
+					drawtype: 0,
+					yaxisside: 0,
+					sortorder: number,
+					flags: (typeof list.values[i].flags === 'undefined') ? 0 : list.values[i].flags,
+					color: getNextColor(1),
+					name: list.values[i].name
+				},
+				itemTpl = new Template(jQuery('#itemTpl').html());
 
-			var itemTpl = new Template(jQuery('#itemTpl').html());
 			jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
 			jQuery('#items_' + item['number'] + '_calc_fnc').val(<?= CALC_FNC_AVG ?>);
 			jQuery('#items_' + item['number'] + '_color').val(item['color']);
