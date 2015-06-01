@@ -972,36 +972,34 @@ if test "x$ARCH" = "xhpux"; then
 	CFLAGS="-D_HPUX_API_LEVEL=20040821"
 	AC_TRY_RUN(
 [
+#ifdef HAVE_DLFCN_H
+#	include <dlfcn.h>
+#endif
 #ifdef HAVE_SYS_UTSNAME_H
 #	include <sys/utsname.h>
 #endif
 
 int main(void)
 {
+	void	*p1, *p2;
+
+	/* check that the compiler (e.g., GCC 4.3.0 and above) supports function-level versioning */
+
+	p1 = uname;
+	p2 = dlsym(RTLD_DEFAULT, "uname{20040821}");
+
+	if (p1 != p2)
+		return -1;
+
 	/* uname() fails with EFAULT on HP-UX systems that were only partially upgraded to this API level */
 
 	struct utsname	name;
-	return uname(&name));
+	return uname(&name);
 }
 ],
 	CFLAGS="-D_HPUX_API_LEVEL=20040821 $saved_CFLAGS"
 	AC_MSG_RESULT(yes),
 	CFLAGS="$saved_CFLAGS"
-	AC_MSG_RESULT(no))
-
-	AC_MSG_CHECKING(for struct utsname_hpux_v1 in sys/utsname.h)
-	AC_TRY_COMPILE(
-[
-#ifdef HAVE_SYS_UTSNAME_H
-#	include <sys/utsname.h>
-#endif
-],
-[
-struct utsname_hpux_v1	name;
-uname((struct utsname *)&name);
-],
-	AC_DEFINE(HAVE_SYS_UTSNAME_HPUX_V1, 1, [Define to 1 if struct 'utsname_hpux_v1' exists.])
-	AC_MSG_RESULT(yes),
 	AC_MSG_RESULT(no))
 fi
 
