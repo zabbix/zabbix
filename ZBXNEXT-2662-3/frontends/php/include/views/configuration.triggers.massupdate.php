@@ -73,10 +73,9 @@ foreach ($data['dependencies'] as $dependency) {
 	);
 
 	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$description = new CLink($depTriggerDescription,
+		$description = (new CLink($depTriggerDescription,
 			'triggers.php?form=update&triggerid='.$dependency['triggerid']
-		);
-		$description->setAttribute('target', '_blank');
+		))->setAttribute('target', '_blank');
 	}
 	else {
 		$description = $depTriggerDescription;

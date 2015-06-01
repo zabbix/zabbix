@@ -67,7 +67,9 @@ foreach ($this->data['items'] as $item) {
 		$template_host = get_realhost_by_itemid($item['templateid']);
 		$templateDiscoveryRuleId = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $template_host['hostid']);
 
-		$description[] = new CLink($template_host['name'], '?parent_discoveryid='.$templateDiscoveryRuleId, ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
+		$description[] = (new CLink($template_host['name'], '?parent_discoveryid='.$templateDiscoveryRuleId))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}
 	$description[] = new CLink(
@@ -75,16 +77,16 @@ foreach ($this->data['items'] as $item) {
 		'?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid']
 	);
 
-	$status = new CLink(
+	$status = (new CLink(
 		itemIndicator($item['status']),
 		'?group_itemid='.$item['itemid'].
 			'&parent_discoveryid='.$this->data['parent_discoveryid'].
 			'&action='.($item['status'] == ITEM_STATUS_DISABLED
 				? 'itemprototype.massenable'
 				: 'itemprototype.massdisable'
-			),
-		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($item['status'])
-	);
+			)))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(itemIndicatorStyle($item['status']));
 
 	if (!empty($item['applications'])) {
 		order_result($item['applications'], 'name');

@@ -330,8 +330,8 @@ if ($data['config']['hk_history_global'] && $data['parent_discoveryid'] == 0
 
 	$keepHistory[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
-		$link->setAttribute('target', '_blank');
+		$link = (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
+			->setAttribute('target', '_blank');
 		$keepHistory[] = $link;
 	}
 	else {
@@ -348,8 +348,8 @@ if ($data['config']['hk_trends_global'] && $data['parent_discoveryid'] == 0
 
 	$keepTrend[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
-		$link->setAttribute('target', '_blank');
+		$link = (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
+			->setAttribute('target', '_blank');
 		$keepTrend[] = $link;
 	}
 	else {
@@ -395,8 +395,8 @@ else {
 		$valuemapComboBox->addItem($valuemap['valuemapid'], CHtml::encode($valuemap['name']));
 	}
 }
-$link = new CLink(_('show value mappings'), 'adm.valuemapping.php');
-$link->setAttribute('target', '_blank');
+$link = (new CLink(_('show value mappings'), 'adm.valuemapping.php'))
+	->setAttribute('target', '_blank');
 $itemFormList->addRow(_('Show value'), [$valuemapComboBox, SPACE, $link], null, 'row_valuemap');
 $itemFormList->addRow(_('Allowed hosts'),
 	new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE),

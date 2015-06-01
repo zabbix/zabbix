@@ -45,11 +45,13 @@ $hostList = new CFormList('hostlist');
 if ($hostPrototype['templateid'] && $data['parents']) {
 	$parents = [];
 	foreach (array_reverse($data['parents']) as $parent) {
-		$parents[] = new CLink(
+		$parents[] = (new CLink(
 			$parent['parentHost']['name'],
-			'?form=update&hostid='.$parent['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid'],
-			'highlight underline weight_normal'
-		);
+			'?form=update&hostid='.$parent['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid'])
+		)
+			->addClass('highlight')
+			->addClass('underline')
+			->addClass('weight_normal');
 		$parents[] = SPACE.'&rArr;'.SPACE;
 	}
 	array_pop($parents);
@@ -264,8 +266,8 @@ $ignoreTemplates = [];
 if ($hostPrototype['templates']) {
 	foreach ($hostPrototype['templates'] as $template) {
 		$tmplList->addVar('templates['.$template['templateid'].']', $template['templateid']);
-		$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
-		$templateLink->setTarget('_blank');
+		$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+			->setTarget('_blank');
 
 		$linkedTemplateTable->addRow([
 			$templateLink,
@@ -312,7 +314,7 @@ if (!$hostPrototype['templateid']) {
 		(new CDiv($newTemplateTable))
 			->addClass('objectgroup')
 			->addClass('inlineblock')
-			->addCLass('border_dotted')
+			->addClass('border_dotted')
 	);
 }
 

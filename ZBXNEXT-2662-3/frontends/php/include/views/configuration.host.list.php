@@ -101,9 +101,11 @@ foreach ($data['hosts'] as $host) {
 		$description[] = $data['proxies'][$host['proxy_hostid']]['host'].NAME_DELIMITER;
 	}
 	if ($host['discoveryRule']) {
-		$description[] = new CLink($host['discoveryRule']['name'],
-			'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_ORANGE
-		);
+		$description[] = (new CLink($host['discoveryRule']['name'],
+			'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid'])
+		)
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
 		$description[] = NAME_DELIMITER;
 	}
 
@@ -136,7 +138,10 @@ foreach ($data['hosts'] as $host) {
 		$statusClass = ZBX_STYLE_RED;
 	}
 
-	$status = new CLink($statusCaption, $statusUrl, ZBX_STYLE_LINK_ACTION.' '.$statusClass, $statusScript);
+	$status = (new CLink($statusCaption, $statusUrl))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass($statusClass)
+		->onClick($statusScript);
 
 	if (empty($host['parentTemplates'])) {
 		$hostTemplates = '';
@@ -156,11 +161,13 @@ foreach ($data['hosts'] as $host) {
 				break;
 			}
 
-			$caption = [new CLink(
+			$caption = [(new CLink(
 				CHtml::encode($template['name']),
-				'templates.php?form=update&templateid='.$template['templateid'],
-				ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY
-			)];
+				'templates.php?form=update&templateid='.$template['templateid'])
+				)
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_GREY)
+			];
 
 			$parentTemplates = $data['templates'][$template['templateid']]['parentTemplates'];
 			if ($parentTemplates) {
@@ -168,10 +175,11 @@ foreach ($data['hosts'] as $host) {
 
 				$caption[] = ' (';
 				foreach ($parentTemplates as $parentTemplate) {
-					$caption[] = new CLink(CHtml::encode($parentTemplate['name']),
-						'templates.php?form=update&templateid='.$parentTemplate['templateid'],
-						ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY
-					);
+					$caption[] = (new CLink(CHtml::encode($parentTemplate['name']),
+						'templates.php?form=update&templateid='.$parentTemplate['templateid'])
+						)
+							->addClass(ZBX_STYLE_LINK_ALT)
+							->addClass(ZBX_STYLE_GREY);
 					$caption[] = ', ';
 				}
 				array_pop($caption);

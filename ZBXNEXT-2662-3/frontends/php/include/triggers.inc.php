@@ -642,19 +642,19 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 							$link = (new CSpan($functionData['host'].':'.$functionData['key_']))->addClass($style);
 						}
 						elseif ($functionData['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-							$link = new CLink(
+							$link = (new CLink(
 								$functionData['host'].':'.$functionData['key_'],
 								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].'&parent_discoveryid='.
-									$trigger['discoveryRuleid'],
-								ZBX_STYLE_LINK_ALT.' '.$style
-							);
+									$trigger['discoveryRuleid']))
+								->addClass(ZBX_STYLE_LINK_ALT)
+								->addClass($style);
 						}
 						else {
-							$link = new CLink(
+							$link = (new CLink(
 								$functionData['host'].':'.$functionData['key_'],
-								'items.php?form=update&itemid='.$functionData['itemid'],
-								ZBX_STYLE_LINK_ALT.' '.$style
-							);
+								'items.php?form=update&itemid='.$functionData['itemid']))
+								->addClass(ZBX_STYLE_LINK_ALT)
+								->addClass($style);
 						}
 
 						$expressionExpanded[] = ['{', $link,'.', bold($functionData['function'].'('), $functionData['parameter'], bold(')'), '}'];
@@ -774,13 +774,13 @@ function triggerExpression($trigger, $html = false) {
 						$link = (new CSpan($function_data['host'].':'.CHtml::encode($function_data['key_'])))->addClass($style);
 					}
 					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$link = new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
+						$link = (new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
 							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
-							$trigger['discoveryRuleid'], $style);
+							$trigger['discoveryRuleid']))->addClass($style);
 					}
 					else {
-						$link = new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
-							'items.php?form=update&itemid='.$function_data['itemid'], $style);
+						$link = (new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
+							'items.php?form=update&itemid='.$function_data['itemid']))->addClass($style);
 					}
 					array_push(
 						$exp,
@@ -1466,7 +1466,7 @@ function make_trigger_details($trigger) {
 	$table->addRow([_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 		? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')]);
 	$table->addRow([_('Disabled'), ((TRIGGER_STATUS_ENABLED == $trigger['status'])
-		? (new CCol(_('No')))->addCLass(ZBX_STYLE_GREEN) : (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED))]);
+		? (new CCol(_('No')))->addClass(ZBX_STYLE_GREEN) : (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED))]);
 
 	return $table;
 }

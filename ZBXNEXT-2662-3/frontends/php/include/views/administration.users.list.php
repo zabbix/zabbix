@@ -76,7 +76,9 @@ foreach ($this->data['users'] as $user) {
 
 	// blocked
 	$blocked = ($user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS)
-		? new CLink(_('Blocked'), 'users.php?action=user.massunblock&group_userid[]='.$userId, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED)
+		? (new CLink(_('Blocked'), 'users.php?action=user.massunblock&group_userid[]='.$userId))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(ZBX_STYLE_RED)
 		: (new CSpan(_('Ok')))->addClass(ZBX_STYLE_GREEN);
 
 	// user groups
@@ -98,12 +100,12 @@ foreach ($this->data['users'] as $user) {
 			$usersGroups[] = ', ';
 		}
 
-		$usersGroups[] = new CLink(
+		$usersGroups[] = (new CLink(
 			$userGroup['name'],
-			'usergrps.php?form=update&usrgrpid='.$userGroup['usrgrpid'],
-			($userGroup['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $userGroup['users_status'] == GROUP_STATUS_DISABLED)
-				? ZBX_STYLE_LINK_ALT . ' ' . ZBX_STYLE_RED : ZBX_STYLE_LINK_ALT . ' ' . ZBX_STYLE_GREEN
-		);
+			'usergrps.php?form=update&usrgrpid='.$userGroup['usrgrpid']))
+			->addClass($userGroup['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $userGroup['users_status'] == GROUP_STATUS_DISABLED
+				? ZBX_STYLE_LINK_ALT . ' ' . ZBX_STYLE_RED
+				: ZBX_STYLE_LINK_ALT . ' ' . ZBX_STYLE_GREEN);
 	}
 
 	// user type style

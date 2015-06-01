@@ -57,10 +57,10 @@ $hostList = new CFormList('hostlist');
 if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	$hostList->addRow(
 		_('Discovered by'),
-		new CLink($data['discoveryRule']['name'],
-			'host_prototypes.php?parent_discoveryid='.$data['discoveryRule']['itemid'],
-			'highlight underline weight_normal'
-		)
+		(new CLink($data['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$data['discoveryRule']['itemid']))
+			->addClass('highlight')
+			->addClass('underline')
+			->addClass('weight_normal')
 	);
 }
 
@@ -628,8 +628,8 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
-		$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
-		$templateLink->setTarget('_blank');
+		$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+			->setTarget('_blank');
 
 		$unlinkButton = (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK);
 		if (array_key_exists($template['templateid'], $data['original_templates'])) {
@@ -686,8 +686,8 @@ else {
 	$linkedTemplateTable->setHeader([_('Name')]);
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
-		$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
-		$templateLink->setTarget('_blank');
+		$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+			->setTarget('_blank');
 
 		$linkedTemplateTable->addRow($templateLink, null, 'conditions_'.$template['templateid']);
 	}
@@ -800,8 +800,8 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	if (array_key_exists($inventoryNo, $data['inventory_items'])) {
 		$name = $data['inventory_items'][$inventoryNo]['name_expanded'];
 
-		$link = new CLink($name, 'items.php?form=update&itemid='.$data['inventory_items'][$inventoryNo]['itemid']);
-		$link->setAttribute('title', _s('This field is automatically populated by item "%s".', $name));
+		$link = (new CLink($name, 'items.php?form=update&itemid='.$data['inventory_items'][$inventoryNo]['itemid']))
+			->setAttribute('title', _s('This field is automatically populated by item "%s".', $name));
 
 		$inventory_item = (new CSpan([' &larr; ', $link]))->addClass('populating_item');
 		if ($data['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {

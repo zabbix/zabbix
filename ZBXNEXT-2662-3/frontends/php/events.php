@@ -811,10 +811,9 @@ else {
 					}
 
 					$table->addRow([
-						new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
-								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
-							'action'
-						),
+						(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
+								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']))
+							->addClass('action'),
 						$hostName,
 						$triggerDescription,
 						$statusSpan,

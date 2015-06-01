@@ -275,11 +275,13 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 
 		// is activated
 		if (str_in_array($id, $subfilter)) {
-			$link = new CLink($element['name'], null, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN);
-			$link->onClick(CHtml::encode(
-				'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
-				'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
-			));
+			$link = (new CLink($element['name']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_GREEN)
+				->onClick(CHtml::encode(
+					'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+					'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
+				));
 			$output[] = $link;
 			$output[] = new CSup(SPACE.$element['count']);
 		}
@@ -288,7 +290,9 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 		else {
 			// subfilter has 0 items
 			if ($element['count'] == 0) {
-				$output[] = new CLink($element['name'], null,  ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREY);
+				$output[] = (new CLink($element['name']))
+					->addClass( ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_GREY);
 				$output[] = new CSup(SPACE.$element['count']);
 			}
 			else {
@@ -297,15 +301,16 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 					? new CSup(SPACE.'+'.$element['count'])
 					: new CSup(SPACE.$element['count']);
 
-				$link = new CLink($element['name'], null, ZBX_STYLE_LINK_ACTION);
-				$link->onClick(CHtml::encode(
-					'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
-					'create_var("zbx_filter", '.
-						CJs::encodeJson($subfilterName.'['.$id.']').', '.
-						CJs::encodeJson($id).', '.
-						'true'.
-					');'
-				));
+				$link = (new CLink($element['name']))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->onClick(CHtml::encode(
+						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+						'create_var("zbx_filter", '.
+							CJs::encodeJson($subfilterName.'['.$id.']').', '.
+							CJs::encodeJson($id).', '.
+							'true'.
+						');'
+					));
 
 				$output[] = $link;
 				$output[] = $nspan;
@@ -1046,17 +1051,27 @@ function getItemFormData(array $item = [], array $options = []) {
 					}
 					// discovery rule
 					elseif ($data['is_discovery_rule']) {
-						$data['templates'][] = new CLink($host['name'], 'host_discovery.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
+						$data['templates'][] = (new CLink($host['name'], 'host_discovery.php?form=update&itemid='.$item['itemid']))
+							->addClass('highlight')
+							->addClass('underline')
+							->addClass('weight_normal');
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// item prototype
 					elseif ($item['discoveryRule']) {
-						$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline weight_normal');
+						$data['templates'][] = (new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']))
+							->addClass('highlight')
+							->addClass('underline')
+							->addClass('weight')
+							->addClass('normal');
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// plain item
 					else {
-						$data['templates'][] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
+						$data['templates'][] = (new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid']))
+							->addClass('highlight')
+							->addClass('underline')
+							->addClass('weight_normal');
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 				}
@@ -1396,11 +1411,10 @@ function getTriggerFormData($exprAction) {
 					$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
 				}
 
-				$data['templates'][] = new CLink(
-					CHtml::encode($db_triggers['name']),
-					$link,
-					'highlight underline weight_normal'
-				);
+				$data['templates'][] = (new CLink(CHtml::encode($db_triggers['name']), $link))
+					->addClass('highlight')
+					->addClass('underline')
+					->addClass('weight_normal');
 				$data['templates'][] = SPACE.'&rArr;'.SPACE;
 			}
 			$tmp_triggerid = $db_triggers['templateid'];

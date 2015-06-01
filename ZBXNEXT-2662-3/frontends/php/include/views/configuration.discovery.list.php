@@ -44,11 +44,12 @@ $discoveryTable->setHeader([
 foreach ($data['drules'] as $drule) {
 	array_push($drule['description'], new CLink($drule['name'], '?form=update&druleid='.$drule['druleid']));
 
-	$status = new CCol(new CLink(
+	$status = new CCol((new CLink(
 		discovery_status2str($drule['status']),
-		'?g_druleid[]='.$drule['druleid'].'&action='.($drule['status'] == DRULE_STATUS_ACTIVE ? 'drule.massdisable' : 'drule.massenable'),
-		ZBX_STYLE_LINK_ACTION.' '.discovery_status2style($drule['status'])
-	));
+		'?g_druleid[]='.$drule['druleid'].'&action='.($drule['status'] == DRULE_STATUS_ACTIVE ? 'drule.massdisable' : 'drule.massenable')))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(discovery_status2style($drule['status']))
+	);
 
 	$discoveryTable->addRow([
 		new CCheckBox('g_druleid['.$drule['druleid'].']', null, null, $drule['druleid']),

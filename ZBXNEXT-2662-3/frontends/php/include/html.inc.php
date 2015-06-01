@@ -751,7 +751,10 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 function makePageFooter($with_logo = true, $with_version = true)
 {
 	$logo = $with_logo
-		? (new CLink('', 'http://www.zabbix.com', 'logo', null, true))->setAttribute('target', '_blank')
+		? (new CLink('', 'http://www.zabbix.com'))
+			->addClass('logo')
+			->removeSID()
+			->setAttribute('target', '_blank')
 		: null;
 	$version = $with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : '';
 

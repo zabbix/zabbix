@@ -55,8 +55,8 @@ $iconMappingComboBox->addItem(0, _('<manual>'));
 foreach ($this->data['iconMaps'] as $iconMap) {
 	$iconMappingComboBox->addItem($iconMap['iconmapid'], $iconMap['name']);
 }
-$iconMappingsLink = new CLink(_('show icon mappings'), 'adm.iconmapping.php');
-$iconMappingsLink->setAttribute('target', '_blank');
+$iconMappingsLink = (new CLink(_('show icon mappings'), 'adm.iconmapping.php'))
+	->setAttribute('target', '_blank');
 $sysmapList->addRow(_('Automatic icon mapping'), [$iconMappingComboBox, SPACE, $iconMappingsLink]);
 
 // append multiple checkboxes to form list

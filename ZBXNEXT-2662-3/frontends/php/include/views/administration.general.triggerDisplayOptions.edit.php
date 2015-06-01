@@ -68,7 +68,7 @@ $triggerDOFormList->addRow(
 	_('Acknowledged OK events'),
 	[
 		(new CDiv(new CColor('ok_ack_color', $data['ok_ack_color'])))
-			->addCLass('inlineblock')
+			->addClass('inlineblock')
 			->addClass('trigger_displaying_form_col'),
 		new CCheckBox('ok_ack_style', $data['ok_ack_style'] == 1, null, 1)
 	]

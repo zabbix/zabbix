@@ -394,8 +394,8 @@ $ignoredTemplates = [];
 
 foreach ($data['linkedTemplates'] as $template) {
 	$tmplList->addVar('templates[]', $template['templateid']);
-	$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
-	$templateLink->setTarget('_blank');
+	$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+		->setTarget('_blank');
 
 	$unlinkButton = (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK);
 	$unlinkAndClearButton = (new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))

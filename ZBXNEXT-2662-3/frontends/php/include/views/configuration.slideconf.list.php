@@ -46,7 +46,7 @@ $slidesTable->setHeader([
 foreach ($this->data['slides'] as $slide) {
 	$slidesTable->addRow([
 		new CCheckBox('shows['.$slide['slideshowid'].']', null, null, $slide['slideshowid']),
-		new CLink($slide['name'], '?form=update&slideshowid='.$slide['slideshowid'], 'action'),
+		(new CLink($slide['name'], '?form=update&slideshowid='.$slide['slideshowid']))->addClass('action'),
 		convertUnitsS($slide['delay']),
 		$slide['cnt']
 	]);

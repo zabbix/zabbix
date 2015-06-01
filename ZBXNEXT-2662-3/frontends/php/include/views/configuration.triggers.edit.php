@@ -225,7 +225,7 @@ if ($this->data['input_method'] == IM_TREE) {
 		BR(),
 		(new CDiv([$expressionTable, $testButton]))
 			->addClass('objectgroup')
-			->addCLass('inlineblock')
+			->addClass('inlineblock')
 			->addClass('border_dotted')
 	]);
 
@@ -278,10 +278,8 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 	);
 
 	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$description = new CLink($depTriggerDescription,
-			'triggers.php?form=update&triggerid='.$dependency['triggerid']
-		);
-		$description->setAttribute('target', '_blank');
+		$description = (new CLink($depTriggerDescription, 'triggers.php?form=update&triggerid='.$dependency['triggerid']))
+			->setAttribute('target', '_blank');
 	}
 	else {
 		$description = $depTriggerDescription;

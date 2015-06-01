@@ -59,7 +59,9 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	$name = [];
 	if ($hostPrototype['templateid']) {
 		$sourceTemplate = $hostPrototype['sourceTemplate'];
-		$name[] = new CLink($sourceTemplate['name'], '?parent_discoveryid='.$hostPrototype['sourceDiscoveryRuleId'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
+		$name[] = (new CLink($sourceTemplate['name'], '?parent_discoveryid='.$hostPrototype['sourceDiscoveryRuleId']))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_GREY);
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($hostPrototype['name'], '?form=update&parent_discoveryid='.$discoveryRule['itemid'].'&hostid='.$hostPrototype['hostid']);
@@ -75,7 +77,9 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		foreach ($hostPrototype['templates'] as $template) {
 
 			$caption = [];
-			$caption[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
+			$caption[] = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
 
 			$linkedTemplates = $this->data['linkedTemplates'][$template['templateid']]['parentTemplates'];
 			if ($linkedTemplates) {
@@ -83,7 +87,9 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 				$caption[] = ' (';
 				foreach ($linkedTemplates as $tpl) {
-					$caption[] = new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
+					$caption[] = (new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid']))
+						->addClass(ZBX_STYLE_LINK_ALT)
+						->addClass(ZBX_STYLE_GREY);
 					$caption[] = ', ';
 				}
 				array_pop($caption);
@@ -101,15 +107,15 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	}
 
 	// status
-	$status = new CLink(item_status2str($hostPrototype['status']),
+	$status = (new CLink(item_status2str($hostPrototype['status']),
 		'?group_hostid='.$hostPrototype['hostid'].
 			'&parent_discoveryid='.$discoveryRule['itemid'].
 			'&action='.($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED
 				? 'hostprototype.massenable'
 				: 'hostprototype.massdisable'
-			),
-		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($hostPrototype['status'])
-	);
+			)))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(itemIndicatorStyle($hostPrototype['status']));
 
 	$hostTable->addRow([
 		new CCheckBox('group_hostid['.$hostPrototype['hostid'].']', null, null, $hostPrototype['hostid']),

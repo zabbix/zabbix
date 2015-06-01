@@ -85,11 +85,11 @@ foreach ($this->data['triggers'] as $trigger) {
 			$tpl_disc_ruleid = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'],
 				$real_host['hostid']
 			);
-			$description[] = new CLink(
+			$description[] = (new CLink(
 				CHtml::encode($real_host['name']),
-				'trigger_prototypes.php?parent_discoveryid='.$tpl_disc_ruleid,
-				ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY
-			);
+				'trigger_prototypes.php?parent_discoveryid='.$tpl_disc_ruleid))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_GREY);
 
 			$description[] = NAME_DELIMITER;
 		}
@@ -115,19 +115,17 @@ foreach ($this->data['triggers'] as $trigger) {
 			);
 
 			if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$triggerDependencies[] = new CLink(
+				$triggerDependencies[] = (new CLink(
 					$depTriggerDescription,
 					'trigger_prototypes.php?form=update'.url_param('parent_discoveryid').
-						'&triggerid='.$depTrigger['triggerid'],
-					triggerIndicatorStyle($depTrigger['status'])
-				);
+						'&triggerid='.$depTrigger['triggerid']))
+					->addClass(triggerIndicatorStyle($depTrigger['status']));
 			}
 			elseif ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				$triggerDependencies[] = new CLink(
+				$triggerDependencies[] = (new CLink(
 					$depTriggerDescription,
-					'triggers.php?form=update&triggerid='.$depTrigger['triggerid'],
-					triggerIndicatorStyle($depTrigger['status'])
-				);
+					'triggers.php?form=update&triggerid='.$depTrigger['triggerid']))
+					->addClass(triggerIndicatorStyle($depTrigger['status']));
 			}
 
 			$triggerDependencies[] = BR();
@@ -138,7 +136,7 @@ foreach ($this->data['triggers'] as $trigger) {
 	}
 
 	// status
-	$status = new CLink(
+	$status = (new CLink(
 		triggerIndicator($trigger['status']),
 		'trigger_prototypes.php?'.
 			'action='.($trigger['status'] == TRIGGER_STATUS_DISABLED
@@ -146,9 +144,9 @@ foreach ($this->data['triggers'] as $trigger) {
 				: 'triggerprototype.massdisable'
 			).
 			'&g_triggerid='.$triggerid.
-			'&parent_discoveryid='.$this->data['parent_discoveryid'],
-		ZBX_STYLE_LINK_ACTION.' '.triggerIndicatorStyle($trigger['status'])
-	);
+			'&parent_discoveryid='.$this->data['parent_discoveryid']))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(triggerIndicatorStyle($trigger['status']));
 
 	// checkbox
 	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', null, null, $triggerid);

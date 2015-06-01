@@ -651,25 +651,27 @@ foreach ($triggers as $trigger) {
 		if ($trigger['hasEvents']) {
 			if ($trigger['event_count']) {
 				$ackColumn = new CCol([
-					new CLink(
+					(new CLink(
 						_('No'),
 						'acknow.php?'.
 							'triggers[]='.$trigger['triggerid'].
-							'&backurl='.$page['file'],
-						ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED
-					), CViewHelper::showNum($trigger['event_count'])
+							'&backurl='.$page['file']))
+						->addClass(ZBX_STYLE_LINK_ALT)
+						->addClass(ZBX_STYLE_RED),
+					CViewHelper::showNum($trigger['event_count'])
 				]);
 			}
 			else {
 				$ackColumn = new CCol(
-					new CLink(
+					(new CLink(
 						_('Yes'),
 						'acknow.php?'.
 							'eventid='.$trigger['lastEvent']['eventid'].
 							'&triggerid='.$trigger['lastEvent']['objectid'].
-							'&backurl='.$page['file'],
-						ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN
-				));
+							'&backurl='.$page['file']))
+						->addClass(ZBX_STYLE_LINK_ALT)
+						->addClass(ZBX_STYLE_GREEN)
+				);
 			}
 		}
 		else {

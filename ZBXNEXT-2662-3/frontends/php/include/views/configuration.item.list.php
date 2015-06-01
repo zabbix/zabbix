@@ -77,20 +77,20 @@ foreach ($this->data['items'] as $item) {
 	// description
 	$description = [];
 	if (!empty($item['template_host'])) {
-		$description[] = new CLink(
+		$description[] = (new CLink(
 			CHtml::encode($item['template_host']['name']),
-			'?hostid='.$item['template_host']['hostid'].'&filter_set=1',
-			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY
-		);
+			'?hostid='.$item['template_host']['hostid'].'&filter_set=1'))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}
 
 	if (!empty($item['discoveryRule'])) {
-		$description[] = new CLink(
+		$description[] = (new CLink(
 			CHtml::encode($item['discoveryRule']['name']),
-			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'],
-			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_ORANGE
-		);
+			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid']))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
 		$description[] = NAME_DELIMITER.$item['name_expanded'];
 	}
 	else {
@@ -101,13 +101,14 @@ foreach ($this->data['items'] as $item) {
 	}
 
 	// status
-	$status = new CCol(new CLink(
+	$status = new CCol((new CLink(
 		itemIndicator($item['status'], $item['state']),
 		'?group_itemid='.$item['itemid'].
 			'&hostid='.$item['hostid'].
-			'&action='.($item['status'] == ITEM_STATUS_DISABLED ? 'item.massenable' : 'item.massdisable'),
-		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($item['status'], $item['state'])
-	));
+			'&action='.($item['status'] == ITEM_STATUS_DISABLED ? 'item.massenable' : 'item.massdisable')))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(itemIndicatorStyle($item['status'], $item['state']))
+	);
 
 	// info
 	if ($data['showInfoColumn']) {
@@ -171,11 +172,10 @@ foreach ($this->data['items'] as $item) {
 			}
 			else {
 				$realHost = reset($this->data['triggerRealHosts'][$trigger['triggerid']]);
-				$triggerDescription[] = new CLink(
+				$triggerDescription[] = (new CLink(
 					CHtml::encode($realHost['name']),
-					'triggers.php?hostid='.$realHost['hostid'],
-					ZBX_STYLE_GREY
-				);
+					'triggers.php?hostid='.$realHost['hostid']))
+					->addClass(ZBX_STYLE_GREY);
 				$triggerDescription[] = ':';
 			}
 		}

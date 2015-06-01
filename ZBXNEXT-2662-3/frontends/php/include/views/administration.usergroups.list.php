@@ -50,8 +50,12 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 	$userGroupId = $usrgrp['usrgrpid'];
 
 	$debugMode = ($usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
-		? new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisabledebug&usrgrpid='.$userGroupId, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_ORANGE)
-		: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenabledebug&usrgrpid='.$userGroupId, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN);
+		? (new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisabledebug&usrgrpid='.$userGroupId))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(ZBX_STYLE_ORANGE)
+		: (new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenabledebug&usrgrpid='.$userGroupId))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(ZBX_STYLE_GREEN);
 
 	// gui access
 	$guiAccess = user_auth_type2str($usrgrp['gui_access']);
@@ -68,15 +72,16 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 			? GROUP_GUI_ACCESS_SYSTEM
 			: $usrgrp['gui_access'] + 1;
 
-		$guiAccess = new CLink(
-			$guiAccess,
-			'usergrps.php?action=usergroup.set_gui_access&set_gui_access='.$nextGuiAuth.'&usrgrpid='.$userGroupId,
-			$guiAccessStyle
-		);
+		$guiAccess = (new CLink($guiAccess, 'usergrps.php?action=usergroup.set_gui_access&set_gui_access='.$nextGuiAuth.'&usrgrpid='.$userGroupId))
+			->addClass($guiAccessStyle);
 
 		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
-			? new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisable&usrgrpid='.$userGroupId, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN)
-			: new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenable&usrgrpid='.$userGroupId, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
+			? (new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisable&usrgrpid='.$userGroupId))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_GREEN)
+			: (new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenable&usrgrpid='.$userGroupId))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_RED);
 	}
 	else {
 		$guiAccess = (new CSpan($guiAccess))->addClass($guiAccessStyle);
@@ -105,11 +110,11 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 				$users[] = ', ';
 			}
 
-			$users[] = new CLink(getUserFullname($user),
-				'users.php?form=update&userid='.$user['userid'],
-				($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $user['users_status'] == GROUP_STATUS_DISABLED)
-					? ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED : ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN
-			);
+			$users[] = (new CLink(getUserFullname($user), 'users.php?form=update&userid='.$user['userid']))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $user['users_status'] == GROUP_STATUS_DISABLED
+						? ZBX_STYLE_RED
+						: ZBX_STYLE_GREEN);
 		}
 	}
 

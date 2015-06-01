@@ -437,8 +437,8 @@ $valueMapsComboBox->addItem(0, _('As is'));
 foreach ($this->data['valuemaps'] as $valuemap) {
 	$valueMapsComboBox->addItem($valuemap['valuemapid'], $valuemap['name']);
 }
-$valueMapLink = new CLink(_('show value mappings'), 'adm.valuemapping.php');
-$valueMapLink->setAttribute('target', '_blank');
+$valueMapLink = (new CLink(_('show value mappings'), 'adm.valuemapping.php'))
+	->setAttribute('target', '_blank');
 
 $itemFormList->addRow(
 	[
