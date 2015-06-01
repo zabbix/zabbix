@@ -89,12 +89,11 @@
 			}
 			$url->removeArgument('sid');
 
+			$sub_menu_item = (new CLink($sub_page['menu_text'], $url->getUrl()))->removeSID();
 			if ($sub_page['selected']) {
-				$sub_menu_item = (new CLink($sub_page['menu_text'], $url->getUrl()))->addClass('selected');
+				$sub_menu_item->addClass('selected');
 			}
-			else {
-				$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl());
-			}
+
 			$sub_menu_row->addItem($sub_menu_item);
 		}
 

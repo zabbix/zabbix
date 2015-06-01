@@ -21,51 +21,46 @@
 
 class CLink extends CTag {
 
-	protected $sid = null;
-	private	$usesid = true;
+	private	$use_sid = true;
+	private $url = null;
 
 	public function __construct($item = null, $url = null) {
 		parent::__construct('a', 'yes');
 
-		if (!is_null($item)) {
+		if ($item !== null) {
 			$this->addItem($item);
 		}
-		if (!is_null($url)) {
-			$this->setUrl($url);
-		}
-	}
-
-	private function setUrl($value) {
-		if ($this->usesid) {
-			if (is_null($this->sid)) {
-				$this->sid = isset($_COOKIE['zbx_sessionid']) ? substr($_COOKIE['zbx_sessionid'], 16, 16) : null;
-			}
-			if (!is_null($this->sid)) {
-				$value .= (strpos($value, '&') !== false || strpos($value, '?') !== false)
-					? '&sid='.$this->sid
-					: '?sid='.$this->sid;
-			}
-			$url = $value;
-		}
-		else {
-			$url = $value;
-		}
-		$this->setAttribute('href', $url);
+		$this->url = $url;
 	}
 
 	public function removeSID() {
-		$this->usesid  = false;
+		$this->use_sid = false;
 
 		return $this;
 	}
 
-	public function getUrl() {
-		return isset($this->attributes['href']) ? $this->attributes['href'] : null;
+	private function getUrl() {
+		$url = $this->url;
+
+		if ($this->use_sid) {
+			if (array_key_exists('zbx_sessionid', $_COOKIE)) {
+				$url .= (strpos($url, '&') !== false || strpos($url, '?') !== false) ? '&' : '?';
+				$url .= 'sid='.substr($_COOKIE['zbx_sessionid'], 16, 16);
+			}
+		}
+
+		return $url;
 	}
 
 	public function setTarget($value = null) {
 		$this->attributes['target'] = $value;
 
 		return $this;
+	}
+
+	public function toString($destroy = true) {
+		$this->setAttribute('href', $this->getUrl());
+
+		return parent::toString($destroy);
 	}
 }
