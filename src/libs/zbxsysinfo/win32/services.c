@@ -23,9 +23,10 @@
 #include "zbxjson.h"
 
 const DWORD	service_states[7] = {SERVICE_RUNNING, SERVICE_PAUSED, SERVICE_START_PENDING, SERVICE_PAUSE_PENDING,
-	SERVICE_CONTINUE_PENDING, SERVICE_STOP_PENDING, SERVICE_STOPPED}, service_types[4] = {SERVICE_KERNEL_DRIVER,
-	SERVICE_FILE_SYSTEM_DRIVER, SERVICE_WIN32_SHARE_PROCESS, SERVICE_WIN32_OWN_PROCESS}, start_types[5] =
-	{SERVICE_BOOT_START, SERVICE_SYSTEM_START, SERVICE_AUTO_START, SERVICE_DEMAND_START, SERVICE_DISABLED};
+	SERVICE_CONTINUE_PENDING, SERVICE_STOP_PENDING, SERVICE_STOPPED}, service_types[5] = {SERVICE_KERNEL_DRIVER,
+	SERVICE_FILE_SYSTEM_DRIVER, SERVICE_WIN32_SHARE_PROCESS, SERVICE_WIN32_OWN_PROCESS,
+	SERVICE_INTERACTIVE_PROCESS}, start_types[5] = {SERVICE_BOOT_START, SERVICE_SYSTEM_START, SERVICE_AUTO_START,
+	SERVICE_DEMAND_START, SERVICE_DISABLED};
 
 int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -52,31 +53,8 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			SC_HANDLE	h_srv;
 
-			if (NULL == (h_srv = OpenService(h_mgr, ssp[i].lpServiceName,
-					SERVICE_QUERY_STATUS | SERVICE_QUERY_CONFIG)))
-			{
+			if (NULL == (h_srv = OpenService(h_mgr, ssp[i].lpServiceName, SERVICE_QUERY_CONFIG)))
 				continue;
-			}
-
-			zbx_json_addobject(&j, NULL);
-
-			utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
-			zbx_json_addstring(&j, "{#SERVICE.NAME}", utf8, ZBX_JSON_TYPE_STRING);
-			zbx_free(utf8);
-
-			utf8 = zbx_unicode_to_utf8(ssp[i].lpDisplayName);
-			zbx_json_addstring(&j, "{#SERVICE.DISPLAYNAME}", utf8, ZBX_JSON_TYPE_STRING);
-			zbx_free(utf8);
-
-			for (k = 0; k < 4 && ssp[i].ServiceStatusProcess.dwServiceType != service_types[k]; k++)
-				;
-
-			zbx_json_adduint64(&j, "{#SERVICE.TYPE}", k);
-
-			for (k = 0; k < 7 && ssp[i].ServiceStatusProcess.dwCurrentState != service_states[k]; k++)
-				;
-
-			zbx_json_adduint64(&j, "{#SERVICE.STATE}", k);
 
 			QueryServiceConfig(h_srv, qsc, 0, &sz);
 
@@ -86,6 +64,30 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 				if (0 != QueryServiceConfig(h_srv, qsc, sz, &sz))
 				{
+					DWORD	service_type, current_state;
+
+					zbx_json_addobject(&j, NULL);
+
+					service_type = ssp[i].ServiceStatusProcess.dwServiceType;
+					for (k = 0; k < 5 && service_type != service_types[k]; k++)
+						;
+
+					zbx_json_adduint64(&j, "{#SERVICE.TYPE}", k);
+
+					current_state = ssp[i].ServiceStatusProcess.dwCurrentState;
+					for (k = 0; k < 7 && current_state != service_states[k]; k++)
+						;
+
+					zbx_json_adduint64(&j, "{#SERVICE.STATE}", k);
+
+					utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
+					zbx_json_addstring(&j, "{#SERVICE.NAME}", utf8, ZBX_JSON_TYPE_STRING);
+					zbx_free(utf8);
+
+					utf8 = zbx_unicode_to_utf8(ssp[i].lpDisplayName);
+					zbx_json_addstring(&j, "{#SERVICE.DISPLAYNAME}", utf8, ZBX_JSON_TYPE_STRING);
+					zbx_free(utf8);
+
 					utf8 = zbx_unicode_to_utf8(qsc->lpBinaryPathName);
 					zbx_json_addstring(&j, "{#SERVICE.PATH}", utf8, ZBX_JSON_TYPE_STRING);
 					zbx_free(utf8);
@@ -94,22 +96,16 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 					zbx_json_addstring(&j, "{#SERVICE.USER}", utf8, ZBX_JSON_TYPE_STRING);
 					zbx_free(utf8);
 
-					for (k = 0; k < 5 && qsc->dwStartType != service_states[k]; k++)
+					for (k = 0; k < 5 && qsc->dwStartType != start_types[k]; k++)
 						;
 
 					zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", k);
-				}
-				else
-				{
-					zbx_json_addstring(&j, "{#SERVICE.PATH}", "unknown", ZBX_JSON_TYPE_STRING);
-					zbx_json_addstring(&j, "{#SERVICE.USER}", "unknown", ZBX_JSON_TYPE_STRING);
-					zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", 5);
+
+					zbx_json_close(&j);
 				}
 
 				zbx_free(qsc);
 			}
-
-			zbx_json_close(&j);
 
 			CloseServiceHandle(h_srv);
 		}
@@ -142,6 +138,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_SRV_PARAM_PATH		0x03
 #define ZBX_SRV_PARAM_USER		0x04
 #define ZBX_SRV_PARAM_STARTUP		0x05
+#define ZBX_SRV_PARAM_TYPE		0x06
 
 int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -179,6 +176,8 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 		param_type = ZBX_SRV_PARAM_USER;
 	else if (0 == strcmp(param, "startup"))
 		param_type = ZBX_SRV_PARAM_STARTUP;
+	else if (0 == strcmp(param, "type"))
+		param_type = ZBX_SRV_PARAM_TYPE;
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -255,7 +254,16 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 				SET_STR_RESULT(result, zbx_unicode_to_utf8(qsc->lpServiceStartName));
 				break;
 			case ZBX_SRV_PARAM_STARTUP:
-				SET_UI64_RESULT(result, qsc->dwStartType);
+				for (i = 0; i < 5 && qsc->dwStartType != start_types[i]; i++)
+					;
+
+				SET_UI64_RESULT(result, i);
+				break;
+			case ZBX_SRV_PARAM_TYPE:
+				for (i = 0; i < 5 && qsc->dwServiceType != service_types[i]; i++)
+					;
+
+				SET_UI64_RESULT(result, i);
 				break;
 		}
 
