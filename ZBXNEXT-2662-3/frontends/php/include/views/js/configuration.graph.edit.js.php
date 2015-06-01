@@ -10,7 +10,7 @@
 		<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
 		<?php if ($this->data['graphtype'] != GRAPH_TYPE_PIE && $this->data['graphtype'] != GRAPH_TYPE_EXPLODED): ?>
 			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
-		<?php endif; ?>
+		<?php endif ?>
 	</td>
 
 	<!-- row number -->
@@ -31,7 +31,7 @@
 				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
 			</select>
 		</td>
-	<?php endif; ?>
+	<?php endif ?>
 
 	<!-- function -->
 	<td>
@@ -44,11 +44,11 @@
 		<?php else: ?>
 			<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
 				<option value="<?= CALC_FNC_ALL ?>"><?= _('all') ?></option>
-			<?php endif; ?>
+			<?php endif ?>
 				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
 				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
 				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
-		<?php endif; ?>
+		<?php endif ?>
 		</select>
 	</td>
 
@@ -58,12 +58,12 @@
 			<select id="items_#{number}_drawtype" name="items[#{number}][drawtype]" class="input select">
 			<?php foreach (graph_item_drawtypes() as $drawtype): ?>
 				<option value="<?= $drawtype ?>"><?= graph_item_drawtype2str($drawtype) ?></option>
-			<?php endforeach; ?>
+			<?php endforeach ?>
 			</select>
 		</td>
 	<?php else: ?>
 		<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
-	<?php endif; ?>
+	<?php endif ?>
 
 	<!-- yaxisside -->
 	<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED): ?>
@@ -75,12 +75,11 @@
 		</td>
 	<?php else: ?>
 		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
-	<?php endif; ?>
+	<?php endif ?>
 	<td>
 		<input type="text" id="items_#{number}_color" name="items[#{number}][color]" class="input text colorpicker"
 			onchange="javascript: set_color_by_name('items_#{number}_color', this.value);" maxlength="6" size="7" value="">
-		<div id="lbl_items_#{number}_color" name="lbl_items[#{number}][color]" title="#" class="pointer colorpickerLabel"
-			onclick="javascript: show_color_picker('items_#{number}_color');">&nbsp;&nbsp;&nbsp;</div>
+		<div id="lbl_items_#{number}_color" onclick="javascript: show_color_picker('items_#{number}_color');">&nbsp;&nbsp;&nbsp;</div>
 	</td>
 	<td>
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
@@ -327,7 +326,7 @@
 				<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
 					src += '&percent_left=' + $('#percent_left').val()
 							+ '&percent_right=' + $('#percent_right').val();
-				<?php endif; ?>
+				<?php endif ?>
 
 				src += '&ymin_type=' + $('#ymin_type').val()
 							+ '&ymax_type=' + $('#ymax_type').val()
@@ -337,7 +336,7 @@
 							+ '&ymax_itemid=' + $('#ymax_itemid').val()
 							+ '&showworkperiod=' + ($('#show_work_period').is(':checked') ? 1 : 0)
 							+ '&showtriggers=' + ($('#show_triggers').is(':checked') ? 1 : 0);
-			<?php endif; ?>
+			<?php endif ?>
 
 			$('#itemsTable tr.sortable').find('*[name]').each(function(index, value) {
 				if (!$.isEmptyObject(value) && value.name != null) {
@@ -372,7 +371,7 @@
 				$('#lbl_items_' + i + '_color').removeAttr('onclick');
 				$('#lbl_items_' + i + '_color').attr('class', 'colorpickerLabel');
 			}
-		<?php endif; ?>
+		<?php endif ?>
 
 		// Y axis min clean unused fields
 		$('#ymin_type').change(function() {
