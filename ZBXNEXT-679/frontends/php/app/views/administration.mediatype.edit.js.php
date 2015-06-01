@@ -4,16 +4,20 @@
 		jQuery('#type').change(function() {
 			switch (jQuery(this).val()) {
 				case '<?php echo MEDIA_TYPE_EMAIL; ?>':
-					jQuery('#smtp_server, #smtp_helo, #smtp_email').closest('li').show();
-					jQuery('#exec_path, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #passwd')
+					jQuery('#smtp_server, #smtp_helo, #smtp_email, #smtp_verify_peer, #smtp_verify_host, #smtp_username').closest('li').show();
+					jQuery('#exec_path, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit')
 						.closest('li')
 						.hide();
 					jQuery('#eztext_link').hide();
+
+					// radio buttons actions
+					securityOptions();
+					authenticationOptions();
 					break;
 
 				case '<?php echo MEDIA_TYPE_EXEC; ?>':
 					jQuery('#exec_path').closest('li').show();
-					jQuery('#smtp_server, #smtp_helo, #smtp_email, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #passwd')
+					jQuery('#smtp_server, #smtp_helo, #smtp_email, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username')
 						.closest('li')
 						.hide();
 					jQuery('#eztext_link').hide();
@@ -21,7 +25,7 @@
 
 				case '<?php echo MEDIA_TYPE_SMS; ?>':
 					jQuery('#gsm_modem').closest('li').show();
-					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #jabber_username, #eztext_username, #eztext_limit, #passwd')
+					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #jabber_username, #eztext_username, #eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username')
 						.closest('li')
 						.hide();
 					jQuery('#eztext_link').hide();
@@ -29,7 +33,7 @@
 
 				case '<?php echo MEDIA_TYPE_JABBER; ?>':
 					jQuery('#jabber_username, #passwd').closest('li').show();
-					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #eztext_username, #eztext_limit')
+					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #eztext_username, #eztext_limit, #smtp_verify_peer, #smtp_verify_host, #smtp_username')
 						.closest('li')
 						.hide();
 					jQuery('#eztext_link').hide();
@@ -38,7 +42,7 @@
 				case '<?php echo MEDIA_TYPE_EZ_TEXTING; ?>':
 					jQuery('#eztext_username, #eztext_limit, #passwd').closest('li').show();
 					jQuery('#eztext_link').show();
-					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #jabber_username')
+					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #jabber_username, #smtp_verify_peer, #smtp_verify_host, #smtp_username')
 						.closest('li')
 						.hide();
 					break;
@@ -63,9 +67,37 @@
 			jQuery('#gsm_modem').val(jQuery.trim(jQuery('#gsm_modem').val()));
 			jQuery('#jabber_username').val(jQuery.trim(jQuery('#jabber_username').val()));
 			jQuery('#eztext_username').val(jQuery.trim(jQuery('#eztext_username').val()));
+			jQuery('#smtp_port').val(jQuery.trim(jQuery('#smtp_port').val()));
+			jQuery('#smtp_username').val(jQuery.trim(jQuery('#smtp_username').val()));
 		});
 
 		// refresh field visibility on document load
 		jQuery('#type').trigger('change');
+
+		jQuery('input[name=smtp_security]').change(function() {
+			securityOptions();
+		});
+
+		jQuery('input[name=smtp_authentication]').change(function() {
+			authenticationOptions();
+		});
+
+		function securityOptions() {
+			if (jQuery('input[name=smtp_security]:checked').val() == <?= SMTP_CONNECTION_SECURITY_NONE ?>) {
+				jQuery('#smtp_verify_peer, #smtp_verify_host').prop('checked', false).prop('disabled', true);
+			}
+			else {
+				jQuery('#smtp_verify_peer, #smtp_verify_host').prop('disabled', false);
+			}
+		}
+
+		function authenticationOptions() {
+			if (jQuery('input[name=smtp_authentication]:checked').val() == <?= SMTP_AUTHENTICATION_NORMAL ?>) {
+				jQuery('#smtp_username, #passwd').prop('disabled', false);
+			}
+			else {
+				jQuery('#smtp_username, #passwd').val('').prop('disabled', true);
+			}
+		}
 	});
 </script>
