@@ -989,12 +989,12 @@ int main(void)
 	p2 = dlsym(RTLD_DEFAULT, "uname{20040821}");
 
 	if (p1 != p2)
-		return -1;
+		return 1;
 
 	/* uname() fails with EFAULT on HP-UX systems that were only partially upgraded to this API level */
 
 	struct utsname	name;
-	return uname(&name);
+	return -1 == uname(&name) ? 1 : 0;
 }
 ],
 	CFLAGS="-D_HPUX_API_LEVEL=20040821 $saved_CFLAGS"
