@@ -251,11 +251,11 @@ if ($this->data['parent_discoveryid']) {
 			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");'
 	))->addClass(ZBX_STYLE_BTN_LINK);
 }
-$itemsTable->addRow(new CRow(
-	(new CCol([$addButton, SPACE, SPACE, SPACE, $addPrototypeButton]))->setColSpan(8),
-	null,
-	'itemButtonsRow'
-));
+$itemsTable->addRow(
+	(new CRow(
+		(new CCol([$addButton, SPACE, SPACE, SPACE, $addPrototypeButton]))->setColSpan(8)
+	))->setId('itemButtonsRow')
+);
 
 foreach ($this->data['items'] as $n => $item) {
 	$name = $item['host'].NAME_DELIMITER.$item['name_expanded'];
