@@ -339,7 +339,7 @@ static size_t	smtp_provide_payload(void *buffer, size_t size, size_t nmemb, void
 	return current_len;
 }
 
-#if defined(HAVE_LIBCURL) && 0x072200 <= LIBCURL_VERSION_NUM	/* version 7.34.0 */
+#ifdef HAVE_SMTP_AUTHENTICATION
 static int	smtp_debug_function(CURL *easyhandle, curl_infotype type, char *data, size_t size, void *userptr)
 {
 	const char	labels[3] = {'*', '<', '>'};
@@ -549,7 +549,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		unsigned char smtp_authentication, const char *username, const char *password, int timeout,
 		char *error, size_t max_error_len)
 {
-#if defined(HAVE_LIBCURL) && 0x072200 <= LIBCURL_VERSION_NUM	/* version 7.34.0, required for CURLOPT_LOGIN_OPTIONS */
+#ifdef HAVE_SMTP_AUTHENTICATION
 	int			err, ret = FAIL;
 	CURL            	*easyhandle;
 	char			url[MAX_STRING_LEN], errbuf[CURL_ERROR_SIZE];
