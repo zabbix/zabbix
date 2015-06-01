@@ -31,7 +31,9 @@ class CColor extends CObject {
 		$txt->onChange('set_color_by_name("'.$name.'", this.value)');
 		$txt->addStyle('style', 'margin-top: 0px; margin-bottom: 0px;');
 
-		$lbl = new CColorCell('lbl_'.$name, $value, 'javascript: show_color_picker("'.$name.'")');
+		$lbl = (new CColorCell('lbl_'.$name, $value))
+			->setTitle('#'.$value)
+			->onClick('javascript: show_color_picker("'.$name.'")');
 
 		$this->addItem([$txt, $lbl]);
 

@@ -564,7 +564,7 @@ function create_color_picker() {
 	}
 
 	color_picker = document.createElement('div');
-	color_picker.setAttribute('id', 'color_picker');
+	color_picker.setAttribute('class', 'overlay-dialogue');
 	color_picker.innerHTML = color_table;
 	document.body.appendChild(color_picker);
 	hide_color_picker();
