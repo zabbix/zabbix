@@ -1515,13 +1515,15 @@ function getPagingLine(&$items, $sortorder) {
 
 	if ($currentPage > 1) {
 		$url->setArgument('page', $currentPage - 1);
-		$tags[] = (new CLink((new CSpan())->addClass('arrow-left'), $url->getUrl()))->removeSID();
+		$tags[] = (new CLink(
+			(new CSpan())->addClass('arrow-left'), $url->getUrl()
+		))->removeSID();
 	}
 
 	for ($p = $startPage; $p <= $endPage; $p++) {
 		$url->setArgument('page', $p);
 		$tags[] = (new CLink($p, $url->getUrl()))
-			->addClass($p == $currentPage ? 'paging-selected' : '')
+			->addClass($p == $currentPage ? 'paging-selected' : null)
 			->removeSID();
 	}
 

@@ -642,16 +642,14 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 							$link = (new CSpan($functionData['host'].':'.$functionData['key_']))->addClass($style);
 						}
 						elseif ($functionData['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-							$link = (new CLink(
-								$functionData['host'].':'.$functionData['key_'],
-								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].'&parent_discoveryid='.
-									$trigger['discoveryRuleid']))
+							$link = (new CLink($functionData['host'].':'.$functionData['key_'],
+								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].
+								'&parent_discoveryid='.$trigger['discoveryRuleid']))
 								->addClass(ZBX_STYLE_LINK_ALT)
 								->addClass($style);
 						}
 						else {
-							$link = (new CLink(
-								$functionData['host'].':'.$functionData['key_'],
+							$link = (new CLink($functionData['host'].':'.$functionData['key_'],
 								'items.php?form=update&itemid='.$functionData['itemid']))
 								->addClass(ZBX_STYLE_LINK_ALT)
 								->addClass($style);

@@ -1062,8 +1062,7 @@ function getItemFormData(array $item = [], array $options = []) {
 						$data['templates'][] = (new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']))
 							->addClass('highlight')
 							->addClass('underline')
-							->addClass('weight')
-							->addClass('normal');
+							->addClass('weight_normal');
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// plain item
