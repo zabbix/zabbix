@@ -39,22 +39,28 @@
 	$form->AddItem([$search, $button]);
 	$icons->addItem($form);
 
-	$zshare = new CLink('Share', 'https://share.zabbix.com/', 'top-nav-zbbshare', null, true);
-	$zshare->setAttribute('target', '_blank');
-	$zshare->setAttribute('title', _('Zabbix Share'));
+	$zshare = (new CLink('Share', 'https://share.zabbix.com/'))
+		->addClass('top-nav-zbbshare')
+		->removeSID()
+		->setAttribute('target', '_blank')
+		->setAttribute('title', _('Zabbix Share'));
 	$icons->addItem($zshare);
 
-	$help = new CLink(SPACE, 'http://www.zabbix.com/documentation/', 'top-nav-help', null, true);
-	$help->setAttribute('target', '_blank');
-	$help->setAttribute('title', _('Help'));
+	$help = (new CLink(SPACE, 'http://www.zabbix.com/documentation/'))
+		->addClass('top-nav-help')
+		->removeSID()
+		->setAttribute('target', '_blank')
+		->setAttribute('title', _('Help'));
 	$icons->addItem($help);
 
-	$profile = new CLink(SPACE, 'profile.php', 'top-nav-profile');
-	$profile->setAttribute('title', _('Profile'));
+	$profile = (new CLink(SPACE, 'profile.php'))
+		->addClass('top-nav-profile')
+		->setAttribute('title', _('Profile'));
 	$icons->addItem($profile);
 
-	$signout = new CLink(SPACE, 'index.php?reconnect=1', 'top-nav-signout');
-	$signout->setAttribute('title', _('Sign out'));
+	$signout = (new CLink(SPACE, 'index.php?reconnect=1'))
+		->addClass('top-nav-signout')
+		->setAttribute('title', _('Sign out'));
 	$icons->addItem($signout);
 	$top_menu->addItem($icons);
 
@@ -84,10 +90,10 @@
 			$url->removeArgument('sid');
 
 			if ($sub_page['selected']) {
-				$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl(), 'selected', null, false);
+				$sub_menu_item = (new CLink($sub_page['menu_text'], $url->getUrl()))->addClass('selected');
 			}
 			else {
-				$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl(), null, null, false);
+				$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl());
 			}
 			$sub_menu_row->addItem($sub_menu_item);
 		}

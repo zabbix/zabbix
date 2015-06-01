@@ -315,10 +315,11 @@ if (hasRequest('sform')) {
 
 	$maxId = 0;
 	foreach ($keys as $id => $val) {
-		$del_url = new CLink(_('Delete'), '#', 'action', 'javascript:'.
+		$del_url = (new CLink(_('Delete'), '#'))
+			->addClass('action')
+			->onClick('javascript:'.
 			' if (confirm('.CJs::encodeJson(_('Delete keyword?')).')) remove_keyword("keytr'.$id.'");'.
-			' return false;'
-		);
+			' return false;');
 		$row = new CRow([htmlspecialchars($val['value']), $val['type'], $del_url]);
 		$row->setId('keytr'.$id);
 		$keyTable->addRow($row);

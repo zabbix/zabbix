@@ -69,16 +69,14 @@ foreach ($data['dependencies'] as $dependency) {
 	);
 
 	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-		$description = new CLink($depTriggerDescription,
+		$description = (new CLink($depTriggerDescription,
 			'trigger_prototypes.php?form=update'.url_param('parent_discoveryid').'&triggerid='.$dependency['triggerid']
-		);
-		$description->setAttribute('target', '_blank');
+		))->setAttribute('target', '_blank');
 	}
 	elseif ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$description = new CLink($depTriggerDescription,
+		$description = (new CLink($depTriggerDescription,
 			'triggers.php?form=update&triggerid='.$dependency['triggerid']
-		);
-		$description->setAttribute('target', '_blank');
+		))->setAttribute('target', '_blank');
 	}
 
 	$row = new CRow([$description,

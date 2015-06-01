@@ -140,7 +140,7 @@ elseif (!$allLocalesAvailable) {
 $userFormList->addRow(
 	_('Language'),
 	$languageError
-		? [$languageComboBox, SPACE, (new CSpan($languageError))->addClass('red')->addCLass('wrap')]
+		? [$languageComboBox, SPACE, (new CSpan($languageError))->addClass('red')->addClass('wrap')]
 		: $languageComboBox
 );
 
@@ -178,12 +178,14 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 
 	foreach ($this->data['user_medias'] as $id => $media) {
 		if (!isset($media['active']) || !$media['active']) {
-			$status = new CLink(_('Enabled'), '#', 'enabled');
-			$status->onClick('return create_var("'.$userForm->getName().'","disable_media",'.$id.', true);');
+			$status = (new CLink(_('Enabled'), '#'))
+				->addClass('enabled')
+				->onClick('return create_var("'.$userForm->getName().'","disable_media",'.$id.', true);');
 		}
 		else {
-			$status = new CLink(_('Disabled'), '#', 'disabled');
-			$status->onClick('return create_var("'.$userForm->getName().'","enable_media",'.$id.', true);');
+			$status = (new CLink(_('Disabled'), '#'))
+				->addClass('disabled')
+				->onClick('return create_var("'.$userForm->getName().'","enable_media",'.$id.', true);');
 		}
 
 		$mediaUrl = '?dstfrm='.$userForm->getName().

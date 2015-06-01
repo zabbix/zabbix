@@ -68,7 +68,9 @@ foreach ($this->data['applications'] as $application) {
 		CArrayHelper::sort($application['sourceTemplates'], ['name']);
 
 		foreach ($application['sourceTemplates'] as $template) {
-			$name[] = new CLink($template['name'], 'applications.php?hostid='.$template['hostid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
+			$name[] = (new CLink($template['name'], 'applications.php?hostid='.$template['hostid']))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
 			$name[] = ', ';
 		}
 		array_pop($name);

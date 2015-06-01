@@ -466,7 +466,7 @@ class CScreenBuilder {
 				else {
 					$item = [SPACE];
 					if ($this->mode == SCREEN_MODE_EDIT) {
-						array_push($item, BR(), new CLink(_('Change'), $action, 'empty_change_link'));
+						array_push($item, BR(), (new CLink(_('Change'), $action))->addClass('empty_change_link'));
 					}
 				}
 

@@ -63,23 +63,26 @@ foreach ($data['discoveries'] as $discovery) {
 	if ($discovery['templateid']) {
 		$dbTemplate = get_realhost_by_itemid($discovery['templateid']);
 
-		$description[] = new CLink($dbTemplate['name'], '?hostid='.$dbTemplate['hostid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
+		$description[] = (new CLink($dbTemplate['name'], '?hostid='.$dbTemplate['hostid']))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}
 
 	$description[] = new CLink($discovery['name_expanded'], '?form=update&itemid='.$discovery['itemid']);
 
 	// status
-	$status = new CLink(
+	$status = (new CLink(
 		itemIndicator($discovery['status'], $discovery['state']),
 		'?hostid='.$_REQUEST['hostid'].
 			'&g_hostdruleid='.$discovery['itemid'].
 			'&action='.($discovery['status'] == ITEM_STATUS_DISABLED
 				? 'discoveryrule.massenable'
 				: 'discoveryrule.massdisable'
-			),
-		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($discovery['status'], $discovery['state'])
-	);
+			))
+		)
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']));
 
 	// info
 	if ($data['showInfoColumn']) {

@@ -37,13 +37,14 @@ $servicesParentTable->setHeader([_('Service'), _('Status calculation'), _('Trigg
 $prefix = null;
 
 // root
-$description = new CLink(_('root'), '#', null, 'javascript:
-	jQuery(\'#parent_name\', window.opener.document).val('.zbx_jsvalue(_('root')).');
-	jQuery(\'#parentname\', window.opener.document).val('.zbx_jsvalue(_('root')).');
-	jQuery(\'#parentid\', window.opener.document).val('.zbx_jsvalue(0).');
-	self.close();
-	return false;'
-);
+$description = (new CLink(_('root'), '#'))
+	->onClick('javascript:
+		jQuery(\'#parent_name\', window.opener.document).val('.zbx_jsvalue(_('root')).');
+		jQuery(\'#parentname\', window.opener.document).val('.zbx_jsvalue(_('root')).');
+		jQuery(\'#parentid\', window.opener.document).val('.zbx_jsvalue(0).');
+		self.close();
+		return false;'
+	);
 $servicesParentTable->addRow([
 		[$prefix, $description],
 		_('Note'),

@@ -567,8 +567,9 @@ if ($srctbl == 'usrgrp') {
 	order_result($userGroups, 'name');
 
 	foreach ($userGroups as $userGroup) {
-		$name = new CLink($userGroup['name'], 'javascript:void(0);', null, null, true);
-		$name->setId('spanid'.$userGroup['usrgrpid']);
+		$name = (new CLink($userGroup['name'], 'javascript:void(0);'))
+			->removeSID()
+			->setId('spanid'.$userGroup['usrgrpid']);
 
 		if ($multiselect) {
 			$js_action = "javascript: addValue(".zbx_jsvalue($reference).', '.zbx_jsvalue($userGroup['usrgrpid']).');';
@@ -629,8 +630,9 @@ elseif ($srctbl == 'users') {
 	order_result($users, 'alias');
 
 	foreach ($users as &$user) {
-		$alias = new CLink($user['alias'], 'javascript:void(0);', null, null, true);
-		$alias->setId('spanid'.$user['userid']);
+		$alias = (new CLink($user['alias'], 'javascript:void(0);'))
+			->removeSID()
+			->setId('spanid'.$user['userid']);
 
 		if (isset($srcfld2) && $srcfld2 == 'fullname') {
 			$user[$srcfld2] = getUserFullname($user);
@@ -705,8 +707,9 @@ elseif ($srctbl == 'templates') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($templates as &$template) {
-		$name = new CLink($template['name'], 'javascript:void(0);', null, null, true);
-		$name->setId('spanid'.$template['templateid']);
+		$name = (new CLink($template['name'], 'javascript:void(0);'))
+			->removeSID()
+			->setId('spanid'.$template['templateid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).', '.
 			$parentId.');';
@@ -784,8 +787,9 @@ elseif ($srctbl == 'hosts') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($hosts as &$host) {
-		$name = new CLink($host['name'], 'javascript:void(0);', null, null, true);
-		$name->setId('spanid'.$host['hostid']);
+		$name = (new CLink($host['name'], 'javascript:void(0);'))
+			->removeSID()
+			->setId('spanid'.$host['hostid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
 			$parentId.');';
@@ -864,8 +868,9 @@ elseif ($srctbl == 'host_templates') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($hosts as &$host) {
-		$name = new CLink($host['name'], 'javascript:void(0);', null, null, true);
-		$name->setId('spanid'.$host['hostid']);
+		$name = (new CLink($host['name'], 'javascript:void(0);'))
+			->removeSID()
+			->setId('spanid'.$host['hostid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
 			$parentId.');';
@@ -940,8 +945,9 @@ elseif ($srctbl == 'host_groups') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($hostgroups as &$hostgroup) {
-		$name = new CLink($hostgroup['name'], 'javascript:void(0);', null, null, true);
-		$name->setId('spanid'.$hostgroup['groupid']);
+		$name = (new CLink($hostgroup['name'], 'javascript:void(0);'))
+			->removeSID()
+			->setId('spanid'.$hostgroup['groupid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($hostgroup['groupid']).', '.
 			$parentId.');';
@@ -993,8 +999,9 @@ elseif ($srctbl === 'help_items') {
 	$helpItems = new CHelpItems();
 	foreach ($helpItems->getByType($itemType) as $helpItem) {
 		$action = get_window_opener($dstfrm, $dstfld1, $helpItem[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
-		$name = new CLink($helpItem['key'], 'javascript:void(0);', null, null, true);
-		$name->onClick($action.' close_window(); return false;');
+		$name = (new CLink($helpItem['key'], 'javascript:void(0);'))
+			->removeSID()
+			->onClick($action.' close_window(); return false;');
 		$table->addRow([$name, $helpItem['description']]);
 	}
 	$widget->addItem($table)->show();
@@ -1085,7 +1092,7 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 		$host = reset($trigger['hosts']);
 		$trigger['hostname'] = $host['name'];
 
-		$description = new CLink($trigger['description'], 'javascript:void(0);', null, null, true);
+		$description = (new CLink($trigger['description'], 'javascript:void(0);'))->removeSID();
 		$trigger['description'] = $trigger['hostname'].NAME_DELIMITER.$trigger['description'];
 
 		if ($multiselect) {
@@ -1224,7 +1231,7 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 		$host = reset($item['hosts']);
 		$item['hostname'] = $host['name'];
 
-		$description = new CLink($item['name_expanded'], 'javascript:void(0);', null, null, true);
+		$description = (new CLink($item['name_expanded'], 'javascript:void(0);'))->removeSID();
 		$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name_expanded'];
 
 		if ($multiselect) {
@@ -1324,8 +1331,9 @@ elseif ($srctbl == 'applications') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($apps as &$app) {
-		$name = new CLink($app['name'], 'javascript:void(0);', null, null, true);
-		$name->setId('spanid'.$app['applicationid']);
+		$name = (new CLink($app['name'], 'javascript:void(0);'))
+			->removeSID()
+			->setId('spanid'.$app['applicationid']);
 
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($app['applicationid']).', '.
 			$parentId.');';
@@ -1418,7 +1426,7 @@ elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
 	foreach ($graphs as $graph) {
 		$host = reset($graph['hosts']);
 		$graph['hostname'] = $host['name'];
-		$description = new CLink($graph['name'], 'javascript:void(0);', null, null, true);
+		$description = (new CLink($graph['name'], 'javascript:void(0);'))->removeSID();
 		$graph['name'] = $graph['hostname'].NAME_DELIMITER.$graph['name'];
 
 		if ($multiselect) {
@@ -1504,7 +1512,7 @@ elseif ($srctbl == 'sysmaps') {
 	order_result($sysmaps, 'name');
 
 	foreach ($sysmaps as $sysmap) {
-		$description = new CLink($sysmap['name'], 'javascript:void(0);', null, null, true);
+		$description = (new CLink($sysmap['name'], 'javascript:void(0);'))->removeSID();
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($sysmap['sysmapid']).');';
@@ -1573,7 +1581,7 @@ elseif ($srctbl == 'slides') {
 		}
 		$slideshows[$dbSlideshow['slideshowid']] = $dbSlideshow;
 
-		$name = new CLink($dbSlideshow['name'], 'javascript:void(0);', null, null, true);
+		$name = (new CLink($dbSlideshow['name'], 'javascript:void(0);'))->removeSID();
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($dbSlideshow['slideshowid']).');';
 		}
@@ -1632,7 +1640,7 @@ elseif ($srctbl == 'screens') {
 	order_result($screens, 'name');
 
 	foreach ($screens as $screen) {
-		$name = new CLink($screen['name'], 'javascript:void(0);', null, null, true);
+		$name = (new CLink($screen['name'], 'javascript:void(0);'))->removeSID();
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($screen['screenid']).');';
@@ -1682,7 +1690,7 @@ elseif ($srctbl == 'screens2') {
 			continue;
 		}
 
-		$name = new CLink($screen['name'], 'javascript:void(0);', null, null, true);
+		$name = (new CLink($screen['name'], 'javascript:void(0);'))->removeSID();
 
 		$action = get_window_opener($dstfrm, $dstfld1, $screen[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $screen[$srcfld2]) : '');
 		$name->onClick($action.' close_window(); return false;');
@@ -1706,8 +1714,9 @@ elseif ($srctbl === 'drules') {
 
 	foreach ($dRules as $dRule) {
 		$action = get_window_opener($dstfrm, $dstfld1, $dRule[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $dRule[$srcfld2]) : '');
-		$name = new CLink($dRule['name'], 'javascript:void(0);', null, null, true);
-		$name->onClick($action.' close_window(); return false;');
+		$name = (new CLink($dRule['name'], 'javascript:void(0);'))
+			->removeSID()
+			->onClick($action.' close_window(); return false;');
 		$table->addRow($name);
 	}
 	$widget->addItem($table)->show();
@@ -1731,8 +1740,9 @@ elseif ($srctbl === 'dchecks') {
 			$name = $dRule['name'].NAME_DELIMITER.discovery_check2str($dCheck['type'], $dCheck['key_'], $dCheck['ports']);
 			$action = get_window_opener($dstfrm, $dstfld1, $dCheck[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $name) : '');
-			$name = new CLink($name, 'javascript:void(0);', null, null, true);
-			$name->onClick($action.' close_window(); return false;');
+			$name = (new CLink($name, 'javascript:void(0);'))
+				->removeSID()
+				->onClick($action.' close_window(); return false;');
 			$table->addRow($name);
 		}
 	}
@@ -1754,8 +1764,9 @@ elseif ($srctbl == 'proxies') {
 
 	while ($row = DBfetch($result)) {
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
-		$name = new CLink($row['host'], 'javascript:void(0);', null, null, true);
-		$name->onClick($action.' close_window(); return false;');
+		$name = (new CLink($row['host'], 'javascript:void(0);'))
+			->removeSID()
+			->onClick($action.' close_window(); return false;');
 		$table->addRow($name);
 	}
 	$widget->addItem($table)->show();
@@ -1800,7 +1811,7 @@ elseif ($srctbl == 'scripts') {
 	order_result($scripts, 'name');
 
 	foreach ($scripts as $script) {
-		$description = new CLink($script['name'], 'javascript:void(0);', null, null, true);
+		$description = (new CLink($script['name'], 'javascript:void(0);'))->removeSID();
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($script['scriptid']).');';

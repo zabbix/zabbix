@@ -687,7 +687,9 @@ else {
 				$linkedTemplatesOutput[] = ', ';
 			}
 
-			$linkedTemplatesOutput[] = new CLink($linkedTemplate['name'], $url, ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
+			$linkedTemplatesOutput[] = (new CLink($linkedTemplate['name'], $url))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
 		}
 
 		$i = 0;
@@ -731,7 +733,7 @@ else {
 				$linkedToOutput[] = ', ';
 			}
 
-			$linkedToOutput[] = new CLink($linkedToHost['name'], $url, $style);
+			$linkedToOutput[] = (new CLink($linkedToHost['name'], $url))->addClass($style);
 		}
 
 		$table->addRow([

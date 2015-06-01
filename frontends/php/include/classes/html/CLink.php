@@ -22,28 +22,21 @@
 class CLink extends CTag {
 
 	protected $sid = null;
+	private	$usesid = true;
 
-	public function __construct($item = null, $url = null, $class = null, $action = null, $nosid = null) {
+	public function __construct($item = null, $url = null) {
 		parent::__construct('a', 'yes');
 
-		$this->nosid = $nosid;
-
-		if (!is_null($class)) {
-			$this->addClass($class);
-		}
 		if (!is_null($item)) {
 			$this->addItem($item);
 		}
 		if (!is_null($url)) {
 			$this->setUrl($url);
 		}
-		if (!is_null($action)) {
-			$this->onClick($action);
-		}
 	}
 
 	public function setUrl($value) {
-		if (is_null($this->nosid)) {
+		if ($this->usesid) {
 			if (is_null($this->sid)) {
 				$this->sid = isset($_COOKIE['zbx_sessionid']) ? substr($_COOKIE['zbx_sessionid'], 16, 16) : null;
 			}
@@ -58,6 +51,10 @@ class CLink extends CTag {
 			$url = $value;
 		}
 		$this->setAttribute('href', $url);
+	}
+
+	public function removeSID() {
+		$this->usesid  = false;
 	}
 
 	public function getUrl() {

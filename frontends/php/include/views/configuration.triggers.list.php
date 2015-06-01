@@ -83,22 +83,22 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			$real_hosts = $this->data['realHosts'][$triggerid];
 			$real_host = reset($real_hosts);
 
-			$description[] = new CLink(
+			$description[] = (new CLink(
 				CHtml::encode($real_host['name']),
-				'triggers.php?hostid='.$real_host['hostid'],
-				ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY
-			);
+				'triggers.php?hostid='.$real_host['hostid']))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
 
 			$description[] = NAME_DELIMITER;
 		}
 	}
 
 	if ($trigger['discoveryRule']) {
-		$description[] = new CLink(
+		$description[] = (new CLink(
 			CHtml::encode($trigger['discoveryRule']['name']),
-			'trigger_prototypes.php?parent_discoveryid='.$trigger['discoveryRule']['itemid'],
-			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_ORANGE
-		);
+			'trigger_prototypes.php?parent_discoveryid='.$trigger['discoveryRule']['itemid']))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
 		$description[] = NAME_DELIMITER.$trigger['description'];
 	}
 	else {
@@ -120,11 +120,11 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			);
 
 			if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				$triggerDependencies[] = new CLink(
+				$triggerDependencies[] = (new CLink(
 					$depTriggerDescription,
-					'triggers.php?form=update&triggerid='.$depTrigger['triggerid'],
-					ZBX_STYLE_LINK_ALT.' '.triggerIndicatorStyle($depTrigger['status'])
-				);
+					'triggers.php?form=update&triggerid='.$depTrigger['triggerid']))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(triggerIndicatorStyle($depTrigger['status']));
 			}
 			else {
 				$triggerDependencies[] = $depTriggerDescription;
@@ -155,7 +155,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	}
 
 	// status
-	$status = new CLink(
+	$status = (new CLink(
 		triggerIndicator($trigger['status'], $trigger['state']),
 		'triggers.php?'.
 			'action='.($trigger['status'] == TRIGGER_STATUS_DISABLED
@@ -163,9 +163,9 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				: 'trigger.massdisable'
 			).
 			'&hostid='.$this->data['hostid'].
-			'&g_triggerid='.$triggerid,
-		ZBX_STYLE_LINK_ACTION.' '.triggerIndicatorStyle($trigger['status'], $trigger['state'])
-	);
+			'&g_triggerid='.$triggerid))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']));
 
 	// hosts
 	$hosts = null;

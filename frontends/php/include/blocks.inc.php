@@ -763,7 +763,7 @@ function make_latest_issues(array $filter = []) {
 
 		// description
 		if (!zbx_empty($trigger['url'])) {
-			$description = new CLink($description, $trigger['url'], null, null, true);
+			$description = (new CLink($description, $trigger['url']))->removeSID();
 		}
 		else {
 			$description = (new CSpan($description))->addClass('pointer');

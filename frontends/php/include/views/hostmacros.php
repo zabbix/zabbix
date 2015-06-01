@@ -37,8 +37,8 @@ else {
 	$actions_col = $data['readonly'] ? null : '';
 	if ($data['show_inherited_macros']) {
 		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-			$link = new CLink(_('configure'), 'adm.macros.php');
-			$link->setAttribute('target', '_blank');
+			$link = (new CLink(_('configure'), 'adm.macros.php'))
+				->setAttribute('target', '_blank');
 			$link = [' (', $link, ')'];
 		}
 		else {
@@ -113,11 +113,11 @@ else {
 
 		if ($data['show_inherited_macros']) {
 			if (array_key_exists('template', $macro)) {
-				$link = new CLink(CHtml::encode($macro['template']['name']),
-					'templates.php?form=update&templateid='.$macro['template']['templateid'],
-					'unknown'
-				);
-				$link->setAttribute('target', '_blank');
+				$link = (new CLink(CHtml::encode($macro['template']['name']),
+					'templates.php?form=update&templateid='.$macro['template']['templateid'])
+					)
+					->addClass('unknown')
+					->setAttribute('target', '_blank');
 				$row[] = '&lArr;';
 				$row[] = (new CDiv([$link, NAME_DELIMITER, '"'.$macro['template']['value'].'"']))
 					->addClass('macro-value');

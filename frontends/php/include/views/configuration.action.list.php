@@ -81,16 +81,18 @@ if ($this->data['actions']) {
 		}
 
 		if ($action['status'] == ACTION_STATUS_DISABLED) {
-			$status = new CLink(_('Disabled'),
-				'actionconf.php?action=action.massenable&g_actionid[]='.$action['actionid'].url_param('eventsource'),
-				ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED
-			);
+			$status = (new CLink(_('Disabled'),
+				'actionconf.php?action=action.massenable&g_actionid[]='.$action['actionid'].url_param('eventsource'))
+			)
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_RED);
 		}
 		else {
-			$status = new CLink(_('Enabled'),
-				'actionconf.php?action=action.massdisable&g_actionid[]='.$action['actionid'].url_param('eventsource'),
-				ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN
-			);
+			$status = (new CLink(_('Enabled'),
+				'actionconf.php?action=action.massdisable&g_actionid[]='.$action['actionid'].url_param('eventsource'))
+			)
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_GREEN);
 		}
 
 		$actionTable->addRow([

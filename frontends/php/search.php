@@ -157,7 +157,7 @@ foreach ($hosts as $hnum => $host) {
 
 	if ($admin && isset($rw_hosts[$hostid])) {
 		// host
-		$hostCell = [new CLink($visibleName, 'hosts.php?form=update&'.$link, $style)];
+		$hostCell = [(new CLink($visibleName, 'hosts.php?form=update&'.$link))->addClass($style)];
 
 		$applications_link = [
 			new CLink(_('Applications'), 'applications.php?'.$link),

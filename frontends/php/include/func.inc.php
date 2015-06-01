@@ -1358,7 +1358,7 @@ function zbx_str2links($text) {
 	$start = 0;
 	foreach ($matches[0] as $match) {
 		$result[] = mb_substr($text, $start, $match[1] - $start);
-		$result[] = new CLink($match[0], $match[0], null, null, true);
+		$result[] = (new CLink($match[0], $match[0]))->removeSID();
 		$start = $match[1] + mb_strlen($match[0]);
 	}
 	$result[] = mb_substr($text, $start, mb_strlen($text));
@@ -1510,27 +1510,29 @@ function getPagingLine(&$items, $sortorder) {
 	$url = CUrlFactory::getContextUrl();
 	if ($startPage > 1) {
 		$url->setArgument('page', 1);
-		$tags[] = new CLink(_('First'), $url->getUrl(), null, null, true);
+		$tags[] = (new CLink(_('First'), $url->getUrl()))->removeSID();
 	}
 
 	if ($currentPage > 1) {
 		$url->setArgument('page', $currentPage - 1);
-		$tags[] = new CLink((new CSpan())->addClass('arrow-left'), $url->getUrl(), null, null, true);
+		$tags[] = (new CLink((new CSpan())->addClass('arrow-left'), $url->getUrl()))->removeSID();
 	}
 
 	for ($p = $startPage; $p <= $endPage; $p++) {
 		$url->setArgument('page', $p);
-		$tags[] = new CLink($p, $url->getUrl(), $p == $currentPage ? 'paging-selected' : null, null, true);
+		$tags[] = (new CLink($p, $url->getUrl()))
+			->addClass($p == $currentPage ? 'paging-selected' : '')
+			->removeSID();
 	}
 
 	if ($currentPage < $pagesCount) {
 		$url->setArgument('page', $currentPage + 1);
-		$tags[] = new CLink((new CSpan())->addClass('arrow-right'), $url->getUrl(), null, null, true);
+		$tags[] = (new CLink((new CSpan())->addClass('arrow-right'), $url->getUrl()))->removeSID();
 	}
 
 	if ($p < $pagesCount) {
 		$url->setArgument('page', $pagesCount);
-		$tags[] = new CLink(_('Last'), $url->getUrl(), null, null, true);
+		$tags[] = (new CLink(_('Last'), $url->getUrl()))->removeSID();
 	}
 
 	return (new CDiv($tags))->addClass('table-paging');
@@ -1697,8 +1699,10 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		$msg_details = (new CDiv())->addClass('msg-details');
 
 		if ($title !== null) {
-			$link = new CLink(_('Details'), null, ZBX_STYLE_LINK_ACTION, null, true);
-			$link->onClick('javascript: showHide("msg-messages", IE ? "block" : "");');
+			$link = (new CLink(_('Details')))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->removeSID()
+				->onClick('javascript: showHide("msg-messages", IE ? "block" : "");');
 			$msg_details->addItem($link);
 		}
 

@@ -71,7 +71,9 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 	$name = [];
 	if (isset($this->data['parentTemplates'][$httpTestId])) {
 		$template = $this->data['parentTemplates'][$httpTestId];
-		$name[] = new CLink($template['name'], '?groupid=0&hostid='.$template['id'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
+		$name[] = (new CLink($template['name'], '?groupid=0&hostid='.$template['id']))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_GREY);
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTestId.'&hostid='.$httpTest['hostid']);
@@ -115,16 +117,16 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		httptest_authentications($httpTest['authentication']),
 		($httpTest['http_proxy'] !== '') ? _('Yes') : _('No'),
 		($httpTest['applicationid'] != 0) ? $httpTest['application_name'] : '',
-		new CLink(
+		(new CLink(
 			httptest_status2str($httpTest['status']),
 			'?group_httptestid[]='.$httpTest['httptestid'].
 				'&hostid='.$httpTest['hostid'].
 				'&action='.($httpTest['status'] == HTTPTEST_STATUS_DISABLED
 					? 'httptest.massenable'
 					: 'httptest.massdisable'
-				),
-			ZBX_STYLE_LINK_ACTION.' '.httptest_status2style($httpTest['status'])
-		),
+				)))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(httptest_status2style($httpTest['status'])),
 		$infoIcon
 	]);
 }

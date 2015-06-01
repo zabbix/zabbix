@@ -43,7 +43,8 @@ $servicesChildTable->setHeader([
 
 $prefix = null;
 foreach ($this->data['db_cservices'] as $service) {
-	$description = (new CLink($service['name'], '#', 'service-name'))
+	$description = (new CLink($service['name'], '#'))
+		->addClass('service-name')
 		->setId('service-name-'.$service['serviceid'])
 		->setAttribute('data-name', $service['name'])
 		->setAttribute('data-serviceid', $service['serviceid'])

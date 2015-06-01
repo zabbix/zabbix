@@ -43,7 +43,9 @@ $icon->setMenuPopup(CMenuPopupHelper::getFavouriteGraphs());
 $favouriteGraphs = new CCollapsibleUiWidget(WIDGET_FAVOURITE_GRAPHS, $data['favourite_graphs']);
 $favouriteGraphs->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.state', true);
 $favouriteGraphs->setHeader(_('Favourite graphs'), [$icon]);
-$favouriteGraphs->setFooter(new CList([new CLink(_('Graphs'), 'charts.php', 'highlight')]));
+$favouriteGraphs->setFooter(new CList([
+	(new CLink(_('Graphs'), 'charts.php'))->addClass('highlight')
+]));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.col', 0);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.row', 0);
@@ -59,7 +61,9 @@ $icon->setMenuPopup(CMenuPopupHelper::getFavouriteMaps());
 $favouriteMaps = new CCollapsibleUiWidget(WIDGET_FAVOURITE_MAPS, $data['favourite_maps']);
 $favouriteMaps->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.state', true);
 $favouriteMaps->setHeader(_('Favourite maps'), [$icon]);
-$favouriteMaps->setFooter(new CList([new CLink(_('Maps'), 'zabbix.php?action=map.view', 'highlight')]));
+$favouriteMaps->setFooter(new CList([
+	(new CLink(_('Maps'), 'zabbix.php?action=map.view'))->addClass('highlight')
+]));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.col', 0);
 $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.row', 2);
@@ -80,8 +84,8 @@ $favouriteScreens = new CCollapsibleUiWidget(WIDGET_FAVOURITE_SCREENS, $data['fa
 $favouriteScreens->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.state', true);
 $favouriteScreens->setHeader(_('Favourite screens'), [$icon]);
 $favouriteScreens->setFooter(new CList([
-	new CLink(_('Screens'), 'screens.php', 'highlight'),
-	new CLink(_('Slide shows'), 'slides.php', 'highlight')
+	(new CLink(_('Screens'), 'screens.php'))->addClass('highlight'),
+	(new CLink(_('Slide shows'), 'slides.php'))->addClass('highlight')
 ]));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.col', 0);
