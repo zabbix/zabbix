@@ -249,6 +249,8 @@ class CTag extends CObject {
 
 	public function setTitle($value) {
 		$this->setAttribute('title', $value);
+
+		return $this;
 	}
 
 	public function setId($id) {
