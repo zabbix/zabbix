@@ -67,7 +67,9 @@ foreach ($hostGroups as $hostGroup) {
 	$hostGroupTable->addRow(new CCol([$hostGroupCheckBox, $hostGroup['name']]));
 }
 
-$hostGroupTable->setFooter((new CCol(new CButton('select', _('Select'), 'addGroups("'.$dstfrm.'")')))->addClass('right'));
+$hostGroupTable->setFooter((new CCol(
+	(new CButton('select', _('Select')))->onClick('addGroups("'.$dstfrm.'")')
+))->addClass('right'));
 
 $hostGroupForm->addItem($hostGroupTable);
 $hostGroupForm->show();

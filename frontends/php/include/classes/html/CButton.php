@@ -21,19 +21,14 @@
 
 class CButton extends CTag implements CButtonInterface {
 
-	public function __construct($name = 'button', $caption = '', $action = null, $class = null) {
+	public function __construct($name = 'button', $caption = '') {
 		parent::__construct('button', true, $caption);
 		$this->setAttribute('type', 'button');
 
-		if ($class !== null) {
-			$this->addClass($class);
-		}
 		if ($name !== null) {
 			$this->setId(zbx_formatDomId($name));
 			$this->setAttribute('name', $name);
 		}
-
-		$this->onClick($action);
 	}
 
 	/**

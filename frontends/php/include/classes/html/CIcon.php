@@ -21,14 +21,11 @@
 
 class CIcon extends CSpan {
 
-	public function __construct($title = null, $class) {
+	public function __construct($title = null) {
 		parent::__construct();
 
 		$this->addClass('menu_icon');
 		$this->addClass('shadow');
-		if ($class !== null) {
-			$this->addClass($class);
-		}
 		if ($title !== null) {
 			$this->setAttribute('title', $title);
 		}

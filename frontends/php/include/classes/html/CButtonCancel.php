@@ -21,10 +21,13 @@
 
 class CButtonCancel extends CButton {
 
-	public function __construct($vars = null, $action = null, $class = null) {
-		parent::__construct('cancel', _('Cancel'), $action, $class);
+	public function __construct($vars = null, $action = null) {
+		parent::__construct('cancel', _('Cancel'));
 		if (is_null($action)) {
 			$this->setVars($vars);
+		}
+		if ($action !== null) {
+			$this->onClick($action);
 		}
 	}
 

@@ -125,8 +125,9 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 			$itemListbox->addItem($item['id'], $item['name']);
 		}
 
-		$addItemButton = new CButton('add_log', _('Add'), "return PopUp('popup.php?multiselect=1&real_hosts=1".
-				'&reference=itemid&srctbl=items&value_types[]='.$this->data['value_type']."&srcfld1=itemid');");
+		$addItemButton = (new CButton('add_log', _('Add')))
+			->onClick("return PopUp('popup.php?multiselect=1&real_hosts=1".
+					'&reference=itemid&srctbl=items&value_types[]='.$this->data['value_type']."&srcfld1=itemid');");
 		$deleteItemButton = null;
 
 		if (count($this->data['items']) > 1) {
@@ -224,13 +225,11 @@ else {
 		if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
 
 			$graphType = [
-				new CRadioButton('graphtype', GRAPH_TYPE_NORMAL, null, 'graphtype_'.GRAPH_TYPE_NORMAL,
-					($this->data['graphtype'] == GRAPH_TYPE_NORMAL)
-				),
+				(new CRadioButton('graphtype', GRAPH_TYPE_NORMAL, ($this->data['graphtype'] == GRAPH_TYPE_NORMAL)))
+					->setId('graphtype_'.GRAPH_TYPE_NORMAL),
 				new CLabel(_('Normal'), 'graphtype_'.GRAPH_TYPE_NORMAL),
-				new CRadioButton('graphtype', GRAPH_TYPE_STACKED, null, 'graphtype_'.GRAPH_TYPE_STACKED,
-					($this->data['graphtype'] == GRAPH_TYPE_STACKED)
-				),
+				(new CRadioButton('graphtype', GRAPH_TYPE_STACKED, ($this->data['graphtype'] == GRAPH_TYPE_STACKED)))
+					->setId('graphtype_'.GRAPH_TYPE_STACKED),
 				new CLabel(_('Stacked'), 'graphtype_'.GRAPH_TYPE_STACKED)
 			];
 			$filterColumn1->addRow(_('Graph type'), $graphType);

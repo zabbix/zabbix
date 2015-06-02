@@ -21,21 +21,16 @@
 
 class CInput extends CTag {
 
-	public function __construct($type = 'text', $name = 'textbox', $value = '', $class = null, $id = null) {
+	public function __construct($type = 'text', $name = 'textbox', $value = '') {
 		parent::__construct('input');
 		$this->setType($type);
 
 		// if id is not passed, it will be the same as element name
-		if ($id === null) {
-			$this->setId(zbx_formatDomId($name));
-		}
-		else {
-			$this->setId(zbx_formatDomId($id));
-		}
+		$this->setId(zbx_formatDomId($name));
 		$this->setAttribute('name', $name);
 		$this->setAttribute('value', $value);
-		$class = !is_null($class) ? $class : $type;
-		$this->addClass('input '.$class);
+		$this->addClass($type);
+		$this->addClass('input');
 		return $this;
 	}
 

@@ -24,7 +24,10 @@ $sysmapWidget = (new CWidget())->setTitle(_('Maps'));
 $createForm = (new CForm('get'))->cleanItems();
 $createForm->addItem((new CList())
 	->addItem(new CSubmit('form', _('Create map')))
-	->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=map")'))
+	->addItem(
+		(new CButton('form', _('Import')))
+			->onClick('redirect("conf.import.php?rules_preset=map")')
+	)
 );
 
 $sysmapWidget->setControls($createForm);

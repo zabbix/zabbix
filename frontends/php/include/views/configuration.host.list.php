@@ -26,7 +26,9 @@ $frmForm = (new CForm('get'))->cleanItems();
 $frmForm->addItem((new CList())
 	->addItem([_('Group').SPACE, $data['pageFilter']->getGroupsCB()])
 	->addItem(new CSubmit('form', _('Create host')))
-	->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")'))
+	->addItem(
+		(new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=host")')
+	)
 );
 
 $hostWidget->setControls($frmForm);

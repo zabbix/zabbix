@@ -525,7 +525,7 @@ if (str_in_array($srctbl, ['applications', 'triggers'])) {
 		$epmtyScript .= get_window_opener($dstfrm, $dstfld3, $value3);
 		$epmtyScript .= ' close_window(); return false;';
 
-		$controls[] = [SPACE, new CButton('empty', _('Empty'), $epmtyScript)];
+		$controls[] = [SPACE, (new CButton('empty', _('Empty')))->onClick($epmtyScript)];
 	}
 }
 
@@ -590,7 +590,8 @@ if ($srctbl == 'usrgrp') {
 	}
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'), "javascript: addSelectedValues('usrgrps', ".zbx_jsvalue($reference).');');
+		$button = (new CButton('select', _('Select')))
+			->onClick("javascript: addSelectedValues('usrgrps', ".zbx_jsvalue($reference).');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 
 		insert_js('var popupReference = '.zbx_jsvalue($userGroups, true).';');
@@ -662,7 +663,8 @@ elseif ($srctbl == 'users') {
 	unset($user);
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'), "javascript: addSelectedValues('users', ".zbx_jsvalue($reference).');');
+		$button = (new CButton('select', _('Select')))
+			->onClick("javascript: addSelectedValues('users', ".zbx_jsvalue($reference).');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 
 		insert_js('var popupReference = '.zbx_jsvalue($users, true).';');
@@ -740,9 +742,8 @@ elseif ($srctbl == 'templates') {
 	unset($template);
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'),
-			"javascript: addSelectedValues('templates', ".zbx_jsvalue($reference).', '.$parentId.');'
-		);
+		$button = (new CButton('select', _('Select')))
+			->onClick("javascript: addSelectedValues('templates', ".zbx_jsvalue($reference).', '.$parentId.');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 	}
 
@@ -820,9 +821,8 @@ elseif ($srctbl == 'hosts') {
 	unset($host);
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'),
-			"javascript: addSelectedValues('hosts', ".zbx_jsvalue($reference).', '.$parentId.');'
-		);
+		$button = (new CButton('select', _('Select')))
+			->onCLick("javascript: addSelectedValues('hosts', ".zbx_jsvalue($reference).', '.$parentId.');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 	}
 
@@ -901,9 +901,8 @@ elseif ($srctbl == 'host_templates') {
 	unset($host);
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'),
-			"javascript: addSelectedValues('hosts', ".zbx_jsvalue($reference).', '.$parentId.');'
-		);
+		$button = (new CButton('select', _('Select')))
+			->onClick("javascript: addSelectedValues('hosts', ".zbx_jsvalue($reference).', '.$parentId.');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 	}
 
@@ -977,9 +976,8 @@ elseif ($srctbl == 'host_groups') {
 	unset($hostgroup);
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'),
-			"javascript: addSelectedValues('hostGroups', ".zbx_jsvalue($reference).', '.$parentId.');'
-		);
+		$button = (new CButton('select', _('Select')))
+			->onClick("javascript: addSelectedValues('hostGroups', ".zbx_jsvalue($reference).', '.$parentId.');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 	}
 
@@ -1147,7 +1145,8 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 	}
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'), "addSelectedValues('triggers', ".zbx_jsvalue($reference).', '.$parentId.');');
+		$button = (new CButton('select', _('Select')))
+			->onClick("addSelectedValues('triggers', ".zbx_jsvalue($reference).', '.$parentId.');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 
 		insert_js('var popupReference = '.zbx_jsValue($jsTriggers, true).';');
@@ -1281,9 +1280,8 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 	}
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'),
-			"javascript: addSelectedValues('items', ".zbx_jsvalue($reference).');'
-		);
+		$button = (new CButton('select', _('Select')))
+			->onClick("javascript: addSelectedValues('items', ".zbx_jsvalue($reference).');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 
 		insert_js('var popupReference = '.zbx_jsvalue($jsItems, true).';');
@@ -1356,9 +1354,8 @@ elseif ($srctbl == 'applications') {
 	unset($app);
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'),
-			"javascript: addSelectedValues('applications', ".zbx_jsvalue($reference).', '.$parentId.');'
-		);
+		$button = (new CButton('select', _('Select')))
+			->onClick("javascript: addSelectedValues('applications', ".zbx_jsvalue($reference).', '.$parentId.');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 	}
 
@@ -1471,9 +1468,8 @@ elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
 	}
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'),
-			"javascript: addSelectedValues('graphs', ".zbx_jsvalue($reference).');'
-		);
+		$button = (new CButton('select', _('Select')))
+			->onClick("javascript: addSelectedValues('graphs', ".zbx_jsvalue($reference).');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 
 		insert_js('var popupReference = '.zbx_jsvalue($graphs, true).';');
@@ -1539,7 +1535,8 @@ elseif ($srctbl == 'sysmaps') {
 	}
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'), "javascript: addSelectedValues('sysmaps', ".zbx_jsvalue($reference).');');
+		$button = (new CButton('select', _('Select')))
+			->onClick("javascript: addSelectedValues('sysmaps', ".zbx_jsvalue($reference).');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 
 		insert_js('var popupReference = '.zbx_jsvalue($sysmaps, true).';');
@@ -1601,7 +1598,8 @@ elseif ($srctbl == 'slides') {
 	}
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'), "javascript: addSelectedValues('slides', ".zbx_jsvalue($reference).');');
+		$button = (new CButton('select', _('Select')))
+			->onClick("javascript: addSelectedValues('slides', ".zbx_jsvalue($reference).');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 
 		insert_js('var popupReference = '.zbx_jsvalue($slideshows, true).';');
@@ -1661,7 +1659,8 @@ elseif ($srctbl == 'screens') {
 	}
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'), "javascript: addSelectedValues('screens', ".zbx_jsvalue($reference).');');
+		$button = (new CButton('select', _('Select')))
+			->onClick("javascript: addSelectedValues('screens', ".zbx_jsvalue($reference).');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 
 		insert_js('var popupReference = '.zbx_jsvalue($screens, true).';');
@@ -1850,7 +1849,8 @@ elseif ($srctbl == 'scripts') {
 	}
 
 	if ($multiselect) {
-		$button = new CButton('select', _('Select'), "javascript: addSelectedValues('scripts', ".zbx_jsvalue($reference).');');
+		$button = (new CButton('select', _('Select')))
+			->onClick("javascript: addSelectedValues('scripts', ".zbx_jsvalue($reference).');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 		insert_js('var popupReference = '.zbx_jsvalue($scripts, true).';');
 	}

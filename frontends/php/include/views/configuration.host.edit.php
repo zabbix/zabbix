@@ -742,20 +742,17 @@ $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 $inventoryFormList = new CFormList('inventorylist');
 
 // radio buttons for inventory type choice
-$inventoryDisabledBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, null,
-	'host_inventory_radio_'.HOST_INVENTORY_DISABLED, ($data['inventory_mode'] == HOST_INVENTORY_DISABLED)
-);
-$inventoryDisabledBtn->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
+$inventoryDisabledBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, ($data['inventory_mode'] == HOST_INVENTORY_DISABLED)))
+	->setId('host_inventory_radio_'.HOST_INVENTORY_DISABLED)
+	->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
 
-$inventoryManualBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, null,
-	'host_inventory_radio_'.HOST_INVENTORY_MANUAL, ($data['inventory_mode'] == HOST_INVENTORY_MANUAL)
-);
-$inventoryManualBtn->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
+$inventoryManualBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, ($data['inventory_mode'] == HOST_INVENTORY_MANUAL)))
+	->setId('host_inventory_radio_'.HOST_INVENTORY_MANUAL)
+	->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
 
-$inventoryAutomaticBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, null,
-	'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC, ($data['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)
-);
-$inventoryAutomaticBtn->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
+$inventoryAutomaticBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, ($data['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)))
+	->setId('host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC)
+	->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
 
 $inventoryTypeRadioButton = [
 	$inventoryDisabledBtn, new CLabel(_('Disabled'), 'host_inventory_radio_'.HOST_INVENTORY_DISABLED),

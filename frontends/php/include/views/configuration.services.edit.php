@@ -47,11 +47,11 @@ $servicesFormList->addRow(_('Name'), $nameTextBox);
 // append parent link to form list
 $servicesFormList->addRow(_('Parent service'), [
 	new CTextBox('parent_name', $this->data['parentname'], ZBX_TEXTBOX_STANDARD_SIZE, true, 128),
-	new CButton('select_parent', _('Change'),
-		"javascript: openWinCentered('services.php?pservices=1".url_param('serviceid')."', ".
-			"'ZBX_Services_List', 740, 420, 'scrollbars=1, toolbar=0, menubar=0, resizable=1, dialog=0');",
-		'button-form'
-	)
+	(new CButton('select_parent', _('Change')))
+		->onClick(
+			"javascript: openWinCentered('services.php?pservices=1".url_param('serviceid')."', ".
+				"'ZBX_Services_List', 740, 420, 'scrollbars=1, toolbar=0, menubar=0, resizable=1, dialog=0');")
+		->addClass('button-form')
 ]);
 
 // append algorithm to form list
@@ -70,7 +70,8 @@ $servicesFormList->addRow(_('Calculate SLA, acceptable SLA (in %)'), [$showslaCh
 // append trigger to form list
 $servicesFormList->addRow(_('Trigger'), [
 	new CTextBox('trigger', $this->data['trigger'], ZBX_TEXTBOX_STANDARD_SIZE, true),
-	new CButton('btn1', _('Select'),
+	(new CButton('btn1', _('Select')))
+		->onClick(
 		'return PopUp("popup.php?'.
 			'dstfrm='.$servicesForm->getName().
 			'&dstfld1=triggerid'.
@@ -79,9 +80,8 @@ $servicesFormList->addRow(_('Trigger'), [
 			'&srcfld1=triggerid'.
 			'&srcfld2=description'.
 			'&real_hosts=1'.
-			'&with_triggers=1");',
-		'button-form'
-	)
+			'&with_triggers=1");')
+		->addClass('button-form')
 ]);
 $servicesFormList->addRow(_('Sort order (0->999)'), new CTextBox('sortorder', $this->data['sortorder'], 3, false, 3));
 
@@ -111,7 +111,8 @@ foreach ($this->data['children'] as $child) {
 			1
 		),
 		!empty($child['trigger']) ? $child['trigger'] : '',
-		(new CButton('remove', _('Remove'), 'javascript: removeDependentChild(\''.$child['serviceid'].'\');'))
+		(new CButton('remove', _('Remove')))
+			->onClick('javascript: removeDependentChild(\''.$child['serviceid'].'\');')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 	$row->setId('children_'.$child['serviceid']);
@@ -122,7 +123,8 @@ $servicesDependenciesFormList->addRow(
 	_('Depends on'),
 	(new CDiv([
 		$servicesChildTable,
-		(new CButton('add_child_service', _('Add'), "javascript: openWinCentered('services.php?cservices=1".url_param('serviceid')."', 'ZBX_Services_List', 640, 520, 'scrollbars=1, toolbar=0, menubar=0, resizable=0');"))
+		(new CButton('add_child_service', _('Add')))
+			->onClick("javascript: openWinCentered('services.php?cservices=1".url_param('serviceid')."', 'ZBX_Services_List', 640, 520, 'scrollbars=1, toolbar=0, menubar=0, resizable=0');")
 			->addClass(ZBX_STYLE_BTN_LINK)
 		]))
 		->addClass('objectgroup')
@@ -169,7 +171,9 @@ foreach ($this->data['times'] as $serviceTime) {
 		],
 		$from.' - '.$to,
 		htmlspecialchars($serviceTime['note']),
-		(new CButton('remove', _('Remove'), 'javascript: removeTime(\''.$i.'\');'))->addClass(ZBX_STYLE_BTN_LINK)
+		(new CButton('remove', _('Remove')))
+			->onClick('javascript: removeTime(\''.$i.'\');')
+			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 	$row->setId('times_'.$i);
 	$servicesTimeTable->addRow($row);
@@ -310,13 +314,13 @@ if ($service['serviceid']) {
 	}
 
 	$servicesTab->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update'), 'javascript: document.forms[0].action += \'?saction=1\';'),
+		(new CSubmit('update', _('Update')))->onClick('javascript: document.forms[0].action += \'?saction=1\';'),
 		$buttons
 	));
 }
 else {
 	$servicesTab->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add'), 'javascript: document.forms[0].action += \'?saction=1\';'),
+		(new CSubmit('add', _('Add')))->onClick('javascript: document.forms[0].action += \'?saction=1\';'),
 		[new CButtonCancel()]
 	));
 }

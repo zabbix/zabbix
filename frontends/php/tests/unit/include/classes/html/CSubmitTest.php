@@ -62,11 +62,9 @@ class CSubmitTest extends CTagTest {
 	/**
 	 * @param $name
 	 * @param $caption
-	 * @param $action
-	 * @param $class
 	 * @return CSubmit
 	 */
-	protected function createTag($name = 'submit', $caption = '', $action = null, $class = null) {
-		return new CSubmit($name, $caption, $action, $class);
+	protected function createTag($name = 'submit', $caption = '') {
+		return new CSubmit($name, $caption);
 	}
 }

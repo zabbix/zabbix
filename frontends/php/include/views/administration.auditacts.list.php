@@ -28,9 +28,9 @@ $filterColumn->addRow(
 	_('Recipient'),
 	[
 		new CTextBox('alias', $this->data['alias'], 20),
-		new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm=zbx_filter'.
-			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
-		)
+		(new CButton('btn1', _('Select')))
+			->onClick('return PopUp("popup.php?dstfrm=zbx_filter'.
+				'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");')
 	]
 );
 

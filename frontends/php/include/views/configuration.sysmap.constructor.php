@@ -24,7 +24,8 @@ include('include/views/js/configuration.sysmaps.js.php');
 $sysmapWidget = (new CWidget())->setTitle(_('Network maps'));
 
 // create menu
-$menu = (new CList([], 'object-group'))
+$menu = (new CList())
+	->addClass('object-group')
 	->addItem([
 		_('Icon').':'.SPACE,
 		(new CButton('selementAdd', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),

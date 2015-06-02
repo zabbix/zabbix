@@ -106,12 +106,10 @@ $scriptView = new CTabView();
 $scriptView->addTab('scripts', _('Script'), $scriptFormList);
 
 // footer
-$cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=script.list');
-$cancelButton->setId('cancel');
+$cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=script.list'))->setId('cancel');
 
 if ($data['scriptid'] == 0) {
-	$addButton = new CSubmitButton(_('Add'), 'action', 'script.create');
-	$addButton->setId('add');
+	$addButton = (new CSubmitButton(_('Add'), 'action', 'script.create'))->setId('add');
 
 	$scriptView->setFooter(makeFormFooter(
 		$addButton,
@@ -119,15 +117,13 @@ if ($data['scriptid'] == 0) {
 	));
 }
 else {
-	$updateButton = new CSubmitButton(_('Update'), 'action', 'script.update');
-	$updateButton->setId('update');
-	$cloneButton = new CSimpleButton(_('Clone'));
-	$cloneButton->setId('clone');
-	$deleteButton = new CRedirectButton(_('Delete'),
+	$updateButton = (new CSubmitButton(_('Update'), 'action', 'script.update'))->setId('update');
+	$cloneButton = (new CSimpleButton(_('Clone')))->setId('clone');
+	$deleteButton = (new CRedirectButton(_('Delete'),
 		'zabbix.php?action=script.delete&sid='.$data['sid'].'&scriptids[]='.$data['scriptid'],
 		_('Delete script?')
-	);
-	$deleteButton->setId('delete');
+	))
+		->setId('delete');
 
 	$scriptView->setFooter(makeFormFooter(
 		$updateButton,

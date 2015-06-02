@@ -30,20 +30,17 @@ $authenticationFormList = new CFormList('authenticationList');
 
 // append config radio buttons to form list
 $configTypeRadioButton = [
-	new CRadioButton('config', ZBX_AUTH_INTERNAL, null, 'config_'.ZBX_AUTH_INTERNAL,
-		($this->data['config']['authentication_type'] == ZBX_AUTH_INTERNAL),
-		'submit()'
-	),
+	(new CRadioButton('config', ZBX_AUTH_INTERNAL, ($this->data['config']['authentication_type'] == ZBX_AUTH_INTERNAL)))
+		->setId('config_'.ZBX_AUTH_INTERNAL)
+		->onChange('submit()'),
 	new CLabel(_x('Internal', 'authentication'), 'config_'.ZBX_AUTH_INTERNAL),
-	new CRadioButton('config', ZBX_AUTH_LDAP, null, 'config_'.ZBX_AUTH_LDAP,
-		($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP),
-		'submit()'
-	),
+	(new CRadioButton('config', ZBX_AUTH_LDAP, ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP)))
+		->setId('config_'.ZBX_AUTH_LDAP)
+		->onChange('submit()'),
 	new CLabel(_('LDAP'), 'config_'.ZBX_AUTH_LDAP),
-	new CRadioButton('config', ZBX_AUTH_HTTP, null, 'config_'.ZBX_AUTH_HTTP,
-		($this->data['config']['authentication_type'] == ZBX_AUTH_HTTP),
-		'submit()'
-	),
+	(new CRadioButton('config', ZBX_AUTH_HTTP, ($this->data['config']['authentication_type'] == ZBX_AUTH_HTTP)))
+		->setId('config_'.ZBX_AUTH_HTTP)
+		->onChange('submit()'),
 	new CLabel(_('HTTP'), 'config_'.ZBX_AUTH_HTTP)
 ];
 $authenticationFormList->addRow(_('Default authentication'),
@@ -106,7 +103,7 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 	else {
 		$authenticationFormList->addRow(
 			_('Bind password'),
-			new CSubmit('change_bind_password', _('Change password'), null, 'button-form')
+			(new CSubmit('change_bind_password', _('Change password')))->addClass('button-form')
 		);
 	}
 

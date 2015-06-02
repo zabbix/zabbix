@@ -373,11 +373,11 @@ $filterColumn1->addRow(
 	_('Application'),
 	[
 		new CTextBox('application', $filter['application']),
-		new CButton('application_name', _('Select'),
+		(new CButton('application_name', _('Select')))
+			->onClick(
 			'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
-				'&with_applications=1&dstfrm=zbx_filter");',
-			'button-form'
-		)
+				'&with_applications=1&dstfrm=zbx_filter");')
+			->addClass('button-form')
 	]
 );
 

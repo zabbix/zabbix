@@ -563,14 +563,14 @@ function getItemFilterForm(&$items) {
 	$filterColumn1->addRow(_('Application'),
 		[
 			new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
-			new CButton('btn_app', _('Select'),
-				'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
-					'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
-					'&with_applications=1'.
-					'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
-					.', 0, 0, "application");',
-				'button-form'
-			)
+			(new CButton('btn_app', _('Select')))
+				->onClick(
+					'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
+						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
+						'&with_applications=1'.
+						'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
+						.', 0, 0, "application");')
+				->addClass('button-form')
 		]
 	);
 	$filterColumn2->addRow([$snmpCommunityLabel, $snmpSecurityLabel], [$snmpCommunityField, $snmpSecurityField]);
@@ -1713,10 +1713,12 @@ function get_timeperiod_form() {
 		$tblPeriod->addRow([_('Month'), $tabMonths]);
 
 		$tblPeriod->addRow([_('Date'), [
-			new CRadioButton('new_timeperiod[month_date_type]', '0', null, null, !$new_timeperiod['month_date_type'], 'submit()'),
+			(new CRadioButton('new_timeperiod[month_date_type]', '0', !$new_timeperiod['month_date_type']))
+				->onChange('submit()'),
 			_('Day'),
 			SPACE,
-			new CRadioButton('new_timeperiod[month_date_type]', '1', null, null, $new_timeperiod['month_date_type'], 'submit()'),
+			(new CRadioButton('new_timeperiod[month_date_type]', '1', $new_timeperiod['month_date_type']))
+				->onChange('submit()'),
 			_('Day of week')]]
 		);
 

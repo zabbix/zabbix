@@ -25,7 +25,9 @@ class CFormList extends CList {
 	protected $formInputs = ['ctextbox', 'cnumericbox', 'ctextarea', 'ccombobox', 'ccheckbox', 'cpassbox', 'cipbox'];
 
 	public function __construct($id = null) {
-		parent::__construct([], 'table-forms');
+		parent::__construct();
+
+		$this->addClass('table-forms');
 
 		if ($id) {
 			$this->setId(zbx_formatDomId($id));

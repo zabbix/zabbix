@@ -188,16 +188,16 @@ function get_icon($type, $params = []) {
 	switch ($type) {
 		case 'favourite':
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
-				$icon = new CRedirectButton(SPACE, null);
-				$icon->addClass(ZBX_STYLE_BTN_REMOVE_FAV);
-				$icon->setTitle(_('Remove from favourites'));
-				$icon->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
+				$icon = (new CRedirectButton(SPACE, null))
+					->addClass(ZBX_STYLE_BTN_REMOVE_FAV)
+					->setTitle(_('Remove from favourites'))
+					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
-				$icon = new CRedirectButton(SPACE, null);
-				$icon->addClass(ZBX_STYLE_BTN_ADD_FAV);
-				$icon->setTitle(_('Add to favourites'));
-				$icon->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
+				$icon = (new CRedirectButton(SPACE, null))
+					->addClass(ZBX_STYLE_BTN_ADD_FAV)
+					->setTitle(_('Add to favourites'))
+					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			$icon->setId('addrm_fav');
 
@@ -209,48 +209,48 @@ function get_icon($type, $params = []) {
 			if ($params['fullscreen'] == 0) {
 				$url->setArgument('fullscreen', '1');
 
-				$icon = new CRedirectButton(SPACE, $url->getUrl());
-				$icon->setTitle(_('Fullscreen'));
-				$icon->addClass(ZBX_STYLE_BTN_MAX);
+				$icon = (new CRedirectButton(SPACE, $url->getUrl()))
+					->setTitle(_('Fullscreen'))
+					->addClass(ZBX_STYLE_BTN_MAX);
 			}
 			else {
 				$url->setArgument('fullscreen', '0');
 
-				$icon = new CRedirectButton(SPACE, $url->getUrl());
-				$icon->setTitle(_('Normal view'));
-				$icon->addClass(ZBX_STYLE_BTN_MIN);
+				$icon = (new CRedirectButton(SPACE, $url->getUrl()))
+					->setTitle(_('Normal view'))
+					->addClass(ZBX_STYLE_BTN_MIN);
 			}
 
 			return $icon;
 
 		case 'dashconf':
 
-			$icon = new CRedirectButton(SPACE, 'dashconf.php');
-			$icon->addClass(ZBX_STYLE_BTN_CONF);
-			$icon->setTitle(_('Configure'));
+			$icon = (new CRedirectButton(SPACE, 'dashconf.php'))
+				->addClass(ZBX_STYLE_BTN_CONF)
+				->setTitle(_('Configure'));
 
 			return $icon;
 
 		case 'screenconf':
 
-			$icon = new CRedirectButton(SPACE, null);
-			$icon->addClass(ZBX_STYLE_BTN_CONF);
-			$icon->setTitle(_('Refresh time'));
+			$icon = (new CRedirectButton(SPACE, null))
+				->addClass(ZBX_STYLE_BTN_CONF)
+				->setTitle(_('Refresh time'));
 
 			return $icon;
 
 		case 'overviewhelp':
 
-			$icon = new CRedirectButton(SPACE, null);
-			$icon->addClass(ZBX_STYLE_BTN_INFO);
+			$icon = (new CRedirectButton(SPACE, null))
+				->addClass(ZBX_STYLE_BTN_INFO);
 
 			return $icon;
 
 		case 'reset':
-			$icon = new CRedirectButton(SPACE, null);
-			$icon->addClass(ZBX_STYLE_BTN_RESET);
-			$icon->setTitle(_('Reset'));
-			$icon->onClick('timeControl.objectReset();');
+			$icon = (new CRedirectButton(SPACE, null))
+				->addClass(ZBX_STYLE_BTN_RESET)
+				->setTitle(_('Reset'))
+				->onClick('timeControl.objectReset();');
 
 			return $icon;
 	}
@@ -337,7 +337,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	/*
 	 * Back
 	 */
-	$list = new CList([], 'object-group');
+	$list = (new CList())->addClass('object-group');
 	if ($dbHost['status'] == HOST_STATUS_TEMPLATE) {
 		$list->addItem([new CLink(_('All templates'), '&gt;', 'templates.php?templateid='.$dbHost['hostid'].url_param('groupid'))]);
 
@@ -590,7 +590,7 @@ function makeFormFooter(CButtonInterface $mainButton = null, array $otherButtons
 		$button->addClass(ZBX_STYLE_BTN_ALT);
 	}
 
-	$buttons = new CList([], 'table-forms');
+	$buttons = (new CList())->addClass('table-forms');
 
 	if ($mainButton !== null) {
 		$buttons->addItem([
@@ -682,7 +682,8 @@ function getAvailabilityTable($host, $currentTime) {
  * @return array
  */
 function createDateSelector($name, $date, $relatedCalendar = null) {
-	$calendarIcon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
+	$calendarIcon = (new CImg('images/general/bar/cal.gif', 'calendar', 16, 12))
+		->addClass('pointer');
 	$onClick = 'var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["'.$name.
 		'_calendar"].clndr.clndrshow(pos.top, pos.left);';
 	if ($relatedCalendar) {

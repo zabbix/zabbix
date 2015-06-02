@@ -69,7 +69,7 @@ $styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit(
 	STYLE_LEFT => _('Left')
 ]);
 
-$controls->additem([_('Hosts location').SPACE, $styleComboBox]);
+$controls->addItem([_('Hosts location').SPACE, $styleComboBox]);
 
 // header right
 $help = get_icon('overviewhelp');

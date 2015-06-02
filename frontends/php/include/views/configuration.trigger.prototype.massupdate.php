@@ -80,7 +80,8 @@ foreach ($data['dependencies'] as $dependency) {
 	}
 
 	$row = new CRow([$description,
-		(new CButton('remove', _('Remove'), 'javascript: removeDependency(\''.$dependency['triggerid'].'\');'))
+		(new CButton('remove', _('Remove')))
+			->onClick('javascript: removeDependency(\''.$dependency['triggerid'].'\');')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 
@@ -88,18 +89,18 @@ foreach ($data['dependencies'] as $dependency) {
 	$dependenciesTable->addRow($row);
 }
 
-$addButton = (new CButton('add_dep_trigger', _('Add'),
-	'return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger&dstfld1=new_dependency'.
-	'&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1&with_triggers=1&normal_only=1&noempty=1");'
-))->addClass(ZBX_STYLE_BTN_LINK);
-$addPrototypeButton = (new CButton('add_dep_trigger_prototype', _('Add prototype'),
-	'return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger&dstfld1=new_dependency'.
-	'&srctbl=trigger_prototypes&objname=triggers&srcfld1=triggerid'.url_param('parent_discoveryid').'&multiselect=1");'
-))->addClass(ZBX_STYLE_BTN_LINK);
+$addButton = (new CButton('add_dep_trigger', _('Add')))
+	->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger&dstfld1=new_dependency'.
+		'&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1&with_triggers=1&normal_only=1&noempty=1");')
+	->addClass(ZBX_STYLE_BTN_LINK);
+$addPrototypeButton = (new CButton('add_dep_trigger_prototype', _('Add prototype')))
+	->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger&dstfld1=new_dependency'.
+		'&srctbl=trigger_prototypes&objname=triggers&srcfld1=triggerid'.url_param('parent_discoveryid').'&multiselect=1");')
+	->addClass(ZBX_STYLE_BTN_LINK);
 
 $dependenciesDiv = (new CDiv([$dependenciesTable, $addButton, SPACE, SPACE, SPACE, $addPrototypeButton]))
 	->addClass('objectgroup')
-	->AddClass('inlineblock')
+	->addClass('inlineblock')
 	->addClass('border_dotted')
 	->setId('dependencies_div');
 

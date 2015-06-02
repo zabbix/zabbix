@@ -239,8 +239,9 @@ foreach ($this->data['items'] as $item) {
 			];
 		}
 
-		$menuIcon = new CIcon(_('Menu'), 'iconmenu_b');
-		$menuIcon->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers));
+		$menuIcon = (new CIcon(_('Menu')))
+			->addClass('iconmenu_b')
+			->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers));
 	}
 	else {
 		$menuIcon = SPACE;

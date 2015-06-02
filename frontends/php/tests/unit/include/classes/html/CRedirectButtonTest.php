@@ -60,7 +60,7 @@ class CRedirectButtonTest extends CTagTest {
 	 *
 	 * @return CRedirectButton
 	 */
-	protected function createTag($caption = null, $url = null, $confirmation = null, $class = null) {
-		return new CRedirectButton($caption, $url, $confirmation, $class);
+	protected function createTag($caption = null, $url = null, $confirmation = null) {
+		return new CRedirectButton($caption, $url, $confirmation);
 	}
 }
