@@ -1,7 +1,8 @@
 <script type="text/x-jquery-tmpl" id="itemTpl">
 <tr id="items_#{number}" class="sortable">
 	<!-- icon + hidden -->
-	<td>
+	<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
+		<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 		<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 		<input type="hidden" id="items_#{number}_graphid" name="items[#{number}][graphid]" value="#{graphid}">
@@ -77,9 +78,11 @@
 		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
 	<?php endif ?>
 	<td>
-		<input type="text" id="items_#{number}_color" name="items[#{number}][color]" class="input text colorpicker"
-			onchange="javascript: set_color_by_name('items_#{number}_color', this.value);" maxlength="6" size="7" value="">
-		<div id="lbl_items_#{number}_color" onclick="javascript: show_color_picker('items_#{number}_color');">&nbsp;&nbsp;&nbsp;</div>
+		<div class="<?= ZBX_STYLE_INPUT_COLOR_PICKER ?>">
+			<div id="lbl_items_#{number}_color" onclick="javascript: show_color_picker('items_#{number}_color');"></div>
+			<input type="text" id="items_#{number}_color" name="items[#{number}][color]"
+				onchange="javascript: set_color_by_name('items_#{number}_color', this.value);" maxlength="6" size="7">
+		</div>
 	</td>
 	<td>
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
@@ -272,7 +275,7 @@
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			cursor: 'move',
-			handle: 'span.ui-icon-arrowthick-2-n-s',
+			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
@@ -358,8 +361,8 @@
 		<?php if (!empty($this->data['templateid'])): ?>
 			$('#graphTab .input, #graphTab .button').each(function() {
 				$(this).attr('disabled', 'disabled');
-				$('#itemsTable').sortable({disabled: true});
 			});
+			$('#itemsTable').sortable({disabled: true});
 
 			var size = $('#itemsTable tr.sortable').length;
 
