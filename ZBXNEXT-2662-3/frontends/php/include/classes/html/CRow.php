@@ -22,7 +22,7 @@
 class CRow extends CTag {
 
 	public function __construct($item = null) {
-		parent::__construct('tr', 'yes');
+		parent::__construct('tr', true);
 		$this->addItem($item);
 	}
 

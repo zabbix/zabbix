@@ -22,7 +22,7 @@
 class CColHeader extends CTag {
 
 	public function __construct($item = null) {
-		parent::__construct('th', 'yes');
+		parent::__construct('th', true);
 		$this->addItem($item);
 	}
 

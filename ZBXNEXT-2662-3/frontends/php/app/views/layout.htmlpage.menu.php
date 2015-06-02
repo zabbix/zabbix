@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-	$page_menu = (new CTag('header', 'yes'))->setAttribute('role', 'banner');
+	$page_menu = (new CTag('header', true))->setAttribute('role', 'banner');
 	$page_menu_div = (new CDiv())->addClass('nav')->setAttribute('role', 'navigation');
 
 	$top_menu_items = new CList($data['menu']['main_menu'], 'top-nav');

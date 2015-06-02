@@ -27,7 +27,7 @@ class CMultiSelect extends CTag {
 	 * @see jQuery.multiSelect()
 	 */
 	public function __construct(array $options = []) {
-		parent::__construct('div', 'yes');
+		parent::__construct('div', true);
 		$this->addClass('multiselect');
 		$this->setId(zbx_formatDomId($options['name']));
 

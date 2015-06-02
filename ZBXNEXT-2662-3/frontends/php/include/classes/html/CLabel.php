@@ -22,7 +22,7 @@
 class CLabel extends CTag {
 
 	public function __construct($label, $for = null, $id = null) {
-		parent::__construct('label', 'yes', $label);
+		parent::__construct('label', true, $label);
 
 		if ($id !== null) {
 			$this->setId(zbx_formatDomId($id));

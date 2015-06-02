@@ -22,7 +22,7 @@
 class CDiv extends CTag {
 
 	public function __construct($items = null) {
-		parent::__construct('div', 'yes');
+		parent::__construct('div', true);
 		$this->addItem($items);
 
 		return $this;

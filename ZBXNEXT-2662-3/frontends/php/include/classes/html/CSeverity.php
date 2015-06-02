@@ -27,7 +27,7 @@ class CSeverity extends CTag {
 	 * @param int    $options['value']
 	 */
 	public function __construct(array $options = []) {
-		parent::__construct('div', 'yes');
+		parent::__construct('div', true);
 		$this->setId(isset($options['id']) ? $options['id'] : zbx_formatDomId($options['name']));
 		$this->addClass('jqueryinputset radioset control-severity');
 

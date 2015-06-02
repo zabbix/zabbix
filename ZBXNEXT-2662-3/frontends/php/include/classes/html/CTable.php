@@ -32,7 +32,7 @@ class CTable extends CTag {
 	protected $message;
 
 	public function __construct() {
-		parent::__construct('table', 'yes');
+		parent::__construct('table', true);
 		$this->rownum = 0;
 		$this->oddRowClass = null;
 		$this->evenRowClass = null;
@@ -131,7 +131,7 @@ class CTable extends CTag {
 		}
 		$this->colnum = $value->itemsCount();
 
-		$value = new CTag('thead', 'yes', $value);
+		$value = new CTag('thead', true, $value);
 		$this->header = $value->toString();
 
 		return $this;
