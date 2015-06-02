@@ -84,7 +84,7 @@ class CTweenBox {
 			->setCellPadding(0);
 
 		if (!is_null($caption_l) || !is_null($caption_r)) {
-			$grp_tab->addRow([$caption_l, SPACE, $caption_r]);
+			$grp_tab->addRow([$caption_l, '', $caption_r]);
 		}
 
 		$add_btn = new CButton('add', (new CSpan())->addClass('arrow-left'), null, ZBX_STYLE_BTN_GREY);
@@ -92,7 +92,7 @@ class CTweenBox {
 		$rmv_btn = new CButton('remove', (new CSpan())->addClass('arrow-right'), null, ZBX_STYLE_BTN_GREY);
 		$rmv_btn->onClick('moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_l.'", "'.$this->id_r.'", "rmv");');
 
-		$grp_tab->addRow([$this->lbox, new CCol([$add_btn, $rmv_btn]), $this->rbox]);
+		$grp_tab->addRow([$this->lbox, (new CCol([$add_btn, $rmv_btn]))->addClass(ZBX_STYLE_CENTER), $this->rbox]);
 		return $grp_tab;
 	}
 

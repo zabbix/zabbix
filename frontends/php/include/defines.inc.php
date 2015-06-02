@@ -1003,6 +1003,7 @@ define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
 define('ZBX_STYLE_BTN_RESET', 'btn-reset');
 define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
+define('ZBX_STYLE_CENTER', 'center');
 define('ZBX_STYLE_COLOR_PICKER', 'color-picker');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
