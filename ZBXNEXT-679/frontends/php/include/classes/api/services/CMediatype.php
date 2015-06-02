@@ -262,7 +262,8 @@ class CMediatype extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Password required for media type.'));
 			}
 
-			if (array_key_exists('type', $mediatype) && !in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING))) {
+			$with_passwd = [MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING, MEDIA_TYPE_EMAIL];
+			if (array_key_exists('type', $mediatype) && !in_array($mediatype['type'], $with_passwd)) {
 				$mediatype['passwd'] = '';
 			}
 
