@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "comms.h"
+#include "threads.h"
 #include "log.h"
 #include "tls.h"
 #include "tls_tcp.h"
@@ -116,7 +117,7 @@ ZBX_THREAD_LOCAL char				info_buf[256];
 #if defined(HAVE_POLARSSL)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tls_make_personalization_string                              *
+ * Function: zbx_make_personalization_string                                  *
  *                                                                            *
  * Purpose: provide additional entropy for initialization of crypto library   *
  *                                                                            *
@@ -127,16 +128,25 @@ ZBX_THREAD_LOCAL char				info_buf[256];
  *     http://csrc.nist.gov/publications/nistpubs/800-90A/SP800-90A.pdf       *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_tls_make_personalization_string(char **pers, size_t *len)
+static void	zbx_make_personalization_string(unsigned char pers[64])
 {
-	/* TODO: follow recommendations in http://csrc.nist.gov/publications/nistpubs/800-90A/SP800-90A.pdf */
-	/* and add more entropy into the personalization string (e.g. process PID, microseconds of current time etc.) */
-	/* Pay attention to the personalization string length as described in SP800-90A.pdf */
+	long int	thread_id;
+	zbx_timespec_t	ts;
+	sha512_context	ctx;
 
-	/* For demo purposes only. TODO: replace with production code. */
-#define DEMO_PERS_STRING	"Zabbix TLSZabbix TLSZabbix TLSZabbix TLSZabbix TLS"
-	*pers = zbx_strdup(*pers, DEMO_PERS_STRING);
-	*len = strlen(DEMO_PERS_STRING);
+	sha512_init(&ctx);
+	sha512_starts(&ctx, 1);		/* use SHA-384 mode */
+
+	thread_id = zbx_get_thread_id();
+	sha512_update(&ctx, (const unsigned char *)&thread_id, sizeof(thread_id));
+
+	zbx_timespec(&ts);
+
+	if (0 != ts.ns)
+		sha512_update(&ctx, (const unsigned char *)&ts.ns, sizeof(ts.ns));
+
+	sha512_finish(&ctx, pers);
+	sha512_free(&ctx);
 }
 #endif
 
@@ -2283,8 +2293,7 @@ void	zbx_tls_init_child(void)
 	const char	*__function_name = "zbx_tls_init_child";
 	int		res;
 	unsigned int	cipher_count;
-	char		*pers = NULL;
-	size_t		pers_len = 0;
+	unsigned char	pers[64];	/* personalization string obtained from SHA-512 in SHA-384 mode */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2450,12 +2459,15 @@ void	zbx_tls_init_child(void)
 	entropy = zbx_malloc(entropy, sizeof(entropy_context));
 	entropy_init(entropy);
 
-	zbx_tls_make_personalization_string(&pers, &pers_len);
+	zbx_make_personalization_string(pers);
 
 	ctr_drbg = zbx_malloc(ctr_drbg, sizeof(ctr_drbg_context));
 
-	if (0 != (res = ctr_drbg_init(ctr_drbg, entropy_func, entropy, (unsigned char *)pers, pers_len)))
+	if (0 != (res = ctr_drbg_init(ctr_drbg, entropy_func, entropy, pers, 48)))
+		/* PolarSSL sha512_finish() in SHA-384 mode returns an array "unsigned char output[64]" where result */
+		/* resides in the first 48 bytes and the last 16 bytes are not used */
 	{
+		zbx_guaranteed_memset(pers, 0, sizeof(pers));
 		zbx_tls_error_msg(res, "", &err_msg);
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize random number generator: %s", err_msg);
 		zbx_free(err_msg);
@@ -2463,8 +2475,7 @@ void	zbx_tls_init_child(void)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_guaranteed_memset(pers, 0, pers_len);
-	zbx_free(pers);
+	zbx_guaranteed_memset(pers, 0, sizeof(pers));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
