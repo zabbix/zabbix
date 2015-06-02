@@ -43,5 +43,7 @@ class CRow extends CTag {
 		elseif (!is_null($item)) {
 			parent::addItem(new CCol($item));
 		}
+
+		return $this;
 	}
 }

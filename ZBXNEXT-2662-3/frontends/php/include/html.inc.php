@@ -646,16 +646,16 @@ function getAvailabilityTable($host, $currentTime) {
 
 	// discovered host lifetime indicator
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete']) {
-		$deleteError = new CSpan(SPACE);
+		$info = (new CSpan('!'))->addClass(ZBX_STYLE_STATUS_YELLOW);
 
 		// Check if host should've been deleted in the past.
 		if ($currentTime > $host['hostDiscovery']['ts_delete']) {
-			$deleteError->setHint(_s(
+			$info->setHint(_s(
 				'The host is not discovered anymore and will be deleted the next time discovery rule is processed.'
 			));
 		}
 		else {
-			$deleteError->setHint(_s(
+			$info->setHint(_s(
 				'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
 				zbx_date2age($host['hostDiscovery']['ts_delete']),
 				zbx_date2str(DATE_FORMAT, $host['hostDiscovery']['ts_delete']),
@@ -663,7 +663,7 @@ function getAvailabilityTable($host, $currentTime) {
 			));
 		}
 
-		$ad[] = $deleteError;
+		$ad[] = $info;
 		$ad[] = ' ';
 	}
 

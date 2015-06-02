@@ -1023,6 +1023,7 @@ define('ZBX_STYLE_ORANGE', 'orange');
 define('ZBX_STYLE_OVERLAY_CLOSE_BTN', 'overlay-close-btn');
 define('ZBX_STYLE_RED', 'red');
 define('ZBX_STYLE_SELECT_MULTIPLE', 'select-multiple');
+define('ZBX_STYLE_STATUS_YELLOW', 'status-yellow');
 define('ZBX_STYLE_TABLE_FORMS', 'table-forms');
 define('ZBX_STYLE_TABLE_FORMS_CONTAINER', 'table-forms-container');
 define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
