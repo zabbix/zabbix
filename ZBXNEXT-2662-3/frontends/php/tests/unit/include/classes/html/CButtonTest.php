@@ -85,7 +85,7 @@ class CButtonTest extends CTagTest {
 	 * @param $class
 	 * @return CButton
 	 */
-	protected function createTag($name = 'button', $caption = '', $action = null, $class = null) {
-		return new CButton($name, $caption, $action, $class);
+	protected function createTag($name = 'button', $caption = '') {
+		return new CButton($name, $caption);
 	}
 }

@@ -148,7 +148,9 @@ foreach ($this->data['sysmap']['urls'] as $url) {
 	$urlLabel = new CTextBox('urls['.$i.'][name]', $url['name'], 32);
 	$urlLink = new CTextBox('urls['.$i.'][url]', $url['url'], 32);
 	$urlEtype = new CComboBox('urls['.$i.'][elementtype]', $url['elementtype'], null, sysmap_element_types());
-	$removeButton = (new CButton(null, _('Remove'), '$("urlEntry_'.$i.'").remove();'))->addClass(ZBX_STYLE_BTN_LINK);
+	$removeButton = (new CButton(null, _('Remove')))
+		->onClick('$("urlEntry_'.$i.'").remove();')
+		->addClass(ZBX_STYLE_BTN_LINK);
 
 	$urlRow = new CRow([$urlLabel, $urlLink, $urlEtype, $removeButton]);
 	$urlRow->setId('urlEntry_'.$i);
@@ -164,14 +166,18 @@ $templateUrlLink = new CTextBox('urls[#{id}][url]', '', 32);
 $templateUrlLink->setAttribute('disabled', 'disabled');
 $templateUrlEtype = new CComboBox('urls[#{id}][elementtype]', null, null, sysmap_element_types());
 $templateUrlEtype->setAttribute('disabled', 'disabled');
-$templateRemoveButton = (new CButton(null, _('Remove'), '$("entry_#{id}").remove();'))->addClass(ZBX_STYLE_BTN_LINK);
+$templateRemoveButton = (new CButton(null, _('Remove')))
+	->onClick('$("entry_#{id}").remove();')
+	->addClass(ZBX_STYLE_BTN_LINK);
 $templateUrlRow = new CRow([$templateUrlLabel, $templateUrlLink, $templateUrlEtype, $templateRemoveButton]);
 $templateUrlRow->addStyle('display: none');
 $templateUrlRow->setId('urlEntryTpl');
 $urlTable->addRow($templateUrlRow);
 
 // append "add" button to url table
-$addButton = (new CButton(null, _('Add'), 'cloneRow("urlEntryTpl", '.$i.')'))->addClass(ZBX_STYLE_BTN_LINK);
+$addButton = (new CButton(null, _('Add')))
+	->onClick('cloneRow("urlEntryTpl", '.$i.')')
+	->addClass(ZBX_STYLE_BTN_LINK);
 $addButtonColumn = (new CCol($addButton))->setColSpan(4);
 $urlTable->addRow($addButtonColumn);
 

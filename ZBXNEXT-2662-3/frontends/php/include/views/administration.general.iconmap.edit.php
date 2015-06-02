@@ -61,9 +61,11 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 	);
 	$iconsComboBox->addClass('mappingIcon');
 
-	$iconPreviewImage = new CImg('imgstore.php?iconid='.$mapping['iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
-		'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null, 'pointer preview');
-	$iconPreviewImage->setAttribute('data-image-full', 'imgstore.php?iconid='.$mapping['iconid']);
+	$iconPreviewImage = (new CImg('imgstore.php?iconid='.$mapping['iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
+		'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null))
+		->addClass('pointer')
+		->addClass('preview')
+		->setAttribute('data-image-full', 'imgstore.php?iconid='.$mapping['iconid']);
 
 	$iconMapTable->addRow(
 		(new CRow([
@@ -99,9 +101,11 @@ $iconsComboBox = new CComboBox('iconmap[default_iconid]', $this->data['iconmap']
 );
 $iconsComboBox->addClass('mappingIcon');
 
-$iconPreviewImage = new CImg('imgstore.php?iconid='.$this->data['iconmap']['default_iconid'].
-	'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null, 'pointer preview');
-$iconPreviewImage->setAttribute('data-image-full', 'imgstore.php?iconid='.$this->data['iconmap']['default_iconid']);
+$iconPreviewImage = (new CImg('imgstore.php?iconid='.$this->data['iconmap']['default_iconid'].
+	'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null))
+	->addClass('pointer')
+	->addClass('preview')
+	->setAttribute('data-image-full', 'imgstore.php?iconid='.$this->data['iconmap']['default_iconid']);
 
 $iconMapTable->addRow([(new CCol(_('Default')))->setColSpan(4), $iconsComboBox, $iconPreviewImage]);
 // </default icon row>

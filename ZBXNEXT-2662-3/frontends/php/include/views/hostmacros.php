@@ -152,13 +152,12 @@ else {
 }
 
 $show_inherited_macros_filter = [
-	new CRadioButton('show_inherited_macros', '0', null, 'hide_inherited_macros', !$data['show_inherited_macros'],
-		'this.form.submit()'
-	),
+	(new CRadioButton('show_inherited_macros', '0', !$data['show_inherited_macros']))
+		->setId('hide_inherited_macros')
+		->onChange('this.form.submit()'),
 	new CLabel(_('Host macros'), 'hide_inherited_macros'),
-	new CRadioButton('show_inherited_macros', '1', null, 'show_inherited_macros', $data['show_inherited_macros'],
-		'this.form.submit()'
-	),
+	(new CRadioButton('show_inherited_macros', '1', $data['show_inherited_macros']))
+		->onChange('this.form.submit()'),
 	new CLabel(_('Inherited and host macros'), 'show_inherited_macros')
 ];
 

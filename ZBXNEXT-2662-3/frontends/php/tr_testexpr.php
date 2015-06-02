@@ -189,7 +189,9 @@ if (!$allowedTesting) {
 
 $testForm->addItemToBottomRow($testButton);
 $testForm->addItemToBottomRow(SPACE);
-$testForm->addItemToBottomRow(new CButton('close', _('Close'), 'javascript: self.close();'));
+$testForm->addItemToBottomRow(
+	(new CButton('close', _('Close')))->onClick('javascript: self.close();')
+);
 $testForm->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

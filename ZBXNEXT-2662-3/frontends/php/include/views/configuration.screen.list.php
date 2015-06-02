@@ -29,7 +29,10 @@ if (!empty($this->data['templateid'])) {
 	$screenWidget->addItem(get_header_host_table('screens', $this->data['templateid']));
 }
 else {
-	$controls->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=screen")'));
+	$controls->addItem(
+		(new CButton('form', _('Import')))
+			->onClick('redirect("conf.import.php?rules_preset=screen")')
+	);
 }
 $createForm->addItem($controls);
 $screenWidget->setControls($createForm);

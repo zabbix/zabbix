@@ -235,8 +235,7 @@ $customGroupTable = (new CTable())
 
 // buttons
 $addButton = (new CButton('group_prototype_add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK);
-$buttonColumn = new CCol($addButton);
-$buttonColumn->setAttribute('colspan', 5);
+$buttonColumn = (new CCol($addButton))->setAttribute('colspan', 5);
 
 $buttonRow = (new CRow())
 	->setId('row_new_group_prototype')
@@ -356,20 +355,17 @@ $inventoryFormList = new CFormList('inventorylist');
 
 // radio buttons for inventory type choice
 $inventoryMode = (isset($hostPrototype['inventory']['inventory_mode'])) ? $hostPrototype['inventory']['inventory_mode'] : HOST_INVENTORY_DISABLED;
-$inventoryDisabledBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, null, 'host_inventory_radio_'.HOST_INVENTORY_DISABLED,
-	$inventoryMode == HOST_INVENTORY_DISABLED
-);
-$inventoryDisabledBtn->setEnabled(!$hostPrototype['templateid']);
+$inventoryDisabledBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, $inventoryMode == HOST_INVENTORY_DISABLED))
+	->setId('host_inventory_radio_'.HOST_INVENTORY_DISABLED)
+	->setEnabled(!$hostPrototype['templateid']);
 
-$inventoryManualBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, null, 'host_inventory_radio_'.HOST_INVENTORY_MANUAL,
-	$inventoryMode == HOST_INVENTORY_MANUAL
-);
-$inventoryManualBtn->setEnabled(!$hostPrototype['templateid']);
+$inventoryManualBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, $inventoryMode == HOST_INVENTORY_MANUAL))
+	->setId('host_inventory_radio_'.HOST_INVENTORY_MANUAL)
+	->setEnabled(!$hostPrototype['templateid']);
 
-$inventoryAutomaticBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, null, 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC,
-	$inventoryMode == HOST_INVENTORY_AUTOMATIC
-);
-$inventoryAutomaticBtn->setEnabled(!$hostPrototype['templateid']);
+$inventoryAutomaticBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, $inventoryMode == HOST_INVENTORY_AUTOMATIC))
+	->setId('host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC)
+	->setEnabled(!$hostPrototype['templateid']);
 
 $inventoryTypeRadioButton = [
 	$inventoryDisabledBtn,

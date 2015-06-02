@@ -245,7 +245,7 @@ if (hasRequest('sform')) {
 
 	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item".
 		"&srctbl=items&srcfld1=itemid&srcfld2=name');";
-	$cbtn = new CSubmit('select_item', _('Select'), $script);
+	$cbtn = (new CSubmit('select_item', _('Select')))->onCLick($script);
 
 	$frmTRLog->addRow(_('Item'), [$ctb, $cbtn]);
 	$frmTRLog->addVar('itemid', $itemid);
@@ -259,9 +259,9 @@ if (hasRequest('sform')) {
 	$ctb = new CTextBox('expression', '', 80);
 	$ctb->setId('logexpr');
 
-	$cb = new CButton('add_exp', _('Add'), 'javascript: add_logexpr();');
-	$cbAdd = new CButton('add_key_and', _('AND'), 'javascript: add_keyword_and();');
-	$cbOr = new CButton('add_key_or', _('OR'), 'javascript: add_keyword_or();');
+	$cb = (new CButton('add_exp', _('Add')))->onClick('javascript: add_logexpr();');
+	$cbAdd = (new CButton('add_key_and', _('AND')))->onClick('javascript: add_keyword_and();');
+	$cbOr = (new CButton('add_key_or', _('OR')))->onClick('javascript: add_keyword_or();');
 	$cbIregexp = new CCheckBox('iregexp', 'no', null, 1);
 
 	$frmTRLog->addRow(_('Expression'),
@@ -358,7 +358,9 @@ if (hasRequest('sform')) {
 		$frmTRLog->addItemToBottomRow(new CSubmit('add', _('Add')));
 	}
 	$frmTRLog->addItemToBottomRow(SPACE);
-	$frmTRLog->addItemToBottomRow(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
+	$frmTRLog->addItemToBottomRow(
+		(new CButton('cancel', _('Cancel')))->onClick('javascript: self.close();')
+	);
 
 	$frmTRLog->show();
 }

@@ -111,28 +111,25 @@ $permissionsTable->addRow([
 ]);
 $permissionsTable->addRow([
 	[
-		new CButton('add_read_write', _('Add'),
-			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_READ_WRITE."');",
-			'button-form'
-		),
-		new CSubmit('del_read_write', _('Delete selected'), null, 'button-form')
+		(new CButton('add_read_write', _('Add')))
+			->onClick("return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
+				'&permission='.PERM_READ_WRITE."');")
+			->addClass('button-form'),
+		(new CSubmit('del_read_write', _('Delete selected')))->addClass('button-form')
 	],
 	[
-		new CButton('add_read_only', _('Add'),
-			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_READ."');",
-			'button-form'
-		),
-		new CSubmit('del_read_only', _('Delete selected'), null, 'button-form')
+		(new CButton('add_read_only', _('Add')))
+			->onClick("return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
+				'&permission='.PERM_READ."');")
+			->addClass('button-form'),
+		(new CSubmit('del_read_only', _('Delete selected')))->addClass('button-form')
 	],
 	[
-		new CButton('add_deny', _('Add'),
-			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_DENY."');",
-			'button-form'
-		),
-		new CSubmit('del_deny', _('Delete selected'), null, 'button-form')
+		(new CButton('add_deny', _('Add')))
+			->onClick("return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
+				'&permission='.PERM_DENY."');")
+			->addClass('button-form'),
+		(new CSubmit('del_deny', _('Delete selected')))->addClass('button-form')
 	]
 ]);
 $permissionsFormList->addRow(_('Composing permissions'), $permissionsTable);

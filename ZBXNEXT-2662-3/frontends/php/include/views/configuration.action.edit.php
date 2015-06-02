@@ -104,7 +104,8 @@ if ($this->data['action']['filter']['conditions']) {
 					$actionConditionStringValues[0][$cIdx]
 				),
 				[
-					(new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');'))
+					(new CButton('remove', _('Remove')))
+						->onClick('javascript: removeCondition('.$i.');')
 						->addClass(ZBX_STYLE_BTN_LINK),
 					new CVar('conditions['.$i.']', $condition)
 				],
@@ -264,11 +265,10 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
 			new CTextBox('drule', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
-			new CButton('btn1', _('Select'),
-				'return PopUp("popup.php?srctbl=drules&srcfld1=druleid&srcfld2=name'.
-					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=drule");',
-				'button-form'
-			)
+			(new CButton('btn1', _('Select')))
+				->onClick('return PopUp("popup.php?srctbl=drules&srcfld1=druleid&srcfld2=name'.
+						'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=drule");')
+				->addClass('button-form')
 		];
 		break;
 
@@ -276,11 +276,10 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
 			new CTextBox('dcheck', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
-			new CButton('btn1', _('Select'),
-				'return PopUp("popup.php?srctbl=dchecks&srcfld1=dcheckid&srcfld2=name'.
-					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=dcheck&writeonly=1");',
-				'button-form'
-			)
+			(new CButton('btn1', _('Select')))
+				->onClick('return PopUp("popup.php?srctbl=dchecks&srcfld1=dcheckid&srcfld2=name'.
+						'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=dcheck&writeonly=1");')
+				->addClass('button-form')
 		];
 		break;
 
@@ -288,12 +287,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
 			new CTextBox('proxy', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
-			new CButton('btn1', _('Select'),
-				'return PopUp("popup.php?srctbl=proxies&srcfld1=hostid&srcfld2=host'.
-					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=proxy'.
-					'");',
-				'button-form'
-			)
+			(new CButton('btn1', _('Select')))
+				->onClick('return PopUp("popup.php?srctbl=proxies&srcfld1=hostid&srcfld2=host'.
+						'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=proxy'.
+						'");')
+				->addClass('button-form')
 		];
 		break;
 
@@ -449,7 +447,8 @@ if ($this->data['action']['operations']) {
 					(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
 					SPACE, SPACE, SPACE,
 					[
-						(new CButton('remove', _('Remove'), 'javascript: removeOperation('.$operationid.');'))
+						(new CButton('remove', _('Remove')))
+							->onClick('javascript: removeOperation('.$operationid.');')
 							->addClass(ZBX_STYLE_BTN_LINK),
 						new CVar('operations['.$operationid.']', $operation)
 					]
@@ -463,7 +462,8 @@ if ($this->data['action']['operations']) {
 					(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
 					SPACE, SPACE, SPACE,
 					[
-						(new CButton('remove', _('Remove'), 'javascript: removeOperation('.$operationid.');'))
+						(new CButton('remove', _('Remove')))
+							->onClick('javascript: removeOperation('.$operationid.');')
 							->addClass(ZBX_STYLE_BTN_LINK),
 						new CVar('operations['.$operationid.']', $operation)
 					]
@@ -600,9 +600,10 @@ if (!empty($this->data['new_operation'])) {
 				->setId('opmsgUsrgrpList')
 				->setHeader([_('User group'), _('Action')]);
 
-			$addUsrgrpBtn = (new CButton('add', _('Select'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")'))
-				->addClass(ZBX_STYLE_BTN_GREY);
-			$addUsrgrpBtn->setId('addusrgrpbtn');
+			$addUsrgrpBtn = (new CButton('add', _('Select')))
+				->onClick('return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")')
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->setId('addusrgrpbtn');
 			$usrgrpList->addRow((new CRow(
 				(new CCol($addUsrgrpBtn))->setColSpan(2)))->setId('opmsgUsrgrpListFooter')
 			);
@@ -613,9 +614,10 @@ if (!empty($this->data['new_operation'])) {
 				->setAttribute('style', 'min-width: 310px;')
 				->setId('opmsgUserList');
 
-			$addUserBtn = (new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")'))
-				->addClass(ZBX_STYLE_BTN_LINK);
-			$addUserBtn->setId('adduserbtn');
+			$addUserBtn = (new CButton('add', _('Add')))
+				->onClick('return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")')
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->setId('adduserbtn');
 			$userList->addRow((new CRow(
 				(new CCol($addUserBtn))->setColSpan(2)))->setId('opmsgUserListFooter'));
 
@@ -740,7 +742,8 @@ if (!empty($this->data['new_operation'])) {
 				->setAttribute('style', 'min-width: 310px;')
 				->setHeader([_('Target'), _('Action')]);
 
-			$addCmdBtn = (new CButton('add', _('New'), 'javascript: showOpCmdForm(0, "new");'))
+			$addCmdBtn = (new CButton('add', _('New')))
+				->onClick('javascript: showOpCmdForm(0, "new");')
 				->addClass(ZBX_STYLE_BTN_LINK);
 			$cmdList->addRow((new CRow(
 				(new CCol($addCmdBtn))->setColSpan(3)))->setId('opCmdListFooter')
@@ -932,7 +935,9 @@ if (!empty($this->data['new_operation'])) {
 			)->setId('opGroupListFooter'));
 			$groupList->addRow(
 				(new CCol(
-					(new CButton('add', _('Add'), 'return addDiscoveryHostGroup();'))->addClass(ZBX_STYLE_BTN_LINK)
+					(new CButton('add', _('Add')))
+						->onClick('return addDiscoveryHostGroup();')
+						->addClass(ZBX_STYLE_BTN_LINK)
 				))->setColSpan(2)
 			);
 
@@ -989,7 +994,9 @@ if (!empty($this->data['new_operation'])) {
 
 			$templateList->addRow(
 				(new CCol(
-					(new CButton('add', _('Add'), 'return addDiscoveryTemplates();'))->addClass(ZBX_STYLE_BTN_LINK)
+					(new CButton('add', _('Add')))
+						->onClick('return addDiscoveryTemplates();')
+						->addClass(ZBX_STYLE_BTN_LINK)
 				))->setColSpan(2)
 			);
 
@@ -1073,7 +1080,8 @@ if (!empty($this->data['new_operation'])) {
 						$operationConditionStringValues[$cIdx]
 					),
 					[
-						(new CButton('remove', _('Remove'), 'javascript: removeOperationCondition('.$i.');'))
+						(new CButton('remove', _('Remove')))
+							->onClick('javascript: removeOperationCondition('.$i.');')
 							->addClass(ZBX_STYLE_BTN_LINK),
 						new CVar('new_operation[opconditions]['.$i.'][conditiontype]', $opcondition['conditiontype']),
 						new CVar('new_operation[opconditions]['.$i.'][operator]', $opcondition['operator']),

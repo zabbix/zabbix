@@ -579,7 +579,10 @@ else {
 	$controls = new CList();
 	$controls->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()]);
 	$controls->addItem(new CSubmit('form', _('Create template')));
-	$controls->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=template")'));
+	$controls->addItem(
+		(new CButton('form', _('Import')))
+			->onClick('redirect("conf.import.php?rules_preset=template")')
+	);
 	$frmForm->addItem($controls);
 
 	$templateWidget->setControls($frmForm);

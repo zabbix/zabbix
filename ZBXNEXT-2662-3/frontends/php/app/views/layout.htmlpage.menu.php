@@ -21,22 +21,22 @@
 	$page_menu = (new CTag('header', true))->setAttribute('role', 'banner');
 	$page_menu_div = (new CDiv())->addClass('nav')->setAttribute('role', 'navigation');
 
-	$top_menu_items = new CList($data['menu']['main_menu'], 'top-nav');
+	$top_menu_items = (new CList($data['menu']['main_menu']))->addClass('top-nav');
 
 	// 1st level menu
 	$top_menu = (new CDiv($top_menu_items))
 		->addClass('top-nav-container')
 		->setId('mmenu');
 
-	$icons = new CList([], 'top-nav-icons');
+	$icons = (new CList())->addClass('top-nav-icons');
 
 	$form = new CForm('get', 'search.php');
 	$search = new CTextBox('search', '', 20, false, 255);
 	$search->setAttribute('autocomplete', 'off');
 	$search->addClass('search');
 
-	$button = new CSubmitButton(SPACE, null, null, 'btn-search');
-	$form->AddItem([$search, $button]);
+	$button = (new CSubmitButton(SPACE))->addClass('btn-search');
+	$form->addItem([$search, $button]);
 	$icons->addItem($form);
 
 	$zshare = (new CLink('Share', 'https://share.zabbix.com/'))
@@ -74,7 +74,7 @@
 	$menu_divs = [];
 	$menu_selected = false;
 	foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
-		$sub_menu_row = new CList([], 'top-subnav');
+		$sub_menu_row = (new CList())->addClass('top-subnav');
 		foreach ($sub_menu as $id => $sub_page) {
 			if (empty($sub_page['menu_text'])) {
 				$sub_page['menu_text'] = SPACE;

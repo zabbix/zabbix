@@ -63,7 +63,7 @@ class CSubmitButtonTest extends CTagTest {
 	 *
 	 * @return CSubmitButton
 	 */
-	protected function createTag($name = null, $value = null, $caption = null, $class = null) {
-		return new CSubmitButton($name, $value, $caption, $class);
+	protected function createTag($name = null, $value = null, $caption = null) {
+		return new CSubmitButton($name, $value, $caption);
 	}
 }

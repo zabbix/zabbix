@@ -65,11 +65,13 @@ class CFilter extends CTag {
 
 	private function getHeader() {
 		$switch = (new CDiv())->addClass('filter-btn-container');
-		$button = new CSimpleButton(
-			[_('Filter'), (new CSpan())->addClass('arrow-up')->setId('filter-arrow')],
-			'filter-trigger filter-active');
-		$button->setId('filter-mode');
-		$button->onClick('javascript: jQuery("#filter-space").toggle(); jQuery("#filter-mode").toggleClass("filter-active"); jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");');
+		$button = (new CSimpleButton(
+			[_('Filter'), (new CSpan())->addClass('arrow-up')->setId('filter-arrow')]
+		))
+			->addClass('filter-trigger')
+			->addClass('filter-active')
+			->setId('filter-mode')
+			->onClick('javascript: jQuery("#filter-space").toggle(); jQuery("#filter-mode").toggleClass("filter-active"); jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");');
 		$switch->addItem($button);
 
 		return $switch;
@@ -98,12 +100,12 @@ class CFilter extends CTag {
 		$url->removeArgument('sid');
 		$url->removeArgument('filter_set');
 		$url->setArgument('filter_rst', 1);
-		$resetButton = new CRedirectButton(_('Reset'), $url->getUrl());
-		$resetButton->addClass(ZBX_STYLE_BTN_ALT);
-		$resetButton->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
+		$resetButton = (new CRedirectButton(_('Reset'), $url->getUrl()))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
 
-		$filterButton = new CSubmit('filter_set', _('Filter'));
-		$filterButton->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
+		$filterButton = (new CSubmit('filter_set', _('Filter')))
+			->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
 
 		$buttons->addItem($filterButton);
 		$buttons->addItem($resetButton);

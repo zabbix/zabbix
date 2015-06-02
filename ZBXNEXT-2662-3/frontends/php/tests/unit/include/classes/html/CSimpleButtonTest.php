@@ -67,7 +67,7 @@ class CSimpleButtonTest extends CTagTest {
 	 *
 	 * @return CSimpleButton
 	 */
-	protected function createTag($caption = '', $class = null) {
-		return new CSimpleButton($caption, $class);
+	protected function createTag($caption = '') {
+		return new CSimpleButton($caption);
 	}
 }

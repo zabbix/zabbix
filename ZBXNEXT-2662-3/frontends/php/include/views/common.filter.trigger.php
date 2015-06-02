@@ -95,7 +95,8 @@ $application_name_url =
 // application
 $column->addRow(_('Filter by application'), [
 	new CTextBox('application', $filter['application'], 40),
-	(new CButton('application_name', _('Select'), 'return PopUp("'.$application_name_url.'");'))
+	(new CButton('application_name', _('Select')))
+		->onClick('return PopUp("'.$application_name_url.'");')
 		->addClass(ZBX_STYLE_BTN_GREY)
 ]);
 

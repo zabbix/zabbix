@@ -25,11 +25,11 @@ class CButtonQMessage extends CSubmit {
 	public $msg;
 	public $name;
 
-	public function __construct($name, $caption, $msg = null, $vars = null, $class = null) {
+	public function __construct($name, $caption, $msg = null, $vars = null) {
 		$this->vars = null;
 		$this->msg = null;
 		$this->name = $name;
-		parent::__construct($name, $caption, null, $class);
+		parent::__construct($name, $caption);
 		$this->setMessage($msg);
 		$this->setVars($vars);
 		$this->setAction(null);

@@ -124,9 +124,11 @@ $securityLevelComboBox = new CComboBox('snmpv3_securitylevel', $this->data['snmp
 ]);
 $itemFormList->addRow(_('Security level'), $securityLevelComboBox, false, 'row_snmpv3_securitylevel');
 $authProtocolRadioButton = [
-	new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5, null, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_MD5),
+	(new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_MD5))
+		->setId('snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5),
 	new CLabel(_('MD5'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5),
-	new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_SHA, null, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_SHA),
+	(new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_SHA, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_SHA))
+		->setId('snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA),
 	new CLabel(_('SHA'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
 ];
 $itemFormList->addRow(_('Authentication protocol'),
@@ -140,9 +142,11 @@ $itemFormList->addRow(_('Authentication passphrase'),
 	false, 'row_snmpv3_authpassphrase'
 );
 $privProtocolRadioButton = [
-	new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES, null, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_DES),
+	(new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_DES))
+		->setId('snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES),
 	new CLabel(_('DES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES),
-	new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_AES, null, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_AES),
+	(new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_AES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_AES))
+		->setId('snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES),
 	new CLabel(_('AES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
 ];
 $itemFormList->addRow(_('Privacy protocol'),
@@ -215,7 +219,9 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 	$row = (new CRow([
 		$delayFlex['delay'],
 		$delayFlex['period'],
-		(new CButton('remove', _('Remove'), 'javascript: removeDelayFlex('.$i.');'))->addClass(ZBX_STYLE_BTN_LINK)
+		(new CButton('remove', _('Remove')))
+			->onClick('javascript: removeDelayFlex('.$i.');')
+			->addClass(ZBX_STYLE_BTN_LINK)
 	]))->setId('delayFlex_'.$i);
 	$delayFlexTable->addRow($row);
 

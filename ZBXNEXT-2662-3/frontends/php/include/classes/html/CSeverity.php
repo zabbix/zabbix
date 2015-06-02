@@ -41,13 +41,11 @@ class CSeverity extends CTag {
 		$config = select_config();
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$items[] = new CRadioButton(
+			$items[] = (new CRadioButton(
 				$options['name'],
 				$severity,
-				null,
-				$options['name'].'_'.$severity,
 				($options['value'] == $severity)
-			);
+			))->setId($options['name'].'_'.$severity);
 
 			$css = getSeverityStyle($severity);
 

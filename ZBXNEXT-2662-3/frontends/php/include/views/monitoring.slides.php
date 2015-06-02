@@ -40,7 +40,7 @@ if ($this->data['slideshows']) {
 			'elname' => 'slideshowid',
 			'elid' => $this->data['elementId']
 		])
-		: new CIcon(_('Favourites'), 'iconplus');
+		: (new CIcon(_('Favourites')))->addClass('iconplus');
 
 	$refreshIcon = get_icon('screenconf');
 

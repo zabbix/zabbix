@@ -63,11 +63,11 @@ if (!$this->data['is_profile']) {
 	$userFormList->addRow(_('Groups'),
 		[
 			$lstGroups,
-			new CButton('add_group', _('Add'),
-				'return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups");', 'button-form top'),
+			(new CButton('add_group', _('Add')))
+				->onClick('return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups");', 'button-form top'),
 			BR(),
 			(count($this->data['user_groups']) > 0)
-				? new CSubmit('del_user_group', _('Delete selected'), null, 'button-form')
+				? (new CSubmit('del_user_group', _('Delete selected')))->addClass('button-form')
 				: null
 		]
 	);
@@ -90,7 +90,7 @@ if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 		}
 	}
 	else {
-		$passwdButton = new CSubmit('change_password', _('Change password'), null, 'button-form');
+		$passwdButton = (new CSubmit('change_password', _('Change password')))->addClass('button-form');
 		if ($this->data['alias'] == ZBX_GUEST_USER) {
 			$passwdButton->setAttribute('disabled', 'disabled');
 		}
@@ -215,13 +215,15 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			(new CSpan($media['period']))->addClass(ZBX_STYLE_NOWRAP),
 			$mediaSeverity,
 			$status,
-			(new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'");'))
+			(new CButton('edit_media', _('Edit')))
+				->onClick('return PopUp("popup_media.php'.$mediaUrl.'");')
 				->addClass(ZBX_STYLE_BTN_LINK)
 		]);
 	}
 
 	$userMediaFormList->addRow(_('Media'), [$mediaTableInfo,
-		(new CButton('add_media', _('Add'), 'return PopUp("popup_media.php?dstfrm='.$userForm->getName().'");'))
+		(new CButton('add_media', _('Add')))
+			->onClick('return PopUp("popup_media.php?dstfrm='.$userForm->getName().'");')
 			->addClass(ZBX_STYLE_BTN_LINK),
 		SPACE,
 		SPACE,
@@ -261,8 +263,12 @@ if ($this->data['is_profile']) {
 		_('Recovery'),
 		SPACE,
 		$soundList,
-		new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.recovery');", 'button-form'),
-		new CButton('stop', _('Stop'), 'javascript: AudioControl.stop();', 'button-form')
+		(new CButton('start', _('Play')))
+			->onClick("javascript: testUserSound('messages_sounds.recovery');")
+			->addClass('button-form'),
+		(new CButton('stop', _('Stop')))
+			->onClick('javascript: AudioControl.stop();')
+			->addClass('button-form')
 	];
 
 	$triggersTable = (new CTable())
@@ -292,8 +298,12 @@ if ($this->data['is_profile']) {
 			getSeverityName($severity, $this->data['config']),
 			SPACE,
 			$soundList,
-			new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.".$severity."');", 'button-form'),
-			new CButton('stop', _('Stop'), 'javascript: AudioControl.stop();', 'button-form')
+			(new CButton('start', _('Play')))
+				->onClick( "javascript: testUserSound('messages_sounds.".$severity."');")
+				->addClass('button-form'),
+			(new CButton('stop', _('Stop')))
+				->onClick('javascript: AudioControl.stop();')
+				->addClass('button-form')
 		]);
 
 		zbx_subarray_push($msgVisibility, 1, 'messages[triggers.severities]['.$severity.']');

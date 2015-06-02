@@ -21,20 +21,13 @@
 
 class CRadioButton extends CTag {
 
-	public function __construct($name, $value, $class = null, $id = null, $checked = false, $action = null) {
+	public function __construct($name, $value, $checked = false) {
 		parent::__construct('input');
-		if ($class !== null) {
-			$this->addClass($class);
-		}
 		$this->setAttribute('name', $name);
 		$this->setAttribute('value', $value);
-		$this->setId($id);
 		$this->setAttribute('type', 'radio');
 		if ($checked) {
 			$this->setAttribute('checked', 'checked');
-		}
-		if (!empty($action)) {
-			$this->onChange($action);
 		}
 	}
 

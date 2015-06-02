@@ -34,11 +34,11 @@ $dashboardWidget = (new CWidget('dashboard'))
 $dashboardGrid = [[], [], []];
 $widgetRefreshParams = [];
 
-$icon = new CRedirectButton(SPACE, null);
-$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
-$icon->setTitle(_('Action'));
-$icon->setId('favouriteGraphs');
-$icon->setMenuPopup(CMenuPopupHelper::getFavouriteGraphs());
+$icon = (new CRedirectButton(SPACE, null))
+	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
+	->setTitle(_('Action'))
+	->setId('favouriteGraphs')
+	->setMenuPopup(CMenuPopupHelper::getFavouriteGraphs());
 
 $favouriteGraphs = new CCollapsibleUiWidget(WIDGET_FAVOURITE_GRAPHS, $data['favourite_graphs']);
 $favouriteGraphs->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.state', true);
@@ -52,11 +52,11 @@ $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.row', 0);
 $dashboardGrid[$col][$row] = $favouriteGraphs;
 
 // favourite maps
-$icon = new CRedirectButton(SPACE, null);
-$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
-$icon->setTitle(_('Action'));
-$icon->setId('favouriteMaps');
-$icon->setMenuPopup(CMenuPopupHelper::getFavouriteMaps());
+$icon = (new CRedirectButton(SPACE, null))
+	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
+	->setTitle(_('Action'))
+	->setId('favouriteMaps')
+	->setMenuPopup(CMenuPopupHelper::getFavouriteMaps());
 
 $favouriteMaps = new CCollapsibleUiWidget(WIDGET_FAVOURITE_MAPS, $data['favourite_maps']);
 $favouriteMaps->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.state', true);
@@ -70,15 +70,16 @@ $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.row', 2);
 $dashboardGrid[$col][$row] = $favouriteMaps;
 
 // favourite screens
-$icon = new CIcon(_('Menu'), 'iconmenu');
-$icon->setId('favouriteScreens');
-$icon->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
+$icon = (new CIcon(_('Menu')))
+	->addClass('iconmenu')
+	->setId('favouriteScreens')
+	->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
 
-$icon = new CRedirectButton(SPACE, null);
-$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
-$icon->setTitle(_('Action'));
-$icon->setId('favouriteScreens');
-$icon->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
+$icon = (new CRedirectButton(SPACE, null))
+	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
+	->setTitle(_('Action'))
+	->setId('favouriteScreens')
+	->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
 
 $favouriteScreens = new CCollapsibleUiWidget(WIDGET_FAVOURITE_SCREENS, $data['favourite_screens']);
 $favouriteScreens->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.state', true);
@@ -96,10 +97,10 @@ $dashboardGrid[$col][$row] = $favouriteScreens;
 if ($data['show_status_widget']) {
 	$rate = CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.rf_rate', 60);
 
-	$icon = new CRedirectButton(SPACE, null);
-	$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
-	$icon->setTitle(_('Action'));
-	$icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_ZABBIX_STATUS, $rate));
+	$icon = (new CRedirectButton(SPACE, null))
+		->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
+		->setTitle(_('Action'))
+		->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_ZABBIX_STATUS, $rate));
 
 	$zabbixStatus = new CCollapsibleUiWidget(WIDGET_ZABBIX_STATUS, (new CDiv())->addClass('preloader'));
 	$zabbixStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_ZABBIX_STATUS.'.state', true);
@@ -124,10 +125,10 @@ if ($data['show_status_widget']) {
 // system status
 $rate = CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.rf_rate', 60);
 
-$icon = new CRedirectButton(SPACE, null);
-$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
-$icon->setTitle(_('Action'));
-$icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_SYSTEM_STATUS, $rate));
+$icon = (new CRedirectButton(SPACE, null))
+	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
+	->setTitle(_('Action'))
+	->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_SYSTEM_STATUS, $rate));
 
 $systemStatus = new CCollapsibleUiWidget(WIDGET_SYSTEM_STATUS, (new CDiv())->addClass('preloader'));
 $systemStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_SYSTEM_STATUS.'.state', true);
@@ -151,10 +152,10 @@ $widgetRefreshParams[WIDGET_SYSTEM_STATUS] = [
 // host status
 $rate = CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.rf_rate', 60);
 
-$icon = new CRedirectButton(SPACE, null);
-$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
-$icon->setTitle(_('Action'));
-$icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_HOST_STATUS, $rate));
+$icon = (new CRedirectButton(SPACE, null))
+	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
+	->setTitle(_('Action'))
+	->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_HOST_STATUS, $rate));
 
 $hostStatus = new CCollapsibleUiWidget(WIDGET_HOST_STATUS, (new CDiv())->addClass('preloader'));
 $hostStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_HOST_STATUS.'.state', true);
@@ -178,10 +179,10 @@ $widgetRefreshParams[WIDGET_HOST_STATUS] = [
 // last issues
 $rate = CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.rf_rate', 60);
 
-$icon = new CRedirectButton(SPACE, null);
-$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
-$icon->setTitle(_('Action'));
-$icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_LAST_ISSUES, $rate));
+$icon = (new CRedirectButton(SPACE, null))
+	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
+	->setTitle(_('Action'))
+	->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_LAST_ISSUES, $rate));
 
 $lastIssues = new CCollapsibleUiWidget(WIDGET_LAST_ISSUES, (new CDiv())->addClass('preloader'));
 $lastIssues->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_LAST_ISSUES.'.state', true);
@@ -205,10 +206,10 @@ $widgetRefreshParams[WIDGET_LAST_ISSUES] = [
 // web monitoring
 $rate = CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.rf_rate', 60);
 
-$icon = new CRedirectButton(SPACE, null);
-$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
-$icon->setTitle(_('Action'));
-$icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_WEB_OVERVIEW, $rate));
+$icon = (new CRedirectButton(SPACE, null))
+	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
+	->setTitle(_('Action'))
+	->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_WEB_OVERVIEW, $rate));
 
 $webMonitoring = new CCollapsibleUiWidget(WIDGET_WEB_OVERVIEW, (new CDiv())->addClass('preloader'));
 $webMonitoring->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_WEB_OVERVIEW.'.state', true);
@@ -233,10 +234,10 @@ $widgetRefreshParams[WIDGET_WEB_OVERVIEW] = [
 if ($data['show_discovery_widget']) {
 	$rate = CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.rf_rate', 60);
 
-	$icon = new CRedirectButton(SPACE, null);
-	$icon->addClass(ZBX_STYLE_BTN_WIDGET_ACTION);
-	$icon->setTitle(_('Action'));
-	$icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_DISCOVERY_STATUS, $rate));
+	$icon = (new CRedirectButton(SPACE, null))
+		->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
+		->setTitle(_('Action'))
+		->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_DISCOVERY_STATUS, $rate));
 
 	$discoveryStatus = new CCollapsibleUiWidget(WIDGET_DISCOVERY_STATUS, (new CDiv())->addClass('preloader'));
 	$discoveryStatus->open = (bool) CProfile::get('web.dashboard.widget.'.WIDGET_DISCOVERY_STATUS.'.state', true);

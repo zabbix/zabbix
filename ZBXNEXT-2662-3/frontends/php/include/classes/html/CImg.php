@@ -23,7 +23,7 @@ class CImg extends CTag {
 
 	public $preloader;
 
-	public function __construct($src, $name = null, $width = null, $height = null, $class = null) {
+	public function __construct($src, $name = null, $width = null, $height = null) {
 		if (is_null($name)) {
 			$name = 'image';
 		}
@@ -35,9 +35,6 @@ class CImg extends CTag {
 		$this->setSrc($src);
 		$this->setWidth($width);
 		$this->setHeight($height);
-		if ($class !== null) {
-			$this->addClass($class);
-		}
 	}
 
 	public function setSrc($value) {

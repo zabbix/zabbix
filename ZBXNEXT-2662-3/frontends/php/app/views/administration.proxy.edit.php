@@ -91,12 +91,10 @@ $proxyTab = new CTabView();
 $proxyTab->addTab('proxyTab', _('Proxy'), $proxyFormList);
 
 // append buttons to form
-$cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list');
-$cancelButton->setId('cancel');
+$cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list'))->setId('cancel');
 
 if ($data['proxyid'] == 0) {
-	$addButton = new CSubmitButton(_('Add'), 'action', 'proxy.create');
-	$addButton->setId('add');
+	$addButton = (new CSubmitButton(_('Add'), 'action', 'proxy.create'))->setId('add');
 
 	$proxyTab->setFooter(makeFormFooter(
 		$addButton,
@@ -104,15 +102,13 @@ if ($data['proxyid'] == 0) {
 	));
 }
 else {
-	$updateButton = new CSubmitButton(_('Update'), 'action', 'proxy.update');
-	$updateButton->setId('update');
-	$cloneButton = new CSimpleButton(_('Clone'));
-	$cloneButton->setId('clone');
-	$deleteButton = new CRedirectButton(_('Delete'),
+	$updateButton = (new CSubmitButton(_('Update'), 'action', 'proxy.update'))->setId('update');
+	$cloneButton = (new CSimpleButton(_('Clone')))->setId('clone');
+	$deleteButton = (new CRedirectButton(_('Delete'),
 		'zabbix.php?action=proxy.delete&sid='.$data['sid'].'&proxyids[]='.$data['proxyid'],
 		_('Delete proxy?')
-	);
-	$deleteButton->setId('delete');
+	))
+		->setId('delete');
 
 	$proxyTab->setFooter(makeFormFooter(
 		$updateButton,

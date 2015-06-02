@@ -60,7 +60,8 @@ $mediaTypeFormList->addRow(_('GSM modem'), new CTextBox('gsm_modem', $data['gsm_
 
 // create password field
 if ($data['passwd'] != '') {
-	$passwdButton = new CButton('chPass_btn', _('Change password'), 'this.style.display="none"; $("passwd").enable().show().focus();');
+	$passwdButton = (new CButton('chPass_btn', _('Change password')))
+		->onClick('this.style.display="none"; $("passwd").enable().show().focus();');
 	$passwdBox = new CPassBox('passwd', $data['passwd'], ZBX_TEXTBOX_SMALL_SIZE);
 	$passwdBox->addStyle('display: none;');
 	$passwdField = [$passwdButton, $passwdBox];
@@ -85,12 +86,10 @@ $mediaTypeTab = new CTabView();
 $mediaTypeTab->addTab('mediaTypeTab', _('Media type'), $mediaTypeFormList);
 
 // append buttons to form
-$cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.list');
-$cancelButton->setId('cancel');
+$cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.list'))->setId('cancel');
 
 if ($data['mediatypeid'] == 0) {
-	$addButton = new CSubmitButton(_('Add'), 'action', 'mediatype.create');
-	$addButton->setId('add');
+	$addButton = (new CSubmitButton(_('Add'), 'action', 'mediatype.create'))->setId('add');
 
 	$mediaTypeTab->setFooter(makeFormFooter(
 		$addButton,
@@ -98,15 +97,13 @@ if ($data['mediatypeid'] == 0) {
 	));
 }
 else {
-	$updateButton = new CSubmitButton(_('Update'), 'action', 'mediatype.update');
-	$updateButton->setId('update');
-	$cloneButton = new CSimpleButton(_('Clone'));
-	$cloneButton->setId('clone');
-	$deleteButton = new CRedirectButton(_('Delete'),
+	$updateButton = (new CSubmitButton(_('Update'), 'action', 'mediatype.update'))->setId('update');
+	$cloneButton = (new CSimpleButton(_('Clone')))->setId('clone');
+	$deleteButton = (new CRedirectButton(_('Delete'),
 		'zabbix.php?action=mediatype.delete&sid='.$data['sid'].'&mediatypeids[]='.$data['mediatypeid'],
 		_('Delete media type?')
-	);
-	$deleteButton->setId('delete');
+	))
+		->setId('delete');
 
 	$mediaTypeTab->setFooter(makeFormFooter(
 		$updateButton,

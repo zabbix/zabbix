@@ -456,7 +456,7 @@ $tmplList->addRow(
 		->addClass('template-link-block')
 		->addClass('objectgroup')
 		->addClass('inlineblock')
-		->AddClass('border_dotted')
+		->addClass('border_dotted')
 );
 
 $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
