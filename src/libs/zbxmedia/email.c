@@ -317,6 +317,7 @@ static char	*smtp_prepare_payload(const char *from_display_name, const char *fro
 	return tmp;
 }
 
+#ifdef HAVE_SMTP_AUTHENTICATION
 typedef struct
 {
 	char	*payload;
@@ -339,7 +340,6 @@ static size_t	smtp_provide_payload(void *buffer, size_t size, size_t nmemb, void
 	return current_len;
 }
 
-#ifdef HAVE_SMTP_AUTHENTICATION
 static int	smtp_debug_function(CURL *easyhandle, curl_infotype type, char *data, size_t size, void *userptr)
 {
 	const char	labels[3] = {'*', '<', '>'};
