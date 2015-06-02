@@ -551,7 +551,7 @@ if ($srctbl == 'usrgrp') {
 		$multiselect
 			? (new CColHeader(
 				new CCheckBox('all_usrgrps', null, "javascript: checkAll('".$form->getName()."', 'all_usrgrps', 'usrgrps');"))
-			)->addClass('cell-width')
+			)->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name')
 	]);
@@ -612,7 +612,7 @@ elseif ($srctbl == 'users') {
 		$multiselect
 			? (new CColHeader(
 				new CCheckBox('all_users', null, "javascript: checkAll('".$form->getName()."', 'all_users', 'users');"))
-			)->addClass('cell-width')
+			)->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Alias'),
 		_x('Name', 'user first name'),
@@ -685,7 +685,7 @@ elseif ($srctbl == 'templates') {
 		$multiselect
 			? (new CColHeader(
 				new CCheckBox('all_templates', null, "javascript: checkAll('".$form->getName()."', 'all_templates', 'templates');"))
-			)->addClass('cell-width')
+			)->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name')
 	]);
@@ -765,7 +765,7 @@ elseif ($srctbl == 'hosts') {
 		$multiselect
 			? (new CColHeader(
 				new CCheckBox('all_hosts', null, "javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');"))
-			)->addClass('cell-width')
+			)->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name')
 	]);
@@ -845,7 +845,7 @@ elseif ($srctbl == 'host_templates') {
 		$multiselect
 			? (new CColHeader(
 				new CCheckBox('all_hosts', null, "javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');"))
-			)->addClass('cell-width')
+			)->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name')
 	]);
@@ -926,7 +926,7 @@ elseif ($srctbl == 'host_groups') {
 		$multiselect
 			? (new CColHeader(
 				new CCheckBox('all_hostgroups', null, "javascript: checkAll('".$form->getName()."', 'all_hostgroups', 'hostGroups');"))
-			)->addClass('cell-width')
+			)->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name')
 	]);
@@ -1022,7 +1022,7 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 		$multiselect
 			? (new CColHeader(
 				new CCheckBox('all_triggers', null, "checkAll('".$form->getName()."', 'all_triggers', 'triggers');"))
-			)->addClass('cell-width')
+			)->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name'),
 		_('Severity'),
@@ -1173,7 +1173,7 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 		$multiselect
 			? (new CColHeader(
 				new CCheckBox('all_items', null, "javascript: checkAll('".$form->getName()."', 'all_items', 'items');"))
-			)->addClass('cell-width')
+			)->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name'),
 		_('Key'),
@@ -1306,7 +1306,7 @@ elseif ($srctbl == 'applications') {
 		$multiselect
 			? (new CColHeader(
 				new CCheckBox('all_applications', null, "javascript: checkAll('".$form->getName()."', 'all_applications', 'applications');"))
-			)->addClass('cell-width')
+			)->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name')
 	]);

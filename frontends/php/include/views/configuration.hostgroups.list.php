@@ -48,7 +48,7 @@ $hostGroupTable = new CTableInfo();
 $hostGroupTable->setHeader([
 	(new CColHeader(
 		new CCheckBox('all_groups', null, "checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');")
-	))->addClass('cell-width'),
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Hosts'),
 	_('Templates'),

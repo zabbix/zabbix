@@ -45,7 +45,7 @@ $usersTable = new CTableInfo();
 $usersTable->setHeader([
 	(new CColHeader(
 		new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');")
-	))->addClass('cell-width'),
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Alias'), 'alias', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_x('Name', 'user first name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Surname'), 'surname', $this->data['sort'], $this->data['sortorder']),

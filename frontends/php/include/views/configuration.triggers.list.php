@@ -55,7 +55,7 @@ $triggersTable = new CTableInfo();
 $triggersTable->setHeader([
 	(new CColHeader(
 		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")
-	))->addClass('cell-width'),
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
 	($this->data['hostid'] == 0) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),

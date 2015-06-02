@@ -45,7 +45,7 @@ $screenTable = new CTableInfo();
 $screenTable->setHeader([
 	(new CColHeader(
 		new CCheckBox('all_screens', null, "checkAll('".$screenForm->getName()."', 'all_screens', 'screens');")
-	))->addClass('cell-width'),
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Dimension (cols x rows)'),
 	_('Screen')

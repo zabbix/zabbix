@@ -37,7 +37,7 @@ $userGroupTable = new CTableInfo();
 $userGroupTable->setHeader([
 	(new CColHeader(
 		new CCheckBox('all_groups', null, "checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');")
-	))->addClass('cell-width'),
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	'#',
 	_('Members'),

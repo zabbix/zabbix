@@ -49,7 +49,7 @@ $httpTable = new CTableInfo();
 $httpTable->setHeader([
 	(new CColHeader(
 		new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');")
-	))->addClass('cell-width'),
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	($this->data['hostid'] == 0)
 		? make_sorting_header(_('Host'), 'hostname', $this->data['sort'], $this->data['sortorder'])
 		: null,

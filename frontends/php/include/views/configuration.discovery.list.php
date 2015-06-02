@@ -34,7 +34,7 @@ $discoveryTable = new CTableInfo();
 $discoveryTable->setHeader([
 	(new CColHeader(
 		new CCheckBox('all_drules', null, "checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');")
-	))->addClass('cell-width'),
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('IP range'),
 	_('Delay'),

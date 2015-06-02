@@ -35,7 +35,7 @@ $servicesChildTable = new CTableInfo();
 $servicesChildTable->setHeader([
 	(new CColHeader(
 		new CCheckBox('all_services', null, "javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');")
-	))->addClass('cell-width'),
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	_('Service'),
 	_('Status calculation'),
 	_('Trigger')

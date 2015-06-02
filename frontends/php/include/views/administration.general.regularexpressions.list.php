@@ -25,7 +25,7 @@ $regExpTable = new CTableInfo();
 $regExpTable->setHeader([
 	(new CColHeader(
 		new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');")
-	))->addClass('cell-width'),
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	_('Name'),
 	_('Expressions')
 ]);
