@@ -100,7 +100,9 @@ class CSetupWizard extends CForm {
 		$setup_right = (new CDiv($this->getStage()))->addClass('setup-right');
 
 		if (CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-			$cancel_button = new CSubmit('cancel', _('Cancel'), null, 'btn-alt float-left');
+			$cancel_button = (new CSubmit('cancel', _('Cancel')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass(ZBX_STYLE_FLOAT_LEFT);
 			if ($this->DISABLE_CANCEL_BUTTON) {
 				$cancel_button->setEnabled(false);
 			}
@@ -116,7 +118,9 @@ class CSetupWizard extends CForm {
 			$next_button = new CSubmit($this->SHOW_RETRY_BUTTON ? 'retry' : 'finish', _('Finish'));
 		}
 
-		$back_button = new CSubmit('back['.$this->getStep().']', _('Back'), null, 'btn-alt float-left');
+		$back_button = (new CSubmit('back['.$this->getStep().']', _('Back')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass(ZBX_STYLE_FLOAT_LEFT);
 
 		if ($this->getStep() == 0 || $this->DISABLE_BACK_BUTTON) {
 			$back_button->setEnabled(false);
