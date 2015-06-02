@@ -66,15 +66,15 @@ class CActionButtonList extends CObject {
 		$this->checkboxesName = $checkboxesName;
 		$this->cookieNamePrefix = $cookieNamePrefix;
 
-		foreach ($buttonsData as $actionValue => $buttonData) {
-			$this->buttons[$actionValue] = new CSubmit($actionName, $buttonData['name']);
-
-			$this->buttons[$actionValue]->removeAttribute('id');
-			$this->buttons[$actionValue]->setAttribute('value', $actionValue);
-			$this->buttons[$actionValue]->addClass('btn-alt footerButton');
+		foreach ($buttonsData as $action=> $buttonData) {
+			$this->buttons[$action] = (new CSubmit($actionName, $buttonData['name']))
+				->addClass('btn-alt')
+				->addClass('footerButton')
+				->removeAttribute('id')
+				->setAttribute('value', $action);
 
 			if (array_key_exists('confirm', $buttonData)) {
-				$this->buttons[$actionValue]->setAttribute('confirm', $buttonData['confirm']);
+				$this->buttons[$action]->setAttribute('confirm', $buttonData['confirm']);
 			}
 		}
 	}
