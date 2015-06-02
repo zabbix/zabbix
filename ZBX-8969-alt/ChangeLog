@@ -6,6 +6,11 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Polish translat
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
+...G...... [ZBX-8969] fixed "system.uname" and "system.sw.arch" returning bad values on HP-UX (asaveljevs, wiper)
+...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
+...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
+...G...... [ZBX-9456] fixed sustem.cpu.util item to work correctly on OpenBSD 5.7 (igors)
+........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
 .......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
 .......PS. [ZBX-9457] fixed server crash in case ValueCacheSize=0; thanks to MATSUDA Daiki for patch (asaveljevs)
@@ -18,7 +23,7 @@ Bug fixes:
 .......PS. [ZBX-7446] fixed vmware.hv.status item always returning 0 (gray) status (wiper)
 ...G...... [ZBX-9410] fixed agent logging to eventlog (syslog option) on Windows (wiper)
 A.F....... [ZBX-9365] fixed array_combine() function giving a warning message for PHP versions < 5.4.0 (Ivo)
-..F....... [ZBX-9402] fixed trigger list sorting (Ivo)
+..F....... [ZBX-9402] fixed sorting of elements in pages and fixed several requests returning more results than record count set in configuration (Ivo)
 ..F....... [ZBX-9367] fixed "Status of Zabbix" and "System status" widget default refresh intervals (Ivo)
 ..F....... [ZBX-9102] fixed "System status" dashboard widget performing poorly (Ivo)
 A......... [ZBX-5656] fixed maintenance.create and maintenance.update methods "timeperiods" parameter to be an array of arrays (Ivo)
@@ -1253,6 +1258,10 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
+...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
+...G...... [ZBX-9456] fixed sustem.cpu.util item to work correctly on OpenBSD 5.7 (igors)
+........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
 .......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
 .......PS. [ZBX-5717] fixed incorrect calculation of icmppingloss[] due to floating-point errors (asaveljevs)

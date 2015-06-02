@@ -388,7 +388,6 @@ $options = array(
 	'monitored' => true,
 	'skipDependent' => true,
 	'sortfield' => $sortfield,
-	'sortorder' => $sortorder,
 	'limit' => $config['search_limit'] + 1
 );
 

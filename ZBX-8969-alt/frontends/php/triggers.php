@@ -379,11 +379,17 @@ else {
 	if ($data['pageFilter']->hostsSelected) {
 		$options = array(
 			'editable' => true,
-			'output' => array('triggerid'),
 			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
 			'limit' => $config['search_limit'] + 1
 		);
+
+		if ($sortfield === 'status') {
+			$options['output'] = array('triggerid', 'status', 'state');
+		}
+		else {
+			$options['output'] = array('triggerid', $sortfield);
+		}
+
 		if (empty($data['showdisabled'])) {
 			$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 		}
@@ -398,7 +404,14 @@ else {
 
 	$_REQUEST['hostid'] = get_request('hostid', $data['pageFilter']->hostid);
 
-	// paging
+	// sort for paging
+	if ($sortfield === 'status') {
+		orderTriggersByStatus($data['triggers'], $sortorder);
+	}
+	else {
+		order_result($data['triggers'], $sortfield, $sortorder);
+	}
+
 	$data['paging'] = getPagingLine($data['triggers'], array('triggerid'), array('hostid' => $_REQUEST['hostid']));
 
 	$data['triggers'] = API::Trigger()->get(array(
@@ -411,6 +424,7 @@ else {
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND
 	));
 
+	// sort for displaying full results
 	if ($sortfield === 'status') {
 		orderTriggersByStatus($data['triggers'], $sortorder);
 	}

@@ -300,9 +300,11 @@ else {
 
 	// get triggers
 	$sortfield = getPageSortField('description');
+	$sortorder = getPageSortOrder();
+
 	$options = array(
 		'editable' => true,
-		'output' => array('triggerid'),
+		'output' => array('triggerid', $sortfield),
 		'discoveryids' => $data['parent_discoveryid'],
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
@@ -311,6 +313,8 @@ else {
 		$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 	}
 	$data['triggers'] = API::TriggerPrototype()->get($options);
+
+	order_result($data['triggers'], $sortfield, $sortorder);
 
 	// paging
 	$data['paging'] = getPagingLine(
@@ -329,7 +333,7 @@ else {
 		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
 		'selectFunctions' => API_OUTPUT_EXTEND
 	));
-	order_result($data['triggers'], $sortfield, getPageSortOrder());
+	order_result($data['triggers'], $sortfield, $sortorder);
 
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
