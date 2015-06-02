@@ -1011,6 +1011,7 @@ define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_HIDDEN', 'hidden');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
+define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');

@@ -19,23 +19,19 @@
 **/
 
 
-class CColor extends CObject {
+class CColor extends CDiv {
 
 	public function __construct($name, $value) {
-		parent::__construct();
+		parent::__construct([
+			(new CColorCell('lbl_'.$name, $value))
+				->setTitle('#'.$value)
+				->onClick('javascript: show_color_picker("'.$name.'")'),
+			(new CTextBox($name, $value))
+				->setAttribute('maxlength', 6)
+				->onChange('set_color_by_name("'.$name.'", this.value)')
+		]);
 
-		$txt = new CTextBox($name, $value);
-		$txt->addStyle('width: 6em;');
-		$txt->setAttribute('maxlength', 6);
-		$txt->setId(zbx_formatDomId($name));
-		$txt->onChange('set_color_by_name("'.$name.'", this.value)');
-		$txt->addStyle('style', 'margin-top: 0px; margin-bottom: 0px;');
-
-		$lbl = (new CColorCell('lbl_'.$name, $value))
-			->setTitle('#'.$value)
-			->onClick('javascript: show_color_picker("'.$name.'")');
-
-		$this->addItem([$txt, $lbl]);
+		$this->addClass(ZBX_STYLE_INPUT_COLOR_PICKER);
 
 		insert_show_color_picker_javascript();
 	}

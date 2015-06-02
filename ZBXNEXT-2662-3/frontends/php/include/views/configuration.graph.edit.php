@@ -218,30 +218,30 @@ else {
 
 // append items to form list
 $itemsTable = (new CTable())
-	->addClass('formElementTable')
+	->addClass(ZBX_STYLE_LIST_TABLE)
 	->setAttribute('style', 'min-width: 700px;')
-	->setId('itemsTable');
-$itemsTable->setHeader([
-	(new CColHeader(SPACE))->setWidth(15),
-	(new CColHeader(SPACE))->setWidth(15),
-	(new CColHeader(_('Name')))->setWidth(($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? 280 : 360),
-	($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED)
-		? (new CColHeader(_('Type')))->setWidth(80)
-		: null,
-	(new CColHeader(_('Function')))->setWidth(80),
-	($this->data['graphtype'] == GRAPH_TYPE_NORMAL)
-		? (new CColHeader(_('Draw style')))
-			->addClass(ZBX_STYLE_NOWRAP)
-			->setWidth(80)
-		: null,
-	($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED)
-		? (new CColHeader(_('Y axis side')))
-			->addClass(ZBX_STYLE_NOWRAP)
-			->setWidth(80)
-		: null,
-	(new CColHeader(_('Colour')))->setWidth(100),
-	(new CColHeader(_('Action')))->setWidth(50)
-]);
+	->setId('itemsTable')
+	->setHeader([
+		(new CColHeader())->setWidth(15),
+		(new CColHeader())->setWidth(15),
+		(new CColHeader(_('Name')))->setWidth(($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? 280 : 360),
+		($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED)
+			? (new CColHeader(_('Type')))->setWidth(80)
+			: null,
+		(new CColHeader(_('Function')))->setWidth(80),
+		($this->data['graphtype'] == GRAPH_TYPE_NORMAL)
+			? (new CColHeader(_('Draw style')))
+				->addClass(ZBX_STYLE_NOWRAP)
+				->setWidth(80)
+			: null,
+		($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED)
+			? (new CColHeader(_('Y axis side')))
+				->addClass(ZBX_STYLE_NOWRAP)
+				->setWidth(80)
+			: null,
+		(new CColHeader(_('Colour')))->setWidth(100),
+		(new CColHeader(_('Action')))->setWidth(50)
+	]);
 
 $addButton = (new CButton('add_item', _('Add'),
 	'return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
