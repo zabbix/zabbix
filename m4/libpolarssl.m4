@@ -1,11 +1,11 @@
-# PolarSSL CHECK_CONFIG ([DEFAULT-ACTION])
+# mbed TLS (PolarSSL) CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
 # Derived from libssh2.m4 written by
 #    Alexander Vladishev                      Oct-26-2009
 #    Dmitry Borovikov                         Feb-13-2010
 #
-# Checks for PolarSSL library libpolarssl.  DEFAULT-ACTION is the string yes or no to
-# specify whether to default to --with-polarssl or --without-polarssl.
+# Checks for mbed TLS (PolarSSL) library libpolarssl.  DEFAULT-ACTION is the string yes or no to
+# specify whether to default to --with-mbed-tls or --without-mbed-tls.
 # If not supplied, DEFAULT-ACTION is no.
 #
 # This macro #defines HAVE_POLARSSL if a required header files are
@@ -35,9 +35,9 @@ found_polarssl="yes",)
 
 AC_DEFUN([LIBPOLARSSL_CHECK_CONFIG],
 [
-  AC_ARG_WITH(polarssl,[
-If you want to use encryption provided by PolarSSL libpolarssl library:
-AC_HELP_STRING([--with-polarssl@<:@=DIR@:>@],[use PolarSSL package @<:@default=no@:>@, DIR is the PolarSSL library libpolarssl install directory.])],
+  AC_ARG_WITH(mbed-tls,[
+If you want to use encryption provided by mbed TLS (PolarSSL) libpolarssl library:
+AC_HELP_STRING([--with-mbed-tls@<:@=DIR@:>@],[use mbed TLS (PolarSSL) package @<:@default=no@:>@, DIR is the mbed TLS (PolarSSL) library libpolarssl install directory.])],
     [
 	if test "$withval" = "no"; then
 	    want_polarssl="no"
@@ -53,7 +53,7 @@ AC_HELP_STRING([--with-polarssl@<:@=DIR@:>@],[use PolarSSL package @<:@default=n
   )
 
   if test "x$want_polarssl" = "xyes"; then
-     AC_MSG_CHECKING(for PolarSSL support)
+     AC_MSG_CHECKING(for mbed TLS (PolarSSL) support)
 
      if test "x$_libpolarssl_dir" = "xno"; then
        if test -f /usr/local/include/polarssl/ssl.h; then
