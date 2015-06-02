@@ -28,6 +28,67 @@ const DWORD	service_states[7] = {SERVICE_RUNNING, SERVICE_PAUSED, SERVICE_START_
 	SERVICE_INTERACTIVE_PROCESS}, start_types[6] = {SERVICE_AUTO_START, SERVICE_AUTO_START, SERVICE_BOOT_START,
 	SERVICE_SYSTEM_START, SERVICE_DEMAND_START, SERVICE_DISABLED};
 
+static const char	*get_state_string(DWORD state)
+{
+	switch (state)
+	{
+		case SERVICE_RUNNING:
+			return "running";
+		case SERVICE_PAUSED:
+			return "paused";
+		case SERVICE_START_PENDING:
+			return "start pending";
+		case SERVICE_PAUSE_PENDING:
+			return "pause pending";
+		case SERVICE_CONTINUE_PENDING:
+			return "continue pending";
+		case SERVICE_STOP_PENDING:
+			return "stop pending";
+		case SERVICE_STOPPED:
+			return "stopped";
+		default:
+			return "unknown";
+	}
+}
+
+static const char	*get_type_string(DWORD type)
+{
+	switch (type)
+	{
+		case SERVICE_KERNEL_DRIVER:
+			return "kernel driver";
+		case SERVICE_FILE_SYSTEM_DRIVER:
+			return "file system driver";
+		case SERVICE_WIN32_SHARE_PROCESS:
+			return "win32 own process";
+		case SERVICE_WIN32_OWN_PROCESS:
+			return "win32 share process";
+		case SERVICE_INTERACTIVE_PROCESS:
+			return "interactive process";
+		default:
+			return "unknown";
+	}
+}
+
+static const char	*get_startup_string(DWORD startup)
+{
+	switch (startup)
+	{
+		case SERVICE_AUTO_START:
+			return "auto";
+		case SERVICE_BOOT_START:
+			return "boot";
+		case SERVICE_SYSTEM_START:
+			return "system";
+		case SERVICE_DEMAND_START:
+			return "demand";
+		case SERVICE_DISABLED:
+			return "disabled";
+		default:
+			return "unknown";
+	}
+}
+
 static int	check_delayed_start(SC_HANDLE h_srv)
 {
 	SERVICE_DELAYED_AUTO_START_INFO	*sds = NULL;
@@ -96,12 +157,16 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 						;
 
 					zbx_json_adduint64(&j, "{#SERVICE.TYPE}", k);
+					zbx_json_addstring(&j, "{#SERVICE.TYPENAME}", get_type_string(service_type),
+							ZBX_JSON_TYPE_STRING);
 
 					current_state = ssp[i].ServiceStatusProcess.dwCurrentState;
 					for (k = 0; k < 7 && current_state != service_states[k]; k++)
 						;
 
 					zbx_json_adduint64(&j, "{#SERVICE.STATE}", k);
+					zbx_json_addstring(&j, "{#SERVICE.STATENAME}", get_state_string(current_state),
+							ZBX_JSON_TYPE_STRING);
 
 					utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
 					zbx_json_addstring(&j, "{#SERVICE.NAME}", utf8, ZBX_JSON_TYPE_STRING);
@@ -122,9 +187,17 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 					if (SERVICE_AUTO_START == qsc->dwStartType)
 					{
 						if (SUCCEED == check_delayed_start(h_srv))
+						{
 							zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", 1);
+							zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", "auto delayed",
+									ZBX_JSON_TYPE_STRING);
+						}
 						else
+						{
 							zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", 0);
+							zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", "auto",
+									ZBX_JSON_TYPE_STRING);
+						}
 					}
 					else
 					{
@@ -132,6 +205,9 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 							;
 
 						zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", k);
+						zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}",
+								get_startup_string(qsc->dwStartType),
+								ZBX_JSON_TYPE_STRING);
 					}
 
 					zbx_json_close(&j);
