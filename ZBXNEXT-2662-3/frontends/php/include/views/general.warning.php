@@ -25,7 +25,7 @@ $pageHeader->display();
 
 $buttons = array_key_exists('buttons', $data)
 	? $data['buttons']
-	: [(new CButton(null, _('Retry')))-onClick('document.location.reload();')];
+	: [(new CButton(null, _('Retry')))->onClick('document.location.reload();')];
 
 echo '<body>';
 
