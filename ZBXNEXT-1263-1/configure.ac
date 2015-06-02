@@ -1344,17 +1344,17 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $OPENIPMI_LIBS"
 fi
 
-dnl Check for PolarSSL libpolarssl [by default - skip]
+dnl Check for mbed TLS (PolarSSL) libpolarssl [by default - skip]
 LIBPOLARSSL_CHECK_CONFIG([no])
 if test "x$want_polarssl" = "xyes"; then
 	if test "x$have_tls" != "xno"; then
-		AC_MSG_ERROR([You can configure for only one TLS library (--with-polarssl, --with-gnutls or --with-openssl).])
+		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbed-tls, --with-gnutls or --with-openssl).])
 	fi
 
 	if test "x$found_polarssl" != "xyes"; then
-		AC_MSG_ERROR([PolarSSL library libpolarssl not found])
+		AC_MSG_ERROR([mbed TLS (PolarSSL) library libpolarssl not found])
 	else
-			have_tls="PolarSSL"
+			have_tls="mbed TLS"
 	fi
 fi
 CFLAGS="$CFLAGS $POLARSSL_CFLAGS"
@@ -1377,7 +1377,7 @@ dnl Check for GnuTLS libgnutls [by default - skip]
 LIBGNUTLS_CHECK_CONFIG([no])
 if test "x$want_gnutls" = "xyes"; then
 	if test "x$have_tls" != "xno"; then
-		AC_MSG_ERROR([You can configure for only one TLS library (--with-polarssl, --with-gnutls or --with-openssl).])
+		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbed-tls, --with-gnutls or --with-openssl).])
 	fi
 
 	if test "x$found_gnutls" != "xyes"; then
@@ -1406,7 +1406,7 @@ dnl Check for OpenSSL libssl [by default - skip]
 LIBOPENSSL_CHECK_CONFIG([no])
 if test "x$want_openssl" = "xyes"; then
 	if test "x$have_tls" != "xno"; then
-		AC_MSG_ERROR([You can configure for only one TLS library (--with-polarssl, --with-gnutls or --with-openssl).])
+		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbed-tls, --with-gnutls or --with-openssl).])
 	fi
 
 	if test "x$found_openssl" != "xyes"; then
