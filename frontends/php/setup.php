@@ -105,7 +105,7 @@ $pageHeader->display();
 /*
  * Dispalying
  */
-$header = (new CTag('header', 'yes', new CDiv((new CDiv())->addClass('signin-logo'))))
+$header = (new CTag('header', true, new CDiv((new CDiv())->addClass('signin-logo'))))
 	->setAttribute('role', 'banner');
 
 $link = (new CLink('GPL v2', 'http://www.zabbix.com/license.php'))
@@ -113,7 +113,7 @@ $link = (new CLink('GPL v2', 'http://www.zabbix.com/license.php'))
 	->setAttribute('target', '_blank');
 $sub_footer = (new CDiv(['Licensed under ', $link]))->addClass('signin-links');
 
-$body = new CTag('body', 'yes', [
+$body = new CTag('body', true, [
 	$header,
 	(new CDiv([$ZBX_SETUP_WIZARD, $sub_footer]))->addClass(ZBX_STYLE_ARTICLE),
 	makePageFooter(false)

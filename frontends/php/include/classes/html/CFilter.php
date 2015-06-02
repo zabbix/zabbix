@@ -29,7 +29,7 @@ class CFilter extends CTag {
 	private $name = 'zbx_filter';
 
 	public function __construct($filterid) {
-		parent::__construct('div', 'yes');
+		parent::__construct('div', true);
 		$this->addClass('filter-container');
 		$this->setId('filter-space');
 		$this->filterid = $filterid;

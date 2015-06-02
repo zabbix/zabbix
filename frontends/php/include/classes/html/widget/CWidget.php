@@ -104,7 +104,7 @@ class CWidget {
 	}
 
 	private function createTopHeader() {
-		$body = [new CTag('h1', 'yes', $this->title), $this->controls];
+		$body = [new CTag('h1', true, $this->title), $this->controls];
 
 		return (new CDiv($body))->addClass('header-title');
 	}

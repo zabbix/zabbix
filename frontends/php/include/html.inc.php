@@ -23,14 +23,14 @@ function italic($str) {
 	if (is_array($str)) {
 		foreach ($str as $key => $val) {
 			if (is_string($val)) {
-				$em = new CTag('em', 'yes');
+				$em = new CTag('em', true);
 				$em->addItem($val);
 				$str[$key] = $em;
 			}
 		}
 	}
 	elseif (is_string($str)) {
-		$em = new CTag('em', 'yes', '');
+		$em = new CTag('em', true, '');
 		$em->addItem($str);
 		$str = $em;
 	}
@@ -41,14 +41,14 @@ function bold($str) {
 	if (is_array($str)) {
 		foreach ($str as $key => $val) {
 			if (is_string($val)) {
-				$b = new CTag('strong', 'yes');
+				$b = new CTag('strong', true);
 				$b->addItem($val);
 				$str[$key] = $b;
 			}
 		}
 	}
 	else {
-		$b = new CTag('strong', 'yes', '');
+		$b = new CTag('strong', true, '');
 		$b->addItem($str);
 		$str = $b;
 	}
@@ -143,7 +143,7 @@ function url_params(array $params) {
 }
 
 function BR() {
-	return new CTag('br', 'no');
+	return new CTag('br');
 }
 
 function get_table_header($columnLeft, $columnRights = SPACE) {

@@ -25,7 +25,7 @@ class CLink extends CTag {
 	private $url = null;
 
 	public function __construct($item = null, $url = null) {
-		parent::__construct('a', 'yes');
+		parent::__construct('a', true);
 
 		if ($item !== null) {
 			$this->addItem($item);

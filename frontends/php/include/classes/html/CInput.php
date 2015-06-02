@@ -22,7 +22,7 @@
 class CInput extends CTag {
 
 	public function __construct($type = 'text', $name = 'textbox', $value = '', $class = null, $id = null) {
-		parent::__construct('input', 'no');
+		parent::__construct('input');
 		$this->setType($type);
 
 		// if id is not passed, it will be the same as element name

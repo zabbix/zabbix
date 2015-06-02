@@ -22,7 +22,7 @@
 class CCol extends CTag {
 
 	public function __construct($item = null) {
-		parent::__construct('td', 'yes');
+		parent::__construct('td', true);
 		$this->addItem($item);
 	}
 

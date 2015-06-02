@@ -199,7 +199,7 @@ class CSetupWizard extends CForm {
 		}
 
 		return [
-			new CTag('h1', 'yes', _('Check of pre-requisites')),
+			new CTag('h1', true, _('Check of pre-requisites')),
 			(new CDiv([$message_box, $table]))->addClass('setup-right-body')
 		];
 	}
@@ -251,9 +251,9 @@ class CSetupWizard extends CForm {
 		}
 
 		return [
-			new CTag('h1', 'yes', _('Configure DB connection')),
+			new CTag('h1', true, _('Configure DB connection')),
 			(new CDiv([
-				new CTag('p', 'yes', _s('Please create database manually, and set the configuration parameters for connection to this database. Press "%1$s" button when done.', _('Next step'))),
+				new CTag('p', true, _s('Please create database manually, and set the configuration parameters for connection to this database. Press "%1$s" button when done.', _('Next step'))),
 				$message_box,
 				$table]))
 				->addClass('setup-right-body')
@@ -277,9 +277,9 @@ class CSetupWizard extends CForm {
 		$table->addRow('Name', new CTextBox('zbx_server_name', $this->getConfig('ZBX_SERVER_NAME', '')));
 
 		return [
-			new CTag('h1', 'yes', _('Zabbix server details')),
+			new CTag('h1', true, _('Zabbix server details')),
 			(new CDiv([
-				new CTag('p', 'yes', _('Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional).')),
+				new CTag('p', true, _('Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional).')),
 				$table]))
 				->addClass('setup-right-body')
 		];
@@ -318,9 +318,9 @@ class CSetupWizard extends CForm {
 		$table->addRow((new CSpan(_('Zabbix server name')))->addClass(ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER_NAME'));
 
 		return [
-			new CTag('h1', 'yes', _('Pre-installation summary')),
+			new CTag('h1', true, _('Pre-installation summary')),
 			(new CDiv([
-				new CTag('p', 'yes', _s('Please check configuration parameters. If all is correct, press "%1$s" button, or "%2$s" button to change configuration parameters.', _('Next step'), _('Back'))),
+				new CTag('p', true, _s('Please check configuration parameters. If all is correct, press "%1$s" button, or "%2$s" button to change configuration parameters.', _('Next step'), _('Back'))),
 				$table]))
 				->addClass('setup-right-body')
 		];
@@ -363,10 +363,10 @@ class CSetupWizard extends CForm {
 
 			$message_box = makeMessageBox(false, $messages, _('Cannot create the configuration file.'), false, true);
 			$message = [
-				new CTag('p', 'yes', _('Alternatively, you can install it manually:')),
-				new CTag('ol', 'yes', [
-					new CTag('li', 'yes', new CLink(_('Download the configuration file'), 'setup.php?save_config=1')),
-					new CTag('li', 'yes', _s('Save it as "%1$s"', $config_file_name))
+				new CTag('p', true, _('Alternatively, you can install it manually:')),
+				new CTag('ol', true, [
+					new CTag('li', true, new CLink(_('Download the configuration file'), 'setup.php?save_config=1')),
+					new CTag('li', true, _s('Save it as "%1$s"', $config_file_name))
 				]),
 			];
 		}
@@ -376,15 +376,15 @@ class CSetupWizard extends CForm {
 
 			$message_box = null;
 			$message = [
-				new CTag('h4', 'yes', _('Congratulations! You have successfully installed Zabbix frontend.'),
+				new CTag('h4', true, _('Congratulations! You have successfully installed Zabbix frontend.'),
 					ZBX_STYLE_GREEN
 				),
-				new CTag('p', 'yes', _s('Configuration file "%1$s" created.', $config_file_name))
+				new CTag('p', true, _s('Configuration file "%1$s" created.', $config_file_name))
 			];
 		}
 
 		return [
-			new CTag('h1', 'yes', _('Install')),
+			new CTag('h1', true, _('Install')),
 			(new CDiv([$message_box, $message]))->addClass('setup-right-body')
 		];
 	}

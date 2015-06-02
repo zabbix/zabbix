@@ -268,7 +268,7 @@ function getPermissionsFormList($rights = [], $user_type = USER_TYPE_ZABBIX_USER
 function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 	order_result($data, 'name');
 
-	$output = [new CTag('h3', 'yes', $label)];
+	$output = [new CTag('h3', true, $label)];
 
 	foreach ($data as $id => $element) {
 		$element['name'] = nbsp(CHtml::encode($element['name']));
@@ -608,7 +608,7 @@ function getItemFilterForm(&$items) {
 	$table_subfilter = new CTableInfo();
 	$table_subfilter->addRow(
 		[
-			new CTag('h4', 'yes',
+			new CTag('h4', true,
 				[
 					_('Subfilter').SPACE,
 					new CSpan(_('affects only filtered data'))

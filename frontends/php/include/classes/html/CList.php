@@ -30,7 +30,7 @@ class CList extends CTag {
 	 * @param string $class			HTML class
 	 */
 	public function __construct(array $values = [], $class = null) {
-		parent::__construct('ul', 'yes');
+		parent::__construct('ul', true);
 
 		foreach ($values as $value) {
 			$this->addItem($value);

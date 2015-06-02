@@ -27,8 +27,11 @@
 class CSimpleButton extends CTag implements CButtonInterface {
 
 	public function __construct($caption = '', $class = null) {
-		parent::__construct('button', 'yes', $caption, $class);
+		parent::__construct('button', true, $caption);
 		$this->setAttribute('type', 'button');
+		if ($class !== null) {
+			$this->addClass($class);
+		}
 	}
 
 	/**
