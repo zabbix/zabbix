@@ -488,9 +488,9 @@ static void    zbx_load_config(const char *config_file)
 			PARM_OPT,	0,			0},
 		{"TLSConnect",			&cfg_tls_connect,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCaFile",			&cfg_tls_ca_file,			TYPE_STRING,
+		{"TLSCAFile",			&cfg_tls_ca_file,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCrlFile",			&cfg_tls_crl_file,			TYPE_STRING,
+		{"TLSCRLFile",			&cfg_tls_crl_file,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSServerCertIssuer",		&cfg_tls_server_cert_issuer,		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -500,9 +500,9 @@ static void    zbx_load_config(const char *config_file)
 			PARM_OPT,	0,			0},
 		{"TLSKeyFile",			&cfg_tls_key_file,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPskFile",			&cfg_tls_psk_file,			TYPE_STRING,
+		{"TLSPSKFile",			&cfg_tls_psk_file,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPskIdentity",		&cfg_tls_psk_identity,			TYPE_STRING,
+		{"TLSPSKIdentity",		&cfg_tls_psk_identity,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{NULL}
 	};

@@ -597,9 +597,9 @@ static void	zbx_load_config(void)
 			PARM_OPT,	0,			0},
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		{"TLSCaFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
+		{"TLSCAFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCrlFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
+		{"TLSCRLFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCertFile",			&CONFIG_TLS_CERT_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},

@@ -634,9 +634,9 @@ static void	zbx_load_config(void)
 			PARM_OPT,	0,			0},
 		{"TLSAccept",			&CONFIG_TLS_ACCEPT,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"TLSCaFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
+		{"TLSCAFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCrlFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
+		{"TLSCRLFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSServerCertIssuer",		&CONFIG_TLS_SERVER_CERT_ISSUER,		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -646,9 +646,9 @@ static void	zbx_load_config(void)
 			PARM_OPT,	0,			0},
 		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPskFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
+		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPskIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
+		{"TLSPSKIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 #endif
 		{NULL}
