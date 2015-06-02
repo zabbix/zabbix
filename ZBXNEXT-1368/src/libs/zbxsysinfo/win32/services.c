@@ -25,8 +25,31 @@
 const DWORD	service_states[7] = {SERVICE_RUNNING, SERVICE_PAUSED, SERVICE_START_PENDING, SERVICE_PAUSE_PENDING,
 	SERVICE_CONTINUE_PENDING, SERVICE_STOP_PENDING, SERVICE_STOPPED}, service_types[5] = {SERVICE_KERNEL_DRIVER,
 	SERVICE_FILE_SYSTEM_DRIVER, SERVICE_WIN32_SHARE_PROCESS, SERVICE_WIN32_OWN_PROCESS,
-	SERVICE_INTERACTIVE_PROCESS}, start_types[5] = {SERVICE_BOOT_START, SERVICE_SYSTEM_START, SERVICE_AUTO_START,
-	SERVICE_DEMAND_START, SERVICE_DISABLED};
+	SERVICE_INTERACTIVE_PROCESS}, start_types[6] = {SERVICE_AUTO_START, SERVICE_AUTO_START, SERVICE_BOOT_START,
+	SERVICE_SYSTEM_START, SERVICE_DEMAND_START, SERVICE_DISABLED};
+
+static int	check_delayed_start(SC_HANDLE h_srv)
+{
+	SERVICE_DELAYED_AUTO_START_INFO	*sds = NULL;
+	DWORD				sz = 0;
+	int 				ret = FAIL;
+
+	QueryServiceConfig2(h_srv, SERVICE_CONFIG_DELAYED_AUTO_START_INFO, NULL, 0, &sz);
+
+	if(ERROR_INSUFFICIENT_BUFFER == GetLastError())
+	{
+		sds = (SERVICE_DELAYED_AUTO_START_INFO *)zbx_malloc(sds, sz);
+
+		if (0 != QueryServiceConfig2(h_srv, SERVICE_CONFIG_DELAYED_AUTO_START_INFO, (LPBYTE)sds, sz, &sz) &&
+				TRUE == sds->fDelayedAutostart)
+		{
+			ret = SUCCEED;
+		}
+
+		zbx_free(sds);
+	}
+	return ret;
+}
 
 int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -96,10 +119,20 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 					zbx_json_addstring(&j, "{#SERVICE.USER}", utf8, ZBX_JSON_TYPE_STRING);
 					zbx_free(utf8);
 
-					for (k = 0; k < 5 && qsc->dwStartType != start_types[k]; k++)
-						;
+					if (SERVICE_AUTO_START == qsc->dwStartType)
+					{
+						if (SUCCEED == check_delayed_start(h_srv))
+							zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", 1);
+						else
+							zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", 0);
+					}
+					else
+					{
+						for (k = 2; k < 6 && qsc->dwStartType != start_types[k]; k++)
+							;
 
-					zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", k);
+						zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", k);
+					}
 
 					zbx_json_close(&j);
 				}
@@ -254,10 +287,20 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 				SET_STR_RESULT(result, zbx_unicode_to_utf8(qsc->lpServiceStartName));
 				break;
 			case ZBX_SRV_PARAM_STARTUP:
-				for (i = 0; i < 5 && qsc->dwStartType != start_types[i]; i++)
-					;
+				if (SERVICE_AUTO_START == qsc->dwStartType)
+					{
+						if (SUCCEED == check_delayed_start(h_srv))
+							SET_UI64_RESULT(result, 1);
+						else
+							SET_UI64_RESULT(result, 0);
+					}
+					else
+					{
+						for (i = 2; i < 6 && qsc->dwStartType != start_types[i]; i++)
+							;
 
-				SET_UI64_RESULT(result, i);
+						SET_UI64_RESULT(result, i);
+					}
 				break;
 			case ZBX_SRV_PARAM_TYPE:
 				for (i = 0; i < 5 && qsc->dwServiceType != service_types[i]; i++)
