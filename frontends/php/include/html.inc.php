@@ -587,7 +587,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
  */
 function makeFormFooter(CButtonInterface $mainButton = null, array $otherButtons = []) {
 	foreach ($otherButtons as $button) {
-		$button->addClass('btn-alt');
+		$button->addClass(ZBX_STYLE_BTN_ALT);
 	}
 
 	$buttons = new CList([], 'table-forms');

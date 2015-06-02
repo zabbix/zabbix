@@ -99,7 +99,7 @@ class CFilter extends CTag {
 		$url->removeArgument('filter_set');
 		$url->setArgument('filter_rst', 1);
 		$resetButton = new CRedirectButton(_('Reset'), $url->getUrl());
-		$resetButton->addClass('btn-alt');
+		$resetButton->addClass(ZBX_STYLE_BTN_ALT);
 		$resetButton->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
 
 		$filterButton = new CSubmit('filter_set', _('Filter'));
