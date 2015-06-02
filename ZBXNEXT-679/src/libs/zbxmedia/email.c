@@ -603,12 +603,21 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 
 	if (SMTP_AUTHENTICATION_NORMAL_PASSWORD == smtp_authentication)
 	{
+#if 0x072200 <= LIBCURL_VERSION_NUM	/* versions 7.34.0 and above support CURLOPT_LOGIN_OPTIONS */
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERNAME, username)) ||
 				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PASSWORD, password)) ||
 				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_LOGIN_OPTIONS, "AUTH=PLAIN")))
 		{
 			goto error;
 		}
+#else					/* versions 7.31.0 to 7.33.0 support login options in CURLOPT_USERPWD */
+		char	userpwd[523];
+
+		zbx_snprintf(userpwd, sizeof(userpwd), "%s:%s;AUTH=PLAIN", username, password);
+
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, userpwd)))
+			goto error;
+#endif
 	}
 
 	recipients = curl_slist_append(recipients, to_angle_addr);
