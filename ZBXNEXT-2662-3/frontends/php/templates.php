@@ -591,7 +591,7 @@ else {
 	$table->setHeader([
 		(new CColHeader(
 			new CCheckBox('all_templates', null, "checkAll('".$form->getName()."', 'all_templates', 'templates');")
-		))->addClass('cell-width'),
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Templates'), 'name', $sortField, $sortOrder),
 		_('Applications'),
 		_('Items'),
