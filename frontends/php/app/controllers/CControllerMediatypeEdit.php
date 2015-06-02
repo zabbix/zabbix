@@ -126,6 +126,10 @@ class CControllerMediatypeEdit extends CController {
 			$data['status'] = $this->mediatype['status'];
 
 			switch ($data['type']) {
+				case MEDIA_TYPE_EMAIL:
+					$data['smtp_username'] = $this->mediatype['username'];
+					break;
+
 				case MEDIA_TYPE_JABBER:
 					$data['jabber_username'] = $this->mediatype['username'];
 					break;

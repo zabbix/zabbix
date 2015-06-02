@@ -4,7 +4,7 @@
 		jQuery('#type').change(function() {
 			switch (jQuery(this).val()) {
 				case '<?php echo MEDIA_TYPE_EMAIL; ?>':
-					jQuery('#smtp_server, #smtp_helo, #smtp_email, #smtp_verify_peer, #smtp_verify_host, #smtp_username').closest('li').show();
+					jQuery('#smtp_server, #smtp_helo, #smtp_email, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #passwd, input[name=smtp_security], input[name=smtp_authentication]').closest('li').show();
 					jQuery('#exec_path, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit')
 						.closest('li')
 						.hide();
@@ -17,7 +17,7 @@
 
 				case '<?php echo MEDIA_TYPE_EXEC; ?>':
 					jQuery('#exec_path').closest('li').show();
-					jQuery('#smtp_server, #smtp_helo, #smtp_email, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username')
+					jQuery('#smtp_server, #smtp_helo, #smtp_email, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username, input[name=smtp_security], input[name=smtp_authentication]')
 						.closest('li')
 						.hide();
 					jQuery('#eztext_link').hide();
@@ -25,7 +25,7 @@
 
 				case '<?php echo MEDIA_TYPE_SMS; ?>':
 					jQuery('#gsm_modem').closest('li').show();
-					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #jabber_username, #eztext_username, #eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username')
+					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #jabber_username, #eztext_username, #eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username, input[name=smtp_security], input[name=smtp_authentication]')
 						.closest('li')
 						.hide();
 					jQuery('#eztext_link').hide();
@@ -33,7 +33,7 @@
 
 				case '<?php echo MEDIA_TYPE_JABBER; ?>':
 					jQuery('#jabber_username, #passwd').closest('li').show();
-					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #eztext_username, #eztext_limit, #smtp_verify_peer, #smtp_verify_host, #smtp_username')
+					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #eztext_username, #eztext_limit, #smtp_verify_peer, #smtp_verify_host, #smtp_username, input[name=smtp_security], input[name=smtp_authentication]')
 						.closest('li')
 						.hide();
 					jQuery('#eztext_link').hide();
@@ -42,7 +42,7 @@
 				case '<?php echo MEDIA_TYPE_EZ_TEXTING; ?>':
 					jQuery('#eztext_username, #eztext_limit, #passwd').closest('li').show();
 					jQuery('#eztext_link').show();
-					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #jabber_username, #smtp_verify_peer, #smtp_verify_host, #smtp_username')
+					jQuery('#smtp_server, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #jabber_username, #smtp_verify_peer, #smtp_verify_host, #smtp_username, input[name=smtp_security], input[name=smtp_authentication]')
 						.closest('li')
 						.hide();
 					break;
