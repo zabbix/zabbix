@@ -81,7 +81,7 @@ static const char	*get_startup_string(DWORD startup)
 		case SERVICE_SYSTEM_START:
 			return "system";
 		case SERVICE_DEMAND_START:
-			return "demand";
+			return "manual";
 		case SERVICE_DISABLED:
 			return "disabled";
 		default:
