@@ -34,15 +34,16 @@ $form-disabled-border-color: #3d3d3d; //NEW
 
 // BUTTONS
 $btn-font-color: #e6e8f3;//#fff;
-$btn-hover-color: #e6e8f3;//#fff;
-$btn-active-color: #e6e8f3;//#fff;
+//$btn-hover-color: #e6e8f3;//#fff;
+//$btn-active-color: #e6e8f3;//#fff;
 $btn-bg-color: #6c818c;//#44474c;//#5c5c5c;//#0275b8;
+$btn-border-color: #6c818c;
 
 $btn-alt-font-color: #768d99;//#0275b8;
 $btn-alt-hover-color: #768d99;//#0275b8;
 $btn-alt-active-color: #768d99;//#0275b8;
 $btn-alt-bg-color: transparent;
-$btn-alt-border-color: $btn-bg-color;
+$btn-alt-border-color: $btn-border-color;
 
 $btn-form-font-color: #d1dade;//#2782b8;//#0275b8;
 $btn-form-hover-color: #0275b8;
@@ -78,33 +79,33 @@ $link-main-subnav-visited-color: #bfced7;
 // Important! @import string should always be last
 @import 'screen.scss';
 
-.dashbrd-widget {
-	@extend %no-shadow;
-}
+//.dashbrd-widget {
+//	@extend %no-shadow;
+//}
 
-.list-table {
-	@extend %no-shadow;
-}
+//.list-table {
+//	@extend %no-shadow;
+//}
 
-.table-paging {
-	@extend %no-shadow;
-}
+//.table-paging {
+//	@extend %no-shadow;
+//}
 
-.table-forms-container {
-	@extend %no-shadow;
-}
+//.table-forms-container {
+//	@extend %no-shadow;
+//}
 
-.filter-container {
-	@include box-shadow(none);	
-}
+//.filter-container {
+//	@include box-shadow(none);	
+//}
 
-%no-shadow {
-	@include box-shadow(none);
-}
+//%no-shadow {
+//	@include box-shadow(none);
+//}
 
-.available {
-	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.4));
-}
+//.available {
+//	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.4));
+//}
 
 .search-suggest {
 	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.4));
@@ -116,4 +117,11 @@ $link-main-subnav-visited-color: #bfced7;
 
 .overlay-dialogue {
 	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.4));
+}
+
+%form-input-style {
+
+	&:focus {
+		border-color: lighten($form-border-color, 15%);
+	}
 }

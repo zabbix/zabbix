@@ -1345,10 +1345,10 @@ legend {
 }
 
 %form-input-height-padding {
-	//padding: 4px 5px;
-	padding: 0 5px;
-	min-height: 22px;
-	line-height: 22px;
+	padding: 4px 5px;
+	//padding: 0 5px;
+	//min-height: 22px;
+	//line-height: 22px;
 	zoom: 1;
 }
 
@@ -1383,7 +1383,8 @@ button {
 	@include transition(border-color, background-color .2s ease-out);
 
 	&:hover {
-		@extend %button-hover;
+		//@extend %button-hover-active;
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
 	&:focus {
@@ -1392,7 +1393,8 @@ button {
 	}
 
 	&:active {
-		@extend %button-active;
+		//@extend %button-hover-active;
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
 	&.btn-alt {
@@ -1401,11 +1403,13 @@ button {
 		background-color: $btn-alt-bg-color;
 
 		&:hover {
-			@extend %button-hover;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			@extend %button-active;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
 
@@ -1449,11 +1453,13 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			@extend %button-hover;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			@extend %button-active;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
 
@@ -1462,11 +1468,13 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			@extend %button-hover;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			@extend %button-active;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
 
@@ -1475,11 +1483,13 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			@extend %button-hover;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			@extend %button-active;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
 
@@ -1488,11 +1498,13 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			@extend %button-hover;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			@extend %button-active;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
 
@@ -1501,11 +1513,13 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			@extend %button-hover;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			@extend %button-active;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
 
@@ -1514,11 +1528,13 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			@extend %button-hover;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			@extend %button-active;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
 
@@ -1527,11 +1543,13 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			@extend %button-hover;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			@extend %button-active;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
 
@@ -1540,11 +1558,13 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			@extend %button-hover;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			@extend %button-active;
+			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
 
@@ -1743,17 +1763,23 @@ button {
 	}
 }
 
-%button-hover {
-	color: $btn-hover-color;
-	background-color: darken($btn-bg-color, 5%);
-	border-color: darken($btn-bg-color, 5%);
-}
+//%button-hover-active {
+//	color: $btn-font-color;
+//	background-color: darken($btn-bg-color, 5%);
+//	border-color: darken($btn-bg-color, 5%);
+//}
 
-%button-active {
-	color: $btn-active-color;
-	background-color: darken($btn-bg-color, 10%);
-	border-color: darken($btn-bg-color, 10%);
-}
+//%button-hover {
+//	color: $btn-hover-color;
+//	background-color: darken($btn-bg-color, 5%);
+//	border-color: darken($btn-bg-color, 5%);
+//}
+
+//%button-active {
+//	color: $btn-active-color;
+//	background-color: darken($btn-bg-color, 10%);
+//	border-color: darken($btn-bg-color, 10%);
+//}
 
 %button-icon-size {
 	width: 24px;
@@ -2066,9 +2092,9 @@ button[disabled] {
 }
 
 %signin-input {
-	//padding: 10px 5px;
-	min-height: 38px;
-	line-height: 38px; 
+	padding: 10px 5px;
+	//min-height: 38px;
+	//line-height: 38px; 
 	width: 100%;
 	@include box-sizing(border-box);
 }
