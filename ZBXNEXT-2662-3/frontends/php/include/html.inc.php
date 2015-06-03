@@ -339,7 +339,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	 */
 	$list = (new CList())->addClass('object-group');
 	if ($dbHost['status'] == HOST_STATUS_TEMPLATE) {
-		$list->addItem([new CLink(_('All templates'), '&gt;', 'templates.php?templateid='.$dbHost['hostid'].url_param('groupid'))]);
+		$list->addItem([new CLink(_('All templates'), 'templates.php?templateid='.$dbHost['hostid'].url_param('groupid'))]);
 
 		$dbHost['screens'] = API::TemplateScreen()->get([
 			'editable' => true,
