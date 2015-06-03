@@ -25,6 +25,7 @@ a {
 	&:link {
 		text-decoration: none;
 		color: $link-color;
+		outline: 0;
 		@include transition(color .2s ease-out);
 	}
 
@@ -34,6 +35,11 @@ a {
 	}
 
 	&:hover {
+		border-bottom: 1px solid rgba(2,117,184,0.5);
+		color: $link-hover-color;
+	}
+
+	&:focus {
 		border-bottom: 1px solid rgba(2,117,184,0.5);
 		color: $link-hover-color;
 	}
@@ -85,6 +91,13 @@ a {
 	}
 
 	&:hover {
+		text-decoration: none;
+		border-bottom: 1px solid rgba(2,117,184,0.5);
+		cursor: pointer;
+		color: $link-hover-color;
+	}
+
+	&:focus {
 		text-decoration: none;
 		border-bottom: 1px solid rgba(2,117,184,0.5);
 		cursor: pointer;
@@ -173,6 +186,10 @@ nav {
 			@extend %no-border;
 		}
 
+		&:focus {
+			@extend %no-border;
+		}
+
 		&:active {
 			@extend %no-border;
 		}
@@ -228,11 +245,15 @@ nav {
 	}
 
 	a {
-		padding: 10px 13px 10px 13px;
+		padding: 10px 13px;
 		color: $link-main-nav-color;
 		text-decoration: none;
 
 		&:hover {
+			color: $link-main-nav-hover-color;
+		}
+
+		&:focus {
 			color: $link-main-nav-hover-color;
 		}
 	}
@@ -273,6 +294,10 @@ ul.top-nav-icons {
 		@include transition(all .2s ease-out);
 
 		&:hover {
+			@include opacity(1);
+		}
+
+		&:focus {
 			@include opacity(1);
 		}
     }
@@ -346,6 +371,11 @@ ul.top-nav-icons {
 	color: $link-main-subnav-color;
 
 	&:hover {
+		color: $link-main-subnav-hover-color;
+		text-decoration: none;
+	}
+
+	&:focus {
 		color: $link-main-subnav-hover-color;
 		text-decoration: none;
 	}
@@ -518,9 +548,14 @@ footer {
 	    		background-color: $ui-hover-color
 	    	}
 
+	    	&:focus {
+	    		text-decoration: none;
+	    		background-color: $ui-hover-color
+	    	}
+
 	    	&:active {
 	    		text-decoration: none;
-	    		background-color: darken($ui-hover-color, 5%);
+	    		background-color: $ui-hover-color
 	    	}	    
 	    }
 	}
@@ -597,9 +632,17 @@ footer {
 		background-color: $ui-hover-color;
 	}
 
+	&:focus {
+		color: $link-hover-color;
+		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
+		position: relative;
+	}
+
 	&:active {
 		color: $link-active-color;
-		background-color: darken($ui-hover-color, 5%);
+		background-color: $ui-hover-color;
+		position: relative;
 	}
 
 	&:first-child {
@@ -619,8 +662,16 @@ footer {
 			background-color: darken($ui-bg-selected-color, 5%);
 		}
 
+		&:focus {
+			background-color: darken($ui-bg-selected-color, 5%);
+			border-color: $form-border-focus-color;
+			position: relative;
+		}
+
 		&:active {
-			background-color: darken($ui-bg-selected-color, 10%);
+			background-color: darken($ui-bg-selected-color, 5%);
+			border-color: $form-border-focus-color;
+			position: relative;
 		}
 	}
 }
@@ -642,8 +693,13 @@ footer {
 		background-color: $ui-hover-color;
 	}
 
+	&:focus {
+		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
+	}
+
 	&:active {
-		background-color: darken($ui-hover-color, 5%);
+		background-color: $ui-hover-color;
 	}
 }
 
@@ -667,7 +723,15 @@ footer {
 		border-left-color: $link-color;
 	}
 
+	&:focus .arrow-right {
+		border-left-color: $link-color;
+	}
+
 	&:hover .arrow-down {
+		border-top-color: $link-color;
+	}
+
+	&:focus .arrow-down {
 		border-top-color: $link-color;
 	}
 }
@@ -1155,10 +1219,10 @@ footer {
 			 	vertical-align: middle;
 			 }
 
-			.btn-grey {
-				margin: 5px 0;
-				display: block;
-			}
+			//.btn-grey {
+				//margin: 5px 0;
+				//display: block;
+			//}
 		}
 	}
 }
@@ -1358,6 +1422,7 @@ legend {
 	font-size: $font-form-size;
 	color: $font-color;
 	background-color: $form-bg-color;
+	outline: 0;
 	@include transition(border-color .2s ease-out);
 
 	&:focus {
@@ -1372,7 +1437,6 @@ button::-moz-focus-inner {
 }
 
 button {
-	@include border-radius(2px);
 	color: $btn-font-color;
 	background-color: $btn-bg-color;
 	font-family: $font-stack;
@@ -1380,35 +1444,37 @@ button {
 	padding: 0 11px;
 	min-height: 24px;
 	cursor: pointer;
+	@include border-radius(2px);
 	@include transition(border-color, background-color .2s ease-out);
 
 	&:hover {
-		//@extend %button-hover-active;
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
 	&:focus {
-		outline: thin dotted;
-		outline-offset: -2px;
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+		//outline: thin dotted;
+		//outline-offset: -2px;
 	}
 
 	&:active {
-		//@extend %button-hover-active;
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
 	&.btn-alt {
-		@extend button;
 		color: $btn-alt-font-color;
 		background-color: $btn-alt-bg-color;
+		@extend button;
 
 		&:hover {
-			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
+		}
+
+		&:focus {
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			//@extend %button-hover-active;
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
@@ -1453,12 +1519,14 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
+		}
+
+		&:focus {
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			//@extend %button-hover-active;
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
@@ -1468,12 +1536,14 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
+		}
+
+		&:focus {
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			//@extend %button-hover-active;
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
@@ -1483,12 +1553,14 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
+		}
+
+		&:focus {
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			//@extend %button-hover-active;
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
@@ -1498,12 +1570,14 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
+		}
+
+		&:focus {
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			//@extend %button-hover-active;
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
@@ -1513,12 +1587,14 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
+		}
+
+		&:focus {
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			//@extend %button-hover-active;
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
@@ -1528,12 +1604,14 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
+		}
+
+		&:focus {
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			//@extend %button-hover-active;
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
@@ -1543,12 +1621,14 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
+		}
+
+		&:focus {
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			//@extend %button-hover-active;
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
@@ -1558,12 +1638,14 @@ button {
 		@extend %button-icon-size;
 		
 		&:hover {
-			//@extend %button-hover-active;
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
+		}
+
+		&:focus {
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			//@extend %button-hover-active;
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
@@ -1605,6 +1687,10 @@ button {
 			@extend %btn-widget-hover-active;
 		}
 
+		&:focus {
+			@include opacity(1);
+		}
+
 		&:active {
 			@extend %btn-widget-hover-active;
 		}
@@ -1619,6 +1705,10 @@ button {
 
 		&:hover {
 			@extend %btn-widget-hover-active;
+		}
+
+		&:focus {
+			@include opacity(1);
 		}
 
 		&:active {
@@ -1637,6 +1727,10 @@ button {
 			@extend %btn-widget-hover-active;
 		}
 
+		&:focus {
+			@include opacity(1);
+		}
+
 		&:active {
 			@extend %btn-widget-hover-active;
 		}
@@ -1651,6 +1745,10 @@ button {
 
 		&:hover {
 			@extend %btn-widget-hover-active;
+		}
+
+		&:focus {
+			@include opacity(1);
 		}
 
 		&:active {
@@ -1669,6 +1767,10 @@ button {
 			@extend %btn-widget-hover-active;
 		}
 
+		&:focus {
+			@include opacity(1);
+		}
+
 		&:active {
 			@extend %btn-widget-hover-active;
 		}
@@ -1683,6 +1785,10 @@ button {
 
 		&:hover {
 			@extend %btn-widget-hover-active;
+		}
+
+		&:focus {
+			@include opacity(1);
 		}
 
 		&:active {
@@ -1701,6 +1807,10 @@ button {
 			@extend %btn-widget-hover-active;
 		}
 
+		&:focus {
+			@include opacity(1);
+		}
+
 		&:active {
 			@extend %btn-widget-hover-active;
 		}
@@ -1713,25 +1823,31 @@ button {
 		vertical-align: top;
 
 		&:hover {
-			color: $btn-form-hover-color;
+			color: $btn-form-font-color;
 			background-color: $ui-hover-color;
 			border-color: $btn-form-border-color;
 		}
 
+		&:focus {
+			color: $btn-form-font-color;
+			background-color: $ui-hover-color;
+			border-color: $form-border-focus-color;
+		}
+
 		&:active {
 			color: $btn-form-font-color;
-			background-color: darken($ui-hover-color, 5%);
+			background-color: $ui-hover-color;
 		}
 
-		.arrow-left {
-			border-right-color: $btn-form-font-color;
+		//.arrow-left {
+		//	border-right-color: $btn-form-font-color;
 
-		}
+		//}
 
-		.arrow-right {
-			border-left-color: $btn-form-font-color;
+		//.arrow-right {
+		//	border-left-color: $btn-form-font-color;
 
-		}
+		//}
 	}
 
 	&.filter-trigger {
@@ -2817,6 +2933,11 @@ td.disaster-bg {
 		text-decoration: none;
 	}
 
+	&:focus {
+		@include opacity(1);
+		text-decoration: none;
+	}
+
 	&:active {
 		@include opacity(1);
 		text-decoration: none;
@@ -2854,8 +2975,12 @@ a.overlay-close-btn {
 		background-color: darken($ui-bg-selected-color, 5%);
 	}
 
+	&:hover {
+		background-color: darken($ui-bg-selected-color, 5%);
+	}
+
 	&:active {
-		background-color: darken($ui-bg-selected-color, 10%);
+		background-color: darken($ui-bg-selected-color, 5%);
 	}
 }
 
