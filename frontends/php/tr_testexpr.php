@@ -134,8 +134,6 @@ $testForm->addRow(_('Test data'), $dataTable);
 $resultTable = (new CTable())
 	->addClass('tableinfo')
 	->setId('result_list');
-$resultTable->setOddRowClass('even_row');
-$resultTable->setEvenRowClass('even_row');
 $resultTable->setHeader([_('Expression'), _('Result')]);
 
 ksort($rplcts, SORT_NUMERIC);

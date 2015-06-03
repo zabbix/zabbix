@@ -23,8 +23,6 @@ class CTable extends CTag {
 
 	public $headerClass;
 	public $footerClass;
-	protected $oddRowClass;
-	protected $evenRowClass;
 	protected $header;
 	protected $footer;
 	protected $colnum;
@@ -34,25 +32,11 @@ class CTable extends CTag {
 	public function __construct() {
 		parent::__construct('table', true);
 		$this->rownum = 0;
-		$this->oddRowClass = null;
-		$this->evenRowClass = null;
 		$this->header = '';
 		$this->headerClass = null;
 		$this->footer = '';
 		$this->footerClass = null;
 		$this->colnum = 1;
-	}
-
-	public function setOddRowClass($value = null) {
-		$this->oddRowClass = $value;
-
-		return $this;
-	}
-
-	public function setEvenRowClass($value = null) {
-		$this->evenRowClass = $value;
-
-		return $this;
 	}
 
 	public function setCellPadding($value) {
@@ -105,12 +89,6 @@ class CTable extends CTag {
 			}
 		}
 
-		if (!isset($item->attributes['class']) || is_array($item->attributes['class'])) {
-			$class = ($this->rownum % 2) ? $this->oddRowClass : $this->evenRowClass;
-			if ($class !== null) {
-				$item->addClass($class);
-			}
-		}
 		return $item;
 	}
 
