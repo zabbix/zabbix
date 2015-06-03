@@ -2699,7 +2699,12 @@ void	zbx_tls_init_child(void)
 	ERR_load_BIO_strings();
 	SSL_library_init();		/* always returns "1" */
 #endif
-	/* TODO PRNG initialization */
+	if (1 != RAND_status())		/* protect against not properly seeded PRNG */
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize PRNG");
+		zbx_tls_free();
+		exit(EXIT_FAILURE);
+	}
 
 	/* set protocol version to TLS 1.2 */
 
