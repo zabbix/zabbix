@@ -94,7 +94,7 @@ $saveButton = new CSubmit('update', _('Update'));
 $saveButton->setAttribute('data-removed-count', 0);
 $saveButton->main();
 
-$tab_view->setFooter(makeFormFooter(null, [$saveButton]));
+$tab_view->setFooter(makeFormFooter($saveButton));
 
 $form = new CForm();
 $form->setName('macrosForm');

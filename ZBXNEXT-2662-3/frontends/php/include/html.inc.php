@@ -578,35 +578,30 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 /**
  * Renders a form footer with the given buttons.
  *
- * @param CButtonInterface 		$mainButton	main button that will be displayed on the left
- * @param CButtonInterface[] 	$otherButtons
+ * @param CButtonInterface 		$main_button	main button that will be displayed on the left
+ * @param CButtonInterface[] 	$other_buttons
  *
  * @return CDiv
  *
- * @throws InvalidArgumentException	if an element of $otherButtons contain something other than CButtonInterface
+ * @throws InvalidArgumentException	if an element of $other_buttons contain something other than CButtonInterface
  */
-function makeFormFooter(CButtonInterface $mainButton = null, array $otherButtons = []) {
-	foreach ($otherButtons as $button) {
-		$button->addClass(ZBX_STYLE_BTN_ALT);
+function makeFormFooter(CButtonInterface $main_button = null, array $other_buttons = []) {
+	foreach ($other_buttons as $other_button) {
+		$other_button->addClass(ZBX_STYLE_BTN_ALT);
 	}
 
-	$buttons = (new CList())->addClass('table-forms');
-
-	if ($mainButton !== null) {
-		$buttons->addItem([
-			(new CDiv($mainButton))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-			(new CDiv($otherButtons))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)]
-		);
-	}
-	else {
-		$buttons->addItem([
-			(new CDiv(SPACE))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-			(new CDiv($otherButtons))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)]
-		);
+	if ($main_button !== null) {
+		array_unshift($other_buttons, $main_button);
 	}
 
-//	return new CDiv($buttons, 'form-btns');
-	return $buttons;
+	return (new CList())
+		->addClass('table-forms')
+		->addItem([
+			(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+			(new CDiv($other_buttons))
+				->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+				->addClass('tfoot-buttons')
+		]);
 }
 
 /**
