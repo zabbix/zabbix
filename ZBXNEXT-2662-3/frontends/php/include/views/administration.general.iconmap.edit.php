@@ -35,7 +35,7 @@ if (isset($this->data['iconmapid'])) {
 }
 
 $iconMapTable = (new CTable())
-	->addClass(ZBX_STYLE_LIST_TABLE)
+	->setAttribute('style', 'min-width: 700px;')
 	->setId('iconMapTable')
 	->setHeader(['', '', _('Inventory field'), _('Expression'), _('Icon'), '', '']);
 
