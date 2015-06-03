@@ -60,9 +60,9 @@ static const char	*get_type_string(DWORD type)
 		case SERVICE_FILE_SYSTEM_DRIVER:
 			return "file system driver";
 		case SERVICE_WIN32_SHARE_PROCESS:
-			return "win32 own process";
-		case SERVICE_WIN32_OWN_PROCESS:
 			return "win32 share process";
+		case SERVICE_WIN32_OWN_PROCESS:
+			return "win32 own process";
 		case SERVICE_INTERACTIVE_PROCESS:
 			return "interactive process";
 		default:
