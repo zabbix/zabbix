@@ -4429,7 +4429,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
 	}
-	else if (0 != strncmp("NONE", cipher_name, 4))		/* TODO list explicitly certificate ciphers */
+	else if (0 != strncmp("NONE", cipher_name, 4))		/* is there a better method to find cipher type ? */
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
 
