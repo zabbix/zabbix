@@ -137,8 +137,6 @@ if ($this->data['input_method'] == IM_TREE) {
 		->addClass('formElementTable')
 		->setAttribute('style', 'min-width: 500px;')
 		->setId('exp_list')
-		->setOddRowClass('even_row')
-		->setEvenRowClass('even_row')
 		->setHeader([
 			$this->data['limited'] ? null : _('Target'),
 			_('Expression'),
