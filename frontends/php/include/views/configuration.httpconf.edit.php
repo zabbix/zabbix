@@ -158,7 +158,7 @@ $httpAuthenticationFormList->addRow(
  */
 $httpStepFormList = new CFormList('httpFormList');
 $stepsTable = (new CTable())
-	->addClass(ZBX_STYLE_LIST_TABLE)
+	->setAttribute('style', 'min-width: 700px;')
 	->setId('httpStepTable')
 	->setHeader([
 		(new CColHeader(''))->setWidth('15'),

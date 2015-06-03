@@ -218,7 +218,6 @@ else {
 
 // append items to form list
 $itemsTable = (new CTable())
-	->addClass(ZBX_STYLE_LIST_TABLE)
 	->setAttribute('style', 'min-width: 700px;')
 	->setId('itemsTable')
 	->setHeader([
