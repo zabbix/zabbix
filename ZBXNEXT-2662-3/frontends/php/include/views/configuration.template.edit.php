@@ -117,14 +117,13 @@ else {
 $templateList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
 
 // FORM ITEM : new group text box [  ]
-$newgroupTB = new CTextBox('newgroup', $newgroup);
-$newgroupTB->setAttribute('maxlength', 64);
-$tmp_label = _('New group');
+$new_group = (new CTextBox('newgroup', $newgroup))->setAttribute('maxlength', 64);
+$new_group_label = _('New group');
 if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-	$tmp_label .= SPACE._('(Only super admins can create groups)');
-	$newgroupTB->setReadonly(true);
+	$new_group_label .= ' '._('(Only super admins can create groups)');
+	$new_group->setReadonly(true);
 }
-$templateList->addRow(SPACE, [$tmp_label, BR(), $newgroupTB], null, null, 'new');
+$templateList->addRow($new_group_label, (new CSpan($new_group))->addClass('form-new-group'));
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
 $cmbGroups = new CComboBox('twb_groupid', $data['twb_groupid'], 'submit()');

@@ -73,16 +73,21 @@ if ($this->data['groupid'] == 0) {
 	));
 }
 else {
-	$deleteButton = new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid'));
+	$clone_button = new CSubmit('clone', _('Clone'));
+	if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+		$clone_button->setAttribute('disabled', 'disabled');
+	}
+
+	$delete_button = new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid'));
 	if (!isset($this->data['deletableHostGroups'][$this->data['groupid']])) {
-		$deleteButton->setAttribute('disabled', 'disabled');
+		$delete_button->setAttribute('disabled', 'disabled');
 	}
 
 	$hostGroupTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new CSubmit('clone', _('Clone')),
-			$deleteButton,
+			$clone_button,
+			$delete_button,
 			new CButtonCancel()
 		]
 	));
