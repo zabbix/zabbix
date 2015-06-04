@@ -30,8 +30,8 @@ $createForm = (new CForm('get'))->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
 
 $controls = new CList();
-$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$controls->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
+$controls->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]);
+$controls->addItem([SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()]);
 
 if (!$this->data['hostid']) {
 	$createButton = new CSubmit('form', _('Create trigger (select host first)'));
@@ -52,23 +52,23 @@ $triggersForm->addVar('hostid', $this->data['hostid']);
 
 // create table
 $triggersTable = new CTableInfo();
-$triggersTable->setHeader(array(
-	new CColHeader(
-		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
-		'cell-width'),
+$triggersTable->setHeader([
+	(new CColHeader(
+		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")))->
+		addClass('cell-width'),
 	make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
 	($this->data['hostid'] == 0) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
 	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
 	$this->data['showInfoColumn'] ? _('Info') : null
-));
+]);
 
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
 
 	// description
-	$description = array();
+	$description = [];
 
 	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 	$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
@@ -108,38 +108,33 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		);
 	}
 
-	$dependencies = $trigger['dependencies'];
-	if (count($dependencies) > 0) {
-		$description[] = array(BR(), bold(_('Depends on').NAME_DELIMITER));
-		$triggerDependencies = array();
+	if ($trigger['dependencies']) {
+		$description[] = [BR(), bold(_('Depends on').':')];
+		$triggerDependencies = [];
 
-		foreach ($dependencies as $dependency) {
+		foreach ($trigger['dependencies'] as $dependency) {
 			$depTrigger = $this->data['dependencyTriggers'][$dependency['triggerid']];
-			$hostNames = array();
 
-			foreach ($depTrigger['hosts'] as $host) {
-				$hostNames[] = CHtml::encode($host['name']);
-				$hostNames[] = ', ';
-			}
-			array_pop($hostNames);
+			$depTriggerDescription = CHtml::encode(
+				implode(', ', zbx_objectValues($depTrigger['hosts'], 'name')).NAME_DELIMITER.$depTrigger['description']
+			);
 
 			if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				$host = reset($depTrigger['hosts']);
 				$triggerDependencies[] = new CLink(
-					array($hostNames, NAME_DELIMITER, CHtml::encode($depTrigger['description'])),
-					'triggers.php?form=update&hostid='.$host['hostid'].'&triggerid='.$depTrigger['triggerid'],
+					$depTriggerDescription,
+					'triggers.php?form=update&triggerid='.$depTrigger['triggerid'],
 					ZBX_STYLE_LINK_ALT.' '.triggerIndicatorStyle($depTrigger['status'])
 				);
 			}
 			else {
-				$triggerDependencies[] = array($hostNames, NAME_DELIMITER, $depTrigger['description']);
+				$triggerDependencies[] = $depTriggerDescription;
 			}
 
 			$triggerDependencies[] = BR();
 		}
 		array_pop($triggerDependencies);
 
-		$description = array_merge($description, array(new CDiv($triggerDependencies, 'dependencies')));
+		$description = array_merge($description, [new CDiv($triggerDependencies, 'dependencies')]);
 	}
 
 
@@ -185,34 +180,34 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', null, null, $triggerid);
 	$checkBox->setEnabled(empty($trigger['discoveryRule']));
 
-	$triggersTable->addRow(array(
+	$triggersTable->addRow([
 		$checkBox,
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$hosts,
 		$description,
-		new CCol(triggerExpression($trigger, true), 'trigger-expression'),
+		(new CCol(triggerExpression($trigger, true)))->addClass('trigger-expression'),
 		$status,
 		$info
-	));
+	]);
 }
 
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
-$triggersForm->addItem(array(
+$triggersForm->addItem([
 	$triggersTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
-		array(
-			'trigger.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected triggers?')),
-			'trigger.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected triggers?')),
-			'trigger.masscopyto' =>  array('name' => _('Copy')),
-			'trigger.massupdateform' => array('name' => _('Mass update')),
-			'trigger.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected triggers?'))
-		),
+		[
+			'trigger.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected triggers?')],
+			'trigger.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected triggers?')],
+			'trigger.masscopyto' =>  ['name' => _('Copy')],
+			'trigger.massupdateform' => ['name' => _('Mass update')],
+			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?')]
+		],
 		$this->data['hostid']
 	)
-));
+]);
 
 // append form to widget
 $triggersWidget->addItem($triggersForm);

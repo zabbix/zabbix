@@ -18,7 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-	$page_menu = new CTag('header', 'yes');
+	$page_menu = (new CTag('header', 'yes'))->setAttribute('role', 'banner');
+	$page_menu_div = (new CDiv(null, 'nav'))->setAttribute('role', 'navigation');
 
 	$top_menu_items = new CList($data['menu']['main_menu'], 'top-nav');
 
@@ -26,7 +27,7 @@
 	$top_menu = new CDiv($top_menu_items, 'top-nav-container');
 	$top_menu->setAttribute('id', 'mmenu');
 
-	$icons = new CList(null, 'top-nav-icons');
+	$icons = new CList([], 'top-nav-icons');
 
 	$form = new CForm('get', 'search.php');
 	$search = new CTextBox('search', '', 20, false, 255);
@@ -34,7 +35,7 @@
 	$search->addClass('search');
 
 	$button = new CSubmitButton(SPACE, null, null, 'btn-search');
-	$form->AddItem(array($search, $button));
+	$form->AddItem([$search, $button]);
 	$icons->addItem($form);
 
 	$zshare = new CLink('Share', 'https://share.zabbix.com/', 'top-nav-zbbshare', null, true);
@@ -56,14 +57,17 @@
 	$icons->addItem($signout);
 	$top_menu->addItem($icons);
 
-	$page_menu->addItem($top_menu);
+	$page_menu_div->addItem($top_menu);
 
 	// 2nd level menu
-	$sub_menu_table = new CTable(null, 'sub_menu maxwidth ui-widget-header');
-	$menu_divs = array();
+	$sub_menu_table = (new CTable())->
+		addClass('sub_menu')->
+		addClass('maxwidth')->
+		addClass('ui-widget-header');
+	$menu_divs = [];
 	$menu_selected = false;
 	foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
-		$sub_menu_row = new CList(null, 'top-subnav');
+		$sub_menu_row = new CList([], 'top-subnav');
 		foreach ($sub_menu as $id => $sub_page) {
 			if (empty($sub_page['menu_text'])) {
 				$sub_page['menu_text'] = SPACE;
@@ -89,8 +93,8 @@
 
 		$sub_menu_div = new CDiv($sub_menu_row, 'top-subnav-container');
 		$sub_menu_div->setAttribute('id', 'sub_'.$label);
-		$sub_menu_div->addAction('onmouseover', 'javascript: MMenu.submenu_mouseOver();');
-		$sub_menu_div->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
+		$sub_menu_div->onMouseover('javascript: MMenu.submenu_mouseOver();');
+		$sub_menu_div->onMouseout('javascript: MMenu.mouseOut();');
 
 		if ($data['menu']['selected'] == $label) {
 			$menu_selected = true;
@@ -109,6 +113,7 @@
 
 	$menu_divs[] = $sub_menu_div;
 
-	$page_menu->addItem($menu_divs);
-	$page_menu->addItem($sub_menu_table);
+	$page_menu_div->addItem($menu_divs);
+	$page_menu_div->addItem($sub_menu_table);
+	$page_menu->addItem($page_menu_div);
 	$page_menu->show();

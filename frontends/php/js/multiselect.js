@@ -231,12 +231,25 @@ jQuery(function($) {
 				'class': 'multiselect-wrapper'
 			}));
 
+			// selected
+			var selected_div = $('<div>', {
+				'class': 'selected'
+			});
+			var selected_ul = $('<ul>', {
+				'class': 'multiselect-list'
+			});
+			if (options.disabled) {
+				selected_ul.addClass('disabled');
+			}
+			obj.append(selected_div.append(selected_ul));
+
 			// search input
 			if (!options.disabled) {
 				var input = $('<input>', {
 					'class': 'input',
 					type: 'text'
 				})
+				.attr('placeholder', options.labels['type here to search'])
 				.on('keyup change', function(e) {
 					if (e.which == KEY.ESCAPE) {
 						cleanSearchInput(obj);
@@ -439,21 +452,6 @@ jQuery(function($) {
 				obj.append(input);
 			}
 
-			// selected
-			var selected_div = $('<div>', {
-				'class': 'selected'
-			});
-			var sdelected_ul = $('<ul>', {
-				'class': 'multiselect-list',
-				css: {
-					width: values.width
-				}
-			});
-			if (options.disabled) {
-				sdelected_ul.addClass('disabled');
-			}
-			obj.append(selected_div.append(sdelected_ul));
-
 			// available
 			if (!options.disabled) {
 				var available = $('<div>', {
@@ -475,14 +473,10 @@ jQuery(function($) {
 			// preload data
 			if (empty(options.data)) {
 				setDefaultValue(obj, options);
-				setPlaceholder(obj, options);
 			}
 			else {
 				loadSelected(options.data, obj, values, options);
 			}
-
-			// resize
-			resize(obj, values, options);
 
 			cleanLastSearch(obj);
 
@@ -498,7 +492,7 @@ jQuery(function($) {
 
 				var popupButton = $('<button>', {
 					type: 'button',
-					'class': options.popup.buttonClass ? options.popup.buttonClass : 'btn-alt',
+					'class': options.popup.buttonClass ? options.popup.buttonClass : 'btn-grey',
 					text: options.labels['Select']
 				});
 
@@ -512,11 +506,6 @@ jQuery(function($) {
 				}
 
 				obj.parent().append($('<div class="multiselect-button"></div>').append(popupButton));
-			}
-
-			// IE browsers use default width
-			if (IE) {
-				options.defaultWidth = $('input[type="text"]', obj).width();
 			}
 		});
 	};
@@ -704,11 +693,6 @@ jQuery(function($) {
 
 			text.append(close_btn);
 
-			removePlaceholder(obj);
-
-			// resize
-			resize(obj, values, options);
-
 			// set readonly
 			if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
 				setReadonly(obj);
@@ -723,25 +707,17 @@ jQuery(function($) {
 
 		delete values.selected[id];
 
-		// resize
-		resize(obj, values, options);
-
 		// remove readonly
 		if ($('.selected li', obj).length == 0) {
 			setDefaultValue(obj, options);
-			setPlaceholder(obj, options);
-		}
-
-		if (options.selectedLimit == 0 || $('.selected li', obj).length < options.selectedLimit) {
-			$('input[type="text"]', obj).prop('disabled', false);
 		}
 
 		// clean
 		cleanAvailable(obj, values);
 		cleanLastSearch(obj);
 
-		if (!$('input[type="text"]', obj).prop('disabled')) {
-			$('input[type="text"]', obj).focus();
+		if (options.selectedLimit == 0 || $('.selected li', obj).length < options.selectedLimit) {
+			$('input[type="text"]', obj).css({'display': ''}).focus();
 		}
 	}
 
@@ -805,7 +781,7 @@ jQuery(function($) {
 			cleanAvailable(obj, values);
 			cleanLastSearch(obj);
 
-			if (!$('input[type="text"]', obj).prop('disabled')) {
+			if (options.selectedLimit == 0 || $('.selected li', obj).length < options.selectedLimit) {
 				$('input[type="text"]', obj).focus();
 			}
 		}
@@ -851,68 +827,11 @@ jQuery(function($) {
 	}
 
 	function cleanLastSearch(obj) {
-		var input = $('input[type="text"]', obj);
-
-		input.data('lastSearch', '');
-		input.val('');
+		$('input[type="text"]', obj).data('lastSearch', '').val('');
 	}
 
 	function cleanSearchInput(obj) {
-		var input = $('input[type="text"]', obj);
-
-		if (!(IE && input.val() == input.attr('placeholder'))) {
-			input.val('');
-		}
-	}
-
-	function resize(obj, values, options) {
-		if (!options.selectedLimit || $('.selected li', obj).length < options.selectedLimit) {
-			resizeSelected(obj, values, options);
-		}
-	}
-
-	function resizeSelected(obj, values, options) {
-		if (options.disabled) {
-			if ($('.selected li', obj).length) {
-				var item = $('.selected li', obj),
-					item_margins = item.outerHeight(true) - item.height();
-
-				$('.selected ul', obj).css({
-					'padding-bottom': item_margins
-				});
-			}
-		}
-		else {
-			var input_padding_top = 0,
-				input = $('input[type="text"]', obj),
-				obj_paddings = obj.innerWidth() - obj.width(),
-				input_paddings = input.innerWidth() - input.width();
-
-			if ($('.selected li', obj).length > 0) {
-				var lastItem = $('.selected li:last-child', obj),
-					position = lastItem.position();
-
-				input_padding_top = position.top + lastItem.outerHeight(true);
-			}
-
-			$('.selected ul', obj).css({
-				'padding-bottom': input.height()
-			});
-
-			input.css({
-				'width': obj.width() + obj_paddings - input_paddings,
-				'padding-top': input_padding_top
-			});
-
-			if (IE) {
-				// hack to fix inline-block container resizing and poke input element value to trigger reflow
-				if (IE8) {
-					$('.multiselect-wrapper').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-				}
-				var currentInputVal = input.val();
-				input.val(' ').val(currentInputVal);
-			}
-		}
+		$('input[type="text"]', obj).val('');
 	}
 
 	function resizeSelectedText(item, text, obj, options) {
@@ -981,8 +900,7 @@ jQuery(function($) {
 	}
 
 	function setReadonly(obj) {
-		cleanSearchInput(obj);
-		$('input[type="text"]', obj).prop('disabled', true);
+		$('input[type="text"]', obj).css({'display': 'none'});
 		$(obj).removeClass('active');
 
 		var item = $('.selected li', obj),
@@ -991,17 +909,6 @@ jQuery(function($) {
 		$('.selected ul', obj).css({
 			'padding-bottom': item_margins
 		});
-	}
-
-	function setPlaceholder(obj, options) {
-		$('input[type="text"]', obj).attr('placeholder', options.labels['type here to search']);
-	}
-
-	function removePlaceholder(obj) {
-		$('input[type="text"]', obj)
-			.removeAttr('placeholder')
-//			.removeClass('placeholder')
-			.val('');
 	}
 
 	function getLimit(values, options) {

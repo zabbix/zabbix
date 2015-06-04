@@ -36,7 +36,7 @@ $screenForm->addVar('templateid', $this->data['templateid']);
 // create screen form list
 $screenFormList = new CFormList();
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $screenFormList->addRow(_('Name'), $nameTextBox);
 $screenFormList->addRow(_('Columns'), new CNumericBox('hsize', $this->data['hsize'], 3));
 $screenFormList->addRow(_('Rows'), new CNumericBox('vsize', $this->data['vsize'], 3));
@@ -50,17 +50,17 @@ if (isset($this->data['screenid']))
 {
 	$screenTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete screen?'), url_param('form').url_param('screenid').url_param('templateid')),
 			new CButtonCancel(url_param('templateid'))
-		)
+		]
 	));
 }
 else {
 	$screenTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('templateid')))
+		[new CButtonCancel(url_param('templateid'))]
 	));
 }
 

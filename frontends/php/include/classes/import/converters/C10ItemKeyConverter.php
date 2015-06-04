@@ -36,11 +36,11 @@ class C10ItemKeyConverter extends CConverter {
 	}
 
 	public function convert($value) {
-		$keys = array('tcp', 'ftp', 'http', 'imap', 'ldap', 'nntp', 'ntp', 'pop', 'smtp', 'ssh');
+		$keys = ['tcp', 'ftp', 'http', 'imap', 'ldap', 'nntp', 'ntp', 'pop', 'smtp', 'ssh'];
 
-		$perfKeys = array('tcp_perf', 'ftp_perf', 'http_perf', 'imap_perf', 'ldap_perf', 'nntp_perf', 'ntp_perf',
+		$perfKeys = ['tcp_perf', 'ftp_perf', 'http_perf', 'imap_perf', 'ldap_perf', 'nntp_perf', 'ntp_perf',
 			'pop_perf', 'smtp_perf', 'ssh_perf'
-		);
+		];
 
 		$parts = explode(',', $value);
 		if (count($parts) <= 2) {

@@ -29,13 +29,13 @@ $page['file'] = 'hostinventoriesoverview.php';
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'groupid' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	null),
-	'groupby' =>	array(T_ZBX_STR, O_OPT,	P_SYS,	null,	null),
+$fields = [
+	'groupid' =>	[T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	null],
+	'groupby' =>	[T_ZBX_STR, O_OPT,	P_SYS,	null,	null],
 	// sort and sortorder
-	'sort' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"host_count","inventory_field"'),		null),
-	'sortorder' =>	array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
-);
+	'sort' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"host_count","inventory_field"'),		null],
+	'sortorder' =>	[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+];
 check_fields($fields);
 
 $sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'host_count'));
@@ -47,7 +47,7 @@ CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR
 /*
  * Permissions
  */
-if (getRequest('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable([$_REQUEST['groupid']])) {
 	access_deny();
 }
 
@@ -56,12 +56,12 @@ if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) 
 	exit;
 }
 
-$options = array(
-	'groups' => array(
+$options = [
+	'groups' => [
 		'real_hosts' => 1,
-	),
+	],
 	'groupid' => getRequest('groupid'),
-);
+];
 $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['groupby'] = getRequest('groupby', '');
@@ -86,46 +86,46 @@ foreach($inventoryFields as $inventoryField){
 
 $r_form = new CForm('get');
 $controls = new CList();
-$controls->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
-$controls->addItem(array(_('Grouping by').SPACE, $inventoryFieldsComboBox));
+$controls->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()]);
+$controls->addItem([_('Grouping by').SPACE, $inventoryFieldsComboBox]);
 $r_form->addItem($controls);
 $hostinvent_wdgt->setControls($r_form);
 
 $table = new CTableInfo();
 $table->setHeader(
-	array(
+	[
 		make_sorting_header($groupFieldTitle === '' ? _('Field') : $groupFieldTitle, 'inventory_field',
 			$sortField, $sortOrder
 		),
 		make_sorting_header(_('Host count'), 'host_count', $sortField, $sortOrder),
-	)
+	]
 );
 
 // to show a report, we will need a host group and a field to aggregate
 if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 
-	$options = array(
-		'output' => array('hostid', 'name'),
-		'selectInventory' => array($_REQUEST['groupby']), // only one field is required
+	$options = [
+		'output' => ['hostid', 'name'],
+		'selectInventory' => [$_REQUEST['groupby']], // only one field is required
 		'withInventory' => true
-	);
+	];
 	if($pageFilter->groupid > 0)
 		$options['groupids'] = $pageFilter->groupid;
 
 	$hosts = API::Host()->get($options);
 
 	// aggregating data by chosen field value
-	$report = array();
+	$report = [];
 	foreach($hosts as $host) {
 		if ($host['inventory'][$_REQUEST['groupby']] !== '') {
 			// same names with different letter casing are considered the same
 			$lowerValue = mb_strtolower($host['inventory'][$_REQUEST['groupby']]);
 
 			if (!isset($report[$lowerValue])) {
-				$report[$lowerValue] = array(
+				$report[$lowerValue] = [
 					'inventory_field' => $host['inventory'][$_REQUEST['groupby']],
 					'host_count' => 1
-				);
+				];
 			}
 			else {
 				$report[$lowerValue]['host_count'] += 1;
@@ -136,10 +136,10 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 	order_result($report, $sortField, $sortOrder);
 
 	foreach($report as $rep){
-		$row = array(
+		$row = [
 			new CSpan(zbx_str2links($rep['inventory_field']), 'pre'),
 			new CLink($rep['host_count'],'hostinventories.php?filter_field='.$_REQUEST['groupby'].'&filter_field_value='.urlencode($rep['inventory_field']).'&filter_set=1&filter_exact=1'.url_param('groupid')),
-		);
+		];
 		$table->addRow($row);
 	}
 }

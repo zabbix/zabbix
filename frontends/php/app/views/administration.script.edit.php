@@ -33,15 +33,15 @@ $scriptFormList = new CFormList();
 
 // name
 $nameTextBox = new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->attr('autofocus', 'autofocus');
-$nameTextBox->attr('placeholder', _('<Sub-menu/Sub-menu.../>Script'));
+$nameTextBox->setAttribute('autofocus', 'autofocus');
+$nameTextBox->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'));
 $scriptFormList->addRow(_('Name'), $nameTextBox);
 
 // type
-$scriptFormList->addRow(_('Type'), new CComboBox('type', $data['type'], null, array(
+$scriptFormList->addRow(_('Type'), new CComboBox('type', $data['type'], null, [
 	ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
 	ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Script')
-)));
+]));
 
 // execute on
 $typeRadioButton = new CRadioButtonList('execute_on', $data['execute_on']);
@@ -66,41 +66,41 @@ $scriptFormList->addRow(
 $scriptFormList->addRow(_('Description'), new CTextArea('description', $data['description']));
 
 // user groups
-$user_groups = array(0 => _('All'));
+$user_groups = [0 => _('All')];
 foreach ($data['usergroups'] as $user_group) {
 	$user_groups[$user_group['usrgrpid']] = $user_group['name'];
 }
 $scriptFormList->addRow(_('User group'), new CComboBox('usrgrpid', $data['usrgrpid'], null, $user_groups));
 
 // host groups
-$scriptFormList->addRow(_('Host group'), new CComboBox('hgstype', $data['hgstype'], null, array(
+$scriptFormList->addRow(_('Host group'), new CComboBox('hgstype', $data['hgstype'], null, [
 	0 => _('All'),
 	1 => _('Selected')
-)));
-$scriptFormList->addRow(null, new CMultiSelect(array(
+]));
+$scriptFormList->addRow(null, new CMultiSelect([
 	'name' => 'groupid',
 	'selectedLimit' => 1,
 	'objectName' => 'hostGroup',
 	'data' => $data['hostgroup'],
-	'popup' => array(
+	'popup' => [
 		'parameters' => 'srctbl=host_groups&dstfrm='.$scriptForm->getName().'&dstfld1=groupid&srcfld1=groupid'
-	)
-)), null, 'hostGroupSelection');
+	]
+]), null, 'hostGroupSelection');
 
 // access
-$scriptFormList->addRow(_('Required host permissions'), new CComboBox('host_access', $data['host_access'], null, array(
+$scriptFormList->addRow(_('Required host permissions'), new CComboBox('host_access', $data['host_access'], null, [
 	PERM_READ => _('Read'),
 	PERM_READ_WRITE => _('Write')
-)));
+]));
 $scriptFormList->addRow(new CLabel(_('Enable confirmation'), 'enable_confirmation'),
 	new CCheckBox('enable_confirmation', $data['enable_confirmation']));
 
 $confirmationLabel = new CLabel(_('Confirmation text'), 'confirmation');
-$scriptFormList->addRow($confirmationLabel, array(
+$scriptFormList->addRow($confirmationLabel, [
 	new CTextBox('confirmation', $data['confirmation'], ZBX_TEXTBOX_STANDARD_SIZE),
 	SPACE,
 	new CButton('testConfirmation', _('Test confirmation'), null, 'link_menu')
-));
+]);
 
 $scriptView = new CTabView();
 $scriptView->addTab('scripts', _('Script'), $scriptFormList);
@@ -115,7 +115,7 @@ if ($data['scriptid'] == 0) {
 
 	$scriptView->setFooter(makeFormFooter(
 		$addButton,
-		array($cancelButton)
+		[$cancelButton]
 	));
 }
 else {
@@ -131,11 +131,11 @@ else {
 
 	$scriptView->setFooter(makeFormFooter(
 		$updateButton,
-		array(
+		[
 			$cloneButton,
 			$deleteButton,
 			$cancelButton
-		)
+		]
 	));
 }
 

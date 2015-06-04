@@ -45,7 +45,7 @@ class CJsonRpc {
 		$this->initErrors();
 
 		$this->_error = false;
-		$this->_response = array();
+		$this->_response = [];
 		$this->_jsonDecoded = $this->json->decode($jsonData, true);
 
 		if (!$this->_jsonDecoded) {
@@ -116,11 +116,11 @@ class CJsonRpc {
 				return;
 			}
 
-			$formedResp = array(
+			$formedResp = [
 				'jsonrpc' => self::VERSION,
 				'result' => $response->data,
 				'id' => $call['id']
-			);
+			];
 
 			$this->_response = $formedResp;
 		}
@@ -153,65 +153,65 @@ class CJsonRpc {
 		}
 
 
-		$formed_error = array(
+		$formed_error = [
 			'jsonrpc' => self::VERSION,
 			'error' => $error,
 			'id' => $id
-		);
+		];
 
 		$this->_response = $formed_error;
 	}
 
 	private function initErrors() {
-		$this->_error_list = array(
-			'-32700' => array(
+		$this->_error_list = [
+			'-32700' => [
 				'code' => -32700,
 				'message' => _('Parse error'),
 				'data' => _('Invalid JSON. An error occurred on the server while parsing the JSON text.')
-			),
-			'-32600' => array(
+			],
+			'-32600' => [
 				'code' => -32600,
 				'message' => _('Invalid Request.'),
 				'data' => _('The received JSON is not a valid JSON-RPC Request.')
-			),
-			'-32601' => array(
+			],
+			'-32601' => [
 				'code' => -32601,
 				'message' => _('Method not found.'),
 				'data' => _('The requested remote-procedure does not exist / is not available')
-			),
-			'-32602' => array(
+			],
+			'-32602' => [
 				'code' => -32602,
 				'message' => _('Invalid params.'),
 				'data' => _('Invalid method parameters.')
-			),
-			'-32603' => array(
+			],
+			'-32603' => [
 				'code' => -32603,
 				'message' => _('Internal error.'),
 				'data' => _('Internal JSON-RPC error.')
-			),
-			'-32500' => array(
+			],
+			'-32500' => [
 				'code' => -32500,
 				'message' => _('Application error.'),
 				'data' => _('No details')
-			),
-			'-32400' => array(
+			],
+			'-32400' => [
 				'code' => -32400,
 				'message' => _('System error.'),
 				'data' => _('No details')
-			),
-			'-32300' => array(
+			],
+			'-32300' => [
 				'code' => -32300,
 				'message' => _('Transport error.'),
 				'data' => _('No details')
-			)
-		);
+			]
+		];
 
-		$this->_zbx2jsonErrors = array(
+		$this->_zbx2jsonErrors = [
 			ZBX_API_ERROR_NO_METHOD => '-32601',
 			ZBX_API_ERROR_PARAMETERS => '-32602',
 			ZBX_API_ERROR_NO_AUTH => '-32602',
 			ZBX_API_ERROR_PERMISSIONS => '-32500',
 			ZBX_API_ERROR_INTERNAL => '-32500'
-		);
+		];
 	}
 }

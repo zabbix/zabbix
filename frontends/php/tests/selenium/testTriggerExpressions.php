@@ -23,11 +23,11 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testTriggerExpression extends CWebTest {
 
 	public static function provider() {
-		return array (
-			array('10M', '20M', 'FALSE'),
-			array('10T', '2G', 'TRUE'),
-			array('10T', '2T', 'TRUE')
-		);
+		return [
+			['10M', '20M', 'FALSE'],
+			['10T', '2G', 'TRUE'],
+			['10T', '2T', 'TRUE']
+		];
 	}
 
 	/**

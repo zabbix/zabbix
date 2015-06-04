@@ -26,52 +26,52 @@ $page['file'] = 'adm.housekeeper.php';
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$fields = array(
-	'hk_events_mode' =>		array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')),
-	'hk_events_trigger' => 	array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
+$fields = [
+	'hk_events_mode' =>		[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')],
+	'hk_events_trigger' => 	[T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
 		'isset({update}) && isset({hk_events_mode})', _('Trigger event and alert data storage period')
-	),
-	'hk_events_internal' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
+	],
+	'hk_events_internal' => [T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
 		'isset({update}) && isset({hk_events_mode})', _('Internal event and alert data storage period')
-	),
-	'hk_events_discovery' =>array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
+	],
+	'hk_events_discovery' =>[T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
 		'isset({update}) && isset({hk_events_mode})', _('Network discovery event and alert data storage period')
-	),
-	'hk_events_autoreg' => 	array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
+	],
+	'hk_events_autoreg' => 	[T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
 		'isset({update}) && isset({hk_events_mode})', _('Auto-registration event and alert data storage period')
-	),
-	'hk_services_mode' =>	array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')),
-	'hk_services' => 		array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
+	],
+	'hk_services_mode' =>	[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')],
+	'hk_services' => 		[T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
 		'isset({update}) && isset({hk_services_mode})', _('IT service data storage period')
-	),
-	'hk_audit_mode' =>		array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')),
-	'hk_audit' => 			array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
+	],
+	'hk_audit_mode' =>		[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')],
+	'hk_audit' => 			[T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
 		'isset({update}) && isset({hk_audit_mode})', _('Audit data storage period')
-	),
-	'hk_sessions_mode' =>	array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')),
-	'hk_sessions' => 		array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
-		'isset({update}) && isset({hk_sessions_mode})', _('User session data storage period')),
-	'hk_history_mode' =>	array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')),
-	'hk_history_global' =>	array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('Override item history period')),
-	'hk_history' => 		array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 99999),
+	],
+	'hk_sessions_mode' =>	[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')],
+	'hk_sessions' => 		[T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999),
+		'isset({update}) && isset({hk_sessions_mode})', _('User session data storage period')],
+	'hk_history_mode' =>	[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')],
+	'hk_history_global' =>	[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Override item history period')],
+	'hk_history' => 		[T_ZBX_INT, O_OPT, null, BETWEEN(0, 99999),
 		'isset({update}) && isset({hk_history_global})', _('History data storage period')
-	),
-	'hk_trends_mode' =>		array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')),
-	'hk_trends_global' =>	array(T_ZBX_INT, O_OPT, null, IN('1'), null, _('Override item history period')),
-	'hk_trends' => 			array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 99999),
+	],
+	'hk_trends_mode' =>		[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable internal housekeeping')],
+	'hk_trends_global' =>	[T_ZBX_INT, O_OPT, null, IN('1'), null, _('Override item history period')],
+	'hk_trends' => 			[T_ZBX_INT, O_OPT, null, BETWEEN(0, 99999),
 		'isset({update}) && isset({hk_trends_global})', _('Trend data storage period')
-	),
+	],
 	// actions
-	'update' =>				array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT,	null, null, null)
-);
+	'update' =>				[T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null],
+	'form_refresh' =>		[T_ZBX_INT, O_OPT,	null, null, null]
+];
 check_fields($fields);
 
 /*
  * Actions
  */
 if (hasRequest('update')) {
-	$config = array(
+	$config = [
 		'hk_events_mode' => getRequest('hk_events_mode', 0),
 		'hk_services_mode' => getRequest('hk_services_mode', 0),
 		'hk_audit_mode' => getRequest('hk_audit_mode', 0),
@@ -80,7 +80,7 @@ if (hasRequest('update')) {
 		'hk_history_global' => getRequest('hk_history_global', 0),
 		'hk_trends_mode' => getRequest('hk_trends_mode', 0),
 		'hk_trends_global' => getRequest('hk_trends_global', 0)
-	);
+	];
 
 	if ($config['hk_events_mode'] == 1) {
 		$config['hk_events_trigger'] = getRequest('hk_events_trigger');
@@ -123,7 +123,7 @@ $form->cleanItems();
 $controls = new CList();
 $controls->addItem(new CComboBox('configDropDown', 'adm.housekeeper.php',
 	'redirect(this.options[this.selectedIndex].value);',
-	array(
+	[
 		'adm.gui.php' => _('GUI'),
 		'adm.housekeeper.php' => _('Housekeeping'),
 		'adm.images.php' => _('Images'),
@@ -135,17 +135,17 @@ $controls->addItem(new CComboBox('configDropDown', 'adm.housekeeper.php',
 		'adm.triggerseverities.php' => _('Trigger severities'),
 		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 		'adm.other.php' => _('Other')
-	)
+	]
 ));
 
 $form->addItem($controls);
 
-$cnf_wdgt = new CWidget()->setTitle(_('Housekeeping'))->setControls($form);
+$cnf_wdgt = (new CWidget())->setTitle(_('Housekeeping'))->setControls($form);
 
 $config = select_config();
 
 if (hasRequest('form_refresh')) {
-	$data = array(
+	$data = [
 		'hk_events_mode' => getRequest('hk_events_mode', 0),
 		'hk_events_trigger' => getRequest('hk_events_trigger', $config['hk_events_trigger']),
 		'hk_events_internal' => getRequest('hk_events_internal', $config['hk_events_internal']),
@@ -163,10 +163,10 @@ if (hasRequest('form_refresh')) {
 		'hk_trends_mode' => getRequest('hk_trends_mode', 0),
 		'hk_trends_global' => getRequest('hk_trends_global', 0),
 		'hk_trends' => getRequest('hk_trends', $config['hk_trends'])
-	);
+	];
 }
 else {
-	$data = array(
+	$data = [
 		'hk_events_mode' => $config['hk_events_mode'],
 		'hk_events_trigger' => $config['hk_events_trigger'],
 		'hk_events_internal' => $config['hk_events_internal'],
@@ -184,7 +184,7 @@ else {
 		'hk_trends_mode' => $config['hk_trends_mode'],
 		'hk_trends_global' => $config['hk_trends_global'],
 		'hk_trends' => $config['hk_trends']
-	);
+	];
 }
 
 $houseKeeperForm = new CView('administration.general.housekeeper.edit', $data);
