@@ -28,7 +28,7 @@ class CMediatype extends CApiService {
 
 	protected $tableName = 'media_type';
 	protected $tableAlias = 'mt';
-	protected $sortColumns = array('mediatypeid');
+	protected $sortColumns = ['mediatypeid'];
 
 	/**
 	 * Get Media types data
@@ -44,20 +44,20 @@ class CMediatype extends CApiService {
 	 * @param string $options['sortorder'] output will be sorted in given order [ 'ASC', 'DESC' ]
 	 * @return array
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 
-		$sqlParts = array(
-			'select'	=> array('media_type' => 'mt.mediatypeid'),
-			'from'		=> array('media_type' => 'media_type mt'),
-			'where'		=> array(),
-			'group'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['media_type' => 'mt.mediatypeid'],
+			'from'		=> ['media_type' => 'media_type mt'],
+			'where'		=> [],
+			'group'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'mediatypeids'				=> null,
 			'mediaids'					=> null,
 			'userids'					=> null,
@@ -78,7 +78,7 @@ class CMediatype extends CApiService {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// permission check
@@ -87,7 +87,7 @@ class CMediatype extends CApiService {
 		elseif (is_null($options['editable']) && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
 		}
 		elseif (!is_null($options['editable']) || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			return array();
+			return [];
 		}
 
 		// mediatypeids
@@ -185,23 +185,23 @@ class CMediatype extends CApiService {
 		$mediatypes = zbx_toArray($mediatypes);
 
 		foreach ($mediatypes as $mediatype) {
-			$mediatypeDbFields = array(
+			$mediatypeDbFields = [
 				'type' => null,
 				'description' => null
-			);
+			];
 			if (!check_db_fields($mediatypeDbFields, $mediatype)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for media type.'));
 			}
 
-			if (in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING))
+			if (in_array($mediatype['type'], [MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING])
 					&& (!isset($mediatype['passwd']) || empty($mediatype['passwd']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Password required for media type.'));
 			}
 
-			$mediatypeExist = $this->get(array(
-				'filter' => array('description' => $mediatype['description']),
+			$mediatypeExist = $this->get([
+				'filter' => ['description' => $mediatype['description']],
 				'output' => API_OUTPUT_EXTEND
-			));
+			]);
 			if (!empty($mediatypeExist)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%s" already exists.', $mediatypeExist[0]['description']));
 			}
@@ -209,7 +209,7 @@ class CMediatype extends CApiService {
 
 		$mediatypeids = DB::insert('media_type', $mediatypes);
 
-		return array('mediatypeids' => $mediatypeids);
+		return ['mediatypeids' => $mediatypeids];
 	}
 
 	/**
@@ -235,21 +235,21 @@ class CMediatype extends CApiService {
 
 		$mediatypes = zbx_toArray($mediatypes);
 
-		$update = array();
+		$update = [];
 		foreach ($mediatypes as $mediatype) {
-			$mediatypeDbFields = array(
+			$mediatypeDbFields = [
 				'mediatypeid' => null
-			);
+			];
 			if (!check_db_fields($mediatypeDbFields, $mediatype)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for media type.'));
 			}
 
 			if (isset($mediatype['description'])) {
-				$options = array(
-					'filter' => array('description' => $mediatype['description']),
+				$options = [
+					'filter' => ['description' => $mediatype['description']],
 					'preservekeys' => true,
-					'output' => array('mediatypeid')
-				);
+					'output' => ['mediatypeid']
+				];
 				$existMediatypes = $this->get($options);
 				$existMediatype = reset($existMediatypes);
 
@@ -262,7 +262,7 @@ class CMediatype extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Password required for media type.'));
 			}
 
-			if (array_key_exists('type', $mediatype) && !in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING))) {
+			if (array_key_exists('type', $mediatype) && !in_array($mediatype['type'], [MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING])) {
 				$mediatype['passwd'] = '';
 			}
 
@@ -270,17 +270,17 @@ class CMediatype extends CApiService {
 			unset($mediatype['mediatypeid']);
 
 			if (!empty($mediatype)) {
-				$update[] = array(
+				$update[] = [
 					'values' => $mediatype,
-					'where' => array('mediatypeid' => $mediatypeid)
-				);
+					'where' => ['mediatypeid' => $mediatypeid]
+				];
 			}
 		}
 
 		DB::update('media_type', $update);
 		$mediatypeids = zbx_objectValues($mediatypes, 'mediatypeid');
 
-		return array('mediatypeids' => $mediatypeids);
+		return ['mediatypeids' => $mediatypeids];
 	}
 
 	/**
@@ -295,19 +295,19 @@ class CMediatype extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete media types.'));
 		}
 
-		$actions = API::Action()->get(array(
+		$actions = API::Action()->get([
 			'mediatypeids' => $mediatypeids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		));
+		]);
 		if (!empty($actions)) {
 			$action = reset($actions);
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media types used by action "%s".', $action['name']));
 		}
 
-		DB::delete('media_type', array('mediatypeid' => $mediatypeids));
+		DB::delete('media_type', ['mediatypeid' => $mediatypeids]);
 
-		return array('mediatypeids' => $mediatypeids);
+		return ['mediatypeids' => $mediatypeids];
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -316,11 +316,11 @@ class CMediatype extends CApiService {
 		// adding users
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'mediatypeid', 'userid', 'media');
-			$users = API::User()->get(array(
+			$users = API::User()->get([
 				'output' => $options['selectUsers'],
 				'userids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapMany($result, $users, 'users');
 		}
 

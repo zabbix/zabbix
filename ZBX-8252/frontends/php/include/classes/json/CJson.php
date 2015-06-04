@@ -58,11 +58,11 @@ class CJson {
 	 * @var array
 	 *
 	 */
-	protected $_config = array(
+	protected $_config = [
 		'bypass_ext' => false,
 		'bypass_mb' => false,
 		'noerror' => false
-	);
+	];
 
 	/**
 	 *
@@ -133,7 +133,7 @@ class CJson {
 	 * @return string JSON encoded value
 	 *
 	 */
-	public function encode($valueToEncode, $deQuote = array(), $forceObject = false) {
+	public function encode($valueToEncode, $deQuote = [], $forceObject = false) {
 		if (!$this->_config['bypass_ext'] && function_exists('json_encode') && defined('JSON_FORCE_OBJECT')) {
 			if ($this->_config['noerror']) {
 				$old_errlevel = error_reporting(E_ERROR ^ E_WARNING);
@@ -179,7 +179,7 @@ class CJson {
 	protected function _deQuote($encoded, $keys) {
 		foreach ($keys as $key) {
 			$encoded = preg_replace_callback("/(\"".$key."\"\:)(\".*(?:[^\\\]\"))/U",
-					array($this, '_stripvalueslashes'), $encoded);
+					[$this, '_stripvalueslashes'], $encoded);
 		}
 		return $encoded;
 	}
@@ -385,16 +385,16 @@ class CJson {
 
 				// treat as a JSON object
 				if (self::$forceObject || is_array($var) && count($var) && array_keys($var) !== range(0, sizeof($var) - 1)) {
-					$properties = array_map(array($this, '_name_value'), array_keys($var), array_values($var));
+					$properties = array_map([$this, '_name_value'], array_keys($var), array_values($var));
 					return '{' . join(',', $properties) . '}';
 				}
 
 				// treat it like a regular array
-				$elements = array_map(array($this, '_json_encode'), $var);
+				$elements = array_map([$this, '_json_encode'], $var);
 				return '[' . join(',', $elements) . ']';
 			case 'object':
 				$vars = get_object_vars($var);
-				$properties = array_map(array($this, '_name_value'), array_keys($vars), array_values($vars));
+				$properties = array_map([$this, '_name_value'], array_keys($vars), array_values($vars));
 				return '{' . join(',', $properties) . '}';
 			default:
 				if ($this->_config['noerror']) {
@@ -404,7 +404,7 @@ class CJson {
 					'Solar_Json',
 					'ERR_CANNOT_ENCODE',
 					gettype($var).' cannot be encoded as a JSON string',
-					array('var' => $var)
+					['var' => $var]
 				);
 		}
 	}
@@ -437,7 +437,7 @@ class CJson {
 				// "A JSON payload should be an object or array, not a string."
 				// Thus, returning bool(true) is invalid parsing, unless
 				// we're nested inside an array or object.
-				if (in_array($this->_level, array(self::IN_ARR, self::IN_OBJ))) {
+				if (in_array($this->_level, [self::IN_ARR, self::IN_OBJ])) {
 					return true;
 				}
 				else {
@@ -449,7 +449,7 @@ class CJson {
 				// "A JSON payload should be an object or array, not a string."
 				// Thus, returning bool(false) is invalid parsing, unless
 				// we're nested inside an array or object.
-				if (in_array($this->_level, array(self::IN_ARR, self::IN_OBJ))) {
+				if (in_array($this->_level, [self::IN_ARR, self::IN_OBJ])) {
 					return false;
 				}
 				else {
@@ -459,11 +459,11 @@ class CJson {
 			case 'null':
 				return null;
 			default:
-				$m = array();
+				$m = [];
 
 				if (is_numeric($str) || ctype_digit($str) || ctype_xdigit($str)) {
 					// return float or int, or null as appropriate
-					if (in_array($this->_level, array(self::IN_ARR, self::IN_OBJ))) {
+					if (in_array($this->_level, [self::IN_ARR, self::IN_OBJ])) {
 						return ((float) $str == (integer) $str) ? (integer) $str : (float) $str;
 					}
 					else {
@@ -552,7 +552,7 @@ class CJson {
 						}
 					}
 
-					if (in_array($this->_level, array(self::IN_ARR, self::IN_OBJ))) {
+					if (in_array($this->_level, [self::IN_ARR, self::IN_OBJ])) {
 						return $utf8;
 					}
 					else {
@@ -562,22 +562,22 @@ class CJson {
 				elseif (preg_match('/^\[.*\]$/s', $str) || preg_match('/^\{.*\}$/s', $str)) {
 					// array, or object notation
 					if ($str{0} == '[') {
-						$stk = array(self::IN_ARR);
+						$stk = [self::IN_ARR];
 						$this->_level = self::IN_ARR;
-						$arr = array();
+						$arr = [];
 					}
 					else {
 						if ($asArray) {
-							$stk = array(self::IN_OBJ);
-							$obj = array();
+							$stk = [self::IN_OBJ];
+							$obj = [];
 						}
 						else {
-							$stk = array(self::IN_OBJ);
+							$stk = [self::IN_OBJ];
 							$obj = new stdClass();
 						}
 						$this->_level = self::IN_OBJ;
 					}
-					array_push($stk, array('what' => self::SLICE, 'where' => 0, 'delim' => false));
+					array_push($stk, ['what' => self::SLICE, 'where' => 0, 'delim' => false]);
 
 					$chrs = substr($str, 1, -1);
 					$chrs = $this->_reduce_string($chrs);
@@ -600,7 +600,7 @@ class CJson {
 							// found a comma that is not inside a string, array, etc.,
 							// OR we've reached the end of the character list
 							$slice = substr($chrs, $top['where'], $c - $top['where']);
-							array_push($stk, array('what' => self::SLICE, 'where' => $c + 1, 'delim' => false));
+							array_push($stk, ['what' => self::SLICE, 'where' => $c + 1, 'delim' => false]);
 
 							if (reset($stk) == self::IN_ARR) {
 								$this->_level = self::IN_ARR;
@@ -613,7 +613,7 @@ class CJson {
 								// out the property name and set an
 								// element in an associative array,
 								// for now
-								$parts = array();
+								$parts = [];
 
 								if (preg_match('/^\s*(["\'].*[^\\\]["\'])\s*:\s*(\S.*),?$/Uis', $slice, $parts)) {
 									// "name":value pair
@@ -657,7 +657,7 @@ class CJson {
 						}
 						elseif (($chrs{$c} == '"' || $chrs{$c} == "'") && $top['what'] != self::IN_STR) {
 							// found a quote, and we are not inside a string
-							array_push($stk, array('what' => self::IN_STR, 'where' => $c, 'delim' => $chrs{$c}));
+							array_push($stk, ['what' => self::IN_STR, 'where' => $c, 'delim' => $chrs{$c}]);
 						}
 						elseif (((strlen(substr($chrs, 0, $c)) - strlen(rtrim(substr($chrs, 0, $c), '\\'))) % 2 != 1)
 								&& $chrs{$c} == $top['delim'] && $top['what'] == self::IN_STR) {
@@ -667,9 +667,9 @@ class CJson {
 							array_pop($stk);
 						}
 						elseif ($chrs{$c} == '['
-								&& in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
+								&& in_array($top['what'], [self::SLICE, self::IN_ARR, self::IN_OBJ])) {
 							// found a left-bracket, and we are in an array, object, or slice
-							array_push($stk, array('what' => self::IN_ARR, 'where' => $c, 'delim' => false));
+							array_push($stk, ['what' => self::IN_ARR, 'where' => $c, 'delim' => false]);
 						}
 						elseif ($chrs{$c} == ']' && $top['what'] == self::IN_ARR) {
 							// found a right-bracket, and we're in an array
@@ -677,9 +677,9 @@ class CJson {
 							array_pop($stk);
 						}
 						elseif ($chrs{$c} == '{'
-								&& in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
+								&& in_array($top['what'], [self::SLICE, self::IN_ARR, self::IN_OBJ])) {
 							// found a left-brace, and we are in an array, object, or slice
-							array_push($stk, array('what' => self::IN_OBJ, 'where' => $c, 'delim' => false));
+							array_push($stk, ['what' => self::IN_OBJ, 'where' => $c, 'delim' => false]);
 						}
 						elseif ($chrs{$c} == '}' && $top['what'] == self::IN_OBJ) {
 							// found a right-brace, and we're in an object
@@ -687,9 +687,9 @@ class CJson {
 							array_pop($stk);
 						}
 						elseif ($substr_chrs_c_2 == '/*'
-								&& in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
+								&& in_array($top['what'], [self::SLICE, self::IN_ARR, self::IN_OBJ])) {
 							// found a comment start, and we are in an array, object, or slice
-							array_push($stk, array('what' => self::IN_CMT, 'where' => $c, 'delim' => false));
+							array_push($stk, ['what' => self::IN_CMT, 'where' => $c, 'delim' => false]);
 							$c++;
 						}
 						elseif ($substr_chrs_c_2 == '*/' && ($top['what'] == self::IN_CMT)) {
@@ -802,7 +802,7 @@ class CJson {
 	 * @return string string value stripped of comments and whitespace
 	 */
 	protected function _reduce_string($str) {
-		$str = preg_replace(array(
+		$str = preg_replace([
 			// eliminate single line comments in '// ...' form
 			'#^\s*//(.+)$#m',
 
@@ -812,7 +812,7 @@ class CJson {
 			// eliminate multi-line comments in '/* ... */' form, at end of string
 			'#/\*(.+)\*/\s*$#Us'
 
-		), '', $str);
+		], '', $str);
 		// eliminate extraneous space
 		return trim($str);
 	}
@@ -859,13 +859,13 @@ class CJson {
 	 *
 	 * @var array
 	 */
-	protected $_ascii_class = array();
+	protected $_ascii_class = [];
 
 	/**
 	 * State transition table.
 	 * @var array
 	 */
-	protected $_state_transition_table = array();
+	protected $_state_transition_table = [];
 
 	/**
 	 * These modes can be pushed on the "pushdown automata" (PDA) stack.
@@ -886,7 +886,7 @@ class CJson {
 	 * The stack to maintain the state of nested structures.
 	 * @var array
 	 */
-	protected $_the_stack = array();
+	protected $_the_stack = [];
 
 	/**
 	 * Pointer for the top of the stack.
@@ -1021,7 +1021,7 @@ class CJson {
 	 * @return void
 	 */
 	protected function _mapAscii() {
-		$this->_ascii_class = array(
+		$this->_ascii_class = [
 			self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR,
 			self::S_ERR, self::S_WSP, self::S_WSP, self::S_ERR, self::S_ERR, self::S_WSP, self::S_ERR, self::S_ERR,
 			self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR,
@@ -1041,7 +1041,7 @@ class CJson {
 			self::S_ETC, self::S_ETC, self::S_ETC, self::S_ETC, self::S__L_, self::S_ETC, self::S__N_, self::S_ETC,
 			self::S_ETC, self::S_ETC, self::S__R_, self::S__S_, self::S__T_, self::S__U_, self::S_ETC, self::S_ETC,
 			self::S_ETC, self::S_ETC, self::S_ETC, self::S_LBE, self::S_ETC, self::S_RBE, self::S_ETC, self::S_ETC
-		);
+		];
 	}
 
 	/**
@@ -1053,38 +1053,38 @@ class CJson {
 	 * @return void;
 	 */
 	protected function _setStateTransitionTable() {
-		$this->_state_transition_table = array(
-			array( 0, 0,-8,-1,-6,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-			array( 1, 1,-1,-9,-1,-1,-1,-1, 3,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-			array( 2, 2,-8,-1,-6,-5,-1,-1, 3,-1,-1,-1,20,-1,21,22,-1,-1,-1,-1,-1,13,-1,17,-1,-1,10,-1,-1,-1,-1),
-			array( 3,-1, 3, 3, 3, 3, 3, 3,-4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
-			array(-1,-1,-1,-1,-1,-1,-1,-1, 3, 3, 3,-1,-1,-1,-1,-1,-1, 3,-1,-1,-1, 3,-1, 3, 3,-1, 3, 5,-1,-1,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 6, 6, 6, 6, 6, 6, 6, 6,-1,-1,-1,-1,-1,-1, 6, 6,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 7, 7, 7, 7, 7, 7, 7, 7,-1,-1,-1,-1,-1,-1, 7, 7,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 8, 8, 8, 8, 8, 8, 8, 8,-1,-1,-1,-1,-1,-1, 8, 8,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 3, 3, 3, 3, 3, 3, 3, 3,-1,-1,-1,-1,-1,-1, 3, 3,-1),
-			array( 9, 9,-1,-7,-1,-5,-1,-3,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,11,-1,-1,-1,-1,-1,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,12,-1,-1,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 9,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,14,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,15,-1,-1,-1,-1,-1,-1,-1,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,16,-1,-1,-1,-1,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 9,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,18,-1,-1,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,19,-1,-1,-1,-1,-1,-1,-1,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 9,-1,-1,-1,-1,-1,-1,-1,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,21,22,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-			array( 9, 9,-1,-7,-1,-5,-1,-3,-1,-1,-1,-1,-1,23,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-			array( 9, 9,-1,-7,-1,-5,-1,-3,-1,-1,-1,-1,-1,23,22,22,-1,-1,-1,-1,24,-1,-1,-1,-1,-1,-1,-1,-1,24,-1),
-			array( 9, 9,-1,-7,-1,-5,-1,-3,-1,-1,-1,-1,-1,-1,23,23,-1,-1,-1,-1,24,-1,-1,-1,-1,-1,-1,-1,-1,24,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,25,25,-1,26,26,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-			array(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,26,26,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-			array( 9, 9,-1,-7,-1,-5,-1,-3,-1,-1,-1,-1,-1,-1,26,26,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-			array(27,27,-1,-1,-1,-1,-2,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-			array(28,28,-8,-1,-6,-1,-1,-1, 3,-1,-1,-1,20,-1,21,22,-1,-1,-1,-1,-1,13,-1,17,-1,-1,10,-1,-1,-1,-1),
-			array(29,29,-1,-1,-1,-1,-1,-1, 3,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1)
-		);
+		$this->_state_transition_table = [
+			[ 0, 0,-8,-1,-6,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[ 1, 1,-1,-9,-1,-1,-1,-1, 3,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[ 2, 2,-8,-1,-6,-5,-1,-1, 3,-1,-1,-1,20,-1,21,22,-1,-1,-1,-1,-1,13,-1,17,-1,-1,10,-1,-1,-1,-1],
+			[ 3,-1, 3, 3, 3, 3, 3, 3,-4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+			[-1,-1,-1,-1,-1,-1,-1,-1, 3, 3, 3,-1,-1,-1,-1,-1,-1, 3,-1,-1,-1, 3,-1, 3, 3,-1, 3, 5,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 6, 6, 6, 6, 6, 6, 6, 6,-1,-1,-1,-1,-1,-1, 6, 6,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 7, 7, 7, 7, 7, 7, 7, 7,-1,-1,-1,-1,-1,-1, 7, 7,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 8, 8, 8, 8, 8, 8, 8, 8,-1,-1,-1,-1,-1,-1, 8, 8,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 3, 3, 3, 3, 3, 3, 3, 3,-1,-1,-1,-1,-1,-1, 3, 3,-1],
+			[ 9, 9,-1,-7,-1,-5,-1,-3,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,11,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,12,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 9,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,14,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,15,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,16,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 9,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,18,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,19,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 9,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,21,22,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[ 9, 9,-1,-7,-1,-5,-1,-3,-1,-1,-1,-1,-1,23,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[ 9, 9,-1,-7,-1,-5,-1,-3,-1,-1,-1,-1,-1,23,22,22,-1,-1,-1,-1,24,-1,-1,-1,-1,-1,-1,-1,-1,24,-1],
+			[ 9, 9,-1,-7,-1,-5,-1,-3,-1,-1,-1,-1,-1,-1,23,23,-1,-1,-1,-1,24,-1,-1,-1,-1,-1,-1,-1,-1,24,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,25,25,-1,26,26,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,26,26,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[ 9, 9,-1,-7,-1,-5,-1,-3,-1,-1,-1,-1,-1,-1,26,26,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[27,27,-1,-1,-1,-1,-2,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[28,28,-8,-1,-6,-1,-1,-1, 3,-1,-1,-1,20,-1,21,22,-1,-1,-1,-1,-1,13,-1,17,-1,-1,10,-1,-1,-1,-1],
+			[29,29,-1,-1,-1,-1,-1,-1, 3,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
+		];
 	}
 
 	/**

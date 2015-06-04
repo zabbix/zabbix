@@ -56,7 +56,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/vmmeter.h strings.h vm/vm_param.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h \
   stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h \
-  sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h \
+  sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h sys/sched.h \
   zone.h nlist.h kvm.h linux/kernel.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
@@ -681,7 +681,11 @@ AC_TRY_COMPILE(
 [
 #include <sys/param.h>
 #include <sys/sysctl.h>
-#include <sys/dkstat.h>
+#if defined(HAVE_SYS_DKSTAT_H)
+#	include <sys/dkstat.h>
+#elif defined(HAVE_SYS_SCHED_H)
+#	include <sys/sched.h>
+#endif
 ],
 [
 size_t	sz;
@@ -980,7 +984,32 @@ if test "x$ARCH" = "xhpux"; then
 	saved_CFLAGS="$CFLAGS"
 	CFLAGS="-D_HPUX_API_LEVEL=20040821"
 	AC_TRY_RUN(
-	[int main(void) {return 0;}],
+[
+#ifdef HAVE_DLFCN_H
+#	include <dlfcn.h>
+#endif
+#ifdef HAVE_SYS_UTSNAME_H
+#	include <sys/utsname.h>
+#endif
+
+int main(void)
+{
+	void		*p1, *p2;
+	struct utsname	name;
+
+	/* check that the compiler (e.g., GCC 4.3.0 and above) supports function-level versioning */
+
+	p1 = uname;
+	p2 = dlsym(RTLD_DEFAULT, "uname{20040821}");
+
+	if (p1 != p2)
+		return 1;
+
+	/* uname() fails with EFAULT on HP-UX systems that were only partially upgraded to this API level */
+
+	return -1 == uname(&name) ? 1 : 0;
+}
+],
 	CFLAGS="-D_HPUX_API_LEVEL=20040821 $saved_CFLAGS"
 	AC_MSG_RESULT(yes),
 	CFLAGS="$saved_CFLAGS"

@@ -32,7 +32,7 @@ class CIconMap extends CApiService {
 
 	protected $tableName = 'icon_map';
 	protected $tableAlias = 'im';
-	protected $sortColumns = array('iconmapid', 'name');
+	protected $sortColumns = ['iconmapid', 'name'];
 
 	/**
 	 * Get IconMap data.
@@ -45,18 +45,18 @@ class CIconMap extends CApiService {
 	 * @param array $options['order']
 	 * @return array
 	 */
-	public function get(array $options = array()) {
-		$result = array();
+	public function get(array $options = []) {
+		$result = [];
 
-		$sqlParts = array(
-			'select'	=> array('icon_map' => 'im.iconmapid'),
-			'from'		=> array('icon_map' => 'icon_map im'),
-			'where'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['icon_map' => 'im.iconmapid'],
+			'from'		=> ['icon_map' => 'icon_map im'],
+			'where'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'iconmapids'				=> null,
 			'sysmapids'					=> null,
 			'nopermissions'				=> null,
@@ -76,12 +76,12 @@ class CIconMap extends CApiService {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
 		if ($options['editable'] && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			return array();
+			return [];
 		}
 
 		// iconmapids
@@ -152,9 +152,9 @@ class CIconMap extends CApiService {
 		}
 
 		$iconMaps = zbx_toArray($iconMaps);
-		$iconMapRequiredFields = array('name' => null);
+		$iconMapRequiredFields = ['name' => null];
 
-		$duplicates = array();
+		$duplicates = [];
 		foreach ($iconMaps as $iconMap) {
 			if (!check_db_fields($iconMapRequiredFields, $iconMap)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameter is used for icon map "%s".', $iconMap['name']));
@@ -172,12 +172,12 @@ class CIconMap extends CApiService {
 
 		$this->validateMappings($iconMaps);
 
-		$options = array(
-			'filter' => array('name' => $duplicates),
-			'output' => array('name'),
+		$options = [
+			'filter' => ['name' => $duplicates],
+			'output' => ['name'],
 			'editable' => true,
 			'nopermissions' => true
-		);
+		];
 		$dbIconMaps = $this->get($options);
 		foreach ($dbIconMaps as $dbIconMap) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map "%s" already exists.', $dbIconMap['name']));
@@ -185,7 +185,7 @@ class CIconMap extends CApiService {
 
 		$iconMapids = DB::insert('icon_map', $iconMaps);
 
-		$mappings = array();
+		$mappings = [];
 		foreach ($iconMaps as $imnum => $iconMap) {
 			foreach ($iconMap['mappings'] as $mapping) {
 				$mapping['iconmapid'] = $iconMapids[$imnum];
@@ -194,7 +194,7 @@ class CIconMap extends CApiService {
 		}
 		DB::insert('icon_mapping', $mappings);
 
-		return array('iconmapids' => $iconMapids);
+		return ['iconmapids' => $iconMapids];
 	}
 
 	/**
@@ -210,11 +210,11 @@ class CIconMap extends CApiService {
 		$iconMaps = zbx_toArray($iconMaps);
 
 		$iconMapids = zbx_objectValues($iconMaps, 'iconmapid');
-		$updates = array();
+		$updates = [];
 
-		$duplicates = array();
+		$duplicates = [];
 		foreach ($iconMaps as $iconMap) {
-			if (!check_db_fields(array('iconmapid' => null), $iconMap)) {
+			if (!check_db_fields(['iconmapid' => null], $iconMap)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters for icon map update method "%s".', $iconMap['name']));
 			}
 
@@ -234,15 +234,15 @@ class CIconMap extends CApiService {
 		$this->validateMappings($iconMaps, false);
 
 
-		$iconMapsUpd = API::IconMap()->get(array(
+		$iconMapsUpd = API::IconMap()->get([
 			'iconmapids' => $iconMapids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 			'selectMappings' => API_OUTPUT_EXTEND
-		));
+		]);
 
-		$oldIconMappings = array();
-		$newIconMappings = array();
+		$oldIconMappings = [];
+		$newIconMappings = [];
 		foreach ($iconMaps as $iconMap) {
 			if (!isset($iconMapsUpd[$iconMap['iconmapid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map with iconmapid "%s" does not exist.', $iconMap['iconmapid']));
@@ -250,13 +250,13 @@ class CIconMap extends CApiService {
 
 			// Existence
 			if (isset($iconMap['name'])) {
-				$iconMapExists = $this->get(array(
-					'filter' => array('name' => $iconMap['name']),
-					'output' => array('iconmapid'),
+				$iconMapExists = $this->get([
+					'filter' => ['name' => $iconMap['name']],
+					'output' => ['iconmapid'],
 					'editable' => true,
 					'nopermissions' => true,
 					'preservekeys' => true
-				));
+				]);
 				if (($iconMapExists = reset($iconMapExists)) && (bccomp($iconMapExists['iconmapid'], $iconMap['iconmapid']) != 0)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map "%s" already exists.', $iconMap['name']));
 				}
@@ -276,17 +276,17 @@ class CIconMap extends CApiService {
 			$iconMapid = $iconMap['iconmapid'];
 			unset($iconMap['iconmapid']);
 			if (!empty($iconMap)) {
-				$updates[] = array(
+				$updates[] = [
 					'values' => $iconMap,
-					'where' => array('iconmapid' => $iconMapid)
-				);
+					'where' => ['iconmapid' => $iconMapid]
+				];
 			}
 		}
 
 		DB::save('icon_map', $iconMaps);
 		DB::replace('icon_mapping', $oldIconMappings, $newIconMappings);
 
-		return array('iconmapids' => $iconMapids);
+		return ['iconmapids' => $iconMapids];
 	}
 
 	/**
@@ -314,9 +314,9 @@ class CIconMap extends CApiService {
 			);
 		}
 
-		DB::delete('icon_map', array('iconmapid' => $iconmapids));
+		DB::delete('icon_map', ['iconmapid' => $iconmapids]);
 
-		return array('iconmapids' => $iconmapids);
+		return ['iconmapids' => $iconmapids];
 	}
 
 	/**
@@ -334,10 +334,10 @@ class CIconMap extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'iconmapids' => $ids,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -357,11 +357,11 @@ class CIconMap extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'iconmapids' => $ids,
 			'editable' => true,
 			'countOutput' => true
-		));
+		]);
 
 		return count($ids) == $count;
 	}
@@ -375,11 +375,11 @@ class CIconMap extends CApiService {
 	 */
 	protected function validateMappings($iconMaps, $mustExist = true) {
 		$inventoryFields = getHostInventories();
-		$imageids = API::Image()->get(array(
-			'output' => array('imageid'),
+		$imageids = API::Image()->get([
+			'output' => ['imageid'],
 			'preservekeys' => true,
-			'filter' => array('imagetype' => IMAGE_TYPE_ICON)
-		));
+			'filter' => ['imagetype' => IMAGE_TYPE_ICON]
+		]);
 
 		foreach ($iconMaps as $iconMap) {
 			if (isset($iconMap['mappings']) && empty($iconMap['mappings'])) {
@@ -396,7 +396,7 @@ class CIconMap extends CApiService {
 				}
 			}
 
-			$uniqField = array();
+			$uniqField = [];
 			foreach ($iconMap['mappings'] as $mapping) {
 				if (!isset($mapping['expression'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Required field "expression" is missing in icon mapping.'));
@@ -453,14 +453,14 @@ class CIconMap extends CApiService {
 		$iconMapIds = array_keys($result);
 
 		if ($options['selectMappings'] !== null && $options['selectMappings'] != API_OUTPUT_COUNT) {
-			$mappings = API::getApiService()->select('icon_mapping', array(
-				'output' => $this->outputExtend($options['selectMappings'], array('iconmapid', 'iconmappingid')),
-				'filter' => array('iconmapid' => $iconMapIds),
+			$mappings = API::getApiService()->select('icon_mapping', [
+				'output' => $this->outputExtend($options['selectMappings'], ['iconmapid', 'iconmappingid']),
+				'filter' => ['iconmapid' => $iconMapIds],
 				'preservekeys' => true
-			));
+			]);
 			$relationMap = $this->createRelationMap($mappings, 'iconmapid', 'iconmappingid');
 
-			$mappings = $this->unsetExtraFields($mappings, array('iconmapid', 'iconmappingid'), $options['selectMappings']);
+			$mappings = $this->unsetExtraFields($mappings, ['iconmapid', 'iconmappingid'], $options['selectMappings']);
 			$result = $relationMap->mapMany($result, $mappings, 'mappings');
 		}
 

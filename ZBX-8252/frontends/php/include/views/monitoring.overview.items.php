@@ -24,31 +24,31 @@ $overviewWidget = (new CWidget())->setTitle(_('Overview'));
 $headerForm = new CForm('get');
 
 $controls = new CList();
-$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$controls->addItem(array(_('Type').SPACE, new CComboBox('type', $this->data['type'], 'submit()', array(
+$controls->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]);
+$controls->addItem([_('Type').SPACE, new CComboBox('type', $this->data['type'], 'submit()', [
 	SHOW_TRIGGERS => _('Triggers'),
 	SHOW_DATA => _('Data')
-))));
+])]);
 
 // hint table
 $hintTable = new CTableInfo();
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$hintTable->addRow(array(getSeverityCell($severity, $this->data['config']), _('PROBLEM')));
+	$hintTable->addRow([getSeverityCell($severity, $this->data['config']), _('PROBLEM')]);
 }
-$hintTable->addRow(array(new CCol(SPACE), _('OK or no trigger')));
+$hintTable->addRow([new CCol(SPACE), _('OK or no trigger')]);
 
 // header left
-$styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit()', array(
+$styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit()', [
 	STYLE_TOP => _('Top'),
 	STYLE_LEFT => _('Left')
-));
+]);
 
-$controls->additem(array(_('Hosts location').SPACE, $styleComboBox));
+$controls->additem([_('Hosts location').SPACE, $styleComboBox]);
 
 // header right
 $help = get_icon('overviewhelp');
 $help->setHint($hintTable);
-$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
+$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 $controls->addItem($help);
 
 $headerForm->addItem($controls);
@@ -64,14 +64,14 @@ $filter->addVar('hostid', $this->data['hostid']);
 $column = new CFormList();
 
 // application
-$column->addRow(_('Filter by application'), array(
+$column->addRow(_('Filter by application'), [
 	new CTextBox('application', $this->data['filter']['application'], 40),
 	new CButton('application_name', _('Select'),
 		'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1'.
 		'&dstfrm=zbx_filter");',
 		'button-form'
 	)
-));
+]);
 
 $filter->addColumn($column);
 

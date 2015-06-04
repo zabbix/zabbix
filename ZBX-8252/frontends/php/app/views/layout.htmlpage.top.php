@@ -25,7 +25,7 @@ if ($data['fullscreen'] == 0) {
 	$support = new CLink(_('Get support'), 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 	$support->setTarget('_blank');
 
-	$page_header_r_col = array($help, '|', $support, '|');
+	$page_header_r_col = [$help, '|', $support, '|'];
 
 	$page_header_r_col[] = new CLink(_('Print'), '', 'small_font print-link', null, 'nosid');
 	$page_header_r_col[] = '|';
@@ -67,14 +67,15 @@ if ($data['fullscreen'] == 0) {
 	$logo = new CLink(new CDiv(null, 'zabbix_logo'), 'http://www.zabbix.com/', 'image', null, 'nosid');
 	$logo->setTarget('_blank');
 
-	$top_page_row = array(
-		new CCol($logo, 'page_header_l'),
-		new CCol($page_header_r_col, 'maxwidth page_header_r')
-	);
+	$top_page_row = [
+		(new CCol($logo))->addClass('page_header_l'),
+		(new CCol($page_header_r_col))->addClass('maxwidth')->addClass('page_header_r')
+	];
 
 	unset($logo, $page_header_r_col, $help, $support, $debug);
 
-	$table = new CTable(null, 'maxwidth page_header');
-	$table->addRow($top_page_row);
-//	$table->show();
+	$table = (new CTable())->
+		addClass('maxwidth')->
+		addClass('page_header')->
+		addRow($top_page_row);
 }

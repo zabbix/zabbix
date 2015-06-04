@@ -22,38 +22,38 @@
 class CSubmitButtonTest extends CTagTest {
 
 	public function constructProvider() {
-		return array(
-			array(
-				array('caption'),
+		return [
+			[
+				['caption'],
 				'<button class="button button-plain shadow ui-corner-all" type="submit">caption</button>'
-			),
-			array(
-				array('caption', 'button'),
+			],
+			[
+				['caption', 'button'],
 				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button">caption</button>'
-			),
-			array(
-				array('caption', 'button[value]'),
+			],
+			[
+				['caption', 'button[value]'],
 				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button[value]">caption</button>'
-			),
-			array(
-				array('caption', 'button', 'value'),
+			],
+			[
+				['caption', 'button', 'value'],
 				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button" value="value">caption</button>'
-			),
-			array(
-				array('caption', 'button', 'value', 'my-class'),
+			],
+			[
+				['caption', 'button', 'value', 'my-class'],
 				'<button class="button my-class" type="submit" name="button" value="value">caption</button>'
-			),
+			],
 			// caption encoding
-			array(
-				array('</button>'),
+			[
+				['</button>'],
 				'<button class="button button-plain shadow ui-corner-all" type="submit">&lt;/button&gt;</button>'
-			),
+			],
 			// parameter encoding
-			array(
-				array('caption', 'button', 'button"&"'),
+			[
+				['caption', 'button', 'button"&"'],
 				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button" value="button&quot;&amp;&quot;">caption</button>'
-			),
-		);
+			],
+		];
 	}
 	/**
 	 * @param $name

@@ -25,8 +25,8 @@
 class CAjaxResponse {
 
 	private $_result = true;
-	private $_data = array();
-	private $_errors = array();
+	private $_data = [];
+	private $_errors = [];
 
 	public function __construct($data = null) {
 		if ($data !== null) {
@@ -42,7 +42,7 @@ class CAjaxResponse {
 	 */
 	public function error($error) {
 		$this->_result = false;
-		$this->_errors[] = array('error' => $error);
+		$this->_errors[] = ['error' => $error];
 	}
 
 	/**
@@ -67,10 +67,10 @@ class CAjaxResponse {
 		$json = new CJson();
 
 		if ($this->_result) {
-			echo $json->encode(array('result' => true, 'data' => $this->_data));
+			echo $json->encode(['result' => true, 'data' => $this->_data]);
 		}
 		else {
-			echo $json->encode(array('result' => false, 'errors' => $this->_errors));
+			echo $json->encode(['result' => false, 'errors' => $this->_errors]);
 		}
 	}
 }

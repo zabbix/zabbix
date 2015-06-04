@@ -26,7 +26,7 @@ class CControllerProxyEdit extends CController {
 	}
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'proxyid' =>		'db       hosts.hostid',
 			'host' =>			'db       hosts.host',
 			'status' =>			'db       hosts.status         |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
@@ -37,7 +37,7 @@ class CControllerProxyEdit extends CController {
 			'port' =>			'db       interface.port',
 			'proxy_hostids' =>	'array_db hosts.hostid',
 			'description' =>	'db       hosts.description'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -54,11 +54,11 @@ class CControllerProxyEdit extends CController {
 		}
 
 		if ($this->hasInput('proxyid')) {
-			return (bool) API::Proxy()->get(array(
-				'output' => array(),
+			return (bool) API::Proxy()->get([
+				'output' => [],
 				'proxyids' => $this->getInput('proxyid'),
 				'editable' => true
-			));
+			]);
 		}
 
 		return true;
@@ -66,7 +66,7 @@ class CControllerProxyEdit extends CController {
 
 	protected function doAction() {
 		// default values
-		$data = array(
+		$data = [
 			'sid' => $this->getUserSID(),
 			'proxyid' => 0,
 			'host' => '',
@@ -75,20 +75,20 @@ class CControllerProxyEdit extends CController {
 			'ip' => '127.0.0.1',
 			'useip' => '1',
 			'port' => '10051',
-			'proxy_hostids' => array(),
+			'proxy_hostids' => [],
 			'description' => ''
-		);
+		];
 
 		// get values from the dabatase
 		if ($this->hasInput('proxyid')) {
 			$data['proxyid'] = $this->getInput('proxyid');
 
-			$proxies = API::Proxy()->get(array(
-				'output' => array('host', 'status', 'description'),
-				'selectHosts' => array('hostid'),
-				'selectInterface' => array('interfaceid', 'dns', 'ip', 'useip', 'port'),
+			$proxies = API::Proxy()->get([
+				'output' => ['host', 'status', 'description'],
+				'selectHosts' => ['hostid'],
+				'selectInterface' => ['interfaceid', 'dns', 'ip', 'useip', 'port'],
 				'proxyids' => $data['proxyid']
-			));
+			]);
 			$proxy = $proxies[0];
 
 			$data['host'] = $proxy['host'];

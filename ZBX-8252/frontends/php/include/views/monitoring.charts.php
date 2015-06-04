@@ -26,17 +26,17 @@ $chartForm->addVar('fullscreen', $this->data['fullscreen']);
 
 $controls = new CList();
 
-$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$controls->addItem(array(_('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
-$controls->addItem(array(_('Graph').SPACE, $this->data['pageFilter']->getGraphsCB()));
+$controls->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]);
+$controls->addItem([_('Host').SPACE, $this->data['pageFilter']->getHostsCB()]);
+$controls->addItem([_('Graph').SPACE, $this->data['pageFilter']->getGraphsCB()]);
 
 if ($this->data['graphid']) {
-	$controls->addItem(get_icon('favourite', array('fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid'])));
-	$controls->addItem(get_icon('reset', array('id' => $this->data['graphid'])));
-	$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
+	$controls->addItem(get_icon('favourite', ['fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid']]));
+	$controls->addItem(get_icon('reset', ['id' => $this->data['graphid']]));
+	$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 }
 else {
-	$controls->addItem(array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
+	$controls->addItem([get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']])]);
 }
 
 $chartForm->addItem($controls);
@@ -48,28 +48,29 @@ $chartsWidget->addItem($filterForm);
 
 if (!empty($this->data['graphid'])) {
 	// append chart to widget
-	$screen = CScreenBuilder::getScreen(array(
+	$screen = CScreenBuilder::getScreen([
 		'resourcetype' => SCREEN_RESOURCE_CHART,
 		'graphid' => $this->data['graphid'],
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $this->data['graphid']
-	));
+	]);
 
-	$chartTable = new CTable(null, 'maxwidth');
-	$chartTable->addRow($screen->get());
+	$chartTable = (new CTable())->
+		addClass('maxwidth')->
+		addRow($screen->get());
 
 	$chartsWidget->addItem($chartTable);
 
-	CScreenBuilder::insertScreenStandardJs(array(
+	CScreenBuilder::insertScreenStandardJs([
 		'timeline' => $screen->timeline,
 		'profileIdx' => $screen->profileIdx
-	));
+	]);
 }
 else {
 	$screen = new CScreenBuilder();
-	CScreenBuilder::insertScreenStandardJs(array(
+	CScreenBuilder::insertScreenStandardJs([
 		'timeline' => $screen->timeline
-	));
+	]);
 
 	$chartsWidget->addItem(new CTableInfo());
 }
