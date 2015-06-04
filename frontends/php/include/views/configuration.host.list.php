@@ -77,35 +77,16 @@ $currentTime = time();
 foreach ($data['hosts'] as $host) {
 	$interface = reset($host['interfaces']);
 
-	$applications = [new CLink(_('Applications'),
-		'applications.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
-		CViewHelper::showNum($host['applications'])
-	];
-	$items = [new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$host['hostid']),
-		CViewHelper::showNum($host['items'])
-	];
-	$triggers = [new CLink(_('Triggers'), 'triggers.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
-		CViewHelper::showNum($host['triggers'])
-	];
-	$graphs = [new CLink(_('Graphs'), 'graphs.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
-		CViewHelper::showNum($host['graphs'])
-	];
-	$discoveries = [new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$host['hostid']),
-		CViewHelper::showNum($host['discoveries'])
-	];
-	$httpTests = [new CLink(_('Web'), 'httpconf.php?&hostid='.$host['hostid']),
-		CViewHelper::showNum($host['httpTests'])
-	];
-
 	$description = [];
 
-	if (isset($data['proxies'][$host['proxy_hostid']])) {
-		$description[] = $data['proxies'][$host['proxy_hostid']]['host'].NAME_DELIMITER;
+	if ($host['proxy_hostid'] != 0) {
+		$description[] = $data['proxies'][$host['proxy_hostid']]['host'];
+		$description[] = NAME_DELIMITER;
 	}
 	if ($host['discoveryRule']) {
-		$description[] = (new CLink($host['discoveryRule']['name'],
-			'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid'])
-		)
+		$description[] = (new CLink(
+			$host['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid']
+		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
 		$description[] = NAME_DELIMITER;
@@ -145,67 +126,81 @@ foreach ($data['hosts'] as $host) {
 		->addClass($statusClass)
 		->onClick($statusScript);
 
-	if (empty($host['parentTemplates'])) {
-		$hostTemplates = '';
-	}
-	else {
-		order_result($host['parentTemplates'], 'name');
+	order_result($host['parentTemplates'], 'name');
 
-		$hostTemplates = [];
-		$i = 0;
+	$hostTemplates = [];
+	$i = 0;
 
-		foreach ($host['parentTemplates'] as $template) {
-			$i++;
+	foreach ($host['parentTemplates'] as $template) {
+		$i++;
 
-			if ($i > $data['config']['max_in_table']) {
-				$hostTemplates[] = ' &hellip;';
+		if ($i > $data['config']['max_in_table']) {
+			$hostTemplates[] = ' &hellip;';
 
-				break;
-			}
-
-			$caption = [(new CLink(
-				CHtml::encode($template['name']),
-				'templates.php?form=update&templateid='.$template['templateid'])
-				)
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY)
-			];
-
-			$parentTemplates = $data['templates'][$template['templateid']]['parentTemplates'];
-			if ($parentTemplates) {
-				order_result($parentTemplates, 'name');
-
-				$caption[] = ' (';
-				foreach ($parentTemplates as $parentTemplate) {
-					$caption[] = (new CLink(CHtml::encode($parentTemplate['name']),
-						'templates.php?form=update&templateid='.$parentTemplate['templateid'])
-						)
-							->addClass(ZBX_STYLE_LINK_ALT)
-							->addClass(ZBX_STYLE_GREY);
-					$caption[] = ', ';
-				}
-				array_pop($caption);
-
-				$caption[] = ')';
-			}
-
-			if ($hostTemplates) {
-				$hostTemplates[] = ', ';
-			}
-
-			$hostTemplates[] = $caption;
+			break;
 		}
+
+		$caption = [
+			(new CLink(
+				CHtml::encode($template['name']), 'templates.php?form=update&templateid='.$template['templateid']
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY)
+		];
+
+		$parentTemplates = $data['templates'][$template['templateid']]['parentTemplates'];
+		if ($parentTemplates) {
+			order_result($parentTemplates, 'name');
+
+			$caption[] = ' (';
+			foreach ($parentTemplates as $parentTemplate) {
+				$caption[] = (new CLink(
+					CHtml::encode($parentTemplate['name']),
+					'templates.php?form=update&templateid='.$parentTemplate['templateid']
+				))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_GREY);
+				$caption[] = ', ';
+			}
+			array_pop($caption);
+
+			$caption[] = ')';
+		}
+
+		if ($hostTemplates) {
+			$hostTemplates[] = ', ';
+		}
+
+		$hostTemplates[] = $caption;
 	}
 
 	$table->addRow([
 		new CCheckBox('hosts['.$host['hostid'].']', null, null, $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
-		$applications,
-		$items,
-		$triggers,
-		$graphs,
-		$discoveries,
-		$httpTests,
+		[
+			new CLink(_('Applications'), 'applications.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+			CViewHelper::showNum($host['applications'])
+		],
+		[
+			new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$host['hostid']),
+			CViewHelper::showNum($host['items'])
+		],
+		[
+			new CLink(_('Triggers'), 'triggers.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+			CViewHelper::showNum($host['triggers'])
+		],
+		[
+			new CLink(_('Graphs'), 'graphs.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+			CViewHelper::showNum($host['graphs'])
+		],
+		[
+			new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$host['hostid']),
+			CViewHelper::showNum($host['discoveries'])
+		],
+		[
+			new CLink(_('Web'), 'httpconf.php?&hostid='.$host['hostid']),
+			CViewHelper::showNum($host['httpTests'])
+		],
 		$hostInterface,
 		$hostTemplates,
 		$status,

@@ -1,6 +1,8 @@
 <script type="text/x-jquery-tmpl" id="hostInterfaceRow">
 <tr class="interfaceRow" id="hostInterfaceRow_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}">
-	<td class="interface-drag-control"></td>
+	<td class="interface-drag-control <?= ZBX_STYLE_TD_DRAG_ICON ?>">
+		<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+	</td>
 	<td class="interface-ip">
 		<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}" />
 		<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}" />
@@ -122,10 +124,9 @@
 		}
 
 		function addDraggableIcon(domElement) {
-			domElement.children().first().append('<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>');
 			domElement.draggable({
 				helper: 'clone',
-				handle: 'span.ui-icon-arrowthick-2-n-s',
+				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				revert: 'invalid',
 				stop: function(event, ui) {
 					var hostInterfaceId = jQuery(this).data('interfaceid');
@@ -136,18 +137,18 @@
 		}
 
 		function addNotDraggableIcon(domElement) {
-			domElement.children().first().append('<span class="ui-icon ui-icon-arrowthick-2-n-s state-disabled"></span>');
-			jQuery('.ui-icon', domElement).hover(
-				function (event) {
-					jQuery('<div>' + <?= CJs::encodeJson(_('Interface is used by items that require this type of the interface.')) ?> + '</div>')
-						.css({position: 'absolute', opacity: 1, padding: '2px'})
-						.addClass('ui-state-highlight')
-						.appendTo(event.target.parentNode);
-				},
-				function (event) {
-					jQuery(event.target).next().remove();
-				}
-			)
+			jQuery('td.<?= ZBX_STYLE_TD_DRAG_ICON ?> div.<?= ZBX_STYLE_DRAG_ICON ?>', domElement)
+				.addClass('<?= ZBX_STYLE_DISABLED ?>')
+				.hover(
+					function (event) {
+						hintBox.showHint(event, this,
+							<?= CJs::encodeJson(_('Interface is used by items that require this type of the interface.')) ?>
+						);
+					},
+					function (event) {
+						hintBox.hideHint(event, this);
+					}
+				);
 		}
 
 		function getDomElementsAttrsForInterface(hostInterface) {
@@ -340,8 +341,10 @@
 		jQuery('#agentInterfaces, #SNMPInterfaces, #JMXInterfaces, #IPMIInterfaces').parent().droppable({
 			tolerance: 'pointer',
 			drop: function(event, ui) {
-				var hostInterfaceTypeName = jQuery('.formElementTable', this).data('type'),
+				var hostInterfaceTypeName = jQuery(this).data('type'),
 					hostInterfaceId = ui.draggable.data('interfaceid');
+
+					console.log(hostInterfaceTypeName);
 
 				ui.helper.remove();
 
@@ -379,13 +382,11 @@
 			},
 			activate: function(event, ui) {
 				if (!jQuery(this).find(ui.draggable).length) {
-					jQuery(this).addClass('dropArea');
-					jQuery('span.dragHelpText', this).toggle();
+					jQuery(this).addClass('<?= ZBX_STYLE_DRAG_DROP_AREA ?>');
 				}
 			},
 			deactivate: function(event, ui) {
-				jQuery(this).removeClass('dropArea');
-				jQuery('span.dragHelpText', this).toggle(false);
+				jQuery(this).removeClass('<?= ZBX_STYLE_DRAG_DROP_AREA ?>');
 			}
 		});
 
