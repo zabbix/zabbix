@@ -38,11 +38,11 @@ require_once dirname(__FILE__).'/../../include/classes/db/PostgresqlDbBackend.ph
 function DBdata($sql) {
 	DBconnect($error);
 
-	$data = array();
+	$data = [];
 
 	$result = DBselect($sql);
 	while ($row = DBfetch($result)) {
-		$data[] = array($row);
+		$data[] = [$row];
 	}
 	DBclose();
 
@@ -95,7 +95,7 @@ function DBget_tables(&$tables, $topTable) {
 function DBsave_tables($topTable) {
 	global $DB;
 
-	$tables = array();
+	$tables = [];
 
 	DBget_tables($tables, $topTable);
 
@@ -124,7 +124,7 @@ function DBsave_tables($topTable) {
 function DBrestore_tables($topTable) {
 	global $DB;
 
-	$tables = array();
+	$tables = [];
 
 	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
 		$result = DBselect('select @@unique_checks,@@foreign_key_checks');

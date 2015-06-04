@@ -50,7 +50,7 @@ class CConditionHelper {
 	 * @return string
 	 */
 	public static function getFormula(array $conditions, $evalType) {
-		$groupedConditions = array();
+		$groupedConditions = [];
 		foreach ($conditions as $id => $condition) {
 			$groupedConditions[$condition][] = '{'.$id.'}';
 		}
@@ -71,7 +71,7 @@ class CConditionHelper {
 				break;
 		}
 
-		$groupFormulas = array();
+		$groupFormulas = [];
 		foreach ($groupedConditions as $conditionIds) {
 			if (count($conditionIds) > 1) {
 				$groupFormulas[] = '('.implode(' '.$conditionOperator.' ', $conditionIds).')';
@@ -105,13 +105,13 @@ class CConditionHelper {
 	 * @return array
 	 */
 	public static function getFormulaIds($formula) {
-		$matches = array();
+		$matches = [];
 		preg_match_all('/\d+/', $formula, $matches);
 
 		$ids = array_keys(array_flip($matches[0]));
 
 		$i = 0;
-		$formulaIds = array();
+		$formulaIds = [];
 		foreach ($ids as $id) {
 			$formulaIds[$id] = num2letter($i);
 
@@ -199,7 +199,7 @@ class CConditionHelper {
 			$nextFormulaId = 'A';
 		}
 		else {
-			usort($formulaIds, array('CConditionHelper', 'compareFormulaIds'));
+			usort($formulaIds, ['CConditionHelper', 'compareFormulaIds']);
 
 			$lastFormulaId = array_pop($formulaIds);
 

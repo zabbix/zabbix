@@ -20,11 +20,11 @@
 
 
 function serviceAlgorythm($algorythm = null) {
-	$algorythms = array(
+	$algorythms = [
 		SERVICE_ALGORITHM_MAX => _('Problem, if at least one child has a problem'),
 		SERVICE_ALGORITHM_MIN => _('Problem, if all children have problems'),
 		SERVICE_ALGORITHM_NONE => _('Do not calculate')
-	);
+	];
 
 	if ($algorythm === null) {
 		return $algorythms;
@@ -38,7 +38,7 @@ function serviceAlgorythm($algorythm = null) {
 }
 
 function get_service_childs($serviceid, $soft = 0) {
-	$childs = array();
+	$childs = [];
 
 	$result = DBselect(
 		'SELECT sl.servicedownid'.
@@ -64,37 +64,37 @@ function get_service_childs($serviceid, $soft = 0) {
  * @param array $dependency
  * @param array $tree
  */
-function createServiceConfigurationTree(array $services, &$tree, array $parentService = array(), array $service = array(), array $dependency = array()) {
+function createServiceConfigurationTree(array $services, &$tree, array $parentService = [], array $service = [], array $dependency = []) {
 	if (!$service) {
 		$caption = new CLink(_('root'), '#');
 		$caption->setMenuPopup(CMenuPopupHelper::getServiceConfiguration(null, _('root'), false));
 
-		$serviceNode = array(
+		$serviceNode = [
 			'id' => 0,
 			'parentid' => 0,
 			'caption' => $caption,
-			'trigger' => array(),
+			'trigger' => [],
 			'algorithm' => SPACE,
 			'description' => SPACE
-		);
+		];
 
 		$service = $serviceNode;
 		$service['serviceid'] = 0;
-		$service['dependencies'] = array();
-		$service['trigger'] = array();
+		$service['dependencies'] = [];
+		$service['trigger'] = [];
 
 		// add all top level services as children of "root"
 		foreach ($services as $topService) {
 			if (!$topService['parent']) {
-				$service['dependencies'][] = array(
+				$service['dependencies'][] = [
 					'servicedownid' => $topService['serviceid'],
 					'soft' => 0,
 					'linkid' => 0
-				);
+				];
 			}
 		}
 
-		$tree = array($serviceNode);
+		$tree = [$serviceNode];
 	}
 	else {
 		// caption
@@ -111,13 +111,13 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 
 		$caption->setMenuPopup(CMenuPopupHelper::getServiceConfiguration($service['serviceid'], $service['name'], $deletable));
 
-		$serviceNode = array(
+		$serviceNode = [
 			'id' => $service['serviceid'],
 			'caption' => $caption,
-			'description' => $service['trigger'] ? $service['trigger']['description'] : '-',
+			'description' => $service['trigger'] ? $service['trigger']['description'] : '',
 			'parentid' => $parentService ? $parentService['serviceid'] : 0,
 			'algorithm' => serviceAlgorythm($service['algorithm'])
-		);
+		];
 	}
 
 	if (!$dependency || !$dependency['soft']) {
@@ -148,38 +148,38 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
  * @param array $dependency
  * @param array $tree
  */
-function createServiceMonitoringTree(array $services, array $slaData, $period, &$tree, array $parentService = array(), array $service = array(), array $dependency = array()) {
+function createServiceMonitoringTree(array $services, array $slaData, $period, &$tree, array $parentService = [], array $service = [], array $dependency = []) {
 	// if no parent service is given, start from the root
 	if (!$service) {
-		$serviceNode = array(
+		$serviceNode = [
 			'id' => 0,
 			'parentid' => 0,
 			'caption' => _('root'),
 			'status' => SPACE,
 			'sla' => SPACE,
 			'sla2' => SPACE,
-			'trigger' => array(),
+			'trigger' => [],
 			'reason' => SPACE,
 			'graph' => SPACE,
-		);
+		];
 
 		$service = $serviceNode;
 		$service['serviceid'] = 0;
-		$service['dependencies'] = array();
-		$service['trigger'] = array();
+		$service['dependencies'] = [];
+		$service['trigger'] = [];
 
 		// add all top level services as children of "root"
 		foreach ($services as $topService) {
 			if (!$topService['parent']) {
-				$service['dependencies'][] = array(
+				$service['dependencies'][] = [
 					'servicedownid' => $topService['serviceid'],
 					'soft' => 0,
 					'linkid' => 0
-				);
+				];
 			}
 		}
 
-		$tree = array($serviceNode);
+		$tree = [$serviceNode];
 	}
 	// create a not from the given service
 	else {
@@ -188,7 +188,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 
 		// caption
 		// remember the selected time period when following the bar link
-		$periods = array(
+		$periods = [
 			'today' => 'daily',
 			'week' => 'weekly',
 			'month' => 'monthly',
@@ -197,12 +197,12 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			24 * 7 => 'weekly',
 			24 * 30 => 'monthly',
 			24 * DAY_IN_YEAR => 'yearly'
-		);
+		];
 
-		$caption = array(new CLink(
+		$caption = [new CLink(
 			$service['name'],
 			'report3.php?serviceid='.$service['serviceid'].'&year='.date('Y').'&period='.$periods[$period]
-		));
+		)];
 		$trigger = $service['trigger'];
 		if ($trigger) {
 			$url = new CLink($trigger['description'],
@@ -213,9 +213,9 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 		}
 
 		// reason
-		$problemList = '-';
+		$problemList = '';
 		if ($serviceSla['problems']) {
-			$problemList = new CList(null, 'service-problems');
+			$problemList = new CList([], 'service-problems');
 			foreach ($serviceSla['problems'] as $problemTrigger) {
 				$problemList->addItem(new CLink($problemTrigger['description'],
 					'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
@@ -246,29 +246,29 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 				$chart2 = new CDiv(null, 'sla-bar-part sla-red');
 				$chart2->setAttribute('style', 'width: '.$widthRed.'px;');
 			}
-			$bar = new CLink(array(
+			$bar = new CLink([
 				$chart1,
 				$chart2,
 				new CDiv('80%', 'sla-bar-legend sla-bar-legend-start'),
 				new CDiv('100%', 'sla-bar-legend sla-bar-legend-end')
-			), 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'));
+			], 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'));
 			$bar = new CDiv($bar, 'sla-bar');
 			$bar->setAttribute('title', _s('Only the last 20%% of the indicator is displayed.'));
 
-			$slaBar = array(
+			$slaBar = [
 				$bar,
 				new CSpan(sprintf('%.4f', $slaBad), 'sla-value '.(($service['goodsla'] > $slaGood) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN))
-			);
+			];
 
 			$sla = new CDiv($slaBar, 'invisible');
-			$sla2 = array(
+			$sla2 = [
 				new CSpan(sprintf('%.4f', $slaGood), 'sla-value '.(($service['goodsla'] > $slaGood) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)),
 				'/',
 				new CSpan(sprintf('%.4f', $service['goodsla']), 'sla-value')
-			);
+			];
 		}
 
-		$serviceNode = array(
+		$serviceNode = [
 			'id' => $service['serviceid'],
 			'caption' => $caption,
 			'description' => ($service['trigger']) ? $service['trigger']['description'] : _('None'),
@@ -276,8 +276,8 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			'sla' => $sla,
 			'sla2' => $sla2,
 			'parentid' => ($parentService) ? $parentService['serviceid'] : 0,
-			'status' => ($serviceSla['status'] !== null) ? $serviceSla['status'] : '-'
-		);
+			'status' => ($serviceSla['status'] !== null) ? $serviceSla['status'] : ''
+		];
 	}
 
 	// hard dependencies and dependencies for the "root" node
@@ -327,7 +327,7 @@ function calculateItServiceStatus($rootServiceId, array $servicesLinks, array &$
 	}
 	elseif (isset($servicesLinks[$rootServiceId])) {
 		// calculate status depending on children status
-		$statuses = array();
+		$statuses = [];
 
 		foreach ($servicesLinks[$rootServiceId] as $rootServiceId) {
 			calculateItServiceStatus($rootServiceId, $servicesLinks, $services, $triggers);
@@ -371,14 +371,14 @@ function calculateItServiceStatusByTrigger($triggerStatus, $triggerValue, $trigg
  * Updates the status of all IT services
  */
 function updateItServices() {
-	$servicesLinks = array();
-	$services = array();
-	$rootServiceIds = array();
-	$triggers = array();
+	$servicesLinks = [];
+	$services = [];
+	$rootServiceIds = [];
+	$triggers = [];
 
 	// auxiliary arrays
-	$triggerIds = array();
-	$servicesLinksDown = array();
+	$triggerIds = [];
+	$servicesLinksDown = [];
 
 	$result = DBselect('SELECT sl.serviceupid,sl.servicedownid FROM services_links sl');
 
@@ -390,12 +390,12 @@ function updateItServices() {
 	$result = DBselect('SELECT s.serviceid,s.algorithm,s.triggerid,s.status FROM services s ORDER BY s.serviceid');
 
 	while ($row = DBfetch($result)) {
-		$services[$row['serviceid']] = array(
+		$services[$row['serviceid']] = [
 			'serviceid' => $row['serviceid'],
 			'algorithm' => $row['algorithm'],
 			'triggerid' => $row['triggerid'],
 			'status' => $row['status']
-		);
+		];
 
 		if (!isset($servicesLinksDown[$row['serviceid']])) {
 			$rootServiceIds[] = $row['serviceid'];
@@ -414,11 +414,11 @@ function updateItServices() {
 		);
 
 		while ($row = DBfetch($result)) {
-			$triggers[$row['triggerid']] = array(
+			$triggers[$row['triggerid']] = [
 				'priority' => $row['priority'],
 				'status' => $row['status'],
 				'value' => $row['value']
-			);
+			];
 		}
 	}
 
@@ -431,21 +431,21 @@ function updateItServices() {
 	}
 
 	// updating changed data
-	$updates = array();
-	$inserts = array();
+	$updates = [];
+	$inserts = [];
 	$clock = time();
 
 	foreach ($services as $service) {
 		if ($service['newStatus'] != $service['status']) {
-			$updates[] = array(
-				'values' => array('status' => $service['newStatus']),
-				'where' =>  array('serviceid' => $service['serviceid'])
-			);
-			$inserts[] = array(
+			$updates[] = [
+				'values' => ['status' => $service['newStatus']],
+				'where' =>  ['serviceid' => $service['serviceid']]
+			];
+			$inserts[] = [
 				'serviceid' => $service['serviceid'],
 				'clock' => $clock,
 				'value' => $service['newStatus']
-			);
+			];
 		}
 	}
 
@@ -467,11 +467,11 @@ function updateItServices() {
  */
 function checkServiceTime(array $serviceTime) {
 	// type validation
-	$serviceTypes = array(
+	$serviceTypes = [
 		SERVICE_TIME_TYPE_DOWNTIME,
 		SERVICE_TIME_TYPE_ONETIME_DOWNTIME,
 		SERVICE_TIME_TYPE_UPTIME
-	);
+	];
 	if (!isset($serviceTime['type']) || !in_array($serviceTime['type'], $serviceTypes)) {
 		throw new APIException(ZBX_API_ERROR_PARAMETERS, _('Incorrect service time type.'));
 	}

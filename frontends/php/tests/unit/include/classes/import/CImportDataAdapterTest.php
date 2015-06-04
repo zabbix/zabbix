@@ -26,56 +26,56 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @var array
 	 */
-	protected $sources = array();
+	protected $sources = [];
 
 	public function testEmptyXml() {
 		$adapter = $this->getAdapter($this->getEmptyXml());
 
-		$this->assertEquals($adapter->getGroups(), array());
-		$this->assertEquals($adapter->getHosts(), array());
-		$this->assertEquals($adapter->getTemplates(), array());
-		$this->assertEquals($adapter->getApplications(), array());
-		$this->assertEquals($adapter->getItems(), array());
-		$this->assertEquals($adapter->getTriggers(), array());
-		$this->assertEquals($adapter->getGraphs(), array());
-		$this->assertEquals($adapter->getDiscoveryRules(), array());
-		$this->assertEquals($adapter->getTemplateScreens(), array());
-		$this->assertEquals($adapter->getScreens(), array());
-		$this->assertEquals($adapter->getImages(), array());
-		$this->assertEquals($adapter->getMaps(), array());
+		$this->assertEquals($adapter->getGroups(), []);
+		$this->assertEquals($adapter->getHosts(), []);
+		$this->assertEquals($adapter->getTemplates(), []);
+		$this->assertEquals($adapter->getApplications(), []);
+		$this->assertEquals($adapter->getItems(), []);
+		$this->assertEquals($adapter->getTriggers(), []);
+		$this->assertEquals($adapter->getGraphs(), []);
+		$this->assertEquals($adapter->getDiscoveryRules(), []);
+		$this->assertEquals($adapter->getTemplateScreens(), []);
+		$this->assertEquals($adapter->getScreens(), []);
+		$this->assertEquals($adapter->getImages(), []);
+		$this->assertEquals($adapter->getMaps(), []);
 	}
 
 	public function testGetGroups() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getGroups(), array(
-			array (
+		$this->assertEquals($adapter->getGroups(), [
+			[
 				'name' => 'Linux servers',
-			),
-			array (
+			],
+			[
 				'name' => 'Zabbix servers',
-			),
-			array (
+			],
+			[
 				'name' => 'Templates',
-			),
-		));
+			],
+		]);
 	}
 
 	public function testGetHosts() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getHosts(), array (
-			array (
+		$this->assertEquals($adapter->getHosts(), [
+			[
 				'inventory' => '',
 				'proxy' => '',
-				'groups' => array (
-					array (
+				'groups' => [
+					[
 						'name' => 'Linux servers',
-					),
-				),
-				'macros' =>	array (),
-				'interfaces' => array (
-					array (
+					],
+				],
+				'macros' =>	[],
+				'interfaces' => [
+					[
 						'type' => '1',
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -84,8 +84,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'bulk' => '1',
 						'interface_ref' => 'if1',
 						'main' => '1',
-					),
-				),
+					],
+				],
 				'host' => 'empty-host',
 				'status' => '0',
 				'description' => '',
@@ -95,9 +95,9 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'ipmi_password' => '',
 				'name' => 'empty-host',
 				'inventory_mode' => -1,
-			),
-			array (
-				'inventory' => array (
+			],
+			[
+				'inventory' => [
 					'type' => 'my-type',
 					'type_full' => '',
 					'name' => '',
@@ -168,33 +168,33 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'poc_2_cell' => '',
 					'poc_2_screen' => '',
 					'poc_2_notes' => '',
-				),
+				],
 				'proxy' => '',
-				'groups' => array (
-						array (
+				'groups' => [
+						[
 							'name' => 'Linux servers',
-						),
-					),
-				'templates' => array (
-					array (
+						],
+					],
+				'templates' => [
+					[
 						'name' => 'Template App FTP Service',
-					),
-					array (
+					],
+					[
 						'name' => 'Template OS Linux',
-					),
-				),
-				'macros' => array (
-						array (
+					],
+				],
+				'macros' => [
+						[
 							'macro' => '{$MACRO}',
 							'value' => '2',
-						),
-						array (
+						],
+						[
 							'macro' => '{$SNMP_COMMUNITY}',
 							'value' => '1',
-						),
-					),
-				'interfaces' => array (
-					array (
+						],
+					],
+				'interfaces' => [
+					[
 						'type' => '1',
 						'useip' => '1',
 						'ip' => '0.0.0.0',
@@ -203,8 +203,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'bulk' => '1',
 						'interface_ref' => 'if1',
 						'main' => '1',
-					),
-					array (
+					],
+					[
 						'type' => '3',
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -213,8 +213,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'bulk' => '1',
 						'interface_ref' => 'if4',
 						'main' => '1',
-					),
-					array (
+					],
+					[
 						'type' => '2',
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -223,8 +223,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'bulk' => '1',
 						'interface_ref' => 'if2',
 						'main' => '1',
-					),
-					array (
+					],
+					[
 						'type' => '4',
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -233,8 +233,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'bulk' => '1',
 						'interface_ref' => 'if3',
 						'main' => '1',
-					),
-				),
+					],
+				],
 				'host' => 'export-host',
 				'status' => '0',
 				'description' => '',
@@ -244,79 +244,79 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'ipmi_password' => 'impi password',
 				'name' => 'export-host',
 				'inventory_mode' => '0',
-			),
-		));
+			],
+		]);
 	}
 
 	public function testGetTemplates() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getTemplates(), array (
-			array (
-				'groups' => array (
-					array (
+		$this->assertEquals($adapter->getTemplates(), [
+			[
+				'groups' => [
+					[
 						'name' => 'Templates',
-					),
-				),
-				'macros' => array (),
+					],
+				],
+				'macros' => [],
 				'host' => 'empty-template',
 				'name' => 'empty-template',
 				'description' => '',
-			),
-			array (
-				'groups' =>	array (
-					array (
+			],
+			[
+				'groups' =>	[
+					[
 						'name' => 'Templates',
-					),
-				),
-				'macros' => array (
-					array (
+					],
+				],
+				'macros' => [
+					[
 						'macro' => '{$MACRO}',
 						'value' => '2',
-					),
-					array (
+					],
+					[
 						'macro' => '{$SNMP_COMMUNITY}',
 						'value' => '1',
-					),
-				),
-				'templates' => array (
-					array (
+					],
+				],
+				'templates' => [
+					[
 						'name' => 'Template App FTP Service',
-					),
-					array (
+					],
+					[
 						'name' => 'Template OS Linux',
-					),
-				),
+					],
+				],
 				'host' => 'export-template',
 				'name' => 'export-template',
 				'description' => '',
-			),
-		));
+			],
+		]);
 	}
 
 	public function testGetApplications() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getApplications(), array (
-			'export-host' => array (
-				'app' => array (
+		$this->assertEquals($adapter->getApplications(), [
+			'export-host' => [
+				'app' => [
 					'name' => 'app',
-				),
-			),
-			'export-template' => array (
-				'app' => array (
+				],
+			],
+			'export-template' => [
+				'app' => [
 					'name' => 'app',
-				),
-			),
-		));
+				],
+			],
+		]);
 	}
 
 	public function testGetItems() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getItems(), array (
-			'export-host' => array (
-				'item' => array (
+		$this->assertEquals($adapter->getItems(), [
+			'export-host' => [
+				'item' => [
 					'name' => 'item',
 					'type' => '0',
 					'snmp_community' => '',
@@ -349,14 +349,14 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'port' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => array (),
+					'applications' => [],
 					'valuemap' => '',
 					'logtimefmt' => '',
 					'interface_ref' => 'if1',
 					'key_' => 'item',
 					'trapper_hosts' => '',
-				),
-				'item2' => array (
+				],
+				'item2' => [
 					'name' => 'item2',
 					'type' => '0',
 					'snmp_community' => '',
@@ -389,20 +389,20 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'port' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => array (
-						'application' => array (
+					'applications' => [
+						'application' => [
 							'name' => 'app',
-						),
-					),
+						],
+					],
 					'valuemap' => '',
 					'logtimefmt' => '',
 					'interface_ref' => 'if1',
 					'key_' => 'item2',
 					'trapper_hosts' => '',
-				)
-			),
-			'export-template' => array (
-				'item' => array (
+				]
+			],
+			'export-template' => [
+				'item' => [
 					'name' => 'item',
 					'type' => '0',
 					'snmp_community' => '',
@@ -435,13 +435,13 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'port' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => array (),
+					'applications' => [],
 					'valuemap' => '',
 					'logtimefmt' => '',
 					'key_' => 'item',
 					'trapper_hosts' => '',
-				),
-				'item2' => array (
+				],
+				'item2' => [
 					'name' => 'item2',
 					'type' => '0',
 					'snmp_community' => '',
@@ -474,82 +474,82 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'port' => '',
 					'description' => '',
 					'inventory_link' => '0',
-					'applications' => array (
-						'application' => array (
+					'applications' => [
+						'application' => [
 							'name' => 'app',
-						),
-					),
+						],
+					],
 					'valuemap' => '',
 					'logtimefmt' => '',
 					'key_' => 'item2',
 					'trapper_hosts' => '',
-				)
-			),
-		));
+				]
+			],
+		]);
 	}
 
 	public function testGetTriggers() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getTriggers(), array (
-			array (
+		$this->assertEquals($adapter->getTriggers(), [
+			[
 				'expression' => '{export-host:item.last(0)}<>0',
 				'url' => '',
 				'status' => '0',
 				'priority' => '0',
 				'type' => '0',
-				'dependencies' =>array (
-					array (
+				'dependencies' =>[
+					[
 						'name' => 'trigger2',
 						'expression' => '{export-host:item.last(0)}<>0',
-					),
-				),
+					],
+				],
 				'comments' => '',
 				'description' => 'trigger',
-			),
-			array (
+			],
+			[
 				'expression' => '{export-host:item.last(0)}<>0',
 				'url' => '',
 				'status' => '0',
 				'priority' => '0',
 				'type' => '0',
-				'dependencies' => array (),
+				'dependencies' => [],
 				'comments' => '',
 				'description' => 'trigger2',
-			),
-			array (
+			],
+			[
 				'expression' => '{export-template:item.last(0)}<>0',
 				'url' => '',
 				'status' => '0',
 				'priority' => '0',
 				'type' => '0',
-				'dependencies' =>array (
-					array (
+				'dependencies' =>[
+					[
 						'name' => 'trigger2',
 						'expression' => '{export-template:item.last(0)}<>0',
-					),
-				),
+					],
+				],
 				'comments' => '',
 				'description' => 'trigger',
-			),
-			array (
+			],
+			[
 				'expression' => '{export-template:item.last(0)}<>0',
 				'url' => '',
 				'status' => '0',
 				'priority' => '0',
 				'type' => '0',
-				'dependencies' => array (),
+				'dependencies' => [],
 				'comments' => '',
 				'description' => 'trigger2',
-			),
-		));
+			],
+		]);
 	}
 
 	public function testGetGraphs() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getGraphs(), array (
-			array (
+		$this->assertEquals($adapter->getGraphs(), [
+			[
 				'name' => 'simple',
 				'width' => '900',
 				'height' => '200',
@@ -566,22 +566,22 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'graphtype' => '0',
 				'ymin_type' => '0',
 				'ymax_type' => '0',
-				'gitems' => array (
-					array (
+				'gitems' => [
+					[
 						'sortorder' => '0',
 						'drawtype' => '0',
 						'color' => '009900',
 						'yaxisside' => '0',
 						'calc_fnc' => '2',
 						'type' => '0',
-						'item' => array (
+						'item' => [
 							'host' => 'export-host',
 							'key' => 'item',
-						),
-					),
-				),
-			),
-			array (
+						],
+					],
+				],
+			],
+			[
 				'name' => 'simple',
 				'width' => '900',
 				'height' => '200',
@@ -598,30 +598,30 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'graphtype' => '0',
 				'ymin_type' => '0',
 				'ymax_type' => '0',
-				'gitems' => array (
-					array (
+				'gitems' => [
+					[
 						'sortorder' => '0',
 						'drawtype' => '0',
 						'color' => '009900',
 						'yaxisside' => '0',
 						'calc_fnc' => '2',
 						'type' => '0',
-						'item' => array (
+						'item' => [
 							'host' => 'export-template',
 							'key' => 'item',
-						),
-					),
-				),
-			),
-		));
+						],
+					],
+				],
+			],
+		]);
 	}
 
 	public function testGetDiscoveryRules() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getDiscoveryRules(), array (
-			'export-host' => array (
-				'empty-lld-rule' => array (
+		$this->assertEquals($adapter->getDiscoveryRules(), [
+			'export-host' => [
+				'empty-lld-rule' => [
 					'name' => 'empty-lld-rule',
 					'type' => '0',
 					'snmp_community' => '',
@@ -647,15 +647,15 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'filter' => '',
 					'lifetime' => '30',
 					'description' => '',
-					'item_prototypes' => array (),
-					'trigger_prototypes' => array (),
-					'graph_prototypes' => array (),
-					'host_prototypes' => array (),
+					'item_prototypes' => [],
+					'trigger_prototypes' => [],
+					'graph_prototypes' => [],
+					'host_prototypes' => [],
 					'interface_ref' => 'if1',
 					'key_' => 'empty-lld-rule',
 					'trapper_hosts' => '',
-				),
-				'lld-rule' => array (
+				],
+				'lld-rule' => [
 					'name' => 'lld-rule',
 					'type' => '0',
 					'snmp_community' => '',
@@ -678,28 +678,28 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'publickey' => '',
 					'privatekey' => '',
 					'port' => '',
-					'filter' => array (
+					'filter' => [
 						'evaltype' => '0',
 						'formula' => '',
-						'conditions' => array (
-							array (
+						'conditions' => [
+							[
 								'macro' => '{#FSTYPE}',
 								'value' => '1',
 								'operator' => '8',
 								'formulaid' => 'A',
-							),
-							array (
+							],
+							[
 								'macro' => '{#FSTYPE2}',
 								'value' => '2',
 								'operator' => '8',
 								'formulaid' => 'B',
-							),
-						),
-					),
+							],
+						],
+					],
 					'lifetime' => '30',
 					'description' => '',
-					'item_prototypes' => array (
-						'item_prototype' => array (
+					'item_prototypes' => [
+						'item_prototype' => [
 							'name' => 'lld-item',
 							'type' => '0',
 							'snmp_community' => '',
@@ -732,14 +732,14 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'port' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'applications' => array (),
+							'applications' => [],
 							'valuemap' => '',
 							'logtimefmt' => '',
 							'interface_ref' => 'if1',
 							'key_' => 'lld-item',
 							'trapper_hosts' => '',
-						),
-						'item_prototype1' => array (
+						],
+						'item_prototype1' => [
 							'name' => 'lld-item2',
 							'type' => '0',
 							'snmp_community' => '',
@@ -772,20 +772,20 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'port' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'applications' => array(
-								array (
+							'applications' => [
+								[
 									'name' => 'app',
-								),
-							),
+								],
+							],
 							'valuemap' => '',
 							'logtimefmt' => '',
 							'interface_ref' => 'if1',
 							'key_' => 'lld-item2',
 							'trapper_hosts' => '',
-						),
-					),
-					'trigger_prototypes' => array (
-						'trigger_prototype' => array (
+						],
+					],
+					'trigger_prototypes' => [
+						'trigger_prototype' => [
 							'expression' => '{export-host:lld-item.last()}=0',
 							'url' => '',
 							'status' => '0',
@@ -793,10 +793,10 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'type' => '0',
 							'comments' => '',
 							'description' => 'lld-trigger',
-						),
-					),
-					'graph_prototypes' => array (
-						'graph_prototype' => array (
+						],
+					],
+					'graph_prototypes' => [
+						'graph_prototype' => [
 							'name' => 'lld-graph',
 							'width' => '900',
 							'height' => '200',
@@ -813,49 +813,49 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'graphtype' => '0',
 							'ymin_type' => '0',
 							'ymax_type' => '0',
-							'gitems' => array (
-								'graph_item' => array (
+							'gitems' => [
+								'graph_item' => [
 									'sortorder' => '0',
 									'drawtype' => '0',
 									'color' => '00C800',
 									'yaxisside' => '0',
 									'calc_fnc' => '2',
 									'type' => '0',
-									'item' => array (
+									'item' => [
 										'host' => 'export-host',
 										'key' => 'lld-item',
-									),
-								),
-							),
-						),
-					),
-					'host_prototypes' => array (
-						'host_prototype' => array (
+									],
+								],
+							],
+						],
+					],
+					'host_prototypes' => [
+						'host_prototype' => [
 							'host' => '{#VMID}',
 							'name' => '{#VMID}',
 							'status' => '0',
-							'group_links' => array (
-								'group_link' => array (
-									'group' => array (
+							'group_links' => [
+								'group_link' => [
+									'group' => [
 										'name' => 'Zabbix servers',
-									),
-								),
-							),
-							'group_prototypes' => array (
-								array (
+									],
+								],
+							],
+							'group_prototypes' => [
+								[
 									'name' => '{#VMNAME}',
-								),
-							),
-							'templates' => array (),
-						),
-					),
+								],
+							],
+							'templates' => [],
+						],
+					],
 					'interface_ref' => 'if1',
 					'key_' => 'lld-rule',
 					'trapper_hosts' => '',
-				),
-			),
-			'export-template' => array (
-				'empty-lld-rule' => array (
+				],
+			],
+			'export-template' => [
+				'empty-lld-rule' => [
 					'name' => 'empty-lld-rule',
 					'type' => '0',
 					'snmp_community' => '',
@@ -881,14 +881,14 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'filter' => '',
 					'lifetime' => '30',
 					'description' => '',
-					'item_prototypes' => array (),
-					'trigger_prototypes' => array (),
-					'graph_prototypes' => array (),
-					'host_prototypes' => array (),
+					'item_prototypes' => [],
+					'trigger_prototypes' => [],
+					'graph_prototypes' => [],
+					'host_prototypes' => [],
 					'key_' => 'empty-lld-rule',
 					'trapper_hosts' => '',
-				),
-				'lld-rule' => array (
+				],
+				'lld-rule' => [
 					'name' => 'lld-rule',
 					'type' => '0',
 					'snmp_community' => '',
@@ -911,28 +911,28 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'publickey' => '',
 					'privatekey' => '',
 					'port' => '',
-					'filter' => array (
+					'filter' => [
 						'evaltype' => '0',
 						'formula' => '',
-						'conditions' => array (
-							array (
+						'conditions' => [
+							[
 								'macro' => '{#FSTYPE}',
 								'value' => '1',
 								'operator' => '8',
 								'formulaid' => 'A',
-							),
-							array (
+							],
+							[
 								'macro' => '{#FSTYPE2}',
 								'value' => '2',
 								'operator' => '8',
 								'formulaid' => 'B',
-							),
-						),
-					),
+							],
+						],
+					],
 					'lifetime' => '30',
 					'description' => '',
-					'item_prototypes' => array (
-						'item_prototype' => array (
+					'item_prototypes' => [
+						'item_prototype' => [
 							'name' => 'lld-item',
 							'type' => '0',
 							'snmp_community' => '',
@@ -965,13 +965,13 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'port' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'applications' => array (),
+							'applications' => [],
 							'valuemap' => '',
 							'logtimefmt' => '',
 							'key_' => 'lld-item',
 							'trapper_hosts' => '',
-						),
-						'item_prototype1' => array (
+						],
+						'item_prototype1' => [
 							'name' => 'lld-item2',
 							'type' => '0',
 							'snmp_community' => '',
@@ -1004,19 +1004,19 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'port' => '',
 							'description' => '',
 							'inventory_link' => '0',
-							'applications' => array(
-								array (
+							'applications' => [
+								[
 									'name' => 'app',
-								),
-							),
+								],
+							],
 							'valuemap' => '',
 							'logtimefmt' => '',
 							'key_' => 'lld-item2',
 							'trapper_hosts' => '',
-						),
-					),
-					'trigger_prototypes' => array (
-						'trigger_prototype' => array (
+						],
+					],
+					'trigger_prototypes' => [
+						'trigger_prototype' => [
 							'expression' => '{export-template:lld-item.last()}=0',
 							'url' => '',
 							'status' => '0',
@@ -1024,10 +1024,10 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'type' => '0',
 							'comments' => '',
 							'description' => 'lld-trigger',
-						),
-					),
-					'graph_prototypes' => array (
-						'graph_prototype' => array (
+						],
+					],
+					'graph_prototypes' => [
+						'graph_prototype' => [
 							'name' => 'lld-graph',
 							'width' => '900',
 							'height' => '200',
@@ -1044,60 +1044,60 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'graphtype' => '0',
 							'ymin_type' => '0',
 							'ymax_type' => '0',
-							'gitems' => array (
-								'graph_item' => array (
+							'gitems' => [
+								'graph_item' => [
 									'sortorder' => '0',
 									'drawtype' => '0',
 									'color' => '00C800',
 									'yaxisside' => '0',
 									'calc_fnc' => '2',
 									'type' => '0',
-									'item' => array (
+									'item' => [
 										'host' => 'export-template',
 										'key' => 'lld-item',
-									),
-								),
-							),
-						),
-					),
-					'host_prototypes' => array (
-						'host_prototype' => array (
+									],
+								],
+							],
+						],
+					],
+					'host_prototypes' => [
+						'host_prototype' => [
 							'host' => '{#VMID}',
 							'name' => '{#VMID}',
 							'status' => '0',
-							'group_links' => array (
-								'group_link' => array (
-									'group' => array (
+							'group_links' => [
+								'group_link' => [
+									'group' => [
 										'name' => 'Zabbix servers',
-									),
-								),
-							),
-							'group_prototypes' => array (
-								array (
+									],
+								],
+							],
+							'group_prototypes' => [
+								[
 									'name' => '{#VMNAME}',
-								),
-							),
-							'templates' => array (),
-						),
-					),
+								],
+							],
+							'templates' => [],
+						],
+					],
 					'key_' => 'lld-rule',
 					'trapper_hosts' => '',
-				),
-			),
-		));
+				],
+			],
+		]);
 	}
 
 	public function testGetTemplateScreens() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getTemplateScreens(), array (
-			'export-template' => array (
-				'screen' => array (
+		$this->assertEquals($adapter->getTemplateScreens(), [
+			'export-template' => [
+				'screen' => [
 					'name' => 'screen',
 					'hsize' => '1',
 					'vsize' => '1',
-					'screenitems' => array (
-						array (
+					'screenitems' => [
+						[
 							'resourcetype' => '0',
 							'width' => '500',
 							'height' => '100',
@@ -1112,36 +1112,36 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'url' => '',
 							'dynamic' => '0',
 							'sort_triggers' => '0',
-							'resource' => array (
+							'resource' => [
 								'name' => 'graph',
 								'host' => 'export-template',
-							),
+							],
 							'max_columns' => '1',
 							'application' => '',
-						),
-					),
-				),
-			),
-		));
+						],
+					],
+				],
+			],
+		]);
 	}
 
 	public function testGetImages() {
 		$adapter = $this->getAdapter($this->getMapXml());
 
-		$this->assertEquals($adapter->getImages(), array (
-			array (
+		$this->assertEquals($adapter->getImages(), [
+			[
 				'name' => 'Server_(96)',
 				'imagetype' => '1',
 				'image' => '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',
-			),
-		));
+			],
+		]);
 	}
 
 	public function testGetMaps() {
 		$adapter = $this->getAdapter($this->getMapXml());
 
-		$this->assertEquals($adapter->getMaps(), array (
-			array (
+		$this->assertEquals($adapter->getMaps(), [
+			[
 				'name' => 'empty-map',
 				'width' => '800',
 				'height' => '600',
@@ -1169,11 +1169,11 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'expand_macros' => '0',
 				'background' => '',
 				'iconmap' => '',
-				'urls' => array (),
-				'selements' => array (),
-				'links' => array (),
-			),
-			array (
+				'urls' => [],
+				'selements' => [],
+				'links' => [],
+			],
+			[
 				'name' => 'map',
 				'width' => '800',
 				'height' => '600',
@@ -1201,15 +1201,15 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'expand_macros' => '0',
 				'background' => '',
 				'iconmap' => '',
-				'urls' => array (
-					array (
+				'urls' => [
+					[
 						'name' => 'url',
 						'url' => 'http://google.com',
 						'elementtype' => '0',
-					),
-				),
-				'selements' => array (
-					array (
+					],
+				],
+				'selements' => [
+					[
 						'elementtype' => '2',
 						'label' => 'New element',
 						'label_location' => '-1',
@@ -1222,25 +1222,25 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'viewtype' => '0',
 						'use_iconmap' => '0',
 						'selementid' => '32',
-						'element' => array (
+						'element' => [
 							'description' => 'trigger',
 							'expression' => '{export-host:item.last(0)}<>0 or {export-host:item.last(0)}<>0 and {export-host:item.last(0)}<>0',
-						),
-						'icon_off' => array (
+						],
+						'icon_off' => [
 							'name' => 'Server_(96)',
-						),
+						],
 						'icon_on' => '',
 						'icon_disabled' => '',
 						'icon_maintenance' => '',
 						'application' => '',
-						'urls' => array (
-							array (
+						'urls' => [
+							[
 								'name' => 'url',
 								'url' => 'http://google.com',
-							),
-						),
-					),
-					array (
+							],
+						],
+					],
+					[
 						'elementtype' => '0',
 						'label' => 'New element',
 						'label_location' => '-1',
@@ -1253,19 +1253,19 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'viewtype' => '0',
 						'use_iconmap' => '0',
 						'selementid' => '33',
-						'element' => array (
+						'element' => [
 							'host' => 'export-host',
-						),
-						'icon_off' => array (
+						],
+						'icon_off' => [
 							'name' => 'Server_(96)',
-						),
+						],
 						'icon_on' => '',
 						'icon_disabled' => '',
 						'icon_maintenance' => '',
 						'application' => '',
-						'urls' => array (),
-					),
-					array (
+						'urls' => [],
+					],
+					[
 						'elementtype' => '3',
 						'label' => 'New element',
 						'label_location' => '-1',
@@ -1278,66 +1278,66 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'viewtype' => '0',
 						'use_iconmap' => '0',
 						'selementid' => '34',
-						'element' => array (
+						'element' => [
 							'name' => 'Zabbix servers',
-						),
-						'icon_off' => array (
+						],
+						'icon_off' => [
 							'name' => 'Server_(96)',
-						),
+						],
 						'icon_on' => '',
 						'icon_disabled' => '',
 						'icon_maintenance' => '',
 						'application' => '',
-						'urls' => array (),
-					),
-				),
-				'links' => array (
-					array (
+						'urls' => [],
+					],
+				],
+				'links' => [
+					[
 						'drawtype' => '0',
 						'color' => '00CC00',
 						'label' => '',
 						'selementid1' => '32',
 						'selementid2' => '33',
-						'linktriggers' => array (
-							array (
+						'linktriggers' => [
+							[
 								'drawtype' => '0',
 								'color' => 'DD0000',
-								'trigger' => array (
+								'trigger' => [
 									'description' => 'trigger',
 									'expression' => '{export-host:item.last(0)}<>0 or {export-host:item.last(0)}<>0 and {export-host:item.last(0)}<>0',
-								),
-							),
-						),
-					),
-					array (
+								],
+							],
+						],
+					],
+					[
 						'drawtype' => '0',
 						'color' => '00CC00',
 						'label' => '',
 						'selementid1' => '32',
 						'selementid2' => '34',
-						'linktriggers' => array (),
-					),
-				),
-			),
-		));
+						'linktriggers' => [],
+					],
+				],
+			],
+		]);
 	}
 
 	public function testGetScreens() {
 		$adapter = $this->getAdapter($this->getScreenXml());
 
-		$this->assertEquals($adapter->getScreens(), array (
-			array (
+		$this->assertEquals($adapter->getScreens(), [
+			[
 				'name' => 'empty-screen',
 				'hsize' => '1',
 				'vsize' => '1',
-				'screenitems' => array (),
-			),
-			array (
+				'screenitems' => [],
+			],
+			[
 				'name' => 'screen',
 				'hsize' => '1',
 				'vsize' => '1',
-				'screenitems' => array (
-					array (
+				'screenitems' => [
+					[
 						'resourcetype' => '0',
 						'width' => '500',
 						'height' => '100',
@@ -1352,39 +1352,39 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'url' => '',
 						'dynamic' => '0',
 						'sort_triggers' => '0',
-						'resource' => array (
+						'resource' => [
 							'name' => 'simple',
 							'host' => 'export-host',
-						),
+						],
 						'max_columns' => '1',
 						'application' => '',
-					),
-				),
-			),
-		));
+					],
+				],
+			],
+		]);
 	}
 
 	public function testConversion() {
 		$adapter = $this->getAdapter($this->get18Xml());
 
 		$this->assertEquals(
-			array(
-				array(
+			[
+				[
 					'name' => 'Linux servers'
-				),
-				array(
+				],
+				[
 					'name' => 'Templates'
-				)
-			),
+				]
+			],
 			$adapter->getGroups()
 		);
 
 		$this->assertEquals(
-			array(
-				array(
-					'macros' => array(),
-					'interfaces' => array (
-						array (
+			[
+				[
+					'macros' => [],
+					'interfaces' => [
+						[
 							'type' => 1,
 							'useip' => '1',
 							'ip' => '10.0.0.6',
@@ -1392,7 +1392,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'port' => '10050',
 							'interface_ref' => 'if0',
 							'main' => 1
-						),
+						],
 //						array (								// ??? IPMI interface
 //							'type' => 3,
 //							'useip' => '0',
@@ -1403,7 +1403,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 //							'main' => 1,
 //							'bulk' => 1
 //						)
-					),
+					],
 					'host' => 'host',
 					'status' => '0',
 					'ipmi_authtype' => '0',
@@ -1411,54 +1411,54 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'ipmi_username' => '',
 					'ipmi_password' => '',
 					'inventory_mode' => -1,
-					'inventory' => array(),
-					'groups' =>	array(
-						array(
+					'inventory' => [],
+					'groups' =>	[
+						[
 							'name' => 'Linux servers'
-						)
-					)
-				)
-			),
+						]
+					]
+				]
+			],
 			$adapter->getHosts()
 		);
 
 		$this->assertEquals(
-			array(
-				array(
-					'macros' => array(
-						array(
+			[
+				[
+					'macros' => [
+						[
 							'value' => '21',
 							'macro' => '{$PORT.FTP}'
-						),
-						array(
+						],
+						[
 							'value' => '22',
 							'macro' => '{$PORT.SSH}'
-						)
-					),
+						]
+					],
 					'host' => 'Template_Linux',
-					'groups' =>	array(
-						array(
+					'groups' =>	[
+						[
 							'name' => 'Templates'
-						)
-					)
-				),
-				array(
-					'macros' => array(),
+						]
+					]
+				],
+				[
+					'macros' => [],
 					'host' => 'Template_Simple',
-					'groups' =>	array(
-						array(
+					'groups' =>	[
+						[
 							'name' => 'Templates'
-						)
-					)
-				)
-			),
+						]
+					]
+				]
+			],
 			$adapter->getTemplates()
 		);
 
 		$this->assertEquals(
-			array(
-				'Template_Linux' => array(
-					'vfs.fs.size[/,pfree]' => array(
+			[
+				'Template_Linux' => [
+					'vfs.fs.size[/,pfree]' => [
 						'type' => '0',
 						'value_type' => '0',
 						'ipmi_sensor' => '',
@@ -1488,21 +1488,20 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'snmpv3_authpassphrase' => '',
 						'snmpv3_privpassphrase' => '',
 						'valuemapid' => '0',
-						'applications' => array(
-							array(
+						'applications' => [
+							[
 								'name' => 'Filesystem'
-							),
-							array(
+							],
+							[
 								'name' => 'Availability'
-							)
-						),
+							]
+						],
 						'name' => 'Free disk space on $1 in %',
 						'key_' => 'vfs.fs.size[/,pfree]'
-					)
-				),
-				'Template_Simple' => array(
-					'net.tcp.service[ftp,,21]' => array
-					(
+					]
+				],
+				'Template_Simple' => [
+					'net.tcp.service[ftp,,21]' => [
 						'type' => '3',
 						'value_type' => '3',
 						'ipmi_sensor' => '',
@@ -1532,16 +1531,15 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'snmpv3_authpassphrase' => '',
 						'snmpv3_privpassphrase' => '',
 						'valuemapid' => '0',
-						'applications' => array(
-							array(
+						'applications' => [
+							[
 								'name' => 'Simple checks'
-							)
-						),
+							]
+						],
 						'name' => 'FTP check',
 						'key_' => 'net.tcp.service[ftp,,21]'
-					),
-					'net.tcp.service[ftp,,{$PORT.FTP}]' => array
-					(
+					],
+					'net.tcp.service[ftp,,{$PORT.FTP}]' => [
 						'type' => '3',
 						'value_type' => '3',
 						'ipmi_sensor' => '',
@@ -1571,41 +1569,41 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'snmpv3_authpassphrase' => '',
 						'snmpv3_privpassphrase' => '',
 						'valuemapid' => '0',
-						'applications' => array(
-							array(
+						'applications' => [
+							[
 								'name' => 'Simple checks'
-							)
-						),
+							]
+						],
 						'name' => 'FTP check with macro',
 						'key_' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
-					)
-				)
-			),
+					]
+				]
+			],
 			$adapter->getItems()
 		);
 
 		$this->assertEquals(
-			array(
-				'Template_Linux' => array(
-					'Filesystem' => array(
+			[
+				'Template_Linux' => [
+					'Filesystem' => [
 						'name' => 'Filesystem'
-					),
-					'Availability' => array(
+					],
+					'Availability' => [
 						'name' => 'Availability'
-					),
-				),
-				'Template_Simple' => array(
-					'Simple checks' => array(
+					],
+				],
+				'Template_Simple' => [
+					'Simple checks' => [
 						'name' => 'Simple checks'
-					)
-				)
-			),
+					]
+				]
+			],
 			$adapter->getApplications()
 		);
 
 		$this->assertEquals(
-			array(
-				array(
+			[
+				[
 					'type' => '0',
 					'expression' => '{Template_Linux:vfs.fs.size[/,pfree].last(0)}<10',
 					'url' => 'http://www.zabbix.com/',
@@ -1613,8 +1611,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'priority' => '4',
 					'comments' => 'test comments',
 					'description' => 'Low free disk space on {HOSTNAME} volume /'
-				),
-				array(
+				],
+				[
 					'type' => '1',
 					'expression' => '{Template_Simple:net.tcp.service[ftp,,21].last(0)}<>0 or {Template_Simple:net.tcp.service[ftp,,{$PORT.FTP}].last(0)}<>0',
 					'url' => 'triggers.php',
@@ -1622,14 +1620,14 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'priority' => '3',
 					'comments' => 'comments',
 					'description' => 'simple triggert'
-				)
-			),
+				]
+			],
 			$adapter->getTriggers()
 		);
 
 		$this->assertEquals(
-			array(
-				array(
+			[
+				[
 					'name' => 'simple graph fixed',
 					'width' => '755',
 					'height' => '332',
@@ -1645,34 +1643,34 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'ymin_item_1' => '',						// ???
 					'ymax_item_1' => '',						// ???
 					'graphtype' => '0',
-					'gitems' => array(
-						array(
-							'item' => array(
+					'gitems' => [
+						[
+							'item' => [
 								'host' => 'Template_Simple',
 								'key' => 'net.tcp.service[ftp,,21]'
-							),
+							],
 							'drawtype' => '0',
 							'sortorder' => '0',
 							'color' => '3333FF',
 							'yaxisside' => '0',
 							'calc_fnc' => '7',
 							'type' => '0'
-						),
-						array(
-							'item' => array(
+						],
+						[
+							'item' => [
 								'host' => 'Template_Simple',
 								'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
-							),
+							],
 							'drawtype' => '1',
 							'sortorder' => '1',
 							'color' => '009999',
 							'yaxisside' => '1',
 							'calc_fnc' => '4',
 							'type' => '0'
-						)
-					)
-				),
-				array(
+						]
+					]
+				],
+				[
 					'name' => 'simple graph',
 					'width' => '900',
 					'height' => '200',
@@ -1688,34 +1686,34 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'ymin_item_1' => '',						// ???
 					'ymax_item_1' => '',						// ???
 					'graphtype' => '0',
-					'gitems' => array(
-						array(
-							'item' => array(
+					'gitems' => [
+						[
+							'item' => [
 								'host' => 'Template_Simple',
 								'key' => 'net.tcp.service[ftp,,21]'
-							),
+							],
 							'drawtype' => '0',
 							'sortorder' => '0',
 							'color' => '3333FF',
 							'yaxisside' => '0',
 							'calc_fnc' => '2',
 							'type' => '0'
-						),
-						array(
-							'item' => array(
+						],
+						[
+							'item' => [
 								'host' => 'Template_Simple',
 								'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
-							),
+							],
 							'drawtype' => '0',
 							'sortorder' => '1',
 							'color' => '009999',
 							'yaxisside' => '0',
 							'calc_fnc' => '2',
 							'type' => '0'
-						)
-					)
-				),
-				array(
+						]
+					]
+				],
+				[
 					'name' => 'simple graph min/max',
 					'width' => '1024',
 					'height' => '768',
@@ -1728,43 +1726,43 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'show_3d' => '0',
 					'percent_left' => '0.0000',
 					'percent_right' => '0.0000',
-					'ymin_item_1' => array(
+					'ymin_item_1' => [
 						'host' => 'Template_Simple',
 						'key' => 'net.tcp.service[ftp,,21]'
-					),
-					'ymax_item_1' => array(
+					],
+					'ymax_item_1' => [
 						'host' => 'Template_Simple',
 						'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
-					),
+					],
 					'graphtype' => '1',
-					'gitems' => array(
-						array(
-							'item' => array(
+					'gitems' => [
+						[
+							'item' => [
 								'host' => 'Template_Simple',
 								'key' => 'net.tcp.service[ftp,,21]'
-							),
+							],
 							'drawtype' => '0',
 							'sortorder' => '0',
 							'color' => '3333FF',
 							'yaxisside' => '0',
 							'calc_fnc' => '2',
 							'type' => '0'
-						),
-						array(
-							'item' => array(
+						],
+						[
+							'item' => [
 								'host' => 'Template_Simple',
 								'key' => 'net.tcp.service[ftp,,{$PORT.FTP}]'
-							),
+							],
 							'drawtype' => '0',
 							'sortorder' => '1',
 							'color' => '009999',
 							'yaxisside' => '0',
 							'calc_fnc' => '2',
 							'type' => '0'
-						)
-					)
-				)
-			),
+						]
+					]
+				]
+			],
 			$adapter->getGraphs()
 		);
 

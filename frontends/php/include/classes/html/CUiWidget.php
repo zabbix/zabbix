@@ -68,7 +68,7 @@ class CUiWidget extends CDiv {
 	 */
 	public function __construct($id, $body = null) {
 		$this->id = $id;
-		$this->body = $body ? array($body) : array();
+		$this->body = $body ? [$body] : [];
 
 //		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget ui-tabs');
 		parent::__construct(null, 'dashbrd-widget');
@@ -82,7 +82,7 @@ class CUiWidget extends CDiv {
 	 * @param string|array|CTag $caption
 	 * @param array             $icons
 	 */
-	public function setHeader($caption = null, array $icons = array()) {
+	public function setHeader($caption = null, array $icons = []) {
 		zbx_value2array($icons);
 
 		if ($caption === null && $icons !== null) {
@@ -105,15 +105,15 @@ class CUiWidget extends CDiv {
 	 * @param string|array|CTag $rightColumn
 	 */
 	public function setDoubleHeader($leftColumn, $rightColumn) {
-		$leftColumn = new CCol($leftColumn);
-		$leftColumn->addStyle('text-align: left; border: 0;');
+		$leftColumn = (new CCol($leftColumn))->
+			addStyle('text-align: left; border: 0;');
 
-		$rightColumn = new CCol($rightColumn);
-		$rightColumn->addStyle('text-align: right; border: 0;');
+		$rightColumn = (new CCol($rightColumn))->
+			addStyle('text-align: right; border: 0;');
 
 		$table = new CTable();
 		$table->addStyle('width: 100%;');
-		$table->addRow(array($leftColumn, $rightColumn));
+		$table->addRow([$leftColumn, $rightColumn]);
 
 		$this->header = new CDiv($table, ZBX_STYLE_NOWRAP.' ui-corner-all ui-widget-header header');
 	}

@@ -31,7 +31,7 @@ $createForm->addItem(new CSubmit('form', _('Create host prototype')));
 $itemsWidget->setControls($createForm);
 
 // header
-$itemsWidget->addHeader(array(_('Host prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], ZBX_STYLE_ORANGE)));
+$itemsWidget->addHeader([_('Host prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], ZBX_STYLE_ORANGE)]);
 $itemsWidget->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $this->data['parent_discoveryid']));
 
 // create form
@@ -42,18 +42,18 @@ $itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 // create table
 $hostTable = new CTableInfo();
 
-$hostTable->setHeader(array(
-	new CColHeader(
-		new CCheckBox('all_hosts', null, "checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');"),
-		'cell-width'),
+$hostTable->setHeader([
+	(new CColHeader(
+		new CCheckBox('all_hosts', null, "checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');")))->
+		addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Templates'),
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
-));
+]);
 
 foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	// name
-	$name = array();
+	$name = [];
 	if ($hostPrototype['templateid']) {
 		$sourceTemplate = $hostPrototype['sourceTemplate'];
 		$name[] = new CLink($sourceTemplate['name'], '?parent_discoveryid='.$hostPrototype['sourceDiscoveryRuleId'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
@@ -63,15 +63,15 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 	// template list
 	if (empty($hostPrototype['templates'])) {
-		$hostTemplates = '-';
+		$hostTemplates = '';
 	}
 	else {
-		$hostTemplates = array();
+		$hostTemplates = [];
 		order_result($hostPrototype['templates'], 'name');
 
 		foreach ($hostPrototype['templates'] as $template) {
 
-			$caption = array();
+			$caption = [];
 			$caption[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
 
 			$linkedTemplates = $this->data['linkedTemplates'][$template['templateid']]['parentTemplates'];
@@ -108,35 +108,35 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($hostPrototype['status'])
 	);
 
-	$hostTable->addRow(array(
+	$hostTable->addRow([
 		new CCheckBox('group_hostid['.$hostPrototype['hostid'].']', null, null, $hostPrototype['hostid']),
 		$name,
-		new CCol($hostTemplates, 'wraptext'),
+		$hostTemplates,
 		$status
-	));
+	]);
 }
 
 zbx_add_post_js('cookie.prefix = "'.$discoveryRule['itemid'].'";');
 
 // append table to form
-$itemForm->addItem(array(
+$itemForm->addItem([
 	$hostTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'group_hostid',
-		array(
-			'hostprototype.massenable' => array('name' => _('Enable'),
+		[
+			'hostprototype.massenable' => ['name' => _('Enable'),
 				'confirm' => _('Enable selected host prototypes?')
-			),
-			'hostprototype.massdisable' => array('name' => _('Disable'),
+			],
+			'hostprototype.massdisable' => ['name' => _('Disable'),
 				'confirm' => _('Disable selected host prototypes?')
-			),
-			'hostprototype.massdelete' => array('name' => _('Delete'),
+			],
+			'hostprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected host prototypes?')
-			)
-		),
+			]
+		],
 		$discoveryRule['itemid']
 	)
-));
+]);
 
 // append form to widget
 $itemsWidget->addItem($itemForm);

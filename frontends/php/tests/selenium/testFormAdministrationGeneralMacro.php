@@ -49,11 +49,11 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of macros');
 		$this->zbxTestTextPresent('CONFIGURATION OF MACROS');
 		$this->zbxTestTextPresent('Macros');
-		$this->zbxTestTextPresent(array('Macro', 'Value'));
+		$this->zbxTestTextPresent(['Macro', 'Value']);
 	}
 
 	private function checkGlobalMacrosOrder($skip_index = -1) {
-		$globalMacros = array();
+		$globalMacros = [];
 
 		$result = DBselect('select globalmacroid,macro,value from globalmacro');
 		while ($row = DBfetch($result)) {
@@ -88,7 +88,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 			$this->zbxTestTextPresent('CONFIGURATION OF MACROS');
 			$this->zbxTestTextPresent('Macros');
-			$this->zbxTestTextPresent(array('Macro', 'Value'));
+			$this->zbxTestTextPresent(['Macro', 'Value']);
 		}
 	}
 
@@ -106,26 +106,26 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	}
 
 	public static function wrongMacros() {
-		return array(
-			array('MACRO'),
-			array('{'),
-			array('{$'),
-			array('{$MACRO'),
-			array('}'),
-			array('$}'),
-			array('MACRO}'),
-			array('$MACRO}'),
-			array('{}'),
-			array('{MACRO}'),
-			array('}$MACRO{'),
-			array('{$MACRO}}'),
-			array('{{$MACRO}'),
-			array('{{$MACRO}}'),
-			array('{$}'),
-			array('{$$}'),
-			array('{$$MACRO}'),
-			array('{$MACRO$}')
-		);
+		return [
+			['MACRO'],
+			['{'],
+			['{$'],
+			['{$MACRO'],
+			['}'],
+			['$}'],
+			['MACRO}'],
+			['$MACRO}'],
+			['{}'],
+			['{MACRO}'],
+			['}$MACRO{'],
+			['{$MACRO}}'],
+			['{{$MACRO}'],
+			['{{$MACRO}}'],
+			['{$}'],
+			['{$$}'],
+			['{$$MACRO}'],
+			['{$MACRO$}']
+		];
 	}
 
 	public function testFormAdministrationGeneralMacros_backup() {

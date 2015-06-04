@@ -151,6 +151,87 @@ static int	DBpatch_2050010(void)
 
 static int	DBpatch_2050011(void)
 {
+	/* 1 - ITEM_VALUE_TYPE_STR, 2 - ITEM_VALUE_TYPE_LOG, 4 - ITEM_VALUE_TYPE_TEXT */
+	if (ZBX_DB_OK <= DBexecute("update items set trends=0 where value_type in (1,2,4)"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_2050012(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*key = NULL, *key_esc, *param;
+	int		ret = SUCCEED;
+	AGENT_REQUEST	request;
+
+	/* type - ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE */
+	result = DBselect(
+			"select itemid,key_"
+			" from items"
+			" where type in (0,3,7)"
+				" and key_ like 'net.tcp.service%%[%%ntp%%'");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		init_request(&request);
+
+		if (SUCCEED != parse_item_key(row[1], &request))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot parse item key \"%s\"", row[1]);
+			continue;
+		}
+
+		param = get_rparam(&request, 0);
+
+		if (0 != strcmp("service.ntp", param) && 0 != strcmp("ntp", param))
+		{
+			free_request(&request);
+			continue;
+		}
+
+		key = zbx_strdup(key, row[1]);
+
+		if (0 == strcmp("service.ntp", param))
+		{
+			/* replace "service.ntp" with "ntp" */
+
+			char	*p;
+
+			p = strstr(key, "service.ntp");
+
+			do
+			{
+				*p = *(p + 8);
+			}
+			while ('\0' != *(p++));
+		}
+
+		free_request(&request);
+
+		/* replace "net.tcp.service" with "net.udp.service" */
+
+		key[4] = 'u';
+		key[5] = 'd';
+		key[6] = 'p';
+
+		key_esc = DBdyn_escape_string(key);
+
+		if (ZBX_DB_OK > DBexecute("update items set key_='%s' where itemid=%s", key_esc, row[0]))
+			ret = FAIL;
+
+		zbx_free(key_esc);
+	}
+	DBfree_result(result);
+
+	zbx_free(key);
+
+	return ret;
+}
+
+static int	DBpatch_2050013(void)
+{
 	const ZBX_TABLE table =
 			{"application_prototype", "application_prototypeid", 0,
 				{
@@ -166,24 +247,24 @@ static int	DBpatch_2050011(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_2050012(void)
+static int	DBpatch_2050014(void)
 {
 	return DBcreate_index("application_prototype", "application_prototype_1", "itemid", 0);
 }
 
-static int	DBpatch_2050013(void)
+static int	DBpatch_2050015(void)
 {
 	return DBcreate_index("application_prototype", "application_prototype_2", "templateid", 0);
 }
 
-static int	DBpatch_2050014(void)
+static int	DBpatch_2050016(void)
 {
 	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("application_prototype", 1, &field);
 }
 
-static int	DBpatch_2050015(void)
+static int	DBpatch_2050017(void)
 {
 	const ZBX_FIELD	field = {"templateid", NULL, "application_prototype", "application_prototypeid",
 			0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
@@ -191,7 +272,7 @@ static int	DBpatch_2050015(void)
 	return DBadd_foreign_key("application_prototype", 2, &field);
 }
 
-static int	DBpatch_2050016(void)
+static int	DBpatch_2050018(void)
 {
 	const ZBX_TABLE table =
 			{"item_application_prototype", "item_application_prototypeid", 0,
@@ -208,18 +289,18 @@ static int	DBpatch_2050016(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_2050017(void)
+static int	DBpatch_2050019(void)
 {
 	return DBcreate_index("item_application_prototype", "item_application_prototype_1",
 			"application_prototypeid,itemid", 1);
 }
 
-static int	DBpatch_2050018(void)
+static int	DBpatch_2050020(void)
 {
 	return DBcreate_index("item_application_prototype", "item_application_prototype_2", "itemid", 0);
 }
 
-static int	DBpatch_2050019(void)
+static int	DBpatch_2050021(void)
 {
 	const ZBX_FIELD	field = {"application_prototypeid", NULL, "application_prototype", "application_prototypeid",
 			0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
@@ -227,14 +308,14 @@ static int	DBpatch_2050019(void)
 	return DBadd_foreign_key("item_application_prototype", 1, &field);
 }
 
-static int	DBpatch_2050020(void)
+static int	DBpatch_2050022(void)
 {
 	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("item_application_prototype", 2, &field);
 }
 
-static int	DBpatch_2050021(void)
+static int	DBpatch_2050023(void)
 {
 	const ZBX_TABLE table =
 			{"application_discovery", "application_discoveryid", 0,
@@ -253,17 +334,17 @@ static int	DBpatch_2050021(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_2050022(void)
+static int	DBpatch_2050024(void)
 {
 	return DBcreate_index("application_discovery", "application_discovery_1", "applicationid", 0);
 }
 
-static int	DBpatch_2050023(void)
+static int	DBpatch_2050025(void)
 {
 	return DBcreate_index("application_discovery", "application_discovery_2", "application_prototypeid", 0);
 }
 
-static int	DBpatch_2050024(void)
+static int	DBpatch_2050026(void)
 {
 	const ZBX_FIELD	field = {"applicationid", NULL, "applications", "applicationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
@@ -271,7 +352,7 @@ static int	DBpatch_2050024(void)
 	return DBadd_foreign_key("application_discovery", 1, &field);
 }
 
-static int	DBpatch_2050025(void)
+static int	DBpatch_2050027(void)
 {
 	const ZBX_FIELD	field = {"application_prototypeid", NULL, "application_prototype", "application_prototypeid",
 			0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
@@ -279,7 +360,7 @@ static int	DBpatch_2050025(void)
 	return DBadd_foreign_key("application_discovery", 2, &field);
 }
 
-static int	DBpatch_2050026(void)
+static int	DBpatch_2050028(void)
 {
 	const ZBX_FIELD field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -319,5 +400,7 @@ DBPATCH_ADD(2050023, 0, 1)
 DBPATCH_ADD(2050024, 0, 1)
 DBPATCH_ADD(2050025, 0, 1)
 DBPATCH_ADD(2050026, 0, 1)
+DBPATCH_ADD(2050027, 0, 1)
+DBPATCH_ADD(2050028, 0, 1)
 
 DBPATCH_END()

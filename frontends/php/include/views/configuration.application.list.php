@@ -23,8 +23,8 @@ $applicationWidget = (new CWidget())->setTitle(_('Applications'));
 $createForm = (new CForm('get'))->cleanItems();
 
 $controls = (new CList())->
-	addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()))->
-	addItem(array(_('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
+	addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()])->
+	addItem([_('Host').SPACE, $this->data['pageFilter']->getHostsCB()]);
 
 // append host summary to widget header
 if (empty($this->data['hostid'])) {
@@ -51,15 +51,15 @@ $applicationForm->setName('applicationForm');
 
 // create table
 $applicationTable = new CTableInfo();
-$applicationTable->setHeader(array(
-	new CColHeader(
-		new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');"),
-		'cell-width'),
+$applicationTable->setHeader([
+	(new CColHeader(
+		new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');")))->
+		addClass('cell-width'),
 	($this->data['hostid'] > 0) ? null : _('Host'),
 	make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Show'),
 	$data['showInfoColumn'] ? _('Info') : null
-));
+]);
 
 $current_time = time();
 
@@ -150,20 +150,20 @@ foreach ($this->data['applications'] as $application) {
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
-$applicationForm->addItem(array(
+$applicationForm->addItem([
 	$applicationTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'applications',
-		array(
-			'application.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected applications?')),
-			'application.massdisable' => array('name' => _('Disable'),
+		[
+			'application.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected applications?')],
+			'application.massdisable' => ['name' => _('Disable'),
 				'confirm' => _('Disable selected applications?')
-			),
-			'application.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected applications?'))
-		),
+			],
+			'application.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected applications?')]
+		],
 		$this->data['hostid']
 	)
-));
+]);
 
 // append form to widget
 $applicationWidget->addItem($applicationForm);

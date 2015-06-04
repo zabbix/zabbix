@@ -28,7 +28,7 @@ if (hasRequest('add') || hasRequest('update')) {
 	$result = true;
 	if ((!hasRequest('stepid') || (hasRequest('stepid') && getRequest('name') !== getRequest('old_name')))
 			&& hasRequest('steps_names')) {
-		foreach (getRequest('steps_names', array()) as $name) {
+		foreach (getRequest('steps_names', []) as $name) {
 			if ($name === getRequest('name')) {
 				show_error_message(_s('Step with name "%1$s" already exists.', $name));
 				$result = false;
@@ -48,7 +48,7 @@ else {
 
 if ((hasRequest('add') || hasRequest('update')) && $result) {
 
-	$httpStepForJs = array(
+	$httpStepForJs = [
 		'stepid' => getRequest('stepid'),
 		'name' => getRequest('name'),
 		'timeout' => getRequest('timeout'),
@@ -60,7 +60,7 @@ if ((hasRequest('add') || hasRequest('update')) && $result) {
 		'headers' => getRequest('headers'),
 		'follow_redirects' => getRequest('follow_redirects'),
 		'retrieve_mode'  => getRequest('retrieve_mode')
-	);
+	];
 
 	if (!hasRequest('stepid')) {
 		insert_js('add_httpstep('.CJs::encodeJson(getRequest('dstfrm')).','.
@@ -106,13 +106,13 @@ else {
 	if (hasRequest('stepid')) {
 		$httpPopupTab->setFooter(makeFormFooter(
 			new CSubmit('update', _('Update')),
-			array(new CButtonCancel(null, 'close_window();'))
+			[new CButtonCancel(null, 'close_window();')]
 		));
 	}
 	else {
 		$httpPopupTab->setFooter(makeFormFooter(
 			new CSubmit('add', _('Add')),
-			array(new CButtonCancel(null, 'close_window();'))
+			[new CButtonCancel(null, 'close_window();')]
 		));
 	}
 
