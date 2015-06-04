@@ -68,10 +68,10 @@ class CMacrosResolverHelper {
 	public static function resolveHttpTestName($hostId, $name) {
 		self::init();
 
-		$macros = self::$macrosResolver->resolve(array(
+		$macros = self::$macrosResolver->resolve([
 			'config' => 'httpTestName',
-			'data' => array($hostId => array($name))
-		));
+			'data' => [$hostId => [$name]]
+		]);
 
 		return $macros[$hostId][0];
 	}
@@ -94,7 +94,7 @@ class CMacrosResolverHelper {
 		self::init();
 
 		// agent primary ip and dns
-		$data = array();
+		$data = [];
 		foreach ($interfaces as $interface) {
 			if ($interface['type'] == INTERFACE_TYPE_AGENT && $interface['main'] == INTERFACE_PRIMARY) {
 				$data[$interface['hostid']][] = $interface['ip'];
@@ -102,10 +102,10 @@ class CMacrosResolverHelper {
 			}
 		}
 
-		$resolvedData = self::$macrosResolver->resolve(array(
+		$resolvedData = self::$macrosResolver->resolve([
 			'config' => 'hostInterfaceIpDnsAgentPrimary',
 			'data' => $data
-		));
+		]);
 
 		foreach ($resolvedData as $hostId => $texts) {
 			$n = 0;
@@ -123,7 +123,7 @@ class CMacrosResolverHelper {
 		}
 
 		// others ip and dns
-		$data = array();
+		$data = [];
 		foreach ($interfaces as $interface) {
 			if (!($interface['type'] == INTERFACE_TYPE_AGENT && $interface['main'] == INTERFACE_PRIMARY)) {
 				$data[$interface['hostid']][] = $interface['ip'];
@@ -131,10 +131,10 @@ class CMacrosResolverHelper {
 			}
 		}
 
-		$resolvedData = self::$macrosResolver->resolve(array(
+		$resolvedData = self::$macrosResolver->resolve([
 			'config' => 'hostInterfaceIpDns',
 			'data' => $data
-		));
+		]);
 
 		foreach ($resolvedData as $hostId => $texts) {
 			$n = 0;
@@ -152,15 +152,15 @@ class CMacrosResolverHelper {
 		}
 
 		// port
-		$data = array();
+		$data = [];
 		foreach ($interfaces as $interface) {
 			$data[$interface['hostid']][] = $interface['port'];
 		}
 
-		$resolvedData = self::$macrosResolver->resolve(array(
+		$resolvedData = self::$macrosResolver->resolve([
 			'config' => 'hostInterfacePort',
 			'data' => $data
-		));
+		]);
 
 		foreach ($resolvedData as $hostId => $texts) {
 			$n = 0;
@@ -187,7 +187,7 @@ class CMacrosResolverHelper {
 	 * @return string
 	 */
 	public static function resolveTriggerName(array $trigger) {
-		$macros = self::resolveTriggerNames(array($trigger));
+		$macros = self::resolveTriggerNames([$trigger]);
 		$macros = reset($macros);
 
 		return $macros['description'];
@@ -205,10 +205,10 @@ class CMacrosResolverHelper {
 	public static function resolveTriggerNames(array $triggers) {
 		self::init();
 
-		return self::$macrosResolver->resolve(array(
+		return self::$macrosResolver->resolve([
 			'config' => 'triggerName',
 			'data' => zbx_toHash($triggers, 'triggerid')
-		));
+		]);
 	}
 
 	/**
@@ -221,7 +221,7 @@ class CMacrosResolverHelper {
 	 * @return string
 	 */
 	public static function resolveTriggerDescription(array $trigger) {
-		$macros = self::resolveTriggerDescriptions(array($trigger));
+		$macros = self::resolveTriggerDescriptions([$trigger]);
 		$macros = reset($macros);
 
 		return $macros['comments'];
@@ -239,10 +239,10 @@ class CMacrosResolverHelper {
 	public static function resolveTriggerDescriptions(array $triggers) {
 		self::init();
 
-		return self::$macrosResolver->resolve(array(
+		return self::$macrosResolver->resolve([
 			'config' => 'triggerDescription',
 			'data' => zbx_toHash($triggers, 'triggerid')
-		));
+		]);
 	}
 
 	/**
@@ -259,10 +259,10 @@ class CMacrosResolverHelper {
 	public static function resolveTriggerUrl(array $triggers) {
 		self::init();
 
-		return self::$macrosResolver->resolve(array(
+		return self::$macrosResolver->resolve([
 			'config' => 'triggerUrl',
 			'data' => $triggers
-		));
+		]);
 	}
 
 	/**
@@ -275,7 +275,7 @@ class CMacrosResolverHelper {
 	 * @return string
 	 */
 	public static function resolveTriggerNameById($triggerId) {
-		$macros = self::resolveTriggerNameByIds(array($triggerId));
+		$macros = self::resolveTriggerNameByIds([$triggerId]);
 		$macros = reset($macros);
 
 		return $macros['description'];
@@ -299,10 +299,10 @@ class CMacrosResolverHelper {
 			' WHERE '.dbConditionInt('t.triggerid', $triggerIds)
 		));
 
-		return self::$macrosResolver->resolve(array(
+		return self::$macrosResolver->resolve([
 			'config' => 'triggerName',
 			'data' => zbx_toHash($triggers, 'triggerid')
-		));
+		]);
 	}
 
 	/**
@@ -339,10 +339,10 @@ class CMacrosResolverHelper {
 
 		self::init();
 
-		$triggers = self::$macrosResolver->resolve(array(
+		$triggers = self::$macrosResolver->resolve([
 			'config' => 'triggerExpressionUser',
-			'data' => zbx_toHash(array($trigger), 'triggerid')
-		));
+			'data' => zbx_toHash([$trigger], 'triggerid')
+		]);
 		$trigger = reset($triggers);
 
 		return $trigger['expression'];
@@ -360,10 +360,10 @@ class CMacrosResolverHelper {
 	public static function resolveEventDescription(array $event) {
 		self::init();
 
-		$macros = self::$macrosResolver->resolve(array(
+		$macros = self::$macrosResolver->resolve([
 			'config' => 'eventDescription',
-			'data' => array($event['triggerid'] => $event)
-		));
+			'data' => [$event['triggerid'] => $event]
+		]);
 		$macros = reset($macros);
 
 		return $macros['description'];
@@ -384,10 +384,10 @@ class CMacrosResolverHelper {
 	public static function resolveGraphName($name, array $items) {
 		self::init();
 
-		$graph = self::$macrosResolver->resolve(array(
+		$graph = self::$macrosResolver->resolve([
 			'config' => 'graphName',
-			'data' => array(array('name' => $name, 'items' => $items))
-		));
+			'data' => [['name' => $name, 'items' => $items]]
+		]);
 		$graph = reset($graph);
 
 		return $graph['name'];
@@ -408,16 +408,16 @@ class CMacrosResolverHelper {
 	public static function resolveGraphNameByIds(array $data) {
 		self::init();
 
-		$graphIds = array();
-		$graphMap = array();
+		$graphIds = [];
+		$graphMap = [];
 		foreach ($data as $graph) {
 			// skip graphs without macros
 			if (strpos($graph['name'], '{') !== false) {
-				$graphMap[$graph['graphid']] = array(
+				$graphMap[$graph['graphid']] = [
 					'graphid' => $graph['graphid'],
 					'name' => $graph['name'],
-					'items' => array()
-				);
+					'items' => []
+				];
 				$graphIds[$graph['graphid']] = $graph['graphid'];
 			}
 		}
@@ -432,13 +432,13 @@ class CMacrosResolverHelper {
 		));
 
 		foreach ($items as $item) {
-			$graphMap[$item['graphid']]['items'][] = array('hostid' => $item['hostid'], 'host' => $item['host']);
+			$graphMap[$item['graphid']]['items'][] = ['hostid' => $item['hostid'], 'host' => $item['host']];
 		}
 
-		$graphMap = self::$macrosResolver->resolve(array(
+		$graphMap = self::$macrosResolver->resolve([
 			'config' => 'graphName',
 			'data' => $graphMap
-		));
+		]);
 
 		$resolvedGraph = reset($graphMap);
 		foreach ($data as &$graph) {
@@ -554,14 +554,14 @@ class CMacrosResolverHelper {
 	public static function resolveScreenElementURL(array $screenElement) {
 		self::init();
 
-		$macros = self::$macrosResolver->resolve(array(
+		$macros = self::$macrosResolver->resolve([
 			'config' => $screenElement['config'],
-			'data' => array(
-				$screenElement['hostid'] => array(
+			'data' => [
+				$screenElement['hostid'] => [
 					'url' => $screenElement['url']
-				)
-			)
-		));
+				]
+			]
+		]);
 		$macros = reset($macros);
 
 		return $macros['url'];

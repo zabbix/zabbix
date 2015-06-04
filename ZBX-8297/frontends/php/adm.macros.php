@@ -27,25 +27,25 @@ $page['file'] = 'adm.macros.php';
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'macros'		=> array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
+$fields = [
+	'macros'		=> [T_ZBX_STR, O_OPT, P_SYS,			null,	null],
 	// actions
-	'update'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'form_refresh'	=> array(T_ZBX_INT, O_OPT,	null,	null,	null)
-);
+	'update'		=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'form_refresh'	=> [T_ZBX_INT, O_OPT,	null,	null,	null]
+];
 check_fields($fields);
 
 /*
  * Actions
  */
 if (hasRequest('update')) {
-	$dbMacros = API::UserMacro()->get(array(
-		'output' => array('globalmacroid', 'macro', 'value'),
+	$dbMacros = API::UserMacro()->get([
+		'output' => ['globalmacroid', 'macro', 'value'],
 		'globalmacro' => true,
 		'preservekeys' => true
-	));
+	]);
 
-	$macros = getRequest('macros', array());
+	$macros = getRequest('macros', []);
 
 	// remove empty new macro lines
 	foreach ($macros as $idx => $macro) {
@@ -61,7 +61,7 @@ if (hasRequest('update')) {
 	unset($macro);
 
 	// update
-	$macrosToUpdate = array();
+	$macrosToUpdate = [];
 	foreach ($macros as $idx => $macro) {
 		if (array_key_exists('globalmacroid', $macro) && array_key_exists($macro['globalmacroid'], $dbMacros)) {
 			$dbMacro = $dbMacros[$macro['globalmacroid']];
@@ -111,16 +111,16 @@ if (hasRequest('update')) {
 /*
  * Display
  */
-$data = array();
+$data = [];
 
 if (hasRequest('form_refresh')) {
-	$data['macros'] = getRequest('macros', array());
+	$data['macros'] = getRequest('macros', []);
 }
 else {
-	$data['macros'] = API::UserMacro()->get(array(
-		'output' => array('globalmacroid', 'macro', 'value'),
+	$data['macros'] = API::UserMacro()->get([
+		'output' => ['globalmacroid', 'macro', 'value'],
 		'globalmacro' => true
-	));
+	]);
 	$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
 }
 

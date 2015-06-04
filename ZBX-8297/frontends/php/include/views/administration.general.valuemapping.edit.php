@@ -31,14 +31,15 @@ $valueMappingFormList = new CFormList('valueMappingFormList');
 
 // name
 $nameTextBox = new CTextBox('mapname', $this->data['mapname'], 40, false, 64);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $valueMappingFormList->addRow(_('Name'), $nameTextBox);
 
 // mappings
-$mappingsTable = new CTable(SPACE, 'formElementTable');
-$mappingsTable->setAttribute('id', 'mappingsTable');
-$mappingsTable->addRow(array(_('Value'), SPACE, _('Mapped to'), SPACE));
-$mappingsTable->addRow(new CCol(new CButton('addMapping', _('Add'), '', 'link_menu'), null, 4));
+$mappingsTable = (new CTable(SPACE))->
+	addClass('formElementTable')->
+	setAttribute('id', 'mappingsTable')->
+	addRow([_('Value'), SPACE, _('Mapped to'), SPACE])->
+	addRow((new CCol(new CButton('addMapping', _('Add'), '', 'link_menu')))->setColSpan(4));
 $valueMappingFormList->addRow(_('Mappings'), new CDiv($mappingsTable, 'border_dotted inlineblock objectgroup'));
 
 // add mappings to form by js
@@ -57,16 +58,16 @@ $valueMappingTab->addTab('valuemapping', _('Value mapping'), $valueMappingFormLi
 if (!empty($this->data['valuemapid'])) {
 	$valueMappingTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CButtonDelete($this->data['confirmMessage'], url_param('valuemapid')),
 			new CButtonCancel()
-		)
+		]
 	));
 }
 else {
 	$valueMappingTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 

@@ -30,7 +30,7 @@ class CTree {
 	private $size;
 	private $maxlevel;
 
-	public function __construct($treename, $value = array(), $fields = array()) {
+	public function __construct($treename, $value = [], $fields = []) {
 		$this->maxlevel = 0;
 		$this->tree = $value;
 		$this->fields = $fields;

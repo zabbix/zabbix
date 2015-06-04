@@ -57,7 +57,7 @@ class CSimpleButton extends CTag implements CButtonInterface {
 			$this->removeAttribute('disabled');
 		}
 		else {
-			$this->attr('disabled', 'disabled');
+			$this->setAttribute('disabled', 'disabled');
 		}
 	}
 

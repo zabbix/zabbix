@@ -27,18 +27,18 @@ $page['file'] = 'report4.php';
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'year' =>		array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO,	null,	null),
-	'period' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_NZERO,	IN('"daily","weekly","monthly","yearly"'), null),
-	'media_type' =>	array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	null)
-);
+$fields = [
+	'year' =>		[T_ZBX_INT, O_OPT, P_SYS|P_NZERO,	null,	null],
+	'period' =>		[T_ZBX_STR, O_OPT, P_SYS|P_NZERO,	IN('"daily","weekly","monthly","yearly"'), null],
+	'media_type' =>	[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	null]
+];
 check_fields($fields);
 
 if (getRequest('media_type')) {
-	$mediaTypeData = API::MediaType()->get(array(
-		'mediatypeids' => array($_REQUEST['media_type']),
+	$mediaTypeData = API::MediaType()->get([
+		'mediatypeids' => [$_REQUEST['media_type']],
 		'countOutput' => true
-	));
+	]);
 	if (!$mediaTypeData) {
 		access_deny ();
 	}
@@ -55,7 +55,7 @@ $_REQUEST['media_type'] = $media_type;
 $currentYear = date('Y');
 
 // fetch media types
-$media_types = array();
+$media_types = [];
 $db_media_types = DBselect('SELECT mt.* FROM media_type mt ORDER BY mt.description');
 
 while ($media_type_data = DBfetch($db_media_types)) {
@@ -102,12 +102,12 @@ else {
 	$controls->addItem($cmbMedia);
 
 	$controls->addItem(SPACE._('Period').SPACE);
-	$controls->addItem(new CComboBox('period', $period, 'submit()', array(
+	$controls->addItem(new CComboBox('period', $period, 'submit()', [
 		'daily' => _('Daily'),
 		'weekly' => _('Weekly'),
 		'monthly' => _('Monthly'),
 		'yearly' => _('Yearly')
-	)));
+	]));
 
 	if ($period != 'yearly') {
 		$controls->addItem(SPACE._('Year').SPACE);
@@ -121,14 +121,14 @@ else {
 	$form->addItem($controls);
 	$widget->setControls($form);
 
-	$header = array();
+	$header = [];
 	$db_users = DBselect('SELECT u.* FROM users u ORDER BY u.alias,u.userid');
 	while ($user_data = DBfetch($db_users)) {
-		$header[] = new CColHeader($user_data['alias'], 'vertical_rotation');
+		$header[] = (new CColHeader($user_data['alias']))->addClass('vertical_rotation');
 		$users[$user_data['userid']] = $user_data['alias'];
 	}
 
-	$intervals = array();
+	$intervals = [];
 	switch ($period) {
 		case 'yearly':
 			$minTime = mktime(0, 0, 0, 1, 1, $minYear);
@@ -189,24 +189,24 @@ else {
 	$maxTime = ($year == $currentYear) ? time() : mktime(0, 0, 0, 1, 1, $year + 1);
 
 	// fetch alerts
-	$alerts = array();
+	$alerts = [];
 	foreach (eventSourceObjects() as $sourceObject) {
-		$alerts = array_merge($alerts, API::Alert()->get(array(
-			'output' => array('mediatypeid', 'userid', 'clock'),
+		$alerts = array_merge($alerts, API::Alert()->get([
+			'output' => ['mediatypeid', 'userid', 'clock'],
 			'eventsource' => $sourceObject['source'],
 			'eventobject' => $sourceObject['object'],
 			'mediatypeids' => (getRequest('media_type')) ? getRequest('media_type') : null,
 			'time_from' => $minTime,
 			'time_till' => $maxTime
-		)));
+		]));
 	}
 	// sort alerts in chronological order so we could easily iterate through them later
-	CArrayHelper::sort($alerts, array('clock'));
+	CArrayHelper::sort($alerts, ['clock']);
 
 	$table->setHeader($header, 'vertical_header');
 	foreach ($intervals as $from => $till) {
 		// interval start
-		$row = array(zbx_date2str($dateFormat, $from));
+		$row = [zbx_date2str($dateFormat, $from)];
 
 		// interval end, displayed only for week intervals
 		if ($period == 'weekly') {
@@ -214,11 +214,11 @@ else {
 		}
 
 		// counting alert count for each user and media type
-		$summary = array();
+		$summary = [];
 		foreach ($users as $userid => $alias) {
-			$summary[$userid] = array();
+			$summary[$userid] = [];
 			$summary[$userid]['total'] = 0;
-			$summary[$userid]['medias'] = array();
+			$summary[$userid]['medias'] = [];
 			foreach ($media_types as $media_type_nr => $mt) {
 				$summary[$userid]['medias'][$media_type_nr] = 0;
 			}
@@ -248,7 +248,7 @@ else {
 				array_push($row, '');
 			}
 			else {
-				array_push($row, array($s['total'], ($media_type == 0) ? SPACE.'('.implode('/', $s['medias']).')' : ''));
+				array_push($row, [$s['total'], ($media_type == 0) ? SPACE.'('.implode('/', $s['medias']).')' : '']);
 			}
 		}
 
@@ -260,14 +260,14 @@ else {
 	if ($media_type == 0) {
 		echo BR();
 
-		$links = array();
+		$links = [];
 		foreach ($media_types as $id => $description) {
 			$links[] = new CLink($description, 'zabbix.php?action=mediatype.edit&mediatypeid='.$id);
 			$links[] = SPACE.'/'.SPACE;
 		}
 		array_pop($links);
 
-		$linksDiv = new CDiv(array(SPACE._('all').SPACE.'('.SPACE, $links, SPACE.')'));
+		$linksDiv = new CDiv([SPACE._('all').SPACE.'('.SPACE, $links, SPACE.')']);
 		$linksDiv->show();
 	}
 }

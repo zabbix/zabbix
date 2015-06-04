@@ -29,84 +29,84 @@ class CServicesSlaCalculatorTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testCalculateSlaProvider() {
-		return array(
-			array(
-				array(
-					array(
+		return [
+			[
+				[
+					[
 						'clock' => strtotime('30 March 2014 3:00'),
 						'value' => 3
-					),
-					array(
+					],
+					[
 						'clock' => strtotime('30 March 2014 6:00'),
 						'value' => 0
-					),
-				),
-				array(
+					],
+				],
+				[
 					// downtime during DST
-					array(
+					[
 						'type' => SERVICE_TIME_TYPE_DOWNTIME,
 						'ts_from' => 10800,
 						'ts_to' => 18000
-					)
-				),
+					]
+				],
 				strtotime('30 March 2014 0:00'),
 				strtotime('30 March 2014 24:00'),
 				0,
-				array(
-					'dt' => array(
+				[
+					'dt' => [
 						'problemTime' => 3600,
 						'okTime' => 0
-					),
-					'ut' => array(
+					],
+					'ut' => [
 						'problemTime' => 3600,
 						'okTime' => 75600
-					),
+					],
 					'problemTime' => 3600,
 					'okTime' => 75600,
 					'downtimeTime' => 3600,
 					'problem' => 4.5454545454545,
 					'ok' => 95.454545454545
-				)
-			),
-			array(
-				array(
-					array(
+				]
+			],
+			[
+				[
+					[
 						'clock' => strtotime('30 March 2014 3:00'),
 						'value' => 3
-					),
-					array(
+					],
+					[
 						'clock' => strtotime('30 March 2014 6:00'),
 						'value' => 0
-					),
-				),
-				array(
+					],
+				],
+				[
 					// downtime during DST
-					array(
+					[
 						'type' => SERVICE_TIME_TYPE_DOWNTIME,
 						'ts_from' => 10800,
 						'ts_to' => 18000
-					)
-				),
+					]
+				],
 				strtotime('1 March 2014 0:00'),
 				strtotime('30 March 2014 24:00'),
 				0,
-				array(
-					'dt' => array(
+				[
+					'dt' => [
 						'problemTime' => 3600,
 						'okTime' => 28800
-					),
-					'ut' => array(
+					],
+					'ut' => [
 						'problemTime' => 3600,
 						'okTime' => 2552400
-					),
+					],
 					'problemTime' => 3600,
 					'okTime' => 2552400,
 					'downtimeTime' => 32400,
 					'problem' => 0.14084507042254,
 					'ok' => 99.859154929577
-				)
-			)
-		);
+				]
+			]
+		];
 	}
 
 	/**

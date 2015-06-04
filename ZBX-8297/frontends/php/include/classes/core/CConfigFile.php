@@ -27,7 +27,7 @@ class CConfigFile {
 	const CONFIG_FILE_PATH = '/conf/zabbix.conf.php';
 
 	public $configFile = null;
-	public $config = array();
+	public $config = [];
 	public $error = '';
 
 	private static function exception($error, $code = self::CONFIG_ERROR) {
@@ -59,7 +59,7 @@ class CConfigFile {
 		ob_end_clean();
 
 		// config file in plain php is bad
-		$dbs = array(ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ORACLE, ZBX_DB_DB2, ZBX_DB_SQLITE3);
+		$dbs = [ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ORACLE, ZBX_DB_DB2, ZBX_DB_SQLITE3];
 		if (!isset($DB['TYPE'])) {
 			self::exception('DB type is not set.');
 		}
@@ -175,7 +175,7 @@ $IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
 	}
 
 	protected function setDefaults() {
-		$this->config['DB'] = array(
+		$this->config['DB'] = [
 			'TYPE' => null,
 			'SERVER' => 'localhost',
 			'PORT' => '0',
@@ -183,14 +183,14 @@ $IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
 			'USER' => '',
 			'PASSWORD' => '',
 			'SCHEMA' => ''
-		);
+		];
 		$this->config['ZBX_SERVER'] = 'localhost';
 		$this->config['ZBX_SERVER_PORT'] = '10051';
 		$this->config['ZBX_SERVER_NAME'] = '';
 	}
 
 	protected function check() {
-		$dbs = array(ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ORACLE, ZBX_DB_DB2, ZBX_DB_SQLITE3);
+		$dbs = [ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ORACLE, ZBX_DB_DB2, ZBX_DB_SQLITE3];
 
 		if (!isset($this->config['DB']['TYPE'])) {
 			self::exception('DB type is not set.');
