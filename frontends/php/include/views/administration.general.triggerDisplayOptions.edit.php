@@ -25,54 +25,54 @@ $triggerDOFormList = new CFormList();
 
 $headerDiv = new CDiv(_('Colour'), 'inlineblock trigger_displaying_form_col');
 $headerDiv->addStyle('margin-left: 2px;');
-$triggerDOFormList->addRow(SPACE, array($headerDiv, _('Blinking')));
+$triggerDOFormList->addRow(SPACE, [$headerDiv, _('Blinking')]);
 
 // Unacknowledged problem events
 $triggerDOFormList->addRow(
 	_('Unacknowledged PROBLEM events'),
-	array(
+	[
 		new CDiv(
 			new CColor('problem_unack_color', $data['problem_unack_color']),
 			'inlineblock trigger_displaying_form_col'
 		),
 		new CCheckBox('problem_unack_style', $data['problem_unack_style'] == 1, null, 1)
-	)
+	]
 );
 
 // Acknowledged problem events
 $triggerDOFormList->addRow(
 	_('Acknowledged PROBLEM events'),
-	array(
+	[
 		new CDiv(
 			new CColor('problem_ack_color', $data['problem_ack_color']),
 			'inlineblock trigger_displaying_form_col'
 		),
 		new CCheckBox('problem_ack_style', $data['problem_ack_style'] == 1, null, 1)
-	)
+	]
 );
 
 // Unacknowledged recovery events
 $triggerDOFormList->addRow(
 	_('Unacknowledged OK events'),
-	array(
+	[
 		new CDiv(
 			new CColor('ok_unack_color', $data['ok_unack_color']),
 			'inlineblock trigger_displaying_form_col'
 		),
 		new CCheckBox('ok_unack_style', $data['ok_unack_style'] == 1, null, 1)
-	)
+	]
 );
 
 // Acknowledged recovery events
 $triggerDOFormList->addRow(
 	_('Acknowledged OK events'),
-	array(
+	[
 		new CDiv(
 			new CColor('ok_ack_color', $data['ok_ack_color']),
 			'inlineblock trigger_displaying_form_col'
 		),
 		new CCheckBox('ok_ack_style', $data['ok_ack_style'] == 1, null, 1)
-	)
+	]
 );
 
 // some air between the sections
@@ -82,13 +82,13 @@ $triggerDOFormList->addRow(BR());
 $okPeriodTextBox = new CTextBox('ok_period', $data['ok_period']);
 $okPeriodTextBox->addStyle('width: 4em;');
 $okPeriodTextBox->setAttribute('maxlength', '6');
-$triggerDOFormList->addRow(_('Display OK triggers for'), array($okPeriodTextBox, SPACE, _('seconds')));
+$triggerDOFormList->addRow(_('Display OK triggers for'), [$okPeriodTextBox, SPACE, _('seconds')]);
 
 // Triggers blink on status change
 $okPeriodTextBox = new CTextBox('blink_period', $data['blink_period']);
 $okPeriodTextBox->addStyle('width: 4em;');
 $okPeriodTextBox->setAttribute('maxlength', '6');
-$triggerDOFormList->addRow(_('On status change triggers blink for'), array($okPeriodTextBox, SPACE, _('seconds')));
+$triggerDOFormList->addRow(_('On status change triggers blink for'), [$okPeriodTextBox, SPACE, _('seconds')]);
 
 $severityView = new CTabView();
 $severityView->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFormList);
@@ -98,7 +98,7 @@ $severityForm->setName('triggerDisplayOptions');
 
 $severityView->setFooter(makeFormFooter(
 	new CSubmit('update', _('Update')),
-	array(new CButton('resetDefaults', _('Reset defaults')))
+	[new CButton('resetDefaults', _('Reset defaults'))]
 ));
 
 $severityForm->addItem($severityView);

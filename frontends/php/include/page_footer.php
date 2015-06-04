@@ -49,7 +49,7 @@ if (isset($DB) && isset($DB['TRANSACTIONS']) && $DB['TRANSACTIONS'] != 0) {
 
 show_messages();
 
-if (in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))) {
+if (in_array($page['type'], [PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML])) {
 	if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode']) && CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 		CProfiler::getInstance()->stop();
 		CProfiler::getInstance()->show();
@@ -58,12 +58,9 @@ if (in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))) {
 
 if ($page['type'] == PAGE_TYPE_HTML) {
 	// end of article div
-	echo '<div class="article">'."\n";
+	echo '</div>'."\n";
 	if (!defined('ZBX_PAGE_NO_MENU')) {
-		echo '<div class="footer">'."\n";
-		echo '<a href="http://www.zabbix.com" target="_blank" class="logo"></a>'."\n";
-		echo 'Zabbix '.ZABBIX_VERSION.'. &copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', <a href="http://www.zabbix.com" target="_blank">Zabbix SIA</a>'."\n";
-		echo '</div>'."\n";
+		makePageFooter()->show();
 	}
 	insertPagePostJs();
 	require_once 'include/views/js/common.init.js.php';

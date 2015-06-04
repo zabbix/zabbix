@@ -25,8 +25,9 @@ class CTriggersInfo extends CTable {
 	private $groupid;
 
 	public function __construct($groupid) {
-		parent::__construct(null, 'list-table');
+		parent::__construct();
 
+		$this->addClass(ZBX_STYLE_LIST_TABLE);
 		$this->groupid = $groupid;
 	}
 

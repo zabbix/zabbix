@@ -32,18 +32,18 @@ $mediaTypeForm->addVar('mediatypeid', $data['mediatypeid']);
 // create form list
 $mediaTypeFormList = new CFormList('mediaTypeFormList');
 $nameTextBox = new CTextBox('description', $data['description'], ZBX_TEXTBOX_STANDARD_SIZE, false, 100);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $mediaTypeFormList->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
-$cmbType = new CComboBox('type', $data['type'], null, array(
+$cmbType = new CComboBox('type', $data['type'], null, [
 	MEDIA_TYPE_EMAIL => _('Email'),
 	MEDIA_TYPE_EXEC => _('Script'),
 	MEDIA_TYPE_SMS => _('SMS'),
 	MEDIA_TYPE_JABBER => _('Jabber')
-));
-$cmbType->addItemsInGroup(_('Commercial'), array(MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')));
-$cmbTypeRow = array($cmbType);
+]);
+$cmbType->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')]);
+$cmbTypeRow = [$cmbType];
 $ez_texting_link = new CLink('https://app.eztexting.com', 'https://app.eztexting.com/', null, null, 'nosid');
 $ez_texting_link->setAttribute('id', 'eztext_link');
 $ez_texting_link->setTarget('_blank');
@@ -62,7 +62,7 @@ if ($data['passwd'] != '') {
 	$passwdButton = new CButton('chPass_btn', _('Change password'), 'this.style.display="none"; $("passwd").enable().show().focus();');
 	$passwdBox = new CPassBox('passwd', $data['passwd'], ZBX_TEXTBOX_SMALL_SIZE);
 	$passwdBox->addStyle('display: none;');
-	$passwdField = array($passwdButton, $passwdBox);
+	$passwdField = [$passwdButton, $passwdBox];
 }
 else {
 	$passwdField = new CPassBox('passwd', '', ZBX_TEXTBOX_SMALL_SIZE);
@@ -72,10 +72,10 @@ else {
 $mediaTypeFormList->addRow(_('Jabber identifier'), new CTextBox('jabber_username', $data['jabber_username'], ZBX_TEXTBOX_STANDARD_SIZE));
 $mediaTypeFormList->addRow(_('Username'), new CTextBox('eztext_username', $data['eztext_username'], ZBX_TEXTBOX_STANDARD_SIZE));
 $mediaTypeFormList->addRow(_('Password'), $passwdField);
-$mediaTypeFormList->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['exec_path'], null, array(
+$mediaTypeFormList->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['exec_path'], null, [
 	EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
 	EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
-)));
+]));
 
 $mediaTypeFormList->addRow(_('Enabled'), new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE == $data['status'], null, MEDIA_TYPE_STATUS_ACTIVE));
 
@@ -93,7 +93,7 @@ if ($data['mediatypeid'] == 0) {
 
 	$mediaTypeTab->setFooter(makeFormFooter(
 		$addButton,
-		array($cancelButton)
+		[$cancelButton]
 	));
 }
 else {
@@ -109,11 +109,11 @@ else {
 
 	$mediaTypeTab->setFooter(makeFormFooter(
 		$updateButton,
-		array(
+		[
 			$cloneButton,
 			$deleteButton,
 			$cancelButton
-		)
+		]
 	));
 }
 

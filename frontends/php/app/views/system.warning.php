@@ -30,8 +30,9 @@ $buttons = [new CButton('back', _('Go to dashboard'),
 
 echo '<body>';
 
-(new CDiv(new CWarning(_('Fatal error, please report to the Zabbix team'), $data['messages'], $buttons), 'article'))->
-	show();
+(new CDiv(
+	new CWarning(_('Fatal error, please report to the Zabbix team'), $data['messages'], $buttons), ZBX_STYLE_ARTICLE
+))->show();
 
 echo '</body>';
 echo '</html>';

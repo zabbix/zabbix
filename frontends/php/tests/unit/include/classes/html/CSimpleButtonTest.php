@@ -22,25 +22,25 @@
 class CSimpleButtonTest extends CTagTest {
 
 	public function constructProvider() {
-		return array(
-			array(
-				array(),
+		return [
+			[
+				[],
 				'<button class="button button-plain shadow ui-corner-all" type="button"></button>'
-			),
-			array(
-				array('caption'),
+			],
+			[
+				['caption'],
 				'<button class="button button-plain shadow ui-corner-all" type="button">caption</button>'
-			),
-			array(
-				array('caption', 'my-class'),
+			],
+			[
+				['caption', 'my-class'],
 				'<button class="button my-class" type="button">caption</button>'
-			),
+			],
 			// value encoding
-			array(
-				array('</button>'),
+			[
+				['</button>'],
 				'<button class="button button-plain shadow ui-corner-all" type="button">&lt;/button&gt;</button>'
-			),
-		);
+			],
+		];
 	}
 
 	public function testSetEnabled() {

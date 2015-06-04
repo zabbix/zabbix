@@ -22,18 +22,18 @@
 class CControllerDashboardSort extends CController {
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'grid' =>	'fatal|required|json'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$widgets = array(
+			$widgets = [
 				WIDGET_SYSTEM_STATUS, WIDGET_ZABBIX_STATUS, WIDGET_LAST_ISSUES, WIDGET_WEB_OVERVIEW,
 				WIDGET_DISCOVERY_STATUS, WIDGET_HOST_STATUS, WIDGET_FAVOURITE_GRAPHS, WIDGET_FAVOURITE_MAPS,
 				WIDGET_FAVOURITE_SCREENS
-			);
+			];
 
 			/*
 			 * {
@@ -97,9 +97,9 @@ class CControllerDashboardSort extends CController {
 			}
 		}
 
-		$data = array(
+		$data = [
 			'main_block' => ''
-		);
+		];
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

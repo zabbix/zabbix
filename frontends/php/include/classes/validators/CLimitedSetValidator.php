@@ -26,7 +26,7 @@ class CLimitedSetValidator extends CValidator {
 	 *
 	 * @var array
 	 */
-	public $values = array();
+	public $values = [];
 
 	/**
 	 * Error message if the value is invalid or is not of an acceptable type.

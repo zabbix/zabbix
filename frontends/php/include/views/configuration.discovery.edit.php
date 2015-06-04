@@ -34,7 +34,7 @@ if (!empty($this->data['druleid'])) {
 // create form list
 $discoveryFormList = new CFormList();
 $nameTextBox = new CTextBox('name', $this->data['drule']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $discoveryFormList->addRow(_('Name'), $nameTextBox);
 
 // append proxy to form list
@@ -48,16 +48,11 @@ $discoveryFormList->addRow(_('IP range'), new CTextBox('iprange', $this->data['d
 $discoveryFormList->addRow(_('Delay (in sec)'), new CNumericBox('delay', $this->data['drule']['delay'], 8));
 
 // append checks to form list
-$checkTable = new CTable(null, 'formElementTable');
-$checkTable->addRow(new CRow(
-	new CCol(
-		new CButton('newCheck', _('New'), null, 'link_menu'),
-		null,
-		2
-	),
-	null,
-	'dcheckListFooter'
-));
+$checkTable = (new CTable())->addClass('formElementTable');
+$checkTable->addRow((new CRow(
+	(new CCol(new CButton('newCheck', _('New'), null, 'link_menu')))->
+		setColSpan(2)))->setId('dcheckListFooter')
+);
 $discoveryFormList->addRow(_('Checks'),
 	new CDiv($checkTable, 'objectgroup inlineblock border_dotted ui-corner-all', 'dcheckList'));
 
@@ -83,17 +78,17 @@ if (isset($this->data['druleid']))
 {
 	$discoveryTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete discovery rule?'), url_param('form').url_param('druleid')),
 			new CButtonCancel()
-		)
+		]
 	));
 }
 else {
 	$discoveryTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 

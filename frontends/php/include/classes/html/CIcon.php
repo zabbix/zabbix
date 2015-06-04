@@ -25,7 +25,7 @@ class CIcon extends CSpan {
 		parent::__construct(null, $class.' menu_icon shadow');
 
 		if ($title !== null) {
-			$this->attr('title', $title);
+			$this->setAttribute('title', $title);
 		}
 	}
 }

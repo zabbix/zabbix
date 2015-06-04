@@ -54,135 +54,135 @@ class testFormGraph extends CWebTest {
 
 	// Returns layout data
 	public static function layout() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'graphtype' => 'Normal',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'graphtype' => 'Stacked',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed' ,
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Fixed',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Item',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'graphtype' => 'Pie',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'graphtype' => 'Exploded',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'form' => 'testFormGraph1'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'form' => 'testInheritanceGraph1'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Template inheritance test host',
 					'templatedHost' => 'Inheritance test template',
 					'form' => 'testInheritanceGraph1'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'graphtype' => 'Normal',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'graphtype' => 'Stacked',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed' ,
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Fixed',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Item',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'graphtype' => 'Pie',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'graphtype' => 'Exploded',
 					'template' => 'Inheritance test template'
-				)
-			)
-		);
+				]
+			]
+		];
 	}
 
 	/**
@@ -271,12 +271,12 @@ class testFormGraph extends CWebTest {
 
 		$this->zbxTestTextPresent('Graph type');
 		$this->assertVisible('graphtype');
-		$this->zbxTestDropdownHasOptions('graphtype', array(
+		$this->zbxTestDropdownHasOptions('graphtype', [
 			'Normal',
 			'Stacked',
 			'Pie',
 			'Exploded'
-		));
+		]);
 		if (!isset($data['form'])) {
 			$this->assertAttribute("//*[@id='graphtype']/option[text()='Normal']/@selected", 'selected');
 		}
@@ -392,11 +392,11 @@ class testFormGraph extends CWebTest {
 		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
 			$this->zbxTestTextPresent('Y axis MIN value');
 			$this->assertVisible('ymin_type');
-			$this->zbxTestDropdownHasOptions('ymin_type', array(
+			$this->zbxTestDropdownHasOptions('ymin_type', [
 				'Calculated',
 				'Fixed',
 				'Item'
-			));
+			]);
 
 			if (isset($data['templatedHost'])) {
 				$this->assertAttribute("//select[@id='ymin_type']/@disabled", 'disabled');
@@ -421,11 +421,11 @@ class testFormGraph extends CWebTest {
 
 			$this->zbxTestTextPresent('Y axis MAX value');
 			$this->assertVisible('ymax_type');
-			$this->zbxTestDropdownHasOptions('ymax_type', array(
+			$this->zbxTestDropdownHasOptions('ymax_type', [
 				'Calculated',
 				'Fixed',
 				'Item'
-			));
+			]);
 
 			if (isset($data['templatedHost'])) {
 				$this->assertAttribute("//select[@id='ymax_type']/@disabled", 'disabled');
@@ -540,14 +540,14 @@ class testFormGraph extends CWebTest {
 
 			switch ($graphtype) {
 				case 'Normal':
-					$this->zbxTestTextPresent(array('Items', 'Name', 'Function', 'Draw style', 'Y axis side', 'Colour', 'Action'));
+					$this->zbxTestTextPresent(['Items', 'Name', 'Function', 'Draw style', 'Y axis side', 'Colour', 'Action']);
 					break;
 				case 'Stacked':
-					$this->zbxTestTextPresent(array('Items', 'Name', 'Function', 'Y axis side', 'Colour', 'Action'));
+					$this->zbxTestTextPresent(['Items', 'Name', 'Function', 'Y axis side', 'Colour', 'Action']);
 					break;
 				case 'Pie':
 				case 'Exploded':
-					$this->zbxTestTextPresent(array('Items', 'Name', 'Type', 'Function', 'Colour', 'Action'));
+					$this->zbxTestTextPresent(['Items', 'Name', 'Type', 'Function', 'Colour', 'Action']);
 					break;
 			}
 		}
@@ -621,167 +621,167 @@ class testFormGraph extends CWebTest {
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graphs');
-		$this->zbxTestTextPresent(array(
+		$this->zbxTestTextPresent([
 			'Graph updated',
 			$data['name'],
 			'GRAPHS'
-		));
+		]);
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
 
 	// Returns create data
 	public static function create() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'expected' => TEST_BAD,
-					'errors' => array(
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.'
-					)
-				)
-			),
-			array(
-				array(
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'graphSaveCheck',
-					'addItems' => array(
-						array('itemName' => 'testFormItem', 'remove' => true),
-						array('itemName' => 'testFormItem')
-					),
+					'addItems' => [
+						['itemName' => 'testFormItem', 'remove' => true],
+						['itemName' => 'testFormItem']
+					],
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'graphSaveCheck',
-					'addItems' => array(
-						array('itemName' => 'testFormItem')
-					),
-					'errors' => array(
+					'addItems' => [
+						['itemName' => 'testFormItem']
+					],
+					'errors' => [
 						'ERROR: Cannot add graph',
 						'Graph with name "graphSaveCheck" already exists in graphs or graph prototypes.'
-					)
-				)
-			),
-			array(
-				array(
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'graphSaveCheck',
-					'errors' => array(
+					'errors' => [
 						'ERROR: Cannot add graph',
 						'Missing items for graph "graphSaveCheck".'
-					)
-				)
-			),
-			array(
-				array(
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'graphNormal1',
-					'addItems' => array(
-						array('itemName' => 'testFormItem')
-					),
+					'addItems' => [
+						['itemName' => 'testFormItem']
+					],
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
 					'ymax_name' => 'testFormItem',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'graphNormal2',
-					'addItems' => array(
-						array('itemName' => 'testFormItem')
-					),
+					'addItems' => [
+						['itemName' => 'testFormItem']
+					],
 					'ymin_type' => 'Item',
 					'ymin_name' => 'testFormItem',
 					'ymax_type' => 'Item',
 					'ymax_name' => 'testFormItem',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'graphNormal3',
-					'addItems' => array(
-						array('itemName' => 'testFormItem')
-					),
+					'addItems' => [
+						['itemName' => 'testFormItem']
+					],
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
 					'ymax_name' => 'testFormItem',
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'graphNormal4',
 					'graphtype' => 'Normal',
-					'addItems' => array(
-						array('itemName' => 'testFormItem')
-					)
-				)
-			),
-			array(
-				array(
+					'addItems' => [
+						['itemName' => 'testFormItem']
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'graphStacked1',
 					'graphtype' => 'Stacked',
-					'addItems' => array(
-						array('itemName' => 'testFormItem')
-					)
-				)
-			),
-			array(
-				array(
+					'addItems' => [
+						['itemName' => 'testFormItem']
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'graphStacked2',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed' ,
-					'addItems' => array(
-						array('itemName' => 'testFormItem')
-					)
-				)
-			),
-			array(
-				array(
+					'addItems' => [
+						['itemName' => 'testFormItem']
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'graphStacked3',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
 					'ymin_name' => 'testFormItem',
 					'ymax_type' => 'Fixed',
-					'addItems' => array(
-						array('itemName' => 'testFormItem')
-					)
-				)
-			),
-			array(
-				array(
+					'addItems' => [
+						['itemName' => 'testFormItem']
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'graphStacked',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Fixed',
-					'addItems' => array(
-						array('itemName' => 'testFormItem')
-					),
-					'errors' => array(
+					'addItems' => [
+						['itemName' => 'testFormItem']
+					],
+					'errors' => [
 						'ERROR: Cannot add graph',
 						'No permissions to referred object or it does not exist!'
-					)
-				)
-			),
-			array(
-				array(
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'graphStacked',
 					'width' => 'name',
@@ -791,20 +791,20 @@ class testFormGraph extends CWebTest {
 					'yaxismin' => 'name',
 					'ymax_type' => 'Fixed',
 					'yaxismax' => 'name',
-					'addItems' => array(
-						array('itemName' => 'testFormItem')
-					),
-					'errors' => array(
+					'addItems' => [
+						['itemName' => 'testFormItem']
+					],
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value "0" for "Width" field: must be between 20 and 65535.',
 						'Incorrect value "0" for "Height" field: must be between 20 and 65535.',
 						'Value "name" of "yaxismin" has incorrect decimal format.',
 						'Value "name" of "yaxismax" has incorrect decimal format.'
-					)
-				)
-			),
-			array(
-				array(
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'graphStacked',
 					'width' => '65536',
@@ -812,49 +812,49 @@ class testFormGraph extends CWebTest {
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Fixed',
-					'addItems' => array(
-						array('itemName' => 'testFormItem')
-					),
-					'errors' => array(
+					'addItems' => [
+						['itemName' => 'testFormItem']
+					],
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value "65536" for "Width" field: must be between 20 and 65535.',
 						'Incorrect value "-22" for "Height" field: must be between 20 and 65535.'
-					)
-				)
-			),
-			array(
-				array(
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'graphPie',
 					'graphtype' => 'Pie',
-					'addItems' => array(
-						array('itemName' => 'testFormItem')
-					)
-				)
-			),
-			array(
-				array(
+					'addItems' => [
+						['itemName' => 'testFormItem']
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'graphExploded',
 					'graphtype' => 'Exploded',
-					'addItems' => array(
-						array('itemName' => 'testFormItem')
-					)
-				)
-			),
-			array(
-				array(
+					'addItems' => [
+						['itemName' => 'testFormItem']
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'graph!@#$%^&*()><>?:"|{},./;',
 					'graphtype' => 'Exploded',
-					'addItems' => array(
-						array('itemName' => 'testFormItem')
-					),
+					'addItems' => [
+						['itemName' => 'testFormItem']
+					],
 					'dbCheck' => true,
 					'formCheck' => true
-				)
-			)
-		);
+				]
+			]
+		];
 	}
 
 	/**
@@ -987,7 +987,7 @@ class testFormGraph extends CWebTest {
 				foreach ($data['errors'] as $msg) {
 				$this->zbxTestTextPresent($msg);
 				}
-				$this->zbxTestTextPresent(array('Name', 'Width', 'Height'));
+				$this->zbxTestTextPresent(['Name', 'Width', 'Height']);
 				break;
 			}
 
