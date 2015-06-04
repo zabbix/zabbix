@@ -171,7 +171,6 @@ class CMediatype extends CApiService {
 		$create = ($method === 'create');
 		$update = ($method === 'update');
 
-		// permissions check
 		if ($create) {
 			if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create media types.'));
@@ -209,7 +208,7 @@ class CMediatype extends CApiService {
 					]);
 					$existMediatype = reset($existMediatypes);
 
-					$mediatype_exist =  ($existMediatype
+					$mediatype_exist = ($existMediatype
 							&& bccomp($existMediatype['mediatypeid'], $mediatype['mediatypeid']) != 0);
 					$mediatype_description = $mediatype['description'];
 				}
