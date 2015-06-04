@@ -27,11 +27,11 @@
  * @return string
  */
 function permission2str($permission) {
-	$permissions = array(
+	$permissions = [
 		PERM_READ_WRITE => _('Read-write'),
 		PERM_READ => _('Read only'),
 		PERM_DENY => _('Deny')
-	);
+	];
 
 	return isset($permissions[$permission]) ? $permissions[$permission] : _('Unknown');
 }
@@ -44,11 +44,11 @@ function permission2str($permission) {
  * @return string
  */
 function authentication2str($type) {
-	$authentications = array(
+	$authentications = [
 		ZBX_AUTH_INTERNAL => _('Zabbix internal authentication'),
 		ZBX_AUTH_LDAP => _('LDAP authentication'),
 		ZBX_AUTH_HTTP => _('HTTP authentication')
-	);
+	];
 
 	return isset($authentications[$type]) ? $authentications[$type] : _('Unknown');
 }
@@ -187,22 +187,22 @@ function getGroupAuthenticationType($groupIds, $maxGuiAccess = null) {
 	$rights[i]['id']	= resource id
 */
 function get_accessible_hosts_by_rights(&$rights, $user_type, $perm) {
-	$result = array();
-	$res_perm = array();
+	$result = [];
+	$res_perm = [];
 
 	foreach ($rights as $id => $right) {
 		$res_perm[$right['id']] = $right['permission'];
 	}
 
-	$host_perm = array();
-	$where = array();
+	$host_perm = [];
+	$where = [];
 
 	array_push($where, 'h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')');
-	array_push($where, dbConditionInt('h.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)));
+	array_push($where, dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]));
 
 	$where = count($where) ? $where = ' WHERE '.implode(' AND ', $where) : '';
 
-	$perm_by_host = array();
+	$perm_by_host = [];
 
 	$dbHosts = DBselect(
 		'SELECT hg.groupid AS groupid,h.hostid,h.host,h.name AS host_name,h.status'.
@@ -213,7 +213,7 @@ function get_accessible_hosts_by_rights(&$rights, $user_type, $perm) {
 	while ($dbHost = DBfetch($dbHosts)) {
 		if (isset($dbHost['groupid']) && isset($res_perm[$dbHost['groupid']])) {
 			if (!isset($perm_by_host[$dbHost['hostid']])) {
-				$perm_by_host[$dbHost['hostid']] = array();
+				$perm_by_host[$dbHost['hostid']] = [];
 			}
 			$perm_by_host[$dbHost['hostid']][] = $res_perm[$dbHost['groupid']];
 			$host_perm[$dbHost['hostid']][$dbHost['groupid']] = $res_perm[$dbHost['groupid']];
@@ -246,17 +246,17 @@ function get_accessible_hosts_by_rights(&$rights, $user_type, $perm) {
 		$result[$dbHost['hostid']] = $dbHost;
 	}
 
-	CArrayHelper::sort($result, array(
-		array('field' => 'host_name', 'order' => ZBX_SORT_UP)
-	));
+	CArrayHelper::sort($result, [
+		['field' => 'host_name', 'order' => ZBX_SORT_UP]
+	]);
 
 	return $result;
 }
 
 function get_accessible_groups_by_rights(&$rights, $user_type, $perm) {
-	$result = array();
+	$result = [];
 
-	$group_perm = array();
+	$group_perm = [];
 	foreach ($rights as $right) {
 		$group_perm[$right['id']] = $right['permission'];
 	}
@@ -281,9 +281,9 @@ function get_accessible_groups_by_rights(&$rights, $user_type, $perm) {
 		$result[$dbHostGroup['groupid']] = $dbHostGroup;
 	}
 
-	CArrayHelper::sort($result, array(
-		array('field' => 'name', 'order' => ZBX_SORT_UP)
-	));
+	CArrayHelper::sort($result, [
+		['field' => 'name', 'order' => ZBX_SORT_UP]
+	]);
 
 	return $result;
 }
@@ -299,7 +299,7 @@ function getUserGroupsByUserId($userId) {
 	static $userGroups;
 
 	if (!isset($userGroups[$userId])) {
-		$userGroups[$userId] = array();
+		$userGroups[$userId] = [];
 
 		$result = DBselect('SELECT usrgrpid FROM users_groups WHERE userid='.zbx_dbstr($userId));
 		while ($row = DBfetch($result)) {

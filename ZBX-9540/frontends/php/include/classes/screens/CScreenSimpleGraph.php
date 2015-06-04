@@ -35,14 +35,14 @@ class CScreenSimpleGraph extends CScreenBase {
 		$graphDims['width'] = $this->screenitem['width'];
 
 		// get time control
-		$timeControlData = array(
+		$timeControlData = [
 			'id' => $this->getDataId(),
 			'containerid' => $containerid,
 			'objDims' => $graphDims,
 			'loadImage' => 1,
 			'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-		);
+		];
 
 		// host feature
 		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && !empty($this->hostid)) {

@@ -27,10 +27,10 @@ $headerForm = new CForm();
 
 $controls = new CList();
 $controls->addItem(new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);',
-	array(
+	[
 		'screens.php' => _('Screens'),
 		'slides.php' => _('Slide shows')
-	)
+	]
 ));
 
 if (empty($this->data['screens'])) {
@@ -38,9 +38,9 @@ if (empty($this->data['screens'])) {
 	$screenWidget->setControls($headerForm)->addItem(BR())->addItem(new CTableInfo());
 
 	$screenBuilder = new CScreenBuilder();
-	CScreenBuilder::insertScreenStandardJs(array(
+	CScreenBuilder::insertScreenStandardJs([
 		'timeline' => $screenBuilder->timeline
-	));
+	]);
 }
 else {
 	if (!isset($this->data['screens'][$this->data['elementIdentifier']])) {
@@ -66,39 +66,39 @@ else {
 		$elementsComboBox->addItem($dbScreen['screenid'],
 			htmlspecialchars($dbScreen['name']));
 	}
-	$controls->addItem(array(_('Screens').SPACE, $elementsComboBox));
+	$controls->addItem([_('Screens').SPACE, $elementsComboBox]);
 
 	if (check_dynamic_items($screen['screenid'], 0)) {
-		$pageFilter = new CPageFilter(array(
-			'groups' => array(
+		$pageFilter = new CPageFilter([
+			'groups' => [
 				'monitored_hosts' => true,
 				'with_items' => true
-			),
-			'hosts' => array(
+			],
+			'hosts' => [
 				'monitored_hosts' => true,
 				'with_items' => true,
 				'DDFirstLabel' => _('not selected')
-			),
+			],
 			'hostid' => getRequest('hostid'),
 			'groupid' => getRequest('groupid')
-		));
+		]);
 		$_REQUEST['groupid'] = $pageFilter->groupid;
 		$_REQUEST['hostid'] = $pageFilter->hostid;
 
-		$controls->addItem(array( _('Group').SPACE, $pageFilter->getGroupsCB()));
-		$controls->addItem(array( _('Host').SPACE, $pageFilter->getHostsCB()));
+		$controls->addItem([ _('Group').SPACE, $pageFilter->getGroupsCB()]);
+		$controls->addItem([ _('Host').SPACE, $pageFilter->getHostsCB()]);
 	}
 
 	// page header
-	$controls->addItem(get_icon('favourite', array('fav' => 'web.favorite.screenids', 'elname' => 'screenid', 'elid' => $screen['screenid'])));
-	$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
+	$controls->addItem(get_icon('favourite', ['fav' => 'web.favorite.screenids', 'elname' => 'screenid', 'elid' => $screen['screenid']]));
+	$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 
 	$headerForm->addItem($controls);
 
 	$screenWidget->setControls($headerForm);
 
 	// append screens to widget
-	$screenBuilder = new CScreenBuilder(array(
+	$screenBuilder = new CScreenBuilder([
 		'screenid' => $screen['screenid'],
 		'mode' => SCREEN_MODE_PREVIEW,
 		'profileIdx' => 'web.screens',
@@ -107,13 +107,13 @@ else {
 		'hostid' => getRequest('hostid'),
 		'period' => $this->data['period'],
 		'stime' => $this->data['stime']
-	));
+	]);
 	$screenWidget->addItem($screenBuilder->show());
 
-	CScreenBuilder::insertScreenStandardJs(array(
+	CScreenBuilder::insertScreenStandardJs([
 		'timeline' => $screenBuilder->timeline,
 		'profileIdx' => $screenBuilder->profileIdx
-	));
+	]);
 
 	$screenWidget->addItem(BR());
 }

@@ -36,13 +36,13 @@ class CControllerWidgetIssuesView extends CController {
 	}
 
 	protected function doAction() {
-		$filter = array(
+		$filter = [
 			'groupids' => null,
 			'maintenance' => null,
 			'severity' => null,
 			'extAck' => 0,
 			'backUrl' => 'zabbix.php?action=dashboard.view'
-		);
+		];
 
 		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
 			// groups
@@ -57,25 +57,25 @@ class CControllerWidgetIssuesView extends CController {
 				if ($hideHostGroupIds) {
 					// get all groups if no selected groups defined
 					if (!$filter['groupids']) {
-						$dbHostGroups = API::HostGroup()->get(array(
-							'output' => array('groupid')
-						));
+						$dbHostGroups = API::HostGroup()->get([
+							'output' => ['groupid']
+						]);
 						$filter['groupids'] = zbx_objectValues($dbHostGroups, 'groupid');
 					}
 
 					$filter['groupids'] = array_diff($filter['groupids'], $hideHostGroupIds);
 
 					// get available hosts
-					$dbAvailableHosts = API::Host()->get(array(
+					$dbAvailableHosts = API::Host()->get([
 						'groupids' => $filter['groupids'],
-						'output' => array('hostid')
-					));
+						'output' => ['hostid']
+					]);
 					$availableHostIds = zbx_objectValues($dbAvailableHosts, 'hostid');
 
-					$dbDisabledHosts = API::Host()->get(array(
+					$dbDisabledHosts = API::Host()->get([
 						'groupids' => $hideHostGroupIds,
-						'output' => array('hostid')
-					));
+						'output' => ['hostid']
+					]);
 					$disabledHostIds = zbx_objectValues($dbDisabledHosts, 'hostid');
 
 					$filter['hostids'] = array_diff($availableHostIds, $disabledHostIds);
@@ -101,9 +101,9 @@ class CControllerWidgetIssuesView extends CController {
 			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
 		}
 
-		$data = array (
+		$data = [
 			'filter' => $filter
-		);
+		];
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

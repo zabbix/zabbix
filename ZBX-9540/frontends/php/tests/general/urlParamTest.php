@@ -26,116 +26,116 @@ require_once dirname(__FILE__).'/../../include/html.inc.php';
 class urlParamTest extends CZabbixTest {
 
 	public static function provider() {
-		return array(
+		return [
 			/*
 			 * Request is empty
 			 */
-			array(
-				'inputData' => array('abc'),
+			[
+				'inputData' => ['abc'],
 				'expectedResult' => '',
 				'expectError' => false,
-				'requestData' => array()
-			),
-			array(
-				'inputData' => array('abc', true),
+				'requestData' => []
+			],
+			[
+				'inputData' => ['abc', true],
 				'expectedResult' => '',
 				'expectError' => false,
-				'requestData' => array()
-			),
-			array(
-				'inputData' => array('abc', true, 'name'),
+				'requestData' => []
+			],
+			[
+				'inputData' => ['abc', true, 'name'],
 				'expectedResult' => '',
 				'expectError' => false,
-				'requestData' => array()
-			),
-			array(
-				'inputData' => array(array('a' => 1, 'b' => 2, 'c' => 3)),
+				'requestData' => []
+			],
+			[
+				'inputData' => [['a' => 1, 'b' => 2, 'c' => 3]],
 				'expectedResult' => '',
 				'expectError' => true,
-				'requestData' => array()
-			),
-			array(
-				'inputData' => array(array('a' => 1, 'b' => 2, 'c' => 3), true),
+				'requestData' => []
+			],
+			[
+				'inputData' => [['a' => 1, 'b' => 2, 'c' => 3], true],
 				'expectedResult' => '',
 				'expectError' => true,
-				'requestData' => array()
-			),
-			array(
-				'inputData' => array('abc', false, 'name'),
+				'requestData' => []
+			],
+			[
+				'inputData' => ['abc', false, 'name'],
 				'expectedResult' => '&name=abc',
 				'expectError' => false,
-				'requestData' => array()
-			),
-			array(
-				'inputData' => array(array('a' => 1, 'b' => 2, 'c' => 3), false, 'abc'),
+				'requestData' => []
+			],
+			[
+				'inputData' => [['a' => 1, 'b' => 2, 'c' => 3], false, 'abc'],
 				'expectedResult' => '&abc[a]=1&abc[b]=2&abc[c]=3',
 				'expectError' => false,
-				'requestData' => array()
-			),
+				'requestData' => []
+			],
 			/*
 			 * Request exist
 			 */
-			array(
-				'inputData' => array('a'),
+			[
+				'inputData' => ['a'],
 				'expectedResult' => '&a=1',
 				'expectError' => false,
-				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
-			),
-			array(
-				'inputData' => array('a', true),
+				'requestData' => ['a' => 1, 'b' => 2, 'c' => 3, 'd' => ['d0', 'd1', 'd2']]
+			],
+			[
+				'inputData' => ['a', true],
 				'expectedResult' => '&a=1',
 				'expectError' => false,
-				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
-			),
-			array(
-				'inputData' => array('a', true, 'b'),
+				'requestData' => ['a' => 1, 'b' => 2, 'c' => 3, 'd' => ['d0', 'd1', 'd2']]
+			],
+			[
+				'inputData' => ['a', true, 'b'],
 				'expectedResult' => '&b=1',
 				'expectError' => false,
-				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
-			),
-			array(
-				'inputData' => array('b', true, 'b'),
+				'requestData' => ['a' => 1, 'b' => 2, 'c' => 3, 'd' => ['d0', 'd1', 'd2']]
+			],
+			[
+				'inputData' => ['b', true, 'b'],
 				'expectedResult' => '&b=2',
 				'expectError' => false,
-				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
-			),
-			array(
-				'inputData' => array('abc', true),
+				'requestData' => ['a' => 1, 'b' => 2, 'c' => 3, 'd' => ['d0', 'd1', 'd2']]
+			],
+			[
+				'inputData' => ['abc', true],
 				'expectedResult' => '',
 				'expectError' => false,
-				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
-			),
-			array(
-				'inputData' => array('abc', true, 'abc'),
+				'requestData' => ['a' => 1, 'b' => 2, 'c' => 3, 'd' => ['d0', 'd1', 'd2']]
+			],
+			[
+				'inputData' => ['abc', true, 'abc'],
 				'expectedResult' => '',
 				'expectError' => false,
-				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
-			),
-			array(
-				'inputData' => array('d', true, 'aaa'),
+				'requestData' => ['a' => 1, 'b' => 2, 'c' => 3, 'd' => ['d0', 'd1', 'd2']]
+			],
+			[
+				'inputData' => ['d', true, 'aaa'],
 				'expectedResult' => '&aaa[0]=d0&aaa[1]=d1&aaa[2]=d2',
 				'expectError' => false,
-				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
-			),
-			array(
-				'inputData' => array('d', true, 'b'),
+				'requestData' => ['a' => 1, 'b' => 2, 'c' => 3, 'd' => ['d0', 'd1', 'd2']]
+			],
+			[
+				'inputData' => ['d', true, 'b'],
 				'expectedResult' => '&b[0]=d0&b[1]=d1&b[2]=d2',
 				'expectError' => false,
-				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
-			),
-			array(
-				'inputData' => array('abc', false, 'name'),
+				'requestData' => ['a' => 1, 'b' => 2, 'c' => 3, 'd' => ['d0', 'd1', 'd2']]
+			],
+			[
+				'inputData' => ['abc', false, 'name'],
 				'expectedResult' => '&name=abc',
 				'expectError' => false,
-				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
-			),
-			array(
-				'inputData' => array(array('a' => 1, 'b' => 2, 'c' => 3), false, 'abc'),
+				'requestData' => ['a' => 1, 'b' => 2, 'c' => 3, 'd' => ['d0', 'd1', 'd2']]
+			],
+			[
+				'inputData' => [['a' => 1, 'b' => 2, 'c' => 3], false, 'abc'],
 				'expectedResult' => '&abc[a]=1&abc[b]=2&abc[c]=3',
 				'expectError' => false,
-				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
-			)
-		);
+				'requestData' => ['a' => 1, 'b' => 2, 'c' => 3, 'd' => ['d0', 'd1', 'd2']]
+			]
+		];
 	}
 
 	/**
@@ -149,10 +149,10 @@ class urlParamTest extends CZabbixTest {
 				$result = null;
 
 				if (isset($inputData[2])) {
-					$result = call_user_func_array('url_param', array($inputData[0], $inputData[1], $inputData[2]));
+					$result = call_user_func_array('url_param', [$inputData[0], $inputData[1], $inputData[2]]);
 				}
 				elseif (isset($inputData[1])) {
-					$result = call_user_func_array('url_param', array($inputData[0], $inputData[1]));
+					$result = call_user_func_array('url_param', [$inputData[0], $inputData[1]]);
 				}
 				elseif (isset($inputData[0])) {
 					$result = call_user_func_array('url_param', $inputData[0]);

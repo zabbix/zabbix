@@ -23,8 +23,8 @@ $discoveryWidget = (new CWidget())->setTitle(_('Status of discovery'));
 
 // create header form
 $controls = new CList();
-$controls->addItem(array(_('Discovery rule'), SPACE, $data['pageFilter']->getDiscoveryCB()));
-$controls->addItem(get_icon('fullscreen', array('fullscreen' => $data['fullscreen'])));
+$controls->addItem([_('Discovery rule'), SPACE, $data['pageFilter']->getDiscoveryCB()]);
+$controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
 
 $discoveryHeaderForm = new CForm('get');
 $discoveryHeaderForm->setName('slideHeaderForm');
@@ -41,19 +41,19 @@ $discoveryTable->makeVerticalRotation();
 $discoveredDeviceCol = make_sorting_header(_('Discovered device'), 'ip', $data['sort'], $data['sortorder']);
 $discoveredDeviceCol->addClass('left');
 
-$header = array(
+$header = [
 	$discoveredDeviceCol,
-	new CColHeader(_('Monitored host'), 'left'),
-	new CColHeader(array(_('Uptime').'/', _('Downtime')), 'left')
-);
+	(new CColHeader(_('Monitored host')))->addClass('left'),
+	(new CColHeader([_('Uptime').'/', _('Downtime')]))->addClass('left')
+];
 
 foreach ($data['services'] as $name => $foo) {
-	$header[] = new CColHeader($name, 'vertical_rotation');
+	$header[] = (new CColHeader($name))->addClass('vertical_rotation');
 }
 $discoveryTable->setHeader($header, 'vertical_header');
 
 foreach ($data['drules'] as $drule) {
-	$discovery_info = array();
+	$discovery_info = [];
 
 	$dhosts = $drule['dhosts'];
 	foreach ($dhosts as $dhost) {
@@ -96,7 +96,7 @@ foreach ($data['drules'] as $drule) {
 			}
 
 			if (!isset($discovery_info[$dservice['ip']])) {
-				$discovery_info[$dservice['ip']] = array(
+				$discovery_info[$dservice['ip']] = [
 					'ip' => $dservice['ip'],
 					'dns' => $dservice['dns'],
 					'type' => $htype,
@@ -104,7 +104,7 @@ foreach ($data['drules'] as $drule) {
 					'host' => $hostName,
 					'time' => $htime,
 					'druleid' => $dhost['druleid']
-				);
+				];
 			}
 
 			$class = 'active';
@@ -124,15 +124,15 @@ foreach ($data['drules'] as $drule) {
 
 			$serviceName = discovery_check_type2str($dservice['type']).discovery_port2str($dservice['type'], $dservice['port']).$key_;
 
-			$discovery_info[$dservice['ip']]['services'][$serviceName] = array(
+			$discovery_info[$dservice['ip']]['services'][$serviceName] = [
 				'class' => $class,
 				'time' => $dservice[$time]
-			);
+			];
 		}
 	}
 
 	if (empty($data['druleid']) && !empty($discovery_info)) {
-		$col = new CCol(array(bold($drule['name']), SPACE.'('._n('%d device', '%d devices', count($discovery_info)).')'));
+		$col = new CCol([bold($drule['name']), SPACE.'('._n('%d device', '%d devices', count($discovery_info)).')']);
 		$col->setColSpan(count($data['services']) + 3);
 
 		$discoveryTable->addRow($col);
@@ -141,13 +141,13 @@ foreach ($data['drules'] as $drule) {
 
 	foreach ($discovery_info as $ip => $h_data) {
 		$dns = $h_data['dns'] == '' ? '' : ' ('.$h_data['dns'].')';
-		$row = array(
+		$row = [
 			$h_data['type'] == 'primary' ? new CSpan($ip.$dns, $h_data['class']) : new CSpan(SPACE.SPACE.$ip.$dns),
-			new CSpan(empty($h_data['host']) ? '-' : $h_data['host']),
+			new CSpan(empty($h_data['host']) ? '' : $h_data['host']),
 			new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave')
 				? ''
-				: convert_units(array('value' => time() - $h_data['time'], 'units' => 'uptime'))), $h_data['class'])
-		);
+				: convert_units(['value' => time() - $h_data['time'], 'units' => 'uptime'])), $h_data['class'])
+		];
 
 		foreach ($data['services'] as $name => $foo) {
 			$class = null;
@@ -168,10 +168,10 @@ foreach ($data['drules'] as $drule) {
 				elseif ($class == 'inactive') {
 					$hintTable->setHeader(_('Downtime'));
 				}
-				$timeColumn = new CCol(zbx_date2age($h_data['services'][$name]['time']), $class);
+				$timeColumn = (new CCol(zbx_date2age($h_data['services'][$name]['time'])))->addClass($class);
 				$hintTable->addRow($timeColumn);
 			}
-			$column = new CCol($hint, $class);
+			$column = (new CCol($hint))->addClass($class);
 			if (!is_null($hintTable)) {
 				$column->setHint($hintTable);
 			}

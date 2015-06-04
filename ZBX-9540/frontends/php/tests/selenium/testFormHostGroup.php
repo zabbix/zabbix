@@ -28,7 +28,7 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of host groups');
 		$this->zbxTestTextPresent('CONFIGURATION OF HOST GROUPS');
 		$this->zbxTestTextPresent('Host group');
-		$this->zbxTestTextPresent(array('Group name', 'Hosts', 'Hosts in', 'Other hosts | Group'));
+		$this->zbxTestTextPresent(['Group name', 'Hosts', 'Hosts in', 'Other hosts | Group']);
 
 		$this->assertElementPresent('name');
 		$this->assertAttribute("//input[@id='name']/@size", 50);

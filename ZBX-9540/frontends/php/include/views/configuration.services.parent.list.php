@@ -32,7 +32,7 @@ if (!empty($this->data['service'])) {
 
 // create table
 $servicesParentTable = new CTableInfo();
-$servicesParentTable->setHeader(array(_('Service'), _('Status calculation'), _('Trigger')));
+$servicesParentTable->setHeader([_('Service'), _('Status calculation'), _('Trigger')]);
 
 $prefix = null;
 
@@ -44,7 +44,11 @@ $description = new CLink(_('root'), '#', null, 'javascript:
 	self.close();
 	return false;'
 );
-$servicesParentTable->addRow(array(array($prefix, $description), _('Note'), '-'));
+$servicesParentTable->addRow([
+		[$prefix, $description],
+		_('Note'),
+		'-'
+]);
 
 // others
 foreach ($this->data['db_pservices'] as $db_service) {
@@ -56,7 +60,7 @@ foreach ($this->data['db_pservices'] as $db_service) {
 		self.close();
 		return false;'
 	);
-	$servicesParentTable->addRow(array(array($prefix, $description), serviceAlgorythm($db_service['algorithm']), $db_service['trigger']));
+	$servicesParentTable->addRow([[$prefix, $description], serviceAlgorythm($db_service['algorithm']), $db_service['trigger']]);
 }
 $column = new CCol(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
 $column->setAttribute('style', 'text-align:right;');

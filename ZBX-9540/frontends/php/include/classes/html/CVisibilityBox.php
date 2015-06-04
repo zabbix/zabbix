@@ -23,7 +23,7 @@ class CVisibilityBox extends CCheckBox {
 
 	public function __construct($name = 'visibilitybox', $value = 'yes', $object_name = null, $replace_to = null) {
 		if (!is_array($object_name)) {
-			$object_name = array($object_name);
+			$object_name = [$object_name];
 		}
 		$this->object_name = $object_name;
 		$this->replace_to = unpack_object($replace_to);

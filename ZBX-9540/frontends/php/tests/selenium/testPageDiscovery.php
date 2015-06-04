@@ -28,8 +28,8 @@ class testPageDiscovery extends CWebTest {
 		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 		$this->zbxTestTextPresent('Discovery rules');
 		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextPresent(array('Name', 'IP range', 'Delay', 'Checks', 'Status'));
-		$this->zbxTestDropdownHasOptions('action', array('Enable selected', 'Disable selected', 'Delete selected'));
+		$this->zbxTestTextPresent(['Name', 'IP range', 'Delay', 'Checks', 'Status']);
+		$this->zbxTestDropdownHasOptions('action', ['Enable selected', 'Disable selected', 'Delete selected']);
 	}
 
 	// returns all discovery rules

@@ -28,7 +28,7 @@ class CUserMedia extends CApiService {
 
 	protected $tableName = 'media';
 	protected $tableAlias = 'm';
-	protected $sortColumns = array('mediaid', 'userid', 'mediatypeid');
+	protected $sortColumns = ['mediaid', 'userid', 'mediatypeid'];
 
 	/**
 	 * Get users data.
@@ -46,19 +46,19 @@ class CUserMedia extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 
-		$sqlParts = array(
-			'select'	=> array('media' => 'm.mediaid'),
-			'from'		=> array('media' => 'media m'),
-			'where'		=> array(),
-			'group'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['media' => 'm.mediaid'],
+			'from'		=> ['media' => 'media m'],
+			'where'		=> [],
+			'group'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'usrgrpids'					=> null,
 			'userids'					=> null,
 			'mediaids'					=> null,
@@ -79,7 +79,7 @@ class CUserMedia extends CApiService {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// permission check
