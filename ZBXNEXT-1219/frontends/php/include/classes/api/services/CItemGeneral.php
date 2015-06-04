@@ -40,7 +40,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @return array
 	 */
-	abstract public function get($options = array());
+	abstract public function get($options = []);
 
 	public function __construct() {
 		parent::__construct();
@@ -48,57 +48,57 @@ abstract class CItemGeneral extends CApiService {
 		// template - if templated item, value is taken from template item, cannot be changed on host
 		// system - values should not be updated
 		// host - value should be null for template items
-		$this->fieldRules = array(
-			'type'					=> array('template' => 1),
-			'snmp_community'		=> array(),
-			'snmp_oid'				=> array('template' => 1),
-			'hostid'				=> array(),
-			'name'					=> array('template' => 1),
-			'description'			=> array(),
-			'key_'					=> array('template' => 1),
-			'delay'					=> array(),
-			'history'				=> array(),
-			'trends'				=> array(),
-			'status'				=> array(),
-			'value_type'			=> array('template' => 1),
-			'trapper_hosts'			=> array(),
-			'units'					=> array('template' => 1),
-			'multiplier'			=> array('template' => 1),
-			'delta'					=> array(),
-			'snmpv3_contextname'	=> array(),
-			'snmpv3_securityname'	=> array(),
-			'snmpv3_securitylevel'	=> array(),
-			'snmpv3_authprotocol'	=> array(),
-			'snmpv3_authpassphrase'	=> array(),
-			'snmpv3_privprotocol'	=> array(),
-			'snmpv3_privpassphrase'	=> array(),
-			'formula'				=> array('template' => 1),
-			'error'					=> array('system' => 1),
-			'lastlogsize'			=> array('system' => 1),
-			'logtimefmt'			=> array(),
-			'templateid'			=> array('system' => 1),
-			'valuemapid'			=> array('template' => 1),
-			'delay_flex'			=> array(),
-			'params'				=> array(),
-			'ipmi_sensor'			=> array('template' => 1),
-			'data_type'				=> array('template' => 1),
-			'authtype'				=> array(),
-			'username'				=> array(),
-			'password'				=> array(),
-			'publickey'				=> array(),
-			'privatekey'			=> array(),
-			'mtime'					=> array('system' => 1),
-			'flags'					=> array(),
-			'filter'				=> array(),
-			'interfaceid'			=> array('host' => 1),
-			'port'					=> array(),
-			'inventory_link'		=> array(),
-			'lifetime'				=> array()
-		);
+		$this->fieldRules = [
+			'type'					=> ['template' => 1],
+			'snmp_community'		=> [],
+			'snmp_oid'				=> ['template' => 1],
+			'hostid'				=> [],
+			'name'					=> ['template' => 1],
+			'description'			=> [],
+			'key_'					=> ['template' => 1],
+			'delay'					=> [],
+			'history'				=> [],
+			'trends'				=> [],
+			'status'				=> [],
+			'value_type'			=> ['template' => 1],
+			'trapper_hosts'			=> [],
+			'units'					=> ['template' => 1],
+			'multiplier'			=> ['template' => 1],
+			'delta'					=> [],
+			'snmpv3_contextname'	=> [],
+			'snmpv3_securityname'	=> [],
+			'snmpv3_securitylevel'	=> [],
+			'snmpv3_authprotocol'	=> [],
+			'snmpv3_authpassphrase'	=> [],
+			'snmpv3_privprotocol'	=> [],
+			'snmpv3_privpassphrase'	=> [],
+			'formula'				=> ['template' => 1],
+			'error'					=> ['system' => 1],
+			'lastlogsize'			=> ['system' => 1],
+			'logtimefmt'			=> [],
+			'templateid'			=> ['system' => 1],
+			'valuemapid'			=> ['template' => 1],
+			'delay_flex'			=> [],
+			'params'				=> [],
+			'ipmi_sensor'			=> ['template' => 1],
+			'data_type'				=> ['template' => 1],
+			'authtype'				=> [],
+			'username'				=> [],
+			'password'				=> [],
+			'publickey'				=> [],
+			'privatekey'			=> [],
+			'mtime'					=> ['system' => 1],
+			'flags'					=> [],
+			'filter'				=> [],
+			'interfaceid'			=> ['host' => 1],
+			'port'					=> [],
+			'inventory_link'		=> [],
+			'lifetime'				=> []
+		];
 
-		$this->errorMessages = array_merge($this->errorMessages, array(
+		$this->errorMessages = array_merge($this->errorMessages, [
 			self::ERROR_NO_INTERFACE => _('Cannot find host interface on "%1$s" for item key "%2$s".')
-		));
+		]);
 	}
 
 	/**
@@ -115,33 +115,33 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function checkInput(array &$items, $update = false) {
 		if ($update) {
-			$itemDbFields = array('itemid' => null);
+			$itemDbFields = ['itemid' => null];
 
-			$dbItemsFields = array('itemid', 'templateid');
+			$dbItemsFields = ['itemid', 'templateid'];
 			foreach ($this->fieldRules as $field => $rule) {
 				if (!isset($rule['system'])) {
 					$dbItemsFields[] = $field;
 				}
 			}
 
-			$dbItems = $this->get(array(
+			$dbItems = $this->get([
 				'output' => $dbItemsFields,
 				'itemids' => zbx_objectValues($items, 'itemid'),
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
-			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid', 'status', 'name'),
+			$dbHosts = API::Host()->get([
+				'output' => ['hostid', 'status', 'name'],
 				'hostids' => zbx_objectValues($dbItems, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
-				'selectApplications' => array('applicationid', 'flags'),
+				'selectApplications' => ['applicationid', 'flags'],
 				'preservekeys' => true
-			));
+			]);
 		}
 		else {
-			$itemDbFields = array(
+			$itemDbFields = [
 				'name' => null,
 				'key_' => null,
 				'hostid' => null,
@@ -149,31 +149,31 @@ abstract class CItemGeneral extends CApiService {
 				'value_type' => null,
 				'delay' => '0',
 				'delay_flex' => ''
-			);
+			];
 
-			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid', 'status', 'name'),
+			$dbHosts = API::Host()->get([
+				'output' => ['hostid', 'status', 'name'],
 				'hostids' => zbx_objectValues($items, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
-				'selectApplications' => array('applicationid', 'flags'),
+				'selectApplications' => ['applicationid', 'flags'],
 				'preservekeys' => true
-			));
+			]);
 		}
 
 		// interfaces
-		$interfaces = API::HostInterface()->get(array(
-			'output' => array('interfaceid', 'hostid', 'type'),
+		$interfaces = API::HostInterface()->get([
+			'output' => ['interfaceid', 'hostid', 'type'],
 			'hostids' => zbx_objectValues($dbHosts, 'hostid'),
 			'nopermissions' => true,
 			'preservekeys' => true
-		));
+		]);
 
 		if ($update) {
-			$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
-				'allowed' => array('itemid', 'status'),
+			$updateDiscoveredValidator = new CUpdateDiscoveredValidator([
+				'allowed' => ['itemid', 'status'],
 				'messageAllowedField' => _('Cannot update "%2$s" for a discovered item "%1$s".')
-			));
+			]);
 			foreach ($items as $item) {
 				// check permissions
 				if (!isset($dbItems[$item['itemid']])) {
@@ -190,7 +190,7 @@ abstract class CItemGeneral extends CApiService {
 				$this->checkPartialValidator($item, $updateDiscoveredValidator, $dbItem);
 			}
 
-			$items = $this->extendObjects($this->tableName(), $items, array('name', 'flags'));
+			$items = $this->extendObjects($this->tableName(), $items, ['name', 'flags']);
 		}
 
 		foreach ($items as $inum => &$item) {
@@ -207,7 +207,7 @@ abstract class CItemGeneral extends CApiService {
 
 				$this->checkNoParameters(
 					$item,
-					array('templateid', 'state'),
+					['templateid', 'state'],
 					_('Cannot update "%1$s" for item "%2$s".'),
 					$item['name']
 				);
@@ -243,7 +243,7 @@ abstract class CItemGeneral extends CApiService {
 
 				$this->checkNoParameters(
 					$item,
-					array('templateid', 'state'),
+					['templateid', 'state'],
 					_('Cannot set "%1$s" for item "%2$s".'),
 					$item['name']
 				);
@@ -259,6 +259,12 @@ abstract class CItemGeneral extends CApiService {
 			}
 			if ($fullItem['value_type'] != ITEM_VALUE_TYPE_UINT64) {
 				$item['data_type'] = 0;
+			}
+
+			// For non-numeric types, whichever value was entered in trends field, is overwritten to zero.
+			if ($fullItem['value_type'] == ITEM_VALUE_TYPE_STR || $fullItem['value_type'] == ITEM_VALUE_TYPE_LOG
+					|| $fullItem['value_type'] == ITEM_VALUE_TYPE_TEXT) {
+				$item['trends'] = 0;
 			}
 
 			// check if the item requires an interface
@@ -306,12 +312,12 @@ abstract class CItemGeneral extends CApiService {
 			$itemKey = new CItemKey($fullItem['key_']);
 			if (!$itemKey->isValid()) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_params($this->getErrorMsg(self::ERROR_INVALID_KEY), array(
+					_params($this->getErrorMsg(self::ERROR_INVALID_KEY), [
 						$fullItem['key_'],
 						$fullItem['name'],
 						$host['name'],
 						$itemKey->getError()
-					))
+					])
 				);
 			}
 
@@ -319,10 +325,10 @@ abstract class CItemGeneral extends CApiService {
 			if ($fullItem['type'] == ITEM_TYPE_AGGREGATE) {
 				$params = $itemKey->getParameters();
 
-				if (!str_in_array($itemKey->getKeyId(), array('grpmax', 'grpmin', 'grpsum', 'grpavg'))
+				if (!str_in_array($itemKey->getKeyId(), ['grpmax', 'grpmin', 'grpsum', 'grpavg'])
 						|| count($params) > 4 || count($params) < 3
 						|| (count($params) == 3 && $params[2] !== 'last')
-						|| !str_in_array($params[2], array('last', 'min', 'max', 'avg', 'sum', 'count'))) {
+						|| !str_in_array($params[2], ['last', 'min', 'max', 'avg', 'sum', 'count'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Key "%1$s" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key",'.
 							' "<last|min|max|avg|sum|count>", "parameter"].', $itemKey->getKeyId()));
@@ -337,7 +343,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			// log
-			if ($fullItem['value_type'] != ITEM_VALUE_TYPE_LOG && str_in_array($itemKey->getKeyId(), array('log', 'logrt', 'eventlog'))) {
+			if ($fullItem['value_type'] != ITEM_VALUE_TYPE_LOG && str_in_array($itemKey->getKeyId(), ['log', 'logrt', 'eventlog'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be "Log" for log key.'));
 			}
 
@@ -374,13 +380,13 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			// snmp oid
-			if ((in_array($fullItem['type'], array(ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3)))
+			if ((in_array($fullItem['type'], [ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3]))
 					&& zbx_empty($fullItem['snmp_oid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP OID specified.'));
 			}
 
 			// snmp community
-			if (in_array($fullItem['type'], array(ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C))
+			if (in_array($fullItem['type'], [ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C])
 					&& zbx_empty($fullItem['snmp_community'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP community specified.'));
 			}
@@ -393,10 +399,10 @@ abstract class CItemGeneral extends CApiService {
 
 			if (isset($fullItem['snmpv3_securitylevel']) && $fullItem['snmpv3_securitylevel'] != ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
 				// snmpv3 authprotocol
-				if (str_in_array($fullItem['snmpv3_securitylevel'], array(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV))) {
+				if (str_in_array($fullItem['snmpv3_securitylevel'], [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])) {
 					if (isset($fullItem['snmpv3_authprotocol']) && (zbx_empty($fullItem['snmpv3_authprotocol'])
 							|| !str_in_array($fullItem['snmpv3_authprotocol'],
-								array(ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA)))) {
+								[ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA]))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect authentication protocol for item "%1$s".', $fullItem['name']));
 					}
 				}
@@ -405,7 +411,7 @@ abstract class CItemGeneral extends CApiService {
 				if ($fullItem['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
 					if (isset($fullItem['snmpv3_privprotocol']) && (zbx_empty($fullItem['snmpv3_privprotocol'])
 							|| !str_in_array($fullItem['snmpv3_privprotocol'],
-								array(ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES)))) {
+								[ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES]))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect privacy protocol for item "%1$s".', $fullItem['name']));
 					}
 				}
@@ -495,7 +501,7 @@ abstract class CItemGeneral extends CApiService {
 	 *							false, if the item does not need an interface
 	 */
 	public static function findInterfaceForItem(array $item, array $interfaces) {
-		$typeInterface = array();
+		$typeInterface = [];
 		foreach ($interfaces as $interface) {
 			if ($interface['main'] == 1) {
 				$typeInterface[$interface['type']] = $interface;
@@ -505,16 +511,16 @@ abstract class CItemGeneral extends CApiService {
 		// find item interface type
 		$type = itemTypeInterface($item['type']);
 
-		$matchingInterface = array();
+		$matchingInterface = [];
 
 		// the item can use any interface
 		if ($type == INTERFACE_TYPE_ANY) {
-			$interfaceTypes = array(
+			$interfaceTypes = [
 				INTERFACE_TYPE_AGENT,
 				INTERFACE_TYPE_SNMP,
 				INTERFACE_TYPE_JMX,
 				INTERFACE_TYPE_IPMI
-			);
+			];
 			foreach ($interfaceTypes as $itype) {
 				if (isset($typeInterface[$itype])) {
 					$matchingInterface = $typeInterface[$itype];
@@ -524,7 +530,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 		// the item uses a specific type of interface
 		elseif ($type !== false) {
-			$matchingInterface = (isset($typeInterface[$type])) ? $typeInterface[$type] : array();
+			$matchingInterface = (isset($typeInterface[$type])) ? $typeInterface[$type] : [];
 		}
 		// the item does not need an interface
 		else {
@@ -544,10 +550,10 @@ abstract class CItemGeneral extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'itemids' => $ids,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -562,11 +568,11 @@ abstract class CItemGeneral extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'itemids' => $ids,
 			'editable' => true,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -601,30 +607,30 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function checkUseInGraphAxis(array $itemids, $checkMax = false) {
 		if ($checkMax) {
-			$filter = array('ymax_itemid' => $itemids);
+			$filter = ['ymax_itemid' => $itemids];
 			$itemIdColumn = 'ymax_itemid';
 			$typeColumn = 'ymax_type';
 		}
 		else {
-			$filter = array('ymin_itemid' => $itemids);
+			$filter = ['ymin_itemid' => $itemids];
 			$itemIdColumn = 'ymin_itemid';
 			$typeColumn = 'ymin_type';
 		}
 
 		// make it work for both graphs and graph prototypes
-		$filter['flags'] = array(
+		$filter['flags'] = [
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			ZBX_FLAG_DISCOVERY_NORMAL,
 			ZBX_FLAG_DISCOVERY_CREATED
-		);
+		];
 
 		// check if the items are used in Y axis min/max values in any graphs
-		$graphs = API::Graph()->get(array(
-			'output' => array($itemIdColumn, $typeColumn, 'graphtype'),
+		$graphs = API::Graph()->get([
+			'output' => [$itemIdColumn, $typeColumn, 'graphtype'],
 			'filter' => $filter
-		));
+		]);
 
-		$updateGraphs = array();
+		$updateGraphs = [];
 		foreach ($graphs as &$graph) {
 			// check if Y type is actually set to GRAPH_YAXIS_TYPE_ITEM_VALUE
 			if ($graph[$typeColumn] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
@@ -672,26 +678,26 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function prepareInheritedItems(array $itemsToInherit, array $hostIds = null) {
 		// fetch all child hosts
-		$chdHosts = API::Host()->get(array(
-			'output' => array('hostid', 'host', 'status'),
-			'selectParentTemplates' => array('templateid'),
+		$chdHosts = API::Host()->get([
+			'output' => ['hostid', 'host', 'status'],
+			'selectParentTemplates' => ['templateid'],
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'templateids' => zbx_objectValues($itemsToInherit, 'hostid'),
 			'hostids' => $hostIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'templated_hosts' => true
-		));
+		]);
 		if (empty($chdHosts)) {
-			return array();
+			return [];
 		}
 
-		$newItems = array();
+		$newItems = [];
 		foreach ($chdHosts as $hostId => $host) {
 			$templateids = zbx_toHash($host['parentTemplates'], 'templateid');
 
 			// skip items not from parent templates of current host
-			$parentItems = array();
+			$parentItems = [];
 			foreach ($itemsToInherit as $inum => $parentItem) {
 				if (isset($templateids[$parentItem['hostid']])) {
 					$parentItems[$inum] = $parentItem;
@@ -699,18 +705,18 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			// check existing items to decide insert or update
-			$exItems = API::Item()->get(array(
-				'output' => array('itemid', 'type', 'key_', 'flags', 'templateid'),
+			$exItems = API::Item()->get([
+				'output' => ['itemid', 'type', 'key_', 'flags', 'templateid'],
 				'hostids' => $hostId,
 				'preservekeys' => true,
 				'nopermissions' => true,
-				'filter' => array('flags' => null)
-			));
+				'filter' => ['flags' => null]
+			]);
 
 			$exItemsKeys = zbx_toHash($exItems, 'key_');
 			$exItemsTpl = zbx_toHash($exItems, 'templateid');
 
-			$itemids_with_application_prototypes = array();
+			$itemids_with_application_prototypes = [];
 
 			foreach ($parentItems as $parentItem) {
 				if (isset($parentItem['applicationPrototypes']) && is_array($parentItem['applicationPrototypes'])
@@ -747,7 +753,7 @@ abstract class CItemGeneral extends CApiService {
 						&& !idcmp($exItemsKeys[$parentItem['key_']]['templateid'], $parentItem['itemid'])) {
 						self::exception(
 							ZBX_API_ERROR_PARAMETERS,
-							_params($this->getErrorMsg(self::ERROR_EXISTS), array($parentItem['key_'], $host['host']))
+							_params($this->getErrorMsg(self::ERROR_EXISTS), [$parentItem['key_'], $host['host']])
 						);
 					}
 				}
@@ -760,10 +766,10 @@ abstract class CItemGeneral extends CApiService {
 
 						self::exception(
 							ZBX_API_ERROR_PARAMETERS,
-							_params($this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), array(
+							_params($this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), [
 								$parentItem['key_'],
 								$host['host']
-							))
+							])
 						);
 					}
 				}
@@ -780,10 +786,10 @@ abstract class CItemGeneral extends CApiService {
 					elseif ($interface !== false) {
 						self::exception(
 							ZBX_API_ERROR_PARAMETERS,
-							_params($this->getErrorMsg(self::ERROR_NO_INTERFACE), array(
+							_params($this->getErrorMsg(self::ERROR_NO_INTERFACE), [
 								$host['host'],
 								$parentItem['key_']
-							))
+							])
 						);
 					}
 				}
@@ -812,7 +818,7 @@ abstract class CItemGeneral extends CApiService {
 						$discovery_ruleid = $discovery_rules[$parentItem['itemid']]['parent_itemid'];
 					}
 
-					$newItem['applicationPrototypes'] = array();
+					$newItem['applicationPrototypes'] = [];
 
 					$db_application_prototypes = DBfetchArray(DBselect(
 						'SELECT ap.application_prototypeid,ap.name'.
@@ -828,10 +834,10 @@ abstract class CItemGeneral extends CApiService {
 					foreach ($parentItem['applicationPrototypes'] as $application_prototype) {
 						$db_application_prototype = $db_application_prototypes[$application_prototype['name']];
 
-						$newItem['applicationPrototypes'][] = array(
+						$newItem['applicationPrototypes'][] = [
 							'name' => $application_prototype['name'],
 							'templateid' => $db_application_prototype['application_prototypeid']
-						);
+						];
 					}
 				}
 
@@ -857,11 +863,11 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $items
 	 */
 	protected function checkExistingItems(array $items) {
-		$itemKeysByHostId = array();
-		$itemIds = array();
+		$itemKeysByHostId = [];
+		$itemIds = [];
 		foreach ($items as $item) {
 			if (!isset($itemKeysByHostId[$item['hostid']])) {
-				$itemKeysByHostId[$item['hostid']] = array();
+				$itemKeysByHostId[$item['hostid']] = [];
 			}
 			$itemKeysByHostId[$item['hostid']][] = $item['key_'];
 
@@ -870,7 +876,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		$sqlWhere = array();
+		$sqlWhere = [];
 		foreach ($itemKeysByHostId as $hostId => $keys) {
 			$sqlWhere[] = '(i.hostid='.zbx_dbstr($hostId).' AND '.dbConditionString('i.key_', $keys).')';
 		}
@@ -937,13 +943,13 @@ abstract class CItemGeneral extends CApiService {
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'itemid', 'hostid');
-			$hosts = API::Host()->get(array(
+			$hosts = API::Host()->get([
 				'hostids' => $relationMap->getRelatedIds(),
 				'templated_hosts' => true,
 				'output' => $options['selectHosts'],
 				'nopermissions' => true,
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 

@@ -25,20 +25,20 @@ require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 class dbConditionStringTest extends CZabbixTest {
 
 	public static function provider() {
-		return array(
-			array(
-				array('field', array()),
+		return [
+			[
+				['field', []],
 				'1=0'
-			),
-			array(
-				array('field', array('a')),
+			],
+			[
+				['field', ['a']],
 				'field=\'a\''
-			),
-			array(
-				array('field', array('a'), true),
+			],
+			[
+				['field', ['a'], true],
 				'field!=\'a\''
-			)
-		);
+			]
+		];
 	}
 
 	/**

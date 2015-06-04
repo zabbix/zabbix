@@ -40,7 +40,7 @@ function setHostGroupInternal($groupid, $internal) {
 	return DBexecute(
 		'UPDATE groups'.
 		' SET internal='.zbx_dbstr($internal).
-		' WHERE '.dbConditionInt('groupid', array($groupid))
+		' WHERE '.dbConditionInt('groupid', [$groupid])
 	);
 }
 
@@ -48,10 +48,10 @@ function update_config($config) {
 	$configOrig = select_config();
 
 	if (array_key_exists('discovery_groupid', $config)) {
-		$hostGroups = API::HostGroup()->get(array(
-			'output' => array('name'),
+		$hostGroups = API::HostGroup()->get([
+			'output' => ['name'],
 			'groupids' => $config['discovery_groupid']
-		));
+		]);
 		if (!$hostGroups) {
 			error(_('Incorrect host group.'));
 			return false;
@@ -80,7 +80,7 @@ function update_config($config) {
 
 	if ($updateSeverity) {
 		// check duplicate severity names and if name is empty.
-		$names = array();
+		$names = [];
 		for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
 			$varName = 'severity_name_'.$i;
 			if (!array_key_exists($varName, $config)) {
@@ -97,7 +97,7 @@ function update_config($config) {
 		}
 	}
 
-	$update = array();
+	$update = [];
 
 	foreach ($config as $key => $value) {
 		if (!is_null($value)) {
@@ -118,7 +118,7 @@ function update_config($config) {
 	$result = DBexecute('UPDATE config SET '.implode(',', $update));
 
 	if ($result) {
-		$msg = array();
+		$msg = [];
 		if (array_key_exists('hk_events_trigger', $config)) {
 			$msg[] = _s('Trigger event and alert data storage period (in days) "%1$s".', $config['hk_events_trigger']);
 		}

@@ -33,7 +33,7 @@ abstract class CValidatorTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @return CValidator
 	 */
-	abstract protected function createValidator(array $params = array());
+	abstract protected function createValidator(array $params = []);
 
 	/**
 	 * Test creating the validator with a valid set of parameters.
@@ -57,9 +57,9 @@ abstract class CValidatorTest extends PHPUnit_Framework_TestCase {
 			'Incorrect option "invalidParam" for validator "'.get_class($this->createValidator()).'".'
 		);
 
-		$this->createValidator(array(
+		$this->createValidator([
 			'invalidParam' => 'value'
-		));
+		]);
 	}
 
 	/**

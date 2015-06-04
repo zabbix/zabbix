@@ -21,231 +21,231 @@
 
 class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 
-	private static function parameterSecNumPeriod_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
-		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
-				ITEM_VALUE_TYPE_TEXT);
+	private static function parameterSecNumPeriod_TestCases($func, array $valueTypes, array $params = [], $no = 0) {
+		$valueTypesAny = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+				ITEM_VALUE_TYPE_TEXT];
 
-		$tests = array();
+		$tests = [];
 
 		foreach ($valueTypesAny as $valueType) {
-			$params[$no] = '0';			$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '12345';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '01';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1s';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1m';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1h';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1d';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1w';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1K';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1M';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1G';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1T';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '-15';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1.0';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#0';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#1';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '#12345';	$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '#01';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '#-15';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#1.0';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '{$M}';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1{$M}';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '0';			$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1';			$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '12345';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '01';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1s';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1m';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1h';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1d';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1w';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1K';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1M';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1G';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1T';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '-15';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1.0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#1';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '#12345';	$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '#01';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '#-15';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#1.0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '{$M}';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1{$M}';		$tests[] = [$func, $params, $valueType, false];
 		}
 
 		return $tests;
 	}
 
-	private static function parameterSecNumOffset_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
-		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
-				ITEM_VALUE_TYPE_TEXT);
+	private static function parameterSecNumOffset_TestCases($func, array $valueTypes, array $params = [], $no = 0) {
+		$valueTypesAny = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+				ITEM_VALUE_TYPE_TEXT];
 
-		$tests = array();
+		$tests = [];
 
 		foreach ($valueTypesAny as $valueType) {
-			$params[$no] = '0';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '12345';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '01';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1s';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1m';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1h';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1d';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1w';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1K';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1M';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1G';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1T';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '-15';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1.0';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#0';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#1';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '#12345';	$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '#01';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '#-15';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#1.0';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '{$M}';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1{$M}';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '0';			$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1';			$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '12345';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '01';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1s';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1m';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1h';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1d';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1w';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1K';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1M';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1G';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1T';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '-15';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1.0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#1';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '#12345';	$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '#01';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '#-15';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#1.0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '{$M}';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1{$M}';		$tests[] = [$func, $params, $valueType, false];
 		}
 
 		return $tests;
 	}
 
-	private static function parameterTimeShift_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
-		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
-				ITEM_VALUE_TYPE_TEXT);
+	private static function parameterTimeShift_TestCases($func, array $valueTypes, array $params = [], $no = 0) {
+		$valueTypesAny = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+				ITEM_VALUE_TYPE_TEXT];
 
-		$tests = array();
+		$tests = [];
 
 		foreach ($valueTypesAny as $valueType) {
-			$params[$no] = '0';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '12345';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '01';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1s';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1m';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1h';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1d';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1w';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1K';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1M';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1G';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1T';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '-15';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1.0';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#0';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#1';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#12345';	$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#01';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#-15';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#1.0';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '{$M}';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1{$M}';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '0';			$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1';			$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '12345';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '01';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1s';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1m';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1h';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1d';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1w';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1K';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1M';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1G';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1T';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '-15';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1.0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#1';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#12345';	$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#01';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#-15';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#1.0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '{$M}';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1{$M}';		$tests[] = [$func, $params, $valueType, false];
 		}
 
 		return $tests;
 	}
 
-	private static function parameterPercent_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
-		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
-				ITEM_VALUE_TYPE_TEXT);
+	private static function parameterPercent_TestCases($func, array $valueTypes, array $params = [], $no = 0) {
+		$valueTypesAny = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+				ITEM_VALUE_TYPE_TEXT];
 
-		$tests = array();
+		$tests = [];
 
 		foreach ($valueTypesAny as $valueType) {
-			$params[$no] = '0';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '01';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1s';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1m';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1h';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1d';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1w';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1K';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1M';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1G';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1T';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '-15';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '-15.0';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '0.0';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1.0';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1.0123';	$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1.01234';	$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1.00000';	$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '1.';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '.1';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '.';			$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '100.0000';	$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '100.0001';	$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#0';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#1';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#1.0';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#-15';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '{$M}';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1{$M}';		$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = '0';			$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1';			$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '01';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1s';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1m';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1h';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1d';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1w';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1K';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1M';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1G';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1T';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '-15';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '-15.0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '0.0';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1.0';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1.0123';	$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1.01234';	$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1.00000';	$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '1.';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '.1';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '.';			$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '100.0000';	$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '100.0001';	$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#1';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#1.0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#-15';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '{$M}';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1{$M}';		$tests[] = [$func, $params, $valueType, false];
 		}
 
 		return $tests;
 	}
 
-	private static function parameterString_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
-		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
-				ITEM_VALUE_TYPE_TEXT);
+	private static function parameterString_TestCases($func, array $valueTypes, array $params = [], $no = 0) {
+		$valueTypesAny = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+				ITEM_VALUE_TYPE_TEXT];
 
-		$tests = array();
+		$tests = [];
 
 		foreach ($valueTypesAny as $valueType) {
-			$params[$no] = '0';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '12345';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '01';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '-15';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1.0';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '#0';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '#1';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '#12345';	$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '#01';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '#-15';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '#1.0';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '{$M}';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '1{$M}';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
+			$params[$no] = '0';			$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1';			$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '12345';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '01';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '-15';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1.0';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '#0';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '#1';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '#12345';	$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '#01';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '#-15';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '#1.0';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '{$M}';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '1{$M}';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
 		}
 
 		return $tests;
 	}
 
-	private static function parameterOperator_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
-		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
-				ITEM_VALUE_TYPE_TEXT);
+	private static function parameterOperator_TestCases($func, array $valueTypes, array $params = [], $no = 0) {
+		$valueTypesAny = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+				ITEM_VALUE_TYPE_TEXT];
 
-		$tests = array();
+		$tests = [];
 
 		foreach ($valueTypesAny as $valueType) {
-			$params[$no] = 'eq';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = 'ne';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = 'gt';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = 'ge';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = 'lt';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = 'le';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = 'like';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = 'band';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '{$M}';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
-			$params[$no] = '0';			$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#12345';	$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#01';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#-15';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '#1.0';		$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = 'gt{$M}';	$tests[] = array($func, $params, $valueType, false);
-			$params[$no] = '{$M}gt';	$tests[] = array($func, $params, $valueType, false);
+			$params[$no] = 'eq';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = 'ne';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = 'gt';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = 'ge';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = 'lt';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = 'le';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = 'like';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = 'band';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '{$M}';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '';			$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = '0';			$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#12345';	$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#01';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#-15';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '#1.0';		$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = 'gt{$M}';	$tests[] = [$func, $params, $valueType, false];
+			$params[$no] = '{$M}gt';	$tests[] = [$func, $params, $valueType, false];
 		}
 
 		return $tests;
 	}
 
 	public static function provider() {
-		$valueTypesAny = array(
+		$valueTypesAny = [
 			ITEM_VALUE_TYPE_FLOAT => true,
 			ITEM_VALUE_TYPE_STR => true,
 			ITEM_VALUE_TYPE_LOG => true,
 			ITEM_VALUE_TYPE_UINT64 => true,
 			ITEM_VALUE_TYPE_TEXT => true
-		);
-		$valueTypesLog = array(
+		];
+		$valueTypesLog = [
 			ITEM_VALUE_TYPE_LOG => true
-		);
-		$valueTypesNum = array(
+		];
+		$valueTypesNum = [
 			ITEM_VALUE_TYPE_FLOAT => true,
 			ITEM_VALUE_TYPE_UINT64 => true
-		);
-		$valueTypesInt = array(
+		];
+		$valueTypesInt = [
 			ITEM_VALUE_TYPE_UINT64 => true
-		);
-		$valueTypesStr = array(
+		];
+		$valueTypesStr = [
 			ITEM_VALUE_TYPE_STR => true,
 			ITEM_VALUE_TYPE_LOG => true,
 			ITEM_VALUE_TYPE_TEXT => true
-		);
+		];
 
 		return array_merge(
 			// abschange() - (ignored) [float, int, str, text, log]
@@ -280,47 +280,47 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 
 			// avg() - (sec or #num, time_shift) [float, int]
 			self::parameterSecNumPeriod_TestCases('avg', $valueTypesNum),
-			self::parameterTimeShift_TestCases('avg', $valueTypesNum, array('#1', ''), 1),
+			self::parameterTimeShift_TestCases('avg', $valueTypesNum, ['#1', ''], 1),
 
 			// band() - (sec or #num, mask, time_shift) [int]
-			self::parameterSecNumOffset_TestCases('band', $valueTypesInt, array('', '0')),
+			self::parameterSecNumOffset_TestCases('band', $valueTypesInt, ['', '0']),
 //			TODO Mask
-			self::parameterTimeShift_TestCases('band', $valueTypesInt, array('#1', '0', ''), 2),
+			self::parameterTimeShift_TestCases('band', $valueTypesInt, ['#1', '0', ''], 2),
 
 			// count() - (sec or #num, pattern, operator, time_shift) [float, int, str, text, log]
 			self::parameterSecNumPeriod_TestCases('count', $valueTypesAny),
 //			TODO Pattern
-			self::parameterOperator_TestCases('count', $valueTypesAny, array('#1', '', ''), 2),
-			self::parameterTimeShift_TestCases('count', $valueTypesAny, array('#1', '', '', ''), 3),
+			self::parameterOperator_TestCases('count', $valueTypesAny, ['#1', '', ''], 2),
+			self::parameterTimeShift_TestCases('count', $valueTypesAny, ['#1', '', '', ''], 3),
 
 			// delta() - (sec or #num, time_shift) [float, int]
 			self::parameterSecNumPeriod_TestCases('delta', $valueTypesNum),
-			self::parameterTimeShift_TestCases('delta', $valueTypesNum, array('#1', ''), 1),
+			self::parameterTimeShift_TestCases('delta', $valueTypesNum, ['#1', ''], 1),
 
 			// last() - (sec or #num, time_shift) [float, int, str, text, log]
 			self::parameterSecNumOffset_TestCases('last', $valueTypesAny),
-			self::parameterTimeShift_TestCases('last', $valueTypesAny, array('#1', ''), 1),
+			self::parameterTimeShift_TestCases('last', $valueTypesAny, ['#1', ''], 1),
 
 			// max() - (sec or #num, time_shift) [float, int]
 			self::parameterSecNumPeriod_TestCases('max', $valueTypesNum),
-			self::parameterTimeShift_TestCases('max', $valueTypesNum, array('#1', ''), 1),
+			self::parameterTimeShift_TestCases('max', $valueTypesNum, ['#1', ''], 1),
 
 			// min() - (sec or #num, time_shift) [float, int]
 			self::parameterSecNumPeriod_TestCases('min', $valueTypesNum),
-			self::parameterTimeShift_TestCases('min', $valueTypesNum, array('#1', ''), 1),
+			self::parameterTimeShift_TestCases('min', $valueTypesNum, ['#1', ''], 1),
 
 			// percentile() - (sec or #num, time_shift, float) [float, int]
-			self::parameterSecNumPeriod_TestCases('percentile', $valueTypesNum, array('#1', '', '50')),
-			self::parameterTimeShift_TestCases('percentile', $valueTypesNum, array('#1', '', '50'), 1),
-			self::parameterPercent_TestCases('percentile', $valueTypesNum, array('#1', '', '50'), 2),
+			self::parameterSecNumPeriod_TestCases('percentile', $valueTypesNum, ['#1', '', '50']),
+			self::parameterTimeShift_TestCases('percentile', $valueTypesNum, ['#1', '', '50'], 1),
+			self::parameterPercent_TestCases('percentile', $valueTypesNum, ['#1', '', '50'], 2),
 
 			// strlen() - (sec or #num, time_shift) [str, text, log]
 			self::parameterSecNumOffset_TestCases('strlen', $valueTypesStr),
-			self::parameterTimeShift_TestCases('strlen', $valueTypesStr, array('#1', ''), 1),
+			self::parameterTimeShift_TestCases('strlen', $valueTypesStr, ['#1', ''], 1),
 
 			// sum() - (sec or #num, time_shift) [float, int]
 			self::parameterSecNumPeriod_TestCases('sum', $valueTypesNum),
-			self::parameterTimeShift_TestCases('sum', $valueTypesNum, array('#1', ''), 1),
+			self::parameterTimeShift_TestCases('sum', $valueTypesNum, ['#1', ''], 1),
 
 			// fuzzytime() - (sec) [float, int]
 			self::parameterTimeShift_TestCases('fuzzytime', $valueTypesNum),
@@ -330,7 +330,7 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 
 			// iregexp() - (string, sec or #num) [str, text, log]
 			self::parameterString_TestCases('iregexp', $valueTypesStr),
-			self::parameterSecNumPeriod_TestCases('iregexp', $valueTypesStr, array('', ''), 1),
+			self::parameterSecNumPeriod_TestCases('iregexp', $valueTypesStr, ['', ''], 1),
 
 			// logeventid() - (string) [log]
 			self::parameterString_TestCases('logeventid', $valueTypesLog),
@@ -340,11 +340,11 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 
 			// regexp() - (string, sec or #num) [str, text, log]
 			self::parameterString_TestCases('regexp', $valueTypesStr),
-			self::parameterSecNumPeriod_TestCases('regexp', $valueTypesStr, array('', ''), 1),
+			self::parameterSecNumPeriod_TestCases('regexp', $valueTypesStr, ['', ''], 1),
 
 			// str() - (string, sec or #num) [str, text, log]
 			self::parameterString_TestCases('str', $valueTypesStr),
-			self::parameterSecNumPeriod_TestCases('str', $valueTypesStr, array('', ''), 1)
+			self::parameterSecNumPeriod_TestCases('str', $valueTypesStr, ['', ''], 1)
 		);
 	}
 
@@ -354,12 +354,12 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 	public function test_parse($functionName, $functionParamList, $valueType, $expectedResult) {
 		$triggerFunctionValidator = new CFunctionValidator();
 
-		$result = $triggerFunctionValidator->validate(array(
+		$result = $triggerFunctionValidator->validate([
 			'function' => '',
 			'functionName' => $functionName,
 			'functionParamList' => $functionParamList,
 			'valueType' => $valueType
-		));
+		]);
 
 		$this->assertSame($result, $expectedResult);
 	}

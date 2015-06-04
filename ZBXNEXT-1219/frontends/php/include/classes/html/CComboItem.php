@@ -61,7 +61,7 @@ class CComboItem extends CTag {
 			$this->removeAttribute('disabled');
 		}
 		else {
-			$this->attr('disabled', 'disabled');
+			$this->setAttribute('disabled', 'disabled');
 		}
 	}
 }

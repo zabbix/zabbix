@@ -26,11 +26,11 @@ class CControllerScriptList extends CController {
 	}
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'sort' =>		'in name,command',
 			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'uncheck' =>	'in 1'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -52,28 +52,31 @@ class CControllerScriptList extends CController {
 		CProfile::update('web.scripts.php.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.scripts.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-		$data = array(
+		$config = select_config();
+
+		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sortField,
 			'sortorder' => $sortOrder
-		);
+		];
 
 		// list of scripts
-		$data['scripts'] = API::Script()->get(array(
-			'output' => array('scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type',
+		$data['scripts'] = API::Script()->get([
+			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type',
 				'execute_on'
-			),
-			'editable' => true
-		));
+			],
+			'editable' => true,
+			'limit' => $config['search_limit'] + 1
+		]);
 
 		// sorting & paging
 		order_result($data['scripts'], $sortField, $sortOrder);
-		$data['paging'] = getPagingLine($data['scripts']);
+		$data['paging'] = getPagingLine($data['scripts'], $sortOrder);
 
 		// find script host group name and user group name. set to '' if all host/user groups used.
 
-		$usrgrpids = array();
-		$groupids = array();
+		$usrgrpids = [];
+		$groupids = [];
 
 		foreach ($data['scripts'] as &$script) {
 			$script['userGroupName'] = null; // all user groups
@@ -90,11 +93,11 @@ class CControllerScriptList extends CController {
 		unset($script);
 
 		if ($usrgrpids) {
-			$userGroups = API::UserGroup()->get(array(
-				'output' => array('name'),
+			$userGroups = API::UserGroup()->get([
+				'output' => ['name'],
 				'usrgrpids' => $usrgrpids,
 				'preservekeys' => true
-			));
+			]);
 
 			foreach ($data['scripts'] as &$script) {
 				if ($script['usrgrpid'] != 0 && array_key_exists($script['usrgrpid'], $userGroups)) {
@@ -106,11 +109,11 @@ class CControllerScriptList extends CController {
 		}
 
 		if ($groupids) {
-			$hostGroups = API::HostGroup()->get(array(
-				'output' => array('name'),
+			$hostGroups = API::HostGroup()->get([
+				'output' => ['name'],
 				'groupids' => $groupids,
 				'preservekeys' => true
-			));
+			]);
 
 			foreach ($data['scripts'] as &$script) {
 				if ($script['groupid'] != 0 && array_key_exists($script['groupid'], $hostGroups)) {

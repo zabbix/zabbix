@@ -33,27 +33,27 @@ $filterForm->addVar('hostid', $filter['hostId']);
 $column = new CFormList();
 
 // trigger status
-$column->addRow(_('Triggers status'), new CComboBox('show_triggers', $filter['showTriggers'], null, array(
+$column->addRow(_('Triggers status'), new CComboBox('show_triggers', $filter['showTriggers'], null, [
 	TRIGGERS_OPTION_ALL => _('Any'),
 	TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problem'),
 	TRIGGERS_OPTION_IN_PROBLEM => _('Problem')
-)));
+]));
 
 // ack status
 if ($config['event_ack_enable']) {
-	$column->addRow(_('Acknowledge status'), new CComboBox('ack_status', $filter['ackStatus'], null, array(
+	$column->addRow(_('Acknowledge status'), new CComboBox('ack_status', $filter['ackStatus'], null, [
 		ZBX_ACK_STS_ANY => _('Any'),
 		ZBX_ACK_STS_WITH_UNACK => _('With unacknowledged events'),
 		ZBX_ACK_STS_WITH_LAST_UNACK => _('With last event unacknowledged')
-	)));
+	]));
 }
 
 // events
 if (!$overview) {
-	$eventsComboBox = new CComboBox('show_events', $filter['showEvents'], null, array(
+	$eventsComboBox = new CComboBox('show_events', $filter['showEvents'], null, [
 		EVENTS_OPTION_NOEVENT => _('Hide all'),
 		EVENTS_OPTION_ALL => _n('Show all (%1$s day)', 'Show all (%1$s days)', $config['event_expire'])
-	));
+	]);
 	if ($config['event_ack_enable']) {
 		$eventsComboBox->addItem(EVENTS_OPTION_NOT_ACK,
 			_n('Show unacknowledged (%1$s day)', 'Show unacknowledged (%1$s days)', $config['event_expire'])
@@ -63,7 +63,7 @@ if (!$overview) {
 }
 
 // min severity
-$severityNames = array();
+$severityNames = [];
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$severityNames[] = getSeverityName($severity, $config);
 }
@@ -85,29 +85,30 @@ $statusChangeCheckBox->addStyle('vertical-align: middle;');
 
 $daysSpan = new CSpan(_('days'));
 $daysSpan->addStyle('vertical-align: middle;');
-$column->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan));
+$column->addRow(_('Age less than'), [$statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan]);
 
 // name
 $column->addRow(_('Filter by name'), new CTextBox('txt_select', $filter['txtSelect'], 40));
 
 // application
-$column->addRow(_('Filter by application'), array(
+$column->addRow(_('Filter by application'), [
 	new CTextBox('application', $filter['application'], 40),
+
 	new CButton('application_name', _('Select'),
 		'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1'.
 		'&dstfrm=zbx_filter");',
-		'button-form'
+		ZBX_STYLE_BTN_GREY
 	)
-));
+]);
 
 // inventory filter
 $inventoryFilters = $filter['inventory'];
 if (!$inventoryFilters) {
-	$inventoryFilters = array(
-		array('field' => '', 'value' => '')
-	);
+	$inventoryFilters = [
+		['field' => '', 'value' => '']
+	];
 }
-$inventoryFields = array();
+$inventoryFields = [];
 foreach (getHostInventories() as $inventory) {
 	$inventoryFields[$inventory['db_field']] = $inventory['title'];
 }
@@ -116,16 +117,16 @@ $inventoryFilterTable = new CTable();
 $inventoryFilterTable->setAttribute('id', 'inventory-filter');
 $i = 0;
 foreach ($inventoryFilters as $field) {
-	$inventoryFilterTable->addRow(array(
+	$inventoryFilterTable->addRow([
 		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventoryFields),
 		new CTextBox('inventory['.$i.'][value]', $field['value'], 20),
-		new CButton('inventory['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')
-	), 'form_row');
+		new CButton('inventory['.$i.'][remove]', _('Remove'), null, 'element-table-remove')
+	], 'form_row');
 
 	$i++;
 }
 $inventoryFilterTable->addRow(
-	new CCol(new CButton('inventory_add', _('Add'), null, 'link_menu element-table-add'), null, 3)
+	(new CCol(new CButton('inventory_add', _('Add'), null, 'element-table-add')))->setColSpan(2)
 );
 $column->addRow(_('Filter by host inventory'), $inventoryFilterTable);
 

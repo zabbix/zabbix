@@ -39,7 +39,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 		$this->assertElementPresent('btn1');
 		$this->assertElementPresent('filter');
 		$this->assertElementPresent('filter_rst');
-		$this->zbxTestTextPresent(array('Time', 'Type', 'Status', 'Retries left', 'Recipient(s)', 'Message', 'Error'));
+		$this->zbxTestTextPresent(['Time', 'Type', 'Status', 'Retries left', 'Recipient(s)', 'Message', 'Error']);
 
 	}
 
@@ -89,7 +89,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 			$retries = $auditactions['retries'];
 		}
 
-		$this->zbxTestTextPresent(array($today, $type['description'], $status, $retries, $auditactions['sendto'], $auditactions['subject'], $auditactions['message'], $auditactions['error']));
+		$this->zbxTestTextPresent([$today, $type['description'], $status, $retries, $auditactions['sendto'], $auditactions['subject'], $auditactions['message'], $auditactions['error']]);
 
 		// checking that there are no records in the report for 'guest' user
 		$this->zbxTestClick('flicker_icon_l');
