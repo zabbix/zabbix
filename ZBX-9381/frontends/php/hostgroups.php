@@ -395,10 +395,11 @@ else {
 
 	$groups = API::HostGroup()->get(array(
 		'editable' => true,
-		'output' => array('groupid'),
+		'output' => array('groupid', $sortfield),
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
 	));
+	order_result($groups, $sortfield, $sortorder);
 
 	$data['paging'] = getPagingLine($groups, array('groupid'));
 

@@ -368,7 +368,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 			0,
 			MSG_ZABBIX_MESSAGE,
 			NULL,
-			sizeof(*strings)-1,
+			sizeof(strings) / sizeof(*strings),
 			0,
 			strings,
 			NULL);

@@ -86,35 +86,31 @@ $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIG
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 $_REQUEST['go'] = get_request('go', 'none');
 
-// validate permissions
-$triggerIds = getRequest('g_triggerid', array());
-if (!is_array($triggerIds)) {
-	$triggerIds = zbx_toArray($triggerIds);
-}
-if (!zbx_empty(getRequest('triggerid'))) {
-	$triggerIds[] = getRequest('triggerid');
-}
+// Validate permissions to single trigger.
+$triggerId = getRequest('triggerid');
 
-if ($triggerIds) {
-	$triggers = API::Trigger()->get(array(
+if ($triggerId !== null) {
+	$trigger = API::Trigger()->get(array(
+		'triggerids' => array($triggerId),
 		'output' => array('triggerid'),
-		'triggerids' => array_keys(array_flip($triggerIds)),
-		'preservekeys' => true,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'editable' => true
 	));
 
-	if ($triggers) {
-		foreach ($triggerIds as $triggerId) {
-			if (!isset($triggers[$triggerId])) {
-				access_deny();
-			}
-		}
-	}
-	else {
+	if (!$trigger) {
 		access_deny();
 	}
 }
+
+// Validate permissions to a group of triggers for mass enable/disable actions.
+$triggerIds = getRequest('g_triggerid', array());
+$triggerIds = zbx_toArray($triggerIds);
+
+if ($triggerIds && !API::Trigger()->isWritable($triggerIds)) {
+	access_deny();
+}
+
+// Validate permissions to host.
 if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
 	access_deny();
 }
@@ -378,13 +374,22 @@ else {
 
 	// get triggers
 	$sortfield = getPageSortField('description');
+	$sortorder = getPageSortOrder();
+
 	if ($data['pageFilter']->hostsSelected) {
 		$options = array(
 			'editable' => true,
-			'output' => array('triggerid'),
 			'sortfield' => $sortfield,
 			'limit' => $config['search_limit'] + 1
 		);
+
+		if ($sortfield === 'status') {
+			$options['output'] = array('triggerid', 'status', 'state');
+		}
+		else {
+			$options['output'] = array('triggerid', $sortfield);
+		}
+
 		if (empty($data['showdisabled'])) {
 			$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 		}
@@ -399,7 +404,14 @@ else {
 
 	$_REQUEST['hostid'] = get_request('hostid', $data['pageFilter']->hostid);
 
-	// paging
+	// sort for paging
+	if ($sortfield === 'status') {
+		orderTriggersByStatus($data['triggers'], $sortorder);
+	}
+	else {
+		order_result($data['triggers'], $sortfield, $sortorder);
+	}
+
 	$data['paging'] = getPagingLine($data['triggers'], array('triggerid'), array('hostid' => $_REQUEST['hostid']));
 
 	$data['triggers'] = API::Trigger()->get(array(
@@ -412,11 +424,12 @@ else {
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND
 	));
 
+	// sort for displaying full results
 	if ($sortfield === 'status') {
-		orderTriggersByStatus($data['triggers'], getPageSortOrder());
+		orderTriggersByStatus($data['triggers'], $sortorder);
 	}
 	else {
-		order_result($data['triggers'], $sortfield, getPageSortOrder());
+		order_result($data['triggers'], $sortfield, $sortorder);
 	}
 
 	// get real hosts
