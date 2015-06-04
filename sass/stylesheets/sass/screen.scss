@@ -787,7 +787,7 @@ footer {
 		padding: 0 10px 0px 10px;
 	}
 
-	.list-table {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+	.list-table {                                       
 		margin-bottom: -10px;
 		@include box-shadow(none);
 
@@ -1023,14 +1023,6 @@ footer {
 	left: 28px;
 	height: 24px;
 	margin: 5px 0;
-
-	.arrow-left {
-		border-right-color: $font-alt-color;
-	}
-
-	.arrow-right {
-		border-left-color: $font-alt-color;
-	}
 }
 
 .bar {
@@ -1044,16 +1036,24 @@ footer {
 .icon {
 	position: relative;
 	height: 22px;
-	background-color: $btn-form-bg-color;
+	background-color: $form-bg-color;
+	border-color: $form-border-color;
 	cursor: move;
 	@include border-radius(2px);
+	@include transition(background-color .2s ease-out);
 
 	&:hover {
 		background-color: $ui-hover-color;
 	}
 
+	&:focus {
+		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
+	}
+
 	&:active {
-		background-color: darken($ui-hover-color, 5%);
+		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
 	}
 
 	.center {
