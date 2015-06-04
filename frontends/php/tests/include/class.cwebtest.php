@@ -35,7 +35,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 	protected $screenshotUrl = 'http://192.168.3.32/~hudson/screenshots';
 
 	// List of strings that should NOT appear on any page
-	public $failIfExists = array (
+	public $failIfExists = [
 		'pg_query',
 		'Error in',
 		'expects parameter',
@@ -58,10 +58,10 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		'Try to read inaccessible property',
 		'Illegal string offset',
 		'must be an array'
-	);
+	];
 
 	// List of strings that SHOULD appear on every page
-	public $failIfNotExists = array (
+	public $failIfNotExists = [
 		'Help',
 		'Get support',
 		'Print',
@@ -69,7 +69,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		'Logout',
 		'Connected',
 		'Admin'
-	);
+	];
 
 	protected function setUp() {
 		global $DB;
@@ -114,7 +114,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		if (isset($url)) {
 			$this->zbxTestOpenWait($url);
 		}
-		$this->zbxTestTextPresent(array($ZBX_SERVER_NAME, 'Admin'));
+		$this->zbxTestTextPresent([$ZBX_SERVER_NAME, 'Admin']);
 		$this->zbxTestTextNotPresent('Login name or password is incorrect');
 	}
 
@@ -146,7 +146,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	public function zbxTestTextPresent($strings) {
 		if (!is_array($strings)) {
-			$strings = array($strings);
+			$strings = [$strings];
 		}
 		foreach ($strings as $string) {
 			$this->assertTextPresent('exact:'.$string, 'Chuck Norris: I expect string "'.$string.'" here');
@@ -155,7 +155,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	public function zbxTestTextNotPresent($strings) {
 		if (!is_array($strings)) {
-			$strings = array($strings);
+			$strings = [$strings];
 		}
 		foreach ($strings as $string) {
 			$this->assertTextNotPresent($string, "Chuck Norris: I do not expect string '$string' here");
@@ -254,12 +254,12 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	public function zbxGetDropDownElements($dropdownId) {
 		$optionCount = $this->getXpathCount('//*[@id="'.$dropdownId.'"]/option');
-		$optionList = array();
+		$optionList = [];
 		for ($i = 1; $i <= $optionCount; $i++) {
-			$optionList[] = array(
+			$optionList[] = [
 				'id' => $this->getAttribute('//*[@id="'.$dropdownId.'"]/option['.$i.']@value'),
 				'content' => $this->getText('//*[@id="'.$dropdownId.'"]/option['.$i.']')
-			);
+			];
 		}
 		return $optionList;
 	}

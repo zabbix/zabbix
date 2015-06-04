@@ -27,7 +27,7 @@ class CAreaMap extends CTag {
 	}
 
 	public function addRectArea($x1, $y1, $x2, $y2, $href, $alt) {
-		return $this->addArea(array($x1, $y1, $x2, $y2), $href, $alt, 'rect');
+		return $this->addArea([$x1, $y1, $x2, $y2], $href, $alt, 'rect');
 	}
 
 	public function addArea($coords, $href, $alt, $shape) {

@@ -24,31 +24,31 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 
 $page['title'] = _('Period');
 $page['file'] = 'popup_period.php';
-$page['scripts'] = array('class.calendar.js');
+$page['scripts'] = ['class.calendar.js'];
 
 define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'dstfrm'=>			array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,			null),
-		'config'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1,2,3'),		NULL),
+	$fields=[
+		'dstfrm'=>			[T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,			null],
+		'config'=>			[T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1,2,3'),		NULL],
 
-		'period_id'=>			array(T_ZBX_INT, O_OPT,  null,	null,			null),
-		'caption'=>				array(T_ZBX_STR, O_OPT,  null,	null,			null),
-		'report_timesince'=>	array(T_ZBX_STR, O_OPT,  null,	null,		'isset({add}) || isset({update})'),
-		'report_timetill'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({add}) || isset({update})'),
+		'period_id'=>			[T_ZBX_INT, O_OPT,  null,	null,			null],
+		'caption'=>				[T_ZBX_STR, O_OPT,  null,	null,			null],
+		'report_timesince'=>	[T_ZBX_STR, O_OPT,  null,	null,		'isset({add}) || isset({update})'],
+		'report_timetill'=>		[T_ZBX_STR, O_OPT,  null,	null,		'isset({add}) || isset({update})'],
 
-		'color'=>				array(T_ZBX_CLR, O_OPT,  null,	null,		'isset({add}) || isset({update})'),
+		'color'=>				[T_ZBX_CLR, O_OPT,  null,	null,		'isset({add}) || isset({update})'],
 
 /* actions */
-		'add'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'update'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'add'=>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+		'update'=>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 /* other */
-		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		'form_refresh'=>	array(T_ZBX_INT, O_OPT, null,	null,	null)
-	);
+		'form'=>			[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
+		'form_refresh'=>	[T_ZBX_INT, O_OPT, null,	null,	null]
+	];
 
 	check_fields($fields);
 
@@ -114,12 +114,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 
 		$frmPd->addRow(
-			array(
+			[
 				new CVisibilityBox('caption_visible', hasRequest('caption') && $caption != $autoCaption, 'caption',
 					_('Default')
 				),
 				_('Caption')
-			),
+			],
 			new CTextBox('caption', $caption, 42)
 		);
 

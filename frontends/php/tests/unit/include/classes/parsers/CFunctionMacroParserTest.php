@@ -28,39 +28,39 @@ class CFunctionMacroParserTest extends CParserTest {
 	}
 
 	public function validProvider() {
-		return array(
-			array('{host:item.func()}', 0, '{host:item.func()}', 18),
-			array('{host:item.func(0)}', 0, '{host:item.func(0)}', 19),
-			array('{host:item.func(0, param)}', 0, '{host:item.func(0, param)}', 26),
-			array('{host:item.func(0, "param")}', 0, '{host:item.func(0, "param")}', 28),
-			array('{host:item[0].func()}', 0, '{host:item[0].func()}', 21),
-			array('{host:item[0, param].func()}', 0, '{host:item[0, param].func()}', 28),
-			array('{host:item[, param].func()}', 0, '{host:item[, param].func()}', 27),
-			array('{host:item[0, "param"].func()}', 0, '{host:item[0, "param"].func()}', 30),
+		return [
+			['{host:item.func()}', 0, '{host:item.func()}', 18],
+			['{host:item.func(0)}', 0, '{host:item.func(0)}', 19],
+			['{host:item.func(0, param)}', 0, '{host:item.func(0, param)}', 26],
+			['{host:item.func(0, "param")}', 0, '{host:item.func(0, "param")}', 28],
+			['{host:item[0].func()}', 0, '{host:item[0].func()}', 21],
+			['{host:item[0, param].func()}', 0, '{host:item[0, param].func()}', 28],
+			['{host:item[, param].func()}', 0, '{host:item[, param].func()}', 27],
+			['{host:item[0, "param"].func()}', 0, '{host:item[0, "param"].func()}', 30],
 
-			array('{host:item.func()} = 0', 0, '{host:item.func()}', 18),
-			array('not {host:item.func()} = 0', 4, '{host:item.func()}', 18),
-		);
+			['{host:item.func()} = 0', 0, '{host:item.func()}', 18],
+			['not {host:item.func()} = 0', 4, '{host:item.func()}', 18],
+		];
 	}
 
 	public function invalidProvider() {
-		return array(
-			array('', 0,  0),
-			array('{}', 0,  1),
-			array('{host}', 0, 5),
-			array('{host:item}', 0, 10),
-			array('{host:item.func}', 0, 15),
-			array('{host:item.func(}', 0, 16),
-			array('{host:item.func()', 0, 17),
-			array('{host.item.func()}', 0, 15),
-		);
+		return [
+			['', 0,  0],
+			['{}', 0,  1],
+			['{host}', 0, 5],
+			['{host:item}', 0, 10],
+			['{host:item.func}', 0, 15],
+			['{host:item.func(}', 0, 16],
+			['{host:item.func()', 0, 17],
+			['{host.item.func()}', 0, 15],
+		];
 	}
 
 	public function testParseExpressionProvider() {
-		return array(
-			array(
+		return [
+			[
 				'{host:item[0, param1, "param2"].func(0, param1, "param2")}',
-				array(
+				[
 					'expression' => '{host:item[0, param1, "param2"].func(0, param1, "param2")}',
 					'pos' => 0,
 					'host' => 'host',
@@ -68,16 +68,16 @@ class CFunctionMacroParserTest extends CParserTest {
 					'function' => 'func(0, param1, "param2")',
 					'functionName' => 'func',
 					'functionParam' => '0, param1, "param2"',
-					'functionParamList' => array(
+					'functionParamList' => [
 						'0',
 						'param1',
 						'param2'
-					)
-				)
-			),
-			array(
+					]
+				]
+			],
+			[
 				'{host:item[0, param1, "param2"].func(, param1, "param2")}',
-				array(
+				[
 					'expression' => '{host:item[0, param1, "param2"].func(, param1, "param2")}',
 					'pos' => 0,
 					'host' => 'host',
@@ -85,14 +85,14 @@ class CFunctionMacroParserTest extends CParserTest {
 					'function' => 'func(, param1, "param2")',
 					'functionName' => 'func',
 					'functionParam' => ', param1, "param2"',
-					'functionParamList' => array(
+					'functionParamList' => [
 						'',
 						'param1',
 						'param2'
-					)
-				)
-			),
-		);
+					]
+				]
+			],
+		];
 	}
 
 

@@ -24,9 +24,9 @@ class CFormTable extends CForm {
 	private $align;
 	private $title;
 	private $tableclass = 'formtable';
-	protected $top_items = array();
-	protected $center_items = array();
-	protected $bottom_items = array();
+	protected $top_items = [];
+	protected $center_items = [];
+	protected $bottom_items = [];
 
 	public function __construct($title = null, $action = null, $method = null, $enctype = null, $form_variable = null) {
 		$method = is_null($method) ? 'post' : $method;
@@ -37,8 +37,9 @@ class CFormTable extends CForm {
 		$form_variable = is_null($form_variable) ? 'form' : $form_variable;
 		$this->addVar($form_variable, getRequest($form_variable, 1));
 
-		$this->bottom_items = new CCol(SPACE, 'form_row_last');
-		$this->bottom_items->setColSpan(2);
+		$this->bottom_items = (new CCol(SPACE))->
+			addClass('form_row_last')->
+			setColSpan(2);
 	}
 
 	public function setAction($value) {
@@ -57,8 +58,8 @@ class CFormTable extends CForm {
 		if (!is_string($value)) {
 			return $this->error('Incorrect value for setName "'.$value.'".');
 		}
-		$this->attr('name', $value);
-		$this->attr('id', zbx_formatDomId($value));
+		$this->setAttribute('name', $value);
+		$this->setAttribute('id', zbx_formatDomId($value));
 		return true;
 	}
 
@@ -77,8 +78,9 @@ class CFormTable extends CForm {
 		if (is_object($item1) && strtolower(get_class($item1)) === 'crow') {
 		}
 		elseif (is_object($item1) && strtolower(get_class($item1)) === 'ctable') {
-			$td = new CCol($item1, 'form_row_c');
-			$td->setColSpan(2);
+			$td = (new CCol($item1))->
+				addClass('form_row_c')->
+				setColSpan(2);
 			$item1 = new CRow($td);
 		}
 		else {
@@ -92,17 +94,15 @@ class CFormTable extends CForm {
 				$item2 = SPACE;
 			}
 
-			$item1 = new CRow(
-				array(
-					new CCol($item1, 'form_row_l'),
-					new CCol($item2, 'form_row_r')
-				),
-				$class
-			);
+			$item1 = (new CRow(
+				[
+					(new CCol($item1))->addClass('form_row_l'),
+					(new CCol($item2))->addClass('form_row_r')
+				]))->addClass($class);
 		}
 
-		if (!is_null($id)) {
-			$item1->attr('id', zbx_formatDomId($id));
+		if ($id !== null) {
+			$item1->setAttribute('id', zbx_formatDomId($id));
 		}
 		array_push($this->center_items, $item1);
 
@@ -116,8 +116,9 @@ class CFormTable extends CForm {
 		if (is_null($class)) {
 			$class = 'form_row_c';
 		}
-		$col = new CCol($value, $class);
-		$col->setColSpan(2);
+		$col = (new CCol($value))->
+			addClass($class)->
+			setColSpan(2);
 		array_push($this->center_items, new CRow($col));
 	}
 
@@ -136,15 +137,17 @@ class CFormTable extends CForm {
 
 	public function bodyToString() {
 		$res = parent::bodyToString();
-		$tbl = new CTable(null, $this->tableclass);
+		$tbl = new CTable();
+		$tbl->addClass($this->tableclass);
 		$tbl->setCellSpacing(0);
 		$tbl->setCellPadding(1);
 		$tbl->setAlign($this->align);
 
 		// add first row
 		if (!is_null($this->title)) {
-			$col = new CCol(null, 'form_row_first');
-			$col->setColSpan(2);
+			$col = (new CCol())->
+				addClass('form_row_first')->
+				setColSpan(2);
 
 			if (isset($this->title)) {
 				$col->addItem($this->title);

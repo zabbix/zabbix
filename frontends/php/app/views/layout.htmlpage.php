@@ -28,46 +28,46 @@ function local_generateHeader($data) {
 	header('Content-Type: text/html; charset=UTF-8');
 
 	// construct menu
-	$main_menu = array();
-	$sub_menus = array();
+	$main_menu = [];
+	$sub_menus = [];
 
 	zbx_construct_menu($main_menu, $sub_menus, $page, $data['controller']['action']);
 
-	$pageHeader = new CView('layout.htmlpage.header', array(
-		'javascript' => array(
+	$pageHeader = new CView('layout.htmlpage.header', [
+		'javascript' => [
 			'files' => $data['javascript']['files']
-		),
-		'page' => array(
+		],
+		'page' => [
 			'title' => $data['page']['title']
-		),
-		'user' => array(
+		],
+		'user' => [
 			'lang' => CWebUser::$data['lang'],
 			'theme' => CWebUser::$data['theme']
-		)
-	));
+		]
+	]);
 	echo $pageHeader->getOutput();
 
-	$pageTop = new CView('layout.htmlpage.top', array(
+	$pageTop = new CView('layout.htmlpage.top', [
 		'fullscreen' => $data['fullscreen'],
-		'user' => array(
+		'user' => [
 			'debug_mode' => CWebUser::$data['debug_mode'],
 			'is_guest' => CWebUser::isGuest()
-		)
-	));
+		]
+	]);
 	echo $pageTop->getOutput();
 
 	if ($data['fullscreen'] == 0) {
-		$pageMenu = new CView('layout.htmlpage.menu', array(
-			'menu' => array(
+		$pageMenu = new CView('layout.htmlpage.menu', [
+			'menu' => [
 				'main_menu' => $main_menu,
 				'sub_menus' => $sub_menus,
 				'selected' => $page['menu']
-			)
-		));
+			]
+		]);
 		echo $pageMenu->getOutput();
 	}
 
-	echo '<article>';
+	echo '<div class="'.ZBX_STYLE_ARTICLE.'">';
 
 	// should be replaced with addPostJS() at some point
 	zbx_add_post_js('initMessages({});');
@@ -93,13 +93,13 @@ function local_generateHeader($data) {
 }
 
 function local_generateFooter($fullscreen) {
-	$pageFooter = new CView('layout.htmlpage.footer', array(
+	$pageFooter = new CView('layout.htmlpage.footer', [
 		'fullscreen' => $fullscreen,
-		'user' => array(
+		'user' => [
 			'alias' => CWebUser::$data['alias'],
 			'debug_mode' => CWebUser::$data['debug_mode']
-		)
-	));
+		]
+	]);
 	echo $pageFooter->getOutput();
 }
 

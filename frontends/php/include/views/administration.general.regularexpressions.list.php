@@ -22,20 +22,20 @@ $form = new CForm();
 $form->setName('regularExpressionsForm');
 
 $regExpTable = new CTableInfo();
-$regExpTable->setHeader(array(
-	new CColHeader(
-		new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');"),
-		'cell-width'),
+$regExpTable->setHeader([
+	(new CColHeader(
+		new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');")))->
+		addClass('cell-width'),
 	_('Name'),
 	_('Expressions')
-));
+]);
 
 $regExpWidget = (new CWidget())->setTitle(_('Regular expressions'));
 
 $controls = new CList();
 $controls->addItem(new CComboBox('configDropDown', 'adm.regexps.php',
 	'redirect(this.options[this.selectedIndex].value);',
-	array(
+	[
 		'adm.gui.php' => _('GUI'),
 		'adm.housekeeper.php' => _('Housekeeping'),
 		'adm.images.php' => _('Images'),
@@ -47,7 +47,7 @@ $controls->addItem(new CComboBox('configDropDown', 'adm.regexps.php',
 		'adm.triggerseverities.php' => _('Trigger severities'),
 		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 		'adm.other.php' => _('Other')
-	)
+	]
 ));
 $controls->addItem(new CSubmit('form', _('New regular expression')));
 
@@ -57,8 +57,8 @@ $regExpForm->cleanItems();
 $regExpForm->addItem($controls);
 $regExpWidget->setControls($regExpForm);
 
-$expressions = array();
-$values = array();
+$expressions = [];
+$values = [];
 foreach($data['db_exps'] as $exp) {
 	if (!isset($expressions[$exp['regexpid']])) {
 		$values[$exp['regexpid']] = 1;
@@ -79,20 +79,20 @@ foreach($data['db_exps'] as $exp) {
 	]);
 }
 foreach($data['regexps'] as $regexpid => $regexp) {
-	$regExpTable->addRow(array(
+	$regExpTable->addRow([
 		new CCheckBox('regexpids['.$regexp['regexpid'].']', null, null, $regexp['regexpid']),
 		new CLink($regexp['name'], 'adm.regexps.php?form=update'.'&regexpid='.$regexp['regexpid']),
-		isset($expressions[$regexpid]) ? $expressions[$regexpid] : '-'
-	));
+		isset($expressions[$regexpid]) ? $expressions[$regexpid] : ''
+	]);
 }
 
 // append table to form
-$form->addItem(array(
+$form->addItem([
 	$regExpTable,
-	new CActionButtonList('action', 'regexpids', array(
-		'regexp.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected regular expressions?'))
-	))
-));
+	new CActionButtonList('action', 'regexpids', [
+		'regexp.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected regular expressions?')]
+	])
+]);
 
 // append form to widget
 $regExpWidget->addItem($form);

@@ -26,7 +26,7 @@
  */
 class CHost extends CHostGeneral {
 
-	protected $sortColumns = array('hostid', 'host', 'name', 'status');
+	protected $sortColumns = ['hostid', 'host', 'name', 'status'];
 
 	/**
 	 * Get host data.
@@ -61,21 +61,21 @@ class CHost extends CHostGeneral {
 	 *
 	 * @return array|boolean Host data as array or false if error
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sqlParts = array(
-			'select'	=> array('hosts' => 'h.hostid'),
-			'from'		=> array('hosts' => 'hosts h'),
-			'where'		=> array('flags' => 'h.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'),
-			'group'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['hosts' => 'h.hostid'],
+			'from'		=> ['hosts' => 'hosts h'],
+			'where'		=> ['flags' => 'h.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'],
+			'group'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'proxyids'					=> null,
@@ -134,7 +134,7 @@ class CHost extends CHostGeneral {
 			'sortorder'					=> '',
 			'limit'						=> null,
 			'limitSelects'				=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
@@ -403,13 +403,13 @@ class CHost extends CHostGeneral {
 			$sqlParts['where']['hii'] = 'h.hostid=hii.hostid';
 
 			zbx_db_search('host_inventory hii',
-				array(
+				[
 					'search' => $options['searchInventory'],
 					'startSearch' => $options['startSearch'],
 					'excludeSearch' => $options['excludeSearch'],
 					'searchWildcardsEnabled' => $options['searchWildcardsEnabled'],
 					'searchByAny' => $options['searchByAny']
-				),
+				],
 				$sqlParts
 			);
 		}
@@ -466,15 +466,15 @@ class CHost extends CHostGeneral {
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 
-		$hostDbfields = $update ? array('hostid' => null) : array('host' => null);
+		$hostDbfields = $update ? ['hostid' => null] : ['host' => null];
 
 		if ($update) {
-			$dbHosts = $this->get(array(
-				'output' => array('hostid', 'host', 'flags'),
+			$dbHosts = $this->get([
+				'output' => ['hostid', 'host', 'flags'],
 				'hostids' => zbx_objectValues($hosts, 'hostid'),
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			foreach ($hosts as $host) {
 				if (!isset($dbHosts[$host['hostid']])) {
@@ -485,7 +485,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 		else {
-			$groupIds = array();
+			$groupIds = [];
 
 			foreach ($hosts as $host) {
 				if (!isset($host['groups'])) {
@@ -495,12 +495,12 @@ class CHost extends CHostGeneral {
 			}
 
 			if ($groupIds) {
-				$dbGroups = API::HostGroup()->get(array(
-					'output' => array('groupid'),
+				$dbGroups = API::HostGroup()->get([
+					'output' => ['groupid'],
 					'groupids' => $groupIds,
 					'editable' => true,
 					'preservekeys' => true
-				));
+				]);
 			}
 		}
 
@@ -546,17 +546,17 @@ class CHost extends CHostGeneral {
 		$inventoryFields = getHostInventories();
 		$inventoryFields = zbx_objectValues($inventoryFields, 'db_field');
 
-		$statusValidator = new CLimitedSetValidator(array(
-			'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
+		$statusValidator = new CLimitedSetValidator([
+			'values' => [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED],
 			'messageInvalid' => _('Incorrect status for host "%1$s".')
-		));
+		]);
 
-		$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
-			'allowed' => array('hostid', 'status', 'inventory', 'description'),
+		$updateDiscoveredValidator = new CUpdateDiscoveredValidator([
+			'allowed' => ['hostid', 'status', 'inventory', 'description'],
 			'messageAllowedField' => _('Cannot update "%2$s" for a discovered host "%1$s".')
-		));
+		]);
 
-		$hostNames = array();
+		$hostNames = [];
 		foreach ($hosts as &$host) {
 			if ($update) {
 				$dbHost = $dbHosts[$host['hostid']];
@@ -639,7 +639,7 @@ class CHost extends CHostGeneral {
 
 		if ($update || $create) {
 			if (isset($hostNames['host']) || isset($hostNames['name'])) {
-				$filter = array();
+				$filter = [];
 				if (isset($hostNames['host'])) {
 					$filter['host'] = array_keys($hostNames['host']);
 				}
@@ -647,13 +647,13 @@ class CHost extends CHostGeneral {
 					$filter['name'] = array_keys($hostNames['name']);
 				}
 
-				$options = array(
-					'output' => array('hostid', 'host', 'name'),
+				$options = [
+					'output' => ['hostid', 'host', 'name'],
 					'filter' => $filter,
 					'searchByAny' => true,
 					'nopermissions' => true,
 					'preservekeys' => true
-				);
+				];
 
 				$hostsExists = $this->get($options);
 
@@ -714,28 +714,28 @@ class CHost extends CHostGeneral {
 	 */
 	public function create($hosts) {
 		$hosts = zbx_toArray($hosts);
-		$hostids = array();
+		$hostids = [];
 
 		$this->checkInput($hosts, __FUNCTION__);
 
 		foreach ($hosts as $host) {
-			$hostid = DB::insert('hosts', array($host));
+			$hostid = DB::insert('hosts', [$host]);
 			$hostids[] = $hostid = reset($hostid);
 
 			$host['hostid'] = $hostid;
 
 			// save groups
 			// groups must be added before calling massAdd() for permission validation to work
-			$groupsToAdd = array();
+			$groupsToAdd = [];
 			foreach ($host['groups'] as $group) {
-				$groupsToAdd[] = array(
+				$groupsToAdd[] = [
 					'hostid' => $hostid,
 					'groupid' => $group['groupid']
-				);
+				];
 			}
 			DB::insert('hosts_groups', $groupsToAdd);
 
-			$options = array();
+			$options = [];
 			$options['hosts'] = $host;
 
 			if (isset($host['templates']) && !is_null($host['templates'])) {
@@ -762,11 +762,11 @@ class CHost extends CHostGeneral {
 					? $host['inventory_mode']
 					: HOST_INVENTORY_MANUAL;
 
-				DB::insert('host_inventory', array($hostInventory), false);
+				DB::insert('host_inventory', [$hostInventory], false);
 			}
 		}
 
-		return array('hostids' => $hostids);
+		return ['hostids' => $hostids];
 	}
 
 	/**
@@ -796,7 +796,7 @@ class CHost extends CHostGeneral {
 		$this->checkInput($hosts, __FUNCTION__);
 
 		// fetch fields required to update host inventory
-		$inventories = array();
+		$inventories = [];
 		foreach ($hosts as $host) {
 			if (isset($host['inventory'])) {
 				$inventory = $host['inventory'];
@@ -805,10 +805,10 @@ class CHost extends CHostGeneral {
 				$inventories[] = $inventory;
 			}
 		}
-		$inventories = $this->extendObjects('host_inventory', $inventories, array('inventory_mode'));
+		$inventories = $this->extendObjects('host_inventory', $inventories, ['inventory_mode']);
 		$inventories = zbx_toHash($inventories, 'hostid');
 
-		$macros = array();
+		$macros = [];
 		foreach ($hosts as &$host) {
 			if (isset($host['macros'])) {
 				$macros[$host['hostid']] = $host['macros'];
@@ -844,7 +844,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		return array('hostids' => $hostids);
+		return ['hostids' => $hostids];
 	}
 
 	/**
@@ -862,7 +862,7 @@ class CHost extends CHostGeneral {
 	 * @return array
 	 */
 	public function massAdd(array $data) {
-		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : array();
+		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : [];
 		$hostIds = zbx_objectValues($hosts, 'hostid');
 
 		// check permissions
@@ -872,10 +872,10 @@ class CHost extends CHostGeneral {
 
 		// add new interfaces
 		if (!empty($data['interfaces'])) {
-			API::HostInterface()->massAdd(array(
+			API::HostInterface()->massAdd([
 				'hosts' => $data['hosts'],
 				'interfaces' => zbx_toArray($data['interfaces'])
-			));
+			]);
 		}
 
 		// rename the "templates" parameter to the common "templates_link"
@@ -884,7 +884,7 @@ class CHost extends CHostGeneral {
 			unset($data['templates']);
 		}
 
-		$data['templates'] = array();
+		$data['templates'] = [];
 
 		return parent::massAdd($data);
 	}
@@ -917,12 +917,12 @@ class CHost extends CHostGeneral {
 
 		sort($hostIds);
 
-		$dbHosts = $this->get(array(
+		$dbHosts = $this->get([
 			'hostids' => $hostIds,
 			'editable' => true,
-			'output' => array('hostid'),
+			'output' => ['hostid'],
 			'preservekeys' => true,
-		));
+		]);
 		foreach ($hosts as $host) {
 			if (!isset($dbHosts[$host['hostid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
@@ -954,24 +954,24 @@ class CHost extends CHostGeneral {
 
 			$curHost = reset($hosts);
 
-			$sameHostnameHost = $this->get(array(
-				'output' => array('hostid'),
-				'filter' => array('host' => $data['host']),
+			$sameHostnameHost = $this->get([
+				'output' => ['hostid'],
+				'filter' => ['host' => $data['host']],
 				'nopermissions' => true,
 				'limit' => 1
-			));
+			]);
 			$sameHostnameHost = reset($sameHostnameHost);
 			if ($sameHostnameHost && (bccomp($sameHostnameHost['hostid'], $curHost['hostid']) != 0)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%1$s" already exists.', $data['host']));
 			}
 
 			// can't add host with the same name as existing template
-			$sameHostnameTemplate = API::Template()->get(array(
-				'output' => array('templateid'),
-				'filter' => array('host' => $data['host']),
+			$sameHostnameTemplate = API::Template()->get([
+				'output' => ['templateid'],
+				'filter' => ['host' => $data['host']],
 				'nopermissions' => true,
 				'limit' => 1
-			));
+			]);
 			if ($sameHostnameTemplate) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%1$s" already exists.', $data['host']));
 			}
@@ -1012,7 +1012,7 @@ class CHost extends CHostGeneral {
 
 		if (isset($data['inventory_mode'])) {
 			if (!isset($updateInventory)) {
-				$updateInventory = array();
+				$updateInventory = [];
 			}
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
 		}
@@ -1025,10 +1025,10 @@ class CHost extends CHostGeneral {
 			$data['macros'], $data['inventory'], $data['inventory_mode'], $data['status']);
 
 		if (!zbx_empty($data)) {
-			DB::update('hosts', array(
+			DB::update('hosts', [
 				'values' => $data,
-				'where' => array('hostid' => $hostIds)
-			));
+				'where' => ['hostid' => $hostIds]
+			]);
 		}
 
 		if (isset($updateStatus)) {
@@ -1042,20 +1042,20 @@ class CHost extends CHostGeneral {
 			$templateIdsClear = zbx_objectValues($updateTemplatesClear, 'templateid');
 
 			if ($updateTemplatesClear) {
-				$this->massRemove(array('hostids' => $hostIds, 'templateids_clear' => $templateIdsClear));
+				$this->massRemove(['hostids' => $hostIds, 'templateids_clear' => $templateIdsClear]);
 			}
 		}
 		else {
-			$templateIdsClear = array();
+			$templateIdsClear = [];
 		}
 
 		// unlink templates
 		if (isset($updateTemplates)) {
-			$hostTemplates = API::Template()->get(array(
+			$hostTemplates = API::Template()->get([
 				'hostids' => $hostIds,
-				'output' => array('templateid'),
+				'output' => ['templateid'],
 				'preservekeys' => true
-			));
+			]);
 
 			$hostTemplateids = array_keys($hostTemplates);
 			$newTemplateids = zbx_objectValues($updateTemplates, 'templateid');
@@ -1064,10 +1064,10 @@ class CHost extends CHostGeneral {
 			$templatesToDel = array_diff($templatesToDel, $templateIdsClear);
 
 			if ($templatesToDel) {
-				$result = $this->massRemove(array(
+				$result = $this->massRemove([
 					'hostids' => $hostIds,
 					'templateids' => $templatesToDel
-				));
+				]);
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot unlink template'));
 				}
@@ -1079,19 +1079,19 @@ class CHost extends CHostGeneral {
 		 */
 		if (isset($updateInterfaces)) {
 			foreach($hostIds as $hostId) {
-				API::HostInterface()->replaceHostInterfaces(array(
+				API::HostInterface()->replaceHostInterfaces([
 					'hostid' => $hostId,
 					'interfaces' => $updateInterfaces
-				));
+				]);
 			}
 		}
 
 		// link new templates
 		if (isset($updateTemplates)) {
-			$result = $this->massAdd(array(
+			$result = $this->massAdd([
 				'hosts' => $hosts,
 				'templates' => $updateTemplates
-			));
+			]);
 
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot link template'));
@@ -1100,12 +1100,12 @@ class CHost extends CHostGeneral {
 
 		// macros
 		if (isset($updateMacros)) {
-			DB::delete('hostmacro', array('hostid' => $hostIds));
+			DB::delete('hostmacro', ['hostid' => $hostIds]);
 
-			$this->massAdd(array(
+			$this->massAdd([
 				'hosts' => $hosts,
 				'macros' => $updateMacros
-			));
+			]);
 		}
 
 		/*
@@ -1128,7 +1128,7 @@ class CHost extends CHostGeneral {
 				), 'hostid');
 
 				// check existing host inventory data
-				$automaticHostIds = array();
+				$automaticHostIds = [];
 				if ($updateInventory['inventory_mode'] === null) {
 					foreach ($hostIds as $hostId) {
 						// if inventory is disabled for one of the updated hosts, throw an exception
@@ -1145,7 +1145,7 @@ class CHost extends CHostGeneral {
 					}
 				}
 
-				$inventoriesToSave = array();
+				$inventoriesToSave = [];
 				foreach ($hostIds as $hostId) {
 					$hostInventory = $updateInventory;
 					$hostInventory['hostid'] = $hostId;
@@ -1162,11 +1162,11 @@ class CHost extends CHostGeneral {
 				if ($updateInventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC
 						|| ($updateInventory['inventory_mode'] === null && $automaticHostIds)) {
 
-					$itemsToInventories = API::item()->get(array(
-						'output' => array('inventory_link', 'hostid'),
+					$itemsToInventories = API::item()->get([
+						'output' => ['inventory_link', 'hostid'],
 						'hostids' => $automaticHostIds ? $automaticHostIds : $hostIds,
 						'nopermissions' => true
-					));
+					]);
 
 					$inventoryFields = getHostInventories();
 					foreach ($itemsToInventories as $hinv) {
@@ -1182,13 +1182,13 @@ class CHost extends CHostGeneral {
 				foreach ($inventoriesToSave as $inventory) {
 					$hostId = $inventory['hostid'];
 					if (isset($existingInventoriesDb[$hostId])) {
-						DB::update('host_inventory', array(
+						DB::update('host_inventory', [
 							'values' => $inventory,
-							'where' => array('hostid' => $hostId)
-						));
+							'where' => ['hostid' => $hostId]
+						]);
 					}
 					else {
-						DB::insert('host_inventory', array($inventory), false);
+						DB::insert('host_inventory', [$inventory], false);
 					}
 				}
 			}
@@ -1202,31 +1202,31 @@ class CHost extends CHostGeneral {
 		if (isset($updateGroups)) {
 			$updateGroups = zbx_toArray($updateGroups);
 
-			$hostGroups = API::HostGroup()->get(array(
-				'output' => array('groupid'),
+			$hostGroups = API::HostGroup()->get([
+				'output' => ['groupid'],
 				'hostids' => $hostIds
-			));
+			]);
 			$hostGroupIds = zbx_objectValues($hostGroups, 'groupid');
 			$newGroupIds = zbx_objectValues($updateGroups, 'groupid');
 
 			$groupsToAdd = array_diff($newGroupIds, $hostGroupIds);
 			if ($groupsToAdd) {
-				$this->massAdd(array(
+				$this->massAdd([
 					'hosts' => $hosts,
 					'groups' => zbx_toObject($groupsToAdd, 'groupid')
-				));
+				]);
 			}
 
 			$groupIdsToDelete = array_diff($hostGroupIds, $newGroupIds);
 			if ($groupIdsToDelete) {
-				$this->massRemove(array(
+				$this->massRemove([
 					'hostids' => $hostIds,
 					'groupids' => $groupIdsToDelete
-				));
+				]);
 			}
 		}
 
-		return array('hostids' => $inputHostIds);
+		return ['hostids' => $inputHostIds];
 	}
 
 	/**
@@ -1247,10 +1247,10 @@ class CHost extends CHostGeneral {
 		$this->checkPermissions($hostids);
 
 		if (isset($data['interfaces'])) {
-			$options = array(
+			$options = [
 				'hostids' => $hostids,
 				'interfaces' => zbx_toArray($data['interfaces'])
-			);
+			];
 			API::HostInterface()->massRemove($options);
 		}
 
@@ -1260,7 +1260,7 @@ class CHost extends CHostGeneral {
 			unset($data['templateids']);
 		}
 
-		$data['templateids'] = array();
+		$data['templateids'] = [];
 
 		return parent::massRemove($data);
 	}
@@ -1297,29 +1297,29 @@ class CHost extends CHostGeneral {
 		$this->validateDelete($hostIds, $nopermissions);
 
 		// delete the discovery rules first
-		$delRules = API::DiscoveryRule()->get(array(
-			'output' => array('itemid'),
+		$delRules = API::DiscoveryRule()->get([
+			'output' => ['itemid'],
 			'hostids' => $hostIds,
 			'nopermissions' => true,
 			'preservekeys' => true
-		));
+		]);
 		if ($delRules) {
 			API::DiscoveryRule()->delete(array_keys($delRules), true);
 		}
 
 		// delete the items
-		$delItems = API::Item()->get(array(
+		$delItems = API::Item()->get([
 			'templateids' => $hostIds,
-			'output' => array('itemid'),
+			'output' => ['itemid'],
 			'nopermissions' => true,
 			'preservekeys' => true
-		));
+		]);
 		if ($delItems) {
 			API::Item()->delete(array_keys($delItems), true);
 		}
 
 		// delete web tests
-		$delHttptests = array();
+		$delHttptests = [];
 		$dbHttptests = get_httptests_by_hostid($hostIds);
 		while ($dbHttptest = DBfetch($dbHttptests)) {
 			$delHttptests[$dbHttptest['httptestid']] = $dbHttptest['httptestid'];
@@ -1330,22 +1330,22 @@ class CHost extends CHostGeneral {
 
 
 		// delete screen items
-		DB::delete('screens_items', array(
+		DB::delete('screens_items', [
 			'resourceid' => $hostIds,
 			'resourcetype' => SCREEN_RESOURCE_HOST_TRIGGERS
-		));
+		]);
 
 		// delete host from maps
 		if (!empty($hostIds)) {
-			DB::delete('sysmaps_elements', array(
+			DB::delete('sysmaps_elements', [
 				'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 				'elementid' => $hostIds
-			));
+			]);
 		}
 
 		// disable actions
 		// actions from conditions
-		$actionids = array();
+		$actionids = [];
 		$sql = 'SELECT DISTINCT actionid'.
 				' FROM conditions'.
 				' WHERE conditiontype='.CONDITION_TYPE_HOST.
@@ -1366,22 +1366,22 @@ class CHost extends CHostGeneral {
 		}
 
 		if (!empty($actionids)) {
-			$update = array();
-			$update[] = array(
-				'values' => array('status' => ACTION_STATUS_DISABLED),
-				'where' => array('actionid' => $actionids)
-			);
+			$update = [];
+			$update[] = [
+				'values' => ['status' => ACTION_STATUS_DISABLED],
+				'where' => ['actionid' => $actionids]
+			];
 			DB::update('actions', $update);
 		}
 
 		// delete action conditions
-		DB::delete('conditions', array(
+		DB::delete('conditions', [
 			'conditiontype' => CONDITION_TYPE_HOST,
 			'value' => $hostIds
-		));
+		]);
 
 		// delete action operation commands
-		$operationids = array();
+		$operationids = [];
 		$sql = 'SELECT DISTINCT oh.operationid'.
 				' FROM opcommand_hst oh'.
 				' WHERE '.dbConditionInt('oh.hostid', $hostIds);
@@ -1390,12 +1390,12 @@ class CHost extends CHostGeneral {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
-		DB::delete('opcommand_hst', array(
+		DB::delete('opcommand_hst', [
 			'hostid' => $hostIds,
-		));
+		]);
 
 		// delete empty operations
-		$delOperationids = array();
+		$delOperationids = [];
 		$sql = 'SELECT DISTINCT o.operationid'.
 				' FROM operations o'.
 				' WHERE '.dbConditionInt('o.operationid', $operationids).
@@ -1405,27 +1405,27 @@ class CHost extends CHostGeneral {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
-		DB::delete('operations', array(
+		DB::delete('operations', [
 			'operationid' => $delOperationids,
-		));
+		]);
 
-		$hosts = API::Host()->get(array(
-			'output' => array(
+		$hosts = API::Host()->get([
+			'output' => [
 				'hostid',
 				'name'
-			),
+			],
 			'hostids' => $hostIds,
 			'nopermissions' => true
-		));
+		]);
 
 		// delete host inventory
-		DB::delete('host_inventory', array('hostid' => $hostIds));
+		DB::delete('host_inventory', ['hostid' => $hostIds]);
 
 		// delete host applications
-		DB::delete('applications', array('hostid' => $hostIds));
+		DB::delete('applications', ['hostid' => $hostIds]);
 
 		// delete host
-		DB::delete('hosts', array('hostid' => $hostIds));
+		DB::delete('hosts', ['hostid' => $hostIds]);
 
 		// TODO: remove info from API
 		foreach ($hosts as $host) {
@@ -1436,7 +1436,7 @@ class CHost extends CHostGeneral {
 		// remove Monitoring > Latest data toggle profile values related to given hosts
 		CProfile::delete('web.latest.toggle_other', $hostIds);
 
-		return array('hostids' => $hostIds);
+		return ['hostids' => $hostIds];
 	}
 
 	/**
@@ -1456,11 +1456,11 @@ class CHost extends CHostGeneral {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'hostids' => $ids,
 			'templated_hosts' => true,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -1482,12 +1482,12 @@ class CHost extends CHostGeneral {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'hostids' => $ids,
 			'editable' => true,
 			'templated_hosts' => true,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -1500,38 +1500,38 @@ class CHost extends CHostGeneral {
 		// adding inventories
 		if ($options['selectInventory'] !== null) {
 			$relationMap = $this->createRelationMap($result, 'hostid', 'hostid');
-			$inventory = API::getApiService()->select('host_inventory', array(
+			$inventory = API::getApiService()->select('host_inventory', [
 				'output' => $options['selectInventory'],
-				'filter' => array('hostid' => $hostids)
-			));
+				'filter' => ['hostid' => $hostids]
+			]);
 			$result = $relationMap->mapOne($result, zbx_toHash($inventory, 'hostid'), 'inventory');
 		}
 
 		// adding hostinterfaces
 		if ($options['selectInterfaces'] !== null) {
 			if ($options['selectInterfaces'] != API_OUTPUT_COUNT) {
-				$interfaces = API::HostInterface()->get(array(
-					'output' => $this->outputExtend($options['selectInterfaces'], array('hostid', 'interfaceid')),
+				$interfaces = API::HostInterface()->get([
+					'output' => $this->outputExtend($options['selectInterfaces'], ['hostid', 'interfaceid']),
 					'hostids' => $hostids,
 					'nopermissions' => true,
 					'preservekeys' => true
-				));
+				]);
 
 				// we need to order interfaces for proper linkage and viewing
 				order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
 
 				$relationMap = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
 
-				$interfaces = $this->unsetExtraFields($interfaces, array('hostid', 'interfaceid'), $options['selectInterfaces']);
+				$interfaces = $this->unsetExtraFields($interfaces, ['hostid', 'interfaceid'], $options['selectInterfaces']);
 				$result = $relationMap->mapMany($result, $interfaces, 'interfaces', $options['limitSelects']);
 			}
 			else {
-				$interfaces = API::HostInterface()->get(array(
+				$interfaces = API::HostInterface()->get([
 					'hostids' => $hostids,
 					'nopermissions' => true,
 					'countOutput' => true,
 					'groupCount' => true
-				));
+				]);
 
 				$interfaces = zbx_toHash($interfaces, 'hostid');
 				foreach ($result as $hostid => $host) {
@@ -1543,11 +1543,11 @@ class CHost extends CHostGeneral {
 		// adding screens
 		if ($options['selectScreens'] !== null) {
 			if ($options['selectScreens'] != API_OUTPUT_COUNT) {
-				$screens = API::TemplateScreen()->get(array(
-					'output' => $this->outputExtend($options['selectScreens'], array('hostid')),
+				$screens = API::TemplateScreen()->get([
+					'output' => $this->outputExtend($options['selectScreens'], ['hostid']),
 					'hostids' => $hostids,
 					'nopermissions' => true
-				));
+				]);
 				if (!is_null($options['limitSelects'])) {
 					order_result($screens, 'name');
 				}
@@ -1558,16 +1558,16 @@ class CHost extends CHostGeneral {
 					$relationMap->addRelation($screen['hostid'], $key);
 				}
 
-				$screens = $this->unsetExtraFields($screens, array('hostid'), $options['selectScreens']);
+				$screens = $this->unsetExtraFields($screens, ['hostid'], $options['selectScreens']);
 				$result = $relationMap->mapMany($result, $screens, 'screens', $options['limitSelects']);
 			}
 			else {
-				$screens = API::TemplateScreen()->get(array(
+				$screens = API::TemplateScreen()->get([
 					'hostids' => $hostids,
 					'nopermissions' => true,
 					'countOutput' => true,
 					'groupCount' => true
-				));
+				]);
 				$screens = zbx_toHash($screens, 'hostid');
 
 				foreach ($result as $hostid => $host) {
@@ -1587,24 +1587,24 @@ class CHost extends CHostGeneral {
 			));
 			$relationMap = $this->createRelationMap($discoveryRules, 'hostid', 'parent_itemid');
 
-			$discoveryRules = API::DiscoveryRule()->get(array(
+			$discoveryRules = API::DiscoveryRule()->get([
 				'output' => $options['selectDiscoveryRule'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
 		// adding host discovery
 		if ($options['selectHostDiscovery'] !== null) {
-			$hostDiscoveries = API::getApiService()->select('host_discovery', array(
-				'output' => $this->outputExtend($options['selectHostDiscovery'], array('hostid')),
-				'filter' => array('hostid' => $hostids),
+			$hostDiscoveries = API::getApiService()->select('host_discovery', [
+				'output' => $this->outputExtend($options['selectHostDiscovery'], ['hostid']),
+				'filter' => ['hostid' => $hostids],
 				'preservekeys' => true
-			));
+			]);
 			$relationMap = $this->createRelationMap($hostDiscoveries, 'hostid', 'hostid');
 
-			$hostDiscoveries = $this->unsetExtraFields($hostDiscoveries, array('hostid'),
+			$hostDiscoveries = $this->unsetExtraFields($hostDiscoveries, ['hostid'],
 				$options['selectHostDiscovery']
 			);
 			$result = $relationMap->mapOne($result, $hostDiscoveries, 'hostDiscovery');

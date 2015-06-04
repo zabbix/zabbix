@@ -24,7 +24,7 @@ $hostWidget = (new CWidget('host-list'))->setTitle(_('Hosts'));
 $frmForm = (new CForm('get'))->cleanItems();
 
 $frmForm->addItem((new CList())->
-	addItem(array(_('Group').SPACE, $data['pageFilter']->getGroupsCB()))->
+	addItem([_('Group').SPACE, $data['pageFilter']->getGroupsCB()])->
 	addItem(new CSubmit('form', _('Create host')))->
 	addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")'))
 );
@@ -53,10 +53,10 @@ $form = new CForm();
 $form->setName('hosts');
 
 $table = new CTableInfo();
-$table->setHeader(array(
-	new CColHeader(
-		new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');"),
-		'cell-width'),
+$table->setHeader([
+	(new CColHeader(
+		new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');")))->
+		addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
 	_('Applications'),
 	_('Items'),
@@ -68,34 +68,34 @@ $table->setHeader(array(
 	_('Templates'),
 	make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder']),
 	_('Availability')
-));
+]);
 
 $currentTime = time();
 
 foreach ($data['hosts'] as $host) {
 	$interface = reset($host['interfaces']);
 
-	$applications = array(new CLink(_('Applications'),
+	$applications = [new CLink(_('Applications'),
 		'applications.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
 		CViewHelper::showNum($host['applications'])
-	);
-	$items = array(new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$host['hostid']),
+	];
+	$items = [new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$host['hostid']),
 		CViewHelper::showNum($host['items'])
-	);
-	$triggers = array(new CLink(_('Triggers'), 'triggers.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+	];
+	$triggers = [new CLink(_('Triggers'), 'triggers.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
 		CViewHelper::showNum($host['triggers'])
-	);
-	$graphs = array(new CLink(_('Graphs'), 'graphs.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+	];
+	$graphs = [new CLink(_('Graphs'), 'graphs.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
 		CViewHelper::showNum($host['graphs'])
-	);
-	$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$host['hostid']),
+	];
+	$discoveries = [new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$host['hostid']),
 		CViewHelper::showNum($host['discoveries'])
-	);
-	$httpTests = array(new CLink(_('Web'), 'httpconf.php?&hostid='.$host['hostid']),
+	];
+	$httpTests = [new CLink(_('Web'), 'httpconf.php?&hostid='.$host['hostid']),
 		CViewHelper::showNum($host['httpTests'])
-	);
+	];
 
-	$description = array();
+	$description = [];
 
 	if (isset($data['proxies'][$host['proxy_hostid']])) {
 		$description[] = $data['proxies'][$host['proxy_hostid']]['host'].NAME_DELIMITER;
@@ -139,12 +139,12 @@ foreach ($data['hosts'] as $host) {
 	$status = new CLink($statusCaption, $statusUrl, ZBX_STYLE_LINK_ACTION.' '.$statusClass, $statusScript);
 
 	if (empty($host['parentTemplates'])) {
-		$hostTemplates = '-';
+		$hostTemplates = '';
 	}
 	else {
 		order_result($host['parentTemplates'], 'name');
 
-		$hostTemplates = array();
+		$hostTemplates = [];
 		$i = 0;
 
 		foreach ($host['parentTemplates'] as $template) {
@@ -156,11 +156,11 @@ foreach ($data['hosts'] as $host) {
 				break;
 			}
 
-			$caption = array(new CLink(
+			$caption = [new CLink(
 				CHtml::encode($template['name']),
 				'templates.php?form=update&templateid='.$template['templateid'],
 				ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY
-			));
+			)];
 
 			$parentTemplates = $data['templates'][$template['templateid']]['parentTemplates'];
 			if ($parentTemplates) {
@@ -187,9 +187,9 @@ foreach ($data['hosts'] as $host) {
 		}
 	}
 
-	$table->addRow(array(
+	$table->addRow([
 		new CCheckBox('hosts['.$host['hostid'].']', null, null, $host['hostid']),
-		new CCol($description, ZBX_STYLE_NOWRAP),
+		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		$applications,
 		$items,
 		$triggers,
@@ -197,25 +197,25 @@ foreach ($data['hosts'] as $host) {
 		$discoveries,
 		$httpTests,
 		$hostInterface,
-		new CCol($hostTemplates, 'wraptext'),
+		$hostTemplates,
 		$status,
 		getAvailabilityTable($host, $currentTime)
-	));
+	]);
 }
 
-$form->addItem(array(
+$form->addItem([
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'hosts',
-		array(
-			'host.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected hosts?')),
-			'host.massdisable' => array('name' => _('Disable'), 'confirm' =>  _('Disable selected hosts?')),
-			'host.export' => array('name' => _('Export')),
-			'host.massupdateform' => array('name' => _('Mass update')),
-			'host.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected hosts?'))
-		)
+		[
+			'host.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected hosts?')],
+			'host.massdisable' => ['name' => _('Disable'), 'confirm' =>  _('Disable selected hosts?')],
+			'host.export' => ['name' => _('Export')],
+			'host.massupdateform' => ['name' => _('Mass update')],
+			'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]
+		]
 	)
-));
+]);
 
 $hostWidget->addItem($form);
 

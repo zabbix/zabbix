@@ -24,14 +24,14 @@
  */
 class CLdapAuthValidator extends CValidator {
 
-	public $conf = array(
+	public $conf = [
 		'host' => null,
 		'port' => null,
 		'base_dn' => null,
 		'bind_dn' => null,
 		'bind_password' => null,
 		'search_attribute' => null
-	);
+	];
 
 	/**
 	 * Checks if the given user name and password are valid.

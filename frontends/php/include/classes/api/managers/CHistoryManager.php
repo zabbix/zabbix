@@ -34,7 +34,7 @@ class CHistoryManager {
 	 * @return array    an array with items IDs as keys and arrays of history objects as values
 	 */
 	public function getLast(array $items, $limit = 1, $period = null) {
-		$rs = array();
+		$rs = [];
 		foreach ($items as $item) {
 			$values = DBfetchArray(DBselect(
 				'SELECT *'.
@@ -61,13 +61,13 @@ class CHistoryManager {
 	 * @return string
 	 */
 	public static function getTableName($valueType) {
-		$tables = array(
+		$tables = [
 			ITEM_VALUE_TYPE_LOG => 'history_log',
 			ITEM_VALUE_TYPE_TEXT => 'history_text',
 			ITEM_VALUE_TYPE_STR => 'history_str',
 			ITEM_VALUE_TYPE_FLOAT => 'history',
 			ITEM_VALUE_TYPE_UINT64 => 'history_uint'
-		);
+		];
 
 		return $tables[$valueType];
 	}
