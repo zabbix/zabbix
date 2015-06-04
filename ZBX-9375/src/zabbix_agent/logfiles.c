@@ -31,6 +31,7 @@
 #define ZBX_SAME_FILE_ERROR	-1
 #define ZBX_SAME_FILE_NO	0
 #define ZBX_SAME_FILE_YES	1
+#define ZBX_SAME_FILE_RETRY	2
 
 /******************************************************************************
  *                                                                            *
@@ -474,6 +475,7 @@ static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
  * Return value: ZBX_SAME_FILE_NO - it is not the same file,                  *
  *               ZBX_SAME_FILE_YES - it could be the same file,               *
  *               ZBX_SAME_FILE_ERROR - error.                                 *
+ *               ZBX_SAME_FILE_RETRY - retry on the next check                *
  *                                                                            *
  * Comments: In some cases we can say that it IS NOT the same file.           *
  *           We can never say that it IS the same file and it has not been    *
@@ -514,7 +516,26 @@ static int	is_same_file(const struct st_logfile *old, const struct st_logfile *n
 
 	if (old->size == new->size && old->mtime < new->mtime)
 	{
-		/* File's mtime cannot increase without changing size unless manipulated. */
+		/* Depending on file system it's possible that stat() was called */
+		/* between mtime and file size update. In this situation we will */
+		/* get a file with the old size and a new mtime.                 */
+		/* On the first try we assume it's the same file, just its size  */
+		/* has not been changed yet.                                     */
+		/* If the size has not changed on the next check, then we assume */
+		/* that some tampering was done and to be safe we will treat it  */
+		/* as a different file.                                          */
+		if (0 == old->retry)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "the modification time of log file \"%s\" has been updated"
+					" without changing its size, try checking again later", old->filename);
+			ret = ZBX_SAME_FILE_RETRY;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "after changing modification time the size of log file \"%s\""
+					" still has not been updated, consider it to be a new file", old->filename);
+		}
+
 		goto out;
 	}
 
@@ -606,7 +627,7 @@ out:
  *       old2new[i][j] = '1' - the i-th old file COULD BE the j-th new file   *
  *                                                                            *
  ******************************************************************************/
-static int	setup_old2new(char *old2new, const struct st_logfile *old, int num_old,
+static int	setup_old2new(char *old2new, struct st_logfile *old, int num_old,
 		const struct st_logfile *new, int num_new, int use_ino, char **err_msg)
 {
 	int	i, j, rc;
@@ -618,12 +639,27 @@ static int	setup_old2new(char *old2new, const struct st_logfile *old, int num_ol
 		{
 			rc = is_same_file(old + i, new + j, use_ino, err_msg);
 
-			if (ZBX_SAME_FILE_NO == rc)
-				p[j] = '0';
-			else if (ZBX_SAME_FILE_YES == rc)
-				p[j] = '1';
-			else if (ZBX_SAME_FILE_ERROR == rc)
-				return FAIL;
+			switch (rc)
+			{
+				case ZBX_SAME_FILE_NO:
+					p[j] = '0';
+					break;
+				case ZBX_SAME_FILE_YES:
+					if (1 == old[i].retry)
+					{
+						zabbix_log(LOG_LEVEL_DEBUG, "the size of log file \"%s\" has been"
+								" updated since modification time change, consider"
+								" it to be the same file", old->filename);
+						old[i].retry = 0;
+					}
+					p[j] = '1';
+					break;
+				case ZBX_SAME_FILE_RETRY:
+					old[i].retry = 1;
+					/* break; is not missing here */
+				case ZBX_SAME_FILE_ERROR:
+					return FAIL;
+			}
 
 			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 			{
@@ -1083,6 +1119,7 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 #endif
 	(*logfiles)[i].size = (zbx_uint64_t)st->st_size;
 	(*logfiles)[i].processed_size = 0;
+	(*logfiles)[i].retry = 0;
 
 	++(*logfiles_num);
 out:
@@ -1772,7 +1809,7 @@ static int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, un
 	zbx_stat_t	buf;
 	zbx_uint64_t	l_size;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
 			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0);
 
 	if (0 != zbx_stat(filename, &buf))
@@ -1831,7 +1868,7 @@ static int	process_log(char *filename, zbx_uint64_t *lastlogsize, int *mtime, un
 		ret = FAIL;
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime: %d ret:%s",
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d ret:%s",
 			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0, zbx_result_string(ret));
 
 	return ret;

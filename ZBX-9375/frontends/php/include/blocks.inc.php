@@ -319,14 +319,15 @@ function make_system_status($filter) {
 		'skipDependent' => true,
 		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
 		'selectLastEvent' => array('eventid', 'acknowledged', 'objectid'),
-		'expandDescription' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
-		'output' => array('triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange'),
+		'output' => array('triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange',
+			'expression'
+		),
 		'selectHosts' => array('name'),
 		'selectGroups' => array('groupid'),
 		'preservekeys' => true
@@ -1301,6 +1302,8 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 	));
 
 	CArrayHelper::sort($triggers, array(array('field' => 'lastchange', 'order' => ZBX_SORT_DOWN)));
+
+	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 
 	foreach ($triggers as $trigger) {
 		// unknown triggers

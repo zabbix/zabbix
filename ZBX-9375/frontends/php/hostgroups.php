@@ -407,14 +407,14 @@ else {
 	);
 
 	$groups = API::HostGroup()->get(array(
-		'output' => array('groupid'),
+		'output' => array('groupid', $sortField),
 		'editable' => true,
 		'sortfield' => $sortField,
-		'sortorder' => $sortOrder,
 		'limit' => $config['search_limit'] + 1
 	));
+	order_result($groups, $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($groups);
+	$data['paging'] = getPagingLine($groups, $sortOrder);
 	$groupIds = zbx_objectValues($groups, 'groupid');
 
 	// get hosts and templates count

@@ -260,6 +260,8 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	$config = select_config();
+
 	$data = array(
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
@@ -269,7 +271,8 @@ else {
 	$data['scripts'] = API::Script()->get(array(
 		'output' => array('scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type', 'execute_on'),
 		'editable' => true,
-		'selectGroups' => API_OUTPUT_EXTEND
+		'selectGroups' => API_OUTPUT_EXTEND,
+		'limit' => $config['search_limit'] + 1
 	));
 
 	// find script host group name and user group name. set to '' if all host/user groups used.
@@ -298,7 +301,7 @@ else {
 
 	// sorting & paging
 	order_result($data['scripts'], $sortField, $sortOrder);
-	$data['paging'] = getPagingLine($data['scripts']);
+	$data['paging'] = getPagingLine($data['scripts'], $sortOrder);
 
 	// render view
 	$scriptView = new CView('administration.script.list', $data);

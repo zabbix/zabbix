@@ -318,7 +318,7 @@ else {
 	// get triggers
 	$options = array(
 		'editable' => true,
-		'output' => array('triggerid'),
+		'output' => array('triggerid', $sortField),
 		'discoveryids' => $data['parent_discoveryid'],
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
@@ -328,8 +328,10 @@ else {
 	}
 	$data['triggers'] = API::TriggerPrototype()->get($options);
 
+	order_result($data['triggers'], $sortField, $sortOrder);
+
 	// paging
-	$data['paging'] = getPagingLine($data['triggers']);
+	$data['paging'] = getPagingLine($data['triggers'], $sortOrder);
 
 	$data['triggers'] = API::TriggerPrototype()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
