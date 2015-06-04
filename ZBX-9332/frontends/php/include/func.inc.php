@@ -1776,7 +1776,13 @@ function getPagingLine(&$items, array $removeUrlParams = array(), array $urlPara
 
 	$searchLimit = '';
 	if ($config['search_limit'] < count($items)) {
-		array_pop($items);
+		if (getPageSortOrder() == ZBX_SORT_UP) {
+			array_pop($items);
+		}
+		else {
+			array_shift($items);
+		}
+
 		$searchLimit = '+';
 	}
 
