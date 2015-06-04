@@ -71,8 +71,8 @@ static char	*get_template_names(const zbx_vector_uint64_t *templateids)
 static void	DBget_screenitems_by_resource_types_ids(zbx_vector_uint64_t *screen_itemids, const zbx_uint64_t *types,
 		int types_num, const zbx_vector_uint64_t *resourceids)
 {
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct screenitemid from screens_items where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourcetype", types, types_num);
@@ -104,9 +104,8 @@ static void	DBget_screenitems_by_resource_types_ids(zbx_vector_uint64_t *screen_
 static void	DBget_profiles_by_source_idxs_values(zbx_vector_uint64_t *profileids, const char *source,
 		const char **idxs, int idxs_num, zbx_vector_uint64_t *value_ids)
 {
-
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct profileid from profiles where");
 
@@ -143,8 +142,8 @@ static void	DBget_profiles_by_source_idxs_values(zbx_vector_uint64_t *profileids
 static void	DBget_sysmapelements_by_element_type_ids(zbx_vector_uint64_t *selementids, int elementtype,
 		zbx_vector_uint64_t *elementids)
 {
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct selementid"
@@ -1176,7 +1175,7 @@ out:
  ******************************************************************************/
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 {
-	const char	*__function_name = "DBdelete_graphs";
+	const char		*__function_name = "DBdelete_graphs";
 
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
@@ -1327,14 +1326,14 @@ out:
  ******************************************************************************/
 void	DBdelete_items(zbx_vector_uint64_t *itemids)
 {
-	const char	*__function_name = "DBdelete_items";
+	const char		*__function_name = "DBdelete_items";
 
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset;
 	zbx_vector_uint64_t	screen_itemids, profileids;
-	int		num;
-	zbx_uint64_t	resource_types[] = {SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_SIMPLE_GRAPH};
-	const char	*profile_idx = "web.favorite.graphids";
+	int			num;
+	zbx_uint64_t		resource_types[] = {SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_SIMPLE_GRAPH};
+	const char		*profile_idx = "web.favorite.graphids";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, itemids->values_num);
 
