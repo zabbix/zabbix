@@ -344,8 +344,6 @@
 				var hostInterfaceTypeName = jQuery(this).data('type'),
 					hostInterfaceId = ui.draggable.data('interfaceid');
 
-					console.log(hostInterfaceTypeName);
-
 				ui.helper.remove();
 
 				if (getHostInterfaceNumericType(hostInterfaceTypeName) == <?= INTERFACE_TYPE_SNMP ?>) {
