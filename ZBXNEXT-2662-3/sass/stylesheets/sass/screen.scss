@@ -907,16 +907,6 @@ footer {
 			}
 		}
 	}
-
-	.disabled {
-		@include opacity(0.5);
-
-		.subfilter-disable-btn {
-			cursor: default;
-			color: lighten($ui-bg-selected-color, 10%);
-			background-color: $ui-bg-selected-color;
-		}
-	}
 }
 
 .multiselect-button {
@@ -1453,459 +1443,190 @@ button {
 
 	&:focus {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
-		//outline: thin dotted;
-		//outline-offset: -2px;
 	}
 
 	&:active {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
+}
 
-	&.btn-alt {
-		color: $btn-alt-font-color;
-		background-color: $btn-alt-bg-color;
-		@extend button;
+.btn-alt {
+	color: $btn-alt-font-color;
+	background-color: $btn-alt-bg-color;
 
-		&:hover {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:focus {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:active {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
+	&:hover {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
-	&.btn-link {
-		background-color: $transparent;
-		border: none;
-		color: $link-color;
-		font-size: inherit;
-		border-bottom: 1px dotted $link-color;
-		padding: 0!important;
-		min-height: inherit;
-		@include border-radius(0);
-
-		&:hover {
-			@extend .btn-link;
-		}
-
-		&:active {
-			@extend .btn-link;
-		}  
+	&:focus {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
-	//&.btn-remove {
-	//	background-color: $transparent;
-	//	border: none;
-	//	padding: 0;
-	//	min-height: inherit;
-	//	@extend %close-icon;
-
-	//	&:hover {
-	//		@extend .btn-remove;
-	//	}
-
-	//	&:active {
-	//		@extend .btn-remove;
-	//	}  
-	//}
-
-	&.btn-conf {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -145px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:focus {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:active {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-	}
-
-	&.btn-max {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -169px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:focus {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:active {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-	}
-
-	&.btn-min {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -193px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:focus {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:active {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-	}
-
-	&.btn-add-fav {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -1px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:focus {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:active {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-	}
-
-	&.btn-remove-fav {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -25px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:focus {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:active {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-	}
-
-	&.btn-action {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -49px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:focus {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:active {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-	}
-
-	&.btn-info {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -73px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:focus {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:active {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-	}
-
-	&.btn-reset {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -97px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:focus {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-
-		&:active {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		}
-	}
-
-
-	&.btn-search {
-		background: darken($main-color, 5%) url(../img/icon-sprite.png) no-repeat 1px -1px;
-		position: absolute;
-		border: none;
-		top: 7px;
-		right: 8px;
-		width: 24px;
-		min-height: 22px;
-		padding: 0;
-		@include opacity(0.75);
-		@include transition(opacity .2s ease-out);
-		
-		&:hover {
-			@extend %btn-search-hover-focus;
-		}
-
-		&:active {
-			@extend %btn-search-hover-focus;
-		}
-
-		&:focus {
-			@extend %btn-search-hover-focus;
-		}
-	}
-
-    &.btn-widget-action {
-    	border: 0;
-    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat 3px -262px;
-		@extend %button-widget-icon-size;
-		@include opacity(0.5);
-		@include transition(opacity .2s ease-out);
-
-		&:hover {
-			@extend %btn-widget-hover-active;
-		}
-
-		&:focus {
-			@include opacity(1);
-		}
-
-		&:active {
-			@extend %btn-widget-hover-active;
-		}
-    }
-
-    &.btn-widget-collapse {
-    	border: 0;
-    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat 2px -214px;
-		@extend %button-widget-icon-size;
-		@include opacity(0.5);
-		@include transition(opacity .2s ease-out);
-
-		&:hover {
-			@extend %btn-widget-hover-active;
-		}
-
-		&:focus {
-			@include opacity(1);
-		}
-
-		&:active {
-			@extend %btn-widget-hover-active;
-		}
-    }
-
-    &.btn-widget-expand {
-    	border: 0;
-    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat 2px -238px;
-		@extend %button-widget-icon-size;
-		@include opacity(0.5);
-		@include transition(opacity .2s ease-out);
-
-		&:hover {
-			@extend %btn-widget-hover-active;
-		}
-
-		&:focus {
-			@include opacity(1);
-		}
-
-		&:active {
-			@extend %btn-widget-hover-active;
-		}
-    }
-
-    &.btn-alarm-on {
-    	border: 0;
-    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat -45px -191px;
-		@extend %button-widget-icon-size;
-		@include opacity(0.5);
-		@include transition(opacity .2s ease-out);
-
-		&:hover {
-			@extend %btn-widget-hover-active;
-		}
-
-		&:focus {
-			@include opacity(1);
-		}
-
-		&:active {
-			@extend %btn-widget-hover-active;
-		}
-    }
-
-    &.btn-alarm-off {
-    	border: 0;
-    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat -45px -239px;
-		@extend %button-widget-icon-size;
-		@include opacity(0.5);
-		@include transition(opacity .2s ease-out);
-
-		&:hover {
-			@extend %btn-widget-hover-active;
-		}
-
-		&:focus {
-			@include opacity(1);
-		}
-
-		&:active {
-			@extend %btn-widget-hover-active;
-		}
-    }
-
-    &.btn-sound-on {
-    	border: 0;
-    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat -45px -216px;
-		@extend %button-widget-icon-size;
-		@include opacity(0.5);
-		@include transition(opacity .2s ease-out);
-
-		&:hover {
-			@extend %btn-widget-hover-active;
-		}
-
-		&:focus {
-			@include opacity(1);
-		}
-
-		&:active {
-			@extend %btn-widget-hover-active;
-		}
-    }
-
-     &.btn-sound-off {
-    	border: 0;
-    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat -45px -264px;
-		@extend %button-widget-icon-size;
-		@include opacity(0.5);
-		@include transition(opacity .2s ease-out);
-
-		&:hover {
-			@extend %btn-widget-hover-active;
-		}
-
-		&:focus {
-			@include opacity(1);
-		}
-
-		&:active {
-			@extend %btn-widget-hover-active;
-		}
-    } 
-
-	&.btn-grey {
-		color: $btn-form-font-color;
-		background-color: $btn-form-bg-color;
-		border-color: $btn-form-border-color;
-		vertical-align: top;
-
-		&:hover {
-			color: $btn-form-font-color;
-			background-color: $ui-hover-color;
-			border-color: $btn-form-border-color;
-		}
-
-		&:focus {
-			color: $btn-form-font-color;
-			background-color: $ui-hover-color;
-			border-color: $form-border-focus-color;
-		}
-
-		&:active {
-			color: $btn-form-font-color;
-			background-color: $ui-hover-color;
-		}
-
-		//.arrow-left {
-		//	border-right-color: $btn-form-font-color;
-
-		//}
-
-		//.arrow-right {
-		//	border-left-color: $btn-form-font-color;
-
-		//}
-	}
-
-	&.filter-trigger {
-		position: relative;
-		@include border-radius(2px 2px 0 0);
-		padding-right: 21px;
-		min-width: 94px;
-
-		&.filter-active {
-			background-color: $ui-bg-color;
-			border: none;
-			color: $link-color;
-			@include box-shadow(0 -1px 1px 0 rgba(118,141,153,0.08));
-
-			.arrow-up {
-				position: absolute;
-				top: 50%;
-				margin: 0 0 0 4px;
-				border-bottom-color: $link-color;
-			}
-		}
-
-		.arrow-down {
-			position: absolute;
-			top: 50%;
-			margin: 0 0 0 4px;
-			border-top-color: $white;
-		}
+	&:active {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 }
 
-//%button-hover-active {
-//	color: $btn-font-color;
-//	background-color: darken($btn-bg-color, 5%);
-//	border-color: darken($btn-bg-color, 5%);
-//}
+.btn-grey {
+	color: $btn-form-font-color;
+	background-color: $btn-form-bg-color;
+	border-color: $btn-form-border-color;
+	vertical-align: top;
 
-//%button-hover {
-//	color: $btn-hover-color;
-//	background-color: darken($btn-bg-color, 5%);
-//	border-color: darken($btn-bg-color, 5%);
-//}
+	&:hover {
+		color: $btn-form-font-color;
+		background-color: $ui-hover-color;
+		border-color: $btn-form-border-color;
+	}
 
-//%button-active {
-//	color: $btn-active-color;
-//	background-color: darken($btn-bg-color, 10%);
-//	border-color: darken($btn-bg-color, 10%);
-//}
+	&:focus {
+		color: $btn-form-font-color;
+		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
+	}
+
+	&:active {
+		color: $btn-form-font-color;
+		background-color: $ui-hover-color;
+	}
+}
+
+.btn-link {
+	background-color: $transparent;
+	border: none;
+	color: $link-color;
+	font-size: inherit;
+	border-bottom: 1px dotted $link-color;
+	padding: 0;
+	min-height: inherit;
+	@include border-radius(0);
+
+	&:hover {
+		@extend .btn-link;
+	}
+
+	&:focus {
+		@extend .btn-link;
+	}
+
+	&:active {
+		@extend .btn-link;
+	}
+}
+
+.btn-search {
+	background: darken($main-color, 5%) url(../img/icon-sprite.png) no-repeat 1px -1px;
+	position: absolute;
+	border: none;
+	top: 7px;
+	right: 8px;
+	width: 24px;
+	min-height: 22px;
+	padding: 0;
+	@include opacity(0.75);
+	@include transition(opacity .2s ease-out);
+
+	&:hover {
+		@extend %btn-search-hover-focus;
+	}
+
+	&:active {
+		@extend %btn-search-hover-focus;
+	}
+
+	&:focus {
+		@extend %btn-search-hover-focus;
+	}
+}
+
+.filter-trigger {
+	position: relative;
+	padding-right: 21px;
+	min-width: 94px;
+	@include border-radius(2px 2px 0 0);
+
+	&.filter-active {
+		color: $link-color;
+		background-color: $ui-bg-color;
+		border: none;
+		@include box-shadow(0 -1px 1px 0 rgba(118,141,153,0.08));
+
+		.arrow-up {
+			position: absolute;
+			top: 50%;
+			margin: 0 0 0 4px;
+			border-bottom-color: $link-color;
+		}
+	}
+
+	.arrow-down {
+		position: absolute;
+		top: 50%;
+		margin: 0 0 0 4px;
+		border-top-color: $white;
+	}
+}
+
+$icon-buttons: (
+	conf: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -145px,
+	max: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -169px,
+	min: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -193px,
+	add-fav: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -1px,
+	remove-fav: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -25px,
+	action: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -49px,
+	info: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -73px,
+	reset: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -97px
+
+);
+
+@each $icon-buttons, $bgimage in $icon-buttons {
+    .btn-#{$icon-buttons} {
+        background: $bgimage;
+    }
+}
+
+$icon-widget-buttons: (
+	widget-action: url(../img/icon-sprite.png) no-repeat 3px -262px,
+	widget-collapse: url(../img/icon-sprite.png) no-repeat 2px -214px,
+	widget-expand: url(../img/icon-sprite.png) no-repeat 2px -238px,
+	alarm-on: url(../img/icon-sprite.png) no-repeat -45px -191px,
+	alarm-off: url(../img/icon-sprite.png) no-repeat -45px -239px,
+	sound-on: url(../img/icon-sprite.png) no-repeat -45px -216px,
+	sound-off: url(../img/icon-sprite.png) no-repeat -45px -264px
+);
+
+@each $icon-widget-buttons, $bgimage in $icon-widget-buttons {
+    .btn-#{$icon-widget-buttons} {
+        background: $bgimage;
+        @extend %btn-widget;
+    }
+}
+
+%btn-widget {
+	border: none;
+	width: 30px;
+	height: 28px;
+	padding: 0;
+	background-color: $ui-bg-color;
+	@include opacity(0.5);
+	@include transition(opacity .2s ease-out);
+
+	&:hover {
+		@extend %btn-widget-hover-active;
+	}
+
+	&:focus {
+		@extend %btn-widget-hover-active;
+	}
+
+	&:active {
+		@extend %btn-widget-hover-active;
+	}
+}
 
 %button-icon-size {
 	width: 24px;
 	height: 24px;
-	padding: 0;
-}
-
-%button-widget-icon-size {
-	width: 30px;
-	height: 28px;
 	padding: 0;
 }
 
@@ -1920,6 +1641,16 @@ button {
 	color: $form-disabled-font-color;
 	background-color: $form-disabled-bg-color;
 	border-color: $form-disabled-border-color;
+}
+
+.disabled {
+	cursor: default !important;
+	@include opacity(0.5);
+
+	.subfilter-disable-btn {
+		color: lighten($ui-bg-selected-color, 10%);
+		background-color: $ui-bg-selected-color;
+	}
 }
 
 %btn-search-hover-focus {
